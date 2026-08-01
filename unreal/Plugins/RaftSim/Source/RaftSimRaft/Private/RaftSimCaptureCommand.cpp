@@ -11,6 +11,7 @@
 #include "Camera/CameraComponent.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Components/MeshComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
@@ -433,6 +434,45 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
     const float BackM = Args.Num() > 2 ? FCString::Atof(*Args[2]) : 8.0f;
     const float UpM = Args.Num() > 3 ? FCString::Atof(*Args[3]) : 4.0f;
     const float AheadM = Args.Num() > 4 ? FCString::Atof(*Args[4]) : 22.0f;
+    auto DiagnosticFloat = [&Args](const TCHAR* Prefix, float DefaultValue)
+    {
+        const FString PrefixString(Prefix);
+        for (int32 Index = 5; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].StartsWith(PrefixString, ESearchCase::IgnoreCase))
+            {
+                return FCString::Atof(*Args[Index].RightChop(PrefixString.Len()));
+            }
+        }
+        return DefaultValue;
+    };
+    auto HasDiagnosticMode = [&Args](const TCHAR* Mode)
+    {
+        for (int32 Index = 5; Index < Args.Num(); ++Index)
+        {
+            if (Args[Index].Equals(Mode, ESearchCase::IgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    };
+    const float WaterRoughnessDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterroughness="), -1.0f), -1.0f, 1.0f);
+    const float WaterSpecularDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterspecular="), -1.0f), -1.0f, 1.0f);
+    const float WaterNormalDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waternormal="), -1.0f), -1.0f, 1.5f);
+    const float WaterReflectionDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("waterreflection="), -1.0f), -1.0f, 1.0f);
+    const float WaterEmissiveDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("wateremissive="), -1.0f), -1.0f, 0.5f);
+    const float WaterVariationDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("watervariation="), -1.0f), -1.0f, 1.0f);
+    const float WaterOpacityDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("wateropacity="), -1.0f), -1.0f, 1.0f);
+    const bool bWaterInventoryDiagnostic =
+        HasDiagnosticMode(TEXT("waterinventory"));
     const FString OutPath =
         FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Screenshots"), Label + TEXT(".png"));
 
@@ -454,9 +494,89 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
     FTimerHandle ShotHandle;
     World->GetTimerManager().SetTimer(
         ShotHandle,
-        FTimerDelegate::CreateLambda([WeakWorld, OutPath, BackM, UpM, AheadM]()
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, OutPath, BackM, UpM, AheadM,
+             WaterRoughnessDiagnostic, WaterSpecularDiagnostic,
+             WaterNormalDiagnostic, WaterReflectionDiagnostic,
+             WaterEmissiveDiagnostic, WaterVariationDiagnostic,
+             WaterOpacityDiagnostic, bWaterInventoryDiagnostic]()
         {
             UWorld* W = WeakWorld.Get();
+            if (W != nullptr &&
+                (WaterRoughnessDiagnostic >= 0.0f ||
+                 WaterSpecularDiagnostic >= 0.0f ||
+                 WaterNormalDiagnostic >= 0.0f ||
+                 WaterReflectionDiagnostic >= 0.0f ||
+                 WaterEmissiveDiagnostic >= 0.0f ||
+                 WaterVariationDiagnostic >= 0.0f ||
+                 WaterOpacityDiagnostic >= 0.0f))
+            {
+                int32 OverrideComponentCount = 0;
+                const FName PhysicalWaterTag(TEXT("RaftSimPhysicalCorridorWater"));
+                for (TActorIterator<AActor> It(W); It; ++It)
+                {
+                    AActor* Actor = *It;
+                    if (!Actor || !Actor->ActorHasTag(PhysicalWaterTag))
+                    {
+                        continue;
+                    }
+                    TInlineComponentArray<UMeshComponent*> Components(Actor);
+                    for (UMeshComponent* Component : Components)
+                    {
+                        if (!Component || Component->GetNumMaterials() == 0)
+                        {
+                            continue;
+                        }
+                        UMaterialInstanceDynamic* Material =
+                            Component->CreateDynamicMaterialInstance(0);
+                        if (!Material)
+                        {
+                            continue;
+                        }
+                        auto SetIfRequested = [Material](
+                            const TCHAR* ParameterName, float Value)
+                        {
+                            if (Value >= 0.0f)
+                            {
+                                Material->SetScalarParameterValue(
+                                    ParameterName, Value);
+                            }
+                        };
+                        SetIfRequested(TEXT("Roughness"), WaterRoughnessDiagnostic);
+                        SetIfRequested(TEXT("Specular"), WaterSpecularDiagnostic);
+                        SetIfRequested(TEXT("NormalIntensity"), WaterNormalDiagnostic);
+                        SetIfRequested(
+                            TEXT("ReflectionFillIntensity"),
+                            WaterReflectionDiagnostic);
+                        SetIfRequested(
+                            TEXT("EmissiveFillScale"), WaterEmissiveDiagnostic);
+                        SetIfRequested(
+                            TEXT("SurfaceVariationStrength"),
+                            WaterVariationDiagnostic);
+                        SetIfRequested(TEXT("Opacity"), WaterOpacityDiagnostic);
+                        ++OverrideComponentCount;
+                    }
+                }
+                UE_LOG(
+                    LogTemp,
+                    Display,
+                    TEXT("RaftSim.CaptureRaft: physical-water diagnostic "
+                         "components=%d roughness=%.3f specular=%.3f "
+                         "normal=%.3f reflection=%.3f emissive=%.3f "
+                         "variation=%.3f opacity=%.3f"),
+                    OverrideComponentCount,
+                    WaterRoughnessDiagnostic,
+                    WaterSpecularDiagnostic,
+                    WaterNormalDiagnostic,
+                    WaterReflectionDiagnostic,
+                    WaterEmissiveDiagnostic,
+                    WaterVariationDiagnostic,
+                    WaterOpacityDiagnostic);
+            }
+            if (W != nullptr && bWaterInventoryDiagnostic)
+            {
+                LogVisibleWaterPresentationInventory(W);
+            }
             if (ARaftSimRaftActor* Raft = FindRaft(W))
             {
                 const FVector RaftLoc = Raft->GetActorLocation();
@@ -502,7 +622,10 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
 static FAutoConsoleCommandWithWorldAndArgs GCaptureRaftCommand(
     TEXT("RaftSim.CaptureRaft"),
     TEXT("Paddle the raft downstream into the rapid, then screenshot over its "
-         "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] [aheadM]"),
+         "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] "
+         "[aheadM] [waterroughness=N] [waterspecular=N] [waternormal=N] "
+         "[waterreflection=N] [wateremissive=N] [watervariation=N] "
+         "[wateropacity=N] [waterinventory]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRaft));
 
 // Deterministic close-up for M1: place an authoritative D4 rock against the

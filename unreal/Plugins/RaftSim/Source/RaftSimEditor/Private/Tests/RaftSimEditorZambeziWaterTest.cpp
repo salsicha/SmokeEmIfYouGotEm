@@ -57,14 +57,34 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
     TestEqual(TEXT("Two opposed normal layers move independently"), PannerCount, 2);
     TestEqual(TEXT("One physical water-volume output is bound"), WaterOutputCount, 1);
 
-    float Opacity = 0.0f;
-    TestTrue(
-        TEXT("The instance binds a water-volume opacity override"),
-        Instance->GetScalarParameterValue(
-            FMaterialParameterInfo(TEXT("Opacity")), Opacity));
-    TestTrue(
-        TEXT("Zambezi opacity remains transmissive but substantial"),
-        Opacity >= 0.45f && Opacity <= 0.70f);
+    auto TestScalarParameter = [this, Instance](
+        const TCHAR* Label,
+        const TCHAR* ParameterName,
+        float ExpectedValue)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s parameter is bound"), Label),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(
+                TEXT("%s uses the renderer-reviewed value %.3f (actual %.3f)"),
+                Label,
+                ExpectedValue,
+                Value),
+            FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+    };
+    TestScalarParameter(TEXT("Opacity"), TEXT("Opacity"), 0.62f);
+    TestScalarParameter(TEXT("Roughness"), TEXT("Roughness"), 0.42f);
+    TestScalarParameter(TEXT("Specular"), TEXT("Specular"), 0.28f);
+    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.20f);
+    TestScalarParameter(
+        TEXT("Reflection fill"), TEXT("ReflectionFillIntensity"), 0.04f);
+    TestScalarParameter(
+        TEXT("Emissive fill"), TEXT("EmissiveFillScale"), 0.0f);
+    TestScalarParameter(
+        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.12f);
     return !HasAnyErrors();
 }
 
