@@ -322,7 +322,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_Unlit);
+    Material->SetShadingModel(Candidate.PreviewSpec.RiverId == TEXT("pacuare") ? MSM_DefaultLit : MSM_Unlit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
@@ -493,7 +493,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     ConditionedBaseColor->Alpha.Expression = RiverbedBlendMask;
     Material->GetExpressionCollection().AddExpression(ConditionedBaseColor);
 
-    UMaterialExpression* FinalBaseColor = ConditionedBaseColor;
+    UMaterialExpression* FinalBaseColor = Candidate.PreviewSpec.RiverId == TEXT("pacuare") ? BuildPacuareOrganicRainforestBaseColor(Material, ConditionedBaseColor) : ConditionedBaseColor;
     if (Candidate.bPhysicalScaleSourceCorridor)
     {
         UMaterialExpressionVertexNormalWS* VertexNormalWs =

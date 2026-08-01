@@ -908,6 +908,10 @@ UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
     UMaterial* Material,
     UMaterialExpression* RockSlopeMask);
 
+UMaterialExpression* BuildPacuareOrganicRainforestBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor);
+
 struct FZambeziBatokaVisualMorphologyStats
 {
     int32 VisualTileCount = 0;

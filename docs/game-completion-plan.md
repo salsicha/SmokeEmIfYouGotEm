@@ -3584,3 +3584,19 @@ path is verified, and the completion goal can be marked complete.
   five successful rows with zero failures. Physics, collision, mass, rescue, scoring, and
   progression authority are unchanged. Character/PFD art and named art/safety acceptance
   remain open, so M9 is not promoted.
+- Pacuare organic rainforest terrain V1 replaces the source Landscape's flat unlit
+  green response with a Pacuare-only Default Lit graph. Three incommensurate
+  world-space fields vary broad humid-forest value, moss versus leaf litter, and
+  fine mineral response; smoothed Landscape slope adds bounded wet-rock and rock-moss
+  shading. The graph has no world-position offset and does not modify the 1009x1009
+  review-gated heightfield, preview channel burn, Landscape collision, water ribbon,
+  solver, route, or gameplay authority. The regenerated 256-component map passes
+  MapCheck with zero errors and warnings, audits 256/256 source and 256/256 Nanite
+  material slots, and retains 48 boulders plus 420 vegetation instances. The editor
+  build, 37 focused Python/source-layout contracts, and the focused saved-material
+  automation test pass. Both canonical 1280x720 downstream views now expose materially
+  broader terrain value and soil/moss variation, but the result remains photoreal-
+  rejected for compressed/coarse preview geometry, broad smooth banks, generic repeated
+  PVE vegetation, sparse near-bank ground cover, flat provisional water, missing
+  rainforest atmosphere/VFX, and absent named Pacuare guide, ecology, geospatial, and
+  environment-art approval. This is an organic terrain foundation, not M9 promotion.
