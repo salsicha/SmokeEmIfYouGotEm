@@ -341,5 +341,60 @@
     "water_config_count": 1
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v2"
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v3",
+  "visual_terrain": {
+    "authority": "procedural_render_only",
+    "conditioned_tile_count": 4,
+    "physics_and_collision_authority": "source_copernicus_landscape",
+    "tiles": [
+      {
+        "actor_label": "RaftSim_PhysicalCorridorDenseSourceTerrainTile_00_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+        "procedural_mesh_count": 1,
+        "tags": [
+          "RaftSimBatokaWorldAlignedTerrain",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimProceduralVisualMorphology",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_PhysicalCorridorDenseSourceTerrainTile_01_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+        "procedural_mesh_count": 1,
+        "tags": [
+          "RaftSimBatokaWorldAlignedTerrain",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimProceduralVisualMorphology",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_PhysicalCorridorDenseSourceTerrainTile_02_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+        "procedural_mesh_count": 1,
+        "tags": [
+          "RaftSimBatokaWorldAlignedTerrain",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimProceduralVisualMorphology",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_PhysicalCorridorDenseSourceTerrainTile_03_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+        "procedural_mesh_count": 1,
+        "tags": [
+          "RaftSimBatokaWorldAlignedTerrain",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimProceduralVisualMorphology",
+          "RaftSimZambeziRun"
+        ]
+      }
+    ]
+  }
 }

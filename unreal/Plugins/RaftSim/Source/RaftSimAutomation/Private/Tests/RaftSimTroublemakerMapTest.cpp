@@ -11,6 +11,7 @@
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "ProceduralMeshComponent.h"
 #include "Tests/AutomationCommon.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -129,6 +130,40 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has one procedural runtime water config"),
             RuntimeWaterConfigCount,
             1);
+        int32 ConditionedVisualTerrainCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor->Tags.Contains(TEXT("RaftSimProceduralVisualMorphology")) ||
+                !Actor->Tags.Contains(TEXT("RaftSimBatokaWorldAlignedTerrain")))
+            {
+                continue;
+            }
+            const UProceduralMeshComponent* Mesh =
+                Actor->FindComponentByClass<UProceduralMeshComponent>();
+            Test->TestNotNull(TEXT("conditioned Batoka tile has a procedural mesh"), Mesh);
+            if (!Mesh)
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("conditioned Batoka tile is render-only"),
+                Mesh->GetCollisionEnabled(),
+                ECollisionEnabled::NoCollision);
+            const UMaterialInterface* Material = Mesh->GetMaterial(0);
+            Test->TestNotNull(TEXT("conditioned Batoka tile has a material"), Material);
+            if (Material)
+            {
+                Test->TestTrue(
+                    TEXT("conditioned Batoka tile uses the world-aligned material"),
+                    Material->GetName().Contains(TEXT("BatokaV12_WorldAligned")));
+            }
+            ++ConditionedVisualTerrainCount;
+        }
+        Test->TestEqual(
+            TEXT("Zambezi reference run has four conditioned visual-terrain tiles"),
+            ConditionedVisualTerrainCount,
+            4);
         return true;
     }
 

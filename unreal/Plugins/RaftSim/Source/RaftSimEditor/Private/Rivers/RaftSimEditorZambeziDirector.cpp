@@ -1044,19 +1044,7 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaBasaltCorridorComparison(
     return bAllCaptured && bReportSaved;
 }
 
-struct FZambeziBatokaVisualMorphologyStats
-{
-    int32 VisualTileCount = 0;
-    int64 TotalVertexCount = 0;
-    int64 ModifiedVertexCount = 0;
-    int64 ProtectedRiverCorridorVertexCount = 0;
-    int64 RejectedLowSlopeVertexCount = 0;
-    double AbsoluteOffsetSumCm = 0.0;
-    float MinimumOffsetCm = TNumericLimits<float>::Max();
-    float MaximumOffsetCm = TNumericLimits<float>::Lowest();
-};
-
-bool ApplyZambeziBatokaVisualTerrainTreatment(
+bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     UWorld* World,
     UMaterialInterface* TerrainReviewMaterial,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
@@ -1112,11 +1100,15 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
             continue;
         }
         MeshComponent->SetMaterial(0, TerrainReviewMaterial);
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaWorldAlignedTerrain"));
         ++LocalStats.VisualTileCount;
         if (!bApplyVisualMorphology)
         {
             continue;
         }
+        Actor->Tags.AddUnique(TEXT("RaftSimProceduralVisualMorphology"));
+        Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
 
         FProcMeshSection* Section = MeshComponent->GetProcMeshSection(0);
         if (!Section || Section->ProcVertexBuffer.IsEmpty() ||
@@ -1276,7 +1268,7 @@ bool ApplyZambeziBatokaVisualTerrainTreatment(
         *OutStats = LocalStats;
     }
     OutSummary += FString::Printf(
-        TEXT("Applied the transient Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
+        TEXT("Applied the Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
         bApplyVisualMorphology ? TEXT("V13 morphology plus V12 world-aligned material")
                                : TEXT("V12 world-aligned material"),
         LocalStats.VisualTileCount);

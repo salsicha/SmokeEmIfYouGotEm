@@ -887,6 +887,26 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     bool bBatokaTerrainIntegratedReview = false,
     bool bBatokaWorldAlignedReview = false);
 
+struct FZambeziBatokaVisualMorphologyStats
+{
+    int32 VisualTileCount = 0;
+    int64 TotalVertexCount = 0;
+    int64 ModifiedVertexCount = 0;
+    int64 ProtectedRiverCorridorVertexCount = 0;
+    int64 RejectedLowSlopeVertexCount = 0;
+    double AbsoluteOffsetSumCm = 0.0;
+    float MinimumOffsetCm = TNumericLimits<float>::Max();
+    float MaximumOffsetCm = TNumericLimits<float>::Lowest();
+};
+
+bool ApplyZambeziBatokaVisualTerrainTreatment(
+    UWorld* World,
+    UMaterialInterface* TerrainMaterial,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    bool bApplyVisualMorphology,
+    FZambeziBatokaVisualMorphologyStats* OutStats,
+    FString& OutSummary);
+
 UMaterialInterface* LoadOrCreatePreviewTranslucentColorMaterial();
 
 UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial();

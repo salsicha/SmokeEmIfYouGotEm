@@ -44,6 +44,16 @@ the vertical-slice game mode, and a live-water runtime configuration. Rapid 9
 is tagged as a mandatory commercial portage. Gameplay hides the labels; the
 World Outliner and editor viewport retain them for authoring.
 
+The saved runnable map also contains four render-only source-terrain tiles with
+the retained Batoka V12 world-aligned basalt material and V13 bounded visual
+morphology. The morphology adds deterministic lava-flow terraces, joint
+recesses, and talus variation only outside a 220 m protected river corridor,
+fades out by 650 m, and is clamped to 4.5 m. It never changes the hidden
+Copernicus Landscape used for collision, height queries, or physics. The actor
+tags `RaftSimProceduralVisualMorphology`, `RaftSimBatokaWorldAlignedTerrain`,
+and `RaftSimNonCollisionRenderSurface` make that authority boundary inspectable
+in the generated map.
+
 ## Runnable reference status
 
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
@@ -60,6 +70,11 @@ The source-controlled runtime bundle lives under
 This makes the complete map launchable and paddleable with the normal gameplay
 stack. It does not turn the inferred bed or rapid cues into real-world
 bathymetry, navigation guidance, or validated Zambezi hydraulics.
+
+The visual fallback materially improves surface scale and canyon breakup, but
+the 30 m DEM still yields rounded large-scale cliff silhouettes and the current
+vegetation remains sparse and visibly procedural. The runnable reference map is
+therefore not yet accepted as photoreal.
 
 ## Production status and gates
 
