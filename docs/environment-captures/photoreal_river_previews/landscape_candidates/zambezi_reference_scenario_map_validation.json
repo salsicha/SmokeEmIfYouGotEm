@@ -1,5 +1,5 @@
 {
-  "actor_count": 52,
+  "actor_count": 55,
   "mandatory_portage_actor": "RaftSim_ZambeziRapid_9_Commercial_Suicide",
   "mandatory_portage_marker_count": 1,
   "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
@@ -341,13 +341,76 @@
     "water_config_count": 1
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v6",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v7",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,
     "camera_visible_bank_cover_instance_count": 1200,
-    "component_count": 5,
+    "camera_visible_woody_component_count": 3,
+    "camera_visible_woody_instance_count": 232,
+    "camera_visible_woody_placement_contract": "deterministic_40_candidate_visible_bank_search_with_hard_slope_ceiling",
+    "camera_visible_woody_slope_ceiling_degrees": 24.0,
+    "camera_visible_woody_slope_rejection_count": 8,
+    "camera_visible_woody_target_instance_count": 240,
+    "component_count": 8,
     "components": [
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziCameraRiparianTree_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 58,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1.SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1",
+        "tags": [
+          "RaftSimCameraVisibleWoodyEcology",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimOrganicWoodyBankLayer",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimWoodySlopeCeiling24Degrees",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziCameraThornScrub_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 117,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1.SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1",
+        "tags": [
+          "RaftSimCameraVisibleWoodyEcology",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimOrganicWoodyBankLayer",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimWoodySlopeCeiling24Degrees",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziCameraUmbrellaTree_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 57,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1.SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1",
+        "tags": [
+          "RaftSimCameraVisibleWoodyEcology",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimOrganicWoodyBankLayer",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimWoodySlopeCeiling24Degrees",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
       {
         "actor_label": "RaftSim_LandscapeCandidate_ZambeziOpaqueGroundCover_zambezi_batoka_gorge",
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
@@ -431,7 +494,7 @@
         ]
       }
     ],
-    "instance_count": 6800,
+    "instance_count": 7032,
     "legacy_zambezi_pve_actor_count": 0,
     "legacy_zambezi_pve_actors": [],
     "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards"

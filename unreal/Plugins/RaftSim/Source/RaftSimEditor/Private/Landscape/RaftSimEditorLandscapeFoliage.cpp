@@ -10,6 +10,8 @@ constexpr TCHAR ZambeziVegetationMaterialPath[] = TEXT(
 constexpr TCHAR ZambeziVegetationMeshRoot[] = TEXT(
     "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/");
 constexpr int32 ZambeziEvidenceBankMosaicInstanceCount = 1200;
+constexpr int32 ZambeziEvidenceWoodyInstanceCount = 240;
+constexpr float ZambeziEvidenceWoodySlopeCeilingDegrees = 24.0f;
 
 enum class EZambeziVegetationForm : uint8
 {
@@ -212,10 +214,10 @@ UMaterial* CreateZambeziOpaqueVegetationMaterial(FString& OutSummary)
     Specular->R = 0.08f;
     UMaterialExpressionConstant* AmbientOcclusion = Add(
         NewObject<UMaterialExpressionConstant>(Material));
-    AmbientOcclusion->R = 0.82f;
+    AmbientOcclusion->R = 1.0f;
     UMaterialExpressionConstant* ShadowFloor = Add(
         NewObject<UMaterialExpressionConstant>(Material));
-    ShadowFloor->R = 0.035f;
+    ShadowFloor->R = 0.09f;
     UMaterialExpressionMultiply* ShadowFill = Add(
         NewObject<UMaterialExpressionMultiply>(Material));
     ShadowFill->A.Expression = VertexColor;
@@ -288,9 +290,9 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     const FLinearColor BarkBase(0.175f, 0.125f, 0.070f, 1.0f);
     const FLinearColor BarkTip(0.215f, 0.155f, 0.082f, 1.0f);
     const FLinearColor LeafGreen = Form == EZambeziVegetationForm::UmbrellaTree
-        ? FLinearColor(0.105f, 0.185f, 0.038f, 1.0f)
-        : FLinearColor(0.085f, 0.165f, 0.032f, 1.0f);
-    const FLinearColor ScrubGreen(0.115f, 0.195f, 0.042f, 1.0f);
+        ? FLinearColor(0.085f, 0.135f, 0.034f, 1.0f)
+        : FLinearColor(0.072f, 0.122f, 0.030f, 1.0f);
+    const FLinearColor ScrubGreen(0.082f, 0.132f, 0.038f, 1.0f);
     const FLinearColor DryGrass(0.29f, 0.225f, 0.070f, 1.0f);
 
     if (Form == EZambeziVegetationForm::SavannaGroundCover)
@@ -1451,6 +1453,39 @@ bool AddLandscapeCandidateBiomeDressing(
               true,
               ZambeziOpaqueVegetationMaterial)
         : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziCameraRiparianTreeInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              BroadleafTreeMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziCameraRiparianTree_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziCameraUmbrellaTreeInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ConiferTreeMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziCameraUmbrellaTree_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        ZambeziCameraThornScrubInstances = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ShrubMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziCameraThornScrub_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedRockInstances;
     for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
     {
@@ -1478,6 +1513,10 @@ bool AddLandscapeCandidateBiomeDressing(
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
         !ShrubInstances || !UnderstoryInstances ||
         (bZambezi && !ZambeziBankMosaicInstances) ||
+        (bZambezi &&
+         (!ZambeziCameraRiparianTreeInstances ||
+          !ZambeziCameraUmbrellaTreeInstances ||
+          !ZambeziCameraThornScrubInstances)) ||
         Algo::AnyOf(ReviewedRockInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
@@ -1499,13 +1538,19 @@ bool AddLandscapeCandidateBiomeDressing(
             ConiferTreeInstances,
             ShrubInstances,
             UnderstoryInstances,
-            ZambeziBankMosaicInstances};
+            ZambeziBankMosaicInstances,
+            ZambeziCameraRiparianTreeInstances,
+            ZambeziCameraUmbrellaTreeInstances,
+            ZambeziCameraThornScrubInstances};
         const TArray<UStaticMesh*> Meshes = {
             BroadleafTreeMesh,
             ConiferTreeMesh,
             ShrubMesh,
             UnderstoryMesh,
-            UnderstoryMesh};
+            UnderstoryMesh,
+            BroadleafTreeMesh,
+            ConiferTreeMesh,
+            ShrubMesh};
         for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
         {
             if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
@@ -1539,6 +1584,32 @@ bool AddLandscapeCandidateBiomeDressing(
             ZambeziBankMosaicInstances->ComponentTags.AddUnique(
                 TEXT("RaftSimCameraVisibleBankCover"));
         }
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            CameraWoodyComponents = {
+                ZambeziCameraRiparianTreeInstances,
+                ZambeziCameraUmbrellaTreeInstances,
+                ZambeziCameraThornScrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             CameraWoodyComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimCameraVisibleWoodyEcology"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicWoodyBankLayer"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimWoodySlopeCeiling24Degrees"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimCameraVisibleWoodyEcology"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOrganicWoodyBankLayer"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimWoodySlopeCeiling24Degrees"));
+            }
+        }
         OutResult.DressingFoliageMaterialBoundSlotCount = 0;
         for (UStaticMesh* Mesh : Meshes)
         {
@@ -1550,7 +1621,7 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
         OutResult.bDressingFoliageMaterialsValidated =
-            OutResult.DressingFoliageMaterialBoundSlotCount == 5 &&
+            OutResult.DressingFoliageMaterialBoundSlotCount == 8 &&
             ValidateZambeziOpaqueVegetationMaterial(
                 ZambeziOpaqueVegetationMaterial) &&
             Algo::AllOf(
@@ -2023,6 +2094,9 @@ bool AddLandscapeCandidateBiomeDressing(
         }
     }
 
+    int32 CameraVisibleWoodyPlacedCount = 0;
+    int32 CameraVisibleWoodyRejectedSlopeCount = 0;
+    float CameraVisibleWoodyMaximumSlopeDegrees = 0.0f;
     if (bZambeziWoodland)
     {
         // The general 30 km dressing distribution is intentionally sparse,
@@ -2131,8 +2205,176 @@ bool AddLandscapeCandidateBiomeDressing(
             ZambeziEvidenceBankMosaicInstanceCount);
     }
 
+    if (bZambeziWoodland)
+    {
+        // Low grass alone still leaves the canonical banks without a readable
+        // woody silhouette.  Populate the same two evidence windows with a
+        // bounded mix of the existing solid tree and thorn-scrub meshes.  The
+        // dedicated components make this visual contract independently
+        // countable and keep the sparse full-run distribution unchanged.
+        constexpr int32 ViewBandCount = 2;
+        constexpr int32 BankSideCount = 2;
+        constexpr int32 WoodySpeciesSlotCount = 4;
+        const int32 InstancesPerWoodyLane =
+            ZambeziEvidenceWoodyInstanceCount /
+            (ViewBandCount * BankSideCount * WoodySpeciesSlotCount);
+        for (int32 WoodyIndex = 0;
+             WoodyIndex < ZambeziEvidenceWoodyInstanceCount;
+             ++WoodyIndex)
+        {
+            const int32 SpeciesSlot = WoodyIndex % WoodySpeciesSlotCount;
+            const int32 ViewBand =
+                (WoodyIndex / WoodySpeciesSlotCount) % ViewBandCount;
+            const int32 SideIndex =
+                (WoodyIndex / (WoodySpeciesSlotCount * ViewBandCount)) %
+                BankSideCount;
+            const int32 AlongIndex = WoodyIndex /
+                (WoodySpeciesSlotCount * ViewBandCount * BankSideCount);
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(WoodyIndex, 8101)) /
+                static_cast<float>(InstancesPerWoodyLane);
+            const float BaseLogicalX = ViewBand == 0
+                ? FMath::Lerp(450.0f, 1250.0f, AlongT)
+                : FMath::Lerp(5620.0f, 6420.0f, AlongT);
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float MaximumAdditionalOffset = FMath::Max(
+                3000.0f,
+                FMath::Min(
+                    ViewBand == 0 ? 12000.0f : 10000.0f,
+                    MaxBankOffset - ActiveRiverHalfWidth));
+            const float BaseOffset = ActiveRiverHalfWidth + FMath::Lerp(
+                2500.0f,
+                MaximumAdditionalOffset,
+                FMath::Pow(
+                    ZambeziVegetationUnitRandom(WoodyIndex, 8111),
+                    1.25f));
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * BaseOffset);
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestPlacementScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 40; ++CandidateIndex)
+            {
+                const float CandidatePhase =
+                    static_cast<float>(WoodyIndex) * 0.6180339f +
+                    static_cast<float>(CandidateIndex) * 1.2207441f;
+                const float CandidateLogicalX = BaseLogicalX +
+                    76.0f * FMath::Sin(CandidatePhase);
+                const float CandidateAdditionalOffset = FMath::Lerp(
+                    2500.0f,
+                    MaximumAdditionalOffset,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            WoodyIndex * 43 + CandidateIndex,
+                            8129),
+                        1.18f));
+                const float CandidateOffset = ActiveRiverHalfWidth +
+                    CandidateAdditionalOffset;
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * CandidateOffset);
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float PlacementScore = SlopeDegrees +
+                    1.25f * CandidateAdditionalOffset /
+                        FMath::Max(1.0f, MaximumAdditionalOffset);
+                if (PlacementScore < BestPlacementScore)
+                {
+                    BestPlacementScore = PlacementScore;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestPoint = CandidatePoint;
+                }
+            }
+            if (BestSlopeDegrees > ZambeziEvidenceWoodySlopeCeilingDegrees)
+            {
+                ++CameraVisibleWoodyRejectedSlopeCount;
+                continue;
+            }
+
+            UStaticMesh* WoodyMesh = ShrubMesh;
+            UHierarchicalInstancedStaticMeshComponent* WoodyInstances =
+                ZambeziCameraThornScrubInstances;
+            bool bWoodyCanopy = false;
+            float TargetHeightCm = FMath::Lerp(
+                180.0f,
+                330.0f,
+                ZambeziVegetationUnitRandom(WoodyIndex, 8147));
+            if (SpeciesSlot == 0)
+            {
+                WoodyMesh = BroadleafTreeMesh;
+                WoodyInstances = ZambeziCameraRiparianTreeInstances;
+                TargetHeightCm = FMath::Lerp(
+                    720.0f,
+                    1100.0f,
+                    ZambeziVegetationUnitRandom(WoodyIndex, 8161));
+                bWoodyCanopy = true;
+            }
+            else if (SpeciesSlot == 1)
+            {
+                WoodyMesh = ConiferTreeMesh;
+                WoodyInstances = ZambeziCameraUmbrellaTreeInstances;
+                TargetHeightCm = FMath::Lerp(
+                    680.0f,
+                    1000.0f,
+                    ZambeziVegetationUnitRandom(WoodyIndex, 8167));
+                bWoodyCanopy = true;
+            }
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(WoodyMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                WoodyInstances,
+                WoodyMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.035f, 0.0f, 1.2f),
+                    360.0f * ZambeziVegetationUnitRandom(WoodyIndex, 8179),
+                    0.8f * FMath::Sin(static_cast<float>(WoodyIndex) * 0.73f)),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.82f,
+                        1.18f,
+                        ZambeziVegetationUnitRandom(WoodyIndex, 8191)),
+                    UniformScale * FMath::Lerp(
+                        0.84f,
+                        1.16f,
+                        ZambeziVegetationUnitRandom(WoodyIndex, 8209)),
+                    UniformScale));
+            ++CameraVisibleWoodyPlacedCount;
+            CameraVisibleWoodyMaximumSlopeDegrees = FMath::Max(
+                CameraVisibleWoodyMaximumSlopeDegrees,
+                BestSlopeDegrees);
+            ++OutResult.DressingFoliageInstanceCount;
+            if (bWoodyCanopy)
+            {
+                ++OutResult.DressingCanopyTreeInstanceCount;
+            }
+            else
+            {
+                ++OutResult.DressingUnderstoryInstanceCount;
+            }
+        }
+        OutSummary += FString::Printf(
+            TEXT("Zambezi camera-visible woody ecology: %d/%d opaque, grounded, "
+                 "non-colliding tree and thorn-scrub instances in two "
+                 "downstream windows; %d candidates rejected above %.1f "
+                 "degrees and maximum placed slope %.2f degrees.\n"),
+            CameraVisibleWoodyPlacedCount,
+            ZambeziEvidenceWoodyInstanceCount,
+            CameraVisibleWoodyRejectedSlopeCount,
+            ZambeziEvidenceWoodySlopeCeilingDegrees,
+            CameraVisibleWoodyMaximumSlopeDegrees);
+    }
+
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
-        (bZambeziWoodland ? ZambeziEvidenceBankMosaicInstanceCount : 0);
+        (bZambeziWoodland
+             ? ZambeziEvidenceBankMosaicInstanceCount +
+                 CameraVisibleWoodyPlacedCount
+             : 0);
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount == BoulderCount &&
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&

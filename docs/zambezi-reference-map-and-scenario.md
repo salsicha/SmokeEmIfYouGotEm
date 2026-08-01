@@ -64,7 +64,11 @@ non-colliding hierarchical instances:
 - 1,400 `SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1` instances; and
 - 700 full-corridor `SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1`
   instances, plus 1,200 instances of the same mesh in a separately tagged
-  organic bank-mosaic component aligned to the two canonical camera windows.
+  organic bank-mosaic component aligned to the two canonical camera windows;
+- 58 camera-window riparian trees, 57 camera-window umbrella trees, and 117
+  camera-window thorn-scrub instances in three separately auditable woody
+  components. Eight of 240 deterministic targets are rejected by the hard 24°
+  slope ceiling, leaving 232 placed instances.
 
 All four use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
 or blade geometry rather than alpha cards. The revised ground-cover mesh spans
@@ -74,6 +78,8 @@ All dressing actors carry the
 `RaftSimSlopeScreenedPlacement`, `RaftSimNonCollisionRenderSurface`, and
 `RaftSimProceduralVegetationFallback` tags. The additional component also
 carries `RaftSimOrganicBankMosaic` and `RaftSimCameraVisibleBankCover`.
+The woody-window components carry `RaftSimCameraVisibleWoodyEcology`,
+`RaftSimOrganicWoodyBankLayer`, and `RaftSimWoodySlopeCeiling24Degrees`.
 Placement selects the lowest-slope candidate on each dry bank, keeps a hard
 inner exclusion outside the 72 m active river half-width, starts beyond each
 camera target, and covers approximately the next 120-600 m of view. This makes
@@ -120,20 +126,23 @@ bathymetry, navigation guidance, or validated Zambezi hydraulics.
 
 The visual fallback materially improves surface scale and canyon breakup, and
 the canonical guide-seat and river-eye views now contain visible solid bank
-cover instead of completely barren slopes. The 30 m DEM still yields rounded
-large-scale cliff silhouettes, however, and the small synthetic clumps remain
-too sparse and repetitive for lifelike ecology. The views prove that the broken
-card foliage is absent and that bank cover is rendered; they do not prove that
-the vegetation or terrain is photoreal. The runnable reference map is therefore
-not yet accepted as photoreal.
+cover plus restrained tree and thorn-scrub silhouettes instead of completely
+barren slopes. The 30 m DEM still yields rounded large-scale cliff silhouettes,
+however, and the project-owned tree crowns and small synthetic clumps remain
+repetitive and visibly procedural. The views prove that the broken card foliage
+is absent and that multi-height bank ecology is rendered; they do not prove
+that the vegetation or terrain is photoreal. The runnable reference map is
+therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v6 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v7 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding visual-terrain tiles, the exact four vegetation mesh families and
-five instance components with a 6,800-instance total, exactly one tagged
-1,200-instance camera-visible bank mosaic, zero legacy Zambezi PVE actors, and
+eight instance components with a 7,032-instance total, exactly one tagged
+1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
+components with the 58/57/117 accepted split and 24° slope-ceiling contract,
+zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
