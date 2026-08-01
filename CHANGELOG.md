@@ -6,6 +6,10 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- A runnable Zambezi Batoka Gorge reference Free Run, including a curved runtime
+  coordinate map, procedural full-corridor water seed, gameplay bootstrap, player-facing
+  river catalog entry, and validation that keeps production terrain, bathymetry,
+  rapid-hydraulic, guide, visual, and performance acceptance gates explicit.
 - An independent Project Chrono/PyChrono 10.0.0 D6 runner that consumes only the
   frozen fixture-input package, measures twelve-segment tube and rock-contact
   compliance through `ChSystemSMC`/`ChLinkTSDA`, repeats all seven fixtures

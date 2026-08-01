@@ -9,6 +9,7 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
+#include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "Tests/AutomationCommon.h"
 
@@ -29,6 +30,8 @@ const TCHAR* GRiverMapPaths[] = {
     TEXT("/Game/RaftSim/Maps/L_UpperHuacas"),
     TEXT("/Game/RaftSim/Maps/L_Terminator"),
     TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),
+    TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
+         "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
 };
 
 UWorld* GetRiverTestWorld()
@@ -84,12 +87,49 @@ bool FRaftSimAssertRiverMapCommand::Update()
         }
     }
 
+    bool bZambeziReferenceRun = false;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
         ARaftSimRaftActor* Raft = *It;
+        bZambeziReferenceRun =
+            Raft->GetActorLabel() == TEXT("RaftSim_Zambezi_PlayerRaft");
         Test->TestTrue(
             FString::Printf(TEXT("raft rests within depth envelope (z=%.0f)"), Raft->GetActorLocation().Z),
             FMath::Abs(Raft->GetActorLocation().Z) < 20000.0f);
+    }
+    else
+    {
+        Test->AddError(TEXT("River map has no player raft"));
+    }
+
+    if (bZambeziReferenceRun)
+    {
+        int32 ScenarioMarkerCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if ((*It)->Tags.Contains(TEXT("RaftSimScenarioMarker")) &&
+                (*It)->Tags.Contains(TEXT("RaftSimZambeziRun")))
+            {
+                ++ScenarioMarkerCount;
+            }
+        }
+        Test->TestEqual(
+            TEXT("Zambezi reference run retains all 25 rapid markers"),
+            ScenarioMarkerCount,
+            25);
+        int32 RuntimeWaterConfigCount = 0;
+        for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabel() == TEXT("RaftSim_Zambezi_RuntimeWaterConfig"))
+            {
+                ++RuntimeWaterConfigCount;
+            }
+        }
+        Test->TestEqual(
+            TEXT("Zambezi reference run has one procedural runtime water config"),
+            RuntimeWaterConfigCount,
+            1);
+        return true;
     }
 
     int32 AuthoritativeRockCount = 0;

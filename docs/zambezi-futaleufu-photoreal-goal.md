@@ -1,6 +1,6 @@
 # Zambezi And Futaleufu Photoreal Goal
 
-> Active priority decision, July 14, 2026: Zambezi Batoka Gorge and Futaleufu are the immediate photoreal environment goal. Zambezi returns from backlog as an additional active environment target, while runnable and lifelike promotion remains blocked until authoritative full-reach centerline, high-resolution terrain, route, guide, and review evidence are attached. Chilko remains in the five-river runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
+> Status update, July 31, 2026: Zambezi Batoka Gorge and Futaleufu remain the immediate photoreal environment goal. Zambezi is restored as the sixth runnable environment in a clearly labeled reference Free Run; lifelike and production-hydraulic promotion remain blocked until authoritative full-reach centerline, high-resolution terrain, bathymetry, route, guide, and review evidence are attached. Chilko remains in the runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
 
 ## Objective
 
@@ -9,7 +9,7 @@ Make these two priority river environments photorealistic in Unreal:
 - Zambezi River, Batoka Gorge, from Boiling Pot to Mukuni Beach: a photoreal big-water basalt gorge run below Victoria Falls.
 - Futaleufu River, Chile, from Rio Azul Swinging Bridge to The Pasarela: a photoreal Patagonian turquoise big-water run with boulder gardens and forested Andean valley walls.
 
-Futaleufu is required by the active five-river runnable goal. Zambezi is an additional active environment target whose runnable promotion remains source-blocked. For both rivers, completion means lifelike in-engine guide-seat and river-eye captures at reviewed seasonal flows, backed by source-traceable terrain, hydrography, materials, foliage, water, atmosphere, named hazards, and accepted art, guide, geospatial, rights, hazard-readability, desktop, and VR review. Source-data packages, generated maps, or technically valid screenshots alone do not complete the goal.
+Futaleufu and Zambezi are both part of the active six-river runnable goal. Zambezi's reference Free Run is playable now, but its production-fidelity promotion remains source- and review-blocked. For both rivers, completion means lifelike in-engine guide-seat and river-eye captures at reviewed seasonal flows, backed by source-traceable terrain, hydrography, materials, foliage, water, atmosphere, named hazards, and accepted art, guide, geospatial, rights, hazard-readability, desktop, and VR review. Source-data packages, generated maps, or technically valid screenshots alone do not complete the goal.
 
 ## Current Evidence And Blockers
 

@@ -148,6 +148,18 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
     TestTrue(TEXT("full descent spans authored playable reach"),
         FullDescent.bFullDescent && FullDescent.StartStationM <= 120.0f &&
         FullDescent.FinishStationM >= 48900.0f);
+    FRaftSimCareerScenarioDefinition Zambezi;
+    TestTrue(
+        TEXT("Zambezi reference run is catalogued"),
+        URaftSimProgressionLibrary::FindScenario(TEXT("zambezi_reference_run"), Zambezi));
+    TestEqual(
+        TEXT("Zambezi reference run opens the source-scale Batoka Gorge map"),
+        Zambezi.LevelName,
+        FName(TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
+                   "L_ZambeziBatokaGorge_PhysicalCorridorCandidate")));
+    TestTrue(
+        TEXT("Zambezi reference run spans the mapped Rapids 1-25 station range"),
+        Zambezi.StartStationM == 0.0f && Zambezi.FinishStationM >= 27358.0f);
     TestEqual(TEXT("assist gold cap deterministic"),
         static_cast<int32>(URaftSimProgressionLibrary::CalculateMedal(0.98f, 0.98f, true)),
         static_cast<int32>(ERaftSimMedal::Silver));

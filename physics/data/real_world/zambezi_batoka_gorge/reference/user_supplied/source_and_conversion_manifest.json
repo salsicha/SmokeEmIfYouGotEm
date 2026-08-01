@@ -34,9 +34,19 @@
       "path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
       "sha256": "e9f7bc2cacf27fd005895fdcf2dbfb19d1a9c7413eb87e36264709608b68aa6d"
     },
+    "runtime_cooked_fields": {
+      "authority": "procedural_gameplay_seed_not_real_world_hydraulic_authority",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/cooked_flow_fields/manifest.json",
+      "sha256": "9f72d3deb8e356ce1399fb9a972a7397a30f170edb3c27dc52e3203f2a989d35"
+    },
+    "runtime_coordinate_map": {
+      "authority": "review_gated_runtime_mapping_not_survey_authority",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/river_coordinate_map.json",
+      "sha256": "957b31653d71e7853b805227786d4fe6987dd843dc5f673fcef69cfd28e78c01"
+    },
     "scenario": {
       "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
-      "sha256": "9a5cef34ebc8f3295d09077d23e43070021c17a202fd184acfc79bf55b8baacc"
+      "sha256": "e7e00475fdfb410b118a5d1907ae69314abf60789b259f96a1ccb75c658a8a33"
     }
   },
   "height_conversion": {

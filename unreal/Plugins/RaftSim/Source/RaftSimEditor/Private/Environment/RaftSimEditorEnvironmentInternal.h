@@ -2109,6 +2109,12 @@ bool AddLandscapeCandidateScenarioMarkers(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FString& OutSummary);
 
+bool AddLandscapeCandidateRunnableGameplay(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary);
+
 void RepositionLandscapeCandidatePhysicalCameras(
     UWorld* World,
     ALandscape* Landscape,

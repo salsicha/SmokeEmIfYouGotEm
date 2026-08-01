@@ -39,17 +39,37 @@ The Unreal candidate is generated with:
 
 This saves the locally generated, git-ignored map at
 `/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate`.
-The map contains 25 editor-only rapid marker actors. Rapid 9 is tagged as a
-mandatory commercial portage. Gameplay hides the labels; the World Outliner and
-editor viewport retain them for authoring.
+The map contains 25 editor-only rapid marker actors, a player raft and start,
+the vertical-slice game mode, and a live-water runtime configuration. Rapid 9
+is tagged as a mandatory commercial portage. Gameplay hides the labels; the
+World Outliner and editor viewport retain them for authoring.
 
-## Scenario status and gates
+## Runnable reference status
+
+The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
+Beach**. It is a reference Free Run with the normal-big-water planning band.
+The source-controlled runtime bundle lives under
+`physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/`:
+
+- `river_coordinate_map.json` maps the source-scale curved centerline into
+  station/lateral coordinates used by the runtime solver.
+- `cooked_flow_fields/` supplies a lightweight 30 km finite-volume seed. The
+  centerline surface follows the conditioned Copernicus corridor; missing
+  channel geometry and rapid cues are deterministic procedural infill.
+
+This makes the complete map launchable and paddleable with the normal gameplay
+stack. It does not turn the inferred bed or rapid cues into real-world
+bathymetry, navigation guidance, or validated Zambezi hydraulics.
+
+## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route
 descriptions (Rapid 11–23 and Rapid 14–25) are preserved as disabled candidates
-instead of silently choosing one. The scenario is not physics-runnable yet.
+instead of silently choosing one. Only the full reference route is selectable.
 
 Promotion still requires local-guide approval of stations, lines, portages,
 access, and rescue routes; geospatial review of the centerline/datum; rights
 review of the supplied files; seasonal-flow reconciliation; a validated C++
 hydraulic window for every rapid; and desktop/VR visual and performance passes.
+These gates block production hydraulic-fidelity, lifelike, and release claims;
+they do not hide or disable the explicitly labeled reference Free Run.

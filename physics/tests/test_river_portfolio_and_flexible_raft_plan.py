@@ -11,23 +11,26 @@ FLEXIBLE_TUBE_PATH = (
 )
 
 
-def test_active_river_portfolio_prioritizes_zambezi_and_futaleufu() -> None:
+def test_active_river_portfolio_includes_reference_runnable_zambezi() -> None:
     plan = json.loads(PORTFOLIO_PATH.read_text(encoding="utf-8"))
     active = plan["active_rivers"]
     active_ids = [river["river_id"] for river in active]
 
-    assert [river["order"] for river in active] == [1, 2, 3, 4, 5]
+    assert [river["order"] for river in active] == [1, 2, 3, 4, 5, 6]
     assert active_ids == [
         "american_south_fork",
         "colorado_river_grand_canyon_rowing",
         "pacuare_river_costa_rica",
         "futaleufu_river_chile",
         "chilko_river_lava_canyon",
+        "zambezi_batoka_gorge",
     ]
-    assert "zambezi_batoka_gorge" not in active_ids
-    chilko = active[-1]
+    chilko = active[-2]
     assert chilko["put_in"] == "Chilko River Lodge"
     assert chilko["take_out"] == "Chilko-Taseko Junction"
+    zambezi = active[-1]
+    assert zambezi["runnable_status"].startswith("runnable_reference_")
+    assert zambezi["hydraulic_fidelity_status"].startswith("procedural_seed_")
     assert plan["portfolio_rules"]["active_river_count"] == len(active)
 
     priority = plan["photoreal_priority_goal"]
@@ -37,15 +40,8 @@ def test_active_river_portfolio_prioritizes_zambezi_and_futaleufu() -> None:
     ]
     assert priority["no_photoreal_claim_before_all_gates_pass"] is True
 
-    additional = {
-        river["river_id"]: river
-        for river in plan["additional_active_environment_targets"]
-    }
-    zambezi = additional["zambezi_batoka_gorge"]
-    assert zambezi["environment_status"] == (
-        "active_photoreal_production_source_blocked"
-    )
-    assert zambezi["runnable_status"].startswith("blocked_pending_")
+    additional = plan["additional_active_environment_targets"]
+    assert additional == []
     assert plan["backlog_rivers"] == []
     assert plan["portfolio_rules"]["active_environment_target_count"] == (
         len(active) + len(additional)

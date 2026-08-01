@@ -1,4 +1,4 @@
-"""Load the generated Zambezi candidate and verify its scenario marker actors."""
+"""Verify the generated Zambezi reference-run map and gameplay bootstrap."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v1",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v2",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -56,6 +56,33 @@ def main() -> None:
                 }
             )
         portages = [row for row in marker_rows if "RaftSimMandatoryPortage" in row["tags"]]
+        player_rafts = [
+            actor
+            for actor in actors
+            if actor.get_actor_label() == "RaftSim_Zambezi_PlayerRaft"
+            and actor.get_class().get_name() == "RaftSimRaftActor"
+        ]
+        water_configs = [
+            actor
+            for actor in actors
+            if actor.get_actor_label() == "RaftSim_Zambezi_RuntimeWaterConfig"
+            and actor.get_class().get_name() == "RaftSimRiverWaterConfig"
+        ]
+        player_starts = [
+            actor
+            for actor in actors
+            if actor.get_actor_label() == "RaftSim_GuideSeat_PlayerStart"
+            and actor.get_class().get_name() == "PlayerStart"
+        ]
+        world_settings = world.get_world_settings()
+        default_game_mode = (
+            world_settings.get_editor_property("default_game_mode")
+            if world_settings
+            else None
+        )
+        game_mode_path = (
+            default_game_mode.get_path_name() if default_game_mode else None
+        )
         rapid_numbers = []
         for row in marker_rows:
             suffix = str(row["actor_label"]).removeprefix("RaftSim_ZambeziRapid_")
@@ -68,6 +95,12 @@ def main() -> None:
                 "mandatory_portage_marker_count": len(portages),
                 "mandatory_portage_actor": portages[0]["actor_label"] if portages else None,
                 "markers": sorted(marker_rows, key=lambda row: row["actor_label"]),
+                "runnable": {
+                    "player_raft_count": len(player_rafts),
+                    "water_config_count": len(water_configs),
+                    "player_start_count": len(player_starts),
+                    "game_mode": game_mode_path,
+                },
             }
         )
         passed = (
@@ -77,11 +110,18 @@ def main() -> None:
             and "_9_Commercial_Suicide" in str(portages[0]["actor_label"])
             and all("RaftSimScenarioMarker" in row["tags"] for row in marker_rows)
             and all("RaftSimZambeziRun" in row["tags"] for row in marker_rows)
+            and len(player_rafts) == 1
+            and len(water_configs) == 1
+            and len(player_starts) == 1
+            and str(game_mode_path).endswith("RaftSimVerticalSliceGameMode")
         )
         report["passed"] = passed
         if not passed:
             raise RuntimeError("Generated Zambezi scenario marker contract did not pass")
-        unreal.log(f"Zambezi scenario map validation passed with {len(markers)} markers")
+        unreal.log(
+            f"Zambezi reference run validation passed with {len(markers)} markers, "
+            f"{len(player_rafts)} raft, and {len(water_configs)} runtime water config"
+        )
     except Exception as error:
         report["error"] = str(error)
         report["traceback"] = traceback.format_exc()

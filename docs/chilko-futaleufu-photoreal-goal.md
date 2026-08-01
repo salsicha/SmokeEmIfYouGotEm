@@ -2,7 +2,7 @@
 
 ## Portfolio Decision
 
-The active five-river production portfolio is:
+The original five-river production portfolio is:
 
 1. South Fork American River, Chili Bar to Folsom Reservoir.
 2. Colorado River through Grand Canyon, Lees Ferry to Pearce Ferry.
@@ -10,7 +10,7 @@ The active five-river production portfolio is:
 4. Futaleufu River, Rio Azul Swinging Bridge to The Pasarela.
 5. Chilko River, Chilko River Lodge to the Chilko-Taseko Junction.
 
-Zambezi Batoka Gorge is now an additional active photoreal environment target and, with Futaleufu, forms the immediate environment priority. It remains outside the five-river runnable claim until authoritative full-reach terrain, centerline, route, guide, and review evidence pass. This priority change does not remove Chilko from the runnable portfolio or promote, delete, or rewrite any existing evidence.
+Zambezi Batoka Gorge is now the sixth runnable environment and, with Futaleufu, forms the immediate environment priority. Its current classification is `reference_free_run`: the complete physical corridor and procedural water seed are playable, but authoritative full-reach terrain, centerline, bathymetry, rapid hydraulics, guide, and review evidence remain required for production-fidelity promotion. This priority change does not remove Chilko from the runnable portfolio or promote, delete, or rewrite any existing evidence.
 
 ## Objective
 
