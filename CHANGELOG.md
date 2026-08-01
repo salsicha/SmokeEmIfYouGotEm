@@ -32,6 +32,13 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reaffirmed Zambezi Batoka Gorge as the sixth runnable river at the bounded
+  `reference_free_run` tier across the portfolio, generated scenario, player
+  catalog, frontend launch contract, cook/regeneration checks, and current
+  documentation. A cross-layer regression now prevents the runnable map from
+  silently falling out of any one of those registries; the historical 5+1
+  editor report is explicitly marked as superseded rather than rewritten as
+  new execution evidence.
 - Restored Zambezi to the authoritative six-river named-rapid portfolio as a
   `reference_free_run`, regenerated editor markers and all 123 Zambezi review-run
   definitions with runnable metadata, and changed the live Rapid/River Editor summary

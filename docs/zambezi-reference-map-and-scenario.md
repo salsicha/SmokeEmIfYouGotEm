@@ -166,12 +166,24 @@ approval remain open.
 ## Runnable reference status
 
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
-Beach**. It is a reference Free Run with the normal-big-water planning band.
+Beach**. Select **Free Run** to launch it without a career-license gate. Its
+frontend scenario ID is `zambezi_reference_run`, and both the player selection
+catalog and source scenario now carry the explicit portfolio role
+`runnable_river` and tier `reference_free_run`. It uses the normal-big-water
+planning band.
 The named-rapid source catalog, generated marker and simulator-run manifests,
 Rapid/River Editor shell, player-facing scenario catalog, runtime map-load test,
 and shipping cook list all classify it as the sixth runnable river. There are
 no remaining `additional_active_environment` river entries in the current
 portfolio.
+
+The generated `.umap` is intentionally not committed because it is currently
+about 1.6 GB. `package_mac.sh` and `package_win.ps1` regenerate it from the
+source-controlled reference bundle when absent, and `DefaultGame.ini` includes
+the resulting package in shipping cooks. The regression suite checks that the
+portfolio, source scenario, player catalog, frontend launch entry, cook list,
+and packaging regeneration commands all continue to name the same runnable
+map.
 The source-controlled runtime bundle lives under
 `physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/`:
 
