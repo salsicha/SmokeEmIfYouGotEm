@@ -8,8 +8,11 @@ American, Chili Bar to Salmon Falls**, with all 20 named rapids at three real
 flow levels. The Zambezi now adds a source-scale Boiling Pot-to-Mukuni Beach
 reference run with all 25 mapped rapids; its missing bathymetry and
 rapid-specific hydraulics are explicitly procedural and remain blocked from
-production-fidelity claims. See [docs/game-completion-plan.md](docs/game-completion-plan.md)
-for the active milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
+production-fidelity claims. Its current map, regeneration path, validation, and
+open gates are documented in
+[docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
+See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
+milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 
 ## What's in this repository
 

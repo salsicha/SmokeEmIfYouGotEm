@@ -442,6 +442,29 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.bUseSolverVisualizationFields;
         const bool bHasManifestConditionedPhysicalChannel =
             Candidate.bPhysicalScaleSourceCorridor;
+        const bool bUsesZambeziOpaqueVegetation =
+            Result.bDressingUsesOpaqueVolumetricVegetation;
+        const FString DressingSourceSpeciesJson = bUsesZambeziOpaqueVegetation
+            ? TEXT("[]")
+            : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
+        const FString DressingConvertedSpeciesJson =
+            bUsesZambeziOpaqueVegetation
+            ? FString::Printf(
+                  TEXT("[\"%s\", \"%s\", \"%s\", \"%s\"]"),
+                  *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
+                  *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
+                  *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+                  *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath))
+            : TEXT("[\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"]");
+        const FString DefaultBroadleafMaterialAsset = FString::Printf(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate"),
+            *RiverAssetName);
+        const FString DefaultConiferMaterialAsset = FString::Printf(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Conifer_BiomeFoliageCandidate"),
+            *RiverAssetName);
+        const FString DefaultUnderstoryMaterialAsset = FString::Printf(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Understory_BiomeFoliageCandidate"),
+            *RiverAssetName);
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -527,12 +550,12 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_external_review_broadleaf_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_conifer_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_conifer_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
-            TEXT("      \"landscape_dressing_source_species_skeletal_assets\": [\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"],\n")
-            TEXT("      \"landscape_dressing_converted_species_static_assets\": [\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"],\n")
+            TEXT("      \"landscape_dressing_source_species_skeletal_assets\": %s,\n")
+            TEXT("      \"landscape_dressing_converted_species_static_assets\": %s,\n")
             TEXT("      \"landscape_dressing_broadleaf_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_conifer_asset\": \"%s\",\n")
-            TEXT("      \"landscape_dressing_shrub_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\",\n")
-            TEXT("      \"landscape_dressing_understory_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\",\n")
+            TEXT("      \"landscape_dressing_shrub_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_understory_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_trunk_asset\": null,\n")
             TEXT("      \"landscape_dressing_instance_implementation\": \"%s\",\n")
             TEXT("      \"landscape_dressing_boulder_instance_count\": %d,\n")
@@ -545,9 +568,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_foliage_material_asset_count\": %d,\n")
             TEXT("      \"landscape_dressing_foliage_material_bound_slot_count\": %d,\n")
             TEXT("      \"landscape_dressing_native_foliage_material_fallback_slot_count\": %d,\n")
-            TEXT("      \"landscape_dressing_broadleaf_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate\",\n")
-            TEXT("      \"landscape_dressing_conifer_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Conifer_BiomeFoliageCandidate\",\n")
-            TEXT("      \"landscape_dressing_understory_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Understory_BiomeFoliageCandidate\",\n")
+            TEXT("      \"landscape_dressing_broadleaf_material_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_conifer_material_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_understory_material_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_broadleaf_front_tint\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_dressing_broadleaf_back_tint\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_dressing_broadleaf_transmission_tint\": [%.6f, %.6f, %.6f],\n")
@@ -703,7 +726,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             MaterialSettings.WetBankColorScale.G,
             MaterialSettings.WetBankColorScale.B,
             Result.bDressingValidated
-                ? (Result.DressingExternalRockMeshCount == 6
+                ? (bUsesZambeziOpaqueVegetation
+                       ? TEXT("source_mask_placed_opaque_volumetric_zambezi_vegetation_and_rights_reviewed_rock_comparison_captured")
+                       : Result.DressingExternalRockMeshCount == 6
                        ? TEXT("source_mask_placed_complete_pve_species_and_rights_reviewed_rock_comparison_captured")
                        : TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured"))
                 : TEXT("dressing_generation_or_validation_failed"),
@@ -745,9 +770,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath
                     : FString()),
+            *DressingSourceSpeciesJson,
+            *DressingConvertedSpeciesJson,
             *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
             *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
-            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+            *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
+            bUsesZambeziOpaqueVegetation
+                ? TEXT("zambezi_opaque_volumetric_nanite_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_hierarchical_instancing")
+                : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_and_sparse_three_variant_pine_hierarchical_instancing")
                 : (Result.DressingExternalRockMeshCount == 6
                        ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_hierarchical_instancing")
@@ -764,14 +795,25 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("water_and_vegetation_masks_loaded_and_used_for_candidate_selection")
                 : TEXT("required_source_masks_missing"),
             Result.bDressingFoliageMaterialsValidated
-                ? TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained")
+                ? (bUsesZambeziOpaqueVegetation
+                       ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards")
+                       : TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained"))
                 : TEXT("foliage_material_generation_or_binding_failed"),
             Result.DressingFoliageMaterialAssetCount,
             Result.DressingFoliageMaterialBoundSlotCount,
             Result.DressingNativeFoliageMaterialFallbackSlotCount,
-            *RiverAssetName,
-            *RiverAssetName,
-            *RiverAssetName,
+            *EscapeRaftSimJsonString(
+                bUsesZambeziOpaqueVegetation
+                    ? Result.DressingFoliageMaterialAssetPath
+                    : DefaultBroadleafMaterialAsset),
+            *EscapeRaftSimJsonString(
+                bUsesZambeziOpaqueVegetation
+                    ? Result.DressingFoliageMaterialAssetPath
+                    : DefaultConiferMaterialAsset),
+            *EscapeRaftSimJsonString(
+                bUsesZambeziOpaqueVegetation
+                    ? Result.DressingFoliageMaterialAssetPath
+                    : DefaultUnderstoryMaterialAsset),
             FoliageSettings.BroadleafFrontTint.R,
             FoliageSettings.BroadleafFrontTint.G,
             FoliageSettings.BroadleafFrontTint.B,
@@ -796,7 +838,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
-            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+            bUsesZambeziOpaqueVegetation
+                ? TEXT("opaque_volumetric_zambezi_fallback_removes_card_artifacts_but_requires_species_ecology_guide_visual_and_performance_review")
+                : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_rock_and_pine_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
                 : (Result.DressingExternalRockMeshCount == 6
                        ? TEXT("rights_reviewed_rock_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")

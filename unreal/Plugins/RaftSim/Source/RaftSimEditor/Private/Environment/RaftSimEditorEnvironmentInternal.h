@@ -696,6 +696,12 @@ struct FRaftSimLandscapeImportCandidateResult
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static");
     FString DressingConiferAssetPath =
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static");
+    FString DressingShrubAssetPath =
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static");
+    FString DressingUnderstoryAssetPath =
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static");
+    FString DressingFoliageMaterialAssetPath;
+    bool bDressingUsesOpaqueVolumetricVegetation = false;
     bool bDressingValidated = false;
     FString WaterMaterialPath;
     int32 WaterMaterialBoundComponentCount = 0;

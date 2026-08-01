@@ -54,6 +54,26 @@ tags `RaftSimProceduralVisualMorphology`, `RaftSimBatokaWorldAlignedTerrain`,
 and `RaftSimNonCollisionRenderSurface` make that authority boundary inspectable
 in the generated map.
 
+The active Zambezi dressing no longer loads the generic Procedural Vegetation
+Editor species or their masked leaf cards. The generator creates four
+project-owned, opaque, one-sided, vertex-colour Nanite meshes and places them as
+non-colliding hierarchical instances:
+
+- 2,100 `SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1` instances;
+- 1,400 `SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1` instances;
+- 1,400 `SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1` instances; and
+- 700 `SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1` instances.
+
+All four use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
+or blade geometry rather than alpha cards, and carry the
+`RaftSimZambeziOpaqueVegetation`, `RaftSimOpaqueVolumetricVegetation`,
+`RaftSimSlopeScreenedPlacement`, `RaftSimNonCollisionRenderSurface`, and
+`RaftSimProceduralVegetationFallback` tags. Placement searches a wider bank
+area, rejects steep canyon-face candidates, and keeps the launch cameras and
+navigable corridor clear. This removes the floating black/green triangle and
+cliff-mounted-tree failures from the active Zambezi views; it does not establish
+correct species, woodland ecology, or photoreal vegetation.
+
 ## Runnable reference status
 
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
@@ -73,8 +93,19 @@ bathymetry, navigation guidance, or validated Zambezi hydraulics.
 
 The visual fallback materially improves surface scale and canyon breakup, but
 the 30 m DEM still yields rounded large-scale cliff silhouettes and the current
-vegetation remains sparse and visibly procedural. The runnable reference map is
-therefore not yet accepted as photoreal.
+vegetation remains synthetic and is deliberately sparse outside the launch
+vista. The canonical guide-seat and river-eye views prove that the broken card
+foliage is absent, not that the vegetation or terrain is lifelike. The runnable
+reference map is therefore not yet accepted as photoreal.
+
+The saved-map audit is written to
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
+Schema v4 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+start, runtime water configuration, the vertical-slice game mode, four
+non-colliding visual-terrain tiles, the exact four vegetation families and
+5,600-instance total, and zero legacy Zambezi PVE actors. The focused runtime
+gate is
+`RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`.
 
 ## Production status and gates
 
@@ -85,6 +116,8 @@ instead of silently choosing one. Only the full reference route is selectable.
 Promotion still requires local-guide approval of stations, lines, portages,
 access, and rescue routes; geospatial review of the centerline/datum; rights
 review of the supplied files; seasonal-flow reconciliation; a validated C++
-hydraulic window for every rapid; and desktop/VR visual and performance passes.
-These gates block production hydraulic-fidelity, lifelike, and release claims;
-they do not hide or disable the explicitly labeled reference Free Run.
+hydraulic window for every rapid; approved southern African gorge species and
+ecology; lifelike terrain, bank, vegetation, and water art; and desktop/VR
+visual and performance passes. These gates block production hydraulic-fidelity
+and lifelike claims; they do not hide or disable the explicitly labeled
+reference Free Run.
