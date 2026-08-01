@@ -37,6 +37,8 @@ def test_active_river_portfolio_includes_reference_runnable_zambezi() -> None:
         "upright_after_initial_settle_and_all_forward_with_five_attached_crew_and_zero_swimmers"
     )
     assert zambezi["safe_launch_contract"] == "raftsim.zambezi.safe_launch_apron.v1"
+    assert zambezi["portfolio_role"] == "runnable_river"
+    assert zambezi["runnable_tier"] == "reference_free_run"
     assert zambezi["hydraulic_fidelity_status"].startswith("procedural_seed_")
     assert plan["portfolio_rules"]["active_river_count"] == len(active)
 

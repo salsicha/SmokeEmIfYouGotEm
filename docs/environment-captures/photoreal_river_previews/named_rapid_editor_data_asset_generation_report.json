@@ -3,6 +3,13 @@
   "run_date": "2026-07-14",
   "evidence_scope": "historical_pre_zambezi_runnable_portfolio_migration",
   "current_portfolio_source": "physics/data/real_world/named_rapid_source_catalog.json",
+  "superseded_portfolio_snapshot": {
+    "status": "historical_only_do_not_use_for_current_runnable_count",
+    "current_runnable_river_count": 6,
+    "current_additional_active_environment_count": 0,
+    "zambezi_portfolio_role": "runnable_river",
+    "zambezi_runnable_tier": "reference_free_run"
+  },
   "status": "compiled_saved_captured_and_validated_shutdown_completed_after_manual_interrupt",
   "production_promoted": false,
   "editor_version": "Unreal Engine 5.8",

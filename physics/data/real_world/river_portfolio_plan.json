@@ -57,6 +57,8 @@
       "take_out": "Mukuni Beach",
       "crew_mode": "guided_paddle_raft",
       "voice_commands": true,
+      "portfolio_role": "runnable_river",
+      "runnable_tier": "reference_free_run",
       "environment_status": "source_scale_reference_corridor_runnable_photoreal_promotion_blocked",
       "runnable_status": "runnable_reference_corridor_with_procedural_full_run_water",
       "runtime_acceptance_status": "six_river_map_load_gate_passed_zero_failures",

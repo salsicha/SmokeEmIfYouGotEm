@@ -94,6 +94,7 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     assert scenario["rapid_count"] == 25
     assert scenario["production_promoted"] is False
     assert scenario["gameplay"]["runnable"] is True
+    assert scenario["gameplay"]["portfolio_role"] == "runnable_river"
     assert scenario["gameplay"]["runnable_tier"] == "reference_free_run"
     assert scenario["gameplay"]["runtime_coordinate_map"] == (
         COORDINATE_MAP_RELATIVE.as_posix()
@@ -122,6 +123,8 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
         for river in player_catalog["sections"]
         if river["river_id"] == "zambezi_batoka_gorge"
     )
+    assert player_entry["frontend_scenario_id"] == "zambezi_reference_run"
+    assert player_entry["portfolio_role"] == "runnable_river"
     assert player_entry["runnable"] is True
     assert player_entry["runnable_tier"] == "reference_free_run"
     runtime_acceptance = player_entry["runtime_acceptance"]
@@ -284,6 +287,16 @@ def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contract
     )
     assert f'+MapsToCook=(FilePath="{map_package}")' in default_game
 
+    frontend_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimUI/Private/"
+        "RaftSimVerticalSliceFrontend.cpp"
+    ).read_text(encoding="utf-8")
+    assert 'TEXT("zambezi_reference_run")' in frontend_source
+    assert 'TEXT("Zambezi: Boiling Pot to Mukuni Beach")' in frontend_source
+    assert 'TEXT("Runnable Reference Free Run:' in frontend_source
+    assert '"L_ZambeziBatokaGorge_PhysicalCorridorCandidate")' in frontend_source
+
     module_header = (
         REPO_ROOT
         / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Public/RaftSimEditorModule.h"
@@ -357,10 +370,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "ShorelineDryBufferCm = 2800.0f" in director_cpp
     assert "NearBankMorphologyReachBeyondWaterCm = 14800.0f" in director_cpp
     assert "NearBankRoundedSlopeMaskStart = 0.055f" in director_cpp
-    assert "MorphologyOffsetClampCm = 450.0f" in director_cpp
+    assert "MorphologyOffsetClampCm = 280.0f" in director_cpp
     assert "ClosestCenterlinePoint" in director_cpp
     assert "SegmentLengthSquared" in director_cpp
-    assert "RaftSimBatokaNearBankMorphologyV14" in director_cpp
+    assert "RaftSimBatokaOrganicMorphologyV15" in director_cpp
+    assert "RaftSimBatokaHeightAwareFacetReconstructionV15" in director_cpp
     assert "RaftSimProtectedShorelineBuffer" in director_cpp
     assert "MorphologyStats.NearBankModifiedVertexCount <= 0" in build_cpp
     assert "MorphologyStats.MinimumModifiedCenterlineDistanceCm + 0.5f" in build_cpp
@@ -420,7 +434,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v10")
+    assert validation["schema"].endswith(".v12")
     assert validation["runtime_hydraulics"][
         "preserves_global_river_stations"
     ] is True
@@ -430,16 +444,18 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     )
     assert validation["runtime_hydraulics"]["safe_launch_apron_tagged"] is True
     assert validation["visual_terrain"]["morphology_contract"] == (
-        "v14_near_bank_basalt_with_100m_polyline_shoreline_"
-        "protection_and_full_strength_by_220m"
+        "v15_organic_basalt_with_100m_polyline_shoreline_protection_"
+        "full_strength_by_220m_and_central_difference_grid_normals_"
+        "plus_height_aware_source_facet_reconstruction"
     )
     assert validation["visual_terrain"]["active_water_half_width_m"] == 72.0
     assert validation["visual_terrain"]["protected_shoreline_radius_m"] == 100.0
     assert validation["visual_terrain"]["minimum_dry_bank_buffer_m"] == 26.56
     assert validation["visual_terrain"]["full_strength_morphology_radius_m"] == 220.0
-    assert validation["visual_terrain"]["maximum_vertical_offset_m"] == 4.5
+    assert validation["visual_terrain"]["maximum_visual_treatment_vertical_offset_m"] == 2.8
     assert all(
-        "RaftSimBatokaNearBankMorphologyV14" in tile["tags"]
+        "RaftSimBatokaOrganicMorphologyV15" in tile["tags"]
+        and "RaftSimBatokaHeightAwareFacetReconstructionV15" in tile["tags"]
         and "RaftSimProtectedShorelineBuffer" in tile["tags"]
         for tile in validation["visual_terrain"]["tiles"]
     )
@@ -447,8 +463,8 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["water_surface"]["shading_model_contract"] == (
         "SingleLayerWater"
     )
-    assert validation["vegetation"]["component_count"] == 8
-    assert validation["vegetation"]["instance_count"] == 7032
+    assert validation["vegetation"]["component_count"] == 12
+    assert validation["vegetation"]["instance_count"] == 7679
     assert (
         validation["vegetation"]["camera_visible_bank_cover_component_count"]
         == 1
@@ -463,10 +479,14 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["vegetation"]["camera_visible_woody_slope_rejection_count"] == 8
     assert validation["vegetation"]["camera_visible_woody_slope_ceiling_degrees"] == 24.0
     assert validation["vegetation"]["legacy_zambezi_pve_actor_count"] == 0
+    assert validation["vegetation"]["runnable_launch_bank_cover_component_count"] == 1
+    assert validation["vegetation"]["runnable_launch_bank_cover_instance_count"] == 592
+    assert validation["vegetation"]["runnable_launch_woody_component_count"] == 3
+    assert validation["vegetation"]["runnable_launch_woody_instance_count"] == 55
     assert sorted(
         component["instance_count"]
         for component in validation["vegetation"]["components"]
-    ) == [57, 58, 117, 700, 1200, 1400, 1400, 2100]
+    ) == [13, 14, 28, 57, 58, 117, 592, 700, 1200, 1400, 1400, 2100]
     assert all(
         "M_RaftSim_Zambezi_OpaqueVegetation" in component["material"]
         for component in validation["vegetation"]["components"]

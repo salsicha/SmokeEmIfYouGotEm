@@ -13,6 +13,7 @@
     "default_flow_band": "normal_big_water",
     "flexible_raft_enabled": true,
     "hydraulic_authority": "feature_tagged_procedural_reference_only_not_validated_real_world_hydraulics",
+    "portfolio_role": "runnable_river",
     "rapid_9_policy": "mandatory_commercial_portage_not_normal_runnable_line",
     "rock_wrap_and_flip_enabled": true,
     "runnable": true,

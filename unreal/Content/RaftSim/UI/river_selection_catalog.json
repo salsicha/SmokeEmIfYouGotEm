@@ -207,9 +207,11 @@
       "section_id": "boiling_pot_to_mukuni_beach_reference_run",
       "section_name": "Batoka Gorge: Rapids 1–25",
       "scenario": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
+      "frontend_scenario_id": "zambezi_reference_run",
       "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
       "region": "Zambia–Zimbabwe Batoka Gorge",
       "route_style": "guided_paddle_raft",
+      "portfolio_role": "runnable_river",
       "runnable": true,
       "runnable_tier": "reference_free_run",
       "runtime_acceptance": {
