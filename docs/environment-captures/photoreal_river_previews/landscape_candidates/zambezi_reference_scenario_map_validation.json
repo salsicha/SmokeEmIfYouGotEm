@@ -346,14 +346,16 @@
     "preserves_global_river_stations": true,
     "rapid_9_policy": "hazard_visualization_only_mandatory_commercial_portage_not_a_runnable_line",
     "rapid_count": 25,
+    "safe_launch_apron_tagged": true,
     "water_config_tags": [
       "RaftSimGlobalRiverStationAuthority",
       "RaftSimProceduralRuntimeWater",
+      "RaftSimSafeLaunchApron",
       "RaftSimZambeziRun"
     ]
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v9",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v10",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,

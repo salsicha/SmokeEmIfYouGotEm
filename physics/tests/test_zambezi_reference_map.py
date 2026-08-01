@@ -19,6 +19,9 @@ from raftsim.zambezi_reference_map import (
     RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN,
     RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M,
     RUNTIME_GRID_DX_M,
+    RUNTIME_FIRST_RAPID_CONTROL_STATION_M,
+    RUNTIME_LAUNCH_STATION_M,
+    RUNTIME_MINIMUM_SAFE_LAUNCH_APRON_M,
     RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
     SCENARIO_RELATIVE,
     build_runtime_coordinate_map,
@@ -111,6 +114,26 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     assert scenario["route_variants"][2]["source_id"] == "zambezi_victoria_falls_guide"
     assert len(scenario["acceptance_gates"]) >= 5
 
+    player_catalog = _load(
+        REPO_ROOT / "unreal/Content/RaftSim/UI/river_selection_catalog.json"
+    )
+    player_entry = next(
+        river
+        for river in player_catalog["sections"]
+        if river["river_id"] == "zambezi_batoka_gorge"
+    )
+    assert player_entry["runnable"] is True
+    assert player_entry["runnable_tier"] == "reference_free_run"
+    runtime_acceptance = player_entry["runtime_acceptance"]
+    assert runtime_acceptance["result"] == "pass"
+    assert runtime_acceptance["safe_launch_apron"] == (
+        "raftsim.zambezi.safe_launch_apron.v1"
+    )
+    assert runtime_acceptance["initial_settle_upright"] is True
+    assert runtime_acceptance["all_forward_upright"] is True
+    assert runtime_acceptance["attached_crew_count"] == 5
+    assert runtime_acceptance["swimmer_count"] == 0
+
     catalog = _load(REPO_ROOT / CATALOG_RELATIVE)
     generated = build_editor_markers(catalog, REPO_ROOT)
     zambezi = next(
@@ -128,6 +151,7 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
 
 
 def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
+    scenario = _load(REPO_ROOT / SCENARIO_RELATIVE)
     coordinate_map = _load(REPO_ROOT / COORDINATE_MAP_RELATIVE)
     assert coordinate_map == build_runtime_coordinate_map(REPO_ROOT)
     assert coordinate_map["schema"] == "raftsim.curved_river_coordinate_map.v1"
@@ -144,7 +168,7 @@ def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
     assert manifest["production_promoted"] is False
     assert manifest["bands"][0]["band_id"] == "normal_big_water"
     assert manifest["bands"][0]["convergence"]["converged"] is False
-    assert manifest["generator"].endswith("feature_tagged_hydraulic_seed.v2")
+    assert manifest["generator"].endswith("feature_tagged_hydraulic_seed.v3")
     assert manifest["grid"]["dx_m"] == RUNTIME_GRID_DX_M == 5.0
     assert manifest["procedural_infill"]["authority"].startswith(
         "gameplay_reference_only"
@@ -194,11 +218,41 @@ def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
     assert rapid_9["mandatory_commercial_portage"] is True
     assert contract["rapid_9_policy"].startswith("hazard_visualization_only")
 
+    launch_apron = manifest["procedural_infill"]["safe_launch_apron"]
+    assert launch_apron["schema"] == "raftsim.zambezi.safe_launch_apron.v1"
+    assert launch_apron["raft_spawn_station_m"] == RUNTIME_LAUNCH_STATION_M
+    assert launch_apron["first_rapid_control_station_m"] == (
+        RUNTIME_FIRST_RAPID_CONTROL_STATION_M
+    )
+    assert launch_apron["safe_subcritical_clearance_m"] >= (
+        RUNTIME_MINIMUM_SAFE_LAUNCH_APRON_M
+    )
+    assert launch_apron["maximum_centerline_froude_before_approach"] <= (
+        RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX
+    )
+    assert launch_apron["production_authoritative"] is False
+    assert scenario["gameplay"]["safe_launch_apron"] == launch_apron
+    assert contract["transitions"][0]["control_station_m"] == (
+        RUNTIME_FIRST_RAPID_CONTROL_STATION_M
+    )
+
     center_row = loaded["h"].shape[0] // 2
     station_m = np.arange(loaded["h"].shape[1]) * RUNTIME_GRID_DX_M
     center_h = loaded["h"][center_row]
     center_u = loaded["u"][center_row]
     center_v = loaded["v"][center_row]
+    launch_start_index = int(RUNTIME_LAUNCH_STATION_M / RUNTIME_GRID_DX_M)
+    launch_end_index = int(
+        launch_apron["first_rapid_approach_start_station_m"] / RUNTIME_GRID_DX_M
+    )
+    launch_froude = np.hypot(
+        center_u[launch_start_index:launch_end_index],
+        center_v[launch_start_index:launch_end_index],
+    ) / np.sqrt(
+        9.80665
+        * np.maximum(center_h[launch_start_index:launch_end_index], 1.0e-6)
+    )
+    assert float(launch_froude.max()) <= RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX
     for row in contract["transitions"]:
         control_station_m = float(row["control_station_m"])
         sampled_station_m = np.arange(
@@ -295,6 +349,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSim_Zambezi_PlayerRaft" in geometry_cpp
     assert "bRecenterHydraulicCrux = false" in geometry_cpp
     assert "RaftSimGlobalRiverStationAuthority" in geometry_cpp
+    assert "RaftSimSafeLaunchApron" in geometry_cpp
     assert "ApplyZambeziBatokaVisualTerrainTreatment" in build_cpp
     assert "LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true)" in build_cpp
     assert "RaftSimProceduralVisualMorphology" in director_cpp
@@ -365,7 +420,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v9")
+    assert validation["schema"].endswith(".v10")
     assert validation["runtime_hydraulics"][
         "preserves_global_river_stations"
     ] is True
@@ -373,6 +428,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
         "hazard_visualization_only"
     )
+    assert validation["runtime_hydraulics"]["safe_launch_apron_tagged"] is True
     assert validation["visual_terrain"]["morphology_contract"] == (
         "v14_near_bank_basalt_with_100m_polyline_shoreline_"
         "protection_and_full_strength_by_220m"

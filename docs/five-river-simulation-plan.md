@@ -1,6 +1,6 @@
 # Runnable River Simulation & Playability Plan
 
-Written July 18, 2026; updated July 31, 2026. Goal: **all six runnable
+Written July 18, 2026; updated August 1, 2026. Goal: **all six runnable
 rivers playable in-engine with live finite-volume solver water and the full
 gameplay stack** (crew, flip/swim/recover, scoring, HUD, reactive audio). The
 first five use a validated signature-rapid pattern. Zambezi is restored at an
@@ -93,3 +93,20 @@ and external acceptance gates pass.
   rapid cues. It is reference gameplay only: Rapid 9 remains a mandatory
   portage and guide, geospatial, rights, seasonal-flow, rapid-hydraulic,
   photoreal, desktop, and VR gates remain open.
+
+### 2026-08-01 — Zambezi safe launch and live crew acceptance
+
+- Rapid 1's procedural control moved to station 160 m, leaving a 55 m
+  subcritical launch apron after the station-75 raft spawn. The generator
+  fail-closes above Froude 0.94; the current maximum is 0.4041.
+- The rigid-body support mass now includes the dry raft, guide, and four
+  passengers. The generated map places that 605 kg loaded body at hydrostatic
+  equilibrium instead of dropping it from above the surface.
+- The saved-map audit passes schema v10 with the safe-launch tag. The focused
+  PIE gate proves the raft is upright before and after `AllForward`, with five
+  attached crew and zero swimmers. The full parameterized map-load regression
+  passes all six rivers with zero failures.
+- The close runtime capture passes runnable/crew-cohesion review but fails
+  photoreal review: the water is overbright and low-detail, the terrain remains
+  rounded and tessellated-looking, and biome/ground-cover fidelity is still
+  provisional.

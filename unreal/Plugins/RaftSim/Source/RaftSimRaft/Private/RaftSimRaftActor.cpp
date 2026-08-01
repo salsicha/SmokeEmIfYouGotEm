@@ -26,6 +26,8 @@
 namespace
 {
 constexpr float kCmPerM = 100.0f;
+constexpr float kGuideMassKg = 85.0f;
+constexpr float kPassengerMassKg = 75.0f;
 
 bool IsFiniteVector(const FVector& Value)
 {
@@ -141,16 +143,24 @@ void ARaftSimRaftActor::BeginPlay()
     // tools opt into capture explicitly when they need an audit artifact.
     WaterConfig.bEnableDeterministicCapture = false;
 
+    // The rigid-body support stage integrates one combined body, so its mass
+    // and inertia must include the occupied crew represented by D2. The flex
+    // model below keeps MassKg as the dry raft mass and applies the same crew
+    // masses to tube compression; using dry mass here made moving-water rafts
+    // settle far below their loaded waterline and admit runaway deck water.
+    const float LoadedBodyMassKg =
+        MassKg + kGuideMassKg + kPassengerMassKg * static_cast<float>(PaddlerCount);
     FRaftSimRaftBodyConfig BodyConfig;
     BodyConfig.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
-    BodyConfig.MassKg = MassKg;
+    BodyConfig.MassKg = LoadedBodyMassKg;
     BodyConfig.TubeRadiusMeters = TubeRadiusM;
     BodyConfig.LengthMeters = FootprintLengthM;
     BodyConfig.WidthMeters = FootprintWidthM;
     // Yaw inertia of a flat raft: (1/12) m (L^2 + W^2); roll/pitch stiffer
     // response at 0.45x, matching the P1 integrator.
     const float YawInertia =
-        MassKg * (FootprintLengthM * FootprintLengthM + FootprintWidthM * FootprintWidthM) / 12.0f;
+        LoadedBodyMassKg *
+        (FootprintLengthM * FootprintLengthM + FootprintWidthM * FootprintWidthM) / 12.0f;
     BodyConfig.InertiaTensorKgM2 =
         FVector(0.45f * YawInertia, 0.45f * YawInertia, YawInertia);
     BodyConfig.BuoyancyWeightMultiple = BuoyancyWeightMultiple;
@@ -277,8 +287,8 @@ void ARaftSimRaftActor::BeginPlay()
     FlexParameters.LengthM = FootprintLengthM;
     FlexParameters.WidthM = FootprintWidthM;
     FlexParameters.TubeRadiusM = TubeRadiusM;
-    FlexParameters.GuideMassKg = 85.0;
-    FlexParameters.PassengerMassKg = 75.0;
+    FlexParameters.GuideMassKg = kGuideMassKg;
+    FlexParameters.PassengerMassKg = kPassengerMassKg;
     FlexParameters.PassengerCount = PaddlerCount;
     Adapter->ConfigureFlexibleRaftModel(
         FlexParameters, RaftSimFlex::BuildDefaultCrewSeats(FlexParameters));
@@ -1134,6 +1144,28 @@ void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
 
 void ARaftSimRaftActor::EnterCapsize()
 {
+    const FRaftSimFlexStepTelemetry EntryTelemetry = RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry()
+        : FRaftSimFlexStepTelemetry{};
+    UE_LOG(
+        LogTemp,
+        Warning,
+        TEXT("RaftSim capsize: raft=%s location_cm=%s rotation_deg=%s "
+             "flip_margin_nm=%.3f flip_threshold_nm=%.3f retained_water_kg=%.3f "
+             "retained_roll_moment_nm=%.3f wet_samples=%d/%d contacts=%d "
+             "wrapping=%d pinned=%d"),
+        *GetName(),
+        *GetActorLocation().ToCompactString(),
+        *GetActorRotation().ToCompactString(),
+        EntryTelemetry.ReferenceFlipMarginNm,
+        EntryTelemetry.ReferenceFlipThresholdNm,
+        EntryTelemetry.TotalRetainedWaterMassKg,
+        EntryTelemetry.RetainedWaterRollMomentNm,
+        EntryTelemetry.LiveWetSampleCount,
+        EntryTelemetry.LiveWaterSampleCount,
+        EntryTelemetry.ContactCount,
+        EntryTelemetry.WrappingContactCount,
+        EntryTelemetry.PinnedObstacleCount);
     RaftMode = ERaftSimRaftMode::Capsized;
     FlipRiskLatchSeconds = 0.0f;
     // Right the boat here on re-flip. Guard against a diverged sink so the

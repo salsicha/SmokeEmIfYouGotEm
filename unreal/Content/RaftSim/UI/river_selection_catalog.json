@@ -212,6 +212,15 @@
       "route_style": "guided_paddle_raft",
       "runnable": true,
       "runnable_tier": "reference_free_run",
+      "runtime_acceptance": {
+        "test": "RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+        "result": "pass",
+        "safe_launch_apron": "raftsim.zambezi.safe_launch_apron.v1",
+        "initial_settle_upright": true,
+        "all_forward_upright": true,
+        "attached_crew_count": 5,
+        "swimmer_count": 0
+      },
       "input_contract": {
         "manual_input_parity_required": true,
         "passenger_paddle_voice_commands_allowed": true,

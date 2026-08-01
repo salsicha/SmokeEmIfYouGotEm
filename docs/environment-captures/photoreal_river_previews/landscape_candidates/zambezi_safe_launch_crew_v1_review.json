@@ -1,0 +1,80 @@
+{
+  "schema": "raftsim.zambezi.safe_launch_crew_review.v1",
+  "status": "runnable_acceptance_pass_photoreal_promotion_fail",
+  "authority": "reference_free_run_only_not_real_world_navigation_or_production_hydraulic_authority",
+  "acceptance": {
+    "player_catalog_runnable": "pass",
+    "safe_launch_apron": "pass",
+    "initial_settle_upright": "pass",
+    "all_forward_upright": "pass",
+    "five_attached_crew": "pass",
+    "zero_swimmers": "pass",
+    "six_river_regression": "pass",
+    "photoreal_visual_promotion": "fail",
+    "production_hydraulic_promotion": "fail"
+  },
+  "runtime_contract": {
+    "raft_spawn_station_m": 75.0,
+    "first_rapid_approach_start_station_m": 130.0,
+    "first_rapid_control_station_m": 160.0,
+    "safe_subcritical_clearance_m": 55.0,
+    "maximum_centerline_froude_before_approach": 0.4041,
+    "maximum_allowed_froude_before_approach": 0.94,
+    "dry_raft_mass_kg": 220.0,
+    "loaded_body_mass_kg": 605.0,
+    "map_launch_hydrostatic_offset_m": -0.2153846,
+    "crew_command": "AllForward",
+    "raft_mode_after_command": "Upright",
+    "attached_crew_count": 5,
+    "swimmer_count": 0
+  },
+  "evidence": {
+    "renderer_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_safe_launch_crew_v1.png",
+      "sha256": "1cf8b53cbdb1477251ab346940a1f840bfa794dfcb8ec625fa13f92c20f8d1c7",
+      "dimensions_px": [
+        1280,
+        720
+      ]
+    },
+    "saved_map_validation": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "64973fab9daa63cb992e061f0d1268bc8c8612637708ef1911fc7c988d795f43",
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v10",
+      "result": "pass"
+    },
+    "runtime_field_manifest": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/cooked_flow_fields/manifest.json",
+      "sha256": "cdbd8297159d009f02280c7b0ae2e54d1bae5f33c2385a5bdc3027ad942bce52"
+    },
+    "focused_runtime_report": {
+      "path": "unreal/Saved/Automation/ZambeziSafeLaunch/index.json",
+      "sha256": "3f907dc575ce78bc58a80eb566249ee7784b75d9b12b2059a7de16c6583894ad",
+      "result": "1_passed_0_failed",
+      "committed": false
+    },
+    "six_river_runtime_report": {
+      "path": "unreal/Saved/Automation/RiverMapLoadsSixRivers/index.json",
+      "sha256": "2acafb84ee767203b6587776a51b36c65ab2d8278ad9182f409848b36ed88d15",
+      "result": "6_passed_0_failed",
+      "committed": false
+    }
+  },
+  "visual_findings": [
+    "The renderer-backed gameplay frame shows one upright raft with four paddlers and one guide aboard after the launch command.",
+    "The former empty-raft and five-swimmer launch failure is absent.",
+    "The river surface remains overbright, smooth, and low-detail rather than convincing Zambezi big water.",
+    "The 30 m terrain remains rounded and tessellated-looking, with provisional sparse ecology and ground cover.",
+    "Runnable acceptance must not be relabeled as photoreal, guide-approved, or production-hydraulic acceptance."
+  ],
+  "external_gates_remaining": [
+    "local-guide approval of rapid stations, lines, portages, access, and rescue routes",
+    "geospatial approval of centerline and horizontal and vertical datums",
+    "rights approval for the supplied map PDF, height image, and production derivatives",
+    "higher-resolution full-reach terrain and reviewed channel or bathymetric geometry",
+    "seasonal-flow calibration and rapid-scale hydraulic validation",
+    "approved southern African gorge species and ecology",
+    "lifelike terrain, shoreline, vegetation, water, atmosphere, raft, and crew art",
+    "desktop and VR visual, hazard-readability, and performance acceptance"
+  ]
+}

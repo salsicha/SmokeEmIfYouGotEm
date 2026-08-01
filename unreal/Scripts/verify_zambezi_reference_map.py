@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v9",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v10",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -180,6 +180,9 @@ def main() -> None:
             and not water_config.get_editor_property("recenter_hydraulic_crux")
             and "RaftSimGlobalRiverStationAuthority" in water_config_tags
         )
+        safe_launch_apron_tagged = bool(
+            water_config and "RaftSimSafeLaunchApron" in water_config_tags
+        )
         rapid_numbers = []
         for row in marker_rows:
             suffix = str(row["actor_label"]).removeprefix("RaftSim_ZambeziRapid_")
@@ -211,6 +214,7 @@ def main() -> None:
                     ),
                     "water_config_tags": water_config_tags,
                     "rapid_count": 25,
+                    "safe_launch_apron_tagged": safe_launch_apron_tagged,
                     "rapid_9_policy": (
                         "hazard_visualization_only_mandatory_commercial_portage_"
                         "not_a_runnable_line"
@@ -310,6 +314,7 @@ def main() -> None:
             and len(player_rafts) == 1
             and len(water_configs) == 1
             and preserves_global_river_stations
+            and safe_launch_apron_tagged
             and len(player_starts) == 1
             and str(game_mode_path).endswith("RaftSimVerticalSliceGameMode")
             and len(terrain_rows) == 4

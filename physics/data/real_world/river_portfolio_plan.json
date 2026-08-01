@@ -59,6 +59,9 @@
       "voice_commands": true,
       "environment_status": "source_scale_reference_corridor_runnable_photoreal_promotion_blocked",
       "runnable_status": "runnable_reference_corridor_with_procedural_full_run_water",
+      "runtime_acceptance_status": "six_river_map_load_gate_passed_zero_failures",
+      "safe_launch_status": "upright_after_initial_settle_and_all_forward_with_five_attached_crew_and_zero_swimmers",
+      "safe_launch_contract": "raftsim.zambezi.safe_launch_apron.v1",
       "hydraulic_fidelity_status": "procedural_seed_pending_rapid_specific_validation",
       "artifact_policy": "regenerate_candidate_map_locally_from_source_controlled_inputs"
     }
