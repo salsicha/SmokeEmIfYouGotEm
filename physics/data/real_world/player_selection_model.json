@@ -82,6 +82,54 @@
           ]
         }
       ]
+    },
+    {
+      "region": "Zambia–Zimbabwe Batoka Gorge",
+      "rivers": [
+        {
+          "portfolio_role": "runnable_river",
+          "river_id": "zambezi_batoka_gorge",
+          "river_name": "Zambezi River",
+          "runnable": true,
+          "runnable_tier": "reference_free_run",
+          "sections": [
+            {
+              "crew_setups": [
+                "ai_training_crew",
+                "experienced_ai_crew"
+              ],
+              "data_confidence": 0.18,
+              "difficulty_presets": [
+                "full_reference_run_1_to_25"
+              ],
+              "difficulty_range": [
+                "class_iii_reference",
+                "class_v_reference"
+              ],
+              "flow_bands": [
+                {
+                  "flow_band": "normal_big_water",
+                  "procedural_runtime_seed": true,
+                  "relative_flow": "reference",
+                  "requires_validation_before_production_hydraulic_fidelity": true,
+                  "runnable": true
+                }
+              ],
+              "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+              "raft_setups": [
+                "standard_14ft_paddle_raft"
+              ],
+              "scenario": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
+              "scenario_id": "zambezi_reference_run",
+              "seasons": [
+                "normal_big_water_reference"
+              ],
+              "section_id": "boiling_pot_to_mukuni_beach_reference_run",
+              "section_name": "Batoka Gorge: Rapids 1–25"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

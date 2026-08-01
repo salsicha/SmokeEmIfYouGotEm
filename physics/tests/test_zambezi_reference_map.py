@@ -118,6 +118,9 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     player_catalog = _load(
         REPO_ROOT / "unreal/Content/RaftSim/UI/river_selection_catalog.json"
     )
+    assert player_catalog["source_model"] == (
+        "physics/data/real_world/player_selection_model.json"
+    )
     player_entry = next(
         river
         for river in player_catalog["sections"]
@@ -136,6 +139,21 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     assert runtime_acceptance["all_forward_upright"] is True
     assert runtime_acceptance["attached_crew_count"] == 5
     assert runtime_acceptance["swimmer_count"] == 0
+
+    source_model = _load(REPO_ROOT / player_catalog["source_model"])
+    source_entry = next(
+        river
+        for region in source_model["regions"]
+        for river in region["rivers"]
+        if river["river_id"] == "zambezi_batoka_gorge"
+    )
+    assert source_entry["portfolio_role"] == "runnable_river"
+    assert source_entry["runnable"] is True
+    assert source_entry["runnable_tier"] == "reference_free_run"
+    source_section = source_entry["sections"][0]
+    assert source_section["scenario_id"] == "zambezi_reference_run"
+    assert source_section["map_package"] == player_entry["map_package"]
+    assert source_section["flow_bands"][0]["runnable"] is True
 
     catalog = _load(REPO_ROOT / CATALOG_RELATIVE)
     generated = build_editor_markers(catalog, REPO_ROOT)

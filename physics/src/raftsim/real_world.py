@@ -5496,6 +5496,48 @@ def build_south_fork_flow_band_review(
 def build_player_selection_model() -> dict[str, object]:
     section = south_fork_american_section()
     flow_bands = south_fork_american_flow_bands()
+    zambezi_region = {
+        "region": "Zambia–Zimbabwe Batoka Gorge",
+        "rivers": [
+            {
+                "river_id": "zambezi_batoka_gorge",
+                "river_name": "Zambezi River",
+                "portfolio_role": "runnable_river",
+                "runnable": True,
+                "runnable_tier": "reference_free_run",
+                "sections": [
+                    {
+                        "section_id": "boiling_pot_to_mukuni_beach_reference_run",
+                        "section_name": "Batoka Gorge: Rapids 1–25",
+                        "scenario_id": "zambezi_reference_run",
+                        "scenario": (
+                            "physics/data/real_world/zambezi_batoka_gorge/"
+                            "scenario_zambezi_run/scenario.json"
+                        ),
+                        "map_package": (
+                            "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
+                            "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+                        ),
+                        "difficulty_range": ["class_iii_reference", "class_v_reference"],
+                        "seasons": ["normal_big_water_reference"],
+                        "flow_bands": [
+                            {
+                                "flow_band": "normal_big_water",
+                                "relative_flow": "reference",
+                                "runnable": True,
+                                "procedural_runtime_seed": True,
+                                "requires_validation_before_production_hydraulic_fidelity": True,
+                            }
+                        ],
+                        "difficulty_presets": ["full_reference_run_1_to_25"],
+                        "raft_setups": ["standard_14ft_paddle_raft"],
+                        "crew_setups": ["ai_training_crew", "experienced_ai_crew"],
+                        "data_confidence": 0.18,
+                    }
+                ],
+            }
+        ],
+    }
     return {
         "regions": [
             {
@@ -5520,7 +5562,8 @@ def build_player_selection_model() -> dict[str, object]:
                         ],
                     }
                 ],
-            }
+            },
+            zambezi_region,
         ]
     }
 
