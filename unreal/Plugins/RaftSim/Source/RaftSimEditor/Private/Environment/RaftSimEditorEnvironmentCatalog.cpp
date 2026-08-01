@@ -125,21 +125,24 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
-        // Batoka uses its own Single Layer Water parent. Keep the surface dark
-        // and sediment-bearing while allowing the water volume and reflected
-        // sky to carry the guide-eye read; high emissive and normal gains made
-        // the previous Default Lit sheet look opaque and camera-radial.
-        Settings.BaseColorScale = 0.98f;
+        // Batoka uses its own Single Layer Water parent. The retained bracket
+        // balances sediment absorption against a restrained grazing reflection
+        // instead of exposing the pale sky sheet seen at low roughness. Reduce
+        // analytic displacement separately so long flow-aligned grooves do
+        // not masquerade as metre-scale standing waves at the calm launch.
+        Settings.BaseColorScale = 0.78f;
         Settings.EmissiveFillScale = 0.0f;
-        Settings.Roughness = 0.42f;
-        Settings.Specular = 0.28f;
-        Settings.Opacity = 0.62f;
-        Settings.NormalIntensity = 0.20f;
-        Settings.SurfaceVariationStrength = 0.12f;
+        Settings.Roughness = 0.50f;
+        Settings.Specular = 0.26f;
+        Settings.Opacity = 0.48f;
+        Settings.NormalIntensity = 0.04f;
+        Settings.SurfaceVariationStrength = 0.04f;
         Settings.PhaseG = 0.08f;
         Settings.VertexTintWeight = 0.50f;
         Settings.RenderWidthScale = 1.24f;
-        Settings.ReflectionFillIntensity = 0.04f;
+        Settings.RenderNormalUpBlend = 0.92f;
+        Settings.RenderDisplacementScale = 0.08f;
+        Settings.ReflectionFillIntensity = 0.02f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -148,14 +151,14 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 0.0f;
         Settings.SolverFroudeVisualGain = 0.0f;
         Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.060f, 0.105f, 0.055f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.36f, 0.48f, 0.46f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.028f, 0.078f, 0.032f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.30f, 0.42f, 0.40f, 0.0f);
         Settings.ScatteringCoefficients =
-            FLinearColor(0.0008f, 0.0016f, 0.0007f, 0.0f);
+            FLinearColor(0.00025f, 0.00090f, 0.00035f, 0.0f);
         Settings.AbsorptionCoefficients =
-            FLinearColor(0.0045f, 0.0030f, 0.0055f, 0.0f);
+            FLinearColor(0.0150f, 0.0050f, 0.0180f, 0.0f);
         Settings.ColorScaleBehindWater =
-            FLinearColor(0.28f, 0.34f, 0.22f, 0.0f);
+            FLinearColor(0.12f, 0.22f, 0.10f, 0.0f);
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {

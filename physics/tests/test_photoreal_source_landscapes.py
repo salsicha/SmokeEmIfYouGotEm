@@ -87,7 +87,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
     assert "colorado_lees_ferry_reach_terrain_albedo_2048.png" in editor_source
     assert "bRockCanyon ? 0.05f : 0.24f" in editor_source
     assert "bRockCanyon ? 0.04f : 0.18f" in editor_source
-    assert "RenderReliefCapCm = bZambezi ? 420.0f" in editor_source
+    assert "RenderReliefCapCm = bZambezi ? 220.0f" in editor_source
     assert "bFutaleufu ? 240.0f : 180.0f" in editor_source
     assert "0.250f, 0.365f, 230.0f, 150.0f" in editor_source
     assert "0.450f, 0.565f, 175.0f, 125.0f" in editor_source
@@ -783,13 +783,15 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
         if is_zambezi_single_layer_water:
             expected_water = {
                 **expected_water,
-                "base_color_scale": 0.98,
-                "surface_tint": [0.060, 0.105, 0.055],
-                "vertex_tint_weight": 0.50,
-                "reflection_fill_intensity": 0.26,
-                "reflection_tint": [0.36, 0.48, 0.46],
-                "opacity": 0.64,
+                "base_color_scale": 0.78,
+                "surface_tint": [0.028, 0.078, 0.032],
+                "reflection_fill_intensity": 0.02,
+                "reflection_tint": [0.30, 0.42, 0.40],
+                "opacity": 0.48,
                 "phase_g": 0.08,
+                "vertex_tint_weight": 0.50,
+                "render_normal_up_blend": 0.92,
+                "render_displacement_scale": 0.08,
             }
         assert candidate["water_material_status"] == (
             "zambezi_single_layer_water_volume_candidate_bound_and_captured"
@@ -939,7 +941,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             assert candidate["water_solver_foam_max_opacity"] == 0.0
             assert candidate["water_solver_foam_surface_offset_cm"] == 0.0
         assert 0.0 <= candidate["water_emissive_fill_scale"] <= 0.10
-        assert 0.0 < candidate["water_roughness"] <= 0.45
+        assert 0.0 < candidate["water_roughness"] <= 0.50
         assert 0.0 < candidate["water_normal_intensity"] <= 0.90
         assert candidate["water_normal_atlas_sampling_policy"] == (
             "half_period_dual_sample_crossfade_prevents_frac_tile_boundaries"
@@ -1227,18 +1229,32 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
     assert candidate["water_volume_parameter_status"] == (
         "active_on_zambezi_isolated_parent"
     )
-    assert candidate["water_surface_opacity"] == 0.64
-    assert candidate["water_normal_intensity"] == 0.40
+    assert candidate["water_base_color_scale"] == 0.78
+    assert candidate["water_surface_opacity"] == 0.48
+    assert candidate["water_roughness"] == 0.50
+    assert candidate["water_specular"] == 0.26
+    assert candidate["water_normal_intensity"] == 0.04
+    assert candidate["water_surface_variation_strength"] == 0.04
+    assert candidate["water_surface_tint"] == [0.028, 0.078, 0.032]
+    assert candidate["water_reflection_fill_intensity"] == 0.02
+    assert candidate["water_reflection_tint"] == [0.30, 0.42, 0.40]
+    assert candidate["water_render_normal_up_blend"] == 0.92
+    assert candidate["water_render_displacement_scale"] == 0.08
     assert candidate["water_single_layer_phase_g"] == 0.08
     assert candidate["water_single_layer_scattering_coefficients_per_cm"] == [
-        0.0008,
-        0.0016,
-        0.0007,
+        0.00025,
+        0.00090,
+        0.00035,
     ]
     assert candidate["water_single_layer_absorption_coefficients_per_cm"] == [
-        0.0045,
-        0.0030,
-        0.0055,
+        0.0150,
+        0.0050,
+        0.0180,
+    ]
+    assert candidate["water_single_layer_color_scale_behind_water"] == [
+        0.12,
+        0.22,
+        0.10,
     ]
     assert candidate["water_material_promotion_status"] == (
         "review_only_requires_visual_guide_solver_hazard_and_performance_validation"
@@ -1257,7 +1273,7 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
 
     validation = json.loads(validation_path.read_text(encoding="utf-8"))
     assert validation["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v7"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v12"
     )
     assert validation["passed"] is True
     assert validation["water_surface"]["component_count"] == 1

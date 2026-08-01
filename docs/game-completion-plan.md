@@ -3536,6 +3536,20 @@ path is verified, and the completion goal can be marked complete.
   polygonal analytical breaking forms, coarse canyon terrain, sparse synthetic
   ecology, lighting, and absent named water-VFX-art/guide approval. M9 remains
   open.
+- Zambezi sediment water V2 keeps Batoka Gorge in the six-river runnable
+  portfolio while correcting the calm physical ribbon's synthetic surface
+  response. A matched Unreal gameplay bracket selects 0.48 opacity, 0.50
+  roughness, 0.26 specular, 0.04 normal and optical-variation strength, 0.92
+  mesh-normal up blend, and 0.08 authored displacement with sediment-specific
+  scattering and absorption. Mean horizontal image-gradient energy in the
+  audited water band falls 39.7%, removing most long streamwise grooves without
+  changing the transparent live solver carrier, focused foam sheet, raft/crew
+  foam exclusion, collision, navigation, forces, or hydraulics. The editor
+  build, two focused Python contracts, saved-material test, water-render test,
+  runnable-map load test, and schema-v12 25-marker saved-map audit pass. The
+  accepted frame still exposes coarse bright terrain, sparse synthetic ecology,
+  calm broad water, and simplified raft/crew art, so this is not photoreal or
+  release promotion and M9 remains open.
 - Torso-wrapped production PFD V2 removes the remaining backpack-like rear
   silhouette across every runnable river. The four chest cells now arc 2.0 cm
   toward the flanks; two independently rounded rear cells replace the single

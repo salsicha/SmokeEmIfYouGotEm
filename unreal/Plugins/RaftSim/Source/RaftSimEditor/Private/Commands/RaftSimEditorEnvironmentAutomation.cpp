@@ -660,6 +660,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_specular\": %.6f,\n")
             TEXT("      \"water_surface_opacity\": %.6f,\n")
             TEXT("      \"water_normal_intensity\": %.6f,\n")
+            TEXT("      \"water_surface_variation_strength\": %.6f,\n")
             TEXT("      \"water_normal_atlas_sampling_policy\": \"half_period_dual_sample_crossfade_prevents_frac_tile_boundaries\",\n")
             TEXT("      \"water_normal_atlas_phase_offset\": 0.500000,\n")
             TEXT("%s")
@@ -933,6 +934,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.Specular,
             bUsesZambeziSingleLayerWater ? WaterSettings.Opacity : 1.0f,
             WaterSettings.NormalIntensity,
+            WaterSettings.SurfaceVariationStrength,
             *WaterSingleLayerParametersJson,
             WaterSettings.RenderWidthScale,
             WaterSettings.RenderNormalUpBlend,

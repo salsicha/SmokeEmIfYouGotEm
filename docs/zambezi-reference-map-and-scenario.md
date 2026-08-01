@@ -138,7 +138,7 @@ The physical-corridor ribbon now uses an isolated
 `M_RaftSim_Zambezi_SingleLayerWater` parent instead of changing the shared
 Default Lit candidate used by the other rivers. It binds Unreal's
 `SingleLayerWaterMaterialOutput` with per-centimetre scattering and absorption,
-phase, behind-water colour scale, and a 0.62 surface-opacity control. Two
+phase, behind-water colour scale, and a 0.48 surface-opacity control. Two
 opposed panners animate independently tiled normal-atlas layers, while bounded
 world-space optical variation keeps commandlet captures from collapsing into a
 single flat colour when temporal reflections are unavailable. The ribbon stays
@@ -147,21 +147,29 @@ the gameplay authority. The generated actor exposes
 `RaftSimZambeziSingleLayerWater`, `RaftSimMovingMultiScaleWaterNormals`,
 `RaftSimPhysicalCorridorWater`, and `RaftSimNonCollisionRenderSurface` tags.
 
-An August 1 fixed-camera renderer bracket replaces the overbright mirror-sheet
-response with a sediment-bearing green-gray surface. The accepted instance uses
-0.42 roughness, 0.28 specular, 0.20 normal intensity, 0.04 reflection fill, no
-emissive fill, and 0.12 optical variation. In the lower 480 rows of the matched
-1280 x 720 gameplay frames, mean luminance falls from 0.7044 to 0.5271 and the
-share above 0.80 falls from 14.40% to 0.69%. The regenerated default capture
-matches the selected diagnostic bracket without runtime overrides. It does not
-reproduce the foreground depth split that rejected the earlier global Single
-Layer experiment, although some elongated procedural normal/geometry structure
-is still visible. The live
-runtime can now add solver-triggered breaking-water, roller, aerosol, foam, and
+An August 1 second renderer bracket supersedes the first sediment-water scalar
+profile. The accepted instance now uses 0.48 opacity, 0.50 roughness, 0.26
+specular, 0.04 normal intensity, 0.02 reflection fill, no emissive fill, and
+0.04 optical variation. The source-aligned ribbon blends its mesh normals 0.92
+toward up and scales its authored calm-water displacement to 0.08; the live
+solver mesh remains optically disabled and keeps its own bounded rapid relief.
+In the matched 1280 x 720 launch-water band, mean luminance falls from 0.5302 to
+0.3906 and mean absolute horizontal image gradient falls from 0.003204 to
+0.001931, a 39.7% reduction in the long artificial streamwise-groove response.
+The regenerated default capture matches the selected diagnostic bracket without
+runtime overrides. It does not reproduce the foreground depth split that
+rejected the earlier global Single Layer experiment. The live runtime can add
+solver-triggered breaking-water, roller, aerosol, foam, and
 mist components at the procedural rapid controls described below. This is an
 incremental optical and runtime baseline, not final water art: realistic crest
 geometry, local bathymetric transmission, seasonal calibration, and guide/art
 approval remain open.
+
+The retained frame and machine-readable comparison are
+`zambezi_sediment_water_gameplay_v2.png` and
+`zambezi_sediment_water_gameplay_v2_review.json` in the landscape-candidate
+capture directory. They are gameplay-viewport evidence for the runnable
+`reference_free_run`, not approval of real-world hydraulics or photoreal art.
 
 ## Runnable reference status
 

@@ -1,0 +1,109 @@
+{
+  "schema": "raftsim.zambezi.sediment_water_gameplay_review.v2",
+  "status": "retained_visual_improvement_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_hydraulic_navigation_or_collision_authority",
+  "runnable_contract": {
+    "river_id": "zambezi_batoka_gorge",
+    "scenario_id": "zambezi_reference_run",
+    "portfolio_role": "runnable_river",
+    "fidelity_tier": "reference_free_run",
+    "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+  },
+  "method": {
+    "renderer": "Unreal Engine 5.8 offscreen Metal gameplay viewport",
+    "resolution_px": [1280, 720],
+    "capture_command": "RaftSim.CaptureRaft 3 <label> 8 4 22 waterinventory",
+    "controlled_state": "same saved map, camera offsets, raft transform, crew command, lighting, scalability, and 3 second capture time",
+    "runtime_override_on_accepted_capture": false,
+    "measurement_region_px": [0, 285, 1280, 450]
+  },
+  "accepted_material_contract": {
+    "material_parent": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate",
+    "base_color_scale": 0.78,
+    "surface_tint": [0.028, 0.078, 0.032],
+    "vertex_tint_weight": 0.50,
+    "opacity": 0.48,
+    "roughness": 0.50,
+    "specular": 0.26,
+    "normal_intensity": 0.04,
+    "reflection_fill_intensity": 0.02,
+    "reflection_tint": [0.30, 0.42, 0.40],
+    "emissive_fill_scale": 0.0,
+    "surface_variation_strength": 0.04,
+    "phase_g": 0.08,
+    "scattering_coefficients_per_cm": [0.00025, 0.00090, 0.00035],
+    "absorption_coefficients_per_cm": [0.015, 0.005, 0.018],
+    "color_scale_behind_water": [0.12, 0.22, 0.10],
+    "render_width_scale": 1.24,
+    "render_normal_up_blend": 0.92,
+    "render_displacement_scale": 0.08
+  },
+  "matched_frame_metrics": {
+    "before_mean_luminance": 0.530151,
+    "after_mean_luminance": 0.390619,
+    "before_mean_absolute_horizontal_gradient": 0.003204,
+    "after_mean_absolute_horizontal_gradient": 0.001931,
+    "horizontal_gradient_reduction_fraction": 0.397316,
+    "before_mean_absolute_vertical_gradient": 0.006794,
+    "after_mean_absolute_vertical_gradient": 0.003866,
+    "vertical_gradient_reduction_fraction": 0.430969,
+    "interpretation": "The darker sediment-volume response and restrained normal/displacement layers remove most of the long solver-aligned-looking grooves and pale mirror-sheet response in the matched calm launch view. Gradient reductions are descriptive renderer evidence, not perceptual or hydraulic acceptance thresholds."
+  },
+  "runtime_water_telemetry": {
+    "wet_vertices": 2673,
+    "foam_mean": 0.0341,
+    "foam_max": 0.7285,
+    "depth_mean_m": 0.8766,
+    "speed_mean_mps": 0.3437,
+    "standing_wave_abs_max_m": 0.2640,
+    "hydraulic_relief_abs_max_m": 0.1262,
+    "rapid_foam_vertices": 125,
+    "rapid_foam_visible": true,
+    "broad_live_surface_optical_coverage": 0.0,
+    "raft_and_crew_foam_exclusion_contract_preserved": true
+  },
+  "evidence": {
+    "before_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_sediment_water_gameplay_v2_before.png",
+      "sha256": "f087ab5748336d0c1e7fc901a0a6ad69ae596cfc47378e686f2b29b99dd9312f"
+    },
+    "accepted_default_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_sediment_water_gameplay_v2.png",
+      "sha256": "6da49dbdef2f91b8bd19a3348d43f7787b6e3f8d807af8fdf6d310cd8d2c8eea"
+    },
+    "generated_candidate_manifest": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_zambezi_batoka_gorge.json",
+      "sha256": "e6bd33c3cd7b63eae6cf74b3627d93bf2490d600576180994a005de325a39018"
+    },
+    "saved_map_validation": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "f109d8979032b1792c4e8ca70f39956a142f69db43f3e767c67f210c35942f11",
+      "result": "passed_25_markers_1_player_raft_1_water_config_1_player_start"
+    }
+  },
+  "automated_acceptance": {
+    "editor_build": "passed",
+    "python_source_and_manifest_tests": "2_passed_2_deselected",
+    "native_material_test": "passed_RaftSim.M9.FZambeziSingleLayerWater",
+    "native_water_render_test": "passed_RaftSim.P2.WaterSurfaceRenders",
+    "native_runnable_map_load_test": "passed_RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+  },
+  "visual_findings": [
+    "The regenerated default asset reproduces the retained scalar, volume, normal, and mesh-displacement settings without a runtime material override.",
+    "The broad live solver carrier remains optically disabled; only focused masked solver foam is visible, and its raft/crew exclusion contract is unchanged.",
+    "The matched launch view shows substantially less streamwise streaking and a more credible dark green-gray sediment response than the prior default.",
+    "The calm launch remains intentionally free of fabricated rapid-scale whitewater.",
+    "The coarse bright terrain, sparse procedural ecology, provisional hydraulics, simplified raft and crew, and distant analytical VFX still fail photoreal promotion."
+  ],
+  "external_gates_remaining": [
+    "local-guide approval of rapid stations, lines, portages, access, and rescue routes",
+    "geospatial approval of centerline and horizontal and vertical datums",
+    "rights approval for the supplied map PDF, height image, and production derivatives",
+    "higher-resolution full-reach terrain and reviewed channel or bathymetric geometry",
+    "seasonal-flow calibration and rapid-scale hydraulic validation",
+    "approved southern African gorge species and ecology",
+    "lifelike terrain, shoreline, vegetation, whitewater, atmosphere, raft, and crew art",
+    "desktop and VR visual, hazard-readability, and performance acceptance"
+  ]
+}
