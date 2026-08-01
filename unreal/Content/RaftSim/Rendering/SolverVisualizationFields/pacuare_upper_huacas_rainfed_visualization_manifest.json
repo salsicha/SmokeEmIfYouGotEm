@@ -1,0 +1,153 @@
+{
+  "schema": "raftsim.unreal.pacuare_upper_huacas_solver_visualization.v1",
+  "generated_on": "2026-08-01",
+  "status": "reference_runnable_capture_visualization_not_production_promoted",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "flow_band": "rainfed_runnable_planning",
+  "source_scenario_id": "pacuare_upper_huacas_c3_window_rainfed_runnable_planning",
+  "source_artifacts": {
+    "manifest": {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/manifest.json",
+      "sha256": "9bd0ff4288f58d7b11ae47494a652e629d425f94367b47db7d8a48fe1b073d67",
+      "size_bytes": 65292
+    },
+    "bed": {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/bed.npy",
+      "sha256": "e8903570072f2bbe259ce70395350d596c19ea309f949ec68869db2a9c17d390",
+      "size_bytes": 48288
+    },
+    "h": {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/h.npy",
+      "sha256": "1d10c9c2aeb176754cb5ed56b56c8740c960ec405301770f8522503128f063db",
+      "size_bytes": 48288
+    },
+    "u": {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/u.npy",
+      "sha256": "ff65987e160de8ceb946105bfc619f813430eacf8db67f44b35755227183664f",
+      "size_bytes": 48288
+    },
+    "v": {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/v.npy",
+      "sha256": "427198ef6c58b2d4c07a9d6dfcced2e7875f11899c9d452f6aa59a87af2ce53a",
+      "size_bytes": 48288
+    },
+    "wet_mask": {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/wet_mask.npy",
+      "sha256": "beda0440ed95e9271ecec2eb317a852fc0db0a0ba8639c67dba3a0f08b8ce5ef",
+      "size_bytes": 12168
+    }
+  },
+  "source_grid": {
+    "crs": "channel-following meters; x downstream along the traced GLO-30 valley centerline anchored at the Upper Huacas gorge/hole review seed (preview station 17000.0 m), y positive river-left",
+    "downstream_axis": "+x",
+    "dx_m": 2.0,
+    "dy_m": 2.0,
+    "index_to_world": "world_x = origin_x_m + col * dx_m; world_y = origin_y_m + row * dy_m (cell-centered samples)",
+    "layout": "row_major_c_order",
+    "nx": 301,
+    "ny": 40,
+    "origin_x_m": 0.0,
+    "origin_y_m": -39.0
+  },
+  "solver_evidence": {
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "flux_scheme": "hll",
+    "spatial_order": 2,
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "final_convergence_window": {
+      "end_time_s": 800.0,
+      "max_abs_dh_m": 0.012810540820016314,
+      "max_abs_du_m_per_s": 0.04344039922571641,
+      "max_abs_dv_m_per_s": 0.014778187966635853
+    },
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "discharge_authority": "interpreted_planning_value_not_gauge_calibrated",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "field_ranges": {
+    "wet_depth_m": [
+      0.0037685115821659565,
+      3.3070878982543945
+    ],
+    "wet_speed_mps": [
+      0.0,
+      4.274537563323975
+    ],
+    "wet_froude": [
+      0.0,
+      2.524568120199761
+    ],
+    "wet_surface_relief_m": [
+      -0.7993388629154197,
+      0.2559649990084836
+    ]
+  },
+  "normalization": {
+    "policy": "fixed_physical_caps_clamp_to_unit_interval",
+    "caps": {
+      "depth_m": 3.5,
+      "speed_mps": 4.5,
+      "froude": 2.5,
+      "surface_relief_m": 1.0
+    }
+  },
+  "surface_relief_derivation": {
+    "source_field": "bed_plus_h",
+    "detrending": "subtract_least_squares_fit_of_per_column_wet_cell_median_surface",
+    "trend_slope_m_per_m": -0.013024134196268666,
+    "trend_intercept_m": 458.2491482569107,
+    "wet_cell_clipped_fraction": 0.0,
+    "render_height_scale": 0.18,
+    "render_height_cap_cm": 18.0
+  },
+  "hydraulic_visualization_evidence": {
+    "wet_cell_count": 5393,
+    "supercritical_cell_count": 52,
+    "foam_eligible_cell_count": 125,
+    "foam_mask": "wet_and_froude_at_least_0.72_and_speed_at_least_0.8_mps",
+    "strongest_column_index": 143,
+    "strongest_column_station_m": 286.0,
+    "strongest_column_mean_froude": 1.5880918353203237,
+    "camera_progress": {
+      "guide": 0.405,
+      "guide_target": 0.49,
+      "river_eye": 0.445,
+      "river_eye_target": 0.505,
+      "solver_rapid": 0.43,
+      "solver_rapid_target": 0.515
+    }
+  },
+  "texture": {
+    "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png",
+    "sha256": "2374a59f5bf5945158ba8b853216a35b8620471daff44165cb0f30e0bbd2e763",
+    "width": 1024,
+    "height": 256,
+    "channels": "R=depth_m/3.5 G=speed_mps/4.5 B=froude/2.5 A=detrended_surface_relief_m/2+0.5",
+    "source_orientation": "image_x_increases_downstream_station; image_y_increases_from_river_right_to_river_left"
+  },
+  "render_binding": {
+    "map": "/Game/RaftSim/Maps/L_UpperHuacas",
+    "surface_actor": "RaftSim_PhysicalCorridorRiverRibbon_pacuare",
+    "foam_actor": "RaftSim_SolverFieldFoam_pacuare",
+    "capture_only": true,
+    "hidden_in_game": true,
+    "collision_enabled": false,
+    "runtime_water_owner": "ARaftSimWaterSurfaceActor_live_cooked_field_window",
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0,
+    "foam_persistence_policy": "bounded_decay_from_current_and_two_upstream_cooked_field_samples"
+  },
+  "authority_policy": {
+    "physical_authority": "live_custom_cxx_shallow_water_solver",
+    "derivative_scope": "capture_only_noncolliding_authored_ribbon_color_relief_and_foam",
+    "changes_collision_or_raft_forces": false,
+    "changes_solver_state": false,
+    "changes_cooked_fields": false,
+    "may_be_used_as_production_calibration_evidence": false,
+    "reason": "source convergence is false and Upper Huacas geometry, discharge, stationing, and guide lines remain review-gated"
+  }
+}

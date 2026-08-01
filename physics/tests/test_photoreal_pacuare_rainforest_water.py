@@ -83,7 +83,17 @@ def test_pacuare_manifest_records_capture_accepted_render_only_water():
     assert candidate["water_render_normal_up_blend"] == 0.82
     assert candidate["water_render_displacement_scale"] == 0.20
     assert candidate["water_solver_render_geometry_collision_enabled"] is False
-    assert candidate["water_solver_visualization_field_enable"] == 0.0
+    assert candidate["water_solver_visualization_field_enable"] == 1.0
+    assert candidate["water_solver_visualization_field_status"] == (
+        "pacuare_cooked_field_capture_visualization_bound_review_only_not_"
+        "production_promoted"
+    )
+    assert candidate["water_solver_visualization_field_texture_count"] == 1
+    assert candidate["water_solver_surface_relief_cap_cm"] == 18.0
+    assert candidate["water_solver_foam_status"] == (
+        "capture_only_cooked_speed_froude_masked_noncolliding_surface_bound_"
+        "hidden_in_game"
+    )
     assert candidate["water_material_promotion_status"] == (
         "review_only_requires_visual_guide_solver_hazard_and_performance_validation"
     )

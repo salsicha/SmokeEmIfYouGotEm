@@ -42,12 +42,12 @@
     {
       "view": "guide_seat_downstream",
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "c6ee08bf9b72f215b04feace792de7e95dcbf34fa15d17cc78be663a80cdc6d7"
+      "sha256": "16da9111e63ce778abde5c7269d57d368fe1ddb38ed40e08135e7255e7b8d6df"
     },
     {
       "view": "river_eye_downstream",
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "ae5f2e49623feefcfe0d715ec1cf5c299c4bf83801149ca8045e4338b663b5cb"
+      "sha256": "179bb042cdf6a144f720308a0cf0e18910ab4b26b0677f977df23c2fe167eb60"
     }
   ],
   "visual_assessment": {

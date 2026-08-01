@@ -45,7 +45,7 @@
   "retained_artifacts": [
     {
       "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
-      "sha256": "744e763b7a9913046a2b6c2eab38c5cc19c555632aa5c2e9b59b66d36e503f64"
+      "sha256": "260c2426c3f58ceab595b11ba4079e19d6e71d01af33f6af327bcd2bccb1f81b"
     },
     {
       "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png",
@@ -57,11 +57,23 @@
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "c6ee08bf9b72f215b04feace792de7e95dcbf34fa15d17cc78be663a80cdc6d7"
+      "sha256": "16da9111e63ce778abde5c7269d57d368fe1ddb38ed40e08135e7255e7b8d6df"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "ae5f2e49623feefcfe0d715ec1cf5c299c4bf83801149ca8045e4338b663b5cb"
+      "sha256": "179bb042cdf6a144f720308a0cf0e18910ab4b26b0677f977df23c2fe167eb60"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
+      "sha256": "ce1904e43bbdf5babf8a198b2c027b5df459c66181554760347cf0c3a6388af7"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png",
+      "sha256": "2374a59f5bf5945158ba8b853216a35b8620471daff44165cb0f30e0bbd2e763"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_visualization_manifest.json",
+      "sha256": "b37742ba315c08d93cf11ebe3b01e8e502ec182e9f28d05c1d21ca7bb1d789ec"
     }
   ],
   "visual_assessment": {
@@ -69,12 +81,16 @@
       "replaced the grossly mismatched broad DEM preview with the physical 600 m Upper Huacas window",
       "removed the huge planar DEM facets and rectangular water-land intersection",
       "kept water inside continuous source-aligned banks in both canonical downstream views",
-      "added dense rainforest framing and bounded non-periodic bank relief"
+      "added dense rainforest framing and bounded non-periodic bank relief",
+      "reframed the evidence on the cooked field hydraulic crux near station 286 m",
+      "made the capture-only authored surface visible to evidence rendering while keeping it hidden in play",
+      "added a separate non-colliding cooked-field-derived foam sheet and solver-crux capture"
     ],
     "remaining_photoreal_defects": [
-      "capture water is still dark and opaque instead of optically convincing shallow turbulent water",
+      "capture water now reads as water and carries field-derived foam, but remains an opaque review shader rather than optically convincing shallow turbulent water",
       "generic sample foliage silhouettes and repeated canopy structure remain visible",
-      "runtime Upper Huacas field currently produces no visible rapid-foam vertices at the tested launch window",
+      "the calm runtime launch window still produces no live rapid-foam vertices; downstream full-run VFX evidence remains missing",
+      "capture foam bands remain coarse and require production crest, roller, spray, and breakup art",
       "missing production wet-bank microgeometry, riverbed optics, mist, spray, waterfall treatment, and Pacuare-specific ecology assets"
     ]
   },

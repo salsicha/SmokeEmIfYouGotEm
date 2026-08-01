@@ -375,7 +375,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             OutSummary);
         FString SolverRapidCapturePath;
         bool bSolverRapidCaptured = true;
-        if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+        const bool bHasRiverSpecificSolverVisualization =
+            Candidate.bUseSolverVisualizationFields &&
+            (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ||
+             !Candidate.SolverVisualizationFieldRelativePath.IsEmpty());
+        if (bHasRiverSpecificSolverVisualization)
         {
             SolverRapidCapturePath = GetLandscapeCandidateCaptureRelativePath(
                 Candidate,
@@ -440,8 +444,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             (Candidate.LandscapeSize - 1) /
             (CandidateNumSubsections * CandidateSubsectionSizeQuads);
         const bool bHasSolverVisualizationFields =
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") &&
-            Candidate.bUseSolverVisualizationFields;
+            bHasRiverSpecificSolverVisualization;
+        const bool bPacuareSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const FString CandidateSolverVisualizationManifest =
+            bPacuareSolverVisualization
+            ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                   "pacuare_upper_huacas_rainfed_visualization_manifest.json")
+            : GetSolverVisualizationFieldManifestRelativePath();
         const bool bHasManifestConditionedPhysicalChannel =
             Candidate.bPhysicalScaleSourceCorridor;
         const bool bUsesZambeziOpaqueVegetation =
@@ -722,11 +733,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(GuideSeatCapturePath),
             *EscapeRaftSimJsonString(RiverEyeCapturePath),
             *EscapeRaftSimJsonString(SolverRapidCapturePath),
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+            bHasRiverSpecificSolverVisualization
                 ? (bSolverRapidCaptured
-                       ? (bHasSolverVisualizationFields
-                              ? TEXT("captured_at_validated_median_field_high_froude_approach")
-                              : TEXT("captured_physical_corridor_midreach_geometry_review_without_solver_field"))
+                       ? (bPacuareSolverVisualization
+                              ? TEXT("captured_at_upper_huacas_cooked_field_hydraulic_crux")
+                              : TEXT("captured_at_validated_median_field_high_froude_approach"))
                        : TEXT("solver_rapid_capture_failed"))
                 : TEXT("not_available_without_river_specific_validated_solver_field"),
             bCandidateSucceeded ? TEXT("captured_source_landscape_import_candidate") : TEXT("candidate_generation_or_capture_failed"),
@@ -944,12 +955,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("active_on_zambezi_isolated_parent")
                 : TEXT("inactive_single_layer_evaluation_values_retained_in_manifest_only"),
             bHasSolverVisualizationFields
-                ? TEXT("validated_cpp_solver_visualization_fields_bound_review_only")
+                ? (bPacuareSolverVisualization
+                       ? TEXT("pacuare_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : TEXT("validated_cpp_solver_visualization_fields_bound_review_only"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_for_physical_corridor_until_solver_grid_georeferencing_is_validated")
                        : TEXT("not_available_for_river_no_cross_river_field_reuse")),
-            *EscapeRaftSimJsonString(GetSolverVisualizationFieldManifestRelativePath()),
-            bHasSolverVisualizationFields ? 2 : 0,
+            *EscapeRaftSimJsonString(CandidateSolverVisualizationManifest),
+            bHasSolverVisualizationFields ? (bPacuareSolverVisualization ? 1 : 2) : 0,
             bHasSolverVisualizationFields ? TEXT("0") : TEXT("null"),
             WaterSettings.SolverFieldEnable,
             WaterSettings.SolverMacroNormalWeight,
@@ -959,14 +972,17 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.SolverSpeedVisualGain,
             WaterSettings.SolverFroudeVisualGain,
             WaterSettings.SolverSurfaceReliefScale,
-            WaterSettings.SolverSurfaceReliefScale * 400.0f,
-            bHasSolverVisualizationFields ? 0.42f : 1.0f,
+            Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
+                WaterSettings.SolverSurfaceReliefScale,
+            bHasSolverVisualizationFields ? (bPacuareSolverVisualization ? 0.22f : 0.42f) : 1.0f,
             bHasSolverVisualizationFields
-                ? TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound")
+                ? (bPacuareSolverVisualization
+                       ? TEXT("capture_only_cooked_speed_froude_masked_noncolliding_surface_bound_hidden_in_game")
+                       : TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_until_physical_corridor_solver_grid_georeferencing_is_validated")
                        : TEXT("not_available_without_river_specific_validated_solver_field")),
-            bHasSolverVisualizationFields ? 0.72f : 0.0f,
+            bHasSolverVisualizationFields ? (bPacuareSolverVisualization ? 0.94f : 0.72f) : 0.0f,
             bHasSolverVisualizationFields ? 1.4f : 0.0f,
             Result.WaterMaterialBoundComponentCount,
             WaterSettings.BaseColorScale,

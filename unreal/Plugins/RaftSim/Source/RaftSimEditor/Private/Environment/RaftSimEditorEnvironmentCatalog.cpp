@@ -102,28 +102,30 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         // Single Layer Water's hard foreground depth-composition band. Keep a
         // bounded render overlap over known Landscape seam gaps without
         // changing collision, solver geometry, or the analytic bank profile.
-        Settings.BaseColorScale = 0.90f;
-        Settings.EmissiveFillScale = 0.32f;
+        Settings.BaseColorScale = 1.08f;
+        Settings.EmissiveFillScale = 0.40f;
         Settings.Roughness = 0.32f;
         Settings.Specular = 0.42f;
         Settings.Opacity = 0.28f;
         Settings.NormalIntensity = 0.20f;
         Settings.SurfaceVariationStrength = 0.32f;
         Settings.PhaseG = 0.15f;
-        Settings.VertexTintWeight = 0.30f;
+        Settings.VertexTintWeight = 0.52f;
         Settings.RenderWidthScale = 1.35f;
         Settings.RenderNormalUpBlend = 0.82f;
         Settings.RenderDisplacementScale = 0.20f;
         Settings.ReflectionFillIntensity = 0.06f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.050f, 0.085f, 0.060f, 0.0f);
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.18f;
+        Settings.SolverDepthColorWeight = 0.30f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.58f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.18f;
+        Settings.SurfaceTint = FLinearColor(0.075f, 0.160f, 0.120f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.025f, 0.090f, 0.072f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.88f, 0.93f, 0.90f, 0.0f);
         Settings.ReflectionTint = FLinearColor(0.30f, 0.38f, 0.40f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f);
         Settings.AbsorptionCoefficients = FLinearColor(0.0055f, 0.0020f, 0.0035f, 0.0f);
@@ -1274,7 +1276,16 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.TargetReliefCm = 2395.6667f;
             Candidate.WorldVerticalOffsetCm = -470.1597f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bUseSolverVisualizationFields = true;
+            Candidate.SolverVisualizationFieldRelativePath =
+                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                     "pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png");
+            Candidate.SolverVisualizationDepthCapM = 3.5f;
+            Candidate.SolverVisualizationSpeedCapMps = 4.5f;
+            Candidate.SolverVisualizationFroudeCap = 2.5f;
+            Candidate.SolverVisualizationSurfaceReliefCapM = 1.0f;
+            Candidate.SolverVisualizationLateralMinM = -39.0f;
+            Candidate.SolverVisualizationLateralMaxM = 39.0f;
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;

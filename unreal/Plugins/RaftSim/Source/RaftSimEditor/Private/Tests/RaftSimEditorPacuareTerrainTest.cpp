@@ -217,17 +217,17 @@ bool FRaftSimPacuareRainforestDefaultLitWaterTest::RunTest(
             FString::Printf(TEXT("%s keeps its reviewed value"), ParameterName),
             Value.Equals(ExpectedValue, 0.0001f));
     };
-    TestScalar(TEXT("BaseColorScale"), 0.90f);
+    TestScalar(TEXT("BaseColorScale"), 1.08f);
     TestScalar(TEXT("Opacity"), 0.28f);
     TestScalar(TEXT("Roughness"), 0.32f);
     TestScalar(TEXT("Specular"), 0.42f);
     TestScalar(TEXT("NormalIntensity"), 0.20f);
     TestScalar(TEXT("SurfaceVariationStrength"), 0.32f);
     TestScalar(TEXT("RefractionIor"), 1.333f);
-    TestScalar(TEXT("SolverFieldEnable"), 0.0f);
+    TestScalar(TEXT("SolverFieldEnable"), 1.0f);
     TestVector(
         TEXT("SurfaceTint"),
-        FLinearColor(0.050f, 0.085f, 0.060f, 0.0f));
+        FLinearColor(0.075f, 0.160f, 0.120f, 0.0f));
     TestVector(
         TEXT("ScatteringCoefficients"),
         FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f));

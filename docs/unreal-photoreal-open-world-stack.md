@@ -37,6 +37,25 @@ Zambezi is now an explicit isolated exception to the shared Default Lit water co
 
 Pacuare's later isolated Single Layer V1 is now explicitly rejected and inactive. Both direct material isolation and a 31,409-vertex procedural reference-infill bathymetry bracket left the same hard horizontal foreground depth-composition band; a separate terrain-colored shoreline-infill attempt covered bright gaps but introduced broad tessellated bank facets and was also discarded. The retained `M_RaftSim_Pacuare_RainforestDefaultLitWater` preserves Pacuare's two moving normal layers and two world-variation scales without a volume output. A 1.35x non-colliding render overlap removes the continuous shoreline gaps while leaving one tiny distant river-right point for source-aligned production bank microgeometry. No rejected infill changes the saved map, Landscape collision, heightfield, solver geometry, hydraulics, or raft forces.
 
+The August 1 Pacuare field binding supersedes the earlier statement above that
+only South Fork had a river-specific solver visualization. Upper Huacas now
+has its own deterministic packed derivative from the committed
+`rainfed_runnable_planning` arrays: depth, speed, Froude, and detrended
+`bed+h` relief. The source contains 5,393 wet cells, 52 supercritical cells, a
+4.275 m/s speed maximum, and a 2.525 Froude maximum; the strongest column-mean
+Froude occurs at station 286 m. The non-colliding capture ribbon uses at most
+18 cm of added field relief, 22% residual analytic ripple, and a separate
+masked foam sheet with eight metres of bounded downstream persistence from
+adjacent cooked samples. Guide, river-eye, and dedicated solver-crux cameras
+frame that hydraulic control. Both authored actors remain hidden in play while
+the live cooked-field surface owns runtime rendering and forces; capture
+automation temporarily reveals only actors tagged
+`RaftSimCaptureOnlyStaticWater` and restores their saved state afterward. This
+closes the flat/dark-water evidence bug, not the production-fidelity gate: the
+source run is unconverged, and the opaque water, coarse foam bands, generic
+foliage, interpreted geography, missing spray/mist, guide validation, and
+full-run runtime evidence remain rejected in the V2 review.
+
 The August 1 Upper Huacas integration supersedes Pacuare's broad,
 scale-mismatched DEM candidate as the active runnable map. `L_UpperHuacas` now
 owns a physical 600×78 m, 1009×1009 Landscape derived from the committed C3

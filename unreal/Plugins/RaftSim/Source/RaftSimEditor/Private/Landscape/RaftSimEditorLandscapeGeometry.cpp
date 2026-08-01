@@ -70,6 +70,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     UMaterialInterface* WaterMaterial,
+    const FRaftSimPreviewImage* SolverVisualizationFields,
+    UMaterialInterface* SolverFoamMaterial,
     FString& OutSummary)
 {
     if (!World || !Landscape || !WaterMaterial)
@@ -89,6 +91,14 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     int32 ConditionedProfileCenterCount = 0;
     const bool bChilkoSourceScale =
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const FRaftSimLandscapeCandidateWaterSettings WaterSettings =
+        GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+    const bool bUseSolverVisualizationFields =
+        Candidate.bUseSolverVisualizationFields &&
+        WaterSettings.SolverFieldEnable > 0.5f &&
+        SolverVisualizationFields &&
+        SolverVisualizationFields->IsValid() &&
+        SolverFoamMaterial;
     const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
@@ -152,10 +162,15 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
+    TArray<FLinearColor> SolverFoamVertexColors;
     TArray<int32> Triangles;
     Vertices.Reserve(Centers.Num() * (CrossSteps + 1));
     UVs.Reserve(Centers.Num() * (CrossSteps + 1));
     VertexColors.Reserve(Centers.Num() * (CrossSteps + 1));
+    if (bUseSolverVisualizationFields)
+    {
+        SolverFoamVertexColors.Reserve(Centers.Num() * (CrossSteps + 1));
+    }
     for (int32 CenterIndex = 0; CenterIndex < Centers.Num(); ++CenterIndex)
     {
         const FVector2D Previous = Centers[FMath::Max(0, CenterIndex - 1)];
@@ -163,6 +178,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         const FVector2D Tangent = (Next - Previous).GetSafeNormal();
         const FVector2D Normal(-Tangent.Y, Tangent.X);
         const float HalfWidth = GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec) *
+            (bUseSolverVisualizationFields ? WaterSettings.RenderWidthScale : 1.0f) *
             (0.92f + 0.10f * FMath::Sin(StationsCm[CenterIndex] * 0.00031f));
         const float SurfaceZ = ConditionedSurfaceWorldZ[CenterIndex] +
             Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
@@ -170,17 +186,70 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
             const float Lateral = FMath::Lerp(-HalfWidth, HalfWidth, V);
+            const float SolverU = StationsCm[CenterIndex] /
+                FMath::Max(StationsCm.Last(), 1.0f);
+            const float SolverLateralV = FMath::GetMappedRangeValueClamped(
+                FVector2D(
+                    Candidate.SolverVisualizationLateralMinM,
+                    Candidate.SolverVisualizationLateralMaxM),
+                FVector2D(0.0f, 1.0f),
+                Lateral * 0.01f);
+            const FLinearColor SolverField = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      SolverU,
+                      1.0f - SolverLateralV)
+                : FLinearColor::Black;
+            const float SolverPersistenceStepU = 4.0f /
+                FMath::Max(StationsCm.Last() * 0.01f, 1.0f);
+            const FLinearColor SolverFieldUpstream4M = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      FMath::Clamp(SolverU - SolverPersistenceStepU, 0.0f, 1.0f),
+                      1.0f - SolverLateralV)
+                : FLinearColor::Black;
+            const FLinearColor SolverFieldUpstream8M = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      FMath::Clamp(SolverU - SolverPersistenceStepU * 2.0f, 0.0f, 1.0f),
+                      1.0f - SolverLateralV)
+                : FLinearColor::Black;
+            const float SolverDepthM = SolverField.R *
+                Candidate.SolverVisualizationDepthCapM;
+            const float SolverSpeedMps = SolverField.G *
+                Candidate.SolverVisualizationSpeedCapMps;
+            const float SolverFroude = SolverField.B *
+                Candidate.SolverVisualizationFroudeCap;
+            const float SolverPersistentSpeedMps = FMath::Max3(
+                SolverSpeedMps,
+                SolverFieldUpstream4M.G * Candidate.SolverVisualizationSpeedCapMps * 0.94f,
+                SolverFieldUpstream8M.G * Candidate.SolverVisualizationSpeedCapMps * 0.84f);
+            const float SolverPersistentFroude = FMath::Max3(
+                SolverFroude,
+                SolverFieldUpstream4M.B * Candidate.SolverVisualizationFroudeCap * 0.94f,
+                SolverFieldUpstream8M.B * Candidate.SolverVisualizationFroudeCap * 0.84f);
+            const float SolverHydraulicPresence = bUseSolverVisualizationFields
+                ? SmoothPreviewStep(0.03f, 0.16f, SolverDepthM)
+                : 0.0f;
+            const float SolverSurfaceReliefCm = bUseSolverVisualizationFields
+                ? (SolverField.A - 0.5f) * 2.0f *
+                      Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
+                      WaterSettings.SolverSurfaceReliefScale * SolverHydraulicPresence
+                : 0.0f;
+            const float SolverHydraulicAerationT = bUseSolverVisualizationFields
+                ? SmoothPreviewStep(0.60f, 1.10f, SolverPersistentFroude) *
+                      SmoothPreviewStep(0.65f, 2.10f, SolverPersistentSpeedMps) *
+                      SolverHydraulicPresence
+                : 0.0f;
             const float EdgeT = FMath::Abs(V - 0.5f) * 2.0f;
             const float FlowCueScale = Candidate.PreviewSpec.FlowCurrentCueScale;
             const float WaveEnvelope = 1.0f - EdgeT * 0.48f;
             const float Wave = FlowCueScale * WaveEnvelope * (
                 12.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0041f + Lateral * 0.011f) +
                 5.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0107f - Lateral * 0.021f) +
-                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f));
+                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f)) *
+                (bUseSolverVisualizationFields ? 0.22f : 1.0f);
             Vertices.Add(FVector(
                 Centers[CenterIndex].X + Normal.X * Lateral,
                 Centers[CenterIndex].Y + Normal.Y * Lateral,
-                SurfaceZ + Wave));
+                SurfaceZ + Wave + SolverSurfaceReliefCm));
             UVs.Add(FVector2D(StationsCm[CenterIndex] / 8000.0f, V));
             FLinearColor Deep = Candidate.PreviewSpec.bDesertCanyon
                 ? FMath::Lerp(
@@ -212,15 +281,53 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 FMath::Pow(EdgeT, 1.8f));
             const float BreakerSignal =
                 CurrentThread * 0.52f + FineCurrent * 0.28f + CrestCue * 0.20f;
-            const float Breaker = FlowCueScale * WaveEnvelope *
-                SmoothPreviewStep(0.72f, 0.92f, BreakerSignal) * 0.72f;
+            const float Breaker = bUseSolverVisualizationFields
+                ? SolverHydraulicAerationT * WaterSettings.SolverFroudeAerationWeight
+                : FlowCueScale * WaveEnvelope *
+                      SmoothPreviewStep(0.72f, 0.92f, BreakerSignal) * 0.72f;
+            if (bUseSolverVisualizationFields)
+            {
+                const float DepthColorT = SmoothPreviewStep(0.20f, 2.60f, SolverDepthM) *
+                    WaterSettings.SolverDepthColorWeight * SolverHydraulicPresence;
+                const float SpeedColorT = SmoothPreviewStep(0.60f, 3.40f, SolverSpeedMps) *
+                    0.18f * SolverHydraulicPresence;
+                SurfaceColor = FMath::Lerp(
+                    SurfaceColor,
+                    WaterSettings.SolverDeepWaterTint,
+                    DepthColorT);
+                SurfaceColor = FMath::Lerp(
+                    SurfaceColor,
+                    FLinearColor(0.10f, 0.30f, 0.24f),
+                    SpeedColorT);
+            }
             SurfaceColor = FMath::Lerp(
                 SurfaceColor,
-                Candidate.PreviewSpec.bDesertCanyon
+                bUseSolverVisualizationFields
+                    ? WaterSettings.SolverAerationTint
+                    : Candidate.PreviewSpec.bDesertCanyon
                     ? FLinearColor(0.72f, 0.68f, 0.58f)
                     : FLinearColor(0.75f, 0.84f, 0.80f),
                 Breaker);
             VertexColors.Add(SurfaceColor);
+            if (bUseSolverVisualizationFields)
+            {
+                const float FoamNoiseA = FMath::PerlinNoise2D(FVector2D(
+                    StationsCm[CenterIndex] * 0.0065f + SolverFroude * 1.7f,
+                    Lateral * 0.0120f + SolverSpeedMps * 2.3f)) * 0.5f + 0.5f;
+                const float FoamNoiseB = FMath::PerlinNoise2D(FVector2D(
+                    StationsCm[CenterIndex] * 0.0170f - Lateral * 0.0040f + 19.7f,
+                    Lateral * 0.0290f + SolverFroude * 3.1f - 7.4f)) * 0.5f + 0.5f;
+                const float FoamBreakup = SmoothPreviewStep(
+                    0.34f,
+                    0.70f,
+                    FMath::Clamp(FoamNoiseA * 0.68f + FoamNoiseB * 0.32f, 0.0f, 1.0f));
+                const float FoamOpacity = FMath::Clamp(
+                    SolverHydraulicAerationT * (0.28f + FoamBreakup * 0.72f) * 0.94f,
+                    0.0f,
+                    0.94f);
+                SolverFoamVertexColors.Add(
+                    FLinearColor(0.86f, 0.92f, 0.88f, FoamOpacity));
+            }
         }
     }
     const int32 RowSize = CrossSteps + 1;
@@ -246,11 +353,14 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         Normal = FMath::Lerp(Normal, FVector::UpVector, 0.24f).GetSafeNormal();
     }
     OutSummary += FString::Printf(
-        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below 20 centimetres, and sparse flow-scaled breaker coloration across %.1f m.\n"),
+        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below 20 centimetres, and %s breaker coloration across %.1f m.\n"),
         Centers.Num(),
         CenterSampleSpacingCm * 0.01f,
         ConditionedProfileCenterCount,
         CrossSteps,
+        bUseSolverVisualizationFields
+            ? TEXT("cooked-field-derived")
+            : TEXT("sparse flow-scaled analytic"),
         Last.StationMeters);
     AActor* WaterActor = AddPreviewProceduralMeshActor(
         World,
@@ -279,6 +389,35 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             WaterActor->Tags.AddUnique(TEXT("RaftSimPacuareDefaultLitWater"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
+        }
+    }
+    if (bUseSolverVisualizationFields &&
+        SolverFoamVertexColors.Num() == Vertices.Num())
+    {
+        TArray<FVector> SolverFoamVertices = Vertices;
+        for (int32 VertexIndex = 0; VertexIndex < SolverFoamVertices.Num(); ++VertexIndex)
+        {
+            SolverFoamVertices[VertexIndex] += Normals[VertexIndex] * 1.4f;
+        }
+        AActor* FoamActor = AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(
+                TEXT("RaftSim_SolverFieldFoam_%s"),
+                *Candidate.PreviewSpec.RiverId),
+            SolverFoamVertices,
+            Triangles,
+            Normals,
+            UVs,
+            FLinearColor(0.86f, 0.92f, 0.88f, 0.0f),
+            SolverFoamMaterial,
+            &SolverFoamVertexColors,
+            false);
+        if (FoamActor)
+        {
+            FoamActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+            FoamActor->Tags.AddUnique(TEXT("RaftSimSolverFieldFoam"));
+            FoamActor->Tags.AddUnique(TEXT("RaftSimPacuareUpperHuacasSolverVisualization"));
+            FoamActor->Tags.AddUnique(TEXT("RaftSimPacuareCaptureOnlyWater"));
         }
     }
     return WaterActor;
@@ -827,7 +966,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             if (!It->GetActorLabel().Contains(
-                    TEXT("RaftSim_PhysicalCorridorRiverRibbon_pacuare")))
+                    TEXT("RaftSim_PhysicalCorridorRiverRibbon_pacuare")) &&
+                !It->Tags.Contains(TEXT("RaftSimPacuareCaptureOnlyWater")))
             {
                 continue;
             }
@@ -937,12 +1077,24 @@ void RepositionLandscapeCandidatePhysicalCameras(
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.254f, 280.0f, 150.0f);
         SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.420f, 0.424f, 210.0f, 125.0f);
     }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.405f, 0.490f, 420.0f, 145.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.445f, 0.505f, 285.0f, 125.0f);
+    }
     else
     {
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 330.0f, 180.0f);
         SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.275f, 0.390f, 270.0f, 165.0f);
     }
-    SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.530f, 0.645f, 275.0f, 165.0f);
+    if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.430f, 0.515f, 330.0f, 130.0f);
+    }
+    else
+    {
+        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.530f, 0.645f, 275.0f, 165.0f);
+    }
     for (TActorIterator<APlayerStart> It(World); It; ++It)
     {
         if (It->GetActorLabel() == TEXT("RaftSim_GuideSeat_PlayerStart"))
