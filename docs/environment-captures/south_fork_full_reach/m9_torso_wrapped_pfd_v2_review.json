@@ -1,0 +1,140 @@
+{
+  "artifact": "M9 torso-wrapped production PFD V2 review",
+  "recorded_local_date": "2026-08-01",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "V2 removes the remaining planar backpack silhouette from the project-owned rescue PFD. The chest cells now follow a 2.0 cm lateral torso arc. The former single rear plate is replaced by independently rounded upper and lumbar cells with a narrow flex channel, 3.2 cm lateral body wrap, reduced 4.0 cm thickness, and a shallower crown. Shoulder connections remain webbing-only with zero flotation shoulder pads.",
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_pfd.py",
+    "generator_version": 7,
+    "generator_sha256": "7fe3cec7f10fc719b5fb6ff494b56fb95bafbf610781c1d5275bbc3ca7060297",
+    "importer": "unreal/Scripts/import_production_whitewater_pfd.py",
+    "importer_sha256": "ba5644bd47bc16466f5a2ef8538e6155f6faf76c6c24b7ddb77b913d3f917917",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/production_whitewater_pfd_manifest.json",
+    "manifest_sha256": "5ac06eaa076bbbf5c9c4f0d2611e3f00cfc2b68cef036a77c6fd751e6be8ce41",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+    "fbx_sha256": "eb9a566f9dbb11d5ce753b171241f31d84ce72c555a9a7bfe4e91ac67eda885d",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+    "blend_sha256": "ca2cafea138b4085da67cb7cd00e22566b2f75b542fdbe4adff68ad99fc670df",
+    "external_asset_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "uasset": "unreal/Content/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd.uasset",
+    "uasset_sha256": "36ee847ca18a0e7b2c3697e10d2b692cd812e7ff44d413649042b95371d7bead",
+    "dimensions_cm": [42.295, 44.8966, 42.29],
+    "source_vertices": 13740,
+    "source_polygons": 14718,
+    "authored_lod0_triangles": 26664,
+    "nanite_fallback_triangles": 2416,
+    "nanite_enabled": true,
+    "material_slot_count": 5,
+    "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
+  },
+  "construction": {
+    "front_foam_panels": 4,
+    "back_panels": 2,
+    "rear_flex_channels": 1,
+    "side_wings": 2,
+    "shoulder_foam_pads": 0,
+    "shoulder_webbing_runs": 2,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 2,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1,
+    "reflective_chest_zones": 2,
+    "blank_back_placards": 1,
+    "front_lash_tabs": 3
+  },
+  "soft_geometry": {
+    "outline_corner_rounding": "four-pass closed Chaikin",
+    "outline_corner_rounding_passes": 4,
+    "flat_exterior_foam_faces": 0,
+    "front_panel_edge_roll_cm": 1.35,
+    "front_panel_crown_depth_cm": 1.45,
+    "front_panel_lateral_wrap_depth_cm": 2.0,
+    "back_panel_edge_roll_cm": 1.05,
+    "back_panel_crown_depth_cm": 1.35,
+    "back_panel_lateral_wrap_depth_cm": 3.2,
+    "side_wing_flat_exterior_faces": 0,
+    "side_wing_crown_depth_cm": 0.75,
+    "front_pocket_flat_exterior_faces": 0,
+    "front_pocket_crown_depth_cm": 0.62,
+    "smooth_shaded": true
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_roster_capture.json",
+    "source_report_sha256": "8c683ee74d1ce694edc78e244bc5da9965e6ba73bebc3d2847fc59120314dcf7",
+    "captured_character_count": 5,
+    "characters_using_production_pfd": 5,
+    "maximum_runtime_torso_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_guide_full.png",
+      "capture_sha256": "b2e98db6c5b67dd20c05cd4b017ada450607316e1b7ad695cc4fd888d89177a4"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_guide_profile.png",
+      "capture_sha256": "081e399356e9857b2bab5180cfa1843b5f16077d3de9a36a5fbf6f26f7a9efa4"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_guide_rear.png",
+      "capture_sha256": "4c0a7e59dcc488a73887e45c9b3c72f2e3ce26c1c7e183b11bf9cc22b8568d63"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_broadest_full.png",
+      "capture_sha256": "5fe0c1d860dcb0acbda528edce1e840919ce8d7e8dfbb912f20d6c66e0433a1f"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_broadest_profile.png",
+      "capture_sha256": "9cea5e5be6ceedfd06803fdb487fd5ed98b86cd2b765128c9a4244f0d93413fe"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_broadest_rear.png",
+      "capture_sha256": "ea48d6f9fa06cefd6c85d980fc61057dfc698563e95ae2946a1f21dc6df71253"
+    },
+    "technical_verdict": "pass: renderer pixels show curved chest edges, separate rounded rear cells, a flexible waist break, and no flotation shoulder-pad silhouette across the guide and broadest roster identity",
+    "photoreal_verdict": "fail pending named approval or replacement of the simplified first-party fabric shader, hardware, webbing intersections, identity-specific deformation, seated pose, and review lighting"
+  },
+  "implementation": {
+    "single_rear_plate_removed": true,
+    "front_lateral_wrap_depth_cm": 2.0,
+    "rear_lateral_wrap_depth_cm": 3.2,
+    "rear_flex_channel_count": 1,
+    "back_thickness_before_cm": 4.8,
+    "back_thickness_after_cm": 4.0,
+    "shoulder_foam_pads_after": 0,
+    "pfd_runtime_transform_changed": false,
+    "material_assignment_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "validation": {
+    "source_generation": "Blender 5.2 regenerated and validated the deterministic FBX, Blend file, manifest, five material slots, UV channel, 13,740 vertices, 14,718 polygons, and plausible centimetre bounds",
+    "source_import": "Unreal import succeeded with the exact FBX hash, 26,664 authored triangles, 2,416 Nanite fallback triangles, five material slots, and valid centimetre bounds",
+    "focused_python": "5/5 PFD, safety-gear, and renderer-review source contracts passed",
+    "renderer_turntable": "5/5 identities captured with production PFD selection and exactly 0.0 cm maximum torso-origin error",
+    "m5_crew_presentation": "1/1 passed renderer-enabled (M9V751TorsoWrappedPfdV2M5Crew)",
+    "m5_report": "unreal/Saved/Automation/M9V751TorsoWrappedPfdV2M5Crew/index.json",
+    "m5_report_sha256": "0daa5b33ad8b4ae98d60c67e8cf61d4e3d392678ef9f90e73518b03bde3e6d87",
+    "broader_worktree_note": "The full flexible-raft visual file remains locally red because pre-existing unstaged Zambezi water-material binaries do not match two older photographic-water isolation hashes; those unrelated files are excluded from this milestone."
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false
+  }
+}

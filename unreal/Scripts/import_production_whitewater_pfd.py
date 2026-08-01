@@ -49,7 +49,8 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
     construction = manifest.get("construction", {})
     expected_counts = {
         "front_foam_panels": 4,
-        "back_panels": 1,
+        "back_panels": 2,
+        "rear_flex_channels": 1,
         "side_wings": 2,
         "shoulder_foam_pads": 0,
         "shoulder_webbing_runs": 2,

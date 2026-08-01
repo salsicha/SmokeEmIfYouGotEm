@@ -3536,3 +3536,16 @@ path is verified, and the completion goal can be marked complete.
   polygonal analytical breaking forms, coarse canyon terrain, sparse synthetic
   ecology, lighting, and absent named water-VFX-art/guide approval. M9 remains
   open.
+- Torso-wrapped production PFD V2 removes the remaining backpack-like rear
+  silhouette across every runnable river. The four chest cells now arc 2.0 cm
+  toward the flanks; two independently rounded rear cells replace the single
+  broad plate, add a narrow lumbar flex break, wrap 3.2 cm laterally, and reduce
+  rear foam thickness from 4.8 to 4.0 cm. The regenerated production asset has
+  26,664 authored triangles and a 2,416-triangle Nanite fallback. Five roster
+  identities capture with production PFD selection and 0.0 cm maximum
+  torso-origin error; five focused Python contracts and the renderer-enabled M5
+  crew presentation gate pass. The runtime transform, collision, mass,
+  animation, water, D3/D4, rescue, and gameplay authority are unchanged.
+  Simplified fabric/hardware, identity-specific deformation, seated motion, and
+  named character-art plus qualified whitewater-safety approval remain open, so
+  this is a technical baseline rather than photoreal promotion.
