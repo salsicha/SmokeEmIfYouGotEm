@@ -1,0 +1,105 @@
+{
+  "artifact": "M9 cloth and live-wet production PFD V1 review",
+  "recorded_local_date": "2026-08-01",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "All four runnable-river PFD shell materials now use Unreal Cloth shading with project-owned ripstop albedo, normal, and packed AO/roughness maps. A per-avatar dynamic material instance follows native raft surface wetness and immediate swimmer/re-entry states. The retained wet bracket darkens the woven shell and adds a bounded water-film highlight without changing physics, rescue, collision, mass, scoring, or progression authority.",
+  "implementation": {
+    "material_generator": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+    "material_generator_sha256": "c3fa4fb292e43a9d764f3e0b62a4f728207f34606b7078a23bfdff7fbbba51eb",
+    "runtime_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+    "runtime_source_sha256": "8cfb548e0bf53ddef5d3b531915289ffa48efe6b9c01fd18ecd486c92fdeedd9",
+    "runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+    "runtime_header_sha256": "b54855951068964a07e5da26b658d9b7584527aa41b1d9bd1ad724bfefe63ae6",
+    "shading_model": "MSM_Cloth",
+    "dry_roughness": 0.68,
+    "roughness_variation": 0.10,
+    "saturated_roughness_scale": 0.52,
+    "saturated_roughness_max": 0.40,
+    "dry_specular": 0.24,
+    "wet_specular": 0.42,
+    "dry_cloth_amount": 0.42,
+    "wet_cloth_amount": 0.16,
+    "textile_normal_strength": 0.22,
+    "textile_tiling": 1.15,
+    "live_raft_wetness_scale": 0.46,
+    "seated_wetness_cap": 0.52,
+    "swimming_wetness_floor": 0.84,
+    "reentry_wetness_floor": 0.70,
+    "falling_wetness_floor": 0.52,
+    "wet_interpolation_rate": 5.5,
+    "dry_interpolation_rate": 0.10,
+    "physics_authority_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "rescue_logic_changed": false,
+    "scoring_or_progression_changed": false
+  },
+  "runtime_assets": [
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_CrewPFD.uasset",
+      "sha256": "9f55788d684479b76878db921f42e426815215598cf2e0e312b20cb689f2bc0d"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_PFD_Red.uasset",
+      "sha256": "580ac294af9eee9dc952f3a8f755adb040831081ed628ef5b6e373845ed4419c"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_PFD_Yellow.uasset",
+      "sha256": "66fdab44224f2004667f91564dc5c846ee2739aac55a70089497d1446d75c6f5"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_PFD_Blue.uasset",
+      "sha256": "0c8f7906f209d373f366aa36edaa5b08111b9360527d20c7d3787e5bd865b141"
+    }
+  ],
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_roster_capture.json",
+    "source_report_sha256": "dd5a1532391ee1fd99a48ff8d5e35635ab187f3ecb23118fba06fac6079efcd3",
+    "captured_character_count": 5,
+    "characters_with_live_material_response": 5,
+    "guide_dry_presentation_wetness": 0.0,
+    "guide_wet_presentation_wetness": 0.8399999737739563
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_guide_full.png",
+      "capture_sha256": "44f2d1618fa421a2104c1a61d3b46d0f65aeb7f24035ae01b09dad9f9ff85d76"
+    },
+    "guide_dry": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_guide_dry.png",
+      "capture_sha256": "5845e3da3144e1e78e258d9aca3a99962fc05c2ef73eb1dfa6d4a8d178235d8a"
+    },
+    "guide_wet": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_guide_wet.png",
+      "capture_sha256": "152a9f5dfd390d787955505defa39ac5f4ec9e98e6b26d3a1ae2cdc0e17a1481"
+    },
+    "technical_verdict": "pass: matched renderer pixels show a matte woven dry shell and a darker, controlled wet shell with narrower water-film highlights; the wet frame is byte-distinct and its runtime parameter remains at the forced 0.84 swimmer floor",
+    "photoreal_verdict": "fail pending named review or replacement of simplified PFD construction, hardware, seams, body deformation, surrounding procedural hands and anatomy, and turntable lighting"
+  },
+  "validation": {
+    "focused_python": "4/4 safety-gear source, asset, and renderer-evidence contracts passed",
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with Unreal Engine 5.8",
+    "material_rebuild": "4/4 opaque Nanite Cloth materials compiled with exactly the project-owned PfdRipstop albedo, normal, and AO/roughness/height textures",
+    "roster_capture": "5/5 production identities expose one live PFD material response; matched guide dry/wet captures report 0.0 and 0.84 presentation wetness",
+    "m5_report": "docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_m5_report.json",
+    "m5_report_sha256": "a3168460afd27db6f13f6a522f36ecaea37fe3a7bbf7bb65c8cfd9763c65566e",
+    "m5_results": {
+      "succeeded": 4,
+      "succeeded_with_warnings": 1,
+      "failed": 0,
+      "test_rows": 5
+    },
+    "m5_warning": "Existing r.MotionVectorSimulation render-thread-safety warning; no test failed."
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false
+  }
+}

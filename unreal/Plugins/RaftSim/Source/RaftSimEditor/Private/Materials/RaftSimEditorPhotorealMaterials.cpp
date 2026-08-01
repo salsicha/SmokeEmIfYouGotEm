@@ -2179,7 +2179,10 @@ static UMaterial* BuildTexturedRaftMaterial(
     float SaturatedRoughnessScale = 0.34f,
     float SaturatedRoughnessMax = 0.32f,
     bool bUseTextileAlbedo = true,
-    bool bUseAmbientOcclusion = true)
+    bool bUseAmbientOcclusion = true,
+    bool bUseClothShading = false,
+    float DrySpecularValue = 0.28f,
+    float WetSpecularValue = 0.56f)
 {
     const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Materials/%s"), AssetName);
     const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, AssetName);
@@ -2203,6 +2206,7 @@ static UMaterial* BuildTexturedRaftMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(bUseClothShading ? MSM_Cloth : MSM_DefaultLit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = bTwoSided;
     Material->bTangentSpaceNormal = true;
@@ -2357,10 +2361,10 @@ static UMaterial* BuildTexturedRaftMaterial(
     RuntimeWetRoughness->Alpha.Expression = Wetness;
     Add(RuntimeWetRoughness);
     UMaterialExpressionConstant* DrySpecular = NewObject<UMaterialExpressionConstant>(Material);
-    DrySpecular->R = 0.28f;
+    DrySpecular->R = FMath::Clamp(DrySpecularValue, 0.0f, 1.0f);
     Add(DrySpecular);
     UMaterialExpressionConstant* WetSpecular = NewObject<UMaterialExpressionConstant>(Material);
-    WetSpecular->R = 0.56f;
+    WetSpecular->R = FMath::Clamp(WetSpecularValue, 0.0f, 1.0f);
     Add(WetSpecular);
     UMaterialExpressionLinearInterpolate* RuntimeWetSpecular =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -2409,9 +2413,49 @@ static UMaterial* BuildTexturedRaftMaterial(
     // the old material.
     EditorData->Normal.Expression = nullptr;
     EditorData->Normal.OutputIndex = 0;
+    // Cloth reuses the serialized Subsurface Color and Clear Coat inputs as
+    // Fuzz Color and Cloth amount. Clear both inputs on every rebuild so a
+    // material that changes shading model cannot retain orphaned expressions.
+    EditorData->SubsurfaceColor.Expression = nullptr;
+    EditorData->SubsurfaceColor.OutputIndex = 0;
+    EditorData->ClearCoat.Expression = nullptr;
+    EditorData->ClearCoat.OutputIndex = 0;
     if (TextileNormalStrength > UE_SMALL_NUMBER)
     {
         EditorData->Normal.Connect(0, BlendedNormal);
+    }
+    if (bUseClothShading)
+    {
+        // A restrained, shell-coloured grazing response separates woven nylon
+        // from molded plastic without adding an emissive halo. Drenching lays
+        // the short fibres down while the existing wet color, roughness and
+        // specular paths retain the water-film response.
+        UMaterialExpressionConstant3Vector* FuzzGain =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        FuzzGain->Constant = FLinearColor(0.36f, 0.38f, 0.41f, 1.0f);
+        Add(FuzzGain);
+        UMaterialExpressionMultiply* FuzzColor =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FuzzColor->A.Expression = RuntimeWetColor;
+        FuzzColor->B.Expression = FuzzGain;
+        Add(FuzzColor);
+        EditorData->SubsurfaceColor.Connect(0, FuzzColor);
+
+        UMaterialExpressionConstant* DryCloth =
+            NewObject<UMaterialExpressionConstant>(Material);
+        DryCloth->R = 0.42f;
+        Add(DryCloth);
+        UMaterialExpressionConstant* WetCloth =
+            NewObject<UMaterialExpressionConstant>(Material);
+        WetCloth->R = 0.16f;
+        Add(WetCloth);
+        UMaterialExpressionLinearInterpolate* RuntimeCloth =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        RuntimeCloth->A.Expression = DryCloth;
+        RuntimeCloth->B.Expression = WetCloth;
+        RuntimeCloth->Alpha.Expression = Wetness;
+        Add(RuntimeCloth);
+        EditorData->ClearCoat.Connect(0, RuntimeCloth);
     }
     if (bUseAmbientOcclusion)
     {
@@ -2450,10 +2494,38 @@ static void BuildPfdMaterials()
     // use the project-owned 1K ripstop maps at restrained scale. Darker safety
     // tints preserve high visibility without clipping into toy-like neon under
     // the roster and bright-water exposure ranges.
-    BuildTexturedRaftMaterial(TEXT("M_RaftSim_CrewPFD"), TEXT("PfdRipstop"), FLinearColor(0.42f, 0.025f, 0.004f, 1.0f), 0.74f, 0.07f, 1.5f, 0.16f, false);
-    BuildTexturedRaftMaterial(TEXT("M_RaftSim_PFD_Red"), TEXT("PfdRipstop"), FLinearColor(0.32f, 0.008f, 0.003f, 1.0f), 0.74f, 0.07f, 1.5f, 0.16f, false);
-    BuildTexturedRaftMaterial(TEXT("M_RaftSim_PFD_Yellow"), TEXT("PfdRipstop"), FLinearColor(0.42f, 0.20f, 0.004f, 1.0f), 0.74f, 0.07f, 1.5f, 0.16f, false);
-    BuildTexturedRaftMaterial(TEXT("M_RaftSim_PFD_Blue"), TEXT("PfdRipstop"), FLinearColor(0.006f, 0.065f, 0.24f, 1.0f), 0.74f, 0.07f, 1.5f, 0.16f, false);
+    const auto BuildPfdShellMaterial = [](const TCHAR* AssetName, const FLinearColor& Color)
+    {
+        return BuildTexturedRaftMaterial(
+            AssetName,
+            TEXT("PfdRipstop"),
+            Color,
+            /*Roughness=*/0.68f,
+            /*RoughnessVariation=*/0.10f,
+            /*TextureTiling=*/1.15f,
+            /*TextileNormalStrength=*/0.22f,
+            /*bTwoSided=*/false,
+            /*bSkeletalMesh=*/false,
+            /*SaturatedRoughnessScale=*/0.52f,
+            /*SaturatedRoughnessMax=*/0.40f,
+            /*bUseTextileAlbedo=*/true,
+            /*bUseAmbientOcclusion=*/true,
+            /*bUseClothShading=*/true,
+            /*DrySpecularValue=*/0.24f,
+            /*WetSpecularValue=*/0.42f);
+    };
+    BuildPfdShellMaterial(
+        TEXT("M_RaftSim_CrewPFD"),
+        FLinearColor(0.42f, 0.025f, 0.004f, 1.0f));
+    BuildPfdShellMaterial(
+        TEXT("M_RaftSim_PFD_Red"),
+        FLinearColor(0.32f, 0.008f, 0.003f, 1.0f));
+    BuildPfdShellMaterial(
+        TEXT("M_RaftSim_PFD_Yellow"),
+        FLinearColor(0.42f, 0.20f, 0.004f, 1.0f));
+    BuildPfdShellMaterial(
+        TEXT("M_RaftSim_PFD_Blue"),
+        FLinearColor(0.006f, 0.065f, 0.24f, 1.0f));
 }
 
 static void BuildHelmetMaterials()

@@ -413,6 +413,27 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                 TA_Wrap);
         }
     }
+    static const TCHAR* PfdMaterialPaths[] = {
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Red.M_RaftSim_PFD_Red"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Yellow.M_RaftSim_PFD_Yellow"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Blue.M_RaftSim_PFD_Blue")};
+    for (const TCHAR* MaterialPath : PfdMaterialPaths)
+    {
+        UMaterial* Material = LoadObject<UMaterial>(nullptr, MaterialPath);
+        TestNotNull(
+            FString::Printf(TEXT("production PFD material exists: %s"), MaterialPath),
+            Material);
+        if (Material)
+        {
+            TestTrue(
+                FString::Printf(TEXT("PFD shell uses Cloth shading: %s"), MaterialPath),
+                Material->GetShadingModels().HasShadingModel(MSM_Cloth));
+            TestTrue(
+                FString::Printf(TEXT("PFD shell retains Nanite usage: %s"), MaterialPath),
+                Material->GetUsageByFlag(MATUSAGE_Nanite));
+        }
+    }
     constexpr int32 ActionCount = static_cast<int32>(ERaftSimCrewAvatarAction::Reentry) + 1;
     TSet<FString> PoseFingerprints;
     for (int32 ActionIndex = 0; ActionIndex < ActionCount; ++ActionIndex)
@@ -1037,6 +1058,7 @@ bool FRaftSimM5StartRescueCommand::Update()
     }
     Test->TestEqual(TEXT("Manny fallback is absent with packaged CC0 bodies"), MannyBodyCount, 0);
     Test->TestEqual(TEXT("five rigged crew bodies spawned"), RiggedBodyCount, 5);
+    int32 SwimmingPfdCount = 0;
     for (TActorIterator<ARaftSimCrewAvatarActor> It(GetM5GameWorld()); It; ++It)
     {
         Test->TestTrue(
@@ -1050,6 +1072,26 @@ bool FRaftSimM5StartRescueCommand::Update()
         Test->TestTrue(
             FString::Printf(TEXT("avatar %s uses the production whitewater rescue PFD"), *It->GetName()),
             It->HasProductionWhitewaterPfd());
+        Test->TestTrue(
+            FString::Printf(TEXT("avatar %s owns a live PFD material response"), *It->GetName()),
+            It->HasLivePfdMaterialResponse());
+        const float PfdWetness = It->GetPfdPresentationWetness();
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("avatar %s keeps bounded presentation PFD wetness (%.4f)"),
+                *It->GetName(),
+                PfdWetness),
+            PfdWetness >= 0.0f && PfdWetness <= 0.84f);
+        if (It->GetAvatarAction() == ERaftSimCrewAvatarAction::Swimming)
+        {
+            ++SwimmingPfdCount;
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("swimming avatar %s immediately saturates its PFD (%.4f)"),
+                    *It->GetName(),
+                    PfdWetness),
+                PfdWetness >= 0.82f);
+        }
         Test->TestTrue(
             FString::Printf(TEXT("avatar %s uses two production river boots"), *It->GetName()),
             It->HasProductionRiverBoots());
@@ -1179,6 +1221,10 @@ bool FRaftSimM5StartRescueCommand::Update()
         BodyProfiles.Add(It->GetBodyProportionScale().ToCompactString());
         SkinTones.Add(It->GetSkinTone().ToString());
     }
+    Test->TestEqual(
+        TEXT("exactly one forced swimmer owns the drenched PFD response"),
+        SwimmingPfdCount,
+        1);
     Test->TestTrue(TEXT("crew exposes at least four deterministic body profiles"),
                    BodyProfiles.Num() >= 4);
     Test->TestTrue(TEXT("crew exposes at least four deterministic skin tones"),

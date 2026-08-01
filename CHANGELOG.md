@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced the uniformly plastic production-PFD shell response on every runnable river
+  with project-owned ripstop Cloth shading, restrained dry fuzz, and a per-avatar dynamic
+  wetness instance driven by native raft surface wetness plus swimmer, re-entry, and falling
+  state. A rejected over-glossy bracket was tightened to a 0.42 wet specular endpoint,
+  0.40 saturated-roughness floor, and retained 0.16 wet cloth response. Matched dry/wet
+  renderer evidence and all five M5 production-quality rows pass technically; simplified
+  construction, body deformation, surrounding character art, and named art/safety review
+  remain open, so this is not photoreal promotion.
 - Reaffirmed Zambezi Batoka Gorge as the sixth runnable river at the bounded
   `reference_free_run` tier across the portfolio, generated scenario, player
   catalog, frontend launch contract, cook/regeneration checks, and current

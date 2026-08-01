@@ -306,6 +306,7 @@ def main() -> None:
                 or not actor.has_layered_commercial_safety_gear()
                 or not actor.has_production_whitewater_helmet()
                 or not actor.has_production_whitewater_pfd()
+                or not actor.has_live_pfd_material_response()
                 or not actor.has_production_river_boots()
                 or not actor.has_fitted_upright_production_river_boots()
                 or not actor.has_commercial_paddle_silhouette()
@@ -530,6 +531,59 @@ def main() -> None:
             rear_path = export_capture(
                 world, capture_component, render_target, f"{stem}_rear"
             )
+            pfd_material_evidence = None
+            if is_guide:
+                # Match one close torso camera before/after saturation. The
+                # swimmer transition publishes wetness immediately; returning
+                # to the seated pose preserves that material state so the two
+                # frames compare fabric response without a pose confound.
+                pfd_target = unreal.Vector(
+                    origin.x,
+                    origin.y,
+                    origin.z + 25.0,
+                )
+                pfd_location = unreal.Vector(
+                    origin.x + 180.0,
+                    origin.y,
+                    pfd_target.z,
+                )
+                capture.set_actor_location(pfd_location, False, False)
+                capture.set_actor_rotation(
+                    look_at(pfd_location, pfd_target), False
+                )
+                capture_component.set_editor_property("fov_angle", 30.0)
+                dry_wetness = actor.get_pfd_presentation_wetness()
+                dry_pfd_path = export_capture(
+                    world, capture_component, render_target, f"{stem}_pfd_dry"
+                )
+                actor.set_avatar_action(
+                    unreal.RaftSimCrewAvatarAction.SWIMMING, 1.0
+                )
+                actor.set_avatar_action(
+                    unreal.RaftSimCrewAvatarAction.SEATED_IDLE, 1.0
+                )
+                wet_wetness_before_capture = actor.get_pfd_presentation_wetness()
+                if wet_wetness_before_capture < 0.82:
+                    raise RuntimeError(
+                        "Swimmer transition did not saturate the guide PFD: "
+                        f"{wet_wetness_before_capture:.4f}"
+                    )
+                wet_pfd_path = export_capture(
+                    world, capture_component, render_target, f"{stem}_pfd_wet"
+                )
+                pfd_material_evidence = {
+                    "dry_presentation_wetness": dry_wetness,
+                    "wet_presentation_wetness_before_capture": (
+                        wet_wetness_before_capture
+                    ),
+                    "wet_presentation_wetness_after_capture": (
+                        actor.get_pfd_presentation_wetness()
+                    ),
+                    "dry_capture": str(dry_pfd_path),
+                    "dry_capture_sha256": sha256(dry_pfd_path),
+                    "wet_capture": str(wet_pfd_path),
+                    "wet_capture_sha256": sha256(wet_pfd_path),
+                }
             report["characters"].append(
                 {
                     "name": character_name,
@@ -542,6 +596,12 @@ def main() -> None:
                     ),
                     "runtime_production_whitewater_pfd": (
                         actor.has_production_whitewater_pfd()
+                    ),
+                    "runtime_live_pfd_material_response": (
+                        actor.has_live_pfd_material_response()
+                    ),
+                    "runtime_pfd_presentation_wetness": (
+                        actor.get_pfd_presentation_wetness()
                     ),
                     "runtime_production_river_boots": (
                         actor.has_production_river_boots()
@@ -667,6 +727,7 @@ def main() -> None:
                     "profile_capture_sha256": sha256(profile_path),
                     "rear_capture": str(rear_path),
                     "rear_capture_sha256": sha256(rear_path),
+                    "pfd_material_evidence": pfd_material_evidence,
                     "status": "captured",
                 }
             )

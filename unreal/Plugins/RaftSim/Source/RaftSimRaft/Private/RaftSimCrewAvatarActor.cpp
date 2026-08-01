@@ -3,11 +3,13 @@
 #include "RaftSimCC0CrewVisualActor.h"
 #include "RaftSimMannyCrewVisualActor.h"
 #include "RaftSimMetaHumanCrewVisualActor.h"
+#include "RaftSimRaftActor.h"
 
 #include "Components/ChildActorComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "Misc/PackageName.h"
 #include "ProceduralMeshComponent.h"
@@ -1129,6 +1131,7 @@ void ARaftSimCrewAvatarActor::SetProductionBodyOnlyShadowMode(bool bEnabled)
 void ARaftSimCrewAvatarActor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    UpdatePfdMaterialResponse(DeltaSeconds);
     const float CyclesPerSecond = CurrentAction == ERaftSimCrewAvatarAction::Swimming ? 0.8f : 1.25f;
     const float PhaseStep = DeltaSeconds * CyclesPerSecond * ActionIntensity;
     AnimationPhase = FMath::IsFinite(PhaseStep)
@@ -1497,6 +1500,11 @@ bool ARaftSimCrewAvatarActor::HasProductionWhitewaterPfd() const
     return ProductionPfd && ProductionPfd->GetStaticMesh() != nullptr;
 }
 
+bool ARaftSimCrewAvatarActor::HasLivePfdMaterialResponse() const
+{
+    return PfdShellMaterialInstance != nullptr;
+}
+
 bool ARaftSimCrewAvatarActor::HasProductionRiverBoots() const
 {
     return ProductionLeftBoot && ProductionLeftBoot->GetStaticMesh() != nullptr &&
@@ -1565,6 +1573,19 @@ void ARaftSimCrewAvatarActor::SetAvatarAction(
         AnimationPhase = WrapNormalizedPhase(AnimationPhaseOffset);
     }
     ActionIntensity = FMath::Clamp(Intensity, 0.15f, 2.0f);
+    if (NewAction == ERaftSimCrewAvatarAction::Swimming)
+    {
+        PfdPresentationWetness = FMath::Max(PfdPresentationWetness, 0.84f);
+    }
+    else if (NewAction == ERaftSimCrewAvatarAction::Reentry)
+    {
+        PfdPresentationWetness = FMath::Max(PfdPresentationWetness, 0.70f);
+    }
+    else if (NewAction == ERaftSimCrewAvatarAction::Falling)
+    {
+        PfdPresentationWetness = FMath::Max(PfdPresentationWetness, 0.52f);
+    }
+    ApplyPfdMaterialWetness();
     if (bVisualBuilt)
     {
         // Action transitions can be observed before the actor's next Tick
@@ -1607,14 +1628,21 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     const int32 PfdVariant = bGuide ? 2 : VariantIndex;
     UMaterialInterface* PfdMaterial =
         LoadObject<UMaterialInterface>(nullptr, PfdPaths[PfdVariant]);
+    PfdShellMaterialInstance = PfdMaterial
+        ? UMaterialInstanceDynamic::Create(PfdMaterial, this)
+        : nullptr;
+    UMaterialInterface* VisiblePfdMaterial = PfdShellMaterialInstance
+        ? static_cast<UMaterialInterface*>(PfdShellMaterialInstance.Get())
+        : PfdMaterial;
     if (Pfd && PfdMaterial)
     {
-        Pfd->SetMaterial(0, PfdMaterial);
+        Pfd->SetMaterial(0, VisiblePfdMaterial);
     }
     if (ProductionPfd && PfdMaterial)
     {
-        ProductionPfd->SetMaterial(0, PfdMaterial);
+        ProductionPfd->SetMaterial(0, VisiblePfdMaterial);
     }
+    ApplyPfdMaterialWetness();
     static const TCHAR* HelmetPaths[] = {
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_White.M_RaftSim_Helmet_White"),
@@ -1676,6 +1704,53 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     RebuildHeadMesh();
     ApplyPose(URaftSimCrewAvatarPoseLibrary::EvaluatePose(CurrentAction, AnimationPhase, SeatSide));
     TryActivateProductionVisual();
+}
+
+void ARaftSimCrewAvatarActor::UpdatePfdMaterialResponse(float DeltaSeconds)
+{
+    float TargetWetness = 0.0f;
+    if (const ARaftSimRaftActor* OwningRaft = Cast<ARaftSimRaftActor>(GetOwner()))
+    {
+        // Seated crew inherit only bounded splash/dampness from the solver-owned
+        // raft signal; a PFD above the tube must not look fully submerged merely
+        // because the raft is floating in wet cells.
+        TargetWetness = FMath::Clamp(
+            OwningRaft->GetSurfaceWetness() * 0.46f,
+            0.0f,
+            0.52f);
+    }
+    if (CurrentAction == ERaftSimCrewAvatarAction::Swimming)
+    {
+        TargetWetness = FMath::Max(TargetWetness, 0.84f);
+    }
+    else if (CurrentAction == ERaftSimCrewAvatarAction::Reentry)
+    {
+        TargetWetness = FMath::Max(TargetWetness, 0.70f);
+    }
+    else if (CurrentAction == ERaftSimCrewAvatarAction::Falling)
+    {
+        TargetWetness = FMath::Max(TargetWetness, 0.52f);
+    }
+
+    const float InterpSpeed = TargetWetness > PfdPresentationWetness
+        ? 5.5f
+        : 0.10f;
+    PfdPresentationWetness = FMath::FInterpTo(
+        PfdPresentationWetness,
+        TargetWetness,
+        FMath::Clamp(DeltaSeconds, 0.0f, 0.25f),
+        InterpSpeed);
+    ApplyPfdMaterialWetness();
+}
+
+void ARaftSimCrewAvatarActor::ApplyPfdMaterialWetness()
+{
+    if (PfdShellMaterialInstance)
+    {
+        PfdShellMaterialInstance->SetScalarParameterValue(
+            TEXT("Wetness"),
+            FMath::Clamp(PfdPresentationWetness, 0.0f, 0.84f));
+    }
 }
 
 FString ARaftSimCrewAvatarActor::GetProductionVisualClassPath() const

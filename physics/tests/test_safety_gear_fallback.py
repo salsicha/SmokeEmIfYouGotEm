@@ -10,6 +10,10 @@ HOST_SOURCE = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp"
 )
+HOST_HEADER = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h"
+)
 MATERIAL_SOURCE = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
@@ -51,10 +55,16 @@ REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_safety_gear_fallback_v306_review.json"
 )
+CLOTH_WET_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_cloth_wet_pfd_v1_review.json"
+)
 
 
 def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None:
     host = HOST_SOURCE.read_text(encoding="utf-8")
+    host_header = HOST_HEADER.read_text(encoding="utf-8")
     material = MATERIAL_SOURCE.read_text(encoding="utf-8")
     refresh = REFRESH_UTILITY.read_text(encoding="utf-8")
 
@@ -77,6 +87,12 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
     assert "HasProductionWhitewaterHelmet" in host
     assert "SM_RaftSim_WhitewaterHelmet" in host
     assert "HasProductionWhitewaterPfd" in host
+    assert "HasLivePfdMaterialResponse" in host
+    assert "HasLivePfdMaterialResponse" in host_header
+    assert "GetPfdPresentationWetness" in host_header
+    assert "PfdShellMaterialInstance" in host
+    assert "OwningRaft->GetSurfaceWetness() * 0.46f" in host
+    assert "PfdPresentationWetness, 0.84f" in host
     assert "GetProductionPfdTorsoErrorCm" in host
     assert "SM_RaftSim_WhitewaterRescuePfd" in host
     assert "bReplacedPfdLayer" in host
@@ -84,9 +100,22 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
 
     assert "static void BuildPfdMaterials()" in material
     assert "static void BuildHelmetMaterials()" in material
-    assert 'BuildTexturedRaftMaterial(TEXT("M_RaftSim_PFD_Yellow")' in material
+    assert 'BuildPfdShellMaterial(' in material
+    assert 'TEXT("M_RaftSim_PFD_Yellow")' in material
     assert 'TEXT("PfdRipstop")' in material
-    assert "0.74f, 0.07f, 1.5f, 0.16f" in material
+    assert "/*Roughness=*/0.68f" in material
+    assert "/*RoughnessVariation=*/0.10f" in material
+    assert "/*TextureTiling=*/1.15f" in material
+    assert "/*TextileNormalStrength=*/0.22f" in material
+    assert "/*bUseClothShading=*/true" in material
+    assert "/*SaturatedRoughnessScale=*/0.52f" in material
+    assert "/*SaturatedRoughnessMax=*/0.40f" in material
+    assert "/*DrySpecularValue=*/0.24f" in material
+    assert "/*WetSpecularValue=*/0.42f" in material
+    assert "WetCloth->R = 0.16f" in material
+    assert "Material->SetShadingModel(bUseClothShading ? MSM_Cloth" in material
+    assert "EditorData->SubsurfaceColor.Connect(0, FuzzColor)" in material
+    assert "EditorData->ClearCoat.Connect(0, RuntimeCloth)" in material
     assert 'TEXT("M_RaftSim_Helmet")' in material
     assert 'TEXT("M_RaftSim_Helmet_Red")' in material
     assert 'TEXT("M_RaftSim_Helmet_Yellow")' in material
@@ -105,6 +134,10 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
     assert 'get_editor_property("used_with_nanite")' in refresh
     assert "EXPECTED_TEXTURE_NAMES" in refresh
     assert "does not use the complete PFD ripstop set" in refresh
+    assert "unreal.MaterialShadingModel.MSM_CLOTH" in refresh
+    assert "unreal.MaterialShadingModel.MSM_CLOTH" in (
+        REPO_ROOT / "unreal/Scripts/create_production_pfd_materials.py"
+    ).read_text(encoding="utf-8")
 
 
 def test_project_owned_production_helmet_source_and_import_are_hash_locked() -> None:
@@ -195,6 +228,12 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert PFD_ASSET_PATH.is_file()
     roster_capture = ROSTER_CAPTURE_SCRIPT.read_text(encoding="utf-8")
     assert "actor.has_production_whitewater_pfd()" in roster_capture
+    assert "actor.has_live_pfd_material_response()" in roster_capture
+    assert "actor.get_pfd_presentation_wetness()" in roster_capture
+    assert "unreal.RaftSimCrewAvatarAction.SWIMMING" in roster_capture
+    assert "unreal.RaftSimCrewAvatarAction.SEATED_IDLE" in roster_capture
+    assert 'f"{stem}_pfd_dry"' in roster_capture
+    assert 'f"{stem}_pfd_wet"' in roster_capture
     assert "actor.get_production_pfd_torso_error_cm() > 1.0" in roster_capture
     assert '"runtime_production_whitewater_pfd"' in roster_capture
     assert '"runtime_pfd_torso_error_cm"' in roster_capture
@@ -215,3 +254,26 @@ def test_safety_gear_renderer_review_is_hash_verified_and_fail_closed() -> None:
         hashlib.sha256(capture.read_bytes()).hexdigest()
         == review["renderer_evidence"]["capture_sha256"]
     )
+
+
+def test_cloth_wet_pfd_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(CLOTH_WET_REVIEW_PATH.read_text(encoding="utf-8"))
+
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["promotion_allowed"] is False
+    assert review["implementation"]["shading_model"] == "MSM_Cloth"
+    assert review["implementation"]["physics_authority_changed"] is False
+    assert review["runtime_roster_metrics"]["captured_character_count"] == 5
+    assert review["runtime_roster_metrics"]["characters_with_live_material_response"] == 5
+    assert review["validation"]["m5_results"]["failed"] == 0
+    for evidence in review["renderer_evidence"].values():
+        if not isinstance(evidence, dict) or "capture" not in evidence:
+            continue
+        capture = REPO_ROOT / evidence["capture"]
+        assert capture.is_file()
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == evidence["capture_sha256"]
+    for asset in review["runtime_assets"]:
+        path = REPO_ROOT / asset["path"]
+        assert path.is_file()
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == asset["sha256"]
