@@ -179,12 +179,21 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
         "RaftSimEditorLandscapeGeometry.cpp"
     ).read_text(encoding="utf-8")
+    director_cpp = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Rivers/"
+        "RaftSimEditorZambeziDirector.cpp"
+    ).read_text(encoding="utf-8")
     assert "ScenarioRelativePath" in internal
     assert SCENARIO_RELATIVE.as_posix() in catalog_cpp
     assert "AddLandscapeCandidateScenarioMarkers" in build_cpp
     assert "AddLandscapeCandidateRunnableGameplay" in build_cpp
     assert "RaftSim_ZambeziRapid_" in geometry_cpp
     assert "RaftSim_Zambezi_PlayerRaft" in geometry_cpp
+    assert "ApplyZambeziBatokaVisualTerrainTreatment" in build_cpp
+    assert "LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true)" in build_cpp
+    assert "RaftSimProceduralVisualMorphology" in director_cpp
+    assert "RaftSimNonCollisionRenderSurface" in director_cpp
 
     validation = _load(
         REPO_ROOT
@@ -201,4 +210,14 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["runnable"]["water_config_count"] == 1
     assert validation["runnable"]["game_mode"].endswith(
         "RaftSimVerticalSliceGameMode"
+    )
+    assert validation["visual_terrain"]["authority"] == "procedural_render_only"
+    assert validation["visual_terrain"]["conditioned_tile_count"] == 4
+    assert all(
+        "BatokaV12_WorldAligned" in tile["material"]
+        for tile in validation["visual_terrain"]["tiles"]
+    )
+    assert all(
+        "NO_COLLISION" in tile["collision_enabled"]
+        for tile in validation["visual_terrain"]["tiles"]
     )

@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v2",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v3",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -74,6 +74,25 @@ def main() -> None:
             if actor.get_actor_label() == "RaftSim_GuideSeat_PlayerStart"
             and actor.get_class().get_name() == "PlayerStart"
         ]
+        terrain_actors = [
+            actor
+            for actor in actors
+            if "RaftSimProceduralVisualMorphology" in {str(tag) for tag in actor.tags}
+        ]
+        terrain_rows = []
+        for actor in terrain_actors:
+            components = actor.get_components_by_class(unreal.ProceduralMeshComponent)
+            mesh = components[0] if components else None
+            material = mesh.get_material(0) if mesh else None
+            terrain_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
+                    "procedural_mesh_count": len(components),
+                    "material": material.get_path_name() if material else None,
+                    "collision_enabled": str(mesh.get_collision_enabled()) if mesh else None,
+                }
+            )
         world_settings = world.get_world_settings()
         default_game_mode = (
             world_settings.get_editor_property("default_game_mode")
@@ -101,6 +120,12 @@ def main() -> None:
                     "player_start_count": len(player_starts),
                     "game_mode": game_mode_path,
                 },
+                "visual_terrain": {
+                    "authority": "procedural_render_only",
+                    "physics_and_collision_authority": "source_copernicus_landscape",
+                    "conditioned_tile_count": len(terrain_rows),
+                    "tiles": sorted(terrain_rows, key=lambda row: row["actor_label"]),
+                },
             }
         )
         passed = (
@@ -114,13 +139,29 @@ def main() -> None:
             and len(water_configs) == 1
             and len(player_starts) == 1
             and str(game_mode_path).endswith("RaftSimVerticalSliceGameMode")
+            and len(terrain_rows) == 4
+            and all(row["procedural_mesh_count"] == 1 for row in terrain_rows)
+            and all(
+                "BatokaV12_WorldAligned" in str(row["material"])
+                for row in terrain_rows
+            )
+            and all(
+                "NO_COLLISION" in str(row["collision_enabled"])
+                for row in terrain_rows
+            )
+            and all(
+                "RaftSimNonCollisionRenderSurface" in row["tags"]
+                and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
+                for row in terrain_rows
+            )
         )
         report["passed"] = passed
         if not passed:
             raise RuntimeError("Generated Zambezi scenario marker contract did not pass")
         unreal.log(
             f"Zambezi reference run validation passed with {len(markers)} markers, "
-            f"{len(player_rafts)} raft, and {len(water_configs)} runtime water config"
+            f"{len(player_rafts)} raft, {len(water_configs)} runtime water config, "
+            f"and {len(terrain_rows)} conditioned visual-terrain tiles"
         )
     except Exception as error:
         report["error"] = str(error)

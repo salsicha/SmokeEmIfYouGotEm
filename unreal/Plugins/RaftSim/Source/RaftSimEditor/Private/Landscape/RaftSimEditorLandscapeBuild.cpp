@@ -264,6 +264,33 @@ bool BuildLandscapeImportCandidateMap(
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
+    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        UMaterialInterface* BatokaTerrainMaterial =
+            LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true);
+        FZambeziBatokaVisualMorphologyStats MorphologyStats;
+        if (!BatokaTerrainMaterial ||
+            !ApplyZambeziBatokaVisualTerrainTreatment(
+                World,
+                BatokaTerrainMaterial,
+                Candidate,
+                true,
+                &MorphologyStats,
+                OutSummary) ||
+            MorphologyStats.VisualTileCount != 4 ||
+            MorphologyStats.ModifiedVertexCount <= 0)
+        {
+            OutSummary += TEXT(
+                "Runnable Zambezi map requires four conditioned Batoka visual-terrain "
+                "tiles with bounded procedural morphology.\n");
+            return false;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Saved runnable Batoka visual terrain: %lld/%lld vertices received "
+                 "bounded morphology outside the protected river corridor.\n"),
+            MorphologyStats.ModifiedVertexCount,
+            MorphologyStats.TotalVertexCount);
+    }
     if (Candidate.bPhysicalScaleSourceCorridor)
     {
         Landscape->SetActorHiddenInGame(true);

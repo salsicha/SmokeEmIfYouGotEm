@@ -3479,3 +3479,12 @@ path is verified, and the completion goal can be marked complete.
   are green. Coarse hand anatomy, thumb contact, wet skin/material response, synchronized stroke
   biomechanics, and named character-art/guide acceptance remain open, so M9 is not promoted and
   no milestone commit or push is permitted yet.
+- Runnable Batoka terrain integration makes the retained Zambezi V12 world-aligned basalt
+  material and V13 bounded morphology part of normal map generation instead of an isolated
+  comparison path. Four tagged, non-colliding render tiles receive deterministic lava-flow
+  terraces, joint recesses, and talus variation outside the protected river corridor; the
+  hidden Copernicus Landscape remains collision, height-query, and physics authority. Python,
+  editor-map, and PIE gates now fail unless all four conditioned tiles are present and use the
+  intended material. This is a reproducible visual improvement, not photoreal acceptance: the
+  30 m canyon silhouette, vegetation fidelity/density, water, lighting, and named art/guide/
+  geospatial review remain open under M9.
