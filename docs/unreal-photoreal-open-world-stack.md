@@ -35,7 +35,7 @@ The first native source-terrain candidates now live under `/Game/RaftSim/Maps/En
 
 Zambezi is now an explicit isolated exception to the shared Default Lit water contract. Its physical-corridor instance uses `M_RaftSim_Zambezi_SingleLayerWater`, active scattering/absorption/phase/behind-water controls, 0.62 surface opacity, two opposed panned normal layers, and restrained world-space optical variation. A fixed-camera runtime bracket selects 0.42 roughness, 0.28 specular, 0.20 normal intensity, 0.04 reflection fill, zero emissive fill, and 0.12 variation; the regenerated asset reproduces that bracket without a diagnostic override. This removes the previous white mirror-sheet read, lowering matched lower-frame mean luminance from 0.7044 to 0.5271 and the share above 0.80 from 14.40% to 0.69%. It avoids silently changing the other rivers and keeps the ribbon non-colliding and presentation-only. The earlier global Single Layer experiment's foreground depth split remains absent. The 5 m reference flow field preserves its full-corridor station axis and produces live breaking sites in the launch-window PIE gate, with production Niagara roller and aerosol activity required by the test. Those 25 feature-tagged transitions are explicitly procedural reference infill, not measured hydraulics. The result remains review-gated rather than photoreal: terrain silhouette, local bathymetry, credible crest/foam/spray geometry, vegetation, atmosphere, seasonal calibration, and named guide/art approval remain open.
 
-The Zambezi render terrain now uses a V15 organic treatment on four collision-free 12.5 m visual tiles while the source Copernicus Landscape remains the sole terrain/physics authority. Central-difference grid normals, slower relief, variable strata/erosion/talus, and a 3.2 m-capped six-pass reconstruction reduce triangle and regular-terrace artifacts; the first 100 m stays horizontally protected except for upper rock at least 6 m above local water, and morphology remains capped at 2.8 m outside that radius. Since the 30 m DEM still generates a false comb under self-shadow, only those non-colliding visual tiles have shadow casting disabled; an audited movable -48/-90 degree review sun keeps the result deterministic while raft, rock, vegetation, and gameplay shadows remain active. Schema v11 rejects any restored high-density bank ribbon and requires these tags and properties. The accepted default capture passes artifact reduction, not photoreal promotion: the canyon remains rounded, bright, barren at gameplay distance, and dependent on acquisition of higher-resolution full-reach terrain and reviewed southern African ecology.
+The Zambezi render terrain now uses a V15 organic treatment on four collision-free 12.5 m visual tiles while the source Copernicus Landscape remains the sole terrain/physics authority. Central-difference grid normals, slower relief, variable strata/erosion/talus, and a 3.2 m-capped six-pass reconstruction reduce triangle and regular-terrace artifacts; the first 100 m stays horizontally protected except for upper rock at least 6 m above local water, and morphology remains capped at 2.8 m outside that radius. Since the 30 m DEM still generates a false comb under self-shadow, only those non-colliding visual tiles have shadow casting disabled; an audited movable -48/-90 degree review sun keeps the result deterministic while raft, rock, downstream woody vegetation, and gameplay geometry retain shadows. Schema v12 rejects any restored high-density bank ribbon and requires these tags and properties. The accepted default capture passes artifact reduction, not photoreal promotion: the canyon remains rounded and bright and is dependent on acquisition of higher-resolution full-reach terrain and reviewed southern African ecology.
 
 Zambezi also has an isolated camera-visible bank-cover component. It adds 1,200
 grounded instances of the project-owned opaque savanna mesh across the two
@@ -51,11 +51,27 @@ separate HISM actors: 58 riparian trees, 57 umbrella trees, and 117 thorn-scrub
 forms. A deterministic forty-candidate search rejects eight placements above a
 hard 24° DEM-slope ceiling; the maximum accepted slope is 15.83°. Muted olive
 vertex colours and a stronger low-light material floor reduce the first
-bracket's graphic green/black contrast. The current map therefore audits 7,032
+bracket's graphic green/black contrast. That milestone audited 7,032
 opaque, non-colliding vegetation instances across eight components. The result
 is more legible ecology, not production foliage: repeated procedural crowns,
 missing wind/seasonal variation, coarse lighting, and absent species/art/guide
 approval remain open.
+
+The runnable launch now has four additional HISM components rather than
+depending on those downstream documentary windows. A deterministic search
+places 592 solid savanna-cover instances approximately 194-560 m downstream
+and 55 woody instances approximately 270-600 m downstream. Every candidate is
+checked against all route segments, conditioned-water height, and a hard DEM
+slope ceiling; woody plants stay at least 50 m beyond the active half-width.
+The accepted default gameplay capture removes the rejected camera-clipped
+silhouette and woody/waterline intersection while retaining a visible ridge
+tree line. These launch-only, non-colliding components suppress shadows to avoid
+the rejected crown/wall streak under the low review sun; the full-corridor and
+camera-mosaic ground-cover layers are also shadowless, while downstream woody
+ecology retains shadows. The saved map now
+audits 7,679 instances across 12 components under schema v12. The foreground
+remains sparse and synthetic, so this is ecology coverage, not photoreal art or
+ecological promotion.
 
 Candidate lighting and post-processing now come from one river-specific `FRaftSimPhotographicCaptureSettings` contract rather than scattered desert/rainforest conditionals. Sun, skylight, fog, manual exposure, saturation, contrast, sharpening, vignette, and zero camera-film-grain values are serialized into `landscape_candidate_manifest.json` for every evidence frame. A clean UE 5.8 rebuild and offscreen recapture produced no material or shader errors and all 26 environment tests pass. The controlled sky fill improves diagnostic shadow retention, but visual review still finds near-black repeated foliage, coarse terrain plates, and a flat overlapping foreground water/bank ribbon; these are production material/geometry blockers, not reasons to hide the scene with stronger exposure or post-process noise.
 

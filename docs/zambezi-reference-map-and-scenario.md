@@ -95,7 +95,17 @@ non-colliding hierarchical instances:
 - 58 camera-window riparian trees, 57 camera-window umbrella trees, and 117
   camera-window thorn-scrub instances in three separately auditable woody
   components. Eight of 240 deterministic targets are rejected by the hard 24°
-  slope ceiling, leaving 232 placed instances.
+  slope ceiling, leaving 232 placed instances;
+- 592 of 600 launch-window savanna ground-cover targets in a separate
+  non-shadow-casting component. A deterministic 96-candidate search spans
+  approximately 194-560 m downstream, stays at least 15 m beyond the active
+  half-width relative to every route segment, requires ground at least 0.8 m
+  above conditioned water, and rejects slopes above 32°; and
+- 13 launch-window riparian trees, 14 umbrella trees, and 28 thorn-scrub
+  instances. Their deterministic 160-candidate search spans approximately
+  270-600 m downstream, requires 50 m of full-route clearance beyond the active
+  half-width and ground at least 3 m above conditioned water, and rejects slopes
+  above 24°. Nine of 64 targets fail those gates, leaving 55 placed instances.
 
 All four use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
 or blade geometry rather than alpha cards. The revised ground-cover mesh spans
@@ -107,6 +117,16 @@ All dressing actors carry the
 carries `RaftSimOrganicBankMosaic` and `RaftSimCameraVisibleBankCover`.
 The woody-window components carry `RaftSimCameraVisibleWoodyEcology`,
 `RaftSimOrganicWoodyBankLayer`, and `RaftSimWoodySlopeCeiling24Degrees`.
+The four launch components carry `RaftSimRunnableLaunchBankEcologyV1`; the
+cover component adds `RaftSimRunnableLaunchBankCover`, while the three woody
+components add `RaftSimRunnableLaunchWoodyEcology`. Launch cover and woody
+components do not cast shadows: this narrow presentation exception removes the
+rejected near-camera crown/wall streak under the low review sun, without
+changing collision, water, solver state, raft forces, downstream documentary
+woody shadows, or physics authority. The full-corridor ground-cover and
+camera-mosaic components are likewise shadowless so dense grass blades do not
+paint synthetic black streaks across the coarse DEM; full-corridor and
+documentary trees and scrub still cast shadows.
 Placement selects the lowest-slope candidate on each dry bank, keeps a hard
 inner exclusion outside the 72 m active river half-width, starts beyond each
 camera target, and covers approximately the next 120-600 m of view. This makes
@@ -205,7 +225,11 @@ bathymetry, navigation guidance, or validated Zambezi hydraulics.
 The visual fallback materially improves surface scale and canyon breakup, and
 the canonical guide-seat and river-eye views now contain visible solid bank
 cover plus restrained tree and thorn-scrub silhouettes instead of completely
-barren slopes. The 30 m DEM still yields rounded large-scale cliff silhouettes,
+barren slopes. The default runnable launch now also exposes a restrained
+ecology layer ahead of the raft: the accepted capture contains no camera-clipped
+plant and no woody silhouette visibly intersecting the waterline. The V1
+placement bracket that put cover on a 54.16° face and trees at the waterline was
+rejected rather than documented as progress. The 30 m DEM still yields rounded large-scale cliff silhouettes,
 however, and the project-owned tree crowns and small synthetic clumps remain
 repetitive and visibly procedural. The views prove that the broken card foliage
 is absent and that multi-height bank ecology is rendered; they do not prove
@@ -214,20 +238,23 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v11 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v12 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
 degree presentation light, absence of rejected high-density bank actors, the
 exact four vegetation mesh families and
-eight instance components with a 7,032-instance total, exactly one tagged
+12 instance components with a 7,679-instance total, exactly one tagged
 1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
 components with the 58/57/117 accepted split and 24° slope-ceiling contract,
+one 592-instance launch-cover component, three launch woody components with the
+13/14/28 accepted split, their full-route/dry-height/slope placement tags, and
+the bounded launch-window shadow exception,
 zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
 also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
-covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v11 additionally
+covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v12 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.

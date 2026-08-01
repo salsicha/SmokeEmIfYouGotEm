@@ -1,0 +1,139 @@
+{
+  "schema": "raftsim.environment.zambezi_runnable_launch_ecology_review.v1",
+  "date": "2026-08-01",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+  "status": "visual_ecology_coverage_pass_photoreal_promotion_fail",
+  "decision": {
+    "runnable_launch_ecology_coverage": "pass",
+    "photoreal_environment_promotion": "fail",
+    "summary": "The default playable launch now shows a restrained savanna tree line and countable low bank cover without the rejected waterline canopy or camera-clipped silhouette. The coarse terrain, synthetic vegetation, flat water, sparse near-field cover, and missing reviewed Batoka ecology remain below the photoreal bar."
+  },
+  "evidence": {
+    "baseline_capture": "zambezi_organic_terrain_lighting_v1.png",
+    "baseline_sha256": "b619b0ecf3f87257e21ae8c0e4203a68156f1f10567d46d00f21d3372f83bbaf",
+    "accepted_capture": "zambezi_runnable_launch_ecology_v1.png",
+    "accepted_capture_sha256": "1acdcc3724e960f499c5636bd3ad67812dfa0cd670f8aa341a2fd768cbfd5f87",
+    "accepted_capture_size_px": [
+      1280,
+      720
+    ],
+    "capture_path": "default runnable gameplay camera with raft and crew; no diagnostic camera override",
+    "upper_quarter_green_pixel_heuristic": {
+      "definition": "Pixels in the upper 25 percent with G greater than 1.12 times R, G greater than 1.08 times B, and G greater than 45; baseline letterbox removed before analysis.",
+      "baseline_pixels": 0,
+      "accepted_pixels": 746,
+      "interpretation": "The heuristic corroborates visible ridgeline ecology only; it is not a photoreal or species-fidelity metric."
+    }
+  },
+  "accepted_generation_contract": {
+    "ground_cover": {
+      "target_instances": 600,
+      "placed_instances": 592,
+      "rejected_candidates": 8,
+      "maximum_placed_slope_degrees": 31.71,
+      "slope_ceiling_degrees": 32.0,
+      "longitudinal_window_m_downstream": [
+        194,
+        560
+      ],
+      "minimum_full_route_clearance_beyond_active_half_width_m": 15.0,
+      "minimum_height_above_conditioned_water_m": 0.8,
+      "collision": "disabled",
+      "cast_shadow": false,
+      "related_ground_cover_shadow_policy": "full-corridor ground cover and the documentary camera mosaic are also shadowless; downstream woody ecology retains shadows"
+    },
+    "woody_ecology": {
+      "target_instances": 64,
+      "placed_instances": 55,
+      "riparian_tree_instances": 13,
+      "umbrella_tree_instances": 14,
+      "thorn_scrub_instances": 28,
+      "rejected_candidates": 9,
+      "maximum_placed_slope_degrees": 22.46,
+      "slope_ceiling_degrees": 24.0,
+      "longitudinal_window_m_downstream": [
+        270,
+        600
+      ],
+      "minimum_full_route_clearance_beyond_active_half_width_m": 50.0,
+      "minimum_height_above_conditioned_water_m": 3.0,
+      "collision": "disabled",
+      "cast_shadow": false,
+      "shadow_exception_scope": "runnable launch window only; prevents near-camera crown/wall streaks under the low review sun"
+    },
+    "saved_map": {
+      "vegetation_components": 12,
+      "vegetation_instances": 7679,
+      "map_check_errors": 0,
+      "map_check_warnings": 0
+    },
+    "authority": {
+      "placement_surface": "source Copernicus Landscape",
+      "rendering_only": true,
+      "changes_collision": false,
+      "changes_water_geometry": false,
+      "changes_solver_state": false,
+      "changes_raft_forces": false
+    }
+  },
+  "rejected_iterations": [
+    {
+      "id": "V1",
+      "ground_cover_placed": 600,
+      "woody_placed": 120,
+      "ground_cover_maximum_slope_degrees": 54.16,
+      "reason": "Rejected: cover was pasted onto steep faces and woody silhouettes visibly occupied the right waterline."
+    },
+    {
+      "id": "V3",
+      "ground_cover_placed": 135,
+      "woody_placed": 15,
+      "reason": "Rejected: hard gates reduced invalid cover, but a near launch canopy cluster still read as standing in water and a clipped dark silhouette crossed the left wall."
+    },
+    {
+      "id": "V4",
+      "ground_cover_placed": 110,
+      "woody_placed": 61,
+      "reason": "Rejected: broader lateral clearance increased safe candidates but retained the near-camera composition defect."
+    }
+  ],
+  "validation": {
+    "editor_build": "pass",
+    "map_generation": "pass",
+    "map_check": "0 errors, 0 warnings",
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v12",
+      "result": "pass"
+    },
+    "focused_automation": [
+      {
+        "test": "RaftSim.M9.FZambeziOrganicTerrainNormals",
+        "result": "pass"
+      },
+      {
+        "test": "RaftSim.M9.FZambeziSingleLayerWater",
+        "result": "pass"
+      }
+    ],
+    "runnable_pie_gate": {
+      "test": "RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "result": "pass"
+    },
+    "manual_capture_review": {
+      "camera_clipped_launch_vegetation": "pass_none_visible",
+      "woody_waterline_intersection": "pass_none_visible",
+      "visible_ridgeline_ecology": "pass",
+      "photorealism": "fail"
+    }
+  },
+  "remaining_external_acceptance_gates": [
+    "Guide and geospatial approval of the playable centerline, stationing, access, portage, and rescue context.",
+    "Rights approval for all terrain, imagery, supplied-map, vegetation, and reference inputs.",
+    "Higher-resolution full-reach terrain or reviewed field-capture derivative replacing the 30 m DSM approximation.",
+    "Southern African gorge-woodland species, density, age, wind, season, and wetness approval.",
+    "Production terrain, vegetation, rock, water, breaking-water, foam, spray, mist, and lighting art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual/performance acceptance."
+  ]
+}
