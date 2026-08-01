@@ -2,6 +2,13 @@
 
 > **FROZEN July 17, 2026 — superseded by `docs/release-1.0-plan.md`.** The A–E workstream content survives only as referenced by that plan; the review-form/runbook/DoD apparatus is retired. Do not execute tasks from this document.
 
+> **Current portfolio note, August 1, 2026:** Zambezi is now the sixth runnable
+> river at the explicitly limited `reference_free_run` tier. The five-river and
+> Zambezi-backlog wording below records the state when this frozen plan was
+> written; it is not current launch or catalog authority. See
+> `docs/zambezi-reference-map-and-scenario.md` and
+> `physics/data/real_world/river_portfolio_plan.json`.
+
 Written July 15, 2026. This is a self-contained execution plan for an agent with no prior context. It consolidates the goals below into ordered, committable tasks, building on infrastructure that already exists in this repo. Read `docs/code-review-remediation-plan.md` first — its Finding 1 (water-solver validation honesty) and Finding 3 (LFS retention) are prerequisites woven into this plan.
 
 **Execution status, July 16, 2026:** active goal started. `docs/code-review-remediation-plan.md` is complete under the owner's Option B water-solver decision and keep-versioning/no-prune retention decision. The current baseline is `504 passed, 3 skipped` for `cd physics && UV_CACHE_DIR=/private/tmp/raftsim-uv-cache uv run pytest -q`. This plan now executes from that state: live custom-water rapid approval remains blocked until genuine solver parity gates pass, while generated preview/candidate maps remain versioned in Git LFS unless the owner later reverses that decision.
@@ -16,7 +23,7 @@ Build complete photorealistic Unreal river environments, with realistic named-ra
 4. **Futaleufú River** — Rio Azul Swinging Bridge put-in to The Pasarela take-out.
 5. **Chilko River** — Chilko River Lodge put-in to Chilko–Taseko Junction take-out.
 
-**Zambezi (Boiling Pot to Mukuni Beach) is backlogged**: no adequate terrain/centerline source exists (see `docs/batoka-high-resolution-terrain-acquisition-request.md`). Keep its evidence and catalog entries with their existing `additional_active_environment` role; do no new Zambezi work except passively recording acquisition leads.
+**Historical freeze state:** Zambezi (Boiling Pot to Mukuni Beach) was backlogged because no adequate terrain/centerline source existed. That classification was superseded when the complete source-scale reference corridor and procedural full-run water seed became runnable; the unresolved high-resolution terrain, exact centerline, bathymetry, guide, rights, and hydraulic gates now block production fidelity rather than access to the labeled reference Free Run.
 
 This matches the existing portfolio decision in `docs/chilko-futaleufu-photoreal-goal.md` and `docs/named-rapid-realism-validation-plan.md` — this plan sequences and executes that decision; it does not change it.
 

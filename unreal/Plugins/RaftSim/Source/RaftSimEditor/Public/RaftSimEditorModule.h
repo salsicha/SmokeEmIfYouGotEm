@@ -170,6 +170,7 @@ private:
     bool bCreatePhotorealEnvironmentPreviewMapsOnStartup = false;
     bool bCapturePhotorealEnvironmentPreviewsOnStartup = false;
     bool bCreateLandscapeImportCandidateMapsOnStartup = false;
+    FString LandscapeImportCandidateRiverFilter;
     bool bCreatePhotorealRiverWaterMaterialOnStartup = false;
     bool bCreateWaterVfxMaterialOnStartup = false;
     bool bCreateSouthForkFullReachEnvironmentOnStartup = false;

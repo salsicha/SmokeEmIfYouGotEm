@@ -205,10 +205,10 @@ def build_photoreal_asset_intake_b1() -> dict[str, Any]:
         "river_shopping_lists": river_lists,
         "zambezi_policy": {
             "river_id": "zambezi_batoka_gorge",
-            "portfolio_role": "additional_active_environment_backlogged",
+            "portfolio_role": "runnable_reference_free_run",
             "decision": (
-                "Retain existing evidence and catalog entries only; do no new "
-                "Zambezi asset intake while its terrain/centerline source gate is backlogged."
+                "Allow source-traceable environment intake for the runnable reference Free Run; "
+                "keep terrain, centerline, hydraulics, rights, guide, and lifelike promotion gated."
             ),
         },
         "promotion_gate": {

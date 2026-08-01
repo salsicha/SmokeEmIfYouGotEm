@@ -32,6 +32,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Restored Zambezi to the authoritative six-river named-rapid portfolio as a
+  `reference_free_run`, regenerated editor markers and all 123 Zambezi review-run
+  definitions with runnable metadata, and changed the live Rapid/River Editor summary
+  from five runnable plus one additional environment to six runnable rivers. The
+  generated Batoka map is now a shipping cook target; Mac and Windows packaging
+  regenerate it from source-controlled inputs when the ignored local map is absent.
 - Extended the bounded 12-card connected-crown treatment from interior live oak to all
   six active South Fork canopy profiles using project-owned Ponderosa-pine, white-alder,
   and deerbrush branch atlases. Each deterministic 4×4 atlas carries twelve occupied

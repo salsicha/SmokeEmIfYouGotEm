@@ -34,8 +34,9 @@ RUNNABLE_RIVERS = {
     "pacuare_river_costa_rica",
     "futaleufu_river_chile",
     "chilko_river_lava_canyon",
+    "zambezi_batoka_gorge",
 }
-ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS = {"zambezi_batoka_gorge"}
+ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS: set[str] = set()
 REQUIRED_RIVERS = RUNNABLE_RIVERS | ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS
 NAMED_RAPID_SUBFEATURE_TYPES = (
     "hole",

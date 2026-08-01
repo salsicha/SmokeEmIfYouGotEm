@@ -881,8 +881,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Record the E1 platform-matrix owner decision before using E2/E3 evidence for release-candidate planning; keep console and handheld as evaluation or explicitly deferred targets until owner hardware/licensing decisions exist.
-2. Use the non-authoritative recommendation packet to start E2/E3 release evidence with same-seed profile parity first, then packaged runtime rows for all five runnable rivers and six profiles, while keeping authoritative physics identical and named-rapid/flexible-raft gates separate.
-3. Use the Markdown review form to record the E1 target decision, all six E2 profile batches, all seven package targets, all 30 E3 river/profile rows, paths, SHA-256s, performance and hazard outcomes, deferments, failure notes, and reviewer signoff before filling the E2/E3 sidecars.
+2. Use the non-authoritative recommendation packet to start E2/E3 release evidence with same-seed profile parity first, then packaged runtime rows for all six runnable rivers and six profiles, while keeping authoritative physics identical and named-rapid/flexible-raft gates separate.
+3. Use the Markdown review form to record the E1 target decision, all six E2 profile batches, all seven package targets, all 36 E3 river/profile rows, paths, SHA-256s, performance and hazard outcomes, deferments, failure notes, and reviewer signoff before filling the E2/E3 sidecars.
 4. Populate E2 profile-parity results from measured same-seed runs across all target profiles.
 5. Populate E3 packaged-runtime rows with package manifests, artifact hashes, captures, traces, and reviews.
 6. Use platform evidence only after named-rapid and flexible-raft gates are already valid.

@@ -339,8 +339,9 @@ struct FRiverMapSpec
     const TCHAR* FlowBand;
 };
 
-// The five runnable rivers (docs/five-river-simulation-plan.md). Each points at
-// its signature rapid's cooked flow fields; a river map that has no cooked
+// The five compact signature-rapid maps (docs/five-river-simulation-plan.md).
+// Zambezi uses its separately generated source-scale reference corridor. Each
+// compact map points at its signature rapid's cooked flow fields; a map with no cooked
 // package yet falls back to the dev tank at runtime until its fields land.
 static const FRiverMapSpec GRiverMaps[] = {
     {TEXT("L_Troublemaker"),
@@ -458,7 +459,7 @@ static void HandleCreateRiverMaps(const TArray<FString>& Args)
 
 static FAutoConsoleCommand GCreateRiverMapsCommand(
     TEXT("RaftSim.CreateRiverMaps"),
-    TEXT("Generate the five runnable river maps (L_Troublemaker, L_Hance, "
+    TEXT("Generate the five compact signature-rapid maps (L_Troublemaker, L_Hance, "
          "L_UpperHuacas, L_Terminator, L_LavaCanyon) with live cooked-field "
          "river water. Optional args filter by map-name substring."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateRiverMaps));

@@ -12,8 +12,26 @@ if ($OutputDir -eq "") {
     $OutputDir = Join-Path $RepoRoot "unreal\Packaged\Win64-$Config"
 }
 
+$Project = Join-Path $RepoRoot "unreal\SmokeEmIfYouGotEm.uproject"
+$ZambeziMap = Join-Path $RepoRoot "unreal\Content\RaftSim\Maps\EnvironmentPreviews\LandscapeCandidates\L_ZambeziBatokaGorge_PhysicalCorridorCandidate.umap"
+if (-not (Test-Path $ZambeziMap)) {
+    & "$UeRoot\Engine\Build\BatchFiles\Build.bat" `
+        SmokeEmIfYouGotEmEditor Win64 Development $Project `
+        -WaitMutex -NoHotReload
+    if ($LASTEXITCODE -ne 0) { throw "Windows editor build for Zambezi map generation failed" }
+    & "$UeRoot\Engine\Binaries\Win64\UnrealEditor-Cmd.exe" `
+        $Project -unattended -nop4 -nosplash -NoSound -RenderOffscreen `
+        -RaftSimCreateLandscapeImportCandidateMaps `
+        -RaftSimLandscapeImportCandidateRiverId=zambezi_batoka_gorge `
+        -RaftSimExitAfterEnvironmentAutomation
+    if ($LASTEXITCODE -ne 0) { throw "Zambezi runnable map generation failed" }
+}
+if (-not (Test-Path $ZambeziMap)) {
+    throw "Zambezi runnable map was not generated: $ZambeziMap"
+}
+
 & "$UeRoot\Engine\Build\BatchFiles\RunUAT.bat" BuildCookRun `
-    -project="$RepoRoot\unreal\SmokeEmIfYouGotEm.uproject" `
+    -project="$Project" `
     -platform=Win64 -clientconfig=$Config `
     -build -cook -stage -pak -package `
     -archive -archivedirectory="$OutputDir" `

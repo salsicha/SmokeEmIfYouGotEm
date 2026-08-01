@@ -10,20 +10,19 @@
     "show_subfeature_inventory_panel": true
   },
   "portfolio": {
-    "additional_active_environment_count": 1,
-    "additional_active_environment_river_ids": [
-      "zambezi_batoka_gorge"
-    ],
-    "runnable_river_count": 5,
+    "additional_active_environment_count": 0,
+    "additional_active_environment_river_ids": [],
+    "runnable_river_count": 6,
     "runnable_river_ids": [
       "south_fork_american_chili_bar",
       "colorado_river_grand_canyon_rowing",
       "pacuare_river_costa_rica",
       "futaleufu_river_chile",
-      "chilko_river_lava_canyon"
+      "chilko_river_lava_canyon",
+      "zambezi_batoka_gorge"
     ],
     "source": "physics/data/real_world/river_portfolio_plan.json",
-    "status": "five_runnable_rivers_plus_one_additional_active_environment",
+    "status": "six_runnable_rivers",
     "total_river_count": 6,
     "zambezi_evidence_retained": true
   },
@@ -10089,7 +10088,7 @@
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "river_id": "zambezi_batoka_gorge",
       "run_length_m": 27358.848,
       "source_refs": [
