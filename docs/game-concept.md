@@ -254,7 +254,11 @@ Content route order:
 - Third runnable river target: Pacuare River in Costa Rica, focused on tropical rainforest whitewater, rain-fed flow variability, steep-walled gorges, and rights-cleared guide/field-media review before solver generation; its first planning contract is `unreal/Content/RaftSim/River/pacuare_river_third_target_editor_pass.json`.
 - Fourth runnable river target: Futaleufu River in Chile, Rio Azul Swinging Bridge to The Pasarela, focused on turquoise Patagonian big water, boulder gardens, standing-wave timing, and temperate-rainforest mountain corridors.
 - Fifth runnable river target: Chilko River in British Columbia, Chilko River Lodge to the Chilko-Taseko Junction, focused on continuous medium-to-big water, Lava Canyon, flow-dependent wave trains and pins, and source/guide/Tŝilhqot’in publication review.
-- Backlog river: Zambezi through Batoka Gorge. Preserve the existing research and environment evidence, but do not resume active production until authoritative full-reach centerline and high-resolution terrain become available.
+- Runnable reference river: Zambezi through Batoka Gorge, Boiling Pot to Mukuni
+  Beach. Its complete corridor launches as the clearly labeled
+  `reference_free_run`; authoritative high-resolution terrain, exact centerline,
+  bathymetry, seasonal hydraulics, guide, rights, art, and performance review
+  remain production-fidelity gates rather than blockers to reference play.
 
 ## Tone
 

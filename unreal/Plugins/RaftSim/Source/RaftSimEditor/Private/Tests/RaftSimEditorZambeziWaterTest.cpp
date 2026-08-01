@@ -122,16 +122,47 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
                 Value),
             FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
     };
-    TestScalarParameter(TEXT("Opacity"), TEXT("Opacity"), 0.62f);
-    TestScalarParameter(TEXT("Roughness"), TEXT("Roughness"), 0.42f);
-    TestScalarParameter(TEXT("Specular"), TEXT("Specular"), 0.28f);
-    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.20f);
+    auto TestVectorParameter = [this, Instance](
+        const TCHAR* Label,
+        const TCHAR* ParameterName,
+        const FLinearColor& ExpectedValue)
+    {
+        FLinearColor Value = FLinearColor::Black;
+        TestTrue(
+            FString::Printf(TEXT("%s parameter is bound"), Label),
+            Instance->GetVectorParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s uses the renderer-reviewed value"), Label),
+            Value.Equals(ExpectedValue, 0.0001f));
+    };
+    TestScalarParameter(TEXT("Base color scale"), TEXT("BaseColorScale"), 0.78f);
+    TestScalarParameter(TEXT("Opacity"), TEXT("Opacity"), 0.48f);
+    TestScalarParameter(TEXT("Roughness"), TEXT("Roughness"), 0.50f);
+    TestScalarParameter(TEXT("Specular"), TEXT("Specular"), 0.26f);
+    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.04f);
     TestScalarParameter(
-        TEXT("Reflection fill"), TEXT("ReflectionFillIntensity"), 0.04f);
+        TEXT("Reflection fill"), TEXT("ReflectionFillIntensity"), 0.02f);
     TestScalarParameter(
         TEXT("Emissive fill"), TEXT("EmissiveFillScale"), 0.0f);
     TestScalarParameter(
-        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.12f);
+        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.04f);
+    TestVectorParameter(
+        TEXT("Sediment surface tint"),
+        TEXT("SurfaceTint"),
+        FLinearColor(0.028f, 0.078f, 0.032f, 0.0f));
+    TestVectorParameter(
+        TEXT("Physical scattering"),
+        TEXT("ScatteringCoefficients"),
+        FLinearColor(0.00025f, 0.00090f, 0.00035f, 0.0f));
+    TestVectorParameter(
+        TEXT("Physical absorption"),
+        TEXT("AbsorptionCoefficients"),
+        FLinearColor(0.0150f, 0.0050f, 0.0180f, 0.0f));
+    TestVectorParameter(
+        TEXT("Behind-water sediment transmission"),
+        TEXT("ColorScaleBehindWater"),
+        FLinearColor(0.12f, 0.22f, 0.10f, 0.0f));
     return !HasAnyErrors();
 }
 

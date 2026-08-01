@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Retained a second Zambezi sediment-water profile on the runnable Batoka Gorge
+  reference Free Run. The isolated Single Layer instance now uses darker
+  sediment absorption, 0.48 opacity, 0.50 roughness, 0.26 specular, 0.04 normal
+  and optical-variation strength, 0.92 mesh-normal up blend, and 0.08 authored
+  ribbon displacement. Matched gameplay evidence reduces the calm launch's
+  mean horizontal image gradient by 39.7%, removing most long artificial
+  streamwise grooves while preserving solver foam, raft/crew foam exclusion,
+  collision, navigation, and hydraulic authority. Saved-material, water-render,
+  runnable-map, and 25-marker scenario gates pass; the environment remains
+  photoreal-rejected pending the documented external terrain, bathymetry,
+  hydraulics, ecology, art, guide, rights, and performance gates.
 - Replaced the uniformly plastic production-PFD shell response on every runnable river
   with project-owned ripstop Cloth shading, restrained dry fuzz, and a per-avatar dynamic
   wetness instance driven by native raft surface wetness plus swimmer, re-entry, and falling
