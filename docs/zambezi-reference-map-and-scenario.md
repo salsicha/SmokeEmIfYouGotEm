@@ -264,6 +264,21 @@ now fails unless the loaded map produces live breaking sites and production
 Niagara roller and aerosol activity, stays upright before and after the first
 crew command, retains five attached crew avatars, and has zero swimmers.
 
+The live surface now exposes its advected solver foam on a separate masked
+rapid-foam mesh instead of increasing opacity on the broad moving-water grid.
+The underlying live carrier remains optically disabled, preserving the prior
+rectangular-edge correction. The foam component copies the solver-displaced
+surface at a 1.4 cm presentation offset, combines only the solver foam field
+with the verified station/bank feather, and uses the existing material's
+pixel-level raft/crew exclusion. It has no collision, shadow, navigation,
+sampling, buoyancy, force, D3, or D4 authority. The exact-current launch test
+records eight accepted breaking sites, 125 visible foam vertices, 2,673 wet
+surface vertices, 0.7285 maximum foam, 0.2640 m maximum standing-wave
+displacement, and 0.1262 m maximum hydraulic-relief displacement. Evidence is
+in `zambezi_live_solver_rapid_foam_v1.png` and
+`zambezi_live_solver_rapid_foam_v1_review.json`. This is a retained runtime
+readability baseline, not photoreal or real-world hydraulic acceptance.
+
 ## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route

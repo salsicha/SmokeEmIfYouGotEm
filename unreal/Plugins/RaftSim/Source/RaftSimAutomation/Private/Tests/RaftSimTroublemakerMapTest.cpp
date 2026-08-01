@@ -217,6 +217,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TArray<ARaftSimWaterSurfaceActor::FBreakingSite> BreakingSites;
             It->GetBreakingSites(BreakingSites);
             BreakingSiteCount = BreakingSites.Num();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("Zambezi exposes advected rapid foam on the separate masked sheet (%d vertices)"),
+                    It->GetVisibleRapidFoamVertexCount()),
+                It->GetVisibleRapidFoamVertexCount() > 0);
+            Test->TestTrue(
+                TEXT("Zambezi rapid-foam presentation is visible when solver foam is active"),
+                It->IsRapidFoamMeshVisible());
         }
         Test->TestTrue(
             TEXT("Zambezi start apron activates solver-owned breaking water"),

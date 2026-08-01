@@ -3524,3 +3524,15 @@ path is verified, and the completion goal can be marked complete.
   unchanged. Procedural repeated crowns, missing authentic species/wind/
   seasonal variation, coarse terrain/lighting, and absent named guide/art
   approval still reject photoreal promotion; M9 remains open.
+- Zambezi live solver rapid foam V1 makes the already computed advected foam
+  field visible without restoring the rejected rectangular moving-water
+  overlay. A separate masked procedural sheet follows the displaced live
+  surface, uses the existing pixel-level raft/crew exclusion material, and
+  remains non-colliding, shadowless, navigation-inert, and physically
+  non-authoritative. The exact-current runnable launch exposes eight accepted
+  breaking sites and 125 focused foam vertices; P2 water-surface and focused
+  Zambezi PIE gates pass. The retained oblique capture improves localized
+  rapid readability but remains photoreal-rejected for broad flat water,
+  polygonal analytical breaking forms, coarse canyon terrain, sparse synthetic
+  ecology, lighting, and absent named water-VFX-art/guide approval. M9 remains
+  open.

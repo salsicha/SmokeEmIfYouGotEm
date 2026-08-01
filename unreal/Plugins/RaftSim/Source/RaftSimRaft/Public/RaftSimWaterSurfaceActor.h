@@ -118,6 +118,19 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsBreakingRollerVolumeVisible() const;
 
+    /** Number of live-water vertices currently contributing solver-owned,
+     * advected rapid foam to the separate masked presentation sheet. The
+     * sheet is visual-only and remains independent of sampling, collision,
+     * buoyancy, D3, and D4. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetVisibleRapidFoamVertexCount() const
+    {
+        return VisibleRapidFoamVertexCount;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsRapidFoamMeshVisible() const;
+
     /** Selects the non-colliding roller-mesh fallback. Production Niagara
      * disables it only after all required particle assets are bound. */
     void SetBreakingRollerVolumeRenderingEnabled(bool bEnabled);
@@ -138,12 +151,22 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UProceduralMeshComponent> BreakingRollerVolumeMesh;
 
+    /** Masked lace sheet driven by the live solver's advected foam field.
+     * Keeping it separate from the intentionally transparent live-water
+     * carrier exposes rapid structure without restoring a rectangular water
+     * overlay. The bound material applies the raft/crew exclusion mask. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UProceduralMeshComponent> RapidFoamMesh;
+
     /** Water material applied to the surface (single-layer water). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     TObjectPtr<UMaterialInterface> WaterMaterial;
 
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UMaterialInterface> BreakingWaterMaterial;
+
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UMaterialInterface> RapidFoamMaterial;
 
     /** Grid origin (world cm, lower corner). Centred on world origin, where the
      * loader re-centres the reach's hydraulic crux. */
@@ -244,6 +267,8 @@ private:
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
+    TArray<FVector> RapidFoamVertices;
+    TArray<FLinearColor> RapidFoamVertexColors;
     TArray<FProcMeshTangent> Tangents;
     float TimeSinceRefresh = 0.0f;
     bool bLoggedPresentationDiagnostics = false;
@@ -264,5 +289,6 @@ private:
     TArray<FBreakingSite> BreakingSites;
     int32 BreakingLipTriangleCount = 0;
     int32 BreakingRollerVolumeTriangleCount = 0;
+    int32 VisibleRapidFoamVertexCount = 0;
     bool bBreakingRollerVolumeRenderingEnabled = true;
 };

@@ -1,0 +1,93 @@
+{
+  "schema": "raftsim.zambezi.live_solver_rapid_foam_review.v1",
+  "authority": "presentation_only_solver_foam_no_hydraulic_or_gameplay_authority",
+  "acceptance": {
+    "localized_solver_foam_readability": "pass",
+    "rectangular_live_water_overlay_absent_by_construction": "pass",
+    "raft_and_crew_foam_exclusion_contract": "pass",
+    "runnable_map_regression": "pass",
+    "photoreal_visual_promotion": "fail",
+    "production_hydraulic_promotion": "fail"
+  },
+  "implementation": {
+    "component": "ARaftSimWaterSurfaceActor.RapidFoamMesh",
+    "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate",
+    "source_field": "persistent_advected_live_solver_foam",
+    "presentation_offset_cm": 1.4,
+    "focus_smoothstep": [
+      0.12,
+      0.72
+    ],
+    "visible_vertex_threshold": 0.18,
+    "surface_color_linear": [
+      0.62,
+      0.68,
+      0.66
+    ],
+    "collision": false,
+    "casts_shadow": false,
+    "affects_navigation": false,
+    "broad_live_surface_coverage": 0.0,
+    "raft_crew_exclusion": "MPC_RaftSim_RaftFoamOcclusion pixel-level ellipse"
+  },
+  "runtime_telemetry": {
+    "active_breaking_sites": 8,
+    "edge_rejected_sites": 16,
+    "wet_surface_vertices": 2673,
+    "visible_rapid_foam_vertices": 125,
+    "foam_mean": 0.0341,
+    "foam_maximum": 0.7285,
+    "depth_normalized_mean": 0.8766,
+    "speed_normalized_mean": 0.3437,
+    "standing_wave_absolute_maximum_m": 0.264,
+    "hydraulic_relief_absolute_maximum_m": 0.1262,
+    "strongest_interior_breaking_intensity": 0.572,
+    "strongest_interior_edge_clearance_m": 48.0
+  },
+  "evidence": {
+    "fixed_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_solver_rapid_foam_v1.png",
+      "sha256": "a311a68e6950e3bd4186fb5f92ae0f86afc7c56f4ca8db801300dc11400c9168",
+      "resolution": [
+        1280,
+        720
+      ],
+      "camera_world_cm_pitch_yaw": [
+        330016.0,
+        -410918.0,
+        15919.0,
+        -24.6,
+        142.5
+      ]
+    },
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "p2_water_surface": {
+      "test": "RaftSim.P2.WaterSurfaceRenders",
+      "path": "unreal/Saved/Automation/ZambeziRapidFoamFinalP2/index.json",
+      "sha256": "a2a9d303dc2946d6f11489252a4c3b4b6c22893bc6367d946f0c0d409f24b2d0",
+      "result": "1_passed_0_failed_1_known_engine_warning"
+    },
+    "focused_runnable_map": {
+      "test": "RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "path": "unreal/Saved/Automation/ZambeziRapidFoamFinalMapLoad/index.json",
+      "sha256": "dbbfe6fc6a83744f82dae6e188ecd6de6b993d5098d3cb339053ae28615cda60",
+      "result": "1_passed_0_failed_2_known_environment_warnings"
+    }
+  },
+  "visual_findings": [
+    "The separate sheet makes solver-owned foam visible where the broad live carrier remains optically disabled.",
+    "Focused alpha removes the rejected broad low-energy haze while retaining flow-aligned lace around the strongest live rapid response.",
+    "The capture remains visibly synthetic: the base water is broad and flat, analytical breaking geometry exposes polygonal forms, and the canyon terrain, ecology, atmosphere, and lighting remain below the photoreal bar.",
+    "The retained result is a runtime readability baseline and must not be relabeled as real-world hydraulic validation or photoreal acceptance."
+  ],
+  "external_gates_remaining": [
+    "qualified Zambezi guide approval of rapid stations, lines, portages, access, rescue routes, and seasonal behavior",
+    "named water-VFX art approval of the surface, breaking geometry, foam, spray, mist, and temporal response",
+    "geospatial approval of centerline and horizontal/vertical datum",
+    "rights approval for supplied PDF, heightmap, and all production derivatives",
+    "higher-resolution full-reach terrain and reviewed channel or bathymetric geometry",
+    "seasonal-flow calibration and measured or guide-reviewed rapid-scale hydraulic validation",
+    "reviewed southern African gorge species and ecology",
+    "desktop and VR visual, hazard-readability, and performance acceptance"
+  ]
+}
