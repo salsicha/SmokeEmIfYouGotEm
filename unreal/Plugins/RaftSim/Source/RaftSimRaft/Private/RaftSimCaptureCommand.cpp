@@ -15,6 +15,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
+#include "Engine/DirectionalLight.h"
 #include "Engine/GameInstance.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/World.h"
@@ -471,6 +472,10 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
         DiagnosticFloat(TEXT("watervariation="), -1.0f), -1.0f, 1.0f);
     const float WaterOpacityDiagnostic = FMath::Clamp(
         DiagnosticFloat(TEXT("wateropacity="), -1.0f), -1.0f, 1.0f);
+    const float SunPitchDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("sunpitch="), 999.0f), -89.0f, 999.0f);
+    const float SunYawDiagnostic = FMath::Clamp(
+        DiagnosticFloat(TEXT("sunyaw="), 999.0f), -360.0f, 999.0f);
     const bool bWaterInventoryDiagnostic =
         HasDiagnosticMode(TEXT("waterinventory"));
     const FString OutPath =
@@ -499,9 +504,39 @@ static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
              WaterRoughnessDiagnostic, WaterSpecularDiagnostic,
              WaterNormalDiagnostic, WaterReflectionDiagnostic,
              WaterEmissiveDiagnostic, WaterVariationDiagnostic,
-             WaterOpacityDiagnostic, bWaterInventoryDiagnostic]()
+             WaterOpacityDiagnostic, SunPitchDiagnostic, SunYawDiagnostic,
+             bWaterInventoryDiagnostic]()
         {
             UWorld* W = WeakWorld.Get();
+            if (W != nullptr &&
+                (SunPitchDiagnostic < 900.0f || SunYawDiagnostic < 900.0f))
+            {
+                for (TActorIterator<ADirectionalLight> It(W); It; ++It)
+                {
+                    ADirectionalLight* Sun = *It;
+                    if (!Sun)
+                    {
+                        continue;
+                    }
+                    FRotator Rotation = Sun->GetActorRotation();
+                    if (SunPitchDiagnostic < 900.0f)
+                    {
+                        Rotation.Pitch = SunPitchDiagnostic;
+                    }
+                    if (SunYawDiagnostic < 900.0f)
+                    {
+                        Rotation.Yaw = SunYawDiagnostic;
+                    }
+                    Sun->SetActorRotation(Rotation);
+                    UE_LOG(
+                        LogTemp,
+                        Display,
+                        TEXT("RaftSim.CaptureRaft: sun diagnostic pitch=%.1f yaw=%.1f"),
+                        Rotation.Pitch,
+                        Rotation.Yaw);
+                    break;
+                }
+            }
             if (W != nullptr &&
                 (WaterRoughnessDiagnostic >= 0.0f ||
                  WaterSpecularDiagnostic >= 0.0f ||
@@ -625,7 +660,7 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureRaftCommand(
          "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] "
          "[aheadM] [waterroughness=N] [waterspecular=N] [waternormal=N] "
          "[waterreflection=N] [wateremissive=N] [watervariation=N] "
-         "[wateropacity=N] [waterinventory]"),
+         "[wateropacity=N] [waterinventory] [sunpitch=N] [sunyaw=N]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRaft));
 
 // Deterministic close-up for M1: place an authoritative D4 rock against the

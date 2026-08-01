@@ -70,6 +70,43 @@ TArray<FVector> ComputePreviewMeshNormals(const TArray<FVector>& Vertices, const
     return Normals;
 }
 
+TArray<FVector> ComputePreviewGridHeightfieldNormals(
+    const TArray<FVector>& Vertices,
+    int32 RowSize)
+{
+    TArray<FVector> Normals;
+    Normals.Init(FVector::UpVector, Vertices.Num());
+    if (RowSize < 2 || Vertices.Num() < RowSize * 2 ||
+        Vertices.Num() % RowSize != 0)
+    {
+        return Normals;
+    }
+
+    const int32 RowCount = Vertices.Num() / RowSize;
+    for (int32 Y = 0; Y < RowCount; ++Y)
+    {
+        for (int32 X = 0; X < RowSize; ++X)
+        {
+            const int32 Center = Y * RowSize + X;
+            const int32 Left = Y * RowSize + FMath::Max(X - 1, 0);
+            const int32 Right = Y * RowSize + FMath::Min(X + 1, RowSize - 1);
+            const int32 Down = FMath::Max(Y - 1, 0) * RowSize + X;
+            const int32 Up = FMath::Min(Y + 1, RowCount - 1) * RowSize + X;
+            const FVector AcrossX = Vertices[Right] - Vertices[Left];
+            const FVector AcrossY = Vertices[Up] - Vertices[Down];
+            FVector Normal = FVector::CrossProduct(AcrossX, AcrossY).GetSafeNormal(
+                UE_SMALL_NUMBER,
+                FVector::UpVector);
+            if (Normal.Z < 0.0f)
+            {
+                Normal *= -1.0f;
+            }
+            Normals[Center] = Normal;
+        }
+    }
+    return Normals;
+}
+
 bool LoadPreviewPngImage(const FString& RelativePath, FRaftSimPreviewImage& OutImage)
 {
     OutImage = FRaftSimPreviewImage();

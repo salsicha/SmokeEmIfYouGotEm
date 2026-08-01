@@ -900,14 +900,20 @@ struct FZambeziBatokaVisualMorphologyStats
     int64 TotalVertexCount = 0;
     int64 ModifiedVertexCount = 0;
     int64 NearBankModifiedVertexCount = 0;
+    int64 ReconstructedVertexCount = 0;
+    int64 ReconstructedInsideProtectedRadiusVertexCount = 0;
     int64 ProtectedRiverCorridorVertexCount = 0;
     int64 RejectedLowSlopeVertexCount = 0;
     double AbsoluteOffsetSumCm = 0.0;
+    double AbsoluteReconstructionOffsetSumCm = 0.0;
     float ProtectedShorelineRadiusCm = 0.0f;
     float FullStrengthMorphologyRadiusCm = 0.0f;
     float MinimumModifiedCenterlineDistanceCm = TNumericLimits<float>::Max();
     float MinimumOffsetCm = TNumericLimits<float>::Max();
     float MaximumOffsetCm = TNumericLimits<float>::Lowest();
+    float MaximumAbsoluteReconstructionOffsetCm = 0.0f;
+    float MinimumReconstructedInsideRadiusHeightAboveWaterCm =
+        TNumericLimits<float>::Max();
 };
 
 bool ApplyZambeziBatokaVisualTerrainTreatment(
@@ -1066,6 +1072,13 @@ UMaterialInstanceDynamic* CreatePreviewColorMaterial(UObject* Outer, const FLine
 UMaterialInstanceDynamic* CreatePreviewTranslucentColorMaterial(UObject* Outer, const FLinearColor& Color, float Opacity);
 
 TArray<FVector> ComputePreviewMeshNormals(const TArray<FVector>& Vertices, const TArray<int32>& Triangles);
+
+/** Smooth normals for a row-major heightfield grid. Central differences avoid
+ * the alternating diagonal bias produced by triangle-averaged normals on the
+ * coarse visual terrain overlay. */
+TArray<FVector> ComputePreviewGridHeightfieldNormals(
+    const TArray<FVector>& Vertices,
+    int32 RowSize);
 
 bool LoadPreviewPngImage(const FString& RelativePath, FRaftSimPreviewImage& OutImage);
 

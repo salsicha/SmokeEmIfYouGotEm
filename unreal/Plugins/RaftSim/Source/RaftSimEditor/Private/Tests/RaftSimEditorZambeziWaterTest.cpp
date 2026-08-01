@@ -7,6 +7,53 @@
 #if WITH_AUTOMATION_TESTS
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimZambeziOrganicTerrainNormalsTest,
+    "RaftSim.M9.FZambeziOrganicTerrainNormals",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimZambeziOrganicTerrainNormalsTest::RunTest(const FString& Parameters)
+{
+    TArray<FVector> Vertices;
+    Vertices.Reserve(9);
+    for (int32 Y = 0; Y < 3; ++Y)
+    {
+        for (int32 X = 0; X < 3; ++X)
+        {
+            Vertices.Emplace(
+                static_cast<float>(X) * 100.0f,
+                static_cast<float>(Y) * 100.0f,
+                static_cast<float>(X) * 10.0f + static_cast<float>(Y) * 20.0f);
+        }
+    }
+
+    const TArray<FVector> Normals =
+        RaftSimEditorEnvironment::ComputePreviewGridHeightfieldNormals(
+            Vertices,
+            3);
+    const FVector ExpectedNormal = FVector(-0.1f, -0.2f, 1.0f).GetSafeNormal();
+    TestEqual(TEXT("Every grid vertex receives one normal"), Normals.Num(), 9);
+    for (int32 Index = 0; Index < Normals.Num(); ++Index)
+    {
+        TestTrue(
+            FString::Printf(TEXT("Planar grid normal %d has no triangle bias"), Index),
+            FVector::DotProduct(Normals[Index], ExpectedNormal) > 0.9999f);
+    }
+
+    const TArray<FVector> InvalidNormals =
+        RaftSimEditorEnvironment::ComputePreviewGridHeightfieldNormals(
+            Vertices,
+            4);
+    TestEqual(
+        TEXT("An invalid grid still returns a safe normal for every vertex"),
+        InvalidNormals.Num(),
+        9);
+    TestTrue(
+        TEXT("Invalid grid fallback is upright"),
+        InvalidNormals[4].Equals(FVector::UpVector));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimZambeziSingleLayerWaterTest,
     "RaftSim.M9.FZambeziSingleLayerWater",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

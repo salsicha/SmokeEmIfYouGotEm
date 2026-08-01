@@ -53,22 +53,33 @@ is tagged as a mandatory commercial portage. Gameplay hides the labels; the
 World Outliner and editor viewport retain them for authoring.
 
 The saved runnable map also contains four render-only source-terrain tiles with
-the retained Batoka V12 world-aligned basalt material and V14 bounded visual
-morphology. The 72 m active-water half-width is followed by a hard 28 m dry-bank
+the retained Batoka V12 world-aligned basalt material and V15 bounded organic
+morphology. Grid central differences replace triangle-averaged normals, and
+the initial authored relief uses slower wavelengths under a 2.2 m cap instead
+of sampling near the 12.5 m render-mesh Nyquist limit. The 72 m active-water
+half-width is followed by a hard 28 m dry-bank
 buffer, so terrain vertices remain untouched for the first 100 m from the full
 209-point source-aligned route polyline. The widest 73.44 m water edge retains
-at least 26.56 m of unchanged shoreline. From 100-220 m the morphology fades in
-smoothly; the current deterministic build's nearest conditioned vertex is
-102.63 m from the polyline. The treatment reaches full strength on the lower
-canyon wall by 220 m, and adds deterministic
-lava-flow terraces, joint recesses, and talus variation under a 4.5 m vertical
-cap. A broader rounded-slope mask within the near-bank envelope breaks up the
-30 m DEM silhouette without manufacturing a hard water/land boundary. It never
-changes the hidden Copernicus Landscape used for collision, height queries, or
-physics. The actor tags `RaftSimProceduralVisualMorphology`,
-`RaftSimBatokaNearBankMorphologyV14`, `RaftSimProtectedShorelineBuffer`,
-`RaftSimBatokaWorldAlignedTerrain`, and `RaftSimNonCollisionRenderSurface` make
-that authority boundary inspectable in the generated map.
+at least 26.56 m of unchanged shoreline. Six bounded low-pass passes reconstruct
+source facets by at most 3.2 m; inside the 100 m horizontal buffer this is
+allowed only on rock at least 6 m above local water and reaches full strength
+at 18 m. From 100-220 m the 2.8 m-capped morphology fades in smoothly. The
+current deterministic build reconstructs 97,842 vertices with an observed
+2.82 m maximum, then conditions 89,494 of 1,631,500 vertices; its nearest
+morphology vertex is 103.73 m from the polyline. Variable-height terraces,
+warped joint recesses, multi-scale erosion, and talus variation replace the
+regular V14 strata. Because the 30 m DEM still produced false comb-like
+self-shadows, only the four non-colliding visual tiles have shadow casting
+disabled; the raft, rocks, vegetation, and gameplay geometry still cast
+shadows. A movable Zambezi review sun at -48 degrees pitch and -90 degrees yaw
+keeps that presentation deterministic. None of this changes the hidden
+Copernicus Landscape used for collision, height queries, or physics. The actor
+tags `RaftSimProceduralVisualMorphology`,
+`RaftSimBatokaOrganicMorphologyV15`,
+`RaftSimBatokaHeightAwareFacetReconstructionV15`,
+`RaftSimCoarseSourceSelfShadowSuppressed`, `RaftSimProtectedShorelineBuffer`,
+`RaftSimBatokaWorldAlignedTerrain`, and `RaftSimNonCollisionRenderSurface`
+make that authority boundary inspectable in the generated map.
 
 The active Zambezi dressing no longer loads the generic Procedural Vegetation
 Editor species or their masked leaf cards. The generator creates four
@@ -203,9 +214,11 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v10 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v11 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
-non-colliding visual-terrain tiles, the exact four vegetation mesh families and
+non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
+degree presentation light, absence of rejected high-density bank actors, the
+exact four vegetation mesh families and
 eight instance components with a 7,032-instance total, exactly one tagged
 1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
 components with the 58/57/117 accepted split and 24° slope-ceiling contract,
@@ -213,7 +226,8 @@ zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
-also covered by `RaftSim.M9.FZambeziSingleLayerWater`. Schema v10 additionally
+also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
+covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v11 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.

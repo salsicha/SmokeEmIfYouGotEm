@@ -403,10 +403,17 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
             }
         }
 
-        TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+        TArray<FVector> Normals = bZambezi
+            ? ComputePreviewGridHeightfieldNormals(Vertices, RowSize)
+            : ComputePreviewMeshNormals(Vertices, Triangles);
         if (bRockCanyon || bFutaleufu)
         {
-            const float RenderReliefCapCm = bZambezi ? 420.0f : (bFutaleufu ? 240.0f : 180.0f);
+            // The earlier Batoka overlay sampled a 12 m noise octave on a
+            // 12.5 m grid and amplified it by more than four metres. That
+            // near-Nyquist displacement exposed the grid as regular ribs in
+            // gameplay. Keep only resolvable 40-150 m basalt-scale relief in
+            // geometry; the world-aligned material owns sub-grid detail.
+            const float RenderReliefCapCm = bZambezi ? 220.0f : (bFutaleufu ? 240.0f : 180.0f);
             for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
             {
                 const float Steepness = 1.0f - FMath::Clamp(Normals[VertexIndex].Z, 0.0f, 1.0f);
@@ -420,21 +427,29 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
                 }
                 const FVector& Vertex = Vertices[VertexIndex];
                 const float BroadFacet = FMath::PerlinNoise2D(
-                    FVector2D(Vertex.X * 0.00024f, Vertex.Y * 0.00024f));
+                    FVector2D(
+                        Vertex.X * (bZambezi ? 0.000065f : 0.00024f),
+                        Vertex.Y * (bZambezi ? 0.000065f : 0.00024f)));
                 const float LocalFracture = FMath::PerlinNoise2D(
-                    FVector2D(Vertex.X * 0.00082f + 17.0f, Vertex.Y * 0.00082f - 9.0f));
+                    FVector2D(
+                        Vertex.X * (bZambezi ? 0.00020f : 0.00082f) + 17.0f,
+                        Vertex.Y * (bZambezi ? 0.00020f : 0.00082f) - 9.0f));
                 const float Strata = FMath::Sin(
-                    Vertex.Z * 0.0115f + Vertex.X * 0.00031f - Vertex.Y * 0.00019f);
+                    Vertex.Z * (bZambezi ? 0.0028f : 0.0115f) +
+                    Vertex.X * (bZambezi ? 0.00011f : 0.00031f) -
+                    Vertex.Y * (bZambezi ? 0.00007f : 0.00019f));
                 const float ReliefCm = FMath::Clamp(
                     SteepReliefT *
-                        (BroadFacet * (bZambezi ? 230.0f : (bFutaleufu ? 135.0f : 105.0f)) +
-                         LocalFracture * (bZambezi ? 125.0f : (bFutaleufu ? 88.0f : 62.0f)) +
-                         Strata * (bZambezi ? 82.0f : (bFutaleufu ? 55.0f : 38.0f))),
+                        (BroadFacet * (bZambezi ? 125.0f : (bFutaleufu ? 135.0f : 105.0f)) +
+                         LocalFracture * (bZambezi ? 65.0f : (bFutaleufu ? 88.0f : 62.0f)) +
+                         Strata * (bZambezi ? 35.0f : (bFutaleufu ? 55.0f : 38.0f))),
                     -RenderReliefCapCm,
                     RenderReliefCapCm);
                 Vertices[VertexIndex].Z += ReliefCm;
             }
-            Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+            Normals = bZambezi
+                ? ComputePreviewGridHeightfieldNormals(Vertices, RowSize)
+                : ComputePreviewMeshNormals(Vertices, Triangles);
         }
         for (int32 VertexIndex = 0; VertexIndex < Normals.Num(); ++VertexIndex)
         {
