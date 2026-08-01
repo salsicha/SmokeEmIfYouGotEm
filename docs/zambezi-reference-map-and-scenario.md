@@ -197,9 +197,11 @@ frame and full rejection boundary are recorded in
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
 Beach**. Select **Free Run** to launch it without a career-license gate. Its
 frontend scenario ID is `zambezi_reference_run`, and both the player selection
-catalog and source scenario now carry the explicit portfolio role
-`runnable_river` and tier `reference_free_run`. It uses the normal-big-water
-planning band.
+catalog, its generated source model, and the source scenario now carry the
+explicit portfolio role `runnable_river` and tier `reference_free_run`. The
+source model resolves the same frontend scenario, saved map package, and
+normal-big-water reference band, so regeneration no longer falls back to the
+old South-Fork-only selection model.
 The named-rapid source catalog, generated marker and simulator-run manifests,
 Rapid/River Editor shell, player-facing scenario catalog, runtime map-load test,
 and shipping cook list all classify it as the sixth runnable river. There are
@@ -258,6 +260,14 @@ swimmers. The focused test passes, and the complete parameterized
 `RaftSim.P4.RiverMapLoads` run passes all six maps with zero failures. The
 renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
 deliberately fails photoreal promotion while passing runnable launch acceptance.
+
+The runnable classification was reverified on August 1, 2026 after restoring
+the generated player-selection source model. The focused Unreal test again
+passed the saved Batoka map with its live wet finite solver window, upright
+five-person raft, rapid markers, separate live foam, Niagara water pool, and
+four non-colliding visual-terrain tiles. The Python Zambezi reference and
+Sentinel-centerline suites also pass. This is runnable acceptance only; it does
+not close any production-hydraulic or photoreal gate below.
 
 This makes the complete map launchable and paddleable with the normal gameplay
 stack. It does not turn the inferred bed or rapid cues into real-world

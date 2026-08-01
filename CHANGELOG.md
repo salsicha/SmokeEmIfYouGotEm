@@ -32,6 +32,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Restored Zambezi Batoka Gorge to the generated player-selection source model,
+  aligning it with the already-runnable Unreal Free Run catalog, scenario,
+  shipping cook target, and saved map. A cross-model regression now locks the
+  `reference_free_run` tier, frontend scenario, map package, and runnable
+  normal-big-water reference band; the focused Unreal map-load acceptance and
+  Zambezi Python suites pass again.
 - Restored Pacuare Upper Huacas as a physical reach-local runnable map instead
   of the flat signature-rapid shell and scale-mismatched broad DEM preview.
   `L_UpperHuacas` now combines a 600×78 m Landscape, bounded outer-bank infill,
