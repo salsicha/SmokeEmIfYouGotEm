@@ -1058,6 +1058,17 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     }
 
     FZambeziBatokaVisualMorphologyStats LocalStats;
+    constexpr float ShorelineDryBufferCm = 2800.0f;
+    constexpr float NearBankMorphologyReachBeyondWaterCm = 14800.0f;
+    constexpr float NearBankRoundedSlopeMaskStart = 0.055f;
+    constexpr float NearBankRoundedSlopeMaskEnd = 0.34f;
+    constexpr float MorphologyOffsetClampCm = 450.0f;
+    const float ActiveWaterHalfWidthCm =
+        GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
+    LocalStats.ProtectedShorelineRadiusCm =
+        ActiveWaterHalfWidthCm + ShorelineDryBufferCm;
+    LocalStats.FullStrengthMorphologyRadiusCm =
+        ActiveWaterHalfWidthCm + NearBankMorphologyReachBeyondWaterCm;
     TArray<FVector2D> CenterlineWorldPoints;
     if (bApplyVisualMorphology)
     {
@@ -1066,7 +1077,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         {
             return false;
         }
-        for (int32 Index = 0; Index < Centerline.Num(); Index += 2)
+        for (int32 Index = 0; Index < Centerline.Num(); ++Index)
         {
             const float Progress = Centerline.Num() > 1
                 ? static_cast<float>(Index) / static_cast<float>(Centerline.Num() - 1)
@@ -1074,13 +1085,11 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             CenterlineWorldPoints.Add(
                 SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, Progress));
         }
-        if (CenterlineWorldPoints.IsEmpty() ||
-            !CenterlineWorldPoints.Last().Equals(
-                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, 1.0f),
-                1.0f))
+        if (CenterlineWorldPoints.Num() < 2)
         {
-            CenterlineWorldPoints.Add(
-                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, 1.0f));
+            OutSummary += TEXT(
+                "Batoka V14 requires at least two source-aligned centerline points.\n");
+            return false;
         }
     }
 
@@ -1109,13 +1118,15 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         Actor->Tags.AddUnique(TEXT("RaftSimProceduralVisualMorphology"));
         Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
         Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaNearBankMorphologyV14"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProtectedShorelineBuffer"));
 
         FProcMeshSection* Section = MeshComponent->GetProcMeshSection(0);
         if (!Section || Section->ProcVertexBuffer.IsEmpty() ||
             Section->ProcIndexBuffer.IsEmpty() || Section->bEnableCollision)
         {
             OutSummary += FString::Printf(
-                TEXT("Batoka V13 refused to condition invalid or collision-enabled visual tile %s.\n"),
+                TEXT("Batoka V14 refused to condition invalid or collision-enabled visual tile %s.\n"),
                 *Actor->GetActorLabel());
             return false;
         }
@@ -1138,21 +1149,37 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         {
             ++LocalStats.TotalVertexCount;
             const FVector WorldPosition = ActorTransform.TransformPosition(Vertices[VertexIndex]);
+            const FVector2D WorldPosition2D(WorldPosition.X, WorldPosition.Y);
             float MinimumCenterlineDistanceSquared = TNumericLimits<float>::Max();
-            for (const FVector2D& CenterlinePoint : CenterlineWorldPoints)
+            for (int32 SegmentIndex = 1;
+                 SegmentIndex < CenterlineWorldPoints.Num();
+                 ++SegmentIndex)
             {
+                const FVector2D SegmentStart = CenterlineWorldPoints[SegmentIndex - 1];
+                const FVector2D SegmentDelta =
+                    CenterlineWorldPoints[SegmentIndex] - SegmentStart;
+                const float SegmentLengthSquared = SegmentDelta.SizeSquared();
+                const float SegmentProgress = SegmentLengthSquared > KINDA_SMALL_NUMBER
+                    ? FMath::Clamp(
+                          FVector2D::DotProduct(
+                              WorldPosition2D - SegmentStart,
+                              SegmentDelta) /
+                              SegmentLengthSquared,
+                          0.0f,
+                          1.0f)
+                    : 0.0f;
+                const FVector2D ClosestCenterlinePoint =
+                    SegmentStart + SegmentDelta * SegmentProgress;
                 MinimumCenterlineDistanceSquared = FMath::Min(
                     MinimumCenterlineDistanceSquared,
-                    FVector2D::DistSquared(
-                        FVector2D(WorldPosition.X, WorldPosition.Y),
-                        CenterlinePoint));
+                    FVector2D::DistSquared(WorldPosition2D, ClosestCenterlinePoint));
             }
             const float CenterlineDistanceCm = FMath::Sqrt(MinimumCenterlineDistanceSquared);
-            const float RiverProtectionFade = SmoothPreviewStep(
-                22000.0f,
-                65000.0f,
+            const float ShorelineProtectionFade = SmoothPreviewStep(
+                LocalStats.ProtectedShorelineRadiusCm,
+                LocalStats.FullStrengthMorphologyRadiusCm,
                 CenterlineDistanceCm);
-            if (RiverProtectionFade <= KINDA_SMALL_NUMBER)
+            if (ShorelineProtectionFade <= KINDA_SMALL_NUMBER)
             {
                 ++LocalStats.ProtectedRiverCorridorVertexCount;
                 continue;
@@ -1162,7 +1189,20 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                 SourceNormals[VertexIndex].Z,
                 0.0f,
                 1.0f);
-            const float ScarpMask = SmoothPreviewStep(0.12f, 0.62f, Steepness);
+            const float FarScarpMask = SmoothPreviewStep(0.12f, 0.62f, Steepness);
+            const float NearBankEnvelope = 1.0f - SmoothPreviewStep(
+                LocalStats.FullStrengthMorphologyRadiusCm,
+                36000.0f,
+                CenterlineDistanceCm);
+            const float RoundedNearBankScarpMask =
+                SmoothPreviewStep(
+                    NearBankRoundedSlopeMaskStart,
+                    NearBankRoundedSlopeMaskEnd,
+                    Steepness) *
+                NearBankEnvelope * 0.82f;
+            const float ScarpMask = FMath::Max(
+                FarScarpMask,
+                RoundedNearBankScarpMask);
             const float TalusMask =
                 SmoothPreviewStep(0.08f, 0.30f, Steepness) *
                 (1.0f - SmoothPreviewStep(0.55f, 0.78f, Steepness));
@@ -1233,10 +1273,10 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             const float TalusOffsetCm =
                 (TalusBroad * 92.0f + TalusFine * 46.0f) * TalusMask;
             const float OffsetCm = FMath::Clamp(
-                RiverProtectionFade *
+                ShorelineProtectionFade *
                     (ScarpMask * (TerraceOffsetCm + JointRecessCm) + TalusOffsetCm),
-                -450.0f,
-                450.0f);
+                -MorphologyOffsetClampCm,
+                MorphologyOffsetClampCm);
             if (FMath::Abs(OffsetCm) <= 0.5f)
             {
                 continue;
@@ -1246,7 +1286,14 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                 FVector(0.0f, 0.0f, OffsetCm));
             Vertices[VertexIndex] += LocalOffset;
             ++LocalStats.ModifiedVertexCount;
+            if (CenterlineDistanceCm <= LocalStats.FullStrengthMorphologyRadiusCm)
+            {
+                ++LocalStats.NearBankModifiedVertexCount;
+            }
             LocalStats.AbsoluteOffsetSumCm += FMath::Abs(OffsetCm);
+            LocalStats.MinimumModifiedCenterlineDistanceCm = FMath::Min(
+                LocalStats.MinimumModifiedCenterlineDistanceCm,
+                CenterlineDistanceCm);
             LocalStats.MinimumOffsetCm = FMath::Min(LocalStats.MinimumOffsetCm, OffsetCm);
             LocalStats.MaximumOffsetCm = FMath::Max(LocalStats.MaximumOffsetCm, OffsetCm);
         }
@@ -1269,7 +1316,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     }
     OutSummary += FString::Printf(
         TEXT("Applied the Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
-        bApplyVisualMorphology ? TEXT("V13 morphology plus V12 world-aligned material")
+        bApplyVisualMorphology ? TEXT("V14 near-bank morphology plus V12 world-aligned material")
                                : TEXT("V12 world-aligned material"),
         LocalStats.VisualTileCount);
     return LocalStats.VisualTileCount == 4;
@@ -1670,11 +1717,25 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaVisualMorphologyComparison(
         Object->SetNumberField(TEXT("total_vertex_count"), Stats.TotalVertexCount);
         Object->SetNumberField(TEXT("modified_vertex_count"), Stats.ModifiedVertexCount);
         Object->SetNumberField(
+            TEXT("near_bank_modified_vertex_count"),
+            Stats.NearBankModifiedVertexCount);
+        Object->SetNumberField(
             TEXT("protected_river_corridor_vertex_count"),
             Stats.ProtectedRiverCorridorVertexCount);
         Object->SetNumberField(
             TEXT("rejected_low_slope_vertex_count"),
             Stats.RejectedLowSlopeVertexCount);
+        Object->SetNumberField(
+            TEXT("protected_shoreline_radius_cm"),
+            Stats.ProtectedShorelineRadiusCm);
+        Object->SetNumberField(
+            TEXT("full_strength_morphology_radius_cm"),
+            Stats.FullStrengthMorphologyRadiusCm);
+        Object->SetNumberField(
+            TEXT("minimum_modified_centerline_distance_cm"),
+            Stats.ModifiedVertexCount > 0
+                ? Stats.MinimumModifiedCenterlineDistanceCm
+                : 0.0);
         Object->SetNumberField(
             TEXT("minimum_offset_cm"),
             Stats.ModifiedVertexCount > 0 ? Stats.MinimumOffsetCm : 0.0);

@@ -53,14 +53,22 @@ is tagged as a mandatory commercial portage. Gameplay hides the labels; the
 World Outliner and editor viewport retain them for authoring.
 
 The saved runnable map also contains four render-only source-terrain tiles with
-the retained Batoka V12 world-aligned basalt material and V13 bounded visual
-morphology. The morphology adds deterministic lava-flow terraces, joint
-recesses, and talus variation only outside a 220 m protected river corridor,
-fades out by 650 m, and is clamped to 4.5 m. It never changes the hidden
-Copernicus Landscape used for collision, height queries, or physics. The actor
-tags `RaftSimProceduralVisualMorphology`, `RaftSimBatokaWorldAlignedTerrain`,
-and `RaftSimNonCollisionRenderSurface` make that authority boundary inspectable
-in the generated map.
+the retained Batoka V12 world-aligned basalt material and V14 bounded visual
+morphology. The 72 m active-water half-width is followed by a hard 28 m dry-bank
+buffer, so terrain vertices remain untouched for the first 100 m from the full
+209-point source-aligned route polyline. The widest 73.44 m water edge retains
+at least 26.56 m of unchanged shoreline. From 100-220 m the morphology fades in
+smoothly; the current deterministic build's nearest conditioned vertex is
+102.63 m from the polyline. The treatment reaches full strength on the lower
+canyon wall by 220 m, and adds deterministic
+lava-flow terraces, joint recesses, and talus variation under a 4.5 m vertical
+cap. A broader rounded-slope mask within the near-bank envelope breaks up the
+30 m DEM silhouette without manufacturing a hard water/land boundary. It never
+changes the hidden Copernicus Landscape used for collision, height queries, or
+physics. The actor tags `RaftSimProceduralVisualMorphology`,
+`RaftSimBatokaNearBankMorphologyV14`, `RaftSimProtectedShorelineBuffer`,
+`RaftSimBatokaWorldAlignedTerrain`, and `RaftSimNonCollisionRenderSurface` make
+that authority boundary inspectable in the generated map.
 
 The active Zambezi dressing no longer loads the generic Procedural Vegetation
 Editor species or their masked leaf cards. The generator creates four

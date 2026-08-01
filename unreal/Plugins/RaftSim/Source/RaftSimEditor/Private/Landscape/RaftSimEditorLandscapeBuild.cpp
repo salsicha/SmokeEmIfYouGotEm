@@ -278,7 +278,10 @@ bool BuildLandscapeImportCandidateMap(
                 &MorphologyStats,
                 OutSummary) ||
             MorphologyStats.VisualTileCount != 4 ||
-            MorphologyStats.ModifiedVertexCount <= 0)
+            MorphologyStats.ModifiedVertexCount <= 0 ||
+            MorphologyStats.NearBankModifiedVertexCount <= 0 ||
+            MorphologyStats.MinimumModifiedCenterlineDistanceCm + 0.5f <
+                MorphologyStats.ProtectedShorelineRadiusCm)
         {
             OutSummary += TEXT(
                 "Runnable Zambezi map requires four conditioned Batoka visual-terrain "
@@ -287,9 +290,15 @@ bool BuildLandscapeImportCandidateMap(
         }
         OutSummary += FString::Printf(
             TEXT("Saved runnable Batoka visual terrain: %lld/%lld vertices received "
-                 "bounded morphology outside the protected river corridor.\n"),
+                 "bounded morphology, including %lld dry near-bank vertices outside "
+                 "the %.1f m protected shoreline radius (nearest conditioned vertex "
+                 "%.2f m; full strength by %.1f m).\n"),
             MorphologyStats.ModifiedVertexCount,
-            MorphologyStats.TotalVertexCount);
+            MorphologyStats.TotalVertexCount,
+            MorphologyStats.NearBankModifiedVertexCount,
+            MorphologyStats.ProtectedShorelineRadiusCm / 100.0f,
+            MorphologyStats.MinimumModifiedCenterlineDistanceCm / 100.0f,
+            MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f);
     }
     if (Candidate.bPhysicalScaleSourceCorridor)
     {
