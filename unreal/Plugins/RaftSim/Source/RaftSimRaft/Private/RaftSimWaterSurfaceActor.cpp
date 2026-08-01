@@ -219,6 +219,18 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     BreakingRollerVolumeMesh->SetVisibility(false, true);
     BreakingRollerVolumeMesh->bUseAsyncCooking = true;
 
+    RapidFoamMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
+        TEXT("RapidFoamMesh"));
+    RapidFoamMesh->SetupAttachment(SurfaceMesh);
+    RapidFoamMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    RapidFoamMesh->SetCastShadow(false);
+    RapidFoamMesh->SetCanEverAffectNavigation(false);
+    RapidFoamMesh->SetMobility(EComponentMobility::Movable);
+    RapidFoamMesh->SetTranslucentSortPriority(3);
+    RapidFoamMesh->SetVisibility(false, true);
+    RapidFoamMesh->ComponentTags.AddUnique(TEXT("RaftSimLiveSolverRapidFoam"));
+    RapidFoamMesh->bUseAsyncCooking = true;
+
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> WaterMat(
         TEXT("/Game/RaftSim/Materials/M_RaftSim_LiveRiverSurface.M_RaftSim_LiveRiverSurface"));
     if (WaterMat.Succeeded())
@@ -256,6 +268,15 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
         {
             BreakingWaterMaterial = FallbackBreakingWaterMat.Object;
         }
+    }
+
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> RapidFoamMat(
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "M_RaftSim_SolverFieldFoamCandidate."
+             "M_RaftSim_SolverFieldFoamCandidate"));
+    if (RapidFoamMat.Succeeded())
+    {
+        RapidFoamMaterial = RapidFoamMat.Object;
     }
 
     static ConstructorHelpers::FObjectFinder<UMaterialParameterCollection>
@@ -501,6 +522,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     Normals.SetNum(VertCount);
     UVs.SetNum(VertCount);
     VertexColors.SetNum(VertCount);
+    RapidFoamVertices.SetNum(VertCount);
+    RapidFoamVertexColors.SetNum(VertCount);
     Tangents.SetNum(VertCount);
     Triangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     FoamField.SetNumZeroed(VertCount);
@@ -564,6 +587,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     GridStationN,
                     VertexSpacingMeters,
                     CurvedGridEdgeBlendMeters));
+            RapidFoamVertices[Index] = Vertices[Index];
+            RapidFoamVertexColors[Index] = FLinearColor(
+                0.62f, 0.68f, 0.66f, 0.0f);
             Tangents[Index] = FProcMeshTangent(1.0f, 0.0f, 0.0f);
         }
     }
@@ -589,6 +615,19 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     SurfaceMesh->CreateMeshSection_LinearColor(
         0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents,
         /*bCreateCollision=*/false);
+    RapidFoamMesh->CreateMeshSection_LinearColor(
+        0,
+        RapidFoamVertices,
+        Triangles,
+        Normals,
+        UVs,
+        RapidFoamVertexColors,
+        Tangents,
+        /*bCreateCollision=*/false);
+    if (RapidFoamMaterial != nullptr)
+    {
+        RapidFoamMesh->SetMaterial(0, RapidFoamMaterial);
+    }
     if (WaterMaterial != nullptr)
     {
         // The authored seasonal surface remains directly below this moving
@@ -1787,6 +1826,48 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
+    // The live carrier remains optically disabled because even a few percent
+    // of broad translucent coverage revealed its rectangular moving window.
+    // Present only solver-owned foam on a masked lace sheet. Vertex alpha
+    // combines advected foam with the already verified station/bank feather;
+    // the material's runtime raft ellipse then removes foam over the boat and
+    // crew at pixel resolution. This mesh never participates in water queries,
+    // collision, navigation, forces, buoyancy, D3, or D4.
+    VisibleRapidFoamVertexCount = 0;
+    if (RapidFoamVertices.Num() == Vertices.Num() &&
+        RapidFoamVertexColors.Num() == VertexColors.Num())
+    {
+        for (int32 Index = 0; Index < Vertices.Num(); ++Index)
+        {
+            RapidFoamVertices[Index] =
+                Vertices[Index] + Normals[Index].GetSafeNormal() * 1.4f;
+            // Suppress the broad low-energy haze while keeping the strongest
+            // advected crests opaque enough to survive the material's lace
+            // mask and gameplay-distance mips. This is a smooth response to
+            // the solver-owned foam field, not an authored rapid marker.
+            const float FocusedFoam = FMath::SmoothStep(
+                0.12f, 0.72f, VertexColors[Index].R);
+            const float FoamCoverage = FMath::Clamp(
+                FocusedFoam * VertexColors[Index].A,
+                0.0f,
+                1.0f);
+            RapidFoamVertexColors[Index] = FLinearColor(
+                0.62f, 0.68f, 0.66f, FoamCoverage);
+            if (FoamCoverage >= 0.18f)
+            {
+                ++VisibleRapidFoamVertexCount;
+            }
+        }
+        RapidFoamMesh->UpdateMeshSection_LinearColor(
+            0,
+            RapidFoamVertices,
+            Normals,
+            UVs,
+            RapidFoamVertexColors,
+            Tangents);
+        RapidFoamMesh->SetVisibility(VisibleRapidFoamVertexCount > 0, true);
+    }
+
     SurfaceMesh->UpdateMeshSection_LinearColor(
         0, Vertices, Normals, UVs, VertexColors, Tangents);
     if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)
@@ -1796,7 +1877,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             LogTemp, Display,
             TEXT("RaftSim live water presentation: material=%s wet_vertices=%d "
                  "foam_mean=%.4f foam_max=%.4f depth_mean=%.4f speed_mean=%.4f "
-                 "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f"),
+                 "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f "
+                 "rapid_foam_vertices=%d rapid_foam_visible=%d"),
             SurfaceMesh->GetMaterial(0)
                 ? *SurfaceMesh->GetMaterial(0)->GetPathName()
                 : TEXT("none"),
@@ -1806,7 +1888,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             DepthSum / WetVertexCount,
             SpeedSum / WetVertexCount,
             MaximumAbsoluteStandingWaveM,
-            MaximumAbsoluteHydraulicReliefM);
+            MaximumAbsoluteHydraulicReliefM,
+            VisibleRapidFoamVertexCount,
+            IsRapidFoamMeshVisible() ? 1 : 0);
     }
     if (!bLoggedHydraulicReliefDiagnostics &&
         MaximumAbsoluteHydraulicReliefM > 0.01f)
@@ -1821,6 +1905,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MaximumAbsoluteStandingWaveM,
             WetVertexCount);
     }
+}
+
+bool ARaftSimWaterSurfaceActor::IsRapidFoamMeshVisible() const
+{
+    return RapidFoamMesh &&
+        RapidFoamMesh->IsVisible() &&
+        VisibleRapidFoamVertexCount > 0;
 }
 
 void ARaftSimWaterSurfaceActor::GetBreakingSites(TArray<FBreakingSite>& OutSites) const

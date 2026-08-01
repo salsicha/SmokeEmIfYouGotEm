@@ -200,6 +200,36 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
                 TransitionalCoverageVertices > 0);
         }
     }
+    UProceduralMeshComponent* RapidFoamMesh = nullptr;
+    TArray<UProceduralMeshComponent*> ProceduralMeshes;
+    Surface->GetComponents<UProceduralMeshComponent>(ProceduralMeshes);
+    for (UProceduralMeshComponent* Candidate : ProceduralMeshes)
+    {
+        if (Candidate && Candidate->GetFName() == TEXT("RapidFoamMesh"))
+        {
+            RapidFoamMesh = Candidate;
+            break;
+        }
+    }
+    Test->TestNotNull(
+        TEXT("surface exposes a separate solver-owned rapid-foam mesh"),
+        RapidFoamMesh);
+    if (RapidFoamMesh)
+    {
+        Test->TestEqual(
+            TEXT("rapid foam remains non-colliding"),
+            RapidFoamMesh->GetCollisionEnabled(),
+            ECollisionEnabled::NoCollision);
+        Test->TestFalse(
+            TEXT("rapid foam does not cast a duplicate water shadow"),
+            RapidFoamMesh->CastShadow);
+        Test->TestTrue(
+            TEXT("rapid foam uses the raft-occluded masked lace material"),
+            RapidFoamMesh->GetMaterial(0) &&
+                RapidFoamMesh->GetMaterial(0)->GetPathName().Contains(
+                    TEXT("M_RaftSim_SolverFieldFoamCandidate")) &&
+                RapidFoamMesh->GetMaterial(0)->GetBlendMode() == BLEND_Masked);
+    }
     const FVector2D RapidCoordinateM(960.0f, 0.0f);
     const float FirstRapidWaveM =
         ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(

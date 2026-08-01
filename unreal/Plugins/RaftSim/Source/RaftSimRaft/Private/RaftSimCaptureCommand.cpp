@@ -368,6 +368,7 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
     bool bHasCamera = false;
     FVector CamLoc = FVector::ZeroVector;
     FRotator CamRot = FRotator::ZeroRotator;
+    const FString CameraPreset = Args.Num() > 2 ? Args[2] : FString();
     if (Args.Num() >= 7)
     {
         CamLoc = FVector(FCString::Atof(*Args[2]), FCString::Atof(*Args[3]), FCString::Atof(*Args[4]));
@@ -379,13 +380,32 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
     FTimerHandle Handle;
     World->GetTimerManager().SetTimer(
         Handle,
-        FTimerDelegate::CreateLambda([WeakWorld, OutPath, bHasCamera, CamLoc, CamRot]()
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, OutPath, bHasCamera, CamLoc, CamRot, CameraPreset]()
         {
             UWorld* W = WeakWorld.Get();
-            if (W != nullptr && bHasCamera)
+            FVector ResolvedCamLoc = CamLoc;
+            FRotator ResolvedCamRot = CamRot;
+            bool bResolvedCamera = bHasCamera;
+            if (W != nullptr && !bResolvedCamera &&
+                (CameraPreset == TEXT("breaking_water") ||
+                 CameraPreset == TEXT("breaking_water_side") ||
+                 CameraPreset == TEXT("breaking_water_opposite")))
+            {
+                if (ARaftSimRaftActor* Raft = FindRaft(W))
+                {
+                    bResolvedCamera = ResolveBreakingWaterEvidenceCameraPose(
+                        W,
+                        *Raft,
+                        CameraPreset,
+                        ResolvedCamLoc,
+                        ResolvedCamRot);
+                }
+            }
+            if (W != nullptr && bResolvedCamera)
             {
                 ACameraActor* Cam = W->SpawnActor<ACameraActor>(
-                    ACameraActor::StaticClass(), CamLoc, CamRot);
+                    ACameraActor::StaticClass(), ResolvedCamLoc, ResolvedCamRot);
                 if (Cam != nullptr)
                 {
                     if (APlayerController* PC = W->GetFirstPlayerController())
@@ -417,8 +437,10 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
 static FAutoConsoleCommandWithWorldAndArgs GCaptureAfterCommand(
     TEXT("RaftSim.CaptureAfter"),
     TEXT("After N in-game seconds, optionally place a camera (x y z pitch yaw), "
-         "screenshot the viewport and exit. "
-         "Usage: RaftSim.CaptureAfter <seconds> [label] [x y z pitch yaw]"),
+         "or use a solver-owned breaking-water preset, then screenshot the "
+         "viewport and exit. Usage: RaftSim.CaptureAfter <seconds> [label] "
+         "[x y z pitch yaw|breaking_water|breaking_water_side|"
+         "breaking_water_opposite]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureAfter));
 
 // Over-the-shoulder capture: order the crew to paddle downstream so the raft
