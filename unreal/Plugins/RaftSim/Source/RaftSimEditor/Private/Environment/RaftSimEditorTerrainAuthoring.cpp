@@ -1625,6 +1625,12 @@ AActor* AddPreviewRiverRibbonMesh(
         MaterialOverride ? MaterialOverride : LoadOrCreatePreviewWaterVertexColorMaterial(),
         &VertexColors,
         !bUsePhysicalCandidateShading);
+    if (WaterActor && Spec.RiverId == TEXT("pacuare"))
+    {
+        WaterActor->Tags.AddUnique(TEXT("RaftSimPacuareSingleLayerWater"));
+        WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+        WaterActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+    }
     if (bUseSolverVisualizationFields && SolverFoamVertexColors.Num() == Vertices.Num())
     {
         TArray<FVector> SolverFoamVertices = Vertices;

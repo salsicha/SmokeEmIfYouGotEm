@@ -1,6 +1,8 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
 #include "Materials/MaterialExpressionNoise.h"
+#include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -116,6 +118,122 @@ bool FRaftSimPacuareOrganicRainforestTerrainTest::RunTest(
         TestTrue(TEXT("Moss remains the greenest ground response"), Moss->G > Moss->R);
         TestTrue(TEXT("Wet rock remains darker than moss"), WetRock->G < Moss->G);
     }
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareRainforestSingleLayerWaterTest,
+    "RaftSim.M9.FPacuareRainforestSingleLayerWater",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareRainforestSingleLayerWaterTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate."
+             "MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate"));
+    TestNotNull(TEXT("Pacuare water instance exists"), Instance);
+    if (!Instance)
+    {
+        return false;
+    }
+
+    UMaterial* Parent = Cast<UMaterial>(Instance->Parent);
+    TestNotNull(TEXT("Pacuare water parent exists"), Parent);
+    if (!Parent)
+    {
+        return false;
+    }
+    TestEqual(
+        TEXT("Pacuare water has an isolated rainforest parent"),
+        Parent->GetPathName(),
+        FString(TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
+                     "M_RaftSim_Pacuare_RainforestSingleLayerWater."
+                     "M_RaftSim_Pacuare_RainforestSingleLayerWater")));
+    TestTrue(
+        TEXT("Pacuare uses Single Layer Water"),
+        Parent->GetShadingModels().HasShadingModel(MSM_SingleLayerWater));
+    TestEqual(TEXT("Pacuare water volume stays opaque"), Parent->BlendMode, BLEND_Opaque);
+    const UMaterialEditorOnlyData* EditorOnlyData = Parent->GetEditorOnlyData();
+    TestNotNull(TEXT("Pacuare water graph is inspectable"), EditorOnlyData);
+    if (EditorOnlyData)
+    {
+        TestNull(
+            TEXT("Pacuare presentation never displaces solver geometry"),
+            EditorOnlyData->WorldPositionOffset.Expression);
+    }
+
+    int32 PannerCount = 0;
+    int32 WaterOutputCount = 0;
+    TArray<float> NoiseScales;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Parent->GetExpressionCollection().Expressions)
+    {
+        PannerCount += Cast<UMaterialExpressionPanner>(Expression.Get()) ? 1 : 0;
+        WaterOutputCount +=
+            Cast<UMaterialExpressionSingleLayerWaterMaterialOutput>(Expression.Get())
+            ? 1
+            : 0;
+        if (const UMaterialExpressionNoise* Noise =
+                Cast<UMaterialExpressionNoise>(Expression.Get()))
+        {
+            NoiseScales.Add(Noise->Scale);
+        }
+    }
+    TestEqual(TEXT("Two independently moving normal layers exist"), PannerCount, 2);
+    TestEqual(TEXT("One physical water-volume output exists"), WaterOutputCount, 1);
+    TestEqual(TEXT("Two world-space variation fields exist"), NoiseScales.Num(), 2);
+    TestTrue(TEXT("Rainforest reach-scale variation exists"), NoiseScales.Contains(0.00042f));
+    TestTrue(TEXT("Rainforest surface-scale variation exists"), NoiseScales.Contains(0.00210f));
+
+    auto TestScalar = [this, Instance](
+                          const TCHAR* ParameterName,
+                          float ExpectedValue)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its reviewed value"), ParameterName),
+            FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+    };
+    auto TestVector = [this, Instance](
+                          const TCHAR* ParameterName,
+                          const FLinearColor& ExpectedValue)
+    {
+        FLinearColor Value = FLinearColor::Black;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetVectorParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its reviewed value"), ParameterName),
+            Value.Equals(ExpectedValue, 0.0001f));
+    };
+    TestScalar(TEXT("BaseColorScale"), 0.90f);
+    TestScalar(TEXT("Opacity"), 0.28f);
+    TestScalar(TEXT("Roughness"), 0.32f);
+    TestScalar(TEXT("Specular"), 0.42f);
+    TestScalar(TEXT("NormalIntensity"), 0.20f);
+    TestScalar(TEXT("SurfaceVariationStrength"), 0.32f);
+    TestScalar(TEXT("RefractionIor"), 1.333f);
+    TestScalar(TEXT("SolverFieldEnable"), 0.0f);
+    TestVector(
+        TEXT("SurfaceTint"),
+        FLinearColor(0.050f, 0.085f, 0.060f, 0.0f));
+    TestVector(
+        TEXT("ScatteringCoefficients"),
+        FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f));
+    TestVector(
+        TEXT("AbsorptionCoefficients"),
+        FLinearColor(0.0055f, 0.0020f, 0.0035f, 0.0f));
+    TestVector(
+        TEXT("ColorScaleBehindWater"),
+        FLinearColor(0.60f, 0.65f, 0.55f, 0.0f));
     return !HasAnyErrors();
 }
 

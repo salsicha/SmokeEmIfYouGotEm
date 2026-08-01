@@ -11,8 +11,10 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
 
+    const float GuideSeatPitch = Spec.RiverId == TEXT("pacuare") ? -5.5f : -13.5f;
+    const float GuideSeatHeight = Spec.RiverId == TEXT("pacuare") ? 165.0f : 140.0f;
     ACameraActor* Camera = Cast<ACameraActor>(
-        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(-13.5f, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), 140.0f))));
+        GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(GuideSeatPitch, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), GuideSeatHeight))));
     if (Camera)
     {
         Camera->SetActorLabel(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"));
@@ -67,11 +69,18 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
             World->GetCurrentLevel(),
             ACameraActor::StaticClass(),
             FTransform(
-                FRotator(Spec.bDesertCanyon ? -10.5f : -12.75f, RiverEyeCenterlineFollowingYawDeg, 0.0f),
+                FRotator(
+                    Spec.bDesertCanyon
+                        ? -10.5f
+                        : (Spec.RiverId == TEXT("pacuare") ? -5.0f : -12.75f),
+                    RiverEyeCenterlineFollowingYawDeg,
+                    0.0f),
                 FVector(
                     RiverEyeCameraX,
                     RiverEyeCameraY,
-                    Spec.bDesertCanyon ? 152.0f : 162.0f))));
+                    Spec.bDesertCanyon
+                        ? 152.0f
+                        : (Spec.RiverId == TEXT("pacuare") ? 175.0f : 162.0f)))));
     if (RiverEyeCamera)
     {
         RiverEyeCamera->SetActorLabel(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"));

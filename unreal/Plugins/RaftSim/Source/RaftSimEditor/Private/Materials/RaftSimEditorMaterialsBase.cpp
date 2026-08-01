@@ -2889,10 +2889,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
 
-    const bool bUseSingleLayerWater =
-        Spec.RiverId == TEXT("zambezi_batoka_gorge");
-    UMaterial* Parent = LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
-        OutSummary, bUseSingleLayerWater);
+    const bool bUseSingleLayerWater = Spec.RiverId == TEXT("zambezi_batoka_gorge") || Spec.RiverId == TEXT("pacuare");
+    UMaterial* Parent = Spec.RiverId == TEXT("pacuare") ? LoadOrCreatePacuareRainforestWaterParent(OutSummary) : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(OutSummary, bUseSingleLayerWater);
     if (!Parent)
     {
         return nullptr;
@@ -3023,6 +3021,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
             TEXT("SurfaceVariationStrength"),
             Settings.SurfaceVariationStrength);
         SetScalar(TEXT("Opacity"), Settings.Opacity);
+        SetScalar(TEXT("RefractionIor"), Settings.RefractionIor);
         SetScalar(TEXT("PhaseG"), Settings.PhaseG);
         SetVector(TEXT("ScatteringCoefficients"), Settings.ScatteringCoefficients);
         SetVector(TEXT("AbsorptionCoefficients"), Settings.AbsorptionCoefficients);
