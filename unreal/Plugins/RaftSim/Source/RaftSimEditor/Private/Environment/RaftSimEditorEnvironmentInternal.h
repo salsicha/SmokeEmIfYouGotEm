@@ -216,6 +216,7 @@ struct FRaftSimLandscapeCandidateWaterSettings
     float Specular = 0.45f;
     float Opacity = 0.30f;
     float NormalIntensity = 0.62f;
+    float SurfaceVariationStrength = 0.0f;
     float RefractionIor = 1.333f;
     float PhaseG = 0.15f;
     float VertexTintWeight = 0.65f;

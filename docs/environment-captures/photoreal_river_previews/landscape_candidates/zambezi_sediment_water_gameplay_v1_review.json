@@ -1,0 +1,69 @@
+{
+  "schema": "raftsim.zambezi.sediment_water_gameplay_review.v1",
+  "status": "visual_improvement_pass_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_hydraulic_or_navigation_authority",
+  "method": {
+    "renderer": "Unreal Engine 5.8 offscreen Metal gameplay viewport",
+    "resolution_px": [1280, 720],
+    "capture_command": "RaftSim.CaptureRaft 3 <label> 8 4 22",
+    "controlled_state": "same map, camera offsets, raft transform, crew command, lighting, scalability, and 3 second capture time",
+    "runtime_override_on_accepted_capture": false
+  },
+  "accepted_material_contract": {
+    "material_parent": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate",
+    "opacity": 0.62,
+    "roughness": 0.42,
+    "specular": 0.28,
+    "normal_intensity": 0.20,
+    "reflection_fill_intensity": 0.04,
+    "emissive_fill_scale": 0.0,
+    "surface_variation_strength": 0.12
+  },
+  "matched_frame_metrics": {
+    "measurement_region_px": [0, 240, 1280, 720],
+    "before_mean_luminance": 0.704353,
+    "after_mean_luminance": 0.527139,
+    "before_fraction_above_0_80": 0.143963,
+    "after_fraction_above_0_80": 0.006938,
+    "interpretation": "The selected material removes the overbright white mirror-sheet response while retaining coherent sky reflection and a sediment-bearing green-gray water read."
+  },
+  "evidence": {
+    "before_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_water_brightness_before_v1.png",
+      "sha256": "b5e3737db8898b0919b33d7a8ed26e76b633274661ee87c68312636e8b459f0a"
+    },
+    "accepted_default_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_sediment_water_gameplay_v1.png",
+      "sha256": "626e26a0dfaeb34013b3bff6211094f039221b6cb8b4559404df8fecd5bab26f"
+    },
+    "material_contract_test": {
+      "path": "unreal/Saved/Automation/ZambeziSedimentWater/index.json",
+      "sha256": "9eb72747e2e6b06bcd6af42c3f5df568d24b755faca65742420c63a7a3dd7226",
+      "result": "1_passed_0_failed",
+      "committed": false
+    },
+    "focused_runnable_map_test": {
+      "path": "unreal/Saved/Automation/ZambeziSedimentWaterMapLoad/index.json",
+      "sha256": "a642126c3f39fe047c976c9a3dc2631f930d509f734e13e7d8f8e9d6775288ae",
+      "result": "1_passed_with_2_environment_warnings_0_failed",
+      "committed": false
+    }
+  },
+  "visual_findings": [
+    "The regenerated default material visually matches the selected sediment-water diagnostic bracket without runtime overrides.",
+    "The former nearly white foreground water is replaced by a darker green-gray surface with substantially less high-luminance coverage.",
+    "Some elongated procedural normal or ribbon-geometry structure remains visible and the safe launch is intentionally calm rather than fabricated whitewater.",
+    "The coarse terrain, sparse procedural ecology, provisional hydraulic features, raft and crew presentation, and absent production rapid-scale aeration still fail photoreal promotion."
+  ],
+  "external_gates_remaining": [
+    "local-guide approval of rapid stations, lines, portages, access, and rescue routes",
+    "geospatial approval of centerline and horizontal and vertical datums",
+    "rights approval for the supplied map PDF, height image, and production derivatives",
+    "higher-resolution full-reach terrain and reviewed channel or bathymetric geometry",
+    "seasonal-flow calibration and rapid-scale hydraulic validation",
+    "approved southern African gorge species and ecology",
+    "lifelike terrain, shoreline, vegetation, whitewater, atmosphere, raft, and crew art",
+    "desktop and VR visual, hazard-readability, and performance acceptance"
+  ]
+}

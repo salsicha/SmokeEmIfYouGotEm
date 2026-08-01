@@ -3028,7 +3028,9 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetScalar(TEXT("NormalIntensity"), Settings.NormalIntensity);
     if (bUseSingleLayerWater)
     {
-        SetScalar(TEXT("SurfaceVariationStrength"), 0.42f);
+        SetScalar(
+            TEXT("SurfaceVariationStrength"),
+            Settings.SurfaceVariationStrength);
         SetScalar(TEXT("Opacity"), Settings.Opacity);
         SetScalar(TEXT("PhaseG"), Settings.PhaseG);
         SetVector(TEXT("ScatteringCoefficients"), Settings.ScatteringCoefficients);
@@ -3085,4 +3087,38 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         Settings.SolverFieldEnable);
     return Instance;
 }
+
+static void HandleRefreshZambeziPhysicalCorridorWaterMaterial(
+    const TArray<FString>&)
+{
+    FString Summary;
+    bool bSucceeded = false;
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate :
+         GetLandscapeImportCandidateSpecs())
+    {
+        if (Candidate.PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+        {
+            continue;
+        }
+        bSucceeded = LoadOrCreateLandscapeCandidateWaterMaterial(
+            Candidate.PreviewSpec,
+            Summary,
+            !Candidate.bUseSolverVisualizationFields) != nullptr;
+        break;
+    }
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim.RefreshZambeziPhysicalCorridorWaterMaterial: "
+             "succeeded=%d\n%s"),
+        bSucceeded ? 1 : 0,
+        *Summary);
+}
+
+static FAutoConsoleCommand GRefreshZambeziPhysicalCorridorWaterMaterialCommand(
+    TEXT("RaftSim.RefreshZambeziPhysicalCorridorWaterMaterial"),
+    TEXT("Regenerate only the isolated Zambezi Single Layer Water parent and "
+         "physical-corridor instance; do not rebuild or save the map."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleRefreshZambeziPhysicalCorridorWaterMaterial));
 } // namespace RaftSimEditorEnvironment

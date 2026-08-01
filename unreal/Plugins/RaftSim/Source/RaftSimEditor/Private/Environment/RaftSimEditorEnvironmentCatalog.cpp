@@ -130,15 +130,16 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         // sky to carry the guide-eye read; high emissive and normal gains made
         // the previous Default Lit sheet look opaque and camera-radial.
         Settings.BaseColorScale = 0.98f;
-        Settings.EmissiveFillScale = 0.035f;
-        Settings.Roughness = 0.18f;
-        Settings.Specular = 0.66f;
-        Settings.Opacity = 0.64f;
-        Settings.NormalIntensity = 0.40f;
+        Settings.EmissiveFillScale = 0.0f;
+        Settings.Roughness = 0.42f;
+        Settings.Specular = 0.28f;
+        Settings.Opacity = 0.62f;
+        Settings.NormalIntensity = 0.20f;
+        Settings.SurfaceVariationStrength = 0.12f;
         Settings.PhaseG = 0.08f;
         Settings.VertexTintWeight = 0.50f;
         Settings.RenderWidthScale = 1.24f;
-        Settings.ReflectionFillIntensity = 0.26f;
+        Settings.ReflectionFillIntensity = 0.04f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;

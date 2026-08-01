@@ -107,7 +107,7 @@ The physical-corridor ribbon now uses an isolated
 `M_RaftSim_Zambezi_SingleLayerWater` parent instead of changing the shared
 Default Lit candidate used by the other rivers. It binds Unreal's
 `SingleLayerWaterMaterialOutput` with per-centimetre scattering and absorption,
-phase, behind-water colour scale, and a 0.64 surface-opacity control. Two
+phase, behind-water colour scale, and a 0.62 surface-opacity control. Two
 opposed panners animate independently tiled normal-atlas layers, while bounded
 world-space optical variation keeps commandlet captures from collapsing into a
 single flat colour when temporal reflections are unavailable. The ribbon stays
@@ -116,9 +116,16 @@ the gameplay authority. The generated actor exposes
 `RaftSimZambeziSingleLayerWater`, `RaftSimMovingMultiScaleWaterNormals`,
 `RaftSimPhysicalCorridorWater`, and `RaftSimNonCollisionRenderSurface` tags.
 
-The regenerated views remove most of the former camera-radial dark grooves and
-show a lighter gray-green surface without reproducing the foreground depth
-split that rejected the earlier global Single Layer experiment. The live
+An August 1 fixed-camera renderer bracket replaces the overbright mirror-sheet
+response with a sediment-bearing green-gray surface. The accepted instance uses
+0.42 roughness, 0.28 specular, 0.20 normal intensity, 0.04 reflection fill, no
+emissive fill, and 0.12 optical variation. In the lower 480 rows of the matched
+1280 x 720 gameplay frames, mean luminance falls from 0.7044 to 0.5271 and the
+share above 0.80 falls from 14.40% to 0.69%. The regenerated default capture
+matches the selected diagnostic bracket without runtime overrides. It does not
+reproduce the foreground depth split that rejected the earlier global Single
+Layer experiment, although some elongated procedural normal/geometry structure
+is still visible. The live
 runtime can now add solver-triggered breaking-water, roller, aerosol, foam, and
 mist components at the procedural rapid controls described below. This is an
 incremental optical and runtime baseline, not final water art: realistic crest
