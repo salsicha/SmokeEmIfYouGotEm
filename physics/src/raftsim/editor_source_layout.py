@@ -12,7 +12,7 @@ EDITOR_PUBLIC_RELATIVE_PATH = Path("unreal/Plugins/RaftSim/Source/RaftSimEditor/
 
 RIVER_BUILD_TARGETS = (
     ("american_south_fork", "L_SouthForkAmerican_PhysicalCorridorCandidate"),
-    ("colorado_river", "L_ColoradoGrandCanyon_PhysicalCorridorCandidate"),
+    ("colorado_river", "L_Hance"),
     ("pacuare", "L_UpperHuacas"),
     ("zambezi_batoka_gorge", "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
     ("futaleufu_terminator", "L_FutaleufuTerminator_PhysicalCorridorCandidate"),

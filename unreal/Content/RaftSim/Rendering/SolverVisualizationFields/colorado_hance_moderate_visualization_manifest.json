@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.unreal.colorado_hance_solver_visualization.v1",
+  "generated_on": "2026-08-01",
+  "status": "reference_runnable_capture_visualization_not_production_promoted",
+  "river_id": "colorado_river",
+  "rapid_name": "Hance",
+  "flow_band": "moderate_release_planning",
+  "source_scenario_id": "colorado_hance_c3_window_moderate_release_planning",
+  "source_artifacts": {
+    "manifest": {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/manifest.json",
+      "sha256": "db4aa87a2e457e1cd5e4134d80bd80920f6ff52e8716cbb175fc8fb0f3a8818a",
+      "size_bytes": 32961
+    },
+    "bed": {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/bed.npy",
+      "sha256": "097b041659accdaacac318e2f7e145473992729c90c3bde400b09a5b322f2370",
+      "size_bytes": 48288
+    },
+    "h": {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/h.npy",
+      "sha256": "ef1f0c09813b95ae2ac4775000fdc04c5a1b28464b3cfae3113ca726159d1a5b",
+      "size_bytes": 48288
+    },
+    "u": {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/u.npy",
+      "sha256": "6877a08f6799c42a7c766e8a4c35ff07343d5c01a118c37ec9253c82541ca0ee",
+      "size_bytes": 48288
+    },
+    "v": {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/v.npy",
+      "sha256": "c74f5f3d03ea14fb21cfbc9aae8b793aca2f5a13f3e268f244aa456919da5318",
+      "size_bytes": 48288
+    },
+    "wet_mask": {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/wet_mask.npy",
+      "sha256": "356176740856ca15393cf94acaf46a26b220a9fe54685bd3ce15cab61966e76a",
+      "size_bytes": 12168
+    }
+  },
+  "source_grid": {
+    "crs": "channel-following meters; x downstream along the committed corridor channel centered on corridor station 1250.0 m, y positive river-left",
+    "downstream_axis": "+x",
+    "dx_m": 2.0,
+    "dy_m": 2.0,
+    "index_to_world": "world_x = origin_x_m + col * dx_m; world_y = origin_y_m + row * dy_m (cell-centered samples)",
+    "layout": "row_major_c_order",
+    "nx": 301,
+    "ny": 40,
+    "origin_x_m": 0.0,
+    "origin_y_m": -39.0
+  },
+  "solver_evidence": {
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "flux_scheme": "hll",
+    "spatial_order": 2,
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "final_convergence_window": {
+      "end_time_s": 300.0,
+      "max_abs_dh_m": 0.17052942497739743,
+      "max_abs_du_m_per_s": 0.9110790659725296,
+      "max_abs_dv_m_per_s": 0.3330948813905311
+    },
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "discharge_authority": "planning_placeholders_pending_release_history_review",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "field_ranges": {
+    "wet_depth_m": [
+      0.0001643209980102256,
+      4.739068031311035
+    ],
+    "wet_speed_mps": [
+      0.0,
+      7.395288467407227
+    ],
+    "wet_froude": [
+      0.0,
+      4.101213912627204
+    ],
+    "wet_surface_relief_m": [
+      -0.8373106297892718,
+      0.7615201717999298
+    ]
+  },
+  "normalization": {
+    "policy": "fixed_physical_caps_clamp_to_unit_interval",
+    "caps": {
+      "depth_m": 5.0,
+      "speed_mps": 8.0,
+      "froude": 4.5,
+      "surface_relief_m": 1.5
+    }
+  },
+  "surface_relief_derivation": {
+    "source_field": "bed_plus_h",
+    "detrending": "subtract_least_squares_fit_of_per_column_wet_cell_median_surface",
+    "trend_slope_m_per_m": -0.009708626766267797,
+    "trend_intercept_m": 953.5882377337963,
+    "wet_cell_clipped_fraction": 0.0,
+    "render_height_scale": 0.3,
+    "render_height_cap_cm": 45.0
+  },
+  "hydraulic_visualization_evidence": {
+    "wet_cell_count": 8275,
+    "supercritical_cell_count": 118,
+    "foam_eligible_cell_count": 242,
+    "foam_mask": "wet_and_froude_at_least_0.80_and_speed_at_least_1.20_mps",
+    "strongest_column_index": 228,
+    "strongest_column_station_m": 456.0,
+    "strongest_column_mean_froude": 1.8324583150739047,
+    "camera_progress": {
+      "guide": 0.65,
+      "guide_target": 0.75,
+      "river_eye": 0.685,
+      "river_eye_target": 0.785,
+      "solver_rapid": 0.705,
+      "solver_rapid_target": 0.805
+    }
+  },
+  "texture": {
+    "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_depth_speed_froude_surface_v1.png",
+    "sha256": "e83eb97051def8f44fcf0a5ce3e7b7efb409064f2331aa17a4811dd6aa426c85",
+    "width": 1024,
+    "height": 256,
+    "channels": "R=depth_m/5 G=speed_mps/8 B=froude/4.5 A=detrended_surface_relief_m/3+0.5",
+    "source_orientation": "image_x_increases_downstream_station; image_y_increases_from_river_right_to_river_left"
+  },
+  "render_binding": {
+    "map": "/Game/RaftSim/Maps/L_Hance",
+    "surface_actor": "RaftSim_PhysicalCorridorRiverRibbon_colorado_river",
+    "foam_actor": "RaftSim_SolverFieldFoam_colorado_river",
+    "capture_only": true,
+    "hidden_in_game": true,
+    "collision_enabled": false,
+    "runtime_water_owner": "ARaftSimWaterSurfaceActor_live_cooked_field_window",
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0
+  },
+  "authority_policy": {
+    "physical_authority": "live_custom_cxx_shallow_water_solver",
+    "derivative_scope": "capture_only_noncolliding_authored_ribbon_color_relief_and_foam",
+    "changes_collision_or_raft_forces": false,
+    "changes_solver_state": false,
+    "changes_cooked_fields": false,
+    "may_be_used_as_production_calibration_evidence": false,
+    "reason": "source convergence is false and Hance geometry, release bands, stationing, and guide lines remain review-gated"
+  }
+}

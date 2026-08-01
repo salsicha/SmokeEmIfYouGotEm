@@ -15,7 +15,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 1057
+      "line_count": 1080
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
@@ -31,7 +31,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
-      "line_count": 1607
+      "line_count": 1626
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
@@ -155,7 +155,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp",
-      "line_count": 1219
+      "line_count": 1212
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
@@ -163,7 +163,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
-      "line_count": 1113
+      "line_count": 1177
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBatokaMaterial.cpp",
@@ -279,7 +279,7 @@
     }
   ],
   "implementation_file_count": 69,
-  "implementation_line_count": 75001,
+  "implementation_line_count": 75100,
   "registered_console_command_count": 37,
   "registered_console_commands": [
     {
@@ -541,7 +541,7 @@
     },
     {
       "river_id": "colorado_river",
-      "map_package_token": "L_ColoradoGrandCanyon_PhysicalCorridorCandidate",
+      "map_package_token": "L_Hance",
       "river_id_present": true,
       "map_package_present": true
     },

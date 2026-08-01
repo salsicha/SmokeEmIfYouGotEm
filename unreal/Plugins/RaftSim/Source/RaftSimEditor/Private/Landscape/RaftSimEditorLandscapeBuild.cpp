@@ -105,12 +105,12 @@ bool BuildLandscapeImportCandidateMap(
     {
         return false;
     }
-    // Pacuare's packed field is sampled on the CPU-authored capture ribbon.
-    // Keep its established PhysicalCorridor instance identity; the isolated
-    // rainforest parent does not bind a solver texture parameter directly.
+    // Reach-local packed fields are sampled on the CPU-authored capture
+    // ribbon.  Keep the water material free of the South Fork default texture;
+    // the candidate-specific pixels already drive ribbon relief and foam.
     const bool bDisableSolverVisualizationFieldsInMaterial =
         !Candidate.bUseSolverVisualizationFields ||
-        Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        !Candidate.SolverVisualizationFieldRelativePath.IsEmpty();
     UMaterialInterface* CandidateWaterMaterial =
         LoadOrCreateLandscapeCandidateWaterMaterial(
             Candidate.PreviewSpec,
@@ -139,15 +139,8 @@ bool BuildLandscapeImportCandidateMap(
             return false;
         }
         SolverVisualizationFieldsPtr = &SolverVisualizationFields;
-        SolverFoamMaterial = LoadObject<UMaterialInterface>(
-            nullptr,
-            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
-                 "M_RaftSim_SolverFieldFoamCandidate."
-                 "M_RaftSim_SolverFieldFoamCandidate"));
-        if (!SolverFoamMaterial)
-        {
-            SolverFoamMaterial = LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
-        }
+        SolverFoamMaterial =
+            LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
         if (!SolverFoamMaterial)
         {
             return false;

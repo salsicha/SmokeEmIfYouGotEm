@@ -323,7 +323,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(Candidate.PreviewSpec.RiverId == TEXT("pacuare") ? MSM_DefaultLit : MSM_Unlit);
+    Material->SetShadingModel(Candidate.PreviewSpec.RiverId == TEXT("pacuare") || Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? MSM_DefaultLit : MSM_Unlit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
@@ -2674,7 +2674,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_DefaultLit);
+    Material->SetShadingModel(MSM_Unlit);
     // Aerated crests are predominantly scattering/opaque. A masked surface is
     // also deterministic in SceneCapture and packaged rendering, where this
     // generated candidate's translucent vertex-alpha pass could disappear
@@ -2804,7 +2804,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     Specular->R = 0.18f;
     Material->GetExpressionCollection().AddExpression(Specular);
     UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-    EmissiveScale->R = 0.025f;
+    EmissiveScale->R = 0.82f;
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
     UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
     EmissiveColor->A.Expression = VertexColor;

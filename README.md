@@ -17,13 +17,20 @@ datum alignment, player raft/start, and the full vertical-slice game mode now
 ship together. It is reference-runnable, not photoreal-approved; the evidence
 and remaining gates are recorded in
 [the Upper Huacas water/readability review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_upper_huacas_solver_whitewater_v2_review.json).
+Colorado's `L_Hance` is likewise restored as a reference-runnable physical
+reach: a 600×320 m Landscape preserves the complete 600×78 m interpreted Hance
+solver bed, procedurally fills missing outer-canyon terrain, and launches the
+live moderate-release cooked field with the player raft and game mode. It is
+not surveyed Hance geography or photoreal-approved; its evidence and open gates
+are recorded in
+[the Hance runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_reach_local_runnable_v1_review.json).
 See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
 milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 
 | Runnable river | Player-facing run | Current tier |
 |---|---|---|
 | South Fork American | Chili Bar to Salmon Falls plus Troublemaker | production campaign |
-| Colorado, Grand Canyon | Hance | signature-rapid Free Run |
+| Colorado, Grand Canyon | Hance | runnable reference signature-rapid Free Run |
 | Pacuare | Upper Huacas | runnable reference signature-rapid Free Run |
 | Futaleufú | Terminator | signature-rapid Free Run |
 | Chilko | Lava Canyon | signature-rapid Free Run |

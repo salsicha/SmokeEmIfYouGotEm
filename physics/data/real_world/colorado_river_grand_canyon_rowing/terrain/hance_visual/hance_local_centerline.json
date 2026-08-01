@@ -1,0 +1,3319 @@
+{
+  "schema": "raftsim.local_centerline.v1",
+  "river_id": "colorado_river",
+  "section_id": "hance_corridor_station_1250m_c3_window",
+  "local_metric_policy": "channel-following C3 coordinates; Unreal X is downstream station and Unreal Y shifts solver lateral 0 to the center of a 320 m visual canyon",
+  "points": [
+    {
+      "station_m": 0.0,
+      "unreal_local_cm": [
+        0.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8553565740585,
+      "conditioned_visual_bed_elevation_m": 949.6241455078125,
+      "conditioned_visual_surface_normalized": 0.09946793952969103,
+      "conditioned_visual_bed_normalized": 0.06297510575821202
+    },
+    {
+      "station_m": 2.0,
+      "unreal_local_cm": [
+        200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8497756719589,
+      "conditioned_visual_bed_elevation_m": 949.6084594726562,
+      "conditioned_visual_surface_normalized": 0.09940490962281077,
+      "conditioned_visual_bed_normalized": 0.06279794992971467
+    },
+    {
+      "station_m": 4.0,
+      "unreal_local_cm": [
+        400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8409336805344,
+      "conditioned_visual_bed_elevation_m": 949.5931396484375,
+      "conditioned_visual_surface_normalized": 0.09930504944139582,
+      "conditioned_visual_bed_normalized": 0.06262493003495656
+    },
+    {
+      "station_m": 6.0,
+      "unreal_local_cm": [
+        600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8324778079987,
+      "conditioned_visual_bed_elevation_m": 949.5784301757812,
+      "conditioned_visual_surface_normalized": 0.09920955003126387,
+      "conditioned_visual_bed_normalized": 0.06245880336309719
+    },
+    {
+      "station_m": 8.0,
+      "unreal_local_cm": [
+        800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8238598108292,
+      "conditioned_visual_bed_elevation_m": 949.5648803710938,
+      "conditioned_visual_surface_normalized": 0.09911221960879946,
+      "conditioned_visual_bed_normalized": 0.0623057738147454
+    },
+    {
+      "station_m": 10.0,
+      "unreal_local_cm": [
+        1000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8150918483734,
+      "conditioned_visual_bed_elevation_m": 949.552734375,
+      "conditioned_visual_surface_normalized": 0.09901319549992749,
+      "conditioned_visual_bed_normalized": 0.06216859867906068
+    },
+    {
+      "station_m": 12.0,
+      "unreal_local_cm": [
+        1200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.8061224222183,
+      "conditioned_visual_bed_elevation_m": 949.5424194335938,
+      "conditioned_visual_surface_normalized": 0.0989118960889659,
+      "conditioned_visual_bed_normalized": 0.062052103212072156
+    },
+    {
+      "station_m": 14.0,
+      "unreal_local_cm": [
+        1400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7969073057175,
+      "conditioned_visual_bed_elevation_m": 949.5341796875,
+      "conditioned_visual_surface_normalized": 0.09880782188652107,
+      "conditioned_visual_bed_normalized": 0.06195904470293931
+    },
+    {
+      "station_m": 16.0,
+      "unreal_local_cm": [
+        1600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7874442338943,
+      "conditioned_visual_bed_elevation_m": 949.528076171875,
+      "conditioned_visual_surface_normalized": 0.09870094731227362,
+      "conditioned_visual_bed_normalized": 0.061890112473952014
+    },
+    {
+      "station_m": 18.0,
+      "unreal_local_cm": [
+        1800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7777944803238,
+      "conditioned_visual_bed_elevation_m": 949.5238647460938,
+      "conditioned_visual_surface_normalized": 0.09859196438117863,
+      "conditioned_visual_bed_normalized": 0.06184254923595078
+    },
+    {
+      "station_m": 20.0,
+      "unreal_local_cm": [
+        2000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7678521871567,
+      "conditioned_visual_bed_elevation_m": 949.520751953125,
+      "conditioned_visual_surface_normalized": 0.0984796775498896,
+      "conditioned_visual_bed_normalized": 0.06180739379916726
+    },
+    {
+      "station_m": 22.0,
+      "unreal_local_cm": [
+        2200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7579095363617,
+      "conditioned_visual_bed_elevation_m": 949.5178833007812,
+      "conditioned_visual_surface_normalized": 0.09836738667960278,
+      "conditioned_visual_bed_normalized": 0.061774995651543235
+    },
+    {
+      "station_m": 24.0,
+      "unreal_local_cm": [
+        2400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7479944229126,
+      "conditioned_visual_bed_elevation_m": 949.5140991210938,
+      "conditioned_visual_surface_normalized": 0.09825540681214597,
+      "conditioned_visual_bed_normalized": 0.06173225766957111
+    },
+    {
+      "station_m": 26.0,
+      "unreal_local_cm": [
+        2600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7383146286011,
+      "conditioned_visual_bed_elevation_m": 949.5084228515625,
+      "conditioned_visual_surface_normalized": 0.09814608460523642,
+      "conditioned_visual_bed_normalized": 0.061668150696612925
+    },
+    {
+      "station_m": 28.0,
+      "unreal_local_cm": [
+        2800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.728905916214,
+      "conditioned_visual_bed_elevation_m": 949.4999389648438,
+      "conditioned_visual_surface_normalized": 0.09803982395865339,
+      "conditioned_visual_bed_normalized": 0.06157233489832059
+    },
+    {
+      "station_m": 30.0,
+      "unreal_local_cm": [
+        3000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7198921442032,
+      "conditioned_visual_bed_elevation_m": 949.4880981445312,
+      "conditioned_visual_surface_normalized": 0.09793802371196557,
+      "conditioned_visual_bed_normalized": 0.06143860637408524
+    },
+    {
+      "station_m": 32.0,
+      "unreal_local_cm": [
+        3200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.711477637291,
+      "conditioned_visual_bed_elevation_m": 949.4727172851562,
+      "conditioned_visual_surface_normalized": 0.09784299147924493,
+      "conditioned_visual_bed_normalized": 0.06126489715703726
+    },
+    {
+      "station_m": 34.0,
+      "unreal_local_cm": [
+        3400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.7035782337189,
+      "conditioned_visual_bed_elevation_m": 949.4545288085938,
+      "conditioned_visual_surface_normalized": 0.09775377674967768,
+      "conditioned_visual_bed_normalized": 0.06105947911465512
+    },
+    {
+      "station_m": 36.0,
+      "unreal_local_cm": [
+        3600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.696021437645,
+      "conditioned_visual_bed_elevation_m": 949.4344482421875,
+      "conditioned_visual_surface_normalized": 0.09766843137999538,
+      "conditioned_visual_bed_normalized": 0.06083269208128692
+    },
+    {
+      "station_m": 38.0,
+      "unreal_local_cm": [
+        3800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6886795759201,
+      "conditioned_visual_bed_elevation_m": 949.4136962890625,
+      "conditioned_visual_surface_normalized": 0.09758551344798622,
+      "conditioned_visual_bed_normalized": 0.060598322502730124
+    },
+    {
+      "station_m": 40.0,
+      "unreal_local_cm": [
+        4000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6815330982208,
+      "conditioned_visual_bed_elevation_m": 949.3935546875,
+      "conditioned_visual_surface_normalized": 0.0975048021551042,
+      "conditioned_visual_bed_normalized": 0.060370846147072055
+    },
+    {
+      "station_m": 42.0,
+      "unreal_local_cm": [
+        4200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.674268245697,
+      "conditioned_visual_bed_elevation_m": 949.3748168945312,
+      "conditioned_visual_surface_normalized": 0.09742275395395296,
+      "conditioned_visual_bed_normalized": 0.06015922420408106
+    },
+    {
+      "station_m": 44.0,
+      "unreal_local_cm": [
+        4400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.666993021965,
+      "conditioned_visual_bed_elevation_m": 949.3582763671875,
+      "conditioned_visual_surface_normalized": 0.09734058862186573,
+      "conditioned_visual_bed_normalized": 0.059972417863525494
+    },
+    {
+      "station_m": 46.0,
+      "unreal_local_cm": [
+        4600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6594804525375,
+      "conditioned_visual_bed_elevation_m": 949.3438110351562,
+      "conditioned_visual_surface_normalized": 0.09725574274157708,
+      "conditioned_visual_bed_normalized": 0.05980904848082561
+    },
+    {
+      "station_m": 48.0,
+      "unreal_local_cm": [
+        4800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6519201993942,
+      "conditioned_visual_bed_elevation_m": 949.3311157226562,
+      "conditioned_visual_surface_normalized": 0.09717035832824945,
+      "conditioned_visual_bed_normalized": 0.05966566944453204
+    },
+    {
+      "station_m": 50.0,
+      "unreal_local_cm": [
+        5000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6442898511887,
+      "conditioned_visual_bed_elevation_m": 949.3192138671875,
+      "conditioned_visual_surface_normalized": 0.09708418227135455,
+      "conditioned_visual_bed_normalized": 0.05953125159800681
+    },
+    {
+      "station_m": 52.0,
+      "unreal_local_cm": [
+        5200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.636810541153,
+      "conditioned_visual_bed_elevation_m": 949.3071899414062,
+      "conditioned_visual_surface_normalized": 0.09699971201786058,
+      "conditioned_visual_bed_normalized": 0.05939545510690185
+    },
+    {
+      "station_m": 54.0,
+      "unreal_local_cm": [
+        5400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6294655799866,
+      "conditioned_visual_bed_elevation_m": 949.2939453125,
+      "conditioned_visual_surface_normalized": 0.09691675908120388,
+      "conditioned_visual_bed_normalized": 0.059245872169999415
+    },
+    {
+      "station_m": 56.0,
+      "unreal_local_cm": [
+        5600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.622376203537,
+      "conditioned_visual_bed_elevation_m": 949.2787475585938,
+      "conditioned_visual_surface_normalized": 0.09683669268163601,
+      "conditioned_visual_bed_normalized": 0.05907423091982106
+    },
+    {
+      "station_m": 58.0,
+      "unreal_local_cm": [
+        5800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6156731843948,
+      "conditioned_visual_bed_elevation_m": 949.26123046875,
+      "conditioned_visual_surface_normalized": 0.09676098974601637,
+      "conditioned_visual_bed_normalized": 0.05887639542262752
+    },
+    {
+      "station_m": 60.0,
+      "unreal_local_cm": [
+        6000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.6093882322311,
+      "conditioned_visual_bed_elevation_m": 949.2413330078125,
+      "conditioned_visual_surface_normalized": 0.09669000839881581,
+      "conditioned_visual_bed_normalized": 0.058651676356128946
+    },
+    {
+      "station_m": 62.0,
+      "unreal_local_cm": [
+        6200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.603386759758,
+      "conditioned_visual_bed_elevation_m": 949.2191772460938,
+      "conditioned_visual_surface_normalized": 0.0966222286305319,
+      "conditioned_visual_bed_normalized": 0.058401452364905064
+    },
+    {
+      "station_m": 64.0,
+      "unreal_local_cm": [
+        6400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5977560281754,
+      "conditioned_visual_bed_elevation_m": 949.1953735351562,
+      "conditioned_visual_surface_normalized": 0.09655863595662592,
+      "conditioned_visual_bed_normalized": 0.05813261667185462
+    },
+    {
+      "station_m": 66.0,
+      "unreal_local_cm": [
+        6600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5924434661865,
+      "conditioned_visual_bed_elevation_m": 949.1705322265625,
+      "conditioned_visual_surface_normalized": 0.09649863664442243,
+      "conditioned_visual_bed_normalized": 0.05785206249987633
+    },
+    {
+      "station_m": 68.0,
+      "unreal_local_cm": [
+        6800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5872648954391,
+      "conditioned_visual_bed_elevation_m": 949.1451416015625,
+      "conditioned_visual_surface_normalized": 0.09644015061005844,
+      "conditioned_visual_bed_normalized": 0.05756530442728919
+    },
+    {
+      "station_m": 70.0,
+      "unreal_local_cm": [
+        7000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5822546482086,
+      "conditioned_visual_bed_elevation_m": 949.1198120117188,
+      "conditioned_visual_surface_normalized": 0.09638356559732196,
+      "conditioned_visual_bed_normalized": 0.05727923567699192
+    },
+    {
+      "station_m": 72.0,
+      "unreal_local_cm": [
+        7200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5773409605026,
+      "conditioned_visual_bed_elevation_m": 949.0949096679688,
+      "conditioned_visual_surface_normalized": 0.0963280711139894,
+      "conditioned_visual_bed_normalized": 0.056997992182723764
+    },
+    {
+      "station_m": 74.0,
+      "unreal_local_cm": [
+        7400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5725220441818,
+      "conditioned_visual_bed_elevation_m": 949.0707397460938,
+      "conditioned_visual_surface_normalized": 0.09627364696507178,
+      "conditioned_visual_bed_normalized": 0.05672502055593408
+    },
+    {
+      "station_m": 76.0,
+      "unreal_local_cm": [
+        7600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5676656961441,
+      "conditioned_visual_bed_elevation_m": 949.04736328125,
+      "conditioned_visual_surface_normalized": 0.09621880006771856,
+      "conditioned_visual_bed_normalized": 0.05646101011891274
+    },
+    {
+      "station_m": 78.0,
+      "unreal_local_cm": [
+        7800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5629307031631,
+      "conditioned_visual_bed_elevation_m": 949.0250244140625,
+      "conditioned_visual_surface_normalized": 0.09616532373694951,
+      "conditioned_visual_bed_normalized": 0.056208718160819245
+    },
+    {
+      "station_m": 80.0,
+      "unreal_local_cm": [
+        8000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.558140873909,
+      "conditioned_visual_bed_elevation_m": 949.0035400390625,
+      "conditioned_visual_surface_normalized": 0.09611122809318566,
+      "conditioned_visual_bed_normalized": 0.05596607671478397
+    },
+    {
+      "station_m": 82.0,
+      "unreal_local_cm": [
+        8200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5534183979034,
+      "conditioned_visual_bed_elevation_m": 948.9829711914062,
+      "conditioned_visual_surface_normalized": 0.09605789312733934,
+      "conditioned_visual_bed_normalized": 0.05573377510309679
+    },
+    {
+      "station_m": 84.0,
+      "unreal_local_cm": [
+        8400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5487232208252,
+      "conditioned_visual_bed_elevation_m": 948.9631958007812,
+      "conditioned_visual_surface_normalized": 0.09600486647165782,
+      "conditioned_visual_bed_normalized": 0.05551043468117796
+    },
+    {
+      "station_m": 86.0,
+      "unreal_local_cm": [
+        8600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5440300703049,
+      "conditioned_visual_bed_elevation_m": 948.944091796875,
+      "conditioned_visual_surface_normalized": 0.09595186270363047,
+      "conditioned_visual_bed_normalized": 0.055294676804447725
+    },
+    {
+      "station_m": 88.0,
+      "unreal_local_cm": [
+        8800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5393303632736,
+      "conditioned_visual_bed_elevation_m": 948.925537109375,
+      "conditioned_visual_surface_normalized": 0.09589878488731025,
+      "conditioned_visual_bed_normalized": 0.05508512282832635
+    },
+    {
+      "station_m": 90.0,
+      "unreal_local_cm": [
+        9000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5347498655319,
+      "conditioned_visual_bed_elevation_m": 948.9075317382812,
+      "conditioned_visual_surface_normalized": 0.09584705340358744,
+      "conditioned_visual_bed_normalized": 0.054881772752813834
+    },
+    {
+      "station_m": 92.0,
+      "unreal_local_cm": [
+        9200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.530158996582,
+      "conditioned_visual_bed_elevation_m": 948.8898315429688,
+      "conditioned_visual_surface_normalized": 0.09579520478892865,
+      "conditioned_visual_bed_normalized": 0.054681869288750684
+    },
+    {
+      "station_m": 94.0,
+      "unreal_local_cm": [
+        9400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5255863666534,
+      "conditioned_visual_bed_elevation_m": 948.8723754882812,
+      "conditioned_visual_surface_normalized": 0.09574356216315728,
+      "conditioned_visual_bed_normalized": 0.05448472311384702
+    },
+    {
+      "station_m": 96.0,
+      "unreal_local_cm": [
+        9600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5211033821106,
+      "conditioned_visual_bed_elevation_m": 948.8551635742188,
+      "conditioned_visual_surface_normalized": 0.09569293197949914,
+      "conditioned_visual_bed_normalized": 0.05429033422810285
+    },
+    {
+      "station_m": 98.0,
+      "unreal_local_cm": [
+        9800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5166486501694,
+      "conditioned_visual_bed_elevation_m": 948.8380737304688,
+      "conditioned_visual_surface_normalized": 0.09564262087666661,
+      "conditioned_visual_bed_normalized": 0.05409732398693843
+    },
+    {
+      "station_m": 100.0,
+      "unreal_local_cm": [
+        10000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5122742652893,
+      "conditioned_visual_bed_elevation_m": 948.8211059570312,
+      "conditioned_visual_surface_normalized": 0.09559321720200471,
+      "conditioned_visual_bed_normalized": 0.053905692390353754
+    },
+    {
+      "station_m": 102.0,
+      "unreal_local_cm": [
+        10200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5078957080841,
+      "conditioned_visual_bed_elevation_m": 948.8041381835938,
+      "conditioned_visual_surface_normalized": 0.09554376640570192,
+      "conditioned_visual_bed_normalized": 0.05371406079376908
+    },
+    {
+      "station_m": 104.0,
+      "unreal_local_cm": [
+        10400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.5035983324051,
+      "conditioned_visual_bed_elevation_m": 948.7872314453125,
+      "conditioned_visual_surface_normalized": 0.09549523246189795,
+      "conditioned_visual_bed_normalized": 0.05352311851947427
+    },
+    {
+      "station_m": 106.0,
+      "unreal_local_cm": [
+        10600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4993960857391,
+      "conditioned_visual_bed_elevation_m": 948.7703857421875,
+      "conditioned_visual_surface_normalized": 0.09544777289150672,
+      "conditioned_visual_bed_normalized": 0.05333286556746934
+    },
+    {
+      "station_m": 108.0,
+      "unreal_local_cm": [
+        10800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4952327013016,
+      "conditioned_visual_bed_elevation_m": 948.7535400390625,
+      "conditioned_visual_surface_normalized": 0.09540075222554224,
+      "conditioned_visual_bed_normalized": 0.05314261261546441
+    },
+    {
+      "station_m": 110.0,
+      "unreal_local_cm": [
+        11000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.491103053093,
+      "conditioned_visual_bed_elevation_m": 948.7366943359375,
+      "conditioned_visual_surface_normalized": 0.09535411257170283,
+      "conditioned_visual_bed_normalized": 0.05295235966345948
+    },
+    {
+      "station_m": 112.0,
+      "unreal_local_cm": [
+        11200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4870542287827,
+      "conditioned_visual_bed_elevation_m": 948.7199096679688,
+      "conditioned_visual_surface_normalized": 0.09530838573136446,
+      "conditioned_visual_bed_normalized": 0.05276279603374442
+    },
+    {
+      "station_m": 114.0,
+      "unreal_local_cm": [
+        11400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4830659627914,
+      "conditioned_visual_bed_elevation_m": 948.7031860351562,
+      "conditioned_visual_surface_normalized": 0.09526334282798558,
+      "conditioned_visual_bed_normalized": 0.05257392172631924
+    },
+    {
+      "station_m": 116.0,
+      "unreal_local_cm": [
+        11600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4791141748428,
+      "conditioned_visual_bed_elevation_m": 948.6865234375,
+      "conditioned_visual_surface_normalized": 0.0952187119023815,
+      "conditioned_visual_bed_normalized": 0.05238573674118392
+    },
+    {
+      "station_m": 118.0,
+      "unreal_local_cm": [
+        11800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4752404689789,
+      "conditioned_visual_bed_elevation_m": 948.6699829101562,
+      "conditioned_visual_surface_normalized": 0.09517496282462873,
+      "conditioned_visual_bed_normalized": 0.052198930400628354
+    },
+    {
+      "station_m": 120.0,
+      "unreal_local_cm": [
+        12000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4713703393936,
+      "conditioned_visual_bed_elevation_m": 948.6535034179688,
+      "conditioned_visual_surface_normalized": 0.09513125413685387,
+      "conditioned_visual_bed_normalized": 0.05201281338236266
+    },
+    {
+      "station_m": 122.0,
+      "unreal_local_cm": [
+        12200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.467630982399,
+      "conditioned_visual_bed_elevation_m": 948.63720703125,
+      "conditioned_visual_surface_normalized": 0.09508902237593837,
+      "conditioned_visual_bed_normalized": 0.05182876433096659
+    },
+    {
+      "station_m": 124.0,
+      "unreal_local_cm": [
+        12400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4639151096344,
+      "conditioned_visual_bed_elevation_m": 948.6209716796875,
+      "conditioned_visual_surface_normalized": 0.09504705584254457,
+      "conditioned_visual_bed_normalized": 0.05164540460186039
+    },
+    {
+      "station_m": 126.0,
+      "unreal_local_cm": [
+        12600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4602499008179,
+      "conditioned_visual_bed_elevation_m": 948.6047973632812,
+      "conditioned_visual_surface_normalized": 0.09500566150050466,
+      "conditioned_visual_bed_normalized": 0.05146273419504405
+    },
+    {
+      "station_m": 128.0,
+      "unreal_local_cm": [
+        12800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4567300081253,
+      "conditioned_visual_bed_elevation_m": 948.5887451171875,
+      "conditioned_visual_surface_normalized": 0.09496590833790099,
+      "conditioned_visual_bed_normalized": 0.051281442432807474
+    },
+    {
+      "station_m": 130.0,
+      "unreal_local_cm": [
+        13000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4532412290573,
+      "conditioned_visual_bed_elevation_m": 948.5726928710938,
+      "conditioned_visual_surface_normalized": 0.09492650656810525,
+      "conditioned_visual_bed_normalized": 0.05110015067057089
+    },
+    {
+      "station_m": 132.0,
+      "unreal_local_cm": [
+        13200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.449894785881,
+      "conditioned_visual_bed_elevation_m": 948.5567016601562,
+      "conditioned_visual_surface_normalized": 0.0948887123194308,
+      "conditioned_visual_bed_normalized": 0.05091954823062418
+    },
+    {
+      "station_m": 134.0,
+      "unreal_local_cm": [
+        13400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4465546607971,
+      "conditioned_visual_bed_elevation_m": 948.5406494140625,
+      "conditioned_visual_surface_normalized": 0.09485098942638404,
+      "conditioned_visual_bed_normalized": 0.050738256468387595
+    },
+    {
+      "station_m": 136.0,
+      "unreal_local_cm": [
+        13600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4433810710907,
+      "conditioned_visual_bed_elevation_m": 948.524658203125,
+      "conditioned_visual_surface_normalized": 0.09481514735997583,
+      "conditioned_visual_bed_normalized": 0.05055765402844089
+    },
+    {
+      "station_m": 138.0,
+      "unreal_local_cm": [
+        13800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4402966499329,
+      "conditioned_visual_bed_elevation_m": 948.5086669921875,
+      "conditioned_visual_surface_normalized": 0.09478031235035049,
+      "conditioned_visual_bed_normalized": 0.050377051588494176
+    },
+    {
+      "station_m": 140.0,
+      "unreal_local_cm": [
+        14000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4372538328171,
+      "conditioned_visual_bed_elevation_m": 948.49267578125,
+      "conditioned_visual_surface_normalized": 0.09474594721080165,
+      "conditioned_visual_bed_normalized": 0.05019644914854746
+    },
+    {
+      "station_m": 142.0,
+      "unreal_local_cm": [
+        14200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4335519075394,
+      "conditioned_visual_bed_elevation_m": 948.4766845703125,
+      "conditioned_visual_surface_normalized": 0.09470413819832174,
+      "conditioned_visual_bed_normalized": 0.05001584670860076
+    },
+    {
+      "station_m": 144.0,
+      "unreal_local_cm": [
+        14400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.4269046783447,
+      "conditioned_visual_bed_elevation_m": 948.460693359375,
+      "conditioned_visual_surface_normalized": 0.09462906534635768,
+      "conditioned_visual_bed_normalized": 0.049835244268654044
+    },
+    {
+      "station_m": 146.0,
+      "unreal_local_cm": [
+        14600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.3789631128311,
+      "conditioned_visual_bed_elevation_m": 948.5741577148438,
+      "conditioned_visual_surface_normalized": 0.09408762018998625,
+      "conditioned_visual_bed_normalized": 0.05111669440552784
+    },
+    {
+      "station_m": 148.0,
+      "unreal_local_cm": [
+        14800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.2916672229767,
+      "conditioned_visual_bed_elevation_m": 949.2352905273438,
+      "conditioned_visual_surface_normalized": 0.09310171294589768,
+      "conditioned_visual_bed_normalized": 0.058583433449431524
+    },
+    {
+      "station_m": 150.0,
+      "unreal_local_cm": [
+        15000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.3086568117142,
+      "conditioned_visual_bed_elevation_m": 949.657470703125,
+      "conditioned_visual_surface_normalized": 0.09329359092134769,
+      "conditioned_visual_bed_normalized": 0.06335147572848264
+    },
+    {
+      "station_m": 152.0,
+      "unreal_local_cm": [
+        15200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.3015801906586,
+      "conditioned_visual_bed_elevation_m": 949.6414794921875,
+      "conditioned_visual_surface_normalized": 0.09321366857936775,
+      "conditioned_visual_bed_normalized": 0.06317087328853593
+    },
+    {
+      "station_m": 154.0,
+      "unreal_local_cm": [
+        15400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.2919474840164,
+      "conditioned_visual_bed_elevation_m": 949.62548828125,
+      "conditioned_visual_surface_normalized": 0.09310487817383419,
+      "conditioned_visual_bed_normalized": 0.06299027084858923
+    },
+    {
+      "station_m": 156.0,
+      "unreal_local_cm": [
+        15600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.2793310880661,
+      "conditioned_visual_bed_elevation_m": 949.6094360351562,
+      "conditioned_visual_surface_normalized": 0.0929623904097201,
+      "conditioned_visual_bed_normalized": 0.06280897908635265
+    },
+    {
+      "station_m": 158.0,
+      "unreal_local_cm": [
+        15800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.2653788328171,
+      "conditioned_visual_bed_elevation_m": 949.5934448242188,
+      "conditioned_visual_surface_normalized": 0.09280481564251945,
+      "conditioned_visual_bed_normalized": 0.06262837664640593
+    },
+    {
+      "station_m": 160.0,
+      "unreal_local_cm": [
+        16000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.251082777977,
+      "conditioned_visual_bed_elevation_m": 949.5774536132812,
+      "conditioned_visual_surface_normalized": 0.09264335805210788,
+      "conditioned_visual_bed_normalized": 0.06244777420645922
+    },
+    {
+      "station_m": 162.0,
+      "unreal_local_cm": [
+        16200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.234099149704,
+      "conditioned_visual_bed_elevation_m": 949.5614624023438,
+      "conditioned_visual_surface_normalized": 0.09245154739328776,
+      "conditioned_visual_bed_normalized": 0.06226717176651251
+    },
+    {
+      "station_m": 164.0,
+      "unreal_local_cm": [
+        16400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.2149713039398,
+      "conditioned_visual_bed_elevation_m": 949.5454711914062,
+      "conditioned_visual_surface_normalized": 0.09223552025003805,
+      "conditioned_visual_bed_normalized": 0.0620865693265658
+    },
+    {
+      "station_m": 166.0,
+      "unreal_local_cm": [
+        16600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.2005219459534,
+      "conditioned_visual_bed_elevation_m": 949.5294799804688,
+      "conditioned_visual_surface_normalized": 0.09207233127590621,
+      "conditioned_visual_bed_normalized": 0.06190596688661909
+    },
+    {
+      "station_m": 168.0,
+      "unreal_local_cm": [
+        16800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.1893957853317,
+      "conditioned_visual_bed_elevation_m": 949.5134887695312,
+      "conditioned_visual_surface_normalized": 0.09194667401559233,
+      "conditioned_visual_bed_normalized": 0.061725364446672384
+    },
+    {
+      "station_m": 170.0,
+      "unreal_local_cm": [
+        17000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.17724776268,
+      "conditioned_visual_bed_elevation_m": 949.4974365234375,
+      "conditioned_visual_surface_normalized": 0.09180947599225345,
+      "conditioned_visual_bed_normalized": 0.0615440726844358
+    },
+    {
+      "station_m": 172.0,
+      "unreal_local_cm": [
+        17200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.1631520986557,
+      "conditioned_visual_bed_elevation_m": 949.4814453125,
+      "conditioned_visual_surface_normalized": 0.09165028158693812,
+      "conditioned_visual_bed_normalized": 0.061363470244489085
+    },
+    {
+      "station_m": 174.0,
+      "unreal_local_cm": [
+        17400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.1465607881546,
+      "conditioned_visual_bed_elevation_m": 949.4654541015625,
+      "conditioned_visual_surface_normalized": 0.09146290170869606,
+      "conditioned_visual_bed_normalized": 0.06118286780454238
+    },
+    {
+      "station_m": 176.0,
+      "unreal_local_cm": [
+        17600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.1198341846466,
+      "conditioned_visual_bed_elevation_m": 949.449462890625,
+      "conditioned_visual_surface_normalized": 0.09116105528668977,
+      "conditioned_visual_bed_normalized": 0.061002265364595666
+    },
+    {
+      "station_m": 178.0,
+      "unreal_local_cm": [
+        17800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.1019517183304,
+      "conditioned_visual_bed_elevation_m": 949.4334716796875,
+      "conditioned_visual_surface_normalized": 0.09095909328008518,
+      "conditioned_visual_bed_normalized": 0.06082166292464896
+    },
+    {
+      "station_m": 180.0,
+      "unreal_local_cm": [
+        18000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.0843327045441,
+      "conditioned_visual_bed_elevation_m": 949.41748046875,
+      "conditioned_visual_surface_normalized": 0.09076010666852086,
+      "conditioned_visual_bed_normalized": 0.06064106048470225
+    },
+    {
+      "station_m": 182.0,
+      "unreal_local_cm": [
+        18200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.071527004242,
+      "conditioned_visual_bed_elevation_m": 949.4014892578125,
+      "conditioned_visual_surface_normalized": 0.09061548092824209,
+      "conditioned_visual_bed_normalized": 0.060460458044755534
+    },
+    {
+      "station_m": 184.0,
+      "unreal_local_cm": [
+        18400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.0671571493149,
+      "conditioned_visual_bed_elevation_m": 949.3854370117188,
+      "conditioned_visual_surface_normalized": 0.0905661284142189,
+      "conditioned_visual_bed_normalized": 0.060279166282518955
+    },
+    {
+      "station_m": 186.0,
+      "unreal_local_cm": [
+        18600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.05710542202,
+      "conditioned_visual_bed_elevation_m": 949.3694458007812,
+      "conditioned_visual_surface_normalized": 0.09045260564960546,
+      "conditioned_visual_bed_normalized": 0.06009856384257224
+    },
+    {
+      "station_m": 188.0,
+      "unreal_local_cm": [
+        18800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.0349501371384,
+      "conditioned_visual_bed_elevation_m": 949.3534545898438,
+      "conditioned_visual_surface_normalized": 0.09020238704371196,
+      "conditioned_visual_bed_normalized": 0.059917961402625536
+    },
+    {
+      "station_m": 190.0,
+      "unreal_local_cm": [
+        19000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.0194281339645,
+      "conditioned_visual_bed_elevation_m": 949.3374633789062,
+      "conditioned_visual_surface_normalized": 0.09002708376886866,
+      "conditioned_visual_bed_normalized": 0.05973735896267882
+    },
+    {
+      "station_m": 192.0,
+      "unreal_local_cm": [
+        19200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 952.0059893131256,
+      "conditioned_visual_bed_elevation_m": 949.3214721679688,
+      "conditioned_visual_surface_normalized": 0.08987530765616504,
+      "conditioned_visual_bed_normalized": 0.05955675652273211
+    },
+    {
+      "station_m": 194.0,
+      "unreal_local_cm": [
+        19400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9936740398407,
+      "conditioned_visual_bed_elevation_m": 949.3054809570312,
+      "conditioned_visual_surface_normalized": 0.08973622072819201,
+      "conditioned_visual_bed_normalized": 0.059376154082785404
+    },
+    {
+      "station_m": 196.0,
+      "unreal_local_cm": [
+        19600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9792205095291,
+      "conditioned_visual_bed_elevation_m": 949.2894897460938,
+      "conditioned_visual_surface_normalized": 0.08957298463241926,
+      "conditioned_visual_bed_normalized": 0.05919555164283869
+    },
+    {
+      "station_m": 198.0,
+      "unreal_local_cm": [
+        19800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9646785259247,
+      "conditioned_visual_bed_elevation_m": 949.2734375,
+      "conditioned_visual_surface_normalized": 0.08940874955785925,
+      "conditioned_visual_bed_normalized": 0.05901425988060211
+    },
+    {
+      "station_m": 200.0,
+      "unreal_local_cm": [
+        20000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9492720365524,
+      "conditioned_visual_bed_elevation_m": 949.2574462890625,
+      "conditioned_visual_surface_normalized": 0.08923475087930283,
+      "conditioned_visual_bed_normalized": 0.0588336574406554
+    },
+    {
+      "station_m": 202.0,
+      "unreal_local_cm": [
+        20200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9339143633842,
+      "conditioned_visual_bed_elevation_m": 949.241455078125,
+      "conditioned_visual_surface_normalized": 0.08906130352394503,
+      "conditioned_visual_bed_normalized": 0.05865305500070869
+    },
+    {
+      "station_m": 204.0,
+      "unreal_local_cm": [
+        20400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9191143512726,
+      "conditioned_visual_bed_elevation_m": 949.2254638671875,
+      "conditioned_visual_surface_normalized": 0.08889415431247794,
+      "conditioned_visual_bed_normalized": 0.05847245256076198
+    },
+    {
+      "station_m": 206.0,
+      "unreal_local_cm": [
+        20600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.9039069414139,
+      "conditioned_visual_bed_elevation_m": 949.20947265625,
+      "conditioned_visual_surface_normalized": 0.08872240400935918,
+      "conditioned_visual_bed_normalized": 0.05829185012081527
+    },
+    {
+      "station_m": 208.0,
+      "unreal_local_cm": [
+        20800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.8812320232391,
+      "conditioned_visual_bed_elevation_m": 949.1934814453125,
+      "conditioned_visual_surface_normalized": 0.08846631673967359,
+      "conditioned_visual_bed_normalized": 0.05811124768086856
+    },
+    {
+      "station_m": 210.0,
+      "unreal_local_cm": [
+        21000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.8610119819641,
+      "conditioned_visual_bed_elevation_m": 949.177490234375,
+      "conditioned_visual_surface_normalized": 0.08823795449716643,
+      "conditioned_visual_bed_normalized": 0.05793064524092185
+    },
+    {
+      "station_m": 212.0,
+      "unreal_local_cm": [
+        21200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.843877196312,
+      "conditioned_visual_bed_elevation_m": 949.1614379882812,
+      "conditioned_visual_surface_normalized": 0.08804443668861278,
+      "conditioned_visual_bed_normalized": 0.05774935347868527
+    },
+    {
+      "station_m": 214.0,
+      "unreal_local_cm": [
+        21400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.8318059444427,
+      "conditioned_visual_bed_elevation_m": 949.1454467773438,
+      "conditioned_visual_surface_normalized": 0.08790810570346663,
+      "conditioned_visual_bed_normalized": 0.057568751038738555
+    },
+    {
+      "station_m": 216.0,
+      "unreal_local_cm": [
+        21600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.8214595317841,
+      "conditioned_visual_bed_elevation_m": 949.1294555664062,
+      "conditioned_visual_surface_normalized": 0.0877912548046724,
+      "conditioned_visual_bed_normalized": 0.05738814859879184
+    },
+    {
+      "station_m": 218.0,
+      "unreal_local_cm": [
+        21800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.8174782991409,
+      "conditioned_visual_bed_elevation_m": 949.1134643554688,
+      "conditioned_visual_surface_normalized": 0.08774629133491677,
+      "conditioned_visual_bed_normalized": 0.057207546158845136
+    },
+    {
+      "station_m": 220.0,
+      "unreal_local_cm": [
+        22000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.8019332885742,
+      "conditioned_visual_bed_elevation_m": 949.0974731445312,
+      "conditioned_visual_surface_normalized": 0.08757072821788214,
+      "conditioned_visual_bed_normalized": 0.057026943718898424
+    },
+    {
+      "station_m": 222.0,
+      "unreal_local_cm": [
+        22200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.7853506207466,
+      "conditioned_visual_bed_elevation_m": 949.0814819335938,
+      "conditioned_visual_surface_normalized": 0.0873834459487534,
+      "conditioned_visual_bed_normalized": 0.05684634127895172
+    },
+    {
+      "station_m": 224.0,
+      "unreal_local_cm": [
+        22400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.7690758109093,
+      "conditioned_visual_bed_elevation_m": 949.0654907226562,
+      "conditioned_visual_surface_normalized": 0.08719964058355745,
+      "conditioned_visual_bed_normalized": 0.056665738839005005
+    },
+    {
+      "station_m": 226.0,
+      "unreal_local_cm": [
+        22600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.7542026638985,
+      "conditioned_visual_bed_elevation_m": 949.0494384765625,
+      "conditioned_visual_surface_normalized": 0.08703166539704184,
+      "conditioned_visual_bed_normalized": 0.05648444707676842
+    },
+    {
+      "station_m": 228.0,
+      "unreal_local_cm": [
+        22800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.7402503490448,
+      "conditioned_visual_bed_elevation_m": 949.033447265625,
+      "conditioned_visual_surface_normalized": 0.0868740899566749,
+      "conditioned_visual_bed_normalized": 0.05630384463682171
+    },
+    {
+      "station_m": 230.0,
+      "unreal_local_cm": [
+        23000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.7273136377335,
+      "conditioned_visual_bed_elevation_m": 949.0174560546875,
+      "conditioned_visual_surface_normalized": 0.08672798459687157,
+      "conditioned_visual_bed_normalized": 0.056123242196875
+    },
+    {
+      "station_m": 232.0,
+      "unreal_local_cm": [
+        23200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.7150163650513,
+      "conditioned_visual_bed_elevation_m": 949.00146484375,
+      "conditioned_visual_surface_normalized": 0.08658910096512075,
+      "conditioned_visual_bed_normalized": 0.05594263975692829
+    },
+    {
+      "station_m": 234.0,
+      "unreal_local_cm": [
+        23400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.702401638031,
+      "conditioned_visual_bed_elevation_m": 948.9854736328125,
+      "conditioned_visual_surface_normalized": 0.08644663204966302,
+      "conditioned_visual_bed_normalized": 0.05576203731698158
+    },
+    {
+      "station_m": 236.0,
+      "unreal_local_cm": [
+        23600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6900024414062,
+      "conditioned_visual_bed_elevation_m": 948.969482421875,
+      "conditioned_visual_surface_normalized": 0.08630659730354141,
+      "conditioned_visual_bed_normalized": 0.05558143487703487
+    },
+    {
+      "station_m": 238.0,
+      "unreal_local_cm": [
+        23800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6772539615631,
+      "conditioned_visual_bed_elevation_m": 948.9534912109375,
+      "conditioned_visual_surface_normalized": 0.08616261780290939,
+      "conditioned_visual_bed_normalized": 0.05540083243708816
+    },
+    {
+      "station_m": 240.0,
+      "unreal_local_cm": [
+        24000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6643269062042,
+      "conditioned_visual_bed_elevation_m": 948.9374389648438,
+      "conditioned_visual_surface_normalized": 0.08601662149604646,
+      "conditioned_visual_bed_normalized": 0.055219540674851575
+    },
+    {
+      "station_m": 242.0,
+      "unreal_local_cm": [
+        24200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6437793970108,
+      "conditioned_visual_bed_elevation_m": 948.9214477539062,
+      "conditioned_visual_surface_normalized": 0.08578456087789421,
+      "conditioned_visual_bed_normalized": 0.05503893823490487
+    },
+    {
+      "station_m": 244.0,
+      "unreal_local_cm": [
+        24400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6287298202515,
+      "conditioned_visual_bed_elevation_m": 948.9054565429688,
+      "conditioned_visual_surface_normalized": 0.08561459311913443,
+      "conditioned_visual_bed_normalized": 0.054858335794958156
+    },
+    {
+      "station_m": 246.0,
+      "unreal_local_cm": [
+        24600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6156748533249,
+      "conditioned_visual_bed_elevation_m": 948.8894653320312,
+      "conditioned_visual_surface_normalized": 0.08546715219739448,
+      "conditioned_visual_bed_normalized": 0.05467773335501144
+    },
+    {
+      "station_m": 248.0,
+      "unreal_local_cm": [
+        24800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.6072789430618,
+      "conditioned_visual_bed_elevation_m": 948.8734741210938,
+      "conditioned_visual_surface_normalized": 0.08537232999255903,
+      "conditioned_visual_bed_normalized": 0.05449713091506474
+    },
+    {
+      "station_m": 250.0,
+      "unreal_local_cm": [
+        25000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.5762269496918,
+      "conditioned_visual_bed_elevation_m": 948.8574829101562,
+      "conditioned_visual_surface_normalized": 0.08502163323858838,
+      "conditioned_visual_bed_normalized": 0.054316528475118024
+    },
+    {
+      "station_m": 252.0,
+      "unreal_local_cm": [
+        25200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.5251109600067,
+      "conditioned_visual_bed_elevation_m": 949.1126098632812,
+      "conditioned_visual_surface_normalized": 0.08444433659148057,
+      "conditioned_visual_bed_normalized": 0.057197895646786914
+    },
+    {
+      "station_m": 254.0,
+      "unreal_local_cm": [
+        25400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.5079777240753,
+      "conditioned_visual_bed_elevation_m": 949.2216491699219,
+      "conditioned_visual_surface_normalized": 0.0842508362852507,
+      "conditioned_visual_bed_normalized": 0.05842936991764492
+    },
+    {
+      "station_m": 256.0,
+      "unreal_local_cm": [
+        25600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.501366019249,
+      "conditioned_visual_bed_elevation_m": 949.1043090820312,
+      "conditioned_visual_surface_normalized": 0.08417616464040065,
+      "conditioned_visual_bed_normalized": 0.057104147815364194
+    },
+    {
+      "station_m": 258.0,
+      "unreal_local_cm": [
+        25800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4953840374947,
+      "conditioned_visual_bed_elevation_m": 949.0695495605469,
+      "conditioned_visual_surface_normalized": 0.08410860499749641,
+      "conditioned_visual_bed_normalized": 0.05671157877128156
+    },
+    {
+      "station_m": 260.0,
+      "unreal_local_cm": [
+        26000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4826062321663,
+      "conditioned_visual_bed_elevation_m": 949.0395812988281,
+      "conditioned_visual_surface_normalized": 0.08396429429904544,
+      "conditioned_visual_bed_normalized": 0.056373121526953944
+    },
+    {
+      "station_m": 262.0,
+      "unreal_local_cm": [
+        26200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4738805294037,
+      "conditioned_visual_bed_elevation_m": 948.761474609375,
+      "conditioned_visual_surface_normalized": 0.08386574746507926,
+      "conditioned_visual_bed_normalized": 0.053232224513147894
+    },
+    {
+      "station_m": 264.0,
+      "unreal_local_cm": [
+        26400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4591579437256,
+      "conditioned_visual_bed_elevation_m": 948.7454833984375,
+      "conditioned_visual_surface_normalized": 0.08369947269663416,
+      "conditioned_visual_bed_normalized": 0.05305162207320118
+    },
+    {
+      "station_m": 266.0,
+      "unreal_local_cm": [
+        26600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4532474279404,
+      "conditioned_visual_bed_elevation_m": 948.7294921875,
+      "conditioned_visual_surface_normalized": 0.08363272018012206,
+      "conditioned_visual_bed_normalized": 0.052871019633254475
+    },
+    {
+      "station_m": 268.0,
+      "unreal_local_cm": [
+        26800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4401932954788,
+      "conditioned_visual_bed_elevation_m": 948.7134399414062,
+      "conditioned_visual_surface_normalized": 0.0834852886827103,
+      "conditioned_visual_bed_normalized": 0.05268972787101789
+    },
+    {
+      "station_m": 270.0,
+      "unreal_local_cm": [
+        27000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4265015125275,
+      "conditioned_visual_bed_elevation_m": 948.6974487304688,
+      "conditioned_visual_surface_normalized": 0.08333065565223499,
+      "conditioned_visual_bed_normalized": 0.052509125431071176
+    },
+    {
+      "station_m": 272.0,
+      "unreal_local_cm": [
+        27200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.4097965955734,
+      "conditioned_visual_bed_elevation_m": 948.6814575195312,
+      "conditioned_visual_surface_normalized": 0.0831419927190276,
+      "conditioned_visual_bed_normalized": 0.05232852299112447
+    },
+    {
+      "station_m": 274.0,
+      "unreal_local_cm": [
+        27400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3770544528961,
+      "conditioned_visual_bed_elevation_m": 948.6654663085938,
+      "conditioned_visual_surface_normalized": 0.0827722076614909,
+      "conditioned_visual_bed_normalized": 0.05214792055117776
+    },
+    {
+      "station_m": 276.0,
+      "unreal_local_cm": [
+        27600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.349268078804,
+      "conditioned_visual_bed_elevation_m": 948.898681640625,
+      "conditioned_visual_surface_normalized": 0.08245839234269364,
+      "conditioned_visual_bed_normalized": 0.05478182102078226
+    },
+    {
+      "station_m": 278.0,
+      "unreal_local_cm": [
+        27800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3504576683044,
+      "conditioned_visual_bed_elevation_m": 948.8349609375,
+      "conditioned_visual_surface_normalized": 0.08247182739568318,
+      "conditioned_visual_bed_normalized": 0.05406216855015491
+    },
+    {
+      "station_m": 280.0,
+      "unreal_local_cm": [
+        28000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3663010597229,
+      "conditioned_visual_bed_elevation_m": 948.6434631347656,
+      "conditioned_visual_surface_normalized": 0.08265076038320911,
+      "conditioned_visual_bed_normalized": 0.051899419865678566
+    },
+    {
+      "station_m": 282.0,
+      "unreal_local_cm": [
+        28200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3630903959274,
+      "conditioned_visual_bed_elevation_m": 948.6014404296875,
+      "conditioned_visual_surface_normalized": 0.08261449960736311,
+      "conditioned_visual_bed_normalized": 0.051424821469101045
+    },
+    {
+      "station_m": 284.0,
+      "unreal_local_cm": [
+        28400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3648209571838,
+      "conditioned_visual_bed_elevation_m": 948.58544921875,
+      "conditioned_visual_surface_normalized": 0.08263404431767969,
+      "conditioned_visual_bed_normalized": 0.05124421902915433
+    },
+    {
+      "station_m": 286.0,
+      "unreal_local_cm": [
+        28600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3597348928452,
+      "conditioned_visual_bed_elevation_m": 948.5694580078125,
+      "conditioned_visual_surface_normalized": 0.08257660303741127,
+      "conditioned_visual_bed_normalized": 0.051063616589207626
+    },
+    {
+      "station_m": 288.0,
+      "unreal_local_cm": [
+        28800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3537005186081,
+      "conditioned_visual_bed_elevation_m": 948.553466796875,
+      "conditioned_visual_surface_normalized": 0.08250845168133047,
+      "conditioned_visual_bed_normalized": 0.05088301414926091
+    },
+    {
+      "station_m": 290.0,
+      "unreal_local_cm": [
+        29000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3433047533035,
+      "conditioned_visual_bed_elevation_m": 948.5374755859375,
+      "conditioned_visual_surface_normalized": 0.0823910434008409,
+      "conditioned_visual_bed_normalized": 0.0507024117093142
+    },
+    {
+      "station_m": 292.0,
+      "unreal_local_cm": [
+        29200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3194679021835,
+      "conditioned_visual_bed_elevation_m": 948.521484375,
+      "conditioned_visual_surface_normalized": 0.08212183342732837,
+      "conditioned_visual_bed_normalized": 0.050521809269367494
+    },
+    {
+      "station_m": 294.0,
+      "unreal_local_cm": [
+        29400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.316113948822,
+      "conditioned_visual_bed_elevation_m": 948.5054931640625,
+      "conditioned_visual_surface_normalized": 0.0820839543597003,
+      "conditioned_visual_bed_normalized": 0.05034120682942078
+    },
+    {
+      "station_m": 296.0,
+      "unreal_local_cm": [
+        29600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.3080304861069,
+      "conditioned_visual_bed_elevation_m": 948.4894409179688,
+      "conditioned_visual_surface_normalized": 0.08199266089260265,
+      "conditioned_visual_bed_normalized": 0.0501599150671842
+    },
+    {
+      "station_m": 298.0,
+      "unreal_local_cm": [
+        29800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.2999165058136,
+      "conditioned_visual_bed_elevation_m": 948.4734497070312,
+      "conditioned_visual_surface_normalized": 0.08190102276436008,
+      "conditioned_visual_bed_normalized": 0.04997931262723749
+    },
+    {
+      "station_m": 300.0,
+      "unreal_local_cm": [
+        30000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.2948272228241,
+      "conditioned_visual_bed_elevation_m": 948.4574584960938,
+      "conditioned_visual_surface_normalized": 0.08184354513311153,
+      "conditioned_visual_bed_normalized": 0.049798710187290776
+    },
+    {
+      "station_m": 302.0,
+      "unreal_local_cm": [
+        30200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.2916413545609,
+      "conditioned_visual_bed_elevation_m": 948.4414672851562,
+      "conditioned_visual_surface_normalized": 0.0818075643944458,
+      "conditioned_visual_bed_normalized": 0.04961810774734407
+    },
+    {
+      "station_m": 304.0,
+      "unreal_local_cm": [
+        30400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 951.2818406820297,
+      "conditioned_visual_bed_elevation_m": 948.4254760742188,
+      "conditioned_visual_surface_normalized": 0.08169687700628249,
+      "conditioned_visual_bed_normalized": 0.04943750530739736
+    },
+    {
+      "station_m": 306.0,
+      "unreal_local_cm": [
+        30600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.9106582403183,
+      "conditioned_visual_bed_elevation_m": 949.3094482421875,
+      "conditioned_visual_surface_normalized": 0.07750479581240255,
+      "conditioned_visual_bed_normalized": 0.05942096003162715
+    },
+    {
+      "station_m": 308.0,
+      "unreal_local_cm": [
+        30800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.7741253972054,
+      "conditioned_visual_bed_elevation_m": 949.29345703125,
+      "conditioned_visual_surface_normalized": 0.07596281348877282,
+      "conditioned_visual_bed_normalized": 0.059240357591680434
+    },
+    {
+      "station_m": 310.0,
+      "unreal_local_cm": [
+        31000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2874315977097,
+      "conditioned_visual_bed_elevation_m": 949.2774658203125,
+      "conditioned_visual_surface_normalized": 0.07046616360782268,
+      "conditioned_visual_bed_normalized": 0.05905975515173372
+    },
+    {
+      "station_m": 312.0,
+      "unreal_local_cm": [
+        31200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.8564841747284,
+      "conditioned_visual_bed_elevation_m": 947.0614624023438,
+      "conditioned_visual_surface_normalized": 0.07689296169517343,
+      "conditioned_visual_bed_normalized": 0.0340325307733169
+    },
+    {
+      "station_m": 314.0,
+      "unreal_local_cm": [
+        31400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.853605389595,
+      "conditioned_visual_bed_elevation_m": 947.0454711914062,
+      "conditioned_visual_surface_normalized": 0.07686044910927863,
+      "conditioned_visual_bed_normalized": 0.033851928333370196
+    },
+    {
+      "station_m": 316.0,
+      "unreal_local_cm": [
+        31600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.8545545339584,
+      "conditioned_visual_bed_elevation_m": 947.0294799804688,
+      "conditioned_visual_surface_normalized": 0.07687116860941919,
+      "conditioned_visual_bed_normalized": 0.03367132589342348
+    },
+    {
+      "station_m": 318.0,
+      "unreal_local_cm": [
+        31800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.8549000024796,
+      "conditioned_visual_bed_elevation_m": 947.0134887695312,
+      "conditioned_visual_surface_normalized": 0.07687507028128647,
+      "conditioned_visual_bed_normalized": 0.03349072345347677
+    },
+    {
+      "station_m": 320.0,
+      "unreal_local_cm": [
+        32000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.8483389616013,
+      "conditioned_visual_bed_elevation_m": 946.9974365234375,
+      "conditioned_visual_surface_normalized": 0.07680097082779032,
+      "conditioned_visual_bed_normalized": 0.03330943169124019
+    },
+    {
+      "station_m": 322.0,
+      "unreal_local_cm": [
+        32200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.8351962566376,
+      "conditioned_visual_bed_elevation_m": 946.9814453125,
+      "conditioned_visual_surface_normalized": 0.07665253900525869,
+      "conditioned_visual_bed_normalized": 0.03312882925129348
+    },
+    {
+      "station_m": 324.0,
+      "unreal_local_cm": [
+        32400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.7953723669052,
+      "conditioned_visual_bed_elevation_m": 946.9654541015625,
+      "conditioned_visual_surface_normalized": 0.07620277371344035,
+      "conditioned_visual_bed_normalized": 0.03294822681134677
+    },
+    {
+      "station_m": 326.0,
+      "unreal_local_cm": [
+        32600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.6503434181213,
+      "conditioned_visual_bed_elevation_m": 947.9141540527344,
+      "conditioned_visual_surface_normalized": 0.07456483759242706,
+      "conditioned_visual_bed_normalized": 0.043662707823986804
+    },
+    {
+      "station_m": 328.0,
+      "unreal_local_cm": [
+        32800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.6392756700516,
+      "conditioned_visual_bed_elevation_m": 948.2485961914062,
+      "conditioned_visual_surface_normalized": 0.0744398400350859,
+      "conditioned_visual_bed_normalized": 0.04743984931134558
+    },
+    {
+      "station_m": 330.0,
+      "unreal_local_cm": [
+        33000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.6130089759827,
+      "conditioned_visual_bed_elevation_m": 948.2177124023438,
+      "conditioned_visual_surface_normalized": 0.0741431877642404,
+      "conditioned_visual_bed_normalized": 0.04709105223266987
+    },
+    {
+      "station_m": 332.0,
+      "unreal_local_cm": [
+        33200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.5056282281876,
+      "conditioned_visual_bed_elevation_m": 948.4983520507812,
+      "conditioned_visual_surface_normalized": 0.07293044501881013,
+      "conditioned_visual_bed_normalized": 0.05026055612150565
+    },
+    {
+      "station_m": 334.0,
+      "unreal_local_cm": [
+        33400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.4715611934662,
+      "conditioned_visual_bed_elevation_m": 948.4823608398438,
+      "conditioned_visual_surface_normalized": 0.07254569682078583,
+      "conditioned_visual_bed_normalized": 0.05007995368155894
+    },
+    {
+      "station_m": 336.0,
+      "unreal_local_cm": [
+        33600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.4556496739388,
+      "conditioned_visual_bed_elevation_m": 948.16943359375,
+      "conditioned_visual_surface_normalized": 0.0723659944041805,
+      "conditioned_visual_bed_normalized": 0.04654579830138038
+    },
+    {
+      "station_m": 338.0,
+      "unreal_local_cm": [
+        33800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.4839985370636,
+      "conditioned_visual_bed_elevation_m": 948.1534423828125,
+      "conditioned_visual_surface_normalized": 0.07268616239333862,
+      "conditioned_visual_bed_normalized": 0.046365195861433665
+    },
+    {
+      "station_m": 340.0,
+      "unreal_local_cm": [
+        34000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.4541238546371,
+      "conditioned_visual_bed_elevation_m": 948.137451171875,
+      "conditioned_visual_surface_normalized": 0.07234876202009997,
+      "conditioned_visual_bed_normalized": 0.04618459342148696
+    },
+    {
+      "station_m": 342.0,
+      "unreal_local_cm": [
+        34200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.4264978170395,
+      "conditioned_visual_bed_elevation_m": 948.1214599609375,
+      "conditioned_visual_surface_normalized": 0.07203675751864623,
+      "conditioned_visual_bed_normalized": 0.046003990981540246
+    },
+    {
+      "station_m": 344.0,
+      "unreal_local_cm": [
+        34400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.4009354710579,
+      "conditioned_visual_bed_elevation_m": 948.10546875,
+      "conditioned_visual_surface_normalized": 0.07174806005395253,
+      "conditioned_visual_bed_normalized": 0.045823388541593534
+    },
+    {
+      "station_m": 346.0,
+      "unreal_local_cm": [
+        34600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.3743922710419,
+      "conditioned_visual_bed_elevation_m": 948.0894775390625,
+      "conditioned_visual_surface_normalized": 0.07144828496464734,
+      "conditioned_visual_bed_normalized": 0.04564278610164683
+    },
+    {
+      "station_m": 348.0,
+      "unreal_local_cm": [
+        34800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.3079676628113,
+      "conditioned_visual_bed_elevation_m": 948.073486328125,
+      "conditioned_visual_surface_normalized": 0.07069809497804558,
+      "conditioned_visual_bed_normalized": 0.045462183661700115
+    },
+    {
+      "station_m": 350.0,
+      "unreal_local_cm": [
+        35000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2541689872742,
+      "conditioned_visual_bed_elevation_m": 948.0639343261719,
+      "conditioned_visual_surface_normalized": 0.0700905004621657,
+      "conditioned_visual_bed_normalized": 0.045354304723335
+    },
+    {
+      "station_m": 352.0,
+      "unreal_local_cm": [
+        35200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2101314663887,
+      "conditioned_visual_bed_elevation_m": 948.0414428710938,
+      "conditioned_visual_surface_normalized": 0.06959314702519309,
+      "conditioned_visual_bed_normalized": 0.04510028945951682
+    },
+    {
+      "station_m": 354.0,
+      "unreal_local_cm": [
+        35400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.1624981164932,
+      "conditioned_visual_bed_elevation_m": 948.0254516601562,
+      "conditioned_visual_surface_normalized": 0.06905518281175226,
+      "conditioned_visual_bed_normalized": 0.04491968701957011
+    },
+    {
+      "station_m": 356.0,
+      "unreal_local_cm": [
+        35600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.1134655475616,
+      "conditioned_visual_bed_elevation_m": 948.0094604492188,
+      "conditioned_visual_surface_normalized": 0.06850141601944935,
+      "conditioned_visual_bed_normalized": 0.0447390845796234
+    },
+    {
+      "station_m": 358.0,
+      "unreal_local_cm": [
+        35800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.0740344524384,
+      "conditioned_visual_bed_elevation_m": 947.993408203125,
+      "conditioned_visual_surface_normalized": 0.06805608689353948,
+      "conditioned_visual_bed_normalized": 0.04455779281738682
+    },
+    {
+      "station_m": 360.0,
+      "unreal_local_cm": [
+        36000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.0135614871979,
+      "conditioned_visual_bed_elevation_m": 947.9773559570312,
+      "conditioned_visual_surface_normalized": 0.06737311390819592,
+      "conditioned_visual_bed_normalized": 0.04437650105515024
+    },
+    {
+      "station_m": 362.0,
+      "unreal_local_cm": [
+        36200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.9530608057976,
+      "conditioned_visual_bed_elevation_m": 947.9612426757812,
+      "conditioned_visual_surface_normalized": 0.06668982790052345,
+      "conditioned_visual_bed_normalized": 0.04419451997062378
+    },
+    {
+      "station_m": 364.0,
+      "unreal_local_cm": [
+        36400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2799417972565,
+      "conditioned_visual_bed_elevation_m": 947.5068969726562,
+      "conditioned_visual_surface_normalized": 0.07038157487706014,
+      "conditioned_visual_bed_normalized": 0.039063204844809615
+    },
+    {
+      "station_m": 366.0,
+      "unreal_local_cm": [
+        36600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2725098133087,
+      "conditioned_visual_bed_elevation_m": 946.8134155273438,
+      "conditioned_visual_surface_normalized": 0.07029763911760732,
+      "conditioned_visual_bed_normalized": 0.031231124987273276
+    },
+    {
+      "station_m": 368.0,
+      "unreal_local_cm": [
+        36800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2451076507568,
+      "conditioned_visual_bed_elevation_m": 946.6676025390625,
+      "conditioned_visual_surface_normalized": 0.06998816302877152,
+      "conditioned_visual_bed_normalized": 0.029584334036766823
+    },
+    {
+      "station_m": 370.0,
+      "unreal_local_cm": [
+        37000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2327412366867,
+      "conditioned_visual_bed_elevation_m": 946.6510620117188,
+      "conditioned_visual_surface_normalized": 0.06984849852411419,
+      "conditioned_visual_bed_normalized": 0.02939752769621126
+    },
+    {
+      "station_m": 372.0,
+      "unreal_local_cm": [
+        37200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2272244691849,
+      "conditioned_visual_bed_elevation_m": 946.6343994140625,
+      "conditioned_visual_surface_normalized": 0.06978619294417135,
+      "conditioned_visual_bed_normalized": 0.029209342711075944
+    },
+    {
+      "station_m": 374.0,
+      "unreal_local_cm": [
+        37400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2228255271912,
+      "conditioned_visual_bed_elevation_m": 946.61767578125,
+      "conditioned_visual_surface_normalized": 0.06973651192499439,
+      "conditioned_visual_bed_normalized": 0.02902046840365076
+    },
+    {
+      "station_m": 376.0,
+      "unreal_local_cm": [
+        37600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2189366817474,
+      "conditioned_visual_bed_elevation_m": 946.6008911132812,
+      "conditioned_visual_surface_normalized": 0.06969259186300174,
+      "conditioned_visual_bed_normalized": 0.0288309047739357
+    },
+    {
+      "station_m": 378.0,
+      "unreal_local_cm": [
+        37800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2149716615677,
+      "conditioned_visual_bed_elevation_m": 946.5841674804688,
+      "conditioned_visual_surface_normalized": 0.06964781149447935,
+      "conditioned_visual_bed_normalized": 0.028642030466510517
+    },
+    {
+      "station_m": 380.0,
+      "unreal_local_cm": [
+        38000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2095744609833,
+      "conditioned_visual_bed_elevation_m": 946.5674438476562,
+      "conditioned_visual_surface_normalized": 0.0695868562861317,
+      "conditioned_visual_bed_normalized": 0.02845315615908533
+    },
+    {
+      "station_m": 382.0,
+      "unreal_local_cm": [
+        38200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.20516705513,
+      "conditioned_visual_bed_elevation_m": 946.55078125,
+      "conditioned_visual_surface_normalized": 0.06953707967734032,
+      "conditioned_visual_bed_normalized": 0.028264971173950017
+    },
+    {
+      "station_m": 384.0,
+      "unreal_local_cm": [
+        38400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.2003391981125,
+      "conditioned_visual_bed_elevation_m": 946.5342407226562,
+      "conditioned_visual_surface_normalized": 0.06948255455347789,
+      "conditioned_visual_bed_normalized": 0.02807816483339445
+    },
+    {
+      "station_m": 386.0,
+      "unreal_local_cm": [
+        38600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.1981822252274,
+      "conditioned_visual_bed_elevation_m": 946.517822265625,
+      "conditioned_visual_surface_normalized": 0.06945819401146039,
+      "conditioned_visual_bed_normalized": 0.02789273713741863
+    },
+    {
+      "station_m": 388.0,
+      "unreal_local_cm": [
+        38800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.193470954895,
+      "conditioned_visual_bed_elevation_m": 946.5015258789062,
+      "conditioned_visual_surface_normalized": 0.06940498560087822,
+      "conditioned_visual_bed_normalized": 0.027708688086022556
+    },
+    {
+      "station_m": 390.0,
+      "unreal_local_cm": [
+        39000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.1820464134216,
+      "conditioned_visual_bed_elevation_m": 946.4853515625,
+      "conditioned_visual_surface_normalized": 0.06927595847007303,
+      "conditioned_visual_bed_normalized": 0.027526017679206226
+    },
+    {
+      "station_m": 392.0,
+      "unreal_local_cm": [
+        39200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.1490345001221,
+      "conditioned_visual_bed_elevation_m": 946.46923828125,
+      "conditioned_visual_surface_normalized": 0.06890312666186839,
+      "conditioned_visual_bed_normalized": 0.02734403659467977
+    },
+    {
+      "station_m": 394.0,
+      "unreal_local_cm": [
+        39400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.1198740005493,
+      "conditioned_visual_bed_elevation_m": 946.4531860351562,
+      "conditioned_visual_surface_normalized": 0.06857379216722082,
+      "conditioned_visual_bed_normalized": 0.027162744832443186
+    },
+    {
+      "station_m": 396.0,
+      "unreal_local_cm": [
+        39600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.0913351774216,
+      "conditioned_visual_bed_elevation_m": 946.4371337890625,
+      "conditioned_visual_surface_normalized": 0.06825147879706872,
+      "conditioned_visual_bed_normalized": 0.026981453070206603
+    },
+    {
+      "station_m": 398.0,
+      "unreal_local_cm": [
+        39800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.0464745759964,
+      "conditioned_visual_bed_elevation_m": 946.421142578125,
+      "conditioned_visual_surface_normalized": 0.06774482960667731,
+      "conditioned_visual_bed_normalized": 0.026800850630259894
+    },
+    {
+      "station_m": 400.0,
+      "unreal_local_cm": [
+        40000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 950.0068874359131,
+      "conditioned_visual_bed_elevation_m": 946.4250183105469,
+      "conditioned_visual_surface_normalized": 0.06729773813139743,
+      "conditioned_visual_bed_normalized": 0.026844622595666827
+    },
+    {
+      "station_m": 402.0,
+      "unreal_local_cm": [
+        40200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.790992975235,
+      "conditioned_visual_bed_elevation_m": 947.8879089355469,
+      "conditioned_visual_surface_normalized": 0.06485945709553113,
+      "conditioned_visual_bed_normalized": 0.043366299239341446
+    },
+    {
+      "station_m": 404.0,
+      "unreal_local_cm": [
+        40400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7792037725449,
+      "conditioned_visual_bed_elevation_m": 947.7163696289062,
+      "conditioned_visual_surface_normalized": 0.06472631153331046,
+      "conditioned_visual_bed_normalized": 0.041428958943653546
+    },
+    {
+      "station_m": 406.0,
+      "unreal_local_cm": [
+        40600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7160235643387,
+      "conditioned_visual_bed_elevation_m": 947.7003784179688,
+      "conditioned_visual_surface_normalized": 0.06401276333467976,
+      "conditioned_visual_bed_normalized": 0.04124835650370683
+    },
+    {
+      "station_m": 408.0,
+      "unreal_local_cm": [
+        40800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.8247405290604,
+      "conditioned_visual_bed_elevation_m": 946.3610229492188,
+      "conditioned_visual_surface_normalized": 0.06524059712219438,
+      "conditioned_visual_bed_normalized": 0.02612186817473505
+    },
+    {
+      "station_m": 410.0,
+      "unreal_local_cm": [
+        41000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7953845262527,
+      "conditioned_visual_bed_elevation_m": 946.3251342773438,
+      "conditioned_visual_surface_normalized": 0.06490905464208704,
+      "conditioned_visual_bed_normalized": 0.02571654666828976
+    },
+    {
+      "station_m": 412.0,
+      "unreal_local_cm": [
+        41200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7716860771179,
+      "conditioned_visual_bed_elevation_m": 946.3091430664062,
+      "conditioned_visual_surface_normalized": 0.06464140776072011,
+      "conditioned_visual_bed_normalized": 0.02553594422834305
+    },
+    {
+      "station_m": 414.0,
+      "unreal_local_cm": [
+        41400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7461017370224,
+      "conditioned_visual_bed_elevation_m": 946.2931518554688,
+      "conditioned_visual_surface_normalized": 0.06435246189766218,
+      "conditioned_visual_bed_normalized": 0.025355341788396338
+    },
+    {
+      "station_m": 416.0,
+      "unreal_local_cm": [
+        41600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.720316529274,
+      "conditioned_visual_bed_elevation_m": 946.2970275878906,
+      "conditioned_visual_surface_normalized": 0.06406124746417761,
+      "conditioned_visual_bed_normalized": 0.02539911375380327
+    },
+    {
+      "station_m": 418.0,
+      "unreal_local_cm": [
+        41800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5841604471207,
+      "conditioned_visual_bed_elevation_m": 947.6043701171875,
+      "conditioned_visual_surface_normalized": 0.062523520224722,
+      "conditioned_visual_bed_normalized": 0.0401640525417367
+    },
+    {
+      "station_m": 420.0,
+      "unreal_local_cm": [
+        42000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5751892328262,
+      "conditioned_visual_bed_elevation_m": 947.58837890625,
+      "conditioned_visual_surface_normalized": 0.062422200618771455,
+      "conditioned_visual_bed_normalized": 0.03998345010178999
+    },
+    {
+      "station_m": 422.0,
+      "unreal_local_cm": [
+        42200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5923819541931,
+      "conditioned_visual_bed_elevation_m": 947.5723876953125,
+      "conditioned_visual_surface_normalized": 0.06261637274496744,
+      "conditioned_visual_bed_normalized": 0.039802847661843284
+    },
+    {
+      "station_m": 424.0,
+      "unreal_local_cm": [
+        42400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.705362200737,
+      "conditioned_visual_bed_elevation_m": 946.2330017089844,
+      "conditioned_visual_surface_normalized": 0.06389235542516317,
+      "conditioned_visual_bed_normalized": 0.024676014671726556
+    },
+    {
+      "station_m": 426.0,
+      "unreal_local_cm": [
+        42600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7256144285202,
+      "conditioned_visual_bed_elevation_m": 946.1971435546875,
+      "conditioned_visual_surface_normalized": 0.06412108117747163,
+      "conditioned_visual_bed_normalized": 0.024271037826426204
+    },
+    {
+      "station_m": 428.0,
+      "unreal_local_cm": [
+        42800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.7356402873993,
+      "conditioned_visual_bed_elevation_m": 946.18115234375,
+      "conditioned_visual_surface_normalized": 0.06423431178791143,
+      "conditioned_visual_bed_normalized": 0.024090435386479495
+    },
+    {
+      "station_m": 430.0,
+      "unreal_local_cm": [
+        43000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.6980174779892,
+      "conditioned_visual_bed_elevation_m": 946.1651611328125,
+      "conditioned_visual_surface_normalized": 0.06380940518117166,
+      "conditioned_visual_bed_normalized": 0.023909832946532785
+    },
+    {
+      "station_m": 432.0,
+      "unreal_local_cm": [
+        43200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.6406821012497,
+      "conditioned_visual_bed_elevation_m": 946.1690368652344,
+      "conditioned_visual_surface_normalized": 0.06316186766979187,
+      "conditioned_visual_bed_normalized": 0.023953604911939718
+    },
+    {
+      "station_m": 434.0,
+      "unreal_local_cm": [
+        43400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.502858042717,
+      "conditioned_visual_bed_elevation_m": 947.4763793945312,
+      "conditioned_visual_surface_normalized": 0.06160530254463332,
+      "conditioned_visual_bed_normalized": 0.03871854369987315
+    },
+    {
+      "station_m": 436.0,
+      "unreal_local_cm": [
+        43600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.4992432594299,
+      "conditioned_visual_bed_elevation_m": 947.4603881835938,
+      "conditioned_visual_surface_normalized": 0.061564477701282115,
+      "conditioned_visual_bed_normalized": 0.03853794125992644
+    },
+    {
+      "station_m": 438.0,
+      "unreal_local_cm": [
+        43800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.4671514034271,
+      "conditioned_visual_bed_elevation_m": 947.4443664550781,
+      "conditioned_visual_surface_normalized": 0.061202036888064276,
+      "conditioned_visual_bed_normalized": 0.03835699415883479
+    },
+    {
+      "station_m": 440.0,
+      "unreal_local_cm": [
+        44000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5822983980179,
+      "conditioned_visual_bed_elevation_m": 946.1050109863281,
+      "conditioned_visual_surface_normalized": 0.06250249050955048,
+      "conditioned_visual_bed_normalized": 0.023230505829863003
+    },
+    {
+      "station_m": 442.0,
+      "unreal_local_cm": [
+        44200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5653821229935,
+      "conditioned_visual_bed_elevation_m": 946.0691528320312,
+      "conditioned_visual_surface_normalized": 0.062311440528647885,
+      "conditioned_visual_bed_normalized": 0.02282552898456265
+    },
+    {
+      "station_m": 444.0,
+      "unreal_local_cm": [
+        44400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5539222955704,
+      "conditioned_visual_bed_elevation_m": 946.0531616210938,
+      "conditioned_visual_surface_normalized": 0.06218201488339385,
+      "conditioned_visual_bed_normalized": 0.022644926544615942
+    },
+    {
+      "station_m": 446.0,
+      "unreal_local_cm": [
+        44600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.5248301029205,
+      "conditioned_visual_bed_elevation_m": 946.0371704101562,
+      "conditioned_visual_surface_normalized": 0.06185345183732459,
+      "conditioned_visual_bed_normalized": 0.02246432410466923
+    },
+    {
+      "station_m": 448.0,
+      "unreal_local_cm": [
+        44800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.4402054548264,
+      "conditioned_visual_bed_elevation_m": 946.0211181640625,
+      "conditioned_visual_surface_normalized": 0.06089771321407875,
+      "conditioned_visual_bed_normalized": 0.022283032342432646
+    },
+    {
+      "station_m": 450.0,
+      "unreal_local_cm": [
+        45000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.3453578352928,
+      "conditioned_visual_bed_elevation_m": 946.2473754882812,
+      "conditioned_visual_surface_normalized": 0.05982651781944328,
+      "conditioned_visual_bed_normalized": 0.024838350070991635
+    },
+    {
+      "station_m": 452.0,
+      "unreal_local_cm": [
+        45200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.234160900116,
+      "conditioned_visual_bed_elevation_m": 947.7599792480469,
+      "conditioned_visual_surface_normalized": 0.05857067560173848,
+      "conditioned_visual_bed_normalized": 0.041921479719767764
+    },
+    {
+      "station_m": 454.0,
+      "unreal_local_cm": [
+        45400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 949.1359314918518,
+      "conditioned_visual_bed_elevation_m": 947.7439880371094,
+      "conditioned_visual_surface_normalized": 0.05746128677081344,
+      "conditioned_visual_bed_normalized": 0.04174087727982105
+    },
+    {
+      "station_m": 456.0,
+      "unreal_local_cm": [
+        45600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.7952698469162,
+      "conditioned_visual_bed_elevation_m": 947.7279968261719,
+      "conditioned_visual_surface_normalized": 0.0536139030728501,
+      "conditioned_visual_bed_normalized": 0.04156027483987434
+    },
+    {
+      "station_m": 458.0,
+      "unreal_local_cm": [
+        45800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.9190683364868,
+      "conditioned_visual_bed_elevation_m": 946.1833801269531,
+      "conditioned_visual_surface_normalized": 0.0550120654362606,
+      "conditioned_visual_bed_normalized": 0.024115595650059857
+    },
+    {
+      "station_m": 460.0,
+      "unreal_local_cm": [
+        46000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.8223588466644,
+      "conditioned_visual_bed_elevation_m": 945.9251708984375,
+      "conditioned_visual_surface_normalized": 0.05391984234595251,
+      "conditioned_visual_bed_normalized": 0.021199417702752386
+    },
+    {
+      "station_m": 462.0,
+      "unreal_local_cm": [
+        46200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.7549523115158,
+      "conditioned_visual_bed_elevation_m": 945.9091186523438,
+      "conditioned_visual_surface_normalized": 0.0531585626177459,
+      "conditioned_visual_bed_normalized": 0.021018125940515803
+    },
+    {
+      "station_m": 464.0,
+      "unreal_local_cm": [
+        46400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.7104012966156,
+      "conditioned_visual_bed_elevation_m": 945.8931274414062,
+      "conditioned_visual_surface_normalized": 0.05265540985310996,
+      "conditioned_visual_bed_normalized": 0.020837523500569093
+    },
+    {
+      "station_m": 466.0,
+      "unreal_local_cm": [
+        46600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.6827292442322,
+      "conditioned_visual_bed_elevation_m": 945.8771362304688,
+      "conditioned_visual_surface_normalized": 0.05234288566727362,
+      "conditioned_visual_bed_normalized": 0.020656921060622384
+    },
+    {
+      "station_m": 468.0,
+      "unreal_local_cm": [
+        46800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.6512579917908,
+      "conditioned_visual_bed_elevation_m": 945.8611450195312,
+      "conditioned_visual_surface_normalized": 0.051987453861557884,
+      "conditioned_visual_bed_normalized": 0.02047631862067567
+    },
+    {
+      "station_m": 470.0,
+      "unreal_local_cm": [
+        47000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.6105647683144,
+      "conditioned_visual_bed_elevation_m": 945.8451538085938,
+      "conditioned_visual_surface_normalized": 0.051527870439272955,
+      "conditioned_visual_bed_normalized": 0.02029571618072896
+    },
+    {
+      "station_m": 472.0,
+      "unreal_local_cm": [
+        47200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.5680952072144,
+      "conditioned_visual_bed_elevation_m": 946.4124755859375,
+      "conditioned_visual_surface_normalized": 0.05104822531495405,
+      "conditioned_visual_bed_normalized": 0.026702966865097936
+    },
+    {
+      "station_m": 474.0,
+      "unreal_local_cm": [
+        47400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.5359387993813,
+      "conditioned_visual_bed_elevation_m": 946.396484375,
+      "conditioned_visual_surface_normalized": 0.050685055462634715,
+      "conditioned_visual_bed_normalized": 0.026522364425151226
+    },
+    {
+      "station_m": 476.0,
+      "unreal_local_cm": [
+        47600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.5073879957199,
+      "conditioned_visual_bed_elevation_m": 946.3804626464844,
+      "conditioned_visual_surface_normalized": 0.050362606786056585,
+      "conditioned_visual_bed_normalized": 0.02634141732405958
+    },
+    {
+      "station_m": 478.0,
+      "unreal_local_cm": [
+        47800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.4837726354599,
+      "conditioned_visual_bed_elevation_m": 945.7811279296875,
+      "conditioned_visual_surface_normalized": 0.05009589829851004,
+      "conditioned_visual_bed_normalized": 0.01957261709865225
+    },
+    {
+      "station_m": 480.0,
+      "unreal_local_cm": [
+        48000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.4645354747772,
+      "conditioned_visual_bed_elevation_m": 945.76513671875,
+      "conditioned_visual_surface_normalized": 0.049878636568268506,
+      "conditioned_visual_bed_normalized": 0.019392014658705537
+    },
+    {
+      "station_m": 482.0,
+      "unreal_local_cm": [
+        48200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.4518797397614,
+      "conditioned_visual_bed_elevation_m": 945.7491455078125,
+      "conditioned_visual_surface_normalized": 0.04973570451439727,
+      "conditioned_visual_bed_normalized": 0.019211412218758828
+    },
+    {
+      "station_m": 484.0,
+      "unreal_local_cm": [
+        48400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.4390547275543,
+      "conditioned_visual_bed_elevation_m": 945.733154296875,
+      "conditioned_visual_surface_normalized": 0.04959086066823772,
+      "conditioned_visual_bed_normalized": 0.019030809778812118
+    },
+    {
+      "station_m": 486.0,
+      "unreal_local_cm": [
+        48600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.4268591403961,
+      "conditioned_visual_bed_elevation_m": 945.7171630859375,
+      "conditioned_visual_surface_normalized": 0.049453125458192485,
+      "conditioned_visual_bed_normalized": 0.01885020733886541
+    },
+    {
+      "station_m": 488.0,
+      "unreal_local_cm": [
+        48800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.4125738143921,
+      "conditioned_visual_bed_elevation_m": 945.701171875,
+      "conditioned_visual_surface_normalized": 0.04929178903771469,
+      "conditioned_visual_bed_normalized": 0.0186696048989187
+    },
+    {
+      "station_m": 490.0,
+      "unreal_local_cm": [
+        49000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3985441923141,
+      "conditioned_visual_bed_elevation_m": 945.6851196289062,
+      "conditioned_visual_surface_normalized": 0.049133340500658325,
+      "conditioned_visual_bed_normalized": 0.018488313136682113
+    },
+    {
+      "station_m": 492.0,
+      "unreal_local_cm": [
+        49200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3843488693237,
+      "conditioned_visual_bed_elevation_m": 945.6691284179688,
+      "conditioned_visual_surface_normalized": 0.04897302056129157,
+      "conditioned_visual_bed_normalized": 0.018307710696735403
+    },
+    {
+      "station_m": 494.0,
+      "unreal_local_cm": [
+        49400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3699749708176,
+      "conditioned_visual_bed_elevation_m": 945.6531372070312,
+      "conditioned_visual_surface_normalized": 0.048810683815693895,
+      "conditioned_visual_bed_normalized": 0.018127108256788694
+    },
+    {
+      "station_m": 496.0,
+      "unreal_local_cm": [
+        49600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3556447029114,
+      "conditioned_visual_bed_elevation_m": 945.6371459960938,
+      "conditioned_visual_surface_normalized": 0.04864883982782687,
+      "conditioned_visual_bed_normalized": 0.017946505816841984
+    },
+    {
+      "station_m": 498.0,
+      "unreal_local_cm": [
+        49800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3416483402252,
+      "conditioned_visual_bed_elevation_m": 945.6211547851562,
+      "conditioned_visual_surface_normalized": 0.04849076691756519,
+      "conditioned_visual_bed_normalized": 0.017765903376895275
+    },
+    {
+      "station_m": 500.0,
+      "unreal_local_cm": [
+        50000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3281850814819,
+      "conditioned_visual_bed_elevation_m": 945.6051635742188,
+      "conditioned_visual_surface_normalized": 0.04833871480667912,
+      "conditioned_visual_bed_normalized": 0.017585300936948562
+    },
+    {
+      "station_m": 502.0,
+      "unreal_local_cm": [
+        50200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3150550127029,
+      "conditioned_visual_bed_elevation_m": 945.5891723632812,
+      "conditioned_visual_surface_normalized": 0.04819042569540279,
+      "conditioned_visual_bed_normalized": 0.017404698497001853
+    },
+    {
+      "station_m": 504.0,
+      "unreal_local_cm": [
+        50400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.3018546104431,
+      "conditioned_visual_bed_elevation_m": 945.5731201171875,
+      "conditioned_visual_surface_normalized": 0.048041342247894005,
+      "conditioned_visual_bed_normalized": 0.01722340673476527
+    },
+    {
+      "station_m": 506.0,
+      "unreal_local_cm": [
+        50600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.2884417772293,
+      "conditioned_visual_bed_elevation_m": 945.55712890625,
+      "conditioned_visual_surface_normalized": 0.047889859635696634,
+      "conditioned_visual_bed_normalized": 0.01704280429481856
+    },
+    {
+      "station_m": 508.0,
+      "unreal_local_cm": [
+        50800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.2748485803604,
+      "conditioned_visual_bed_elevation_m": 945.5411376953125,
+      "conditioned_visual_surface_normalized": 0.04773634002227939,
+      "conditioned_visual_bed_normalized": 0.01686220185487185
+    },
+    {
+      "station_m": 510.0,
+      "unreal_local_cm": [
+        51000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.2610762119293,
+      "conditioned_visual_bed_elevation_m": 945.525146484375,
+      "conditioned_visual_surface_normalized": 0.04758079687096823,
+      "conditioned_visual_bed_normalized": 0.01668159941492514
+    },
+    {
+      "station_m": 512.0,
+      "unreal_local_cm": [
+        51200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.247377038002,
+      "conditioned_visual_bed_elevation_m": 945.5091552734375,
+      "conditioned_visual_surface_normalized": 0.04742608036787189,
+      "conditioned_visual_bed_normalized": 0.01650099697497843
+    },
+    {
+      "station_m": 514.0,
+      "unreal_local_cm": [
+        51400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.2333528995514,
+      "conditioned_visual_bed_elevation_m": 945.4931640625,
+      "conditioned_visual_surface_normalized": 0.04726769376211501,
+      "conditioned_visual_bed_normalized": 0.01632039453503172
+    },
+    {
+      "station_m": 516.0,
+      "unreal_local_cm": [
+        51600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.2185219526291,
+      "conditioned_visual_bed_elevation_m": 945.4771728515625,
+      "conditioned_visual_surface_normalized": 0.04710019517733887,
+      "conditioned_visual_bed_normalized": 0.01613979209508501
+    },
+    {
+      "station_m": 518.0,
+      "unreal_local_cm": [
+        51800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.2036479711533,
+      "conditioned_visual_bed_elevation_m": 945.4611206054688,
+      "conditioned_visual_surface_normalized": 0.04693221056649507,
+      "conditioned_visual_bed_normalized": 0.015958500332848426
+    },
+    {
+      "station_m": 520.0,
+      "unreal_local_cm": [
+        52000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.1885352134705,
+      "conditioned_visual_bed_elevation_m": 945.4451293945312,
+      "conditioned_visual_surface_normalized": 0.04676152925145866,
+      "conditioned_visual_bed_normalized": 0.015777897892901717
+    },
+    {
+      "station_m": 522.0,
+      "unreal_local_cm": [
+        52200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.1741775274277,
+      "conditioned_visual_bed_elevation_m": 945.4291381835938,
+      "conditioned_visual_surface_normalized": 0.046599375607094234,
+      "conditioned_visual_bed_normalized": 0.015597295452955006
+    },
+    {
+      "station_m": 524.0,
+      "unreal_local_cm": [
+        52400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.1591188013554,
+      "conditioned_visual_bed_elevation_m": 945.4131469726562,
+      "conditioned_visual_surface_normalized": 0.0464293045173076,
+      "conditioned_visual_bed_normalized": 0.015416693013008296
+    },
+    {
+      "station_m": 526.0,
+      "unreal_local_cm": [
+        52600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.1441444158554,
+      "conditioned_visual_bed_elevation_m": 945.3971557617188,
+      "conditioned_visual_surface_normalized": 0.04626018595783363,
+      "conditioned_visual_bed_normalized": 0.015236090573061585
+    },
+    {
+      "station_m": 528.0,
+      "unreal_local_cm": [
+        52800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.1295464038849,
+      "conditioned_visual_bed_elevation_m": 945.3811645507812,
+      "conditioned_visual_surface_normalized": 0.046095318106952825,
+      "conditioned_visual_bed_normalized": 0.015055488133114876
+    },
+    {
+      "station_m": 530.0,
+      "unreal_local_cm": [
+        53000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.114847779274,
+      "conditioned_visual_bed_elevation_m": 945.3651733398438,
+      "conditioned_visual_surface_normalized": 0.04592931395135981,
+      "conditioned_visual_bed_normalized": 0.014874885693168164
+    },
+    {
+      "station_m": 532.0,
+      "unreal_local_cm": [
+        53200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.1004193425179,
+      "conditioned_visual_bed_elevation_m": 945.34912109375,
+      "conditioned_visual_surface_normalized": 0.04576636125859882,
+      "conditioned_visual_bed_normalized": 0.014693593930931581
+    },
+    {
+      "station_m": 534.0,
+      "unreal_local_cm": [
+        53400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.0863863229752,
+      "conditioned_visual_bed_elevation_m": 945.3331298828125,
+      "conditioned_visual_surface_normalized": 0.045607874351063435,
+      "conditioned_visual_bed_normalized": 0.014512991490984872
+    },
+    {
+      "station_m": 536.0,
+      "unreal_local_cm": [
+        53600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.072483420372,
+      "conditioned_visual_bed_elevation_m": 945.317138671875,
+      "conditioned_visual_surface_normalized": 0.045450856965558124,
+      "conditioned_visual_bed_normalized": 0.01433238905103816
+    },
+    {
+      "station_m": 538.0,
+      "unreal_local_cm": [
+        53800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.0578943490982,
+      "conditioned_visual_bed_elevation_m": 945.3011474609375,
+      "conditioned_visual_surface_normalized": 0.04528609008962212,
+      "conditioned_visual_bed_normalized": 0.014151786611091451
+    },
+    {
+      "station_m": 540.0,
+      "unreal_local_cm": [
+        54000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.0421155691147,
+      "conditioned_visual_bed_elevation_m": 945.28515625,
+      "conditioned_visual_surface_normalized": 0.045107886814364,
+      "conditioned_visual_bed_normalized": 0.01397118417114474
+    },
+    {
+      "station_m": 542.0,
+      "unreal_local_cm": [
+        54200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.0250623226166,
+      "conditioned_visual_bed_elevation_m": 945.2691650390625,
+      "conditioned_visual_surface_normalized": 0.044915289897306976,
+      "conditioned_visual_bed_normalized": 0.01379058173119803
+    },
+    {
+      "station_m": 544.0,
+      "unreal_local_cm": [
+        54400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 948.0074105262756,
+      "conditioned_visual_bed_elevation_m": 945.253173828125,
+      "conditioned_visual_surface_normalized": 0.04471593304427837,
+      "conditioned_visual_bed_normalized": 0.013609979291251321
+    },
+    {
+      "station_m": 546.0,
+      "unreal_local_cm": [
+        54600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.9905388355255,
+      "conditioned_visual_bed_elevation_m": 945.2371215820312,
+      "conditioned_visual_surface_normalized": 0.044525386591767205,
+      "conditioned_visual_bed_normalized": 0.013428687529014738
+    },
+    {
+      "station_m": 548.0,
+      "unreal_local_cm": [
+        54800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.9739826321602,
+      "conditioned_visual_bed_elevation_m": 945.2211303710938,
+      "conditioned_visual_surface_normalized": 0.04433840320847508,
+      "conditioned_visual_bed_normalized": 0.013248085089068027
+    },
+    {
+      "station_m": 550.0,
+      "unreal_local_cm": [
+        55000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.9576500654221,
+      "conditioned_visual_bed_elevation_m": 945.2051391601562,
+      "conditioned_visual_surface_normalized": 0.044153945545135694,
+      "conditioned_visual_bed_normalized": 0.013067482649121318
+    },
+    {
+      "station_m": 552.0,
+      "unreal_local_cm": [
+        55200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.941431760788,
+      "conditioned_visual_bed_elevation_m": 945.1891479492188,
+      "conditioned_visual_surface_normalized": 0.04397077834159092,
+      "conditioned_visual_bed_normalized": 0.012886880209174606
+    },
+    {
+      "station_m": 554.0,
+      "unreal_local_cm": [
+        55400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.9266992807388,
+      "conditioned_visual_bed_elevation_m": 945.1731567382812,
+      "conditioned_visual_surface_normalized": 0.04380439182754024,
+      "conditioned_visual_bed_normalized": 0.012706277769227897
+    },
+    {
+      "station_m": 556.0,
+      "unreal_local_cm": [
+        55600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.9124565124512,
+      "conditioned_visual_bed_elevation_m": 945.1571655273438,
+      "conditioned_visual_surface_normalized": 0.04364353604779972,
+      "conditioned_visual_bed_normalized": 0.012525675329281186
+    },
+    {
+      "station_m": 558.0,
+      "unreal_local_cm": [
+        55800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.8988527059555,
+      "conditioned_visual_bed_elevation_m": 945.1411743164062,
+      "conditioned_visual_surface_normalized": 0.0434898966107813,
+      "conditioned_visual_bed_normalized": 0.012345072889334476
+    },
+    {
+      "station_m": 560.0,
+      "unreal_local_cm": [
+        56000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.884674757719,
+      "conditioned_visual_bed_elevation_m": 945.1251220703125,
+      "conditioned_visual_surface_normalized": 0.04332977289939061,
+      "conditioned_visual_bed_normalized": 0.012163781127097893
+    },
+    {
+      "station_m": 562.0,
+      "unreal_local_cm": [
+        56200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.8705232739449,
+      "conditioned_visual_bed_elevation_m": 945.109130859375,
+      "conditioned_visual_surface_normalized": 0.043169948073836555,
+      "conditioned_visual_bed_normalized": 0.011983178687151184
+    },
+    {
+      "station_m": 564.0,
+      "unreal_local_cm": [
+        56400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.8556062579155,
+      "conditioned_visual_bed_elevation_m": 945.0931396484375,
+      "conditioned_visual_surface_normalized": 0.04300147743692508,
+      "conditioned_visual_bed_normalized": 0.011802576247204473
+    },
+    {
+      "station_m": 566.0,
+      "unreal_local_cm": [
+        56600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.8410440683365,
+      "conditioned_visual_bed_elevation_m": 945.0771484375,
+      "conditioned_visual_surface_normalized": 0.04283701415898981,
+      "conditioned_visual_bed_normalized": 0.011621973807257763
+    },
+    {
+      "station_m": 568.0,
+      "unreal_local_cm": [
+        56800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.8257442712784,
+      "conditioned_visual_bed_elevation_m": 945.0611572265625,
+      "conditioned_visual_surface_normalized": 0.04266422044810806,
+      "conditioned_visual_bed_normalized": 0.011441371367311052
+    },
+    {
+      "station_m": 570.0,
+      "unreal_local_cm": [
+        57000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.8102022409439,
+      "conditioned_visual_bed_elevation_m": 945.0451049804688,
+      "conditioned_visual_surface_normalized": 0.042488690989388386,
+      "conditioned_visual_bed_normalized": 0.011260079605074469
+    },
+    {
+      "station_m": 572.0,
+      "unreal_local_cm": [
+        57200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7951235473156,
+      "conditioned_visual_bed_elevation_m": 945.0291137695312,
+      "conditioned_visual_surface_normalized": 0.042318394388891685,
+      "conditioned_visual_bed_normalized": 0.01107947716512776
+    },
+    {
+      "station_m": 574.0,
+      "unreal_local_cm": [
+        57400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7802027463913,
+      "conditioned_visual_bed_elevation_m": 945.0130004882812,
+      "conditioned_visual_surface_normalized": 0.04214988100592025,
+      "conditioned_visual_bed_normalized": 0.010897496080601303
+    },
+    {
+      "station_m": 576.0,
+      "unreal_local_cm": [
+        57600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7653920650482,
+      "conditioned_visual_bed_elevation_m": 944.996826171875,
+      "conditioned_visual_surface_normalized": 0.04198261129768567,
+      "conditioned_visual_bed_normalized": 0.010714825673784975
+    },
+    {
+      "station_m": 578.0,
+      "unreal_local_cm": [
+        57800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7507765293121,
+      "conditioned_visual_bed_elevation_m": 944.9805908203125,
+      "conditioned_visual_surface_normalized": 0.041817545535913055,
+      "conditioned_visual_bed_normalized": 0.010531465944678771
+    },
+    {
+      "station_m": 580.0,
+      "unreal_local_cm": [
+        58000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7363871335983,
+      "conditioned_visual_bed_elevation_m": 944.9642333984375,
+      "conditioned_visual_surface_normalized": 0.041655033767077715,
+      "conditioned_visual_bed_normalized": 0.010346727570992824
+    },
+    {
+      "station_m": 582.0,
+      "unreal_local_cm": [
+        58200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7222501039505,
+      "conditioned_visual_bed_elevation_m": 944.9478149414062,
+      "conditioned_visual_surface_normalized": 0.04149537218435109,
+      "conditioned_visual_bed_normalized": 0.010161299875017004
+    },
+    {
+      "station_m": 584.0,
+      "unreal_local_cm": [
+        58400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.7080467939377,
+      "conditioned_visual_bed_elevation_m": 944.9312133789062,
+      "conditioned_visual_surface_normalized": 0.04133496204070031,
+      "conditioned_visual_bed_normalized": 0.009973804212171564
+    },
+    {
+      "station_m": 586.0,
+      "unreal_local_cm": [
+        58600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.6936587393284,
+      "conditioned_visual_bed_elevation_m": 944.9144897460938,
+      "conditioned_visual_surface_normalized": 0.041172465418106687,
+      "conditioned_visual_bed_normalized": 0.009784929904746378
+    },
+    {
+      "station_m": 588.0,
+      "unreal_local_cm": [
+        58800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.6792018413544,
+      "conditioned_visual_bed_elevation_m": 944.8977661132812,
+      "conditioned_visual_surface_normalized": 0.041009191288438065,
+      "conditioned_visual_bed_normalized": 0.009596055597321193
+    },
+    {
+      "station_m": 590.0,
+      "unreal_local_cm": [
+        59000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.6646355390549,
+      "conditioned_visual_bed_elevation_m": 944.8809814453125,
+      "conditioned_visual_surface_normalized": 0.040844681562028175,
+      "conditioned_visual_bed_normalized": 0.009406491967606135
+    },
+    {
+      "station_m": 592.0,
+      "unreal_local_cm": [
+        59200.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.6501935720444,
+      "conditioned_visual_bed_elevation_m": 944.8641967773438,
+      "conditioned_visual_surface_normalized": 0.04068157606051738,
+      "conditioned_visual_bed_normalized": 0.009216928337891075
+    },
+    {
+      "station_m": 594.0,
+      "unreal_local_cm": [
+        59400.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.6360461711884,
+      "conditioned_visual_bed_elevation_m": 944.8475341796875,
+      "conditioned_visual_surface_normalized": 0.040521797346854786,
+      "conditioned_visual_bed_normalized": 0.009028743352755764
+    },
+    {
+      "station_m": 596.0,
+      "unreal_local_cm": [
+        59600.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.621918797493,
+      "conditioned_visual_bed_elevation_m": 944.8309326171875,
+      "conditioned_visual_surface_normalized": 0.04036224481706855,
+      "conditioned_visual_bed_normalized": 0.008841247689910323
+    },
+    {
+      "station_m": 598.0,
+      "unreal_local_cm": [
+        59800.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.6072297096252,
+      "conditioned_visual_bed_elevation_m": 944.8145141601562,
+      "conditioned_visual_surface_normalized": 0.04019634836808333,
+      "conditioned_visual_bed_normalized": 0.008655819993934503
+    },
+    {
+      "station_m": 600.0,
+      "unreal_local_cm": [
+        60000.0,
+        16000.0
+      ],
+      "conditioned_visual_surface_elevation_m": 947.5927879810333,
+      "conditioned_visual_bed_elevation_m": 944.798095703125,
+      "conditioned_visual_surface_normalized": 0.04003324555923773,
+      "conditioned_visual_bed_normalized": 0.008470392297958682
+    }
+  ]
+}

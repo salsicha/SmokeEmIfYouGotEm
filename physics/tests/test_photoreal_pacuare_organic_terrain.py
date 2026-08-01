@@ -31,7 +31,8 @@ def test_pacuare_organic_material_is_river_local_and_non_displacing():
         "BuildPacuareOrganicRainforestBaseColor"
     ) in base_source
     assert (
-        'Candidate.PreviewSpec.RiverId == TEXT("pacuare") ? '
+        'Candidate.PreviewSpec.RiverId == TEXT("pacuare") || '
+        'Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? '
         "MSM_DefaultLit : MSM_Unlit"
     ) in base_source
     assert "WorldPositionOffset" not in material_source

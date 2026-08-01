@@ -321,8 +321,15 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     0.34f,
                     0.70f,
                     FMath::Clamp(FoamNoiseA * 0.68f + FoamNoiseB * 0.32f, 0.0f, 1.0f));
+                const bool bColoradoHanceFoam =
+                    Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+                const float FoamBaseCoverage = bColoradoHanceFoam ? 0.46f : 0.28f;
+                const float FoamBreakupCoverage = 1.0f - FoamBaseCoverage;
+                const float FoamGain = bColoradoHanceFoam ? 1.10f : 0.94f;
                 const float FoamOpacity = FMath::Clamp(
-                    SolverHydraulicAerationT * (0.28f + FoamBreakup * 0.72f) * 0.94f,
+                    SolverHydraulicAerationT *
+                        (FoamBaseCoverage + FoamBreakup * FoamBreakupCoverage) *
+                        FoamGain,
                     0.0f,
                     0.94f);
                 SolverFoamVertexColors.Add(
@@ -416,8 +423,19 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         {
             FoamActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
             FoamActor->Tags.AddUnique(TEXT("RaftSimSolverFieldFoam"));
-            FoamActor->Tags.AddUnique(TEXT("RaftSimPacuareUpperHuacasSolverVisualization"));
-            FoamActor->Tags.AddUnique(TEXT("RaftSimPacuareCaptureOnlyWater"));
+            FoamActor->Tags.AddUnique(TEXT("RaftSimCaptureOnlyWater"));
+            if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimPacuareUpperHuacasSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimPacuareCaptureOnlyWater"));
+            }
+            else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimColoradoHanceSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceCaptureOnlyWater"));
+            }
         }
     }
     return WaterActor;
@@ -816,9 +834,69 @@ bool AddLandscapeCandidateRunnableGameplay(
     const bool bZambezi =
         Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
     const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
-    if (!bZambezi && !bPacuare)
+    const bool bColoradoHance =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    if (!bZambezi && !bPacuare && !bColoradoHance)
     {
         return true;
+    }
+
+    FString RuntimeConfigLabel;
+    FString CookedFieldsDir;
+    FName FlowBand;
+    FVector2D WindowCenterM;
+    float WindowExtentM = 0.0f;
+    FString CoordinateMapPath;
+    FName RunTag;
+    FString PlayerRaftLabel;
+    FString DisplayName;
+    if (bPacuare)
+    {
+        RuntimeConfigLabel = TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+                 "scenario_upper_huacas/cooked_flow_fields");
+        FlowBand = FName(TEXT("rainfed_runnable_planning"));
+        WindowCenterM = FVector2D(300.0f, 0.0f);
+        WindowExtentM = 700.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/"
+                 "upper_huacas_visual/upper_huacas_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimPacuareUpperHuacasRun"));
+        PlayerRaftLabel = TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
+        DisplayName = TEXT("Pacuare Upper Huacas");
+    }
+    else if (bColoradoHance)
+    {
+        RuntimeConfigLabel = TEXT("RaftSim_ColoradoHance_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/"
+                 "scenario_hance/cooked_flow_fields");
+        FlowBand = FName(TEXT("moderate_release_planning"));
+        WindowCenterM = FVector2D(300.0f, 0.0f);
+        WindowExtentM = 700.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/"
+                 "hance_visual/hance_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimColoradoHanceRun"));
+        PlayerRaftLabel = TEXT("RaftSim_ColoradoHance_PlayerRaft");
+        DisplayName = TEXT("Colorado Hance");
+    }
+    else
+    {
+        RuntimeConfigLabel = TEXT("RaftSim_Zambezi_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                 "scenario_zambezi_run/runtime/cooked_flow_fields");
+        FlowBand = FName(TEXT("normal_big_water"));
+        WindowCenterM = FVector2D(15000.0f, 0.0f);
+        WindowExtentM = 32000.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+                 "scenario_zambezi_run/runtime/river_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimZambeziRun"));
+        PlayerRaftLabel = TEXT("RaftSim_Zambezi_PlayerRaft");
+        DisplayName = TEXT("Zambezi");
     }
 
     TArray<FRaftSimLandscapeCandidateCenterlinePoint> Points;
@@ -828,7 +906,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    const float StartProgress = bPacuare ? 0.04f : 0.0025f;
+    const bool bReachLocalRun = bPacuare || bColoradoHance;
+    const float StartProgress = bReachLocalRun ? 0.04f : 0.0025f;
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
         Candidate,
@@ -873,32 +952,16 @@ bool AddLandscapeCandidateRunnableGameplay(
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
-    WaterConfig->SetActorLabel(
-        bPacuare
-            ? TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig")
-            : TEXT("RaftSim_Zambezi_RuntimeWaterConfig"));
-    WaterConfig->CookedFieldsDir = bPacuare
-        ? TEXT("physics/data/real_world/pacuare_river_costa_rica/"
-               "scenario_upper_huacas/cooked_flow_fields")
-        : TEXT("physics/data/real_world/zambezi_batoka_gorge/"
-               "scenario_zambezi_run/runtime/cooked_flow_fields");
-    WaterConfig->FlowBand = bPacuare
-        ? FName(TEXT("rainfed_runnable_planning"))
-        : FName(TEXT("normal_big_water"));
-    WaterConfig->WindowCenterM = bPacuare
-        ? FVector2D(300.0f, 0.0f)
-        : FVector2D(15000.0f, 0.0f);
-    WaterConfig->WindowExtentM = bPacuare ? 700.0f : 32000.0f;
+    WaterConfig->SetActorLabel(RuntimeConfigLabel);
+    WaterConfig->CookedFieldsDir = CookedFieldsDir;
+    WaterConfig->FlowBand = FlowBand;
+    WaterConfig->WindowCenterM = WindowCenterM;
+    WaterConfig->WindowExtentM = WindowExtentM;
     WaterConfig->bRecenterHydraulicCrux = false;
-    WaterConfig->CoordinateMapPath = bPacuare
-        ? TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/"
-               "upper_huacas_visual/upper_huacas_runtime_coordinate_map.json")
-        : TEXT("physics/data/real_world/zambezi_batoka_gorge/"
-               "scenario_zambezi_run/runtime/river_coordinate_map.json");
+    WaterConfig->CoordinateMapPath = CoordinateMapPath;
     WaterConfig->bEnableMovingWindowStreaming = false;
     WaterConfig->bMapProvidesTerrain = true;
-    WaterConfig->Tags.AddUnique(
-        bPacuare ? TEXT("RaftSimPacuareUpperHuacasRun") : TEXT("RaftSimZambeziRun"));
+    WaterConfig->Tags.AddUnique(RunTag);
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimSafeLaunchApron"));
@@ -925,12 +988,8 @@ bool AddLandscapeCandidateRunnableGameplay(
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
-    Raft->SetActorLabel(
-        bPacuare
-            ? TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft")
-            : TEXT("RaftSim_Zambezi_PlayerRaft"));
-    Raft->Tags.AddUnique(
-        bPacuare ? TEXT("RaftSimPacuareUpperHuacasRun") : TEXT("RaftSimZambeziRun"));
+    Raft->SetActorLabel(PlayerRaftLabel);
+    Raft->Tags.AddUnique(RunTag);
     Raft->Tags.AddUnique(TEXT("RaftSimReferenceRunnable"));
 
     bool bPlayerStartPositioned = false;
@@ -944,8 +1003,7 @@ bool AddLandscapeCandidateRunnableGameplay(
             FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + 170.0f) -
                 StartTangent * 500.0f,
             StartRotation);
-        It->Tags.AddUnique(
-            bPacuare ? TEXT("RaftSimPacuareUpperHuacasRun") : TEXT("RaftSimZambeziRun"));
+        It->Tags.AddUnique(RunTag);
         bPlayerStartPositioned = true;
         break;
     }
@@ -957,17 +1015,19 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    if (bPacuare)
+    if (bReachLocalRun)
     {
         // The authored ribbon is used for deterministic editor captures. In
         // gameplay, hide it so the solver-driven ARaftSimWaterSurfaceActor is
         // the only visible surface and the same cooked field owns forces and
         // hydraulics.
+        const FString RibbonLabel = FString::Printf(
+            TEXT("RaftSim_PhysicalCorridorRiverRibbon_%s"),
+            *Candidate.PreviewSpec.RiverId);
         for (TActorIterator<AActor> It(World); It; ++It)
         {
-            if (!It->GetActorLabel().Contains(
-                    TEXT("RaftSim_PhysicalCorridorRiverRibbon_pacuare")) &&
-                !It->Tags.Contains(TEXT("RaftSimPacuareCaptureOnlyWater")))
+            if (!It->GetActorLabel().Contains(RibbonLabel) &&
+                !It->Tags.Contains(TEXT("RaftSimCaptureOnlyWater")))
             {
                 continue;
             }
@@ -981,7 +1041,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         TEXT("Added reference-runnable %s gameplay at station %.1f m: "
              "live cooked-field water, player raft, player start, and vertical-slice "
              "game mode; terrain, flow calibration, and production art remain review-gated.\n"),
-        bPacuare ? TEXT("Pacuare Upper Huacas") : TEXT("Zambezi"),
+        *DisplayName,
         Points.Last().StationMeters * StartProgress);
     return true;
 }
@@ -1059,8 +1119,8 @@ void RepositionLandscapeCandidatePhysicalCameras(
     };
     if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 230.0f, 150.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.450f, 0.565f, 175.0f, 125.0f);
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.650f, 0.750f, 260.0f, 105.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.685f, 0.785f, 170.0f, 85.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
     {
@@ -1087,7 +1147,11 @@ void RepositionLandscapeCandidatePhysicalCameras(
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 330.0f, 180.0f);
         SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.275f, 0.390f, 270.0f, 165.0f);
     }
-    if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.705f, 0.805f, 185.0f, 90.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
     {
         SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.430f, 0.515f, 330.0f, 130.0f);
     }

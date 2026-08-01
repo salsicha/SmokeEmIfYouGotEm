@@ -1,0 +1,69 @@
+{
+  "schema": "raftsim.colorado.hance_visual_terrain.v1",
+  "status": "generated_review_gated_reach_local_visual_and_collision_infill_not_survey_solver_or_production_terrain_authority",
+  "river_id": "colorado_river",
+  "section_id": "hance_corridor_station_1250m_c3_window",
+  "reference_flow_band": "moderate_release_planning",
+  "inputs": {
+    "window_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/window_manifest.json",
+    "window_manifest_sha256": "5d0efe39eee13d49b64523424a13c7e7f0be55b931d87252d2a88f6def8d138e",
+    "cooked_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/manifest.json",
+    "cooked_manifest_sha256": "db4aa87a2e457e1cd5e4134d80bd80920f6ff52e8716cbb175fc8fb0f3a8818a",
+    "bed": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/bed.npy",
+    "bed_sha256": "097b041659accdaacac318e2f7e145473992729c90c3bde400b09a5b322f2370",
+    "depth": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/h.npy",
+    "depth_sha256": "ef1f0c09813b95ae2ac4775000fdc04c5a1b28464b3cfae3113ca726159d1a5b",
+    "wet_mask": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning/wet_mask.npy",
+    "wet_mask_sha256": "356176740856ca15393cf94acaf46a26b220a9fe54685bd3ce15cab61966e76a"
+  },
+  "outputs": {
+    "heightfield": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png",
+    "heightfield_sha256": "4e51c6e97d43187a7bbd64f0fbea856b2e521f5c126e9cb5f69ed6bee3b030b5",
+    "local_centerline": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_local_centerline.json",
+    "local_centerline_sha256": "374d2b45a27e2ad9b065a4fd563d5645770a739428d29e9d974cad944def23bf",
+    "runtime_coordinate_map": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_runtime_coordinate_map.json",
+    "runtime_coordinate_map_sha256": "d3b3a75db55fc7f6fecd9e26af6c8827e417c9cce33cdb20a990b64738226768"
+  },
+  "landscape": {
+    "size_px": 1009,
+    "pixel_format": "16_bit_grayscale_png",
+    "horizontal_span_x_m": 600.0,
+    "horizontal_span_y_m": 320.0,
+    "source_solver_span_y_m": 78.0,
+    "sample_spacing_x_m": 0.5952380952380952,
+    "sample_spacing_y_m": 0.31746031746031744,
+    "terrain_min_m": 944.048095703125,
+    "terrain_max_m": 1032.591810517933,
+    "target_relief_cm": 8854.371481480803,
+    "world_vertical_offset_cm": -666.5287645079843,
+    "runtime_vertical_datum_m": 950.7133833482048
+  },
+  "procedural_infill": {
+    "algorithm": "deterministic_asymmetric_stratified_desert_canyon_v1",
+    "source_solver_half_width_m": 39.0,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_source_join_step_m": 0.007589998334554935,
+    "maximum_added_canyon_relief_m": 74.97718291544122,
+    "authority": "visual and Landscape collision infill only outside the complete C3 solver strip; cooked bed, water state, and raft forces are unchanged"
+  },
+  "alignment": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0,
+    "static_water_flow_offset_cm": 0.0
+  },
+  "honesty": {
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "source_reach_limitation": "The only committed Colorado corridor terrain is the Lees Ferry pilot reach (river mile ~1.4-2.9); Hance's published location is river mile 77.1, far downstream and NOT inside the committed corridor. This window uses the committed Lees Ferry corridor as an interpreted big-water canyon valley frame for the authored Hance features; it is not a survey of the Hance reach.",
+    "procedural_gap_fill_authority": "visual_and_collision_infill_not_survey",
+    "solver_authority": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/manifest.json",
+    "production_promoted": false,
+    "pending_human_review": true,
+    "missing": [
+      "surveyed Hance bathymetry, bank breaklines, and canyon terrain",
+      "reviewed Hance planform and river-mile registration",
+      "USGS release-history calibration",
+      "guide, geospatial, ecology, art, and performance acceptance"
+    ]
+  }
+}

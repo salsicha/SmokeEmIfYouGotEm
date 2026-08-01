@@ -3649,3 +3649,21 @@ path is verified, and the completion goal can be marked complete.
   riverbed optics, higher-resolution geography, and named guide/geospatial/
   hydraulic/ecology/art/performance approval keep M9 and photoreal promotion
   open.
+- Colorado Hance reach-local runnable V1 replaces the flat signature-rapid
+  shell and the scale-mismatched Lees Ferry preview without presenting either
+  as surveyed Hance terrain. `L_Hance` now contains a 600×320 m, 1009×1009
+  Landscape that preserves every sample of the complete 600×78 m interpreted
+  C3 bed and adds deterministic asymmetric canyon relief only outside the
+  protected 39 m solver half-width. A 301-point station/lateral map applies the
+  950.713 m runtime datum with 0.0 m centerline error. The moderate-release
+  cooked field, player raft/start, and vertical-slice game mode make the map
+  reference-runnable; the authored field-derived ribbon and foam remain
+  capture-only, non-colliding, and hidden during play. The editor builds, the
+  focused runnable PIE gate passes 1/1 with an upright raft and zero swimmers,
+  MapCheck reports 0 errors and 0 warnings, and the deterministic terrain,
+  water, authority, and artifact-hash contracts pass. The canonical views are
+  still photoreal-rejected for smooth tessellated-looking canyon walls, sparse
+  generic ecology and ground cover, dark opaque stepped water, coarse foam
+  mats, missing surveyed Hance geography, unconverged hydraulics, and open
+  guide/geospatial/geology/ecology/water-VFX/performance acceptance gates; M9
+  remains open.

@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Restored Colorado Hance as a physical reach-local runnable map instead of a
+  flat rapid shell or mismatched Lees Ferry preview. The 600×320 m Landscape
+  preserves the complete interpreted 600×78 m cooked-field bed, procedurally
+  fills only the missing outer canyon, aligns the 950.713 m runtime datum, and
+  launches live moderate-release solver water with the player raft and game
+  mode. Focused PIE and MapCheck gates pass; surveyed Hance geography,
+  converged/calibrated hydraulics, organic ecology, photoreal water and foam,
+  guide review, and production performance acceptance remain explicitly open.
 - Pacuare Upper Huacas now derives its capture-only water color, bounded surface
   relief, and separate masked foam sheet from the committed rain-fed cooked
   depth/speed/Froude field. Canonical cameras frame the station 286 m hydraulic
