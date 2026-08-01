@@ -211,7 +211,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
         ),
         "pacuare": (
             "unreal/Content/RaftSim/Materials/LandscapeCandidates/"
-            "M_RaftSim_pacuare_SourceLandscapeCandidate.uasset"
+            "M_RaftSim_pacuare_physicalcorridor_SourceLandscapeCandidate.uasset"
         ),
         "zambezi_batoka_gorge": (
             "unreal/Content/RaftSim/Materials/LandscapeCandidates/"
@@ -241,8 +241,8 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             "trunks": 0,
         },
         "pacuare": {
-            "boulders": 48,
-            "foliage": 420,
+            "boulders": 180,
+            "foliage": 12000,
             "trunks": 0,
         },
         "zambezi_batoka_gorge": {
@@ -477,12 +477,16 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
 
     for candidate in manifest["candidates"]:
         is_south_fork_physical_corridor = candidate["river_id"] == "american_south_fork"
+        is_reach_local_pacuare = candidate["river_id"] == "pacuare"
         is_source_scale_physical_corridor = candidate["river_id"] in {
             "american_south_fork",
             "colorado_river",
             "zambezi_batoka_gorge",
             "futaleufu_terminator",
         }
+        is_conditioned_physical_corridor = (
+            is_source_scale_physical_corridor or is_reach_local_pacuare
+        )
         has_reviewed_rocks = candidate["river_id"] in {
             "american_south_fork",
             "zambezi_batoka_gorge",
@@ -505,12 +509,14 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
         assert candidate["heightfield_height_px"] == (
             2017 if is_source_scale_physical_corridor else 1009
         )
-        assert candidate["component_count_total"] == 256
+        assert candidate["component_count_total"] == (
+            64 if is_reach_local_pacuare else 256
+        )
         assert candidate["num_subsections"] == (
-            2 if is_source_scale_physical_corridor else 1
+            2 if is_conditioned_physical_corridor else 1
         )
         assert candidate["subsection_size_quads"] == 63
-        if is_source_scale_physical_corridor:
+        if is_conditioned_physical_corridor:
             assert candidate["preview_channel_modified_sample_count"] == 0
             assert candidate["channel_burn_policy"] == (
                 "source_manifest_recorded_bounded_hydrologic_channel_conditioning"
@@ -891,7 +897,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             )
             assert candidate["water_solver_foam_max_opacity"] == 0.0
             assert candidate["water_solver_foam_surface_offset_cm"] == 0.0
-        elif is_source_scale_physical_corridor:
+        elif is_conditioned_physical_corridor:
             assert candidate["solver_rapid_river_eye_capture"] == ""
             assert candidate["solver_rapid_capture_status"] == (
                 "not_available_without_river_specific_validated_solver_field"
@@ -982,17 +988,25 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             if is_source_scale_physical_corridor
             else "nanite_and_static_lighting"
         )
-        assert candidate["material_bound_component_count"] == 256
+        assert candidate["material_bound_component_count"] == (
+            64 if is_reach_local_pacuare else 256
+        )
         assert candidate["material_binding_status"] == "all_source_components_bound"
         assert candidate["nanite_enabled"] is (not is_source_scale_physical_corridor)
         assert candidate["nanite_component_count"] == (
-            0 if is_source_scale_physical_corridor else 4
+            0
+            if is_source_scale_physical_corridor
+            else (1 if is_reach_local_pacuare else 4)
         )
         assert candidate["nanite_material_slot_count"] == (
-            0 if is_source_scale_physical_corridor else 256
+            0
+            if is_source_scale_physical_corridor
+            else (64 if is_reach_local_pacuare else 256)
         )
         assert candidate["nanite_material_bound_slot_count"] == (
-            0 if is_source_scale_physical_corridor else 256
+            0
+            if is_source_scale_physical_corridor
+            else (64 if is_reach_local_pacuare else 256)
         )
         assert candidate["nanite_material_audit_error_count"] == 0
         assert candidate["nanite_representation_status"] == (

@@ -18,8 +18,8 @@ bool FRaftSimPacuareOrganicRainforestTerrainTest::RunTest(
     UMaterial* Material = LoadObject<UMaterial>(
         nullptr,
         TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
-             "M_RaftSim_pacuare_SourceLandscapeCandidate."
-             "M_RaftSim_pacuare_SourceLandscapeCandidate"));
+             "M_RaftSim_pacuare_physicalcorridor_SourceLandscapeCandidate."
+             "M_RaftSim_pacuare_physicalcorridor_SourceLandscapeCandidate"));
     TestNotNull(TEXT("Pacuare source Landscape material exists"), Material);
     if (!Material)
     {
@@ -132,8 +132,8 @@ bool FRaftSimPacuareRainforestDefaultLitWaterTest::RunTest(
     UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
         nullptr,
         TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
-             "MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate."
-             "MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate"));
+             "MI_RaftSim_Pacuare_PhysicalCorridorWaterCandidate."
+             "MI_RaftSim_Pacuare_PhysicalCorridorWaterCandidate"));
     TestNotNull(TEXT("Pacuare water instance exists"), Instance);
     if (!Instance)
     {

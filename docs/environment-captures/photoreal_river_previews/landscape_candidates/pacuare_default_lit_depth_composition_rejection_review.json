@@ -6,7 +6,7 @@
   "supersedes_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_rainforest_single_layer_water_v1_review.json",
   "decision": {
     "active_parent": "/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater",
-    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Pacuare_PhysicalCorridorWaterCandidate",
     "shading_model": "DefaultLit",
     "blend_mode": "Opaque",
     "single_layer_water_active": false,
@@ -42,12 +42,12 @@
     {
       "view": "guide_seat_downstream",
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "d3b65e7c55f951d246e96850a4dcef70d92255645b8eb2b49d6b4ad2494e7a76"
+      "sha256": "c6ee08bf9b72f215b04feace792de7e95dcbf34fa15d17cc78be663a80cdc6d7"
     },
     {
       "view": "river_eye_downstream",
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "4ba0127f141b993be848567c3b0a3400ab4a4cb095a08d5d094d505bbcd1d57b"
+      "sha256": "ae5f2e49623feefcfe0d715ec1cf5c299c4bf83801149ca8045e4338b663b5cb"
     }
   ],
   "visual_assessment": {

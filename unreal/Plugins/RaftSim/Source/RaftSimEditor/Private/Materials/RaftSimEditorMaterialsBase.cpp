@@ -241,7 +241,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         DetailAssetName,
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailNormal"));
-    if (Candidate.bPhysicalScaleSourceCorridor)
+    if (Candidate.bPhysicalScaleSourceCorridor &&
+        Candidate.bUseDensePhysicalTerrainRenderSurface)
     {
         SourceMacroAlbedo = LoadCandidateTexture(
             TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),

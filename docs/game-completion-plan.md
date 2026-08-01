@@ -3632,3 +3632,20 @@ path is verified, and the completion goal can be marked complete.
   Pacuare solver hydraulics/foam/spray, production water and bank transitions,
   performance evidence, and named guide/art/ecology/geospatial acceptance still block
   photoreal and M9 promotion.
+- Pacuare Upper Huacas reach-local runnable V1 supersedes the scale-mismatched
+  broad DEM preview and the flat signature-rapid shell without claiming source
+  fidelity that is not available. `L_UpperHuacas` now contains a physical
+  600×78 m, 1009×1009 Landscape built from the committed C3 bed, with no
+  procedural change inside the protected 17 m channel half-width or at the map
+  perimeter and no more than 0.38 m of deterministic outer-bank relief. A
+  301-point identity station/lateral map applies the measured 454.283 m runtime
+  datum; static and live centerline surfaces agree to 0.0 m. During play the
+  capture ribbon is hidden and the live finite-volume field owns rendering and
+  forces. The rebuilt map passes 0/0 MapCheck, the focused runnable PIE gate
+  1/1 with an upright raft and zero swimmers, both Pacuare material tests 2/2,
+  and the deterministic terrain contracts. The new views remove the huge DEM
+  facets and rectangular shoreline, but dark opaque water, generic sample
+  foliage, absent visible rapid foam/spray at launch, missing production bank/
+  riverbed optics, higher-resolution geography, and named guide/geospatial/
+  hydraulic/ecology/art/performance approval keep M9 and photoreal promotion
+  open.

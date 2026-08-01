@@ -31,7 +31,7 @@ the full-corridor Zambezi reference run:
 |---|---|---|---|---|
 | South Fork American | `south_fork_american_chili_bar` | **Troublemaker** (+ Meat Grinder) | `L_Troublemaker` | **DONE, playable** |
 | Colorado Grand Canyon | `colorado_river_grand_canyon_rowing` | **Hance** | `L_Hance` | to build |
-| Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | to build |
+| Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | to build |
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | to build |
 | Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | **reference runnable; production hydraulics gated** |
@@ -110,3 +110,20 @@ and external acceptance gates pass.
   photoreal review: the water is overbright and low-detail, the terrain remains
   rounded and tessellated-looking, and biome/ground-cover fidelity is still
   provisional.
+
+### 2026-08-01 — Pacuare Upper Huacas physical runnable map restored
+
+- `L_UpperHuacas` now delegates to the source-Landscape builder instead of the
+  old flat signature-rapid shell. The saved map contains a 1009×1009,
+  8×8-component Landscape over the physical 600×78 m C3 window, with bounded
+  deterministic bank relief outside a protected 17 m channel half-width.
+- An identity station/lateral coordinate map applies the recorded 454.283 m
+  vertical datum, aligning absolute cooked elevations with the local Unreal
+  reach. Static capture water matches the live centerline surface exactly; it
+  is hidden in play so solver water alone renders and drives the raft.
+- `RaftSim.P4.RiverMapLoads.L_UpperHuacas` passes with a wet finite live window,
+  an upright raft, and zero swimmers. Both Pacuare material tests pass and
+  MapCheck reports 0 errors/0 warnings. The new captures remove the gross DEM
+  facets and rectangular shoreline, but opaque water, generic foliage,
+  incomplete whitewater VFX, source fidelity, and external guide/geospatial/
+  ecology/art/performance approvals still reject photoreal promotion.

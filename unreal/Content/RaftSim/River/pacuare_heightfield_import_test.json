@@ -1,34 +1,38 @@
 {
   "asset_class": "URaftSimGeospatialHeightfieldImportTestConfig",
-  "schema": "raftsim.unreal.heightfield_import_test.v1",
+  "schema": "raftsim.unreal.heightfield_import_test.v2",
   "river_id": "pacuare",
-  "section_id": "lower_pacuare_planning_corridor",
-  "status": "review_gated_not_enabled_for_preview_maps",
+  "section_id": "upper_huacas_station_17000m_c3_window",
+  "status": "enabled_for_reach_local_runnable_visual_and_collision_candidate_not_production_promotion",
   "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/source_manifest.json",
   "heightfield_candidate": {
-    "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png",
-    "manifest": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
+    "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png",
+    "manifest": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_visual_terrain_manifest.json",
     "format": "16-bit grayscale PNG",
     "size_px": 1009,
-    "source_crs": "EPSG:4326 source bounds; final Costa Rica working CRS not selected",
-    "elevation_min_m": 16.122909545898438,
-    "elevation_max_m": 3230.446044921875,
-    "normalization": "0..65535 maps linearly to recorded elevation_min_m..elevation_max_m"
+    "source_crs": "channel-following Upper Huacas C3 meters; planform/station remains pending review",
+    "elevation_min_m": 449.5815124511719,
+    "elevation_max_m": 473.53817967006137,
+    "normalization": "0..65535 maps linearly to the manifest-recorded conditioned reach-local terrain range",
+    "horizontal_span_x_m": 600.0,
+    "horizontal_span_y_m": 78.0,
+    "world_vertical_offset_cm": -470.15965990274253,
+    "runtime_coordinate_map": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_runtime_coordinate_map.json",
+    "runtime_vertical_datum_m": 454.2831090501993
   },
   "target_unreal": {
-    "preview_map": "/Game/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview",
-    "intended_import_target": "Unreal Landscape import-test level or replacement terrain layer",
-    "enabled_for_automation": false,
-    "reason_disabled": "Heightfield is not clipped, reprojected, conditioned, channel-burned, or guide-reviewed."
+    "preview_map": "/Game/RaftSim/Maps/L_UpperHuacas",
+    "intended_import_target": "Reach-local runnable Upper Huacas Landscape candidate",
+    "enabled_for_automation": true,
+    "authority_limit": "visual and Landscape collision candidate only; live cooked C3 fields remain water/force authority"
   },
   "required_before_enable": [
     "Select Costa Rica working CRS and record WGS84/local/Unreal transforms.",
-    "Clip the DEM to a reviewed Pacuare corridor rather than the current broad planning bounds.",
-    "Void/artifact review the Copernicus DEM and compare against official SNIT/IDECORI or field-reviewed sources.",
-    "Hydrologically condition the river channel, bank breaklines, access edges, shelves, and tributary context.",
-    "Burn or otherwise encode the reviewed river centerline/channel so the Landscape import does not fight the validated water geometry.",
+    "Replace the order-only/curvilinear Upper Huacas planform with reviewed stationing and route geometry.",
+    "Void/artifact review the Copernicus DEM and compare against official SNIT/IDECORI, field, or survey sources.",
+    "Replace interpreted channel, bank, and sub-DEM relief with reviewed bank breaklines, shelves, and bathymetry where available.",
     "Attach protected-area/access review and guide review before publishing detailed route packages.",
-    "Run editor import/export validation and capture before replacing the current procedural preview terrain."
+    "Pass guide, geospatial, ecology, art, hazard-readability, and desktop/VR performance review before production promotion."
   ],
   "validation_actions": [
     "RaftSim.SourceChecks",
@@ -37,7 +41,8 @@
     "RaftSim.CapturePhotorealEnvironmentPreviews"
   ],
   "notes": [
-    "This contract exists so the Pacuare heightfield artifact has a clear Unreal-side target and gate.",
-    "It must not be treated as production terrain or solver geometry until the conditioning gates pass."
+    "The earlier broad 37x44 km GLO-30 sample was incorrectly squeezed over a 323x55 m visual map; it is retained as source history but no longer drives L_UpperHuacas.",
+    "The active heightfield uses the committed 600x78 m C3 bed and preserves a 17 m half-width protected channel while adding at most 0.38 m deterministic bank infill.",
+    "It must not be treated as surveyed/production terrain or solver geometry; the cooked Upper Huacas fields remain runtime water and force authority."
   ]
 }

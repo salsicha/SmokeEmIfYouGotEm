@@ -11,6 +11,12 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
+Pacuare's `L_UpperHuacas` is again a runnable map: a physical 600 m reach-local
+Landscape, the committed Upper Huacas cooked solver field, explicit vertical
+datum alignment, player raft/start, and the full vertical-slice game mode now
+ship together. It is reference-runnable, not photoreal-approved; the evidence
+and remaining gates are recorded in
+[the Upper Huacas runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_upper_huacas_reach_local_runnable_v1_review.json).
 See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
 milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 
@@ -18,7 +24,7 @@ milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 |---|---|---|
 | South Fork American | Chili Bar to Salmon Falls plus Troublemaker | production campaign |
 | Colorado, Grand Canyon | Hance | signature-rapid Free Run |
-| Pacuare | Upper Huacas | signature-rapid Free Run |
+| Pacuare | Upper Huacas | runnable reference signature-rapid Free Run |
 | Futaleufú | Terminator | signature-rapid Free Run |
 | Chilko | Lava Canyon | signature-rapid Free Run |
 | Zambezi, Batoka Gorge | Boiling Pot to Mukuni Beach, Rapids 1–25 | runnable reference Free Run |

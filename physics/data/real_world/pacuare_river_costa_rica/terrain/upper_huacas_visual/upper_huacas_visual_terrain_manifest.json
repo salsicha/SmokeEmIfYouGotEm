@@ -1,0 +1,70 @@
+{
+  "schema": "raftsim.pacuare.upper_huacas_visual_terrain.v1",
+  "status": "generated_review_gated_reach_local_visual_and_collision_infill_not_solver_survey_or_production_terrain_authority",
+  "river_id": "pacuare",
+  "section_id": "upper_huacas_station_17000m_c3_window",
+  "reference_flow_band": "rainfed_runnable_planning",
+  "inputs": {
+    "window_manifest": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/window_manifest.json",
+    "window_manifest_sha256": "7d5bf1f09ee2b4996afa39e38d3d7cd70b49e20cd7ab23b43f02815de09682df",
+    "cooked_manifest": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/manifest.json",
+    "cooked_manifest_sha256": "9bd0ff4288f58d7b11ae47494a652e629d425f94367b47db7d8a48fe1b073d67",
+    "bed": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/bed.npy",
+    "bed_sha256": "e8903570072f2bbe259ce70395350d596c19ea309f949ec68869db2a9c17d390",
+    "depth": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/h.npy",
+    "depth_sha256": "1d10c9c2aeb176754cb5ed56b56c8740c960ec405301770f8522503128f063db",
+    "wet_mask": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning/wet_mask.npy",
+    "wet_mask_sha256": "beda0440ed95e9271ecec2eb317a852fc0db0a0ba8639c67dba3a0f08b8ce5ef"
+  },
+  "outputs": {
+    "heightfield": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png",
+    "heightfield_sha256": "223cdbef34dc68e063168b99dc9b198a7832bdd0b61b8d466cf3180dd2367204",
+    "local_centerline": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_local_centerline.json",
+    "local_centerline_sha256": "f04f801b130936913811ab50cc6f53547acf3c2bc91739d852dd074e88b3e448",
+    "runtime_coordinate_map": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_runtime_coordinate_map.json",
+    "runtime_coordinate_map_sha256": "b6557e2cb29840489c41830337c56c266df23da8c9865172953d6bd432fcca1b"
+  },
+  "landscape": {
+    "size_px": 1009,
+    "pixel_format": "16_bit_grayscale_png",
+    "horizontal_span_x_m": 600.0,
+    "horizontal_span_y_m": 78.0,
+    "sample_spacing_x_m": 0.5952380952380952,
+    "sample_spacing_y_m": 0.07738095238095238,
+    "terrain_min_m": 449.5815124511719,
+    "terrain_max_m": 473.53817967006137,
+    "target_relief_cm": 2395.6667218889493,
+    "world_vertical_offset_cm": -470.15965990274253,
+    "runtime_vertical_datum_m": 454.2831090501993
+  },
+  "procedural_infill": {
+    "algorithm": "deterministic_domain_warped_multiscale_bank_relief_v1",
+    "maximum_absolute_relief_m": 0.38,
+    "protected_channel_half_width_m": 17.0,
+    "full_infill_cross_channel_m": 29.0,
+    "longitudinal_edge_fade_m": 14.0,
+    "cross_channel_edge_fade_m": 4.0,
+    "maximum_protected_channel_change_m": 0.0,
+    "maximum_map_edge_change_m": 0.0,
+    "authority": "bounded_visual_and_landscape_collision_infill_only; cooked C3 bed, water state, solver forces, and source macroscale terrain are unchanged"
+  },
+  "alignment": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_matches_runtime_cross_channel_m": true,
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0,
+    "static_water_flow_offset_cm": 0.0
+  },
+  "honesty": {
+    "source_macro_geometry_authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "procedural_gap_fill_authority": "visual_and_collision_infill_not_survey",
+    "solver_authority": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/manifest.json",
+    "production_promoted": false,
+    "pending_human_review": true,
+    "missing": [
+      "surveyed bathymetry and bank breaklines",
+      "reviewed exact Upper Huacas stationing and planform",
+      "higher-resolution route-local terrain",
+      "guide, geospatial, ecology, art, and performance acceptance"
+    ]
+  }
+}

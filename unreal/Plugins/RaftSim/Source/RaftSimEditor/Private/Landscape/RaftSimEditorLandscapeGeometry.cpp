@@ -89,6 +89,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     int32 ConditionedProfileCenterCount = 0;
     const bool bChilkoSourceScale =
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
     {
@@ -103,7 +104,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             const float T = static_cast<float>(Step) / static_cast<float>(Steps);
             const FVector2D Local = FMath::Lerp(A.LocalCm, B.LocalCm, T);
             Centers.Add(FVector2D(
-                -5800.0f + Local.X,
+                LandscapeMinX + Local.X,
                 -Candidate.HorizontalSpanYCm * 0.5f + Local.Y));
             StationsCm.Add(FMath::Lerp(A.StationMeters, B.StationMeters, T) * 100.0f);
             if (A.bHasConditionedVisualSurface && B.bHasConditionedVisualSurface)
@@ -112,7 +113,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     FMath::Lerp(
                         A.ConditionedVisualSurfaceNormalized,
                         B.ConditionedVisualSurfaceNormalized,
-                        T) * Candidate.TargetReliefCm);
+                        T) * Candidate.TargetReliefCm +
+                    Candidate.WorldVerticalOffsetCm);
                 ++ConditionedProfileCenterCount;
             }
             else
@@ -127,13 +129,14 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     }
     const FRaftSimLandscapeCandidateCenterlinePoint& Last = SourcePoints.Last();
     Centers.Add(FVector2D(
-        -5800.0f + Last.LocalCm.X,
+        LandscapeMinX + Last.LocalCm.X,
         -Candidate.HorizontalSpanYCm * 0.5f + Last.LocalCm.Y));
     StationsCm.Add(Last.StationMeters * 100.0f);
     if (Last.bHasConditionedVisualSurface)
     {
         ConditionedSurfaceWorldZ.Add(
-            Last.ConditionedVisualSurfaceNormalized * Candidate.TargetReliefCm);
+            Last.ConditionedVisualSurfaceNormalized * Candidate.TargetReliefCm +
+            Candidate.WorldVerticalOffsetCm);
         ++ConditionedProfileCenterCount;
     }
     else
@@ -271,6 +274,12 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             WaterActor->Tags.AddUnique(TEXT("RaftSimZambeziSingleLayerWater"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
         }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimPacuareDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
+        }
     }
     return WaterActor;
 }
@@ -312,7 +321,7 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
         return nullptr;
     }
 
-    constexpr float LandscapeMinX = -5800.0f;
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float LandscapeMaxX = LandscapeMinX + Candidate.HorizontalSpanXCm;
     const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
     const float LandscapeMaxY = Candidate.HorizontalSpanYCm * 0.5f;
@@ -564,7 +573,7 @@ bool AddLandscapeCandidateScenarioMarkers(
         OutSummary += TEXT("Could not load the engine cone used for scenario markers.\n");
         return false;
     }
-    const float LandscapeMinX = -5800.0f;
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
     float PreviousStationM = -1.0f;
     int32 SpawnedCount = 0;
@@ -665,7 +674,10 @@ bool AddLandscapeCandidateRunnableGameplay(
     {
         return false;
     }
-    if (Candidate.PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+    const bool bZambezi =
+        Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+    if (!bZambezi && !bPacuare)
     {
         return true;
     }
@@ -677,7 +689,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    constexpr float StartProgress = 0.0025f;
+    const float StartProgress = bPacuare ? 0.04f : 0.0025f;
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
         Candidate,
@@ -704,7 +716,9 @@ bool AddLandscapeCandidateRunnableGameplay(
         TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
     if (!RuntimeGameMode)
     {
-        OutSummary += TEXT("Could not load RaftSimVerticalSliceGameMode for Zambezi.\n");
+        OutSummary += FString::Printf(
+            TEXT("Could not load RaftSimVerticalSliceGameMode for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
         return false;
     }
     World->GetWorldSettings()->DefaultGameMode = RuntimeGameMode;
@@ -715,23 +729,37 @@ bool AddLandscapeCandidateRunnableGameplay(
             FTransform::Identity);
     if (!WaterConfig)
     {
-        OutSummary += TEXT("Could not spawn the Zambezi runtime water config.\n");
+        OutSummary += FString::Printf(
+            TEXT("Could not spawn the runtime water config for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
         return false;
     }
-    WaterConfig->SetActorLabel(TEXT("RaftSim_Zambezi_RuntimeWaterConfig"));
-    WaterConfig->CookedFieldsDir =
-        TEXT("physics/data/real_world/zambezi_batoka_gorge/"
-             "scenario_zambezi_run/runtime/cooked_flow_fields");
-    WaterConfig->FlowBand = TEXT("normal_big_water");
-    WaterConfig->WindowCenterM = FVector2D(15000.0f, 0.0f);
-    WaterConfig->WindowExtentM = 32000.0f;
+    WaterConfig->SetActorLabel(
+        bPacuare
+            ? TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig")
+            : TEXT("RaftSim_Zambezi_RuntimeWaterConfig"));
+    WaterConfig->CookedFieldsDir = bPacuare
+        ? TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+               "scenario_upper_huacas/cooked_flow_fields")
+        : TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+               "scenario_zambezi_run/runtime/cooked_flow_fields");
+    WaterConfig->FlowBand = bPacuare
+        ? FName(TEXT("rainfed_runnable_planning"))
+        : FName(TEXT("normal_big_water"));
+    WaterConfig->WindowCenterM = bPacuare
+        ? FVector2D(300.0f, 0.0f)
+        : FVector2D(15000.0f, 0.0f);
+    WaterConfig->WindowExtentM = bPacuare ? 700.0f : 32000.0f;
     WaterConfig->bRecenterHydraulicCrux = false;
-    WaterConfig->CoordinateMapPath =
-        TEXT("physics/data/real_world/zambezi_batoka_gorge/"
-             "scenario_zambezi_run/runtime/river_coordinate_map.json");
+    WaterConfig->CoordinateMapPath = bPacuare
+        ? TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/"
+               "upper_huacas_visual/upper_huacas_runtime_coordinate_map.json")
+        : TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+               "scenario_zambezi_run/runtime/river_coordinate_map.json");
     WaterConfig->bEnableMovingWindowStreaming = false;
     WaterConfig->bMapProvidesTerrain = true;
-    WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+    WaterConfig->Tags.AddUnique(
+        bPacuare ? TEXT("RaftSimPacuareUpperHuacasRun") : TEXT("RaftSimZambeziRun"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimSafeLaunchApron"));
@@ -753,11 +781,17 @@ bool AddLandscapeCandidateRunnableGameplay(
             FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + LaunchHydrostaticOffsetCm)));
     if (!Raft)
     {
-        OutSummary += TEXT("Could not spawn the Zambezi player raft.\n");
+        OutSummary += FString::Printf(
+            TEXT("Could not spawn the player raft for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
         return false;
     }
-    Raft->SetActorLabel(TEXT("RaftSim_Zambezi_PlayerRaft"));
-    Raft->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+    Raft->SetActorLabel(
+        bPacuare
+            ? TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft")
+            : TEXT("RaftSim_Zambezi_PlayerRaft"));
+    Raft->Tags.AddUnique(
+        bPacuare ? TEXT("RaftSimPacuareUpperHuacasRun") : TEXT("RaftSimZambeziRun"));
     Raft->Tags.AddUnique(TEXT("RaftSimReferenceRunnable"));
 
     bool bPlayerStartPositioned = false;
@@ -771,20 +805,43 @@ bool AddLandscapeCandidateRunnableGameplay(
             FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + 170.0f) -
                 StartTangent * 500.0f,
             StartRotation);
-        It->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+        It->Tags.AddUnique(
+            bPacuare ? TEXT("RaftSimPacuareUpperHuacasRun") : TEXT("RaftSimZambeziRun"));
         bPlayerStartPositioned = true;
         break;
     }
     if (!bPlayerStartPositioned)
     {
-        OutSummary += TEXT("Could not position the Zambezi player start.\n");
+        OutSummary += FString::Printf(
+            TEXT("Could not position the player start for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
         return false;
     }
 
+    if (bPacuare)
+    {
+        // The authored ribbon is used for deterministic editor captures. In
+        // gameplay, hide it so the solver-driven ARaftSimWaterSurfaceActor is
+        // the only visible surface and the same cooked field owns forces and
+        // hydraulics.
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!It->GetActorLabel().Contains(
+                    TEXT("RaftSim_PhysicalCorridorRiverRibbon_pacuare")))
+            {
+                continue;
+            }
+            It->SetActorHiddenInGame(true);
+            It->Tags.AddUnique(TEXT("RaftSimCaptureOnlyStaticWater"));
+            It->Tags.AddUnique(TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering"));
+        }
+    }
+
     OutSummary += FString::Printf(
-        TEXT("Added reference-runnable Zambezi gameplay at station %.1f m: "
-             "live procedural full-corridor water, player raft, player start, "
-             "and vertical-slice game mode; production rapid hydraulics remain review-gated.\n"),
+        TEXT("Added reference-runnable %s gameplay at station %.1f m: "
+             "live cooked-field water, player raft, player start, and vertical-slice "
+             "game mode; terrain, flow calibration, and production art remain review-gated.\n"),
+        bPacuare ? TEXT("Pacuare Upper Huacas") : TEXT("Zambezi"),
         Points.Last().StationMeters * StartProgress);
     return true;
 }

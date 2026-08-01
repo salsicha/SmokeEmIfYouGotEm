@@ -561,6 +561,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"horizontal_span_x_cm\": %.3f,\n")
             TEXT("      \"horizontal_span_y_cm\": %.3f,\n")
             TEXT("      \"target_relief_cm\": %.3f,\n")
+            TEXT("      \"world_vertical_offset_cm\": %.3f,\n")
+            TEXT("      \"source_aligned_centerline\": \"%s\",\n")
+            TEXT("      \"terrain_render_authority\": \"%s\",\n")
+            TEXT("      \"runnable_gameplay_status\": \"%s\",\n")
             TEXT("      \"landscape_material_status\": \"source_conditioned_macro_zones_plus_first_party_close_range_detail_review_candidate\",\n")
             TEXT("      \"landscape_material_shading_model\": \"%s\",\n")
             TEXT("      \"landscape_material_organic_surface_status\": \"%s\",\n")
@@ -764,6 +768,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.HorizontalSpanXCm,
             Candidate.HorizontalSpanYCm,
             Candidate.TargetReliefCm,
+            Candidate.WorldVerticalOffsetCm,
+            *EscapeRaftSimJsonString(Candidate.LocalCenterlineRelativePath),
+            Candidate.bUseDensePhysicalTerrainRenderSurface
+                ? TEXT("hidden_landscape_collision_and_height_query_plus_noncolliding_dense_render_tiles")
+                : TEXT("visible_reach_local_landscape_owns_rendering_collision_and_height_queries"),
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare")
+                ? TEXT("reference_runnable_upper_huacas_live_cooked_water_player_raft_and_game_mode")
+                : (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge")
+                       ? TEXT("reference_runnable_full_corridor_live_cooked_water_player_raft_and_game_mode")
+                       : TEXT("capture_candidate_only")),
             bUsesPacuareOrganicRainforestSurface
                 ? TEXT("DefaultLit")
                 : TEXT("Unlit"),

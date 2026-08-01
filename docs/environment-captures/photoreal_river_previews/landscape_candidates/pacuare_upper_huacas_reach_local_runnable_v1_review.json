@@ -1,0 +1,100 @@
+{
+  "schema": "raftsim.environment.pacuare_upper_huacas_reach_local_runnable_review.v1",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "milestone": "pacuare_upper_huacas_reach_local_runnable_v1",
+  "status": "accepted_reference_runnable_photoreal_promotion_rejected",
+  "runnable_decision": {
+    "listed_as_runnable_river": true,
+    "reference_runnable": true,
+    "production_promoted": false,
+    "landscape_owns_rendering_collision_and_height_queries": true,
+    "live_solver_owns_gameplay_water_rendering_and_forces": true,
+    "capture_only_static_water_hidden_in_game": true
+  },
+  "coordinate_contract": {
+    "world_x": "Upper Huacas C3 downstream station in meters",
+    "world_y": "Upper Huacas C3 cross-channel distance in meters",
+    "span_m": [600.0, 78.0],
+    "runtime_vertical_datum_m": 454.2831090501993,
+    "coordinate_map": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_runtime_coordinate_map.json",
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "source": "committed Upper Huacas C3 interpreted solver-window bed geometry",
+    "landscape_size_px": [1009, 1009],
+    "landscape_components": [8, 8],
+    "landscape_span_m": [600.0, 78.0],
+    "bounded_procedural_bank_infill_max_abs_m": 0.38,
+    "protected_channel_half_width_m": 17.0,
+    "maximum_protected_channel_change_m": 0.0,
+    "maximum_map_edge_change_m": 0.0,
+    "surveyed_bathymetry": false,
+    "production_terrain": false
+  },
+  "runtime_water": {
+    "cooked_fields": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields",
+    "flow_band": "rainfed_runnable_planning",
+    "recenter_hydraulic_crux": false,
+    "map_provides_terrain": true,
+    "native_test_wet_vertices": 987,
+    "native_test_hydraulic_relief_abs_max_m": 0.1685,
+    "native_test_rapid_foam_vertices": 0
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "sha256": "744e763b7a9913046a2b6c2eab38c5cc19c555632aa5c2e9b59b66d36e503f64"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png",
+      "sha256": "223cdbef34dc68e063168b99dc9b198a7832bdd0b61b8d466cf3180dd2367204"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_runtime_coordinate_map.json",
+      "sha256": "b6557e2cb29840489c41830337c56c266df23da8c9865172953d6bd432fcca1b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "c6ee08bf9b72f215b04feace792de7e95dcbf34fa15d17cc78be663a80cdc6d7"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "ae5f2e49623feefcfe0d715ec1cf5c299c4bf83801149ca8045e4338b663b5cb"
+    }
+  ],
+  "visual_assessment": {
+    "accepted_improvements": [
+      "replaced the grossly mismatched broad DEM preview with the physical 600 m Upper Huacas window",
+      "removed the huge planar DEM facets and rectangular water-land intersection",
+      "kept water inside continuous source-aligned banks in both canonical downstream views",
+      "added dense rainforest framing and bounded non-periodic bank relief"
+    ],
+    "remaining_photoreal_defects": [
+      "capture water is still dark and opaque instead of optically convincing shallow turbulent water",
+      "generic sample foliage silhouettes and repeated canopy structure remain visible",
+      "runtime Upper Huacas field currently produces no visible rapid-foam vertices at the tested launch window",
+      "missing production wet-bank microgeometry, riverbed optics, mist, spray, waterfall treatment, and Pacuare-specific ecology assets"
+    ]
+  },
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_UpperHuacas_pass_1_of_1",
+    "focused_material_tests": "RaftSim.M9.FPacuare_pass_2_of_2",
+    "terrain_generator_tests": "pass",
+    "coordinate_map_log": "301_points_datum_454.283_m",
+    "raft_upright_after_initial_settle": true,
+    "swimmer_count_after_initial_settle": 0
+  },
+  "required_external_acceptance_gates": [
+    "Pacuare guide review of Upper Huacas line, hazards, water levels, entry, and exit",
+    "geospatial review of exact stationing, planform, vertical datum, bank breaklines, and higher-resolution terrain",
+    "hydraulic calibration and convergence approval against observed Upper Huacas behavior across playable flow bands",
+    "ecology and environment-art approval of species, density, ground cover, geology, wet banks, and waterfall context",
+    "photoreal water/VFX approval for transparency, foam, spray, mist, refraction, reflections, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}
