@@ -493,6 +493,9 @@ def test_geoclaw_cli_normalizes_export(tmp_path):
 
 
 def test_geoclaw_cli_runs_existing_export_with_normalization(monkeypatch, tmp_path, capsys):
+    if not check_geoclaw_availability().available:
+        pytest.skip("GeoClaw unavailable: the CLI availability gate exits before the faked run/normalize hooks.")
+
     class FakeRunResult:
         scenario_id = "fake_geoclaw"
         export_dir = tmp_path / "export"

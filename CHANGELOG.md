@@ -4,6 +4,33 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ## [Unreleased]
 
+### Native Linux build support (August 1, 2026)
+
+- The UE editor and game targets now build and run on Linux (verified against a
+  5.8.1 source engine): added the missing `<optional>`/`<array>` includes that
+  broke the C++ solver under libstdc++, and `unreal/Scripts/build_solver_lib.sh`
+  is now portable bash that compiles `libraftsim_water.a` with the engine's
+  bundled clang/libc++ toolchain on Linux (a gcc/libstdc++ archive cannot link
+  into UE there); RaftSimWater declares the engine zlib dependency the archive's
+  `.npy` inflation needs.
+- Added `unreal/Scripts/package_linux.sh` (BuildCookRun, `UE_ROOT` overridable).
+- Stopped tracking `physics/cpp/build-ue/` (a macOS build cache and Mach-O
+  archive were committed; the stale cache blocked configure and the Mach-O lib
+  would shadow the per-host rebuild on other platforms).
+- Declared `pillow` as a real runtime dependency of the physics package and
+  moved pytest (plus matplotlib for the example-plot tests) into the default
+  `uv` dev dependency group, so `uv run pytest -q` uses the locked environment
+  on a fresh checkout instead of silently falling back to a PATH pytest.
+- C3-window determinism tests now prove same-host determinism by double
+  generation and compare committed packages at 1e-12 tolerance, since the
+  Mac-generated artifacts differ by ~1 ulp under other libm/FMA
+  implementations. Meat Grinder is the exception: its discrete channel-trace
+  search amplifies ulp differences into a different traced path off the
+  generating platform, so its committed-package comparison is a separate test
+  marked xfail on non-macOS. Machine-local-evidence checks (GeoClaw CLI
+  plumbing, m16 solver-output provenance) skip with a reason where their
+  non-versioned prerequisites are absent.
+
 ### Game completion M3 — Full South Fork hydraulics (July 19, 2026)
 
 - Cooked all 20 South Fork named rapids at 900, 1,600, and 3,000 cfs through the

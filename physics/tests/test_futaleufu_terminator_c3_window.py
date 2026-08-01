@@ -112,11 +112,21 @@ def test_bed_geometry_expresses_headline_features(committed_packages):
 
 def test_generation_is_deterministic(committed_packages):
     regenerated = generate_terminator_scenario2_5d(REPO_ROOT, "median_runnable")
+    repeated = generate_terminator_scenario2_5d(REPO_ROOT, "median_runnable")
     committed = committed_packages["median_runnable"]
-    np.testing.assert_array_equal(regenerated.bed, committed.bed)
-    np.testing.assert_array_equal(regenerated.initial_state.depth, committed.initial_state.depth)
-    np.testing.assert_array_equal(regenerated.initial_state.u, committed.initial_state.u)
-    assert regenerated.metadata.provenance["stage_west_m"] == committed.metadata.provenance["stage_west_m"]
+    # Determinism proper: identical bytes for identical inputs on this host.
+    np.testing.assert_array_equal(regenerated.bed, repeated.bed)
+    np.testing.assert_array_equal(regenerated.initial_state.depth, repeated.initial_state.depth)
+    np.testing.assert_array_equal(regenerated.initial_state.u, repeated.initial_state.u)
+    # The committed package is bit-exact only on the platform that generated
+    # it; libm/FMA differences shift transcendentals by ~1 ulp elsewhere, so
+    # hold the cross-platform comparison just above ulp tightness.
+    np.testing.assert_allclose(regenerated.bed, committed.bed, rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(regenerated.initial_state.depth, committed.initial_state.depth, rtol=1e-12, atol=1e-12)
+    np.testing.assert_allclose(regenerated.initial_state.u, committed.initial_state.u, rtol=1e-12, atol=1e-12)
+    assert regenerated.metadata.provenance["stage_west_m"] == pytest.approx(
+        committed.metadata.provenance["stage_west_m"], rel=1e-12, abs=1e-12
+    )
 
 
 def test_flow_bands_are_derived_from_corridor_planning_bands(committed_packages):
