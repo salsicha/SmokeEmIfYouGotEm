@@ -64,6 +64,9 @@ RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M = 15.5
 RUNTIME_PRESENTATION_SAMPLE_SPACING_M = 3.0
 RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN = 1.12
 RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX = 0.94
+RUNTIME_LAUNCH_STATION_M = 75.0
+RUNTIME_FIRST_RAPID_CONTROL_STATION_M = 160.0
+RUNTIME_MINIMUM_SAFE_LAUNCH_APRON_M = 50.0
 
 # Legend colours are sampled from x=2016 at the centre of each 40-pixel band in
 # the supplied screenshot. Keeping the byte colours avoids any dependency on
@@ -604,6 +607,12 @@ def _write_runtime_water_bundle(
         rapid_intensity = np.maximum(
             rapid_intensity, weight * np.exp(-0.5 * distance**2)
         )
+        is_first_rapid = str(rapid["rapid_number"]) == "1"
+        control_station_target_m = (
+            RUNTIME_FIRST_RAPID_CONTROL_STATION_M
+            if is_first_rapid
+            else float(rapid["station_m"])
+        )
         rapid_controls.append(
             {
                 "rapid": rapid,
@@ -616,19 +625,19 @@ def _write_runtime_water_bundle(
                         0.92,
                     )
                 ),
-                # Rapid 1 is printed at the route origin. Move its procedural
-                # control one bounded 70 m launch apron downstream so both the
-                # supercritical approach and subcritical pile clear the live
-                # surface actor's 36 m station fade plus 15 m hydraulic-site
-                # safety margin. Every other control stays on the nearest
-                # five-metre source station.
+                # Rapid 1 is printed at the route origin, while the runnable
+                # raft starts at station 75 m. Put its procedural control far
+                # enough downstream to preserve a measured calm launch and a
+                # full approach before the first supercritical cell. Every
+                # other control stays on the nearest five-metre source station.
                 "control_index": int(
                     np.clip(
-                        round(float(rapid["station_m"]) / RUNTIME_GRID_DX_M),
-                        14,
+                        round(control_station_target_m / RUNTIME_GRID_DX_M),
+                        0,
                         nx - 10,
                     )
                 ),
+                "repositioned_for_safe_launch": is_first_rapid,
             }
         )
     rapid_intensity = np.clip(rapid_intensity, 0.0, 1.0)
@@ -805,6 +814,64 @@ def _write_runtime_water_bundle(
             }
         )
 
+    first_control = rapid_controls[0]
+    first_control_index = int(first_control["control_index"])
+    first_approach_index = first_control_index - (len(approach_profile) - 1)
+    launch_index = int(round(RUNTIME_LAUNCH_STATION_M / RUNTIME_GRID_DX_M))
+    safe_launch_apron_m = float(
+        station_m[first_approach_index] - station_m[launch_index]
+    )
+    maximum_launch_froude = float(
+        np.max(
+            np.hypot(
+                center_u[launch_index:first_approach_index],
+                center_v[launch_index:first_approach_index],
+            )
+            / np.sqrt(
+                9.80665
+                * np.maximum(
+                    center_h[launch_index:first_approach_index],
+                    1.0e-6,
+                )
+            )
+        )
+    )
+    if safe_launch_apron_m < RUNTIME_MINIMUM_SAFE_LAUNCH_APRON_M:
+        raise RuntimeError(
+            "Procedural Zambezi launch apron is shorter than the gameplay contract: "
+            f"{safe_launch_apron_m:.1f} m"
+        )
+    if maximum_launch_froude > RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX:
+        raise RuntimeError(
+            "Procedural Zambezi launch apron is not subcritical: "
+            f"maximum Froude {maximum_launch_froude:.3f}"
+        )
+    launch_apron_contract = {
+        "schema": "raftsim.zambezi.safe_launch_apron.v1",
+        "raft_spawn_station_m": RUNTIME_LAUNCH_STATION_M,
+        "first_rapid_source_station_m": float(
+            first_control["rapid"]["station_m"]
+        ),
+        "first_rapid_control_station_m": float(
+            station_m[first_control_index]
+        ),
+        "first_rapid_approach_start_station_m": float(
+            station_m[first_approach_index]
+        ),
+        "safe_subcritical_clearance_m": safe_launch_apron_m,
+        "minimum_required_clearance_m": RUNTIME_MINIMUM_SAFE_LAUNCH_APRON_M,
+        "maximum_centerline_froude_before_approach": round(
+            maximum_launch_froude, 4
+        ),
+        "maximum_allowed_froude_before_approach": (
+            RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX
+        ),
+        "crew_ejection_policy": (
+            "no_forced_ejection_before_player_reaches_first_rapid_approach"
+        ),
+        "production_authoritative": False,
+    }
+
     arrays = {
         "bed": (
             bed,
@@ -829,7 +896,7 @@ def _write_runtime_water_bundle(
     manifest = {
         "schema": "raftsim.cooked_flow_fields.v1",
         "generator": (
-            "raftsim.zambezi_reference_map.feature_tagged_hydraulic_seed.v2"
+            "raftsim.zambezi_reference_map.feature_tagged_hydraulic_seed.v3"
         ),
         "river_id": "zambezi_batoka_gorge",
         "section_id": "boiling_pot_to_mukuni_beach_reference_run",
@@ -910,6 +977,7 @@ def _write_runtime_water_bundle(
                 ),
                 "transitions": rapid_transition_records,
             },
+            "safe_launch_apron": launch_apron_contract,
             "authority": (
                 "gameplay_reference_only_not_navigation_or_real_world_hydraulic_authority"
             ),
@@ -944,6 +1012,14 @@ def _write_runtime_water_bundle(
 
 def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, Any]:
     corridor = json.loads((repo_root / CORRIDOR_MANIFEST_RELATIVE).read_text(encoding="utf-8"))
+    runtime_manifest = json.loads(
+        (repo_root / COOKED_FIELDS_RELATIVE / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    launch_apron_contract = runtime_manifest["procedural_infill"][
+        "safe_launch_apron"
+    ]
     rapid_entries = []
     for rapid in digitization["rapids"]:
         rapid_entries.append(
@@ -1036,6 +1112,7 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
                 "feature_tagged_procedural_reference_only_not_validated_"
                 "real_world_hydraulics"
             ),
+            "safe_launch_apron": launch_apron_contract,
         },
         "route_variants": [
             {

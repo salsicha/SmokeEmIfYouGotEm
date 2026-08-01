@@ -6,7 +6,7 @@
           "description": "Procedural channel bed aligned to the conditioned visual surface.",
           "dtype": "float32",
           "file": "bed.npy",
-          "sha256": "21999d9a667da9ca656cd9c324c4620c899d0c3925b36e9c5914ae8807e4dea8",
+          "sha256": "7e33635f6f19a0eec3a09f0dcd51bcdb7162975ba9da9b9b286a03ee5b2c7c57",
           "shape": [
             25,
             5999
@@ -17,7 +17,7 @@
           "description": "Procedural reference-run water depth above bed.",
           "dtype": "float32",
           "file": "h.npy",
-          "sha256": "51eaefca9d1932c1dca71e0c735399c1ed81888ce271d4b24693841f336dfedc",
+          "sha256": "06d9cda8d948f2ace3c2e4a0fde81fa31d9887af863da0bf0e0bd48a2e6d45fa",
           "shape": [
             25,
             5999
@@ -28,7 +28,7 @@
           "description": "Downstream reference-run seed velocity.",
           "dtype": "float32",
           "file": "u.npy",
-          "sha256": "28687a047f174f8048381b3c78ad222ae9313397f0fd88d9295789b02a02a78f",
+          "sha256": "588b0adaec0ba501593f3f9dbb5b174a68bf3d856e35076850b4c1f577513a57",
           "shape": [
             25,
             5999
@@ -66,7 +66,7 @@
       "roughness_manning_n": 0.041
     }
   ],
-  "generator": "raftsim.zambezi_reference_map.feature_tagged_hydraulic_seed.v2",
+  "generator": "raftsim.zambezi_reference_map.feature_tagged_hydraulic_seed.v3",
   "grid": {
     "crs": "curved river coordinates; x is station downstream and y is river-left",
     "downstream_axis": "+x",
@@ -97,7 +97,7 @@
       "tailwater_froude_maximum": 0.94,
       "transitions": [
         {
-          "control_station_m": 70.0,
+          "control_station_m": 160.0,
           "difficulty_label": "IV-V",
           "display_name": "Against the Wall",
           "feature_tags": [
@@ -112,7 +112,7 @@
           "runtime_sample_spacing_m": 3.0,
           "source_station_m": 0.0,
           "tailwater_froude": 0.8207,
-          "transition_station_m": 73.0,
+          "transition_station_m": 163.0,
           "upstream_froude": 1.8466
         },
         {
@@ -545,6 +545,19 @@
     },
     "rapid_cues": "bounded feature-tagged hydraulic controls from the user-supplied 25-rapid map",
     "reason": "surveyed bathymetry and rapid-scale hydraulic geometry are unavailable",
+    "safe_launch_apron": {
+      "crew_ejection_policy": "no_forced_ejection_before_player_reaches_first_rapid_approach",
+      "first_rapid_approach_start_station_m": 130.0,
+      "first_rapid_control_station_m": 160.0,
+      "first_rapid_source_station_m": 0.0,
+      "maximum_allowed_froude_before_approach": 0.94,
+      "maximum_centerline_froude_before_approach": 0.4041,
+      "minimum_required_clearance_m": 50.0,
+      "production_authoritative": false,
+      "raft_spawn_station_m": 75.0,
+      "safe_subcritical_clearance_m": 55.0,
+      "schema": "raftsim.zambezi.safe_launch_apron.v1"
+    },
     "surface_alignment": "conditioned visual centerline profile in the Copernicus source-scale map",
     "wet_half_width_m": 72.0
   },

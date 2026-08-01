@@ -161,6 +161,25 @@ world origin. A focused Unreal PIE gate found nine live breaking sites in the
 launch window and a ready 19-component production Niagara pool; the test also
 requires at least one active roller and rapid-aerosol component.
 
+The launch itself now has an explicit fail-closed contract. The raft spawns at
+station 75 m on a subcritical apron whose first rapid approach starts at 130 m
+and whose first procedural hydraulic control is at 160 m. That leaves 55 m of
+clearance; the generated centerline Froude number is at most 0.4041 before the
+approach, below the 0.94 ceiling. The saved map carries
+`RaftSimSafeLaunchApron`. Its raft transform is authored at the loaded
+hydrostatic tube-center waterline, about 0.215 m below the sampled surface,
+instead of falling 0.58 m from above the water. Runtime buoyancy now integrates
+the 220 kg dry raft and the 385 kg guide/passenger load as one 605 kg body while
+D2 retains those same occupant masses for local tube compression.
+
+`RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`
+requires the raft to remain upright through the initial settle and after an
+`AllForward` command, retain all five attached crew actors, and report zero
+swimmers. The focused test passes, and the complete parameterized
+`RaftSim.P4.RiverMapLoads` run passes all six maps with zero failures. The
+renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
+deliberately fails photoreal promotion while passing runnable launch acceptance.
+
 This makes the complete map launchable and paddleable with the normal gameplay
 stack. It does not turn the inferred bed or rapid cues into real-world
 bathymetry, navigation guidance, or validated Zambezi hydraulics.
@@ -177,7 +196,7 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v9 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v10 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding visual-terrain tiles, the exact four vegetation mesh families and
 eight instance components with a 7,032-instance total, exactly one tagged
@@ -187,13 +206,15 @@ zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
-also covered by `RaftSim.M9.FZambeziSingleLayerWater`. Schema v9 additionally
+also covered by `RaftSim.M9.FZambeziSingleLayerWater`. Schema v10 additionally
 requires global-station preservation, the global-station authority tag, all 25
-procedural rapid records, and the Rapid 9 visualization-only portage policy.
+procedural rapid records, the Rapid 9 visualization-only portage policy, and
+the `RaftSimSafeLaunchApron` tag.
 The focused runtime gate is
 `RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`; it
 now fails unless the loaded map produces live breaking sites and production
-Niagara roller and aerosol activity.
+Niagara roller and aerosol activity, stays upright before and after the first
+crew command, retains five attached crew avatars, and has zero swimmers.
 
 ## Production status and gates
 

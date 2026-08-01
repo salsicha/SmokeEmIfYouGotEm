@@ -19,6 +19,19 @@
     "runnable_tier": "reference_free_run",
     "runtime_cooked_fields": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/cooked_flow_fields",
     "runtime_coordinate_map": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/river_coordinate_map.json",
+    "safe_launch_apron": {
+      "crew_ejection_policy": "no_forced_ejection_before_player_reaches_first_rapid_approach",
+      "first_rapid_approach_start_station_m": 130.0,
+      "first_rapid_control_station_m": 160.0,
+      "first_rapid_source_station_m": 0.0,
+      "maximum_allowed_froude_before_approach": 0.94,
+      "maximum_centerline_froude_before_approach": 0.4041,
+      "minimum_required_clearance_m": 50.0,
+      "production_authoritative": false,
+      "raft_spawn_station_m": 75.0,
+      "safe_subcritical_clearance_m": 55.0,
+      "schema": "raftsim.zambezi.safe_launch_apron.v1"
+    },
     "swimmer_and_rescue_enabled": true,
     "voice_paddle_commands_enabled": true
   },

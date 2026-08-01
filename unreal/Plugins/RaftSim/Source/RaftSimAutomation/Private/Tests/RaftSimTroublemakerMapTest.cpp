@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "Misc/AutomationTest.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimCrewAvatarActor.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimRiverWaterConfig.h"
@@ -58,6 +59,36 @@ bool MapExists(const FString& PackagePath)
 }
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimStartZambeziLaunchCommand, FAutomationTestBase*, Test);
+bool FRaftSimStartZambeziLaunchCommand::Update()
+{
+    UWorld* World = GetRiverTestWorld();
+    if (World == nullptr)
+    {
+        Test->AddError(TEXT("No world for Zambezi launch command"));
+        return true;
+    }
+    for (TActorIterator<ARaftSimRaftActor> It(World); It; ++It)
+    {
+        if (It->GetActorLabel() == TEXT("RaftSim_Zambezi_PlayerRaft"))
+        {
+            Test->TestEqual(
+                TEXT("Zambezi raft remains upright through initial settle"),
+                static_cast<int32>(It->GetRaftMode()),
+                static_cast<int32>(ERaftSimRaftMode::Upright));
+            Test->TestEqual(
+                TEXT("Zambezi initial settle keeps every person in the raft"),
+                It->GetSwimmerCount(),
+                0);
+            It->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+            return true;
+        }
+    }
+    Test->AddError(TEXT("Zambezi launch command found no player raft"));
+    return true;
+}
+
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimAssertRiverMapCommand, FAutomationTestBase*, Test);
 bool FRaftSimAssertRiverMapCommand::Update()
 {
@@ -91,14 +122,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
     }
 
     bool bZambeziReferenceRun = false;
+    ARaftSimRaftActor* PlayerRaft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
-        ARaftSimRaftActor* Raft = *It;
-        bZambeziReferenceRun =
-            Raft->GetActorLabel() == TEXT("RaftSim_Zambezi_PlayerRaft");
+        PlayerRaft = *It;
+        bZambeziReferenceRun = PlayerRaft->GetActorLabel() ==
+            TEXT("RaftSim_Zambezi_PlayerRaft");
         Test->TestTrue(
-            FString::Printf(TEXT("raft rests within depth envelope (z=%.0f)"), Raft->GetActorLocation().Z),
-            FMath::Abs(Raft->GetActorLocation().Z) < 20000.0f);
+            FString::Printf(
+                TEXT("raft rests within depth envelope (z=%.0f)"),
+                PlayerRaft->GetActorLocation().Z),
+            FMath::Abs(PlayerRaft->GetActorLocation().Z) < 20000.0f);
     }
     else
     {
@@ -107,6 +141,42 @@ bool FRaftSimAssertRiverMapCommand::Update()
 
     if (bZambeziReferenceRun)
     {
+        Test->TestEqual(
+            TEXT("Zambezi calm launch keeps the raft upright after all-forward"),
+            static_cast<int32>(PlayerRaft->GetRaftMode()),
+            static_cast<int32>(ERaftSimRaftMode::Upright));
+        Test->TestEqual(
+            TEXT("Zambezi calm launch keeps every person in the raft"),
+            PlayerRaft->GetSwimmerCount(),
+            0);
+        Test->TestEqual(
+            TEXT("Zambezi calm launch retains four paddlers and one guide"),
+            PlayerRaft->GetCrewAvatarCount(),
+            5);
+        int32 AttachedCrewCount = 0;
+        for (TActorIterator<ARaftSimCrewAvatarActor> It(World); It; ++It)
+        {
+            ARaftSimCrewAvatarActor* Avatar = *It;
+            if (Avatar->GetOwner() != PlayerRaft)
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("Zambezi seated crew stays attached to the player raft"),
+                Avatar->GetAttachParentActor() == PlayerRaft);
+            Test->TestTrue(
+                TEXT("Zambezi seated crew root stays within the raft envelope"),
+                FVector::Dist(Avatar->GetActorLocation(), PlayerRaft->GetActorLocation()) <
+                    300.0f);
+            Test->TestTrue(
+                TEXT("Zambezi seated crew visual transforms remain finite"),
+                Avatar->HasFiniteVisualTransforms());
+            ++AttachedCrewCount;
+        }
+        Test->TestEqual(
+            TEXT("Zambezi has five attached live crew actors"),
+            AttachedCrewCount,
+            5);
         int32 ScenarioMarkerCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
@@ -131,6 +201,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Test->TestTrue(
                     TEXT("Zambezi water config records global river-station authority"),
                     (*It)->Tags.Contains(TEXT("RaftSimGlobalRiverStationAuthority")));
+                Test->TestTrue(
+                    TEXT("Zambezi water config records the safe launch apron"),
+                    (*It)->Tags.Contains(TEXT("RaftSimSafeLaunchApron")));
                 ++RuntimeWaterConfigCount;
             }
         }
@@ -234,6 +307,11 @@ void FRaftSimRiverMapLoadsTest::GetTests(
 bool FRaftSimRiverMapLoadsTest::RunTest(const FString& MapPath)
 {
     AutomationOpenMap(MapPath);
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
+    if (MapPath.Contains(TEXT("Zambezi")))
+    {
+        ADD_LATENT_AUTOMATION_COMMAND(FRaftSimStartZambeziLaunchCommand(this));
+    }
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertRiverMapCommand(this));
     return true;

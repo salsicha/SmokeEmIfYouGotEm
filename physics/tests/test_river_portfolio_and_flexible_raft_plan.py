@@ -30,6 +30,13 @@ def test_active_river_portfolio_includes_reference_runnable_zambezi() -> None:
     assert chilko["take_out"] == "Chilko-Taseko Junction"
     zambezi = active[-1]
     assert zambezi["runnable_status"].startswith("runnable_reference_")
+    assert zambezi["runtime_acceptance_status"] == (
+        "six_river_map_load_gate_passed_zero_failures"
+    )
+    assert zambezi["safe_launch_status"] == (
+        "upright_after_initial_settle_and_all_forward_with_five_attached_crew_and_zero_swimmers"
+    )
+    assert zambezi["safe_launch_contract"] == "raftsim.zambezi.safe_launch_apron.v1"
     assert zambezi["hydraulic_fidelity_status"].startswith("procedural_seed_")
     assert plan["portfolio_rules"]["active_river_count"] == len(active)
 

@@ -719,12 +719,23 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimSafeLaunchApron"));
 
+    // Author the launch at loaded hydrostatic equilibrium instead of dropping
+    // the raft from above the surface. The reduced body saturates over one
+    // tube diameter and provides 2.6x weight at full immersion, so the calm
+    // tube-center waterline is 2R / 2.6 below the sampled surface. Starting at
+    // +58 cm caused an underdamped first plunge, false deck-water retention,
+    // and a capsize before the guide could issue a command.
+    constexpr float LaunchTubeRadiusCm = 28.0f;
+    constexpr float LaunchBuoyancyWeightMultiple = 2.6f;
+    constexpr float LaunchHydrostaticOffsetCm =
+        -(2.0f * LaunchTubeRadiusCm) / LaunchBuoyancyWeightMultiple;
     ARaftSimRaftActor* Raft = World->SpawnActor<ARaftSimRaftActor>(
         ARaftSimRaftActor::StaticClass(),
         FTransform(
             StartRotation,
-            FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + 58.0f)));
+            FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + LaunchHydrostaticOffsetCm)));
     if (!Raft)
     {
         OutSummary += TEXT("Could not spawn the Zambezi player raft.\n");
