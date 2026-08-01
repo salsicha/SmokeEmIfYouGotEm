@@ -1,6 +1,6 @@
 # Zambezi And Futaleufu Photoreal Goal
 
-> Status update, July 31, 2026: Zambezi Batoka Gorge and Futaleufu remain the immediate photoreal environment goal. Zambezi is restored as the sixth runnable environment in a clearly labeled reference Free Run; lifelike and production-hydraulic promotion remain blocked until authoritative full-reach centerline, high-resolution terrain, bathymetry, route, guide, and review evidence are attached. Chilko remains in the runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
+> Status update, August 1, 2026: Zambezi Batoka Gorge and Futaleufu remain the immediate photoreal environment goal. Zambezi is restored as the sixth runnable environment in a clearly labeled reference Free Run, and its feature-tagged procedural flow field now activates the live rapid VFX stack without losing global station registration. Lifelike and production-hydraulic promotion remain blocked until authoritative full-reach centerline, high-resolution terrain, bathymetry, route, guide, and review evidence are attached. Chilko remains in the runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
 
 ## Objective
 
@@ -158,6 +158,22 @@ collision, height queries,
 water geometry, hydraulics, raft contact, rapid stationing, or gameplay. This is
 a bounded runnable-map presentation improvement; rights-cleared higher-resolution
 terrain and external visual/geology review remain the production-photoreal gates.
+
+The runnable Zambezi reference now has a separate live-hydraulics acceptance
+layer. Its 30 km cooked field is regenerated at 5 m downstream resolution, and
+each of the 25 PDF-derived rapid records produces a bounded feature-tagged
+control plus a 3 m presentation-sampled Froude transition. The full-corridor
+water actor preserves global river stations instead of applying the legacy
+single-rapid crux recentering. The focused MacEditor PIE gate loads the saved
+map successfully, detects nine breaking sites in the launch window, creates a
+ready 19-component production Niagara pool, and requires nonzero live roller
+and rapid-aerosol activity. Rapid 9 remains visualization-only and a mandatory
+commercial portage. This closes runnable runtime registration, not hydraulic or
+visual fidelity: an offscreen chase-camera diagnostic still shows flat bright
+water, coarse 30 m canyon forms, sparse ecology, and presentation failures in
+the raft/crew composition. The transition geometry is procedural reference
+infill and cannot support guide lines, navigation, seasonal, or real-world
+hydraulic claims.
 
 The project-owned Futaleufu coigue family now has a separate far-corridor runtime representation and a 512-tree HISM review map. The full eight-form closeup family remains intact at 350.87 MiB; deterministic one-in-six far-card meshes plus the structural trunks reduce the final runtime far family to 19.33 MiB, 435,064 vertices, and 223,592 triangles, a 94.492 percent resource reduction. The corrected benchmark keeps crowns registered to their trunks, but it remains a technical candidate: the neutral stand is too dark and regular, has no mixed native ecology or corridor masks, and lacks near/mid/far transition, wind, packaged desktop, and on-device VR evidence. `futaleufu_native_canopy_coigue_v12_runtime_lod_review.json` keeps corridor substitution and production promotion closed.
 

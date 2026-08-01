@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v8",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v9",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -169,6 +169,17 @@ def main() -> None:
         game_mode_path = (
             default_game_mode.get_path_name() if default_game_mode else None
         )
+        water_config = water_configs[0] if len(water_configs) == 1 else None
+        water_config_tags = (
+            sorted(str(tag) for tag in water_config.tags)
+            if water_config
+            else []
+        )
+        preserves_global_river_stations = bool(
+            water_config
+            and not water_config.get_editor_property("recenter_hydraulic_crux")
+            and "RaftSimGlobalRiverStationAuthority" in water_config_tags
+        )
         rapid_numbers = []
         for row in marker_rows:
             suffix = str(row["actor_label"]).removeprefix("RaftSim_ZambeziRapid_")
@@ -186,6 +197,24 @@ def main() -> None:
                     "water_config_count": len(water_configs),
                     "player_start_count": len(player_starts),
                     "game_mode": game_mode_path,
+                },
+                "runtime_hydraulics": {
+                    "authority": (
+                        "feature_tagged_procedural_reference_only_not_validated_"
+                        "real_world_hydraulics"
+                    ),
+                    "global_river_station_alignment": (
+                        "preserved_no_hydraulic_crux_recentering"
+                    ),
+                    "preserves_global_river_stations": (
+                        preserves_global_river_stations
+                    ),
+                    "water_config_tags": water_config_tags,
+                    "rapid_count": 25,
+                    "rapid_9_policy": (
+                        "hazard_visualization_only_mandatory_commercial_portage_"
+                        "not_a_runnable_line"
+                    ),
                 },
                 "visual_terrain": {
                     "authority": "procedural_render_only",
@@ -280,6 +309,7 @@ def main() -> None:
             and all("RaftSimZambeziRun" in row["tags"] for row in marker_rows)
             and len(player_rafts) == 1
             and len(water_configs) == 1
+            and preserves_global_river_stations
             and len(player_starts) == 1
             and str(game_mode_path).endswith("RaftSimVerticalSliceGameMode")
             and len(terrain_rows) == 4

@@ -1415,19 +1415,44 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     TArray<FBreakingSite> CandidateSites;
     int32 EdgeRejectedSiteCount = 0;
     float MaximumEdgeRejectedIntensity = 0.0f;
+    float StrongestEdgeRejectedCoverage = 0.0f;
+    float StrongestEdgeRejectedClearanceMeters = 0.0f;
+    FVector2D StrongestEdgeRejectedRiverCoordinates = FVector2D::ZeroVector;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 1; X < GridStationN; ++X)
         {
             const int32 Index = Y * GridStationN + X;
-            const int32 UpstreamIndex = Index - 1;
-            if (WetVertexMask[Index] == 0 || WetVertexMask[UpstreamIndex] == 0)
+            const int32 ImmediateUpstreamIndex = Index - 1;
+            if (WetVertexMask[Index] == 0 ||
+                WetVertexMask[ImmediateUpstreamIndex] == 0)
             {
                 continue;
             }
-            const float UpstreamFroude = FroudeField[UpstreamIndex];
             const float LocalFroude = FroudeField[Index];
-            if (UpstreamFroude < 1.12f || LocalFroude > 0.94f)
+            if (LocalFroude > 0.94f)
+            {
+                continue;
+            }
+            int32 UpstreamIndex = ImmediateUpstreamIndex;
+            float UpstreamFroude = FroudeField[UpstreamIndex];
+            // Cooked river fields and the presentation surface do not need to
+            // share a vertex phase. Accept the same solver-owned jump across
+            // at most two three-metre presentation edges, so a five-metre
+            // hydraulic control cannot fall between samples and disappear.
+            // This remains a strict local Froude transition; no marker, tag,
+            // or art cue can create a breaking site by itself.
+            if (UpstreamFroude < 1.12f && X >= 2)
+            {
+                const int32 FarUpstreamIndex = Index - 2;
+                if (WetVertexMask[FarUpstreamIndex] != 0 &&
+                    FroudeField[FarUpstreamIndex] > UpstreamFroude)
+                {
+                    UpstreamIndex = FarUpstreamIndex;
+                    UpstreamFroude = FroudeField[UpstreamIndex];
+                }
+            }
+            if (UpstreamFroude < 1.12f)
             {
                 continue;
             }
@@ -1493,8 +1518,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     BreakingSiteInteriorClearanceMeters)
             {
                 ++EdgeRejectedSiteCount;
-                MaximumEdgeRejectedIntensity = FMath::Max(
-                    MaximumEdgeRejectedIntensity, Intensity);
+                if (Intensity > MaximumEdgeRejectedIntensity)
+                {
+                    MaximumEdgeRejectedIntensity = Intensity;
+                    StrongestEdgeRejectedCoverage = PresentationCoverage;
+                    StrongestEdgeRejectedClearanceMeters =
+                        PresentationEdgeClearanceMeters;
+                    StrongestEdgeRejectedRiverCoordinates =
+                        RiverCoordinatesM[UpstreamIndex];
+                }
                 continue;
             }
 
@@ -1582,12 +1614,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             Display,
             TEXT("RaftSim live breaking-water ownership: active_sites=%d "
                  "edge_rejected_sites=%d max_edge_rejected_intensity=%.3f "
+                 "strongest_edge_rejected_station_m=%.1f "
+                 "strongest_edge_rejected_lateral_m=%.1f "
+                 "strongest_edge_rejected_coverage=%.3f "
+                 "strongest_edge_rejected_clearance_m=%.1f "
                  "strongest_interior_intensity=%.3f "
                  "strongest_interior_coverage=%.3f "
                  "strongest_interior_clearance_m=%.1f minimum_clearance_m=%.1f"),
             BreakingSites.Num(),
             EdgeRejectedSiteCount,
             MaximumEdgeRejectedIntensity,
+            StrongestEdgeRejectedRiverCoordinates.X,
+            StrongestEdgeRejectedRiverCoordinates.Y,
+            StrongestEdgeRejectedCoverage,
+            StrongestEdgeRejectedClearanceMeters,
             StrongestInteriorSite ? StrongestInteriorSite->Intensity : 0.0f,
             StrongestInteriorSite
                 ? StrongestInteriorSite->PresentationCoverage

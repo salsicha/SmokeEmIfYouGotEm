@@ -118,10 +118,12 @@ the gameplay authority. The generated actor exposes
 
 The regenerated views remove most of the former camera-radial dark grooves and
 show a lighter gray-green surface without reproducing the foreground depth
-split that rejected the earlier global Single Layer experiment. This is an
-incremental optical baseline, not final water art: hydraulic foam, breaking
-crests, spray/mist, local bathymetric transmission, seasonal calibration, and
-guide/art approval remain open.
+split that rejected the earlier global Single Layer experiment. The live
+runtime can now add solver-triggered breaking-water, roller, aerosol, foam, and
+mist components at the procedural rapid controls described below. This is an
+incremental optical and runtime baseline, not final water art: realistic crest
+geometry, local bathymetric transmission, seasonal calibration, and guide/art
+approval remain open.
 
 ## Runnable reference status
 
@@ -137,9 +139,27 @@ The source-controlled runtime bundle lives under
 
 - `river_coordinate_map.json` maps the source-scale curved centerline into
   station/lateral coordinates used by the runtime solver.
-- `cooked_flow_fields/` supplies a lightweight 30 km finite-volume seed. The
-  centerline surface follows the conditioned Copernicus corridor; missing
-  channel geometry and rapid cues are deterministic procedural infill.
+- `cooked_flow_fields/` supplies a lightweight 30 km finite-volume seed on a
+  5 m downstream grid. The centerline surface follows the conditioned
+  Copernicus corridor; missing channel geometry and rapid cues are
+  deterministic procedural infill.
+
+Every one of the 25 mapped rapid records now contributes a bounded,
+feature-tagged procedural control and a renderer-detectable
+supercritical-to-subcritical transition. The generator verifies those
+transitions again on the runtime presentation's 3 m sample spacing, using the
+same upstream Froude minimum of 1.12 and downstream maximum of 0.94 as the live
+water renderer. Speeds remain below 8 m/s. Rapid 9 receives hazard
+visualization only and remains a mandatory commercial portage; the generated
+transition is never a runnable-line recommendation.
+
+The full-corridor water configuration disables the legacy hydraulic-crux
+recentering used by single-rapid maps and carries the
+`RaftSimGlobalRiverStationAuthority` tag. This keeps the cooked 0-30 km station
+axis registered to the curved Zambezi route instead of moving one rapid to the
+world origin. A focused Unreal PIE gate found nine live breaking sites in the
+launch window and a ready 19-component production Niagara pool; the test also
+requires at least one active roller and rapid-aerosol component.
 
 This makes the complete map launchable and paddleable with the normal gameplay
 stack. It does not turn the inferred bed or rapid cues into real-world
@@ -157,7 +177,7 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v7 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v9 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding visual-terrain tiles, the exact four vegetation mesh families and
 eight instance components with a 7,032-instance total, exactly one tagged
@@ -167,8 +187,13 @@ zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
-also covered by `RaftSim.M9.FZambeziSingleLayerWater`; the focused runtime gate is
-`RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`.
+also covered by `RaftSim.M9.FZambeziSingleLayerWater`. Schema v9 additionally
+requires global-station preservation, the global-station authority tag, all 25
+procedural rapid records, and the Rapid 9 visualization-only portage policy.
+The focused runtime gate is
+`RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`; it
+now fails unless the loaded map produces live breaking sites and production
+Niagara roller and aerosol activity.
 
 ## Production status and gates
 
@@ -178,8 +203,8 @@ instead of silently choosing one. Only the full reference route is selectable.
 
 Promotion still requires local-guide approval of stations, lines, portages,
 access, and rescue routes; geospatial review of the centerline/datum; rights
-review of the supplied files; seasonal-flow reconciliation; a validated C++
-hydraulic window for every rapid; approved southern African gorge species and
+review of the supplied files; seasonal-flow reconciliation; a validated
+real-world hydraulic window for every rapid; approved southern African gorge species and
 ecology; lifelike terrain, bank, vegetation, and water art; and desktop/VR
 visual and performance passes. These gates block production hydraulic-fidelity
 and lifelike claims; they do not hide or disable the explicitly labeled

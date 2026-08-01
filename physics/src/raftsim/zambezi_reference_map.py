@@ -55,12 +55,15 @@ HEIGHT_MAP_CROP = (0, 0, 2000, 1040)
 REFERENCE_HEIGHTFIELD_SIZE = (1009, 625)
 REFERENCE_MESH_SIZE = (513, 321)
 OVERLAY_REJECTION_DISTANCE_RGB = 32.0
-RUNTIME_GRID_DX_M = 20.0
+RUNTIME_GRID_DX_M = 5.0
 RUNTIME_GRID_DY_M = 10.0
 RUNTIME_GRID_HALF_WIDTH_M = 120.0
 RUNTIME_WET_HALF_WIDTH_M = 72.0
 RUNTIME_COORDINATE_MAX_STEP_M = 5.0
 RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M = 15.5
+RUNTIME_PRESENTATION_SAMPLE_SPACING_M = 3.0
+RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN = 1.12
+RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX = 0.94
 
 # Legend colours are sampled from x=2016 at the centre of each 40-pixel band in
 # the supplied screenshot. Keeping the byte colours avoids any dependency on
@@ -589,6 +592,7 @@ def _write_runtime_water_bundle(
         + 0.12
     )
     rapid_intensity = np.zeros_like(station_m)
+    rapid_controls: list[dict[str, Any]] = []
     for rapid in digitization["rapids"]:
         difficulty = str(rapid["difficulty_label"])
         weight = (
@@ -600,6 +604,33 @@ def _write_runtime_water_bundle(
         rapid_intensity = np.maximum(
             rapid_intensity, weight * np.exp(-0.5 * distance**2)
         )
+        rapid_controls.append(
+            {
+                "rapid": rapid,
+                "severity": float(
+                    np.clip(
+                        0.56
+                        + 0.08 * difficulty.count("V")
+                        + 0.016 * len(rapid["feature_tags"]),
+                        0.58,
+                        0.92,
+                    )
+                ),
+                # Rapid 1 is printed at the route origin. Move its procedural
+                # control one bounded 70 m launch apron downstream so both the
+                # supercritical approach and subcritical pile clear the live
+                # surface actor's 36 m station fade plus 15 m hydraulic-site
+                # safety margin. Every other control stays on the nearest
+                # five-metre source station.
+                "control_index": int(
+                    np.clip(
+                        round(float(rapid["station_m"]) / RUNTIME_GRID_DX_M),
+                        14,
+                        nx - 10,
+                    )
+                ),
+            }
+        )
     rapid_intensity = np.clip(rapid_intensity, 0.0, 1.0)
     center_surface_m += (
         0.12 * rapid_intensity * np.sin(station_m * 0.055)
@@ -610,9 +641,97 @@ def _write_runtime_water_bundle(
         0.0,
         1.0,
     )[:, None]
-    center_depth_m = (4.2 - 0.85 * rapid_intensity)[None, :]
-    h = (center_depth_m * np.power(cross_fraction, 0.65)).astype(np.float32)
+    cross_depth_profile = np.power(cross_fraction, 0.65)
+    center_depth_m = (4.2 - 0.35 * rapid_intensity)[None, :]
+    h = center_depth_m * cross_depth_profile
     wet_mask = (h > 0.05).astype(np.uint8)
+    target_froude = (
+        (0.36 + 0.08 * rapid_intensity)[None, :]
+        * (0.86 + 0.14 * cross_fraction)
+    )
+
+    # Missing surveyed rapid bathymetry is filled with an explicit, bounded
+    # reference-only hydraulic-control contract. The five-metre station grid
+    # is fine enough for the live three-metre presentation mesh to see a real
+    # supercritical-to-subcritical transition instead of a broad Gaussian
+    # speed tint. Difficulty and feature tags scale the cue, but never assert
+    # an exact line, rock, bathymetry, or navigationally authoritative shape.
+    approach_profile = (0.12, 0.20, 0.34, 0.52, 0.70, 0.86, 1.0)
+    surface_profile = (
+        (-6, 0.02),
+        (-5, 0.04),
+        (-4, 0.07),
+        (-3, 0.11),
+        (-2, 0.16),
+        (-1, 0.23),
+        (0, 0.31),
+        (1, -0.08),
+        (2, 0.13),
+        (3, -0.07),
+        (4, 0.08),
+        (5, -0.04),
+        (6, 0.03),
+    )
+    for control in rapid_controls:
+        rapid = control["rapid"]
+        severity = float(control["severity"])
+        control_index = int(control["control_index"])
+        tags = {str(tag) for tag in rapid["feature_tags"]}
+        broad_feature = any(
+            token in " ".join(tags)
+            for token in ("river_wide", "large_wave", "wave_train", "multiple")
+        )
+        lane_sigma_m = 55.0 if broad_feature else 46.0
+        lane = np.exp(-0.5 * (np.abs(lateral_m) / lane_sigma_m) ** 4)
+        lane = np.where(wet_mask[:, control_index] != 0, lane, 0.0)
+        control_depth_m = 2.15 - 0.48 * severity
+        control_froude = 1.58 + 0.34 * severity
+        for profile_index, profile_strength in enumerate(approach_profile):
+            offset = profile_index - (len(approach_profile) - 1)
+            column = control_index + offset
+            blend = np.clip(lane * profile_strength, 0.0, 1.0)
+            h[:, column] = np.where(
+                wet_mask[:, column] != 0,
+                h[:, column] * (1.0 - blend) + control_depth_m * blend,
+                0.0,
+            )
+            target_froude[:, column] = np.maximum(
+                target_froude[:, column],
+                target_froude[:, column] * (1.0 - blend)
+                + control_froude * blend,
+            )
+
+        # The first tailwater station is intentionally abrupt: it is the
+        # hydraulic jump. Deeper, slower water then releases into a decaying
+        # feature-tagged wave train. The renderer owns any overhanging crest,
+        # foam, roller, aerosol, and mist; these fields remain physics inputs.
+        pile_depth_m = 4.45 + 0.42 * severity
+        pile_froude = 0.46 - 0.04 * severity
+        for tail_offset in range(1, 9):
+            column = control_index + tail_offset
+            decay = math.exp(-0.34 * (tail_offset - 1))
+            phase = math.cos(2.05 * tail_offset)
+            blend = np.clip(lane * decay, 0.0, 1.0)
+            tail_depth_m = pile_depth_m + 0.24 * severity * phase * decay
+            tail_froude = pile_froude + 0.09 * max(phase, 0.0) * decay
+            h[:, column] = np.where(
+                wet_mask[:, column] != 0,
+                h[:, column] * (1.0 - blend) + tail_depth_m * blend,
+                0.0,
+            )
+            target_froude[:, column] = np.where(
+                wet_mask[:, column] != 0,
+                target_froude[:, column] * (1.0 - blend)
+                + tail_froude * blend,
+                0.0,
+            )
+
+        for offset, relative_surface_m in surface_profile:
+            center_surface_m[control_index + offset] += (
+                relative_surface_m * severity
+            )
+
+    h = h.astype(np.float32)
     dry_bank_rise = (
         np.maximum(np.abs(lateral_m) - RUNTIME_WET_HALF_WIDTH_M, 0.0)[:, None]
         * 0.035
@@ -624,16 +743,67 @@ def _write_runtime_water_bundle(
     ).astype(np.float32)
     u = (
         wet_mask
-        * (2.15 + 1.55 * rapid_intensity[None, :])
-        * (0.72 + 0.28 * cross_fraction)
+        * target_froude
+        * np.sqrt(9.80665 * np.maximum(h, 1.0e-6))
     ).astype(np.float32)
     v = (
         wet_mask
-        * 0.24
+        * 0.38
         * rapid_intensity[None, :]
         * np.sin(np.pi * lateral_m[:, None] / RUNTIME_WET_HALF_WIDTH_M)
         * np.sin(station_m[None, :] * 0.011)
     ).astype(np.float32)
+
+    center_row = int(np.argmin(np.abs(lateral_m)))
+    center_h = h[center_row].astype(np.float64)
+    center_u = u[center_row].astype(np.float64)
+    center_v = v[center_row].astype(np.float64)
+    rapid_transition_records: list[dict[str, Any]] = []
+    for control in rapid_controls:
+        rapid = control["rapid"]
+        control_index = int(control["control_index"])
+        control_station_m = float(station_m[control_index])
+        sample_stations = np.arange(
+            max(0.0, control_station_m - 15.0),
+            min(float(station_m[-1]), control_station_m + 25.0)
+            + 0.5 * RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
+            RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
+        )
+        sample_h = np.interp(sample_stations, station_m, center_h)
+        sample_u = np.interp(sample_stations, station_m, center_u)
+        sample_v = np.interp(sample_stations, station_m, center_v)
+        sample_froude = np.hypot(sample_u, sample_v) / np.sqrt(
+            9.80665 * np.maximum(sample_h, 1.0e-6)
+        )
+        transitions = np.flatnonzero(
+            (sample_froude[:-1] >= RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN)
+            & (sample_froude[1:] <= RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX)
+        )
+        if transitions.size == 0:
+            raise RuntimeError(
+                "Procedural Zambezi rapid "
+                f"{rapid['rapid_number']} does not satisfy the live breaking-water "
+                "transition contract"
+            )
+        transition_index = int(transitions[0])
+        rapid_transition_records.append(
+            {
+                "rapid_number": str(rapid["rapid_number"]),
+                "display_name": str(rapid["catalog_name"]),
+                "source_station_m": float(rapid["station_m"]),
+                "control_station_m": control_station_m,
+                "difficulty_label": str(rapid["difficulty_label"]),
+                "feature_tags": list(rapid["feature_tags"]),
+                "mandatory_commercial_portage": str(rapid["rapid_number"]) == "9",
+                "upstream_froude": round(float(sample_froude[transition_index]), 4),
+                "tailwater_froude": round(float(sample_froude[transition_index + 1]), 4),
+                "transition_station_m": round(
+                    float(sample_stations[transition_index + 1]), 3
+                ),
+                "runtime_sample_spacing_m": RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
+                "production_authoritative": False,
+            }
+        )
 
     arrays = {
         "bed": (
@@ -659,13 +829,14 @@ def _write_runtime_water_bundle(
     manifest = {
         "schema": "raftsim.cooked_flow_fields.v1",
         "generator": (
-            "raftsim.zambezi_reference_map.procedural_full_corridor_seed.v1"
+            "raftsim.zambezi_reference_map.feature_tagged_hydraulic_seed.v2"
         ),
         "river_id": "zambezi_batoka_gorge",
         "section_id": "boiling_pot_to_mukuni_beach_reference_run",
         "window_id": "zambezi_full_reference_corridor",
         "status": (
-            "reference_runnable_procedural_seed_not_validated_rapid_hydraulics"
+            "reference_runnable_feature_tagged_procedural_hydraulics_"
+            "not_validated_real_world_hydraulics"
         ),
         "production_promoted": False,
         "source_package": SCENARIO_RELATIVE.parent.as_posix(),
@@ -720,8 +891,25 @@ def _write_runtime_water_bundle(
             ),
             "wet_half_width_m": RUNTIME_WET_HALF_WIDTH_M,
             "rapid_cues": (
-                "bounded Gaussian station cues from the user-supplied 25-rapid map"
+                "bounded feature-tagged hydraulic controls from the user-supplied "
+                "25-rapid map"
             ),
+            "hydraulic_transition_contract": {
+                "schema": "raftsim.zambezi.procedural_hydraulic_transitions.v1",
+                "runtime_station_resolution_m": RUNTIME_GRID_DX_M,
+                "presentation_sample_spacing_m": RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
+                "upstream_froude_minimum": RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN,
+                "tailwater_froude_maximum": RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX,
+                "rapid_transition_count": len(rapid_transition_records),
+                "all_rapid_transitions_detected": (
+                    len(rapid_transition_records) == len(rapid_controls)
+                ),
+                "rapid_9_policy": (
+                    "hazard_visualization_only_mandatory_commercial_portage_"
+                    "not_a_runnable_line"
+                ),
+                "transitions": rapid_transition_records,
+            },
             "authority": (
                 "gameplay_reference_only_not_navigation_or_real_world_hydraulic_authority"
             ),
@@ -730,6 +918,11 @@ def _write_runtime_water_bundle(
             (
                 "This lightweight full-corridor seed makes the generated Zambezi map "
                 "runnable with the live finite-volume runtime."
+            ),
+            (
+                "Every mapped rapid now contains a bounded five-metre procedural "
+                "control and a live-renderer-detectable supercritical-to-subcritical "
+                "transition; exact geometry, lines, and hydraulic fidelity remain open."
             ),
             (
                 "It does not claim surveyed bathymetry, exact rapid lines, guide approval, "
@@ -840,7 +1033,8 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
             "runtime_coordinate_map": COORDINATE_MAP_RELATIVE.as_posix(),
             "runtime_cooked_fields": COOKED_FIELDS_RELATIVE.as_posix(),
             "hydraulic_authority": (
-                "procedural_gameplay_seed_not_rapid_specific_or_real_world_authority"
+                "feature_tagged_procedural_reference_only_not_validated_"
+                "real_world_hydraulics"
             ),
         },
         "route_variants": [
@@ -849,8 +1043,8 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
                 "start_rapid": "1",
                 "end_rapid": "25",
                 "status": (
-                    "reference_runnable_with_procedural_water_"
-                    "not_production_rapid_hydraulics"
+                    "reference_runnable_with_feature_tagged_procedural_"
+                    "hydraulics_not_production_rapid_hydraulics"
                 ),
                 "selection_policy": "default_reference_corridor",
             },
