@@ -184,6 +184,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Rivers/"
         "RaftSimEditorZambeziDirector.cpp"
     ).read_text(encoding="utf-8")
+    foliage_cpp = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
+        "RaftSimEditorLandscapeFoliage.cpp"
+    ).read_text(encoding="utf-8")
     assert "ScenarioRelativePath" in internal
     assert SCENARIO_RELATIVE.as_posix() in catalog_cpp
     assert "AddLandscapeCandidateScenarioMarkers" in build_cpp
@@ -194,6 +199,14 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true)" in build_cpp
     assert "RaftSimProceduralVisualMorphology" in director_cpp
     assert "RaftSimNonCollisionRenderSurface" in director_cpp
+    assert "CreateZambeziOpaqueVegetationAssets" in foliage_cpp
+    assert "M_RaftSim_Zambezi_OpaqueVegetation" in foliage_cpp
+    assert "Material->BlendMode = BLEND_Opaque" in foliage_cpp
+    assert "Material->TwoSided = false" in foliage_cpp
+    assert "RaftSimOpaqueVolumetricVegetation" in foliage_cpp
+    assert "RaftSimProceduralVegetationFallback" in foliage_cpp
+    assert "RaftSimSlopeScreenedPlacement" in foliage_cpp
+    assert "GetLandscapeSlopeDegrees" in foliage_cpp
 
     validation = _load(
         REPO_ROOT
@@ -220,4 +233,20 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert all(
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
+    )
+    assert validation["schema"].endswith(".v4")
+    assert validation["vegetation"]["component_count"] == 4
+    assert validation["vegetation"]["instance_count"] == 5600
+    assert validation["vegetation"]["legacy_zambezi_pve_actor_count"] == 0
+    assert sorted(
+        component["instance_count"]
+        for component in validation["vegetation"]["components"]
+    ) == [700, 1400, 1400, 2100]
+    assert all(
+        "M_RaftSim_Zambezi_OpaqueVegetation" in component["material"]
+        for component in validation["vegetation"]["components"]
+    )
+    assert all(
+        "NO_COLLISION" in component["collision_enabled"]
+        for component in validation["vegetation"]["components"]
     )

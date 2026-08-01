@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v3",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v4",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -93,6 +93,45 @@ def main() -> None:
                     "collision_enabled": str(mesh.get_collision_enabled()) if mesh else None,
                 }
             )
+        vegetation_actors = [
+            actor
+            for actor in actors
+            if "RaftSimZambeziOpaqueVegetation"
+            in {str(tag) for tag in actor.tags}
+        ]
+        vegetation_rows = []
+        for actor in vegetation_actors:
+            components = actor.get_components_by_class(
+                unreal.HierarchicalInstancedStaticMeshComponent
+            )
+            component = components[0] if components else None
+            material = component.get_material(0) if component else None
+            static_mesh = (
+                component.get_editor_property("static_mesh") if component else None
+            )
+            vegetation_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
+                    "component_count": len(components),
+                    "instance_count": (
+                        component.get_instance_count() if component else 0
+                    ),
+                    "static_mesh": (
+                        static_mesh.get_path_name() if static_mesh else None
+                    ),
+                    "material": material.get_path_name() if material else None,
+                    "collision_enabled": (
+                        str(component.get_collision_enabled()) if component else None
+                    ),
+                }
+            )
+        legacy_zambezi_pve_actors = [
+            actor.get_actor_label()
+            for actor in actors
+            if "zambezi_batoka_gorge" in actor.get_actor_label()
+            and "LandscapeCandidate_PveWhole" in actor.get_actor_label()
+        ]
         world_settings = world.get_world_settings()
         default_game_mode = (
             world_settings.get_editor_property("default_game_mode")
@@ -126,8 +165,29 @@ def main() -> None:
                     "conditioned_tile_count": len(terrain_rows),
                     "tiles": sorted(terrain_rows, key=lambda row: row["actor_label"]),
                 },
+                "vegetation": {
+                    "authority": "procedural_render_only_no_exact_species_claim",
+                    "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards",
+                    "component_count": len(vegetation_rows),
+                    "instance_count": sum(
+                        int(row["instance_count"]) for row in vegetation_rows
+                    ),
+                    "legacy_zambezi_pve_actor_count": len(
+                        legacy_zambezi_pve_actors
+                    ),
+                    "legacy_zambezi_pve_actors": sorted(
+                        legacy_zambezi_pve_actors
+                    ),
+                    "components": sorted(
+                        vegetation_rows, key=lambda row: row["actor_label"]
+                    ),
+                },
             }
         )
+        vegetation_by_label = {
+            row["actor_label"]: int(row["instance_count"])
+            for row in vegetation_rows
+        }
         passed = (
             len(markers) == 25
             and sorted(rapid_numbers) == list(range(1, 26))
@@ -154,6 +214,45 @@ def main() -> None:
                 and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
                 for row in terrain_rows
             )
+            and len(vegetation_rows) == 4
+            and sum(int(row["instance_count"]) for row in vegetation_rows) == 5600
+            and any(
+                "ZambeziOpaqueRiparianTree" in label and count == 2100
+                for label, count in vegetation_by_label.items()
+            )
+            and any(
+                "ZambeziOpaqueUmbrellaTree" in label and count == 1400
+                for label, count in vegetation_by_label.items()
+            )
+            and any(
+                "ZambeziOpaqueThornScrub" in label and count == 1400
+                for label, count in vegetation_by_label.items()
+            )
+            and any(
+                "ZambeziOpaqueGroundCover" in label and count == 700
+                for label, count in vegetation_by_label.items()
+            )
+            and not legacy_zambezi_pve_actors
+            and all(row["component_count"] == 1 for row in vegetation_rows)
+            and all(
+                "M_RaftSim_Zambezi_OpaqueVegetation" in str(row["material"])
+                for row in vegetation_rows
+            )
+            and all(
+                "OpaqueV1" in str(row["static_mesh"])
+                for row in vegetation_rows
+            )
+            and all(
+                "NO_COLLISION" in str(row["collision_enabled"])
+                for row in vegetation_rows
+            )
+            and all(
+                "RaftSimOpaqueVolumetricVegetation" in row["tags"]
+                and "RaftSimNonCollisionRenderSurface" in row["tags"]
+                and "RaftSimProceduralVegetationFallback" in row["tags"]
+                and "RaftSimSlopeScreenedPlacement" in row["tags"]
+                for row in vegetation_rows
+            )
         )
         report["passed"] = passed
         if not passed:
@@ -161,7 +260,9 @@ def main() -> None:
         unreal.log(
             f"Zambezi reference run validation passed with {len(markers)} markers, "
             f"{len(player_rafts)} raft, {len(water_configs)} runtime water config, "
-            f"and {len(terrain_rows)} conditioned visual-terrain tiles"
+            f"{len(terrain_rows)} conditioned visual-terrain tiles, and "
+            f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
+            "opaque vegetation instances"
         )
     except Exception as error:
         report["error"] = str(error)

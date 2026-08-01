@@ -341,7 +341,81 @@
     "water_config_count": 1
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v3",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v4",
+  "vegetation": {
+    "authority": "procedural_render_only_no_exact_species_claim",
+    "component_count": 4,
+    "components": [
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziOpaqueGroundCover_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 700,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1.SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1",
+        "tags": [
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziOpaqueRiparianTree_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 2100,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1.SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1",
+        "tags": [
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziOpaqueThornScrub_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 1400,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1.SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1",
+        "tags": [
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziOpaqueUmbrellaTree_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 1400,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1.SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1",
+        "tags": [
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      }
+    ],
+    "instance_count": 5600,
+    "legacy_zambezi_pve_actor_count": 0,
+    "legacy_zambezi_pve_actors": [],
+    "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards"
+  },
   "visual_terrain": {
     "authority": "procedural_render_only",
     "conditioned_tile_count": 4,
