@@ -335,6 +335,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
             1);
 
         int32 CaptureOnlyWaterCount = 0;
+        int32 SolverFieldFoamCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             if (!(*It)->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
@@ -347,11 +348,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Pacuare runtime solver owns gameplay water rendering"),
                 (*It)->Tags.Contains(TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Pacuare authored foam is identified as solver-field visualization"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimPacuareUpperHuacasSolverVisualization")));
+                ++SolverFieldFoamCount;
+            }
             ++CaptureOnlyWaterCount;
         }
         Test->TestEqual(
-            TEXT("Pacuare has one capture-only static water ribbon"),
+            TEXT("Pacuare has capture-only static water and foam surfaces"),
             CaptureOnlyWaterCount,
+            2);
+        Test->TestEqual(
+            TEXT("Pacuare has one cooked-field-derived capture foam surface"),
+            SolverFieldFoamCount,
             1);
         return true;
     }

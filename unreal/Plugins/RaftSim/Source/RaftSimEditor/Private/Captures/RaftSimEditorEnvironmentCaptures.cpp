@@ -488,6 +488,80 @@ bool CapturePreviewImageForSpec(
             CulledReviewOnlyForegroundComponentCount,
             *Spec.RiverId);
     }
+    struct FCaptureOnlyWaterVisibilityState
+    {
+        AActor* Actor = nullptr;
+        bool bWasHiddenInGame = false;
+        bool bWasTemporarilyHiddenInEditor = false;
+        TArray<FForegroundRaftProxyHiddenState::FComponentHiddenState> ComponentStates;
+    };
+    TArray<FCaptureOnlyWaterVisibilityState> CaptureOnlyWaterVisibilityStates;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor ||
+            !Actor->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+        {
+            continue;
+        }
+        FCaptureOnlyWaterVisibilityState State;
+        State.Actor = Actor;
+        State.bWasHiddenInGame = Actor->IsHidden();
+        State.bWasTemporarilyHiddenInEditor =
+            Actor->IsTemporarilyHiddenInEditor(false);
+        TArray<UPrimitiveComponent*> PrimitiveComponents;
+        Actor->GetComponents<UPrimitiveComponent>(PrimitiveComponents);
+        for (UPrimitiveComponent* PrimitiveComponent : PrimitiveComponents)
+        {
+            if (!PrimitiveComponent)
+            {
+                continue;
+            }
+            State.ComponentStates.Add(
+                {PrimitiveComponent,
+                 PrimitiveComponent->IsVisible(),
+                 PrimitiveComponent->bHiddenInGame});
+            PrimitiveComponent->SetVisibility(true, true);
+            PrimitiveComponent->SetHiddenInGame(false, true);
+        }
+        Actor->SetActorHiddenInGame(false);
+        Actor->SetIsTemporarilyHiddenInEditor(false);
+        CaptureOnlyWaterVisibilityStates.Add(MoveTemp(State));
+    }
+    auto RestoreCaptureOnlyWaterVisibility = [&CaptureOnlyWaterVisibilityStates]()
+    {
+        for (const FCaptureOnlyWaterVisibilityState& State :
+             CaptureOnlyWaterVisibilityStates)
+        {
+            if (State.Actor)
+            {
+                State.Actor->SetActorHiddenInGame(State.bWasHiddenInGame);
+                State.Actor->SetIsTemporarilyHiddenInEditor(
+                    State.bWasTemporarilyHiddenInEditor);
+            }
+            for (const FForegroundRaftProxyHiddenState::FComponentHiddenState&
+                     ComponentState : State.ComponentStates)
+            {
+                if (!ComponentState.Component)
+                {
+                    continue;
+                }
+                ComponentState.Component->SetVisibility(
+                    ComponentState.bWasVisible,
+                    true);
+                ComponentState.Component->SetHiddenInGame(
+                    ComponentState.bWasHiddenInGame,
+                    true);
+            }
+        }
+    };
+    if (!CaptureOnlyWaterVisibilityStates.IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("Temporarily revealed %d capture-only water actors for %s evidence.\n"),
+            CaptureOnlyWaterVisibilityStates.Num(),
+            *Spec.RiverId);
+    }
     const bool bUseTemporaryRiverEyeCenterArtifactCover = false;
     AActor* RiverEyeCenterArtifactCoverActor = bHideForegroundRaftProxies && bUseTemporaryRiverEyeCenterArtifactCover
         ? AddPreviewRiverEyeCenterArtifactCover(World, Spec)
@@ -527,6 +601,7 @@ bool CapturePreviewImageForSpec(
         ImageData.Num() != CaptureWidth * CaptureHeight)
     {
         DestroyRiverEyeCenterArtifactCover();
+        RestoreCaptureOnlyWaterVisibility();
         RestoreForegroundRaftProxyVisibility();
         SceneCapture->Destroy();
         RenderTarget->ReleaseResource();
@@ -584,6 +659,7 @@ bool CapturePreviewImageForSpec(
     const bool bSaved = FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
 
     DestroyRiverEyeCenterArtifactCover();
+    RestoreCaptureOnlyWaterVisibility();
     RestoreForegroundRaftProxyVisibility();
     SceneCapture->Destroy();
     RenderTarget->ReleaseResource();

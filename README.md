@@ -16,7 +16,7 @@ Landscape, the committed Upper Huacas cooked solver field, explicit vertical
 datum alignment, player raft/start, and the full vertical-slice game mode now
 ship together. It is reference-runnable, not photoreal-approved; the evidence
 and remaining gates are recorded in
-[the Upper Huacas runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_upper_huacas_reach_local_runnable_v1_review.json).
+[the Upper Huacas water/readability review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_upper_huacas_solver_whitewater_v2_review.json).
 See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
 milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 

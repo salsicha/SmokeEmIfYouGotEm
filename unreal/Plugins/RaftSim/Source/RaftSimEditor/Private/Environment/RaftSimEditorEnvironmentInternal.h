@@ -171,6 +171,7 @@ struct FRaftSimLandscapeImportCandidateSpec
     FString ImportContractRelativePath;
     FString LocalCenterlineRelativePath;
     FString ScenarioRelativePath;
+    FString SolverVisualizationFieldRelativePath;
     FString MapPackagePath;
     int32 LandscapeSize = 1009;
     float HorizontalSpanXCm = 32300.0f;
@@ -179,6 +180,12 @@ struct FRaftSimLandscapeImportCandidateSpec
     float WorldVerticalOffsetCm = 0.0f;
     bool bApplyPreviewAnalyticChannelBurn = true;
     bool bUseSolverVisualizationFields = true;
+    float SolverVisualizationDepthCapM = 6.0f;
+    float SolverVisualizationSpeedCapMps = 10.0f;
+    float SolverVisualizationFroudeCap = 7.0f;
+    float SolverVisualizationSurfaceReliefCapM = 4.0f;
+    float SolverVisualizationLateralMinM = -19.0f;
+    float SolverVisualizationLateralMaxM = 19.0f;
     bool bPhysicalScaleSourceCorridor = false;
     bool bUseDensePhysicalTerrainRenderSurface = true;
     bool bEnableLandscapeNanite = true;
@@ -2166,6 +2173,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     UMaterialInterface* WaterMaterial,
+    const FRaftSimPreviewImage* SolverVisualizationFields,
+    UMaterialInterface* SolverFoamMaterial,
     FString& OutSummary);
 
 AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(

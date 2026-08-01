@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Pacuare Upper Huacas now derives its capture-only water color, bounded surface
+  relief, and separate masked foam sheet from the committed rain-fed cooked
+  depth/speed/Froude field. Canonical cameras frame the station 286 m hydraulic
+  crux, and capture automation temporarily reveals the two authored water actors
+  before restoring their serialized hidden-in-game state. The live solver remains
+  the sole gameplay renderer and force authority; the focused build, map, material,
+  and provenance gates pass, while field convergence and photoreal/guide approval
+  remain explicitly rejected.
 - Restored Zambezi Batoka Gorge to the generated player-selection source model,
   aligning it with the already-runnable Unreal Free Run catalog, scenario,
   shipping cook target, and saved map. A cross-model regression now locks the

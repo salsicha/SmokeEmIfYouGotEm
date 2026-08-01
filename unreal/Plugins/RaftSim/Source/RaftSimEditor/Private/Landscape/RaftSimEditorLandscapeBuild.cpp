@@ -105,11 +105,17 @@ bool BuildLandscapeImportCandidateMap(
     {
         return false;
     }
+    // Pacuare's packed field is sampled on the CPU-authored capture ribbon.
+    // Keep its established PhysicalCorridor instance identity; the isolated
+    // rainforest parent does not bind a solver texture parameter directly.
+    const bool bDisableSolverVisualizationFieldsInMaterial =
+        !Candidate.bUseSolverVisualizationFields ||
+        Candidate.PreviewSpec.RiverId == TEXT("pacuare");
     UMaterialInterface* CandidateWaterMaterial =
         LoadOrCreateLandscapeCandidateWaterMaterial(
             Candidate.PreviewSpec,
             OutSummary,
-            !Candidate.bUseSolverVisualizationFields);
+            bDisableSolverVisualizationFieldsInMaterial);
     if (!CandidateWaterMaterial)
     {
         return false;
@@ -121,9 +127,10 @@ bool BuildLandscapeImportCandidateMap(
     UMaterialInterface* SolverFoamMaterial = nullptr;
     if (Candidate.bUseSolverVisualizationFields && CandidateWaterSettings.SolverFieldEnable > 0.5f)
     {
-        const FString SolverFieldImage =
-            TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
-                 "american_south_fork_median_cpp_solver_depth_speed_froude_v1.png");
+        const FString SolverFieldImage = Candidate.SolverVisualizationFieldRelativePath.IsEmpty()
+            ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                   "american_south_fork_median_cpp_solver_depth_speed_froude_v1.png")
+            : Candidate.SolverVisualizationFieldRelativePath;
         if (!LoadPreviewPngImage(SolverFieldImage, SolverVisualizationFields))
         {
             OutSummary += FString::Printf(
@@ -132,7 +139,15 @@ bool BuildLandscapeImportCandidateMap(
             return false;
         }
         SolverVisualizationFieldsPtr = &SolverVisualizationFields;
-        SolverFoamMaterial = LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        SolverFoamMaterial = LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                 "M_RaftSim_SolverFieldFoamCandidate."
+                 "M_RaftSim_SolverFieldFoamCandidate"));
+        if (!SolverFoamMaterial)
+        {
+            SolverFoamMaterial = LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        }
         if (!SolverFoamMaterial)
         {
             return false;
@@ -345,6 +360,8 @@ bool BuildLandscapeImportCandidateMap(
               Landscape,
               Candidate,
               CandidateWaterMaterial,
+              SolverVisualizationFieldsPtr,
+              SolverFoamMaterial,
               OutSummary)
         : AddPreviewRiverRibbonMesh(
               World,

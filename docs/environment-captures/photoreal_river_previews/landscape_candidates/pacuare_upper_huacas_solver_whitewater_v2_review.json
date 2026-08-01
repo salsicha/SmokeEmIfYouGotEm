@@ -1,0 +1,113 @@
+{
+  "schema": "raftsim.environment.pacuare_upper_huacas_solver_whitewater_review.v2",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "milestone": "pacuare_upper_huacas_solver_whitewater_v2",
+  "status": "accepted_capture_readability_photoreal_promotion_rejected",
+  "decision": {
+    "reference_runnable": true,
+    "capture_reads_as_moving_whitewater": true,
+    "production_promoted": false,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "authored_capture_water_hidden_in_game": true,
+    "capture_only_water_actor_count": 2,
+    "capture_only_water_collision_enabled": false
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields/rainfed_runnable_planning",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "wet_cell_count": 5393,
+    "supercritical_cell_count": 52,
+    "foam_eligible_cell_count": 125,
+    "maximum_speed_m_per_s": 4.274537563323975,
+    "maximum_froude": 2.524568120199761,
+    "strongest_mean_froude_station_m": 286.0,
+    "strongest_column_mean_froude": 1.5880918353203237,
+    "production_calibration_evidence": false
+  },
+  "capture_presentation": {
+    "packed_field_channels": "R depth, G speed, B Froude, A detrended bed-plus-depth surface relief",
+    "surface_relief_render_cap_cm": 18.0,
+    "residual_analytic_displacement_scale": 0.22,
+    "foam_max_opacity": 0.94,
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0,
+    "foam_persistence_policy": "bounded decay from current and two upstream cooked-field samples",
+    "guide_camera_progress": [0.405, 0.49],
+    "river_eye_camera_progress": [0.445, 0.505],
+    "solver_rapid_camera_progress": [0.43, 0.515],
+    "capture_visibility_policy": "temporarily reveal RaftSimCaptureOnlyStaticWater actors during editor evidence and restore their serialized runtime-hidden state"
+  },
+  "authority_boundary": {
+    "capture_derivative_changes_solver_state": false,
+    "capture_derivative_changes_cooked_fields": false,
+    "capture_derivative_changes_collision": false,
+    "capture_derivative_changes_raft_forces": false,
+    "capture_derivative_changes_runtime_water_rendering": false,
+    "runtime_water_owner": "ARaftSimWaterSurfaceActor live cooked-field window",
+    "terrain_owner": "L_UpperHuacas reach-local Landscape"
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "sha256": "260c2426c3f58ceab595b11ba4079e19d6e71d01af33f6af327bcd2bccb1f81b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "16da9111e63ce778abde5c7269d57d368fe1ddb38ed40e08135e7255e7b8d6df"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "179bb042cdf6a144f720308a0cf0e18910ab4b26b0677f977df23c2fe167eb60"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
+      "sha256": "ce1904e43bbdf5babf8a198b2c027b5df459c66181554760347cf0c3a6388af7"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
+      "sha256": "7dc1d7a104c8ad0790d38805173c2522310750af83b0f3da18f2687b9af7a0a1"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png",
+      "sha256": "2374a59f5bf5945158ba8b853216a35b8620471daff44165cb0f30e0bbd2e763"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_visualization_manifest.json",
+      "sha256": "b37742ba315c08d93cf11ebe3b01e8e502ec182e9f28d05c1d21ca7bb1d789ec"
+    }
+  ],
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_UpperHuacas_pass_1_of_1",
+    "focused_material_tests": "RaftSim.M9.FPacuare_pass_2_of_2",
+    "focused_python_tests": "pass",
+    "runtime_launch_wet_vertices": 987,
+    "runtime_launch_hydraulic_relief_abs_max_m": 0.1685,
+    "runtime_launch_rapid_foam_vertices": 0,
+    "raft_upright_after_initial_settle": true,
+    "swimmer_count_after_initial_settle": 0
+  },
+  "remaining_photoreal_defects": [
+    "opaque Default Lit water still lacks production shallow-water transmission, depth optics, and riverbed readability",
+    "foam remains a coarse capture derivative rather than production crest, roller, spray, and mist VFX",
+    "generic sample foliage produces repeated triangular silhouettes and lacks Pacuare-specific ecology",
+    "terrain and bank detail still depend on interpreted 30 m DEM context and bounded procedural infill",
+    "the cooked field is not converged and discharge, bathymetry, stationing, and guide line remain uncalibrated",
+    "full downstream live-runtime whitewater, capsize, rescue, performance, and packaged-run evidence is missing"
+  ],
+  "required_external_acceptance_gates": [
+    "Pacuare guide review of Upper Huacas line, hazards, water levels, entry, and exit",
+    "geospatial review of exact stationing, planform, vertical datum, bank breaklines, and higher-resolution terrain",
+    "hydraulic calibration and convergence approval against observed Upper Huacas behavior across playable flow bands",
+    "ecology and environment-art approval of species, density, ground cover, geology, wet banks, and waterfall context",
+    "photoreal water/VFX approval for transparency, foam, spray, mist, refraction, reflections, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}
