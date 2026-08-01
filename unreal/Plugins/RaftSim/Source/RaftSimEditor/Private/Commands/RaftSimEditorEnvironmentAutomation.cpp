@@ -448,11 +448,17 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bPacuareSolverVisualization =
             bHasSolverVisualizationFields &&
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bColoradoHanceSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
         const FString CandidateSolverVisualizationManifest =
             bPacuareSolverVisualization
             ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
                    "pacuare_upper_huacas_rainfed_visualization_manifest.json")
-            : GetSolverVisualizationFieldManifestRelativePath();
+            : (bColoradoHanceSolverVisualization
+                   ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                          "colorado_hance_moderate_visualization_manifest.json")
+                   : GetSolverVisualizationFieldManifestRelativePath());
         const bool bHasManifestConditionedPhysicalChannel =
             Candidate.bPhysicalScaleSourceCorridor;
         const bool bUsesZambeziOpaqueVegetation =
@@ -464,6 +470,12 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bUsesDefaultLitLandscape =
+            bUsesPacuareOrganicRainforestSurface ||
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+        const bool bUsesReachLocalReferenceGameplay =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
         const FString WaterMaterialParentPath = bUsesZambeziSingleLayerWater
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater")
             : (bUsesPacuareRainforestDefaultLitWater
@@ -721,7 +733,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"nanite_material_audit_error_count\": %d,\n")
             TEXT("      \"nanite_representation_status\": \"%s\",\n")
             TEXT("      \"capture_shader_warmup_policy\": \"render_then_finish_compilation_recreate_landscape_components_render_again\",\n")
-            TEXT("      \"promotion_status\": \"review_gated_isolated_candidate_not_enabled_for_gameplay_or_active_previews\"\n")
+            TEXT("      \"promotion_status\": \"%s\"\n")
             TEXT("    }"),
             Index == 0 ? TEXT("") : TEXT(",\n"),
             *EscapeRaftSimJsonString(Candidate.PreviewSpec.RiverId),
@@ -784,12 +796,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.bUseDensePhysicalTerrainRenderSurface
                 ? TEXT("hidden_landscape_collision_and_height_query_plus_noncolliding_dense_render_tiles")
                 : TEXT("visible_reach_local_landscape_owns_rendering_collision_and_height_queries"),
-            Candidate.PreviewSpec.RiverId == TEXT("pacuare")
-                ? TEXT("reference_runnable_upper_huacas_live_cooked_water_player_raft_and_game_mode")
+            bUsesReachLocalReferenceGameplay
+                ? (Candidate.PreviewSpec.RiverId == TEXT("pacuare")
+                       ? TEXT("reference_runnable_upper_huacas_live_cooked_water_player_raft_and_game_mode")
+                       : TEXT("reference_runnable_colorado_hance_live_cooked_water_player_raft_and_game_mode"))
                 : (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge")
                        ? TEXT("reference_runnable_full_corridor_live_cooked_water_player_raft_and_game_mode")
                        : TEXT("capture_candidate_only")),
-            bUsesPacuareOrganicRainforestSurface
+            bUsesDefaultLitLandscape
                 ? TEXT("DefaultLit")
                 : TEXT("Unlit"),
             bUsesPacuareOrganicRainforestSurface
@@ -957,12 +971,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             bHasSolverVisualizationFields
                 ? (bPacuareSolverVisualization
                        ? TEXT("pacuare_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : bColoradoHanceSolverVisualization
+                       ? TEXT("colorado_hance_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
                        : TEXT("validated_cpp_solver_visualization_fields_bound_review_only"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_for_physical_corridor_until_solver_grid_georeferencing_is_validated")
                        : TEXT("not_available_for_river_no_cross_river_field_reuse")),
             *EscapeRaftSimJsonString(CandidateSolverVisualizationManifest),
-            bHasSolverVisualizationFields ? (bPacuareSolverVisualization ? 1 : 2) : 0,
+            bHasSolverVisualizationFields
+                ? (!Candidate.SolverVisualizationFieldRelativePath.IsEmpty() ? 1 : 2)
+                : 0,
             bHasSolverVisualizationFields ? TEXT("0") : TEXT("null"),
             WaterSettings.SolverFieldEnable,
             WaterSettings.SolverMacroNormalWeight,
@@ -974,15 +992,17 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.SolverSurfaceReliefScale,
             Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
                 WaterSettings.SolverSurfaceReliefScale,
-            bHasSolverVisualizationFields ? (bPacuareSolverVisualization ? 0.22f : 0.42f) : 1.0f,
+            bHasSolverVisualizationFields ? 0.22f : 1.0f,
             bHasSolverVisualizationFields
-                ? (bPacuareSolverVisualization
+                ? (!Candidate.SolverVisualizationFieldRelativePath.IsEmpty()
                        ? TEXT("capture_only_cooked_speed_froude_masked_noncolliding_surface_bound_hidden_in_game")
                        : TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_until_physical_corridor_solver_grid_georeferencing_is_validated")
                        : TEXT("not_available_without_river_specific_validated_solver_field")),
-            bHasSolverVisualizationFields ? (bPacuareSolverVisualization ? 0.94f : 0.72f) : 0.0f,
+            bHasSolverVisualizationFields
+                ? (!Candidate.SolverVisualizationFieldRelativePath.IsEmpty() ? 0.94f : 0.72f)
+                : 0.0f,
             bHasSolverVisualizationFields ? 1.4f : 0.0f,
             Result.WaterMaterialBoundComponentCount,
             WaterSettings.BaseColorScale,
@@ -1024,7 +1044,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? (Result.bNaniteRepresentationBuilt
                        ? TEXT("enabled_and_built_up_to_date")
                        : TEXT("enabled_candidate_build_failed_or_stale"))
-                : TEXT("disabled_for_physical_corridor_after_captured_nanite_hole_regression"));
+                : TEXT("disabled_for_physical_corridor_after_captured_nanite_hole_regression"),
+            bUsesReachLocalReferenceGameplay || bUsesZambeziSingleLayerWater
+                ? TEXT("reference_runnable_gameplay_photoreal_and_production_promotion_review_gated")
+                : TEXT("review_gated_isolated_candidate_not_enabled_for_gameplay_or_active_previews"));
     }
 
     const FString Manifest = FString::Printf(

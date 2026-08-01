@@ -89,8 +89,9 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
     assert "bRockCanyon ? 0.04f : 0.18f" in editor_source
     assert "RenderReliefCapCm = bZambezi ? 220.0f" in editor_source
     assert "bFutaleufu ? 240.0f : 180.0f" in editor_source
-    assert "0.250f, 0.365f, 230.0f, 150.0f" in editor_source
-    assert "0.450f, 0.565f, 175.0f, 125.0f" in editor_source
+    assert "0.650f, 0.750f, 260.0f, 105.0f" in editor_source
+    assert "0.685f, 0.785f, 170.0f, 85.0f" in editor_source
+    assert "0.705f, 0.805f, 185.0f, 90.0f" in editor_source
     assert (
         "ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ValidatedNormal)"
         in editor_source

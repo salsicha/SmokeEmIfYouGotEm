@@ -30,7 +30,7 @@ the full-corridor Zambezi reference run:
 | River | Corridor dir | Signature rapid | Map | Status |
 |---|---|---|---|---|
 | South Fork American | `south_fork_american_chili_bar` | **Troublemaker** (+ Meat Grinder) | `L_Troublemaker` | **DONE, playable** |
-| Colorado Grand Canyon | `colorado_river_grand_canyon_rowing` | **Hance** | `L_Hance` | to build |
+| Colorado Grand Canyon | `colorado_river_grand_canyon_rowing` | **Hance** | `L_Hance` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | to build |
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | to build |
@@ -127,3 +127,23 @@ and external acceptance gates pass.
   facets and rectangular shoreline, but opaque water, generic foliage,
   incomplete whitewater VFX, source fidelity, and external guide/geospatial/
   ecology/art/performance approvals still reject photoreal promotion.
+
+### 2026-08-01 — Colorado Hance physical runnable map restored
+
+- `L_Hance` now delegates to the source-Landscape builder instead of the old
+  flat signature-rapid shell or the unrelated broad Lees Ferry preview. Its
+  1009×1009, 8×8-component Landscape covers 600×320 m, preserves the complete
+  600×78 m interpreted C3 solver bed exactly, and adds as much as 74.977 m of
+  deterministic asymmetric canyon relief only outside that protected strip.
+- A 301-point identity station/lateral coordinate map applies the recorded
+  950.713 m runtime datum. The saved map launches the moderate-release cooked
+  field, player raft/start, and vertical-slice game mode; the non-colliding
+  field-derived capture ribbon and foam are serialized hidden in play so live
+  finite-volume water remains the gameplay renderer and force authority.
+- `RaftSim.P4.RiverMapLoads.L_Hance` passes 1/1 with a wet finite window, an
+  upright raft, and zero swimmers; MapCheck reports 0 errors and 0 warnings.
+  The lit canyon and hydraulic review view are a useful technical baseline,
+  but smooth tessellated-looking walls, sparse generic ecology and ground
+  cover, dark opaque water, coarse foam mats, missing Hance survey geography,
+  unconverged hydraulics, and external guide/geospatial/ecology/art/performance
+  gates keep photoreal and production promotion rejected.

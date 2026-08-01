@@ -1,0 +1,135 @@
+{
+  "schema": "raftsim.environment.colorado_hance_reach_local_runnable_review.v1",
+  "river_id": "colorado_river",
+  "rapid_name": "Hance",
+  "map_package": "/Game/RaftSim/Maps/L_Hance",
+  "milestone": "colorado_hance_reach_local_runnable_v1",
+  "status": "accepted_reference_runnable_photoreal_promotion_rejected",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "reach_local_landscape_owns_rendering_collision_and_height_queries": true,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "authored_capture_water_hidden_in_game": true,
+    "capture_only_water_actor_count": 2,
+    "capture_only_water_collision_enabled": false
+  },
+  "coordinate_contract": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "landscape_span_m": [600.0, 320.0],
+    "protected_solver_strip_span_m": [600.0, 78.0],
+    "runtime_vertical_datum_m": 950.7133833482048,
+    "runtime_coordinate_map": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_runtime_coordinate_map.json",
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "heightfield_size_px": 1009,
+    "landscape_component_grid": [8, 8],
+    "maximum_added_procedural_canyon_relief_m": 74.97718291544122,
+    "protected_solver_half_width_m": 39.0,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_source_join_step_m": 0.007589998334554935,
+    "surveyed_hance_terrain": false,
+    "source_limitation": "The committed Colorado DEM pilot is the Lees Ferry corridor, not Hance at river mile 77.1. The complete 600 by 78 m interpreted Hance C3 bed is preserved; terrain outside that strip is deterministic visual and Landscape-collision infill, not surveyed Hance geography."
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "wet_cell_count": 8275,
+    "supercritical_cell_count": 118,
+    "foam_eligible_cell_count": 242,
+    "maximum_speed_m_per_s": 7.395288467407227,
+    "maximum_froude": 4.101213912627204,
+    "strongest_mean_froude_station_m": 456.0,
+    "strongest_column_mean_froude": 1.8324583150739047,
+    "production_calibration_evidence": false
+  },
+  "capture_presentation": {
+    "packed_field_channels": "R depth, G speed, B Froude, A detrended bed-plus-depth surface relief",
+    "surface_relief_render_cap_cm": 45.0,
+    "residual_analytic_displacement_scale": 0.22,
+    "foam_max_opacity": 0.94,
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0,
+    "capture_visibility_policy": "temporarily reveal RaftSimCaptureOnlyStaticWater actors during editor evidence and restore their serialized runtime-hidden state"
+  },
+  "runtime_water": {
+    "cooked_field_directory": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields",
+    "flow_band": "moderate_release_planning",
+    "recenter_on_runtime_raft": false,
+    "coordinate_map_matches_terrain": true,
+    "runtime_launch_wet_vertices": 1534,
+    "runtime_launch_depth_mean_m": 0.6581,
+    "runtime_launch_speed_mean_m_per_s": 0.2068,
+    "runtime_launch_hydraulic_relief_abs_max_m": 0.0439,
+    "runtime_launch_rapid_foam_vertices": 0
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Hance.umap",
+      "sha256": "7a8ff031fc11c82bceac379b7c2a92fd4c3b9245dd35392550e08286d7fca588"
+    },
+    {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png",
+      "sha256": "4e51c6e97d43187a7bbd64f0fbea856b2e521f5c126e9cb5f69ed6bee3b030b5"
+    },
+    {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_runtime_coordinate_map.json",
+      "sha256": "d3b3a75db55fc7f6fecd9e26af6c8827e417c9cce33cdb20a990b64738226768"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_depth_speed_froude_surface_v1.png",
+      "sha256": "e83eb97051def8f44fcf0a5ce3e7b7efb409064f2331aa17a4811dd6aa426c85"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_visualization_manifest.json",
+      "sha256": "3b53db33ed0e572d76b251bbaca2f93116a07525fa2f38e1e7237324ef701635"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png",
+      "sha256": "ab91317f430f29d9edc42a6b589245f4137a994f9cfc1467e21863a1f5862bc0"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
+      "sha256": "0a75bf229226834fc703455f4ee230437c8198e2738a8d79322fe5a60f23090b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png",
+      "sha256": "00542bafc3f65fde2dc75ab53cf3e71c4b5a77356b9a26ba8d579a229a887575"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json",
+      "sha256": "2d2e5fe5cf7facb3e428b39bf20b66c55d92976e95ccd0a931eabbe41b235019"
+    }
+  ],
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_Hance_pass_1_of_1",
+    "focused_python_tests": "pass",
+    "raft_upright_after_initial_settle": true,
+    "swimmer_count_after_initial_settle": 0
+  },
+  "remaining_photoreal_defects": [
+    "canyon walls remain overly smooth and visibly tessellated, with sparse generic boulders, grass, shrubs, and ground cover",
+    "water remains dark and opaque with stepped ribbon edges instead of convincing depth, transmission, reflection, and riverbed readability",
+    "whitewater is rendered as coarse bright foam mats rather than resolved crests, rollers, spray, mist, and entrained aeration",
+    "the terrain outside the protected 78 m solver strip is procedural and is not surveyed or geospatially registered Hance geography",
+    "the calm launch has no runtime rapid-foam vertices and a full downstream gameplay capture through the hydraulic crux is still missing",
+    "release calibration, guide line, ecology, environment art, performance, capsize, recovery, and packaged-run evidence remain open"
+  ],
+  "required_external_acceptance_gates": [
+    "Colorado River guide or oarsman review of the Hance line, hazards, entry, exit, and playable flow bands",
+    "geospatial review of exact river-mile registration, planform, terrain, bank breaklines, bathymetry, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Hance behavior across playable release bands",
+    "geology, ecology, and environment-art approval of strata, boulders, shrubs, grass, ground cover, wet banks, and canyon context",
+    "photoreal water and VFX approval for depth, transmission, foam, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}

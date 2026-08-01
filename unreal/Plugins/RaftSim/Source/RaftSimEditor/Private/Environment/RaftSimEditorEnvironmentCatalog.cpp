@@ -69,27 +69,34 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     FRaftSimLandscapeCandidateWaterSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
-        Settings.BaseColorScale = 1.20f;
-        Settings.EmissiveFillScale = 0.100f;
-        Settings.Roughness = 0.40f;
-        Settings.Specular = 0.30f;
-        Settings.Opacity = 0.55f;
-        Settings.NormalIntensity = 0.40f;
-        Settings.PhaseG = 0.05f;
-        Settings.VertexTintWeight = 0.55f;
-        Settings.RenderWidthScale = 1.17f;
-        Settings.RenderNormalUpBlend = 0.60f;
-        Settings.RenderDisplacementScale = 0.55f;
-        Settings.ReflectionFillIntensity = 0.10f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
+        // The Hance map samples its own moderate-release C++ solver frame on
+        // the CPU-authored capture ribbon.  These restrained gains expose the
+        // hydraulic tongue and holes without allowing analytic displacement
+        // or a stale shader texture to invent gameplay water state.
+        Settings.BaseColorScale = 0.94f;
+        Settings.EmissiveFillScale = 0.140f;
+        Settings.Roughness = 0.35f;
+        Settings.Specular = 0.36f;
+        Settings.Opacity = 0.38f;
+        Settings.NormalIntensity = 0.22f;
+        Settings.SurfaceVariationStrength = 0.24f;
+        Settings.PhaseG = 0.08f;
+        Settings.VertexTintWeight = 0.62f;
+        Settings.RenderWidthScale = 1.20f;
+        Settings.RenderNormalUpBlend = 0.80f;
+        Settings.RenderDisplacementScale = 0.20f;
+        Settings.ReflectionFillIntensity = 0.06f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.16f;
+        Settings.SolverDepthColorWeight = 0.26f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.66f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.30f;
         Settings.SurfaceTint = FLinearColor(0.220f, 0.240f, 0.150f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.085f, 0.080f, 0.055f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.84f, 0.82f, 0.74f, 0.0f);
         Settings.ReflectionTint = FLinearColor(0.38f, 0.44f, 0.46f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f);
         Settings.AbsorptionCoefficients = FLinearColor(0.0014f, 0.0022f, 0.0040f, 0.0f);
@@ -1238,25 +1245,37 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         else if (PreviewSpec.RiverId == TEXT("colorado_river"))
         {
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_heightfield_2017.png");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_visual_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_visual_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/centerline_local.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ColoradoGrandCanyon_PhysicalCorridorCandidate");
-            Candidate.LandscapeSize = 2017;
-            Candidate.HorizontalSpanXCm = 296889.772f;
-            Candidate.HorizontalSpanYCm = 203765.214f;
-            Candidate.TargetReliefCm = 49316.565f;
+                TEXT("/Game/RaftSim/Maps/L_Hance");
+            Candidate.LandscapeSize = 1009;
+            Candidate.HorizontalSpanXCm = 60000.0f;
+            Candidate.HorizontalSpanYCm = 32000.0f;
+            Candidate.TargetReliefCm = 8854.3715f;
+            Candidate.WorldVerticalOffsetCm = -666.5288f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bUseSolverVisualizationFields = true;
+            Candidate.SolverVisualizationFieldRelativePath =
+                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                     "colorado_hance_moderate_depth_speed_froude_surface_v1.png");
+            Candidate.SolverVisualizationDepthCapM = 5.0f;
+            Candidate.SolverVisualizationSpeedCapMps = 8.0f;
+            Candidate.SolverVisualizationFroudeCap = 4.5f;
+            Candidate.SolverVisualizationSurfaceReliefCapM = 1.5f;
+            Candidate.SolverVisualizationLateralMinM = -39.0f;
+            Candidate.SolverVisualizationLateralMaxM = 39.0f;
             Candidate.bPhysicalScaleSourceCorridor = true;
-            Candidate.bEnableLandscapeNanite = false;
-            Candidate.PreviewSpec.RiverHalfWidthCm = 6000.0f;
-            Candidate.PreviewSpec.BankWidthCm = 24000.0f;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+            Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 2600.0f;
+            Candidate.PreviewSpec.BankWidthCm = 6200.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("pacuare"))
         {
@@ -1376,7 +1395,7 @@ FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings
         Settings.DetailMappingScale = 144.0f;
         Settings.DetailAlbedoWeight = 0.16f;
         Settings.DetailNormalWeight = 0.28f;
-        Settings.EmissiveFillScale = 0.035f;
+        Settings.EmissiveFillScale = 0.085f;
         Settings.SpecularLevel = 0.14f;
         Settings.RiverbedBlendWeight = 0.78f;
         Settings.WetBankBlendWeight = 0.58f;

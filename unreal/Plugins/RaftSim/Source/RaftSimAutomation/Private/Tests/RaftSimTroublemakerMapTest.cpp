@@ -123,6 +123,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
 
     bool bZambeziReferenceRun = false;
     bool bPacuareReferenceRun = false;
+    bool bColoradoHanceReferenceRun = false;
     ARaftSimRaftActor* PlayerRaft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
@@ -131,6 +132,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("RaftSim_Zambezi_PlayerRaft");
         bPacuareReferenceRun = PlayerRaft->GetActorLabel() ==
             TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
+        bColoradoHanceReferenceRun = PlayerRaft->GetActorLabel() ==
+            TEXT("RaftSim_ColoradoHance_PlayerRaft");
         Test->TestTrue(
             FString::Printf(
                 TEXT("raft rests within depth envelope (z=%.0f)"),
@@ -364,6 +367,92 @@ bool FRaftSimAssertRiverMapCommand::Update()
             2);
         Test->TestEqual(
             TEXT("Pacuare has one cooked-field-derived capture foam surface"),
+            SolverFieldFoamCount,
+            1);
+        return true;
+    }
+
+    if (bColoradoHanceReferenceRun)
+    {
+        Test->TestTrue(
+            TEXT("Colorado Hance player raft is marked reference-runnable"),
+            PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
+        Test->TestTrue(
+            TEXT("Colorado Hance launch keeps the raft upright"),
+            PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
+        Test->TestEqual(
+            TEXT("Colorado Hance launch keeps every person in the raft"),
+            PlayerRaft->GetSwimmerCount(),
+            0);
+
+        int32 RuntimeWaterConfigCount = 0;
+        for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabel() !=
+                TEXT("RaftSim_ColoradoHance_RuntimeWaterConfig"))
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("Colorado Hance loads the Hance cooked package"),
+                (*It)->CookedFieldsDir,
+                FString(TEXT("physics/data/real_world/"
+                             "colorado_river_grand_canyon_rowing/"
+                             "scenario_hance/cooked_flow_fields")));
+            Test->TestEqual(
+                TEXT("Colorado Hance loads the moderate release planning band"),
+                (*It)->FlowBand,
+                FName(TEXT("moderate_release_planning")));
+            Test->TestFalse(
+                TEXT("Colorado Hance preserves source station/lateral coordinates"),
+                (*It)->bRecenterHydraulicCrux);
+            Test->TestEqual(
+                TEXT("Colorado Hance binds the local-world vertical datum map"),
+                (*It)->CoordinateMapPath,
+                FString(TEXT("physics/data/real_world/"
+                             "colorado_river_grand_canyon_rowing/terrain/"
+                             "hance_visual/hance_runtime_coordinate_map.json")));
+            Test->TestTrue(
+                TEXT("Colorado Hance Landscape owns runtime terrain"),
+                (*It)->bMapProvidesTerrain);
+            ++RuntimeWaterConfigCount;
+        }
+        Test->TestEqual(
+            TEXT("Colorado Hance reference run has one runtime water config"),
+            RuntimeWaterConfigCount,
+            1);
+
+        int32 CaptureOnlyWaterCount = 0;
+        int32 SolverFieldFoamCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("Colorado Hance authored capture water is hidden during play"),
+                (*It)->IsHidden());
+            Test->TestTrue(
+                TEXT("Colorado Hance runtime solver owns gameplay water rendering"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Colorado Hance foam is identified as solver-field visualization"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimColoradoHanceSolverVisualization")));
+                ++SolverFieldFoamCount;
+            }
+            ++CaptureOnlyWaterCount;
+        }
+        Test->TestEqual(
+            TEXT("Colorado Hance has capture-only static water and foam surfaces"),
+            CaptureOnlyWaterCount,
+            2);
+        Test->TestEqual(
+            TEXT("Colorado Hance has one cooked-field-derived capture foam surface"),
             SolverFieldFoamCount,
             1);
         return true;
