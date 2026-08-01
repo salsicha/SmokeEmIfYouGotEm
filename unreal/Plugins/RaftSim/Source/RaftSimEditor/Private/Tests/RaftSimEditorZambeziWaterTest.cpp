@@ -1,7 +1,10 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialExpressionTextureObjectParameter.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -50,6 +53,123 @@ bool FRaftSimZambeziOrganicTerrainNormalsTest::RunTest(const FString& Parameters
     TestTrue(
         TEXT("Invalid grid fallback is upright"),
         InvalidNormals[4].Equals(FVector::UpVector));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimZambeziOrganicBasaltMaterialTest,
+    "RaftSim.M9.FZambeziOrganicBasaltMaterial",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters)
+{
+    UMaterial* Material = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview."
+             "M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview"));
+    TestNotNull(TEXT("Runnable Batoka terrain material exists"), Material);
+    if (!Material)
+    {
+        return false;
+    }
+
+    TestEqual(TEXT("Batoka terrain stays opaque"), Material->BlendMode, BLEND_Opaque);
+    TestTrue(
+        TEXT("Batoka terrain stays Default Lit"),
+        Material->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestTrue(TEXT("Batoka terrain remains two-sided"), Material->TwoSided);
+    TestFalse(
+        TEXT("World-aligned Batoka normals stay in world space"),
+        Material->bTangentSpaceNormal);
+
+    TMap<FName, float> ScalarDefaults;
+    TMap<FName, FLinearColor> VectorDefaults;
+    TSet<FName> TextureObjectParameters;
+    int32 NoiseCount = 0;
+    int32 MacroScaleCount = 0;
+    int32 SecondaryMacroScaleCount = 0;
+    int32 DetailScaleCount = 0;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (const UMaterialExpressionScalarParameter* Scalar =
+                Cast<UMaterialExpressionScalarParameter>(Expression.Get()))
+        {
+            ScalarDefaults.Add(Scalar->ParameterName, Scalar->DefaultValue);
+        }
+        if (const UMaterialExpressionVectorParameter* Vector =
+                Cast<UMaterialExpressionVectorParameter>(Expression.Get()))
+        {
+            VectorDefaults.Add(Vector->ParameterName, Vector->DefaultValue);
+        }
+        if (const UMaterialExpressionTextureObjectParameter* TextureObject =
+                Cast<UMaterialExpressionTextureObjectParameter>(Expression.Get()))
+        {
+            TextureObjectParameters.Add(TextureObject->ParameterName);
+        }
+        NoiseCount += Cast<UMaterialExpressionNoise>(Expression.Get()) ? 1 : 0;
+        if (const UMaterialExpressionConstant3Vector* Constant =
+                Cast<UMaterialExpressionConstant3Vector>(Expression.Get()))
+        {
+            MacroScaleCount += Constant->Constant.Equals(
+                FLinearColor(5000.0f, 5000.0f, 5000.0f, 1.0f), 0.01f) ? 1 : 0;
+            SecondaryMacroScaleCount += Constant->Constant.Equals(
+                FLinearColor(8300.0f, 8300.0f, 8300.0f, 1.0f), 0.01f) ? 1 : 0;
+            DetailScaleCount += Constant->Constant.Equals(
+                FLinearColor(480.0f, 480.0f, 480.0f, 1.0f), 0.01f) ? 1 : 0;
+        }
+    }
+
+    TestEqual(TEXT("Two world-space mineral fields break repetition"), NoiseCount, 2);
+    TestTrue(TEXT("Four primary 50 m macro channels remain"), MacroScaleCount >= 4);
+    TestEqual(TEXT("One 83 m secondary macro color projection exists"), SecondaryMacroScaleCount, 1);
+    TestEqual(TEXT("Three 4.8 m detail projections remain coherent"), DetailScaleCount, 3);
+    TestTrue(
+        TEXT("Secondary macro texture projection is bound"),
+        TextureObjectParameters.Contains(TEXT("BatokaAerialRocks02WorldAlignedSecondaryAlbedo")));
+
+    auto TestScalar = [this, &ScalarDefaults](
+                          const TCHAR* ParameterName,
+                          float ExpectedValue)
+    {
+        const float* Value = ScalarDefaults.Find(ParameterName);
+        TestNotNull(FString::Printf(TEXT("%s exists"), ParameterName), Value);
+        if (Value)
+        {
+            TestTrue(
+                FString::Printf(TEXT("%s keeps its accepted default"), ParameterName),
+                FMath::IsNearlyEqual(*Value, ExpectedValue, 0.001f));
+        }
+    };
+    TestScalar(TEXT("BatokaMacroAntiTileStrength"), 0.78f);
+    TestScalar(TEXT("BatokaWeatheringVariationStrength"), 0.28f);
+    TestScalar(TEXT("BatokaMineralShadowScale"), 0.78f);
+    TestScalar(TEXT("BatokaMineralHighlightScale"), 1.02f);
+    TestScalar(TEXT("BatokaMacroWeight"), 0.86f);
+    TestScalar(TEXT("BatokaTerrainColorCoverageFloor"), 0.78f);
+    TestScalar(TEXT("BatokaDetailColorScale"), 0.86f);
+    TestScalar(TEXT("BatokaDetailColorWeight"), 0.07f);
+    TestScalar(TEXT("BatokaDetailNormalWeight"), 0.24f);
+    TestScalar(TEXT("BatokaDetailRoughnessWeight"), 0.18f);
+
+    const FLinearColor* BasaltTint = VectorDefaults.Find(TEXT("BatokaBasaltTint"));
+    const FLinearColor* WeatheredTint =
+        VectorDefaults.Find(TEXT("BatokaWeatheredInterflowTint"));
+    TestNotNull(TEXT("Dark basalt tint exists"), BasaltTint);
+    TestNotNull(TEXT("Weathered interflow tint exists"), WeatheredTint);
+    if (BasaltTint)
+    {
+        TestTrue(
+            TEXT("Basalt is blue-gray and substantially darker than the old tan response"),
+            BasaltTint->Equals(FLinearColor(0.38f, 0.42f, 0.48f, 1.0f), 0.0001f));
+    }
+    if (WeatheredTint)
+    {
+        TestTrue(
+            TEXT("Weathering stays a bounded brown accent"),
+            WeatheredTint->Equals(FLinearColor(0.58f, 0.43f, 0.40f, 1.0f), 0.0001f));
+    }
     return !HasAnyErrors();
 }
 

@@ -843,11 +843,41 @@ def test_batoka_basalt_iterations_are_isolated_hashed_and_source_bounded():
     manifest = json.loads(
         ZAMBEZI_BATOKA_BASALT_AUTHORING_MANIFEST_PATH.read_text(encoding="utf-8")
     )
+    organic_review = json.loads(
+        (
+            REPO_ROOT
+            / "docs/environment-captures/photoreal_river_previews/"
+            "landscape_candidates/zambezi_organic_basalt_surface_v16_review.json"
+        ).read_text(encoding="utf-8")
+    )
     assert manifest["status"] == (
         "v13_bounded_visual_morphology_rejected_insufficient_source_resolution"
     )
     assert manifest["production_promoted"] is False
     assert manifest["corridor_substitution_performed"] is False
+    assert manifest["runnable_material_presentation"]["iteration"] == (
+        "BatokaOrganicBasaltV16"
+    )
+    assert manifest["runnable_material_presentation"][
+        "collision_or_geometry_changed"
+    ] is False
+    assert manifest["runnable_material_presentation"][
+        "water_solver_route_or_gameplay_authority_changed"
+    ] is False
+    assert organic_review["status"] == (
+        "organic_surface_improvement_pass_photoreal_promotion_fail"
+    )
+    assert organic_review["accepted_material_contract"][
+        "runtime_presentation_iteration"
+    ] == "BatokaOrganicBasaltV16"
+    assert organic_review["authority_invariants"][
+        "water_solver_route_raft_and_hazard_authority"
+    ] == "unchanged"
+    for evidence_name in ("baseline", "accepted"):
+        evidence = organic_review["evidence"][evidence_name]
+        evidence_path = REPO_ROOT / evidence["path"]
+        assert evidence_path.is_file()
+        assert _sha256(evidence_path) == evidence["sha256"]
     assert manifest["authorship"]["external_pixels_copied"] is True
     assert manifest["authorship"]["external_geometry_copied"] is False
     assert manifest["authorship"]["third_party_asset_dependency"] is True
@@ -1053,6 +1083,18 @@ def test_batoka_basalt_iterations_are_isolated_hashed_and_source_bounded():
     assert "RaftSimCaptureZambeziBatokaWorldAlignedTerrainComparison" in editor_source
     assert "RaftSim.CaptureZambeziBatokaVisualMorphologyComparison" in editor_source
     assert "RaftSimCaptureZambeziBatokaVisualMorphologyComparison" in editor_source
+    assert "BatokaOrganicBasaltV16" in editor_source
+    assert "BatokaAerialRocks02WorldAlignedSecondaryAlbedo" in editor_source
+    assert "BatokaMacroAntiTileStrength" in editor_source
+    assert "BatokaWeatheringVariationStrength" in editor_source
+    assert "BatokaMineralShadowScale" in editor_source
+    assert "BatokaMineralHighlightScale" in editor_source
+    assert "BatokaBasaltTint" in editor_source
+    assert "BatokaWeatheredInterflowTint" in editor_source
+    assert "BatokaTerrainColorCoverageFloor" in editor_source
+    assert "BatokaDetailColorWeight\"), 0.07f" in editor_source
+    assert "BatokaDetailNormalWeight" in editor_source
+    assert "BatokaDetailRoughnessWeight" in editor_source
     c1_report = json.loads(
         (REPO_ROOT / ZAMBEZI_BATOKA_BASALT_C1_CORRIDOR_REPORT_RELATIVE_PATH).read_text(
             encoding="utf-8"
