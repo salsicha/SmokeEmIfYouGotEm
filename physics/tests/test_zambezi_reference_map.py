@@ -203,6 +203,9 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "M_RaftSim_Zambezi_OpaqueVegetation" in foliage_cpp
     assert "Material->BlendMode = BLEND_Opaque" in foliage_cpp
     assert "Material->TwoSided = false" in foliage_cpp
+    assert "AmbientOcclusion->R = 1.0f" in foliage_cpp
+    assert "ShadowFloor->R = 0.09f" in foliage_cpp
+    assert "FLinearColor(0.085f, 0.135f, 0.034f, 1.0f)" in foliage_cpp
     assert "RaftSimOpaqueVolumetricVegetation" in foliage_cpp
     assert "RaftSimProceduralVegetationFallback" in foliage_cpp
     assert "RaftSimSlopeScreenedPlacement" in foliage_cpp
@@ -211,6 +214,20 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "ZambeziOrganicBankMosaic" in foliage_cpp
     assert "RaftSimCameraVisibleBankCover" in foliage_cpp
     assert "InstancesPerLongitudinalLane" in foliage_cpp
+    assert "ZambeziEvidenceWoodyInstanceCount = 240" in foliage_cpp
+    assert "ZambeziEvidenceWoodySlopeCeilingDegrees = 24.0f" in foliage_cpp
+    assert "ZambeziCameraRiparianTree" in foliage_cpp
+    assert "ZambeziCameraUmbrellaTree" in foliage_cpp
+    assert "ZambeziCameraThornScrub" in foliage_cpp
+    assert "RaftSimCameraVisibleWoodyEcology" in foliage_cpp
+    assert "RaftSimOrganicWoodyBankLayer" in foliage_cpp
+    assert "RaftSimWoodySlopeCeiling24Degrees" in foliage_cpp
+    assert "InstancesPerWoodyLane" in foliage_cpp
+    assert "CandidateIndex < 40" in foliage_cpp
+    assert (
+        "BestSlopeDegrees > ZambeziEvidenceWoodySlopeCeilingDegrees"
+        in foliage_cpp
+    )
 
     validation = _load(
         REPO_ROOT
@@ -238,13 +255,13 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v6")
+    assert validation["schema"].endswith(".v7")
     assert validation["water_surface"]["component_count"] == 1
     assert validation["water_surface"]["shading_model_contract"] == (
         "SingleLayerWater"
     )
-    assert validation["vegetation"]["component_count"] == 5
-    assert validation["vegetation"]["instance_count"] == 6800
+    assert validation["vegetation"]["component_count"] == 8
+    assert validation["vegetation"]["instance_count"] == 7032
     assert (
         validation["vegetation"]["camera_visible_bank_cover_component_count"]
         == 1
@@ -253,11 +270,16 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         validation["vegetation"]["camera_visible_bank_cover_instance_count"]
         == 1200
     )
+    assert validation["vegetation"]["camera_visible_woody_component_count"] == 3
+    assert validation["vegetation"]["camera_visible_woody_instance_count"] == 232
+    assert validation["vegetation"]["camera_visible_woody_target_instance_count"] == 240
+    assert validation["vegetation"]["camera_visible_woody_slope_rejection_count"] == 8
+    assert validation["vegetation"]["camera_visible_woody_slope_ceiling_degrees"] == 24.0
     assert validation["vegetation"]["legacy_zambezi_pve_actor_count"] == 0
     assert sorted(
         component["instance_count"]
         for component in validation["vegetation"]["components"]
-    ) == [700, 1200, 1400, 1400, 2100]
+    ) == [57, 58, 117, 700, 1200, 1400, 1400, 2100]
     assert all(
         "M_RaftSim_Zambezi_OpaqueVegetation" in component["material"]
         for component in validation["vegetation"]["components"]
@@ -274,3 +296,19 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimCameraVisibleBankCover" in mosaic["tags"]
     assert "RaftSimOrganicBankMosaic" in mosaic["tags"]
     assert "SavannaGroundCover_A_OpaqueV1" in mosaic["static_mesh"]
+    woody = [
+        component
+        for component in validation["vegetation"]["components"]
+        if "RaftSimCameraVisibleWoodyEcology" in component["tags"]
+    ]
+    assert len(woody) == 3
+    assert sorted(component["instance_count"] for component in woody) == [
+        57,
+        58,
+        117,
+    ]
+    assert all("RaftSimOrganicWoodyBankLayer" in component["tags"] for component in woody)
+    assert all(
+        "RaftSimWoodySlopeCeiling24Degrees" in component["tags"]
+        for component in woody
+    )

@@ -44,6 +44,17 @@ non-colliding vegetation instances and zero legacy alpha-card actors. Both
 captures visibly contain bank cover, but the procedural clumps, sparse ecology,
 coarse DEM silhouette, and synthetic materials still fail photoreal promotion.
 
+The next Zambezi ecology layer adds 232 camera-visible woody instances in three
+separate HISM actors: 58 riparian trees, 57 umbrella trees, and 117 thorn-scrub
+forms. A deterministic forty-candidate search rejects eight placements above a
+hard 24° DEM-slope ceiling; the maximum accepted slope is 15.83°. Muted olive
+vertex colours and a stronger low-light material floor reduce the first
+bracket's graphic green/black contrast. The current map therefore audits 7,032
+opaque, non-colliding vegetation instances across eight components. The result
+is more legible ecology, not production foliage: repeated procedural crowns,
+missing wind/seasonal variation, coarse lighting, and absent species/art/guide
+approval remain open.
+
 Candidate lighting and post-processing now come from one river-specific `FRaftSimPhotographicCaptureSettings` contract rather than scattered desert/rainforest conditionals. Sun, skylight, fog, manual exposure, saturation, contrast, sharpening, vignette, and zero camera-film-grain values are serialized into `landscape_candidate_manifest.json` for every evidence frame. A clean UE 5.8 rebuild and offscreen recapture produced no material or shader errors and all 26 environment tests pass. The controlled sky fill improves diagnostic shadow retention, but visual review still finds near-black repeated foliage, coarse terrain plates, and a flat overlapping foreground water/bank ribbon; these are production material/geometry blockers, not reasons to hide the scene with stronger exposure or post-process noise.
 
 The PVE evaluation path now uses complete exported geometry rather than assembling crowns from twig fragments and cylinder trunks. Editor automation loads the installed deciduous tree, conifer, shrub, and plant Nanite skeletal sources, converts them once into four saved static meshes under `/Game/RaftSim/Environment/BiomeSpecies/`, and places whole meshes with source water/vegetation masks through HISM components. Three complete-species `TwoSidedFoliage` slots receive river-specific texture-preserving material instances and the fourth keeps its native PVE material. The manifest records four source assets, four conversions, three custom bindings, one native fallback, Nanite state, and canopy/understory counts: 160/100 for South Fork, 0/110 for Colorado, and 194/226 for Pacuare. A near-camera ecology rule restricts the immediate evidence corridor to shrubs and understory so full crowns cannot occlude the river-eye frame. The twig-pile construction is gone, but the small generic sample set still has oversized repeated leaf forms and is not a substitute for rights-clear biome-specific species, canopy age/shape diversity, wind, seasonal state, or performance review.

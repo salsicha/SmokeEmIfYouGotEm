@@ -3511,3 +3511,15 @@ path is verified, and the completion goal can be marked complete.
   runnable/water/terrain contracts intact. The result remains photoreal-rejected
   for sparse/repetitive procedural clumps, rounded 30 m terrain, missing
   authentic Batoka ecology, and absent named guide/art approval; M9 stays open.
+- Zambezi camera-visible woody ecology V1 adds three separately auditable HISM
+  actors to both canonical downstream windows using the existing solid opaque
+  riparian-tree, umbrella-tree, and thorn-scrub meshes. The retained bracket
+  places 58/57/117 instances respectively; eight of 240 deterministic targets
+  are rejected by a hard 24° DEM-slope ceiling, and the maximum accepted slope
+  is 15.83°. Muted olive vertex colours and a 9% low-light material floor reduce
+  the oversized green/black read of the rejected first bracket. Both images now
+  show restrained multi-height ecology, schema v7 passes with eight components
+  and 7,032 total instances, and the runnable terrain/water/rapid contracts stay
+  unchanged. Procedural repeated crowns, missing authentic species/wind/
+  seasonal variation, coarse terrain/lighting, and absent named guide/art
+  approval still reject photoreal promotion; M9 remains open.

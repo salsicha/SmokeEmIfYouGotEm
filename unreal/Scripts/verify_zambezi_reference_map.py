@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v6",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v7",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -236,6 +236,32 @@ def main() -> None:
             int(row["instance_count"])
             for row in camera_visible_bank_cover_rows
         )
+        camera_visible_woody_rows = [
+            row
+            for row in vegetation_rows
+            if "RaftSimCameraVisibleWoodyEcology" in row["tags"]
+            and "RaftSimOrganicWoodyBankLayer" in row["tags"]
+        ]
+        report["vegetation"]["camera_visible_woody_component_count"] = len(
+            camera_visible_woody_rows
+        )
+        report["vegetation"]["camera_visible_woody_instance_count"] = sum(
+            int(row["instance_count"])
+            for row in camera_visible_woody_rows
+        )
+        report["vegetation"]["camera_visible_woody_target_instance_count"] = 240
+        report["vegetation"]["camera_visible_woody_slope_rejection_count"] = (
+            240
+            - int(
+                report["vegetation"][
+                    "camera_visible_woody_instance_count"
+                ]
+            )
+        )
+        report["vegetation"]["camera_visible_woody_slope_ceiling_degrees"] = 24.0
+        report["vegetation"]["camera_visible_woody_placement_contract"] = (
+            "deterministic_40_candidate_visible_bank_search_with_hard_slope_ceiling"
+        )
         passed = (
             len(markers) == 25
             and sorted(rapid_numbers) == list(range(1, 26))
@@ -278,8 +304,8 @@ def main() -> None:
             in water_surface_rows[0]["tags"]
             and "RaftSimMovingMultiScaleWaterNormals"
             in water_surface_rows[0]["tags"]
-            and len(vegetation_rows) == 5
-            and sum(int(row["instance_count"]) for row in vegetation_rows) == 6800
+            and len(vegetation_rows) == 8
+            and sum(int(row["instance_count"]) for row in vegetation_rows) == 7032
             and any(
                 "ZambeziOpaqueRiparianTree" in label and count == 2100
                 for label, count in vegetation_by_label.items()
@@ -302,6 +328,28 @@ def main() -> None:
             )
             and len(camera_visible_bank_cover_rows) == 1
             and int(camera_visible_bank_cover_rows[0]["instance_count"]) == 1200
+            and len(camera_visible_woody_rows) == 3
+            and sum(
+                int(row["instance_count"])
+                for row in camera_visible_woody_rows
+            )
+            == 232
+            and any(
+                "ZambeziCameraRiparianTree" in label and count == 58
+                for label, count in vegetation_by_label.items()
+            )
+            and any(
+                "ZambeziCameraUmbrellaTree" in label and count == 57
+                for label, count in vegetation_by_label.items()
+            )
+            and any(
+                "ZambeziCameraThornScrub" in label and count == 117
+                for label, count in vegetation_by_label.items()
+            )
+            and all(
+                "RaftSimWoodySlopeCeiling24Degrees" in row["tags"]
+                for row in camera_visible_woody_rows
+            )
             and not legacy_zambezi_pve_actors
             and all(row["component_count"] == 1 for row in vegetation_rows)
             and all(
@@ -334,7 +382,7 @@ def main() -> None:
             f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
             "opaque vegetation instances, including 1200 camera-visible "
-            "organic bank-cover instances"
+            "organic bank-cover and 232 camera-visible woody instances"
         )
     except Exception as error:
         report["error"] = str(error)
