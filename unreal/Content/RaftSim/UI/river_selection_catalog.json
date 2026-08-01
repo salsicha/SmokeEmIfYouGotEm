@@ -200,6 +200,59 @@
         "field_media_timecodes": "required_before_playable",
         "rainforest_gorge_fidelity_review": "required_before_playable"
       }
+    },
+    {
+      "river_id": "zambezi_batoka_gorge",
+      "river_name": "Zambezi River",
+      "section_id": "boiling_pot_to_mukuni_beach_reference_run",
+      "section_name": "Batoka Gorge: Rapids 1–25",
+      "scenario": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "region": "Zambia–Zimbabwe Batoka Gorge",
+      "route_style": "guided_paddle_raft",
+      "runnable": true,
+      "runnable_tier": "reference_free_run",
+      "input_contract": {
+        "manual_input_parity_required": true,
+        "passenger_paddle_voice_commands_allowed": true,
+        "manual_actions": [
+          "GuideForwardPaddle",
+          "GuideBackPaddle",
+          "GuideLeftPaddle",
+          "GuideRightPaddle",
+          "GuideStopPaddle",
+          "Brace",
+          "HighSide",
+          "HoldOn",
+          "RescueTargetSelect",
+          "RescueReachGrab",
+          "RescueThrowLine"
+        ]
+      },
+      "difficulty_presets": [
+        "full_reference_run_1_to_25"
+      ],
+      "difficulty_range": ["class_iii_reference", "class_v_reference"],
+      "seasons": ["normal_big_water_reference"],
+      "flow_bands": [
+        {
+          "flow_band": "normal_big_water",
+          "relative_flow": "reference",
+          "procedural_runtime_seed": true,
+          "requires_validation_before_playable": false,
+          "requires_validation_before_production_hydraulic_fidelity": true
+        }
+      ],
+      "raft_setups": ["standard_14ft_paddle_raft"],
+      "crew_setups": ["ai_training_crew", "experienced_ai_crew"],
+      "validation_status": {
+        "reference_map_runtime": "runnable",
+        "terrain_and_collision": "copernicus_source_scale_technical_corridor",
+        "bathymetry_and_rapid_hydraulics": "procedural_pending_validation",
+        "guide_review": "required_before_production_promotion",
+        "rights_review": "required_before_distribution",
+        "photoreal_review": "required_before_lifelike_claim"
+      }
     }
   ],
   "menu_flow": [

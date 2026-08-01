@@ -1,6 +1,12 @@
-# Five-River Simulation & Playability Plan
+# Runnable River Simulation & Playability Plan
 
-Written July 18, 2026. Goal: **all five runnable rivers playable in-engine with live finite-volume solver water and the full gameplay stack** (crew, flip/swim/recover, scoring, HUD, reactive audio). This plan replicates the proven Troublemaker pattern across the portfolio. It is decision-complete for autonomous execution; where the source data is thin, the executing agent authors honestly-labeled `interpreted_bed_geometry` and records gaps, per `docs/release-1.0-plan.md` §11.
+Written July 18, 2026; updated July 31, 2026. Goal: **all six runnable
+rivers playable in-engine with live finite-volume solver water and the full
+gameplay stack** (crew, flip/swim/recover, scoring, HUD, reactive audio). The
+first five use a validated signature-rapid pattern. Zambezi is restored at an
+explicit reference tier: the full source-scale corridor is playable, while
+procedural bathymetry and rapid cues remain barred from production-fidelity
+claims.
 
 ## The proven pattern (Troublemaker, shipped July 18)
 
@@ -18,7 +24,8 @@ The gameplay stack (crew, flip/swim/recover, scoring, HUD, audio) is river-agnos
 
 ## Portfolio (decisions final)
 
-Zambezi remains backlogged (no adequate terrain/centerline). The five runnable rivers and their **signature rapids** (chosen for iconicity + data availability):
+The runnable portfolio now contains the original five signature-rapid maps and
+the full-corridor Zambezi reference run:
 
 | River | Corridor dir | Signature rapid | Map | Status |
 |---|---|---|---|---|
@@ -27,6 +34,7 @@ Zambezi remains backlogged (no adequate terrain/centerline). The five runnable r
 | Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | to build |
 | Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | to build |
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | to build |
+| Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | **reference runnable; production hydraulics gated** |
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -59,7 +67,12 @@ For Colorado/Pacuare/Futaleufú/Chilko, one agent each authors the signature-rap
 Commit + push per river as it lands. Physics suite green before every push. Honest evidence: interpreted geometry labeled, convergence gaps recorded, no playback presented as solver parity. No review-form/readiness paperwork — code, data, maps, tests. Photoreal environment art (terrain meshes, foliage, rock/water materials) is **out of scope for this plan** — this plan delivers *simulation and gameplay* playability on blockout visuals; photoreal is the separate owner-gated P4 art track.
 
 ## Definition of done
-All five `L_<River>` maps: load a live wet finite cooked-field river window; spawn the raft on it with crew, scoring, HUD, and audio; are reachable from the main menu; pass their automation load test; and drive end-to-end in an interactive playable check (raft runs the rapid, can flip and be recovered, scores, saves). Physics suite green.
+The original five `L_<River>` maps load their live wet finite cooked-field
+signature-rapid windows. The Zambezi corridor loads a source-aligned,
+procedurally infilled full-run seed. Every map spawns a raft with crew, scoring,
+HUD, and audio, is reachable from the menu, and is covered by a runtime load
+test. Zambezi remains a reference Free Run until its rapid-specific hydraulic
+and external acceptance gates pass.
 
 ## Execution log
 
@@ -71,3 +84,12 @@ All five `L_<River>` maps: load a live wet finite cooked-field river window; spa
 - Physics agents landed all four remaining signature-rapid windows + cooked fields, each honestly labeled (interpreted bed geometry; convergence/gaps recorded; not production-promoted): Colorado **Hance** (`2626d679`), Pacuare **Upper Huacas** (`f7faa740`/`ce4e2400`), Chilko **Lava Canyon** (`d29e4b71`), Futaleufú **Terminator** (`79d72a37`). manning_n recorded per band throughout.
 - All five maps regenerated onto their cooked windows (`cooked_fields=1`); `RaftSim.P4.RiverMapLoads` passes for all five — **L_Troublemaker, L_Hance, L_UpperHuacas, L_Terminator, L_LavaCanyon all load a live wet finite cooked-field river window and the raft rests on it.** Loader falls back to the manifest's middle (reference) band so each river's band naming resolves.
 - Every river is playable with the full gameplay stack (crew, flip/swim/recover, scoring, HUD, reactive audio) on genuine finite-volume solver water. Simulation-and-gameplay playability for the five-river portfolio is complete. (Photoreal environment art remains the separate owner-gated track.)
+
+### 2026-07-31 — Zambezi restored as the sixth runnable river
+- The generated Boiling Pot-to-Mukuni Beach source-scale map now carries the
+  vertical-slice game mode, player raft/start, 25 mapped rapid markers, and a
+  curved-coordinate live-water configuration.
+- A deterministic 30 km procedural solver seed fills missing bathymetry and
+  rapid cues. It is reference gameplay only: Rapid 9 remains a mandatory
+  portage and guide, geospatial, rights, seasonal-flow, rapid-hydraulic,
+  photoreal, desktop, and VR gates remain open.

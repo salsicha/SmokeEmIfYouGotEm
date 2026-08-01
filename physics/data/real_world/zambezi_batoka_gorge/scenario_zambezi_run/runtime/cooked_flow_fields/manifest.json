@@ -1,0 +1,115 @@
+{
+  "bands": [
+    {
+      "arrays": {
+        "bed": {
+          "description": "Procedural channel bed aligned to the conditioned visual surface.",
+          "dtype": "float32",
+          "file": "bed.npy",
+          "sha256": "724b20660fb9f43b8934f133439699614070ea6d7f1d17a393ec3ab7db0445ef",
+          "shape": [
+            25,
+            1500
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Procedural reference-run water depth above bed.",
+          "dtype": "float32",
+          "file": "h.npy",
+          "sha256": "82894d35960f79b061a6614498a279c735e7c8f0414f171c6a41480a0a9f1519",
+          "shape": [
+            25,
+            1500
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Downstream reference-run seed velocity.",
+          "dtype": "float32",
+          "file": "u.npy",
+          "sha256": "4b750a42cbb4237419d152d5e4887b5c14f38b386cb59cad1e26fab7c78194d0",
+          "shape": [
+            25,
+            1500
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Bounded cross-stream rapid cue velocity.",
+          "dtype": "float32",
+          "file": "v.npy",
+          "sha256": "7218d89607fc642d14be0cd8e4a9b085f44c9007151afb257090214fcc209965",
+          "shape": [
+            25,
+            1500
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "One where the procedural reference channel is wet.",
+          "dtype": "uint8",
+          "file": "wet_mask.npy",
+          "sha256": "c2065587412d1001106c33f74502a54d7eaeded1f28a9f638d028b57cb8052d2",
+          "shape": [
+            25,
+            1500
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "normal_big_water",
+      "convergence": {
+        "converged": false,
+        "status": "procedural_seed_not_a_steady_state_solver_claim"
+      },
+      "roughness_manning_n": 0.041
+    }
+  ],
+  "generator": "raftsim.zambezi_reference_map.procedural_full_corridor_seed.v1",
+  "grid": {
+    "crs": "curved river coordinates; x is station downstream and y is river-left",
+    "downstream_axis": "+x",
+    "dx_m": 20.0,
+    "dy_m": 10.0,
+    "index_to_world": "station_m = origin_x_m + col * dx_m; lateral_m = origin_y_m + row * dy_m",
+    "layout": "row_major_c_order",
+    "nx": 1500,
+    "ny": 25,
+    "origin_x_m": 0.0,
+    "origin_y_m": -120.0
+  },
+  "notes": [
+    "This lightweight full-corridor seed makes the generated Zambezi map runnable with the live finite-volume runtime.",
+    "It does not claim surveyed bathymetry, exact rapid lines, guide approval, seasonal calibration, or production hydraulic fidelity.",
+    "The Copernicus DEM remains terrain/collision authority and the generated river-coordinate map remains review-gated."
+  ],
+  "procedural_infill": {
+    "authority": "gameplay_reference_only_not_navigation_or_real_world_hydraulic_authority",
+    "rapid_cues": "bounded Gaussian station cues from the user-supplied 25-rapid map",
+    "reason": "surveyed bathymetry and rapid-scale hydraulic geometry are unavailable",
+    "surface_alignment": "conditioned visual centerline profile in the Copernicus source-scale map",
+    "wet_half_width_m": 72.0
+  },
+  "production_promoted": false,
+  "river_id": "zambezi_batoka_gorge",
+  "schema": "raftsim.cooked_flow_fields.v1",
+  "section_id": "boiling_pot_to_mukuni_beach_reference_run",
+  "solver": {
+    "bed_slope_source_scale": 1.0,
+    "cfl": 0.35,
+    "disable_fixture_calibrations": true,
+    "dry_tolerance": 1e-06,
+    "feature_strength_scale": 0.0,
+    "fixed_dt_s": 0.02,
+    "flux_scheme": "hll",
+    "preserve_initial_mass": false,
+    "roughness_scale": 1.0,
+    "solver_mode": "finite_volume",
+    "spatial_order": 2
+  },
+  "source_elevation_datum_m": 0.0,
+  "source_package": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run",
+  "status": "reference_runnable_procedural_seed_not_validated_rapid_hydraulics",
+  "window_id": "zambezi_full_reference_corridor"
+}

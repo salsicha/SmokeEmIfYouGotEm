@@ -4,15 +4,21 @@
     "geospatial reviewer approves centerline alignment and terrain datum",
     "rights reviewer approves supplied PDF/image use and all shipped source products",
     "seasonal-flow reviewer resolves high-water start/take-out variants and flow bands",
-    "each rapid receives validated hydraulic geometry and C++ solver windows before gameplay promotion",
+    "each rapid receives validated hydraulic geometry and C++ solver windows before production hydraulic-fidelity promotion",
     "desktop and VR performance plus lifelike visual review pass on the generated Unreal map"
   ],
   "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
   "gameplay": {
     "control_mode": "guided_paddle_crew",
+    "default_flow_band": "normal_big_water",
     "flexible_raft_enabled": true,
+    "hydraulic_authority": "procedural_gameplay_seed_not_rapid_specific_or_real_world_authority",
     "rapid_9_policy": "mandatory_commercial_portage_not_normal_runnable_line",
     "rock_wrap_and_flip_enabled": true,
+    "runnable": true,
+    "runnable_tier": "reference_free_run",
+    "runtime_cooked_fields": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/cooked_flow_fields",
+    "runtime_coordinate_map": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/river_coordinate_map.json",
     "swimmer_and_rescue_enabled": true,
     "voice_paddle_commands_enabled": true
   },
@@ -430,7 +436,7 @@
       "end_rapid": "25",
       "selection_policy": "default_reference_corridor",
       "start_rapid": "1",
-      "status": "editor_preview_ready_not_physics_runnable",
+      "status": "reference_runnable_with_procedural_water_not_production_rapid_hydraulics",
       "variant_id": "full_reference_run_1_to_25"
     },
     {
@@ -453,7 +459,7 @@
   "run_length_m": 27358.848,
   "scenario_id": "zambezi_boiling_pot_to_mukuni_beach_reference_run",
   "schema": "raftsim.zambezi.run_scenario.v1",
-  "status": "map_and_run_definition_ready_hydraulic_windows_and_guide_review_pending",
+  "status": "reference_runnable_with_procedural_full_corridor_water_production_hydraulics_and_reviews_pending",
   "terrain": {
     "authority": "copernicus_dem_glo30_source_scale_technical_corridor",
     "collision_and_height_query_authority": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/manifest.json",

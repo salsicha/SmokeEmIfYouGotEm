@@ -1,5 +1,10 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/WorldSettings.h"
+#include "RaftSimRaftActor.h"
+#include "RaftSimRiverWaterConfig.h"
+
 namespace RaftSimEditorEnvironment
 {
 FString GetLandscapeCandidateCaptureRelativePath(
@@ -622,6 +627,127 @@ bool AddLandscapeCandidateScenarioMarkers(
         SpawnedCount,
         *Candidate.ScenarioRelativePath);
     return SpawnedCount == RapidValues->Num();
+}
+
+bool AddLandscapeCandidateRunnableGameplay(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    if (!World || !Landscape)
+    {
+        return false;
+    }
+    if (Candidate.PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+    {
+        return true;
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> Points;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, Points, OutSummary) ||
+        Points.Num() < 2)
+    {
+        return false;
+    }
+
+    constexpr float StartProgress = 0.0025f;
+    FVector2D StartTangent2D(1.0f, 0.0f);
+    const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
+        Candidate,
+        Points,
+        StartProgress,
+        &StartTangent2D);
+    float SurfaceWorldZ = 0.0f;
+    if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+            Candidate,
+            Points,
+            StartProgress,
+            SurfaceWorldZ))
+    {
+        SurfaceWorldZ = Landscape->GetHeightAtLocation(
+            FVector(StartXY.X, StartXY.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f) + 140.0f;
+    }
+    SurfaceWorldZ += Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
+    const FVector StartTangent(StartTangent2D.X, StartTangent2D.Y, 0.0f);
+    const FRotator StartRotation = StartTangent.Rotation();
+
+    UClass* RuntimeGameMode = LoadClass<AGameModeBase>(
+        nullptr,
+        TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
+    if (!RuntimeGameMode)
+    {
+        OutSummary += TEXT("Could not load RaftSimVerticalSliceGameMode for Zambezi.\n");
+        return false;
+    }
+    World->GetWorldSettings()->DefaultGameMode = RuntimeGameMode;
+
+    ARaftSimRiverWaterConfig* WaterConfig =
+        World->SpawnActor<ARaftSimRiverWaterConfig>(
+            ARaftSimRiverWaterConfig::StaticClass(),
+            FTransform::Identity);
+    if (!WaterConfig)
+    {
+        OutSummary += TEXT("Could not spawn the Zambezi runtime water config.\n");
+        return false;
+    }
+    WaterConfig->SetActorLabel(TEXT("RaftSim_Zambezi_RuntimeWaterConfig"));
+    WaterConfig->CookedFieldsDir =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+             "scenario_zambezi_run/runtime/cooked_flow_fields");
+    WaterConfig->FlowBand = TEXT("normal_big_water");
+    WaterConfig->WindowCenterM = FVector2D(15000.0f, 0.0f);
+    WaterConfig->WindowExtentM = 32000.0f;
+    WaterConfig->CoordinateMapPath =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/"
+             "scenario_zambezi_run/runtime/river_coordinate_map.json");
+    WaterConfig->bEnableMovingWindowStreaming = false;
+    WaterConfig->bMapProvidesTerrain = true;
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
+
+    ARaftSimRaftActor* Raft = World->SpawnActor<ARaftSimRaftActor>(
+        ARaftSimRaftActor::StaticClass(),
+        FTransform(
+            StartRotation,
+            FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + 58.0f)));
+    if (!Raft)
+    {
+        OutSummary += TEXT("Could not spawn the Zambezi player raft.\n");
+        return false;
+    }
+    Raft->SetActorLabel(TEXT("RaftSim_Zambezi_PlayerRaft"));
+    Raft->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+    Raft->Tags.AddUnique(TEXT("RaftSimReferenceRunnable"));
+
+    bool bPlayerStartPositioned = false;
+    for (TActorIterator<APlayerStart> It(World); It; ++It)
+    {
+        if (It->GetActorLabel() != TEXT("RaftSim_GuideSeat_PlayerStart"))
+        {
+            continue;
+        }
+        It->SetActorLocationAndRotation(
+            FVector(StartXY.X, StartXY.Y, SurfaceWorldZ + 170.0f) -
+                StartTangent * 500.0f,
+            StartRotation);
+        It->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+        bPlayerStartPositioned = true;
+        break;
+    }
+    if (!bPlayerStartPositioned)
+    {
+        OutSummary += TEXT("Could not position the Zambezi player start.\n");
+        return false;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Added reference-runnable Zambezi gameplay at station %.1f m: "
+             "live procedural full-corridor water, player raft, player start, "
+             "and vertical-slice game mode; production rapid hydraulics remain review-gated.\n"),
+        Points.Last().StationMeters * StartProgress);
+    return true;
 }
 
 void RepositionLandscapeCandidatePhysicalCameras(

@@ -90,7 +90,15 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("lava_canyon_challenge"), TEXT("Lava Canyon Free Run"),
             TEXT("Bonus Chilko rapid slice."),
             TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),
-            ERaftSimLicenseTier::ExpeditionGuide, 14, -1.0f, -1.0f)
+            ERaftSimLicenseTier::ExpeditionGuide, 14, -1.0f, -1.0f),
+        MakeScenario(
+            TEXT("zambezi_reference_run"), TEXT("Zambezi: Boiling Pot to Mukuni Beach"),
+            TEXT("Run the source-scale Batoka Gorge reference corridor past all 25 mapped "
+                 "rapids. Water and missing bathymetry are procedural pending guide and "
+                 "rapid-specific hydraulic review; Rapid 9 is a mandatory portage."),
+            TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
+                 "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
+            ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 27358.848f)
     };
 }
 

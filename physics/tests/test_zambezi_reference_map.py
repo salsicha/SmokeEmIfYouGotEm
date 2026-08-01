@@ -8,12 +8,16 @@ from PIL import Image
 from raftsim.named_rapid_registry import build_editor_markers
 from raftsim.zambezi_reference_map import (
     CATALOG_RELATIVE,
+    COOKED_FIELDS_RELATIVE,
+    COORDINATE_MAP_RELATIVE,
     HEIGHT_IMAGE_SHA256,
     OUTPUT_RELATIVE,
     RAPID_MAP_SHA256,
     REFERENCE_HEIGHTFIELD_SIZE,
     REFERENCE_MESH_SIZE,
+    RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M,
     SCENARIO_RELATIVE,
+    build_runtime_coordinate_map,
     build_rapid_map_digitization,
 )
 
@@ -82,6 +86,14 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     scenario = _load(REPO_ROOT / SCENARIO_RELATIVE)
     assert scenario["rapid_count"] == 25
     assert scenario["production_promoted"] is False
+    assert scenario["gameplay"]["runnable"] is True
+    assert scenario["gameplay"]["runnable_tier"] == "reference_free_run"
+    assert scenario["gameplay"]["runtime_coordinate_map"] == (
+        COORDINATE_MAP_RELATIVE.as_posix()
+    )
+    assert scenario["gameplay"]["runtime_cooked_fields"] == (
+        COOKED_FIELDS_RELATIVE.as_posix()
+    )
     assert scenario["rapids"][8]["mandatory_commercial_portage"] is True
     assert sum(rapid["mandatory_commercial_portage"] for rapid in scenario["rapids"]) == 1
     assert scenario["route_variants"][0]["start_rapid"] == "1"
@@ -111,6 +123,41 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     ]
 
 
+def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
+    coordinate_map = _load(REPO_ROOT / COORDINATE_MAP_RELATIVE)
+    assert coordinate_map == build_runtime_coordinate_map(REPO_ROOT)
+    assert coordinate_map["schema"] == "raftsim.curved_river_coordinate_map.v1"
+    assert coordinate_map["station_domain_m"][0] == 0.0
+    assert 29900.0 <= coordinate_map["station_domain_m"][1] <= 30100.0
+    assert len(coordinate_map["points"]) > 5000
+    assert coordinate_map["maximum_runtime_corridor_edge_step_m"] <= (
+        RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M
+    )
+
+    cooked_root = REPO_ROOT / COOKED_FIELDS_RELATIVE
+    manifest = _load(cooked_root / "manifest.json")
+    assert manifest["schema"] == "raftsim.cooked_flow_fields.v1"
+    assert manifest["production_promoted"] is False
+    assert manifest["bands"][0]["band_id"] == "normal_big_water"
+    assert manifest["bands"][0]["convergence"]["converged"] is False
+    assert manifest["procedural_infill"]["authority"].startswith(
+        "gameplay_reference_only"
+    )
+    arrays = manifest["bands"][0]["arrays"]
+    loaded = {}
+    for name, metadata in arrays.items():
+        path = cooked_root / metadata["file"]
+        assert _sha256(path) == metadata["sha256"]
+        loaded[name] = np.load(path, allow_pickle=False)
+        assert list(loaded[name].shape) == metadata["shape"]
+    assert loaded["wet_mask"].dtype == np.uint8
+    assert loaded["wet_mask"].mean() > 0.4
+    assert np.isfinite(loaded["bed"]).all()
+    assert np.isfinite(loaded["h"]).all()
+    assert float(loaded["h"].max()) > 3.0
+    assert float(loaded["u"].max()) > 3.0
+
+
 def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers():
     internal = (
         REPO_ROOT
@@ -135,7 +182,9 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "ScenarioRelativePath" in internal
     assert SCENARIO_RELATIVE.as_posix() in catalog_cpp
     assert "AddLandscapeCandidateScenarioMarkers" in build_cpp
+    assert "AddLandscapeCandidateRunnableGameplay" in build_cpp
     assert "RaftSim_ZambeziRapid_" in geometry_cpp
+    assert "RaftSim_Zambezi_PlayerRaft" in geometry_cpp
 
     validation = _load(
         REPO_ROOT
@@ -147,4 +196,9 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["rapid_numbers"] == list(range(1, 26))
     assert validation["mandatory_portage_actor"] == (
         "RaftSim_ZambeziRapid_9_Commercial_Suicide"
+    )
+    assert validation["runnable"]["player_raft_count"] == 1
+    assert validation["runnable"]["water_config_count"] == 1
+    assert validation["runnable"]["game_mode"].endswith(
+        "RaftSimVerticalSliceGameMode"
     )

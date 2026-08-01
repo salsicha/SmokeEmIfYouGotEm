@@ -1,5 +1,5 @@
 {
-  "actor_count": 49,
+  "actor_count": 51,
   "mandatory_portage_actor": "RaftSim_ZambeziRapid_9_Commercial_Suicide",
   "mandatory_portage_marker_count": 1,
   "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
@@ -334,6 +334,12 @@
     24,
     25
   ],
+  "runnable": {
+    "game_mode": "/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode",
+    "player_raft_count": 1,
+    "player_start_count": 1,
+    "water_config_count": 1
+  },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v1"
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v2"
 }

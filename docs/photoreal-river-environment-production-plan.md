@@ -8,15 +8,16 @@ The latest locked review driver and any code it actively needs remain runnable. 
 
 ## Goal
 
-Construct complete, photorealistic Unreal river environments for the five planned runnable rivers:
+Construct complete, photorealistic Unreal river environments for the six runnable rivers:
 
 - South Fork American River, Chili Bar to Folsom Reservoir
 - Colorado River through the Grand Canyon, Lees Ferry to Pearce Ferry
 - Pacuare River, Tres Equis to Siquirres
 - Futaleufu River, Rio Azul Swinging Bridge to The Pasarela
 - Chilko River, Chilko River Lodge to the Chilko-Taseko Junction
+- Zambezi River through Batoka Gorge, Boiling Pot to Mukuni Beach
 
-The immediate photoreal priority is the Zambezi River through Batoka Gorge from Boiling Pot to Mukuni Beach and the Futaleufu River from Rio Azul Swinging Bridge to The Pasarela. Zambezi is an additional active environment target beyond the five planned runnable rivers; it is no longer backlog work, but its runnable and lifelike promotion remains blocked by authoritative centerline, high-resolution terrain, route, guide, and review evidence.
+The immediate photoreal priority is the Zambezi River through Batoka Gorge from Boiling Pot to Mukuni Beach and the Futaleufu River from Rio Azul Swinging Bridge to The Pasarela. Zambezi is runnable as a clearly labeled reference Free Run using the retained physical corridor and procedural full-run water seed. This does not promote its terrain, centerline, bathymetry, rapid hydraulics, guide line, or visuals to production fidelity; those gates remain blocked on authoritative source and review evidence.
 
 The portfolio decision is machine-readable in `physics/data/real_world/river_portfolio_plan.json`. The original three-river source and capture artifacts remain valid legacy checkpoints for South Fork, Colorado, and Pacuare. Futaleufu keeps the international production contract; Chilko keeps the source and validation contract in `docs/chilko-futaleufu-photoreal-goal.md`; and the Zambezi/Futaleufu priority and completion gates live in `docs/zambezi-futaleufu-photoreal-goal.md`.
 

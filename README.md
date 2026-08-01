@@ -2,7 +2,14 @@
 
 An open-source, photorealistic whitewater rafting simulator built with Unreal Engine 5.8 and a first-party shallow-water physics stack. You are the river guide: read the rapid, set the angle, call the strokes, keep your crew in the boat.
 
-**Status (July 2026): pre-release, in active development.** The physics/validation foundation and environment-authoring pipeline are mature; the playable game layer is being built now. The 1.0 release targets one complete river — the **South Fork American, Chili Bar to Salmon Falls** — with all 20 named rapids at three real flow levels. See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
+**Status (July 2026): pre-release, in active development.** Six rivers are
+runnable in-engine. The 1.0 production campaign remains the **South Fork
+American, Chili Bar to Salmon Falls**, with all 20 named rapids at three real
+flow levels. The Zambezi now adds a source-scale Boiling Pot-to-Mukuni Beach
+reference run with all 25 mapped rapids; its missing bathymetry and
+rapid-specific hydraulics are explicitly procedural and remain blocked from
+production-fidelity claims. See [docs/game-completion-plan.md](docs/game-completion-plan.md)
+for the active milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 
 ## What's in this repository
 

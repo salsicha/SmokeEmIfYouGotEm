@@ -327,6 +327,13 @@ bool BuildLandscapeImportCandidateMap(
     }
     AddPreviewCameraAndStart(World, Candidate.PreviewSpec);
     RepositionLandscapeCandidatePhysicalCameras(World, Landscape, Candidate, OutSummary);
+    if (!AddLandscapeCandidateRunnableGameplay(World, Landscape, Candidate, OutSummary))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Runnable gameplay bootstrap failed for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
 
     OutSummary += FString::Printf(
         TEXT("Imported %s as a %d-component ALandscape candidate; preview channel burn modified %d samples.\n"),

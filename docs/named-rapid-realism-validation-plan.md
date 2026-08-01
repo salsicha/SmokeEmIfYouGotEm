@@ -4,24 +4,25 @@
 
 Make each authored river behave like its real run, not like a generic sequence of whitewater set pieces. Every notable rapid must be traceable from a published name and station/order through exact terrain and bed geometry, a validated C++ water window, flow-dependent hydraulic behavior, guide-reviewed lines, raft and crew outcomes, visual/audio rendering, and repeatable multi-platform simulator evidence.
 
-The five runs are:
+The six runnable river environments are:
 
 - South Fork American, Chili Bar to Folsom Reservoir.
 - Colorado River through Grand Canyon, Lees Ferry to Pearce Ferry.
 - Pacuare River, Tres Equis to Siquirres.
 - Futaleufu River, Rio Azul Swinging Bridge to The Pasarela.
 - Chilko River, Chilko River Lodge to the Chilko-Taseko Junction.
+- Zambezi River through Batoka Gorge, Boiling Pot to Mukuni Beach (reference Free Run; production rapid hydraulics remain gated).
 
 ## Implemented Baseline
 
-The hand-reviewed source catalog is `physics/data/real_world/named_rapid_source_catalog.json`. It records 85 markers across six catalog rivers while explicitly separating the five runnable rivers from Zambezi as one additional active photoreal environment. Zambezi evidence is retained; it is not silently counted as runnable. Chilko's five entries are sourced downstream-name leads projected onto the official-source-scale centerline and remain provisional until exact GPS/aerial/guide stationing:
+The hand-reviewed source catalog is `physics/data/real_world/named_rapid_source_catalog.json`. It records 85 markers across six runnable river environments. Zambezi is explicitly labeled `reference_free_run`: its complete corridor is playable, while its rapid geometry, hydraulics, and guide line remain provisional and cannot satisfy production-fidelity acceptance. Chilko's five entries are sourced downstream-name leads projected onto the official-source-scale centerline and remain provisional until exact GPS/aerial/guide stationing:
 
 | River | Markers | Current station basis |
 | --- | ---: | --- |
 | South Fork American | 20 | Published river miles from Chili Bar |
 | Colorado Grand Canyon | 15 major rapids | Published river miles; exact values still require NPS/USGS/guide cross-check |
 | Pacuare | 15 | Published downstream map order; editor stations are provisional interpolation |
-| Zambezi additional active environment | 25 | Published rapid number/order; editor stations are provisional interpolation |
+| Zambezi reference Free Run | 25 | Published rapid number/order; editor stations are provisional interpolation |
 | Futaleufu | 5 | Published downstream order; editor stations are provisional interpolation |
 | Chilko | 5 | Published downstream names/order; official FWA-centerline projections are provisional |
 
@@ -29,9 +30,9 @@ The hand-reviewed source catalog is `physics/data/real_world/named_rapid_source_
 
 `unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson` provides 50 candidate map points by interpolating the Pacuare preview scaffold, low-precision Zambezi route trace, review-gated Futaleufu route trace, and source-scale Chilko FWA centerline. Every point remains non-authoritative. South Fork binding is deliberately disabled: the current NHD candidate declares a 26.2 km Chili Bar-to-Coloma line while the published mile log puts Coloma Bridge at about 9.0 km, and the existing Coloma access seed is at 5.2 km. `physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json` records the conflict and blocks plausible-looking but incorrect Meat Grinder/Troublemaker points. Colorado's current 4.7 km Lees Ferry pilot does not reach the first indexed major rapid.
 
-`unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json` defines 453 deterministic review runs across low, reference, and high flow. Chilko contributes 30 blocked definitions; Zambezi retains all 123 existing definitions with `additional_active_environment` role metadata. High and critical features receive both a clean reference line and a bounded feature-contact line. Optional portages receive a portage control. Zambezi Rapid 9, Commercial Suicide, receives only mandatory commercial-portage controls and cannot bind a normal raft line.
+`unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json` defines 453 deterministic review runs across low, reference, and high flow. Chilko contributes 30 blocked definitions; Zambezi retains all 123 existing definitions and its legacy role metadata until the named-rapid registry is separately migrated. High and critical features receive both a clean reference line and a bounded feature-contact line. Optional portages receive a portage control. Zambezi Rapid 9, Commercial Suicide, receives only mandatory commercial-portage controls and cannot bind a normal raft line.
 
-The reviewed Unreal `DA_RapidRiverEditorShell` DataAsset points to both manifests. The live Rapid/River Editor reports the five-runnable/one-additional portfolio split, exposes a portfolio-role filter, badges each row as runnable or additional active environment, and retains the existing source, flow, station, geometry, guide, and execution filters.
+The reviewed Unreal `DA_RapidRiverEditorShell` DataAsset points to both manifests. Its legacy portfolio-role metadata remains a validation-workflow classification, not the player-facing runnable gate. The player-facing catalog exposes all six rivers and labels Zambezi as a reference Free Run; the editor retains the existing source, flow, station, geometry, guide, and execution filters.
 
 The C1 feature-inventory intake is now review-gated but still empty. `physics/data/real_world/named_rapid_feature_inventory_template.json` enumerates all 85 rapid records and required subfeature fields. `physics/data/real_world/named_rapid_feature_inventory_sidecar_template.json` is the fillable reviewer handoff for holes, waves, ledges, eddy lines, laterals, lines, scout/portage notes, and other typed subfeatures. `physics/data/real_world/named_rapid_feature_inventory_sidecar_merge_report.json` currently blocks merge with 85 missing-subfeature errors and keeps C2 editor-pin generation, C3 water-window binding, and behavior-review claims disabled until reviewed source IDs, geometry evidence, flow dependence, guide/oarsman signoff, geospatial signoff, rights/publication signoff, owner, and review date are recorded.
 
@@ -135,4 +136,4 @@ Retain Against the Wall, Gulliver's Travels, Midnight Diner, Commercial Suicide,
 1. Repair and anchor the South Fork NHD candidate before enabling any published-mile projection; then replace the first provisional markers with exact geometry at Meat Grinder, Troublemaker, and Futaleufu Terminator, and establish exact Chilko rapid stationing before binding its first marker.
 2. Bind Meat Grinder to the existing accepted South Fork C++ field as the first executable named-rapid run, or explicitly record why a new higher-resolution window is required.
 3. Add run execution and telemetry capture from the Rapid/River Editor, then capture the first clean and consequence videos.
-4. Continue production terrain, water, material, foliage, Nanite, lighting, and low/reference/high-flow capture work for the five runnable environments and the additional active Zambezi environment without conflating their acceptance sets.
+4. Continue production terrain, water, material, foliage, Nanite, lighting, and low/reference/high-flow capture work for all six runnable environments without conflating Zambezi reference-run playability with production-fidelity acceptance.

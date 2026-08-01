@@ -33,6 +33,15 @@ CORRIDOR_MANIFEST_RELATIVE = Path(
     "physics/data/real_world/zambezi_batoka_gorge/production_corridor/"
     "boiling_pot_to_mukuni_beach/manifest.json"
 )
+CORRIDOR_CENTERLINE_RELATIVE = Path(
+    "physics/data/real_world/zambezi_batoka_gorge/production_corridor/"
+    "boiling_pot_to_mukuni_beach/hydrography/centerline_local.json"
+)
+RUNTIME_RELATIVE = Path(
+    "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime"
+)
+COORDINATE_MAP_RELATIVE = RUNTIME_RELATIVE / "river_coordinate_map.json"
+COOKED_FIELDS_RELATIVE = RUNTIME_RELATIVE / "cooked_flow_fields"
 
 SOURCE_HEIGHT_IMAGE = Path("zambezi_batoka_heightmap.png")
 SOURCE_RAPID_MAP = Path("victoria-falls-rapids-map.pdf")
@@ -46,6 +55,12 @@ HEIGHT_MAP_CROP = (0, 0, 2000, 1040)
 REFERENCE_HEIGHTFIELD_SIZE = (1009, 625)
 REFERENCE_MESH_SIZE = (513, 321)
 OVERLAY_REJECTION_DISTANCE_RGB = 32.0
+RUNTIME_GRID_DX_M = 20.0
+RUNTIME_GRID_DY_M = 10.0
+RUNTIME_GRID_HALF_WIDTH_M = 120.0
+RUNTIME_WET_HALF_WIDTH_M = 72.0
+RUNTIME_COORDINATE_MAX_STEP_M = 5.0
+RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M = 15.5
 
 # Legend colours are sampled from x=2016 at the centre of each 40-pixel band in
 # the supplied screenshot. Keeping the byte colours avoids any dependency on
@@ -155,6 +170,143 @@ def _sha256(path: Path) -> str:
 def _write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _array_metadata(
+    path: Path, array: np.ndarray, description: str, units: str
+) -> dict[str, Any]:
+    return {
+        "file": path.name,
+        "sha256": _sha256(path),
+        "shape": list(array.shape),
+        "dtype": str(array.dtype),
+        "description": description,
+        "units": units,
+    }
+
+
+def _smooth_tangent_angles(positions: np.ndarray) -> np.ndarray:
+    """Return normals smooth enough for the runtime coordinate-map fold guard."""
+
+    look = min(20, max(1, len(positions) // 20))
+    tangents = np.empty_like(positions)
+    for index in range(len(positions)):
+        before = positions[max(0, index - look)]
+        after = positions[min(len(positions) - 1, index + look)]
+        delta = after - before
+        tangents[index] = delta / max(float(np.linalg.norm(delta)), 1.0e-9)
+    angles = np.unwrap(np.arctan2(tangents[:, 1], tangents[:, 0]))
+
+    # The C++ runtime rejects coordinate maps whose +/-256 m corridor edges
+    # jump more than 16 m between samples. Widen the angular smoothing window
+    # deterministically until the generated map is inside that guard.
+    window = 81
+    while True:
+        maximum_odd_window = len(angles) if len(angles) % 2 else len(angles) - 1
+        window = max(3, min(window, maximum_odd_window))
+        pad = window // 2
+        padded = np.pad(angles, (pad, pad), mode="edge")
+        smoothed = np.convolve(padded, np.ones(window) / window, mode="valid")
+        tangent = np.column_stack((np.cos(smoothed), np.sin(smoothed)))
+        normal = np.column_stack((-tangent[:, 1], tangent[:, 0]))
+        left_edge = positions + normal * 256.0
+        right_edge = positions - normal * 256.0
+        edge_steps = np.maximum(
+            np.linalg.norm(np.diff(left_edge, axis=0), axis=1),
+            np.linalg.norm(np.diff(right_edge, axis=0), axis=1),
+        )
+        if (
+            float(edge_steps.max(initial=0.0))
+            <= RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M
+        ):
+            return normal
+        if window >= maximum_odd_window:
+            raise ValueError("Could not produce a fold-safe Zambezi runtime coordinate map")
+        window = min(window * 2 + 1, maximum_odd_window)
+
+
+def build_runtime_coordinate_map(repo_root: Path) -> dict[str, Any]:
+    """Convert the source-scale centerline into the runtime curved-river schema."""
+
+    corridor = json.loads(
+        (repo_root / CORRIDOR_MANIFEST_RELATIVE).read_text(encoding="utf-8")
+    )
+    source = json.loads(
+        (repo_root / CORRIDOR_CENTERLINE_RELATIVE).read_text(encoding="utf-8")
+    )
+    half_height_m = float(corridor["physical_size_m"]["height"]) * 0.5
+    source_points = source["points"]
+
+    dense_positions: list[np.ndarray] = []
+    for index, (start, finish) in enumerate(zip(source_points, source_points[1:])):
+        start_xy = np.asarray(
+            (-58.0 + float(start["x_m"]), -half_height_m + float(start["y_m"])),
+            dtype=np.float64,
+        )
+        finish_xy = np.asarray(
+            (-58.0 + float(finish["x_m"]), -half_height_m + float(finish["y_m"])),
+            dtype=np.float64,
+        )
+        segment_length = float(np.linalg.norm(finish_xy - start_xy))
+        subdivisions = max(
+            1, int(math.ceil(segment_length / RUNTIME_COORDINATE_MAX_STEP_M))
+        )
+        for step in range(subdivisions):
+            if index > 0 and step == 0:
+                continue
+            dense_positions.append(
+                start_xy + (finish_xy - start_xy) * (step / subdivisions)
+            )
+    last = source_points[-1]
+    dense_positions.append(
+        np.asarray(
+            (-58.0 + float(last["x_m"]), -half_height_m + float(last["y_m"])),
+            dtype=np.float64,
+        )
+    )
+    positions = np.asarray(dense_positions, dtype=np.float64)
+    segment_lengths = np.linalg.norm(np.diff(positions, axis=0), axis=1)
+    stations = np.concatenate((np.asarray([0.0]), np.cumsum(segment_lengths)))
+    normals = _smooth_tangent_angles(positions)
+    left_edge = positions + normals * 256.0
+    right_edge = positions - normals * 256.0
+    max_edge_step = float(
+        np.maximum(
+            np.linalg.norm(np.diff(left_edge, axis=0), axis=1),
+            np.linalg.norm(np.diff(right_edge, axis=0), axis=1),
+        ).max(initial=0.0)
+    )
+    return {
+        "schema": "raftsim.curved_river_coordinate_map.v1",
+        "river_id": "zambezi_batoka_gorge",
+        "status": "reference_runnable_source_scale_centerline_review_gated",
+        "vertical_datum_m": 0.0,
+        "station_domain_m": [
+            round(float(stations[0]), 6),
+            round(float(stations[-1]), 6),
+        ],
+        "point_spacing_policy": (
+            f"source_segments_subdivided_to_at_most_"
+            f"{RUNTIME_COORDINATE_MAX_STEP_M:g}_m"
+        ),
+        "runtime_corridor_half_width_m": 256.0,
+        "maximum_runtime_corridor_edge_step_m": round(max_edge_step, 6),
+        "source": CORRIDOR_CENTERLINE_RELATIVE.as_posix(),
+        "authority": (
+            "source_scale_osm_and_satellite_review_centerline_"
+            "not_navigation_or_survey_authority"
+        ),
+        "points": [
+            [
+                round(float(station), 6),
+                round(float(position[0]), 6),
+                round(float(position[1]), 6),
+                round(float(normal[0]), 8),
+                round(float(normal[1]), 8),
+            ]
+            for station, position, normal in zip(stations, positions, normals)
+        ],
+    }
 
 
 def _validate_sources(repo_root: Path) -> tuple[Path, Path]:
@@ -392,6 +544,211 @@ def build_rapid_map_digitization(repo_root: Path) -> dict[str, Any]:
     }
 
 
+def _write_runtime_water_bundle(
+    repo_root: Path,
+    corridor: dict[str, Any],
+    digitization: dict[str, Any],
+) -> dict[str, Path]:
+    """Write a lightweight full-run solver seed where bathymetry is unavailable."""
+
+    runtime_root = repo_root / RUNTIME_RELATIVE
+    cooked_root = repo_root / COOKED_FIELDS_RELATIVE
+    runtime_root.mkdir(parents=True, exist_ok=True)
+    cooked_root.mkdir(parents=True, exist_ok=True)
+
+    coordinate_map = build_runtime_coordinate_map(repo_root)
+    coordinate_path = repo_root / COORDINATE_MAP_RELATIVE
+    _write_json(coordinate_path, coordinate_map)
+
+    source_centerline = json.loads(
+        (repo_root / CORRIDOR_CENTERLINE_RELATIVE).read_text(encoding="utf-8")
+    )["points"]
+    source_stations = np.asarray(
+        [float(point["station_m"]) for point in source_centerline], dtype=np.float64
+    )
+    source_surface_normalized = np.asarray(
+        [
+            float(point["conditioned_visual_surface_normalized"])
+            for point in source_centerline
+        ],
+        dtype=np.float64,
+    )
+    route_length_m = float(coordinate_map["station_domain_m"][1])
+    nx = int(math.floor(route_length_m / RUNTIME_GRID_DX_M)) + 1
+    ny = int(round(2.0 * RUNTIME_GRID_HALF_WIDTH_M / RUNTIME_GRID_DY_M)) + 1
+    station_m = np.arange(nx, dtype=np.float64) * RUNTIME_GRID_DX_M
+    lateral_m = (
+        np.arange(ny, dtype=np.float64) * RUNTIME_GRID_DY_M
+        - RUNTIME_GRID_HALF_WIDTH_M
+    )
+
+    relief_m = float(corridor["artifacts"]["relief_m"])
+    center_surface_m = (
+        np.interp(station_m, source_stations, source_surface_normalized)
+        * relief_m
+        + 0.12
+    )
+    rapid_intensity = np.zeros_like(station_m)
+    for rapid in digitization["rapids"]:
+        difficulty = str(rapid["difficulty_label"])
+        weight = (
+            0.48
+            + 0.10 * difficulty.count("V")
+            + 0.018 * len(rapid["feature_tags"])
+        )
+        distance = (station_m - float(rapid["station_m"])) / 95.0
+        rapid_intensity = np.maximum(
+            rapid_intensity, weight * np.exp(-0.5 * distance**2)
+        )
+    rapid_intensity = np.clip(rapid_intensity, 0.0, 1.0)
+    center_surface_m += (
+        0.12 * rapid_intensity * np.sin(station_m * 0.055)
+    )
+
+    cross_fraction = np.clip(
+        1.0 - (np.abs(lateral_m) / RUNTIME_WET_HALF_WIDTH_M) ** 2,
+        0.0,
+        1.0,
+    )[:, None]
+    center_depth_m = (4.2 - 0.85 * rapid_intensity)[None, :]
+    h = (center_depth_m * np.power(cross_fraction, 0.65)).astype(np.float32)
+    wet_mask = (h > 0.05).astype(np.uint8)
+    dry_bank_rise = (
+        np.maximum(np.abs(lateral_m) - RUNTIME_WET_HALF_WIDTH_M, 0.0)[:, None]
+        * 0.035
+    )
+    bed = np.where(
+        wet_mask != 0,
+        center_surface_m[None, :] - h,
+        center_surface_m[None, :] + dry_bank_rise,
+    ).astype(np.float32)
+    u = (
+        wet_mask
+        * (2.15 + 1.55 * rapid_intensity[None, :])
+        * (0.72 + 0.28 * cross_fraction)
+    ).astype(np.float32)
+    v = (
+        wet_mask
+        * 0.24
+        * rapid_intensity[None, :]
+        * np.sin(np.pi * lateral_m[:, None] / RUNTIME_WET_HALF_WIDTH_M)
+        * np.sin(station_m[None, :] * 0.011)
+    ).astype(np.float32)
+
+    arrays = {
+        "bed": (
+            bed,
+            "Procedural channel bed aligned to the conditioned visual surface.",
+            "m",
+        ),
+        "h": (h, "Procedural reference-run water depth above bed.", "m"),
+        "u": (u, "Downstream reference-run seed velocity.", "m_per_s"),
+        "v": (v, "Bounded cross-stream rapid cue velocity.", "m_per_s"),
+        "wet_mask": (
+            wet_mask,
+            "One where the procedural reference channel is wet.",
+            "boolean",
+        ),
+    }
+    array_metadata: dict[str, Any] = {}
+    for name, (array, description, units) in arrays.items():
+        path = cooked_root / f"{name}.npy"
+        np.save(path, array, allow_pickle=False)
+        array_metadata[name] = _array_metadata(path, array, description, units)
+
+    manifest = {
+        "schema": "raftsim.cooked_flow_fields.v1",
+        "generator": (
+            "raftsim.zambezi_reference_map.procedural_full_corridor_seed.v1"
+        ),
+        "river_id": "zambezi_batoka_gorge",
+        "section_id": "boiling_pot_to_mukuni_beach_reference_run",
+        "window_id": "zambezi_full_reference_corridor",
+        "status": (
+            "reference_runnable_procedural_seed_not_validated_rapid_hydraulics"
+        ),
+        "production_promoted": False,
+        "source_package": SCENARIO_RELATIVE.parent.as_posix(),
+        "source_elevation_datum_m": 0.0,
+        "grid": {
+            "crs": (
+                "curved river coordinates; x is station downstream and y is river-left"
+            ),
+            "downstream_axis": "+x",
+            "layout": "row_major_c_order",
+            "index_to_world": (
+                "station_m = origin_x_m + col * dx_m; "
+                "lateral_m = origin_y_m + row * dy_m"
+            ),
+            "nx": nx,
+            "ny": ny,
+            "dx_m": RUNTIME_GRID_DX_M,
+            "dy_m": RUNTIME_GRID_DY_M,
+            "origin_x_m": 0.0,
+            "origin_y_m": -RUNTIME_GRID_HALF_WIDTH_M,
+        },
+        "solver": {
+            "solver_mode": "finite_volume",
+            "flux_scheme": "hll",
+            "spatial_order": 2,
+            "cfl": 0.35,
+            "dry_tolerance": 1.0e-6,
+            "roughness_scale": 1.0,
+            "bed_slope_source_scale": 1.0,
+            "feature_strength_scale": 0.0,
+            "fixed_dt_s": 0.02,
+            "preserve_initial_mass": False,
+            "disable_fixture_calibrations": True,
+        },
+        "bands": [
+            {
+                "band_id": "normal_big_water",
+                "roughness_manning_n": 0.041,
+                "arrays": array_metadata,
+                "convergence": {
+                    "converged": False,
+                    "status": "procedural_seed_not_a_steady_state_solver_claim",
+                },
+            }
+        ],
+        "procedural_infill": {
+            "reason": (
+                "surveyed bathymetry and rapid-scale hydraulic geometry are unavailable"
+            ),
+            "surface_alignment": (
+                "conditioned visual centerline profile in the Copernicus source-scale map"
+            ),
+            "wet_half_width_m": RUNTIME_WET_HALF_WIDTH_M,
+            "rapid_cues": (
+                "bounded Gaussian station cues from the user-supplied 25-rapid map"
+            ),
+            "authority": (
+                "gameplay_reference_only_not_navigation_or_real_world_hydraulic_authority"
+            ),
+        },
+        "notes": [
+            (
+                "This lightweight full-corridor seed makes the generated Zambezi map "
+                "runnable with the live finite-volume runtime."
+            ),
+            (
+                "It does not claim surveyed bathymetry, exact rapid lines, guide approval, "
+                "seasonal calibration, or production hydraulic fidelity."
+            ),
+            (
+                "The Copernicus DEM remains terrain/collision authority and the generated "
+                "river-coordinate map remains review-gated."
+            ),
+        ],
+    }
+    manifest_path = cooked_root / "manifest.json"
+    _write_json(manifest_path, manifest)
+    return {
+        "coordinate_map": coordinate_path,
+        "cooked_fields_manifest": manifest_path,
+    }
+
+
 def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, Any]:
     corridor = json.loads((repo_root / CORRIDOR_MANIFEST_RELATIVE).read_text(encoding="utf-8"))
     rapid_entries = []
@@ -414,7 +771,10 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
         "scenario_id": "zambezi_boiling_pot_to_mukuni_beach_reference_run",
         "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
         "river_id": "zambezi_batoka_gorge",
-        "status": "map_and_run_definition_ready_hydraulic_windows_and_guide_review_pending",
+        "status": (
+            "reference_runnable_with_procedural_full_corridor_water_"
+            "production_hydraulics_and_reviews_pending"
+        ),
         "production_promoted": False,
         "unreal_map_package": (
             "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
@@ -474,13 +834,24 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
             "rock_wrap_and_flip_enabled": True,
             "swimmer_and_rescue_enabled": True,
             "rapid_9_policy": "mandatory_commercial_portage_not_normal_runnable_line",
+            "runnable": True,
+            "runnable_tier": "reference_free_run",
+            "default_flow_band": "normal_big_water",
+            "runtime_coordinate_map": COORDINATE_MAP_RELATIVE.as_posix(),
+            "runtime_cooked_fields": COOKED_FIELDS_RELATIVE.as_posix(),
+            "hydraulic_authority": (
+                "procedural_gameplay_seed_not_rapid_specific_or_real_world_authority"
+            ),
         },
         "route_variants": [
             {
                 "variant_id": "full_reference_run_1_to_25",
                 "start_rapid": "1",
                 "end_rapid": "25",
-                "status": "editor_preview_ready_not_physics_runnable",
+                "status": (
+                    "reference_runnable_with_procedural_water_"
+                    "not_production_rapid_hydraulics"
+                ),
                 "selection_policy": "default_reference_corridor",
             },
             {
@@ -507,7 +878,10 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
             "geospatial reviewer approves centerline alignment and terrain datum",
             "rights reviewer approves supplied PDF/image use and all shipped source products",
             "seasonal-flow reviewer resolves high-water start/take-out variants and flow bands",
-            "each rapid receives validated hydraulic geometry and C++ solver windows before gameplay promotion",
+            (
+                "each rapid receives validated hydraulic geometry and C++ solver windows "
+                "before production hydraulic-fidelity promotion"
+            ),
             "desktop and VR performance plus lifelike visual review pass on the generated Unreal map",
         ],
     }
@@ -543,6 +917,7 @@ def generate_zambezi_reference_bundle(repo_root: Path) -> dict[str, Path]:
     digitization = build_rapid_map_digitization(repo_root)
     digitization_path = output_root / "rapid_map_digitization.json"
     _write_json(digitization_path, digitization)
+    runtime = _write_runtime_water_bundle(repo_root, corridor, digitization)
     scenario = build_scenario(repo_root, digitization)
     scenario_path = repo_root / SCENARIO_RELATIVE
     _write_json(scenario_path, scenario)
@@ -617,6 +992,18 @@ def generate_zambezi_reference_bundle(repo_root: Path) -> dict[str, Path]:
                 "path": scenario_path.relative_to(repo_root).as_posix(),
                 "sha256": _sha256(scenario_path),
             },
+            "runtime_coordinate_map": {
+                "path": runtime["coordinate_map"].relative_to(repo_root).as_posix(),
+                "sha256": _sha256(runtime["coordinate_map"]),
+                "authority": "review_gated_runtime_mapping_not_survey_authority",
+            },
+            "runtime_cooked_fields": {
+                "path": runtime["cooked_fields_manifest"].relative_to(repo_root).as_posix(),
+                "sha256": _sha256(runtime["cooked_fields_manifest"]),
+                "authority": (
+                    "procedural_gameplay_seed_not_real_world_hydraulic_authority"
+                ),
+            },
         },
         "terrain_authority": {
             "manifest": CORRIDOR_MANIFEST_RELATIVE.as_posix(),
@@ -633,4 +1020,6 @@ def generate_zambezi_reference_bundle(repo_root: Path) -> dict[str, Path]:
         "mesh": mesh_path,
         "digitization": digitization_path,
         "scenario": scenario_path,
+        "coordinate_map": runtime["coordinate_map"],
+        "cooked_fields_manifest": runtime["cooked_fields_manifest"],
     }
