@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v11",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v12",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -177,6 +177,9 @@ def main() -> None:
                     "collision_enabled": (
                         str(component.get_collision_enabled()) if component else None
                     ),
+                    "cast_shadow": bool(
+                        component.get_editor_property("cast_shadow")
+                    ) if component else None,
                 }
             )
         legacy_zambezi_pve_actors = [
@@ -320,6 +323,14 @@ def main() -> None:
             int(row["instance_count"])
             for row in camera_visible_bank_cover_rows
         )
+        full_corridor_ground_cover_rows = [
+            row
+            for row in vegetation_rows
+            if "ZambeziOpaqueGroundCover" in row["actor_label"]
+        ]
+        report["vegetation"]["ground_cover_shadow_policy"] = (
+            "disabled_on_full_corridor_camera_mosaic_and_launch_cover"
+        )
         camera_visible_woody_rows = [
             row
             for row in vegetation_rows
@@ -345,6 +356,65 @@ def main() -> None:
         report["vegetation"]["camera_visible_woody_slope_ceiling_degrees"] = 24.0
         report["vegetation"]["camera_visible_woody_placement_contract"] = (
             "deterministic_40_candidate_visible_bank_search_with_hard_slope_ceiling"
+        )
+        runnable_launch_bank_cover_rows = [
+            row
+            for row in vegetation_rows
+            if "RaftSimRunnableLaunchBankEcologyV1" in row["tags"]
+            and "RaftSimRunnableLaunchBankCover" in row["tags"]
+        ]
+        report["vegetation"]["runnable_launch_bank_cover_component_count"] = len(
+            runnable_launch_bank_cover_rows
+        )
+        report["vegetation"]["runnable_launch_bank_cover_instance_count"] = sum(
+            int(row["instance_count"])
+            for row in runnable_launch_bank_cover_rows
+        )
+        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 600
+        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = (
+            600
+            - int(
+                report["vegetation"][
+                    "runnable_launch_bank_cover_instance_count"
+                ]
+            )
+        )
+        report["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"] = 32.0
+        report["vegetation"]["runnable_launch_bank_cover_shadow_policy"] = (
+            "disabled_on_noncolliding_ground_cover_only"
+        )
+        report["vegetation"]["runnable_launch_bank_cover_placement_contract"] = (
+            "deterministic_96_candidate_search_194m_to_560m_downstream_"
+            "with_full_route_clearance_dry_height_and_hard_slope_gates"
+        )
+        runnable_launch_woody_rows = [
+            row
+            for row in vegetation_rows
+            if "RaftSimRunnableLaunchBankEcologyV1" in row["tags"]
+            and "RaftSimRunnableLaunchWoodyEcology" in row["tags"]
+        ]
+        report["vegetation"]["runnable_launch_woody_component_count"] = len(
+            runnable_launch_woody_rows
+        )
+        report["vegetation"]["runnable_launch_woody_instance_count"] = sum(
+            int(row["instance_count"])
+            for row in runnable_launch_woody_rows
+        )
+        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 64
+        report["vegetation"]["runnable_launch_woody_rejection_count"] = (
+            64
+            - int(
+                report["vegetation"]["runnable_launch_woody_instance_count"]
+            )
+        )
+        report["vegetation"]["runnable_launch_woody_slope_ceiling_degrees"] = 24.0
+        report["vegetation"]["runnable_launch_woody_shadow_policy"] = (
+            "disabled_on_launch_window_only_to_prevent_camera_wall_streaks"
+        )
+        report["vegetation"]["runnable_launch_woody_placement_contract"] = (
+            "deterministic_160_candidate_search_270m_to_600m_downstream_"
+            "with_50m_beyond_active_half_width_full_route_clearance_"
+            "dry_height_and_hard_slope_gates"
         )
         passed = (
             len(markers) == 25
@@ -400,8 +470,8 @@ def main() -> None:
             in water_surface_rows[0]["tags"]
             and "RaftSimMovingMultiScaleWaterNormals"
             in water_surface_rows[0]["tags"]
-            and len(vegetation_rows) == 8
-            and sum(int(row["instance_count"]) for row in vegetation_rows) == 7032
+            and len(vegetation_rows) == 12
+            and sum(int(row["instance_count"]) for row in vegetation_rows) == 7679
             and any(
                 "ZambeziOpaqueRiparianTree" in label and count == 2100
                 for label, count in vegetation_by_label.items()
@@ -424,12 +494,16 @@ def main() -> None:
             )
             and len(camera_visible_bank_cover_rows) == 1
             and int(camera_visible_bank_cover_rows[0]["instance_count"]) == 1200
+            and not camera_visible_bank_cover_rows[0]["cast_shadow"]
+            and len(full_corridor_ground_cover_rows) == 1
+            and not full_corridor_ground_cover_rows[0]["cast_shadow"]
             and len(camera_visible_woody_rows) == 3
             and sum(
                 int(row["instance_count"])
                 for row in camera_visible_woody_rows
             )
             == 232
+            and all(row["cast_shadow"] for row in camera_visible_woody_rows)
             and any(
                 "ZambeziCameraRiparianTree" in label and count == 58
                 for label, count in vegetation_by_label.items()
@@ -445,6 +519,23 @@ def main() -> None:
             and all(
                 "RaftSimWoodySlopeCeiling24Degrees" in row["tags"]
                 for row in camera_visible_woody_rows
+            )
+            and len(runnable_launch_bank_cover_rows) == 1
+            and int(runnable_launch_bank_cover_rows[0]["instance_count"]) == 592
+            and not runnable_launch_bank_cover_rows[0]["cast_shadow"]
+            and "RaftSimGroundCoverSelfShadowSuppressed"
+            in runnable_launch_bank_cover_rows[0]["tags"]
+            and len(runnable_launch_woody_rows) == 3
+            and sum(
+                int(row["instance_count"])
+                for row in runnable_launch_woody_rows
+            )
+            == 55
+            and all(not row["cast_shadow"] for row in runnable_launch_woody_rows)
+            and all(
+                "RaftSimWoodySlopeCeiling24Degrees" in row["tags"]
+                and "RaftSimRunnableLaunchWoodyShadowSuppressed" in row["tags"]
+                for row in runnable_launch_woody_rows
             )
             and not legacy_zambezi_pve_actors
             and all(row["component_count"] == 1 for row in vegetation_rows)
@@ -478,7 +569,9 @@ def main() -> None:
             f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
             "opaque vegetation instances, including 1200 camera-visible "
-            "organic bank-cover and 232 camera-visible woody instances"
+            "organic bank-cover, 232 camera-visible woody instances, 592 "
+            "runnable-launch bank-cover instances, and 55 runnable-launch "
+            "woody instances"
         )
     except Exception as error:
         report["error"] = str(error)
