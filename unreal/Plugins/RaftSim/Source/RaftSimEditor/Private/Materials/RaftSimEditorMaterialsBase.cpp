@@ -1049,8 +1049,8 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     if (bBatokaTerrainIntegratedReview)
     {
         BatokaDetailCoordinates = NewObject<UMaterialExpressionTextureCoordinate>(Material);
-        BatokaDetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / 240.0f;
-        BatokaDetailCoordinates->VTiling = Candidate.HorizontalSpanYCm / 240.0f;
+        BatokaDetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / 480.0f;
+        BatokaDetailCoordinates->VTiling = Candidate.HorizontalSpanYCm / 480.0f;
         Material->GetExpressionCollection().AddExpression(BatokaDetailCoordinates);
     }
 
@@ -1155,6 +1155,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         return Result;
     };
     FMaterialExpressionOutputRef BatokaMacroAlbedoRef = MakeOutputRef(RockGroundAlbedoSample);
+    FMaterialExpressionOutputRef BatokaMacroSecondaryAlbedoRef;
     FMaterialExpressionOutputRef BatokaMacroNormalRef = MakeOutputRef(RockGroundNormalSample);
     FMaterialExpressionOutputRef BatokaMacroRoughnessRef = MakeOutputRef(RockGroundRoughnessSample);
     FMaterialExpressionOutputRef BatokaMacroAoRef = MakeOutputRef(BatokaMacroAoSample);
@@ -1240,6 +1241,16 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
             SAMPLERTYPE_Color,
             5000.0f,
             false);
+        // A second incommensurate projection prevents the reviewed 50 m source
+        // footprint from reading as a repeated square across the long gorge.
+        // This is appearance-only: neither projection displaces vertices or
+        // participates in collision, height queries, or hydraulic authority.
+        BatokaMacroSecondaryAlbedoRef = AddWorldAlignedProjection(
+            TEXT("BatokaAerialRocks02WorldAlignedSecondaryAlbedo"),
+            RockGroundAlbedo,
+            SAMPLERTYPE_Color,
+            8300.0f,
+            false);
         BatokaMacroNormalRef = AddWorldAlignedProjection(
             TEXT("BatokaAerialRocks02WorldAlignedNormal"),
             RockGroundNormal,
@@ -1262,21 +1273,23 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
             TEXT("BatokaRock037WorldAlignedDetailAlbedo"),
             BatokaDetailAlbedo,
             SAMPLERTYPE_Color,
-            240.0f,
+            480.0f,
             false);
         BatokaDetailNormalRef = AddWorldAlignedProjection(
             TEXT("BatokaRock037WorldAlignedDetailNormal"),
             BatokaDetailNormal,
             SAMPLERTYPE_Normal,
-            240.0f,
+            480.0f,
             true);
         BatokaDetailRoughnessRef = AddWorldAlignedProjection(
             TEXT("BatokaRock037WorldAlignedDetailRoughness"),
             BatokaDetailRoughness,
             SAMPLERTYPE_Masks,
-            240.0f,
+            480.0f,
             false);
-        if (!BatokaMacroAlbedoRef.Expression || !BatokaMacroNormalRef.Expression ||
+        if (!BatokaMacroAlbedoRef.Expression ||
+            !BatokaMacroSecondaryAlbedoRef.Expression ||
+            !BatokaMacroNormalRef.Expression ||
             !BatokaMacroRoughnessRef.Expression || !BatokaMacroAoRef.Expression ||
             !BatokaDetailAlbedoRef.Expression || !BatokaDetailNormalRef.Expression ||
             !BatokaDetailRoughnessRef.Expression)
@@ -1347,53 +1360,27 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     UMaterialExpression* RockSurfaceBaseColor = RockDetailedBaseColor;
     if (bBatokaTerrainIntegratedReview)
     {
-        UMaterialExpressionConstant3Vector* BatokaMacroColorBalance =
-            NewObject<UMaterialExpressionConstant3Vector>(Material);
-        BatokaMacroColorBalance->Constant = FLinearColor(0.78f, 0.58f, 0.72f, 1.0f);
-        Material->GetExpressionCollection().AddExpression(BatokaMacroColorBalance);
-        UMaterialExpressionMultiply* BalancedBatokaMacro =
-            NewObject<UMaterialExpressionMultiply>(Material);
-        BalancedBatokaMacro->A.Expression = BatokaMacroAlbedoRef.Expression;
-        BalancedBatokaMacro->A.OutputIndex = BatokaMacroAlbedoRef.OutputIndex;
-        BalancedBatokaMacro->B.Expression = BatokaMacroColorBalance;
-        Material->GetExpressionCollection().AddExpression(BalancedBatokaMacro);
-        UMaterialExpressionConstant* BatokaMacroWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaMacroWeight->R = 0.56f;
-        Material->GetExpressionCollection().AddExpression(BatokaMacroWeight);
-        UMaterialExpressionLinearInterpolate* BatokaMacroBaseColor =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaMacroBaseColor->A.Expression = BaseColor;
-        BatokaMacroBaseColor->B.Expression = BalancedBatokaMacro;
-        BatokaMacroBaseColor->Alpha.Expression = BatokaMacroWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaMacroBaseColor);
-        UMaterialExpressionConstant* BatokaDetailColorScale =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailColorScale->R = 1.18f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailColorScale);
-        UMaterialExpressionMultiply* ScaledBatokaDetail =
-            NewObject<UMaterialExpressionMultiply>(Material);
-        ScaledBatokaDetail->A.Expression = BatokaDetailAlbedoRef.Expression;
-        ScaledBatokaDetail->A.OutputIndex = BatokaDetailAlbedoRef.OutputIndex;
-        ScaledBatokaDetail->B.Expression = BatokaDetailColorScale;
-        Material->GetExpressionCollection().AddExpression(ScaledBatokaDetail);
-        UMaterialExpressionConstant* BatokaDetailColorWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailColorWeight->R = 0.16f;
-        Material->GetExpressionCollection().AddExpression(BatokaDetailColorWeight);
-        UMaterialExpressionLinearInterpolate* BatokaTwoScaleBaseColor =
-            NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        BatokaTwoScaleBaseColor->A.Expression = BatokaMacroBaseColor;
-        BatokaTwoScaleBaseColor->B.Expression = ScaledBatokaDetail;
-        BatokaTwoScaleBaseColor->Alpha.Expression = BatokaDetailColorWeight;
-        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleBaseColor);
-        RockSurfaceBaseColor = BatokaTwoScaleBaseColor;
+        RockSurfaceBaseColor = BuildBatokaOrganicBasaltBaseColor(
+            Material,
+            BaseColor,
+            BatokaMacroAlbedoRef.Expression,
+            BatokaMacroAlbedoRef.OutputIndex,
+            BatokaMacroSecondaryAlbedoRef.Expression,
+            BatokaMacroSecondaryAlbedoRef.OutputIndex,
+            BatokaDetailAlbedoRef.Expression,
+            BatokaDetailAlbedoRef.OutputIndex);
+        if (!RockSurfaceBaseColor)
+        {
+            return nullptr;
+        }
     }
     UMaterialExpressionLinearInterpolate* DetailedBaseColor =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
     DetailedBaseColor->A.Expression = ForestDetailedBaseColor;
     DetailedBaseColor->B.Expression = RockSurfaceBaseColor;
-    DetailedBaseColor->Alpha.Expression = RockSlopeMask;
+    DetailedBaseColor->Alpha.Expression = bBatokaTerrainIntegratedReview
+        ? BuildBatokaOrganicBasaltColorCoverage(Material, RockSlopeMask)
+        : RockSlopeMask;
     Material->GetExpressionCollection().AddExpression(DetailedBaseColor);
 
     UMaterialExpressionComponentMask* AmbientOcclusion =
@@ -1448,9 +1435,11 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         BatokaDetailRoughnessMask->Input.OutputIndex = BatokaDetailRoughnessRef.OutputIndex;
         BatokaDetailRoughnessMask->R = true;
         Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessMask);
-        UMaterialExpressionConstant* BatokaDetailRoughnessWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailRoughnessWeight->R = 0.28f;
+        UMaterialExpressionScalarParameter* BatokaDetailRoughnessWeight =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        BatokaDetailRoughnessWeight->ParameterName = TEXT("BatokaDetailRoughnessWeight");
+        BatokaDetailRoughnessWeight->DefaultValue = 0.18f;
+        BatokaDetailRoughnessWeight->Group = TEXT("BatokaOrganicBasaltV16");
         Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessWeight);
         UMaterialExpressionLinearInterpolate* BatokaTwoScaleRoughness =
             NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -1499,9 +1488,11 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     UMaterialExpression* RockSurfaceNormal = RockDetailedNormal;
     if (bBatokaTerrainIntegratedReview)
     {
-        UMaterialExpressionConstant* BatokaDetailNormalWeight =
-            NewObject<UMaterialExpressionConstant>(Material);
-        BatokaDetailNormalWeight->R = 0.42f;
+        UMaterialExpressionScalarParameter* BatokaDetailNormalWeight =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        BatokaDetailNormalWeight->ParameterName = TEXT("BatokaDetailNormalWeight");
+        BatokaDetailNormalWeight->DefaultValue = 0.24f;
+        BatokaDetailNormalWeight->Group = TEXT("BatokaOrganicBasaltV16");
         Material->GetExpressionCollection().AddExpression(BatokaDetailNormalWeight);
         UMaterialExpressionLinearInterpolate* BatokaTwoScaleNormal =
             NewObject<UMaterialExpressionLinearInterpolate>(Material);

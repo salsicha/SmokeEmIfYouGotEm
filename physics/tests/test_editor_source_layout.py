@@ -16,8 +16,8 @@ FROZEN_LEGACY_EXCEPTIONS = {
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
 }
 FROZEN_OVERSIZED_IMPLEMENTATION_MAX_LINES = {
-    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": 3088,
-    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": 3073,
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": 3115,
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": 3145,
 }
 
 

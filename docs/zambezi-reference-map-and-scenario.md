@@ -171,6 +171,27 @@ The retained frame and machine-readable comparison are
 capture directory. They are gameplay-viewport evidence for the runnable
 `reference_free_run`, not approval of real-world hydraulics or photoreal art.
 
+An August 1 organic-basalt material pass now conditions the same four
+render-only V15 terrain tiles. It keeps the reviewed 50 m world-aligned macro
+source, blends a second incommensurate 83 m projection through deterministic
+world-space variation, doubles the Rock037 detail footprint to 4.8 m, and
+reduces its color, normal, and roughness weights. A blue-gray basalt multiplier
+and bounded brown weathering replace the former uniformly tan response across
+both steep and rounded dry walls. The accepted gameplay comparison lowers mean
+dry-canyon luminance from 0.7061 to 0.6448, lowers mean saturation from 0.3255
+to 0.3003, and raises bounded adjacent luminance variation from 0.00758 to
+0.01115 without introducing pixels below 0.18 luminance in the matched terrain
+mask. These are descriptive renderer measurements, not an art threshold.
+
+The graph changes color/material presentation only. The hidden Copernicus
+Landscape, four render-tile meshes, V15 morphology, 100 m shoreline protection,
+collision, height query, water, solver, route, hazards, raft forces, and
+scenario remain unchanged. The generic CC0 Aerial Rocks 02 and Rock037 sources
+are still visual analogs rather than Batoka lithology authority. The retained
+frame and full rejection boundary are recorded in
+`zambezi_organic_basalt_surface_v16.png` and
+`zambezi_organic_basalt_surface_v16_review.json`.
+
 ## Runnable reference status
 
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni

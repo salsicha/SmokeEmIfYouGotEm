@@ -159,6 +159,25 @@ water geometry, hydraulics, raft contact, rapid stationing, or gameplay. This is
 a bounded runnable-map presentation improvement; rights-cleared higher-resolution
 terrain and external visual/geology review remain the production-photoreal gates.
 
+V16 keeps V15 morphology and closes the runnable material's brightest tan-wall
+failure without treating shader work as terrain authority. The retained 50 m
+world-aligned Aerial Rocks 02 macro is cross-blended with an incommensurate
+83 m projection through a deterministic low-frequency field; a separate field
+adds bounded mineral-value variation, Rock037 detail moves from 2.4 m to 4.8 m
+with reduced color/normal/roughness weights, and explicit blue-gray basalt plus
+brown weathering parameters cover the broad rounded walls that the legacy
+steep-slope mask missed. In the matched gameplay terrain mask, mean luminance
+drops from 0.7061 to 0.6448 and mean saturation from 0.3255 to 0.3003, while
+adjacent luminance variation rises from 0.00758 to 0.01115 and no terrain pixel
+falls below 0.18. `zambezi_organic_basalt_surface_v16_review.json` retains the
+graph, exact defaults, hashes, rejected weaker brackets, and external gates.
+The source Landscape, four render meshes, V15 displacement, shoreline buffer,
+collision, water, solver, route, hazards, and raft forces are unchanged. This
+is a runnable visual improvement, not photoreal or Batoka-lithology promotion:
+the sun-facing wall remains rounded and bright, and higher-resolution terrain,
+reach-specific geology, authentic ecology, guide/art review, and platform gates
+remain open.
+
 The runnable Zambezi reference now has a separate live-hydraulics acceptance
 layer. Its 30 km cooked field is regenerated at 5 m downstream resolution, and
 each of the 25 PDF-derived rapid records produces a bounded feature-tagged

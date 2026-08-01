@@ -3489,6 +3489,16 @@ path is verified, and the completion goal can be marked complete.
   intended material. This is a reproducible visual improvement, not photoreal acceptance: the
   30 m canyon silhouette, vegetation fidelity/density, water, lighting, and named art/guide/
   geospatial review remain open under M9.
+- Zambezi organic basalt surface V16 improves that runnable map's material response without
+  changing its geography or gameplay authority. A second 83 m world-aligned macro projection,
+  two deterministic world-space mineral fields, a 4.8 m restrained detail layer, and bounded
+  blue-gray/brown grading replace the former uniform tan wall response. In the matched 1280x720
+  gameplay mask, mean canyon luminance falls from 0.7061 to 0.6448, saturation falls from 0.3255
+  to 0.3003, and adjacent luminance variation rises from 0.00758 to 0.01115 with no terrain pixels
+  below 0.18. The source DEM, four V15 render meshes, protected shoreline, collision, water,
+  solver, route, hazards, and raft forces are unchanged. The result remains photoreal-rejected
+  for rounded 30 m source forms, generic rather than reach-specific lithology, sparse/repetitive
+  ecology, provisional shoreline/water/lighting, and open named guide/art/geology review.
 - Zambezi Single Layer Water V1 replaces only Batoka's flat opaque candidate parent with
   an isolated physical water-volume material. Active scattering, absorption, phase, and
   behind-water controls combine with two opposed panned normal layers and bounded

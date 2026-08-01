@@ -894,6 +894,20 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     bool bBatokaTerrainIntegratedReview = false,
     bool bBatokaWorldAlignedReview = false);
 
+UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor,
+    UMaterialExpression* PrimaryMacroAlbedo,
+    int32 PrimaryMacroOutputIndex,
+    UMaterialExpression* SecondaryMacroAlbedo,
+    int32 SecondaryMacroOutputIndex,
+    UMaterialExpression* DetailAlbedo,
+    int32 DetailOutputIndex);
+
+UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
+    UMaterial* Material,
+    UMaterialExpression* RockSlopeMask);
+
 struct FZambeziBatokaVisualMorphologyStats
 {
     int32 VisualTileCount = 0;

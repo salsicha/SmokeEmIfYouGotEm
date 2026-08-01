@@ -15,7 +15,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 990
+      "line_count": 992
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
@@ -31,15 +31,15 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
-      "line_count": 1558
+      "line_count": 1562
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
-      "line_count": 2579
+      "line_count": 2611
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp",
-      "line_count": 1884
+      "line_count": 1895
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderMaterial.cpp",
@@ -111,7 +111,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSurfaceSampling.cpp",
-      "line_count": 1323
+      "line_count": 1360
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorTerrainAuthoring.cpp",
@@ -155,15 +155,19 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp",
-      "line_count": 1170
+      "line_count": 1194
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
-      "line_count": 2403
+      "line_count": 2882
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
-      "line_count": 876
+      "line_count": 904
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBatokaMaterial.cpp",
+      "line_count": 173
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp",
@@ -183,7 +187,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
-      "line_count": 3088
+      "line_count": 3115
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp",
@@ -199,7 +203,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
-      "line_count": 3073
+      "line_count": 3145
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealTextureAssets.cpp",
@@ -239,7 +243,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Rivers/RaftSimEditorZambeziDirector.cpp",
-      "line_count": 1785
+      "line_count": 2036
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkGroundCoverTest.cpp",
@@ -255,15 +259,15 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp",
-      "line_count": 71
+      "line_count": 289
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tools/RaftSimEditorTools.cpp",
       "line_count": 1530
     }
   ],
-  "implementation_file_count": 65,
-  "implementation_line_count": 72399,
+  "implementation_file_count": 66,
+  "implementation_line_count": 73757,
   "registered_console_command_count": 37,
   "registered_console_commands": [
     {
