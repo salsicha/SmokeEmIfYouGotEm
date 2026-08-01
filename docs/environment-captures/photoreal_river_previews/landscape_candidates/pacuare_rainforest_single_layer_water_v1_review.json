@@ -1,0 +1,81 @@
+{
+  "schema": "raftsim.environment.pacuare_rainforest_single_layer_water_review.v1",
+  "river_id": "pacuare",
+  "milestone": "pacuare_rainforest_single_layer_water_v1",
+  "status": "accepted_technical_visual_improvement_photoreal_promotion_rejected",
+  "baseline": {
+    "git_commit": "02f4768811568cc24332fc24030218d84e06a4aa",
+    "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+    "sha256": "d7bfd4b15e188807cc64094cb05ec7e0984b6e3eb1a801409b967aa516905a65",
+    "water_status": "default_lit_opaque_uniform_surface"
+  },
+  "accepted_captures": [
+    {
+      "view": "guide_seat_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "e838970569b9f40cacd77c906e0a59bcbf024f19146dd112b205ee427642ae6d"
+    },
+    {
+      "view": "river_eye_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "eaecbfd9f4ec58c109ca4290aec591e6a5f6581735e5079081144e6fa8a06e23"
+    }
+  ],
+  "implementation": {
+    "material_parent": "/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestSingleLayerWater",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate",
+    "shading_model": "SingleLayerWater",
+    "blend_mode": "Opaque",
+    "single_layer_output_count": 1,
+    "moving_normal_layers": 2,
+    "world_variation_scales_per_cm": [0.00042, 0.0021],
+    "surface_tint": [0.05, 0.085, 0.06],
+    "surface_opacity": 0.28,
+    "surface_variation_strength": 0.32,
+    "render_width_scale": 1.05,
+    "render_normal_up_blend": 0.82,
+    "render_displacement_scale": 0.2,
+    "review_camera_policy": "pacuare_only_reach_framing_guide_pitch_minus_5_5_height_165_cm_river_eye_pitch_minus_5_height_175_cm",
+    "world_position_offset": false,
+    "render_surface_collision": false,
+    "solver_visualization_field_reused": false,
+    "terrain_collision_or_heightfield_changed": false,
+    "raft_forces_or_hydraulics_changed": false
+  },
+  "rejected_brackets": [
+    "v1_initial_near_black_uniform_single_layer_volume",
+    "v1_second_bracket_overbright_cyan_surface_and_water_dominant_camera_composition"
+  ],
+  "visual_assessment": {
+    "accepted_improvements": [
+      "readable_gray_green_surface_instead_of_the_initial_near_black_volume",
+      "visible_multi_scale_moving_normal_response",
+      "reduced_render_width_and_displacement_keep_the_surface_closer_to_the_authored_channel",
+      "review_cameras_show_more_downstream_geography_and_less_uniform_foreground_water"
+    ],
+    "remaining_defects": [
+      "near_camera_water_or_underwater_transition_remains_visible_at_the_bottom_of_both_frames",
+      "small_river_right_terrain_voids_remain_visible",
+      "broad_surface_response_lacks_pacuare_specific_solver_derived_rapid_hydraulics_foam_and_spray",
+      "coarse_smooth_banks_and_generic_repeated_vegetation_dominate_the_scene"
+    ]
+  },
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "water_material_bound_components": "1_of_1",
+    "landscape_source_material_slots": "256_of_256",
+    "landscape_nanite_material_slots": "256_of_256",
+    "focused_native_test": "RaftSim.M9.FPacuareRainforestSingleLayerWater_pass",
+    "focused_python_and_source_layout_tests": "44_pass"
+  },
+  "photoreal_rejection_reasons": [
+    "remaining_near_camera_transition_and_river_right_void_artifacts",
+    "missing_pacuare_specific_solver_derived_hydraulics_foam_and_spray",
+    "compressed_coarse_preview_heightfield_and_broad_smooth_banks",
+    "generic_repeated_vegetation_and_sparse_near_bank_ground_cover",
+    "missing_production_rain_mist_waterfall_and_humid_atmosphere_vfx",
+    "missing_named_pacuare_guide_water_vfx_environment_art_ecology_and_geospatial_approval"
+  ]
+}

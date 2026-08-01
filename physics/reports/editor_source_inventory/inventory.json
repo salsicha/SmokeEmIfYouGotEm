@@ -3,7 +3,7 @@
   "implementation_files": [
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorEnvironmentCaptures.cpp",
-      "line_count": 2274
+      "line_count": 2283
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorFutaleufuDiagnostics.cpp",
@@ -15,7 +15,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 1007
+      "line_count": 1015
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
@@ -31,11 +31,11 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
-      "line_count": 1562
+      "line_count": 1567
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
-      "line_count": 2615
+      "line_count": 2617
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp",
@@ -115,7 +115,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorTerrainAuthoring.cpp",
-      "line_count": 2819
+      "line_count": 2825
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorWaterAndBanks.cpp",
@@ -155,7 +155,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp",
-      "line_count": 1194
+      "line_count": 1195
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
@@ -187,7 +187,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
-      "line_count": 3115
+      "line_count": 3114
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp",
@@ -204,6 +204,10 @@
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPacuareMaterial.cpp",
       "line_count": 152
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPacuareWaterMaterial.cpp",
+      "line_count": 364
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
@@ -251,7 +255,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorPacuareTerrainTest.cpp",
-      "line_count": 122
+      "line_count": 240
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkGroundCoverTest.cpp",
@@ -274,8 +278,8 @@
       "line_count": 1530
     }
   ],
-  "implementation_file_count": 68,
-  "implementation_line_count": 74050,
+  "implementation_file_count": 69,
+  "implementation_line_count": 74562,
   "registered_console_command_count": 37,
   "registered_console_commands": [
     {

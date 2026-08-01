@@ -97,18 +97,23 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("pacuare"))
     {
-        Settings.BaseColorScale = 1.00f;
-        Settings.EmissiveFillScale = 0.075f;
+        // Pacuare uses a dedicated rainforest Single Layer Water parent. Keep
+        // the generated ribbon close to the surveyed bank profile, restrain
+        // analytic relief, and let volume transmission reveal shallow bed
+        // color without returning to the old opaque green render sheet.
+        Settings.BaseColorScale = 0.90f;
+        Settings.EmissiveFillScale = 0.32f;
         Settings.Roughness = 0.32f;
         Settings.Specular = 0.42f;
-        Settings.Opacity = 0.40f;
-        Settings.NormalIntensity = 0.68f;
-        Settings.PhaseG = 0.25f;
-        Settings.VertexTintWeight = 0.62f;
-        Settings.RenderWidthScale = 1.45f;
-        Settings.RenderNormalUpBlend = 0.48f;
-        Settings.RenderDisplacementScale = 0.78f;
-        Settings.ReflectionFillIntensity = 0.15f;
+        Settings.Opacity = 0.28f;
+        Settings.NormalIntensity = 0.20f;
+        Settings.SurfaceVariationStrength = 0.32f;
+        Settings.PhaseG = 0.15f;
+        Settings.VertexTintWeight = 0.30f;
+        Settings.RenderWidthScale = 1.05f;
+        Settings.RenderNormalUpBlend = 0.82f;
+        Settings.RenderDisplacementScale = 0.20f;
+        Settings.ReflectionFillIntensity = 0.06f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -117,11 +122,11 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 0.0f;
         Settings.SolverFroudeVisualGain = 0.0f;
         Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.018f, 0.095f, 0.065f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.32f, 0.48f, 0.54f, 0.0f);
-        Settings.ScatteringCoefficients = FLinearColor(0.0008f, 0.0030f, 0.0018f, 0.0f);
-        Settings.AbsorptionCoefficients = FLinearColor(0.0050f, 0.0012f, 0.0022f, 0.0f);
-        Settings.ColorScaleBehindWater = FLinearColor(0.82f, 0.94f, 0.84f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.050f, 0.085f, 0.060f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.30f, 0.38f, 0.40f, 0.0f);
+        Settings.ScatteringCoefficients = FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f);
+        Settings.AbsorptionCoefficients = FLinearColor(0.0055f, 0.0020f, 0.0035f, 0.0f);
+        Settings.ColorScaleBehindWater = FLinearColor(0.60f, 0.65f, 0.55f, 0.0f);
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {

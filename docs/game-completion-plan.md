@@ -3600,3 +3600,19 @@ path is verified, and the completion goal can be marked complete.
   PVE vegetation, sparse near-bank ground cover, flat provisional water, missing
   rainforest atmosphere/VFX, and absent named Pacuare guide, ecology, geospatial, and
   environment-art approval. This is an organic terrain foundation, not M9 promotion.
+- Pacuare rainforest Single Layer Water V1 replaces the map's flat Default Lit water
+  sheet with a Pacuare-only physical water-volume parent. Two opposed moving normal
+  layers, two incommensurate world-space variation fields, active scattering,
+  absorption, phase, behind-water color, and index-of-refraction controls now drive the
+  saved material instance. Render width falls from 1.45 to 1.05, analytic displacement
+  from 0.78 to 0.20, and the review cameras frame more downstream geography; the
+  regenerated views retain readable gray-green surface motion instead of the rejected
+  near-black first bracket and overbright cyan second bracket. The procedural ribbon
+  remains non-colliding, has no world-position offset, reuses no cross-river solver
+  fields, and cannot change terrain, raft forces, hydraulics, route, or gameplay
+  authority. The editor build, zero-error/zero-warning MapCheck, focused native material
+  test, and 44 Python/source-layout contracts pass. This remains photoreal-rejected for
+  a visible near-camera transition, small river-right terrain voids, missing Pacuare-
+  specific rapid hydraulics/foam/spray, coarse smooth banks, generic repeated ecology,
+  and absent named guide, water-VFX, environment-art, ecology, and geospatial approval;
+  M9 and the external acceptance gates remain open.

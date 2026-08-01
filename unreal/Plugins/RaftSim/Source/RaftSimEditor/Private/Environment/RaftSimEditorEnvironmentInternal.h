@@ -950,6 +950,8 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
     FString& OutSummary,
     bool bUseSingleLayerWater = false);
 
+UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
+
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
 
