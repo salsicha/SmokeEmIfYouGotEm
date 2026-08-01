@@ -125,6 +125,11 @@ presentation flags, and SHA-256 hashes in
 `Saved/RaftSimValidation/m9/metahuman-production-captures.json`; pixel-level photoreal,
 hair/PPE, clipping, and identity review remains a human release decision.
 
+For the guide, the same run also records matched close-torso dry and forced-swimmer-wet PFD
+frames, material-instance availability, and before/after presentation wetness. This proves
+that Cloth/fuzz and live wet response are wired to the production roster; it does not replace
+named character-art or whitewater-safety review.
+
 Official setup references:
 
 - <https://dev.epicgames.com/documentation/en-us/metahuman/getting-started-with-metahuman-creator>

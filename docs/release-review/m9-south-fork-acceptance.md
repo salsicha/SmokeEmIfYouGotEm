@@ -2442,6 +2442,38 @@ its seated biomechanics before photoreal or release-media acceptance. Exact sour
 image, and validation hashes are in
 `docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json`.
 
+## Cloth and live-wet production PFD V1 — textile response retained, external review open
+
+The torso-wrapped PFD geometry still used a uniformly lit shell that read as molded plastic.
+All four shell colors now use Unreal Cloth shading with the existing project-owned ripstop
+albedo, normal, and packed AO/roughness maps. Each avatar owns one dynamic shell instance;
+native raft surface wetness controls seated dampness, while swimming, re-entry, and falling
+immediately impose presentation-only wetness floors.
+
+![Dry cloth PFD close view](../environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_guide_dry.png)
+
+![Wet cloth PFD close view](../environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_guide_wet.png)
+
+The first wet bracket was rejected for a broad lacquer-like highlight. The retained bracket
+uses a 0.42 wet specular endpoint, at least 0.40 saturated roughness, and 0.16 retained wet
+cloth response. Matched captures hold the same seated pose and camera while changing the
+guide shell from 0.0 to 0.84 presentation wetness. The dry frame retains a matte visible
+weave; the wet frame darkens and develops narrower water-film highlights without erasing the
+fabric response.
+
+The Unreal 5.8 editor target builds. The renderer-backed material audit compiles all four
+opaque Nanite Cloth assets with exactly the PfdRipstop texture set. Four focused source and
+evidence contracts pass. All five roster identities expose the live material response, and
+M5 passes all five production-quality rows with zero failures; one existing motion-vector
+configuration warning remains.
+
+This is a cross-river presentation repair only. It does not change collision, crew mass,
+raft/water forces, rescue, scoring, progression, or any other gameplay authority. Simplified
+PFD hardware and seams, identity-specific fit/deformation, surrounding procedural anatomy,
+and named character-art and whitewater-safety approval remain open. Exact hashes and the
+fail-closed verdict are in
+`docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_review.json`.
+
 ## Required named decisions
 
 - [ ] Product owner: campaign, scope, disclosures, and every deferred/blocking item.

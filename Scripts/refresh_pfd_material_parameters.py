@@ -43,8 +43,13 @@ for asset_path in MATERIAL_PATHS:
         raise RuntimeError(f"{asset_path} retained two-sided self-shadowing")
     if material.get_editor_property("blend_mode") != unreal.BlendMode.BLEND_OPAQUE:
         raise RuntimeError(f"{asset_path} is not opaque")
+    if (
+        material.get_editor_property("shading_model")
+        != unreal.MaterialShadingModel.MSM_CLOTH
+    ):
+        raise RuntimeError(f"{asset_path} does not use the cloth/fuzz shading model")
     if not bool(material.get_editor_property("used_with_nanite")):
         raise RuntimeError(f"{asset_path} lacks its persisted Nanite usage permutation")
-    unreal.log(f"RaftSim PFD audit: {asset_path} stable matte material")
+    unreal.log(f"RaftSim PFD audit: {asset_path} cloth/fuzz wet-response material")
 
 unreal.log(f"RaftSim PFD rebuild complete: materials={len(MATERIAL_PATHS)}")

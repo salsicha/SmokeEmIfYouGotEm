@@ -3549,3 +3549,14 @@ path is verified, and the completion goal can be marked complete.
   Simplified fabric/hardware, identity-specific deformation, seated motion, and
   named character-art plus qualified whitewater-safety approval remain open, so
   this is a technical baseline rather than photoreal promotion.
+- Cloth and live-wet production PFD V1 replaces the same shell material on every runnable
+  river with Unreal Cloth shading, project-owned PfdRipstop albedo/normal/packed maps, and
+  one shared dynamic instance per avatar. Native raft surface wetness controls the seated
+  baseline while swimming, re-entry, and falling impose immediate presentation-only floors;
+  the 0.84 swimmer bracket is retained after reducing its wet specular endpoint to 0.42,
+  saturated roughness to no less than 0.40, and wet cloth amount to 0.16. Five roster
+  identities expose the live response, matched guide frames prove 0.0-to-0.84 material
+  change, four focused contracts pass, the editor builds, and renderer-backed M5 reports
+  five successful rows with zero failures. Physics, collision, mass, rescue, scoring, and
+  progression authority are unchanged. Character/PFD art and named art/safety acceptance
+  remain open, so M9 is not promoted.

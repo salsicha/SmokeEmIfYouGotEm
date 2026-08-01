@@ -31,6 +31,11 @@ for asset_path in MATERIAL_PATHS:
         raise RuntimeError(f"{asset_path} lacks its persisted Nanite usage permutation")
     if material.get_editor_property("blend_mode") != unreal.BlendMode.BLEND_OPAQUE:
         raise RuntimeError(f"{asset_path} is not opaque")
+    if (
+        material.get_editor_property("shading_model")
+        != unreal.MaterialShadingModel.MSM_CLOTH
+    ):
+        raise RuntimeError(f"{asset_path} does not use the cloth/fuzz shading model")
     used_textures = unreal.MaterialEditingLibrary.get_material_used_textures(material)
     used_texture_names = {texture.get_name() for texture in used_textures}
     if used_texture_names != EXPECTED_TEXTURE_NAMES:

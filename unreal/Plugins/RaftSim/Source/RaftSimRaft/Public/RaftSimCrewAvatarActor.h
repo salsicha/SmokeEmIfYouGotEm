@@ -8,6 +8,7 @@
 #include "RaftSimCrewAvatarActor.generated.h"
 
 class UMaterialInterface;
+class UMaterialInstanceDynamic;
 class UChildActorComponent;
 class UProceduralMeshComponent;
 class USceneComponent;
@@ -155,6 +156,14 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasProductionWhitewaterPfd() const;
 
+    /** True when the visible PFD shell owns its live water-response material instance. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasLivePfdMaterialResponse() const;
+
+    /** Bounded presentation-only PFD saturation; never physics or rescue authority. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    float GetPfdPresentationWetness() const { return PfdPresentationWetness; }
+
     /** True when both solved feet use the authored static whitewater river boot. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasProductionRiverBoots() const;
@@ -267,6 +276,8 @@ private:
     void SetProceduralVisualVisible(bool bVisible);
     void DispatchProductionPose();
     void AlignProductionHeadgearToSolvedHead();
+    void UpdatePfdMaterialResponse(float DeltaSeconds);
+    void ApplyPfdMaterialWetness();
     void ApplyPose(const FRaftSimCrewAvatarPose& Pose);
     UProceduralMeshComponent* CreateOrganicPart(
         const TCHAR* Name,
@@ -313,6 +324,8 @@ private:
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdBuckle;
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Crew|Production")
     TObjectPtr<UStaticMeshComponent> ProductionPfd;
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> PfdShellMaterialInstance;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Neck;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Head;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Helmet;
@@ -351,4 +364,5 @@ private:
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;
+    float PfdPresentationWetness = 0.0f;
 };
