@@ -448,6 +448,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingUsesOpaqueVolumetricVegetation;
         const bool bUsesZambeziSingleLayerWater =
             Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+        const bool bUsesPacuareOrganicRainforestSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const FString WaterMaterialParentPath = bUsesZambeziSingleLayerWater
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
                    "M_RaftSim_Zambezi_SingleLayerWater")
@@ -544,6 +546,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"horizontal_span_y_cm\": %.3f,\n")
             TEXT("      \"target_relief_cm\": %.3f,\n")
             TEXT("      \"landscape_material_status\": \"source_conditioned_macro_zones_plus_first_party_close_range_detail_review_candidate\",\n")
+            TEXT("      \"landscape_material_shading_model\": \"%s\",\n")
+            TEXT("      \"landscape_material_organic_surface_status\": \"%s\",\n")
+            TEXT("      \"landscape_material_organic_world_noise_scales_per_cm\": %s,\n")
+            TEXT("      \"landscape_material_geometry_authority_status\": \"shade_only_no_world_position_offset_no_collision_or_solver_change\",\n")
             TEXT("      \"landscape_material_texture_asset_count\": 7,\n")
             TEXT("      \"landscape_material_zone_parameter\": \"SourceConditionedMaterialZones\",\n")
             TEXT("      \"landscape_material_zone_semantics\": \"rgb_r_terrain_wet_bank_g_vegetation_b_visible_water\",\n")
@@ -741,6 +747,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.HorizontalSpanXCm,
             Candidate.HorizontalSpanYCm,
             Candidate.TargetReliefCm,
+            bUsesPacuareOrganicRainforestSurface
+                ? TEXT("DefaultLit")
+                : TEXT("Unlit"),
+            bUsesPacuareOrganicRainforestSurface
+                ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
+                : TEXT("not_enabled_for_this_river"),
+            bUsesPacuareOrganicRainforestSurface
+                ? TEXT("[0.000210, 0.000950, 0.003500]")
+                : TEXT("[]"),
             MaterialSettings.MacroMappingScale,
             MaterialSettings.DetailMappingScale,
             MaterialSettings.DetailAlbedoWeight,

@@ -1,0 +1,62 @@
+{
+  "schema": "raftsim.environment.pacuare_organic_rainforest_surface_review.v1",
+  "river_id": "pacuare",
+  "milestone": "pacuare_organic_rainforest_terrain_v1",
+  "status": "accepted_technical_visual_improvement_photoreal_promotion_rejected",
+  "baseline": {
+    "git_commit": "2ecaabdbf6f543b1a66427002ca616e2b98bfeb2",
+    "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+    "sha256": "8121aca92a603d52363d62daf6640962e1fd005f7da134e15cc6dca3b7029019"
+  },
+  "accepted_captures": [
+    {
+      "view": "guide_seat_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "d7bfd4b15e188807cc64094cb05ec7e0984b6e3eb1a801409b967aa516905a65"
+    },
+    {
+      "view": "river_eye_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "1d4706b12d79e0b07b1155c55957e06e2918ee5871db0c6614576501460b59b8"
+    }
+  ],
+  "implementation": {
+    "shading_model": "DefaultLit",
+    "world_noise_scales_per_cm": [0.00021, 0.00095, 0.0035],
+    "surface_responses": [
+      "humid_forest_macro_value",
+      "moss_leaf_litter_palette",
+      "slope_aware_wet_rock_and_rock_moss",
+      "fine_mineral_value"
+    ],
+    "geometry_authority": "unchanged_review_gated_source_landscape",
+    "world_position_offset": false,
+    "collision_changed": false,
+    "water_or_solver_changed": false
+  },
+  "descriptive_image_measurements": {
+    "method": "fixed guide-view left-bank ROI x_0_620_y_20_370; RGB converted to linearized 0_to_1 channel values without a perceptual acceptance threshold",
+    "baseline_mean_luminance": 0.17453417,
+    "accepted_mean_luminance": 0.30725035,
+    "baseline_luminance_stddev": 0.07962084,
+    "accepted_luminance_stddev": 0.05134264,
+    "interpretation": "the lit graph recovers readable bank exposure and visible source/surface variation; these descriptive values are not a photoreal score"
+  },
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "landscape_source_material_slots": "256_of_256",
+    "landscape_nanite_material_slots": "256_of_256",
+    "focused_native_test": "RaftSim.M9.FPacuareOrganicRainforestTerrain_pass",
+    "focused_python_and_source_layout_tests": "37_pass"
+  },
+  "photoreal_rejection_reasons": [
+    "compressed_and_coarse_preview_heightfield_geometry",
+    "broad_smooth_banks_without_production_microgeometry",
+    "generic_repeated_pve_vegetation_and_sparse_near_bank_ground_cover",
+    "provisional_flat_water_without_pacuare_solver_derived_hydraulics",
+    "missing_production_rain_mist_waterfall_and_humid_atmosphere_vfx",
+    "missing_named_pacuare_guide_ecology_geospatial_and_environment_art_approval"
+  ]
+}
