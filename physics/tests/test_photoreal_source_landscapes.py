@@ -383,7 +383,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             "reflection_tint": [0.30, 0.38, 0.40],
             "opacity": 0.28,
             "phase_g": 0.15,
-            "render_width_scale": 1.05,
+            "render_width_scale": 1.35,
             "render_normal_up_blend": 0.82,
             "render_displacement_scale": 0.20,
         },
@@ -780,13 +780,8 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             candidate["river_id"] == "zambezi_batoka_gorge"
             and candidate["water_shading_model"] == "SingleLayerWater"
         )
-        is_pacuare_single_layer_water = (
-            candidate["river_id"] == "pacuare"
-            and candidate["water_shading_model"] == "SingleLayerWater"
-        )
-        is_single_layer_water = (
-            is_zambezi_single_layer_water or is_pacuare_single_layer_water
-        )
+        is_pacuare_default_lit_water = candidate["river_id"] == "pacuare"
+        is_single_layer_water = is_zambezi_single_layer_water
         if is_zambezi_single_layer_water:
             expected_water = {
                 **expected_water,
@@ -804,8 +799,9 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             "zambezi_single_layer_water_volume_candidate_bound_and_captured"
             if is_zambezi_single_layer_water
             else (
-                "pacuare_rainforest_single_layer_water_volume_candidate_bound_and_captured"
-                if is_pacuare_single_layer_water
+                "pacuare_rainforest_default_lit_candidate_bound_after_single_layer_"
+                "capture_rejection"
+                if is_pacuare_default_lit_water
                 else "solver_surface_default_lit_candidate_bound_and_captured"
             )
         )
@@ -819,11 +815,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             else "none_surface_only_solver_conditioned_shading"
         )
         assert candidate["water_volume_parameter_status"] == (
-            (
-                "active_on_zambezi_isolated_parent"
-                if is_zambezi_single_layer_water
-                else "active_on_pacuare_isolated_parent"
-            )
+            "active_on_zambezi_isolated_parent"
             if is_single_layer_water
             else "inactive_single_layer_evaluation_values_retained_in_manifest_only"
         )
@@ -956,7 +948,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             assert candidate["water_solver_foam_max_opacity"] == 0.0
             assert candidate["water_solver_foam_surface_offset_cm"] == 0.0
         assert 0.0 <= candidate["water_emissive_fill_scale"] <= (
-            0.40 if is_pacuare_single_layer_water else 0.10
+            0.40 if is_pacuare_default_lit_water else 0.10
         )
         assert 0.0 < candidate["water_roughness"] <= 0.50
         assert 0.0 < candidate["water_normal_intensity"] <= 0.90

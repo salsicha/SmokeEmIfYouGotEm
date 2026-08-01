@@ -641,7 +641,8 @@ def test_unreal_editor_preview_capture_records_procedural_asset_plan():
     assert "Missing production geospatial attachment ledger" in editor_source
     assert water_review["schema"] == "raftsim.unreal.water_material_candidate_review.v1"
     assert water_review["status"] == (
-        "solver_surface_default_lit_landscape_candidate_captured_review_only"
+        "default_lit_landscape_candidates_with_zambezi_single_layer_exception_"
+        "captured_review_only"
     )
     assert (
         water_review["active_decision"]["active_material"]
@@ -649,6 +650,10 @@ def test_unreal_editor_preview_capture_records_procedural_asset_plan():
     )
     assert water_review["active_decision"]["landscape_candidate_material"] == (
         "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate"
+    )
+    assert water_review["active_decision"]["pacuare_landscape_candidate_parent"] == (
+        "/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
+        "M_RaftSim_Pacuare_RainforestDefaultLitWater"
     )
     assert (
         "Opaque DefaultLit surface shading"
@@ -662,7 +667,7 @@ def test_unreal_editor_preview_capture_records_procedural_asset_plan():
         in water_review["active_decision"]["observed_result"]
     )
     assert water_review["single_layer_depth_split_failure"]["decision"].startswith(
-        "Keep Single Layer Water assets inactive"
+        "Keep failed global and Pacuare Single Layer Water assets inactive"
     )
     assert water_review["test_run"]["clean_start_material_compile_failures"] == 0
     assert water_review["test_run"]["photoreal_asset_tests"] == "26 passed"

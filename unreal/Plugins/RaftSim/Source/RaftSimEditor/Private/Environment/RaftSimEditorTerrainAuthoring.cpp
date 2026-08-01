@@ -1627,9 +1627,10 @@ AActor* AddPreviewRiverRibbonMesh(
         !bUsePhysicalCandidateShading);
     if (WaterActor && Spec.RiverId == TEXT("pacuare"))
     {
-        WaterActor->Tags.AddUnique(TEXT("RaftSimPacuareSingleLayerWater"));
+        WaterActor->Tags.AddUnique(TEXT("RaftSimPacuareDefaultLitWater"));
         WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
         WaterActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
     }
     if (bUseSolverVisualizationFields && SolverFoamVertexColors.Num() == Vertices.Num())
     {

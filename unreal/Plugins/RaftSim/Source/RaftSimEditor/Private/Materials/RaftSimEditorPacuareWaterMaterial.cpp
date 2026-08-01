@@ -2,7 +2,6 @@
 
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
-#include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -21,9 +20,9 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary)
 {
     static const FString MaterialPackagePath =
         TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
-             "M_RaftSim_Pacuare_RainforestSingleLayerWater");
+             "M_RaftSim_Pacuare_RainforestDefaultLitWater");
     static const FString MaterialObjectName =
-        TEXT("M_RaftSim_Pacuare_RainforestSingleLayerWater");
+        TEXT("M_RaftSim_Pacuare_RainforestDefaultLitWater");
     const FString MaterialObjectPath = FString::Printf(
         TEXT("%s.%s"), *MaterialPackagePath, *MaterialObjectName);
 
@@ -68,11 +67,10 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary)
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_SingleLayerWater);
+    Material->SetShadingModel(MSM_DefaultLit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
-    Material->RefractionMethod = RM_IndexOfRefraction;
 
     auto Scalar = [Material](const TCHAR* Name, float Value)
     {
@@ -291,21 +289,22 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary)
         Scalar(TEXT("Roughness"), 0.32f);
     UMaterialExpressionScalarParameter* Specular =
         Scalar(TEXT("Specular"), 0.42f);
-    UMaterialExpressionScalarParameter* Opacity =
-        Scalar(TEXT("Opacity"), 0.28f);
-    UMaterialExpressionScalarParameter* RefractionIor =
-        Scalar(TEXT("RefractionIor"), 1.333f);
+    Scalar(TEXT("Opacity"), 0.28f);
+    Scalar(TEXT("RefractionIor"), 1.333f);
 
-    UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput =
-        AddPacuareWaterExpression<UMaterialExpressionSingleLayerWaterMaterialOutput>(Material);
-    WaterOutput->ScatteringCoefficients.Expression = Vector(
+    // Retain the volume values as unbound evaluation metadata so existing
+    // material-instance contracts remain inspectable. Direct isolation and a
+    // conditioned-riverbed bracket both left a hard foreground composition
+    // band in Single Layer Water, so Pacuare remains opaque Default Lit until
+    // production bathymetry and a passing volume-water capture exist.
+    Vector(
         TEXT("ScatteringCoefficients"),
         FLinearColor(0.00055f, 0.00080f, 0.00065f, 0.0f));
-    WaterOutput->AbsorptionCoefficients.Expression = Vector(
+    Vector(
         TEXT("AbsorptionCoefficients"),
         FLinearColor(0.0055f, 0.0020f, 0.0035f, 0.0f));
-    WaterOutput->PhaseG.Expression = Scalar(TEXT("PhaseG"), 0.15f);
-    WaterOutput->ColorScaleBehindWater.Expression = Vector(
+    Scalar(TEXT("PhaseG"), 0.15f);
+    Vector(
         TEXT("ColorScaleBehindWater"),
         FLinearColor(0.60f, 0.65f, 0.55f, 0.0f));
 
@@ -330,8 +329,6 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary)
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->Opacity, Opacity);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->Refraction, RefractionIor);
     }
 
     Material->PostEditChange();
@@ -357,8 +354,9 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary)
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += TEXT(
-        "Built Pacuare rainforest Single Layer Water with two moving normal "
-        "scales, two world variation fields, and no visual displacement.\n");
+        "Built Pacuare rainforest opaque Default Lit water with two moving "
+        "normal scales, two world variation fields, and no visual displacement; "
+        "Single Layer Water remains rejected by capture.\n");
     return Material;
 }
 } // namespace RaftSimEditorEnvironment

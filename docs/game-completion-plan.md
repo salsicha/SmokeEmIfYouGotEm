@@ -3616,3 +3616,19 @@ path is verified, and the completion goal can be marked complete.
   specific rapid hydraulics/foam/spray, coarse smooth banks, generic repeated ecology,
   and absent named guide, water-VFX, environment-art, ecology, and geospatial approval;
   M9 and the external acceptance gates remain open.
+- Pacuare water depth-composition correction V1 supersedes that retained visual
+  bracket without erasing its evidence. Direct isolation and a 31,409-vertex,
+  48.5-267.6 cm procedural reference-infill bathymetry attempt both leave the hard
+  lower-frame Single Layer depth band; a two-sided terrain-infill attempt covers the
+  white gaps but creates broad tessellated bank facets. Both synthetic geometry paths
+  are rejected and absent from the saved map. Pacuare now uses its own opaque Default
+  Lit rainforest water parent, retaining two moving normal layers, two world-variation
+  scales, and the accepted scalar palette with no world-position offset. A 1.35x
+  render-only overlap removes continuous shoreline gaps and leaves one tiny distant
+  river-right point for source-aligned production microgeometry; collision, solver
+  width, Landscape heightfield, hydraulics, and raft forces are unchanged. The two
+  canonical captures have no lower-frame band and MapCheck remains clean. This closes
+  the visible composition regression only; coarse terrain, generic ecology, absent
+  Pacuare solver hydraulics/foam/spray, production water and bank transitions,
+  performance evidence, and named guide/art/ecology/geospatial acceptance still block
+  photoreal and M9 promotion.
