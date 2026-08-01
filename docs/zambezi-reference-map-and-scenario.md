@@ -74,6 +74,26 @@ navigable corridor clear. This removes the floating black/green triangle and
 cliff-mounted-tree failures from the active Zambezi views; it does not establish
 correct species, woodland ecology, or photoreal vegetation.
 
+The physical-corridor ribbon now uses an isolated
+`M_RaftSim_Zambezi_SingleLayerWater` parent instead of changing the shared
+Default Lit candidate used by the other rivers. It binds Unreal's
+`SingleLayerWaterMaterialOutput` with per-centimetre scattering and absorption,
+phase, behind-water colour scale, and a 0.64 surface-opacity control. Two
+opposed panners animate independently tiled normal-atlas layers, while bounded
+world-space optical variation keeps commandlet captures from collapsing into a
+single flat colour when temporal reflections are unavailable. The ribbon stays
+non-colliding and render-only; the runtime water configuration and solver remain
+the gameplay authority. The generated actor exposes
+`RaftSimZambeziSingleLayerWater`, `RaftSimMovingMultiScaleWaterNormals`,
+`RaftSimPhysicalCorridorWater`, and `RaftSimNonCollisionRenderSurface` tags.
+
+The regenerated views remove most of the former camera-radial dark grooves and
+show a lighter gray-green surface without reproducing the foreground depth
+split that rejected the earlier global Single Layer experiment. This is an
+incremental optical baseline, not final water art: hydraulic foam, breaking
+crests, spray/mist, local bathymetric transmission, seasonal calibration, and
+guide/art approval remain open.
+
 ## Runnable reference status
 
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
@@ -100,11 +120,13 @@ reference map is therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v4 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v5 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding visual-terrain tiles, the exact four vegetation families and
-5,600-instance total, and zero legacy Zambezi PVE actors. The focused runtime
-gate is
+5,600-instance total, zero legacy Zambezi PVE actors, and exactly one
+non-colliding physical-corridor ribbon bound through the isolated Single Layer
+Water parent with the moving-normal contract tags. The saved material asset is
+also covered by `RaftSim.M9.FZambeziSingleLayerWater`; the focused runtime gate is
 `RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`.
 
 ## Production status and gates

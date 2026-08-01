@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v4",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v5",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -91,6 +91,34 @@ def main() -> None:
                     "procedural_mesh_count": len(components),
                     "material": material.get_path_name() if material else None,
                     "collision_enabled": str(mesh.get_collision_enabled()) if mesh else None,
+                }
+            )
+        water_surface_actors = [
+            actor
+            for actor in actors
+            if actor.get_actor_label()
+            == "RaftSim_PhysicalCorridorRiverRibbon_zambezi_batoka_gorge"
+        ]
+        water_surface_rows = []
+        for actor in water_surface_actors:
+            components = actor.get_components_by_class(unreal.ProceduralMeshComponent)
+            mesh = components[0] if components else None
+            material = mesh.get_material(0) if mesh else None
+            parent = (
+                material.get_editor_property("parent")
+                if material and isinstance(material, unreal.MaterialInstanceConstant)
+                else None
+            )
+            water_surface_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
+                    "procedural_mesh_count": len(components),
+                    "material": material.get_path_name() if material else None,
+                    "parent_material": parent.get_path_name() if parent else None,
+                    "collision_enabled": (
+                        str(mesh.get_collision_enabled()) if mesh else None
+                    ),
                 }
             )
         vegetation_actors = [
@@ -165,6 +193,13 @@ def main() -> None:
                     "conditioned_tile_count": len(terrain_rows),
                     "tiles": sorted(terrain_rows, key=lambda row: row["actor_label"]),
                 },
+                "water_surface": {
+                    "authority": "render_only_source_aligned_physical_corridor",
+                    "shading_model_contract": "SingleLayerWater",
+                    "normal_motion_contract": "two_opposed_panned_atlas_layers",
+                    "component_count": len(water_surface_rows),
+                    "components": water_surface_rows,
+                },
                 "vegetation": {
                     "authority": "procedural_render_only_no_exact_species_claim",
                     "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards",
@@ -214,6 +249,22 @@ def main() -> None:
                 and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
                 for row in terrain_rows
             )
+            and len(water_surface_rows) == 1
+            and water_surface_rows[0]["procedural_mesh_count"] == 1
+            and "MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate"
+            in str(water_surface_rows[0]["material"])
+            and "M_RaftSim_Zambezi_SingleLayerWater"
+            in str(water_surface_rows[0]["parent_material"])
+            and "NO_COLLISION"
+            in str(water_surface_rows[0]["collision_enabled"])
+            and "RaftSimNonCollisionRenderSurface"
+            in water_surface_rows[0]["tags"]
+            and "RaftSimPhysicalCorridorWater"
+            in water_surface_rows[0]["tags"]
+            and "RaftSimZambeziSingleLayerWater"
+            in water_surface_rows[0]["tags"]
+            and "RaftSimMovingMultiScaleWaterNormals"
+            in water_surface_rows[0]["tags"]
             and len(vegetation_rows) == 4
             and sum(int(row["instance_count"]) for row in vegetation_rows) == 5600
             and any(
@@ -260,7 +311,8 @@ def main() -> None:
         unreal.log(
             f"Zambezi reference run validation passed with {len(markers)} markers, "
             f"{len(player_rafts)} raft, {len(water_configs)} runtime water config, "
-            f"{len(terrain_rows)} conditioned visual-terrain tiles, and "
+            f"{len(terrain_rows)} conditioned visual-terrain tiles, "
+            f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
             "opaque vegetation instances"
         )

@@ -335,9 +335,14 @@ bool BuildLandscapeImportCandidateMap(
             }
         }
     }
+    const EMaterialShadingModel ExpectedWaterShadingModel =
+        Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge")
+        ? MSM_SingleLayerWater
+        : MSM_DefaultLit;
     OutResult.bSolverSurfaceWaterMaterialBound =
         OutResult.WaterMaterialBoundComponentCount == 1 &&
-        CandidateWaterMaterial->GetShadingModels().HasShadingModel(MSM_DefaultLit);
+        CandidateWaterMaterial->GetShadingModels().HasShadingModel(
+            ExpectedWaterShadingModel);
     if (!OutResult.bSolverSurfaceWaterMaterialBound)
     {
         OutSummary += FString::Printf(

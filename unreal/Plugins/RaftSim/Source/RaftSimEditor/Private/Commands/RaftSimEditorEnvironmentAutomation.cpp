@@ -444,6 +444,39 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.bPhysicalScaleSourceCorridor;
         const bool bUsesZambeziOpaqueVegetation =
             Result.bDressingUsesOpaqueVolumetricVegetation;
+        const bool bUsesZambeziSingleLayerWater =
+            Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+        const FString WaterMaterialParentPath = bUsesZambeziSingleLayerWater
+            ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+                   "M_RaftSim_Zambezi_SingleLayerWater")
+            : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                   "M_RaftSim_SolverSurfaceWaterCandidate");
+        const FString WaterSingleLayerParameterKeyPrefix =
+            bUsesZambeziSingleLayerWater
+            ? TEXT("water_single_layer")
+            : TEXT("water_inactive_single_layer");
+        const FString WaterSingleLayerParametersJson = FString::Printf(
+            TEXT("      \"%s_refraction_ior\": %.6f,\n")
+            TEXT("      \"%s_phase_g\": %.6f,\n")
+            TEXT("      \"%s_scattering_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"%s_absorption_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"%s_color_scale_behind_water\": [%.6f, %.6f, %.6f],\n"),
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.RefractionIor,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.PhaseG,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.ScatteringCoefficients.R,
+            WaterSettings.ScatteringCoefficients.G,
+            WaterSettings.ScatteringCoefficients.B,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.AbsorptionCoefficients.R,
+            WaterSettings.AbsorptionCoefficients.G,
+            WaterSettings.AbsorptionCoefficients.B,
+            *WaterSingleLayerParameterKeyPrefix,
+            WaterSettings.ColorScaleBehindWater.R,
+            WaterSettings.ColorScaleBehindWater.G,
+            WaterSettings.ColorScaleBehindWater.B);
         const FString DressingSourceSpeciesJson = bUsesZambeziOpaqueVegetation
             ? TEXT("[]")
             : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
@@ -588,11 +621,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_promotion_status\": \"%s\",\n")
             TEXT("      \"water_material_status\": \"%s\",\n")
             TEXT("      \"water_material_asset\": \"%s\",\n")
-            TEXT("      \"water_material_parent\": \"/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate\",\n")
-            TEXT("      \"water_shading_model\": \"DefaultLit\",\n")
+            TEXT("      \"water_material_parent\": \"%s\",\n")
+            TEXT("      \"water_shading_model\": \"%s\",\n")
             TEXT("      \"water_blend_mode\": \"Opaque\",\n")
-            TEXT("      \"water_custom_output\": \"none_surface_only_solver_conditioned_shading\",\n")
-            TEXT("      \"water_volume_parameter_status\": \"inactive_single_layer_evaluation_values_retained_in_manifest_only\",\n")
+            TEXT("      \"water_custom_output\": \"%s\",\n")
+            TEXT("      \"water_volume_parameter_status\": \"%s\",\n")
             TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_plus_optional_validated_cpp_solver_macro_normal\",\n")
             TEXT("      \"water_solver_visualization_field_status\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_manifest\": \"%s\",\n")
@@ -627,19 +660,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_normal_intensity\": %.6f,\n")
             TEXT("      \"water_normal_atlas_sampling_policy\": \"half_period_dual_sample_crossfade_prevents_frac_tile_boundaries\",\n")
             TEXT("      \"water_normal_atlas_phase_offset\": 0.500000,\n")
-            TEXT("      \"water_inactive_single_layer_refraction_ior\": %.6f,\n")
-            TEXT("      \"water_inactive_single_layer_phase_g\": %.6f,\n")
-            TEXT("      \"water_inactive_single_layer_scattering_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
-            TEXT("      \"water_inactive_single_layer_absorption_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
-            TEXT("      \"water_inactive_single_layer_color_scale_behind_water\": [%.6f, %.6f, %.6f],\n")
+            TEXT("%s")
             TEXT("      \"water_render_width_scale\": %.6f,\n")
             TEXT("      \"water_render_normal_up_blend\": %.6f,\n")
             TEXT("      \"water_render_displacement_scale\": %.6f,\n")
             TEXT("      \"water_near_camera_synthetic_wedge_fill_enabled\": false,\n")
             TEXT("      \"water_near_camera_synthetic_wedge_fill_policy\": \"disabled_for_solver_surface_water_candidates_legacy_diagnostic_branch_retained\",\n")
             TEXT("      \"water_geometry_authority\": \"custom_cpp_solver_informed_ribbon_geometry_and_vertex_flow_cues_no_visual_forcing_authority\",\n")
-            TEXT("      \"waterbody_dependency\": \"none_default_lit_solver_surface_runs_on_generated_procedural_mesh_ribbon\",\n")
-            TEXT("      \"water_reflection_capture_policy\": \"default_lit_surface_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_and_bounded_fresnel_sky_fill\",\n")
+            TEXT("      \"waterbody_dependency\": \"%s\",\n")
+            TEXT("      \"water_reflection_capture_policy\": \"%s\",\n")
             TEXT("      \"water_material_promotion_status\": \"review_only_requires_visual_guide_solver_hazard_and_performance_validation\",\n")
             TEXT("      \"material_usage_contract\": \"%s\",\n")
             TEXT("      \"material_bound_component_count\": %d,\n")
@@ -849,9 +878,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("rights_reviewed_broadleaf_analog_and_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
                        : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"))),
             Result.bSolverSurfaceWaterMaterialBound
-                ? TEXT("solver_surface_default_lit_candidate_bound_and_captured")
+                ? (bUsesZambeziSingleLayerWater
+                       ? TEXT("zambezi_single_layer_water_volume_candidate_bound_and_captured")
+                       : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
+            *EscapeRaftSimJsonString(WaterMaterialParentPath),
+            bUsesZambeziSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
+            bUsesZambeziSingleLayerWater
+                ? TEXT("SingleLayerWaterMaterialOutput_scattering_absorption_phase_and_behind_water_scale")
+                : TEXT("none_surface_only_solver_conditioned_shading"),
+            bUsesZambeziSingleLayerWater
+                ? TEXT("active_on_zambezi_isolated_parent")
+                : TEXT("inactive_single_layer_evaluation_values_retained_in_manifest_only"),
             bHasSolverVisualizationFields
                 ? TEXT("validated_cpp_solver_visualization_fields_bound_review_only")
                 : (Candidate.bPhysicalScaleSourceCorridor
@@ -890,22 +929,18 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.ReflectionTint.B,
             WaterSettings.Roughness,
             WaterSettings.Specular,
-            1.0f,
+            bUsesZambeziSingleLayerWater ? WaterSettings.Opacity : 1.0f,
             WaterSettings.NormalIntensity,
-            WaterSettings.RefractionIor,
-            WaterSettings.PhaseG,
-            WaterSettings.ScatteringCoefficients.R,
-            WaterSettings.ScatteringCoefficients.G,
-            WaterSettings.ScatteringCoefficients.B,
-            WaterSettings.AbsorptionCoefficients.R,
-            WaterSettings.AbsorptionCoefficients.G,
-            WaterSettings.AbsorptionCoefficients.B,
-            WaterSettings.ColorScaleBehindWater.R,
-            WaterSettings.ColorScaleBehindWater.G,
-            WaterSettings.ColorScaleBehindWater.B,
+            *WaterSingleLayerParametersJson,
             WaterSettings.RenderWidthScale,
             WaterSettings.RenderNormalUpBlend,
             WaterSettings.RenderDisplacementScale,
+            bUsesZambeziSingleLayerWater
+                ? TEXT("none_single_layer_water_runs_on_generated_procedural_mesh_ribbon")
+                : TEXT("none_default_lit_solver_surface_runs_on_generated_procedural_mesh_ribbon"),
+            bUsesZambeziSingleLayerWater
+                ? TEXT("single_layer_water_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_volume_transmission_and_bounded_fresnel_sky_fill")
+                : TEXT("default_lit_surface_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_and_bounded_fresnel_sky_fill"),
             Candidate.bEnableLandscapeNanite
                 ? TEXT("nanite_and_static_lighting")
                 : TEXT("static_lighting_non_nanite_physical_corridor_review"),

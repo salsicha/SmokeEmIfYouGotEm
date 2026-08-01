@@ -125,14 +125,20 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
-        Settings.BaseColorScale = 1.10f;
-        Settings.EmissiveFillScale = 0.085f;
-        Settings.Roughness = 0.38f;
-        Settings.Specular = 0.34f;
-        Settings.Opacity = 0.52f;
-        Settings.NormalIntensity = 0.58f;
-        Settings.VertexTintWeight = 0.58f;
+        // Batoka uses its own Single Layer Water parent. Keep the surface dark
+        // and sediment-bearing while allowing the water volume and reflected
+        // sky to carry the guide-eye read; high emissive and normal gains made
+        // the previous Default Lit sheet look opaque and camera-radial.
+        Settings.BaseColorScale = 0.98f;
+        Settings.EmissiveFillScale = 0.035f;
+        Settings.Roughness = 0.18f;
+        Settings.Specular = 0.66f;
+        Settings.Opacity = 0.64f;
+        Settings.NormalIntensity = 0.40f;
+        Settings.PhaseG = 0.08f;
+        Settings.VertexTintWeight = 0.50f;
         Settings.RenderWidthScale = 1.24f;
+        Settings.ReflectionFillIntensity = 0.26f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -141,8 +147,14 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 0.0f;
         Settings.SolverFroudeVisualGain = 0.0f;
         Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.13f, 0.16f, 0.065f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.40f, 0.46f, 0.39f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.060f, 0.105f, 0.055f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.36f, 0.48f, 0.46f, 0.0f);
+        Settings.ScatteringCoefficients =
+            FLinearColor(0.0008f, 0.0016f, 0.0007f, 0.0f);
+        Settings.AbsorptionCoefficients =
+            FLinearColor(0.0045f, 0.0030f, 0.0055f, 0.0f);
+        Settings.ColorScaleBehindWater =
+            FLinearColor(0.28f, 0.34f, 0.22f, 0.0f);
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
