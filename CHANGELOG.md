@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Restored Pacuare Upper Huacas as a physical reach-local runnable map instead
+  of the flat signature-rapid shell and scale-mismatched broad DEM preview.
+  `L_UpperHuacas` now combines a 600×78 m Landscape, bounded outer-bank infill,
+  an explicit 454.283 m solver/world vertical datum, live cooked water, player
+  raft/start, and the vertical-slice game mode. The focused PIE gate passes with
+  a wet finite window, upright raft, and zero swimmers; opaque preview water,
+  generic foliage, missing visible rapid foam/spray, higher-resolution source
+  geography, and external acceptance still block photoreal promotion.
 - Retained a second Zambezi sediment-water profile on the runnable Batoka Gorge
   reference Free Run. The isolated Single Layer instance now uses darker
   sediment absorption, 0.48 opacity, 0.50 roughness, 0.26 specular, 0.04 normal

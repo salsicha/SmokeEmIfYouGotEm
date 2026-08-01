@@ -812,13 +812,26 @@ bool LoadLandscapeCandidateLocalCenterline(
     return true;
 }
 
+float GetLandscapeCandidateWorldMinX(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate)
+{
+    // The compact legacy previews were authored around X=-58 m. Reach-local
+    // physical windows use their cooked solver station directly so live water,
+    // Landscape collision, static capture water, and raft launch share one
+    // coordinate frame.
+    return Candidate.PreviewSpec.RiverId == TEXT("pacuare") &&
+            !Candidate.LocalCenterlineRelativePath.IsEmpty()
+        ? 0.0f
+        : -5800.0f;
+}
+
 FVector2D SampleLandscapeCandidateCenterlineWorld(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points,
     float Progress,
     FVector2D* OutTangent)
 {
-    constexpr float LandscapeMinX = -5800.0f;
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     if (Points.Num() < 2)
     {
         const float X = FMath::Lerp(
@@ -888,7 +901,7 @@ bool SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
     OutWorldZ = FMath::Lerp(
         A.ConditionedVisualSurfaceNormalized,
         B.ConditionedVisualSurfaceNormalized,
-        T) * Candidate.TargetReliefCm;
+        T) * Candidate.TargetReliefCm + Candidate.WorldVerticalOffsetCm;
     return true;
 }
 
@@ -1246,13 +1259,28 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         else if (PreviewSpec.RiverId == TEXT("pacuare"))
         {
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json");
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_visual_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
                 TEXT("unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json");
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_Pacuare_SourceLandscapeCandidate");
+                TEXT("/Game/RaftSim/Maps/L_UpperHuacas");
+            Candidate.LandscapeSize = 1009;
+            Candidate.HorizontalSpanXCm = 60000.0f;
+            Candidate.HorizontalSpanYCm = 7800.0f;
+            Candidate.TargetReliefCm = 2395.6667f;
+            Candidate.WorldVerticalOffsetCm = -470.1597f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+            Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1250.0f;
+            Candidate.PreviewSpec.BankWidthCm = 2600.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
         {

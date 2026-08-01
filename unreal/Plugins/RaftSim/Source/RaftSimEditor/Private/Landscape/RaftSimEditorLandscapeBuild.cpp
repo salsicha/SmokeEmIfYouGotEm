@@ -11,7 +11,7 @@ bool BuildLandscapeImportCandidateMap(
     const int32 LandscapeQuads = LandscapeSize - 1;
     const int32 NumSubsections = Candidate.bPhysicalScaleSourceCorridor ? 2 : 1;
     constexpr int32 SubsectionSizeQuads = 63;
-    constexpr float MinX = -5800.0f;
+    const float MinX = GetLandscapeCandidateWorldMinX(Candidate);
 
     const FString HeightfieldAbsolutePath = FPaths::ConvertRelativePathToFull(
         FPaths::Combine(GetRepoRoot(), Candidate.HeightfieldRelativePath));
@@ -149,7 +149,7 @@ bool BuildLandscapeImportCandidateMap(
     OutResult.LandscapeLocation = FVector(
         MinX,
         -Candidate.HorizontalSpanYCm * 0.5f,
-        ChannelBedWorldZ - EncodedChannelFloorCm);
+        ChannelBedWorldZ - EncodedChannelFloorCm + Candidate.WorldVerticalOffsetCm);
     OutResult.LandscapeScale = FVector(ScaleX, ScaleY, ScaleZ);
 
     ALandscape* Landscape = World->SpawnActor<ALandscape>(
@@ -257,6 +257,7 @@ bool BuildLandscapeImportCandidateMap(
         return false;
     }
     if (Candidate.bPhysicalScaleSourceCorridor &&
+        Candidate.bUseDensePhysicalTerrainRenderSurface &&
         !AddLandscapeCandidatePhysicalBankCorridorMesh(World, Landscape, Candidate, OutSummary))
     {
         OutSummary += FString::Printf(
@@ -315,7 +316,8 @@ bool BuildLandscapeImportCandidateMap(
             MorphologyStats.MinimumModifiedCenterlineDistanceCm / 100.0f,
             MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f);
     }
-    if (Candidate.bPhysicalScaleSourceCorridor)
+    if (Candidate.bPhysicalScaleSourceCorridor &&
+        Candidate.bUseDensePhysicalTerrainRenderSurface)
     {
         Landscape->SetActorHiddenInGame(true);
         for (ULandscapeComponent* LandscapeComponent : Landscape->LandscapeComponents)
@@ -329,6 +331,12 @@ bool BuildLandscapeImportCandidateMap(
         OutSummary += TEXT(
             "Physical source Landscape remains the collision and height-query authority; "
             "dense source-terrain tiles are the non-colliding render surface.\n");
+    }
+    else if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        OutSummary += TEXT(
+            "Reach-local physical Landscape remains visible and owns terrain collision/rendering; "
+            "no duplicate dense source-terrain overlay is active.\n");
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
     AActor* WaterActor = Candidate.bPhysicalScaleSourceCorridor

@@ -30,6 +30,8 @@
 #include "UObject/Package.h"
 #include "UObject/SavePackage.h"
 
+#include "Environment/RaftSimEditorEnvironmentInternal.h"
+
 namespace RaftSimVerticalSliceBootstrap
 {
 
@@ -363,6 +365,35 @@ static const FRiverMapSpec GRiverMaps[] = {
 
 static bool BuildRiverMap(const FRiverMapSpec& Spec)
 {
+    if (FCString::Strcmp(Spec.MapName, TEXT("L_UpperHuacas")) == 0)
+    {
+        for (const RaftSimEditorEnvironment::FRaftSimLandscapeImportCandidateSpec& Candidate :
+             RaftSimEditorEnvironment::GetLandscapeImportCandidateSpecs())
+        {
+            if (Candidate.PreviewSpec.RiverId != TEXT("pacuare"))
+            {
+                continue;
+            }
+            RaftSimEditorEnvironment::FRaftSimLandscapeImportCandidateResult Result;
+            FString Summary;
+            const bool bBuilt =
+                RaftSimEditorEnvironment::BuildLandscapeImportCandidateMap(
+                    Candidate,
+                    Result,
+                    Summary);
+            UE_LOG(
+                LogTemp,
+                Display,
+                TEXT("RaftSim bootstrap: %s reach-local Landscape saved=%d\n%s"),
+                Spec.MapName,
+                bBuilt ? 1 : 0,
+                *Summary);
+            return bBuilt;
+        }
+        UE_LOG(LogTemp, Error, TEXT("RaftSim bootstrap: no Pacuare Landscape candidate spec."));
+        return false;
+    }
+
     UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
     AddCommonLighting(World);
 

@@ -37,6 +37,22 @@ Zambezi is now an explicit isolated exception to the shared Default Lit water co
 
 Pacuare's later isolated Single Layer V1 is now explicitly rejected and inactive. Both direct material isolation and a 31,409-vertex procedural reference-infill bathymetry bracket left the same hard horizontal foreground depth-composition band; a separate terrain-colored shoreline-infill attempt covered bright gaps but introduced broad tessellated bank facets and was also discarded. The retained `M_RaftSim_Pacuare_RainforestDefaultLitWater` preserves Pacuare's two moving normal layers and two world-variation scales without a volume output. A 1.35x non-colliding render overlap removes the continuous shoreline gaps while leaving one tiny distant river-right point for source-aligned production bank microgeometry. No rejected infill changes the saved map, Landscape collision, heightfield, solver geometry, hydraulics, or raft forces.
 
+The August 1 Upper Huacas integration supersedes Pacuare's broad,
+scale-mismatched DEM candidate as the active runnable map. `L_UpperHuacas` now
+owns a physical 600×78 m, 1009×1009 Landscape derived from the committed C3
+window rather than squeezing a roughly 37×44 km GLO-30 review mosaic into a
+323×55 m shell. A bounded ±0.38 m procedural relief field affects only
+unmeasured outer banks; the protected channel and map perimeter remain
+unchanged. A 301-point identity station/lateral coordinate map applies a
+454.283 m vertical datum, making the live cooked field and static Landscape
+agree exactly along the centerline. The saved map supplies the player
+raft/start and game mode, hides its deterministic capture ribbon during play,
+and passes its focused runtime load test. This is a reference-runnable
+geography correction, not photoreal promotion: water optics, visible rapid
+foam/spray, biome-specific foliage, wet-bank/riverbed detail, higher-resolution
+terrain, guide/geospatial/hydraulic/ecology/art review, and desktop/VR
+performance evidence remain open.
+
 The Zambezi render terrain now uses a V15 organic treatment on four collision-free 12.5 m visual tiles while the source Copernicus Landscape remains the sole terrain/physics authority. Central-difference grid normals, slower relief, variable strata/erosion/talus, and a 3.2 m-capped six-pass reconstruction reduce triangle and regular-terrace artifacts; the first 100 m stays horizontally protected except for upper rock at least 6 m above local water, and morphology remains capped at 2.8 m outside that radius. Since the 30 m DEM still generates a false comb under self-shadow, only those non-colliding visual tiles have shadow casting disabled; an audited movable -48/-90 degree review sun keeps the result deterministic while raft, rock, downstream woody vegetation, and gameplay geometry retain shadows. Schema v12 rejects any restored high-density bank ribbon and requires these tags and properties. The accepted default capture passes artifact reduction, not photoreal promotion: the canyon remains rounded and bright and is dependent on acquisition of higher-resolution full-reach terrain and reviewed southern African ecology.
 
 Zambezi also has an isolated camera-visible bank-cover component. It adds 1,200

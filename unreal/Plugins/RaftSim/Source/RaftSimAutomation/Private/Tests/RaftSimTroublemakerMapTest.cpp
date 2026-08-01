@@ -122,12 +122,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
     }
 
     bool bZambeziReferenceRun = false;
+    bool bPacuareReferenceRun = false;
     ARaftSimRaftActor* PlayerRaft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
         PlayerRaft = *It;
         bZambeziReferenceRun = PlayerRaft->GetActorLabel() ==
             TEXT("RaftSim_Zambezi_PlayerRaft");
+        bPacuareReferenceRun = PlayerRaft->GetActorLabel() ==
+            TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
         Test->TestTrue(
             FString::Printf(
                 TEXT("raft rests within depth envelope (z=%.0f)"),
@@ -279,6 +282,77 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has four conditioned visual-terrain tiles"),
             ConditionedVisualTerrainCount,
             4);
+        return true;
+    }
+
+    if (bPacuareReferenceRun)
+    {
+        Test->TestTrue(
+            TEXT("Pacuare player raft is marked reference-runnable"),
+            PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
+        Test->TestTrue(
+            TEXT("Pacuare launch keeps the raft upright"),
+            PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
+        Test->TestEqual(
+            TEXT("Pacuare launch keeps every person in the raft"),
+            PlayerRaft->GetSwimmerCount(),
+            0);
+
+        int32 RuntimeWaterConfigCount = 0;
+        for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabel() !=
+                TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig"))
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("Pacuare loads the Upper Huacas cooked package"),
+                (*It)->CookedFieldsDir,
+                FString(TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+                             "scenario_upper_huacas/cooked_flow_fields")));
+            Test->TestEqual(
+                TEXT("Pacuare loads the rain-fed runnable planning band"),
+                (*It)->FlowBand,
+                FName(TEXT("rainfed_runnable_planning")));
+            Test->TestFalse(
+                TEXT("Pacuare preserves source station/lateral coordinates"),
+                (*It)->bRecenterHydraulicCrux);
+            Test->TestEqual(
+                TEXT("Pacuare binds the local-world vertical datum map"),
+                (*It)->CoordinateMapPath,
+                FString(TEXT("physics/data/real_world/pacuare_river_costa_rica/"
+                             "terrain/upper_huacas_visual/"
+                             "upper_huacas_runtime_coordinate_map.json")));
+            Test->TestTrue(
+                TEXT("Pacuare Landscape owns runtime terrain"),
+                (*It)->bMapProvidesTerrain);
+            ++RuntimeWaterConfigCount;
+        }
+        Test->TestEqual(
+            TEXT("Pacuare reference run has one runtime water config"),
+            RuntimeWaterConfigCount,
+            1);
+
+        int32 CaptureOnlyWaterCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("Pacuare authored capture ribbon is hidden during play"),
+                (*It)->IsHidden());
+            Test->TestTrue(
+                TEXT("Pacuare runtime solver owns gameplay water rendering"),
+                (*It)->Tags.Contains(TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            ++CaptureOnlyWaterCount;
+        }
+        Test->TestEqual(
+            TEXT("Pacuare has one capture-only static water ribbon"),
+            CaptureOnlyWaterCount,
+            1);
         return true;
     }
 

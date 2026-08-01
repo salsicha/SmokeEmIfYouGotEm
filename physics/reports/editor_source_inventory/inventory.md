@@ -1,7 +1,7 @@
 # RaftSim Editor Source Inventory
 
 Implementation files: **69**.
-Implementation lines: **74576**.
+Implementation lines: **74720**.
 Registered console commands: **37**.
 
 ## Source Files
@@ -11,12 +11,12 @@ Registered console commands: **37**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorEnvironmentCaptures.cpp` | 2283 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorFutaleufuDiagnostics.cpp` | 1589 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorPhotorealCaptureDirector.cpp` | 437 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp` | 1027 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp` | 479 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp` | 1041 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp` | 510 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorAtmosphereAndFoliage.cpp` | 1602 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentBridge.cpp` | 385 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp` | 1568 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h` | 2617 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp` | 1596 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h` | 2622 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp` | 1895 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderMaterial.cpp` | 369 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderPresentation.cpp` | 101 |
@@ -46,15 +46,15 @@ Registered console commands: **37**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveAuthoringInternal.h` | 208 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveEvaluation.cpp` | 4900 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Geometry/RaftSimEditorMeshPrimitives.cpp` | 569 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp` | 1194 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeBuild.cpp` | 1202 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp` | 2882 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp` | 904 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp` | 961 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBatokaMaterial.cpp` | 173 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp` | 298 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorConnectedWaterV6Material.cpp` | 329 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialInstances.cpp` | 612 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialTextures.cpp` | 2373 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp` | 3114 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp` | 3115 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp` | 703 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorOfflineMetaHumanMaterial.cpp` | 475 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorOfflineMetaHumanMaterial.h` | 21 |
@@ -126,7 +126,7 @@ Registered console commands: **37**.
 | --- | --- | --- |
 | `american_south_fork` | `L_SouthForkAmerican_PhysicalCorridorCandidate` | yes |
 | `colorado_river` | `L_ColoradoGrandCanyon_PhysicalCorridorCandidate` | yes |
-| `pacuare` | `L_Pacuare_SourceLandscapeCandidate` | yes |
+| `pacuare` | `L_UpperHuacas` | yes |
 | `zambezi_batoka_gorge` | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | yes |
 | `futaleufu_terminator` | `L_FutaleufuTerminator_PhysicalCorridorCandidate` | yes |
 | `chilko_river_lava_canyon` | `L_ChilkoRiver_PhysicalCorridorCandidate` | yes |

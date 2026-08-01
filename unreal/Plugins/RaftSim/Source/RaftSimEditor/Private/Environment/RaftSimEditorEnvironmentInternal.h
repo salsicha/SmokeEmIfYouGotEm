@@ -176,9 +176,11 @@ struct FRaftSimLandscapeImportCandidateSpec
     float HorizontalSpanXCm = 32300.0f;
     float HorizontalSpanYCm = 5500.0f;
     float TargetReliefCm = 1000.0f;
+    float WorldVerticalOffsetCm = 0.0f;
     bool bApplyPreviewAnalyticChannelBurn = true;
     bool bUseSolverVisualizationFields = true;
     bool bPhysicalScaleSourceCorridor = false;
+    bool bUseDensePhysicalTerrainRenderSurface = true;
     bool bEnableLandscapeNanite = true;
 };
 
@@ -838,6 +840,9 @@ FVector2D SampleLandscapeCandidateCenterlineWorld(
     const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points,
     float Progress,
     FVector2D* OutTangent = nullptr);
+
+float GetLandscapeCandidateWorldMinX(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate);
 
 bool SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
