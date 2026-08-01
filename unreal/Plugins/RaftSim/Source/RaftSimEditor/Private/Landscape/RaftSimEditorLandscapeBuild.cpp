@@ -278,6 +278,11 @@ bool BuildLandscapeImportCandidateMap(
                 &MorphologyStats,
                 OutSummary) ||
             MorphologyStats.VisualTileCount != 4 ||
+            MorphologyStats.ReconstructedVertexCount <= 0 ||
+            (MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount > 0 &&
+             MorphologyStats.MinimumReconstructedInsideRadiusHeightAboveWaterCm +
+                     0.5f <
+                 600.0f) ||
             MorphologyStats.ModifiedVertexCount <= 0 ||
             MorphologyStats.NearBankModifiedVertexCount <= 0 ||
             MorphologyStats.MinimumModifiedCenterlineDistanceCm + 0.5f <
@@ -289,10 +294,20 @@ bool BuildLandscapeImportCandidateMap(
             return false;
         }
         OutSummary += FString::Printf(
-            TEXT("Saved runnable Batoka visual terrain: %lld/%lld vertices received "
-                 "bounded morphology, including %lld dry near-bank vertices outside "
+            TEXT("Saved runnable Batoka visual terrain: %lld vertices received capped "
+                 "source-facet reconstruction (maximum %.2f m; %lld upper-cliff vertices "
+                 "inside the horizontal buffer, minimum %.2f m above local water), then "
+                 "%lld/%lld vertices "
+                 "received bounded morphology, including %lld dry near-bank vertices outside "
                  "the %.1f m protected shoreline radius (nearest conditioned vertex "
                  "%.2f m; full strength by %.1f m).\n"),
+            MorphologyStats.ReconstructedVertexCount,
+            MorphologyStats.MaximumAbsoluteReconstructionOffsetCm / 100.0f,
+            MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount,
+            MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount > 0
+                ? MorphologyStats.MinimumReconstructedInsideRadiusHeightAboveWaterCm /
+                      100.0f
+                : 0.0f,
             MorphologyStats.ModifiedVertexCount,
             MorphologyStats.TotalVertexCount,
             MorphologyStats.NearBankModifiedVertexCount,

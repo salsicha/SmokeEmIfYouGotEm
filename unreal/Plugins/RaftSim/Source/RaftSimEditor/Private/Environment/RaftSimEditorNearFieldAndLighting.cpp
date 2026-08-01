@@ -1816,10 +1816,21 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
 
+    // Batoka's coarse source DEM produces a conspicuous diagonal comb when lit
+    // across its facets at the shared grazing angle.  Keep the shared rig for
+    // every other river, but align this review-only sun more closely with the
+    // gorge so the renderer does not amplify source sampling into fake ribs.
+    const FRotator SunRotation = Spec.RiverId == TEXT("zambezi_batoka_gorge")
+        ? FRotator(-48.0f, -90.0f, 0.0f)
+        : FRotator(-58.0f, -30.0f, 0.0f);
     ADirectionalLight* Sun = Cast<ADirectionalLight>(
-        GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(FRotator(-58.0f, -30.0f, 0.0f))));
+        GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(SunRotation)));
     if (Sun)
     {
+        // AddActor may preserve the DirectionalLight class template's rotation;
+        // make the authored map contract absolute and inspectable.
+        Sun->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+        Sun->SetActorRotation(SunRotation);
         Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
         Sun->GetLightComponent()->SetIntensity(CaptureSettings.SunIntensity);
         Sun->GetLightComponent()->SetLightColor(CaptureSettings.SunColor);

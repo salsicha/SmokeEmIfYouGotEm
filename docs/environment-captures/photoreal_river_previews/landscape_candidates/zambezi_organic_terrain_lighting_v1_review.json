@@ -1,0 +1,103 @@
+{
+  "schema": "raftsim.zambezi.organic_terrain_lighting_review.v1",
+  "status": "visual_artifact_reduction_pass_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_geospatial_hydraulic_or_navigation_authority",
+  "method": {
+    "renderer": "Unreal Engine 5.8 offscreen Metal gameplay viewport",
+    "accepted_capture_resolution_px": [1470, 956],
+    "visible_content_crop_px": [0, 65, 1470, 894],
+    "capture_command": "RaftSim.CaptureRaft 3 <label> 8 4 22 waterinventory",
+    "runtime_override_on_accepted_capture": false,
+    "comparison_normalization": "letterbox removed and accepted frame resized to the historical 1280x720 fixed-camera frame"
+  },
+  "accepted_visual_terrain_contract": {
+    "source": "Copernicus GLO-30-derived 2017x2017 physical corridor heightfield",
+    "physics_and_collision_authority": "unchanged hidden source Landscape",
+    "render_tile_count": 4,
+    "render_tile_collision": false,
+    "central_difference_grid_normals": true,
+    "initial_authored_relief_cap_m": 2.2,
+    "morphology_version": "V15",
+    "morphology_vertical_cap_m": 2.8,
+    "source_facet_reconstruction_cap_m": 3.2,
+    "source_facet_reconstruction_pass_count": 6,
+    "horizontal_shoreline_protection_radius_m": 100.0,
+    "inside_radius_reconstruction_minimum_height_above_local_water_m": 6.0,
+    "inside_radius_reconstruction_full_strength_height_above_local_water_m": 18.0,
+    "full_strength_morphology_radius_m": 220.0,
+    "visual_tile_cast_shadow": false,
+    "visual_tile_shadow_policy": "coarse source self-shadow suppressed on non-colliding visual tiles only",
+    "zambezi_sun_pitch_degrees": -48.0,
+    "zambezi_sun_yaw_degrees": -90.0,
+    "zambezi_sun_mobility": "movable"
+  },
+  "generation_measurements": {
+    "total_visual_vertices": 1631500,
+    "reconstructed_vertex_count": 97842,
+    "observed_maximum_reconstruction_offset_m": 2.82,
+    "reconstructed_inside_horizontal_buffer_vertex_count": 7124,
+    "minimum_reconstructed_inside_buffer_height_above_local_water_m": 6.33,
+    "morphology_vertex_count": 89494,
+    "dry_near_bank_morphology_vertex_count": 18168,
+    "nearest_morphology_vertex_to_centerline_m": 103.73,
+    "map_check_errors": 0,
+    "map_check_warnings": 0
+  },
+  "normalized_frame_metrics": {
+    "baseline_terrain_region_px": [0, 60, 1280, 315],
+    "baseline_mean_terrain_luminance": 0.4824,
+    "accepted_mean_terrain_luminance": 0.6781,
+    "baseline_terrain_fraction_below_0_18_luminance": 0.0098,
+    "accepted_terrain_fraction_below_0_18_luminance": 0.0,
+    "mean_absolute_rgb_delta": [25.6777, 22.4683, 18.4259],
+    "interpretation": "The accepted frame removes the false dark comb and coarse self-shadow field; the brighter, flatter canyon remains a review compromise rather than final lighting."
+  },
+  "evidence": {
+    "baseline_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_sediment_water_gameplay_v1.png",
+      "sha256": "626e26a0dfaeb34013b3bff6211094f039221b6cb8b4559404df8fecd5bab26f"
+    },
+    "accepted_default_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_terrain_lighting_v1.png",
+      "sha256": "b619b0ecf3f87257e21ae8c0e4203a68156f1f10567d46d00f21d3372f83bbaf"
+    },
+    "saved_map_validation": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "cc18efe6b3cf3e40b83634570095ea056e3b7fc68ff39498ab8907bffe065fab",
+      "result": "pass"
+    },
+    "unit_tests": {
+      "tests": [
+        "RaftSim.M9.FZambeziOrganicTerrainNormals",
+        "RaftSim.M9.FZambeziSingleLayerWater"
+      ],
+      "result": "2_passed_0_failed",
+      "committed": false
+    },
+    "focused_runnable_map_test": {
+      "test": "RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "result": "1_passed_0_failed_with_8_active_breaking_sites_and_production_rapid_roller_aerosol",
+      "committed": false
+    }
+  },
+  "rejected_experiments": [
+    "A 12 m reconstruction bracket exaggerated large shadow teeth and was reverted.",
+    "Two high-density centerline bank-ribbon prototypes folded across tight bends and were removed from both source and the regenerated map.",
+    "Lighting alone moved or exposed the 30 m source-facet pattern; it did not reliably remove it.",
+    "Larger unsupported displacement was rejected because it would fabricate unsupported canyon geometry."
+  ],
+  "visual_findings": [
+    "The default runnable capture no longer shows the dominant diagonal or vertical terrain self-shadow comb.",
+    "Central-difference normals remove the previous triangle-diagonal normal bias, and near-Nyquist authored relief has been slowed and reduced.",
+    "The waterline, collision Landscape, centerline, water surface, hazards, raft forces, and solver state are unchanged.",
+    "The canyon remains rounded, bright, sparsely vegetated at gameplay distance, and far below photoreal production quality."
+  ],
+  "external_gates_remaining": [
+    "guide and geospatial approval of the full-reach centerline and vertical and horizontal datums",
+    "rights-cleared higher-resolution terrain, stereo reconstruction, lidar, photogrammetry, or field-capture coverage",
+    "surveyed or reviewed riverbanks, channel sections, bathymetry, rapid geometry, and seasonal hydraulics",
+    "approved southern African gorge species, density, season, and ecology",
+    "lifelike terrain, shoreline, vegetation, whitewater, atmosphere, raft, and crew art",
+    "guide, safety, art, rights, hazard-readability, desktop, and VR performance acceptance"
+  ]
+}

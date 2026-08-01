@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v10",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v11",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -36,6 +36,28 @@ def main() -> None:
         if not subsystem:
             raise RuntimeError("EditorActorSubsystem is unavailable")
         actors = list(subsystem.get_all_level_actors())
+        sun_actors = [
+            actor
+            for actor in actors
+            if actor.get_actor_label() == "RaftSim_Sun_LumenPreview"
+            and actor.get_class().get_name() == "DirectionalLight"
+        ]
+        sun_rows = []
+        for actor in sun_actors:
+            rotation = actor.get_actor_rotation()
+            sun_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "pitch_degrees": round(rotation.pitch, 3),
+                    "yaw_degrees": round(rotation.yaw, 3),
+                }
+            )
+        rejected_high_density_bank_actors = [
+            actor.get_actor_label()
+            for actor in actors
+            if "RaftSimZambeziHighDensityBank"
+            in {str(tag) for tag in actor.tags}
+        ]
         markers = [
             actor
             for actor in actors
@@ -91,6 +113,9 @@ def main() -> None:
                     "procedural_mesh_count": len(components),
                     "material": material.get_path_name() if material else None,
                     "collision_enabled": str(mesh.get_collision_enabled()) if mesh else None,
+                    "cast_shadow": bool(
+                        mesh.get_editor_property("cast_shadow")
+                    ) if mesh else None,
                 }
             )
         water_surface_actors = [
@@ -224,16 +249,33 @@ def main() -> None:
                     "authority": "procedural_render_only",
                     "physics_and_collision_authority": "source_copernicus_landscape",
                     "morphology_contract": (
-                        "v14_near_bank_basalt_with_100m_polyline_shoreline_"
-                        "protection_and_full_strength_by_220m"
+                        "v15_organic_basalt_with_100m_polyline_shoreline_"
+                        "protection_full_strength_by_220m_and_central_"
+                        "difference_grid_normals_plus_height_aware_source_"
+                        "facet_reconstruction"
                     ),
                     "active_water_half_width_m": 72.0,
                     "protected_shoreline_radius_m": 100.0,
                     "minimum_dry_bank_buffer_m": 26.56,
                     "full_strength_morphology_radius_m": 220.0,
-                    "maximum_vertical_offset_m": 4.5,
+                    "maximum_visual_treatment_vertical_offset_m": 2.8,
+                    "maximum_source_facet_reconstruction_offset_m": 3.2,
+                    "inside_protected_radius_reconstruction_minimum_height_"
+                    "above_local_water_m": 6.0,
                     "conditioned_tile_count": len(terrain_rows),
+                    "coarse_source_self_shadow_policy": (
+                        "disabled_on_noncolliding_visual_tiles_only"
+                    ),
                     "tiles": sorted(terrain_rows, key=lambda row: row["actor_label"]),
+                },
+                "lighting": {
+                    "authority": "presentation_only_no_physics_effect",
+                    "source_facet_amplification_control": (
+                        "zambezi_specific_gorge_aligned_sun"
+                    ),
+                    "required_pitch_degrees": -48.0,
+                    "required_yaw_degrees": -90.0,
+                    "directional_lights": sun_rows,
                 },
                 "water_surface": {
                     "authority": "render_only_source_aligned_physical_corridor",
@@ -317,6 +359,10 @@ def main() -> None:
             and safe_launch_apron_tagged
             and len(player_starts) == 1
             and str(game_mode_path).endswith("RaftSimVerticalSliceGameMode")
+            and len(sun_rows) == 1
+            and abs(float(sun_rows[0]["pitch_degrees"]) + 48.0) <= 0.01
+            and abs(float(sun_rows[0]["yaw_degrees"]) + 90.0) <= 0.01
+            and not rejected_high_density_bank_actors
             and len(terrain_rows) == 4
             and all(row["procedural_mesh_count"] == 1 for row in terrain_rows)
             and all(
@@ -327,10 +373,14 @@ def main() -> None:
                 "NO_COLLISION" in str(row["collision_enabled"])
                 for row in terrain_rows
             )
+            and all(not row["cast_shadow"] for row in terrain_rows)
             and all(
                 "RaftSimNonCollisionRenderSurface" in row["tags"]
                 and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
-                and "RaftSimBatokaNearBankMorphologyV14" in row["tags"]
+                and "RaftSimBatokaOrganicMorphologyV15" in row["tags"]
+                and "RaftSimBatokaHeightAwareFacetReconstructionV15"
+                in row["tags"]
+                and "RaftSimCoarseSourceSelfShadowSuppressed" in row["tags"]
                 and "RaftSimProtectedShorelineBuffer" in row["tags"]
                 for row in terrain_rows
             )
