@@ -335,17 +335,21 @@ def test_production_rescue_pfd_uses_contoured_back_source_art() -> None:
     build_source = PRODUCTION_PFD_BUILD_SCRIPT.read_text(encoding="utf-8")
     manifest = json.loads(PRODUCTION_PFD_MANIFEST.read_text(encoding="utf-8"))
 
-    assert "GENERATOR_VERSION = 6" in build_source
-    assert 'add_crowned_foam_panel(\n            "ProtectiveBackPanel"' in build_source
-    assert '(-10.0, -17.8)' in build_source
-    assert '(6.8, 23.0)' in build_source
-    assert "former 31.5 x 42 cm rounded rectangle" in build_source
+    assert "GENERATOR_VERSION = 7" in build_source
+    assert '"ProtectiveBackUpperCell"' in build_source
+    assert '"ProtectiveBackLumbarCell"' in build_source
+    assert "lateral_wrap_depth=3.2" in build_source
+    assert "former single\n    # 31.5 x 42 cm plate" in build_source
     assert "ShoulderFoamBand" not in build_source
-    assert manifest["generator_version"] == 6
+    assert manifest["generator_version"] == 7
+    assert manifest["construction"]["back_panels"] == 2
+    assert manifest["construction"]["rear_flex_channels"] == 1
     assert manifest["soft_geometry"]["flat_exterior_foam_faces"] == 0
     assert manifest["soft_geometry"]["outline_corner_rounding_passes"] == 4
     assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 1.45
-    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 1.65
+    assert manifest["soft_geometry"]["front_panel_lateral_wrap_depth_cm"] == 2.0
+    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 1.35
+    assert manifest["soft_geometry"]["back_panel_lateral_wrap_depth_cm"] == 3.2
     assert manifest["soft_geometry"]["side_wing_flat_exterior_faces"] == 0
     assert manifest["soft_geometry"]["front_pocket_flat_exterior_faces"] == 0
     assert manifest["construction"]["shoulder_foam_pads"] == 0

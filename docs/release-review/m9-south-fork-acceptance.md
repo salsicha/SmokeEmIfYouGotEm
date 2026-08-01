@@ -2251,6 +2251,35 @@ replace the retained PFD; this geometry review is not equipment certification. I
 source, asset, renderer, roster, and automation hashes are recorded in
 `docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_review.json`.
 
+## Torso-wrapped production PFD V2 — rear plate removed, external review open
+
+The V1 cell lofts rounded the visible faces, but the single rear cell still presented one
+broad plane to the guide camera. V2 changes the source mesh itself. All four chest cells
+now follow a 2.0 cm lateral torso arc, and the rear is two independently rounded upper and
+lumbar cells with a narrow flex break and 3.2 cm of lateral wrap. Rear foam thickness drops
+from 4.8 to 4.0 cm and its crown from 1.65 to 1.35 cm. The vest still terminates below the
+shoulders: two thin webbing connectors remain and flotation shoulder-pad count stays zero.
+
+![Torso-wrapped PFD guide front](../environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_guide_full.png)
+
+![Torso-wrapped PFD guide profile](../environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_guide_profile.png)
+
+![Torso-wrapped PFD guide rear](../environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_guide_rear.png)
+
+The reimported project-owned asset has 26,664 authored triangles, a 2,416-triangle Nanite
+fallback, five material sections, and unchanged plausible 42.295×44.897×42.29 cm bounds.
+All five production identities select it with 0.0 cm maximum torso-origin error. The five
+focused PFD/safety contracts and the focused renderer-enabled M5 production-crew gate pass.
+Collision, crew mass, animation authority, water, D3/D4, raft contact, rescue, scoring, and
+progression are unchanged.
+
+This is a retained technical candidate, not photoreal or safety approval. The simplified
+first-party fabric shader, hardware, webbing intersections, identity-specific deformation,
+seated pose, and review lighting still require replacement or named character-art review;
+a qualified whitewater safety reviewer must also approve the form independently. Exact
+source, asset, roster, renderer, and validation hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_review.json`.
+
 ## Organic bank mosaic V2 — broader low cover, external review open
 
 The five canonical views still exposed large bare, tessellated bank areas. Organic bank

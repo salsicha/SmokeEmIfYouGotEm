@@ -22,7 +22,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 6
+GENERATOR_VERSION = 7
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -187,6 +187,7 @@ def add_crowned_foam_panel(
     crown_depth: float,
     outward_sign: float = 1.0,
     depth_axis: str = "x",
+    lateral_wrap_depth: float = 0.0,
 ) -> bpy.types.Object:
     """Loft a fabric-covered foam cell with rounded corners and a soft crown.
 
@@ -221,14 +222,26 @@ def add_crowned_foam_panel(
         (half_depth, 0.91),
         (half_depth + crown_depth * 0.68, 0.58),
     ]
+    maximum_lateral_radius = max(
+        abs(point[0] - centroid_y) for point in outline
+    )
+
     def coordinate(
         signed_depth: float,
         outline_a: float,
         outline_b: float,
     ) -> tuple[float, float, float]:
         depth = x_center + outward_sign * signed_depth
+        # Back and chest cells must follow a torso arc rather than remain
+        # broad planar plates. The quadratic falloff preserves the authored
+        # centre crown while bringing each lateral edge toward the flank.
+        lateral_alpha = min(
+            abs(outline_a - centroid_y) / maximum_lateral_radius,
+            1.0,
+        )
+        wrapped_depth = depth + lateral_wrap_depth * lateral_alpha**2
         if depth_axis == "x":
-            return (depth, outline_a, outline_b)
+            return (wrapped_depth, outline_a, outline_b)
         if depth_axis == "y":
             return (outline_a, depth, outline_b)
         raise ValueError(f"Unsupported foam-panel depth axis: {depth_axis}")
@@ -426,6 +439,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                 materials["PfdShell"],
                 1.35,
                 1.45,
+                lateral_wrap_depth=-2.0,
             )
         )
         pieces.append(
@@ -445,38 +459,58 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                 materials["PfdShell"],
                 1.35,
                 1.45,
+                lateral_wrap_depth=-2.0,
             )
         )
 
-    # A thin, contoured back turns the front cells into one wearable shell.
-    # The former 31.5 x 42 cm rounded rectangle read as a rigid backpack from
-    # the guide camera. This authored perimeter narrows at the lumbar hem and
-    # between the shoulder blades while retaining lateral flotation volume.
-    pieces.append(
-        add_crowned_foam_panel(
-            "ProtectiveBackPanel",
-            -14.6,
-            4.8,
+    # Two thin, independently rounded rear cells replace the former single
+    # 31.5 x 42 cm plate. A visible horizontal flex channel lets the lumbar
+    # section move independently, while 3.2 cm of lateral arc wraps both cells
+    # toward the flanks instead of presenting a rectangular backpack profile.
+    rear_cells = [
+        (
+            "ProtectiveBackUpperCell",
             [
-                (-10.0, -17.8),
-                (10.0, -17.8),
-                (14.5, -13.0),
-                (16.0, -5.0),
-                (15.0, 11.5),
-                (11.5, 19.5),
-                (6.8, 23.0),
-                (-6.8, 23.0),
-                (-11.5, 19.5),
-                (-15.0, 11.5),
-                (-16.0, -5.0),
-                (-14.5, -13.0),
+                (-13.4, 0.3),
+                (13.4, 0.3),
+                (15.2, 5.0),
+                (14.3, 12.3),
+                (10.7, 19.1),
+                (6.3, 23.0),
+                (-6.3, 23.0),
+                (-10.7, 19.1),
+                (-14.3, 12.3),
+                (-15.2, 5.0),
             ],
-            materials["PfdShell"],
-            1.2,
-            1.65,
-            outward_sign=-1.0,
+        ),
+        (
+            "ProtectiveBackLumbarCell",
+            [
+                (-9.5, -17.8),
+                (9.5, -17.8),
+                (13.5, -13.2),
+                (14.8, -6.0),
+                (13.4, -0.3),
+                (-13.4, -0.3),
+                (-14.8, -6.0),
+                (-13.5, -13.2),
+            ],
+        ),
+    ]
+    for name, outline in rear_cells:
+        pieces.append(
+            add_crowned_foam_panel(
+                name,
+                -14.2,
+                4.0,
+                outline,
+                materials["PfdShell"],
+                1.05,
+                1.35,
+                outward_sign=-1.0,
+                lateral_wrap_depth=3.2,
+            )
         )
-    )
     for side in (-1.0, 1.0):
         pieces.append(
             add_crowned_foam_panel(
@@ -795,7 +829,8 @@ def main() -> None:
         "material_slots": MATERIAL_NAMES,
         "construction": {
             "front_foam_panels": 4,
-            "back_panels": 1,
+            "back_panels": 2,
+            "rear_flex_channels": 1,
             "side_wings": 2,
             "shoulder_foam_pads": 0,
             "shoulder_webbing_runs": 2,
@@ -816,8 +851,10 @@ def main() -> None:
             "flat_exterior_foam_faces": 0,
             "front_panel_edge_roll_cm": 1.35,
             "front_panel_crown_depth_cm": 1.45,
-            "back_panel_edge_roll_cm": 1.2,
-            "back_panel_crown_depth_cm": 1.65,
+            "front_panel_lateral_wrap_depth_cm": 2.0,
+            "back_panel_edge_roll_cm": 1.05,
+            "back_panel_crown_depth_cm": 1.35,
+            "back_panel_lateral_wrap_depth_cm": 3.2,
             "side_wing_flat_exterior_faces": 0,
             "side_wing_crown_depth_cm": 0.75,
             "front_pocket_flat_exterior_faces": 0,

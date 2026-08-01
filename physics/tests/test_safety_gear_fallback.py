@@ -167,14 +167,18 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "flat_exterior_foam_faces": 0,
         "front_panel_edge_roll_cm": 1.35,
         "front_panel_crown_depth_cm": 1.45,
-        "back_panel_edge_roll_cm": 1.2,
-        "back_panel_crown_depth_cm": 1.65,
+        "front_panel_lateral_wrap_depth_cm": 2.0,
+        "back_panel_edge_roll_cm": 1.05,
+        "back_panel_crown_depth_cm": 1.35,
+        "back_panel_lateral_wrap_depth_cm": 3.2,
         "side_wing_flat_exterior_faces": 0,
         "side_wing_crown_depth_cm": 0.75,
         "front_pocket_flat_exterior_faces": 0,
         "front_pocket_crown_depth_cm": 0.62,
         "smooth_shaded": True,
     }
+    assert manifest["construction"]["back_panels"] == 2
+    assert manifest["construction"]["rear_flex_channels"] == 1
     assert manifest["material_slots"] == [
         "PfdShell",
         "PfdWebbing",
