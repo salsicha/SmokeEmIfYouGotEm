@@ -1,0 +1,101 @@
+{
+  "acceptance": {
+    "global_river_station_alignment": "pass",
+    "live_breaking_water_activation": "pass",
+    "map_runnable_reference_free_run": "pass",
+    "photoreal_visual_promotion": "fail",
+    "production_hydraulic_promotion": "fail",
+    "rapid_9_mandatory_portage_policy": "pass"
+  },
+  "authority": "feature_tagged_procedural_reference_only_not_validated_real_world_hydraulics",
+  "evidence": {
+    "generator": {
+      "path": "physics/src/raftsim/zambezi_reference_map.py",
+      "sha256": "6793d8d9201305487adb120d63bfc4061c1fa7815e86280889eeaa3962616c8d"
+    },
+    "runtime_automation_report": {
+      "errors": 0,
+      "path": "unreal/Saved/Automation/ZambeziHydraulicActivation/index.json",
+      "sha256": "6e1cac8f54c43d0b656ee6cae6e84ef86c7a2d017c28a9f9b330ff9cd6a67c1d",
+      "state": "Success",
+      "warnings": 2,
+      "warnings_disposition": "HTTP connectivity probe timeout and NullRHI audio sample-rate warning; neither is a map or water-system failure"
+    },
+    "regression_reports": {
+      "m4_live_water": {
+        "path": "unreal/Saved/Automation/ZambeziRegressionM4/index.json",
+        "result": "4_passed_0_failed",
+        "sha256": "2e1ca7cd816c714dd8232e68f90d86a81999c8570dc81f74e4a4f99be188ffb6"
+      },
+      "m5_production_niagara_offscreen_metal": {
+        "path": "unreal/Saved/Automation/ZambeziRegressionM5NiagaraMetal/index.json",
+        "result": "1_passed_0_failed",
+        "sha256": "2613532686e9cb528e27699ed4e733a4c1b6b54f9ecbf45cccb3adf22acd7738"
+      },
+      "p2_water_surface": {
+        "path": "unreal/Saved/Automation/ZambeziRegressionP2WaterSurface/index.json",
+        "result": "1_passed_0_failed",
+        "sha256": "97a42a0c41888b2cef53458ba410326611317cb5e78bf769c4334d5362db59d4"
+      },
+      "six_river_map_loads": {
+        "path": "unreal/Saved/Automation/ZambeziSixRiverMapLoads/index.json",
+        "result": "6_passed_0_failed_1_benign_audio_warning",
+        "sha256": "a896a8929184cafc646f04fceac819a7a2d9340fdb4cbac14adf02fa5e40b2c5"
+      }
+    },
+    "runtime_field_manifest": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/cooked_flow_fields/manifest.json",
+      "sha256": "8de30bebd8121ad7dac7d2e9bd79156300d94405c8c197f2eed1c55bc75c16f0"
+    },
+    "saved_map_validation": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v9",
+      "sha256": "2596c42517274b3b992c9ed12dd53572c284270f6328403959e17fa58a9cef31",
+      "status": "pass"
+    },
+    "visual_diagnostic": {
+      "committed": false,
+      "local_path": "unreal/Saved/Screenshots/Zambezi_Live_Hydraulics_Close.png",
+      "sha256": "8ef9150816e38c15774ba311897d935dbc92797ce7f6bab70361a457ade1f166",
+      "verdict": "fail_photoreal_promotion"
+    }
+  },
+  "external_gates_remaining": [
+    "local-guide approval of rapid stations, lines, portages, access, and rescue routes",
+    "geospatial approval of the centerline, horizontal datum, and vertical datum",
+    "rights approval for the user-supplied PDF and heightmap and every production derivative",
+    "higher-resolution full-reach terrain and reviewed channel or bathymetric geometry",
+    "seasonal-flow calibration against authoritative hydrology",
+    "measured or guide-reviewed rapid-scale hydraulic validation",
+    "southern African gorge species and ecology approval",
+    "lifelike terrain, shoreline, vegetation, water, atmosphere, raft, and crew art",
+    "desktop and VR visual, hazard-readability, and performance acceptance"
+  ],
+  "rapid_9_policy": "hazard_visualization_only_mandatory_commercial_portage_not_a_runnable_line",
+  "runtime_contract": {
+    "active_breaking_sites_in_launch_window": 9,
+    "active_rapid_aerosol_required": true,
+    "active_roller_required": true,
+    "all_rapid_transitions_detected": true,
+    "downstream_froude_maximum": 0.94,
+    "field_shape": [
+      25,
+      5999
+    ],
+    "global_station_recentering": false,
+    "maximum_speed_m_per_s": 7.7,
+    "niagara_component_pool_size": 19,
+    "presentation_sample_spacing_m": 3.0,
+    "rapid_transition_count": 25,
+    "runtime_station_resolution_m": 5.0,
+    "upstream_froude_minimum": 1.12
+  },
+  "schema": "raftsim.zambezi.feature_tagged_hydraulics_review.v1",
+  "visual_findings": [
+    "The close runtime diagnostic proves that the raft, procedural water, canyon, and character actors render together.",
+    "The water is still flat, bright, and low-detail in the diagnostic rather than a credible big-water surface.",
+    "The 30 m terrain remains smooth and tessellated-looking at river level, with sparse repetitive ground cover.",
+    "The chase view exposes unresolved raft and crew composition problems and is not presentation-ready.",
+    "Technical runtime success must not be relabeled as photoreal or production-hydraulic acceptance."
+  ]
+}

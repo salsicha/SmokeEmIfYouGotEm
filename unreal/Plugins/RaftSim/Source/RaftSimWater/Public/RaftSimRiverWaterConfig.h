@@ -36,6 +36,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
     float WindowExtentM = 600.0f;
 
+    /** Legacy named-rapid windows place their strongest hydraulic at local
+     * origin. Full-corridor maps with a station/lateral coordinate map must
+     * disable this so cooked cells retain their global river stations. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
+    bool bRecenterHydraulicCrux = true;
+
     /** Optional dense station/lateral-to-curved-world coordinate map. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
     FString CoordinateMapPath;

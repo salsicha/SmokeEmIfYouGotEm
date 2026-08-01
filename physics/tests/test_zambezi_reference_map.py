@@ -15,7 +15,11 @@ from raftsim.zambezi_reference_map import (
     RAPID_MAP_SHA256,
     REFERENCE_HEIGHTFIELD_SIZE,
     REFERENCE_MESH_SIZE,
+    RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX,
+    RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN,
     RUNTIME_COORDINATE_MAX_CORRIDOR_EDGE_STEP_M,
+    RUNTIME_GRID_DX_M,
+    RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
     SCENARIO_RELATIVE,
     build_runtime_coordinate_map,
     build_rapid_map_digitization,
@@ -140,6 +144,8 @@ def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
     assert manifest["production_promoted"] is False
     assert manifest["bands"][0]["band_id"] == "normal_big_water"
     assert manifest["bands"][0]["convergence"]["converged"] is False
+    assert manifest["generator"].endswith("feature_tagged_hydraulic_seed.v2")
+    assert manifest["grid"]["dx_m"] == RUNTIME_GRID_DX_M == 5.0
     assert manifest["procedural_infill"]["authority"].startswith(
         "gameplay_reference_only"
     )
@@ -156,6 +162,62 @@ def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
     assert np.isfinite(loaded["h"]).all()
     assert float(loaded["h"].max()) > 3.0
     assert float(loaded["u"].max()) > 3.0
+    assert float(loaded["h"].max()) < 5.0
+    assert float(np.hypot(loaded["u"], loaded["v"]).max()) < 8.0
+
+    contract = manifest["procedural_infill"]["hydraulic_transition_contract"]
+    assert contract["schema"] == (
+        "raftsim.zambezi.procedural_hydraulic_transitions.v1"
+    )
+    assert contract["runtime_station_resolution_m"] == 5.0
+    assert contract["presentation_sample_spacing_m"] == (
+        RUNTIME_PRESENTATION_SAMPLE_SPACING_M
+    )
+    assert contract["upstream_froude_minimum"] == (
+        RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN
+    )
+    assert contract["tailwater_froude_maximum"] == (
+        RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX
+    )
+    assert contract["rapid_transition_count"] == 25
+    assert contract["all_rapid_transitions_detected"] is True
+    assert [row["rapid_number"] for row in contract["transitions"]] == [
+        str(number) for number in range(1, 26)
+    ]
+    assert all(not row["production_authoritative"] for row in contract["transitions"])
+    assert all(
+        row["upstream_froude"] >= RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN
+        and row["tailwater_froude"] <= RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX
+        for row in contract["transitions"]
+    )
+    rapid_9 = contract["transitions"][8]
+    assert rapid_9["mandatory_commercial_portage"] is True
+    assert contract["rapid_9_policy"].startswith("hazard_visualization_only")
+
+    center_row = loaded["h"].shape[0] // 2
+    station_m = np.arange(loaded["h"].shape[1]) * RUNTIME_GRID_DX_M
+    center_h = loaded["h"][center_row]
+    center_u = loaded["u"][center_row]
+    center_v = loaded["v"][center_row]
+    for row in contract["transitions"]:
+        control_station_m = float(row["control_station_m"])
+        sampled_station_m = np.arange(
+            max(0.0, control_station_m - 15.0),
+            control_station_m + 25.0 + 0.5 * RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
+            RUNTIME_PRESENTATION_SAMPLE_SPACING_M,
+        )
+        sampled_h = np.interp(sampled_station_m, station_m, center_h)
+        sampled_speed = np.hypot(
+            np.interp(sampled_station_m, station_m, center_u),
+            np.interp(sampled_station_m, station_m, center_v),
+        )
+        sampled_froude = sampled_speed / np.sqrt(
+            9.80665 * np.maximum(sampled_h, 1.0e-6)
+        )
+        assert np.any(
+            (sampled_froude[:-1] >= RUNTIME_BREAKING_UPSTREAM_FROUDE_MIN)
+            & (sampled_froude[1:] <= RUNTIME_BREAKING_DOWNSTREAM_FROUDE_MAX)
+        )
 
 
 def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contracts():
@@ -231,6 +293,8 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "AddLandscapeCandidateRunnableGameplay" in build_cpp
     assert "RaftSim_ZambeziRapid_" in geometry_cpp
     assert "RaftSim_Zambezi_PlayerRaft" in geometry_cpp
+    assert "bRecenterHydraulicCrux = false" in geometry_cpp
+    assert "RaftSimGlobalRiverStationAuthority" in geometry_cpp
     assert "ApplyZambeziBatokaVisualTerrainTreatment" in build_cpp
     assert "LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true)" in build_cpp
     assert "RaftSimProceduralVisualMorphology" in director_cpp
@@ -301,7 +365,14 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v8")
+    assert validation["schema"].endswith(".v9")
+    assert validation["runtime_hydraulics"][
+        "preserves_global_river_stations"
+    ] is True
+    assert validation["runtime_hydraulics"]["rapid_count"] == 25
+    assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
+        "hazard_visualization_only"
+    )
     assert validation["visual_terrain"]["morphology_contract"] == (
         "v14_near_bank_basalt_with_100m_polyline_shoreline_"
         "protection_and_full_strength_by_220m"

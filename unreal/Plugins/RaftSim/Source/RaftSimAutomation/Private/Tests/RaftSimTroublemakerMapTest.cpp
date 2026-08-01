@@ -11,6 +11,8 @@
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimWaterVfxActor.h"
 #include "ProceduralMeshComponent.h"
 #include "Tests/AutomationCommon.h"
 
@@ -123,6 +125,12 @@ bool FRaftSimAssertRiverMapCommand::Update()
         {
             if ((*It)->GetActorLabel() == TEXT("RaftSim_Zambezi_RuntimeWaterConfig"))
             {
+                Test->TestFalse(
+                    TEXT("Zambezi preserves globally stationed cooked hydraulics"),
+                    (*It)->bRecenterHydraulicCrux);
+                Test->TestTrue(
+                    TEXT("Zambezi water config records global river-station authority"),
+                    (*It)->Tags.Contains(TEXT("RaftSimGlobalRiverStationAuthority")));
                 ++RuntimeWaterConfigCount;
             }
         }
@@ -130,6 +138,32 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has one procedural runtime water config"),
             RuntimeWaterConfigCount,
             1);
+        int32 BreakingSiteCount = 0;
+        if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
+        {
+            TArray<ARaftSimWaterSurfaceActor::FBreakingSite> BreakingSites;
+            It->GetBreakingSites(BreakingSites);
+            BreakingSiteCount = BreakingSites.Num();
+        }
+        Test->TestTrue(
+            TEXT("Zambezi start apron activates solver-owned breaking water"),
+            BreakingSiteCount > 0);
+        if (TActorIterator<ARaftSimWaterVfxActor> It(World); It)
+        {
+            Test->TestTrue(
+                TEXT("Zambezi uses the complete production Niagara water pool"),
+                It->IsProductionNiagaraReady());
+            Test->TestTrue(
+                TEXT("Zambezi emits a camera-local rapid roller"),
+                It->GetActiveRapidRollerNiagaraCount() > 0);
+            Test->TestTrue(
+                TEXT("Zambezi emits camera-local rapid aerosol"),
+                It->GetActiveRapidAerosolNiagaraCount() > 0);
+        }
+        else
+        {
+            Test->AddError(TEXT("Zambezi did not spawn the live water VFX actor"));
+        }
         int32 ConditionedVisualTerrainCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {

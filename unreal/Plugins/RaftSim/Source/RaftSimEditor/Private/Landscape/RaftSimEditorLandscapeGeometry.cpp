@@ -710,6 +710,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->FlowBand = TEXT("normal_big_water");
     WaterConfig->WindowCenterM = FVector2D(15000.0f, 0.0f);
     WaterConfig->WindowExtentM = 32000.0f;
+    WaterConfig->bRecenterHydraulicCrux = false;
     WaterConfig->CoordinateMapPath =
         TEXT("physics/data/real_world/zambezi_batoka_gorge/"
              "scenario_zambezi_run/runtime/river_coordinate_map.json");
@@ -717,6 +718,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->bMapProvidesTerrain = true;
     WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
 
     ARaftSimRaftActor* Raft = World->SpawnActor<ARaftSimRaftActor>(
         ARaftSimRaftActor::StaticClass(),

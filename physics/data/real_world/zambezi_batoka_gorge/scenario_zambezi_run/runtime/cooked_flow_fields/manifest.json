@@ -6,10 +6,10 @@
           "description": "Procedural channel bed aligned to the conditioned visual surface.",
           "dtype": "float32",
           "file": "bed.npy",
-          "sha256": "724b20660fb9f43b8934f133439699614070ea6d7f1d17a393ec3ab7db0445ef",
+          "sha256": "21999d9a667da9ca656cd9c324c4620c899d0c3925b36e9c5914ae8807e4dea8",
           "shape": [
             25,
-            1500
+            5999
           ],
           "units": "m"
         },
@@ -17,10 +17,10 @@
           "description": "Procedural reference-run water depth above bed.",
           "dtype": "float32",
           "file": "h.npy",
-          "sha256": "82894d35960f79b061a6614498a279c735e7c8f0414f171c6a41480a0a9f1519",
+          "sha256": "51eaefca9d1932c1dca71e0c735399c1ed81888ce271d4b24693841f336dfedc",
           "shape": [
             25,
-            1500
+            5999
           ],
           "units": "m"
         },
@@ -28,10 +28,10 @@
           "description": "Downstream reference-run seed velocity.",
           "dtype": "float32",
           "file": "u.npy",
-          "sha256": "4b750a42cbb4237419d152d5e4887b5c14f38b386cb59cad1e26fab7c78194d0",
+          "sha256": "28687a047f174f8048381b3c78ad222ae9313397f0fd88d9295789b02a02a78f",
           "shape": [
             25,
-            1500
+            5999
           ],
           "units": "m_per_s"
         },
@@ -39,10 +39,10 @@
           "description": "Bounded cross-stream rapid cue velocity.",
           "dtype": "float32",
           "file": "v.npy",
-          "sha256": "7218d89607fc642d14be0cd8e4a9b085f44c9007151afb257090214fcc209965",
+          "sha256": "87609d2d3a9375ae2615d128f1578266d41de9324714dbfd8ab1f094f6b0d183",
           "shape": [
             25,
-            1500
+            5999
           ],
           "units": "m_per_s"
         },
@@ -50,10 +50,10 @@
           "description": "One where the procedural reference channel is wet.",
           "dtype": "uint8",
           "file": "wet_mask.npy",
-          "sha256": "c2065587412d1001106c33f74502a54d7eaeded1f28a9f638d028b57cb8052d2",
+          "sha256": "78d95b33254be57e40d4dc463683defc2d20da6c4d165cad674d2b41d0f9d250",
           "shape": [
             25,
-            1500
+            5999
           ],
           "units": "boolean"
         }
@@ -66,27 +66,484 @@
       "roughness_manning_n": 0.041
     }
   ],
-  "generator": "raftsim.zambezi_reference_map.procedural_full_corridor_seed.v1",
+  "generator": "raftsim.zambezi_reference_map.feature_tagged_hydraulic_seed.v2",
   "grid": {
     "crs": "curved river coordinates; x is station downstream and y is river-left",
     "downstream_axis": "+x",
-    "dx_m": 20.0,
+    "dx_m": 5.0,
     "dy_m": 10.0,
     "index_to_world": "station_m = origin_x_m + col * dx_m; lateral_m = origin_y_m + row * dy_m",
     "layout": "row_major_c_order",
-    "nx": 1500,
+    "nx": 5999,
     "ny": 25,
     "origin_x_m": 0.0,
     "origin_y_m": -120.0
   },
   "notes": [
     "This lightweight full-corridor seed makes the generated Zambezi map runnable with the live finite-volume runtime.",
+    "Every mapped rapid now contains a bounded five-metre procedural control and a live-renderer-detectable supercritical-to-subcritical transition; exact geometry, lines, and hydraulic fidelity remain open.",
     "It does not claim surveyed bathymetry, exact rapid lines, guide approval, seasonal calibration, or production hydraulic fidelity.",
     "The Copernicus DEM remains terrain/collision authority and the generated river-coordinate map remains review-gated."
   ],
   "procedural_infill": {
     "authority": "gameplay_reference_only_not_navigation_or_real_world_hydraulic_authority",
-    "rapid_cues": "bounded Gaussian station cues from the user-supplied 25-rapid map",
+    "hydraulic_transition_contract": {
+      "all_rapid_transitions_detected": true,
+      "presentation_sample_spacing_m": 3.0,
+      "rapid_9_policy": "hazard_visualization_only_mandatory_commercial_portage_not_a_runnable_line",
+      "rapid_transition_count": 25,
+      "runtime_station_resolution_m": 5.0,
+      "schema": "raftsim.zambezi.procedural_hydraulic_transitions.v1",
+      "tailwater_froude_maximum": 0.94,
+      "transitions": [
+        {
+          "control_station_m": 70.0,
+          "difficulty_label": "IV-V",
+          "display_name": "Against the Wall",
+          "feature_tags": [
+            "wall_cushion",
+            "eddy_ferry",
+            "boils",
+            "flow_sensitive"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "1",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 0.0,
+          "tailwater_froude": 0.8207,
+          "transition_station_m": 73.0,
+          "upstream_froude": 1.8466
+        },
+        {
+          "control_station_m": 695.0,
+          "difficulty_label": "III",
+          "display_name": "The Bridge",
+          "feature_tags": [
+            "surf_wave",
+            "hole"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "2",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 692.571,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 698.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 1360.0,
+          "difficulty_label": "IV",
+          "display_name": "Between Two Worlds",
+          "feature_tags": [
+            "wave",
+            "hole"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "3",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 1360.16,
+          "tailwater_froude": 0.8195,
+          "transition_station_m": 1363.0,
+          "upstream_froude": 1.8085
+        },
+        {
+          "control_station_m": 1705.0,
+          "difficulty_label": "IV-V",
+          "display_name": "Morning Glory",
+          "feature_tags": [
+            "dragons_back",
+            "tight_line",
+            "wave_train",
+            "low_flow_sensitive"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "4",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 1703.779,
+          "tailwater_froude": 0.8207,
+          "transition_station_m": 1708.0,
+          "upstream_froude": 1.8466
+        },
+        {
+          "control_station_m": 2880.0,
+          "difficulty_label": "V",
+          "display_name": "Stairway to Heaven",
+          "feature_tags": [
+            "drop",
+            "hole",
+            "wave_train"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "5",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 2881.692,
+          "tailwater_froude": 0.8197,
+          "transition_station_m": 2883.0,
+          "upstream_froude": 1.8139
+        },
+        {
+          "control_station_m": 4750.0,
+          "difficulty_label": "IV",
+          "display_name": "Devil's Toilet Bowl",
+          "feature_tags": [
+            "large_wave_train",
+            "hole"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "6",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 4750.519,
+          "tailwater_froude": 0.8195,
+          "transition_station_m": 4753.0,
+          "upstream_froude": 1.8085
+        },
+        {
+          "control_station_m": 6490.0,
+          "difficulty_label": "V",
+          "display_name": "Gulliver's Travels",
+          "feature_tags": [
+            "large_diagonal",
+            "large_waves",
+            "multiple_moves"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "7",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 6490.387,
+          "tailwater_froude": 0.8197,
+          "transition_station_m": 6493.0,
+          "upstream_froude": 1.8139
+        },
+        {
+          "control_station_m": 7560.0,
+          "difficulty_label": "III-V",
+          "display_name": "Midnight Diner",
+          "feature_tags": [
+            "large_hole",
+            "multiple_lines",
+            "star_trek_line",
+            "muncher_line",
+            "chicken_line"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "8",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 7561.786,
+          "tailwater_froude": 0.8201,
+          "transition_station_m": 7563.0,
+          "upstream_froude": 1.8248
+        },
+        {
+          "control_station_m": 8410.0,
+          "difficulty_label": "V-VI",
+          "display_name": "Commercial Suicide",
+          "feature_tags": [
+            "river_wide_pourover",
+            "narrow_slot",
+            "mandatory_commercial_portage",
+            "high_consequence"
+          ],
+          "mandatory_commercial_portage": true,
+          "production_authoritative": false,
+          "rapid_number": "9",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 8411.157,
+          "tailwater_froude": 0.8207,
+          "transition_station_m": 8413.0,
+          "upstream_froude": 1.8466
+        },
+        {
+          "control_station_m": 9240.0,
+          "difficulty_label": "IV",
+          "display_name": "Gnashing Jaws of Death",
+          "feature_tags": [
+            "large_waves",
+            "holes"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "10",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 9240.596,
+          "tailwater_froude": 0.8195,
+          "transition_station_m": 9243.0,
+          "upstream_froude": 1.8085
+        },
+        {
+          "control_station_m": 10290.0,
+          "difficulty_label": "V",
+          "display_name": "Overland Truck Eater",
+          "feature_tags": [
+            "boils",
+            "large_waves",
+            "high_water_put_in"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "11",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 10288.346,
+          "tailwater_froude": 0.8197,
+          "transition_station_m": 10293.0,
+          "upstream_froude": 1.8139
+        },
+        {
+          "control_station_m": 11930.0,
+          "difficulty_label": "III-IV",
+          "display_name": "Three Ugly Sisters",
+          "feature_tags": [
+            "large_wave_train",
+            "surf_wave"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "12",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 11931.709,
+          "tailwater_froude": 0.8195,
+          "transition_station_m": 11933.0,
+          "upstream_froude": 1.8085
+        },
+        {
+          "control_station_m": 12415.0,
+          "difficulty_label": "IV-V",
+          "display_name": "The Mother",
+          "feature_tags": [
+            "large_wave_train",
+            "holes"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "13",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 12413.768,
+          "tailwater_froude": 0.8204,
+          "transition_station_m": 12418.0,
+          "upstream_froude": 1.8357
+        },
+        {
+          "control_station_m": 14345.0,
+          "difficulty_label": "III",
+          "display_name": "Surprise Surprise",
+          "feature_tags": [
+            "waves",
+            "boils"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "14",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 14343.385,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 14348.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 16145.0,
+          "difficulty_label": "IV-V",
+          "display_name": "The Washing Machine",
+          "feature_tags": [
+            "recirculating_pourover",
+            "central_hole",
+            "multiple_avoidance_lines",
+            "flow_sensitive"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "15",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 16146.394,
+          "tailwater_froude": 0.8207,
+          "transition_station_m": 16148.0,
+          "upstream_froude": 1.8466
+        },
+        {
+          "control_station_m": 16920.0,
+          "difficulty_label": "IV",
+          "display_name": "The Terminators",
+          "feature_tags": [
+            "large_wave_train",
+            "flip_wave",
+            "high_flow_sensitive"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "16",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 16920.925,
+          "tailwater_froude": 0.8197,
+          "transition_station_m": 16923.0,
+          "upstream_froude": 1.8139
+        },
+        {
+          "control_station_m": 17575.0,
+          "difficulty_label": "V",
+          "display_name": "Double Trouble",
+          "feature_tags": [
+            "two_large_holes",
+            "flow_sensitive",
+            "multiple_avoidance_lines"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "17",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 17573.434,
+          "tailwater_froude": 0.8197,
+          "transition_station_m": 17578.0,
+          "upstream_froude": 1.8139
+        },
+        {
+          "control_station_m": 18775.0,
+          "difficulty_label": "V",
+          "display_name": "Oblivion",
+          "feature_tags": [
+            "crashing_hole",
+            "third_wave",
+            "flip_hazard",
+            "surf",
+            "flow_sensitive"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "18",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 18775.979,
+          "tailwater_froude": 0.8201,
+          "transition_station_m": 18778.0,
+          "upstream_froude": 1.8248
+        },
+        {
+          "control_station_m": 21275.0,
+          "difficulty_label": "II-III",
+          "display_name": "The Last Straw",
+          "feature_tags": [
+            "wave_train",
+            "boils"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "19",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 21273.964,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 21278.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 21880.0,
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 20",
+          "feature_tags": [
+            "waves",
+            "eddy_lines"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "20",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 21879.457,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 21883.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 22450.0,
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 21",
+          "feature_tags": [
+            "waves",
+            "boils"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "21",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 22447.952,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 22453.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 24010.0,
+          "difficulty_label": "II-III",
+          "display_name": "Morning Shave",
+          "feature_tags": [
+            "wave_train",
+            "eddy_lines"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "22",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 24008.521,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 24013.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 24810.0,
+          "difficulty_label": "II-III",
+          "display_name": "Morning Shower",
+          "feature_tags": [
+            "wave_train",
+            "high_water_takeout_context"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "23",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 24810.694,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 24813.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 25635.0,
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 24",
+          "feature_tags": [
+            "waves",
+            "boils"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "24",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 25635.434,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 25638.0,
+          "upstream_froude": 1.7813
+        },
+        {
+          "control_station_m": 27360.0,
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 25",
+          "feature_tags": [
+            "wave_train",
+            "takeout_context"
+          ],
+          "mandatory_commercial_portage": false,
+          "production_authoritative": false,
+          "rapid_number": "25",
+          "runtime_sample_spacing_m": 3.0,
+          "source_station_m": 27358.848,
+          "tailwater_froude": 0.8184,
+          "transition_station_m": 27363.0,
+          "upstream_froude": 1.7813
+        }
+      ],
+      "upstream_froude_minimum": 1.12
+    },
+    "rapid_cues": "bounded feature-tagged hydraulic controls from the user-supplied 25-rapid map",
     "reason": "surveyed bathymetry and rapid-scale hydraulic geometry are unavailable",
     "surface_alignment": "conditioned visual centerline profile in the Copernicus source-scale map",
     "wet_half_width_m": 72.0
@@ -110,6 +567,6 @@
   },
   "source_elevation_datum_m": 0.0,
   "source_package": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run",
-  "status": "reference_runnable_procedural_seed_not_validated_rapid_hydraulics",
+  "status": "reference_runnable_feature_tagged_procedural_hydraulics_not_validated_real_world_hydraulics",
   "window_id": "zambezi_full_reference_corridor"
 }

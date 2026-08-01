@@ -198,7 +198,8 @@ void ARaftSimRaftActor::BeginPlay()
                     RiverConfig->CookedFieldsDir, RiverConfig->FlowBand.ToString(),
                     RiverConfig->WindowCenterM,
                     FVector2D(RiverConfig->WindowExtentM, RiverConfig->WindowExtentM),
-                    /*RoughnessManning=*/0.041f);
+                    /*RoughnessManning=*/0.041f,
+                    RiverConfig->bRecenterHydraulicCrux);
             }
         }
         if (!bRiverConfigured)

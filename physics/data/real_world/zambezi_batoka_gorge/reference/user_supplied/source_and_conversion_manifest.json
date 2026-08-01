@@ -37,7 +37,7 @@
     "runtime_cooked_fields": {
       "authority": "procedural_gameplay_seed_not_real_world_hydraulic_authority",
       "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/cooked_flow_fields/manifest.json",
-      "sha256": "9f72d3deb8e356ce1399fb9a972a7397a30f170edb3c27dc52e3203f2a989d35"
+      "sha256": "8de30bebd8121ad7dac7d2e9bd79156300d94405c8c197f2eed1c55bc75c16f0"
     },
     "runtime_coordinate_map": {
       "authority": "review_gated_runtime_mapping_not_survey_authority",
@@ -46,7 +46,7 @@
     },
     "scenario": {
       "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
-      "sha256": "e7e00475fdfb410b118a5d1907ae69314abf60789b259f96a1ccb75c658a8a33"
+      "sha256": "daf91f1eb95ab95cc6f2424bd56a406cb88dc33232125eeb0c9404df35384c8a"
     }
   },
   "height_conversion": {
