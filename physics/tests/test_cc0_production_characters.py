@@ -227,14 +227,56 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "ShiftLaterally(Pose.RightShoulderCm, 30.0f)" in host
     assert "ShiftLaterally(Pose.LeftHipCm, 28.0f)" in host
     assert "ShiftLaterally(Pose.RightHipCm, 28.0f)" in host
+    assert "Part == Pelvis || Part == Torso ||" in host
+    assert "Part == LeftThigh || Part == RightThigh" in host
+    assert "Part == LeftShoulderSleeve || Part == RightShoulderSleeve" in host
+    assert "kProductionShoulderSleeveRadiusCm = 5.2f" in host
+    assert "kProductionShoulderSleeveArmFraction = 1.0f" in host
+    assert 'TEXT("LeftShoulderSleeve"), Jacket ? Jacket : Wetsuit' in host
+    assert 'TEXT("RightShoulderSleeve"), Jacket ? Jacket : Wetsuit' in host
+    assert "Pose.LeftShoulderCm, LeftElbow, kProductionShoulderSleeveArmFraction" in host
+    assert "Pose.RightShoulderCm, RightElbow, kProductionShoulderSleeveArmFraction" in host
+    assert "Pose.LeftShoulderCm,\n        LeftShoulderSleeveEnd" in host
+    assert "Pose.RightShoulderCm,\n        RightShoulderSleeveEnd" in host
+    assert "HasVisibleShoulderSilhouette() const" in host
+    assert "GetMaximumShoulderSleeveAnchorErrorCm() const" in host
+    assert "ExtentCm.X >= 4.7f" in host
+    assert "ExtentCm.Y >= 4.7f" in host
+    assert "ExtentCm.Z >= 5.6f" in host
+    assert "ExtentCm.Z > ExtentCm.X" in host
+    assert "HasVisibleWaistHipSilhouette() const" in host
+    assert "GetWaistHipCenterErrorCm() const" in host
+    assert "IsWaistHipMaterialOpaque() const" in host
+    assert "Material->GetBlendMode() == BLEND_Opaque" in host
+    assert "GetMaximumHipThighBridgeCoverageErrorCm() const" in host
+    assert "kProductionHipThighBridgeStartFraction = -0.15f" in host
+    assert "kProductionHipThighBridgeEndFraction = 1.06f" in host
+    assert "kProductionHipThighBridgeRadiusCm = 8.0f" in host
+    assert "BuildUnitHipThighBridgeMesh(" in host
+    assert "LeftBridgeSection->ProcVertexBuffer.Num() >= 350" in host
+    assert "RightBridgeSection->ProcVertexBuffer.Num() >= 350" in host
+    assert "DistanceToBridgeCentreline" in host
+    assert "HasContinuousThighKneeSilhouette() const" in host
+    assert "GetMaximumThighKneeBridgeCoverageErrorCm() const" in host
+    assert "ThighExtentCm.X >= 7.2f" in host
+    assert "ThighExtentCm.Y >= 7.2f" in host
+    assert "ThighExtentCm.Z >= 15.5f" in host
+    assert "BuildUnitSeatedPelvisMesh(" in host
+    assert "full waist-to-glute-to-thigh bridge" in host
+    assert "kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f)" in host
+    assert "FMath::Exp(-FMath::Square((Z + 0.35f) / 0.5f))" in host
+    assert "SaddleLift = LowerFit" in host
+    assert "ExtentCm.X >= 14.0f" in host
+    assert "ExtentCm.Y >= 21.0f" in host
+    assert "ExtentCm.Z >= 13.8f" in host
     assert "ShiftLaterally(Pose.LeftKneeCm, 22.0f)" in host
     assert "ShiftLaterally(Pose.RightKneeCm, 22.0f)" in host
     assert "ShiftLaterally(Pose.LeftFootCm, 14.0f)" in host
     assert "ShiftLaterally(Pose.RightFootCm, 14.0f)" in host
     assert "const FVector ProductionSkullCenterOffsetCm = bUsingProductionVisual" in host
-    assert "const float HelmetFit = bUsingProductionVisual ? 0.96f : 1.0f;" in host
+    assert "constexpr float kProductionHelmetReferenceFit = 0.96f;" in host
     assert "const float CollarFit = bUsingProductionVisual ? 1.28f : 1.0f;" in host
-    assert "kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 12.0f)" in host
+    assert "kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 9.5f)" in host
     assert "kProductionHelmetShellOffsetCm(2.5f, 0.0f, 0.0f)" in host
     assert "kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f)" in host
     assert "FVector(0.0f, 0.0f, -4.0f)" in host
@@ -246,6 +288,13 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     ).read_text(encoding="utf-8")
     assert 'TEXT("Manny fallback is absent with packaged CC0 bodies")' in automation
     assert 'TEXT("five rigged crew bodies spawned")' in automation
+    assert "It->GetProceduralBodyPartCount() >= 28" in automation
+    assert "It->HasVisibleShoulderSilhouette()" in automation
+    assert "ShoulderAnchorErrorCm <= 0.25f" in automation
+    assert "It->IsWaistHipMaterialOpaque()" in automation
+    assert "HipThighCoverageErrorCm <= 0.25f" in automation
+    assert "It->HasContinuousThighKneeSilhouette()" in automation
+    assert "ThighKneeCoverageErrorCm <= 0.25f" in automation
     assert "T_RaftSim_Hair_BraidedRows_N" in automation
     assert "has a named hair slot" in automation
     assert "Mesh->GetMaterials().Num()" in automation
@@ -303,8 +352,28 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "GetProductionVisualActor() const" in host
     assert "AlignProductionHeadgearToSolvedHead()" in host
     assert "MetaHumanVisual->GetSolvedHeadWorldLocation()" in host
+    assert 'f"{stem}_full_profile"' in capture
+    assert 'f"{stem}_full_rear"' in capture
     assert "GetProductionHelmetHeadErrorCm() const" in host
+    assert "GetProductionHelmetForwardAlignment() const" in host
+    assert "GetProductionHelmetFitScale() const" in host
+    assert "actor.has_visible_shoulder_silhouette()" in capture
+    assert "actor.is_waist_hip_material_opaque()" in capture
+    assert "actor.get_minimum_hip_thigh_bridge_extent_cm()" in capture
+    assert "actor.get_maximum_hip_thigh_bridge_coverage_error_cm()" in capture
+    assert "actor.has_continuous_thigh_knee_silhouette()" in capture
+    assert "actor.get_maximum_thigh_knee_bridge_coverage_error_cm()" in capture
+    assert "actor.get_minimum_shoulder_sleeve_extent_cm()" in capture
+    assert "actor.get_maximum_shoulder_sleeve_anchor_error_cm()" in capture
+    assert "GetSolvedFaceForwardWorldVector() const" in adapter
+    assert "GetSolvedFaceUpWorldVector() const" in adapter
+    assert "GetRecommendedWhitewaterHelmetScale() const" in adapter
+    assert "FRotationMatrix::MakeFromXZ" in host
+    assert "HelmetForwardAlignment >= 0.98f" in automation
+    assert "HelmetFitScale >= 0.90f && HelmetFitScale <= 1.02f" in automation
     assert "HelmetHeadErrorCm <= 1.0f" in automation
+    assert "It->HasVisibleWaistHipSilhouette()" in automation
+    assert "WaistHipCenterErrorCm <= 0.1f" in automation
     assert "ARaftSimCC0CrewVisualActor::StaticClass()" in host
     assert "MetaHumanVisual && !MetaHumanVisual->IsBodyReady()" in host
     assert '"/Game/RaftSim/Characters/Production/MetaHumans"' in adapter
@@ -361,12 +430,21 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "Face->RefreshBoneTransforms()" in adapter
     assert "HasCompleteAssembledPresentation()" in automation
     assert "HasArticulatedPaddleGripRig()" in automation
-    assert "ApplyPaddleGripPose(Pose.bShowPaddle)" in adapter
+    assert "ApplyPaddleGripPose(Pose)" in adapter
     assert "ResolvePaddleGripWristCm" in adapter
     assert "middle_metacarpal_%s" in adapter
     assert "GetMaximumPaddleGripAnchorErrorCm()" in automation
+    assert "GetMaximumPaddleGripContactErrorCm()" in automation
+    assert "ApplyFingerChainAroundGrip" in adapter
+    assert "MeasurePaddleFingerContactErrorCm" in adapter
+    assert "WrapAnglesDegrees[] = {50.0f, 68.0f, 52.0f}" in adapter
+    assert "JointRadiiCm[] = {3.2f, 2.65f, 2.35f}" in adapter
+    assert "get_maximum_paddle_grip_contact_error_cm()" in capture
+    assert "runtime_paddle_grip_contact_error_cm" in capture
     assert "%s_metacarpal_%s" in adapter
     assert "ThumbCurlDegrees" in adapter
+    assert "{58.0f, 72.0f, 50.0f}" in adapter
+    assert "{34.0f, 50.0f, 38.0f}" in adapter
     assert 'TEXT("assembled roster is all-or-nothing")' in automation
     assert "EvidenceSettings.AutoExposureBias = -1.25f" in automation
     assert '"Name": "MetaHumanCharacter"' in project
@@ -407,6 +485,12 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "visual_actor.get_hair_mesh_fallback_head_error_cm() > 1.0" in capture
     assert "actor.get_production_helmet_head_error_cm() > 1.0" in capture
     assert '"runtime_helmet_head_error_cm"' in capture
+    assert '"runtime_helmet_forward_alignment"' in capture
+    assert '"runtime_helmet_fit_scale"' in capture
+    assert 'f"{stem}_profile"' in capture
+    assert 'f"{stem}_rear"' in capture
+    assert '"profile_capture_sha256"' in capture
+    assert '"rear_capture_sha256"' in capture
     assert "actor.has_layered_commercial_safety_gear()" in capture
     assert "origin.x + 430.0" in capture
     assert 'asset.get_editor_property("hair_groups_meshes")' in capture

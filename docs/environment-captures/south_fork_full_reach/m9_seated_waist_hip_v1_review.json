@@ -1,0 +1,137 @@
+{
+  "artifact": "M9 seated waist and hip silhouette V1 review",
+  "recorded_local_date": "2026-07-31",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The production presentation previously hid its pose-matched pelvis overlay while retaining a tapered torso overlay, so the PFD terminated above two visually disconnected thighs and the crew appeared to have no waist or hips. V1 restores that collisionless layer and replaces its scaled-sphere source with a broad, shallow seated pelvis shell that has finite waist and thigh-root widths. The shell follows the solved hip centre and identity body proportions without changing animation, collision, mass, raft contact, or any gameplay force.",
+  "root_cause": {
+    "production_visibility_defect": "SetProceduralVisualVisible(false) retained the torso but excluded Pelvis from the production overlay set.",
+    "rejected_first_repair": "Restoring the original 14 x 18 x 14 cm organic ellipsoid recovered hip width in front view but produced a hanging spherical silhouette in profile and rear views.",
+    "retained_repair": "A dedicated 14-ring by 24-side tapered pelvis shell keeps nonzero upper-waist and lower-thigh-root cross-sections, then uses a shallow identity-scaled 9.5 x 18.0 x 8.5 cm reference extent."
+  },
+  "runtime_boundary": {
+    "component": "Pelvis UProceduralMeshComponent",
+    "material": "/Game/RaftSim/Materials/M_RaftSim_Wetsuit",
+    "collision": "disabled",
+    "cast_shadow": true,
+    "pose_source": "deterministic solved hip centre and torso rotation",
+    "production_visual_only": true,
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "raft_collision_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_roster_capture.json",
+    "source_report_sha256": "d3db5ca5be7cf47d8d4044a3b281468b4226cd7fe5eb58fb33781477aee8ac8a",
+    "captured_character_count": 5,
+    "characters_with_visible_waist_hip_silhouette": 5,
+    "maximum_hip_center_error_cm": 0.0,
+    "minimum_extent_cm": [
+      9.024999886751175,
+      16.56000030040741,
+      7.989999979734421
+    ],
+    "maximum_extent_cm": [
+      9.9749995470047,
+      19.260000944137573,
+      8.75499975681305
+    ],
+    "characters": [
+      {
+        "name": "MHC_RaftSim_Guide",
+        "extent_cm": [9.5, 18.0, 8.5],
+        "hip_center_error_cm": 0.0
+      },
+      {
+        "name": "MHC_RaftSim_Crew_01",
+        "extent_cm": [9.5, 18.0, 8.5],
+        "hip_center_error_cm": 0.0
+      },
+      {
+        "name": "MHC_RaftSim_Crew_02",
+        "extent_cm": [9.024999886751175, 16.56000030040741, 8.330000162124634],
+        "hip_center_error_cm": 0.0
+      },
+      {
+        "name": "MHC_RaftSim_Crew_03",
+        "extent_cm": [9.9749995470047, 19.260000944137573, 8.75499975681305],
+        "hip_center_error_cm": 0.0
+      },
+      {
+        "name": "MHC_RaftSim_Crew_04",
+        "extent_cm": [9.31000018119812, 18.359999656677246, 7.989999979734421],
+        "hip_center_error_cm": 0.0
+      }
+    ]
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_guide_full.png",
+      "capture_sha256": "8bd05cd73e5580e91277ff741c4afb1646b3bcf8ee88b99dce9eb9503971b6c5"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_guide_profile.png",
+      "capture_sha256": "d944c484bb0161830930b39a67072a12631d705a46a380803629d42a058d1272"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_guide_rear.png",
+      "capture_sha256": "4b47e46750238e3dc45fc0ef05e1c364ca47e44a04b55421afb240eac154b17d"
+    },
+    "broadest_identity_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_broadest_full.png",
+      "capture_sha256": "1c14bf010974ca6d340fd687931f92dca2f2592419819f686b77295e1d3b7721"
+    },
+    "broadest_identity_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_broadest_profile.png",
+      "capture_sha256": "ae7a93df11c71590cd6010e7fbed722b6b0c2611d11dff15a4f35adb519c73a7"
+    },
+    "broadest_identity_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_broadest_rear.png",
+      "capture_sha256": "deb799db61e3d55761974654936b55de41ed5f9575029bdca1dbf2b05024f65d"
+    },
+    "technical_verdict": "pass: reference and broadest identities show continuous wetsuit volume below the PFD, a defined waist, broad seated hips, and overlap into both upper thighs in front, profile, and rear views",
+    "photoreal_verdict": "fail pending replacement or named approval of the visibly simplified procedural torso/pelvis integration, wetsuit surface response, body anatomy, and seated deformation"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "e05dff0b236efeb17524f62af0956ada55277b3cf9827cb73599d6fee84cf829",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "d00eb3169a09ddb7bb2fd25dc2498757203b4e10193221107a0364bb2160d1a1",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "2bccc572fc18f1696ac4d3a08304805206b7aeb4f35a50196b8d4a653d85edb3",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "f8637574f9877696e2c1fb3435b3d45dcff785604ee7b010870de6a23d519f59",
+    "physics/tests/test_cc0_production_characters.py": "2c7fe2b2cd8a5815c0761a313e8b9385bf30080bf6f17368e043d9eec3e6697b"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 production-character, safety-gear, and flexible-raft visual contracts passed",
+    "renderer_turntable": "5/5 identities captured with full-body front, profile, and rear views and zero hip-centre error",
+    "m4": "4/4 passed (M9V526WaistHipM4)",
+    "m4_report": "unreal/Saved/Automation/M9V526WaistHipM4/index.json",
+    "m4_report_sha256": "fd6e2f1447e9ee484fc48cb1c84363ce42f3a1d558cb935c6ef5083997ae78e9",
+    "m5": "5/5 result entries passed renderer-enabled, including native waist/hip visibility and hip-centre assertions (M9V527WaistHipM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V527WaistHipM5Renderer/index.json",
+    "m5_report_sha256": "ab443f9cc6f235a1cd858c960f3e9606f0bc20be5f654c5a56372405cab3ca44",
+    "m7": "4/4 result entries passed renderer-enabled (M9V528WaistHipM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V528WaistHipM7Renderer/index.json",
+    "m7_report_sha256": "54da8de6a092841be156706c31f96cbb42c0621f0749250c60a77f0d0cc87e28",
+    "m8": "4/4 passed renderer-enabled (M9V529WaistHipM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V529WaistHipM8Renderer/index.json",
+    "m8_report_sha256": "c7f61e0b2f71f5ae25e9de00fd4a111737639d9a6a5884c885337ec45b846a12",
+    "full_python": "1148 passed, 3 expected installed-dependency skips, 0 failed in 430.43 seconds (M9V530SeatedWaistHip)",
+    "full_python_report": "physics/reports/m9/m9_v530_seated_waist_hip_full_matrix.xml",
+    "full_python_report_sha256": "86c7c0e32d2fcf5ce68575947c8a9f11f85076cf546be6d20ca9fe6e83810057"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "art_approval": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the simplified procedural torso/pelvis integration, wetsuit surfacing, body anatomy, identity proportions, and seated deformation in motion.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

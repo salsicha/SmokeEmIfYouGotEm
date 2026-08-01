@@ -1,0 +1,95 @@
+{
+  "artifact": "M9 raft interior water transmission V1 review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_water_vfx_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The shared Single Layer Water surface previously rendered its opaque-looking scattering response across the raft interior. A raft-aligned rounded-rectangle transmission aperture now suppresses surface opacity and water optical coefficients only inside the inflatable tubes while preserving behind-water transmission. A dedicated warm rescue-orange coated-fabric floor with bounded shadow fill prevents the real floor from reading as a dark water slab. Direct port and starboard renderer views retain the exterior river, reflections, foam, tube occlusion, crew, and paddle silhouettes while making the textured I-beam floor legible through the interior water volume.",
+  "implementation": {
+    "shared_water_parent_modified": false,
+    "south_fork_derived_water_parent": "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater",
+    "raft_interior_surface_opacity_scale": 0.0,
+    "raft_interior_behind_water_scale": 1.0,
+    "raft_interior_scattering_scale": 0.0,
+    "raft_interior_absorption_scale": 0.0,
+    "raft_interior_half_width_cm": 82.0,
+    "raft_interior_half_length_cm": 215.0,
+    "aperture_tracks_live_raft_transform": true,
+    "readable_floor_material": "/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable",
+    "floor_shadow_fill": 0.28,
+    "floor_textile_tiling": 7.5,
+    "floor_textile_normal_strength": 0.42,
+    "fallback_i_beam_relief_scale": 0.095,
+    "foam_occlusion_changed": false,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "physics_forces_changed": false,
+    "raft_mass_or_buoyancy_changed": false
+  },
+  "renderer_evidence": {
+    "contact_starboard": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_contact_starboard.png",
+      "capture_sha256": "ceb6682af4eb8d31270c81ce7cd6e919910f9efd4d5db4fcffead6e9bbbc24d0",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_contact_starboard.log",
+      "log_sha256": "16382190c8c794a57d1bbe11ca14d5d51c18788e53dad409d7750bec5490ebad"
+    },
+    "contact_port": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_contact_port.png",
+      "capture_sha256": "ebc5de6c60dd436409153fcbd602659c734cefa1c30ac0b5a510afd855d7abbd",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_contact_port.log",
+      "log_sha256": "933329c9785b388032b68d8455b866f15880722530e23a584ac909bb531636db"
+    },
+    "technical_verdict": "pass: port and starboard views show a clearly identifiable textured red/maroon floor instead of an opaque blue-gray water slab; the exterior authored water and foam remain visible and correctly occluded by the raft and crew"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h": "629ed847150c42a3f24955722b933b9f11287c5e2a038b6483a55a9225e0e85f",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "11cfbde65e89209f2503255fe23b263b3f456b70d3c8551f63981ddbc890f928",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "4255d0a87e57e85a20b63a956b5a8857338dd34212b5fe1c7da06f9edac3ae00",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "2bbd1b44363a5121817336091b9790e6e7badb3b99107b0071851cbe61a7792c",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "94abec82cbde60c2aa152c9ebe3599d1c037579aaded1c757524b64e53db076b",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp": "004130b24f807743d262dd2c9a10fcb801144c5ad34fa1b436d0cf959b1f1236",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftMesh.cpp": "226a24acfcf614a4fecef1064104e2ba98a6176f5d860364c986d8f8371accd6"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "58/58 editor-source-layout and flexible-raft visual checks passed",
+    "water_surface": "1/1 passed with zero warnings and zero errors (M9V490WaterFloorP2)",
+    "water_surface_report": "unreal/Saved/Automation/M9V490WaterFloorP2/index.json",
+    "water_surface_report_sha256": "adf7ccd953f7f41bf7dd374f6b7223d227e537d057502ddb71cab22fed77ab0b",
+    "m4": "4/4 passed (M9V492WaterFloorM4)",
+    "m4_report": "unreal/Saved/Automation/M9V492WaterFloorM4/index.json",
+    "m4_report_sha256": "8b8e0f56b98665121153b3491cb89ae44986fffcb93617f290d8ab8734b6fd0b",
+    "m5": "5/5 leaf tests passed renderer-enabled (M9V493WaterFloorM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V493WaterFloorM5Renderer/index.json",
+    "m5_report_sha256": "4f491bd352cd5f0a0a9d357fd772141acbdce46ddaa93f9ff79188add548065b",
+    "m7": "4/4 leaf tests passed renderer-enabled (M9V494WaterFloorM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V494WaterFloorM7Renderer/index.json",
+    "m7_report_sha256": "7eca1dc216aa227c1ac9ef23b7bf58b810dd25ae77c73a8c07cd80a02d77c263",
+    "m8": "4/4 passed renderer-enabled (M9V491WaterFloorM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V491WaterFloorM8Renderer/index.json",
+    "m8_report_sha256": "8ad85e592782b444dc9c2e9d09436fbdb01155da8846473b4280ab4529cd9eea",
+    "m9": "6/6 passed after evidence reconciliation (M9V497WaterFloorReconciledM9)",
+    "m9_report": "unreal/Saved/Automation/M9V497WaterFloorReconciledM9/index.json",
+    "m9_report_sha256": "f05689b482bbf9c45a46a679163494be5d9c1561b7503a70a14277cca14c5a1b",
+    "related_python": "1148 passed, 3 expected installed-dependency inverse-path skips, 0 failed in 425.518 seconds",
+    "python_report": "physics/reports/m9/m9_v496_raft_interior_water_full_matrix.xml",
+    "python_report_sha256": "1b0b8747d9992fa3cb6a075d33387f1dc2e66c3bc769454e3947e34ee562c1b0"
+  },
+  "reviewers": {
+    "named_water_vfx_art_reviewer": null,
+    "qualified_south_fork_guide": null,
+    "product_owner": null,
+    "art_approval": false,
+    "guide_approval": false,
+    "product_approval": false
+  },
+  "open_gates": [
+    "A named water-VFX or art reviewer must approve transmission, interior-water readability, and exterior-water continuity in motion.",
+    "A qualified South Fork guide must approve the resulting raft/water presentation at Meat Grinder.",
+    "The product owner must accept the exact-current presentation candidate.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

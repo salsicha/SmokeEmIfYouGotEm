@@ -51,7 +51,8 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
         "front_foam_panels": 4,
         "back_panels": 1,
         "side_wings": 2,
-        "shoulder_bridges": 2,
+        "shoulder_foam_pads": 0,
+        "shoulder_webbing_runs": 2,
         "front_pockets": 2,
         "front_zip": 1,
         "backup_buckles": 2,
@@ -143,7 +144,7 @@ def configure_and_audit(
         bounds.max.z - bounds.min.z,
     ]
     fallback_triangles = mesh.get_num_triangles(0)
-    if not (38.0 <= dimensions[0] <= 50.0 and 40.0 <= dimensions[1] <= 52.0 and 44.0 <= dimensions[2] <= 60.0):
+    if not (38.0 <= dimensions[0] <= 50.0 and 40.0 <= dimensions[1] <= 52.0 and 42.0 <= dimensions[2] <= 60.0):
         raise RuntimeError(f"PFD import has implausible centimetre bounds: {dimensions}")
     if not (15_000 <= source_triangles <= 80_000):
         raise RuntimeError(f"PFD production triangle budget changed: {source_triangles}")

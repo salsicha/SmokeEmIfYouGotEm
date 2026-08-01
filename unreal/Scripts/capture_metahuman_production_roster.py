@@ -1,4 +1,4 @@
-"""Render deterministic full-body and portrait evidence for the production roster.
+"""Render deterministic full-body and helmet turntable evidence for the roster.
 
 Run after ``build_metahuman_production_characters.py``. Captures and a
 hash-addressed report are written to ``Saved/RaftSimValidation/m9``. The script
@@ -306,10 +306,15 @@ def main() -> None:
                 or not actor.has_layered_commercial_safety_gear()
                 or not actor.has_production_whitewater_helmet()
                 or not actor.has_production_whitewater_pfd()
+                or not actor.has_production_river_boots()
+                or not actor.has_fitted_upright_production_river_boots()
                 or not actor.has_commercial_paddle_silhouette()
                 or not actor.has_finite_visual_transforms()
                 or not visual_actor.is_using_assembled_character()
                 or not visual_actor.has_complete_assembled_presentation()
+                or not visual_actor.has_articulated_paddle_grip_rig()
+                or visual_actor.get_maximum_paddle_grip_anchor_error_cm() > 0.25
+                or visual_actor.get_maximum_paddle_grip_contact_error_cm() > 0.25
                 or not visual_actor.is_assembled_body_using_wetsuit()
                 or not visual_actor.is_assembled_face_using_cropped_skin()
                 or not visual_actor.is_assembled_wardrobe_suppressed_for_safety_gear()
@@ -319,11 +324,26 @@ def main() -> None:
                 or not visual_actor.are_assembled_grooms_suppressed_for_gameplay()
                 or visual_actor.get_hair_mesh_fallback_head_error_cm() > 1.0
                 or actor.get_production_helmet_head_error_cm() > 1.0
+                or actor.get_production_helmet_forward_alignment() < 0.98
+                or not 0.899 <= actor.get_production_helmet_fit_scale() <= 1.021
                 or actor.get_production_pfd_torso_error_cm() > 1.0
+                or not actor.has_visible_waist_hip_silhouette()
+                or actor.get_waist_hip_center_error_cm() > 0.1
+                or not actor.is_waist_hip_material_opaque()
+                or actor.get_maximum_hip_thigh_bridge_coverage_error_cm() > 0.25
+                or not actor.has_continuous_thigh_knee_silhouette()
+                or actor.get_maximum_thigh_knee_bridge_coverage_error_cm() > 0.25
+                or not actor.has_visible_shoulder_silhouette()
+                or actor.get_maximum_shoulder_sleeve_anchor_error_cm() > 0.25
             ):
                 raise RuntimeError(
                     f"Gameplay adapter rejected assembled production character: "
-                    f"{character_name}"
+                    f"{character_name}; shoulder_silhouette="
+                    f"{actor.has_visible_shoulder_silhouette()}, "
+                    f"shoulder_sleeve_extent_cm="
+                    f"{vector_values(actor.get_minimum_shoulder_sleeve_extent_cm())}, "
+                    f"shoulder_sleeve_anchor_error_cm="
+                    f"{actor.get_maximum_shoulder_sleeve_anchor_error_cm():.3f}"
                 )
             skeletal_components = []
             wardrobe_mesh_count = 0
@@ -432,6 +452,40 @@ def main() -> None:
                 world, capture_component, render_target, f"{stem}_full"
             )
 
+            full_profile_location = unreal.Vector(
+                origin.x,
+                origin.y + 430.0,
+                106.0,
+            )
+            capture.set_actor_location(full_profile_location, False, False)
+            capture.set_actor_rotation(
+                look_at(
+                    full_profile_location,
+                    unreal.Vector(origin.x, origin.y, 96.0),
+                ),
+                False,
+            )
+            full_profile_path = export_capture(
+                world, capture_component, render_target, f"{stem}_full_profile"
+            )
+
+            full_rear_location = unreal.Vector(
+                origin.x - 430.0,
+                origin.y,
+                106.0,
+            )
+            capture.set_actor_location(full_rear_location, False, False)
+            capture.set_actor_rotation(
+                look_at(
+                    full_rear_location,
+                    unreal.Vector(origin.x, origin.y, 96.0),
+                ),
+                False,
+            )
+            full_rear_path = export_capture(
+                world, capture_component, render_target, f"{stem}_full_rear"
+            )
+
             portrait_target = visual_actor.get_solved_head_world_location()
             portrait_location = unreal.Vector(
                 origin.x + 185.0,
@@ -446,6 +500,36 @@ def main() -> None:
             portrait_path = export_capture(
                 world, capture_component, render_target, f"{stem}_portrait"
             )
+
+            # The production shell is authored with its visor/brow facing +X.
+            # Capture both orthogonal sides of that axis so helmet direction and
+            # skull seating can be reviewed from pixels, rather than inferred
+            # only from the runtime forward-vector assertion above.
+            profile_location = unreal.Vector(
+                origin.x,
+                origin.y + 185.0,
+                portrait_target.z,
+            )
+            capture.set_actor_location(profile_location, False, False)
+            capture.set_actor_rotation(
+                look_at(profile_location, portrait_target), False
+            )
+            profile_path = export_capture(
+                world, capture_component, render_target, f"{stem}_profile"
+            )
+
+            rear_location = unreal.Vector(
+                origin.x - 185.0,
+                origin.y,
+                portrait_target.z,
+            )
+            capture.set_actor_location(rear_location, False, False)
+            capture.set_actor_rotation(
+                look_at(rear_location, portrait_target), False
+            )
+            rear_path = export_capture(
+                world, capture_component, render_target, f"{stem}_rear"
+            )
             report["characters"].append(
                 {
                     "name": character_name,
@@ -459,7 +543,22 @@ def main() -> None:
                     "runtime_production_whitewater_pfd": (
                         actor.has_production_whitewater_pfd()
                     ),
+                    "runtime_production_river_boots": (
+                        actor.has_production_river_boots()
+                    ),
+                    "runtime_fitted_upright_river_boots": (
+                        actor.has_fitted_upright_production_river_boots()
+                    ),
                     "runtime_paddle": actor.has_commercial_paddle_silhouette(),
+                    "runtime_articulated_paddle_grip": (
+                        visual_actor.has_articulated_paddle_grip_rig()
+                    ),
+                    "runtime_paddle_grip_anchor_error_cm": (
+                        visual_actor.get_maximum_paddle_grip_anchor_error_cm()
+                    ),
+                    "runtime_paddle_grip_contact_error_cm": (
+                        visual_actor.get_maximum_paddle_grip_contact_error_cm()
+                    ),
                     "runtime_hair_uses_cards": runtime_hair_uses_cards,
                     "runtime_hair_forced_lod": runtime_hair_forced_lod,
                     "runtime_hair_mesh_fallback": (
@@ -489,8 +588,47 @@ def main() -> None:
                     "runtime_helmet_head_error_cm": (
                         actor.get_production_helmet_head_error_cm()
                     ),
+                    "runtime_helmet_forward_alignment": (
+                        actor.get_production_helmet_forward_alignment()
+                    ),
+                    "runtime_helmet_fit_scale": (
+                        actor.get_production_helmet_fit_scale()
+                    ),
                     "runtime_pfd_torso_error_cm": (
                         actor.get_production_pfd_torso_error_cm()
+                    ),
+                    "runtime_waist_hip_silhouette": (
+                        actor.has_visible_waist_hip_silhouette()
+                    ),
+                    "runtime_waist_hip_extent_cm": vector_values(
+                        actor.get_waist_hip_extent_cm()
+                    ),
+                    "runtime_waist_hip_center_error_cm": (
+                        actor.get_waist_hip_center_error_cm()
+                    ),
+                    "runtime_waist_hip_material_opaque": (
+                        actor.is_waist_hip_material_opaque()
+                    ),
+                    "runtime_hip_thigh_bridge_minimum_extent_cm": vector_values(
+                        actor.get_minimum_hip_thigh_bridge_extent_cm()
+                    ),
+                    "runtime_hip_thigh_bridge_coverage_error_cm": (
+                        actor.get_maximum_hip_thigh_bridge_coverage_error_cm()
+                    ),
+                    "runtime_thigh_knee_silhouette": (
+                        actor.has_continuous_thigh_knee_silhouette()
+                    ),
+                    "runtime_thigh_knee_bridge_coverage_error_cm": (
+                        actor.get_maximum_thigh_knee_bridge_coverage_error_cm()
+                    ),
+                    "runtime_shoulder_silhouette": (
+                        actor.has_visible_shoulder_silhouette()
+                    ),
+                    "runtime_shoulder_sleeve_minimum_extent_cm": vector_values(
+                        actor.get_minimum_shoulder_sleeve_extent_cm()
+                    ),
+                    "runtime_shoulder_sleeve_anchor_error_cm": (
+                        actor.get_maximum_shoulder_sleeve_anchor_error_cm()
                     ),
                     "solved_head_world_cm": vector_values(
                         visual_actor.get_solved_head_world_location()
@@ -519,8 +657,16 @@ def main() -> None:
                     ),
                     "full_capture": str(full_path),
                     "full_capture_sha256": sha256(full_path),
+                    "full_profile_capture": str(full_profile_path),
+                    "full_profile_capture_sha256": sha256(full_profile_path),
+                    "full_rear_capture": str(full_rear_path),
+                    "full_rear_capture_sha256": sha256(full_rear_path),
                     "portrait_capture": str(portrait_path),
                     "portrait_capture_sha256": sha256(portrait_path),
+                    "profile_capture": str(profile_path),
+                    "profile_capture_sha256": sha256(profile_path),
+                    "rear_capture": str(rear_path),
+                    "rear_capture_sha256": sha256(rear_path),
                     "status": "captured",
                 }
             )

@@ -312,9 +312,9 @@ int32 AddSouthForkBankUnderstoryInstance(
     float LateralSlope,
     const FLinearColor& SourceDensity)
 {
-    if (!Understory || (CoordinateIndex & 3) != 2 ||
-        BankDistanceM < 38.0f || BankDistanceM > 88.0f ||
-        LateralSlope > 0.38f)
+    if (!Understory || (CoordinateIndex & 1) != 0 ||
+        BankDistanceM < 34.0f || BankDistanceM > 108.0f ||
+        LateralSlope > 0.40f)
     {
         return 0;
     }
@@ -322,8 +322,18 @@ int32 AddSouthForkBankUnderstoryInstance(
         SourceDensity.A,
         SourceDensity.R * 0.20f + SourceDensity.G * 0.46f +
             SourceDensity.B * 0.34f);
+    const float PatchNoise = 0.5f + 0.5f * FMath::PerlinNoise2D(
+        FVector2D(GroundLocation.X, GroundLocation.Y) / 44000.0f +
+        FVector2D(3.7f, -6.1f));
+    const float ShoreFade = FMath::SmoothStep(
+        34.0f, 44.0f, BankDistanceM);
+    const float OuterBankFade = 1.0f - FMath::SmoothStep(
+        94.0f, 108.0f, BankDistanceM);
     const float Probability = FMath::Clamp(
-        0.28f + SourceVegetationSignal * 0.54f, 0.28f, 0.78f);
+        (0.18f + SourceVegetationSignal * 0.42f) *
+            FMath::Lerp(0.52f, 1.46f, PatchNoise) *
+            ShoreFade * OuterBankFade,
+        0.0f, 0.68f);
     if (ShoreUnitRandom(CoordinateIndex, Column, 307) > Probability)
     {
         return 0;
@@ -332,7 +342,7 @@ int32 AddSouthForkBankUnderstoryInstance(
     const FVector Across(LeftNormal.X, LeftNormal.Y, 0.0f);
     const FVector Along(Across.Y, -Across.X, 0.0f);
     const float Scale = FMath::Lerp(
-        0.96f, 1.72f,
+        0.82f, 1.58f,
         ShoreUnitRandom(CoordinateIndex, Column, 311));
     const FVector Jitter =
         Along * FMath::Lerp(

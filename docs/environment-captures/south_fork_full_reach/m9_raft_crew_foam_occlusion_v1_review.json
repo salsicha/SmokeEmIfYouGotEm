@@ -1,0 +1,76 @@
+{
+  "artifact": "M9 raft and crew foam-occlusion V1 review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "South Fork previously rendered solver foam twice: once in the opaque Single Layer Water parent and again in a raised masked sheet. The duplicate raised sheet could cover raft tubes, PFDs, and crew lower bodies. V1 assigns whitewater ownership to the dedicated solver-conditioned foam sheet and removes that sheet inside a feathered, raft-aligned ellipse updated from the live raft transform. Contact spray, ordinary waterline intersection, water samples, forces, collision, D3, D4, scoring, rescue, and progression are unchanged.",
+  "implementation": {
+    "base_water_hydraulic_foam_intensity": 0.0,
+    "foam_owner": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate",
+    "runtime_parameter_collection": "/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion",
+    "exclusion_half_length_cm": 320.0,
+    "exclusion_half_width_cm": 190.0,
+    "fully_clear_inner_ellipse_fraction_squared": 0.62,
+    "outer_feather_fraction_squared": 1.0,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "physics_forces_changed": false,
+    "solver_foam_values_changed": false,
+    "contact_spray_changed": false
+  },
+  "renderer_evidence": {
+    "contact_port": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_contact_port.png",
+      "capture_sha256": "e76f1fbc618c95bb5dc9cd0ebabdb38e01ddd09402c11757d814dd540edcefe3",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_contact_port.log",
+      "log_sha256": "490214aae80918e100692e979192a00acc45ac0d5102a4d2c1f6373e0eb835fb"
+    },
+    "wrap_hero": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_wrap_hero.png",
+      "capture_sha256": "145a810dfccde27ca7d320db5bf591a107ef83ee6b84651ed15fbbe6cd269912",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_wrap_hero.log",
+      "log_sha256": "67c7ceb2d8454062e0ba010a972ff785f811d8745b0dd2cf9bff0d499055c69c"
+    },
+    "technical_verdict": "pass: surrounding flow and rock foam remain visible; masked foam does not cover the raft or crew in either reviewed camera; submerged lower geometry retains an ordinary waterline intersection"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "7a59e2b8fe9c34a675fc758f93ea6441a14573411c3a3afb720603b735f9d38d",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "0b8dffb7eec1b161dd7580799bbf9ebb03a2e30e3ec6ad617a9ee7da44cf30b6",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "e90582c83fe88827599b585d9f6fd46084f301091ea649c5ff6d588d863688f4",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "150ce7b05c4f8fbe834010d4b4dfaa22dbf1842263a9a672b6a5a6e87e6f026f",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "2ac60ad49b6cdf1c61b89b45eb38b028b4c5faa672a422be1aadf499b38d6925",
+    "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset": "be38a3e055260f3e27222c585dadc5b74a3b6c29977fc2e65be2d6a3e12b4d88",
+    "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": "9a9fe8c419b5d30745368912bb596af81f5be74ef62bb3d9e7cbd799e91d1df7",
+    "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/MI_RaftSim_SouthForkProductionWater.uasset": "7c85b8167535c243caaf775c882b7eb9a46a7ffb576d1bdb848a53d087040670"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "37/37 release-packet and editor-source-layout checks passed after exact no-growth capping of the protected 3073-line photoreal-material implementation",
+    "related_python": "1148 passed, 3 expected installed-dependency inverse-path skips, 0 failed in 429.514 seconds",
+    "python_report": "physics/reports/m9/m9_v451_foam_occlusion_full_matrix.xml",
+    "python_report_sha256": "bb04809ff2e37337b6d564dbda34dd3d6e274e595a7ba326b474f30204e9f7b4",
+    "native_automation": "RaftSim.P2.WaterSurfaceRenders passed 1/1",
+    "native_automation_report": "unreal/Saved/Automation/M9V443FoamOcclusionP2/index.json",
+    "native_automation_report_sha256": "7d21a9e371a4fd03f0b3438b0fa2b7a3c33b978ca13be6dbd37601fb80b6295a",
+    "m4": "4/4 passed (M9V445FoamOcclusionM4)",
+    "m5": "5/5 passed renderer-enabled (M9V453FoamOcclusionM5Renderer)",
+    "m7": "4/4 passed renderer-enabled (M9V454FoamOcclusionM7Renderer)",
+    "m8": "4/4 passed renderer-enabled (M9V455FoamOcclusionM8Renderer)",
+    "m9": "6/6 passed (M9V452FoamOcclusionM9)"
+  },
+  "reviewers": {
+    "named_water_vfx_art_reviewer": null,
+    "qualified_south_fork_guide": null,
+    "art_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "A named water-VFX art reviewer must approve the exclusion feather, contact-water read, and short-sequence motion.",
+    "A qualified South Fork guide must approve Meat Grinder visibility and hydraulic readability.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, animation, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

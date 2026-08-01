@@ -167,6 +167,13 @@ static void ResolveRapidEvidenceCameraPose(
         CameraOffset = FVector(-100.0f, -520.0f, 330.0f);
         LookAtOffset = FVector(-80.0f, -130.0f, 60.0f);
     }
+    else if (CameraPreset == TEXT("contact_starboard"))
+    {
+        // Mirrored close review angle for seat-side paddle, crew, and contact
+        // checks that cannot be judged reliably through the port-side crew.
+        CameraOffset = FVector(-100.0f, 520.0f, 330.0f);
+        LookAtOffset = FVector(-80.0f, 130.0f, 60.0f);
+    }
     else if (CameraPreset == TEXT("particle_macro"))
     {
         // Capture-only inspection of the real D4 contact emitter volume. The

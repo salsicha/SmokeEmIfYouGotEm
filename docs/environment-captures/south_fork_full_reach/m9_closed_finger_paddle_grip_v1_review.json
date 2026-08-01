@@ -1,0 +1,142 @@
+{
+  "schema": "raftsim.m9.closed_finger_paddle_grip_review.v1",
+  "reviewed_utc": "2026-07-31T18:26:30Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_palm_centered_paddle_grip_v36_review.json",
+  "summary": "V36 placed each middle-palm anchor at the solved paddle point but did not prove that the shaft passed inside the fingers. Closed-finger V1 preserves those palm and wrist targets, resolves the real lower-shaft or upper T-grip axis for each hand, and lays the four visible non-thumb finger chains onto a deterministic three-segment arc around that axis. The result reads as a closed hand around the paddle in the retained profile and rear views without the rejected wrist twist or buried upper hand.",
+  "replacement_boundary": {
+    "production_adapter": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp",
+    "production_adapter_sha256": "571495eea1b26cc5e0b62ca2681bdfc78fdd6288563539e3e37e2ff6b36585c7",
+    "production_adapter_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h",
+    "production_adapter_header_sha256": "4196f93d70c8518f357309a135989506995ad412657816d88de58ee26109a799",
+    "native_test_source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+    "native_test_source_sha256": "fcb1b6da45f9f57181d5d2adfd3d476f31187b92a79174fc4b800e743eb05392",
+    "capture_source": "unreal/Scripts/capture_metahuman_production_roster.py",
+    "capture_source_sha256": "d4b28c0ebdb1f55b9d3d9eac5dc4b467a822db46e0606cf3668421d6ad5ac434",
+    "source_contract_test": "physics/tests/test_cc0_production_characters.py",
+    "source_contract_test_sha256": "9de407aa5612dbeac2581af90c6c71c822d47c4e36bb2b6653390f0df0727f81",
+    "animation_authority": "Existing FRaftSimCrewAvatarPose shoulders, elbows, wrists and paddle endpoints remain authoritative; only visible-paddle finger-chain presentation is wrapped around the resolved grip axis.",
+    "physics_or_gameplay_changes": false,
+    "crew_mass_changes": false,
+    "water_or_raft_changes": false,
+    "collision_changes": false,
+    "rescue_or_progression_changes": false
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "articulated_hands_per_avatar": 2,
+    "visible_paddle_hands": 10,
+    "explicit_non_thumb_finger_chains": 40,
+    "segments_per_finger_chain": 3,
+    "lower_hand_grip_axis": "PaddleBottomCm minus PaddleTopCm, normalized",
+    "upper_hand_grip_axis": "transverse T-grip axis orthogonal to the shaft and world up",
+    "upper_hand_t_grip_detection_radius_cm": 2.0,
+    "finger_arc_cumulative_degrees": [50.0, 68.0, 52.0],
+    "finger_arc_radii_cm": [3.2, 2.65, 2.35],
+    "finger_curl_degrees": [58.0, 72.0, 50.0],
+    "thumb_curl_degrees": [34.0, 50.0, 38.0],
+    "non_thumb_metacarpal_curl_degrees": 8.0,
+    "maximum_allowed_runtime_palm_anchor_error_cm": 0.25,
+    "maximum_allowed_runtime_distal_contact_error_cm": 0.25,
+    "measured_maximum_runtime_palm_anchor_error_cm": 1.880034572465661e-9,
+    "measured_maximum_runtime_distal_contact_error_cm": 0.0,
+    "measured_distal_contact_joints_per_avatar": 8,
+    "thumb_contact_is_visually_reviewed_not_metric_gated": true,
+    "non_paddle_hand_targets_unchanged": true,
+    "solved_wrist_targets_unchanged": true
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_roster_capture.json",
+    "report_sha256": "cc74ea4699fbc55bc257c666379de9675605fd9cf71fea55d4c41714745243da",
+    "captured_character_count": 5,
+    "characters_with_articulated_paddle_grip": 5,
+    "maximum_paddle_grip_anchor_error_cm": 1.880034572465661e-9,
+    "maximum_paddle_grip_contact_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_guide_full.png",
+      "capture_sha256": "d8724126b46be29eea69f77bf83cebcf2b181fc520d72da7b2d67a5a48b452dc"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_guide_profile.png",
+      "capture_sha256": "28aea86f8add547267297e16b58c7c0433cdd5d25454a78dd55c0febbff17b61"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_guide_rear.png",
+      "capture_sha256": "405b74b84ceefe0f9915df726afce7bddd97b84dfdf00eaf09d631d61507fb5c"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_broadest_full.png",
+      "capture_sha256": "b38234ad1c8000b72c63a5baa6e6997405a350837162ecba37b90179a0937dcc"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_broadest_profile.png",
+      "capture_sha256": "0189ec49d43496d73b59b99e2746cca91d846b8ef40731c1cfa5ef8511847fe6"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_broadest_rear.png",
+      "capture_sha256": "c344bd1b8568ae1274b5a3671f5aaee273be45b6a7cc04d542ddcf6ca7d118c8"
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: the lower hand encloses the shaft and the upper hand encloses the transverse T-grip without moving the solved wrist or palm anchors",
+    "photoreal_verdict": "fail pending named review of coarse finger anatomy, thumb contact, skin/shaft penetration, wet materials and stroke biomechanics"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 character, safety-gear and flexible-raft source contracts passed",
+    "m4": "4/4 result entries passed (M9V563ClosedFingerGripM4)",
+    "m4_report": "unreal/Saved/Automation/M9V563ClosedFingerGripM4/index.json",
+    "m4_report_sha256": "435105504b67aaff4c6e6646801c5e5c8f7e3d8d731b116daf3e6035fcd2da35",
+    "m5": "5/5 result entries passed renderer-enabled, including palm-anchor and closed-finger contact assertions (M9V562ClosedFingerGripM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V562ClosedFingerGripM5Renderer/index.json",
+    "m5_report_sha256": "c46ba2f46c6d41bdf5fd164806ebb2c682e34adaa7ad10734ad642a63e36c80b",
+    "m7": "4/4 result entries passed offscreen-rendered (M9V564ClosedFingerGripM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V564ClosedFingerGripM7Renderer/index.json",
+    "m7_report_sha256": "25aace2e8a79eff9798d9a115472feb9c52fdebd55a28d07094bd2bab9bca6fd",
+    "m8": "4/4 passed offscreen-rendered (M9V565ClosedFingerGripM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V565ClosedFingerGripM8Renderer/index.json",
+    "m8_report_sha256": "8ce705a8d1ec9298765a6d4832710eb3412a2ba4a53cd0749eebb96abded408f",
+    "full_python": "1148 passed, 3 expected installed-dependency skips, 0 failed in 426.06 seconds (M9V566ClosedFingerPaddleGrip)",
+    "full_python_report": "physics/reports/m9/m9_v566_closed_finger_paddle_grip_full_matrix.xml",
+    "full_python_report_sha256": "f424d2f3a38c9abf0c14f32c603f3df4541344e9c91e9bdcad4ccc3f65fc44e3",
+    "m9_reconciled": "6/6 passed (M9V567ClosedFingerGripReconciledM9)",
+    "m9_reconciled_report": "unreal/Saved/Automation/M9V567ClosedFingerGripReconciledM9/index.json",
+    "m9_reconciled_report_sha256": "430a9d6737d636905b338740984dfadbe0ce2b546cf4c4c18c8fbda3ae003e4a",
+    "m9_exact_confirmation": "6/6 passed from an independent user profile (M9V568ClosedFingerGripExactM9)",
+    "m9_exact_confirmation_report": "unreal/Saved/Automation/M9V568ClosedFingerGripExactM9/index.json",
+    "m9_exact_confirmation_report_sha256": "b2258b8409fcddbd020a365f8d33e18ac5f8795cadc0492e6acf603e5235fd57",
+    "shipping": "historical, dirty-worktree, non-notarized and not promotable"
+  },
+  "accepted": [
+    "All five production avatars retain the existing two-hand grip while each visible non-thumb distal chain is now positioned around the actual shaft or transverse T-grip axis.",
+    "The palm-anchor metric remains within 0.25 cm and the new eight-joint distal-contact metric remains within 0.25 cm for every avatar; the archived roster reports a 1.880034572465661e-9 cm maximum anchor error and 0.0 cm maximum contact error.",
+    "The retained guide and broadest-body full, profile and rear views show the lower fingers enclosing the paddle shaft and the upper fingers closing around the T-grip without the rejected wrist twist.",
+    "The UE 5.8 editor build and exact-current M4, M5, M7 and M8 suites are green."
+  ],
+  "rejected_or_open": [
+    "A full shaft/T-grip hand frame was rejected because it created a twisted-mitten silhouette and an implausible T-grip ring.",
+    "Stronger generic curl alone was rejected because it closed the fingers while leaving the grip at the edge of the hand.",
+    "A closed-finger cage-centroid translation was rejected because it shifted the wrist by 5.5 to 5.9 cm and buried the upper hand.",
+    "A bounded forearm-axis roll plus weighted grip centre was rejected because the shaft still sat beside the visible finger loop.",
+    "The deterministic distal-contact metric covers eight non-thumb distal joints; thumb contact remains an authored-curl visual-review item rather than a contact-constrained guarantee.",
+    "The procedural production hand mesh, finger proportions, knuckles, skin deformation, wet response and synchronized rafting stroke remain visibly synthetic and below final photoreal character-art approval.",
+    "No named guide or character-art reviewer has approved hand placement, grip safety, stroke biomechanics or these captures, and none is approved for release media."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the coarse procedural hand anatomy, deformation and material response.",
+    "A qualified whitewater guide must approve the two-hand shaft/T-grip placement and stroke biomechanics.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance and promotion gates."
+  ]
+}

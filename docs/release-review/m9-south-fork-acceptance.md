@@ -33,8 +33,13 @@ deformation-gradient tangent-frame response on the project-owned production raft
 M9B.3 v48 solver-gated multi-valued breaking-water lip. v48 adds a separate, non-colliding
 curled sheet only at existing supercritical-to-subcritical hydraulic-jump sites; it changes
 no water sampling, D3, D4, collision, buoyancy, flip, wrap, pin, damage, or rescue authority.
-The retained fixed-camera images are the final v270 settled-map set. Independent v269 and
-v270 editor processes loaded the same saved World Partition map without regeneration.
+The current technical baseline also includes raft-and-crew foam-occlusion V1, which removes
+duplicate raised foam from the raft/crew footprint without changing hydraulic or gameplay
+authority. The canonical fixed-camera files now carry the current shoreline, ground, and
+presentation hashes recorded in the machine-readable packet. The v269/v270 repeat is retained
+as historical determinism evidence and is explicitly `exact_current: false`; it does not qualify
+the changed captures. In that earlier run, independent v269 and v270 editor processes loaded
+the same saved World Partition map without regeneration.
 Three views are byte-identical; Meat Grinder changes 3 pixels with maximum channel delta
 1, and Troublemaker changes 7 pixels with maximum channel delta 4. Every view passes the
 locked per-image limits of 32 changed pixels, 0.00005 changed fraction, 0.0001 mean
@@ -1141,6 +1146,35 @@ M9, packaging, and release evidence are stale or pending after v34; water-surfac
 content-current. No named guide or art reviewer has approved the footwear or frame, which
 remains rejected for marketing, store, trailer, press-kit, and release-media use.
 
+### Upright fitted production river boot V1 — inverted read repaired, external review open
+
+The authored boot was not rotated 180 degrees: its outsole and tread occupy negative local Z,
+its cuff rises to positive Z, and its toe points along local +X. The visual inversion came from
+using the full 23.575 cm source height on a deeply flexed seated pose whose solved knee is only
+13 cm above the foot. The oversized cuff could rise through or above the knee and made the leg
+appear to enter the sole end of the boot.
+
+V1 explicitly constructs a +X toe-forward, +Z cuff-up basis and applies a bounded
+0.88×0.92×0.68 footwear fit before the existing identity profile. The runtime reads the source
+mesh's actual minimum-Z sole bound and offsets the fitted component so the tread remains at the
+exact previous support height. Solved foot points remain animation authority; collision, crew
+mass, raft contact, water, D3/D4, rescue, scoring, and progression are unchanged.
+
+![Upright fitted boot guide front](../environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_guide_full.png)
+
+![Upright fitted boot guide profile](../environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_guide_profile.png)
+
+![Upright fitted boot guide rear](../environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_guide_rear.png)
+
+All ten boots across the five production identities pass the fitted-upright runtime invariant
+with 1.0 minimum cuff-up and toe-forward alignment. The editor target builds; 36 focused source
+contracts pass; M4 v556 passes 4/4, renderer-backed M5 v555 passes 5/5, rendered M7 v557
+passes 4/4, and rendered M8 v558 passes 4/4. The exact-current full matrix passes 1,148 tests
+with three expected dependency-path skips and zero failures in 433.05 seconds. Reconciled M9
+v560 and its independent-profile confirmation v561 each pass 6/6. Rigid ankle/toe deformation
+and procedural wet-footwear materials remain below final photoreal character quality, and named
+character-art and guide approval are still required.
+
 ### Meat Grinder D4 wrap v35 — articulated production paddle grip, still rejected as photoreal art
 
 The retained matched
@@ -1937,6 +1971,447 @@ The complete immutable capture, log, source, report, and reviewer ledger is
 `docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json`.
 This closes the V10 local technical candidate gate only; it closes no photoreal, named-review,
 external-platform, signing, media, clean-build, or promotion gate.
+
+## Raft-and-crew foam occlusion V1 — technical repair retained, external review open
+
+The raised solver-conditioned foam sheet previously duplicated foam already painted into the
+opaque Single Layer Water base. Because the sheet can rise roughly 56 cm above the sampled
+surface, that duplicate layer could render over raft tubes, PFDs, and crew lower bodies. V1
+assigns visible hydraulic foam to the dedicated masked sheet, sets the base-water hydraulic-foam
+contribution to zero, and feathers the sheet out inside a live raft-aligned 320-by-190 cm
+half-extent ellipse. Contact spray and ordinary waterline intersection remain; water samples,
+forces, collision, D3, D4, flip/wrap/pin behavior, rescue, scoring, and progression are unchanged.
+
+![Foam-occlusion V1 contact-port review](../environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_contact_port.png)
+
+![Foam-occlusion V1 wrap-hero review](../environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_wrap_hero.png)
+
+The focused exact-current `RaftSim.P2.WaterSurfaceRenders` contract passes 1/1 in
+`unreal/Saved/Automation/M9V443FoamOcclusionP2/index.json`. Both reviewed frames retain
+surrounding flow and rock foam while keeping the masked foam sheet off the raft and crew. This
+closes only the focused technical defect. A named water-VFX art reviewer must still approve the
+feather, contact-water read, and motion in a short sequence, and a qualified South Fork guide
+must approve Meat Grinder visibility and hydraulic readability.
+
+The broad local technical qualification has now been refreshed after V1. M4 v445 passes 4/4,
+renderer-enabled M5 v453 passes 5/5, M7 v454 passes 4/4, M8 v455 passes 4/4, and the manifest-sensitive M9 v452
+passes 6/6. The locked Python 3.13 data/source matrix passes 1,148 tests with three expected
+installed-dependency inverse-path skips and zero failures in 429.514 seconds; its JUnit SHA-256 is
+`bb04809ff2e37337b6d564dbda34dd3d6e274e595a7ba326b474f30204e9f7b4`.
+
+This closes the V1 local editor/source regression lanes only. The v273 package/performance evidence
+remains historical, and no package, performance, human-review, external-platform, signing, media,
+clean-source, or promotion gate is claimed.
+
+The immutable source, asset, capture, log, and focused-report hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json`.
+
+## Seat-side paddle orientation V1 — technical repair retained, external review open
+
+The crew pose library previously reversed the ordinary paddle endpoints: the T-grip sat
+outboard while the blade aimed toward the raft centre. The high-side pose separately aimed
+every paddle toward the commanded tube. Perspective concealed much of the port-side error but
+left the starboard passengers visibly crossing their paddles through the raft.
+
+V1 keeps the T-grip inboard and the blade outboard for every assigned seat, mirrors the
+anatomical T-grip/lower-shaft hand ownership, and uses opposing forward/back strokes for turns
+without moving either blade through the boat. During a high-side command the existing
+coordinated body translation remains unchanged, while each passenger's brace paddle stays
+outside that passenger's tube and reaches the waterline.
+
+![Seat-side paddle V1 port review](../environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_contact_port.png)
+
+![Seat-side paddle V1 starboard review](../environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_contact_starboard.png)
+
+The UE 5.8 editor target builds. The production-character/source checks pass 44/44; M4 v465
+passes 4/4; renderer-enabled M5 v463 passes all five leaf tests; renderer-enabled M7 v464 passes
+all four leaf tests; and renderer-enabled M8 v466 passes 4/4. Direct mirrored cameras show both
+seat-side blades outside the raft and reaching the water during the same live four-contact D4
+wrap. Physics forces, water samples, collision, crew mass, D3/D4, rescue, scoring, and
+progression are unchanged. The locked Python 3.13 data/source matrix passes 1,148 tests with
+three expected installed-dependency inverse-path skips and zero failures in 419.151 seconds;
+its JUnit SHA-256 is
+`0215934f5353a51c74b374ff556f5ea462b829f2768e609910558dfd1cdeb7a3`.
+The reconciled fail-closed M9 v468 suite passes 6/6.
+
+This closes the reported paddle-side defect as a local technical repair. A named
+character-animation/art reviewer must still approve the grip and stroke silhouettes in motion,
+and a qualified South Fork guide must approve high-side and brace readability. Package,
+performance, clean-source, platform, signing, media, and promotion gates remain open. Immutable
+source, capture, log, and report hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_review.json`.
+
+## Raft-interior water transmission V1 — technical repair retained, external review open
+
+The authored Single Layer Water surface previously applied its scattering and surface-opacity
+response across the raft interior, creating an opaque blue-gray slab over the floor. Removing
+that water in a diagnostic exposed a second contributor: the real floor was so dark and smooth
+under the tube shadow that it still read as opaque water.
+
+V1 gives the South Fork production water instance a derived, raft-aligned rounded-rectangle
+transmission aperture. Inside the tubes it suppresses only surface opacity, scattering, and
+absorption while retaining behind-water transmission; outside the aperture the authored river
+is unchanged. The aperture follows the live raft transform. A dedicated warm rescue-orange
+coated-fabric floor adds bounded shadow fill and textile relief so the actual I-beam floor stays
+legible under passengers and tube shadows.
+
+![Raft-interior water transmission V1 starboard review](../environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_contact_starboard.png)
+
+![Raft-interior water transmission V1 port review](../environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_contact_port.png)
+
+The UE 5.8 editor target builds. Focused source guards pass 58/58. The exact-current water-
+surface contract passes 1/1 with zero warnings and errors; M4 v492 passes 4/4; renderer-enabled
+M5 v493 passes 5/5; renderer-enabled M7 v494 passes 4/4; renderer-enabled M8 v491 passes 4/4;
+and the post-evidence-reconciliation fail-closed M9 v497 passes 6/6. Collision, water sampling, forces, raft mass, buoyancy,
+D3/D4, flip, wrap, pin, rescue, scoring, and progression are unchanged. The exact-current full
+Python/data/source matrix passes 1,148 tests with three expected installed-dependency inverse-
+path skips and zero failures in 425.518 seconds; its JUnit SHA-256 is
+`1b0b8747d9992fa3cb6a075d33387f1dc2e66c3bc769454e3947e34ee562c1b0`.
+
+This closes the reported opaque-water defect as a local technical repair only. A named water-
+VFX/art reviewer must approve transmission and exterior continuity in motion, a qualified South
+Fork guide must approve the presentation at Meat Grinder, and the product owner must accept the
+candidate. Package, performance, clean-source, platform, signing, media, and promotion gates
+remain open. Immutable source, asset, capture, log, and report hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json`.
+
+## Identity-fitted helmet V1 — direction and seating repaired, external review open
+
+The production helmet previously followed the avatar torso rotation instead of the rendered
+face, used one shared fit scale for all five MetaHuman identities, and retained a 12 cm vertical
+lift. Those three choices made the asymmetric shell read as backward in some poses and perched
+above the head in close views.
+
+V1 uses each rendered face's forward and up axes to orient the shell, guarantees that the
+helmet's authored +X brow faces the same direction as the character, derives scale from the
+identity's face bounds, and lowers the skull-centre lift to 9.5 cm. The runtime gate now checks
+all five identities for no more than 1 cm solved-head error, at least 0.98 forward alignment,
+and a bounded 0.90-1.02 fit scale. The captured roster records forward alignment of exactly
+1.0 for every identity, a fit-scale range of 0.90-0.990621, and maximum solved-head error of
+`1.877e-10` cm.
+
+![Identity-fitted guide helmet front](../environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_guide_front.png)
+
+![Identity-fitted guide helmet profile](../environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_guide_profile.png)
+
+![Smallest-identity helmet profile](../environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_smallest_profile.png)
+
+![Smallest-identity helmet rear](../environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_smallest_rear.png)
+
+The editor target builds. Exact-current M4 v505 passes 4/4; renderer-backed M5 v502 records
+five successful result entries; M7 v503 records four; and M8 v504 passes 4/4, all with zero
+failures. The full Python/data/source matrix passes 1,148 tests with three expected dependency-
+path skips and zero failures in 424.27 seconds; its JUnit SHA-256 is
+`49beafd41f1beea6f7be631fc5da292707725a30865fef88b38a304ed5c4e075`.
+The reconciled fail-closed M9 v507 acceptance suite passes 6/6.
+Helmet mesh, materials, collision, crew mass, water, and physics authority are unchanged.
+
+This closes the reported backward/shared-fit transform defect as a local technical repair. It
+does not make the simplified first-party shell, retention hardware, materials, or character
+lighting photoreal. A named character-art reviewer must approve or replace those assets, and a
+qualified whitewater safety reviewer must approve the visible coverage and retention depiction;
+this is not equipment certification. Immutable source, renderer, metric, and report hashes are
+recorded in
+`docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json`.
+
+## Unpadded production PFD V1 — shoulder flotation removed, external review open
+
+The production rescue PFD contained two swept shoulder foam bands, each 5.2 cm wide and
+2.6 cm thick. Those bands created the reported shoulder-pad silhouette. V1 deletes both
+foam objects and their source helper, terminates the front and back flotation cells below
+the shoulders, and retains only two narrow shell-fitted webbing connectors. The first
+diagnostic also exposed two protruding shoulder sliders; those were removed before the
+retained capture.
+
+![Unpadded PFD guide front](../environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_front.png)
+
+![Unpadded PFD guide profile](../environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_profile.png)
+
+![Unpadded PFD guide rear](../environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_rear.png)
+
+The deterministic source manifest now requires zero shoulder foam pads and two 2.0 cm-wide,
+0.18 cm-thick webbing runs. The reimported asset has 19,948 authored triangles, a 2,058-
+triangle Nanite fallback, five material sections, and plausible 42.2×44.9×43.3 cm bounds.
+All five production MetaHuman wrappers select it with exactly 0.0 cm maximum torso-origin
+error. The editor builds; focused source contracts pass 27/27; M4 v513 passes 4/4; renderer-
+backed M5 v514 records all five results with zero failures; M7 v515 records all four results
+with zero failures; and renderer-backed M8 v516 passes 4/4. Collision, crew mass, water,
+D3/D4, flip/wrap/pin, rescue, scoring, and progression are unchanged.
+
+The exact-current full Python/data/source matrix passes 1,148 tests with three expected
+dependency-path skips and zero failures in 430.68 seconds; its immutable JUnit SHA-256 is
+`0090fc5ab8fbddb23415027bb6f4d6f647cf1d74f988193a18ce016b81d7ac5d`.
+The reconciled fail-closed M9 v518 acceptance suite passes 6/6.
+
+This closes the reported padded-shoulder geometry defect as a local technical repair. It does
+not make the simplified rigid front/back cells, hardware, fabric response, strap intersections,
+character pose, or lighting photoreal. A named character-art reviewer and qualified whitewater
+safety reviewer must approve or replace the current PFD; this is not equipment certification.
+Immutable source, asset, renderer, roster, and automation hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_review.json`.
+
+## Seated waist/hip V1 — missing body volume repaired, external review open
+
+The production visibility path kept its tapered torso overlay but hid the pose-matched
+pelvis. The PFD therefore ended above two visually disconnected thighs, making every
+passenger appear to have no waist or hips. Simply restoring the former ellipsoid recovered
+width from the front but looked like a hanging sphere in profile and rear views, so that
+first repair was rejected.
+
+V1 retains the collisionless pelvis layer and replaces its spherical source with a dedicated
+14-ring by 24-side seated shell. It is shallow front-to-back, broad through the hips, and
+keeps finite upper-waist and lower-thigh-root widths so it overlaps both the torso and legs.
+The shell remains centred on the deterministic hip solve and scales with each identity.
+
+![Seated waist and hip guide front](../environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_guide_full.png)
+
+![Seated waist and hip guide profile](../environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_guide_profile.png)
+
+![Seated waist and hip guide rear](../environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_guide_rear.png)
+
+All five production identities pass the runtime silhouette gate with exactly 0.0 cm maximum
+hip-centre error. The smallest measured half-extent is 9.025×16.56×7.99 cm, and the broadest
+is 9.975×19.26×8.755 cm. M4 v526 passes 4/4; renderer-backed M5 v527 passes all five results,
+including the new native anatomy checks; M7 v528 passes 4/4; and M8 v529 passes 4/4. The
+full Python/data/source matrix passes 1,148 tests with three expected dependency-path skips
+and zero failures in 430.43 seconds; its immutable JUnit SHA-256 is
+`86c7c0e32d2fcf5ce68575947c8a9f11f85076cf546be6d20ca9fe6e83810057`.
+The reconciled fail-closed M9 v531 acceptance suite passes 6/6.
+
+This closes the reported missing-waist/hips defect as a local technical repair. It does not
+make the procedural torso/pelvis integration, wetsuit response, body anatomy, or seated
+deformation photoreal. A named character-art reviewer must approve or replace the retained
+presentation. Collision, mass, animation authority, water, D3/D4, raft contact, rescue,
+scoring, and progression are unchanged. Immutable source, renderer, roster, and automation
+hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_review.json`.
+
+## Seated waist/hip V2 — fuller pelvis silhouette retained, external review open
+
+The V1 layer was present, but its 9.5×18×8.5 cm reference half-extent still read as a
+pointed bridge under the PFD rather than a human seated pelvis. A first enlarged V2 bracket
+restored width and depth but formed a skirt-like lower edge, so that shape was rejected.
+The retained V2 uses an 18-ring by 32-side shell with rounded mid-volume shaping, a localized
+seated glute bulge, and a central saddle between the thigh roots. Its reference half-extent is
+15×23×15 cm, and the native visibility contract now also requires at least 500 mesh vertices.
+
+![Fuller seated hips guide front](../environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_guide_full.png)
+
+![Fuller seated hips guide profile](../environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_guide_profile.png)
+
+![Fuller seated hips guide rear](../environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_guide_rear.png)
+
+All five production identities pass with zero hip-centre error. The smallest measured V2
+half-extent is 14.25×21.16×14.10 cm and the broadest is 15.75×24.61×15.45 cm. The editor
+build and 36 focused Python contracts pass; M4 v549 passes 4/4, renderer-backed M5 v548
+passes 5/5, offscreen-rendered M7 v550 passes 4/4, and offscreen-rendered M8 v551 passes
+4/4. The exact-current v552 matrix reports 1,148 passes, three expected skips, and zero
+failures in 434.82 seconds. Reconciled M9 v553 and its independent exact confirmation v554
+both pass 6/6.
+
+This V2 closes the specific missing-hip silhouette defect as a local technical repair. The
+still-procedural anatomy, wetsuit surfacing, identity-specific deformation, and seated motion
+remain below final photoreal character quality and require a named character-art reviewer.
+Collision, mass, animation authority, water, D3/D4, raft contact, rescue, scoring, and
+progression are unchanged. Exact source, capture, roster, and validation hashes are in
+`docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_review.json`.
+
+## Soft rounded production PFD V1 — rigid panel silhouette repaired, external review open
+
+The production rescue PFD still built its visible foam from broad planar extrusions. Edge
+bevels softened only the rim, leaving the chest cells and back plate rigid-looking and the
+side wings rectangular in profile. V1 replaces every visible flotation face with a
+multi-ring loft: four-pass rounded outlines, rolled edge transitions, shallow convex crowns,
+and smooth normals. The same treatment is applied to the flank wings and low front pockets.
+Zero shoulder foam pads and the two narrow webbing-only shoulder connectors remain unchanged.
+
+![Soft rounded PFD guide front](../environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_guide_full.png)
+
+![Soft rounded PFD guide profile](../environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_guide_profile.png)
+
+![Soft rounded PFD guide rear](../environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_guide_rear.png)
+
+The reimported project-owned asset has 25,320 authored triangles, a 2,260-triangle Nanite
+fallback, five material sections, and plausible 42.295×44.897×42.29 cm bounds. All five
+production identities select it with exactly 0.0 cm maximum torso-origin error. M4 v532
+passes 4/4; renderer-backed M5 v533 records five successful results; renderer-backed M7
+v534 records four successful results; and renderer-backed M8 v535 passes 4/4. Collision,
+crew mass, water, D3/D4, flip/wrap/pin, rescue, scoring, and progression are unchanged.
+
+The exact-current full Python/data/source matrix passes 1,148 tests with three expected
+dependency-path skips and zero failures in 416.60 seconds; its immutable JUnit SHA-256 is
+`56b4dab37713fd6d4a004922a84d06ee5535859f0ac39a6d130ddca340d2b167`.
+The reconciled fail-closed M9 v537 acceptance suite passes 6/6.
+
+This closes the reported hard-edged PFD silhouette as a local technical repair. It does not
+approve the simplified first-party hardware, fabric shader, webbing intersections,
+identity-specific deformation, seated pose, or review lighting as photoreal. A named
+character-art reviewer and qualified whitewater safety reviewer must still approve or
+replace the retained PFD; this geometry review is not equipment certification. Immutable
+source, asset, renderer, roster, and automation hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_review.json`.
+
+## Organic bank mosaic V2 — broader low cover, external review open
+
+The five canonical views still exposed large bare, tessellated bank areas. Organic bank
+mosaic V2 replaces the sparse broad tuft with 52 narrower grass blades and ten low forb
+leaves, expands the source-conditioned ground-cover band to 22–118 m, and uses bounded
+multi-scale patch noise plus shoreline and outer-bank fades for both grass and understory.
+The regenerated settled map contains 220,759 collisionless ground-cover instances, 82,609
+near-corridor foliage instances, and 15,702 non-colliding shore-cobble instances.
+
+![Organic bank mosaic at Meat Grinder](../environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png)
+
+![Organic bank mosaic at Troublemaker](../environment-captures/south_fork_full_reach/troublemaker_approach.png)
+
+![Organic bank mosaic at Coloma Bridge](../environment-captures/south_fork_full_reach/coloma_bridge_context.png)
+
+The Unreal 5.8 editor target builds. The focused native ground-cover contract passes 1/1;
+the source-layout set passes 35/35; exact-current M4 lists 4/4 successful results, M5 lists
+5/5, M7 lists 4/4, and M8 passes 4/4. The final HLOD repeat evaluates 28/28 actors and saves
+zero packages. The full Python/data/source matrix passes 1,148 tests with three expected
+dependency-path skips and zero failures in 426.20 seconds. Reconciled and frozen-ledger M9
+runs both pass 6/6.
+
+This is a material organic-ground improvement, not photoreal acceptance. Procedural tuft
+forms, coarse terrain materials, simple repeated trees, sparse mid-story vegetation,
+distant cards, and synthetic lighting remain visible. Collision, navigation, terrain and
+water geometry, sampling, hydraulics, D3/D4, raft/crew physics, rescue, scoring, and
+progression are unchanged. Named environment-art, geospatial, and South Fork guide review
+remain open. Exact hashes and the fail-closed verdict are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_organic_bank_mosaic_v2_review.json`.
+
+## Closed-finger paddle grip V1 — shaft-aware wrap retained, external review open
+
+The V36 grip put the middle-palm anchor on the solved paddle point, but that metric did not
+prove that the shaft was inside the fingers. Closed-finger V1 keeps the existing shoulder,
+elbow, wrist, palm, paddle, physics, and gameplay authority. For visible-paddle poses only,
+it resolves the lower hand against the shaft axis and the upper hand against the transverse
+T-grip, then places all four visible non-thumb finger chains on a deterministic three-segment
+arc around that real grip axis.
+
+![Closed-finger guide full view](../environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_guide_full.png)
+
+![Closed-finger guide profile](../environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_guide_profile.png)
+
+![Closed-finger guide rear view](../environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_guide_rear.png)
+
+All five production identities retain the articulated two-hand pose. Their maximum measured
+palm-anchor error is `1.880034572465661e-9` cm and their maximum eight-distal-joint grip-contact
+error is `0.0` cm, both below the 0.25 cm runtime gates. The Unreal 5.8 editor target builds;
+M4 V563 passes 4/4, renderer-backed M5 V562 passes all five results including the new anchor
+and contact assertions, M7 V564 passes 4/4, and M8 V565 passes 4/4. The full V566 matrix
+passes 1,148 tests with three expected skips and zero failures in 426.06 seconds. Reconciled
+M9 V567 and its independent-profile confirmation V568 both pass 6/6.
+
+This closes the reported open-finger/edge-contact defect as a local technical repair. It does
+not make the procedural hand mesh, knuckles, thumb contact, skin deformation, wet response,
+or synchronized paddle stroke photoreal. A named character-art reviewer and qualified
+whitewater guide must approve or replace the retained hand placement and biomechanics; the
+captures are not approved release media. Exact source, roster, image, and validation hashes
+are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_review.json`.
+
+## Visible shoulders V1 — continuous garment sleeves retained, external review open
+
+The production visibility layer previously hid both procedural upper arms after assembling
+the MetaHuman body. The PFD, neck, torso and arms therefore lacked a reliable visible
+deltoid transition. Three isolated shoulder-cap attempts were rejected because they read as
+rigid balls or flotation shoulder pads. The retained repair instead adds a splash-jacket
+sleeve from each authoritative solved shoulder to its live elbow target.
+
+![Visible shoulders guide full view](../environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_guide_full.png)
+
+![Visible shoulders guide profile](../environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_guide_profile.png)
+
+![Visible shoulders guide rear view](../environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_guide_rear.png)
+
+All five production identities pass the visible-silhouette contract. The smallest measured
+sleeve radius is 4.861 cm, the smallest turntable half-length is 7.411 cm, and the maximum
+shoulder-anchor error is `1.3605050241949357e-7` cm. The live M5 rescue pose additionally
+proves that each sleeve remains elongated at its shorter 5.87 cm half-length. The PFD still
+contains zero flotation shoulder pads and retains only its narrow webbing connectors.
+
+The Unreal 5.8 editor target builds; M4 V571 passes 4/4, renderer-backed M5 V570 passes all
+five results, M7 V572 passes 4/4, and M8 V573 passes 4/4. The full V574 matrix passes 1,148
+tests with three expected skips and zero failures in 426.11 seconds. Reconciled M9 V575 and
+the independent fresh-profile confirmation V576 both pass 6/6.
+
+This closes the reported missing-shoulder silhouette as a local technical repair without
+changing animation, mass, collision, raft, water, rescue, or gameplay forces. The sleeves,
+seams, deformation, wet response, and torso integration remain simplified procedural art.
+A named character-art reviewer and qualified guide must approve or replace them before any
+photoreal or release-media claim. Exact source, roster, image, and validation hashes are in
+`docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json`.
+
+### Opaque profile hips V1 technical candidate
+
+The character profile exposed the turntable background between the retained seated pelvis
+and the assembled production legs. Inspection confirmed that the wetsuit shader was already
+opaque: the apparent transparency was missing junction geometry. Retaining the full fallback
+thighs closed the hole with oversized spherical hip pads, and shorter stretched spheres still
+read as detached round joints. Both candidates were rejected.
+
+The retained repair uses two closed, tapered wetsuit bridges. Each begins 15% above its solved
+hip inside the pelvis and ends 58% along the live hip-to-knee segment, so its caps stay hidden
+inside overlapping anatomy. The guide and all four crew identities now preserve a continuous
+opaque waist-to-upper-leg profile.
+
+![Opaque hips guide profile](../environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_guide_profile.png)
+
+![Opaque hips guide rear view](../environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_guide_rear.png)
+
+All five turntables report opaque pelvis and thigh-root materials. The smallest measured
+bridge radius is 6.357 cm, the smallest turntable half-length is 11.844 cm, and the maximum
+solved-hip centreline error is `2.7414336045694654e-7` cm. Renderer-backed M5 also passes the
+shorter 9.82 cm live rescue-pose bridge after a rejected diagnostic exposed an overstrict
+turntable-only 10.5 cm threshold.
+
+The Unreal 5.8 editor target builds; M5 V578 passes 5/5, M4 V579 passes 4/4, M7 V580 passes
+4/4, and M8 V581 passes 4/4. The full V582 matrix passes 1,148 tests with three expected skips
+and zero failures in 425.75 seconds. Reconciled M9 V583 and independent fresh-profile M9 V584
+both pass 6/6.
+
+This closes the reported transparent profile hip as a local technical repair without changing
+animation, mass, collision, raft, water, rescue, or gameplay forces. The procedural
+pelvis/thigh anatomy, seams, deformation, and wet response remain below final photoreal
+character-art acceptance. A named character-art reviewer and qualified guide must approve or
+replace them before release-media use. Exact source, roster, image, and validation hashes are
+in `docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_review.json`.
+
+### Continuous thigh/knee V1 technical candidate
+
+The retained opaque hip bridge ended at 58% of the solved hip-to-knee segment. In profile,
+that left a diagonal separation before the assembled knee; because the retained thigh was
+also narrower, the knee read as a detached mass larger than the upper leg. The replacement
+keeps the same closed tapered mesh but extends it from -0.15 to 1.06 of the solved segment,
+raises its maximum reference radius to 8.0 cm, and narrows the analytic profile toward the
+knee. Its caps stay buried in the overlapping pelvis and assembled lower-leg geometry.
+
+![Continuous thigh and knee guide profile](../environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_guide_profile.png)
+
+![Continuous thigh and knee guide rear view](../environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_guide_rear.png)
+
+![Continuous thigh and knee smallest-body profile](../environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_smallest_profile.png)
+
+All five production identities report a continuous thigh/knee silhouette. The smallest
+measured thigh radius is 7.479 cm, the smallest half-length is 19.632 cm, and the maximum
+solved-knee centreline coverage error is `2.3936797433066204e-8` cm. Guide, broadest, and
+smallest-body front/profile/rear captures all preserve a larger thigh with a narrower knee
+transition.
+
+The Unreal 5.8 editor target builds; renderer-backed M5 V585 passes 5/5, M4 V586 passes 4/4,
+M7 V587 passes 4/4, and M8 V588 passes 4/4. The full V589 matrix passes 1,148 tests with three
+expected skips and zero failures in 428.19 seconds. Reconciled M9 V590 and exact confirmation
+M9 V591 both pass 6/6.
+
+This closes the disconnected and oversized-knee relationship as a local technical repair
+without changing animation, mass, collision, raft, water, rescue, or gameplay forces. Rear
+thigh muscle shape, deformation, seams, and wet response remain simplified procedural art.
+A named character-art reviewer and qualified guide must approve or replace this anatomy and
+its seated biomechanics before photoreal or release-media acceptance. Exact source, roster,
+image, and validation hashes are in
+`docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json`.
 
 ## Required named decisions
 

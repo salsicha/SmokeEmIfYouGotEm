@@ -155,6 +155,8 @@
 #include "Widgets/Views/SListView.h"
 #include "Widgets/SWindow.h"
 
+class UMaterialParameterCollection;
+
 DECLARE_LOG_CATEGORY_EXTERN(LogRaftSimEditorEnvironment, Log, All);
 
 namespace RaftSimEditorEnvironment
@@ -890,6 +892,11 @@ UMaterialInterface* LoadOrCreatePreviewTranslucentColorMaterial();
 UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial();
 
 UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSummary);
+
+UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
+    FString& OutSummary);
+
+UMaterialInterface* LoadOrCreateReadableRaftFloorMaterial(FString& OutSummary);
 
 UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& OutSummary);
 

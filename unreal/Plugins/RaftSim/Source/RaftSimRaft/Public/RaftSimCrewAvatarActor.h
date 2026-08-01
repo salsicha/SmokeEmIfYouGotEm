@@ -159,6 +159,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasProductionRiverBoots() const;
 
+    /** True when both authored boots are fitted, toe-forward, and unambiguously sole-down. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasFittedUprightProductionRiverBoots() const;
+
     /** True when the host carries a modeled blade, shaft, and transverse T-grip. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasCommercialPaddleSilhouette() const;
@@ -193,9 +197,61 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetProductionHelmetHeadErrorCm() const;
 
+    /** Dot product between the shell's authored front and the rendered face direction. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetProductionHelmetForwardAlignment() const;
+
+    /** Effective identity-calibrated uniform scale of the production helmet. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetProductionHelmetFitScale() const;
+
     /** Distance between the authored PFD origin and deterministic torso solve. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetProductionPfdTorsoErrorCm() const;
+
+    /** True when the production character retains the pose-matched wetsuit waist/hip volume. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasVisibleWaistHipSilhouette() const;
+
+    /** Half-extents of the retained waist/hip volume in centimetres. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetWaistHipExtentCm() const;
+
+    /** Distance between the visible waist/hip volume and the solved hip centre. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetWaistHipCenterErrorCm() const;
+
+    /** True when the pelvis and pose-matched thigh roots all use opaque materials. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool IsWaistHipMaterialOpaque() const;
+
+    /** Smallest half-extent shared by the two retained wetsuit thigh bridges. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetMinimumHipThighBridgeExtentCm() const;
+
+    /** Largest distance from either solved hip to its buried thigh-bridge centreline. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumHipThighBridgeCoverageErrorCm() const;
+
+    /** True when both tapered thigh overlays overlap their solved knees without oversizing them. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasContinuousThighKneeSilhouette() const;
+
+    /** Largest distance from either solved knee to its tapered thigh centreline. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumThighKneeBridgeCoverageErrorCm() const;
+
+    /** True when two pose-matched splash-jacket sleeves bridge the PFD to the assembled arms. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasVisibleShoulderSilhouette() const;
+
+    /** Smallest half-extent shared by the two visible proximal shoulder sleeves. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetMinimumShoulderSleeveExtentCm() const;
+
+    /** Largest distance between a sleeve's proximal endpoint and its solved shoulder joint. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumShoulderSleeveAnchorErrorCm() const;
 
     /** Keep one posed production-body caster instead of duplicate character layers. */
     void SetProductionBodyOnlyShadowMode(bool bEnabled);
@@ -249,6 +305,8 @@ private:
 
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Pelvis;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Torso;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> LeftShoulderSleeve;
+    UPROPERTY() TObjectPtr<UProceduralMeshComponent> RightShoulderSleeve;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Pfd;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdRearWebbing;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> PfdBelt;

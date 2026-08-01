@@ -1,0 +1,79 @@
+{
+  "artifact": "M9 seat-side paddle orientation V1 review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_animation_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The shared crew pose placed each ordinary paddle blade inboard while perspective concealed the problem on port, and the high-side pose aimed every paddle toward the commanded tube. Starboard passengers therefore crossed their paddles through the raft. V1 keeps the T-grip inboard and the blade outboard for each assigned seat, mirrors the anatomical T-grip and lower-shaft hand assignment, uses opposing seat-side strokes for turns, and preserves the coordinated high-side body translation while leaving each brace paddle outside its own tube and down at the waterline.",
+  "implementation": {
+    "ordinary_t_grip_side": "inboard",
+    "ordinary_blade_side": "outboard",
+    "port_lower_shaft_hand": "left",
+    "starboard_lower_shaft_hand": "right",
+    "turn_strokes": "opposing_forward_and_back_with_both_blades_outboard",
+    "high_side_body_translation_changed": false,
+    "high_side_paddle_side": "assigned_seat_outboard",
+    "high_side_local_blade_z_max_cm": -10.0,
+    "contact_starboard_review_camera_added": true,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "physics_forces_changed": false,
+    "crew_mass_changed": false
+  },
+  "renderer_evidence": {
+    "contact_port": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_contact_port.png",
+      "capture_sha256": "354806e30509055219e3e45fa02b93bdfe7e1318c5f7c4fb234a69f0edd17c41",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_contact_port.log",
+      "log_sha256": "3b29590daa602c8d40a5f1b367cdd66cc5e8e21851847fe16b497878260a00a7"
+    },
+    "contact_starboard": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_contact_starboard.png",
+      "capture_sha256": "ef4dbc9f1b1938e50fecab1b8245276e8d2400d3521644e529a98d7bda3ba8be",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_contact_starboard.log",
+      "log_sha256": "94dc625dadf2734d7f540fc1263a43b2c326b414ca2121549e491cfa72ebf8cf"
+    },
+    "technical_verdict": "pass: direct port and starboard views show both seat-side blades outside the raft and reaching the water; no passenger paddle crosses the raft interior; the live four-contact D4 wrap and coordinated high-side body response remain active"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "2ddd24f9e6776061fe092e72b50b1ab63d030e1afbdb590ee72a9bac4ee89eba",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "4aef3ebf7a7444f3da33261e00d6fb7477551cf8ce1d11cb2037e26c7b5dac2e",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "0cc89193aed83231b417c39b9f90f009655b3eacfdd110bd824b693cfa130db3"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "44/44 production-character and editor-source-layout checks passed",
+    "related_python": "1148 passed, 3 expected installed-dependency inverse-path skips, 0 failed in 419.151 seconds",
+    "python_report": "physics/reports/m9/m9_v467_seat_side_paddle_full_matrix.xml",
+    "python_report_sha256": "0215934f5353a51c74b374ff556f5ea462b829f2768e609910558dfd1cdeb7a3",
+    "m4": "4/4 passed (M9V465PaddleSideM4)",
+    "m4_report": "unreal/Saved/Automation/M9V465PaddleSideM4/index.json",
+    "m4_report_sha256": "e62c47a4d950cc125da5b4ba577f9226b332f53fcd1cf92adf7b40e3f0aee95f",
+    "m5": "5/5 leaf tests passed renderer-enabled (M9V463PaddleSideM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V463PaddleSideM5Renderer/index.json",
+    "m5_report_sha256": "55ecdf4e74311d9ba353648147ee26b5a1eb4280b5a7b7f17df66533c9a4b626",
+    "m7": "4/4 leaf tests passed renderer-enabled (M9V464PaddleSideM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V464PaddleSideM7Renderer/index.json",
+    "m7_report_sha256": "98e7e7188bd2f33decf0eff518dfffa8d03a3889fa20bb515b4423ae2bce2867",
+    "m8": "4/4 passed renderer-enabled (M9V466PaddleSideM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V466PaddleSideM8Renderer/index.json",
+    "m8_report_sha256": "f786abd7ab49a0c0715cec175409b8e0eb03e492e1c6db18a142c8eb79dc847b",
+    "m9": "6/6 passed (M9V468PaddleSideM9)",
+    "m9_report": "unreal/Saved/Automation/M9V468PaddleSideM9/index.json",
+    "m9_report_sha256": "9881ff83b12f13318e40e3c12b7b192316c13459ade9e29e6299ef9279b642ae"
+  },
+  "reviewers": {
+    "named_character_animation_art_reviewer": null,
+    "qualified_south_fork_guide": null,
+    "art_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "A named character-animation or art reviewer must approve the mirrored grip, stroke silhouette, and high-side brace in motion.",
+    "A qualified South Fork guide must approve paddle placement and high-side readability at Meat Grinder.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

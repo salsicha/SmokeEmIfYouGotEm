@@ -1,0 +1,137 @@
+{
+  "schema": "raftsim.m9.continuous_thigh_knee_review.v1",
+  "reviewed_utc": "2026-07-31T22:30:00Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "summary": "The retained production thigh previously stopped at 0.58 of the solved hip-to-knee segment, leaving a visible diagonal break before the assembled knee and allowing the knee volume to dominate the profile. Continuous Thigh/Knee V1 extends the closed tapered wetsuit thigh through the solved knee, gives the thigh a larger proximal volume, and narrows the mesh toward the knee. Guide, broadest, and smallest-body front/profile/rear captures now show a continuous thigh-to-knee silhouette with the knee transition narrower than the thigh.",
+  "root_cause": {
+    "disconnected_joint": "The opaque profile-hip bridge ended at 0.58 of the solved hip-to-knee segment, leaving the distal thigh uncovered before the assembled knee.",
+    "oversized_knee_relationship": "The short retained thigh was only 6.8 cm at maximum radius, so the assembled knee read as a separate larger mass instead of a continuation of the upper leg.",
+    "retained_shape": "The existing 377-vertex closed tapered tube is extended from -0.15 to 1.06 of the solved hip-to-knee segment. Its 8.0 cm maximum radius fills the upper leg while the analytic end profile narrows toward the knee, and both caps remain buried inside overlapping pelvis or assembled-leg geometry."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "continuous_thighs_per_avatar": 2,
+    "reference_maximum_thigh_radius_cm": 8.0,
+    "bridge_start_fraction": -0.15,
+    "bridge_end_fraction": 1.06,
+    "minimum_allowed_runtime_radius_cm": 7.2,
+    "minimum_allowed_runtime_half_length_cm": 15.5,
+    "maximum_allowed_knee_centreline_error_cm": 0.25,
+    "bridge_material": "/Game/RaftSim/Materials/M_RaftSim_Wetsuit",
+    "material_blend_mode": "BLEND_Opaque",
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "collision_changed": false,
+    "physics_or_gameplay_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_roster_capture.json",
+    "report_sha256": "8ccb4ce304498daf320ae78a231e60719b5e39b4edbe03a218fa55cc324ded57",
+    "captured_character_count": 5,
+    "characters_with_continuous_thigh_knee_silhouette": 5,
+    "minimum_thigh_radius_cm": 7.479037284851074,
+    "minimum_thigh_half_length_cm": 19.632225863208998,
+    "maximum_knee_centreline_error_cm": 2.3936797433066204e-8
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_guide_full.png",
+      "capture_sha256": "63bcc9700f2b4ff6947f0d602f7f4dafc0efff97f0dce5bea9903b348332df54"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_guide_profile.png",
+      "capture_sha256": "85d5f7f0a9929248e121f25643f4493a1e041b9f64f8c5d0b16ffd5ae1144ecf"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_guide_rear.png",
+      "capture_sha256": "19b277e1a9c47c891d2ca376ada5abf6257a67c807bb31dab1eeca6ac6efe284"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_broadest_full.png",
+      "capture_sha256": "016a7116b09b70d6102a71e56b816684b69d2cdf6718489f84c3851a13977187"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_broadest_profile.png",
+      "capture_sha256": "a2ebbff6dd9fea5f2b57d964783e1784e4e2bde8bff0afaadd50dac80c54508b"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_broadest_rear.png",
+      "capture_sha256": "011cefc2773c568231221365754e19f3e3780cee1b86053ea949325715f29547"
+    },
+    "smallest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_smallest_full.png",
+      "capture_sha256": "d2d27b979c7070e001e6dcdbe9f93b142bc37e8a40cb660706d910669c029bd7"
+    },
+    "smallest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_smallest_profile.png",
+      "capture_sha256": "328ff7f7be21eedf0ac8c31d6f69653d9c5019bca5c91ffc4ced298b955812bc"
+    },
+    "smallest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_smallest_rear.png",
+      "capture_sha256": "6ef5ffb3b72e366bde9163c335be49b83d06de0da34db246e1c68d2169b64692"
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: all five turntables retain continuous hip-to-knee geometry; guide, broadest, and smallest profiles show a tapered thigh whose knee transition no longer dominates the upper leg",
+    "photoreal_verdict": "fail pending named review or replacement of the still-simplified procedural thigh anatomy, deformation, seams and wet material response"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+    "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 production-character, safety-gear, and flexible-raft source contracts passed",
+    "renderer_turntable": "5/5 identities and 30/30 PNG outputs captured",
+    "m4": "4/4 passed (M9V586ContinuousThighKneeM4)",
+    "m4_report": "unreal/Saved/Automation/M9V586ContinuousThighKneeM4/index.json",
+    "m4_report_sha256": "1841471e5fc6afd08dd64a7fc060965d5467773b27c7c43dc1f04428b55220d9",
+    "m5": "5/5 passed renderer-enabled, including live thigh visibility, closed tapered-mesh density, extent and solved-knee coverage assertions (M9V585ContinuousThighKneeM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V585ContinuousThighKneeM5Renderer/index.json",
+    "m5_report_sha256": "51397b43654535f8975a5a8d5c2a41631951ce1f862270fa1f87ea6869797f52",
+    "m7": "4/4 passed offscreen-rendered (M9V587ContinuousThighKneeM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V587ContinuousThighKneeM7Renderer/index.json",
+    "m7_report_sha256": "e8e9ac2f69672d335f6ccfbb863f81f098f6ca09198288039456f85b758066b2",
+    "m8": "4/4 passed offscreen-rendered (M9V588ContinuousThighKneeM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V588ContinuousThighKneeM8Renderer/index.json",
+    "m8_report_sha256": "ba624deb2333bf7eec5e8de791d049a98705a3bb9f82b61c5d4a3bfe38308bfe",
+    "full_python": "1148 passed, three expected installed-dependency inverse-path skips, and zero failures in 428.19 seconds (M9V589ContinuousThighKnee)",
+    "full_python_report": "physics/reports/m9/m9_v589_continuous_thigh_knee_full_matrix.xml",
+    "full_python_report_sha256": "1a4b08866846e32c64b90c94666f323208fe44a54d87ed9d40fdca7e0708cf25",
+    "m9": "6/6 passed after continuous thigh/knee V1 evidence reconciliation (M9V590ContinuousThighKneeReconciledM9)",
+    "m9_report": "unreal/Saved/Automation/M9V590ContinuousThighKneeReconciledM9/index.json",
+    "m9_report_sha256": "1b24c9f577f4c3018466f0472a208d96eb73d7574ae2cced7c6f07f861a4055c",
+    "m9_exact_confirmation": "6/6 passed against the reconciled continuous thigh/knee V1 manifest (M9V591ContinuousThighKneeExactM9)",
+    "m9_exact_confirmation_report": "unreal/Saved/Automation/M9V591ContinuousThighKneeExactM9/index.json",
+    "m9_exact_confirmation_report_sha256": "2768e42c42f5753ffd619800ab0d765bd78d6116ba634030da4c12719009e6d7"
+  },
+  "accepted": [
+    "All five production characters now retain an uninterrupted thigh-to-knee silhouette in front, profile, and rear views.",
+    "The broadest and smallest body variants both preserve the intended larger-thigh, narrower-knee relationship.",
+    "Each solved knee lies on the retained thigh centreline within 0.000001 cm and all identities exceed the geometry extent floors.",
+    "The retained mesh is closed, opaque, tapered, and overlaps both adjacent anatomy assemblies.",
+    "No animation, body mass, collision, raft, water, rescue, or gameplay-force authority changed."
+  ],
+  "rejected_or_open": [
+    "The prior 0.58-length thigh was rejected because it visibly stopped before the knee and made the knee look oversized.",
+    "A thin distal-only patch was rejected because it would preserve the weak upper-leg proportion instead of correcting the full silhouette.",
+    "The retained procedural thighs remain visibly simplified, particularly in rear-view muscle shape, and do not satisfy final photoreal character-art acceptance.",
+    "No named character-art reviewer or qualified guide has approved these captures for release media."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the thigh/knee anatomy, deformation, seams, and wet-material response.",
+    "A qualified whitewater guide must approve seated knee articulation and paddle-stroke biomechanics in motion.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance, and promotion gates."
+  ]
+}

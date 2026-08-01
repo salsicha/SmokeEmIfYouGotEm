@@ -4,8 +4,11 @@
 #include "Components/MeshComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "Misc/AutomationTest.h"
 #include "ProceduralMeshComponent.h"
+#include "RaftSimRaftActor.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "Tests/AutomationCommon.h"
 
@@ -52,6 +55,85 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     {
         Test->AddError(TEXT("No water surface actor spawned with the raft"));
         return true;
+    }
+
+    UMaterialParameterCollection* FoamOcclusionCollection =
+        LoadObject<UMaterialParameterCollection>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+                 "MPC_RaftSim_RaftFoamOcclusion"));
+    Test->TestNotNull(
+        TEXT("raft foam exclusion collection is loadable"),
+        FoamOcclusionCollection);
+    if (FoamOcclusionCollection)
+    {
+        UMaterialParameterCollectionInstance* FoamOcclusion =
+            World->GetParameterCollectionInstance(FoamOcclusionCollection);
+        Test->TestNotNull(
+            TEXT("game world has a foam exclusion collection instance"),
+            FoamOcclusion);
+        if (FoamOcclusion)
+        {
+            float Enabled = 0.0f;
+            FLinearColor CenterAndWidth = FLinearColor::Transparent;
+            FLinearColor ForwardAndLength = FLinearColor::Transparent;
+            float InteriorWaterEnabled = 0.0f;
+            FLinearColor InteriorCenterAndWidth = FLinearColor::Transparent;
+            FLinearColor InteriorForwardAndLength = FLinearColor::Transparent;
+            Test->TestTrue(
+                TEXT("foam exclusion enable parameter exists"),
+                FoamOcclusion->GetScalarParameterValue(
+                    TEXT("RaftFoamExclusionEnabled"), Enabled));
+            Test->TestTrue(
+                TEXT("foam exclusion center parameter exists"),
+                FoamOcclusion->GetVectorParameterValue(
+                    TEXT("RaftFoamExclusionCenterAndHalfWidthCm"),
+                    CenterAndWidth));
+            Test->TestTrue(
+                TEXT("foam exclusion forward parameter exists"),
+                FoamOcclusion->GetVectorParameterValue(
+                    TEXT("RaftFoamExclusionForwardAndHalfLengthCm"),
+                    ForwardAndLength));
+            Test->TestTrue(
+                TEXT("raft-interior transmission enable parameter exists"),
+                FoamOcclusion->GetScalarParameterValue(
+                    TEXT("RaftInteriorWaterTransmissionEnabled"),
+                    InteriorWaterEnabled));
+            Test->TestTrue(
+                TEXT("raft-interior transmission center parameter exists"),
+                FoamOcclusion->GetVectorParameterValue(
+                    TEXT("RaftInteriorWaterCenterAndHalfWidthCm"),
+                    InteriorCenterAndWidth));
+            Test->TestTrue(
+                TEXT("raft-interior transmission forward parameter exists"),
+                FoamOcclusion->GetVectorParameterValue(
+                    TEXT("RaftInteriorWaterForwardAndHalfLengthCm"),
+                    InteriorForwardAndLength));
+            Test->TestEqual(
+                TEXT("raft-present world enables the foam exclusion"),
+                Enabled,
+                1.0f);
+            Test->TestEqual(
+                TEXT("foam exclusion protects the seated-crew beam"),
+                CenterAndWidth.A,
+                190.0f);
+            Test->TestEqual(
+                TEXT("foam exclusion protects the deformed raft length"),
+                ForwardAndLength.A,
+                320.0f);
+            Test->TestEqual(
+                TEXT("raft-present world enables interior water transmission"),
+                InteriorWaterEnabled,
+                1.0f);
+            Test->TestEqual(
+                TEXT("transmission aperture clears the complete floor beam"),
+                InteriorCenterAndWidth.A,
+                82.0f);
+            Test->TestEqual(
+                TEXT("transmission aperture clears the complete floor length"),
+                InteriorForwardAndLength.A,
+                215.0f);
+        }
     }
 
     UProceduralMeshComponent* Mesh =

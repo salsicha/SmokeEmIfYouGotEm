@@ -1,4 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Materials/MaterialExpressionCollectionParameter.h"
+#include "Materials/MaterialParameterCollection.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -2325,6 +2327,225 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     return Material;
 }
 
+UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
+    FString& OutSummary)
+{
+    static const TCHAR* CollectionPackagePath =
+        TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion");
+    static const TCHAR* CollectionObjectPath =
+        TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+             "MPC_RaftSim_RaftFoamOcclusion");
+
+    UPackage* Package = CreatePackage(CollectionPackagePath);
+    if (!Package)
+    {
+        OutSummary += TEXT(
+            "Failed to create the raft foam-occlusion parameter collection package.\n");
+        return nullptr;
+    }
+    UMaterialParameterCollection* Collection =
+        LoadObject<UMaterialParameterCollection>(nullptr, CollectionObjectPath);
+    if (!Collection)
+    {
+        Collection = NewObject<UMaterialParameterCollection>(
+            Package,
+            TEXT("MPC_RaftSim_RaftFoamOcclusion"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Collection)
+        {
+            FAssetRegistryModule::AssetCreated(Collection);
+        }
+    }
+    if (!Collection)
+    {
+        OutSummary += TEXT(
+            "Failed to create the raft foam-occlusion parameter collection.\n");
+        return nullptr;
+    }
+
+    Collection->Modify();
+    auto EnsureScalar = [Collection](FName Name, float DefaultValue)
+    {
+        const int32 ExistingIndex = Collection->ScalarParameters.IndexOfByPredicate(
+            [Name](const FCollectionScalarParameter& Parameter)
+            {
+                return Parameter.ParameterName == Name;
+            });
+        if (ExistingIndex != INDEX_NONE)
+        {
+            Collection->ScalarParameters[ExistingIndex].DefaultValue =
+                DefaultValue;
+            return;
+        }
+        FCollectionScalarParameter Parameter;
+        Parameter.ParameterName = Name;
+        Parameter.DefaultValue = DefaultValue;
+        Collection->ScalarParameters.Add(Parameter);
+    };
+    auto EnsureVector =
+        [Collection](FName Name, const FLinearColor& DefaultValue)
+    {
+        const int32 ExistingIndex = Collection->VectorParameters.IndexOfByPredicate(
+            [Name](const FCollectionVectorParameter& Parameter)
+            {
+                return Parameter.ParameterName == Name;
+            });
+        if (ExistingIndex != INDEX_NONE)
+        {
+            Collection->VectorParameters[ExistingIndex].DefaultValue =
+                DefaultValue;
+            return;
+        }
+        FCollectionVectorParameter Parameter;
+        Parameter.ParameterName = Name;
+        Parameter.DefaultValue = DefaultValue;
+        Collection->VectorParameters.Add(Parameter);
+    };
+    EnsureScalar(TEXT("RaftFoamExclusionEnabled"), 0.0f);
+    EnsureVector(
+        TEXT("RaftFoamExclusionCenterAndHalfWidthCm"),
+        FLinearColor(0.0f, 0.0f, 0.0f, 190.0f));
+    EnsureVector(
+        TEXT("RaftFoamExclusionForwardAndHalfLengthCm"),
+        FLinearColor(1.0f, 0.0f, 0.0f, 320.0f));
+    // The broad Single Layer Water surface needs a much tighter opening than
+    // the foam/crew exclusion. These independently sized parameters expose
+    // only the self-bailing floor instead of punching a water-free halo around
+    // the complete raft and paddles.
+    EnsureScalar(TEXT("RaftInteriorWaterTransmissionEnabled"), 0.0f);
+    EnsureVector(
+        TEXT("RaftInteriorWaterCenterAndHalfWidthCm"),
+        FLinearColor(0.0f, 0.0f, 0.0f, 82.0f));
+    EnsureVector(
+        TEXT("RaftInteriorWaterForwardAndHalfLengthCm"),
+        FLinearColor(1.0f, 0.0f, 0.0f, 215.0f));
+    Collection->StateId = FGuid::NewGuid();
+    Collection->PostEditChange();
+    Package->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        CollectionPackagePath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Collection->GetPackage(), Collection, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT(
+            "Failed to save the raft foam-occlusion parameter collection.\n");
+        return nullptr;
+    }
+    return Collection;
+}
+
+UMaterialInterface* LoadOrCreateReadableRaftFloorMaterial(FString& OutSummary)
+{
+    static const TCHAR* SourcePath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube");
+    static const TCHAR* PackagePath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable");
+    static const TCHAR* ObjectName = TEXT("M_RaftSim_RaftFloorReadable");
+    static const TCHAR* ObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable."
+             "M_RaftSim_RaftFloorReadable");
+
+    UMaterial* Source = LoadObject<UMaterial>(nullptr, SourcePath);
+    UPackage* Package = CreatePackage(PackagePath);
+    if (!Source || !Package)
+    {
+        OutSummary += TEXT(
+            "Could not load the coated-fabric source for the readable raft floor.\n");
+        return nullptr;
+    }
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, ObjectPath);
+    if (!Material)
+    {
+        Material = DuplicateObject<UMaterial>(Source, Package, ObjectName);
+        if (!Material)
+        {
+            OutSummary += TEXT("Could not duplicate the readable raft floor material.\n");
+            return nullptr;
+        }
+        Material->SetFlags(RF_Public | RF_Standalone | RF_Transactional);
+        FAssetRegistryModule::AssetCreated(Material);
+    }
+
+    bool bHasShadowFill = false;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (Expression && Expression->Desc == TEXT("RaftSimRaftFloorShadowFill"))
+        {
+            bHasShadowFill = true;
+            break;
+        }
+    }
+    Material->Modify();
+    if (!bHasShadowFill)
+    {
+        UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
+        UMaterialExpression* FloorColor =
+            EditorData ? EditorData->BaseColor.Expression : nullptr;
+        if (!EditorData || !FloorColor)
+        {
+            OutSummary += TEXT(
+                "The coated-fabric source lacks a base-colour graph for floor fill.\n");
+            return nullptr;
+        }
+        // The tubes place the self-bailing floor in deep geometric shadow.
+        // Reuse its wet coated-fabric colour as bounded indirect bounce rather
+        // than an unrelated glow, so ribs and seams remain visible under the
+        // raft while direct-sun response and authored roughness stay intact.
+        UMaterialExpressionScalarParameter* ShadowFill =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        ShadowFill->ParameterName = TEXT("FloorShadowFill");
+        ShadowFill->DefaultValue = 0.28f;
+        ShadowFill->Group = TEXT("RaftSimRaftFloor");
+        Material->GetExpressionCollection().AddExpression(ShadowFill);
+        UMaterialExpressionMultiply* FilledFloorColor =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FilledFloorColor->Desc = TEXT("RaftSimRaftFloorShadowFill");
+        FilledFloorColor->A.Expression = FloorColor;
+        FilledFloorColor->B.Expression = ShadowFill;
+        Material->GetExpressionCollection().AddExpression(FilledFloorColor);
+        EditorData->EmissiveColor.Connect(0, FilledFloorColor);
+    }
+
+    Material->PostEditChange();
+    Material->ForceRecompileForRendering();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    FMaterialResource* Resource =
+        Material->GetMaterialResource(GMaxRHIShaderPlatform);
+    if (!Resource ||
+        Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform) ||
+        !Resource->GetCompileErrors().IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("Readable raft floor shader validation failed: %s\n"),
+            Resource
+                ? *FString::Join(Resource->GetCompileErrors(), TEXT(" | "))
+                : TEXT("no platform material resource"));
+        return nullptr;
+    }
+    Package->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT("Could not save the readable raft floor material.\n");
+        return nullptr;
+    }
+    return Material;
+}
+
 UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& OutSummary)
 {
     static const TCHAR* MaterialPackagePath =
@@ -2359,6 +2580,13 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     if (!Material)
     {
         OutSummary += TEXT("Failed to create the solver-field foam material.\n");
+        return nullptr;
+    }
+
+    UMaterialParameterCollection* FoamOcclusionCollection =
+        LoadOrCreateRaftFoamOcclusionCollection(OutSummary);
+    if (!FoamOcclusionCollection)
+    {
         return nullptr;
     }
 
@@ -2408,6 +2636,85 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
         FoamMaskExpression = SolverMaskedLace;
         FoamMaskOutputIndex = 0;
     }
+
+    // The full-reach whitewater sheet is intentionally raised above the broad
+    // water body, but it must not become a decal over the raft or its crew.
+    // A runtime-updated material collection cuts a feathered, raft-aligned
+    // ellipse only from this presentation layer. Water depth, contact spray,
+    // D3/D4 state, collision, and every solver-authored foam value are intact.
+    auto CollectionParameter =
+        [Material, FoamOcclusionCollection](FName Name, bool bScalar)
+            -> UMaterialExpressionCollectionParameter*
+    {
+        UMaterialExpressionCollectionParameter* Expression =
+            NewObject<UMaterialExpressionCollectionParameter>(Material);
+        Expression->Collection = FoamOcclusionCollection;
+        Expression->ParameterName = Name;
+        Expression->ExpressionGUID = FGuid::NewGuid();
+        const int32 ParameterIndex = bScalar
+            ? FoamOcclusionCollection->ScalarParameters.IndexOfByPredicate(
+                [Name](const FCollectionScalarParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                })
+            : FoamOcclusionCollection->VectorParameters.IndexOfByPredicate(
+                [Name](const FCollectionVectorParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                });
+        if (ParameterIndex != INDEX_NONE)
+        {
+            Expression->ParameterId = bScalar
+                ? FoamOcclusionCollection->ScalarParameters[ParameterIndex].Id
+                : FoamOcclusionCollection->VectorParameters[ParameterIndex].Id;
+        }
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    UMaterialExpressionWorldPosition* WorldPosition =
+        NewObject<UMaterialExpressionWorldPosition>(Material);
+    Material->GetExpressionCollection().AddExpression(WorldPosition);
+    UMaterialExpressionCollectionParameter* ExclusionEnabled =
+        CollectionParameter(TEXT("RaftFoamExclusionEnabled"), true);
+    UMaterialExpressionCollectionParameter* ExclusionCenter =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionCenterAndHalfWidthCm"), false);
+    UMaterialExpressionCollectionParameter* ExclusionForward =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionForwardAndHalfLengthCm"), false);
+    UMaterialExpressionCustom* RaftExclusion =
+        NewObject<UMaterialExpressionCustom>(Material);
+    RaftExclusion->Description = TEXT("Raft and crew foam-layer exclusion");
+    RaftExclusion->OutputType = CMOT_Float1;
+    RaftExclusion->Code = TEXT(
+        "float2 Delta = WorldPosition.xy - CenterAndHalfWidth.xy;\n"
+        "float2 Forward = normalize(ForwardAndHalfLength.xy + float2(1e-5, 0.0));\n"
+        "float Along = dot(Delta, Forward) / max(ForwardAndHalfLength.w, 1.0);\n"
+        "float Across = dot(Delta, float2(-Forward.y, Forward.x)) / max(CenterAndHalfWidth.w, 1.0);\n"
+        "float EllipseSquared = Along * Along + Across * Across;\n"
+        "float OutsideRaft = smoothstep(0.62, 1.0, EllipseSquared);\n"
+        "return lerp(1.0, OutsideRaft, saturate(Enabled));");
+    auto AddCustomInput = [RaftExclusion](
+        FName Name, UMaterialExpression* Expression)
+    {
+        FCustomInput Input;
+        Input.InputName = Name;
+        Input.Input.Expression = Expression;
+        RaftExclusion->Inputs.Add(Input);
+    };
+    AddCustomInput(TEXT("WorldPosition"), WorldPosition);
+    AddCustomInput(TEXT("CenterAndHalfWidth"), ExclusionCenter);
+    AddCustomInput(TEXT("ForwardAndHalfLength"), ExclusionForward);
+    AddCustomInput(TEXT("Enabled"), ExclusionEnabled);
+    Material->GetExpressionCollection().AddExpression(RaftExclusion);
+    UMaterialExpressionMultiply* OcclusionSafeFoamMask =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    OcclusionSafeFoamMask->A.Expression = FoamMaskExpression;
+    OcclusionSafeFoamMask->A.OutputIndex = FoamMaskOutputIndex;
+    OcclusionSafeFoamMask->B.Expression = RaftExclusion;
+    Material->GetExpressionCollection().AddExpression(OcclusionSafeFoamMask);
+    FoamMaskExpression = OcclusionSafeFoamMask;
+    FoamMaskOutputIndex = 0;
     UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
     Roughness->R = 0.82f;
     Material->GetExpressionCollection().AddExpression(Roughness);

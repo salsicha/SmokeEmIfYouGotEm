@@ -8,7 +8,7 @@
     "docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
     "docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png"
   ],
-  "detailed_mesh_reuse_requested": false,
+  "detailed_mesh_reuse_requested": true,
   "deterministic_actor_guid_count": 200,
   "deterministic_actor_guids": true,
   "deterministic_actor_object_name_count": 200,
@@ -17,9 +17,9 @@
   "generated_on": "2026-07-19",
   "hlod_actor_count": 28,
   "hlod_evidence": {
-    "byte_count": 8022,
+    "byte_count": 7999,
     "path": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
-    "sha256": "e7e74ccb011dd38527d42c094857ed7f6ebdcb114386af25c2ce2eb92b3f8c98"
+    "sha256": "3edd731da085f01cbb53aa4846b37292dfd830454935712ae2a2aafc63e8be7d"
   },
   "hlod_generation_complete": true,
   "hlod_status": "built_and_validated_terminal_instancing",
@@ -32,10 +32,10 @@
     "far_field_patches": 8,
     "far_field_pine_card_instances": 85368,
     "far_field_triangles": 2049736,
-    "foliage_instances": 70567,
+    "foliage_instances": 82609,
     "infrastructure_actors": 72,
     "local_reflection_probes": 13,
-    "procedural_noncolliding_ground_cover_instances": 168322,
+    "procedural_noncolliding_ground_cover_instances": 220759,
     "procedural_noncolliding_shore_cobble_instances": 15702,
     "procedural_shoreline_completion_vertices": 10892,
     "procedural_shoreline_transition_cells": 86243,

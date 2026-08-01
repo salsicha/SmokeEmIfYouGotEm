@@ -1,0 +1,151 @@
+{
+  "schema": "raftsim.m9.upright_fitted_production_river_boot_review.v1",
+  "recorded_local_date": "2026-07-31",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "promotion_allowed": false,
+  "summary": "The source boot was upright, but the runtime used its full 23.575 cm height while a deeply flexed seated knee was only 13 cm above the solved foot. The cuff could therefore rise through or above the knee and read as inverted. V1 constructs a toe-forward and cuff-up basis explicitly, fits the source to 0.88 x 0.92 x 0.68 before identity scaling, and offsets from the source sole bound so the tread remains on the exact prior support plane.",
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_boot.py",
+    "generator_sha256": "a7536e622435a411c85b7a10cb3b58a33b6d4407381e8a91ca58fe31bac74922",
+    "importer": "unreal/Scripts/import_production_whitewater_boot.py",
+    "importer_sha256": "28f7ba7d1743c44e5330c77786fff26a0a4050a8362ef4b715d160623236ad33",
+    "material_builder": "unreal/Scripts/create_production_whitewater_boot_materials.py",
+    "material_builder_sha256": "6da2aa20e0c9c693c31b0e4736ae26d1517c688024d7ffcf663ab428c738156c",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/production_whitewater_river_boot_manifest.json",
+    "manifest_sha256": "551bbe148be9eea6185478216d74b76fad89f49a5be3d2c9b40bc9c27a4fce7d",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/SM_RaftSim_WhitewaterRiverBoot.blend",
+    "blend_sha256": "eb7b038dd8a23cc9cf8e9f445f37f666f2a61839cadcfbb15df5d9e1b188de62",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/SM_RaftSim_WhitewaterRiverBoot.fbx",
+    "fbx_sha256": "ac5f9a53fd9dd00f14847aaa5e6ef1e0cf9c9fa1b0cdb52160facb68fd375359",
+    "external_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRiverBoot",
+    "uasset_sha256": "02c17a777d8b93500dd8092718b051ba72cd3c2c9257feba9394e60b03ae946d",
+    "dimensions_cm": [33.34, 13.5, 23.575],
+    "authored_lod0_triangles": 9708,
+    "nanite_fallback_triangles": 1704,
+    "nanite_enabled": true,
+    "material_slot_count": 3,
+    "outsole_lugs": 12,
+    "vamp_drain_bands": 3,
+    "pull_tabs": 1,
+    "collision": "disabled",
+    "physics_or_gameplay_changes": false
+  },
+  "materials": {
+    "upper_asset": "/Game/RaftSim/Materials/M_RaftSim_RiverBootUpper",
+    "upper_asset_sha256": "b5cd7e8580acabc92b2808ae55c6ebcb26e91687184aaeaafa5224e5557a5be3",
+    "upper_base_tint_linear": [0.018, 0.023, 0.028],
+    "rubber_asset": "/Game/RaftSim/Materials/M_RaftSim_RiverBootRubber",
+    "rubber_asset_sha256": "33297dbf3cb0d54ea2ea6369f3d9baca54c39adfd622138a59b4756c27c4f36d",
+    "rubber_roughness": 0.62,
+    "report": "unreal/Saved/RaftSimValidation/m9/production-whitewater-river-boot-materials.json",
+    "report_sha256": "3f65ce1c6593c9b0d859302bac60183aed1f5390af3dbe9e20e41a8cc66c0e41",
+    "visual_only": true
+  },
+  "integration": {
+    "crew_runtime_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+    "crew_runtime_source_sha256": "980da706c6f5e2228e0ecfabc72a5eb32f80d9e41907e83636bef694694ecc0b",
+    "crew_runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+    "crew_runtime_header_sha256": "2565f31c326f0460b84f5bb8ea7b4b281a3d5e5970466d87d12633196cc6b8d7",
+    "native_test_source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+    "native_test_source_sha256": "0a397bde57081c582dd79a3e9c35cf20a2a0b70c8158d0dedd4c3a280b247a0a",
+    "capture_source": "unreal/Scripts/capture_metahuman_production_roster.py",
+    "capture_source_sha256": "df5013c7073a9b37090b23055360de04d96f30a9567bd5caf5ab2c02dadc078d",
+    "source_contract_test": "physics/tests/test_flexible_raft_visual_upgrade.py",
+    "source_contract_test_sha256": "2a91eab9c02a267ed8557ab7abc11d1476b2f417e8bb8891ae386805c9e353d8",
+    "toe_axis": "+X",
+    "cuff_axis": "+Z",
+    "presentation_scale": [0.88, 0.92, 0.68],
+    "sole_contact_preserved_from_source_minimum_z": true,
+    "production_roster_count": 5,
+    "production_boot_instances": 10,
+    "fitted_upright_boot_instances": 10,
+    "production_boot_collision_enabled": false,
+    "solved_foot_positions_remain_authority": true,
+    "physics_or_rescue_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_roster_capture.json",
+    "report_sha256": "078ec6a228fe9790980e063f1d60c0bfd450d478b3bfffab5ad327d37f7453f7",
+    "captured_character_count": 5,
+    "production_boot_instance_count": 10,
+    "fitted_upright_boot_instance_count": 10,
+    "minimum_toe_forward_alignment": 1.0,
+    "minimum_cuff_up_alignment": 1.0,
+    "minimum_presentation_scale": [0.836, 0.8464, 0.6392],
+    "maximum_presentation_scale": [0.924, 0.9844, 0.7004]
+  },
+  "import_audit": {
+    "report": "unreal/Saved/RaftSimValidation/m9/production-whitewater-river-boot.json",
+    "report_sha256": "11dd31143a9a1a0f362a1473d8810dadf5c06f6803b535cd81fd464ccf849fbd",
+    "status": "production_mesh_imported"
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_guide_full.png",
+      "capture_sha256": "044069b46d9d42d81e8c1900f355293f549d67d51fbc2b15fdd8f9b5ec532aae"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_guide_profile.png",
+      "capture_sha256": "2bc29dcc0021c840313ee2f8e9c57de2d10462edee1733abbddc14f6573f3c9b"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_guide_rear.png",
+      "capture_sha256": "0b1cdc604e90d7145eabefaa3c21b45242740c863f8e442ff6b007830f316cff"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_broadest_full.png",
+      "capture_sha256": "8383a33b6488d6d795c52389062245580237b81948a975e6bd02ec27f9093f00"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_broadest_profile.png",
+      "capture_sha256": "f7bb59843c70f1ef62ad7a539c0509787735d246aaf25e0d21ca234b12e717f2"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_upright_fitted_boot_v1_broadest_rear.png",
+      "capture_sha256": "2136b6ecbf31c776b1e54bdd40b8cfe9a641146de05806a907d49bf44104b485"
+    },
+    "technical_verdict": "pass: outsole remains below the upper, toe points forward, cuff terminates below the seated knee, and all ten boots remain planted",
+    "photoreal_verdict": "fail pending named review of rigid ankle deformation, fit, wet materials, tread, and identity-specific footwear motion"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 character, safety-gear, and flexible-raft source contracts passed",
+    "m4": "4/4 result entries passed (M9V556UprightFittedBootM4)",
+    "m4_report": "unreal/Saved/Automation/M9V556UprightFittedBootM4/index.json",
+    "m4_report_sha256": "ed66c34cbe458179afbadb7aba50bea1e13455013399dfa5013ff720a682e72c",
+    "m5": "5/5 result entries passed renderer-enabled, including fitted sole-down assertions (M9V555UprightFittedBootM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V555UprightFittedBootM5Renderer/index.json",
+    "m5_report_sha256": "8dc04bbd441f5c82a9118a5552e82847059789a4d31443c30db46eeca792ecad",
+    "m7": "4/4 result entries passed offscreen-rendered (M9V557UprightFittedBootM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V557UprightFittedBootM7Renderer/index.json",
+    "m7_report_sha256": "89038e64376dfc04cee82a32bc87ded62c1af1f3af6b65fd18ae5e8e396e4357",
+    "m8": "4/4 passed offscreen-rendered (M9V558UprightFittedBootM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V558UprightFittedBootM8Renderer/index.json",
+    "m8_report_sha256": "82d963ac49d89a9da23ea35996f7e7a54a259c5b1d94a76610cf70c5ced711f0",
+    "full_python": "1148 passed, 3 expected installed-dependency skips, 0 failed in 433.05 seconds (M9V559UprightFittedBoot)",
+    "full_python_report": "physics/reports/m9/m9_v559_upright_fitted_boot_full_matrix.xml",
+    "full_python_report_sha256": "e1aed354f79437102a8227c93c86a951274859c35471e0f22fde3c6b274ca66b",
+    "m9_reconciled": "6/6 passed (M9V560UprightFittedBootReconciledM9)",
+    "m9_reconciled_report": "unreal/Saved/Automation/M9V560UprightFittedBootReconciledM9/index.json",
+    "m9_reconciled_report_sha256": "d3f49f84c90a959df634a0ebf6ab8305e934963f033aef991a94da586946a333",
+    "m9_exact_confirmation": "6/6 passed from an independent user profile (M9V561UprightFittedBootExactM9)",
+    "m9_exact_confirmation_report": "unreal/Saved/Automation/M9V561UprightFittedBootExactM9/index.json",
+    "m9_exact_confirmation_report_sha256": "d3c09f514e313486c12b485a790c839bab56a9e961a0608d0af763badf56b70c"
+  },
+  "open_gates": [
+    "A named character-art reviewer and qualified guide must approve or replace the rigid procedural boot fit and motion.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance, and promotion gates."
+  ]
+}

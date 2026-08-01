@@ -5,6 +5,8 @@
 #include "HAL/PlatformTime.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
@@ -255,6 +257,15 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
             BreakingWaterMaterial = FallbackBreakingWaterMat.Object;
         }
     }
+
+    static ConstructorHelpers::FObjectFinder<UMaterialParameterCollection>
+        FoamOcclusionCollection(
+            TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+                 "MPC_RaftSim_RaftFoamOcclusion"));
+    if (FoamOcclusionCollection.Succeeded())
+    {
+        RaftFoamOcclusionCollection = FoamOcclusionCollection.Object;
+    }
 }
 
 float ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
@@ -363,8 +374,114 @@ void ARaftSimWaterSurfaceActor::BeginPlay()
         }
     }
 
+    UpdateRaftFoamExclusionParameters();
     BuildGrid();
     RefreshSurface();
+}
+
+void ARaftSimWaterSurfaceActor::UpdateRaftFoamExclusionParameters()
+{
+    UWorld* World = GetWorld();
+    if (!World || !RaftFoamOcclusionCollection)
+    {
+        return;
+    }
+    UMaterialParameterCollectionInstance* Parameters =
+        World->GetParameterCollectionInstance(RaftFoamOcclusionCollection);
+    if (!Parameters)
+    {
+        return;
+    }
+    if (!IsValid(FoamOcclusionRaft))
+    {
+        FoamOcclusionRaft = nullptr;
+        if (TActorIterator<ARaftSimRaftActor> RaftIt(World); RaftIt)
+        {
+            FoamOcclusionRaft = *RaftIt;
+        }
+    }
+    if (!FoamOcclusionRaft)
+    {
+        Parameters->SetScalarParameterValue(
+            TEXT("RaftFoamExclusionEnabled"), 0.0f);
+        Parameters->SetScalarParameterValue(
+            TEXT("RaftInteriorWaterTransmissionEnabled"), 0.0f);
+        return;
+    }
+
+    FVector Forward = FoamOcclusionRaft->GetActorForwardVector().GetSafeNormal2D();
+    if (Forward.IsNearlyZero())
+    {
+        Forward = FVector::ForwardVector;
+    }
+    const FVector Center = FoamOcclusionRaft->GetActorLocation();
+    // The inner 79% is fully clear and the remaining band feathers back to
+    // whitewater. Extents include deformed tubes, seated legs, and paddles at
+    // the waterline while keeping contact foam visible just outside the hull.
+    constexpr float RaftFoamExclusionHalfWidthCm = 190.0f;
+    constexpr float RaftFoamExclusionHalfLengthCm = 320.0f;
+    Parameters->SetVectorParameterValue(
+        TEXT("RaftFoamExclusionCenterAndHalfWidthCm"),
+        FLinearColor(
+            Center.X,
+            Center.Y,
+            Center.Z,
+            RaftFoamExclusionHalfWidthCm));
+    Parameters->SetVectorParameterValue(
+        TEXT("RaftFoamExclusionForwardAndHalfLengthCm"),
+        FLinearColor(
+            Forward.X,
+            Forward.Y,
+            Forward.Z,
+            RaftFoamExclusionHalfLengthCm));
+    Parameters->SetScalarParameterValue(
+        TEXT("RaftFoamExclusionEnabled"), 1.0f);
+    // Single Layer Water is intentionally opaque enough to hold the river's
+    // depth at guide-eye distance. When the physical waterline crosses the
+    // open raft, however, that same response hides the self-bailing floor as
+    // a flat slab. Drive a separate, floor-sized transmission window so the
+    // water remains present while the submerged interior is optically legible.
+    // The custom mask's fully clear core ends at 0.62^(1/4) ~= 0.887 of
+    // these rounded-rectangle extents. 82 x 215 cm therefore clears the
+    // complete 66 x 181 cm floor while its feather finishes beneath the tubes.
+    constexpr float RaftInteriorWaterHalfWidthCm = 82.0f;
+    constexpr float RaftInteriorWaterHalfLengthCm = 215.0f;
+    Parameters->SetVectorParameterValue(
+        TEXT("RaftInteriorWaterCenterAndHalfWidthCm"),
+        FLinearColor(
+            Center.X,
+            Center.Y,
+            Center.Z,
+            RaftInteriorWaterHalfWidthCm));
+    Parameters->SetVectorParameterValue(
+        TEXT("RaftInteriorWaterForwardAndHalfLengthCm"),
+        FLinearColor(
+            Forward.X,
+            Forward.Y,
+            Forward.Z,
+            RaftInteriorWaterHalfLengthCm));
+    Parameters->SetScalarParameterValue(
+        TEXT("RaftInteriorWaterTransmissionEnabled"), 1.0f);
+    if (!bLoggedRaftInteriorWaterTransmission ||
+        FVector::DistSquared2D(
+            Center, LastLoggedRaftInteriorWaterCenter) > FMath::Square(10000.0f))
+    {
+        bLoggedRaftInteriorWaterTransmission = true;
+        LastLoggedRaftInteriorWaterCenter = Center;
+        UE_LOG(
+            LogTemp,
+            Display,
+            TEXT("RaftSim raft-interior water transmission: enabled=1 "
+                 "center=(%.1f,%.1f,%.1f) forward=(%.3f,%.3f) "
+                 "half_width_cm=%.1f half_length_cm=%.1f"),
+            Center.X,
+            Center.Y,
+            Center.Z,
+            Forward.X,
+            Forward.Y,
+            RaftInteriorWaterHalfWidthCm,
+            RaftInteriorWaterHalfLengthCm);
+    }
 }
 
 void ARaftSimWaterSurfaceActor::BuildGrid()
@@ -1700,6 +1817,7 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
     if (TimeSinceRefresh >= RefreshIntervalSeconds)
     {
         TimeSinceRefresh = 0.0f;
+        UpdateRaftFoamExclusionParameters();
         RefreshSurface();
     }
 }

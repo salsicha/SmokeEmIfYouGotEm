@@ -15,9 +15,17 @@
 namespace
 {
 constexpr float kBaseRadiusCm = 50.0f;
-const FVector kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 12.0f);
+const FVector kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f);
+constexpr float kProductionHipThighBridgeStartFraction = -0.15f;
+constexpr float kProductionHipThighBridgeEndFraction = 1.06f;
+constexpr float kProductionHipThighBridgeRadiusCm = 8.0f;
+constexpr float kProductionShoulderSleeveRadiusCm = 5.2f;
+constexpr float kProductionShoulderSleeveArmFraction = 1.0f;
+const FVector kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.68f);
+const FVector kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 9.5f);
 const FVector kProductionHelmetShellOffsetCm(2.5f, 0.0f, 0.0f);
 const FVector kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f);
+constexpr float kProductionHelmetReferenceFit = 0.96f;
 
 void BuildUnitOrganicMesh(
     TArray<FVector>& Vertices,
@@ -58,6 +66,165 @@ void BuildUnitOrganicMesh(
             const int32 D = C + 1;
             Triangles.Append({A, C, B, B, C, D});
         }
+    }
+}
+
+void BuildUnitHipThighBridgeMesh(
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs,
+    TArray<FProcMeshTangent>& Tangents)
+{
+    // The production body needs only the wetsuit-covered transition from the
+    // retained pelvis through the assembled knee. A stretched sphere leaves a
+    // visible ball at each hip, while a short bridge exposes a diagonal gap at
+    // the knee. This closed, softly tapered tube keeps both narrow ends buried
+    // in overlapping meshes and carries fullness through the anatomical thigh.
+    constexpr int32 Rings = 14;
+    constexpr int32 Sides = 24;
+    const auto RadiusAt = [](float V)
+    {
+        const float SafeV = FMath::Clamp(V, 0.0f, 1.0f);
+        return 0.70f + 0.30f * FMath::Pow(
+            FMath::Max(FMath::Sin(PI * SafeV), 0.0f),
+            0.72f);
+    };
+    for (int32 Ring = 0; Ring <= Rings; ++Ring)
+    {
+        const float V = static_cast<float>(Ring) / Rings;
+        const float Z = -1.0f + 2.0f * V;
+        const float Radius = RadiusAt(V);
+        const float SampleStep = 1.0f / Rings;
+        const float PreviousV = FMath::Max(V - SampleStep, 0.0f);
+        const float NextV = FMath::Min(V + SampleStep, 1.0f);
+        const float DeltaZ = 2.0f * FMath::Max(NextV - PreviousV, UE_SMALL_NUMBER);
+        const float RadiusSlope = (RadiusAt(NextV) - RadiusAt(PreviousV)) / DeltaZ;
+        for (int32 Side = 0; Side <= Sides; ++Side)
+        {
+            const float U = static_cast<float>(Side) / Sides;
+            const float Theta = 2.0f * PI * U;
+            const float CosTheta = FMath::Cos(Theta);
+            const float SinTheta = FMath::Sin(Theta);
+            Vertices.Add(FVector(Radius * CosTheta, Radius * SinTheta, Z) * kBaseRadiusCm);
+            Normals.Add(FVector(CosTheta, SinTheta, -RadiusSlope).GetSafeNormal());
+            UVs.Add(FVector2D(U, V));
+            Tangents.Add(FProcMeshTangent(-SinTheta, CosTheta, 0.0f));
+        }
+    }
+    for (int32 Ring = 0; Ring < Rings; ++Ring)
+    {
+        for (int32 Side = 0; Side < Sides; ++Side)
+        {
+            const int32 A = Ring * (Sides + 1) + Side;
+            const int32 B = A + 1;
+            const int32 C = A + Sides + 1;
+            const int32 D = C + 1;
+            Triangles.Append({A, C, B, B, C, D});
+        }
+    }
+
+    const int32 BottomCenter = Vertices.Num();
+    Vertices.Add(FVector(0.0f, 0.0f, -kBaseRadiusCm));
+    Normals.Add(-FVector::UpVector);
+    UVs.Add(FVector2D(0.5f, 0.5f));
+    Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));
+    const int32 TopCenter = Vertices.Num();
+    Vertices.Add(FVector(0.0f, 0.0f, kBaseRadiusCm));
+    Normals.Add(FVector::UpVector);
+    UVs.Add(FVector2D(0.5f, 0.5f));
+    Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));
+    const int32 TopRing = Rings * (Sides + 1);
+    for (int32 Side = 0; Side < Sides; ++Side)
+    {
+        Triangles.Append({BottomCenter, Side + 1, Side});
+        Triangles.Append({TopCenter, TopRing + Side, TopRing + Side + 1});
+    }
+}
+
+void BuildUnitSeatedPelvisMesh(
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs,
+    TArray<FProcMeshTangent>& Tangents)
+{
+    // A seated wetsuit silhouette needs a full waist-to-glute-to-thigh bridge,
+    // not the short narrow trunk used by V1. Keep broad finite cross-sections
+    // at both caps, carry more depth below the hip joint, and bias the lower
+    // volume rearward so the profile reads as a seated pelvis rather than a
+    // pointed crotch wedge between a floating torso and two thighs.
+    constexpr int32 Rings = 18;
+    constexpr int32 Sides = 32;
+    for (int32 Ring = 0; Ring <= Rings; ++Ring)
+    {
+        const float V = static_cast<float>(Ring) / Rings;
+        const float Z = 1.0f - 2.0f * V;
+        const float MidVolume = FMath::Pow(FMath::Sin(PI * V), 0.58f);
+        const float UpperFit = FMath::Max(Z, 0.0f);
+        const float LowerFit = FMath::Max(-Z, 0.0f);
+        const float Depth = 0.72f + 0.28f * MidVolume - 0.02f * UpperFit;
+        const float Width = 0.72f + 0.28f * MidVolume;
+        const float SeatBulge =
+            FMath::Exp(-FMath::Square((Z + 0.35f) / 0.5f));
+        const float PosteriorBias = 0.06f * MidVolume + 0.18f * SeatBulge;
+        for (int32 Side = 0; Side <= Sides; ++Side)
+        {
+            const float U = static_cast<float>(Side) / Sides;
+            const float Theta = 2.0f * PI * U;
+            const float CosTheta = FMath::Cos(Theta);
+            const float SinTheta = FMath::Sin(Theta);
+            const float SaddleLift = LowerFit *
+                FMath::Square(1.0f - FMath::Abs(SinTheta)) * 0.28f;
+            const FVector Point(
+                Depth * CosTheta - PosteriorBias,
+                Width * SinTheta,
+                Z + SaddleLift);
+
+            // The side normal follows the elliptical cross-section. A small
+            // vertical component rounds the transition into the hidden caps
+            // without turning the whole pelvis back into an oval.
+            const float CapBlend = FMath::Pow(FMath::Abs(Z), 3.0f);
+            const FVector ApproximateNormal(
+                CosTheta / FMath::Max(Depth, UE_SMALL_NUMBER),
+                SinTheta / FMath::Max(Width, UE_SMALL_NUMBER),
+                FMath::Sign(Z) * 0.32f * CapBlend);
+            Vertices.Add(Point * kBaseRadiusCm);
+            Normals.Add(ApproximateNormal.GetSafeNormal());
+            UVs.Add(FVector2D(U, V));
+            Tangents.Add(FProcMeshTangent(-SinTheta, CosTheta, 0.0f));
+        }
+    }
+    for (int32 Ring = 0; Ring < Rings; ++Ring)
+    {
+        for (int32 Side = 0; Side < Sides; ++Side)
+        {
+            const int32 A = Ring * (Sides + 1) + Side;
+            const int32 B = A + 1;
+            const int32 C = A + Sides + 1;
+            const int32 D = C + 1;
+            Triangles.Append({A, C, B, B, C, D});
+        }
+    }
+
+    const int32 TopCenter = Vertices.Num();
+    Vertices.Add(FVector(0.0f, 0.0f, kBaseRadiusCm));
+    Normals.Add(FVector::UpVector);
+    UVs.Add(FVector2D(0.5f, 0.5f));
+    Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));
+    const int32 BottomCenter = Vertices.Num();
+    Vertices.Add(FVector(
+        -0.04f * kBaseRadiusCm,
+        0.0f,
+        -0.68f * kBaseRadiusCm));
+    Normals.Add(FVector::DownVector);
+    UVs.Add(FVector2D(0.5f, 0.5f));
+    Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));
+    const int32 BottomRing = Rings * (Sides + 1);
+    for (int32 Side = 0; Side < Sides; ++Side)
+    {
+        Triangles.Append({TopCenter, Side, Side + 1});
+        Triangles.Append({BottomCenter, BottomRing + Side + 1, BottomRing + Side});
     }
 }
 
@@ -647,6 +814,32 @@ void ApplyWaistPivotedUpperBodyArticulation(FRaftSimCrewAvatarPose& Pose)
     RotateAroundPivot(Pose.RightShoulderCm);
     RotateAroundPivot(Pose.HeadCenterCm);
 }
+
+void ApplyMirroredPaddleGrip(
+    FRaftSimCrewAvatarPose& Pose,
+    float SeatSide,
+    float LowerHandAlpha = 0.43f)
+{
+    const FVector LowerHandCm = FMath::Lerp(
+        Pose.PaddleTopCm,
+        Pose.PaddleBottomCm,
+        FMath::Clamp(LowerHandAlpha, 0.0f, 1.0f));
+
+    // Paddlers face +X. On port (-Y), the left hand is the outboard/lower
+    // shaft hand and the right hand owns the inboard T-grip. Starboard is the
+    // anatomical mirror. Keeping this assignment side-aware prevents the
+    // starboard arms and paddle from crossing through the raft.
+    if (SeatSide < 0.0f)
+    {
+        Pose.LeftHandCm = LowerHandCm;
+        Pose.RightHandCm = Pose.PaddleTopCm;
+    }
+    else
+    {
+        Pose.LeftHandCm = Pose.PaddleTopCm;
+        Pose.RightHandCm = LowerHandCm;
+    }
+}
 }
 
 FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
@@ -669,8 +862,13 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     Pose.RightKneeCm = FVector(22.0f, 14.0f, 21.0f);
     Pose.LeftFootCm = FVector(45.0f, -17.0f, 8.0f);
     Pose.RightFootCm = FVector(45.0f, 17.0f, 8.0f);
-    Pose.PaddleTopCm = FVector(25.0f, 25.0f * Side, 67.0f);
-    Pose.PaddleBottomCm = FVector(65.0f, -42.0f * Side, -7.0f);
+    // The T-grip belongs inboard of the tube and the blade belongs outboard
+    // in the water. The previous signs were reversed, so both blades aimed at
+    // the raft centre; perspective happened to hide the error on port while
+    // making the starboard paddles visibly cross the boat.
+    Pose.PaddleTopCm = FVector(25.0f, -25.0f * Side, 67.0f);
+    Pose.PaddleBottomCm = FVector(65.0f, 42.0f * Side, -7.0f);
+    ApplyMirroredPaddleGrip(Pose, Side);
 
     switch (Action)
     {
@@ -685,9 +883,7 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.PaddleTopCm.X += Reach;
             Pose.PaddleBottomCm.X -= 20.0f * Wave;
             Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
-            Pose.LeftHandCm = Pose.PaddleTopCm;
-            Pose.RightHandCm = FMath::Lerp(
-                Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.43f);
+            ApplyMirroredPaddleGrip(Pose, Side);
             break;
         }
         case ERaftSimCrewAvatarAction::BackStroke:
@@ -705,9 +901,7 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.PaddleTopCm.X += Reach;
             Pose.PaddleBottomCm.X -= 20.0f * BackWave;
             Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
-            Pose.LeftHandCm = Pose.PaddleTopCm;
-            Pose.RightHandCm = FMath::Lerp(
-                Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.43f);
+            ApplyMirroredPaddleGrip(Pose, Side);
             Pose.TorsoRotation.Pitch *= -0.7f;
             break;
         }
@@ -715,21 +909,24 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
         case ERaftSimCrewAvatarAction::TurnRight:
         {
             const float Turn = Action == ERaftSimCrewAvatarAction::TurnLeft ? -1.0f : 1.0f;
+            // A paddle-raft pivot uses opposing forward/back strokes. Both
+            // blades remain outside their own tubes instead of every paddler
+            // reaching across the boat toward the commanded turn direction.
+            const float StrokeDirection = -Turn * Side;
             Pose.TorsoRotation.Yaw = Turn * (18.0f + 8.0f * Wave);
-            Pose.PaddleBottomCm.Y = Turn * 58.0f;
-            Pose.PaddleTopCm.Y = Turn * 20.0f;
-            Pose.LeftHandCm = Pose.PaddleTopCm;
-            Pose.RightHandCm = FMath::Lerp(Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.42f);
+            Pose.PaddleTopCm.X += 12.0f * StrokeDirection * Wave;
+            Pose.PaddleBottomCm.X -= 18.0f * StrokeDirection * Wave;
+            Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
+            ApplyMirroredPaddleGrip(Pose, Side, 0.42f);
             break;
         }
         case ERaftSimCrewAvatarAction::Brace:
             Pose.TorsoCenterCm.Z -= 15.0f;
             Pose.HeadCenterCm.Z -= 15.0f;
             Pose.TorsoRotation.Pitch = 18.0f;
-            Pose.PaddleTopCm = FVector(38.0f, -55.0f, 28.0f);
-            Pose.PaddleBottomCm = FVector(38.0f, 55.0f, 20.0f);
-            Pose.LeftHandCm = FMath::Lerp(Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.28f);
-            Pose.RightHandCm = FMath::Lerp(Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.72f);
+            Pose.PaddleTopCm = FVector(38.0f, -24.0f * Side, 44.0f);
+            Pose.PaddleBottomCm = FVector(38.0f, 58.0f * Side, 16.0f);
+            ApplyMirroredPaddleGrip(Pose, Side, 0.55f);
             break;
         case ERaftSimCrewAvatarAction::HighSidePort:
         case ERaftSimCrewAvatarAction::HighSideStarboard:
@@ -763,26 +960,25 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
 
             // Keep the emergency paddle in the paddler's hands instead of
             // making it disappear for the duration of the high-side command.
-            // The inboard hand stays high on the grip while the outside hand
-            // plants the shaft toward the commanded tube. Extrapolating from
-            // those two hand positions places the blade near the waterline and
-            // keeps both production-mesh hands on the same visible shaft.
-            const FVector InboardHand(24.0f, Shift * 18.0f, 58.0f);
-            const FVector HighSideHand(42.0f, Shift * 58.0f, 34.0f);
-            if (Shift < 0.0f)
+            // The body still translates toward the commanded tube, but each
+            // paddle remains outside its assigned seat. A shared Shift-based
+            // paddle direction put the opposite-side blades inside the raft.
+            const FVector InboardHand(24.0f, -Side * 18.0f, 58.0f);
+            const FVector OutboardHand(40.0f, Side * 18.0f, 30.0f);
+            if (Side < 0.0f)
             {
-                Pose.LeftHandCm = HighSideHand;
+                Pose.LeftHandCm = OutboardHand;
                 Pose.RightHandCm = InboardHand;
             }
             else
             {
                 Pose.LeftHandCm = InboardHand;
-                Pose.RightHandCm = HighSideHand;
+                Pose.RightHandCm = OutboardHand;
             }
             Pose.PaddleTopCm = InboardHand;
-            const FVector HighSidePaddleDirection =
-                (HighSideHand - InboardHand).GetSafeNormal();
-            Pose.PaddleBottomCm = HighSideHand + HighSidePaddleDirection * 28.0f;
+            const FVector OutboardPaddleDirection =
+                (OutboardHand - InboardHand).GetSafeNormal();
+            Pose.PaddleBottomCm = OutboardHand + OutboardPaddleDirection * 73.0f;
             Pose.bShowPaddle = true;
             break;
         }
@@ -1001,13 +1197,36 @@ float ARaftSimCrewAvatarActor::GetProductionHelmetHeadErrorCm() const
         ? static_cast<const USceneComponent*>(ProductionHelmet.Get())
         : static_cast<const USceneComponent*>(Helmet.Get());
     const FQuat HelmetRotation = FittedHelmet->GetRelativeRotation().Quaternion();
+    const float LiftScale = HasProductionWhitewaterHelmet()
+        ? FittedHelmet->GetRelativeScale3D().Z / kProductionHelmetReferenceFit
+        : 1.0f;
     const FVector AssetShellOffset = HasProductionWhitewaterHelmet()
         ? FVector::ZeroVector
         : kProductionHelmetShellOffsetCm;
     const FVector FittedHeadCenterCm = FittedHelmet->GetRelativeLocation() -
         HelmetRotation.RotateVector(
-            kProductionHelmetSkullCenterOffsetCm + AssetShellOffset);
+            kProductionHelmetSkullCenterOffsetCm * LiftScale + AssetShellOffset);
     return FVector::Distance(FittedHeadCenterCm, SolvedHeadRelativeCm);
+}
+
+float ARaftSimCrewAvatarActor::GetProductionHelmetForwardAlignment() const
+{
+    const ARaftSimMetaHumanCrewVisualActor* MetaHumanVisual =
+        Cast<ARaftSimMetaHumanCrewVisualActor>(GetProductionVisualActor());
+    if (!MetaHumanVisual || !HasProductionWhitewaterHelmet())
+    {
+        return -1.0f;
+    }
+    return FVector::DotProduct(
+        ProductionHelmet->GetForwardVector().GetSafeNormal(),
+        MetaHumanVisual->GetSolvedFaceForwardWorldVector());
+}
+
+float ARaftSimCrewAvatarActor::GetProductionHelmetFitScale() const
+{
+    return HasProductionWhitewaterHelmet()
+        ? ProductionHelmet->GetRelativeScale3D().X
+        : 0.0f;
 }
 
 float ARaftSimCrewAvatarActor::GetProductionPfdTorsoErrorCm() const
@@ -1020,6 +1239,206 @@ float ARaftSimCrewAvatarActor::GetProductionPfdTorsoErrorCm() const
         URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             CurrentAction, AnimationPhase, SeatSide);
     return FVector::Distance(ProductionPfd->GetRelativeLocation(), Pose.TorsoCenterCm);
+}
+
+bool ARaftSimCrewAvatarActor::HasVisibleWaistHipSilhouette() const
+{
+    if (!bUsingProductionVisual || !Pelvis || !LeftThigh || !RightThigh ||
+        !Pelvis->IsVisible() || !LeftThigh->IsVisible() || !RightThigh->IsVisible())
+    {
+        return false;
+    }
+    const FProcMeshSection* Section = Pelvis->GetProcMeshSection(0);
+    const FProcMeshSection* LeftBridgeSection = LeftThigh->GetProcMeshSection(0);
+    const FProcMeshSection* RightBridgeSection = RightThigh->GetProcMeshSection(0);
+    const FVector ExtentCm = GetWaistHipExtentCm();
+    const FVector ThighExtentCm = GetMinimumHipThighBridgeExtentCm();
+    return Section && Section->ProcVertexBuffer.Num() >= 500 &&
+        LeftBridgeSection && LeftBridgeSection->ProcVertexBuffer.Num() >= 350 &&
+        RightBridgeSection && RightBridgeSection->ProcVertexBuffer.Num() >= 350 &&
+        ExtentCm.X >= 14.0f && ExtentCm.Y >= 21.0f && ExtentCm.Z >= 13.8f &&
+        ThighExtentCm.X >= 6.2f && ThighExtentCm.Y >= 6.2f &&
+        ThighExtentCm.Z >= 9.5f && IsWaistHipMaterialOpaque() &&
+        GetMaximumHipThighBridgeCoverageErrorCm() <= 0.25f;
+}
+
+FVector ARaftSimCrewAvatarActor::GetWaistHipExtentCm() const
+{
+    return Pelvis
+        ? Pelvis->GetRelativeScale3D().GetAbs() * kBaseRadiusCm
+        : FVector::ZeroVector;
+}
+
+float ARaftSimCrewAvatarActor::GetWaistHipCenterErrorCm() const
+{
+    if (!Pelvis)
+    {
+        return TNumericLimits<float>::Max();
+    }
+    const FRaftSimCrewAvatarPose Pose =
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+            CurrentAction, AnimationPhase, SeatSide);
+    const FVector SolvedHipCenter = (Pose.LeftHipCm + Pose.RightHipCm) * 0.5f;
+    return FVector::Distance(Pelvis->GetRelativeLocation(), SolvedHipCenter);
+}
+
+bool ARaftSimCrewAvatarActor::IsWaistHipMaterialOpaque() const
+{
+    const auto HasOpaqueMaterial = [](const UProceduralMeshComponent* Component)
+    {
+        const UMaterialInterface* Material = Component ? Component->GetMaterial(0) : nullptr;
+        return Material && Material->GetBlendMode() == BLEND_Opaque;
+    };
+    return HasOpaqueMaterial(Pelvis) &&
+        HasOpaqueMaterial(LeftThigh) && HasOpaqueMaterial(RightThigh);
+}
+
+FVector ARaftSimCrewAvatarActor::GetMinimumHipThighBridgeExtentCm() const
+{
+    if (!LeftThigh || !RightThigh)
+    {
+        return FVector::ZeroVector;
+    }
+    const FVector LeftExtentCm =
+        LeftThigh->GetRelativeScale3D().GetAbs() * kBaseRadiusCm;
+    const FVector RightExtentCm =
+        RightThigh->GetRelativeScale3D().GetAbs() * kBaseRadiusCm;
+    return FVector(
+        FMath::Min(LeftExtentCm.X, RightExtentCm.X),
+        FMath::Min(LeftExtentCm.Y, RightExtentCm.Y),
+        FMath::Min(LeftExtentCm.Z, RightExtentCm.Z));
+}
+
+float ARaftSimCrewAvatarActor::GetMaximumHipThighBridgeCoverageErrorCm() const
+{
+    if (!LeftThigh || !RightThigh)
+    {
+        return TNumericLimits<float>::Max();
+    }
+    const FRaftSimCrewAvatarPose Pose =
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+            CurrentAction, AnimationPhase, SeatSide);
+    const auto DistanceToBridgeCentreline = [](
+        const UProceduralMeshComponent* Thigh,
+        const FVector& HipCm)
+    {
+        const FVector Axis = Thigh->GetRelativeRotation().RotateVector(FVector::UpVector);
+        const float HalfLengthCm =
+            Thigh->GetRelativeScale3D().GetAbs().Z * kBaseRadiusCm;
+        const FVector StartCm = Thigh->GetRelativeLocation() - Axis * HalfLengthCm;
+        const FVector EndCm = Thigh->GetRelativeLocation() + Axis * HalfLengthCm;
+        const FVector Segment = EndCm - StartCm;
+        const float SegmentLengthSquared = Segment.SizeSquared();
+        const float Alpha = SegmentLengthSquared > UE_SMALL_NUMBER
+            ? FMath::Clamp(
+                FVector::DotProduct(HipCm - StartCm, Segment) / SegmentLengthSquared,
+                0.0f,
+                1.0f)
+            : 0.0f;
+        return FVector::Distance(StartCm + Segment * Alpha, HipCm);
+    };
+    return FMath::Max(
+        DistanceToBridgeCentreline(LeftThigh, Pose.LeftHipCm),
+        DistanceToBridgeCentreline(RightThigh, Pose.RightHipCm));
+}
+
+bool ARaftSimCrewAvatarActor::HasContinuousThighKneeSilhouette() const
+{
+    if (!bUsingProductionVisual || !LeftThigh || !RightThigh ||
+        !LeftThigh->IsVisible() || !RightThigh->IsVisible())
+    {
+        return false;
+    }
+    const FProcMeshSection* LeftBridgeSection = LeftThigh->GetProcMeshSection(0);
+    const FProcMeshSection* RightBridgeSection = RightThigh->GetProcMeshSection(0);
+    const FVector ThighExtentCm = GetMinimumHipThighBridgeExtentCm();
+    return LeftBridgeSection && LeftBridgeSection->ProcVertexBuffer.Num() >= 350 &&
+        RightBridgeSection && RightBridgeSection->ProcVertexBuffer.Num() >= 350 &&
+        ThighExtentCm.X >= 7.2f && ThighExtentCm.Y >= 7.2f &&
+        ThighExtentCm.Z >= 15.5f && IsWaistHipMaterialOpaque() &&
+        GetMaximumThighKneeBridgeCoverageErrorCm() <= 0.25f;
+}
+
+float ARaftSimCrewAvatarActor::GetMaximumThighKneeBridgeCoverageErrorCm() const
+{
+    if (!LeftThigh || !RightThigh)
+    {
+        return TNumericLimits<float>::Max();
+    }
+    const FRaftSimCrewAvatarPose Pose =
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+            CurrentAction, AnimationPhase, SeatSide);
+    const auto DistanceToBridgeCentreline = [](
+        const UProceduralMeshComponent* Thigh,
+        const FVector& KneeCm)
+    {
+        const FVector Axis = Thigh->GetRelativeRotation().RotateVector(FVector::UpVector);
+        const float HalfLengthCm =
+            Thigh->GetRelativeScale3D().GetAbs().Z * kBaseRadiusCm;
+        const FVector StartCm = Thigh->GetRelativeLocation() - Axis * HalfLengthCm;
+        const FVector EndCm = Thigh->GetRelativeLocation() + Axis * HalfLengthCm;
+        const FVector Segment = EndCm - StartCm;
+        const float SegmentLengthSquared = Segment.SizeSquared();
+        const float Alpha = SegmentLengthSquared > UE_SMALL_NUMBER
+            ? FMath::Clamp(
+                FVector::DotProduct(KneeCm - StartCm, Segment) / SegmentLengthSquared,
+                0.0f,
+                1.0f)
+            : 0.0f;
+        return FVector::Distance(StartCm + Segment * Alpha, KneeCm);
+    };
+    return FMath::Max(
+        DistanceToBridgeCentreline(LeftThigh, Pose.LeftKneeCm),
+        DistanceToBridgeCentreline(RightThigh, Pose.RightKneeCm));
+}
+
+FVector ARaftSimCrewAvatarActor::GetMinimumShoulderSleeveExtentCm() const
+{
+    if (!LeftShoulderSleeve || !RightShoulderSleeve)
+    {
+        return FVector::ZeroVector;
+    }
+    const FVector LeftExtentCm =
+        LeftShoulderSleeve->GetRelativeScale3D().GetAbs() * kBaseRadiusCm;
+    const FVector RightExtentCm =
+        RightShoulderSleeve->GetRelativeScale3D().GetAbs() * kBaseRadiusCm;
+    return FVector(
+        FMath::Min(LeftExtentCm.X, RightExtentCm.X),
+        FMath::Min(LeftExtentCm.Y, RightExtentCm.Y),
+        FMath::Min(LeftExtentCm.Z, RightExtentCm.Z));
+}
+
+float ARaftSimCrewAvatarActor::GetMaximumShoulderSleeveAnchorErrorCm() const
+{
+    if (!LeftShoulderSleeve || !RightShoulderSleeve)
+    {
+        return TNumericLimits<float>::Max();
+    }
+    const FRaftSimCrewAvatarPose Pose =
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+            CurrentAction, AnimationPhase, SeatSide);
+    const auto ProximalEndpoint = [](const UProceduralMeshComponent* Sleeve)
+    {
+        const FVector Axis = Sleeve->GetRelativeRotation().RotateVector(FVector::UpVector);
+        const float HalfLengthCm =
+            Sleeve->GetRelativeScale3D().GetAbs().Z * kBaseRadiusCm;
+        return Sleeve->GetRelativeLocation() - Axis * HalfLengthCm;
+    };
+    return FMath::Max(
+        FVector::Distance(
+            ProximalEndpoint(LeftShoulderSleeve), Pose.LeftShoulderCm),
+        FVector::Distance(
+            ProximalEndpoint(RightShoulderSleeve), Pose.RightShoulderCm));
+}
+
+bool ARaftSimCrewAvatarActor::HasVisibleShoulderSilhouette() const
+{
+    const FVector ExtentCm = GetMinimumShoulderSleeveExtentCm();
+    return bUsingProductionVisual && LeftShoulderSleeve && RightShoulderSleeve &&
+        LeftShoulderSleeve->IsVisible() && RightShoulderSleeve->IsVisible() &&
+        ExtentCm.X >= 4.7f && ExtentCm.Y >= 4.7f && ExtentCm.Z >= 5.6f &&
+        ExtentCm.Z > ExtentCm.X &&
+        GetMaximumShoulderSleeveAnchorErrorCm() <= 0.25f;
 }
 
 FVector ARaftSimCrewAvatarActor::GetBodyProportionScale() const
@@ -1082,6 +1501,27 @@ bool ARaftSimCrewAvatarActor::HasProductionRiverBoots() const
 {
     return ProductionLeftBoot && ProductionLeftBoot->GetStaticMesh() != nullptr &&
         ProductionRightBoot && ProductionRightBoot->GetStaticMesh() != nullptr;
+}
+
+bool ARaftSimCrewAvatarActor::HasFittedUprightProductionRiverBoots() const
+{
+    const auto IsFittedAndSoleDown = [](const UStaticMeshComponent* Boot)
+    {
+        if (!Boot || !Boot->GetStaticMesh())
+        {
+            return false;
+        }
+        const FBox SourceBounds = Boot->GetStaticMesh()->GetBoundingBox();
+        const FVector Scale = Boot->GetRelativeScale3D();
+        const FVector LocalUp =
+            Boot->GetRelativeRotation().RotateVector(FVector::UpVector);
+        return SourceBounds.Min.Z < 0.0f && SourceBounds.Max.Z > 0.0f &&
+            FVector::DotProduct(LocalUp, FVector::UpVector) >= 0.999f &&
+            Scale.X > 0.0f && Scale.Y > 0.0f && Scale.Z > 0.0f &&
+            Scale.X <= 0.93f && Scale.Y <= 1.0f && Scale.Z <= 0.72f;
+    };
+    return IsFittedAndSoleDown(ProductionLeftBoot) &&
+        IsFittedAndSoleDown(ProductionRightBoot);
 }
 
 bool ARaftSimCrewAvatarActor::HasCommercialPaddleSilhouette() const
@@ -1427,12 +1867,19 @@ void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
         if (Part)
         {
             // The MetaHuman body now owns the single fitted wetsuit layer.
-            // Keep only equipment overlays that are not part of that body.
+            // Keep only pose-matched rafting overlays that are not reliably
+            // preserved by the assembled body. The pelvis is intentionally
+            // retained with both opaque thigh roots: hiding those roots made
+            // the shell terminate above the assembled legs and exposed the
+            // background through the hip junction in profile.
             const bool bProductionOverlay =
                 Part == Pfd || Part == PfdRearWebbing || Part == PfdBelt ||
                 Part == PfdBuckle || Part == Helmet ||
                 Part == HelmetRim || Part == HelmetRetention ||
-                Part == Torso || Part == Neck ||
+                Part == Pelvis || Part == Torso ||
+                Part == LeftThigh || Part == RightThigh ||
+                Part == LeftShoulderSleeve || Part == RightShoulderSleeve ||
+                Part == Neck ||
                 Part == LeftBoot || Part == RightBoot ||
                 Part == PaddleShaft || Part == PaddleBlade || Part == PaddleGrip;
             const bool bReplacedHelmetLayer = bHasProductionHelmet &&
@@ -1509,10 +1956,11 @@ void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()
         return;
     }
     // ApplyPose owns the production PPE silhouette and resets it every frame;
-    // the MetaHuman adapter then publishes the exact skeletal head solve. Move
-    // all three helmet layers by only that measured delta so their authored
-    // fit/rotation remains intact while non-seated/high-side poses cannot leave
-    // the shell beside the face.
+    // the MetaHuman adapter then publishes the exact rendered face transform.
+    // Position, orient, and size the asymmetric shell from that transform. A
+    // torso-only rotation made the brow/rear profile look reversed whenever
+    // the driven head and torso bases diverged, while one shared scale visibly
+    // overfit the narrower identities.
     const FVector HeadSolveDeltaCm = SolvedHeadRelativeCm - PoseHeadRelativeCm;
     Helmet->SetRelativeLocation(
         Helmet->GetRelativeLocation() + HeadSolveDeltaCm);
@@ -1522,8 +1970,26 @@ void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()
         HelmetRetention->GetRelativeLocation() + HeadSolveDeltaCm);
     if (HasProductionWhitewaterHelmet())
     {
-        ProductionHelmet->SetRelativeLocation(
-            ProductionHelmet->GetRelativeLocation() + HeadSolveDeltaCm);
+        const FTransform RootTransform = Root->GetComponentTransform();
+        const FVector FaceForward = RootTransform.InverseTransformVectorNoScale(
+            MetaHumanVisual->GetSolvedFaceForwardWorldVector()).GetSafeNormal();
+        const FVector FaceUp = RootTransform.InverseTransformVectorNoScale(
+            MetaHumanVisual->GetSolvedFaceUpWorldVector()).GetSafeNormal();
+        if (!FaceForward.IsNearlyZero() && !FaceUp.IsNearlyZero())
+        {
+            const FQuat FittedRotation = FRotationMatrix::MakeFromXZ(
+                FaceForward, FaceUp).ToQuat();
+            const float FittedScale =
+                MetaHumanVisual->GetRecommendedWhitewaterHelmetScale();
+            const float LiftScale =
+                FittedScale / kProductionHelmetReferenceFit;
+            const FVector FittedLocation = SolvedHeadRelativeCm +
+                FittedRotation.RotateVector(
+                    kProductionHelmetSkullCenterOffsetCm * LiftScale);
+            ProductionHelmet->SetRelativeLocationAndRotation(
+                FittedLocation, FittedRotation);
+            ProductionHelmet->SetRelativeScale3D(FVector(FittedScale));
+        }
     }
 }
 
@@ -1599,7 +2065,26 @@ void ARaftSimCrewAvatarActor::BuildVisual()
     }
 
     Pelvis = CreateOrganicPart(TEXT("Pelvis"), Wetsuit);
+    {
+        TArray<FVector> Vertices, Normals;
+        TArray<int32> Triangles;
+        TArray<FVector2D> UVs;
+        TArray<FProcMeshTangent> Tangents;
+        BuildUnitSeatedPelvisMesh(Vertices, Triangles, Normals, UVs, Tangents);
+        ReplaceMeshSection(Pelvis, Vertices, Triangles, Normals, UVs, Tangents);
+    }
     Torso = CreateOrganicPart(TEXT("Torso"), Jacket ? Jacket : Wetsuit);
+    // The assembled MetaHuman body supplies the animated arms, but the PFD
+    // terminates below the shoulder crest and the host previously hid every
+    // pose-matched upper-arm overlay. Retain two short rounded splash-jacket
+    // sleeves as anatomical bridges, not flotation or PFD shoulder pads.
+    // These are garment sleeves, not flotation shoulder pads. They start at
+    // the authoritative shoulder joint and continue to the elbow beneath the
+    // PFD instead of floating as isolated caps beside the torso.
+    LeftShoulderSleeve = CreateOrganicPart(
+        TEXT("LeftShoulderSleeve"), Jacket ? Jacket : Wetsuit);
+    RightShoulderSleeve = CreateOrganicPart(
+        TEXT("RightShoulderSleeve"), Jacket ? Jacket : Wetsuit);
     Pfd = CreateOrganicPart(TEXT("PFD"), DefaultPfd);
     PfdRearWebbing = CreateOrganicPart(TEXT("PFDRearWebbing"), Webbing ? Webbing : Wetsuit);
     PfdBelt = CreateOrganicPart(TEXT("PFDBelt"), Webbing ? Webbing : Wetsuit);
@@ -1623,6 +2108,15 @@ void ARaftSimCrewAvatarActor::BuildVisual()
     LeftShin = CreateOrganicPart(TEXT("LeftShin"), Wetsuit);
     LeftBoot = CreateOrganicPart(TEXT("LeftBoot"), BootRubber ? BootRubber : Wetsuit);
     RightThigh = CreateOrganicPart(TEXT("RightThigh"), Wetsuit);
+    {
+        TArray<FVector> Vertices, Normals;
+        TArray<int32> Triangles;
+        TArray<FVector2D> UVs;
+        TArray<FProcMeshTangent> Tangents;
+        BuildUnitHipThighBridgeMesh(Vertices, Triangles, Normals, UVs, Tangents);
+        ReplaceMeshSection(LeftThigh, Vertices, Triangles, Normals, UVs, Tangents);
+        ReplaceMeshSection(RightThigh, Vertices, Triangles, Normals, UVs, Tangents);
+    }
     RightShin = CreateOrganicPart(TEXT("RightShin"), Wetsuit);
     RightBoot = CreateOrganicPart(TEXT("RightBoot"), BootRubber ? BootRubber : Wetsuit);
     PaddleShaft = CreateOrganicPart(TEXT("PaddleShaft"), Shaft);
@@ -2037,8 +2531,15 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
     {
         return Pose.TorsoCenterCm + TorsoRotation.RotateVector(OffsetCm);
     };
-    SetEllipsoid(Pelvis, HipCenter, Pose.TorsoRotation,
-                 FVector(14.0f * Profile.X, 18.0f * Profile.Y, 14.0f * Profile.Z));
+    // The V2 seated pelvis is deliberately comparable in width to the torso,
+    // substantially deeper in profile, and tall enough to overlap both the
+    // lower torso and the assembled upper thighs. Its mesh carries additional
+    // rearward glute volume while the solved hip centre remains authoritative.
+    SetEllipsoid(
+        Pelvis,
+        HipCenter,
+        Pose.TorsoRotation,
+        kProductionSeatedPelvisReferenceExtentCm * Profile);
     SetEllipsoid(Torso, Pose.TorsoCenterCm, Pose.TorsoRotation,
                  FVector(17.0f * Profile.X, 21.0f * Profile.Y, 27.0f * Profile.Z));
     Pfd->SetRelativeLocationAndRotation(Pose.TorsoCenterCm, Pose.TorsoRotation);
@@ -2109,6 +2610,22 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
 
     const FVector LeftElbow = FMath::Lerp(Pose.LeftShoulderCm, Pose.LeftHandCm, 0.48f) + FVector(0.0f, -5.0f, -2.0f);
     const FVector RightElbow = FMath::Lerp(Pose.RightShoulderCm, Pose.RightHandCm, 0.48f) + FVector(0.0f, 5.0f, -2.0f);
+    const FVector LeftShoulderSleeveEnd = FMath::Lerp(
+        Pose.LeftShoulderCm, LeftElbow, kProductionShoulderSleeveArmFraction);
+    const FVector RightShoulderSleeveEnd = FMath::Lerp(
+        Pose.RightShoulderCm, RightElbow, kProductionShoulderSleeveArmFraction);
+    const float ShoulderSleeveRadiusCm =
+        kProductionShoulderSleeveRadiusCm * LimbBulk;
+    SetRoundedLimb(
+        LeftShoulderSleeve,
+        Pose.LeftShoulderCm,
+        LeftShoulderSleeveEnd,
+        ShoulderSleeveRadiusCm);
+    SetRoundedLimb(
+        RightShoulderSleeve,
+        Pose.RightShoulderCm,
+        RightShoulderSleeveEnd,
+        ShoulderSleeveRadiusCm);
     SetRoundedLimb(LeftUpperArm, Pose.LeftShoulderCm, LeftElbow, 5.8f * LimbBulk);
     SetRoundedLimb(LeftLowerArm, LeftElbow, Pose.LeftHandCm, 5.0f * LimbBulk);
     SetEllipsoid(
@@ -2123,9 +2640,33 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         Pose.RightHandCm,
         FRotationMatrix::MakeFromX((Pose.RightHandCm - RightElbow).GetSafeNormal()).Rotator(),
         FVector(7.0f, 3.7f, 2.8f) * LimbBulk);
-    SetRoundedLimb(LeftThigh, Pose.LeftHipCm, Pose.LeftKneeCm, 8.3f * LimbBulk);
+    const FVector LeftThighBridgeStartCm = FMath::Lerp(
+        Pose.LeftHipCm,
+        Pose.LeftKneeCm,
+        kProductionHipThighBridgeStartFraction);
+    const FVector LeftThighBridgeEndCm = FMath::Lerp(
+        Pose.LeftHipCm,
+        Pose.LeftKneeCm,
+        kProductionHipThighBridgeEndFraction);
+    const FVector RightThighBridgeStartCm = FMath::Lerp(
+        Pose.RightHipCm,
+        Pose.RightKneeCm,
+        kProductionHipThighBridgeStartFraction);
+    const FVector RightThighBridgeEndCm = FMath::Lerp(
+        Pose.RightHipCm,
+        Pose.RightKneeCm,
+        kProductionHipThighBridgeEndFraction);
+    SetRoundedLimb(
+        LeftThigh,
+        bUsingProductionVisual ? LeftThighBridgeStartCm : Pose.LeftHipCm,
+        bUsingProductionVisual ? LeftThighBridgeEndCm : Pose.LeftKneeCm,
+        (bUsingProductionVisual ? kProductionHipThighBridgeRadiusCm : 8.3f) * LimbBulk);
     SetRoundedLimb(LeftShin, Pose.LeftKneeCm, Pose.LeftFootCm, 6.7f * LimbBulk);
-    SetRoundedLimb(RightThigh, Pose.RightHipCm, Pose.RightKneeCm, 8.3f * LimbBulk);
+    SetRoundedLimb(
+        RightThigh,
+        bUsingProductionVisual ? RightThighBridgeStartCm : Pose.RightHipCm,
+        bUsingProductionVisual ? RightThighBridgeEndCm : Pose.RightKneeCm,
+        (bUsingProductionVisual ? kProductionHipThighBridgeRadiusCm : 8.3f) * LimbBulk);
     SetRoundedLimb(RightShin, Pose.RightKneeCm, Pose.RightFootCm, 6.7f * LimbBulk);
     const FVector LeftFootDirection = (Pose.LeftFootCm - Pose.LeftKneeCm).GetSafeNormal();
     const FVector RightFootDirection = (Pose.RightFootCm - Pose.RightKneeCm).GetSafeNormal();
@@ -2135,18 +2676,36 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
                    Pose.RightFootCm + RightFootDirection * 11.0f, 5.8f);
     if (HasProductionRiverBoots())
     {
-        // The generated boot's ankle-centred local +X axis points toward the
-        // toe. Keep seated/high-side footwear planted in the raft plane; only
-        // yaw follows the solved torso. Swimming naturally rotates the same
-        // visual with the body's 88-degree yaw. The solved foot points remain
+        // The source boot is +X toe-forward and +Z cuff-up. Construct that
+        // basis explicitly so no pose yaw can make the sole read above the
+        // cuff. The authored 23.6 cm source height also overran the strongly
+        // flexed seated knee when used at body scale. Fit it as footwear while
+        // translating from the source sole bound so the tread remains on the
+        // exact previously solved support plane. The solved foot points remain
         // the single animation authority.
-        const FRotator ProductionBootRotation(0.0f, Pose.TorsoRotation.Yaw, 0.0f);
-        ProductionLeftBoot->SetRelativeLocationAndRotation(
-            Pose.LeftFootCm, ProductionBootRotation);
-        ProductionLeftBoot->SetRelativeScale3D(Profile);
-        ProductionRightBoot->SetRelativeLocationAndRotation(
-            Pose.RightFootCm, ProductionBootRotation);
-        ProductionRightBoot->SetRelativeScale3D(Profile);
+        const FVector ToeForward =
+            FRotator(0.0f, Pose.TorsoRotation.Yaw, 0.0f).RotateVector(
+                FVector::ForwardVector);
+        const FRotator ProductionBootRotation =
+            FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector).Rotator();
+        const FVector ProductionBootScale =
+            kProductionRiverBootPresentationScale * Profile;
+        const auto PlaceProductionBoot = [
+            &ProductionBootRotation,
+            &ProductionBootScale,
+            &Profile](UStaticMeshComponent* Boot, const FVector& SolvedFootCm)
+        {
+            const float SourceSoleZCm =
+                Boot->GetStaticMesh()->GetBoundingBox().Min.Z;
+            FVector FittedLocationCm = SolvedFootCm;
+            FittedLocationCm.Z += SourceSoleZCm * Profile.Z *
+                (1.0f - kProductionRiverBootPresentationScale.Z);
+            Boot->SetRelativeLocationAndRotation(
+                FittedLocationCm, ProductionBootRotation);
+            Boot->SetRelativeScale3D(ProductionBootScale);
+        };
+        PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm);
+        PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm);
     }
 
     PaddleShaft->SetVisibility(Pose.bShowPaddle);

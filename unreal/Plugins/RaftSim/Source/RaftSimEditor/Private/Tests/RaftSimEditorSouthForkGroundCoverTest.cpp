@@ -73,12 +73,31 @@ bool FRaftSimSouthForkOrganicGroundPresentationTest::RunTest(
 
     TestFalse(TEXT("Grass stays out of the wetted shoreline corridor"),
         ComputeSouthForkGroundCoverPlacement(
-            17, 72, 18.0f, 0.12f,
+            17, 72, 20.0f, 0.12f,
+            RepresentativeDensity, GroundLocation).bAccepted);
+    TestFalse(TEXT("Grass fades out beyond the detailed bank ribbon"),
+        ComputeSouthForkGroundCoverPlacement(
+            17, 72, 120.0f, 0.12f,
             RepresentativeDensity, GroundLocation).bAccepted);
     TestFalse(TEXT("Grass stays off implausibly steep DEM faces"),
         ComputeSouthForkGroundCoverPlacement(
-            17, 72, 56.0f, 0.50f,
+            17, 72, 56.0f, 0.46f,
             RepresentativeDensity, GroundLocation).bAccepted);
+
+    int32 AcceptedDryBankSamples = 0;
+    for (int32 CoordinateIndex = 0; CoordinateIndex < 1024; ++CoordinateIndex)
+    {
+        const bool bAcceptedDryBank = ComputeSouthForkGroundCoverPlacement(
+            CoordinateIndex, 72, 58.0f, 0.12f,
+            RepresentativeDensity,
+            GroundLocation + FVector(CoordinateIndex * 800.0f, 0.0f, 0.0f))
+                                          .bAccepted;
+        AcceptedDryBankSamples += bAcceptedDryBank ? 1 : 0;
+    }
+    TestTrue(TEXT("Dry-bank cover is dense enough to read as a mosaic"),
+        AcceptedDryBankSamples >= 320);
+    TestTrue(TEXT("Dry-bank cover retains deterministic open ground"),
+        AcceptedDryBankSamples <= 850);
 
     return true;
 }

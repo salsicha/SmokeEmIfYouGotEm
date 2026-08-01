@@ -59,6 +59,13 @@ public:
         return MaximumPaddleGripAnchorErrorCm;
     }
 
+    /** Maximum closed-finger grasp-centre error against the visible paddle. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleGripContactErrorCm() const
+    {
+        return MaximumPaddleGripContactErrorCm;
+    }
+
     /** True only when the reviewed, assembled character BP is the rendered body. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     bool IsUsingAssembledCharacter() const { return bUsingAssembledCharacter; }
@@ -117,6 +124,18 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetSolvedHeadWorldLocation() const;
 
+    /** World-space direction the rendered face looks after the solved head pose. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedFaceForwardWorldVector() const;
+
+    /** World-space crown direction paired with the rendered face orientation. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedFaceUpWorldVector() const;
+
+    /** Identity-calibrated uniform shell scale derived from the assembled face bounds. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetRecommendedWhitewaterHelmetScale() const;
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetAssembledFaceReferenceHeadComponentLocation() const
     {
@@ -152,9 +171,14 @@ private:
     void ResetAssembledCharacter();
     void CacheReferencePose();
     void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
-    void ApplyPaddleGripPose(bool bShowPaddle);
+    void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyFingerChain(bool bLeft, const TCHAR* Digit, bool bHasMetacarpal,
                           float GripAlpha);
+    void ApplyFingerChainAroundGrip(
+        bool bLeft,
+        const TCHAR* Digit,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis);
     void SynchronizeAssembledFollowers();
     void UpdateRigidAssembledFace();
     void SetBoneAtPoint(FName BoneName, const FVector& DesiredPointCm);
@@ -168,9 +192,14 @@ private:
     FVector ResolvePaddleGripWristCm(
         bool bLeft,
         const FVector& DesiredGripCm) const;
+    FVector ResolvePaddleGripAxis(
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
     float MeasurePaddleGripAnchorErrorCm(
         bool bLeft,
         const FVector& DesiredGripCm) const;
+    float MeasurePaddleFingerContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
 
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> Root;
@@ -193,6 +222,7 @@ private:
     TObjectPtr<USkeletalMeshComponent> AssembledBody;
 
     float MaximumPaddleGripAnchorErrorCm = 0.0f;
+    float MaximumPaddleGripContactErrorCm = 0.0f;
 
     UPROPERTY(Transient)
     TObjectPtr<USkeletalMeshComponent> AssembledFace;

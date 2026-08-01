@@ -1,0 +1,50 @@
+{
+  "artifact": "M9 upright fitted production river boot V1 roster capture",
+  "recorded_local_date": "2026-07-31",
+  "capture_resolution": [1536, 1024],
+  "captured_character_count": 5,
+  "production_boot_instance_count": 10,
+  "fitted_upright_boot_instance_count": 10,
+  "minimum_toe_forward_alignment": 1.0,
+  "minimum_cuff_up_alignment": 1.0,
+  "source_bounds_cm": {
+    "minimum": [-8.34, -6.75, -5.575],
+    "maximum": [25.0, 6.75, 18.0]
+  },
+  "presentation_scale_range": {
+    "minimum": [0.836, 0.8464, 0.6392],
+    "maximum": [0.924, 0.9844, 0.7004]
+  },
+  "characters": [
+    {
+      "name": "MHC_RaftSim_Guide",
+      "production_river_boots": true,
+      "fitted_upright_river_boots": true,
+      "presentation_scale": [0.88, 0.92, 0.68]
+    },
+    {
+      "name": "MHC_RaftSim_Crew_01",
+      "production_river_boots": true,
+      "fitted_upright_river_boots": true,
+      "presentation_scale": [0.88, 0.92, 0.68]
+    },
+    {
+      "name": "MHC_RaftSim_Crew_02",
+      "production_river_boots": true,
+      "fitted_upright_river_boots": true,
+      "presentation_scale": [0.836, 0.8464, 0.6664]
+    },
+    {
+      "name": "MHC_RaftSim_Crew_03",
+      "production_river_boots": true,
+      "fitted_upright_river_boots": true,
+      "presentation_scale": [0.924, 0.9844, 0.7004]
+    },
+    {
+      "name": "MHC_RaftSim_Crew_04",
+      "production_river_boots": true,
+      "fitted_upright_river_boots": true,
+      "presentation_scale": [0.8624, 0.9384, 0.6392]
+    }
+  ]
+}

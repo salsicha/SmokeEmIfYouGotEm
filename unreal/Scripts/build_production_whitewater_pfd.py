@@ -22,7 +22,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 4
+GENERATOR_VERSION = 6
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -151,7 +151,146 @@ def add_extruded_panel(
     return obj
 
 
-def add_swept_shoulder_bridge(
+def rounded_outline(
+    outline_yz: list[tuple[float, float]],
+    iterations: int = 4,
+) -> list[tuple[float, float]]:
+    """Round every closed-outline corner without changing its authored silhouette."""
+    result = list(outline_yz)
+    for _ in range(iterations):
+        softened: list[tuple[float, float]] = []
+        for index, current in enumerate(result):
+            following = result[(index + 1) % len(result)]
+            softened.extend(
+                [
+                    (
+                        current[0] * 0.75 + following[0] * 0.25,
+                        current[1] * 0.75 + following[1] * 0.25,
+                    ),
+                    (
+                        current[0] * 0.25 + following[0] * 0.75,
+                        current[1] * 0.25 + following[1] * 0.75,
+                    ),
+                ]
+            )
+        result = softened
+    return result
+
+
+def add_crowned_foam_panel(
+    name: str,
+    x_center: float,
+    thickness: float,
+    outline_yz: list[tuple[float, float]],
+    piece_material: bpy.types.Material,
+    edge_roll: float,
+    crown_depth: float,
+    outward_sign: float = 1.0,
+    depth_axis: str = "x",
+) -> bpy.types.Object:
+    """Loft a fabric-covered foam cell with rounded corners and a soft crown.
+
+    The prior bevel-only construction left a large planar exterior face. These
+    nested perimeter rings roll the shell over the foam edge and progressively
+    crown the visible face, so specular response reads as compliant padding
+    instead of a hard plate.
+    """
+    outline = rounded_outline(outline_yz)
+    centroid_y = sum(point[0] for point in outline) / len(outline)
+    centroid_z = sum(point[1] for point in outline) / len(outline)
+
+    def scaled_outline(scale: float) -> list[tuple[float, float]]:
+        return [
+            (
+                centroid_y + (y - centroid_y) * scale,
+                centroid_z + (z - centroid_z) * scale,
+            )
+            for y, z in outline
+        ]
+
+    half_depth = thickness * 0.5
+    # Depth is expressed from the torso-facing surface toward the visible shell.
+    # The two full-size rings retain flotation coverage while the inset rings
+    # roll both edges and the final rings create a broad, non-pointed crown.
+    ring_profiles = [
+        (-half_depth, 0.88),
+        (-half_depth + edge_roll * 0.72, 0.985),
+        (-half_depth + edge_roll, 1.0),
+        (half_depth - edge_roll, 1.0),
+        (half_depth - edge_roll * 0.28, 0.985),
+        (half_depth, 0.91),
+        (half_depth + crown_depth * 0.68, 0.58),
+    ]
+    def coordinate(
+        signed_depth: float,
+        outline_a: float,
+        outline_b: float,
+    ) -> tuple[float, float, float]:
+        depth = x_center + outward_sign * signed_depth
+        if depth_axis == "x":
+            return (depth, outline_a, outline_b)
+        if depth_axis == "y":
+            return (outline_a, depth, outline_b)
+        raise ValueError(f"Unsupported foam-panel depth axis: {depth_axis}")
+
+    vertices: list[tuple[float, float, float]] = []
+    for signed_depth, scale in ring_profiles:
+        vertices.extend(
+            coordinate(signed_depth, outline_a, outline_b)
+            for outline_a, outline_b in scaled_outline(scale)
+        )
+
+    count = len(outline)
+    faces: list[tuple[int, ...]] = []
+    for ring_index in range(len(ring_profiles) - 1):
+        current = ring_index * count
+        following = current + count
+        for index in range(count):
+            next_index = (index + 1) % count
+            faces.append(
+                (
+                    current + index,
+                    current + next_index,
+                    following + next_index,
+                    following + index,
+                )
+            )
+
+    inner_center_index = len(vertices)
+    vertices.append(coordinate(-half_depth, centroid_y, centroid_z))
+    outer_center_index = len(vertices)
+    vertices.append(
+        coordinate(half_depth + crown_depth, centroid_y, centroid_z)
+    )
+    final_ring = (len(ring_profiles) - 1) * count
+    for index in range(count):
+        next_index = (index + 1) % count
+        faces.append((inner_center_index, next_index, index))
+        faces.append(
+            (
+                outer_center_index,
+                final_ring + index,
+                final_ring + next_index,
+            )
+        )
+
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(piece_material)
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.normals_make_consistent(inside=False)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    shade_smooth(obj)
+    return obj
+
+
+def add_flat_webbing_run(
     name: str,
     path_xz: list[tuple[float, float]],
     y_center: float,
@@ -159,7 +298,7 @@ def add_swept_shoulder_bridge(
     thickness: float,
     piece_material: bpy.types.Material,
 ) -> bpy.types.Object:
-    """Sweep a flattened foam band over one shoulder as a continuous shell."""
+    """Sweep a thin rectangular strap across a shoulder without foam volume."""
     half_width = width * 0.5
     half_thickness = thickness * 0.5
     vertices: list[tuple[float, float, float]] = []
@@ -192,9 +331,9 @@ def add_swept_shoulder_bridge(
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.data.materials.append(piece_material)
-    bevel = obj.modifiers.new("ShoulderBandEdge", "BEVEL")
-    bevel.width = 0.65
-    bevel.segments = 6
+    bevel = obj.modifiers.new("SoftWebbingEdge", "BEVEL")
+    bevel.width = 0.10
+    bevel.segments = 2
     bevel.limit_method = "ANGLE"
     bpy.context.view_layer.objects.active = obj
     obj.select_set(True)
@@ -260,16 +399,17 @@ def add_torus(
 def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object]:
     pieces: list[bpy.types.Object] = []
 
-    # Four contoured front foam cells. Broad, shallow extrusions read as layered
-    # flotation foam instead of inflated balloons. The authored inner edges
-    # create the front-entry V while the outer edges preserve arm clearance.
+    # Four contoured front foam cells. Rounded outlines, rolled edge rings, and
+    # shallow exterior crowns read as soft fabric-covered flotation foam. The
+    # authored inner edges create the entry V while the outer edges preserve
+    # arm clearance.
     for side in (-1.0, 1.0):
         def mirrored(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
             result = [(side * y, z) for y, z in points]
             return result if side > 0.0 else list(reversed(result))
 
         pieces.append(
-            add_extruded_panel(
+            add_crowned_foam_panel(
                 f"FrontUpperCell_{side:+.0f}",
                 17.0,
                 7.2,
@@ -284,11 +424,12 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                     ]
                 ),
                 materials["PfdShell"],
-                1.15,
+                1.35,
+                1.45,
             )
         )
         pieces.append(
-            add_extruded_panel(
+            add_crowned_foam_panel(
                 f"FrontLowerCell_{side:+.0f}",
                 17.1,
                 7.4,
@@ -302,7 +443,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                     ]
                 ),
                 materials["PfdShell"],
-                1.1,
+                1.35,
+                1.45,
             )
         )
 
@@ -311,13 +453,13 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     # the guide camera. This authored perimeter narrows at the lumbar hem and
     # between the shoulder blades while retaining lateral flotation volume.
     pieces.append(
-        add_extruded_panel(
+        add_crowned_foam_panel(
             "ProtectiveBackPanel",
             -14.6,
             4.8,
             [
-                (-10.0, -17.5),
-                (10.0, -17.5),
+                (-10.0, -17.8),
+                (10.0, -17.8),
                 (14.5, -13.0),
                 (16.0, -5.0),
                 (15.0, 11.5),
@@ -330,51 +472,79 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                 (-14.5, -13.0),
             ],
             materials["PfdShell"],
-            1.35,
+            1.2,
+            1.65,
+            outward_sign=-1.0,
         )
     )
     for side in (-1.0, 1.0):
         pieces.append(
-            add_rounded_box(
+            add_crowned_foam_panel(
                 f"SideWing_{side:+.0f}",
-                (0.5, side * 18.4, -0.5),
-                (25.5, 4.2, 15.0),
+                side * 18.4,
+                4.2,
+                [
+                    (-11.8, -7.7),
+                    (8.8, -7.7),
+                    (12.2, -5.2),
+                    (13.1, 2.9),
+                    (10.2, 7.3),
+                    (-8.4, 7.3),
+                    (-12.2, 3.7),
+                ],
                 materials["PfdShell"],
-                1.65,
-                rotation=(0.0, 0.0, math.radians(side * 2.0)),
+                0.8,
+                0.75,
+                outward_sign=side,
+                depth_axis="y",
             )
         )
 
-    # Each reinforced shoulder is a single continuous swept foam band. This
-    # preserves the low body-hugging arc without the visible joints that made
-    # the prior three-box construction look mechanical in portrait framing.
+    # The flotation cells terminate below the shoulders. Only flexible fit
+    # webbing crosses from the chest to the back so the vest does not create a
+    # rigid shoulder-pad silhouette on the crew avatars.
     for side in (-1.0, 1.0):
         pieces.append(
-            add_swept_shoulder_bridge(
-                f"ShoulderFoamBand_{side:+.0f}",
+            add_flat_webbing_run(
+                f"ShoulderWebbingRun_{side:+.0f}",
                 [
-                    (14.0, 21.0),
-                    (8.0, 24.0),
-                    (1.0, 25.6),
-                    (-6.0, 24.3),
-                    (-12.5, 21.2),
+                    (20.6, 18.5),
+                    (14.0, 21.5),
+                    (6.5, 23.6),
+                    (0.0, 24.4),
+                    (-7.5, 23.2),
+                    (-14.0, 20.2),
+                    (-17.1, 17.5),
                 ],
-                side * 11.5,
-                5.2,
-                2.6,
-                materials["PfdShell"],
+                side * 11.0,
+                2.0,
+                0.18,
+                materials["PfdWebbing"],
             )
         )
 
     # Two useful front pockets sit low enough to preserve the paddle stroke.
     for side in (-1.0, 1.0):
+        center_y = side * 8.6
+        center_z = -7.4
         pieces.append(
-            add_rounded_box(
+            add_crowned_foam_panel(
                 f"ZipperedFrontPocket_{side:+.0f}",
-                (21.8, side * 8.6, -7.4),
-                (1.8, 10.8, 6.8),
+                21.55,
+                1.25,
+                [
+                    (center_y - 4.1, center_z - 3.4),
+                    (center_y + 4.1, center_z - 3.4),
+                    (center_y + 5.4, center_z - 2.1),
+                    (center_y + 5.4, center_z + 2.1),
+                    (center_y + 4.1, center_z + 3.4),
+                    (center_y - 4.1, center_z + 3.4),
+                    (center_y - 5.4, center_z + 2.1),
+                    (center_y - 5.4, center_z - 2.1),
+                ],
                 materials["PfdShell"],
-                0.85,
+                0.38,
+                0.62,
             )
         )
 
@@ -412,14 +582,15 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
             )
         )
 
-    # Eight fit points: four side, two shoulder, and two waist adjustments.
+    # Six visible side/waist adjustment runs plus the two flat shoulder straps
+    # above provide eight fit points. Shoulder hardware is kept off the crest
+    # so it cannot read as a floating pad in profile.
     adjustment_runs = []
     for side in (-1.0, 1.0):
         adjustment_runs.extend(
             [
                 [(11.0, side * 20.0, 9.0), (-8.0, side * 20.0, 9.0)],
                 [(11.0, side * 20.0, -6.0), (-8.0, side * 20.0, -6.0)],
-                [(11.5, side * 12.8, 23.0), (-6.0, side * 12.8, 25.5)],
                 [(15.0, side * 18.0, -13.0), (-10.0, side * 17.5, -13.0)],
             ]
         )
@@ -555,7 +726,7 @@ def validate(mesh_object: bpy.types.Object) -> dict[str, object]:
     minimum = Vector((min(v.x for v in coordinates), min(v.y for v in coordinates), min(v.z for v in coordinates)))
     maximum = Vector((max(v.x for v in coordinates), max(v.y for v in coordinates), max(v.z for v in coordinates)))
     dimensions = maximum - minimum
-    if not (38.0 <= dimensions.x <= 50.0 and 40.0 <= dimensions.y <= 52.0 and 44.0 <= dimensions.z <= 60.0):
+    if not (38.0 <= dimensions.x <= 50.0 and 40.0 <= dimensions.y <= 52.0 and 42.0 <= dimensions.z <= 60.0):
         raise RuntimeError(f"Production PFD bounds are implausible: {tuple(dimensions)}")
     return {
         "vertex_count": len(mesh_object.data.vertices),
@@ -613,7 +784,7 @@ def main() -> None:
             },
             {
                 "url": "https://astraldesigns.com/products/greenjacket",
-                "facts_used": "whitewater/rafting rescue use, contoured layered foam, reinforced shoulders/sides and rescue hardware",
+                "facts_used": "whitewater/rafting rescue use, contoured layered foam, adjustable shoulder webbing, fitted sides and rescue hardware",
                 "asset_content_copied": False,
             },
         ],
@@ -626,7 +797,8 @@ def main() -> None:
             "front_foam_panels": 4,
             "back_panels": 1,
             "side_wings": 2,
-            "shoulder_bridges": 2,
+            "shoulder_foam_pads": 0,
+            "shoulder_webbing_runs": 2,
             "front_pockets": 2,
             "front_zip": 1,
             "backup_buckles": 2,
@@ -637,6 +809,20 @@ def main() -> None:
             "reflective_chest_zones": 2,
             "blank_back_placards": 1,
             "front_lash_tabs": 3,
+        },
+        "soft_geometry": {
+            "outline_corner_rounding": "four-pass closed Chaikin",
+            "outline_corner_rounding_passes": 4,
+            "flat_exterior_foam_faces": 0,
+            "front_panel_edge_roll_cm": 1.35,
+            "front_panel_crown_depth_cm": 1.45,
+            "back_panel_edge_roll_cm": 1.2,
+            "back_panel_crown_depth_cm": 1.65,
+            "side_wing_flat_exterior_faces": 0,
+            "side_wing_crown_depth_cm": 0.75,
+            "front_pocket_flat_exterior_faces": 0,
+            "front_pocket_crown_depth_cm": 0.62,
+            "smooth_shaded": True,
         },
         "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native.",
         **audit,

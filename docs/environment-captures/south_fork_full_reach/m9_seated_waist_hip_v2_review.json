@@ -1,0 +1,108 @@
+{
+  "artifact": "M9 seated waist and hip silhouette V2 review",
+  "recorded_local_date": "2026-07-31",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "V1 made the pelvis component visible but remained too narrow and shallow to read as human hips in the production silhouette. V2 replaces that pointed bridge with a denser, broader seated waist-to-glute-to-thigh shell. A rounded posterior bulge supplies profile depth while a central saddle preserves two distinct thigh roots. The shell stays centered on each solved hip and changes no animation, collision, mass, raft contact, or gameplay force.",
+  "root_cause": {
+    "v1_visibility_contract_gap": "The V1 reference half-extent of 9.5 x 18.0 x 8.5 cm and minimum 9.0 x 16.0 x 7.9 cm contract proved component visibility, but allowed a pointed, visually disconnected pelvis with inadequate front/profile/rear body volume.",
+    "rejected_first_v2_shape": "A broad 15 x 23 x 15 cm shell with linear lower posterior bias restored hip volume but created a skirt-like lower edge in profile and rear review.",
+    "retained_v2_shape": "An 18-ring by 32-side shell uses rounded mid-volume shaping, a localized seated glute bulge, and a central lower saddle lift. Its production reference half-extent is 15 x 23 x 15 cm and its visibility contract requires at least 500 mesh vertices and 14 x 21 x 13.8 cm runtime half-extents."
+  },
+  "runtime_boundary": {
+    "component": "Pelvis UProceduralMeshComponent",
+    "material": "/Game/RaftSim/Materials/M_RaftSim_Wetsuit",
+    "collision": "disabled",
+    "cast_shadow": true,
+    "pose_source": "deterministic solved hip centre and torso rotation",
+    "production_visual_only": true,
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "raft_collision_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_roster_capture.json",
+    "source_report_sha256": "98a2691a2202ba2347861bc2aaaca1eb9afcdc5a1ac04770fce2e44f77688046",
+    "captured_character_count": 5,
+    "characters_with_visible_waist_hip_silhouette": 5,
+    "maximum_hip_center_error_cm": 0.0,
+    "minimum_extent_cm": [14.249999821186066, 21.160000383853912, 14.099999964237215],
+    "maximum_extent_cm": [15.749999284744263, 24.61000120639801, 15.44999957084656]
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_guide_full.png",
+      "capture_sha256": "e6adc1a5502ccb2b5dc9e6364c4673176c212120ff03c0125aea1961a1408ea7"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_guide_profile.png",
+      "capture_sha256": "4983d5c86dbfb1e283ee4b26be229693d47f8a27714615374c25f25e872f3e59"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_guide_rear.png",
+      "capture_sha256": "a51482dc3ee767956c6f5403b9f70092e504533b571dea31949e95bb58aa622c"
+    },
+    "broadest_identity_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_broadest_full.png",
+      "capture_sha256": "00756399ca51c81bed656515cc33306117f82ffccd3bedf38fbd317c39ff2d48"
+    },
+    "broadest_identity_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_broadest_profile.png",
+      "capture_sha256": "d4d6fb568866eba3e48ff74d86915798148bc80421452e1670d4b18e2f6afd71"
+    },
+    "broadest_identity_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_broadest_rear.png",
+      "capture_sha256": "bb0966cbddcec48a94115450af5b263f92e480a9ab0aba9cff781cb704901ba2"
+    },
+    "technical_verdict": "pass: all five identities now show a visibly broader continuous waist/hip/glute bridge into two distinct upper-thigh roots in front, profile, and rear views",
+    "photoreal_verdict": "fail pending replacement or named approval of the still-simplified procedural anatomy, wetsuit response, identity-specific deformation, and in-motion seated character result"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "5eb02220e424fae003a01c275c17e9f1ea4a6a5df3ca4151c11bfaf4ad4dfbdb",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "d00eb3169a09ddb7bb2fd25dc2498757203b4e10193221107a0364bb2160d1a1",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "2bccc572fc18f1696ac4d3a08304805206b7aeb4f35a50196b8d4a653d85edb3",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "f8637574f9877696e2c1fb3435b3d45dcff785604ee7b010870de6a23d519f59",
+    "physics/tests/test_cc0_production_characters.py": "ddc58744fd846d0a86d6c843a7d4851a1927dc81d601ca7bfc13467db756d2af"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 production-character, safety-gear, and flexible-raft visual contracts passed",
+    "renderer_turntable": "5/5 identities captured with full-body front, profile, and rear views, stronger V2 extents, and zero hip-centre error",
+    "m4": "4/4 result entries passed (M9V549FullerSeatedHipsM4)",
+    "m4_report": "unreal/Saved/Automation/M9V549FullerSeatedHipsM4/index.json",
+    "m4_report_sha256": "df027dce27d29526b345c591ba1750d3eb614962ec6d92ca1f38894708f19284",
+    "m5": "5/5 result entries passed renderer-enabled, including production waist/hip visibility and hip-centre assertions (M9V548FullerSeatedHipsM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V548FullerSeatedHipsM5Renderer/index.json",
+    "m5_report_sha256": "9e38b75defab48ab4718af998672bb406593a90310185c6e8db656d834600d77",
+    "m7": "4/4 result entries passed offscreen-rendered (M9V550FullerSeatedHipsM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V550FullerSeatedHipsM7Renderer/index.json",
+    "m7_report_sha256": "323030128e44a91a548bb3da4a871bc6aeb68ad25e72236be91f0b00fe932f8f",
+    "m8": "4/4 passed offscreen-rendered (M9V551FullerSeatedHipsM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V551FullerSeatedHipsM8Renderer/index.json",
+    "m8_report_sha256": "97e89ab1c3c5e5622d2c00e84af6898089d5caaa4fbd442bba73ca200400b737",
+    "full_python": "1148 passed, 3 expected installed-dependency skips, 0 failed in 434.82 seconds (M9V552FullerSeatedHips)",
+    "full_python_report": "physics/reports/m9/m9_v552_fuller_seated_hips_full_matrix.xml",
+    "full_python_report_sha256": "484bac51a6487b41669725d134345ae3aad72963029c7893ba8b0068e6f73837",
+    "m9_reconciled": "6/6 passed (M9V553FullerSeatedHipsReconciledM9)",
+    "m9_reconciled_report": "unreal/Saved/Automation/M9V553FullerSeatedHipsReconciledM9/index.json",
+    "m9_reconciled_report_sha256": "b3412408d973875d221ae0a5bf628c806328f98f0e89c7ed2a1f620fd691b587",
+    "m9_exact_confirmation": "6/6 passed (M9V554FullerSeatedHipsExactM9)",
+    "m9_exact_confirmation_report": "unreal/Saved/Automation/M9V554FullerSeatedHipsExactM9/index.json",
+    "m9_exact_confirmation_report_sha256": "0b342871c654b2c4c6c30ea74c68dcab03f2aa453406446d50e22379b02a5cad"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "art_approval": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the procedural torso/pelvis integration, wetsuit surfacing, body anatomy, identity proportions, and seated deformation in motion.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

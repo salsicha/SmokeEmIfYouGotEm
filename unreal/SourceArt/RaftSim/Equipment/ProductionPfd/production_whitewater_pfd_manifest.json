@@ -1,6 +1,6 @@
 {
   "schema": "raftsim.production_whitewater_pfd_source.v1",
-  "generator_version": 4,
+  "generator_version": 6,
   "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
   "source_inputs": [],
   "reference_only_sources": [
@@ -11,14 +11,14 @@
     },
     {
       "url": "https://astraldesigns.com/products/greenjacket",
-      "facts_used": "whitewater/rafting rescue use, contoured layered foam, reinforced shoulders/sides and rescue hardware",
+      "facts_used": "whitewater/rafting rescue use, contoured layered foam, adjustable shoulder webbing, fitted sides and rescue hardware",
       "asset_content_copied": false
     }
   ],
   "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
   "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
-  "fbx_sha256": "fc3309c049be007baf966602100e8302254880f278b95c5b843a7076ad117b20",
-  "blend_sha256": "97b637446ce0aa5601eda2163ed31a61b62f6c42498eb2e345f9a23b8f2efb86",
+  "fbx_sha256": "f167a51358fec0e0387b8bc3fe3f618df60c6b42423cb0429ab8382e9c38671b",
+  "blend_sha256": "eeec5a5c06c587fde0df2a3396104201481271dc9a9de81320d702a47990e5a7",
   "material_slots": [
     "PfdShell",
     "PfdWebbing",
@@ -30,7 +30,8 @@
     "front_foam_panels": 4,
     "back_panels": 1,
     "side_wings": 2,
-    "shoulder_bridges": 2,
+    "shoulder_foam_pads": 0,
+    "shoulder_webbing_runs": 2,
     "front_pockets": 2,
     "front_zip": 1,
     "backup_buckles": 2,
@@ -42,23 +43,37 @@
     "blank_back_placards": 1,
     "front_lash_tabs": 3
   },
+  "soft_geometry": {
+    "outline_corner_rounding": "four-pass closed Chaikin",
+    "outline_corner_rounding_passes": 4,
+    "flat_exterior_foam_faces": 0,
+    "front_panel_edge_roll_cm": 1.35,
+    "front_panel_crown_depth_cm": 1.45,
+    "back_panel_edge_roll_cm": 1.2,
+    "back_panel_crown_depth_cm": 1.65,
+    "side_wing_flat_exterior_faces": 0,
+    "side_wing_crown_depth_cm": 0.75,
+    "front_pocket_flat_exterior_faces": 0,
+    "front_pocket_crown_depth_cm": 0.62,
+    "smooth_shaded": true
+  },
   "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native.",
-  "vertex_count": 11580,
-  "polygon_count": 11398,
+  "vertex_count": 13066,
+  "polygon_count": 13950,
   "uv_channel_count": 1,
   "bounds_min_cm": [
     -19.5,
     -22.4483,
-    -18.85
+    -17.8
   ],
   "bounds_max_cm": [
-    22.7,
+    22.795,
     22.4483,
-    26.9
+    24.49
   ],
   "dimensions_cm": [
-    42.2,
+    42.295,
     44.8966,
-    45.75
+    42.29
   ]
 }
