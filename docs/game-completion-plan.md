@@ -3488,3 +3488,14 @@ path is verified, and the completion goal can be marked complete.
   intended material. This is a reproducible visual improvement, not photoreal acceptance: the
   30 m canyon silhouette, vegetation fidelity/density, water, lighting, and named art/guide/
   geospatial review remain open under M9.
+- Zambezi Single Layer Water V1 replaces only Batoka's flat opaque candidate parent with
+  an isolated physical water-volume material. Active scattering, absorption, phase, and
+  behind-water controls combine with two opposed panned normal layers and bounded
+  world-space optical variation; the generated ribbon remains non-colliding and cannot
+  affect solver, raft, or terrain authority. Both 1280x720 canonical views were regenerated.
+  They materially reduce the former camera-radial grooves and do not reproduce the earlier
+  global Single Layer foreground split, but remain photoreal-rejected for flat broad-water
+  response, missing rapid-specific hydraulics/foam/spray, coarse Batoka terrain, synthetic
+  ecology, and absent named guide/art approval. The editor build, focused saved-material
+  automation 1/1, schema-v5 map audit, and focused runtime map-load gate 1/1 pass. M9 stays
+  in progress; this milestone does not close the external acceptance or release gates.

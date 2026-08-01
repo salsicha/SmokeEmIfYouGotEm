@@ -1,5 +1,8 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
+#include "Materials/MaterialExpressionNoise.h"
+#include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialParameterCollection.h"
 
 namespace RaftSimEditorEnvironment
@@ -1888,30 +1891,39 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
     return Material;
 }
 
-UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSummary)
+UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+    FString& OutSummary,
+    bool bUseSingleLayerWater)
 {
-    static const TCHAR* MaterialPackagePath =
-        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate");
-    static const TCHAR* MaterialObjectPath =
-        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate.M_RaftSim_SolverSurfaceWaterCandidate");
+    const FString MaterialPackagePath = bUseSingleLayerWater
+        ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+               "M_RaftSim_Zambezi_SingleLayerWater")
+        : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+               "M_RaftSim_SolverSurfaceWaterCandidate");
+    const FString MaterialObjectName = bUseSingleLayerWater
+        ? TEXT("M_RaftSim_Zambezi_SingleLayerWater")
+        : TEXT("M_RaftSim_SolverSurfaceWaterCandidate");
+    const FString MaterialObjectPath = FString::Printf(
+        TEXT("%s.%s"), *MaterialPackagePath, *MaterialObjectName);
 
-    UPackage* Package = CreatePackage(MaterialPackagePath);
+    UPackage* Package = CreatePackage(*MaterialPackagePath);
     if (!Package)
     {
         OutSummary += TEXT("Failed to create the solver-surface water candidate material package.\n");
         return nullptr;
     }
 
-    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(
+        UMaterial::StaticClass(), nullptr, *MaterialObjectPath));
     if (!Material)
     {
-        Material = FindObject<UMaterial>(Package, TEXT("M_RaftSim_SolverSurfaceWaterCandidate"));
+        Material = FindObject<UMaterial>(Package, *MaterialObjectName);
     }
     if (!Material)
     {
         Material = NewObject<UMaterial>(
             Package,
-            TEXT("M_RaftSim_SolverSurfaceWaterCandidate"),
+            *MaterialObjectName,
             RF_Public | RF_Standalone | RF_Transactional);
         if (Material)
         {
@@ -1926,7 +1938,8 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_DefaultLit);
+    Material->SetShadingModel(
+        bUseSingleLayerWater ? MSM_SingleLayerWater : MSM_DefaultLit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
@@ -2081,6 +2094,41 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     BaseColor->A.Expression = SolverConditionedSurface;
     BaseColor->B.Expression = BaseColorScale;
     Material->GetExpressionCollection().AddExpression(BaseColor);
+    UMaterialExpression* OpticallyVariedBaseColor = BaseColor;
+    if (bUseSingleLayerWater)
+    {
+        UMaterialExpressionNoise* SurfaceVariationNoise =
+            NewObject<UMaterialExpressionNoise>(Material);
+        SurfaceVariationNoise->Scale = 0.0032f;
+        SurfaceVariationNoise->bTurbulence = true;
+        SurfaceVariationNoise->Levels = 3;
+        SurfaceVariationNoise->OutputMin = 0.0f;
+        SurfaceVariationNoise->OutputMax = 1.0f;
+        Material->GetExpressionCollection().AddExpression(SurfaceVariationNoise);
+        UMaterialExpressionScalarParameter* SurfaceVariationStrength =
+            AddScalarParameter(TEXT("SurfaceVariationStrength"), 0.0f);
+        UMaterialExpressionMultiply* SurfaceVariationAlpha =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        SurfaceVariationAlpha->A.Expression = SurfaceVariationNoise;
+        SurfaceVariationAlpha->B.Expression = SurfaceVariationStrength;
+        Material->GetExpressionCollection().AddExpression(SurfaceVariationAlpha);
+        UMaterialExpressionConstant* LiftedSurfaceScale =
+            NewObject<UMaterialExpressionConstant>(Material);
+        LiftedSurfaceScale->R = 1.45f;
+        Material->GetExpressionCollection().AddExpression(LiftedSurfaceScale);
+        UMaterialExpressionMultiply* LiftedBaseColor =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        LiftedBaseColor->A.Expression = BaseColor;
+        LiftedBaseColor->B.Expression = LiftedSurfaceScale;
+        Material->GetExpressionCollection().AddExpression(LiftedBaseColor);
+        UMaterialExpressionLinearInterpolate* SurfaceVariation =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        SurfaceVariation->A.Expression = BaseColor;
+        SurfaceVariation->B.Expression = LiftedBaseColor;
+        SurfaceVariation->Alpha.Expression = SurfaceVariationAlpha;
+        Material->GetExpressionCollection().AddExpression(SurfaceVariation);
+        OpticallyVariedBaseColor = SurfaceVariation;
+    }
 
     UMaterialExpressionVectorParameter* AtlasTileOriginParameter =
         AddVectorParameter(TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
@@ -2098,7 +2146,11 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     Material->GetExpressionCollection().AddExpression(AtlasTileScale);
 
     auto AddWaterNormalSample =
-        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture](float UTiling, float VTiling) -> UMaterialExpression*
+        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture, bUseSingleLayerWater](
+            float UTiling,
+            float VTiling,
+            float SpeedX,
+            float SpeedY) -> UMaterialExpression*
     {
         UMaterialExpressionTextureCoordinate* TexCoord =
             NewObject<UMaterialExpressionTextureCoordinate>(Material);
@@ -2106,8 +2158,20 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         TexCoord->VTiling = VTiling;
         Material->GetExpressionCollection().AddExpression(TexCoord);
 
+        UMaterialExpression* SampleCoordinates = TexCoord;
+        if (bUseSingleLayerWater)
+        {
+            UMaterialExpressionPanner* Panner =
+                NewObject<UMaterialExpressionPanner>(Material);
+            Panner->SpeedX = SpeedX;
+            Panner->SpeedY = SpeedY;
+            Panner->Coordinate.Expression = TexCoord;
+            Material->GetExpressionCollection().AddExpression(Panner);
+            SampleCoordinates = Panner;
+        }
+
         UMaterialExpressionFrac* WrappedUvPrimary = NewObject<UMaterialExpressionFrac>(Material);
-        WrappedUvPrimary->Input.Expression = TexCoord;
+        WrappedUvPrimary->Input.Expression = SampleCoordinates;
         Material->GetExpressionCollection().AddExpression(WrappedUvPrimary);
         UMaterialExpressionConstant2Vector* HalfPeriodOffset =
             NewObject<UMaterialExpressionConstant2Vector>(Material);
@@ -2115,7 +2179,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         HalfPeriodOffset->G = 0.0f;
         Material->GetExpressionCollection().AddExpression(HalfPeriodOffset);
         UMaterialExpressionAdd* OffsetTexCoord = NewObject<UMaterialExpressionAdd>(Material);
-        OffsetTexCoord->A.Expression = TexCoord;
+        OffsetTexCoord->A.Expression = SampleCoordinates;
         OffsetTexCoord->B.Expression = HalfPeriodOffset;
         Material->GetExpressionCollection().AddExpression(OffsetTexCoord);
         UMaterialExpressionFrac* WrappedUvOffset = NewObject<UMaterialExpressionFrac>(Material);
@@ -2183,8 +2247,10 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
         return SeamContinuousNormal;
     };
 
-    UMaterialExpression* NormalSampleA = AddWaterNormalSample(0.73f, 2.15f);
-    UMaterialExpression* NormalSampleB = AddWaterNormalSample(1.11f, 3.30f);
+    UMaterialExpression* NormalSampleA = AddWaterNormalSample(
+        0.73f, 2.15f, 0.036f, 0.006f);
+    UMaterialExpression* NormalSampleB = AddWaterNormalSample(
+        1.11f, 3.30f, -0.014f, 0.027f);
     UMaterialExpressionConstant* NormalLayerBlend = NewObject<UMaterialExpressionConstant>(Material);
     NormalLayerBlend->R = 0.46f;
     Material->GetExpressionCollection().AddExpression(NormalLayerBlend);
@@ -2237,7 +2303,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     UMaterialExpressionScalarParameter* EmissiveFillScale =
         AddScalarParameter(TEXT("EmissiveFillScale"), 0.004f);
     UMaterialExpressionMultiply* BaseEmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-    BaseEmissiveColor->A.Expression = BaseColor;
+    BaseEmissiveColor->A.Expression = OpticallyVariedBaseColor;
     BaseEmissiveColor->B.Expression = EmissiveFillScale;
     Material->GetExpressionCollection().AddExpression(BaseEmissiveColor);
     UMaterialExpressionFresnel* ReflectionFresnel = NewObject<UMaterialExpressionFresnel>(Material);
@@ -2292,13 +2358,37 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSu
     Material->GetExpressionCollection().AddExpression(Roughness);
     UMaterialExpressionScalarParameter* Specular =
         AddScalarParameter(TEXT("Specular"), 0.52f);
+    UMaterialExpressionScalarParameter* Opacity = nullptr;
+    if (bUseSingleLayerWater)
+    {
+        Opacity = AddScalarParameter(TEXT("Opacity"), 0.58f);
+        UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput =
+            NewObject<UMaterialExpressionSingleLayerWaterMaterialOutput>(Material);
+        Material->GetExpressionCollection().AddExpression(WaterOutput);
+        WaterOutput->ScatteringCoefficients.Expression = AddVectorParameter(
+            TEXT("ScatteringCoefficients"),
+            FLinearColor(0.00018f, 0.00023f, 0.00013f, 0.0f));
+        WaterOutput->AbsorptionCoefficients.Expression = AddVectorParameter(
+            TEXT("AbsorptionCoefficients"),
+            FLinearColor(0.0068f, 0.0058f, 0.0072f, 0.0f));
+        WaterOutput->PhaseG.Expression = AddScalarParameter(
+            TEXT("PhaseG"), 0.08f);
+        WaterOutput->ColorScaleBehindWater.Expression = AddVectorParameter(
+            TEXT("ColorScaleBehindWater"),
+            FLinearColor(0.18f, 0.20f, 0.14f, 0.0f));
+    }
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
-        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
+        ConnectPreviewMaterialColorInput(
+            EditorOnlyData->BaseColor, OpticallyVariedBaseColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+        if (Opacity)
+        {
+            ConnectPreviewMaterialScalarInput(EditorOnlyData->Opacity, Opacity);
+        }
     }
 
     // SetMaterialUsage compiles immediately. Refresh cached expression data first so
@@ -2808,7 +2898,10 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
 
-    UMaterial* Parent = LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(OutSummary);
+    const bool bUseSingleLayerWater =
+        Spec.RiverId == TEXT("zambezi_batoka_gorge");
+    UMaterial* Parent = LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+        OutSummary, bUseSingleLayerWater);
     if (!Parent)
     {
         return nullptr;
@@ -2933,6 +3026,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetScalar(TEXT("Roughness"), Settings.Roughness);
     SetScalar(TEXT("Specular"), Settings.Specular);
     SetScalar(TEXT("NormalIntensity"), Settings.NormalIntensity);
+    if (bUseSingleLayerWater)
+    {
+        SetScalar(TEXT("SurfaceVariationStrength"), 0.42f);
+        SetScalar(TEXT("Opacity"), Settings.Opacity);
+        SetScalar(TEXT("PhaseG"), Settings.PhaseG);
+        SetVector(TEXT("ScatteringCoefficients"), Settings.ScatteringCoefficients);
+        SetVector(TEXT("AbsorptionCoefficients"), Settings.AbsorptionCoefficients);
+        SetVector(TEXT("ColorScaleBehindWater"), Settings.ColorScaleBehindWater);
+    }
     SetScalar(TEXT("SolverFieldEnable"), Settings.SolverFieldEnable);
     SetScalar(TEXT("SolverMacroNormalWeight"), Settings.SolverMacroNormalWeight);
     SetScalar(TEXT("SolverDepthColorWeight"), Settings.SolverDepthColorWeight);
@@ -2974,9 +3076,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += FString::Printf(
-        TEXT("Built %s opaque DefaultLit solver-surface water candidate (roughness %.3f, normal %.3f, solver field %.0f).\n"),
+        TEXT("Built %s opaque %s solver-surface water candidate (roughness %.3f, opacity %.3f, normal %.3f, solver field %.0f).\n"),
         *Spec.RiverId,
+        bUseSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
         Settings.Roughness,
+        bUseSingleLayerWater ? Settings.Opacity : 1.0f,
         Settings.NormalIntensity,
         Settings.SolverFieldEnable);
     return Instance;

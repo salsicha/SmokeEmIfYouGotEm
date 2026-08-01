@@ -341,7 +341,7 @@
     "water_config_count": 1
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v4",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v5",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "component_count": 4,
@@ -470,5 +470,26 @@
         ]
       }
     ]
+  },
+  "water_surface": {
+    "authority": "render_only_source_aligned_physical_corridor",
+    "component_count": 1,
+    "components": [
+      {
+        "actor_label": "RaftSim_PhysicalCorridorRiverRibbon_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "material": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate.MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate",
+        "parent_material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater.M_RaftSim_Zambezi_SingleLayerWater",
+        "procedural_mesh_count": 1,
+        "tags": [
+          "RaftSimMovingMultiScaleWaterNormals",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimPhysicalCorridorWater",
+          "RaftSimZambeziSingleLayerWater"
+        ]
+      }
+    ],
+    "normal_motion_contract": "two_opposed_panned_atlas_layers",
+    "shading_model_contract": "SingleLayerWater"
   }
 }

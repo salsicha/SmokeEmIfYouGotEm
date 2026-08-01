@@ -249,7 +249,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         ConditionedProfileCenterCount,
         CrossSteps,
         Last.StationMeters);
-    return AddPreviewProceduralMeshActor(
+    AActor* WaterActor = AddPreviewProceduralMeshActor(
         World,
         FString::Printf(
             TEXT("RaftSim_PhysicalCorridorRiverRibbon_%s"),
@@ -262,6 +262,17 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         WaterMaterial,
         &VertexColors,
         false);
+    if (WaterActor)
+    {
+        WaterActor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        WaterActor->Tags.AddUnique(TEXT("RaftSimPhysicalCorridorWater"));
+        if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimZambeziSingleLayerWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+        }
+    }
+    return WaterActor;
 }
 
 AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(

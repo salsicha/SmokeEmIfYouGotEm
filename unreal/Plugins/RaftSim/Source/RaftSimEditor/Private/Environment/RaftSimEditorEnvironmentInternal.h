@@ -917,7 +917,9 @@ UMaterialInterface* LoadOrCreatePreviewTranslucentColorMaterial();
 
 UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial();
 
-UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(FString& OutSummary);
+UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+    FString& OutSummary,
+    bool bUseSingleLayerWater = false);
 
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
