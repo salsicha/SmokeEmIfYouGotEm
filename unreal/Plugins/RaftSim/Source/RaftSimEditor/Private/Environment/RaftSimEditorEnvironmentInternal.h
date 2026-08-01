@@ -898,9 +898,13 @@ struct FZambeziBatokaVisualMorphologyStats
     int32 VisualTileCount = 0;
     int64 TotalVertexCount = 0;
     int64 ModifiedVertexCount = 0;
+    int64 NearBankModifiedVertexCount = 0;
     int64 ProtectedRiverCorridorVertexCount = 0;
     int64 RejectedLowSlopeVertexCount = 0;
     double AbsoluteOffsetSumCm = 0.0;
+    float ProtectedShorelineRadiusCm = 0.0f;
+    float FullStrengthMorphologyRadiusCm = 0.0f;
+    float MinimumModifiedCenterlineDistanceCm = TNumericLimits<float>::Max();
     float MinimumOffsetCm = TNumericLimits<float>::Max();
     float MaximumOffsetCm = TNumericLimits<float>::Lowest();
 };

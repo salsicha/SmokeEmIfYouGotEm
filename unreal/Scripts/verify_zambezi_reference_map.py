@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v7",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v8",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -190,6 +190,15 @@ def main() -> None:
                 "visual_terrain": {
                     "authority": "procedural_render_only",
                     "physics_and_collision_authority": "source_copernicus_landscape",
+                    "morphology_contract": (
+                        "v14_near_bank_basalt_with_100m_polyline_shoreline_"
+                        "protection_and_full_strength_by_220m"
+                    ),
+                    "active_water_half_width_m": 72.0,
+                    "protected_shoreline_radius_m": 100.0,
+                    "minimum_dry_bank_buffer_m": 26.56,
+                    "full_strength_morphology_radius_m": 220.0,
+                    "maximum_vertical_offset_m": 4.5,
                     "conditioned_tile_count": len(terrain_rows),
                     "tiles": sorted(terrain_rows, key=lambda row: row["actor_label"]),
                 },
@@ -286,6 +295,8 @@ def main() -> None:
             and all(
                 "RaftSimNonCollisionRenderSurface" in row["tags"]
                 and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
+                and "RaftSimBatokaNearBankMorphologyV14" in row["tags"]
+                and "RaftSimProtectedShorelineBuffer" in row["tags"]
                 for row in terrain_rows
             )
             and len(water_surface_rows) == 1

@@ -141,6 +141,24 @@ V12 closes the projection defect without promoting the scene. `RaftSim.CaptureZa
 
 V13 tests and rejects the remaining bounded procedural fallback instead of silently enlarging it. `RaftSim.CaptureZambeziBatokaVisualMorphologyComparison` keeps the V12 material, protects the first 220 m around the source centerline with a fade to 650 m, and applies render-only elevation-conditioned flow breaks, two irregular joint families, and talus-scale breakup under a 4.5 m absolute cap. Each comparison accounts for all 1,631,500 visual vertices: 76,403 are river-protected, 1,471,404 fail the slope mask, and 69,987 move by a mean absolute 29.35 cm with -3.94 m/+2.93 m extrema. The exact cameras change 5.22 and 7.84 percent of pixels, but mean channel deltas are only 0.19 and 0.25 levels and the rounded silhouette is effectively unchanged. `zambezi_batoka_v13_visual_morphology_visual_review.json` therefore rejects the pass. Increasing displacement enough to fabricate scarps would invent unsupported walls and banks, so the next legitimate input is rights-cleared higher-resolution terrain: feasibility Vol.3 only if its coverage index intersects the game reach, or a commercially licensed stereo/field-capture product with full reach coverage and complete datum, accuracy, derivative-use, and attribution metadata.
 
+V14 does not overturn that photoreal rejection or promote procedural terrain as
+geographic truth. For the runnable reference-free-run map, it moves the same
+render-only treatment onto the visibly rounded dry lower banks while keeping a
+hard 100 m centreline protection radius around the 72 m active-water
+half-width. The widest generated water edge therefore retains at least 26.56 m
+of untouched shoreline; morphology fades in from 100-220 m, broadens only the
+near-bank rounded-slope mask, and keeps the V13 4.5 m displacement cap. Map
+generation now fails unless four collision-off terrain tiles and at least one
+conditioned dry near-bank vertex are present. Protection distance is measured
+to the full 209-point source-aligned polyline rather than sparse point samples.
+The generated map moved 90,926 of 1,631,500 render vertices, including 18,277
+inside the 220 m near-bank envelope; its nearest conditioned vertex is 102.63 m
+from the polyline. It does so without changing the hidden Copernicus Landscape,
+collision, height queries,
+water geometry, hydraulics, raft contact, rapid stationing, or gameplay. This is
+a bounded runnable-map presentation improvement; rights-cleared higher-resolution
+terrain and external visual/geology review remain the production-photoreal gates.
+
 The project-owned Futaleufu coigue family now has a separate far-corridor runtime representation and a 512-tree HISM review map. The full eight-form closeup family remains intact at 350.87 MiB; deterministic one-in-six far-card meshes plus the structural trunks reduce the final runtime far family to 19.33 MiB, 435,064 vertices, and 223,592 triangles, a 94.492 percent resource reduction. The corrected benchmark keeps crowns registered to their trunks, but it remains a technical candidate: the neutral stand is too dark and regular, has no mixed native ecology or corridor masks, and lacks near/mid/far transition, wind, packaged desktop, and on-device VR evidence. `futaleufu_native_canopy_coigue_v12_runtime_lod_review.json` keeps corridor substitution and production promotion closed.
 
 The V13 pass tests that retained LOD and placement path in the real Futaleufu physical corridor rather than another neutral stand. `RaftSim.CaptureFutaleufuNativeCanopyCorridorComparison` maps the source vegetation and water masks over the physical Landscape, samples authoritative terrain height, enforces a 65 m riparian setback, 15 m spacing, 100-900 m elevation and 39-degree slope bands, moist-aspect thinning, and deterministic macro/micro canopy gaps. It places 1,200 transient non-colliding trees per capture through all eight forms and three representation bands while hiding only the four temporary PVE foliage actors; the saved map, collision, dense visual terrain, river ribbon, water, rocks, custom C++ solver, and GeoClaw reference remain unchanged. The guide-seat view records 50 full, 126 intermediate, and 1,024 runtime-far trees; river-eye records 40, 157, and 1,003.
