@@ -1,0 +1,166 @@
+{
+  "artifact": "M9 soft rounded production PFD V1 review",
+  "recorded_local_date": "2026-07-31",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The production PFD used beveled extrusions with broad planar faces, so the flotation cells, back, flank wings, and pockets still read as hard plates. V1 replaces those visible faces with project-owned multi-ring foam lofts: four-pass rounded outlines, rolled edges, shallow convex crowns, smooth normals, and no flat exterior foam faces. The prior zero-shoulder-foam contract remains intact with only two narrow webbing connectors.",
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_pfd.py",
+    "generator_version": 6,
+    "generator_sha256": "bbf45dc99a9d82ed2cc47f7154f63712d02022f70862eac60b69999f959116d7",
+    "importer": "unreal/Scripts/import_production_whitewater_pfd.py",
+    "importer_sha256": "49efaf7d9dd27d81c89ccab33d764a9fbc93191ec209eb307cab994000d24134",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/production_whitewater_pfd_manifest.json",
+    "manifest_sha256": "26cac750a3629ae93c0bcb5bf91f3287e308bbb76b16dde8680ca59286479271",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+    "fbx_sha256": "f167a51358fec0e0387b8bc3fe3f618df60c6b42423cb0429ab8382e9c38671b",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+    "blend_sha256": "eeec5a5c06c587fde0df2a3396104201481271dc9a9de81320d702a47990e5a7",
+    "external_asset_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "uasset": "unreal/Content/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd.uasset",
+    "uasset_sha256": "36bc211ebebb4f086bd8e38260aaeafac06f8b73052a70d0d72f9fda9f4033bd",
+    "dimensions_cm": [
+      42.295,
+      44.8966,
+      42.29
+    ],
+    "source_vertices": 13066,
+    "source_polygons": 13950,
+    "authored_lod0_triangles": 25320,
+    "nanite_fallback_triangles": 2260,
+    "nanite_enabled": true,
+    "material_slot_count": 5,
+    "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
+  },
+  "construction": {
+    "front_foam_panels": 4,
+    "back_panels": 1,
+    "side_wings": 2,
+    "shoulder_foam_pads": 0,
+    "shoulder_webbing_runs": 2,
+    "shoulder_webbing_width_cm": 2.0,
+    "shoulder_webbing_thickness_cm": 0.18,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 2,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1,
+    "reflective_chest_zones": 2,
+    "blank_back_placards": 1,
+    "front_lash_tabs": 3
+  },
+  "soft_geometry": {
+    "outline_corner_rounding": "four-pass closed Chaikin",
+    "outline_corner_rounding_passes": 4,
+    "flat_exterior_foam_faces": 0,
+    "front_panel_edge_roll_cm": 1.35,
+    "front_panel_crown_depth_cm": 1.45,
+    "back_panel_edge_roll_cm": 1.2,
+    "back_panel_crown_depth_cm": 1.65,
+    "side_wing_flat_exterior_faces": 0,
+    "side_wing_crown_depth_cm": 0.75,
+    "front_pocket_flat_exterior_faces": 0,
+    "front_pocket_crown_depth_cm": 0.62,
+    "smooth_shaded": true
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_roster_capture.json",
+    "source_report_sha256": "a51a5c4f3b76017e7419c28d7b4183d13929463e9ab194d032f8d32df5dfa17c",
+    "captured_character_count": 5,
+    "characters_using_production_pfd": 5,
+    "maximum_runtime_torso_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_guide_full.png",
+      "capture_sha256": "854b52898e727f03718245f5ed70c1276ae597fee7a75111d821cb0189fb6e78"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_guide_profile.png",
+      "capture_sha256": "c114e01100396e83ffdd52b379803a16ba3cde587aadc5e27353ab097a9b66a1"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_guide_rear.png",
+      "capture_sha256": "864ed246c86172a02eeef7f74594cf00620d0663de810bbfab393105ed7a113f"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_broadest_full.png",
+      "capture_sha256": "d27730c56ebccb7d89004132ecf0262a13cdadb0abb260a8bff598832385ce86"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_broadest_profile.png",
+      "capture_sha256": "cc9be037e241ac4cfe7121bb5fa50d41a30e5e026aa2506bb8a159e7d75bb49e"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_soft_rounded_pfd_v1_broadest_rear.png",
+      "capture_sha256": "abb3d887b941a76cb040da7e6a2c0016059615a0f1e26b01191c1557847696ce"
+    },
+    "technical_verdict": "pass: front, profile, and rear runtime pixels show rounded chamber perimeters, rolled edge transitions, and convex lighting gradients on the chest, flank wings, pockets, and back; no rigid shoulder pad was reintroduced",
+    "photoreal_verdict": "fail pending named approval or replacement of the simplified first-party hardware, fabric shader, webbing intersections, identity-specific deformation, seated pose, and review lighting"
+  },
+  "implementation": {
+    "replaced_flat_panel_helper": "add_extruded_panel",
+    "retained_rounded_panel_helper": "add_crowned_foam_panel",
+    "rounded_components": [
+      "four front flotation cells",
+      "protective back panel",
+      "two side wings",
+      "two front pockets"
+    ],
+    "flat_exterior_foam_faces_after": 0,
+    "shoulder_foam_pads_after": 0,
+    "shoulder_webbing_runs_after": 2,
+    "pfd_runtime_transform_changed": false,
+    "material_assignment_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development remained current; this repair changed deterministic source art and one imported static mesh only",
+    "source_import": "Unreal import succeeded with the exact FBX hash, 25,320 authored triangles, 2,260 Nanite fallback triangles, five material slots, and valid centimetre bounds",
+    "focused_python": "27/27 safety-gear and flexible-raft visual source contracts passed before release-ledger reconciliation",
+    "renderer_turntable": "5/5 identities captured with production PFD selection and exactly 0.0 cm maximum torso-origin error",
+    "m4": "4/4 passed (M9V532SoftRoundedPfdM4)",
+    "m4_report": "unreal/Saved/Automation/M9V532SoftRoundedPfdM4/index.json",
+    "m4_report_sha256": "5af4fe1a5655535a9c71d9b5d9c7d6126b19bca3d92ac74f2ede68c0753a659b",
+    "m5": "5/5 result entries passed renderer-enabled (M9V533SoftRoundedPfdM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V533SoftRoundedPfdM5Renderer/index.json",
+    "m5_report_sha256": "8b46f16a6a71bd63c2c73589677f25e784bd8ce9f4c48752d105c546800207d1",
+    "m7": "4/4 result entries passed renderer-enabled (M9V534SoftRoundedPfdM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V534SoftRoundedPfdM7Renderer/index.json",
+    "m7_report_sha256": "036431d03a35c15e5718b67438c44e9e8dc4abeb869e2af4158fae06d4a30d1d",
+    "m8": "4/4 passed renderer-enabled (M9V535SoftRoundedPfdM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V535SoftRoundedPfdM8Renderer/index.json",
+    "m8_report_sha256": "12d30fbd87679588f499b25a011800327c08cfda1294e26f8ef4789ab6b4cac5",
+    "full_python_matrix": "1148 passed, 3 expected skips, 0 failed in 416.60 seconds (M9V536SoftRoundedPfd)",
+    "full_python_report": "physics/reports/m9/m9_v536_soft_rounded_pfd_full_matrix.xml",
+    "full_python_report_sha256": "56b4dab37713fd6d4a004922a84d06ee5535859f0ac39a6d130ddca340d2b167",
+    "m9": "6/6 passed after soft rounded PFD evidence reconciliation (M9V537SoftRoundedPfdReconciledM9)",
+    "m9_report": "unreal/Saved/Automation/M9V537SoftRoundedPfdReconciledM9/index.json",
+    "m9_report_sha256": "1d4022812a89e0b469876eb903c161fccd68a46a2532f8b3bb68d6ba4ab5c95c"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the rounded first-party PFD geometry, simplified hardware, webbing intersections, materials, and identity-specific fit in motion.",
+    "A qualified whitewater safety reviewer must approve the visible flotation coverage, adjustment layout, rescue hardware, and gameplay depiction; this geometry review is not equipment certification.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

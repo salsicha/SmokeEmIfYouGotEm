@@ -145,17 +145,26 @@ UStaticMesh* CreateGrassTuftMesh(
     {
         return nullptr;
     }
-    constexpr int32 BladeCount = 24;
+    // One instance represents a small, irregular patch rather than a radial
+    // star of oversized blades.  The former 24-blade, 1.24 m diameter tuft
+    // disappeared at guide-eye distance and left the four-metre DEM surface
+    // visually bare between isolated yellow clumps.  Use many narrower blades
+    // over a wider footprint, then mix in low litter/forb leaves that remain
+    // close to the terrain.  This is presentation-only geometry; the source
+    // density raster still decides where patches may exist.
+    constexpr int32 BladeCount = 52;
+    constexpr int32 LowLeafCount = 10;
+    constexpr int32 ElementCount = BladeCount + LowLeafCount;
     TArray<FVector> Vertices;
     TArray<int32> Triangles;
     TArray<FVector2D> Uvs;
     TArray<FLinearColor> Colors;
     TArray<FProcMeshTangent> Tangents;
-    Vertices.Reserve(BladeCount * 5);
-    Triangles.Reserve(BladeCount * 9);
-    Uvs.Reserve(BladeCount * 5);
-    Colors.Reserve(BladeCount * 5);
-    Tangents.Reserve(BladeCount * 5);
+    Vertices.Reserve(ElementCount * 5);
+    Triangles.Reserve(ElementCount * 9);
+    Uvs.Reserve(ElementCount * 5);
+    Colors.Reserve(ElementCount * 5);
+    Tangents.Reserve(ElementCount * 5);
 
     for (int32 Blade = 0; Blade < BladeCount; ++Blade)
     {
@@ -164,13 +173,13 @@ UStaticMesh* CreateGrassTuftMesh(
         const FVector Forward(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
         const FVector Right(-Forward.Y, Forward.X, 0.0f);
         const float RadiusCm = FMath::Lerp(
-            4.0f, 62.0f, GroundCoverUnitRandom(Blade, 19, 509));
+            6.0f, 116.0f, GroundCoverUnitRandom(Blade, 19, 509));
         const float WidthCm = FMath::Lerp(
-            5.0f, 13.0f, GroundCoverUnitRandom(Blade, 23, 521));
+            1.4f, 4.8f, GroundCoverUnitRandom(Blade, 23, 521));
         const float HeightCm = FMath::Lerp(
-            50.0f, 125.0f, GroundCoverUnitRandom(Blade, 29, 523));
+            28.0f, 104.0f, GroundCoverUnitRandom(Blade, 29, 523));
         const float LeanCm = FMath::Lerp(
-            -14.0f, 30.0f, GroundCoverUnitRandom(Blade, 31, 541));
+            -18.0f, 36.0f, GroundCoverUnitRandom(Blade, 31, 541));
         const FVector Center = Forward * RadiusCm;
         const FVector BaseLeft = Center - Right * WidthCm * 0.5f;
         const FVector BaseRight = Center + Right * WidthCm * 0.5f;
@@ -199,6 +208,56 @@ UStaticMesh* CreateGrassTuftMesh(
             FLinearColor(0.62f, 0.50f, 0.22f, 1.0f), Dryness);
         Colors.Append({
             BaseColor * 0.82f, BaseColor * 0.82f,
+            BaseColor, BaseColor, TipColor});
+        for (int32 Vertex = 0; Vertex < 5; ++Vertex)
+        {
+            Tangents.Add(FProcMeshTangent(Right, false));
+        }
+    }
+
+    for (int32 Leaf = 0; Leaf < LowLeafCount; ++Leaf)
+    {
+        const int32 Element = BladeCount + Leaf;
+        const float Angle = UE_TWO_PI *
+            GroundCoverUnitRandom(Element, 41, 701);
+        const FVector Forward(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+        const FVector Right(-Forward.Y, Forward.X, 0.0f);
+        const float RadiusCm = FMath::Lerp(
+            12.0f, 94.0f, GroundCoverUnitRandom(Element, 43, 709));
+        const float WidthCm = FMath::Lerp(
+            7.0f, 16.0f, GroundCoverUnitRandom(Element, 47, 719));
+        const float LengthCm = FMath::Lerp(
+            30.0f, 74.0f, GroundCoverUnitRandom(Element, 53, 727));
+        const float RiseCm = FMath::Lerp(
+            5.0f, 20.0f, GroundCoverUnitRandom(Element, 59, 733));
+        const FVector BaseCenter = Forward * RadiusCm;
+        const FVector BaseLeft = BaseCenter - Right * WidthCm * 0.42f;
+        const FVector BaseRight = BaseCenter + Right * WidthCm * 0.42f;
+        const FVector MiddleCenter = BaseCenter + Forward * LengthCm * 0.56f +
+            FVector(0.0f, 0.0f, RiseCm * 0.58f);
+        const FVector MiddleLeft = MiddleCenter - Right * WidthCm * 0.50f;
+        const FVector MiddleRight = MiddleCenter + Right * WidthCm * 0.50f;
+        const FVector Tip = BaseCenter + Forward * LengthCm +
+            FVector(0.0f, 0.0f, RiseCm);
+        const int32 VertexBase = Vertices.Num();
+        Vertices.Append({BaseLeft, BaseRight, MiddleLeft, MiddleRight, Tip});
+        Triangles.Append({
+            VertexBase, VertexBase + 1, VertexBase + 2,
+            VertexBase + 1, VertexBase + 3, VertexBase + 2,
+            VertexBase + 2, VertexBase + 3, VertexBase + 4});
+        Uvs.Append({
+            FVector2D(0.0f, 1.0f), FVector2D(1.0f, 1.0f),
+            FVector2D(0.0f, 0.48f), FVector2D(1.0f, 0.48f),
+            FVector2D(0.5f, 0.0f)});
+        const float Dryness = GroundCoverUnitRandom(Element, 61, 739);
+        const FLinearColor BaseColor = FMath::Lerp(
+            FLinearColor(0.13f, 0.24f, 0.055f, 1.0f),
+            FLinearColor(0.40f, 0.30f, 0.105f, 1.0f), Dryness);
+        const FLinearColor TipColor = FMath::Lerp(
+            BaseColor * 1.04f,
+            FLinearColor(0.48f, 0.38f, 0.15f, 1.0f), Dryness);
+        Colors.Append({
+            BaseColor * 0.74f, BaseColor * 0.74f,
             BaseColor, BaseColor, TipColor});
         for (int32 Vertex = 0; Vertex < 5; ++Vertex)
         {
@@ -284,8 +343,8 @@ FSouthForkGroundCoverPlacement ComputeSouthForkGroundCoverPlacement(
     const FVector& GroundLocation)
 {
     FSouthForkGroundCoverPlacement Placement;
-    if (BankDistanceM < 24.0f || BankDistanceM > 96.0f ||
-        LateralSlope > 0.34f)
+    if (BankDistanceM < 22.0f || BankDistanceM > 118.0f ||
+        LateralSlope > 0.40f)
     {
         return Placement;
     }
@@ -296,11 +355,14 @@ FSouthForkGroundCoverPlacement ComputeSouthForkGroundCoverPlacement(
     const float PatchNoise = 0.5f + 0.5f * FMath::PerlinNoise2D(
         FVector2D(GroundLocation.X, GroundLocation.Y) / 2600.0f);
     const float ShoreFade = FMath::SmoothStep(
-        24.0f, 34.0f, BankDistanceM);
+        22.0f, 33.0f, BankDistanceM);
+    const float OuterBankFade = 1.0f - FMath::SmoothStep(
+        102.0f, 118.0f, BankDistanceM);
     const float Probability = FMath::Clamp(
-        (0.24f + SourceSignal * 0.46f) *
-            FMath::Lerp(0.64f, 1.34f, PatchNoise) * ShoreFade,
-        0.0f, 0.78f);
+        (0.28f + SourceSignal * 0.48f) *
+            FMath::Lerp(0.58f, 1.42f, PatchNoise) *
+            ShoreFade * OuterBankFade,
+        0.0f, 0.84f);
     if (GroundCoverUnitRandom(CoordinateIndex, Column, 601) > Probability)
     {
         return Placement;
@@ -320,7 +382,7 @@ FSouthForkGroundCoverPlacement ComputeSouthForkGroundCoverPlacement(
         GroundCoverUnitRandom(CoordinateIndex, Column, 615) <
             FMath::Lerp(0.12f, 0.48f, SourceSignal * PatchNoise);
     Placement.BaseScale = FMath::Lerp(
-        0.70f, 1.12f,
+        0.76f, 1.18f,
         GroundCoverUnitRandom(CoordinateIndex, Column, 617));
     return Placement;
 }
@@ -358,10 +420,10 @@ int32 AddSouthForkGroundCoverInstances(
         const int32 Salt = 631 + Cluster * 29;
         FVector Jitter =
             Along * FMath::Lerp(
-                -340.0f, 340.0f,
+                -380.0f, 380.0f,
                 GroundCoverUnitRandom(CoordinateIndex, Column, Salt)) +
             Across * FMath::Lerp(
-                -300.0f, 300.0f,
+                -340.0f, 340.0f,
                 GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 2));
         if (SurfaceNormal.Z > 0.25f)
         {
@@ -383,7 +445,7 @@ int32 AddSouthForkGroundCoverInstances(
                 0.84f, 1.18f,
                 GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 7)),
             Scale * FMath::Lerp(
-                0.75f, 1.10f,
+                0.64f, 1.08f,
                 GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 11)));
         const FQuat SurfaceAlignment = FQuat::FindBetweenNormals(
             FVector::UpVector, SurfaceNormal);

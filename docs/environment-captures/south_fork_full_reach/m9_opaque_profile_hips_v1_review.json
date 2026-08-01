@@ -1,0 +1,126 @@
+{
+  "schema": "raftsim.m9.opaque_profile_hips_review.v1",
+  "reviewed_utc": "2026-07-31T21:06:05Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "summary": "The production character profile previously exposed the bright turntable background between the retained seated pelvis and the assembled MetaHuman upper legs. Opaque Profile Hips V1 retains two pose-matched wetsuit hip roots, buries their proximal ends inside the pelvis, and uses a closed tapered mesh instead of a stretched sphere. The guide and all four crew profiles now keep a continuous opaque waist-to-upper-leg silhouette without the rejected round hip-pad artifact.",
+  "root_cause": {
+    "production_visibility_gap": "SetProceduralVisualVisible(false) retained the project-owned pelvis but hid both pose-matched thigh roots, while the assembled production legs did not close the profile junction to that pelvis shell.",
+    "material_diagnosis": "The retained pelvis and wetsuit materials were already BLEND_Opaque; the apparent transparency was literal background visible through missing junction geometry, not alpha blending.",
+    "rejected_full_thigh_candidate": "Retaining the existing full 8.3 cm-radius stretched-sphere thighs closed the hole but created oversized round hip pads and an inflated rear silhouette.",
+    "rejected_short_sphere_candidate": "Shorter 6.8 cm-radius stretched spheres reduced the volume but kept a visibly bulbous proximal joint.",
+    "retained_shape": "A 377-vertex closed tapered tube per side, spanning -0.15 to 0.58 of the solved hip-to-knee segment. Its narrow caps remain inside overlapping pelvis and assembled-leg geometry."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "opaque_hip_bridges_per_avatar": 2,
+    "reference_bridge_radius_cm": 6.8,
+    "bridge_start_fraction": -0.15,
+    "bridge_end_fraction": 0.58,
+    "minimum_allowed_runtime_radius_cm": 6.2,
+    "minimum_allowed_runtime_half_length_cm": 9.5,
+    "maximum_allowed_hip_centreline_error_cm": 0.25,
+    "bridge_material": "/Game/RaftSim/Materials/M_RaftSim_Wetsuit",
+    "material_blend_mode": "BLEND_Opaque",
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "collision_changed": false,
+    "physics_or_gameplay_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_roster_capture.json",
+    "report_sha256": "202f235f40752f53f5ed0d16a2e4a3713c2b91a4c2e1fd1c6dd89316b100226e",
+    "captured_character_count": 5,
+    "characters_with_visible_waist_hip_silhouette": 5,
+    "characters_with_opaque_waist_hip_materials": 5,
+    "minimum_bridge_radius_cm": 6.357182025909423,
+    "minimum_bridge_half_length_cm": 11.844235765824047,
+    "maximum_hip_centreline_error_cm": 2.7414336045694654e-7
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_guide_full.png",
+      "capture_sha256": "4eb935d2ffbb5106224050d9272ed3fd7086d2426c1b0d65ecbdcf34dfb1d470"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_guide_profile.png",
+      "capture_sha256": "f1cdc0ccaef9a1fd899aba8b52a75353b7366824f1c2cf4178fb817e63015421"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_guide_rear.png",
+      "capture_sha256": "18fe0312bcf671db82e12a6d53791f4e03b758f477308f444925d7c0fb4288c1"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_broadest_full.png",
+      "capture_sha256": "09d3ba68915217d7da8e2960027bb1f419f80c1810c2289f1655aedb9cca5d35"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_broadest_profile.png",
+      "capture_sha256": "7d77d14c767540577115664bace311edfbab86f4e0d1e2459c186c5303110dd6"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_broadest_rear.png",
+      "capture_sha256": "fa68abe9084746b7cfe457807e2da9130877c1a1700d58a0b9d8e6a3725ceea2"
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: all five front/profile/rear turntables retain opaque hip junctions; guide and broadest profiles show no background between pelvis and upper leg",
+    "photoreal_verdict": "fail pending named review or replacement of the still-simplified procedural pelvis/thigh anatomy, seams, deformation and wet material response"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+    "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 production-character, safety-gear, and flexible-raft source contracts passed",
+    "renderer_turntable": "5/5 identities and 30/30 PNG outputs captured",
+    "m4": "4/4 passed (M9V579OpaqueProfileHipsM4)",
+    "m4_report": "unreal/Saved/Automation/M9V579OpaqueProfileHipsM4/index.json",
+    "m4_report_sha256": "b1d28eab760aafb8fd9b41838ab9aec735a26c1f5ef6ed377af6a70df931e80a",
+    "m5": "5/5 passed renderer-enabled, including live hip visibility, opaque material, tapered-mesh density, extent and centreline-coverage assertions (M9V578OpaqueProfileHipsM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V578OpaqueProfileHipsM5Renderer/index.json",
+    "m5_report_sha256": "f1b186d101e565d95da0caface8dd75bbf68488e1f300d4364220e233814aa4f",
+    "failed_diagnostic": "M9V577OpaqueProfileHipsM5Renderer was rejected because its 10.5 cm turntable half-length floor did not admit the valid 9.82 cm live rescue-pose bridge; it is not retained as passing evidence.",
+    "m7": "4/4 passed offscreen-rendered (M9V580OpaqueProfileHipsM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V580OpaqueProfileHipsM7Renderer/index.json",
+    "m7_report_sha256": "3f9d85c92febc26272cd336c4be861afde0d27f50e11f5328890babb90308f38",
+    "m8": "4/4 passed offscreen-rendered (M9V581OpaqueProfileHipsM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V581OpaqueProfileHipsM8Renderer/index.json",
+    "m8_report_sha256": "88aaacb0d002281d322640d5e989d035cfff50c743fd2db025d995c41736cd9b",
+    "full_python": "1148 passed, three expected installed-dependency inverse-path skips, and zero failures in 425.75 seconds (M9V582OpaqueProfileHips)",
+    "full_python_report": "physics/reports/m9/m9_v582_opaque_profile_hips_full_matrix.xml",
+    "full_python_report_sha256": "11997950376a11560a4d5971180b60a652f32ac7ae7f716be34722207c0146c6",
+    "m9": "6/6 passed after opaque profile hips V1 evidence reconciliation (M9V583OpaqueProfileHipsReconciledM9)",
+    "m9_report": "unreal/Saved/Automation/M9V583OpaqueProfileHipsReconciledM9/index.json",
+    "m9_report_sha256": "0c6f45275a221155925b242484e5079a297429e1ec328ca9119d07206db9edde"
+  },
+  "accepted": [
+    "All five production profiles now retain an opaque waist-to-upper-leg silhouette with no background exposed at either hip junction.",
+    "Both bridge materials are runtime-verified as BLEND_Opaque.",
+    "Each solved hip lies on the buried bridge centreline within 0.000001 cm and all identities exceed the minimum geometry extents.",
+    "The retained tapered mesh removes the rejected spherical hip-pad silhouette.",
+    "No animation, body mass, collision, raft, water, rescue or gameplay-force authority changed."
+  ],
+  "rejected_or_open": [
+    "Full fallback thighs were rejected because they closed the gap with oversized capsule volume.",
+    "Short stretched-sphere roots were rejected because their round ends still read as detached hip pads.",
+    "The retained procedural pelvis and thigh junction remain visibly synthetic and do not satisfy final photoreal character-art acceptance.",
+    "No named character-art reviewer or qualified guide has approved these captures for release media."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the pelvis, hip-root anatomy, deformation, seams and wet-material response.",
+    "A qualified whitewater guide must approve the seated hip range of motion and paddle-stroke biomechanics in motion.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance and promotion gates."
+  ]
+}

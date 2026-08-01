@@ -3437,3 +3437,45 @@ path is verified, and the completion goal can be marked complete.
   `m9_depth_bearing_contact_water_v10_review.json`. M9 remains uncommitted and unpushed pending
   accepted photoreal art, all named reviews, external platform/input, signing/notarization,
   rights-cleared media, distribution accounts, clean immutable qualification, and promotion.
+- Organic bank mosaic V2 closes the latest local low-cover pass without weakening M9. The
+  deterministic ground-cover mesh now combines 52 narrow grass blades with ten low forb leaves;
+  source-conditioned placement spans 22-118 m from the river with shoreline/outer-bank fades, and
+  the settled map records 220,759 collisionless ground-cover instances plus 82,609 near-corridor
+  foliage instances. All five canonical captures were regenerated from the saved map, and the final
+  HLOD repeat evaluates 28/28 actors with zero modified packages. Validation passes the editor build,
+  focused native 1/1, source-layout 35/35, M4 4/4, M5 5/5, M7 4/4, M8 4/4, the 1,148-pass Python
+  matrix with three expected skips, and two 6/6 M9 runs. The scene is materially less bare but still
+  photoreal-rejected for procedural tuft forms, repeated/sparse vegetation, coarse terrain materials,
+  distant cards, and synthetic lighting. M9 remains in progress, uncommitted, and unpushed because
+  named product-owner, guide, art, geospatial, and rights review; five-view approval; fresh-device
+  input; Windows/Proton; signing/notarization; approved media; exact-current performance; clean
+  immutable rebuild; and promotion gates remain open.
+- Fuller seated hips V2 closes the reported production-character silhouette gap without
+  changing gameplay authority. The retained 18-ring by 32-side pelvis shell broadens the
+  waist-to-glute bridge, adds localized seated profile depth, and separates the thigh roots
+  with a central saddle. Five production identities pass with zero hip-centre error and a
+  minimum measured half-extent of 14.25×21.16×14.10 cm; the editor build, 36 focused Python
+  contracts, M4 4/4, M5 5/5, M7 4/4, M8 4/4, the 1,148-pass full matrix, and two 6/6
+  fail-closed M9 runs are green. The prior narrow V1 and a
+  skirt-like first V2 bracket remain rejected visual evidence. Final photoreal anatomy,
+  wetsuit deformation, and character-art approval remain open, so M9 is not promoted and no
+  milestone commit or push is permitted yet.
+- Upright fitted production river boot V1 resolves the reported inverted footwear read while
+  retaining the existing project-owned mesh and support points. Runtime placement now constructs
+  a toe-forward/cuff-up basis explicitly, fits the overly tall source cuff to 68% height, and
+  offsets from the actual source sole bound so every tread remains at its prior planted height.
+  Ten of ten boots across the five production identities pass the fitted-upright invariant;
+  the editor build, 36 focused contracts, M4 4/4, M5 5/5, M7 4/4, M8 4/4, the 1,148-pass
+  exact-current full matrix, and independent 6/6 M9 runs v560 and v561 are green. Rigid ankle
+  deformation, photoreal wet materials, and named character-art/guide acceptance remain open,
+  so this is a technical baseline rather than release promotion.
+- Closed-finger paddle grip V1 closes the reported open-hand/edge-contact defect without
+  moving the existing shoulder, elbow, wrist, palm, paddle, physics, collision, or gameplay
+  authority. Each visible lower hand now wraps four non-thumb finger chains around the shaft;
+  each upper hand wraps around the transverse T-grip. Across five production identities the
+  maximum palm-anchor error is `1.880034572465661e-9` cm and the maximum eight-distal-joint
+  contact error is `0.0` cm. The editor build, 38 focused acceptance/source contracts, M4 4/4,
+  M5 5/5, M7 4/4, M8 4/4, the 1,148-pass full matrix, and independent 6/6 M9 runs V567 and V568
+  are green. Coarse hand anatomy, thumb contact, wet skin/material response, synchronized stroke
+  biomechanics, and named character-art/guide acceptance remain open, so M9 is not promoted and
+  no milestone commit or push is permitted yet.

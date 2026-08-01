@@ -1,0 +1,137 @@
+{
+  "artifact": "M9 identity-fitted helmet orientation V1 review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The production helmet previously inherited the torso rotation, used one shared fit scale, and retained a 12 cm vertical lift. That could make the asymmetric shell appear reversed and perched above differently sized MetaHuman heads. V1 derives orientation from the rendered face forward/up axes, scales the shell from each identity's face bounds, lowers the skull-center lift to 9.5 cm, and verifies both the transform and front/profile/rear renderer evidence.",
+  "implementation": {
+    "shell_authored_front_axis": "+X",
+    "rendered_face_authored_forward_axis": "+Y",
+    "runtime_alignment_basis": "rendered_face_world_forward_and_up",
+    "helmet_world_rotation_solver": "FRotationMatrix::MakeFromXZ",
+    "reference_fit_scale": 0.96,
+    "identity_fit_scale_min": 0.9,
+    "identity_fit_scale_max": 1.02,
+    "skull_center_lift_cm": 9.5,
+    "maximum_allowed_head_error_cm": 1.0,
+    "minimum_allowed_forward_alignment": 0.98,
+    "helmet_mesh_or_material_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_roster_capture.json",
+    "source_report_sha256": "d95d1b4a0d7fe2c755c3674d127f31a61aaadd02f9f21f9946451792017f76ac",
+    "captured_character_count": 5,
+    "maximum_head_error_cm": 1.8771323384569882e-10,
+    "minimum_forward_alignment": 1.0,
+    "maximum_forward_alignment": 1.0,
+    "minimum_fit_scale": 0.8999999761581421,
+    "maximum_fit_scale": 0.9906209111213684,
+    "characters": [
+      {
+        "name": "MHC_RaftSim_Guide",
+        "head_error_cm": 1.8771323384569882e-10,
+        "forward_alignment": 1.0,
+        "fit_scale": 0.9599999785423279
+      },
+      {
+        "name": "MHC_RaftSim_Crew_01",
+        "head_error_cm": 8.881784197001252e-16,
+        "forward_alignment": 1.0,
+        "fit_scale": 0.9906209111213684
+      },
+      {
+        "name": "MHC_RaftSim_Crew_02",
+        "head_error_cm": 8.470329472543003e-22,
+        "forward_alignment": 1.0,
+        "fit_scale": 0.9225399494171143
+      },
+      {
+        "name": "MHC_RaftSim_Crew_03",
+        "head_error_cm": 0.0,
+        "forward_alignment": 1.0,
+        "fit_scale": 0.8999999761581421
+      },
+      {
+        "name": "MHC_RaftSim_Crew_04",
+        "head_error_cm": 1.8522865186110238e-10,
+        "forward_alignment": 1.0,
+        "fit_scale": 0.9473026394844055
+      }
+    ]
+  },
+  "renderer_evidence": {
+    "guide_front": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_guide_front.png",
+      "capture_sha256": "bee9812e6a09d3d31e2d2a622c2ea0448cd6a7e2095c11c90dcd643bf6c8fdba"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_guide_profile.png",
+      "capture_sha256": "6a958644db0a8c55e7deba4bde87b1d9b5ed8709a936edd520d5ba270648a9d8"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_guide_rear.png",
+      "capture_sha256": "ebf58e6201f6f989c43e66f3a6ac260fb8f31f8e95c892f15f7cf72d0c8b0186"
+    },
+    "smallest_identity_front": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_smallest_front.png",
+      "capture_sha256": "4f8ccfd5e6046079ab962bbe3d02e02031d2bde6f2c467e7cce2d014090a045c"
+    },
+    "smallest_identity_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_smallest_profile.png",
+      "capture_sha256": "2c9630ca4f8c3fc6402bad35fe0671955ef849b269129cca1cef4ee728da8abb"
+    },
+    "smallest_identity_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_smallest_rear.png",
+      "capture_sha256": "c45ea9745bb93d8a05748672efba7e61d1d7fa83da826db73fd2b66a415168df"
+    },
+    "technical_verdict": "pass: the helmet brow is over the rendered face, the extended occipital and retention geometry is behind the skull, and both the reference and smallest identity show a seated shell in orthogonal views",
+    "photoreal_verdict": "fail pending replacement or named approval of the visibly simplified first-party shell, retention hardware, materials, and character lighting"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h": "e0137f6f677af7607ebd6e7bf85a32eb014f674bb5ec739a60a223b71a21adf1",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp": "e78f35ffcf01d0731683e4e6291494c68c4b5070edfe51352753e9282259dd99",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "54775738c3c6858034da159a31993e103eccbc13ddeef1283062fbea02c8f287",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "e1f3b66343a8424849e862ab5fe35bfddf9fe9399f8adf27c274f70d34d9bd84",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "f515965e37d4e34a9eb08b7841cbc3c48334f0dd3ee855378e97cd0c0321427e",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "fd658fed54cc43c8db89db0e16dbedf28bf712cca54f6897dc9c757f496aa1b4",
+    "physics/tests/test_cc0_production_characters.py": "3f00f40ee9266baba14a0a9784f4d13de7b44129f98cfa0d9c120ad9b3e1a380"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the 9.5 cm final fit adjustment",
+    "focused_python": "50/50 production-character, editor-source-layout, safety-gear, and M9 evidence-contract checks passed",
+    "full_python": "1148 passed, 3 expected installed-dependency inverse-path skips, 0 failed in 424.27 seconds",
+    "full_python_report": "physics/reports/m9/m9_v506_identity_fitted_helmet_full_matrix.xml",
+    "full_python_report_sha256": "49beafd41f1beea6f7be631fc5da292707725a30865fef88b38a304ed5c4e075",
+    "renderer_turntable": "5/5 identities captured with front, profile, and rear helmet views (M9V501HelmetTurntable)",
+    "m4": "4/4 passed (M9V505HelmetFitM4)",
+    "m4_report": "unreal/Saved/Automation/M9V505HelmetFitM4/index.json",
+    "m4_report_sha256": "2b2a81c3f1e20a1cd5426f13808c26fa56a1e733b1d961873cf287584768a312",
+    "m5": "5/5 result entries passed renderer-enabled (M9V502HelmetFitM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V502HelmetFitM5Renderer/index.json",
+    "m5_report_sha256": "5098968035fa0def40eb619f683e4d6926bca2ecaf9e93483e7eacea4dc7167b",
+    "m7": "4/4 result entries passed renderer-enabled (M9V503HelmetFitM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V503HelmetFitM7Renderer/index.json",
+    "m7_report_sha256": "cc2dbf41bd1cef9d2593de3a99c26f775e85581b7d6131636423db1ed9edd09e",
+    "m8": "4/4 passed renderer-enabled (M9V504HelmetFitM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V504HelmetFitM8Renderer/index.json",
+    "m8_report_sha256": "73a1f280c46d71552ac11cf744ed953d4b3c4f242fbb3cd122624ae19512668e"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the simplified helmet shell, retention geometry, materials, and identity-specific fit in motion.",
+    "A qualified whitewater safety reviewer must approve the visible coverage, retention placement, and gameplay depiction; this technical fit check is not equipment certification.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

@@ -466,8 +466,9 @@ void ARaftSimRaftActor::BuildRaftVisual()
             Section.Tangents,
             /*bCreateCollision=*/false);
     }
-    if (UMaterialInterface* TubeMat = LoadObject<UMaterialInterface>(
-            nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube")))
+    UMaterialInterface* TubeMat = LoadObject<UMaterialInterface>(
+        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube"));
+    if (TubeMat)
     {
         TubeMaterialInstance = UMaterialInstanceDynamic::Create(TubeMat, this);
         RaftVisual->SetMaterial(0, TubeMaterialInstance ? TubeMaterialInstance : TubeMat);
@@ -475,8 +476,33 @@ void ARaftSimRaftActor::BuildRaftVisual()
     if (UMaterialInterface* FloorMat = LoadObject<UMaterialInterface>(
             nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloor.M_RaftSim_RaftFloor")))
     {
-        FloorMaterialInstance = UMaterialInstanceDynamic::Create(FloorMat, this);
-        RaftVisual->SetMaterial(1, FloorMaterialInstance ? FloorMaterialInstance : FloorMat);
+        // The former near-black floor became indistinguishable from opaque
+        // water whenever the self-bailer sat below the waterline. Use the same
+        // weathered rescue-orange coated fabric as the chambers, but retain a
+        // separate instance and denser textile scale for the inflated floor.
+        // The original floor material remains a fallback if the production
+        // tube material is unavailable.
+        UMaterialInterface* ReadableFloorMaterial = LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable."
+                 "M_RaftSim_RaftFloorReadable"));
+        UMaterialInterface* FloorPresentationMaterial = ReadableFloorMaterial
+            ? ReadableFloorMaterial
+            : (TubeMat ? TubeMat : FloorMat);
+        FloorMaterialInstance = UMaterialInstanceDynamic::Create(
+            FloorPresentationMaterial, this);
+        if (FloorMaterialInstance)
+        {
+            FloorMaterialInstance->SetScalarParameterValue(
+                TEXT("TextileTiling"), 7.5f);
+            FloorMaterialInstance->SetScalarParameterValue(
+                TEXT("TextileNormalStrength"), 0.42f);
+            FloorMaterialInstance->SetScalarParameterValue(
+                TEXT("FloorShadowFill"), 0.28f);
+        }
+        RaftVisual->SetMaterial(
+            1,
+            FloorMaterialInstance ? FloorMaterialInstance : FloorPresentationMaterial);
     }
     if (UMaterialInterface* RiggingMat = LoadObject<UMaterialInterface>(
             nullptr,

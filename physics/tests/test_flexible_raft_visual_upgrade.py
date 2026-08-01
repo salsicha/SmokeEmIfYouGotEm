@@ -335,12 +335,21 @@ def test_production_rescue_pfd_uses_contoured_back_source_art() -> None:
     build_source = PRODUCTION_PFD_BUILD_SCRIPT.read_text(encoding="utf-8")
     manifest = json.loads(PRODUCTION_PFD_MANIFEST.read_text(encoding="utf-8"))
 
-    assert "GENERATOR_VERSION = 4" in build_source
-    assert 'add_extruded_panel(\n            "ProtectiveBackPanel"' in build_source
-    assert '(-10.0, -17.5)' in build_source
+    assert "GENERATOR_VERSION = 6" in build_source
+    assert 'add_crowned_foam_panel(\n            "ProtectiveBackPanel"' in build_source
+    assert '(-10.0, -17.8)' in build_source
     assert '(6.8, 23.0)' in build_source
     assert "former 31.5 x 42 cm rounded rectangle" in build_source
-    assert manifest["generator_version"] == 4
+    assert "ShoulderFoamBand" not in build_source
+    assert manifest["generator_version"] == 6
+    assert manifest["soft_geometry"]["flat_exterior_foam_faces"] == 0
+    assert manifest["soft_geometry"]["outline_corner_rounding_passes"] == 4
+    assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 1.45
+    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 1.65
+    assert manifest["soft_geometry"]["side_wing_flat_exterior_faces"] == 0
+    assert manifest["soft_geometry"]["front_pocket_flat_exterior_faces"] == 0
+    assert manifest["construction"]["shoulder_foam_pads"] == 0
+    assert manifest["construction"]["shoulder_webbing_runs"] == 2
     assert manifest["ownership"] == (
         "Project-owned deterministic source art; no external mesh or texture input."
     )
@@ -547,6 +556,12 @@ def test_production_raft_wet_film_is_focused_and_d4_visual_only() -> None:
     assert "0.0f, 0.50f" in actor_source
     assert 'TEXT("Wetness"), PresentationWetness' in actor_source
     assert "SurfaceWetness remains the full physical/telemetry signal" in actor_source
+    assert "M_RaftSim_RaftFloorReadable" in actor_source
+    assert 'TEXT("TextileTiling"), 7.5f' in actor_source
+    assert 'TEXT("TextileNormalStrength"), 0.42f' in actor_source
+    assert 'TEXT("FloorShadowFill"), 0.28f' in actor_source
+    mesh_source = MESH_SOURCE.read_text(encoding="utf-8")
+    assert "const float IBeamRelief = Tr * 0.095f" in mesh_source
 
 
 def test_production_river_boot_replaces_only_the_procedural_footwear_overlay() -> None:
@@ -595,14 +610,18 @@ def test_production_river_boot_replaces_only_the_procedural_footwear_overlay() -
         "ProductionLeftBoot",
         "ProductionRightBoot",
         "HasProductionRiverBoots()",
+        "HasFittedUprightProductionRiverBoots()",
         "bReplacedBootLayer",
         "SM_RaftSim_WhitewaterRiverBoot",
-        "Pose.LeftFootCm, ProductionBootRotation",
-        "Pose.RightFootCm, ProductionBootRotation",
+        "kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.68f)",
+        "FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector)",
+        "PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm)",
+        "PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm)",
+        "SourceSoleZCm * Profile.Z",
         "SetCollisionEnabled(ECollisionEnabled::NoCollision)",
     ):
         assert contract in raft_source or contract in raft_header
-    assert "The solved foot points remain" in raft_source
+    assert "the single animation authority" in raft_source
 
 
 def test_contact_water_cards_follow_d4_segment_authority() -> None:

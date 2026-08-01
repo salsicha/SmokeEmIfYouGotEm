@@ -1,0 +1,117 @@
+{
+  "schema": "raftsim.m9.visible_shoulders_review.v1",
+  "reviewed_utc": "2026-07-31T19:16:08Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "summary": "The production wrapper previously hid both procedural upper arms while retaining the PFD and assembled MetaHuman body, leaving a narrow or disconnected transition from the vest to the arms. Visible Shoulders V1 adds two project-owned splash-jacket upper sleeves. Each sleeve starts at the authoritative solved shoulder, follows the live shoulder-to-elbow segment, remains elongated in the shortest tested gameplay pose, and restores a rounded upper-body silhouette without adding flotation shoulder pads to the PFD.",
+  "root_cause": {
+    "production_visibility_gap": "SetProceduralVisualVisible(false) retained torso, PFD, waist, boots, helmet and paddle overlays but hid both procedural upper arms; the assembled body did not provide a reliable visible deltoid bridge outside the fitted PFD.",
+    "rejected_cap_iterations": "Three isolated shoulder-cap candidates were rejected because closed ellipsoids and short capsules read as rigid balls or vest shoulder pads.",
+    "retained_shape": "A continuous shoulder-to-elbow garment sleeve with a 5.2 cm reference radius; live pose length remains authoritative and no shoulder point is invented."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "visible_sleeves_per_avatar": 2,
+    "reference_sleeve_radius_cm": 5.2,
+    "shoulder_to_elbow_fraction": 1.0,
+    "minimum_allowed_runtime_radius_cm": 4.7,
+    "minimum_allowed_runtime_half_length_cm": 5.6,
+    "maximum_allowed_shoulder_anchor_error_cm": 0.25,
+    "sleeve_material": "/Game/RaftSim/Materials/M_RaftSim_SplashJacket",
+    "pfd_shoulder_foam_added": false,
+    "pfd_shoulder_webbing_changed": false,
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "collision_changed": false,
+    "physics_or_gameplay_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_roster_capture.json",
+    "report_sha256": "8f17bfe1788daf6f161c0fe3b32ff6f422a8d843d981f12562c4936cb2ed15f6",
+    "captured_character_count": 5,
+    "characters_with_visible_shoulder_silhouette": 5,
+    "minimum_sleeve_radius_cm": 4.8613739013671875,
+    "minimum_sleeve_half_length_cm": 7.41104568734806,
+    "maximum_shoulder_anchor_error_cm": 1.3605050241949357e-7
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_guide_full.png",
+      "capture_sha256": "b4c292aa2fac7328257cc5f434438b7244bfab95dc714a16452efdb2041c9f7d"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_guide_profile.png",
+      "capture_sha256": "3e78df2655f5744109ffd97a386f44a32ab6fc7537b2e301c41477ee644a2250"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_guide_rear.png",
+      "capture_sha256": "eefbc9b45cb499a322ff166aec192fa9ab74359fe156688a718288d24221ffe6"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_broadest_full.png",
+      "capture_sha256": "1fad32296333e28f314ddde674a0e9aec9169976b8c4d913c3c5c9d5f8448a9e"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_broadest_profile.png",
+      "capture_sha256": "7ac0a6c6a02b3bd03ab5249645d1cab8fda633b2a8e3ab110e603563eec14eda"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_broadest_rear.png",
+      "capture_sha256": "7713baa6b3f798592cf358a97ba435961c438cd5e4ac8db676891289347fb96a"
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: guide and broadest-body front, profile and rear views retain rounded body shoulders behind an unpadded PFD",
+    "photoreal_verdict": "fail pending named review or replacement of the still-simplified procedural sleeve anatomy, seams, deformation and wet material response"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+    "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "36/36 production-character, safety-gear, and flexible-raft source contracts passed",
+    "renderer_turntable": "5/5 identities and 30/30 PNG outputs captured",
+    "m4": "4/4 passed (M9V571VisibleShouldersM4)",
+    "m4_report": "unreal/Saved/Automation/M9V571VisibleShouldersM4/index.json",
+    "m4_report_sha256": "b805c8778dccaec32124fd2cd683e509145048a9b92c1fbcf39fe107c220bd4c",
+    "m5": "5/5 passed renderer-enabled, including live shoulder visibility and anchor assertions (M9V570VisibleShouldersM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V570VisibleShouldersM5Renderer/index.json",
+    "m5_report_sha256": "474aa1300bc4558907a3b4d6470a3b7c94516e67f7b0a41e45e96dd633361435",
+    "m7": "4/4 passed offscreen-rendered (M9V572VisibleShouldersM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V572VisibleShouldersM7Renderer/index.json",
+    "m7_report_sha256": "f2780b11c64af6e986794dafcc0a9dc7ada5426c7d441588a0d7afe74064c689",
+    "m8": "4/4 passed offscreen-rendered (M9V573VisibleShouldersM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V573VisibleShouldersM8Renderer/index.json",
+    "m8_report_sha256": "35e82378f78511e1d2271910b602896e48f8b9d8878bde5bbfdd41e621e97f12",
+    "failed_diagnostic": "M9V569VisibleShouldersM5Renderer was rejected because its turntable-oriented 6.4 cm half-length floor did not admit the valid 5.87 cm live rescue sleeve; it is not retained as passing evidence."
+  },
+  "accepted": [
+    "Both production shoulders now have a visible, pose-matched garment bridge from the solved shoulder to the assembled arm.",
+    "All five roster identities meet the radius, elongated-shape and 0.25 cm joint-anchor contracts.",
+    "The PFD still has zero flotation shoulder pads; only its existing narrow webbing crosses the shoulders.",
+    "No animation, body mass, collision, raft, water, rescue or gameplay-force authority changed."
+  ],
+  "rejected_or_open": [
+    "Large cyan deltoid ellipsoids were rejected because they read as rigid protective pads.",
+    "Reduced dark ellipsoids were rejected because they still floated as disconnected balls.",
+    "Short shoulder capsules were rejected because the shortest pose clamped them into spheres.",
+    "The retained procedural garment sleeves remain visibly synthetic and do not satisfy final photoreal character-art acceptance.",
+    "No named character-art reviewer or qualified guide has approved these captures for release media."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the sleeve anatomy, torso integration, deformation, seams and wet-material response.",
+    "A qualified whitewater guide must approve shoulder range of motion and paddle-stroke biomechanics in motion.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance and promotion gates."
+  ]
+}

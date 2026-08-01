@@ -126,6 +126,7 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
         TEXT("/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloor.M_RaftSim_RaftFloor"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloorReadable.M_RaftSim_RaftFloorReadable"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Skin.M_RaftSim_Skin"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"),
@@ -298,8 +299,8 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
             TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/Materials/"
                  "MI_RaftSim_south_fork_00_Terrain."
                  "MI_RaftSim_south_fork_00_Terrain"),
-            0.56f,
-            0.68f,
+            0.44f,
+            0.52f,
         },
         {
             TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/Materials/"

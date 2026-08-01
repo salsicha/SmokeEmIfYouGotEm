@@ -12,6 +12,10 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 REPORT_ROOT = REPO_ROOT / "physics/reports/editor_source_inventory"
 FROZEN_LEGACY_EXCEPTIONS = {
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveEvaluation.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+}
+FROZEN_OVERSIZED_IMPLEMENTATION_MAX_LINES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": 3073,
 }
 
 
@@ -66,6 +70,11 @@ def test_editor_source_split_keeps_module_and_focused_implementations_bounded():
         path: line_count
         for path, line_count in line_counts.items()
         if line_count > 3000 and path not in FROZEN_LEGACY_EXCEPTIONS
+    } == {}
+    assert {
+        path: line_counts[path]
+        for path, maximum in FROZEN_OVERSIZED_IMPLEMENTATION_MAX_LINES.items()
+        if line_counts[path] > maximum
     } == {}
 
     internal_header = (
@@ -1158,8 +1167,10 @@ def test_full_reach_shore_cobbles_are_bounded_visual_only_procedural_infill():
     assert "bEnableNanite=*/false" in cobble_source
     assert "AddSouthForkBankUnderstoryInstance" in full_reach_source
     assert "SourceVegetationSignal" in cobble_source
-    assert "BankDistanceM < 38.0f || BankDistanceM > 88.0f" in cobble_source
-    assert "LateralSlope > 0.38f" in cobble_source
+    assert "BankDistanceM < 34.0f || BankDistanceM > 108.0f" in cobble_source
+    assert "LateralSlope > 0.40f" in cobble_source
+    assert "PatchNoise" in cobble_source
+    assert "OuterBankFade" in cobble_source
     assert "SelectSouthForkDetailedFoliage" in full_reach_source
     assert "bUseWhiteAlder" in foliage_source
     assert "< 0.70f" in foliage_source
@@ -1194,8 +1205,11 @@ def test_full_reach_ground_cover_breaks_up_repeated_terrain_without_gameplay_col
     assert "SM_RaftSim_SouthForkGrassTuft_A" in ground_cover_source
     assert "MSM_TwoSidedFoliage" in ground_cover_source
     assert "FMath::PerlinNoise2D" in ground_cover_source
-    assert "BankDistanceM < 24.0f || BankDistanceM > 96.0f" in ground_cover_source
-    assert "LateralSlope > 0.34f" in ground_cover_source
+    assert "constexpr int32 BladeCount = 52" in ground_cover_source
+    assert "constexpr int32 LowLeafCount = 10" in ground_cover_source
+    assert "BankDistanceM < 22.0f || BankDistanceM > 118.0f" in ground_cover_source
+    assert "LateralSlope > 0.40f" in ground_cover_source
+    assert "OuterBankFade" in ground_cover_source
     assert "ECollisionEnabled::NoCollision" in full_reach_source
     assert "SurfaceNormal.X * Jitter.X" in ground_cover_source
     assert "bUseCorridorEdgeBlend ? 0.44f : 0.92f" in terrain_source
@@ -1322,6 +1336,20 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert "SolverMaskedLace->A.OutputIndex = 4" in material_source
     assert "SolverMaskedLace->B.Expression = FoamLaceSample" in material_source
     assert "SolverMaskedLace->B.OutputIndex = 1" in material_source
+    assert "MPC_RaftSim_RaftFoamOcclusion" in material_source
+    assert 'TEXT("RaftFoamExclusionEnabled")' in material_source
+    assert 'TEXT("RaftFoamExclusionCenterAndHalfWidthCm")' in material_source
+    assert 'TEXT("RaftFoamExclusionForwardAndHalfLengthCm")' in material_source
+    assert 'TEXT("RaftInteriorWaterTransmissionEnabled")' in material_source
+    assert 'TEXT("RaftInteriorWaterCenterAndHalfWidthCm")' in material_source
+    assert 'TEXT("RaftInteriorWaterForwardAndHalfLengthCm")' in material_source
+    assert "FLinearColor(0.0f, 0.0f, 0.0f, 82.0f)" in material_source
+    assert "FLinearColor(1.0f, 0.0f, 0.0f, 215.0f)" in material_source
+    assert "Raft and crew foam-layer exclusion" in material_source
+    assert "smoothstep(0.62, 1.0, EllipseSquared)" in material_source
+    assert "OcclusionSafeFoamMask->A.Expression = FoamMaskExpression" in (
+        material_source
+    )
     assert "Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes)" in (
         material_source
     )
@@ -1359,7 +1387,7 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     ).read_text(encoding="utf-8")
     assert 'TEXT("ShallowWaterOpacity")), 0.76f' in water_presentation_source
     assert 'TEXT("DeepWaterOpacity")), 0.82f' in water_presentation_source
-    assert 'TEXT("HydraulicFoamIntensity")), 0.88f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamIntensity")), 0.0f' in water_presentation_source
     assert 'TEXT("HydraulicFoamCoverageGain")), 0.82f' in water_presentation_source
     assert 'TEXT("WaterRoughness")), 0.24f' in water_presentation_source
     assert 'TEXT("Specular")), 0.28f' in water_presentation_source
@@ -1371,6 +1399,42 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert 'TEXT("CalmRippleStrength")), 0.055f' in water_presentation_source
     assert 'TEXT("FlowRippleStrength")), 0.075f' in water_presentation_source
     assert 'TEXT("FoamRippleStrength")), 0.110f' in water_presentation_source
+    assert "M_RaftSim_SouthForkRaftTransmissionWater" in water_presentation_source
+    assert "RaftSimRaftInteriorWaterTransmission" in water_presentation_source
+    assert "RaftSimRaftInteriorWaterOpticalDepth" in water_presentation_source
+    assert "pow(Along, 4.0) + pow(Across, 4.0)" in water_presentation_source
+    assert 'TEXT("RaftInteriorSurfaceOpacityScale")), 0.0f' in (
+        water_presentation_source
+    )
+    assert 'TEXT("RaftInteriorOpticalDepthScale")), 0.0f' in (
+        water_presentation_source
+    )
+    assert "FLinearColor(1.0f, 1.0f, 1.0f, 0.0f)" in water_presentation_source
+    assert "LoadOrCreateReadableRaftFloorMaterial" in water_presentation_source
+    assert "M_RaftSim_RaftFloorReadable" in material_source
+    assert 'TEXT("FloorShadowFill")' in material_source
+    assert "ShadowFill->DefaultValue = 0.28f" in material_source
+    water_surface_source = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+        "RaftSimWaterSurfaceActor.cpp"
+    ).read_text(encoding="utf-8")
+    water_surface_header = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+        "RaftSimWaterSurfaceActor.h"
+    ).read_text(encoding="utf-8")
+    assert "UpdateRaftFoamExclusionParameters" in water_surface_source
+    assert "RaftFoamExclusionHalfWidthCm = 190.0f" in water_surface_source
+    assert "RaftFoamExclusionHalfLengthCm = 320.0f" in water_surface_source
+    assert 'TEXT("RaftFoamExclusionEnabled"), 1.0f' in water_surface_source
+    assert "RaftInteriorWaterHalfWidthCm = 82.0f" in water_surface_source
+    assert "RaftInteriorWaterHalfLengthCm = 215.0f" in water_surface_source
+    assert 'TEXT("RaftInteriorWaterTransmissionEnabled"), 1.0f' in (
+        water_surface_source
+    )
+    assert "TObjectPtr<UMaterialParameterCollection>" in water_surface_header
+    assert "TObjectPtr<ARaftSimRaftActor> FoamOcclusionRaft" in (
+        water_surface_header
+    )
     assert 'TEXT("ShallowWaterColor"))' in water_presentation_source
     assert "FLinearColor(0.026f, 0.050f, 0.058f, 0.0f)" in water_presentation_source
     assert 'TEXT("DeepWaterColor"))' in water_presentation_source

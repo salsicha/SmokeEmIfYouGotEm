@@ -290,6 +290,58 @@ FVector ARaftSimMetaHumanCrewVisualActor::GetSolvedHeadWorldLocation() const
         TEXT("head"), EBoneSpaces::WorldSpace).GetLocation();
 }
 
+FVector ARaftSimMetaHumanCrewVisualActor::GetSolvedFaceForwardWorldVector() const
+{
+    const USceneComponent* RenderedFace = bUsingAssembledCharacter && AssembledFace
+        ? static_cast<const USceneComponent*>(AssembledFace.Get())
+        : static_cast<const USceneComponent*>(Face.Get());
+    if (!RenderedFace)
+    {
+        return GetActorForwardVector();
+    }
+    // MetaHuman face assets author their gaze along local +Y. The assembled
+    // face component carries the solved head delta and the -90-degree
+    // mesh-to-avatar correction, so this vector is the actual rendered gaze.
+    return RenderedFace->GetComponentQuat()
+        .RotateVector(FVector::YAxisVector)
+        .GetSafeNormal();
+}
+
+FVector ARaftSimMetaHumanCrewVisualActor::GetSolvedFaceUpWorldVector() const
+{
+    const USceneComponent* RenderedFace = bUsingAssembledCharacter && AssembledFace
+        ? static_cast<const USceneComponent*>(AssembledFace.Get())
+        : static_cast<const USceneComponent*>(Face.Get());
+    if (!RenderedFace)
+    {
+        return GetActorUpVector();
+    }
+    return RenderedFace->GetComponentQuat()
+        .RotateVector(FVector::UpVector)
+        .GetSafeNormal();
+}
+
+float ARaftSimMetaHumanCrewVisualActor::GetRecommendedWhitewaterHelmetScale() const
+{
+    if (!AssembledFace)
+    {
+        return 0.96f;
+    }
+    FBoxSphereBounds Bounds;
+    AssembledFace->GetPreSkinnedLocalBounds(Bounds);
+    // The guide identity is the reviewed 0.96 reference fit. Scale the shell
+    // by the geometric mean of each identity's lateral and fore/aft face
+    // bounds, then keep the result inside the authored helmet size run. This
+    // prevents the narrow identities from inheriting the broadest shell.
+    constexpr float ReferenceFaceHalfWidthCm = 18.61654f;
+    constexpr float ReferenceFaceHalfDepthCm = 12.91950f;
+    const float WidthRatio = Bounds.BoxExtent.X / ReferenceFaceHalfWidthCm;
+    const float DepthRatio = Bounds.BoxExtent.Y / ReferenceFaceHalfDepthCm;
+    const float IdentityScale = FMath::Sqrt(
+        FMath::Max(WidthRatio * DepthRatio, 0.01f));
+    return FMath::Clamp(0.96f * IdentityScale, 0.90f, 1.02f);
+}
+
 FVector ARaftSimMetaHumanCrewVisualActor::
     GetAssembledFacePreSkinnedBoundsOrigin() const
 {
@@ -1013,24 +1065,34 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPos
     // on the shaft leaves the palm and curled digits visibly detached. For
     // paddle-bearing actions only, offset the wrist by the reference
     // hand-to-middle-palm vector while preserving the authored grip target.
-    const FVector LeftWristCm = Pose.bShowPaddle
+    FVector LeftWristCm = Pose.bShowPaddle
         ? ResolvePaddleGripWristCm(true, Pose.LeftHandCm)
         : Pose.LeftHandCm;
-    const FVector RightWristCm = Pose.bShowPaddle
+    FVector RightWristCm = Pose.bShowPaddle
         ? ResolvePaddleGripWristCm(false, Pose.RightHandCm)
         : Pose.RightHandCm;
-    const FVector LeftElbow =
-        FMath::Lerp(Pose.LeftShoulderCm, LeftWristCm, 0.48f) + FVector(0.0f, -5.0f, -2.0f);
-    const FVector RightElbow =
-        FMath::Lerp(Pose.RightShoulderCm, RightWristCm, 0.48f) + FVector(0.0f, 5.0f, -2.0f);
-    SetSegmentBone(TEXT("clavicle_l"), TEXT("upperarm_l"), UpperSpine, Pose.LeftShoulderCm);
-    SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), Pose.LeftShoulderCm, LeftElbow);
-    SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm);
-    SetBoneAtPoint(TEXT("hand_l"), LeftWristCm);
-    SetSegmentBone(TEXT("clavicle_r"), TEXT("upperarm_r"), UpperSpine, Pose.RightShoulderCm);
-    SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), Pose.RightShoulderCm, RightElbow);
-    SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm);
-    SetBoneAtPoint(TEXT("hand_r"), RightWristCm);
+    const auto ApplyArmPose = [&]()
+    {
+        const FVector LeftElbow =
+            FMath::Lerp(Pose.LeftShoulderCm, LeftWristCm, 0.48f) +
+            FVector(0.0f, -5.0f, -2.0f);
+        const FVector RightElbow =
+            FMath::Lerp(Pose.RightShoulderCm, RightWristCm, 0.48f) +
+            FVector(0.0f, 5.0f, -2.0f);
+        SetSegmentBone(
+            TEXT("clavicle_l"), TEXT("upperarm_l"), UpperSpine, Pose.LeftShoulderCm);
+        SetSegmentBone(
+            TEXT("upperarm_l"), TEXT("lowerarm_l"), Pose.LeftShoulderCm, LeftElbow);
+        SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm);
+        SetBoneAtPoint(TEXT("hand_l"), LeftWristCm);
+        SetSegmentBone(
+            TEXT("clavicle_r"), TEXT("upperarm_r"), UpperSpine, Pose.RightShoulderCm);
+        SetSegmentBone(
+            TEXT("upperarm_r"), TEXT("lowerarm_r"), Pose.RightShoulderCm, RightElbow);
+        SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm);
+        SetBoneAtPoint(TEXT("hand_r"), RightWristCm);
+    };
+    ApplyArmPose();
 
     SetSegmentBone(TEXT("thigh_l"), TEXT("calf_l"), Pose.LeftHipCm, Pose.LeftKneeCm);
     SetSegmentBone(TEXT("calf_l"), TEXT("foot_l"), Pose.LeftKneeCm, Pose.LeftFootCm);
@@ -1046,13 +1108,16 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPos
     // driving this pose every frame, but direct visual tools must see the same
     // body on the first frame rather than a one-frame standing reference pose.
     Body->RefreshBoneTransforms();
+    ApplyPaddleGripPose(Pose);
+    Body->RefreshBoneTransforms();
     MaximumPaddleGripAnchorErrorCm = Pose.bShowPaddle
         ? FMath::Max(
               MeasurePaddleGripAnchorErrorCm(true, Pose.LeftHandCm),
               MeasurePaddleGripAnchorErrorCm(false, Pose.RightHandCm))
         : 0.0f;
-    ApplyPaddleGripPose(Pose.bShowPaddle);
-    Body->RefreshBoneTransforms();
+    MaximumPaddleGripContactErrorCm = Pose.bShowPaddle
+        ? MeasurePaddleFingerContactErrorCm(Pose)
+        : 0.0f;
     if (bUsingAssembledCharacter)
     {
         UpdateRigidAssembledFace();
@@ -1111,6 +1176,30 @@ FVector ARaftSimMetaHumanCrewVisualActor::ResolvePaddleGripWristCm(
     return DesiredGripCm - ReferencePalmOffsetCm;
 }
 
+FVector ARaftSimMetaHumanCrewVisualActor::ResolvePaddleGripAxis(
+    const FRaftSimCrewAvatarPose& Pose,
+    const FVector& DesiredGripCm) const
+{
+    const FVector ShaftAxis =
+        (Pose.PaddleBottomCm - Pose.PaddleTopCm).GetSafeNormal();
+    if (ShaftAxis.IsNearlyZero())
+    {
+        return FVector::UpVector;
+    }
+    if (FVector::DistSquared(DesiredGripCm, Pose.PaddleTopCm) <= 4.0f)
+    {
+        FVector TGripAxis = FVector::CrossProduct(ShaftAxis, FVector::UpVector)
+            .GetSafeNormal();
+        if (TGripAxis.IsNearlyZero())
+        {
+            TGripAxis = FVector::CrossProduct(ShaftAxis, FVector::ForwardVector)
+                .GetSafeNormal();
+        }
+        return TGripAxis.IsNearlyZero() ? FVector::RightVector : TGripAxis;
+    }
+    return ShaftAxis;
+}
+
 float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleGripAnchorErrorCm(
     bool bLeft,
     const FVector& DesiredGripCm) const
@@ -1129,6 +1218,41 @@ float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleGripAnchorErrorCm(
         Body->GetBoneTransformByName(PalmAnchorName, EBoneSpaces::ComponentSpace)
             .GetLocation() * BodyScale;
     return FVector::Distance(RenderedGripCm, DesiredGripCm);
+}
+
+float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleFingerContactErrorCm(
+    const FRaftSimCrewAvatarPose& Pose) const
+{
+    if (!Body || !Pose.bShowPaddle)
+    {
+        return 0.0f;
+    }
+    float MaximumErrorCm = 0.0f;
+    for (const bool bLeft : {true, false})
+    {
+        const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+        const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector GripAxis = ResolvePaddleGripAxis(Pose, GripCenterCm);
+        for (const TCHAR* Digit : {TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
+        {
+            const FName DistalName(*FString::Printf(TEXT("%s_03_%s"), Digit, Side));
+            if (Body->GetBoneIndex(DistalName) == INDEX_NONE)
+            {
+                return TNumericLimits<float>::Max();
+            }
+            const FVector DistalCm = Body->GetBoneTransformByName(
+                DistalName,
+                EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+            const FVector OffsetCm = DistalCm - GripCenterCm;
+            const float RadialDistanceCm = FVector::VectorPlaneProject(
+                OffsetCm,
+                GripAxis).Size();
+            MaximumErrorCm = FMath::Max(
+                MaximumErrorCm,
+                FMath::Abs(RadialDistanceCm - 2.65f));
+        }
+    }
+    return MaximumErrorCm;
 }
 
 void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChain(
@@ -1180,12 +1304,14 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChain(
         const FName MetacarpalName(*FString::Printf(
             TEXT("%s_metacarpal_%s"), Digit, Side));
         ParentCurrent = ApplyRelativeBone(
-            MetacarpalName, ParentName, ParentCurrent, 4.0f);
+            MetacarpalName, ParentName, ParentCurrent, 8.0f);
         ParentName = MetacarpalName;
     }
 
-    static const float CurlDegrees[] = {30.0f, 48.0f, 34.0f};
-    static const float ThumbCurlDegrees[] = {18.0f, 28.0f, 22.0f};
+    // These values close the distal pads around the 3.3 cm production shaft;
+    // the previous 30/48/34 profile left a conspicuous open-finger silhouette.
+    static const float CurlDegrees[] = {58.0f, 72.0f, 50.0f};
+    static const float ThumbCurlDegrees[] = {34.0f, 50.0f, 38.0f};
     for (int32 Segment = 1; Segment <= 3; ++Segment)
     {
         const FName BoneName(*FString::Printf(
@@ -1199,7 +1325,84 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChain(
     }
 }
 
-void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(bool bShowPaddle)
+void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChainAroundGrip(
+    bool bLeft,
+    const TCHAR* Digit,
+    const FVector& GripCenterCm,
+    const FVector& GripAxis)
+{
+    if (!Body || !Digit)
+    {
+        return;
+    }
+    const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+    const FName HandName(*FString::Printf(TEXT("hand_%s"), Side));
+    const FName FirstName(*FString::Printf(TEXT("%s_01_%s"), Digit, Side));
+    const FName SecondName(*FString::Printf(TEXT("%s_02_%s"), Digit, Side));
+    const FName ThirdName(*FString::Printf(TEXT("%s_03_%s"), Digit, Side));
+    if (Body->GetBoneIndex(HandName) == INDEX_NONE ||
+        Body->GetBoneIndex(FirstName) == INDEX_NONE ||
+        Body->GetBoneIndex(SecondName) == INDEX_NONE ||
+        Body->GetBoneIndex(ThirdName) == INDEX_NONE)
+    {
+        return;
+    }
+    const FVector SafeGripAxis = GripAxis.GetSafeNormal();
+    FVector SegmentStartCm = Body->GetBoneTransformByName(
+        FirstName,
+        EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+    FVector RadialDirection = FVector::VectorPlaneProject(
+        SegmentStartCm - GripCenterCm,
+        SafeGripAxis).GetSafeNormal();
+    const FVector WristCm = Body->GetBoneTransformByName(
+        HandName,
+        EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+    const FVector WristRadial = FVector::VectorPlaneProject(
+        WristCm - GripCenterCm,
+        SafeGripAxis).GetSafeNormal();
+    if (SafeGripAxis.IsNearlyZero() || RadialDirection.IsNearlyZero())
+    {
+        return;
+    }
+    float WrapSign = FVector::DotProduct(
+        SafeGripAxis,
+        FVector::CrossProduct(RadialDirection, WristRadial)) >= 0.0f
+        ? 1.0f
+        : -1.0f;
+    if (WristRadial.IsNearlyZero())
+    {
+        WrapSign = bLeft ? -1.0f : 1.0f;
+    }
+    const float AxialOffsetCm = FVector::DotProduct(
+        SegmentStartCm - GripCenterCm,
+        SafeGripAxis);
+    static const float WrapAnglesDegrees[] = {50.0f, 68.0f, 52.0f};
+    static const float JointRadiiCm[] = {3.2f, 2.65f, 2.35f};
+    const FName BoneNames[] = {FirstName, SecondName, ThirdName};
+    float CumulativeAngleDegrees = 0.0f;
+    for (int32 SegmentIndex = 0; SegmentIndex < 3; ++SegmentIndex)
+    {
+        CumulativeAngleDegrees += WrapAnglesDegrees[SegmentIndex] * WrapSign;
+        const FVector TargetRadial = RadialDirection.RotateAngleAxis(
+            CumulativeAngleDegrees,
+            SafeGripAxis);
+        const FVector SegmentEndCm =
+            GripCenterCm + SafeGripAxis * AxialOffsetCm +
+            TargetRadial * JointRadiiCm[SegmentIndex];
+        const FName ReferenceEnd = SegmentIndex < 2
+            ? BoneNames[SegmentIndex + 1]
+            : BoneNames[SegmentIndex];
+        SetSegmentBone(
+            BoneNames[SegmentIndex],
+            ReferenceEnd,
+            SegmentStartCm,
+            SegmentEndCm);
+        SegmentStartCm = SegmentEndCm;
+    }
+}
+
+void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(
+    const FRaftSimCrewAvatarPose& Pose)
 {
     if (!HasArticulatedPaddleGripRig())
     {
@@ -1207,7 +1410,7 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(bool bShowPaddle)
     }
     // A visible paddle uses a firm but not fist-like curl; rescue and swim
     // states retain relaxed natural flex rather than the imported flat palm.
-    const float GripAlpha = bShowPaddle ? 1.0f : 0.16f;
+    const float GripAlpha = Pose.bShowPaddle ? 1.0f : 0.16f;
     for (const bool bLeft : {true, false})
     {
         ApplyFingerChain(bLeft, TEXT("thumb"), false, GripAlpha);
@@ -1215,6 +1418,24 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(bool bShowPaddle)
         ApplyFingerChain(bLeft, TEXT("middle"), true, GripAlpha);
         ApplyFingerChain(bLeft, TEXT("ring"), true, GripAlpha);
         ApplyFingerChain(bLeft, TEXT("pinky"), true, GripAlpha);
+    }
+    if (!Pose.bShowPaddle)
+    {
+        return;
+    }
+    Body->RefreshBoneTransforms();
+    for (const bool bLeft : {true, false})
+    {
+        const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector GripAxis = ResolvePaddleGripAxis(Pose, GripCenterCm);
+        ApplyFingerChainAroundGrip(
+            bLeft, TEXT("index"), GripCenterCm, GripAxis);
+        ApplyFingerChainAroundGrip(
+            bLeft, TEXT("middle"), GripCenterCm, GripAxis);
+        ApplyFingerChainAroundGrip(
+            bLeft, TEXT("ring"), GripCenterCm, GripAxis);
+        ApplyFingerChainAroundGrip(
+            bLeft, TEXT("pinky"), GripCenterCm, GripAxis);
     }
 }
 

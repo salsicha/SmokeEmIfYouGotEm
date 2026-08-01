@@ -1,0 +1,42 @@
+{
+  "artifact": "M9 seated waist and hip silhouette V2 production-roster capture",
+  "recorded_local_date": "2026-07-31",
+  "capture_resolution": [1536, 1024],
+  "captured_character_count": 5,
+  "characters_with_visible_waist_hip_silhouette": 5,
+  "maximum_hip_center_error_cm": 0.0,
+  "minimum_extent_cm": [14.249999821186066, 21.160000383853912, 14.099999964237215],
+  "maximum_extent_cm": [15.749999284744263, 24.61000120639801, 15.44999957084656],
+  "characters": [
+    {
+      "name": "MHC_RaftSim_Guide",
+      "runtime_waist_hip_silhouette": true,
+      "runtime_waist_hip_extent_cm": [15.0, 23.0, 15.0],
+      "runtime_waist_hip_center_error_cm": 0.0
+    },
+    {
+      "name": "MHC_RaftSim_Crew_01",
+      "runtime_waist_hip_silhouette": true,
+      "runtime_waist_hip_extent_cm": [15.0, 23.0, 15.0],
+      "runtime_waist_hip_center_error_cm": 0.0
+    },
+    {
+      "name": "MHC_RaftSim_Crew_02",
+      "runtime_waist_hip_silhouette": true,
+      "runtime_waist_hip_extent_cm": [14.249999821186066, 21.160000383853912, 14.700000286102297],
+      "runtime_waist_hip_center_error_cm": 0.0
+    },
+    {
+      "name": "MHC_RaftSim_Crew_03",
+      "runtime_waist_hip_silhouette": true,
+      "runtime_waist_hip_extent_cm": [15.749999284744263, 24.61000120639801, 15.44999957084656],
+      "runtime_waist_hip_center_error_cm": 0.0
+    },
+    {
+      "name": "MHC_RaftSim_Crew_04",
+      "runtime_waist_hip_silhouette": true,
+      "runtime_waist_hip_extent_cm": [14.700000286102297, 23.459999561309814, 14.099999964237215],
+      "runtime_waist_hip_center_error_cm": 0.0
+    }
+  ]
+}

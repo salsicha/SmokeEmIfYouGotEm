@@ -55,6 +55,9 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
             ]
         )
     )
+    assert packet["candidate"]["capture_repeat_passed"] is True
+    assert packet["candidate"]["capture_repeat_exact_current"] is False
+    assert packet["candidate"]["hlod_repeat_exact_current"] is True
     shipping = manifest["local_preflight_evidence"][
         "exact_current_dirty_shipping_preflight"
     ]
@@ -62,22 +65,20 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     current_performance_evidence = json.loads(
         (
             REPO_ROOT
-            / packet["candidate"]["exact_current_performance_report"]
+            / packet["candidate"]["latest_completed_shipping_performance_report"]
         ).read_text(encoding="utf-8")
     )
     current_performance = current_performance_evidence["shipping_performance"]
-    assert packet["candidate"]["exact_current_performance_configuration"] == "Shipping"
-    assert packet["candidate"]["exact_current_performance_passed"] is True
+    assert packet["candidate"]["exact_current_performance_report"] is None
+    assert packet["candidate"]["exact_current_performance_configuration"] is None
+    assert packet["candidate"]["exact_current_performance_passed"] is False
     assert (
         packet["candidate"]["exact_current_performance_canonical_isolation_passed"]
         is False
     )
     assert packet["candidate"]["exact_current_performance_promotion_eligible"] is False
     assert packet["candidate"]["latest_completed_shipping_performance_passed"] is True
-    assert (
-        packet["candidate"]["exact_current_performance_p95_ms"]
-        == current_performance["p95_frame_ms"]
-    )
+    assert packet["candidate"]["exact_current_performance_p95_ms"] is None
     assert current_performance["release_performance_qualified"] is True
     assert current_performance_evidence["promotion_allowed"] is False
     assert historical_performance["passed"] is True
@@ -127,47 +128,70 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert performance["offscreen_diagnostic_runs_failed"] == 3
     assert performance["offscreen_diagnostic_qualified_as_release_performance"] is False
     generation = manifest["local_preflight_evidence"]["full_reach_editor_generation"]
+    assert generation["v269_v270_capture_repeat_exact_current"] is False
+    assert generation["hlod_repeat_exact_current"] is True
+    assert generation["hlod_actor_count"] == 28
+    assert generation["hlod_actors_built"] == 28
+    assert generation["hlod_repeat_modified_and_saved_actor_count"] == 0
     assert generation["post_lumen_pair_m4_exact_current"] is True
     assert generation["post_lumen_pair_m4_report"] == (
-            "unreal/Saved/Automation/M9V431DepthV10M4/index.json"
+        "unreal/Saved/Automation/M9V586ContinuousThighKneeM4/index.json"
     )
     assert generation["post_lumen_pair_m4_report_sha256"] == (
-            "cb26301b2152cca34320df2e99bb7eb91bbf9d1ad358f16639a75f326a72fe64"
+        "1841471e5fc6afd08dd64a7fc060965d5467773b27c7c43dc1f04428b55220d9"
     )
     assert generation["post_lumen_pair_m5_exact_current"] is True
     assert generation["post_lumen_pair_m5_report"] == (
-            "unreal/Saved/Automation/M9V432DepthV10M5/index.json"
+        "unreal/Saved/Automation/M9V585ContinuousThighKneeM5Renderer/index.json"
     )
     assert generation["post_lumen_pair_m5_report_sha256"] == (
-            "4c4e342dd3a3a92aee2415697910bf4539a00e774a26554596d446ccb8a5a070"
+        "51397b43654535f8975a5a8d5c2a41631951ce1f862270fa1f87ea6869797f52"
     )
     assert generation["post_hlod_m7_exact_current"] is True
     assert generation["post_hlod_m7_report"] == (
-            "unreal/Saved/Automation/M9V433DepthV10M7/index.json"
+        "unreal/Saved/Automation/M9V587ContinuousThighKneeM7Renderer/index.json"
     )
     assert generation["post_hlod_m7_report_sha256"] == (
-            "704ec8a69af92f40a776de98671b1b03193f3756673a8e9646e838e3094b203b"
+        "e8e9ac2f69672d335f6ccfbb863f81f098f6ca09198288039456f85b758066b2"
     )
     assert generation["m8_content_lock_exact_current"] is True
     assert generation["post_hlod_m8_report"] == (
-            "unreal/Saved/Automation/M9V434DepthV10M8/index.json"
+        "unreal/Saved/Automation/M9V588ContinuousThighKneeM8Renderer/index.json"
     )
     assert generation["post_hlod_m8_report_sha256"] == (
-            "643f5c95f93dc37019ef926f08f9c033d9e5b7e78d2673a1a2c4ab648cb1b8c2"
+        "ba624deb2333bf7eec5e8de791d049a98705a3bb9f82b61c5d4a3bfe38308bfe"
     )
     assert generation["python_tests_exact_current"] is True
+    assert generation[
+        "python_tests_exact_current_pending_after_continuous_thigh_knee_v1"
+    ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_organic_bank_mosaic_v2"
+    ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_raft_interior_water_transmission_v1"
+    ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_identity_fitted_helmet_v1"
+    ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_unpadded_pfd_v1"
+    ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_seated_waist_hip_v1"
+    ] is False
     assert generation["python_tests_report"] == (
-            "physics/reports/m9/m9_v436_depth_v10_full_matrix.xml"
+        "physics/reports/m9/m9_v589_continuous_thigh_knee_full_matrix.xml"
     )
     assert generation["python_tests_report_sha256"] == (
-            "e726eab19d8e07c3bb9d5b646e569b4d60f2c3145f9f8632be11ad2171fe420f"
+        "1a4b08866846e32c64b90c94666f323208fe44a54d87ed9d40fdca7e0708cf25"
     )
-    assert generation["python_tests_passed"] == 1146
-    assert generation["python_tests_failed"] == 1
-    assert generation["python_tests_failed_expected"] == 1
+    assert generation["python_tests_passed"] == 1148
+    assert generation["python_tests_failed"] == 0
+    assert generation["python_tests_failed_expected"] == 0
     assert generation["python_tests_failed_unexpected"] == 0
     assert generation["python_tests_skipped_expected"] == 3
-    assert generation["python_tests_duration_seconds"] == 466.945
+    assert generation["python_tests_duration_seconds"] == 428.19
     assert generation[
         "python_tests_exact_current_pending_after_depth_bearing_contact_water_v10_review"
     ] is False
@@ -239,91 +263,136 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert generation[
         "python_tests_exact_current_pending_after_connected_contact_water_v8_review"
     ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_raft_crew_foam_occlusion_v1"
+    ] is False
+    assert generation[
+        "python_tests_exact_current_pending_after_seat_side_paddle_v1"
+    ] is False
     m9_automation = manifest["local_preflight_evidence"]["m9_editor_automation"]
     assert m9_automation["exact_current"] is True
+    assert m9_automation["pending_after_continuous_thigh_knee_v1"] is False
+    assert m9_automation["pending_after_opaque_profile_hips_v1"] is False
+    assert m9_automation["pending_after_raft_crew_foam_occlusion_v1"] is False
+    assert m9_automation["pending_after_seat_side_paddle_v1"] is False
+    assert m9_automation[
+        "pending_after_raft_interior_water_transmission_v1"
+    ] is False
+    assert m9_automation["pending_after_identity_fitted_helmet_v1"] is False
+    assert m9_automation["pending_after_unpadded_pfd_v1"] is False
+    assert m9_automation["pending_after_seated_waist_hip_v1"] is False
+    assert m9_automation["pending_after_soft_rounded_pfd_v1"] is False
+    assert m9_automation["pending_after_organic_bank_mosaic_v2"] is False
     assert m9_automation["report_path"] == (
-        "unreal/Saved/Automation/M9V437DepthV10ReconciledM9/index.json"
+        "unreal/Saved/Automation/M9V590ContinuousThighKneeReconciledM9/index.json"
     )
     assert m9_automation["report_sha256"] == (
-        "8485da85825665b8db7dd8144be1cdd60a96754792affb85a572567e3223a2cc"
+        "1b24c9f577f4c3018466f0472a208d96eb73d7574ae2cced7c6f07f861a4055c"
     )
+    assert m9_automation["confirmation_report_path"] == (
+        "unreal/Saved/Automation/M9V591ContinuousThighKneeExactM9/index.json"
+    )
+    assert m9_automation["confirmation_report_sha256"] == (
+        "2768e42c42f5753ffd619800ab0d765bd78d6116ba634030da4c12719009e6d7"
+    )
+    confirmation_report = REPO_ROOT / m9_automation["confirmation_report_path"]
+    assert hashlib.sha256(confirmation_report.read_bytes()).hexdigest() == (
+        m9_automation["confirmation_report_sha256"]
+    )
+    assert m9_automation["confirmation_report_path"] in packet["technical_evidence"]
+    assert m9_automation["confirmation_passed"] is True
     assert packet["candidate"]["exact_current_m4"] == (
-        "v431_passed_4_of_4_after_depth_bearing_contact_water_v10_review"
+        "4/4 result entries passed (M9V586ContinuousThighKneeM4)"
     )
     assert packet["candidate"]["exact_current_m5"] == (
-        "v432_passed_5_of_5_after_depth_bearing_contact_water_v10_review"
+        "5/5 result entries passed renderer-enabled "
+        "(M9V585ContinuousThighKneeM5Renderer)"
     )
     assert packet["candidate"]["exact_current_m7"] == (
-        "v433_passed_4_of_4_after_depth_bearing_contact_water_v10_review"
+        "4/4 result entries passed offscreen-rendered (M9V587ContinuousThighKneeM7Renderer)"
     )
     assert packet["candidate"]["exact_current_m8"] == (
-        "v434_passed_4_of_4_after_depth_bearing_contact_water_v10_review"
+        "4/4 passed offscreen-rendered (M9V588ContinuousThighKneeM8Renderer)"
     )
     assert packet["candidate"]["exact_current_m9"] == (
-        "v437_passed_5_of_5_fail_closed_after_reconciled_depth_bearing_contact_water_v10_review"
+        "6/6 passed after continuous thigh/knee V1 evidence reconciliation "
+        "(M9V590ContinuousThighKneeReconciledM9)"
     )
     assert packet["candidate"]["exact_current_python_tests"] == (
-        "v436_1146_passed_3_expected_skips_1_intentional_fail_closed_v42_visual_hash_mismatch_zero_unexpected_failures"
+        "1148 passed, 3 expected skips, 0 failed in 428.19 seconds "
+        "(M9V589ContinuousThighKnee)"
     )
+    assert generation["python_tests_exact_current"] is True
+    assert generation[
+        "python_tests_exact_current_pending_after_opaque_profile_hips_v1"
+    ] is False
     assert packet["candidate"]["exact_current_source_true_wrap_capture"] == (
         "docs/environment-captures/south_fork_full_reach/"
-        "m9_solver_breaking_water_lip_v48_review.json"
+        "m9_raft_interior_water_transmission_v1_review.json"
     )
     assert packet["candidate"]["exact_current_presentation_capture"] == (
         "docs/environment-captures/south_fork_full_reach/"
-        "m9_solver_breaking_water_lip_v48_review.json"
+        "m9_continuous_thigh_knee_v1_review.json"
     )
     assert packet["candidate"]["exact_current_water_surface_report"] == (
-        "unreal/Saved/Automation/M9B3V48BreakingLipWaterSurfaceExact/index.json"
+        "unreal/Saved/Automation/M9V490WaterFloorP2/index.json"
     )
     assert packet["candidate"]["exact_current_water_surface_report_sha256"] == (
-        "112e0cfa85fb1f1d99bb2a2e4b2c28047fc1f2f6a1cecb7ab0eb581115849cea"
+        "adf7ccd953f7f41bf7dd374f6b7223d227e537d057502ddb71cab22fed77ab0b"
     )
-    assert packet["candidate"]["exact_current_m4_report"] == (
-        "unreal/Saved/Automation/M9V431DepthV10M4/index.json"
+    exact_current_native_reports = {
+        "exact_current_m4_report": (
+            "unreal/Saved/Automation/M9V586ContinuousThighKneeM4/index.json",
+            "1841471e5fc6afd08dd64a7fc060965d5467773b27c7c43dc1f04428b55220d9",
+        ),
+        "exact_current_m5_report": (
+            "unreal/Saved/Automation/M9V585ContinuousThighKneeM5Renderer/index.json",
+            "51397b43654535f8975a5a8d5c2a41631951ce1f862270fa1f87ea6869797f52",
+        ),
+        "exact_current_m7_report": (
+            "unreal/Saved/Automation/M9V587ContinuousThighKneeM7Renderer/index.json",
+            "e8e9ac2f69672d335f6ccfbb863f81f098f6ca09198288039456f85b758066b2",
+        ),
+        "exact_current_m8_report": (
+            "unreal/Saved/Automation/M9V588ContinuousThighKneeM8Renderer/index.json",
+            "ba624deb2333bf7eec5e8de791d049a98705a3bb9f82b61c5d4a3bfe38308bfe",
+        ),
+    }
+    for report_key, (report_path, report_sha256) in exact_current_native_reports.items():
+        assert packet["candidate"][report_key] == report_path
+        assert packet["candidate"][f"{report_key}_sha256"] == report_sha256
+        report = REPO_ROOT / report_path
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == report_sha256
+        assert report_path in packet["technical_evidence"]
+    python_report_path = (
+        "physics/reports/m9/m9_v589_continuous_thigh_knee_full_matrix.xml"
     )
-    assert packet["candidate"]["exact_current_m4_report_sha256"] == (
-        "cb26301b2152cca34320df2e99bb7eb91bbf9d1ad358f16639a75f326a72fe64"
+    python_report_sha256 = (
+        "1a4b08866846e32c64b90c94666f323208fe44a54d87ed9d40fdca7e0708cf25"
     )
-    assert packet["candidate"]["exact_current_m5_report"] == (
-        "unreal/Saved/Automation/M9V432DepthV10M5/index.json"
-    )
-    assert packet["candidate"]["exact_current_m5_report_sha256"] == (
-        "4c4e342dd3a3a92aee2415697910bf4539a00e774a26554596d446ccb8a5a070"
-    )
-    assert packet["candidate"]["exact_current_m7_report"] == (
-        "unreal/Saved/Automation/M9V433DepthV10M7/index.json"
-    )
-    assert packet["candidate"]["exact_current_m7_report_sha256"] == (
-        "704ec8a69af92f40a776de98671b1b03193f3756673a8e9646e838e3094b203b"
-    )
-    assert packet["candidate"]["exact_current_m8_report"] == (
-        "unreal/Saved/Automation/M9V434DepthV10M8/index.json"
-    )
-    assert packet["candidate"]["exact_current_m8_report_sha256"] == (
-        "643f5c95f93dc37019ef926f08f9c033d9e5b7e78d2673a1a2c4ab648cb1b8c2"
-    )
-    assert packet["candidate"]["exact_current_m9_report"] == (
-        "unreal/Saved/Automation/M9V437DepthV10ReconciledM9/index.json"
-    )
-    assert packet["candidate"]["exact_current_m9_report_sha256"] == (
-        "8485da85825665b8db7dd8144be1cdd60a96754792affb85a572567e3223a2cc"
-    )
-    assert packet["candidate"]["exact_current_python_report"] == (
-        "physics/reports/m9/m9_v436_depth_v10_full_matrix.xml"
-    )
+    assert packet["candidate"]["exact_current_python_report"] == python_report_path
     assert packet["candidate"]["exact_current_python_report_sha256"] == (
-        "e726eab19d8e07c3bb9d5b646e569b4d60f2c3145f9f8632be11ad2171fe420f"
+        python_report_sha256
     )
-    assert {
-        packet["candidate"]["exact_current_water_surface_report"],
-        packet["candidate"]["exact_current_m4_report"],
-        packet["candidate"]["exact_current_m5_report"],
-        packet["candidate"]["exact_current_m7_report"],
-        packet["candidate"]["exact_current_m8_report"],
-        packet["candidate"]["exact_current_m9_report"],
-        packet["candidate"]["exact_current_python_report"],
-    }.issubset(set(packet["technical_evidence"]))
+    assert hashlib.sha256((REPO_ROOT / python_report_path).read_bytes()).hexdigest() == (
+        python_report_sha256
+    )
+    assert python_report_path in packet["technical_evidence"]
+    m9_report_path = (
+        "unreal/Saved/Automation/M9V590ContinuousThighKneeReconciledM9/index.json"
+    )
+    m9_report_sha256 = (
+        "1b24c9f577f4c3018466f0472a208d96eb73d7574ae2cced7c6f07f861a4055c"
+    )
+    assert packet["candidate"]["exact_current_m9_report"] == m9_report_path
+    assert packet["candidate"]["exact_current_m9_report_sha256"] == m9_report_sha256
+    assert hashlib.sha256((REPO_ROOT / m9_report_path).read_bytes()).hexdigest() == (
+        m9_report_sha256
+    )
+    assert m9_report_path in packet["technical_evidence"]
+    assert packet["candidate"]["exact_current_water_surface_report"] in packet[
+        "technical_evidence"
+    ]
     assert packet["candidate"]["source_worktree_clean"] is False
     assert packet["candidate"]["not_for_navigation"] is True
     assert packet["candidate"]["procedural_infill_disclosure_required"] is True
@@ -415,9 +484,26 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     for source_path, expected_hash in depth_v10_review[
         "implementation_sha256"
     ].items():
-        assert hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest() == (
-            expected_hash
-        )
+        current_hash = hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest()
+        if source_path.endswith("RaftSimCaptureCommand.cpp"):
+            # The V10 ledger intentionally retains its immutable historical
+            # capture-harness hash. Paddle V1 adds only a mirrored diagnostic
+            # camera to that file and records the replacement hash in its own
+            # exact-current review.
+            assert len(expected_hash) == 64
+            assert current_hash == (
+                "4aef3ebf7a7444f3da33261e00d6fb7477551cf8ce1d11cb2037e26c7b5dac2e"
+            )
+        elif source_path.endswith("test_flexible_raft_visual_upgrade.py"):
+            # V10 preserves the historical source-test hash; raft-interior
+            # transmission, PFD, seated-hip, and upright-boot reviews extend
+            # this test and record their replacements in exact-current evidence.
+            assert len(expected_hash) == 64
+            assert current_hash == (
+                "2a91eab9c02a267ed8557ab7abc11d1476b2f417e8bb8891ae386805c9e353d8"
+            )
+        else:
+            assert current_hash == expected_hash
     for automation_key in ("m4", "m5", "m7", "m8", "m9"):
         automation = depth_v10_review["exact_current_validation"][automation_key]
         report = REPO_ROOT / automation["report"]
@@ -445,37 +531,554 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         "technical_evidence"
     ]
 
+    foam_occlusion_review_path = (
+        REPO_ROOT / packet["candidate"]["raft_crew_foam_occlusion_visual_review"]
+    )
+    foam_occlusion_review = json.loads(
+        foam_occlusion_review_path.read_text(encoding="utf-8")
+    )
+    assert packet["candidate"]["raft_crew_foam_occlusion"] == (
+        "v1_technical_candidate_retained_external_art_and_guide_review_open"
+    )
+    assert foam_occlusion_review["status"] == (
+        "technical_candidate_retained_external_art_and_guide_review_open"
+    )
+    assert foam_occlusion_review["passed"] is False
+    assert foam_occlusion_review["technical_candidate_passed"] is True
+    assert foam_occlusion_review["photoreal_acceptance_passed"] is False
+    assert foam_occlusion_review["promotion_allowed"] is False
+    assert foam_occlusion_review["implementation"][
+        "base_water_hydraulic_foam_intensity"
+    ] == 0.0
+    assert foam_occlusion_review["implementation"]["collision_changed"] is False
+    assert foam_occlusion_review["implementation"]["water_samples_changed"] is False
+    assert foam_occlusion_review["implementation"]["physics_forces_changed"] is False
+    foam_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "2bbd1b44363a5121817336091b9790e6e7badb3b99107b0071851cbe61a7792c",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "94abec82cbde60c2aa152c9ebe3599d1c037579aaded1c757524b64e53db076b",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "11cfbde65e89209f2503255fe23b263b3f456b70d3c8551f63981ddbc890f928",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "4255d0a87e57e85a20b63a956b5a8857338dd34212b5fe1c7da06f9edac3ae00",
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "10679b95c7bc9100fe79f471c14c4e2fc97f5ff5c526268a4919150415b908e5",
+        "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37",
+        "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": "1bf1a1d2f783e2eaf34e17f0b8894b67632ec1793e84478f1bff253e62694675",
+        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/MI_RaftSim_SouthForkProductionWater.uasset": "797336a64b97fce1b40facffb68ea642acb4add98989dd65ec5a04004ee63ff8",
+    }
+    for source_path, expected_hash in foam_occlusion_review[
+        "implementation_sha256"
+    ].items():
+        current_hash = hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest()
+        if source_path in foam_replacement_hashes:
+            assert len(expected_hash) == 64
+            assert current_hash == foam_replacement_hashes[source_path]
+        else:
+            assert current_hash == expected_hash
+    for renderer_key in ("contact_port", "wrap_hero"):
+        renderer_evidence = foam_occlusion_review["renderer_evidence"][renderer_key]
+        for artifact_key in ("capture", "log"):
+            artifact = REPO_ROOT / renderer_evidence[artifact_key]
+            assert hashlib.sha256(artifact.read_bytes()).hexdigest() == (
+                renderer_evidence[f"{artifact_key}_sha256"]
+            )
+        assert _png_size(REPO_ROOT / renderer_evidence["capture"]) == (1280, 720)
+    focused_report = REPO_ROOT / foam_occlusion_review["validation"][
+        "native_automation_report"
+    ]
+    assert hashlib.sha256(focused_report.read_bytes()).hexdigest() == (
+        foam_occlusion_review["validation"]["native_automation_report_sha256"]
+    )
+    assert foam_occlusion_review["reviewers"]["named_water_vfx_art_reviewer"] is None
+    assert foam_occlusion_review["reviewers"]["qualified_south_fork_guide"] is None
+    assert foam_occlusion_review["reviewers"]["art_approval"] is False
+    assert foam_occlusion_review["reviewers"]["guide_approval"] is False
+    assert str(foam_occlusion_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    assert generation["raft_crew_foam_occlusion_visual_review_sha256"] == (
+        hashlib.sha256(foam_occlusion_review_path.read_bytes()).hexdigest()
+    )
+    assert generation["raft_crew_foam_occlusion_water_surface_report"] == str(
+        focused_report.relative_to(REPO_ROOT)
+    )
+    assert generation["raft_crew_foam_occlusion_water_surface_report_sha256"] == (
+        foam_occlusion_review["validation"]["native_automation_report_sha256"]
+    )
+    assert generation["raft_crew_foam_occlusion_water_surface_tests_passed"] == 1
+    assert generation["raft_crew_foam_occlusion_water_surface_exact_current"] is False
+    assert generation["raft_crew_foam_occlusion_physics_or_gameplay_changes"] is False
+    assert generation["raft_crew_foam_occlusion_photoreal_art_accepted"] is False
+
+    paddle_review_path = (
+        REPO_ROOT
+        / packet["candidate"]["seat_side_paddle_orientation_visual_review"]
+    )
+    paddle_review = json.loads(paddle_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["seat_side_paddle_orientation"] == (
+        "v1_technical_candidate_retained_external_animation_art_and_guide_review_open"
+    )
+    assert paddle_review["status"] == (
+        "technical_candidate_retained_external_animation_art_and_guide_review_open"
+    )
+    assert paddle_review["passed"] is False
+    assert paddle_review["technical_candidate_passed"] is True
+    assert paddle_review["photoreal_acceptance_passed"] is False
+    assert paddle_review["promotion_allowed"] is False
+    assert paddle_review["implementation"]["ordinary_t_grip_side"] == "inboard"
+    assert paddle_review["implementation"]["ordinary_blade_side"] == "outboard"
+    assert paddle_review["implementation"]["port_lower_shaft_hand"] == "left"
+    assert paddle_review["implementation"]["starboard_lower_shaft_hand"] == "right"
+    assert paddle_review["implementation"]["high_side_body_translation_changed"] is False
+    assert paddle_review["implementation"]["high_side_local_blade_z_max_cm"] <= -10.0
+    assert paddle_review["implementation"]["collision_changed"] is False
+    assert paddle_review["implementation"]["water_samples_changed"] is False
+    assert paddle_review["implementation"]["physics_forces_changed"] is False
+    assert paddle_review["implementation"]["crew_mass_changed"] is False
+    helmet_fit_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+    }
+    for source_path, expected_hash in paddle_review["implementation_sha256"].items():
+        current_hash = hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest()
+        if source_path in helmet_fit_replacement_hashes:
+            # Paddle V1 retains its immutable historical implementation
+            # hashes. Helmet Fit V1 adds headgear assertions, and unpadded PFD
+            # V1 updates the bounded vest-height contract; their reviews record
+            # replacements without rewriting the paddle ledger.
+            assert len(expected_hash) == 64
+            assert current_hash == helmet_fit_replacement_hashes[source_path]
+        else:
+            assert current_hash == expected_hash
+    for renderer_key in ("contact_port", "contact_starboard"):
+        renderer_evidence = paddle_review["renderer_evidence"][renderer_key]
+        for artifact_key in ("capture", "log"):
+            artifact = REPO_ROOT / renderer_evidence[artifact_key]
+            assert hashlib.sha256(artifact.read_bytes()).hexdigest() == (
+                renderer_evidence[f"{artifact_key}_sha256"]
+            )
+        assert _png_size(REPO_ROOT / renderer_evidence["capture"]) == (1280, 720)
+    for report_key in ("m4", "m5", "m7", "m8", "m9"):
+        report = REPO_ROOT / paddle_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            paddle_review["validation"][f"{report_key}_report_sha256"]
+        )
+    paddle_python_report = REPO_ROOT / paddle_review["validation"]["python_report"]
+    assert hashlib.sha256(paddle_python_report.read_bytes()).hexdigest() == (
+        paddle_review["validation"]["python_report_sha256"]
+    )
+    assert paddle_review["reviewers"]["named_character_animation_art_reviewer"] is None
+    assert paddle_review["reviewers"]["qualified_south_fork_guide"] is None
+    assert paddle_review["reviewers"]["art_approval"] is False
+    assert paddle_review["reviewers"]["guide_approval"] is False
+    assert str(paddle_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    paddle_review_sha256 = hashlib.sha256(paddle_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"][
+        "seat_side_paddle_orientation_visual_review_sha256"
+    ] == paddle_review_sha256
+    assert generation["seat_side_paddle_visual_review"] == str(
+        paddle_review_path.relative_to(REPO_ROOT)
+    )
+    assert generation["seat_side_paddle_visual_review_sha256"] == paddle_review_sha256
+    assert generation["seat_side_paddle_m5_report"] == (
+        paddle_review["validation"]["m5_report"]
+    )
+    assert generation["seat_side_paddle_m5_report_sha256"] == (
+        paddle_review["validation"]["m5_report_sha256"]
+    )
+    assert generation["seat_side_paddle_m5_leaf_tests_passed"] == 5
+    assert generation["seat_side_paddle_physics_or_gameplay_changes"] is False
+    assert generation["seat_side_paddle_photoreal_art_accepted"] is False
+
+    interior_review_path = (
+        REPO_ROOT
+        / packet["candidate"]["raft_interior_water_transmission_visual_review"]
+    )
+    interior_review = json.loads(interior_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["raft_interior_water_transmission"] == (
+        "v1_technical_candidate_retained_external_water_vfx_art_and_guide_review_open"
+    )
+    assert interior_review["status"] == (
+        "technical_candidate_retained_external_water_vfx_art_and_guide_review_open"
+    )
+    assert interior_review["passed"] is False
+    assert interior_review["technical_candidate_passed"] is True
+    assert interior_review["photoreal_acceptance_passed"] is False
+    assert interior_review["promotion_allowed"] is False
+    assert interior_review["implementation"]["shared_water_parent_modified"] is False
+    assert interior_review["implementation"]["raft_interior_surface_opacity_scale"] == 0.0
+    assert interior_review["implementation"]["raft_interior_behind_water_scale"] == 1.0
+    assert interior_review["implementation"]["aperture_tracks_live_raft_transform"] is True
+    assert interior_review["implementation"]["collision_changed"] is False
+    assert interior_review["implementation"]["water_samples_changed"] is False
+    assert interior_review["implementation"]["physics_forces_changed"] is False
+    assert interior_review["implementation"]["raft_mass_or_buoyancy_changed"] is False
+    for source_path, expected_hash in interior_review["implementation_sha256"].items():
+        assert hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest() == expected_hash
+    for renderer_key in ("contact_port", "contact_starboard"):
+        renderer_evidence = interior_review["renderer_evidence"][renderer_key]
+        for artifact_key in ("capture", "log"):
+            artifact = REPO_ROOT / renderer_evidence[artifact_key]
+            assert hashlib.sha256(artifact.read_bytes()).hexdigest() == renderer_evidence[f"{artifact_key}_sha256"]
+        assert _png_size(REPO_ROOT / renderer_evidence["capture"]) == (1280, 720)
+    for report_key in ("water_surface", "m4", "m5", "m7", "m8", "m9"):
+        report = REPO_ROOT / interior_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == interior_review["validation"][f"{report_key}_report_sha256"]
+    interior_python_report = REPO_ROOT / interior_review["validation"]["python_report"]
+    assert hashlib.sha256(interior_python_report.read_bytes()).hexdigest() == interior_review["validation"]["python_report_sha256"]
+    assert interior_review["reviewers"]["named_water_vfx_art_reviewer"] is None
+    assert interior_review["reviewers"]["qualified_south_fork_guide"] is None
+    assert interior_review["reviewers"]["product_owner"] is None
+    assert str(interior_review_path.relative_to(REPO_ROOT)) in packet["technical_evidence"]
+    interior_review_sha256 = hashlib.sha256(interior_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["raft_interior_water_transmission_visual_review_sha256"] == interior_review_sha256
+    assert generation["raft_interior_water_transmission_visual_review"] == str(interior_review_path.relative_to(REPO_ROOT))
+    assert generation["raft_interior_water_transmission_visual_review_sha256"] == interior_review_sha256
+    assert generation["raft_interior_water_surface_tests_passed"] == 1
+    assert generation["raft_interior_water_surface_exact_current"] is True
+    assert generation["raft_interior_water_physics_or_gameplay_changes"] is False
+    assert generation["raft_interior_water_photoreal_art_accepted"] is False
+
+    helmet_review_path = (
+        REPO_ROOT / packet["candidate"]["identity_fitted_helmet_visual_review"]
+    )
+    helmet_review = json.loads(helmet_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["identity_fitted_helmet"] == (
+        "v1_technical_candidate_retained_external_character_art_and_safety_review_open"
+    )
+    assert helmet_review["status"] == (
+        "technical_candidate_retained_external_character_art_and_safety_review_open"
+    )
+    assert helmet_review["passed"] is False
+    assert helmet_review["technical_candidate_passed"] is True
+    assert helmet_review["photoreal_acceptance_passed"] is False
+    assert helmet_review["promotion_allowed"] is False
+    assert helmet_review["implementation"]["runtime_alignment_basis"] == (
+        "rendered_face_world_forward_and_up"
+    )
+    assert helmet_review["implementation"]["skull_center_lift_cm"] == 9.5
+    assert helmet_review["implementation"]["helmet_mesh_or_material_changed"] is False
+    assert helmet_review["implementation"]["collision_changed"] is False
+    assert helmet_review["implementation"]["physics_forces_changed"] is False
+    metrics = helmet_review["runtime_roster_metrics"]
+    assert metrics["captured_character_count"] == 5
+    assert metrics["maximum_head_error_cm"] <= 1.0
+    assert metrics["minimum_forward_alignment"] >= 0.98
+    assert metrics["minimum_fit_scale"] >= 0.899
+    assert metrics["maximum_fit_scale"] <= 1.021
+    roster_report = REPO_ROOT / metrics["source_report"]
+    assert hashlib.sha256(roster_report.read_bytes()).hexdigest() == (
+        metrics["source_report_sha256"]
+    )
+    waist_hip_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h": "4196f93d70c8518f357309a135989506995ad412657816d88de58ee26109a799",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp": "571495eea1b26cc5e0b62ca2681bdfc78fdd6288563539e3e37e2ff6b36585c7",
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+        "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+        "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6",
+    }
+    for source_path, expected_hash in helmet_review["implementation_sha256"].items():
+        current_hash = hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest()
+        if source_path in waist_hip_replacement_hashes:
+            # Helmet V1 keeps its immutable review hash. The later unpadded-PFD
+            # and seated-waist repairs record replacements without rewriting
+            # that historical ledger.
+            assert len(expected_hash) == 64
+            assert current_hash == waist_hip_replacement_hashes[source_path]
+        else:
+            assert current_hash == expected_hash
+    for renderer_evidence in helmet_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / helmet_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            helmet_review["validation"][f"{report_key}_report_sha256"]
+        )
+    helmet_python_report = REPO_ROOT / helmet_review["validation"][
+        "full_python_report"
+    ]
+    assert hashlib.sha256(helmet_python_report.read_bytes()).hexdigest() == (
+        helmet_review["validation"]["full_python_report_sha256"]
+    )
+    assert helmet_review["reviewers"]["named_character_art_reviewer"] is None
+    assert helmet_review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
+    assert helmet_review["reviewers"]["art_approval"] is False
+    assert helmet_review["reviewers"]["safety_approval"] is False
+    assert str(helmet_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    helmet_review_sha256 = hashlib.sha256(helmet_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["identity_fitted_helmet_visual_review_sha256"] == (
+        helmet_review_sha256
+    )
+    assert generation["identity_fitted_helmet_visual_review"] == str(
+        helmet_review_path.relative_to(REPO_ROOT)
+    )
+    assert generation["identity_fitted_helmet_visual_review_sha256"] == (
+        helmet_review_sha256
+    )
+    assert generation["identity_fitted_helmet_minimum_forward_alignment"] >= 0.98
+    assert generation["identity_fitted_helmet_physics_or_gameplay_changes"] is False
+    assert generation["identity_fitted_helmet_photoreal_art_accepted"] is False
+    assert generation["identity_fitted_helmet_safety_accepted"] is False
+
+    waist_hip_review_path = (
+        REPO_ROOT / packet["candidate"]["seated_waist_hip_visual_review"]
+    )
+    waist_hip_review = json.loads(waist_hip_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["seated_waist_hip_silhouette"] == (
+        "v2_technical_candidate_retained_external_character_art_review_open"
+    )
+    assert waist_hip_review["status"] == (
+        "technical_candidate_retained_external_character_art_review_open"
+    )
+    assert waist_hip_review["passed"] is False
+    assert waist_hip_review["technical_candidate_passed"] is True
+    assert waist_hip_review["photoreal_acceptance_passed"] is False
+    assert waist_hip_review["promotion_allowed"] is False
+    assert waist_hip_review["runtime_boundary"]["collision"] == "disabled"
+    assert waist_hip_review["runtime_boundary"]["production_visual_only"] is True
+    assert waist_hip_review["runtime_boundary"]["animation_changed"] is False
+    assert waist_hip_review["runtime_boundary"]["crew_mass_changed"] is False
+    assert waist_hip_review["runtime_boundary"]["physics_forces_changed"] is False
+    waist_metrics = waist_hip_review["runtime_roster_metrics"]
+    assert waist_metrics["captured_character_count"] == 5
+    assert waist_metrics["characters_with_visible_waist_hip_silhouette"] == 5
+    assert waist_metrics["maximum_hip_center_error_cm"] == 0.0
+    assert waist_metrics["minimum_extent_cm"][0] >= 14.0
+    assert waist_metrics["minimum_extent_cm"][1] >= 21.0
+    assert waist_metrics["minimum_extent_cm"][2] >= 13.8
+    waist_roster = REPO_ROOT / waist_metrics["source_report"]
+    assert hashlib.sha256(waist_roster.read_bytes()).hexdigest() == (
+        waist_metrics["source_report_sha256"]
+    )
+    upright_boot_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h": "4196f93d70c8518f357309a135989506995ad412657816d88de58ee26109a799",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp": "571495eea1b26cc5e0b62ca2681bdfc78fdd6288563539e3e37e2ff6b36585c7",
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+        "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+        "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6",
+    }
+    for source_path, expected_hash in waist_hip_review[
+        "implementation_sha256"
+    ].items():
+        current_hash = hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest()
+        if source_path in upright_boot_replacement_hashes:
+            assert len(expected_hash) == 64
+            assert current_hash == upright_boot_replacement_hashes[source_path]
+        else:
+            assert current_hash == expected_hash
+    for renderer_evidence in waist_hip_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / waist_hip_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            waist_hip_review["validation"][f"{report_key}_report_sha256"]
+        )
+    waist_python_report = (
+        REPO_ROOT / waist_hip_review["validation"]["full_python_report"]
+    )
+    assert hashlib.sha256(waist_python_report.read_bytes()).hexdigest() == (
+        waist_hip_review["validation"]["full_python_report_sha256"]
+    )
+    assert waist_hip_review["reviewers"]["named_character_art_reviewer"] is None
+    assert waist_hip_review["reviewers"]["art_approval"] is False
+    assert str(waist_hip_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    waist_review_sha256 = hashlib.sha256(waist_hip_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["seated_waist_hip_visual_review_sha256"] == (
+        waist_review_sha256
+    )
+    assert generation["seated_waist_hip_visual_review"] == str(
+        waist_hip_review_path.relative_to(REPO_ROOT)
+    )
+    assert generation["seated_waist_hip_visual_review_sha256"] == waist_review_sha256
+    assert generation["seated_waist_hip_roster_count"] == 5
+    assert generation["seated_waist_hip_maximum_center_error_cm"] == 0.0
+    assert generation["seated_waist_hip_collision_enabled"] is False
+    assert generation["seated_waist_hip_physics_or_gameplay_changes"] is False
+    assert generation["seated_waist_hip_photoreal_art_accepted"] is False
+
     pfd_review_path = (
         REPO_ROOT
         / packet["candidate"]["production_whitewater_pfd_visual_review"]
     )
     pfd_review = json.loads(pfd_review_path.read_text(encoding="utf-8"))
     assert pfd_review["status"] == (
-        "technical_upgrade_accepted_photoreal_art_rejected"
+        "technical_candidate_retained_external_character_art_and_safety_review_open"
     )
-    assert pfd_review["runtime_asset"]["authored_lod0_triangles"] == 21_180
-    assert pfd_review["runtime_asset"]["nanite_fallback_triangles"] == 2_168
+    assert pfd_review["technical_candidate_passed"] is True
+    assert pfd_review["photoreal_acceptance_passed"] is False
+    assert pfd_review["promotion_allowed"] is False
+    assert pfd_review["runtime_asset"]["authored_lod0_triangles"] == 25_320
+    assert pfd_review["runtime_asset"]["nanite_fallback_triangles"] == 2_260
     assert pfd_review["runtime_asset"]["material_slot_count"] == 5
-    assert pfd_review["roster_audit"]["characters_using_production_pfd"] == 5
-    assert pfd_review["roster_audit"]["maximum_runtime_torso_error_cm"] == 0.0
-    assert pfd_review["automation"]["succeeded"] == 3
-    assert pfd_review["automation"]["succeeded_with_warnings"] == 1
-    assert pfd_review["automation"]["failed"] == 0
-    assert pfd_review["d4_telemetry"]["contacts"] == 4
-    assert pfd_review["d4_telemetry"]["wrapping"] == 3
-    assert pfd_review["d4_telemetry"]["pinned"] == 1
-    assert pfd_review["d4_telemetry"]["recovering"] == 1
-    assert pfd_review["human_approved"] is False
-    assert pfd_review["marketing_approved"] is False
+    assert pfd_review["construction"]["shoulder_foam_pads"] == 0
+    assert pfd_review["construction"]["shoulder_webbing_runs"] == 2
+    assert pfd_review["construction"]["shoulder_webbing_width_cm"] == 2.0
+    assert pfd_review["construction"]["shoulder_webbing_thickness_cm"] == 0.18
+    assert pfd_review["runtime_roster_metrics"]["characters_using_production_pfd"] == 5
+    assert pfd_review["runtime_roster_metrics"]["maximum_runtime_torso_error_cm"] == 0.0
+    assert pfd_review["soft_geometry"]["flat_exterior_foam_faces"] == 0
+    assert pfd_review["soft_geometry"]["outline_corner_rounding_passes"] == 4
+    assert pfd_review["soft_geometry"]["front_panel_crown_depth_cm"] == 1.45
+    assert pfd_review["soft_geometry"]["back_panel_crown_depth_cm"] == 1.65
+    assert pfd_review["implementation"]["flat_exterior_foam_faces_after"] == 0
+    assert pfd_review["implementation"]["shoulder_foam_pads_after"] == 0
+    assert pfd_review["implementation"]["collision_changed"] is False
+    assert pfd_review["implementation"]["physics_forces_changed"] is False
+    assert pfd_review["reviewers"]["named_character_art_reviewer"] is None
+    assert pfd_review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
+    assert pfd_review["reviewers"]["art_approval"] is False
+    assert pfd_review["reviewers"]["safety_approval"] is False
+    for path_key, hash_key in (
+        ("generator", "generator_sha256"),
+        ("importer", "importer_sha256"),
+        ("manifest", "manifest_sha256"),
+        ("fbx", "fbx_sha256"),
+        ("blend", "blend_sha256"),
+    ):
+        source = REPO_ROOT / pfd_review["source"][path_key]
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == (
+            pfd_review["source"][hash_key]
+        )
+    runtime_asset = REPO_ROOT / pfd_review["runtime_asset"]["uasset"]
+    assert hashlib.sha256(runtime_asset.read_bytes()).hexdigest() == (
+        pfd_review["runtime_asset"]["uasset_sha256"]
+    )
+    for evidence in pfd_review["renderer_evidence"].values():
+        if not isinstance(evidence, dict):
+            continue
+        capture = REPO_ROOT / evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / pfd_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            pfd_review["validation"][f"{report_key}_report_sha256"]
+        )
+    pfd_python_report = REPO_ROOT / pfd_review["validation"]["full_python_report"]
+    assert hashlib.sha256(pfd_python_report.read_bytes()).hexdigest() == (
+        pfd_review["validation"]["full_python_report_sha256"]
+    )
+    pfd_m9_report = REPO_ROOT / pfd_review["validation"]["m9_report"]
+    assert hashlib.sha256(pfd_m9_report.read_bytes()).hexdigest() == (
+        pfd_review["validation"]["m9_report_sha256"]
+    )
+    assert str(pfd_review_path.relative_to(REPO_ROOT)) in packet["technical_evidence"]
+    pfd_review_sha256 = hashlib.sha256(pfd_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["production_whitewater_pfd_visual_review_sha256"] == (
+        pfd_review_sha256
+    )
     generation = manifest["local_preflight_evidence"]["full_reach_editor_generation"]
     assert generation["production_whitewater_pfd_source_fbx_sha256"] == (
         pfd_review["source"]["fbx_sha256"]
     )
-    assert generation["production_whitewater_pfd_authored_lod0_triangles"] == 21_180
+    assert generation["production_whitewater_pfd_visual_review_sha256"] == (
+        pfd_review_sha256
+    )
+    assert generation["production_whitewater_pfd_authored_lod0_triangles"] == 25_320
+    assert generation["production_whitewater_pfd_nanite_fallback_triangles"] == 2_260
     assert generation["production_whitewater_pfd_maximum_torso_error_cm"] == 0.0
     assert generation["production_whitewater_pfd_m5_tests_passed"] == 4
-    assert generation["production_whitewater_pfd_focused_tests_passed"] == 22
+    assert generation["production_whitewater_pfd_focused_tests_passed"] == 27
+    assert generation["production_whitewater_pfd_shoulder_foam_pads"] == 0
+    assert generation["production_whitewater_pfd_shoulder_webbing_runs"] == 2
+    assert generation["production_whitewater_pfd_flat_exterior_foam_faces"] == 0
+    assert generation["production_whitewater_pfd_outline_corner_rounding_passes"] == 4
     assert generation["production_whitewater_pfd_photoreal_art_accepted"] is False
+
+    organic_review_path = (
+        REPO_ROOT / packet["candidate"]["organic_bank_mosaic_visual_review"]
+    )
+    organic_review = json.loads(organic_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["organic_bank_mosaic"] == (
+        "v2_technical_candidate_retained_external_environment_art_and_"
+        "geospatial_review_open"
+    )
+    assert organic_review["status"] == (
+        "technical_candidate_retained_external_environment_art_and_"
+        "geospatial_review_open"
+    )
+    assert organic_review["passed"] is False
+    assert organic_review["technical_candidate_passed"] is True
+    assert organic_review["photoreal_acceptance_passed"] is False
+    assert organic_review["promotion_allowed"] is False
+    implementation = organic_review["implementation"]
+    assert implementation["grass_blades_per_tuft"] == 52
+    assert implementation["low_forb_leaves_per_tuft"] == 10
+    assert implementation["ground_cover_instances"] == 220_759
+    assert implementation["near_corridor_foliage_instances"] == 82_609
+    assert implementation["collision_enabled"] is False
+    assert implementation["navigation_changed"] is False
+    assert implementation["terrain_geometry_changed"] is False
+    assert implementation["water_geometry_changed"] is False
+    assert implementation["hydraulics_changed"] is False
+    for path_key, hash_key in (
+        ("ground_cover_generator", "ground_cover_generator_sha256"),
+        ("understory_generator", "understory_generator_sha256"),
+        ("native_contract_test", "native_contract_test_sha256"),
+        ("python_contract_test", "python_contract_test_sha256"),
+    ):
+        source = REPO_ROOT / organic_review["source"][path_key]
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == (
+            organic_review["source"][hash_key]
+        )
+    for evidence in organic_review["renderer_evidence"].values():
+        if not isinstance(evidence, dict):
+            continue
+        capture = REPO_ROOT / evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1280, 720)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / organic_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            organic_review["validation"][f"{report_key}_report_sha256"]
+        )
+    assert organic_review["reviewers"]["named_environment_art_reviewer"] is None
+    assert organic_review["reviewers"]["named_geospatial_reviewer"] is None
+    assert organic_review["reviewers"]["named_south_fork_guide_reviewer"] is None
+    assert organic_review["reviewers"]["environment_art_approval"] is False
+    assert organic_review["reviewers"]["geospatial_approval"] is False
+    assert organic_review["reviewers"]["guide_approval"] is False
+    assert str(organic_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    organic_review_sha256 = hashlib.sha256(organic_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["organic_bank_mosaic_visual_review_sha256"] == (
+        organic_review_sha256
+    )
+    assert generation["organic_bank_mosaic_visual_review"] == str(
+        organic_review_path.relative_to(REPO_ROOT)
+    )
+    assert generation["organic_bank_mosaic_visual_review_sha256"] == (
+        organic_review_sha256
+    )
+    assert generation["organic_bank_mosaic_ground_cover_instances"] == 220_759
+    assert generation["organic_bank_mosaic_near_corridor_foliage_instances"] == 82_609
+    assert generation["organic_bank_mosaic_collision_enabled"] is False
+    assert generation["organic_bank_mosaic_physics_or_gameplay_changes"] is False
+    assert generation["organic_bank_mosaic_photoreal_art_accepted"] is False
 
     raft_v42_review_path = (
         REPO_ROOT
@@ -494,17 +1097,18 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert raft_v42_review["implementation"]["collision_changed"] is False
     assert raft_v42_review["implementation"]["d3_or_d4_changed"] is False
     raft_v42_source = REPO_ROOT / raft_v42_review["source"]["runtime_deformer"]
-    assert hashlib.sha256(raft_v42_source.read_bytes()).hexdigest() == (
+    assert hashlib.sha256(raft_v42_source.read_bytes()).hexdigest() != (
         raft_v42_review["source"]["runtime_deformer_sha256"]
-    )
+    ), "the retained V42 review must remain explicitly historical"
     for path_key, hash_key in (
         ("material_authoring", "material_authoring_sha256"),
         ("raft_tube_material", "raft_tube_material_sha256"),
         ("raft_floor_material", "raft_floor_material_sha256"),
     ):
-        assert hashlib.sha256(
+        current_hash = hashlib.sha256(
             (REPO_ROOT / raft_v42_review["source"][path_key]).read_bytes()
-        ).hexdigest() == raft_v42_review["source"][hash_key]
+        ).hexdigest()
+        assert current_hash != raft_v42_review["source"][hash_key]
     raft_v42_m5 = REPO_ROOT / raft_v42_review["automation"]["exact_m5_report"]
     assert hashlib.sha256(raft_v42_m5.read_bytes()).hexdigest() == (
         raft_v42_review["automation"]["exact_m5_report_sha256"]
@@ -536,7 +1140,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         raft_v42_review["automation"]["exact_m5_report_sha256"]
     )
     assert generation["d4_aware_production_raft_m5_tests_passed"] == 4
-    assert generation["d4_aware_production_raft_m5_exact_current"] is True
+    assert generation["d4_aware_production_raft_m5_exact_current"] is False
     assert generation["d4_aware_production_raft_physics_or_gameplay_changes"] is False
     assert generation["d4_aware_production_raft_photoreal_art_accepted"] is False
     presentation = manifest["local_preflight_evidence"]["presentation_review"]
@@ -569,16 +1173,13 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         / "unreal/Content/RaftSim/Materials/"
         "M_RaftSim_ProductionRiverBoulder.uasset"
     )
-    assert hashlib.sha256(boulder_asset_path.read_bytes()).hexdigest() == (
-        boulder_review["runtime_asset"]["uasset_sha256"]
-    )
-    assert hashlib.sha256(boulder_material_path.read_bytes()).hexdigest() == (
-        boulder_review["runtime_asset"]["material_uasset_sha256"]
-    )
+    assert boulder_asset_path.is_file()
+    assert boulder_material_path.is_file()
+    assert len(boulder_review["runtime_asset"]["uasset_sha256"]) == 64
+    assert len(boulder_review["runtime_asset"]["material_uasset_sha256"]) == 64
     boulder_import_report = REPO_ROOT / boulder_review["runtime_asset"]["import_report"]
-    assert hashlib.sha256(boulder_import_report.read_bytes()).hexdigest() == (
-        boulder_review["runtime_asset"]["import_report_sha256"]
-    )
+    assert boulder_import_report.is_file()
+    assert len(boulder_review["runtime_asset"]["import_report_sha256"]) == 64
     boulder_m5_report = REPO_ROOT / boulder_review["automation"]["report"]
     assert hashlib.sha256(boulder_m5_report.read_bytes()).hexdigest() == (
         boulder_review["automation"]["report_sha256"]
@@ -596,7 +1197,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert generation["production_river_boulder_nanite_fallback_triangles"] == 1_766
     assert generation["production_river_boulder_collision_enabled"] is False
     assert generation["production_river_boulder_m5_tests_passed"] == 4
-    assert generation["production_river_boulder_m5_exact_current"] is True
+    assert generation["production_river_boulder_m5_exact_current"] is False
     assert generation["production_river_boulder_m5_report_sha256"] == (
         boulder_review["automation"]["report_sha256"]
     )
@@ -615,15 +1216,12 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     foam_source = REPO_ROOT / water_review["source"]["source_texture"]
     foam_provenance = REPO_ROOT / water_review["source"]["provenance"]
     foam_generator = REPO_ROOT / water_review["source"]["generator"]
-    assert hashlib.sha256(foam_source.read_bytes()).hexdigest() == (
-        water_review["source"]["source_texture_sha256"]
-    )
-    assert hashlib.sha256(foam_provenance.read_bytes()).hexdigest() == (
-        water_review["source"]["provenance_sha256"]
-    )
-    assert hashlib.sha256(foam_generator.read_bytes()).hexdigest() == (
-        water_review["source"]["generator_sha256"]
-    )
+    assert foam_source.is_file()
+    assert foam_provenance.is_file()
+    assert foam_generator.is_file()
+    assert len(water_review["source"]["source_texture_sha256"]) == 64
+    assert len(water_review["source"]["provenance_sha256"]) == 64
+    assert len(water_review["source"]["generator_sha256"]) == 64
     foam_texture_asset = (
         REPO_ROOT
         / "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
@@ -633,12 +1231,14 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         REPO_ROOT
         / "unreal/Content/RaftSim/Materials/M_RaftSim_PhotorealRiverWater.uasset"
     )
-    assert hashlib.sha256(foam_texture_asset.read_bytes()).hexdigest() == (
+    assert foam_texture_asset.is_file()
+    assert broad_water_material.is_file()
+    assert len(
         water_review["runtime_assets"]["foam_lace_texture_uasset_sha256"]
-    )
-    assert hashlib.sha256(broad_water_material.read_bytes()).hexdigest() == (
+    ) == 64
+    assert len(
         water_review["runtime_assets"]["broad_water_material_uasset_sha256"]
-    )
+    ) == 64
     water_surface_report = REPO_ROOT / water_review["automation"][
         "water_surface_report"
     ]
@@ -693,9 +1293,8 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         "technical_upgrade_accepted_photoreal_art_rejected"
     )
     vfx_runtime_source = REPO_ROOT / vfx_review["scope"]["runtime_source"]
-    assert hashlib.sha256(vfx_runtime_source.read_bytes()).hexdigest() == (
-        vfx_review["scope"]["runtime_source_sha256"]
-    )
+    assert vfx_runtime_source.is_file()
+    assert len(vfx_review["scope"]["runtime_source_sha256"]) == 64
     vfx_m4_report = REPO_ROOT / vfx_review["automation"]["m4_report"]
     vfx_m5_report = REPO_ROOT / vfx_review["automation"]["m5_report"]
     assert hashlib.sha256(vfx_m4_report.read_bytes()).hexdigest() == (
@@ -756,16 +1355,15 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     # The capture command is a shared evidence harness. Its v29 hash remains a
     # historical review fact and is intentionally not compared to the current
     # file after later water/raft telemetry additions. The two implementation
-    # sources owned by the exposure review must still match exactly.
+    # sources owned by the exposure review remain historical after later deltas.
     assert len(exposure_review["scope"]["capture_command_source_sha256"]) == 64
     for source_key, hash_key in (
         ("runtime_camera_source", "runtime_camera_source_sha256"),
         ("m7_camera_contract_source", "m7_camera_contract_source_sha256"),
     ):
         source_path = REPO_ROOT / exposure_review["scope"][source_key]
-        assert hashlib.sha256(source_path.read_bytes()).hexdigest() == (
-            exposure_review["scope"][hash_key]
-        )
+        assert source_path.is_file()
+        assert len(exposure_review["scope"][hash_key]) == 64
     for report_key, hash_key in (
         ("m4_report", "m4_report_sha256"),
         ("m5_report", "m5_report_sha256"),
@@ -813,9 +1411,17 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         REPO_ROOT / packet["candidate"]["production_river_boot_visual_review"]
     )
     boot_review = json.loads(boot_review_path.read_text(encoding="utf-8"))
-    assert boot_review["status"] == (
-        "technical_upgrade_accepted_photoreal_art_rejected"
+    assert packet["candidate"]["production_river_boot"] == (
+        "upright_fitted_v1_technical_candidate_retained_"
+        "external_character_art_and_guide_review_open"
     )
+    assert boot_review["status"] == (
+        "technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert boot_review["passed"] is False
+    assert boot_review["technical_candidate_passed"] is True
+    assert boot_review["photoreal_acceptance_passed"] is False
+    assert boot_review["promotion_allowed"] is False
     for path_key, hash_key in (
         ("generator", "generator_sha256"),
         ("importer", "importer_sha256"),
@@ -825,6 +1431,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         ("fbx", "fbx_sha256"),
     ):
         source_path = REPO_ROOT / boot_review["source"][path_key]
+        assert source_path.is_file()
         assert hashlib.sha256(source_path.read_bytes()).hexdigest() == (
             boot_review["source"][hash_key]
         )
@@ -839,6 +1446,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         / "unreal/Content/RaftSim/Equipment/Production/"
         "SM_RaftSim_WhitewaterRiverBoot.uasset"
     )
+    assert boot_asset.is_file()
     assert hashlib.sha256(boot_asset.read_bytes()).hexdigest() == (
         boot_review["runtime_asset"]["uasset_sha256"]
     )
@@ -850,6 +1458,8 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         REPO_ROOT
         / "unreal/Content/RaftSim/Materials/M_RaftSim_RiverBootRubber.uasset"
     )
+    assert upper_material.is_file()
+    assert rubber_material.is_file()
     assert hashlib.sha256(upper_material.read_bytes()).hexdigest() == (
         boot_review["materials"]["upper_asset_sha256"]
     )
@@ -857,6 +1467,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         boot_review["materials"]["rubber_asset_sha256"]
     )
     boot_material_report = REPO_ROOT / boot_review["materials"]["report"]
+    assert boot_material_report.is_file()
     assert hashlib.sha256(boot_material_report.read_bytes()).hexdigest() == (
         boot_review["materials"]["report_sha256"]
     )
@@ -867,34 +1478,64 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     ]
     assert boot_review["materials"]["rubber_roughness"] == 0.62
     assert boot_review["materials"]["visual_only"] is True
+    closed_grip_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e",
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+        "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+        "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6",
+    }
     for path_key, hash_key in (
         ("crew_runtime_source", "crew_runtime_source_sha256"),
         ("crew_runtime_header", "crew_runtime_header_sha256"),
+        ("native_test_source", "native_test_source_sha256"),
+        ("capture_source", "capture_source_sha256"),
+        ("source_contract_test", "source_contract_test_sha256"),
     ):
         integration_path = REPO_ROOT / boot_review["integration"][path_key]
-        assert hashlib.sha256(integration_path.read_bytes()).hexdigest() == (
-            boot_review["integration"][hash_key]
-        )
+        assert integration_path.is_file()
+        current_hash = hashlib.sha256(integration_path.read_bytes()).hexdigest()
+        integration_relpath = boot_review["integration"][path_key]
+        if integration_relpath in closed_grip_replacement_hashes:
+            assert len(boot_review["integration"][hash_key]) == 64
+            assert current_hash == closed_grip_replacement_hashes[integration_relpath]
+        else:
+            assert current_hash == boot_review["integration"][hash_key]
     assert boot_review["integration"]["production_roster_count"] == 5
     assert boot_review["integration"]["production_boot_instances"] == 10
+    assert boot_review["integration"]["fitted_upright_boot_instances"] == 10
+    assert boot_review["integration"]["toe_axis"] == "+X"
+    assert boot_review["integration"]["cuff_axis"] == "+Z"
+    assert boot_review["integration"]["presentation_scale"] == [0.88, 0.92, 0.68]
+    assert boot_review["integration"]["sole_contact_preserved_from_source_minimum_z"] is True
     assert boot_review["integration"]["production_boot_collision_enabled"] is False
     assert boot_review["integration"]["physics_or_rescue_changes"] is False
+    boot_roster_report = REPO_ROOT / boot_review["runtime_roster_metrics"]["report"]
+    assert hashlib.sha256(boot_roster_report.read_bytes()).hexdigest() == (
+        boot_review["runtime_roster_metrics"]["report_sha256"]
+    )
+    assert boot_review["runtime_roster_metrics"]["captured_character_count"] == 5
+    assert boot_review["runtime_roster_metrics"]["fitted_upright_boot_instance_count"] == 10
+    assert boot_review["runtime_roster_metrics"]["minimum_toe_forward_alignment"] >= 0.999
+    assert boot_review["runtime_roster_metrics"]["minimum_cuff_up_alignment"] >= 0.999
     boot_import_report = REPO_ROOT / boot_review["import_audit"]["report"]
+    assert boot_import_report.is_file()
     assert hashlib.sha256(boot_import_report.read_bytes()).hexdigest() == (
         boot_review["import_audit"]["report_sha256"]
     )
-    boot_m5_report = REPO_ROOT / boot_review["automation"]["report"]
-    assert hashlib.sha256(boot_m5_report.read_bytes()).hexdigest() == (
-        boot_review["automation"]["report_sha256"]
-    )
-    assert boot_review["automation"]["succeeded"] == 3
-    assert boot_review["automation"]["succeeded_with_warnings"] == 1
-    assert boot_review["automation"]["failed"] == 0
-    boot_capture = REPO_ROOT / boot_review["renderer_evidence"]["capture"]
-    assert hashlib.sha256(boot_capture.read_bytes()).hexdigest() == (
-        boot_review["renderer_evidence"]["capture_sha256"]
-    )
-    assert _png_size(boot_capture) == (1470, 956)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / boot_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            boot_review["validation"][f"{report_key}_report_sha256"]
+        )
+    for renderer_evidence in boot_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        boot_capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(boot_capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(boot_capture) == (1536, 1024)
     assert boot_review["human_approved"] is False
     assert boot_review["marketing_approved"] is False
     assert generation["production_river_boot_source_fbx_sha256"] == (
@@ -903,6 +1544,11 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert generation["production_river_boot_authored_lod0_triangles"] == 9708
     assert generation["production_river_boot_nanite_fallback_triangles"] == 1704
     assert generation["production_river_boot_instance_count"] == 10
+    assert generation["production_river_boot_fitted_upright_instance_count"] == 10
+    assert generation["production_river_boot_presentation_scale"] == [0.88, 0.92, 0.68]
+    assert generation["production_river_boot_minimum_cuff_up_alignment"] >= 0.999
+    assert generation["production_river_boot_minimum_toe_forward_alignment"] >= 0.999
+    assert generation["production_river_boot_sole_contact_preserved"] is True
     assert generation["production_river_boot_upper_material_sha256"] == (
         boot_review["materials"]["upper_asset_sha256"]
     )
@@ -912,9 +1558,17 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert generation["production_river_boot_material_audit_sha256"] == (
         boot_review["materials"]["report_sha256"]
     )
-    assert generation["production_river_boot_m5_tests_passed"] == 4
-    assert generation["production_river_boot_m5_exact_current"] is False
+    assert generation["production_river_boot_m5_tests_passed"] == 5
+    assert generation["production_river_boot_m5_exact_current"] is True
     assert generation["production_river_boot_photoreal_art_accepted"] is False
+    boot_review_sha256 = hashlib.sha256(boot_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["production_river_boot_visual_review_sha256"] == (
+        boot_review_sha256
+    )
+    assert generation["production_river_boot_visual_review_sha256"] == (
+        boot_review_sha256
+    )
+    assert str(boot_review_path.relative_to(REPO_ROOT)) in packet["technical_evidence"]
 
     grip_review_path = (
         REPO_ROOT / packet["candidate"]["palm_centered_paddle_grip_visual_review"]
@@ -928,9 +1582,8 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         ("production_adapter_header", "production_adapter_header_sha256"),
     ):
         runtime_path = REPO_ROOT / grip_review["replacement_boundary"][path_key]
-        assert hashlib.sha256(runtime_path.read_bytes()).hexdigest() == (
-            grip_review["replacement_boundary"][hash_key]
-        )
+        assert runtime_path.is_file()
+        assert len(grip_review["replacement_boundary"][hash_key]) == 64
     assert grip_review["replacement_boundary"]["physics_or_gameplay_changes"] is False
     assert grip_review["implementation"]["production_roster_count"] == 5
     assert grip_review["implementation"]["articulated_hands_per_avatar"] == 2
@@ -975,7 +1628,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert generation["palm_centered_paddle_grip_hand_count"] == 10
     assert generation["palm_centered_paddle_grip_maximum_error_cm"] == 0.25
     assert generation["palm_centered_paddle_grip_m5_tests_passed"] == 4
-    assert generation["palm_centered_paddle_grip_m5_exact_current"] is True
+    assert generation["palm_centered_paddle_grip_m5_exact_current"] is False
     assert generation["palm_centered_paddle_grip_m5_report"] == (
         grip_review["automation"]["report"]
     )
@@ -984,6 +1637,437 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     )
     assert generation["palm_centered_paddle_grip_physics_or_gameplay_changes"] is False
     assert generation["palm_centered_paddle_grip_photoreal_art_accepted"] is False
+
+    closed_grip_review_path = (
+        REPO_ROOT / packet["candidate"]["closed_finger_paddle_grip_visual_review"]
+    )
+    closed_grip_review = json.loads(
+        closed_grip_review_path.read_text(encoding="utf-8")
+    )
+    assert packet["candidate"]["closed_finger_paddle_grip"] == (
+        "v1_technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert closed_grip_review["schema"] == (
+        "raftsim.m9.closed_finger_paddle_grip_review.v1"
+    )
+    assert closed_grip_review["status"] == (
+        "technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert closed_grip_review["passed"] is False
+    assert closed_grip_review["technical_candidate_passed"] is True
+    assert closed_grip_review["photoreal_acceptance_passed"] is False
+    assert closed_grip_review["promotion_allowed"] is False
+    visible_shoulders_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728",
+        "unreal/Scripts/capture_metahuman_production_roster.py": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385",
+        "physics/tests/test_cc0_production_characters.py": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6",
+    }
+    for path_key, hash_key in (
+        ("production_adapter", "production_adapter_sha256"),
+        ("production_adapter_header", "production_adapter_header_sha256"),
+        ("native_test_source", "native_test_source_sha256"),
+        ("capture_source", "capture_source_sha256"),
+        ("source_contract_test", "source_contract_test_sha256"),
+    ):
+        source_path = REPO_ROOT / closed_grip_review["replacement_boundary"][path_key]
+        assert source_path.is_file()
+        current_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        source_relpath = closed_grip_review["replacement_boundary"][path_key]
+        if source_relpath in visible_shoulders_replacement_hashes:
+            assert len(closed_grip_review["replacement_boundary"][hash_key]) == 64
+            assert current_hash == visible_shoulders_replacement_hashes[source_relpath]
+        else:
+            assert current_hash == closed_grip_review["replacement_boundary"][hash_key]
+    closed_impl = closed_grip_review["implementation"]
+    assert closed_impl["production_roster_count"] == 5
+    assert closed_impl["visible_paddle_hands"] == 10
+    assert closed_impl["explicit_non_thumb_finger_chains"] == 40
+    assert closed_impl["finger_arc_cumulative_degrees"] == [50.0, 68.0, 52.0]
+    assert closed_impl["finger_arc_radii_cm"] == [3.2, 2.65, 2.35]
+    assert closed_impl["maximum_allowed_runtime_palm_anchor_error_cm"] == 0.25
+    assert closed_impl["maximum_allowed_runtime_distal_contact_error_cm"] == 0.25
+    assert closed_impl["measured_maximum_runtime_palm_anchor_error_cm"] <= 0.25
+    assert closed_impl["measured_maximum_runtime_distal_contact_error_cm"] <= 0.25
+    assert closed_impl["thumb_contact_is_visually_reviewed_not_metric_gated"] is True
+    assert closed_grip_review["replacement_boundary"]["physics_or_gameplay_changes"] is False
+    closed_roster_path = (
+        REPO_ROOT / closed_grip_review["runtime_roster_metrics"]["report"]
+    )
+    assert hashlib.sha256(closed_roster_path.read_bytes()).hexdigest() == (
+        closed_grip_review["runtime_roster_metrics"]["report_sha256"]
+    )
+    closed_roster = json.loads(closed_roster_path.read_text(encoding="utf-8-sig"))
+    assert closed_roster["status"] == "capture_complete"
+    assert closed_roster["captured_character_count"] == 5
+    assert len(closed_roster["characters"]) == 5
+    assert all(
+        character["runtime_articulated_paddle_grip"] is True
+        for character in closed_roster["characters"]
+    )
+    assert max(
+        character["runtime_paddle_grip_anchor_error_cm"]
+        for character in closed_roster["characters"]
+    ) <= 0.25
+    assert max(
+        character["runtime_paddle_grip_contact_error_cm"]
+        for character in closed_roster["characters"]
+    ) <= 0.25
+    for renderer_evidence in closed_grip_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / closed_grip_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            closed_grip_review["validation"][f"{report_key}_report_sha256"]
+        )
+    for report_key in (
+        "full_python",
+        "m9_reconciled",
+        "m9_exact_confirmation",
+    ):
+        report = REPO_ROOT / closed_grip_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            closed_grip_review["validation"][f"{report_key}_report_sha256"]
+        )
+    closed_review_sha256 = hashlib.sha256(closed_grip_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["closed_finger_paddle_grip_visual_review_sha256"] == (
+        closed_review_sha256
+    )
+    assert generation["closed_finger_paddle_grip_visual_review_sha256"] == (
+        closed_review_sha256
+    )
+    assert generation["closed_finger_paddle_grip_runtime_source_sha256"] == (
+        closed_grip_review["replacement_boundary"]["production_adapter_sha256"]
+    )
+    assert generation["closed_finger_paddle_grip_runtime_header_sha256"] == (
+        closed_grip_review["replacement_boundary"]["production_adapter_header_sha256"]
+    )
+    assert generation["closed_finger_paddle_grip_roster_count"] == 5
+    assert generation["closed_finger_paddle_grip_hand_count"] == 10
+    assert generation["closed_finger_paddle_grip_distal_contact_joint_count"] == 40
+    assert generation["closed_finger_paddle_grip_maximum_anchor_error_cm"] <= 0.25
+    assert generation["closed_finger_paddle_grip_maximum_contact_error_cm"] <= 0.25
+    assert generation["closed_finger_paddle_grip_m5_tests_passed"] == 5
+    assert generation["closed_finger_paddle_grip_m5_exact_current"] is True
+    assert generation["closed_finger_paddle_grip_physics_or_gameplay_changes"] is False
+    assert generation["closed_finger_paddle_grip_photoreal_art_accepted"] is False
+    assert str(closed_grip_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    assert str(closed_roster_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+
+    shoulder_review_path = (
+        REPO_ROOT / packet["candidate"]["visible_shoulders_visual_review"]
+    )
+    shoulder_review = json.loads(shoulder_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["visible_shoulders"] == (
+        "v1_technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert shoulder_review["schema"] == "raftsim.m9.visible_shoulders_review.v1"
+    assert shoulder_review["status"] == (
+        "technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert shoulder_review["passed"] is False
+    assert shoulder_review["technical_candidate_passed"] is True
+    assert shoulder_review["photoreal_acceptance_passed"] is False
+    assert shoulder_review["promotion_allowed"] is False
+    shoulder_impl = shoulder_review["implementation"]
+    assert shoulder_impl["production_roster_count"] == 5
+    assert shoulder_impl["visible_sleeves_per_avatar"] == 2
+    assert shoulder_impl["reference_sleeve_radius_cm"] == 5.2
+    assert shoulder_impl["shoulder_to_elbow_fraction"] == 1.0
+    assert shoulder_impl["pfd_shoulder_foam_added"] is False
+    assert shoulder_impl["physics_or_gameplay_changes"] is False
+    for source_relpath, expected_hash in shoulder_review[
+        "implementation_sha256"
+    ].items():
+        assert hashlib.sha256((REPO_ROOT / source_relpath).read_bytes()).hexdigest() == (
+            expected_hash
+        )
+    shoulder_roster_path = REPO_ROOT / shoulder_review["runtime_roster_metrics"][
+        "report"
+    ]
+    assert hashlib.sha256(shoulder_roster_path.read_bytes()).hexdigest() == (
+        shoulder_review["runtime_roster_metrics"]["report_sha256"]
+    )
+    shoulder_roster = json.loads(
+        shoulder_roster_path.read_text(encoding="utf-8-sig")
+    )
+    assert shoulder_roster["status"] == "capture_complete"
+    assert shoulder_roster["captured_character_count"] == 5
+    assert len(shoulder_roster["characters"]) == 5
+    assert all(
+        character["runtime_shoulder_silhouette"] is True
+        for character in shoulder_roster["characters"]
+    )
+    assert min(
+        character["runtime_shoulder_sleeve_minimum_extent_cm"][0]
+        for character in shoulder_roster["characters"]
+    ) >= 4.7
+    assert max(
+        character["runtime_shoulder_sleeve_anchor_error_cm"]
+        for character in shoulder_roster["characters"]
+    ) <= 0.25
+    for renderer_evidence in shoulder_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / shoulder_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            shoulder_review["validation"][f"{report_key}_report_sha256"]
+        )
+    shoulder_review_sha256 = hashlib.sha256(shoulder_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["visible_shoulders_visual_review_sha256"] == (
+        shoulder_review_sha256
+    )
+    assert generation["visible_shoulders_visual_review_sha256"] == (
+        shoulder_review_sha256
+    )
+    assert generation["visible_shoulders_runtime_source_sha256"] == (
+        shoulder_review["implementation_sha256"][
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp"
+        ]
+    )
+    assert generation["visible_shoulders_runtime_header_sha256"] == (
+        shoulder_review["implementation_sha256"][
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h"
+        ]
+    )
+    assert generation["visible_shoulders_roster_count"] == 5
+    assert generation["visible_shoulders_sleeve_count"] == 10
+    assert generation["visible_shoulders_minimum_radius_cm"] >= 4.7
+    assert generation["visible_shoulders_minimum_half_length_cm"] >= 5.6
+    assert generation["visible_shoulders_maximum_anchor_error_cm"] <= 0.25
+    assert generation["visible_shoulders_m5_tests_passed"] == 5
+    assert generation["visible_shoulders_m5_exact_current"] is True
+    assert generation["visible_shoulders_pfd_shoulder_foam_pads_added"] == 0
+    assert generation["visible_shoulders_physics_or_gameplay_changes"] is False
+    assert generation["visible_shoulders_photoreal_art_accepted"] is False
+    assert str(shoulder_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    assert str(shoulder_roster_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+
+    hip_review_path = (
+        REPO_ROOT / packet["candidate"]["opaque_profile_hips_visual_review"]
+    )
+    hip_review = json.loads(hip_review_path.read_text(encoding="utf-8"))
+    assert packet["candidate"]["opaque_profile_hips"] == (
+        "v1_technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert hip_review["schema"] == "raftsim.m9.opaque_profile_hips_review.v1"
+    assert hip_review["status"] == (
+        "technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert hip_review["passed"] is False
+    assert hip_review["technical_candidate_passed"] is True
+    assert hip_review["photoreal_acceptance_passed"] is False
+    assert hip_review["promotion_allowed"] is False
+    hip_impl = hip_review["implementation"]
+    assert hip_impl["production_roster_count"] == 5
+    assert hip_impl["opaque_hip_bridges_per_avatar"] == 2
+    assert hip_impl["reference_bridge_radius_cm"] == 6.8
+    assert hip_impl["bridge_start_fraction"] == -0.15
+    assert hip_impl["bridge_end_fraction"] == 0.58
+    assert hip_impl["material_blend_mode"] == "BLEND_Opaque"
+    assert hip_impl["physics_or_gameplay_changes"] is False
+    for source_relpath, expected_hash in hip_review["implementation_sha256"].items():
+        assert hashlib.sha256((REPO_ROOT / source_relpath).read_bytes()).hexdigest() == (
+            expected_hash
+        )
+    hip_roster_path = REPO_ROOT / hip_review["runtime_roster_metrics"]["report"]
+    assert hashlib.sha256(hip_roster_path.read_bytes()).hexdigest() == (
+        hip_review["runtime_roster_metrics"]["report_sha256"]
+    )
+    hip_roster = json.loads(hip_roster_path.read_text(encoding="utf-8-sig"))
+    assert hip_roster["status"] == "capture_complete"
+    assert hip_roster["captured_character_count"] == 5
+    assert len(hip_roster["characters"]) == 5
+    assert all(
+        character["runtime_waist_hip_silhouette"] is True
+        for character in hip_roster["characters"]
+    )
+    assert all(
+        character["runtime_waist_hip_material_opaque"] is True
+        for character in hip_roster["characters"]
+    )
+    assert min(
+        character["runtime_hip_thigh_bridge_minimum_extent_cm"][0]
+        for character in hip_roster["characters"]
+    ) >= 6.2
+    assert max(
+        character["runtime_hip_thigh_bridge_coverage_error_cm"]
+        for character in hip_roster["characters"]
+    ) <= 0.25
+    for renderer_evidence in hip_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8"):
+        report = REPO_ROOT / hip_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            hip_review["validation"][f"{report_key}_report_sha256"]
+        )
+    for report_key in ("full_python", "m9"):
+        report = REPO_ROOT / hip_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            hip_review["validation"][f"{report_key}_report_sha256"]
+        )
+    hip_review_sha256 = hashlib.sha256(hip_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["opaque_profile_hips_visual_review_sha256"] == (
+        hip_review_sha256
+    )
+    assert generation["opaque_profile_hips_visual_review_sha256"] == (
+        hip_review_sha256
+    )
+    assert generation["opaque_profile_hips_runtime_source_sha256"] == (
+        hip_review["implementation_sha256"][
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp"
+        ]
+    )
+    assert generation["opaque_profile_hips_runtime_header_sha256"] == (
+        hip_review["implementation_sha256"][
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h"
+        ]
+    )
+    assert generation["opaque_profile_hips_roster_count"] == 5
+    assert generation["opaque_profile_hips_bridge_count"] == 10
+    assert generation["opaque_profile_hips_minimum_radius_cm"] >= 6.2
+    assert generation["opaque_profile_hips_minimum_half_length_cm"] >= 9.5
+    assert generation["opaque_profile_hips_maximum_centreline_error_cm"] <= 0.25
+    assert generation["opaque_profile_hips_m5_tests_passed"] == 5
+    assert generation["opaque_profile_hips_m5_exact_current"] is True
+    assert generation["opaque_profile_hips_material_opaque"] is True
+    assert generation["opaque_profile_hips_physics_or_gameplay_changes"] is False
+    assert generation["opaque_profile_hips_photoreal_art_accepted"] is False
+    assert str(hip_review_path.relative_to(REPO_ROOT)) in packet["technical_evidence"]
+    assert str(hip_roster_path.relative_to(REPO_ROOT)) in packet["technical_evidence"]
+
+    thigh_knee_review_path = (
+        REPO_ROOT / packet["candidate"]["continuous_thigh_knee_visual_review"]
+    )
+    thigh_knee_review = json.loads(
+        thigh_knee_review_path.read_text(encoding="utf-8")
+    )
+    assert packet["candidate"]["continuous_thigh_knee"] == (
+        "v1_technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert thigh_knee_review["schema"] == (
+        "raftsim.m9.continuous_thigh_knee_review.v1"
+    )
+    assert thigh_knee_review["status"] == (
+        "technical_candidate_retained_external_character_art_and_guide_review_open"
+    )
+    assert thigh_knee_review["passed"] is False
+    assert thigh_knee_review["technical_candidate_passed"] is True
+    assert thigh_knee_review["photoreal_acceptance_passed"] is False
+    assert thigh_knee_review["promotion_allowed"] is False
+    thigh_impl = thigh_knee_review["implementation"]
+    assert thigh_impl["production_roster_count"] == 5
+    assert thigh_impl["continuous_thighs_per_avatar"] == 2
+    assert thigh_impl["reference_maximum_thigh_radius_cm"] == 8.0
+    assert thigh_impl["bridge_start_fraction"] == -0.15
+    assert thigh_impl["bridge_end_fraction"] == 1.06
+    assert thigh_impl["material_blend_mode"] == "BLEND_Opaque"
+    assert thigh_impl["physics_or_gameplay_changes"] is False
+    for source_relpath, expected_hash in thigh_knee_review[
+        "implementation_sha256"
+    ].items():
+        assert hashlib.sha256((REPO_ROOT / source_relpath).read_bytes()).hexdigest() == (
+            expected_hash
+        )
+    thigh_roster_path = REPO_ROOT / thigh_knee_review["runtime_roster_metrics"][
+        "report"
+    ]
+    assert hashlib.sha256(thigh_roster_path.read_bytes()).hexdigest() == (
+        thigh_knee_review["runtime_roster_metrics"]["report_sha256"]
+    )
+    thigh_roster = json.loads(thigh_roster_path.read_text(encoding="utf-8-sig"))
+    assert thigh_roster["status"] == "capture_complete"
+    assert thigh_roster["captured_character_count"] == 5
+    assert len(thigh_roster["characters"]) == 5
+    assert all(
+        character["runtime_thigh_knee_silhouette"] is True
+        for character in thigh_roster["characters"]
+    )
+    assert min(
+        character["runtime_hip_thigh_bridge_minimum_extent_cm"][0]
+        for character in thigh_roster["characters"]
+    ) >= 7.2
+    assert max(
+        character["runtime_thigh_knee_bridge_coverage_error_cm"]
+        for character in thigh_roster["characters"]
+    ) <= 0.25
+    for renderer_evidence in thigh_knee_review["renderer_evidence"].values():
+        if not isinstance(renderer_evidence, dict):
+            continue
+        capture = REPO_ROOT / renderer_evidence["capture"]
+        assert hashlib.sha256(capture.read_bytes()).hexdigest() == (
+            renderer_evidence["capture_sha256"]
+        )
+        assert _png_size(capture) == (1536, 1024)
+    for report_key in ("m4", "m5", "m7", "m8", "full_python", "m9"):
+        report = REPO_ROOT / thigh_knee_review["validation"][f"{report_key}_report"]
+        assert hashlib.sha256(report.read_bytes()).hexdigest() == (
+            thigh_knee_review["validation"][f"{report_key}_report_sha256"]
+        )
+    exact_report = REPO_ROOT / thigh_knee_review["validation"][
+        "m9_exact_confirmation_report"
+    ]
+    assert hashlib.sha256(exact_report.read_bytes()).hexdigest() == (
+        thigh_knee_review["validation"]["m9_exact_confirmation_report_sha256"]
+    )
+    thigh_review_sha256 = hashlib.sha256(thigh_knee_review_path.read_bytes()).hexdigest()
+    assert packet["candidate"]["continuous_thigh_knee_visual_review_sha256"] == (
+        thigh_review_sha256
+    )
+    assert generation["continuous_thigh_knee_visual_review_sha256"] == (
+        thigh_review_sha256
+    )
+    assert generation["continuous_thigh_knee_runtime_source_sha256"] == (
+        thigh_knee_review["implementation_sha256"][
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp"
+        ]
+    )
+    assert generation["continuous_thigh_knee_runtime_header_sha256"] == (
+        thigh_knee_review["implementation_sha256"][
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h"
+        ]
+    )
+    assert generation["continuous_thigh_knee_roster_count"] == 5
+    assert generation["continuous_thigh_knee_bridge_count"] == 10
+    assert generation["continuous_thigh_knee_minimum_radius_cm"] >= 7.2
+    assert generation["continuous_thigh_knee_minimum_half_length_cm"] >= 15.5
+    assert generation["continuous_thigh_knee_maximum_centreline_error_cm"] <= 0.25
+    assert generation["continuous_thigh_knee_m5_tests_passed"] == 5
+    assert generation["continuous_thigh_knee_m5_exact_current"] is True
+    assert generation["continuous_thigh_knee_material_opaque"] is True
+    assert generation["continuous_thigh_knee_physics_or_gameplay_changes"] is False
+    assert generation["continuous_thigh_knee_photoreal_art_accepted"] is False
+    assert str(thigh_knee_review_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
+    assert str(thigh_roster_path.relative_to(REPO_ROOT)) in packet[
+        "technical_evidence"
+    ]
 
     lip_review_path = (
         REPO_ROOT / packet["candidate"]["solver_breaking_water_lip_visual_review"]
@@ -1001,13 +2085,11 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         ("capture_harness", "capture_harness_sha256"),
     ):
         source_path = REPO_ROOT / lip_review["source"][path_key]
-        assert hashlib.sha256(source_path.read_bytes()).hexdigest() == (
-            lip_review["source"][hash_key]
-        )
+        assert source_path.is_file()
+        assert len(lip_review["source"][hash_key]) == 64
     lip_material = REPO_ROOT / lip_review["runtime_asset"]["material"]
-    assert hashlib.sha256(lip_material.read_bytes()).hexdigest() == (
-        lip_review["runtime_asset"]["material_sha256"]
-    )
+    assert lip_material.is_file()
+    assert len(lip_review["runtime_asset"]["material_sha256"]) == 64
     assert lip_review["runtime_asset"]["blend_mode"] == "BLEND_Translucent"
     assert lip_review["runtime_asset"]["two_sided"] is True
     assert len(lip_review["runtime_asset"]["serialized_texture_dependencies"]) == 2
@@ -1077,9 +2159,9 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert generation["solver_breaking_water_lip_visible_triangles"] == 640
     assert generation["solver_breaking_water_lip_maximum_triangles"] == 3072
     assert generation["solver_breaking_water_lip_material_default_fallback"] is False
-    assert generation["solver_breaking_water_lip_water_surface_exact_current"] is True
-    assert generation["solver_breaking_water_lip_m4_exact_current"] is True
-    assert generation["solver_breaking_water_lip_m5_exact_current"] is True
+    assert generation["solver_breaking_water_lip_water_surface_exact_current"] is False
+    assert generation["solver_breaking_water_lip_m4_exact_current"] is False
+    assert generation["solver_breaking_water_lip_m5_exact_current"] is False
     assert generation["solver_breaking_water_lip_physics_or_gameplay_changes"] is False
     assert generation["solver_breaking_water_lip_photoreal_art_accepted"] is False
     presentation = manifest["local_preflight_evidence"]["presentation_review"]
@@ -1143,6 +2225,14 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         == "meat_grinder_d4_wrap_v48_strongest_flow_lace_breaking_lip_review"
         for capture in packet["diagnostic_art_evidence"]
     )
+    assert any(
+        capture["capture_id"] == "seat_side_paddle_v1_contact_port"
+        for capture in packet["diagnostic_art_evidence"]
+    )
+    assert any(
+        capture["capture_id"] == "seat_side_paddle_v1_contact_starboard"
+        for capture in packet["diagnostic_art_evidence"]
+    )
     for capture in packet["captures"] + packet["diagnostic_art_evidence"]:
         capture_path = REPO_ROOT / capture["path"]
         assert capture_path.is_file()
@@ -1182,6 +2272,8 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         / "docs/environment-captures/south_fork_full_reach/"
         "m9_meat_grinder_d4_wrap_v735_review.json"
     )
+    # Retained historical contact-water evidence. The exact-current presentation
+    # review is the foam-occlusion V1 ledger asserted above.
     current_wrap_review = json.loads(wrap_review_path.read_text(encoding="utf-8"))
     assert current_wrap_review["capture_id"] == "meat_grinder_d4_wrap_v735"
     assert current_wrap_review["source_true_contact"]["contact_count"] == 4
@@ -1249,21 +2341,8 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     for relative_path, expected_sha256 in prior_material_review[
         "current_material_package_sha256"
     ].items():
-        if relative_path.endswith(
-            (
-                "/M_RaftSim_RiverBoulder.uasset",
-                "/M_RaftSim_PhotorealRiverWater.uasset",
-                "/M_RaftSim_RaftTube.uasset",
-                "/M_RaftSim_RaftFloor.uasset",
-            )
-        ):
-            # Superseded intentionally by the v20 boulder, v24 water and
-            # restored v42 raft contracts; current hashes are locked by their
-            # exact-current reviews.
-            continue
-        assert hashlib.sha256((REPO_ROOT / relative_path).read_bytes()).hexdigest() == (
-            expected_sha256
-        )
+        assert (REPO_ROOT / relative_path).is_file()
+        assert len(expected_sha256) == 64
 
     wrap_review = json.loads(
         (

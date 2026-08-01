@@ -143,6 +143,10 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert "front_foam_panels" in build_script
     assert "quick_release_rescue_belts" in build_script
     assert "rescue_tether_rings" in build_script
+    assert "ShoulderFoamBand" not in build_script
+    assert "add_swept_shoulder_bridge" not in build_script
+    assert "add_crowned_foam_panel" in build_script
+    assert "rounded_outline" in build_script
     assert '"PfdShell"' in build_script
     assert 'EXPECTED_SLOTS = [' in import_script
     assert '"PfdReflective"' in import_script
@@ -151,10 +155,26 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     )
     assert manifest["source_inputs"] == []
     assert manifest["construction"]["front_foam_panels"] == 4
+    assert manifest["construction"]["shoulder_foam_pads"] == 0
+    assert manifest["construction"]["shoulder_webbing_runs"] == 2
     assert manifest["construction"]["adjustment_points"] == 8
     assert manifest["construction"]["front_backup_webbing_runs"] == 2
     assert manifest["construction"]["quick_release_rescue_belts"] == 1
     assert manifest["construction"]["rescue_tether_rings"] == 1
+    assert manifest["soft_geometry"] == {
+        "outline_corner_rounding": "four-pass closed Chaikin",
+        "outline_corner_rounding_passes": 4,
+        "flat_exterior_foam_faces": 0,
+        "front_panel_edge_roll_cm": 1.35,
+        "front_panel_crown_depth_cm": 1.45,
+        "back_panel_edge_roll_cm": 1.2,
+        "back_panel_crown_depth_cm": 1.65,
+        "side_wing_flat_exterior_faces": 0,
+        "side_wing_crown_depth_cm": 0.75,
+        "front_pocket_flat_exterior_faces": 0,
+        "front_pocket_crown_depth_cm": 0.62,
+        "smooth_shaded": True,
+    }
     assert manifest["material_slots"] == [
         "PfdShell",
         "PfdWebbing",

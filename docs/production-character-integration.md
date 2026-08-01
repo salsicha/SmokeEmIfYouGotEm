@@ -106,7 +106,7 @@ downloaded texture sources. Duplicating the gray preview meshes is not an accept
 release workaround because it discards the production textures, stable build output,
 and packaging contract.
 
-After a successful roster build, render the matched full-body and portrait evidence set:
+After a successful roster build, render the matched full-body and helmet-turntable evidence set:
 
 ```sh
 "/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd" \
@@ -118,7 +118,9 @@ After a successful roster build, render the matched full-body and portrait evide
 The capture harness requires all five optimized Blueprint classes, fixed turntable lighting
 and camera geometry, finite assembled bounds, the cropped baked face shader, wetsuit body,
 suppressed garment/groom layers, helmet-compatible reviewed hair representation, complete
-PPE and paddle, and ten nonempty renderer outputs. It records paths, bounds, crop planes,
+PPE and paddle, and thirty nonempty full-body/portrait front/profile/rear renderer outputs.
+It fail-closes on helmet-to-head error, rendered-face forward alignment, identity-fit scale,
+visible seated waist/hip volume, and hip-centre error, then records paths, bounds, crop planes,
 presentation flags, and SHA-256 hashes in
 `Saved/RaftSimValidation/m9/metahuman-production-captures.json`; pixel-level photoreal,
 hair/PPE, clipping, and identity review remains a human release decision.

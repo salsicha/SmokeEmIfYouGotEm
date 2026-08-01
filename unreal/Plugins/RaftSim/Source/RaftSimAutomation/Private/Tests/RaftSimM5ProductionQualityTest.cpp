@@ -132,7 +132,7 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         TestTrue(TEXT("production rescue PFD has plausible centimetre bounds"),
                  DimensionsCm.X >= 40.0f && DimensionsCm.X <= 50.0f &&
                  DimensionsCm.Y >= 40.0f && DimensionsCm.Y <= 50.0f &&
-                 DimensionsCm.Z >= 44.0f && DimensionsCm.Z <= 55.0f);
+                 DimensionsCm.Z >= 42.0f && DimensionsCm.Z <= 55.0f);
         TestTrue(TEXT("production rescue PFD has a Nanite render resource"),
                  ProductionPfd->HasValidNaniteData());
     }
@@ -439,6 +439,9 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         ERaftSimCrewAvatarAction::Swimming, 0.25f, 1);
     const FRaftSimCrewAvatarPose HighSide = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
         ERaftSimCrewAvatarAction::HighSidePort, 0.25f, 1);
+    const FRaftSimCrewAvatarPose PortSeatHighSide =
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+            ERaftSimCrewAvatarAction::HighSidePort, 0.25f, -1);
     const FRaftSimCrewAvatarPose Seated = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
         ERaftSimCrewAvatarAction::SeatedIdle, 0.25f, 1);
     const FRaftSimCrewAvatarPose Forward = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
@@ -451,6 +454,10 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         ERaftSimCrewAvatarAction::ForwardStroke, 0.79f, 1);
     const FRaftSimCrewAvatarPose ForwardCycleSeam = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
         ERaftSimCrewAvatarAction::ForwardStroke, 0.9999f, 1);
+    const FRaftSimCrewAvatarPose PortForward = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+        ERaftSimCrewAvatarAction::ForwardStroke, 0.25f, -1);
+    const FRaftSimCrewAvatarPose StarboardForward = URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+        ERaftSimCrewAvatarAction::ForwardStroke, 0.25f, 1);
     TestFalse(TEXT("swimming hides the paddle"), Swim.bShowPaddle);
     TestTrue(TEXT("high-side retains the emergency paddle"), HighSide.bShowPaddle);
     TestTrue(
@@ -464,9 +471,11 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                 HighSide.PaddleTopCm,
                 HighSide.PaddleBottomCm) <= 0.5f);
     TestTrue(
-        TEXT("high-side plants the blade low on the commanded side"),
-        FMath::Sign(HighSide.PaddleBottomCm.Y) == FMath::Sign(HighSide.TorsoCenterCm.Y) &&
-            HighSide.PaddleBottomCm.Z <= 22.0f);
+        TEXT("high-side keeps both seat-side blades low and outside the raft"),
+        PortSeatHighSide.PaddleBottomCm.Y < 0.0f &&
+            HighSide.PaddleBottomCm.Y > 0.0f &&
+            PortSeatHighSide.PaddleBottomCm.Z <= -10.0f &&
+            HighSide.PaddleBottomCm.Z <= -10.0f);
     TestTrue(TEXT("high-side visibly shifts the torso"), FMath::Abs(HighSide.TorsoCenterCm.Y) > 25.0f);
     TestTrue(
         TEXT("forward stroke articulates the upper body around the waist"),
@@ -496,8 +505,38 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                 FMath::PointDistToSegment(
                     StrokePose->RightHandCm,
                     StrokePose->PaddleTopCm,
-                    StrokePose->PaddleBottomCm) <= 0.5f);
+                StrokePose->PaddleBottomCm) <= 0.5f);
     }
+    TestTrue(
+        TEXT("port and starboard forward-stroke blades stay outboard of their seats"),
+        PortForward.PaddleBottomCm.Y < 0.0f &&
+            StarboardForward.PaddleBottomCm.Y > 0.0f &&
+            PortForward.PaddleTopCm.Y > 0.0f &&
+            StarboardForward.PaddleTopCm.Y < 0.0f);
+    TestTrue(
+        TEXT("port and starboard paddle endpoints are true lateral mirrors"),
+        FMath::IsNearlyEqual(
+            PortForward.PaddleTopCm.Y,
+            -StarboardForward.PaddleTopCm.Y,
+            0.01f) &&
+            FMath::IsNearlyEqual(
+                PortForward.PaddleBottomCm.Y,
+                -StarboardForward.PaddleBottomCm.Y,
+                0.01f));
+    TestTrue(
+        TEXT("mirrored forward grips put the anatomical outboard hand down-shaft"),
+        FVector::Distance(PortForward.RightHandCm, PortForward.PaddleTopCm) <= 0.5f &&
+            FVector::Distance(
+                StarboardForward.LeftHandCm,
+                StarboardForward.PaddleTopCm) <= 0.5f &&
+            FMath::PointDistToSegment(
+                PortForward.LeftHandCm,
+                PortForward.PaddleTopCm,
+                PortForward.PaddleBottomCm) <= 0.5f &&
+            FMath::PointDistToSegment(
+                StarboardForward.RightHandCm,
+                StarboardForward.PaddleTopCm,
+                StarboardForward.PaddleBottomCm) <= 0.5f);
     TSet<int32> CrewTimingOffsetsMillis;
     for (int32 Variant = 0; Variant < 4; ++Variant)
     {
@@ -967,11 +1006,18 @@ bool FRaftSimM5StartRescueCommand::Update()
             It->HasArticulatedPaddleGripRig());
         Test->TestTrue(
             FString::Printf(
-                TEXT("MetaHuman crew %s centres its visible palm on the solved grip "
+                TEXT("MetaHuman crew %s keeps its palm on the solved grip "
                      "(error %.3f cm)"),
                 *It->GetName(),
                 It->GetMaximumPaddleGripAnchorErrorCm()),
             It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f);
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("MetaHuman crew %s centres its closed fingers on the solved grip "
+                     "(error %.3f cm)"),
+                *It->GetName(),
+                It->GetMaximumPaddleGripContactErrorCm()),
+            It->GetMaximumPaddleGripContactErrorCm() <= 0.25f);
     }
     Test->TestEqual(
         TEXT("assembled roster is all-or-nothing"),
@@ -995,7 +1041,7 @@ bool FRaftSimM5StartRescueCommand::Update()
     {
         Test->TestTrue(
             FString::Printf(TEXT("avatar %s has layered production gear"), *It->GetName()),
-            It->GetProceduralBodyPartCount() >= 26 && It->HasLayeredCommercialSafetyGear() &&
+            It->GetProceduralBodyPartCount() >= 28 && It->HasLayeredCommercialSafetyGear() &&
             It->HasCommercialPaddleSilhouette() &&
                 It->HasBatchedFacialFeatures());
         Test->TestTrue(
@@ -1007,6 +1053,11 @@ bool FRaftSimM5StartRescueCommand::Update()
         Test->TestTrue(
             FString::Printf(TEXT("avatar %s uses two production river boots"), *It->GetName()),
             It->HasProductionRiverBoots());
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("avatar %s keeps both fitted production boots sole-down"),
+                *It->GetName()),
+            It->HasFittedUprightProductionRiverBoots());
         Test->TestEqual(
             FString::Printf(TEXT("avatar %s facial batching count"), *It->GetName()),
             It->GetBatchedFacialSubmeshCount(),
@@ -1032,6 +1083,23 @@ bool FRaftSimM5StartRescueCommand::Update()
                     *It->GetName(),
                     HelmetHeadErrorCm),
                 HelmetHeadErrorCm <= 1.0f);
+            const float HelmetForwardAlignment =
+                It->GetProductionHelmetForwardAlignment();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s points the helmet brow with the rendered face "
+                         "(alignment %.4f)"),
+                    *It->GetName(),
+                    HelmetForwardAlignment),
+                HelmetForwardAlignment >= 0.98f);
+            const float HelmetFitScale = It->GetProductionHelmetFitScale();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s uses a bounded identity-calibrated helmet fit "
+                         "(scale %.4f)"),
+                    *It->GetName(),
+                    HelmetFitScale),
+                HelmetFitScale >= 0.90f && HelmetFitScale <= 1.02f);
             const float PfdTorsoErrorCm = It->GetProductionPfdTorsoErrorCm();
             Test->TestTrue(
                 FString::Printf(
@@ -1040,6 +1108,73 @@ bool FRaftSimM5StartRescueCommand::Update()
                     *It->GetName(),
                     PfdTorsoErrorCm),
                 PfdTorsoErrorCm <= 1.0f);
+            const FVector WaistHipExtentCm = It->GetWaistHipExtentCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s retains a visible seated waist/hip silhouette "
+                         "(extent %s)"),
+                    *It->GetName(),
+                    *WaistHipExtentCm.ToCompactString()),
+                It->HasVisibleWaistHipSilhouette());
+            const float WaistHipCenterErrorCm =
+                It->GetWaistHipCenterErrorCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s keeps the visible pelvis on the solved hip centre "
+                         "(error %.3f cm)"),
+                    *It->GetName(),
+                    WaistHipCenterErrorCm),
+                WaistHipCenterErrorCm <= 0.1f);
+            const FVector HipThighBridgeExtentCm =
+                It->GetMinimumHipThighBridgeExtentCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s keeps opaque wetsuit thigh roots under the pelvis "
+                         "(minimum extent %s)"),
+                    *It->GetName(),
+                    *HipThighBridgeExtentCm.ToCompactString()),
+                It->IsWaistHipMaterialOpaque() &&
+                    HipThighBridgeExtentCm.X >= 7.2f &&
+                    HipThighBridgeExtentCm.Y >= 7.2f &&
+                    HipThighBridgeExtentCm.Z >= 15.5f);
+            const float HipThighCoverageErrorCm =
+                It->GetMaximumHipThighBridgeCoverageErrorCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s buries both profile hip junctions inside their "
+                         "bridges (maximum centreline error %.3f cm)"),
+                    *It->GetName(),
+                    HipThighCoverageErrorCm),
+                HipThighCoverageErrorCm <= 0.25f);
+            const float ThighKneeCoverageErrorCm =
+                It->GetMaximumThighKneeBridgeCoverageErrorCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s carries tapered thighs through both solved knees "
+                         "without a disconnected or oversized joint (maximum "
+                         "centreline error %.3f cm)"),
+                    *It->GetName(),
+                    ThighKneeCoverageErrorCm),
+                It->HasContinuousThighKneeSilhouette() &&
+                    ThighKneeCoverageErrorCm <= 0.25f);
+            const FVector ShoulderSleeveExtentCm =
+                It->GetMinimumShoulderSleeveExtentCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s retains rounded shoulders between the PFD and arms "
+                         "(minimum extent %s)"),
+                    *It->GetName(),
+                    *ShoulderSleeveExtentCm.ToCompactString()),
+                It->HasVisibleShoulderSilhouette());
+            const float ShoulderAnchorErrorCm =
+                It->GetMaximumShoulderSleeveAnchorErrorCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s keeps both deltoids on the solved shoulder joints "
+                         "(maximum error %.3f cm)"),
+                    *It->GetName(),
+                    ShoulderAnchorErrorCm),
+                ShoulderAnchorErrorCm <= 0.25f);
         }
         BodyProfiles.Add(It->GetBodyProportionScale().ToCompactString());
         SkinTones.Add(It->GetSkinTone().ToString());

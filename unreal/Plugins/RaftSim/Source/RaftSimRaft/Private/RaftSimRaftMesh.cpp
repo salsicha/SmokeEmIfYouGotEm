@@ -1129,7 +1129,7 @@ void BuildInflatableRaft(
                                (1.0f - FMath::Square(2.0f * fy - 1.0f));
             // Five low longitudinal I-beam crowns give the self-bailing floor
             // real inflated structure and controlled specular breakup.
-            const float IBeamRelief = Tr * 0.045f *
+            const float IBeamRelief = Tr * 0.095f *
                 FMath::Square(FMath::Cos(4.0f * PI * fy));
             const FVector RestVertex(X, Y, FloorZ + Dish + IBeamRelief);
             FPointDeformation FloorShape = EvaluatePointDeformation(RestVertex, Tr, &Deformation);

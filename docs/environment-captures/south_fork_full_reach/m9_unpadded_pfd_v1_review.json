@@ -1,0 +1,143 @@
+{
+  "artifact": "M9 unpadded production PFD V1 review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The production rescue PFD previously included two 5.2 cm-wide, 2.6 cm-thick swept foam shoulder bands. V1 removes both flotation bands, terminates the front and back flotation cells below the shoulders, and retains only two 2.0 cm-wide, 0.18 cm-thick shell-fitted webbing connectors. The protruding shoulder sliders from the first diagnostic iteration were also removed.",
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_pfd.py",
+    "generator_version": 5,
+    "generator_sha256": "1247d1bb4764f30e852b1414c29fb957540042bb27cd115a9ad8c56f5fd7a42f",
+    "importer": "unreal/Scripts/import_production_whitewater_pfd.py",
+    "importer_sha256": "49efaf7d9dd27d81c89ccab33d764a9fbc93191ec209eb307cab994000d24134",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/production_whitewater_pfd_manifest.json",
+    "manifest_sha256": "bc3115aa229392c1cfbbee6c50424fcfb1c26b0bf2cef95e30ee4003c0338ef8",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+    "fbx_sha256": "0791f59813592ab3723ad1c79cac555b40d9921e717907051c2f45111a03443d",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+    "blend_sha256": "a38a70d415726232edb25051c0bd27c5b92fc2f0459a7d75a8a44a568aae4565",
+    "external_asset_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "uasset": "unreal/Content/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd.uasset",
+    "uasset_sha256": "7aa9ae60bcfbd1b2bbf13916a2d815afe4e0713bfb43bd7d6e73d2e166bb7fa3",
+    "dimensions_cm": [
+      42.2,
+      44.8966,
+      43.34
+    ],
+    "source_vertices": 10380,
+    "source_polygons": 10226,
+    "authored_lod0_triangles": 19948,
+    "nanite_fallback_triangles": 2058,
+    "nanite_enabled": true,
+    "material_slot_count": 5,
+    "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
+  },
+  "construction": {
+    "front_foam_panels": 4,
+    "back_panels": 1,
+    "side_wings": 2,
+    "shoulder_foam_pads": 0,
+    "shoulder_webbing_runs": 2,
+    "shoulder_webbing_width_cm": 2.0,
+    "shoulder_webbing_thickness_cm": 0.18,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 2,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1,
+    "reflective_chest_zones": 2,
+    "blank_back_placards": 1,
+    "front_lash_tabs": 3
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_roster_capture.json",
+    "source_report_sha256": "7d76c31c713e0e109ee33835e54254c24df5bd3c553047c385c72e7d2cedbc50",
+    "captured_character_count": 5,
+    "characters_using_production_pfd": 5,
+    "maximum_runtime_torso_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_full.png",
+      "capture_sha256": "771b0a1b2b640ff44ae849ff366bb4d6cfeca1c83e3c0fc94ee5db4f47e4c5da"
+    },
+    "guide_front": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_front.png",
+      "capture_sha256": "fc1f722f53bda00a737a47a70b1d9d21c4fc9d32f0fdc007e698ac9b68bf9cbe"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_profile.png",
+      "capture_sha256": "3b9c53cc3dec899170b9e64d9dcd8450e532f4254a920fa34b78f331871ecab6"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_guide_rear.png",
+      "capture_sha256": "0554bb562e501ef6afd05aae639fe11fd1f8eccc126152bda726130aa9df57e4"
+    },
+    "cross_roster_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_unpadded_pfd_v1_crew03_full.png",
+      "capture_sha256": "a690798e358ff358edc7b4f42fb8ddef250bf266ceafe9eeba5d6ad8f8637981"
+    },
+    "technical_verdict": "pass: front, profile, and rear pixels show that the flotation shell ends below both shoulders; no padded shoulder bridge remains, and the remaining narrow webbing has no shoulder slider or flotation volume",
+    "photoreal_verdict": "fail pending replacement or named approval of the visibly simplified rigid front/back cells, hardware, fabric response, webbing intersections, character pose, and turntable lighting"
+  },
+  "implementation": {
+    "removed_source_objects": [
+      "ShoulderFoamBand_-1",
+      "ShoulderFoamBand_+1"
+    ],
+    "removed_shoulders_source_helper": "add_swept_shoulder_bridge",
+    "shoulder_slider_count_before": 2,
+    "shoulder_slider_count_after": 0,
+    "pfd_runtime_transform_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "source_import": "Unreal import succeeded with the exact FBX hash, 19,948 authored triangles, 2,058 Nanite fallback triangles, five material slots, and valid centimetre bounds",
+    "focused_python": "27/27 safety-gear and flexible-raft visual source contracts passed",
+    "renderer_turntable": "5/5 identities captured with production PFD selection and exactly 0.0 cm maximum torso-origin error",
+    "m4": "4/4 passed (M9V513UnpaddedPfdM4)",
+    "m4_report": "unreal/Saved/Automation/M9V513UnpaddedPfdM4/index.json",
+    "m4_report_sha256": "d683dbcc6d824a1d427525fdb28ee09afb4c6be061af705626e5a9cd89531ced",
+    "m5": "5/5 result entries passed renderer-enabled (M9V514UnpaddedPfdM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V514UnpaddedPfdM5Renderer/index.json",
+    "m5_report_sha256": "fff93b687c417396793fbfe09251c42c7e8d5ba0c0b522936d3ffcc0f8ea97df",
+    "m7": "4/4 result entries passed renderer-enabled (M9V515UnpaddedPfdM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V515UnpaddedPfdM7Renderer/index.json",
+    "m7_report_sha256": "37ef746675cc25710e60623010180260a076d97b0cf6e0821c9ae022fd98cb0a",
+    "m8": "4/4 passed renderer-enabled (M9V516UnpaddedPfdM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V516UnpaddedPfdM8Renderer/index.json",
+    "m8_report_sha256": "1b0699c0ec0861996a9b1dc34675bff07cc2e64e00ef193f6918d28dd0ced95a",
+    "full_python_matrix": "1148 passed, 3 expected skips, 0 failed in 430.68 seconds (M9V517UnpaddedPfd)",
+    "full_python_report": "physics/reports/m9/m9_v517_unpadded_pfd_full_matrix.xml",
+    "full_python_report_sha256": "0090fc5ab8fbddb23415027bb6f4d6f647cf1d74f988193a18ce016b81d7ac5d",
+    "m9": "6/6 passed after unpadded PFD evidence reconciliation (M9V518UnpaddedPfdReconciledM9)",
+    "m9_report": "unreal/Saved/Automation/M9V518UnpaddedPfdReconciledM9/index.json",
+    "m9_report_sha256": "b5b72e537fa799946f6a613ebb246b8540d94d177fdc788f35ded04ce65bb6bc"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the simplified PFD panels, hardware, webbing intersections, materials, and identity-specific fit in motion.",
+    "A qualified whitewater safety reviewer must approve the visible flotation coverage, adjustment layout, rescue hardware, and gameplay depiction; this geometry review is not equipment certification.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

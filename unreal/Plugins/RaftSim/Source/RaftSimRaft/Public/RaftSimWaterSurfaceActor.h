@@ -8,6 +8,8 @@
 
 class UProceduralMeshComponent;
 class UMaterialInterface;
+class UMaterialParameterCollection;
+class ARaftSimRaftActor;
 class URaftSimWaterRuntimeAdapter;
 
 /**
@@ -218,9 +220,19 @@ private:
     void HideBreakingLipMesh();
     void RebuildBreakingRollerVolumeMesh();
     void HideBreakingRollerVolumeMesh();
+    void UpdateRaftFoamExclusionParameters();
 
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
+
+    /** Global presentation-only mask used by the static solver-foam sheet.
+     * Updated from the visible raft transform; it never changes water samples,
+     * forces, collision, or the solver's foam field. */
+    UPROPERTY()
+    TObjectPtr<UMaterialParameterCollection> RaftFoamOcclusionCollection;
+
+    UPROPERTY()
+    TObjectPtr<ARaftSimRaftActor> FoamOcclusionRaft;
 
     int32 GridStationN = 0;
     int32 GridLateralN = 0;
@@ -236,6 +248,8 @@ private:
     float TimeSinceRefresh = 0.0f;
     bool bLoggedPresentationDiagnostics = false;
     bool bLoggedHydraulicReliefDiagnostics = false;
+    bool bLoggedRaftInteriorWaterTransmission = false;
+    FVector LastLoggedRaftInteriorWaterCenter = FVector::ZeroVector;
     bool bLoggedBreakingSiteDiagnostics = false;
 
     // Persistent foam state advected between refreshes. The field lives on the

@@ -1,0 +1,140 @@
+{
+  "artifact": "M9 organic bank mosaic V2 review",
+  "recorded_local_date": "2026-07-31",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_environment_art_and_geospatial_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The five canonical South Fork views exposed large bare, tessellated ground areas with little low vegetation. V2 replaces the sparse single-shape treatment with a deterministic source-conditioned mosaic of narrow grass blades, low forbs, broader bank coverage, and denser understory. The regenerated settled map contains 220,759 collisionless ground-cover instances and 82,609 near-corridor foliage instances. The result is materially less bare and repetitive, but it remains a technical candidate pending named environment-art and geospatial review and is not accepted as photoreal.",
+  "source": {
+    "ownership": "Project-owned deterministic procedural geometry and placement; authoritative corridor terrain remains DEM/satellite-derived and procedural infill remains disclosed.",
+    "ground_cover_generator": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkGroundCover.cpp",
+    "ground_cover_generator_sha256": "39c30c4e7c8a53919f81ba09dff6762da2f4f1380830297b9817f6ac06af8d59",
+    "understory_generator": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkShoreCobbleDressing.cpp",
+    "understory_generator_sha256": "3916a1435e33351db37a5a7adb4ebecbd9728890e929e9afc5bcbdac3dbf6f8f",
+    "native_contract_test": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkGroundCoverTest.cpp",
+    "native_contract_test_sha256": "a0baffb7e3404bccae503f8f62fcb0324d7347f314e53f59012ab66ac8df9bd1",
+    "python_contract_test": "physics/tests/test_editor_source_layout.py",
+    "python_contract_test_sha256": "f0584d9cdc71cc56cdca0b50e5ec8dd61a6d2bad7fe72ab0319a1a8bffd374e8",
+    "external_asset_inputs": []
+  },
+  "implementation": {
+    "grass_blades_per_tuft": 52,
+    "low_forb_leaves_per_tuft": 10,
+    "tuft_footprint_radius_cm": 116.0,
+    "blade_width_cm": [
+      1.4,
+      4.8
+    ],
+    "blade_height_cm": [
+      28.0,
+      104.0
+    ],
+    "ground_cover_bank_band_m": [
+      22.0,
+      118.0
+    ],
+    "understory_bank_band_m": [
+      34.0,
+      108.0
+    ],
+    "maximum_placement_slope": 0.4,
+    "source_conditioning": "multi-scale deterministic Perlin patch noise with shoreline and outer-bank fades",
+    "ground_cover_instances": 220759,
+    "near_corridor_foliage_instances": 82609,
+    "shore_cobble_instances": 15702,
+    "collision_enabled": false,
+    "navigation_changed": false,
+    "terrain_geometry_changed": false,
+    "water_geometry_changed": false,
+    "water_sampling_changed": false,
+    "hydraulics_changed": false,
+    "raft_or_crew_physics_changed": false
+  },
+  "generated_world": {
+    "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "97dfe8197b5e493c7af66be26281c3114c50a31c973673f2f8a989adb3efe735",
+    "hlod_evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "hlod_evidence_sha256": "3edd731da085f01cbb53aa4846b37292dfd830454935712ae2a2aafc63e8be7d",
+    "hlod_actor_count": 28,
+    "hlod_actors_built": 28,
+    "settled_repeat_modified_and_saved_actor_count": 0
+  },
+  "renderer_evidence": {
+    "chili_bar_launch_downstream": {
+      "capture": "docs/environment-captures/south_fork_full_reach/chili_bar_launch_downstream.png",
+      "capture_sha256": "8bda163d459275499d37fdd4838c6217b4db85ba3bac1295ed65d74c64646425",
+      "width": 1280,
+      "height": 720
+    },
+    "meat_grinder_guide_eye": {
+      "capture": "docs/environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png",
+      "capture_sha256": "e6a15bca98189101c8d72bad091788a9a8edfb3b8ac93b36275cca870faacf53",
+      "width": 1280,
+      "height": 720
+    },
+    "troublemaker_approach": {
+      "capture": "docs/environment-captures/south_fork_full_reach/troublemaker_approach.png",
+      "capture_sha256": "39b8a9edd7bfb3dd985287356a056e80de440125029c6d50423048d1aa8e7522",
+      "width": 1280,
+      "height": 720
+    },
+    "coloma_bridge_context": {
+      "capture": "docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
+      "capture_sha256": "f8fa999df48ff42683648a7a89fbfa2493a7668807d3153e6886f9a6bd7108f1",
+      "width": 1280,
+      "height": 720
+    },
+    "salmon_falls_takeout": {
+      "capture": "docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png",
+      "capture_sha256": "d9d1a76644e1241f43940cedfa31f8fd7bbd0132771e4a06f81e74303078b405",
+      "width": 1280,
+      "height": 720
+    },
+    "technical_verdict": "pass: all five settled-map captures render the widened low-cover band and substantially reduce exposed bare terrain without reintroducing rectangular water-bank intersections",
+    "photoreal_verdict": "fail pending named approval or replacement of procedural tuft shapes, repeated tree forms, coarse terrain materials, sparse mid-story vegetation, distant cards, and synthetic lighting"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with Unreal Engine 5.8",
+    "focused_native": "1/1 ground-cover organic-presentation test passed (M9V540OrganicBankMosaicFocused)",
+    "focused_python": "35/35 editor source-layout tests passed",
+    "m4": "4/4 result entries passed (M9V541OrganicBankMosaicM4)",
+    "m4_report": "unreal/Saved/Automation/M9V541OrganicBankMosaicM4/index.json",
+    "m4_report_sha256": "a02923add48dbb2e90c5e64ed0889fe474a554ce5e90bc4331bc090a06b0591d",
+    "m5": "5/5 result entries passed renderer-enabled (M9V544OrganicBankMosaicM5Renderer)",
+    "m5_report": "unreal/Saved/Automation/M9V544OrganicBankMosaicM5Renderer/index.json",
+    "m5_report_sha256": "21f8cf9c2d14f16972a78ab02b2be595187ee4648c9dda3ed0c2137cec1f91af",
+    "m7": "4/4 result entries passed (M9V543OrganicBankMosaicM7Renderer)",
+    "m7_report": "unreal/Saved/Automation/M9V543OrganicBankMosaicM7Renderer/index.json",
+    "m7_report_sha256": "1d17c6b8012ea4f5964c88db3fd9e72cb976414a11395a0490484f29d4ab29dc",
+    "m8": "4/4 passed (M9V542OrganicBankMosaicM8Renderer)",
+    "m8_report": "unreal/Saved/Automation/M9V542OrganicBankMosaicM8Renderer/index.json",
+    "m8_report_sha256": "5ee78ded59350dd1a89ce28e61f3d362378ef7e033ebdf6b64c55df62eedb917",
+    "full_python_matrix": "1,148 passed, 3 expected skips, 0 failed in 426.20 seconds (M9V545OrganicBankMosaic)",
+    "full_python_report": "physics/reports/m9/m9_v545_organic_bank_mosaic_full_matrix.xml",
+    "full_python_report_sha256": "19525353fc7ddd6ce37cee7f14d0ee9747467c011831fe36efc8810e2cf68fef",
+    "m9": "6/6 passed after organic bank mosaic V2 evidence reconciliation (M9V546OrganicBankMosaicReconciledM9)",
+    "m9_report": "unreal/Saved/Automation/M9V546OrganicBankMosaicReconciledM9/index.json",
+    "m9_report_sha256": "62188492fddac1e6cccdd708c6cffa47f22d5e57c896fe2836d9be587464a6cb",
+    "m9_exact_confirmation": "6/6 passed after frozen-ledger verification (M9V547OrganicBankMosaicExactM9)",
+    "m9_exact_confirmation_report": "unreal/Saved/Automation/M9V547OrganicBankMosaicExactM9/index.json",
+    "m9_exact_confirmation_report_sha256": "58b11540d16241841522835c4d53e84621023a83653e7bef6ddd1a7c469caf9d"
+  },
+  "reviewers": {
+    "named_environment_art_reviewer": null,
+    "named_geospatial_reviewer": null,
+    "named_south_fork_guide_reviewer": null,
+    "environment_art_approval": false,
+    "geospatial_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "A named environment-art reviewer must approve or replace the procedural low-cover shapes, density, material response, mid-story vegetation, and composition across all five canonical views.",
+    "A named geospatial reviewer must confirm that source-conditioned placement and disclosed procedural infill remain plausible for the South Fork corridor and do not imply navigational accuracy.",
+    "A named South Fork guide must approve visual river-edge and approach readability at Meat Grinder, Troublemaker, Coloma Bridge, Chili Bar, and Salmon Falls.",
+    "M9 remains blocked from promotion by the wider product-owner, terrain, water, character, legal, audio, safety, accessibility, platform, packaging, performance, signing, media, and distribution gates."
+  ]
+}
