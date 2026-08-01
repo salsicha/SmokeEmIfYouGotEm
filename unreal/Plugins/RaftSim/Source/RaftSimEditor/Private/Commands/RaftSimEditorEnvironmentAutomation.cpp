@@ -50,7 +50,9 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
 
     if (bCreateLandscapeImportCandidateMapsOnStartup)
     {
-        bSucceeded &= CreateLandscapeImportCandidateMaps(Summary);
+        bSucceeded &= CreateLandscapeImportCandidateMaps(
+            Summary,
+            LandscapeImportCandidateRiverFilter);
     }
 
     if (bCreatePhotorealRiverWaterMaterialOnStartup)

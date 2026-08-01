@@ -33,12 +33,20 @@ The Unreal candidate is generated with:
 
 ```bash
 "/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd" \
-  "$PWD/unreal/SmokeEmIfYouGotEm.uproject" -unattended -nop4 -nosplash -NoSound \
-  -ExecCmds="RaftSim.CreateLandscapeImportCandidateMaps zambezi_batoka_gorge,Quit"
+  "$PWD/unreal/SmokeEmIfYouGotEm.uproject" \
+  -unattended -nop4 -nosplash -NoSound -RenderOffscreen \
+  -RaftSimCreateLandscapeImportCandidateMaps \
+  -RaftSimLandscapeImportCandidateRiverId=zambezi_batoka_gorge \
+  -RaftSimExitAfterEnvironmentAutomation
 ```
 
 This saves the locally generated, git-ignored map at
 `/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate`.
+The logical package is in `DefaultGame.ini`'s shipping cook list. Because the
+1.6 GB candidate remains reproducible and intentionally excluded from Git LFS,
+the Mac and Windows packaging scripts build the editor and regenerate this one
+river automatically when the map is absent, then fail closed if the package was
+not created before cooking.
 The map contains 25 editor-only rapid marker actors, a player raft and start,
 the vertical-slice game mode, and a live-water runtime configuration. Rapid 9
 is tagged as a mandatory commercial portage. Gameplay hides the labels; the
@@ -111,6 +119,11 @@ guide/art approval remain open.
 
 The map is available from the main menu as **Zambezi: Boiling Pot to Mukuni
 Beach**. It is a reference Free Run with the normal-big-water planning band.
+The named-rapid source catalog, generated marker and simulator-run manifests,
+Rapid/River Editor shell, player-facing scenario catalog, runtime map-load test,
+and shipping cook list all classify it as the sixth runnable river. There are
+no remaining `additional_active_environment` river entries in the current
+portfolio.
 The source-controlled runtime bundle lives under
 `physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/`:
 

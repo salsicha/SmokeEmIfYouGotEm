@@ -41,7 +41,7 @@ def _load(relative_path: str) -> dict:
     return json.loads((REPO_ROOT / relative_path).read_text(encoding="utf-8"))
 
 
-def test_named_rapid_catalog_covers_runnable_portfolio_and_additional_environment():
+def test_named_rapid_catalog_covers_six_runnable_rivers():
     catalog = _load(SOURCE_CATALOG_RELATIVE_PATH)
     validate_source_catalog(catalog)
 
@@ -62,27 +62,25 @@ def test_named_rapid_catalog_covers_runnable_portfolio_and_additional_environmen
     assert catalog["status"] == "review_baseline_not_guide_approved"
     assert catalog["portfolio"] == {
         "source": "physics/data/real_world/river_portfolio_plan.json",
-        "status": "five_runnable_rivers_plus_one_additional_active_environment",
+        "status": "six_runnable_rivers",
         "runnable_river_ids": [
             "south_fork_american_chili_bar",
             "colorado_river_grand_canyon_rowing",
             "pacuare_river_costa_rica",
             "futaleufu_river_chile",
             "chilko_river_lava_canyon",
+            "zambezi_batoka_gorge",
         ],
-        "additional_active_environment_river_ids": ["zambezi_batoka_gorge"],
-        "runnable_river_count": 5,
-        "additional_active_environment_count": 1,
+        "additional_active_environment_river_ids": [],
+        "runnable_river_count": 6,
+        "additional_active_environment_count": 0,
         "total_river_count": 6,
         "zambezi_evidence_retained": True,
     }
     rivers = {river["river_id"]: river for river in catalog["rivers"]}
-    assert rivers["zambezi_batoka_gorge"]["portfolio_role"] == "additional_active_environment"
-    assert all(
-        river["portfolio_role"] == "runnable_river"
-        for river_id, river in rivers.items()
-        if river_id != "zambezi_batoka_gorge"
-    )
+    assert rivers["zambezi_batoka_gorge"]["portfolio_role"] == "runnable_river"
+    assert rivers["zambezi_batoka_gorge"]["runnable_tier"] == "reference_free_run"
+    assert all(river["portfolio_role"] == "runnable_river" for river in rivers.values())
 
 
 def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
@@ -92,8 +90,8 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     assert generated == committed
     assert committed["production_promoted"] is False
     assert sum(river["marker_count"] for river in committed["rivers"]) == 85
-    assert committed["portfolio"]["runnable_river_count"] == 5
-    assert committed["portfolio"]["additional_active_environment_count"] == 1
+    assert committed["portfolio"]["runnable_river_count"] == 6
+    assert committed["portfolio"]["additional_active_environment_count"] == 0
 
     rivers = {river["river_id"]: river for river in committed["rivers"]}
     south_fork = {marker["display_name"]: marker for marker in rivers["south_fork_american_chili_bar"]["markers"]}
@@ -500,7 +498,7 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     assert all(run["portfolio_role"] == "runnable_river" for run in chilko)
     zambezi = [run for run in committed["runs"] if run["river_id"] == "zambezi_batoka_gorge"]
     assert zambezi
-    assert all(run["portfolio_role"] == "additional_active_environment" for run in zambezi)
+    assert all(run["portfolio_role"] == "runnable_river" for run in zambezi)
 
     commercial_suicide = [
         run for run in committed["runs"]
@@ -533,8 +531,8 @@ def test_unreal_rapid_editor_exposes_named_markers_and_review_run_queue():
         assert relative_path in actions
         assert relative_path in shell["source_manifests"].values()
     assert shell["named_rapid_review"]["river_count"] == 6
-    assert shell["named_rapid_review"]["runnable_river_count"] == 5
-    assert shell["named_rapid_review"]["additional_active_environment_count"] == 1
+    assert shell["named_rapid_review"]["runnable_river_count"] == 6
+    assert shell["named_rapid_review"]["additional_active_environment_count"] == 0
     assert shell["named_rapid_review"]["marker_count"] == 85
     assert shell["named_rapid_review"]["candidate_geometry_count"] == 50
     assert shell["named_rapid_review"]["run_definition_count"] == 453

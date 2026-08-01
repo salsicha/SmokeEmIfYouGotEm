@@ -1,6 +1,8 @@
 {
   "schema": "raftsim.unreal.named_rapid_editor_data_asset_generation_report.v1",
   "run_date": "2026-07-14",
+  "evidence_scope": "historical_pre_zambezi_runnable_portfolio_migration",
+  "current_portfolio_source": "physics/data/real_world/named_rapid_source_catalog.json",
   "status": "compiled_saved_captured_and_validated_shutdown_completed_after_manual_interrupt",
   "production_promoted": false,
   "editor_version": "Unreal Engine 5.8",

@@ -21,10 +21,10 @@
         "zambezi_evidence_retained"
       ],
       "properties": {
-        "runnable_river_ids": {"type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true},
-        "additional_active_environment_river_ids": {"type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true},
-        "runnable_river_count": {"const": 5},
-        "additional_active_environment_count": {"const": 1},
+        "runnable_river_ids": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true},
+        "additional_active_environment_river_ids": {"type": "array", "maxItems": 0, "uniqueItems": true},
+        "runnable_river_count": {"const": 6},
+        "additional_active_environment_count": {"const": 0},
         "total_river_count": {"const": 6},
         "zambezi_evidence_retained": {"const": true}
       }

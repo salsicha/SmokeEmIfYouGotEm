@@ -7,20 +7,19 @@
     "visual": "Water, foam, spray, wet banks, rocks, foliage, and lighting agree with rights-reviewed references at the recorded flow."
   },
   "portfolio": {
-    "additional_active_environment_count": 1,
-    "additional_active_environment_river_ids": [
-      "zambezi_batoka_gorge"
-    ],
-    "runnable_river_count": 5,
+    "additional_active_environment_count": 0,
+    "additional_active_environment_river_ids": [],
+    "runnable_river_count": 6,
     "runnable_river_ids": [
       "south_fork_american_chili_bar",
       "colorado_river_grand_canyon_rowing",
       "pacuare_river_costa_rica",
       "futaleufu_river_chile",
-      "chilko_river_lava_canyon"
+      "chilko_river_lava_canyon",
+      "zambezi_batoka_gorge"
     ],
     "source": "physics/data/real_world/river_portfolio_plan.json",
-    "status": "five_runnable_rivers_plus_one_additional_active_environment",
+    "status": "six_runnable_rivers",
     "total_river_count": 6,
     "zambezi_evidence_retained": true
   },
@@ -15004,7 +15003,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15060,7 +15059,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15116,7 +15115,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15172,7 +15171,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15228,7 +15227,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15284,7 +15283,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15340,7 +15339,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15396,7 +15395,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15452,7 +15451,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15508,7 +15507,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15564,7 +15563,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15620,7 +15619,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15676,7 +15675,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15732,7 +15731,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15788,7 +15787,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15844,7 +15843,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15900,7 +15899,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15956,7 +15955,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16012,7 +16011,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16068,7 +16067,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16124,7 +16123,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16180,7 +16179,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16236,7 +16235,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16292,7 +16291,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16348,7 +16347,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16404,7 +16403,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16460,7 +16459,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16516,7 +16515,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16572,7 +16571,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16628,7 +16627,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16684,7 +16683,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16740,7 +16739,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16796,7 +16795,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16852,7 +16851,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16908,7 +16907,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16964,7 +16963,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17020,7 +17019,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17076,7 +17075,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17132,7 +17131,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17188,7 +17187,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17244,7 +17243,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17300,7 +17299,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17356,7 +17355,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17412,7 +17411,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17468,7 +17467,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17524,7 +17523,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17580,7 +17579,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17636,7 +17635,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17692,7 +17691,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17748,7 +17747,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17804,7 +17803,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17860,7 +17859,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17916,7 +17915,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17972,7 +17971,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18028,7 +18027,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18084,7 +18083,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18140,7 +18139,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18196,7 +18195,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18252,7 +18251,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18308,7 +18307,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18364,7 +18363,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18420,7 +18419,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18476,7 +18475,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18532,7 +18531,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18588,7 +18587,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18644,7 +18643,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18700,7 +18699,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18756,7 +18755,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18812,7 +18811,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18868,7 +18867,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18924,7 +18923,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18980,7 +18979,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19036,7 +19035,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19092,7 +19091,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19148,7 +19147,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19204,7 +19203,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19260,7 +19259,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19316,7 +19315,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19372,7 +19371,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19428,7 +19427,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19484,7 +19483,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19540,7 +19539,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19596,7 +19595,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19652,7 +19651,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19708,7 +19707,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19764,7 +19763,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19820,7 +19819,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19876,7 +19875,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19932,7 +19931,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19988,7 +19987,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20044,7 +20043,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20100,7 +20099,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20156,7 +20155,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20212,7 +20211,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20268,7 +20267,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20324,7 +20323,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20380,7 +20379,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20436,7 +20435,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20492,7 +20491,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20548,7 +20547,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20604,7 +20603,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20660,7 +20659,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20716,7 +20715,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20772,7 +20771,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20828,7 +20827,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20884,7 +20883,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20940,7 +20939,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20996,7 +20995,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21052,7 +21051,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21108,7 +21107,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21164,7 +21163,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21220,7 +21219,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21276,7 +21275,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21332,7 +21331,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21388,7 +21387,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21444,7 +21443,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21500,7 +21499,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21556,7 +21555,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21612,7 +21611,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21668,7 +21667,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21724,7 +21723,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21780,7 +21779,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21836,7 +21835,7 @@
         "console_performance",
         "handheld_low"
       ],
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",

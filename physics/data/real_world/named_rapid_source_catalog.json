@@ -5,19 +5,18 @@
   "rights_policy": "Link-only factual indexing. Do not vendor guide text, photos, video, maps, or social-media content without item-level permission.",
   "portfolio": {
     "source": "physics/data/real_world/river_portfolio_plan.json",
-    "status": "five_runnable_rivers_plus_one_additional_active_environment",
+    "status": "six_runnable_rivers",
     "runnable_river_ids": [
       "south_fork_american_chili_bar",
       "colorado_river_grand_canyon_rowing",
       "pacuare_river_costa_rica",
       "futaleufu_river_chile",
-      "chilko_river_lava_canyon"
-    ],
-    "additional_active_environment_river_ids": [
+      "chilko_river_lava_canyon",
       "zambezi_batoka_gorge"
     ],
-    "runnable_river_count": 5,
-    "additional_active_environment_count": 1,
+    "additional_active_environment_river_ids": [],
+    "runnable_river_count": 6,
+    "additional_active_environment_count": 0,
     "total_river_count": 6,
     "zambezi_evidence_retained": true
   },
@@ -2153,7 +2152,8 @@
     },
     {
       "river_id": "zambezi_batoka_gorge",
-      "portfolio_role": "additional_active_environment",
+      "portfolio_role": "runnable_river",
+      "runnable_tier": "reference_free_run",
       "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
       "run_length_m": 27358.848,
       "stationing_authority": "stylized_map_relative_spacing_not_surveyed",

@@ -191,8 +191,9 @@ path is verified, and the completion goal can be marked complete.
   using continuous spatial blending; topology stays stable while contacted fabric moves
   and locally loses radius.
 - Added `ARaftSimRockObstacleActor` as the explicit world/solver authority boundary and
-  bound nearby actors into D4 in raft-local coordinates. Regenerated all five runnable
-  signature-rapid maps with four deterministic contact rocks each.
+  bound nearby actors into D4 in raft-local coordinates. Regenerated the original five
+  compact signature-rapid maps with four deterministic contact rocks each; the later
+  source-scale Zambezi reference corridor uses its separate generator.
 - Added `RaftSim.M1.FlexibleRaftVisualTracksContact`: a multi-segment wrap produces more
   than 5 cm of visible tube displacement, preserves topology/finite vertices, and returns
   to rest after release. Added map assertions for serialized D4 rocks.

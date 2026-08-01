@@ -390,6 +390,10 @@ void FRaftSimEditorModule::StartupModule()
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCapturePhotorealEnvironmentPreviews"));
     bCreateLandscapeImportCandidateMapsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateLandscapeImportCandidateMaps"));
+    FParse::Value(
+        FCommandLine::Get(),
+        TEXT("RaftSimLandscapeImportCandidateRiverId="),
+        LandscapeImportCandidateRiverFilter);
     bCreatePhotorealRiverWaterMaterialOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreatePhotorealRiverWaterMaterial"));
     bCreateWaterVfxMaterialOnStartup =

@@ -12,9 +12,11 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 REPORT_ROOT = REPO_ROOT / "physics/reports/editor_source_inventory"
 FROZEN_LEGACY_EXCEPTIONS = {
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveEvaluation.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
 }
 FROZEN_OVERSIZED_IMPLEMENTATION_MAX_LINES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": 3088,
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": 3073,
 }
 

@@ -80,9 +80,8 @@ def test_photoreal_asset_intake_b1_hardens_import_contract():
     assert "classify alpha/opacity textures as masks" in contract["new_importers_must"]
     assert "60 m river-distance capture" in contract["isolated_gate_required"]
     assert "150 m river-distance capture" in contract["isolated_gate_required"]
-    assert intake["zambezi_policy"]["portfolio_role"] == (
-        "additional_active_environment_backlogged"
-    )
+    assert intake["zambezi_policy"]["portfolio_role"] == "runnable_reference_free_run"
+    assert "promotion gated" in intake["zambezi_policy"]["decision"]
     assert gate["b1_complete_for_planning"] is True
     assert gate["assets_imported"] is False
     assert gate["can_promote_any_river_asset_set"] is False

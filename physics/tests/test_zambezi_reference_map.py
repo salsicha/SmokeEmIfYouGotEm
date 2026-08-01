@@ -158,6 +158,42 @@ def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
     assert float(loaded["u"].max()) > 3.0
 
 
+def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contracts():
+    map_package = (
+        "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
+        "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+    )
+    default_game = (REPO_ROOT / "unreal/Config/DefaultGame.ini").read_text(
+        encoding="utf-8"
+    )
+    assert f'+MapsToCook=(FilePath="{map_package}")' in default_game
+
+    module_header = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Public/RaftSimEditorModule.h"
+    ).read_text(encoding="utf-8")
+    module_cpp = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp"
+    ).read_text(encoding="utf-8")
+    automation_cpp = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/"
+        "RaftSimEditorEnvironmentAutomation.cpp"
+    ).read_text(encoding="utf-8")
+    assert "LandscapeImportCandidateRiverFilter" in module_header
+    assert "RaftSimLandscapeImportCandidateRiverId=" in module_cpp
+    assert "LandscapeImportCandidateRiverFilter" in automation_cpp
+
+    for relative in ("unreal/Scripts/package_mac.sh", "unreal/Scripts/package_win.ps1"):
+        packaging_script = (REPO_ROOT / relative).read_text(encoding="utf-8")
+        assert "L_ZambeziBatokaGorge_PhysicalCorridorCandidate.umap" in packaging_script
+        assert "RaftSimCreateLandscapeImportCandidateMaps" in packaging_script
+        assert "RaftSimLandscapeImportCandidateRiverId=zambezi_batoka_gorge" in (
+            packaging_script
+        )
+
+
 def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers():
     internal = (
         REPO_ROOT
