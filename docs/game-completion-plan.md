@@ -3499,3 +3499,15 @@ path is verified, and the completion goal can be marked complete.
   ecology, and absent named guide/art approval. The editor build, focused saved-material
   automation 1/1, schema-v5 map audit, and focused runtime map-load gate 1/1 pass. M9 stays
   in progress; this milestone does not close the external acceptance or release gates.
+- Zambezi camera-visible organic bank cover V1 adds a separately auditable
+  1,200-instance ground-cover mosaic to the two canonical downstream windows.
+  The underlying project-owned mesh now uses 54 solid tapered grass blades and
+  11 low forb clusters over a several-metre footprint; no masked cards return.
+  Placement begins beyond each camera target, searches ten DEM candidates for
+  the lowest slope, and remains outside the 72 m active river half-width with
+  collision disabled. The regenerated images visibly break up both formerly
+  barren banks. Schema v6 passes with five components, 6,800 total instances,
+  one tagged camera-visible mosaic, zero legacy PVE actors, and the existing
+  runnable/water/terrain contracts intact. The result remains photoreal-rejected
+  for sparse/repetitive procedural clumps, rounded 30 m terrain, missing
+  authentic Batoka ecology, and absent named guide/art approval; M9 stays open.

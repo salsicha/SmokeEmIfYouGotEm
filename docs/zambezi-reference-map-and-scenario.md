@@ -62,17 +62,24 @@ non-colliding hierarchical instances:
 - 2,100 `SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1` instances;
 - 1,400 `SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1` instances;
 - 1,400 `SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1` instances; and
-- 700 `SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1` instances.
+- 700 full-corridor `SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1`
+  instances, plus 1,200 instances of the same mesh in a separately tagged
+  organic bank-mosaic component aligned to the two canonical camera windows.
 
 All four use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
-or blade geometry rather than alpha cards, and carry the
+or blade geometry rather than alpha cards. The revised ground-cover mesh spans
+several metres with 54 tapered grass blades and 11 low solid forb clusters.
+All dressing actors carry the
 `RaftSimZambeziOpaqueVegetation`, `RaftSimOpaqueVolumetricVegetation`,
 `RaftSimSlopeScreenedPlacement`, `RaftSimNonCollisionRenderSurface`, and
-`RaftSimProceduralVegetationFallback` tags. Placement searches a wider bank
-area, rejects steep canyon-face candidates, and keeps the launch cameras and
-navigable corridor clear. This removes the floating black/green triangle and
-cliff-mounted-tree failures from the active Zambezi views; it does not establish
-correct species, woodland ecology, or photoreal vegetation.
+`RaftSimProceduralVegetationFallback` tags. The additional component also
+carries `RaftSimOrganicBankMosaic` and `RaftSimCameraVisibleBankCover`.
+Placement selects the lowest-slope candidate on each dry bank, keeps a hard
+inner exclusion outside the 72 m active river half-width, starts beyond each
+camera target, and covers approximately the next 120-600 m of view. This makes
+solid grass/forb cover visible in both canonical images while preserving the
+navigable corridor and removing the old floating black/green card failure. It
+does not establish correct species, woodland ecology, or photoreal vegetation.
 
 The physical-corridor ribbon now uses an isolated
 `M_RaftSim_Zambezi_SingleLayerWater` parent instead of changing the shared
@@ -111,19 +118,23 @@ This makes the complete map launchable and paddleable with the normal gameplay
 stack. It does not turn the inferred bed or rapid cues into real-world
 bathymetry, navigation guidance, or validated Zambezi hydraulics.
 
-The visual fallback materially improves surface scale and canyon breakup, but
-the 30 m DEM still yields rounded large-scale cliff silhouettes and the current
-vegetation remains synthetic and is deliberately sparse outside the launch
-vista. The canonical guide-seat and river-eye views prove that the broken card
-foliage is absent, not that the vegetation or terrain is lifelike. The runnable
-reference map is therefore not yet accepted as photoreal.
+The visual fallback materially improves surface scale and canyon breakup, and
+the canonical guide-seat and river-eye views now contain visible solid bank
+cover instead of completely barren slopes. The 30 m DEM still yields rounded
+large-scale cliff silhouettes, however, and the small synthetic clumps remain
+too sparse and repetitive for lifelike ecology. The views prove that the broken
+card foliage is absent and that bank cover is rendered; they do not prove that
+the vegetation or terrain is photoreal. The runnable reference map is therefore
+not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v5 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v6 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
-non-colliding visual-terrain tiles, the exact four vegetation families and
-5,600-instance total, zero legacy Zambezi PVE actors, and exactly one
+non-colliding visual-terrain tiles, the exact four vegetation mesh families and
+five instance components with a 6,800-instance total, exactly one tagged
+1,200-instance camera-visible bank mosaic, zero legacy Zambezi PVE actors, and
+exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
 also covered by `RaftSim.M9.FZambeziSingleLayerWater`; the focused runtime gate is

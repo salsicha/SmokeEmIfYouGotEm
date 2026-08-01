@@ -9,6 +9,7 @@ constexpr TCHAR ZambeziVegetationMaterialPath[] = TEXT(
     "M_RaftSim_Zambezi_OpaqueVegetation");
 constexpr TCHAR ZambeziVegetationMeshRoot[] = TEXT(
     "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/");
+constexpr int32 ZambeziEvidenceBankMosaicInstanceCount = 1200;
 
 enum class EZambeziVegetationForm : uint8
 {
@@ -295,8 +296,8 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     if (Form == EZambeziVegetationForm::SavannaGroundCover)
     {
         AppendZambeziOpaqueLobe(
-            FVector(0.0f, 0.0f, 8.0f),
-            FVector(28.0f, 24.0f, 12.0f),
+            FVector(0.0f, 0.0f, 10.0f),
+            FVector(46.0f, 38.0f, 15.0f),
             Seed,
             ScalePreviewColor(DryGrass, 0.62f),
             Vertices,
@@ -304,7 +305,11 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
             Normals,
             Uvs,
             Colors);
-        constexpr int32 BladeCount = 30;
+        // One opaque mesh instance covers a several-metre patch.  This is
+        // intentionally solid tapered geometry rather than masked crossed
+        // cards, so the near banks break up organically without returning the
+        // black/green card artifacts rejected by the visual review.
+        constexpr int32 BladeCount = 54;
         for (int32 BladeIndex = 0; BladeIndex < BladeCount; ++BladeIndex)
         {
             const float Angle = UE_TWO_PI *
@@ -312,16 +317,16 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
             const FVector Direction(
                 FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
             const float Radius = FMath::Lerp(
-                5.0f,
-                95.0f,
+                12.0f,
+                240.0f,
                 ZambeziVegetationUnitRandom(BladeIndex + Seed, 1213));
             const float Height = FMath::Lerp(
-                42.0f,
-                118.0f,
+                24.0f,
+                82.0f,
                 ZambeziVegetationUnitRandom(BladeIndex + Seed, 1231));
             const float Lean = FMath::Lerp(
-                8.0f,
-                38.0f,
+                5.0f,
+                28.0f,
                 ZambeziVegetationUnitRandom(BladeIndex + Seed, 1249));
             const FVector Start = Direction * Radius;
             const FVector End = Start + Direction * Lean + FVector::UpVector * Height;
@@ -334,11 +339,41 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
             AppendZambeziColoredSegment(
                 Start,
                 End,
-                2.6f,
-                0.65f,
+                1.8f,
+                0.42f,
                 5,
                 ScalePreviewColor(BladeColor, 0.72f),
                 ScalePreviewColor(BladeColor, 1.08f),
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
+        }
+        constexpr int32 LowForbCount = 11;
+        for (int32 ForbIndex = 0; ForbIndex < LowForbCount; ++ForbIndex)
+        {
+            const int32 RandomIndex = ForbIndex + Seed * 2;
+            const float Angle = UE_TWO_PI *
+                ZambeziVegetationUnitRandom(RandomIndex, 1301);
+            const float Radius = FMath::Lerp(
+                34.0f,
+                205.0f,
+                ZambeziVegetationUnitRandom(RandomIndex, 1303));
+            const float Scale = FMath::Lerp(
+                0.72f,
+                1.24f,
+                ZambeziVegetationUnitRandom(RandomIndex, 1307));
+            const FLinearColor ForbColor = FMath::Lerp(
+                FLinearColor(0.12f, 0.20f, 0.045f, 1.0f),
+                DryGrass,
+                ZambeziVegetationUnitRandom(RandomIndex, 1319));
+            AppendZambeziOpaqueLobe(
+                FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f) * Radius +
+                    FVector::UpVector * (9.0f * Scale),
+                FVector(21.0f, 17.0f, 11.0f) * Scale,
+                RandomIndex,
+                ForbColor,
                 Vertices,
                 Triangles,
                 Normals,
@@ -1405,6 +1440,17 @@ bool AddLandscapeCandidateBiomeDressing(
                       *Candidate.PreviewSpec.RiverId),
             true,
             bZambezi ? ZambeziOpaqueVegetationMaterial : nullptr);
+    UHierarchicalInstancedStaticMeshComponent* ZambeziBankMosaicInstances =
+        bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              UnderstoryMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziOrganicBankMosaic_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedRockInstances;
     for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
     {
@@ -1431,6 +1477,7 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
         !ShrubInstances || !UnderstoryInstances ||
+        (bZambezi && !ZambeziBankMosaicInstances) ||
         Algo::AnyOf(ReviewedRockInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
@@ -1451,11 +1498,13 @@ bool AddLandscapeCandidateBiomeDressing(
             BroadleafTreeInstances,
             ConiferTreeInstances,
             ShrubInstances,
-            UnderstoryInstances};
+            UnderstoryInstances,
+            ZambeziBankMosaicInstances};
         const TArray<UStaticMesh*> Meshes = {
             BroadleafTreeMesh,
             ConiferTreeMesh,
             ShrubMesh,
+            UnderstoryMesh,
             UnderstoryMesh};
         for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
         {
@@ -1476,6 +1525,20 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimNonCollisionRenderSurface"));
             }
         }
+        if (AActor* MosaicOwner = ZambeziBankMosaicInstances
+                ? ZambeziBankMosaicInstances->GetOwner()
+                : nullptr)
+        {
+            MosaicOwner->Tags.AddUnique(TEXT("RaftSimOrganicBankMosaic"));
+            MosaicOwner->Tags.AddUnique(TEXT("RaftSimCameraVisibleBankCover"));
+        }
+        if (ZambeziBankMosaicInstances)
+        {
+            ZambeziBankMosaicInstances->ComponentTags.AddUnique(
+                TEXT("RaftSimOrganicBankMosaic"));
+            ZambeziBankMosaicInstances->ComponentTags.AddUnique(
+                TEXT("RaftSimCameraVisibleBankCover"));
+        }
         OutResult.DressingFoliageMaterialBoundSlotCount = 0;
         for (UStaticMesh* Mesh : Meshes)
         {
@@ -1487,7 +1550,7 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
         OutResult.bDressingFoliageMaterialsValidated =
-            OutResult.DressingFoliageMaterialBoundSlotCount == 4 &&
+            OutResult.DressingFoliageMaterialBoundSlotCount == 5 &&
             ValidateZambeziOpaqueVegetationMaterial(
                 ZambeziOpaqueVegetationMaterial) &&
             Algo::AllOf(
@@ -1960,9 +2023,119 @@ bool AddLandscapeCandidateBiomeDressing(
         }
     }
 
+    if (bZambeziWoodland)
+    {
+        // The general 30 km dressing distribution is intentionally sparse,
+        // but that made the two canonical downstream cameras read as bare DEM
+        // terrain.  Add a separate low-profile mosaic on both dry banks in
+        // front of those cameras.  The water half-width remains a hard inner
+        // exclusion and the best of several candidates is chosen by DEM slope,
+        // keeping this render-only layer out of the navigable channel.
+        constexpr int32 ViewBandCount = 2;
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerLongitudinalLane =
+            ZambeziEvidenceBankMosaicInstanceCount /
+            (ViewBandCount * BankSideCount);
+        const float GroundCoverMeshHeightCm = FMath::Max(
+            1.0f,
+            GetLandscapeCandidateEffectiveMeshBounds(UnderstoryMesh).GetSize().Z);
+        for (int32 MosaicIndex = 0;
+             MosaicIndex < ZambeziEvidenceBankMosaicInstanceCount;
+             ++MosaicIndex)
+        {
+            const int32 ViewBand = MosaicIndex % ViewBandCount;
+            const int32 SideIndex =
+                (MosaicIndex / ViewBandCount) % BankSideCount;
+            const int32 AlongIndex =
+                MosaicIndex / (ViewBandCount * BankSideCount);
+            const float AlongJitter =
+                ZambeziVegetationUnitRandom(MosaicIndex, 7103);
+            const float AlongT =
+                (static_cast<float>(AlongIndex) + AlongJitter) /
+                static_cast<float>(InstancesPerLongitudinalLane);
+            // Physical-camera progress maps to logical X through
+            // (X + 2500) / 27900.  Because that lookup spans the full 30 km
+            // source centerline, a few hundred logical centimetres represent
+            // hundreds of physical route metres.  These windows begin just
+            // past each camera target and cover roughly the next 120-600 m of
+            // visible bank without placing meshes around the raft.
+            const float BaseLogicalX = ViewBand == 0
+                ? FMath::Lerp(410.0f, 850.0f, AlongT)
+                : FMath::Lerp(5580.0f, 6020.0f, AlongT);
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float OffsetT = FMath::Pow(
+                ZambeziVegetationUnitRandom(MosaicIndex, 7121),
+                1.65f);
+            const float BaseOffset = ActiveRiverHalfWidth +
+                FMath::Lerp(280.0f, 4300.0f, OffsetT);
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * BaseOffset);
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 10; ++CandidateIndex)
+            {
+                const float CandidatePhase =
+                    static_cast<float>(MosaicIndex) * 0.7548777f +
+                    static_cast<float>(CandidateIndex) * 1.3247179f;
+                const float CandidateLogicalX = BaseLogicalX +
+                    18.0f * FMath::Sin(CandidatePhase);
+                const float CandidateOffset = FMath::Clamp(
+                    BaseOffset + 760.0f * FMath::Cos(CandidatePhase * 0.83f),
+                    ActiveRiverHalfWidth + 240.0f,
+                    ActiveRiverHalfWidth + 4700.0f);
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * CandidateOffset);
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                if (SlopeDegrees < BestSlopeDegrees)
+                {
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestPoint = CandidatePoint;
+                }
+            }
+
+            const float TargetHeightCm = FMath::Lerp(
+                54.0f,
+                96.0f,
+                ZambeziVegetationUnitRandom(MosaicIndex, 7151));
+            const float UniformScale = TargetHeightCm / GroundCoverMeshHeightCm;
+            const float FootprintScale = FMath::Lerp(
+                1.15f,
+                1.82f,
+                ZambeziVegetationUnitRandom(MosaicIndex, 7177));
+            AddGroundedInstance(
+                ZambeziBankMosaicInstances,
+                UnderstoryMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.08f, 0.0f, 1.8f),
+                    360.0f * ZambeziVegetationUnitRandom(MosaicIndex, 7193),
+                    1.2f * FMath::Sin(static_cast<float>(MosaicIndex) * 0.91f)),
+                FVector(
+                    UniformScale * FootprintScale,
+                    UniformScale * FootprintScale *
+                        FMath::Lerp(
+                            0.82f,
+                            1.18f,
+                            ZambeziVegetationUnitRandom(MosaicIndex, 7207)),
+                    UniformScale));
+            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Zambezi organic bank mosaic: %d opaque, grounded, non-colliding "
+                 "instances in two camera-visible slope-screened bank windows.\n"),
+            ZambeziEvidenceBankMosaicInstanceCount);
+    }
+
+    const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
+        (bZambeziWoodland ? ZambeziEvidenceBankMosaicInstanceCount : 0);
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount == BoulderCount &&
-        OutResult.DressingFoliageInstanceCount == FoliageClusterCount &&
+        OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
         ((Spec.bDesertCanyon && !bZambeziWoodland) ||
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&

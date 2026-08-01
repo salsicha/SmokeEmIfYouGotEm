@@ -24,7 +24,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v5",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v6",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -223,6 +223,19 @@ def main() -> None:
             row["actor_label"]: int(row["instance_count"])
             for row in vegetation_rows
         }
+        camera_visible_bank_cover_rows = [
+            row
+            for row in vegetation_rows
+            if "RaftSimCameraVisibleBankCover" in row["tags"]
+            and "RaftSimOrganicBankMosaic" in row["tags"]
+        ]
+        report["vegetation"]["camera_visible_bank_cover_component_count"] = len(
+            camera_visible_bank_cover_rows
+        )
+        report["vegetation"]["camera_visible_bank_cover_instance_count"] = sum(
+            int(row["instance_count"])
+            for row in camera_visible_bank_cover_rows
+        )
         passed = (
             len(markers) == 25
             and sorted(rapid_numbers) == list(range(1, 26))
@@ -265,8 +278,8 @@ def main() -> None:
             in water_surface_rows[0]["tags"]
             and "RaftSimMovingMultiScaleWaterNormals"
             in water_surface_rows[0]["tags"]
-            and len(vegetation_rows) == 4
-            and sum(int(row["instance_count"]) for row in vegetation_rows) == 5600
+            and len(vegetation_rows) == 5
+            and sum(int(row["instance_count"]) for row in vegetation_rows) == 6800
             and any(
                 "ZambeziOpaqueRiparianTree" in label and count == 2100
                 for label, count in vegetation_by_label.items()
@@ -283,6 +296,12 @@ def main() -> None:
                 "ZambeziOpaqueGroundCover" in label and count == 700
                 for label, count in vegetation_by_label.items()
             )
+            and any(
+                "ZambeziOrganicBankMosaic" in label and count == 1200
+                for label, count in vegetation_by_label.items()
+            )
+            and len(camera_visible_bank_cover_rows) == 1
+            and int(camera_visible_bank_cover_rows[0]["instance_count"]) == 1200
             and not legacy_zambezi_pve_actors
             and all(row["component_count"] == 1 for row in vegetation_rows)
             and all(
@@ -314,7 +333,8 @@ def main() -> None:
             f"{len(terrain_rows)} conditioned visual-terrain tiles, "
             f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
-            "opaque vegetation instances"
+            "opaque vegetation instances, including 1200 camera-visible "
+            "organic bank-cover instances"
         )
     except Exception as error:
         report["error"] = str(error)

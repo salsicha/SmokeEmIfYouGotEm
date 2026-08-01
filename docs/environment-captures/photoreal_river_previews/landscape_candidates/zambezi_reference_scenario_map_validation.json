@@ -1,5 +1,5 @@
 {
-  "actor_count": 51,
+  "actor_count": 52,
   "mandatory_portage_actor": "RaftSim_ZambeziRapid_9_Commercial_Suicide",
   "mandatory_portage_marker_count": 1,
   "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
@@ -341,10 +341,12 @@
     "water_config_count": 1
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v5",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v6",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
-    "component_count": 4,
+    "camera_visible_bank_cover_component_count": 1,
+    "camera_visible_bank_cover_instance_count": 1200,
+    "component_count": 5,
     "components": [
       {
         "actor_label": "RaftSim_LandscapeCandidate_ZambeziOpaqueGroundCover_zambezi_batoka_gorge",
@@ -409,9 +411,27 @@
           "RaftSimZambeziOpaqueVegetation",
           "RaftSimZambeziRun"
         ]
+      },
+      {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziOrganicBankMosaic_zambezi_batoka_gorge",
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 1200,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1.SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1",
+        "tags": [
+          "RaftSimCameraVisibleBankCover",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimOrganicBankMosaic",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
       }
     ],
-    "instance_count": 5600,
+    "instance_count": 6800,
     "legacy_zambezi_pve_actor_count": 0,
     "legacy_zambezi_pve_actors": [],
     "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards"

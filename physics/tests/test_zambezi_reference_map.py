@@ -207,6 +207,10 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimProceduralVegetationFallback" in foliage_cpp
     assert "RaftSimSlopeScreenedPlacement" in foliage_cpp
     assert "GetLandscapeSlopeDegrees" in foliage_cpp
+    assert "ZambeziEvidenceBankMosaicInstanceCount = 1200" in foliage_cpp
+    assert "ZambeziOrganicBankMosaic" in foliage_cpp
+    assert "RaftSimCameraVisibleBankCover" in foliage_cpp
+    assert "InstancesPerLongitudinalLane" in foliage_cpp
 
     validation = _load(
         REPO_ROOT
@@ -234,14 +238,26 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v4")
-    assert validation["vegetation"]["component_count"] == 4
-    assert validation["vegetation"]["instance_count"] == 5600
+    assert validation["schema"].endswith(".v6")
+    assert validation["water_surface"]["component_count"] == 1
+    assert validation["water_surface"]["shading_model_contract"] == (
+        "SingleLayerWater"
+    )
+    assert validation["vegetation"]["component_count"] == 5
+    assert validation["vegetation"]["instance_count"] == 6800
+    assert (
+        validation["vegetation"]["camera_visible_bank_cover_component_count"]
+        == 1
+    )
+    assert (
+        validation["vegetation"]["camera_visible_bank_cover_instance_count"]
+        == 1200
+    )
     assert validation["vegetation"]["legacy_zambezi_pve_actor_count"] == 0
     assert sorted(
         component["instance_count"]
         for component in validation["vegetation"]["components"]
-    ) == [700, 1400, 1400, 2100]
+    ) == [700, 1200, 1400, 1400, 2100]
     assert all(
         "M_RaftSim_Zambezi_OpaqueVegetation" in component["material"]
         for component in validation["vegetation"]["components"]
@@ -250,3 +266,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in component["collision_enabled"]
         for component in validation["vegetation"]["components"]
     )
+    mosaic = next(
+        component
+        for component in validation["vegetation"]["components"]
+        if "ZambeziOrganicBankMosaic" in component["actor_label"]
+    )
+    assert "RaftSimCameraVisibleBankCover" in mosaic["tags"]
+    assert "RaftSimOrganicBankMosaic" in mosaic["tags"]
+    assert "SavannaGroundCover_A_OpaqueV1" in mosaic["static_mesh"]
