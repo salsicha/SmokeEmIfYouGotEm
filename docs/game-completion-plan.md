@@ -3492,6 +3492,18 @@ path is verified, and the completion goal can be marked complete.
   cloth folds, skinning/deformation, identity-specific tailoring, cuff and torso integration,
   wet-material response, and named character-art/guide acceptance remain open; this is a
   fail-closed technical candidate, not photoreal promotion.
+- Folded wet splash sleeves V3 supersedes V2's smooth, glossy tubular surface while preserving
+  its solved shoulder-to-elbow placement. Each project-owned sleeve now has 28 axial rings,
+  36 radial sides, two bounded diagonal fold fields, cuff gathering, underarm seam relief,
+  a softly elliptical profile, and finite-difference normals. The isolated opaque Cloth parent
+  uses the three project-owned ripstop texture channels and shares the PFD's bounded
+  presentation-only wetness. All five identities report 1,075 vertices per sleeve, live material
+  response, visible shoulder silhouettes, and at most `1.3605050241949357e-7` cm shoulder-anchor
+  error. The editor build, isolated material audit, 16 focused Python contracts, five-identity
+  renderer roster, and renderer-enabled M5 gate pass. Front/profile/rear evidence shows more
+  cloth-like breakup and lower rigid gloss than V2, but regular procedural folds, abrupt
+  torso/cuff integration, missing skinned deformation and identity tailoring, and open named
+  character-art/guide acceptance keep photoreal promotion false.
 - Runnable Batoka terrain integration makes the retained Zambezi V12 world-aligned basalt
   material and V13 bounded morphology part of normal map generation instead of an isolated
   comparison path. Four tagged, non-colliding render tiles receive deterministic lava-flow

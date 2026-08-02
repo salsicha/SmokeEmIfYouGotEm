@@ -307,6 +307,7 @@ def main() -> None:
                 or not actor.has_production_whitewater_helmet()
                 or not actor.has_production_whitewater_pfd()
                 or not actor.has_live_pfd_material_response()
+                or not actor.has_live_splash_jacket_material_response()
                 or not actor.has_production_river_boots()
                 or not actor.has_fitted_upright_production_river_boots()
                 or not actor.has_commercial_paddle_silhouette()
@@ -335,7 +336,7 @@ def main() -> None:
                 or not actor.has_continuous_thigh_knee_silhouette()
                 or actor.get_maximum_thigh_knee_bridge_coverage_error_cm() > 0.25
                 or not actor.has_visible_shoulder_silhouette()
-                or actor.get_minimum_shoulder_sleeve_vertex_count() < 550
+                or actor.get_minimum_shoulder_sleeve_vertex_count() < 1000
                 or actor.get_maximum_shoulder_sleeve_anchor_error_cm() > 0.25
             ):
                 raise RuntimeError(
@@ -602,6 +603,9 @@ def main() -> None:
                     ),
                     "runtime_live_pfd_material_response": (
                         actor.has_live_pfd_material_response()
+                    ),
+                    "runtime_live_splash_jacket_material_response": (
+                        actor.has_live_splash_jacket_material_response()
                     ),
                     "runtime_pfd_presentation_wetness": (
                         actor.get_pfd_presentation_wetness()

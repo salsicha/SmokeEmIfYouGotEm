@@ -2576,6 +2576,31 @@ static UMaterial* BuildProductionCrewWetsuitMaterial()
         /*bSkeletalMesh=*/true);
 }
 
+static UMaterial* BuildSplashJacketMaterial()
+{
+    // The upper-arm overlay is a thin woven splash shell, not molded foam.
+    // Keep the existing project-owned ripstop source but resolve it at garment
+    // scale, use Cloth grazing response, and retain a rougher wet state than
+    // the earlier generic material so drenched sleeves do not become plastic.
+    return BuildTexturedRaftMaterial(
+        TEXT("M_RaftSim_SplashJacket"),
+        TEXT("PfdRipstop"),
+        FLinearColor(0.015f, 0.15f, 0.24f, 1.0f),
+        /*Roughness=*/0.72f,
+        /*RoughnessVariation=*/0.08f,
+        /*TextureTiling=*/1.45f,
+        /*TextileNormalStrength=*/0.20f,
+        /*bTwoSided=*/false,
+        /*bSkeletalMesh=*/false,
+        /*SaturatedRoughnessScale=*/0.56f,
+        /*SaturatedRoughnessMax=*/0.44f,
+        /*bUseTextileAlbedo=*/true,
+        /*bUseAmbientOcclusion=*/true,
+        /*bUseClothShading=*/true,
+        /*DrySpecularValue=*/0.20f,
+        /*WetSpecularValue=*/0.38f);
+}
+
 static void BuildProductionRaftMaterials()
 {
     // Water contact drives both instances close to full wetness in a rapid.
@@ -2618,7 +2643,7 @@ static void BuildRaftCrewMaterials()
     BuildHelmetMaterials();
     BuildSolidMaterial(TEXT("M_RaftSim_Skin"), FLinearColor(0.55f, 0.34f, 0.23f, 1.0f), 0.56f, 0.0f);
     BuildCrewFaceMaterial();
-    BuildTexturedRaftMaterial(TEXT("M_RaftSim_SplashJacket"), TEXT("PfdRipstop"), FLinearColor(0.015f, 0.15f, 0.24f, 1.0f), 0.58f, 0.08f, 5.0f, 0.14f, false);
+    BuildSplashJacketMaterial();
     BuildProductionCrewWetsuitMaterial();
     BuildSolidMaterial(TEXT("M_RaftSim_PFDWebbing"), FLinearColor(0.008f, 0.010f, 0.012f, 1.0f), 0.72f, 0.0f);
     BuildSolidMaterial(TEXT("M_RaftSim_BootRubber"), FLinearColor(0.006f, 0.008f, 0.010f, 1.0f), 0.78f, 0.0f);
@@ -2982,6 +3007,13 @@ static void HandleCreateProductionCrewWetsuitMaterial(const TArray<FString>&)
     BuildProductionCrewWetsuitMaterial();
 }
 
+static void HandleCreateSplashJacketMaterial(const TArray<FString>&)
+{
+    // Focused sleeve iteration must not resave the raft, PFD, helmet, skin,
+    // water-VFX, or shared textile texture packages.
+    BuildSplashJacketMaterial();
+}
+
 static void HandleCreateProductionPfdMaterials(const TArray<FString>&)
 {
     BuildPfdMaterials();
@@ -3089,6 +3121,12 @@ static FAutoConsoleCommand GCreateProductionCrewWetsuitMaterialCommand(
     TEXT("Author the skeletal-compatible generated-neoprene production crew material."),
     FConsoleCommandWithArgsDelegate::CreateStatic(
         &HandleCreateProductionCrewWetsuitMaterial));
+
+static FAutoConsoleCommand GCreateSplashJacketMaterialCommand(
+    TEXT("RaftSim.CreateSplashJacketMaterial"),
+    TEXT("Author only the folded-sleeve splash-jacket Cloth material."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleCreateSplashJacketMaterial));
 
 static FAutoConsoleCommand GCreateProductionPfdMaterialsCommand(
     TEXT("RaftSim.CreateProductionPfdMaterials"),

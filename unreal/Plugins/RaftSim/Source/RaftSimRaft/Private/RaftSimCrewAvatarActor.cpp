@@ -78,49 +78,80 @@ void BuildUnitAnatomicalShoulderSleeveMesh(
     TArray<FVector2D>& UVs,
     TArray<FProcMeshTangent>& Tangents)
 {
-    // A uniformly scaled sphere/capsule gives the shoulder and elbow the same
-    // diameter and reads as a rigid ball beside the PFD. This garment profile
-    // carries a broad deltoid high on the upper arm, then tapers continuously
-    // into a restrained cuff whose end is buried in the assembled arm.
-    constexpr int32 Rings = 18;
-    constexpr int32 Sides = 28;
-    const auto RadiusAt = [](float V)
+    // The retained V2 taper fixed the missing-shoulder gap, but a perfectly
+    // circular surface still read as a glossy molded tube. Keep the solved
+    // shoulder-to-elbow axis authoritative while adding a denser, softly
+    // elliptical shell with two incommensurate fold fields, gathered cloth at
+    // the cuff, and one restrained under-arm seam. This is visual garment
+    // topology only: it never changes the body pose, collision, mass, or grip.
+    constexpr int32 Rings = 28;
+    constexpr int32 Sides = 36;
+    const auto BaseRadiusAt = [](float V)
     {
         const float SafeV = FMath::Clamp(V, 0.0f, 1.0f);
         const float Deltoid = FMath::Exp(
             -FMath::Square((SafeV - 0.18f) / 0.24f));
         const float CuffRoll = FMath::Exp(
-            -FMath::Square((SafeV - 0.90f) / 0.075f));
-        return 0.90f - 0.27f * SafeV + 0.20f * Deltoid +
-            0.045f * CuffRoll;
+            -FMath::Square((SafeV - 0.88f) / 0.095f));
+        return 0.88f - 0.22f * SafeV + 0.16f * Deltoid +
+            0.035f * CuffRoll;
+    };
+    const auto SurfacePoint = [&BaseRadiusAt](float V, float Theta)
+    {
+        const float SafeV = FMath::Clamp(V, 0.0f, 1.0f);
+        const float EndEnvelope = FMath::Pow(
+            FMath::Max(FMath::Sin(PI * SafeV), 0.0f),
+            1.15f);
+        const float DiagonalFold =
+            0.055f * EndEnvelope *
+                FMath::Sin(7.0f * PI * SafeV + 2.0f * Theta) +
+            0.028f * EndEnvelope *
+                FMath::Sin(13.0f * PI * SafeV - 3.0f * Theta + 0.70f);
+        const float CuffGather =
+            0.034f *
+            FMath::Exp(-FMath::Square((SafeV - 0.80f) / 0.16f)) *
+            FMath::Sin(5.0f * Theta + 9.0f * PI * SafeV);
+        const float UnderArmDelta = FMath::FindDeltaAngleRadians(
+            Theta,
+            -0.5f * PI);
+        const float UnderArmSeam =
+            0.018f * EndEnvelope *
+            FMath::Exp(-FMath::Square(UnderArmDelta / 0.12f));
+        const float Radius = FMath::Max(
+            BaseRadiusAt(SafeV) + DiagonalFold + CuffGather + UnderArmSeam,
+            0.52f);
+        const float AxialDrape =
+            0.012f * EndEnvelope *
+            FMath::Sin(9.0f * PI * SafeV + 4.0f * Theta);
+        return FVector(
+                   1.035f * Radius * FMath::Cos(Theta),
+                   0.965f * Radius * FMath::Sin(Theta),
+                   -1.0f + 2.0f * SafeV + AxialDrape) *
+            kBaseRadiusCm;
     };
     for (int32 Ring = 0; Ring <= Rings; ++Ring)
     {
         const float V = static_cast<float>(Ring) / Rings;
-        const float Z = -1.0f + 2.0f * V;
-        const float Radius = RadiusAt(V);
-        const float SampleStep = 1.0f / Rings;
-        const float PreviousV = FMath::Max(V - SampleStep, 0.0f);
-        const float NextV = FMath::Min(V + SampleStep, 1.0f);
-        const float DeltaZ = 2.0f * FMath::Max(
-            NextV - PreviousV,
-            UE_SMALL_NUMBER);
-        const float RadiusSlope =
-            (RadiusAt(NextV) - RadiusAt(PreviousV)) / DeltaZ;
         for (int32 Side = 0; Side <= Sides; ++Side)
         {
             const float U = static_cast<float>(Side) / Sides;
             const float Theta = 2.0f * PI * U;
-            const float CosTheta = FMath::Cos(Theta);
-            const float SinTheta = FMath::Sin(Theta);
-            Vertices.Add(
-                FVector(Radius * CosTheta, Radius * SinTheta, Z) *
-                kBaseRadiusCm);
+            Vertices.Add(SurfacePoint(V, Theta));
+            constexpr float DifferentialStep = 0.0025f;
+            const FVector CircumferentialTangent =
+                SurfacePoint(V, Theta + DifferentialStep) -
+                SurfacePoint(V, Theta - DifferentialStep);
+            const FVector AxialTangent =
+                SurfacePoint(FMath::Min(V + DifferentialStep, 1.0f), Theta) -
+                SurfacePoint(FMath::Max(V - DifferentialStep, 0.0f), Theta);
             Normals.Add(
-                FVector(CosTheta, SinTheta, -RadiusSlope).GetSafeNormal());
+                FVector::CrossProduct(CircumferentialTangent, AxialTangent)
+                    .GetSafeNormal());
             UVs.Add(FVector2D(U, V));
             Tangents.Add(
-                FProcMeshTangent(-SinTheta, CosTheta, 0.0f));
+                FProcMeshTangent(
+                    CircumferentialTangent.GetSafeNormal(),
+                    /*bInFlipTangentY=*/false));
         }
     }
     for (int32 Ring = 0; Ring < Rings; ++Ring)
@@ -1541,7 +1572,8 @@ bool ARaftSimCrewAvatarActor::HasVisibleShoulderSilhouette() const
     const FVector ExtentCm = GetMinimumShoulderSleeveExtentCm();
     return bUsingProductionVisual && LeftShoulderSleeve && RightShoulderSleeve &&
         LeftShoulderSleeve->IsVisible() && RightShoulderSleeve->IsVisible() &&
-        GetMinimumShoulderSleeveVertexCount() >= 550 &&
+        GetMinimumShoulderSleeveVertexCount() >= 1000 &&
+        HasLiveSplashJacketMaterialResponse() &&
         ExtentCm.X >= 4.7f && ExtentCm.Y >= 4.7f && ExtentCm.Z >= 5.6f &&
         ExtentCm.Z > ExtentCm.X &&
         GetMaximumShoulderSleeveAnchorErrorCm() <= 0.25f;
@@ -1745,6 +1777,30 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
     {
         ProductionPfd->SetMaterial(0, VisiblePfdMaterial);
     }
+    UMaterialInterface* SplashJacketMaterial = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_SplashJacket."
+             "M_RaftSim_SplashJacket"));
+    SplashJacketMaterialInstance = SplashJacketMaterial
+        ? UMaterialInstanceDynamic::Create(SplashJacketMaterial, this)
+        : nullptr;
+    UMaterialInterface* VisibleSplashJacket = SplashJacketMaterialInstance
+        ? static_cast<UMaterialInterface*>(SplashJacketMaterialInstance.Get())
+        : SplashJacketMaterial;
+    for (UProceduralMeshComponent* JacketPart : {
+             Torso,
+             LeftShoulderSleeve,
+             RightShoulderSleeve,
+             LeftUpperArm,
+             LeftLowerArm,
+             RightUpperArm,
+             RightLowerArm})
+    {
+        if (JacketPart && VisibleSplashJacket)
+        {
+            JacketPart->SetMaterial(0, VisibleSplashJacket);
+        }
+    }
     ApplyPfdMaterialWetness();
     static const TCHAR* HelmetPaths[] = {
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"),
@@ -1848,11 +1904,19 @@ void ARaftSimCrewAvatarActor::UpdatePfdMaterialResponse(float DeltaSeconds)
 
 void ARaftSimCrewAvatarActor::ApplyPfdMaterialWetness()
 {
+    const float BoundedWetness =
+        FMath::Clamp(PfdPresentationWetness, 0.0f, 0.84f);
     if (PfdShellMaterialInstance)
     {
         PfdShellMaterialInstance->SetScalarParameterValue(
             TEXT("Wetness"),
-            FMath::Clamp(PfdPresentationWetness, 0.0f, 0.84f));
+            BoundedWetness);
+    }
+    if (SplashJacketMaterialInstance)
+    {
+        SplashJacketMaterialInstance->SetScalarParameterValue(
+            TEXT("Wetness"),
+            BoundedWetness);
     }
 }
 

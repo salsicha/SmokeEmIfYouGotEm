@@ -2400,6 +2400,41 @@ or qualified whitewater guide has approved the captures. Photoreal acceptance an
 therefore remain false. Exact source, roster, capture, and M5 hashes are recorded in
 `docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json`.
 
+## Folded wet splash sleeves V3 — Cloth response retained, photoreal review open
+
+V2 closed the missing-shoulder gap and fixed the uniform diameter, but its smooth circular
+surface and generic wet shader still read as rigid cyan tubes. V3 preserves every solved
+shoulder and elbow target while replacing only the visible garment shell and its focused
+material. Twenty-eight axial rings and thirty-six radial sides carry two bounded diagonal
+fold fields, localized cuff gathering, restrained underarm seam relief, axial drape, and a
+softly elliptical profile with finite-difference surface normals.
+
+![Folded wet sleeves guide full view](../environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_guide_full.png)
+
+![Folded wet sleeves guide profile](../environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_guide_profile.png)
+
+![Folded wet sleeves guide rear view](../environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_guide_rear.png)
+
+The isolated opaque splash-jacket parent uses Cloth shading and exactly the project-owned
+PFD-ripstop albedo, normal, and packed AO/roughness/height textures. It shares the PFD's
+bounded presentation-only `Wetness` signal; it has no collision, mass, rescue, water, raft,
+paddle-force, or gameplay authority. All five production identities report live material
+response, a visible shoulder silhouette, 1,075 authored vertices per sleeve, and maximum
+shoulder-anchor error of `1.3605050241949357e-7` cm.
+
+The Unreal 5.8 editor target builds, the isolated material authoring audit completes, all 16
+focused source/review contracts pass, the five-identity roster capture completes, and the
+renderer-enabled M5 gate passes 1/1 with zero warnings and zero errors. Compared with V2,
+front, profile, and rear views show visible garment breakup and less hard-plastic gloss.
+
+This remains a fail-closed technical candidate, not final character art. The folds are still
+regular and exaggerated, the torso and cuff transitions remain abrupt, and the overlay lacks
+production skinning, compression deformation, authored seam construction, and identity-specific
+tailoring. No named character-art reviewer or qualified whitewater guide has approved it.
+Photoreal acceptance and promotion therefore remain false. Exact source, material, roster,
+capture, and M5 hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json`.
+
 ### Opaque profile hips V1 technical candidate
 
 The character profile exposed the turntable background between the retained seated pelvis
