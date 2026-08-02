@@ -1,6 +1,6 @@
 # Zambezi reference map and scenario
 
-> Runtime status, August 1, 2026: the complete reference Free Run is one of the
+> Runtime status, August 2, 2026: the complete reference Free Run is one of the
 > six runnable rivers, is selectable from the player-facing Free Run catalog,
 > and is versioned at `/Game/RaftSim/Maps/L_Zambezi`.
 > Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
@@ -51,6 +51,10 @@ package is versioned and listed in `DefaultGame.ini`'s shipping cook list, so a
 fresh checkout contains a directly runnable Zambezi map. The Mac and Windows
 packaging scripts retain a deterministic fail-closed regeneration fallback if
 the package is missing before cooking.
+The M6 progression migration test and the Python shipping-contract test both
+require the player-facing `zambezi_reference_run` selector to resolve to this
+shipping package; the former ignored
+`L_ZambeziBatokaGorge_PhysicalCorridorCandidate` path is explicitly rejected.
 The map contains 25 editor-only rapid marker actors, a player raft and start,
 the vertical-slice game mode, and a live-water runtime configuration. Rapid 9
 is tagged as a mandatory commercial portage. Gameplay hides the labels; the

@@ -231,3 +231,7 @@ and external acceptance gates pass.
   upright five-person raft, and zero swimmers. This is runtime delivery
   acceptance only; bathymetry, rapid-specific hydraulics, terrain/ecology art,
   guide/geospatial review, and performance promotion remain open.
+- The player-facing catalog, M6 progression regression test, Python shipping
+  contract, and cook list now all require `/Game/RaftSim/Maps/L_Zambezi`; the
+  old ignored Landscape-candidate preview path is no longer accepted as a
+  runnable destination.

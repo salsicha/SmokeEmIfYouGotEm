@@ -317,6 +317,16 @@ def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contract
     assert 'TEXT("Runnable Reference Free Run:' in frontend_source
     assert 'TEXT("/Game/RaftSim/Maps/L_Zambezi")' in frontend_source
 
+    progression_test_source = (
+        REPO_ROOT
+        / "unreal/Source/SmokeEmIfYouGotEm/Tests/RaftSimM6GameProgressionTest.cpp"
+    ).read_text(encoding="utf-8")
+    assert 'FindScenario(TEXT("zambezi_reference_run")' in progression_test_source
+    assert 'FName(TEXT("/Game/RaftSim/Maps/L_Zambezi"))' in progression_test_source
+    assert "L_ZambeziBatokaGorge_PhysicalCorridorCandidate" not in (
+        progression_test_source
+    )
+
     module_header = (
         REPO_ROOT
         / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Public/RaftSimEditorModule.h"

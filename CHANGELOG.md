@@ -32,6 +32,11 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Repaired the Zambezi runnable-map regression guard so the player-facing
+  `zambezi_reference_run` catalog entry, M6 progression test, Python shipping
+  contract, and cook configuration all resolve to the committed
+  `/Game/RaftSim/Maps/L_Zambezi` package instead of the former ignored preview
+  candidate.
 - Gave runnable Colorado Hance an isolated four-scale Default Lit canyon
   surface and Colorado-only opaque Default Lit capture-water parent. The new
   shade graph adds sandy-bench, weathered-rock, dark-basement-rock, iron-cliff,
