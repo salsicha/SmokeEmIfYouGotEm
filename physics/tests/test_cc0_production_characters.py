@@ -211,6 +211,10 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
         / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
         "RaftSimCC0CrewVisualActor.cpp"
     ).read_text(encoding="utf-8")
+    capture = (
+        REPO_ROOT
+        / "unreal/Scripts/capture_cc0_production_roster.py"
+    ).read_text(encoding="utf-8")
     automation = (
         REPO_ROOT
         / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
@@ -289,6 +293,13 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "ThighExtentCm.X >= 7.2f" in host
     assert "ThighExtentCm.Y >= 7.2f" in host
     assert "ThighExtentCm.Z >= 15.5f" in host
+    assert "HasExclusiveCC0BodyOwnership() const" in host
+    assert "ActivateCC0FallbackForValidation()" in host
+    assert "const bool bCompleteCC0Body" in host
+    assert "const bool bBodyGapOverlay = !bCompleteCC0Body" in host
+    assert "bSafetyGearOrPaddleOverlay || bBodyGapOverlay" in host
+    assert "actor.activate_cc0_fallback_for_validation()" in capture
+    assert "runtime_exclusive_cc0_body_ownership" in capture
     assert "BuildUnitSeatedPelvisMesh(" in host
     assert "full waist-to-glute-to-thigh bridge" in host
     assert "kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f)" in host
@@ -316,6 +327,8 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     ).read_text(encoding="utf-8")
     assert 'TEXT("Manny fallback is absent with packaged CC0 bodies")' in automation
     assert 'TEXT("five rigged crew bodies spawned")' in automation
+    assert 'TEXT("RaftSimForceCC0Review")' in automation
+    assert "It->HasExclusiveCC0BodyOwnership()" in automation
     assert "It->GetProceduralBodyPartCount() >= 28" in automation
     assert "It->HasVisibleShoulderSilhouette()" in automation
     assert "ShoulderSleeveVertexCount >= 1000" in automation

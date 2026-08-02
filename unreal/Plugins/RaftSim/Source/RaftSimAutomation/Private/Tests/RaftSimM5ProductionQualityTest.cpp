@@ -980,8 +980,23 @@ bool FRaftSimM5StartRescueCommand::Update()
     TSet<FString> BodyProfiles;
     TSet<FString> SkinTones;
     int32 RiggedBodyCount = 0;
+    const bool bForceCC0Review =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimForceCC0Review"));
+    if (bForceCC0Review)
+    {
+        for (TActorIterator<ARaftSimCrewAvatarActor> It(GetM5GameWorld()); It; ++It)
+        {
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s activates the packaged CC0 validation path"),
+                    *It->GetName()),
+                It->ActivateCC0FallbackForValidation());
+        }
+    }
     const bool bAssembledMetaHumanRoster =
         ARaftSimMetaHumanCrewVisualActor::AreAllProductionCharactersAvailable();
+    const bool bExpectCC0Roster =
+        bForceCC0Review || !bAssembledMetaHumanRoster;
     int32 CC0BodyCount = 0;
     for (TActorIterator<ARaftSimCC0CrewVisualActor> It(GetM5GameWorld()); It; ++It)
     {
@@ -1000,7 +1015,7 @@ bool FRaftSimM5StartRescueCommand::Update()
     Test->TestEqual(
         TEXT("CC0 roster is used exactly when assembled production art is unavailable"),
         CC0BodyCount,
-        bAssembledMetaHumanRoster ? 0 : 5);
+        bExpectCC0Roster ? 5 : 0);
     int32 MetaHumanBodyCount = 0;
     for (TActorIterator<ARaftSimMetaHumanCrewVisualActor> It(GetM5GameWorld()); It; ++It)
     {
@@ -1043,7 +1058,7 @@ bool FRaftSimM5StartRescueCommand::Update()
     Test->TestEqual(
         TEXT("assembled roster is all-or-nothing"),
         MetaHumanBodyCount,
-        bAssembledMetaHumanRoster ? 5 : 0);
+        bExpectCC0Roster ? 0 : 5);
     int32 MannyBodyCount = 0;
     for (TActorIterator<ARaftSimMannyCrewVisualActor> It(GetM5GameWorld()); It; ++It)
     {
@@ -1119,7 +1134,15 @@ bool FRaftSimM5StartRescueCommand::Update()
         Test->TestFalse(
             FString::Printf(TEXT("avatar %s exposes a deterministic production class slot"), *It->GetName()),
             It->GetProductionVisualClassPath().IsEmpty());
-        if (Cast<ARaftSimMetaHumanCrewVisualActor>(It->GetProductionVisualActor()))
+        if (Cast<ARaftSimCC0CrewVisualActor>(It->GetProductionVisualActor()))
+        {
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s gives its complete CC0 mesh exclusive body ownership"),
+                    *It->GetName()),
+                It->HasExclusiveCC0BodyOwnership());
+        }
+        else if (Cast<ARaftSimMetaHumanCrewVisualActor>(It->GetProductionVisualActor()))
         {
             const float HelmetHeadErrorCm =
                 It->GetProductionHelmetHeadErrorCm();

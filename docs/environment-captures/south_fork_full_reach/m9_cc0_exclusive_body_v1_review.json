@@ -1,0 +1,128 @@
+{
+  "schema": "raftsim.m9.cc0_exclusive_body_review.v1",
+  "reviewed_utc": "2026-08-02T17:50:00Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_photoreal_character_art_rejected",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_cc0_production_character_fallback_v287_review.json",
+  "summary": "The packaged CC0 fallback already supplies a complete rigged wetsuit body, but the gameplay host previously drew MetaHuman-specific torso, pelvis, thigh, shoulder-sleeve, and neck gap-fill shells over it. Exclusive Body V1 resolves adapter visibility after the CC0 mesh is configured and gives that complete body sole ownership of visible anatomy while retaining the production PFD, helmet, boots, and paddle. This removes the duplicated hip, waist, thigh, knee, and shoulder volumes from all five fallback identities without changing the MetaHuman path or gameplay authority.",
+  "root_cause": {
+    "adapter_mismatch": "SetProceduralVisualVisible(false) used one body-overlay policy for both the cropped MetaHuman adapter and the complete MakeHuman/MPFB CC0 adapter.",
+    "initialization_order": "The direct CC0 fallback could evaluate overlay visibility before EnsureBodyLoaded established that the skeletal body was complete.",
+    "retained_boundary": "CC0 owns its full visible body; host-owned production safety gear and paddle remain visible; MetaHuman-specific gap-fill geometry remains available only to the MetaHuman path."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "exclusive_cc0_body_count": 5,
+    "suppressed_redundant_overlays": [
+      "Pelvis",
+      "Torso",
+      "LeftThigh",
+      "RightThigh",
+      "LeftShoulderSleeve",
+      "RightShoulderSleeve",
+      "Neck"
+    ],
+    "retained_host_layers": [
+      "production rescue PFD",
+      "production whitewater helmet",
+      "two production river boots",
+      "modeled paddle shaft, blade, and T-grip"
+    ],
+    "direct_fallback_visibility_resolved_after_configuration": true,
+    "metahuman_gap_fill_policy_changed": false,
+    "animation_targets_changed": false,
+    "crew_mass_changed": false,
+    "collision_changed": false,
+    "raft_changed": false,
+    "water_changed": false,
+    "rescue_changed": false,
+    "physics_or_gameplay_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_roster_capture.json",
+    "report_sha256": "4b27e23d89167c3c685a2685d2e359246afb1dbb4b943002f2ca1f98bd88725d",
+    "captured_character_count": 5,
+    "characters_with_exclusive_cc0_body_ownership": 5,
+    "characters_with_finite_pose": 5,
+    "characters_with_production_pfd": 5,
+    "characters_with_production_helmet": 5,
+    "characters_with_production_boots": 5,
+    "renderer_views": 15
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_guide_full.png",
+      "capture_sha256": "a151da7518273acb1a2c86913ed41ccb017911430cd99a10217cddba507dc99f"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_guide_profile.png",
+      "capture_sha256": "15cdc4b0dde6f7ac1a27dcf2c7ccd2c8d3ed434c49744dd49688d41a6ce61754"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_guide_rear.png",
+      "capture_sha256": "c1e34d862548cc66716990e621367528a04b060be1ea4cf68518c2028306baab"
+    },
+    "crew03_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_crew03_full.png",
+      "capture_sha256": "a5cfac885c86ea6f325b244a8394d84d4b2c4804c778008d2f63c6f9efcc4b8c"
+    },
+    "crew03_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_crew03_profile.png",
+      "capture_sha256": "bc08218c65a605017f872e321a9caa734217c58d900d1ff8c9d15be2e3c22092"
+    },
+    "crew03_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_crew03_rear.png",
+      "capture_sha256": "2e91e64d450d1cd7447529b27e4dec52dcc25596c68a008617d24d16559ff150"
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: all five packaged CC0 identities render one continuous rigged body with redundant host anatomy hidden and production safety gear retained",
+    "photoreal_verdict": "fail: head/hair/helmet integration, guide facial exposure, open hand-to-paddle contact, PFD surfacing, tailoring, deformation, and identity-specific wet response remain visibly synthetic"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "771d0f799030ffe961d0ecf2b316a9fdb5a1cfc45710760be648f2d9f5558d89",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "40b5fdeb94fdc93ae322c82ad728c306c37140b97b426593431962a9e3d122fe",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "c8114a63ada77ce276647eb0d3ba4b06175f86c4337cb4be9f99ab7b70bd3b48",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "1397f655761127238c263e898cfcc88f3f937dfc60424a590933f2ce83b9aed7",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "28e2da76c33f4300969600f0046ccbab826e6c6b657e415d4f93ec34c3d6dd51",
+    "unreal/Scripts/capture_cc0_production_roster.py": "c9dae90d4fbe1121fcfe754ea2ef4d393b2b35edc7a0a95e869f32d220fb5d6b",
+    "physics/tests/test_cc0_production_characters.py": "b85e746fe487521852b57936d7b8fc385beec2aab526bd6c0bbb370b63c35d29"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "16/16 production-character and safety-gear source, artifact, and fail-closed review contracts passed after provenance hashes were refreshed",
+    "renderer_turntable": "5/5 identities and 15/15 front, profile, and rear PNGs captured",
+    "m5": "1/1 RuntimeRescueLoop passed with the forced CC0 roster under Metal SM6; one existing r.MotionVectorSimulation warning, zero errors",
+    "m5_report": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_m5.json",
+    "m5_report_sha256": "98e01cf70a4a3753b337c5011b9ebe7c4d7fd19f661cbfa4e218570d19f8cb47"
+  },
+  "accepted": [
+    "The complete CC0 skeletal mesh now owns the fallback waist, hips, thighs, knees, torso, shoulders, and neck without duplicate procedural anatomy.",
+    "All five fallback identities pass the explicit exclusive-body runtime contract while retaining production PFD, helmet, boots, paddle, finite transforms, and the existing deterministic pose solve.",
+    "The direct no-MetaHuman fallback resolves visibility only after its skeletal mesh has configured successfully.",
+    "The MetaHuman presentation path and all animation, mass, collision, raft, water, rescue, and gameplay-force authority remain unchanged."
+  ],
+  "rejected_or_open": [
+    "A contact-constrained CC0 finger experiment was rejected because it stretched the skinned fingers into wire-like loops even though its numeric joint-distance metric passed.",
+    "A generic local-axis finger curl was rejected because imported hand bases differ across identities and visibly exploded the guide hand.",
+    "The retained CC0 hands remain open and do not yet demonstrate a safe, convincing shaft and T-grip grasp.",
+    "The guide head, hair, and helmet remain poorly integrated at turntable distance, and the fallback face/skin exposure is not final character art.",
+    "The production PFD and helmet remain visibly procedural and the full roster remains below the requested photoreal bar.",
+    "No named character-art reviewer or qualified whitewater guide has approved these captures."
+  ],
+  "open_gates": [
+    "Build identity-aware CC0 hand retargeting from each source rig's actual palm and digit bases, then obtain named character-art and guide review of paddle contact in motion.",
+    "Calibrate CC0 head, hair, and helmet fit from rendered skull bounds and obtain named character-art approval.",
+    "Replace or externally approve the remaining fallback face, PFD, helmet, boot, material, tailoring, and deformation presentation.",
+    "M9 remains blocked by the wider human, platform, signing, media, clean-build, performance, and promotion gates."
+  ]
+}

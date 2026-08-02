@@ -1,0 +1,199 @@
+{
+  "capture_resolution": [
+    1536,
+    1024
+  ],
+  "captured_character_count": 5,
+  "characters": [
+    {
+      "bounds_extent_cm": [
+        48.81001973172062,
+        52.5297122858271,
+        78.32501373934602
+      ],
+      "bounds_origin_cm": [
+        31.810019731720622,
+        20.739327475443122,
+        38.1172065609279
+      ],
+      "captures": {
+        "full": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_full.png",
+          "sha256": "a151da7518273acb1a2c86913ed41ccb017911430cd99a10217cddba507dc99f"
+        },
+        "profile": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_profile.png",
+          "sha256": "15cdc4b0dde6f7ac1a27dcf2c7ccd2c8d3ed434c49744dd49688d41a6ce61754"
+        },
+        "rear": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_rear.png",
+          "sha256": "c1e34d862548cc66716990e621367528a04b060be1ea4cf68518c2028306baab"
+        }
+      },
+      "guide": true,
+      "name": "RaftSim_CC0_Guide",
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_finite_pose": true,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Guide.SK_RaftSim_CC0_Guide",
+      "status": "captured",
+      "variant_index": 0
+    },
+    {
+      "bounds_extent_cm": [
+        48.81001973172062,
+        52.5297122858271,
+        78.33721892285203
+      ],
+      "bounds_origin_cm": [
+        31.810019731720622,
+        20.739327475443122,
+        38.12941174443391
+      ],
+      "captures": {
+        "full": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_full.png",
+          "sha256": "d120a5b59d87af98a09c57d54a9c02a3ed0963e20259c3737b79e154b95511c6"
+        },
+        "profile": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_profile.png",
+          "sha256": "8262bb57c6aa5e6af3fe027f0a2284ff3c5257bc676bb40240ed61ebfaa9850d"
+        },
+        "rear": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_rear.png",
+          "sha256": "f1e40f2e433af950b7551c91b48a28d225e8dd573f0693d696ea87822cade498"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew01",
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_finite_pose": true,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew01.SK_RaftSim_CC0_Crew01",
+      "status": "captured",
+      "variant_index": 0
+    },
+    {
+      "bounds_extent_cm": [
+        48.3350196184718,
+        52.33596676246455,
+        78.26112409999703
+      ],
+      "bounds_origin_cm": [
+        32.28501984496945,
+        20.933072998805663,
+        38.05331692157891
+      ],
+      "captures": {
+        "full": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_full.png",
+          "sha256": "0068b5f963d3cc0c37ce5914e1ce005623826a1a530aab9373be2f7b768c2d8b"
+        },
+        "profile": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_profile.png",
+          "sha256": "d0adc1c9082b2840311eb618e2a72b3c2c2c045500113707cae42850ba6e371f"
+        },
+        "rear": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_rear.png",
+          "sha256": "90cf446a6b241de34cc54e00268edd43c2b6aacb3536752ae16676336b490bbf"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew02",
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_finite_pose": true,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew02.SK_RaftSim_CC0_Crew02",
+      "status": "captured",
+      "variant_index": 1
+    },
+    {
+      "bounds_extent_cm": [
+        49.28501927872532,
+        52.70808345164069,
+        78.48039085431432
+      ],
+      "bounds_origin_cm": [
+        31.335020184715923,
+        20.560956309629532,
+        38.2725836758962
+      ],
+      "captures": {
+        "full": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_full.png",
+          "sha256": "a5cfac885c86ea6f325b244a8394d84d4b2c4804c778008d2f63c6f9efcc4b8c"
+        },
+        "profile": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_profile.png",
+          "sha256": "bc08218c65a605017f872e321a9caa734217c58d900d1ff8c9d15be2e3c22092"
+        },
+        "rear": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_rear.png",
+          "sha256": "2e91e64d450d1cd7447529b27e4dec52dcc25596c68a008617d24d16559ff150"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew03",
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_finite_pose": true,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew03.SK_RaftSim_CC0_Crew03",
+      "status": "captured",
+      "variant_index": 2
+    },
+    {
+      "bounds_extent_cm": [
+        48.62001991291874,
+        52.529117173076855,
+        78.07701896842812
+      ],
+      "bounds_origin_cm": [
+        32.0000195505225,
+        20.73992258819336,
+        37.86921179001
+      ],
+      "captures": {
+        "full": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_full.png",
+          "sha256": "ffbe05bfd0a8d5340248d30edd0f1dc1172c8e595237b2d6d8f9bf3768cca308"
+        },
+        "profile": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_profile.png",
+          "sha256": "1163b40fd87a1954154fd7666be36236e95088ff687f2c239d73364db93da9a0"
+        },
+        "rear": {
+          "path": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_rear.png",
+          "sha256": "745facc80d1ec44accaf23d140ac0ee4aeaf7f483dc8aa791649d18a9f926d31"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew04",
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_finite_pose": true,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew04.SK_RaftSim_CC0_Crew04",
+      "status": "captured",
+      "variant_index": 3
+    }
+  ],
+  "exclusive_body_count": 5,
+  "schema": "raftsim.cc0.exclusive_body_capture.v1",
+  "script": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Scripts/capture_cc0_production_roster.py",
+  "script_sha256": "c9dae90d4fbe1121fcfe754ea2ef4d393b2b35edc7a0a95e869f32d220fb5d6b",
+  "status": "capture_complete"
+}

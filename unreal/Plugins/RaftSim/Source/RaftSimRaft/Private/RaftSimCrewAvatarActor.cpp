@@ -2023,7 +2023,6 @@ void ARaftSimCrewAvatarActor::TryActivateProductionVisual()
 
     bUsingProductionVisual = true;
     ProductionVisual->SetVisibility(true, true);
-    SetProceduralVisualVisible(false);
     IRaftSimCrewProductionVisual::Execute_ConfigureCrewAppearance(
         VisualActor,
         VariantIndex,
@@ -2044,6 +2043,10 @@ void ARaftSimCrewAvatarActor::TryActivateProductionVisual()
         SetProceduralVisualVisible(true);
         return;
     }
+    // Adapter-owned visibility can only be resolved after configuration. In
+    // particular, the direct CC0 fallback path does not report a complete body
+    // until its packaged skeletal mesh has loaded and accepted the pose buffer.
+    SetProceduralVisualVisible(false);
     DispatchProductionPose();
     AlignProductionHeadgearToSolvedHead();
 }
@@ -2090,6 +2093,54 @@ bool ARaftSimCrewAvatarActor::TryActivateCC0FallbackVisual()
     return true;
 }
 
+bool ARaftSimCrewAvatarActor::ActivateCC0FallbackForValidation()
+{
+    if (!ProductionVisual)
+    {
+        return false;
+    }
+    bUsingProductionVisual = false;
+    ProductionVisual->SetChildActorClass(nullptr);
+    if (!TryActivateCC0FallbackVisual())
+    {
+        ProductionVisual->SetVisibility(false, true);
+        SetProceduralVisualVisible(true);
+        return false;
+    }
+    DispatchProductionPose();
+    AlignProductionHeadgearToSolvedHead();
+    return HasExclusiveCC0BodyOwnership();
+}
+
+bool ARaftSimCrewAvatarActor::HasExclusiveCC0BodyOwnership() const
+{
+    const ARaftSimCC0CrewVisualActor* CC0Visual =
+        Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor());
+    if (!bUsingProductionVisual || !CC0Visual || !CC0Visual->IsBodyReady())
+    {
+        return false;
+    }
+    const UProceduralMeshComponent* RedundantBodyOverlays[] = {
+        Pelvis,
+        Torso,
+        LeftThigh,
+        RightThigh,
+        LeftShoulderSleeve,
+        RightShoulderSleeve,
+        Neck};
+    for (const UProceduralMeshComponent* Overlay : RedundantBodyOverlays)
+    {
+        if (!Overlay || Overlay->IsVisible())
+        {
+            return false;
+        }
+    }
+    return HasProductionWhitewaterPfd() && ProductionPfd->IsVisible() &&
+        HasProductionWhitewaterHelmet() && ProductionHelmet->IsVisible() &&
+        HasProductionRiverBoots() && ProductionLeftBoot->IsVisible() &&
+        ProductionRightBoot->IsVisible();
+}
+
 void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
 {
     if (!bVisible && Neck)
@@ -2104,26 +2155,33 @@ void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
     const bool bHasProductionHelmet = HasProductionWhitewaterHelmet();
     const bool bHasProductionPfd = HasProductionWhitewaterPfd();
     const bool bHasProductionBoots = HasProductionRiverBoots();
+    const ARaftSimCC0CrewVisualActor* CC0Visual =
+        Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor());
+    const bool bCompleteCC0Body =
+        !bVisible && CC0Visual && CC0Visual->IsBodyReady();
     for (UProceduralMeshComponent* Part : BodyParts)
     {
         if (Part)
         {
-            // The MetaHuman body now owns the single fitted wetsuit layer.
-            // Keep only pose-matched rafting overlays that are not reliably
-            // preserved by the assembled body. The pelvis is intentionally
-            // retained with both opaque thigh roots: hiding those roots made
-            // the shell terminate above the assembled legs and exposed the
-            // background through the hip junction in profile.
-            const bool bProductionOverlay =
+            // The MetaHuman adapter still needs bounded pose-matched gap-fill
+            // overlays around its cropped assembled body. The packaged CC0
+            // adapter supplies a complete rigged body, so drawing those same
+            // torso, pelvis, thigh, shoulder, and neck shells over it creates
+            // duplicated anatomy. In that path retain only safety gear and
+            // the paddle; the CC0 mesh owns the visible body continuously.
+            const bool bSafetyGearOrPaddleOverlay =
                 Part == Pfd || Part == PfdRearWebbing || Part == PfdBelt ||
                 Part == PfdBuckle || Part == Helmet ||
                 Part == HelmetRim || Part == HelmetRetention ||
-                Part == Pelvis || Part == Torso ||
-                Part == LeftThigh || Part == RightThigh ||
-                Part == LeftShoulderSleeve || Part == RightShoulderSleeve ||
-                Part == Neck ||
                 Part == LeftBoot || Part == RightBoot ||
                 Part == PaddleShaft || Part == PaddleBlade || Part == PaddleGrip;
+            const bool bBodyGapOverlay = !bCompleteCC0Body &&
+                (Part == Pelvis || Part == Torso ||
+                 Part == LeftThigh || Part == RightThigh ||
+                 Part == LeftShoulderSleeve || Part == RightShoulderSleeve ||
+                 Part == Neck);
+            const bool bProductionOverlay =
+                bSafetyGearOrPaddleOverlay || bBodyGapOverlay;
             const bool bReplacedHelmetLayer = bHasProductionHelmet &&
                 (Part == Helmet || Part == HelmetRim || Part == HelmetRetention);
             const bool bReplacedPfdLayer = bHasProductionPfd &&

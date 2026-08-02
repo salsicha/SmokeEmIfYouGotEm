@@ -1,0 +1,300 @@
+"""Render the packaged CC0 fallback with exclusive full-body ownership.
+
+The primary assembled-character turntable cannot prove the shipping fallback
+because it deliberately selects the MetaHuman adapter when that roster is
+installed. This capture forces the public validation path on the ordinary
+gameplay host, then records the guide and four crew identities from front,
+profile, and rear. Safety gear and the paddle remain host-owned; redundant
+procedural anatomy must be hidden behind the complete CC0 body.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from pathlib import Path
+import traceback
+
+import unreal
+
+
+SCHEMA = "raftsim.cc0.exclusive_body_capture.v1"
+CHARACTER_NAMES = (
+    "RaftSim_CC0_Guide",
+    "RaftSim_CC0_Crew01",
+    "RaftSim_CC0_Crew02",
+    "RaftSim_CC0_Crew03",
+    "RaftSim_CC0_Crew04",
+)
+HOST_CLASS = "/Script/RaftSimRaft.RaftSimCrewAvatarActor"
+CC0_CLASS = "/Script/RaftSimRaft.RaftSimCC0CrewVisualActor"
+OUTPUT_ROOT = (
+    Path(unreal.Paths.project_saved_dir())
+    / "RaftSimValidation"
+    / "m9"
+    / "cc0-exclusive-body-captures"
+)
+REPORT_PATH = OUTPUT_ROOT.parent / "cc0-exclusive-body-captures.json"
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def write_report(report: dict[str, object]) -> None:
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text(
+        json.dumps(report, indent=2, sort_keys=True), encoding="utf-8"
+    )
+
+
+def spawn(actor_class, location: unreal.Vector, rotation=unreal.Rotator()):
+    actor = unreal.EditorLevelLibrary.spawn_actor_from_class(
+        actor_class, location, rotation
+    )
+    if actor is None:
+        raise RuntimeError(f"Failed to spawn {actor_class}")
+    return actor
+
+
+def look_at(location: unreal.Vector, target: unreal.Vector) -> unreal.Rotator:
+    return unreal.MathLibrary.find_look_at_rotation(location, target)
+
+
+def vector_values(vector: unreal.Vector) -> list[float]:
+    return [float(vector.x), float(vector.y), float(vector.z)]
+
+
+def finite_vector(vector: unreal.Vector) -> bool:
+    return all(abs(value) < 1.0e8 for value in vector_values(vector))
+
+
+def configure_rect_light(
+    location: unreal.Vector,
+    target: unreal.Vector,
+    intensity: float,
+    width: float,
+    height: float,
+    color: unreal.Color,
+):
+    actor = spawn(unreal.RectLight, location, look_at(location, target))
+    component = actor.get_component_by_class(unreal.RectLightComponent)
+    component.set_editor_property("intensity", intensity)
+    component.set_editor_property("source_width", width)
+    component.set_editor_property("source_height", height)
+    component.set_editor_property("light_color", color)
+    component.set_editor_property("cast_shadows", False)
+    return actor
+
+
+def export_capture(world, component, render_target, name: str) -> Path:
+    component.capture_scene()
+    unreal.AutomationLibrary.finish_loading_before_screenshot()
+    unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+    component.capture_scene()
+    unreal.RenderingLibrary.export_render_target(
+        world, render_target, str(OUTPUT_ROOT), f"{name}.png"
+    )
+    path = OUTPUT_ROOT / f"{name}.png"
+    if not path.is_file() or path.stat().st_size <= 0:
+        raise RuntimeError(f"Renderer produced no valid capture: {path}")
+    return path
+
+
+def main() -> None:
+    script_path = Path(__file__).resolve()
+    report: dict[str, object] = {
+        "schema": SCHEMA,
+        "status": "starting",
+        "script": str(script_path),
+        "script_sha256": sha256(script_path),
+        "capture_resolution": [1536, 1024],
+        "characters": [],
+    }
+    write_report(report)
+    try:
+        OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
+        host_class = unreal.load_class(None, HOST_CLASS)
+        cc0_class = unreal.load_class(None, CC0_CLASS)
+        if host_class is None or cc0_class is None:
+            raise RuntimeError("Gameplay host or packaged CC0 adapter class is missing")
+        unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+        world = unreal.EditorLevelLibrary.get_editor_world()
+        if world is None:
+            raise RuntimeError("No editor world is available for CC0 capture")
+
+        floor_actor = spawn(unreal.StaticMeshActor, unreal.Vector(0.0, 0.0, -1.0))
+        floor_actor.static_mesh_component.set_static_mesh(
+            unreal.load_asset("/Engine/BasicShapes/Plane.Plane")
+        )
+        floor_actor.set_actor_scale3d(unreal.Vector(5.0, 5.0, 5.0))
+
+        target = unreal.Vector(0.0, 0.0, 100.0)
+        configure_rect_light(
+            unreal.Vector(180.0, 240.0, 235.0),
+            target,
+            150.0,
+            165.0,
+            165.0,
+            unreal.Color(255, 239, 222, 255),
+        )
+        configure_rect_light(
+            unreal.Vector(-180.0, 175.0, 165.0),
+            target,
+            85.0,
+            220.0,
+            220.0,
+            unreal.Color(205, 224, 255, 255),
+        )
+        configure_rect_light(
+            unreal.Vector(75.0, -165.0, 215.0),
+            unreal.Vector(0.0, 0.0, 135.0),
+            80.0,
+            100.0,
+            100.0,
+            unreal.Color(186, 211, 255, 255),
+        )
+        sky = spawn(unreal.SkyLight, unreal.Vector())
+        sky_component = sky.get_component_by_class(unreal.SkyLightComponent)
+        sky_component.set_editor_property("intensity", 0.25)
+        sky_component.recapture_sky()
+
+        capture = spawn(unreal.SceneCapture2D, unreal.Vector())
+        capture_component = capture.capture_component2d
+        capture_component.set_editor_property("fov_angle", 36.0)
+        capture_component.set_editor_property(
+            "capture_source", unreal.SceneCaptureSource.SCS_FINAL_COLOR_LDR
+        )
+        capture_component.set_editor_property("capture_every_frame", False)
+        capture_component.set_editor_property("capture_on_movement", False)
+        render_target = unreal.RenderingLibrary.create_render_target2d(
+            world,
+            1536,
+            1024,
+            unreal.TextureRenderTargetFormat.RTF_RGBA8,
+            unreal.LinearColor(0.018, 0.022, 0.028, 1.0),
+            False,
+        )
+        capture_component.set_editor_property("texture_target", render_target)
+
+        unreal.SystemLibrary.execute_console_command(world, "r.EyeAdaptationQuality 0")
+        unreal.SystemLibrary.execute_console_command(world, "r.ExposureOffset -0.55")
+        unreal.SystemLibrary.execute_console_command(world, "r.ScreenPercentage 100")
+        unreal.SystemLibrary.execute_console_command(world, "r.SkeletalMeshLODBias 0")
+        unreal.SystemLibrary.execute_console_command(world, "r.VolumetricCloud 0")
+        unreal.SystemLibrary.execute_console_command(world, "r.Lumen.GlobalIllumination 0")
+        unreal.SystemLibrary.execute_console_command(world, "r.Lumen.Reflections 0")
+        unreal.SystemLibrary.execute_console_command(world, "r.SSR.Quality 0")
+        unreal.SystemLibrary.execute_console_command(world, "r.PostProcessAAQuality 2")
+
+        for roster_index, character_name in enumerate(CHARACTER_NAMES):
+            is_guide = roster_index == 0
+            variant_index = max(roster_index - 1, 0)
+            actor = spawn(host_class, unreal.Vector())
+            actor.initialize_avatar_visual()
+            actor.configure_appearance(variant_index, 0, is_guide)
+            if not actor.activate_cc0_fallback_for_validation():
+                raise RuntimeError(
+                    f"{character_name} could not activate the packaged CC0 fallback"
+                )
+            actor.set_avatar_action(
+                unreal.RaftSimCrewAvatarAction.SEATED_IDLE, 1.0
+            )
+            visual_actor = actor.get_production_visual_actor()
+            if visual_actor is None or visual_actor.get_class() != cc0_class:
+                raise RuntimeError(
+                    f"Gameplay host did not select CC0 adapter: {character_name}"
+                )
+            if (
+                not actor.is_using_production_visual()
+                or not actor.has_exclusive_cc0_body_ownership()
+                or not actor.has_layered_commercial_safety_gear()
+                or not actor.has_production_whitewater_helmet()
+                or not actor.has_production_whitewater_pfd()
+                or not actor.has_production_river_boots()
+                or not actor.has_fitted_upright_production_river_boots()
+                or not actor.has_commercial_paddle_silhouette()
+                or not actor.has_finite_visual_transforms()
+                or not visual_actor.is_body_ready()
+                or not visual_actor.has_finite_pose()
+            ):
+                raise RuntimeError(
+                    f"Incomplete exclusive CC0 presentation: {character_name}"
+                )
+
+            unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+            origin, extent = actor.get_actor_bounds(False, False)
+            if not finite_vector(origin) or not finite_vector(extent) or extent.z < 45.0:
+                raise RuntimeError(
+                    f"Invalid CC0 bounds for {character_name}: {origin}, {extent}"
+                )
+            stem = character_name.lower()
+            target_point = unreal.Vector(origin.x, origin.y, 92.0)
+            views = {
+                "full": unreal.Vector(origin.x + 430.0, origin.y, 104.0),
+                "profile": unreal.Vector(origin.x, origin.y + 430.0, 104.0),
+                "rear": unreal.Vector(origin.x - 430.0, origin.y, 104.0),
+            }
+            captures: dict[str, object] = {}
+            for view_name, location in views.items():
+                capture.set_actor_location(location, False, False)
+                capture.set_actor_rotation(look_at(location, target_point), False)
+                path = export_capture(
+                    world, capture_component, render_target, f"{stem}_{view_name}"
+                )
+                captures[view_name] = {
+                    "path": str(path),
+                    "sha256": sha256(path),
+                }
+
+            report["characters"].append(
+                {
+                    "name": character_name,
+                    "guide": is_guide,
+                    "variant_index": variant_index,
+                    "selected_mesh": visual_actor.get_selected_mesh_path(),
+                    "runtime_exclusive_cc0_body_ownership": (
+                        actor.has_exclusive_cc0_body_ownership()
+                    ),
+                    "runtime_body_ready": visual_actor.is_body_ready(),
+                    "runtime_finite_pose": visual_actor.has_finite_pose(),
+                    "runtime_production_pfd": (
+                        actor.has_production_whitewater_pfd()
+                    ),
+                    "runtime_production_helmet": (
+                        actor.has_production_whitewater_helmet()
+                    ),
+                    "runtime_production_boots": actor.has_production_river_boots(),
+                    "bounds_origin_cm": vector_values(origin),
+                    "bounds_extent_cm": vector_values(extent),
+                    "captures": captures,
+                    "status": "captured",
+                }
+            )
+            write_report(report)
+            unreal.EditorLevelLibrary.destroy_actor(actor)
+
+        report["captured_character_count"] = len(report["characters"])
+        report["exclusive_body_count"] = sum(
+            1
+            for character in report["characters"]
+            if character["runtime_exclusive_cc0_body_ownership"]
+        )
+        report["status"] = "capture_complete"
+    except Exception as error:
+        report["status"] = "error"
+        report["error_type"] = type(error).__name__
+        report["error"] = str(error)
+        report["traceback"] = traceback.format_exc()
+        unreal.log_error(f"RaftSim CC0 character capture failed: {error}")
+        raise
+    finally:
+        write_report(report)
+
+
+if __name__ == "__main__":
+    main()
