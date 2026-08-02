@@ -15,7 +15,9 @@ MANIFEST_PATH = SOURCE_ROOT / "production_whitewater_pfd_manifest.json"
 DESTINATION = "/Game/RaftSim/Equipment/Production"
 ASSET_NAME = "SM_RaftSim_WhitewaterRescuePfd"
 ASSET_PATH = f"{DESTINATION}/{ASSET_NAME}"
-REPORT_PATH = REPO_ROOT / "unreal/Saved/RaftSimValidation/m9/production-whitewater-pfd.json"
+REPORT_PATH = (
+    REPO_ROOT / "unreal/Saved/RaftSimValidation/m9/production-whitewater-pfd.json"
+)
 EXPECTED_SLOTS = [
     "PfdShell",
     "PfdWebbing",
@@ -48,16 +50,19 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
         raise RuntimeError(f"Unexpected source slots: {manifest.get('material_slots')}")
     construction = manifest.get("construction", {})
     expected_counts = {
+        "front_carrier_panels": 2,
+        "back_carrier_panels": 1,
         "front_foam_panels": 4,
         "back_panels": 2,
         "rear_flex_channels": 1,
-        "side_wings": 2,
+        "side_wings": 0,
+        "side_webbing_connectors": 6,
         "shoulder_foam_pads": 0,
         "shoulder_webbing_runs": 2,
         "front_pockets": 2,
         "front_zip": 1,
         "backup_buckles": 2,
-        "front_backup_webbing_runs": 2,
+        "front_backup_webbing_runs": 4,
         "adjustment_points": 8,
         "quick_release_rescue_belts": 1,
         "rescue_tether_rings": 1,
@@ -67,7 +72,9 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
     }
     for field, expected in expected_counts.items():
         if construction.get(field) != expected:
-            raise RuntimeError(f"Production PFD {field} changed: {construction.get(field)}")
+            raise RuntimeError(
+                f"Production PFD {field} changed: {construction.get(field)}"
+            )
     fbx_path = REPO_ROOT / str(manifest["fbx"])
     if not fbx_path.is_file() or sha256(fbx_path) != manifest.get("fbx_sha256"):
         raise RuntimeError("Production PFD FBX is absent or stale")
@@ -82,7 +89,9 @@ def import_mesh(fbx_path: Path) -> unreal.StaticMesh:
         if settings.enabled:
             settings.enabled = False
             subsystem.set_nanite_settings(existing, settings)
-            unreal.EditorAssetLibrary.save_loaded_asset(existing, only_if_is_dirty=False)
+            unreal.EditorAssetLibrary.save_loaded_asset(
+                existing, only_if_is_dirty=False
+            )
 
     options = unreal.FbxImportUI()
     options.automated_import_should_detect_type = False
@@ -112,7 +121,9 @@ def import_mesh(fbx_path: Path) -> unreal.StaticMesh:
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
     mesh = unreal.load_asset(ASSET_PATH)
     if not isinstance(mesh, unreal.StaticMesh):
-        raise RuntimeError(f"PFD import did not produce a StaticMesh: {task.imported_object_paths}")
+        raise RuntimeError(
+            f"PFD import did not produce a StaticMesh: {task.imported_object_paths}"
+        )
     return mesh
 
 
@@ -145,21 +156,31 @@ def configure_and_audit(
         bounds.max.z - bounds.min.z,
     ]
     fallback_triangles = mesh.get_num_triangles(0)
-    if not (38.0 <= dimensions[0] <= 50.0 and 40.0 <= dimensions[1] <= 52.0 and 42.0 <= dimensions[2] <= 60.0):
-        raise RuntimeError(f"PFD import has implausible centimetre bounds: {dimensions}")
+    if not (
+        36.0 <= dimensions[0] <= 48.0
+        and 32.0 <= dimensions[1] <= 44.0
+        and 40.0 <= dimensions[2] <= 56.0
+    ):
+        raise RuntimeError(
+            f"PFD import has implausible centimetre bounds: {dimensions}"
+        )
     if not (15_000 <= source_triangles <= 80_000):
-        raise RuntimeError(f"PFD production triangle budget changed: {source_triangles}")
+        raise RuntimeError(
+            f"PFD production triangle budget changed: {source_triangles}"
+        )
     return {
         "schema_version": 1,
         "status": "production_mesh_imported",
         "asset_path": mesh.get_path_name(),
         "source_fbx_sha256": manifest["fbx_sha256"],
+        "generator_version": manifest["generator_version"],
         "ownership": manifest["ownership"],
         "dimensions_cm": [round(float(value), 4) for value in dimensions],
         "authored_lod0_triangles": source_triangles,
         "nanite_fallback_triangles": fallback_triangles,
         "nanite_enabled": subsystem.get_nanite_settings(mesh).enabled,
         "construction": manifest["construction"],
+        "soft_geometry": manifest["soft_geometry"],
         "material_slots": [
             {
                 "slot": str(slot.material_slot_name),

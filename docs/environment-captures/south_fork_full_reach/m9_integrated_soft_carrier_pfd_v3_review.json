@@ -1,0 +1,158 @@
+{
+  "artifact": "M9 integrated soft-carrier production PFD V3 review",
+  "recorded_local_date": "2026-08-01",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_torso_wrapped_pfd_v2_review.json",
+  "summary": "V3 replaces the floating-block silhouette with a fitted fabric carrier behind four thinner chest cells and two rear cells. Rigid side foam wings are removed, six fit points reuse three flat webbing connectors per side, and the rescue belt is a flat torso-following band rather than a round projected tube. Front foam depth falls from 5.2 cm in the rejected intermediate to 4.2 cm, all flotation remains below the shoulder crest, and the production roster retains exactly zero centimetres of PFD torso-origin error.",
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_pfd.py",
+    "generator_version": 10,
+    "generator_sha256": "f1ef39df073bf77710b83d6fa7e0336e026251e1cf259c06b8dc7b1991451631",
+    "importer": "unreal/Scripts/import_production_whitewater_pfd.py",
+    "importer_sha256": "e1c021599eab9a9b7342a182bd7d907d02ad8ee2a714e9b6865af5a111b1f4da",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/production_whitewater_pfd_manifest.json",
+    "manifest_sha256": "29b86301a3151a503b88932e4e85835b6afe0f9a7910fa0ca2913c412afbc9b9",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+    "fbx_sha256": "ff794fe034ee392d9526e3169d3a4ee7e76376f76956f785eec6671e830256c0",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+    "blend_sha256": "b2b6753141d6656d4650162d1716167fea9b2cb6d40a2db78447ca8a80471438",
+    "external_asset_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "uasset": "unreal/Content/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd.uasset",
+    "uasset_sha256": "f5728827f9a0d49f506806943a4cd7b8191ab134df3b743b5de51d04c9d5bbf7",
+    "dimensions_cm": [39.025, 34.52, 42.8],
+    "source_vertices": 20126,
+    "source_polygons": 21366,
+    "authored_lod0_triangles": 39448,
+    "nanite_fallback_triangles": 2667,
+    "nanite_enabled": true,
+    "material_slot_count": 5,
+    "import_report": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_import_report.json",
+    "import_report_sha256": "adc3cad2a63e8ac809fe2de080623829ac57b9898bdc737f798a52b98771d5b9",
+    "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
+  },
+  "construction": {
+    "front_carrier_panels": 2,
+    "back_carrier_panels": 1,
+    "front_foam_panels": 4,
+    "back_panels": 2,
+    "rear_flex_channels": 1,
+    "side_wings": 0,
+    "side_webbing_connectors": 6,
+    "shoulder_foam_pads": 0,
+    "shoulder_webbing_runs": 2,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 4,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1
+  },
+  "soft_geometry": {
+    "carrier_shell_thickness_cm": 0.9,
+    "front_panel_foam_thickness_cm": 4.2,
+    "front_panel_edge_roll_cm": 1.0,
+    "front_panel_crown_depth_cm": 1.25,
+    "front_panel_lateral_wrap_depth_cm": 2.4,
+    "back_panel_foam_thickness_cm": 3.2,
+    "back_panel_edge_roll_cm": 0.92,
+    "back_panel_crown_depth_cm": 1.6,
+    "back_panel_lateral_wrap_depth_cm": 3.8,
+    "rigid_side_foam_wings": 0,
+    "duplicate_tubular_side_adjustment_runs": 0,
+    "rescue_belt_profile": "flat torso-following webbing",
+    "flat_exterior_foam_faces": 0,
+    "smooth_shaded": true
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_roster_capture.json",
+    "source_report_sha256": "94b3b30a92fc479370b168de18443dfce1ab210e51d1502b5109395f48086ad5",
+    "captured_character_count": 5,
+    "characters_using_production_pfd": 5,
+    "broadest_identity": "MHC_RaftSim_Crew_03",
+    "maximum_runtime_torso_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_full.png",
+      "capture_sha256": "97d6a7a7c9fd7a8ccc0afc7829d9da1f0266393284204f4d3fa8ad1f9702ae70"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_profile.png",
+      "capture_sha256": "d5af614537802a1a6098e701d0fdef77b77cacdf869c37802df24ebd1d369d9e"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_rear.png",
+      "capture_sha256": "7b98775e8cd74f3ea2d03fa4389b66120cf7167ca5ba9922f120245ddc8c9a83"
+    },
+    "guide_pfd_dry": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_pfd_dry.png",
+      "capture_sha256": "d2e62b59a345081207bba3b83b6e77ec42519ff7006b61f447547a1615acb364"
+    },
+    "guide_pfd_wet": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_pfd_wet.png",
+      "capture_sha256": "2a0039951ae6f140fec12b2c68b3265b68c8959c1eecf8190779952a6b3e141e"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_broadest_full.png",
+      "capture_sha256": "9f4526d2e521e34ee16e65ad1f273f889ac271c197997f1fae45da0524971724"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_broadest_profile.png",
+      "capture_sha256": "5fdc8aa1372c1feba1fb18d279cb03842e20220c3bd1fcbfb4ebd2312cdb5ee7"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_broadest_rear.png",
+      "capture_sha256": "408974ff404698f363260f7832c5da49cca29f6bf2937adb71d3056960f9f3bd"
+    },
+    "technical_verdict": "pass: renderer pixels show a fitted carrier beneath thinner rounded flotation, no rigid side-wing or shoulder-pad silhouette, a flat rescue belt, and exactly three side connector bands plus that belt in profile",
+    "photoreal_verdict": "fail pending named approval or replacement of the simplified first-party fabric shader, remaining faceted foam highlights, pocket and webbing intersections, identity-specific deformation, seated pose, and neutral review lighting"
+  },
+  "implementation": {
+    "integrated_carrier_added": true,
+    "rigid_side_foam_removed": true,
+    "round_rescue_belt_replaced": true,
+    "duplicate_tubular_side_adjustment_runs_removed": true,
+    "front_panel_foam_thickness_before_cm": 5.2,
+    "front_panel_foam_thickness_after_cm": 4.2,
+    "shoulder_foam_pads_after": 0,
+    "pfd_runtime_transform_changed": false,
+    "material_assignment_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after compiling the fitted-PFD automation bounds",
+    "source_generation": "Blender 5.2 regenerated and validated the deterministic FBX, Blend file, manifest, five material slots, UV channel, 20,126 vertices, 21,366 polygons, and plausible centimetre bounds",
+    "source_import": "Unreal import succeeded with the exact FBX hash, generator version 10, 39,448 authored triangles, 2,667 Nanite fallback triangles, five material slots, and valid centimetre bounds",
+    "focused_python": "6/6 PFD source, import, safety-gear, and renderer-contract checks passed before evidence reconciliation",
+    "renderer_turntable": "5/5 identities captured with production PFD selection and exactly 0.0 cm maximum torso-origin error",
+    "m5_crew_presentation": "1/1 passed renderer-enabled",
+    "m5_report": "docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_m5.json",
+    "m5_report_sha256": "1ffc83289f08cebe03227eabf9d3c837893ba9bc2481f69465fda00dc2f40399"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false,
+    "human_approved": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the first-party PFD geometry, fabric response, hardware, webbing intersections, and identity-specific fit in motion.",
+    "A qualified whitewater safety reviewer must approve visible flotation coverage, fit adjustment, rescue belt and tether-ring depiction; this geometry review is not equipment certification.",
+    "M9 remains blocked from promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

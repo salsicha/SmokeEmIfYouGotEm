@@ -15,19 +15,15 @@ HOST_HEADER = (
     / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h"
 )
 MATERIAL_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
     "RaftSimEditorPhotorealMaterials.cpp"
 )
-HELMET_BUILD_SCRIPT = (
-    REPO_ROOT / "unreal/Scripts/build_production_whitewater_helmet.py"
-)
+HELMET_BUILD_SCRIPT = REPO_ROOT / "unreal/Scripts/build_production_whitewater_helmet.py"
 HELMET_IMPORT_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/import_production_whitewater_helmet.py"
 )
 HELMET_MANIFEST_PATH = (
-    REPO_ROOT
-    / "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/"
+    REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/"
     "production_whitewater_helmet_manifest.json"
 )
 HELMET_ASSET_PATH = (
@@ -37,13 +33,11 @@ HELMET_ASSET_PATH = (
 PFD_BUILD_SCRIPT = REPO_ROOT / "unreal/Scripts/build_production_whitewater_pfd.py"
 PFD_IMPORT_SCRIPT = REPO_ROOT / "unreal/Scripts/import_production_whitewater_pfd.py"
 PFD_MANIFEST_PATH = (
-    REPO_ROOT
-    / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/"
+    REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/"
     "production_whitewater_pfd_manifest.json"
 )
 PFD_ASSET_PATH = (
-    REPO_ROOT
-    / "unreal/Content/RaftSim/Equipment/Production/"
+    REPO_ROOT / "unreal/Content/RaftSim/Equipment/Production/"
     "SM_RaftSim_WhitewaterRescuePfd.uasset"
 )
 ROSTER_CAPTURE_SCRIPT = (
@@ -51,14 +45,16 @@ ROSTER_CAPTURE_SCRIPT = (
 )
 REFRESH_UTILITY = REPO_ROOT / "scripts/refresh_pfd_material_parameters.py"
 REVIEW_PATH = (
-    REPO_ROOT
-    / "docs/environment-captures/south_fork_full_reach/"
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_safety_gear_fallback_v306_review.json"
 )
 CLOTH_WET_REVIEW_PATH = (
-    REPO_ROOT
-    / "docs/environment-captures/south_fork_full_reach/"
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_cloth_wet_pfd_v1_review.json"
+)
+INTEGRATED_CARRIER_REVIEW_PATH = (
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
+    "m9_integrated_soft_carrier_pfd_v3_review.json"
 )
 
 
@@ -100,7 +96,7 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
 
     assert "static void BuildPfdMaterials()" in material
     assert "static void BuildHelmetMaterials()" in material
-    assert 'BuildPfdShellMaterial(' in material
+    assert "BuildPfdShellMaterial(" in material
     assert 'TEXT("M_RaftSim_PFD_Yellow")' in material
     assert 'TEXT("PfdRipstop")' in material
     assert "/*Roughness=*/0.68f" in material
@@ -148,7 +144,10 @@ def test_project_owned_production_helmet_source_and_import_are_hash_locked() -> 
     assert "cut_vents" in build_script
     assert "LowerEdgeGasket" in build_script
     assert "RetentionWebbing" in build_script
-    assert 'EXPECTED_SLOTS = ["HelmetShell", "HelmetLiner", "HelmetWebbing", "HelmetHardware"]' in import_script
+    assert (
+        'EXPECTED_SLOTS = ["HelmetShell", "HelmetLiner", "HelmetWebbing", "HelmetHardware"]'
+        in import_script
+    )
     assert "DirectoriesToAlwaysCook" not in import_script
     assert manifest["ownership"] == (
         "Project-owned deterministic source art; no external mesh or texture input."
@@ -181,33 +180,41 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert "add_crowned_foam_panel" in build_script
     assert "rounded_outline" in build_script
     assert '"PfdShell"' in build_script
-    assert 'EXPECTED_SLOTS = [' in import_script
+    assert "EXPECTED_SLOTS = [" in import_script
     assert '"PfdReflective"' in import_script
     assert manifest["ownership"] == (
         "Project-owned deterministic source art; no external mesh or texture input."
     )
     assert manifest["source_inputs"] == []
+    assert manifest["construction"]["front_carrier_panels"] == 2
+    assert manifest["construction"]["back_carrier_panels"] == 1
     assert manifest["construction"]["front_foam_panels"] == 4
     assert manifest["construction"]["shoulder_foam_pads"] == 0
     assert manifest["construction"]["shoulder_webbing_runs"] == 2
     assert manifest["construction"]["adjustment_points"] == 8
-    assert manifest["construction"]["front_backup_webbing_runs"] == 2
+    assert manifest["construction"]["front_backup_webbing_runs"] == 4
     assert manifest["construction"]["quick_release_rescue_belts"] == 1
     assert manifest["construction"]["rescue_tether_rings"] == 1
     assert manifest["soft_geometry"] == {
         "outline_corner_rounding": "four-pass closed Chaikin",
         "outline_corner_rounding_passes": 4,
         "flat_exterior_foam_faces": 0,
-        "front_panel_edge_roll_cm": 1.35,
-        "front_panel_crown_depth_cm": 1.45,
-        "front_panel_lateral_wrap_depth_cm": 2.0,
-        "back_panel_edge_roll_cm": 1.05,
-        "back_panel_crown_depth_cm": 1.35,
-        "back_panel_lateral_wrap_depth_cm": 3.2,
-        "side_wing_flat_exterior_faces": 0,
-        "side_wing_crown_depth_cm": 0.75,
+        "carrier_shell_thickness_cm": 0.9,
+        "front_panel_foam_thickness_cm": 4.2,
+        "front_panel_edge_roll_cm": 1.0,
+        "front_panel_crown_depth_cm": 1.25,
+        "front_panel_lateral_wrap_depth_cm": 2.4,
+        "back_panel_foam_thickness_cm": 3.2,
+        "back_panel_edge_roll_cm": 0.92,
+        "back_panel_crown_depth_cm": 1.6,
+        "back_panel_lateral_wrap_depth_cm": 3.8,
+        "rigid_side_foam_wings": 0,
+        "side_webbing_connector_thickness_cm": 0.36,
         "front_pocket_flat_exterior_faces": 0,
-        "front_pocket_crown_depth_cm": 0.62,
+        "front_pocket_crown_depth_cm": 0.18,
+        "rescue_belt_profile": "flat torso-following webbing",
+        "rescue_belt_thickness_cm": 0.36,
+        "duplicate_tubular_side_adjustment_runs": 0,
         "smooth_shaded": True,
     }
     assert manifest["construction"]["back_panels"] == 2
@@ -219,8 +226,8 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "PfdReflective",
         "PfdLabel",
     ]
-    assert 10_000 <= manifest["vertex_count"] <= 20_000
-    assert 10_000 <= manifest["polygon_count"] <= 20_000
+    assert 10_000 <= manifest["vertex_count"] <= 25_000
+    assert 10_000 <= manifest["polygon_count"] <= 25_000
     fbx = REPO_ROOT / manifest["fbx"]
     blend = REPO_ROOT / manifest["blend"]
     assert hashlib.sha256(fbx.read_bytes()).hexdigest() == manifest["fbx_sha256"]
@@ -265,15 +272,76 @@ def test_cloth_wet_pfd_review_is_hash_verified_and_fail_closed() -> None:
     assert review["implementation"]["shading_model"] == "MSM_Cloth"
     assert review["implementation"]["physics_authority_changed"] is False
     assert review["runtime_roster_metrics"]["captured_character_count"] == 5
-    assert review["runtime_roster_metrics"]["characters_with_live_material_response"] == 5
+    assert (
+        review["runtime_roster_metrics"]["characters_with_live_material_response"] == 5
+    )
     assert review["validation"]["m5_results"]["failed"] == 0
     for evidence in review["renderer_evidence"].values():
         if not isinstance(evidence, dict) or "capture" not in evidence:
             continue
         capture = REPO_ROOT / evidence["capture"]
         assert capture.is_file()
-        assert hashlib.sha256(capture.read_bytes()).hexdigest() == evidence["capture_sha256"]
+        assert (
+            hashlib.sha256(capture.read_bytes()).hexdigest()
+            == evidence["capture_sha256"]
+        )
     for asset in review["runtime_assets"]:
         path = REPO_ROOT / asset["path"]
         assert path.is_file()
         assert hashlib.sha256(path.read_bytes()).hexdigest() == asset["sha256"]
+
+
+def test_integrated_soft_carrier_pfd_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(INTEGRATED_CARRIER_REVIEW_PATH.read_text(encoding="utf-8"))
+
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["promotion_allowed"] is False
+    assert review["construction"]["side_wings"] == 0
+    assert review["construction"]["side_webbing_connectors"] == 6
+    assert review["construction"]["shoulder_foam_pads"] == 0
+    assert review["soft_geometry"]["duplicate_tubular_side_adjustment_runs"] == 0
+    assert review["runtime_roster_metrics"]["captured_character_count"] == 5
+    assert review["runtime_roster_metrics"]["characters_using_production_pfd"] == 5
+    assert review["runtime_roster_metrics"]["maximum_runtime_torso_error_cm"] == 0.0
+    assert review["reviewers"]["named_character_art_reviewer"] is None
+    assert review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
+    assert review["reviewers"]["human_approved"] is False
+
+    hash_locked_paths = [
+        (review["source"]["generator"], review["source"]["generator_sha256"]),
+        (review["source"]["importer"], review["source"]["importer_sha256"]),
+        (review["source"]["manifest"], review["source"]["manifest_sha256"]),
+        (review["source"]["fbx"], review["source"]["fbx_sha256"]),
+        (review["source"]["blend"], review["source"]["blend_sha256"]),
+        (review["runtime_asset"]["uasset"], review["runtime_asset"]["uasset_sha256"]),
+        (
+            review["runtime_asset"]["import_report"],
+            review["runtime_asset"]["import_report_sha256"],
+        ),
+        (
+            review["runtime_roster_metrics"]["source_report"],
+            review["runtime_roster_metrics"]["source_report_sha256"],
+        ),
+        (review["validation"]["m5_report"], review["validation"]["m5_report_sha256"]),
+    ]
+    for relative_path, expected_hash in hash_locked_paths:
+        path = REPO_ROOT / relative_path
+        assert path.is_file()
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected_hash
+
+    for evidence in review["renderer_evidence"].values():
+        if not isinstance(evidence, dict) or "capture" not in evidence:
+            continue
+        capture = REPO_ROOT / evidence["capture"]
+        assert capture.is_file()
+        assert (
+            hashlib.sha256(capture.read_bytes()).hexdigest()
+            == evidence["capture_sha256"]
+        )
+
+    m5 = json.loads(
+        (REPO_ROOT / review["validation"]["m5_report"]).read_text(encoding="utf-8-sig")
+    )
+    assert m5["succeeded"] == 1
+    assert m5["failed"] == 0

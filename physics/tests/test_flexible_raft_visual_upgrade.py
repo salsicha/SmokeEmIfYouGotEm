@@ -7,51 +7,41 @@ from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MESH_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftMesh.cpp"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftMesh.cpp"
 )
 AUTOMATION_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
     "RaftSimM5ProductionQualityTest.cpp"
 )
 ROCK_ACTOR_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimRockObstacleActor.cpp"
 )
 CAPTURE_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimCaptureCommand.cpp"
 )
 CAMERA_PRESENTATION_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimCameraPresentation.h"
 )
 ROCK_MATERIAL_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
     "RaftSimEditorPhotorealMaterials.cpp"
 )
 RAFT_MATERIAL_SCRIPT = REPO_ROOT / "unreal/Scripts/create_production_raft_materials.py"
 RAFT_ACTOR_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp"
 )
 RAFT_HEADER_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimRaftActor.h"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimRaftActor.h"
 )
 CREW_AVATAR_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimCrewAvatarActor.cpp"
 )
 CREW_AVATAR_HEADER = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
     "RaftSimCrewAvatarActor.h"
 )
 PRODUCTION_RAFT_BUILD_SCRIPT = (
@@ -61,13 +51,11 @@ PRODUCTION_RAFT_IMPORT_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/import_production_whitewater_raft.py"
 )
 PRODUCTION_RAFT_MANIFEST = (
-    REPO_ROOT
-    / "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/"
+    REPO_ROOT / "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/"
     "production_paddle_raft_manifest.json"
 )
 PRODUCTION_RAFT_ASSET = (
-    REPO_ROOT
-    / "unreal/Content/RaftSim/Rafts/Production/"
+    REPO_ROOT / "unreal/Content/RaftSim/Rafts/Production/"
     "SM_RaftSim_ProductionPaddleRaft.uasset"
 )
 WATER_VFX_SOURCE = (
@@ -81,22 +69,18 @@ WATER_VFX_HEADER = (
 DEFAULT_GAME_CONFIG = REPO_ROOT / "unreal/Config/DefaultGame.ini"
 DEFAULT_SCALABILITY_CONFIG = REPO_ROOT / "unreal/Config/DefaultScalability.ini"
 CONTENT_LOCK_DIRECTOR_SOURCE = (
-    REPO_ROOT
-    / "unreal/Source/SmokeEmIfYouGotEm/RaftSimContentLockDirector.cpp"
+    REPO_ROOT / "unreal/Source/SmokeEmIfYouGotEm/RaftSimContentLockDirector.cpp"
 )
 NIAGARA_WATER_VFX_EDITOR_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
     "RaftSimEditorNiagaraWaterVfx.cpp"
 )
 NIAGARA_WATER_VFX_AUTOMATION_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
     "RaftSimNiagaraWaterVfxTest.cpp"
 )
 CONNECTED_WATER_V6_EDITOR_SOURCE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+    REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
     "RaftSimEditorConnectedWaterV6Material.cpp"
 )
 CONNECTED_WATER_V6_AUTHOR_SCRIPT = (
@@ -105,9 +89,7 @@ CONNECTED_WATER_V6_AUTHOR_SCRIPT = (
 WATER_PARTICLE_ATLAS = (
     REPO_ROOT / "unreal/SourceArt/RaftSim/Water/T_RaftSim_WaterParticle_SubUV.png"
 )
-WATER_PARTICLE_ATLAS_PROVENANCE = WATER_PARTICLE_ATLAS.with_suffix(
-    ".provenance.json"
-)
+WATER_PARTICLE_ATLAS_PROVENANCE = WATER_PARTICLE_ATLAS.with_suffix(".provenance.json")
 WATER_PARTICLE_ATLAS_GENERATOR = (
     REPO_ROOT / "unreal/Scripts/build_production_water_particle_atlas.py"
 )
@@ -118,11 +100,10 @@ PHOTOGRAPHIC_WATER_ATLAS_SOURCE = (
     PHOTOGRAPHIC_WATER_ATLAS_DIR / "T_RaftSim_WhitewaterSubUV_Source_v4.png"
 )
 PHOTOGRAPHIC_WATER_ATLAS_REVIEW = (
-    PHOTOGRAPHIC_WATER_ATLAS_DIR
-    / "T_RaftSim_WaterParticle_SubUV_v4_review.png"
+    PHOTOGRAPHIC_WATER_ATLAS_DIR / "T_RaftSim_WaterParticle_SubUV_v4_review.png"
 )
-PHOTOGRAPHIC_WATER_ATLAS_PROVENANCE = (
-    PHOTOGRAPHIC_WATER_ATLAS_REVIEW.with_suffix(".provenance.json")
+PHOTOGRAPHIC_WATER_ATLAS_PROVENANCE = PHOTOGRAPHIC_WATER_ATLAS_REVIEW.with_suffix(
+    ".provenance.json"
 )
 PHOTOGRAPHIC_WATER_ATLAS_GENERATOR = (
     REPO_ROOT / "unreal/Scripts/build_photographic_water_particle_atlas_v4.py"
@@ -134,8 +115,7 @@ PHOTOGRAPHIC_WATER_REVIEW_ASSET_DIR = (
     REPO_ROOT / "unreal/Content/RaftSim/VFX/Water/PhotographicSubUVV4Review"
 )
 PHOTOGRAPHIC_WATER_REVIEW_EVIDENCE = (
-    REPO_ROOT
-    / "docs/environment-captures/south_fork_full_reach/"
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_photographic_water_subuv_v4_review.json"
 )
 PHOTOGRAPHIC_WATER_V5_ATLAS_DIR = (
@@ -150,15 +130,14 @@ PHOTOGRAPHIC_WATER_V5_SOURCE_PATHS = {
     / "T_RaftSim_WhitewaterParticleScale_AeratedFoam_Source_v5.png",
 }
 PHOTOGRAPHIC_WATER_V5_ATLAS_REVIEW = (
-    PHOTOGRAPHIC_WATER_V5_ATLAS_DIR
-    / "T_RaftSim_WaterParticle_SubUV_v5_review.png"
+    PHOTOGRAPHIC_WATER_V5_ATLAS_DIR / "T_RaftSim_WaterParticle_SubUV_v5_review.png"
 )
 PHOTOGRAPHIC_WATER_V5_MIP_PREVIEW = (
     PHOTOGRAPHIC_WATER_V5_ATLAS_DIR
     / "T_RaftSim_WaterParticle_SubUV_v5_mip32_preview.png"
 )
-PHOTOGRAPHIC_WATER_V5_ATLAS_PROVENANCE = (
-    PHOTOGRAPHIC_WATER_V5_ATLAS_REVIEW.with_suffix(".provenance.json")
+PHOTOGRAPHIC_WATER_V5_ATLAS_PROVENANCE = PHOTOGRAPHIC_WATER_V5_ATLAS_REVIEW.with_suffix(
+    ".provenance.json"
 )
 PHOTOGRAPHIC_WATER_V5_ATLAS_GENERATOR = (
     REPO_ROOT / "unreal/Scripts/build_photographic_water_particle_atlas_v5.py"
@@ -170,18 +149,15 @@ PHOTOGRAPHIC_WATER_V5_REVIEW_ASSET_DIR = (
     REPO_ROOT / "unreal/Content/RaftSim/VFX/Water/PhotographicSubUVV5Review"
 )
 PHOTOGRAPHIC_WATER_V5_REVIEW_EVIDENCE = (
-    REPO_ROOT
-    / "docs/environment-captures/south_fork_full_reach/"
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_photographic_water_subuv_v5_review.json"
 )
 REVIEW_PATH = (
-    REPO_ROOT
-    / "docs/environment-captures/south_fork_full_reach/"
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_flexible_raft_upgrade_v317_review.json"
 )
 PRODUCTION_RAFT_REVIEW_PATH = (
-    REPO_ROOT
-    / "docs/environment-captures/south_fork_full_reach/"
+    REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_production_paddle_raft_v12_review.json"
 )
 PRODUCTION_BOULDER_BUILD_SCRIPT = (
@@ -197,39 +173,33 @@ PRODUCTION_BOOT_MATERIAL_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/create_production_whitewater_boot_materials.py"
 )
 PRODUCTION_BOOT_MANIFEST = (
-    REPO_ROOT
-    / "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/"
+    REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/"
     "production_whitewater_river_boot_manifest.json"
 )
 PRODUCTION_BOOT_ASSET = (
-    REPO_ROOT
-    / "unreal/Content/RaftSim/Equipment/Production/"
+    REPO_ROOT / "unreal/Content/RaftSim/Equipment/Production/"
     "SM_RaftSim_WhitewaterRiverBoot.uasset"
 )
 PRODUCTION_PFD_BUILD_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/build_production_whitewater_pfd.py"
 )
 PRODUCTION_PFD_MANIFEST = (
-    REPO_ROOT
-    / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/"
+    REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/"
     "production_whitewater_pfd_manifest.json"
 )
 PRODUCTION_PFD_ASSET = (
-    REPO_ROOT
-    / "unreal/Content/RaftSim/Equipment/Production/"
+    REPO_ROOT / "unreal/Content/RaftSim/Equipment/Production/"
     "SM_RaftSim_WhitewaterRescuePfd.uasset"
 )
 PRODUCTION_BOULDER_IMPORT_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/import_production_river_boulder.py"
 )
 PRODUCTION_BOULDER_MANIFEST = (
-    REPO_ROOT
-    / "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/"
+    REPO_ROOT / "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/"
     "production_river_boulder_manifest.json"
 )
 PRODUCTION_BOULDER_ASSET = (
-    REPO_ROOT
-    / "unreal/Content/RaftSim/Environment/Rocks/Production/"
+    REPO_ROOT / "unreal/Content/RaftSim/Environment/Rocks/Production/"
     "SM_RaftSim_ProductionRiverBoulder.uasset"
 )
 
@@ -290,9 +260,10 @@ def test_project_owned_production_raft_source_and_runtime_boundary_are_locked() 
     assert 195.0 <= manifest["dimensions_cm"][1] <= 220.0
     for key in ("fbx", "blend"):
         source_asset = REPO_ROOT / manifest[key]
-        assert hashlib.sha256(source_asset.read_bytes()).hexdigest() == manifest[
-            f"{key}_sha256"
-        ]
+        assert (
+            hashlib.sha256(source_asset.read_bytes()).hexdigest()
+            == manifest[f"{key}_sha256"]
+        )
     assert PRODUCTION_RAFT_ASSET.is_file()
 
     for contract in (
@@ -315,8 +286,14 @@ def test_project_owned_production_raft_source_and_runtime_boundary_are_locked() 
     assert "LightingGradientScale = 0.52f" in mesh_source
     assert "TransformDirection" in mesh_source
     assert "BentSection.Normals" in automation_source
-    assert "production raft lighting frame follows the D4 contact field" in automation_source
-    assert "production wrap projection stays within a 90 cm visual bound" in automation_source
+    assert (
+        "production raft lighting frame follows the D4 contact field"
+        in automation_source
+    )
+    assert (
+        "production wrap projection stays within a 90 cm visual bound"
+        in automation_source
+    )
     assert "GetFlexibleVisualSegments()" in actor_source
     assert "SM_RaftSim_ProductionPaddleRaft" in actor_source
     assert "bCreateCollision=*/false" in actor_source
@@ -331,26 +308,39 @@ def test_raft_art_review_mode_is_explicitly_evidence_only() -> None:
     assert "M5_RescueProduction.png" in source
 
 
-def test_production_rescue_pfd_uses_contoured_back_source_art() -> None:
+def test_production_rescue_pfd_uses_integrated_soft_carrier_source_art() -> None:
     build_source = PRODUCTION_PFD_BUILD_SCRIPT.read_text(encoding="utf-8")
     manifest = json.loads(PRODUCTION_PFD_MANIFEST.read_text(encoding="utf-8"))
 
-    assert "GENERATOR_VERSION = 7" in build_source
+    assert "GENERATOR_VERSION = 10" in build_source
+    assert '"FrontCarrier_' in build_source
+    assert '"RearCarrier"' in build_source
     assert '"ProtectiveBackUpperCell"' in build_source
     assert '"ProtectiveBackLumbarCell"' in build_source
-    assert "lateral_wrap_depth=3.2" in build_source
+    assert "lateral_wrap_depth=3.8" in build_source
     assert "former single\n    # 31.5 x 42 cm plate" in build_source
     assert "ShoulderFoamBand" not in build_source
-    assert manifest["generator_version"] == 7
+    assert manifest["generator_version"] == 10
+    assert manifest["construction"]["front_carrier_panels"] == 2
+    assert manifest["construction"]["back_carrier_panels"] == 1
     assert manifest["construction"]["back_panels"] == 2
     assert manifest["construction"]["rear_flex_channels"] == 1
     assert manifest["soft_geometry"]["flat_exterior_foam_faces"] == 0
     assert manifest["soft_geometry"]["outline_corner_rounding_passes"] == 4
-    assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 1.45
-    assert manifest["soft_geometry"]["front_panel_lateral_wrap_depth_cm"] == 2.0
-    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 1.35
-    assert manifest["soft_geometry"]["back_panel_lateral_wrap_depth_cm"] == 3.2
-    assert manifest["soft_geometry"]["side_wing_flat_exterior_faces"] == 0
+    assert manifest["soft_geometry"]["carrier_shell_thickness_cm"] == 0.9
+    assert manifest["soft_geometry"]["front_panel_foam_thickness_cm"] == 4.2
+    assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 1.25
+    assert manifest["soft_geometry"]["front_panel_lateral_wrap_depth_cm"] == 2.4
+    assert manifest["soft_geometry"]["back_panel_foam_thickness_cm"] == 3.2
+    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 1.6
+    assert manifest["soft_geometry"]["back_panel_lateral_wrap_depth_cm"] == 3.8
+    assert manifest["construction"]["side_wings"] == 0
+    assert manifest["construction"]["side_webbing_connectors"] == 6
+    assert manifest["soft_geometry"]["rigid_side_foam_wings"] == 0
+    assert manifest["soft_geometry"]["rescue_belt_profile"] == (
+        "flat torso-following webbing"
+    )
+    assert manifest["soft_geometry"]["duplicate_tubular_side_adjustment_runs"] == 0
     assert manifest["soft_geometry"]["front_pocket_flat_exterior_faces"] == 0
     assert manifest["construction"]["shoulder_foam_pads"] == 0
     assert manifest["construction"]["shoulder_webbing_runs"] == 2
@@ -359,9 +349,10 @@ def test_production_rescue_pfd_uses_contoured_back_source_art() -> None:
     )
     for key in ("fbx", "blend"):
         source_asset = REPO_ROOT / manifest[key]
-        assert hashlib.sha256(source_asset.read_bytes()).hexdigest() == manifest[
-            f"{key}_sha256"
-        ]
+        assert (
+            hashlib.sha256(source_asset.read_bytes()).hexdigest()
+            == manifest[f"{key}_sha256"]
+        )
     assert PRODUCTION_PFD_ASSET.is_file()
 
 
@@ -405,7 +396,9 @@ def test_named_rapid_wrap_evidence_uses_production_runtime_authority() -> None:
     assert "not represented as site-specific geology" in rock_source
 
 
-def test_production_boulder_source_import_and_runtime_boundary_are_fail_closed() -> None:
+def test_production_boulder_source_import_and_runtime_boundary_are_fail_closed() -> (
+    None
+):
     assert PRODUCTION_BOULDER_BUILD_SCRIPT.is_file()
     assert PRODUCTION_BOULDER_IMPORT_SCRIPT.is_file()
     assert PRODUCTION_BOULDER_MANIFEST.is_file()
@@ -413,7 +406,9 @@ def test_production_boulder_source_import_and_runtime_boundary_are_fail_closed()
     fbx_path = REPO_ROOT / manifest["fbx"]
     blend_path = REPO_ROOT / manifest["blend"]
     assert hashlib.sha256(fbx_path.read_bytes()).hexdigest() == manifest["fbx_sha256"]
-    assert hashlib.sha256(blend_path.read_bytes()).hexdigest() == manifest["blend_sha256"]
+    assert (
+        hashlib.sha256(blend_path.read_bytes()).hexdigest() == manifest["blend_sha256"]
+    )
     assert manifest["ownership"] == (
         "Project-owned deterministic source art; no external mesh or texture input."
     )
@@ -465,8 +460,8 @@ def test_production_boulder_source_import_and_runtime_boundary_are_fail_closed()
         'CameraPreset == TEXT("contact_port")',
         'CameraPreset == TEXT("wrap_hero")',
         'CameraPreset == TEXT("river_action")',
-        'FVector(-680.0f, -520.0f, 245.0f)',
-        'FVector(260.0f, 0.0f, 55.0f)',
+        "FVector(-680.0f, -520.0f, 245.0f)",
+        "FVector(260.0f, 0.0f, 55.0f)",
         "CameraOffset = FVector(360.0f, -350.0f, 275.0f)",
         "LookAtOffset = FVector(15.0f, -20.0f, 35.0f)",
         "LookAtOffset = FVector(-80.0f, -130.0f, 60.0f)",
@@ -485,7 +480,9 @@ def test_contact_rock_material_supports_both_reviewed_and_fallback_shells() -> N
     assert marker in source
     boulder_source = source.split(marker, 1)[1].split("static UMaterial*", 1)[0]
     assert "Material->TwoSided = false" in boulder_source
-    assert "Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes)" in boulder_source
+    assert (
+        "Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes)" in boulder_source
+    )
     assert "Material->SetMaterialUsage(MATUSAGE_StaticMesh)" in boulder_source
     assert "Material->SetMaterialUsage(MATUSAGE_Nanite)" in boulder_source
     assert "MATUSAGE_ProceduralMesh" not in boulder_source
@@ -501,7 +498,9 @@ def test_contact_rock_material_supports_both_reviewed_and_fallback_shells() -> N
     assert "ProceduralBaseColor, ReviewedTintedBaseColor" in boulder_source
     assert "FLinearColor(0.090f, 0.101f, 0.105f" in boulder_source
     assert "FLinearColor(0.340f, 0.308f, 0.264f" in boulder_source
-    assert "It is an appearance analog, not South Fork geology authority" in boulder_source
+    assert (
+        "It is an appearance analog, not South Fork geology authority" in boulder_source
+    )
     assert 'TEXT("RockVisualSourceBlend")' in boulder_source
     assert "VisualSourceBlend->DefaultValue = 1.0f" in boulder_source
     assert "SelectedVisualSource->A.OutputIndex = 4" in boulder_source
@@ -513,8 +512,7 @@ def test_contact_rock_material_supports_both_reviewed_and_fallback_shells() -> N
 def test_production_contact_rock_uses_south_fork_world_aligned_dressing() -> None:
     rock_actor_source = ROCK_ACTOR_SOURCE.read_text(encoding="utf-8")
     dressing_source = (
-        REPO_ROOT
-        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkBoulderMaterial.cpp"
     ).read_text(encoding="utf-8")
 
@@ -528,7 +526,9 @@ def test_production_contact_rock_uses_south_fork_world_aligned_dressing() -> Non
     assert "EditorData->Roughness.Connect(0, WaterlineRoughness)" in dressing_source
 
 
-def test_runtime_camera_uses_bounded_local_exposure_without_simulation_authority() -> None:
+def test_runtime_camera_uses_bounded_local_exposure_without_simulation_authority() -> (
+    None
+):
     source = CAMERA_PRESENTATION_SOURCE.read_text(encoding="utf-8")
     for contract in (
         "float ExposureBias = 1.25f",
@@ -836,9 +836,9 @@ def test_connected_contact_water_v7_separates_attachment_crest_and_breakup() -> 
     assert "connectedV7Triangles=%d connectedV7Visible=%d" in capture
     assert "GetConnectedContactWaterV7TriangleCount()" in capture
     assert "IsConnectedContactWaterV7Visible()" in capture
-    assert '0, 0.14f, 0.16f, 0.06f, 0.0f' in source
-    assert '1, 0.040f, 0.80f, 0.10f, 0.0f' in source
-    assert '2, 0.008f, 0.86f, 0.060f, 0.32f' in source
+    assert "0, 0.14f, 0.16f, 0.06f, 0.0f" in source
+    assert "1, 0.040f, 0.80f, 0.10f, 0.0f" in source
+    assert "2, 0.008f, 0.86f, 0.060f, 0.32f" in source
 
 
 def test_connected_contact_water_v8_uses_closed_irregular_lobes() -> None:
@@ -958,9 +958,7 @@ def test_production_niagara_particle_atlas_is_owned_and_profile_partitioned() ->
     assert "FTextureCompilingManager::Get().FinishCompilation" in m5_automation_source
     assert "solver/contact state remains the sole emission source" in generator_source
 
-    provenance = json.loads(
-        WATER_PARTICLE_ATLAS_PROVENANCE.read_text(encoding="utf-8")
-    )
+    provenance = json.loads(WATER_PARTICLE_ATLAS_PROVENANCE.read_text(encoding="utf-8"))
     assert provenance["ownership"] == "project_owned_first_party_procedural"
     assert provenance["external_source_input"] is False
     assert provenance["authoritative_geography_claim"] is False
@@ -972,9 +970,10 @@ def test_production_niagara_particle_atlas_is_owned_and_profile_partitioned() ->
         "aerated_mist": [11, 13],
         "rapid_aerosol": [14, 15],
     }
-    assert hashlib.sha256(WATER_PARTICLE_ATLAS.read_bytes()).hexdigest() == provenance[
-        "sha256"
-    ]
+    assert (
+        hashlib.sha256(WATER_PARTICLE_ATLAS.read_bytes()).hexdigest()
+        == provenance["sha256"]
+    )
     with Image.open(WATER_PARTICLE_ATLAS) as atlas:
         assert atlas.size == (2048, 2048)
         assert atlas.mode == "L"
@@ -987,14 +986,10 @@ def test_photographic_water_atlas_v4_is_owned_padded_and_review_only() -> None:
     review_evidence = json.loads(
         PHOTOGRAPHIC_WATER_REVIEW_EVIDENCE.read_text(encoding="utf-8")
     )
-    generator_source = PHOTOGRAPHIC_WATER_ATLAS_GENERATOR.read_text(
-        encoding="utf-8"
-    )
+    generator_source = PHOTOGRAPHIC_WATER_ATLAS_GENERATOR.read_text(encoding="utf-8")
     editor_source = NIAGARA_WATER_VFX_EDITOR_SOURCE.read_text(encoding="utf-8")
     runtime_source = WATER_VFX_SOURCE.read_text(encoding="utf-8")
-    import_source = PHOTOGRAPHIC_WATER_ATLAS_IMPORT_SCRIPT.read_text(
-        encoding="utf-8"
-    )
+    import_source = PHOTOGRAPHIC_WATER_ATLAS_IMPORT_SCRIPT.read_text(encoding="utf-8")
 
     assert provenance["ownership"] == "project_owned_first_party_image_generation"
     assert provenance["image_generation_mode"] == "built_in_imagegen"
@@ -1009,12 +1004,16 @@ def test_photographic_water_atlas_v4_is_owned_padded_and_review_only() -> None:
     assert review_evidence["authoritative_geography_claim"] is False
     assert review_evidence["production"]["selected"] is True
     assert review_evidence["isolation"]["default_switch_state"] is False
-    assert review_evidence["isolation"][
-        "solver_contact_emission_authority_changed"
-    ] is False
-    assert review_evidence["isolation"][
-        "current_review_assets_restored_to_unscaled_profiles"
-    ] is True
+    assert (
+        review_evidence["isolation"]["solver_contact_emission_authority_changed"]
+        is False
+    )
+    assert (
+        review_evidence["isolation"][
+            "current_review_assets_restored_to_unscaled_profiles"
+        ]
+        is True
+    )
     assert provenance["dimensions_px"] == [2048, 2048]
     assert provenance["grid"] == [4, 4]
     assert provenance["cell_dimensions_px"] == [512, 512]
@@ -1044,14 +1043,12 @@ def test_photographic_water_atlas_v4_is_owned_padded_and_review_only() -> None:
         15,
         7,
     ]
-    assert "high-speed macro photography of real cold freshwater" in provenance[
-        "source_prompt"
-    ]
-    assert "review-only photographic" in generator_source
     assert (
-        "solver/contact state remains the sole authority"
-        in generator_source.lower()
+        "high-speed macro photography of real cold freshwater"
+        in provenance["source_prompt"]
     )
+    assert "review-only photographic" in generator_source
+    assert "solver/contact state remains the sole authority" in generator_source.lower()
     for contract in (
         "RaftSim.CreatePhotographicV4ReviewNiagaraWaterVfxSystems",
         "T_RaftSim_WaterParticle_SubUV_v4_review.png",
@@ -1064,20 +1061,25 @@ def test_photographic_water_atlas_v4_is_owned_padded_and_review_only() -> None:
     assert "Production maps/assets remain byte-identical" in runtime_source
     assert 'TEXT("/Game/RaftSim/VFX/Water/%s.%s")' in runtime_source
     assert "isolated review complete" in import_source
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_SOURCE.read_bytes()).hexdigest() == (
-        provenance["source_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_SOURCE.read_bytes()).hexdigest()
+        == (provenance["source_sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_REVIEW.read_bytes()).hexdigest() == (
-        provenance["sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_REVIEW.read_bytes()).hexdigest()
+        == (provenance["sha256"])
     )
-    assert hashlib.sha256(WATER_PARTICLE_ATLAS.read_bytes()).hexdigest() == (
-        review_evidence["production"]["source_atlas_sha256"]
+    assert (
+        hashlib.sha256(WATER_PARTICLE_ATLAS.read_bytes()).hexdigest()
+        == (review_evidence["production"]["source_atlas_sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_SOURCE.read_bytes()).hexdigest() == (
-        review_evidence["candidate_source"]["generated_source_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_SOURCE.read_bytes()).hexdigest()
+        == (review_evidence["candidate_source"]["generated_source_sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_REVIEW.read_bytes()).hexdigest() == (
-        review_evidence["candidate_source"]["derived_review_atlas_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_ATLAS_REVIEW.read_bytes()).hexdigest()
+        == (review_evidence["candidate_source"]["derived_review_atlas_sha256"])
     )
     for relative_path, expected_sha256 in review_evidence["isolation"][
         "current_review_asset_sha256"
@@ -1127,9 +1129,7 @@ def test_photographic_water_atlas_v5_is_particle_scale_mip_safe_and_isolated() -
     review_evidence = json.loads(
         PHOTOGRAPHIC_WATER_V5_REVIEW_EVIDENCE.read_text(encoding="utf-8")
     )
-    generator_source = PHOTOGRAPHIC_WATER_V5_ATLAS_GENERATOR.read_text(
-        encoding="utf-8"
-    )
+    generator_source = PHOTOGRAPHIC_WATER_V5_ATLAS_GENERATOR.read_text(encoding="utf-8")
     import_source = PHOTOGRAPHIC_WATER_V5_IMPORT_SCRIPT.read_text(encoding="utf-8")
     editor_source = NIAGARA_WATER_VFX_EDITOR_SOURCE.read_text(encoding="utf-8")
     runtime_source = WATER_VFX_SOURCE.read_text(encoding="utf-8")
@@ -1148,8 +1148,13 @@ def test_photographic_water_atlas_v5_is_particle_scale_mip_safe_and_isolated() -
     assert review_evidence["production"]["selected"] is True
     assert review_evidence["isolation"]["default_switch_state"] is False
     assert review_evidence["isolation"]["production_assets_modified_by_review"] is False
-    assert review_evidence["isolation"]["solver_contact_emission_authority_changed"] is False
-    assert review_evidence["isolation"]["world_space_sprite_dimensions_changed"] is False
+    assert (
+        review_evidence["isolation"]["solver_contact_emission_authority_changed"]
+        is False
+    )
+    assert (
+        review_evidence["isolation"]["world_space_sprite_dimensions_changed"] is False
+    )
     assert provenance["dimensions_px"] == [2048, 2048]
     assert provenance["grid"] == [4, 4]
     assert provenance["cell_dimensions_px"] == [512, 512]
@@ -1194,16 +1199,14 @@ def test_photographic_water_atlas_v5_is_particle_scale_mip_safe_and_isolated() -
     for source_name, source_path in PHOTOGRAPHIC_WATER_V5_SOURCE_PATHS.items():
         source_record = provenance["sources"][source_name]
         assert source_record["dimensions_px"] == [1254, 1254]
-        assert hashlib.sha256(source_path.read_bytes()).hexdigest() == source_record[
-            "sha256"
-        ]
+        assert (
+            hashlib.sha256(source_path.read_bytes()).hexdigest()
+            == source_record["sha256"]
+        )
         prompt = source_record["prompt"]
         assert "particle" in prompt.lower() or "mip-safe" in prompt.lower()
         assert "authoritative geography" not in prompt.lower()
-    assert (
-        "solver/contact state remains the sole authority"
-        in generator_source.lower()
-    )
+    assert "solver/contact state remains the sole authority" in generator_source.lower()
     assert "SPRAY_FOAM_SOURCE_REGIONS" in generator_source
     for contract in (
         "RaftSim.CreatePhotographicV5ReviewNiagaraWaterVfxSystems",
@@ -1223,20 +1226,25 @@ def test_photographic_water_atlas_v5_is_particle_scale_mip_safe_and_isolated() -
     assert "Production maps/assets remain byte-identical" in runtime_source
     assert 'CameraPreset == TEXT("particle_macro")' in capture_source
     assert "production-scale 2-6 cm spray" in capture_source
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_V5_ATLAS_REVIEW.read_bytes()).hexdigest() == (
-        provenance["sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_V5_ATLAS_REVIEW.read_bytes()).hexdigest()
+        == (provenance["sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_V5_MIP_PREVIEW.read_bytes()).hexdigest() == (
-        provenance["mip_review_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_V5_MIP_PREVIEW.read_bytes()).hexdigest()
+        == (provenance["mip_review_sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_V5_ATLAS_PROVENANCE.read_bytes()).hexdigest() == (
-        review_evidence["candidate_source"]["provenance_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_V5_ATLAS_PROVENANCE.read_bytes()).hexdigest()
+        == (review_evidence["candidate_source"]["provenance_sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_V5_ATLAS_GENERATOR.read_bytes()).hexdigest() == (
-        review_evidence["candidate_source"]["generator_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_V5_ATLAS_GENERATOR.read_bytes()).hexdigest()
+        == (review_evidence["candidate_source"]["generator_sha256"])
     )
-    assert hashlib.sha256(PHOTOGRAPHIC_WATER_V5_IMPORT_SCRIPT.read_bytes()).hexdigest() == (
-        review_evidence["isolation"]["author_script_sha256"]
+    assert (
+        hashlib.sha256(PHOTOGRAPHIC_WATER_V5_IMPORT_SCRIPT.read_bytes()).hexdigest()
+        == (review_evidence["isolation"]["author_script_sha256"])
     )
     for relative_path, expected_sha256 in review_evidence["isolation"][
         "current_review_asset_sha256"
@@ -1261,12 +1269,15 @@ def test_photographic_water_atlas_v5_is_particle_scale_mip_safe_and_isolated() -
             if key.endswith("capture"):
                 capture_path = REPO_ROOT / value
                 assert capture_path.is_file()
-                assert hashlib.sha256(capture_path.read_bytes()).hexdigest() == section[
-                    f"{key}_sha256"
-                ]
+                assert (
+                    hashlib.sha256(capture_path.read_bytes()).hexdigest()
+                    == section[f"{key}_sha256"]
+                )
     assert len(provenance["mip_metrics"]) == 16
     assert all(metric["border_max"] == 0 for metric in provenance["mip_metrics"])
-    assert all(metric["active_pixels_gt_8"] >= 50 for metric in provenance["mip_metrics"])
+    assert all(
+        metric["active_pixels_gt_8"] >= 50 for metric in provenance["mip_metrics"]
+    )
 
     with Image.open(PHOTOGRAPHIC_WATER_V5_ATLAS_REVIEW) as atlas:
         assert atlas.size == (2048, 2048)
@@ -1295,7 +1306,9 @@ def test_photographic_water_atlas_v5_is_particle_scale_mip_safe_and_isolated() -
         assert len(mip_hashes) == 16
 
 
-def test_packaged_performance_probe_records_and_applies_renderer_state_post_travel() -> None:
+def test_packaged_performance_probe_records_and_applies_renderer_state_post_travel() -> (
+    None
+):
     source = CONTENT_LOCK_DIRECTOR_SOURCE.read_text(encoding="utf-8")
     for contract in (
         "ApplyBoundedIntegerConsoleVariable",
@@ -1342,9 +1355,7 @@ def test_packaged_performance_probe_records_and_applies_renderer_state_post_trav
     ):
         assert contract in source
 
-    mac_rc = (REPO_ROOT / "unreal/Scripts/build_mac_rc.sh").read_text(
-        encoding="utf-8"
-    )
+    mac_rc = (REPO_ROOT / "unreal/Scripts/build_mac_rc.sh").read_text(encoding="utf-8")
     scalability = DEFAULT_SCALABILITY_CONFIG.read_text(encoding="utf-8")
     assert "[ReflectionQuality@2]" in scalability
     assert "r.Lumen.TranslucencyReflections.RadianceCache=0" in scalability
@@ -1400,8 +1411,7 @@ def test_packaged_performance_probe_records_and_applies_renderer_state_post_trav
         assert contract in windows_rc
 
     meta_human = (
-        REPO_ROOT
-        / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
         "RaftSimMetaHumanCrewVisualActor.cpp"
     ).read_text(encoding="utf-8")
     avatar = CREW_AVATAR_SOURCE.read_text(encoding="utf-8")
@@ -1436,7 +1446,9 @@ def test_packaged_performance_probe_records_and_applies_renderer_state_post_trav
         assert contract in capture
 
 
-def test_shared_crew_pose_articulates_upper_body_without_moving_gameplay_authority() -> None:
+def test_shared_crew_pose_articulates_upper_body_without_moving_gameplay_authority() -> (
+    None
+):
     source = CREW_AVATAR_SOURCE.read_text(encoding="utf-8")
 
     assert "ApplyWaistPivotedUpperBodyArticulation" in source
@@ -1458,9 +1470,10 @@ def test_flexible_raft_review_is_fail_closed_and_capture_locked() -> None:
     for evidence_key in ("renderer_evidence", "in_river_renderer_evidence"):
         evidence = review[evidence_key]
         capture = REPO_ROOT / evidence["capture"]
-        assert hashlib.sha256(capture.read_bytes()).hexdigest() == evidence[
-            "capture_sha256"
-        ]
+        assert (
+            hashlib.sha256(capture.read_bytes()).hexdigest()
+            == evidence["capture_sha256"]
+        )
         assert evidence["human_approved"] is False
 
 
@@ -1483,6 +1496,7 @@ def test_production_raft_review_is_hash_locked_and_fail_closed() -> None:
     assert review["automation"]["succeeded_with_warnings"] == 1
     assert review["automation"]["failed"] == 0
     assert capture.is_file()
-    assert hashlib.sha256(capture.read_bytes()).hexdigest() == review[
-        "renderer_evidence"
-    ]["capture_sha256"]
+    assert (
+        hashlib.sha256(capture.read_bytes()).hexdigest()
+        == review["renderer_evidence"]["capture_sha256"]
+    )
