@@ -125,6 +125,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
     bool bPacuareReferenceRun = false;
     bool bColoradoHanceReferenceRun = false;
     bool bChilkoLavaCanyonReferenceRun = false;
+    bool bFutaleufuTerminatorReferenceRun = false;
     ARaftSimRaftActor* PlayerRaft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
@@ -137,6 +138,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("RaftSim_ColoradoHance_PlayerRaft");
         bChilkoLavaCanyonReferenceRun = PlayerRaft->GetActorLabel() ==
             TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
+        bFutaleufuTerminatorReferenceRun = PlayerRaft->GetActorLabel() ==
+            TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
         Test->TestTrue(
             FString::Printf(
                 TEXT("raft rests within depth envelope (z=%.0f)"),
@@ -457,6 +460,106 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestEqual(
             TEXT("Colorado Hance has one cooked-field-derived capture foam surface"),
             SolverFieldFoamCount,
+            1);
+        return true;
+    }
+
+    if (bFutaleufuTerminatorReferenceRun)
+    {
+        Test->TestTrue(
+            TEXT("Futaleufu Terminator player raft is marked reference-runnable"),
+            PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
+        Test->TestTrue(
+            TEXT("Futaleufu Terminator launch keeps the raft upright"),
+            PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
+        Test->TestEqual(
+            TEXT("Futaleufu Terminator launch keeps every person in the raft"),
+            PlayerRaft->GetSwimmerCount(),
+            0);
+
+        int32 RuntimeWaterConfigCount = 0;
+        for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabel() !=
+                TEXT("RaftSim_FutaleufuTerminator_RuntimeWaterConfig"))
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("Futaleufu loads the Terminator cooked package"),
+                (*It)->CookedFieldsDir,
+                FString(TEXT("physics/data/real_world/futaleufu_river_chile/"
+                             "scenario_terminator/cooked_flow_fields")));
+            Test->TestEqual(
+                TEXT("Futaleufu loads the median runnable band"),
+                (*It)->FlowBand,
+                FName(TEXT("median_runnable")));
+            Test->TestFalse(
+                TEXT("Futaleufu preserves source station/lateral coordinates"),
+                (*It)->bRecenterHydraulicCrux);
+            Test->TestEqual(
+                TEXT("Futaleufu binds the local-world vertical datum map"),
+                (*It)->CoordinateMapPath,
+                FString(TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                             "terminator_visual/"
+                             "terminator_runtime_coordinate_map.json")));
+            Test->TestTrue(
+                TEXT("Futaleufu Landscape owns runtime terrain"),
+                (*It)->bMapProvidesTerrain);
+            ++RuntimeWaterConfigCount;
+        }
+        Test->TestEqual(
+            TEXT("Futaleufu Terminator reference run has one runtime water config"),
+            RuntimeWaterConfigCount,
+            1);
+
+        int32 CaptureOnlyWaterCount = 0;
+        int32 SolverFieldFoamCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("Futaleufu authored capture water is hidden during play"),
+                (*It)->IsHidden());
+            Test->TestTrue(
+                TEXT("Futaleufu runtime solver owns gameplay water rendering"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Futaleufu foam is identified as solver-field visualization"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimFutaleufuTerminatorSolverVisualization")));
+                ++SolverFieldFoamCount;
+            }
+            ++CaptureOnlyWaterCount;
+        }
+        Test->TestEqual(
+            TEXT("Futaleufu has capture-only static water and foam surfaces"),
+            CaptureOnlyWaterCount,
+            2);
+        Test->TestEqual(
+            TEXT("Futaleufu has one cooked-field-derived capture foam surface"),
+            SolverFieldFoamCount,
+            1);
+
+        int32 InterpretedD4RockCount = 0;
+        for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
+        {
+            if ((*It)->Tags.Contains(TEXT("RaftSimInterpretedC3Obstacle")) &&
+                (*It)->Tags.Contains(TEXT("RaftSimReviewGatedGeometry")) &&
+                (*It)->GetContactRadiusM() >= 0.1f)
+            {
+                ++InterpretedD4RockCount;
+            }
+        }
+        Test->TestEqual(
+            TEXT("Futaleufu retains one review-gated interpreted D4 contact"),
+            InterpretedD4RockCount,
             1);
         return true;
     }

@@ -444,6 +444,12 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     TEXT("RaftSimChilkoLavaCanyonSolverVisualization"));
                 FoamActor->Tags.AddUnique(TEXT("RaftSimChilkoCaptureOnlyWater"));
             }
+            else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimFutaleufuTerminatorSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimFutaleufuCaptureOnlyWater"));
+            }
         }
     }
     return WaterActor;
@@ -846,7 +852,10 @@ bool AddLandscapeCandidateRunnableGameplay(
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bChilkoLavaCanyon =
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
-    if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon)
+    const bool bFutaleufuTerminator =
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon &&
+        !bFutaleufuTerminator)
     {
         return true;
     }
@@ -908,6 +917,22 @@ bool AddLandscapeCandidateRunnableGameplay(
         PlayerRaftLabel = TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
         DisplayName = TEXT("Chilko Lava Canyon");
     }
+    else if (bFutaleufuTerminator)
+    {
+        RuntimeConfigLabel = TEXT("RaftSim_FutaleufuTerminator_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/futaleufu_river_chile/"
+                 "scenario_terminator/cooked_flow_fields");
+        FlowBand = FName(TEXT("median_runnable"));
+        WindowCenterM = FVector2D(300.0f, 0.0f);
+        WindowExtentM = 700.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                 "terminator_visual/terminator_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimFutaleufuTerminatorRun"));
+        PlayerRaftLabel = TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
+        DisplayName = TEXT("Futaleufu Terminator");
+    }
     else
     {
         RuntimeConfigLabel = TEXT("RaftSim_Zambezi_RuntimeWaterConfig");
@@ -932,7 +957,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    const bool bReachLocalRun = bPacuare || bColoradoHance || bChilkoLavaCanyon;
+    const bool bReachLocalRun =
+        bPacuare || bColoradoHance || bChilkoLavaCanyon || bFutaleufuTerminator;
     const float StartProgress = bReachLocalRun ? 0.04f : 0.0025f;
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
@@ -1112,6 +1138,55 @@ bool AddLandscapeCandidateRunnableGameplay(
             "Added four review-gated D4 contacts from Lava Canyon interpreted "
             "broach-rock and fixed-seed boulder geometry.\n");
     }
+    else if (bFutaleufuTerminator)
+    {
+        // The entry marker boulder is the only discrete rock in the authored
+        // C3 bed. It is an interpretation of published feature tags rather
+        // than surveyed geometry, so keep the runtime contact review-gated.
+        constexpr float StationM = 266.0f;
+        constexpr float LateralM = -8.0f;
+        constexpr float RadiusM = 3.2f;
+        constexpr float CrestAboveSurfaceM = 0.7f;
+        const float Progress = StationM /
+            FMath::Max(Points.Last().StationMeters, 1.0f);
+        FVector2D Tangent2D(1.0f, 0.0f);
+        FVector2D RockXY = SampleLandscapeCandidateCenterlineWorld(
+            Candidate,
+            Points,
+            Progress,
+            &Tangent2D);
+        const FVector2D RiverLeftNormal(-Tangent2D.Y, Tangent2D.X);
+        RockXY += RiverLeftNormal * LateralM * 100.0f;
+        float RockSurfaceZ = 0.0f;
+        if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+                Candidate,
+                Points,
+                Progress,
+                RockSurfaceZ))
+        {
+            OutSummary += TEXT("Could not align the Terminator marker boulder to water.\n");
+            return false;
+        }
+        const float RockCenterZ = RockSurfaceZ -
+            (RadiusM - CrestAboveSurfaceM) * 100.0f;
+        ARaftSimRockObstacleActor* Rock =
+            World->SpawnActor<ARaftSimRockObstacleActor>(
+                ARaftSimRockObstacleActor::StaticClass(),
+                FTransform(FVector(RockXY.X, RockXY.Y, RockCenterZ)));
+        if (!Rock)
+        {
+            OutSummary += TEXT("Could not spawn the Terminator marker boulder.\n");
+            return false;
+        }
+        Rock->ConfigureContact(RadiusM, 0.76f);
+        Rock->SetActorLabel(TEXT("RaftSim_FutaleufuTerminator_D4_EntryMarkerBoulder"));
+        Rock->Tags.AddUnique(RunTag);
+        Rock->Tags.AddUnique(TEXT("RaftSimInterpretedC3Obstacle"));
+        Rock->Tags.AddUnique(TEXT("RaftSimReviewGatedGeometry"));
+        OutSummary += TEXT(
+            "Added one review-gated D4 contact from Terminator's interpreted "
+            "entry-marker-boulder geometry.\n");
+    }
 
     if (bReachLocalRun)
     {
@@ -1227,8 +1302,8 @@ void RepositionLandscapeCandidatePhysicalCameras(
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.815f, 0.825f, 330.0f, 170.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.644f, 0.654f, 270.0f, 160.0f);
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.143333f, 0.243333f, 330.0f, 170.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.178333f, 0.278333f, 270.0f, 160.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
     {
@@ -1257,10 +1332,12 @@ void RepositionLandscapeCandidatePhysicalCameras(
     {
         const bool bChilko =
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        const bool bFutaleufu =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         SetCamera(
             TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"),
-            bChilko ? 0.438f : 0.530f,
-            bChilko ? 0.538f : 0.645f,
+            bChilko ? 0.438f : (bFutaleufu ? 0.198333f : 0.530f),
+            bChilko ? 0.538f : (bFutaleufu ? 0.298333f : 0.645f),
             bChilko ? 270.0f : 275.0f,
             bChilko ? 160.0f : 165.0f);
     }

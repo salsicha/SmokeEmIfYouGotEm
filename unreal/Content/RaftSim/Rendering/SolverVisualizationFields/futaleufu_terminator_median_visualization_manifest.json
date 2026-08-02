@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.unreal.futaleufu_terminator_solver_visualization.v1",
+  "generated_on": "2026-08-01",
+  "status": "reference_runnable_capture_visualization_not_production_promoted",
+  "river_id": "futaleufu_river_chile",
+  "rapid_name": "Terminator",
+  "flow_band": "median_runnable",
+  "source_scenario_id": "futaleufu_terminator_c3_window_median_runnable",
+  "source_artifacts": {
+    "manifest": {
+      "path": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/manifest.json",
+      "sha256": "a12c1d9f2ba9666344064abaeffb6250a31c665347408d8290daa538098ffe29",
+      "size_bytes": 38710
+    },
+    "bed": {
+      "path": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/bed.npy",
+      "sha256": "d29c54624a27fed2fd5e8d7f954065a742427703f594804a4d6b52e57dd44c19",
+      "size_bytes": 51900
+    },
+    "h": {
+      "path": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/h.npy",
+      "sha256": "9ddd92aaec8db4be56579b058198bfd9a885a5c08ef95bd535b870804bba1ebe",
+      "size_bytes": 51900
+    },
+    "u": {
+      "path": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/u.npy",
+      "sha256": "d7413a44291c312b695ec5781512ea1a5e706aa0ecc24b5434ca9795ae2e7f62",
+      "size_bytes": 51900
+    },
+    "v": {
+      "path": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/v.npy",
+      "sha256": "5cdf1133d0324573d2efee38928924a799b031000cc27aac7d0c24c56c054239",
+      "size_bytes": 51900
+    },
+    "wet_mask": {
+      "path": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/wet_mask.npy",
+      "sha256": "5b20194e0d5d5c2a82e4417e94620b286ecd3f51c01bf17d644019417fe58bb3",
+      "size_bytes": 13071
+    }
+  },
+  "source_grid": {
+    "crs": "channel-following meters; x downstream along the committed corridor centerline centered on order-distributed route station 5312.259 m, y positive river-left",
+    "downstream_axis": "+x",
+    "dx_m": 2.0,
+    "dy_m": 2.0,
+    "index_to_world": "world_x = origin_x_m + col * dx_m; world_y = origin_y_m + row * dy_m (cell-centered samples)",
+    "layout": "row_major_c_order",
+    "nx": 301,
+    "ny": 43,
+    "origin_x_m": 0.0,
+    "origin_y_m": -42.0
+  },
+  "solver_evidence": {
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "flux_scheme": "hll",
+    "spatial_order": 2,
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "final_convergence_window": {
+      "end_time_s": 400.0,
+      "max_abs_dh_m": 0.2736481273531577,
+      "max_abs_du_m_per_s": 1.0678007393688542,
+      "max_abs_dv_m_per_s": 0.6442324449318582
+    },
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "discharge_authority": "scenario_planning_band_pending_review",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "field_ranges": {
+    "wet_depth_m": [
+      3.2641592042637058e-06,
+      3.96189546585083
+    ],
+    "wet_speed_mps": [
+      0.0,
+      7.116096019744873
+    ],
+    "wet_froude": [
+      0.0,
+      5.612317711422328
+    ],
+    "wet_surface_relief_m": [
+      -2.3480512131919795,
+      1.479010735842877
+    ]
+  },
+  "normalization": {
+    "policy": "fixed_physical_caps_clamp_to_unit_interval",
+    "caps": {
+      "depth_m": 6.0,
+      "speed_mps": 10.0,
+      "froude": 6.0,
+      "surface_relief_m": 2.5
+    }
+  },
+  "surface_relief_derivation": {
+    "source_field": "bed_plus_h",
+    "detrending": "subtract_least_squares_fit_of_per_column_wet_cell_median_surface",
+    "trend_slope_m_per_m": -0.016673254424200038,
+    "trend_intercept_m": 211.5773858221387,
+    "wet_cell_clipped_fraction": 0.0,
+    "render_height_scale": 0.22,
+    "render_height_cap_cm": 55.0
+  },
+  "hydraulic_visualization_evidence": {
+    "wet_cell_count": 8749,
+    "supercritical_cell_count": 452,
+    "foam_eligible_cell_count": 857,
+    "foam_mask": "wet_and_froude_at_least_0.80_and_speed_at_least_1.20_mps",
+    "strongest_column_index": 76,
+    "strongest_column_station_m": 152.0,
+    "strongest_column_mean_froude": 2.81512712928369,
+    "camera_progress": {
+      "guide": 0.14333333333333337,
+      "guide_target": 0.24333333333333335,
+      "river_eye": 0.17833333333333334,
+      "river_eye_target": 0.2783333333333334,
+      "solver_rapid": 0.19833333333333336,
+      "solver_rapid_target": 0.29833333333333334
+    }
+  },
+  "texture": {
+    "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/futaleufu_terminator_median_depth_speed_froude_surface_v1.png",
+    "sha256": "9a8314313301b537dd2fcf406756f134eb1230c40a68cfd246b224907e06264e",
+    "width": 1024,
+    "height": 256,
+    "channels": "R=depth_m/6 G=speed_mps/10 B=froude/6 A=detrended_surface_relief_m/5+0.5",
+    "source_orientation": "image_x_increases_downstream_station; image_y_increases_from_river_right_to_river_left"
+  },
+  "render_binding": {
+    "map": "/Game/RaftSim/Maps/L_Terminator",
+    "surface_actor": "RaftSim_PhysicalCorridorRiverRibbon_futaleufu_terminator",
+    "foam_actor": "RaftSim_SolverFieldFoam_futaleufu_terminator",
+    "capture_only": true,
+    "hidden_in_game": true,
+    "collision_enabled": false,
+    "runtime_water_owner": "ARaftSimWaterSurfaceActor_live_cooked_field_window",
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0
+  },
+  "authority_policy": {
+    "physical_authority": "live_custom_cxx_shallow_water_solver",
+    "derivative_scope": "capture_only_noncolliding_authored_ribbon_color_relief_and_foam",
+    "changes_collision_or_raft_forces": false,
+    "changes_solver_state": false,
+    "changes_cooked_fields": false,
+    "may_be_used_as_production_calibration_evidence": false,
+    "reason": "source convergence is false and Terminator stationing, geometry, flow bands, hazards, and guide lines remain review-gated"
+  }
+}

@@ -454,6 +454,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bChilkoLavaCanyonSolverVisualization =
             bHasSolverVisualizationFields &&
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        const bool bFutaleufuTerminatorSolverVisualization =
+            bHasSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const FString CandidateSolverVisualizationManifest =
             bPacuareSolverVisualization
             ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
@@ -464,7 +467,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                    : (bChilkoLavaCanyonSolverVisualization
                           ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
                                  "chilko_lava_canyon_median_visualization_manifest.json")
-                          : GetSolverVisualizationFieldManifestRelativePath()));
+                          : (bFutaleufuTerminatorSolverVisualization
+                                 ? TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                                        "futaleufu_terminator_median_visualization_manifest.json")
+                                 : GetSolverVisualizationFieldManifestRelativePath())));
         const bool bHasManifestConditionedPhysicalChannel =
             Candidate.bPhysicalScaleSourceCorridor;
         const bool bUsesZambeziOpaqueVegetation =
@@ -479,10 +485,12 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesDefaultLitLandscape =
             bUsesPacuareOrganicRainforestSurface ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const bool bUsesReachLocalReferenceGameplay =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const FString WaterMaterialParentPath = bUsesZambeziSingleLayerWater
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater")
@@ -809,7 +817,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("reference_runnable_upper_huacas_live_cooked_water_player_raft_and_game_mode")
                        : (Candidate.PreviewSpec.RiverId == TEXT("colorado_river")
                               ? TEXT("reference_runnable_colorado_hance_live_cooked_water_player_raft_and_game_mode")
-                              : TEXT("reference_runnable_chilko_lava_canyon_live_cooked_water_player_raft_and_game_mode")))
+                              : (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
+                                     ? TEXT("reference_runnable_futaleufu_terminator_live_cooked_water_player_raft_and_game_mode")
+                                     : TEXT("reference_runnable_chilko_lava_canyon_live_cooked_water_player_raft_and_game_mode"))))
                 : (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge")
                        ? TEXT("reference_runnable_full_corridor_live_cooked_water_player_raft_and_game_mode")
                        : TEXT("capture_candidate_only")),
@@ -985,6 +995,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("colorado_hance_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
                        : bChilkoLavaCanyonSolverVisualization
                        ? TEXT("chilko_lava_canyon_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
+                       : bFutaleufuTerminatorSolverVisualization
+                       ? TEXT("futaleufu_terminator_cooked_field_capture_visualization_bound_review_only_not_production_promoted")
                        : TEXT("validated_cpp_solver_visualization_fields_bound_review_only"))
                 : (Candidate.bPhysicalScaleSourceCorridor
                        ? TEXT("disabled_for_physical_corridor_until_solver_grid_georeferencing_is_validated")

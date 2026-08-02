@@ -1,0 +1,158 @@
+{
+  "schema": "raftsim.environment.futaleufu_terminator_reach_local_runnable_review.v1",
+  "river_id": "futaleufu_terminator",
+  "rapid_name": "Terminator",
+  "map_package": "/Game/RaftSim/Maps/L_Terminator",
+  "milestone": "futaleufu_terminator_reach_local_runnable_v1",
+  "status": "accepted_reference_runnable_photoreal_promotion_rejected",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "reach_local_landscape_owns_rendering_collision_and_height_queries": true,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "authored_capture_water_hidden_in_game": true,
+    "capture_only_water_actor_count": 2,
+    "capture_only_water_collision_enabled": false
+  },
+  "coordinate_contract": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "landscape_span_m": [600.0, 600.0],
+    "protected_solver_strip_span_m": [600.0, 84.0],
+    "runtime_vertical_datum_m": 206.59621940526426,
+    "runtime_coordinate_map": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_runtime_coordinate_map.json",
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "adopted_hydrography": "OpenStreetMap named-river route scaffold pending guide and geospatial review",
+    "terrain": "Copernicus DEM GLO-30 surface model, corridor-conditioned, EGM2008 orthometric heights",
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "route_station_authority": "order_distributed_route_work_window_not_authoritative",
+    "heightfield_size_px": 1009,
+    "landscape_component_grid": [8, 8],
+    "corridor_station_range_m": [5012.259, 5612.259],
+    "protected_solver_half_width_m": 42.0,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_corridor_dem_edge_correction_m": 4.882013151505504,
+    "edge_correction_feather_distance_m": 135.0,
+    "maximum_procedural_microrelief_m": 1.159929968635603,
+    "maximum_change_from_corridor_dem_outside_solver_strip_m": 4.88194160385612,
+    "surveyed_terminator_bathymetry": false,
+    "source_limitation": "The 30 m surface model and review-gated route define broad reach form only. The complete interpreted 600 by 84 m C3 bed is preserved; bounded correction and microrelief outside it are visual and Landscape-collision infill rather than surveyed Terminator geography."
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "flux_scheme": "hll",
+    "spatial_order": 2,
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "wet_cell_count": 8749,
+    "supercritical_cell_count": 452,
+    "foam_eligible_cell_count": 857,
+    "maximum_depth_m": 3.96189546585083,
+    "maximum_speed_m_per_s": 7.116096019744873,
+    "maximum_froude": 5.612317711422328,
+    "strongest_mean_froude_station_m": 152.0,
+    "strongest_column_mean_froude": 2.81512712928369,
+    "production_calibration_evidence": false
+  },
+  "interpreted_contact_geometry": {
+    "count": 1,
+    "authority": "interpreted_c3_feature_tag_review_gated_not_surveyed_hazard",
+    "contacts": [
+      {
+        "kind": "entry_marker_boulder",
+        "station_m": 266.0,
+        "lateral_m": -8.0,
+        "radius_m": 3.2,
+        "crest_above_surface_m": 0.7
+      }
+    ]
+  },
+  "capture_presentation": {
+    "packed_field_channels": "R depth, G speed, B Froude, A detrended bed-plus-depth surface relief",
+    "surface_relief_render_cap_cm": 55.0,
+    "residual_analytic_displacement_scale": 0.22,
+    "foam_max_opacity": 0.94,
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0,
+    "camera_authority": "hydraulic framing derived from strongest-column evidence in the median visualization manifest",
+    "capture_visibility_policy": "temporarily reveal RaftSimCaptureOnlyStaticWater actors during editor evidence and restore their serialized runtime-hidden state"
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "bbafba96ce9df1d690c264704b05e2ca9950d5b1b805d33bc401174074b4b8d6"
+    },
+    {
+      "path": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_conditioned_heightfield_1009.png",
+      "sha256": "5cdab40a20ec309d51930584e8b8297202c1057e03704088f8e75cdcf78a8e3b"
+    },
+    {
+      "path": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_local_centerline.json",
+      "sha256": "2f09a8312de4cc1dcd0173b6c40e861ce5cfe2aea98da0a25a6f1c039030475f"
+    },
+    {
+      "path": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_runtime_coordinate_map.json",
+      "sha256": "93ee065a6154c573a13ed6060591f043fa5ce41e8f21de87c6b11354cf912ce5"
+    },
+    {
+      "path": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_visual_terrain_manifest.json",
+      "sha256": "14ae5ca5524f7c60fe025f4c25d8f8fc7e1c7b09c367d830d24cae1a1bb50afd"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/futaleufu_terminator_median_depth_speed_froude_surface_v1.png",
+      "sha256": "9a8314313301b537dd2fcf406756f134eb1230c40a68cfd246b224907e06264e"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/futaleufu_terminator_median_visualization_manifest.json",
+      "sha256": "fdb720e8fd9df231aaf9dffdf8b5a7b7a846924aa3b25f18746db3ffbee58257"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
+      "sha256": "42df4beb63ee62326c1ab00dff25730502cefc6f4809637b3dd552b34edf1d31",
+      "mean_luminance": 0.3120
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
+      "sha256": "bf6fccc8b221f1f62ab19ff0e850a918375a1b89300ed132e350d1fc9e8006eb",
+      "mean_luminance": 0.3091
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png",
+      "sha256": "e6c91d9de16d8c18d2e02c4560291310257612efc09256e90f279d9aaa141011",
+      "mean_luminance": 0.3116
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "sha256": "9e9638dc0539cc3734770b4977067f29f7c8961714373e8e75047936a72a94bc"
+    }
+  ],
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_Terminator_pass_1_of_1",
+    "focused_python_tests": "pass",
+    "raft_upright_after_initial_settle": true,
+    "swimmer_count_after_initial_settle": 0
+  },
+  "remaining_photoreal_defects": [
+    "water remains dark and opaque and the high-Froude rapid structure is visually understated",
+    "near-bank terrain is nearly black and broad/smooth rather than resolving wet rock, gravel, soil, and small-scale bank form",
+    "foliage uses dense visibly repeated sample geometry with sparse ground cover instead of authentic Futaleufu species and natural distribution",
+    "the rapid lacks surveyed rock geometry, resolved holes and flip waves, spray, mist, entrained aeration, and convincing shoreline contact",
+    "the 30 m source surface, review-gated route scaffold, and interpreted C3 bed are not surveyed Terminator bathymetry or authoritative rapid stationing",
+    "hydraulics are unconverged and guide line, ecology, geology, environment art, performance, capsize, recovery, and packaged-run evidence remain open"
+  ],
+  "required_external_acceptance_gates": [
+    "Futaleufu guide review of Terminator stationing, entry, main and sneak lines, holes, flip-wave train, marker boulder, recovery, and playable flow bands",
+    "geospatial review of route registration, rapid station, terrain, bank breaklines, bathymetry, rapid rocks, and EGM2008 vertical datum",
+    "hydraulic calibration and convergence approval against observed Terminator behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of native species, ground cover, wet banks, boulders, valley form, and seasonal presentation",
+    "photoreal water and VFX approval for depth, transmission, holes, flip waves, foam, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}

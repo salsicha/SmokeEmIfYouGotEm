@@ -177,24 +177,33 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
-        Settings.BaseColorScale = 1.08f;
+        // Terminator samples its median cooked C++ field on the reach-local
+        // ribbon. Keep the Futaleufu turquoise restrained so measured depth,
+        // speed, Froude number, and free-surface relief own the rapid cues.
+        Settings.BaseColorScale = 1.02f;
         Settings.EmissiveFillScale = 0.090f;
-        Settings.Roughness = 0.27f;
-        Settings.Specular = 0.50f;
+        Settings.Roughness = 0.28f;
+        Settings.Specular = 0.48f;
         Settings.Opacity = 0.34f;
-        Settings.NormalIntensity = 0.74f;
-        Settings.VertexTintWeight = 0.66f;
-        Settings.RenderWidthScale = 1.30f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.012f, 0.20f, 0.24f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.40f, 0.60f, 0.68f, 0.0f);
+        Settings.NormalIntensity = 0.22f;
+        Settings.SurfaceVariationStrength = 0.24f;
+        Settings.VertexTintWeight = 0.62f;
+        Settings.RenderWidthScale = 1.18f;
+        Settings.RenderNormalUpBlend = 0.84f;
+        Settings.RenderDisplacementScale = 0.18f;
+        Settings.ReflectionFillIntensity = 0.07f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.20f;
+        Settings.SolverDepthColorWeight = 0.30f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.72f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.22f;
+        Settings.SurfaceTint = FLinearColor(0.008f, 0.18f, 0.22f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.006f, 0.095f, 0.13f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.88f, 0.95f, 0.96f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.38f, 0.56f, 0.65f, 0.0f);
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
@@ -840,6 +849,7 @@ float GetLandscapeCandidateWorldMinX(
     const bool bReachLocalSolverWindow =
         Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
     return bReachLocalSolverWindow &&
             !Candidate.LocalCenterlineRelativePath.IsEmpty()
@@ -1349,21 +1359,41 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         else if (PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
         {
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png");
-            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
-            Candidate.ImportContractRelativePath = PreviewSpec.SourceManifest;
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                     "terminator_visual/terminator_conditioned_heightfield_1009.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                     "terminator_visual/terminator_visual_terrain_manifest.json");
+            Candidate.ImportContractRelativePath =
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                     "terminator_visual/terminator_visual_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/centerline_local.json");
+                TEXT("physics/data/real_world/futaleufu_river_chile/terrain/"
+                     "terminator_visual/terminator_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate");
-            Candidate.LandscapeSize = 2017;
-            Candidate.HorizontalSpanXCm = 1006390.921f;
-            Candidate.HorizontalSpanYCm = 836476.459f;
-            Candidate.TargetReliefCm = 167894.690f;
+                TEXT("/Game/RaftSim/Maps/L_Terminator");
+            Candidate.LandscapeSize = 1009;
+            Candidate.HorizontalSpanXCm = 60000.0f;
+            Candidate.HorizontalSpanYCm = 60000.0f;
+            Candidate.TargetReliefCm = 7188.1457f;
+            Candidate.WorldVerticalOffsetCm = -640.6583f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bUseSolverVisualizationFields = true;
+            Candidate.SolverVisualizationFieldRelativePath =
+                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                     "futaleufu_terminator_median_depth_speed_froude_surface_v1.png");
+            Candidate.SolverVisualizationDepthCapM = 6.0f;
+            Candidate.SolverVisualizationSpeedCapMps = 10.0f;
+            Candidate.SolverVisualizationFroudeCap = 6.0f;
+            Candidate.SolverVisualizationSurfaceReliefCapM = 2.5f;
+            Candidate.SolverVisualizationLateralMinM = -41.0f;
+            Candidate.SolverVisualizationLateralMaxM = 41.0f;
             Candidate.bPhysicalScaleSourceCorridor = true;
-            Candidate.bEnableLandscapeNanite = false;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
+            Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 2400.0f;
+            Candidate.PreviewSpec.BankWidthCm = 6200.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
         {
