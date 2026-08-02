@@ -235,3 +235,22 @@ and external acceptance gates pass.
   contract, and cook list now all require `/Game/RaftSim/Maps/L_Zambezi`; the
   old ignored Landscape-candidate preview path is no longer accepted as a
   runnable destination.
+
+### 2026-08-02 — Futaleufú and Chilko organic waterline structure retained
+
+- `L_Terminator` and `L_LavaCanyon` each add 1,440 source-Landscape-grounded
+  instances from the rights-reviewed six-form CC0 rock set across both banks
+  and the complete route. A deterministic 72-choice search keeps every
+  instance outside the complete visible-water width and enforces full-route
+  centerline clearance, dry-height, and 55-degree slope gates.
+- All six per-river HISM components remain non-colliding and explicitly carry
+  procedural-gap-fill, generic-rock/no-lithology, no-hydraulic-authority, and
+  river-run tags. Source terrain, collision, water geometry, bathymetry,
+  hydraulics, route stationing, hazard contacts, and raft forces are unchanged.
+- Both maps place 1,440/1,440 targets with zero rejects. Fixed comparisons
+  change 14.35-14.43% of the Futaleufú bank review band and 18.11-20.87% of
+  the Chilko band beyond a two-percent pixel threshold. The result is retained
+  as useful bank breakup, but photoreal promotion remains rejected because the
+  coarse terrain, procedural ecology, opaque water, incomplete gravel/deadwood,
+  sparse rapid VFX, unconverged hydraulics, and all six external acceptance
+  gates remain open.

@@ -234,6 +234,61 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("temperate river has one organic ground-cover layer"),
             OrganicGroundCoverActorCount,
             1);
+
+        int32 WaterlineStructureActorCount = 0;
+        int32 WaterlineStructureInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor ||
+                !Actor->Tags.Contains(
+                    TEXT("RaftSimTemperateWaterlineStructureV1")) ||
+                !Actor->Tags.Contains(RiverRunTag))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                Actor->FindComponentByClass<
+                    UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestNotNull(
+                TEXT("temperate waterline structure actor has one HISM"),
+                Instances);
+            if (!Instances)
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("temperate waterline structure remains non-colliding"),
+                Instances->GetCollisionEnabled(),
+                ECollisionEnabled::NoCollision);
+            Test->TestTrue(
+                TEXT("temperate waterline structure remains outside the solver strip"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimOutsideProtectedSolverStrip")) &&
+                    Instances->ComponentTags.Contains(
+                        TEXT("RaftSimOutsideProtectedSolverStrip")));
+            Test->TestTrue(
+                TEXT("temperate waterline structure disclaims measured geology and hydraulics"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority")) &&
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")) &&
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimProceduralSourceGapFill")));
+            Test->TestTrue(
+                TEXT("temperate waterline structure is source-Landscape grounded"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimSourceLandscapeGrounded")));
+            WaterlineStructureInstanceCount += Instances->GetInstanceCount();
+            ++WaterlineStructureActorCount;
+        }
+        Test->TestEqual(
+            TEXT("temperate river has six waterline rock morphology variants"),
+            WaterlineStructureActorCount,
+            6);
+        Test->TestTrue(
+            TEXT("temperate river has dense organic waterline structure"),
+            WaterlineStructureInstanceCount >= 1250);
     }
 
     if (bZambeziReferenceRun)

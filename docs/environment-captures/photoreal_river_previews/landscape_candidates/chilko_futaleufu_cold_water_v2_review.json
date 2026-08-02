@@ -92,7 +92,7 @@
     "The separate capture-only foam carrier is sparse and is not yet proven against raft and passenger occlusion in these two maps.",
     "Thirty-metre source terrain remains too smooth for reach-specific bank shelves, undercuts, cobble bars, and rapid rocks.",
     "The project-owned conifer, broadleaf, shrub, and ground-cover forms remain visibly procedural and repetitive.",
-    "Near-bank gravel, cobble, roots, deadwood, wet-rock transitions, and deposited sediment remain sparse.",
+    "Temperate waterline structure V1 adds a dense source-grounded rock morphology layer, but fine gravel, roots, deadwood, terrain-integrated wetness, and deposited sediment remain incomplete.",
     "Cooked hydraulics remain unconverged and uncalibrated against observed Terminator and Lava Canyon behavior.",
     "No named local guide, environment-art reviewer, water-VFX reviewer, or target-hardware performance reviewer has accepted either result."
   ],
@@ -108,7 +108,7 @@
     "isolated_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
     "isolated_futaleufu_native_test": "RaftSim.M9.FFutaleufuTerminatorWater passed 1/1",
     "isolated_chilko_native_test": "RaftSim.M9.FChilkoLavaCanyonWater passed 1/1",
-    "branch_validation": "editor build succeeded; focused Python passed 8/8; RaftSim.M9.FFutaleufuTerminatorWater, RaftSim.M9.FChilkoLavaCanyonWater, RaftSim.P4.RiverMapLoads.L_Terminator, and RaftSim.P4.RiverMapLoads.L_LavaCanyon each passed 1/1"
+    "branch_validation": "editor build succeeded; focused Python passed 15/15 after waterline V1 regeneration; native Futaleufu and Chilko terrain/water audits passed 4/4; RaftSim.P4.RiverMapLoads.L_Terminator and RaftSim.P4.RiverMapLoads.L_LavaCanyon each passed 1/1 with zero errors or warnings"
   },
   "reviewers": {
     "named_local_guide": null,
@@ -117,19 +117,19 @@
     "named_performance_reviewer": null
   },
   "retained_artifacts": [
-    {"path": "unreal/Content/RaftSim/Maps/L_Terminator.umap", "sha256": "ac7fc7f7d848f72c6d8d263244f19ffed45cc4b65236953d4ba077b7bc8de22d"},
-    {"path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap", "sha256": "989fad8ff567d7075f128a910bd375f7e583bb675da00ae36416451219e99f66"},
+    {"path": "unreal/Content/RaftSim/Maps/L_Terminator.umap", "sha256": "f853fc3764105f830acfddcab20bb5135b17747ce57b20905b65a67e20f4f815"},
+    {"path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap", "sha256": "75761b69da8fe0827dff5db3c9022774a31abd775822f37d212ededeb0513b7d"},
     {"path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater.uasset", "sha256": "06e83130d4fa1e207c60f57c3818e04b68e84ba6bd52c4f728cd6d37e2e09630"},
     {"path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater.uasset", "sha256": "9e2b4d5f8892038c48bd90d1ca1a386fbc678e8a49b40549aaca61cc022cfd4d"},
     {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate.uasset", "sha256": "33bbccfd9f2123b2546b8e85e2bed979d094b4127cc63197135ef2ca7ac9ffeb"},
     {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate.uasset", "sha256": "de85279618724b532ba8871a738b146b7f20413def61c7b887f7078c9dc8062d"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json", "sha256": "0fd6202450c2c4cbc84972da2dd3db5e0ffe7a197521dd3a0ce717f249485c17"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json", "sha256": "8e36e89b808be8afeb725a53b1d59482f759ec17bae1232b425a13ba1b13b220"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png", "sha256": "51f0df7838a9429b26abaf5ea9e5c298bf9cb5b1ef824ee1fe4ba36633ad8da7"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png", "sha256": "be85678540fee99a86a424c1decbf8be395c12c0ac293ee584e9a9705b6126f0"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png", "sha256": "51f0df7838a9429b26abaf5ea9e5c298bf9cb5b1ef824ee1fe4ba36633ad8da7"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png", "sha256": "3be2ea860cd031990c965910dba1088c81926659ef105d603a83e354c4b9e270"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png", "sha256": "e55e60975f2492cae80c06252925f0c7c982f24e5e0b1d51922aa28d1088c600"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png", "sha256": "3be2ea860cd031990c965910dba1088c81926659ef105d603a83e354c4b9e270"}
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json", "sha256": "0ca241e553aaef0ecadfb5fdba76c43e90a2f098324e92bda68d6ff3b2c8d210"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json", "sha256": "348e8d5a447c02cd09d81be65369c8c0abd0759d158e0ec7bd2f69f3b978e8da"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png", "sha256": "421c593c2cfbcf4db6cba88646d26741f0a97731a378d52f540138a65fca44c1"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png", "sha256": "6287c6a0c50f2729dd0b8e8d2a36761acc19ca834ee17609685a70d73af44853"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png", "sha256": "421c593c2cfbcf4db6cba88646d26741f0a97731a378d52f540138a65fca44c1"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png", "sha256": "a0b1adda132f59ed86c452e2313440d4b7fa9d17d627c4b42acffae09558e5c0"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png", "sha256": "446ec546f634ac8825a8ceb467ebd1148ed6f280c5f72ecd022cf2c29079d9a2"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png", "sha256": "a0b1adda132f59ed86c452e2313440d4b7fa9d17d627c4b42acffae09558e5c0"}
   ]
 }
