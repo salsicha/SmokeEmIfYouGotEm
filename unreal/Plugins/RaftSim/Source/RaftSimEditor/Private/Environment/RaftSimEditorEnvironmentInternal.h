@@ -946,6 +946,22 @@ struct FZambeziBatokaVisualMorphologyStats
         TNumericLimits<float>::Max();
 };
 
+struct FZambeziAdaptiveNearFieldTerrainStats
+{
+    int32 ActorCount = 0;
+    int64 VertexCount = 0;
+    int64 TriangleCount = 0;
+    int64 DryShorelineInfillVertexCount = 0;
+    int64 RefinedVertexCount = 0;
+    int32 ShadowSuppressedActorCount = 0;
+    int32 CollisionEnabledActorCount = 0;
+    float LongitudinalSpacingCm = 0.0f;
+    float LateralSpacingCm = 0.0f;
+    float MaximumDryShorelineInfillCm = 0.0f;
+    float MinimumRenderedHeightAboveWaterCm = TNumericLimits<float>::Max();
+    float MaximumAbsoluteRefinementCm = 0.0f;
+};
+
 bool ApplyZambeziBatokaVisualTerrainTreatment(
     UWorld* World,
     UMaterialInterface* TerrainMaterial,
@@ -2181,6 +2197,14 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
     UWorld* World,
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary);
+
+bool AddZambeziAdaptiveNearFieldTerrain(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    UMaterialInterface* TerrainMaterial,
+    FZambeziAdaptiveNearFieldTerrainStats& OutStats,
     FString& OutSummary);
 
 bool AddLandscapeCandidateScenarioMarkers(

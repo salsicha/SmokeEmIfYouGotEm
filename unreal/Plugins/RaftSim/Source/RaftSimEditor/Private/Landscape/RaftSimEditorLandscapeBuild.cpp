@@ -323,6 +323,21 @@ bool BuildLandscapeImportCandidateMap(
             MorphologyStats.ProtectedShorelineRadiusCm / 100.0f,
             MorphologyStats.MinimumModifiedCenterlineDistanceCm / 100.0f,
             MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f);
+
+        FZambeziAdaptiveNearFieldTerrainStats NearFieldStats;
+        if (!AddZambeziAdaptiveNearFieldTerrain(
+                World,
+                Landscape,
+                Candidate,
+                BatokaTerrainMaterial,
+                NearFieldStats,
+                OutSummary))
+        {
+            OutSummary += TEXT(
+                "Runnable Zambezi map requires the source-conditioned adaptive "
+                "near-field bank surface at the playable launch.\n");
+            return false;
+        }
     }
     if (Candidate.bPhysicalScaleSourceCorridor &&
         Candidate.bUseDensePhysicalTerrainRenderSurface)

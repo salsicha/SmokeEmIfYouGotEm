@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Added two source-conditioned, non-colliding 5 m adaptive bank meshes over the
+  first kilometre of the runnable Zambezi map, with bounded dry-shoreline and
+  sub-metre erosion/talus infill where the 30 m source lacks local detail. The
+  retained bracket suppresses the first iteration's catastrophic self-shadow
+  wedges, expands launch ecology to 1,721 ground-cover and 174 woody instances,
+  and binds a tagged four-actor dry-season atmosphere contract. Saved-map schema
+  v13, the focused runtime gate, and Python regression lock the authority
+  boundary. The default frame remains photoreal-rejected because the canyon,
+  ground cover, water, rocks, ecology, and atmosphere are visibly synthetic.
 - Promoted the complete Zambezi Batoka Gorge reference run from an ignored
   `EnvironmentPreviews` candidate package to the stable, versioned
   `/Game/RaftSim/Maps/L_Zambezi` runnable-map contract. The frontend, generated

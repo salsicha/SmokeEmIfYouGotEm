@@ -1,11 +1,51 @@
 {
-  "actor_count": 59,
+  "actor_count": 61,
   "lighting": {
+    "atmosphere_actor_count": 4,
+    "atmosphere_actors": [
+      {
+        "actor_label": "RaftSim_CanyonAtmosphere",
+        "class": "ExponentialHeightFog",
+        "tags": [
+          "RaftSimVolumetricGorgeHaze",
+          "RaftSimZambeziAtmosphereV1"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_SkyAtmosphere_SourceAware",
+        "class": "SkyAtmosphere",
+        "tags": [
+          "RaftSimSourceAwareDrySeasonSky",
+          "RaftSimZambeziAtmosphereV1"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_SkyLight_PhotorealPreview",
+        "class": "SkyLight",
+        "tags": [
+          "RaftSimCapturedGorgeSkyFill",
+          "RaftSimZambeziAtmosphereV1"
+        ]
+      },
+      {
+        "actor_label": "RaftSim_Sun_LumenPreview",
+        "class": "DirectionalLight",
+        "tags": [
+          "RaftSimAtmosphereSunLight",
+          "RaftSimZambeziAtmosphereV1"
+        ]
+      }
+    ],
+    "atmosphere_contract": "zambezi_specific_sun_linked_dry_season_sky_captured_gorge_fill_and_volumetric_haze",
     "authority": "presentation_only_no_physics_effect",
     "directional_lights": [
       {
         "actor_label": "RaftSim_Sun_LumenPreview",
         "pitch_degrees": -48.0,
+        "tags": [
+          "RaftSimAtmosphereSunLight",
+          "RaftSimZambeziAtmosphereV1"
+        ],
         "yaw_degrees": -90.0
       }
     ],
@@ -368,7 +408,7 @@
     ]
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v12",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v13",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,
@@ -533,7 +573,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 592,
+        "instance_count": 1721,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1.SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1",
         "tags": [
@@ -553,7 +593,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 13,
+        "instance_count": 44,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1.SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1",
         "tags": [
@@ -574,7 +614,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 28,
+        "instance_count": 87,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1.SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1",
         "tags": [
@@ -595,7 +635,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 14,
+        "instance_count": 43,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1.SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1",
         "tags": [
@@ -613,28 +653,78 @@
       }
     ],
     "ground_cover_shadow_policy": "disabled_on_full_corridor_camera_mosaic_and_launch_cover",
-    "instance_count": 7679,
+    "instance_count": 8927,
     "legacy_zambezi_pve_actor_count": 0,
     "legacy_zambezi_pve_actors": [],
     "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards",
     "runnable_launch_bank_cover_component_count": 1,
-    "runnable_launch_bank_cover_instance_count": 592,
-    "runnable_launch_bank_cover_placement_contract": "deterministic_96_candidate_search_194m_to_560m_downstream_with_full_route_clearance_dry_height_and_hard_slope_gates",
-    "runnable_launch_bank_cover_rejection_count": 8,
+    "runnable_launch_bank_cover_instance_count": 1721,
+    "runnable_launch_bank_cover_placement_contract": "deterministic_96_candidate_search_151m_to_842m_downstream_with_full_route_clearance_dry_height_and_hard_slope_gates",
+    "runnable_launch_bank_cover_rejection_count": 79,
     "runnable_launch_bank_cover_shadow_policy": "disabled_on_noncolliding_ground_cover_only",
     "runnable_launch_bank_cover_slope_ceiling_degrees": 32.0,
-    "runnable_launch_bank_cover_target_instance_count": 600,
+    "runnable_launch_bank_cover_target_instance_count": 1800,
     "runnable_launch_woody_component_count": 3,
-    "runnable_launch_woody_instance_count": 55,
-    "runnable_launch_woody_placement_contract": "deterministic_160_candidate_search_270m_to_600m_downstream_with_50m_beyond_active_half_width_full_route_clearance_dry_height_and_hard_slope_gates",
-    "runnable_launch_woody_rejection_count": 9,
+    "runnable_launch_woody_instance_count": 174,
+    "runnable_launch_woody_placement_contract": "deterministic_160_candidate_search_215m_to_864m_downstream_with_50m_beyond_active_half_width_full_route_clearance_dry_height_and_hard_slope_gates",
+    "runnable_launch_woody_rejection_count": 18,
     "runnable_launch_woody_shadow_policy": "disabled_on_launch_window_only_to_prevent_camera_wall_streaks",
     "runnable_launch_woody_slope_ceiling_degrees": 24.0,
-    "runnable_launch_woody_target_instance_count": 64
+    "runnable_launch_woody_target_instance_count": 192
   },
   "visual_terrain": {
     "active_water_half_width_m": 72.0,
-    "authority": "procedural_render_only",
+    "adaptive_near_field": {
+      "active_water_half_width_m": 72.0,
+      "actor_count": 2,
+      "actors": [
+        {
+          "actor_label": "RaftSim_ZambeziAdaptiveNearFieldTerrainV1_LeftBank",
+          "cast_shadow": false,
+          "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+          "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+          "procedural_mesh_count": 1,
+          "tags": [
+            "RaftSimNearFieldSelfShadowSuppressed",
+            "RaftSimNonCollisionRenderSurface",
+            "RaftSimProceduralInfill",
+            "RaftSimProtectedDryShoreline",
+            "RaftSimSourceConditionedTerrain",
+            "RaftSimZambeziAdaptiveNearFieldTerrainV1",
+            "RaftSimZambeziRun"
+          ]
+        },
+        {
+          "actor_label": "RaftSim_ZambeziAdaptiveNearFieldTerrainV1_RightBank",
+          "cast_shadow": false,
+          "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+          "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+          "procedural_mesh_count": 1,
+          "tags": [
+            "RaftSimNearFieldSelfShadowSuppressed",
+            "RaftSimNonCollisionRenderSurface",
+            "RaftSimProceduralInfill",
+            "RaftSimProtectedDryShoreline",
+            "RaftSimSourceConditionedTerrain",
+            "RaftSimZambeziAdaptiveNearFieldTerrainV1",
+            "RaftSimZambeziRun"
+          ]
+        }
+      ],
+      "authority": "source_conditioned_surface_with_bounded_procedural_dry_shoreline_and_basalt_erosion_infill",
+      "grid_spacing_m": 5.0,
+      "inner_dry_bank_buffer_m": 3.0,
+      "maximum_dry_shoreline_infill_m": 1.8,
+      "maximum_lateral_extent_m": 600.0,
+      "maximum_procedural_refinement_m": 0.96,
+      "minimum_rendered_dry_clearance_m": 0.295,
+      "physics_and_collision_authority": "source_copernicus_landscape_only",
+      "station_window_m": [
+        0.0,
+        1000.0
+      ]
+    },
+    "authority": "source_conditioned_plus_bounded_procedural_render_only",
     "coarse_source_self_shadow_policy": "disabled_on_noncolliding_visual_tiles_only",
     "conditioned_tile_count": 4,
     "full_strength_morphology_radius_m": 220.0,

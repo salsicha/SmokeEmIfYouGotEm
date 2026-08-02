@@ -72,7 +72,7 @@ foam/spray, biome-specific foliage, wet-bank/riverbed detail, higher-resolution
 terrain, guide/geospatial/hydraulic/ecology/art review, and desktop/VR
 performance evidence remain open.
 
-The Zambezi render terrain now uses a V15 organic treatment on four collision-free 12.5 m visual tiles while the source Copernicus Landscape remains the sole terrain/physics authority. Central-difference grid normals, slower relief, variable strata/erosion/talus, and a 3.2 m-capped six-pass reconstruction reduce triangle and regular-terrace artifacts; the first 100 m stays horizontally protected except for upper rock at least 6 m above local water, and morphology remains capped at 2.8 m outside that radius. Since the 30 m DEM still generates a false comb under self-shadow, only those non-colliding visual tiles have shadow casting disabled; an audited movable -48/-90 degree review sun keeps the result deterministic while raft, rock, downstream woody vegetation, and gameplay geometry retain shadows. Schema v12 rejects any restored high-density bank ribbon and requires these tags and properties. The accepted default capture passes artifact reduction, not photoreal promotion: the canyon remains rounded and bright and is dependent on acquisition of higher-resolution full-reach terrain and reviewed southern African ecology.
+The Zambezi render terrain now uses a V15 organic treatment on four collision-free 12.5 m visual tiles while the source Copernicus Landscape remains the sole terrain/physics authority. Central-difference grid normals, slower relief, variable strata/erosion/talus, and a 3.2 m-capped six-pass reconstruction reduce triangle and regular-terrace artifacts; the first 100 m stays horizontally protected except for upper rock at least 6 m above local water, and morphology remains capped at 2.8 m outside that radius. Since the 30 m DEM still generates a false comb under self-shadow, only those non-colliding visual tiles have shadow casting disabled; an audited movable -48/-90 degree review sun keeps the result deterministic while raft, rock, downstream woody vegetation, and gameplay geometry retain shadows. Two additional source-conditioned 5 m adaptive banks cover the first kilometre, preserve a 3 m dry buffer outside the 72 m active-water half-width, and use at most 1.8 m of dry-shoreline correction plus 0.96 m of bounded erosion/fracture/talus infill. They contribute 42,612 vertices and 61,748 triangles but remain non-colliding and presentation-only. Their shadow-casting V1 was rejected for enormous black wedges; the retained actors suppress self-shadow. Schema v13 rejects any restored high-density bank ribbon and requires all six terrain actors, the four-actor Zambezi atmosphere contract, and their authority tags and properties. The accepted default capture passes dry-clearance and artifact reduction, not photoreal promotion: the canyon remains rounded and bright and is dependent on acquisition of higher-resolution full-reach terrain and reviewed southern African ecology.
 
 Zambezi also has an isolated camera-visible bank-cover component. It adds 1,200
 grounded instances of the project-owned opaque savanna mesh across the two
@@ -94,21 +94,22 @@ is more legible ecology, not production foliage: repeated procedural crowns,
 missing wind/seasonal variation, coarse lighting, and absent species/art/guide
 approval remain open.
 
-The runnable launch now has four additional HISM components rather than
-depending on those downstream documentary windows. A deterministic search
-places 592 solid savanna-cover instances approximately 194-560 m downstream
-and 55 woody instances approximately 270-600 m downstream. Every candidate is
+The runnable launch has four additional HISM components rather than depending
+on those downstream documentary windows. The expanded deterministic search
+places 1,721 solid savanna-cover instances approximately 151-842 m downstream
+and 174 woody instances approximately 215-864 m downstream, split 44/43/87
+between riparian tree, umbrella tree, and thorn scrub. Every candidate is
 checked against all route segments, conditioned-water height, and a hard DEM
 slope ceiling; woody plants stay at least 50 m beyond the active half-width.
-The accepted default gameplay capture removes the rejected camera-clipped
-silhouette and woody/waterline intersection while retaining a visible ridge
-tree line. These launch-only, non-colliding components suppress shadows to avoid
-the rejected crown/wall streak under the low review sun; the full-corridor and
+These launch-only, non-colliding components suppress shadows to avoid the
+rejected crown/wall streak under the low review sun; the full-corridor and
 camera-mosaic ground-cover layers are also shadowless, while downstream woody
-ecology retains shadows. The saved map now
-audits 7,679 instances across 12 components under schema v12. The foreground
-remains sparse and synthetic, so this is ecology coverage, not photoreal art or
-ecological promotion.
+ecology retains shadows. The saved map now audits 8,927 instances across 12
+components under schema v13. The retained gameplay frame is stable and contains
+no adaptive-bank shadow wedge, but the extra ground cover reads as a thin,
+repeated shoreline band and the foreground remains sparse and synthetic. This
+is technical coverage and dry-bank conditioning, not photoreal art or ecological
+promotion.
 
 Candidate lighting and post-processing now come from one river-specific `FRaftSimPhotographicCaptureSettings` contract rather than scattered desert/rainforest conditionals. Sun, skylight, fog, manual exposure, saturation, contrast, sharpening, vignette, and zero camera-film-grain values are serialized into `landscape_candidate_manifest.json` for every evidence frame. A clean UE 5.8 rebuild and offscreen recapture produced no material or shader errors and all 26 environment tests pass. The controlled sky fill improves diagnostic shadow retention, but visual review still finds near-black repeated foliage, coarse terrain plates, and a flat overlapping foreground water/bank ribbon; these are production material/geometry blockers, not reasons to hide the scene with stronger exposure or post-process noise.
 

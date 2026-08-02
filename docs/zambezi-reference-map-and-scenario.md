@@ -84,6 +84,24 @@ tags `RaftSimProceduralVisualMorphology`,
 `RaftSimBatokaWorldAlignedTerrain`, and `RaftSimNonCollisionRenderSurface`
 make that authority boundary inspectable in the generated map.
 
+The runnable launch also carries two adaptive, source-conditioned bank meshes
+covering stations 0-1,000 m. They bilinearly sample the four conditioned terrain
+tiles onto a 5 m grid, exclude the 72 m active-water half-width plus a 3 m inner
+dry-bank buffer, and extend no farther than 600 m laterally. Where the coarse
+source leaves a shoreline gap, a bounded correction raises only the render
+surface by at most 1.8 m; the retained map observes 0.33 m minimum dry clearance.
+Sub-metre erosion, fracture, and talus detail is capped at 0.96 m and observes a
+0.56 m maximum. The two actors contain 42,612 vertices and 61,748 triangles,
+remain non-colliding, and never replace the Copernicus Landscape's height-query,
+collision, or physics authority. Their first shadow-casting bracket was rejected
+because it projected large black wedges across the river; the retained actors
+are tagged `RaftSimNearFieldSelfShadowSuppressed` and do not cast shadows.
+
+The Zambezi preview light rig now binds the directional light as atmosphere sun
+zero and tags one captured skylight, one dry-season sky atmosphere, and one
+volumetric gorge-haze actor. This is a deterministic presentation contract, not
+evidence of measured atmospheric conditions or final lighting approval.
+
 The active Zambezi dressing no longer loads the generic Procedural Vegetation
 Editor species or their masked leaf cards. The generator creates four
 project-owned, opaque, one-sided, vertex-colour Nanite meshes and places them as
@@ -99,16 +117,17 @@ non-colliding hierarchical instances:
   camera-window thorn-scrub instances in three separately auditable woody
   components. Eight of 240 deterministic targets are rejected by the hard 24°
   slope ceiling, leaving 232 placed instances;
-- 592 of 600 launch-window savanna ground-cover targets in a separate
+- 1,721 of 1,800 launch-window savanna ground-cover targets in a separate
   non-shadow-casting component. A deterministic 96-candidate search spans
-  approximately 194-560 m downstream, stays at least 15 m beyond the active
+  approximately 151-842 m downstream, stays at least 15 m beyond the active
   half-width relative to every route segment, requires ground at least 0.8 m
   above conditioned water, and rejects slopes above 32°; and
-- 13 launch-window riparian trees, 14 umbrella trees, and 28 thorn-scrub
+- 44 launch-window riparian trees, 43 umbrella trees, and 87 thorn-scrub
   instances. Their deterministic 160-candidate search spans approximately
-  270-600 m downstream, requires 50 m of full-route clearance beyond the active
+  215-864 m downstream, requires 50 m of full-route clearance beyond the active
   half-width and ground at least 3 m above conditioned water, and rejects slopes
-  above 24°. Nine of 64 targets fail those gates, leaving 55 placed instances.
+  above 24°. Eighteen of 192 targets fail those gates, leaving 174 placed
+  instances.
 
 All four use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
 or blade geometry rather than alpha cards. The revised ground-cover mesh spans
@@ -211,13 +230,13 @@ and shipping cook list all classify it as the sixth runnable river. There are
 no remaining `additional_active_environment` river entries in the current
 portfolio.
 
-The generated `.umap` is intentionally not committed because it is currently
-about 1.6 GB. `package_mac.sh` and `package_win.ps1` regenerate it from the
-source-controlled reference bundle when absent, and `DefaultGame.ini` includes
-the resulting package in shipping cooks. The regression suite checks that the
-portfolio, source scenario, player catalog, frontend launch entry, cook list,
-and packaging regeneration commands all continue to name the same runnable
-map.
+The approximately 1.6 GB generated `.umap` is committed through Git LFS at
+`/Game/RaftSim/Maps/L_Zambezi`. `package_mac.sh` and `package_win.ps1` retain a
+fail-closed regeneration fallback if that versioned package is absent, and
+`DefaultGame.ini` includes it in shipping cooks. The regression suite checks
+that the portfolio, source scenario, player catalog, frontend launch entry,
+cook list, versioned map, and packaging regeneration commands all continue to
+name the same runnable map.
 The source-controlled runtime bundle lives under
 `physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/runtime/`:
 
@@ -285,30 +304,35 @@ plant and no woody silhouette visibly intersecting the waterline. The V1
 placement bracket that put cover on a 54.16° face and trees at the waterline was
 rejected rather than documented as progress. The 30 m DEM still yields rounded large-scale cliff silhouettes,
 however, and the project-owned tree crowns and small synthetic clumps remain
-repetitive and visibly procedural. The views prove that the broken card foliage
+repetitive and visibly procedural. The expanded launch layer makes more of the
+dry bank technically occupied, but the retained gameplay frame reads that
+ground cover as a thin, repeated shoreline band rather than organic vegetation.
+The views prove that the broken card foliage
 is absent and that multi-height bank ecology is rendered; they do not prove
 that the vegetation or terrain is photoreal. The runnable reference map is
 therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v12 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v13 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
-degree presentation light, absence of rejected high-density bank actors, the
+degree presentation light, two tagged non-colliding adaptive near-field banks,
+the four-actor sun/sky/fill/fog atmosphere contract, absence of rejected
+high-density bank actors, the
 exact four vegetation mesh families and
-12 instance components with a 7,679-instance total, exactly one tagged
+12 instance components with an 8,927-instance total, exactly one tagged
 1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
 components with the 58/57/117 accepted split and 24° slope-ceiling contract,
-one 592-instance launch-cover component, three launch woody components with the
-13/14/28 accepted split, their full-route/dry-height/slope placement tags, and
+one 1,721-instance launch-cover component, three launch woody components with
+the 44/43/87 accepted split, their full-route/dry-height/slope placement tags, and
 the bounded launch-window shadow exception,
 zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
 also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
-covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v12 additionally
+covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v13 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.

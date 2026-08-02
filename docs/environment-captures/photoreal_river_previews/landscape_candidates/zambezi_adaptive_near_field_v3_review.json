@@ -1,0 +1,136 @@
+{
+  "schema": "raftsim.environment.zambezi_adaptive_near_field_review.v1",
+  "date": "2026-08-01",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "status": "retained_artifact_reduction_photoreal_promotion_fail",
+  "decision": {
+    "runnable_map_integrity": "pass",
+    "dry_shoreline_clearance": "pass",
+    "coarse_self_shadow_regression": "pass_after_rejected_iteration",
+    "photoreal_environment_promotion": "fail",
+    "summary": "The source-conditioned 5 m launch banks preserve a dry corridor and remove the first iteration's catastrophic shadow wedges. The retained gameplay view remains visibly synthetic: the 30 m source silhouette is broad and rounded, ground cover reads as a thin repeated shoreline band, water is flat, woody ecology is sparse, and the gorge lacks production rocks, wet-bank breakup, foam, spray, mist, and reviewed lighting."
+  },
+  "evidence": {
+    "rejected_shadow_capture": "zambezi_adaptive_near_field_v1_shadow_wedge_rejected.png",
+    "rejected_shadow_capture_sha256": "fc4b79b8d52703a6fb787bdf617c2a8812246f3d68d03bf75f187d8576e96414",
+    "retained_capture": "zambezi_adaptive_near_field_v3.png",
+    "retained_capture_sha256": "2147ee2f2ef284e7a80f62f56e5c326a9865c7ddf8042600334ed8bb139c18f0",
+    "retained_capture_size_px": [
+      1280,
+      720
+    ],
+    "capture_path": "default runnable gameplay camera with raft and crew; no diagnostic camera override",
+    "manual_review": {
+      "rectangular_water_land_intersection": "no new adaptive-surface intersection visible in retained frame",
+      "catastrophic_shadow_wedges": "pass_none_visible_after_disabling shadow on render-only adaptive banks",
+      "organic_ground_coverage": "fail_thin_repeated_band_at_gameplay_distance",
+      "terrain_silhouette": "fail_coarse_rounded_30m_source",
+      "water_and_whitewater": "fail_flat_surface_and_missing_credible_launch_rapid_detail",
+      "photorealism": "fail"
+    }
+  },
+  "retained_generation_contract": {
+    "adaptive_near_field_terrain": {
+      "actors": 2,
+      "actor_labels": [
+        "RaftSim_ZambeziAdaptiveNearFieldTerrainV1_LeftBank",
+        "RaftSim_ZambeziAdaptiveNearFieldTerrainV1_RightBank"
+      ],
+      "station_window_m": [
+        0.0,
+        1000.0
+      ],
+      "grid_spacing_m": 5.0,
+      "maximum_lateral_extent_m": 600.0,
+      "active_water_half_width_m": 72.0,
+      "inner_dry_bank_buffer_m": 3.0,
+      "vertices": 42612,
+      "triangles": 61748,
+      "procedurally_refined_vertices": 25729,
+      "maximum_observed_refinement_m": 0.56,
+      "maximum_allowed_refinement_m": 0.96,
+      "dry_shoreline_infill_vertices": 11510,
+      "maximum_observed_dry_shoreline_infill_m": 1.8,
+      "minimum_observed_rendered_clearance_m": 0.33,
+      "minimum_required_rendered_clearance_m": 0.295,
+      "collision": "disabled",
+      "cast_shadow": false
+    },
+    "launch_ecology": {
+      "ground_cover_target_instances": 1800,
+      "ground_cover_placed_instances": 1721,
+      "ground_cover_rejected_candidates": 79,
+      "ground_cover_maximum_placed_slope_degrees": 31.45,
+      "ground_cover_slope_ceiling_degrees": 32.0,
+      "woody_target_instances": 192,
+      "woody_placed_instances": 174,
+      "woody_rejected_candidates": 18,
+      "woody_riparian_tree_instances": 44,
+      "woody_umbrella_tree_instances": 43,
+      "woody_thorn_scrub_instances": 87,
+      "woody_maximum_placed_slope_degrees": 23.51,
+      "woody_slope_ceiling_degrees": 24.0,
+      "collision": "disabled",
+      "cast_shadow": false
+    },
+    "atmosphere": {
+      "actors": 4,
+      "sun": "atmosphere-linked directional light",
+      "sky_light": "captured gorge sky fill",
+      "sky_atmosphere": "source-aware dry-season presentation",
+      "height_fog": "volumetric gorge haze",
+      "authority": "presentation_only_no_physics_effect"
+    },
+    "saved_map": {
+      "vegetation_components": 12,
+      "vegetation_instances": 8927,
+      "map_check_errors": 0,
+      "map_check_warnings": 0
+    },
+    "authority": {
+      "base_surface": "conditioned Copernicus terrain tiles",
+      "procedural_scope": "bounded dry-shoreline correction plus sub-metre basalt erosion and talus infill where source detail is missing",
+      "physics_and_collision_terrain": "source Copernicus Landscape only",
+      "changes_collision": false,
+      "changes_water_geometry": false,
+      "changes_solver_state": false,
+      "changes_raft_forces": false
+    }
+  },
+  "rejected_iterations": [
+    {
+      "id": "V1",
+      "capture": "zambezi_adaptive_near_field_v1_shadow_wedge_rejected.png",
+      "reason": "Rejected: both render-only adaptive bank meshes cast enormous black shadow wedges across the river and canyon."
+    },
+    {
+      "id": "V2",
+      "capture_sha256": "648b2d7c70298f43853f230238bae286f29ca5e7ea60d6d8838a21e60a7ad2e8",
+      "reason": "Superseded: disabling adaptive-bank shadows removed the wedges, but the original launch ecology remained too sparse to evaluate the wider placement window."
+    }
+  ],
+  "validation": {
+    "editor_build": "pass",
+    "map_generation": "pass",
+    "map_check": "0 errors, 0 warnings",
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v13",
+      "result": "pass"
+    },
+    "focused_runtime_gate": {
+      "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "result": "pass"
+    },
+    "python_regression": "pass_9_tests"
+  },
+  "remaining_external_acceptance_gates": [
+    "Guide and geospatial approval of the playable centerline, stationing, access, portage, and rescue context.",
+    "Rights approval for all terrain, imagery, supplied-map, vegetation, and reference inputs.",
+    "Higher-resolution full-reach terrain or a reviewed field-capture derivative replacing the 30 m DSM approximation.",
+    "Southern African gorge-woodland species, density, age, wind, season, ground-cover distribution, and wetness approval.",
+    "Production terrain, vegetation, rock, wet-bank, riverbed, water, breaking-water, foam, spray, mist, and lighting art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual/performance acceptance."
+  ]
+}
