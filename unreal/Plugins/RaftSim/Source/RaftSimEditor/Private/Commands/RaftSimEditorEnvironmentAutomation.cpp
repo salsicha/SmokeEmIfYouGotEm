@@ -492,7 +492,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.bPhysicalScaleSourceCorridor;
         const bool bUsesOpaqueVolumetricVegetation =
             Result.bDressingUsesOpaqueVolumetricVegetation;
-        const bool bUsesZambeziSingleLayerWater =
+        const bool bUsesZambeziDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
         const bool bUsesPacuareRainforestDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
@@ -502,7 +502,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const bool bUsesChilkoLavaCanyonDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
-        const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
+        const bool bUsesSingleLayerWater = false;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesColoradoOrganicHanceSurface =
@@ -521,8 +521,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
-        const FString WaterMaterialParentPath = bUsesZambeziSingleLayerWater
-            ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater")
+        const FString WaterMaterialParentPath = bUsesZambeziDefaultLitWater
+            ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater")
             : (bUsesPacuareRainforestDefaultLitWater
                    ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater")
                    : (bUsesColoradoHanceDefaultLitWater
@@ -558,7 +558,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.ColorScaleBehindWater.R,
             WaterSettings.ColorScaleBehindWater.G,
             WaterSettings.ColorScaleBehindWater.B);
-        const FString WaterNormalProjectionManifestJson = bUsesZambeziSingleLayerWater
+        const FString WaterNormalProjectionManifestJson = bUsesZambeziDefaultLitWater
             ? TEXT(
                   "      \"water_normal_primary_uv_tiling\": [2.400000, 6.200000],\n"
                   "      \"water_normal_secondary_uv_tiling\": [4.100000, 10.300000],\n"
@@ -1053,8 +1053,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"))),
             *PacuareWaterDecisionJson,
             Result.bSolverSurfaceWaterMaterialBound
-                ? (bUsesSingleLayerWater
-                       ? TEXT("zambezi_single_layer_water_volume_candidate_bound_and_captured")
+                ? (bUsesZambeziDefaultLitWater
+                       ? TEXT("zambezi_default_lit_moving_surface_candidate_bound_after_single_layer_capture_rejection")
                        : (bUsesPacuareRainforestDefaultLitWater
                               ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
                               : (bUsesColoradoHanceDefaultLitWater
@@ -1156,7 +1156,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("enabled_and_built_up_to_date")
                        : TEXT("enabled_candidate_build_failed_or_stale"))
                 : TEXT("disabled_for_physical_corridor_after_captured_nanite_hole_regression"),
-            bUsesReachLocalReferenceGameplay || bUsesZambeziSingleLayerWater
+            bUsesReachLocalReferenceGameplay || bUsesZambeziDefaultLitWater
                 ? TEXT("reference_runnable_gameplay_photoreal_and_production_promotion_review_gated")
                 : TEXT("review_gated_isolated_candidate_not_enabled_for_gameplay_or_active_previews"));
     }

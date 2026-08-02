@@ -98,7 +98,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
     )
     assert "ValidatedAmbientOcclusion" in editor_source
     assert "UVs.Add(FVector2D(SourceU, SourceV))" in editor_source
-    assert "VertexColorWeight->R = bZambezi ? 0.16f" in editor_source
+    assert "VertexColorWeight->R = bZambezi ? 0.0f" in editor_source
     assert "DetailTileSizeCm = bZambezi ? 1800.0f" in editor_source
     assert "SourceAoWeight->R = (bZambezi || bFutaleufu) ? 0.18f" in editor_source
     assert "SourceAlbedo.SampleRawBilinear(SourceU, SourceV)" in editor_source
@@ -783,28 +783,28 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             == expected_promotion_status
         )
         expected_water = expected_water_settings[candidate["river_id"]]
-        is_zambezi_single_layer_water = (
+        is_zambezi_default_lit_water = (
             candidate["river_id"] == "zambezi_batoka_gorge"
-            and candidate["water_shading_model"] == "SingleLayerWater"
+            and candidate["water_shading_model"] == "DefaultLit"
         )
         is_pacuare_default_lit_water = candidate["river_id"] == "pacuare"
-        is_single_layer_water = is_zambezi_single_layer_water
-        if is_zambezi_single_layer_water:
+        is_single_layer_water = False
+        if is_zambezi_default_lit_water:
             expected_water = {
                 **expected_water,
-                "base_color_scale": 0.78,
-                "surface_tint": [0.028, 0.078, 0.032],
-                "reflection_fill_intensity": 0.02,
-                "reflection_tint": [0.30, 0.42, 0.40],
-                "opacity": 0.48,
+                "base_color_scale": 1.08,
+                "surface_tint": [0.055, 0.115, 0.050],
+                "reflection_fill_intensity": 0.08,
+                "reflection_tint": [0.24, 0.34, 0.36],
                 "phase_g": 0.08,
-                "vertex_tint_weight": 0.50,
-                "render_normal_up_blend": 0.92,
-                "render_displacement_scale": 0.08,
+                "vertex_tint_weight": 0.62,
+                "render_normal_up_blend": 0.90,
+                "render_displacement_scale": 0.06,
             }
         assert candidate["water_material_status"] == (
-            "zambezi_single_layer_water_volume_candidate_bound_and_captured"
-            if is_zambezi_single_layer_water
+            "zambezi_default_lit_moving_surface_candidate_bound_after_single_layer_"
+            "capture_rejection"
+            if is_zambezi_default_lit_water
             else (
                 "pacuare_rainforest_default_lit_candidate_bound_after_single_layer_"
                 "capture_rejection"
@@ -955,7 +955,9 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
             assert candidate["water_solver_foam_max_opacity"] == 0.0
             assert candidate["water_solver_foam_surface_offset_cm"] == 0.0
         assert 0.0 <= candidate["water_emissive_fill_scale"] <= (
-            0.40 if is_pacuare_default_lit_water else 0.10
+            0.40
+            if (is_pacuare_default_lit_water or is_zambezi_default_lit_water)
+            else 0.10
         )
         assert 0.0 < candidate["water_roughness"] <= 0.50
         assert 0.0 < candidate["water_normal_intensity"] <= 0.90
@@ -1229,7 +1231,7 @@ def test_production_visual_source_item_intake_records_unpromoted_item_level_gate
     assert "Fill exact item URLs/layers/windows" in intake["next_checkpoint"]
 
 
-def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
+def test_zambezi_default_lit_water_candidate_is_isolated_and_review_gated():
     candidate_manifest_path = REPO_ROOT / (
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
         "landscape_candidate_manifest_zambezi_batoka_gorge.json"
@@ -1267,39 +1269,40 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
         "landscape_dressing_runnable_launch_talus_target_height_range_m"
     ] == [0.95, 5.20]
     assert candidate["water_material_status"] == (
-        "zambezi_single_layer_water_volume_candidate_bound_and_captured"
+        "zambezi_default_lit_moving_surface_candidate_bound_after_single_layer_"
+        "capture_rejection"
     )
     assert candidate["water_material_parent"] == (
         "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
-        "M_RaftSim_Zambezi_SingleLayerWater"
+        "M_RaftSim_Zambezi_DefaultLitWater"
     )
-    assert candidate["water_shading_model"] == "SingleLayerWater"
+    assert candidate["water_shading_model"] == "DefaultLit"
     assert candidate["water_volume_parameter_status"] == (
-        "active_on_zambezi_isolated_parent"
+        "inactive_single_layer_evaluation_values_retained_in_manifest_only"
     )
-    assert candidate["water_base_color_scale"] == 0.78
-    assert candidate["water_surface_opacity"] == 0.48
-    assert candidate["water_roughness"] == 0.50
-    assert candidate["water_specular"] == 0.26
-    assert candidate["water_normal_intensity"] == 0.04
-    assert candidate["water_surface_variation_strength"] == 0.04
-    assert candidate["water_surface_tint"] == [0.028, 0.078, 0.032]
-    assert candidate["water_reflection_fill_intensity"] == 0.02
-    assert candidate["water_reflection_tint"] == [0.30, 0.42, 0.40]
-    assert candidate["water_render_normal_up_blend"] == 0.92
-    assert candidate["water_render_displacement_scale"] == 0.08
-    assert candidate["water_single_layer_phase_g"] == 0.08
-    assert candidate["water_single_layer_scattering_coefficients_per_cm"] == [
+    assert candidate["water_base_color_scale"] == 1.08
+    assert candidate["water_surface_opacity"] == 1.0
+    assert candidate["water_roughness"] == 0.34
+    assert candidate["water_specular"] == 0.38
+    assert candidate["water_normal_intensity"] == 0.16
+    assert candidate["water_surface_variation_strength"] == 0.14
+    assert candidate["water_surface_tint"] == [0.055, 0.115, 0.050]
+    assert candidate["water_reflection_fill_intensity"] == 0.08
+    assert candidate["water_reflection_tint"] == [0.24, 0.34, 0.36]
+    assert candidate["water_render_normal_up_blend"] == 0.90
+    assert candidate["water_render_displacement_scale"] == 0.06
+    assert candidate["water_inactive_single_layer_phase_g"] == 0.08
+    assert candidate["water_inactive_single_layer_scattering_coefficients_per_cm"] == [
         0.00025,
         0.00090,
         0.00035,
     ]
-    assert candidate["water_single_layer_absorption_coefficients_per_cm"] == [
+    assert candidate["water_inactive_single_layer_absorption_coefficients_per_cm"] == [
         0.0150,
         0.0050,
         0.0180,
     ]
-    assert candidate["water_single_layer_color_scale_behind_water"] == [
+    assert candidate["water_inactive_single_layer_color_scale_behind_water"] == [
         0.12,
         0.22,
         0.10,
@@ -1310,7 +1313,7 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
 
     parent_asset = REPO_ROOT / (
         "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/"
-        "M_RaftSim_Zambezi_SingleLayerWater.uasset"
+        "M_RaftSim_Zambezi_DefaultLitWater.uasset"
     )
     assert parent_asset.is_file()
     for capture_name in (
@@ -1321,16 +1324,17 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
 
     validation = json.loads(validation_path.read_text(encoding="utf-8"))
     assert validation["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v15"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v16"
     )
     assert validation["passed"] is True
     assert validation["water_surface"]["component_count"] == 1
     water_component = validation["water_surface"]["components"][0]
-    assert "M_RaftSim_Zambezi_SingleLayerWater" in water_component["parent_material"]
+    assert "M_RaftSim_Zambezi_DefaultLitWater" in water_component["parent_material"]
     assert "NO_COLLISION" in water_component["collision_enabled"]
     assert {
         "RaftSimMovingMultiScaleWaterNormals",
         "RaftSimNonCollisionRenderSurface",
         "RaftSimPhysicalCorridorWater",
-        "RaftSimZambeziSingleLayerWater",
+        "RaftSimZambeziDefaultLitWater",
+        "RaftSimSingleLayerWaterCaptureRejected",
     }.issubset(water_component["tags"])

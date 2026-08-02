@@ -437,8 +437,9 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         WaterActor->Tags.AddUnique(TEXT("RaftSimPhysicalCorridorWater"));
         if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
         {
-            WaterActor->Tags.AddUnique(TEXT("RaftSimZambeziSingleLayerWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimZambeziDefaultLitWater"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
         }
         else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
         {

@@ -553,7 +553,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "RaftSimVolumetricGorgeHaze",
     } <= atmosphere_tags
     assert validation["water_surface"]["component_count"] == 1
-    assert validation["water_surface"]["shading_model_contract"] == ("SingleLayerWater")
+    assert validation["water_surface"]["shading_model_contract"] == "DefaultLit"
     talus = validation["launch_talus"]
     assert talus["component_count"] == 6
     assert talus["target_instance_count"] == 360

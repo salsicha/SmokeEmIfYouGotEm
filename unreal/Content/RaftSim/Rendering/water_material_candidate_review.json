@@ -1,8 +1,8 @@
 {
   "schema": "raftsim.unreal.water_material_candidate_review.v1",
-  "generated_on": "2026-08-01",
-  "status": "default_lit_landscape_candidates_with_zambezi_single_layer_exception_captured_review_only",
-  "goal": "Render river surfaces continuously on the custom C++ solver-owned procedural ribbon while retaining failed global and Pacuare Single Layer Water candidates as review evidence and keeping Zambezi's isolated exception review-gated.",
+  "generated_on": "2026-08-02",
+  "status": "default_lit_landscape_candidates_with_zambezi_capture_correction_review_only",
+  "goal": "Render river surfaces continuously and readably on the custom C++ solver-owned procedural ribbon while retaining failed global, Pacuare, and Zambezi Single Layer Water candidates as review evidence.",
   "candidate_materials": [
     {
       "material": "/WaterAdvanced/Materials/Water_Material_Simple.Water_Material_Simple",
@@ -33,6 +33,16 @@
       "material": "/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater",
       "source": "RaftSim Pacuare isolated opaque Default Lit parent",
       "result": "active_review_only_after_foreground_band_removal"
+    },
+    {
+      "material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater",
+      "source": "RaftSim Zambezi isolated Single Layer Water evaluation parent",
+      "result": "inactive_after_nearly_black_fixed_route_offscreen_capture"
+    },
+    {
+      "material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater",
+      "source": "RaftSim Zambezi isolated opaque Default Lit parent",
+      "result": "active_review_only_after_fixed_route_readability_correction"
     }
   ],
   "test_run": {
@@ -46,7 +56,9 @@
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_solver_rapid_river_eye_downstream.png",
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
-      "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png"
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_guide_seat_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_river_eye_downstream.png"
     ]
   },
   "observed_failure": {
@@ -66,11 +78,12 @@
     "active_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
     "landscape_candidate_material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate",
     "pacuare_landscape_candidate_parent": "/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater",
-    "decision": "Use opaque Default Lit water on isolated Landscape candidates, with Pacuare's isolated parent retaining its accepted moving normals and variation; retain failed global and Pacuare Single Layer parents as inactive evidence. Zambezi remains a separate review-gated Single Layer exception.",
+    "zambezi_landscape_candidate_parent": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater",
+    "decision": "Use opaque Default Lit water on isolated Landscape candidates, with Pacuare and Zambezi retaining isolated moving-normal parents; retain failed global, Pacuare, and Zambezi Single Layer parents as inactive evidence.",
     "solver_surface_water_contract": "Opaque DefaultLit surface shading uses river-specific surface/vertex tint, roughness, specular, seam-continuous dual-sampled first-party normal-atlas detail, and bounded Fresnel reflection fill. South Fork additionally samples clamped macro normals and packed RGBA depth/speed/Froude/detrended-eta generated from its accepted whole-window median finite-volume C++ frame. The same packed field drives noncolliding render-only surface relief and a separate noncolliding DefaultLit foam sheet with procedural breakup confined to the decoded hydraulic aeration mask. A movable skylight, runtime corridor reflection capture, and screen-space reflections serve the surface path without WaterBody authority or depth-dependent Single Layer volume composition.",
     "photographic_capture_contract": "River-specific sun, skylight, fog, manual exposure, saturation, contrast, sharpening, and vignette values come from FRaftSimPhotographicCaptureSettings and are recorded per candidate. Camera film grain and engine-side capture dithering are both zero or disabled so capture detail must originate in rendered scene content.",
     "geometry_authority": "The custom C++ water simulation remains authoritative. The solver visualization derivative changes only noncolliding review render geometry and material response under a 36 cm relief ceiling, feature forcing remains disabled, and neither it nor render-normal smoothing, render-only width overlap, foam opacity, or Fresnel fallback can change solver state, collision, raft forces, or conservation evidence.",
-    "observed_result": "Direct isolation captures proved that the procedural ribbon mesh is continuous and the lower-frame split came from Single Layer Water composition: hiding the ribbon removed both zones, and swapping the same mesh to Default Lit removed the split while preserving wave geometry. Pacuare's later 31,409-vertex procedural reference-infill bathymetry bracket still left the band, so that geometry and two tessellated shoreline-infill attempts were rejected and removed. The retained Pacuare Default Lit parent eliminates the lower-frame band while preserving two moving normal layers and two world-variation fields. The active solver-surface material keeps South Fork macro-normal, depth, speed, Froude, detrended free-surface relief, and field-confined foam; Colorado and Pacuare explicitly do not reuse those fields. Stronger wet-bank feather-tail shading did not move residual bright bank strips, while bounded noncolliding render overlap did; 1.35x South Fork and Pacuare widths remove continuous rails, with one tiny distant Pacuare bank point left for production microgeometry, while Colorado remains at 1.17x. Recorded photometry removes camera grain. Complete PVE deciduous, conifer, shrub, and plant skeletal exports now convert to saved Nanite static meshes and replace twig/cylinder assemblies through source-mask-aware HISM placement; three complete-species leaf slots use river-specific materials and one retains its native PVE material. The result remains provisional because the generic sample species still have repeated oversized leaf forms and the scene lacks production reflections/refraction, live crest-scale turbulence, spray, validated bathymetry, bank transitions, atmosphere, and biome assets.",
+    "observed_result": "Direct isolation captures proved that the procedural ribbon mesh is continuous and the lower-frame split came from Single Layer Water composition: hiding the ribbon removed both zones, and swapping the same mesh to Default Lit removed the split while preserving wave geometry. Pacuare's later 31,409-vertex procedural reference-infill bathymetry bracket still left the band, so that geometry and two tessellated shoreline-infill attempts were rejected and removed. Zambezi's isolated volume parent remained readable in gameplay but rendered nearly black in both fixed-route SceneCapture2D views; shading-model isolation alone remained black, while the retained Default Lit parent plus a bounded 0.32 base-color-relative fill restored the olive sediment surface in both canonical captures. Pacuare and Zambezi preserve two moving normal layers and world variation without changing ribbon geometry, collision, solver state, or raft forces. The active solver-surface material keeps South Fork macro-normal, depth, speed, Froude, detrended free-surface relief, and field-confined foam; no river reuses another river's hydraulic fields. The result remains provisional because production reflections/refraction, live crest-scale turbulence, spray, validated bathymetry, bank transitions, atmosphere, biome assets, and named guide/art approval remain open.",
     "promotion_gate": "Do not promote the candidate until live-editor and packaged captures show credible reflection/refraction, solver-aligned flow detail, bank/riverbed transitions, foam and spray, hazard and swimmer/rescue readability, guide review, and measured desktop/VR performance for every seasonal flow band."
   },
   "single_layer_depth_split_failure": {
@@ -82,14 +95,14 @@
       "changing preview channel depth moved the original split",
       "a continuous 31,409-vertex Pacuare riverbed spanning 48.5-267.6 cm below the water datum did not remove the later isolated Single Layer band"
     ],
-    "decision": "Keep failed global and Pacuare Single Layer Water assets inactive; bathymetry alone is not an accepted fix. Re-evaluate only with production source-aligned bathymetry plus passing live-editor and packaged captures."
+    "decision": "Keep failed global, Pacuare, and Zambezi Single Layer Water assets inactive; bathymetry or viewport-only readability is not an accepted fix. Re-evaluate only with production source-aligned bathymetry plus passing fixed-route, live-editor, and packaged captures."
   },
   "next_actions": [
     "Extend the static South Fork review derivative to live per-frame solver displacement, velocity-aligned micro-normal advection, wet/dry transitions, crest-scale foam, and spray while keeping feature forcing disabled by default.",
     "Generate Colorado and Pacuare fields only from their own accepted C++/GeoClaw scenarios; never reuse South Fork hydraulic textures across rivers.",
     "Build production riverbed and wet-bank material transitions so shallow refraction does not expose coarse Landscape channel-burn geometry.",
     "Replace the isolated Pacuare bank point with source-aligned production bank microgeometry; do not widen collision or add a synthetic cover.",
-    "Re-evaluate Single Layer Water only after conditioned bathymetry removes abrupt depth transitions; compare against the active solver-surface material in live editor and packaged builds.",
+    "Re-evaluate Single Layer Water only after conditioned bathymetry removes abrupt depth transitions and the same parent passes fixed-route, live-editor, and packaged captures.",
     "Replace the generic complete PVE sample species with rights-clear biome-specific South Fork, Grand Canyon, and Pacuare geometry, age and crown diversity, seasonal state, and wind response while preserving the recorded leaf-color and transmission contract.",
     "Replace the validation-grid foam sheet with solver-aligned crest-scale foam, spray, mist, and whitewater VFX for holes, wave trains, laterals, eddy lines, shelves, and boulder interactions.",
     "Capture the same material in the live editor and packaged game because commandlet SceneCapture reflection behavior is not sufficient evidence for promotion.",

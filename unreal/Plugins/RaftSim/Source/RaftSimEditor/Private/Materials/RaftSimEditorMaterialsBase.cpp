@@ -2010,16 +2010,24 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
 
 UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
     FString& OutSummary,
-    bool bUseSingleLayerWater)
+    bool bUseSingleLayerWater,
+    bool bUseIsolatedZambeziParent)
 {
+    const bool bUseZambeziMovingSurface =
+        bUseSingleLayerWater || bUseIsolatedZambeziParent;
     const FString MaterialPackagePath = bUseSingleLayerWater
         ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
                "M_RaftSim_Zambezi_SingleLayerWater")
-        : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
-               "M_RaftSim_SolverSurfaceWaterCandidate");
+        : (bUseIsolatedZambeziParent
+               ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+                      "M_RaftSim_Zambezi_DefaultLitWater")
+               : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                      "M_RaftSim_SolverSurfaceWaterCandidate"));
     const FString MaterialObjectName = bUseSingleLayerWater
         ? TEXT("M_RaftSim_Zambezi_SingleLayerWater")
-        : TEXT("M_RaftSim_SolverSurfaceWaterCandidate");
+        : (bUseIsolatedZambeziParent
+               ? TEXT("M_RaftSim_Zambezi_DefaultLitWater")
+               : TEXT("M_RaftSim_SolverSurfaceWaterCandidate"));
     const FString MaterialObjectPath = FString::Printf(
         TEXT("%s.%s"), *MaterialPackagePath, *MaterialObjectName);
 
@@ -2212,7 +2220,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
     BaseColor->B.Expression = BaseColorScale;
     Material->GetExpressionCollection().AddExpression(BaseColor);
     UMaterialExpression* OpticallyVariedBaseColor = BaseColor;
-    if (bUseSingleLayerWater)
+    if (bUseZambeziMovingSurface)
     {
         UMaterialExpressionNoise* SurfaceVariationNoise =
             NewObject<UMaterialExpressionNoise>(Material);
@@ -2263,7 +2271,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
     Material->GetExpressionCollection().AddExpression(AtlasTileScale);
 
     auto AddWaterNormalSample =
-        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture, bUseSingleLayerWater](
+        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture, bUseZambeziMovingSurface](
             float UTiling,
             float VTiling,
             float SpeedX,
@@ -2277,7 +2285,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
         Material->GetExpressionCollection().AddExpression(TexCoord);
 
         UMaterialExpression* BaseCoordinates = TexCoord;
-        if (bUseSingleLayerWater && bSwapCoordinates)
+        if (bUseZambeziMovingSurface && bSwapCoordinates)
         {
             UMaterialExpressionComponentMask* CoordinateU =
                 NewObject<UMaterialExpressionComponentMask>(Material);
@@ -2299,7 +2307,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
         }
 
         UMaterialExpression* SampleCoordinates = BaseCoordinates;
-        if (bUseSingleLayerWater)
+        if (bUseZambeziMovingSurface)
         {
             UMaterialExpressionPanner* Panner =
                 NewObject<UMaterialExpressionPanner>(Material);
@@ -2394,14 +2402,14 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
     // parent at shorter, incommensurate wavelengths so the opposed moving
     // layers read as local wind/current ripples instead of river-length ribs.
     UMaterialExpression* NormalSampleA = AddWaterNormalSample(
-        bUseSingleLayerWater ? 2.40f : 0.73f,
-        bUseSingleLayerWater ? 6.20f : 2.15f,
+        bUseZambeziMovingSurface ? 2.40f : 0.73f,
+        bUseZambeziMovingSurface ? 6.20f : 2.15f,
         0.036f,
         0.006f,
         false);
     UMaterialExpression* NormalSampleB = AddWaterNormalSample(
-        bUseSingleLayerWater ? 4.10f : 1.11f,
-        bUseSingleLayerWater ? 10.30f : 3.30f,
+        bUseZambeziMovingSurface ? 4.10f : 1.11f,
+        bUseZambeziMovingSurface ? 10.30f : 3.30f,
         -0.014f,
         0.027f,
         true);
@@ -3052,7 +3060,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
 
-    const bool bUseSingleLayerWater = Spec.RiverId == TEXT("zambezi_batoka_gorge");
+    // The isolated Single Layer Water parent remains committed as rejected
+    // comparison evidence. Its volume pass renders nearly black through the
+    // deterministic SceneCapture2D path even though the editor/game viewport
+    // is readable. Bind the authored Zambezi ribbon to an isolated Default Lit
+    // parent so canonical evidence and gameplay use the same surface-shading
+    // contract while preserving geometry, collision, and solver authority.
+    const bool bUseSingleLayerWater = false;
+    const bool bUseIsolatedZambeziParent =
+        Spec.RiverId == TEXT("zambezi_batoka_gorge");
     UMaterial* Parent = Spec.RiverId == TEXT("pacuare")
         ? LoadOrCreatePacuareRainforestWaterParent(OutSummary)
         : (Spec.RiverId == TEXT("colorado_river")
@@ -3062,7 +3078,9 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
                : (Spec.RiverId == TEXT("chilko_river_lava_canyon")
                       ? LoadOrCreateChilkoLavaCanyonWaterParent(OutSummary)
                       : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
-                            OutSummary, bUseSingleLayerWater))));
+                            OutSummary,
+                            bUseSingleLayerWater,
+                            bUseIsolatedZambeziParent))));
     if (!Parent)
     {
         return nullptr;
@@ -3184,6 +3202,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     }
     Instance->Modify();
     Instance->SetParentEditorOnly(Parent);
+    Instance->ClearParameterValuesEditorOnly();
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
     {
         Instance->SetScalarParameterValueEditorOnly(FMaterialParameterInfo(Name), Value);
@@ -3199,11 +3218,14 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetScalar(TEXT("Roughness"), Settings.Roughness);
     SetScalar(TEXT("Specular"), Settings.Specular);
     SetScalar(TEXT("NormalIntensity"), Settings.NormalIntensity);
-    if (bUseSingleLayerWater)
+    if (bUseSingleLayerWater || bUseIsolatedZambeziParent)
     {
         SetScalar(
             TEXT("SurfaceVariationStrength"),
             Settings.SurfaceVariationStrength);
+    }
+    if (bUseSingleLayerWater)
+    {
         SetScalar(TEXT("Opacity"), Settings.Opacity);
         SetScalar(TEXT("RefractionIor"), Settings.RefractionIor);
         SetScalar(TEXT("PhaseG"), Settings.PhaseG);

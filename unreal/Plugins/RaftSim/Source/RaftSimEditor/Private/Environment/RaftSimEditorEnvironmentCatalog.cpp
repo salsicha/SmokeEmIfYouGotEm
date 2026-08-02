@@ -144,26 +144,24 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
-        // Batoka uses its own Single Layer Water parent. The retained bracket
-        // preserves the renderer-reviewed sediment optics after the brighter
-        // reflection bracket produced a pale sky sheet in gameplay. The
-        // isolated parent now owns shorter opposed normal wavelengths, so a
-        // modest normal/variation increase can add local breakup without
-        // restoring the rejected river-length grooves. Analytic geometry
-        // remains nearly flat at the calm launch.
-        Settings.BaseColorScale = 0.78f;
-        Settings.EmissiveFillScale = 0.0f;
-        Settings.Roughness = 0.50f;
-        Settings.Specular = 0.26f;
+        // Batoka uses its own opaque Default Lit surface parent after the
+        // retained Single Layer Water bracket rendered nearly black in the
+        // canonical offscreen capture path. Keep the accepted sediment palette
+        // and shorter opposed normal wavelengths without changing the ribbon,
+        // collision, solver, or gameplay-force authority.
+        Settings.BaseColorScale = 1.08f;
+        Settings.EmissiveFillScale = 0.32f;
+        Settings.Roughness = 0.34f;
+        Settings.Specular = 0.38f;
         Settings.Opacity = 0.48f;
-        Settings.NormalIntensity = 0.10f;
-        Settings.SurfaceVariationStrength = 0.10f;
+        Settings.NormalIntensity = 0.16f;
+        Settings.SurfaceVariationStrength = 0.14f;
         Settings.PhaseG = 0.08f;
-        Settings.VertexTintWeight = 0.50f;
+        Settings.VertexTintWeight = 0.62f;
         Settings.RenderWidthScale = 1.24f;
         Settings.RenderNormalUpBlend = 0.90f;
         Settings.RenderDisplacementScale = 0.06f;
-        Settings.ReflectionFillIntensity = 0.02f;
+        Settings.ReflectionFillIntensity = 0.08f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -172,8 +170,8 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 0.0f;
         Settings.SolverFroudeVisualGain = 0.0f;
         Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.028f, 0.078f, 0.032f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.30f, 0.42f, 0.40f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.055f, 0.115f, 0.050f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.24f, 0.34f, 0.36f, 0.0f);
         Settings.ScatteringCoefficients =
             FLinearColor(0.00025f, 0.00090f, 0.00035f, 0.0f);
         Settings.AbsorptionCoefficients =

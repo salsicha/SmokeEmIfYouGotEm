@@ -1026,17 +1026,18 @@
         "actor_label": "RaftSim_PhysicalCorridorRiverRibbon_zambezi_batoka_gorge",
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "material": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate.MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate",
-        "parent_material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater.M_RaftSim_Zambezi_SingleLayerWater",
+        "parent_material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater.M_RaftSim_Zambezi_DefaultLitWater",
         "procedural_mesh_count": 1,
         "tags": [
           "RaftSimMovingMultiScaleWaterNormals",
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPhysicalCorridorWater",
-          "RaftSimZambeziSingleLayerWater"
+          "RaftSimSingleLayerWaterCaptureRejected",
+          "RaftSimZambeziDefaultLitWater"
         ]
       }
     ],
     "normal_motion_contract": "two_opposed_panned_atlas_layers",
-    "shading_model_contract": "SingleLayerWater"
+    "shading_model_contract": "DefaultLit"
   }
 }
