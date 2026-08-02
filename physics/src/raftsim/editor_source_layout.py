@@ -16,7 +16,7 @@ RIVER_BUILD_TARGETS = (
     ("pacuare", "L_UpperHuacas"),
     ("zambezi_batoka_gorge", "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
     ("futaleufu_terminator", "L_FutaleufuTerminator_PhysicalCorridorCandidate"),
-    ("chilko_river_lava_canyon", "L_ChilkoRiver_PhysicalCorridorCandidate"),
+    ("chilko_river_lava_canyon", "L_LavaCanyon"),
 )
 
 

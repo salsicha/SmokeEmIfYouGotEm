@@ -1,0 +1,87 @@
+{
+  "schema": "raftsim.chilko.lava_canyon_visual_terrain.v1",
+  "status": "generated_review_gated_reach_local_official_dem_plus_interpreted_c3_solver_strip_not_survey_or_production_terrain_authority",
+  "river_id": "chilko_river_lava_canyon",
+  "section_id": "lava_canyon_station_9030m_c3_window",
+  "reference_flow_band": "median_runnable",
+  "inputs": {
+    "source_corridor_manifest": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/manifest.json",
+    "source_corridor_manifest_sha256": "837a0816715ac07b16bf30234a09c86b86743a31ad61aec4d88463bbac1ad0b4",
+    "source_centerline": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/centerline_local.json",
+    "source_centerline_sha256": "760fd5c85b00493cb2b85405dd164b9a1278360776ca3da94517f9d40190ef9d",
+    "official_conditioned_heightfield": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_2017.png",
+    "official_conditioned_heightfield_sha256": "a033e84a93a60c2dd6ca10ab37dd60ec9a719445853768b9c3ca583469a6703a",
+    "window_manifest": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/window_manifest.json",
+    "window_manifest_sha256": "6596d191a618cba5c73ec03fdfb82b8cb62fe8c9de34f7811c1aa1a3af02ecc4",
+    "cooked_manifest": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/manifest.json",
+    "cooked_manifest_sha256": "be660cd7e54fc6244d16f4ba50bd72ca42267f9d0e899e218652c4484dee856d",
+    "bed": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/bed.npy",
+    "bed_sha256": "a23b1b4910e8509c64738fa08dcfbb59d41e03baa418f4e392e55525a2773c20",
+    "depth": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/h.npy",
+    "depth_sha256": "240fdeec826ef9390a9860a8d25625237045c38c8a17f83f5a65c5d2581becd0",
+    "wet_mask": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/wet_mask.npy",
+    "wet_mask_sha256": "0cde7fc1a2411742cfcf1f1fb44f2bbe78acd53515ef6d10c2608d32fa4f64aa"
+  },
+  "outputs": {
+    "heightfield": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_conditioned_heightfield_1009.png",
+    "heightfield_sha256": "dd8ba5ef74a31180f32f0176c973a69d87b11e2537244a11c25d15b8bbdcaeed",
+    "local_centerline": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_local_centerline.json",
+    "local_centerline_sha256": "5456393d6c96927d3fa31aa8e122a48dc0b0baf9c30810199429cc49bc1cfd98",
+    "runtime_coordinate_map": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_runtime_coordinate_map.json",
+    "runtime_coordinate_map_sha256": "00c9f283876b8380eb701957e842d6d8964fb0368a7a825bea38df0043a85212"
+  },
+  "landscape": {
+    "size_px": 1009,
+    "pixel_format": "16_bit_grayscale_png",
+    "horizontal_span_x_m": 600.0,
+    "horizontal_span_y_m": 600.0,
+    "source_solver_span_y_m": 80.0,
+    "sample_spacing_x_m": 0.5952380952380952,
+    "sample_spacing_y_m": 0.5952380952380952,
+    "terrain_min_m": 1096.7489013671875,
+    "terrain_max_m": 1167.3707208508324,
+    "target_relief_cm": 7062.181948364491,
+    "world_vertical_offset_cm": -496.4160253202863,
+    "runtime_vertical_datum_m": 1101.7130616203904
+  },
+  "source_registration": {
+    "anchor_corridor_station_m": 9030.0,
+    "corridor_station_range_m": [
+      8730.0,
+      9330.0
+    ],
+    "official_hydrography": "BC Freshwater Atlas centerline",
+    "official_terrain": "NRCan CanElevation MRDEM-30 DTM CGVD2013",
+    "sampling_policy": "bilinear_frenet_cross_section_along_official_route"
+  },
+  "procedural_infill": {
+    "algorithm": "official_dem_edge_alignment_and_sub_30m_microrelief_v1",
+    "source_solver_half_width_m": 40.0,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_official_dem_edge_correction_m": 2.1443472817829843,
+    "edge_correction_feather_distance_m": 120.0,
+    "maximum_procedural_microrelief_m": 1.029798216823645,
+    "maximum_change_from_official_dem_outside_solver_strip_m": 2.6818534135625214,
+    "authority": "visual and Landscape collision infill only; official DEM broad form, complete C3 bed, cooked water state, and raft forces remain unchanged"
+  },
+  "alignment": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0,
+    "static_water_flow_offset_cm": 0.0
+  },
+  "honesty": {
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "source_terrain_resolution_m": 30.0,
+    "procedural_gap_fill_authority": "visual_and_collision_infill_not_survey",
+    "solver_authority": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/manifest.json",
+    "production_promoted": false,
+    "pending_human_review": true,
+    "missing": [
+      "surveyed Lava Canyon bathymetry, bank breaklines, and rapid rocks",
+      "reviewed rapid station and guide lines",
+      "discharge calibration and solver convergence",
+      "guide, geospatial, ecology, art, and performance acceptance"
+    ]
+  }
+}

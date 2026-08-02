@@ -3667,3 +3667,20 @@ path is verified, and the completion goal can be marked complete.
   mats, missing surveyed Hance geography, unconverged hydraulics, and open
   guide/geospatial/geology/ecology/water-VFX/performance acceptance gates; M9
   remains open.
+- Chilko Lava Canyon reach-local runnable V1 replaces the flat signature-rapid
+  shell with a physical 600×600 m, 1009×1009 Landscape. Its broad canyon form
+  follows the official BC Freshwater Atlas route through the committed NRCan
+  CanElevation MRDEM-30 DTM, while the complete 600×80 m interpreted C3 bed is
+  protected exactly and bounded sub-30 m procedural microrelief fills only the
+  source-resolution gap outside it. The 301-point identity station/lateral map
+  applies the 1101.713 m runtime datum with 0.0 m centerline error. Median-band
+  cooked water, the player raft/start, vertical-slice game mode, and four
+  interpreted review-gated C3 contact rocks make the saved map reference
+  runnable; capture water and foam remain non-colliding and hidden in play so
+  live solver water alone owns rendering and raft forces. The editor builds,
+  the focused PIE gate passes 1/1 with an upright raft and zero swimmers, and
+  MapCheck is clean. Dark opaque water, smooth broad banks, repeated sample
+  foliage, sparse ground cover, limited rapid-specific rock detail,
+  unconverged hydraulics, and open guide/geospatial/ecology/art/water-VFX/
+  performance gates still reject photoreal and production promotion; M9 stays
+  open.

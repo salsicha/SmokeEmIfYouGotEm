@@ -4,6 +4,7 @@
 #include "GameFramework/WorldSettings.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimRockObstacleActor.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -90,7 +91,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<float> ConditionedSurfaceWorldZ;
     int32 ConditionedProfileCenterCount = 0;
     const bool bChilkoSourceScale =
-        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon") &&
+        Candidate.HorizontalSpanXCm > 1000000.0f;
     const FRaftSimLandscapeCandidateWaterSettings WaterSettings =
         GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
     const bool bUseSolverVisualizationFields =
@@ -435,6 +437,12 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 FoamActor->Tags.AddUnique(
                     TEXT("RaftSimColoradoHanceSolverVisualization"));
                 FoamActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceCaptureOnlyWater"));
+            }
+            else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+            {
+                FoamActor->Tags.AddUnique(
+                    TEXT("RaftSimChilkoLavaCanyonSolverVisualization"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimChilkoCaptureOnlyWater"));
             }
         }
     }
@@ -836,7 +844,9 @@ bool AddLandscapeCandidateRunnableGameplay(
     const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
     const bool bColoradoHance =
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
-    if (!bZambezi && !bPacuare && !bColoradoHance)
+    const bool bChilkoLavaCanyon =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon)
     {
         return true;
     }
@@ -882,6 +892,22 @@ bool AddLandscapeCandidateRunnableGameplay(
         PlayerRaftLabel = TEXT("RaftSim_ColoradoHance_PlayerRaft");
         DisplayName = TEXT("Colorado Hance");
     }
+    else if (bChilkoLavaCanyon)
+    {
+        RuntimeConfigLabel = TEXT("RaftSim_ChilkoLavaCanyon_RuntimeWaterConfig");
+        CookedFieldsDir =
+            TEXT("physics/data/real_world/chilko_river_lava_canyon/"
+                 "scenario_lava_canyon/cooked_flow_fields");
+        FlowBand = FName(TEXT("median_runnable"));
+        WindowCenterM = FVector2D(300.0f, 0.0f);
+        WindowExtentM = 700.0f;
+        CoordinateMapPath =
+            TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
+                 "lava_canyon_visual/lava_canyon_runtime_coordinate_map.json");
+        RunTag = FName(TEXT("RaftSimChilkoLavaCanyonRun"));
+        PlayerRaftLabel = TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
+        DisplayName = TEXT("Chilko Lava Canyon");
+    }
     else
     {
         RuntimeConfigLabel = TEXT("RaftSim_Zambezi_RuntimeWaterConfig");
@@ -906,7 +932,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    const bool bReachLocalRun = bPacuare || bColoradoHance;
+    const bool bReachLocalRun = bPacuare || bColoradoHance || bChilkoLavaCanyon;
     const float StartProgress = bReachLocalRun ? 0.04f : 0.0025f;
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
@@ -1013,6 +1039,78 @@ bool AddLandscapeCandidateRunnableGameplay(
             TEXT("Could not position the player start for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
         return false;
+    }
+
+    if (bChilkoLavaCanyon)
+    {
+        // These four D4 contacts mirror three manifest-recorded broach rocks
+        // plus the first fixed-seed boulder in the interpreted C3 bed. Their
+        // placement is deliberately review-gated: it enables wrap/pin physics
+        // without presenting the coarse feature-tag interpretation as survey.
+        struct FInterpretedRockSpec
+        {
+            float StationM;
+            float LateralM;
+            float RadiusM;
+            float CrestBelowSurfaceM;
+            float Friction;
+            const TCHAR* Label;
+        };
+        const FInterpretedRockSpec InterpretedRocks[] = {
+            {250.0f, 3.5f, 2.4f, 1.1f, 0.76f, TEXT("BroachRockUpper")},
+            {300.0f, -4.0f, 2.4f, 1.1f, 0.78f, TEXT("BroachRockCenter")},
+            {392.0f, 2.0f, 2.4f, 1.1f, 0.74f, TEXT("BroachRockLower")},
+            {405.8667f, 10.6160f, 1.9816f, 1.0270f, 0.72f, TEXT("SeededBoulder01")},
+        };
+        int32 SpawnedRockCount = 0;
+        for (const FInterpretedRockSpec& RockSpec : InterpretedRocks)
+        {
+            const float Progress = RockSpec.StationM /
+                FMath::Max(Points.Last().StationMeters, 1.0f);
+            FVector2D Tangent2D(1.0f, 0.0f);
+            FVector2D RockXY = SampleLandscapeCandidateCenterlineWorld(
+                Candidate,
+                Points,
+                Progress,
+                &Tangent2D);
+            const FVector2D RiverLeftNormal(-Tangent2D.Y, Tangent2D.X);
+            RockXY += RiverLeftNormal * RockSpec.LateralM * 100.0f;
+            float RockSurfaceZ = 0.0f;
+            if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+                    Candidate,
+                    Points,
+                    Progress,
+                    RockSurfaceZ))
+            {
+                OutSummary += TEXT("Could not align a Lava Canyon D4 rock to water.\n");
+                return false;
+            }
+            const float RockCenterZ = RockSurfaceZ -
+                (RockSpec.CrestBelowSurfaceM + RockSpec.RadiusM) * 100.0f;
+            ARaftSimRockObstacleActor* Rock =
+                World->SpawnActor<ARaftSimRockObstacleActor>(
+                    ARaftSimRockObstacleActor::StaticClass(),
+                    FTransform(FVector(RockXY.X, RockXY.Y, RockCenterZ)));
+            if (!Rock)
+            {
+                OutSummary += TEXT("Could not spawn a Lava Canyon D4 rock.\n");
+                return false;
+            }
+            Rock->ConfigureContact(RockSpec.RadiusM, RockSpec.Friction);
+            Rock->SetActorLabel(FString::Printf(
+                TEXT("RaftSim_ChilkoLavaCanyon_D4_%s"), RockSpec.Label));
+            Rock->Tags.AddUnique(RunTag);
+            Rock->Tags.AddUnique(TEXT("RaftSimInterpretedC3Obstacle"));
+            Rock->Tags.AddUnique(TEXT("RaftSimReviewGatedGeometry"));
+            ++SpawnedRockCount;
+        }
+        if (SpawnedRockCount != UE_ARRAY_COUNT(InterpretedRocks))
+        {
+            return false;
+        }
+        OutSummary += TEXT(
+            "Added four review-gated D4 contacts from Lava Canyon interpreted "
+            "broach-rock and fixed-seed boulder geometry.\n");
     }
 
     if (bReachLocalRun)
@@ -1134,8 +1232,8 @@ void RepositionLandscapeCandidatePhysicalCameras(
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.254f, 280.0f, 150.0f);
-        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.420f, 0.424f, 210.0f, 125.0f);
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.383f, 0.483f, 330.0f, 170.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.418f, 0.518f, 270.0f, 160.0f);
     }
     else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
     {
@@ -1157,7 +1255,14 @@ void RepositionLandscapeCandidatePhysicalCameras(
     }
     else
     {
-        SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.530f, 0.645f, 275.0f, 165.0f);
+        const bool bChilko =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+        SetCamera(
+            TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"),
+            bChilko ? 0.438f : 0.530f,
+            bChilko ? 0.538f : 0.645f,
+            bChilko ? 270.0f : 275.0f,
+            bChilko ? 160.0f : 165.0f);
     }
     for (TActorIterator<APlayerStart> It(World); It; ++It)
     {

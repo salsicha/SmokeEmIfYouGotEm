@@ -1,0 +1,150 @@
+{
+  "schema": "raftsim.environment.chilko_lava_canyon_reach_local_runnable_review.v1",
+  "river_id": "chilko_river_lava_canyon",
+  "rapid_name": "Lava Canyon",
+  "map_package": "/Game/RaftSim/Maps/L_LavaCanyon",
+  "milestone": "chilko_lava_canyon_reach_local_runnable_v1",
+  "status": "accepted_reference_runnable_photoreal_promotion_rejected",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "reach_local_landscape_owns_rendering_collision_and_height_queries": true,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "authored_capture_water_hidden_in_game": true,
+    "capture_only_water_actor_count": 2,
+    "capture_only_water_collision_enabled": false
+  },
+  "coordinate_contract": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "landscape_span_m": [600.0, 600.0],
+    "protected_solver_strip_span_m": [600.0, 80.0],
+    "runtime_vertical_datum_m": 1101.7130616203904,
+    "runtime_coordinate_map": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_runtime_coordinate_map.json",
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "official_hydrography": "BC Freshwater Atlas centerline",
+    "official_terrain": "NRCan CanElevation MRDEM-30 DTM CGVD2013",
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "heightfield_size_px": 1009,
+    "landscape_component_grid": [8, 8],
+    "corridor_station_range_m": [8730.0, 9330.0],
+    "protected_solver_half_width_m": 40.0,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_official_dem_edge_correction_m": 2.1443472817829843,
+    "edge_correction_feather_distance_m": 120.0,
+    "maximum_procedural_microrelief_m": 1.029798216823645,
+    "maximum_change_from_official_dem_outside_solver_strip_m": 2.6818534135625214,
+    "surveyed_lava_canyon_bathymetry": false,
+    "source_limitation": "The official 30 m DEM and route define broad reach form. The complete interpreted 600 by 80 m C3 bed is preserved, while bounded procedural detail outside it is visual and Landscape-collision infill rather than surveyed Lava Canyon geography."
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "wet_cell_count": 6060,
+    "supercritical_cell_count": 97,
+    "foam_eligible_cell_count": 188,
+    "maximum_speed_m_per_s": 6.3103179931640625,
+    "maximum_froude": 3.2803898008456547,
+    "strongest_mean_froude_station_m": 296.0,
+    "strongest_column_mean_froude": 1.1651107172336197,
+    "production_calibration_evidence": false
+  },
+  "interpreted_contact_geometry": {
+    "count": 4,
+    "authority": "interpreted_c3_bed_controls_review_gated_not_surveyed_hazards",
+    "contacts": [
+      {"kind": "broach_rock", "station_m": 250.0, "lateral_m": 3.5, "radius_m": 2.4, "crest_below_surface_m": 1.1},
+      {"kind": "broach_rock", "station_m": 300.0, "lateral_m": -4.0, "radius_m": 2.4, "crest_below_surface_m": 1.1},
+      {"kind": "broach_rock", "station_m": 392.0, "lateral_m": 2.0, "radius_m": 2.4, "crest_below_surface_m": 1.1},
+      {"kind": "fixed_seed_boulder", "station_m": 405.8667, "lateral_m": 10.616, "radius_m": 1.9816, "crest_below_surface_m": 1.027}
+    ]
+  },
+  "capture_presentation": {
+    "packed_field_channels": "R depth, G speed, B Froude, A detrended bed-plus-depth surface relief",
+    "surface_relief_render_cap_cm": 39.0,
+    "residual_analytic_displacement_scale": 0.22,
+    "foam_max_opacity": 0.94,
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0,
+    "capture_visibility_policy": "temporarily reveal RaftSimCaptureOnlyStaticWater actors during editor evidence and restore their serialized runtime-hidden state"
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "126debf4d1107c901911c039299d4c2561ca7dccdd53207f1e8e4dc8dd210d28"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_conditioned_heightfield_1009.png",
+      "sha256": "dd8ba5ef74a31180f32f0176c973a69d87b11e2537244a11c25d15b8bbdcaeed"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_local_centerline.json",
+      "sha256": "5456393d6c96927d3fa31aa8e122a48dc0b0baf9c30810199429cc49bc1cfd98"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_runtime_coordinate_map.json",
+      "sha256": "00c9f283876b8380eb701957e842d6d8964fb0368a7a825bea38df0043a85212"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/terrain/lava_canyon_visual/lava_canyon_visual_terrain_manifest.json",
+      "sha256": "d104be1ec7502391449377416c4cb4faf159cc4dcbc4418a24d5a010186cd29f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/chilko_lava_canyon_median_depth_speed_froude_surface_v1.png",
+      "sha256": "3f7a227b5cd4cd97fdbe65290b679cb8b32694df65a85df8ef6d5376fac41297"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/chilko_lava_canyon_median_visualization_manifest.json",
+      "sha256": "724493c7a8b257a9407668913ea084117692d4a1eb025236c71678e60e5966ea"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+      "sha256": "25c960d214fb9853d32235a6baf764ed0c199370d8b8ba819905dd4fca122531",
+      "mean_luminance": 0.2957
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+      "sha256": "56ad99ccf125c71b697aa7194262873b66ffa9fad946cce9aba7d18e47aee1d8",
+      "mean_luminance": 0.2902
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+      "sha256": "fc3aecaf82821a8f6732779d32bc899cb1b0ab1f9efeb7505ffd7708785abdf9",
+      "mean_luminance": 0.2954
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "sha256": "22d55b20b22425a787c1098ad2b28c9a0126963d5a721babb99d1bdb8efd881e"
+    }
+  ],
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_LavaCanyon_pass_1_of_1",
+    "focused_python_tests": "pass",
+    "raft_upright_after_initial_settle": true,
+    "swimmer_count_after_initial_settle": 0
+  },
+  "remaining_photoreal_defects": [
+    "water remains dark and opaque and the cooked hydraulic structure is not visually legible enough",
+    "banks remain broad, smooth, and nearly black in places rather than resolving wet rock, sediment, and small-scale canyon structure",
+    "foliage uses visibly repeated sample geometry and sparse ground cover instead of authentic Chilko species and natural distribution",
+    "the rapid lacks surveyed rock geometry, resolved crests, rollers, spray, mist, entrained aeration, and convincing shoreline contact",
+    "the 30 m source terrain and interpreted C3 bed are not surveyed Lava Canyon bathymetry or rapid-specific bank breaklines",
+    "hydraulics are unconverged and guide line, ecology, environment art, performance, capsize, recovery, and packaged-run evidence remain open"
+  ],
+  "required_external_acceptance_gates": [
+    "Chilko guide review of Lava Canyon stationing, entry, line, broach hazards, recovery, exit, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Lava Canyon behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, boulders, canyon form, and seasonal presentation",
+    "photoreal water and VFX approval for depth, transmission, foam, holes, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}

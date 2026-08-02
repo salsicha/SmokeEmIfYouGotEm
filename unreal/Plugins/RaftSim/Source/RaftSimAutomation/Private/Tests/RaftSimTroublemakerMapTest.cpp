@@ -124,6 +124,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
     bool bZambeziReferenceRun = false;
     bool bPacuareReferenceRun = false;
     bool bColoradoHanceReferenceRun = false;
+    bool bChilkoLavaCanyonReferenceRun = false;
     ARaftSimRaftActor* PlayerRaft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
@@ -134,6 +135,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
         bColoradoHanceReferenceRun = PlayerRaft->GetActorLabel() ==
             TEXT("RaftSim_ColoradoHance_PlayerRaft");
+        bChilkoLavaCanyonReferenceRun = PlayerRaft->GetActorLabel() ==
+            TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
         Test->TestTrue(
             FString::Printf(
                 TEXT("raft rests within depth envelope (z=%.0f)"),
@@ -455,6 +458,102 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Colorado Hance has one cooked-field-derived capture foam surface"),
             SolverFieldFoamCount,
             1);
+        return true;
+    }
+
+    if (bChilkoLavaCanyonReferenceRun)
+    {
+        Test->TestTrue(
+            TEXT("Chilko Lava Canyon player raft is marked reference-runnable"),
+            PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
+        Test->TestTrue(
+            TEXT("Chilko Lava Canyon launch keeps the raft upright"),
+            PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
+        Test->TestEqual(
+            TEXT("Chilko Lava Canyon launch keeps every person in the raft"),
+            PlayerRaft->GetSwimmerCount(),
+            0);
+
+        int32 RuntimeWaterConfigCount = 0;
+        for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabel() !=
+                TEXT("RaftSim_ChilkoLavaCanyon_RuntimeWaterConfig"))
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("Chilko loads the Lava Canyon cooked package"),
+                (*It)->CookedFieldsDir,
+                FString(TEXT("physics/data/real_world/chilko_river_lava_canyon/"
+                             "scenario_lava_canyon/cooked_flow_fields")));
+            Test->TestEqual(
+                TEXT("Chilko loads the median runnable band"),
+                (*It)->FlowBand,
+                FName(TEXT("median_runnable")));
+            Test->TestFalse(
+                TEXT("Chilko preserves source station/lateral coordinates"),
+                (*It)->bRecenterHydraulicCrux);
+            Test->TestEqual(
+                TEXT("Chilko binds the local-world vertical datum map"),
+                (*It)->CoordinateMapPath,
+                FString(TEXT("physics/data/real_world/chilko_river_lava_canyon/"
+                             "terrain/lava_canyon_visual/"
+                             "lava_canyon_runtime_coordinate_map.json")));
+            Test->TestTrue(
+                TEXT("Chilko Landscape owns runtime terrain"),
+                (*It)->bMapProvidesTerrain);
+            ++RuntimeWaterConfigCount;
+        }
+        Test->TestEqual(
+            TEXT("Chilko Lava Canyon reference run has one runtime water config"),
+            RuntimeWaterConfigCount,
+            1);
+
+        int32 CaptureOnlyWaterCount = 0;
+        int32 SolverFieldFoamCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("Chilko authored capture water is hidden during play"),
+                (*It)->IsHidden());
+            if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Chilko foam is identified as solver-field visualization"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimChilkoLavaCanyonSolverVisualization")));
+                ++SolverFieldFoamCount;
+            }
+            ++CaptureOnlyWaterCount;
+        }
+        Test->TestEqual(
+            TEXT("Chilko has capture-only static water and foam surfaces"),
+            CaptureOnlyWaterCount,
+            2);
+        Test->TestEqual(
+            TEXT("Chilko has one cooked-field-derived capture foam surface"),
+            SolverFieldFoamCount,
+            1);
+
+        int32 InterpretedD4RockCount = 0;
+        for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
+        {
+            if ((*It)->Tags.Contains(TEXT("RaftSimInterpretedC3Obstacle")) &&
+                (*It)->Tags.Contains(TEXT("RaftSimReviewGatedGeometry")) &&
+                (*It)->GetContactRadiusM() >= 0.1f)
+            {
+                ++InterpretedD4RockCount;
+            }
+        }
+        Test->TestEqual(
+            TEXT("Chilko retains four review-gated interpreted D4 contacts"),
+            InterpretedD4RockCount,
+            4);
         return true;
     }
 
