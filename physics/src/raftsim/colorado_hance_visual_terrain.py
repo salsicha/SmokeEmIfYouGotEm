@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image
 
 
-SCHEMA = "raftsim.colorado.hance_visual_terrain.v1"
+SCHEMA = "raftsim.colorado.hance_visual_terrain.v2"
 DEFAULT_OUTPUT_RELATIVE = Path(
     "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual"
 )
@@ -133,22 +133,59 @@ def build_colorado_hance_visual_terrain(
     base = _resample_clamped_regular_grid(bed, source_x, source_y, target_x, target_y)
     xx, yy = np.meshgrid(target_x, target_y)
 
-    # Preserve the complete interpreted C3 bed.  Outside it, construct broad
-    # asymmetric canyon walls with softened terraces, talus, and non-periodic
-    # domain-warped relief.  Every term is exactly zero at the source boundary.
+    # Preserve the complete interpreted C3 bed. Outside it, construct broad
+    # asymmetric canyon walls with non-periodic massing, shallow eroded strata,
+    # incised gullies, alcoves, and talus. V1's metre-scale cross-bank sine
+    # bands read as manufactured terraces from the guide camera. V2 keeps the
+    # same broad canyon envelope but moves most variation into longitudinally
+    # warped erosion and reduces periodic cross-bank relief. Every added term
+    # remains exactly zero at the source boundary.
     source_half_width_m = source_span_y_m * 0.5
     bank_distance = np.maximum(np.abs(yy) - source_half_width_m, 0.0)
     bank_fade = _smoothstep(0.0, 10.0, bank_distance)
     side_scale = np.where(yy >= 0.0, 1.08, 0.92)
+    longitudinal_mass = (
+        1.0
+        + 0.070 * np.sin(xx / 91.0 + 0.52 * np.sin(xx / 37.0))
+        + 0.035 * np.sin(xx / 29.0 - yy / 73.0 + 0.4)
+    )
     broad_rise = side_scale * (
-        0.145 * bank_distance + 0.00335 * np.square(bank_distance)
+        0.142 * bank_distance + 0.00330 * np.square(bank_distance)
+    ) * longitudinal_mass
+    warp = (
+        8.4 * np.sin(xx / 79.0 + 0.38 * np.sin(np.abs(yy) / 43.0))
+        + 3.1 * np.sin(xx / 31.0 - yy / 61.0)
+        + 1.7 * np.sin(xx / 13.0 + yy / 27.0 + 1.1)
     )
-    warp = 6.2 * np.sin(xx / 63.0 + 0.45 * np.sin(np.abs(yy) / 31.0)) + 2.8 * np.sin(
-        xx / 23.0 - yy / 47.0
+    eroded_strata = bank_fade * (
+        0.42 * np.sin((bank_distance + warp) / 17.0 + xx / 71.0)
+        + 0.21 * np.sin((bank_distance + 0.54 * warp) / 8.9 - xx / 39.0 + 0.7)
+        + 0.09 * np.sin(bank_distance / 4.1 + xx / 17.0 - yy / 33.0)
     )
-    strata = bank_fade * (
-        1.45 * np.sin((bank_distance + warp) / 7.8 + xx / 52.0)
-        + 0.62 * np.sin(bank_distance / 3.1 - xx / 27.0 + 0.7)
+    # Domain-warp the drainage axes so the narrow negative lobes do not form
+    # the evenly spaced, camera-facing grooves produced by a plain sinusoid.
+    # Each frequency bends at a different longitudinal and cross-bank scale;
+    # the smaller amplitude keeps the gullies subordinate to the canyon mass.
+    gully_phase_a = np.sin(
+        xx / 47.0
+        + 0.74 * np.sin(xx / 17.0 + bank_distance / 63.0)
+        + np.sign(yy) * 0.73
+        + bank_distance / 185.0
+        + 0.31 * np.sin(bank_distance / 29.0 - xx / 83.0)
+    )
+    gully_phase_b = np.sin(
+        xx / 23.0
+        + 0.53 * np.sin(xx / 9.0 - bank_distance / 41.0)
+        - np.sign(yy) * 0.41
+        - bank_distance / 97.0
+        + 0.22 * np.sin(bank_distance / 18.0 + xx / 57.0)
+    )
+    gully_mask = _smoothstep(8.0, 58.0, bank_distance)
+    gullies = -bank_fade * gully_mask * (
+        (0.36 + 0.0065 * bank_distance)
+        * np.exp(-np.square(gully_phase_a / 0.22))
+        + (0.12 + 0.0025 * bank_distance)
+        * np.exp(-np.square(gully_phase_b / 0.17))
     )
     alcoves = bank_fade * (
         -2.8
@@ -159,12 +196,31 @@ def build_colorado_hance_visual_terrain(
         * np.exp(-np.square((np.abs(yy) - 126.0) / 42.0))
     )
     talus = bank_fade * (
-        0.54 * np.sin(xx / 8.6 + yy / 6.1 + 0.7 * np.sin(xx / 37.0))
-        + 0.28 * np.sin(xx / 3.9 - yy / 4.7 + 1.9)
+        0.30
+        * np.sin(
+            xx / 9.7
+            + yy / 7.3
+            + 0.70 * np.sin(xx / 41.0 - yy / 29.0)
+            + 0.24 * np.sin(xx / 15.0 + yy / 19.0)
+        )
+        + 0.16
+        * np.sin(
+            xx / 4.7
+            - yy / 5.9
+            + 1.9
+            + 0.42 * np.sin(xx / 21.0 - yy / 13.0)
+        )
+        + 0.08
+        * np.sin(
+            xx / 2.8
+            + yy / 3.7
+            - 0.6
+            + 0.35 * np.sin(xx / 11.0 + yy / 8.0)
+        )
     )
     procedural_infill = np.where(
         bank_distance > 0.0,
-        broad_rise + strata + alcoves + talus,
+        broad_rise + eroded_strata + gullies + alcoves + talus,
         0.0,
     )
     conditioned = base + procedural_infill
@@ -258,6 +314,23 @@ def build_colorado_hance_visual_terrain(
         centerline_surface - terrain_min_m + runtime_vertical_offset_cm / 100.0
     )
     runtime_centerline_surface_m = centerline_surface - runtime_vertical_datum_m
+    outer_profile_dominant_band_ratios: list[float] = []
+    outer_max_adjacent_steps_m: list[float] = []
+    for side_mask in (target_y < -source_half_width_m, target_y > source_half_width_m):
+        side_distance = np.abs(target_y[side_mask]) - source_half_width_m
+        mean_profile = np.mean(conditioned[side_mask], axis=1)
+        trend = np.polyval(np.polyfit(side_distance, mean_profile, 2), side_distance)
+        residual = mean_profile - trend
+        power = np.square(np.abs(np.fft.rfft(residual - np.mean(residual))))
+        non_dc_power = power[1:]
+        outer_profile_dominant_band_ratios.append(
+            float(np.max(non_dc_power) / np.sum(non_dc_power))
+            if np.sum(non_dc_power) > 0.0
+            else 0.0
+        )
+        outer_max_adjacent_steps_m.append(
+            float(np.max(np.abs(np.diff(conditioned[side_mask], axis=0))))
+        )
     manifest: dict[str, object] = {
         "schema": SCHEMA,
         "status": (
@@ -302,7 +375,7 @@ def build_colorado_hance_visual_terrain(
             "runtime_vertical_datum_m": runtime_vertical_datum_m,
         },
         "procedural_infill": {
-            "algorithm": "deterministic_asymmetric_stratified_desert_canyon_v1",
+            "algorithm": "deterministic_asymmetric_eroded_desert_canyon_v2",
             "source_solver_half_width_m": source_half_width_m,
             "protected_solver_strip_change_m": float(
                 np.max(np.abs(procedural_infill[protected_mask]))
@@ -311,6 +384,17 @@ def build_colorado_hance_visual_terrain(
                 np.max(np.abs(procedural_infill[source_join_mask]))
             ),
             "maximum_added_canyon_relief_m": float(procedural_infill.max()),
+            "maximum_outer_adjacent_cross_bank_step_m": max(
+                outer_max_adjacent_steps_m
+            ),
+            "maximum_outer_mean_profile_dominant_band_energy_ratio": max(
+                outer_profile_dominant_band_ratios
+            ),
+            "regular_terrace_reduction_policy": (
+                "replace metre-scale periodic cross-bank bands with shallow "
+                "domain-warped strata, longitudinal massing, incised gullies, "
+                "and lower-amplitude talus"
+            ),
             "authority": (
                 "visual and Landscape collision infill only outside the complete C3 "
                 "solver strip; cooked bed, water state, and raft forces are unchanged"

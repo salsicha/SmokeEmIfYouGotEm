@@ -1285,7 +1285,7 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.LandscapeSize = 1009;
             Candidate.HorizontalSpanXCm = 60000.0f;
             Candidate.HorizontalSpanYCm = 32000.0f;
-            Candidate.TargetReliefCm = 8854.3715f;
+            Candidate.TargetReliefCm = 8932.6415f;
             Candidate.WorldVerticalOffsetCm = -666.5288f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
             Candidate.bUseSolverVisualizationFields = true;
