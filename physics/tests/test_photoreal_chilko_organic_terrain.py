@@ -75,7 +75,7 @@ def test_chilko_generated_manifest_records_shading_and_authority_separation() ->
     )
 
 
-def test_chilko_organic_terrain_review_is_hash_locked_and_honest() -> None:
+def test_chilko_organic_terrain_review_retains_immutable_evidence_and_is_honest() -> None:
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
 
     assert review["schema"] == (
@@ -102,7 +102,23 @@ def test_chilko_organic_terrain_review_is_hash_locked_and_honest() -> None:
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 
+    # The native-water milestone supersedes the mutable map, manifest, current
+    # captures, and shared generator wiring. Its own review locks their current
+    # hashes; this historical terrain review continues to lock the immutable
+    # before frames, audit reports, terrain material, and terrain-only source.
+    superseded_paths = {
+        "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+    }
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_paths:
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]

@@ -414,13 +414,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         }
         FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
-        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") &&
+        if ((Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon")) &&
             Candidate.bUseSolverVisualizationFields &&
             !Candidate.SolverVisualizationFieldRelativePath.IsEmpty())
         {
-            // Terminator's packed field is already sampled into capture
-            // geometry and vertex colours. The material must not re-sample
-            // the shared South Fork fallback texture on top of that result.
+            // Both reach-local packed fields are already sampled into capture
+            // geometry and vertex colours. Their materials must not re-sample
+            // the shared South Fork fallback texture on top of those results.
             WaterSettings.SolverFieldEnable = 0.0f;
             WaterSettings.SolverMacroNormalWeight = 0.0f;
             WaterSettings.SolverDepthColorWeight = 0.0f;
@@ -496,6 +497,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesFutaleufuTerminatorDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+        const bool bUsesChilkoLavaCanyonDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
@@ -519,7 +522,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                    ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater")
                    : (bUsesFutaleufuTerminatorDefaultLitWater
                           ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater")
-                          : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate")));
+                          : (bUsesChilkoLavaCanyonDefaultLitWater
+                                 ? TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater")
+                                 : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate"))));
         const FString WaterSingleLayerParameterKeyPrefix =
             bUsesSingleLayerWater
             ? TEXT("water_single_layer")
@@ -1010,7 +1015,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                               ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
                               : (bUsesFutaleufuTerminatorDefaultLitWater
                                      ? TEXT("futaleufu_terminator_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
-                                     : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))))
+                                     : (bUsesChilkoLavaCanyonDefaultLitWater
+                                            ? TEXT("chilko_lava_canyon_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
+                                            : TEXT("solver_surface_default_lit_candidate_bound_and_captured")))))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
             *EscapeRaftSimJsonString(WaterMaterialParentPath),

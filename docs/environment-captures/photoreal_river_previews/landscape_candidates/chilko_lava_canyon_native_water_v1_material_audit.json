@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "E07276208D4FA41F7DE0D9B31C03A369",
+			"instanceName": "Alexs-MacBook-Air.local-81895",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-06.10.32",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.0082334987819194794,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FChilkoLavaCanyonWater",
+			"fullTestPath": "RaftSim.M9.FChilkoLavaCanyonWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E07276208D4FA41F7DE0D9B31C03A369"
+			],
+			"duration": 0.0082334987819194794,
+			"dateTime": "2026.08.02-06.10.32",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

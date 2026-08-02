@@ -778,6 +778,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Chilko visible carrier has complete calm-water coverage"),
                 (*It)->LiveSurfaceCalmCoverage >= 0.80f);
+            Test->TestTrue(
+                TEXT("Chilko live sky reflection stays restrained"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSkyReflectionStrength, 0.38f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko live carrier keeps moving micro-normal response"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRippleStrength, 0.32f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko solver foam remains optically legible"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveFoamIntensity, 0.72f, 0.001f));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
@@ -796,6 +808,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Chilko authored capture water is hidden during play"),
                 (*It)->IsHidden());
+            if (!(*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Chilko capture ribbon uses its isolated Default Lit water"),
+                    (*It)->Tags.Contains(TEXT("RaftSimChilkoDefaultLitWater")));
+                Test->TestTrue(
+                    TEXT("Chilko capture ribbon records CPU cooked-field color authority"),
+                    (*It)->Tags.Contains(TEXT("RaftSimCpuAuthoredCookedFieldColor")));
+            }
             if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
             {
                 Test->TestTrue(
