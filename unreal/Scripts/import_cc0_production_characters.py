@@ -1,8 +1,10 @@
 """Verify and import the rights-compatible guide/crew source set into Unreal.
 
 Run through UnrealEditor-Cmd with ``-ExecutePythonScript``. The import is
-idempotent by default; set ``RAFTSIM_CC0_REIMPORT=1`` to replace existing
-assets after intentionally regenerating the source FBXs.
+idempotent by default. Skeletal bind data cannot be safely deleted and rebuilt
+under the same loaded Unreal packages, so intentional source regeneration is a
+two-process operation: first run with ``RAFTSIM_CC0_REIMPORT=1`` to remove only
+the importer-owned pairs, then run normally to import clean pairs.
 """
 
 from __future__ import annotations
@@ -19,7 +21,7 @@ import unreal
 DESTINATION = "/Game/RaftSim/Characters/Production/CC0"
 TEXTURE_DESTINATION = f"{DESTINATION}/Textures"
 MATERIAL_DESTINATION = f"{DESTINATION}/Materials"
-FBX_IMPORT_UNIFORM_SCALE = 1.0
+FBX_IMPORT_UNIFORM_SCALE = 100.0
 MIN_PRODUCTION_BODY_HEIGHT_CM = 140.0
 MAX_PRODUCTION_BODY_HEIGHT_CM = 220.0
 SOURCE_SHA256_METADATA_TAG = "RaftSimSourceSHA256"
@@ -31,6 +33,18 @@ SOURCE_ROOT = (
     / "RaftSim"
     / "Characters"
     / "CC0Production"
+)
+CONTENT_DISK_ROOT = (
+    Path(unreal.Paths.project_content_dir())
+    / "RaftSim"
+    / "Characters"
+    / "Production"
+    / "CC0"
+)
+PAIR_REIMPORT_BACKUP_ROOT = (
+    Path(unreal.Paths.project_saved_dir())
+    / "RaftSim"
+    / "cc0_pair_reimport_backup"
 )
 
 ATLASES = {
@@ -70,11 +84,11 @@ HAIR_TEXTURES = {
 }
 
 CHARACTERS = {
-    "Guide": ("young_lightskinned_male_diffuse.png", "73c72e1b89b37841f3addd8dddeb86e59ac762de1ed46cbbd1d800fa601a2f54"),
-    "Crew01": ("young_darkskinned_male_diffuse.png", "f980d7d3eaf1c978a8a0cf17d9a48af80548fda125764a2766656357b3452cd1"),
-    "Crew02": ("young_lightskinned_male_diffuse3.png", "54bc59c9990ddfce62611f4aa3c8a6c45c1152c6d099c4447e37645bbf609f5a"),
-    "Crew03": ("young_lightskinned_female_diffuse.png", "24fbc26f6b19fbc49525946a3c7f3c7b13c20730ca60220e3f1eac1f0b077636"),
-    "Crew04": ("young_darkskinned_female_diffuse.png", "e232214376f84213205f78c5cc184207ecfb29d5c0ce628879344c4e9c6f0bf6"),
+    "Guide": ("young_lightskinned_male_diffuse.png", "49506857a5f208ab8a6f911931ee7dbfd72fc589f6bfd6ee6f4673a3d65a3f2f"),
+    "Crew01": ("young_darkskinned_male_diffuse.png", "41e2ac4217928d64196a17a2dbc00a7f2b2695b6e2ea76fb987bc84e148cc395"),
+    "Crew02": ("young_lightskinned_male_diffuse3.png", "ca863f7456086d8dd2569226ed978bb27a29a67ae284eecd99e0ccf28a159f8e"),
+    "Crew03": ("young_lightskinned_female_diffuse.png", "17dfba3ba51deb1bcdb3cc8f494bd4f107aae1b9b0789975a01b30a6e0bd6e07"),
+    "Crew04": ("young_darkskinned_female_diffuse.png", "2891732c837ed38c0d9e2f566e422c993b414766773e2f92d4cca0f812a2e4ee"),
 }
 
 CHARACTER_HAIR = {
@@ -149,6 +163,74 @@ def reference_skeleton_status(mesh: unreal.SkeletalMesh) -> tuple[bool, str]:
     return True, f"reference head={head_height_cm:.3f}cm"
 
 
+def prepare_character_pair_reimport() -> list[dict[str, object]]:
+    """Delete canonical generated pairs and require a fresh editor process.
+
+    Unreal can keep a deleted SkeletalMesh package and its Skeleton reference
+    alive until shutdown. Importing back into the same object path in that
+    process can therefore create a mesh with no Skeleton. This preparation
+    phase performs only exact-path deletion; the normal importer run after
+    restart creates both packages from the same FBX.
+    """
+    records: list[dict[str, object]] = []
+    PAIR_REIMPORT_BACKUP_ROOT.mkdir(parents=True, exist_ok=True)
+
+    def move_remaining_package(asset_name: str) -> str | None:
+        source = CONTENT_DISK_ROOT / f"{asset_name}.uasset"
+        if not source.is_file():
+            return None
+        destination = PAIR_REIMPORT_BACKUP_ROOT / source.name
+        if destination.exists():
+            destination = PAIR_REIMPORT_BACKUP_ROOT / (
+                f"{source.stem}_{sha256(source)[:12]}{source.suffix}"
+            )
+        if destination.exists():
+            raise RuntimeError(
+                f"Refusing to overwrite reimport backup {destination}"
+            )
+        source.replace(destination)
+        return str(destination)
+
+    for variant in CHARACTERS:
+        asset_name = f"SK_RaftSim_CC0_{variant}"
+        mesh_path = f"{DESTINATION}/{asset_name}"
+        skeleton_path = f"{mesh_path}_Skeleton"
+        mesh = unreal.load_asset(mesh_path)
+        if isinstance(mesh, unreal.SkeletalMesh):
+            referenced_skeleton = mesh.get_editor_property("skeleton")
+            if isinstance(referenced_skeleton, unreal.Skeleton):
+                actual_path = referenced_skeleton.get_path_name().split(".", 1)[0]
+                if actual_path != skeleton_path:
+                    raise RuntimeError(
+                        f"Refusing to prepare unexpected shared skeleton for "
+                        f"{asset_name}: {actual_path}"
+                    )
+            if not unreal.EditorAssetLibrary.delete_asset(mesh_path):
+                raise RuntimeError(f"Could not remove generated mesh {mesh_path}")
+        elif unreal.EditorAssetLibrary.does_asset_exist(mesh_path):
+            raise RuntimeError(f"Unexpected non-skeletal asset at {mesh_path}")
+        mesh = None
+        unreal.SystemLibrary.collect_garbage()
+        mesh_backup = move_remaining_package(asset_name)
+        if unreal.EditorAssetLibrary.does_asset_exist(skeleton_path):
+            if not unreal.EditorAssetLibrary.delete_asset(skeleton_path):
+                raise RuntimeError(
+                    f"Could not remove generated skeleton {skeleton_path}"
+                )
+        skeleton_backup = move_remaining_package(f"{asset_name}_Skeleton")
+        records.append(
+            {
+                "variant": variant,
+                "mesh": mesh_path,
+                "skeleton": skeleton_path,
+                "mesh_backup": mesh_backup,
+                "skeleton_backup": skeleton_backup,
+                "status": "deleted_for_clean_restart",
+            }
+        )
+    return records
+
+
 def import_textures(replace_existing: bool) -> dict[str, unreal.Texture2D]:
     textures: dict[str, unreal.Texture2D] = {}
     imported_paths: set[str] = set()
@@ -206,13 +288,12 @@ def import_textures(replace_existing: bool) -> dict[str, unreal.Texture2D]:
     return textures
 
 
-def import_characters(replace_existing: bool) -> dict[str, unreal.SkeletalMesh]:
+def import_characters() -> dict[str, unreal.SkeletalMesh]:
     result: dict[str, unreal.SkeletalMesh] = {}
     for variant in CHARACTERS:
         asset_name = f"SK_RaftSim_CC0_{variant}"
         existing = unreal.load_asset(f"{DESTINATION}/{asset_name}")
-        should_replace = replace_existing
-        if isinstance(existing, unreal.SkeletalMesh) and not should_replace:
+        if isinstance(existing, unreal.SkeletalMesh):
             existing_height = existing.get_imported_bounds().box_extent.z * 2.0
             skeleton_valid, skeleton_reason = reference_skeleton_status(existing)
             imported_source_hash = unreal.EditorAssetLibrary.get_metadata_tag(
@@ -233,30 +314,12 @@ def import_characters(replace_existing: bool) -> dict[str, unreal.SkeletalMesh]:
                 reasons.append("source hash changed or was not recorded")
             if not skeleton_valid:
                 reasons.append(skeleton_reason)
-            unreal.log_warning(f"Reimporting {asset_name}: {', '.join(reasons)}")
-            should_replace = True
-
-            # Unreal preserves an existing Skeleton when replacing a mesh,
-            # including stale meter-scale rest bones. These exact assets are
-            # deterministic outputs of this importer, so regenerate the pair
-            # when its reference skeleton fails the centimeter/detail checks.
-            if not skeleton_valid:
-                mesh_path = f"{DESTINATION}/{asset_name}"
-                referenced_skeleton = existing.get_editor_property("skeleton")
-                skeleton_path = (
-                    referenced_skeleton.get_path_name().split(".", 1)[0]
-                    if referenced_skeleton
-                    else f"{DESTINATION}/{asset_name}_Skeleton"
-                )
-                if not unreal.EditorAssetLibrary.delete_asset(mesh_path):
-                    raise RuntimeError(f"Could not remove stale generated mesh {mesh_path}")
-                if unreal.EditorAssetLibrary.does_asset_exist(skeleton_path):
-                    if not unreal.EditorAssetLibrary.delete_asset(skeleton_path):
-                        raise RuntimeError(
-                            f"Could not remove stale generated skeleton {skeleton_path}"
-                        )
-                unreal.SystemLibrary.collect_garbage()
-                should_replace = False
+            raise RuntimeError(
+                f"{asset_name} requires atomic pair regeneration "
+                f"({', '.join(reasons)}). Run once with RAFTSIM_CC0_REIMPORT=1, "
+                "restart Unreal, then run the importer normally; retaining the "
+                "old package can preserve stale inverse bind matrices."
+            )
 
         options = unreal.FbxImportUI()
         options.automated_import_should_detect_type = False
@@ -277,7 +340,7 @@ def import_characters(replace_existing: bool) -> dict[str, unreal.SkeletalMesh]:
         task.destination_path = DESTINATION
         task.destination_name = asset_name
         task.automated = True
-        task.replace_existing = should_replace
+        task.replace_existing = False
         task.save = False
         task.factory = unreal.FbxFactory()
         task.options = options
@@ -546,6 +609,11 @@ def configure_mesh(
     skeleton_valid, skeleton_reason = reference_skeleton_status(mesh)
     if not skeleton_valid:
         raise RuntimeError(f"{variant} has invalid reference skeleton: {skeleton_reason}")
+    # A newly imported Skeleton is a separate package and is not guaranteed to
+    # appear in AssetImportTask.imported_object_paths. Save it explicitly so a
+    # successful unattended import cannot leave the mesh referencing a
+    # transient package that disappears on editor shutdown.
+    unreal.EditorAssetLibrary.save_loaded_asset(skeleton, only_if_is_dirty=False)
     subsystem = unreal.get_editor_subsystem(unreal.SkeletalMeshEditorSubsystem)
     if not subsystem:
         raise RuntimeError("SkeletalMeshEditorSubsystem is unavailable")
@@ -589,12 +657,21 @@ def main() -> None:
     try:
         report["verified_sources"] = verify_sources()
         replace_existing = os.environ.get("RAFTSIM_CC0_REIMPORT", "0") == "1"
+        if replace_existing:
+            report["character_pairs"] = prepare_character_pair_reimport()
+            report["status"] = "prepared_reimport_restart_required"
+            write_report(report)
+            unreal.log(
+                "RaftSim CC0 pairs removed; restart Unreal and run the importer "
+                "normally to create clean mesh/skeleton pairs"
+            )
+            return
         replace_textures = (
             os.environ.get("RAFTSIM_CC0_REIMPORT_TEXTURES", "0") == "1"
         )
         textures = import_textures(replace_textures)
         materials = build_materials(textures, rebuild_hair=replace_textures)
-        meshes = import_characters(replace_existing)
+        meshes = import_characters()
         report["characters"] = [
             configure_mesh(variant, meshes[variant], materials) for variant in CHARACTERS
         ]

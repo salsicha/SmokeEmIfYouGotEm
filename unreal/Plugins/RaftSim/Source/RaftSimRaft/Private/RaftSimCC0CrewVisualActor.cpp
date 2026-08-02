@@ -37,8 +37,8 @@ const FVector CrewHeadLocalEyeCentersCm[] = {
 // Capture-fitted correction from the rendered eye-line to the helmet anchor.
 // The guide and first crew identity have longer face-to-crown proportions than
 // the common shell reference; the other three already seat at the brow.
-constexpr float GuideHelmetAnchorDropCm = 10.0f;
-const float CrewHelmetAnchorDropsCm[] = {6.0f, 0.0f, 0.0f, 0.0f};
+constexpr float GuideHelmetAnchorDropCm = 5.0f;
+const float CrewHelmetAnchorDropsCm[] = {6.0f, 9.0f, 9.0f, 7.0f};
 
 const FName DrivenBones[] = {
     TEXT("pelvis"),
@@ -235,66 +235,39 @@ void ARaftSimCC0CrewVisualActor::CacheRenderedFaceAnchorVertices()
     }
     USkeletalMesh* Mesh = Cast<USkeletalMesh>(Body->GetSkinnedAsset());
     FSkeletalMeshRenderData* RenderData = Mesh ? Mesh->GetResourceForRendering() : nullptr;
-    const FTransform* ReferenceHead = ReferenceComponentTransforms.Find(TEXT("head"));
-    if (!Mesh || !RenderData || RenderData->LODRenderData.IsEmpty() || !ReferenceHead)
+    if (!Mesh || !RenderData || RenderData->LODRenderData.IsEmpty())
     {
         return;
     }
 
-    int32 SkinMaterialIndex = INDEX_NONE;
+    int32 EyeMaterialIndex = INDEX_NONE;
     const TArray<FSkeletalMaterial>& Materials = Mesh->GetMaterials();
     for (int32 MaterialIndex = 0; MaterialIndex < Materials.Num(); ++MaterialIndex)
     {
         if (Materials[MaterialIndex].MaterialSlotName.ToString().Contains(
-                TEXT("Skin"), ESearchCase::IgnoreCase))
+                TEXT("Eyes"), ESearchCase::IgnoreCase))
         {
-            SkinMaterialIndex = MaterialIndex;
+            EyeMaterialIndex = MaterialIndex;
             break;
         }
     }
-    if (SkinMaterialIndex == INDEX_NONE)
+    if (EyeMaterialIndex == INDEX_NONE)
     {
         return;
     }
 
-    const FVector LocalEyeCenterCm = bCurrentGuide
-        ? GuideHeadLocalEyeCenterCm
-        : CrewHeadLocalEyeCentersCm[FMath::Clamp(CurrentVariantIndex, 0, 3)];
-    const FVector ReferenceEyeCenterCm =
-        ReferenceHead->TransformPosition(LocalEyeCenterCm / BodyScale);
     const FSkeletalMeshLODRenderData& LODData = RenderData->LODRenderData[0];
-    struct FFaceCandidate
-    {
-        int32 VertexIndex = INDEX_NONE;
-        float DistanceSquared = TNumericLimits<float>::Max();
-    };
-    TArray<FFaceCandidate> Candidates;
     for (const FSkelMeshRenderSection& Section : LODData.RenderSections)
     {
-        if (Section.MaterialIndex != SkinMaterialIndex)
+        if (Section.MaterialIndex != EyeMaterialIndex)
         {
             continue;
         }
         const uint32 EndVertex = Section.BaseVertexIndex + Section.NumVertices;
         for (uint32 VertexIndex = Section.BaseVertexIndex; VertexIndex < EndVertex; ++VertexIndex)
         {
-            const FVector ReferencePosition(
-                LODData.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(VertexIndex));
-            Candidates.Add({
-                static_cast<int32>(VertexIndex),
-                FVector::DistSquared(ReferencePosition, ReferenceEyeCenterCm)});
+            RenderedFaceAnchorVertexIndices.Add(static_cast<int32>(VertexIndex));
         }
-    }
-    Candidates.Sort([](const FFaceCandidate& A, const FFaceCandidate& B)
-    {
-        return A.DistanceSquared < B.DistanceSquared;
-    });
-    constexpr int32 FacialSampleCount = 64;
-    const int32 RetainedCount = FMath::Min(FacialSampleCount, Candidates.Num());
-    RenderedFaceAnchorVertexIndices.Reserve(RetainedCount);
-    for (int32 Index = 0; Index < RetainedCount; ++Index)
-    {
-        RenderedFaceAnchorVertexIndices.Add(Candidates[Index].VertexIndex);
     }
 }
 

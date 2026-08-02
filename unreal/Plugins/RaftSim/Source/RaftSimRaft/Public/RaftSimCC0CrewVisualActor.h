@@ -84,7 +84,7 @@ private:
     UPROPERTY()
     TMap<FName, FTransform> ReferenceComponentTransforms;
 
-    /** Small LOD0 skin sample nearest the authored eye line, cached per identity. */
+    /** LOD0 rendered-eye vertices; their live centroid anchors the fitted helmet. */
     TArray<int32> RenderedFaceAnchorVertexIndices;
 
     int32 CurrentVariantIndex = 0;

@@ -2187,6 +2187,104 @@ static UMaterial* BuildProductionCC0SkinMaterial(
     return Material;
 }
 
+static UMaterial* BuildProductionCC0EyeMaterial()
+{
+    const TCHAR* AssetName = TEXT("M_RaftSim_CC0_Eyes");
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/%s"), AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, AssetName);
+    UPackage* Package = CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+    UMaterial* Material = Cast<UMaterial>(
+        StaticLoadObject(UMaterial::StaticClass(), nullptr, *ObjectPath));
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package, AssetName, RF_Public | RF_Standalone | RF_Transactional);
+        FAssetRegistryModule::AssetCreated(Material);
+    }
+    UTexture2D* EyeAtlas = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Characters/Production/CC0/Textures/"
+             "T_RaftSim_CC0_BrownEye.T_RaftSim_CC0_BrownEye"));
+    if (!Material || !EyeAtlas)
+    {
+        UE_LOG(LogTemp, Error, TEXT("RaftSim: missing production CC0 eye inputs"));
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->BlendMode = BLEND_Opaque;
+    // The source-level FBX attachment gate now preserves the reviewed outward
+    // winding and coherent inverse-bind matrices. Keep the ocular surface
+    // one-sided so backfaces cannot mask a future geometry regression.
+    Material->TwoSided = false;
+    Material->bTangentSpaceNormal = true;
+    // The joined FBX eye surfaces already retain open-lid geometry and the
+    // hash-locked MakeHuman iris/sclera UVs. Clear Coat represents the smooth
+    // tear-film/cornea layer without changing the source atlas or adding a
+    // detached procedural eyeball.
+    Material->SetShadingModel(MSM_ClearCoat);
+    Material->SetMaterialUsage(MATUSAGE_SkeletalMesh);
+
+    auto Add = [Material](UMaterialExpression* Expression)
+    {
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    auto Constant = [&](float Value)
+    {
+        UMaterialExpressionConstant* Expression =
+            NewObject<UMaterialExpressionConstant>(Material);
+        Expression->R = Value;
+        Add(Expression);
+        return Expression;
+    };
+
+    UMaterialExpressionTextureSampleParameter2D* AtlasSample =
+        Cast<UMaterialExpressionTextureSampleParameter2D>(
+            Add(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
+    AtlasSample->ParameterName = TEXT("LicensedEyeAtlas");
+    AtlasSample->Texture = EyeAtlas;
+    AtlasSample->SamplerType = SAMPLERTYPE_Color;
+    AtlasSample->Group = TEXT("RaftSimCC0Eyes");
+
+    UMaterialExpressionMultiply* CalibratedAtlas =
+        Cast<UMaterialExpressionMultiply>(
+            Add(NewObject<UMaterialExpressionMultiply>(Material)));
+    CalibratedAtlas->A.Expression = AtlasSample;
+    CalibratedAtlas->B.Expression = Constant(0.82f);
+    CalibratedAtlas->Desc = TEXT("SourceEyeAtlasReflectanceCalibration");
+
+    UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
+    EditorData->BaseColor.Connect(0, CalibratedAtlas);
+    EditorData->Roughness.Connect(0, Constant(0.24f));
+    EditorData->Specular.Connect(0, Constant(0.50f));
+    EditorData->ClearCoat.Connect(0, Constant(1.0f));
+    EditorData->ClearCoatRoughness.Connect(0, Constant(0.04f));
+    EditorData->AmbientOcclusion.Connect(0, Constant(0.86f));
+
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    Package->MarkPackageDirty();
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath, FPackageName::GetAssetPackageExtension());
+    const bool bSaved = UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim: production CC0 eye material saved=%d"),
+        bSaved ? 1 : 0);
+    return Material;
+}
+
 static void BuildProductionCC0SkinMaterials()
 {
     struct FSkinSpec
@@ -2217,6 +2315,7 @@ static void BuildProductionCC0SkinMaterials()
             SkinSpec.AtlasAssetName,
             SkinSpec.AtlasReflectanceCalibration);
     }
+    BuildProductionCC0EyeMaterial();
 }
 
 // Project-owned scan-derived textile response shared by current procedural

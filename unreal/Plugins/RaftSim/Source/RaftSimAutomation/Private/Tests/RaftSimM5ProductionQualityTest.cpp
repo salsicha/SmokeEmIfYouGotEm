@@ -18,6 +18,8 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimRaftCondition.h"
 #include "RaftSimRaftMesh.h"
+#include "Rendering/SkeletalMeshRenderData.h"
+#include "Rendering/SkinWeightVertexBuffer.h"
 #include "Tests/AutomationCommon.h"
 #include "TextureCompiler.h"
 #include "UnrealClient.h"
@@ -286,6 +288,19 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                     Material->GetShadingModels().HasShadingModel(
                         MSM_PreintegratedSkin));
             }
+            if (FString(MaterialPath).Contains(TEXT("_Eyes.")))
+            {
+                TestTrue(
+                    TEXT("CC0 eyes use a corneal clear-coat shading layer"),
+                    Material->GetShadingModels().HasShadingModel(MSM_ClearCoat));
+                TestEqual(
+                    TEXT("CC0 eye surface remains opaque"),
+                    Material->GetBlendMode(),
+                    BLEND_Opaque);
+                TestFalse(
+                    TEXT("CC0 helper-eye shell retains reviewed outward winding"),
+                    Material->IsTwoSided());
+            }
         }
     }
 
@@ -364,6 +379,197 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                     FString::Printf(TEXT("%s helmet-contained hair is suppressed"), Variant),
                     HairSlot->MaterialInterface->GetPathName().Contains(
                         TEXT("M_RaftSim_CC0_HelmetContainedHairHidden")));
+            }
+        }
+
+        FSkeletalMeshRenderData* RenderData = Mesh->GetResourceForRendering();
+        TestNotNull(
+            FString::Printf(TEXT("%s has cooked skeletal render data"), Variant),
+            RenderData);
+        if (RenderData && !RenderData->LODRenderData.IsEmpty())
+        {
+            const int32 HeadBoneIndex =
+                Mesh->GetRefSkeleton().FindBoneIndex(TEXT("head"));
+            TestTrue(
+                FString::Printf(TEXT("%s has a head bone"), Variant),
+                HeadBoneIndex != INDEX_NONE);
+            const FSkeletalMeshLODRenderData& LODData = RenderData->LODRenderData[0];
+            const FSkinWeightVertexBuffer* SkinWeights =
+                LODData.GetSkinWeightVertexBuffer();
+            TestNotNull(
+                FString::Printf(TEXT("%s has LOD0 skin weights"), Variant),
+                SkinWeights);
+            if (HeadBoneIndex != INDEX_NONE && SkinWeights)
+            {
+                const auto DominantSkeletonBone = [SkinWeights](
+                    const FSkelMeshRenderSection& Section,
+                    uint32 VertexIndex)
+                {
+                    uint16 DominantWeight = 0;
+                    int32 DominantBone = INDEX_NONE;
+                    for (uint32 InfluenceIndex = 0;
+                         InfluenceIndex < SkinWeights->GetMaxBoneInfluences();
+                         ++InfluenceIndex)
+                    {
+                        const uint32 LocalBoneIndex =
+                            SkinWeights->GetBoneIndex(VertexIndex, InfluenceIndex);
+                        if (!Section.BoneMap.IsValidIndex(LocalBoneIndex))
+                        {
+                            continue;
+                        }
+                        const uint16 Weight =
+                            SkinWeights->GetBoneWeight(VertexIndex, InfluenceIndex);
+                        if (Weight > DominantWeight)
+                        {
+                            DominantWeight = Weight;
+                            DominantBone = Section.BoneMap[LocalBoneIndex];
+                        }
+                    }
+                    return DominantBone;
+                };
+                struct FSkinVertex
+                {
+                    uint32 VertexIndex = 0;
+                    const FSkelMeshRenderSection* Section = nullptr;
+                };
+                TArray<FSkinVertex> SkinVertices;
+                for (const FSkelMeshRenderSection& Section : LODData.RenderSections)
+                {
+                    if (!Mesh->GetMaterials().IsValidIndex(Section.MaterialIndex) ||
+                        !Mesh->GetMaterials()[Section.MaterialIndex]
+                             .MaterialSlotName.ToString()
+                             .Contains(TEXT("Skin"), ESearchCase::IgnoreCase))
+                    {
+                        continue;
+                    }
+                    const uint32 EndVertex =
+                        Section.BaseVertexIndex + Section.NumVertices;
+                    for (uint32 VertexIndex = Section.BaseVertexIndex;
+                         VertexIndex < EndVertex;
+                         ++VertexIndex)
+                    {
+                        SkinVertices.Add({VertexIndex, &Section});
+                    }
+                }
+                TestTrue(
+                    FString::Printf(TEXT("%s has Skin-section LOD0 vertices"), Variant),
+                    !SkinVertices.IsEmpty());
+                for (const FSkelMeshRenderSection& Section : LODData.RenderSections)
+                {
+                    if (!Mesh->GetMaterials().IsValidIndex(Section.MaterialIndex))
+                    {
+                        continue;
+                    }
+                    const FString SlotName = Mesh->GetMaterials()[Section.MaterialIndex]
+                        .MaterialSlotName.ToString();
+                    if (!SlotName.Contains(TEXT("Eyes"), ESearchCase::IgnoreCase) &&
+                        !SlotName.Contains(TEXT("Brows"), ESearchCase::IgnoreCase))
+                    {
+                        continue;
+                    }
+                    int32 HeadDominantVertices = 0;
+                    int32 NearestSkinHeadDominantVertices = 0;
+                    int32 ValidVertices = 0;
+                    float MaximumReferenceSeparationCm = 0.0f;
+                    TArray<float> ReferenceSeparationsCm;
+                    FBox DetailBounds(EForceInit::ForceInit);
+                    const uint32 EndVertex =
+                        Section.BaseVertexIndex + Section.NumVertices;
+                    for (uint32 VertexIndex = Section.BaseVertexIndex;
+                         VertexIndex < EndVertex;
+                         ++VertexIndex)
+                    {
+                        const int32 DetailDominantBone =
+                            DominantSkeletonBone(Section, VertexIndex);
+                        if (DetailDominantBone != INDEX_NONE)
+                        {
+                            ++ValidVertices;
+                            if (DetailDominantBone == HeadBoneIndex)
+                            {
+                                ++HeadDominantVertices;
+                            }
+                        }
+                        const FVector DetailPosition(
+                            LODData.StaticVertexBuffers.PositionVertexBuffer
+                                .VertexPosition(VertexIndex));
+                        DetailBounds += DetailPosition;
+                        const FSkinVertex* NearestSkin = nullptr;
+                        float NearestDistanceSquared = TNumericLimits<float>::Max();
+                        for (const FSkinVertex& SkinVertex : SkinVertices)
+                        {
+                            const FVector SkinPosition(
+                                LODData.StaticVertexBuffers.PositionVertexBuffer
+                                    .VertexPosition(SkinVertex.VertexIndex));
+                            const float DistanceSquared = FVector::DistSquared(
+                                DetailPosition, SkinPosition);
+                            if (DistanceSquared < NearestDistanceSquared)
+                            {
+                                NearestDistanceSquared = DistanceSquared;
+                                NearestSkin = &SkinVertex;
+                            }
+                        }
+                        if (NearestSkin &&
+                            DominantSkeletonBone(
+                                *NearestSkin->Section,
+                                NearestSkin->VertexIndex) == HeadBoneIndex)
+                        {
+                            ++NearestSkinHeadDominantVertices;
+                        }
+                        MaximumReferenceSeparationCm = FMath::Max(
+                            MaximumReferenceSeparationCm,
+                            FMath::Sqrt(NearestDistanceSquared));
+                        ReferenceSeparationsCm.Add(FMath::Sqrt(NearestDistanceSquared));
+                    }
+                    TestEqual(
+                        FString::Printf(
+                            TEXT("%s %s section has a valid dominant bone for every vertex"),
+                            Variant,
+                            *SlotName),
+                        ValidVertices,
+                        static_cast<int32>(Section.NumVertices));
+                    TestEqual(
+                        FString::Printf(
+                            TEXT("%s %s section is rigidly head-dominant after import"),
+                            Variant,
+                            *SlotName),
+                        HeadDominantVertices,
+                        static_cast<int32>(Section.NumVertices));
+                    TestEqual(
+                        FString::Printf(
+                            TEXT("%s %s detail is paired to head-dominant facial Skin"),
+                            Variant,
+                            *SlotName),
+                        NearestSkinHeadDominantVertices,
+                        static_cast<int32>(Section.NumVertices));
+                    ReferenceSeparationsCm.Sort();
+                    const float MedianReferenceSeparationCm = ReferenceSeparationsCm[
+                        ReferenceSeparationsCm.Num() / 2];
+                    const float P95ReferenceSeparationCm = ReferenceSeparationsCm[
+                        FMath::Min(
+                            ReferenceSeparationsCm.Num() - 1,
+                            FMath::RoundToInt(
+                                (ReferenceSeparationsCm.Num() - 1) * 0.95f))];
+                    AddInfo(FString::Printf(
+                        TEXT("%s %s detail bounds min=%s max=%s separation "
+                             "median=%.3f p95=%.3f max=%.3f cm"),
+                        Variant,
+                        *SlotName,
+                        *DetailBounds.Min.ToCompactString(),
+                        *DetailBounds.Max.ToCompactString(),
+                        MedianReferenceSeparationCm,
+                        P95ReferenceSeparationCm,
+                        MaximumReferenceSeparationCm));
+                    TestTrue(
+                        FString::Printf(
+                            TEXT("%s %s reference p95 separation is at most 1.25 cm "
+                                 "(median=%.3f p95=%.3f max=%.3f cm)"),
+                            Variant,
+                            *SlotName,
+                            MedianReferenceSeparationCm,
+                            P95ReferenceSeparationCm,
+                            MaximumReferenceSeparationCm),
+                        P95ReferenceSeparationCm <= 1.25f);
+                }
             }
         }
     }

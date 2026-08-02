@@ -32,6 +32,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Rebased all five packaged CC0 fallback FBXs so their raw reference vertices,
+  evaluated Blender geometry, and imported Unreal LOD0 agree. The generator and
+  canonicalizer now bake the evaluated shape/armature result and promote the
+  current armature pose to rest before restoring one clean modifier; a new
+  fail-closed validator checks raw reference, evaluated reference, and a 58°
+  synthetic head pose. Unreal now derives the live helmet anchor from the
+  actually rendered Eye section and applies reviewed per-identity seating.
+  All five source reports pass, native eye/brow p95 separation remains below
+  1.25 cm, the renderer capture completes 20/20 views, and M5 completes five
+  tests with zero failures. This closes the detached/closed-looking eye and
+  off-head helmet regressions technically, but simplified anatomy, material
+  response, garment/arm/hand/PPE intersections, and missing named character-art
+  and qualified whitewater-safety approval still reject photoreal promotion.
 - Added a retained V2 cold-water presentation bracket to the runnable
   Futaleufú Terminator and Chilko Lava Canyon maps. Their river-local Default
   Lit parents now use three moving normal directions, three world optical
