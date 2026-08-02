@@ -1,4 +1,5 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionNoise.h"
@@ -2191,7 +2192,8 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
             float UTiling,
             float VTiling,
             float SpeedX,
-            float SpeedY) -> UMaterialExpression*
+            float SpeedY,
+            bool bSwapCoordinates) -> UMaterialExpression*
     {
         UMaterialExpressionTextureCoordinate* TexCoord =
             NewObject<UMaterialExpressionTextureCoordinate>(Material);
@@ -2199,14 +2201,36 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
         TexCoord->VTiling = VTiling;
         Material->GetExpressionCollection().AddExpression(TexCoord);
 
-        UMaterialExpression* SampleCoordinates = TexCoord;
+        UMaterialExpression* BaseCoordinates = TexCoord;
+        if (bUseSingleLayerWater && bSwapCoordinates)
+        {
+            UMaterialExpressionComponentMask* CoordinateU =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            CoordinateU->Input.Expression = TexCoord;
+            CoordinateU->R = true;
+            Material->GetExpressionCollection().AddExpression(CoordinateU);
+            UMaterialExpressionComponentMask* CoordinateV =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            CoordinateV->Input.Expression = TexCoord;
+            CoordinateV->G = true;
+            Material->GetExpressionCollection().AddExpression(CoordinateV);
+            UMaterialExpressionAppendVector* SwappedCoordinates =
+                NewObject<UMaterialExpressionAppendVector>(Material);
+            SwappedCoordinates->A.Expression = CoordinateV;
+            SwappedCoordinates->B.Expression = CoordinateU;
+            Material->GetExpressionCollection().AddExpression(
+                SwappedCoordinates);
+            BaseCoordinates = SwappedCoordinates;
+        }
+
+        UMaterialExpression* SampleCoordinates = BaseCoordinates;
         if (bUseSingleLayerWater)
         {
             UMaterialExpressionPanner* Panner =
                 NewObject<UMaterialExpressionPanner>(Material);
             Panner->SpeedX = SpeedX;
             Panner->SpeedY = SpeedY;
-            Panner->Coordinate.Expression = TexCoord;
+            Panner->Coordinate.Expression = BaseCoordinates;
             Material->GetExpressionCollection().AddExpression(Panner);
             SampleCoordinates = Panner;
         }
@@ -2288,10 +2312,24 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
         return SeamContinuousNormal;
     };
 
+    // The Zambezi ribbon stretches U over the full reach. Its earlier
+    // Single Layer Water values therefore produced long, parallel grooves
+    // that read as combed plastic in the launch camera. Keep the shared
+    // Default Lit projection unchanged, but sample the isolated Zambezi
+    // parent at shorter, incommensurate wavelengths so the opposed moving
+    // layers read as local wind/current ripples instead of river-length ribs.
     UMaterialExpression* NormalSampleA = AddWaterNormalSample(
-        0.73f, 2.15f, 0.036f, 0.006f);
+        bUseSingleLayerWater ? 2.40f : 0.73f,
+        bUseSingleLayerWater ? 6.20f : 2.15f,
+        0.036f,
+        0.006f,
+        false);
     UMaterialExpression* NormalSampleB = AddWaterNormalSample(
-        1.11f, 3.30f, -0.014f, 0.027f);
+        bUseSingleLayerWater ? 4.10f : 1.11f,
+        bUseSingleLayerWater ? 10.30f : 3.30f,
+        -0.014f,
+        0.027f,
+        true);
     UMaterialExpressionConstant* NormalLayerBlend = NewObject<UMaterialExpressionConstant>(Material);
     NormalLayerBlend->R = 0.46f;
     Material->GetExpressionCollection().AddExpression(NormalLayerBlend);

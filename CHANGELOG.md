@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reworked the runnable Zambezi Single Layer Water parent's normal projection
+  into shorter, crossed wavelengths while retaining its accepted sediment
+  volume response. Only the secondary layer swaps UV axes; bounded normal and
+  variation response rise to 0.10 and calm presentation displacement falls to
+  0.06. Brighter reflection/emissive brackets were rejected as pale sky sheets.
+  The editor build, exact saved-material audit, runnable-map load, general
+  surface-render gate, MapCheck, and focused Zambezi source/route tests pass.
+  Broad smooth water, residual streamwise grooves, sparse whitewater VFX,
+  coarse terrain/ecology, the dark fixed-route offscreen-capture defect, and
+  all named external reviews still reject photoreal promotion.
 - Reduced Colorado Hance's capture-only cooked-field relief ceiling from 45 cm
   to 9 cm and added a river-local, plane-preserving five-tap presentation filter
   to both capture and live render geometry. The live path smooths a temporary
