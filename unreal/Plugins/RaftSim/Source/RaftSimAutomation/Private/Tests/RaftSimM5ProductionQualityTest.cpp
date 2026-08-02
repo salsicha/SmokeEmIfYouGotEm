@@ -277,6 +277,15 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
             TestTrue(
                 FString::Printf(TEXT("CC0 material has SkeletalMesh usage: %s"), MaterialPath),
             Material->GetUsageByFlag(MATUSAGE_SkeletalMesh));
+            if (FString(MaterialPath).Contains(TEXT("_Skin.")))
+            {
+                TestTrue(
+                    FString::Printf(
+                        TEXT("CC0 skin uses preintegrated scattering: %s"),
+                        MaterialPath),
+                    Material->GetShadingModels().HasShadingModel(
+                        MSM_PreintegratedSkin));
+            }
         }
     }
 

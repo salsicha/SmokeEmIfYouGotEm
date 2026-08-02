@@ -3934,3 +3934,18 @@ path is verified, and the completion goal can be marked complete.
   clothing response, hands, helmet/webbing materials, lighting, named
   character-art approval, and qualified whitewater-safety review keep M9 and
   photoreal promotion open.
+- CC0 skin reflectance calibration V1 replaces the fallback skin materials'
+  broad subsurface response with Unreal's preintegrated skin shading and
+  applies one linear scalar per existing, hash-locked source atlas. The gains
+  preserve every atlas pixel and hue family while bringing five differently
+  exposed photographic sources into the fixed roster-lighting bracket. All
+  five profile comparisons reduce p95 luminance (guide 244.974→228.160,
+  Crew01 173.276→170.081, Crew02 241.901→231.382, Crew03 248.127→237.186,
+  Crew04 176.291→173.662). The editor target builds and the forced-CC0
+  renderer-backed M5 run records five successful tests with zero failures.
+  This is a reflectance-only technical improvement: the rendered review still
+  fails photoreal acceptance for simplified anatomy, closed-looking eyes,
+  hands, clothing/PPE intersections, hair, and absent named character-art and
+  qualified whitewater-safety approval. No identity geometry, rig, animation,
+  gameplay, water, raft force, collision, rescue, scoring, or progression
+  authority changed.

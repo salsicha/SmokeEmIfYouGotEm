@@ -1984,7 +1984,8 @@ static UMaterial* BuildCrewFaceMaterial()
 // remain unchanged.
 static UMaterial* BuildProductionCC0SkinMaterial(
     const TCHAR* AssetName,
-    const TCHAR* AtlasAssetName)
+    const TCHAR* AtlasAssetName,
+    const FLinearColor& AtlasReflectanceCalibration)
 {
     const FString PackagePath = FString::Printf(
         TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/%s"), AssetName);
@@ -2038,7 +2039,13 @@ static UMaterial* BuildProductionCC0SkinMaterial(
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = false;
     Material->bTangentSpaceNormal = true;
-    Material->SetShadingModel(MSM_Subsurface);
+    // The source atlases span materially different photographed exposure and
+    // white-balance brackets. Broad Subsurface shading amplified those
+    // differences: the three light atlases clipped toward white under the
+    // fixed roster rig while DarkFemale shifted orange. Preintegrated Skin
+    // keeps the lightweight fallback suitable for skeletal rendering and lets
+    // the atlas-specific reflectance calibration below remain authoritative.
+    Material->SetShadingModel(MSM_PreintegratedSkin);
     Material->SetMaterialUsage(MATUSAGE_SkeletalMesh);
 
     auto Add = [Material](UMaterialExpression* Expression)
@@ -2090,6 +2097,15 @@ static UMaterial* BuildProductionCC0SkinMaterial(
     AtlasSample->SamplerType = SAMPLERTYPE_Color;
     AtlasSample->Group = TEXT("RaftSimCC0Skin");
 
+    UMaterialExpressionConstant3Vector* ReflectanceCalibration =
+        Cast<UMaterialExpressionConstant3Vector>(
+            Constant3(AtlasReflectanceCalibration));
+    ReflectanceCalibration->Desc = TEXT("AtlasReflectanceCalibration");
+    UMaterialExpressionMultiply* CalibratedAtlas =
+        Cast<UMaterialExpressionMultiply>(Multiply(
+            AtlasSample,
+            ReflectanceCalibration));
+
     UMaterialExpressionTextureCoordinate* MicroUv =
         Cast<UMaterialExpressionTextureCoordinate>(
             Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
@@ -2113,7 +2129,7 @@ static UMaterial* BuildProductionCC0SkinMaterial(
     BoundedMicroGain->MinDefault = 0.95f;
     BoundedMicroGain->MaxDefault = 1.05f;
     UMaterialExpressionMultiply* DetailedBase =
-        Cast<UMaterialExpressionMultiply>(Multiply(AtlasSample, BoundedMicroGain));
+        Cast<UMaterialExpressionMultiply>(Multiply(CalibratedAtlas, BoundedMicroGain));
 
     UMaterialExpressionComponentMask* MicroMask =
         Cast<UMaterialExpressionComponentMask>(
@@ -2140,7 +2156,7 @@ static UMaterial* BuildProductionCC0SkinMaterial(
 
     UMaterialExpressionMultiply* ScatterColor =
         Cast<UMaterialExpressionMultiply>(Multiply(
-            AtlasSample,
+            CalibratedAtlas,
             Constant3(FLinearColor(0.18f, 0.13f, 0.11f, 1.0f))));
     UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
     EditorData->BaseColor.Connect(0, DetailedBase);
@@ -2177,17 +2193,29 @@ static void BuildProductionCC0SkinMaterials()
     {
         const TCHAR* AssetName;
         const TCHAR* AtlasAssetName;
+        FLinearColor AtlasReflectanceCalibration;
     };
     static const FSkinSpec SkinSpecs[] = {
-        {TEXT("M_RaftSim_CC0_Guide_Skin"), TEXT("T_RaftSim_CC0_LightMale")},
-        {TEXT("M_RaftSim_CC0_Crew01_Skin"), TEXT("T_RaftSim_CC0_DarkMale")},
-        {TEXT("M_RaftSim_CC0_Crew02_Skin"), TEXT("T_RaftSim_CC0_AsianMale")},
-        {TEXT("M_RaftSim_CC0_Crew03_Skin"), TEXT("T_RaftSim_CC0_LightFemale")},
-        {TEXT("M_RaftSim_CC0_Crew04_Skin"), TEXT("T_RaftSim_CC0_DarkFemale")},
+        // These bounded linear-space gains normalize the five hash-locked
+        // photographic atlases into one renderer bracket. They do not change
+        // identity, hue family, texture pixels, or source provenance.
+        {TEXT("M_RaftSim_CC0_Guide_Skin"), TEXT("T_RaftSim_CC0_LightMale"),
+         FLinearColor(0.36f, 0.36f, 0.36f, 1.0f)},
+        {TEXT("M_RaftSim_CC0_Crew01_Skin"), TEXT("T_RaftSim_CC0_DarkMale"),
+         FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)},
+        {TEXT("M_RaftSim_CC0_Crew02_Skin"), TEXT("T_RaftSim_CC0_AsianMale"),
+         FLinearColor(0.48f, 0.48f, 0.48f, 1.0f)},
+        {TEXT("M_RaftSim_CC0_Crew03_Skin"), TEXT("T_RaftSim_CC0_LightFemale"),
+         FLinearColor(0.42f, 0.42f, 0.42f, 1.0f)},
+        {TEXT("M_RaftSim_CC0_Crew04_Skin"), TEXT("T_RaftSim_CC0_DarkFemale"),
+         FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)},
     };
     for (const FSkinSpec& SkinSpec : SkinSpecs)
     {
-        BuildProductionCC0SkinMaterial(SkinSpec.AssetName, SkinSpec.AtlasAssetName);
+        BuildProductionCC0SkinMaterial(
+            SkinSpec.AssetName,
+            SkinSpec.AtlasAssetName,
+            SkinSpec.AtlasReflectanceCalibration);
     }
 }
 
