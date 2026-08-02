@@ -906,6 +906,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingValidated
                 ? (bUsesOpaqueVolumetricVegetation
                        ? TEXT("source_mask_placed_project_owned_opaque_volumetric_vegetation_and_rock_dressing_captured")
+                       : bUsesColoradoOrganicHanceSurface
+                       ? TEXT("source_grounded_project_owned_opaque_hance_dryland_ground_cover_shrubs_and_rock_dressing_captured_zero_legacy_pve_instances")
                        : Result.DressingExternalRockMeshCount == 6
                        ? TEXT("source_mask_placed_complete_pve_species_and_rights_reviewed_rock_comparison_captured")
                        : TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured"))
@@ -956,6 +958,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
             bUsesOpaqueVolumetricVegetation
                 ? TEXT("project_owned_opaque_volumetric_nanite_species_hierarchical_instancing_plus_river_specific_rock_dressing")
+                : bUsesColoradoOrganicHanceSurface
+                ? TEXT("project_owned_opaque_hance_dryland_ground_cover_and_shrub_hierarchical_instancing_zero_legacy_pve_instances_plus_dense_irregular_procedural_boulders")
                 : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_and_sparse_three_variant_pine_hierarchical_instancing")
                 : (Result.DressingExternalRockMeshCount == 6
@@ -982,6 +986,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingFoliageMaterialsValidated
                 ? (bUsesOpaqueVolumetricVegetation
                        ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards")
+                       : bUsesColoradoOrganicHanceSurface
+                       ? TEXT("three_legacy_pve_material_assets_retained_with_zero_instances_plus_one_project_owned_opaque_one_sided_hance_dryland_material_bound_to_ground_cover_and_shrub_forms")
                        : TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained"))
                 : TEXT("foliage_material_generation_or_binding_failed"),
             Result.DressingFoliageMaterialAssetCount,
@@ -1025,6 +1031,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             bUsesOpaqueVolumetricVegetation
                 ? TEXT("opaque_volumetric_procedural_fallback_removes_alpha_card_artifacts_but_requires_species_ecology_guide_visual_and_performance_review")
+                : bUsesColoradoOrganicHanceSurface
+                ? TEXT("opaque_hance_dryland_gap_fill_replaces_the_legacy_bench_band_but_requires_exact_species_ecology_guide_visual_and_performance_review")
                 : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_rock_and_pine_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
                 : (Result.DressingExternalRockMeshCount == 6

@@ -14,6 +14,15 @@ constexpr TCHAR TemperateVegetationMaterialPath[] = TEXT(
     "M_RaftSim_Temperate_OpaqueVegetation");
 constexpr TCHAR TemperateVegetationMeshRoot[] = TEXT(
     "/Game/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/");
+constexpr TCHAR HanceDrylandVegetationMaterialPath[] = TEXT(
+    "/Game/RaftSim/Environment/ColoradoRun/Vegetation/Materials/"
+    "M_RaftSim_Hance_OpaqueDrylandVegetation");
+constexpr TCHAR HanceDrylandVegetationMeshRoot[] = TEXT(
+    "/Game/RaftSim/Environment/ColoradoRun/Vegetation/Meshes/");
+constexpr int32 HanceDrylandGroundCoverInstanceCount = 1800;
+constexpr int32 HanceDrylandShrubInstanceCount = 320;
+constexpr float HanceDrylandGroundCoverSlopeCeilingDegrees = 38.0f;
+constexpr float HanceDrylandShrubSlopeCeilingDegrees = 30.0f;
 constexpr int32 ZambeziEvidenceBankMosaicInstanceCount = 1200;
 constexpr int32 ZambeziEvidenceWoodyInstanceCount = 240;
 constexpr float ZambeziEvidenceWoodySlopeCeilingDegrees = 24.0f;
@@ -318,6 +327,9 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     EZambeziVegetationForm Form,
     int32 Seed,
     UMaterialInterface* Material,
+    const TCHAR* MeshRoot,
+    const TCHAR* ProfileLabel,
+    bool bHanceDrylandPalette,
     FString& OutSummary)
 {
     if (!World || !AssetToken || !Material)
@@ -330,13 +342,27 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     TArray<FVector> Normals;
     TArray<FVector2D> Uvs;
     TArray<FLinearColor> Colors;
-    const FLinearColor BarkBase(0.175f, 0.125f, 0.070f, 1.0f);
-    const FLinearColor BarkTip(0.215f, 0.155f, 0.082f, 1.0f);
+    const FLinearColor BarkBase = bHanceDrylandPalette
+        ? FLinearColor(0.105f, 0.066f, 0.030f, 1.0f)
+        : FLinearColor(0.175f, 0.125f, 0.070f, 1.0f);
+    const FLinearColor BarkTip = bHanceDrylandPalette
+        ? FLinearColor(0.142f, 0.091f, 0.040f, 1.0f)
+        : FLinearColor(0.215f, 0.155f, 0.082f, 1.0f);
     const FLinearColor LeafGreen = Form == EZambeziVegetationForm::UmbrellaTree
         ? FLinearColor(0.085f, 0.135f, 0.034f, 1.0f)
         : FLinearColor(0.072f, 0.122f, 0.030f, 1.0f);
-    const FLinearColor ScrubGreen(0.082f, 0.132f, 0.038f, 1.0f);
-    const FLinearColor DryGrass(0.29f, 0.225f, 0.070f, 1.0f);
+    const FLinearColor ScrubGreen = bHanceDrylandPalette
+        ? FLinearColor(0.050f, 0.060f, 0.018f, 1.0f)
+        : FLinearColor(0.082f, 0.132f, 0.038f, 1.0f);
+    const FLinearColor DryGrass = bHanceDrylandPalette
+        ? FLinearColor(0.180f, 0.118f, 0.035f, 1.0f)
+        : FLinearColor(0.29f, 0.225f, 0.070f, 1.0f);
+    const FLinearColor LowPlantGreen = bHanceDrylandPalette
+        ? FLinearColor(0.055f, 0.068f, 0.018f, 1.0f)
+        : FLinearColor(0.12f, 0.20f, 0.045f, 1.0f);
+    const FLinearColor BladeGreen = bHanceDrylandPalette
+        ? FLinearColor(0.070f, 0.082f, 0.020f, 1.0f)
+        : FLinearColor(0.19f, 0.30f, 0.075f, 1.0f);
 
     if (Form == EZambeziVegetationForm::SavannaGroundCover)
     {
@@ -378,7 +404,7 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
             const float Dryness = ZambeziVegetationUnitRandom(
                 BladeIndex + Seed, 1277);
             const FLinearColor BladeColor = FMath::Lerp(
-                FLinearColor(0.19f, 0.30f, 0.075f, 1.0f),
+                BladeGreen,
                 DryGrass,
                 Dryness);
             AppendZambeziColoredSegment(
@@ -410,7 +436,7 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
                 1.24f,
                 ZambeziVegetationUnitRandom(RandomIndex, 1307));
             const FLinearColor ForbColor = FMath::Lerp(
-                FLinearColor(0.12f, 0.20f, 0.045f, 1.0f),
+                LowPlantGreen,
                 DryGrass,
                 ZambeziVegetationUnitRandom(RandomIndex, 1319));
             AppendZambeziOpaqueLobe(
@@ -631,14 +657,16 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
         Colors.Num() != Vertices.Num() || Uvs.Num() != Vertices.Num())
     {
         OutSummary += FString::Printf(
-            TEXT("Zambezi vegetation geometry contract failed for %s.\n"),
+            TEXT("%s vegetation geometry contract failed for %s.\n"),
+            ProfileLabel,
             AssetToken);
         return nullptr;
     }
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
     AActor* TemporaryActor = AddPreviewProceduralMeshActor(
         World,
-        FString::Printf(TEXT("RaftSim_Zambezi_%s_BuildSource"), AssetToken),
+        FString::Printf(
+            TEXT("RaftSim_%s_%s_BuildSource"), ProfileLabel, AssetToken),
         Vertices,
         Triangles,
         Normals,
@@ -651,7 +679,7 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     {
         return nullptr;
     }
-    const FString PackagePath = FString(ZambeziVegetationMeshRoot) + AssetToken;
+    const FString PackagePath = FString(MeshRoot) + AssetToken;
     UStaticMesh* Mesh = ConvertNativeCanopyProceduralActorToStaticMesh(
         TemporaryActor,
         PackagePath,
@@ -663,8 +691,9 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     if (Mesh)
     {
         OutSummary += FString::Printf(
-            TEXT("Prepared Zambezi %s opaque volumetric vegetation: "
+            TEXT("Prepared %s %s opaque volumetric vegetation: "
                  "vertices=%d triangles=%d Nanite=%d collision=false.\n"),
+            ProfileLabel,
             AssetToken,
             Mesh->GetNumVertices(0),
             Mesh->GetNumTriangles(0),
@@ -693,6 +722,9 @@ bool CreateZambeziOpaqueVegetationAssets(
         EZambeziVegetationForm::RiparianTree,
         1709,
         OutMaterial,
+        ZambeziVegetationMeshRoot,
+        TEXT("Zambezi"),
+        false,
         OutSummary);
     OutUmbrellaTree = CreateZambeziOpaqueVegetationMesh(
         World,
@@ -700,6 +732,9 @@ bool CreateZambeziOpaqueVegetationAssets(
         EZambeziVegetationForm::UmbrellaTree,
         2713,
         OutMaterial,
+        ZambeziVegetationMeshRoot,
+        TEXT("Zambezi"),
+        false,
         OutSummary);
     OutThornScrub = CreateZambeziOpaqueVegetationMesh(
         World,
@@ -707,6 +742,9 @@ bool CreateZambeziOpaqueVegetationAssets(
         EZambeziVegetationForm::ThornScrub,
         3907,
         OutMaterial,
+        ZambeziVegetationMeshRoot,
+        TEXT("Zambezi"),
+        false,
         OutSummary);
     OutGroundCover = CreateZambeziOpaqueVegetationMesh(
         World,
@@ -714,6 +752,9 @@ bool CreateZambeziOpaqueVegetationAssets(
         EZambeziVegetationForm::SavannaGroundCover,
         4933,
         OutMaterial,
+        ZambeziVegetationMeshRoot,
+        TEXT("Zambezi"),
+        false,
         OutSummary);
     const bool bComplete =
         OutRiparianTree && OutUmbrellaTree && OutThornScrub && OutGroundCover;
@@ -723,6 +764,51 @@ bool CreateZambeziOpaqueVegetationAssets(
             "Failed to build the complete Zambezi opaque vegetation family.\n");
     }
     return bComplete;
+}
+
+bool CreateHanceOpaqueDrylandVegetationAssets(
+    UWorld* World,
+    UStaticMesh*& OutShrub,
+    UStaticMesh*& OutGroundCover,
+    UMaterialInterface*& OutMaterial,
+    FString& OutSummary)
+{
+    OutMaterial = CreateOpaqueVegetationMaterial(
+        HanceDrylandVegetationMaterialPath,
+        TEXT("Colorado Hance dryland"),
+        0.045f,
+        OutSummary);
+    if (!OutMaterial)
+    {
+        return false;
+    }
+    OutShrub = CreateZambeziOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Hance_DesertShrub_A_OpaqueV1"),
+        EZambeziVegetationForm::ThornScrub,
+        7307,
+        OutMaterial,
+        HanceDrylandVegetationMeshRoot,
+        TEXT("HanceDryland"),
+        true,
+        OutSummary);
+    OutGroundCover = CreateZambeziOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Hance_DryGroundCover_A_OpaqueV1"),
+        EZambeziVegetationForm::SavannaGroundCover,
+        7411,
+        OutMaterial,
+        HanceDrylandVegetationMeshRoot,
+        TEXT("HanceDryland"),
+        true,
+        OutSummary);
+    if (!OutShrub || !OutGroundCover)
+    {
+        OutSummary += TEXT(
+            "Failed to build the Hance opaque dryland vegetation family.\n");
+        return false;
+    }
+    return true;
 }
 
 UStaticMesh* CreateTemperateOpaqueVegetationMesh(
@@ -1697,6 +1783,8 @@ bool AddLandscapeCandidateBiomeDressing(
     const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
     const bool bChilko =
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const bool bColoradoHance =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bOpaqueTemperate = bFutaleufu || bChilko;
     const bool bUsesOpaqueVolumetricVegetation = bZambezi || bOpaqueTemperate;
     TArray<UStaticMesh*> ReviewedRockMeshes;
@@ -1776,6 +1864,9 @@ bool AddLandscapeCandidateBiomeDressing(
     UStaticMesh* UnderstoryMesh = nullptr;
     UMaterialInterface* ZambeziOpaqueVegetationMaterial = nullptr;
     UMaterialInterface* TemperateOpaqueVegetationMaterial = nullptr;
+    UStaticMesh* HanceDrylandShrubMesh = nullptr;
+    UStaticMesh* HanceDrylandGroundCoverMesh = nullptr;
+    UMaterialInterface* HanceDrylandVegetationMaterial = nullptr;
     if (bZambezi)
     {
         if (!CreateZambeziOpaqueVegetationAssets(
@@ -1854,6 +1945,19 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
     }
     OutResult.DressingAssetCount += ReviewedRockMeshes.Num() + ReviewedPineMeshes.Num();
+    if (bColoradoHance)
+    {
+        if (!CreateHanceOpaqueDrylandVegetationAssets(
+                World,
+                HanceDrylandShrubMesh,
+                HanceDrylandGroundCoverMesh,
+                HanceDrylandVegetationMaterial,
+                OutSummary))
+        {
+            return false;
+        }
+        OutResult.DressingAssetCount += 2;
+    }
     OutResult.bDressingAssetsLoaded = bUsesOpaqueVolumetricVegetation
         ? OutResult.DressingSourceSkeletalMeshCount == 0 &&
             OutResult.DressingConvertedStaticMeshCount == 4 &&
@@ -1899,6 +2003,16 @@ bool AddLandscapeCandidateBiomeDressing(
                  "broadleaf, shrub, and ground-cover family is procedural infill, "
                  "not exact-species or photoreal approval.\n"),
             *Candidate.PreviewSpec.RiverId);
+    }
+    else if (bColoradoHance)
+    {
+        OutSummary += TEXT(
+            "Colorado Hance retains its four legacy PVE evaluation assets for "
+            "compatibility but places zero legacy instances; two project-owned "
+            "opaque dryland forms provide the countable ground-cover and shrub "
+            "layers without the former horizontal PVE bench band. The added "
+            "family is procedural gap fill, not exact-species, "
+            "ecology, surveyed-terrain, or photoreal approval.\n");
     }
 
     OutResult.bDressingBoulderMeshNaniteEnabled =
@@ -1980,13 +2094,15 @@ bool AddLandscapeCandidateBiomeDressing(
                 FoliageSettings.NormalStrength,
                 OutSummary);
     }
-    OutResult.DressingFoliageMaterialAssetCount = bUsesOpaqueVolumetricVegetation
+    OutResult.DressingFoliageMaterialAssetCount = (bUsesOpaqueVolumetricVegetation
         ? (OpaqueVegetationMaterial ? 1 : 0)
         : (BroadleafFoliageMaterial ? 1 : 0) +
             (ConiferFoliageMaterial ? 1 : 0) +
-            (UnderstoryFoliageMaterial ? 1 : 0);
+            (UnderstoryFoliageMaterial ? 1 : 0)) +
+        (bColoradoHance && HanceDrylandVegetationMaterial ? 1 : 0);
     const int32 ExpectedFoliageMaterialAssetCount =
-        bUsesOpaqueVolumetricVegetation ? 1 : 3;
+        (bUsesOpaqueVolumetricVegetation ? 1 : 3) +
+        (bColoradoHance ? 1 : 0);
     if (OutResult.DressingFoliageMaterialAssetCount !=
         ExpectedFoliageMaterialAssetCount)
     {
@@ -2077,6 +2193,24 @@ bool AddLandscapeCandidateBiomeDressing(
                       *Candidate.PreviewSpec.RiverId),
             true,
             bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
+    UHierarchicalInstancedStaticMeshComponent* HanceDrylandGroundCoverInstances =
+        bColoradoHance
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              HanceDrylandGroundCoverMesh,
+              TEXT("RaftSim_LandscapeCandidate_HanceDrylandGroundCover"),
+              false,
+              HanceDrylandVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* HanceDrylandShrubInstances =
+        bColoradoHance
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              HanceDrylandShrubMesh,
+              TEXT("RaftSim_LandscapeCandidate_HanceDrylandShrub"),
+              true,
+              HanceDrylandVegetationMaterial)
+        : nullptr;
     UHierarchicalInstancedStaticMeshComponent* ZambeziBankMosaicInstances =
         bZambezi
         ? AddLandscapeCandidateInstancedMeshComponent(
@@ -2212,6 +2346,8 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
         !ShrubInstances || !UnderstoryInstances ||
+        (bColoradoHance &&
+         (!HanceDrylandGroundCoverInstances || !HanceDrylandShrubInstances)) ||
         (bZambezi && !ZambeziBankMosaicInstances) ||
         (bZambezi &&
          (!ZambeziCameraRiparianTreeInstances ||
@@ -2241,6 +2377,34 @@ bool AddLandscapeCandidateBiomeDressing(
             TEXT("Failed to create one or more Landscape biome dressing instance components for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
         return false;
+    }
+    if (bColoradoHance)
+    {
+        const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
+            HanceDrylandGroundCoverInstances,
+            HanceDrylandShrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimColoradoHanceRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimHanceOpaqueDrylandVegetationV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralVegetationFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoEcologyAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimHanceOpaqueDrylandVegetationV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        }
+        HanceDrylandGroundCoverInstances->SetCastShadow(false);
+        HanceDrylandGroundCoverInstances->ComponentTags.AddUnique(
+            TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
     }
     if (bOpaqueTemperate)
     {
@@ -2561,6 +2725,32 @@ bool AddLandscapeCandidateBiomeDressing(
              OutResult.bDressingExternalBroadleafMaterialsValidated) &&
             (!OutResult.bDressingExternalConiferReviewAssetLoaded ||
              OutResult.bDressingExternalConiferMaterialsValidated);
+    }
+    if (bColoradoHance)
+    {
+        const bool bHanceOpaqueDrylandValidated =
+            ValidateZambeziOpaqueVegetationMaterial(
+                HanceDrylandVegetationMaterial) &&
+            HanceDrylandShrubMesh &&
+            HanceDrylandShrubMesh->GetStaticMaterials().Num() == 1 &&
+            HanceDrylandShrubMesh->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandGroundCoverMesh &&
+            HanceDrylandGroundCoverMesh->GetStaticMaterials().Num() == 1 &&
+            HanceDrylandGroundCoverMesh->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandGroundCoverInstances->GetCollisionEnabled() ==
+                ECollisionEnabled::NoCollision &&
+            HanceDrylandGroundCoverInstances->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial &&
+            HanceDrylandShrubInstances->GetCollisionEnabled() ==
+                ECollisionEnabled::NoCollision &&
+            HanceDrylandShrubInstances->GetMaterial(0) ==
+                HanceDrylandVegetationMaterial;
+        OutResult.DressingFoliageMaterialBoundSlotCount +=
+            bHanceOpaqueDrylandValidated ? 2 : 0;
+        OutResult.bDressingFoliageMaterialsValidated &=
+            bHanceOpaqueDrylandValidated;
     }
     if (!OutResult.bDressingFoliageMaterialsValidated)
     {
@@ -2980,7 +3170,9 @@ bool AddLandscapeCandidateBiomeDressing(
     OutResult.DressingRunnableLaunchTalusMaximumSlopeDegrees =
         RunnableLaunchTalusMaximumSlopeDegrees;
 
-    const int32 FoliageClusterCount = bPhysicalCorridor
+    const int32 FoliageClusterCount = bColoradoHance
+        ? 0
+        : bPhysicalCorridor
         ? (bZambeziWoodland
                ? 5600
                : (bOpaqueTemperate ? 6200 : (Spec.bDesertCanyon ? 800 : 12000)))
@@ -3241,6 +3433,256 @@ bool AddLandscapeCandidateBiomeDressing(
         {
             ++OutResult.DressingUnderstoryInstanceCount;
         }
+    }
+
+    int32 HanceDrylandGroundCoverPlacedCount = 0;
+    int32 HanceDrylandGroundCoverRejectedCount = 0;
+    int32 HanceDrylandShrubPlacedCount = 0;
+    int32 HanceDrylandShrubRejectedCount = 0;
+    float HanceDrylandMaximumSlopeDegrees = 0.0f;
+    if (bColoradoHance && bPhysicalCorridor)
+    {
+        // The interpreted C3 channel is complete only to lateral +/-39 m.
+        // Populate the procedural outer canyon, never the solver strip, with
+        // countable opaque dryland patches. Candidate searches prefer lower
+        // slopes and enforce dry-height limits so no instance can bridge the
+        // water edge or paste across a cliff face.
+        constexpr int32 BankSideCount = 2;
+        const int32 GroundCoverPerSide =
+            HanceDrylandGroundCoverInstanceCount / BankSideCount;
+        const float GroundCoverMeshHeightCm = FMath::Max(
+            1.0f,
+            GetLandscapeCandidateEffectiveMeshBounds(
+                HanceDrylandGroundCoverMesh).GetSize().Z);
+        for (int32 CoverIndex = 0;
+             CoverIndex < HanceDrylandGroundCoverInstanceCount;
+             ++CoverIndex)
+        {
+            const int32 SideIndex = CoverIndex % BankSideCount;
+            const int32 AlongIndex = CoverIndex / BankSideCount;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(CoverIndex, 10103)) /
+                static_cast<float>(GroundCoverPerSide);
+            const float BaseLogicalX = FMath::Lerp(-2300.0f, 25200.0f, AlongT);
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float PreferredOffset = FMath::Lerp(
+                4300.0f,
+                15100.0f,
+                FMath::Pow(
+                    ZambeziVegetationUnitRandom(CoverIndex, 10107),
+                    1.12f));
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * PreferredOffset);
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 36; ++CandidateIndex)
+            {
+                const int32 RandomIndex = CoverIndex * 43 + CandidateIndex;
+                const float CandidateLogicalX = BaseLogicalX +
+                    125.0f * FMath::Sin(
+                        CoverIndex * 0.7548777f + CandidateIndex * 1.2207441f);
+                const float CandidateOffset = FMath::Lerp(
+                    4300.0f,
+                    15100.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(RandomIndex, 10111),
+                        1.34f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * CandidateOffset);
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float GroundZ = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float DryHeightAboveWaterCm = GroundZ -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (SlopeDegrees >
+                        HanceDrylandGroundCoverSlopeCeilingDegrees ||
+                    DryHeightAboveWaterCm < 90.0f ||
+                    DryHeightAboveWaterCm > 7600.0f)
+                {
+                    continue;
+                }
+                const float Score =
+                    0.040f * SlopeDegrees +
+                    FMath::Abs(CandidateOffset - PreferredOffset) / 1300.0f +
+                    0.11f * ZambeziVegetationUnitRandom(
+                        RandomIndex,
+                        10129);
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestPoint = CandidatePoint;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                ++HanceDrylandGroundCoverRejectedCount;
+                continue;
+            }
+
+            const float TargetHeightCm = FMath::Lerp(
+                20.0f,
+                48.0f,
+                ZambeziVegetationUnitRandom(CoverIndex, 10133));
+            const float UniformScale = TargetHeightCm / GroundCoverMeshHeightCm;
+            const float FootprintScale = FMath::Lerp(
+                0.82f,
+                1.38f,
+                ZambeziVegetationUnitRandom(CoverIndex, 10151));
+            AddGroundedInstance(
+                HanceDrylandGroundCoverInstances,
+                HanceDrylandGroundCoverMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.05f, 0.0f, 1.5f),
+                    360.0f * ZambeziVegetationUnitRandom(CoverIndex, 10159),
+                    0.8f * FMath::Sin(CoverIndex * 0.91f)),
+                FVector(
+                    UniformScale * FootprintScale,
+                    UniformScale * FootprintScale * FMath::Lerp(
+                        0.80f,
+                        1.20f,
+                        ZambeziVegetationUnitRandom(CoverIndex, 10177)),
+                    UniformScale));
+            HanceDrylandMaximumSlopeDegrees = FMath::Max(
+                HanceDrylandMaximumSlopeDegrees,
+                BestSlopeDegrees);
+            ++HanceDrylandGroundCoverPlacedCount;
+            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
+        }
+
+        constexpr int32 ShrubSpeciesLaneCount = BankSideCount;
+        const int32 ShrubsPerSide =
+            HanceDrylandShrubInstanceCount / ShrubSpeciesLaneCount;
+        const float ShrubMeshHeightCm = FMath::Max(
+            1.0f,
+            GetLandscapeCandidateEffectiveMeshBounds(
+                HanceDrylandShrubMesh).GetSize().Z);
+        for (int32 ShrubIndex = 0;
+             ShrubIndex < HanceDrylandShrubInstanceCount;
+             ++ShrubIndex)
+        {
+            const int32 SideIndex = ShrubIndex % BankSideCount;
+            const int32 AlongIndex = ShrubIndex / BankSideCount;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(ShrubIndex, 10201)) /
+                static_cast<float>(ShrubsPerSide);
+            const float BaseLogicalX = FMath::Lerp(-2200.0f, 25100.0f, AlongT);
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float PreferredOffset = FMath::Lerp(
+                4700.0f,
+                14900.0f,
+                FMath::Pow(
+                    ZambeziVegetationUnitRandom(ShrubIndex, 10207),
+                    0.92f));
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * PreferredOffset);
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 64; ++CandidateIndex)
+            {
+                const int32 RandomIndex = ShrubIndex * 71 + CandidateIndex;
+                const float CandidateLogicalX = BaseLogicalX +
+                    155.0f * FMath::Sin(
+                        ShrubIndex * 0.6180339f + CandidateIndex * 1.3247179f);
+                const float CandidateOffset = FMath::Lerp(
+                    4700.0f,
+                    14900.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(RandomIndex, 10211),
+                        1.18f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * CandidateOffset);
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float GroundZ = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float DryHeightAboveWaterCm = GroundZ -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (SlopeDegrees > HanceDrylandShrubSlopeCeilingDegrees ||
+                    DryHeightAboveWaterCm < 150.0f ||
+                    DryHeightAboveWaterCm > 7200.0f)
+                {
+                    continue;
+                }
+                const float Score =
+                    0.055f * SlopeDegrees +
+                    FMath::Abs(CandidateOffset - PreferredOffset) / 1450.0f +
+                    0.13f * ZambeziVegetationUnitRandom(
+                        RandomIndex,
+                        10231);
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestPoint = CandidatePoint;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                ++HanceDrylandShrubRejectedCount;
+                continue;
+            }
+
+            const float TargetHeightCm = FMath::Lerp(
+                65.0f,
+                165.0f,
+                ZambeziVegetationUnitRandom(ShrubIndex, 10243));
+            const float UniformScale = TargetHeightCm / ShrubMeshHeightCm;
+            AddGroundedInstance(
+                HanceDrylandShrubInstances,
+                HanceDrylandShrubMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.04f, 0.0f, 1.2f),
+                    360.0f * ZambeziVegetationUnitRandom(ShrubIndex, 10259),
+                    0.9f * FMath::Sin(ShrubIndex * 0.73f)),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.78f,
+                        1.22f,
+                        ZambeziVegetationUnitRandom(ShrubIndex, 10267)),
+                    UniformScale * FMath::Lerp(
+                        0.80f,
+                        1.20f,
+                        ZambeziVegetationUnitRandom(ShrubIndex, 10271)),
+                    UniformScale));
+            HanceDrylandMaximumSlopeDegrees = FMath::Max(
+                HanceDrylandMaximumSlopeDegrees,
+                BestSlopeDegrees);
+            ++HanceDrylandShrubPlacedCount;
+            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Colorado Hance dryland ecology: %d/%d opaque ground-cover "
+                 "patches and %d/%d opaque shrubs grounded outside the protected "
+                 "+/-39 m solver strip; %d/%d targets rejected by dry-height or "
+                 "%.1f/%.1f-degree slope gates; maximum selected slope %.2f "
+                 "degrees. Procedural visual gap fill only.\n"),
+            HanceDrylandGroundCoverPlacedCount,
+            HanceDrylandGroundCoverInstanceCount,
+            HanceDrylandShrubPlacedCount,
+            HanceDrylandShrubInstanceCount,
+            HanceDrylandGroundCoverRejectedCount,
+            HanceDrylandShrubRejectedCount,
+            HanceDrylandGroundCoverSlopeCeilingDegrees,
+            HanceDrylandShrubSlopeCeilingDegrees,
+            HanceDrylandMaximumSlopeDegrees);
     }
 
     int32 CameraVisibleWoodyPlacedCount = 0;
@@ -3815,6 +4257,8 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
+        HanceDrylandGroundCoverPlacedCount +
+        HanceDrylandShrubPlacedCount +
         (bZambeziWoodland
              ? ZambeziEvidenceBankMosaicInstanceCount +
                  CameraVisibleWoodyPlacedCount +
@@ -3828,6 +4272,9 @@ bool AddLandscapeCandidateBiomeDressing(
         ((Spec.bDesertCanyon && !bZambeziWoodland) ||
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&
+        (!bColoradoHance ||
+         HanceDrylandGroundCoverPlacedCount >= 1500) &&
+        (!bColoradoHance || HanceDrylandShrubPlacedCount >= 260) &&
         (!bZambeziWoodland ||
          RunnableLaunchGroundCoverPlacedCount >= 900) &&
         (!bZambeziWoodland || RunnableLaunchWoodyPlacedCount >= 96) &&

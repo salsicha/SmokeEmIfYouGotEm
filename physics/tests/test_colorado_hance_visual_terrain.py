@@ -29,6 +29,24 @@ def test_hance_visual_terrain_preserves_solver_strip_and_aligns_runtime(tmp_path
     assert manifest["procedural_infill"]["protected_solver_strip_change_m"] == 0.0
     assert manifest["procedural_infill"]["maximum_source_join_step_m"] < 0.25
     assert manifest["procedural_infill"]["maximum_added_canyon_relief_m"] > 55.0
+    assert manifest["procedural_infill"]["algorithm"].endswith(
+        "eroded_desert_canyon_v2"
+    )
+    assert (
+        manifest["procedural_infill"][
+            "maximum_outer_adjacent_cross_bank_step_m"
+        ]
+        < 1.25 * manifest["landscape"]["sample_spacing_y_m"]
+    )
+    assert (
+        manifest["procedural_infill"][
+            "maximum_outer_mean_profile_dominant_band_energy_ratio"
+        ]
+        < 0.46
+    )
+    assert "domain-warped strata" in manifest["procedural_infill"][
+        "regular_terrace_reduction_policy"
+    ]
     assert (
         manifest["alignment"]["maximum_static_to_runtime_centerline_surface_error_m"]
         < 1e-9

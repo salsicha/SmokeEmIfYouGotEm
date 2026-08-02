@@ -743,6 +743,81 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Colorado Hance has one cooked-field-derived capture foam surface"),
             SolverFieldFoamCount,
             1);
+
+        int32 DrylandComponentCount = 0;
+        int32 DrylandGroundCoverInstanceCount = 0;
+        int32 DrylandShrubInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor ||
+                !Actor->Tags.Contains(
+                    TEXT("RaftSimHanceOpaqueDrylandVegetationV1")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                Actor->FindComponentByClass<
+                    UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestNotNull(
+                TEXT("Colorado Hance dryland dressing actor has one HISM"),
+                Instances);
+            if (!Instances)
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("Colorado Hance dryland dressing remains non-colliding"),
+                Instances->GetCollisionEnabled(),
+                ECollisionEnabled::NoCollision);
+            Test->TestTrue(
+                TEXT("Colorado Hance dryland dressing remains outside the solver strip"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimOutsideProtectedSolverStrip")) &&
+                    Instances->ComponentTags.Contains(
+                        TEXT("RaftSimOutsideProtectedSolverStrip")));
+            Test->TestTrue(
+                TEXT("Colorado Hance dryland dressing disclaims ecology authority"),
+                Actor->Tags.Contains(TEXT("RaftSimNoEcologyAuthority")) &&
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimProceduralVegetationFallback")));
+            Test->TestTrue(
+                TEXT("Colorado Hance dryland dressing uses the isolated material"),
+                Instances->GetMaterial(0) &&
+                    Instances->GetMaterial(0)->GetPathName().Contains(
+                        TEXT("M_RaftSim_Hance_OpaqueDrylandVegetation")));
+
+            const FString ComponentName = Instances->GetName();
+            if (ComponentName.Contains(TEXT("HanceDrylandGroundCover")))
+            {
+                Test->TestFalse(
+                    TEXT("Colorado Hance ground cover suppresses coarse self-shadowing"),
+                    Instances->CastShadow);
+                Test->TestTrue(
+                    TEXT("Colorado Hance ground cover records self-shadow suppression"),
+                    Instances->ComponentTags.Contains(
+                        TEXT("RaftSimGroundCoverSelfShadowSuppressed")));
+                DrylandGroundCoverInstanceCount += Instances->GetInstanceCount();
+            }
+            else if (ComponentName.Contains(TEXT("HanceDrylandShrub")))
+            {
+                Test->TestTrue(
+                    TEXT("Colorado Hance shrubs retain grounded shadows"),
+                    Instances->CastShadow);
+                DrylandShrubInstanceCount += Instances->GetInstanceCount();
+            }
+            ++DrylandComponentCount;
+        }
+        Test->TestEqual(
+            TEXT("Colorado Hance has ground-cover and shrub HISM components"),
+            DrylandComponentCount,
+            2);
+        Test->TestTrue(
+            TEXT("Colorado Hance has dense dryland ground cover"),
+            DrylandGroundCoverInstanceCount >= 1500);
+        Test->TestTrue(
+            TEXT("Colorado Hance has distributed dryland shrubs"),
+            DrylandShrubInstanceCount >= 260);
         return true;
     }
 

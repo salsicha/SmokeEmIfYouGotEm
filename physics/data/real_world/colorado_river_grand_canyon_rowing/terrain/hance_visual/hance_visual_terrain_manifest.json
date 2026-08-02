@@ -1,5 +1,5 @@
 {
-  "schema": "raftsim.colorado.hance_visual_terrain.v1",
+  "schema": "raftsim.colorado.hance_visual_terrain.v2",
   "status": "generated_review_gated_reach_local_visual_and_collision_infill_not_survey_solver_or_production_terrain_authority",
   "river_id": "colorado_river",
   "section_id": "hance_corridor_station_1250m_c3_window",
@@ -18,9 +18,9 @@
   },
   "outputs": {
     "heightfield": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png",
-    "heightfield_sha256": "4e51c6e97d43187a7bbd64f0fbea856b2e521f5c126e9cb5f69ed6bee3b030b5",
+    "heightfield_sha256": "b56b12dcd8bdea9cebc5037565957173ed42247309e910a0076d0626307185d7",
     "local_centerline": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_local_centerline.json",
-    "local_centerline_sha256": "374d2b45a27e2ad9b065a4fd563d5645770a739428d29e9d974cad944def23bf",
+    "local_centerline_sha256": "24ceeebb46e6deb7ed21283ab35706d0abd2189f15ae4db80fd7391fffe7dc4c",
     "runtime_coordinate_map": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_runtime_coordinate_map.json",
     "runtime_coordinate_map_sha256": "d3b3a75db55fc7f6fecd9e26af6c8827e417c9cce33cdb20a990b64738226768"
   },
@@ -33,17 +33,20 @@
     "sample_spacing_x_m": 0.5952380952380952,
     "sample_spacing_y_m": 0.31746031746031744,
     "terrain_min_m": 944.048095703125,
-    "terrain_max_m": 1032.591810517933,
-    "target_relief_cm": 8854.371481480803,
+    "terrain_max_m": 1033.3745108064154,
+    "target_relief_cm": 8932.64151032904,
     "world_vertical_offset_cm": -666.5287645079843,
     "runtime_vertical_datum_m": 950.7133833482048
   },
   "procedural_infill": {
-    "algorithm": "deterministic_asymmetric_stratified_desert_canyon_v1",
+    "algorithm": "deterministic_asymmetric_eroded_desert_canyon_v2",
     "source_solver_half_width_m": 39.0,
     "protected_solver_strip_change_m": 0.0,
-    "maximum_source_join_step_m": 0.007589998334554935,
-    "maximum_added_canyon_relief_m": 74.97718291544122,
+    "maximum_source_join_step_m": 0.008046951738415655,
+    "maximum_added_canyon_relief_m": 78.35773519053744,
+    "maximum_outer_adjacent_cross_bank_step_m": 0.3815239493451372,
+    "maximum_outer_mean_profile_dominant_band_energy_ratio": 0.4316907889691226,
+    "regular_terrace_reduction_policy": "replace metre-scale periodic cross-bank bands with shallow domain-warped strata, longitudinal massing, incised gullies, and lower-amplitude talus",
     "authority": "visual and Landscape collision infill only outside the complete C3 solver strip; cooked bed, water state, and raft forces are unchanged"
   },
   "alignment": {

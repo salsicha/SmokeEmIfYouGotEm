@@ -1,0 +1,142 @@
+{
+  "schema": "raftsim.environment.colorado_hance_organic_canyon_dryland_cover_review.v2",
+  "review_date": "2026-08-02",
+  "status": "retained_technical_visual_improvement_photoreal_promotion_fail",
+  "passed": false,
+  "supersedes_mutable_artifacts_from": "colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "visual_improvement_passed": true,
+    "photoreal_acceptance_passed": false,
+    "organic_outer_canyon_morphology_passed": true,
+    "dryland_ground_cover_distribution_passed": true,
+    "solver_state_changed": false,
+    "protected_solver_strip_changed": false,
+    "water_changed": false,
+    "collision_changed_inside_protected_solver_strip": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "authority_boundary": {
+    "protected_solver_strip": "The existing C3 solver corridor within plus or minus 39 meters of centerline is copied exactly and remains gameplay authority.",
+    "terrain": "Visual Landscape height is deterministic procedural canyon infill outside the protected strip; it is not surveyed Hance terrain or geospatial authority.",
+    "terrain_collision": "Landscape collision follows the visual infill only outside the protected strip and does not alter the protected water, bathymetry, solver, buoyancy, or raft-force corridor.",
+    "vegetation": "Project-owned opaque procedural dryland meshes are non-colliding, remain outside the protected strip, and carry explicit procedural-fallback and no-ecology-authority tags.",
+    "water_and_gameplay": "The retained water presentation, raw WaterSamples, finite-volume solver state, collision, buoyancy, and raft-force paths are unchanged by this milestone."
+  },
+  "terrain_contract": {
+    "schema": "raftsim.colorado.hance_visual_terrain.v2",
+    "algorithm": "deterministic_asymmetric_eroded_desert_canyon_v2",
+    "protected_half_width_m": 39.0,
+    "protected_strip_max_absolute_change_m": 0.0,
+    "protected_join_max_step_m": 0.008046951738415655,
+    "added_outer_relief_m": 78.35773519053744,
+    "target_relief_cm": 8932.64151032904,
+    "world_vertical_offset_cm": -666.5287645079843,
+    "outer_canyon_profile_before": {
+      "max_adjacent_cross_bank_step_m": 0.48369,
+      "dominant_band_energy_ratio": 0.47118
+    },
+    "outer_canyon_profile_after": {
+      "max_adjacent_cross_bank_step_m": 0.3815239493451372,
+      "dominant_band_energy_ratio": 0.4316907889691226
+    },
+    "interpretation": "The asymmetric domain-warped strata, gullies, alcoves, broad rise, and multiscale talus reduce the regular terrace signature while preserving the protected solver corridor exactly."
+  },
+  "vegetation_contract": {
+    "procedural_ground_cover_instances": 1800,
+    "procedural_desert_shrub_instances": 320,
+    "legacy_pve_instances": 0,
+    "hierarchical_instanced_mesh_components": 2,
+    "collision_enabled": false,
+    "protected_solver_strip_excluded": true,
+    "source_landscape_grounded": true,
+    "ground_cover_casts_shadows": false,
+    "shrubs_cast_shadows": true,
+    "ecology_authority": false,
+    "first_pass_decision": "rejected because the flattest-site placement formed an artificial horizontal bench band",
+    "retained_pass_decision": "accepted as a technical improvement after deterministic preferred-lateral placement scattered smaller ground cover and shrubs across bank depth"
+  },
+  "capture_comparison": {
+    "technical_verdict": "retain: the former oversized faceted terrace walls and rejected horizontal vegetation bench band are absent, canyon massing is less repetitive, and small dryland plants are distributed across the banks without entering the protected solver corridor",
+    "photoreal_verdict": "fail: the terrain remains generic procedural infill, plants remain simple generated analogs, rock and ecology diversity is inadequate, and the retained water still lacks physically convincing Hance hydraulics and VFX"
+  },
+  "remaining_photoreal_defects": [
+    "The outer canyon is deterministic procedural infill rather than surveyed and geospatially registered Hance terrain, and it does not reproduce exact strata, alcoves, talus fields, erosion cuts, or bank breaklines.",
+    "Generated lobed plants are not reviewed tamarisk, willow, cactus, grass, or other exact river-corridor species and lack ecology authority, wind response, seasonal variation, and close-range production geometry.",
+    "Boulders remain sparse, repeated, and procedural rather than surveyed, geology-reviewed, source-varied Hance rock assets.",
+    "Horizontal water bands remain visible, foam remains sparse lace rather than hydraulic structure, and the water lacks credible crests, holes, rollers, entrained aeration, spray, mist, rock-water contact, and raft occlusion.",
+    "Canyon horizon, lighting, atmosphere, and distant geographic context remain generic rather than a verified Hance composition.",
+    "The cooked hydraulic field is unconverged and is not calibrated against observed Hance behavior across playable releases.",
+    "No named guide, geospatial reviewer, geologist or ecologist, environment artist, water-VFX artist, or target-hardware reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Colorado River guide or oarsman review of the Hance line, hazards, entry, exit, and playable flow bands",
+    "geospatial review of exact river-mile registration, planform, terrain, bank breaklines, bathymetry, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Hance behavior across playable release bands",
+    "geology, ecology, and environment-art approval of strata, boulders, shrubs, grass, ground cover, wet banks, and canyon context",
+    "photoreal water and VFX approval for depth, transmission, foam, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after final terrain and placement revisions",
+    "map_regeneration": "0 MapCheck errors and 0 MapCheck warnings; 1800 ground-cover instances, 320 shrub instances, and 0 legacy PVE instances generated",
+    "native_terrain": "RaftSim.M9.FColoradoOrganicHanceTerrain passed 1/1",
+    "runtime_map_load": "RaftSim.P4.RiverMapLoads.L_Hance passed 1/1, including runnable launch, water authority, dryland component count, material isolation, collision, tags, shadow policy, and minimum instance counts",
+    "focused_python": "physics/tests/test_colorado_hance_visual_terrain.py passed 2/2",
+    "protected_dirty_worktree_snapshot": "all 50 pre-existing unrelated modified files remained byte-identical"
+  },
+  "reviewers": {
+    "named_colorado_guide_or_oarsman": null,
+    "named_geospatial_reviewer": null,
+    "named_geology_or_ecology_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Hance.umap",
+      "sha256": "982a2110bfc3193498d6410875bea81567dc1550aaf094e36d0b0325305a060e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json",
+      "sha256": "72c1abfcb865bf1ad41c28bce46993c2de3efa453c5afd49c993720137fa340c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png",
+      "sha256": "6a60e97b9209baf5c84a56a8e1de4b4ae08064bbc24cc4e1862fd2885b6b8d30"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
+      "sha256": "8e8c195cad1e6efc1e59e3ed24586f71fae35ac23cdbb85200a01e3eb204d0a2"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png",
+      "sha256": "6a60e97b9209baf5c84a56a8e1de4b4ae08064bbc24cc4e1862fd2885b6b8d30"
+    },
+    {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png",
+      "sha256": "b56b12dcd8bdea9cebc5037565957173ed42247309e910a0076d0626307185d7"
+    },
+    {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_visual_terrain_manifest.json",
+      "sha256": "3af9c9ee4b973f2f95b39d96c1e49532304c2dc44ee04d0aa7e4c25c72924d89"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ColoradoRun/Vegetation/Materials/M_RaftSim_Hance_OpaqueDrylandVegetation.uasset",
+      "sha256": "1be76bb308fed90ab5402e37713268c77d31da83a9a12967769d897b40a33f61"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ColoradoRun/Vegetation/Meshes/SM_RaftSim_Hance_DesertShrub_A_OpaqueV1.uasset",
+      "sha256": "8fd90af1019a6e7fb2948c9dd9f591c2a92f921e40709fc1d189e9b3317f1fbb"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ColoradoRun/Vegetation/Meshes/SM_RaftSim_Hance_DryGroundCover_A_OpaqueV1.uasset",
+      "sha256": "8aa6b21963a21b99b8ed9588a7d0138cb9668144dc76d106accb0966962889f7"
+    }
+  ]
+}
