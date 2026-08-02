@@ -51,6 +51,17 @@ public:
         float SpeedMetersPerSecond,
         float DepthMeters);
 
+    /** Plane-preserving cardinal filter used only by opted-in live rendering.
+     * Symmetric neighbours preserve any linear grade exactly while reducing
+     * one-cell cooked-field steps. */
+    static float ComputePresentationSmoothedSurfaceHeightMeters(
+        float CenterSurfaceHeightMeters,
+        float UpstreamSurfaceHeightMeters,
+        float DownstreamSurfaceHeightMeters,
+        float RiverRightSurfaceHeightMeters,
+        float RiverLeftSurfaceHeightMeters,
+        float Strength);
+
     /** Deterministic cross-section for the presentation-only breaking-water
      * lip. X is downstream travel and Y is vertical lift in centimetres. The
      * final quarter curls back upstream and below the sampled free surface,
@@ -149,6 +160,18 @@ public:
     float GetActiveLiveSurfaceCoverage() const
     {
         return ResolvedActiveLiveSurfaceCoverage;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsLivePresentationSurfaceSmoothingEnabled() const
+    {
+        return bLivePresentationSurfaceSmoothingEnabled;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetLivePresentationSurfaceSmoothingStrength() const
+    {
+        return ResolvedPresentationSurfaceSmoothingStrength;
     }
 
     /** Selects the non-colliding roller-mesh fallback. Production Niagara
@@ -314,4 +337,11 @@ private:
     bool bLiveSurfaceCarrierEnabled = false;
     float ResolvedCalmLiveSurfaceCoverage = 0.0f;
     float ResolvedActiveLiveSurfaceCoverage = 0.0f;
+    bool bLivePresentationSurfaceSmoothingEnabled = false;
+    float ResolvedPresentationSurfaceSmoothingStrength = 0.0f;
+    float ResolvedPresentationStandingWaveScale = 1.0f;
+    float ResolvedPresentationHydraulicReliefScale = 1.0f;
+    float ResolvedRapidFoamFocusStart = 0.12f;
+    float ResolvedRapidFoamFocusEnd = 0.72f;
+    float ResolvedRapidFoamCoverageGain = 1.0f;
 };

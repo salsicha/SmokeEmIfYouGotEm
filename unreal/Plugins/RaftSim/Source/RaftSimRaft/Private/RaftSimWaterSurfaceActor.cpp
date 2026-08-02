@@ -321,6 +321,24 @@ float ARaftSimWaterSurfaceActor::ComputePresentationHydraulicReliefDisplacementM
         DepthMeters);
 }
 
+float ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(
+    float CenterSurfaceHeightMeters,
+    float UpstreamSurfaceHeightMeters,
+    float DownstreamSurfaceHeightMeters,
+    float RiverRightSurfaceHeightMeters,
+    float RiverLeftSurfaceHeightMeters,
+    float Strength)
+{
+    const float FilteredSurfaceHeightMeters =
+        CenterSurfaceHeightMeters * 0.44f +
+        (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters +
+            RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) * 0.14f;
+    return FMath::Lerp(
+        CenterSurfaceHeightMeters,
+        FilteredSurfaceHeightMeters,
+        FMath::Clamp(Strength, 0.0f, 1.0f));
+}
+
 FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingLipProfileCentimeters(
     float NormalizedCurl,
     float Intensity)
@@ -537,6 +555,36 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     ResolvedActiveLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveSurfaceActiveCoverage, 0.0f, 1.0f)
         : 0.0f;
+    bLivePresentationSurfaceSmoothingEnabled =
+        bLiveSurfaceCarrierEnabled &&
+        RiverWaterConfig->bEnableLivePresentationSurfaceSmoothing;
+    ResolvedPresentationSurfaceSmoothingStrength =
+        bLivePresentationSurfaceSmoothingEnabled
+            ? FMath::Clamp(
+                  RiverWaterConfig->LivePresentationSurfaceSmoothingStrength,
+                  0.0f,
+                  1.0f)
+            : 0.0f;
+    ResolvedPresentationStandingWaveScale = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(
+              RiverWaterConfig->LivePresentationStandingWaveScale, 0.0f, 1.0f)
+        : 1.0f;
+    ResolvedPresentationHydraulicReliefScale = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(
+              RiverWaterConfig->LivePresentationHydraulicReliefScale, 0.0f, 1.0f)
+        : 1.0f;
+    ResolvedRapidFoamFocusStart = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(RiverWaterConfig->LiveRapidFoamFocusStart, 0.0f, 0.95f)
+        : 0.12f;
+    ResolvedRapidFoamFocusEnd = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(
+              RiverWaterConfig->LiveRapidFoamFocusEnd,
+              ResolvedRapidFoamFocusStart + 0.05f,
+              1.0f)
+        : 0.72f;
+    ResolvedRapidFoamCoverageGain = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(RiverWaterConfig->LiveRapidFoamCoverageGain, 0.0f, 1.0f)
+        : 1.0f;
     if (bLiveSurfaceCarrierEnabled)
     {
         CurvedGridLateralEdgeBlendMeters = FMath::Clamp(
@@ -1307,6 +1355,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     WetVertexMask.Init(0, Vertices.Num());
     TArray<FRaftSimWaterSample> WaterSamples;
     WaterSamples.SetNum(Vertices.Num());
+    TArray<float> PresentationSurfaceHeightMeters;
+    PresentationSurfaceHeightMeters.Init(0.0f, Vertices.Num());
     TArray<float> HydraulicReliefMeters;
     HydraulicReliefMeters.Init(0.0f, Vertices.Num());
     TArray<float> FroudeField;
@@ -1341,6 +1391,50 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     : WaterAdapter->SampleWaterAtWorldPosition(
                         FVector(V.X, V.Y, 0.0f), Sample);
                 WetVertexMask[Index] = bSampled && Sample.bWet ? 1 : 0;
+                if (WetVertexMask[Index] != 0)
+                {
+                    PresentationSurfaceHeightMeters[Index] =
+                        Sample.SurfaceHeightMeters;
+                }
+            }
+        }
+    }
+
+    // Colorado's 4 m cooked visualization cells can otherwise read as broad
+    // transverse steps on the 3 m live presentation grid. The optional
+    // cardinal filter is Jacobi-style (always reads the untouched sampled
+    // field), preserves a linear grade exactly, and only writes this local
+    // render array. WaterSamples remains the authority for gameplay.
+    if (bLivePresentationSurfaceSmoothingEnabled &&
+        ResolvedPresentationSurfaceSmoothingStrength > 0.0f)
+    {
+        const TArray<float> RawPresentationSurfaceHeightMeters =
+            PresentationSurfaceHeightMeters;
+        for (int32 Y = 1; Y < GridLateralN - 1; ++Y)
+        {
+            for (int32 X = 1; X < GridStationN - 1; ++X)
+            {
+                const int32 Index = Y * GridStationN + X;
+                const int32 UpstreamIndex = Index - 1;
+                const int32 DownstreamIndex = Index + 1;
+                const int32 RiverRightIndex = Index - GridStationN;
+                const int32 RiverLeftIndex = Index + GridStationN;
+                if (WetVertexMask[Index] == 0 ||
+                    WetVertexMask[UpstreamIndex] == 0 ||
+                    WetVertexMask[DownstreamIndex] == 0 ||
+                    WetVertexMask[RiverRightIndex] == 0 ||
+                    WetVertexMask[RiverLeftIndex] == 0)
+                {
+                    continue;
+                }
+                PresentationSurfaceHeightMeters[Index] =
+                    ComputePresentationSmoothedSurfaceHeightMeters(
+                        RawPresentationSurfaceHeightMeters[Index],
+                        RawPresentationSurfaceHeightMeters[UpstreamIndex],
+                        RawPresentationSurfaceHeightMeters[DownstreamIndex],
+                        RawPresentationSurfaceHeightMeters[RiverRightIndex],
+                        RawPresentationSurfaceHeightMeters[RiverLeftIndex],
+                        ResolvedPresentationSurfaceSmoothingStrength);
             }
         }
     }
@@ -1367,13 +1461,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
             const FRaftSimWaterSample& Sample = WaterSamples[Index];
             HydraulicReliefMeters[Index] = ComputePresentationHydraulicRelief(
-                Sample.SurfaceHeightMeters,
-                WaterSamples[UpstreamFarIndex].SurfaceHeightMeters,
-                WaterSamples[UpstreamNearIndex].SurfaceHeightMeters,
-                WaterSamples[DownstreamNearIndex].SurfaceHeightMeters,
-                WaterSamples[DownstreamFarIndex].SurfaceHeightMeters,
+                PresentationSurfaceHeightMeters[Index],
+                PresentationSurfaceHeightMeters[UpstreamFarIndex],
+                PresentationSurfaceHeightMeters[UpstreamNearIndex],
+                PresentationSurfaceHeightMeters[DownstreamNearIndex],
+                PresentationSurfaceHeightMeters[DownstreamFarIndex],
                 Sample.VelocityMetersPerSecond.Size2D(),
-                Sample.DepthMeters);
+                Sample.DepthMeters) * ResolvedPresentationHydraulicReliefScale;
         }
     }
     TArray<float> StationWetSurfaceZSum;
@@ -1422,7 +1516,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // sampled cooked surface. A 2 cm presentation lift prevents
                 // depth fighting. None of these terms changes physics.
                 SurfaceZCm =
-                    (Sample.SurfaceHeightMeters + StandingWave.DisplacementMeters +
+                    (PresentationSurfaceHeightMeters[Index] +
+                        StandingWave.DisplacementMeters *
+                            ResolvedPresentationStandingWaveScale +
                         HydraulicRelief) *
                         kSurfCmPerM +
                     2.0f;
@@ -1432,13 +1528,37 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     MinimumWetLateralIndex[X], Y);
                 MaximumWetLateralIndex[X] = FMath::Max(
                     MaximumWetLateralIndex[X], Y);
-                const FVector SampleNormal =
-                    Sample.SurfaceNormal.GetSafeNormal();
+                const FVector SampleNormal = Sample.SurfaceNormal.GetSafeNormal();
                 const float SafeNormalZ = FMath::Max(SampleNormal.Z, 0.1f);
-                const float BaseStationSlope =
-                    -SampleNormal.X / SafeNormalZ;
-                const float BaseLateralSlope =
-                    -SampleNormal.Y / SafeNormalZ;
+                float BaseStationSlope = -SampleNormal.X / SafeNormalZ;
+                float BaseLateralSlope = -SampleNormal.Y / SafeNormalZ;
+                if (bLivePresentationSurfaceSmoothingEnabled &&
+                    X > 0 && X < GridStationN - 1 &&
+                    Y > 0 && Y < GridLateralN - 1)
+                {
+                    const int32 UpstreamIndex = Index - 1;
+                    const int32 DownstreamIndex = Index + 1;
+                    const int32 RiverRightIndex = Index - GridStationN;
+                    const int32 RiverLeftIndex = Index + GridStationN;
+                    if (WetVertexMask[UpstreamIndex] != 0 &&
+                        WetVertexMask[DownstreamIndex] != 0 &&
+                        WetVertexMask[RiverRightIndex] != 0 &&
+                        WetVertexMask[RiverLeftIndex] != 0)
+                    {
+                        BaseStationSlope =
+                            (PresentationSurfaceHeightMeters[DownstreamIndex] -
+                                PresentationSurfaceHeightMeters[UpstreamIndex]) /
+                            FMath::Max(
+                                2.0f * VertexSpacingMeters,
+                                KINDA_SMALL_NUMBER);
+                        BaseLateralSlope =
+                            (PresentationSurfaceHeightMeters[RiverLeftIndex] -
+                                PresentationSurfaceHeightMeters[RiverRightIndex]) /
+                            FMath::Max(
+                                2.0f * VertexSpacingMeters,
+                                KINDA_SMALL_NUMBER);
+                    }
+                }
 
                 float ReliefStationSlope = 0.0f;
                 if (X > 0 && X < GridStationN - 1 &&
@@ -1465,8 +1585,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     }
                 }
                 const FVector PresentationLocalNormal = FVector(
-                    -(BaseStationSlope + StandingWave.StationSlope + ReliefStationSlope),
-                    -(BaseLateralSlope + StandingWave.LateralSlope + ReliefLateralSlope),
+                    -(BaseStationSlope +
+                        StandingWave.StationSlope *
+                            ResolvedPresentationStandingWaveScale +
+                        ReliefStationSlope),
+                    -(BaseLateralSlope +
+                        StandingWave.LateralSlope *
+                            ResolvedPresentationStandingWaveScale +
+                        ReliefLateralSlope),
                     1.0f).GetSafeNormal();
                 if (bUsesCurvedRiverCoordinates)
                 {
@@ -1922,7 +2048,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // mask and gameplay-distance mips. This is a smooth response to
             // the solver-owned foam field, not an authored rapid marker.
             const float FocusedFoam = FMath::SmoothStep(
-                0.12f, 0.72f, VertexColors[Index].R);
+                ResolvedRapidFoamFocusStart,
+                ResolvedRapidFoamFocusEnd,
+                VertexColors[Index].R) * ResolvedRapidFoamCoverageGain;
             const float FoamCoverage = FMath::Clamp(
                 FocusedFoam * VertexColors[Index].A,
                 0.0f,
@@ -1954,7 +2082,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             TEXT("RaftSim live water presentation: material=%s wet_vertices=%d "
                  "foam_mean=%.4f foam_max=%.4f depth_mean=%.4f speed_mean=%.4f "
                  "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f "
-                 "rapid_foam_vertices=%d rapid_foam_visible=%d"),
+                 "rapid_foam_vertices=%d rapid_foam_visible=%d "
+                 "surface_smoothing=%d smoothing_strength=%.2f "
+                 "standing_wave_scale=%.2f relief_scale=%.2f "
+                 "foam_focus=[%.2f,%.2f] foam_coverage_gain=%.2f"),
             SurfaceMesh->GetMaterial(0)
                 ? *SurfaceMesh->GetMaterial(0)->GetPathName()
                 : TEXT("none"),
@@ -1966,7 +2097,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MaximumAbsoluteStandingWaveM,
             MaximumAbsoluteHydraulicReliefM,
             VisibleRapidFoamVertexCount,
-            IsRapidFoamMeshVisible() ? 1 : 0);
+            IsRapidFoamMeshVisible() ? 1 : 0,
+            bLivePresentationSurfaceSmoothingEnabled ? 1 : 0,
+            ResolvedPresentationSurfaceSmoothingStrength,
+            ResolvedPresentationStandingWaveScale,
+            ResolvedPresentationHydraulicReliefScale,
+            ResolvedRapidFoamFocusStart,
+            ResolvedRapidFoamFocusEnd,
+            ResolvedRapidFoamCoverageGain);
     }
     if (!bLoggedHydraulicReliefDiagnostics &&
         MaximumAbsoluteHydraulicReliefM > 0.01f)

@@ -1,0 +1,148 @@
+{
+  "schema": "raftsim.environment.colorado_hance_subcell_smoothed_water_lace_foam_review.v1",
+  "review_date": "2026-08-02",
+  "status": "retained_technical_water_improvement_photoreal_promotion_fail",
+  "passed": false,
+  "supersedes_mutable_artifacts_from": "colorado_hance_organic_terrain_native_water_v1_review.json",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "visual_improvement_passed": true,
+    "photoreal_acceptance_passed": false,
+    "broad_foam_sheet_reduction_passed": true,
+    "bounded_subcell_surface_presentation_passed": true,
+    "solver_state_changed": false,
+    "collision_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "authority_boundary": {
+    "capture_surface": "Colorado-only plane-preserving five-tap presentation filter over cooked-field samples; applied only to all-wet ribbon interior vertices",
+    "capture_foam": "Colorado-only coverage breakup and opacity bracket on the non-colliding capture foam mesh",
+    "runtime_surface": "presentation-only height array built from authoritative live WaterSamples immediately before render geometry generation",
+    "gameplay": "raw WaterSamples, finite-volume solver state, collision, buoyancy, and raft-force paths remain authoritative and unmodified"
+  },
+  "capture_contract": {
+    "filter_schema": "raftsim.presentation.plane_preserving_cardinal_5tap.v1",
+    "center_weight": 0.44,
+    "cardinal_neighbor_weight_each": 0.14,
+    "neighbor_offset_m": 4.0,
+    "wet_interior_only": true,
+    "render_height_scale": 0.06,
+    "render_relief_cap_cm": 9.0,
+    "normal_up_blend": 0.80,
+    "foam_base_coverage": 0.22,
+    "foam_noise_smoothstep": [0.42, 0.74],
+    "foam_coverage_gain": 0.96,
+    "foam_maximum_opacity": 0.82,
+    "collision_enabled": false,
+    "hidden_in_game": true
+  },
+  "runtime_contract": {
+    "surface_smoothing_strength": 0.72,
+    "standing_wave_scale": 0.55,
+    "hydraulic_relief_scale": 0.55,
+    "carrier_foam_intensity": 0.58,
+    "rapid_foam_focus": [0.30, 0.82],
+    "rapid_foam_coverage_gain": 0.82,
+    "raw_water_samples_unchanged": true,
+    "presentation_array_only": true,
+    "plane_preserving_filter": true,
+    "zero_strength_returns_authoritative_sample": true
+  },
+  "runtime_launch_diagnostics": {
+    "wet_vertices": 1534,
+    "depth_mean_m": 0.6581,
+    "speed_mean_m_per_s": 0.2068,
+    "standing_wave_abs_max_m": 0.0533,
+    "hydraulic_relief_abs_max_m": 0.0164,
+    "surface_smoothing_enabled": true,
+    "surface_smoothing_strength": 0.72,
+    "standing_wave_scale": 0.55,
+    "hydraulic_relief_scale": 0.55,
+    "rapid_foam_focus": [0.30, 0.82],
+    "rapid_foam_coverage_gain": 0.82,
+    "launch_rapid_foam_vertices": 0,
+    "diagnostic_scope": "calm launch window; this does not demonstrate the downstream Hance rapid"
+  },
+  "capture_comparison": {
+    "method": "normalized RGB comparison over the fixed y=345..520 capture band; white pixels use mean RGB above 0.72 and channel range below 0.18",
+    "guide_seat_downstream": {
+      "white_fraction_before": 0.03678125,
+      "white_fraction_after": 0.0036651785714285714,
+      "mean_luminance_before": 0.31919065117836,
+      "mean_luminance_after": 0.29538512229919434,
+      "mean_vertical_gradient_before": 0.01267554797232151,
+      "mean_vertical_gradient_after": 0.00963096134364605
+    },
+    "river_eye_downstream": {
+      "white_fraction_before": 0.01104017857142857,
+      "white_fraction_after": 0.006214285714285714,
+      "mean_luminance_before": 0.3549988269805908,
+      "mean_luminance_after": 0.3385894298553467,
+      "mean_vertical_gradient_before": 0.00775932427495718,
+      "mean_vertical_gradient_after": 0.00733426446095109
+    },
+    "solver_rapid_river_eye_downstream": {
+      "white_fraction_before": 0.03678125,
+      "white_fraction_after": 0.0036651785714285714,
+      "mean_luminance_before": 0.31919065117836,
+      "mean_luminance_after": 0.29538512229919434,
+      "mean_vertical_gradient_before": 0.01267554797232151,
+      "mean_vertical_gradient_after": 0.00963096134364605
+    },
+    "technical_verdict": "retain: the capture no longer presents the previous broad opaque white foam sheets, the display relief is bounded to nine centimeters, and the live carrier executes the river-local presentation filter without mutating gameplay authority",
+    "photoreal_verdict": "fail: horizontal water bands remain visible, foam is sparse rather than physically structured, and the evidence contains no credible crest, hole, roller, entrained aeration, spray, mist, or rock-water interaction"
+  },
+  "remaining_photoreal_defects": [
+    "Horizontal water bands remain visible in all three fixed captures; the plane-preserving local filter reduces relief amplitude but cannot reconstruct continuous hydraulic geometry from the coarse cooked field.",
+    "The retained foam appears as a few small lace patches rather than hydraulically placed crests, holes, rollers, breaking waves, entrained aeration, spray, mist, and rock-water interaction.",
+    "The opaque Default Lit ribbon still lacks convincing depth, transmission, refraction, reflection complexity, and riverbed readability.",
+    "Canyon walls remain visibly polygonal and terraced and lack surveyed strata, alcoves, talus geometry, erosion cuts, and bank breaklines.",
+    "Grass, shrubs, desert ground cover, riparian structure, woody debris, and boulder variety remain sparse, repeated, undersized, and ecologically unreviewed.",
+    "Terrain outside the protected 78 m solver strip remains deterministic procedural infill rather than surveyed and geospatially registered Hance geography.",
+    "The runtime screenshot did not acquire the gameplay camera, and launch diagnostics do not demonstrate the complete downstream rapid or rapid-zone foam behavior.",
+    "The cooked hydraulic field is unconverged and is not calibrated against observed Hance behavior across playable releases.",
+    "No named guide, geospatial reviewer, geologist or ecologist, environment artist, water-VFX artist, or target-hardware reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Colorado River guide or oarsman review of the Hance line, hazards, entry, exit, and playable flow bands",
+    "geospatial review of exact river-mile registration, planform, terrain, bank breaklines, bathymetry, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Hance behavior across playable release bands",
+    "geology, ecology, and environment-art approval of strata, boulders, shrubs, grass, ground cover, wet banks, and canyon context",
+    "photoreal water and VFX approval for depth, transmission, foam, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "map_regeneration": "0 MapCheck errors and 0 MapCheck warnings",
+    "native_colorado_water": "RaftSim.M9.FColoradoHanceWater and RaftSim.M9.FColoradoOrganicHanceTerrain passed 2/2",
+    "native_water_authority": "RaftSim.P2.WaterSurfaceRenders passed 1/1",
+    "runtime_map_load": "RaftSim.P4.RiverMapLoads.L_Hance passed 1/1 with 0 test errors and one known render-thread console-variable warning",
+    "focused_python": "9/9 Colorado Hance visual-water and presentation contracts passed"
+  },
+  "reviewers": {
+    "named_colorado_guide_or_oarsman": null,
+    "named_geospatial_reviewer": null,
+    "named_geology_or_ecology_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_Hance.umap", "sha256": "27ad1c8ada314cd5caa37e6d4e3b22f13fc39786c65ef41a2480ec992e7ee731"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json", "sha256": "1ecc8986a9f09e40b3e48f8713021f07ea68c1b6f154e86ec318fc1886170de1"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png", "sha256": "792436b8270ebf719e0a8544538930153df58a1c8845e077c08765d956552f3a"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png", "sha256": "3b38ca2f598754491f8bd7be3c3a1ce55e7dcdabc73c7b5ea5c886286b0112b3"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png", "sha256": "792436b8270ebf719e0a8544538930153df58a1c8845e077c08765d956552f3a"},
+    {"path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_visualization_manifest.json", "sha256": "ed0eab31b79def5cf74d124a7b8ba6877db16e25b2c3910118c321f8034ca5da"},
+    {"path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_depth_speed_froude_surface_v1.png", "sha256": "e83eb97051def8f44fcf0a5ce3e7b7efb409064f2331aa17a4811dd6aa426c85"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp", "sha256": "6e3c3572942535e2833eb85914db0aacb26f0d6491e3705dc16ac9f5ba9a6049"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp", "sha256": "e931782b85f5ea102cc67f9f0c8169a5e5216be139b8a2c65b8794ed817b1b9d"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp", "sha256": "27e5e490e754ad78a1c9804e776b40d5c9c5b37e57a76d780b842fc99df124cd"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h", "sha256": "033c2608b6670163a33868ea9cf4174fd63ad8aa0e0462dfe4ac81e6503cb3c1"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h", "sha256": "9199a0e26e9196aa445eff6d81bc32075b6fd5df45e0a5dd0d7ff2fdcb7c900c"}
+  ]
+}

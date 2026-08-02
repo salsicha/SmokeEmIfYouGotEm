@@ -93,7 +93,11 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverFroudeAerationWeight = 0.66f;
         Settings.SolverSpeedVisualGain = 1.0f;
         Settings.SolverFroudeVisualGain = 1.0f;
-        Settings.SolverSurfaceReliefScale = 0.30f;
+        // Hance's packed 4 m field remains the hydraulic source, but 30% of
+        // its 1.5 m detrended range produced 45 cm transverse render steps.
+        // The retained subcell-smoothed presentation caps that visual-only
+        // relief at 9 cm without touching the cooked field or gameplay.
+        Settings.SolverSurfaceReliefScale = 0.06f;
         Settings.SurfaceTint = FLinearColor(0.072f, 0.115f, 0.088f, 0.0f);
         Settings.SolverDeepWaterTint = FLinearColor(0.050f, 0.065f, 0.046f, 0.0f);
         Settings.SolverAerationTint = FLinearColor(0.84f, 0.82f, 0.74f, 0.0f);

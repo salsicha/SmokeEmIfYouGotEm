@@ -101,6 +101,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         SolverVisualizationFields &&
         SolverVisualizationFields->IsValid() &&
         SolverFoamMaterial;
+    const bool bColoradoHancePresentation =
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
@@ -196,13 +198,17 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     Candidate.SolverVisualizationLateralMaxM),
                 FVector2D(0.0f, 1.0f),
                 Lateral * 0.01f);
+            const float SolverPersistenceStepU = 4.0f /
+                FMath::Max(StationsCm.Last() * 0.01f, 1.0f);
+            const float SolverLateralStepV = 4.0f / FMath::Max(
+                Candidate.SolverVisualizationLateralMaxM -
+                    Candidate.SolverVisualizationLateralMinM,
+                1.0f);
             const FLinearColor SolverField = bUseSolverVisualizationFields
                 ? SolverVisualizationFields->SampleRawBilinear(
                       SolverU,
                       1.0f - SolverLateralV)
                 : FLinearColor::Black;
-            const float SolverPersistenceStepU = 4.0f /
-                FMath::Max(StationsCm.Last() * 0.01f, 1.0f);
             const FLinearColor SolverFieldUpstream4M = bUseSolverVisualizationFields
                 ? SolverVisualizationFields->SampleRawBilinear(
                       FMath::Clamp(SolverU - SolverPersistenceStepU, 0.0f, 1.0f),
@@ -213,11 +219,46 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                       FMath::Clamp(SolverU - SolverPersistenceStepU * 2.0f, 0.0f, 1.0f),
                       1.0f - SolverLateralV)
                 : FLinearColor::Black;
-            const float SolverDepthM = SolverField.R *
+            const FLinearColor SolverFieldDownstream4M =
+                bUseSolverVisualizationFields && bColoradoHancePresentation
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      FMath::Clamp(SolverU + SolverPersistenceStepU, 0.0f, 1.0f),
+                      1.0f - SolverLateralV)
+                : SolverField;
+            const FLinearColor SolverFieldRiverRight4M =
+                bUseSolverVisualizationFields && bColoradoHancePresentation
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      SolverU,
+                      1.0f - FMath::Clamp(
+                          SolverLateralV - SolverLateralStepV, 0.0f, 1.0f))
+                : SolverField;
+            const FLinearColor SolverFieldRiverLeft4M =
+                bUseSolverVisualizationFields && bColoradoHancePresentation
+                ? SolverVisualizationFields->SampleRawBilinear(
+                      SolverU,
+                      1.0f - FMath::Clamp(
+                          SolverLateralV + SolverLateralStepV, 0.0f, 1.0f))
+                : SolverField;
+            const float MinimumHanceFilterDepthNormalized =
+                0.03f / FMath::Max(
+                    Candidate.SolverVisualizationDepthCapM, 0.01f);
+            const bool bUseHanceSubcellFilter =
+                bUseSolverVisualizationFields && bColoradoHancePresentation &&
+                SolverField.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldUpstream4M.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldDownstream4M.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldRiverRight4M.R > MinimumHanceFilterDepthNormalized &&
+                SolverFieldRiverLeft4M.R > MinimumHanceFilterDepthNormalized;
+            const FLinearColor SolverPresentationField = bUseHanceSubcellFilter
+                ? SolverField * 0.44f +
+                      (SolverFieldUpstream4M + SolverFieldDownstream4M +
+                          SolverFieldRiverRight4M + SolverFieldRiverLeft4M) * 0.14f
+                : SolverField;
+            const float SolverDepthM = SolverPresentationField.R *
                 Candidate.SolverVisualizationDepthCapM;
-            const float SolverSpeedMps = SolverField.G *
+            const float SolverSpeedMps = SolverPresentationField.G *
                 Candidate.SolverVisualizationSpeedCapMps;
-            const float SolverFroude = SolverField.B *
+            const float SolverFroude = SolverPresentationField.B *
                 Candidate.SolverVisualizationFroudeCap;
             const float SolverPersistentSpeedMps = FMath::Max3(
                 SolverSpeedMps,
@@ -231,7 +272,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 ? SmoothPreviewStep(0.03f, 0.16f, SolverDepthM)
                 : 0.0f;
             const float SolverSurfaceReliefCm = bUseSolverVisualizationFields
-                ? (SolverField.A - 0.5f) * 2.0f *
+                ? (SolverPresentationField.A - 0.5f) * 2.0f *
                       Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
                       WaterSettings.SolverSurfaceReliefScale * SolverHydraulicPresence
                 : 0.0f;
@@ -320,20 +361,19 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     StationsCm[CenterIndex] * 0.0170f - Lateral * 0.0040f + 19.7f,
                     Lateral * 0.0290f + SolverFroude * 3.1f - 7.4f)) * 0.5f + 0.5f;
                 const float FoamBreakup = SmoothPreviewStep(
-                    0.34f,
-                    0.70f,
+                    bColoradoHancePresentation ? 0.42f : 0.34f,
+                    bColoradoHancePresentation ? 0.74f : 0.70f,
                     FMath::Clamp(FoamNoiseA * 0.68f + FoamNoiseB * 0.32f, 0.0f, 1.0f));
-                const bool bColoradoHanceFoam =
-                    Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
-                const float FoamBaseCoverage = bColoradoHanceFoam ? 0.46f : 0.28f;
+                const float FoamBaseCoverage =
+                    bColoradoHancePresentation ? 0.22f : 0.28f;
                 const float FoamBreakupCoverage = 1.0f - FoamBaseCoverage;
-                const float FoamGain = bColoradoHanceFoam ? 1.10f : 0.94f;
+                const float FoamGain = bColoradoHancePresentation ? 0.96f : 0.94f;
                 const float FoamOpacity = FMath::Clamp(
                     SolverHydraulicAerationT *
                         (FoamBaseCoverage + FoamBreakup * FoamBreakupCoverage) *
                         FoamGain,
                     0.0f,
-                    0.94f);
+                    bColoradoHancePresentation ? 0.82f : 0.94f);
                 SolverFoamVertexColors.Add(
                     FLinearColor(0.86f, 0.92f, 0.88f, FoamOpacity));
             }
@@ -359,14 +399,21 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
     for (FVector& Normal : Normals)
     {
-        Normal = FMath::Lerp(Normal, FVector::UpVector, 0.24f).GetSafeNormal();
+        Normal = FMath::Lerp(
+            Normal,
+            FVector::UpVector,
+            bColoradoHancePresentation
+                ? WaterSettings.RenderNormalUpBlend
+                : 0.24f).GetSafeNormal();
     }
     OutSummary += FString::Printf(
-        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below 20 centimetres, and %s breaker coloration across %.1f m.\n"),
+        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below %.1f centimetres, and %s breaker coloration across %.1f m.\n"),
         Centers.Num(),
         CenterSampleSpacingCm * 0.01f,
         ConditionedProfileCenterCount,
         CrossSteps,
+        Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
+            WaterSettings.SolverSurfaceReliefScale,
         bUseSolverVisualizationFields
             ? TEXT("cooked-field-derived")
             : TEXT("sparse flow-scaled analytic"),
@@ -404,6 +451,10 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             WaterActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceDefaultLitWater"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+            WaterActor->Tags.AddUnique(
+                TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimRenderOnlyHydraulicSmoothing"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
         }
         else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
         {
@@ -455,6 +506,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 FoamActor->Tags.AddUnique(
                     TEXT("RaftSimColoradoHanceSolverVisualization"));
                 FoamActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceCaptureOnlyWater"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceLaceFoamV1"));
+                FoamActor->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
             }
             else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
             {
@@ -1541,7 +1594,14 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveSurfaceRoughness = 0.28f;
         WaterConfig->LiveSkyReflectionStrength = 0.34f;
         WaterConfig->LiveRippleStrength = 0.30f;
-        WaterConfig->LiveFoamIntensity = 0.76f;
+        WaterConfig->LiveFoamIntensity = 0.58f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.72f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.55f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.55f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.30f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.82f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.82f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
             FLinearColor(0.095f, 0.145f, 0.110f, 1.0f);
@@ -1588,6 +1648,14 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimSafeLaunchApron"));
+    if (bColoradoHance)
+    {
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimRenderOnlyHydraulicSmoothing"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimColoradoHanceLaceFoamV1"));
+    }
     if (bReachLocalRun)
     {
         WaterConfig->Tags.AddUnique(

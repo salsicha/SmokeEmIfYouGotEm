@@ -107,6 +107,12 @@ bool FRaftSimColoradoHanceWaterTest::RunTest(const FString& Parameters)
                          "T_RaftSim_ColoradoRiver_NormalAtlas."
                          "T_RaftSim_ColoradoRiver_NormalAtlas")));
     }
+    const RaftSimEditorEnvironment::FRaftSimLandscapeCandidateWaterSettings Settings =
+        RaftSimEditorEnvironment::GetLandscapeCandidateWaterSettings(
+            TEXT("colorado_river"));
+    TestTrue(
+        TEXT("Hance capture relief is capped at nine centimetres"),
+        FMath::IsNearlyEqual(Settings.SolverSurfaceReliefScale, 0.06f, 0.001f));
     return !HasAnyErrors();
 }
 

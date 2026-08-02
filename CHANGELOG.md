@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reduced Colorado Hance's capture-only cooked-field relief ceiling from 45 cm
+  to 9 cm and added a river-local, plane-preserving five-tap presentation filter
+  to both capture and live render geometry. The live path smooths a temporary
+  presentation array only; raw solver samples, collision, bathymetry, buoyancy,
+  and raft forces remain unchanged. A narrower lace-foam bracket reduces bright
+  neutral coverage in the guide/solver water band from 3.68% to 0.37%. Build,
+  regeneration, native water-authority, runnable-map, and nine focused Python
+  gates pass. Horizontal bands, sparse foam, opaque water, terraced canyon
+  geometry, missing rapid VFX, unconverged hydraulics, and external review still
+  reject photoreal promotion.
 - Repaired the Zambezi runnable-map regression guard so the player-facing
   `zambezi_reference_run` catalog entry, M6 progression test, Python shipping
   contract, and cook configuration all resolve to the committed

@@ -317,6 +317,45 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
             CalmReliefM),
         FMath::IsNearlyZero(CalmReliefM, 1.0e-6f));
 
+    const float SmoothedStepM =
+        ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(
+            1.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.72f);
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("presentation filter reduces a one-cell cooked step (%.4f m)"),
+            SmoothedStepM),
+        SmoothedStepM > 0.0f && SmoothedStepM < 1.0f);
+    const float SmoothedPlaneM =
+        ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(
+            10.0f,
+            10.6f,
+            9.4f,
+            10.2f,
+            9.8f,
+            0.72f);
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("presentation filter preserves a linear river plane (%.6f m)"),
+            SmoothedPlaneM),
+        FMath::IsNearlyEqual(SmoothedPlaneM, 10.0f, 1.0e-6f));
+    const float DisabledSmoothingM =
+        ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(
+            1.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f);
+    Test->TestEqual(
+        TEXT("zero smoothing strength returns the authoritative sample"),
+        DisabledSmoothingM,
+        1.0f);
+
     const FVector2D LipStart =
         ARaftSimWaterSurfaceActor::ComputeBreakingLipProfileCentimeters(0.0f, 1.0f);
     const FVector2D LipCrest =
