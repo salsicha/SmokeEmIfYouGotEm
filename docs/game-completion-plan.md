@@ -3863,3 +3863,21 @@ path is verified, and the completion goal can be marked complete.
   changes. Broad smooth highlight bands, provisional geography, incomplete
   rapid-scale foam/spray, and all external acceptance gates keep the result at
   reference quality rather than photoreal promotion.
+- Pacuare opaque rainforest vegetation V1 removes the bright and black PVE
+  alpha-card wall from the runnable Upper Huacas map and its three canonical
+  review frames. Four project-owned solid meshes—two canopy forms, riparian
+  shrub, and ground cover—use a Pacuare-only opaque one-sided Default Lit
+  vertex-color material, Nanite hierarchical instancing, deterministic
+  source-mask placement, and slope screening. All 12,000 instances are
+  non-colliding procedural infill with no species, ecology, terrain, water,
+  solver, or raft-force authority. In the fixed guide and river-eye frames the
+  bright-card-green artifact fraction falls from 1.6313%/1.5566% to
+  0.0123%/0.0151%, while near-black frame coverage falls from 17.1912%/15.9486%
+  to 7.9759%/7.1942%. The editor builds, the native Pacuare material/mesh,
+  terrain, and water tests pass 3/3, and `L_UpperHuacas` passes its runnable PIE
+  gate. The retained review explicitly rejects photoreal promotion: tree crowns
+  and trunks remain visibly procedural, banks are still smooth and broad,
+  river-edge structure and reviewed species/age/wind/wetness/season variation
+  are incomplete, water lacks production rapid-scale detail, and all named
+  external guide, geospatial, ecology, art, water-VFX, and performance gates
+  remain open.

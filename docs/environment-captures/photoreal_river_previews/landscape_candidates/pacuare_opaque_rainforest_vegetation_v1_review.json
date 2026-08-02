@@ -1,0 +1,99 @@
+{
+  "schema": "raftsim.environment.pacuare_opaque_rainforest_vegetation_review.v1",
+  "river_id": "pacuare",
+  "milestone": "pacuare_opaque_rainforest_vegetation_v1",
+  "status": "accepted_alpha_card_removal_photoreal_promotion_rejected",
+  "supersedes_visual_dressing_in_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_default_lit_depth_composition_rejection_review.json",
+  "decision": {
+    "material": "/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/M_RaftSim_Pacuare_OpaqueRainforestVegetation",
+    "mesh_root": "/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes",
+    "mesh_count": 4,
+    "source_skeletal_mesh_count": 0,
+    "alpha_card_source_count": 0,
+    "foliage_instance_count": 12000,
+    "canopy_instance_count": 5993,
+    "understory_instance_count": 6007,
+    "collision": false,
+    "nanite": true,
+    "placement": "deterministic_source_mask_and_slope_screened_procedural_infill"
+  },
+  "objective_capture_comparison": [
+    {
+      "view": "guide_seat_downstream",
+      "before_sha256": "16da9111e63ce778abde5c7269d57d368fe1ddb38ed40e08135e7255e7b8d6df",
+      "after_sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d",
+      "bright_card_green_pixel_fraction_before": 0.016313,
+      "bright_card_green_pixel_fraction_after": 0.000123,
+      "near_black_pixel_fraction_before": 0.171912,
+      "near_black_pixel_fraction_after": 0.079759
+    },
+    {
+      "view": "river_eye_downstream",
+      "before_sha256": "179bb042cdf6a144f720308a0cf0e18910ab4b26b0677f977df23c2fe167eb60",
+      "after_sha256": "53f859c16e33d0c47bd4a63c4db1b4b3539a9f338f14b5e5fc85d112fb37d640",
+      "bright_card_green_pixel_fraction_before": 0.015566,
+      "bright_card_green_pixel_fraction_after": 0.000151,
+      "near_black_pixel_fraction_before": 0.159486,
+      "near_black_pixel_fraction_after": 0.071942
+    }
+  ],
+  "metric_definition": {
+    "bright_card_green_pixel": "8-bit RGB pixel with G > 105, G > 1.35 * R, and G > 1.15 * B",
+    "near_black_pixel": "8-bit RGB pixel with max(R, G, B) < 25",
+    "scope": "entire fixed 1280x720 canonical frame",
+    "interpretation": "objective artifact indicators only; neither metric is a photorealism score"
+  },
+  "retained_captures": [
+    {
+      "view": "guide_seat_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d"
+    },
+    {
+      "view": "river_eye_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "53f859c16e33d0c47bd4a63c4db1b4b3539a9f338f14b5e5fc85d112fb37d640"
+    },
+    {
+      "view": "solver_rapid_river_eye_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
+      "sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d"
+    }
+  ],
+  "visual_assessment": {
+    "accepted_improvements": [
+      "repeated_bright_and_black_pve_alpha_cards_are_absent",
+      "solid_canopy_shrub_and_ground_cover_geometry_is_visible_on_both_banks",
+      "near_black_frame_coverage_is_less_than_half_the_rejected_baseline",
+      "source_mask_slope_screening_and_noncollision_authority_are_retained"
+    ],
+    "remaining_defects": [
+      "canopy_lobes_and_trunks_remain_visibly_procedural_and_repetitive",
+      "terrain_banks_remain_smooth_and_broad_with_incomplete_organic_edge_structure",
+      "no_reviewed_pacuare_species_age_wind_wetness_or_season_variants",
+      "water_remains_broad_smooth_and_underfeatured",
+      "missing_production_reflection_refraction_foam_spray_mist_and_waterfall_vfx"
+    ]
+  },
+  "authority": {
+    "terrain_heightfield_changed": false,
+    "landscape_collision_changed": false,
+    "solver_geometry_changed": false,
+    "water_geometry_changed": false,
+    "raft_forces_changed": false,
+    "species_or_ecology_authority": false
+  },
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "focused_native_tests": "3_pass",
+    "runnable_map_test": "RaftSim.P4.RiverMapLoads.L_UpperHuacas_pass_with_one_unrelated_engine_render_thread_warning",
+    "focused_python_contracts": "16_pass"
+  },
+  "photoreal_rejection_reasons": [
+    "procedural_tree_crown_and_trunk_silhouettes",
+    "coarse_smooth_source_scale_banks_and_incomplete_river_edge_structure",
+    "missing_reviewed_pacuare_species_ecology_age_wind_wetness_and_season_variants",
+    "broad_smooth_water_and_incomplete_rapid_scale_foam_spray_mist_and_waterfall_vfx",
+    "missing_named_pacuare_guide_geospatial_ecology_art_water_vfx_and_performance_approval"
+  ]
+}

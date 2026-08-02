@@ -1,11 +1,82 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Engine/StaticMesh.h"
+#include "Materials/Material.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareOpaqueRainforestVegetationTest,
+    "RaftSim.M9.FPacuareOpaqueRainforestVegetation",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareOpaqueRainforestVegetationTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterial* Material = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/"
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation."
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation"));
+    TestNotNull(TEXT("Pacuare opaque rainforest material exists"), Material);
+    if (!Material)
+    {
+        return false;
+    }
+    TestEqual(TEXT("Rainforest material is opaque"), Material->BlendMode, BLEND_Opaque);
+    TestFalse(TEXT("Rainforest material is one-sided"), Material->TwoSided);
+    TestTrue(
+        TEXT("Rainforest material uses scene lighting"),
+        Material->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestTrue(
+        TEXT("Rainforest material supports instanced static meshes"),
+        Material->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes));
+    TestTrue(
+        TEXT("Rainforest material supports Nanite"),
+        Material->GetUsageByFlag(MATUSAGE_Nanite));
+
+    const TCHAR* MeshPaths[] = {
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1."
+             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1"),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1."
+             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1"),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1."
+             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1"),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
+             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1."
+             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1")};
+    for (const TCHAR* MeshPath : MeshPaths)
+    {
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath);
+        TestNotNull(FString::Printf(TEXT("%s exists"), MeshPath), Mesh);
+        if (!Mesh)
+        {
+            continue;
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s has Nanite enabled"), MeshPath),
+            Mesh->IsNaniteEnabled());
+        TestTrue(
+            FString::Printf(TEXT("%s has solid geometry"), MeshPath),
+            Mesh->GetNumVertices(0) > 100 && Mesh->GetNumTriangles(0) > 100);
+        TestEqual(
+            FString::Printf(TEXT("%s has one material slot"), MeshPath),
+            Mesh->GetStaticMaterials().Num(),
+            1);
+        TestEqual(
+            FString::Printf(TEXT("%s binds the Pacuare material"), MeshPath),
+            Mesh->GetMaterial(0),
+            static_cast<UMaterialInterface*>(Material));
+    }
+    return !HasAnyErrors();
+}
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimPacuareOrganicRainforestTerrainTest,
