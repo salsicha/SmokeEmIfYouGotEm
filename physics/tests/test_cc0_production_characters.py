@@ -20,6 +20,11 @@ SKIN_REFLECTANCE_REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_skin_reflectance_v1_review.json"
 )
+EYE_REFERENCE_POSE_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_cc0_eye_reference_pose_v1_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -35,14 +40,22 @@ def _manifest() -> dict[str, object]:
 def test_cc0_character_manifest_freezes_five_distinct_rights_compatible_sources() -> None:
     manifest = _manifest()
 
-    assert manifest["schema_version"] == 3
+    assert manifest["schema_version"] == 5
     assert manifest["license"]["asset_license"] == "mixed_cc0_1_0_and_cc_by_4_0"
     assert manifest["license"]["body_asset_license"] == "CC0-1.0"
     assert manifest["license"]["hair_asset_license"] == "CC-BY-4.0"
     assert manifest["toolchain"]["mpfb"] == "2.0.17"
-    assert manifest["toolchain"]["fbx_world_unit"] == "centimeter"
+    assert manifest["toolchain"]["fbx_source_unit"] == "meter"
+    assert manifest["toolchain"]["fbx_runtime_unit"] == "centimeter"
+    assert "one 100x uniform conversion" in manifest["toolchain"]["fbx_unit_policy"]
+    assert "raw FBX reference vertices" in manifest["toolchain"][
+        "reference_pose_policy"
+    ]
     assert manifest["toolchain"]["checked_in_fbx_canonicalizer"] == (
         "unreal/Scripts/canonicalize_cc0_helmet_hair.py"
+    )
+    assert manifest["toolchain"]["head_detail_attachment_validator"] == (
+        "unreal/Scripts/validate_cc0_head_detail_attachment.py"
     )
     assert "at least 0.75 authored head weight" in manifest["toolchain"][
         "helmet_hair_weight_policy"
@@ -134,18 +147,20 @@ def test_cc0_atlas_hashes_and_license_are_reproducible() -> None:
         assert _sha256(atlas) == row["sha256_lfs_oid"]
 
 
-def test_cc0_generator_bakes_mesh_and_rest_bones_to_centimeters() -> None:
+def test_cc0_generator_preserves_native_units_and_single_fbx_conversion() -> None:
     source = (
         REPO_ROOT / "unreal/Scripts/build_cc0_production_character.py"
     ).read_text(encoding="utf-8")
 
     assert 'bpy.ops.object.join()' in source
-    assert 'meters_to_centimeters = Matrix.Scale(100.0, 4)' in source
-    assert 'body.data.transform(meters_to_centimeters)' in source
-    assert 'rig.data.transform(meters_to_centimeters)' in source
-    assert 'length_unit = "CENTIMETERS"' in source
+    assert 'Matrix.Scale(100.0, 4)' not in source
+    assert 'body.data.transform(' not in source
+    assert 'rig.data.transform(' not in source
+    assert 'length_unit = "METERS"' in source
+    assert 'scale_length = 1.0' in source
     assert 'apply_scale_options="FBX_SCALE_ALL"' in source
     assert 'global_scale=1.0' in source
+    assert 'use_mesh_modifiers=True' in source
     assert '_bind_rigid_mesh(eyes, rig, "head")' in source
     assert '_bind_rigid_mesh(brow, rig, "head")' in source
     assert 'HumanService.add_mhclo_asset(' in source
@@ -154,6 +169,10 @@ def test_cc0_generator_bakes_mesh_and_rest_bones_to_centimeters() -> None:
     assert '_find_exported_hair(source_hair, rig)' in source
     assert '_replace_with_rigid_bone_weights(hair, "head")' in source
     assert '_rigidify_high_confidence_head_vertices(body)' in source
+    assert '_bake_evaluated_mesh_and_pose_as_reference(body, rig)' in source
+    assert 'bpy.ops.object.shape_key_remove(all=True, apply_mix=True)' in source
+    assert 'bpy.ops.object.modifier_apply(' in source
+    assert 'bpy.ops.pose.armature_apply(selected=False)' in source
 
 
 def test_cc0_checked_in_fbx_can_rebuild_helmet_hair_without_mpfb() -> None:
@@ -168,11 +187,38 @@ def test_cc0_checked_in_fbx_can_rebuild_helmet_hair_without_mpfb() -> None:
     assert 'group.remove(sorted_indices)' in source
     assert 'head_group.add(sorted_indices, 1.0, "REPLACE")' in source
     assert 'assignments != {"head": 1.0}' in source
-    assert 'body.scale = (1.0, 1.0, 1.0)' in source
-    assert 'rig.scale = (1.0, 1.0, 1.0)' in source
-    assert 'length_unit = "CENTIMETERS"' in source
-    assert 'scale_length = 0.01' in source
+    assert 'body.scale = (1.0, 1.0, 1.0)' not in source
+    assert 'rig.scale = (1.0, 1.0, 1.0)' not in source
+    assert 'length_unit = "METERS"' in source
+    assert 'scale_length = 1.0' in source
+    assert 'use_mesh_modifiers=True' in source
     assert 'use_armature_deform_only=True' in source
+    assert '_bake_evaluated_mesh_and_pose_as_reference(body, rig)' in source
+    assert 'bpy.ops.object.shape_key_remove(all=True, apply_mix=True)' in source
+    assert 'bpy.ops.object.modifier_apply(' in source
+    assert 'bpy.ops.pose.armature_apply(selected=False)' in source
+
+
+def test_cc0_head_detail_attachment_validator_is_evaluated_and_fail_closed() -> None:
+    source = (
+        REPO_ROOT / "unreal/Scripts/validate_cc0_head_detail_attachment.py"
+    ).read_text(encoding="utf-8")
+
+    assert 'evaluated_get(depsgraph)' in source
+    assert 'evaluated_object.to_mesh(' in source
+    assert 'preserve_all_data_layers=True' in source
+    assert '"schema_version": 2' in source
+    assert '"raw_reference_sections": raw_sections' in source
+    assert '"paired_reference_skin": paired_reference_sections' in source
+    assert '"synthetic_head_pose": {' in source
+    assert '_append_failures(failures, "raw_reference_pose", raw_sections)' in source
+    assert '_append_failures(failures, "synthetic_head_pose", posed_sections)' in source
+    assert '"eyes": {"median": 0.010' in source
+    assert '"brows": {"median": 0.010' in source
+    assert '"hair": {"median": 0.025' in source
+    assert '"status": "passed" if not failures else "failed"' in source
+    assert 'raise RuntimeError("; ".join(report["failures"]))' in source
+    assert 'sys.exit(1)' in source
 
 
 def test_cc0_importer_is_hash_tracked_scale_validated_and_idempotent() -> None:
@@ -181,6 +227,16 @@ def test_cc0_importer_is_hash_tracked_scale_validated_and_idempotent() -> None:
     ).read_text(encoding="utf-8")
 
     assert 'SOURCE_SHA256_METADATA_TAG = "RaftSimSourceSHA256"' in source
+    assert 'FBX_IMPORT_UNIFORM_SCALE = 100.0' in source
+    assert 'def prepare_character_pair_reimport(' in source
+    assert 'prepared_reimport_restart_required' in source
+    assert 'Refusing to prepare unexpected shared skeleton' in source
+    assert 'if isinstance(existing, unreal.SkeletalMesh):' in source
+    assert 'restart Unreal, then run the importer normally' in source
+    assert 'task.replace_existing = False' in source
+    assert 'stale inverse bind matrices' in source
+    assert 'mesh/skeleton pairs' in source
+    assert 'save_loaded_asset(skeleton, only_if_is_dirty=False)' in source
     assert 'MIN_PRODUCTION_BODY_HEIGHT_CM = 140.0' in source
     assert 'MAX_PRODUCTION_BODY_HEIGHT_CM = 220.0' in source
     assert 'MIN_REFERENCE_HEAD_HEIGHT_CM = 120.0' in source
@@ -224,6 +280,16 @@ def test_cc0_production_skin_builder_preserves_atlases_and_adds_physical_respons
     assert "FLinearColor(0.48f, 0.48f, 0.48f, 1.0f)" in source
     assert "FLinearColor(0.42f, 0.42f, 0.42f, 1.0f)" in source
     assert source.count("FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)") >= 2
+    assert "static UMaterial* BuildProductionCC0EyeMaterial()" in source
+    assert "T_RaftSim_CC0_BrownEye.T_RaftSim_CC0_BrownEye" in source
+    assert "Material->SetShadingModel(MSM_ClearCoat)" in source
+    assert "source-level FBX attachment gate" in source
+    assert "Material->TwoSided = false" in source
+    assert 'AtlasSample->ParameterName = TEXT("LicensedEyeAtlas")' in source
+    assert "SourceEyeAtlasReflectanceCalibration" in source
+    assert "EditorData->ClearCoat.Connect(0, Constant(1.0f))" in source
+    assert "EditorData->ClearCoatRoughness.Connect(0, Constant(0.04f))" in source
+    assert "BuildProductionCC0EyeMaterial();" in source
     assert "Material->SetMaterialUsage(MATUSAGE_SkeletalMesh)" in source
     assert "MicroUv->UTiling = 36.0f" in source
     assert "MicroUv->VTiling = 36.0f" in source
@@ -341,6 +407,12 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "bSafetyGearOrPaddleOverlay || bBodyGapOverlay" in host
     assert "actor.activate_cc0_fallback_for_validation()" in capture
     assert "runtime_exclusive_cc0_body_ownership" in capture
+    assert '"face": (' in capture
+    assert "get_solved_face_forward_world_vector()" in capture
+    assert "runtime_eye_materials" in capture
+    assert '"M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"' in capture
+    assert "origin.z + extent.z * 0.45" in capture
+    assert "Rendered eye/head anchor fell below the upper body" in capture
     assert "ResolveProductionHeadFit(" in host
     assert "CC0Visual->GetSolvedHeadWorldLocation()" in host
     assert "CC0Visual->GetSolvedFaceForwardWorldVector()" in host
@@ -349,6 +421,10 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "HeadTransform.TransformPosition(LocalEyeCenterCm / BodyScale)" in adapter
     assert "HeadTransform.GetRotation().RotateVector(-FVector::UpVector)" in adapter
     assert "HeadTransform.GetRotation().RotateVector(-FVector::YAxisVector)" in adapter
+    assert "CacheRenderedFaceAnchorVertices()" in adapter
+    assert "Section.MaterialIndex != EyeMaterialIndex" in adapter
+    assert "USkinnedMeshComponent::GetSkinnedVertexPosition(" in adapter
+    assert "ComponentCenter /= RenderedFaceAnchorVertexIndices.Num()" in adapter
     assert "BuildUnitSeatedPelvisMesh(" in host
     assert "full waist-to-glute-to-thigh bridge" in host
     assert "kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f)" in host
@@ -377,6 +453,11 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert 'TEXT("Manny fallback is absent with packaged CC0 bodies")' in automation
     assert 'TEXT("five rigged crew bodies spawned")' in automation
     assert 'TEXT("RaftSimForceCC0Review")' in automation
+    assert "MSM_ClearCoat" in automation
+    assert 'TEXT("CC0 eyes use a corneal clear-coat shading layer")' in automation
+    assert 'TEXT("CC0 helper-eye shell retains reviewed outward winding")' in automation
+    assert 'TEXT("%s %s detail is paired to head-dominant facial Skin")' in automation
+    assert "P95ReferenceSeparationCm <= 1.25f" in automation
     assert "It->HasExclusiveCC0BodyOwnership()" in automation
     assert "It->GetProceduralBodyPartCount() >= 28" in automation
     assert "It->HasVisibleShoulderSilhouette()" in automation
@@ -683,8 +764,12 @@ def test_cc0_skin_reflectance_review_is_hash_verified_and_fail_closed() -> None:
     for asset_relpath, expected_hash in review["material_assets_sha256"].items():
         assert _sha256(REPO_ROOT / asset_relpath) == expected_hash
 
-    for source_relpath, expected_hash in review["implementation_sha256"].items():
-        assert _sha256(REPO_ROOT / source_relpath) == expected_hash
+    # This is immutable evidence for the superseded reflectance milestone. Its
+    # implementation hashes describe that historical candidate; later source
+    # repairs intentionally change those files without rewriting the record.
+    for source_relpath, historical_hash in review["implementation_sha256"].items():
+        assert (REPO_ROOT / source_relpath).is_file()
+        assert len(historical_hash) == 64
 
     m5 = review["validation"]["m5"]
     m5_report = REPO_ROOT / m5["report"]
@@ -694,3 +779,70 @@ def test_cc0_skin_reflectance_review_is_hash_verified_and_fail_closed() -> None:
     assert m5_payload["succeededWithWarnings"] == m5["succeeded_with_warnings"]
     assert m5_payload["failed"] == 0
     assert sum(test["state"] == "Success" for test in m5_payload["tests"]) == 5
+
+
+def test_cc0_eye_reference_pose_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(EYE_REFERENCE_POSE_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert review["schema"] == "raftsim.m9.cc0_eye_reference_pose_review.v1"
+    assert review["passed"] is False
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["human_approved"] is False
+    assert review["promotion_allowed"] is False
+    assert review["implementation"]["raw_and_evaluated_reference_geometry_agree"] is True
+    assert review["implementation"]["synthetic_head_rotation_degrees"] == 58.0
+    assert review["implementation"]["gameplay_physics_changed"] is False
+    assert review["source_validation"]["all_five_passed"] is True
+    assert review["source_validation"]["validator_schema_version"] == 2
+    assert review["reviewers"]["named_character_art_reviewer"] is None
+    assert review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
+    assert len(review["required_external_acceptance_gates"]) == 3
+
+    for item in review["source_validation"]["reports"].values():
+        report_path = REPO_ROOT / item["path"]
+        assert _sha256(report_path) == item["sha256"]
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert report["schema_version"] == 2
+        assert report["status"] == "passed"
+        assert report["failures"] == []
+
+    imported = review["unreal_import"]
+    assert imported["status"] == "imported"
+    assert imported["character_count"] == 5
+    assert imported["lod_count_each"] == 3
+    assert _sha256(REPO_ROOT / imported["report"]) == imported["report_sha256"]
+
+    automation = review["native_automation"]
+    assert automation["failed"] == 0
+    assert automation["succeeded"] + automation["succeeded_with_warnings"] == 5
+    assert automation["maximum_measured_eye_p95_cm"] <= automation[
+        "eye_brow_reference_p95_limit_cm"
+    ]
+    assert automation["maximum_measured_brow_p95_cm"] <= automation[
+        "eye_brow_reference_p95_limit_cm"
+    ]
+    assert _sha256(REPO_ROOT / automation["report"]) == automation["report_sha256"]
+
+    runtime = review["runtime_roster"]
+    assert runtime["status"] == "capture_complete"
+    assert runtime["captured_character_count"] == 5
+    assert runtime["exclusive_cc0_body_count"] == 5
+    assert runtime["all_solved_heads_above_upper_body_threshold"] is True
+    assert runtime["maximum_helmet_head_error_cm"] <= 1.0
+    assert runtime["minimum_helmet_forward_alignment"] >= 0.98
+    assert _sha256(REPO_ROOT / runtime["report"]) == runtime["report_sha256"]
+
+    roster = json.loads((REPO_ROOT / runtime["report"]).read_text(encoding="utf-8"))
+    captures_dir = REPO_ROOT / runtime["captures_directory"]
+    for character in roster["characters"]:
+        assert character["runtime_solved_head_cm"][2] >= character[
+            "runtime_solved_head_minimum_z_cm"
+        ]
+        for item in character["captures"].values():
+            capture = captures_dir / Path(item["path"]).name
+            assert _sha256(capture) == item["sha256"]
+
+    for asset_relpath, expected_hash in review["asset_sha256"].items():
+        assert _sha256(REPO_ROOT / asset_relpath) == expected_hash
+    for source_relpath, expected_hash in review["implementation_sha256"].items():
+        assert _sha256(REPO_ROOT / source_relpath) == expected_hash

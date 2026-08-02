@@ -2624,6 +2624,40 @@ qualified whitewater-safety approval remain open, so M9 and photoreal promotion 
 Exact captures, measurements, asset/source hashes, and validation are recorded in
 `docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1_review.json`.
 
+## CC0 eye reference pose and rendered helmet anchor V1 — attachment fixed, photoreal review rejected
+
+The previous fallback render exposed a source/export mismatch: Blender displayed eyes and
+brows after a non-identity Armature deformation, while Unreal populated its reference vertex
+buffers from the unbaked raw mesh. The apparent Blender attachment therefore hid detached
+raw facial sections and produced closed-looking or missing eyes after import.
+
+V1 bakes the evaluated shape and one Armature deformation into each joined body, promotes
+the displayed armature pose to rest, and restores exactly one clean modifier before export.
+The validator now checks raw and evaluated reference geometry, stable Skin pairing, and a
+58° synthetic head rotation. All five checked-in FBXs pass. The Unreal quality gate measures
+maximum p95 separation of 0.368 cm for eyes and 1.120 cm for brows against a 1.25 cm limit.
+
+![Guide repaired eye and helmet close-up](../environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1/captures/raftsim_cc0_guide_face.png)
+
+![Crew 02 repaired eye and helmet close-up](../environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1/captures/raftsim_cc0_crew02_face.png)
+
+![Crew 04 repaired eye and helmet full-body view](../environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1/captures/raftsim_cc0_crew04_full.png)
+
+Runtime helmet fitting now averages the actually rendered Eye-section vertices after live
+skinning. Bounded identity offsets seat all five shells on the head; the fixed harness rejects
+any solved anchor below the upper body. Twenty fixed views complete with exclusive CC0 body
+ownership, production PFD/helmet/boots, 1.0 helmet forward alignment, and 0.96 fit scale. The
+Unreal editor target builds, 12 focused Python contracts pass, and renderer-backed M5 reports
+five completed tests with zero failures and the existing motion-vector warning.
+
+This closes eye/brow detachment and the resulting off-head helmet regression as technical
+defects. It does not accept the fallback as photoreal: anatomy and expression remain
+simplified; garment, arm, hand, paddle, and PPE intersections remain visible; and material
+response is still synthetic. Named character-art review, qualified whitewater-safety review,
+and product-owner release-media approval remain required. Exact hashes and the fail-closed
+verdict are in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json`.
+
 ## Required named decisions
 
 - [ ] Product owner: campaign, scope, disclosures, and every deferred/blocking item.

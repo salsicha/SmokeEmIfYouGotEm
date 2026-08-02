@@ -3949,3 +3949,20 @@ path is verified, and the completion goal can be marked complete.
   qualified whitewater-safety approval. No identity geometry, rig, animation,
   gameplay, water, raft force, collision, rescue, scoring, or progression
   authority changed.
+- CC0 eye reference-pose and rendered helmet-anchor V1 removes the remaining
+  detached facial-detail defect from the packaged fallback. All five checked-in
+  FBXs now bake their evaluated shape and Armature deformation into raw mesh
+  geometry, promote the displayed armature pose to rest, and restore exactly one
+  clean Armature modifier. The schema-v2 validator passes raw reference,
+  evaluated reference, paired facial Skin, and 58° synthetic-head checks for
+  every identity. Fresh Unreal mesh/skeleton pairs retain three LODs, and the
+  native M5 gate measures maximum eye/brow p95 reference separations of 0.368 cm
+  and 1.120 cm against a 1.25 cm limit. Helmet fitting now averages the live
+  rendered Eye material vertices instead of a stale nearest-Skin sample and uses
+  bounded identity offsets; 20/20 fixed roster views complete with every solved
+  head above the upper-body fail-closed threshold. The editor build, 12 focused
+  contracts, five Blender validations, renderer capture, and all five M5 tests
+  pass. The eye/helmet transform defects are technically closed; simplified
+  anatomy and expression, garment/arm/hand/PPE intersections, materials, and
+  missing named character-art, qualified whitewater-safety, and product-owner
+  approval keep M9 and photoreal release promotion open.

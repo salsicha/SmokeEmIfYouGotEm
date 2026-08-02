@@ -1,0 +1,239 @@
+{
+  "schema": "raftsim.unreal.cc0_character_import.v1",
+  "destination": "/Game/RaftSim/Characters/Production/CC0",
+  "status": "imported",
+  "verified_sources": [
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Atlases/brownlight_eye.png",
+      "sha256": "3f43a4de70e446186dac1760cfa01dfe36d530ed7564208455395b0ebcdf788a",
+      "bytes": 680577
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Atlases/young_darkskinned_female_diffuse.png",
+      "sha256": "96aa4a96b247fc90d371587bb88e6ae3bfc77e83f5126f17e6bbb713aa200470",
+      "bytes": 4427634
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Atlases/young_darkskinned_male_diffuse.png",
+      "sha256": "e3f0dbb634e4c68561338f0087f7a122444e84ec56df102212f1222aa12e4d50",
+      "bytes": 2976491
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Atlases/young_lightskinned_female_diffuse.png",
+      "sha256": "b2a6ac8cd4f9febdb447368e29c76cd68410bb66e46d9dcfa2d5f75126eea8fc",
+      "bytes": 4391156
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Atlases/young_lightskinned_male_diffuse.png",
+      "sha256": "862a26e335e958b70534cb5f0d7c47ef30ab148a56c42b3e9da969cf76f12963",
+      "bytes": 3693828
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Atlases/young_lightskinned_male_diffuse3.png",
+      "sha256": "f50016a5507fc687dc8df06599c8ea48de950cd185de33a71cafc1319ddab4d5",
+      "bytes": 3593099
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Hair/Hair02/elvs_grump_hair/elvs_grumphair.png",
+      "sha256": "2fb446705b13298d5c55c38a6a4dcb089c440c1b00ccab91ddd05dee26aba83a",
+      "bytes": 3550135
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Hair/Hair02/elvs_braided_rows/mh_cornrowstex1.png",
+      "sha256": "f23aea7a2b04c1030319fc6fb5e39f0d9c588d23d6f604526551a4975af3fe8f",
+      "bytes": 886174
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Hair/Hair02/elvs_braided_rows/normals.png",
+      "sha256": "c166083c581905a4297bb74ee2e6de621c699b488234b69209acbf962e506ac0",
+      "bytes": 1391147
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/Hair/Hair02/elvs_short_side_do/darkmaggiehair.png",
+      "sha256": "230bebbe9c1ce436ebd210cee4c41c470db9d1c58e4d22aabd7c22dc9dd11d72",
+      "bytes": 789755
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/FBX/RaftSim_CC0_Guide.fbx",
+      "sha256": "49506857a5f208ab8a6f911931ee7dbfd72fc589f6bfd6ee6f4673a3d65a3f2f",
+      "bytes": 1451052
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/FBX/RaftSim_CC0_Crew01.fbx",
+      "sha256": "41e2ac4217928d64196a17a2dbc00a7f2b2695b6e2ea76fb987bc84e148cc395",
+      "bytes": 2159516
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/FBX/RaftSim_CC0_Crew02.fbx",
+      "sha256": "ca863f7456086d8dd2569226ed978bb27a29a67ae284eecd99e0ccf28a159f8e",
+      "bytes": 1450492
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/FBX/RaftSim_CC0_Crew03.fbx",
+      "sha256": "17dfba3ba51deb1bcdb3cc8f494bd4f107aae1b9b0789975a01b30a6e0bd6e07",
+      "bytes": 3980620
+    },
+    {
+      "file": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/FBX/RaftSim_CC0_Crew04.fbx",
+      "sha256": "2891732c837ed38c0d9e2f566e422c993b414766773e2f92d4cca0f812a2e4ee",
+      "bytes": 2158828
+    }
+  ],
+  "characters": [
+    {
+      "variant": "Guide",
+      "asset": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Guide.SK_RaftSim_CC0_Guide",
+      "skeleton": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Guide_Skeleton.SK_RaftSim_CC0_Guide_Skeleton",
+      "reference_skeleton": "reference head=166.538cm",
+      "imported_height_cm": 184.88720439421013,
+      "fbx_import_uniform_scale": 100.0,
+      "lod_count": 3,
+      "material_slots": [
+        {
+          "slot": "RaftSim_CC0_Guide_Skin",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Guide_Skin.M_RaftSim_CC0_Guide_Skin"
+        },
+        {
+          "slot": "RaftSim_CC0_Guide_Wetsuit",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit.M_RaftSim_CC0_Wetsuit"
+        },
+        {
+          "slot": "RaftSim_CC0_Guide_Hair",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_HelmetContainedHairHidden.M_RaftSim_CC0_HelmetContainedHairHidden"
+        },
+        {
+          "slot": "RaftSim_CC0_Guide_Eyes",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+        },
+        {
+          "slot": "RaftSim_CC0_Guide_Brows",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows.M_RaftSim_CC0_Brows"
+        }
+      ]
+    },
+    {
+      "variant": "Crew01",
+      "asset": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew01.SK_RaftSim_CC0_Crew01",
+      "skeleton": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew01_Skeleton.SK_RaftSim_CC0_Crew01_Skeleton",
+      "reference_skeleton": "reference head=162.518cm",
+      "imported_height_cm": 178.89379815757275,
+      "fbx_import_uniform_scale": 100.0,
+      "lod_count": 3,
+      "material_slots": [
+        {
+          "slot": "RaftSim_CC0_Crew01_Skin",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew01_Skin.M_RaftSim_CC0_Crew01_Skin"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew01_Wetsuit",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit.M_RaftSim_CC0_Wetsuit"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew01_Hair",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_HelmetContainedHairHidden.M_RaftSim_CC0_HelmetContainedHairHidden"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew01_Eyes",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew01_Brows",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows.M_RaftSim_CC0_Brows"
+        }
+      ]
+    },
+    {
+      "variant": "Crew02",
+      "asset": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew02.SK_RaftSim_CC0_Crew02",
+      "skeleton": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew02_Skeleton.SK_RaftSim_CC0_Crew02_Skeleton",
+      "reference_skeleton": "reference head=145.008cm",
+      "imported_height_cm": 162.43613155186176,
+      "fbx_import_uniform_scale": 100.0,
+      "lod_count": 3,
+      "material_slots": [
+        {
+          "slot": "RaftSim_CC0_Crew02_Skin",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew02_Skin.M_RaftSim_CC0_Crew02_Skin"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew02_Wetsuit",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit.M_RaftSim_CC0_Wetsuit"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew02_Hair",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_HelmetContainedHairHidden.M_RaftSim_CC0_HelmetContainedHairHidden"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew02_Eyes",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew02_Brows",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows.M_RaftSim_CC0_Brows"
+        }
+      ]
+    },
+    {
+      "variant": "Crew03",
+      "asset": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew03.SK_RaftSim_CC0_Crew03",
+      "skeleton": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew03_Skeleton.SK_RaftSim_CC0_Crew03_Skeleton",
+      "reference_skeleton": "reference head=147.955cm",
+      "imported_height_cm": 163.7857847213745,
+      "fbx_import_uniform_scale": 100.0,
+      "lod_count": 3,
+      "material_slots": [
+        {
+          "slot": "RaftSim_CC0_Crew03_Skin",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew03_Skin.M_RaftSim_CC0_Crew03_Skin"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew03_Wetsuit",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit.M_RaftSim_CC0_Wetsuit"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew03_Hair",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_HelmetContainedHairHidden.M_RaftSim_CC0_HelmetContainedHairHidden"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew03_Eyes",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew03_Brows",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows.M_RaftSim_CC0_Brows"
+        }
+      ]
+    },
+    {
+      "variant": "Crew04",
+      "asset": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew04.SK_RaftSim_CC0_Crew04",
+      "skeleton": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew04_Skeleton.SK_RaftSim_CC0_Crew04_Skeleton",
+      "reference_skeleton": "reference head=153.038cm",
+      "imported_height_cm": 169.76271653175354,
+      "fbx_import_uniform_scale": 100.0,
+      "lod_count": 3,
+      "material_slots": [
+        {
+          "slot": "RaftSim_CC0_Crew04_Skin",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew04_Skin.M_RaftSim_CC0_Crew04_Skin"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew04_Wetsuit",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit.M_RaftSim_CC0_Wetsuit"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew04_Hair",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_HelmetContainedHairHidden.M_RaftSim_CC0_HelmetContainedHairHidden"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew04_Eyes",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+        },
+        {
+          "slot": "RaftSim_CC0_Crew04_Brows",
+          "material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows.M_RaftSim_CC0_Brows"
+        }
+      ]
+    }
+  ]
+}

@@ -140,6 +140,46 @@ def _rigid_bind_helmet_head_island(mesh: bpy.types.Object) -> dict[str, int]:
     }
 
 
+def _bake_evaluated_mesh_and_pose_as_reference(
+    mesh: bpy.types.Object, rig: bpy.types.Object
+) -> None:
+    """Make raw mesh vertices and armature rest matrices agree.
+
+    MPFB's export copy can carry a non-identity default armature pose. Blender
+    evaluates that pose before display, so facial detail appears attached even
+    when the raw Skin vertices are several centimetres away. Unreal builds its
+    reference vertex buffer from the raw positions and therefore exposes the
+    mismatch. Bake the evaluated mesh once, promote the current pose to the
+    armature rest pose, then restore one clean Armature modifier.
+    """
+    armature_modifiers = [
+        modifier for modifier in mesh.modifiers
+        if modifier.type == "ARMATURE" and modifier.object == rig
+    ]
+    if len(armature_modifiers) != 1:
+        raise RuntimeError(
+            f"Expected one {rig.name} Armature modifier on {mesh.name}; "
+            f"found {[modifier.name for modifier in armature_modifiers]}"
+        )
+    bpy.ops.object.select_all(action="DESELECT")
+    mesh.select_set(True)
+    bpy.context.view_layer.objects.active = mesh
+    if mesh.data.shape_keys is not None:
+        bpy.ops.object.shape_key_remove(all=True, apply_mix=True)
+    bpy.ops.object.modifier_apply(modifier=armature_modifiers[0].name)
+
+    bpy.ops.object.select_all(action="DESELECT")
+    rig.select_set(True)
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.object.mode_set(mode="POSE")
+    bpy.ops.pose.armature_apply(selected=False)
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    modifier = mesh.modifiers.new("Armature", "ARMATURE")
+    modifier.object = rig
+    bpy.context.view_layer.update()
+
+
 def main() -> None:
     args = _arguments()
     input_path = Path(args.input).resolve()
@@ -159,18 +199,14 @@ def main() -> None:
     body = meshes[0]
     rig = rigs[0]
     island_counts = _rigid_bind_helmet_head_island(body)
+    _bake_evaluated_mesh_and_pose_as_reference(body, rig)
 
-    # Blender's FBX importer expresses a centimeter-authored file as
-    # centimeter-valued mesh/rest data under 0.01 object scales. Re-exporting
-    # those transforms verbatim applies the centimeter conversion twice and
-    # Unreal receives a 1.8 cm character. Restore the generator's pre-export
-    # state: centimeter-valued data, unit object scales, and a scene whose
-    # declared unit is one centimeter.
-    body.scale = (1.0, 1.0, 1.0)
-    rig.scale = (1.0, 1.0, 1.0)
+    # The production FBXs keep their MPFB mesh/rest data in meters and encode
+    # that unit once in FBX metadata. Preserve this standards-based state so
+    # skin inverse-bind matrices and facial-detail placement remain coherent.
     bpy.context.scene.unit_settings.system = "METRIC"
-    bpy.context.scene.unit_settings.length_unit = "CENTIMETERS"
-    bpy.context.scene.unit_settings.scale_length = 0.01
+    bpy.context.scene.unit_settings.length_unit = "METERS"
+    bpy.context.scene.unit_settings.scale_length = 1.0
 
     bpy.ops.object.select_all(action="DESELECT")
     rig.select_set(True)
@@ -186,6 +222,7 @@ def main() -> None:
         axis_forward="-Y",
         axis_up="Z",
         add_leaf_bones=False,
+        use_mesh_modifiers=True,
         use_armature_deform_only=True,
         bake_anim=False,
         path_mode="COPY",
@@ -201,7 +238,7 @@ def main() -> None:
         f"eye_brow_vertices={island_counts['eye_brow']}",
         f"head_island_vertices={island_counts['total']}",
         f"bones={len(rig.data.bones)}",
-        "unit_scale=centimeter",
+        "fbx_source_unit=meter",
     )
 
 

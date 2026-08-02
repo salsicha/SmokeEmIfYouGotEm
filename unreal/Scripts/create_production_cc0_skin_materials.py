@@ -1,4 +1,4 @@
-"""Regenerate only the five rights-tracked production CC0 skin materials."""
+"""Regenerate the rights-tracked CC0 skin and shared corneal eye materials."""
 
 import unreal
 

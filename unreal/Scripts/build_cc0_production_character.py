@@ -20,7 +20,7 @@ from pathlib import Path
 import sys
 
 import bpy
-from mathutils import Matrix, Vector
+from mathutils import Vector
 
 
 def _arguments() -> argparse.Namespace:
@@ -400,6 +400,38 @@ def _render_preview(body: bpy.types.Object, output_path: Path, size: int) -> Non
     bpy.ops.render.render(write_still=True)
 
 
+def _bake_evaluated_mesh_and_pose_as_reference(
+    mesh: bpy.types.Object, rig: bpy.types.Object
+) -> None:
+    """Align raw reference vertices with the evaluated MPFB default pose."""
+    armature_modifiers = [
+        modifier for modifier in mesh.modifiers
+        if modifier.type == "ARMATURE" and modifier.object == rig
+    ]
+    if len(armature_modifiers) != 1:
+        raise RuntimeError(
+            f"Expected one {rig.name} Armature modifier on {mesh.name}; "
+            f"found {[modifier.name for modifier in armature_modifiers]}"
+        )
+    bpy.ops.object.select_all(action="DESELECT")
+    mesh.select_set(True)
+    bpy.context.view_layer.objects.active = mesh
+    if mesh.data.shape_keys is not None:
+        bpy.ops.object.shape_key_remove(all=True, apply_mix=True)
+    bpy.ops.object.modifier_apply(modifier=armature_modifiers[0].name)
+
+    bpy.ops.object.select_all(action="DESELECT")
+    rig.select_set(True)
+    bpy.context.view_layer.objects.active = rig
+    bpy.ops.object.mode_set(mode="POSE")
+    bpy.ops.pose.armature_apply(selected=False)
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    modifier = mesh.modifiers.new("Armature", "ARMATURE")
+    modifier.object = rig
+    bpy.context.view_layer.update()
+
+
 def _export_fbx(rig: bpy.types.Object, meshes: list[bpy.types.Object], output_path: Path) -> None:
     # Join the separately reviewed eye/brow surfaces into the weighted body.
     # Leaving them as sibling mesh nodes makes some FBX importers promote the
@@ -410,17 +442,15 @@ def _export_fbx(rig: bpy.types.Object, meshes: list[bpy.types.Object], output_pa
         obj.select_set(True)
     bpy.context.view_layer.objects.active = body
     bpy.ops.object.join()
+    _bake_evaluated_mesh_and_pose_as_reference(body, rig)
 
-    # MPFB is authored in meters. Scale both vertices and rest bones—not just
-    # the FBX root transform—so skinning and component-space procedural poses
-    # share Unreal's centimeter coordinates.
-    meters_to_centimeters = Matrix.Scale(100.0, 4)
-    body.data.transform(meters_to_centimeters)
-    body.data.update()
-    rig.data.transform(meters_to_centimeters)
+    # MPFB is authored in meters. Keep mesh and rest-bone data in their native
+    # unit and let FBX declare/convert the scene unit once. Manually scaling
+    # both datablocks before FBX export corrupts the inverse bind matrices for
+    # the joined facial-detail sections.
     bpy.context.scene.unit_settings.system = "METRIC"
-    bpy.context.scene.unit_settings.length_unit = "CENTIMETERS"
-    bpy.context.scene.unit_settings.scale_length = 0.01
+    bpy.context.scene.unit_settings.length_unit = "METERS"
+    bpy.context.scene.unit_settings.scale_length = 1.0
 
     bpy.ops.object.select_all(action="DESELECT")
     rig.select_set(True)
@@ -436,6 +466,7 @@ def _export_fbx(rig: bpy.types.Object, meshes: list[bpy.types.Object], output_pa
         axis_forward="-Y",
         axis_up="Z",
         add_leaf_bones=False,
+        use_mesh_modifiers=True,
         use_armature_deform_only=True,
         bake_anim=False,
         path_mode="COPY",

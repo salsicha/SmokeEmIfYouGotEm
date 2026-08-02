@@ -227,6 +227,25 @@ def main() -> None:
                 )
 
             unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+            selected_mesh = unreal.load_asset(visual_actor.get_selected_mesh_path())
+            if not isinstance(selected_mesh, unreal.SkeletalMesh):
+                raise RuntimeError(f"Selected CC0 mesh is unavailable: {character_name}")
+            eye_material_paths = []
+            for slot in selected_mesh.get_editor_property("materials"):
+                slot_name = str(slot.get_editor_property("material_slot_name"))
+                material = slot.get_editor_property("material_interface")
+                if "eye" in slot_name.lower() and material is not None:
+                    eye_material_paths.append(material.get_path_name())
+            expected_eye_material = (
+                "/Game/RaftSim/Characters/Production/CC0/Materials/"
+                "M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+            )
+            if eye_material_paths != [expected_eye_material]:
+                raise RuntimeError(
+                    f"Unexpected eye material binding for {character_name}: "
+                    f"{eye_material_paths}"
+                )
+
             origin, extent = actor.get_actor_bounds(False, False)
             if not finite_vector(origin) or not finite_vector(extent) or extent.z < 45.0:
                 raise RuntimeError(
@@ -234,15 +253,39 @@ def main() -> None:
                 )
             stem = character_name.lower()
             target_point = unreal.Vector(origin.x, origin.y, 92.0)
+            solved_head = visual_actor.get_solved_head_world_location()
+            face_forward = visual_actor.get_solved_face_forward_world_vector()
+            face_up = visual_actor.get_solved_face_up_world_vector()
+            minimum_solved_head_z = origin.z + extent.z * 0.45
+            if solved_head.z < minimum_solved_head_z:
+                raise RuntimeError(
+                    f"Rendered eye/head anchor fell below the upper body for "
+                    f"{character_name}: z={solved_head.z:.3f}cm, "
+                    f"minimum={minimum_solved_head_z:.3f}cm"
+                )
+            face_target = unreal.Vector(origin.x, origin.y, 92.0)
             views = {
-                "full": unreal.Vector(origin.x + 430.0, origin.y, 104.0),
-                "profile": unreal.Vector(origin.x, origin.y + 430.0, 104.0),
-                "rear": unreal.Vector(origin.x - 430.0, origin.y, 104.0),
+                "full": (
+                    unreal.Vector(origin.x + 430.0, origin.y, 104.0),
+                    target_point,
+                ),
+                "profile": (
+                    unreal.Vector(origin.x, origin.y + 430.0, 104.0),
+                    target_point,
+                ),
+                "rear": (
+                    unreal.Vector(origin.x - 430.0, origin.y, 104.0),
+                    target_point,
+                ),
+                "face": (
+                    unreal.Vector(origin.x, origin.y + 115.0, 95.2),
+                    face_target,
+                ),
             }
             captures: dict[str, object] = {}
-            for view_name, location in views.items():
+            for view_name, (location, view_target) in views.items():
                 capture.set_actor_location(location, False, False)
-                capture.set_actor_rotation(look_at(location, target_point), False)
+                capture.set_actor_rotation(look_at(location, view_target), False)
                 path = export_capture(
                     world, capture_component, render_target, f"{stem}_{view_name}"
                 )
@@ -278,6 +321,11 @@ def main() -> None:
                     "guide": is_guide,
                     "variant_index": variant_index,
                     "selected_mesh": visual_actor.get_selected_mesh_path(),
+                    "runtime_eye_materials": eye_material_paths,
+                    "runtime_solved_head_cm": vector_values(solved_head),
+                    "runtime_solved_head_minimum_z_cm": minimum_solved_head_z,
+                    "runtime_face_forward": vector_values(face_forward),
+                    "runtime_face_up": vector_values(face_up),
                     "runtime_exclusive_cc0_body_ownership": (
                         actor.has_exclusive_cc0_body_ownership()
                     ),

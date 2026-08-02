@@ -1,0 +1,388 @@
+{
+  "body_bounds_max": [
+    0.51068705,
+    0.09800724,
+    1.62462437
+  ],
+  "body_bounds_min": [
+    -0.51068735,
+    -0.3228536,
+    0.00026344
+  ],
+  "failures": [],
+  "head_skin_vertices": 4375,
+  "input": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/SourceArt/RaftSim/Characters/CC0Production/FBX/RaftSim_CC0_Crew02.fbx",
+  "limits": {
+    "brows": {
+      "centroid": 0.02,
+      "median": 0.01,
+      "p95": 0.015
+    },
+    "eyes": {
+      "centroid": 0.02,
+      "median": 0.01,
+      "p95": 0.015
+    },
+    "hair": {
+      "centroid": 0.05,
+      "median": 0.025,
+      "p95": 0.055
+    }
+  },
+  "mesh": "RaftSim_CC0_Crew02_Body",
+  "mesh_transform": {
+    "location": [
+      2e-08,
+      1e-08,
+      0.0
+    ],
+    "matrix_world": [
+      [
+        0.99999994,
+        1.5e-07,
+        0.0,
+        0.0
+      ],
+      [
+        -1.5e-07,
+        1.0,
+        -0.0,
+        -1e-08
+      ],
+      [
+        2e-08,
+        -1e-08,
+        0.99999988,
+        -1e-08
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "rotation_euler": [
+      -0.0,
+      1e-08,
+      -0.0
+    ],
+    "scale": [
+      1.0,
+      1.00000012,
+      1.0
+    ]
+  },
+  "normalization_extent": 1.62436092,
+  "paired_reference_skin": {
+    "brows": {
+      "maximum_normalized": 0.00776712,
+      "median_normalized": 0.00377429,
+      "p95_normalized": 0.00686774,
+      "vertices": 400
+    },
+    "eyes": {
+      "maximum_normalized": 0.00199672,
+      "median_normalized": 0.00114531,
+      "p95_normalized": 0.00172931,
+      "vertices": 144
+    },
+    "hair": {
+      "maximum_normalized": 0.02512836,
+      "median_normalized": 0.00927495,
+      "p95_normalized": 0.01549199,
+      "vertices": 9522
+    }
+  },
+  "raw_reference_sections": {
+    "brows": {
+      "bounds_max": [
+        0.0463331,
+        -0.13822037,
+        1.51716065
+      ],
+      "bounds_min": [
+        -0.04633314,
+        -0.14353336,
+        1.50892723
+      ],
+      "centroid": [
+        -1e-08,
+        -0.14121723,
+        1.51358879
+      ],
+      "nearest_head_skin_normalized": {
+        "centroid": 0.00238454,
+        "maximum": 0.00776712,
+        "median": 0.00377429,
+        "p95": 0.00686774
+      },
+      "vertices": 400
+    },
+    "eyes": {
+      "bounds_max": [
+        0.04329889,
+        -0.10127755,
+        1.5037111
+      ],
+      "bounds_min": [
+        -0.04329892,
+        -0.13085927,
+        1.47706282
+      ],
+      "centroid": [
+        -1e-08,
+        -0.11614254,
+        1.49051106
+      ],
+      "nearest_head_skin_normalized": {
+        "centroid": 0.00929168,
+        "maximum": 0.00199672,
+        "median": 0.00114531,
+        "p95": 0.00172931
+      },
+      "vertices": 144
+    },
+    "hair": {
+      "bounds_max": [
+        0.08794099,
+        0.07085553,
+        1.62462449
+      ],
+      "bounds_min": [
+        -0.08835886,
+        -0.16398533,
+        1.3991518
+      ],
+      "centroid": [
+        -0.00982955,
+        -0.03002902,
+        1.54118872
+      ],
+      "nearest_head_skin_normalized": {
+        "centroid": 0.03189724,
+        "maximum": 0.02512837,
+        "median": 0.00927495,
+        "p95": 0.01549199
+      },
+      "vertices": 9522
+    }
+  },
+  "rig_transform": {
+    "location": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "matrix_world": [
+      [
+        1.0,
+        1.5e-07,
+        0.0,
+        0.0
+      ],
+      [
+        -1.5e-07,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "rotation_euler": [
+      0.0,
+      0.0,
+      -1.5e-07
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "schema_version": 2,
+  "sections": {
+    "brows": {
+      "bounds_max": [
+        0.0463331,
+        -0.13822024,
+        1.51716053
+      ],
+      "bounds_min": [
+        -0.04633314,
+        -0.14353323,
+        1.50892711
+      ],
+      "centroid": [
+        -1e-08,
+        -0.1412171,
+        1.51358879
+      ],
+      "nearest_head_skin_normalized": {
+        "centroid": 0.00238448,
+        "maximum": 0.00776712,
+        "median": 0.00377429,
+        "p95": 0.00686774
+      },
+      "vertices": 400
+    },
+    "eyes": {
+      "bounds_max": [
+        0.04329888,
+        -0.10127743,
+        1.50371099
+      ],
+      "bounds_min": [
+        -0.04329891,
+        -0.13085914,
+        1.4770627
+      ],
+      "centroid": [
+        -1e-08,
+        -0.11614241,
+        1.4905107
+      ],
+      "nearest_head_skin_normalized": {
+        "centroid": 0.00929167,
+        "maximum": 0.00199672,
+        "median": 0.00114531,
+        "p95": 0.00172931
+      },
+      "vertices": 144
+    },
+    "hair": {
+      "bounds_max": [
+        0.08794098,
+        0.07085557,
+        1.62462437
+      ],
+      "bounds_min": [
+        -0.08835886,
+        -0.16398519,
+        1.39915168
+      ],
+      "centroid": [
+        -0.00982955,
+        -0.03002894,
+        1.54118836
+      ],
+      "nearest_head_skin_normalized": {
+        "centroid": 0.03189738,
+        "maximum": 0.02512836,
+        "median": 0.00927495,
+        "p95": 0.01549199
+      },
+      "vertices": 9522
+    }
+  },
+  "status": "passed",
+  "synthetic_head_pose": {
+    "head_skin_median_displacement_normalized": 0.05172808,
+    "local_x_rotation_degrees": 58.0,
+    "paired_reference_skin": {
+      "brows": {
+        "maximum_normalized": 0.00776709,
+        "median_normalized": 0.00377429,
+        "p95_normalized": 0.00686777,
+        "vertices": 400
+      },
+      "eyes": {
+        "maximum_normalized": 0.00199669,
+        "median_normalized": 0.00114533,
+        "p95_normalized": 0.00172934,
+        "vertices": 144
+      },
+      "hair": {
+        "maximum_normalized": 0.02512827,
+        "median_normalized": 0.00927497,
+        "p95_normalized": 0.01549199,
+        "vertices": 9522
+      }
+    },
+    "sections": {
+      "brows": {
+        "bounds_max": [
+          0.0463331,
+          -0.14503621,
+          1.4043448
+        ],
+        "bounds_min": [
+          -0.04633314,
+          -0.15348947,
+          1.39985311
+        ],
+        "centroid": [
+          -1e-08,
+          -0.14990798,
+          1.40225279
+        ],
+        "nearest_head_skin_normalized": {
+          "centroid": 0.0023847,
+          "maximum": 0.00776709,
+          "median": 0.00377429,
+          "p95": 0.00686777
+        },
+        "vertices": 400
+      },
+      "eyes": {
+        "bounds_max": [
+          0.04329888,
+          -0.10345971,
+          1.42570937
+        ],
+        "bounds_min": [
+          -0.04329891,
+          -0.13052881,
+          1.39684832
+        ],
+        "centroid": [
+          -1e-08,
+          -0.1170496,
+          1.4112879
+        ],
+        "nearest_head_skin_normalized": {
+          "centroid": 0.00929167,
+          "maximum": 0.00199669,
+          "median": 0.00114533,
+          "p95": 0.00172934
+        },
+        "vertices": 144
+      },
+      "hair": {
+        "bounds_max": [
+          0.08794098,
+          0.03903377,
+          1.59103477
+        ],
+        "bounds_min": [
+          -0.08835887,
+          -0.21342945,
+          1.39184511
+        ],
+        "centroid": [
+          -0.00982956,
+          -0.1143915,
+          1.51117158
+        ],
+        "nearest_head_skin_normalized": {
+          "centroid": 0.03189798,
+          "maximum": 0.02512827,
+          "median": 0.00927497,
+          "p95": 0.01549199
+        },
+        "vertices": 9522
+      }
+    }
+  }
+}
