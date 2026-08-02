@@ -308,6 +308,33 @@ def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contract
     )
     assert f'+MapsToCook=(FilePath="{map_package}")' in default_game
 
+    progression_manifest = _load(
+        REPO_ROOT / "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json"
+    )
+    free_run = progression_manifest["game_modes"]["free_run"]
+    assert free_run["runnable_river_count"] == 6
+    runnable_rivers = free_run["runnable_rivers"]
+    assert len(runnable_rivers) == free_run["runnable_river_count"]
+    assert {river["river_id"] for river in runnable_rivers} == {
+        "south_fork_american_chili_bar",
+        "colorado_river_grand_canyon_rowing",
+        "pacuare_river_costa_rica",
+        "futaleufu_river_chile",
+        "chilko_river_lava_canyon",
+        "zambezi_batoka_gorge",
+    }
+    zambezi = next(
+        river
+        for river in runnable_rivers
+        if river["river_id"] == "zambezi_batoka_gorge"
+    )
+    assert zambezi == {
+        "river_id": "zambezi_batoka_gorge",
+        "scenario_id": "zambezi_reference_run",
+        "map_package": map_package,
+        "tier": "reference_free_run",
+    }
+
     frontend_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimUI/Private/"
         "RaftSimVerticalSliceFrontend.cpp"

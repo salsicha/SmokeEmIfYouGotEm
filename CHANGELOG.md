@@ -32,6 +32,11 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Pinned Zambezi in the versioned six-river Free Run progression contract.
+  The manifest now binds `zambezi_batoka_gorge` to
+  `zambezi_reference_run` and `/Game/RaftSim/Maps/L_Zambezi`, while focused
+  Python and native catalog checks prevent the runnable entry from silently
+  falling back to the superseded preview map or disappearing from the menu.
 - Rebased all five packaged CC0 fallback FBXs so their raw reference vertices,
   evaluated Blender geometry, and imported Unreal LOD0 agree. The generator and
   canonicalizer now bake the evaluated shape/armature result and promote the

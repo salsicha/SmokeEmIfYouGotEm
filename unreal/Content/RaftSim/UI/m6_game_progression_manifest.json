@@ -21,7 +21,46 @@
     },
     "free_run": {
       "ignores_career_locks": true,
-      "available_maps": 7
+      "available_maps": 7,
+      "runnable_river_count": 6,
+      "runnable_rivers": [
+        {
+          "river_id": "south_fork_american_chili_bar",
+          "scenario_id": "south_fork_full_descent",
+          "map_package": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+          "tier": "production_campaign"
+        },
+        {
+          "river_id": "colorado_river_grand_canyon_rowing",
+          "scenario_id": "hance_challenge",
+          "map_package": "/Game/RaftSim/Maps/L_Hance",
+          "tier": "signature_rapid_free_run"
+        },
+        {
+          "river_id": "pacuare_river_costa_rica",
+          "scenario_id": "upper_huacas_challenge",
+          "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+          "tier": "signature_rapid_free_run"
+        },
+        {
+          "river_id": "futaleufu_river_chile",
+          "scenario_id": "terminator_challenge",
+          "map_package": "/Game/RaftSim/Maps/L_Terminator",
+          "tier": "signature_rapid_free_run"
+        },
+        {
+          "river_id": "chilko_river_lava_canyon",
+          "scenario_id": "lava_canyon_challenge",
+          "map_package": "/Game/RaftSim/Maps/L_LavaCanyon",
+          "tier": "signature_rapid_free_run"
+        },
+        {
+          "river_id": "zambezi_batoka_gorge",
+          "scenario_id": "zambezi_reference_run",
+          "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+          "tier": "reference_free_run"
+        }
+      ]
     },
     "training_eddy": {
       "measured_drills": [
@@ -56,8 +95,10 @@
   "geography_notice": "South Fork terrain and hydraulics include explicitly labeled deterministic procedural infill and are not for navigation.",
   "source_authority": [
     "docs/game-completion-plan.md",
+    "docs/zambezi-reference-map-and-scenario.md",
     "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/streaming_manifest.json",
     "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "unreal/Content/RaftSim/UI/river_selection_catalog.json",
     "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
     "NOTICE.md",
     "LICENSE-CONTENT.md"

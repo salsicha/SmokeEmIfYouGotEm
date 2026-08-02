@@ -124,8 +124,9 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
 {
     const TArray<FRaftSimCareerScenarioDefinition> Catalog =
         URaftSimProgressionLibrary::GetScenarioCatalog();
-    TestTrue(TEXT("training, campaign, full run, and five bonus slices are catalogued"),
-        Catalog.Num() >= 11);
+    TestTrue(
+        TEXT("training, South Fork campaign, five signature challenges, and Zambezi reference run are catalogued"),
+        Catalog.Num() >= 12);
     TArray<FRaftSimCareerScenarioDefinition> Sections;
     FRaftSimCareerScenarioDefinition FullDescent;
     int32 TrainingCount = 0;
