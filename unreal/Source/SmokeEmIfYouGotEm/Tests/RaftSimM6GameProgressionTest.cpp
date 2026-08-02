@@ -155,8 +155,7 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
     TestEqual(
         TEXT("Zambezi reference run opens the source-scale Batoka Gorge map"),
         Zambezi.LevelName,
-        FName(TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-                   "L_ZambeziBatokaGorge_PhysicalCorridorCandidate")));
+        FName(TEXT("/Game/RaftSim/Maps/L_Zambezi")));
     TestTrue(
         TEXT("Zambezi reference run spans the mapped Rapids 1-25 station range"),
         Zambezi.StartStationM == 0.0f && Zambezi.FinishStationM >= 27358.0f);
