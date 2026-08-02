@@ -17,6 +17,8 @@ open gates are documented in
 The August 2 runnable revalidation confirms that the frontend selector, source
 scenario, shipping cook, saved map, live PIE launch, and schema-v16 map audit
 all resolve to `/Game/RaftSim/Maps/L_Zambezi`.
+The versioned progression manifest also enumerates Zambezi in the six-river
+Free Run contract, so catalog tests fail if its scenario or map path is removed.
 The South Fork production campaign still resolves to the 49.1 km
 `L_SouthForkAmerican_FullReach` gameplay map. Its August 2 organic foothill
 terrain pass now shares dry-grass, oak-litter, granitic-soil, and weathered-

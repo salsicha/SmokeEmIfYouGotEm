@@ -285,6 +285,14 @@ and shipping cook list all classify it as the sixth runnable river. There are
 no remaining `additional_active_environment` river entries in the current
 portfolio.
 
+The M6 progression manifest now makes that runtime promise explicit rather than
+leaving it implicit in the aggregate `available_maps` count. Its six-entry
+`runnable_rivers` array binds `zambezi_batoka_gorge` to
+`zambezi_reference_run`, `/Game/RaftSim/Maps/L_Zambezi`, and the
+`reference_free_run` tier. The focused Python contract cross-checks this row
+against the versioned map, cook configuration, frontend C++ catalog, player
+selection catalog, source scenario, and packaging regeneration commands.
+
 The approximately 1.6 GB generated `.umap` is committed through Git LFS at
 `/Game/RaftSim/Maps/L_Zambezi`. `package_mac.sh` and `package_win.ps1` retain a
 fail-closed regeneration fallback if that versioned package is absent, and
