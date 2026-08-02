@@ -15,10 +15,10 @@ REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_production_character_fallback_v287_review.json"
 )
-FOLDED_SPLASH_SLEEVE_REVIEW_PATH = (
+FACE_FITTED_HELMET_REVIEW_PATH = (
     REPO_ROOT
     / "docs/environment-captures/south_fork_full_reach/"
-    "m9_folded_wet_splash_sleeves_v3_review.json"
+    "m9_cc0_face_fitted_helmet_v1_review.json"
 )
 
 
@@ -35,12 +35,22 @@ def _manifest() -> dict[str, object]:
 def test_cc0_character_manifest_freezes_five_distinct_rights_compatible_sources() -> None:
     manifest = _manifest()
 
-    assert manifest["schema_version"] == 2
+    assert manifest["schema_version"] == 3
     assert manifest["license"]["asset_license"] == "mixed_cc0_1_0_and_cc_by_4_0"
     assert manifest["license"]["body_asset_license"] == "CC0-1.0"
     assert manifest["license"]["hair_asset_license"] == "CC-BY-4.0"
     assert manifest["toolchain"]["mpfb"] == "2.0.17"
     assert manifest["toolchain"]["fbx_world_unit"] == "centimeter"
+    assert manifest["toolchain"]["checked_in_fbx_canonicalizer"] == (
+        "unreal/Scripts/canonicalize_cc0_helmet_hair.py"
+    )
+    assert "at least 0.75 authored head weight" in manifest["toolchain"][
+        "helmet_hair_weight_policy"
+    ]
+    assert "complete connected Skin region" in manifest["toolchain"][
+        "helmet_hair_weight_policy"
+    ]
+    assert "1.0 head weight" in manifest["toolchain"]["helmet_hair_weight_policy"]
     assert manifest["toolchain"]["body_topology"] == {
         "vertices": 13380,
         "polygons": 13378,
@@ -142,6 +152,27 @@ def test_cc0_generator_bakes_mesh_and_rest_bones_to_centimeters() -> None:
     assert 'asset_type="Hair"' in source
     assert 'interpolate_weights=True' in source
     assert '_find_exported_hair(source_hair, rig)' in source
+    assert '_replace_with_rigid_bone_weights(hair, "head")' in source
+    assert '_rigidify_high_confidence_head_vertices(body)' in source
+
+
+def test_cc0_checked_in_fbx_can_rebuild_helmet_hair_without_mpfb() -> None:
+    source = (
+        REPO_ROOT / "unreal/Scripts/canonicalize_cc0_helmet_hair.py"
+    ).read_text(encoding="utf-8")
+
+    assert 'term in material.name.casefold()' in source
+    assert 'assignment.weight >= 0.75' in source
+    assert 'facial_skin_indices' in source
+    assert 'detail_indices' in source
+    assert 'group.remove(sorted_indices)' in source
+    assert 'head_group.add(sorted_indices, 1.0, "REPLACE")' in source
+    assert 'assignments != {"head": 1.0}' in source
+    assert 'body.scale = (1.0, 1.0, 1.0)' in source
+    assert 'rig.scale = (1.0, 1.0, 1.0)' in source
+    assert 'length_unit = "CENTIMETERS"' in source
+    assert 'scale_length = 0.01' in source
+    assert 'use_armature_deform_only=True' in source
 
 
 def test_cc0_importer_is_hash_tracked_scale_validated_and_idempotent() -> None:
@@ -163,8 +194,11 @@ def test_cc0_importer_is_hash_tracked_scale_validated_and_idempotent() -> None:
     assert 'unreal.BlendMode.BLEND_MASKED' in source
     assert 'unreal.MaterialEditingLibrary.delete_all_material_expressions(material)' in source
     assert 'rough.r = 0.68' in source
-    assert 'build_materials(textures, rebuild_hair=replace_existing)' in source
+    assert 'RAFTSIM_CC0_REIMPORT_TEXTURES' in source
+    assert 'build_materials(textures, rebuild_hair=replace_textures)' in source
     assert 'materials[f"hair_{variant}"]' in source
+    assert 'M_RaftSim_CC0_HelmetContainedHairHidden' in source
+    assert 'selected = materials["helmet_hidden_hair"]' in source
 
 
 def test_cc0_production_skin_builder_preserves_atlases_and_adds_physical_response() -> None:
@@ -300,6 +334,14 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "bSafetyGearOrPaddleOverlay || bBodyGapOverlay" in host
     assert "actor.activate_cc0_fallback_for_validation()" in capture
     assert "runtime_exclusive_cc0_body_ownership" in capture
+    assert "ResolveProductionHeadFit(" in host
+    assert "CC0Visual->GetSolvedHeadWorldLocation()" in host
+    assert "CC0Visual->GetSolvedFaceForwardWorldVector()" in host
+    assert "GuideHeadLocalEyeCenterCm" in adapter
+    assert "CrewHeadLocalEyeCentersCm" in adapter
+    assert "HeadTransform.TransformPosition(LocalEyeCenterCm / BodyScale)" in adapter
+    assert "HeadTransform.GetRotation().RotateVector(-FVector::UpVector)" in adapter
+    assert "HeadTransform.GetRotation().RotateVector(-FVector::YAxisVector)" in adapter
     assert "BuildUnitSeatedPelvisMesh(" in host
     assert "full waist-to-glute-to-thigh bridge" in host
     assert "kProductionSeatedPelvisReferenceExtentCm(15.0f, 23.0f, 15.0f)" in host
@@ -574,26 +616,52 @@ def test_cc0_assets_and_renderer_review_remain_fail_closed() -> None:
     assert review["automation_evidence"]["failed"] == 0
     assert _sha256(capture) == review["renderer_evidence"]["capture_sha256"]
 
-def test_folded_splash_sleeves_review_is_hash_verified_and_fail_closed() -> None:
-    review = json.loads(FOLDED_SPLASH_SLEEVE_REVIEW_PATH.read_text(encoding="utf-8"))
-    assert review["schema"] == "raftsim.m9.folded_wet_splash_sleeves_review.v3"
+def test_face_fitted_cc0_helmet_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(FACE_FITTED_HELMET_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert review["schema"] == "raftsim.m9.cc0_face_fitted_helmet_review.v1"
     assert review["passed"] is False
     assert review["technical_candidate_passed"] is True
     assert review["photoreal_acceptance_passed"] is False
     assert review["human_approved"] is False
-    assert review["named_character_art_reviewer"] is None
-    assert review["named_guide_reviewer"] is None
+    assert review["reviewers"]["named_character_art_reviewer"] is None
+    assert review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
     assert review["promotion_allowed"] is False
-    assert review["supersedes"].endswith("m9_tapered_shoulder_sleeves_v2_review.json")
+    assert review["supersedes"].endswith("m9_folded_wet_splash_sleeves_v3_review.json")
 
     metrics = review["runtime_roster_metrics"]
     assert metrics["captured_character_count"] == 5
-    assert metrics["characters_with_visible_shoulder_silhouette"] == 5
-    assert metrics["minimum_sleeve_vertex_count"] >= 1000
-    assert metrics["characters_with_live_splash_jacket_material_response"] == 5
-    assert metrics["maximum_shoulder_anchor_error_cm"] <= 0.25
+    assert metrics["exclusive_cc0_body_count"] == 5
+    assert metrics["maximum_helmet_head_error_cm"] <= 1.0
+    assert metrics["minimum_helmet_forward_alignment"] >= 0.98
+    assert 0.90 <= metrics["minimum_helmet_fit_scale"] <= 1.02
+    assert 0.90 <= metrics["maximum_helmet_fit_scale"] <= 1.02
     roster_report = REPO_ROOT / metrics["report"]
     assert _sha256(roster_report) == metrics["report_sha256"]
+
+    roster = json.loads(roster_report.read_text(encoding="utf-8"))
+    assert roster["status"] == "capture_complete"
+    assert roster["exclusive_body_count"] == 5
+    for character in roster["characters"]:
+        assert character["runtime_helmet_head_error_cm"] <= 1.0
+        assert character["runtime_helmet_forward_alignment"] >= 0.98
+        assert 0.90 <= character["runtime_helmet_fit_scale"] <= 1.02
+
+    import_evidence = review["import_evidence"]
+    import_report = REPO_ROOT / import_evidence["report"]
+    assert _sha256(import_report) == import_evidence["report_sha256"]
+    imported = json.loads(import_report.read_text(encoding="utf-8"))
+    assert imported["status"] == "imported"
+    assert len(imported["characters"]) == 5
+    assert all(
+        any(
+            slot["material"].endswith(
+                "M_RaftSim_CC0_HelmetContainedHairHidden"
+            )
+            for slot in character["material_slots"]
+            if "Hair" in slot["slot"]
+        )
+        for character in imported["characters"]
+    )
 
     for item in review["renderer_evidence"]["captures"].values():
         capture = REPO_ROOT / item["capture"]
@@ -606,6 +674,6 @@ def test_folded_splash_sleeves_review_is_hash_verified_and_fail_closed() -> None
     m5_report = REPO_ROOT / m5["report"]
     assert _sha256(m5_report) == m5["report_sha256"]
     m5_payload = json.loads(m5_report.read_text(encoding="utf-8-sig"))
-    assert m5_payload["succeeded"] == 1
+    assert m5_payload["succeeded"] == m5["succeeded"]
     assert m5_payload["failed"] == 0
-    assert m5_payload["tests"][0]["state"] == "Success"
+    assert sum(test["state"] == "Success" for test in m5_payload["tests"]) == 5

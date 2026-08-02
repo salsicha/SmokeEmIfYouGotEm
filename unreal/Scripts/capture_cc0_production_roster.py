@@ -251,6 +251,27 @@ def main() -> None:
                     "sha256": sha256(path),
                 }
 
+            helmet_head_error_cm = actor.get_production_helmet_head_error_cm()
+            helmet_forward_alignment = (
+                actor.get_production_helmet_forward_alignment()
+            )
+            helmet_fit_scale = actor.get_production_helmet_fit_scale()
+            if helmet_head_error_cm > 1.0:
+                raise RuntimeError(
+                    f"Helmet head error exceeds 1 cm for {character_name}: "
+                    f"{helmet_head_error_cm:.6f}"
+                )
+            if helmet_forward_alignment < 0.98:
+                raise RuntimeError(
+                    f"Helmet faces away from {character_name}: "
+                    f"{helmet_forward_alignment:.6f}"
+                )
+            if not 0.90 <= helmet_fit_scale <= 1.02:
+                raise RuntimeError(
+                    f"Helmet fit scale is invalid for {character_name}: "
+                    f"{helmet_fit_scale:.6f}"
+                )
+
             report["characters"].append(
                 {
                     "name": character_name,
@@ -268,6 +289,9 @@ def main() -> None:
                     "runtime_production_helmet": (
                         actor.has_production_whitewater_helmet()
                     ),
+                    "runtime_helmet_head_error_cm": helmet_head_error_cm,
+                    "runtime_helmet_forward_alignment": helmet_forward_alignment,
+                    "runtime_helmet_fit_scale": helmet_fit_scale,
                     "runtime_production_boots": actor.has_production_river_boots(),
                     "bounds_origin_cm": vector_values(origin),
                     "bounds_extent_cm": vector_values(extent),

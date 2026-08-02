@@ -294,6 +294,11 @@ private:
     /** Shows the full fallback, or only project-owned rafting gear over a rigged body. */
     void SetProceduralVisualVisible(bool bVisible);
     void DispatchProductionPose();
+    bool ResolveProductionHeadFit(
+        FVector& OutSolvedHeadWorldLocation,
+        FVector& OutFaceForwardWorld,
+        FVector& OutFaceUpWorld,
+        float& OutHelmetScale) const;
     void AlignProductionHeadgearToSolvedHead();
     void UpdatePfdMaterialResponse(float DeltaSeconds);
     void ApplyPfdMaterialWetness();

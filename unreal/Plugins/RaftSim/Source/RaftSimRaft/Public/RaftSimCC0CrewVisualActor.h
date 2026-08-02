@@ -45,9 +45,27 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FString GetSelectedMeshPath() const;
 
+    /** World-space anchor of the coherently posed head/hair island. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedHeadWorldLocation() const;
+
+    /** World-space direction the rendered face points after the rafting pose. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedFaceForwardWorldVector() const;
+
+    /** World-space crown direction paired with the rendered face frame. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    FVector GetSolvedFaceUpWorldVector() const;
+
+    /** Uniform shell scale for the five similarly sized authored skulls. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetRecommendedWhitewaterHelmetScale() const { return 0.96f; }
+
 private:
     bool EnsureBodyLoaded();
     void CacheReferencePose();
+    void CacheRenderedFaceAnchorVertices();
+    bool TryGetRenderedFaceEyeCenterWorld(FVector& OutWorldLocation) const;
     void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
     void SetBoneAtPoint(FName BoneName, const FVector& DesiredPointCm);
     void SetSegmentBone(
@@ -65,6 +83,9 @@ private:
 
     UPROPERTY()
     TMap<FName, FTransform> ReferenceComponentTransforms;
+
+    /** Small LOD0 skin sample nearest the authored eye line, cached per identity. */
+    TArray<int32> RenderedFaceAnchorVertexIndices;
 
     int32 CurrentVariantIndex = 0;
     bool bCurrentGuide = false;

@@ -2563,6 +2563,37 @@ safety approval remain open. No collision, crew mass, animation, raft/water phys
 rescue, scoring, or progression authority changed. Exact hashes and the fail-closed verdict are
 in `docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_review.json`.
 
+## CC0 rendered-face-fitted helmet V1 — fallback fit retained, external review open
+
+The packaged CC0 fallback previously positioned the production helmet from a bone-space
+estimate. Identity-dependent face/neck deformation left the guide and Crew 01 shells hovering
+above their visible faces, while legacy hair cards protruded around the shell.
+
+V1 caches 64 skin vertices nearest each source eye line and averages their live post-skinning
+positions, then gives that rendered facial anchor and the head's authored forward/up frame to
+the shared production fitter. Bounded guide and Crew 01 offsets seat the shell at the brow. The
+continuous shell uses a dedicated zero-opacity material for helmet-contained hair; the original
+CC0/CC-BY source files, materials, hashes, and attribution remain packaged.
+
+![CC0 guide fitted helmet front](../environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_guide_full.png)
+
+![CC0 guide fitted helmet profile](../environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_guide_profile.png)
+
+![CC0 Crew 01 fitted helmet profile](../environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew01_profile.png)
+
+All five identities pass front/profile/rear capture with exclusive CC0 body ownership, production
+PFD/helmet/boots, exactly 1.0 forward alignment, 0.96 fit scale, and maximum solved-anchor error
+of `7.312e-10` cm. The editor target builds and the forced-CC0 renderer-backed M5 report contains
+five successful result entries with zero failures. Collision, crew mass, water, raft forces,
+rescue, scoring, and progression are unchanged.
+
+This closes the reported backward/hovering fallback-helmet transform defect as a technical repair.
+It does not make the fallback anatomy, skin/eye shading, clothing deformation, hands, shell and
+retention materials, or lighting photoreal. Named character-art approval and qualified
+whitewater-safety review remain open. Exact source, import, renderer, metric, and automation
+hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json`.
+
 ## Required named decisions
 
 - [ ] Product owner: campaign, scope, disclosures, and every deferred/blocking item.

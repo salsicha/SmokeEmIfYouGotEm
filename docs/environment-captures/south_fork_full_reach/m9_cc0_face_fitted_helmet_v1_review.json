@@ -1,0 +1,103 @@
+{
+  "schema": "raftsim.m9.cc0_face_fitted_helmet_review.v1",
+  "artifact": "M9 CC0 rendered-face-fitted helmet V1 review",
+  "recorded_local_date": "2026-08-02",
+  "milestone": "M9",
+  "status": "technical_headgear_fit_improvement_accepted_photoreal_pending",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+  "summary": "The packaged CC0 fallback now derives its helmet anchor from 64 post-skinning facial vertices nearest each source eye line, publishes the rendered face frame to the shared production helmet fitter, applies bounded guide/Crew01 brow-seat corrections, and suppresses legacy hair cards only where the continuous production shell fully contains them. This removes the visibly detached hair and hovering/backward shell presentation without changing body pose, collision, mass, water, raft forces, rescue, scoring, or progression.",
+  "implementation": {
+    "rendered_face_anchor_sample_vertices": 64,
+    "guide_helmet_anchor_drop_cm": 10.0,
+    "crew01_helmet_anchor_drop_cm": 6.0,
+    "other_identity_anchor_drop_cm": 0.0,
+    "helmet_fit_scale": 0.96,
+    "maximum_allowed_head_error_cm": 1.0,
+    "minimum_allowed_forward_alignment": 0.98,
+    "helmet_contained_hair_material": "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_HelmetContainedHairHidden",
+    "hair_source_and_attribution_retained": true,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_roster_capture.json",
+    "report_sha256": "6a8fbd466d3880e2e4a11b002f5c44f4b6b14dbe1ce5ad245c64da2f6dadace0",
+    "captured_character_count": 5,
+    "exclusive_cc0_body_count": 5,
+    "maximum_helmet_head_error_cm": 7.31135485487755e-10,
+    "minimum_helmet_forward_alignment": 1.0,
+    "minimum_helmet_fit_scale": 0.9599999785423279,
+    "maximum_helmet_fit_scale": 0.9599999785423279
+  },
+  "import_evidence": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_import.json",
+    "report_sha256": "c14d48bf3f6428b612ce536d16d413fc68c5a2b2631360e744b717cf2e033901",
+    "status": "imported",
+    "character_count": 5,
+    "characters_using_helmet_contained_hair_material": 5,
+    "minimum_imported_height_cm": 163.61898928135633,
+    "maximum_imported_height_cm": 184.78303539007902
+  },
+  "renderer_evidence": {
+    "captures": {
+      "guide_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_guide_full.png", "capture_sha256": "a625ce4e914c355499b63309bdcd41ab6947053ac9a3dccbc42dcda004dcf016"},
+      "guide_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_guide_profile.png", "capture_sha256": "385f623095538751a980ac22bbc0daf0f1846817b05748e957b4c2c204a85245"},
+      "guide_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_guide_rear.png", "capture_sha256": "ecb2cc89a9e57b90df1023798554b23f927cdaaa848a1048e9dcfaba56f13212"},
+      "crew01_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew01_full.png", "capture_sha256": "226476e7c2893df2ff283d15b8be857f60071b3825953c040c2ca61bce3bbbaa"},
+      "crew01_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew01_profile.png", "capture_sha256": "5a057c29f40965f992e79786e192d72bb616f8da97d5e98e061b40aa41232a59"},
+      "crew01_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew01_rear.png", "capture_sha256": "7cf9d09d6f0a3685774cbe764459821e46a8ac792491e3c35158ff304d8d45eb"},
+      "crew02_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew02_full.png", "capture_sha256": "e16d22294c779a186374c53478d050362c926e38b1a19d4d86ac997c6c2d9ade"},
+      "crew02_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew02_profile.png", "capture_sha256": "05e5b987e6826a70b0a363fbda2ea7546370f160b3e44de0ef42f5df008f48ce"},
+      "crew02_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew02_rear.png", "capture_sha256": "edec86edc897498cc2665751bc0a0580cd580162949217eaba78b5f255a206b1"},
+      "crew03_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew03_full.png", "capture_sha256": "03f34948571e3616bf77e5e10c6c7fc35634830f3987fb2c969e4c9eec7fbc4b"},
+      "crew03_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew03_profile.png", "capture_sha256": "46fc76231bf72824bbf695964ecb1d0ccaa82451ce7cf6e8a416600348115993"},
+      "crew03_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew03_rear.png", "capture_sha256": "e29bd75b277585bbbccde1cf1ee6c9b5c69e1f5a0eef1d0866b09da50929f762"},
+      "crew04_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew04_full.png", "capture_sha256": "146d0a05181c9ca1199dcff36e221f670293478ec3e96e774500aa8ee2d3d383"},
+      "crew04_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew04_profile.png", "capture_sha256": "f380690d0ae71315b219d0dca91527915a024c6385220e270e10e27ac839b0e8"},
+      "crew04_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_crew04_rear.png", "capture_sha256": "3f1be333f43e4c152bfeb67c7e5f08dfd04a311319099754a985a509df8e5e49"}
+    },
+    "technical_verdict": "pass: all five shells face with the rendered characters, seat at the brow, retain rear coverage, and no detached hair cards protrude around the shell",
+    "photoreal_verdict": "fail: body anatomy, skin/eye shading, clothing deformation, hands, shell/webbing materials, and presentation lighting remain visibly simplified"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "d3b8b253025a80fc0f3c449902876db0d316e9e7f7f5cbebd3dfbec76ad8672d",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "65726402fe099337298de2531a48dc62f4a58a833a0513bd023f8b724aabafb5",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "b6cffc7383a3d6f9a22cf7d364937550dcc6fe21e49b748c16f9f286e2e714a2",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "2365406ddfd6f8b5506beda0781f527f5d73f9241c8075c044976694441bde66",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "5d8b81d7315e71293eee6de7c0b562f7442fc90ddbd805b63f92870e72420c09",
+    "unreal/Scripts/build_cc0_production_character.py": "c6831a19efb3580e58e5a90bfa99452120847e682776cd6c99ffdc65f90c721f",
+    "unreal/Scripts/canonicalize_cc0_helmet_hair.py": "d3fd78a63c5bf6fc4a4503108f38f5bb8ddc92abdcb30d13bf070c06f49f689b",
+    "unreal/Scripts/import_cc0_production_characters.py": "029cfcff26f3e41212f40a98de96d8221135f6a4a121232bbbb41ad245d58cf4",
+    "unreal/Scripts/capture_cc0_production_roster.py": "fcad88e9053f181110755c290ecb9b591c1bbcd7c7cee0c3bec539f6405d912b",
+    "unreal/SourceArt/RaftSim/Characters/CC0Production/character_source_manifest.json": "30fd8454b1a13a3df35fc5dae17e672784981de93e91dd19dfd0672e9d33e896"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "physics/tests/test_cc0_production_characters.py",
+    "m5": {
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_m5.json",
+      "report_sha256": "67b766082abbb6907027bfae87e7baacebd487af8a6c3df14fcc01f5d7294277",
+      "succeeded": 4,
+      "failed": 0,
+      "success_result_entries": 5,
+      "forced_cc0_review": true
+    }
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the visibly simplified fallback anatomy, shading, helmet shell, retention hardware, and seated lighting.",
+    "A qualified whitewater safety reviewer must approve visible helmet coverage and retention depiction; this transform check is not equipment certification.",
+    "Photoreal character promotion and the wider M9 external acceptance matrix remain open."
+  ]
+}
