@@ -3710,6 +3710,24 @@ path is verified, and the completion goal can be marked complete.
   unconverged hydraulics, and open guide/geospatial/ecology/art/water-VFX/
   performance gates still reject photoreal and production promotion; M9 stays
   open.
+- Chilko organic lit terrain V1 replaces the runnable map's nearly black
+  generic bank response with a river-only four-scale Default Lit shade graph.
+  It preserves source macro registration, material zones, close-range normals,
+  wet-bank/riverbed conditioning, and the existing 1009×1009 Landscape, then
+  adds non-harmonic 0.00016, 0.00059, 0.00270, and 0.00790 per-centimetre fields
+  for open-bench value, dry grass and mineral soil, slope-aware wet/oxidized
+  basalt, scree, and fine mineral variation. No world-position offset is
+  connected, so terrain geometry, collision, the protected 600×80 m solver
+  strip, route, cooked water, hydraulics, and raft forces are unchanged. In
+  fixed left-bank regions, guide-seat mean luminance rises from 0.1199 to
+  0.2375 and near-black coverage falls from 30.05% to 1.04%; river-eye mean
+  luminance rises from 0.1397 to 0.2616 and near-black coverage falls from
+  32.90% to 0.85%. The editor build succeeds; the native saved-material audit
+  passes 1/1; `L_LavaCanyon` passes its runtime gate 1/1; and the focused
+  terrain/water/isolation contracts pass. This is a retained technical
+  foundation, not photoreal promotion: broad source-scale landform, horizontal
+  material banding, repeated stylized trees, uniform opaque water, weak rapid
+  foam/spray, unconverged hydraulics, and all named external gates remain open.
 - Futaleufú Terminator reach-local runnable V1 replaces the flat signature-
   rapid shell and scale-mismatched 16 km corridor preview with a physical
   600×600 m, 1009×1009 Landscape. The review-gated OSM route scaffold and

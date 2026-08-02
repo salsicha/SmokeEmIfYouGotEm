@@ -928,6 +928,10 @@ UMaterialExpression* BuildFutaleufuOrganicTemperateBaseColor(
     UMaterial* Material,
     UMaterialExpression* SourceBaseColor);
 
+UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor);
+
 struct FZambeziBatokaVisualMorphologyStats
 {
     int32 VisualTileCount = 0;
