@@ -98,6 +98,33 @@ collision, or physics authority. Their first shadow-casting bracket was rejected
 because it projected large black wedges across the river; the retained actors
 are tagged `RaftSimNearFieldSelfShadowSuppressed` and do not cast shadows.
 
+The runnable first kilometre now has a separate six-component talus layer. The
+older physical-corridor boulder distribution begins about 5 km downstream, so
+it could not break up either bank seen from the launch. A deterministic
+128-candidate search now places 360 rights-reviewed CC0 Poly Haven rock analogs,
+60 for each of six meshes, approximately 118-993 m downstream. Every placement
+is grounded against the source Landscape, stays outside the full route by at
+least 3 m beyond the 72 m active-water half-width, requires 1-160 m of dry
+height above conditioned water, and rejects slopes above 48 degrees. All 360
+targets pass in the retained build; the maximum accepted slope is 37.817
+degrees. Heights range from 0.95-5.20 m, with small talus dominant and sparse
+larger breakup rocks. The actors cast grounded presentation shadows but have no
+collision, navigation, solver, water, raft-force, or Batoka-lithology authority.
+Their tags include `RaftSimRunnableLaunchTalusV1`,
+`RaftSimGenericRockAnalogNoLithologyAuthority`,
+`RaftSimNonCollisionRenderSurface`, and
+`RaftSimPresentationOnlyNoHydraulicAuthority`.
+
+The fixed gameplay view confirms that the layer does not enter the water or
+obstruct the raft, but most rocks remain subtle at guide-eye distance. The
+close review exposes useful bank breakup as well as the remaining defects:
+generic mossy analog material, coarse rounded terrain, repeated bright
+ground-cover forms, hard shadows, and no credible wet-bank transition. The
+retained evidence is `zambezi_launch_talus_gameplay_v1.png`,
+`zambezi_launch_talus_close_review_v1.png`, and
+`zambezi_launch_talus_v1_review.json`. This is a retained presentation layer,
+not photoreal, geology, or guide approval.
+
 The Zambezi preview light rig now binds the directional light as atmosphere sun
 zero and tags one captured skylight, one dry-season sky atmosphere, and one
 volumetric gorge-haze actor. This is a deterministic presentation contract, not
@@ -315,7 +342,7 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v13 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v14 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
@@ -328,12 +355,15 @@ components with the 58/57/117 accepted split and 24° slope-ceiling contract,
 one 1,721-instance launch-cover component, three launch woody components with
 the 44/43/87 accepted split, their full-route/dry-height/slope placement tags, and
 the bounded launch-window shadow exception,
+six separately tagged launch-talus components with 360 total source-grounded,
+shadow-casting, non-colliding rock analog instances and their explicit
+no-lithology/no-hydraulic-authority contract,
 zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
 also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
-covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v13 additionally
+covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v14 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.

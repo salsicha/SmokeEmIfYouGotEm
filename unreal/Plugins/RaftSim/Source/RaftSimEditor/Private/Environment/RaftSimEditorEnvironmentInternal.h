@@ -677,6 +677,10 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 NaniteMaterialAuditErrorCount = 0;
     int32 DressingAssetCount = 0;
     int32 DressingBoulderInstanceCount = 0;
+    int32 DressingRunnableLaunchTalusTargetInstanceCount = 0;
+    int32 DressingRunnableLaunchTalusInstanceCount = 0;
+    int32 DressingRunnableLaunchTalusRejectedPlacementCount = 0;
+    float DressingRunnableLaunchTalusMaximumSlopeDegrees = 0.0f;
     int32 DressingFoliageInstanceCount = 0;
     int32 DressingTrunkInstanceCount = 0;
     int32 DressingCanopyTreeInstanceCount = 0;
