@@ -22,7 +22,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 7
+GENERATOR_VERSION = 10
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -121,9 +121,7 @@ def add_extruded_panel(
 ) -> bpy.types.Object:
     """Create a flat, softly edged foam panel from an authored Y/Z outline."""
     half_depth = thickness * 0.5
-    vertices = [
-        (x_center + half_depth, y, z) for y, z in outline_yz
-    ] + [
+    vertices = [(x_center + half_depth, y, z) for y, z in outline_yz] + [
         (x_center - half_depth, y, z) for y, z in outline_yz
     ]
     count = len(outline_yz)
@@ -219,12 +217,12 @@ def add_crowned_foam_panel(
         (-half_depth + edge_roll, 1.0),
         (half_depth - edge_roll, 1.0),
         (half_depth - edge_roll * 0.28, 0.985),
-        (half_depth, 0.91),
-        (half_depth + crown_depth * 0.68, 0.58),
+        (half_depth, 0.94),
+        (half_depth + crown_depth * 0.32, 0.86),
+        (half_depth + crown_depth * 0.66, 0.70),
+        (half_depth + crown_depth * 0.88, 0.46),
     ]
-    maximum_lateral_radius = max(
-        abs(point[0] - centroid_y) for point in outline
-    )
+    maximum_lateral_radius = max(abs(point[0] - centroid_y) for point in outline)
 
     def coordinate(
         signed_depth: float,
@@ -272,9 +270,7 @@ def add_crowned_foam_panel(
     inner_center_index = len(vertices)
     vertices.append(coordinate(-half_depth, centroid_y, centroid_z))
     outer_center_index = len(vertices)
-    vertices.append(
-        coordinate(half_depth + crown_depth, centroid_y, centroid_z)
-    )
+    vertices.append(coordinate(half_depth + crown_depth, centroid_y, centroid_z))
     final_ring = (len(ring_profiles) - 1) * count
     for index in range(count):
         next_index = (index + 1) % count
@@ -355,6 +351,62 @@ def add_flat_webbing_run(
     return obj
 
 
+def add_flat_belt_loop(
+    name: str,
+    path_xy: list[tuple[float, float]],
+    z_center: float,
+    height: float,
+    thickness: float,
+    piece_material: bpy.types.Material,
+) -> bpy.types.Object:
+    """Build a flat, torso-following rescue belt instead of a rubbery tube."""
+    half_height = height * 0.5
+    half_thickness = thickness * 0.5
+    vertices: list[tuple[float, float, float]] = []
+    for index, (x, y) in enumerate(path_xy):
+        previous = Vector(path_xy[(index - 1) % len(path_xy)])
+        following = Vector(path_xy[(index + 1) % len(path_xy)])
+        tangent = (following - previous).normalized()
+        outward = Vector((tangent.y, -tangent.x)).normalized()
+        centre = Vector((x, y))
+        inner = centre - outward * half_thickness
+        outer = centre + outward * half_thickness
+        vertices.extend(
+            [
+                (inner.x, inner.y, z_center - half_height),
+                (outer.x, outer.y, z_center - half_height),
+                (outer.x, outer.y, z_center + half_height),
+                (inner.x, inner.y, z_center + half_height),
+            ]
+        )
+    faces: list[tuple[int, ...]] = []
+    for section in range(len(path_xy)):
+        start = section * 4
+        following = ((section + 1) % len(path_xy)) * 4
+        faces.extend(
+            [
+                (start, start + 1, following + 1, following),
+                (start + 1, start + 2, following + 2, following + 1),
+                (start + 2, start + 3, following + 3, following + 2),
+                (start + 3, start, following, following + 3),
+            ]
+        )
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(piece_material)
+    bevel = obj.modifiers.new("SoftBeltEdge", "BEVEL")
+    bevel.width = min(thickness * 0.35, 0.12)
+    bevel.segments = 3
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    shade_smooth(obj)
+    return obj
+
+
 def add_curve(
     name: str,
     points: list[tuple[float, float, float]],
@@ -412,11 +464,73 @@ def add_torus(
 def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object]:
     pieces: list[bpy.types.Object] = []
 
+    # A real rescue vest is a sewn carrier holding separate foam cells, not a
+    # collection of flotation blocks suspended around an empty torso. Two thin
+    # front carrier halves and one rear carrier sit against the body, visibly
+    # bridge the cell seams and give the zipper, straps and hardware a fabric
+    # substrate. They remain sleeveless and add no shoulder flotation.
+    for side in (-1.0, 1.0):
+
+        def mirrored_carrier(
+            points: list[tuple[float, float]],
+        ) -> list[tuple[float, float]]:
+            result = [(side * y, z) for y, z in points]
+            return result if side > 0.0 else list(reversed(result))
+
+        pieces.append(
+            add_crowned_foam_panel(
+                f"FrontCarrier_{side:+.0f}",
+                12.8,
+                0.9,
+                mirrored_carrier(
+                    [
+                        (0.5, -16.0),
+                        (14.7, -15.8),
+                        (16.2, -11.2),
+                        (16.4, 5.0),
+                        (14.5, 15.5),
+                        (10.5, 20.3),
+                        (5.0, 21.0),
+                        (0.8, 18.2),
+                    ]
+                ),
+                materials["PfdShell"],
+                0.24,
+                0.22,
+                lateral_wrap_depth=-1.6,
+            )
+        )
+    pieces.append(
+        add_crowned_foam_panel(
+            "RearCarrier",
+            -11.8,
+            1.0,
+            [
+                (-14.0, -18.8),
+                (14.0, -18.8),
+                (16.0, -12.5),
+                (16.4, 7.0),
+                (13.8, 17.5),
+                (7.0, 24.0),
+                (-7.0, 24.0),
+                (-13.8, 17.5),
+                (-16.4, 7.0),
+                (-16.0, -12.5),
+            ],
+            materials["PfdShell"],
+            0.28,
+            0.30,
+            outward_sign=-1.0,
+            lateral_wrap_depth=2.0,
+        )
+    )
+
     # Four contoured front foam cells. Rounded outlines, rolled edge rings, and
     # shallow exterior crowns read as soft fabric-covered flotation foam. The
     # authored inner edges create the entry V while the outer edges preserve
     # arm clearance.
     for side in (-1.0, 1.0):
+
         def mirrored(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
             result = [(side * y, z) for y, z in points]
             return result if side > 0.0 else list(reversed(result))
@@ -424,42 +538,42 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 f"FrontUpperCell_{side:+.0f}",
-                17.0,
-                7.2,
+                15.2,
+                4.2,
                 mirrored(
                     [
-                        (2.3, -0.7),
-                        (13.8, -1.0),
-                        (16.9, 4.8),
-                        (15.8, 14.8),
-                        (11.0, 21.7),
-                        (6.2, 20.6),
+                        (0.7, -0.8),
+                        (13.2, -1.0),
+                        (15.5, 4.5),
+                        (14.6, 13.8),
+                        (10.2, 19.3),
+                        (4.5, 18.8),
                     ]
                 ),
                 materials["PfdShell"],
-                1.35,
-                1.45,
-                lateral_wrap_depth=-2.0,
+                1.0,
+                1.25,
+                lateral_wrap_depth=-2.4,
             )
         )
         pieces.append(
             add_crowned_foam_panel(
                 f"FrontLowerCell_{side:+.0f}",
-                17.1,
-                7.4,
+                15.2,
+                4.2,
                 mirrored(
                     [
-                        (1.8, -14.5),
-                        (14.8, -14.2),
-                        (16.8, -10.2),
-                        (16.2, -2.3),
-                        (3.0, -1.3),
+                        (0.7, -14.6),
+                        (13.7, -14.1),
+                        (15.4, -10.0),
+                        (14.9, -2.3),
+                        (1.2, -1.2),
                     ]
                 ),
                 materials["PfdShell"],
-                1.35,
-                1.45,
-                lateral_wrap_depth=-2.0,
+                1.0,
+                1.25,
+                lateral_wrap_depth=-2.4,
             )
         )
 
@@ -501,38 +615,30 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 name,
-                -14.2,
-                4.0,
+                -13.8,
+                3.2,
                 outline,
                 materials["PfdShell"],
-                1.05,
-                1.35,
+                0.92,
+                1.60,
                 outward_sign=-1.0,
-                lateral_wrap_depth=3.2,
+                lateral_wrap_depth=3.8,
             )
         )
+    # Real high-profile rescue PFDs leave the side body articulated. Six flat
+    # webbing connectors replace the former rigid yellow side blocks, which
+    # read as flotation shoulder/hip armour in profile.
     for side in (-1.0, 1.0):
-        pieces.append(
-            add_crowned_foam_panel(
-                f"SideWing_{side:+.0f}",
-                side * 18.4,
-                4.2,
-                [
-                    (-11.8, -7.7),
-                    (8.8, -7.7),
-                    (12.2, -5.2),
-                    (13.1, 2.9),
-                    (10.2, 7.3),
-                    (-8.4, 7.3),
-                    (-12.2, 3.7),
-                ],
-                materials["PfdShell"],
-                0.8,
-                0.75,
-                outward_sign=side,
-                depth_axis="y",
+        for index, z in enumerate((-10.5, -3.0, 5.0)):
+            pieces.append(
+                add_rounded_box(
+                    f"SideWebbingConnector_{side:+.0f}_{index + 1}",
+                    (0.5, side * 16.6, z),
+                    (24.0, 0.36, 1.35),
+                    materials["PfdWebbing"],
+                    0.16,
+                )
             )
-        )
 
     # The flotation cells terminate below the shoulders. Only flexible fit
     # webbing crosses from the chest to the back so the vest does not create a
@@ -542,16 +648,16 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
             add_flat_webbing_run(
                 f"ShoulderWebbingRun_{side:+.0f}",
                 [
-                    (20.6, 18.5),
-                    (14.0, 21.5),
-                    (6.5, 23.6),
-                    (0.0, 24.4),
-                    (-7.5, 23.2),
-                    (-14.0, 20.2),
-                    (-17.1, 17.5),
+                    (18.5, 17.2),
+                    (12.5, 20.0),
+                    (5.5, 21.4),
+                    (0.0, 21.8),
+                    (-7.0, 20.8),
+                    (-13.0, 18.5),
+                    (-16.0, 16.5),
                 ],
                 side * 11.0,
-                2.0,
+                1.7,
                 0.18,
                 materials["PfdWebbing"],
             )
@@ -564,8 +670,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 f"ZipperedFrontPocket_{side:+.0f}",
-                21.55,
-                1.25,
+                18.85,
+                0.45,
                 [
                     (center_y - 4.1, center_z - 3.4),
                     (center_y + 4.1, center_z - 3.4),
@@ -577,8 +683,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                     (center_y - 5.4, center_z - 2.1),
                 ],
                 materials["PfdShell"],
-                0.38,
-                0.62,
+                0.18,
+                0.18,
             )
         )
 
@@ -586,8 +692,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     pieces.append(
         add_curve(
             "FrontEntryZipper",
-            [(21.1, 0.0, -13.0), (21.3, 0.0, 2.0), (20.8, 0.0, 19.5)],
-            0.30,
+            [(18.75, 0.0, -13.0), (18.95, 0.0, 2.0), (18.65, 0.0, 18.0)],
+            0.22,
             materials["PfdHardware"],
             resolution=2,
         )
@@ -596,95 +702,88 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_rounded_box(
                 f"BackupBuckle_{index + 1}",
-                (21.8, 0.0, z),
-                (1.6, 3.8, 2.3),
+                (19.15, 0.0, z),
+                (0.9, 3.2, 1.8),
                 materials["PfdHardware"],
-                0.45,
+                0.32,
             )
         )
 
     # Visible low-profile backup webbing ties the four foam cells together and
     # prevents the broad front from reading as a rigid plate carrier.
     for index, z in enumerate((-8.8, 4.8)):
-        pieces.append(
-            add_rounded_box(
-                f"FrontBackupWebbing_{index + 1}",
-                (21.05, 0.0, z),
-                (0.55, 29.0, 1.35),
-                materials["PfdWebbing"],
-                0.28,
+        for side in (-1.0, 1.0):
+            pieces.append(
+                add_rounded_box(
+                    f"FrontBackupWebbing_{index + 1}_{side:+.0f}",
+                    (18.82, side * 7.3, z),
+                    (0.34, 12.6, 1.05),
+                    materials["PfdWebbing"],
+                    0.18,
+                )
             )
-        )
 
-    # Six visible side/waist adjustment runs plus the two flat shoulder straps
-    # above provide eight fit points. Shoulder hardware is kept off the crest
-    # so it cannot read as a floating pad in profile.
-    adjustment_runs = []
+    # Six low-profile sliders on the existing side connectors plus the two flat
+    # shoulder straps provide eight fit points. Reusing the connector webbing
+    # avoids duplicated tubular bands and keeps hardware off the shoulder crest.
+    adjustment_points = []
     for side in (-1.0, 1.0):
-        adjustment_runs.extend(
+        adjustment_points.extend(
             [
-                [(11.0, side * 20.0, 9.0), (-8.0, side * 20.0, 9.0)],
-                [(11.0, side * 20.0, -6.0), (-8.0, side * 20.0, -6.0)],
-                [(15.0, side * 18.0, -13.0), (-10.0, side * 17.5, -13.0)],
+                (1.0, side * 16.9, 5.0),
+                (1.0, side * 16.9, -3.0),
+                (1.0, side * 16.9, -10.5),
             ]
         )
-    for index, points in enumerate(adjustment_runs):
-        pieces.append(
-            add_curve(
-                f"AdjustmentWebbing_{index + 1:02d}",
-                points,
-                0.62,
-                materials["PfdWebbing"],
-                resolution=2,
-            )
-        )
-        midpoint = Vector(points[0]).lerp(Vector(points[-1]), 0.5)
+    for index, point in enumerate(adjustment_points):
         pieces.append(
             add_rounded_box(
                 f"AdjustmentSlider_{index + 1:02d}",
-                tuple(midpoint),
-                (2.0, 2.8, 1.5),
+                point,
+                (2.8, 0.72, 1.85),
                 materials["PfdHardware"],
-                0.35,
+                0.28,
             )
         )
 
     # A distinct 2-inch-class quick-release rescue belt and tether ring.
     belt_points = [
-        (18.5, -16.5, -14.0),
-        (0.0, -21.5, -14.0),
-        (-15.5, -15.5, -14.0),
-        (-18.5, 0.0, -14.0),
-        (-15.5, 15.5, -14.0),
-        (0.0, 21.5, -14.0),
-        (18.5, 16.5, -14.0),
-        (21.0, 0.0, -14.0),
+        (18.9, -11.0),
+        (10.0, -16.8),
+        (-8.0, -16.8),
+        (-16.6, -11.0),
+        (-17.4, 0.0),
+        (-16.6, 11.0),
+        (-8.0, 16.8),
+        (10.0, 16.8),
+        (18.9, 11.0),
+        (19.4, 0.0),
     ]
     pieces.append(
-        add_curve(
+        add_flat_belt_loop(
             "QuickReleaseRescueBelt",
             belt_points,
-            0.95,
+            -13.6,
+            2.7,
+            0.36,
             materials["PfdWebbing"],
-            cyclic=True,
-            resolution=2,
         )
     )
     pieces.append(
         add_rounded_box(
             "QuickReleaseBuckle",
-            (21.8, 0.0, -14.0),
-            (1.8, 4.8, 2.8),
+            (19.65, 0.0, -13.6),
+            (0.75, 3.8, 2.2),
             materials["PfdHardware"],
-            0.5,
+            0.38,
         )
     )
     pieces.append(
         add_torus(
             "RescueTetherRing",
-            (-19.0, 0.0, -11.0),
-            2.7,
-            0.5,
+            (-18.1, 0.0, -10.8),
+            1.8,
+            0.32,
             materials["PfdHardware"],
             rotation=(0.0, math.pi / 2.0, 0.0),
         )
@@ -695,10 +794,10 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_rounded_box(
                 f"ChestReflective_{side:+.0f}",
-                (21.1, side * 9.2, 13.0),
-                (0.6, 4.5, 1.8),
+                (18.75, side * 8.6, 12.5),
+                (0.36, 4.0, 1.4),
                 materials["PfdReflective"],
-                0.35,
+                0.24,
             )
         )
     pieces.append(
@@ -714,10 +813,10 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_rounded_box(
                 f"FrontLashTab_{side:+.0f}",
-                (21.2, side * 8.0, 2.5),
-                (0.7, 2.6, 2.6),
+                (18.75, side * 7.5, 2.3),
+                (0.34, 1.5, 1.5),
                 materials["PfdLabel"],
-                0.35,
+                0.24,
             )
         )
     return pieces
@@ -756,12 +855,32 @@ def validate(mesh_object: bpy.types.Object) -> dict[str, object]:
         raise RuntimeError(
             f"Production PFD is unexpectedly low detail: {len(mesh_object.data.polygons)} polygons"
         )
-    coordinates = [mesh_object.matrix_world @ vertex.co for vertex in mesh_object.data.vertices]
-    minimum = Vector((min(v.x for v in coordinates), min(v.y for v in coordinates), min(v.z for v in coordinates)))
-    maximum = Vector((max(v.x for v in coordinates), max(v.y for v in coordinates), max(v.z for v in coordinates)))
+    coordinates = [
+        mesh_object.matrix_world @ vertex.co for vertex in mesh_object.data.vertices
+    ]
+    minimum = Vector(
+        (
+            min(v.x for v in coordinates),
+            min(v.y for v in coordinates),
+            min(v.z for v in coordinates),
+        )
+    )
+    maximum = Vector(
+        (
+            max(v.x for v in coordinates),
+            max(v.y for v in coordinates),
+            max(v.z for v in coordinates),
+        )
+    )
     dimensions = maximum - minimum
-    if not (38.0 <= dimensions.x <= 50.0 and 40.0 <= dimensions.y <= 52.0 and 42.0 <= dimensions.z <= 60.0):
-        raise RuntimeError(f"Production PFD bounds are implausible: {tuple(dimensions)}")
+    if not (
+        36.0 <= dimensions.x <= 48.0
+        and 32.0 <= dimensions.y <= 44.0
+        and 40.0 <= dimensions.z <= 56.0
+    ):
+        raise RuntimeError(
+            f"Production PFD bounds are implausible: {tuple(dimensions)}"
+        )
     return {
         "vertex_count": len(mesh_object.data.vertices),
         "polygon_count": len(mesh_object.data.polygons),
@@ -828,16 +947,19 @@ def main() -> None:
         "blend_sha256": sha256(BLEND_PATH),
         "material_slots": MATERIAL_NAMES,
         "construction": {
+            "front_carrier_panels": 2,
+            "back_carrier_panels": 1,
             "front_foam_panels": 4,
             "back_panels": 2,
             "rear_flex_channels": 1,
-            "side_wings": 2,
+            "side_wings": 0,
+            "side_webbing_connectors": 6,
             "shoulder_foam_pads": 0,
             "shoulder_webbing_runs": 2,
             "front_pockets": 2,
             "front_zip": 1,
             "backup_buckles": 2,
-            "front_backup_webbing_runs": 2,
+            "front_backup_webbing_runs": 4,
             "adjustment_points": 8,
             "quick_release_rescue_belts": 1,
             "rescue_tether_rings": 1,
@@ -849,16 +971,22 @@ def main() -> None:
             "outline_corner_rounding": "four-pass closed Chaikin",
             "outline_corner_rounding_passes": 4,
             "flat_exterior_foam_faces": 0,
-            "front_panel_edge_roll_cm": 1.35,
-            "front_panel_crown_depth_cm": 1.45,
-            "front_panel_lateral_wrap_depth_cm": 2.0,
-            "back_panel_edge_roll_cm": 1.05,
-            "back_panel_crown_depth_cm": 1.35,
-            "back_panel_lateral_wrap_depth_cm": 3.2,
-            "side_wing_flat_exterior_faces": 0,
-            "side_wing_crown_depth_cm": 0.75,
+            "carrier_shell_thickness_cm": 0.9,
+            "front_panel_foam_thickness_cm": 4.2,
+            "front_panel_edge_roll_cm": 1.0,
+            "front_panel_crown_depth_cm": 1.25,
+            "front_panel_lateral_wrap_depth_cm": 2.4,
+            "back_panel_foam_thickness_cm": 3.2,
+            "back_panel_edge_roll_cm": 0.92,
+            "back_panel_crown_depth_cm": 1.6,
+            "back_panel_lateral_wrap_depth_cm": 3.8,
+            "rigid_side_foam_wings": 0,
+            "side_webbing_connector_thickness_cm": 0.36,
             "front_pocket_flat_exterior_faces": 0,
-            "front_pocket_crown_depth_cm": 0.62,
+            "front_pocket_crown_depth_cm": 0.18,
+            "rescue_belt_profile": "flat torso-following webbing",
+            "rescue_belt_thickness_cm": 0.36,
+            "duplicate_tubular_side_adjustment_runs": 0,
             "smooth_shaded": True,
         },
         "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native.",

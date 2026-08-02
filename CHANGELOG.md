@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Rebuilt the production rescue PFD as a fitted soft-carrier V3 across every
+  runnable river. Two front carrier halves and one rear carrier now support
+  thinner rounded foam cells; rigid side wings are removed in favor of three
+  flat fit bands per side; the rescue belt is a flat torso-following loop; and
+  duplicate tubular adjustment geometry is gone. The deterministic Blender
+  source, fail-closed Unreal importer, 39,448-triangle Nanite asset, five-identity
+  roster captures, dry/wet close views, and renderer-enabled M5 gate all pass
+  technically with zero torso-origin error. Remaining faceting, fabric/hardware
+  fidelity, deformation, and named character-art/safety approval keep photoreal
+  acceptance and release promotion open.
 - Reverified Zambezi Batoka Gorge as a selectable sixth runnable river. The
   generated player-selection model, Unreal river catalog, frontend scenario,
   source scenario, shipping cook list, versioned `L_Zambezi` map, and focused

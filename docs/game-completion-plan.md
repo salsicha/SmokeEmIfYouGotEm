@@ -3575,6 +3575,20 @@ path is verified, and the completion goal can be marked complete.
   Simplified fabric/hardware, identity-specific deformation, seated motion, and
   named character-art plus qualified whitewater-safety approval remain open, so
   this is a technical baseline rather than photoreal promotion.
+- Integrated soft-carrier production PFD V3 supersedes that geometry baseline
+  across every runnable river. A 0.9 cm fitted carrier supports four thinner
+  4.2 cm chest cells and two rounded rear cells. The two rigid yellow side wings
+  are removed; three flat fit connectors per side preserve all eight adjustment
+  points; duplicate tubular side bands are removed; and the rescue belt becomes
+  a 0.36 cm flat torso-following webbing loop. The regenerated asset has 39,448
+  authored triangles, a 2,667-triangle Nanite fallback, five material slots, and
+  39.025 x 34.52 x 42.8 cm bounds. Five production identities retain the asset
+  with 0.0 cm maximum torso-origin error; six focused Python contracts, the
+  editor build, and renderer-enabled M5 crew presentation pass. Collision, mass,
+  animation, water, D3/D4, rescue, and gameplay authority are unchanged. The
+  retained candidate is still photoreal-rejected for remaining foam faceting,
+  simplified textile/hardware response, identity-specific deformation, seated
+  presentation, and missing named character-art and whitewater-safety approval.
 - Cloth and live-wet production PFD V1 replaces the same shell material on every runnable
   river with Unreal Cloth shading, project-owned PfdRipstop albedo/normal/packed maps, and
   one shared dynamic instance per avatar. Native raft surface wetness controls the seated

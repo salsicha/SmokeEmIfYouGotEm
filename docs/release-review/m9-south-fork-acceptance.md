@@ -2474,6 +2474,33 @@ and named character-art and whitewater-safety approval remain open. Exact hashes
 fail-closed verdict are in
 `docs/environment-captures/south_fork_full_reach/m9_cloth_wet_pfd_v1_review.json`.
 
+## Integrated soft-carrier production PFD V3 — fitted geometry retained, external review open
+
+The torso-wrapped V2 still read as separate flotation blocks with rigid yellow side wings,
+projected tubular fit straps, and a round rescue belt. V3 adds a fitted fabric carrier beneath
+thinner chest and rear cells, removes all side foam and duplicate tubular adjustment runs, and
+uses three flat fit bands per side plus a flat torso-following rescue belt. The vest remains
+sleeveless with zero flotation shoulder pads.
+
+![Integrated soft-carrier guide front](../environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_full.png)
+
+![Integrated soft-carrier guide profile](../environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_profile.png)
+
+![Integrated soft-carrier guide rear](../environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_guide_rear.png)
+
+The deterministic generator-v10 source imports at 39.025 x 34.52 x 42.8 cm with 39,448
+authored triangles, a 2,667-triangle Nanite fallback, and five material slots. All five
+production identities use the new asset with 0.0 cm maximum torso-origin error. The editor
+build, six focused Python contracts, renderer turntable, dry/wet close captures, and the
+renderer-enabled M5 crew-presentation test pass.
+
+This is a technical presentation improvement, not photoreal or safety acceptance. Remaining
+foam faceting, simplified fabric and hardware, pocket/webbing intersections, identity-specific
+deformation, seated review lighting, named character-art approval, and qualified whitewater-
+safety approval remain open. No collision, crew mass, animation, raft/water physics, D3/D4,
+rescue, scoring, or progression authority changed. Exact hashes and the fail-closed verdict are
+in `docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_review.json`.
+
 ## Required named decisions
 
 - [ ] Product owner: campaign, scope, disclosures, and every deferred/blocking item.

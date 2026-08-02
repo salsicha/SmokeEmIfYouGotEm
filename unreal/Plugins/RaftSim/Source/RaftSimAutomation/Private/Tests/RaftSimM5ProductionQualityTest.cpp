@@ -130,9 +130,9 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         TestEqual(TEXT("production rescue PFD has five authored material slots"),
                   ProductionPfd->GetStaticMaterials().Num(), 5);
         TestTrue(TEXT("production rescue PFD has plausible centimetre bounds"),
-                 DimensionsCm.X >= 40.0f && DimensionsCm.X <= 50.0f &&
-                 DimensionsCm.Y >= 40.0f && DimensionsCm.Y <= 50.0f &&
-                 DimensionsCm.Z >= 42.0f && DimensionsCm.Z <= 55.0f);
+                 DimensionsCm.X >= 36.0f && DimensionsCm.X <= 48.0f &&
+                 DimensionsCm.Y >= 32.0f && DimensionsCm.Y <= 44.0f &&
+                 DimensionsCm.Z >= 40.0f && DimensionsCm.Z <= 56.0f);
         TestTrue(TEXT("production rescue PFD has a Nanite render resource"),
                  ProductionPfd->HasValidNaniteData());
     }
