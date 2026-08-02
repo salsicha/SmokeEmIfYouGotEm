@@ -433,7 +433,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "ZambeziRunnableLaunchBankCoverInstanceCount = 1800" in foliage_cpp
     assert "ZambeziRunnableLaunchWoodyInstanceCount = 192" in foliage_cpp
     assert "ZambeziRunnableLaunchTalusInstanceCount = 360" in foliage_cpp
+    assert "ZambeziRunnableLaunchTalusReviewedSourceBlend = 0.42f" in foliage_cpp
+    assert "MI_RaftSim_Zambezi_BasaltTalusV1" in foliage_cpp
     assert "RaftSimRunnableLaunchTalusV1" in foliage_cpp
+    assert "RaftSimZambeziBasaltAnalogMaterialV1" in foliage_cpp
+    assert "RaftSimProjectOwnedMineralRetone" in foliage_cpp
     assert "RaftSimGenericRockAnalogNoLithologyAuthority" in foliage_cpp
     assert "RaftSimPresentationOnlyNoHydraulicAuthority" in foliage_cpp
     assert "RaftSimZambeziAtmosphereV1" in lighting_cpp
@@ -470,7 +474,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v14")
+    assert validation["schema"].endswith(".v15")
     assert validation["runtime_hydraulics"]["preserves_global_river_stations"] is True
     assert validation["runtime_hydraulics"]["rapid_count"] == 25
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
@@ -543,8 +547,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in component["collision_enabled"]
         and component["cast_shadow"] is True
         and "RockMossSet01" in component["static_mesh"]
-        and "M_RockMossSet01" in component["material"]
+        and "MI_RaftSim_Zambezi_BasaltTalusV1" in component["material"]
+        and "M_RaftSim_RiverBoulder" in component["parent_material"]
         and "RaftSimRunnableLaunchTalusV1" in component["tags"]
+        and "RaftSimZambeziBasaltAnalogMaterialV1" in component["tags"]
+        and "RaftSimProjectOwnedMineralRetone" in component["tags"]
         and "RaftSimGenericRockAnalogNoLithologyAuthority" in component["tags"]
         and "RaftSimNonCollisionRenderSurface" in component["tags"]
         and "RaftSimPresentationOnlyNoHydraulicAuthority" in component["tags"]

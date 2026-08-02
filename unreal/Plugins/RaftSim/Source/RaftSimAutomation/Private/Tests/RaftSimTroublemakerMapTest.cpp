@@ -431,12 +431,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                             Talus->GetStaticMesh()->GetPathName().Contains(
                                 TEXT("RockMossSet01")));
                     Test->TestTrue(
-                        TEXT("Zambezi launch talus uses the reviewed rock material"),
+                        TEXT("Zambezi launch talus uses its specific basalt-analog material"),
                         Talus->GetMaterial(0) &&
                             Talus->GetMaterial(0)->GetPathName().Contains(
-                                TEXT("M_RockMossSet01")));
+                                TEXT("MI_RaftSim_Zambezi_BasaltTalusV1")));
                     RunnableLaunchTalusInstanceCount += Talus->GetInstanceCount();
                 }
+                Test->TestTrue(
+                    TEXT("Zambezi launch talus declares its basalt-analog retone"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimZambeziBasaltAnalogMaterialV1")) &&
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimProjectOwnedMineralRetone")));
                 Test->TestTrue(
                     TEXT("Zambezi launch talus declares a generic visual analog"),
                     Actor->Tags.Contains(

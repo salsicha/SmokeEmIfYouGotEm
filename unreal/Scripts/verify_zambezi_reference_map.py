@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v14",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v15",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -233,6 +233,12 @@ def main() -> None:
             )
             component = components[0] if components else None
             material = component.get_material(0) if component else None
+            parent = (
+                material.get_editor_property("parent")
+                if material
+                and isinstance(material, unreal.MaterialInstanceConstant)
+                else None
+            )
             static_mesh = (
                 component.get_editor_property("static_mesh") if component else None
             )
@@ -248,6 +254,7 @@ def main() -> None:
                         static_mesh.get_path_name() if static_mesh else None
                     ),
                     "material": material.get_path_name() if material else None,
+                    "parent_material": parent.get_path_name() if parent else None,
                     "collision_enabled": (
                         str(component.get_collision_enabled()) if component else None
                     ),
@@ -401,6 +408,11 @@ def main() -> None:
                     "asset_rights_status": (
                         "rights_reviewed_cc0_poly_haven_rock_moss_set_01_"
                         "six_variant_visual_analog"
+                    ),
+                    "material_contract": (
+                        "zambezi_specific_project_owned_desaturated_mineral_"
+                        "retone_v1_over_rights_reviewed_cc0_microstructure_"
+                        "with_dry_bank_waterline_fail_safe"
                     ),
                     "placement_contract": (
                         "deterministic_128_candidate_search_approximately_"
@@ -615,11 +627,16 @@ def main() -> None:
             )
             and all(
                 "RockMossSet01" in str(row["static_mesh"])
-                and "M_RockMossSet01" in str(row["material"])
+                and "MI_RaftSim_Zambezi_BasaltTalusV1"
+                in str(row["material"])
+                and "M_RaftSim_RiverBoulder"
+                in str(row["parent_material"])
                 for row in launch_talus_rows
             )
             and all(
                 "RaftSimRunnableLaunchTalusV1" in row["tags"]
+                and "RaftSimZambeziBasaltAnalogMaterialV1" in row["tags"]
+                and "RaftSimProjectOwnedMineralRetone" in row["tags"]
                 and "RaftSimRightsReviewedCC0RockAnalog" in row["tags"]
                 and "RaftSimProceduralGeologyFallback" in row["tags"]
                 and "RaftSimGenericRockAnalogNoLithologyAuthority" in row["tags"]

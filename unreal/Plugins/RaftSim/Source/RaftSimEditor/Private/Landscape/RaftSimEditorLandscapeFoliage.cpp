@@ -23,6 +23,15 @@ constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 192;
 constexpr float ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 24.0f;
 constexpr int32 ZambeziRunnableLaunchTalusInstanceCount = 360;
 constexpr float ZambeziRunnableLaunchTalusSlopeCeilingDegrees = 48.0f;
+constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
+    "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
+constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
+    "MI_RaftSim_Zambezi_BasaltTalusV1");
+constexpr TCHAR ZambeziRunnableLaunchTalusMaterialPackagePath[] = TEXT(
+    "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/"
+    "MI_RaftSim_Zambezi_BasaltTalusV1");
+constexpr float ZambeziRunnableLaunchTalusReviewedSourceBlend = 0.42f;
+constexpr float ZambeziRunnableLaunchTalusWetBandWidthCm = 70.0f;
 
 enum class EZambeziVegetationForm : uint8
 {
@@ -1163,6 +1172,102 @@ bool ValidateZambeziOpaqueVegetationMaterial(UMaterialInterface* Material)
         BaseMaterial->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes) &&
         BaseMaterial->GetUsageByFlag(MATUSAGE_Nanite);
 }
+
+UMaterialInstanceConstant* LoadOrCreateZambeziRunnableLaunchTalusMaterial(
+    FString& OutSummary)
+{
+    UMaterialInterface* ParentMaterial = LoadObject<UMaterialInterface>(
+        nullptr,
+        ZambeziRunnableLaunchTalusParentMaterialPath);
+    if (!ParentMaterial)
+    {
+        OutSummary += TEXT(
+            "Failed to load the project-owned river-boulder parent for the "
+            "Zambezi launch talus.\n");
+        return nullptr;
+    }
+
+    const FString ObjectPath = FString::Printf(
+        TEXT("%s.%s"),
+        ZambeziRunnableLaunchTalusMaterialPackagePath,
+        ZambeziRunnableLaunchTalusMaterialAssetName);
+    UPackage* Package = CreatePackage(
+        ZambeziRunnableLaunchTalusMaterialPackagePath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+
+    UMaterialInstanceConstant* Instance = Cast<UMaterialInstanceConstant>(
+        StaticLoadObject(
+            UMaterialInstanceConstant::StaticClass(),
+            nullptr,
+            *ObjectPath));
+    if (!Instance)
+    {
+        Instance = FindObject<UMaterialInstanceConstant>(
+            Package,
+            ZambeziRunnableLaunchTalusMaterialAssetName);
+    }
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(
+            Package,
+            ZambeziRunnableLaunchTalusMaterialAssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Instance)
+        {
+            FAssetRegistryModule::AssetCreated(Instance);
+        }
+    }
+    if (!Instance)
+    {
+        return nullptr;
+    }
+
+    Instance->Modify();
+    Instance->SetParentEditorOnly(ParentMaterial);
+    // Keep enough of the reviewed CC0 scan to preserve real microstructure,
+    // but mix most of its green/ochre appearance into the project-authored
+    // neutral mineral branch. This remains a generic visual analog and makes
+    // no Batoka lithology claim.
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("RockVisualSourceBlend")),
+        ZambeziRunnableLaunchTalusReviewedSourceBlend);
+    // These launch-window rocks are hard-gated onto dry bank. The fail-safe
+    // waterline keeps the parent's wet branch inactive until a future
+    // per-instance river-surface binding can supply a real local elevation.
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("RockWaterlineZCm")),
+        -1.0e7f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("RockWetBandWidthCm")),
+        ZambeziRunnableLaunchTalusWetBandWidthCm);
+    Instance->PostEditChange();
+    Package->MarkPackageDirty();
+
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        ZambeziRunnableLaunchTalusMaterialPackagePath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to save %s.\n"),
+            *ObjectPath);
+        return nullptr;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Built Zambezi launch-talus material %s with %.2f reviewed-source "
+             "blend and dry-bank waterline fail-safe.\n"),
+        *ObjectPath,
+        ZambeziRunnableLaunchTalusReviewedSourceBlend);
+    return Instance;
+}
 } // namespace
 
 UMaterialInstanceConstant* LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
@@ -2074,6 +2179,9 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
+    UMaterialInstanceConstant* ZambeziRunnableLaunchTalusMaterial = bZambezi
+        ? LoadOrCreateZambeziRunnableLaunchTalusMaterial(OutSummary)
+        : nullptr;
     if (bZambezi)
     {
         for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
@@ -2086,7 +2194,8 @@ bool AddLandscapeCandidateBiomeDressing(
                         TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchTalusRock%02d_%s"),
                         RockIndex + 1,
                         *Candidate.PreviewSpec.RiverId),
-                    true));
+                    true,
+                    ZambeziRunnableLaunchTalusMaterial));
         }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedPineInstances;
@@ -2111,7 +2220,8 @@ bool AddLandscapeCandidateBiomeDressing(
           !ZambeziRunnableLaunchGroundCoverInstances ||
           !ZambeziRunnableLaunchRiparianTreeInstances ||
           !ZambeziRunnableLaunchUmbrellaTreeInstances ||
-          !ZambeziRunnableLaunchThornScrubInstances)) ||
+          !ZambeziRunnableLaunchThornScrubInstances ||
+          !ZambeziRunnableLaunchTalusMaterial)) ||
         Algo::AnyOf(ReviewedRockInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
@@ -2230,6 +2340,8 @@ bool AddLandscapeCandidateBiomeDressing(
             {
                 Owner->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
                 Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchTalusV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziBasaltAnalogMaterialV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProjectOwnedMineralRetone"));
                 Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
                 Owner->Tags.AddUnique(TEXT("RaftSimProceduralGeologyFallback"));
                 Owner->Tags.AddUnique(TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
@@ -2243,6 +2355,8 @@ bool AddLandscapeCandidateBiomeDressing(
             {
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimRunnableLaunchTalusV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziBasaltAnalogMaterialV1"));
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
                 Component->ComponentTags.AddUnique(
