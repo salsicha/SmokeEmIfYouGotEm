@@ -22,7 +22,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 10
+GENERATOR_VERSION = 11
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -407,6 +407,62 @@ def add_flat_belt_loop(
     return obj
 
 
+def add_side_webbing_arc(
+    name: str,
+    path_xy: list[tuple[float, float]],
+    z_center: float,
+    height: float,
+    thickness: float,
+    piece_material: bpy.types.Material,
+) -> bpy.types.Object:
+    """Sweep open side webbing around the torso instead of through it."""
+    half_height = height * 0.5
+    half_thickness = thickness * 0.5
+    vertices: list[tuple[float, float, float]] = []
+    for x, y in path_xy:
+        radial = Vector((x, y)).normalized()
+        centre = Vector((x, y))
+        inner = centre - radial * half_thickness
+        outer = centre + radial * half_thickness
+        vertices.extend(
+            [
+                (inner.x, inner.y, z_center - half_height),
+                (outer.x, outer.y, z_center - half_height),
+                (outer.x, outer.y, z_center + half_height),
+                (inner.x, inner.y, z_center + half_height),
+            ]
+        )
+    faces: list[tuple[int, ...]] = [(3, 2, 1, 0)]
+    for section in range(len(path_xy) - 1):
+        start = section * 4
+        following = start + 4
+        faces.extend(
+            [
+                (start, start + 1, following + 1, following),
+                (start + 1, start + 2, following + 2, following + 1),
+                (start + 2, start + 3, following + 3, following + 2),
+                (start + 3, start, following, following + 3),
+            ]
+        )
+    last = (len(path_xy) - 1) * 4
+    faces.append((last, last + 1, last + 2, last + 3))
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(piece_material)
+    bevel = obj.modifiers.new("SoftSideWebbingEdge", "BEVEL")
+    bevel.width = 0.08
+    bevel.segments = 3
+    bevel.limit_method = "ANGLE"
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    shade_smooth(obj)
+    return obj
+
+
 def add_curve(
     name: str,
     points: list[tuple[float, float, float]],
@@ -625,18 +681,29 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                 lateral_wrap_depth=3.8,
             )
         )
-    # Real high-profile rescue PFDs leave the side body articulated. Six flat
-    # webbing connectors replace the former rigid yellow side blocks, which
-    # read as flotation shoulder/hip armour in profile.
+    # Four open side adjustments match the referenced rescue-PFD construction.
+    # Each thin textile run curves around the torso and overlaps the front and
+    # rear carriers, preserving articulation without the former rigid yellow
+    # wings or a solid side armour panel.
     for side in (-1.0, 1.0):
-        for index, z in enumerate((-10.5, -3.0, 5.0)):
+        path_xy = [
+            (-13.8, side * 13.2),
+            (-10.5, side * 15.2),
+            (-6.0, side * 16.5),
+            (0.0, side * 17.0),
+            (6.0, side * 16.5),
+            (10.5, side * 15.2),
+            (13.8, side * 13.2),
+        ]
+        for index, z in enumerate((-8.7, 3.7)):
             pieces.append(
-                add_rounded_box(
+                add_side_webbing_arc(
                     f"SideWebbingConnector_{side:+.0f}_{index + 1}",
-                    (0.5, side * 16.6, z),
-                    (24.0, 0.36, 1.35),
+                    path_xy,
+                    z,
+                    1.05,
+                    0.22,
                     materials["PfdWebbing"],
-                    0.16,
                 )
             )
 
@@ -723,16 +790,14 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                 )
             )
 
-    # Six low-profile sliders on the existing side connectors plus the two flat
-    # shoulder straps provide eight fit points. Reusing the connector webbing
-    # avoids duplicated tubular bands and keeps hardware off the shoulder crest.
+    # Four low-profile side sliders and four shoulder-end adjustments provide
+    # the referenced eight fit points without hardware on the shoulder crest.
     adjustment_points = []
     for side in (-1.0, 1.0):
         adjustment_points.extend(
             [
-                (1.0, side * 16.9, 5.0),
-                (1.0, side * 16.9, -3.0),
-                (1.0, side * 16.9, -10.5),
+                (4.5, side * 16.7, 3.7),
+                (4.5, side * 16.7, -8.7),
             ]
         )
     for index, point in enumerate(adjustment_points):
@@ -740,7 +805,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
             add_rounded_box(
                 f"AdjustmentSlider_{index + 1:02d}",
                 point,
-                (2.8, 0.72, 1.85),
+                (2.0, 0.55, 1.45),
                 materials["PfdHardware"],
                 0.28,
             )
@@ -953,7 +1018,9 @@ def main() -> None:
             "back_panels": 2,
             "rear_flex_channels": 1,
             "side_wings": 0,
-            "side_webbing_connectors": 6,
+            "side_webbing_connectors": 4,
+            "side_adjustment_sliders": 4,
+            "shoulder_adjustment_points": 4,
             "shoulder_foam_pads": 0,
             "shoulder_webbing_runs": 2,
             "front_pockets": 2,
@@ -981,7 +1048,9 @@ def main() -> None:
             "back_panel_crown_depth_cm": 1.6,
             "back_panel_lateral_wrap_depth_cm": 3.8,
             "rigid_side_foam_wings": 0,
-            "side_webbing_connector_thickness_cm": 0.36,
+            "side_webbing_connector_profile": "curved torso-following fabric",
+            "side_webbing_connector_thickness_cm": 0.22,
+            "side_webbing_connector_height_cm": 1.05,
             "front_pocket_flat_exterior_faces": 0,
             "front_pocket_crown_depth_cm": 0.18,
             "rescue_belt_profile": "flat torso-following webbing",
