@@ -49,7 +49,7 @@ def test_build_futaleufu_terminator_visual_water() -> None:
     assert image.size == (1024, 256)
 
 
-def test_terminator_organic_lit_review_is_hash_locked_and_honest() -> None:
+def test_terminator_organic_lit_review_retains_immutable_evidence_and_is_honest() -> None:
     review = json.loads((REPO_ROOT / REVIEW_RELATIVE).read_text(encoding="utf-8"))
 
     assert review["schema"] == (
@@ -89,7 +89,20 @@ def test_terminator_organic_lit_review_is_hash_locked_and_honest() -> None:
     assert len(review["required_external_acceptance_gates"]) == 6
     assert len(review["remaining_photoreal_defects"]) >= 6
 
+    # The native-water milestone supersedes the mutable map, manifest, and
+    # canonical after-captures. Its own review locks their current hashes. This
+    # historical terrain review continues to lock only its immutable before
+    # frames, material audit, map-load report, and terrain material asset.
+    superseded_paths = {
+        "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png",
+    }
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_paths:
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]

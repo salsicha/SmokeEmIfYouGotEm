@@ -3745,6 +3745,24 @@ path is verified, and the completion goal can be marked complete.
   hydraulics/VFX, sparse reach-specific bank structure, and all named guide,
   geospatial, hydraulic, ecology/geology/art, water-VFX, and performance gates
   remain open.
+- Futaleufú native water V1 removes a cross-river presentation error from the
+  retained Terminator map. The physical capture ribbon now binds an isolated
+  opaque Default Lit Futaleufú parent with the river's own first-party normal
+  atlas, two moving normal layers, and non-harmonic 0.00031 and 0.00163 per-
+  centimetre optical fields. The reach-local packed cooked field is interpreted
+  once while the CPU builds ribbon geometry and vertex color; all shader-field
+  gains are zero so the South Fork fallback can no longer double-condition this
+  river. The live solver carrier retains sole gameplay rendering and force
+  authority and now reads river-local reflection, ripple, foam, and water-color
+  controls from the saved config. No water geometry, collision, terrain,
+  hydraulic state, route, or raft-force value changed. Fixed-frame water-band
+  comparisons raise mean luminance from 0.1611 to 0.2063 in the guide view and
+  0.1583 to 0.2028 at river eye, with RGB standard deviation increasing from
+  0.0482 to 0.0722 and 0.0479 to 0.0719. The native material audit and
+  `L_Terminator` runtime load gate each pass 1/1. This remains a rejected visual
+  candidate: broad plate-like water, weak rapid relief, sparse foam/spray,
+  smooth source-scale banks, repeated vegetation, incomplete bank structure,
+  and all six named external acceptance gates remain open.
 - Zambezi stable runnable delivery V1 promotes the already-validated complete
   Batoka Gorge reference run from the ignored `EnvironmentPreviews` namespace
   to the versioned `/Game/RaftSim/Maps/L_Zambezi` package. The editor generator,

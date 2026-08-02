@@ -414,6 +414,21 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         }
         FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") &&
+            Candidate.bUseSolverVisualizationFields &&
+            !Candidate.SolverVisualizationFieldRelativePath.IsEmpty())
+        {
+            // Terminator's packed field is already sampled into capture
+            // geometry and vertex colours. The material must not re-sample
+            // the shared South Fork fallback texture on top of that result.
+            WaterSettings.SolverFieldEnable = 0.0f;
+            WaterSettings.SolverMacroNormalWeight = 0.0f;
+            WaterSettings.SolverDepthColorWeight = 0.0f;
+            WaterSettings.SolverFieldRoughnessWeight = 0.0f;
+            WaterSettings.SolverFroudeAerationWeight = 0.0f;
+            WaterSettings.SolverSpeedVisualGain = 0.0f;
+            WaterSettings.SolverFroudeVisualGain = 0.0f;
+        }
         if (!Candidate.bUseSolverVisualizationFields &&
             Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
         {
@@ -479,6 +494,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
         const bool bUsesPacuareRainforestDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bUsesFutaleufuTerminatorDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
@@ -498,7 +515,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater")
             : (bUsesPacuareRainforestDefaultLitWater
                    ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater")
-                   : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate"));
+                   : (bUsesFutaleufuTerminatorDefaultLitWater
+                          ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater")
+                          : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate")));
         const FString WaterSingleLayerParameterKeyPrefix =
             bUsesSingleLayerWater
             ? TEXT("water_single_layer")
@@ -696,7 +715,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_blend_mode\": \"Opaque\",\n")
             TEXT("      \"water_custom_output\": \"%s\",\n")
             TEXT("      \"water_volume_parameter_status\": \"%s\",\n")
-            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_plus_optional_validated_cpp_solver_macro_normal\",\n")
+            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_plus_cpu_authored_reach_local_or_validated_shader_solver_field\",\n")
             TEXT("      \"water_solver_visualization_field_status\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_manifest\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_texture_count\": %d,\n")
@@ -983,7 +1002,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("zambezi_single_layer_water_volume_candidate_bound_and_captured")
                        : (bUsesPacuareRainforestDefaultLitWater
                               ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
-                              : TEXT("solver_surface_default_lit_candidate_bound_and_captured")))
+                              : (bUsesFutaleufuTerminatorDefaultLitWater
+                                     ? TEXT("futaleufu_terminator_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
+                                     : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
             *EscapeRaftSimJsonString(WaterMaterialParentPath),

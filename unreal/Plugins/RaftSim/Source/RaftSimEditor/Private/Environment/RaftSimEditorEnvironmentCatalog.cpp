@@ -178,20 +178,21 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
         // Terminator samples its median cooked C++ field on the reach-local
-        // ribbon. Keep the Futaleufu turquoise restrained so measured depth,
-        // speed, Froude number, and free-surface relief own the rapid cues.
-        Settings.BaseColorScale = 1.02f;
-        Settings.EmissiveFillScale = 0.090f;
-        Settings.Roughness = 0.28f;
-        Settings.Specular = 0.48f;
+        // ribbon. The CPU-authored vertex colours remain the only cooked-field
+        // color authority; the isolated parent adds native moving normals,
+        // restrained Fresnel response, and non-hydraulic optical variation.
+        Settings.BaseColorScale = 1.08f;
+        Settings.EmissiveFillScale = 0.140f;
+        Settings.Roughness = 0.24f;
+        Settings.Specular = 0.46f;
         Settings.Opacity = 0.34f;
-        Settings.NormalIntensity = 0.22f;
-        Settings.SurfaceVariationStrength = 0.24f;
-        Settings.VertexTintWeight = 0.62f;
+        Settings.NormalIntensity = 0.30f;
+        Settings.SurfaceVariationStrength = 0.30f;
+        Settings.VertexTintWeight = 0.76f;
         Settings.RenderWidthScale = 1.18f;
         Settings.RenderNormalUpBlend = 0.84f;
         Settings.RenderDisplacementScale = 0.18f;
-        Settings.ReflectionFillIntensity = 0.07f;
+        Settings.ReflectionFillIntensity = 0.10f;
         Settings.SolverFieldEnable = 1.0f;
         Settings.SolverMacroNormalWeight = 0.20f;
         Settings.SolverDepthColorWeight = 0.30f;
@@ -200,10 +201,10 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 1.0f;
         Settings.SolverFroudeVisualGain = 1.0f;
         Settings.SolverSurfaceReliefScale = 0.22f;
-        Settings.SurfaceTint = FLinearColor(0.008f, 0.18f, 0.22f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.025f, 0.185f, 0.225f, 0.0f);
         Settings.SolverDeepWaterTint = FLinearColor(0.006f, 0.095f, 0.13f, 0.0f);
         Settings.SolverAerationTint = FLinearColor(0.88f, 0.95f, 0.96f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.38f, 0.56f, 0.65f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.32f, 0.53f, 0.63f, 0.0f);
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {

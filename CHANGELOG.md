@@ -32,6 +32,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Corrected Futaleufú Terminator water provenance and optical response without
+  changing its ribbon geometry, collision, hydraulics, or raft forces. The
+  capture ribbon now uses an isolated opaque Default Lit parent, Futaleufú's
+  own normal atlas, two moving normal layers, and two non-harmonic world-space
+  optical scales; its reach-local cooked field is sampled once into CPU-authored
+  vertex color instead of being overlaid with the shared South Fork shader
+  field. The live solver carrier now exposes river-local reflection, ripple,
+  foam, and color controls. Across the fixed water-band region, mean luminance
+  rises from 0.1611 to 0.2063 in the guide view and 0.1583 to 0.2028 at river
+  eye, while RGB variation rises from 0.0482 to 0.0722 and 0.0479 to 0.0719.
+  The editor build, native saved-material audit, runnable-map gate, and focused
+  contracts pass. Broad synthetic water, sparse foam/spray, coarse terrain,
+  repeated ecology, missing local bathymetry, and named external review keep
+  photoreal and production acceptance open.
 - Corrected Futaleufú Terminator's generated Landscape material from an
   unlit/manifest mismatch to a saved Default Lit organic temperate graph. Three
   incommensurate world-space fields now vary humid-forest value, moss and leaf

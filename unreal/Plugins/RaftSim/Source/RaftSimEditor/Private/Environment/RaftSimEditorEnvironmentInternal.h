@@ -984,6 +984,8 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
 
 UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
 
+UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary);
+
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
 

@@ -701,6 +701,21 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     bLiveSurfaceCarrierEnabled
                         ? RiverWaterConfig->LiveSurfaceRoughness
                         : 0.085f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveSkyReflectionStrength"),
+                    bLiveSurfaceCarrierEnabled
+                        ? RiverWaterConfig->LiveSkyReflectionStrength
+                        : 0.62f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveRippleStrength"),
+                    bLiveSurfaceCarrierEnabled
+                        ? RiverWaterConfig->LiveRippleStrength
+                        : 0.18f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveFoamIntensity"),
+                    bLiveSurfaceCarrierEnabled
+                        ? RiverWaterConfig->LiveFoamIntensity
+                        : 0.52f);
                 if (bLiveSurfaceCarrierEnabled)
                 {
                     LiveWaterMaterial->SetVectorParameterValue(
