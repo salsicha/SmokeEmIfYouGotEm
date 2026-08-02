@@ -473,7 +473,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                                  : GetSolverVisualizationFieldManifestRelativePath())));
         const bool bHasManifestConditionedPhysicalChannel =
             Candidate.bPhysicalScaleSourceCorridor;
-        const bool bUsesZambeziOpaqueVegetation =
+        const bool bUsesOpaqueVolumetricVegetation =
             Result.bDressingUsesOpaqueVolumetricVegetation;
         const bool bUsesZambeziSingleLayerWater =
             Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
@@ -523,11 +523,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.ColorScaleBehindWater.R,
             WaterSettings.ColorScaleBehindWater.G,
             WaterSettings.ColorScaleBehindWater.B);
-        const FString DressingSourceSpeciesJson = bUsesZambeziOpaqueVegetation
+        const FString DressingSourceSpeciesJson = bUsesOpaqueVolumetricVegetation
             ? TEXT("[]")
             : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
         const FString DressingConvertedSpeciesJson =
-            bUsesZambeziOpaqueVegetation
+            bUsesOpaqueVolumetricVegetation
             ? FString::Printf(
                   TEXT("[\"%s\", \"%s\", \"%s\", \"%s\"]"),
                   *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
@@ -849,8 +849,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             MaterialSettings.WetBankColorScale.G,
             MaterialSettings.WetBankColorScale.B,
             Result.bDressingValidated
-                ? (bUsesZambeziOpaqueVegetation
-                       ? TEXT("source_mask_placed_opaque_volumetric_zambezi_vegetation_and_rights_reviewed_rock_comparison_captured")
+                ? (bUsesOpaqueVolumetricVegetation
+                       ? TEXT("source_mask_placed_project_owned_opaque_volumetric_vegetation_and_rock_dressing_captured")
                        : Result.DressingExternalRockMeshCount == 6
                        ? TEXT("source_mask_placed_complete_pve_species_and_rights_reviewed_rock_comparison_captured")
                        : TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured"))
@@ -899,8 +899,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
             *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
             *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
-            bUsesZambeziOpaqueVegetation
-                ? TEXT("zambezi_opaque_volumetric_nanite_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_hierarchical_instancing")
+            bUsesOpaqueVolumetricVegetation
+                ? TEXT("project_owned_opaque_volumetric_nanite_species_hierarchical_instancing_plus_river_specific_rock_dressing")
                 : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_and_sparse_three_variant_pine_hierarchical_instancing")
                 : (Result.DressingExternalRockMeshCount == 6
@@ -918,7 +918,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("water_and_vegetation_masks_loaded_and_used_for_candidate_selection")
                 : TEXT("required_source_masks_missing"),
             Result.bDressingFoliageMaterialsValidated
-                ? (bUsesZambeziOpaqueVegetation
+                ? (bUsesOpaqueVolumetricVegetation
                        ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards")
                        : TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained"))
                 : TEXT("foliage_material_generation_or_binding_failed"),
@@ -926,15 +926,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingFoliageMaterialBoundSlotCount,
             Result.DressingNativeFoliageMaterialFallbackSlotCount,
             *EscapeRaftSimJsonString(
-                bUsesZambeziOpaqueVegetation
+                bUsesOpaqueVolumetricVegetation
                     ? Result.DressingFoliageMaterialAssetPath
                     : DefaultBroadleafMaterialAsset),
             *EscapeRaftSimJsonString(
-                bUsesZambeziOpaqueVegetation
+                bUsesOpaqueVolumetricVegetation
                     ? Result.DressingFoliageMaterialAssetPath
                     : DefaultConiferMaterialAsset),
             *EscapeRaftSimJsonString(
-                bUsesZambeziOpaqueVegetation
+                bUsesOpaqueVolumetricVegetation
                     ? Result.DressingFoliageMaterialAssetPath
                     : DefaultUnderstoryMaterialAsset),
             FoliageSettings.BroadleafFrontTint.R,
@@ -961,8 +961,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
-            bUsesZambeziOpaqueVegetation
-                ? TEXT("opaque_volumetric_zambezi_fallback_removes_card_artifacts_but_requires_species_ecology_guide_visual_and_performance_review")
+            bUsesOpaqueVolumetricVegetation
+                ? TEXT("opaque_volumetric_procedural_fallback_removes_alpha_card_artifacts_but_requires_species_ecology_guide_visual_and_performance_review")
                 : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_rock_and_pine_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
                 : (Result.DressingExternalRockMeshCount == 6

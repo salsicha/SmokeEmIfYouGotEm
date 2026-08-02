@@ -1,4 +1,5 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
@@ -538,6 +539,30 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         SlopeConditionedBaseColor->Alpha.Expression = RockSlopeMask;
         Material->GetExpressionCollection().AddExpression(SlopeConditionedBaseColor);
         FinalBaseColor = SlopeConditionedBaseColor;
+    }
+    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        // The source-conditioned water-zone samples contain valid near-black
+        // bed pixels, but the live carrier's narrow bank feather exposes a few
+        // dry shoreline texels. A small linear-space floor retains source
+        // variation while preventing that transition from reading as a black
+        // polygonal wall. This is presentation only and never changes terrain
+        // height, collision, wet/dry authority, or channel geometry.
+        UMaterialExpressionConstant3Vector* TemperateBankRadianceFloor =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        TemperateBankRadianceFloor->Constant =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator")
+            ? FLinearColor(0.026f, 0.034f, 0.029f, 1.0f)
+            : FLinearColor(0.030f, 0.033f, 0.026f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(
+            TemperateBankRadianceFloor);
+        UMaterialExpressionMax* BankFloor =
+            NewObject<UMaterialExpressionMax>(Material);
+        BankFloor->A.Expression = FinalBaseColor;
+        BankFloor->B.Expression = TemperateBankRadianceFloor;
+        Material->GetExpressionCollection().AddExpression(BankFloor);
+        FinalBaseColor = BankFloor;
     }
 
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);

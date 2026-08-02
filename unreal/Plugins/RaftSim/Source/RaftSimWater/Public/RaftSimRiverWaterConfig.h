@@ -66,4 +66,50 @@ public:
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;
+
+    /** The authored editor-capture ribbon is hidden during play, so the live
+     * solver mesh must render the complete visible river rather than a
+     * subordinate hydraulic-detail overlay. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bLiveSolverOwnsRuntimeRendering = false;
+
+    /** Surface opacity in ordinary current when the live solver owns the
+     * visible river. Kept below one so depth and conditioned bed colour remain
+     * legible without exposing the terrain as the water surface. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSurfaceCalmCoverage = 0.86f;
+
+    /** Surface opacity in solver-active water when the live solver owns the
+     * visible river. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSurfaceActiveCoverage = 0.96f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSurfaceSpecular = 0.42f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.02", ClampMax = "1.0"))
+    float LiveSurfaceRoughness = 0.16f;
+
+    /** Width of the presentation-only alpha feather at the sampled wet bank.
+     * Solver-owned carriers use a narrow blend so water does not appear to
+     * climb several metres onto dry land. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "1.5", ClampMax = "12.0"))
+    float LiveSurfaceBankBlendMeters = 4.5f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveShallowSurfaceColor =
+        FLinearColor(0.10f, 0.23f, 0.24f, 1.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveDeepSurfaceColor =
+        FLinearColor(0.025f, 0.075f, 0.09f, 1.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveReflectedSkyColor =
+        FLinearColor(0.18f, 0.28f, 0.34f, 1.0f);
 };
