@@ -12,8 +12,10 @@ at three flow bands, first-person guiding and AI crew commands, rescue and progr
 photoreal Unreal presentation, genuine live shallow-water physics, and a visibly
 flexible inflatable raft that can overturn, fold, wrap, pin, and recover around rocks.
 
-Futaleufu, Pacuare, Chilko, Colorado, and Zambezi remain bonus rapid slices and the
-post-1.0 expansion path. They do not delay a complete South Fork 1.0.
+Futaleufu, Pacuare, Chilko, and Colorado remain bonus signature-rapid slices.
+Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
+to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
+and do not delay a complete South Fork 1.0.
 
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
