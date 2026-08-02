@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "87579439EF4376DB8B9F0586FD9B07A1",
+			"instanceName": "Alexs-MacBook-Air.local-48246",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-15.18.41",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.23309391736984253,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "CrewAvatarPoseProduction",
+			"fullTestPath": "RaftSim.M5.CrewAvatarPoseProduction",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"87579439EF4376DB8B9F0586FD9B07A1"
+			],
+			"duration": 0.23309391736984253,
+			"dateTime": "2026.08.02-15.18.41",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

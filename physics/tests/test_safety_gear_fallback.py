@@ -55,9 +55,9 @@ CLOTH_WET_REVIEW_PATH = (
     REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_cloth_wet_pfd_v1_review.json"
 )
-INTEGRATED_CARRIER_REVIEW_PATH = (
+CURVED_SIDE_WEBBING_REVIEW_PATH = (
     REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
-    "m9_integrated_soft_carrier_pfd_v3_review.json"
+    "m9_curved_side_webbing_pfd_v4_review.json"
 )
 
 
@@ -202,6 +202,7 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert "rescue_tether_rings" in build_script
     assert "ShoulderFoamBand" not in build_script
     assert "add_swept_shoulder_bridge" not in build_script
+    assert "add_side_webbing_arc" in build_script
     assert "add_crowned_foam_panel" in build_script
     assert "rounded_outline" in build_script
     assert '"PfdShell"' in build_script
@@ -216,6 +217,9 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
     assert manifest["construction"]["front_foam_panels"] == 4
     assert manifest["construction"]["shoulder_foam_pads"] == 0
     assert manifest["construction"]["shoulder_webbing_runs"] == 2
+    assert manifest["construction"]["side_webbing_connectors"] == 4
+    assert manifest["construction"]["side_adjustment_sliders"] == 4
+    assert manifest["construction"]["shoulder_adjustment_points"] == 4
     assert manifest["construction"]["adjustment_points"] == 8
     assert manifest["construction"]["front_backup_webbing_runs"] == 4
     assert manifest["construction"]["quick_release_rescue_belts"] == 1
@@ -234,7 +238,9 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "back_panel_crown_depth_cm": 1.6,
         "back_panel_lateral_wrap_depth_cm": 3.8,
         "rigid_side_foam_wings": 0,
-        "side_webbing_connector_thickness_cm": 0.36,
+        "side_webbing_connector_profile": "curved torso-following fabric",
+        "side_webbing_connector_thickness_cm": 0.22,
+        "side_webbing_connector_height_cm": 1.05,
         "front_pocket_flat_exterior_faces": 0,
         "front_pocket_crown_depth_cm": 0.18,
         "rescue_belt_profile": "flat torso-following webbing",
@@ -316,16 +322,21 @@ def test_cloth_wet_pfd_review_is_hash_verified_and_fail_closed() -> None:
         assert hashlib.sha256(path.read_bytes()).hexdigest() == asset["sha256"]
 
 
-def test_integrated_soft_carrier_pfd_review_is_hash_verified_and_fail_closed() -> None:
-    review = json.loads(INTEGRATED_CARRIER_REVIEW_PATH.read_text(encoding="utf-8"))
+def test_curved_side_webbing_pfd_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(CURVED_SIDE_WEBBING_REVIEW_PATH.read_text(encoding="utf-8"))
 
     assert review["technical_candidate_passed"] is True
     assert review["photoreal_acceptance_passed"] is False
     assert review["promotion_allowed"] is False
     assert review["construction"]["side_wings"] == 0
-    assert review["construction"]["side_webbing_connectors"] == 6
+    assert review["construction"]["side_webbing_connectors"] == 4
+    assert review["construction"]["side_adjustment_sliders"] == 4
+    assert review["construction"]["shoulder_adjustment_points"] == 4
     assert review["construction"]["shoulder_foam_pads"] == 0
     assert review["soft_geometry"]["duplicate_tubular_side_adjustment_runs"] == 0
+    assert review["soft_geometry"]["side_webbing_connector_profile"] == (
+        "curved torso-following fabric"
+    )
     assert review["runtime_roster_metrics"]["captured_character_count"] == 5
     assert review["runtime_roster_metrics"]["characters_using_production_pfd"] == 5
     assert review["runtime_roster_metrics"]["maximum_runtime_torso_error_cm"] == 0.0

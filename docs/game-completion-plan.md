@@ -3901,3 +3901,20 @@ path is verified, and the completion goal can be marked complete.
   simple shoreline structure, synthetic lighting, and absent named environment-
   art, geospatial, and South Fork guide approval keep M9 and photoreal promotion
   open.
+- Curved side-webbing production PFD V4 replaces the retained carrier's six
+  straight rectangular flank bars with four thin open fabric arcs. Two per
+  side now follow the torso and overlap both the front and rear carrier anchors,
+  matching the referenced four-side-adjustment layout while retaining an
+  articulated open side. The rejected solid side-gusset bracket was not
+  promoted because fixed profile pixels read it as a rigid armor plate. The
+  retained V4 adds no side flotation and no shoulder foam, reduces the exposed
+  side sliders from six to four, preserves the flat rescue belt and five
+  material slots, and leaves collision, crew mass, hydraulics, D3/D4 authority,
+  rescue logic, and runtime transforms unchanged. Blender source validation,
+  Unreal import, six focused Python contracts, five-identity fixed-view roster
+  capture, and the renderer-enabled M5 crew presentation gate pass; all five
+  identities retain production PFD selection and 0.0 cm maximum torso-origin
+  error. The hash-locked review remains fail-closed for simplified fabric and
+  foam response, intersections and identity deformation, and absent named
+  character-art and qualified whitewater-safety approval; M9 and photoreal
+  promotion remain open.
