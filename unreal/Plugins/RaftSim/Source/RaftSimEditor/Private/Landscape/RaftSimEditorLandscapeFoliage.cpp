@@ -40,7 +40,7 @@ constexpr TCHAR ZambeziRunnableLaunchTalusMaterialPackagePath[] = TEXT(
     "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/"
     "MI_RaftSim_Zambezi_BasaltTalusV1");
 constexpr float ZambeziRunnableLaunchTalusReviewedSourceBlend = 0.42f;
-constexpr float ZambeziRunnableLaunchTalusWetBandWidthCm = 70.0f;
+constexpr float ZambeziRunnableLaunchTalusWetBandWidthCm = 220.0f;
 
 enum class EZambeziVegetationForm : uint8
 {
@@ -1320,9 +1320,9 @@ UMaterialInstanceConstant* LoadOrCreateZambeziRunnableLaunchTalusMaterial(
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("RockVisualSourceBlend")),
         ZambeziRunnableLaunchTalusReviewedSourceBlend);
-    // These launch-window rocks are hard-gated onto dry bank. The fail-safe
-    // waterline keeps the parent's wet branch inactive until a future
-    // per-instance river-surface binding can supply a real local elevation.
+    // The scalar remains a dry fail-safe. Launch talus binds each instance's
+    // conditioned local visual-surface elevation through custom-data channel
+    // zero, so a curved reach never collapses to one invented flat waterline.
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("RockWaterlineZCm")),
         -1.0e7f);
@@ -2320,7 +2320,7 @@ bool AddLandscapeCandidateBiomeDressing(
     {
         for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
         {
-            ZambeziRunnableLaunchTalusInstances.Add(
+            UHierarchicalInstancedStaticMeshComponent* TalusComponent =
                 AddLandscapeCandidateInstancedMeshComponent(
                     World,
                     ReviewedRockMeshes[RockIndex],
@@ -2329,7 +2329,12 @@ bool AddLandscapeCandidateBiomeDressing(
                         RockIndex + 1,
                         *Candidate.PreviewSpec.RiverId),
                     true,
-                    ZambeziRunnableLaunchTalusMaterial));
+                    ZambeziRunnableLaunchTalusMaterial);
+            if (TalusComponent)
+            {
+                TalusComponent->SetNumCustomDataFloats(1);
+            }
+            ZambeziRunnableLaunchTalusInstances.Add(TalusComponent);
         }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedPineInstances;
@@ -2514,6 +2519,9 @@ bool AddLandscapeCandidateBiomeDressing(
                 Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
                 Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
                 Owner->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimConditionedWaterlineWetBankV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPerInstanceConditionedWaterline"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralWetBankNoMeasuredAuthority"));
             }
             if (Component)
             {
@@ -2525,6 +2533,10 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimNonCollisionRenderSurface"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimConditionedWaterlineWetBankV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimPerInstanceConditionedWaterline"));
             }
         }
         if (AActor* MosaicOwner = ZambeziBankMosaicInstances
@@ -2888,7 +2900,7 @@ bool AddLandscapeCandidateBiomeDressing(
     {
         const FBox Bounds = GetLandscapeCandidateEffectiveMeshBounds(Mesh);
         const float GroundedPivotZ = GroundZ - Bounds.Min.Z * Scale.Z;
-        Component->AddInstance(
+        return Component->AddInstance(
             FTransform(
                 Rotation,
                 FVector(GroundLocation.X, GroundLocation.Y, GroundedPivotZ),
@@ -3046,6 +3058,7 @@ bool AddLandscapeCandidateBiomeDressing(
                 Side * (ActiveRiverHalfWidth + 1800.0f));
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestPlacementScore = TNumericLimits<float>::Max();
+            float BestLogicalX = BaseLogicalX;
             for (int32 CandidateIndex = 0; CandidateIndex < 128; ++CandidateIndex)
             {
                 const float CandidatePhase =
@@ -3092,6 +3105,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     BestPlacementScore = PlacementScore;
                     BestPoint = CandidatePoint;
                     BestSlopeDegrees = SlopeDegrees;
+                    BestLogicalX = CandidateLogicalX;
                 }
             }
             if (BestPlacementScore == TNumericLimits<float>::Max())
@@ -3121,8 +3135,10 @@ bool AddLandscapeCandidateBiomeDressing(
                 1.0f,
                 GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
             const float UniformScale = TargetHeightCm / MeshHeightCm;
-            AddGroundedInstance(
-                ZambeziRunnableLaunchTalusInstances[VariantIndex],
+            UHierarchicalInstancedStaticMeshComponent* TalusComponent =
+                ZambeziRunnableLaunchTalusInstances[VariantIndex];
+            const int32 InstanceIndex = AddGroundedInstance(
+                TalusComponent,
                 RockMesh,
                 BestPoint,
                 GetLandscapeHeight(BestPoint.X, BestPoint.Y),
@@ -3143,15 +3159,29 @@ bool AddLandscapeCandidateBiomeDressing(
                         1.22f,
                         ZambeziVegetationUnitRandom(TalusIndex, 9497)),
                     UniformScale));
+            TalusComponent->SetCustomDataValue(
+                InstanceIndex,
+                0,
+                GetConditionedWaterWorldZ(BestLogicalX),
+                false);
             ++RunnableLaunchTalusPlacedCount;
             RunnableLaunchTalusMaximumSlopeDegrees = FMath::Max(
                 RunnableLaunchTalusMaximumSlopeDegrees,
                 BestSlopeDegrees);
             ++OutResult.DressingBoulderInstanceCount;
         }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ZambeziRunnableLaunchTalusInstances)
+        {
+            if (Component)
+            {
+                Component->MarkRenderStateDirty();
+            }
+        }
         OutSummary += FString::Printf(
             TEXT("Zambezi runnable-launch talus: %d/%d source-grounded, "
-                 "non-colliding generic rock analogs across both dry banks; "
+                 "non-colliding generic rock analogs across both dry banks, each "
+                 "with a conditioned-profile waterline in custom-data channel zero; "
                  "%d targets rejected by full-route distance, dry-height, or "
                  "%.1f-degree slope gates; maximum placed slope %.2f degrees. "
                  "Presentation-only with no Batoka lithology or hydraulic authority.\n"),

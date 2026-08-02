@@ -32,6 +32,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Revalidated Zambezi Batoka Gorge as the sixth runnable river and regenerated
+  the committed `/Game/RaftSim/Maps/L_Zambezi` package from the filtered source
+  corridor pipeline. The frontend `zambezi_reference_run` entry, source model,
+  scenario, cook list, schema-v16 saved-map audit, M6 career catalog, and live
+  P4 PIE map-load gate all resolve to that package. The regenerated reference
+  map retains all 25 rapid markers, Rapid 9's mandatory-portage policy, one
+  player raft/start, live cooked-field water, four source-conditioned terrain
+  tiles, two adaptive near-field banks, 360 launch talus instances, and 8,927
+  vegetation instances. Conditioned render-only wet-bank masks now use an
+  explicit vertex-red scalar, while the talus material reads one conditioned
+  waterline per instance; neither path changes collision, bathymetry,
+  hydraulics, or raft forces. This is runnable acceptance, not photoreal or
+  real-world hydraulic promotion.
 - Reworked the runnable Zambezi Single Layer Water parent's normal projection
   into shorter, crossed wavelengths while retaining its accepted sediment
   volume response. Only the secondary layer swaps UV axes; bounded normal and

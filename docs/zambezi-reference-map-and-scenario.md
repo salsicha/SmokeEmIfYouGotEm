@@ -344,13 +344,15 @@ swimmers. The focused test passes, and the complete parameterized
 renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
 deliberately fails photoreal promotion while passing runnable launch acceptance.
 
-The runnable classification was reverified on August 1, 2026 after restoring
-the generated player-selection source model. The focused Unreal test again
-passed the saved Batoka map with its live wet finite solver window, upright
-five-person raft, rapid markers, separate live foam, Niagara water pool, and
-four non-colliding visual-terrain tiles. The Python Zambezi reference and
-Sentinel-centerline suites also pass. This is runnable acceptance only; it does
-not close any production-hydraulic or photoreal gate below.
+The runnable classification was reverified on August 2, 2026 after a filtered
+Zambezi regeneration. `RaftSim.M6.CareerCatalog` confirms that the player-facing
+`zambezi_reference_run` opens `/Game/RaftSim/Maps/L_Zambezi`, and
+`RaftSim.P4.RiverMapLoads.L_Zambezi` passes a live PIE launch with the cooked
+water field, upright five-person raft, all rapid markers, separate live foam,
+Niagara water pool, and four non-colliding visual-terrain tiles. The schema-v16
+saved-map audit and all seven focused Python contracts pass. This is runnable
+acceptance only; it does not close any production-hydraulic or photoreal gate
+below.
 
 This makes the complete map launchable and paddleable with the normal gameplay
 stack. It does not turn the inferred bed or rapid cues into real-world
@@ -375,7 +377,7 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v15 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v16 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
@@ -392,6 +394,8 @@ six separately tagged launch-talus components with 360 total source-grounded,
 shadow-casting, non-colliding rock analog instances and their explicit
 no-lithology/no-hydraulic-authority contract, plus the Zambezi-specific
 material instance, its project-owned parent, and material-retone tags,
+one conditioned profile waterline value per talus instance, and a bounded
+render-only vertex-red wet-bank mask on the two adaptive near-field meshes,
 zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
@@ -399,7 +403,7 @@ Water parent with the moving-normal contract tags. The saved material asset is
 also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
 covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`, and the talus instance
 and scalar contract are covered by `RaftSim.M9.FZambeziTalusMaterial`. Schema
-v15 additionally
+v16 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.

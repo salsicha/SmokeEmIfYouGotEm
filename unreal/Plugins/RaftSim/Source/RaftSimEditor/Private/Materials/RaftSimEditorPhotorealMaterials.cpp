@@ -24,11 +24,13 @@
 #include "Materials/MaterialExpressionFresnel.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMaterialFunctionCall.h"
+#include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionNormalize.h"
 #include "Materials/MaterialExpressionOneMinus.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionPerInstanceCustomData.h"
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionSubtract.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
@@ -1373,16 +1375,28 @@ static UMaterial* BuildRiverBoulderMaterial(
 
     // --- Solver-driven waterline wet band ---------------------------------
     // Real river rock carries a dark, glossy wet band at and below the water
-    // surface. The rock actor samples the live water field at its own footprint
-    // and writes the sampled surface elevation into RockWaterlineZCm, so the
-    // band tracks the genuine local waterline (a stage change moves it). The
-    // fail-safe default sits far below any reach, leaving unset rocks dry. A
-    // small world-space noise breaks the line so it never reads as a ruler.
+    // surface. Individual rock actors may write the sampled live surface into
+    // RockWaterlineZCm. Instanced talus instead supplies the conditioned local
+    // visual surface through custom-data channel zero. Max resolves those two
+    // bindings while both fail-safe defaults remain far below any reach. This
+    // keeps unset rocks dry and lets one HISM material follow a curved profile
+    // without inventing a single flat river plane. A small world-space noise
+    // breaks the resulting line so it never reads as a ruler.
     UMaterialExpressionScalarParameter* WaterlineZ = NewObject<UMaterialExpressionScalarParameter>(Material);
     WaterlineZ->ParameterName = TEXT("RockWaterlineZCm");
     WaterlineZ->DefaultValue = -1.0e7f;
     WaterlineZ->Group = TEXT("RaftSimRiverBoulder");
     Add(WaterlineZ);
+    UMaterialExpressionPerInstanceCustomData* PerInstanceWaterlineZ =
+        NewObject<UMaterialExpressionPerInstanceCustomData>(Material);
+    PerInstanceWaterlineZ->DataIndex = 0;
+    PerInstanceWaterlineZ->ConstDefaultValue = -1.0e7f;
+    Add(PerInstanceWaterlineZ);
+    UMaterialExpressionMax* ResolvedWaterlineZ =
+        NewObject<UMaterialExpressionMax>(Material);
+    ResolvedWaterlineZ->A.Expression = WaterlineZ;
+    ResolvedWaterlineZ->B.Expression = PerInstanceWaterlineZ;
+    Add(ResolvedWaterlineZ);
     UMaterialExpressionScalarParameter* WetBandWidth = NewObject<UMaterialExpressionScalarParameter>(Material);
     WetBandWidth->ParameterName = TEXT("RockWetBandWidthCm");
     WetBandWidth->DefaultValue = 55.0f;
@@ -1407,7 +1421,7 @@ static UMaterial* BuildRiverBoulderMaterial(
     // height above waterline (cm), jittered: WorldZ - WaterlineZ + noise
     UMaterialExpressionSubtract* HeightAbove = NewObject<UMaterialExpressionSubtract>(Material);
     HeightAbove->A.Expression = WorldZ;
-    HeightAbove->B.Expression = WaterlineZ;
+    HeightAbove->B.Expression = ResolvedWaterlineZ;
     Add(HeightAbove);
     UMaterialExpressionAdd* JitteredHeight = NewObject<UMaterialExpressionAdd>(Material);
     JitteredHeight->A.Expression = HeightAbove;
@@ -3069,6 +3083,14 @@ static void HandleCreateRiverBoulderMaterial(const TArray<FString>&)
         /*bIncludeReviewedSource=*/false);
 }
 
+static void HandleCreateReviewedRiverBoulderMaterial(const TArray<FString>&)
+{
+    // Focused authoring path for the reviewed parent. This deliberately avoids
+    // resaving the separate production fallback while a river-specific visual
+    // milestone is being regenerated.
+    BuildRiverBoulderMaterial();
+}
+
 static void HandleCreateWaterVfxMaterial(const TArray<FString>&)
 {
     FString Summary;
@@ -3168,6 +3190,12 @@ static FAutoConsoleCommand GCreateRiverBoulderMaterialCommand(
     TEXT("RaftSim.CreateRiverBoulderMaterial"),
     TEXT("Author the project-owned world-space wet river-boulder material."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateRiverBoulderMaterial));
+
+static FAutoConsoleCommand GCreateReviewedRiverBoulderMaterialCommand(
+    TEXT("RaftSim.CreateReviewedRiverBoulderMaterial"),
+    TEXT("Author only the reviewed project-owned wet river-boulder material."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleCreateReviewedRiverBoulderMaterial));
 
 static FAutoConsoleCommand GCreateWaterVfxMaterialCommand(
     TEXT("RaftSim.CreateWaterVfxMaterial"),

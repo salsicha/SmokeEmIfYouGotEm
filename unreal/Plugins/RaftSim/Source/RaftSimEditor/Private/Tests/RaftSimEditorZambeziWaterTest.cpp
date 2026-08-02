@@ -1,12 +1,17 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
 #include "Materials/MaterialExpressionAppendVector.h"
+#include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionMax.h"
+#include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionPerInstanceCustomData.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
+#include "Materials/MaterialExpressionVertexColor.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -92,6 +97,9 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
     int32 MacroScaleCount = 0;
     int32 SecondaryMacroScaleCount = 0;
     int32 DetailScaleCount = 0;
+    int32 VertexRedMaskCount = 0;
+    int32 VertexRedBlendCount = 0;
+    const UMaterialExpressionComponentMask* VertexRedMask = nullptr;
     for (const TObjectPtr<UMaterialExpression>& Expression :
          Material->GetExpressionCollection().Expressions)
     {
@@ -111,6 +119,16 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
             TextureObjectParameters.Add(TextureObject->ParameterName);
         }
         NoiseCount += Cast<UMaterialExpressionNoise>(Expression.Get()) ? 1 : 0;
+        if (const UMaterialExpressionComponentMask* Mask =
+                Cast<UMaterialExpressionComponentMask>(Expression.Get()))
+        {
+            if (Cast<UMaterialExpressionVertexColor>(Mask->Input.Expression) &&
+                Mask->R && !Mask->G && !Mask->B && !Mask->A)
+            {
+                VertexRedMask = Mask;
+                ++VertexRedMaskCount;
+            }
+        }
         if (const UMaterialExpressionConstant3Vector* Constant =
                 Cast<UMaterialExpressionConstant3Vector>(Expression.Get()))
         {
@@ -123,10 +141,28 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
         }
     }
 
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (const UMaterialExpressionLinearInterpolate* Lerp =
+                Cast<UMaterialExpressionLinearInterpolate>(Expression.Get()))
+        {
+            VertexRedBlendCount += Lerp->Alpha.Expression == VertexRedMask ? 1 : 0;
+        }
+    }
+
     TestEqual(TEXT("Two world-space mineral fields break repetition"), NoiseCount, 2);
     TestTrue(TEXT("Four primary 50 m macro channels remain"), MacroScaleCount >= 4);
     TestEqual(TEXT("One 83 m secondary macro color projection exists"), SecondaryMacroScaleCount, 1);
     TestEqual(TEXT("Three 4.8 m detail projections remain coherent"), DetailScaleCount, 3);
+    TestEqual(
+        TEXT("Conditioned wet-bank material has one vertex-red mask"),
+        VertexRedMaskCount,
+        1);
+    TestEqual(
+        TEXT("Three material properties bind the conditioned vertex-red mask"),
+        VertexRedBlendCount,
+        3);
     TestTrue(
         TEXT("Secondary macro texture projection is bound"),
         TextureObjectParameters.Contains(TEXT("BatokaAerialRocks02WorldAlignedSecondaryAlbedo")));
@@ -154,6 +190,9 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
     TestScalar(TEXT("BatokaDetailColorWeight"), 0.07f);
     TestScalar(TEXT("BatokaDetailNormalWeight"), 0.24f);
     TestScalar(TEXT("BatokaDetailRoughnessWeight"), 0.18f);
+    TestScalar(TEXT("BatokaWetBankAlbedoScale"), 0.62f);
+    TestScalar(TEXT("BatokaWetBankRoughness"), 0.27f);
+    TestScalar(TEXT("BatokaWetBankSpecular"), 0.34f);
 
     const FLinearColor* BasaltTint = VectorDefaults.Find(TEXT("BatokaBasaltTint"));
     const FLinearColor* WeatheredTint =
@@ -171,6 +210,16 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
         TestTrue(
             TEXT("Weathering stays a bounded brown accent"),
             WeatheredTint->Equals(FLinearColor(0.58f, 0.43f, 0.40f, 1.0f), 0.0001f));
+    }
+    const FLinearColor* WetBankTint = VectorDefaults.Find(TEXT("BatokaWetBankTint"));
+    TestNotNull(TEXT("Conditioned wet-bank tint exists"), WetBankTint);
+    if (WetBankTint)
+    {
+        TestTrue(
+            TEXT("Wet-bank tint remains a bounded cool mineral multiplier"),
+            WetBankTint->Equals(
+                FLinearColor(0.78f, 0.82f, 0.86f, 1.0f),
+                0.0001f));
     }
     return !HasAnyErrors();
 }
@@ -209,6 +258,34 @@ bool FRaftSimZambeziTalusMaterialTest::RunTest(const FString& Parameters)
         TEXT("Talus remains Default Lit"),
         Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
 
+    int32 PerInstanceWaterlineCount = 0;
+    int32 WaterlineResolverCount = 0;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Parent->GetExpressionCollection().Expressions)
+    {
+        if (const UMaterialExpressionPerInstanceCustomData* CustomData =
+                Cast<UMaterialExpressionPerInstanceCustomData>(Expression.Get()))
+        {
+            if (CustomData->DataIndex == 0 &&
+                FMath::IsNearlyEqual(
+                    CustomData->ConstDefaultValue,
+                    -1.0e7f,
+                    1.0f))
+            {
+                ++PerInstanceWaterlineCount;
+            }
+        }
+        WaterlineResolverCount +=
+            Cast<UMaterialExpressionMax>(Expression.Get()) ? 1 : 0;
+    }
+    TestEqual(
+        TEXT("One fail-closed per-instance waterline channel exists"),
+        PerInstanceWaterlineCount,
+        1);
+    TestTrue(
+        TEXT("Scalar and per-instance waterlines resolve through Max"),
+        WaterlineResolverCount >= 1);
+
     auto TestScalarParameter = [this, Instance](
                                    const TCHAR* Label,
                                    const TCHAR* ParameterName,
@@ -239,9 +316,9 @@ bool FRaftSimZambeziTalusMaterialTest::RunTest(const FString& Parameters)
         -1.0e7f,
         1.0f);
     TestScalarParameter(
-        TEXT("Future wet-band width"),
+        TEXT("Conditioned shoreline wet-band width"),
         TEXT("RockWetBandWidthCm"),
-        70.0f,
+        220.0f,
         0.001f);
     return !HasAnyErrors();
 }

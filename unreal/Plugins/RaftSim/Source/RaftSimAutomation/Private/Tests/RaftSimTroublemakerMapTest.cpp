@@ -374,8 +374,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
             4);
 
         int32 AdaptiveNearFieldTerrainCount = 0;
+        int32 AdaptiveNearFieldVertexCount = 0;
+        int32 AdaptiveWetBankVertexCount = 0;
         int32 RunnableLaunchTalusActorCount = 0;
         int32 RunnableLaunchTalusInstanceCount = 0;
+        int32 RunnableLaunchTalusWaterlineCount = 0;
         int32 ZambeziAtmosphereActorCount = 0;
         int32 AtmosphereSunCount = 0;
         int32 CapturedSkyFillCount = 0;
@@ -386,7 +389,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
             AActor* Actor = *It;
             if (Actor->Tags.Contains(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1")))
             {
-                const UProceduralMeshComponent* Mesh =
+                UProceduralMeshComponent* Mesh =
                     Actor->FindComponentByClass<UProceduralMeshComponent>();
                 Test->TestNotNull(TEXT("adaptive Zambezi bank has a procedural mesh"), Mesh);
                 if (Mesh)
@@ -401,6 +404,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     Test->TestNotNull(
                         TEXT("adaptive Zambezi bank has a source-conditioned material"),
                         Mesh->GetMaterial(0));
+                    if (const FProcMeshSection* Section = Mesh->GetProcMeshSection(0))
+                    {
+                        AdaptiveNearFieldVertexCount +=
+                            Section->ProcVertexBuffer.Num();
+                        for (const FProcMeshVertex& Vertex :
+                             Section->ProcVertexBuffer)
+                        {
+                            AdaptiveWetBankVertexCount +=
+                                Vertex.Color.R > 5 ? 1 : 0;
+                        }
+                    }
                 }
                 Test->TestTrue(
                     TEXT("adaptive Zambezi bank declares source-conditioned authority"),
@@ -417,6 +431,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Test->TestTrue(
                     TEXT("adaptive Zambezi bank records its self-shadow policy"),
                     Actor->Tags.Contains(TEXT("RaftSimNearFieldSelfShadowSuppressed")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank binds the conditioned wet-bank treatment"),
+                    Actor->Tags.Contains(TEXT("RaftSimConditionedWaterlineWetBankV1")) &&
+                        Actor->Tags.Contains(TEXT("RaftSimVertexRedWetBankMask")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi wet bank disclaims measured authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimProceduralWetBankNoMeasuredAuthority")));
                 ++AdaptiveNearFieldTerrainCount;
             }
 
@@ -447,6 +469,21 @@ bool FRaftSimAssertRiverMapCommand::Update()
                         Talus->GetMaterial(0) &&
                             Talus->GetMaterial(0)->GetPathName().Contains(
                                 TEXT("MI_RaftSim_Zambezi_BasaltTalusV1")));
+                    Test->TestEqual(
+                        TEXT("Zambezi launch talus reserves one waterline data channel"),
+                        Talus->NumCustomDataFloats,
+                        1);
+                    Test->TestEqual(
+                        TEXT("Every Zambezi launch talus instance has one waterline value"),
+                        Talus->PerInstanceSMCustomData.Num(),
+                        Talus->GetInstanceCount());
+                    for (const float WaterlineZ : Talus->PerInstanceSMCustomData)
+                    {
+                        if (FMath::IsFinite(WaterlineZ) && WaterlineZ > -1.0e6f)
+                        {
+                            ++RunnableLaunchTalusWaterlineCount;
+                        }
+                    }
                     RunnableLaunchTalusInstanceCount += Talus->GetInstanceCount();
                 }
                 Test->TestTrue(
@@ -466,6 +503,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Zambezi launch talus has no hydraulic authority"),
                     Actor->Tags.Contains(
                         TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")));
+                Test->TestTrue(
+                    TEXT("Zambezi launch talus binds a per-instance conditioned waterline"),
+                    Actor->Tags.Contains(TEXT("RaftSimConditionedWaterlineWetBankV1")) &&
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimPerInstanceConditionedWaterline")));
+                Test->TestTrue(
+                    TEXT("Zambezi talus wetness disclaims measured authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimProceduralWetBankNoMeasuredAuthority")));
                 ++RunnableLaunchTalusActorCount;
             }
 
@@ -487,6 +533,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has two adaptive near-field banks"),
             AdaptiveNearFieldTerrainCount,
             2);
+        Test->TestTrue(
+            TEXT("Zambezi adaptive terrain carries a visible but bounded wet-bank mask"),
+            AdaptiveWetBankVertexCount > 0 &&
+                AdaptiveWetBankVertexCount < AdaptiveNearFieldVertexCount);
         Test->TestEqual(
             TEXT("Zambezi reference run has six launch-talus HISM actors"),
             RunnableLaunchTalusActorCount,
@@ -494,6 +544,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestEqual(
             TEXT("Zambezi reference run has 360 launch-talus rock analogs"),
             RunnableLaunchTalusInstanceCount,
+            360);
+        Test->TestEqual(
+            TEXT("Every Zambezi launch-talus rock has a finite conditioned waterline"),
+            RunnableLaunchTalusWaterlineCount,
             360);
         Test->TestEqual(
             TEXT("Zambezi reference run has a four-actor atmosphere contract"),

@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v15",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v16",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -242,6 +242,16 @@ def main() -> None:
             static_mesh = (
                 component.get_editor_property("static_mesh") if component else None
             )
+            custom_data_values = (
+                [
+                    float(value)
+                    for value in component.get_editor_property(
+                        "per_instance_sm_custom_data"
+                    )
+                ]
+                if component
+                else []
+            )
             launch_talus_rows.append(
                 {
                     "actor_label": actor.get_actor_label(),
@@ -261,6 +271,22 @@ def main() -> None:
                     "cast_shadow": (
                         bool(component.get_editor_property("cast_shadow"))
                         if component
+                        else None
+                    ),
+                    "num_custom_data_floats": (
+                        int(component.get_editor_property("num_custom_data_floats"))
+                        if component
+                        else 0
+                    ),
+                    "custom_data_value_count": len(custom_data_values),
+                    "conditioned_waterline_min_z_cm": (
+                        round(min(custom_data_values), 3)
+                        if custom_data_values
+                        else None
+                    ),
+                    "conditioned_waterline_max_z_cm": (
+                        round(max(custom_data_values), 3)
+                        if custom_data_values
                         else None
                     ),
                 }
@@ -366,6 +392,14 @@ def main() -> None:
                         "maximum_dry_shoreline_infill_m": 1.8,
                         "maximum_procedural_refinement_m": 0.96,
                         "minimum_rendered_dry_clearance_m": 0.295,
+                        "wet_bank_contract": (
+                            "conditioned_profile_vertex_red_render_only_"
+                            "irregular_1.75m_to_3.25m_procedural_stain_ceiling"
+                        ),
+                        "wet_bank_authority": (
+                            "procedural_presentation_only_no_measured_wet_bank_"
+                            "collision_or_hydraulic_authority"
+                        ),
                         "physics_and_collision_authority": (
                             "source_copernicus_landscape_only"
                         ),
@@ -412,8 +446,10 @@ def main() -> None:
                     "material_contract": (
                         "zambezi_specific_project_owned_desaturated_mineral_"
                         "retone_v1_over_rights_reviewed_cc0_microstructure_"
-                        "with_dry_bank_waterline_fail_safe"
+                        "with_per_instance_conditioned_profile_waterline_"
+                        "and_dry_scalar_fail_safe"
                     ),
+                    "wet_band_width_m": 2.2,
                     "placement_contract": (
                         "deterministic_128_candidate_search_approximately_"
                         "118m_to_993m_downstream_with_full_route_clearance_"
@@ -591,6 +627,9 @@ def main() -> None:
                 and "RaftSimProtectedDryShoreline" in row["tags"]
                 and "RaftSimNonCollisionRenderSurface" in row["tags"]
                 and "RaftSimNearFieldSelfShadowSuppressed" in row["tags"]
+                and "RaftSimConditionedWaterlineWetBankV1" in row["tags"]
+                and "RaftSimVertexRedWetBankMask" in row["tags"]
+                and "RaftSimProceduralWetBankNoMeasuredAuthority" in row["tags"]
                 for row in adaptive_near_field_terrain_rows
             )
             and all(
@@ -622,6 +661,17 @@ def main() -> None:
             and all(row["component_count"] == 1 for row in launch_talus_rows)
             and all(row["cast_shadow"] for row in launch_talus_rows)
             and all(
+                int(row["num_custom_data_floats"]) == 1
+                and int(row["custom_data_value_count"])
+                == int(row["instance_count"])
+                and row["conditioned_waterline_min_z_cm"] is not None
+                and float(row["conditioned_waterline_min_z_cm"]) > -1.0e6
+                and row["conditioned_waterline_max_z_cm"] is not None
+                and float(row["conditioned_waterline_max_z_cm"])
+                >= float(row["conditioned_waterline_min_z_cm"])
+                for row in launch_talus_rows
+            )
+            and all(
                 "NO_COLLISION" in str(row["collision_enabled"])
                 for row in launch_talus_rows
             )
@@ -645,6 +695,9 @@ def main() -> None:
                 and "RaftSimSlopeScreenedPlacement" in row["tags"]
                 and "RaftSimNonCollisionRenderSurface" in row["tags"]
                 and "RaftSimPresentationOnlyNoHydraulicAuthority" in row["tags"]
+                and "RaftSimConditionedWaterlineWetBankV1" in row["tags"]
+                and "RaftSimPerInstanceConditionedWaterline" in row["tags"]
+                and "RaftSimProceduralWetBankNoMeasuredAuthority" in row["tags"]
                 for row in launch_talus_rows
             )
             and len(vegetation_rows) == 12

@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionAppendVector.h"
+#include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionNoise.h"
@@ -1382,7 +1383,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
     Material->GetExpressionCollection().AddExpression(VertexColor);
     UMaterialExpressionConstant* VertexColorWeight = NewObject<UMaterialExpressionConstant>(Material);
-    VertexColorWeight->R = bZambezi ? 0.16f : (bFutaleufu ? 0.12f : (bRockCanyon ? 1.0f : 0.68f));
+    VertexColorWeight->R = bZambezi ? 0.0f : (bFutaleufu ? 0.12f : (bRockCanyon ? 1.0f : 0.68f));
     Material->GetExpressionCollection().AddExpression(VertexColorWeight);
     UMaterialExpressionLinearInterpolate* BaseColor =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -1613,19 +1614,93 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
     Specular->R = bRockCanyon ? 0.10f : 0.16f;
     Material->GetExpressionCollection().AddExpression(Specular);
+    UMaterialExpression* FinalBaseColor = DetailedBaseColor;
+    UMaterialExpression* FinalRoughness = DetailedRoughness;
+    UMaterialExpression* FinalSpecular = Specular;
+    if (bBatokaWorldAlignedReview)
+    {
+        // Only the adaptive near-field bank writes vertex red. Zambezi's
+        // source-albedo branch does not consume vertex color, leaving this
+        // scalar channel exclusively available for the conditioned mask. It is derived
+        // from the conditioned visual water profile and remains a procedural,
+        // render-only stain: no displacement, collision, or hydraulic input is
+        // connected to this branch.
+        UMaterialExpressionComponentMask* WetBankMask =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        WetBankMask->Input.Expression = VertexColor;
+        WetBankMask->R = true;
+        Material->GetExpressionCollection().AddExpression(WetBankMask);
+        UMaterialExpressionVectorParameter* WetBankTint =
+            NewObject<UMaterialExpressionVectorParameter>(Material);
+        WetBankTint->ParameterName = TEXT("BatokaWetBankTint");
+        WetBankTint->DefaultValue = FLinearColor(0.78f, 0.82f, 0.86f, 1.0f);
+        WetBankTint->Group = TEXT("BatokaConditionedWetBankV1");
+        Material->GetExpressionCollection().AddExpression(WetBankTint);
+        UMaterialExpressionScalarParameter* WetBankAlbedoScale =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        WetBankAlbedoScale->ParameterName = TEXT("BatokaWetBankAlbedoScale");
+        WetBankAlbedoScale->DefaultValue = 0.62f;
+        WetBankAlbedoScale->Group = TEXT("BatokaConditionedWetBankV1");
+        Material->GetExpressionCollection().AddExpression(WetBankAlbedoScale);
+        UMaterialExpressionMultiply* TintedWetBank =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        TintedWetBank->A.Expression = DetailedBaseColor;
+        TintedWetBank->B.Expression = WetBankTint;
+        Material->GetExpressionCollection().AddExpression(TintedWetBank);
+        UMaterialExpressionMultiply* DarkenedWetBank =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        DarkenedWetBank->A.Expression = TintedWetBank;
+        DarkenedWetBank->B.Expression = WetBankAlbedoScale;
+        Material->GetExpressionCollection().AddExpression(DarkenedWetBank);
+        UMaterialExpressionLinearInterpolate* ConditionedWetBaseColor =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        ConditionedWetBaseColor->A.Expression = DetailedBaseColor;
+        ConditionedWetBaseColor->B.Expression = DarkenedWetBank;
+        ConditionedWetBaseColor->Alpha.Expression = WetBankMask;
+        Material->GetExpressionCollection().AddExpression(ConditionedWetBaseColor);
+        FinalBaseColor = ConditionedWetBaseColor;
+
+        UMaterialExpressionScalarParameter* WetBankRoughness =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        WetBankRoughness->ParameterName = TEXT("BatokaWetBankRoughness");
+        WetBankRoughness->DefaultValue = 0.27f;
+        WetBankRoughness->Group = TEXT("BatokaConditionedWetBankV1");
+        Material->GetExpressionCollection().AddExpression(WetBankRoughness);
+        UMaterialExpressionLinearInterpolate* ConditionedWetRoughness =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        ConditionedWetRoughness->A.Expression = DetailedRoughness;
+        ConditionedWetRoughness->B.Expression = WetBankRoughness;
+        ConditionedWetRoughness->Alpha.Expression = WetBankMask;
+        Material->GetExpressionCollection().AddExpression(ConditionedWetRoughness);
+        FinalRoughness = ConditionedWetRoughness;
+
+        UMaterialExpressionScalarParameter* WetBankSpecular =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        WetBankSpecular->ParameterName = TEXT("BatokaWetBankSpecular");
+        WetBankSpecular->DefaultValue = 0.34f;
+        WetBankSpecular->Group = TEXT("BatokaConditionedWetBankV1");
+        Material->GetExpressionCollection().AddExpression(WetBankSpecular);
+        UMaterialExpressionLinearInterpolate* ConditionedWetSpecular =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        ConditionedWetSpecular->A.Expression = Specular;
+        ConditionedWetSpecular->B.Expression = WetBankSpecular;
+        ConditionedWetSpecular->Alpha.Expression = WetBankMask;
+        Material->GetExpressionCollection().AddExpression(ConditionedWetSpecular);
+        FinalSpecular = ConditionedWetSpecular;
+    }
     UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
     EmissiveScale->R = bRockCanyon ? 0.008f : 0.025f;
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
     UMaterialExpressionMultiply* Emissive = NewObject<UMaterialExpressionMultiply>(Material);
-    Emissive->A.Expression = DetailedBaseColor;
+    Emissive->A.Expression = FinalBaseColor;
     Emissive->B.Expression = EmissiveScale;
     Material->GetExpressionCollection().AddExpression(Emissive);
 
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
-    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, DetailedBaseColor);
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, FinalBaseColor);
     ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ValidatedNormal);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, DetailedRoughness);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, FinalRoughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, FinalSpecular);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, FinalAmbientOcclusion);
     ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, Emissive);
 

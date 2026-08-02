@@ -637,7 +637,13 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
                 SourceLinear.R = FMath::Max(SourceLinear.R, 0.012f);
                 SourceLinear.G = FMath::Max(SourceLinear.G, 0.012f);
                 SourceLinear.B = FMath::Max(SourceLinear.B, 0.012f);
-                SourceLinear.A = 1.0f;
+                // Batoka's adaptive near-field mesh authors the only approved
+                // wet-bank red channel. Keep the coarse source-terrain tiles at zero
+                // so the shared material cannot turn the full gorge wet.
+                if (bZambezi)
+                {
+                    SourceLinear.R = 0.0f;
+                }
                 VertexColors.Add(SourceLinear);
             }
         }
@@ -1063,7 +1069,7 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                         FMath::RoundToInt(SourceSrgb.G * 255.0f), 0, 255)),
                     static_cast<uint8>(FMath::Clamp(
                         FMath::RoundToInt(SourceSrgb.B * 255.0f), 0, 255)),
-                    255);
+                    0);
                 VertexColors.Add(FLinearColor::FromSRGBColor(SourceColor8));
                 WaterSurfaceZ.Add(ConditionedWaterZ);
                 const float StationEdgeFade =
@@ -1135,6 +1141,39 @@ bool AddZambeziAdaptiveNearFieldTerrain(
             OutStats.MinimumRenderedHeightAboveWaterCm = FMath::Min(
                 OutStats.MinimumRenderedHeightAboveWaterCm,
                 Vertices[VertexIndex].Z - WaterSurfaceZ[VertexIndex]);
+
+            // The conditioned surface is already sampled at this station. Use
+            // its local height to author a bounded procedural wet stain into
+            // vertex alpha rather than adding a rectangular shoreline overlay.
+            // Two incommensurate noise fields break the edge while the mask is
+            // still explicit about having no measured wet-bank authority.
+            const float DryHeightAboveWaterCm =
+                Vertices[VertexIndex].Z - WaterSurfaceZ[VertexIndex];
+            const float BroadWetEdge = FMath::PerlinNoise2D(FVector2D(
+                Vertices[VertexIndex].X * 0.00031f + Side * 13.0f,
+                Vertices[VertexIndex].Y * 0.00031f - Side * 19.0f));
+            const float FineWetEdge = FMath::PerlinNoise2D(FVector2D(
+                Vertices[VertexIndex].X * 0.00117f - Side * 31.0f,
+                Vertices[VertexIndex].Y * 0.00117f + Side * 37.0f));
+            const float WetStainCeilingCm = FMath::Clamp(
+                250.0f + BroadWetEdge * 55.0f + FineWetEdge * 24.0f,
+                175.0f,
+                325.0f);
+            const float WetMask = 1.0f - SmoothPreviewStep(
+                45.0f,
+                WetStainCeilingCm,
+                DryHeightAboveWaterCm);
+            VertexColors[VertexIndex].R = WetMask;
+            if (WetMask > 0.02f)
+            {
+                ++OutStats.WetBankVertexCount;
+                OutStats.MaximumWetBankMask = FMath::Max(
+                    OutStats.MaximumWetBankMask,
+                    WetMask);
+                OutStats.MaximumWetBankHeightAboveWaterCm = FMath::Max(
+                    OutStats.MaximumWetBankHeightAboveWaterCm,
+                    DryHeightAboveWaterCm);
+            }
         }
 
         for (int32 StationIndex = 0;
@@ -1197,6 +1236,9 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         Actor->Tags.AddUnique(TEXT("RaftSimProtectedDryShoreline"));
         Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
         Actor->Tags.AddUnique(TEXT("RaftSimNearFieldSelfShadowSuppressed"));
+        Actor->Tags.AddUnique(TEXT("RaftSimConditionedWaterlineWetBankV1"));
+        Actor->Tags.AddUnique(TEXT("RaftSimVertexRedWetBankMask"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProceduralWetBankNoMeasuredAuthority"));
         if (UProceduralMeshComponent* Component =
                 Actor->FindComponentByClass<UProceduralMeshComponent>())
         {
@@ -1208,6 +1250,10 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                 TEXT("RaftSimNonCollisionRenderSurface"));
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimNearFieldSelfShadowSuppressed"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimConditionedWaterlineWetBankV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimVertexRedWetBankMask"));
             ++OutStats.ShadowSuppressedActorCount;
             if (Component->GetCollisionEnabled() != ECollisionEnabled::NoCollision)
             {
@@ -1224,6 +1270,8 @@ bool AddZambeziAdaptiveNearFieldTerrain(
              "over stations %.0f-%.0f m: %lld vertices, %lld triangles, %.1f m grid, "
              "%lld bounded refinement vertices (maximum %.2f m), %lld dry-shoreline "
              "infill vertices (maximum %.2f m), minimum rendered clearance %.2f m; "
+             "%lld vertices carry a bounded conditioned-waterline wet-bank mask "
+             "(maximum mask %.3f, maximum affected dry height %.2f m); "
              "collision remains disabled and overlay self-shadow is suppressed "
              "after the rejected shadow-wedge bracket.\n"),
         OutStats.ActorCount,
@@ -1236,10 +1284,16 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         OutStats.MaximumAbsoluteRefinementCm * 0.01f,
         OutStats.DryShorelineInfillVertexCount,
         OutStats.MaximumDryShorelineInfillCm * 0.01f,
-        OutStats.MinimumRenderedHeightAboveWaterCm * 0.01f);
+        OutStats.MinimumRenderedHeightAboveWaterCm * 0.01f,
+        OutStats.WetBankVertexCount,
+        OutStats.MaximumWetBankMask,
+        OutStats.MaximumWetBankHeightAboveWaterCm * 0.01f);
     return OutStats.ActorCount == 2 && OutStats.VertexCount >= 40000 &&
         OutStats.TriangleCount >= 60000 &&
         OutStats.RefinedVertexCount > 0 &&
+        OutStats.WetBankVertexCount > 0 &&
+        OutStats.MaximumWetBankMask > 0.5f &&
+        OutStats.MaximumWetBankHeightAboveWaterCm <= 325.5f &&
         OutStats.MinimumRenderedHeightAboveWaterCm >= 29.5f &&
         OutStats.MaximumDryShorelineInfillCm <=
             MaximumDryShorelineInfillCm + 0.5f &&
