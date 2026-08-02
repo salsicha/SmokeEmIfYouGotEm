@@ -694,6 +694,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_trunk_asset\": null,\n")
             TEXT("      \"landscape_dressing_instance_implementation\": \"%s\",\n")
             TEXT("      \"landscape_dressing_boulder_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_authority\": \"presentation_only_generic_rock_analog_no_lithology_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_target_height_range_m\": [0.95, 5.20],\n")
+            TEXT("      \"landscape_dressing_runnable_launch_talus_placement_contract\": \"deterministic_128_candidate_search_approximately_118m_to_993m_downstream_with_full_route_clearance_dry_height_and_hard_slope_gates\",\n")
             TEXT("      \"landscape_dressing_foliage_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_canopy_tree_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_understory_instance_count\": %d,\n")
@@ -957,6 +965,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("complete_pve_shrub_understory_plus_rights_reviewed_broadleaf_and_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
                        : TEXT("complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders"))),
             Result.DressingBoulderInstanceCount,
+            Result.DressingRunnableLaunchTalusTargetInstanceCount > 0
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_launch_talus_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingRunnableLaunchTalusTargetInstanceCount,
+            Result.DressingRunnableLaunchTalusInstanceCount,
+            Result.DressingRunnableLaunchTalusRejectedPlacementCount,
+            Result.DressingRunnableLaunchTalusMaximumSlopeDegrees,
             Result.DressingFoliageInstanceCount,
             Result.DressingCanopyTreeInstanceCount,
             Result.DressingUnderstoryInstanceCount,

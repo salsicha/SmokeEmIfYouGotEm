@@ -1242,6 +1242,30 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
     assert len(candidate_manifest["candidates"]) == 1
     candidate = candidate_manifest["candidates"][0]
     assert candidate["river_id"] == "zambezi_batoka_gorge"
+    assert candidate["landscape_dressing_boulder_instance_count"] == 540
+    assert candidate["landscape_dressing_runnable_launch_talus_status"] == (
+        "source_grounded_rights_reviewed_cc0_six_variant_launch_talus_captured"
+    )
+    assert candidate["landscape_dressing_runnable_launch_talus_authority"] == (
+        "presentation_only_generic_rock_analog_no_lithology_collision_"
+        "hydraulic_or_raft_force_authority"
+    )
+    assert (
+        candidate["landscape_dressing_runnable_launch_talus_target_instance_count"]
+        == 360
+    )
+    assert candidate["landscape_dressing_runnable_launch_talus_instance_count"] == 360
+    assert (
+        candidate["landscape_dressing_runnable_launch_talus_rejected_placement_count"]
+        == 0
+    )
+    assert (
+        candidate["landscape_dressing_runnable_launch_talus_maximum_slope_degrees"]
+        <= 48.0
+    )
+    assert candidate[
+        "landscape_dressing_runnable_launch_talus_target_height_range_m"
+    ] == [0.95, 5.20]
     assert candidate["water_material_status"] == (
         "zambezi_single_layer_water_volume_candidate_bound_and_captured"
     )
@@ -1297,7 +1321,7 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
 
     validation = json.loads(validation_path.read_text(encoding="utf-8"))
     assert validation["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v13"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v14"
     )
     assert validation["passed"] is True
     assert validation["water_surface"]["component_count"] == 1

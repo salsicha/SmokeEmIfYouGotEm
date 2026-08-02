@@ -21,6 +21,8 @@ constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 1800;
 constexpr float ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees = 32.0f;
 constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 192;
 constexpr float ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 24.0f;
+constexpr int32 ZambeziRunnableLaunchTalusInstanceCount = 360;
+constexpr float ZambeziRunnableLaunchTalusSlopeCeilingDegrees = 48.0f;
 
 enum class EZambeziVegetationForm : uint8
 {
@@ -2070,6 +2072,23 @@ bool AddLandscapeCandidateBiomeDressing(
                 *Candidate.PreviewSpec.RiverId),
             true));
     }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ZambeziRunnableLaunchTalusInstances;
+    if (bZambezi)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            ZambeziRunnableLaunchTalusInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchTalusRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true));
+        }
+    }
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedPineInstances;
     for (int32 PineIndex = 0; PineIndex < ReviewedPineMeshes.Num(); ++PineIndex)
     {
@@ -2097,6 +2116,12 @@ bool AddLandscapeCandidateBiomeDressing(
         {
             return Component == nullptr;
         }) ||
+        Algo::AnyOf(
+            ZambeziRunnableLaunchTalusInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
         Algo::AnyOf(ReviewedPineInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
@@ -2194,6 +2219,32 @@ bool AddLandscapeCandidateBiomeDressing(
             {
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimZambeziOpaqueVegetation"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+            }
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ZambeziRunnableLaunchTalusInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchTalusV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralGeologyFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimDryBankPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchTalusV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimNonCollisionRenderSurface"));
             }
@@ -2541,6 +2592,9 @@ bool AddLandscapeCandidateBiomeDressing(
             true);
     };
 
+    int32 RunnableLaunchTalusPlacedCount = 0;
+    int32 RunnableLaunchTalusRejectedPlacementCount = 0;
+    float RunnableLaunchTalusMaximumSlopeDegrees = 0.0f;
     const int32 BoulderCount = bPhysicalCorridor
         ? 180
         : (Spec.bDesertCanyon ? 62 : (bRainforest ? 48 : 44));
@@ -2656,6 +2710,161 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         ++OutResult.DressingBoulderInstanceCount;
     }
+
+    if (bZambeziWoodland &&
+        ReviewedRockMeshes.Num() == 6 &&
+        ZambeziRunnableLaunchTalusInstances.Num() == 6)
+    {
+        // The legacy physical-corridor boulder distribution starts around
+        // station 5 km. Give the actually runnable first kilometre its own
+        // auditable dry-bank talus layer. These generic CC0 rock analogs are
+        // visual dressing only: the source Landscape remains collision and
+        // height authority, and no instance may enter the active route.
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerSide =
+            ZambeziRunnableLaunchTalusInstanceCount / BankSideCount;
+        for (int32 TalusIndex = 0;
+             TalusIndex < ZambeziRunnableLaunchTalusInstanceCount;
+             ++TalusIndex)
+        {
+            const int32 SideIndex = TalusIndex % BankSideCount;
+            const int32 AlongIndex = TalusIndex / BankSideCount;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(TalusIndex, 9403)) /
+                static_cast<float>(InstancesPerSide);
+            // Logical X -2390..-1580 maps to approximately 118-993 m down
+            // the conditioned route, just ahead of the station-75 m launch.
+            const float BaseLogicalX = FMath::Lerp(-2390.0f, -1580.0f, AlongT);
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (ActiveRiverHalfWidth + 1800.0f));
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestPlacementScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 128; ++CandidateIndex)
+            {
+                const float CandidatePhase =
+                    static_cast<float>(TalusIndex) * 0.7548777f +
+                    static_cast<float>(CandidateIndex) * 1.3247179f;
+                const float CandidateLogicalX = BaseLogicalX +
+                    32.0f * FMath::Sin(CandidatePhase);
+                const float CandidateAdditionalOffset = FMath::Lerp(
+                    600.0f,
+                    14000.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            TalusIndex * 131 + CandidateIndex,
+                            9419),
+                        1.55f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (ActiveRiverHalfWidth + CandidateAdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float GroundZ = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float DryHeightAboveWaterCm = GroundZ -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                const float FullRouteDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                if (SlopeDegrees >
+                        ZambeziRunnableLaunchTalusSlopeCeilingDegrees ||
+                    DryHeightAboveWaterCm < 100.0f ||
+                    DryHeightAboveWaterCm > 16000.0f ||
+                    FullRouteDistanceCm < ActiveRiverHalfWidth + 300.0f)
+                {
+                    continue;
+                }
+                const float PlacementScore =
+                    0.08f * FMath::Abs(SlopeDegrees - 18.0f) +
+                    0.35f * CandidateAdditionalOffset / 14000.0f +
+                    0.15f * FMath::Abs(DryHeightAboveWaterCm - 2800.0f) /
+                        16000.0f;
+                if (PlacementScore < BestPlacementScore)
+                {
+                    BestPlacementScore = PlacementScore;
+                    BestPoint = CandidatePoint;
+                    BestSlopeDegrees = SlopeDegrees;
+                }
+            }
+            if (BestPlacementScore == TNumericLimits<float>::Max())
+            {
+                ++RunnableLaunchTalusRejectedPlacementCount;
+                continue;
+            }
+
+            const int32 ScaleClass = TalusIndex % 20;
+            const float TargetHeightCm = ScaleClass == 0
+                ? FMath::Lerp(
+                      380.0f,
+                      520.0f,
+                      ZambeziVegetationUnitRandom(TalusIndex, 9431))
+                : (ScaleClass < 5
+                       ? FMath::Lerp(
+                             220.0f,
+                             360.0f,
+                             ZambeziVegetationUnitRandom(TalusIndex, 9433))
+                       : FMath::Lerp(
+                             95.0f,
+                             220.0f,
+                             ZambeziVegetationUnitRandom(TalusIndex, 9437)));
+            const int32 VariantIndex = TalusIndex % ReviewedRockMeshes.Num();
+            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                ZambeziRunnableLaunchTalusInstances[VariantIndex],
+                RockMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.16f, 0.0f, 7.5f),
+                    360.0f * ZambeziVegetationUnitRandom(TalusIndex, 9461),
+                    FMath::Lerp(
+                        -6.0f,
+                        6.0f,
+                        ZambeziVegetationUnitRandom(TalusIndex, 9473))),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.82f,
+                        1.28f,
+                        ZambeziVegetationUnitRandom(TalusIndex, 9491)),
+                    UniformScale * FMath::Lerp(
+                        0.78f,
+                        1.22f,
+                        ZambeziVegetationUnitRandom(TalusIndex, 9497)),
+                    UniformScale));
+            ++RunnableLaunchTalusPlacedCount;
+            RunnableLaunchTalusMaximumSlopeDegrees = FMath::Max(
+                RunnableLaunchTalusMaximumSlopeDegrees,
+                BestSlopeDegrees);
+            ++OutResult.DressingBoulderInstanceCount;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Zambezi runnable-launch talus: %d/%d source-grounded, "
+                 "non-colliding generic rock analogs across both dry banks; "
+                 "%d targets rejected by full-route distance, dry-height, or "
+                 "%.1f-degree slope gates; maximum placed slope %.2f degrees. "
+                 "Presentation-only with no Batoka lithology or hydraulic authority.\n"),
+            RunnableLaunchTalusPlacedCount,
+            ZambeziRunnableLaunchTalusInstanceCount,
+            RunnableLaunchTalusRejectedPlacementCount,
+            ZambeziRunnableLaunchTalusSlopeCeilingDegrees,
+            RunnableLaunchTalusMaximumSlopeDegrees);
+    }
+    OutResult.DressingRunnableLaunchTalusTargetInstanceCount =
+        bZambeziWoodland ? ZambeziRunnableLaunchTalusInstanceCount : 0;
+    OutResult.DressingRunnableLaunchTalusInstanceCount =
+        RunnableLaunchTalusPlacedCount;
+    OutResult.DressingRunnableLaunchTalusRejectedPlacementCount =
+        RunnableLaunchTalusRejectedPlacementCount;
+    OutResult.DressingRunnableLaunchTalusMaximumSlopeDegrees =
+        RunnableLaunchTalusMaximumSlopeDegrees;
 
     const int32 FoliageClusterCount = bPhysicalCorridor
         ? (bZambeziWoodland
@@ -3499,7 +3708,8 @@ bool AddLandscapeCandidateBiomeDressing(
                  RunnableLaunchWoodyPlacedCount
              : 0);
     OutResult.bDressingValidated =
-        OutResult.DressingBoulderInstanceCount == BoulderCount &&
+        OutResult.DressingBoulderInstanceCount ==
+            BoulderCount + RunnableLaunchTalusPlacedCount &&
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
         ((Spec.bDesertCanyon && !bZambeziWoodland) ||
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
@@ -3507,6 +3717,7 @@ bool AddLandscapeCandidateBiomeDressing(
         (!bZambeziWoodland ||
          RunnableLaunchGroundCoverPlacedCount >= 900) &&
         (!bZambeziWoodland || RunnableLaunchWoodyPlacedCount >= 96) &&
+        (!bZambeziWoodland || RunnableLaunchTalusPlacedCount >= 300) &&
         OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
         TEXT("Landscape biome dressing for %s: %d %s, %d foliage instances (%d canopy, %d understory), %d %s foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),

@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v13",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v14",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -221,6 +221,43 @@ def main() -> None:
                     ),
                 }
             )
+        launch_talus_actors = [
+            actor
+            for actor in actors
+            if "RaftSimRunnableLaunchTalusV1" in {str(tag) for tag in actor.tags}
+        ]
+        launch_talus_rows = []
+        for actor in launch_talus_actors:
+            components = actor.get_components_by_class(
+                unreal.HierarchicalInstancedStaticMeshComponent
+            )
+            component = components[0] if components else None
+            material = component.get_material(0) if component else None
+            static_mesh = (
+                component.get_editor_property("static_mesh") if component else None
+            )
+            launch_talus_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
+                    "component_count": len(components),
+                    "instance_count": (
+                        component.get_instance_count() if component else 0
+                    ),
+                    "static_mesh": (
+                        static_mesh.get_path_name() if static_mesh else None
+                    ),
+                    "material": material.get_path_name() if material else None,
+                    "collision_enabled": (
+                        str(component.get_collision_enabled()) if component else None
+                    ),
+                    "cast_shadow": (
+                        bool(component.get_editor_property("cast_shadow"))
+                        if component
+                        else None
+                    ),
+                }
+            )
         legacy_zambezi_pve_actors = [
             actor.get_actor_label()
             for actor in actors
@@ -355,6 +392,33 @@ def main() -> None:
                     "normal_motion_contract": "two_opposed_panned_atlas_layers",
                     "component_count": len(water_surface_rows),
                     "components": water_surface_rows,
+                },
+                "launch_talus": {
+                    "authority": (
+                        "presentation_only_generic_rock_analog_no_lithology_"
+                        "collision_hydraulic_or_raft_force_authority"
+                    ),
+                    "asset_rights_status": (
+                        "rights_reviewed_cc0_poly_haven_rock_moss_set_01_"
+                        "six_variant_visual_analog"
+                    ),
+                    "placement_contract": (
+                        "deterministic_128_candidate_search_approximately_"
+                        "118m_to_993m_downstream_with_full_route_clearance_"
+                        "dry_height_and_hard_slope_gates"
+                    ),
+                    "target_instance_count": 360,
+                    "instance_count": sum(
+                        int(row["instance_count"]) for row in launch_talus_rows
+                    ),
+                    "rejected_placement_count": 360
+                    - sum(int(row["instance_count"]) for row in launch_talus_rows),
+                    "slope_ceiling_degrees": 48.0,
+                    "target_height_range_m": [0.95, 5.20],
+                    "component_count": len(launch_talus_rows),
+                    "components": sorted(
+                        launch_talus_rows, key=lambda row: row["actor_label"]
+                    ),
                 },
                 "vegetation": {
                     "authority": "procedural_render_only_no_exact_species_claim",
@@ -541,6 +605,31 @@ def main() -> None:
             and "RaftSimPhysicalCorridorWater" in water_surface_rows[0]["tags"]
             and "RaftSimZambeziSingleLayerWater" in water_surface_rows[0]["tags"]
             and "RaftSimMovingMultiScaleWaterNormals" in water_surface_rows[0]["tags"]
+            and len(launch_talus_rows) == 6
+            and sum(int(row["instance_count"]) for row in launch_talus_rows) == 360
+            and all(row["component_count"] == 1 for row in launch_talus_rows)
+            and all(row["cast_shadow"] for row in launch_talus_rows)
+            and all(
+                "NO_COLLISION" in str(row["collision_enabled"])
+                for row in launch_talus_rows
+            )
+            and all(
+                "RockMossSet01" in str(row["static_mesh"])
+                and "M_RockMossSet01" in str(row["material"])
+                for row in launch_talus_rows
+            )
+            and all(
+                "RaftSimRunnableLaunchTalusV1" in row["tags"]
+                and "RaftSimRightsReviewedCC0RockAnalog" in row["tags"]
+                and "RaftSimProceduralGeologyFallback" in row["tags"]
+                and "RaftSimGenericRockAnalogNoLithologyAuthority" in row["tags"]
+                and "RaftSimSourceLandscapeGrounded" in row["tags"]
+                and "RaftSimDryBankPlacement" in row["tags"]
+                and "RaftSimSlopeScreenedPlacement" in row["tags"]
+                and "RaftSimNonCollisionRenderSurface" in row["tags"]
+                and "RaftSimPresentationOnlyNoHydraulicAuthority" in row["tags"]
+                for row in launch_talus_rows
+            )
             and len(vegetation_rows) == 12
             and sum(int(row["instance_count"]) for row in vegetation_rows) == 8927
             and any(
@@ -644,6 +733,8 @@ def main() -> None:
             f"{len(terrain_rows)} conditioned visual-terrain tiles, "
             f"{len(adaptive_near_field_terrain_rows)} adaptive near-field banks, "
             f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
+            f"{sum(int(row['instance_count']) for row in launch_talus_rows)} "
+            "runnable-launch dry-bank rock analogs, plus "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
             "opaque vegetation instances, including 1200 camera-visible "
             "organic bank-cover, 232 camera-visible woody instances, 1721 "

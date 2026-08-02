@@ -1,0 +1,118 @@
+{
+  "schema": "raftsim.environment.zambezi_launch_talus_review.v1",
+  "date": "2026-08-01",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "status": "retained_bank_breakup_photoreal_promotion_fail",
+  "decision": {
+    "runnable_map_integrity": "pass",
+    "launch_route_clearance": "pass",
+    "dry_bank_grounding": "pass",
+    "rock_asset_rights_gate": "pass_for_cc0_visual_analog",
+    "batoka_lithology_gate": "fail_generic_mossy_rock_analog",
+    "photoreal_environment_promotion": "fail",
+    "summary": "The retained map fills a real coverage gap: the prior 180-rock distribution began roughly 5 km downstream, while the new source-grounded layer places 360 non-colliding analog rocks across the runnable first kilometre. Gameplay evidence shows no water or raft obstruction, but the rocks remain subtle at guide distance. The close review exposes generic mossy material, coarse rounded terrain, repeated bright vegetation, hard shadows, and no credible wet-bank transition."
+  },
+  "evidence": {
+    "gameplay_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_talus_gameplay_v1.png",
+      "sha256": "48e82966116eb444601e22360e44176c9b7656b555c79f548a4c0126456c11bb",
+      "size_px": [1280, 720],
+      "camera": "fixed guide-eye camera behind the saved station-75m raft"
+    },
+    "close_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_talus_close_review_v1.png",
+      "sha256": "d04805efe5ff3d346c57a6c6941dd2fd323044d3af8dda82cb54c5a88df142f0",
+      "size_px": [1280, 720],
+      "camera": "gameplay-rendered close review of the nearest large launch-window placement"
+    },
+    "manual_review": {
+      "rock_water_intersection": "pass_none_visible_in_gameplay_frame",
+      "raft_or_route_obstruction": "pass_none_visible_and_all_components_are_noncolliding",
+      "ground_contact": "pass_instances_use_source_landscape_grounded_pivots",
+      "guide_distance_readability": "partial_rocks_are_present_but_subtle",
+      "rock_material_fidelity": "fail_generic_mossy_cc0_analog_not_reviewed_batoka_basalt",
+      "terrain_and_bank_integration": "fail_coarse_rounded_surface_and_hard_contact_shadows",
+      "ground_cover_fidelity": "fail_bright_repeated_procedural_forms",
+      "wet_bank_transition": "fail_missing_credible_rock_sediment_and_waterline_blend",
+      "photorealism": "fail"
+    }
+  },
+  "retained_generation_contract": {
+    "actor_count": 6,
+    "mesh_variant_count": 6,
+    "target_instance_count": 360,
+    "placed_instance_count": 360,
+    "rejected_placement_count": 0,
+    "instances_per_variant": [60, 60, 60, 60, 60, 60],
+    "station_window_m": [118.0, 993.0],
+    "target_height_range_m": [0.95, 5.2],
+    "active_water_half_width_m": 72.0,
+    "minimum_additional_full_route_clearance_m": 3.0,
+    "dry_height_range_m": [1.0, 160.0],
+    "slope_ceiling_degrees": 48.0,
+    "maximum_placed_slope_degrees": 37.817,
+    "candidate_search_count_per_target": 128,
+    "collision": "disabled",
+    "cast_shadow": true,
+    "asset_source": "rights-reviewed CC0 Poly Haven Rock Moss Set 01 six-variant visual analog",
+    "required_tags": [
+      "RaftSimRunnableLaunchTalusV1",
+      "RaftSimRightsReviewedCC0RockAnalog",
+      "RaftSimProceduralGeologyFallback",
+      "RaftSimGenericRockAnalogNoLithologyAuthority",
+      "RaftSimSourceLandscapeGrounded",
+      "RaftSimDryBankPlacement",
+      "RaftSimSlopeScreenedPlacement",
+      "RaftSimNonCollisionRenderSurface",
+      "RaftSimPresentationOnlyNoHydraulicAuthority"
+    ],
+    "authority": {
+      "presentation_only": true,
+      "changes_source_landscape": false,
+      "changes_collision": false,
+      "changes_navigation": false,
+      "changes_water_geometry": false,
+      "changes_solver_state": false,
+      "changes_raft_forces": false,
+      "claims_batoka_lithology": false
+    }
+  },
+  "validation": {
+    "editor_build": "pass_ue_5_8_editor_target",
+    "filtered_zambezi_regeneration": "pass",
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v14",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "69d42077930f1c0def64c3c02f693798c6c3cb6122b5f792d6947d2c470bc8ca",
+      "result": "pass_67_actors_6_talus_components_360_talus_instances"
+    },
+    "focused_runtime_gate": {
+      "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "report_path": "unreal/Saved/Automation/ZambeziLaunchTalusV1MapLoad/index.json",
+      "report_sha256": "a1f9f8fa46bc444c32ebeb1f484387a2fc6784eeeab0e4bd0dcfef177eba6037",
+      "result": "pass_1_success_0_errors_2_known_environment_warnings"
+    },
+    "native_zambezi_material_gates": {
+      "tests": [
+        "RaftSim.M9.FZambeziOrganicBasaltMaterial",
+        "RaftSim.M9.FZambeziOrganicTerrainNormals",
+        "RaftSim.M9.FZambeziSingleLayerWater"
+      ],
+      "report_path": "unreal/Saved/Automation/ZambeziLaunchTalusV1Materials/index.json",
+      "report_sha256": "b5ecd4c563333489e5123dae703a5d4ba35cfa1ad5060b235d4983412ea310e9",
+      "result": "pass_3_success_0_warnings_0_errors"
+    },
+    "python_regression": "pass_10_tests"
+  },
+  "remaining_external_acceptance_gates": [
+    "Guide and geospatial approval of the playable centerline, stationing, access, portage, rescue context, and visible bank character.",
+    "Rights approval for all terrain, imagery, supplied-map, vegetation, and reference inputs beyond the already reviewed CC0 analog rock set.",
+    "Higher-resolution full-reach terrain or a reviewed field-capture derivative replacing the 30 m DSM approximation.",
+    "Reviewed Batoka basalt lithology, talus shape, weathering, wetness, scale distribution, and bank integration replacing the generic mossy analog.",
+    "Southern African gorge-woodland species, density, age, wind, season, ground-cover distribution, and wetness approval.",
+    "Production terrain, vegetation, rock, wet-bank, riverbed, water, breaking-water, foam, spray, mist, and lighting art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual/performance acceptance."
+  ]
+}

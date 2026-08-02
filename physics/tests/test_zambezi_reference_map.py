@@ -432,6 +432,10 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimWoodySlopeCeiling24Degrees" in foliage_cpp
     assert "ZambeziRunnableLaunchBankCoverInstanceCount = 1800" in foliage_cpp
     assert "ZambeziRunnableLaunchWoodyInstanceCount = 192" in foliage_cpp
+    assert "ZambeziRunnableLaunchTalusInstanceCount = 360" in foliage_cpp
+    assert "RaftSimRunnableLaunchTalusV1" in foliage_cpp
+    assert "RaftSimGenericRockAnalogNoLithologyAuthority" in foliage_cpp
+    assert "RaftSimPresentationOnlyNoHydraulicAuthority" in foliage_cpp
     assert "RaftSimZambeziAtmosphereV1" in lighting_cpp
     assert "RaftSimAtmosphereSunLight" in lighting_cpp
     assert "RaftSimSourceAwareDrySeasonSky" in lighting_cpp
@@ -466,7 +470,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v13")
+    assert validation["schema"].endswith(".v14")
     assert validation["runtime_hydraulics"]["preserves_global_river_stations"] is True
     assert validation["runtime_hydraulics"]["rapid_count"] == 25
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
@@ -520,6 +524,32 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     } <= atmosphere_tags
     assert validation["water_surface"]["component_count"] == 1
     assert validation["water_surface"]["shading_model_contract"] == ("SingleLayerWater")
+    talus = validation["launch_talus"]
+    assert talus["component_count"] == 6
+    assert talus["target_instance_count"] == 360
+    assert talus["instance_count"] == 360
+    assert talus["rejected_placement_count"] == 0
+    assert talus["slope_ceiling_degrees"] == 48.0
+    assert talus["target_height_range_m"] == [0.95, 5.20]
+    assert sorted(component["instance_count"] for component in talus["components"]) == [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+    ]
+    assert all(
+        "NO_COLLISION" in component["collision_enabled"]
+        and component["cast_shadow"] is True
+        and "RockMossSet01" in component["static_mesh"]
+        and "M_RockMossSet01" in component["material"]
+        and "RaftSimRunnableLaunchTalusV1" in component["tags"]
+        and "RaftSimGenericRockAnalogNoLithologyAuthority" in component["tags"]
+        and "RaftSimNonCollisionRenderSurface" in component["tags"]
+        and "RaftSimPresentationOnlyNoHydraulicAuthority" in component["tags"]
+        for component in talus["components"]
+    )
     assert validation["vegetation"]["component_count"] == 12
     assert validation["vegetation"]["instance_count"] == 8927
     assert validation["vegetation"]["camera_visible_bank_cover_component_count"] == 1

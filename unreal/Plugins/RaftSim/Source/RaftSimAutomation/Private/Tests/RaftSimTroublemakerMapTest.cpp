@@ -3,6 +3,8 @@
 // rests on wet, finite water. Runs once per map that exists.
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Misc/AutomationTest.h"
@@ -360,6 +362,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             4);
 
         int32 AdaptiveNearFieldTerrainCount = 0;
+        int32 RunnableLaunchTalusActorCount = 0;
+        int32 RunnableLaunchTalusInstanceCount = 0;
         int32 ZambeziAtmosphereActorCount = 0;
         int32 AtmosphereSunCount = 0;
         int32 CapturedSkyFillCount = 0;
@@ -404,6 +408,49 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 ++AdaptiveNearFieldTerrainCount;
             }
 
+            if (Actor->Tags.Contains(TEXT("RaftSimRunnableLaunchTalusV1")))
+            {
+                const UHierarchicalInstancedStaticMeshComponent* Talus =
+                    Actor->FindComponentByClass<
+                        UHierarchicalInstancedStaticMeshComponent>();
+                Test->TestNotNull(
+                    TEXT("Zambezi launch talus actor has one HISM"),
+                    Talus);
+                if (Talus)
+                {
+                    Test->TestEqual(
+                        TEXT("Zambezi launch talus is presentation-only"),
+                        Talus->GetCollisionEnabled(),
+                        ECollisionEnabled::NoCollision);
+                    Test->TestTrue(
+                        TEXT("Zambezi launch talus retains grounded rock shadows"),
+                        Talus->CastShadow);
+                    Test->TestTrue(
+                        TEXT("Zambezi launch talus uses a reviewed rock mesh"),
+                        Talus->GetStaticMesh() &&
+                            Talus->GetStaticMesh()->GetPathName().Contains(
+                                TEXT("RockMossSet01")));
+                    Test->TestTrue(
+                        TEXT("Zambezi launch talus uses the reviewed rock material"),
+                        Talus->GetMaterial(0) &&
+                            Talus->GetMaterial(0)->GetPathName().Contains(
+                                TEXT("M_RockMossSet01")));
+                    RunnableLaunchTalusInstanceCount += Talus->GetInstanceCount();
+                }
+                Test->TestTrue(
+                    TEXT("Zambezi launch talus declares a generic visual analog"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimGenericRockAnalogNoLithologyAuthority")));
+                Test->TestTrue(
+                    TEXT("Zambezi launch talus cannot replace Landscape collision"),
+                    Actor->Tags.Contains(TEXT("RaftSimNonCollisionRenderSurface")));
+                Test->TestTrue(
+                    TEXT("Zambezi launch talus has no hydraulic authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")));
+                ++RunnableLaunchTalusActorCount;
+            }
+
             if (!Actor->Tags.Contains(TEXT("RaftSimZambeziAtmosphereV1")))
             {
                 continue;
@@ -422,6 +469,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has two adaptive near-field banks"),
             AdaptiveNearFieldTerrainCount,
             2);
+        Test->TestEqual(
+            TEXT("Zambezi reference run has six launch-talus HISM actors"),
+            RunnableLaunchTalusActorCount,
+            6);
+        Test->TestEqual(
+            TEXT("Zambezi reference run has 360 launch-talus rock analogs"),
+            RunnableLaunchTalusInstanceCount,
+            360);
         Test->TestEqual(
             TEXT("Zambezi reference run has a four-actor atmosphere contract"),
             ZambeziAtmosphereActorCount,
