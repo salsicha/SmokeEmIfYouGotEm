@@ -3728,6 +3728,24 @@ path is verified, and the completion goal can be marked complete.
   foundation, not photoreal promotion: broad source-scale landform, horizontal
   material banding, repeated stylized trees, uniform opaque water, weak rapid
   foam/spray, unconverged hydraulics, and all named external gates remain open.
+- Chilko native water V1 removes a cross-river presentation error from the
+  retained Lava Canyon map. The physical capture ribbon now binds an isolated
+  opaque Default Lit Chilko parent with the river's own first-party normal
+  atlas, two moving normal layers, and non-harmonic 0.00027 and 0.00147 per-
+  centimetre optical fields. The reach-local packed cooked field is interpreted
+  once while the CPU builds ribbon geometry and vertex color; all shader-field
+  gains are zero so the South Fork fallback can no longer double-condition this
+  river. The live solver carrier retains sole gameplay rendering and force
+  authority and now reads river-local reflection, ripple, foam, and water-color
+  controls from the saved config. No water geometry, collision, terrain,
+  hydraulic state, route, or raft-force value changed. Fixed-frame water-band
+  comparisons raise mean luminance from 0.1522 to 0.2529 in the guide view and
+  0.1518 to 0.2514 at river eye, with RGB standard deviation increasing from
+  0.0463 to 0.0771 and 0.0473 to 0.0777. The native material audit and
+  `L_LavaCanyon` runtime load gate each pass 1/1. This remains a rejected visual
+  candidate: broad plate-like water, weak rapid relief, sparse foam/spray,
+  smooth source-scale banks, repeated vegetation, incomplete bank structure,
+  and all six named external acceptance gates remain open.
 - Futaleufú Terminator reach-local runnable V1 replaces the flat signature-
   rapid shell and scale-mismatched 16 km corridor preview with a physical
   600×600 m, 1009×1009 Landscape. The review-gated OSM route scaffold and

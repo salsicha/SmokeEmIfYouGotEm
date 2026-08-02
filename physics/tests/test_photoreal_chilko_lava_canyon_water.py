@@ -1,0 +1,146 @@
+from __future__ import annotations
+
+import hashlib
+import json
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+EDITOR_ROOT = REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private"
+WATER_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorChilkoWaterMaterial.cpp"
+BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
+CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
+GEOMETRY_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeGeometry.cpp"
+RUNTIME_SOURCE = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    "RaftSimWaterSurfaceActor.cpp"
+)
+CONFIG_HEADER = (
+    REPO_ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/"
+    "RaftSimRiverWaterConfig.h"
+)
+MANIFEST = (
+    REPO_ROOT
+    / "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "landscape_candidate_manifest_chilko_river_lava_canyon.json"
+)
+REVIEW = MANIFEST.with_name("chilko_lava_canyon_native_water_v1_review.json")
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_chilko_water_is_native_moving_and_non_displacing() -> None:
+    water = WATER_SOURCE.read_text(encoding="utf-8")
+    base = BASE_SOURCE.read_text(encoding="utf-8")
+
+    assert "M_RaftSim_Chilko_LavaCanyonDefaultLitWater" in water
+    assert "MSM_DefaultLit" in water
+    assert "BLEND_Opaque" in water
+    assert "UMaterialExpressionSingleLayerWaterMaterialOutput" not in water
+    assert water.count("AddNormalSample(") == 2
+    assert "0.00027f" in water
+    assert "0.00147f" in water
+    assert "EditorOnlyData->WorldPositionOffset" not in water
+    assert "Landscape->Import" not in water
+    assert "SetCollision" not in water
+    assert 'Spec.RiverId == TEXT("chilko_river_lava_canyon")' in base
+    assert "LoadOrCreateChilkoLavaCanyonWaterParent" in base
+    assert 'TEXT("T_RaftSim_%s_NormalAtlas")' in base
+    assert "Terminator's packed field is sampled exactly once, as is Chilko's" in base
+
+
+def test_chilko_capture_and_live_profiles_are_river_local() -> None:
+    catalog = CATALOG_SOURCE.read_text(encoding="utf-8")
+    geometry = GEOMETRY_SOURCE.read_text(encoding="utf-8")
+    runtime = RUNTIME_SOURCE.read_text(encoding="utf-8")
+    config = CONFIG_HEADER.read_text(encoding="utf-8")
+
+    for token in (
+        "Settings.BaseColorScale = 1.10f",
+        "Settings.EmissiveFillScale = 0.16f",
+        "Settings.NormalIntensity = 0.34f",
+        "Settings.SurfaceVariationStrength = 0.34f",
+        "Settings.VertexTintWeight = 0.78f",
+    ):
+        assert token in catalog
+    for token in (
+        "LiveSkyReflectionStrength = 0.38f",
+        "LiveRippleStrength = 0.32f",
+        "LiveFoamIntensity = 0.72f",
+        "RaftSimChilkoDefaultLitWater",
+        "RaftSimCpuAuthoredCookedFieldColor",
+    ):
+        assert token in geometry
+    for parameter in (
+        "LiveSkyReflectionStrength",
+        "LiveRippleStrength",
+        "LiveFoamIntensity",
+    ):
+        assert parameter in config
+        assert f'TEXT("{parameter}")' in runtime
+
+
+def test_chilko_manifest_records_native_capture_water() -> None:
+    candidate = json.loads(MANIFEST.read_text(encoding="utf-8"))["candidates"][0]
+
+    assert candidate["river_id"] == "chilko_river_lava_canyon"
+    assert candidate["water_material_parent"] == (
+        "/Game/RaftSim/Environment/ChilkoRun/Water/Materials/"
+        "M_RaftSim_Chilko_LavaCanyonDefaultLitWater"
+    )
+    assert candidate["water_material_status"] == (
+        "chilko_lava_canyon_default_lit_native_moving_normal_candidate_"
+        "bound_cpu_cooked_field_color"
+    )
+    assert candidate["water_shading_model"] == "DefaultLit"
+    assert candidate["water_blend_mode"] == "Opaque"
+    assert candidate["water_solver_visualization_field_enable"] == 0.0
+    assert candidate["water_solver_macro_normal_weight"] == 0.0
+    assert candidate["water_solver_depth_color_weight"] == 0.0
+    assert candidate["water_solver_field_roughness_weight"] == 0.0
+    assert candidate["water_solver_froude_aeration_weight"] == 0.0
+    assert candidate["water_solver_visualization_field_texture_count"] == 1
+    assert candidate["water_base_color_scale"] == 1.10
+    assert candidate["water_vertex_tint_weight"] == 0.78
+    assert candidate["water_emissive_fill_scale"] == 0.16
+    assert candidate["water_reflection_fill_intensity"] == 0.12
+    assert candidate["water_roughness"] == 0.22
+    assert candidate["water_specular"] == 0.48
+    assert candidate["water_normal_intensity"] == 0.34
+    assert candidate["water_surface_variation_strength"] == 0.34
+    assert candidate["water_solver_render_geometry_collision_enabled"] is False
+
+
+def test_chilko_native_water_review_is_hash_locked_and_honest() -> None:
+    review = json.loads(REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.chilko_lava_canyon_native_water_review.v1"
+    )
+    assert review["status"] == (
+        "technical_candidate_retained_photoreal_and_external_review_open"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["reference_runnable"] is True
+    assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["hydraulics_changed"] is False
+    assert review["decision"]["raft_forces_changed"] is False
+    assert review["capture_water"]["cross_river_shader_field_reuse"] is False
+    assert review["capture_water"]["native_normal_atlas"] is True
+    assert review["capture_water"]["moving_normal_layer_count"] == 2
+    assert review["capture_water"]["world_optical_scales_per_cm"] == [
+        0.00027,
+        0.00147,
+    ]
+    assert len(review["remaining_photoreal_defects"]) >= 6
+    assert len(review["required_external_acceptance_gates"]) == 6
+
+    for artifact in review["retained_artifacts"]:
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]

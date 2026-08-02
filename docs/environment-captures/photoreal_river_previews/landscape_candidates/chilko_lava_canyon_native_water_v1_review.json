@@ -1,0 +1,198 @@
+{
+  "schema": "raftsim.environment.chilko_lava_canyon_native_water_review.v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "terrain_geometry_changed": false,
+    "water_ribbon_geometry_changed": false,
+    "water_collision_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false,
+    "new_live_gameplay_renderer_capture_accepted": false
+  },
+  "authority_boundary": {
+    "capture_ribbon": "noncolliding editor-review surface hidden during gameplay",
+    "capture_color": "reach-local packed cooked field sampled once into CPU-authored vertex color",
+    "capture_optics": "river-local material normals, world optical variation, scene lighting, and Fresnel fill only",
+    "gameplay_surface": "live C++ solver mesh is the sole runtime water renderer and raft-force authority",
+    "procedural_scope": "optical infill only; no terrain, bank, bathymetry, route, water geometry, collision, hydraulic state, or force changes"
+  },
+  "capture_water": {
+    "parent": "/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater",
+    "instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "two_sided": true,
+    "world_position_offset_connected": false,
+    "cross_river_shader_field_reuse": false,
+    "native_normal_atlas": true,
+    "moving_normal_layer_count": 2,
+    "world_optical_scales_per_cm": [
+      0.00027,
+      0.00147
+    ],
+    "solver_shader_field_enable": 0.0,
+    "cpu_authored_cooked_field_color": true,
+    "base_color_scale": 1.1,
+    "vertex_tint_weight": 0.78,
+    "emissive_fill_scale": 0.16,
+    "reflection_fill_intensity": 0.12,
+    "roughness": 0.22,
+    "specular": 0.48,
+    "normal_intensity": 0.34,
+    "surface_variation_strength": 0.34
+  },
+  "runtime_water": {
+    "renderer": "live solver carrier",
+    "calm_coverage": 0.88,
+    "active_coverage": 0.98,
+    "specular": 0.38,
+    "roughness": 0.26,
+    "sky_reflection_strength": 0.38,
+    "ripple_strength": 0.32,
+    "foam_intensity": 0.72,
+    "bank_blend_m": 4.5,
+    "shallow_color": [
+      0.018,
+      0.09,
+      0.115
+    ],
+    "deep_color": [
+      0.003,
+      0.022,
+      0.036
+    ],
+    "reflected_sky_color": [
+      0.075,
+      0.14,
+      0.18
+    ],
+    "validation_scope": "saved config and runtime map assertions; no new live-gameplay renderer frame accepted"
+  },
+  "renderer_comparison": {
+    "method": "normalized RGB comparison over the fixed full-width water band x=0..1279, y=380..719",
+    "guide_seat_downstream": {
+      "changed_pixel_fraction": 0.9964935661764706,
+      "mean_absolute_rgb_delta": 0.09794742614030838,
+      "mean_luminance_before": 0.15217344462871552,
+      "mean_luminance_after": 0.2528899312019348,
+      "rgb_standard_deviation_before": 0.046319469809532166,
+      "rgb_standard_deviation_after": 0.07706510275602341
+    },
+    "river_eye_downstream": {
+      "changed_pixel_fraction": 0.9933065257352941,
+      "mean_absolute_rgb_delta": 0.09662184864282608,
+      "mean_luminance_before": 0.15183758735656738,
+      "mean_luminance_after": 0.2513734698295593,
+      "rgb_standard_deviation_before": 0.04726484790444374,
+      "rgb_standard_deviation_after": 0.07766890525817871
+    },
+    "solver_rapid_river_eye_downstream": {
+      "changed_pixel_fraction": 0.9964935661764706,
+      "mean_absolute_rgb_delta": 0.09794742614030838,
+      "mean_luminance_before": 0.15217344462871552,
+      "mean_luminance_after": 0.2528899312019348,
+      "rgb_standard_deviation_before": 0.046319469809532166,
+      "rgb_standard_deviation_after": 0.07706510275602341
+    },
+    "technical_verdict": "retain: the isolated river-local material removes cross-river field reuse and materially increases visible water response in all fixed views",
+    "photoreal_verdict": "fail: the water still reads as a broad synthetic plate with sparse foam and spray, weak crest-scale rapid form, and visibly procedural banks and ecology"
+  },
+  "remaining_photoreal_defects": [
+    "The water still reads as a broad plate instead of a deep, refractive, turbulent Chilko river volume.",
+    "Lava Canyon's holes, rollers, standing crests, aeration, spray, mist, and shoreline impacts remain understated.",
+    "No new live-gameplay renderer capture demonstrates the retained runtime reflection, ripple, foam, and color bracket.",
+    "The 30 m source surface remains too smooth to resolve reach-specific banks, rock shelves, and surveyed rapid geometry.",
+    "The opaque conifer, broadleaf, shrub, and ground-cover forms remain visibly repeated and synthetic.",
+    "Near-bank gravel, cobble, roots, deadwood, wet-rock transitions, undercuts, and deposited sediment remain sparse.",
+    "The cooked hydraulics remain unconverged and uncalibrated against observed Lava Canyon behavior.",
+    "No named Chilko guide, environment-art reviewer, water-VFX reviewer, or performance reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Chilko guide review of Lava Canyon stationing, entry, line, broach hazards, recovery, exit, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Lava Canyon behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, boulders, canyon form, and seasonal presentation",
+    "photoreal water and VFX approval for depth, transmission, foam, holes, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "native_material_audit": "RaftSim.M9.FChilkoLavaCanyonWater passed 1/1 with 0 warnings and 0 errors",
+    "runtime_map_load": "RaftSim.P4.RiverMapLoads.L_LavaCanyon passed 1/1 with 0 errors and one host audio-device warning",
+    "focused_python": "46/46 exact-current Chilko, Futaleufu, and Pacuare water, terrain, and isolation contracts passed"
+  },
+  "reviewers": {
+    "named_chilko_guide": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "5394e6f732ef5d2b189f7dad3c359298ef670d462ef98294141309cffbd6080d"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater.uasset",
+      "sha256": "4cd2478253913c42eb9b1224bfed6197d5ce6e881c89254454c0999146f0fa93"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate.uasset",
+      "sha256": "1ce99eaec8b53c88e98f4aaf172b0a5e6681547ff636d2ac3d092cde48927ac9"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "sha256": "ed7cd86b1e86a3dffe64de462fbb7c054e6a61220a18b301d8fa42055d196252"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+      "sha256": "573b65729eea5833f50d5b7951b16f28039f288ac9cd17757099647940930c48"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+      "sha256": "9eb011488bc8a4b144588d33621974fc7317f5cfcccce568865766f26fd616dc"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+      "sha256": "573b65729eea5833f50d5b7951b16f28039f288ac9cd17757099647940930c48"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_native_water_v1_guide_seat_downstream.png",
+      "sha256": "3c99a38aacb18d1ba079b103285abc4f80d00d7608ee460a20a41ff6fe6771ba"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_native_water_v1_river_eye_downstream.png",
+      "sha256": "b63cf87734940f0872b74f0a51dfd3bea953de15daca91e56d9e757de850cd70"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_native_water_v1_solver_rapid_river_eye_downstream.png",
+      "sha256": "3c99a38aacb18d1ba079b103285abc4f80d00d7608ee460a20a41ff6fe6771ba"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_native_water_v1_material_audit.json",
+      "sha256": "e37d2809c94237e87eadfbcb6eb451ef700b45f7b6eecc8baac7384f1fbbce83"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_native_water_v1_map_load.json",
+      "sha256": "4f1f94265d6faad3766bd1c051287218179241a122cae0ba09d1a3e077270cf0"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorChilkoWaterMaterial.cpp",
+      "sha256": "bbc95ca99c5dab4d0815a10c2f2c1cef88c10725508ff799aba306a211731a00"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "sha256": "391ac580abf5cfc25c62f98e974a73c3a3ff4f009478865888cdd220d3717e5d"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h",
+      "sha256": "3e78d88f24fd49d80cdac3f0a9d2cf9f1b3f54650ab15d2e0c3f25c9ffb54d5f"
+    }
+  ]
+}

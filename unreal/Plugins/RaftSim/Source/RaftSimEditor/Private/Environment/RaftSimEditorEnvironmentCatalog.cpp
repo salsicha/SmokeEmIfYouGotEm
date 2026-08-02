@@ -211,18 +211,18 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         // Lava Canyon samples its median C++ field on the reach-local capture
         // ribbon. Keep the glacial color restrained and let measured depth,
         // speed, Froude number, and free-surface relief author the rapid cues.
-        Settings.BaseColorScale = 1.02f;
-        Settings.EmissiveFillScale = 0.10f;
-        Settings.Roughness = 0.30f;
-        Settings.Specular = 0.46f;
+        Settings.BaseColorScale = 1.10f;
+        Settings.EmissiveFillScale = 0.16f;
+        Settings.Roughness = 0.22f;
+        Settings.Specular = 0.48f;
         Settings.Opacity = 0.34f;
-        Settings.NormalIntensity = 0.24f;
-        Settings.SurfaceVariationStrength = 0.26f;
-        Settings.VertexTintWeight = 0.60f;
+        Settings.NormalIntensity = 0.34f;
+        Settings.SurfaceVariationStrength = 0.34f;
+        Settings.VertexTintWeight = 0.78f;
         Settings.RenderWidthScale = 1.20f;
         Settings.RenderNormalUpBlend = 0.82f;
         Settings.RenderDisplacementScale = 0.18f;
-        Settings.ReflectionFillIntensity = 0.06f;
+        Settings.ReflectionFillIntensity = 0.12f;
         Settings.SolverFieldEnable = 1.0f;
         Settings.SolverMacroNormalWeight = 0.18f;
         Settings.SolverDepthColorWeight = 0.30f;
@@ -231,10 +231,10 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 1.0f;
         Settings.SolverFroudeVisualGain = 1.0f;
         Settings.SolverSurfaceReliefScale = 0.26f;
-        Settings.SurfaceTint = FLinearColor(0.018f, 0.19f, 0.23f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.028f, 0.20f, 0.25f, 0.0f);
         Settings.SolverDeepWaterTint = FLinearColor(0.012f, 0.11f, 0.15f, 0.0f);
         Settings.SolverAerationTint = FLinearColor(0.86f, 0.93f, 0.94f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.38f, 0.54f, 0.61f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.34f, 0.55f, 0.66f, 0.0f);
     }
     return Settings;
 }

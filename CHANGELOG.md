@@ -32,6 +32,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Corrected Chilko Lava Canyon water provenance and optical response without
+  changing its ribbon geometry, collision, hydraulics, or raft forces. The
+  capture ribbon now uses an isolated opaque Default Lit parent, Chilko's own
+  normal atlas, two moving normal layers, and two non-harmonic world-space
+  optical scales; its reach-local cooked field is sampled once into CPU-authored
+  vertex color instead of being overlaid with the shared South Fork shader
+  field. The live solver carrier now exposes river-local reflection, ripple,
+  foam, and color controls. Across the fixed water-band region, mean luminance
+  rises from 0.1522 to 0.2529 in the guide view and 0.1518 to 0.2514 at river
+  eye, while RGB variation rises from 0.0463 to 0.0771 and 0.0473 to 0.0777.
+  The editor build, native saved-material audit, runnable-map gate, and focused
+  contracts pass. Broad synthetic water, weak rapid-scale relief, sparse foam
+  and spray, coarse terrain, repeated ecology, unconverged hydraulics, and
+  named external review keep photoreal and production acceptance open.
 - Replaced Chilko Lava Canyon's nearly black generic bank plate with an
   isolated four-scale Default Lit organic surface. Source-registered macro
   color, water zones, detail normals, wet-bank conditioning, and the existing

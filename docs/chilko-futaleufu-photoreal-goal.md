@@ -97,6 +97,30 @@ Both maps also replace the 12,000-instance, broadleaf-dominated PVE card fallbac
 
 The Unreal editor builds, and focused `RaftSim.P4.RiverMapLoads.L_Terminator` and `RaftSim.P4.RiverMapLoads.L_LavaCanyon` each pass 1/1 with new assertions for visible solver coverage, four opaque vegetation forms, and organic ground cover. Matched gameplay review accepts the renderer correction and rejects photoreal promotion: the water remains too uniform and bright toward the horizon, the near banks remain broad and dark, and the solid procedural foliage is visibly stylized and repetitive. Exact hashes, contracts, evidence, and open external gates are recorded in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_runtime_water_opaque_vegetation_v1_review.json`.
 
+## Chilko Native Water V1
+
+Lava Canyon's retained capture ribbon no longer reuses the shared South Fork
+shader field. It now has an isolated opaque Default Lit parent, two moving
+Chilko-native normal layers, and two non-harmonic world-space optical scales.
+The reach-local packed cooked field is sampled exactly once while ribbon
+geometry and vertex color are built on the CPU; shader-field controls remain
+present only as zeroed compatibility metadata. The live solver surface remains
+the sole gameplay water and force authority and now receives Chilko-specific
+reflection, ripple, foam, and color settings from the saved runtime config.
+
+The fixed water-band comparison records a 99.65% changed-pixel fraction in the
+guide/rapid view and 99.33% at river eye. Mean luminance increases from 0.1522
+to 0.2529 and 0.1518 to 0.2514, while RGB standard deviation increases from
+0.0463 to 0.0771 and 0.0473 to 0.0777. The isolated material audit and runnable
+map gate pass, but this is a technical provenance correction rather than a
+photoreal promotion. The retained frames still show broad synthetic water,
+sparse foam and spray, weak crest-scale rapid structure, smooth 30 m banks,
+repeated procedural ecology, and incomplete reach-specific rocks and ground
+cover. No new live-gameplay renderer frame was accepted for this bracket, so
+the runtime optical values remain config- and map-tested rather than visually
+approved. Exact hashes, metrics, and the six open external gates are recorded
+in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_native_water_v1_review.json`.
+
 ## Futaleufu Native Water V1
 
 Terminator's retained capture ribbon no longer reuses either Pacuare's normal

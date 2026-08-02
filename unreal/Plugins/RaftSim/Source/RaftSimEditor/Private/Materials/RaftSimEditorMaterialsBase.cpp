@@ -2938,8 +2938,10 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         ? LoadOrCreatePacuareRainforestWaterParent(OutSummary)
         : (Spec.RiverId == TEXT("futaleufu_terminator")
                ? LoadOrCreateFutaleufuTerminatorWaterParent(OutSummary)
-               : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
-                     OutSummary, bUseSingleLayerWater));
+               : (Spec.RiverId == TEXT("chilko_river_lava_canyon")
+                      ? LoadOrCreateChilkoLavaCanyonWaterParent(OutSummary)
+                      : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+                            OutSummary, bUseSingleLayerWater)));
     if (!Parent)
     {
         return nullptr;
@@ -3027,11 +3029,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     FRaftSimLandscapeCandidateWaterSettings Settings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
     if (bDisableSolverVisualizationFields &&
-        Spec.RiverId == TEXT("futaleufu_terminator"))
+        (Spec.RiverId == TEXT("futaleufu_terminator") ||
+         Spec.RiverId == TEXT("chilko_river_lava_canyon")))
     {
-        // Terminator's packed field is sampled exactly once while the CPU
-        // builds the ribbon's geometry and vertex colours. Do not re-sample
-        // the shared South Fork fallback on top of that river-local result.
+        // Terminator's packed field is sampled exactly once, as is Chilko's,
+        // while the CPU builds ribbon geometry and vertex colours. Do not
+        // re-sample the shared South Fork fallback over either local result.
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;

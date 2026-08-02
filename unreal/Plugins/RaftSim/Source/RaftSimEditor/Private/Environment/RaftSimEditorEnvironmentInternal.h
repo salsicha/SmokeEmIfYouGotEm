@@ -990,6 +990,8 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
 
 UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary);
 
+UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary);
+
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
 
