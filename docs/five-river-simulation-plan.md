@@ -33,7 +33,7 @@ the full-corridor Zambezi reference run:
 | Colorado Grand Canyon | `colorado_river_grand_canyon_rowing` | **Hance** | `L_Hance` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | to build |
-| Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | to build |
+| Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | **reference runnable; production hydraulics gated** |
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
@@ -147,3 +147,27 @@ and external acceptance gates pass.
   cover, dark opaque water, coarse foam mats, missing Hance survey geography,
   unconverged hydraulics, and external guide/geospatial/ecology/art/performance
   gates keep photoreal and production promotion rejected.
+
+### 2026-08-01 — Chilko Lava Canyon physical runnable map restored
+
+- `L_LavaCanyon` now uses a 1009×1009, 8×8-component Landscape covering a
+  reach-local 600×600 m window. Broad terrain is sampled in a Frenet frame from
+  the official BC Freshwater Atlas route and NRCan CanElevation MRDEM-30 DTM;
+  the complete 600×80 m interpreted C3 solver bed is preserved without change.
+  Where the 30 m source cannot resolve local ground form, deterministic
+  sub-30 m microrelief is bounded to 1.030 m and explicitly remains visual and
+  Landscape-collision infill rather than surveyed geography.
+- A 301-point station/lateral coordinate map applies the recorded 1101.713 m
+  vertical datum with 0.0 m centerline surface error. The median runnable
+  cooked field, player raft/start, and vertical-slice game mode are live in the
+  saved map; the authored hydraulic ribbon and foam remain non-colliding,
+  capture-only, and hidden during play. Four interpreted C3 contact rocks make
+  the existing broach controls and first seeded boulder physically present, but
+  remain review-gated rather than surveyed hazard claims.
+- `RaftSim.P4.RiverMapLoads.L_LavaCanyon` passes 1/1 with a wet finite live
+  window, upright raft, and zero swimmers; MapCheck reports 0 errors and 0
+  warnings. The technical runnable baseline is accepted, but dark opaque water,
+  broad/smooth banks, visibly repeated sample foliage, sparse ground cover,
+  limited rapid-specific rock detail, unconverged hydraulics, and open guide,
+  geospatial, ecology, environment-art, water-VFX, and performance gates keep
+  photoreal and production promotion rejected.

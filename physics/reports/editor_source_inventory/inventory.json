@@ -15,7 +15,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 1080
+      "line_count": 1092
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
@@ -31,7 +31,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
-      "line_count": 1626
+      "line_count": 1658
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
@@ -163,7 +163,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
-      "line_count": 1177
+      "line_count": 1282
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBatokaMaterial.cpp",
@@ -279,7 +279,7 @@
     }
   ],
   "implementation_file_count": 69,
-  "implementation_line_count": 75100,
+  "implementation_line_count": 75249,
   "registered_console_command_count": 37,
   "registered_console_commands": [
     {
@@ -565,7 +565,7 @@
     },
     {
       "river_id": "chilko_river_lava_canyon",
-      "map_package_token": "L_ChilkoRiver_PhysicalCorridorCandidate",
+      "map_package_token": "L_LavaCanyon",
       "river_id_present": true,
       "map_package_present": true
     }

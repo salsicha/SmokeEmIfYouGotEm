@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.unreal.chilko_lava_canyon_solver_visualization.v1",
+  "generated_on": "2026-08-01",
+  "status": "reference_runnable_capture_visualization_not_production_promoted",
+  "river_id": "chilko_river_lava_canyon",
+  "rapid_name": "Lava Canyon",
+  "flow_band": "median_runnable",
+  "source_scenario_id": "chilko_lava_canyon_c3_window_median_runnable",
+  "source_artifacts": {
+    "manifest": {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/manifest.json",
+      "sha256": "be660cd7e54fc6244d16f4ba50bd72ca42267f9d0e899e218652c4484dee856d",
+      "size_bytes": 39362
+    },
+    "bed": {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/bed.npy",
+      "sha256": "a23b1b4910e8509c64738fa08dcfbb59d41e03baa418f4e392e55525a2773c20",
+      "size_bytes": 49492
+    },
+    "h": {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/h.npy",
+      "sha256": "240fdeec826ef9390a9860a8d25625237045c38c8a17f83f5a65c5d2581becd0",
+      "size_bytes": 49492
+    },
+    "u": {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/u.npy",
+      "sha256": "baf06b6082ffc7f8ee9f0ad9ece37c9535cd3b1895b473475419b36c1dee96d8",
+      "size_bytes": 49492
+    },
+    "v": {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/v.npy",
+      "sha256": "fb132b7e8fdddc7e7621e6b2998176f364ff14f9efdca7ab74ff008fa95bbe81",
+      "size_bytes": 49492
+    },
+    "wet_mask": {
+      "path": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable/wet_mask.npy",
+      "sha256": "0cde7fc1a2411742cfcf1f1fb44f2bbe78acd53515ef6d10c2608d32fa4f64aa",
+      "size_bytes": 12469
+    }
+  },
+  "source_grid": {
+    "crs": "channel-following meters; x downstream along the traced MRDEM-30 channel centered on adopted-axis station 9030.0 m, y positive river-left",
+    "downstream_axis": "+x",
+    "dx_m": 2.0,
+    "dy_m": 2.0,
+    "index_to_world": "world_x = origin_x_m + col * dx_m; world_y = origin_y_m + row * dy_m (cell-centered samples)",
+    "layout": "row_major_c_order",
+    "nx": 301,
+    "ny": 41,
+    "origin_x_m": 0.0,
+    "origin_y_m": -40.0
+  },
+  "solver_evidence": {
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "flux_scheme": "hll",
+    "spatial_order": 2,
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "final_convergence_window": {
+      "end_time_s": 400.0,
+      "max_abs_dh_m": 0.09148034194840746,
+      "max_abs_du_m_per_s": 0.2519075576680898,
+      "max_abs_dv_m_per_s": 0.6222896218107834
+    },
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "discharge_authority": "scenario_planning_band_pending_review",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "field_ranges": {
+    "wet_depth_m": [
+      2.7068049348599743e-06,
+      2.870906114578247
+    ],
+    "wet_speed_mps": [
+      0.0,
+      6.3103179931640625
+    ],
+    "wet_froude": [
+      0.0,
+      3.2803898008456547
+    ],
+    "wet_surface_relief_m": [
+      -1.8877376735795224,
+      0.8697083541321717
+    ]
+  },
+  "normalization": {
+    "policy": "fixed_physical_caps_clamp_to_unit_interval",
+    "caps": {
+      "depth_m": 5.0,
+      "speed_mps": 8.0,
+      "froude": 4.5,
+      "surface_relief_m": 1.5
+    }
+  },
+  "surface_relief_derivation": {
+    "source_field": "bed_plus_h",
+    "detrending": "subtract_least_squares_fit_of_per_column_wet_cell_median_surface",
+    "trend_slope_m_per_m": -0.010496148990315955,
+    "trend_intercept_m": 1104.9287610217052,
+    "wet_cell_clipped_fraction": 0.0014851485148514852,
+    "render_height_scale": 0.26,
+    "render_height_cap_cm": 39.0
+  },
+  "hydraulic_visualization_evidence": {
+    "wet_cell_count": 6060,
+    "supercritical_cell_count": 97,
+    "foam_eligible_cell_count": 188,
+    "foam_mask": "wet_and_froude_at_least_0.80_and_speed_at_least_1.20_mps",
+    "strongest_column_index": 148,
+    "strongest_column_station_m": 296.0,
+    "strongest_column_mean_froude": 1.1651107172336197,
+    "camera_progress": {
+      "guide": 0.38333333333333336,
+      "guide_target": 0.48333333333333334,
+      "river_eye": 0.41833333333333333,
+      "river_eye_target": 0.5183333333333333,
+      "solver_rapid": 0.43833333333333335,
+      "solver_rapid_target": 0.5383333333333333
+    }
+  },
+  "texture": {
+    "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/chilko_lava_canyon_median_depth_speed_froude_surface_v1.png",
+    "sha256": "3f7a227b5cd4cd97fdbe65290b679cb8b32694df65a85df8ef6d5376fac41297",
+    "width": 1024,
+    "height": 256,
+    "channels": "R=depth_m/5 G=speed_mps/8 B=froude/4.5 A=detrended_surface_relief_m/3+0.5",
+    "source_orientation": "image_x_increases_downstream_station; image_y_increases_from_river_right_to_river_left"
+  },
+  "render_binding": {
+    "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+    "surface_actor": "RaftSim_PhysicalCorridorRiverRibbon_chilko_river_lava_canyon",
+    "foam_actor": "RaftSim_SolverFieldFoam_chilko_river_lava_canyon",
+    "capture_only": true,
+    "hidden_in_game": true,
+    "collision_enabled": false,
+    "runtime_water_owner": "ARaftSimWaterSurfaceActor_live_cooked_field_window",
+    "foam_surface_offset_cm": 1.4,
+    "foam_downstream_persistence_m": 8.0
+  },
+  "authority_policy": {
+    "physical_authority": "live_custom_cxx_shallow_water_solver",
+    "derivative_scope": "capture_only_noncolliding_authored_ribbon_color_relief_and_foam",
+    "changes_collision_or_raft_forces": false,
+    "changes_solver_state": false,
+    "changes_cooked_fields": false,
+    "may_be_used_as_production_calibration_evidence": false,
+    "reason": "source convergence is false and Lava Canyon geometry, flow bands, stationing, hazards, and guide lines remain review-gated"
+  }
+}

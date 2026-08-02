@@ -198,24 +198,33 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        Settings.BaseColorScale = 1.06f;
-        Settings.EmissiveFillScale = 0.085f;
-        Settings.Roughness = 0.29f;
-        Settings.Specular = 0.48f;
-        Settings.Opacity = 0.36f;
-        Settings.NormalIntensity = 0.70f;
-        Settings.VertexTintWeight = 0.64f;
-        Settings.RenderWidthScale = 1.28f;
-        Settings.SolverFieldEnable = 0.0f;
-        Settings.SolverMacroNormalWeight = 0.0f;
-        Settings.SolverDepthColorWeight = 0.0f;
-        Settings.SolverFieldRoughnessWeight = 0.0f;
-        Settings.SolverFroudeAerationWeight = 0.0f;
-        Settings.SolverSpeedVisualGain = 0.0f;
-        Settings.SolverFroudeVisualGain = 0.0f;
-        Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.018f, 0.24f, 0.27f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.42f, 0.60f, 0.66f, 0.0f);
+        // Lava Canyon samples its median C++ field on the reach-local capture
+        // ribbon. Keep the glacial color restrained and let measured depth,
+        // speed, Froude number, and free-surface relief author the rapid cues.
+        Settings.BaseColorScale = 1.02f;
+        Settings.EmissiveFillScale = 0.10f;
+        Settings.Roughness = 0.30f;
+        Settings.Specular = 0.46f;
+        Settings.Opacity = 0.34f;
+        Settings.NormalIntensity = 0.24f;
+        Settings.SurfaceVariationStrength = 0.26f;
+        Settings.VertexTintWeight = 0.60f;
+        Settings.RenderWidthScale = 1.20f;
+        Settings.RenderNormalUpBlend = 0.82f;
+        Settings.RenderDisplacementScale = 0.18f;
+        Settings.ReflectionFillIntensity = 0.06f;
+        Settings.SolverFieldEnable = 1.0f;
+        Settings.SolverMacroNormalWeight = 0.18f;
+        Settings.SolverDepthColorWeight = 0.30f;
+        Settings.SolverFieldRoughnessWeight = 0.12f;
+        Settings.SolverFroudeAerationWeight = 0.64f;
+        Settings.SolverSpeedVisualGain = 1.0f;
+        Settings.SolverFroudeVisualGain = 1.0f;
+        Settings.SolverSurfaceReliefScale = 0.26f;
+        Settings.SurfaceTint = FLinearColor(0.018f, 0.19f, 0.23f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.012f, 0.11f, 0.15f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.86f, 0.93f, 0.94f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.38f, 0.54f, 0.61f, 0.0f);
     }
     return Settings;
 }
@@ -828,7 +837,11 @@ float GetLandscapeCandidateWorldMinX(
     // physical windows use their cooked solver station directly so live water,
     // Landscape collision, static capture water, and raft launch share one
     // coordinate frame.
-    return Candidate.PreviewSpec.RiverId == TEXT("pacuare") &&
+    const bool bReachLocalSolverWindow =
+        Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    return bReachLocalSolverWindow &&
             !Candidate.LocalCenterlineRelativePath.IsEmpty()
         ? 0.0f
         : -5800.0f;
@@ -1355,22 +1368,41 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         else if (PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
         {
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_1009.png");
-            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
+                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
+                     "lava_canyon_visual/lava_canyon_conditioned_heightfield_1009.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
+                     "lava_canyon_visual/lava_canyon_visual_terrain_manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("unreal/Content/RaftSim/River/chilko_heightfield_import_test.json");
+                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
+                     "lava_canyon_visual/lava_canyon_visual_terrain_manifest.json");
             Candidate.LocalCenterlineRelativePath =
-                TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/centerline_local.json");
+                TEXT("physics/data/real_world/chilko_river_lava_canyon/terrain/"
+                     "lava_canyon_visual/lava_canyon_local_centerline.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ChilkoRiver_PhysicalCorridorCandidate");
+                TEXT("/Game/RaftSim/Maps/L_LavaCanyon");
             Candidate.LandscapeSize = 1009;
-            Candidate.HorizontalSpanXCm = 3390375.792f;
-            Candidate.HorizontalSpanYCm = 3878909.999f;
-            Candidate.TargetReliefCm = 70353.516f;
+            Candidate.HorizontalSpanXCm = 60000.0f;
+            Candidate.HorizontalSpanYCm = 60000.0f;
+            Candidate.TargetReliefCm = 7062.1819f;
+            Candidate.WorldVerticalOffsetCm = -496.4160f;
             Candidate.bApplyPreviewAnalyticChannelBurn = false;
-            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bUseSolverVisualizationFields = true;
+            Candidate.SolverVisualizationFieldRelativePath =
+                TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                     "chilko_lava_canyon_median_depth_speed_froude_surface_v1.png");
+            Candidate.SolverVisualizationDepthCapM = 5.0f;
+            Candidate.SolverVisualizationSpeedCapMps = 8.0f;
+            Candidate.SolverVisualizationFroudeCap = 4.5f;
+            Candidate.SolverVisualizationSurfaceReliefCapM = 1.5f;
+            Candidate.SolverVisualizationLateralMinM = -39.0f;
+            Candidate.SolverVisualizationLateralMaxM = 39.0f;
             Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bUseDensePhysicalTerrainRenderSurface = false;
             Candidate.bEnableLandscapeNanite = true;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1800.0f;
+            Candidate.PreviewSpec.BankWidthCm = 5200.0f;
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm = 0.0f;
         }
         else
         {
