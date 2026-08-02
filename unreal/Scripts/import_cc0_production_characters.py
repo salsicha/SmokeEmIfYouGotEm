@@ -70,11 +70,11 @@ HAIR_TEXTURES = {
 }
 
 CHARACTERS = {
-    "Guide": ("young_lightskinned_male_diffuse.png", "c5d4dffdaccc91f934920f35db53be3dc70dcc448abd6198503e5beff4ca6b40"),
-    "Crew01": ("young_darkskinned_male_diffuse.png", "a285c7c16c7742767ef60abe158601c2722f0f710f62854edefca78fd5cade92"),
-    "Crew02": ("young_lightskinned_male_diffuse3.png", "096d2a8d9f75bd2d247db6cde0059c4bbbe2f26ad188a092160bfe626bfc8f0b"),
-    "Crew03": ("young_lightskinned_female_diffuse.png", "b176f8e3ca9e0426ef508f1676cfb68d7766562eba85d3c4b783a70d372355ed"),
-    "Crew04": ("young_darkskinned_female_diffuse.png", "831fdd467a8d729c29556b3e4f27b512a25f722ca06f3157fcfcd34bea4a044a"),
+    "Guide": ("young_lightskinned_male_diffuse.png", "73c72e1b89b37841f3addd8dddeb86e59ac762de1ed46cbbd1d800fa601a2f54"),
+    "Crew01": ("young_darkskinned_male_diffuse.png", "f980d7d3eaf1c978a8a0cf17d9a48af80548fda125764a2766656357b3452cd1"),
+    "Crew02": ("young_lightskinned_male_diffuse3.png", "54bc59c9990ddfce62611f4aa3c8a6c45c1152c6d099c4447e37645bbf609f5a"),
+    "Crew03": ("young_lightskinned_female_diffuse.png", "24fbc26f6b19fbc49525946a3c7f3c7b13c20730ca60220e3f1eac1f0b077636"),
+    "Crew04": ("young_darkskinned_female_diffuse.png", "e232214376f84213205f78c5cc184207ecfb29d5c0ce628879344c4e9c6f0bf6"),
 }
 
 CHARACTER_HAIR = {
@@ -419,6 +419,31 @@ def color_material(name: str, color: unreal.LinearColor, roughness: float) -> un
     return material
 
 
+def hidden_helmet_hair_material() -> unreal.Material:
+    name = "M_RaftSim_CC0_HelmetContainedHairHidden"
+    existing = unreal.load_asset(f"{MATERIAL_DESTINATION}/{name}")
+    if isinstance(existing, unreal.Material):
+        return existing
+    material = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
+        name, MATERIAL_DESTINATION, unreal.Material, unreal.MaterialFactoryNew()
+    )
+    if not isinstance(material, unreal.Material):
+        raise RuntimeError(f"Could not create material {name}")
+    opacity = unreal.MaterialEditingLibrary.create_material_expression(
+        material, unreal.MaterialExpressionConstant, -240, 0
+    )
+    opacity.r = 0.0
+    unreal.MaterialEditingLibrary.connect_material_property(
+        opacity, "", unreal.MaterialProperty.MP_OPACITY_MASK
+    )
+    material.set_editor_property("blend_mode", unreal.BlendMode.BLEND_MASKED)
+    material.set_editor_property("opacity_mask_clip_value", 0.5)
+    material.modify()
+    unreal.MaterialEditingLibrary.layout_material_expressions(material)
+    unreal.MaterialEditingLibrary.recompile_material(material)
+    return material
+
+
 def build_materials(
     textures: dict[str, unreal.Texture2D], rebuild_hair: bool = False
 ) -> dict[str, unreal.MaterialInterface]:
@@ -430,6 +455,7 @@ def build_materials(
         "brows": color_material(
             "M_RaftSim_CC0_Brows", unreal.LinearColor(0.012, 0.0045, 0.002, 1.0), 0.79
         ),
+        "helmet_hidden_hair": hidden_helmet_hair_material(),
     }
     for variant, (atlas_name, _) in CHARACTERS.items():
         materials[f"skin_{variant}"] = texture_material(
@@ -486,7 +512,10 @@ def configure_mesh(
         elif "brow" in normalized:
             selected = materials["brows"]
         elif "hair" in normalized:
-            selected = materials[f"hair_{variant}"]
+            # Keep the licensed source and authored materials packaged, but
+            # suppress cards that are fully contained by the production shell.
+            # Their legacy neck weights can detach in the seated fallback pose.
+            selected = materials["helmet_hidden_hair"]
         else:
             raise RuntimeError(f"Unrecognized {variant} skeletal material slot: {slot_name}")
         if slot.get_editor_property("material_interface") != selected:
@@ -560,8 +589,11 @@ def main() -> None:
     try:
         report["verified_sources"] = verify_sources()
         replace_existing = os.environ.get("RAFTSIM_CC0_REIMPORT", "0") == "1"
-        textures = import_textures(replace_existing)
-        materials = build_materials(textures, rebuild_hair=replace_existing)
+        replace_textures = (
+            os.environ.get("RAFTSIM_CC0_REIMPORT_TEXTURES", "0") == "1"
+        )
+        textures = import_textures(replace_textures)
+        materials = build_materials(textures, rebuild_hair=replace_textures)
         meshes = import_characters(replace_existing)
         report["characters"] = [
             configure_mesh(variant, meshes[variant], materials) for variant in CHARACTERS

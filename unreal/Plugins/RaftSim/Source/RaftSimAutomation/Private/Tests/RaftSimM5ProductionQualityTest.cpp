@@ -264,7 +264,10 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Wetsuit."
              "M_RaftSim_CC0_Wetsuit"),
         TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Brows."
-             "M_RaftSim_CC0_Brows")};
+             "M_RaftSim_CC0_Brows"),
+        TEXT("/Game/RaftSim/Characters/Production/CC0/Materials/"
+             "M_RaftSim_CC0_HelmetContainedHairHidden."
+             "M_RaftSim_CC0_HelmetContainedHairHidden")};
     for (const TCHAR* MaterialPath : CC0MaterialPaths)
     {
         UMaterial* Material = LoadObject<UMaterial>(nullptr, MaterialPath);
@@ -349,9 +352,9 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
             if (HairSlot->MaterialInterface)
             {
                 TestTrue(
-                    FString::Printf(TEXT("%s hair material is variant-specific"), Variant),
+                    FString::Printf(TEXT("%s helmet-contained hair is suppressed"), Variant),
                     HairSlot->MaterialInterface->GetPathName().Contains(
-                        FString::Printf(TEXT("M_RaftSim_CC0_%s_Hair"), Variant)));
+                        TEXT("M_RaftSim_CC0_HelmetContainedHairHidden")));
             }
         }
     }
@@ -1141,6 +1144,30 @@ bool FRaftSimM5StartRescueCommand::Update()
                     TEXT("avatar %s gives its complete CC0 mesh exclusive body ownership"),
                     *It->GetName()),
                 It->HasExclusiveCC0BodyOwnership());
+            const float HelmetHeadErrorCm = It->GetProductionHelmetHeadErrorCm();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s keeps helmet on the rendered CC0 face "
+                         "(error %.3f cm)"),
+                    *It->GetName(),
+                    HelmetHeadErrorCm),
+                HelmetHeadErrorCm <= 1.0f);
+            const float HelmetForwardAlignment =
+                It->GetProductionHelmetForwardAlignment();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s points the CC0 helmet brow with the rendered face "
+                         "(alignment %.4f)"),
+                    *It->GetName(),
+                    HelmetForwardAlignment),
+                HelmetForwardAlignment >= 0.98f);
+            const float HelmetFitScale = It->GetProductionHelmetFitScale();
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("avatar %s uses a bounded CC0 helmet fit (scale %.4f)"),
+                    *It->GetName(),
+                    HelmetFitScale),
+                HelmetFitScale >= 0.90f && HelmetFitScale <= 1.02f);
         }
         else if (Cast<ARaftSimMetaHumanCrewVisualActor>(It->GetProductionVisualActor()))
         {

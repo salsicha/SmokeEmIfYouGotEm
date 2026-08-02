@@ -1,7 +1,7 @@
 {
-  "schema_version": 2,
-  "generated_utc_date": "2026-07-27",
-  "purpose": "Rights-compatible production fallback bodies and helmet-compatible hair for the RaftSim guide and four crew seats.",
+  "schema_version": 3,
+  "generated_utc_date": "2026-08-02",
+  "purpose": "Rights-compatible production fallback bodies with rigid helmet-hair deformation for the RaftSim guide and four crew seats.",
   "license": {
     "asset_license": "mixed_cc0_1_0_and_cc_by_4_0",
     "body_asset_license": "CC0-1.0",
@@ -18,6 +18,8 @@
     "mpfb": "2.0.17",
     "mpfb_extension_archive_sha256": "4f0a879d64a39bf646fbf5f53601ac678855da329d650617dca5737548239a87",
     "generator": "unreal/Scripts/build_cc0_production_character.py",
+    "checked_in_fbx_canonicalizer": "unreal/Scripts/canonicalize_cc0_helmet_hair.py",
+    "helmet_hair_weight_policy": "all Hair, Eyes, and Brows section vertices plus the complete connected Skin region seeded by vertices with at least 0.75 authored head weight are canonicalized to 1.0 head weight and 0.0 every other bone",
     "rig": "MPFB game_engine",
     "fbx_world_unit": "centimeter",
     "body_topology": {
@@ -74,7 +76,7 @@
       "export_vertices": 23446,
       "export_polygons": 20068,
       "parameters": {"gender": 0.86, "height": 0.58, "muscle": 0.52, "weight": 0.46, "ethnicity": "caucasian"},
-      "fbx_sha256": "c5d4dffdaccc91f934920f35db53be3dc70dcc448abd6198503e5beff4ca6b40",
+      "fbx_sha256": "73c72e1b89b37841f3addd8dddeb86e59ac762de1ed46cbbd1d800fa601a2f54",
       "preview_sha256": "aeb9846aa3826f3f372dcd05daf3fd8ceb32d3582f855eca2abc185ae5caaec9"
     },
     {
@@ -86,7 +88,7 @@
       "export_vertices": 35608,
       "export_polygons": 34290,
       "parameters": {"gender": 0.78, "height": 0.48, "muscle": 0.46, "weight": 0.53, "ethnicity": "african"},
-      "fbx_sha256": "a285c7c16c7742767ef60abe158601c2722f0f710f62854edefca78fd5cade92",
+      "fbx_sha256": "f980d7d3eaf1c978a8a0cf17d9a48af80548fda125764a2766656357b3452cd1",
       "preview_sha256": "ac9ae89b9aefa78ccf329111ee4fce714c81bbc3538d80ac14706619d0650f01"
     },
     {
@@ -98,7 +100,7 @@
       "export_vertices": 23446,
       "export_polygons": 20068,
       "parameters": {"gender": 0.66, "height": 0.53, "muscle": 0.41, "weight": 0.43, "ethnicity": "asian"},
-      "fbx_sha256": "096d2a8d9f75bd2d247db6cde0059c4bbbe2f26ad188a092160bfe626bfc8f0b",
+      "fbx_sha256": "54bc59c9990ddfce62611f4aa3c8a6c45c1152c6d099c4447e37645bbf609f5a",
       "preview_sha256": "40f92b1af82c854c5297ba12981a90ff0fb4f265b04eb3c7b7dc68754f684d34"
     },
     {
@@ -110,7 +112,7 @@
       "export_vertices": 64099,
       "export_polygons": 63111,
       "parameters": {"gender": 0.18, "height": 0.46, "muscle": 0.42, "weight": 0.48, "ethnicity": "caucasian"},
-      "fbx_sha256": "b176f8e3ca9e0426ef508f1676cfb68d7766562eba85d3c4b783a70d372355ed",
+      "fbx_sha256": "24fbc26f6b19fbc49525946a3c7f3c7b13c20730ca60220e3f1eac1f0b077636",
       "preview_sha256": "54877836efe4f75851ba278ed5fb0ab5a342680a44fca61f22b4ad91f8e01160"
     },
     {
@@ -122,7 +124,7 @@
       "export_vertices": 35608,
       "export_polygons": 34290,
       "parameters": {"gender": 0.10, "height": 0.51, "muscle": 0.48, "weight": 0.52, "ethnicity": "african"},
-      "fbx_sha256": "831fdd467a8d729c29556b3e4f27b512a25f722ca06f3157fcfcd34bea4a044a",
+      "fbx_sha256": "e232214376f84213205f78c5cc184207ecfb29d5c0ce628879344c4e9c6f0bf6",
       "preview_sha256": "50f53afb722dc2fb79b78183f5564c47970a1a8e8c0e3172b56e30c61a230b98"
     }
   ],
@@ -130,7 +132,7 @@
     "status": "technical_fallback_hair_upgrade_accepted_photoreal_pending",
     "scope": "Blender studio previews for all five variants",
     "known_limitations": [
-      "Helmet-compatible hair is included, but the selected MakeHuman geometry remains a fallback rather than final groom quality.",
+      "Helmet-compatible short hair now deforms rigidly with the head, but the selected MakeHuman geometry remains a fallback rather than final groom quality.",
       "The wetsuit/skin collar boundary is intentionally hidden by the in-game PFD overlay.",
       "Final photoreal acceptance still requires an in-engine close-up review."
     ]

@@ -1299,17 +1299,62 @@ bool ARaftSimCrewAvatarActor::HasFiniteVisualTransforms() const
         !ProductionPfd->GetRelativeTransform().ContainsNaN();
 }
 
+bool ARaftSimCrewAvatarActor::ResolveProductionHeadFit(
+    FVector& OutSolvedHeadWorldLocation,
+    FVector& OutFaceForwardWorld,
+    FVector& OutFaceUpWorld,
+    float& OutHelmetScale) const
+{
+    if (const ARaftSimMetaHumanCrewVisualActor* MetaHumanVisual =
+            Cast<ARaftSimMetaHumanCrewVisualActor>(GetProductionVisualActor()))
+    {
+        OutSolvedHeadWorldLocation = MetaHumanVisual->GetSolvedHeadWorldLocation();
+        OutFaceForwardWorld = MetaHumanVisual->GetSolvedFaceForwardWorldVector();
+        OutFaceUpWorld = MetaHumanVisual->GetSolvedFaceUpWorldVector();
+        OutHelmetScale = MetaHumanVisual->GetRecommendedWhitewaterHelmetScale();
+    }
+    else if (const ARaftSimCC0CrewVisualActor* CC0Visual =
+                 Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor());
+             CC0Visual && CC0Visual->IsBodyReady())
+    {
+        OutSolvedHeadWorldLocation = CC0Visual->GetSolvedHeadWorldLocation();
+        OutFaceForwardWorld = CC0Visual->GetSolvedFaceForwardWorldVector();
+        OutFaceUpWorld = CC0Visual->GetSolvedFaceUpWorldVector();
+        OutHelmetScale = CC0Visual->GetRecommendedWhitewaterHelmetScale();
+    }
+    else
+    {
+        return false;
+    }
+    return !OutSolvedHeadWorldLocation.ContainsNaN() &&
+        !OutFaceForwardWorld.ContainsNaN() &&
+        !OutFaceForwardWorld.IsNearlyZero() &&
+        !OutFaceUpWorld.ContainsNaN() &&
+        !OutFaceUpWorld.IsNearlyZero() &&
+        FMath::IsFinite(OutHelmetScale) && OutHelmetScale > 0.0f;
+}
+
 float ARaftSimCrewAvatarActor::GetProductionHelmetHeadErrorCm() const
 {
-    const ARaftSimMetaHumanCrewVisualActor* MetaHumanVisual =
-        Cast<ARaftSimMetaHumanCrewVisualActor>(GetProductionVisualActor());
-    if (!MetaHumanVisual || !Helmet || !Root)
+    if (!Helmet || !Root)
+    {
+        return TNumericLimits<float>::Max();
+    }
+    FVector SolvedHeadWorldLocation;
+    FVector FaceForwardWorld;
+    FVector FaceUpWorld;
+    float HelmetScale = 0.0f;
+    if (!ResolveProductionHeadFit(
+            SolvedHeadWorldLocation,
+            FaceForwardWorld,
+            FaceUpWorld,
+            HelmetScale))
     {
         return TNumericLimits<float>::Max();
     }
     const FVector SolvedHeadRelativeCm =
         Root->GetComponentTransform().InverseTransformPosition(
-            MetaHumanVisual->GetSolvedHeadWorldLocation());
+            SolvedHeadWorldLocation);
     const USceneComponent* FittedHelmet = HasProductionWhitewaterHelmet()
         ? static_cast<const USceneComponent*>(ProductionHelmet.Get())
         : static_cast<const USceneComponent*>(Helmet.Get());
@@ -1328,15 +1373,25 @@ float ARaftSimCrewAvatarActor::GetProductionHelmetHeadErrorCm() const
 
 float ARaftSimCrewAvatarActor::GetProductionHelmetForwardAlignment() const
 {
-    const ARaftSimMetaHumanCrewVisualActor* MetaHumanVisual =
-        Cast<ARaftSimMetaHumanCrewVisualActor>(GetProductionVisualActor());
-    if (!MetaHumanVisual || !HasProductionWhitewaterHelmet())
+    if (!HasProductionWhitewaterHelmet())
+    {
+        return -1.0f;
+    }
+    FVector SolvedHeadWorldLocation;
+    FVector FaceForwardWorld;
+    FVector FaceUpWorld;
+    float HelmetScale = 0.0f;
+    if (!ResolveProductionHeadFit(
+            SolvedHeadWorldLocation,
+            FaceForwardWorld,
+            FaceUpWorld,
+            HelmetScale))
     {
         return -1.0f;
     }
     return FVector::DotProduct(
         ProductionHelmet->GetForwardVector().GetSafeNormal(),
-        MetaHumanVisual->GetSolvedFaceForwardWorldVector());
+        FaceForwardWorld.GetSafeNormal());
 }
 
 float ARaftSimCrewAvatarActor::GetProductionHelmetFitScale() const
@@ -2240,23 +2295,33 @@ void ARaftSimCrewAvatarActor::DispatchProductionPose()
 
 void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()
 {
-    ARaftSimMetaHumanCrewVisualActor* MetaHumanVisual =
-        Cast<ARaftSimMetaHumanCrewVisualActor>(GetProductionVisualActor());
-    if (!bUsingProductionVisual || !MetaHumanVisual || !Root || !Head ||
+    if (!bUsingProductionVisual || !Root || !Head ||
         !Helmet || !HelmetRim || !HelmetRetention)
+    {
+        return;
+    }
+    FVector SolvedHeadWorldLocation;
+    FVector FaceForwardWorld;
+    FVector FaceUpWorld;
+    float RecommendedHelmetScale = 0.0f;
+    if (!ResolveProductionHeadFit(
+            SolvedHeadWorldLocation,
+            FaceForwardWorld,
+            FaceUpWorld,
+            RecommendedHelmetScale))
     {
         return;
     }
     const FVector SolvedHeadRelativeCm =
         Root->GetComponentTransform().InverseTransformPosition(
-            MetaHumanVisual->GetSolvedHeadWorldLocation());
+            SolvedHeadWorldLocation);
     const FVector PoseHeadRelativeCm = Head->GetRelativeLocation();
     if (SolvedHeadRelativeCm.ContainsNaN() || PoseHeadRelativeCm.ContainsNaN())
     {
         return;
     }
     // ApplyPose owns the production PPE silhouette and resets it every frame;
-    // the MetaHuman adapter then publishes the exact rendered face transform.
+    // each complete production adapter then publishes its rendered face frame.
     // Position, orient, and size the asymmetric shell from that transform. A
     // torso-only rotation made the brow/rear profile look reversed whenever
     // the driven head and torso bases diverged, while one shared scale visibly
@@ -2272,15 +2337,14 @@ void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()
     {
         const FTransform RootTransform = Root->GetComponentTransform();
         const FVector FaceForward = RootTransform.InverseTransformVectorNoScale(
-            MetaHumanVisual->GetSolvedFaceForwardWorldVector()).GetSafeNormal();
+            FaceForwardWorld).GetSafeNormal();
         const FVector FaceUp = RootTransform.InverseTransformVectorNoScale(
-            MetaHumanVisual->GetSolvedFaceUpWorldVector()).GetSafeNormal();
+            FaceUpWorld).GetSafeNormal();
         if (!FaceForward.IsNearlyZero() && !FaceUp.IsNearlyZero())
         {
             const FQuat FittedRotation = FRotationMatrix::MakeFromXZ(
                 FaceForward, FaceUp).ToQuat();
-            const float FittedScale =
-                MetaHumanVisual->GetRecommendedWhitewaterHelmetScale();
+            const float FittedScale = RecommendedHelmetScale;
             const float LiftScale =
                 FittedScale / kProductionHelmetReferenceFit;
             const FVector FittedLocation = SolvedHeadRelativeCm +

@@ -3918,3 +3918,19 @@ path is verified, and the completion goal can be marked complete.
   foam response, intersections and identity deformation, and absent named
   character-art and qualified whitewater-safety approval; M9 and photoreal
   promotion remain open.
+- CC0 rendered-face-fitted helmet V1 repairs the packaged fallback path that is
+  used when the assembled MetaHuman roster is unavailable. The adapter caches
+  64 LOD0 skin vertices nearest each authored eye line, averages their live
+  post-skinning positions, publishes the rendered face forward/up frame, and
+  applies bounded 10 cm guide and 6 cm Crew01 brow-seat corrections. The
+  continuous production shell now contains a masked hair slot, so the five
+  rights-tracked source hairstyles and attribution remain packaged without the
+  detached cards that previously floated above the guide and Crew01 heads.
+  All five front/profile/rear captures retain exclusive CC0 body ownership,
+  production PFD/helmet/boots, 1.0 helmet forward alignment, 0.96 fit scale,
+  and no more than `7.312e-10` cm solved-anchor error. The editor build and
+  forced-CC0 renderer-backed M5 run pass with zero failed tests. This is a
+  technical headgear-fit improvement only: simplified anatomy, skin/eye and
+  clothing response, hands, helmet/webbing materials, lighting, named
+  character-art approval, and qualified whitewater-safety review keep M9 and
+  photoreal promotion open.

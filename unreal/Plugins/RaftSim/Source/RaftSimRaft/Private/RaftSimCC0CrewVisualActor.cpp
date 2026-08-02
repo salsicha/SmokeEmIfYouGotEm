@@ -4,6 +4,8 @@
 #include "Components/SceneComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "Materials/MaterialInterface.h"
+#include "Rendering/SkeletalMeshRenderData.h"
+#include "Rendering/SkinWeightVertexBuffer.h"
 
 namespace
 {
@@ -20,6 +22,23 @@ const TCHAR* CrewMeshPaths[] = {
          "SK_RaftSim_CC0_Crew03"),
     TEXT("/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew04."
          "SK_RaftSim_CC0_Crew04")};
+
+// Measured from the rigid eye surfaces in the hash-locked source FBXs. Whole
+// head-section bounds include identity-dependent neck vertices and shift by
+// more than 20 cm; the eye-line is stable and the host's authored 9.5 cm lift
+// then places the whitewater shell at the crown.
+const FVector GuideHeadLocalEyeCenterCm(0.0f, 3.810171f, 8.598805f);
+const FVector CrewHeadLocalEyeCentersCm[] = {
+    FVector(0.0f, 3.965670f, 7.931258f),
+    FVector(0.0f, 3.460583f, 7.402065f),
+    FVector(0.0f, 2.782320f, 7.364698f),
+    FVector(0.0f, 4.179949f, 7.215961f)};
+
+// Capture-fitted correction from the rendered eye-line to the helmet anchor.
+// The guide and first crew identity have longer face-to-crown proportions than
+// the common shell reference; the other three already seat at the brow.
+constexpr float GuideHelmetAnchorDropCm = 10.0f;
+const float CrewHelmetAnchorDropsCm[] = {6.0f, 0.0f, 0.0f, 0.0f};
 
 const FName DrivenBones[] = {
     TEXT("pelvis"),
@@ -94,6 +113,58 @@ FString ARaftSimCC0CrewVisualActor::GetSelectedMeshPath() const
         : FString(CrewMeshPaths[FMath::Clamp(CurrentVariantIndex, 0, 3)]);
 }
 
+FVector ARaftSimCC0CrewVisualActor::GetSolvedHeadWorldLocation() const
+{
+    if (!bBodyReady || !Body || Body->GetBoneIndex(TEXT("head")) == INDEX_NONE)
+    {
+        return GetActorLocation();
+    }
+    FVector RenderedEyeCenterWorld;
+    if (TryGetRenderedFaceEyeCenterWorld(RenderedEyeCenterWorld))
+    {
+        const float AnchorDropCm = bCurrentGuide
+            ? GuideHelmetAnchorDropCm
+            : CrewHelmetAnchorDropsCm[FMath::Clamp(CurrentVariantIndex, 0, 3)];
+        return RenderedEyeCenterWorld -
+            GetSolvedFaceUpWorldVector() * AnchorDropCm;
+    }
+    const FTransform HeadTransform = Body->GetBoneTransformByName(
+        TEXT("head"), EBoneSpaces::ComponentSpace);
+    const FVector LocalEyeCenterCm = bCurrentGuide
+        ? GuideHeadLocalEyeCenterCm
+        : CrewHeadLocalEyeCentersCm[FMath::Clamp(CurrentVariantIndex, 0, 3)];
+    return Body->GetComponentTransform().TransformPosition(
+        HeadTransform.TransformPosition(LocalEyeCenterCm / BodyScale));
+}
+
+FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceForwardWorldVector() const
+{
+    if (!bBodyReady || !Body || Body->GetBoneIndex(TEXT("head")) == INDEX_NONE)
+    {
+        return GetActorForwardVector();
+    }
+    const FTransform HeadTransform = Body->GetBoneTransformByName(
+        TEXT("head"), EBoneSpaces::ComponentSpace);
+    // Unreal's FBX conversion makes MPFB head-local -Z point through the
+    // rendered face and local -Y point through the crown. Publish that authored
+    // frame so asymmetric helmet geometry cannot inherit torso-only yaw or
+    // present its solid rear bowl toward the guide camera.
+    return Body->GetComponentTransform().TransformVectorNoScale(
+        HeadTransform.GetRotation().RotateVector(-FVector::UpVector)).GetSafeNormal();
+}
+
+FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceUpWorldVector() const
+{
+    if (!bBodyReady || !Body || Body->GetBoneIndex(TEXT("head")) == INDEX_NONE)
+    {
+        return GetActorUpVector();
+    }
+    const FTransform HeadTransform = Body->GetBoneTransformByName(
+        TEXT("head"), EBoneSpaces::ComponentSpace);
+    return Body->GetComponentTransform().TransformVectorNoScale(
+        HeadTransform.GetRotation().RotateVector(-FVector::YAxisVector)).GetSafeNormal();
+}
+
 bool ARaftSimCC0CrewVisualActor::EnsureBodyLoaded()
 {
     if (!Body)
@@ -139,6 +210,7 @@ bool ARaftSimCC0CrewVisualActor::EnsureBodyLoaded()
 void ARaftSimCC0CrewVisualActor::CacheReferencePose()
 {
     ReferenceComponentTransforms.Reset();
+    RenderedFaceAnchorVertexIndices.Reset();
     if (!Body || !Body->GetSkinnedAsset())
     {
         return;
@@ -152,6 +224,110 @@ void ARaftSimCC0CrewVisualActor::CacheReferencePose()
                 Body->GetBoneTransformByName(BoneName, EBoneSpaces::ComponentSpace));
         }
     }
+    CacheRenderedFaceAnchorVertices();
+}
+
+void ARaftSimCC0CrewVisualActor::CacheRenderedFaceAnchorVertices()
+{
+    if (!Body)
+    {
+        return;
+    }
+    USkeletalMesh* Mesh = Cast<USkeletalMesh>(Body->GetSkinnedAsset());
+    FSkeletalMeshRenderData* RenderData = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    const FTransform* ReferenceHead = ReferenceComponentTransforms.Find(TEXT("head"));
+    if (!Mesh || !RenderData || RenderData->LODRenderData.IsEmpty() || !ReferenceHead)
+    {
+        return;
+    }
+
+    int32 SkinMaterialIndex = INDEX_NONE;
+    const TArray<FSkeletalMaterial>& Materials = Mesh->GetMaterials();
+    for (int32 MaterialIndex = 0; MaterialIndex < Materials.Num(); ++MaterialIndex)
+    {
+        if (Materials[MaterialIndex].MaterialSlotName.ToString().Contains(
+                TEXT("Skin"), ESearchCase::IgnoreCase))
+        {
+            SkinMaterialIndex = MaterialIndex;
+            break;
+        }
+    }
+    if (SkinMaterialIndex == INDEX_NONE)
+    {
+        return;
+    }
+
+    const FVector LocalEyeCenterCm = bCurrentGuide
+        ? GuideHeadLocalEyeCenterCm
+        : CrewHeadLocalEyeCentersCm[FMath::Clamp(CurrentVariantIndex, 0, 3)];
+    const FVector ReferenceEyeCenterCm =
+        ReferenceHead->TransformPosition(LocalEyeCenterCm / BodyScale);
+    const FSkeletalMeshLODRenderData& LODData = RenderData->LODRenderData[0];
+    struct FFaceCandidate
+    {
+        int32 VertexIndex = INDEX_NONE;
+        float DistanceSquared = TNumericLimits<float>::Max();
+    };
+    TArray<FFaceCandidate> Candidates;
+    for (const FSkelMeshRenderSection& Section : LODData.RenderSections)
+    {
+        if (Section.MaterialIndex != SkinMaterialIndex)
+        {
+            continue;
+        }
+        const uint32 EndVertex = Section.BaseVertexIndex + Section.NumVertices;
+        for (uint32 VertexIndex = Section.BaseVertexIndex; VertexIndex < EndVertex; ++VertexIndex)
+        {
+            const FVector ReferencePosition(
+                LODData.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(VertexIndex));
+            Candidates.Add({
+                static_cast<int32>(VertexIndex),
+                FVector::DistSquared(ReferencePosition, ReferenceEyeCenterCm)});
+        }
+    }
+    Candidates.Sort([](const FFaceCandidate& A, const FFaceCandidate& B)
+    {
+        return A.DistanceSquared < B.DistanceSquared;
+    });
+    constexpr int32 FacialSampleCount = 64;
+    const int32 RetainedCount = FMath::Min(FacialSampleCount, Candidates.Num());
+    RenderedFaceAnchorVertexIndices.Reserve(RetainedCount);
+    for (int32 Index = 0; Index < RetainedCount; ++Index)
+    {
+        RenderedFaceAnchorVertexIndices.Add(Candidates[Index].VertexIndex);
+    }
+}
+
+bool ARaftSimCC0CrewVisualActor::TryGetRenderedFaceEyeCenterWorld(
+    FVector& OutWorldLocation) const
+{
+    if (!Body || RenderedFaceAnchorVertexIndices.IsEmpty())
+    {
+        return false;
+    }
+    USkeletalMesh* Mesh = Cast<USkeletalMesh>(Body->GetSkinnedAsset());
+    FSkeletalMeshRenderData* RenderData = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    FSkinWeightVertexBuffer* SkinWeights = Body->GetSkinWeightBuffer(0);
+    if (!RenderData || RenderData->LODRenderData.IsEmpty() || !SkinWeights)
+    {
+        return false;
+    }
+    const FSkeletalMeshLODRenderData& LODData = RenderData->LODRenderData[0];
+    TArray<FMatrix44f> CachedRefToLocals;
+    Body->CacheRefToLocalMatrices(CachedRefToLocals);
+    FVector ComponentCenter = FVector::ZeroVector;
+    for (const int32 VertexIndex : RenderedFaceAnchorVertexIndices)
+    {
+        ComponentCenter += FVector(USkinnedMeshComponent::GetSkinnedVertexPosition(
+            Body,
+            VertexIndex,
+            LODData,
+            *SkinWeights,
+            CachedRefToLocals));
+    }
+    ComponentCenter /= RenderedFaceAnchorVertexIndices.Num();
+    OutWorldLocation = Body->GetComponentTransform().TransformPosition(ComponentCenter);
+    return !OutWorldLocation.ContainsNaN();
 }
 
 void ARaftSimCC0CrewVisualActor::ConfigureCrewAppearance_Implementation(

@@ -189,6 +189,69 @@ def _bind_rigid_mesh(mesh: bpy.types.Object, rig: bpy.types.Object, bone_name: s
     group.add(range(len(mesh.data.vertices)), 1.0, "REPLACE")
 
 
+def _replace_with_rigid_bone_weights(mesh: bpy.types.Object, bone_name: str) -> None:
+    """Keep helmet-contained detail meshes coherent under component-space poses."""
+    mesh.vertex_groups.clear()
+    group = mesh.vertex_groups.new(name=bone_name)
+    group.add(range(len(mesh.data.vertices)), 1.0, "REPLACE")
+
+
+def _rigidify_high_confidence_head_vertices(
+    body: bpy.types.Object,
+    minimum_head_weight: float = 0.75,
+) -> int:
+    """Keep facial skin with rigid eyes/hair under component-space head poses."""
+    head_group = body.vertex_groups.get("head")
+    if head_group is None:
+        raise RuntimeError(f"{body.name} has no head vertex group")
+    seeds = {
+        vertex.index
+        for vertex in body.data.vertices
+        if any(
+            assignment.group == head_group.index
+            and assignment.weight >= minimum_head_weight
+            for assignment in vertex.groups
+        )
+    }
+    if not seeds:
+        raise RuntimeError(f"{body.name} has no high-confidence head vertices")
+
+    skin_materials = {
+        index
+        for index, material in enumerate(body.data.materials)
+        if material is not None and "skin" in material.name.casefold()
+    }
+    skin_polygons = [
+        set(polygon.vertices)
+        for polygon in body.data.polygons
+        if polygon.material_index in skin_materials
+    ]
+    vertex_to_polygons: dict[int, list[int]] = {}
+    for polygon_index, vertices in enumerate(skin_polygons):
+        for vertex_index in vertices:
+            vertex_to_polygons.setdefault(vertex_index, []).append(polygon_index)
+
+    selected = set(seeds)
+    pending = list(seeds)
+    visited_polygons: set[int] = set()
+    while pending:
+        vertex_index = pending.pop()
+        for polygon_index in vertex_to_polygons.get(vertex_index, ()):
+            if polygon_index in visited_polygons:
+                continue
+            visited_polygons.add(polygon_index)
+            for connected_index in skin_polygons[polygon_index]:
+                if connected_index not in selected:
+                    selected.add(connected_index)
+                    pending.append(connected_index)
+
+    selected_indices = sorted(selected)
+    for group in body.vertex_groups:
+        group.remove(selected_indices)
+    head_group.add(selected_indices, 1.0, "REPLACE")
+    return len(selected_indices)
+
+
 def _extract_helper_eyes(
     body: bpy.types.Object,
     rig: bpy.types.Object,
@@ -442,6 +505,12 @@ def main() -> None:
     if source_hair is not None:
         hair = _find_exported_hair(source_hair, rig)
         hair.name = f"{args.name}_Hair"
+        # MPFB interpolates proxy weights across the scalp, neck and upper
+        # spine. That is useful for long free hair, but these reviewed short
+        # helmet styles must move as one island with the head. Mixed weights
+        # visibly separate the groom when RaftSim drives component-space neck
+        # transforms, so replace them before joining/export.
+        _replace_with_rigid_bone_weights(hair, "head")
         for material in hair.data.materials:
             if material is not None:
                 material.name = f"{args.name}_Hair"
@@ -455,6 +524,7 @@ def main() -> None:
         detail_meshes.extend(_add_brows(eyes, rig, brow_material, args.name))
     ExportService.bake_modifiers_remove_helpers(
         body, bake_masks=True, bake_subdiv=False, remove_helpers=True, also_proxy=True)
+    _rigidify_high_confidence_head_vertices(body)
 
     materials = {
         "skin": _new_skin_material(f"{args.name}_Skin", atlas_path),
