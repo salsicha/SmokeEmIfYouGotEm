@@ -1,0 +1,124 @@
+{
+  "schema": "raftsim.environment.temperate_runtime_water_opaque_vegetation_review.v1",
+  "milestone": "chilko_futaleufu_runtime_water_opaque_vegetation_v1",
+  "status": "accepted_runtime_renderer_correction_photoreal_promotion_rejected",
+  "decision": {
+    "reference_runnable_retained": true,
+    "runtime_water_carrier_regression_closed": true,
+    "alpha_card_bank_wall_regression_closed": true,
+    "production_promoted": false,
+    "release_media_approved": false
+  },
+  "root_cause": {
+    "runtime_water": "The physical-corridor maps hid their authored capture ribbons during play, while ARaftSimWaterSurfaceActor forced ActiveLiveSurfaceCoverage to zero under the obsolete assumption that authored water remained visible below it.",
+    "vegetation": "The physical-corridor fallback placed up to 12000 converted ProceduralVegetationEditor alpha-card trees, dominated by one broadleaf form, producing repeated cutout walls and sparse ground cover."
+  },
+  "implemented_contract": {
+    "saved_map_water_authority": "ARaftSimRiverWaterConfig explicitly records solver-owned runtime rendering and river-specific coverage, color, roughness, specular, and wet-bank feather values.",
+    "backward_compatibility": "Older physical maps with hidden actors tagged RaftSimLiveSolverWaterOwnsRuntimeRendering promote the live mesh through a fail-closed tag migration instead of rendering no river.",
+    "calm_surface_coverage": {
+      "futaleufu": 0.89,
+      "chilko": 0.88
+    },
+    "active_surface_coverage": {
+      "futaleufu": 0.98,
+      "chilko": 0.98
+    },
+    "wet_bank_feather_m": 4.5,
+    "vegetation_family": [
+      "opaque_volumetric_broadleaf_tree",
+      "opaque_volumetric_conifer_tree",
+      "opaque_volumetric_riparian_shrub",
+      "opaque_volumetric_ground_cover"
+    ],
+    "vegetation_material": "opaque one-sided DefaultLit vertex-color material; no alpha cards",
+    "placement": "6200 deterministic source-mask and slope-screened HISM instances per river; 4650 canopy and 1550 shrub/ground-cover instances",
+    "authority": "procedural visual infill only; no terrain, collision, wet/dry, solver, bathymetry, species, or guide authority"
+  },
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "futaleufu_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_Terminator_pass_1_of_1",
+    "chilko_runnable_map_test": "RaftSim.P4.RiverMapLoads.L_LavaCanyon_pass_1_of_1",
+    "assertions_added": [
+      "exactly one live solver surface actor",
+      "visible carrier follows saved or migrated ownership",
+      "calm and active coverage are nonzero and ordered",
+      "four opaque volumetric vegetation actors",
+      "one organic ground-cover actor",
+      "procedural-infill and slope-screened tags"
+    ]
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "177aa1a9c809232b07bddf55da3f7ee14b86c5cbf18ee46bb8bb5caa7d7ce8a0"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "c14f90ecda261d59d966ad81a4b47ef05e1324e275d1db30657f377bd9177578"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Materials/M_RaftSim_Temperate_OpaqueVegetation.uasset",
+      "sha256": "f526e757613b0477755f0a363870760a69e6087cb30532477efed92d9f1daed0"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_BroadleafTree_A_OpaqueV1.uasset",
+      "sha256": "fcd6afab34831d9a7a64b282e7827c45a8b15dcf421c7afbf43b4d34f13faa2e"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_ConiferTree_A_OpaqueV1.uasset",
+      "sha256": "fedd8cb40a77aa02c6fdc7891926fc19b7182c7ddab20bfbdfe32ec29f3c3fd4"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_RiparianShrub_A_OpaqueV1.uasset",
+      "sha256": "affd5bcefd9607fc59a3a25f9d79664d16c3a5d4e69d9ebd4b38c3806d06f748"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_GroundCover_A_OpaqueV1.uasset",
+      "sha256": "4a9181b80018e53e5e0eba5630032b18e3af06762010a2bcc2f36cff974a1a1e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "sha256": "4717897b0f7623ecf5e204bbbbb991a8b1bbfc3fe652cd97feb6e5c348b03270"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "sha256": "12bcd7c46a06f92404b06f73ee69fb628c7774a11ad5c9d946365c08ddcdd9de"
+    }
+  ],
+  "local_matched_gameplay_diagnostics": [
+    {
+      "path": "unreal/Saved/Screenshots/futaleufu_runtime_water_opaque_vegetation_v3.png",
+      "sha256": "c0ba443dc77860a0dca58da0c74e7c3c017b26ea88a5cf5c423d3a386bce4b27",
+      "retention": "workspace_saved_diagnostic_not_release_evidence"
+    },
+    {
+      "path": "unreal/Saved/Screenshots/lava_canyon_runtime_water_opaque_vegetation_v3.png",
+      "sha256": "c6c4d326feff35aa0fe70f9d6bc96426ad8aeffb196e6c6862b8edd6aa2d18ec",
+      "retention": "workspace_saved_diagnostic_not_release_evidence"
+    }
+  ],
+  "manual_visual_review": {
+    "accepted": [
+      "The gameplay river is visible across the calm launch instead of exposing black or brown terrain as water.",
+      "The moving solver mesh no longer depends on a hidden authored ribbon.",
+      "The sampled wet bank uses a narrow feather rather than a broad rectangular land overlay.",
+      "Opaque volumetric forms remove the former alpha-card cutout wall and add explicit shrubs and ground cover."
+    ],
+    "rejected": [
+      "The procedural lobes remain stylized, too repetitive, and insufficiently species-specific for photoreal approval.",
+      "Near-bank terrain remains broad and dark and needs source-scale rock, sediment, litter, moss, grass, and shoreline breakup.",
+      "Calm water remains too uniform and bright toward the horizon; production water needs richer depth, reflection, transmission, and hydraulic structure.",
+      "Neither frame demonstrates a surveyed rapid, accepted guide line, production spray/aeration, or target-hardware performance."
+    ]
+  },
+  "required_external_acceptance_gates": [
+    "qualified local-guide review of rapid stationing, runnable lines, hazards, flow bands, scouting, recovery, and portage behavior",
+    "geospatial review of route registration, vertical datum, terrain, bank breaklines, rock geometry, and bathymetry",
+    "hydraulic calibration and convergence approval against observed rapid behavior",
+    "ecology and geology approval of species, density, ground cover, wet banks, boulders, and seasonal context",
+    "named environment-art and water-VFX approval for lifelike terrain, foliage, water, foam, spray, mist, shoreline contact, and raft occlusion",
+    "rights and publication approval for all source imagery, cultural/place-name context, and public hazard/access information",
+    "packaged desktop, console-quality, handheld, and VR performance plus collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}

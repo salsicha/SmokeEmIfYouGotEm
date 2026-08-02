@@ -1343,6 +1343,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
     const bool bFutaleufuTerminator =
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bReachLocalRun =
+        bPacuare || bColoradoHance || bChilkoLavaCanyon || bFutaleufuTerminator;
     if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon &&
         !bFutaleufuTerminator)
     {
@@ -1446,8 +1448,6 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    const bool bReachLocalRun =
-        bPacuare || bColoradoHance || bChilkoLavaCanyon || bFutaleufuTerminator;
     const float StartProgress = bReachLocalRun ? 0.04f : 0.0025f;
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
@@ -1502,10 +1502,68 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->CoordinateMapPath = CoordinateMapPath;
     WaterConfig->bEnableMovingWindowStreaming = false;
     WaterConfig->bMapProvidesTerrain = true;
+    WaterConfig->bLiveSolverOwnsRuntimeRendering = bReachLocalRun;
+    if (bPacuare)
+    {
+        WaterConfig->LiveSurfaceCalmCoverage = 0.88f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.97f;
+        WaterConfig->LiveSurfaceSpecular = 0.38f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.075f, 0.20f, 0.16f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.018f, 0.060f, 0.050f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.16f, 0.25f, 0.24f, 1.0f);
+    }
+    else if (bColoradoHance)
+    {
+        WaterConfig->LiveSurfaceCalmCoverage = 0.87f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.97f;
+        WaterConfig->LiveSurfaceSpecular = 0.40f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.12f, 0.20f, 0.16f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.035f, 0.070f, 0.060f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.21f, 0.27f, 0.27f, 1.0f);
+    }
+    else if (bChilkoLavaCanyon)
+    {
+        WaterConfig->LiveSurfaceCalmCoverage = 0.88f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.98f;
+        WaterConfig->LiveSurfaceSpecular = 0.08f;
+        WaterConfig->LiveSurfaceRoughness = 0.26f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.015f, 0.060f, 0.075f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.004f, 0.018f, 0.030f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.025f, 0.050f, 0.075f, 1.0f);
+    }
+    else if (bFutaleufuTerminator)
+    {
+        WaterConfig->LiveSurfaceCalmCoverage = 0.89f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.98f;
+        WaterConfig->LiveSurfaceSpecular = 0.08f;
+        WaterConfig->LiveSurfaceRoughness = 0.24f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.012f, 0.055f, 0.070f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.004f, 0.018f, 0.028f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.025f, 0.050f, 0.070f, 1.0f);
+    }
     WaterConfig->Tags.AddUnique(RunTag);
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimSafeLaunchApron"));
+    if (bReachLocalRun)
+    {
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering"));
+    }
 
     // Author the launch at loaded hydrostatic equilibrium instead of dropping
     // the raft from above the surface. The reduced body saturates over one

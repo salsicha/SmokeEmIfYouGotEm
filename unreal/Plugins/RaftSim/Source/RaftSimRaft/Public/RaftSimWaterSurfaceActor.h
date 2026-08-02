@@ -131,6 +131,26 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsRapidFoamMeshVisible() const;
 
+    /** True when this mesh is the river-wide visible carrier instead of a
+     * transparent detail overlay above an authored water surface. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsLiveSurfaceCarrierEnabled() const
+    {
+        return bLiveSurfaceCarrierEnabled;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetCalmLiveSurfaceCoverage() const
+    {
+        return ResolvedCalmLiveSurfaceCoverage;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetActiveLiveSurfaceCoverage() const
+    {
+        return ResolvedActiveLiveSurfaceCoverage;
+    }
+
     /** Selects the non-colliding roller-mesh fallback. Production Niagara
      * disables it only after all required particle assets are bound. */
     void SetBreakingRollerVolumeRenderingEnabled(bool bEnabled);
@@ -291,4 +311,7 @@ private:
     int32 BreakingRollerVolumeTriangleCount = 0;
     int32 VisibleRapidFoamVertexCount = 0;
     bool bBreakingRollerVolumeRenderingEnabled = true;
+    bool bLiveSurfaceCarrierEnabled = false;
+    float ResolvedCalmLiveSurfaceCoverage = 0.0f;
+    float ResolvedActiveLiveSurfaceCoverage = 0.0f;
 };

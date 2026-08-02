@@ -10,6 +10,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -507,6 +508,43 @@ void ARaftSimWaterSurfaceActor::UpdateRaftFoamExclusionParameters()
 
 void ARaftSimWaterSurfaceActor::BuildGrid()
 {
+    const ARaftSimRiverWaterConfig* RiverWaterConfig = nullptr;
+    if (TActorIterator<ARaftSimRiverWaterConfig> ConfigIt(GetWorld()); ConfigIt)
+    {
+        RiverWaterConfig = *ConfigIt;
+    }
+    bLiveSurfaceCarrierEnabled =
+        RiverWaterConfig && RiverWaterConfig->bLiveSolverOwnsRuntimeRendering;
+    if (!bLiveSurfaceCarrierEnabled)
+    {
+        // Backward-compatible migration for already-versioned physical maps:
+        // older packages tagged and hid the capture ribbon but predate the
+        // explicit config property. Never leave those rivers with neither a
+        // static nor live visible carrier while they await regeneration.
+        for (TActorIterator<AActor> ActorIt(GetWorld()); ActorIt; ++ActorIt)
+        {
+            if (ActorIt->IsHidden() && ActorIt->Tags.Contains(
+                    TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")))
+            {
+                bLiveSurfaceCarrierEnabled = RiverWaterConfig != nullptr;
+                break;
+            }
+        }
+    }
+    ResolvedCalmLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(RiverWaterConfig->LiveSurfaceCalmCoverage, 0.0f, 1.0f)
+        : 0.0f;
+    ResolvedActiveLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
+        ? FMath::Clamp(RiverWaterConfig->LiveSurfaceActiveCoverage, 0.0f, 1.0f)
+        : 0.0f;
+    if (bLiveSurfaceCarrierEnabled)
+    {
+        CurvedGridLateralEdgeBlendMeters = FMath::Clamp(
+            RiverWaterConfig->LiveSurfaceBankBlendMeters,
+            1.5f,
+            12.0f);
+    }
+
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
     GridStationN = FMath::Max(
         2, FMath::RoundToInt(
@@ -637,21 +675,44 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         // Solver mesh normals still carry the resolved flow shape; spray/mist
         // actors add aeration.
         SurfaceMesh->SetMaterial(0, WaterMaterial);
-        // The authored Single Layer Water below owns the coherent river-wide
-        // reflection. The live mesh contributes only solver-scale relief and
-        // foam; its former 3% surface/specular response still read as a large
-        // rectangular overlay at hydraulic jumps. Override scalar parameters
-        // on a transient instance so the locked source material and authored
-        // asset remain reusable while the moving window stays subordinate.
+        // Most maps retain an authored Single Layer Water surface and use this
+        // as a transparent hydraulic-detail overlay. Physical source-corridor
+        // maps deliberately hide their capture ribbon during play; their
+        // saved water config therefore promotes this same solver mesh to the
+        // river-wide visible carrier with a bounded river-specific profile.
         if (WaterMaterial->GetPathName().Contains(TEXT("M_RaftSim_LiveRiverSurface")))
         {
             if (UMaterialInstanceDynamic* LiveWaterMaterial =
                     SurfaceMesh->CreateDynamicMaterialInstance(0, WaterMaterial))
             {
                 LiveWaterMaterial->SetScalarParameterValue(
-                    TEXT("ActiveLiveSurfaceCoverage"), 0.0f);
+                    TEXT("CalmLiveSurfaceCoverage"),
+                    ResolvedCalmLiveSurfaceCoverage);
                 LiveWaterMaterial->SetScalarParameterValue(
-                    TEXT("LiveWaterSpecular"), 0.20f);
+                    TEXT("ActiveLiveSurfaceCoverage"),
+                    ResolvedActiveLiveSurfaceCoverage);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveWaterSpecular"),
+                    bLiveSurfaceCarrierEnabled
+                        ? RiverWaterConfig->LiveSurfaceSpecular
+                        : 0.20f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveWaterRoughness"),
+                    bLiveSurfaceCarrierEnabled
+                        ? RiverWaterConfig->LiveSurfaceRoughness
+                        : 0.085f);
+                if (bLiveSurfaceCarrierEnabled)
+                {
+                    LiveWaterMaterial->SetVectorParameterValue(
+                        TEXT("LiveShallowSurfaceColor"),
+                        RiverWaterConfig->LiveShallowSurfaceColor);
+                    LiveWaterMaterial->SetVectorParameterValue(
+                        TEXT("LiveDeepSurfaceColor"),
+                        RiverWaterConfig->LiveDeepSurfaceColor);
+                    LiveWaterMaterial->SetVectorParameterValue(
+                        TEXT("LiveReflectedSkyColor"),
+                        RiverWaterConfig->LiveReflectedSkyColor);
+                }
             }
         }
     }

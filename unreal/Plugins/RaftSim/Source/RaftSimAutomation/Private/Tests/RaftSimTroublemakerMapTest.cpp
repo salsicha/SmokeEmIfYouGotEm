@@ -150,6 +150,74 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->AddError(TEXT("River map has no player raft"));
     }
 
+    const bool bUsesSolverOwnedVisibleRiver =
+        bPacuareReferenceRun || bColoradoHanceReferenceRun ||
+        bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
+    int32 LiveSurfaceActorCount = 0;
+    for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
+    {
+        ++LiveSurfaceActorCount;
+        Test->TestEqual(
+            TEXT("live surface carrier follows the saved river ownership contract"),
+            It->IsLiveSurfaceCarrierEnabled(),
+            bUsesSolverOwnedVisibleRiver);
+        if (bUsesSolverOwnedVisibleRiver)
+        {
+            Test->TestTrue(
+                TEXT("solver-owned river has visible calm-water coverage"),
+                It->GetCalmLiveSurfaceCoverage() >= 0.80f);
+            Test->TestTrue(
+                TEXT("solver-owned river has visible active-water coverage"),
+                It->GetActiveLiveSurfaceCoverage() >=
+                    It->GetCalmLiveSurfaceCoverage());
+        }
+        else
+        {
+            Test->TestEqual(
+                TEXT("authored visible river keeps the live overlay transparent"),
+                It->GetActiveLiveSurfaceCoverage(),
+                0.0f);
+        }
+    }
+    Test->TestEqual(
+        TEXT("river map has exactly one live solver surface actor"),
+        LiveSurfaceActorCount,
+        1);
+
+    if (bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun)
+    {
+        const FName RiverRunTag = bChilkoLavaCanyonReferenceRun
+            ? FName(TEXT("RaftSimChilkoLavaCanyonRun"))
+            : FName(TEXT("RaftSimFutaleufuTerminatorRun"));
+        int32 OpaqueVegetationActorCount = 0;
+        int32 OrganicGroundCoverActorCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimOpaqueVolumetricVegetation")) ||
+                !(*It)->Tags.Contains(RiverRunTag))
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("temperate vegetation is explicitly procedural infill"),
+                (*It)->Tags.Contains(TEXT("RaftSimProceduralVegetationFallback")));
+            Test->TestTrue(
+                TEXT("temperate vegetation placement is slope screened"),
+                (*It)->Tags.Contains(TEXT("RaftSimSlopeScreenedPlacement")));
+            OrganicGroundCoverActorCount +=
+                (*It)->Tags.Contains(TEXT("RaftSimOrganicBankGroundCover")) ? 1 : 0;
+            ++OpaqueVegetationActorCount;
+        }
+        Test->TestEqual(
+            TEXT("temperate river has four opaque volumetric vegetation forms"),
+            OpaqueVegetationActorCount,
+            4);
+        Test->TestEqual(
+            TEXT("temperate river has one organic ground-cover layer"),
+            OrganicGroundCoverActorCount,
+            1);
+    }
+
     if (bZambeziReferenceRun)
     {
         Test->TestEqual(
@@ -577,6 +645,12 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Futaleufu Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
+            Test->TestTrue(
+                TEXT("Futaleufu solver owns the visible gameplay river"),
+                (*It)->bLiveSolverOwnsRuntimeRendering);
+            Test->TestTrue(
+                TEXT("Futaleufu visible carrier has complete calm-water coverage"),
+                (*It)->LiveSurfaceCalmCoverage >= 0.80f);
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
@@ -677,6 +751,12 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Chilko Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
+            Test->TestTrue(
+                TEXT("Chilko solver owns the visible gameplay river"),
+                (*It)->bLiveSolverOwnsRuntimeRendering);
+            Test->TestTrue(
+                TEXT("Chilko visible carrier has complete calm-water coverage"),
+                (*It)->LiveSurfaceCalmCoverage >= 0.80f);
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
