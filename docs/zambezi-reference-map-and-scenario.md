@@ -111,19 +111,30 @@ degrees. Heights range from 0.95-5.20 m, with small talus dominant and sparse
 larger breakup rocks. The actors cast grounded presentation shadows but have no
 collision, navigation, solver, water, raft-force, or Batoka-lithology authority.
 Their tags include `RaftSimRunnableLaunchTalusV1`,
+`RaftSimZambeziBasaltAnalogMaterialV1`,
+`RaftSimProjectOwnedMineralRetone`,
 `RaftSimGenericRockAnalogNoLithologyAuthority`,
 `RaftSimNonCollisionRenderSurface`, and
 `RaftSimPresentationOnlyNoHydraulicAuthority`.
 
-The fixed gameplay view confirms that the layer does not enter the water or
-obstruct the raft, but most rocks remain subtle at guide-eye distance. The
-close review exposes useful bank breakup as well as the remaining defects:
-generic mossy analog material, coarse rounded terrain, repeated bright
-ground-cover forms, hard shadows, and no credible wet-bank transition. The
-retained evidence is `zambezi_launch_talus_gameplay_v1.png`,
-`zambezi_launch_talus_close_review_v1.png`, and
-`zambezi_launch_talus_v1_review.json`. This is a retained presentation layer,
-not photoreal, geology, or guide approval.
+The six components no longer bind the source moss material directly. They use
+`MI_RaftSim_Zambezi_BasaltTalusV1`, a Zambezi-specific instance of the
+project-owned `M_RaftSim_RiverBoulder` parent. Its reviewed-source contribution
+is bounded to 0.42, mixing the already desaturated scan detail with 0.58
+project-authored neutral mineral response. The instance keeps its waterline at
+-10,000,000 cm as a deliberate dry-bank fail-safe: the parent has a 70 cm wet
+band, but it will not be presented as real shoreline wetness until every
+instance can receive a validated local water elevation.
+
+The regenerated guide-seat and river-eye views confirm that the layer does not
+enter the visible route or obstruct the raft, but the rocks remain too subtle
+in those cameras to claim close material acceptance. The earlier close review
+still documents the generic geometry, coarse rounded terrain, repeated bright
+ground-cover forms, hard transitions, and absent credible wet bank. The
+retained material decision is
+`zambezi_basalt_talus_material_v1_review.json`; it supplements
+`zambezi_launch_talus_v1_review.json` without promoting the layer to
+photoreal, geology, wet-bank, or guide approval.
 
 The Zambezi preview light rig now binds the directional light as atmosphere sun
 zero and tags one captured skylight, one dry-season sky atmosphere, and one
@@ -342,7 +353,7 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v14 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v15 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
@@ -357,13 +368,16 @@ the 44/43/87 accepted split, their full-route/dry-height/slope placement tags, a
 the bounded launch-window shadow exception,
 six separately tagged launch-talus components with 360 total source-grounded,
 shadow-casting, non-colliding rock analog instances and their explicit
-no-lithology/no-hydraulic-authority contract,
+no-lithology/no-hydraulic-authority contract, plus the Zambezi-specific
+material instance, its project-owned parent, and material-retone tags,
 zero legacy Zambezi PVE actors, and
 exactly one
 non-colliding physical-corridor ribbon bound through the isolated Single Layer
 Water parent with the moving-normal contract tags. The saved material asset is
 also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
-covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`. Schema v14 additionally
+covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`, and the talus instance
+and scalar contract are covered by `RaftSim.M9.FZambeziTalusMaterial`. Schema
+v15 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.

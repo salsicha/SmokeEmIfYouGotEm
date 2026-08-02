@@ -1,0 +1,114 @@
+{
+  "schema": "raftsim.environment.zambezi_basalt_talus_material_review.v1",
+  "date": "2026-08-02",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "status": "retained_technical_retone_photoreal_promotion_fail",
+  "decision": {
+    "runnable_map_integrity": "pass",
+    "launch_route_clearance": "pass",
+    "material_binding_contract": "pass",
+    "rock_asset_rights_gate": "pass_for_existing_cc0_visual_analog",
+    "batoka_lithology_gate": "fail_generic_visual_analog_no_lithology_authority",
+    "close_visual_material_acceptance": "not_demonstrated_in_fixed_route_cameras",
+    "photoreal_environment_promotion": "fail",
+    "summary": "All six saved launch-talus components now use a Zambezi-specific project-owned material instance instead of the green/ochre source material directly. The instance preserves 42 percent of the already desaturated reviewed scan branch and mixes 58 percent project-authored neutral mineral response. Saved-map, native-material, and runnable-map gates pass without changing collision or hydraulics. The two deterministic route cameras show no new obstruction, but the talus is too subtle in those views to establish close visual acceptance; coarse terrain, synthetic vegetation, hard transitions, and the absent measured wet-bank treatment still block photoreal promotion."
+  },
+  "evidence": {
+    "guide_seat_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_guide_seat_downstream.png",
+      "sha256": "dab86f1c12c26de8d1b7172d2d9c49c0ff4581a87b6fd9ac31514777855e599b",
+      "size_px": [1280, 720],
+      "camera": "deterministic source-corridor guide-seat downstream camera"
+    },
+    "river_eye_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_river_eye_downstream.png",
+      "sha256": "f078d52a5825b001e642e2762679c7c68cd23b2862851d72a83b0ea41fcb6dc8",
+      "size_px": [1280, 720],
+      "camera": "deterministic source-corridor river-eye downstream camera"
+    },
+    "manual_review": {
+      "rock_water_intersection": "pass_none_visible_in_fixed_route_frames",
+      "raft_or_route_obstruction": "pass_none_visible_and_all_components_noncolliding",
+      "material_binding": "pass_six_of_six_components_use_zambezi_specific_instance",
+      "moss_hue_suppression": "technical_graph_pass_close_visual_acceptance_not_demonstrated",
+      "guide_distance_readability": "fail_talus_too_subtle_in_standard_fixed_route_cameras",
+      "terrain_and_bank_integration": "fail_coarse_rounded_surface_and_synthetic_transitions",
+      "wet_bank_transition": "fail_no_measured_per_instance_local_waterline_binding",
+      "photorealism": "fail"
+    }
+  },
+  "retained_material_contract": {
+    "instance": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1",
+    "parent": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder",
+    "reviewed_source_blend": 0.42,
+    "project_authored_mineral_blend": 0.58,
+    "rock_waterline_z_cm": -10000000.0,
+    "rock_wet_band_width_cm": 70.0,
+    "waterline_policy": "dry_bank_fail_safe_until_real_per_instance_local_water_elevation_is_bound",
+    "component_count": 6,
+    "instance_count": 360,
+    "collision": "disabled",
+    "cast_shadow": true,
+    "required_tags": [
+      "RaftSimRunnableLaunchTalusV1",
+      "RaftSimZambeziBasaltAnalogMaterialV1",
+      "RaftSimProjectOwnedMineralRetone",
+      "RaftSimRightsReviewedCC0RockAnalog",
+      "RaftSimGenericRockAnalogNoLithologyAuthority",
+      "RaftSimNonCollisionRenderSurface",
+      "RaftSimPresentationOnlyNoHydraulicAuthority"
+    ],
+    "authority": {
+      "presentation_only": true,
+      "changes_source_landscape": false,
+      "changes_collision": false,
+      "changes_navigation": false,
+      "changes_water_geometry": false,
+      "changes_solver_state": false,
+      "changes_raft_forces": false,
+      "claims_batoka_lithology": false,
+      "claims_measured_wet_bank": false
+    }
+  },
+  "validation": {
+    "editor_build": "pass_ue_5_8_editor_target",
+    "filtered_zambezi_regeneration": "pass",
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v15",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "61cc2c2ad06eb85acefcde1b801d6eb8b0dbca8f4b11ddfb9e1427555845da21",
+      "result": "pass_67_actors_6_talus_components_360_talus_instances_one_specific_material_instance"
+    },
+    "focused_runtime_gate": {
+      "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "report_path": "unreal/Saved/Automation/ZambeziBasaltTalusV1MapLoad/index.json",
+      "report_sha256": "305e52a8a107c8cb3552320871f792f3183a35d1843eb7a7556d0b422a67ea71",
+      "result": "pass_1_success_with_2_known_environment_warnings_0_errors"
+    },
+    "native_zambezi_material_gates": {
+      "tests": [
+        "RaftSim.M9.FZambeziOrganicBasaltMaterial",
+        "RaftSim.M9.FZambeziOrganicTerrainNormals",
+        "RaftSim.M9.FZambeziSingleLayerWater",
+        "RaftSim.M9.FZambeziTalusMaterial"
+      ],
+      "report_path": "unreal/Saved/Automation/ZambeziBasaltTalusV1Materials/index.json",
+      "report_sha256": "af849ae6f78a6b19c6d6d2f6511f66d1caaa96ef6cbbb646d1d5e7cda989b755",
+      "result": "pass_4_success_0_warnings_0_errors"
+    },
+    "python_regression": "pass_10_tests",
+    "rights_regression": "pass_12_tests"
+  },
+  "remaining_external_acceptance_gates": [
+    "Guide and geospatial approval of the playable centerline, stationing, access, portage, rescue context, and visible bank character.",
+    "Rights approval for all terrain, imagery, supplied-map, vegetation, and reference inputs beyond the already reviewed CC0 analog rock set.",
+    "Higher-resolution full-reach terrain or a reviewed field-capture derivative replacing the 30 m DSM approximation.",
+    "Reviewed Batoka basalt lithology, talus shape, weathering, wetness, scale distribution, and bank integration replacing the generic geometry and material analog.",
+    "A measured per-instance local waterline or reviewed wet-bank treatment rather than the retained dry-bank fail-safe.",
+    "Southern African gorge-woodland species, density, age, wind, season, ground-cover distribution, and wetness approval.",
+    "Production terrain, vegetation, rock, wet-bank, riverbed, water, breaking-water, foam, spray, mist, and lighting art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual/performance acceptance."
+  ]
+}

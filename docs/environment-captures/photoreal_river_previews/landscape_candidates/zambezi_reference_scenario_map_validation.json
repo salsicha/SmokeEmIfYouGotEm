@@ -11,7 +11,8 @@
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
         "instance_count": 60,
-        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit",
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1.MI_RaftSim_Zambezi_BasaltTalusV1",
+        "parent_material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
         "static_mesh": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock01.SM_RockMossSet01_rock_moss_set_01_rock01",
         "tags": [
           "RaftSimDryBankPlacement",
@@ -19,10 +20,12 @@
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPresentationOnlyNoHydraulicAuthority",
           "RaftSimProceduralGeologyFallback",
+          "RaftSimProjectOwnedMineralRetone",
           "RaftSimRightsReviewedCC0RockAnalog",
           "RaftSimRunnableLaunchTalusV1",
           "RaftSimSlopeScreenedPlacement",
           "RaftSimSourceLandscapeGrounded",
+          "RaftSimZambeziBasaltAnalogMaterialV1",
           "RaftSimZambeziRun"
         ]
       },
@@ -32,7 +35,8 @@
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
         "instance_count": 60,
-        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit",
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1.MI_RaftSim_Zambezi_BasaltTalusV1",
+        "parent_material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
         "static_mesh": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock02.SM_RockMossSet01_rock_moss_set_01_rock02",
         "tags": [
           "RaftSimDryBankPlacement",
@@ -40,10 +44,12 @@
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPresentationOnlyNoHydraulicAuthority",
           "RaftSimProceduralGeologyFallback",
+          "RaftSimProjectOwnedMineralRetone",
           "RaftSimRightsReviewedCC0RockAnalog",
           "RaftSimRunnableLaunchTalusV1",
           "RaftSimSlopeScreenedPlacement",
           "RaftSimSourceLandscapeGrounded",
+          "RaftSimZambeziBasaltAnalogMaterialV1",
           "RaftSimZambeziRun"
         ]
       },
@@ -53,7 +59,8 @@
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
         "instance_count": 60,
-        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit",
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1.MI_RaftSim_Zambezi_BasaltTalusV1",
+        "parent_material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
         "static_mesh": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock03.SM_RockMossSet01_rock_moss_set_01_rock03",
         "tags": [
           "RaftSimDryBankPlacement",
@@ -61,10 +68,12 @@
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPresentationOnlyNoHydraulicAuthority",
           "RaftSimProceduralGeologyFallback",
+          "RaftSimProjectOwnedMineralRetone",
           "RaftSimRightsReviewedCC0RockAnalog",
           "RaftSimRunnableLaunchTalusV1",
           "RaftSimSlopeScreenedPlacement",
           "RaftSimSourceLandscapeGrounded",
+          "RaftSimZambeziBasaltAnalogMaterialV1",
           "RaftSimZambeziRun"
         ]
       },
@@ -74,7 +83,8 @@
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
         "instance_count": 60,
-        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit",
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1.MI_RaftSim_Zambezi_BasaltTalusV1",
+        "parent_material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
         "static_mesh": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock04.SM_RockMossSet01_rock_moss_set_01_rock04",
         "tags": [
           "RaftSimDryBankPlacement",
@@ -82,10 +92,12 @@
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPresentationOnlyNoHydraulicAuthority",
           "RaftSimProceduralGeologyFallback",
+          "RaftSimProjectOwnedMineralRetone",
           "RaftSimRightsReviewedCC0RockAnalog",
           "RaftSimRunnableLaunchTalusV1",
           "RaftSimSlopeScreenedPlacement",
           "RaftSimSourceLandscapeGrounded",
+          "RaftSimZambeziBasaltAnalogMaterialV1",
           "RaftSimZambeziRun"
         ]
       },
@@ -95,7 +107,8 @@
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
         "instance_count": 60,
-        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit",
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1.MI_RaftSim_Zambezi_BasaltTalusV1",
+        "parent_material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
         "static_mesh": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock05.SM_RockMossSet01_rock_moss_set_01_rock05",
         "tags": [
           "RaftSimDryBankPlacement",
@@ -103,10 +116,12 @@
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPresentationOnlyNoHydraulicAuthority",
           "RaftSimProceduralGeologyFallback",
+          "RaftSimProjectOwnedMineralRetone",
           "RaftSimRightsReviewedCC0RockAnalog",
           "RaftSimRunnableLaunchTalusV1",
           "RaftSimSlopeScreenedPlacement",
           "RaftSimSourceLandscapeGrounded",
+          "RaftSimZambeziBasaltAnalogMaterialV1",
           "RaftSimZambeziRun"
         ]
       },
@@ -116,7 +131,8 @@
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
         "instance_count": 60,
-        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit",
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/MI_RaftSim_Zambezi_BasaltTalusV1.MI_RaftSim_Zambezi_BasaltTalusV1",
+        "parent_material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
         "static_mesh": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock06.SM_RockMossSet01_rock_moss_set_01_rock06",
         "tags": [
           "RaftSimDryBankPlacement",
@@ -124,15 +140,18 @@
           "RaftSimNonCollisionRenderSurface",
           "RaftSimPresentationOnlyNoHydraulicAuthority",
           "RaftSimProceduralGeologyFallback",
+          "RaftSimProjectOwnedMineralRetone",
           "RaftSimRightsReviewedCC0RockAnalog",
           "RaftSimRunnableLaunchTalusV1",
           "RaftSimSlopeScreenedPlacement",
           "RaftSimSourceLandscapeGrounded",
+          "RaftSimZambeziBasaltAnalogMaterialV1",
           "RaftSimZambeziRun"
         ]
       }
     ],
     "instance_count": 360,
+    "material_contract": "zambezi_specific_project_owned_desaturated_mineral_retone_v1_over_rights_reviewed_cc0_microstructure_with_dry_bank_waterline_fail_safe",
     "placement_contract": "deterministic_128_candidate_search_approximately_118m_to_993m_downstream_with_full_route_clearance_dry_height_and_hard_slope_gates",
     "rejected_placement_count": 0,
     "slope_ceiling_degrees": 48.0,
@@ -550,7 +569,7 @@
     ]
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v14",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v15",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,

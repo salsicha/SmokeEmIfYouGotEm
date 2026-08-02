@@ -174,6 +174,77 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimZambeziTalusMaterialTest,
+    "RaftSim.M9.FZambeziTalusMaterial",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimZambeziTalusMaterialTest::RunTest(const FString& Parameters)
+{
+    UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ZambeziRun/Rocks/Materials/"
+             "MI_RaftSim_Zambezi_BasaltTalusV1."
+             "MI_RaftSim_Zambezi_BasaltTalusV1"));
+    TestNotNull(TEXT("Zambezi launch-talus material instance exists"), Instance);
+    if (!Instance)
+    {
+        return false;
+    }
+
+    UMaterial* Parent = Cast<UMaterial>(Instance->Parent);
+    TestNotNull(TEXT("Zambezi launch talus uses a material parent"), Parent);
+    if (!Parent)
+    {
+        return false;
+    }
+    TestEqual(
+        TEXT("Zambezi launch talus uses the project-owned mineral parent"),
+        Parent->GetPathName(),
+        FString(TEXT("/Game/RaftSim/Materials/M_RaftSim_RiverBoulder."
+                     "M_RaftSim_RiverBoulder")));
+    TestEqual(TEXT("Talus remains opaque"), Parent->BlendMode, BLEND_Opaque);
+    TestTrue(
+        TEXT("Talus remains Default Lit"),
+        Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+
+    auto TestScalarParameter = [this, Instance](
+                                   const TCHAR* Label,
+                                   const TCHAR* ParameterName,
+                                   float ExpectedValue,
+                                   float Tolerance)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s parameter is bound"), Label),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(
+                TEXT("%s keeps the authored value %.2f (actual %.2f)"),
+                Label,
+                ExpectedValue,
+                Value),
+            FMath::IsNearlyEqual(Value, ExpectedValue, Tolerance));
+    };
+    TestScalarParameter(
+        TEXT("Reviewed-source blend"),
+        TEXT("RockVisualSourceBlend"),
+        0.42f,
+        0.001f);
+    TestScalarParameter(
+        TEXT("Dry-bank waterline fail-safe"),
+        TEXT("RockWaterlineZCm"),
+        -1.0e7f,
+        1.0f);
+    TestScalarParameter(
+        TEXT("Future wet-band width"),
+        TEXT("RockWetBandWidthCm"),
+        70.0f,
+        0.001f);
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimZambeziSingleLayerWaterTest,
     "RaftSim.M9.FZambeziSingleLayerWater",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
