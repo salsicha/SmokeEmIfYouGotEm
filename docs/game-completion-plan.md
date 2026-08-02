@@ -3837,3 +3837,15 @@ path is verified, and the completion goal can be marked complete.
   it does not promote inferred bathymetry, procedural rapid hydraulics, coarse
   terrain, synthetic ecology, or photoreal art, and all named external gates
   remain open.
+- Zambezi runnable revalidation V2 regenerates only the filtered Batoka Gorge
+  corridor and proves the complete player path again: `zambezi_reference_run`
+  in the generated source model and M6 career catalog resolves to the shipping
+  `/Game/RaftSim/Maps/L_Zambezi`, while the schema-v16 saved-map verifier,
+  zero-error/zero-warning MapCheck, and live P4 PIE gate pass. The saved map
+  contains all 25 rapid markers, Rapid 9's portage policy, the player raft/start,
+  live cooked-field water, four conditioned terrain tiles, two adaptive banks,
+  360 launch talus instances, and 8,927 vegetation instances. The new bank and
+  talus wetness treatments are presentation-only and cannot drive terrain,
+  collision, hydraulics, or raft forces. Current fixed-camera evidence remains
+  visibly reference-quality, so photoreal and external acceptance gates remain
+  open.

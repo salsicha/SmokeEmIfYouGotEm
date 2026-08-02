@@ -969,6 +969,7 @@ struct FZambeziAdaptiveNearFieldTerrainStats
     int64 TriangleCount = 0;
     int64 DryShorelineInfillVertexCount = 0;
     int64 RefinedVertexCount = 0;
+    int64 WetBankVertexCount = 0;
     int32 ShadowSuppressedActorCount = 0;
     int32 CollisionEnabledActorCount = 0;
     float LongitudinalSpacingCm = 0.0f;
@@ -976,6 +977,8 @@ struct FZambeziAdaptiveNearFieldTerrainStats
     float MaximumDryShorelineInfillCm = 0.0f;
     float MinimumRenderedHeightAboveWaterCm = TNumericLimits<float>::Max();
     float MaximumAbsoluteRefinementCm = 0.0f;
+    float MaximumWetBankMask = 0.0f;
+    float MaximumWetBankHeightAboveWaterCm = 0.0f;
 };
 
 bool ApplyZambeziBatokaVisualTerrainTreatment(

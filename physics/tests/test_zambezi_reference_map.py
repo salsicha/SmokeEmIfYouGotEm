@@ -396,6 +396,9 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimSourceConditionedTerrain" in geometry_cpp
     assert "RaftSimProtectedDryShoreline" in geometry_cpp
     assert "RaftSimNearFieldSelfShadowSuppressed" in geometry_cpp
+    assert "RaftSimConditionedWaterlineWetBankV1" in geometry_cpp
+    assert "RaftSimVertexRedWetBankMask" in geometry_cpp
+    assert "WetStainCeilingCm" in geometry_cpp
     assert (
         "LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate, true, true)"
         in build_cpp
@@ -444,6 +447,10 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "ZambeziRunnableLaunchWoodyInstanceCount = 192" in foliage_cpp
     assert "ZambeziRunnableLaunchTalusInstanceCount = 360" in foliage_cpp
     assert "ZambeziRunnableLaunchTalusReviewedSourceBlend = 0.42f" in foliage_cpp
+    assert "ZambeziRunnableLaunchTalusWetBandWidthCm = 220.0f" in foliage_cpp
+    assert "SetNumCustomDataFloats(1)" in foliage_cpp
+    assert "SetCustomDataValue(" in foliage_cpp
+    assert "RaftSimPerInstanceConditionedWaterline" in foliage_cpp
     assert "MI_RaftSim_Zambezi_BasaltTalusV1" in foliage_cpp
     assert "RaftSimRunnableLaunchTalusV1" in foliage_cpp
     assert "RaftSimZambeziBasaltAnalogMaterialV1" in foliage_cpp
@@ -484,7 +491,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v15")
+    assert validation["schema"].endswith(".v16")
     assert validation["runtime_hydraulics"]["preserves_global_river_stations"] is True
     assert validation["runtime_hydraulics"]["rapid_count"] == 25
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
@@ -516,12 +523,21 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert adaptive["grid_spacing_m"] == 5.0
     assert adaptive["maximum_dry_shoreline_infill_m"] == 1.8
     assert adaptive["maximum_procedural_refinement_m"] == 0.96
+    assert adaptive["wet_bank_contract"].startswith(
+        "conditioned_profile_vertex_red_render_only"
+    )
+    assert adaptive["wet_bank_authority"].startswith(
+        "procedural_presentation_only_no_measured"
+    )
     assert all(
         "NO_COLLISION" in actor["collision_enabled"]
         and actor["cast_shadow"] is False
         and "RaftSimSourceConditionedTerrain" in actor["tags"]
         and "RaftSimProtectedDryShoreline" in actor["tags"]
         and "RaftSimNearFieldSelfShadowSuppressed" in actor["tags"]
+        and "RaftSimConditionedWaterlineWetBankV1" in actor["tags"]
+        and "RaftSimVertexRedWetBankMask" in actor["tags"]
+        and "RaftSimProceduralWetBankNoMeasuredAuthority" in actor["tags"]
         for actor in adaptive["actors"]
     )
     assert validation["lighting"]["atmosphere_actor_count"] == 4
@@ -545,6 +561,8 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert talus["rejected_placement_count"] == 0
     assert talus["slope_ceiling_degrees"] == 48.0
     assert talus["target_height_range_m"] == [0.95, 5.20]
+    assert talus["wet_band_width_m"] == 2.2
+    assert "per_instance_conditioned_profile_waterline" in talus["material_contract"]
     assert sorted(component["instance_count"] for component in talus["components"]) == [
         60,
         60,
@@ -565,6 +583,14 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         and "RaftSimGenericRockAnalogNoLithologyAuthority" in component["tags"]
         and "RaftSimNonCollisionRenderSurface" in component["tags"]
         and "RaftSimPresentationOnlyNoHydraulicAuthority" in component["tags"]
+        and "RaftSimConditionedWaterlineWetBankV1" in component["tags"]
+        and "RaftSimPerInstanceConditionedWaterline" in component["tags"]
+        and "RaftSimProceduralWetBankNoMeasuredAuthority" in component["tags"]
+        and component["num_custom_data_floats"] == 1
+        and component["custom_data_value_count"] == component["instance_count"]
+        and component["conditioned_waterline_min_z_cm"] > -1.0e6
+        and component["conditioned_waterline_max_z_cm"]
+        >= component["conditioned_waterline_min_z_cm"]
         for component in talus["components"]
     )
     assert validation["vegetation"]["component_count"] == 12

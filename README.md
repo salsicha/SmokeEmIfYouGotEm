@@ -14,6 +14,9 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
+The August 2 runnable revalidation confirms that the frontend selector, source
+scenario, shipping cook, saved map, live PIE launch, and schema-v16 map audit
+all resolve to `/Game/RaftSim/Maps/L_Zambezi`.
 Pacuare's `L_UpperHuacas` is again a runnable map: a physical 600 m reach-local
 Landscape, the committed Upper Huacas cooked solver field, explicit vertical
 datum alignment, player raft/start, and the full vertical-slice game mode now

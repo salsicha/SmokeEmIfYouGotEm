@@ -505,6 +505,12 @@ def test_contact_rock_material_supports_both_reviewed_and_fallback_shells() -> N
     assert "VisualSourceBlend->DefaultValue = 1.0f" in boulder_source
     assert "SelectedVisualSource->A.OutputIndex = 4" in boulder_source
     assert "bIncludeReviewedSource && ReviewedBaseColor" in boulder_source
+    assert "UMaterialExpressionPerInstanceCustomData" in boulder_source
+    assert "PerInstanceWaterlineZ->DataIndex = 0" in boulder_source
+    assert "PerInstanceWaterlineZ->ConstDefaultValue = -1.0e7f" in boulder_source
+    assert "UMaterialExpressionMax" in boulder_source
+    assert "HeightAbove->B.Expression = ResolvedWaterlineZ" in boulder_source
+    assert "RaftSim.CreateReviewedRiverBoulderMaterial" in source
     assert 'TEXT("M_RaftSim_ProductionRiverBoulder")' in source
     assert "/*bIncludeReviewedSource=*/false" in source
 
