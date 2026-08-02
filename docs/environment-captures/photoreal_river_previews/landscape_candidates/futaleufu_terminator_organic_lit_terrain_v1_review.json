@@ -1,0 +1,190 @@
+{
+  "schema": "raftsim.environment.futaleufu_terminator_organic_lit_terrain_review.v1",
+  "reviewed_utc": "2026-08-02T04:56:00Z",
+  "river_id": "futaleufu_terminator",
+  "rapid_name": "Terminator",
+  "map_package": "/Game/RaftSim/Maps/L_Terminator",
+  "milestone": "futaleufu_terminator_organic_lit_terrain_v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "human_approved": false,
+  "named_environment_art_reviewer": null,
+  "named_futaleufu_guide_reviewer": null,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_reach_local_runnable_v1_review.json",
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "landscape_owns_rendering_collision_and_height_queries": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "root_cause": {
+    "manifest_runtime_mismatch": "The generated manifest declared the physical Futaleufu Landscape DefaultLit, while LoadOrCreateLandscapeCandidateMaterial assigned MSM_Unlit to Futaleufu and Chilko. The resulting near-bank terrain ignored the scene-lighting contract and read as a nearly black low-information strip.",
+    "repetition_problem": "The prior material combined registered macro and shared detail textures but had no river-local world-space palette variation, leaving smooth broad banks and source-scale repetition visible.",
+    "retained_fix": "Futaleufu now joins the existing Default Lit landscape allow-list and applies a river-local shade-only organic temperate graph after source, wet-bank, riverbed, and slope conditioning."
+  },
+  "material": {
+    "asset": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_futaleufuterminator_physicalcorridor_SourceLandscapeCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "two_sided": true,
+    "tangent_space_normal": true,
+    "world_position_offset_connected": false,
+    "organic_world_noise_scales_per_cm": [0.00018, 0.00071, 0.0042],
+    "organic_layers": [
+      "broad humid temperate-forest value",
+      "moss and leaf-litter palette patches",
+      "slope-aware wet granite and lichen",
+      "metre-scale mineral value variation"
+    ],
+    "source_macro_registration_retained": true,
+    "source_material_zones_retained": true,
+    "wet_bank_and_riverbed_conditioning_retained": true
+  },
+  "coordinate_contract": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "landscape_span_m": [600.0, 600.0],
+    "protected_solver_strip_span_m": [600.0, 84.0],
+    "runtime_vertical_datum_m": 206.59621940526426,
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "terrain": "Copernicus DEM GLO-30 surface model, corridor-conditioned, EGM2008 orthometric heights",
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "surveyed_terminator_bathymetry": false,
+    "protected_solver_strip_change_m": 0.0,
+    "material_change_is_shade_only": true
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable",
+    "solver": "raftsim_water_cpp_v1",
+    "converged": false,
+    "feature_strength_scale": 0.0,
+    "water_or_foam_material_changed": false
+  },
+  "renderer_comparison": {
+    "guide_seat_downstream": {
+      "changed_pixel_fraction": 0.10068576388888889,
+      "mean_absolute_rgb_delta": 0.006539623253047466,
+      "left_bank_roi_xyxy": [0, 245, 430, 390],
+      "left_bank_mean_luminance_before": 0.21797545744884847,
+      "left_bank_mean_luminance_after": 0.23794688310831066,
+      "left_bank_dark_fraction_before": 0.13167602245388935,
+      "left_bank_dark_fraction_after": 0.0476663993584603
+    },
+    "river_eye_downstream": {
+      "changed_pixel_fraction": 0.10027126736111111,
+      "mean_absolute_rgb_delta": 0.006155914627015591,
+      "left_bank_roi_xyxy": [0, 245, 500, 390],
+      "left_bank_mean_luminance_before": 0.2076291486693399,
+      "left_bank_mean_luminance_after": 0.2231312396567268,
+      "left_bank_dark_fraction_before": 0.0772,
+      "left_bank_dark_fraction_after": 0.039917241379310346
+    },
+    "solver_rapid_river_eye_downstream": {
+      "changed_pixel_fraction": 0.10068576388888889,
+      "mean_absolute_rgb_delta": 0.006539623253047466,
+      "left_bank_roi_xyxy": [0, 245, 430, 390],
+      "left_bank_mean_luminance_before": 0.21797545744884847,
+      "left_bank_mean_luminance_after": 0.23794688310831066,
+      "left_bank_dark_fraction_before": 0.13167602245388935,
+      "left_bank_dark_fraction_after": 0.0476663993584603
+    },
+    "technical_verdict": "retain: all three fixed views expose a materially brighter, scene-lit bank response; guide-seat dark coverage falls 8.40 percentage points and river-eye dark coverage falls 3.73 points",
+    "photoreal_verdict": "fail: broad smooth 30 m terrain, repeated procedural vegetation, flat dark water, understated rapid hydraulics, sparse bank structure, and synthetic lighting remain dominant"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorFutaleufuMaterial.cpp": "107adbc0bd1998ae2b29b9ebfa9c28fd7b6c85fe1eff644e95e5aa4f3c903c4f",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "badb27c0ca5dca2a31052dc6285bcfcbefe59ea0cd8cba4a11378a23a8af8fe0",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h": "8a101150cec33ca7462a42a97bf90bd610eaf3aa6df8b6220fb4bac20531d99e",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp": "afafa1c44e23aff9e774578c0270b278b27bc7425b01f5682bb6c29e3686a58d",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorFutaleufuTerrainTest.cpp": "931fdb134b93f18a2887218f2fe2fd62295d743c3b6a50f65b5598d87f7de991",
+    "physics/tests/test_photoreal_futaleufu_organic_terrain.py": "7d545f73500c023739daa71dc0f14a1f68944d292503e92cd289ce7be7351abd",
+    "physics/tests/test_photoreal_pacuare_organic_terrain.py": "5cc5708d582a61924a1af4a4d5f10368ab08124669bd8b3c7c89a99cb625c36e",
+    "physics/tests/test_futaleufu_terminator_visual_water.py": "22556f2750af6f6ffce2e8c3ccbc873c61b6b5cb886bae81a659db1ffde20427"
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "ee8085f1fb06f7b60ed82f421d330a87bfd07c07091c04a1256129afe3de0ffe"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_futaleufuterminator_physicalcorridor_SourceLandscapeCandidate.uasset",
+      "sha256": "2a5084e29358510902bbb5dd17f577a8254962360c075f5792e6e4a342de3212"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "sha256": "5d858ad442024e807f6adfe0a7f170284d9270eeb02e141b6ea49c8bb6d19a30"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
+      "sha256": "1b6459f4ffb2b323bb456a9e7667c46ff88b1c7638018d4220d831310d3b4f1b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
+      "sha256": "46f4bdc782aa2d8f295d93026caa80a0e37b50b2fc941833cca1d997043b0a2d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png",
+      "sha256": "1b6459f4ffb2b323bb456a9e7667c46ff88b1c7638018d4220d831310d3b4f1b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_organic_lit_terrain_v1_guide_seat_downstream.png",
+      "sha256": "60c67718d8c577d7e7f406de067f9e0bc815cf2d842d2be7a3a7450df559bd6c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_organic_lit_terrain_v1_river_eye_downstream.png",
+      "sha256": "c6e718458da31851eabddfa7c4ce5ced41f643bfa203aab241e000047ad4066d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_organic_lit_terrain_v1_solver_rapid_river_eye_downstream.png",
+      "sha256": "60c67718d8c577d7e7f406de067f9e0bc815cf2d842d2be7a3a7450df559bd6c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_material_audit.json",
+      "sha256": "53a95a0d6b8282726fbacddca6f522157bdba50a58d7aacd7336f9be2c0d8d0c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_map_load.json",
+      "sha256": "d1164bb54c1db1bd52af0eeec9a068d2aecb8ec9020e5920fe7d82f693f5120f"
+    }
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "native_material_audit": "1/1 passed with 0 warnings and 0 errors",
+    "runtime_map_load": "1/1 succeeded with 0 errors and the known r.MotionVectorSimulation engine warning",
+    "focused_python": "32/32 passed after exact-current review reconciliation"
+  },
+  "accepted": [
+    "The saved Futaleufu Landscape material now matches its manifest and uses scene lighting.",
+    "Three river-local world-space scales break up the registered source color without moving terrain.",
+    "The fixed guide-seat and river-eye bank regions contain substantially fewer near-black pixels.",
+    "The map remains reference-runnable with the live cooked solver owning gameplay water and forces.",
+    "No pre-existing dirty terrain, water, VFX, texture, or PFD source asset is included in this milestone."
+  ],
+  "remaining_photoreal_defects": [
+    "The 30 m source surface still produces broad smooth banks and does not resolve reach-specific bank breaklines or surveyed rapid-scale terrain.",
+    "The opaque procedural conifer, broadleaf, shrub, and ground-cover forms remain visibly repeated and synthetic.",
+    "The broad water surface remains dark, flat, and low-information in all three fixed views.",
+    "Terminator's holes, flip-wave train, entrained aeration, spray, mist, and shoreline contact remain visually understated.",
+    "Near-bank gravel, cobble, roots, deadwood, undercuts, wet-rock transitions, and deposited sediment structure remain sparse.",
+    "The camera composition, atmosphere, distant valley structure, and lighting remain technical evidence rather than release-media art.",
+    "The cooked hydraulics remain unconverged and are not calibrated against observed Terminator behavior.",
+    "No named environment-art reviewer or qualified Futaleufu guide has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Futaleufu guide review of Terminator stationing, entry, main and sneak lines, holes, flip-wave train, marker boulder, recovery, and playable flow bands",
+    "geospatial review of route registration, rapid station, terrain, bank breaklines, bathymetry, rapid rocks, and EGM2008 vertical datum",
+    "hydraulic calibration and convergence approval against observed Terminator behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of native species, ground cover, wet banks, boulders, valley form, and seasonal presentation",
+    "photoreal water and VFX approval for depth, transmission, holes, flip waves, foam, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ]
+}

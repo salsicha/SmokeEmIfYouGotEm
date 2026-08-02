@@ -482,6 +482,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bUsesFutaleufuOrganicTemperateSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const bool bUsesDefaultLitLandscape =
             bUsesPacuareOrganicRainforestSurface ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
@@ -828,10 +830,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 : TEXT("Unlit"),
             bUsesPacuareOrganicRainforestSurface
                 ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
-                : TEXT("not_enabled_for_this_river"),
+                : (bUsesFutaleufuOrganicTemperateSurface
+                       ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
+                       : TEXT("not_enabled_for_this_river")),
             bUsesPacuareOrganicRainforestSurface
                 ? TEXT("[0.000210, 0.000950, 0.003500]")
-                : TEXT("[]"),
+                : (bUsesFutaleufuOrganicTemperateSurface
+                       ? TEXT("[0.000180, 0.000710, 0.004200]")
+                       : TEXT("[]")),
             MaterialSettings.MacroMappingScale,
             MaterialSettings.DetailMappingScale,
             MaterialSettings.DetailAlbedoWeight,

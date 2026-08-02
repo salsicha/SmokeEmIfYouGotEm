@@ -3727,6 +3727,24 @@ path is verified, and the completion goal can be marked complete.
   sparse ground cover, review-gated route/stationing, unconverged hydraulics,
   and open guide/geospatial/ecology/art/water-VFX/performance gates reject
   photoreal and production promotion; M9 remains open.
+- Futaleufú organic lit terrain V1 fixes the runnable map's saved-material
+  mismatch: its manifest promised Default Lit while the generator serialized an
+  Unlit Landscape. A Futaleufú-only shade graph now preserves the registered
+  source macro color, source zones, wet-bank/riverbed conditioning, and physical
+  slope treatment, then layers three incommensurate world-space scales (0.00018,
+  0.00071, and 0.00420 per centimetre) for humid temperate value, moss/leaf litter,
+  wet granite/lichen, and fine mineral variation. It has no world-position offset
+  and changes neither the 1009×1009 terrain, collision, cooked water, route,
+  gameplay hydraulics, nor raft forces. The editor build succeeds; the saved
+  material audit passes 1/1; `L_Terminator` loads 1/1 with zero errors and only the
+  known `r.MotionVectorSimulation` engine warning; and all 32 focused Python
+  contracts pass. In fixed left-bank regions, near-black coverage falls from
+  13.17% to 4.77% in the guide-seat view and from 7.72% to 3.99% at river eye.
+  This is a retained technical foundation, not photoreal promotion: coarse smooth
+  30 m banks, repeated procedural ecology, flat dark water, weak Terminator
+  hydraulics/VFX, sparse reach-specific bank structure, and all named guide,
+  geospatial, hydraulic, ecology/geology/art, water-VFX, and performance gates
+  remain open.
 - Zambezi stable runnable delivery V1 promotes the already-validated complete
   Batoka Gorge reference run from the ignored `EnvironmentPreviews` namespace
   to the versioned `/Game/RaftSim/Maps/L_Zambezi` package. The editor generator,
