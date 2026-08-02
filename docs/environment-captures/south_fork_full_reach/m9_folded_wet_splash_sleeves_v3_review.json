@@ -95,14 +95,14 @@
     "photoreal_verdict": "fail: the overlay remains procedural and synthetic, with exaggerated regular folds, abrupt torso/cuff integration, no skinned fabric compression, no identity-specific tailoring, and no production garment seam construction"
   },
   "implementation_sha256": {
-    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "e088b957a608fc20adc9037a118ac480ea7b94749e9ddd468685b53dc3648241",
-    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "ff6c1f915a5ad61b4790d6570e3cc515edaf8c24e76cf74ed3dc632869988796",
-    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": "0e5a78070090399a542c1145f0986490f540e4aa945c13ee285db738dcd25f25",
-    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "368e044f979bfdc30ba7ebe72257422f52068714d114beae16e9fe3377e4a033",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "771d0f799030ffe961d0ecf2b316a9fdb5a1cfc45710760be648f2d9f5558d89",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "40b5fdeb94fdc93ae322c82ad728c306c37140b97b426593431962a9e3d122fe",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": "be41d3c245765c1abd72802d39e218d4d1351daf5ec0af7703ed30139a54c97c",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "28e2da76c33f4300969600f0046ccbab826e6c6b657e415d4f93ec34c3d6dd51",
     "unreal/Scripts/create_splash_jacket_material.py": "9ac3d46c1c6bd70302c6a1cc4b2b0d89519ead3209bb0c02203c10cd3b3fbf4b",
     "unreal/Scripts/capture_metahuman_production_roster.py": "5697537fb4801c45010ee0cfd5844f015036ce495d4618a1db1eba76271f5ffa",
-    "physics/tests/test_cc0_production_characters.py": "811dbc2a30839275d77d092af2f9a41bb426ba172ec42c2abfe02f9a8949a470",
-    "physics/tests/test_safety_gear_fallback.py": "9931e3419762c6b3a6372d9a952a0cd5fe30f78ba6404aa24807be8747f137d6",
+    "physics/tests/test_cc0_production_characters.py": "b85e746fe487521852b57936d7b8fc385beec2aab526bd6c0bbb370b63c35d29",
+    "physics/tests/test_safety_gear_fallback.py": "891b77ce33542ecaac115e9e5b836d7af0c05e2a98c41fd4639d368901a14f97",
     "unreal/Content/RaftSim/Materials/M_RaftSim_SplashJacket.uasset": "2df2140d3e162e631d89bbfb460d51966acc948bf0a11629d8207e0394feb034"
   },
   "validation": {

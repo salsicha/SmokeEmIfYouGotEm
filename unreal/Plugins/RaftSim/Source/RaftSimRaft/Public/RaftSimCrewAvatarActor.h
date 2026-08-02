@@ -206,6 +206,14 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     AActor* GetProductionVisualActor() const;
 
+    /** True when the packaged CC0 body owns the complete visible anatomy. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasExclusiveCC0BodyOwnership() const;
+
+    /** Selects the packaged CC0 adapter for deterministic renderer validation. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Validation")
+    bool ActivateCC0FallbackForValidation();
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasFiniteVisualTransforms() const;
 
