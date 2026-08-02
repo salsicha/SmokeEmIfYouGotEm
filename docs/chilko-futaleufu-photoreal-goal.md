@@ -192,6 +192,36 @@ target-hardware reviewer has accepted the result. Exact settings, metrics,
 hashes, captures, authority boundaries, and six external gates are recorded in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_cold_water_v2_review.json`.
 
+## Temperate Waterline Structure V1
+
+The runnable Terminator and Lava Canyon maps now carry a full-route organic
+waterline-structure layer where their 30 m terrain sources cannot resolve
+cobbles and individual bank rocks. Each river places 1,440 deterministic
+instances from the existing rights-reviewed six-form CC0 rock set. A 72-choice
+search grounds every instance on the source Landscape and rejects placements
+inside the complete visible-water width, below the dry-height floor, beyond the
+55-degree slope ceiling, or too close to any segment of the full route. The six
+HISM components are non-colliding and explicitly tagged as generic procedural
+gap fill with no lithology, surveyed-bank, bathymetry, hazard, hydraulic, or
+raft-force authority.
+
+Both isolated generations place 1,440/1,440 targets with zero rejects.
+Futaleufú retains a 32.568 m minimum centerline distance and 14.449-degree
+maximum placed slope; Chilko retains 24.610 m and 15.746 degrees. Fixed-frame
+comparison changes 14.35-14.43% of the selected Futaleufú bank band and
+18.11-20.87% of the Chilko bank band beyond a two-percent pixel threshold.
+The editor build passes, and the saved maps/manifests carry runtime-testable
+component, density, collision, route, and authority tags.
+
+This is retained as a technical environment improvement, not a photoreal
+promotion. The added rocks supply needed scale and interrupt empty banks, but
+the source benches remain broad, fine gravel and sediment are incomplete,
+roots and deadwood are absent, foliage is visibly procedural, near-field water
+is dark and opaque, rapid VFX are sparse, and all six external acceptance gates
+remain open. Exact hashes, metrics, placement limits, captures, and blockers
+are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_waterline_structure_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

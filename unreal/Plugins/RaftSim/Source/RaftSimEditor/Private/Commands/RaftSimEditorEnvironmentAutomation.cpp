@@ -706,6 +706,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_trunk_asset\": null,\n")
             TEXT("      \"landscape_dressing_instance_implementation\": \"%s\",\n")
             TEXT("      \"landscape_dressing_boulder_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_authority\": \"presentation_only_procedural_source_gap_fill_no_lithology_collision_bathymetry_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_target_height_range_m\": [0.22, 2.60],\n")
+            TEXT("      \"landscape_dressing_temperate_waterline_placement_contract\": \"deterministic_72_candidate_source_landscape_search_across_both_full_route_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_authority\": \"presentation_only_generic_rock_analog_no_lithology_collision_hydraulic_or_raft_force_authority\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_target_instance_count\": %d,\n")
@@ -986,6 +995,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("complete_pve_shrub_understory_plus_rights_reviewed_broadleaf_and_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
                        : TEXT("complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders"))),
             Result.DressingBoulderInstanceCount,
+            Result.DressingTemperateWaterlineTargetInstanceCount > 0
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_organic_waterline_structure_v1_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingTemperateWaterlineTargetInstanceCount,
+            Result.DressingTemperateWaterlineInstanceCount,
+            Result.DressingTemperateWaterlineRejectedPlacementCount,
+            Result.DressingTemperateWaterlineMinimumCenterlineDistanceCm,
+            Result.DressingTemperateWaterlineMaximumSlopeDegrees,
             Result.DressingRunnableLaunchTalusTargetInstanceCount > 0
                 ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_launch_talus_captured")
                 : TEXT("not_enabled_for_this_river"),

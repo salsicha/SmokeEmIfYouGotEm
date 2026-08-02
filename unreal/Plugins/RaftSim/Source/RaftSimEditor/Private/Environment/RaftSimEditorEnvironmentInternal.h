@@ -681,6 +681,11 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 NaniteMaterialAuditErrorCount = 0;
     int32 DressingAssetCount = 0;
     int32 DressingBoulderInstanceCount = 0;
+    int32 DressingTemperateWaterlineTargetInstanceCount = 0;
+    int32 DressingTemperateWaterlineInstanceCount = 0;
+    int32 DressingTemperateWaterlineRejectedPlacementCount = 0;
+    float DressingTemperateWaterlineMinimumCenterlineDistanceCm = 0.0f;
+    float DressingTemperateWaterlineMaximumSlopeDegrees = 0.0f;
     int32 DressingRunnableLaunchTalusTargetInstanceCount = 0;
     int32 DressingRunnableLaunchTalusInstanceCount = 0;
     int32 DressingRunnableLaunchTalusRejectedPlacementCount = 0;

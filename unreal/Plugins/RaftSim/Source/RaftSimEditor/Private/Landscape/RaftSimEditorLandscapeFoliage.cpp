@@ -38,6 +38,9 @@ constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 192;
 constexpr float ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 24.0f;
 constexpr int32 ZambeziRunnableLaunchTalusInstanceCount = 360;
 constexpr float ZambeziRunnableLaunchTalusSlopeCeilingDegrees = 48.0f;
+constexpr int32 TemperateWaterlineStructureTargetInstanceCount = 1440;
+constexpr int32 TemperateWaterlineStructureMinimumInstanceCount = 1250;
+constexpr float TemperateWaterlineStructureSlopeCeilingDegrees = 55.0f;
 constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
     "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
 constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
@@ -2134,7 +2137,7 @@ bool AddLandscapeCandidateBiomeDressing(
     const bool bUsesOpaqueVolumetricVegetation =
         bZambezi || bPacuare || bOpaqueTemperate;
     TArray<UStaticMesh*> ReviewedRockMeshes;
-    if (bSouthFork || bZambezi || bFutaleufu)
+    if (bSouthFork || bZambezi || bFutaleufu || bChilko)
     {
         for (int32 RockIndex = 1; RockIndex <= 6; ++RockIndex)
         {
@@ -2709,6 +2712,23 @@ bool AddLandscapeCandidateBiomeDressing(
             true));
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
+        TemperateWaterlineStructureInstances;
+    if (bOpaqueTemperate)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            TemperateWaterlineStructureInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_TemperateWaterlineStructureRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true));
+        }
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
     UMaterialInstanceConstant* ZambeziRunnableLaunchTalusMaterial = bZambezi
         ? LoadOrCreateZambeziRunnableLaunchTalusMaterial(OutSummary)
@@ -2764,6 +2784,12 @@ bool AddLandscapeCandidateBiomeDressing(
         {
             return Component == nullptr;
         }) ||
+        Algo::AnyOf(
+            TemperateWaterlineStructureInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
         Algo::AnyOf(
             ZambeziRunnableLaunchTalusInstances,
             [](UHierarchicalInstancedStaticMeshComponent* Component)
@@ -2876,6 +2902,45 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         UnderstoryInstances->ComponentTags.AddUnique(
             TEXT("RaftSimOrganicBankGroundCover"));
+    }
+    if (bOpaqueTemperate)
+    {
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             TemperateWaterlineStructureInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    bChilko
+                        ? TEXT("RaftSimChilkoLavaCanyonRun")
+                        : TEXT("RaftSimFutaleufuTerminatorRun"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimTemperateWaterlineStructureV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimProceduralSourceGapFill"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimTemperateWaterlineStructureV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+            }
+        }
     }
     if (bZambezi)
     {
@@ -3448,6 +3513,221 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         ++OutResult.DressingBoulderInstanceCount;
     }
+
+    int32 TemperateWaterlinePlacedCount = 0;
+    int32 TemperateWaterlineRejectedPlacementCount = 0;
+    float TemperateWaterlineMinimumCenterlineDistanceCm =
+        TNumericLimits<float>::Max();
+    float TemperateWaterlineMaximumSlopeDegrees = 0.0f;
+    if (bOpaqueTemperate &&
+        ReviewedRockMeshes.Num() == 6 &&
+        TemperateWaterlineStructureInstances.Num() == 6)
+    {
+        // The source DEM establishes terrain and collision, while the live C++
+        // water/solver owns the playable channel. This dense CC0 morphology-
+        // donor layer fills only unresolved sub-DEM bank structure. Every
+        // instance is grounded on the source Landscape, starts outside the
+        // complete visible-water width, remains non-colliding, and carries no
+        // lithology, bathymetry, hydraulic, or raft-force authority.
+        const float VisibleRiverHalfWidth = ActiveRiverHalfWidth *
+            (bChilko ? 1.20f : 1.18f);
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerSide =
+            TemperateWaterlineStructureTargetInstanceCount / BankSideCount;
+        for (int32 StructureIndex = 0;
+             StructureIndex < TemperateWaterlineStructureTargetInstanceCount;
+             ++StructureIndex)
+        {
+            const int32 SideIndex = StructureIndex % BankSideCount;
+            const int32 AlongIndex = StructureIndex / BankSideCount;
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(StructureIndex, 10103)) /
+                static_cast<float>(InstancesPerSide);
+            const float BaseLogicalX =
+                FMath::Lerp(-2380.0f, 25300.0f, AlongT) +
+                95.0f * FMath::Sin(
+                    static_cast<float>(StructureIndex) * 1.3247179f);
+
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (VisibleRiverHalfWidth + 420.0f));
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestCenterlineDistanceCm = 0.0f;
+            float BestPlacementScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 72;
+                 ++CandidateIndex)
+            {
+                const float CandidateLogicalX = BaseLogicalX +
+                    FMath::Lerp(
+                        -115.0f,
+                        115.0f,
+                        ZambeziVegetationUnitRandom(
+                            StructureIndex * 79 + CandidateIndex,
+                            10111));
+                const float CandidateAdditionalOffset = FMath::Lerp(
+                    85.0f,
+                    3200.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            StructureIndex * 83 + CandidateIndex,
+                            10133),
+                        1.72f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side *
+                        (VisibleRiverHalfWidth + CandidateAdditionalOffset));
+                const float CandidateSlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float CandidateCenterlineDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                const float GroundZ = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float HeightAboveWaterCm = GroundZ -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (CandidateSlopeDegrees >
+                        TemperateWaterlineStructureSlopeCeilingDegrees ||
+                    CandidateCenterlineDistanceCm <
+                        VisibleRiverHalfWidth + 60.0f ||
+                    HeightAboveWaterCm < -25.0f ||
+                    HeightAboveWaterCm > 2200.0f)
+                {
+                    continue;
+                }
+
+                const float TargetDryHeightCm = 85.0f +
+                    210.0f * ZambeziVegetationUnitRandom(
+                        StructureIndex,
+                        10139);
+                const float PlacementScore =
+                    0.62f * FMath::Abs(
+                        HeightAboveWaterCm - TargetDryHeightCm) / 2200.0f +
+                    0.24f * CandidateAdditionalOffset / 3200.0f +
+                    0.14f * CandidateSlopeDegrees /
+                        TemperateWaterlineStructureSlopeCeilingDegrees;
+                if (PlacementScore < BestPlacementScore)
+                {
+                    BestPlacementScore = PlacementScore;
+                    BestPoint = CandidatePoint;
+                    BestSlopeDegrees = CandidateSlopeDegrees;
+                    BestCenterlineDistanceCm =
+                        CandidateCenterlineDistanceCm;
+                }
+            }
+            if (BestPlacementScore == TNumericLimits<float>::Max())
+            {
+                ++TemperateWaterlineRejectedPlacementCount;
+                continue;
+            }
+
+            const int32 ScaleClass = StructureIndex % 20;
+            const float TargetHeightCm = ScaleClass == 0
+                ? FMath::Lerp(
+                      160.0f,
+                      260.0f,
+                      ZambeziVegetationUnitRandom(StructureIndex, 10141))
+                : (ScaleClass < 5
+                       ? FMath::Lerp(
+                             60.0f,
+                             135.0f,
+                             ZambeziVegetationUnitRandom(
+                                 StructureIndex,
+                                 10151))
+                       : FMath::Lerp(
+                             22.0f,
+                             58.0f,
+                             ZambeziVegetationUnitRandom(
+                                 StructureIndex,
+                                 10159)));
+            const int32 VariantIndex = StructureIndex %
+                ReviewedRockMeshes.Num();
+            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
+            UHierarchicalInstancedStaticMeshComponent* StructureComponent =
+                TemperateWaterlineStructureInstances[VariantIndex];
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                StructureComponent,
+                RockMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.10f, 0.0f, 5.5f),
+                    360.0f * ZambeziVegetationUnitRandom(
+                        StructureIndex,
+                        10163),
+                    FMath::Lerp(
+                        -5.0f,
+                        5.0f,
+                        ZambeziVegetationUnitRandom(
+                            StructureIndex,
+                            10169))),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.76f,
+                        1.34f,
+                        ZambeziVegetationUnitRandom(
+                            StructureIndex,
+                            10177)),
+                    UniformScale * FMath::Lerp(
+                        0.74f,
+                        1.30f,
+                        ZambeziVegetationUnitRandom(
+                            StructureIndex,
+                            10181)),
+                    UniformScale));
+            ++TemperateWaterlinePlacedCount;
+            ++OutResult.DressingBoulderInstanceCount;
+            TemperateWaterlineMinimumCenterlineDistanceCm = FMath::Min(
+                TemperateWaterlineMinimumCenterlineDistanceCm,
+                BestCenterlineDistanceCm);
+            TemperateWaterlineMaximumSlopeDegrees = FMath::Max(
+                TemperateWaterlineMaximumSlopeDegrees,
+                BestSlopeDegrees);
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             TemperateWaterlineStructureInstances)
+        {
+            if (Component)
+            {
+                Component->MarkRenderStateDirty();
+            }
+        }
+        OutSummary += FString::Printf(
+            TEXT("%s organic waterline structure V1: %d/%d source-grounded, ")
+            TEXT("non-colliding CC0 rock analogs across both banks; %d targets ")
+            TEXT("rejected by visible-water clearance, dry-height, or %.1f-degree ")
+            TEXT("slope gates; minimum full-route centerline distance %.1f cm and ")
+            TEXT("maximum placed slope %.2f degrees. Presentation-only procedural ")
+            TEXT("gap fill with no lithology, hydraulic, collision, bathymetry, or ")
+            TEXT("raft-force authority.\n"),
+            *Spec.RiverId,
+            TemperateWaterlinePlacedCount,
+            TemperateWaterlineStructureTargetInstanceCount,
+            TemperateWaterlineRejectedPlacementCount,
+            TemperateWaterlineStructureSlopeCeilingDegrees,
+            TemperateWaterlineMinimumCenterlineDistanceCm,
+            TemperateWaterlineMaximumSlopeDegrees);
+    }
+    OutResult.DressingTemperateWaterlineTargetInstanceCount =
+        bOpaqueTemperate
+            ? TemperateWaterlineStructureTargetInstanceCount
+            : 0;
+    OutResult.DressingTemperateWaterlineInstanceCount =
+        TemperateWaterlinePlacedCount;
+    OutResult.DressingTemperateWaterlineRejectedPlacementCount =
+        TemperateWaterlineRejectedPlacementCount;
+    OutResult.DressingTemperateWaterlineMinimumCenterlineDistanceCm =
+        TemperateWaterlinePlacedCount > 0
+            ? TemperateWaterlineMinimumCenterlineDistanceCm
+            : 0.0f;
+    OutResult.DressingTemperateWaterlineMaximumSlopeDegrees =
+        TemperateWaterlineMaximumSlopeDegrees;
 
     if (bZambeziWoodland &&
         ReviewedRockMeshes.Num() == 6 &&
@@ -4775,8 +5055,12 @@ bool AddLandscapeCandidateBiomeDressing(
              : 0);
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount ==
-            BoulderCount + RunnableLaunchTalusPlacedCount &&
+            BoulderCount + TemperateWaterlinePlacedCount +
+                RunnableLaunchTalusPlacedCount &&
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
+        (!bOpaqueTemperate ||
+         TemperateWaterlinePlacedCount >=
+             TemperateWaterlineStructureMinimumInstanceCount) &&
         ((Spec.bDesertCanyon && !bZambeziWoodland) ||
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&
