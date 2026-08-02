@@ -258,6 +258,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetMinimumShoulderSleeveExtentCm() const;
 
+    /** Smallest authored vertex count shared by the two tapered garment sleeves. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    int32 GetMinimumShoulderSleeveVertexCount() const;
+
     /** Largest distance between a sleeve's proximal endpoint and its solved shoulder joint. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetMaximumShoulderSleeveAnchorErrorCm() const;

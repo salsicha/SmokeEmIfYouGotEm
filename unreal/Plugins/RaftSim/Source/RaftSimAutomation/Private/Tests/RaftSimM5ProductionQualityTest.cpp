@@ -1201,13 +1201,17 @@ bool FRaftSimM5StartRescueCommand::Update()
                     ThighKneeCoverageErrorCm <= 0.25f);
             const FVector ShoulderSleeveExtentCm =
                 It->GetMinimumShoulderSleeveExtentCm();
+            const int32 ShoulderSleeveVertexCount =
+                It->GetMinimumShoulderSleeveVertexCount();
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("avatar %s retains rounded shoulders between the PFD and arms "
-                         "(minimum extent %s)"),
+                    TEXT("avatar %s retains tapered garment shoulders between the PFD "
+                         "and arms (minimum extent %s, %d vertices)"),
                     *It->GetName(),
-                    *ShoulderSleeveExtentCm.ToCompactString()),
-                It->HasVisibleShoulderSilhouette());
+                    *ShoulderSleeveExtentCm.ToCompactString(),
+                    ShoulderSleeveVertexCount),
+                It->HasVisibleShoulderSilhouette() &&
+                    ShoulderSleeveVertexCount >= 550);
             const float ShoulderAnchorErrorCm =
                 It->GetMaximumShoulderSleeveAnchorErrorCm();
             Test->TestTrue(

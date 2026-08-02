@@ -71,6 +71,89 @@ void BuildUnitOrganicMesh(
     }
 }
 
+void BuildUnitAnatomicalShoulderSleeveMesh(
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs,
+    TArray<FProcMeshTangent>& Tangents)
+{
+    // A uniformly scaled sphere/capsule gives the shoulder and elbow the same
+    // diameter and reads as a rigid ball beside the PFD. This garment profile
+    // carries a broad deltoid high on the upper arm, then tapers continuously
+    // into a restrained cuff whose end is buried in the assembled arm.
+    constexpr int32 Rings = 18;
+    constexpr int32 Sides = 28;
+    const auto RadiusAt = [](float V)
+    {
+        const float SafeV = FMath::Clamp(V, 0.0f, 1.0f);
+        const float Deltoid = FMath::Exp(
+            -FMath::Square((SafeV - 0.18f) / 0.24f));
+        const float CuffRoll = FMath::Exp(
+            -FMath::Square((SafeV - 0.90f) / 0.075f));
+        return 0.90f - 0.27f * SafeV + 0.20f * Deltoid +
+            0.045f * CuffRoll;
+    };
+    for (int32 Ring = 0; Ring <= Rings; ++Ring)
+    {
+        const float V = static_cast<float>(Ring) / Rings;
+        const float Z = -1.0f + 2.0f * V;
+        const float Radius = RadiusAt(V);
+        const float SampleStep = 1.0f / Rings;
+        const float PreviousV = FMath::Max(V - SampleStep, 0.0f);
+        const float NextV = FMath::Min(V + SampleStep, 1.0f);
+        const float DeltaZ = 2.0f * FMath::Max(
+            NextV - PreviousV,
+            UE_SMALL_NUMBER);
+        const float RadiusSlope =
+            (RadiusAt(NextV) - RadiusAt(PreviousV)) / DeltaZ;
+        for (int32 Side = 0; Side <= Sides; ++Side)
+        {
+            const float U = static_cast<float>(Side) / Sides;
+            const float Theta = 2.0f * PI * U;
+            const float CosTheta = FMath::Cos(Theta);
+            const float SinTheta = FMath::Sin(Theta);
+            Vertices.Add(
+                FVector(Radius * CosTheta, Radius * SinTheta, Z) *
+                kBaseRadiusCm);
+            Normals.Add(
+                FVector(CosTheta, SinTheta, -RadiusSlope).GetSafeNormal());
+            UVs.Add(FVector2D(U, V));
+            Tangents.Add(
+                FProcMeshTangent(-SinTheta, CosTheta, 0.0f));
+        }
+    }
+    for (int32 Ring = 0; Ring < Rings; ++Ring)
+    {
+        for (int32 Side = 0; Side < Sides; ++Side)
+        {
+            const int32 A = Ring * (Sides + 1) + Side;
+            const int32 B = A + 1;
+            const int32 C = A + Sides + 1;
+            const int32 D = C + 1;
+            Triangles.Append({A, C, B, B, C, D});
+        }
+    }
+
+    const int32 ShoulderCenter = Vertices.Num();
+    Vertices.Add(FVector(0.0f, 0.0f, -kBaseRadiusCm));
+    Normals.Add(-FVector::UpVector);
+    UVs.Add(FVector2D(0.5f, 0.5f));
+    Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));
+    const int32 CuffCenter = Vertices.Num();
+    Vertices.Add(FVector(0.0f, 0.0f, kBaseRadiusCm));
+    Normals.Add(FVector::UpVector);
+    UVs.Add(FVector2D(0.5f, 0.5f));
+    Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));
+    const int32 CuffRing = Rings * (Sides + 1);
+    for (int32 Side = 0; Side < Sides; ++Side)
+    {
+        Triangles.Append({ShoulderCenter, Side + 1, Side});
+        Triangles.Append(
+            {CuffCenter, CuffRing + Side, CuffRing + Side + 1});
+    }
+}
+
 void BuildUnitHipThighBridgeMesh(
     TArray<FVector>& Vertices,
     TArray<int32>& Triangles,
@@ -1411,6 +1494,25 @@ FVector ARaftSimCrewAvatarActor::GetMinimumShoulderSleeveExtentCm() const
         FMath::Min(LeftExtentCm.Z, RightExtentCm.Z));
 }
 
+int32 ARaftSimCrewAvatarActor::GetMinimumShoulderSleeveVertexCount() const
+{
+    if (!LeftShoulderSleeve || !RightShoulderSleeve)
+    {
+        return 0;
+    }
+    const FProcMeshSection* LeftSection =
+        LeftShoulderSleeve->GetProcMeshSection(0);
+    const FProcMeshSection* RightSection =
+        RightShoulderSleeve->GetProcMeshSection(0);
+    if (!LeftSection || !RightSection)
+    {
+        return 0;
+    }
+    return FMath::Min(
+        LeftSection->ProcVertexBuffer.Num(),
+        RightSection->ProcVertexBuffer.Num());
+}
+
 float ARaftSimCrewAvatarActor::GetMaximumShoulderSleeveAnchorErrorCm() const
 {
     if (!LeftShoulderSleeve || !RightShoulderSleeve)
@@ -1439,6 +1541,7 @@ bool ARaftSimCrewAvatarActor::HasVisibleShoulderSilhouette() const
     const FVector ExtentCm = GetMinimumShoulderSleeveExtentCm();
     return bUsingProductionVisual && LeftShoulderSleeve && RightShoulderSleeve &&
         LeftShoulderSleeve->IsVisible() && RightShoulderSleeve->IsVisible() &&
+        GetMinimumShoulderSleeveVertexCount() >= 550 &&
         ExtentCm.X >= 4.7f && ExtentCm.Y >= 4.7f && ExtentCm.Z >= 5.6f &&
         ExtentCm.Z > ExtentCm.X &&
         GetMaximumShoulderSleeveAnchorErrorCm() <= 0.25f;
@@ -2160,6 +2263,32 @@ void ARaftSimCrewAvatarActor::BuildVisual()
         TEXT("LeftShoulderSleeve"), Jacket ? Jacket : Wetsuit);
     RightShoulderSleeve = CreateOrganicPart(
         TEXT("RightShoulderSleeve"), Jacket ? Jacket : Wetsuit);
+    {
+        TArray<FVector> Vertices, Normals;
+        TArray<int32> Triangles;
+        TArray<FVector2D> UVs;
+        TArray<FProcMeshTangent> Tangents;
+        BuildUnitAnatomicalShoulderSleeveMesh(
+            Vertices,
+            Triangles,
+            Normals,
+            UVs,
+            Tangents);
+        ReplaceMeshSection(
+            LeftShoulderSleeve,
+            Vertices,
+            Triangles,
+            Normals,
+            UVs,
+            Tangents);
+        ReplaceMeshSection(
+            RightShoulderSleeve,
+            Vertices,
+            Triangles,
+            Normals,
+            UVs,
+            Tangents);
+    }
     Pfd = CreateOrganicPart(TEXT("PFD"), DefaultPfd);
     PfdRearWebbing = CreateOrganicPart(TEXT("PFDRearWebbing"), Webbing ? Webbing : Wetsuit);
     PfdBelt = CreateOrganicPart(TEXT("PFDBelt"), Webbing ? Webbing : Wetsuit);

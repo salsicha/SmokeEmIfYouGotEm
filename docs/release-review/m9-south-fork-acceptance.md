@@ -2373,6 +2373,33 @@ A named character-art reviewer and qualified guide must approve or replace them 
 photoreal or release-media claim. Exact source, roster, image, and validation hashes are in
 `docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json`.
 
+## Tapered shoulder sleeves V2 — anatomical garment profile retained, photoreal review open
+
+The uniformly scaled V1 sleeves closed the missing-shoulder gap but still read as cyan balls
+in front and profile views. V2 replaces each sphere-derived section with a closed procedural
+garment mesh. Eighteen axial rings and twenty-eight radial sides form a broad deltoid that
+tapers continuously toward the elbow, with a restrained cuff roll at the assembled-arm
+transition. The authoritative live shoulder and elbow targets do not move.
+
+![Tapered sleeves guide full view](../environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_guide_full.png)
+
+![Tapered sleeves guide profile](../environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_guide_profile.png)
+
+![Tapered sleeves guide rear view](../environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_guide_rear.png)
+
+All five production identities pass the fail-closed silhouette gate with 553 authored vertices
+per sleeve. The smallest measured radius is 4.861 cm, the shortest turntable half-length is
+7.411 cm, and maximum shoulder-anchor error is `1.3605050241949357e-7` cm. The Unreal 5.8
+editor target builds, the five-identity renderer roster completes, and renderer-enabled M5
+passes 1/1 with zero warnings and zero errors.
+
+The new taper is a clear technical improvement, not final character art. The sleeve still has
+simplified topology and shading, an abrupt cuff transition, no production cloth folds or
+identity-specific tailoring, and no convincing wet deformation. No named character-art reviewer
+or qualified whitewater guide has approved the captures. Photoreal acceptance and promotion
+therefore remain false. Exact source, roster, capture, and M5 hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json`.
+
 ### Opaque profile hips V1 technical candidate
 
 The character profile exposed the turntable background between the retained seated pelvis

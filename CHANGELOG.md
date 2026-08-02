@@ -32,6 +32,13 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced the production splash-jacket's uniform shoulder-to-elbow primitives
+  with closed, tapered garment sleeves. An 18-ring, 28-sided profile now carries
+  a broad deltoid into a smaller cuff; all five production identities retain the
+  live solved joint anchors and pass the new 550-vertex fail-closed guard. The
+  editor build, roster renderer, and renderer-enabled M5 gate pass technically.
+  Procedural topology, abrupt cuff integration, cloth deformation, wet response,
+  and named character-art/guide approval keep photoreal acceptance open.
 - Rebuilt the production rescue PFD as a fitted soft-carrier V3 across every
   runnable river. Two front carrier halves and one rear carrier now support
   thinner rounded foam cells; rigid side wings are removed in favor of three

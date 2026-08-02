@@ -1,0 +1,115 @@
+{
+  "schema": "raftsim.m9.tapered_shoulder_sleeves_review.v2",
+  "reviewed_utc": "2026-08-02T04:30:00Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",
+  "summary": "Tapered Shoulder Sleeves V2 replaces the uniformly scaled shoulder-to-elbow primitives retained by Visible Shoulders V1 with closed, project-owned procedural garment meshes. Each sleeve has a broad deltoid, a continuous taper toward the elbow, and a restrained cuff roll while continuing to follow the live solved shoulder-to-elbow segment.",
+  "root_cause": {
+    "v1_shape_problem": "The retained V1 sphere-derived sleeve kept a nearly uniform cross-section, so front and profile captures read as cyan shoulder balls rather than cloth-covered upper arms.",
+    "retained_shape": "An eighteen-ring, twenty-eight-sided axial garment surface uses a deterministic deltoid bulge and cuff roll over a narrowing base radius.",
+    "authority": "The existing solved shoulder and elbow points remain authoritative; the mesh changes silhouette only and does not invent or move joints."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "visible_sleeves_per_avatar": 2,
+    "axial_rings": 18,
+    "radial_sides": 28,
+    "minimum_allowed_vertex_count_per_sleeve": 550,
+    "authored_vertex_count_per_sleeve": 553,
+    "maximum_allowed_shoulder_anchor_error_cm": 0.25,
+    "sleeve_material": "/Game/RaftSim/Materials/M_RaftSim_SplashJacket",
+    "pfd_shoulder_foam_added": false,
+    "pfd_shoulder_webbing_changed": false,
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "collision_changed": false,
+    "raft_changed": false,
+    "water_changed": false,
+    "rescue_changed": false,
+    "physics_or_gameplay_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_roster_capture.json",
+    "report_sha256": "a1e6da4d7c283c7ae96a6876b44d95b40c82468df109ff31b3ba998f27050a96",
+    "captured_character_count": 5,
+    "characters_with_visible_shoulder_silhouette": 5,
+    "minimum_sleeve_vertex_count": 553,
+    "minimum_sleeve_radius_cm": 4.8613739013671875,
+    "minimum_sleeve_half_length_cm": 7.41104568734806,
+    "maximum_shoulder_anchor_error_cm": 1.3605050241949357e-7
+  },
+  "renderer_evidence": {
+    "captures": {
+      "guide_full": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_guide_full.png",
+        "capture_sha256": "c2d2f428bf3ff172d3fba82c392c181492354ee98987e282e571fe604168a024"
+      },
+      "guide_profile": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_guide_profile.png",
+        "capture_sha256": "f09b48e61367c0865fffe8c29ed06b944c08a41bec155bff667dbc7c37fc509f"
+      },
+      "guide_rear": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_guide_rear.png",
+        "capture_sha256": "0ba8a11a243ea31f7edf181cc37997b19b676936f038796a4d8950d0b155deb1"
+      },
+      "broadest_crew_full": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_crew03_full.png",
+        "capture_sha256": "522f0bba5858123dd1a33cef3d91dc6a80c67411ba4f27ecd331960045aa5ab3"
+      },
+      "broadest_crew_profile": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_crew03_profile.png",
+        "capture_sha256": "ea8ebab2d5b41855cc7120aa825489fc66f309eb769e99529022bb698f5697da"
+      },
+      "broadest_crew_rear": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_crew03_rear.png",
+        "capture_sha256": "f9a2a095d13eee21c506107498423618fb33d6c93d541771e8c72fa674b25755"
+      }
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: guide and broadest-body front, profile, and rear captures show a broad deltoid tapering into a smaller cuff with no return of the missing-shoulder gap",
+    "photoreal_verdict": "fail: the procedural garment still lacks production cloth folds, deformation, identity-specific tailoring, seam integration, and convincing wet-material response"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "200a3b0a75ab7c3b6c935f81bb59041ccdedc4c19441df8640470e6275940485",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "ba29b1ca9fa797c60bcaa5e0b5373a4c697dd774fc3a12fc3215082346672b04",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "b848b57df88121ae2a0094d547fb6fba4c74ef0a3326001481aeefd11d05903a",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "acb1f6b8d5ff21241651f1890b3f6761bf23f6cc6a248d5d89999ebc1a4dc209",
+    "physics/tests/test_cc0_production_characters.py": "47491f59738e92cc969f56e9e6f93992b5c9cfae46d3e6f20706a203af4ba27e"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "16/16 production-character and safety-gear source and review-lock contracts passed",
+    "renderer_turntable": "5/5 identities captured with front, profile, and rear views",
+    "m5": {
+      "result": "1/1 CrewAvatarPoseProduction passed renderer-enabled with 0 warnings and 0 errors",
+      "report": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_m5.json",
+      "report_sha256": "d32ee26ec2bc2233b015a63ec46b9f1aadc37bf739a6ed7365843bc71ba8175f"
+    }
+  },
+  "accepted": [
+    "Both production shoulder sleeves now use a tapered garment silhouette instead of uniform spherical or capsule-derived volume.",
+    "All five roster identities meet the 550-vertex mesh guard and existing shoulder-anchor contract.",
+    "The PFD still has no flotation shoulder pads; the geometry remains part of the splash-jacket layer.",
+    "No animation, mass, collision, raft, water, rescue, or gameplay-force authority changed."
+  ],
+  "rejected_or_open": [
+    "The V1 uniform sleeve silhouette is superseded by this evidence set.",
+    "The retained procedural garment remains visibly synthetic and is not final photoreal character art.",
+    "The cuff transition is abrupt in profile and needs production garment topology, skinning, and cloth deformation.",
+    "No named character-art reviewer or qualified whitewater guide has approved this evidence for release media."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the sleeve topology, torso integration, deformation, seams, tailoring, and wet-material response.",
+    "A qualified whitewater guide must approve shoulder range of motion and paddle-stroke biomechanics in motion.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance, and promotion gates."
+  ]
+}

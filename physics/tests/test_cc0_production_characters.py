@@ -15,6 +15,11 @@ REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_production_character_fallback_v287_review.json"
 )
+TAPERED_SHOULDER_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_tapered_shoulder_sleeves_v2_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -232,6 +237,11 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "Part == LeftShoulderSleeve || Part == RightShoulderSleeve" in host
     assert "kProductionShoulderSleeveRadiusCm = 5.2f" in host
     assert "kProductionShoulderSleeveArmFraction = 1.0f" in host
+    assert "BuildUnitAnatomicalShoulderSleeveMesh(" in host
+    assert "constexpr int32 Rings = 18" in host
+    assert "constexpr int32 Sides = 28" in host
+    assert "0.20f * Deltoid" in host
+    assert "0.045f * CuffRoll" in host
     assert 'TEXT("LeftShoulderSleeve"), Jacket ? Jacket : Wetsuit' in host
     assert 'TEXT("RightShoulderSleeve"), Jacket ? Jacket : Wetsuit' in host
     assert "Pose.LeftShoulderCm, LeftElbow, kProductionShoulderSleeveArmFraction" in host
@@ -239,6 +249,8 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "Pose.LeftShoulderCm,\n        LeftShoulderSleeveEnd" in host
     assert "Pose.RightShoulderCm,\n        RightShoulderSleeveEnd" in host
     assert "HasVisibleShoulderSilhouette() const" in host
+    assert "GetMinimumShoulderSleeveVertexCount() const" in host
+    assert "GetMinimumShoulderSleeveVertexCount() >= 550" in host
     assert "GetMaximumShoulderSleeveAnchorErrorCm() const" in host
     assert "ExtentCm.X >= 4.7f" in host
     assert "ExtentCm.Y >= 4.7f" in host
@@ -290,6 +302,7 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert 'TEXT("five rigged crew bodies spawned")' in automation
     assert "It->GetProceduralBodyPartCount() >= 28" in automation
     assert "It->HasVisibleShoulderSilhouette()" in automation
+    assert "ShoulderSleeveVertexCount >= 550" in automation
     assert "ShoulderAnchorErrorCm <= 0.25f" in automation
     assert "It->IsWaistHipMaterialOpaque()" in automation
     assert "HipThighCoverageErrorCm <= 0.25f" in automation
@@ -364,6 +377,7 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "actor.has_continuous_thigh_knee_silhouette()" in capture
     assert "actor.get_maximum_thigh_knee_bridge_coverage_error_cm()" in capture
     assert "actor.get_minimum_shoulder_sleeve_extent_cm()" in capture
+    assert "actor.get_minimum_shoulder_sleeve_vertex_count()" in capture
     assert "actor.get_maximum_shoulder_sleeve_anchor_error_cm()" in capture
     assert "GetSolvedFaceForwardWorldVector() const" in adapter
     assert "GetSolvedFaceUpWorldVector() const" in adapter
@@ -529,3 +543,38 @@ def test_cc0_assets_and_renderer_review_remain_fail_closed() -> None:
     assert review["automation_evidence"]["passed"] == 4
     assert review["automation_evidence"]["failed"] == 0
     assert _sha256(capture) == review["renderer_evidence"]["capture_sha256"]
+
+def test_tapered_shoulder_sleeves_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(TAPERED_SHOULDER_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert review["schema"] == "raftsim.m9.tapered_shoulder_sleeves_review.v2"
+    assert review["passed"] is False
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["human_approved"] is False
+    assert review["named_character_art_reviewer"] is None
+    assert review["named_guide_reviewer"] is None
+    assert review["promotion_allowed"] is False
+    assert review["supersedes"].endswith("m9_visible_shoulders_v1_review.json")
+
+    metrics = review["runtime_roster_metrics"]
+    assert metrics["captured_character_count"] == 5
+    assert metrics["characters_with_visible_shoulder_silhouette"] == 5
+    assert metrics["minimum_sleeve_vertex_count"] >= 550
+    assert metrics["maximum_shoulder_anchor_error_cm"] <= 0.25
+    roster_report = REPO_ROOT / metrics["report"]
+    assert _sha256(roster_report) == metrics["report_sha256"]
+
+    for item in review["renderer_evidence"]["captures"].values():
+        capture = REPO_ROOT / item["capture"]
+        assert _sha256(capture) == item["capture_sha256"]
+
+    for source_relpath, expected_hash in review["implementation_sha256"].items():
+        assert _sha256(REPO_ROOT / source_relpath) == expected_hash
+
+    m5 = review["validation"]["m5"]
+    m5_report = REPO_ROOT / m5["report"]
+    assert _sha256(m5_report) == m5["report_sha256"]
+    m5_payload = json.loads(m5_report.read_text(encoding="utf-8-sig"))
+    assert m5_payload["succeeded"] == 1
+    assert m5_payload["failed"] == 0
+    assert m5_payload["tests"][0]["state"] == "Success"
