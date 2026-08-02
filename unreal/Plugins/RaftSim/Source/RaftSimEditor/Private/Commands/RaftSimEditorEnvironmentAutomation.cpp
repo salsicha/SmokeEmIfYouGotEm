@@ -558,6 +558,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.ColorScaleBehindWater.R,
             WaterSettings.ColorScaleBehindWater.G,
             WaterSettings.ColorScaleBehindWater.B);
+        const FString WaterNormalProjectionManifestJson = bUsesZambeziSingleLayerWater
+            ? TEXT(
+                  "      \"water_normal_primary_uv_tiling\": [2.400000, 6.200000],\n"
+                  "      \"water_normal_secondary_uv_tiling\": [4.100000, 10.300000],\n"
+                  "      \"water_normal_secondary_coordinate_policy\": \"uv_axes_swapped_for_cross_current_breakup\",\n")
+            : TEXT(
+                  "      \"water_normal_primary_uv_tiling\": [0.730000, 2.150000],\n"
+                  "      \"water_normal_secondary_uv_tiling\": [1.110000, 3.300000],\n"
+                  "      \"water_normal_secondary_coordinate_policy\": \"shared_uv_axes\",\n");
         const FString DressingSourceSpeciesJson = bUsesOpaqueVolumetricVegetation
             ? TEXT("[]")
             : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
@@ -772,6 +781,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_surface_variation_strength\": %.6f,\n")
             TEXT("      \"water_normal_atlas_sampling_policy\": \"half_period_dual_sample_crossfade_prevents_frac_tile_boundaries\",\n")
             TEXT("      \"water_normal_atlas_phase_offset\": 0.500000,\n")
+            TEXT("%s")
             TEXT("%s")
             TEXT("      \"water_render_width_scale\": %.6f,\n")
             TEXT("      \"water_render_normal_up_blend\": %.6f,\n")
@@ -1120,6 +1130,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             bUsesSingleLayerWater ? WaterSettings.Opacity : 1.0f,
             WaterSettings.NormalIntensity,
             WaterSettings.SurfaceVariationStrength,
+            *WaterNormalProjectionManifestJson,
             *WaterSingleLayerParametersJson,
             WaterSettings.RenderWidthScale,
             WaterSettings.RenderNormalUpBlend,

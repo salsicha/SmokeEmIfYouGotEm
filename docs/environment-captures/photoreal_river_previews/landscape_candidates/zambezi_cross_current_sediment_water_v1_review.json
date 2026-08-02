@@ -1,0 +1,155 @@
+{
+  "schema": "raftsim.zambezi.cross_current_sediment_water_review.v1",
+  "status": "retained_technical_surface_breakup_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_hydraulic_navigation_collision_bathymetry_or_raft_force_authority",
+  "acceptance": {
+    "runnable_river": "pass",
+    "saved_material_graph": "pass",
+    "local_cross_current_breakup": "pass_incremental",
+    "pale_sky_sheet_brackets": "rejected",
+    "fixed_route_capture_fidelity": "fail_nearly_black_single_layer_water",
+    "photoreal_visual_promotion": "fail",
+    "production_hydraulic_promotion": "fail"
+  },
+  "runnable_contract": {
+    "river_id": "zambezi_batoka_gorge",
+    "scenario_id": "zambezi_reference_run",
+    "portfolio_role": "runnable_river",
+    "fidelity_tier": "reference_free_run",
+    "map_package": "/Game/RaftSim/Maps/L_Zambezi"
+  },
+  "retained_material_contract": {
+    "material_parent": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate",
+    "shading_model": "SingleLayerWater",
+    "moving_normal_panner_count": 2,
+    "normal_primary_uv_tiling": [2.4, 6.2],
+    "normal_secondary_uv_tiling": [4.1, 10.3],
+    "normal_secondary_coordinate_policy": "uv_axes_swapped_for_cross_current_breakup",
+    "base_color_scale": 0.78,
+    "surface_tint": [0.028, 0.078, 0.032],
+    "vertex_tint_weight": 0.50,
+    "opacity": 0.48,
+    "roughness": 0.50,
+    "specular": 0.26,
+    "normal_intensity": 0.10,
+    "surface_variation_strength": 0.10,
+    "reflection_fill_intensity": 0.02,
+    "emissive_fill_scale": 0.0,
+    "phase_g": 0.08,
+    "scattering_coefficients_per_cm": [0.00025, 0.00090, 0.00035],
+    "absorption_coefficients_per_cm": [0.015, 0.005, 0.018],
+    "color_scale_behind_water": [0.12, 0.22, 0.10],
+    "render_width_scale": 1.24,
+    "render_normal_up_blend": 0.90,
+    "render_displacement_scale": 0.06,
+    "solver_field_enable": 0.0,
+    "collision_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "rejected_brackets": [
+    {
+      "name": "bright_reflection_emissive_volume_bracket",
+      "known_settings": {
+        "reflection_fill_intensity": 0.12,
+        "emissive_fill_scale": 0.018,
+        "roughness": 0.34
+      },
+      "decision": "reject",
+      "reason": "The fixed route surface became visible, but the gameplay viewport read as a pale, opaque sky sheet."
+    },
+    {
+      "name": "reduced_reflection_diagnostics",
+      "known_settings": {
+        "reflection_fill_intensity_brackets": [0.05, 0.02],
+        "roughness_final_diagnostic": 0.50
+      },
+      "decision": "reject",
+      "reason": "The altered optical vectors still produced a pale gameplay surface; the prior sediment scattering, absorption, reflection tint, and zero-emissive response were restored."
+    }
+  ],
+  "evidence": {
+    "baseline_gameplay_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_talus_gameplay_v1.png",
+      "sha256": "48e82966116eb444601e22360e44176c9b7656b555c79f548a4c0126456c11bb"
+    },
+    "retained_gameplay_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_cross_current_sediment_water_v1.png",
+      "sha256": "a6e2cd9715608c25b90c800da3b1c75062e3108f8300c2c07fb1a3c1c3b3a2dd",
+      "resolution_px": [1280, 720]
+    },
+    "fixed_guide_seat_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_guide_seat_downstream.png",
+      "sha256": "4004f85e0b69b7e62a2a5ed7545a8d112aafb859f2e3632dc00412ebc8e43f04",
+      "decision": "retained_generation_evidence_not_visual_acceptance"
+    },
+    "fixed_river_eye_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_river_eye_downstream.png",
+      "sha256": "22913682b38b5276150004f7fa3462298a5c1e8d93e1161761f29f6a83f06eea",
+      "decision": "retained_generation_evidence_not_visual_acceptance"
+    },
+    "saved_map": {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "e5913005039ab6a806fab4964202c46bc55972106be3319cd9aa12ba66e2bcfa"
+    },
+    "material_parent": {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater.uasset",
+      "sha256": "22b1bcc0f108fde787c80eea246ceded9edb088be0edecc3158296b963c840d0"
+    },
+    "material_instance": {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate.uasset",
+      "sha256": "ebad3e63764e5b663cfe20bc8dd0dbf74acc60f71379287ef28ba335ca43d006"
+    },
+    "generated_candidate_manifest": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_zambezi_batoka_gorge.json",
+      "sha256": "53b78bab6cad82dc3003aa5e92db3eb24fe6428942c2687b158362a098b98391"
+    },
+    "saved_map_validation": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "61cc2c2ad06eb85acefcde1b801d6eb8b0dbca8f4b11ddfb9e1427555845da21",
+      "result": "schema_v15_passed"
+    }
+  },
+  "automated_acceptance": {
+    "editor_build": "passed_SmokeEmIfYouGotEmEditor_Mac_Development",
+    "generator_map_check": "passed_0_errors_0_warnings",
+    "native_material_graph": {
+      "test": "RaftSim.M9.FZambeziSingleLayerWater",
+      "report": "unreal/Saved/Automation/ZambeziCrossCurrentWaterMaterial/index.json",
+      "sha256": "8287d78b021ab5c6145b9bd1234143776b1eb75bb853520cb646217808ddec46",
+      "result": "1_passed_0_failed_0_warnings"
+    },
+    "native_runnable_map": {
+      "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "report": "unreal/Saved/Automation/ZambeziCrossCurrentWaterMapLoad/index.json",
+      "sha256": "25e8be0f392c17bee8536f54ce8a29833afa70fd2e299581294d6c9437eaaa78",
+      "result": "success_0_errors_2_known_environment_warnings"
+    },
+    "native_water_surface": {
+      "test": "RaftSim.P2.WaterSurfaceRenders",
+      "report": "unreal/Saved/Automation/ZambeziCrossCurrentWaterP2/index.json",
+      "sha256": "6319871ce7f86a595834bc23bbdfb3eab7347166a47c77f0841d686d719a3955",
+      "result": "success_0_errors_1_known_engine_warning"
+    },
+    "python_zambezi_reference_map": "6_passed"
+  },
+  "visual_findings": [
+    "The retained gameplay view preserves the medium green sediment response and avoids the rejected pale reflection sheet.",
+    "The secondary axis swap introduces smaller local crossing variation, but long streamwise grooves remain visible across much of the foreground.",
+    "The water is still broad, smooth, and analytical, with sparse white patches and no credible holes, rollers, aeration, spray, mist, or rock-water contact.",
+    "The 30 m terrain, low-detail banks, repeated sparse ecology, lighting, raft, and crew remain visibly synthetic.",
+    "The fixed offscreen guide-seat and river-eye captures render the Single Layer Water nearly black; that capture-path defect is explicit and prevents those frames from supporting visual promotion."
+  ],
+  "external_gates_remaining": [
+    "qualified Zambezi guide approval of rapid stations, lines, portages, access, rescue routes, and seasonal behavior",
+    "geospatial approval of the centerline and horizontal and vertical datums",
+    "rights approval for the supplied map PDF, heightmap, reference media, and production derivatives",
+    "higher-resolution full-reach terrain plus reviewed channel or bathymetric geometry",
+    "seasonal-flow calibration and measured or guide-reviewed rapid-scale hydraulic validation",
+    "reviewed southern African gorge geology, species, and ecology",
+    "named water-VFX and environment-art approval of terrain, shorelines, breaking geometry, foam, spray, mist, atmosphere, raft, and crew",
+    "full-run hazard-readability, desktop, and VR visual and performance acceptance"
+  ]
+}

@@ -1,9 +1,11 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
 #include "Misc/AutomationTest.h"
 
@@ -282,17 +284,41 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
         Parent->BlendMode, BLEND_Opaque);
 
     int32 PannerCount = 0;
+    int32 CrossCurrentCoordinateSwapCount = 0;
+    int32 ShortWavelengthNormalCoordinateCount = 0;
     int32 WaterOutputCount = 0;
     for (const TObjectPtr<UMaterialExpression>& Expression :
          Parent->GetExpressionCollection().Expressions)
     {
         PannerCount += Cast<UMaterialExpressionPanner>(Expression.Get()) ? 1 : 0;
+        CrossCurrentCoordinateSwapCount +=
+            Cast<UMaterialExpressionAppendVector>(Expression.Get()) ? 1 : 0;
+        if (const UMaterialExpressionTextureCoordinate* TextureCoordinate =
+                Cast<UMaterialExpressionTextureCoordinate>(Expression.Get()))
+        {
+            const bool bFirstLayer =
+                FMath::IsNearlyEqual(TextureCoordinate->UTiling, 2.40f) &&
+                FMath::IsNearlyEqual(TextureCoordinate->VTiling, 6.20f);
+            const bool bSecondLayer =
+                FMath::IsNearlyEqual(TextureCoordinate->UTiling, 4.10f) &&
+                FMath::IsNearlyEqual(TextureCoordinate->VTiling, 10.30f);
+            ShortWavelengthNormalCoordinateCount +=
+                bFirstLayer || bSecondLayer ? 1 : 0;
+        }
         WaterOutputCount +=
             Cast<UMaterialExpressionSingleLayerWaterMaterialOutput>(Expression.Get())
             ? 1
             : 0;
     }
     TestEqual(TEXT("Two opposed normal layers move independently"), PannerCount, 2);
+    TestEqual(
+        TEXT("One normal layer swaps axes for cross-current breakup"),
+        CrossCurrentCoordinateSwapCount,
+        1);
+    TestEqual(
+        TEXT("Two short-wavelength normal coordinates replace long comb grooves"),
+        ShortWavelengthNormalCoordinateCount,
+        2);
     TestEqual(TEXT("One physical water-volume output is bound"), WaterOutputCount, 1);
 
     auto TestScalarParameter = [this, Instance](
@@ -331,13 +357,13 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
     TestScalarParameter(TEXT("Opacity"), TEXT("Opacity"), 0.48f);
     TestScalarParameter(TEXT("Roughness"), TEXT("Roughness"), 0.50f);
     TestScalarParameter(TEXT("Specular"), TEXT("Specular"), 0.26f);
-    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.04f);
+    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.10f);
     TestScalarParameter(
         TEXT("Reflection fill"), TEXT("ReflectionFillIntensity"), 0.02f);
     TestScalarParameter(
         TEXT("Emissive fill"), TEXT("EmissiveFillScale"), 0.0f);
     TestScalarParameter(
-        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.04f);
+        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.10f);
     TestVectorParameter(
         TEXT("Sediment surface tint"),
         TEXT("SurfaceTint"),

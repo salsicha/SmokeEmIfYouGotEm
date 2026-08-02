@@ -236,6 +236,24 @@ The retained frame and machine-readable comparison are
 capture directory. They are gameplay-viewport evidence for the runnable
 `reference_free_run`, not approval of real-world hydraulics or photoreal art.
 
+An August 2 cross-current breakup pass supersedes only the parent's normal
+projection and bounded calm-surface response. The primary normal uses 2.4 x
+6.2 UV tiling; the secondary uses 4.1 x 10.3 and swaps its UV axes before its
+opposed panner. Normal intensity and optical variation are 0.10, the mesh-normal
+up blend is 0.90, and calm render displacement is 0.06. The accepted sediment
+volume vectors, 0.50 roughness, 0.26 specular, 0.48 opacity, 0.02 reflection
+fill, and zero emissive fill remain unchanged. Brighter reflection/emissive
+brackets were rejected because the gameplay viewport became a pale sky sheet.
+The retained frame shows smaller local interference across the flow, but still
+has a broad smooth analytical surface, residual streamwise grooves, sparse
+foam, and no credible holes, rollers, aeration, spray, mist, or rock-contact
+water. The fixed offscreen guide-seat and river-eye route captures also crush
+this Single Layer Water surface nearly black; they are retained as a documented
+capture-path defect and are not used to claim visual acceptance. The retained
+gameplay evidence and hash-locked rejection record are
+`zambezi_cross_current_sediment_water_v1.png` and
+`zambezi_cross_current_sediment_water_v1_review.json`.
+
 An August 1 organic-basalt material pass now conditions the same four
 render-only V15 terrain tiles. It keeps the reviewed 50 m world-aligned macro
 source, blends a second incommensurate 83 m projection through deterministic

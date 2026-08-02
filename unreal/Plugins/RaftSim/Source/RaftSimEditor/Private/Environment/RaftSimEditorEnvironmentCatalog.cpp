@@ -145,22 +145,24 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
         // Batoka uses its own Single Layer Water parent. The retained bracket
-        // balances sediment absorption against a restrained grazing reflection
-        // instead of exposing the pale sky sheet seen at low roughness. Reduce
-        // analytic displacement separately so long flow-aligned grooves do
-        // not masquerade as metre-scale standing waves at the calm launch.
+        // preserves the renderer-reviewed sediment optics after the brighter
+        // reflection bracket produced a pale sky sheet in gameplay. The
+        // isolated parent now owns shorter opposed normal wavelengths, so a
+        // modest normal/variation increase can add local breakup without
+        // restoring the rejected river-length grooves. Analytic geometry
+        // remains nearly flat at the calm launch.
         Settings.BaseColorScale = 0.78f;
         Settings.EmissiveFillScale = 0.0f;
         Settings.Roughness = 0.50f;
         Settings.Specular = 0.26f;
         Settings.Opacity = 0.48f;
-        Settings.NormalIntensity = 0.04f;
-        Settings.SurfaceVariationStrength = 0.04f;
+        Settings.NormalIntensity = 0.10f;
+        Settings.SurfaceVariationStrength = 0.10f;
         Settings.PhaseG = 0.08f;
         Settings.VertexTintWeight = 0.50f;
         Settings.RenderWidthScale = 1.24f;
-        Settings.RenderNormalUpBlend = 0.92f;
-        Settings.RenderDisplacementScale = 0.08f;
+        Settings.RenderNormalUpBlend = 0.90f;
+        Settings.RenderDisplacementScale = 0.06f;
         Settings.ReflectionFillIntensity = 0.02f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
