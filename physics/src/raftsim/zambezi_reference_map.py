@@ -1045,10 +1045,7 @@ def build_scenario(repo_root: Path, digitization: dict[str, Any]) -> dict[str, A
             "production_hydraulics_and_reviews_pending"
         ),
         "production_promoted": False,
-        "unreal_map_package": (
-            "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-            "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
-        ),
+        "unreal_map_package": "/Game/RaftSim/Maps/L_Zambezi",
         "run_length_m": digitization["method"]["run_length_m"],
         "terrain": {
             "collision_and_height_query_authority": CORRIDOR_MANIFEST_RELATIVE.as_posix(),

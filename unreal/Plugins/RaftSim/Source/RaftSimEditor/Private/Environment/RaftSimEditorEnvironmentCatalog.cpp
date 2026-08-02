@@ -1346,7 +1346,7 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.ScenarioRelativePath =
                 TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate");
+                TEXT("/Game/RaftSim/Maps/L_Zambezi");
             Candidate.LandscapeSize = 2017;
             Candidate.HorizontalSpanXCm = 2025477.591f;
             Candidate.HorizontalSpanYCm = 1252708.111f;

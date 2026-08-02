@@ -553,7 +553,7 @@
     },
     {
       "river_id": "zambezi_batoka_gorge",
-      "map_package_token": "L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "map_package_token": "L_Zambezi",
       "river_id_present": true,
       "map_package_present": true
     },

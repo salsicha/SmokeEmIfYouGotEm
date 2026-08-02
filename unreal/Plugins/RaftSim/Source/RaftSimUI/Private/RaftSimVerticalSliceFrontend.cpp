@@ -97,8 +97,7 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
                  "past all 25 mapped rapids. Water and missing bathymetry are procedural "
                  "pending guide and rapid-specific hydraulic review; Rapid 9 is a mandatory "
                  "portage."),
-            TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-                 "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
+            TEXT("/Game/RaftSim/Maps/L_Zambezi"),
             ERaftSimLicenseTier::ExpeditionGuide, 15, 0.0f, 27358.848f)
     };
 }

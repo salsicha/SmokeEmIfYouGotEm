@@ -32,6 +32,13 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Promoted the complete Zambezi Batoka Gorge reference run from an ignored
+  `EnvironmentPreviews` candidate package to the stable, versioned
+  `/Game/RaftSim/Maps/L_Zambezi` runnable-map contract. The frontend, generated
+  selection model, scenario, shipping cook list, packaging fallback, runtime
+  map-load gate, and documentation now resolve the same package. This changes
+  delivery, not authority: the 25-rapid route remains a runnable reference Free
+  Run with procedural water/bathymetry and open production-fidelity gates.
 - Restored Colorado Hance as a physical reach-local runnable map instead of a
   flat rapid shell or mismatched Lees Ferry preview. The 600×320 m Landscape
   preserves the complete interpreted 600×78 m cooked-field bed, procedurally

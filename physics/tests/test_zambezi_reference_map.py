@@ -296,10 +296,10 @@ def test_zambezi_runtime_coordinate_map_and_procedural_water_are_runnable():
 
 
 def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contracts():
-    map_package = (
-        "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-        "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
-    )
+    map_package = "/Game/RaftSim/Maps/L_Zambezi"
+    promoted_map = REPO_ROOT / "unreal/Content/RaftSim/Maps/L_Zambezi.umap"
+    assert promoted_map.is_file()
+    assert promoted_map.stat().st_size > 1_000_000
     default_game = (REPO_ROOT / "unreal/Config/DefaultGame.ini").read_text(
         encoding="utf-8"
     )
@@ -313,7 +313,7 @@ def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contract
     assert 'TEXT("zambezi_reference_run")' in frontend_source
     assert 'TEXT("Zambezi: Boiling Pot to Mukuni Beach")' in frontend_source
     assert 'TEXT("Runnable Reference Free Run:' in frontend_source
-    assert '"L_ZambeziBatokaGorge_PhysicalCorridorCandidate")' in frontend_source
+    assert 'TEXT("/Game/RaftSim/Maps/L_Zambezi")' in frontend_source
 
     module_header = (
         REPO_ROOT
@@ -334,7 +334,7 @@ def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contract
 
     for relative in ("unreal/Scripts/package_mac.sh", "unreal/Scripts/package_win.ps1"):
         packaging_script = (REPO_ROOT / relative).read_text(encoding="utf-8")
-        assert "L_ZambeziBatokaGorge_PhysicalCorridorCandidate.umap" in packaging_script
+        assert "L_Zambezi.umap" in packaging_script
         assert "RaftSimCreateLandscapeImportCandidateMaps" in packaging_script
         assert "RaftSimLandscapeImportCandidateRiverId=zambezi_batoka_gorge" in (
             packaging_script

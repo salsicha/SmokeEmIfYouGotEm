@@ -1,5 +1,10 @@
 # Zambezi reference map and scenario
 
+> Runtime status, August 1, 2026: the complete reference Free Run is one of the
+> six runnable rivers and is versioned at `/Game/RaftSim/Maps/L_Zambezi`.
+> Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
+> acceptance remain open.
+
 The Zambezi map build now combines three evidence layers without pretending they
 have equal authority:
 
@@ -29,7 +34,7 @@ scenario is
 The OBJ uses metres with local X east, Y south, and Z up; elevation 659 m is its
 local zero and Unreal import scale is 100 cm per unit.
 
-The Unreal candidate is generated with:
+The Unreal runnable map is regenerated with:
 
 ```bash
 "/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd" \
@@ -40,13 +45,11 @@ The Unreal candidate is generated with:
   -RaftSimExitAfterEnvironmentAutomation
 ```
 
-This saves the locally generated, git-ignored map at
-`/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate`.
-The logical package is in `DefaultGame.ini`'s shipping cook list. Because the
-1.6 GB candidate remains reproducible and intentionally excluded from Git LFS,
-the Mac and Windows packaging scripts build the editor and regenerate this one
-river automatically when the map is absent, then fail closed if the package was
-not created before cooking.
+This saves the stable runtime package at `/Game/RaftSim/Maps/L_Zambezi`. The
+package is versioned and listed in `DefaultGame.ini`'s shipping cook list, so a
+fresh checkout contains a directly runnable Zambezi map. The Mac and Windows
+packaging scripts retain a deterministic fail-closed regeneration fallback if
+the package is missing before cooking.
 The map contains 25 editor-only rapid marker actors, a player raft and start,
 the vertical-slice game mode, and a live-water runtime configuration. Rapid 9
 is tagged as a mandatory commercial portage. Gameplay hides the labels; the
@@ -253,7 +256,7 @@ instead of falling 0.58 m from above the water. Runtime buoyancy now integrates
 the 220 kg dry raft and the 385 kg guide/passenger load as one 605 kg body while
 D2 retains those same occupant masses for local tube compression.
 
-`RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`
+`RaftSim.P4.RiverMapLoads.L_Zambezi`
 requires the raft to remain upright through the initial settle and after an
 `AllForward` command, retain all five attached crew actors, and report zero
 swimmers. The focused test passes, and the complete parameterized
@@ -310,7 +313,7 @@ requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.
 The focused runtime gate is
-`RaftSim.P4.RiverMapLoads.L_ZambeziBatokaGorge_PhysicalCorridorCandidate`; it
+`RaftSim.P4.RiverMapLoads.L_Zambezi`; it
 now fails unless the loaded map produces live breaking sites and production
 Niagara roller and aerosol activity, stays upright before and after the first
 crew command, retains five attached crew avatars, and has zero swimmers.

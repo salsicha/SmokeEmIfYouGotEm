@@ -3701,3 +3701,14 @@ path is verified, and the completion goal can be marked complete.
   sparse ground cover, review-gated route/stationing, unconverged hydraulics,
   and open guide/geospatial/ecology/art/water-VFX/performance gates reject
   photoreal and production promotion; M9 remains open.
+- Zambezi stable runnable delivery V1 promotes the already-validated complete
+  Batoka Gorge reference run from the ignored `EnvironmentPreviews` namespace
+  to the versioned `/Game/RaftSim/Maps/L_Zambezi` package. The editor generator,
+  frontend scenario, generated player-selection source/model, scenario JSON,
+  cook list, packaging fallback, runtime map-load gate, and docs now share that
+  package. The map retains all 25 rapid markers, the Rapid 9 portage policy,
+  safe five-person launch, full-corridor procedural live water, and current
+  terrain/ecology/water presentation. This closes fresh-checkout delivery only;
+  it does not promote inferred bathymetry, procedural rapid hydraulics, coarse
+  terrain, synthetic ecology, or photoreal art, and all named external gates
+  remain open.

@@ -51,6 +51,12 @@ These are review candidates under `unreal/Content/RaftSim/Maps/EnvironmentPrevie
 - small review evidence, manifests, hashes, source records, generator code, and accepted report locks;
 - generated binary assets only when their exact bytes are an accepted release or validation dependency and regeneration is not sufficiently deterministic.
 
+`/Game/RaftSim/Maps/L_Zambezi` is the bounded exception for Batoka Gorge: it is
+a promoted runnable and shipping-cook dependency, not an unpromoted
+`EnvironmentPreviews` candidate. Its source-controlled generator remains the
+recovery path, but the stable runtime package is versioned so a fresh checkout
+can launch every advertised runnable river without first authoring a map.
+
 ### Regenerate locally
 
 - unpromoted `EnvironmentPreviews/LandscapeCandidates` maps;

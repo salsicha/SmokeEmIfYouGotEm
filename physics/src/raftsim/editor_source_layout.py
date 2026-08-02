@@ -14,7 +14,7 @@ RIVER_BUILD_TARGETS = (
     ("american_south_fork", "L_SouthForkAmerican_PhysicalCorridorCandidate"),
     ("colorado_river", "L_Hance"),
     ("pacuare", "L_UpperHuacas"),
-    ("zambezi_batoka_gorge", "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
+    ("zambezi_batoka_gorge", "L_Zambezi"),
     ("futaleufu_terminator", "L_Terminator"),
     ("chilko_river_lava_canyon", "L_LavaCanyon"),
 )

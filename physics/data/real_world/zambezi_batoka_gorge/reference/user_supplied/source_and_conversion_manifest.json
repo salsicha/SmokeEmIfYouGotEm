@@ -46,7 +46,7 @@
     },
     "scenario": {
       "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
-      "sha256": "ed208ef6c013b8bc5ddb0c92a7807f80fa52606bf8b057648450d5498c41ba39"
+      "sha256": "ffa3d6b8f4f1c8d6c098c348af904676df694ab8e3875b8d9a45cee35ad9cab9"
     }
   },
   "height_conversion": {

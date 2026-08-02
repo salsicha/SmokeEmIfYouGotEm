@@ -5515,8 +5515,7 @@ def build_player_selection_model() -> dict[str, object]:
                             "scenario_zambezi_run/scenario.json"
                         ),
                         "map_package": (
-                            "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-                            "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+                            "/Game/RaftSim/Maps/L_Zambezi"
                         ),
                         "difficulty_range": ["class_iii_reference", "class_v_reference"],
                         "seasons": ["normal_big_water_reference"],

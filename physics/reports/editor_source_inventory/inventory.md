@@ -127,7 +127,7 @@ Registered console commands: **37**.
 | `american_south_fork` | `L_SouthForkAmerican_PhysicalCorridorCandidate` | yes |
 | `colorado_river` | `L_Hance` | yes |
 | `pacuare` | `L_UpperHuacas` | yes |
-| `zambezi_batoka_gorge` | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | yes |
+| `zambezi_batoka_gorge` | `L_Zambezi` | yes |
 | `futaleufu_terminator` | `L_Terminator` | yes |
 | `chilko_river_lava_canyon` | `L_LavaCanyon` | yes |
 

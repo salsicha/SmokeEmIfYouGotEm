@@ -13,7 +13,7 @@ if ($OutputDir -eq "") {
 }
 
 $Project = Join-Path $RepoRoot "unreal\SmokeEmIfYouGotEm.uproject"
-$ZambeziMap = Join-Path $RepoRoot "unreal\Content\RaftSim\Maps\EnvironmentPreviews\LandscapeCandidates\L_ZambeziBatokaGorge_PhysicalCorridorCandidate.umap"
+$ZambeziMap = Join-Path $RepoRoot "unreal\Content\RaftSim\Maps\L_Zambezi.umap"
 if (-not (Test-Path $ZambeziMap)) {
     & "$UeRoot\Engine\Build\BatchFiles\Build.bat" `
         SmokeEmIfYouGotEmEditor Win64 Development $Project `

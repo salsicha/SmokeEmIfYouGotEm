@@ -10,8 +10,7 @@ import unreal
 
 
 MAP_PACKAGE = (
-    "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-    "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+    "/Game/RaftSim/Maps/L_Zambezi"
 )
 REPORT_RELATIVE = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
