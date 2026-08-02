@@ -481,5 +481,5 @@
     "user_reference_authority": "visual_comparison_only_not_collision_or_physics",
     "user_reference_morphology_mesh": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/zambezi_batoka_user_reference_morphology.obj"
   },
-  "unreal_map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+  "unreal_map_package": "/Game/RaftSim/Maps/L_Zambezi"
 }

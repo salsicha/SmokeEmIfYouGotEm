@@ -5,8 +5,9 @@ An open-source, photorealistic whitewater rafting simulator built with Unreal En
 **Status (August 2026): pre-release, in active development.** Six rivers are
 runnable in-engine. The 1.0 production campaign remains the **South Fork
 American, Chili Bar to Salmon Falls**, with all 20 named rapids at three real
-flow levels. The Zambezi now adds a source-scale Boiling Pot-to-Mukuni Beach
-reference run with all 25 mapped rapids; its missing bathymetry and
+flow levels. The versioned `L_Zambezi` map adds a source-scale Boiling
+Pot-to-Mukuni Beach reference run with all 25 mapped rapids; its missing
+bathymetry and
 rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
@@ -34,7 +35,7 @@ milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 | Pacuare | Upper Huacas | runnable reference signature-rapid Free Run |
 | Futaleufú | Terminator | signature-rapid Free Run |
 | Chilko | Lava Canyon | signature-rapid Free Run |
-| Zambezi, Batoka Gorge | Boiling Pot to Mukuni Beach, Rapids 1–25 | runnable reference Free Run |
+| Zambezi, Batoka Gorge | `L_Zambezi`: Boiling Pot to Mukuni Beach, Rapids 1–25 | runnable reference Free Run |
 
 ## What's in this repository
 

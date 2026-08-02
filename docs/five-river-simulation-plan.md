@@ -34,7 +34,7 @@ the full-corridor Zambezi reference run:
 | Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
-| Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | **reference runnable; production hydraulics gated** |
+| Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_Zambezi` | **versioned reference runnable; production hydraulics gated** |
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -194,3 +194,19 @@ and external acceptance gates pass.
   ground cover, non-authoritative route stationing, unconverged hydraulics, and
   open guide/geospatial/ecology/art/water-VFX/performance gates keep photoreal
   and production promotion rejected.
+
+### 2026-08-01 — Zambezi stable runnable package promoted
+
+- The complete source-scale Boiling Pot-to-Mukuni Beach reference run now
+  resolves through `/Game/RaftSim/Maps/L_Zambezi` in the generator, frontend,
+  generated player model, scenario, shipping cook, packaging fallback, and
+  runtime acceptance suite. The 1,722,040,058-byte Git LFS package is versioned,
+  so a fresh checkout can launch every advertised runnable river without first
+  generating an ignored preview map.
+- Unreal regeneration and saved-map audit pass with 0 MapCheck errors/warnings,
+  all 25 rapid markers, one runtime water config, four conditioned terrain
+  tiles, and 7,679 vegetation instances. Focused PIE passes 1/1 with a wet
+  finite solver window, eight breaking sites, visible masked rapid foam, an
+  upright five-person raft, and zero swimmers. This is runtime delivery
+  acceptance only; bathymetry, rapid-specific hydraulics, terrain/ecology art,
+  guide/geospatial review, and performance promotion remain open.

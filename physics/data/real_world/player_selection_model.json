@@ -115,7 +115,7 @@
                   "runnable": true
                 }
               ],
-              "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+              "map_package": "/Game/RaftSim/Maps/L_Zambezi",
               "raft_setups": [
                 "standard_14ft_paddle_raft"
               ],

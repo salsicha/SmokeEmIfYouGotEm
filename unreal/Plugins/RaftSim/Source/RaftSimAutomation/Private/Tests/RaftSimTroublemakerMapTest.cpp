@@ -34,8 +34,7 @@ const TCHAR* GRiverMapPaths[] = {
     TEXT("/Game/RaftSim/Maps/L_UpperHuacas"),
     TEXT("/Game/RaftSim/Maps/L_Terminator"),
     TEXT("/Game/RaftSim/Maps/L_LavaCanyon"),
-    TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-         "L_ZambeziBatokaGorge_PhysicalCorridorCandidate"),
+    TEXT("/Game/RaftSim/Maps/L_Zambezi"),
 };
 
 UWorld* GetRiverTestWorld()

@@ -15,7 +15,7 @@
   },
   "mandatory_portage_actor": "RaftSim_ZambeziRapid_9_Commercial_Suicide",
   "mandatory_portage_marker_count": 1,
-  "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
   "markers": [
     {
       "actor_label": "RaftSim_ZambeziRapid_10_Gnashing_Jaws_of_Death",

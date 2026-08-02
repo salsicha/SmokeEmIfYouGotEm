@@ -7,7 +7,7 @@ CONFIG="${1:-Development}"
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUTPUT_DIR="${2:-$REPO_ROOT/unreal/Packaged/Mac-$CONFIG}"
 UE_ROOT="/Users/Shared/Epic Games/UE_5.8"
-ZAMBEZI_MAP="$REPO_ROOT/unreal/Content/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate.umap"
+ZAMBEZI_MAP="$REPO_ROOT/unreal/Content/RaftSim/Maps/L_Zambezi.umap"
 
 if [[ ! -f "$ZAMBEZI_MAP" ]]; then
   "$UE_ROOT/Engine/Build/BatchFiles/Mac/Build.sh" \
