@@ -32,6 +32,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Clarified the working Zambezi launch contract in the player and design docs:
+  **Free Run → Zambezi: Boiling Pot to Mukuni Beach** is available without a
+  career-license unlock and resolves to the committed, cooked
+  `/Game/RaftSim/Maps/L_Zambezi` package. This reaffirms runnable reference
+  status without claiming production terrain, hydraulic, guide, art, rights,
+  or performance acceptance.
 - Replaced South Fork's washed-out Unlit Landscape review response and uniform
   green runnable ground plate with a shared, shade-only organic foothill graph.
   Three incommensurate world-space fields add dry grass, oak litter, granitic
