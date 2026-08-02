@@ -3,6 +3,7 @@
   "river_id": "pacuare",
   "milestone": "pacuare_default_lit_depth_composition_rejection_and_shoreline_gap_demotion_v1",
   "status": "accepted_technical_visual_correction_photoreal_promotion_rejected",
+  "capture_hash_lock_status": "superseded_by_pacuare_opaque_rainforest_vegetation_v1_review",
   "supersedes_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_rainforest_single_layer_water_v1_review.json",
   "decision": {
     "active_parent": "/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater",

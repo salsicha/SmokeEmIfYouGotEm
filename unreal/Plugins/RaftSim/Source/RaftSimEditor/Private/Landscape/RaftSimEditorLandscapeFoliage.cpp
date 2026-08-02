@@ -14,6 +14,11 @@ constexpr TCHAR TemperateVegetationMaterialPath[] = TEXT(
     "M_RaftSim_Temperate_OpaqueVegetation");
 constexpr TCHAR TemperateVegetationMeshRoot[] = TEXT(
     "/Game/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/");
+constexpr TCHAR PacuareRainforestVegetationMaterialPath[] = TEXT(
+    "/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/"
+    "M_RaftSim_Pacuare_OpaqueRainforestVegetation");
+constexpr TCHAR PacuareRainforestVegetationMeshRoot[] = TEXT(
+    "/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/");
 constexpr TCHAR HanceDrylandVegetationMaterialPath[] = TEXT(
     "/Game/RaftSim/Environment/ColoradoRun/Vegetation/Materials/"
     "M_RaftSim_Hance_OpaqueDrylandVegetation");
@@ -332,7 +337,7 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
     bool bHanceDrylandPalette,
     FString& OutSummary)
 {
-    if (!World || !AssetToken || !Material)
+    if (!World || !AssetToken || !Material || !MeshRoot || !ProfileLabel)
     {
         return nullptr;
     }
@@ -817,6 +822,9 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     ETemperateVegetationForm Form,
     int32 Seed,
     UMaterialInterface* Material,
+    const TCHAR* MeshRoot,
+    const TCHAR* ProfileLabel,
+    bool bRainforestPalette,
     FString& OutSummary)
 {
     if (!World || !AssetToken || !Material)
@@ -832,12 +840,24 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     // These are linear-space radiance values under a 4.75-5.05 lux review
     // sun. The former preview-green values clipped into pale mint balloons
     // once solid lobes stopped casting their invalid card-like shadows.
-    const FLinearColor BarkBase(0.060f, 0.040f, 0.025f, 1.0f);
-    const FLinearColor BarkTip(0.082f, 0.058f, 0.035f, 1.0f);
-    const FLinearColor BroadleafGreen(0.025f, 0.075f, 0.038f, 1.0f);
-    const FLinearColor ConiferGreen(0.018f, 0.055f, 0.035f, 1.0f);
-    const FLinearColor ShrubGreen(0.035f, 0.090f, 0.042f, 1.0f);
-    const FLinearColor GroundGreen(0.040f, 0.100f, 0.045f, 1.0f);
+    const FLinearColor BarkBase = bRainforestPalette
+        ? FLinearColor(0.038f, 0.029f, 0.019f, 1.0f)
+        : FLinearColor(0.060f, 0.040f, 0.025f, 1.0f);
+    const FLinearColor BarkTip = bRainforestPalette
+        ? FLinearColor(0.060f, 0.048f, 0.029f, 1.0f)
+        : FLinearColor(0.082f, 0.058f, 0.035f, 1.0f);
+    const FLinearColor BroadleafGreen = bRainforestPalette
+        ? FLinearColor(0.020f, 0.082f, 0.030f, 1.0f)
+        : FLinearColor(0.025f, 0.075f, 0.038f, 1.0f);
+    const FLinearColor ConiferGreen = bRainforestPalette
+        ? FLinearColor(0.026f, 0.096f, 0.038f, 1.0f)
+        : FLinearColor(0.018f, 0.055f, 0.035f, 1.0f);
+    const FLinearColor ShrubGreen = bRainforestPalette
+        ? FLinearColor(0.030f, 0.110f, 0.040f, 1.0f)
+        : FLinearColor(0.035f, 0.090f, 0.042f, 1.0f);
+    const FLinearColor GroundGreen = bRainforestPalette
+        ? FLinearColor(0.038f, 0.125f, 0.044f, 1.0f)
+        : FLinearColor(0.040f, 0.100f, 0.045f, 1.0f);
 
     if (Form == ETemperateVegetationForm::GroundCover)
     {
@@ -851,7 +871,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
             Normals,
             Uvs,
             Colors);
-        constexpr int32 BladeCount = 58;
+        const int32 BladeCount = bRainforestPalette ? 72 : 58;
         for (int32 BladeIndex = 0; BladeIndex < BladeCount; ++BladeIndex)
         {
             const int32 RandomIndex = Seed + BladeIndex;
@@ -868,8 +888,12 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                 96.0f,
                 ZambeziVegetationUnitRandom(RandomIndex, 5119));
             const FLinearColor BladeColor = FMath::Lerp(
-                FLinearColor(0.105f, 0.245f, 0.085f, 1.0f),
-                FLinearColor(0.19f, 0.25f, 0.095f, 1.0f),
+                bRainforestPalette
+                    ? FLinearColor(0.028f, 0.105f, 0.034f, 1.0f)
+                    : FLinearColor(0.105f, 0.245f, 0.085f, 1.0f),
+                bRainforestPalette
+                    ? FLinearColor(0.050f, 0.135f, 0.042f, 1.0f)
+                    : FLinearColor(0.19f, 0.25f, 0.095f, 1.0f),
                 ZambeziVegetationUnitRandom(RandomIndex, 5147));
             AppendZambeziColoredSegment(
                 Direction * Radius,
@@ -885,7 +909,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                 Uvs,
                 Colors);
         }
-        constexpr int32 ForbCount = 18;
+        const int32 ForbCount = bRainforestPalette ? 26 : 18;
         for (int32 ForbIndex = 0; ForbIndex < ForbCount; ++ForbIndex)
         {
             const float Angle = UE_TWO_PI *
@@ -912,7 +936,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     }
     else if (Form == ETemperateVegetationForm::RiparianShrub)
     {
-        constexpr int32 StemCount = 16;
+        const int32 StemCount = bRainforestPalette ? 20 : 16;
         for (int32 StemIndex = 0; StemIndex < StemCount; ++StemIndex)
         {
             const float Angle = UE_TWO_PI * static_cast<float>(StemIndex) /
@@ -964,7 +988,8 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                 Colors);
         }
     }
-    else if (Form == ETemperateVegetationForm::ConiferTree)
+    else if (Form == ETemperateVegetationForm::ConiferTree &&
+             !bRainforestPalette)
     {
         constexpr float TreeHeightCm = 930.0f;
         AppendZambeziColoredSegment(
@@ -1058,8 +1083,12 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     }
     else
     {
-        const FVector LowerTrunkEnd(-12.0f, 10.0f, 410.0f);
-        const FVector UpperTrunkEnd(18.0f, -14.0f, 650.0f);
+        const bool bRainforestCanopyB =
+            bRainforestPalette && Form == ETemperateVegetationForm::ConiferTree;
+        const float LowerTrunkHeight = bRainforestCanopyB ? 470.0f : 410.0f;
+        const float UpperTrunkHeight = bRainforestCanopyB ? 770.0f : 650.0f;
+        const FVector LowerTrunkEnd(-12.0f, 10.0f, LowerTrunkHeight);
+        const FVector UpperTrunkEnd(18.0f, -14.0f, UpperTrunkHeight);
         AppendZambeziColoredSegment(
             FVector::ZeroVector,
             LowerTrunkEnd,
@@ -1086,7 +1115,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
             Normals,
             Uvs,
             Colors);
-        constexpr int32 BranchCount = 13;
+        const int32 BranchCount = bRainforestPalette ? 17 : 13;
         for (int32 BranchIndex = 0; BranchIndex < BranchCount; ++BranchIndex)
         {
             const float Angle = FMath::Fmod(
@@ -1094,9 +1123,27 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                 360.0f) * PI / 180.0f;
             const FVector Direction(
                 FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
-            const float Radius = 225.0f + 35.0f * (BranchIndex % 5);
-            const float StartZ = 390.0f + 27.0f * (BranchIndex % 6);
-            const float EndZ = 605.0f + 46.0f * (BranchIndex % 5);
+            const float Radius = bRainforestPalette
+                ? FMath::Lerp(
+                      bRainforestCanopyB ? 145.0f : 185.0f,
+                      bRainforestCanopyB ? 285.0f : 345.0f,
+                      ZambeziVegetationUnitRandom(
+                          Seed + BranchIndex, 5843))
+                : 225.0f + 35.0f * (BranchIndex % 5);
+            const float StartZ = bRainforestPalette
+                ? FMath::Lerp(
+                      LowerTrunkHeight * 0.80f,
+                      UpperTrunkHeight * 0.94f,
+                      ZambeziVegetationUnitRandom(
+                          Seed + BranchIndex, 5851))
+                : 390.0f + 27.0f * (BranchIndex % 6);
+            const float EndZ = bRainforestPalette
+                ? UpperTrunkHeight + FMath::Lerp(
+                      -95.0f,
+                      bRainforestCanopyB ? 105.0f : 155.0f,
+                      ZambeziVegetationUnitRandom(
+                          Seed + BranchIndex, 5861))
+                : 605.0f + 46.0f * (BranchIndex % 5);
             const FVector Start(0.0f, 0.0f, StartZ);
             const FVector End = Direction * Radius + FVector::UpVector * EndZ;
             AppendZambeziColoredSegment(
@@ -1112,10 +1159,22 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                 Normals,
                 Uvs,
                 Colors);
+            const float CrownScale = bRainforestPalette
+                ? FMath::Lerp(
+                      0.72f,
+                      1.18f,
+                      ZambeziVegetationUnitRandom(
+                          Seed + BranchIndex, 5879))
+                : 0.86f + 0.08f * static_cast<float>(BranchIndex % 4);
+            const FVector CrownRadii = bRainforestPalette
+                ? FVector(
+                      bRainforestCanopyB ? 112.0f : 138.0f,
+                      bRainforestCanopyB ? 92.0f : 112.0f,
+                      bRainforestCanopyB ? 88.0f : 96.0f) * CrownScale
+                : FVector(158.0f, 132.0f, 112.0f) * CrownScale;
             AppendZambeziOpaqueLobe(
-                End + FVector::UpVector * 26.0f,
-                FVector(158.0f, 132.0f, 112.0f) *
-                    (0.86f + 0.08f * static_cast<float>(BranchIndex % 4)),
+                End + FVector::UpVector * (18.0f + 18.0f * CrownScale),
+                CrownRadii,
                 Seed + BranchIndex * 29,
                 ScalePreviewColor(
                     BroadleafGreen,
@@ -1126,18 +1185,53 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                 Normals,
                 Uvs,
                 Colors);
+            if (bRainforestPalette && BranchIndex % 2 == 0)
+            {
+                const FVector Tangent(-Direction.Y, Direction.X, 0.0f);
+                AppendZambeziOpaqueLobe(
+                    End - Direction * (38.0f + 24.0f * CrownScale) +
+                        Tangent * (BranchIndex % 4 < 2 ? 34.0f : -34.0f) +
+                        FVector::UpVector * 58.0f,
+                    CrownRadii * FVector(0.66f, 0.72f, 0.72f),
+                    Seed + BranchIndex * 41 + 17,
+                    ScalePreviewColor(BroadleafGreen, 0.92f),
+                    Vertices,
+                    Triangles,
+                    Normals,
+                    Uvs,
+                    Colors);
+            }
         }
-        constexpr int32 CrownFillCount = 6;
+        const int32 CrownFillCount = bRainforestPalette ? 10 : 6;
         for (int32 FillIndex = 0; FillIndex < CrownFillCount; ++FillIndex)
         {
             const float Angle = UE_TWO_PI * static_cast<float>(FillIndex) /
                 static_cast<float>(CrownFillCount) + Seed * 0.05f;
+            const float FillRadius = bRainforestPalette
+                ? FMath::Lerp(
+                      45.0f,
+                      bRainforestCanopyB ? 115.0f : 155.0f,
+                      ZambeziVegetationUnitRandom(Seed + FillIndex, 5923))
+                : 94.0f;
+            const float FillScale = bRainforestPalette
+                ? FMath::Lerp(
+                      0.62f,
+                      1.08f,
+                      ZambeziVegetationUnitRandom(Seed + FillIndex, 5939))
+                : 1.0f;
             AppendZambeziOpaqueLobe(
                 FVector(
-                    FMath::Cos(Angle) * 94.0f,
-                    FMath::Sin(Angle) * 94.0f,
-                    700.0f + 28.0f * (FillIndex % 2)),
-                FVector(172.0f, 145.0f, 126.0f),
+                    FMath::Cos(Angle) * FillRadius,
+                    FMath::Sin(Angle) * FillRadius,
+                    (bRainforestPalette ? UpperTrunkHeight + 70.0f : 700.0f) +
+                        (bRainforestPalette
+                             ? FMath::Lerp(
+                                   -52.0f,
+                                   98.0f,
+                                   ZambeziVegetationUnitRandom(
+                                       Seed + FillIndex, 5953))
+                             : 28.0f * (FillIndex % 2))),
+                FVector(172.0f, 145.0f, 126.0f) * FillScale,
                 Seed + 700 + FillIndex * 37,
                 BroadleafGreen,
                 Vertices,
@@ -1172,7 +1266,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     {
         return nullptr;
     }
-    const FString PackagePath = FString(TemperateVegetationMeshRoot) + AssetToken;
+    const FString PackagePath = FString(MeshRoot) + AssetToken;
     UStaticMesh* Mesh = ConvertNativeCanopyProceduralActorToStaticMesh(
         TemporaryActor,
         PackagePath,
@@ -1184,8 +1278,9 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     if (Mesh)
     {
         OutSummary += FString::Printf(
-            TEXT("Prepared temperate %s opaque volumetric vegetation: "
+            TEXT("Prepared %s %s opaque volumetric vegetation: "
                  "vertices=%d triangles=%d Nanite=%d collision=false.\n"),
+            ProfileLabel,
             AssetToken,
             Mesh->GetNumVertices(0),
             Mesh->GetNumTriangles(0),
@@ -1218,6 +1313,9 @@ bool CreateTemperateOpaqueVegetationAssets(
         ETemperateVegetationForm::BroadleafTree,
         6101,
         OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
         OutSummary);
     OutConiferTree = CreateTemperateOpaqueVegetationMesh(
         World,
@@ -1225,6 +1323,9 @@ bool CreateTemperateOpaqueVegetationAssets(
         ETemperateVegetationForm::ConiferTree,
         6203,
         OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
         OutSummary);
     OutShrub = CreateTemperateOpaqueVegetationMesh(
         World,
@@ -1232,6 +1333,9 @@ bool CreateTemperateOpaqueVegetationAssets(
         ETemperateVegetationForm::RiparianShrub,
         6301,
         OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
         OutSummary);
     OutGroundCover = CreateTemperateOpaqueVegetationMesh(
         World,
@@ -1239,6 +1343,9 @@ bool CreateTemperateOpaqueVegetationAssets(
         ETemperateVegetationForm::GroundCover,
         6421,
         OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
         OutSummary);
     const bool bComplete =
         OutBroadleafTree && OutConiferTree && OutShrub && OutGroundCover;
@@ -1246,6 +1353,78 @@ bool CreateTemperateOpaqueVegetationAssets(
     {
         OutSummary += TEXT(
             "Failed to build the complete opaque temperate vegetation family.\n");
+    }
+    return bComplete;
+}
+
+bool CreatePacuareOpaqueRainforestVegetationAssets(
+    UWorld* World,
+    UStaticMesh*& OutCanopyTreeA,
+    UStaticMesh*& OutCanopyTreeB,
+    UStaticMesh*& OutShrub,
+    UStaticMesh*& OutGroundCover,
+    UMaterialInterface*& OutMaterial,
+    FString& OutSummary)
+{
+    OutMaterial = CreateOpaqueVegetationMaterial(
+        PacuareRainforestVegetationMaterialPath,
+        TEXT("Pacuare rainforest"),
+        0.085f,
+        OutSummary);
+    if (!OutMaterial)
+    {
+        return false;
+    }
+    OutCanopyTreeA = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1"),
+        ETemperateVegetationForm::BroadleafTree,
+        7103,
+        OutMaterial,
+        PacuareRainforestVegetationMeshRoot,
+        TEXT("Pacuare rainforest"),
+        true,
+        OutSummary);
+    // The second canopy form deliberately reuses the solid broadleaf grammar
+    // with a different deterministic seed. It adds crown/branch variation
+    // without importing the conifer silhouette that made no ecological sense
+    // in the Upper Huacas rainforest fallback.
+    OutCanopyTreeB = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1"),
+        ETemperateVegetationForm::ConiferTree,
+        7207,
+        OutMaterial,
+        PacuareRainforestVegetationMeshRoot,
+        TEXT("Pacuare rainforest"),
+        true,
+        OutSummary);
+    OutShrub = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1"),
+        ETemperateVegetationForm::RiparianShrub,
+        7309,
+        OutMaterial,
+        PacuareRainforestVegetationMeshRoot,
+        TEXT("Pacuare rainforest"),
+        true,
+        OutSummary);
+    OutGroundCover = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1"),
+        ETemperateVegetationForm::GroundCover,
+        7411,
+        OutMaterial,
+        PacuareRainforestVegetationMeshRoot,
+        TEXT("Pacuare rainforest"),
+        true,
+        OutSummary);
+    const bool bComplete =
+        OutCanopyTreeA && OutCanopyTreeB && OutShrub && OutGroundCover;
+    if (!bComplete)
+    {
+        OutSummary += TEXT(
+            "Failed to build the complete Pacuare opaque rainforest family.\n");
     }
     return bComplete;
 }
@@ -1780,13 +1959,15 @@ bool AddLandscapeCandidateBiomeDressing(
 
     const bool bSouthFork = Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
     const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    const bool bPacuare = Candidate.PreviewSpec.RiverId == TEXT("pacuare");
     const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
     const bool bChilko =
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
     const bool bColoradoHance =
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bOpaqueTemperate = bFutaleufu || bChilko;
-    const bool bUsesOpaqueVolumetricVegetation = bZambezi || bOpaqueTemperate;
+    const bool bUsesOpaqueVolumetricVegetation =
+        bZambezi || bPacuare || bOpaqueTemperate;
     TArray<UStaticMesh*> ReviewedRockMeshes;
     if (bSouthFork || bZambezi || bFutaleufu)
     {
@@ -1863,6 +2044,7 @@ bool AddLandscapeCandidateBiomeDressing(
     UStaticMesh* ShrubMesh = nullptr;
     UStaticMesh* UnderstoryMesh = nullptr;
     UMaterialInterface* ZambeziOpaqueVegetationMaterial = nullptr;
+    UMaterialInterface* PacuareOpaqueRainforestVegetationMaterial = nullptr;
     UMaterialInterface* TemperateOpaqueVegetationMaterial = nullptr;
     UStaticMesh* HanceDrylandShrubMesh = nullptr;
     UStaticMesh* HanceDrylandGroundCoverMesh = nullptr;
@@ -1886,6 +2068,27 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingUnderstoryAssetPath = UnderstoryMesh->GetPathName();
         OutResult.DressingFoliageMaterialAssetPath =
             ZambeziOpaqueVegetationMaterial->GetPathName();
+        OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
+    }
+    else if (bPacuare)
+    {
+        if (!CreatePacuareOpaqueRainforestVegetationAssets(
+                World,
+                BroadleafTreeMesh,
+                ConiferTreeMesh,
+                ShrubMesh,
+                UnderstoryMesh,
+                PacuareOpaqueRainforestVegetationMaterial,
+                OutSummary))
+        {
+            return false;
+        }
+        OutResult.DressingBroadleafAssetPath = BroadleafTreeMesh->GetPathName();
+        OutResult.DressingConiferAssetPath = ConiferTreeMesh->GetPathName();
+        OutResult.DressingShrubAssetPath = ShrubMesh->GetPathName();
+        OutResult.DressingUnderstoryAssetPath = UnderstoryMesh->GetPathName();
+        OutResult.DressingFoliageMaterialAssetPath =
+            PacuareOpaqueRainforestVegetationMaterial->GetPathName();
         OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
     }
     else if (bOpaqueTemperate)
@@ -1964,7 +2167,9 @@ bool AddLandscapeCandidateBiomeDressing(
             ValidateZambeziOpaqueVegetationMaterial(
                 bZambezi
                     ? ZambeziOpaqueVegetationMaterial
-                    : TemperateOpaqueVegetationMaterial)
+                    : (bPacuare
+                           ? PacuareOpaqueRainforestVegetationMaterial
+                           : TemperateOpaqueVegetationMaterial))
         : OutResult.DressingSourceSkeletalMeshCount == 4 &&
             OutResult.DressingConvertedStaticMeshCount == 4;
     if (!OutResult.bDressingAssetsLoaded)
@@ -1994,6 +2199,15 @@ bool AddLandscapeCandidateBiomeDressing(
                  "remain excluded; four project-owned opaque volumetric vegetation forms replace "
                  "the PVE cards without claiming exact species, lifelike, or gameplay promotion.\n"),
             *Candidate.PreviewSpec.RiverId);
+    }
+    else if (bPacuare)
+    {
+        OutSummary += TEXT(
+            "Pacuare replaces the repeated PVE alpha-card banks with two "
+            "project-owned solid canopy forms plus opaque riparian shrub and "
+            "ground-cover meshes. The source-mask and slope-screened family is "
+            "procedural rainforest infill, not exact species, ecology, or "
+            "photoreal approval.\n");
     }
     else if (bOpaqueTemperate)
     {
@@ -2054,7 +2268,9 @@ bool AddLandscapeCandidateBiomeDressing(
         GetLandscapeCandidateFoliageSettings(Spec.RiverId);
     UMaterialInterface* OpaqueVegetationMaterial = bZambezi
         ? ZambeziOpaqueVegetationMaterial
-        : TemperateOpaqueVegetationMaterial;
+        : (bPacuare
+               ? PacuareOpaqueRainforestVegetationMaterial
+               : TemperateOpaqueVegetationMaterial);
     UMaterialInterface* BroadleafFoliageMaterial = OpaqueVegetationMaterial;
     UMaterialInterface* ConiferFoliageMaterial = OpaqueVegetationMaterial;
     UMaterialInterface* UnderstoryFoliageMaterial = OpaqueVegetationMaterial;
@@ -2118,6 +2334,10 @@ bool AddLandscapeCandidateBiomeDressing(
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueRiparianTree_%s"),
                   *Candidate.PreviewSpec.RiverId)
+            : bPacuare
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueCanopyA_%s"),
+                  *Candidate.PreviewSpec.RiverId)
             : bOpaqueTemperate
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueBroadleaf_%s"),
@@ -2140,6 +2360,10 @@ bool AddLandscapeCandidateBiomeDressing(
         bZambezi
             ? FString::Printf(
                   TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueUmbrellaTree_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : bPacuare
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueCanopyB_%s"),
                   *Candidate.PreviewSpec.RiverId)
             : bOpaqueTemperate
             ? FString::Printf(
@@ -2167,6 +2391,10 @@ bool AddLandscapeCandidateBiomeDressing(
                 ? FString::Printf(
                       TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueThornScrub_%s"),
                       *Candidate.PreviewSpec.RiverId)
+                : bPacuare
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueRiparianShrub_%s"),
+                      *Candidate.PreviewSpec.RiverId)
                 : bOpaqueTemperate
                 ? FString::Printf(
                       TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueShrub_%s"),
@@ -2183,6 +2411,10 @@ bool AddLandscapeCandidateBiomeDressing(
             bZambezi
                 ? FString::Printf(
                       TEXT("RaftSim_LandscapeCandidate_ZambeziOpaqueGroundCover_%s"),
+                      *Candidate.PreviewSpec.RiverId)
+                : bPacuare
+                ? FString::Printf(
+                      TEXT("RaftSim_LandscapeCandidate_PacuareOpaqueGroundCover_%s"),
                       *Candidate.PreviewSpec.RiverId)
                 : bOpaqueTemperate
                 ? FString::Printf(
@@ -2411,7 +2643,7 @@ bool AddLandscapeCandidateBiomeDressing(
         HanceDrylandGroundCoverInstances->ComponentTags.AddUnique(
             TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
     }
-    if (bOpaqueTemperate)
+    if (bOpaqueTemperate || bPacuare)
     {
         const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
             BroadleafTreeInstances,
@@ -2427,8 +2659,18 @@ bool AddLandscapeCandidateBiomeDressing(
                 Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
                 Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
                 Owner->Tags.AddUnique(
-                    bChilko ? TEXT("RaftSimChilkoLavaCanyonRun")
-                            : TEXT("RaftSimFutaleufuTerminatorRun"));
+                    bPacuare
+                        ? TEXT("RaftSimPacuareUpperHuacasRun")
+                        : (bChilko
+                               ? TEXT("RaftSimChilkoLavaCanyonRun")
+                               : TEXT("RaftSimFutaleufuTerminatorRun")));
+                if (bPacuare)
+                {
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimPacuareOpaqueRainforestV1"));
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                }
             }
             if (Component)
             {
@@ -2443,6 +2685,11 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimNonCollisionRenderSurface"));
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimOpaqueFallbackShadowSuppressed"));
+                if (bPacuare)
+                {
+                    Component->ComponentTags.AddUnique(
+                        TEXT("RaftSimPacuareOpaqueRainforestV1"));
+                }
             }
         }
         UnderstoryInstances->SetCastShadow(false);
@@ -2662,7 +2909,7 @@ bool AddLandscapeCandidateBiomeDressing(
                             ZambeziOpaqueVegetationMaterial;
                 });
     }
-    else if (bOpaqueTemperate)
+    else if (bOpaqueTemperate || bPacuare)
     {
         const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
             BroadleafTreeInstances,
@@ -2679,7 +2926,7 @@ bool AddLandscapeCandidateBiomeDressing(
         {
             OutResult.DressingFoliageMaterialBoundSlotCount +=
                 Mesh && Mesh->GetStaticMaterials().Num() == 1 &&
-                    Mesh->GetMaterial(0) == TemperateOpaqueVegetationMaterial
+                    Mesh->GetMaterial(0) == OpaqueVegetationMaterial
                 ? 1
                 : 0;
         }
@@ -2687,17 +2934,17 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.bDressingFoliageMaterialsValidated =
             OutResult.DressingFoliageMaterialBoundSlotCount == 4 &&
             ValidateZambeziOpaqueVegetationMaterial(
-                TemperateOpaqueVegetationMaterial) &&
+                OpaqueVegetationMaterial) &&
             Algo::AllOf(
                 Components,
-                [TemperateOpaqueVegetationMaterial](
+                [OpaqueVegetationMaterial](
                     UHierarchicalInstancedStaticMeshComponent* Component)
                 {
                     return Component &&
                         Component->GetCollisionEnabled() ==
                             ECollisionEnabled::NoCollision &&
                         Component->GetMaterial(0) ==
-                            TemperateOpaqueVegetationMaterial;
+                            OpaqueVegetationMaterial;
                 });
     }
     else
@@ -3260,18 +3507,20 @@ bool AddLandscapeCandidateBiomeDressing(
                 ? SmoothPreviewStep(ActiveRiverHalfWidth + 500.0f, MaxBankOffset, CandidateOffset)
                 : SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateWorldX, CandidateWorldY);
             const float SlopeDegrees =
-                (bZambeziWoodland || bOpaqueTemperate)
+                (bZambeziWoodland || bOpaqueTemperate || bPacuare)
                 ? GetLandscapeSlopeDegrees(CandidateWorldX, CandidateWorldY)
                 : 0.0f;
             const float SteepSlopePenalty = bZambeziWoodland
                 ? 3.2f * SmoothPreviewStep(10.0f, 24.0f, SlopeDegrees)
+                : bPacuare
+                ? 2.2f * SmoothPreviewStep(24.0f, 42.0f, SlopeDegrees)
                 : bOpaqueTemperate
                 ? 2.5f * SmoothPreviewStep(18.0f, 34.0f, SlopeDegrees)
                 : 0.0f;
             const float Score = VegetationT *
                     (bRainforest ? 1.85f : (bZambeziWoodland ? 1.22f : (Spec.bDesertCanyon ? 0.58f : 1.34f))) -
                 WaterT * 1.18f +
-                ((bZambeziWoodland || bOpaqueTemperate)
+                ((bZambeziWoodland || bOpaqueTemperate || bPacuare)
                      ? 0.65f * (1.0f - FMath::Clamp(SlopeDegrees / 18.0f, 0.0f, 1.0f))
                      : 0.0f) -
                 SteepSlopePenalty +
@@ -3383,23 +3632,46 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         else if (bRainforest)
         {
-            const int32 SpeciesSelector = ClusterIndex % 5;
+            const int32 SpeciesSelector = FMath::Clamp(
+                FMath::FloorToInt(
+                    ZambeziVegetationUnitRandom(ClusterIndex, 9041) * 10.0f),
+                0,
+                9);
             if (SpeciesSelector <= 2)
             {
                 SpeciesMesh = BroadleafTreeMesh;
                 SpeciesInstances = BroadleafTreeInstances;
-                TargetHeightCm = 980.0f + 105.0f * static_cast<float>(ClusterIndex % 7);
+                TargetHeightCm = FMath::Lerp(
+                    880.0f,
+                    1460.0f,
+                    ZambeziVegetationUnitRandom(ClusterIndex, 9059));
                 bCanopyTree = true;
             }
-            else if (SpeciesSelector == 3)
+            else if (SpeciesSelector <= 4)
+            {
+                SpeciesMesh = ConiferTreeMesh;
+                SpeciesInstances = ConiferTreeInstances;
+                TargetHeightCm = FMath::Lerp(
+                    1020.0f,
+                    1680.0f,
+                    ZambeziVegetationUnitRandom(ClusterIndex, 9067));
+                bCanopyTree = true;
+            }
+            else if (SpeciesSelector <= 7)
             {
                 SpeciesMesh = ShrubMesh;
                 SpeciesInstances = ShrubInstances;
-                TargetHeightCm = 260.0f + 38.0f * static_cast<float>(ClusterIndex % 6);
+                TargetHeightCm = FMath::Lerp(
+                    175.0f,
+                    390.0f,
+                    ZambeziVegetationUnitRandom(ClusterIndex, 9091));
             }
             else
             {
-                TargetHeightCm = 145.0f + 22.0f * static_cast<float>(ClusterIndex % 6);
+                TargetHeightCm = FMath::Lerp(
+                    68.0f,
+                    168.0f,
+                    ZambeziVegetationUnitRandom(ClusterIndex, 9103));
             }
         }
         else
@@ -3441,8 +3713,14 @@ bool AddLandscapeCandidateBiomeDressing(
             GetLandscapeCandidateEffectiveMeshBounds(SpeciesMesh).GetSize().Z);
         const float UniformScale = TargetHeightCm / MeshHeightCm;
         const FVector SpeciesScale(
-            UniformScale * (0.88f + 0.04f * static_cast<float>(ClusterIndex % 5)),
-            UniformScale * (0.90f + 0.035f * static_cast<float>((ClusterIndex + 2) % 5)),
+            UniformScale * FMath::Lerp(
+                bRainforest ? 0.72f : 0.88f,
+                bRainforest ? 1.18f : 1.04f,
+                ZambeziVegetationUnitRandom(ClusterIndex, 9133)),
+            UniformScale * FMath::Lerp(
+                bRainforest ? 0.74f : 0.90f,
+                bRainforest ? 1.16f : 1.04f,
+                ZambeziVegetationUnitRandom(ClusterIndex, 9151)),
             UniformScale);
         AddGroundedInstance(
             SpeciesInstances,

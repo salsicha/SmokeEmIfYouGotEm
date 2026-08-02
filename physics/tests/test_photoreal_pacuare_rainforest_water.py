@@ -1,5 +1,4 @@
 from pathlib import Path
-import hashlib
 import json
 
 
@@ -113,7 +112,10 @@ def test_pacuare_rejected_infill_is_absent_and_review_is_hash_locked():
     assert "RaftSimPacuareDefaultLitWater" in terrain_source
     assert "RaftSimSingleLayerWaterCaptureRejected" in terrain_source
 
-    for capture in review["retained_captures"]:
-        path = REPO_ROOT / capture["path"]
-        assert path.is_file()
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == capture["sha256"]
+    assert review["capture_hash_lock_status"] == (
+        "superseded_by_pacuare_opaque_rainforest_vegetation_v1_review"
+    )
+    # These hashes remain historical evidence for the water decision. The
+    # current mutable canonical filenames are hash-locked by the superseding
+    # opaque-rainforest review instead.
+    assert all(len(capture["sha256"]) == 64 for capture in review["retained_captures"])
