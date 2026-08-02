@@ -64,10 +64,11 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
             NoiseScales.Add(Noise->Scale);
         }
     }
-    TestEqual(TEXT("Two moving normal layers exist"), PannerCount, 2);
-    TestEqual(TEXT("Two world optical scales exist"), NoiseScales.Num(), 2);
+    TestEqual(TEXT("Three moving normal layers exist"), PannerCount, 3);
+    TestEqual(TEXT("Three world optical scales exist"), NoiseScales.Num(), 3);
     TestTrue(TEXT("Reach-scale water variation exists"), NoiseScales.Contains(0.00031f));
     TestTrue(TEXT("Surface-scale water variation exists"), NoiseScales.Contains(0.00163f));
+    TestTrue(TEXT("Fine-scale water variation exists"), NoiseScales.Contains(0.00673f));
 
     auto TestScalar = [this, Instance](
                           const TCHAR* ParameterName,
@@ -89,11 +90,21 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
     TestScalar(TEXT("Roughness"), 0.24f);
     TestScalar(TEXT("Specular"), 0.46f);
     TestScalar(TEXT("NormalIntensity"), 0.30f);
-    TestScalar(TEXT("SurfaceVariationStrength"), 0.30f);
+    TestScalar(TEXT("SurfaceVariationStrength"), 0.44f);
+    TestScalar(TEXT("CrossCurrentNormalWeight"), 0.34f);
+    TestScalar(TEXT("RoughnessVariationAmplitude"), 0.12f);
     TestScalar(TEXT("SolverFieldEnable"), 0.0f);
     TestScalar(TEXT("SolverMacroNormalWeight"), 0.0f);
     TestScalar(TEXT("SolverDepthColorWeight"), 0.0f);
     TestScalar(TEXT("SolverFroudeAerationWeight"), 0.0f);
+
+    const RaftSimEditorEnvironment::FRaftSimLandscapeCandidateWaterSettings WaterSettings =
+        RaftSimEditorEnvironment::GetLandscapeCandidateWaterSettings(
+            TEXT("futaleufu_terminator"));
+    TestEqual(TEXT("Futaleufu ribbon has 48 cross-current samples"), WaterSettings.RibbonCrossSectionSteps, 48);
+    TestTrue(TEXT("Futaleufu CPU chop keeps reviewed scale"), FMath::IsNearlyEqual(WaterSettings.AnalyticChopScale, 0.78f));
+    TestTrue(TEXT("Futaleufu cross-current chop keeps reviewed amplitude"), FMath::IsNearlyEqual(WaterSettings.CrossCurrentChopAmplitudeCm, 8.0f));
+    TestTrue(TEXT("Futaleufu embeds restrained aeration into the water surface"), FMath::IsNearlyEqual(WaterSettings.EmbeddedAerationWeight, 0.22f));
 
     UTexture* NormalAtlas = nullptr;
     TestTrue(

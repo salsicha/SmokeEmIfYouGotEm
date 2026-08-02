@@ -1,0 +1,135 @@
+{
+  "schema": "raftsim.environment.chilko_futaleufu_cold_water_review.v2",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "baseline_commit": "d100ac4a",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "capture_ribbon_geometry_changed": true,
+    "gameplay_water_geometry_changed": false,
+    "water_collision_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "authority_boundary": {
+    "capture_ribbon": "noncolliding editor-review surface hidden during gameplay",
+    "capture_geometry": "CPU-authored render-only solver relief plus bounded procedural chop; all relief tapers to zero across the outer 32 percent of each half-width",
+    "capture_color": "reach-local packed cooked field sampled once into CPU-authored vertex color with restrained embedded aeration breakup",
+    "capture_optics": "river-local Default Lit parents with three moving normal directions, three non-harmonic world fields, and bounded roughness variation",
+    "gameplay_surface": "live C++ solver mesh remains the sole runtime water renderer and raft-force authority",
+    "procedural_scope": "render-only gap filling; no terrain, bank, bathymetry, route, collision, solver state, or raft-force changes"
+  },
+  "rivers": {
+    "futaleufu_terminator": {
+      "parent": "/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater",
+      "instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate",
+      "moving_normal_layer_count": 3,
+      "world_optical_scales_per_cm": [0.00031, 0.00163, 0.00673],
+      "surface_variation_strength": 0.44,
+      "cross_current_normal_weight": 0.34,
+      "roughness_variation_amplitude": 0.12,
+      "ribbon_cross_section_steps": 48,
+      "analytic_chop_scale": 0.78,
+      "cross_current_chop_amplitude_cm": 8.0,
+      "embedded_aeration_weight": 0.22,
+      "guide_water_band_y": 360,
+      "baseline_metrics": {
+        "mean_luminance": 0.2081123143,
+        "rgb_standard_deviation": 0.0728143081,
+        "horizontal_gradient": 0.0062364717,
+        "vertical_gradient": 0.0068579684,
+        "row_mean_standard_deviation": 0.0189584773
+      },
+      "candidate_metrics": {
+        "mean_luminance": 0.2074000090,
+        "rgb_standard_deviation": 0.0727744773,
+        "horizontal_gradient": 0.0063043330,
+        "vertical_gradient": 0.0067239576,
+        "row_mean_standard_deviation": 0.0183657482,
+        "mean_absolute_rgb_delta": 0.0030760115,
+        "pixels_changed_above_two_percent": 0.0801540799
+      },
+      "visual_verdict": "retain: center-channel crests and cross-current breakup become readable while relief reaches zero at the bank; broad near-field water and sparse rapid VFX still fail photoreal review"
+    },
+    "chilko_river_lava_canyon": {
+      "parent": "/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater",
+      "instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate",
+      "moving_normal_layer_count": 3,
+      "world_optical_scales_per_cm": [0.00027, 0.00147, 0.00611],
+      "surface_variation_strength": 0.46,
+      "cross_current_normal_weight": 0.38,
+      "roughness_variation_amplitude": 0.14,
+      "ribbon_cross_section_steps": 48,
+      "analytic_chop_scale": 0.72,
+      "cross_current_chop_amplitude_cm": 7.0,
+      "embedded_aeration_weight": 0.18,
+      "guide_water_band_y": 400,
+      "baseline_metrics": {
+        "mean_luminance": 0.2511602342,
+        "rgb_standard_deviation": 0.0767526850,
+        "horizontal_gradient": 0.0048421929,
+        "vertical_gradient": 0.0048983954,
+        "row_mean_standard_deviation": 0.0188877266
+      },
+      "candidate_metrics": {
+        "mean_luminance": 0.2518721521,
+        "rgb_standard_deviation": 0.0766961500,
+        "horizontal_gradient": 0.0048574880,
+        "vertical_gradient": 0.0049483683,
+        "row_mean_standard_deviation": 0.0182728935,
+        "mean_absolute_rgb_delta": 0.0022276796,
+        "pixels_changed_above_two_percent": 0.0166674805
+      },
+      "visual_verdict": "retain: Lava Canyon gains bounded surface relief and less uniform shoreline/current structure without edge displacement; the broad dark foreground, coarse banks, and sparse rapid VFX still fail photoreal review"
+    }
+  },
+  "remaining_photoreal_defects": [
+    "Both rivers still read as opaque dark surfaces rather than deep refractive water volumes in the near field.",
+    "Named rapid holes, rollers, standing waves, aeration, spray, mist, and rock impact plumes remain understated.",
+    "The separate capture-only foam carrier is sparse and is not yet proven against raft and passenger occlusion in these two maps.",
+    "Thirty-metre source terrain remains too smooth for reach-specific bank shelves, undercuts, cobble bars, and rapid rocks.",
+    "The project-owned conifer, broadleaf, shrub, and ground-cover forms remain visibly procedural and repetitive.",
+    "Near-bank gravel, cobble, roots, deadwood, wet-rock transitions, and deposited sediment remain sparse.",
+    "Cooked hydraulics remain unconverged and uncalibrated against observed Terminator and Lava Canyon behavior.",
+    "No named local guide, environment-art reviewer, water-VFX reviewer, or target-hardware performance reviewer has accepted either result."
+  ],
+  "required_external_acceptance_gates": [
+    "local guide review of Terminator and Lava Canyon stationing, lines, hazards, recovery, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datums",
+    "hydraulic convergence and calibration against observed rapid behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, and season",
+    "photoreal water/VFX and character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "validation": {
+    "isolated_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "isolated_futaleufu_native_test": "RaftSim.M9.FFutaleufuTerminatorWater passed 1/1",
+    "isolated_chilko_native_test": "RaftSim.M9.FChilkoLavaCanyonWater passed 1/1",
+    "branch_validation": "editor build succeeded; focused Python passed 8/8; RaftSim.M9.FFutaleufuTerminatorWater, RaftSim.M9.FChilkoLavaCanyonWater, RaftSim.P4.RiverMapLoads.L_Terminator, and RaftSim.P4.RiverMapLoads.L_LavaCanyon each passed 1/1"
+  },
+  "reviewers": {
+    "named_local_guide": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_Terminator.umap", "sha256": "ac7fc7f7d848f72c6d8d263244f19ffed45cc4b65236953d4ba077b7bc8de22d"},
+    {"path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap", "sha256": "989fad8ff567d7075f128a910bd375f7e583bb675da00ae36416451219e99f66"},
+    {"path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater.uasset", "sha256": "06e83130d4fa1e207c60f57c3818e04b68e84ba6bd52c4f728cd6d37e2e09630"},
+    {"path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater.uasset", "sha256": "9e2b4d5f8892038c48bd90d1ca1a386fbc678e8a49b40549aaca61cc022cfd4d"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate.uasset", "sha256": "33bbccfd9f2123b2546b8e85e2bed979d094b4127cc63197135ef2ca7ac9ffeb"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate.uasset", "sha256": "de85279618724b532ba8871a738b146b7f20413def61c7b887f7078c9dc8062d"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json", "sha256": "0fd6202450c2c4cbc84972da2dd3db5e0ffe7a197521dd3a0ce717f249485c17"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json", "sha256": "8e36e89b808be8afeb725a53b1d59482f759ec17bae1232b425a13ba1b13b220"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png", "sha256": "51f0df7838a9429b26abaf5ea9e5c298bf9cb5b1ef824ee1fe4ba36633ad8da7"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png", "sha256": "be85678540fee99a86a424c1decbf8be395c12c0ac293ee584e9a9705b6126f0"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png", "sha256": "51f0df7838a9429b26abaf5ea9e5c298bf9cb5b1ef824ee1fe4ba36633ad8da7"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png", "sha256": "3be2ea860cd031990c965910dba1088c81926659ef105d603a83e354c4b9e270"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png", "sha256": "e55e60975f2492cae80c06252925f0c7c982f24e5e0b1d51922aa28d1088c600"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png", "sha256": "3be2ea860cd031990c965910dba1088c81926659ef105d603a83e354c4b9e270"}
+  ]
+}

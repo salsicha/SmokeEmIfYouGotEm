@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 
@@ -78,7 +79,7 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
             AddChilkoWaterExpression<UMaterialExpressionScalarParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("ChilkoLavaCanyonWaterV1");
+        Parameter->Group = TEXT("ChilkoLavaCanyonWaterV2");
         return Parameter;
     };
     auto Vector = [Material](const TCHAR* Name, const FLinearColor& Value)
@@ -87,7 +88,7 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
             AddChilkoWaterExpression<UMaterialExpressionVectorParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("ChilkoLavaCanyonWaterV1");
+        Parameter->Group = TEXT("ChilkoLavaCanyonWaterV2");
         return Parameter;
     };
     auto Constant = [Material](float Value)
@@ -153,17 +154,26 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
     SurfaceVariation->Levels = 2;
     SurfaceVariation->OutputMin = 0.0f;
     SurfaceVariation->OutputMax = 1.0f;
+    UMaterialExpressionNoise* FineVariation =
+        AddChilkoWaterExpression<UMaterialExpressionNoise>(Material);
+    FineVariation->Scale = 0.00611f;
+    FineVariation->bTurbulence = true;
+    FineVariation->Levels = 2;
+    FineVariation->OutputMin = 0.0f;
+    FineVariation->OutputMax = 1.0f;
     UMaterialExpression* VariationField = Add(
-        Multiply(ReachVariation, Constant(0.65f)),
-        Multiply(SurfaceVariation, Constant(0.35f)));
+        Add(
+            Multiply(ReachVariation, Constant(0.52f)),
+            Multiply(SurfaceVariation, Constant(0.31f))),
+        Multiply(FineVariation, Constant(0.17f)));
     UMaterialExpression* PatternedColor = Lerp(
-        Multiply(BaseColor, Constant(0.74f)),
-        Multiply(BaseColor, Constant(1.24f)),
+        Multiply(BaseColor, Constant(0.70f)),
+        Multiply(BaseColor, Constant(1.30f)),
         VariationField);
     UMaterialExpression* OpticallyVariedBaseColor = Lerp(
         BaseColor,
         PatternedColor,
-        Scalar(TEXT("SurfaceVariationStrength"), 0.34f));
+        Scalar(TEXT("SurfaceVariationStrength"), 0.46f));
 
     UMaterialExpressionVectorParameter* AtlasTileOriginParameter = Vector(
         TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
@@ -186,17 +196,35 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
             float UTiling,
             float VTiling,
             float SpeedX,
-            float SpeedY) -> UMaterialExpression*
+            float SpeedY,
+            bool bSwapCoordinates) -> UMaterialExpression*
     {
         UMaterialExpressionTextureCoordinate* TexCoord =
             AddChilkoWaterExpression<UMaterialExpressionTextureCoordinate>(Material);
         TexCoord->UTiling = UTiling;
         TexCoord->VTiling = VTiling;
+        UMaterialExpression* BaseCoordinates = TexCoord;
+        if (bSwapCoordinates)
+        {
+            UMaterialExpressionComponentMask* CoordinateU =
+                AddChilkoWaterExpression<UMaterialExpressionComponentMask>(Material);
+            CoordinateU->Input.Expression = TexCoord;
+            CoordinateU->R = true;
+            UMaterialExpressionComponentMask* CoordinateV =
+                AddChilkoWaterExpression<UMaterialExpressionComponentMask>(Material);
+            CoordinateV->Input.Expression = TexCoord;
+            CoordinateV->G = true;
+            UMaterialExpressionAppendVector* SwappedCoordinates =
+                AddChilkoWaterExpression<UMaterialExpressionAppendVector>(Material);
+            SwappedCoordinates->A.Expression = CoordinateV;
+            SwappedCoordinates->B.Expression = CoordinateU;
+            BaseCoordinates = SwappedCoordinates;
+        }
         UMaterialExpressionPanner* Panner =
             AddChilkoWaterExpression<UMaterialExpressionPanner>(Material);
         Panner->SpeedX = SpeedX;
         Panner->SpeedY = SpeedY;
-        Panner->Coordinate.Expression = TexCoord;
+        Panner->Coordinate.Expression = BaseCoordinates;
         UMaterialExpressionFrac* WrappedUv =
             AddChilkoWaterExpression<UMaterialExpressionFrac>(Material);
         WrappedUv->Input.Expression = Panner;
@@ -214,18 +242,25 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
         Sample->Texture = DefaultNormalTexture;
         Sample->SamplerType = SAMPLERTYPE_Normal;
         Sample->Coordinates.Expression = AtlasUv;
-        Sample->Group = TEXT("ChilkoLavaCanyonWaterV1");
+        Sample->Group = TEXT("ChilkoLavaCanyonWaterV2");
         return Sample;
     };
 
-    UMaterialExpression* NormalA = AddNormalSample(0.61f, 1.67f, 0.031f, 0.006f);
-    UMaterialExpression* NormalB = AddNormalSample(1.13f, 2.71f, -0.013f, 0.023f);
+    UMaterialExpression* NormalA =
+        AddNormalSample(0.61f, 1.67f, 0.031f, 0.006f, false);
+    UMaterialExpression* NormalB =
+        AddNormalSample(1.13f, 2.71f, -0.013f, 0.023f, false);
+    UMaterialExpression* CrossCurrentNormal =
+        AddNormalSample(2.31f, 0.83f, 0.019f, -0.029f, true);
     UMaterialExpressionConstant3Vector* FlatNormal =
         AddChilkoWaterExpression<UMaterialExpressionConstant3Vector>(Material);
     FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f, 0.0f);
     UMaterialExpression* WaterNormal = Lerp(
         FlatNormal,
-        Lerp(NormalA, NormalB, Constant(0.46f)),
+        Lerp(
+            Lerp(NormalA, NormalB, Constant(0.46f)),
+            CrossCurrentNormal,
+            Scalar(TEXT("CrossCurrentNormalWeight"), 0.38f)),
         Scalar(TEXT("NormalIntensity"), 0.34f));
 
     UMaterialExpression* BaseEmissive = Multiply(
@@ -242,6 +277,12 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
             Scalar(TEXT("ReflectionFillIntensity"), 0.12f)));
     UMaterialExpressionScalarParameter* Roughness =
         Scalar(TEXT("Roughness"), 0.22f);
+    UMaterialExpression* VariedRoughness = Lerp(
+        Roughness,
+        Add(
+            Roughness,
+            Scalar(TEXT("RoughnessVariationAmplitude"), 0.14f)),
+        VariationField);
     UMaterialExpressionScalarParameter* Specular =
         Scalar(TEXT("Specular"), 0.48f);
 
@@ -270,7 +311,8 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
         ConnectPreviewMaterialColorInput(
             EditorOnlyData->EmissiveColor, Add(BaseEmissive, ReflectionFill));
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->Roughness, VariedRoughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
     }
 
@@ -297,9 +339,10 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary)
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += TEXT(
-        "Built Chilko Lava Canyon opaque Default Lit water with native "
-        "two-scale moving normals, two world optical scales, CPU-authored "
-        "cooked-field color authority, and no displacement.\n");
+        "Built Chilko Lava Canyon opaque Default Lit water V2 with three "
+        "moving normal directions, three world optical scales, varied "
+        "roughness, CPU-authored cooked-field color authority, and no "
+        "displacement.\n");
     return Material;
 }
 } // namespace RaftSimEditorEnvironment
