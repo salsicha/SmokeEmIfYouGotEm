@@ -73,19 +73,19 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         // the CPU-authored capture ribbon.  These restrained gains expose the
         // hydraulic tongue and holes without allowing analytic displacement
         // or a stale shader texture to invent gameplay water state.
-        Settings.BaseColorScale = 0.94f;
-        Settings.EmissiveFillScale = 0.140f;
-        Settings.Roughness = 0.35f;
-        Settings.Specular = 0.36f;
+        Settings.BaseColorScale = 1.06f;
+        Settings.EmissiveFillScale = 0.20f;
+        Settings.Roughness = 0.25f;
+        Settings.Specular = 0.46f;
         Settings.Opacity = 0.38f;
-        Settings.NormalIntensity = 0.22f;
-        Settings.SurfaceVariationStrength = 0.24f;
+        Settings.NormalIntensity = 0.30f;
+        Settings.SurfaceVariationStrength = 0.32f;
         Settings.PhaseG = 0.08f;
-        Settings.VertexTintWeight = 0.62f;
+        Settings.VertexTintWeight = 0.74f;
         Settings.RenderWidthScale = 1.20f;
         Settings.RenderNormalUpBlend = 0.80f;
         Settings.RenderDisplacementScale = 0.20f;
-        Settings.ReflectionFillIntensity = 0.06f;
+        Settings.ReflectionFillIntensity = 0.14f;
         Settings.SolverFieldEnable = 1.0f;
         Settings.SolverMacroNormalWeight = 0.16f;
         Settings.SolverDepthColorWeight = 0.26f;
@@ -94,10 +94,10 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 1.0f;
         Settings.SolverFroudeVisualGain = 1.0f;
         Settings.SolverSurfaceReliefScale = 0.30f;
-        Settings.SurfaceTint = FLinearColor(0.220f, 0.240f, 0.150f, 0.0f);
-        Settings.SolverDeepWaterTint = FLinearColor(0.085f, 0.080f, 0.055f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.072f, 0.115f, 0.088f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.050f, 0.065f, 0.046f, 0.0f);
         Settings.SolverAerationTint = FLinearColor(0.84f, 0.82f, 0.74f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.38f, 0.44f, 0.46f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.28f, 0.40f, 0.46f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f);
         Settings.AbsorptionCoefficients = FLinearColor(0.0014f, 0.0022f, 0.0040f, 0.0f);
         Settings.ColorScaleBehindWater = FLinearColor(0.84f, 0.76f, 0.62f, 0.0f);

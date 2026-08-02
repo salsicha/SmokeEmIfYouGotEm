@@ -77,7 +77,7 @@ def test_committed_hance_visual_water_matches_generator():
     assert (REPO_ROOT / MANIFEST_RELATIVE).read_bytes() == committed_manifest
 
 
-def test_hance_runnable_review_is_hash_locked_and_honest():
+def test_hance_runnable_review_retains_immutable_evidence_and_is_honest():
     review = json.loads((REPO_ROOT / REVIEW_RELATIVE).read_text(encoding="utf-8"))
     assert review["status"] == (
         "accepted_reference_runnable_photoreal_promotion_rejected"
@@ -93,7 +93,20 @@ def test_hance_runnable_review_is_hash_locked_and_honest():
     assert len(review["required_external_acceptance_gates"]) == 6
     assert len(review["remaining_photoreal_defects"]) >= 6
 
+    # The Hance presentation milestone supersedes the mutable saved map,
+    # manifest, and current captures. Its review locks their current hashes;
+    # this reach-local review continues to lock immutable terrain, coordinate,
+    # solver-field, and source-package evidence.
+    superseded_paths = {
+        "unreal/Content/RaftSim/Maps/L_Hance.umap",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png",
+        "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json",
+    }
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_paths:
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]

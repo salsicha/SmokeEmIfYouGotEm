@@ -414,12 +414,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         }
         FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
-        if ((Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+        if ((Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
              Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon")) &&
             Candidate.bUseSolverVisualizationFields &&
             !Candidate.SolverVisualizationFieldRelativePath.IsEmpty())
         {
-            // Both reach-local packed fields are already sampled into capture
+            // These reach-local packed fields are already sampled into capture
             // geometry and vertex colours. Their materials must not re-sample
             // the shared South Fork fallback texture on top of those results.
             WaterSettings.SolverFieldEnable = 0.0f;
@@ -495,6 +496,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
         const bool bUsesPacuareRainforestDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bUsesColoradoHanceDefaultLitWater =
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
         const bool bUsesFutaleufuTerminatorDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const bool bUsesChilkoLavaCanyonDefaultLitWater =
@@ -502,6 +505,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
+        const bool bUsesColoradoOrganicHanceSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
         const bool bUsesFutaleufuOrganicTemperateSurface =
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
         const bool bUsesChilkoOrganicLavaCanyonSurface =
@@ -520,11 +525,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater")
             : (bUsesPacuareRainforestDefaultLitWater
                    ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater")
-                   : (bUsesFutaleufuTerminatorDefaultLitWater
+                   : (bUsesColoradoHanceDefaultLitWater
+                          ? TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_Colorado_HanceDefaultLitWater")
+                          : (bUsesFutaleufuTerminatorDefaultLitWater
                           ? TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater")
                           : (bUsesChilkoLavaCanyonDefaultLitWater
                                  ? TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater")
-                                 : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate"))));
+                                 : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate")))));
         const FString WaterSingleLayerParameterKeyPrefix =
             bUsesSingleLayerWater
             ? TEXT("water_single_layer")
@@ -856,18 +863,22 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 : TEXT("Unlit"),
             bUsesPacuareOrganicRainforestSurface
                 ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
-                : (bUsesFutaleufuOrganicTemperateSurface
+                : (bUsesColoradoOrganicHanceSurface
+                       ? TEXT("colorado_hance_v1_four_scale_world_space_sandy_bench_weathered_iron_cliff_dark_rock_talus_and_fine_grain_response")
+                       : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
                        : (bUsesChilkoOrganicLavaCanyonSurface
                               ? TEXT("chilko_v1_four_scale_world_space_open_bench_dry_grass_mineral_soil_slope_aware_basalt_and_scree_response")
-                              : TEXT("not_enabled_for_this_river"))),
+                              : TEXT("not_enabled_for_this_river")))),
             bUsesPacuareOrganicRainforestSurface
                 ? TEXT("[0.000210, 0.000950, 0.003500]")
-                : (bUsesFutaleufuOrganicTemperateSurface
+                : (bUsesColoradoOrganicHanceSurface
+                       ? TEXT("[0.000140, 0.000530, 0.002300, 0.006800]")
+                       : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("[0.000180, 0.000710, 0.004200]")
                        : (bUsesChilkoOrganicLavaCanyonSurface
                               ? TEXT("[0.000160, 0.000590, 0.002700, 0.007900]")
-                              : TEXT("[]"))),
+                              : TEXT("[]")))),
             MaterialSettings.MacroMappingScale,
             MaterialSettings.DetailMappingScale,
             MaterialSettings.DetailAlbedoWeight,
@@ -1013,11 +1024,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        ? TEXT("zambezi_single_layer_water_volume_candidate_bound_and_captured")
                        : (bUsesPacuareRainforestDefaultLitWater
                               ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
-                              : (bUsesFutaleufuTerminatorDefaultLitWater
+                              : (bUsesColoradoHanceDefaultLitWater
+                                     ? TEXT("colorado_hance_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
+                                     : (bUsesFutaleufuTerminatorDefaultLitWater
                                      ? TEXT("futaleufu_terminator_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
                                      : (bUsesChilkoLavaCanyonDefaultLitWater
                                             ? TEXT("chilko_lava_canyon_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
-                                            : TEXT("solver_surface_default_lit_candidate_bound_and_captured")))))
+                                            : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))))))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
             *EscapeRaftSimJsonString(WaterMaterialParentPath),

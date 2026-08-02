@@ -128,6 +128,27 @@ and external acceptance gates pass.
   incomplete whitewater VFX, source fidelity, and external guide/geospatial/
   ecology/art/performance approvals still reject photoreal promotion.
 
+### 2026-08-01 — Colorado Hance organic terrain and native capture water retained
+
+- `L_Hance` remains reference-runnable on its unchanged 600×320 m reach-local
+  Landscape and unchanged moderate-release finite-volume gameplay water. Its
+  source-conditioned Landscape material now adds four non-harmonic world-space
+  color fields for sandy benches, weathered and iron-stained canyon rock, dark
+  basement-like rock, talus, and fine mineral breakup without world-position
+  offset, collision, bathymetry, solver, or raft-force changes.
+- The non-colliding capture ribbon now binds a Colorado-only opaque Default Lit
+  parent with two moving native normal layers. The Hance cooked field remains
+  sampled once into CPU-authored vertex color; shader-side reuse of the shared
+  South Fork field is disabled. Fixed water-band luminance rises from 0.1922 to
+  0.2716 in the guide view and from 0.2225 to 0.3312 at river eye.
+- The editor build, `RaftSim.M9.FColoradoHanceWater`,
+  `RaftSim.M9.FColoradoOrganicHanceTerrain`, and
+  `RaftSim.P4.RiverMapLoads.L_Hance` pass. Captures still fail photoreal review
+  because polygonal terrain, stepped opaque water, coarse foam, sparse ecology,
+  missing surveyed geography, and unconverged hydraulics remain. The guide,
+  geospatial, hydraulic, geology/ecology/art, water-VFX, and target-hardware
+  acceptance gates remain open.
+
 ### 2026-08-01 — Colorado Hance physical runnable map restored
 
 - `L_Hance` now delegates to the source-Landscape builder instead of the old

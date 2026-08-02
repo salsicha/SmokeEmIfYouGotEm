@@ -50,7 +50,7 @@ def test_chilko_water_is_native_moving_and_non_displacing() -> None:
     assert 'Spec.RiverId == TEXT("chilko_river_lava_canyon")' in base
     assert "LoadOrCreateChilkoLavaCanyonWaterParent" in base
     assert 'TEXT("T_RaftSim_%s_NormalAtlas")' in base
-    assert "Terminator's packed field is sampled exactly once, as is Chilko's" in base
+    assert "Hance, Terminator, and Chilko each sample their packed field once" in base
 
 
 def test_chilko_capture_and_live_profiles_are_river_local() -> None:

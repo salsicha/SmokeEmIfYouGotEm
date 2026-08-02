@@ -1297,7 +1297,7 @@ def test_zambezi_single_layer_water_candidate_is_isolated_and_review_gated():
 
     validation = json.loads(validation_path.read_text(encoding="utf-8"))
     assert validation["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v12"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v13"
     )
     assert validation["passed"] is True
     assert validation["water_surface"]["component_count"] == 1

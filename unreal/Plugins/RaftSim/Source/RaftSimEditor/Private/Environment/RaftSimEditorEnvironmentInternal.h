@@ -924,6 +924,10 @@ UMaterialExpression* BuildPacuareOrganicRainforestBaseColor(
     UMaterial* Material,
     UMaterialExpression* SourceBaseColor);
 
+UMaterialExpression* BuildColoradoOrganicHanceBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor);
+
 UMaterialExpression* BuildFutaleufuOrganicTemperateBaseColor(
     UMaterial* Material,
     UMaterialExpression* SourceBaseColor);
@@ -991,6 +995,8 @@ UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
 UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary);
 
 UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary);
+
+UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary);
 
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
