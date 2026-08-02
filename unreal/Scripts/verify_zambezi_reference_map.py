@@ -8,10 +8,7 @@ import traceback
 
 import unreal
 
-
-MAP_PACKAGE = (
-    "/Game/RaftSim/Maps/L_Zambezi"
-)
+MAP_PACKAGE = "/Game/RaftSim/Maps/L_Zambezi"
 REPORT_RELATIVE = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_reference_scenario_map_validation.json"
@@ -23,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v12",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v13",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -47,6 +44,7 @@ def main() -> None:
             sun_rows.append(
                 {
                     "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
                     "pitch_degrees": round(rotation.pitch, 3),
                     "yaw_degrees": round(rotation.yaw, 3),
                 }
@@ -54,8 +52,7 @@ def main() -> None:
         rejected_high_density_bank_actors = [
             actor.get_actor_label()
             for actor in actors
-            if "RaftSimZambeziHighDensityBank"
-            in {str(tag) for tag in actor.tags}
+            if "RaftSimZambeziHighDensityBank" in {str(tag) for tag in actor.tags}
         ]
         markers = [
             actor
@@ -76,7 +73,9 @@ def main() -> None:
                     ],
                 }
             )
-        portages = [row for row in marker_rows if "RaftSimMandatoryPortage" in row["tags"]]
+        portages = [
+            row for row in marker_rows if "RaftSimMandatoryPortage" in row["tags"]
+        ]
         player_rafts = [
             actor
             for actor in actors
@@ -111,12 +110,52 @@ def main() -> None:
                     "tags": sorted(str(tag) for tag in actor.tags),
                     "procedural_mesh_count": len(components),
                     "material": material.get_path_name() if material else None,
-                    "collision_enabled": str(mesh.get_collision_enabled()) if mesh else None,
-                    "cast_shadow": bool(
-                        mesh.get_editor_property("cast_shadow")
-                    ) if mesh else None,
+                    "collision_enabled": (
+                        str(mesh.get_collision_enabled()) if mesh else None
+                    ),
+                    "cast_shadow": (
+                        bool(mesh.get_editor_property("cast_shadow")) if mesh else None
+                    ),
                 }
             )
+        adaptive_near_field_terrain_actors = [
+            actor
+            for actor in actors
+            if "RaftSimZambeziAdaptiveNearFieldTerrainV1"
+            in {str(tag) for tag in actor.tags}
+        ]
+        adaptive_near_field_terrain_rows = []
+        for actor in adaptive_near_field_terrain_actors:
+            components = actor.get_components_by_class(unreal.ProceduralMeshComponent)
+            mesh = components[0] if components else None
+            material = mesh.get_material(0) if mesh else None
+            adaptive_near_field_terrain_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
+                    "procedural_mesh_count": len(components),
+                    "material": material.get_path_name() if material else None,
+                    "collision_enabled": (
+                        str(mesh.get_collision_enabled()) if mesh else None
+                    ),
+                    "cast_shadow": (
+                        bool(mesh.get_editor_property("cast_shadow")) if mesh else None
+                    ),
+                }
+            )
+        atmosphere_actors = [
+            actor
+            for actor in actors
+            if "RaftSimZambeziAtmosphereV1" in {str(tag) for tag in actor.tags}
+        ]
+        atmosphere_rows = [
+            {
+                "actor_label": actor.get_actor_label(),
+                "class": actor.get_class().get_name(),
+                "tags": sorted(str(tag) for tag in actor.tags),
+            }
+            for actor in atmosphere_actors
+        ]
         water_surface_actors = [
             actor
             for actor in actors
@@ -148,8 +187,7 @@ def main() -> None:
         vegetation_actors = [
             actor
             for actor in actors
-            if "RaftSimZambeziOpaqueVegetation"
-            in {str(tag) for tag in actor.tags}
+            if "RaftSimZambeziOpaqueVegetation" in {str(tag) for tag in actor.tags}
         ]
         vegetation_rows = []
         for actor in vegetation_actors:
@@ -176,9 +214,11 @@ def main() -> None:
                     "collision_enabled": (
                         str(component.get_collision_enabled()) if component else None
                     ),
-                    "cast_shadow": bool(
-                        component.get_editor_property("cast_shadow")
-                    ) if component else None,
+                    "cast_shadow": (
+                        bool(component.get_editor_property("cast_shadow"))
+                        if component
+                        else None
+                    ),
                 }
             )
         legacy_zambezi_pve_actors = [
@@ -198,9 +238,7 @@ def main() -> None:
         )
         water_config = water_configs[0] if len(water_configs) == 1 else None
         water_config_tags = (
-            sorted(str(tag) for tag in water_config.tags)
-            if water_config
-            else []
+            sorted(str(tag) for tag in water_config.tags) if water_config else []
         )
         preserves_global_river_stations = bool(
             water_config
@@ -220,7 +258,9 @@ def main() -> None:
                 "scenario_marker_count": len(markers),
                 "rapid_numbers": sorted(rapid_numbers),
                 "mandatory_portage_marker_count": len(portages),
-                "mandatory_portage_actor": portages[0]["actor_label"] if portages else None,
+                "mandatory_portage_actor": (
+                    portages[0]["actor_label"] if portages else None
+                ),
                 "markers": sorted(marker_rows, key=lambda row: row["actor_label"]),
                 "runnable": {
                     "player_raft_count": len(player_rafts),
@@ -248,7 +288,7 @@ def main() -> None:
                     ),
                 },
                 "visual_terrain": {
-                    "authority": "procedural_render_only",
+                    "authority": "source_conditioned_plus_bounded_procedural_render_only",
                     "physics_and_collision_authority": "source_copernicus_landscape",
                     "morphology_contract": (
                         "v15_organic_basalt_with_100m_polyline_shoreline_"
@@ -269,6 +309,28 @@ def main() -> None:
                         "disabled_on_noncolliding_visual_tiles_only"
                     ),
                     "tiles": sorted(terrain_rows, key=lambda row: row["actor_label"]),
+                    "adaptive_near_field": {
+                        "authority": (
+                            "source_conditioned_surface_with_bounded_"
+                            "procedural_dry_shoreline_and_basalt_erosion_infill"
+                        ),
+                        "station_window_m": [0.0, 1000.0],
+                        "grid_spacing_m": 5.0,
+                        "maximum_lateral_extent_m": 600.0,
+                        "active_water_half_width_m": 72.0,
+                        "inner_dry_bank_buffer_m": 3.0,
+                        "maximum_dry_shoreline_infill_m": 1.8,
+                        "maximum_procedural_refinement_m": 0.96,
+                        "minimum_rendered_dry_clearance_m": 0.295,
+                        "physics_and_collision_authority": (
+                            "source_copernicus_landscape_only"
+                        ),
+                        "actor_count": len(adaptive_near_field_terrain_rows),
+                        "actors": sorted(
+                            adaptive_near_field_terrain_rows,
+                            key=lambda row: row["actor_label"],
+                        ),
+                    },
                 },
                 "lighting": {
                     "authority": "presentation_only_no_physics_effect",
@@ -278,6 +340,14 @@ def main() -> None:
                     "required_pitch_degrees": -48.0,
                     "required_yaw_degrees": -90.0,
                     "directional_lights": sun_rows,
+                    "atmosphere_contract": (
+                        "zambezi_specific_sun_linked_dry_season_sky_"
+                        "captured_gorge_fill_and_volumetric_haze"
+                    ),
+                    "atmosphere_actor_count": len(atmosphere_rows),
+                    "atmosphere_actors": sorted(
+                        atmosphere_rows, key=lambda row: row["actor_label"]
+                    ),
                 },
                 "water_surface": {
                     "authority": "render_only_source_aligned_physical_corridor",
@@ -293,12 +363,8 @@ def main() -> None:
                     "instance_count": sum(
                         int(row["instance_count"]) for row in vegetation_rows
                     ),
-                    "legacy_zambezi_pve_actor_count": len(
-                        legacy_zambezi_pve_actors
-                    ),
-                    "legacy_zambezi_pve_actors": sorted(
-                        legacy_zambezi_pve_actors
-                    ),
+                    "legacy_zambezi_pve_actor_count": len(legacy_zambezi_pve_actors),
+                    "legacy_zambezi_pve_actors": sorted(legacy_zambezi_pve_actors),
                     "components": sorted(
                         vegetation_rows, key=lambda row: row["actor_label"]
                     ),
@@ -306,8 +372,7 @@ def main() -> None:
             }
         )
         vegetation_by_label = {
-            row["actor_label"]: int(row["instance_count"])
-            for row in vegetation_rows
+            row["actor_label"]: int(row["instance_count"]) for row in vegetation_rows
         }
         camera_visible_bank_cover_rows = [
             row
@@ -319,17 +384,16 @@ def main() -> None:
             camera_visible_bank_cover_rows
         )
         report["vegetation"]["camera_visible_bank_cover_instance_count"] = sum(
-            int(row["instance_count"])
-            for row in camera_visible_bank_cover_rows
+            int(row["instance_count"]) for row in camera_visible_bank_cover_rows
         )
         full_corridor_ground_cover_rows = [
             row
             for row in vegetation_rows
             if "ZambeziOpaqueGroundCover" in row["actor_label"]
         ]
-        report["vegetation"]["ground_cover_shadow_policy"] = (
-            "disabled_on_full_corridor_camera_mosaic_and_launch_cover"
-        )
+        report["vegetation"][
+            "ground_cover_shadow_policy"
+        ] = "disabled_on_full_corridor_camera_mosaic_and_launch_cover"
         camera_visible_woody_rows = [
             row
             for row in vegetation_rows
@@ -340,22 +404,16 @@ def main() -> None:
             camera_visible_woody_rows
         )
         report["vegetation"]["camera_visible_woody_instance_count"] = sum(
-            int(row["instance_count"])
-            for row in camera_visible_woody_rows
+            int(row["instance_count"]) for row in camera_visible_woody_rows
         )
         report["vegetation"]["camera_visible_woody_target_instance_count"] = 240
-        report["vegetation"]["camera_visible_woody_slope_rejection_count"] = (
-            240
-            - int(
-                report["vegetation"][
-                    "camera_visible_woody_instance_count"
-                ]
-            )
+        report["vegetation"]["camera_visible_woody_slope_rejection_count"] = 240 - int(
+            report["vegetation"]["camera_visible_woody_instance_count"]
         )
         report["vegetation"]["camera_visible_woody_slope_ceiling_degrees"] = 24.0
-        report["vegetation"]["camera_visible_woody_placement_contract"] = (
-            "deterministic_40_candidate_visible_bank_search_with_hard_slope_ceiling"
-        )
+        report["vegetation"][
+            "camera_visible_woody_placement_contract"
+        ] = "deterministic_40_candidate_visible_bank_search_with_hard_slope_ceiling"
         runnable_launch_bank_cover_rows = [
             row
             for row in vegetation_rows
@@ -366,24 +424,18 @@ def main() -> None:
             runnable_launch_bank_cover_rows
         )
         report["vegetation"]["runnable_launch_bank_cover_instance_count"] = sum(
-            int(row["instance_count"])
-            for row in runnable_launch_bank_cover_rows
+            int(row["instance_count"]) for row in runnable_launch_bank_cover_rows
         )
-        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 600
-        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = (
-            600
-            - int(
-                report["vegetation"][
-                    "runnable_launch_bank_cover_instance_count"
-                ]
-            )
+        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 1800
+        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = 1800 - int(
+            report["vegetation"]["runnable_launch_bank_cover_instance_count"]
         )
         report["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"] = 32.0
-        report["vegetation"]["runnable_launch_bank_cover_shadow_policy"] = (
-            "disabled_on_noncolliding_ground_cover_only"
-        )
+        report["vegetation"][
+            "runnable_launch_bank_cover_shadow_policy"
+        ] = "disabled_on_noncolliding_ground_cover_only"
         report["vegetation"]["runnable_launch_bank_cover_placement_contract"] = (
-            "deterministic_96_candidate_search_194m_to_560m_downstream_"
+            "deterministic_96_candidate_search_151m_to_842m_downstream_"
             "with_full_route_clearance_dry_height_and_hard_slope_gates"
         )
         runnable_launch_woody_rows = [
@@ -396,22 +448,18 @@ def main() -> None:
             runnable_launch_woody_rows
         )
         report["vegetation"]["runnable_launch_woody_instance_count"] = sum(
-            int(row["instance_count"])
-            for row in runnable_launch_woody_rows
+            int(row["instance_count"]) for row in runnable_launch_woody_rows
         )
-        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 64
-        report["vegetation"]["runnable_launch_woody_rejection_count"] = (
-            64
-            - int(
-                report["vegetation"]["runnable_launch_woody_instance_count"]
-            )
+        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 192
+        report["vegetation"]["runnable_launch_woody_rejection_count"] = 192 - int(
+            report["vegetation"]["runnable_launch_woody_instance_count"]
         )
         report["vegetation"]["runnable_launch_woody_slope_ceiling_degrees"] = 24.0
-        report["vegetation"]["runnable_launch_woody_shadow_policy"] = (
-            "disabled_on_launch_window_only_to_prevent_camera_wall_streaks"
-        )
+        report["vegetation"][
+            "runnable_launch_woody_shadow_policy"
+        ] = "disabled_on_launch_window_only_to_prevent_camera_wall_streaks"
         report["vegetation"]["runnable_launch_woody_placement_contract"] = (
-            "deterministic_160_candidate_search_270m_to_600m_downstream_"
+            "deterministic_160_candidate_search_215m_to_864m_downstream_"
             "with_50m_beyond_active_half_width_full_route_clearance_"
             "dry_height_and_hard_slope_gates"
         )
@@ -431,24 +479,53 @@ def main() -> None:
             and len(sun_rows) == 1
             and abs(float(sun_rows[0]["pitch_degrees"]) + 48.0) <= 0.01
             and abs(float(sun_rows[0]["yaw_degrees"]) + 90.0) <= 0.01
+            and "RaftSimAtmosphereSunLight" in sun_rows[0]["tags"]
+            and len(atmosphere_rows) == 4
+            and sum(
+                "RaftSimAtmosphereSunLight" in row["tags"] for row in atmosphere_rows
+            )
+            == 1
+            and sum(
+                "RaftSimCapturedGorgeSkyFill" in row["tags"] for row in atmosphere_rows
+            )
+            == 1
+            and sum(
+                "RaftSimSourceAwareDrySeasonSky" in row["tags"]
+                for row in atmosphere_rows
+            )
+            == 1
+            and sum(
+                "RaftSimVolumetricGorgeHaze" in row["tags"] for row in atmosphere_rows
+            )
+            == 1
             and not rejected_high_density_bank_actors
             and len(terrain_rows) == 4
             and all(row["procedural_mesh_count"] == 1 for row in terrain_rows)
             and all(
-                "BatokaV12_WorldAligned" in str(row["material"])
-                for row in terrain_rows
+                "BatokaV12_WorldAligned" in str(row["material"]) for row in terrain_rows
+            )
+            and len(adaptive_near_field_terrain_rows) == 2
+            and all(
+                row["procedural_mesh_count"] == 1
+                and "NO_COLLISION" in str(row["collision_enabled"])
+                and not row["cast_shadow"]
+                and row["material"]
+                and "RaftSimSourceConditionedTerrain" in row["tags"]
+                and "RaftSimProceduralInfill" in row["tags"]
+                and "RaftSimProtectedDryShoreline" in row["tags"]
+                and "RaftSimNonCollisionRenderSurface" in row["tags"]
+                and "RaftSimNearFieldSelfShadowSuppressed" in row["tags"]
+                for row in adaptive_near_field_terrain_rows
             )
             and all(
-                "NO_COLLISION" in str(row["collision_enabled"])
-                for row in terrain_rows
+                "NO_COLLISION" in str(row["collision_enabled"]) for row in terrain_rows
             )
             and all(not row["cast_shadow"] for row in terrain_rows)
             and all(
                 "RaftSimNonCollisionRenderSurface" in row["tags"]
                 and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
                 and "RaftSimBatokaOrganicMorphologyV15" in row["tags"]
-                and "RaftSimBatokaHeightAwareFacetReconstructionV15"
-                in row["tags"]
+                and "RaftSimBatokaHeightAwareFacetReconstructionV15" in row["tags"]
                 and "RaftSimCoarseSourceSelfShadowSuppressed" in row["tags"]
                 and "RaftSimProtectedShorelineBuffer" in row["tags"]
                 for row in terrain_rows
@@ -459,18 +536,13 @@ def main() -> None:
             in str(water_surface_rows[0]["material"])
             and "M_RaftSim_Zambezi_SingleLayerWater"
             in str(water_surface_rows[0]["parent_material"])
-            and "NO_COLLISION"
-            in str(water_surface_rows[0]["collision_enabled"])
-            and "RaftSimNonCollisionRenderSurface"
-            in water_surface_rows[0]["tags"]
-            and "RaftSimPhysicalCorridorWater"
-            in water_surface_rows[0]["tags"]
-            and "RaftSimZambeziSingleLayerWater"
-            in water_surface_rows[0]["tags"]
-            and "RaftSimMovingMultiScaleWaterNormals"
-            in water_surface_rows[0]["tags"]
+            and "NO_COLLISION" in str(water_surface_rows[0]["collision_enabled"])
+            and "RaftSimNonCollisionRenderSurface" in water_surface_rows[0]["tags"]
+            and "RaftSimPhysicalCorridorWater" in water_surface_rows[0]["tags"]
+            and "RaftSimZambeziSingleLayerWater" in water_surface_rows[0]["tags"]
+            and "RaftSimMovingMultiScaleWaterNormals" in water_surface_rows[0]["tags"]
             and len(vegetation_rows) == 12
-            and sum(int(row["instance_count"]) for row in vegetation_rows) == 7679
+            and sum(int(row["instance_count"]) for row in vegetation_rows) == 8927
             and any(
                 "ZambeziOpaqueRiparianTree" in label and count == 2100
                 for label, count in vegetation_by_label.items()
@@ -497,10 +569,7 @@ def main() -> None:
             and len(full_corridor_ground_cover_rows) == 1
             and not full_corridor_ground_cover_rows[0]["cast_shadow"]
             and len(camera_visible_woody_rows) == 3
-            and sum(
-                int(row["instance_count"])
-                for row in camera_visible_woody_rows
-            )
+            and sum(int(row["instance_count"]) for row in camera_visible_woody_rows)
             == 232
             and all(row["cast_shadow"] for row in camera_visible_woody_rows)
             and any(
@@ -520,16 +589,25 @@ def main() -> None:
                 for row in camera_visible_woody_rows
             )
             and len(runnable_launch_bank_cover_rows) == 1
-            and int(runnable_launch_bank_cover_rows[0]["instance_count"]) == 592
+            and int(runnable_launch_bank_cover_rows[0]["instance_count"]) == 1721
             and not runnable_launch_bank_cover_rows[0]["cast_shadow"]
             and "RaftSimGroundCoverSelfShadowSuppressed"
             in runnable_launch_bank_cover_rows[0]["tags"]
             and len(runnable_launch_woody_rows) == 3
-            and sum(
-                int(row["instance_count"])
-                for row in runnable_launch_woody_rows
+            and sum(int(row["instance_count"]) for row in runnable_launch_woody_rows)
+            == 174
+            and any(
+                "ZambeziRunnableLaunchRiparianTree" in label and count == 44
+                for label, count in vegetation_by_label.items()
             )
-            == 55
+            and any(
+                "ZambeziRunnableLaunchUmbrellaTree" in label and count == 43
+                for label, count in vegetation_by_label.items()
+            )
+            and any(
+                "ZambeziRunnableLaunchThornScrub" in label and count == 87
+                for label, count in vegetation_by_label.items()
+            )
             and all(not row["cast_shadow"] for row in runnable_launch_woody_rows)
             and all(
                 "RaftSimWoodySlopeCeiling24Degrees" in row["tags"]
@@ -542,10 +620,7 @@ def main() -> None:
                 "M_RaftSim_Zambezi_OpaqueVegetation" in str(row["material"])
                 for row in vegetation_rows
             )
-            and all(
-                "OpaqueV1" in str(row["static_mesh"])
-                for row in vegetation_rows
-            )
+            and all("OpaqueV1" in str(row["static_mesh"]) for row in vegetation_rows)
             and all(
                 "NO_COLLISION" in str(row["collision_enabled"])
                 for row in vegetation_rows
@@ -560,16 +635,19 @@ def main() -> None:
         )
         report["passed"] = passed
         if not passed:
-            raise RuntimeError("Generated Zambezi scenario marker contract did not pass")
+            raise RuntimeError(
+                "Generated Zambezi scenario marker contract did not pass"
+            )
         unreal.log(
             f"Zambezi reference run validation passed with {len(markers)} markers, "
             f"{len(player_rafts)} raft, {len(water_configs)} runtime water config, "
             f"{len(terrain_rows)} conditioned visual-terrain tiles, "
+            f"{len(adaptive_near_field_terrain_rows)} adaptive near-field banks, "
             f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
             "opaque vegetation instances, including 1200 camera-visible "
-            "organic bank-cover, 232 camera-visible woody instances, 592 "
-            "runnable-launch bank-cover instances, and 55 runnable-launch "
+            "organic bank-cover, 232 camera-visible woody instances, 1721 "
+            "runnable-launch bank-cover instances, and 174 runnable-launch "
             "woody instances"
         )
     except Exception as error:
@@ -577,7 +655,9 @@ def main() -> None:
         report["traceback"] = traceback.format_exc()
         unreal.log_error(report["traceback"])
     finally:
-        report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        report_path.write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
         unreal.log(f"Zambezi scenario map validation report: {report_path}")
         unreal.SystemLibrary.quit_editor()
 

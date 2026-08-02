@@ -1834,6 +1834,17 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
         Sun->GetLightComponent()->SetIntensity(CaptureSettings.SunIntensity);
         Sun->GetLightComponent()->SetLightColor(CaptureSettings.SunColor);
+        Sun->GetLightComponent()->SetCastShadows(true);
+        if (UDirectionalLightComponent* SunComponent = Sun->GetComponent())
+        {
+            SunComponent->SetAtmosphereSunLight(true);
+            SunComponent->SetAtmosphereSunLightIndex(0);
+        }
+        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            Sun->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            Sun->Tags.AddUnique(TEXT("RaftSimAtmosphereSunLight"));
+        }
     }
 
     ASkyLight* SkyLight = Cast<ASkyLight>(
@@ -1844,6 +1855,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
         SkyLight->GetLightComponent()->SourceType = SLS_CapturedScene;
         SkyLight->GetLightComponent()->SetIntensity(CaptureSettings.SkyLightIntensity);
+        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            SkyLight->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            SkyLight->Tags.AddUnique(TEXT("RaftSimCapturedGorgeSkyFill"));
+        }
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
@@ -1851,6 +1867,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (Atmosphere)
     {
         Atmosphere->SetActorLabel(TEXT("RaftSim_SkyAtmosphere_SourceAware"));
+        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            Atmosphere->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            Atmosphere->Tags.AddUnique(TEXT("RaftSimSourceAwareDrySeasonSky"));
+        }
     }
 
     AExponentialHeightFog* Fog = Cast<AExponentialHeightFog>(
@@ -1860,6 +1881,17 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
         Fog->GetComponent()->SetFogDensity(CaptureSettings.FogDensity);
         Fog->GetComponent()->SetFogInscatteringColor(CaptureSettings.FogColor);
+        if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            // A shallow warm haze gives the kilometre-scale gorge readable
+            // atmospheric perspective without disguising source-terrain gaps.
+            // It affects presentation only; water, collision, and hydraulics
+            // remain unchanged.
+            Fog->GetComponent()->SetFogHeightFalloff(0.20f);
+            Fog->GetComponent()->SetVolumetricFog(true);
+            Fog->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
+            Fog->Tags.AddUnique(TEXT("RaftSimVolumetricGorgeHaze"));
+        }
     }
 
     if (SkyLight && SkyLight->GetLightComponent())

@@ -12,9 +12,9 @@ constexpr TCHAR ZambeziVegetationMeshRoot[] = TEXT(
 constexpr int32 ZambeziEvidenceBankMosaicInstanceCount = 1200;
 constexpr int32 ZambeziEvidenceWoodyInstanceCount = 240;
 constexpr float ZambeziEvidenceWoodySlopeCeilingDegrees = 24.0f;
-constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 600;
+constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 1800;
 constexpr float ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees = 32.0f;
-constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 64;
+constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 192;
 constexpr float ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 24.0f;
 
 enum class EZambeziVegetationForm : uint8
@@ -2578,11 +2578,11 @@ bool AddLandscapeCandidateBiomeDressing(
                 (static_cast<float>(AlongIndex) +
                  ZambeziVegetationUnitRandom(CoverIndex, 9101)) /
                 static_cast<float>(GroundCoverInstancesPerSide);
-            // Logical X -2320..-1980 corresponds to approximately 194-560 m
+            // Logical X -2360..-1720 corresponds to approximately 151-842 m
             // down the source corridor. Keeping the layer ahead of the
             // station-75 m launch avoids camera-clipped plants while retaining
             // it inside the 600 m HISM cull range.
-            const float BaseLogicalX = FMath::Lerp(-2320.0f, -1980.0f, AlongT);
+            const float BaseLogicalX = FMath::Lerp(-2360.0f, -1720.0f, AlongT);
             const float Side = SideIndex == 0 ? -1.0f : 1.0f;
             const float BaseOffset = ActiveRiverHalfWidth + FMath::Lerp(
                 2500.0f,
@@ -2604,7 +2604,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     20.0f * FMath::Sin(CandidatePhase);
                 const float CandidateAdditionalOffset = FMath::Lerp(
                     1800.0f,
-                    24000.0f,
+                    18000.0f,
                     FMath::Pow(
                         ZambeziVegetationUnitRandom(
                             CoverIndex * 101 + CandidateIndex,
@@ -2632,7 +2632,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     continue;
                 }
                 const float PlacementScore = SlopeDegrees +
-                    0.12f * CandidateAdditionalOffset / 24000.0f;
+                    0.12f * CandidateAdditionalOffset / 18000.0f;
                 if (PlacementScore < BestPlacementScore)
                 {
                     BestPlacementScore = PlacementScore;
@@ -2647,13 +2647,13 @@ bool AddLandscapeCandidateBiomeDressing(
             }
 
             const float TargetHeightCm = FMath::Lerp(
-                64.0f,
-                112.0f,
+                72.0f,
+                150.0f,
                 ZambeziVegetationUnitRandom(CoverIndex, 9133));
             const float UniformScale = TargetHeightCm / GroundCoverMeshHeightCm;
             const float FootprintScale = FMath::Lerp(
-                1.25f,
-                2.05f,
+                1.35f,
+                2.40f,
                 ZambeziVegetationUnitRandom(CoverIndex, 9151));
             AddGroundedInstance(
                 ZambeziRunnableLaunchGroundCoverInstances,
@@ -2707,9 +2707,9 @@ bool AddLandscapeCandidateBiomeDressing(
                 (static_cast<float>(AlongIndex) +
                  ZambeziVegetationUnitRandom(WoodyIndex, 9203)) /
                 static_cast<float>(InstancesPerWoodyLane);
-            // Woody crowns begin roughly 270 m downstream so no trunk or crown
+            // Woody crowns begin roughly 215 m downstream so no trunk or crown
             // can clip the guide camera at the launch itself.
-            const float BaseLogicalX = FMath::Lerp(-2250.0f, -1940.0f, AlongT);
+            const float BaseLogicalX = FMath::Lerp(-2300.0f, -1700.0f, AlongT);
             const float Side = SideIndex == 0 ? -1.0f : 1.0f;
             FVector2D BestPoint = ResolveLogicalRiverPoint(
                 BaseLogicalX,
@@ -2725,7 +2725,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     58.0f * FMath::Sin(CandidatePhase);
                 const float CandidateAdditionalOffset = FMath::Lerp(
                     6000.0f,
-                    22000.0f,
+                    18000.0f,
                     FMath::Pow(
                         ZambeziVegetationUnitRandom(
                             WoodyIndex * 59 + CandidateIndex,
@@ -2753,7 +2753,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     continue;
                 }
                 const float PlacementScore = SlopeDegrees +
-                    0.60f * CandidateAdditionalOffset / 22000.0f;
+                    0.60f * CandidateAdditionalOffset / 18000.0f;
                 if (PlacementScore < BestPlacementScore)
                 {
                     BestPlacementScore = PlacementScore;
@@ -2772,16 +2772,16 @@ bool AddLandscapeCandidateBiomeDressing(
                 ZambeziRunnableLaunchThornScrubInstances;
             bool bWoodyCanopy = false;
             float TargetHeightCm = FMath::Lerp(
-                200.0f,
-                360.0f,
+                220.0f,
+                420.0f,
                 ZambeziVegetationUnitRandom(WoodyIndex, 9241));
             if (SpeciesSlot == 0)
             {
                 WoodyMesh = BroadleafTreeMesh;
                 WoodyInstances = ZambeziRunnableLaunchRiparianTreeInstances;
                 TargetHeightCm = FMath::Lerp(
-                    760.0f,
-                    1120.0f,
+                    820.0f,
+                    1380.0f,
                     ZambeziVegetationUnitRandom(WoodyIndex, 9257));
                 bWoodyCanopy = true;
             }
@@ -2790,8 +2790,8 @@ bool AddLandscapeCandidateBiomeDressing(
                 WoodyMesh = ConiferTreeMesh;
                 WoodyInstances = ZambeziRunnableLaunchUmbrellaTreeInstances;
                 TargetHeightCm = FMath::Lerp(
-                    720.0f,
-                    1060.0f,
+                    780.0f,
+                    1320.0f,
                     ZambeziVegetationUnitRandom(WoodyIndex, 9277));
                 bWoodyCanopy = true;
             }
@@ -2858,8 +2858,8 @@ bool AddLandscapeCandidateBiomeDressing(
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&
         (!bZambeziWoodland ||
-         RunnableLaunchGroundCoverPlacedCount >= 240) &&
-        (!bZambeziWoodland || RunnableLaunchWoodyPlacedCount >= 32) &&
+         RunnableLaunchGroundCoverPlacedCount >= 900) &&
+        (!bZambeziWoodland || RunnableLaunchWoodyPlacedCount >= 96) &&
         OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
         TEXT("Landscape biome dressing for %s: %d %s, %d foliage instances (%d canopy, %d understory), %d %s foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),

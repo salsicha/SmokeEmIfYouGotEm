@@ -290,6 +290,78 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has four conditioned visual-terrain tiles"),
             ConditionedVisualTerrainCount,
             4);
+
+        int32 AdaptiveNearFieldTerrainCount = 0;
+        int32 ZambeziAtmosphereActorCount = 0;
+        int32 AtmosphereSunCount = 0;
+        int32 CapturedSkyFillCount = 0;
+        int32 DrySeasonSkyCount = 0;
+        int32 GorgeHazeCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (Actor->Tags.Contains(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1")))
+            {
+                const UProceduralMeshComponent* Mesh =
+                    Actor->FindComponentByClass<UProceduralMeshComponent>();
+                Test->TestNotNull(TEXT("adaptive Zambezi bank has a procedural mesh"), Mesh);
+                if (Mesh)
+                {
+                    Test->TestEqual(
+                        TEXT("adaptive Zambezi bank is render-only"),
+                        Mesh->GetCollisionEnabled(),
+                        ECollisionEnabled::NoCollision);
+                    Test->TestFalse(
+                        TEXT("adaptive Zambezi bank suppresses coarse self-shadow wedges"),
+                        Mesh->CastShadow);
+                    Test->TestNotNull(
+                        TEXT("adaptive Zambezi bank has a source-conditioned material"),
+                        Mesh->GetMaterial(0));
+                }
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank declares source-conditioned authority"),
+                    Actor->Tags.Contains(TEXT("RaftSimSourceConditionedTerrain")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank declares bounded procedural infill"),
+                    Actor->Tags.Contains(TEXT("RaftSimProceduralInfill")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank protects the dry shoreline"),
+                    Actor->Tags.Contains(TEXT("RaftSimProtectedDryShoreline")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank cannot replace Landscape collision"),
+                    Actor->Tags.Contains(TEXT("RaftSimNonCollisionRenderSurface")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank records its self-shadow policy"),
+                    Actor->Tags.Contains(TEXT("RaftSimNearFieldSelfShadowSuppressed")));
+                ++AdaptiveNearFieldTerrainCount;
+            }
+
+            if (!Actor->Tags.Contains(TEXT("RaftSimZambeziAtmosphereV1")))
+            {
+                continue;
+            }
+            ++ZambeziAtmosphereActorCount;
+            AtmosphereSunCount +=
+                Actor->Tags.Contains(TEXT("RaftSimAtmosphereSunLight")) ? 1 : 0;
+            CapturedSkyFillCount +=
+                Actor->Tags.Contains(TEXT("RaftSimCapturedGorgeSkyFill")) ? 1 : 0;
+            DrySeasonSkyCount +=
+                Actor->Tags.Contains(TEXT("RaftSimSourceAwareDrySeasonSky")) ? 1 : 0;
+            GorgeHazeCount +=
+                Actor->Tags.Contains(TEXT("RaftSimVolumetricGorgeHaze")) ? 1 : 0;
+        }
+        Test->TestEqual(
+            TEXT("Zambezi reference run has two adaptive near-field banks"),
+            AdaptiveNearFieldTerrainCount,
+            2);
+        Test->TestEqual(
+            TEXT("Zambezi reference run has a four-actor atmosphere contract"),
+            ZambeziAtmosphereActorCount,
+            4);
+        Test->TestEqual(TEXT("Zambezi links one atmosphere sun"), AtmosphereSunCount, 1);
+        Test->TestEqual(TEXT("Zambezi captures one gorge sky fill"), CapturedSkyFillCount, 1);
+        Test->TestEqual(TEXT("Zambezi has one dry-season sky"), DrySeasonSkyCount, 1);
+        Test->TestEqual(TEXT("Zambezi has one volumetric gorge haze"), GorgeHazeCount, 1);
         return true;
     }
 

@@ -687,6 +687,495 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
     return FirstActor;
 }
 
+bool AddZambeziAdaptiveNearFieldTerrain(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    UMaterialInterface* TerrainMaterial,
+    FZambeziAdaptiveNearFieldTerrainStats& OutStats,
+    FString& OutSummary)
+{
+    OutStats = FZambeziAdaptiveNearFieldTerrainStats();
+    if (!World || !Landscape || !TerrainMaterial ||
+        Candidate.PreviewSpec.RiverId != TEXT("zambezi_batoka_gorge"))
+    {
+        return false;
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> Centerline;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, Centerline, OutSummary) ||
+        Centerline.Num() < 2 || Centerline.Last().StationMeters <= 1000.0f)
+    {
+        OutSummary += TEXT(
+            "Zambezi adaptive near-field terrain requires at least one kilometre "
+            "of source-aligned centerline.\n");
+        return false;
+    }
+
+    FRaftSimPreviewImage SourceAlbedo;
+    if (!LoadPreviewPngImage(Candidate.PreviewSpec.AerialDrapeImage, SourceAlbedo))
+    {
+        OutSummary += TEXT(
+            "Zambezi adaptive near-field terrain could not load the source-conditioned "
+            "albedo image.\n");
+        return false;
+    }
+
+    struct FDenseTerrainTile
+    {
+        AActor* Actor = nullptr;
+        FProcMeshSection* Section = nullptr;
+        int32 RowSize = 0;
+        int32 RowCount = 0;
+        float FirstX = 0.0f;
+        float FirstY = 0.0f;
+        float StepX = 0.0f;
+        float StepY = 0.0f;
+        float MinimumX = 0.0f;
+        float MaximumX = 0.0f;
+        float MinimumY = 0.0f;
+        float MaximumY = 0.0f;
+    };
+
+    TArray<FDenseTerrainTile> DenseTiles;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor || !Actor->GetActorLabel().StartsWith(
+                TEXT("RaftSim_PhysicalCorridorDenseSourceTerrainTile_")))
+        {
+            continue;
+        }
+        UProceduralMeshComponent* Component =
+            Actor->FindComponentByClass<UProceduralMeshComponent>();
+        FProcMeshSection* Section = Component
+            ? Component->GetProcMeshSection(0)
+            : nullptr;
+        if (!Section || Section->ProcVertexBuffer.Num() < 4)
+        {
+            continue;
+        }
+
+        int32 RowSize = 0;
+        const float FirstRowY = Section->ProcVertexBuffer[0].Position.Y;
+        while (RowSize < Section->ProcVertexBuffer.Num() &&
+               FMath::IsNearlyEqual(
+                   Section->ProcVertexBuffer[RowSize].Position.Y,
+                   FirstRowY,
+                   0.1f))
+        {
+            ++RowSize;
+        }
+        if (RowSize < 2 || Section->ProcVertexBuffer.Num() % RowSize != 0)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Zambezi adaptive terrain refused non-grid source tile %s.\n"),
+                *Actor->GetActorLabel());
+            return false;
+        }
+        const int32 RowCount = Section->ProcVertexBuffer.Num() / RowSize;
+        if (RowCount < 2)
+        {
+            return false;
+        }
+
+        const FVector First = FVector(Section->ProcVertexBuffer[0].Position);
+        const FVector LastX = FVector(
+            Section->ProcVertexBuffer[RowSize - 1].Position);
+        const FVector LastY = FVector(
+            Section->ProcVertexBuffer[(RowCount - 1) * RowSize].Position);
+        FDenseTerrainTile& Tile = DenseTiles.AddDefaulted_GetRef();
+        Tile.Actor = Actor;
+        Tile.Section = Section;
+        Tile.RowSize = RowSize;
+        Tile.RowCount = RowCount;
+        Tile.FirstX = First.X;
+        Tile.FirstY = First.Y;
+        Tile.StepX = (LastX.X - First.X) / static_cast<float>(RowSize - 1);
+        Tile.StepY = (LastY.Y - First.Y) / static_cast<float>(RowCount - 1);
+        Tile.MinimumX = FMath::Min(First.X, LastX.X);
+        Tile.MaximumX = FMath::Max(First.X, LastX.X);
+        Tile.MinimumY = FMath::Min(First.Y, LastY.Y);
+        Tile.MaximumY = FMath::Max(First.Y, LastY.Y);
+        if (FMath::Abs(Tile.StepX) < 1.0f || FMath::Abs(Tile.StepY) < 1.0f)
+        {
+            OutSummary += TEXT(
+                "Zambezi adaptive terrain found an invalid dense-tile sample spacing.\n");
+            return false;
+        }
+    }
+    if (DenseTiles.Num() != 4)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Zambezi adaptive terrain requires all four conditioned dense tiles; found %d.\n"),
+            DenseTiles.Num());
+        return false;
+    }
+
+    auto SampleDenseTerrainWorldZ = [&DenseTiles](
+                                        const FVector2D& WorldPoint,
+                                        float& OutWorldZ)
+    {
+        for (const FDenseTerrainTile& Tile : DenseTiles)
+        {
+            const FTransform Transform = Tile.Actor->GetActorTransform();
+            const FVector LocalPoint = Transform.InverseTransformPosition(
+                FVector(WorldPoint.X, WorldPoint.Y, Transform.GetLocation().Z));
+            if (LocalPoint.X < Tile.MinimumX - 0.5f ||
+                LocalPoint.X > Tile.MaximumX + 0.5f ||
+                LocalPoint.Y < Tile.MinimumY - 0.5f ||
+                LocalPoint.Y > Tile.MaximumY + 0.5f)
+            {
+                continue;
+            }
+            const float GridX = (LocalPoint.X - Tile.FirstX) / Tile.StepX;
+            const float GridY = (LocalPoint.Y - Tile.FirstY) / Tile.StepY;
+            const int32 X0 = FMath::Clamp(
+                FMath::FloorToInt(GridX), 0, Tile.RowSize - 2);
+            const int32 Y0 = FMath::Clamp(
+                FMath::FloorToInt(GridY), 0, Tile.RowCount - 2);
+            const float FracX = FMath::Clamp(GridX - static_cast<float>(X0), 0.0f, 1.0f);
+            const float FracY = FMath::Clamp(GridY - static_cast<float>(Y0), 0.0f, 1.0f);
+            const int32 A = Y0 * Tile.RowSize + X0;
+            const int32 B = A + 1;
+            const int32 C = (Y0 + 1) * Tile.RowSize + X0;
+            const int32 D = C + 1;
+            const float LowerZ = FMath::Lerp(
+                Tile.Section->ProcVertexBuffer[A].Position.Z,
+                Tile.Section->ProcVertexBuffer[B].Position.Z,
+                FracX);
+            const float UpperZ = FMath::Lerp(
+                Tile.Section->ProcVertexBuffer[C].Position.Z,
+                Tile.Section->ProcVertexBuffer[D].Position.Z,
+                FracX);
+            const float LocalZ = FMath::Lerp(LowerZ, UpperZ, FracY);
+            OutWorldZ = Transform.TransformPosition(
+                FVector(LocalPoint.X, LocalPoint.Y, LocalZ)).Z;
+            return true;
+        }
+        return false;
+    };
+
+    constexpr float StartStationM = 0.0f;
+    constexpr float EndStationM = 1000.0f;
+    constexpr float LongitudinalSpacingCm = 500.0f;
+    constexpr float LateralSpacingCm = 500.0f;
+    constexpr float OuterBankDistanceCm = 60000.0f;
+    constexpr float SurfaceLiftCm = 3.0f;
+    constexpr float MaximumDryShorelineInfillCm = 180.0f;
+    const float ActiveWaterHalfWidthCm =
+        GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
+    const float InnerBankDistanceCm = ActiveWaterHalfWidthCm + 300.0f;
+    const int32 LongitudinalStepCount = FMath::RoundToInt(
+        (EndStationM - StartStationM) * 100.0f / LongitudinalSpacingCm);
+    const int32 LateralStepCount = FMath::RoundToInt(
+        (OuterBankDistanceCm - InnerBankDistanceCm) / LateralSpacingCm);
+    const int32 RowSize = LateralStepCount + 1;
+    const int32 RowCount = LongitudinalStepCount + 1;
+    OutStats.LongitudinalSpacingCm = LongitudinalSpacingCm;
+    OutStats.LateralSpacingCm = LateralSpacingCm;
+
+    const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
+    const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
+    const float RouteStartStation = Centerline[0].StationMeters;
+    const float RouteStationSpan =
+        Centerline.Last().StationMeters - RouteStartStation;
+    for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+    {
+        const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+        TArray<FVector> Vertices;
+        TArray<FVector2D> Uvs;
+        TArray<FLinearColor> VertexColors;
+        TArray<int32> Triangles;
+        TArray<float> WaterSurfaceZ;
+        TArray<float> RefinementFades;
+        TArray<bool> RenderableVertices;
+        const int32 VertexCapacity = RowSize * RowCount;
+        Vertices.Reserve(VertexCapacity);
+        Uvs.Reserve(VertexCapacity);
+        VertexColors.Reserve(VertexCapacity);
+        WaterSurfaceZ.Reserve(VertexCapacity);
+        RefinementFades.Reserve(VertexCapacity);
+        RenderableVertices.Reserve(VertexCapacity);
+        Triangles.Reserve(LongitudinalStepCount * LateralStepCount * 6);
+
+        for (int32 StationIndex = 0;
+             StationIndex <= LongitudinalStepCount;
+             ++StationIndex)
+        {
+            const float StationT = static_cast<float>(StationIndex) /
+                static_cast<float>(LongitudinalStepCount);
+            const float StationM = FMath::Lerp(
+                StartStationM, EndStationM, StationT);
+            const float Progress = FMath::Clamp(
+                (StationM - RouteStartStation) / RouteStationSpan,
+                0.0f,
+                1.0f);
+            FVector2D Tangent;
+            const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
+                Candidate,
+                Centerline,
+                Progress,
+                &Tangent);
+            const FVector2D BankNormal(-Tangent.Y, Tangent.X);
+            float ConditionedWaterZ = 0.0f;
+            if (!SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+                    Candidate,
+                    Centerline,
+                    Progress,
+                    ConditionedWaterZ))
+            {
+                OutSummary += TEXT(
+                    "Zambezi adaptive terrain requires the conditioned visual water profile.\n");
+                return false;
+            }
+
+            for (int32 LateralIndex = 0;
+                 LateralIndex <= LateralStepCount;
+                 ++LateralIndex)
+            {
+                const float LateralT = static_cast<float>(LateralIndex) /
+                    static_cast<float>(LateralStepCount);
+                const float BankDistanceCm = FMath::Lerp(
+                    InnerBankDistanceCm, OuterBankDistanceCm, LateralT);
+                const FVector2D WorldPoint =
+                    Center + BankNormal * (Side * BankDistanceCm);
+                float DenseTerrainZ = 0.0f;
+                const bool bSampled = SampleDenseTerrainWorldZ(
+                    WorldPoint, DenseTerrainZ);
+                const float ShorelineRiseT = SmoothPreviewStep(
+                    InnerBankDistanceCm,
+                    InnerBankDistanceCm + 3000.0f,
+                    BankDistanceCm);
+                const float RequiredDryHeightCm = FMath::Lerp(
+                    35.0f, 130.0f, ShorelineRiseT);
+                const float ExistingDryHeightCm =
+                    DenseTerrainZ - ConditionedWaterZ;
+                const float DryInfillCm = bSampled
+                    ? FMath::Clamp(
+                          RequiredDryHeightCm - ExistingDryHeightCm,
+                          0.0f,
+                          MaximumDryShorelineInfillCm)
+                    : 0.0f;
+                const bool bRenderable = bSampled &&
+                    ExistingDryHeightCm + DryInfillCm >= 30.0f;
+                if (DryInfillCm > 0.5f)
+                {
+                    ++OutStats.DryShorelineInfillVertexCount;
+                    OutStats.MaximumDryShorelineInfillCm = FMath::Max(
+                        OutStats.MaximumDryShorelineInfillCm,
+                        DryInfillCm);
+                }
+
+                Vertices.Add(FVector(
+                    WorldPoint.X,
+                    WorldPoint.Y,
+                    DenseTerrainZ + DryInfillCm + SurfaceLiftCm));
+                const float SourceU = FMath::Clamp(
+                    (WorldPoint.X - LandscapeMinX) /
+                        Candidate.HorizontalSpanXCm,
+                    0.0f,
+                    1.0f);
+                const float SourceV = FMath::Clamp(
+                    1.0f -
+                        (WorldPoint.Y - LandscapeMinY) /
+                            Candidate.HorizontalSpanYCm,
+                    0.0f,
+                    1.0f);
+                Uvs.Add(FVector2D(SourceU, SourceV));
+                const FLinearColor SourceSrgb =
+                    SourceAlbedo.SampleRawBilinear(SourceU, SourceV);
+                const FColor SourceColor8(
+                    static_cast<uint8>(FMath::Clamp(
+                        FMath::RoundToInt(SourceSrgb.R * 255.0f), 0, 255)),
+                    static_cast<uint8>(FMath::Clamp(
+                        FMath::RoundToInt(SourceSrgb.G * 255.0f), 0, 255)),
+                    static_cast<uint8>(FMath::Clamp(
+                        FMath::RoundToInt(SourceSrgb.B * 255.0f), 0, 255)),
+                    255);
+                VertexColors.Add(FLinearColor::FromSRGBColor(SourceColor8));
+                WaterSurfaceZ.Add(ConditionedWaterZ);
+                const float StationEdgeFade =
+                    SmoothPreviewStep(0.0f, 8000.0f, StationM * 100.0f) *
+                    (1.0f - SmoothPreviewStep(
+                        EndStationM * 100.0f - 8000.0f,
+                        EndStationM * 100.0f,
+                        StationM * 100.0f));
+                const float LateralEdgeFade = SmoothPreviewStep(
+                        InnerBankDistanceCm + 400.0f,
+                        InnerBankDistanceCm + 3600.0f,
+                        BankDistanceCm) *
+                    (1.0f - SmoothPreviewStep(
+                        OuterBankDistanceCm - 8000.0f,
+                        OuterBankDistanceCm,
+                        BankDistanceCm));
+                RefinementFades.Add(
+                    StationEdgeFade * LateralEdgeFade *
+                    SmoothPreviewStep(80.0f, 500.0f,
+                        ExistingDryHeightCm + DryInfillCm));
+                RenderableVertices.Add(bRenderable);
+            }
+        }
+
+        const TArray<FVector> BaseNormals =
+            ComputePreviewGridHeightfieldNormals(Vertices, RowSize);
+        for (int32 VertexIndex = 0;
+             VertexIndex < Vertices.Num();
+             ++VertexIndex)
+        {
+            if (!RenderableVertices[VertexIndex])
+            {
+                continue;
+            }
+            const FVector& Position = Vertices[VertexIndex];
+            const float Steepness = 1.0f - FMath::Clamp(
+                BaseNormals[VertexIndex].Z, 0.0f, 1.0f);
+            const float SlopeResponse = FMath::Lerp(
+                0.28f,
+                1.0f,
+                SmoothPreviewStep(0.035f, 0.48f, Steepness));
+            const float BroadErosion = FMath::PerlinNoise2D(
+                FVector2D(
+                    Position.X * 0.00012f + Side * 17.0f,
+                    Position.Y * 0.00012f - Side * 11.0f));
+            const float LocalFracture = FMath::PerlinNoise2D(
+                FVector2D(
+                    Position.X * 0.00043f - Side * 29.0f,
+                    Position.Y * 0.00043f + Side * 23.0f));
+            const float FineTalus = FMath::PerlinNoise2D(
+                FVector2D(
+                    Position.X * 0.00092f + 41.0f,
+                    Position.Y * 0.00092f - 37.0f));
+            float RefinementCm = RefinementFades[VertexIndex] * SlopeResponse *
+                (BroadErosion * 58.0f + LocalFracture * 31.0f +
+                 FineTalus * 14.0f);
+            RefinementCm = FMath::Clamp(RefinementCm, -96.0f, 96.0f);
+            const float MinimumRefinementCm =
+                WaterSurfaceZ[VertexIndex] + 30.0f - Position.Z;
+            RefinementCm = FMath::Max(RefinementCm, MinimumRefinementCm);
+            Vertices[VertexIndex].Z += RefinementCm;
+            if (FMath::Abs(RefinementCm) > 0.5f)
+            {
+                ++OutStats.RefinedVertexCount;
+                OutStats.MaximumAbsoluteRefinementCm = FMath::Max(
+                    OutStats.MaximumAbsoluteRefinementCm,
+                    FMath::Abs(RefinementCm));
+            }
+            OutStats.MinimumRenderedHeightAboveWaterCm = FMath::Min(
+                OutStats.MinimumRenderedHeightAboveWaterCm,
+                Vertices[VertexIndex].Z - WaterSurfaceZ[VertexIndex]);
+        }
+
+        for (int32 StationIndex = 0;
+             StationIndex < LongitudinalStepCount;
+             ++StationIndex)
+        {
+            for (int32 LateralIndex = 0;
+                 LateralIndex < LateralStepCount;
+                 ++LateralIndex)
+            {
+                const int32 A = StationIndex * RowSize + LateralIndex;
+                const int32 B = A + 1;
+                const int32 C = (StationIndex + 1) * RowSize + LateralIndex;
+                const int32 D = C + 1;
+                if (!RenderableVertices[A] || !RenderableVertices[B] ||
+                    !RenderableVertices[C] || !RenderableVertices[D])
+                {
+                    continue;
+                }
+                if (Side < 0.0f)
+                {
+                    Triangles.Append({A, C, B, B, C, D});
+                }
+                else
+                {
+                    Triangles.Append({A, B, C, B, D, C});
+                }
+            }
+        }
+        if (Triangles.IsEmpty())
+        {
+            OutSummary += TEXT(
+                "Zambezi adaptive near-field terrain produced no dry bank triangles.\n");
+            return false;
+        }
+
+        const TArray<FVector> Normals = ComputePreviewMeshNormals(
+            Vertices, Triangles);
+        AActor* Actor = AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(
+                TEXT("RaftSim_ZambeziAdaptiveNearFieldTerrainV1_%sBank"),
+                Side < 0.0f ? TEXT("Left") : TEXT("Right")),
+            Vertices,
+            Triangles,
+            Normals,
+            Uvs,
+            Candidate.PreviewSpec.TerrainColor,
+            TerrainMaterial,
+            &VertexColors,
+            false);
+        if (!Actor)
+        {
+            return false;
+        }
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1"));
+        Actor->Tags.AddUnique(TEXT("RaftSimSourceConditionedTerrain"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProceduralInfill"));
+        Actor->Tags.AddUnique(TEXT("RaftSimProtectedDryShoreline"));
+        Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+        Actor->Tags.AddUnique(TEXT("RaftSimNearFieldSelfShadowSuppressed"));
+        if (UProceduralMeshComponent* Component =
+                Actor->FindComponentByClass<UProceduralMeshComponent>())
+        {
+            Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            Component->SetCastShadow(false);
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNearFieldSelfShadowSuppressed"));
+            ++OutStats.ShadowSuppressedActorCount;
+            if (Component->GetCollisionEnabled() != ECollisionEnabled::NoCollision)
+            {
+                ++OutStats.CollisionEnabledActorCount;
+            }
+        }
+        ++OutStats.ActorCount;
+        OutStats.VertexCount += Vertices.Num();
+        OutStats.TriangleCount += Triangles.Num() / 3;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Built %d source-conditioned Zambezi adaptive near-field bank actors "
+             "over stations %.0f-%.0f m: %lld vertices, %lld triangles, %.1f m grid, "
+             "%lld bounded refinement vertices (maximum %.2f m), %lld dry-shoreline "
+             "infill vertices (maximum %.2f m), minimum rendered clearance %.2f m; "
+             "collision remains disabled and overlay self-shadow is suppressed "
+             "after the rejected shadow-wedge bracket.\n"),
+        OutStats.ActorCount,
+        StartStationM,
+        EndStationM,
+        OutStats.VertexCount,
+        OutStats.TriangleCount,
+        LongitudinalSpacingCm * 0.01f,
+        OutStats.RefinedVertexCount,
+        OutStats.MaximumAbsoluteRefinementCm * 0.01f,
+        OutStats.DryShorelineInfillVertexCount,
+        OutStats.MaximumDryShorelineInfillCm * 0.01f,
+        OutStats.MinimumRenderedHeightAboveWaterCm * 0.01f);
+    return OutStats.ActorCount == 2 && OutStats.VertexCount >= 40000 &&
+        OutStats.TriangleCount >= 60000 &&
+        OutStats.RefinedVertexCount > 0 &&
+        OutStats.MinimumRenderedHeightAboveWaterCm >= 29.5f &&
+        OutStats.MaximumDryShorelineInfillCm <=
+            MaximumDryShorelineInfillCm + 0.5f &&
+        OutStats.ShadowSuppressedActorCount == 2 &&
+        OutStats.CollisionEnabledActorCount == 0;
+}
+
 bool AddLandscapeCandidateScenarioMarkers(
     UWorld* World,
     ALandscape* Landscape,
