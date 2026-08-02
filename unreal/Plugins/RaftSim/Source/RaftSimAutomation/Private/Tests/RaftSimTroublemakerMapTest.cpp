@@ -651,6 +651,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Futaleufu visible carrier has complete calm-water coverage"),
                 (*It)->LiveSurfaceCalmCoverage >= 0.80f);
+            Test->TestTrue(
+                TEXT("Futaleufu live sky reflection stays restrained"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSkyReflectionStrength, 0.34f, 0.001f));
+            Test->TestTrue(
+                TEXT("Futaleufu live carrier keeps moving micro-normal response"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRippleStrength, 0.30f, 0.001f));
+            Test->TestTrue(
+                TEXT("Futaleufu solver foam remains optically legible"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveFoamIntensity, 0.68f, 0.001f));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
@@ -673,6 +685,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Futaleufu runtime solver owns gameplay water rendering"),
                 (*It)->Tags.Contains(
                     TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            if (!(*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Futaleufu capture ribbon uses its isolated Default Lit water"),
+                    (*It)->Tags.Contains(TEXT("RaftSimFutaleufuDefaultLitWater")));
+                Test->TestTrue(
+                    TEXT("Futaleufu capture ribbon records CPU cooked-field color authority"),
+                    (*It)->Tags.Contains(TEXT("RaftSimCpuAuthoredCookedFieldColor")));
+            }
             if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
             {
                 Test->TestTrue(

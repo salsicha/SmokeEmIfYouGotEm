@@ -2928,7 +2928,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     }
 
     const bool bUseSingleLayerWater = Spec.RiverId == TEXT("zambezi_batoka_gorge");
-    UMaterial* Parent = Spec.RiverId == TEXT("pacuare") ? LoadOrCreatePacuareRainforestWaterParent(OutSummary) : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(OutSummary, bUseSingleLayerWater);
+    UMaterial* Parent = Spec.RiverId == TEXT("pacuare")
+        ? LoadOrCreatePacuareRainforestWaterParent(OutSummary)
+        : (Spec.RiverId == TEXT("futaleufu_terminator")
+               ? LoadOrCreateFutaleufuTerminatorWaterParent(OutSummary)
+               : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
+                     OutSummary, bUseSingleLayerWater));
     if (!Parent)
     {
         return nullptr;
@@ -2937,10 +2942,6 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
     {
         WaterNormalAssetName = TEXT("ColoradoRiver");
-    }
-    else if (Spec.RiverId == TEXT("futaleufu_terminator"))
-    {
-        WaterNormalAssetName = TEXT("Pacuare");
     }
     const FString NormalAtlasName = FString::Printf(
         TEXT("T_RaftSim_%s_NormalAtlas"),
@@ -3019,6 +3020,20 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
 
     FRaftSimLandscapeCandidateWaterSettings Settings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
+    if (bDisableSolverVisualizationFields &&
+        Spec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        // Terminator's packed field is sampled exactly once while the CPU
+        // builds the ribbon's geometry and vertex colours. Do not re-sample
+        // the shared South Fork fallback on top of that river-local result.
+        Settings.SolverFieldEnable = 0.0f;
+        Settings.SolverMacroNormalWeight = 0.0f;
+        Settings.SolverDepthColorWeight = 0.0f;
+        Settings.SolverFieldRoughnessWeight = 0.0f;
+        Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+    }
     if (bDisableSolverVisualizationFields && Spec.RiverId == TEXT("american_south_fork"))
     {
         Settings.BaseColorScale = 1.00f;

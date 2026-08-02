@@ -399,6 +399,12 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
         }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimFutaleufuDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+        }
     }
     if (bUseSolverVisualizationFields &&
         SolverFoamVertexColors.Num() == Vertices.Num())
@@ -1545,15 +1551,18 @@ bool AddLandscapeCandidateRunnableGameplay(
     {
         WaterConfig->LiveSurfaceCalmCoverage = 0.89f;
         WaterConfig->LiveSurfaceActiveCoverage = 0.98f;
-        WaterConfig->LiveSurfaceSpecular = 0.08f;
-        WaterConfig->LiveSurfaceRoughness = 0.24f;
+        WaterConfig->LiveSurfaceSpecular = 0.34f;
+        WaterConfig->LiveSurfaceRoughness = 0.28f;
+        WaterConfig->LiveSkyReflectionStrength = 0.34f;
+        WaterConfig->LiveRippleStrength = 0.30f;
+        WaterConfig->LiveFoamIntensity = 0.68f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.012f, 0.055f, 0.070f, 1.0f);
+            FLinearColor(0.016f, 0.082f, 0.105f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.004f, 0.018f, 0.028f, 1.0f);
+            FLinearColor(0.003f, 0.021f, 0.034f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.025f, 0.050f, 0.070f, 1.0f);
+            FLinearColor(0.070f, 0.125f, 0.160f, 1.0f);
     }
     WaterConfig->Tags.AddUnique(RunTag);
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));

@@ -94,6 +94,22 @@ public:
         meta = (ClampMin = "0.02", ClampMax = "1.0"))
     float LiveSurfaceRoughness = 0.16f;
 
+    /** Strength of the bounded Fresnel sky tint on the solver-owned carrier. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveSkyReflectionStrength = 0.62f;
+
+    /** Strength of the two moving micro-normal layers. Geometry and solver
+     * normals remain authoritative at zero and one alike. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveRippleStrength = 0.18f;
+
+    /** Optical intensity of solver-derived entrained-air coloration. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.5"))
+    float LiveFoamIntensity = 0.52f;
+
     /** Width of the presentation-only alpha feather at the sampled wet bank.
      * Solver-owned carriers use a narrow blend so water does not appear to
      * climb several metres onto dry land. */

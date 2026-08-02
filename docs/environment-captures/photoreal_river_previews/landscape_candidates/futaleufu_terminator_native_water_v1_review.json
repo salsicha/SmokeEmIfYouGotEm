@@ -1,0 +1,186 @@
+{
+  "schema": "raftsim.environment.futaleufu_terminator_native_water_review.v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "live_solver_owns_gameplay_rendering_and_forces": true,
+    "terrain_geometry_changed": false,
+    "water_ribbon_geometry_changed": false,
+    "water_collision_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false,
+    "new_live_gameplay_renderer_capture_accepted": false
+  },
+  "authority_boundary": {
+    "capture_ribbon": "noncolliding editor-review surface hidden during gameplay",
+    "capture_color": "reach-local packed cooked field sampled once into CPU-authored vertex color",
+    "capture_optics": "river-local material normals, world optical variation, scene lighting, and Fresnel fill only",
+    "gameplay_surface": "live C++ solver mesh is the sole runtime water renderer and raft-force authority",
+    "procedural_scope": "optical infill only; no terrain, bank, bathymetry, route, water geometry, collision, hydraulic state, or force changes"
+  },
+  "capture_water": {
+    "parent": "/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater",
+    "instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "two_sided": true,
+    "world_position_offset_connected": false,
+    "cross_river_shader_field_reuse": false,
+    "native_normal_atlas": true,
+    "moving_normal_layer_count": 2,
+    "world_optical_scales_per_cm": [
+      0.00031,
+      0.00163
+    ],
+    "solver_shader_field_enable": 0.0,
+    "cpu_authored_cooked_field_color": true,
+    "base_color_scale": 1.08,
+    "vertex_tint_weight": 0.76,
+    "emissive_fill_scale": 0.14,
+    "reflection_fill_intensity": 0.1,
+    "roughness": 0.24,
+    "specular": 0.46,
+    "normal_intensity": 0.3,
+    "surface_variation_strength": 0.3
+  },
+  "runtime_water": {
+    "renderer": "live solver carrier",
+    "calm_coverage": 0.89,
+    "active_coverage": 0.98,
+    "specular": 0.34,
+    "roughness": 0.28,
+    "sky_reflection_strength": 0.34,
+    "ripple_strength": 0.3,
+    "foam_intensity": 0.68,
+    "bank_blend_m": 4.5,
+    "shallow_color": [0.016, 0.082, 0.105],
+    "deep_color": [0.003, 0.021, 0.034],
+    "reflected_sky_color": [0.07, 0.125, 0.16],
+    "validation_scope": "saved config and runtime map assertions; no new live-gameplay renderer frame accepted"
+  },
+  "renderer_comparison": {
+    "method": "normalized RGB comparison over the fixed full-width water band x=0..1279, y=380..719",
+    "guide_seat_downstream": {
+      "changed_pixel_fraction": 0.57560546875,
+      "mean_absolute_rgb_delta": 0.04095950722694397,
+      "mean_luminance_before": 0.16107819974422455,
+      "mean_luminance_after": 0.20630784332752228,
+      "rgb_standard_deviation_before": 0.04824136942625046,
+      "rgb_standard_deviation_after": 0.07217681407928467
+    },
+    "river_eye_downstream": {
+      "changed_pixel_fraction": 0.5897330729166667,
+      "mean_absolute_rgb_delta": 0.040325287729501724,
+      "mean_luminance_before": 0.15825895965099335,
+      "mean_luminance_after": 0.20284339785575867,
+      "rgb_standard_deviation_before": 0.04792451485991478,
+      "rgb_standard_deviation_after": 0.07193729281425476
+    },
+    "solver_rapid_river_eye_downstream": {
+      "changed_pixel_fraction": 0.57560546875,
+      "mean_absolute_rgb_delta": 0.04095950722694397,
+      "mean_luminance_before": 0.16107819974422455,
+      "mean_luminance_after": 0.20630784332752228,
+      "rgb_standard_deviation_before": 0.04824136942625046,
+      "rgb_standard_deviation_after": 0.07217681407928467
+    },
+    "technical_verdict": "retain: the isolated river-local material removes cross-river field reuse and materially increases visible water response in all fixed views",
+    "photoreal_verdict": "fail: the water still reads as a broad synthetic plate with sparse foam and spray, weak crest-scale rapid form, and visibly procedural banks and ecology"
+  },
+  "remaining_photoreal_defects": [
+    "The water still reads as a broad plate instead of a deep, refractive, turbulent Patagonian river volume.",
+    "Terminator's holes, flip-wave train, standing crests, aeration, spray, mist, and shoreline impact remain understated.",
+    "No new live-gameplay renderer capture demonstrates the retained runtime reflection, ripple, foam, and color bracket.",
+    "The 30 m source surface remains too smooth to resolve reach-specific banks, rock shelves, and surveyed rapid geometry.",
+    "The opaque conifer, broadleaf, shrub, and ground-cover forms remain visibly repeated and synthetic.",
+    "Near-bank gravel, cobble, roots, deadwood, wet-rock transitions, undercuts, and deposited sediment remain sparse.",
+    "The cooked hydraulics remain unconverged and uncalibrated against observed Terminator behavior.",
+    "No named Futaleufú guide, environment-art reviewer, water-VFX reviewer, or performance reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Futaleufu guide review of Terminator stationing, entry, main and sneak lines, holes, flip-wave train, marker boulder, recovery, and playable flow bands",
+    "geospatial review of route registration, rapid station, terrain, bank breaklines, bathymetry, rapid rocks, and EGM2008 vertical datum",
+    "hydraulic calibration and convergence approval against observed Terminator behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of native species, ground cover, wet banks, boulders, valley form, and seasonal presentation",
+    "photoreal water and VFX approval for depth, transmission, holes, flip waves, foam, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "native_material_audit": "RaftSim.M9.FFutaleufuTerminatorWater passed 1/1 with 0 warnings and 0 errors",
+    "runtime_map_load": "RaftSim.P4.RiverMapLoads.L_Terminator passed 1/1 with 0 errors and the known r.MotionVectorSimulation engine warning",
+    "focused_python": "25/25 exact-current Futaleufu and Pacuare isolation contracts passed"
+  },
+  "reviewers": {
+    "named_futaleufu_guide": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "c0896e9d73518eeb6248c752a0530107a78ba24123ca249bf7f04034ef089008"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater.uasset",
+      "sha256": "07277b88b8de1d422bf92fa0dd1b62d26b451928aff999929c4939847fd15095"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate.uasset",
+      "sha256": "e325f2c5653c53cc91fc39974be5228ba9e9d9b9cebce4a4e60932dd9ccb1bd8"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "sha256": "afc53d5415518a1f83dcb8f577d1adbace4db57a20958d3a117dd43ee796439d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
+      "sha256": "8ac5836c1343f46d35c8ded4f3b382f489d31fcc47e8636d1275d83a6fab038c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
+      "sha256": "56199b46dbe36016081a5b73e70183b08ad3b5bc1ae8dd4226bab002e101af63"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png",
+      "sha256": "8ac5836c1343f46d35c8ded4f3b382f489d31fcc47e8636d1275d83a6fab038c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_native_water_v1_guide_seat_downstream.png",
+      "sha256": "1b6459f4ffb2b323bb456a9e7667c46ff88b1c7638018d4220d831310d3b4f1b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_native_water_v1_river_eye_downstream.png",
+      "sha256": "46f4bdc782aa2d8f295d93026caa80a0e37b50b2fc941833cca1d997043b0a2d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_native_water_v1_solver_rapid_river_eye_downstream.png",
+      "sha256": "1b6459f4ffb2b323bb456a9e7667c46ff88b1c7638018d4220d831310d3b4f1b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_native_water_v1_material_audit.json",
+      "sha256": "030eb426b03d454b0886411455c7942ec75c0c2114e8d0c88530e650edef7008"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_native_water_v1_map_load.json",
+      "sha256": "f015332f6979d19ff065a70c98d4a113d42e5693dcc39e1364020be6d64d9c0f"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorFutaleufuWaterMaterial.cpp",
+      "sha256": "6923bcaa2e07c50163474f798ff1a6fd36455bc167307173fc0eb7fa11609b1e"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h",
+      "sha256": "3e78d88f24fd49d80cdac3f0a9d2cf9f1b3f54650ab15d2e0c3f25c9ffb54d5f"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "sha256": "391ac580abf5cfc25c62f98e974a73c3a3ff4f009478865888cdd220d3717e5d"
+    }
+  ]
+}

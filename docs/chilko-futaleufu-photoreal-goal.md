@@ -76,6 +76,30 @@ Both maps also replace the 12,000-instance, broadleaf-dominated PVE card fallbac
 
 The Unreal editor builds, and focused `RaftSim.P4.RiverMapLoads.L_Terminator` and `RaftSim.P4.RiverMapLoads.L_LavaCanyon` each pass 1/1 with new assertions for visible solver coverage, four opaque vegetation forms, and organic ground cover. Matched gameplay review accepts the renderer correction and rejects photoreal promotion: the water remains too uniform and bright toward the horizon, the near banks remain broad and dark, and the solid procedural foliage is visibly stylized and repetitive. Exact hashes, contracts, evidence, and open external gates are recorded in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_runtime_water_opaque_vegetation_v1_review.json`.
 
+## Futaleufu Native Water V1
+
+Terminator's retained capture ribbon no longer reuses either Pacuare's normal
+atlas or the shared South Fork shader field. It now has an isolated opaque
+Default Lit parent, two moving Futaleufú-native normal layers, and two
+non-harmonic world-space optical scales. The reach-local packed cooked field is
+sampled exactly once while ribbon geometry and vertex color are built on the
+CPU; the shader field controls are present only as zeroed compatibility
+metadata. The live solver surface remains the sole gameplay water and force
+authority and now receives Futaleufú-specific reflection, ripple, foam, and
+color settings from the saved runtime config.
+
+The fixed water-band comparison records a 57.56% changed-pixel fraction in the
+guide/rapid view and 58.97% at river eye. Mean luminance increases from 0.1611
+to 0.2063 and 0.1583 to 0.2028, while RGB standard deviation increases from
+0.0482 to 0.0722 and 0.0479 to 0.0719. The isolated material audit and runnable
+map gate pass, but this is a technical provenance correction rather than a
+photoreal promotion. The retained frames still show broad synthetic water,
+sparse foam and spray, weak crest-scale rapid structure, smooth 30 m banks,
+repeated procedural ecology, and incomplete reach-specific rocks and ground
+cover. No new live-gameplay renderer frame was accepted for this bracket, so
+the runtime optical values remain config- and map-tested rather than visually
+approved.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

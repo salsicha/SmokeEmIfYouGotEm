@@ -49,10 +49,8 @@ def test_pacuare_water_is_isolated_moving_and_non_displacing():
     assert "Landscape->Import" not in source
     assert "SetCollision" not in source
     assert "procedural reference-infill bathymetry" not in source
-    assert (
-        'Spec.RiverId == TEXT("pacuare") ? '
-        "LoadOrCreatePacuareRainforestWaterParent"
-    ) in base
+    assert 'Spec.RiverId == TEXT("pacuare")' in base
+    assert "LoadOrCreatePacuareRainforestWaterParent" in base
 
 
 def test_pacuare_manifest_records_capture_accepted_render_only_water():

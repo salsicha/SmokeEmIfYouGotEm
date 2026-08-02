@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "AD3C809E484802B4078ADB8F334A59CF",
+			"instanceName": "Alexs-MacBook-Air.local-74581",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-05.23.08",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.0095652900636196136,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FFutaleufuTerminatorWater",
+			"fullTestPath": "RaftSim.M9.FFutaleufuTerminatorWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"AD3C809E484802B4078ADB8F334A59CF"
+			],
+			"duration": 0.0095652900636196136,
+			"dateTime": "2026.08.02-05.23.08",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}
