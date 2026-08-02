@@ -1,0 +1,117 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "937DA6D9F04E1B52D2F1C199B14CFCC0",
+			"instanceName": "Alexs-MacBook-Air.local-92801",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-20.49.44",
+	"succeeded": 4,
+	"succeededWithWarnings": 1,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 11.074934005737305,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "AimedRescuePaths",
+			"fullTestPath": "RaftSim.M5.AimedRescuePaths",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"937DA6D9F04E1B52D2F1C199B14CFCC0"
+			],
+			"duration": 0.0079553313553333282,
+			"dateTime": "2026.08.02-20.49.32",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "CrewAvatarPoseProduction",
+			"fullTestPath": "RaftSim.M5.CrewAvatarPoseProduction",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"937DA6D9F04E1B52D2F1C199B14CFCC0"
+			],
+			"duration": 0.23198433220386505,
+			"dateTime": "2026.08.02-20.49.32",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FlexibleFabricCondition",
+			"fullTestPath": "RaftSim.M5.FlexibleFabricCondition",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"937DA6D9F04E1B52D2F1C199B14CFCC0"
+			],
+			"duration": 0.019314538687467575,
+			"dateTime": "2026.08.02-20.49.33",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "ProductionNiagaraWaterVfx",
+			"fullTestPath": "RaftSim.M5.ProductionNiagaraWaterVfx",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"937DA6D9F04E1B52D2F1C199B14CFCC0"
+			],
+			"duration": 0.018602874130010605,
+			"dateTime": "2026.08.02-20.49.33",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RuntimeRescueLoop",
+			"fullTestPath": "RaftSim.M5.RuntimeRescueLoop",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"937DA6D9F04E1B52D2F1C199B14CFCC0"
+			],
+			"duration": 10.797077178955078,
+			"dateTime": "2026.08.02-20.49.33",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.02-20.49.35"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

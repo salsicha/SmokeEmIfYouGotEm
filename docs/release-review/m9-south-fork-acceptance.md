@@ -2594,6 +2594,36 @@ whitewater-safety review remain open. Exact source, import, renderer, metric, an
 hashes are recorded in
 `docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json`.
 
+## CC0 skin reflectance calibration V1 — technical response improved, photoreal review rejected
+
+The five packaged CC0 fallback identities previously shared one broad subsurface response even
+though their source atlases were photographed in materially different exposure brackets. Under
+the fixed roster rig, the guide and Crew 02/03 faces clipped toward white while Crew 01/04 read
+hotter and more orange than their unchanged source atlases.
+
+V1 uses Unreal preintegrated skin shading and one identity-neutral linear scalar for each
+existing, rights-tracked atlas: guide 0.36, Crew 01 0.72, Crew 02 0.48, Crew 03 0.42, and Crew 04
+0.72. These are reflectance gains, not replacement textures or per-channel identity remaps; the
+source pixels, atlas hue, geometry, rigs, animation, and gameplay remain unchanged. In matched
+1536×1024 profile captures, candidate p95 luminance is lower for all five identities.
+
+![Calibrated guide profile](../environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_guide_profile.png)
+
+![Calibrated Crew 01 profile](../environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew01_profile.png)
+
+![Calibrated Crew 03 profile](../environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew03_profile.png)
+
+All five front/profile/rear captures retain exclusive CC0 ownership and the previously verified
+helmet/PFD/boot selections. The editor target builds, the focused Python contracts pass, and the
+forced-CC0 renderer-backed M5 report contains five successful test entries with zero failures.
+
+This milestone is deliberately fail-closed. The images still show simplified head/body anatomy,
+closed-looking or absent eye presentation, weak shoulders/hips/knees, disconnected-looking hands
+and boots, clothing/PPE intersections, and synthetic materials. Named character-art approval and
+qualified whitewater-safety approval remain open, so M9 and photoreal promotion remain blocked.
+Exact captures, measurements, asset/source hashes, and validation are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1_review.json`.
+
 ## Required named decisions
 
 - [ ] Product owner: campaign, scope, disclosures, and every deferred/blocking item.

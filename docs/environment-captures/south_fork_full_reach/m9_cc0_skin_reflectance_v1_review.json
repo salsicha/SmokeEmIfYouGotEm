@@ -1,0 +1,94 @@
+{
+  "schema": "raftsim.m9.cc0_skin_reflectance_review.v1",
+  "milestone": "CC0 skin reflectance calibration V1",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+  "summary": "The five existing rights-tracked CC0 skin atlases now use preintegrated skin shading and identity-neutral scalar reflectance gains in one fixed renderer bracket. Source pixels, atlas hue, identity geometry, rigs, animation, gameplay, water, raft forces, collision, rescue, scoring, and progression are unchanged. The renderer evidence remains rejected for photoreal art because anatomy, eyes, hands, PPE integration, clothing, hair, and facial presentation remain visibly synthetic.",
+  "implementation": {
+    "shading_model": "MSM_PreintegratedSkin",
+    "source_atlases_unchanged": true,
+    "scalar_gain_preserves_source_hue": true,
+    "geometry_rig_and_gameplay_unchanged": true,
+    "atlas_scalar_gains": {
+      "guide": 0.36,
+      "crew01": 0.72,
+      "crew02": 0.48,
+      "crew03": 0.42,
+      "crew04": 0.72
+    }
+  },
+  "runtime_roster_metrics": {
+    "captured_character_count": 5,
+    "exclusive_cc0_body_count": 5,
+    "maximum_helmet_head_error_cm": 7.31135485487755e-10,
+    "minimum_helmet_forward_alignment": 1.0,
+    "minimum_helmet_fit_scale": 0.9599999785423279,
+    "maximum_helmet_fit_scale": 0.9599999785423279,
+    "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/roster_capture.json",
+    "report_sha256": "b8e3e3feec83f0921f962f45b7a73457239281a66afa2cdf2668cc3c68a5dcbb"
+  },
+  "reflectance_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/metrics.json",
+    "report_sha256": "410c05e1ca4e18b7416d1eea73f5fa46207debfc90915243ccc93a1ece4f090c",
+    "all_five_candidate_p95_luminance_below_baseline": true
+  },
+  "renderer_evidence": {
+    "result": "capture_complete",
+    "fixed_resolution": [1536, 1024],
+    "captures": {
+      "guide_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_guide_full.png", "capture_sha256": "c2f5e111aeb218fddbbd1d604ce7480443a7ec0be33ee48a65f25525c3e4b39b"},
+      "guide_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_guide_profile.png", "capture_sha256": "a7cdce48f6a5c2a822706d6cd5574c98d550b1a9287b1e6fcdbaa73790f5228f"},
+      "guide_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_guide_rear.png", "capture_sha256": "58f8f9b18a0b7e1de68c50e66ebc623fc3af4b6ffee4ceda33985152c6a3ddf0"},
+      "crew01_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew01_full.png", "capture_sha256": "a03a7b5ef7cc44314b352e8e089d8107d50f8be55060a0b36a208bd336c61609"},
+      "crew01_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew01_profile.png", "capture_sha256": "ed5e627335b8de71be014a438a7b42169513f173578f2ef3e7eb86486ac9a032"},
+      "crew01_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew01_rear.png", "capture_sha256": "411f68dfa7e7cc2ce17328736e359854dc9c0da39ddb693080727554deb5ea0d"},
+      "crew02_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew02_full.png", "capture_sha256": "fa1d14cf8f57d6d5f9fdcc662d906a5ee44d0c2e2e3c7ca5681be5c1b7e03a59"},
+      "crew02_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew02_profile.png", "capture_sha256": "308884547cfe09d78d0bed3421e02dcaf2eadbb4bab052461f61c3d972db9e3f"},
+      "crew02_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew02_rear.png", "capture_sha256": "a21f7bbe2bd039684d154d9a4bf094048e2e898e43e57b6d41623ec11495f6ae"},
+      "crew03_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew03_full.png", "capture_sha256": "1936b9e565947d65ad9b3b27a9257f6ae31aeddf43460a3b68f079f8764497b3"},
+      "crew03_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew03_profile.png", "capture_sha256": "fa35d3a41e8651b4118306ad09b5569a03dc14ff6ae86064cf51b48cfb9ad743"},
+      "crew03_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew03_rear.png", "capture_sha256": "8b29ec52d1a13a5e3cd46e8ac63c1a20de53b2713a74d69267def77d5cdccaf4"},
+      "crew04_full": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew04_full.png", "capture_sha256": "271d4f2befd80edca42b1578d799434beff3962afc98347e029c408ab992df9f"},
+      "crew04_profile": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew04_profile.png", "capture_sha256": "70401b7756ba5f67e2ff3db316bebf03debe2487a46daac6e3e4ccbeddeb1b15"},
+      "crew04_rear": {"capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_crew04_rear.png", "capture_sha256": "69e1e94fdffb258e5f04fc62e7ddc3f8acb895948e1b07119abe6f3a893cea65"}
+    }
+  },
+  "material_assets_sha256": {
+    "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Guide_Skin.uasset": "935c324208735a85cb07573e53bc0d0b0d3ca24a62e6862519149c8ad4d67b57",
+    "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew01_Skin.uasset": "606bd0c3d181fff2e0b2eaa9001beedda3738762bee33051e7bcc92c897d6558",
+    "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew02_Skin.uasset": "9468c17959cfabe21d6605dced1c78e13542bd9160857047e0faeb45d4e2af6f",
+    "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew03_Skin.uasset": "929034473d3789da1a207fcfd51adf699a065712f4b20daffe5145c0e6049446",
+    "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew04_Skin.uasset": "7e55fd74518f2256b7d2f673035ac50d7737e92305341e98ab78df87476b2cf4"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": "5a226a3e606f9182dd33d78ec37b257ee35ad805410cc9c29ed0adb7fb026f39",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "96d1dd2e0d913f7c3f7c88b245d29ddea0c210708241cbda77a852e719b1a6da",
+    "unreal/Scripts/capture_cc0_production_roster.py": "fcad88e9053f181110755c290ecb9b591c1bbcd7c7cee0c3bec539f6405d912b",
+    "unreal/Scripts/create_production_cc0_skin_materials.py": "5630861be6a302492cc9000ef3200a356a3cae8251c6efc5e610b10d54fc371c"
+  },
+  "validation": {
+    "editor_build": "succeeded",
+    "m5": {
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/m5.json",
+      "report_sha256": "921a84bfd1255c77f677a7211cb353efee5bb8a00a45ec67056541809f7625be",
+      "succeeded": 4,
+      "succeeded_with_warnings": 1,
+      "failed": 0,
+      "successful_test_entries": 5
+    }
+  },
+  "open_gates": [
+    "Replace or materially refine the simplified head, eye, eyelid, shoulder, hip, thigh, knee, hand, finger, and boot geometry.",
+    "Add production facial rigging, natural gaze/blink behavior, hair, and identity-specific skin/eye assets.",
+    "Resolve clothing and PPE intersections and obtain named character-art approval.",
+    "Obtain qualified whitewater-safety approval for helmet, PFD, footwear, posture, and equipment use."
+  ],
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null
+  }
+}

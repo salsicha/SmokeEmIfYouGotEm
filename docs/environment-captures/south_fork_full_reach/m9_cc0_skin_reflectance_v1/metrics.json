@@ -1,0 +1,56 @@
+{
+  "schema": "raftsim.m9.cc0_skin_reflectance_metrics.v1",
+  "baseline": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_<identity>_profile.png",
+  "candidate": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1/raftsim_cc0_<identity>_profile.png",
+  "method": {
+    "colorspace": "8-bit rendered RGB",
+    "matched_camera_and_resolution": true,
+    "changed_pixel_threshold": "maximum absolute RGB channel delta greater than 3",
+    "luminance_weights": [0.2126, 0.7152, 0.0722],
+    "scope_note": "Metrics describe renderer response in changed pixels, not anatomy, realism, identity, or art acceptance."
+  },
+  "identities": {
+    "guide": {
+      "scalar_gain": 0.36,
+      "changed_percent": 0.681559,
+      "baseline_mean_rgb": [210.466, 191.485, 177.669],
+      "candidate_mean_rgb": [199.31, 168.019, 147.858],
+      "baseline_p95_luminance": 244.974,
+      "candidate_p95_luminance": 228.16
+    },
+    "crew01": {
+      "scalar_gain": 0.72,
+      "changed_percent": 0.4474,
+      "baseline_mean_rgb": [175.442, 112.464, 82.972],
+      "candidate_mean_rgb": [173.877, 107.528, 77.947],
+      "baseline_p95_luminance": 173.276,
+      "candidate_p95_luminance": 170.081
+    },
+    "crew02": {
+      "scalar_gain": 0.48,
+      "changed_percent": 0.51295,
+      "baseline_mean_rgb": [220.84, 201.746, 189.41],
+      "candidate_mean_rgb": [212.625, 185.438, 168.749],
+      "baseline_p95_luminance": 241.901,
+      "candidate_p95_luminance": 231.382
+    },
+    "crew03": {
+      "scalar_gain": 0.42,
+      "changed_percent": 0.547981,
+      "baseline_mean_rgb": [217.394, 201.017, 192.087],
+      "candidate_mean_rgb": [207.342, 183.118, 170.066],
+      "baseline_p95_luminance": 248.127,
+      "candidate_p95_luminance": 237.186
+    },
+    "crew04": {
+      "scalar_gain": 0.72,
+      "changed_percent": 0.523949,
+      "baseline_mean_rgb": [198.463, 120.349, 87.35],
+      "candidate_mean_rgb": [196.839, 115.423, 82.129],
+      "baseline_p95_luminance": 176.291,
+      "candidate_p95_luminance": 173.662
+    }
+  },
+  "technical_result": "all five identities retain their existing source atlas and show lower p95 luminance in the fixed renderer bracket",
+  "photoreal_result": "rejected"
+}

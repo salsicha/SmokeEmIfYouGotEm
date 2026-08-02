@@ -15,10 +15,10 @@ REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_production_character_fallback_v287_review.json"
 )
-FACE_FITTED_HELMET_REVIEW_PATH = (
+SKIN_REFLECTANCE_REVIEW_PATH = (
     REPO_ROOT
     / "docs/environment-captures/south_fork_full_reach/"
-    "m9_cc0_face_fitted_helmet_v1_review.json"
+    "m9_cc0_skin_reflectance_v1_review.json"
 )
 
 
@@ -217,6 +217,13 @@ def test_cc0_production_skin_builder_preserves_atlases_and_adds_physical_respons
     assert 'TEXT("T_RaftSim_CC0_LightMale")' in source
     assert 'TEXT("T_RaftSim_CC0_DarkFemale")' in source
     assert "Material->SetShadingModel(MSM_PreintegratedSkin)" in source
+    assert "AtlasReflectanceCalibration" in source
+    assert "Multiply(CalibratedAtlas, BoundedMicroGain)" in source
+    assert "FLinearColor(0.36f, 0.36f, 0.36f, 1.0f)" in source
+    assert "FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)" in source
+    assert "FLinearColor(0.48f, 0.48f, 0.48f, 1.0f)" in source
+    assert "FLinearColor(0.42f, 0.42f, 0.42f, 1.0f)" in source
+    assert source.count("FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)") >= 2
     assert "Material->SetMaterialUsage(MATUSAGE_SkeletalMesh)" in source
     assert "MicroUv->UTiling = 36.0f" in source
     assert "MicroUv->VTiling = 36.0f" in source
@@ -616,9 +623,9 @@ def test_cc0_assets_and_renderer_review_remain_fail_closed() -> None:
     assert review["automation_evidence"]["failed"] == 0
     assert _sha256(capture) == review["renderer_evidence"]["capture_sha256"]
 
-def test_face_fitted_cc0_helmet_review_is_hash_verified_and_fail_closed() -> None:
-    review = json.loads(FACE_FITTED_HELMET_REVIEW_PATH.read_text(encoding="utf-8"))
-    assert review["schema"] == "raftsim.m9.cc0_face_fitted_helmet_review.v1"
+def test_cc0_skin_reflectance_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(SKIN_REFLECTANCE_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert review["schema"] == "raftsim.m9.cc0_skin_reflectance_review.v1"
     assert review["passed"] is False
     assert review["technical_candidate_passed"] is True
     assert review["photoreal_acceptance_passed"] is False
@@ -626,7 +633,20 @@ def test_face_fitted_cc0_helmet_review_is_hash_verified_and_fail_closed() -> Non
     assert review["reviewers"]["named_character_art_reviewer"] is None
     assert review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
     assert review["promotion_allowed"] is False
-    assert review["supersedes"].endswith("m9_folded_wet_splash_sleeves_v3_review.json")
+    assert review["supersedes"].endswith("m9_cc0_face_fitted_helmet_v1_review.json")
+
+    implementation = review["implementation"]
+    assert implementation["shading_model"] == "MSM_PreintegratedSkin"
+    assert implementation["source_atlases_unchanged"] is True
+    assert implementation["scalar_gain_preserves_source_hue"] is True
+    assert implementation["geometry_rig_and_gameplay_unchanged"] is True
+    assert implementation["atlas_scalar_gains"] == {
+        "guide": 0.36,
+        "crew01": 0.72,
+        "crew02": 0.48,
+        "crew03": 0.42,
+        "crew04": 0.72,
+    }
 
     metrics = review["runtime_roster_metrics"]
     assert metrics["captured_character_count"] == 5
@@ -646,26 +666,22 @@ def test_face_fitted_cc0_helmet_review_is_hash_verified_and_fail_closed() -> Non
         assert character["runtime_helmet_forward_alignment"] >= 0.98
         assert 0.90 <= character["runtime_helmet_fit_scale"] <= 1.02
 
-    import_evidence = review["import_evidence"]
-    import_report = REPO_ROOT / import_evidence["report"]
-    assert _sha256(import_report) == import_evidence["report_sha256"]
-    imported = json.loads(import_report.read_text(encoding="utf-8"))
-    assert imported["status"] == "imported"
-    assert len(imported["characters"]) == 5
+    reflectance = review["reflectance_metrics"]
+    reflectance_report = REPO_ROOT / reflectance["report"]
+    assert _sha256(reflectance_report) == reflectance["report_sha256"]
+    measured = json.loads(reflectance_report.read_text(encoding="utf-8"))
+    assert reflectance["all_five_candidate_p95_luminance_below_baseline"] is True
     assert all(
-        any(
-            slot["material"].endswith(
-                "M_RaftSim_CC0_HelmetContainedHairHidden"
-            )
-            for slot in character["material_slots"]
-            if "Hair" in slot["slot"]
-        )
-        for character in imported["characters"]
+        row["candidate_p95_luminance"] < row["baseline_p95_luminance"]
+        for row in measured["identities"].values()
     )
 
     for item in review["renderer_evidence"]["captures"].values():
         capture = REPO_ROOT / item["capture"]
         assert _sha256(capture) == item["capture_sha256"]
+
+    for asset_relpath, expected_hash in review["material_assets_sha256"].items():
+        assert _sha256(REPO_ROOT / asset_relpath) == expected_hash
 
     for source_relpath, expected_hash in review["implementation_sha256"].items():
         assert _sha256(REPO_ROOT / source_relpath) == expected_hash
@@ -675,5 +691,6 @@ def test_face_fitted_cc0_helmet_review_is_hash_verified_and_fail_closed() -> Non
     assert _sha256(m5_report) == m5["report_sha256"]
     m5_payload = json.loads(m5_report.read_text(encoding="utf-8-sig"))
     assert m5_payload["succeeded"] == m5["succeeded"]
+    assert m5_payload["succeededWithWarnings"] == m5["succeeded_with_warnings"]
     assert m5_payload["failed"] == 0
     assert sum(test["state"] == "Success" for test in m5_payload["tests"]) == 5
