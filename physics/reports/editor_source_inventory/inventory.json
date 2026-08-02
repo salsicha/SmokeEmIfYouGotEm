@@ -15,7 +15,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 1092
+      "line_count": 1104
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
@@ -31,7 +31,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
-      "line_count": 1658
+      "line_count": 1688
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
@@ -163,7 +163,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
-      "line_count": 1282
+      "line_count": 1359
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBatokaMaterial.cpp",
@@ -279,7 +279,7 @@
     }
   ],
   "implementation_file_count": 69,
-  "implementation_line_count": 75249,
+  "implementation_line_count": 75368,
   "registered_console_command_count": 37,
   "registered_console_commands": [
     {
@@ -559,7 +559,7 @@
     },
     {
       "river_id": "futaleufu_terminator",
-      "map_package_token": "L_FutaleufuTerminator_PhysicalCorridorCandidate",
+      "map_package_token": "L_Terminator",
       "river_id_present": true,
       "map_package_present": true
     },

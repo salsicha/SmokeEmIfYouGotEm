@@ -3684,3 +3684,20 @@ path is verified, and the completion goal can be marked complete.
   unconverged hydraulics, and open guide/geospatial/ecology/art/water-VFX/
   performance gates still reject photoreal and production promotion; M9 stays
   open.
+- Futaleufú Terminator reach-local runnable V1 replaces the flat signature-
+  rapid shell and scale-mismatched 16 km corridor preview with a physical
+  600×600 m, 1009×1009 Landscape. The review-gated OSM route scaffold and
+  Copernicus GLO-30 surface define broad form; the full 600×84 m interpreted C3
+  bed remains exact, while bounded terrain-edge correction and sub-30 m
+  procedural microrelief fill only unresolved space outside it. A 301-point
+  station/lateral map applies the 206.596 m runtime datum with 0.0 m centerline
+  surface error. Median cooked water, player raft/start, vertical-slice game
+  mode, and the one interpreted/review-gated entry-marker-boulder D4 contact
+  make `L_Terminator` reference runnable. Capture water and foam are
+  non-colliding and hidden during play so live solver water owns rendering and
+  forces. The editor builds, focused PIE passes 1/1 with an upright raft and
+  zero swimmers, and MapCheck is clean. Dark opaque water, understated rapid
+  hydraulics, nearly black smooth banks, repeated placeholder vegetation,
+  sparse ground cover, review-gated route/stationing, unconverged hydraulics,
+  and open guide/geospatial/ecology/art/water-VFX/performance gates reject
+  photoreal and production promotion; M9 remains open.

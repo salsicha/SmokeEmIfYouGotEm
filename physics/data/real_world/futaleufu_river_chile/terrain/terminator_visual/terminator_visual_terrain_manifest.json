@@ -1,0 +1,89 @@
+{
+  "schema": "raftsim.futaleufu.terminator_visual_terrain.v1",
+  "status": "generated_review_gated_reach_local_copernicus_dem_plus_interpreted_c3_solver_strip_not_survey_or_production_terrain_authority",
+  "river_id": "futaleufu_terminator",
+  "section_id": "terminator_station_5312m_c3_window",
+  "reference_flow_band": "median_runnable",
+  "inputs": {
+    "source_corridor_manifest": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json",
+    "source_corridor_manifest_sha256": "a872de812513e17ae2b574d8ecbcb4742f65b3abcbc4ccd7c122881807bcd16c",
+    "source_centerline": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/centerline_local.json",
+    "source_centerline_sha256": "2c48437a7d621b28331d93ddef9052bcda60161224f513c95fc8c9ac40fc3b83",
+    "conditioned_corridor_heightfield": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png",
+    "conditioned_corridor_heightfield_sha256": "69bad66c4abfd36613cac68d0f24ba90c8fb8aa64ec7876eb1bb1f6c7d517fff",
+    "window_manifest": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/window_manifest.json",
+    "window_manifest_sha256": "a5620e06985b72f6e2f00f387029b8306ca7c28a4febd4fbb24f0f02d1cefd12",
+    "cooked_manifest": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/manifest.json",
+    "cooked_manifest_sha256": "a12c1d9f2ba9666344064abaeffb6250a31c665347408d8290daa538098ffe29",
+    "bed": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/bed.npy",
+    "bed_sha256": "d29c54624a27fed2fd5e8d7f954065a742427703f594804a4d6b52e57dd44c19",
+    "depth": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/h.npy",
+    "depth_sha256": "9ddd92aaec8db4be56579b058198bfd9a885a5c08ef95bd535b870804bba1ebe",
+    "wet_mask": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/median_runnable/wet_mask.npy",
+    "wet_mask_sha256": "5b20194e0d5d5c2a82e4417e94620b286ecd3f51c01bf17d644019417fe58bb3"
+  },
+  "outputs": {
+    "heightfield": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_conditioned_heightfield_1009.png",
+    "heightfield_sha256": "5cdab40a20ec309d51930584e8b8297202c1057e03704088f8e75cdcf78a8e3b",
+    "local_centerline": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_local_centerline.json",
+    "local_centerline_sha256": "2f09a8312de4cc1dcd0173b6c40e861ce5cfe2aea98da0a25a6f1c039030475f",
+    "runtime_coordinate_map": "physics/data/real_world/futaleufu_river_chile/terrain/terminator_visual/terminator_runtime_coordinate_map.json",
+    "runtime_coordinate_map_sha256": "93ee065a6154c573a13ed6060591f043fa5ce41e8f21de87c6b11354cf912ce5"
+  },
+  "landscape": {
+    "size_px": 1009,
+    "pixel_format": "16_bit_grayscale_png",
+    "horizontal_span_x_m": 600.0,
+    "horizontal_span_y_m": 600.0,
+    "source_solver_span_y_m": 84.0,
+    "sample_spacing_x_m": 0.5952380952380952,
+    "sample_spacing_y_m": 0.5952380952380952,
+    "terrain_min_m": 200.18963623046875,
+    "terrain_max_m": 272.0710932792999,
+    "target_relief_cm": 7188.145704883113,
+    "world_vertical_offset_cm": -640.6583174795514,
+    "runtime_vertical_datum_m": 206.59621940526426
+  },
+  "source_registration": {
+    "anchor_corridor_station_m": 5312.259,
+    "corridor_station_range_m": [
+      5012.259,
+      5612.259
+    ],
+    "adopted_hydrography": "OpenStreetMap named-river route scaffold pending guide and geospatial review",
+    "terrain": "Copernicus DEM GLO-30 surface model, corridor-conditioned",
+    "terrain_vertical_datum": "Copernicus DEM EGM2008 orthometric heights",
+    "sampling_policy": "bilinear_frenet_cross_section_along_adopted_route"
+  },
+  "procedural_infill": {
+    "algorithm": "corridor_dem_edge_alignment_and_sub_30m_microrelief_v1",
+    "source_solver_half_width_m": 42.0,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_corridor_dem_edge_correction_m": 4.882013151505504,
+    "edge_correction_feather_distance_m": 135.0,
+    "maximum_procedural_microrelief_m": 1.159929968635603,
+    "maximum_change_from_corridor_dem_outside_solver_strip_m": 4.88194160385612,
+    "authority": "visual and Landscape collision infill only; Copernicus broad form, complete interpreted C3 bed, cooked water state, and raft forces remain unchanged"
+  },
+  "alignment": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0,
+    "static_water_flow_offset_cm": 0.0
+  },
+  "honesty": {
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "source_terrain_resolution_m": 30.0,
+    "route_station_authority": "order_distributed_route_work_window_not_authoritative",
+    "procedural_gap_fill_authority": "visual_and_collision_infill_not_survey",
+    "solver_authority": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields/manifest.json",
+    "production_promoted": false,
+    "pending_human_review": true,
+    "missing": [
+      "surveyed Terminator bathymetry, bank breaklines, and rapid rocks",
+      "reviewed rapid station, span, and guide lines",
+      "gauge-to-reach discharge calibration and solver convergence",
+      "guide, geospatial, ecology, art, rights, and performance acceptance"
+    ]
+  }
+}

@@ -32,7 +32,7 @@ the full-corridor Zambezi reference run:
 | South Fork American | `south_fork_american_chili_bar` | **Troublemaker** (+ Meat Grinder) | `L_Troublemaker` | **DONE, playable** |
 | Colorado Grand Canyon | `colorado_river_grand_canyon_rowing` | **Hance** | `L_Hance` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
-| Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | to build |
+| Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` | **reference runnable; production hydraulics gated** |
 
@@ -171,3 +171,26 @@ and external acceptance gates pass.
   limited rapid-specific rock detail, unconverged hydraulics, and open guide,
   geospatial, ecology, environment-art, water-VFX, and performance gates keep
   photoreal and production promotion rejected.
+
+### 2026-08-01 — Futaleufú Terminator physical runnable map restored
+
+- `L_Terminator` now uses a 1009×1009, 8×8-component Landscape covering a
+  reach-local 600×600 m window. Broad terrain is sampled in a Frenet frame from
+  the review-gated OpenStreetMap route scaffold and Copernicus DEM GLO-30;
+  the complete 600×84 m interpreted C3 bed remains unchanged. Where the 30 m
+  source cannot resolve local form, deterministic correction and microrelief
+  are bounded to 4.882 m and 1.160 m respectively outside the protected strip,
+  explicitly as visual/collision infill rather than surveyed geography.
+- A 301-point station/lateral coordinate map applies the recorded 206.596 m
+  runtime datum with 0.0 m centerline surface error. Median cooked water, the
+  player raft/start, and vertical-slice game mode are live in the saved map;
+  field-derived capture water and foam are non-colliding and hidden during play.
+  The one discrete C3 rock—the interpreted 3.2 m entry marker boulder—is present
+  as review-gated D4 contact geometry rather than a surveyed hazard claim.
+- `RaftSim.P4.RiverMapLoads.L_Terminator` passes 1/1 with a wet finite live
+  window, upright raft, and zero swimmers; MapCheck reports 0 errors and 0
+  warnings. The physical/runnable baseline is accepted, but dark opaque water,
+  weak rapid structure, smooth banks, repeated placeholder vegetation, sparse
+  ground cover, non-authoritative route stationing, unconverged hydraulics, and
+  open guide/geospatial/ecology/art/water-VFX/performance gates keep photoreal
+  and production promotion rejected.
