@@ -160,6 +160,13 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     bool HasLivePfdMaterialResponse() const;
 
+    /** True when the visible splash-jacket torso and sleeves share live cloth wetness. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    bool HasLiveSplashJacketMaterialResponse() const
+    {
+        return SplashJacketMaterialInstance != nullptr;
+    }
+
     /** Bounded presentation-only PFD saturation; never physics or rescue authority. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
     float GetPfdPresentationWetness() const { return PfdPresentationWetness; }
@@ -330,6 +337,8 @@ private:
     TObjectPtr<UStaticMeshComponent> ProductionPfd;
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> PfdShellMaterialInstance;
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> SplashJacketMaterialInstance;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Neck;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Head;
     UPROPERTY() TObjectPtr<UProceduralMeshComponent> Helmet;

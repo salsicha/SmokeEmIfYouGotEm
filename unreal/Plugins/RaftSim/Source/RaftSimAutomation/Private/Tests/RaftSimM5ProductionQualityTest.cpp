@@ -1075,6 +1075,11 @@ bool FRaftSimM5StartRescueCommand::Update()
         Test->TestTrue(
             FString::Printf(TEXT("avatar %s owns a live PFD material response"), *It->GetName()),
             It->HasLivePfdMaterialResponse());
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("avatar %s owns a live splash-jacket cloth response"),
+                *It->GetName()),
+            It->HasLiveSplashJacketMaterialResponse());
         const float PfdWetness = It->GetPfdPresentationWetness();
         Test->TestTrue(
             FString::Printf(
@@ -1205,13 +1210,13 @@ bool FRaftSimM5StartRescueCommand::Update()
                 It->GetMinimumShoulderSleeveVertexCount();
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("avatar %s retains tapered garment shoulders between the PFD "
-                         "and arms (minimum extent %s, %d vertices)"),
+                    TEXT("avatar %s retains folded cloth shoulders between the PFD and "
+                         "arms (minimum extent %s, %d vertices)"),
                     *It->GetName(),
                     *ShoulderSleeveExtentCm.ToCompactString(),
                     ShoulderSleeveVertexCount),
                 It->HasVisibleShoulderSilhouette() &&
-                    ShoulderSleeveVertexCount >= 550);
+                    ShoulderSleeveVertexCount >= 1000);
             const float ShoulderAnchorErrorCm =
                 It->GetMaximumShoulderSleeveAnchorErrorCm();
             Test->TestTrue(

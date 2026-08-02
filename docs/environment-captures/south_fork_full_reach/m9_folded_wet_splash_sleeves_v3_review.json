@@ -1,0 +1,137 @@
+{
+  "schema": "raftsim.m9.folded_wet_splash_sleeves_review.v3",
+  "reviewed_utc": "2026-08-02T11:01:00Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
+  "summary": "Folded Wet Splash Sleeves V3 retains the solved V2 shoulder-to-elbow silhouette while replacing its smooth, glossy tube surface with a denser project-owned garment shell. Two non-repeating diagonal fold fields, localized cuff gather, a restrained underarm seam, elliptical cross-section, Cloth shading, ripstop texture detail, and live bounded wetness now give the visible splash-jacket overlay a less rigid presentation.",
+  "root_cause": {
+    "v2_shape_problem": "The retained V2 sleeve fixed the missing shoulder and uniform diameter, but its circular low-density surface and generic wet shader still read as a hard cyan tube.",
+    "retained_shape": "A twenty-eight-ring, thirty-six-sided surface preserves the broad deltoid and taper while adding bounded diagonal folds, cuff gathering, underarm seam relief, axial drape, and finite-difference surface normals.",
+    "retained_material": "The isolated opaque splash-jacket parent uses the three project-owned PFD ripstop texture channels at garment scale, Cloth shading, 0.72 dry roughness, bounded 0.44 saturated roughness, and the same presentation-only Wetness signal as the PFD.",
+    "authority": "Existing solved shoulders, elbows, body pose, paddle grip, collision, mass, rescue state, water, raft, and gameplay forces remain authoritative and unchanged."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "visible_sleeves_per_avatar": 2,
+    "axial_rings": 28,
+    "radial_sides": 36,
+    "minimum_allowed_vertex_count_per_sleeve": 1000,
+    "authored_vertex_count_per_sleeve": 1075,
+    "maximum_allowed_shoulder_anchor_error_cm": 0.25,
+    "fold_fields": 2,
+    "cuff_gather": true,
+    "underarm_seam_relief": true,
+    "elliptical_cross_section": true,
+    "finite_difference_normals": true,
+    "sleeve_material": "/Game/RaftSim/Materials/M_RaftSim_SplashJacket",
+    "material_blend_mode": "opaque",
+    "material_shading_model": "MSM_Cloth",
+    "material_texture_set": [
+      "T_RaftSim_PfdRipstop_Albedo",
+      "T_RaftSim_PfdRipstop_Normal",
+      "T_RaftSim_PfdRipstop_AORoughnessHeight"
+    ],
+    "live_splash_jacket_material_response": true,
+    "maximum_presentation_wetness": 0.84,
+    "pfd_shoulder_foam_added": false,
+    "pfd_shoulder_webbing_changed": false,
+    "animation_changed": false,
+    "crew_mass_changed": false,
+    "collision_changed": false,
+    "raft_changed": false,
+    "water_changed": false,
+    "rescue_changed": false,
+    "physics_or_gameplay_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_roster_capture.json",
+    "report_sha256": "d551374742256f53ccd2da9067f86f63b0aa397544cfd2c2d7587c25cb69ce49",
+    "captured_character_count": 5,
+    "characters_with_visible_shoulder_silhouette": 5,
+    "characters_with_live_splash_jacket_material_response": 5,
+    "minimum_sleeve_vertex_count": 1075,
+    "minimum_sleeve_radius_cm": 4.8613739013671875,
+    "minimum_sleeve_half_length_cm": 7.41104568734806,
+    "maximum_shoulder_anchor_error_cm": 1.3605050241949357e-7
+  },
+  "renderer_evidence": {
+    "captures": {
+      "guide_full": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_guide_full.png",
+        "capture_sha256": "ec361bb32c7900c053d34202b5057ef39c5c625b14904a1c64d57935253b7832"
+      },
+      "guide_profile": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_guide_profile.png",
+        "capture_sha256": "8c8b1f52bac68a5c832e51cc6fa49b2f2d007dc0e01bd9c0cc021a11e3c3e3b9"
+      },
+      "guide_rear": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_guide_rear.png",
+        "capture_sha256": "a4189c5e2900c16fc6e49ddbe98749feb4a3c3991b809265791beecaebc9bbcc"
+      },
+      "broadest_crew_full": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_crew03_full.png",
+        "capture_sha256": "d9601d4b7790ea8110ef30a73695eaa23704decb812d77a745d6f5220cfb075f"
+      },
+      "broadest_crew_profile": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_crew03_profile.png",
+        "capture_sha256": "46e2a2b9377560cf36c15a1d719fad60780473173a32f2992816f5710c887812"
+      },
+      "broadest_crew_rear": {
+        "capture": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_crew03_rear.png",
+        "capture_sha256": "c2a1279e8b59ee16ef09845e6053b659848893677ef072f1539cf972df6df79c"
+      }
+    },
+    "width": 1536,
+    "height": 1024,
+    "technical_verdict": "pass: guide and broadest-body front, profile, and rear captures retain the solved shoulder silhouette while showing visible surface folds, gathered cuff irregularity, and lower hard-plastic gloss than V2",
+    "photoreal_verdict": "fail: the overlay remains procedural and synthetic, with exaggerated regular folds, abrupt torso/cuff integration, no skinned fabric compression, no identity-specific tailoring, and no production garment seam construction"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "e088b957a608fc20adc9037a118ac480ea7b94749e9ddd468685b53dc3648241",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "ff6c1f915a5ad61b4790d6570e3cc515edaf8c24e76cf74ed3dc632869988796",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": "0e5a78070090399a542c1145f0986490f540e4aa945c13ee285db738dcd25f25",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "368e044f979bfdc30ba7ebe72257422f52068714d114beae16e9fe3377e4a033",
+    "unreal/Scripts/create_splash_jacket_material.py": "9ac3d46c1c6bd70302c6a1cc4b2b0d89519ead3209bb0c02203c10cd3b3fbf4b",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "5697537fb4801c45010ee0cfd5844f015036ce495d4618a1db1eba76271f5ffa",
+    "physics/tests/test_cc0_production_characters.py": "811dbc2a30839275d77d092af2f9a41bb426ba172ec42c2abfe02f9a8949a470",
+    "physics/tests/test_safety_gear_fallback.py": "9931e3419762c6b3a6372d9a952a0cd5fe30f78ba6404aa24807be8747f137d6",
+    "unreal/Content/RaftSim/Materials/M_RaftSim_SplashJacket.uasset": "2df2140d3e162e631d89bbfb460d51966acc948bf0a11629d8207e0394feb034"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_material_authoring": "isolated RaftSim.CreateSplashJacketMaterial command completed; saved material is opaque MSM_Cloth and uses exactly the three expected ripstop textures",
+    "focused_python": "16/16 production-character and safety-gear source and review-lock contracts passed",
+    "renderer_turntable": "5/5 identities captured with front, profile, and rear views",
+    "m5": {
+      "result": "1/1 CrewAvatarPoseProduction passed renderer-enabled with 0 warnings and 0 errors",
+      "report": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_m5.json",
+      "report_sha256": "3b791802942d313a819713406f5e0a8124a5967de34b0bd58a69bda546069501"
+    }
+  },
+  "accepted": [
+    "Both production shoulder sleeves now use denser folded garment topology instead of the retained smooth V2 tube surface.",
+    "All five roster identities meet the 1000-vertex mesh guard, live Cloth material-response guard, visible-shoulder contract, and existing shoulder-anchor contract.",
+    "The opaque splash-jacket parent uses the complete project-owned ripstop set and bounded live wetness without becoming gameplay authority.",
+    "The PFD still has no flotation shoulder pads; the folded geometry remains part of the splash-jacket layer.",
+    "No animation, mass, collision, raft, water, rescue, paddle-force, or gameplay-force authority changed."
+  ],
+  "rejected_or_open": [
+    "The V2 smooth tapered sleeve presentation is superseded by this evidence set.",
+    "The retained procedural folds remain too regular and pronounced to pass as production cloth.",
+    "The torso, cuff, and underlying arm transitions still need a unified skinned garment with authored seams and compression deformation.",
+    "No named character-art reviewer or qualified whitewater guide has approved this evidence for release media."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the sleeve topology, torso integration, skinning, deformation, seams, tailoring, and wet-material response.",
+    "A qualified whitewater guide must approve shoulder range of motion and paddle-stroke biomechanics in motion.",
+    "M9 remains blocked by all wider human, platform, signing, media, clean-build, performance, and promotion gates."
+  ]
+}

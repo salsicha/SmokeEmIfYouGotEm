@@ -122,6 +122,18 @@ All notable changes to this project are recorded here, newest first. Versioning 
   repeated procedural vegetation, flat dark water, understated rapid hydraulics,
   sparse bank structure, and missing named external review keep the result
   photoreal-rejected.
+- Superseded the smooth production splash-jacket sleeves with denser folded
+  garment shells. Each shoulder-to-elbow overlay now uses 28 axial rings and
+  36 radial sides, two bounded diagonal fold fields, cuff gathering, underarm
+  seam relief, an elliptical profile, and finite-difference surface normals.
+  An isolated opaque Cloth parent uses the complete project-owned ripstop set
+  and shares the PFD's bounded presentation-only wetness. All five production
+  identities pass the 1,000-vertex, live-material, visibility, and joint-anchor
+  gates; the editor build, isolated material audit, 16 focused contracts,
+  five-identity renderer roster, and renderer-enabled M5 test pass. The result
+  is retained as a technical improvement but remains photoreal-rejected for
+  regular procedural folds, abrupt garment integration, missing skinned cloth
+  deformation and tailoring, and absent named character-art/guide review.
 - Replaced the production splash-jacket's uniform shoulder-to-elbow primitives
   with closed, tapered garment sleeves. An 18-ring, 28-sided profile now carries
   a broad deltoid into a smaller cuff; all five production identities retain the

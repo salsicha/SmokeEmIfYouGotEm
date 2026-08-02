@@ -43,6 +43,9 @@ PFD_ASSET_PATH = (
 ROSTER_CAPTURE_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/capture_metahuman_production_roster.py"
 )
+SPLASH_JACKET_BUILD_SCRIPT = (
+    REPO_ROOT / "unreal/Scripts/create_splash_jacket_material.py"
+)
 REFRESH_UTILITY = REPO_ROOT / "scripts/refresh_pfd_material_parameters.py"
 REVIEW_PATH = (
     REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
@@ -89,6 +92,9 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
     assert "PfdShellMaterialInstance" in host
     assert "OwningRaft->GetSurfaceWetness() * 0.46f" in host
     assert "PfdPresentationWetness, 0.84f" in host
+    assert "HasLiveSplashJacketMaterialResponse" in host
+    assert "HasLiveSplashJacketMaterialResponse" in host_header
+    assert "SplashJacketMaterialInstance" in host
     assert "GetProductionPfdTorsoErrorCm" in host
     assert "SM_RaftSim_WhitewaterRescuePfd" in host
     assert "bReplacedPfdLayer" in host
@@ -96,6 +102,7 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
 
     assert "static void BuildPfdMaterials()" in material
     assert "static void BuildHelmetMaterials()" in material
+    assert "static UMaterial* BuildSplashJacketMaterial()" in material
     assert "BuildPfdShellMaterial(" in material
     assert 'TEXT("M_RaftSim_PFD_Yellow")' in material
     assert 'TEXT("PfdRipstop")' in material
@@ -118,6 +125,16 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
     assert 'TEXT("M_RaftSim_Helmet_White")' in material
     assert "/*bTwoSided=*/true" in material
     assert 'TEXT("RaftSim.CreateProductionHelmetMaterials")' in material
+    assert 'TEXT("RaftSim.CreateSplashJacketMaterial")' in material
+    assert 'TEXT("M_RaftSim_SplashJacket")' in material
+    assert "/*Roughness=*/0.72f" in material
+    assert "/*RoughnessVariation=*/0.08f" in material
+    assert "/*TextureTiling=*/1.45f" in material
+    assert "/*TextileNormalStrength=*/0.20f" in material
+    assert "/*SaturatedRoughnessScale=*/0.56f" in material
+    assert "/*SaturatedRoughnessMax=*/0.44f" in material
+    assert "/*DrySpecularValue=*/0.20f" in material
+    assert "/*WetSpecularValue=*/0.38f" in material
     assert "Material->SetMaterialUsage(MATUSAGE_Nanite)" in material
     assert "M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing" in material
     assert "M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft" in material
@@ -134,6 +151,14 @@ def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None
     assert "unreal.MaterialShadingModel.MSM_CLOTH" in (
         REPO_ROOT / "unreal/Scripts/create_production_pfd_materials.py"
     ).read_text(encoding="utf-8")
+    splash_jacket_build = SPLASH_JACKET_BUILD_SCRIPT.read_text(encoding="utf-8")
+    assert '"RaftSim.CreateSplashJacketMaterial"' in splash_jacket_build
+    assert "EXPECTED_TEXTURE_NAMES" in splash_jacket_build
+    assert "get_material_used_textures(material)" in splash_jacket_build
+    assert "unreal.MaterialShadingModel.MSM_CLOTH" in splash_jacket_build
+    assert "T_RaftSim_PfdRipstop_Albedo" in splash_jacket_build
+    assert "T_RaftSim_PfdRipstop_Normal" in splash_jacket_build
+    assert "T_RaftSim_PfdRipstop_AORoughnessHeight" in splash_jacket_build
 
 
 def test_project_owned_production_helmet_source_and_import_are_hash_locked() -> None:

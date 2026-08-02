@@ -15,10 +15,10 @@ REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_production_character_fallback_v287_review.json"
 )
-TAPERED_SHOULDER_REVIEW_PATH = (
+FOLDED_SPLASH_SLEEVE_REVIEW_PATH = (
     REPO_ROOT
     / "docs/environment-captures/south_fork_full_reach/"
-    "m9_tapered_shoulder_sleeves_v2_review.json"
+    "m9_folded_wet_splash_sleeves_v3_review.json"
 )
 
 
@@ -201,6 +201,11 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
         / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
         "RaftSimCrewAvatarActor.cpp"
     ).read_text(encoding="utf-8")
+    header = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+        "RaftSimCrewAvatarActor.h"
+    ).read_text(encoding="utf-8")
     adapter = (
         REPO_ROOT
         / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
@@ -238,10 +243,16 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "kProductionShoulderSleeveRadiusCm = 5.2f" in host
     assert "kProductionShoulderSleeveArmFraction = 1.0f" in host
     assert "BuildUnitAnatomicalShoulderSleeveMesh(" in host
-    assert "constexpr int32 Rings = 18" in host
-    assert "constexpr int32 Sides = 28" in host
-    assert "0.20f * Deltoid" in host
-    assert "0.045f * CuffRoll" in host
+    assert "constexpr int32 Rings = 28" in host
+    assert "constexpr int32 Sides = 36" in host
+    assert "0.16f * Deltoid" in host
+    assert "0.035f * CuffRoll" in host
+    assert "0.055f * EndEnvelope" in host
+    assert "0.028f * EndEnvelope" in host
+    assert "0.034f *" in host
+    assert "FMath::FindDeltaAngleRadians(" in host
+    assert "1.035f * Radius" in host
+    assert "0.965f * Radius" in host
     assert 'TEXT("LeftShoulderSleeve"), Jacket ? Jacket : Wetsuit' in host
     assert 'TEXT("RightShoulderSleeve"), Jacket ? Jacket : Wetsuit' in host
     assert "Pose.LeftShoulderCm, LeftElbow, kProductionShoulderSleeveArmFraction" in host
@@ -250,7 +261,12 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "Pose.RightShoulderCm,\n        RightShoulderSleeveEnd" in host
     assert "HasVisibleShoulderSilhouette() const" in host
     assert "GetMinimumShoulderSleeveVertexCount() const" in host
-    assert "GetMinimumShoulderSleeveVertexCount() >= 550" in host
+    assert "GetMinimumShoulderSleeveVertexCount() >= 1000" in host
+    assert "HasLiveSplashJacketMaterialResponse()" in host
+    assert "HasLiveSplashJacketMaterialResponse() const" in header
+    assert "SplashJacketMaterialInstance" in host
+    assert "SplashJacketMaterialInstance->SetScalarParameterValue(" in host
+    assert "BoundedWetness);" in host
     assert "GetMaximumShoulderSleeveAnchorErrorCm() const" in host
     assert "ExtentCm.X >= 4.7f" in host
     assert "ExtentCm.Y >= 4.7f" in host
@@ -302,7 +318,8 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert 'TEXT("five rigged crew bodies spawned")' in automation
     assert "It->GetProceduralBodyPartCount() >= 28" in automation
     assert "It->HasVisibleShoulderSilhouette()" in automation
-    assert "ShoulderSleeveVertexCount >= 550" in automation
+    assert "ShoulderSleeveVertexCount >= 1000" in automation
+    assert "It->HasLiveSplashJacketMaterialResponse()" in automation
     assert "ShoulderAnchorErrorCm <= 0.25f" in automation
     assert "It->IsWaistHipMaterialOpaque()" in automation
     assert "HipThighCoverageErrorCm <= 0.25f" in automation
@@ -544,9 +561,9 @@ def test_cc0_assets_and_renderer_review_remain_fail_closed() -> None:
     assert review["automation_evidence"]["failed"] == 0
     assert _sha256(capture) == review["renderer_evidence"]["capture_sha256"]
 
-def test_tapered_shoulder_sleeves_review_is_hash_verified_and_fail_closed() -> None:
-    review = json.loads(TAPERED_SHOULDER_REVIEW_PATH.read_text(encoding="utf-8"))
-    assert review["schema"] == "raftsim.m9.tapered_shoulder_sleeves_review.v2"
+def test_folded_splash_sleeves_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(FOLDED_SPLASH_SLEEVE_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert review["schema"] == "raftsim.m9.folded_wet_splash_sleeves_review.v3"
     assert review["passed"] is False
     assert review["technical_candidate_passed"] is True
     assert review["photoreal_acceptance_passed"] is False
@@ -554,12 +571,13 @@ def test_tapered_shoulder_sleeves_review_is_hash_verified_and_fail_closed() -> N
     assert review["named_character_art_reviewer"] is None
     assert review["named_guide_reviewer"] is None
     assert review["promotion_allowed"] is False
-    assert review["supersedes"].endswith("m9_visible_shoulders_v1_review.json")
+    assert review["supersedes"].endswith("m9_tapered_shoulder_sleeves_v2_review.json")
 
     metrics = review["runtime_roster_metrics"]
     assert metrics["captured_character_count"] == 5
     assert metrics["characters_with_visible_shoulder_silhouette"] == 5
-    assert metrics["minimum_sleeve_vertex_count"] >= 550
+    assert metrics["minimum_sleeve_vertex_count"] >= 1000
+    assert metrics["characters_with_live_splash_jacket_material_response"] == 5
     assert metrics["maximum_shoulder_anchor_error_cm"] <= 0.25
     roster_report = REPO_ROOT / metrics["report"]
     assert _sha256(roster_report) == metrics["report_sha256"]
