@@ -32,6 +32,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced Chilko Lava Canyon's nearly black generic bank plate with an
+  isolated four-scale Default Lit organic surface. Source-registered macro
+  color, water zones, detail normals, wet-bank conditioning, and the existing
+  Landscape remain authoritative while non-harmonic world fields add open-
+  bench value, dry grass and mineral soil, slope-aware wet/oxidized basalt,
+  scree, and fine mineral response. The change has no world-position offset
+  and does not alter terrain geometry, collision, bathymetry, hydraulics, or
+  raft forces. Fixed left-bank mean luminance rises from 0.1199 to 0.2375 in
+  the guide view and from 0.1397 to 0.2616 at river eye; near-black coverage
+  falls from 30.05% to 1.04% and 32.90% to 0.85%. The editor build, saved-
+  material audit, runnable-map gate, and focused contracts pass. Broad 30 m
+  terrain, visible horizontal banding, generic ecology, uniform water, weak
+  rapid VFX, unconverged hydraulics, and external acceptance remain open.
 - Corrected Futaleufú Terminator water provenance and optical response without
   changing its ribbon geometry, collision, hydraulics, or raft forces. The
   capture ribbon now uses an isolated opaque Default Lit parent, Futaleufú's

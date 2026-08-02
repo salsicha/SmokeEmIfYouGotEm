@@ -1,0 +1,57 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "1006AFBBBC428D80F3B8B18A02ADA09C",
+			"instanceName": "Alexs-MacBook-Air.local-78717",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-05.48.20",
+	"succeeded": 0,
+	"succeededWithWarnings": 1,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 6.4075961112976074,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "L_LavaCanyon",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"1006AFBBBC428D80F3B8B18A02ADA09C"
+			],
+			"duration": 6.4075961112976074,
+			"dateTime": "2026.08.02-05.48.13",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.02-05.48.14"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

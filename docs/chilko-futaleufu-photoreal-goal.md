@@ -62,6 +62,27 @@ Chilko should read as a real transition through the Chilcotin landscape, not a g
 
 Futaleufu remains a Patagonian turquoise big-water corridor with granite and mixed temperate-rainforest structure, but current coigue and cordilleran-cypress candidates remain review assets rather than ecology or photoreal approval.
 
+## Chilko Organic Lit Terrain V1
+
+The runnable Lava Canyon map now uses a Chilko-only four-scale Default Lit
+surface instead of leaving its source-conditioned banks nearly black. The graph
+retains registered macro color, water/material zones, detail normals, wet-bank
+conditioning, and the existing Landscape, then adds open-bench value, dry grass
+and mineral soil, slope-aware wet and oxidized basalt, scree, and fine mineral
+response at non-harmonic world scales. It has no world-position offset and does
+not change terrain geometry, collision, the protected solver strip, bathymetry,
+hydraulic state, route stationing, or raft forces.
+
+In the fixed left-bank guide region, mean luminance increases from 0.1199 to
+0.2375 and pixels below 0.035 luminance fall from 30.05% to 1.04%. At river eye,
+the same measures move from 0.1397 to 0.2616 and from 32.90% to 0.85%. The
+editor build, native saved-material audit, runnable-map gate, and focused
+regressions pass. Visual review still rejects photoreal promotion: the 30 m
+source creates broad landforms and horizontal bands, the procedural trees are
+repeated and stylized, ground cover and reach-specific rock structure are
+sparse, the water remains uniform and opaque, and Lava Canyon's crests, holes,
+foam, spray, mist, and shoreline impacts are understated.
+
 The cordilleran-cypress V33 transition-path precursor now samples the V32 complementary source/HLOD handoff at 17 exact radial positions from 23.00 m through 27.00 m. It corrected an incomplete woody-material binding and proved that the current dynamic screen mask requires the unchanged source trunk geometry to use traditional raster: the Nanite source path leaked trunk and branches into HLOD-owned pixels. Two deterministic runs keep source, HLOD, and combined variation below 0.004557 percent, match the authored Bayer composite within 0.001411 percent, and bound transition overhead above ordinary camera-motion controls to 1.156684 percentage points. This retains a diagnostic path and renderer boundary, not a photoreal or production LOD. Same-world continuous motion with persistent view state, TAA history, motion vectors, target frame pacing, lit art, and desktop/VR profiling remains required.
 
 V34 supplies that missing same-world diagnostic: three persistent source/HLOD/combined sequences each retain one world and TAA view state while moving from 23-27 m at a fixed 60 Hz simulation step, followed by endpoint settling. Independent runs reproduce all 147 frames within 0.000211 changed-pixel fraction at worst. Ending source coverage at 26 m and retaining ten HLOD-only moving frames reduces combined-to-HLOD history residue from 11.5889 percent to 2.4835 percent, then to 1.5829 percent after settling. The harness is retained, but the transition is not: the 4x4 Bayer pattern changes ownership in 6.25-percent ranks and causes a repeatable 4.3407 percentage-point spike above ordinary camera-motion controls, exceeding the unchanged 1.5-point limit. Replace it with a finer complementary mask or stable blue-noise sequence and rerun V34 before lit art or performance review. Fixed simulation pacing is not measured wall-clock performance, and the unlit frozen-WPO frames are not photoreal evidence.

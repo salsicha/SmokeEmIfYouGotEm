@@ -1,0 +1,209 @@
+{
+  "schema": "raftsim.environment.chilko_lava_canyon_organic_lit_terrain_review.v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "supersedes_mutable_artifacts_from": "chilko_lava_canyon_reach_local_runnable_v1_review.json",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "source_registration_retained": true,
+    "landscape_owns_rendering_collision_and_height_queries": true,
+    "live_solver_owns_gameplay_water_rendering_and_forces": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "authority_boundary": {
+    "terrain": "existing source-conditioned 1009 by 1009 reach-local Landscape",
+    "material": "shade-only organic color response layered after source macro, material-zone, wet-bank, riverbed, and physical-slope conditioning",
+    "procedural_scope": "four world-space optical fields only; no vertex displacement, terrain import, collision, route, bathymetry, solver, or raft-force mutation",
+    "water": "unchanged capture-only static ribbon plus live C++ solver gameplay carrier"
+  },
+  "material": {
+    "asset": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_chilkoriverlavacanyon_physicalcorridor_SourceLandscapeCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "two_sided": true,
+    "tangent_space_normal": true,
+    "world_position_offset_connected": false,
+    "organic_world_noise_scales_per_cm": [
+      0.00016,
+      0.00059,
+      0.0027,
+      0.0079
+    ],
+    "organic_layers": [
+      "open-bench source-value modulation",
+      "dry-grass and mineral-soil palette patches",
+      "slope-aware wet and oxidized basalt",
+      "slope-bound scree patches",
+      "metre-scale mineral value variation"
+    ],
+    "source_macro_registration_retained": true,
+    "source_material_zones_retained": true,
+    "wet_bank_and_riverbed_conditioning_retained": true,
+    "detail_normal_and_surface_response_retained": true
+  },
+  "renderer_comparison": {
+    "method": "normalized RGB comparison over fixed left-bank regions; dark means mean RGB luminance below 0.035",
+    "guide_seat_downstream": {
+      "roi_xyxy": [0, 285, 600, 390],
+      "full_changed_pixel_fraction": 0.20731553819444445,
+      "roi_changed_pixel_fraction": 0.7673174603174603,
+      "roi_mean_absolute_rgb_delta": 0.1279125064611435,
+      "roi_mean_luminance_before": 0.11988554894924164,
+      "roi_mean_luminance_after": 0.23754148185253143,
+      "roi_dark_fraction_before": 0.3005079365079365,
+      "roi_dark_fraction_after": 0.010396825396825397
+    },
+    "river_eye_downstream": {
+      "roi_xyxy": [0, 275, 650, 390],
+      "full_changed_pixel_fraction": 0.2254253472222222,
+      "roi_changed_pixel_fraction": 0.7616053511705686,
+      "roi_mean_absolute_rgb_delta": 0.1320999562740326,
+      "roi_mean_luminance_before": 0.13971474766731262,
+      "roi_mean_luminance_after": 0.2616368234157562,
+      "roi_dark_fraction_before": 0.3290301003344482,
+      "roi_dark_fraction_after": 0.008494983277591973
+    },
+    "solver_rapid_river_eye_downstream": {
+      "roi_xyxy": [0, 285, 600, 390],
+      "full_changed_pixel_fraction": 0.20731553819444445,
+      "roi_changed_pixel_fraction": 0.7673174603174603,
+      "roi_mean_absolute_rgb_delta": 0.1279125064611435,
+      "roi_mean_luminance_before": 0.11988554894924164,
+      "roi_mean_luminance_after": 0.23754148185253143,
+      "roi_dark_fraction_before": 0.3005079365079365,
+      "roi_dark_fraction_after": 0.010396825396825397
+    },
+    "technical_verdict": "retain: the fixed views replace the near-black bank plate with materially readable source-conditioned ground and slope response",
+    "photoreal_verdict": "fail: broad 30 m landform, horizontal material banding, stylized repeated vegetation, uniform water, sparse ground structure, and weak rapid VFX remain dominant"
+  },
+  "coordinate_contract": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "landscape_span_m": [600.0, 600.0],
+    "protected_solver_strip_span_m": [600.0, 80.0],
+    "runtime_vertical_datum_m": 1101.7130616203904,
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "official_hydrography": "BC Freshwater Atlas centerline",
+    "official_terrain": "NRCan CanElevation MRDEM-30 DTM CGVD2013",
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "surveyed_lava_canyon_bathymetry": false,
+    "protected_solver_strip_change_m": 0.0,
+    "maximum_official_dem_edge_correction_m": 2.1443472817829843,
+    "maximum_procedural_microrelief_m": 1.029798216823645,
+    "material_change_is_shade_only": true
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields/median_runnable",
+    "solver": "raftsim_water_cpp_v1",
+    "converged": false,
+    "feature_strength_scale": 0.0,
+    "water_or_foam_material_changed": false
+  },
+  "remaining_photoreal_defects": [
+    "The 30 m terrain source still produces broad landforms and cannot resolve surveyed Lava Canyon bank breaklines or rapid-scale rock geometry.",
+    "The newly readable banks expose horizontal source/material banding and large smooth surfaces rather than gravel, cobble, fractured basalt, soil clumps, and erosion structure.",
+    "The opaque conifer, broadleaf, shrub, and ground-cover forms remain visibly stylized, repeated, and insufficiently representative of Chilko ecology.",
+    "The water remains a broad uniform opaque surface without convincing depth, transmission, reflection complexity, or natural shoreline contact.",
+    "Lava Canyon's crests, holes, rollers, entrained aeration, foam breakup, spray, mist, and rock-water interaction remain visually understated.",
+    "Near-bank roots, woody debris, exposed rock shelves, wet sediment, undercuts, and deposited material remain sparse.",
+    "The cooked hydraulic field remains unconverged and is not calibrated against observed Lava Canyon behavior.",
+    "No named Chilko guide, geospatial reviewer, ecology/geology reviewer, environment artist, water-VFX artist, or target-hardware reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Chilko guide review of Lava Canyon stationing, entry, line, broach hazards, recovery, exit, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Lava Canyon behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, boulders, canyon form, and seasonal presentation",
+    "photoreal water and VFX approval for depth, transmission, foam, holes, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "native_material_audit": "RaftSim.M9.FChilkoOrganicLavaCanyonTerrain passed 1/1 with 0 warnings and 0 errors",
+    "runtime_map_load": "RaftSim.P4.RiverMapLoads.L_LavaCanyon passed 1/1 with 0 errors and one platform audio sample-rate warning",
+    "focused_python": "14/14 exact-current Chilko plus neighboring river isolation contracts passed"
+  },
+  "reviewers": {
+    "named_chilko_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_ecology_or_geology_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "c14c9240570cafa08887c8eecbe0ede06c71bba41eee0db6220f47beff23a59e"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_chilkoriverlavacanyon_physicalcorridor_SourceLandscapeCandidate.uasset",
+      "sha256": "d9976857fb49354ae086f7eaba63168ff105e4110d078430ad3221fd534f0aec"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "sha256": "4f3fc57a5e86aa82d85d4b67c41b01ab42cdd9b48ec9043675d767d8d68e369c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+      "sha256": "3c99a38aacb18d1ba079b103285abc4f80d00d7608ee460a20a41ff6fe6771ba"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+      "sha256": "b63cf87734940f0872b74f0a51dfd3bea953de15daca91e56d9e757de850cd70"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+      "sha256": "3c99a38aacb18d1ba079b103285abc4f80d00d7608ee460a20a41ff6fe6771ba"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_organic_lit_terrain_v1_guide_seat_downstream.png",
+      "sha256": "1e1cad598b046764e84f6b910ef1d165c4d2a01be9521a8bb700d5e38f10c17e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_organic_lit_terrain_v1_river_eye_downstream.png",
+      "sha256": "0f1e71104f6cbf6733ea91ad014a73a6ff0ff10abbb84a6bd5061c1868126359"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_organic_lit_terrain_v1_solver_rapid_river_eye_downstream.png",
+      "sha256": "1e1cad598b046764e84f6b910ef1d165c4d2a01be9521a8bb700d5e38f10c17e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_organic_lit_terrain_v1_material_audit.json",
+      "sha256": "ac391f68d8b6dc78da3c259e648b97c4480bd16d11a7587f2b58cce8eba109d5"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_organic_lit_terrain_v1_map_load.json",
+      "sha256": "c5f1d4f9ca2b328cb1d6fcae499258ac09d697a01450551b82a6d091baaf110e"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorChilkoMaterial.cpp",
+      "sha256": "ea5f563568727a69019ebd819c1c050d79181e7c57282ab71151b73b05744b86"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
+      "sha256": "784e1c8a30ca8e9c579b3bc7d32e5da3580905eb045c52492919c8c0c614a885"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
+      "sha256": "4794ecd005bffaedeac62781b29283746631c57ebe917b6a91fb6c2e2656be4a"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+      "sha256": "22550932f232d3597613c75684253c0fccad00d17a9046d7f020d0063ac37ced"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorChilkoTerrainTest.cpp",
+      "sha256": "b6fb5bb9158c98bfef64e0012f41bb8ef71c78a1ee66f9a763da93b4a43110bf"
+    }
+  ]
+}

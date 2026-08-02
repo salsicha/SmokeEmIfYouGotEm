@@ -552,6 +552,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             Material,
             FinalBaseColor);
     }
+    if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        FinalBaseColor = BuildChilkoOrganicLavaCanyonBaseColor(
+            Material,
+            FinalBaseColor);
+    }
     if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
     {

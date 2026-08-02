@@ -501,6 +501,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesFutaleufuOrganicTemperateSurface =
             Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+        const bool bUsesChilkoOrganicLavaCanyonSurface =
+            Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const bool bUsesDefaultLitLandscape =
             bUsesPacuareOrganicRainforestSurface ||
             Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
@@ -851,12 +853,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("pacuare_v1_three_scale_world_space_canopy_soil_moss_leaf_litter_and_slope_aware_wet_rock_response")
                 : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
-                       : TEXT("not_enabled_for_this_river")),
+                       : (bUsesChilkoOrganicLavaCanyonSurface
+                              ? TEXT("chilko_v1_four_scale_world_space_open_bench_dry_grass_mineral_soil_slope_aware_basalt_and_scree_response")
+                              : TEXT("not_enabled_for_this_river"))),
             bUsesPacuareOrganicRainforestSurface
                 ? TEXT("[0.000210, 0.000950, 0.003500]")
                 : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("[0.000180, 0.000710, 0.004200]")
-                       : TEXT("[]")),
+                       : (bUsesChilkoOrganicLavaCanyonSurface
+                              ? TEXT("[0.000160, 0.000590, 0.002700, 0.007900]")
+                              : TEXT("[]"))),
             MaterialSettings.MacroMappingScale,
             MaterialSettings.DetailMappingScale,
             MaterialSettings.DetailAlbedoWeight,
