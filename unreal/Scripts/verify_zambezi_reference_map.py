@@ -429,7 +429,7 @@ def main() -> None:
                 },
                 "water_surface": {
                     "authority": "render_only_source_aligned_physical_corridor",
-                    "shading_model_contract": "SingleLayerWater",
+                    "shading_model_contract": "DefaultLit",
                     "normal_motion_contract": "two_opposed_panned_atlas_layers",
                     "component_count": len(water_surface_rows),
                     "components": water_surface_rows,
@@ -649,12 +649,14 @@ def main() -> None:
             and water_surface_rows[0]["procedural_mesh_count"] == 1
             and "MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate"
             in str(water_surface_rows[0]["material"])
-            and "M_RaftSim_Zambezi_SingleLayerWater"
+            and "M_RaftSim_Zambezi_DefaultLitWater"
             in str(water_surface_rows[0]["parent_material"])
             and "NO_COLLISION" in str(water_surface_rows[0]["collision_enabled"])
             and "RaftSimNonCollisionRenderSurface" in water_surface_rows[0]["tags"]
             and "RaftSimPhysicalCorridorWater" in water_surface_rows[0]["tags"]
-            and "RaftSimZambeziSingleLayerWater" in water_surface_rows[0]["tags"]
+            and "RaftSimZambeziDefaultLitWater" in water_surface_rows[0]["tags"]
+            and "RaftSimSingleLayerWaterCaptureRejected"
+            in water_surface_rows[0]["tags"]
             and "RaftSimMovingMultiScaleWaterNormals" in water_surface_rows[0]["tags"]
             and len(launch_talus_rows) == 6
             and sum(int(row["instance_count"]) for row in launch_talus_rows) == 360
@@ -802,7 +804,7 @@ def main() -> None:
             f"{len(player_rafts)} raft, {len(water_configs)} runtime water config, "
             f"{len(terrain_rows)} conditioned visual-terrain tiles, "
             f"{len(adaptive_near_field_terrain_rows)} adaptive near-field banks, "
-            f"{len(water_surface_rows)} validated Single Layer Water ribbon, and "
+            f"{len(water_surface_rows)} validated Default Lit water ribbon, and "
             f"{sum(int(row['instance_count']) for row in launch_talus_rows)} "
             "runnable-launch dry-bank rock analogs, plus "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "

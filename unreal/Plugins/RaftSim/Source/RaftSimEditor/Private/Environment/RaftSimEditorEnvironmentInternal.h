@@ -995,7 +995,8 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial();
 
 UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
     FString& OutSummary,
-    bool bUseSingleLayerWater = false);
+    bool bUseSingleLayerWater = false,
+    bool bUseIsolatedZambeziParent = false);
 
 UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
 

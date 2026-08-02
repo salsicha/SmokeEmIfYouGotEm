@@ -324,11 +324,11 @@ bool FRaftSimZambeziTalusMaterialTest::RunTest(const FString& Parameters)
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-    FRaftSimZambeziSingleLayerWaterTest,
-    "RaftSim.M9.FZambeziSingleLayerWater",
+    FRaftSimZambeziDefaultLitWaterTest,
+    "RaftSim.M9.FZambeziDefaultLitWater",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
-bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
+bool FRaftSimZambeziDefaultLitWaterTest::RunTest(const FString& Parameters)
 {
     UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
         nullptr,
@@ -352,12 +352,15 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
         TEXT("Zambezi water has its isolated parent"),
         Parent->GetPathName(),
         FString(TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
-                     "M_RaftSim_Zambezi_SingleLayerWater."
-                     "M_RaftSim_Zambezi_SingleLayerWater")));
+                     "M_RaftSim_Zambezi_DefaultLitWater."
+                     "M_RaftSim_Zambezi_DefaultLitWater")));
     TestTrue(
-        TEXT("Zambezi water uses the Single Layer Water shading model"),
+        TEXT("Zambezi water uses capture-accepted Default Lit shading"),
+        Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestFalse(
+        TEXT("Rejected Single Layer Water shading stays inactive"),
         Parent->GetShadingModels().HasShadingModel(MSM_SingleLayerWater));
-    TestEqual(TEXT("Zambezi water remains an opaque water-volume surface"),
+    TestEqual(TEXT("Zambezi water remains an opaque surface"),
         Parent->BlendMode, BLEND_Opaque);
 
     int32 PannerCount = 0;
@@ -396,7 +399,7 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
         TEXT("Two short-wavelength normal coordinates replace long comb grooves"),
         ShortWavelengthNormalCoordinateCount,
         2);
-    TestEqual(TEXT("One physical water-volume output is bound"), WaterOutputCount, 1);
+    TestEqual(TEXT("Rejected water-volume output is absent"), WaterOutputCount, 0);
 
     auto TestScalarParameter = [this, Instance](
         const TCHAR* Label,
@@ -430,33 +433,20 @@ bool FRaftSimZambeziSingleLayerWaterTest::RunTest(const FString& Parameters)
             FString::Printf(TEXT("%s uses the renderer-reviewed value"), Label),
             Value.Equals(ExpectedValue, 0.0001f));
     };
-    TestScalarParameter(TEXT("Base color scale"), TEXT("BaseColorScale"), 0.78f);
-    TestScalarParameter(TEXT("Opacity"), TEXT("Opacity"), 0.48f);
-    TestScalarParameter(TEXT("Roughness"), TEXT("Roughness"), 0.50f);
-    TestScalarParameter(TEXT("Specular"), TEXT("Specular"), 0.26f);
-    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.10f);
+    TestScalarParameter(TEXT("Base color scale"), TEXT("BaseColorScale"), 1.08f);
+    TestScalarParameter(TEXT("Roughness"), TEXT("Roughness"), 0.34f);
+    TestScalarParameter(TEXT("Specular"), TEXT("Specular"), 0.38f);
+    TestScalarParameter(TEXT("Normal intensity"), TEXT("NormalIntensity"), 0.16f);
     TestScalarParameter(
-        TEXT("Reflection fill"), TEXT("ReflectionFillIntensity"), 0.02f);
+        TEXT("Reflection fill"), TEXT("ReflectionFillIntensity"), 0.08f);
     TestScalarParameter(
-        TEXT("Emissive fill"), TEXT("EmissiveFillScale"), 0.0f);
+        TEXT("Emissive fill"), TEXT("EmissiveFillScale"), 0.32f);
     TestScalarParameter(
-        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.10f);
+        TEXT("Surface variation"), TEXT("SurfaceVariationStrength"), 0.14f);
     TestVectorParameter(
         TEXT("Sediment surface tint"),
         TEXT("SurfaceTint"),
-        FLinearColor(0.028f, 0.078f, 0.032f, 0.0f));
-    TestVectorParameter(
-        TEXT("Physical scattering"),
-        TEXT("ScatteringCoefficients"),
-        FLinearColor(0.00025f, 0.00090f, 0.00035f, 0.0f));
-    TestVectorParameter(
-        TEXT("Physical absorption"),
-        TEXT("AbsorptionCoefficients"),
-        FLinearColor(0.0150f, 0.0050f, 0.0180f, 0.0f));
-    TestVectorParameter(
-        TEXT("Behind-water sediment transmission"),
-        TEXT("ColorScaleBehindWater"),
-        FLinearColor(0.12f, 0.22f, 0.10f, 0.0f));
+        FLinearColor(0.055f, 0.115f, 0.050f, 0.0f));
     return !HasAnyErrors();
 }
 

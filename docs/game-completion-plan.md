@@ -3849,3 +3849,17 @@ path is verified, and the completion goal can be marked complete.
   collision, hydraulics, or raft forces. Current fixed-camera evidence remains
   visibly reference-quality, so photoreal and external acceptance gates remain
   open.
+- Zambezi fixed-route capture water V3 replaces only the non-colliding
+  physical-corridor presentation instance's rejected Single Layer parent with
+  isolated `M_RaftSim_Zambezi_DefaultLitWater`. The retained graph preserves
+  two moving cross-current normal layers, the secondary-axis swap, and bounded
+  world-space variation while adding a first-party capture fill. Canonical
+  lower-half mean luminance rises from 0.060286 to 0.247354 in the guide view
+  and from 0.061027 to 0.223423 at river eye, with no retained lower-half pixels
+  below 0.02. The schema-v16 saved-map audit, exact native material contract,
+  focused runnable map load, and Python source/capture contracts pass. The old
+  Single Layer asset and inactive volume settings remain rejected evidence, and
+  no terrain, collision, solver, hydraulic, bathymetry, or raft-force authority
+  changes. Broad smooth highlight bands, provisional geography, incomplete
+  rapid-scale foam/spray, and all external acceptance gates keep the result at
+  reference quality rather than photoreal promotion.

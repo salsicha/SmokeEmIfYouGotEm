@@ -1,0 +1,60 @@
+{
+  "schema": "raftsim.unreal.zambezi_default_lit_capture_water_review.v1",
+  "recorded_utc": "2026-08-02",
+  "status": "accepted_technical_capture_correction_photoreal_promotion_rejected",
+  "river_id": "zambezi_batoka_gorge",
+  "map": "/Game/RaftSim/Maps/L_Zambezi",
+  "baseline_commit": "0557ce85",
+  "captures": {
+    "guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_guide_seat_downstream.png",
+    "river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_river_eye_downstream.png"
+  },
+  "measured_lower_half_luminance": {
+    "guide_seat_before": 0.060286,
+    "guide_seat_after": 0.247354,
+    "river_eye_before": 0.061027,
+    "river_eye_after": 0.223423,
+    "retained_fraction_below_0_02": 0.0
+  },
+  "material_decision": {
+    "retained_parent": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_DefaultLitWater",
+    "retained_shading_model": "DefaultLit",
+    "rejected_inactive_parent": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater",
+    "single_layer_volume_output": "inactive",
+    "base_color_scale": 1.08,
+    "emissive_fill_scale": 0.32,
+    "roughness": 0.34,
+    "specular": 0.38,
+    "normal_intensity": 0.16,
+    "surface_variation_strength": 0.14,
+    "render_width_scale": 1.24,
+    "render_normal_up_blend": 0.9,
+    "render_displacement_scale": 0.06,
+    "fixed_route_fidelity": "pass_readable_olive_surface",
+    "visual_limit": "broad_smooth_highlight_bands_remain"
+  },
+  "authority": {
+    "presentation_ribbon_only": true,
+    "terrain_changed": false,
+    "collision_changed": false,
+    "solver_state_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_authority_changed": false,
+    "raft_forces_changed": false
+  },
+  "verification": {
+    "schema_v16_saved_map": "passed",
+    "native_material_contract": "passed_RaftSim.M9.FZambeziDefaultLitWater",
+    "focused_runnable_map_load": "passed_RaftSim.P4.RiverMapLoads.L_Zambezi",
+    "python_source_and_capture_contracts": "passed_11_focused_tests",
+    "visual_inspection": "passed_technical_readability"
+  },
+  "external_acceptance_gates": {
+    "guide": "open",
+    "art": "open",
+    "geospatial": "open",
+    "rights": "open",
+    "hazard_readability": "open",
+    "performance": "open"
+  }
+}

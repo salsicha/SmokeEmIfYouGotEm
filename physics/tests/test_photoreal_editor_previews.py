@@ -641,8 +641,8 @@ def test_unreal_editor_preview_capture_records_procedural_asset_plan():
     assert "Missing production geospatial attachment ledger" in editor_source
     assert water_review["schema"] == "raftsim.unreal.water_material_candidate_review.v1"
     assert water_review["status"] == (
-        "default_lit_landscape_candidates_with_zambezi_single_layer_exception_"
-        "captured_review_only"
+        "default_lit_landscape_candidates_with_zambezi_capture_correction_"
+        "review_only"
     )
     assert (
         water_review["active_decision"]["active_material"]
@@ -655,6 +655,10 @@ def test_unreal_editor_preview_capture_records_procedural_asset_plan():
         "/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
         "M_RaftSim_Pacuare_RainforestDefaultLitWater"
     )
+    assert water_review["active_decision"]["zambezi_landscape_candidate_parent"] == (
+        "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
+        "M_RaftSim_Zambezi_DefaultLitWater"
+    )
     assert (
         "Opaque DefaultLit surface shading"
         in water_review["active_decision"]["solver_surface_water_contract"]
@@ -666,9 +670,9 @@ def test_unreal_editor_preview_capture_records_procedural_asset_plan():
         "procedural ribbon mesh is continuous"
         in water_review["active_decision"]["observed_result"]
     )
-    assert water_review["single_layer_depth_split_failure"]["decision"].startswith(
-        "Keep failed global and Pacuare Single Layer Water assets inactive"
-    )
+    assert "global, Pacuare, and Zambezi" in water_review[
+        "single_layer_depth_split_failure"
+    ]["decision"]
     assert water_review["test_run"]["clean_start_material_compile_failures"] == 0
     assert water_review["test_run"]["photoreal_asset_tests"] == "26 passed"
     assert water_review["test_run"]["solver_visualization_manifest"] == str(

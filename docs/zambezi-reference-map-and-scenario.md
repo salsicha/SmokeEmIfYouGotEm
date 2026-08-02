@@ -199,60 +199,42 @@ solid grass/forb cover visible in both canonical images while preserving the
 navigable corridor and removing the old floating black/green card failure. It
 does not establish correct species, woodland ecology, or photoreal vegetation.
 
-The physical-corridor ribbon now uses an isolated
-`M_RaftSim_Zambezi_SingleLayerWater` parent instead of changing the shared
-Default Lit candidate used by the other rivers. It binds Unreal's
-`SingleLayerWaterMaterialOutput` with per-centimetre scattering and absorption,
-phase, behind-water colour scale, and a 0.48 surface-opacity control. Two
-opposed panners animate independently tiled normal-atlas layers, while bounded
-world-space optical variation keeps commandlet captures from collapsing into a
-single flat colour when temporal reflections are unavailable. The ribbon stays
-non-colliding and render-only; the runtime water configuration and solver remain
-the gameplay authority. The generated actor exposes
-`RaftSimZambeziSingleLayerWater`, `RaftSimMovingMultiScaleWaterNormals`,
-`RaftSimPhysicalCorridorWater`, and `RaftSimNonCollisionRenderSurface` tags.
+The physical-corridor presentation ribbon now uses the isolated opaque Default
+Lit parent `M_RaftSim_Zambezi_DefaultLitWater`. It preserves the two opposed
+panners from the earlier sediment-water experiment: the primary normal uses
+2.4 x 6.2 UV tiling, while the secondary uses 4.1 x 10.3 and swaps its axes for
+cross-current breakup. Bounded world-space variation and a first-party capture
+fill keep the surface readable when temporal reflection history is unavailable.
+The generated actor exposes `RaftSimZambeziDefaultLitWater`,
+`RaftSimMovingMultiScaleWaterNormals`,
+`RaftSimSingleLayerWaterCaptureRejected`, `RaftSimPhysicalCorridorWater`, and
+`RaftSimNonCollisionRenderSurface` tags.
 
-An August 1 second renderer bracket supersedes the first sediment-water scalar
-profile. The accepted instance now uses 0.48 opacity, 0.50 roughness, 0.26
-specular, 0.04 normal intensity, 0.02 reflection fill, no emissive fill, and
-0.04 optical variation. The source-aligned ribbon blends its mesh normals 0.92
-toward up and scales its authored calm-water displacement to 0.08; the live
-solver mesh remains optically disabled and keeps its own bounded rapid relief.
-In the matched 1280 x 720 launch-water band, mean luminance falls from 0.5302 to
-0.3906 and mean absolute horizontal image gradient falls from 0.003204 to
-0.001931, a 39.7% reduction in the long artificial streamwise-groove response.
-The regenerated default capture matches the selected diagnostic bracket without
-runtime overrides. It does not reproduce the foreground depth split that
-rejected the earlier global Single Layer experiment. The live runtime can add
-solver-triggered breaking-water, roller, aerosol, foam, and
-mist components at the procedural rapid controls described below. This is an
-incremental optical and runtime baseline, not final water art: realistic crest
-geometry, local bathymetric transmission, seasonal calibration, and guide/art
-approval remain open.
+The retained fixed-route bracket uses 1.08 base-color scale, 0.32 emissive
+fill, 0.34 roughness, 0.38 specular, 0.16 normal intensity, 0.14 optical
+variation, 0.90 mesh-normal up blend, and 0.06 authored displacement. In the
+canonical lower image halves, mean luminance rises from 0.060286 to 0.247354
+in the guide-seat view and from 0.061027 to 0.223423 at river eye; neither
+retained lower half has pixels below 0.02. The result reads as olive-green
+water instead of a nearly black sheet, although broad smooth highlight bands
+still reject photoreal promotion.
 
-The retained frame and machine-readable comparison are
-`zambezi_sediment_water_gameplay_v2.png` and
-`zambezi_sediment_water_gameplay_v2_review.json` in the landscape-candidate
-capture directory. They are gameplay-viewport evidence for the runnable
-`reference_free_run`, not approval of real-world hydraulics or photoreal art.
+The former `M_RaftSim_Zambezi_SingleLayerWater` parent, its volume coefficients,
+the `zambezi_sediment_water_gameplay_v2` bracket, and the
+`zambezi_cross_current_sediment_water_v1` bracket remain audit evidence rather
+than active map state. They established the river-local panner scales and
+showed useful gameplay-viewport groove reduction, but direct fixed-route
+SceneCapture2D evidence rejected that shading path. The current decision and
+measurements are recorded in
+`zambezi_default_lit_capture_water_v1_review.json`.
 
-An August 2 cross-current breakup pass supersedes only the parent's normal
-projection and bounded calm-surface response. The primary normal uses 2.4 x
-6.2 UV tiling; the secondary uses 4.1 x 10.3 and swaps its UV axes before its
-opposed panner. Normal intensity and optical variation are 0.10, the mesh-normal
-up blend is 0.90, and calm render displacement is 0.06. The accepted sediment
-volume vectors, 0.50 roughness, 0.26 specular, 0.48 opacity, 0.02 reflection
-fill, and zero emissive fill remain unchanged. Brighter reflection/emissive
-brackets were rejected because the gameplay viewport became a pale sky sheet.
-The retained frame shows smaller local interference across the flow, but still
-has a broad smooth analytical surface, residual streamwise grooves, sparse
-foam, and no credible holes, rollers, aeration, spray, mist, or rock-contact
-water. The fixed offscreen guide-seat and river-eye route captures also crush
-this Single Layer Water surface nearly black; they are retained as a documented
-capture-path defect and are not used to claim visual acceptance. The retained
-gameplay evidence and hash-locked rejection record are
-`zambezi_cross_current_sediment_water_v1.png` and
-`zambezi_cross_current_sediment_water_v1_review.json`.
+The presentation ribbon stays non-colliding and render-only. The broad live
+solver carrier remains optically disabled, the separate solver-foam sheet and
+its raft/crew exclusion remain active, and the runtime water configuration and
+solver remain the gameplay authority. No terrain, collision, hydraulic state,
+bathymetry authority, or raft-force value changes. Realistic crest geometry,
+local bathymetric transmission, seasonal calibration, rapid-scale foam/spray,
+and guide/art approval remain open.
 
 An August 1 organic-basalt material pass now conditions the same four
 render-only V15 terrain tiles. It keeps the reviewed 50 m world-aligned macro
@@ -398,9 +380,9 @@ one conditioned profile waterline value per talus instance, and a bounded
 render-only vertex-red wet-bank mask on the two adaptive near-field meshes,
 zero legacy Zambezi PVE actors, and
 exactly one
-non-colliding physical-corridor ribbon bound through the isolated Single Layer
-Water parent with the moving-normal contract tags. The saved material asset is
-also covered by `RaftSim.M9.FZambeziSingleLayerWater`; grid-normal behavior is
+non-colliding physical-corridor ribbon bound through the isolated Default Lit
+Zambezi parent with moving-normal and rejected-Single-Layer evidence tags. The
+saved material asset is covered by `RaftSim.M9.FZambeziDefaultLitWater`; grid-normal behavior is
 covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`, and the talus instance
 and scalar contract are covered by `RaftSim.M9.FZambeziTalusMaterial`. Schema
 v16 additionally
