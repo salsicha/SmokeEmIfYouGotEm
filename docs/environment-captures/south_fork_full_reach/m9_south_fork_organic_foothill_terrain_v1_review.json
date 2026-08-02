@@ -1,0 +1,208 @@
+{
+  "artifact": "M9 South Fork organic foothill terrain V1 review",
+  "recorded_local_date": "2026-08-02",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_environment_art_geospatial_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The South Fork Landscape review path was still Unlit and its pale source response washed the canyon toward white. The runnable Chili Bar-to-Folsom map used a different parent material and therefore would not have received a review-only fix. V1 now shares one three-scale, slope-aware dry-grass/oak-litter/granitic-soil/weathered-granite response between both paths, with a stronger 0.58 palette correction in the Landscape candidate and a source-preserving 0.30 response in the runnable full reach. Fixed-camera evidence is materially less washed out and the playable reach now reads as a summer Sierra foothill corridor, but coarse terrain, synthetic vegetation, sparse mid-story cover, smooth water, and lighting still fail photoreal acceptance.",
+  "implementation": {
+    "organic_function": "RaftSimEditorEnvironment::BuildSouthForkOrganicFoothillBaseColor",
+    "world_noise_scales_per_cm": [
+      0.00013,
+      0.00073,
+      0.0031
+    ],
+    "landscape_candidate_palette_weight": 0.58,
+    "runnable_full_reach_palette_weight": 0.3,
+    "surface_responses": [
+      "dry_grass",
+      "oak_litter",
+      "granitic_soil",
+      "slope_aware_weathered_granite",
+      "fine_mineral_value"
+    ],
+    "landscape_shading_model_before": "Unlit",
+    "landscape_shading_model_after": "DefaultLit",
+    "runnable_parent_material": "/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverTerrain",
+    "runnable_map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "menu_route_source": "unreal/Plugins/RaftSim/Source/RaftSimUI/Private/RaftSimVerticalSliceFrontend.cpp"
+  },
+  "authority": {
+    "shade_only": true,
+    "terrain_geometry_changed": false,
+    "world_position_offset_connected": false,
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "navigation_changed": false,
+    "shoreline_geometry_changed": false,
+    "water_geometry_changed": false,
+    "raft_or_crew_physics_changed": false,
+    "source_registration_retained": true
+  },
+  "objective_capture_comparison": {
+    "landscape_guide_seat_right_bank": {
+      "before_sha256": "cb7b1937d068192a72fba473fede0debc92aa2820103f76dff5653eb4fdb47fe",
+      "after_sha256": "6b45e1d19fdb4e677a4d2fddd0aacbfee06b62f000ba2d9f2be5d288ca32ed05",
+      "roi": [
+        620,
+        90,
+        1280,
+        550
+      ],
+      "metric_note": "Sky/water-blue pixels were excluded; pale neutral means mean RGB greater than 140 with channel range less than 60.",
+      "pale_neutral_fraction_before": 0.961066,
+      "pale_neutral_fraction_after": 0.000027,
+      "mean_luma_before": 158.604,
+      "mean_luma_after": 97.692
+    },
+    "runnable_full_reach": [
+      {
+        "capture": "chili_bar_launch_downstream",
+        "before_sha256": "8bda163d459275499d37fdd4838c6217b4db85ba3bac1295ed65d74c64646425",
+        "after_sha256": "87c8b94dcd1a54c933155a441ad1fce66c2a34b1e6d5c525aad27235625ea9c2",
+        "changed_pixel_fraction_gt8": 0.136522,
+        "warm_dry_ground_fraction_before": 0.05087,
+        "warm_dry_ground_fraction_after": 0.175052
+      },
+      {
+        "capture": "meat_grinder_guide_eye",
+        "before_sha256": "e6a15bca98189101c8d72bad091788a9a8edfb3b8ac93b36275cca870faacf53",
+        "after_sha256": "985c6ef6da9b2a8d8ecab8ffb0833735469808bf526820ce47e677ddf4350558",
+        "changed_pixel_fraction_gt8": 0.146057,
+        "warm_dry_ground_fraction_before": 0.047568,
+        "warm_dry_ground_fraction_after": 0.224393
+      },
+      {
+        "capture": "troublemaker_approach",
+        "before_sha256": "39b8a9edd7bfb3dd985287356a056e80de440125029c6d50423048d1aa8e7522",
+        "after_sha256": "86e8b4c390cea0052c395abf06c67cd3ddba25ab393af34daf080f5cbfd6cf6e",
+        "changed_pixel_fraction_gt8": 0.147587,
+        "warm_dry_ground_fraction_before": 0.030391,
+        "warm_dry_ground_fraction_after": 0.177146
+      },
+      {
+        "capture": "coloma_bridge_context",
+        "before_sha256": "f8fa999df48ff42683648a7a89fbfa2493a7668807d3153e6886f9a6bd7108f1",
+        "after_sha256": "3fcb9e112916a25db0a3d7d0f62a409366a2b0245628aaaf7daa803d22fd8856",
+        "changed_pixel_fraction_gt8": 0.174973,
+        "warm_dry_ground_fraction_before": 0.047289,
+        "warm_dry_ground_fraction_after": 0.236901
+      },
+      {
+        "capture": "salmon_falls_takeout",
+        "before_sha256": "d9d1a76644e1241f43940cedfa31f8fd7bbd0132771e4a06f81e74303078b405",
+        "after_sha256": "c6d4b63345b77dead49ae6594d41f034734fe4490cc6c5b4c17e811b9e07ddd2",
+        "changed_pixel_fraction_gt8": 0.078907,
+        "warm_dry_ground_fraction_before": 0.075831,
+        "warm_dry_ground_fraction_after": 0.117326
+      }
+    ],
+    "full_reach_metric_note": "Changed pixels use maximum RGB delta greater than 8. Warm dry-ground fraction is measured in rows 130-429 using R > 1.03G, G > 1.12B, and bounded luma; it verifies the intended palette response, not photoreal quality."
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with Unreal Engine 5.8",
+    "focused_native": "1/1 RaftSim.M9.FSouthForkOrganicFoothillTerrain passed",
+    "focused_native_report": "unreal/Saved/Automation/M9SouthForkOrganicFoothillV1/index.json",
+    "focused_native_report_sha256": "6a05cc0e7c5e468e0341de73123ff25e3d9fff6767fbdfb9747bf0f6aa6cecc0",
+    "renderer_enabled_full_reach": "1/1 RaftSim.M7.ZFullReachPresentation passed through the actual menu/gameplay map",
+    "renderer_enabled_full_reach_report": "unreal/Saved/Automation/M9SouthForkOrganicFoothillM7/index.json",
+    "renderer_enabled_full_reach_report_sha256": "f136b7b15e25c0642aeac05630b16456f6abe446ec8f333efa45f5dc793d7e29",
+    "filtered_landscape_generation": "captured_source_landscape_import_candidate",
+    "settled_full_reach_capture": "five fixed cameras saved after loading 229 World Partition actor references without regeneration"
+  },
+  "photoreal_rejection_reasons": [
+    "The South Fork Landscape candidate still uses sparse temporary PVE-derived alpha-card vegetation with black and bright-green card artifacts.",
+    "The runnable full reach still repeats a limited set of dark tree forms and lacks convincing mid-story species and natural canopy depth.",
+    "Large hills and banks remain coarse, smooth, and visibly procedural despite improved material breakup.",
+    "The broad river surface remains too smooth and uniform, with sparse repetitive whitewater cues.",
+    "Shoreline transitions remain geometrically simple and do not yet carry enough rock, root, litter, shrub, and erosion detail.",
+    "Lighting and atmosphere remain synthetic and do not yet match a guide-approved photographic reference set across the full reach."
+  ],
+  "reviewers": {
+    "named_environment_art_reviewer": null,
+    "named_geospatial_reviewer": null,
+    "named_south_fork_guide_reviewer": null,
+    "environment_art_approval": false,
+    "geospatial_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "A named environment-art reviewer must approve or replace the organic terrain palette, scale hierarchy, material response, vegetation, ground-cover composition, and lighting across the Landscape and all five runnable fixed cameras.",
+    "A named geospatial reviewer must confirm that the registered source macro remains legible and that the disclosed procedural shade-only infill is plausible without implying survey or navigational authority.",
+    "A named South Fork guide must approve river-edge, hazard-approach, and season/flow readability at Chili Bar, Meat Grinder, Coloma Bridge, Troublemaker, and Salmon Falls.",
+    "The wider product-owner, water, character, safety, accessibility, performance, packaging, signing, media, and distribution acceptance gates remain open."
+  ],
+  "hash_locked_artifacts": [
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorSouthForkMaterial.cpp",
+      "sha256": "6f4c8fd7542b63fd43473e9e8d7c4a4ea3fa69d4baf006d9523f8805b76603bd"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
+      "sha256": "8e45e7599f649a3b483eeb3dbdddd7b2e3c3d54c59c2cc18d5bc795907276cba"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+      "sha256": "be41d3c245765c1abd72802d39e218d4d1351daf5ec0af7703ed30139a54c97c"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
+      "sha256": "038a125354d22297076a98cc6242c0cd03facbb88e27546f5612e2f42d1fc0d6"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+      "sha256": "5c138301881dee9cdf35b7f5cdf47e82825d52744ba1c8dc16db2e70819895c7"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkOrganicTerrainTest.cpp",
+      "sha256": "5ac7ef38b7b59a7720cfb5dd4852b272c8c004e754f4399c55ab9eeb7fe1fd4c"
+    },
+    {
+      "path": "physics/tests/test_photoreal_south_fork_organic_terrain.py",
+      "sha256": "a65b9e0ac380d687c140782905b70b9ac36a85913f176a8b05d9e3ebe443823c"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_PhotorealRiverTerrain.uasset",
+      "sha256": "7743e83832d62f7534788dd0f2c4adf7730507338b6e4400ae4e053046fb0a1a"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_americansouthfork_physicalcorridor_SourceLandscapeCandidate.uasset",
+      "sha256": "50d6ccb933ad08d405604a65401703fa607c21579a54d46afed1997238452dab"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_american_south_fork.json",
+      "sha256": "4d319cef8f1f632b13a55570d1e789512a4ccd54f2a7abc8725a3e231f7f7d1a"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_guide_seat_downstream.png",
+      "sha256": "6b45e1d19fdb4e677a4d2fddd0aacbfee06b62f000ba2d9f2be5d288ca32ed05"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
+      "sha256": "bedbec5617b77414a0f60f66df006ef74244dfdc8df18727e191b11e19282056"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/chili_bar_launch_downstream.png",
+      "sha256": "87c8b94dcd1a54c933155a441ad1fce66c2a34b1e6d5c525aad27235625ea9c2"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png",
+      "sha256": "985c6ef6da9b2a8d8ecab8ffb0833735469808bf526820ce47e677ddf4350558"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/troublemaker_approach.png",
+      "sha256": "86e8b4c390cea0052c395abf06c67cd3ddba25ab393af34daf080f5cbfd6cf6e"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
+      "sha256": "3fcb9e112916a25db0a3d7d0f62a409366a2b0245628aaaf7daa803d22fd8856"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png",
+      "sha256": "c6d4b63345b77dead49ae6594d41f034734fe4490cc6c5b4c17e811b9e07ddd2"
+    }
+  ]
+}

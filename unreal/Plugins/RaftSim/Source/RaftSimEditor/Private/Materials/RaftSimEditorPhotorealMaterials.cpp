@@ -987,17 +987,31 @@ static UMaterial* BuildPhotorealTerrainMaterial()
     TonedBase->B.Expression = ResolvedTerrainTone;
     Add(TonedBase);
 
+    // The runnable Chili Bar-to-Folsom terrain uses this parent rather than
+    // the review Landscape material. Apply the same world-space foothill
+    // model at a subtler strength so registered NAIP colour remains dominant
+    // while broad repeated ground tiles no longer read as a smooth plate.
+    UMaterialExpression* OrganicTonedBase =
+        RaftSimEditorEnvironment::BuildSouthForkOrganicFoothillBaseColor(
+            Material,
+            TonedBase,
+            0.30f);
+    if (!OrganicTonedBase)
+    {
+        OrganicTonedBase = TonedBase;
+    }
+
     UMaterialExpressionConstant3Vector* WetDarkColor =
         NewObject<UMaterialExpressionConstant3Vector>(Material);
     WetDarkColor->Constant = FLinearColor(0.38f, 0.42f, 0.40f, 1.0f);
     Add(WetDarkColor);
     UMaterialExpressionMultiply* WetDarkBase = NewObject<UMaterialExpressionMultiply>(Material);
-    WetDarkBase->A.Expression = TonedBase;
+    WetDarkBase->A.Expression = OrganicTonedBase;
     WetDarkBase->B.Expression = WetDarkColor;
     Add(WetDarkBase);
     UMaterialExpressionLinearInterpolate* WetAwareBase =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
-    WetAwareBase->A.Expression = TonedBase;
+    WetAwareBase->A.Expression = OrganicTonedBase;
     WetAwareBase->B.Expression = WetDarkBase;
     WetAwareBase->Alpha.Expression = VertexMacro;
     WetAwareBase->Alpha.OutputIndex = 4; // dedicated vertex-alpha output

@@ -17,6 +17,13 @@ open gates are documented in
 The August 2 runnable revalidation confirms that the frontend selector, source
 scenario, shipping cook, saved map, live PIE launch, and schema-v16 map audit
 all resolve to `/Game/RaftSim/Maps/L_Zambezi`.
+The South Fork production campaign still resolves to the 49.1 km
+`L_SouthForkAmerican_FullReach` gameplay map. Its August 2 organic foothill
+terrain pass now shares dry-grass, oak-litter, granitic-soil, and weathered-
+granite shading with the fixed Landscape review, while leaving DEM geometry,
+collision, navigation, water, and raft physics unchanged. This is a retained
+technical improvement, not photoreal acceptance; evidence and remaining gates
+are in the [South Fork terrain review](docs/environment-captures/south_fork_full_reach/m9_south_fork_organic_foothill_terrain_v1_review.json).
 Pacuare's `L_UpperHuacas` is again a runnable map: a physical 600 m reach-local
 Landscape, the committed Upper Huacas cooked solver field, explicit vertical
 datum alignment, player raft/start, and the full vertical-slice game mode now

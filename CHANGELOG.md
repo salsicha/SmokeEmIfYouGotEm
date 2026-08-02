@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced South Fork's washed-out Unlit Landscape review response and uniform
+  green runnable ground plate with a shared, shade-only organic foothill graph.
+  Three incommensurate world-space fields add dry grass, oak litter, granitic
+  soil, slope-aware weathered granite, and fine mineral value; the review
+  candidate uses a stronger correction while the actual
+  `L_SouthForkAmerican_FullReach` terrain parent retains registered source
+  colour. Build, exact material audit, renderer-enabled full-reach route, fixed
+  captures, and focused Python contracts pass. Geometry, collision, shoreline,
+  navigation, hydraulics, water, and raft forces are unchanged. Coarse terrain,
+  synthetic vegetation, sparse mid-story cover, smooth water, and external
+  review still reject photoreal promotion.
 - Revalidated Zambezi Batoka Gorge as the sixth runnable river and regenerated
   the committed `/Game/RaftSim/Maps/L_Zambezi` package from the filtered source
   corridor pipeline. The frontend `zambezi_reference_run` entry, source model,

@@ -327,6 +327,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     const bool bUsesDefaultLitLandscape =
+        Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ||
         Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
@@ -504,6 +505,13 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Material->GetExpressionCollection().AddExpression(ConditionedBaseColor);
 
     UMaterialExpression* FinalBaseColor = Candidate.PreviewSpec.RiverId == TEXT("pacuare") ? BuildPacuareOrganicRainforestBaseColor(Material, ConditionedBaseColor) : ConditionedBaseColor;
+    if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+    {
+        FinalBaseColor = BuildSouthForkOrganicFoothillBaseColor(
+            Material,
+            FinalBaseColor,
+            0.58f);
+    }
     if (Candidate.bPhysicalScaleSourceCorridor)
     {
         UMaterialExpressionVertexNormalWS* VertexNormalWs =
@@ -542,7 +550,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         Material->GetExpressionCollection().AddExpression(RockColor);
         UMaterialExpressionLinearInterpolate* SlopeConditionedBaseColor =
             NewObject<UMaterialExpressionLinearInterpolate>(Material);
-        SlopeConditionedBaseColor->A.Expression = ConditionedBaseColor;
+        // Preserve river-specific organic shading before adding the shared
+        // physical-corridor rock response. Pointing this input back at the
+        // conditioned source silently discarded any organic graph authored
+        // before this block.
+        SlopeConditionedBaseColor->A.Expression = FinalBaseColor;
         SlopeConditionedBaseColor->B.Expression = RockColor;
         SlopeConditionedBaseColor->Alpha.Expression = RockSlopeMask;
         Material->GetExpressionCollection().AddExpression(SlopeConditionedBaseColor);
