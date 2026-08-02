@@ -6,6 +6,18 @@
 > Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
 > acceptance remain open.
 
+## Run the map
+
+From the game frontend, choose **Free Run** and then **Zambezi: Boiling Pot to
+Mukuni Beach**. Free Run bypasses career-license locks, so the reference run is
+available on a new profile. Its scenario ID is `zambezi_reference_run` and it
+opens `/Game/RaftSim/Maps/L_Zambezi`.
+
+For direct editor testing, open `/Game/RaftSim/Maps/L_Zambezi` and use Play In
+Editor. The stable package is also included in the shipping cook list. Do not
+use `L_ZambeziBatokaGorge_PhysicalCorridorCandidate`: that superseded preview
+package is not the runnable map.
+
 The Zambezi map build now combines three evidence layers without pretending they
 have equal authority:
 

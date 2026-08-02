@@ -49,6 +49,13 @@ milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 | Chilko | Lava Canyon | signature-rapid Free Run |
 | Zambezi, Batoka Gorge | `L_Zambezi`: Boiling Pot to Mukuni Beach, Rapids 1–25 | runnable reference Free Run |
 
+To run Zambezi from the game, choose **Free Run**, then select **Zambezi:
+Boiling Pot to Mukuni Beach**. Free Run scenarios are available without a
+career-license unlock. In the Unreal Editor, the same runnable map can be
+opened directly at `/Game/RaftSim/Maps/L_Zambezi`; the older
+`L_ZambeziBatokaGorge_PhysicalCorridorCandidate` preview is not the gameplay
+map.
+
 ## What's in this repository
 
 | Area | Contents |
