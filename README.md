@@ -3,7 +3,9 @@
 An open-source, photorealistic whitewater rafting simulator built with Unreal Engine 5.8 and a first-party shallow-water physics stack. You are the river guide: read the rapid, set the angle, call the strokes, keep your crew in the boat.
 
 **Status (August 2026): pre-release, in active development.** Six rivers are
-runnable in-engine. The 1.0 production campaign remains the **South Fork
+runnable in-engine. Zambezi is explicitly one of those six and is selectable
+as the **Zambezi: Boiling Pot to Mukuni Beach** reference Free Run. The 1.0
+production campaign remains the **South Fork
 American, Chili Bar to Salmon Falls**, with all 20 named rapids at three real
 flow levels. The versioned `L_Zambezi` map adds a source-scale Boiling
 Pot-to-Mukuni Beach reference run with all 25 mapped rapids; its missing

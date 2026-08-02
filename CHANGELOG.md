@@ -32,6 +32,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reverified Zambezi Batoka Gorge as a selectable sixth runnable river. The
+  generated player-selection model, Unreal river catalog, frontend scenario,
+  source scenario, shipping cook list, versioned `L_Zambezi` map, and focused
+  runtime acceptance contract all resolve the same `reference_free_run` while
+  production terrain, hydraulics, guide, art, rights, and performance gates
+  remain open.
 - Added two source-conditioned, non-colliding 5 m adaptive bank meshes over the
   first kilometre of the runnable Zambezi map, with bounded dry-shoreline and
   sub-metre erosion/talus infill where the 30 m source lacks local detail. The

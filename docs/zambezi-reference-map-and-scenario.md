@@ -1,7 +1,8 @@
 # Zambezi reference map and scenario
 
 > Runtime status, August 1, 2026: the complete reference Free Run is one of the
-> six runnable rivers and is versioned at `/Game/RaftSim/Maps/L_Zambezi`.
+> six runnable rivers, is selectable from the player-facing Free Run catalog,
+> and is versioned at `/Game/RaftSim/Maps/L_Zambezi`.
 > Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
 > acceptance remain open.
 

@@ -408,7 +408,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "Material->BlendMode = BLEND_Opaque" in foliage_cpp
     assert "Material->TwoSided = false" in foliage_cpp
     assert "AmbientOcclusion->R = 1.0f" in foliage_cpp
-    assert "ShadowFloor->R = 0.09f" in foliage_cpp
+    assert "ShadowFloor->R = ShadowFillStrength" in foliage_cpp
+    assert (
+        'ZambeziVegetationMaterialPath,\n        TEXT("Zambezi"),\n        0.09f'
+        in foliage_cpp
+    )
     assert "FLinearColor(0.085f, 0.135f, 0.034f, 1.0f)" in foliage_cpp
     assert "RaftSimOpaqueVolumetricVegetation" in foliage_cpp
     assert "RaftSimProceduralVegetationFallback" in foliage_cpp

@@ -127,9 +127,14 @@ Start with Terminator, Khyber Pass, and Himalayas after exact stationing. Termin
 
 Start with Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and Miracle Canyon after source reconciliation and exact stationing. Validate continuous class III-IV pacing, canyon constrictions, wave trains, boulder contacts, limited recovery, and flow-dependent pin/flush behavior. Do not assign numeric flow thresholds until Environment Canada gauge windows are routed to the game reach and reviewed by a local guide.
 
-### Zambezi Additional Active Environment
+### Zambezi Runnable Reference River
 
-Retain Against the Wall, Gulliver's Travels, Midnight Diner, Commercial Suicide, Three Ugly Sisters, Washing Machine, Terminators, Double Trouble, and Oblivion definitions as active source-blocked evidence. Rapid production still requires authoritative route and higher-resolution terrain. The Namaqualand cliff import remains a CC0 comparison, not Batoka authority.
+Retain Against the Wall, Gulliver's Travels, Midnight Diner, Commercial Suicide,
+Three Ugly Sisters, Washing Machine, Terminators, Double Trouble, and Oblivion
+definitions as active source-blocked evidence inside the runnable reference Free
+Run. Rapid production still requires authoritative route and higher-resolution
+terrain. The Namaqualand cliff import remains a CC0 comparison, not Batoka
+authority.
 
 ## Immediate Next Work
 
