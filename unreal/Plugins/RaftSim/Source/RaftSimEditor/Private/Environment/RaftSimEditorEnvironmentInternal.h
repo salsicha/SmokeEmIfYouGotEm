@@ -928,6 +928,11 @@ UMaterialExpression* BuildPacuareOrganicRainforestBaseColor(
     UMaterial* Material,
     UMaterialExpression* SourceBaseColor);
 
+UMaterialExpression* BuildSouthForkOrganicFoothillBaseColor(
+    UMaterial* Material,
+    UMaterialExpression* SourceBaseColor,
+    float DefaultPaletteWeight);
+
 UMaterialExpression* BuildColoradoOrganicHanceBaseColor(
     UMaterial* Material,
     UMaterialExpression* SourceBaseColor);

@@ -3881,3 +3881,23 @@ path is verified, and the completion goal can be marked complete.
   are incomplete, water lacks production rapid-scale detail, and all named
   external guide, geospatial, ecology, art, water-VFX, and performance gates
   remain open.
+- South Fork organic foothill terrain V1 corrects both terrain paths instead of
+  improving only the detached Landscape review. The physical-corridor Landscape
+  is now Default Lit and uses a 0.58 palette correction; the actual frontend/
+  campaign map, `L_SouthForkAmerican_FullReach`, consumes the same function at a
+  source-preserving 0.30 strength through
+  `M_RaftSim_PhotorealRiverTerrain`. Three incommensurate world-space fields
+  combine summer dry grass, oak litter, granitic soil, slope-aware weathered
+  granite, and fine mineral value. No world-position offset is connected and no
+  DEM/static-mesh height, collision, shoreline, navigation, water, solver,
+  hydraulics, or raft force changed. In the fixed Landscape right-bank region,
+  pale-neutral coverage falls from 96.1066% to 0.0027%; across the five settled
+  gameplay views, 7.89-17.50% of pixels change by more than eight RGB levels and
+  every frame gains the intended warm dry-ground response. The editor build,
+  exact two-material native audit, renderer-enabled M7 full-reach route, filtered
+  Landscape capture, five settled-map captures, and nine Python contracts pass.
+  The hash-locked review remains fail-closed: alpha-card foliage, repeated dark
+  tree forms, sparse mid-story ecology, coarse smooth terrain, broad flat water,
+  simple shoreline structure, synthetic lighting, and absent named environment-
+  art, geospatial, and South Fork guide approval keep M9 and photoreal promotion
+  open.
