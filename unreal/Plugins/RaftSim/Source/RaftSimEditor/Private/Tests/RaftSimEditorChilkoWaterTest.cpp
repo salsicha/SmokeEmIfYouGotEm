@@ -64,10 +64,11 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
             NoiseScales.Add(Noise->Scale);
         }
     }
-    TestEqual(TEXT("Two moving normal layers exist"), PannerCount, 2);
-    TestEqual(TEXT("Two world optical scales exist"), NoiseScales.Num(), 2);
+    TestEqual(TEXT("Three moving normal layers exist"), PannerCount, 3);
+    TestEqual(TEXT("Three world optical scales exist"), NoiseScales.Num(), 3);
     TestTrue(TEXT("Reach-scale water variation exists"), NoiseScales.Contains(0.00027f));
     TestTrue(TEXT("Surface-scale water variation exists"), NoiseScales.Contains(0.00147f));
+    TestTrue(TEXT("Fine-scale water variation exists"), NoiseScales.Contains(0.00611f));
 
     auto TestScalar = [this, Instance](
                           const TCHAR* ParameterName,
@@ -89,12 +90,22 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
     TestScalar(TEXT("Roughness"), 0.22f);
     TestScalar(TEXT("Specular"), 0.48f);
     TestScalar(TEXT("NormalIntensity"), 0.34f);
-    TestScalar(TEXT("SurfaceVariationStrength"), 0.34f);
+    TestScalar(TEXT("SurfaceVariationStrength"), 0.46f);
+    TestScalar(TEXT("CrossCurrentNormalWeight"), 0.38f);
+    TestScalar(TEXT("RoughnessVariationAmplitude"), 0.14f);
     TestScalar(TEXT("SolverFieldEnable"), 0.0f);
     TestScalar(TEXT("SolverMacroNormalWeight"), 0.0f);
     TestScalar(TEXT("SolverDepthColorWeight"), 0.0f);
     TestScalar(TEXT("SolverFieldRoughnessWeight"), 0.0f);
     TestScalar(TEXT("SolverFroudeAerationWeight"), 0.0f);
+
+    const RaftSimEditorEnvironment::FRaftSimLandscapeCandidateWaterSettings WaterSettings =
+        RaftSimEditorEnvironment::GetLandscapeCandidateWaterSettings(
+            TEXT("chilko_river_lava_canyon"));
+    TestEqual(TEXT("Chilko ribbon has 48 cross-current samples"), WaterSettings.RibbonCrossSectionSteps, 48);
+    TestTrue(TEXT("Chilko CPU chop keeps reviewed scale"), FMath::IsNearlyEqual(WaterSettings.AnalyticChopScale, 0.72f));
+    TestTrue(TEXT("Chilko cross-current chop keeps reviewed amplitude"), FMath::IsNearlyEqual(WaterSettings.CrossCurrentChopAmplitudeCm, 7.0f));
+    TestTrue(TEXT("Chilko embeds restrained aeration into the water surface"), FMath::IsNearlyEqual(WaterSettings.EmbeddedAerationWeight, 0.18f));
 
     UTexture* NormalAtlas = nullptr;
     TestTrue(

@@ -168,6 +168,30 @@ cover. No new live-gameplay renderer frame was accepted for this bracket, so
 the runtime optical values remain config- and map-tested rather than visually
 approved.
 
+## Cold Water Optical Breakup V2
+
+The retained Futaleufú and Chilko capture ribbons now carry readable
+center-channel water structure instead of relying on a nearly flat solver
+surface and one uniform optical response. Each river-local Default Lit parent
+uses three moving normal directions, three non-harmonic world fields, and
+bounded spatial roughness variation. The CPU review ribbon increases from 32
+to 48 cross-current samples and combines the unchanged cooked solver relief
+with bounded multiscale and cross-current chop plus restrained aeration color.
+All render relief and embedded aeration taper to zero at the ribbon banks, so
+the new current structure cannot lift water onto adjacent land.
+
+This is a presentation milestone, not a physics change. The edited ribbon is
+noncolliding and hidden during play; the live C++ solver mesh remains the sole
+gameplay water renderer, collision, hydraulic-state, buoyancy, and raft-force
+authority. Fixed captures accept more legible crest/current breakup in both
+rivers, and the editor build plus both native water audits pass. Photoreal
+promotion still fails because the near-field water remains dark and opaque,
+named rapid holes and VFX are sparse, 30 m terrain is coarse, vegetation is
+procedural, and no external guide, geospatial, hydraulic, art/VFX, or
+target-hardware reviewer has accepted the result. Exact settings, metrics,
+hashes, captures, authority boundaries, and six external gates are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_cold_water_v2_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

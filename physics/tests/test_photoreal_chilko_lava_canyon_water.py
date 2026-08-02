@@ -26,7 +26,7 @@ MANIFEST = (
     / "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "landscape_candidate_manifest_chilko_river_lava_canyon.json"
 )
-REVIEW = MANIFEST.with_name("chilko_lava_canyon_native_water_v1_review.json")
+REVIEW = MANIFEST.with_name("chilko_futaleufu_cold_water_v2_review.json")
 
 
 def _sha256(path: Path) -> str:
@@ -41,9 +41,10 @@ def test_chilko_water_is_native_moving_and_non_displacing() -> None:
     assert "MSM_DefaultLit" in water
     assert "BLEND_Opaque" in water
     assert "UMaterialExpressionSingleLayerWaterMaterialOutput" not in water
-    assert water.count("AddNormalSample(") == 2
+    assert water.count("AddNormalSample(") == 3
     assert "0.00027f" in water
     assert "0.00147f" in water
+    assert "0.00611f" in water
     assert "EditorOnlyData->WorldPositionOffset" not in water
     assert "Landscape->Import" not in water
     assert "SetCollision" not in water
@@ -63,7 +64,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "Settings.BaseColorScale = 1.10f",
         "Settings.EmissiveFillScale = 0.16f",
         "Settings.NormalIntensity = 0.34f",
-        "Settings.SurfaceVariationStrength = 0.34f",
+        "Settings.SurfaceVariationStrength = 0.46f",
         "Settings.VertexTintWeight = 0.78f",
     ):
         assert token in catalog
@@ -73,6 +74,8 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveFoamIntensity = 0.72f",
         "RaftSimChilkoDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
+        "RaftSimColdWaterCpuChopV2",
+        "RaftSimColdWaterEmbeddedAerationV2",
     ):
         assert token in geometry
     for parameter in (
@@ -111,7 +114,7 @@ def test_chilko_manifest_records_native_capture_water() -> None:
     assert candidate["water_roughness"] == 0.22
     assert candidate["water_specular"] == 0.48
     assert candidate["water_normal_intensity"] == 0.34
-    assert candidate["water_surface_variation_strength"] == 0.34
+    assert candidate["water_surface_variation_strength"] == 0.46
     assert candidate["water_solver_render_geometry_collision_enabled"] is False
 
 
@@ -119,7 +122,7 @@ def test_chilko_native_water_review_is_hash_locked_and_honest() -> None:
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
 
     assert review["schema"] == (
-        "raftsim.environment.chilko_lava_canyon_native_water_review.v1"
+        "raftsim.environment.chilko_futaleufu_cold_water_review.v2"
     )
     assert review["status"] == (
         "technical_candidate_retained_photoreal_and_external_review_open"
@@ -130,13 +133,19 @@ def test_chilko_native_water_review_is_hash_locked_and_honest() -> None:
     assert review["decision"]["photoreal_acceptance_passed"] is False
     assert review["decision"]["hydraulics_changed"] is False
     assert review["decision"]["raft_forces_changed"] is False
-    assert review["capture_water"]["cross_river_shader_field_reuse"] is False
-    assert review["capture_water"]["native_normal_atlas"] is True
-    assert review["capture_water"]["moving_normal_layer_count"] == 2
-    assert review["capture_water"]["world_optical_scales_per_cm"] == [
+    assert review["decision"]["capture_ribbon_geometry_changed"] is True
+    assert review["decision"]["gameplay_water_geometry_changed"] is False
+    river = review["rivers"]["chilko_river_lava_canyon"]
+    assert river["moving_normal_layer_count"] == 3
+    assert river["world_optical_scales_per_cm"] == [
         0.00027,
         0.00147,
+        0.00611,
     ]
+    assert river["ribbon_cross_section_steps"] == 48
+    assert river["analytic_chop_scale"] == 0.72
+    assert river["cross_current_chop_amplitude_cm"] == 7.0
+    assert river["embedded_aeration_weight"] == 0.18
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 

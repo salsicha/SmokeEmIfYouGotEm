@@ -162,7 +162,9 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         ConditionedSurfaceWorldZ.Add(TerrainZ + 140.0f);
     }
 
-    const int32 CrossSteps = bChilkoSourceScale ? 16 : 32;
+    const int32 CrossSteps = bChilkoSourceScale
+        ? 16
+        : FMath::Max(8, WaterSettings.RibbonCrossSectionSteps);
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
@@ -268,27 +270,42 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 SolverFroude,
                 SolverFieldUpstream4M.B * Candidate.SolverVisualizationFroudeCap * 0.94f,
                 SolverFieldUpstream8M.B * Candidate.SolverVisualizationFroudeCap * 0.84f);
+            const float EdgeT = FMath::Abs(V - 0.5f) * 2.0f;
+            const float ReliefEdgeEnvelope = 1.0f -
+                SmoothPreviewStep(0.68f, 1.0f, EdgeT);
             const float SolverHydraulicPresence = bUseSolverVisualizationFields
                 ? SmoothPreviewStep(0.03f, 0.16f, SolverDepthM)
                 : 0.0f;
             const float SolverSurfaceReliefCm = bUseSolverVisualizationFields
                 ? (SolverPresentationField.A - 0.5f) * 2.0f *
                       Candidate.SolverVisualizationSurfaceReliefCapM * 100.0f *
-                      WaterSettings.SolverSurfaceReliefScale * SolverHydraulicPresence
+                      WaterSettings.SolverSurfaceReliefScale * SolverHydraulicPresence *
+                      ReliefEdgeEnvelope
                 : 0.0f;
             const float SolverHydraulicAerationT = bUseSolverVisualizationFields
                 ? SmoothPreviewStep(0.60f, 1.10f, SolverPersistentFroude) *
                       SmoothPreviewStep(0.65f, 2.10f, SolverPersistentSpeedMps) *
                       SolverHydraulicPresence
                 : 0.0f;
-            const float EdgeT = FMath::Abs(V - 0.5f) * 2.0f;
             const float FlowCueScale = Candidate.PreviewSpec.FlowCurrentCueScale;
-            const float WaveEnvelope = 1.0f - EdgeT * 0.48f;
+            const float WaveEnvelope = ReliefEdgeEnvelope;
+            const float SolverAnalyticChopScale = bUseSolverVisualizationFields
+                ? WaterSettings.AnalyticChopScale
+                : 1.0f;
+            const float CrossCurrentPhase =
+                FMath::PerlinNoise2D(FVector2D(
+                    StationsCm[CenterIndex] * 0.00043f,
+                    Lateral * 0.00071f)) * 1.85f;
+            const float CrossCurrentChop =
+                WaterSettings.CrossCurrentChopAmplitudeCm *
+                FMath::Sin(
+                    StationsCm[CenterIndex] * 0.0023f -
+                    Lateral * 0.0067f + CrossCurrentPhase);
             const float Wave = FlowCueScale * WaveEnvelope * (
                 12.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0041f + Lateral * 0.011f) +
                 5.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0107f - Lateral * 0.021f) +
-                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f)) *
-                (bUseSolverVisualizationFields ? 0.22f : 1.0f);
+                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f) +
+                CrossCurrentChop) * SolverAnalyticChopScale;
             Vertices.Add(FVector(
                 Centers[CenterIndex].X + Normal.X * Lateral,
                 Centers[CenterIndex].Y + Normal.Y * Lateral,
@@ -324,10 +341,24 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 FMath::Pow(EdgeT, 1.8f));
             const float BreakerSignal =
                 CurrentThread * 0.52f + FineCurrent * 0.28f + CrestCue * 0.20f;
+            const float EmbeddedAerationBreakup = SmoothPreviewStep(
+                0.70f,
+                0.91f,
+                BreakerSignal * 0.72f +
+                    (FMath::PerlinNoise2D(FVector2D(
+                         StationsCm[CenterIndex] * 0.0047f,
+                         Lateral * 0.0093f)) * 0.5f + 0.5f) * 0.28f);
+            const float EmbeddedAeration = bUseSolverVisualizationFields
+                ? WaterSettings.EmbeddedAerationWeight *
+                      SmoothPreviewStep(0.75f, 2.80f, SolverPersistentSpeedMps) *
+                      SolverHydraulicPresence * EmbeddedAerationBreakup *
+                      ReliefEdgeEnvelope
+                : 0.0f;
             const float Breaker = bUseSolverVisualizationFields
                 ? SolverHydraulicAerationT * WaterSettings.SolverFroudeAerationWeight
                 : FlowCueScale * WaveEnvelope *
                       SmoothPreviewStep(0.72f, 0.92f, BreakerSignal) * 0.72f;
+            const float CombinedBreaker = FMath::Max(Breaker, EmbeddedAeration);
             if (bUseSolverVisualizationFields)
             {
                 const float DepthColorT = SmoothPreviewStep(0.20f, 2.60f, SolverDepthM) *
@@ -350,7 +381,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     : Candidate.PreviewSpec.bDesertCanyon
                     ? FLinearColor(0.72f, 0.68f, 0.58f)
                     : FLinearColor(0.75f, 0.84f, 0.80f),
-                Breaker);
+                CombinedBreaker);
             VertexColors.Add(SurfaceColor);
             if (bUseSolverVisualizationFields)
             {
@@ -462,12 +493,16 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             WaterActor->Tags.AddUnique(TEXT("RaftSimFutaleufuDefaultLitWater"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterCpuChopV2"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterEmbeddedAerationV2"));
         }
         else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
         {
             WaterActor->Tags.AddUnique(TEXT("RaftSimChilkoDefaultLitWater"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterCpuChopV2"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColdWaterEmbeddedAerationV2"));
         }
     }
     if (bUseSolverVisualizationFields &&

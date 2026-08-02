@@ -191,7 +191,7 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.Specular = 0.46f;
         Settings.Opacity = 0.34f;
         Settings.NormalIntensity = 0.30f;
-        Settings.SurfaceVariationStrength = 0.30f;
+        Settings.SurfaceVariationStrength = 0.44f;
         Settings.VertexTintWeight = 0.76f;
         Settings.RenderWidthScale = 1.18f;
         Settings.RenderNormalUpBlend = 0.84f;
@@ -205,6 +205,10 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 1.0f;
         Settings.SolverFroudeVisualGain = 1.0f;
         Settings.SolverSurfaceReliefScale = 0.22f;
+        Settings.RibbonCrossSectionSteps = 48;
+        Settings.AnalyticChopScale = 0.78f;
+        Settings.CrossCurrentChopAmplitudeCm = 8.0f;
+        Settings.EmbeddedAerationWeight = 0.22f;
         Settings.SurfaceTint = FLinearColor(0.025f, 0.185f, 0.225f, 0.0f);
         Settings.SolverDeepWaterTint = FLinearColor(0.006f, 0.095f, 0.13f, 0.0f);
         Settings.SolverAerationTint = FLinearColor(0.88f, 0.95f, 0.96f, 0.0f);
@@ -221,7 +225,7 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.Specular = 0.48f;
         Settings.Opacity = 0.34f;
         Settings.NormalIntensity = 0.34f;
-        Settings.SurfaceVariationStrength = 0.34f;
+        Settings.SurfaceVariationStrength = 0.46f;
         Settings.VertexTintWeight = 0.78f;
         Settings.RenderWidthScale = 1.20f;
         Settings.RenderNormalUpBlend = 0.82f;
@@ -235,6 +239,10 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 1.0f;
         Settings.SolverFroudeVisualGain = 1.0f;
         Settings.SolverSurfaceReliefScale = 0.26f;
+        Settings.RibbonCrossSectionSteps = 48;
+        Settings.AnalyticChopScale = 0.72f;
+        Settings.CrossCurrentChopAmplitudeCm = 7.0f;
+        Settings.EmbeddedAerationWeight = 0.18f;
         Settings.SurfaceTint = FLinearColor(0.028f, 0.20f, 0.25f, 0.0f);
         Settings.SolverDeepWaterTint = FLinearColor(0.012f, 0.11f, 0.15f, 0.0f);
         Settings.SolverAerationTint = FLinearColor(0.86f, 0.93f, 0.94f, 0.0f);

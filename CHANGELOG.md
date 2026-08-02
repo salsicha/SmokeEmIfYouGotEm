@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Added a retained V2 cold-water presentation bracket to the runnable
+  Futaleufú Terminator and Chilko Lava Canyon maps. Their river-local Default
+  Lit parents now use three moving normal directions, three world optical
+  scales, and varied roughness; the noncolliding capture ribbons use 48
+  cross-current samples, bounded multiscale/cross-current chop, embedded
+  aeration color, and zero-displacement bank tapers. Live solver geometry,
+  collision, hydraulic state, bathymetry, buoyancy, and raft forces are
+  unchanged. Build and focused native/Python/map gates pass, while opaque
+  near-field water, sparse rapid VFX, coarse terrain, procedural ecology, and
+  all named external reviews still reject photoreal promotion.
 - Clarified the working Zambezi launch contract in the player and design docs:
   **Free Run → Zambezi: Boiling Pot to Mukuni Beach** is available without a
   career-license unlock and resolves to the committed, cooked

@@ -241,6 +241,10 @@ struct FRaftSimLandscapeCandidateWaterSettings
     float SolverSpeedVisualGain = 1.50f;
     float SolverFroudeVisualGain = 3.00f;
     float SolverSurfaceReliefScale = 0.09f;
+    int32 RibbonCrossSectionSteps = 32;
+    float AnalyticChopScale = 0.22f;
+    float CrossCurrentChopAmplitudeCm = 0.0f;
+    float EmbeddedAerationWeight = 0.0f;
     FLinearColor SurfaceTint = FLinearColor(0.025f, 0.115f, 0.095f, 0.0f);
     FLinearColor SolverDeepWaterTint = FLinearColor(0.012f, 0.072f, 0.060f, 0.0f);
     FLinearColor SolverAerationTint = FLinearColor(0.74f, 0.82f, 0.76f, 0.0f);

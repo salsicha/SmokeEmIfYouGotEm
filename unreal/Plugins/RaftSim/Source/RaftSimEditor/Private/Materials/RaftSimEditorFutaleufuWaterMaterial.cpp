@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 
@@ -78,7 +79,7 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             AddFutaleufuWaterExpression<UMaterialExpressionScalarParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("FutaleufuTerminatorWaterV1");
+        Parameter->Group = TEXT("FutaleufuTerminatorWaterV2");
         return Parameter;
     };
     auto Vector = [Material](const TCHAR* Name, const FLinearColor& Value)
@@ -87,7 +88,7 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             AddFutaleufuWaterExpression<UMaterialExpressionVectorParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("FutaleufuTerminatorWaterV1");
+        Parameter->Group = TEXT("FutaleufuTerminatorWaterV2");
         return Parameter;
     };
     auto Multiply = [Material](UMaterialExpression* A, UMaterialExpression* B)
@@ -140,8 +141,10 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
         PhysicalSurfaceTint,
         Scalar(TEXT("BaseColorScale"), 1.08f));
 
-    // Two non-harmonic world scales break the broad dark plate without
-    // inventing hydraulic crests or moving the reviewed ribbon geometry.
+    // Three non-harmonic world scales break the broad dark plate without
+    // inventing hydraulic crests or moving the reviewed ribbon geometry. The
+    // third metre-scale field also drives bounded roughness variation, so the
+    // surface does not retain one uniform plastic highlight response.
     UMaterialExpressionNoise* ReachVariation =
         AddFutaleufuWaterExpression<UMaterialExpressionNoise>(Material);
     ReachVariation->Scale = 0.00031f;
@@ -156,17 +159,26 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
     SurfaceVariation->Levels = 2;
     SurfaceVariation->OutputMin = 0.0f;
     SurfaceVariation->OutputMax = 1.0f;
+    UMaterialExpressionNoise* FineVariation =
+        AddFutaleufuWaterExpression<UMaterialExpressionNoise>(Material);
+    FineVariation->Scale = 0.00673f;
+    FineVariation->bTurbulence = true;
+    FineVariation->Levels = 2;
+    FineVariation->OutputMin = 0.0f;
+    FineVariation->OutputMax = 1.0f;
     UMaterialExpression* VariationField = Add(
-        Multiply(ReachVariation, Constant(0.68f)),
-        Multiply(SurfaceVariation, Constant(0.32f)));
+        Add(
+            Multiply(ReachVariation, Constant(0.54f)),
+            Multiply(SurfaceVariation, Constant(0.30f))),
+        Multiply(FineVariation, Constant(0.16f)));
     UMaterialExpression* PatternedColor = Lerp(
-        Multiply(BaseColor, Constant(0.76f)),
-        Multiply(BaseColor, Constant(1.22f)),
+        Multiply(BaseColor, Constant(0.72f)),
+        Multiply(BaseColor, Constant(1.28f)),
         VariationField);
     UMaterialExpression* OpticallyVariedBaseColor = Lerp(
         BaseColor,
         PatternedColor,
-        Scalar(TEXT("SurfaceVariationStrength"), 0.30f));
+        Scalar(TEXT("SurfaceVariationStrength"), 0.44f));
 
     UMaterialExpressionVectorParameter* AtlasTileOriginParameter = Vector(
         TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
@@ -189,17 +201,35 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             float UTiling,
             float VTiling,
             float SpeedX,
-            float SpeedY) -> UMaterialExpression*
+            float SpeedY,
+            bool bSwapCoordinates) -> UMaterialExpression*
     {
         UMaterialExpressionTextureCoordinate* TexCoord =
             AddFutaleufuWaterExpression<UMaterialExpressionTextureCoordinate>(Material);
         TexCoord->UTiling = UTiling;
         TexCoord->VTiling = VTiling;
+        UMaterialExpression* BaseCoordinates = TexCoord;
+        if (bSwapCoordinates)
+        {
+            UMaterialExpressionComponentMask* CoordinateU =
+                AddFutaleufuWaterExpression<UMaterialExpressionComponentMask>(Material);
+            CoordinateU->Input.Expression = TexCoord;
+            CoordinateU->R = true;
+            UMaterialExpressionComponentMask* CoordinateV =
+                AddFutaleufuWaterExpression<UMaterialExpressionComponentMask>(Material);
+            CoordinateV->Input.Expression = TexCoord;
+            CoordinateV->G = true;
+            UMaterialExpressionAppendVector* SwappedCoordinates =
+                AddFutaleufuWaterExpression<UMaterialExpressionAppendVector>(Material);
+            SwappedCoordinates->A.Expression = CoordinateV;
+            SwappedCoordinates->B.Expression = CoordinateU;
+            BaseCoordinates = SwappedCoordinates;
+        }
         UMaterialExpressionPanner* Panner =
             AddFutaleufuWaterExpression<UMaterialExpressionPanner>(Material);
         Panner->SpeedX = SpeedX;
         Panner->SpeedY = SpeedY;
-        Panner->Coordinate.Expression = TexCoord;
+        Panner->Coordinate.Expression = BaseCoordinates;
 
         UMaterialExpressionFrac* WrappedUvPrimary =
             AddFutaleufuWaterExpression<UMaterialExpressionFrac>(Material);
@@ -234,7 +264,7 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             Sample->Texture = DefaultNormalTexture;
             Sample->SamplerType = SAMPLERTYPE_Normal;
             Sample->Coordinates.Expression = AtlasUv;
-            Sample->Group = TEXT("FutaleufuTerminatorWaterV1");
+            Sample->Group = TEXT("FutaleufuTerminatorWaterV2");
             return Sample;
         };
         UMaterialExpression* PrimarySample = SampleAtlas(WrappedUvPrimary);
@@ -268,14 +298,21 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
         return ContinuousNormal;
     };
 
-    UMaterialExpression* NormalA = AddNormalSample(0.64f, 1.72f, 0.029f, 0.004f);
-    UMaterialExpression* NormalB = AddNormalSample(1.07f, 2.83f, -0.011f, 0.021f);
+    UMaterialExpression* NormalA =
+        AddNormalSample(0.64f, 1.72f, 0.029f, 0.004f, false);
+    UMaterialExpression* NormalB =
+        AddNormalSample(1.07f, 2.83f, -0.011f, 0.021f, false);
+    UMaterialExpression* CrossCurrentNormal =
+        AddNormalSample(2.17f, 0.79f, 0.017f, -0.026f, true);
     UMaterialExpressionConstant3Vector* FlatNormal =
         AddFutaleufuWaterExpression<UMaterialExpressionConstant3Vector>(Material);
     FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f, 0.0f);
     UMaterialExpression* WaterNormal = Lerp(
         FlatNormal,
-        Lerp(NormalA, NormalB, Constant(0.43f)),
+        Lerp(
+            Lerp(NormalA, NormalB, Constant(0.43f)),
+            CrossCurrentNormal,
+            Scalar(TEXT("CrossCurrentNormalWeight"), 0.34f)),
         Scalar(TEXT("NormalIntensity"), 0.30f));
 
     UMaterialExpression* BaseEmissive = Multiply(
@@ -292,6 +329,12 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             Scalar(TEXT("ReflectionFillIntensity"), 0.10f)));
     UMaterialExpressionScalarParameter* Roughness =
         Scalar(TEXT("Roughness"), 0.24f);
+    UMaterialExpression* VariedRoughness = Lerp(
+        Roughness,
+        Add(
+            Roughness,
+            Scalar(TEXT("RoughnessVariationAmplitude"), 0.12f)),
+        VariationField);
     UMaterialExpressionScalarParameter* Specular =
         Scalar(TEXT("Specular"), 0.46f);
 
@@ -320,7 +363,8 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
         ConnectPreviewMaterialColorInput(
             EditorOnlyData->EmissiveColor, Add(BaseEmissive, ReflectionFill));
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->Roughness, VariedRoughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
     }
 
@@ -347,9 +391,10 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += TEXT(
-        "Built Futaleufu Terminator opaque Default Lit water with native "
-        "two-scale moving normals, two world optical scales, CPU-authored "
-        "cooked-field color authority, and no displacement.\n");
+        "Built Futaleufu Terminator opaque Default Lit water V2 with three "
+        "moving normal directions, three world optical scales, varied "
+        "roughness, CPU-authored cooked-field color authority, and no "
+        "displacement.\n");
     return Material;
 }
 } // namespace RaftSimEditorEnvironment

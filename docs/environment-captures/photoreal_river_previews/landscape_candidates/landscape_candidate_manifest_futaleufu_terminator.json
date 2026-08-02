@@ -184,7 +184,7 @@
       "water_specular": 0.460000,
       "water_surface_opacity": 1.000000,
       "water_normal_intensity": 0.300000,
-      "water_surface_variation_strength": 0.300000,
+      "water_surface_variation_strength": 0.440000,
       "water_normal_atlas_sampling_policy": "half_period_dual_sample_crossfade_prevents_frac_tile_boundaries",
       "water_normal_atlas_phase_offset": 0.500000,
       "water_normal_primary_uv_tiling": [0.730000, 2.150000],
