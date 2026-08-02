@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "831BE64C8D48F27C00688EBEA9E67D65",
+			"instanceName": "Alexs-MacBook-Air.local-69124",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-04.51.19",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.008626207709312439,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FFutaleufuOrganicTemperateTerrain",
+			"fullTestPath": "RaftSim.M9.FFutaleufuOrganicTemperateTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"831BE64C8D48F27C00688EBEA9E67D65"
+			],
+			"duration": 0.008626207709312439,
+			"dateTime": "2026.08.02-04.51.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

@@ -17,7 +17,7 @@ from raftsim.futaleufu_terminator_visual_water import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 REVIEW_RELATIVE = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "futaleufu_terminator_reach_local_runnable_v1_review.json"
+    "futaleufu_terminator_organic_lit_terrain_v1_review.json"
 )
 
 
@@ -49,22 +49,43 @@ def test_build_futaleufu_terminator_visual_water() -> None:
     assert image.size == (1024, 256)
 
 
-def test_terminator_runnable_review_is_hash_locked_and_honest() -> None:
+def test_terminator_organic_lit_review_is_hash_locked_and_honest() -> None:
     review = json.loads((REPO_ROOT / REVIEW_RELATIVE).read_text(encoding="utf-8"))
 
-    assert review["status"] == (
-        "accepted_reference_runnable_photoreal_promotion_rejected"
+    assert review["schema"] == (
+        "raftsim.environment.futaleufu_terminator_organic_lit_terrain_review.v1"
     )
+    assert review["status"] == (
+        "technical_candidate_retained_photoreal_and_external_review_open"
+    )
+    assert review["passed"] is False
     assert review["decision"]["reference_runnable"] is True
     assert review["decision"]["production_promoted"] is False
+    assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
     assert review["decision"]["live_solver_owns_gameplay_rendering_and_forces"]
-    assert review["decision"]["authored_capture_water_hidden_in_game"]
+    assert review["material"]["shading_model"] == "DefaultLit"
+    assert review["material"]["world_position_offset_connected"] is False
+    assert review["material"]["organic_world_noise_scales_per_cm"] == [
+        0.00018,
+        0.00071,
+        0.0042,
+    ]
+    assert review["renderer_comparison"]["guide_seat_downstream"][
+        "left_bank_dark_fraction_after"
+    ] < review["renderer_comparison"]["guide_seat_downstream"][
+        "left_bank_dark_fraction_before"
+    ]
+    assert review["renderer_comparison"]["river_eye_downstream"][
+        "left_bank_dark_fraction_after"
+    ] < review["renderer_comparison"]["river_eye_downstream"][
+        "left_bank_dark_fraction_before"
+    ]
     assert review["coordinate_contract"][
         "maximum_static_to_runtime_centerline_surface_error_m"
     ] == 0.0
     assert review["terrain_authority"]["surveyed_terminator_bathymetry"] is False
     assert review["cooked_field_evidence"]["converged"] is False
-    assert review["interpreted_contact_geometry"]["count"] == 1
     assert len(review["required_external_acceptance_gates"]) == 6
     assert len(review["remaining_photoreal_defects"]) >= 6
 

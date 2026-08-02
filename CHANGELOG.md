@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Corrected Futaleufú Terminator's generated Landscape material from an
+  unlit/manifest mismatch to a saved Default Lit organic temperate graph. Three
+  incommensurate world-space fields now vary humid-forest value, moss and leaf
+  litter, slope-aware wet granite and lichen, and fine mineral response without
+  moving terrain or changing collision, hydraulics, or raft forces. Fixed-camera
+  comparison reduces near-black left-bank coverage from 13.17% to 4.77% in the
+  guide view and from 7.72% to 3.99% at river eye. The editor build, saved-material
+  audit, runnable-map gate, and 32 focused contracts pass, but coarse 30 m terrain,
+  repeated procedural vegetation, flat dark water, understated rapid hydraulics,
+  sparse bank structure, and missing named external review keep the result
+  photoreal-rejected.
 - Replaced the production splash-jacket's uniform shoulder-to-elbow primitives
   with closed, tapered garment sleeves. An 18-ring, 28-sided profile now carries
   a broad deltoid into a smaller cuff; all five production identities retain the

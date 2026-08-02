@@ -324,7 +324,13 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(Candidate.PreviewSpec.RiverId == TEXT("pacuare") || Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ? MSM_DefaultLit : MSM_Unlit);
+    const bool bUsesDefaultLitLandscape =
+        Candidate.PreviewSpec.RiverId == TEXT("pacuare") ||
+        Candidate.PreviewSpec.RiverId == TEXT("colorado_river") ||
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    Material->SetShadingModel(
+        bUsesDefaultLitLandscape ? MSM_DefaultLit : MSM_Unlit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
@@ -539,6 +545,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         SlopeConditionedBaseColor->Alpha.Expression = RockSlopeMask;
         Material->GetExpressionCollection().AddExpression(SlopeConditionedBaseColor);
         FinalBaseColor = SlopeConditionedBaseColor;
+    }
+    if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        FinalBaseColor = BuildFutaleufuOrganicTemperateBaseColor(
+            Material,
+            FinalBaseColor);
     }
     if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
