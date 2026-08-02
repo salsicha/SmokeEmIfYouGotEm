@@ -79,3 +79,27 @@ def test_unreal_binds_terminator_reach_local_landscape_and_runtime_water() -> No
     assert 'TEXT("RaftSim_FutaleufuTerminator_PlayerRaft")' in source
     assert 'TEXT("RaftSimFutaleufuTerminatorSolverVisualization")' in source
     assert 'TEXT("RaftSim_FutaleufuTerminator_D4_EntryMarkerBoulder")' in source
+
+
+def test_shared_temperate_canopy_breaks_repeated_geometry_and_placement() -> None:
+    foliage_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
+        "RaftSimEditorLandscapeFoliage.cpp"
+    ).read_text(encoding="utf-8")
+    map_test_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+        "RaftSimTroublemakerMapTest.cpp"
+    ).read_text(encoding="utf-8")
+
+    assert "UMaterialExpressionPerInstanceRandom" in foliage_source
+    assert "bRainforestPalette ? 8 : 12" in foliage_source
+    assert "bRainforestPalette ? 16 : 24" in foliage_source
+    assert "0.88f" in foliage_source
+    assert "1.13f" in foliage_source
+    assert "constexpr int32 TemperateSpeciesPermutation = 7" in foliage_source
+    assert "TemperateBlockOffset" in foliage_source
+    assert "ZambeziVegetationUnitRandom(ClusterIndex, 9161)" in foliage_source
+    assert 'TEXT("RaftSimTemperateCanopyVariationV2")' in foliage_source
+    assert 'TEXT("RaftSimTemperateCanopyVariationV2")' in map_test_source

@@ -218,6 +218,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("temperate vegetation placement is slope screened"),
                 (*It)->Tags.Contains(TEXT("RaftSimSlopeScreenedPlacement")));
+            Test->TestTrue(
+                TEXT("temperate vegetation uses deterministic canopy variation V2"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimTemperateCanopyVariationV2")));
             OrganicGroundCoverActorCount +=
                 (*It)->Tags.Contains(TEXT("RaftSimOrganicBankGroundCover")) ? 1 : 0;
             ++OpaqueVegetationActorCount;

@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "5CF8AB30AC4AD4B0A55794B6DC9F537F",
+			"instanceName": "Alexs-MacBook-Air.local-55702",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-16.11.05",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 6.0034375190734863,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "L_Terminator",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Terminator",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"5CF8AB30AC4AD4B0A55794B6DC9F537F"
+			],
+			"duration": 6.0034375190734863,
+			"dateTime": "2026.08.02-16.10.59",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}
