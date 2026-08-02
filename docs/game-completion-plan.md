@@ -3482,6 +3482,16 @@ path is verified, and the completion goal can be marked complete.
   are green. Coarse hand anatomy, thumb contact, wet skin/material response, synchronized stroke
   biomechanics, and named character-art/guide acceptance remain open, so M9 is not promoted and
   no milestone commit or push is permitted yet.
+- Tapered shoulder sleeves V2 supersedes the ball-like uniform sleeve silhouette retained by
+  Visible Shoulders V1 without moving solved shoulder or elbow anchors. Each project-owned
+  splash-jacket sleeve is now a closed 18-ring by 28-sided surface with a broad deltoid,
+  continuous upper-arm taper, and restrained cuff roll. All five production identities expose
+  553 authored vertices per sleeve, retain the visible-shoulder contract, and stay within
+  `1.3605050241949357e-7` cm of the authoritative shoulder anchor. The editor build, 16 focused
+  Python contracts, five-identity renderer roster, and renderer-enabled M5 gate pass. Production
+  cloth folds, skinning/deformation, identity-specific tailoring, cuff and torso integration,
+  wet-material response, and named character-art/guide acceptance remain open; this is a
+  fail-closed technical candidate, not photoreal promotion.
 - Runnable Batoka terrain integration makes the retained Zambezi V12 world-aligned basalt
   material and V13 bounded morphology part of normal map generation instead of an isolated
   comparison path. Four tagged, non-colliding render tiles receive deterministic lava-flow

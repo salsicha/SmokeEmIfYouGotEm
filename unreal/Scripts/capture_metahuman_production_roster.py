@@ -335,6 +335,7 @@ def main() -> None:
                 or not actor.has_continuous_thigh_knee_silhouette()
                 or actor.get_maximum_thigh_knee_bridge_coverage_error_cm() > 0.25
                 or not actor.has_visible_shoulder_silhouette()
+                or actor.get_minimum_shoulder_sleeve_vertex_count() < 550
                 or actor.get_maximum_shoulder_sleeve_anchor_error_cm() > 0.25
             ):
                 raise RuntimeError(
@@ -343,6 +344,8 @@ def main() -> None:
                     f"{actor.has_visible_shoulder_silhouette()}, "
                     f"shoulder_sleeve_extent_cm="
                     f"{vector_values(actor.get_minimum_shoulder_sleeve_extent_cm())}, "
+                    f"shoulder_sleeve_vertex_count="
+                    f"{actor.get_minimum_shoulder_sleeve_vertex_count()}, "
                     f"shoulder_sleeve_anchor_error_cm="
                     f"{actor.get_maximum_shoulder_sleeve_anchor_error_cm():.3f}"
                 )
@@ -686,6 +689,9 @@ def main() -> None:
                     ),
                     "runtime_shoulder_sleeve_minimum_extent_cm": vector_values(
                         actor.get_minimum_shoulder_sleeve_extent_cm()
+                    ),
+                    "runtime_shoulder_sleeve_minimum_vertex_count": (
+                        actor.get_minimum_shoulder_sleeve_vertex_count()
                     ),
                     "runtime_shoulder_sleeve_anchor_error_cm": (
                         actor.get_maximum_shoulder_sleeve_anchor_error_cm()

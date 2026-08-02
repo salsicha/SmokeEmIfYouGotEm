@@ -1,0 +1,2086 @@
+{
+  "capture_resolution": [
+    1536,
+    1024
+  ],
+  "captured_character_count": 5,
+  "characters": [
+    {
+      "blueprint_class": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/BP_MHC_RaftSim_Guide.BP_MHC_RaftSim_Guide_C",
+      "bounds_extent_cm": [
+        48.81001973172062,
+        52.5297122858271,
+        79.55755746648977
+      ],
+      "bounds_origin_cm": [
+        31.810019731720622,
+        20.739327475443122,
+        39.34975028807165
+      ],
+      "eyelash_representation": "populated_groom",
+      "face_crop_height_cm": 156.3950958251953,
+      "face_pre_skinned_bounds_extent_cm": [
+        18.61653995513916,
+        12.919501781463623,
+        19.69652557373047
+      ],
+      "face_pre_skinned_bounds_origin_cm": [
+        9.5367431640625e-07,
+        2.2217564582824707,
+        164.75362396240234
+      ],
+      "face_reference_head_component_cm": [
+        -1.7608017561787648e-05,
+        1.5007286992267599,
+        166.39508974551873
+      ],
+      "full_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_full.png",
+      "full_capture_sha256": "c2d2f428bf3ff172d3fba82c392c181492354ee98987e282e571fe604168a024",
+      "full_profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_full_profile.png",
+      "full_profile_capture_sha256": "f09b48e61367c0865fffe8c29ed06b944c08a41bec155bff667dbc7c37fc509f",
+      "full_rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_full_rear.png",
+      "full_rear_capture_sha256": "0ba8a11a243ea31f7edf181cc37997b19b676936f038796a4d8950d0b155deb1",
+      "groom_components": [
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/GroomAsset_0.GroomAsset_0",
+          "component": "Hair",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Hair_S_BrushCut_CardsMesh_Group0_LOD1.Hair_S_BrushCut_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Hair_S_BrushCut_CardsMesh_Group0_LOD3.Hair_S_BrushCut_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": true
+                  }
+                ]
+              }
+            ],
+            "meshes": [
+              {
+                "group": 0,
+                "lod": 7,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Hair_S_BrushCut_Helmet_LOD7.Hair_S_BrushCut_Helmet_LOD7"
+              },
+              {
+                "group": 0,
+                "lod": 5,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Hair_S_BrushCut_Helmet_LOD5.Hair_S_BrushCut_Helmet_LOD5"
+              }
+            ]
+          },
+          "use_cards": true,
+          "visible": false
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Eyebrows_M_Natural.Eyebrows_M_Natural",
+          "component": "Eyebrows",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Eyebrows_M_Natural_CardsMesh_Group0_LOD1.Eyebrows_M_Natural_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Eyebrows_M_Natural_CardsMesh_Group0_LOD3.Eyebrows_M_Natural_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Fuzz",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Grooms/Eyelashes_S_Fine.Eyelashes_S_Fine",
+          "component": "Eyelashes",
+          "lod_diagnostic": {
+            "cards": [],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Mustache",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": null,
+          "component": "Beard",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        }
+      ],
+      "name": "MHC_RaftSim_Guide",
+      "pfd_material_evidence": {
+        "dry_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_pfd_dry.png",
+        "dry_capture_sha256": "bf6fa283827387529ddf38751744e6713912c7ab9c87d3f7e08fea9c0b433d67",
+        "dry_presentation_wetness": 0.0,
+        "wet_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_pfd_wet.png",
+        "wet_capture_sha256": "59f4f8876c3c4ef7045da8d840ccad1fce48efb16cef5b41c319f401f227b11b",
+        "wet_presentation_wetness_after_capture": 0.8399999737739563,
+        "wet_presentation_wetness_before_capture": 0.8399999737739563
+      },
+      "portrait_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_portrait.png",
+      "portrait_capture_sha256": "28970555008bbedddbe2bde17df1aa9a73ad59475fec5e05cbe315ff55400fe1",
+      "profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_profile.png",
+      "profile_capture_sha256": "dd3dbd5e77995f04a169c78d892b51f7641239c9e5b58c750a2730077129b659",
+      "rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_guide_rear.png",
+      "rear_capture_sha256": "ef052431f4467e42848e47c80124bd17cae63b7e21a485e74e12573bb6ca3892",
+      "runtime_adapter_class": "/Script/RaftSimRaft.RaftSimMetaHumanCrewVisualActor",
+      "runtime_articulated_paddle_grip": true,
+      "runtime_assembled_body_uses_wetsuit": true,
+      "runtime_assembled_face_uses_cropped_skin": true,
+      "runtime_assembled_grooms_suppressed": true,
+      "runtime_fitted_upright_river_boots": true,
+      "runtime_hair_forced_lod": 5,
+      "runtime_hair_groom_suppressed_for_helmet": true,
+      "runtime_hair_head_error_cm": 3.318508391258329e-14,
+      "runtime_hair_mesh_fallback": true,
+      "runtime_hair_suppressed_for_helmet": true,
+      "runtime_hair_uses_cards": true,
+      "runtime_helmet_fit_scale": 0.9599999785423279,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 1.8771323384569882e-10,
+      "runtime_hip_thigh_bridge_coverage_error_cm": 1.2774714264196518e-07,
+      "runtime_hip_thigh_bridge_minimum_extent_cm": [
+        8.0,
+        8.0,
+        19.632225863208998
+      ],
+      "runtime_host_class": "/Script/RaftSimRaft.RaftSimCrewAvatarActor",
+      "runtime_live_pfd_material_response": true,
+      "runtime_paddle": true,
+      "runtime_paddle_grip_anchor_error_cm": 5.272233205566579e-10,
+      "runtime_paddle_grip_contact_error_cm": 0.0,
+      "runtime_pfd_presentation_wetness": 0.8399999737739563,
+      "runtime_pfd_torso_error_cm": 0.0,
+      "runtime_production_river_boots": true,
+      "runtime_production_whitewater_helmet": true,
+      "runtime_production_whitewater_pfd": true,
+      "runtime_safety_gear": true,
+      "runtime_shoulder_silhouette": true,
+      "runtime_shoulder_sleeve_anchor_error_cm": 1.3605050241949357e-07,
+      "runtime_shoulder_sleeve_minimum_extent_cm": [
+        5.199999809265137,
+        5.199999809265137,
+        7.41104568734806
+      ],
+      "runtime_shoulder_sleeve_minimum_vertex_count": 553,
+      "runtime_thigh_knee_bridge_coverage_error_cm": 2.3936797433066204e-08,
+      "runtime_thigh_knee_silhouette": true,
+      "runtime_waist_hip_center_error_cm": 0.0,
+      "runtime_waist_hip_extent_cm": [
+        15.0,
+        23.0,
+        15.0
+      ],
+      "runtime_waist_hip_material_opaque": true,
+      "runtime_waist_hip_silhouette": true,
+      "runtime_wardrobe_suppressed_for_safety_gear": true,
+      "skeletal_components": [
+        {
+          "component": "Body",
+          "material_count": 1,
+          "materials": [
+            "/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Body/SKM_MHC_RaftSim_Guide_BodyMesh.SKM_MHC_RaftSim_Guide_BodyMesh",
+          "visible": true
+        },
+        {
+          "component": "Face",
+          "material_count": 12,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_Teeth_Baked.MI_Teeth_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_EyeL_Baked.MI_EyeL_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_EyeR_Baked.MI_EyeR_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_Face_EyeShell.MI_Face_EyeShell",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_Face_Eyelashes.MI_Face_Eyelashes",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_Face_LacrimalFluid.MI_Face_LacrimalFluid",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_1.RaftSimCroppedFaceSkin_8",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/Materials/MI_Face_EyelashesHiLODs.MI_Face_EyelashesHiLODs",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_1.RaftSimCroppedFaceSkin_10",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_1.RaftSimCroppedFaceSkin_11"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Face/SKM_MHC_RaftSim_Guide_FaceMesh.SKM_MHC_RaftSim_Guide_FaceMesh",
+          "visible": true
+        },
+        {
+          "component": "SkeletalMesh",
+          "material_count": 8,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Guide/Clothing/MHC_RaftSim_Guide_Outfits.MHC_RaftSim_Guide_Outfits",
+          "visible": false
+        }
+      ],
+      "solved_head_world_cm": [
+        6.000000000000002,
+        8.881784197001252e-16,
+        92.93150103092194
+      ],
+      "status": "captured",
+      "wardrobe_mesh_count": 1
+    },
+    {
+      "blueprint_class": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/BP_MHC_RaftSim_Crew_01.BP_MHC_RaftSim_Crew_01_C",
+      "bounds_extent_cm": [
+        48.81001973172062,
+        52.5297122858271,
+        79.98406001908336
+      ],
+      "bounds_origin_cm": [
+        31.810019731720622,
+        20.739327475443122,
+        39.77625284066524
+      ],
+      "eyelash_representation": "populated_groom",
+      "face_crop_height_cm": 162.13929748535156,
+      "face_pre_skinned_bounds_extent_cm": [
+        19.168347358703613,
+        13.360805034637451,
+        19.960891723632812
+      ],
+      "face_pre_skinned_bounds_origin_cm": [
+        9.5367431640625e-07,
+        2.390709400177002,
+        170.1055908203125
+      ],
+      "face_reference_head_component_cm": [
+        -1.8340981558839786e-05,
+        1.8181508558404451,
+        172.13929092573088
+      ],
+      "full_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_01_full.png",
+      "full_capture_sha256": "547e1069279a5efdee3c7fb9c7c15d1e6c445a0d5f5164d597bcf40efeacbf04",
+      "full_profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_01_full_profile.png",
+      "full_profile_capture_sha256": "907702fca188318e76656532b69d2e61ebfffcde910816f34e76b04f8e841d30",
+      "full_rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_01_full_rear.png",
+      "full_rear_capture_sha256": "01e7f7f4e1885f8d48a089eda254d8131339462c460dbbbf611133df6f1571b7",
+      "groom_components": [
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Hair_S_Cornrows.Hair_S_Cornrows",
+          "component": "Hair",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Hair_S_Cornrows_CardsMesh_Group0_LOD1.Hair_S_Cornrows_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Hair_S_Cornrows_CardsMesh_Group0_LOD3.Hair_S_Cornrows_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": true
+                  }
+                ]
+              },
+              {
+                "group": 1,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": [
+              {
+                "group": 0,
+                "lod": 5,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Hair_S_Cornrows_Helmet_LOD5.Hair_S_Cornrows_Helmet_LOD5"
+              },
+              {
+                "group": 0,
+                "lod": 7,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Hair_S_Cornrows_Helmet_LOD7.Hair_S_Cornrows_Helmet_LOD7"
+              }
+            ]
+          },
+          "use_cards": true,
+          "visible": false
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Eyebrows_M_Dense.Eyebrows_M_Dense",
+          "component": "Eyebrows",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Eyebrows_M_Dense_CardMesh_Group0_LOD1.Eyebrows_M_Dense_CardMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Eyebrows_M_Dense_CardMesh_Group0_LOD3.Eyebrows_M_Dense_CardMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Fuzz",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Grooms/Eyelashes_S_Thin.Eyelashes_S_Thin",
+          "component": "Eyelashes",
+          "lod_diagnostic": {
+            "cards": [],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Mustache",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": null,
+          "component": "Beard",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        }
+      ],
+      "name": "MHC_RaftSim_Crew_01",
+      "pfd_material_evidence": null,
+      "portrait_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_01_portrait.png",
+      "portrait_capture_sha256": "54d8b82699bc4274bc801d9d6ac0cf0641fbbf6110e432e0b8f2829114049aa5",
+      "profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_01_profile.png",
+      "profile_capture_sha256": "23a0c134626fa3794f98adbe40028c87802a7ed810d78f672c14d2d2143fd586",
+      "rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_01_rear.png",
+      "rear_capture_sha256": "8a03e9561d0dfc4945f893fda94930a0d24ed5c97790409b3967f96d1d30f4ed",
+      "runtime_adapter_class": "/Script/RaftSimRaft.RaftSimMetaHumanCrewVisualActor",
+      "runtime_articulated_paddle_grip": true,
+      "runtime_assembled_body_uses_wetsuit": true,
+      "runtime_assembled_face_uses_cropped_skin": true,
+      "runtime_assembled_grooms_suppressed": true,
+      "runtime_fitted_upright_river_boots": true,
+      "runtime_hair_forced_lod": 5,
+      "runtime_hair_groom_suppressed_for_helmet": true,
+      "runtime_hair_head_error_cm": 9.979268523726062e-14,
+      "runtime_hair_mesh_fallback": true,
+      "runtime_hair_suppressed_for_helmet": true,
+      "runtime_hair_uses_cards": true,
+      "runtime_helmet_fit_scale": 0.9906209111213684,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 8.881784197001252e-16,
+      "runtime_hip_thigh_bridge_coverage_error_cm": 1.2774714264196518e-07,
+      "runtime_hip_thigh_bridge_minimum_extent_cm": [
+        8.0,
+        8.0,
+        19.632225863208998
+      ],
+      "runtime_host_class": "/Script/RaftSimRaft.RaftSimCrewAvatarActor",
+      "runtime_live_pfd_material_response": true,
+      "runtime_paddle": true,
+      "runtime_paddle_grip_anchor_error_cm": 3.3358618645173976e-10,
+      "runtime_paddle_grip_contact_error_cm": 0.0,
+      "runtime_pfd_presentation_wetness": 0.0,
+      "runtime_pfd_torso_error_cm": 0.0,
+      "runtime_production_river_boots": true,
+      "runtime_production_whitewater_helmet": true,
+      "runtime_production_whitewater_pfd": true,
+      "runtime_safety_gear": true,
+      "runtime_shoulder_silhouette": true,
+      "runtime_shoulder_sleeve_anchor_error_cm": 1.3605050241949357e-07,
+      "runtime_shoulder_sleeve_minimum_extent_cm": [
+        5.199999809265137,
+        5.199999809265137,
+        7.41104568734806
+      ],
+      "runtime_shoulder_sleeve_minimum_vertex_count": 553,
+      "runtime_thigh_knee_bridge_coverage_error_cm": 2.3936797433066204e-08,
+      "runtime_thigh_knee_silhouette": true,
+      "runtime_waist_hip_center_error_cm": 0.0,
+      "runtime_waist_hip_extent_cm": [
+        15.0,
+        23.0,
+        15.0
+      ],
+      "runtime_waist_hip_material_opaque": true,
+      "runtime_waist_hip_silhouette": true,
+      "runtime_wardrobe_suppressed_for_safety_gear": true,
+      "skeletal_components": [
+        {
+          "component": "Body",
+          "material_count": 1,
+          "materials": [
+            "/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Body/SKM_MHC_RaftSim_Crew_01_BodyMesh.SKM_MHC_RaftSim_Crew_01_BodyMesh",
+          "visible": true
+        },
+        {
+          "component": "Face",
+          "material_count": 12,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_Teeth_Baked.MI_Teeth_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_EyeL_Baked.MI_EyeL_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_EyeR_Baked.MI_EyeR_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_Face_EyeShell.MI_Face_EyeShell",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_Face_Eyelashes.MI_Face_Eyelashes",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_Face_LacrimalFluid.MI_Face_LacrimalFluid",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_3.RaftSimCroppedFaceSkin_8",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/Materials/MI_Face_EyelashesHiLODs.MI_Face_EyelashesHiLODs",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_3.RaftSimCroppedFaceSkin_10",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_3.RaftSimCroppedFaceSkin_11"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Face/SKM_MHC_RaftSim_Crew_01_FaceMesh.SKM_MHC_RaftSim_Crew_01_FaceMesh",
+          "visible": true
+        },
+        {
+          "component": "SkeletalMesh",
+          "material_count": 8,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_01/Clothing/MHC_RaftSim_Crew_01_Outfits.MHC_RaftSim_Crew_01_Outfits",
+          "visible": false
+        }
+      ],
+      "solved_head_world_cm": [
+        6.0,
+        8.881784197001252e-16,
+        92.95591139793396
+      ],
+      "status": "captured",
+      "wardrobe_mesh_count": 1
+    },
+    {
+      "blueprint_class": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/BP_MHC_RaftSim_Crew_02.BP_MHC_RaftSim_Crew_02_C",
+      "bounds_extent_cm": [
+        48.3350196184718,
+        52.33596676246455,
+        79.0793095733759
+      ],
+      "bounds_origin_cm": [
+        32.28501984496945,
+        20.933072998805663,
+        38.87150239495777
+      ],
+      "eyelash_representation": "populated_groom",
+      "face_crop_height_cm": 148.73623657226562,
+      "face_pre_skinned_bounds_extent_cm": [
+        17.881505012512207,
+        12.42134428024292,
+        19.052658081054688
+      ],
+      "face_pre_skinned_bounds_origin_cm": [
+        9.5367431640625e-07,
+        2.0867342948913574,
+        157.32627868652344
+      ],
+      "face_reference_head_component_cm": [
+        -1.6630491879165987e-05,
+        1.0775110572102484,
+        158.7362310542516
+      ],
+      "full_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_02_full.png",
+      "full_capture_sha256": "e2e59456a5ce50a5fbb41f58e9b67641985f59ef631d0ecd024d7e38ef4ee12a",
+      "full_profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_02_full_profile.png",
+      "full_profile_capture_sha256": "0bf102ffdacd2b531fd6717046bba54e794b13b106545c274dc5ff1e787fb6a4",
+      "full_rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_02_full_rear.png",
+      "full_rear_capture_sha256": "c795b22de609d424733cb4abc457fe5f0433ccc10e82471a262c008cc8c90f49",
+      "groom_components": [
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Hair_S_Casual.Hair_S_Casual",
+          "component": "Hair",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Hair_S_Casual_CardsMesh_Group0_LOD1.Hair_S_Casual_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Hair_S_Casual_CardsMesh_Group0_LOD3.Hair_S_Casual_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": true
+                  }
+                ]
+              }
+            ],
+            "meshes": [
+              {
+                "group": 0,
+                "lod": 5,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Hair_S_Casual_Helmet_LOD5.Hair_S_Casual_Helmet_LOD5"
+              },
+              {
+                "group": 0,
+                "lod": 7,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Hair_S_Casual_Helmet_LOD7.Hair_S_Casual_Helmet_LOD7"
+              }
+            ]
+          },
+          "use_cards": true,
+          "visible": false
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Eyebrows_M_Wide.Eyebrows_M_Wide",
+          "component": "Eyebrows",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Eyebrows_M_Wide_CardsMesh_Group0_LOD1.Eyebrows_M_Wide_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Eyebrows_M_Wide_CardsMesh_Group0_LOD3.Eyebrows_M_Wide_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Fuzz",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Grooms/Eyelashes_S_Sparse.Eyelashes_S_Sparse",
+          "component": "Eyelashes",
+          "lod_diagnostic": {
+            "cards": [],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Mustache",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": null,
+          "component": "Beard",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        }
+      ],
+      "name": "MHC_RaftSim_Crew_02",
+      "pfd_material_evidence": null,
+      "portrait_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_02_portrait.png",
+      "portrait_capture_sha256": "8bc1c2ed557a64e65dad2b6ab2329ae2d42669102d7017d2d204b13b255636d7",
+      "profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_02_profile.png",
+      "profile_capture_sha256": "71bfbfa8d660c77295b4835428c23ee1c116c516969c4bcbc0956da91c193af2",
+      "rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_02_rear.png",
+      "rear_capture_sha256": "489dead5b3ed9b71687e3e71affd335d42ff146209d9fd004709e6625cce73f7",
+      "runtime_adapter_class": "/Script/RaftSimRaft.RaftSimMetaHumanCrewVisualActor",
+      "runtime_articulated_paddle_grip": true,
+      "runtime_assembled_body_uses_wetsuit": true,
+      "runtime_assembled_face_uses_cropped_skin": true,
+      "runtime_assembled_grooms_suppressed": true,
+      "runtime_fitted_upright_river_boots": true,
+      "runtime_hair_forced_lod": 5,
+      "runtime_hair_groom_suppressed_for_helmet": true,
+      "runtime_hair_head_error_cm": 3.0449534005327905e-09,
+      "runtime_hair_mesh_fallback": true,
+      "runtime_hair_suppressed_for_helmet": true,
+      "runtime_hair_uses_cards": true,
+      "runtime_helmet_fit_scale": 0.9225399494171143,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 8.470329472543003e-22,
+      "runtime_hip_thigh_bridge_coverage_error_cm": 1.2774714264196518e-07,
+      "runtime_hip_thigh_bridge_minimum_extent_cm": [
+        7.479037284851074,
+        7.479037284851074,
+        19.632225863208998
+      ],
+      "runtime_host_class": "/Script/RaftSimRaft.RaftSimCrewAvatarActor",
+      "runtime_live_pfd_material_response": true,
+      "runtime_paddle": true,
+      "runtime_paddle_grip_anchor_error_cm": 1.8606717278046858e-09,
+      "runtime_paddle_grip_contact_error_cm": 0.0,
+      "runtime_pfd_presentation_wetness": 0.0,
+      "runtime_pfd_torso_error_cm": 0.0,
+      "runtime_production_river_boots": true,
+      "runtime_production_whitewater_helmet": true,
+      "runtime_production_whitewater_pfd": true,
+      "runtime_safety_gear": true,
+      "runtime_shoulder_silhouette": true,
+      "runtime_shoulder_sleeve_anchor_error_cm": 1.3605050241949357e-07,
+      "runtime_shoulder_sleeve_minimum_extent_cm": [
+        4.8613739013671875,
+        4.8613739013671875,
+        7.41104568734806
+      ],
+      "runtime_shoulder_sleeve_minimum_vertex_count": 553,
+      "runtime_thigh_knee_bridge_coverage_error_cm": 2.3936797433066204e-08,
+      "runtime_thigh_knee_silhouette": true,
+      "runtime_waist_hip_center_error_cm": 0.0,
+      "runtime_waist_hip_extent_cm": [
+        14.249999821186066,
+        21.160000383853912,
+        14.700000286102297
+      ],
+      "runtime_waist_hip_material_opaque": true,
+      "runtime_waist_hip_silhouette": true,
+      "runtime_wardrobe_suppressed_for_safety_gear": true,
+      "skeletal_components": [
+        {
+          "component": "Body",
+          "material_count": 1,
+          "materials": [
+            "/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Body/SKM_MHC_RaftSim_Crew_02_BodyMesh.SKM_MHC_RaftSim_Crew_02_BodyMesh",
+          "visible": true
+        },
+        {
+          "component": "Face",
+          "material_count": 12,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_Teeth_Baked.MI_Teeth_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_EyeL_Baked.MI_EyeL_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_EyeR_Baked.MI_EyeR_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_Face_EyeShell.MI_Face_EyeShell",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_Face_Eyelashes.MI_Face_Eyelashes",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_Face_LacrimalFluid.MI_Face_LacrimalFluid",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_5.RaftSimCroppedFaceSkin_8",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/Materials/MI_Face_EyelashesHiLODs.MI_Face_EyelashesHiLODs",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_5.RaftSimCroppedFaceSkin_10",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_5.RaftSimCroppedFaceSkin_11"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Face/SKM_MHC_RaftSim_Crew_02_FaceMesh.SKM_MHC_RaftSim_Crew_02_FaceMesh",
+          "visible": true
+        },
+        {
+          "component": "SkeletalMesh",
+          "material_count": 8,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Short.MI_WI_DefaultGarment_M_DG_bodyShapeA_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Short.MI_WI_DefaultGarment_M_DG_bodyShapeA_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Short.MI_WI_DefaultGarment_M_DG_bodyShapeA_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Short.MI_WI_DefaultGarment_M_DG_bodyShapeA_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeA_Shirt"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_02/Clothing/MHC_RaftSim_Crew_02_Outfits.MHC_RaftSim_Crew_02_Outfits",
+          "visible": false
+        }
+      ],
+      "solved_head_world_cm": [
+        6.0000000005525544,
+        7.516169908683423e-10,
+        92.98868143419409
+      ],
+      "status": "captured",
+      "wardrobe_mesh_count": 1
+    },
+    {
+      "blueprint_class": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/BP_MHC_RaftSim_Crew_03.BP_MHC_RaftSim_Crew_03_C",
+      "bounds_extent_cm": [
+        49.28501927872532,
+        52.70808345164069,
+        78.76239838970113
+      ],
+      "bounds_origin_cm": [
+        31.335020184715923,
+        20.560956309629532,
+        38.55459121128301
+      ],
+      "eyelash_representation": "populated_groom",
+      "face_crop_height_cm": 142.03477478027344,
+      "face_pre_skinned_bounds_extent_cm": [
+        17.239059448242188,
+        11.91815710067749,
+        18.329620361328125
+      ],
+      "face_pre_skinned_bounds_origin_cm": [
+        1.9073486328125e-06,
+        1.8837294578552246,
+        150.66769409179688
+      ],
+      "face_reference_head_component_cm": [
+        -1.5774356833642145e-05,
+        0.7072370163051507,
+        152.03476906426633
+      ],
+      "full_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_03_full.png",
+      "full_capture_sha256": "522f0bba5858123dd1a33cef3d91dc6a80c67411ba4f27ecd331960045aa5ab3",
+      "full_profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_03_full_profile.png",
+      "full_profile_capture_sha256": "ea8ebab2d5b41855cc7120aa825489fc66f309eb769e99529022bb698f5697da",
+      "full_rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_03_full_rear.png",
+      "full_rear_capture_sha256": "f9a2a095d13eee21c506107498423618fb33d6c93d541771e8c72fa674b25755",
+      "groom_components": [
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Hair_S_Pixie.Hair_S_Pixie",
+          "component": "Hair",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Hair_S_Pixie_CardsMesh_Group0_LOD1.Hair_S_Pixie_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Hair_S_Pixie_CardsMesh_Group0_LOD3.Hair_S_Pixie_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.20000000298023224,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.10000000149011612,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.05000000074505806,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.02500000037252903,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.012500000186264515,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0062500000931322575,
+                    "visible": true
+                  }
+                ]
+              }
+            ],
+            "meshes": [
+              {
+                "group": 0,
+                "lod": 5,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Hair_S_Pixie_Mesh_LOD5.Hair_S_Pixie_Mesh_LOD5"
+              },
+              {
+                "group": 0,
+                "lod": 7,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Hair_S_Pixie_Mesh_LOD7.Hair_S_Pixie_Mesh_LOD7"
+              }
+            ]
+          },
+          "use_cards": true,
+          "visible": false
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Eyebrows_M_SlightArch.Eyebrows_M_SlightArch",
+          "component": "Eyebrows",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Eyebrows_M_SlightArch_CardsMesh_Group0_LOD1.Eyebrows_M_SlightArch_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Eyebrows_M_SlightArch_CardsMesh_Group0_LOD3.Eyebrows_M_SlightArch_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Fuzz",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Grooms/Eyelashes_L_SlightCurl.Eyelashes_L_SlightCurl",
+          "component": "Eyelashes",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": -1,
+                "mesh": null
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": [
+              {
+                "group": 0,
+                "lod": -1,
+                "mesh": null
+              }
+            ]
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Mustache",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": null,
+          "component": "Beard",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        }
+      ],
+      "name": "MHC_RaftSim_Crew_03",
+      "pfd_material_evidence": null,
+      "portrait_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_03_portrait.png",
+      "portrait_capture_sha256": "ba20398907ee8e9ed14e473155bfc206fc64e769f3574bea4883db72a6cd3741",
+      "profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_03_profile.png",
+      "profile_capture_sha256": "e27c36c589925f798d5a3962115b2519d8d0e333ef5fda359d03c6d287e9e65d",
+      "rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_03_rear.png",
+      "rear_capture_sha256": "48cbd7e9d4b054f1eddbd25314c419d329fcd8fe2f2e6d0b5b0aa04ba0aeb8dc",
+      "runtime_adapter_class": "/Script/RaftSimRaft.RaftSimMetaHumanCrewVisualActor",
+      "runtime_articulated_paddle_grip": true,
+      "runtime_assembled_body_uses_wetsuit": true,
+      "runtime_assembled_face_uses_cropped_skin": true,
+      "runtime_assembled_grooms_suppressed": true,
+      "runtime_fitted_upright_river_boots": true,
+      "runtime_hair_forced_lod": 5,
+      "runtime_hair_groom_suppressed_for_helmet": true,
+      "runtime_hair_head_error_cm": 2.984243296921818e-09,
+      "runtime_hair_mesh_fallback": true,
+      "runtime_hair_suppressed_for_helmet": true,
+      "runtime_hair_uses_cards": true,
+      "runtime_helmet_fit_scale": 0.8999999761581421,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 0.0,
+      "runtime_hip_thigh_bridge_coverage_error_cm": 1.2774714264196518e-07,
+      "runtime_hip_thigh_bridge_minimum_extent_cm": [
+        8.479622840881348,
+        8.479622840881348,
+        19.632225863208998
+      ],
+      "runtime_host_class": "/Script/RaftSimRaft.RaftSimCrewAvatarActor",
+      "runtime_live_pfd_material_response": true,
+      "runtime_paddle": true,
+      "runtime_paddle_grip_anchor_error_cm": 1.8337016349789792e-09,
+      "runtime_paddle_grip_contact_error_cm": 0.0,
+      "runtime_pfd_presentation_wetness": 0.0,
+      "runtime_pfd_torso_error_cm": 0.0,
+      "runtime_production_river_boots": true,
+      "runtime_production_whitewater_helmet": true,
+      "runtime_production_whitewater_pfd": true,
+      "runtime_safety_gear": true,
+      "runtime_shoulder_silhouette": true,
+      "runtime_shoulder_sleeve_anchor_error_cm": 1.3605050241949357e-07,
+      "runtime_shoulder_sleeve_minimum_extent_cm": [
+        5.511754512786865,
+        5.511754512786865,
+        7.41104568734806
+      ],
+      "runtime_shoulder_sleeve_minimum_vertex_count": 553,
+      "runtime_thigh_knee_bridge_coverage_error_cm": 2.3936797433066204e-08,
+      "runtime_thigh_knee_silhouette": true,
+      "runtime_waist_hip_center_error_cm": 0.0,
+      "runtime_waist_hip_extent_cm": [
+        15.749999284744263,
+        24.61000120639801,
+        15.44999957084656
+      ],
+      "runtime_waist_hip_material_opaque": true,
+      "runtime_waist_hip_silhouette": true,
+      "runtime_wardrobe_suppressed_for_safety_gear": true,
+      "skeletal_components": [
+        {
+          "component": "Body",
+          "material_count": 1,
+          "materials": [
+            "/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Body/SKM_MHC_RaftSim_Crew_03_BodyMesh.SKM_MHC_RaftSim_Crew_03_BodyMesh",
+          "visible": true
+        },
+        {
+          "component": "Face",
+          "material_count": 12,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_Teeth_Baked.MI_Teeth_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_EyeL_Baked.MI_EyeL_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_EyeR_Baked.MI_EyeR_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_Face_EyeShell.MI_Face_EyeShell",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_Face_Eyelashes.MI_Face_Eyelashes",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_Face_LacrimalFluid.MI_Face_LacrimalFluid",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_7.RaftSimCroppedFaceSkin_8",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/Materials/MI_Face_EyelashesHiLODs.MI_Face_EyelashesHiLODs",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_7.RaftSimCroppedFaceSkin_10",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_7.RaftSimCroppedFaceSkin_11"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Face/SKM_MHC_RaftSim_Crew_03_FaceMesh.SKM_MHC_RaftSim_Crew_03_FaceMesh",
+          "visible": true
+        },
+        {
+          "component": "SkeletalMesh",
+          "material_count": 8,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Short.MI_WI_DefaultGarment_M_DG_bodyShapeE_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Short.MI_WI_DefaultGarment_M_DG_bodyShapeE_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Short.MI_WI_DefaultGarment_M_DG_bodyShapeE_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeE_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeE_Short.MI_WI_DefaultGarment_M_DG_bodyShapeE_Short"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_03/Clothing/MHC_RaftSim_Crew_03_Outfits.MHC_RaftSim_Crew_03_Outfits",
+          "visible": false
+        }
+      ],
+      "solved_head_world_cm": [
+        6.000000000571236,
+        7.788196754177079e-10,
+        92.96481573437701
+      ],
+      "status": "captured",
+      "wardrobe_mesh_count": 1
+    },
+    {
+      "blueprint_class": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/BP_MHC_RaftSim_Crew_04.BP_MHC_RaftSim_Crew_04_C",
+      "bounds_extent_cm": [
+        48.62001991291874,
+        52.529117173076855,
+        79.41520314239385
+      ],
+      "bounds_origin_cm": [
+        32.0000195505225,
+        20.73992258819336,
+        39.20739596397573
+      ],
+      "eyelash_representation": "populated_groom",
+      "face_crop_height_cm": 153.52304077148438,
+      "face_pre_skinned_bounds_extent_cm": [
+        18.340691566467285,
+        12.76921033859253,
+        19.642982482910156
+      ],
+      "face_pre_skinned_bounds_origin_cm": [
+        9.5367431640625e-07,
+        2.207641124725342,
+        162.1562728881836
+      ],
+      "face_reference_head_component_cm": [
+        -1.724100978739429e-05,
+        1.3420507832249933,
+        163.5230395840158
+      ],
+      "full_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_04_full.png",
+      "full_capture_sha256": "fb7dd59e39800cdecd965b6466ec5440e605bafc7ed5ff777be4ee4c500b62a6",
+      "full_profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_04_full_profile.png",
+      "full_profile_capture_sha256": "9e7db507a74f3fb4701fd0b6a97ed80779580bca7659fc6406e4b00f7fda1901",
+      "full_rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_04_full_rear.png",
+      "full_rear_capture_sha256": "ee157e09fd075e050b1fa999856f2af3d75393d2108ba9a1efa42452f3352f81",
+      "groom_components": [
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Hair_S_AfroFade.Hair_S_AfroFade",
+          "component": "Hair",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Hair_S_AfroFade_CardsMesh_Group0_LOD1.Hair_S_AfroFade_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Hair_S_AfroFade_CardsMesh_Group0_LOD3.Hair_S_AfroFade_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": true
+                  }
+                ]
+              }
+            ],
+            "meshes": [
+              {
+                "group": 0,
+                "lod": 5,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Hair_S_AfroFade_Helmet_LOD5.Hair_S_AfroFade_Helmet_LOD5"
+              },
+              {
+                "group": 0,
+                "lod": 7,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Hair_S_AfroFade_Helmet_LOD7.Hair_S_AfroFade_Helmet_LOD7"
+              }
+            ]
+          },
+          "use_cards": true,
+          "visible": false
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Eyebrows_M_Full.Eyebrows_M_Full",
+          "component": "Eyebrows",
+          "lod_diagnostic": {
+            "cards": [
+              {
+                "group": 0,
+                "lod": 1,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Eyebrows_M_Full_CardsMesh_Group0_LOD1.Eyebrows_M_Full_CardsMesh_Group0_LOD1"
+              },
+              {
+                "group": 0,
+                "lod": 3,
+                "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Eyebrows_M_Full_CardsMesh_Group0_LOD3.Eyebrows_M_Full_CardsMesh_Group0_LOD3"
+              }
+            ],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Fuzz",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Grooms/Eyelashes_L_Curl.Eyelashes_L_Curl",
+          "component": "Eyelashes",
+          "lod_diagnostic": {
+            "cards": [],
+            "groups": [
+              {
+                "group": 0,
+                "lods": [
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 0,
+                    "screen_size": 1.0,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.STRANDS: 0>",
+                    "lod": 1,
+                    "screen_size": 0.5,
+                    "visible": true
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 2,
+                    "screen_size": 0.25,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 3,
+                    "screen_size": 0.125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.CARDS: 1>",
+                    "lod": 4,
+                    "screen_size": 0.0625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 5,
+                    "screen_size": 0.03125,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 6,
+                    "screen_size": 0.015625,
+                    "visible": false
+                  },
+                  {
+                    "geometry_type": "<GroomGeometryType.MESHES: 2>",
+                    "lod": 7,
+                    "screen_size": 0.0078125,
+                    "visible": false
+                  }
+                ]
+              }
+            ],
+            "meshes": []
+          },
+          "use_cards": false,
+          "visible": false
+        },
+        {
+          "asset": null,
+          "component": "Mustache",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        },
+        {
+          "asset": null,
+          "component": "Beard",
+          "lod_diagnostic": null,
+          "use_cards": false,
+          "visible": true
+        }
+      ],
+      "name": "MHC_RaftSim_Crew_04",
+      "pfd_material_evidence": null,
+      "portrait_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_04_portrait.png",
+      "portrait_capture_sha256": "40ae0641d42b807553a7f553790e501e10a9025208d9c761efb43edafc01129e",
+      "profile_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_04_profile.png",
+      "profile_capture_sha256": "6eebb2176a4cb0ffc0727499554a50f3806764f62e7772bf4bd20bc1b167511f",
+      "rear_capture": "../../../../../../alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimValidation/m9/metahuman-captures/mhc_raftsim_crew_04_rear.png",
+      "rear_capture_sha256": "94ef7c7c2e00a0ed66d8c3ed9a3152c1b74e6f4985b6b9752ecd94ba10f4de21",
+      "runtime_adapter_class": "/Script/RaftSimRaft.RaftSimMetaHumanCrewVisualActor",
+      "runtime_articulated_paddle_grip": true,
+      "runtime_assembled_body_uses_wetsuit": true,
+      "runtime_assembled_face_uses_cropped_skin": true,
+      "runtime_assembled_grooms_suppressed": true,
+      "runtime_fitted_upright_river_boots": true,
+      "runtime_hair_forced_lod": 5,
+      "runtime_hair_groom_suppressed_for_helmet": true,
+      "runtime_hair_head_error_cm": 6.122636035318929e-14,
+      "runtime_hair_mesh_fallback": true,
+      "runtime_hair_suppressed_for_helmet": true,
+      "runtime_hair_uses_cards": true,
+      "runtime_helmet_fit_scale": 0.9473026394844055,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 1.8522865186110238e-10,
+      "runtime_hip_thigh_bridge_coverage_error_cm": 1.2774714264196518e-07,
+      "runtime_hip_thigh_bridge_minimum_extent_cm": [
+        7.99839973449707,
+        7.99839973449707,
+        19.632225863208998
+      ],
+      "runtime_host_class": "/Script/RaftSimRaft.RaftSimCrewAvatarActor",
+      "runtime_live_pfd_material_response": true,
+      "runtime_paddle": true,
+      "runtime_paddle_grip_anchor_error_cm": 1.880034572465661e-09,
+      "runtime_paddle_grip_contact_error_cm": 0.0,
+      "runtime_pfd_presentation_wetness": 0.0,
+      "runtime_pfd_torso_error_cm": 0.0,
+      "runtime_production_river_boots": true,
+      "runtime_production_whitewater_helmet": true,
+      "runtime_production_whitewater_pfd": true,
+      "runtime_safety_gear": true,
+      "runtime_shoulder_silhouette": true,
+      "runtime_shoulder_sleeve_anchor_error_cm": 1.3605050241949357e-07,
+      "runtime_shoulder_sleeve_minimum_extent_cm": [
+        5.198959827423096,
+        5.198959827423096,
+        7.41104568734806
+      ],
+      "runtime_shoulder_sleeve_minimum_vertex_count": 553,
+      "runtime_thigh_knee_bridge_coverage_error_cm": 2.3936797433066204e-08,
+      "runtime_thigh_knee_silhouette": true,
+      "runtime_waist_hip_center_error_cm": 0.0,
+      "runtime_waist_hip_extent_cm": [
+        14.700000286102297,
+        23.459999561309814,
+        14.099999964237215
+      ],
+      "runtime_waist_hip_material_opaque": true,
+      "runtime_waist_hip_silhouette": true,
+      "runtime_wardrobe_suppressed_for_safety_gear": true,
+      "skeletal_components": [
+        {
+          "component": "Body",
+          "material_count": 1,
+          "materials": [
+            "/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Body/SKM_MHC_RaftSim_Crew_04_BodyMesh.SKM_MHC_RaftSim_Crew_04_BodyMesh",
+          "visible": true
+        },
+        {
+          "component": "Face",
+          "material_count": 12,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_Teeth_Baked.MI_Teeth_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_EyeL_Baked.MI_EyeL_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_EyeR_Baked.MI_EyeR_Baked",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_Face_EyeShell.MI_Face_EyeShell",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_Face_Eyelashes.MI_Face_Eyelashes",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_Face_LacrimalFluid.MI_Face_LacrimalFluid",
+            "/Game/RaftSim/Characters/Production/MetaHumans/Common/Materials/M_Hide.M_Hide",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_9.RaftSimCroppedFaceSkin_8",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/Materials/MI_Face_EyelashesHiLODs.MI_Face_EyelashesHiLODs",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_9.RaftSimCroppedFaceSkin_10",
+            "/Game/RaftSim/Maps/L_RaftSimBoot.L_RaftSimBoot:PersistentLevel.RaftSimMetaHumanCrewVisualActor_9.RaftSimCroppedFaceSkin_11"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Face/SKM_MHC_RaftSim_Crew_04_FaceMesh.SKM_MHC_RaftSim_Crew_04_FaceMesh",
+          "visible": true
+        },
+        {
+          "component": "SkeletalMesh",
+          "material_count": 8,
+          "materials": [
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt.MI_WI_DefaultGarment_M_DG_bodyShapeD_Shirt",
+            "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MI_WI_DefaultGarment_M_DG_bodyShapeD_Short.MI_WI_DefaultGarment_M_DG_bodyShapeD_Short"
+          ],
+          "mesh": "/Game/RaftSim/Characters/Production/MetaHumans/MHC_RaftSim_Crew_04/Clothing/MHC_RaftSim_Crew_04_Outfits.MHC_RaftSim_Crew_04_Outfits",
+          "visible": false
+        }
+      ],
+      "solved_head_world_cm": [
+        6.0,
+        4.440892098500626e-16,
+        92.99039053916931
+      ],
+      "status": "captured",
+      "wardrobe_mesh_count": 1
+    }
+  ],
+  "schema": "raftsim.metahuman.production_capture.v1",
+  "script": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Scripts/capture_metahuman_production_roster.py",
+  "script_sha256": "acb1f6b8d5ff21241651f1890b3f6761bf23f6cc6a248d5d89999ebc1a4dc209",
+  "status": "capture_complete"
+}
