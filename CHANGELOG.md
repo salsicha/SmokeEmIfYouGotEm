@@ -32,6 +32,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Gave runnable Colorado Hance an isolated four-scale Default Lit canyon
+  surface and Colorado-only opaque Default Lit capture-water parent. The new
+  shade graph adds sandy-bench, weathered-rock, dark-basement-rock, iron-cliff,
+  talus, and fine mineral breakup without moving the Landscape or changing
+  collision, bathymetry, hydraulics, or raft forces. Hance now samples its
+  reach-local cooked field once through CPU-authored vertex color and uses two
+  moving native normal layers instead of re-sampling the shared South Fork
+  shader field. Fixed water-band mean luminance rises from 0.1922 to 0.2716 in
+  the guide view and from 0.2225 to 0.3312 at river eye. The editor build, two
+  native material audits, runnable-map gate, and focused contracts pass.
+  Polygonal canyon terraces, stepped opaque water, coarse foam sheets, sparse
+  ecology, missing surveyed Hance geography, unconverged hydraulics, and all
+  six external acceptance gates keep photoreal and production promotion open.
 - Corrected Chilko Lava Canyon water provenance and optical response without
   changing its ribbon geometry, collision, hydraulics, or raft forces. The
   capture ribbon now uses an isolated opaque Default Lit parent, Chilko's own

@@ -558,6 +558,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             Material,
             FinalBaseColor);
     }
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        FinalBaseColor = BuildColoradoOrganicHanceBaseColor(
+            Material,
+            FinalBaseColor);
+    }
     if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator") ||
         Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
     {
@@ -2936,12 +2942,14 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     const bool bUseSingleLayerWater = Spec.RiverId == TEXT("zambezi_batoka_gorge");
     UMaterial* Parent = Spec.RiverId == TEXT("pacuare")
         ? LoadOrCreatePacuareRainforestWaterParent(OutSummary)
-        : (Spec.RiverId == TEXT("futaleufu_terminator")
+        : (Spec.RiverId == TEXT("colorado_river")
+               ? LoadOrCreateColoradoHanceWaterParent(OutSummary)
+               : (Spec.RiverId == TEXT("futaleufu_terminator")
                ? LoadOrCreateFutaleufuTerminatorWaterParent(OutSummary)
                : (Spec.RiverId == TEXT("chilko_river_lava_canyon")
                       ? LoadOrCreateChilkoLavaCanyonWaterParent(OutSummary)
                       : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
-                            OutSummary, bUseSingleLayerWater)));
+                            OutSummary, bUseSingleLayerWater))));
     if (!Parent)
     {
         return nullptr;
@@ -3029,12 +3037,13 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     FRaftSimLandscapeCandidateWaterSettings Settings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
     if (bDisableSolverVisualizationFields &&
-        (Spec.RiverId == TEXT("futaleufu_terminator") ||
+        (Spec.RiverId == TEXT("colorado_river") ||
+         Spec.RiverId == TEXT("futaleufu_terminator") ||
          Spec.RiverId == TEXT("chilko_river_lava_canyon")))
     {
-        // Terminator's packed field is sampled exactly once, as is Chilko's,
+        // Hance, Terminator, and Chilko each sample their packed field once
         // while the CPU builds ribbon geometry and vertex colours. Do not
-        // re-sample the shared South Fork fallback over either local result.
+        // re-sample the shared South Fork fallback over those local results.
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;

@@ -399,6 +399,12 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
             WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
             WaterActor->Tags.AddUnique(TEXT("RaftSimSingleLayerWaterCaptureRejected"));
         }
+        else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+        {
+            WaterActor->Tags.AddUnique(TEXT("RaftSimColoradoHanceDefaultLitWater"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimMovingMultiScaleWaterNormals"));
+            WaterActor->Tags.AddUnique(TEXT("RaftSimCpuAuthoredCookedFieldColor"));
+        }
         else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
         {
             WaterActor->Tags.AddUnique(TEXT("RaftSimFutaleufuDefaultLitWater"));
@@ -1531,13 +1537,18 @@ bool AddLandscapeCandidateRunnableGameplay(
     {
         WaterConfig->LiveSurfaceCalmCoverage = 0.87f;
         WaterConfig->LiveSurfaceActiveCoverage = 0.97f;
-        WaterConfig->LiveSurfaceSpecular = 0.40f;
+        WaterConfig->LiveSurfaceSpecular = 0.38f;
+        WaterConfig->LiveSurfaceRoughness = 0.28f;
+        WaterConfig->LiveSkyReflectionStrength = 0.34f;
+        WaterConfig->LiveRippleStrength = 0.30f;
+        WaterConfig->LiveFoamIntensity = 0.76f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.12f, 0.20f, 0.16f, 1.0f);
+            FLinearColor(0.095f, 0.145f, 0.110f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.035f, 0.070f, 0.060f, 1.0f);
+            FLinearColor(0.025f, 0.050f, 0.040f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.21f, 0.27f, 0.27f, 1.0f);
+            FLinearColor(0.10f, 0.15f, 0.17f, 1.0f);
     }
     else if (bChilkoLavaCanyon)
     {

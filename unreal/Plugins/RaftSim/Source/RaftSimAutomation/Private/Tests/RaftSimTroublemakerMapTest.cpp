@@ -560,6 +560,24 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Colorado Hance Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
+            Test->TestTrue(
+                TEXT("Colorado Hance solver owns the visible gameplay river"),
+                (*It)->bLiveSolverOwnsRuntimeRendering);
+            Test->TestTrue(
+                TEXT("Colorado Hance visible carrier has complete calm-water coverage"),
+                (*It)->LiveSurfaceCalmCoverage >= 0.80f);
+            Test->TestTrue(
+                TEXT("Colorado Hance live sky reflection stays restrained"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSkyReflectionStrength, 0.34f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance live carrier keeps moving micro-normal response"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRippleStrength, 0.30f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance solver foam remains optically legible"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveFoamIntensity, 0.76f, 0.001f));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
@@ -582,6 +600,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Colorado Hance runtime solver owns gameplay water rendering"),
                 (*It)->Tags.Contains(
                     TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            if (!(*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
+            {
+                Test->TestTrue(
+                    TEXT("Colorado Hance capture ribbon uses isolated Default Lit water"),
+                    (*It)->Tags.Contains(TEXT("RaftSimColoradoHanceDefaultLitWater")));
+                Test->TestTrue(
+                    TEXT("Colorado Hance capture ribbon records CPU cooked-field color authority"),
+                    (*It)->Tags.Contains(TEXT("RaftSimCpuAuthoredCookedFieldColor")));
+            }
             if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
             {
                 Test->TestTrue(

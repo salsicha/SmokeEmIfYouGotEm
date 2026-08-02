@@ -1,0 +1,59 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "44EA6E8F8E412574088D1DAE902B3F90",
+			"instanceName": "Alexs-MacBook-Air.local-85614",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.02-06.41.23",
+	"succeeded": 2,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.018472835421562195,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FColoradoHanceWater",
+			"fullTestPath": "RaftSim.M9.FColoradoHanceWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"44EA6E8F8E412574088D1DAE902B3F90"
+			],
+			"duration": 0.0091137923300266266,
+			"dateTime": "2026.08.02-06.41.23",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FColoradoOrganicHanceTerrain",
+			"fullTestPath": "RaftSim.M9.FColoradoOrganicHanceTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"44EA6E8F8E412574088D1DAE902B3F90"
+			],
+			"duration": 0.0093590430915355682,
+			"dateTime": "2026.08.02-06.41.23",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

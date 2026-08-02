@@ -3693,6 +3693,21 @@ path is verified, and the completion goal can be marked complete.
   mats, missing surveyed Hance geography, unconverged hydraulics, and open
   guide/geospatial/geology/ecology/water-VFX/performance acceptance gates; M9
   remains open.
+- Colorado Hance organic terrain and native capture water V1 retain the same
+  reference-runnable `L_Hance` geometry and live finite-volume gameplay water.
+  A Colorado-only four-scale Default Lit shade graph adds bounded sandy-bench,
+  weathered-rock, dark-rock, iron-cliff, talus, and fine mineral response with
+  no world-position offset. The capture ribbon now uses a Colorado-only opaque
+  Default Lit parent, two moving native normal layers, and the existing
+  CPU-authored cooked-field vertex color; every shader-side solver-field gain is
+  zero, so the shared South Fork fallback field is no longer sampled a second
+  time. Fixed water-band luminance rises from 0.1922 to 0.2716 in the guide view
+  and from 0.2225 to 0.3312 at river eye. The editor build, native terrain and
+  water audits 2/2, and `RaftSim.P4.RiverMapLoads.L_Hance` pass. The retained
+  captures remain photoreal-rejected for polygonal terraces, stepped opaque
+  water, coarse foam sheets, sparse desert ecology and bank structure, missing
+  surveyed Hance geography, unconverged hydraulics, and six required external
+  acceptance gates; M9 remains open.
 - Chilko Lava Canyon reach-local runnable V1 replaces the flat signature-rapid
   shell with a physical 600×600 m, 1009×1009 Landscape. Its broad canyon form
   follows the official BC Freshwater Atlas route through the committed NRCan

@@ -1,0 +1,195 @@
+{
+  "schema": "raftsim.environment.colorado_hance_organic_terrain_native_water_review.v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "supersedes_mutable_artifacts_from": "colorado_hance_reach_local_runnable_v1_review.json",
+  "decision": {
+    "reference_runnable": true,
+    "production_promoted": false,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "source_registration_retained": true,
+    "landscape_owns_rendering_collision_and_height_queries": true,
+    "live_solver_owns_gameplay_water_rendering_and_forces": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "authority_boundary": {
+    "terrain": "existing 1009 by 1009 reach-local Landscape with a protected interpreted C3 bed and deterministic outer-canyon infill",
+    "terrain_material": "shade-only Colorado Hance color response layered after source macro, material-zone, wet-bank, riverbed, and physical-slope conditioning",
+    "terrain_procedural_scope": "four world-space optical fields only; no vertex displacement, terrain import, collision, route, bathymetry, solver, or raft-force mutation",
+    "capture_water": "non-colliding capture ribbon using CPU-authored reach-local cooked-field color and a Colorado-only opaque Default Lit moving-normal parent",
+    "gameplay_water": "live finite-volume C++ solver mesh remains the sole in-play rendering and force carrier"
+  },
+  "terrain_material": {
+    "asset": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_coloradoriver_physicalcorridor_SourceLandscapeCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "world_position_offset_connected": false,
+    "organic_world_noise_scales_per_cm": [
+      0.00014,
+      0.00053,
+      0.0023,
+      0.0068
+    ],
+    "organic_layers": [
+      "sandy bench value and color breakup",
+      "weathered canyon-rock palette variation",
+      "slope-aware dark basement rock and oxidized cliff response",
+      "pale talus patches",
+      "fine mineral grain variation"
+    ],
+    "source_macro_registration_retained": true,
+    "source_material_zones_retained": true,
+    "wet_bank_and_riverbed_conditioning_retained": true,
+    "detail_normal_and_surface_response_retained": true,
+    "surveyed_stratigraphy_authority": false
+  },
+  "capture_water": {
+    "asset": "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_Colorado_HanceDefaultLitWater",
+    "instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_ColoradoRiver_PhysicalCorridorWaterCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "cross_river_shader_field_reuse": false,
+    "cpu_authored_cooked_field_color": true,
+    "native_normal_atlas": true,
+    "moving_normal_layer_count": 2,
+    "world_optical_scales_per_cm": [
+      0.00029,
+      0.00141
+    ],
+    "world_position_offset_connected": false,
+    "geometry_changed": false,
+    "collision_enabled": false,
+    "solver_visualization_field_enable": 0.0,
+    "solver_visualization_field_gains_zero": true
+  },
+  "renderer_comparison": {
+    "method": "normalized RGB before/after comparison over fixed left-bank regions and the fixed y=345..720 water band",
+    "guide_seat_downstream": {
+      "terrain_roi_xyxy": [0, 145, 520, 365],
+      "full_changed_pixel_fraction": 0.6068467881944445,
+      "terrain_roi_changed_pixel_fraction": 0.42819055944055945,
+      "terrain_roi_mean_absolute_rgb_delta": 0.047503408044576645,
+      "terrain_roi_mean_luminance_before": 0.5681936740875244,
+      "terrain_roi_mean_luminance_after": 0.549714207649231,
+      "terrain_roi_luminance_std_before": 0.15879769623279572,
+      "terrain_roi_luminance_std_after": 0.13943640887737274,
+      "water_mean_luminance_before": 0.19224242866039276,
+      "water_mean_luminance_after": 0.27158603072166443
+    },
+    "river_eye_downstream": {
+      "terrain_roi_xyxy": [0, 145, 520, 355],
+      "full_changed_pixel_fraction": 0.5915907118055556,
+      "terrain_roi_changed_pixel_fraction": 0.31775641025641027,
+      "terrain_roi_mean_absolute_rgb_delta": 0.03494364023208618,
+      "terrain_roi_mean_luminance_before": 0.5936521887779236,
+      "terrain_roi_mean_luminance_after": 0.5790275931358337,
+      "terrain_roi_luminance_std_before": 0.14124377071857452,
+      "terrain_roi_luminance_std_after": 0.13092496991157532,
+      "water_mean_luminance_before": 0.2225319892168045,
+      "water_mean_luminance_after": 0.33124786615371704
+    },
+    "solver_rapid_river_eye_downstream": {
+      "terrain_roi_xyxy": [0, 145, 520, 365],
+      "full_changed_pixel_fraction": 0.6068522135416666,
+      "terrain_roi_changed_pixel_fraction": 0.42819055944055945,
+      "terrain_roi_mean_absolute_rgb_delta": 0.04750413820147514,
+      "terrain_roi_mean_luminance_before": 0.5681940913200378,
+      "terrain_roi_mean_luminance_after": 0.549714207649231,
+      "terrain_roi_luminance_std_before": 0.15879817306995392,
+      "terrain_roi_luminance_std_after": 0.13943640887737274,
+      "water_mean_luminance_before": 0.19224242866039276,
+      "water_mean_luminance_after": 0.27158603072166443
+    },
+    "technical_verdict": "retain: the Colorado-only terrain graph adds bounded multi-scale canyon palette breakup and the isolated water parent raises the previously near-black water response without changing geometry or simulation authority",
+    "photoreal_verdict": "fail: polygonal canyon terraces, stepped water geometry, coarse foam sheets, sparse ecology, missing near-bank structure, and absent rapid-scale spray and aeration remain dominant"
+  },
+  "coordinate_contract": {
+    "world_x_matches_runtime_station_m": true,
+    "world_y_center_matches_runtime_lateral_zero": true,
+    "landscape_span_m": [600.0, 320.0],
+    "protected_solver_strip_span_m": [600.0, 78.0],
+    "runtime_vertical_datum_m": 950.7133833482048,
+    "runtime_coordinate_map": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_runtime_coordinate_map.json",
+    "maximum_static_to_runtime_centerline_surface_error_m": 0.0
+  },
+  "terrain_authority": {
+    "source_bed_geometry_authority": "interpreted_bed_geometry",
+    "heightfield_size_px": 1009,
+    "landscape_component_grid": [8, 8],
+    "maximum_added_procedural_canyon_relief_m": 74.97718291544122,
+    "protected_solver_half_width_m": 39.0,
+    "protected_solver_strip_change_m": 0.0,
+    "surveyed_hance_terrain": false,
+    "source_limitation": "The committed Colorado DEM pilot is the Lees Ferry corridor, not Hance at river mile 77.1. The complete 600 by 78 m interpreted Hance C3 bed is preserved; terrain outside that strip is deterministic visual and Landscape-collision infill, not surveyed Hance geography."
+  },
+  "cooked_field_evidence": {
+    "source": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/moderate_release_planning",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "feature_strength_scale": 0.0,
+    "converged": false,
+    "production_calibration_evidence": false
+  },
+  "remaining_photoreal_defects": [
+    "The canyon walls remain visibly polygonal and terraced; shade-only material breakup cannot supply surveyed cliff faces, strata, alcoves, talus geometry, erosion cuts, or bank breaklines.",
+    "The water remains an opaque broad ribbon with stepped cross-river strips and lacks convincing depth, transmission, refraction, reflection complexity, and riverbed readability.",
+    "Whitewater remains coarse bright foam sheets rather than resolved crests, holes, rollers, entrained aeration, spray, mist, and rock-water interaction.",
+    "Grass, shrubs, desert ground cover, riparian structure, woody debris, and boulder variety remain sparse, undersized, repeated, and ecologically unreviewed.",
+    "The terrain outside the protected 78 m solver strip is deterministic procedural infill and is not surveyed or geospatially registered Hance geography.",
+    "The fixed capture remains at the launch/approach and does not demonstrate a complete downstream guide view through the hydraulic crux with representative oar rig, crew, hazards, and recovery context.",
+    "The cooked hydraulic field is unconverged and is not calibrated against observed Hance behavior across playable releases.",
+    "No named Colorado guide or oarsman, geospatial reviewer, geologist/ecologist, environment artist, water-VFX artist, or target-hardware reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Colorado River guide or oarsman review of the Hance line, hazards, entry, exit, and playable flow bands",
+    "geospatial review of exact river-mile registration, planform, terrain, bank breaklines, bathymetry, and vertical datum",
+    "hydraulic calibration and convergence approval against observed Hance behavior across playable release bands",
+    "geology, ecology, and environment-art approval of strata, boulders, shrubs, grass, ground cover, wet banks, and canyon context",
+    "photoreal water and VFX approval for depth, transmission, foam, rollers, spray, mist, reflections, shoreline contact, and raft occlusion",
+    "target-hardware performance, collision, capsize, recovery, and full-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "native_material_audit": "RaftSim.M9.FColoradoHanceWater and RaftSim.M9.FColoradoOrganicHanceTerrain passed 2/2 with 0 warnings and 0 errors",
+    "runtime_map_load": "RaftSim.P4.RiverMapLoads.L_Hance passed 1/1 with 0 errors and one render-thread-safe console-variable warning",
+    "focused_python": "39/39 exact-current Hance plus neighboring river isolation contracts passed"
+  },
+  "reviewers": {
+    "named_colorado_guide_or_oarsman": null,
+    "named_geospatial_reviewer": null,
+    "named_geology_or_ecology_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_Hance.umap", "sha256": "2a8f58e10113bebddc4746a0d91d59a871139ee0fb8b4373ec2abb62ba46942f"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_coloradoriver_physicalcorridor_SourceLandscapeCandidate.uasset", "sha256": "d79518555b3ebcb57701f5c4e9c404b16714431857a3d37de5e701a3c0e50d2c"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_ColoradoRiver_PhysicalCorridorWaterCandidate.uasset", "sha256": "08e5197af144a9c0ad201b3d17c31ec0d9ba6a77ecf2848b31778986a4fc0e94"},
+    {"path": "unreal/Content/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_Colorado_HanceDefaultLitWater.uasset", "sha256": "4683ee239a25c586683eb18c7127e5c310ce551fa306669131404d9138b470da"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json", "sha256": "794fc59feef5716205d45f17724797d76a8adda2ffa8ca8181832e7c5d25f66a"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png", "sha256": "2e19f3d2aa9ed3675576d6bb513cccc108c5d85b4f1d62063415dd42758a90df"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png", "sha256": "11b2b7ed700d83eebeb114ac931b62d26d7c30ef048604f18e856746ea4d40b9"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png", "sha256": "2e19f3d2aa9ed3675576d6bb513cccc108c5d85b4f1d62063415dd42758a90df"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_pre_hance_presentation_v1_guide_seat_downstream.png", "sha256": "ab91317f430f29d9edc42a6b589245f4137a994f9cfc1467e21863a1f5862bc0"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_pre_hance_presentation_v1_river_eye_downstream.png", "sha256": "0a75bf229226834fc703455f4ee230437c8198e2738a8d79322fe5a60f23090b"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_pre_hance_presentation_v1_solver_rapid_river_eye_downstream.png", "sha256": "00542bafc3f65fde2dc75ab53cf3e71c4b5a77356b9a26ba8d579a229a887575"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_presentation_v1_material_audit.json", "sha256": "e215be231df8613fc6c706be98833ccaef98ca57086df21d3dbb37ffbdbffb81"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_presentation_v1_map_load.json", "sha256": "b3421991ebf815f927bdb621ef6ec5f1acae54e2ef1d652af66aa966d945cf9a"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorColoradoMaterial.cpp", "sha256": "2bfee2e9f3bb51384f932fe55959dd9c007a8339c441545c4630cd234de58aa8"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorColoradoWaterMaterial.cpp", "sha256": "95902cf7cc3e40055881f544c53973c12eb8bc24cf05ebab74e7a74d25b3d692"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp", "sha256": "406051d5e687d910d6d2c40c5c6c2483e2be5080383316222ac4c5e1fbc77eaf"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp", "sha256": "0863b3fb4d8afe195c03e1cf355af232abd5054863d8bff1c1e51cb981110f6d"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp", "sha256": "68683050be078f60d6df397cec6f8943ad21969662ca5d25e32aad0f85320f57"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h", "sha256": "72fd4a8cfe7a0d67d60b08ccec078cbcd82d676f6b55e707c2fc09cb5270b68f"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp", "sha256": "9428ff2d6121f95ff1f0996408e682d8e7be38e7dc611c2fd0c94b88ec4e41a8"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorColoradoTerrainTest.cpp", "sha256": "5fb2273e09f50d9fa28ce60e197ee6eeeb221ccf9c6e60454a85e8f70b421a9f"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorColoradoWaterTest.cpp", "sha256": "a87cb765eef35a413942883e58155142fea88b25171e5c2bc1cc37177e848ad4"},
+    {"path": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp", "sha256": "b4d0b1e7bbadbb7bc280ceb41e91e42c18db1172016520d98055bff6cbc777b9"}
+  ]
+}
