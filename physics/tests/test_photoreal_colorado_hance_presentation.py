@@ -7,17 +7,24 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EDITOR_ROOT = REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private"
+RUNTIME_ROOT = REPO_ROOT / "unreal/Plugins/RaftSim/Source"
 TERRAIN_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorColoradoMaterial.cpp"
 WATER_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorColoradoWaterMaterial.cpp"
 BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
 CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
 GEOMETRY_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeGeometry.cpp"
+WATER_CONFIG_HEADER = (
+    RUNTIME_ROOT / "RaftSimWater/Public/RaftSimRiverWaterConfig.h"
+)
+LIVE_SURFACE_SOURCE = (
+    RUNTIME_ROOT / "RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp"
+)
 MANIFEST = REPO_ROOT / (
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "landscape_candidate_manifest_colorado_river.json"
 )
 REVIEW = MANIFEST.with_name(
-    "colorado_hance_organic_terrain_native_water_v1_review.json"
+    "colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json"
 )
 
 
@@ -80,11 +87,47 @@ def test_hance_capture_and_live_profiles_are_river_local() -> None:
     for token in (
         "LiveSkyReflectionStrength = 0.34f",
         "LiveRippleStrength = 0.30f",
-        "LiveFoamIntensity = 0.76f",
+        "LiveFoamIntensity = 0.58f",
+        "LivePresentationSurfaceSmoothingStrength = 0.72f",
+        "LivePresentationStandingWaveScale = 0.55f",
+        "LivePresentationHydraulicReliefScale = 0.55f",
+        "LiveRapidFoamFocusStart = 0.30f",
+        "LiveRapidFoamFocusEnd = 0.82f",
+        "LiveRapidFoamCoverageGain = 0.82f",
         "RaftSimColoradoHanceDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
+        "RaftSimColoradoHanceSubcellSmoothedWaterV1",
+        "RaftSimColoradoHanceLaceFoamV1",
     ):
         assert token in geometry
+
+    assert "Settings.SolverSurfaceReliefScale = 0.06f" in catalog
+    assert "FoamBaseCoverage =" in geometry
+    assert "bColoradoHancePresentation ? 0.22f : 0.28f" in geometry
+    assert "bColoradoHancePresentation ? 0.42f : 0.34f" in geometry
+    assert "bColoradoHancePresentation ? 0.74f : 0.70f" in geometry
+
+
+def test_hance_live_smoothing_is_render_only_and_plane_preserving() -> None:
+    config = WATER_CONFIG_HEADER.read_text(encoding="utf-8")
+    runtime = LIVE_SURFACE_SOURCE.read_text(encoding="utf-8")
+
+    for token in (
+        "bEnableLivePresentationSurfaceSmoothing",
+        "LivePresentationSurfaceSmoothingStrength",
+        "LivePresentationStandingWaveScale",
+        "LivePresentationHydraulicReliefScale",
+        "LiveRapidFoamFocusStart",
+        "LiveRapidFoamFocusEnd",
+        "LiveRapidFoamCoverageGain",
+    ):
+        assert token in config
+    assert "ComputePresentationSmoothedSurfaceHeightMeters" in runtime
+    assert "CenterSurfaceHeightMeters * 0.44f" in runtime
+    assert "* 0.14f" in runtime
+    assert "RawPresentationSurfaceHeightMeters" in runtime
+    assert "WaterSamples remains the authority for gameplay" in runtime
+    assert "PresentationSurfaceHeightMeters[Index]" in runtime
 
 
 def test_hance_manifest_records_organic_terrain_and_native_water() -> None:
@@ -136,25 +179,25 @@ def test_hance_presentation_review_is_hash_locked_and_honest() -> None:
     review = json.loads(REVIEW.read_text(encoding="utf-8"))
 
     assert review["schema"] == (
-        "raftsim.environment.colorado_hance_organic_terrain_native_water_review.v1"
+        "raftsim.environment.colorado_hance_subcell_smoothed_water_lace_foam_review.v1"
     )
     assert review["status"] == (
-        "technical_candidate_retained_photoreal_and_external_review_open"
+        "retained_technical_water_improvement_photoreal_promotion_fail"
     )
     assert review["passed"] is False
     assert review["decision"]["reference_runnable"] is True
     assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["visual_improvement_passed"] is True
     assert review["decision"]["photoreal_acceptance_passed"] is False
-    assert review["decision"]["terrain_geometry_changed"] is False
+    assert review["decision"]["solver_state_changed"] is False
     assert review["decision"]["hydraulics_changed"] is False
     assert review["decision"]["raft_forces_changed"] is False
-    assert review["capture_water"]["cross_river_shader_field_reuse"] is False
-    assert review["capture_water"]["native_normal_atlas"] is True
-    assert review["capture_water"]["moving_normal_layer_count"] == 2
-    assert review["capture_water"]["world_optical_scales_per_cm"] == [
-        0.00029,
-        0.00141,
-    ]
+    assert review["capture_contract"]["render_relief_cap_cm"] == 9.0
+    assert review["capture_contract"]["normal_up_blend"] == 0.80
+    assert review["runtime_contract"]["raw_water_samples_unchanged"] is True
+    assert review["runtime_contract"]["presentation_array_only"] is True
+    assert review["runtime_launch_diagnostics"]["surface_smoothing_enabled"] is True
+    assert review["runtime_launch_diagnostics"]["launch_rapid_foam_vertices"] == 0
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 

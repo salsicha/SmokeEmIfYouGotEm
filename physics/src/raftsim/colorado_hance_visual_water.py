@@ -42,7 +42,10 @@ NORMALIZATION_CAPS = {
     "froude": 4.5,
     "surface_relief_m": 1.5,
 }
-RENDER_HEIGHT_SCALE = 0.30
+# The packed alpha channel retains the complete ±1.5 m detrended source range.
+# Hance's retained presentation consumes only 6% (±9 cm) after a
+# plane-preserving five-tap filter; this never changes the cooked field.
+RENDER_HEIGHT_SCALE = 0.06
 
 
 def _hash_file(path: Path) -> str:
@@ -288,6 +291,28 @@ def build_colorado_hance_visual_water(repo_root: Path) -> dict[str, object]:
             "runtime_water_owner": "ARaftSimWaterSurfaceActor_live_cooked_field_window",
             "foam_surface_offset_cm": 1.4,
             "foam_downstream_persistence_m": 8.0,
+            "capture_surface_filter": {
+                "schema": "raftsim.presentation.plane_preserving_cardinal_5tap.v1",
+                "center_weight": 0.44,
+                "cardinal_neighbor_weight_each": 0.14,
+                "neighbor_offset_m": 4.0,
+                "wet_interior_only": True,
+                "render_height_scale": RENDER_HEIGHT_SCALE,
+            },
+            "capture_foam_breakup": {
+                "base_coverage": 0.22,
+                "noise_smoothstep": [0.42, 0.74],
+                "coverage_gain": 0.96,
+                "maximum_opacity": 0.82,
+            },
+            "live_runtime_presentation": {
+                "surface_smoothing_strength": 0.72,
+                "standing_wave_scale": 0.55,
+                "hydraulic_relief_scale": 0.55,
+                "carrier_foam_intensity": 0.58,
+                "rapid_foam_focus": [0.30, 0.82],
+                "rapid_foam_coverage_gain": 0.82,
+            },
         },
         "authority_policy": {
             "physical_authority": "live_custom_cxx_shallow_water_solver",

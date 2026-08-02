@@ -172,6 +172,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("solver-owned river has visible active-water coverage"),
                 It->GetActiveLiveSurfaceCoverage() >=
                     It->GetCalmLiveSurfaceCoverage());
+            if (bColoradoHanceReferenceRun)
+            {
+                Test->TestTrue(
+                    TEXT("Colorado Hance live mesh applies render-only surface smoothing"),
+                    It->IsLivePresentationSurfaceSmoothingEnabled());
+                Test->TestTrue(
+                    TEXT("Colorado Hance live smoothing keeps its reviewed strength"),
+                    FMath::IsNearlyEqual(
+                        It->GetLivePresentationSurfaceSmoothingStrength(),
+                        0.72f,
+                        0.001f));
+            }
         }
         else
         {
@@ -636,9 +648,41 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 FMath::IsNearlyEqual(
                     (*It)->LiveRippleStrength, 0.30f, 0.001f));
             Test->TestTrue(
-                TEXT("Colorado Hance solver foam remains optically legible"),
+                TEXT("Colorado Hance carrier foam is restrained beneath lace foam"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveFoamIntensity, 0.76f, 0.001f));
+                    (*It)->LiveFoamIntensity, 0.58f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance enables presentation-only subcell smoothing"),
+                (*It)->bEnableLivePresentationSurfaceSmoothing);
+            Test->TestTrue(
+                TEXT("Colorado Hance smoothing strength is reviewed"),
+                FMath::IsNearlyEqual(
+                    (*It)->LivePresentationSurfaceSmoothingStrength,
+                    0.72f,
+                    0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance reduces synthetic standing-wave amplitude"),
+                FMath::IsNearlyEqual(
+                    (*It)->LivePresentationStandingWaveScale, 0.55f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance reduces amplified hydraulic relief"),
+                FMath::IsNearlyEqual(
+                    (*It)->LivePresentationHydraulicReliefScale, 0.55f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance focuses rapid foam above low-energy haze"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamFocusStart, 0.30f, 0.001f) &&
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveRapidFoamFocusEnd, 0.82f, 0.001f) &&
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveRapidFoamCoverageGain, 0.82f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance config declares render-only smoothing authority"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1")) &&
+                    (*It)->Tags.Contains(TEXT("RaftSimRenderOnlyHydraulicSmoothing")) &&
+                    (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")) &&
+                    (*It)->Tags.Contains(TEXT("RaftSimColoradoHanceLaceFoamV1")));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
@@ -669,6 +713,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Test->TestTrue(
                     TEXT("Colorado Hance capture ribbon records CPU cooked-field color authority"),
                     (*It)->Tags.Contains(TEXT("RaftSimCpuAuthoredCookedFieldColor")));
+                Test->TestTrue(
+                    TEXT("Colorado Hance capture ribbon declares subcell smoothing"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1")) &&
+                        (*It)->Tags.Contains(
+                            TEXT("RaftSimRenderOnlyHydraulicSmoothing")) &&
+                        (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
             }
             if ((*It)->Tags.Contains(TEXT("RaftSimSolverFieldFoam")))
             {
@@ -676,6 +727,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Colorado Hance foam is identified as solver-field visualization"),
                     (*It)->Tags.Contains(
                         TEXT("RaftSimColoradoHanceSolverVisualization")));
+                Test->TestTrue(
+                    TEXT("Colorado Hance foam declares the lace breakup contract"),
+                    (*It)->Tags.Contains(TEXT("RaftSimColoradoHanceLaceFoamV1")) &&
+                        (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
                 ++SolverFieldFoamCount;
             }
             ++CaptureOnlyWaterCount;

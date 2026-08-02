@@ -56,6 +56,21 @@ source run is unconverged, and the opaque water, coarse foam bands, generic
 foliage, interpreted geography, missing spray/mist, guide validation, and
 full-run runtime evidence remain rejected in the V2 review.
 
+The August 2 Colorado Hance water pass narrows the cooked-field capture relief
+ceiling from 45 cm to 9 cm and applies a plane-preserving cardinal five-tap
+filter only to all-wet presentation vertices. The live carrier uses the same
+river-local concept with 0.72 smoothing strength, 0.55 standing-wave and relief
+scales, and a narrower rapid-foam focus; it builds a temporary presentation
+height array and leaves authoritative `WaterSamples`, collision, bathymetry,
+buoyancy, and raft forces unchanged. The capture foam bracket reduces bright
+neutral water-band coverage from 3.68% to 0.37% in the guide/solver view, so the
+previous broad white sheets are no longer dominant. This is a retained
+technical improvement, not a photoreal pass: horizontal bands remain visible,
+foam lacks credible rapid structure and spray, the water remains opaque, the
+canyon is terraced, and the hydraulic field and external review gates remain
+open. The hash-locked review is
+`colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json`.
+
 The August 1 Upper Huacas integration supersedes Pacuare's broad,
 scale-mismatched DEM candidate as the active runnable map. `L_UpperHuacas` now
 owns a physical 600×78 m, 1009×1009 Landscape derived from the committed C3

@@ -110,6 +110,40 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.5"))
     float LiveFoamIntensity = 0.52f;
 
+    /** Enables a render-only, plane-preserving five-tap filter over the
+     * sampled free surface. This removes cooked-cell stair steps without
+     * modifying the adapter samples, solver state, collision, buoyancy, or
+     * raft forces. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLivePresentationSurfaceSmoothing = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LivePresentationSurfaceSmoothingStrength = 0.0f;
+
+    /** River-local scale for the synthetic sub-grid standing-wave term. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LivePresentationStandingWaveScale = 1.0f;
+
+    /** River-local scale for visual relief derived from solver curvature. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LivePresentationHydraulicReliefScale = 1.0f;
+
+    /** Solver-foam focus remap for the separate masked lace sheet. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "0.95"))
+    float LiveRapidFoamFocusStart = 0.12f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.05", ClampMax = "1.0"))
+    float LiveRapidFoamFocusEnd = 0.72f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveRapidFoamCoverageGain = 1.0f;
+
     /** Width of the presentation-only alpha feather at the sampled wet bank.
      * Solver-owned carriers use a narrow blend so water does not appear to
      * climb several metres onto dry land. */
