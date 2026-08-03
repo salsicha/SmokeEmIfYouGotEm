@@ -4081,3 +4081,16 @@ path is verified, and the completion goal can be marked complete.
   foam. The V4 review hash-locks this runnable contract while leaving terrain,
   bathymetry, hydraulic, guide/geospatial/rights, photoreal-art/water-VFX, and
   target-performance promotion gates open.
+- Colorado Hance rapid-approach launch V1 moves the reference-runnable
+  `L_Hance` start from station 24 m to station 336 m after exact runtime-grid
+  sampling proved all three committed release bands contain accepted interior
+  solver transitions near station 405 m. The live moderate-band map retains
+  69 m of deep subcritical approach and reports seven active breaking sites,
+  full strongest-interior coverage, 18 m clearance, hydraulic relief, and
+  visible rapid foam. The map also serializes a separate solver-rapid evidence
+  camera instead of duplicating the guide framing. Cooked fields, wet/dry
+  ownership, bathymetry, collision, buoyancy, and raft forces are unchanged.
+  The hash-locked review remains fail-closed for flat banded water, sparse
+  foam/spray volume, terraced terrain, sparse repeated ground cover, missing
+  surveyed Hance geography, unconverged hydraulics, and all six named external
+  acceptance gates; M9 and photoreal promotion remain open.

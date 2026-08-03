@@ -1648,18 +1648,19 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    // Lava Canyon's interpreted hydraulic crux is centered near local station
-    // 300 m.  Launching at the generic reach-local 4% point clamps the 240 m
-    // live-water carrier to stations 0-240, so the genuine cooked-field jump
-    // remains outside the initial gameplay surface even though the rapid is in
-    // the same 600 m scenario.  A 38% launch retains 72 m of calm/developing
-    // approach, starts in deep subcritical water, and places that solver-owned
-    // jump inside the moving carrier with the required bank/edge clearance.
-    // This changes scenario framing only; cooked hydraulics and raft forces are
-    // not synthesized or modified.
-    const float StartProgress = bChilkoLavaCanyon
-        ? 0.38f
-        : (bReachLocalRun ? 0.04f : 0.0025f);
+    // Hance and Lava Canyon both have genuine cooked-field rapid structure
+    // outside the generic station-24 m launch carrier. Hance starts at 56% of
+    // its 600 m reach (station 336 m): all three committed release bands are
+    // deep and subcritical there, and each has an accepted interior breaking
+    // transition about 69 m downstream. Lava Canyon retains its independently
+    // reviewed station-228 m approach. These values change scenario framing
+    // only; cooked hydraulics, wet masks, collision, and raft forces are not
+    // synthesized or modified.
+    const float StartProgress = bColoradoHance
+        ? 0.56f
+        : (bChilkoLavaCanyon
+               ? 0.38f
+               : (bReachLocalRun ? 0.04f : 0.0025f));
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
         Candidate,
@@ -1848,6 +1849,8 @@ bool AddLandscapeCandidateRunnableGameplay(
     if (bColoradoHance)
     {
         WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColoradoHanceRapidApproachLaunchV1"));
+        WaterConfig->Tags.AddUnique(
             TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimRenderOnlyHydraulicSmoothing"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
@@ -1884,7 +1887,12 @@ bool AddLandscapeCandidateRunnableGameplay(
     Raft->SetActorLabel(PlayerRaftLabel);
     Raft->Tags.AddUnique(RunTag);
     Raft->Tags.AddUnique(TEXT("RaftSimReferenceRunnable"));
-    if (bChilkoLavaCanyon)
+    if (bColoradoHance)
+    {
+        Raft->Tags.AddUnique(
+            TEXT("RaftSimColoradoHanceRapidApproachLaunchV1"));
+    }
+    else if (bChilkoLavaCanyon)
     {
         Raft->Tags.AddUnique(TEXT("RaftSimChilkoRapidApproachLaunchV1"));
     }

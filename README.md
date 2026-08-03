@@ -39,10 +39,12 @@ and remaining gates are recorded in
 Colorado's `L_Hance` is likewise restored as a reference-runnable physical
 reach: a 600×320 m Landscape preserves the complete 600×78 m interpreted Hance
 solver bed, procedurally fills missing outer-canyon terrain, and launches the
-live moderate-release cooked field with the player raft and game mode. It is
-not surveyed Hance geography or photoreal-approved; its evidence and open gates
-are recorded in
-[the Hance runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_reach_local_runnable_v1_review.json).
+live moderate-release cooked field at station 336 m with the player raft and
+game mode. That retains 69 m of subcritical approach to the first accepted
+interior solver transition near station 405 m; a separate solver-rapid camera
+now records the downstream hydraulic view. It is not surveyed Hance geography
+or photoreal-approved; its current evidence and open gates are recorded in
+[the Hance rapid-approach review](docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_rapid_approach_launch_v1_review.json).
 Futaleufú's `L_Terminator` and Chilko's `L_LavaCanyon` now use a wet-cell-
 clipped Single Layer Water core beneath their live solver detail surfaces.
 The shared cold-water rollout removes the high-coverage pale overlay while

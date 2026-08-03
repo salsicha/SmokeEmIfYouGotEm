@@ -1,0 +1,211 @@
+{
+  "schema": "raftsim.environment.colorado_hance_rapid_approach_launch_review.v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "baseline_commit": "64ea20d0926d8e5f2164a4932bfa17293e799d5a",
+  "decision": {
+    "reference_runnable": true,
+    "rapid_approach_framing_retained": true,
+    "interior_solver_breaking_site_passed": true,
+    "distinct_solver_rapid_camera_retained": true,
+    "production_promoted": false,
+    "photoreal_acceptance_passed": false,
+    "cooked_fields_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "water_collision_changed": false,
+    "raft_forces_changed": false,
+    "runnable_map_package_changed": true
+  },
+  "corrected_diagnosis": {
+    "prior_observation": "The generic station-24 m Hance launch centered the 240 m live-water carrier too far upstream to frame the strongest committed hydraulic structure. The saved solver-rapid evidence camera also duplicated the guide-oriented framing instead of documenting a separate downstream rapid view.",
+    "finding": "The committed low, moderate, and high Hance cooked fields already contain accepted interior supercritical-to-subcritical transitions near local station 405 m when sampled on the runtime's exact 3 m presentation grid. The missing runnable rapid framing was a launch-window and evidence-camera defect, not proof that the cooked field lacked hydraulic structure.",
+    "retained_fix": "Launch Hance at 56 percent of its 600 m reach (station 336 m), retaining 69 m of deep subcritical approach to the station-405 m transition, and serialize a separate solver-rapid river-eye camera for the downstream hydraulic view.",
+    "source_authority": "The field remains genuine finite-volume solver output over interpreted bed geometry and the surrounding canyon remains deterministic procedural source-gap fill. Neither is surveyed Hance bathymetry or production-calibrated navigation data."
+  },
+  "launch_contract": {
+    "prior_launch_progress": 0.04,
+    "prior_launch_station_m": 24.0,
+    "retained_launch_progress": 0.56,
+    "retained_launch_station_m": 336.0,
+    "solver_transition_station_m": 405.0,
+    "visualization_manifest_strongest_column_station_m": 456.0,
+    "approach_distance_m": 69.0,
+    "live_surface_length_m": 240.0,
+    "live_surface_width_m": 96.0,
+    "live_sample_spacing_m": 3.0,
+    "minimum_breaking_site_clearance_m": 15.0,
+    "launch_centerline_hydraulics": {
+      "low_release_planning": {
+        "depth_m": 1.9088,
+        "speed_m_per_s": 2.3180,
+        "froude": 0.5358
+      },
+      "moderate_release_planning": {
+        "depth_m": 2.3783,
+        "speed_m_per_s": 2.5494,
+        "froude": 0.5279
+      },
+      "high_release_planning": {
+        "depth_m": 3.0720,
+        "speed_m_per_s": 2.7378,
+        "froude": 0.4988
+      }
+    }
+  },
+  "all_band_runtime_sampling_contract": {
+    "method": "The focused regression bilinearly samples each committed cooked field onto the same 3 m, 240 m by 96 m launch-centered grid and applies the runtime wetness, Froude, intensity, full-station-coverage, lateral-clearance, and 15 m edge-clearance rules.",
+    "cooked_manifest_sha256": "db4aa87a2e457e1cd5e4134d80bd80920f6ff52e8716cbb175fc8fb0f3a8818a",
+    "bands": {
+      "low_release_planning": {
+        "accepted_approach_candidates_before_runtime_deduplication": 12,
+        "strongest_station_m": 405.0,
+        "strongest_lateral_m": 9.0,
+        "upstream_froude": 1.3846,
+        "tailwater_froude": 0.2325,
+        "intensity": 0.2747,
+        "edge_clearance_m": 18.0
+      },
+      "moderate_release_planning": {
+        "accepted_approach_candidates_before_runtime_deduplication": 8,
+        "strongest_station_m": 405.0,
+        "strongest_lateral_m": -9.0,
+        "upstream_froude": 1.1950,
+        "tailwater_froude": 0.2959,
+        "intensity": 0.1393,
+        "edge_clearance_m": 18.0
+      },
+      "high_release_planning": {
+        "accepted_approach_candidates_before_runtime_deduplication": 14,
+        "strongest_station_m": 405.0,
+        "strongest_lateral_m": 0.0,
+        "upstream_froude": 1.2240,
+        "tailwater_froude": 0.2294,
+        "intensity": 0.1600,
+        "edge_clearance_m": 27.0
+      }
+    }
+  },
+  "live_pie_evidence": {
+    "test": "RaftSim.P4.RiverMapLoads.L_Hance",
+    "result": "passed_1_of_1",
+    "initial_raft_station_m": 336.0,
+    "initial_active_breaking_sites": 7,
+    "initial_edge_rejected_sites": 15,
+    "initial_strongest_interior_intensity": 0.156,
+    "initial_strongest_interior_coverage": 1.0,
+    "initial_strongest_interior_clearance_m": 18.0,
+    "initial_visible_rapid_foam_vertices": 1,
+    "rapid_foam_mesh_visible": true,
+    "standing_wave_abs_max_m": 0.2148,
+    "hydraulic_relief_abs_max_m": 0.2014,
+    "wet_vertices": 1538,
+    "volume_core_triangles": 2376,
+    "warnings": [
+      "The existing r.MotionVectorSimulation render-thread warning remains; no new test error or map warning was introduced."
+    ]
+  },
+  "capture_evidence": {
+    "native_test": "RaftSim.M9.FColoradoHanceWaterCapture",
+    "result": "passed_1_of_1",
+    "guide_camera_progress": 0.650,
+    "river_eye_camera_progress": 0.685,
+    "solver_rapid_camera_progress": 0.705,
+    "solver_rapid_distinct_from_guide": true,
+    "solver_rapid_distinct_from_river_eye": true,
+    "guide_capture_sha256": "b66b915b693c6938587e9b20bb0faf1c99344d48de82e7baa58565e6e764d528",
+    "river_eye_capture_sha256": "9f630463c119171b2fb60da7bf7b0ebaa32bd9f05ba0bb41c8874c33883412e8",
+    "solver_rapid_capture_sha256": "f783b3f6f6074215a909e526fc36c0e68939c9dec783c6cf08a2730e96491850",
+    "visual_verdict": "Fail closed. The three views now document distinct downstream stations and the solver-rapid frame exposes more aeration, but the water remains thin, flat, muddy, and cross-river banded with sparse white patches instead of convincing rapid-scale volume, foam, spray, or mist. The canyon remains terraced and tessellated-looking, with sparse repeated shrubs, almost no organic ground cover, and inadequate bank structure."
+  },
+  "remaining_photoreal_defects": [
+    "thin flat water body with cross-river bands and weak depth/transmission response",
+    "sparse flat foam patches with no convincing rapid-scale aerated volume, spray, or mist",
+    "terraced and tessellated-looking canyon surfaces with repeated material response",
+    "sparse repeated shrubs, boulders, grass, and ground cover with weak wet-bank transition",
+    "missing surveyed Hance terrain, bank breaklines, bathymetry, and rapid-rock placement",
+    "unconverged and uncalibrated hydraulics across player-selectable release bands",
+    "no named guide, geospatial, hydraulic, environment-art, water-VFX, or performance approval"
+  ],
+  "required_external_acceptance_gates": [
+    "Colorado River guide or oarsman review of the Hance line, hazards, entry, exit, recovery, and playable flow bands",
+    "geospatial review of river-mile registration, planform, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datum",
+    "hydraulic convergence and calibration against observed Hance behavior across playable discharge bands",
+    "geology, ecology, and environment-art approval of strata, boulders, shrubs, grass, ground cover, wet banks, and canyon context",
+    "photoreal water/VFX and raft/character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded in the clean generator worktree and the main workspace",
+    "focused_python": "16 rapid-approach, all-band hydraulic, transmitting-water, presentation, and hash-lock contracts passed",
+    "native_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_Hance passed 1/1 in both the clean generated worktree and the main workspace",
+    "native_water_material_audit": "RaftSim.M9.FColoradoHanceWater passed 1/1 in the main workspace",
+    "native_capture_audit": "RaftSim.M9.FColoradoHanceWaterCapture passed 1/1 in both the clean generated worktree and the main workspace; all three capture hashes remained identical",
+    "protected_user_work_audit": "75 paths checked; 0 mismatches; 0 missing"
+  },
+  "reviewers": {
+    "named_colorado_guide_or_oarsman": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Hance.umap",
+      "role": "reference-runnable station-336 Hance map",
+      "sha256": "0b1c53e54f8ce46ad32946c637350859ce493167528bedc372a89b5e82a2ec50"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png",
+      "role": "retained guide-seat evidence",
+      "sha256": "b66b915b693c6938587e9b20bb0faf1c99344d48de82e7baa58565e6e764d528"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
+      "role": "retained river-eye evidence",
+      "sha256": "9f630463c119171b2fb60da7bf7b0ebaa32bd9f05ba0bb41c8874c33883412e8"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png",
+      "role": "retained distinct solver-rapid evidence",
+      "sha256": "f783b3f6f6074215a909e526fc36c0e68939c9dec783c6cf08a2730e96491850"
+    },
+    {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields/manifest.json",
+      "role": "unchanged three-band cooked-field authority",
+      "sha256": "db4aa87a2e457e1cd5e4134d80bd80920f6ff52e8716cbb175fc8fb0f3a8818a"
+    },
+    {
+      "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_runtime_coordinate_map.json",
+      "role": "unchanged curved runtime coordinate map",
+      "sha256": "d3b3a75db55fc7f6fecd9e26af6c8827e417c9cce33cdb20a990b64738226768"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_visualization_manifest.json",
+      "role": "unchanged moderate-band visualization contract",
+      "sha256": "cfa4d456c2200e9513dbf080a65bdd19e6f329fa619652184515fb97ca60f2ee"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorEnvironmentCaptures.cpp",
+      "role": "distinct solver-rapid evidence-camera authoring",
+      "sha256": "fda2923c628641514a199b64c0e0d50bc4becb394eb19a1b4a4f436e38333bbb"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
+      "role": "station-336 rapid-approach launch authoring",
+      "sha256": "7e6384317c8be3d1ea56167b406b5de11412e7b67dd0af4ef2a4f2e78d2d53ea"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "role": "native saved-map launch and camera acceptance",
+      "sha256": "e297c1bdae26a4b8dec9811eda35e0097c8ff5ec2d6ac288161989f0b12f67fd"
+    },
+    {
+      "path": "physics/tests/test_colorado_hance_rapid_approach.py",
+      "role": "all-band runtime-like hydraulic and hash-lock regression",
+      "sha256": "56a8a2b3377515719a48b4c01180ad8d1225db1552224c0ba214e35d969534eb"
+    }
+  ]
+}
