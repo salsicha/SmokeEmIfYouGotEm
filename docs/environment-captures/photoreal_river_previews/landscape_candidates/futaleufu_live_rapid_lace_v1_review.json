@@ -1,0 +1,118 @@
+{
+  "schema": "raftsim.environment.futaleufu_live_rapid_lace_review.v1",
+  "status": "futaleufu_technical_candidate_retained_chilko_bracket_rejected_photoreal_and_external_review_open",
+  "passed": false,
+  "baseline_commit": "d9078438f794c0b5843dea95d83508adea349fea",
+  "decision": {
+    "futaleufu_reference_runnable": true,
+    "chilko_reference_runnable": true,
+    "futaleufu_technical_candidate_retained": true,
+    "chilko_technical_candidate_retained": false,
+    "production_promoted": false,
+    "photoreal_acceptance_passed": false,
+    "shared_calm_surface_material_changed": false,
+    "gameplay_water_geometry_changed": false,
+    "water_collision_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false
+  },
+  "authority_boundary": {
+    "rapid_lace": "noncolliding masked presentation mesh derived only from the live solver foam field and existing station/bank coverage",
+    "calm_carrier": "the previously reviewed shared live-surface material is byte-identical to the baseline; no third normal, velocity-aeration, color, roughness, transmission, or opacity experiment is retained",
+    "raft_and_crew_occlusion": "the existing pixel-space raft ellipse remains the only rapid-lace exclusion path and is covered by RaftSim.P2.WaterSurfaceRenders",
+    "filtered_generation": "river-filtered map generation reuses shared solver field textures and the shared foam material without resaving them",
+    "physics": "raw cooked fields, wet/dry mask, solver state, surface collision, buoyancy, bathymetry, raft forces, and rapid ownership tests are unchanged"
+  },
+  "futaleufu_terminator": {
+    "focus_before": [0.12, 0.72],
+    "focus_retained": [0.08, 0.58],
+    "coverage_gain": 1.0,
+    "prior_visible_rapid_foam_vertices": 47,
+    "retained_visible_rapid_foam_vertices": 53,
+    "rapid_foam_mesh_visible": true,
+    "active_breaking_sites": 5,
+    "strongest_captured_site": {
+      "station_m": 189.0,
+      "lateral_m": 12.0,
+      "intensity": 0.795,
+      "presentation_coverage": 1.0,
+      "presentation_edge_clearance_m": 15.0
+    },
+    "visual_verdict": "retain as a bounded readability improvement: the calm carrier remains visually consistent and the solver rapid has a denser lace response, but the close rapid frame is still too pale and sheet-like for photoreal acceptance"
+  },
+  "chilko_lava_canyon_rejected_bracket": {
+    "tested_focus": [0.06, 0.55],
+    "restored_focus": [0.12, 0.72],
+    "active_breaking_sites": 0,
+    "edge_rejected_sites": 4,
+    "strongest_edge_rejected_station_m": 198.0,
+    "strongest_edge_rejected_lateral_m": -12.0,
+    "strongest_edge_rejected_coverage": 0.0,
+    "strongest_edge_rejected_clearance_m": 0.0,
+    "visible_rapid_foam_vertices": 0,
+    "visual_verdict": "reject: lowering presentation thresholds cannot create an interior solver-owned rapid; retaining it would add no verified rapid readability and risks amplifying edge foam at the same shoreline boundary the renderer must suppress",
+    "missing_input": "an authoritative or honestly interpreted Chilko cooked field with interior Lava Canyon rapid structure and reviewed stationing"
+  },
+  "remaining_photoreal_defects": [
+    "Futaleufu rapid water still reads as pale opaque surface coverage rather than a deep transmitting turbulent volume.",
+    "Named Terminator holes, rollers, spray, mist, entrained bubbles, and rock-contact plumes remain incomplete.",
+    "Chilko has no interior accepted breaking site in the current live cooked window; all detected candidates are correctly rejected at the wet-mask edge.",
+    "Both rivers retain smooth 30 m source terrain, visibly procedural vegetation, simplified waterline sediment, and incomplete reach-specific rocks.",
+    "No named local guide, geospatial reviewer, hydraulic reviewer, environment artist, water-VFX artist, or target-hardware reviewer has accepted this bracket."
+  ],
+  "required_external_acceptance_gates": [
+    "local guide review of Terminator and Lava Canyon stationing, lines, hazards, recovery, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datums",
+    "hydraulic convergence and calibration against observed rapid behavior across playable discharge bands, including an interior Chilko rapid window",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, and season",
+    "photoreal water/VFX and character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "41 passed, 2 unrelated protected-inventory checks intentionally deselected",
+    "native_tests": [
+      "RaftSim.M8.BRuntimeDataAndMaterials passed",
+      "RaftSim.M9.FFutaleufuTerminatorWater passed",
+      "RaftSim.M9.FChilkoLavaCanyonWater passed",
+      "RaftSim.P2.WaterSurfaceRenders passed with the existing r.MotionVectorSimulation warning",
+      "RaftSim.P4.RiverMapLoads.L_Terminator passed",
+      "RaftSim.P4.RiverMapLoads.L_LavaCanyon passed"
+    ],
+    "protected_user_work_audit": "75 paths checked; 0 mismatches; 0 missing",
+    "shared_live_surface_sha256": "b7b7d87fa6f9e484e6c98d95bf2106cb71b1817ffe8be49b9a26ede76413bef8"
+  },
+  "reviewers": {
+    "named_local_guide": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "fcadfd0a79023ecf330d8719ce83402c66e71cb8227a1cd1c8723729a095048f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "79746336d6fe37ef50ae647404cf771641c1cb62a3a7a94e395db452336749d8"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_LiveRiverSurface.uasset",
+      "sha256": "b7b7d87fa6f9e484e6c98d95bf2106cb71b1817ffe8be49b9a26ede76413bef8"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_live_rapid_lace_v1_calm_retained.png",
+      "sha256": "fd0621b4650a92fa1c07b2f2018b99095907be606860d9a77402717acf91c34d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_live_rapid_lace_v1_breaking_water_side.png",
+      "sha256": "05c28c258484fb42360bf6eb8074b3ee7c2758b30d04e874949e0361cef99c8e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_live_rapid_lace_rejected_edge_only_runtime.png",
+      "sha256": "67df7e187e1a111c4ff704d4d7859f9dec7ba4b1ffb034bcad97d7462103a7ad"
+    }
+  ]
+}

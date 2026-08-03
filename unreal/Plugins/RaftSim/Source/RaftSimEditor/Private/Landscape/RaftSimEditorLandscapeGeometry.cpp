@@ -1726,6 +1726,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveSkyReflectionStrength = 0.34f;
         WaterConfig->LiveRippleStrength = 0.30f;
         WaterConfig->LiveFoamIntensity = 0.68f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.08f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.58f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
             FLinearColor(0.016f, 0.082f, 0.105f, 1.0f);

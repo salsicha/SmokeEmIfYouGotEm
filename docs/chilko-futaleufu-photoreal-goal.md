@@ -283,6 +283,38 @@ all six external acceptance gates remain open. Exact hashes, metrics, placement
 limits, reports, authority boundaries, and blockers are recorded in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_bank_ecology_v4_review.json`.
 
+## Live Rapid Lace V1
+
+The runnable Futaleufú Terminator map now lowers only the solver-derived masked
+rapid-lace focus window from `0.12-0.72` to `0.08-0.58`. The result increases
+visible rapid-foam vertices from 47 to 53 at the retained runtime start and
+keeps five interior breaking sites; the captured station-189 m site has full
+presentation coverage and the required 15 m edge clearance. The accepted calm
+carrier material is byte-identical to the baseline. No color, roughness,
+normal, transmission, opacity, surface geometry, collision, wet/dry mask,
+hydraulics, bathymetry, buoyancy, or raft-force experiment is retained. The
+existing masked foam layer and raft/crew pixel exclusion remain in force.
+
+The equivalent Chilko bracket was rejected. Its current cooked window produced
+zero interior breaking sites and zero visible rapid-foam vertices; all four
+detected transitions were at the wet-mask boundary, including a strongest
+candidate with zero coverage and zero edge clearance. Lowering the display
+threshold could not create missing solver structure and could amplify the same
+water/land edge that must remain suppressed, so `L_LavaCanyon` was restored to
+the conservative `0.12-0.72` focus defaults. Chilko still needs a reviewed
+interior Lava Canyon cooked field rather than a cosmetic substitute.
+
+River-filtered regeneration now reuses the reviewed shared solver textures and
+foam material without resaving them, making isolated map iteration safer. The
+editor build, 42 focused Python contracts, both M9 river audits, the M8 shared
+material audit, both P4 map-load gates, and P2 water/occlusion rendering pass;
+P2 retains Unreal's existing `r.MotionVectorSimulation` warning. The new
+Futaleufú frame still reads too pale and sheet-like for photoreal acceptance,
+and all six guide, geospatial, hydraulic, ecology/art, water-VFX/occlusion, and
+target-hardware gates remain open. Exact evidence, hashes, the rejected Chilko
+diagnostic, and authority boundaries are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_live_rapid_lace_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

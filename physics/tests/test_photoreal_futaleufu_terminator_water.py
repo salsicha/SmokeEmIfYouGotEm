@@ -32,6 +32,9 @@ MANIFEST = (
 REVIEW = MANIFEST.with_name(
     "chilko_futaleufu_cold_water_v2_review.json"
 )
+RAPID_LACE_REVIEW = MANIFEST.with_name(
+    "futaleufu_live_rapid_lace_v1_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -78,6 +81,8 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveSkyReflectionStrength = 0.34f",
         "LiveRippleStrength = 0.30f",
         "LiveFoamIntensity = 0.68f",
+        "LiveRapidFoamFocusStart = 0.08f",
+        "LiveRapidFoamFocusEnd = 0.58f",
         "RaftSimFutaleufuDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
         "RaftSimColdWaterCpuChopV2",
@@ -88,8 +93,15 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
+        "LiveRapidFoamFocusStart",
+        "LiveRapidFoamFocusEnd",
     ):
         assert parameter in config
+    for parameter in (
+        "LiveSkyReflectionStrength",
+        "LiveRippleStrength",
+        "LiveFoamIntensity",
+    ):
         assert f'TEXT("{parameter}")' in runtime
 
 
@@ -178,6 +190,37 @@ def test_futaleufu_native_water_review_is_hash_locked_and_honest() -> None:
     for artifact in review["retained_artifacts"]:
         if artifact["path"] in superseded_paths:
             continue
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
+
+
+def test_futaleufu_live_rapid_lace_review_is_hash_locked_and_fail_closed() -> None:
+    review = json.loads(RAPID_LACE_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.futaleufu_live_rapid_lace_review.v1"
+    )
+    assert review["passed"] is False
+    decision = review["decision"]
+    assert decision["futaleufu_technical_candidate_retained"] is True
+    assert decision["chilko_technical_candidate_retained"] is False
+    assert decision["photoreal_acceptance_passed"] is False
+    assert decision["shared_calm_surface_material_changed"] is False
+    assert decision["hydraulics_changed"] is False
+    assert decision["raft_forces_changed"] is False
+    assert review["futaleufu_terminator"]["focus_before"] == [0.12, 0.72]
+    assert review["futaleufu_terminator"]["focus_retained"] == [0.08, 0.58]
+    assert review["chilko_lava_canyon_rejected_bracket"]["restored_focus"] == [
+        0.12,
+        0.72,
+    ]
+    assert review["chilko_lava_canyon_rejected_bracket"][
+        "visible_rapid_foam_vertices"
+    ] == 0
+    assert len(review["required_external_acceptance_gates"]) == 6
+
+    for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]

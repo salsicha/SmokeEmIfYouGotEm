@@ -1027,6 +1027,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Futaleufu solver foam remains optically legible"),
                 FMath::IsNearlyEqual(
                     (*It)->LiveFoamIntensity, 0.68f, 0.001f));
+            Test->TestTrue(
+                TEXT("Futaleufu rapid lace begins at low solver foam activity"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamFocusStart, 0.08f, 0.001f));
+            Test->TestTrue(
+                TEXT("Futaleufu rapid lace reaches full focus before calm water"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamFocusEnd, 0.58f, 0.001f));
+            Test->TestTrue(
+                TEXT("Futaleufu rapid lace retains full solver coverage"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamCoverageGain, 1.0f, 0.001f));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
@@ -1154,6 +1166,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Chilko solver foam remains optically legible"),
                 FMath::IsNearlyEqual(
                     (*It)->LiveFoamIntensity, 0.72f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko retains conservative rapid-lace onset while edge-only jumps are rejected"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamFocusStart, 0.12f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko retains conservative rapid-lace full-focus threshold"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamFocusEnd, 0.72f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko rapid lace retains full solver coverage"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveRapidFoamCoverageGain, 1.0f, 0.001f));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(

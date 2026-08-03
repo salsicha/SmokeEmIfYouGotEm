@@ -288,3 +288,22 @@ and external acceptance gates pass.
   transition, but photoreal promotion remains rejected for stylized botanical
   geometry, smooth coarse banks, dark opaque water, weak rapid VFX, incomplete
   reach-specific ecology, unconverged hydraulics, and open external gates.
+
+### 2026-08-02 — Futaleufú live rapid lace retained; Chilko bracket rejected
+
+- The Terminator runtime map keeps the accepted calm-water carrier byte-for-
+  byte and lowers only its solver-foam presentation focus from `0.12-0.72` to
+  `0.08-0.58`. Five interior breaking sites remain solver-owned, and visible
+  rapid-lace vertices rise from 47 to 53 without changing terrain, collision,
+  cooked fields, wet/dry ownership, bathymetry, hydraulics, or raft forces.
+- Chilko's attempted `0.06-0.55` bracket was not retained. The current cooked
+  Lava Canyon window has zero interior breaking sites and zero visible rapid-
+  foam vertices; all four detected transitions fail at the wet-mask edge. The
+  shipping map therefore keeps the conservative `0.12-0.72` defaults until a
+  reviewed interior rapid field exists.
+- Filtered map generation now reuses shared solver textures and foam material
+  without resaving them. The editor build, 42 focused Python checks, six native
+  water/map/render tests, and the 75-file protected-work audit pass. This is a
+  technical readability improvement only; the retained Futaleufú rapid frame
+  still fails photoreal water/VFX review and every external acceptance gate
+  remains open.

@@ -5,7 +5,8 @@ namespace RaftSimEditorEnvironment
 bool BuildLandscapeImportCandidateMap(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FRaftSimLandscapeImportCandidateResult& OutResult,
-    FString& OutSummary)
+    FString& OutSummary,
+    bool bReuseSharedSolverPresentationAssets)
 {
     const int32 LandscapeSize = Candidate.LandscapeSize;
     const int32 LandscapeQuads = LandscapeSize - 1;
@@ -139,8 +140,22 @@ bool BuildLandscapeImportCandidateMap(
             return false;
         }
         SolverVisualizationFieldsPtr = &SolverVisualizationFields;
-        SolverFoamMaterial =
-            LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        if (bReuseSharedSolverPresentationAssets)
+        {
+            SolverFoamMaterial = LoadObject<UMaterialInterface>(
+                nullptr,
+                TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                     "M_RaftSim_SolverFieldFoamCandidate."
+                     "M_RaftSim_SolverFieldFoamCandidate"));
+            OutSummary += SolverFoamMaterial
+                ? TEXT("Reused the reviewed shared solver-foam material without resaving it.\n")
+                : TEXT("Could not load the reviewed shared solver-foam material.\n");
+        }
+        else
+        {
+            SolverFoamMaterial =
+                LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        }
         if (!SolverFoamMaterial)
         {
             return false;

@@ -1250,7 +1250,8 @@ def test_live_breaking_water_uses_sparse_foam_and_feathered_moderate_arches():
     assert "CrestFragmentation" in source
     assert "SignedAcross * 17.3f" in source
     assert "NextProfile.X - PreviousProfile.X" in source
-    assert 'TEXT("ActiveLiveSurfaceCoverage"), 0.0f' in source
+    assert 'TEXT("ActiveLiveSurfaceCoverage")' in source
+    assert "ResolvedActiveLiveSurfaceCoverage" in source
     assert "constexpr int32 kAcrossSegments = 16" in source
     assert "constexpr int32 kCurlSegments = 16" in source
     assert "Downstream * 650.0f - Across * 160.0f" in capture_source
@@ -1671,8 +1672,10 @@ def test_live_water_surface_avoids_double_volume_transmission():
 
     assert "M_RaftSim_LiveRiverSurface.M_RaftSim_LiveRiverSurface" in source
     assert "SurfaceMesh->SetMaterial(0, WaterMaterial)" in source
-    assert 'TEXT("ActiveLiveSurfaceCoverage"), 0.0f' in source
-    assert 'TEXT("LiveWaterSpecular"), 0.20f' in source
+    assert 'TEXT("ActiveLiveSurfaceCoverage")' in source
+    assert "ResolvedActiveLiveSurfaceCoverage" in source
+    assert 'TEXT("LiveWaterSpecular")' in source
+    assert "RiverWaterConfig->LiveSurfaceSpecular" in source
     assert "CreateDynamicMaterialInstance(0, WaterMaterial)" in source
 
     material_source = (
@@ -1682,6 +1685,22 @@ def test_live_water_surface_avoids_double_volume_transmission():
     assert 'TEXT("M_RaftSim_LiveRiverSurface")' in material_source
     assert "BuildLiveRiverSurfaceMaterial()" in material_source
     assert 'TEXT("RaftSim.CreateLiveRiverSurfaceMaterial")' in material_source
+    assert "CreateLiveRiverSurfaceMaterial(FString& OutSummary)" in material_source
+    module_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/"
+        "RaftSimEditorModule.cpp"
+    ).read_text(encoding="utf-8")
+    assert 'TEXT("RaftSimCreateLiveRiverSurfaceMaterial")' in module_source
+    environment_automation_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/"
+        "RaftSimEditorEnvironmentAutomation.cpp"
+    ).read_text(encoding="utf-8")
+    assert "if (RiverIdFilter.IsEmpty())" in environment_automation_source
+    assert "Reusing reviewed shared solver-field textures" in (
+        environment_automation_source
+    )
     assert 'Scalar(TEXT("LiveFoamIntensity"), 0.52f)' in material_source
     assert 'Scalar(TEXT("LiveWaterRoughness"), 0.085f)' in material_source
     assert 'Scalar(TEXT("LiveRippleStrength"), 0.18f)' in material_source

@@ -84,7 +84,14 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveFoamIntensity",
     ):
         assert parameter in config
+    for parameter in (
+        "LiveSkyReflectionStrength",
+        "LiveRippleStrength",
+        "LiveFoamIntensity",
+    ):
         assert f'TEXT("{parameter}")' in runtime
+    assert "float LiveRapidFoamFocusStart = 0.12f" in config
+    assert "float LiveRapidFoamFocusEnd = 0.72f" in config
 
 
 def test_chilko_manifest_records_native_capture_water() -> None:

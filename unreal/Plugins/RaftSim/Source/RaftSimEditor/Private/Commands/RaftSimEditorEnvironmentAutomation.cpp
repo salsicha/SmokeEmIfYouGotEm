@@ -60,6 +60,11 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
         bSucceeded &= RaftSimPhotorealMaterials::CreatePhotorealRiverWaterMaterial(Summary);
     }
 
+    if (bCreateLiveRiverSurfaceMaterialOnStartup)
+    {
+        bSucceeded &= RaftSimPhotorealMaterials::CreateLiveRiverSurfaceMaterial(Summary);
+    }
+
     if (bCreateWaterVfxMaterialOnStartup)
     {
         bSucceeded &= RaftSimPhotorealMaterials::CreateWaterVfxMaterial(Summary);
@@ -304,7 +309,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             SourceTextureAssetsByKey,
             OutSummary,
             RiverIdFilter);
-    bAllSucceeded &= CreateSolverVisualizationFieldTextureAssets(OutSummary);
+    if (RiverIdFilter.IsEmpty())
+    {
+        bAllSucceeded &= CreateSolverVisualizationFieldTextureAssets(OutSummary);
+    }
+    else
+    {
+        OutSummary += TEXT(
+            "Reusing reviewed shared solver-field textures for filtered river generation.\n");
+    }
     FAssetCompilingManager::Get().FinishAllCompilation();
     if (GShaderCompilingManager)
     {
@@ -347,7 +360,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
 
         FRaftSimLandscapeImportCandidateResult Result;
         const bool bMapBuilt = bSourceContractsPresent &&
-            BuildLandscapeImportCandidateMap(Candidate, Result, OutSummary);
+            BuildLandscapeImportCandidateMap(
+                Candidate,
+                Result,
+                OutSummary,
+                !RiverIdFilter.IsEmpty());
 
         FString GuideSeatCapturePath = GetLandscapeCandidateCaptureRelativePath(
             Candidate,
