@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v4_review.json"
+    "zambezi_runnable_release_head_v5_review.json"
 )
 
 
@@ -45,13 +45,25 @@ def _sha256(path: Path) -> str:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v2"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "487dd10472e3bf50eadc1bd7a8f918d83004b0a6"
+        "7e26194d3b29c4ac8b51df4aa9629231e14a2df5"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
+    assert review["verification_context"] == {
+        "reason": (
+            "Revalidate the Zambezi runnable contract after the Colorado Hance "
+            "rapid-approach milestone."
+        ),
+        "runtime_contract_changed_since_v4": False,
+        "supersedes_review": (
+            "docs/environment-captures/photoreal_river_previews/"
+            "landscape_candidates/zambezi_runnable_release_head_v4_review.json"
+        ),
+    }
     assert review["player_path"] == {
         "game_mode": "Free Run",
         "display_name": "Zambezi: Boiling Pot to Mukuni Beach",

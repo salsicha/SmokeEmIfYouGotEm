@@ -36,11 +36,11 @@ the full-corridor Zambezi reference run:
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_Zambezi` | **versioned reference runnable; production hydraulics gated** |
 
-Release-head verification keeps Zambezi in ordinal position 6 of the six-river
-Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
+Post-Hance release-head verification keeps Zambezi in ordinal position 6 of the
+six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v4_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v5_review.json`.
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
