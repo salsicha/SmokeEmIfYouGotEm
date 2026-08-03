@@ -88,10 +88,10 @@ def test_pacuare_opaque_rainforest_replaces_alpha_card_sources():
     assert "CreatePacuareOpaqueRainforestVegetationAssets" in source
     assert "M_RaftSim_Pacuare_OpaqueRainforestVegetation" in source
     for asset_name in (
-        "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1",
-        "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1",
-        "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1",
-        "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1",
+        "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2",
+        "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2",
+        "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2",
+        "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2",
     ):
         assert asset_name in source
     assert "RaftSimPacuareOpaqueRainforestV1" in source

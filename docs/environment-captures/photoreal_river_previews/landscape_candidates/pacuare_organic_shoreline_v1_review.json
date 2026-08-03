@@ -6,6 +6,7 @@
   "rapid_name": "Upper Huacas",
   "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
   "status": "retained_technical_visual_improvement_photoreal_promotion_open",
+  "mutable_runtime_evidence_successor": "pacuare_canopy_morphology_v2_review.json",
   "passed": false,
   "decision": {
     "reference_runnable": true,
@@ -105,16 +106,6 @@
   ],
   "retained_artifacts": [
     {
-      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
-      "role": "reference-runnable Upper Huacas map with the non-authoritative organic shoreline layer",
-      "sha256": "828d5e265c0470cee0ae50bff51dff62045f759ee656c4e89d44ea86eac40369"
-    },
-    {
-      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
-      "role": "filtered generation manifest",
-      "sha256": "1d95bd2dfbbd23e1d6b26d6241a3ed1e344083fe4ba7e1d747cb47f7a2656abd"
-    },
-    {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_guide_before.png",
       "role": "immutable release-head guide-seat baseline",
       "sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d"
@@ -133,11 +124,6 @@
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_river_eye.png",
       "role": "retained matched river-eye result",
       "sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875"
-    },
-    {
-      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
-      "role": "regenerated solver-crux context",
-      "sha256": "2ea7c9cdddf30430b480a59f0c0e188222ef7b1987cfc8596e911eecd0f2047a"
     },
     {
       "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/polyhaven_rock_moss_set_01_source_manifest.json",

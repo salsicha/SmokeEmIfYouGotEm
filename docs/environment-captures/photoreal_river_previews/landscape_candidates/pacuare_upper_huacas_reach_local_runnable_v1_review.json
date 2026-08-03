@@ -45,7 +45,7 @@
   "retained_artifacts": [
     {
       "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
-      "sha256": "828d5e265c0470cee0ae50bff51dff62045f759ee656c4e89d44ea86eac40369"
+      "sha256": "8adf2d3219546a3a7c4c5dfe33667674bf8b0f2bd2b807dee419f7966c910557"
     },
     {
       "path": "physics/data/real_world/pacuare_river_costa_rica/terrain/upper_huacas_visual/upper_huacas_conditioned_heightfield_1009.png",
@@ -57,15 +57,15 @@
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "d6ddfba4754b49a76a392b25460a9f5a98cfca47361a6e0974d31e9253f44955"
+      "sha256": "5a62ec14a117aac77961a711bf0c57cb99f216e7f167294986450ca401800b32"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875"
+      "sha256": "2fe6ae29a578171ed29758989e010c11e561e14845f8b213597561c53f6cb7cd"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
-      "sha256": "2ea7c9cdddf30430b480a59f0c0e188222ef7b1987cfc8596e911eecd0f2047a"
+      "sha256": "fd5d4ef3cd08583f2fa126d94ee90df73c52166aaadb15431ec2921e92dc5c3f"
     },
     {
       "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png",

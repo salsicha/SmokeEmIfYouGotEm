@@ -4166,3 +4166,17 @@ path is verified, and the completion goal can be marked complete.
   Pacuare audit 4/4, live `L_UpperHuacas` P4 gate 1/1, and 19 focused Python
   contracts pass; guide, geospatial, hydraulic, ecology/art, water/VFX, and
   platform acceptance remain open.
+- Pacuare compound canopy morphology V2 replaces each oversized single-volume
+  rainforest lobe with a higher-resolution core and six smaller rotated and
+  tilted crownlets across the same four project-owned opaque Nanite families.
+  The same 18,400 non-colliding source-mask placements remain, while a
+  Pacuare-only shadow-fill lift improves dark-bank readability. In matched
+  fixed views, crown-edge coverage rises from 18.56% to 25.58% at guide seat
+  and 18.85% to 25.54% at river eye; near-black coverage falls in both views.
+  The editor build, M9 Pacuare suite 4/4, live P4 map gate 1/1, MapCheck 0/0,
+  13 focused Python contracts, and the complete 79-test Pacuare suite pass.
+  This remains an openly synthetic four-mesh fallback: species/age/strata
+  diversity, branch topology, terrain,
+  water/VFX, calibrated hydraulics, atmosphere, performance, and all six
+  external approvals remain incomplete, so M9 and photoreal promotion stay
+  open.
