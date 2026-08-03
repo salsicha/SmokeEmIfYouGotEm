@@ -20,21 +20,27 @@ package is not the runnable map.
 
 ### Current runnable verification
 
-The current release head was rechecked after the later environment and character
-milestones. The player path is still:
+The release head was rechecked after the later environment, character, and
+water milestones. The player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
-The machine-readable Free Run manifest still counts six runnable rivers and
-lists `zambezi_batoka_gorge` at `reference_free_run` tier. The native
-`RaftSim.M6.CareerCatalog` gate passes with no warnings or errors. The native
-`RaftSim.P4.RiverMapLoads.L_Zambezi` gate loads the committed map into PIE,
-reports the vertical-slice game mode, binds the 5,908-point curved coordinate
-map and cooked field, exposes eight live breaking sites and visible rapid foam,
-and completes MapCheck with zero errors and zero warnings. Twenty-one focused
-Python source, scenario, shipping, named-rapid, and portfolio contracts also
-pass. The Unreal report contains one unrelated connectivity-probe timeout; it
-does not affect map load or gameplay acceptance.
+The machine-readable Free Run manifest counts six runnable rivers and lists
+`zambezi_batoka_gorge` at `reference_free_run` tier. The rebuilt editor passes
+11 focused Python registry/source contracts, and the native
+`RaftSim.M6.CareerCatalog` gate resolves the player-facing scenario without an
+automation warning or error. The native `RaftSim.P4.RiverMapLoads.L_Zambezi`
+gate loads the committed map into PIE, reports the vertical-slice game mode,
+binds the 5,908-point curved coordinate map and cooked field, exposes 2,673 wet
+surface vertices, eight live breaking sites, and 125 visible rapid-foam
+vertices, and completes MapCheck with zero errors and zero warnings. The test
+passes with two unrelated log warnings: the external connectivity probe times
+out and Unreal reports the existing `r.MotionVectorSimulation` thread-safety
+warning. Neither warning changes map load or gameplay acceptance.
+
+The exact base commit, runtime-contract hashes, test commands, measured counts,
+authority boundary, and open external gates are preserved in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v2_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,

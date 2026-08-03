@@ -57,14 +57,18 @@ All notable changes to this project are recorded here, newest first. Versioning 
   gate, and 75-file protected-work audit pass. The retained Futaleufú frame
   remains too pale and sheet-like for photoreal promotion, and all external
   guide, geospatial, hydraulic, art/VFX, and performance gates remain open.
-- Rechecked Zambezi at the current release head and retained it as the sixth
-  runnable river. `RaftSim.M6.CareerCatalog` again resolves the player-facing
+- Rechecked Zambezi at release head and retained it as the sixth runnable
+  river. `RaftSim.M6.CareerCatalog` resolves the player-facing
   `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi`, while
-  `RaftSim.P4.RiverMapLoads.L_Zambezi` loads that saved package into PIE with
-  the vertical-slice game mode, curved coordinate map, live cooked-field water,
-  active breaking sites, visible rapid foam, and zero MapCheck errors or
-  warnings. This is a runnable-reference verification, not photoreal or
-  production-hydraulic promotion.
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` loads that committed package into PIE
+  with the vertical-slice game mode, a 5,908-point curved coordinate map, live
+  cooked-field water, 2,673 wet vertices, eight active breaking sites, and 125
+  visible rapid-foam vertices. The editor builds, 11 focused Python contracts
+  pass, both native gates pass, and MapCheck reports zero errors and zero
+  warnings. The new hash-locked review records the benign connectivity-probe
+  timeout and existing motion-vector warning separately. This is a
+  runnable-reference verification, not photoreal or production-hydraulic
+  promotion.
 - Rebuilt the shared runnable Futaleufú/Chilko fallback canopy as first-party
   Structure V3 geometry. Compound asymmetric crownlets, varied and staggered
   conifer whorls, overlapping distance-stable crown bodies, bounded shortened
