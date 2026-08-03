@@ -1718,15 +1718,63 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;
     if (bPacuare)
     {
-        WaterConfig->LiveSurfaceCalmCoverage = 0.88f;
-        WaterConfig->LiveSurfaceActiveCoverage = 0.97f;
-        WaterConfig->LiveSurfaceSpecular = 0.38f;
+        // A wet-cell-clipped transmitting core replaces the opaque rainforest
+        // carrier as the river body. The low-coverage Default Lit surface is
+        // retained only for solver geometry normals and a soft bank feather.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreatePacuareUpperHuacasLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Textures/"
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal."
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Textures/"
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace."
+                 "T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Pacuare Upper Huacas live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
+        WaterConfig->LiveSurfaceSpecular = 0.30f;
+        WaterConfig->LiveSurfaceRoughness = 0.33f;
+        WaterConfig->LiveSkyReflectionStrength = 0.30f;
+        WaterConfig->LiveRippleStrength = 0.30f;
+        WaterConfig->LiveFoamIntensity = 0.62f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.62f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.78f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.78f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.10f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.66f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.86f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.0f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.075f, 0.20f, 0.16f, 1.0f);
+            FLinearColor(0.035f, 0.130f, 0.095f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.018f, 0.060f, 0.050f, 1.0f);
+            FLinearColor(0.008f, 0.033f, 0.024f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.16f, 0.25f, 0.24f, 1.0f);
+            FLinearColor(0.095f, 0.180f, 0.160f, 1.0f);
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.00016f, 0.00024f, 0.00018f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0070f, 0.0035f, 0.0055f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.12f, 0.16f, 0.09f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.46f;
+        WaterConfig->LiveDeepWaterOpacity = 0.72f;
+        WaterConfig->LiveFoamWaterOpacity = 0.88f;
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimPacuareTransmittingWaterV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
     else if (bColoradoHance)
     {

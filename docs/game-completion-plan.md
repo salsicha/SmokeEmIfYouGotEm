@@ -4107,3 +4107,14 @@ path is verified, and the completion goal can be marked complete.
   foam/spray volume, terraced terrain, sparse repeated ground cover, missing
   surveyed Hance geography, unconverged hydraulics, and all six named external
   acceptance gates; M9 and photoreal promotion remain open.
+- Pacuare live transmitting water V1 replaces Upper Huacas's uniform opaque
+  gameplay carrier with a solver-owned core triangulated only through all-wet
+  live cells. The smoothed live surface remains a 3.5%-14% hydraulic-detail
+  skin, while the authored packed-field ribbon and foam actor remain hidden in
+  play. First-party flow-normal and foam-lace textures are provenance-locked,
+  visual-only, and solver-masked. The editor build, four focused native audits,
+  live PIE map-load gate, four Python contracts, and matched runtime comparison
+  pass. This is a retained optical/readability improvement, not photoreal
+  promotion: rounded procedural banks, generic repeated rainforest vegetation,
+  thin sediment/refraction response, sparse rapid foam and spray, unconverged
+  hydraulics, and all six external acceptance gates remain open.

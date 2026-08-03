@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced Pacuare Upper Huacas's uniform opaque gameplay-water sheet with a
+  live solver-owned transmitting core clipped to all-wet cells. The smoothed
+  surface remains a 3.5%-14% hydraulic-detail skin, while the authored packed-
+  field water and foam remain hidden capture-only actors. Project-owned flow-
+  normal and foam-lace textures are provenance-locked, visual-only, and masked
+  by solver state. The editor build, four focused native audits, live PIE map-
+  load gate, four Python contracts, and matched runtime comparison pass. This
+  is a bounded readability improvement; procedural terrain and ecology, thin
+  optics, sparse rapid VFX, unconverged hydraulics, and all six external gates
+  keep photoreal and production promotion closed.
 - Reaffirmed Zambezi as the sixth runnable river on the post-ground-cover
   release head. The unchanged committed `L_Zambezi` package remains selectable
   as **Zambezi: Boiling Pot to Mukuni Beach** in Free Run and remains in the

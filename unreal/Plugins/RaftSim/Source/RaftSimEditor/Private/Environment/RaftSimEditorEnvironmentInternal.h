@@ -1023,6 +1023,9 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
 
 UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
 
+UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
+    FString& OutSummary);
+
 UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary);
 
 UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
@@ -2724,6 +2727,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
 namespace RaftSimPhotorealMaterials
 {
 bool BuildSouthForkWaterTextureAssets();
+bool BuildPacuareUpperHuacasWaterTextureAssets();
 bool BuildColoradoHanceWaterTextureAssets();
 bool BuildFutaleufuTerminatorWaterTextureAssets();
 bool BuildZambeziBatokaWaterTextureAssets();

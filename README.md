@@ -49,6 +49,14 @@ datum alignment, player raft/start, and the full vertical-slice game mode now
 ship together. It is reference-runnable, not photoreal-approved; the evidence
 and remaining gates are recorded in
 [the Upper Huacas water/readability review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_upper_huacas_solver_whitewater_v2_review.json).
+Its August 3 gameplay-water pass replaces the uniform opaque live sheet with a
+solver-owned, wet-cell-clipped transmitting core and a narrowly covered live
+detail skin. The new project-owned flow-normal and solver-masked foam-lace
+textures are visual-only and cannot alter hydraulics or raft forces. The
+matched result is retained as a technical improvement, while terrain,
+rainforest ecology, whitewater VFX, calibration, external review, and
+photoreal promotion remain open in the
+[Pacuare live-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_live_transmitting_water_v1_review.json).
 Colorado's `L_Hance` is likewise restored as a reference-runnable physical
 reach: a 600×320 m Landscape preserves the complete 600×78 m interpreted Hance
 solver bed, procedurally fills missing outer-canyon terrain, and launches the
