@@ -247,18 +247,99 @@ void AppendTemperateOpaqueLobe(
     TArray<FVector2D>& Uvs,
     TArray<FLinearColor>& Colors)
 {
+    if (bRainforestPalette)
+    {
+        AppendOpaqueLobe(
+            Center,
+            Radii,
+            Seed,
+            BaseColor,
+            8,
+            16,
+            Vertices,
+            Triangles,
+            Normals,
+            Uvs,
+            Colors);
+        return;
+    }
+
+    // Build one continuous, asymmetric crownlet from four overlapping volumes.
+    // This keeps the opaque, distance-stable fallback while removing the single
+    // balloon/diamond silhouette that dominated the runnable river cameras.
+    const float CoreScale = FMath::Lerp(
+        0.84f,
+        0.93f,
+        ZambeziVegetationUnitRandom(Seed, 6029));
     AppendOpaqueLobe(
         Center,
-        Radii,
+        Radii * FVector(CoreScale, CoreScale * 0.96f, CoreScale * 1.04f),
         Seed,
         BaseColor,
-        bRainforestPalette ? 8 : 12,
-        bRainforestPalette ? 16 : 24,
+        9,
+        18,
         Vertices,
         Triangles,
         Normals,
         Uvs,
         Colors);
+
+    constexpr int32 SatelliteLobeCount = 3;
+    for (int32 LobeIndex = 0;
+         LobeIndex < SatelliteLobeCount;
+         ++LobeIndex)
+    {
+        const int32 LobeSeed = Seed + 71 + LobeIndex * 43;
+        const float Angle =
+            UE_TWO_PI * static_cast<float>(LobeIndex) /
+                static_cast<float>(SatelliteLobeCount) +
+            Seed * 0.037f +
+            FMath::Lerp(
+                -0.31f,
+                0.31f,
+                ZambeziVegetationUnitRandom(LobeSeed, 6037));
+        const float RadialScale = FMath::Lerp(
+            0.20f,
+            0.31f,
+            ZambeziVegetationUnitRandom(LobeSeed, 6043));
+        const FVector LobeOffset(
+            FMath::Cos(Angle) * Radii.X * RadialScale,
+            FMath::Sin(Angle) * Radii.Y * RadialScale,
+            Radii.Z * FMath::Lerp(
+                -0.18f,
+                0.20f,
+                ZambeziVegetationUnitRandom(LobeSeed, 6053)));
+        const FVector LobeRadii = Radii * FVector(
+            FMath::Lerp(
+                0.39f,
+                0.49f,
+                ZambeziVegetationUnitRandom(LobeSeed, 6067)),
+            FMath::Lerp(
+                0.36f,
+                0.46f,
+                ZambeziVegetationUnitRandom(LobeSeed, 6073)),
+            FMath::Lerp(
+                0.41f,
+                0.52f,
+                ZambeziVegetationUnitRandom(LobeSeed, 6079)));
+        AppendOpaqueLobe(
+            Center + LobeOffset,
+            LobeRadii,
+            LobeSeed,
+            ScalePreviewColor(
+                BaseColor,
+                FMath::Lerp(
+                    0.88f,
+                    1.08f,
+                    ZambeziVegetationUnitRandom(LobeSeed, 6089))),
+            5,
+            10,
+            Vertices,
+            Triangles,
+            Normals,
+            Uvs,
+            Colors);
+    }
 }
 
 UMaterial* CreateOpaqueVegetationMaterial(
@@ -1075,7 +1156,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     else if (Form == ETemperateVegetationForm::ConiferTree &&
              !bRainforestPalette)
     {
-        constexpr float TreeHeightCm = 930.0f;
+        constexpr float TreeHeightCm = 850.0f;
         AppendZambeziColoredSegment(
             FVector::ZeroVector,
             FVector(8.0f, -7.0f, TreeHeightCm),
@@ -1090,7 +1171,6 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
             Uvs,
             Colors);
         constexpr int32 TierCount = 11;
-        constexpr int32 BranchesPerTier = 7;
         for (int32 TierIndex = 0; TierIndex < TierCount; ++TierIndex)
         {
             const float TierT = static_cast<float>(TierIndex) /
@@ -1105,14 +1185,30 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                     0.88f,
                     1.12f,
                     ZambeziVegetationUnitRandom(Seed + TierIndex, 5659));
+            const int32 BranchCount = 6 + FMath::Clamp(
+                FMath::FloorToInt(
+                    3.0f * ZambeziVegetationUnitRandom(
+                        Seed + TierIndex,
+                        5663)),
+                0,
+                2);
+            const float TierRotation = FMath::Lerp(
+                -0.24f,
+                0.24f,
+                ZambeziVegetationUnitRandom(Seed + TierIndex, 5667));
             for (int32 BranchIndex = 0;
-                 BranchIndex < BranchesPerTier;
+                 BranchIndex < BranchCount;
                  ++BranchIndex)
             {
+                const int32 BranchSeed = Seed + TierIndex * 107 +
+                    BranchIndex * 23;
+                const bool bStormShortenedBranch =
+                    BranchIndex == BranchCount - 1 && BranchCount > 5 &&
+                    ZambeziVegetationUnitRandom(BranchSeed, 5668) < 0.22f;
                 const float Angle = UE_TWO_PI *
                         static_cast<float>(BranchIndex) /
-                        static_cast<float>(BranchesPerTier) +
-                    TierIndex * 0.43f + Seed * 0.017f +
+                        static_cast<float>(BranchCount) +
+                    TierIndex * 0.43f + Seed * 0.017f + TierRotation +
                     FMath::Lerp(
                         -0.15f,
                         0.15f,
@@ -1121,10 +1217,23 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                             5669));
                 const FVector Direction(
                     FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
-                const FVector Start(0.0f, 0.0f, TierZ);
-                const FVector End = Direction * TierRadius +
+                const float BranchLengthScale = FMath::Lerp(
+                    0.84f,
+                    1.15f,
+                    ZambeziVegetationUnitRandom(BranchSeed, 5671)) *
+                    (bStormShortenedBranch ? 0.62f : 1.0f);
+                const float BranchZOffset = FMath::Lerp(
+                    -24.0f,
+                    24.0f,
+                    ZambeziVegetationUnitRandom(BranchSeed, 5677));
+                const FVector Start(
+                    8.0f * TierT,
+                    -7.0f * TierT,
+                    TierZ + BranchZOffset);
+                const FVector End =
+                    Start + Direction * TierRadius * BranchLengthScale +
                     FVector::UpVector *
-                        (TierZ + FMath::Lerp(-18.0f, 48.0f, TierT));
+                        FMath::Lerp(-18.0f, 48.0f, TierT);
                 AppendZambeziColoredSegment(
                     Start,
                     End,
@@ -1138,8 +1247,6 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                     Normals,
                     Uvs,
                     Colors);
-                const int32 BranchSeed = Seed + TierIndex * 107 +
-                    BranchIndex * 23;
                 AppendTemperateOpaqueLobe(
                     FMath::Lerp(Start, End, 0.37f) +
                         FVector::UpVector * 10.0f,
@@ -1194,6 +1301,45 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
                     Uvs,
                     Colors);
             }
+
+            const float ConiferCrownBodyScale = FMath::Lerp(
+                0.68f,
+                0.82f,
+                ZambeziVegetationUnitRandom(Seed + TierIndex, 5767));
+            const FVector CrownBodyCenter(
+                8.0f * TierT + FMath::Lerp(
+                    -18.0f,
+                    18.0f,
+                    ZambeziVegetationUnitRandom(Seed + TierIndex, 5779)),
+                -7.0f * TierT + FMath::Lerp(
+                    -16.0f,
+                    16.0f,
+                    ZambeziVegetationUnitRandom(Seed + TierIndex, 5783)),
+                TierZ + FMath::Lerp(
+                    -10.0f,
+                    18.0f,
+                    ZambeziVegetationUnitRandom(Seed + TierIndex, 5791)));
+            AppendTemperateOpaqueLobe(
+                CrownBodyCenter,
+                FVector(
+                    TierRadius * ConiferCrownBodyScale,
+                    TierRadius * ConiferCrownBodyScale * 0.91f,
+                    FMath::Lerp(112.0f, 54.0f, TierT)),
+                Seed + 1301 + TierIndex * 61,
+                ScalePreviewColor(
+                    ConiferGreen,
+                    FMath::Lerp(
+                        0.80f,
+                        0.98f,
+                        ZambeziVegetationUnitRandom(
+                            Seed + TierIndex,
+                            5801))),
+                bRainforestPalette,
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
         }
         AppendTemperateOpaqueLobe(
             FVector(0.0f, 0.0f, 900.0f),
@@ -2865,7 +3011,7 @@ bool AddLandscapeCandidateBiomeDressing(
                 if (bOpaqueTemperate)
                 {
                     Owner->Tags.AddUnique(
-                        TEXT("RaftSimTemperateCanopyVariationV2"));
+                        TEXT("RaftSimTemperateCanopyStructureV3"));
                 }
             }
             if (Component)
@@ -2889,7 +3035,7 @@ bool AddLandscapeCandidateBiomeDressing(
                 if (bOpaqueTemperate)
                 {
                     Component->ComponentTags.AddUnique(
-                        TEXT("RaftSimTemperateCanopyVariationV2"));
+                        TEXT("RaftSimTemperateCanopyStructureV3"));
                 }
             }
         }

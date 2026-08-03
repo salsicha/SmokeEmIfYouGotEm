@@ -94,12 +94,15 @@ def test_shared_temperate_canopy_breaks_repeated_geometry_and_placement() -> Non
     ).read_text(encoding="utf-8")
 
     assert "UMaterialExpressionPerInstanceRandom" in foliage_source
-    assert "bRainforestPalette ? 8 : 12" in foliage_source
-    assert "bRainforestPalette ? 16 : 24" in foliage_source
+    assert "constexpr int32 SatelliteLobeCount = 3" in foliage_source
+    assert "const int32 BranchCount = 6 + FMath::Clamp" in foliage_source
+    assert "const bool bStormShortenedBranch" in foliage_source
+    assert "const float ConiferCrownBodyScale" in foliage_source
+    assert "constexpr float TreeHeightCm = 850.0f" in foliage_source
     assert "0.88f" in foliage_source
     assert "1.13f" in foliage_source
     assert "constexpr int32 TemperateSpeciesPermutation = 7" in foliage_source
     assert "TemperateBlockOffset" in foliage_source
     assert "ZambeziVegetationUnitRandom(ClusterIndex, 9161)" in foliage_source
-    assert 'TEXT("RaftSimTemperateCanopyVariationV2")' in foliage_source
-    assert 'TEXT("RaftSimTemperateCanopyVariationV2")' in map_test_source
+    assert 'TEXT("RaftSimTemperateCanopyStructureV3")' in foliage_source
+    assert 'TEXT("RaftSimTemperateCanopyStructureV3")' in map_test_source

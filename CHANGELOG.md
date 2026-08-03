@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Rebuilt the shared runnable Futaleufú/Chilko fallback canopy as first-party
+  Structure V3 geometry. Compound asymmetric crownlets, varied and staggered
+  conifer whorls, overlapping distance-stable crown bodies, bounded shortened
+  limbs, and trunks that stop at the highest whorl replace the repeated
+  bare-pole/diamond-tip silhouette while preserving the four-form family,
+  6,200 instances per river, water and physics authority, and deterministic
+  placement. Both regenerated maps pass their focused native load contracts;
+  fixed-camera review accepts only an incremental fallback improvement because
+  species/ecology, close botanical detail, water, terrain, guide/art review, and
+  target-hardware performance gates remain open.
 - Pinned Zambezi in the versioned six-river Free Run progression contract.
   The manifest now binds `zambezi_batoka_gorge` to
   `zambezi_reference_run` and `/Game/RaftSim/Maps/L_Zambezi`, while focused

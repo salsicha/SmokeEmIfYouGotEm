@@ -120,6 +120,34 @@ exposed trunk tips, and wall-forming Nanite Preserve Area—none of which were
 promoted. Exact hashes, comparison metrics, artifacts, and remaining blockers
 are in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_canopy_v2_review.json`.
 
+## Temperate Canopy Structure V3
+
+Futaleufú and Chilko now replace each temperate fallback's single smooth crown
+ellipsoid with one distance-stable core and three deterministic embedded crown
+volumes. Conifers also vary branch count and azimuth, stagger whorl height, retain
+bounded storm-shortened limbs, and surround the branch skeleton with eleven
+overlapping asymmetric crown-body volumes. The trunk now ends at the highest
+whorl instead of protruding as a repeated spear above the foliage. Rainforest and
+Zambezi vegetation paths are unchanged.
+
+Both runnable maps retain the existing four-form family, 6,200 total instances,
+and 4,650/1,550 canopy-understory split. The editor builds, the focused source
+tests pass, and `RaftSim.P4.RiverMapLoads.L_Terminator` plus
+`RaftSim.P4.RiverMapLoads.L_LavaCanyon` each complete 1/1 with zero warnings or
+errors under the new `RaftSimTemperateCanopyStructureV3` saved-map assertion.
+Fixed-camera comparison changes 8.99-10.60 percent of pixels beyond an eight-level
+channel threshold and accepts the stronger continuous conifer silhouette as an
+incremental fallback improvement.
+
+This does not pass the photoreal gate. Only one broadleaf and one conifer
+morphology remain, close crown geometry is still procedural, the banks lack dense
+micro-ecology, and water remains too dark and uniform. The external tree audit did
+not promote any reviewed third-party set: the available assets either failed the
+active cameras or remain contract-limited to isolated comparison. Exact map and
+asset hashes, before/after frames, test reports, rejected brackets, and remaining
+external gates are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_canopy_structure_v3_review.json`.
+
 ## Chilko Native Water V1
 
 Lava Canyon's retained capture ribbon no longer reuses the shared South Fork
