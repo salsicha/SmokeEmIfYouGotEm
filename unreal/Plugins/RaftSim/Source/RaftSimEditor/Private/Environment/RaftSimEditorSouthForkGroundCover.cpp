@@ -468,6 +468,221 @@ int32 AddSouthForkGroundCoverInstances(
     return Placement.ClusterCount;
 }
 
+FVector GetSouthForkScannedGroundCoverScaleCalibration(int32 VariantIndex)
+{
+    // The publisher-authored forms vary from 0.39--0.92 m wide and
+    // 0.25--1.13 m tall. Normalize each selected form to roughly a 1.9 m
+    // patch footprint and 0.70 m height before applying the unchanged
+    // source-conditioned organic scale. This keeps the existing eight-metre
+    // placement lattice legible without inventing more ecology samples.
+    static const FVector Calibrations[] = {
+        FVector(2.25f, 2.25f, 2.80f),
+        FVector(2.70f, 2.70f, 1.65f),
+        FVector(3.40f, 3.40f, 1.60f),
+        FVector(4.90f, 4.90f, 0.72f),
+        FVector(2.10f, 2.10f, 1.05f),
+        FVector(3.45f, 3.45f, 0.70f),
+        FVector(4.65f, 4.65f, 0.62f),
+        FVector(3.50f, 3.50f, 1.27f)};
+    return Calibrations[FMath::Clamp(
+        VariantIndex, 0, UE_ARRAY_COUNT(Calibrations) - 1)];
+}
+
+int32 AddSouthForkScannedGroundCoverInstances(
+    UHierarchicalInstancedStaticMeshComponent* const* GroundCoverComponents,
+    int32 GroundCoverComponentCount,
+    const FVector& GroundLocation,
+    const FVector& GroundNormal,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity)
+{
+    if (!GroundCoverComponents || GroundCoverComponentCount <= 0)
+    {
+        return 0;
+    }
+    FSouthForkGroundCoverPlacement Placement =
+        ComputeSouthForkGroundCoverPlacement(
+            CoordinateIndex, Column, BankDistanceM, LateralSlope,
+            SourceDensity, GroundLocation);
+    if (!Placement.bAccepted && BankDistanceM >= 14.0f &&
+        BankDistanceM < 30.0f && LateralSlope <= 0.32f)
+    {
+        // The caller has already rejected solver/VFX wet cells. Fill only
+        // the remaining dry transition bench with a scanned presentation
+        // layer, leaving the legacy tuft's conservative 22 m limit intact.
+        const float SourceSignal = FMath::Clamp(
+            SourceDensity.A * 0.48f + SourceDensity.R * 0.12f +
+                SourceDensity.G * 0.24f + SourceDensity.B * 0.16f,
+            0.0f, 1.0f);
+        const float PatchNoise = 0.5f + 0.5f * FMath::PerlinNoise2D(
+            FVector2D(GroundLocation.X, GroundLocation.Y) / 2100.0f);
+        const float DryBenchFade =
+            FMath::SmoothStep(14.0f, 22.0f, BankDistanceM) *
+            (1.0f - FMath::SmoothStep(27.0f, 30.0f, BankDistanceM));
+        const float Probability = FMath::Clamp(
+            (0.34f + SourceSignal * 0.46f) *
+                FMath::Lerp(0.72f, 1.30f, PatchNoise) * DryBenchFade,
+            0.0f, 0.82f);
+        if (GroundCoverUnitRandom(CoordinateIndex, Column, 809) < Probability)
+        {
+            Placement.bAccepted = true;
+            Placement.ClusterCount = 3;
+            Placement.ClusterCount +=
+                GroundCoverUnitRandom(CoordinateIndex, Column, 811) <
+                FMath::Lerp(0.38f, 0.78f, SourceSignal);
+            Placement.ClusterCount +=
+                GroundCoverUnitRandom(CoordinateIndex, Column, 821) <
+                FMath::Lerp(0.24f, 0.62f, PatchNoise);
+            Placement.BaseScale = FMath::Lerp(
+                0.68f, 1.02f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, 823));
+        }
+    }
+    if (!Placement.bAccepted)
+    {
+        return 0;
+    }
+
+    const FVector SurfaceNormal = GroundNormal.GetSafeNormal(
+        UE_SMALL_NUMBER, FVector::UpVector);
+    const FVector Across(LeftNormal.X, LeftNormal.Y, 0.0f);
+    const FVector Along(Across.Y, -Across.X, 0.0f);
+    int32 AddedInstanceCount = 0;
+    for (int32 Cluster = 0; Cluster < Placement.ClusterCount; ++Cluster)
+    {
+        constexpr int32 PublisherVariantCount = 8;
+        const int32 VariantIndex = FMath::Abs(
+            CoordinateIndex * 31 + Column * 7 + Cluster * 11) %
+            FMath::Min(GroundCoverComponentCount, PublisherVariantCount);
+        UHierarchicalInstancedStaticMeshComponent* GroundCover =
+            GroundCoverComponents[VariantIndex];
+        if (!GroundCover)
+        {
+            continue;
+        }
+        const int32 Salt = 631 + Cluster * 29;
+        FVector Jitter =
+            Along * FMath::Lerp(
+                -380.0f, 380.0f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt)) +
+            Across * FMath::Lerp(
+                -340.0f, 340.0f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 2));
+        if (SurfaceNormal.Z > 0.25f)
+        {
+            Jitter.Z = -(
+                SurfaceNormal.X * Jitter.X + SurfaceNormal.Y * Jitter.Y) /
+                SurfaceNormal.Z;
+        }
+        const float Scale = Placement.BaseScale * FMath::Lerp(
+            0.82f, 1.18f,
+            GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 3));
+        const FVector OrganicScale(
+            Scale * FMath::Lerp(
+                0.82f, 1.22f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 5)),
+            Scale * FMath::Lerp(
+                0.84f, 1.18f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 7)),
+            Scale * FMath::Lerp(
+                0.64f, 1.08f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 11)));
+        const FVector InstanceScale = OrganicScale *
+            GetSouthForkScannedGroundCoverScaleCalibration(VariantIndex);
+        const FQuat SurfaceAlignment = FQuat::FindBetweenNormals(
+            FVector::UpVector, SurfaceNormal);
+        const FQuat OrganicRotation = FQuat(FRotator(
+            FMath::Lerp(
+                -4.0f, 4.0f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 13)),
+            GroundCoverUnitRandom(
+                CoordinateIndex, Column, Salt + 17) * 360.0f,
+            FMath::Lerp(
+                -4.0f, 4.0f,
+                GroundCoverUnitRandom(CoordinateIndex, Column, Salt + 19))));
+        GroundCover->AddInstance(
+            FTransform(
+                SurfaceAlignment * OrganicRotation,
+                GroundLocation + Jitter - SurfaceNormal * 6.0f,
+                InstanceScale),
+            /*bWorldSpace=*/true);
+        ++AddedInstanceCount;
+
+        // A second, independently jittered scanned form fills the broad gaps
+        // left by the legacy one-tuft-per-cluster representation. It remains
+        // within the same accepted source sample and adds no new ecology
+        // authority. Baseline review hides these satellite components.
+        const int32 SatelliteComponentIndex = PublisherVariantCount +
+            (VariantIndex + 3) % PublisherVariantCount;
+        if (GroundCoverComponentCount > SatelliteComponentIndex &&
+            GroundCoverComponents[SatelliteComponentIndex])
+        {
+            const int32 SatelliteSalt = Salt + 101;
+            FVector SatelliteJitter =
+                Along * FMath::Lerp(
+                    -430.0f, 430.0f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt)) +
+                Across * FMath::Lerp(
+                    -390.0f, 390.0f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt + 2));
+            if (SurfaceNormal.Z > 0.25f)
+            {
+                SatelliteJitter.Z = -(
+                    SurfaceNormal.X * SatelliteJitter.X +
+                    SurfaceNormal.Y * SatelliteJitter.Y) /
+                    SurfaceNormal.Z;
+            }
+            const float SatelliteScale = Placement.BaseScale * FMath::Lerp(
+                0.68f, 1.02f,
+                GroundCoverUnitRandom(
+                    CoordinateIndex, Column, SatelliteSalt + 3));
+            const FVector SatelliteOrganicScale(
+                SatelliteScale * FMath::Lerp(
+                    0.80f, 1.18f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt + 5)),
+                SatelliteScale * FMath::Lerp(
+                    0.82f, 1.16f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt + 7)),
+                SatelliteScale * FMath::Lerp(
+                    0.68f, 1.04f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt + 11)));
+            const int32 SatelliteVariantIndex =
+                SatelliteComponentIndex - PublisherVariantCount;
+            const FVector SatelliteInstanceScale = SatelliteOrganicScale *
+                GetSouthForkScannedGroundCoverScaleCalibration(
+                    SatelliteVariantIndex);
+            const FQuat SatelliteRotation = FQuat(FRotator(
+                FMath::Lerp(
+                    -4.0f, 4.0f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt + 13)),
+                GroundCoverUnitRandom(
+                    CoordinateIndex, Column, SatelliteSalt + 17) * 360.0f,
+                FMath::Lerp(
+                    -4.0f, 4.0f,
+                    GroundCoverUnitRandom(
+                        CoordinateIndex, Column, SatelliteSalt + 19))));
+            GroundCoverComponents[SatelliteComponentIndex]->AddInstance(
+                FTransform(
+                    SurfaceAlignment * SatelliteRotation,
+                    GroundLocation + SatelliteJitter - SurfaceNormal * 6.0f,
+                    SatelliteInstanceScale),
+                /*bWorldSpace=*/true);
+            ++AddedInstanceCount;
+        }
+    }
+    return AddedInstanceCount;
+}
+
 TArray<FVector> BuildSouthForkSmoothedTerrainPresentationNormals(
     const TArray<FVector>& Vertices,
     int32 Width,

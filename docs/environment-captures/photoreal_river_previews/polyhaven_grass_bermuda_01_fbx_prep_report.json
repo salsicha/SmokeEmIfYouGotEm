@@ -1,0 +1,34 @@
+{
+  "schema": "raftsim.reviewed_grass_bermuda_01_fbx_prep.v1",
+  "source_sha256": "ec188edf028e1a76ed2e63f7483165ea765f0212b317e4b73fdc3d64610500cd",
+  "output_sha256": "26922691fd6f21becacfd9aa5946feaefa97ac80d96aa9fe113eed8a3f8d4f87",
+  "removed_zero_area_forms": [
+    "grass_bermuda_01_single_a",
+    "grass_bermuda_01_single_b"
+  ],
+  "retained_mesh_forms": [
+    "grass_bermuda_01_dead_a",
+    "grass_bermuda_01_dead_b",
+    "grass_bermuda_01_flattened_a",
+    "grass_bermuda_01_medium_a",
+    "grass_bermuda_01_medium_b",
+    "grass_bermuda_01_medium_c",
+    "grass_bermuda_01_medium_d",
+    "grass_bermuda_01_medium_e",
+    "grass_bermuda_01_medium_f",
+    "grass_bermuda_01_seedling_a",
+    "grass_bermuda_01_seedling_b",
+    "grass_bermuda_01_seedling_c",
+    "grass_bermuda_01_seedling_d",
+    "grass_bermuda_01_small_a",
+    "grass_bermuda_01_small_b",
+    "grass_bermuda_01_small_c",
+    "grass_bermuda_01_small_d",
+    "grass_bermuda_01_small_e",
+    "grass_bermuda_01_small_f"
+  ],
+  "retained_mesh_form_count": 19,
+  "geometry_or_material_authorship_changed": false,
+  "preparation_script": "unreal/Scripts/prepare_reviewed_grass_bermuda_01_fbx.py",
+  "tool": "Blender 5.2 LTS background FBX import/export"
+}

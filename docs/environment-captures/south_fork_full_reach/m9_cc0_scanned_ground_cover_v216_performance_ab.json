@@ -1,0 +1,66 @@
+{
+  "artifact": "M9 South Fork CC0 scanned ground-cover V216 local performance A/B",
+  "recorded_local_date": "2026-08-03",
+  "protocol": "matched Unreal Engine 5.8 Development offscreen engineering diagnostic",
+  "hardware": {
+    "platform": "Mac",
+    "cpu": "Apple M5",
+    "gpu": "Apple M5",
+    "physical_memory_gb": 32
+  },
+  "profile": {
+    "map": "L_SouthForkAmerican_FullReach",
+    "resolution": [1920, 1080],
+    "screen_percentage": 60,
+    "scalability": 2,
+    "warmup_seconds": 5,
+    "sample_seconds": 15,
+    "render_offscreen": true,
+    "running_from_packaged_build": false,
+    "release_performance_qualification_eligible": false
+  },
+  "baseline": {
+    "description": "same saved map with every currently streamed Cc0ScannedGroundCover HISM hidden by the validation-only command-line switch",
+    "raw_report_sha256": "c5768e6a45e77f8078165f2ea4f3dabfe0b3b2970df412fe61fd1505a6d237d0",
+    "hidden_component_count": 16,
+    "hidden_streamed_instance_count": 40436,
+    "total_saved_map_scanned_instance_count": 442938,
+    "sampled_frame_count": 826,
+    "mean_frame_ms": 18.215299606323242,
+    "p95_frame_ms": 18.68695831298828,
+    "p95_render_thread_ms": 18.655332565307617,
+    "p95_gpu_ms": 18.51354217529297,
+    "hitches_over_33_ms": 0,
+    "average_solver_step_ms": 0.2399030327796936,
+    "peak_used_physical_mb": 7317.5830078125,
+    "frame_budget_passed": false,
+    "solver_budget_passed": true,
+    "memory_budget_passed": true,
+    "gpu_timing_measurement_passed": true
+  },
+  "candidate": {
+    "description": "same saved map and profile with the streamed scanned ground-cover layer visible",
+    "raw_report_sha256": "41de32d93e09e490ceb5f9a76b27cc403a82fa854c42a6076bc51203d771bd3f",
+    "sampled_frame_count": 807,
+    "mean_frame_ms": 18.65214729309082,
+    "p95_frame_ms": 19.105207443237305,
+    "p95_render_thread_ms": 19.09195899963379,
+    "p95_gpu_ms": 18.939790725708008,
+    "hitches_over_33_ms": 0,
+    "average_solver_step_ms": 0.23977287113666534,
+    "peak_used_physical_mb": 7639.5205078125,
+    "frame_budget_passed": false,
+    "solver_budget_passed": true,
+    "memory_budget_passed": true,
+    "gpu_timing_measurement_passed": true
+  },
+  "comparison": {
+    "candidate_minus_baseline_p95_ms": 0.41824913024902344,
+    "candidate_minus_baseline_p95_percent": 2.2381873135464803,
+    "candidate_minus_baseline_peak_memory_mb": 321.9375,
+    "candidate_regression_budget_passed": true,
+    "candidate_regression_budget_rule": "local diagnostic delta below 0.5 ms with no new hitch, solver, memory, map, profile, or GPU-timing failure",
+    "sixty_fps_full_map_gate_passed": false
+  },
+  "decision": "Retain the technical foliage candidate. It adds 0.418 ms p95 in the matched local diagnostic and stays within the milestone regression allowance, but both A and B miss the 16.667 ms full-map frame budget. This does not close packaged windowed desktop or target-VR performance acceptance."
+}

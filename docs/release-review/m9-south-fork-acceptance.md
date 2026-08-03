@@ -2310,6 +2310,38 @@ progression are unchanged. Named environment-art, geospatial, and South Fork gui
 remain open. Exact hashes and the fail-closed verdict are recorded in
 `docs/environment-captures/south_fork_full_reach/m9_organic_bank_mosaic_v2_review.json`.
 
+## CC0 scanned ground-cover V216 — layered bank breakup retained, external review open
+
+The organic-bank mosaic still exposed broad bare tan shelves between one repeated synthetic
+tuft family. V216 retains all 220,759 project-owned tufts and adds 442,938 non-colliding
+instances from eight selected forms in the CC0 Poly Haven Grass Bermuda 01 family. The
+publisher morphology is generic only: the registered vegetation-density raster, deterministic
+patch field, bank distance, slope screen, and solver/VFX wet mask retain placement authority.
+Interleaved four-metre samples are permitted only for scanned cover below 34 m; every legacy
+ecology, cobble, rock, collision, and gameplay layer remains on its prior eight-metre lattice.
+
+![Scanned ground-cover candidate at Meat Grinder](../environment-captures/south_fork_full_reach/photographic_v216_cc0_scanned_ground_cover/meat_grinder_guide_eye.png)
+
+![Scanned ground-cover candidate at Coloma Bridge](../environment-captures/south_fork_full_reach/photographic_v216_cc0_scanned_ground_cover/coloma_bridge_context.png)
+
+The exact-camera baseline hides only the scanned layer. The retained candidate keeps the
+upright procedural grass silhouette and adds lower scanned litter/grass breakup, with the
+largest greater-than-eight RGB change fraction at Meat Grinder (0.004341). No grass-on-water,
+black wall, or neon-card artifact was observed in the five fixed frames. Collision, terrain,
+water, hydraulics, navigation, raft, and crew authority are unchanged.
+
+This remains a technical environment improvement, not photoreal acceptance. The terrain,
+trees, water, lighting, mid-story, and exact local-species match remain inadequate; named
+environment-art, ecology, geospatial, and South Fork guide approval plus final desktop/VR
+performance evidence remain open. A matched 1920×1080 local offscreen diagnostic hides all
+16 currently streamed scanned components (40,436 instances) for its baseline: baseline and
+candidate measure 18.687 ms and 19.105 ms p95, respectively. The 0.418 ms candidate delta
+stays below the milestone's 0.5 ms regression allowance with no hitches and passing solver,
+memory, and GPU-timing checks, but both runs miss the 16.667 ms full-map budget. This is not
+packaged-window or VR qualification. Source hashes, rejected experiments, exact capture hashes,
+the A/B performance record, and the fail-closed verdict are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_scanned_ground_cover_v216_review.json`.
+
 ## Closed-finger paddle grip V1 — shaft-aware wrap retained, external review open
 
 The V36 grip put the middle-palm anchor on the solved paddle point, but that metric did not

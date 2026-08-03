@@ -1,5 +1,6 @@
 #include "RaftSimContentLockDirector.h"
 
+#include "Components/InstancedStaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
@@ -775,8 +776,34 @@ void ARaftSimContentLockDirector::StartPerformanceCapture(
     CapturedRenderThreadMilliseconds.Reset();
     CapturedGpuMilliseconds.Reset();
     InvalidGpuTimingSampleCount = 0;
+    BaselineHiddenScannedGroundCoverComponentCount = 0;
+    BaselineHiddenScannedGroundCoverInstanceCount = 0;
     LastGameDeltaMilliseconds = 0.0f;
     LastPerformanceTickSeconds = FPlatformTime::Seconds();
+
+    if (FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCc0ScannedGroundCoverBaselineReview")))
+    {
+        if (UWorld* World = GetWorld())
+        {
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                TInlineComponentArray<UInstancedStaticMeshComponent*> Components(*It);
+                for (UInstancedStaticMeshComponent* Component : Components)
+                {
+                    if (Component != nullptr && Component->GetName().StartsWith(
+                            TEXT("Cc0ScannedGroundCover")))
+                    {
+                        Component->SetVisibility(false, true);
+                        ++BaselineHiddenScannedGroundCoverComponentCount;
+                        BaselineHiddenScannedGroundCoverInstanceCount +=
+                            Component->GetInstanceCount();
+                    }
+                }
+            }
+        }
+    }
 
     float RequestedScreenPercentage = 0.0f;
     if (FParse::Value(
@@ -1079,6 +1106,15 @@ void ARaftSimContentLockDirector::FinishPerformanceCapture()
     Report->SetBoolField(
         TEXT("performance_profile_requirement_passed"),
         bPresentationProfilePass);
+    Report->SetBoolField(
+        TEXT("scanned_ground_cover_hidden_for_baseline"),
+        BaselineHiddenScannedGroundCoverComponentCount > 0);
+    Report->SetNumberField(
+        TEXT("baseline_hidden_scanned_ground_cover_component_count"),
+        BaselineHiddenScannedGroundCoverComponentCount);
+    Report->SetNumberField(
+        TEXT("baseline_hidden_scanned_ground_cover_instance_count"),
+        BaselineHiddenScannedGroundCoverInstanceCount);
     Report->SetNumberField(
         TEXT("effective_time_dilation"),
         GetWorldSettings() != nullptr

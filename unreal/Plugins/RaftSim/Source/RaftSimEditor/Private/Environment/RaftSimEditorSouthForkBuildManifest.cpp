@@ -69,6 +69,27 @@ bool WriteSouthForkFullReachBuildManifest(
         TEXT("solver wet-mask alpha gaps filled only where decoded terrain is 0.03-0.25 m below decoded water; partial cells emitted only when every dry vertex is inside the 0.05 m terrain-clipped bank skirt; deep gaps omitted; visual only, no collision or hydraulics"));
     BuildRoot->SetBoolField(
         TEXT("far_field_geography_complete"), Metrics.FarFieldPatchCount == 8);
+    BuildRoot->SetBoolField(
+        TEXT("cc0_scanned_ground_cover_v1"),
+        Metrics.Cc0ScannedGroundCoverInstanceCount > 0);
+    BuildRoot->SetNumberField(TEXT("cc0_scanned_ground_cover_mesh_forms"), 8);
+    BuildRoot->SetNumberField(
+        TEXT("cc0_scanned_ground_cover_imported_family_forms"), 19);
+    BuildRoot->SetNumberField(
+        TEXT("cc0_scanned_ground_cover_import_build_scale"), 1000.0);
+    BuildRoot->SetNumberField(
+        TEXT("cc0_scanned_ground_cover_forms_per_source_cluster"), 2.0);
+    BuildRoot->SetStringField(
+        TEXT("cc0_scanned_ground_cover_normalized_patch_target"),
+        TEXT("approximately 1.9 m footprint by 0.70 m height before source-conditioned organic scale"));
+    BuildRoot->SetStringField(
+        TEXT("cc0_scanned_ground_cover_dry_transition_band_m"),
+        TEXT("14-30; interleaved four-metre lateral samples only below 34 m; solver/VFX wet-mask cells excluded before placement"));
+    BuildRoot->SetBoolField(
+        TEXT("cc0_scanned_ground_cover_nanite_enabled"), false);
+    BuildRoot->SetStringField(
+        TEXT("cc0_scanned_ground_cover_authority"),
+        TEXT("Poly Haven Grass Bermuda 01 CC0 morphology used only as non-colliding visual ground cover at the retained source-conditioned clusters plus a bounded dry transition bench; the vegetation-density raster, solver/VFX wet exclusion, bank band, slope screen, and deterministic patch field retain placement authority; no exact South Fork species or ecology claim; no collision, terrain, water, hydraulic, or raft authority"));
     BuildRoot->SetObjectField(
         TEXT("procedural_far_field_microrelief"),
         BuildSouthForkInferredFarFieldReliefManifest());
@@ -135,6 +156,9 @@ bool WriteSouthForkFullReachBuildManifest(
         TEXT("procedural_noncolliding_ground_cover_instances"),
         Metrics.GroundCoverInstanceCount);
     MetricRoot->SetNumberField(
+        TEXT("cc0_noncolliding_scanned_ground_cover_instances"),
+        Metrics.Cc0ScannedGroundCoverInstanceCount);
+    MetricRoot->SetNumberField(
         TEXT("spray_mist_instances"), Metrics.SprayMistInstanceCount);
     MetricRoot->SetNumberField(
         TEXT("infrastructure_actors"), Metrics.InfrastructureActorCount);
@@ -163,7 +187,8 @@ bool WriteSouthForkFullReachBuildManifest(
         TEXT("Full reach: %d terrain tiles, %d water tiles, %d solver-foam overlays, "
              "%lld procedurally completed "
              "shoreline vertices, %lld shoreline transition cells, %d foliage, "
-             "%d ground-cover tufts, "
+             "%d project-owned ground-cover tufts, "
+             "%d scanned ground-cover overlay instances, "
              "%d boulders, %d overlap-suppressed boulder presentation instances, "
              "%d spray/mist instances, %d infrastructure actors.\n"),
         Metrics.TerrainTileCount,
@@ -173,6 +198,7 @@ bool WriteSouthForkFullReachBuildManifest(
         Metrics.ProceduralShorelineTransitionCellCount,
         Metrics.FoliageInstanceCount,
         Metrics.GroundCoverInstanceCount,
+        Metrics.Cc0ScannedGroundCoverInstanceCount,
         Metrics.BoulderInstanceCount,
         Metrics.BoulderOverlapSuppressedInstanceCount,
         Metrics.SprayMistInstanceCount,

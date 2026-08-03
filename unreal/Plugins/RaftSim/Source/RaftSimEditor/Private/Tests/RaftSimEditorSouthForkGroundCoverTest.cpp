@@ -99,6 +99,39 @@ bool FRaftSimSouthForkOrganicGroundPresentationTest::RunTest(
     TestTrue(TEXT("Dry-bank cover retains deterministic open ground"),
         AcceptedDryBankSamples <= 850);
 
+    const TCHAR* ScannedGroundCoverPaths[] = {
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_dead_a.SM_GrassBermuda01_grass_bermuda_01_dead_a"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_dead_b.SM_GrassBermuda01_grass_bermuda_01_dead_b"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_flattened_a.SM_GrassBermuda01_grass_bermuda_01_flattened_a"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_medium_a.SM_GrassBermuda01_grass_bermuda_01_medium_a"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_medium_c.SM_GrassBermuda01_grass_bermuda_01_medium_c"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_medium_d.SM_GrassBermuda01_grass_bermuda_01_medium_d"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_medium_f.SM_GrassBermuda01_grass_bermuda_01_medium_f"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/SM_GrassBermuda01_grass_bermuda_01_small_c.SM_GrassBermuda01_grass_bermuda_01_small_c")};
+    for (int32 VariantIndex = 0;
+         VariantIndex < UE_ARRAY_COUNT(ScannedGroundCoverPaths);
+         ++VariantIndex)
+    {
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(
+            nullptr, ScannedGroundCoverPaths[VariantIndex]);
+        TestNotNull(
+            *FString::Printf(
+                TEXT("Reviewed scanned grass form %d loads"),
+                VariantIndex + 1),
+            Mesh);
+        const FVector Calibration =
+            GetSouthForkScannedGroundCoverScaleCalibration(VariantIndex);
+        TestTrue(
+            *FString::Printf(
+                TEXT("Scanned grass form %d has positive calibration"),
+                VariantIndex + 1),
+            Calibration.X > 0.0f && Calibration.Y > 0.0f &&
+                Calibration.Z > 0.0f);
+    }
+    TestTrue(TEXT("Scanned ground-cover calibration is deterministic"),
+        GetSouthForkScannedGroundCoverScaleCalibration(4).Equals(
+            GetSouthForkScannedGroundCoverScaleCalibration(4)));
+
     return true;
 }
 

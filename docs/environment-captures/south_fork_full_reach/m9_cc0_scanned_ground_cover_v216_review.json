@@ -1,0 +1,145 @@
+{
+  "artifact": "M9 South Fork CC0 scanned ground-cover V216 review",
+  "recorded_local_date": "2026-08-03",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_environment_art_ecology_geospatial_guide_and_performance_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "The retained organic-bank mosaic still left broad tan banks with one visibly synthetic tuft family. V216 keeps all 220,759 project-owned tufts and layers 442,938 conventional-raster CC0 scanned grass instances across eight production forms. Placement remains conditioned by the registered vegetation-density raster, deterministic patch noise, bank distance, slope, and the solver/VFX wet exclusion. Interleaved four-metre lateral samples are allowed only below 34 m to resolve the dry shoreline transition bench; all larger ecology, cobble, rock, collision, and gameplay layers retain the original eight-metre lattice. The fixed frames show materially more irregular low cover at Meat Grinder, Troublemaker, and Coloma without observed grass on water. The coarse DEM, repeated tree silhouettes, broad smooth water, sparse mid-story, generic rather than species-reviewed grass, and synthetic lighting still fail photoreal acceptance.",
+  "source": {
+    "asset": "Poly Haven Grass Bermuda 01",
+    "author": "Rico Cilliers",
+    "license": "CC0 1.0 Universal",
+    "product_page": "https://polyhaven.com/a/grass_bermuda_01",
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/polyhaven_grass_bermuda_01_source_manifest.json",
+    "fbx_preparation_report": "docs/environment-captures/photoreal_river_previews/polyhaven_grass_bermuda_01_fbx_prep_report.json",
+    "unreal_import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_grass_bermuda_01_import_report.json",
+    "generic_morphology_only": true,
+    "exact_south_fork_species_claim": false
+  },
+  "implementation": {
+    "runnable_map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "imported_mesh_forms": 19,
+    "production_mesh_forms": 8,
+    "project_owned_tuft_instances_retained": 220759,
+    "cc0_scanned_ground_cover_instances": 442938,
+    "forms_per_accepted_source_cluster": 2,
+    "normalized_patch_target": "approximately 1.9 m footprint by 0.70 m height before deterministic organic scale",
+    "build_scale": 1000.0,
+    "nanite_enabled": false,
+    "nanite_reason": "6-28 triangle masked cards preserve thin silhouettes under conventional instanced raster rendering",
+    "legacy_ecology_sampling_m": 8.0,
+    "scanned_dry_transition_sampling_m": 4.0,
+    "scanned_dry_transition_bank_band_m": [14.0, 30.0],
+    "larger_ecology_minimum_bank_distance_m": 34.0,
+    "wet_cell_rule": "solver/VFX mask alpha greater than 0.1 is rejected before any ground-cover placement",
+    "collision": "NoCollision",
+    "cull_end_cm": 140000,
+    "cast_shadow": false
+  },
+  "authority": {
+    "visual_presentation_only": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "water_material_changed": false,
+    "hydraulics_changed": false,
+    "navigation_changed": false,
+    "raft_or_crew_physics_changed": false,
+    "source_registration_retained": true,
+    "vegetation_density_source_retained": true,
+    "species_or_ecology_authority": false
+  },
+  "objective_capture_comparison": [
+    {
+      "capture": "chili_bar_launch_downstream",
+      "baseline_sha256": "83bb3544ccb3de5ea091ee5ae42f871a5d73e6a8488843b57924371ab87844b1",
+      "candidate_sha256": "c985c9a162ce3239120bdffd0fde5a6530163002555736227391387088079807",
+      "changed_pixel_fraction_gt8": 0.002176,
+      "mean_absolute_rgb_delta": 0.069724
+    },
+    {
+      "capture": "coloma_bridge_context",
+      "baseline_sha256": "ce03b891b968f35aed4c2c662604110c73c717c82a6fad8422e0fe12b1efc881",
+      "candidate_sha256": "f5ff89839d4f9da54f2f67218d7d16e95bf29f98d854e722191964ca484efaa7",
+      "changed_pixel_fraction_gt8": 0.002524,
+      "mean_absolute_rgb_delta": 0.087449
+    },
+    {
+      "capture": "meat_grinder_guide_eye",
+      "baseline_sha256": "e546e68799d7bb7dd62aaed9cee1a4c8bdc35fd488fff1f0999c7cfcda022d85",
+      "candidate_sha256": "2d7dd6923f3a013473b5b09639418c15e9d2a1144ee6e005ec9d1144e1517571",
+      "changed_pixel_fraction_gt8": 0.004341,
+      "mean_absolute_rgb_delta": 0.199785
+    },
+    {
+      "capture": "salmon_falls_takeout",
+      "baseline_sha256": "ecf82d04a2d071cc24fa3581fe21fafe48796d687a1f4051058c164016a47cf5",
+      "candidate_sha256": "73d2d7b930a5a904b48a1d480cf16c4329ec31ed98902a21a631071420382dba",
+      "changed_pixel_fraction_gt8": 0.001444,
+      "mean_absolute_rgb_delta": 0.047521
+    },
+    {
+      "capture": "troublemaker_approach",
+      "baseline_sha256": "a2db4e32e2c54412fe382ca31cd324f7caf6e629db57a1320f1395907fb5e818",
+      "candidate_sha256": "5abf46e9e9ca7f052da25301e9b82c47ec752404a9fd8ef62a60c2742788ebad",
+      "changed_pixel_fraction_gt8": 0.000454,
+      "mean_absolute_rgb_delta": 0.013222
+    }
+  ],
+  "capture_metric_note": "Changed pixels use maximum RGB delta greater than 8 across exact fixed cameras. The metric proves the layer rendered; visual review determines whether the change reads as useful ground cover and does not imply photoreal quality.",
+  "review_decision": {
+    "retained": true,
+    "reason": "The layered candidate preserves the existing upright grass silhouette while adding lower scanned litter and grass breakup that is visible in the three bank-dominant fixed frames.",
+    "observed_water_overlap": false,
+    "observed_black_or_neon_card_wall": false,
+    "canonical_capture_promotion": true
+  },
+  "rejected_experiments": [
+    "Poly Haven Shrub 02 at 2,255, 9,589, 8,996, and 72,957 instances: rejected because the fixed frames changed by at most 0.30 percent and the thicket cost did not produce a meaningful visual gain.",
+    "Scanned grass as a one-for-one replacement: rejected because publisher-scale forms disappeared and removed the more legible legacy tuft silhouette.",
+    "Dimension-normalized scanned-only replacement: rejected because it read as sparse brown patches rather than a complete ground layer.",
+    "Nanite on 6-28 triangle masked grass cards: rejected because the thin forms were eliminated at guide-eye distance."
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with Unreal Engine 5.8",
+    "map_generation": "13 terrain tiles, 39 water tiles, 220759 retained project-owned tufts, and 442938 scanned overlay instances generated without environment-automation errors",
+    "focused_native": "RaftSim.M9.EGroundCoverOrganicPresentation passed; Automation index SHA-256 60ab6fae2cef98662013577f068bb68f15aae603a5143a7f871cb3d06d1f69c7",
+    "renderer_enabled_full_reach": "RaftSim.M7.ZFullReachPresentation passed; Automation index SHA-256 9d2e7e7a07c8fbb0b3a3ff6d15483d4b1205686a0bce85981f29f1fd1bbebc84",
+    "focused_python": "physics/tests/test_photoreal_south_fork_cc0_scanned_ground_cover.py passed 4 tests including the fail-closed performance-evidence assertions",
+    "graphify": "graphify update completed after the final source change: 175963 nodes, 200349 edges, and 14803 communities",
+    "local_performance_ab": "docs/environment-captures/south_fork_full_reach/m9_cc0_scanned_ground_cover_v216_performance_ab.json",
+    "desktop_performance": "matched local offscreen Development A/B measured 18.687 ms baseline and 19.105 ms candidate p95; the 0.418 ms foliage delta passes the milestone regression allowance, but both runs fail the 16.667 ms full-map budget and are not packaged-window qualification",
+    "vr_performance": "pending external acceptance gate"
+  },
+  "photoreal_rejection_reasons": [
+    "The 30 m/derived terrain remains broad, smooth, and visibly procedural at bank scale.",
+    "The scanned morphology is generic Bermuda grass and has not been approved as a South Fork species or ecology match.",
+    "The eight selected grass forms still repeat and do not supply roots, leaf litter, woody debris, flowering forbs, or reviewed shrub species at photographic density.",
+    "Tree crowns and trunks remain visibly repeated and lack convincing mid-story depth.",
+    "Water remains broad and smooth with sparse, repeated rapid relief and foam cues.",
+    "Lighting, atmosphere, bridge detail, and distant terrain do not match a guide-approved photographic reference set.",
+    "The matched local diagnostic records a 0.418 ms p95 and 321.94 MB peak-memory candidate delta, but both baseline and candidate miss the 16.667 ms full-map frame budget; packaged windowed desktop and target-VR qualification remain open."
+  ],
+  "reviewers": {
+    "named_environment_art_reviewer": null,
+    "named_ecology_reviewer": null,
+    "named_geospatial_reviewer": null,
+    "named_south_fork_guide_reviewer": null,
+    "environment_art_approval": false,
+    "ecology_approval": false,
+    "geospatial_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "A named environment-art reviewer must approve or replace the ground-cover scale, density, material response, repetition, and composition across all five fixed frames.",
+    "A named ecology reviewer must approve the scanned forms as a plausible seasonal South Fork visual analog or replace them with species-reviewed local vegetation.",
+    "A named geospatial reviewer must confirm the bounded dry transition placement does not imply surveyed ecology or navigation authority.",
+    "A named South Fork guide must approve bank and hazard readability at Chili Bar, Meat Grinder, Coloma Bridge, Troublemaker, and Salmon Falls.",
+    "Optimize the exact-current full map below the 16.667 ms p95 desktop budget, then pass a packaged Shipping windowed soak with the scanned layer enabled; the local offscreen A/B is diagnostic only.",
+    "Pass measured target-VR wall-clock, GPU, memory, comfort, and hazard-readability performance gates with the scanned layer enabled.",
+    "The wider product-owner, water, character, safety, accessibility, packaging, signing, media, and distribution acceptance gates remain open."
+  ]
+}

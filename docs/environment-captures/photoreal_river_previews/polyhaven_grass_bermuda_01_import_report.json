@@ -1,0 +1,36 @@
+{
+  "schema": "raftsim.unreal.reviewed_biome_asset_import.v1",
+  "asset_id": "polyhaven_grass_bermuda_01_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "source_page": "https://polyhaven.com/a/grass_bermuda_01",
+  "license": "CC0",
+  "author": "Rico Cilliers",
+  "verified_source_file_count": 6,
+  "imported_mesh_form_count": 19,
+  "production_mesh_form_count": 8,
+  "triangle_count_lod0_range": [6, 28],
+  "effective_height_cm_range": [24.741, 146.851],
+  "effective_width_cm_range": [21.383, 91.619],
+  "build_scale": [1000.0, 1000.0, 1000.0],
+  "nanite_enabled": false,
+  "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/M_GrassBermuda01_Foliage.M_GrassBermuda01_Foliage",
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/T_GrassBermuda01_BaseColor_1K.T_GrassBermuda01_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/T_GrassBermuda01_NormalGL_1K.T_GrassBermuda01_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/T_GrassBermuda01_Opacity_1K.T_GrassBermuda01_Opacity_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/T_GrassBermuda01_Roughness_1K.T_GrassBermuda01_Roughness_1K"
+  ],
+  "production_mesh_forms": [
+    "dead_a",
+    "dead_b",
+    "flattened_a",
+    "medium_a",
+    "medium_c",
+    "medium_d",
+    "medium_f",
+    "small_c"
+  ],
+  "authority": "generic scanned morphology only; no exact South Fork species, ecology, terrain, water, collision, navigation, hydraulic, or raft-force authority"
+}

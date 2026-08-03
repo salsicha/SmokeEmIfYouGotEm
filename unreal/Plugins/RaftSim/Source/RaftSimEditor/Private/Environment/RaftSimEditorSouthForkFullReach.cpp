@@ -892,6 +892,61 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         ? GeneratedInteriorLiveOakMesh
         : BroadleafMesh;
     UStaticMesh* ShrubMesh = GeneratedDeerbrushMesh;
+    constexpr int32 ScannedGroundCoverVariantCount = 8;
+    constexpr int32 ScannedGroundCoverComponentCount =
+        ScannedGroundCoverVariantCount * 2;
+    UStaticMesh* ScannedGroundCoverMeshes[ScannedGroundCoverVariantCount] = {
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_dead_a."
+                 "SM_GrassBermuda01_grass_bermuda_01_dead_a")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_dead_b."
+                 "SM_GrassBermuda01_grass_bermuda_01_dead_b")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_flattened_a."
+                 "SM_GrassBermuda01_grass_bermuda_01_flattened_a")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_a."
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_a")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_c."
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_c")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_d."
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_d")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_f."
+                 "SM_GrassBermuda01_grass_bermuda_01_medium_f")),
+        LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/"
+                 "SM_GrassBermuda01_grass_bermuda_01_small_c."
+                 "SM_GrassBermuda01_grass_bermuda_01_small_c"))};
+    for (UStaticMesh* ScannedGroundCoverMesh : ScannedGroundCoverMeshes)
+    {
+        if (!ScannedGroundCoverMesh)
+        {
+            OutSummary += TEXT(
+                "Rights-reviewed CC0 scanned ground-cover family is incomplete; refusing a procedural fallback.\n");
+            return false;
+        }
+    }
+    OutSummary += TEXT(
+        "Using eight rights-reviewed CC0 scanned grass forms for source-conditioned ground-cover morphology; species and ecology authority remain with project data.\n");
     UStaticMesh* ProductionRockMesh = nullptr;
     UMaterialInterface* ProductionRockMaterial = nullptr;
     if (!LoadSouthForkProductionRockPresentation(
@@ -908,11 +963,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     UStaticMesh* GroundCoverMesh = nullptr;
     UMaterialInterface* GroundCoverMaterial = nullptr;
     if (!CreateSouthForkGroundCoverAssets(
-            // This tiny first-party asset is the visible ground-cover source
-            // of truth. Re-author it even when the expensive terrain meshes
-            // are reused so an organic-ground iteration cannot retain a stale
-            // tuft silhouette or material.
-            World, /*bReuseExistingAssets=*/false,
+            World, /*bReuseExistingAssets=*/true,
             GroundCoverMesh, GroundCoverMaterial, OutSummary))
     {
         return false;
@@ -1125,6 +1176,29 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             /*CullStartCm=*/0, /*CullEndCm=*/140000,
             ECollisionEnabled::NoCollision,
             /*bEnableDensityScaling=*/false, /*bCastShadow=*/false);
+        UHierarchicalInstancedStaticMeshComponent*
+            ScannedGroundCoverComponents[ScannedGroundCoverComponentCount] = {};
+        for (int32 VariantIndex = 0;
+             VariantIndex < ScannedGroundCoverComponentCount; ++VariantIndex)
+        {
+            const bool bSatellite =
+                VariantIndex >= ScannedGroundCoverVariantCount;
+            const int32 MeshVariantIndex =
+                VariantIndex % ScannedGroundCoverVariantCount;
+            const FString ComponentName = bSatellite
+                ? FString::Printf(
+                    TEXT("Cc0ScannedGroundCoverSatellite%02d"),
+                    MeshVariantIndex + 1)
+                : FString::Printf(
+                    TEXT("Cc0ScannedGroundCoverPrimary%02d"),
+                    MeshVariantIndex + 1);
+            ScannedGroundCoverComponents[VariantIndex] = AddHism(
+                DressingActor, DressingRoot, *ComponentName,
+                ScannedGroundCoverMeshes[MeshVariantIndex], nullptr,
+                /*CullStartCm=*/0, /*CullEndCm=*/140000,
+                ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/false, /*bCastShadow=*/false);
+        }
         UHierarchicalInstancedStaticMeshComponent* Spray = AddHism(
             DressingActor, DressingRoot, TEXT("SolverAuthoredSprayMist"),
             SprayMesh, SprayMaterial, 90000, 260000,
@@ -1169,11 +1243,15 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 continue;
             }
             const FSouthForkCoordinatePoint& Point = CoordinatePoints[CoordinateIndex];
-            for (int32 Column = 2; Column < Width - 2; Column += 2)
+            for (int32 Column = 2; Column < Width - 2; ++Column)
             {
                 const int32 Index = Row * Width + Column;
                 const float LateralM = -256.0f + 4.0f * Column;
-                if (FMath::Abs(LateralM) < 24.0f ||
+                // Only the scanned, non-colliding ground-cover layer may
+                // inspect the 14--24 m dry transition bench. The wet/VFX
+                // mask below still rejects water, and every larger ecology,
+                // cobble, and rock layer retains its later 34 m gate.
+                if (FMath::Abs(LateralM) < 14.0f ||
                     FMath::Abs(LateralM) > DetailedTerrainHalfWidthM ||
                     VfxImage.Pixels[Index].A > 0.1f)
                 {
@@ -1196,14 +1274,36 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     DecodeSouthForkHeightM(TerrainHeight.Values[RightHeightIndex], TerrainMinimumM, TerrainMaximumM) -
                     DecodeSouthForkHeightM(TerrainHeight.Values[LeftHeightIndex], TerrainMinimumM, TerrainMaximumM)) / 8.0f;
                 const float BankDistanceM = FMath::Abs(LateralM);
-                Metrics.GroundCoverInstanceCount +=
-                    AddSouthForkGroundCoverInstances(
-                        GroundCover, Location, TerrainNormals[Index],
-                        Point.LeftNormal, CoordinateIndex, Column,
-                        BankDistanceM, LateralSlope, Density);
-                // Preserve the reviewed minimum distance for trees, shrubs,
-                // cobble, and larger rocks. Only low grass extends into the
-                // 24--34 m transition bench.
+                const bool bPrimaryEcologySample = Column % 2 == 0;
+                if (bPrimaryEcologySample)
+                {
+                    Metrics.GroundCoverInstanceCount +=
+                        AddSouthForkGroundCoverInstances(
+                            GroundCover, Location, TerrainNormals[Index],
+                            Point.LeftNormal, CoordinateIndex, Column,
+                            BankDistanceM, LateralSlope, Density);
+                }
+                if (bPrimaryEcologySample || BankDistanceM < 34.0f)
+                {
+                    Metrics.Cc0ScannedGroundCoverInstanceCount +=
+                        AddSouthForkScannedGroundCoverInstances(
+                            ScannedGroundCoverComponents,
+                            ScannedGroundCoverComponentCount,
+                            Location, TerrainNormals[Index], Point.LeftNormal,
+                            CoordinateIndex, Column, BankDistanceM,
+                            LateralSlope, Density);
+                }
+                // Interleaved four-metre samples exist only to resolve the
+                // dry scanned shoreline underlayer. All legacy ecology,
+                // cobble, rock, and infrastructure retain the eight-metre
+                // sampling lattice.
+                if (!bPrimaryEcologySample)
+                {
+                    continue;
+                }
+                // Preserve the reviewed minimum distance for trees, cobble,
+                // and larger rocks. The non-colliding grass presentation may
+                // extend into the 24--34 m transition bench.
                 if (BankDistanceM < 34.0f)
                 {
                     continue;
@@ -2830,7 +2930,8 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
     World->SendAllEndOfFrameUpdates();
     FlushRenderingCommands();
     TArray<TPair<TWeakObjectPtr<UPrimitiveComponent>, bool>> SourceCaptureVisibilityStates;
-    ConfigureSouthForkSettledSourceCaptureVisibility(World, SourceCaptureVisibilityStates, OutSummary);
+    ConfigureSouthForkSettledSourceCaptureVisibility(
+        World, SourceCaptureVisibilityStates, OutSummary);
     TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>
         TerrainDetailV2ReviewMaterialStates;
     TArray<FSouthForkShoreRockReviewComponentState>
@@ -2973,7 +3074,8 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
             Pair.Key->SetMaterial(0, Pair.Value.Get());
         }
     }
-    RestoreSouthForkSettledSourceCaptureVisibility(SourceCaptureVisibilityStates);
+    RestoreSouthForkSettledSourceCaptureVisibility(
+        SourceCaptureVisibilityStates);
     RestoreSouthForkFullReachReviewLayers(
         TerrainDetailV2ReviewMaterialStates,
         PolyHavenShoreRockReviewStates,
