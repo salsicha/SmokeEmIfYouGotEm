@@ -35,6 +35,9 @@ REVIEW = MANIFEST.with_name(
 RAPID_LACE_REVIEW = MANIFEST.with_name(
     "futaleufu_live_rapid_lace_v1_review.json"
 )
+COLD_WATER_VOLUME_CORE_REVIEW = MANIFEST.with_name(
+    "cold_water_live_volume_core_v2_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -78,6 +81,9 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
     ):
         assert token in catalog
     for token in (
+        "bEnableLiveSolverVolumeCore = true",
+        "LiveSurfaceCalmCoverage = 0.035f",
+        "LiveSurfaceActiveCoverage = 0.14f",
         "LiveSkyReflectionStrength = 0.34f",
         "LiveRippleStrength = 0.30f",
         "LiveFoamIntensity = 0.68f",
@@ -90,6 +96,7 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
     ):
         assert token in geometry
     for parameter in (
+        "bEnableLiveSolverVolumeCore",
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
@@ -103,6 +110,10 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveFoamIntensity",
     ):
         assert f'TEXT("{parameter}")' in runtime
+    assert "bUsesMigratedColdWaterVolumeCore" in runtime
+    assert 'TEXT("futaleufu_river_chile")' in runtime
+    assert "kLiveVolumeCoreMinimumStationCoverage = 0.60f" in runtime
+    assert "MinimumCellStationCoverage" in runtime
 
 
 def test_futaleufu_manifest_records_native_capture_water() -> None:
@@ -218,6 +229,49 @@ def test_futaleufu_live_rapid_lace_review_is_hash_locked_and_fail_closed() -> No
     assert review["chilko_lava_canyon_rejected_bracket"][
         "visible_rapid_foam_vertices"
     ] == 0
+    assert len(review["required_external_acceptance_gates"]) == 6
+
+    # The later rapid-approach and volume-core reviews supersede only the
+    # versioned Lava Canyon map package from this two-river historical review.
+    # Continue hash-locking the Terminator map, material, and all captures this
+    # review still owns instead of rewriting its original evidence payload.
+    superseded_artifacts = {"unreal/Content/RaftSim/Maps/L_LavaCanyon.umap"}
+    for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_artifacts:
+            continue
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
+
+
+def test_cold_water_volume_core_v2_review_is_hash_locked_and_honest() -> None:
+    review = json.loads(COLD_WATER_VOLUME_CORE_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.cold_water_live_volume_core_review.v2"
+    )
+    assert review["passed"] is False
+    decision = review["decision"]
+    assert decision["futaleufu_reference_runnable"] is True
+    assert decision["chilko_reference_runnable"] is True
+    assert decision["technical_candidate_passed"] is True
+    assert decision["volume_core_retained"] is True
+    assert decision["photoreal_acceptance_passed"] is False
+    assert decision["hydraulics_changed"] is False
+    assert decision["collision_or_raft_forces_changed"] is False
+    assert review["architecture"]["minimum_core_station_coverage"] == 0.60
+    assert review["architecture"]["lateral_core_rule"] == (
+        "all four sampled cell vertices must be wet"
+    )
+    assert review["live_pie_evidence"]["futaleufu_terminator"][
+        "volume_core_triangles"
+    ] == 2438
+    assert review["live_pie_evidence"]["chilko_lava_canyon"][
+        "volume_core_triangles"
+    ] == 1632
+    assert review["visual_comparison"]["futaleufu_terminator"][
+        "retained_water_band_blue_minus_red"
+    ] > 0.0
     assert len(review["required_external_acceptance_gates"]) == 6
 
     for artifact in review["retained_artifacts"]:

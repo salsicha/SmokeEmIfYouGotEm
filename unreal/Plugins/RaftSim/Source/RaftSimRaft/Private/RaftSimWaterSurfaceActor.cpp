@@ -24,10 +24,11 @@ constexpr float kPresentationFoamFroudeRange = 1.18f;
 // river metres. Keep the moving solver patch in the same river-coordinate
 // basis so normal-map scale does not stretch or pop as the grid recentres.
 constexpr float kWaterTextureRepeatMeters = 3.0f;
-// The opaque optical core stops inside the translucent bank feather. At the
-// production three-metre spacing this removes every cell touching a sampled
-// dry vertex while leaving the detail surface to bridge the final soft edge.
-constexpr float kLiveVolumeCoreMinimumCoverage = 0.60f;
+// The opaque optical core is station-clipped before the rectangular moving
+// window ends, but it reaches the complete sampled wet bank. Requiring four
+// wet corners is the lateral mask; applying the combined alpha here instead
+// would leave an artificial three-metre dry strip beside the water.
+constexpr float kLiveVolumeCoreMinimumStationCoverage = 0.60f;
 constexpr float kLiveVolumeCoreOffsetCm = 1.0f;
 constexpr float kLiveVolumeCoreCalmDetailCoverage = 0.035f;
 constexpr float kLiveVolumeCoreActiveDetailCoverage = 0.14f;
@@ -587,16 +588,22 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     ResolvedActiveLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveSurfaceActiveCoverage, 0.0f, 1.0f)
         : 0.0f;
+    const bool bUsesMigratedColdWaterVolumeCore =
+        // Backward-compatible rollout for already-versioned cold-water maps.
+        // Future regeneration persists the explicit flag; unique cooked-field
+        // identities keep Colorado and Pacuare on their reviewed carriers
+        // until they receive separate visual acceptance.
+        RiverWaterConfig &&
+        (RiverWaterConfig->CookedFieldsDir.Contains(
+             TEXT("chilko_river_lava_canyon"),
+             ESearchCase::CaseSensitive) ||
+         RiverWaterConfig->CookedFieldsDir.Contains(
+             TEXT("futaleufu_river_chile"),
+             ESearchCase::CaseSensitive));
     bLiveVolumeCoreEnabled =
         bLiveSurfaceCarrierEnabled &&
         (RiverWaterConfig->bEnableLiveSolverVolumeCore ||
-            // Backward-compatible pilot migration for the already-versioned
-            // Lava Canyon package. Future regeneration persists the explicit
-            // flag; the unique cooked-field identity keeps every other river
-            // on its reviewed carrier until separately accepted.
-            RiverWaterConfig->CookedFieldsDir.Contains(
-                TEXT("chilko_river_lava_canyon"),
-                ESearchCase::CaseSensitive)) &&
+            bUsesMigratedColdWaterVolumeCore) &&
         LiveVolumeCoreMaterial != nullptr;
     if (bLiveVolumeCoreEnabled)
     {
@@ -2146,12 +2153,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
-    // Build the opaque optical body only from quads whose four corners are wet
-    // and already inside the continuous edge feather. Topology changes only
-    // when the moving window recentres or a wet/dry boundary changes; ordinary
-    // 15 Hz refreshes update vertices without recooking the section. The core
-    // remains one centimetre under the translucent detail surface, has no
-    // collision, and cannot participate in sampling, buoyancy, D3, or D4.
+    // Build the transmitting optical body only from quads whose four corners
+    // are wet, then clip its moving-window ends with the station feather.
+    // Topology changes only when the moving window recentres or a wet/dry
+    // boundary changes; ordinary 15 Hz refreshes update vertices without
+    // recooking the section. The core remains one centimetre under the detail
+    // surface, has no collision, and cannot participate in sampling, buoyancy,
+    // D3, or D4.
     if (bLiveVolumeCoreEnabled &&
         LiveVolumeCoreVertices.Num() == Vertices.Num())
     {
@@ -2168,11 +2176,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const bool bFullyWetCell =
                     WetVertexMask[I0] != 0 && WetVertexMask[I1] != 0 &&
                     WetVertexMask[I2] != 0 && WetVertexMask[I3] != 0;
-                const float MinimumCellCoverage = FMath::Min(
-                    FMath::Min(VertexColors[I0].A, VertexColors[I1].A),
-                    FMath::Min(VertexColors[I2].A, VertexColors[I3].A));
+                const float MinimumCellStationCoverage = FMath::Min(
+                    ComputeStationEdgeCoverage(
+                        X,
+                        GridStationN,
+                        VertexSpacingMeters,
+                        CurvedGridEdgeBlendMeters),
+                    ComputeStationEdgeCoverage(
+                        X + 1,
+                        GridStationN,
+                        VertexSpacingMeters,
+                        CurvedGridEdgeBlendMeters));
                 if (!bFullyWetCell ||
-                    MinimumCellCoverage < kLiveVolumeCoreMinimumCoverage)
+                    MinimumCellStationCoverage <
+                        kLiveVolumeCoreMinimumStationCoverage)
                 {
                     continue;
                 }

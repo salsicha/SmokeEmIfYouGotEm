@@ -1735,8 +1735,13 @@ bool AddLandscapeCandidateRunnableGameplay(
     }
     else if (bFutaleufuTerminator)
     {
-        WaterConfig->LiveSurfaceCalmCoverage = 0.89f;
-        WaterConfig->LiveSurfaceActiveCoverage = 0.98f;
+        // Terminator has the same reviewed cold-water sheet defect as Chilko
+        // and five interior solver breaking sites. Its bank-clipped volume
+        // core supplies optical depth while this low-coverage skin retains
+        // geometric normals, rapid colour response, and the soft bank edge.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
         WaterConfig->LiveSurfaceSpecular = 0.34f;
         WaterConfig->LiveSurfaceRoughness = 0.28f;
         WaterConfig->LiveSkyReflectionStrength = 0.34f;

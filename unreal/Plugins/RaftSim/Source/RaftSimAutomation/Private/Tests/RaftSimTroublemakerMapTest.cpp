@@ -165,17 +165,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
             bUsesSolverOwnedVisibleRiver);
         if (bUsesSolverOwnedVisibleRiver)
         {
-            if (bChilkoLavaCanyonReferenceRun)
+            if (bChilkoLavaCanyonReferenceRun ||
+                bFutaleufuTerminatorReferenceRun)
             {
                 Test->TestTrue(
-                    TEXT("Chilko enables the wet-cell-clipped optical core"),
+                    TEXT("accepted cold-water river enables the wet-cell-clipped optical core"),
                     It->IsLiveVolumeCoreEnabled());
                 Test->TestTrue(
-                    TEXT("Chilko optical core has visible wet-cell triangles"),
+                    TEXT("accepted cold-water optical core has visible wet-cell triangles"),
                     It->IsLiveVolumeCoreVisible() &&
                         It->GetLiveVolumeCoreTriangleCount() > 0);
                 Test->TestTrue(
-                    TEXT("Chilko detail skin stays below opaque-sheet coverage"),
+                    TEXT("accepted cold-water detail skin stays below opaque-sheet coverage"),
                     It->GetCalmLiveSurfaceCoverage() < 0.10f);
             }
             else
@@ -1032,8 +1033,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Futaleufu solver owns the visible gameplay river"),
                 (*It)->bLiveSolverOwnsRuntimeRendering);
             Test->TestTrue(
-                TEXT("Futaleufu visible carrier has complete calm-water coverage"),
-                (*It)->LiveSurfaceCalmCoverage >= 0.80f);
+                TEXT("Futaleufu enables or safely migrates the bank-clipped Single Layer Water core"),
+                (*It)->bEnableLiveSolverVolumeCore ||
+                    (*It)->CookedFieldsDir.Contains(
+                        TEXT("futaleufu_river_chile"),
+                        ESearchCase::CaseSensitive));
+            if ((*It)->bEnableLiveSolverVolumeCore)
+            {
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu config stores restrained calm detail coverage"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceCalmCoverage, 0.035f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu config stores active-water detail response"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceActiveCoverage, 0.14f, 0.001f));
+            }
             Test->TestTrue(
                 TEXT("Futaleufu live sky reflection stays restrained"),
                 FMath::IsNearlyEqual(
