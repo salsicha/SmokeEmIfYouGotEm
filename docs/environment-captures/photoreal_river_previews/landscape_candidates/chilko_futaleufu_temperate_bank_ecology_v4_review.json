@@ -1,0 +1,162 @@
+{
+  "schema": "raftsim.environment.temperate_bank_ecology_review.v4",
+  "generated_on": "2026-08-02",
+  "status": "accepted_incremental_first_party_bank_ecology_v4_photoreal_gate_still_open",
+  "passed": false,
+  "runtime_artifacts_promoted": true,
+  "photoreal_production_promoted": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false,
+    "promotion": "retain_v4_as_a_non_authoritative_runtime_fallback_keep_photoreal_and_species_claims_review_gated"
+  },
+  "implementation": {
+    "runtime_tag": "RaftSimTemperateBankEcologyV4",
+    "near_bank_tag": "RaftSimTemperateNearBankEcologyV4",
+    "shared_material": "/Game/RaftSim/Environment/TemperateRivers/Vegetation/Materials/M_RaftSim_Temperate_OpaqueVegetation",
+    "morphology_mesh_count": 8,
+    "morphologies_per_form": 2,
+    "forms": [
+      "broadleaf_tree",
+      "conifer_tree",
+      "riparian_shrub",
+      "grass_forb_ground_cover"
+    ],
+    "legacy_distribution_instances_per_river": 6200,
+    "near_bank_target_instances_per_river": 1800,
+    "near_bank_placed_instances_per_river": 1800,
+    "near_bank_rejected_instances_per_river": 0,
+    "total_vegetation_instances_per_river": 8000,
+    "canopy_instances_per_river": 4650,
+    "understory_instances_per_river": 3350,
+    "candidate_search_count_per_target": 64,
+    "maximum_slope_degrees": 38.0,
+    "placement": "source_landscape_grounded_full_centerline_screened_dry_bank_only_outside_complete_visible_water_width",
+    "collision": "disabled",
+    "authority": "presentation_only_procedural_gap_fill_no_species_ecology_survey_collision_hydraulic_bathymetry_or_raft_force_authority"
+  },
+  "rivers": [
+    {
+      "river_id": "futaleufu_terminator",
+      "map_package": "/Game/RaftSim/Maps/L_Terminator",
+      "map_sha256": "298ab569e18a66a43c95b124fa12beb76cb6ec79c536f2b0aa45b74817a7ccb8",
+      "runtime_test": "RaftSim.P4.RiverMapLoads.L_Terminator",
+      "runtime_test_result": "1/1 success, 0 warnings, 0 errors",
+      "runtime_test_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_temperate_bank_ecology_v4_map_load.json",
+      "manifest": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "manifest_near_bank_placed": 1800,
+      "manifest_near_bank_rejected": 0,
+      "captures": {
+        "guide_seat": {
+          "baseline_sha256": "7e6ac01a5cfbea3da5e06d524e6b3fb09829732c22293e57938fa05194bff8bb",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
+          "candidate_sha256": "92b593d7ded103b32f1cdefb91420cf4f77c46143d6625cbcbbfba6dd6e35e8b",
+          "mean_absolute_rgb_delta": 2.721910,
+          "pixels_any_channel_gt_8_percent": 6.261068
+        },
+        "river_eye": {
+          "baseline_sha256": "05b0123a35f7f3af5439bf9e142daa1f71b9d03267b79ed9a670410c419a5d5d",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
+          "candidate_sha256": "ce1385c28769db44bc3f3a37dea02a3db5f46605dfde56834c46f52cd9ec79c5",
+          "mean_absolute_rgb_delta": 3.030117,
+          "pixels_any_channel_gt_8_percent": 6.834310
+        }
+      }
+    },
+    {
+      "river_id": "chilko_river_lava_canyon",
+      "map_package": "/Game/RaftSim/Maps/L_LavaCanyon",
+      "map_sha256": "79746336d6fe37ef50ae647404cf771641c1cb62a3a7a94e395db452336749d8",
+      "runtime_test": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+      "runtime_test_result": "1/1 success, 0 warnings, 0 errors",
+      "runtime_test_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_temperate_bank_ecology_v4_map_load.json",
+      "manifest": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "manifest_near_bank_placed": 1800,
+      "manifest_near_bank_rejected": 0,
+      "captures": {
+        "guide_seat": {
+          "baseline_sha256": "be40066765a3dfd34f46ce52bc678cb7851ce67b864bd4d61057fa5d57d0d7f3",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+          "candidate_sha256": "f63107a04dae58467b016f6af94886d1f522852722affa69014f39c41b26e7c8",
+          "mean_absolute_rgb_delta": 3.240507,
+          "pixels_any_channel_gt_8_percent": 6.561306
+        },
+        "river_eye": {
+          "baseline_sha256": "eda070c055da715ae903e29afcda5fbf298f05250928703ae388e94dbfdb5375",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+          "candidate_sha256": "1059df4a5a46f7710c80b2a6def6e8cd31132664ef2e4ccb16f6d5e1065a436f",
+          "mean_absolute_rgb_delta": 3.205986,
+          "pixels_any_channel_gt_8_percent": 6.346788
+        }
+      }
+    }
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "runtime_map_tests": "2/2 succeeded with zero warnings or errors",
+    "m9_material_tests": "14/14 succeeded with zero warnings or errors",
+    "m9_material_test_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_bank_ecology_v4_m9_material_tests.json",
+    "python_tests": "156/156 focused Futaleufu, Chilko, and temperate environment tests passed",
+    "protected_user_artifact_audit": "75/75 byte-identical after both isolated generation runs"
+  },
+  "accepted_findings": [
+    "Both fixed-view pairs show a denser grass, forb, and shrub transition between waterline rocks and the wider canopy instead of the previous empty bank-to-tree jump.",
+    "Each temperate form now alternates between two baked deterministic silhouettes; the B forms change branch seed, proportions, crown width, height, and growth lean before normals are rebuilt.",
+    "Both runnable maps preserve live solver water, the player raft, game mode, terrain collision, and the 4,650-tree canopy count while increasing understory from 1,550 to 3,350 instances.",
+    "Every near-bank target passed full-route centerline, dry-height, and slope screening, and all instance components remain non-colliding."
+  ],
+  "remaining_photoreal_defects": [
+    "The eight first-party vegetation meshes are still visibly low-detail procedural forms rather than production botanical scans with authored LODs.",
+    "Near-bank cover improves density but does not yet supply reach-specific species assemblages, leaf litter, roots, deadwood, moss, sediment, or wetness transitions.",
+    "Large bank benches remain smooth and broad because the available 30 m elevation sources cannot resolve surveyed sub-meter shoreline geometry.",
+    "Near-field water remains dark and opaque, with understated holes, rollers, waves, aeration, spray, and rapid-specific foam structure.",
+    "Wind response, seasonal state, age-class variation, and biome-specific material response are absent.",
+    "Hydraulics remain unconverged against measured water levels and named-rapid guide observations.",
+    "No qualified local rafting guide, geospatial reviewer, ecologist, environment artist, water-VFX reviewer, or target-hardware reviewer has accepted the result."
+  ],
+  "required_external_acceptance_gates": [
+    "Qualified Futaleufu and Chilko rafting guides accept route identity, rapid readability, bank character, and hazard presentation in the runnable views.",
+    "A geospatial reviewer accepts DEM alignment, coordinate transforms, route stationing, and the separation between sourced terrain and procedural gap fill.",
+    "A regional ecologist or qualified environment-art specialist accepts the species mix, density, age classes, season, wetness, and disturbance pattern for both reaches.",
+    "A water-VFX and environment-art review accepts water opacity, waves, holes, rollers, aeration, spray, foam, bank transitions, geology, and close-range asset quality.",
+    "Measured hydraulic evidence accepts the reference flow bands, water-surface elevations, velocities, Froude behavior, and rapid-specific features without presentation geometry standing in for physics.",
+    "Measured desktop and VR profiles pass release frame-time, memory, streaming, shader, and comfort budgets on named target hardware."
+  ],
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_Terminator.umap", "sha256": "298ab569e18a66a43c95b124fa12beb76cb6ec79c536f2b0aa45b74817a7ccb8"},
+    {"path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap", "sha256": "79746336d6fe37ef50ae647404cf771641c1cb62a3a7a94e395db452336749d8"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json", "sha256": "15526263a397818e1bbd200efbf4c004ca5a4051279ce5f0ac11af5a53c3d058"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json", "sha256": "d6f37ae9633c8dabf6d0be4241c4ba13d6fc6ec5f5a4ea5e9c2c3f0e8983fdb4"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png", "sha256": "92b593d7ded103b32f1cdefb91420cf4f77c46143d6625cbcbbfba6dd6e35e8b"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png", "sha256": "ce1385c28769db44bc3f3a37dea02a3db5f46605dfde56834c46f52cd9ec79c5"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png", "sha256": "92b593d7ded103b32f1cdefb91420cf4f77c46143d6625cbcbbfba6dd6e35e8b"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png", "sha256": "f63107a04dae58467b016f6af94886d1f522852722affa69014f39c41b26e7c8"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png", "sha256": "1059df4a5a46f7710c80b2a6def6e8cd31132664ef2e4ccb16f6d5e1065a436f"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png", "sha256": "f63107a04dae58467b016f6af94886d1f522852722affa69014f39c41b26e7c8"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_temperate_bank_ecology_v4_map_load.json", "sha256": "072160f24d6153c2a84bc39fdadea40e0ddd91082572f3bd83dc7538f496140e"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_temperate_bank_ecology_v4_map_load.json", "sha256": "95fc97d1fc413d6ac7c4114eda955c8d2b13f2175c35f31de69c46a2ddc11469"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_bank_ecology_v4_m9_material_tests.json", "sha256": "2cad4d5930f0b6c018751cf5083ec0e27159d404224c3e5793358186075bae99"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_futaleufuterminator_physicalcorridor_SourceLandscapeCandidate.uasset", "sha256": "bd72a4f16f0fc500f04a6ffa7687d96995c95384004b972b2ed2f8b777e4cb8d"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_chilkoriverlavacanyon_physicalcorridor_SourceLandscapeCandidate.uasset", "sha256": "32cc47c65230e6cad7e818c133224e86d6d0681cc944a1328577b5a882a13670"},
+    {"path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater.uasset", "sha256": "8bf7ac2848d978fdfea2829e541f1bdd122ea7a9f89e739c49499f684b9466b1"},
+    {"path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater.uasset", "sha256": "4bad68acfab0848948b427a7a839f9da40e0efea0bd32762c3ed9218fa27a7a9"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate.uasset", "sha256": "5caf77534a486cc7e937899025a3b5fa515fd5cabfdf11531f714f634a9479ce"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate.uasset", "sha256": "818206a1d6513604e94973586d8b620f83676c3efaa924a2b68348bcb65b5441"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Materials/M_RaftSim_Temperate_OpaqueVegetation.uasset", "sha256": "7f8ed2b4285c9fc190fb79fea55955ad68ae77ad63ba8bbd5157dfc45e40df71"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_BroadleafTree_A_OpaqueV1.uasset", "sha256": "4912cd85aaaec426663993943ccc7375df9855ce880894dace58a4ef9af3caed"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_BroadleafTree_B_OpaqueV1.uasset", "sha256": "757487ac54fc23484e32b508fc2276e8fb7771435b09ed23b8752c07366359b5"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_ConiferTree_A_OpaqueV1.uasset", "sha256": "84e8e6f472b80e9092e28b0c34c366dcc3cb8e6b21a086def441773d51d62dad"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_ConiferTree_B_OpaqueV1.uasset", "sha256": "0ed4983fe975fc8088388ec5f3663fce7cb216c1f5867723cd4e28a223449785"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_GroundCover_A_OpaqueV1.uasset", "sha256": "cc1a471b30e83e7fbe6ea5a47e95e856d396e7b6fae5b30c6b34ee303bca7ddf"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_GroundCover_B_OpaqueV1.uasset", "sha256": "3a37152ba331e6456184d341609ec5d046883081fe1276870acf33eeb52dae7d"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_RiparianShrub_A_OpaqueV1.uasset", "sha256": "6a9f5a00f6bb24f44e8219b52a9100265a90a733960df5e711d415556a84a653"},
+    {"path": "unreal/Content/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/SM_RaftSim_Temperate_RiparianShrub_B_OpaqueV1.uasset", "sha256": "87ba37354e54be1fd2d3a7ccfd15c8b93662d2990814fef16b4522a9322c219b"}
+  ]
+}

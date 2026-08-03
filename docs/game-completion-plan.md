@@ -3966,3 +3966,19 @@ path is verified, and the completion goal can be marked complete.
   anatomy and expression, garment/arm/hand/PPE intersections, materials, and
   missing named character-art, qualified whitewater-safety, and product-owner
   approval keep M9 and photoreal release promotion open.
+- Futaleufú/Chilko temperate bank ecology V4 replaces the shared four-mesh
+  fallback with eight baked deterministic morphology meshes and adds 1,800
+  source-Landscape-grounded dry-bank grass/forb/shrub patches per runnable map.
+  Both `L_Terminator` and `L_LavaCanyon` retain their 4,650-tree canopy, live
+  solver water, terrain/collision, player raft, and game mode while total
+  vegetation increases from 6,200 to 8,000. Full-centerline clearance, dry
+  height, and 38-degree slope gates place 1,800/1,800 patches with zero rejects
+  in each river. The editor build, two focused runtime-map gates, 14 native M9
+  terrain/water audits, and 156 focused Futaleufú/Chilko/temperate Python
+  contracts pass. The fixed views
+  show a denser bank-to-tree transition and genuine silhouette variation, but
+  the retained review remains fail-closed for procedural botanical detail,
+  coarse smooth banks, dark opaque water, sparse rapid hydraulics/VFX,
+  incomplete local ecology, and all six external acceptance gates. The layer is
+  non-colliding presentation-only gap fill and changes no DEM, bathymetry,
+  water geometry, hydraulic state, collision, or raft force.

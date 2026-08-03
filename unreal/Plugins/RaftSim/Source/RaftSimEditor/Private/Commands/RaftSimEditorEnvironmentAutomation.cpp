@@ -575,12 +575,24 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
         const FString DressingConvertedSpeciesJson =
             bUsesOpaqueVolumetricVegetation
-            ? FString::Printf(
-                  TEXT("[\"%s\", \"%s\", \"%s\", \"%s\"]"),
-                  *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
-                  *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
-                  *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
-                  *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath))
+            ? ((bUsesFutaleufuOrganicTemperateSurface ||
+                bUsesChilkoOrganicLavaCanyonSurface)
+                   ? FString::Printf(
+                         TEXT("[\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"]"),
+                         *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingBroadleafVariantAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingConiferVariantAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingShrubVariantAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingUnderstoryVariantAssetPath))
+                   : FString::Printf(
+                         TEXT("[\"%s\", \"%s\", \"%s\", \"%s\"]"),
+                         *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
+                         *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath)))
             : TEXT("[\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"]");
         const FString DefaultBroadleafMaterialAsset = FString::Printf(
             TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate"),
@@ -703,6 +715,11 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_conifer_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_shrub_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_understory_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_broadleaf_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_conifer_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_shrub_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_understory_variant_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_morphology_mesh_count\": %d,\n")
             TEXT("      \"landscape_dressing_trunk_asset\": null,\n")
             TEXT("      \"landscape_dressing_instance_implementation\": \"%s\",\n")
             TEXT("      \"landscape_dressing_boulder_instance_count\": %d,\n")
@@ -715,6 +732,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_temperate_waterline_maximum_slope_degrees\": %.3f,\n")
             TEXT("      \"landscape_dressing_temperate_waterline_target_height_range_m\": [0.22, 2.60],\n")
             TEXT("      \"landscape_dressing_temperate_waterline_placement_contract\": \"deterministic_72_candidate_source_landscape_search_across_both_full_route_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_authority\": \"presentation_only_procedural_source_gap_fill_no_species_survey_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_placement_contract\": \"deterministic_64_candidate_source_landscape_search_across_both_full_route_dry_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_authority\": \"presentation_only_generic_rock_analog_no_lithology_collision_hydraulic_or_raft_force_authority\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_target_instance_count\": %d,\n")
@@ -982,6 +1007,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
             *EscapeRaftSimJsonString(Result.DressingShrubAssetPath),
             *EscapeRaftSimJsonString(Result.DressingUnderstoryAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingBroadleafVariantAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingConiferVariantAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingShrubVariantAssetPath),
+            *EscapeRaftSimJsonString(Result.DressingUnderstoryVariantAssetPath),
+            (bUsesFutaleufuOrganicTemperateSurface ||
+             bUsesChilkoOrganicLavaCanyonSurface)
+                ? 8
+                : 0,
             bUsesOpaqueVolumetricVegetation
                 ? TEXT("project_owned_opaque_volumetric_nanite_species_hierarchical_instancing_plus_river_specific_rock_dressing")
                 : bUsesColoradoOrganicHanceSurface
@@ -1003,6 +1036,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingTemperateWaterlineRejectedPlacementCount,
             Result.DressingTemperateWaterlineMinimumCenterlineDistanceCm,
             Result.DressingTemperateWaterlineMaximumSlopeDegrees,
+            Result.DressingTemperateNearBankTargetInstanceCount > 0
+                ? TEXT("source_grounded_dry_bank_grass_forb_shrub_ecology_v4_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingTemperateNearBankTargetInstanceCount,
+            Result.DressingTemperateNearBankInstanceCount,
+            Result.DressingTemperateNearBankRejectedPlacementCount,
+            Result.DressingTemperateNearBankMinimumCenterlineDistanceCm,
+            Result.DressingTemperateNearBankMaximumSlopeDegrees,
             Result.DressingRunnableLaunchTalusTargetInstanceCount > 0
                 ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_launch_talus_captured")
                 : TEXT("not_enabled_for_this_river"),
@@ -1019,7 +1060,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 : TEXT("required_source_masks_missing"),
             Result.bDressingFoliageMaterialsValidated
                 ? (bUsesOpaqueVolumetricVegetation
-                       ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards")
+                       ? ((bUsesFutaleufuOrganicTemperateSurface ||
+                           bUsesChilkoOrganicLavaCanyonSurface)
+                              ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_eight_volumetric_morphology_meshes_no_alpha_cards")
+                              : TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards"))
                        : bUsesColoradoOrganicHanceSurface
                        ? TEXT("three_legacy_pve_material_assets_retained_with_zero_instances_plus_one_project_owned_opaque_one_sided_hance_dryland_material_bound_to_ground_cover_and_shrub_forms")
                        : TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained"))

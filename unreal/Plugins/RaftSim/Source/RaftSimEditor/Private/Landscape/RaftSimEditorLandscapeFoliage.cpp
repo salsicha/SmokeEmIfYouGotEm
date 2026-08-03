@@ -41,6 +41,9 @@ constexpr float ZambeziRunnableLaunchTalusSlopeCeilingDegrees = 48.0f;
 constexpr int32 TemperateWaterlineStructureTargetInstanceCount = 1440;
 constexpr int32 TemperateWaterlineStructureMinimumInstanceCount = 1250;
 constexpr float TemperateWaterlineStructureSlopeCeilingDegrees = 55.0f;
+constexpr int32 TemperateNearBankEcologyTargetInstanceCount = 1800;
+constexpr int32 TemperateNearBankEcologyMinimumInstanceCount = 1600;
+constexpr float TemperateNearBankEcologySlopeCeilingDegrees = 38.0f;
 constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
     "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
 constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
@@ -987,6 +990,7 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
     const TCHAR* MeshRoot,
     const TCHAR* ProfileLabel,
     bool bRainforestPalette,
+    bool bSecondaryMorphology,
     FString& OutSummary)
 {
     if (!World || !AssetToken || !Material)
@@ -1552,6 +1556,42 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
         }
     }
 
+    if (bSecondaryMorphology && !bRainforestPalette)
+    {
+        // The B family is a different deterministic plant silhouette, not an
+        // instance-scale variation. Seeded branch/crown placement above is
+        // combined with form-specific proportions and a bounded growth lean.
+        // The transform is baked into the mesh before normals are recomputed.
+        for (FVector& Vertex : Vertices)
+        {
+            const float HeightT = FMath::Clamp(Vertex.Z / 1100.0f, 0.0f, 1.0f);
+            if (Form == ETemperateVegetationForm::ConiferTree)
+            {
+                Vertex.X = Vertex.X * 0.80f + 44.0f * HeightT * HeightT;
+                Vertex.Y *= 0.87f;
+                Vertex.Z *= 1.18f;
+            }
+            else if (Form == ETemperateVegetationForm::BroadleafTree)
+            {
+                Vertex.X = Vertex.X * 0.79f - 38.0f * HeightT * HeightT;
+                Vertex.Y *= 0.93f;
+                Vertex.Z *= 1.16f;
+            }
+            else if (Form == ETemperateVegetationForm::RiparianShrub)
+            {
+                Vertex.X = Vertex.X * 1.22f + 18.0f * HeightT;
+                Vertex.Y *= 0.76f;
+                Vertex.Z *= 1.08f;
+            }
+            else
+            {
+                Vertex.X *= 1.18f;
+                Vertex.Y *= 0.82f;
+                Vertex.Z *= 0.86f;
+            }
+        }
+    }
+
     if (Vertices.IsEmpty() || Triangles.IsEmpty() ||
         Colors.Num() != Vertices.Num() || Uvs.Num() != Vertices.Num())
     {
@@ -1601,10 +1641,14 @@ UStaticMesh* CreateTemperateOpaqueVegetationMesh(
 
 bool CreateTemperateOpaqueVegetationAssets(
     UWorld* World,
-    UStaticMesh*& OutBroadleafTree,
-    UStaticMesh*& OutConiferTree,
-    UStaticMesh*& OutShrub,
-    UStaticMesh*& OutGroundCover,
+    UStaticMesh*& OutBroadleafTreeA,
+    UStaticMesh*& OutBroadleafTreeB,
+    UStaticMesh*& OutConiferTreeA,
+    UStaticMesh*& OutConiferTreeB,
+    UStaticMesh*& OutShrubA,
+    UStaticMesh*& OutShrubB,
+    UStaticMesh*& OutGroundCoverA,
+    UStaticMesh*& OutGroundCoverB,
     UMaterialInterface*& OutMaterial,
     FString& OutSummary)
 {
@@ -1619,7 +1663,7 @@ bool CreateTemperateOpaqueVegetationAssets(
     {
         return false;
     }
-    OutBroadleafTree = CreateTemperateOpaqueVegetationMesh(
+    OutBroadleafTreeA = CreateTemperateOpaqueVegetationMesh(
         World,
         TEXT("SM_RaftSim_Temperate_BroadleafTree_A_OpaqueV1"),
         ETemperateVegetationForm::BroadleafTree,
@@ -1628,8 +1672,20 @@ bool CreateTemperateOpaqueVegetationAssets(
         TemperateVegetationMeshRoot,
         TEXT("temperate-river"),
         false,
+        false,
         OutSummary);
-    OutConiferTree = CreateTemperateOpaqueVegetationMesh(
+    OutBroadleafTreeB = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Temperate_BroadleafTree_B_OpaqueV1"),
+        ETemperateVegetationForm::BroadleafTree,
+        6113,
+        OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
+        true,
+        OutSummary);
+    OutConiferTreeA = CreateTemperateOpaqueVegetationMesh(
         World,
         TEXT("SM_RaftSim_Temperate_ConiferTree_A_OpaqueV1"),
         ETemperateVegetationForm::ConiferTree,
@@ -1638,8 +1694,20 @@ bool CreateTemperateOpaqueVegetationAssets(
         TemperateVegetationMeshRoot,
         TEXT("temperate-river"),
         false,
+        false,
         OutSummary);
-    OutShrub = CreateTemperateOpaqueVegetationMesh(
+    OutConiferTreeB = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Temperate_ConiferTree_B_OpaqueV1"),
+        ETemperateVegetationForm::ConiferTree,
+        6217,
+        OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
+        true,
+        OutSummary);
+    OutShrubA = CreateTemperateOpaqueVegetationMesh(
         World,
         TEXT("SM_RaftSim_Temperate_RiparianShrub_A_OpaqueV1"),
         ETemperateVegetationForm::RiparianShrub,
@@ -1648,8 +1716,20 @@ bool CreateTemperateOpaqueVegetationAssets(
         TemperateVegetationMeshRoot,
         TEXT("temperate-river"),
         false,
+        false,
         OutSummary);
-    OutGroundCover = CreateTemperateOpaqueVegetationMesh(
+    OutShrubB = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Temperate_RiparianShrub_B_OpaqueV1"),
+        ETemperateVegetationForm::RiparianShrub,
+        6317,
+        OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
+        true,
+        OutSummary);
+    OutGroundCoverA = CreateTemperateOpaqueVegetationMesh(
         World,
         TEXT("SM_RaftSim_Temperate_GroundCover_A_OpaqueV1"),
         ETemperateVegetationForm::GroundCover,
@@ -1658,9 +1738,23 @@ bool CreateTemperateOpaqueVegetationAssets(
         TemperateVegetationMeshRoot,
         TEXT("temperate-river"),
         false,
+        false,
+        OutSummary);
+    OutGroundCoverB = CreateTemperateOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Temperate_GroundCover_B_OpaqueV1"),
+        ETemperateVegetationForm::GroundCover,
+        6437,
+        OutMaterial,
+        TemperateVegetationMeshRoot,
+        TEXT("temperate-river"),
+        false,
+        true,
         OutSummary);
     const bool bComplete =
-        OutBroadleafTree && OutConiferTree && OutShrub && OutGroundCover;
+        OutBroadleafTreeA && OutBroadleafTreeB &&
+        OutConiferTreeA && OutConiferTreeB &&
+        OutShrubA && OutShrubB && OutGroundCoverA && OutGroundCoverB;
     if (!bComplete)
     {
         OutSummary += TEXT(
@@ -1698,6 +1792,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
         PacuareRainforestVegetationMeshRoot,
         TEXT("Pacuare rainforest"),
         true,
+        false,
         OutSummary);
     // The second canopy form deliberately reuses the solid broadleaf grammar
     // with a different deterministic seed. It adds crown/branch variation
@@ -1712,6 +1807,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
         PacuareRainforestVegetationMeshRoot,
         TEXT("Pacuare rainforest"),
         true,
+        false,
         OutSummary);
     OutShrub = CreateTemperateOpaqueVegetationMesh(
         World,
@@ -1722,6 +1818,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
         PacuareRainforestVegetationMeshRoot,
         TEXT("Pacuare rainforest"),
         true,
+        false,
         OutSummary);
     OutGroundCover = CreateTemperateOpaqueVegetationMesh(
         World,
@@ -1732,6 +1829,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
         PacuareRainforestVegetationMeshRoot,
         TEXT("Pacuare rainforest"),
         true,
+        false,
         OutSummary);
     const bool bComplete =
         OutCanopyTreeA && OutCanopyTreeB && OutShrub && OutGroundCover;
@@ -2357,6 +2455,10 @@ bool AddLandscapeCandidateBiomeDressing(
     UStaticMesh* ConiferTreeMesh = nullptr;
     UStaticMesh* ShrubMesh = nullptr;
     UStaticMesh* UnderstoryMesh = nullptr;
+    UStaticMesh* TemperateBroadleafTreeMeshB = nullptr;
+    UStaticMesh* TemperateConiferTreeMeshB = nullptr;
+    UStaticMesh* TemperateShrubMeshB = nullptr;
+    UStaticMesh* TemperateUnderstoryMeshB = nullptr;
     UMaterialInterface* ZambeziOpaqueVegetationMaterial = nullptr;
     UMaterialInterface* PacuareOpaqueRainforestVegetationMaterial = nullptr;
     UMaterialInterface* TemperateOpaqueVegetationMaterial = nullptr;
@@ -2410,9 +2512,13 @@ bool AddLandscapeCandidateBiomeDressing(
         if (!CreateTemperateOpaqueVegetationAssets(
                 World,
                 BroadleafTreeMesh,
+                TemperateBroadleafTreeMeshB,
                 ConiferTreeMesh,
+                TemperateConiferTreeMeshB,
                 ShrubMesh,
+                TemperateShrubMeshB,
                 UnderstoryMesh,
+                TemperateUnderstoryMeshB,
                 TemperateOpaqueVegetationMaterial,
                 OutSummary))
         {
@@ -2422,6 +2528,14 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingConiferAssetPath = ConiferTreeMesh->GetPathName();
         OutResult.DressingShrubAssetPath = ShrubMesh->GetPathName();
         OutResult.DressingUnderstoryAssetPath = UnderstoryMesh->GetPathName();
+        OutResult.DressingBroadleafVariantAssetPath =
+            TemperateBroadleafTreeMeshB->GetPathName();
+        OutResult.DressingConiferVariantAssetPath =
+            TemperateConiferTreeMeshB->GetPathName();
+        OutResult.DressingShrubVariantAssetPath =
+            TemperateShrubMeshB->GetPathName();
+        OutResult.DressingUnderstoryVariantAssetPath =
+            TemperateUnderstoryMeshB->GetPathName();
         OutResult.DressingFoliageMaterialAssetPath =
             TemperateOpaqueVegetationMaterial->GetPathName();
         OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
@@ -2456,7 +2570,20 @@ bool AddLandscapeCandidateBiomeDressing(
             TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static"),
             OutSummary);
     }
-    for (UStaticMesh* Mesh : {BroadleafTreeMesh, ConiferTreeMesh, ShrubMesh, UnderstoryMesh})
+    TArray<UStaticMesh*> ConvertedSpeciesMeshes = {
+        BroadleafTreeMesh,
+        ConiferTreeMesh,
+        ShrubMesh,
+        UnderstoryMesh};
+    if (bOpaqueTemperate)
+    {
+        ConvertedSpeciesMeshes.Append({
+            TemperateBroadleafTreeMeshB,
+            TemperateConiferTreeMeshB,
+            TemperateShrubMeshB,
+            TemperateUnderstoryMeshB});
+    }
+    for (UStaticMesh* Mesh : ConvertedSpeciesMeshes)
     {
         OutResult.DressingAssetCount += Mesh ? 1 : 0;
         OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
@@ -2477,7 +2604,8 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     OutResult.bDressingAssetsLoaded = bUsesOpaqueVolumetricVegetation
         ? OutResult.DressingSourceSkeletalMeshCount == 0 &&
-            OutResult.DressingConvertedStaticMeshCount == 4 &&
+            OutResult.DressingConvertedStaticMeshCount ==
+                (bOpaqueTemperate ? 8 : 4) &&
             ValidateZambeziOpaqueVegetationMaterial(
                 bZambezi
                     ? ZambeziOpaqueVegetationMaterial
@@ -2489,10 +2617,11 @@ bool AddLandscapeCandidateBiomeDressing(
     if (!OutResult.bDressingAssetsLoaded)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s loaded %d source and %d/4 converted species meshes.\n"),
+            TEXT("Landscape biome dressing for %s loaded %d source and %d/%d converted species meshes.\n"),
             *Candidate.PreviewSpec.RiverId,
             OutResult.DressingSourceSkeletalMeshCount,
-            OutResult.DressingConvertedStaticMeshCount);
+            OutResult.DressingConvertedStaticMeshCount,
+            bOpaqueTemperate ? 8 : 4);
         return false;
     }
 
@@ -2526,9 +2655,9 @@ bool AddLandscapeCandidateBiomeDressing(
     else if (bOpaqueTemperate)
     {
         OutSummary += FString::Printf(
-            TEXT("%s replaces repeated alpha-card PVE banks with four project-owned "
-                 "opaque volumetric temperate forms. The deterministic conifer, "
-                 "broadleaf, shrub, and ground-cover family is procedural infill, "
+            TEXT("%s replaces repeated alpha-card PVE banks with eight project-owned "
+                 "opaque volumetric temperate meshes: two deterministic morphologies "
+                 "for each conifer, broadleaf, shrub, and ground-cover form. The family is procedural infill, "
                  "not exact-species or photoreal approval.\n"),
             *Candidate.PreviewSpec.RiverId);
     }
@@ -2550,15 +2679,21 @@ bool AddLandscapeCandidateBiomeDressing(
             return Mesh && Mesh->IsNaniteEnabled();
         });
     OutResult.bDressingBroadleafMeshNaniteEnabled =
-        BroadleafTreeMesh->IsNaniteEnabled() && ShrubMesh->IsNaniteEnabled();
+        BroadleafTreeMesh->IsNaniteEnabled() && ShrubMesh->IsNaniteEnabled() &&
+        (!bOpaqueTemperate ||
+         (TemperateBroadleafTreeMeshB->IsNaniteEnabled() &&
+          TemperateShrubMeshB->IsNaniteEnabled()));
     OutResult.bDressingConiferMeshNaniteEnabled =
         ConiferTreeMesh->IsNaniteEnabled() &&
+        (!bOpaqueTemperate || TemperateConiferTreeMeshB->IsNaniteEnabled()) &&
         (ReviewedPineMeshes.IsEmpty() ||
          Algo::AllOf(ReviewedPineMeshes, [](UStaticMesh* Mesh)
          {
              return Mesh && Mesh->IsNaniteEnabled();
          }));
-    OutResult.bDressingUnderstoryMeshNaniteEnabled = UnderstoryMesh->IsNaniteEnabled();
+    OutResult.bDressingUnderstoryMeshNaniteEnabled =
+        UnderstoryMesh->IsNaniteEnabled() &&
+        (!bOpaqueTemperate || TemperateUnderstoryMeshB->IsNaniteEnabled());
 
     FRaftSimPreviewImage WaterMask;
     FRaftSimPreviewImage VegetationMask;
@@ -2739,6 +2874,50 @@ bool AddLandscapeCandidateBiomeDressing(
                       *Candidate.PreviewSpec.RiverId),
             true,
             bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
+    UHierarchicalInstancedStaticMeshComponent* TemperateBroadleafTreeInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateBroadleafTreeMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueBroadleafB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TemperateConiferTreeInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateConiferTreeMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueConiferB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TemperateShrubInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateShrubMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueShrubB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TemperateUnderstoryInstancesB =
+        bOpaqueTemperate
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              TemperateUnderstoryMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueGroundCoverB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              TemperateOpaqueVegetationMaterial)
+        : nullptr;
     UHierarchicalInstancedStaticMeshComponent* HanceDrylandGroundCoverInstances =
         bColoradoHance
         ? AddLandscapeCandidateInstancedMeshComponent(
@@ -2914,6 +3093,11 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
         !ShrubInstances || !UnderstoryInstances ||
+        (bOpaqueTemperate &&
+         (!TemperateBroadleafTreeInstancesB ||
+          !TemperateConiferTreeInstancesB ||
+          !TemperateShrubInstancesB ||
+          !TemperateUnderstoryInstancesB)) ||
         (bColoradoHance &&
          (!HanceDrylandGroundCoverInstances || !HanceDrylandShrubInstances)) ||
         (bZambezi && !ZambeziBankMosaicInstances) ||
@@ -2982,11 +3166,19 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     if (bOpaqueTemperate || bPacuare)
     {
-        const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
+        TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
             BroadleafTreeInstances,
             ConiferTreeInstances,
             ShrubInstances,
             UnderstoryInstances};
+        if (bOpaqueTemperate)
+        {
+            Components.Append({
+                TemperateBroadleafTreeInstancesB,
+                TemperateConiferTreeInstancesB,
+                TemperateShrubInstancesB,
+                TemperateUnderstoryInstancesB});
+        }
         for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
         {
             if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
@@ -3011,7 +3203,9 @@ bool AddLandscapeCandidateBiomeDressing(
                 if (bOpaqueTemperate)
                 {
                     Owner->Tags.AddUnique(
-                        TEXT("RaftSimTemperateCanopyStructureV3"));
+                        TEXT("RaftSimTemperateBankEcologyV4"));
+                    Owner->Tags.AddUnique(
+                        TEXT("RaftSimTemperateMorphologyVariantFamily"));
                 }
             }
             if (Component)
@@ -3035,19 +3229,34 @@ bool AddLandscapeCandidateBiomeDressing(
                 if (bOpaqueTemperate)
                 {
                     Component->ComponentTags.AddUnique(
-                        TEXT("RaftSimTemperateCanopyStructureV3"));
+                        TEXT("RaftSimTemperateBankEcologyV4"));
+                    Component->ComponentTags.AddUnique(
+                        TEXT("RaftSimTemperateMorphologyVariantFamily"));
                 }
             }
         }
         UnderstoryInstances->SetCastShadow(false);
-        if (AActor* GroundOwner = UnderstoryInstances->GetOwner())
+        TArray<UHierarchicalInstancedStaticMeshComponent*> GroundCoverComponents = {
+            UnderstoryInstances};
+        if (bOpaqueTemperate)
         {
-            GroundOwner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
-            GroundOwner->Tags.AddUnique(
-                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            TemperateUnderstoryInstancesB->SetCastShadow(false);
+            GroundCoverComponents.Add(TemperateUnderstoryInstancesB);
         }
-        UnderstoryInstances->ComponentTags.AddUnique(
-            TEXT("RaftSimOrganicBankGroundCover"));
+        for (UHierarchicalInstancedStaticMeshComponent* GroundCoverComponent :
+             GroundCoverComponents)
+        {
+            if (AActor* GroundOwner = GroundCoverComponent
+                    ? GroundCoverComponent->GetOwner()
+                    : nullptr)
+            {
+                GroundOwner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+                GroundOwner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            }
+            GroundCoverComponent->ComponentTags.AddUnique(
+                TEXT("RaftSimOrganicBankGroundCover"));
+        }
     }
     if (bOpaqueTemperate)
     {
@@ -3297,16 +3506,29 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     else if (bOpaqueTemperate || bPacuare)
     {
-        const TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
+        TArray<UHierarchicalInstancedStaticMeshComponent*> Components = {
             BroadleafTreeInstances,
             ConiferTreeInstances,
             ShrubInstances,
             UnderstoryInstances};
-        const TArray<UStaticMesh*> Meshes = {
+        TArray<UStaticMesh*> Meshes = {
             BroadleafTreeMesh,
             ConiferTreeMesh,
             ShrubMesh,
             UnderstoryMesh};
+        if (bOpaqueTemperate)
+        {
+            Components.Append({
+                TemperateBroadleafTreeInstancesB,
+                TemperateConiferTreeInstancesB,
+                TemperateShrubInstancesB,
+                TemperateUnderstoryInstancesB});
+            Meshes.Append({
+                TemperateBroadleafTreeMeshB,
+                TemperateConiferTreeMeshB,
+                TemperateShrubMeshB,
+                TemperateUnderstoryMeshB});
+        }
         OutResult.DressingFoliageMaterialBoundSlotCount = 0;
         for (UStaticMesh* Mesh : Meshes)
         {
@@ -3318,7 +3540,8 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
         OutResult.bDressingFoliageMaterialsValidated =
-            OutResult.DressingFoliageMaterialBoundSlotCount == 4 &&
+            OutResult.DressingFoliageMaterialBoundSlotCount ==
+                (bOpaqueTemperate ? 8 : 4) &&
             ValidateZambeziOpaqueVegetationMaterial(
                 OpaqueVegetationMaterial) &&
             Algo::AllOf(
@@ -4219,10 +4442,16 @@ bool AddLandscapeCandidateBiomeDressing(
                 TemperateSpeciesBlockSize;
             const int32 ConiferLimit = bChilko ? 12 : 8;
             const int32 BroadleafLimit = bChilko ? 15 : 15;
+            const bool bUseSecondaryMorphology =
+                ZambeziVegetationUnitRandom(ClusterIndex, 8989) > 0.48f;
             if (SpeciesSelector < ConiferLimit)
             {
-                SpeciesMesh = ConiferTreeMesh;
-                SpeciesInstances = ConiferTreeInstances;
+                SpeciesMesh = bUseSecondaryMorphology
+                    ? TemperateConiferTreeMeshB
+                    : ConiferTreeMesh;
+                SpeciesInstances = bUseSecondaryMorphology
+                    ? TemperateConiferTreeInstancesB
+                    : ConiferTreeInstances;
                 TargetHeightCm = FMath::Lerp(
                     bChilko ? 1040.0f : 920.0f,
                     bChilko ? 1640.0f : 1490.0f,
@@ -4231,8 +4460,12 @@ bool AddLandscapeCandidateBiomeDressing(
             }
             else if (SpeciesSelector < BroadleafLimit)
             {
-                SpeciesMesh = BroadleafTreeMesh;
-                SpeciesInstances = BroadleafTreeInstances;
+                SpeciesMesh = bUseSecondaryMorphology
+                    ? TemperateBroadleafTreeMeshB
+                    : BroadleafTreeMesh;
+                SpeciesInstances = bUseSecondaryMorphology
+                    ? TemperateBroadleafTreeInstancesB
+                    : BroadleafTreeInstances;
                 TargetHeightCm = FMath::Lerp(
                     bChilko ? 720.0f : 880.0f,
                     bChilko ? 1180.0f : 1370.0f,
@@ -4241,15 +4474,23 @@ bool AddLandscapeCandidateBiomeDressing(
             }
             else if (SpeciesSelector < 18)
             {
-                SpeciesMesh = ShrubMesh;
-                SpeciesInstances = ShrubInstances;
+                SpeciesMesh = bUseSecondaryMorphology
+                    ? TemperateShrubMeshB
+                    : ShrubMesh;
+                SpeciesInstances = bUseSecondaryMorphology
+                    ? TemperateShrubInstancesB
+                    : ShrubInstances;
                 TargetHeightCm = 205.0f +
                     28.0f * static_cast<float>(ClusterIndex % 6);
             }
             else
             {
-                SpeciesMesh = UnderstoryMesh;
-                SpeciesInstances = UnderstoryInstances;
+                SpeciesMesh = bUseSecondaryMorphology
+                    ? TemperateUnderstoryMeshB
+                    : UnderstoryMesh;
+                SpeciesInstances = bUseSecondaryMorphology
+                    ? TemperateUnderstoryInstancesB
+                    : UnderstoryInstances;
                 TargetHeightCm = 92.0f +
                     14.0f * static_cast<float>(ClusterIndex % 5);
             }
@@ -4368,6 +4609,207 @@ bool AddLandscapeCandidateBiomeDressing(
             ++OutResult.DressingUnderstoryInstanceCount;
         }
     }
+
+    int32 TemperateNearBankPlacedCount = 0;
+    int32 TemperateNearBankRejectedPlacementCount = 0;
+    float TemperateNearBankMinimumCenterlineDistanceCm =
+        TNumericLimits<float>::Max();
+    float TemperateNearBankMaximumSlopeDegrees = 0.0f;
+    if (bOpaqueTemperate && bPhysicalCorridor)
+    {
+        // Fill the visibly bare strip between waterline rocks and the wider
+        // canopy. Every patch is selected against the source Landscape and
+        // full centerline, is dry at the conditioned reference surface, and
+        // remains a non-colliding presentation layer.
+        const float VisibleRiverHalfWidth = ActiveRiverHalfWidth *
+            (bChilko ? 1.20f : 1.18f);
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerSide =
+            TemperateNearBankEcologyTargetInstanceCount / BankSideCount;
+        const TArray<UStaticMesh*> NearBankMeshes = {
+            UnderstoryMesh,
+            TemperateUnderstoryMeshB,
+            ShrubMesh,
+            TemperateShrubMeshB};
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            NearBankComponents = {
+                UnderstoryInstances,
+                TemperateUnderstoryInstancesB,
+                ShrubInstances,
+                TemperateShrubInstancesB};
+        for (int32 PatchIndex = 0;
+             PatchIndex < TemperateNearBankEcologyTargetInstanceCount;
+             ++PatchIndex)
+        {
+            const int32 SideIndex = PatchIndex % BankSideCount;
+            const int32 AlongIndex = PatchIndex / BankSideCount;
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(PatchIndex, 10211)) /
+                static_cast<float>(InstancesPerSide);
+            const float BaseLogicalX = FMath::Lerp(-2380.0f, 25300.0f, AlongT);
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (VisibleRiverHalfWidth + 620.0f));
+            float BestLogicalX = BaseLogicalX;
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestCenterlineDistanceCm = 0.0f;
+            float BestScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 64;
+                 ++CandidateIndex)
+            {
+                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                    -150.0f,
+                    150.0f,
+                    ZambeziVegetationUnitRandom(
+                        PatchIndex * 67 + CandidateIndex,
+                        10223));
+                const float AdditionalOffset = FMath::Lerp(
+                    140.0f,
+                    3600.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            PatchIndex * 71 + CandidateIndex,
+                            10243),
+                        1.55f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (VisibleRiverHalfWidth + AdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float CenterlineDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                const float HeightAboveWaterCm = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y) -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (SlopeDegrees > TemperateNearBankEcologySlopeCeilingDegrees ||
+                    CenterlineDistanceCm < VisibleRiverHalfWidth + 100.0f ||
+                    HeightAboveWaterCm < 15.0f ||
+                    HeightAboveWaterCm > 1600.0f)
+                {
+                    continue;
+                }
+                const float TargetDryHeightCm = FMath::Lerp(
+                    110.0f,
+                    620.0f,
+                    ZambeziVegetationUnitRandom(PatchIndex, 10247));
+                const float Score =
+                    0.60f * FMath::Abs(HeightAboveWaterCm - TargetDryHeightCm) /
+                        1600.0f +
+                    0.25f * AdditionalOffset / 3600.0f +
+                    0.15f * SlopeDegrees /
+                        TemperateNearBankEcologySlopeCeilingDegrees;
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestPoint = CandidatePoint;
+                    BestLogicalX = CandidateLogicalX;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestCenterlineDistanceCm = CenterlineDistanceCm;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                ++TemperateNearBankRejectedPlacementCount;
+                continue;
+            }
+
+            const bool bShrubPatch = PatchIndex % 6 == 0;
+            const bool bSecondaryMorphology =
+                ZambeziVegetationUnitRandom(PatchIndex, 10253) > 0.47f;
+            const int32 FamilyIndex =
+                (bShrubPatch ? 2 : 0) + (bSecondaryMorphology ? 1 : 0);
+            UStaticMesh* PatchMesh = NearBankMeshes[FamilyIndex];
+            UHierarchicalInstancedStaticMeshComponent* PatchComponent =
+                NearBankComponents[FamilyIndex];
+            const float TargetHeightCm = bShrubPatch
+                ? FMath::Lerp(
+                      155.0f,
+                      295.0f,
+                      ZambeziVegetationUnitRandom(PatchIndex, 10259))
+                : FMath::Lerp(
+                      58.0f,
+                      138.0f,
+                      ZambeziVegetationUnitRandom(PatchIndex, 10267));
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(PatchMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                PatchComponent,
+                PatchMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.025f, 0.0f, 0.9f),
+                    360.0f * ZambeziVegetationUnitRandom(PatchIndex, 10273),
+                    0.6f * FMath::Sin(BestLogicalX * 0.001f)),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.76f,
+                        1.28f,
+                        ZambeziVegetationUnitRandom(PatchIndex, 10289)),
+                    UniformScale * FMath::Lerp(
+                        0.78f,
+                        1.24f,
+                        ZambeziVegetationUnitRandom(PatchIndex, 10291)),
+                    UniformScale));
+            ++TemperateNearBankPlacedCount;
+            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
+            TemperateNearBankMinimumCenterlineDistanceCm = FMath::Min(
+                TemperateNearBankMinimumCenterlineDistanceCm,
+                BestCenterlineDistanceCm);
+            TemperateNearBankMaximumSlopeDegrees = FMath::Max(
+                TemperateNearBankMaximumSlopeDegrees,
+                BestSlopeDegrees);
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             NearBankComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimTemperateNearBankEcologyV4"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimTemperateNearBankEcologyV4"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->MarkRenderStateDirty();
+        }
+        OutSummary += FString::Printf(
+            TEXT("%s near-bank ecology V4: %d/%d source-grounded, dry, ")
+            TEXT("non-colliding grass/forb/shrub patches; %d targets rejected ")
+            TEXT("by full-route clearance, dry-height, or %.1f-degree slope ")
+            TEXT("gates; minimum centerline distance %.1f cm and maximum placed ")
+            TEXT("slope %.2f degrees. Procedural gap fill with no species, ")
+            TEXT("survey, collision, hydraulic, or raft-force authority.\n"),
+            *Spec.RiverId,
+            TemperateNearBankPlacedCount,
+            TemperateNearBankEcologyTargetInstanceCount,
+            TemperateNearBankRejectedPlacementCount,
+            TemperateNearBankEcologySlopeCeilingDegrees,
+            TemperateNearBankMinimumCenterlineDistanceCm,
+            TemperateNearBankMaximumSlopeDegrees);
+    }
+    OutResult.DressingTemperateNearBankTargetInstanceCount =
+        bOpaqueTemperate ? TemperateNearBankEcologyTargetInstanceCount : 0;
+    OutResult.DressingTemperateNearBankInstanceCount =
+        TemperateNearBankPlacedCount;
+    OutResult.DressingTemperateNearBankRejectedPlacementCount =
+        TemperateNearBankRejectedPlacementCount;
+    OutResult.DressingTemperateNearBankMinimumCenterlineDistanceCm =
+        TemperateNearBankPlacedCount > 0
+            ? TemperateNearBankMinimumCenterlineDistanceCm
+            : 0.0f;
+    OutResult.DressingTemperateNearBankMaximumSlopeDegrees =
+        TemperateNearBankMaximumSlopeDegrees;
 
     int32 HanceDrylandGroundCoverPlacedCount = 0;
     int32 HanceDrylandGroundCoverRejectedCount = 0;
@@ -5191,6 +5633,7 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
+        TemperateNearBankPlacedCount +
         HanceDrylandGroundCoverPlacedCount +
         HanceDrylandShrubPlacedCount +
         (bZambeziWoodland
@@ -5207,6 +5650,9 @@ bool AddLandscapeCandidateBiomeDressing(
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&
+        (!bOpaqueTemperate ||
+         TemperateNearBankPlacedCount >=
+             TemperateNearBankEcologyMinimumInstanceCount) &&
         ((Spec.bDesertCanyon && !bZambeziWoodland) ||
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&

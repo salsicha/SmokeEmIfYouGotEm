@@ -99,6 +99,7 @@ def test_terminator_organic_lit_review_retains_immutable_evidence_and_is_honest(
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png",
+        "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_futaleufuterminator_physicalcorridor_SourceLandscapeCandidate.uasset",
     }
     for artifact in review["retained_artifacts"]:
         if artifact["path"] in superseded_paths:

@@ -205,6 +205,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             : FName(TEXT("RaftSimFutaleufuTerminatorRun"));
         int32 OpaqueVegetationActorCount = 0;
         int32 OrganicGroundCoverActorCount = 0;
+        int32 NearBankEcologyActorCount = 0;
+        int32 NearBankEcologyInstanceCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             if (!(*It)->Tags.Contains(TEXT("RaftSimOpaqueVolumetricVegetation")) ||
@@ -219,21 +221,52 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("temperate vegetation placement is slope screened"),
                 (*It)->Tags.Contains(TEXT("RaftSimSlopeScreenedPlacement")));
             Test->TestTrue(
-                TEXT("temperate vegetation uses deterministic canopy structure V3"),
+                TEXT("temperate vegetation uses deterministic bank ecology V4"),
                 (*It)->Tags.Contains(
-                    TEXT("RaftSimTemperateCanopyStructureV3")));
+                    TEXT("RaftSimTemperateBankEcologyV4")));
+            Test->TestTrue(
+                TEXT("temperate vegetation records a morphology variant family"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimTemperateMorphologyVariantFamily")));
             OrganicGroundCoverActorCount +=
                 (*It)->Tags.Contains(TEXT("RaftSimOrganicBankGroundCover")) ? 1 : 0;
+            if ((*It)->Tags.Contains(TEXT("RaftSimTemperateNearBankEcologyV4")))
+            {
+                ++NearBankEcologyActorCount;
+                if (const UHierarchicalInstancedStaticMeshComponent* Instances =
+                        (*It)->FindComponentByClass<
+                            UHierarchicalInstancedStaticMeshComponent>())
+                {
+                    NearBankEcologyInstanceCount += Instances->GetInstanceCount();
+                    Test->TestEqual(
+                        TEXT("near-bank ecology remains non-colliding"),
+                        Instances->GetCollisionEnabled(),
+                        ECollisionEnabled::NoCollision);
+                }
+                Test->TestTrue(
+                    TEXT("near-bank ecology is source Landscape grounded"),
+                    (*It)->Tags.Contains(TEXT("RaftSimSourceLandscapeGrounded")));
+                Test->TestTrue(
+                    TEXT("near-bank ecology stays outside the solver strip"),
+                    (*It)->Tags.Contains(TEXT("RaftSimOutsideProtectedSolverStrip")));
+            }
             ++OpaqueVegetationActorCount;
         }
         Test->TestEqual(
-            TEXT("temperate river has four opaque volumetric vegetation forms"),
+            TEXT("temperate river has eight opaque volumetric vegetation morphologies"),
             OpaqueVegetationActorCount,
-            4);
+            8);
         Test->TestEqual(
-            TEXT("temperate river has one organic ground-cover layer"),
+            TEXT("temperate river has two organic ground-cover morphologies"),
             OrganicGroundCoverActorCount,
-            1);
+            2);
+        Test->TestEqual(
+            TEXT("temperate river has four near-bank grass/forb/shrub morphology actors"),
+            NearBankEcologyActorCount,
+            4);
+        Test->TestTrue(
+            TEXT("temperate near-bank ecology retains at least 1600 placed instances"),
+            NearBankEcologyInstanceCount >= 1600);
 
         int32 WaterlineStructureActorCount = 0;
         int32 WaterlineStructureInstanceCount = 0;

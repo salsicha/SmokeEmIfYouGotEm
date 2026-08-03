@@ -1,0 +1,239 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "9D5862492F490FEFA1B3E19066FF7FB4",
+			"instanceName": "Alexs-MacBook-Air.local-30969",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.03-01.32.19",
+	"succeeded": 14,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.13536804914474487,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FChilkoLavaCanyonWater",
+			"fullTestPath": "RaftSim.M9.FChilkoLavaCanyonWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.008233044296503067,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FChilkoOrganicLavaCanyonTerrain",
+			"fullTestPath": "RaftSim.M9.FChilkoOrganicLavaCanyonTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0085014998912811279,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FColoradoHanceWater",
+			"fullTestPath": "RaftSim.M9.FColoradoHanceWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0083538740873336792,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FColoradoOrganicHanceTerrain",
+			"fullTestPath": "RaftSim.M9.FColoradoOrganicHanceTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0085661262273788452,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FFutaleufuOrganicTemperateTerrain",
+			"fullTestPath": "RaftSim.M9.FFutaleufuOrganicTemperateTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0085011683404445648,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FFutaleufuTerminatorWater",
+			"fullTestPath": "RaftSim.M9.FFutaleufuTerminatorWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0084373727440834045,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareOpaqueRainforestVegetation",
+			"fullTestPath": "RaftSim.M9.FPacuareOpaqueRainforestVegetation",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.026002168655395508,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareOrganicRainforestTerrain",
+			"fullTestPath": "RaftSim.M9.FPacuareOrganicRainforestTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.00844612717628479,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareRainforestDefaultLitWater",
+			"fullTestPath": "RaftSim.M9.FPacuareRainforestDefaultLitWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0084064602851867676,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FSouthForkOrganicFoothillTerrain",
+			"fullTestPath": "RaftSim.M9.FSouthForkOrganicFoothillTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0082814581692218781,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FZambeziDefaultLitWater",
+			"fullTestPath": "RaftSim.M9.FZambeziDefaultLitWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0083446241915225983,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FZambeziOrganicBasaltMaterial",
+			"fullTestPath": "RaftSim.M9.FZambeziOrganicBasaltMaterial",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0085555016994476318,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FZambeziOrganicTerrainNormals",
+			"fullTestPath": "RaftSim.M9.FZambeziOrganicTerrainNormals",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0083728767931461334,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FZambeziTalusMaterial",
+			"fullTestPath": "RaftSim.M9.FZambeziTalusMaterial",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"9D5862492F490FEFA1B3E19066FF7FB4"
+			],
+			"duration": 0.0083657503128051758,
+			"dateTime": "2026.08.03-01.32.19",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}
