@@ -964,6 +964,115 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Pacuare has one cooked-field-derived capture foam surface"),
             SolverFieldFoamCount,
             1);
+
+        int32 OrganicShorelineActorCount = 0;
+        int32 OrganicShorelineRockActorCount = 0;
+        int32 OrganicShorelineRockInstanceCount = 0;
+        int32 OrganicShorelineGroundCoverActorCount = 0;
+        int32 OrganicShorelineGroundCoverInstanceCount = 0;
+        int32 OrganicShorelineShrubActorCount = 0;
+        int32 OrganicShorelineShrubInstanceCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor ||
+                !Actor->Tags.Contains(
+                    TEXT("RaftSimPacuareOrganicShorelineV1")))
+            {
+                continue;
+            }
+            const UHierarchicalInstancedStaticMeshComponent* Instances =
+                Actor->FindComponentByClass<
+                    UHierarchicalInstancedStaticMeshComponent>();
+            Test->TestNotNull(
+                TEXT("Pacuare organic shoreline actor has one HISM"),
+                Instances);
+            if (!Instances)
+            {
+                continue;
+            }
+            Test->TestEqual(
+                TEXT("Pacuare organic shoreline remains non-colliding"),
+                Instances->GetCollisionEnabled(),
+                ECollisionEnabled::NoCollision);
+            Test->TestTrue(
+                TEXT("Pacuare organic shoreline is source-Landscape grounded"),
+                Actor->Tags.Contains(TEXT("RaftSimSourceLandscapeGrounded")));
+            Test->TestTrue(
+                TEXT("Pacuare organic shoreline stays outside the solver strip"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimOutsideProtectedSolverStrip")) &&
+                    Instances->ComponentTags.Contains(
+                        TEXT("RaftSimOutsideProtectedSolverStrip")));
+            Test->TestTrue(
+                TEXT("Pacuare organic shoreline disclaims hydraulic authority"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")) &&
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimProceduralSourceGapFill")));
+            if (Actor->Tags.Contains(
+                    TEXT("RaftSimPacuareShorelineMossRock")))
+            {
+                Test->TestTrue(
+                    TEXT("Pacuare shoreline rocks disclaim lithology authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimGenericRockAnalogNoLithologyAuthority")));
+                OrganicShorelineRockInstanceCount +=
+                    Instances->GetInstanceCount();
+                ++OrganicShorelineRockActorCount;
+            }
+            if (Actor->Tags.Contains(
+                    TEXT("RaftSimPacuareShorelineGroundCover")))
+            {
+                Test->TestTrue(
+                    TEXT("Pacuare shoreline ground cover disclaims ecology authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimNoSpeciesOrEcologyAuthority")));
+                Test->TestFalse(
+                    TEXT("Pacuare short ground cover suppresses self-shadowing"),
+                    Instances->CastShadow);
+                OrganicShorelineGroundCoverInstanceCount +=
+                    Instances->GetInstanceCount();
+                ++OrganicShorelineGroundCoverActorCount;
+            }
+            if (Actor->Tags.Contains(
+                    TEXT("RaftSimPacuareShorelineShrub")))
+            {
+                Test->TestTrue(
+                    TEXT("Pacuare shoreline shrubs disclaim ecology authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimNoSpeciesOrEcologyAuthority")));
+                OrganicShorelineShrubInstanceCount +=
+                    Instances->GetInstanceCount();
+                ++OrganicShorelineShrubActorCount;
+            }
+            ++OrganicShorelineActorCount;
+        }
+        Test->TestEqual(
+            TEXT("Pacuare organic shoreline has eight dedicated morphology actors"),
+            OrganicShorelineActorCount,
+            8);
+        Test->TestEqual(
+            TEXT("Pacuare organic shoreline has six moss-rock variants"),
+            OrganicShorelineRockActorCount,
+            6);
+        Test->TestTrue(
+            TEXT("Pacuare organic shoreline retains dense moss-rock structure"),
+            OrganicShorelineRockInstanceCount >= 2350);
+        Test->TestEqual(
+            TEXT("Pacuare organic shoreline has one short ground-cover actor"),
+            OrganicShorelineGroundCoverActorCount,
+            1);
+        Test->TestTrue(
+            TEXT("Pacuare organic shoreline retains dense rainforest-floor cover"),
+            OrganicShorelineGroundCoverInstanceCount >= 4700);
+        Test->TestEqual(
+            TEXT("Pacuare organic shoreline has one shrub actor"),
+            OrganicShorelineShrubActorCount,
+            1);
+        Test->TestTrue(
+            TEXT("Pacuare organic shoreline retains a layered shrub transition"),
+            OrganicShorelineShrubInstanceCount >= 1050);
         return true;
     }
 

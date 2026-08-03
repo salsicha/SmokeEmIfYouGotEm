@@ -1,0 +1,148 @@
+{
+  "schema": "raftsim.environment.pacuare_organic_shoreline_review.v1",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "29df05e865c2ed92e4a530ad16ff6c1ee699a186",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "status": "retained_technical_visual_improvement_photoreal_promotion_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "visual_bank_breakup_improved": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "runnable_map_package_changed": true,
+    "landscape_geometry_changed": false,
+    "landscape_collision_changed": false,
+    "cooked_fields_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "architecture": {
+    "terrain_authority": "The existing 1009x1009 reach-local Landscape remains the sole terrain rendering, collision, and height-query authority.",
+    "water_authority": "The existing live cooked-field water remains the sole gameplay water rendering and raft-force authority; capture-only ribbon and foam actors remain hidden in play.",
+    "procedural_gap_fill": "Eight dedicated non-colliding HISM actors add six rights-reviewed CC0 moss-rock morphology variants, short rainforest-floor cover, and a shrub transition. Every instance is grounded on Landscape height, slope screened, and placed outside the full visible-water and centerline-clearance boundary.",
+    "claims_boundary": "The new dressing is deterministic procedural gap fill. It makes no exact Pacuare lithology, species, ecology, season, survey, hydraulic, bathymetry, or raft-force claim."
+  },
+  "runtime_contract": {
+    "target_moss_rock_instances": 2600,
+    "placed_moss_rock_instances": 2600,
+    "target_short_ground_cover_instances": 5200,
+    "placed_short_ground_cover_instances": 5200,
+    "target_shrub_instances": 1200,
+    "placed_shrub_instances": 1200,
+    "rejected_placements": 0,
+    "dedicated_actor_count": 8,
+    "minimum_centerline_distance_cm": 1777.5,
+    "maximum_placed_slope_degrees": 29.55,
+    "total_map_rock_instances": 2780,
+    "total_map_foliage_instances": 18400,
+    "total_map_canopy_instances": 5993,
+    "total_map_understory_instances": 12407,
+    "collision": false,
+    "shadow_policy": "short ground cover self-shadow suppressed; shrubs and moss-rock analogs retain scene shading"
+  },
+  "matched_capture_metrics": {
+    "scope": "Two side-bank rectangles per fixed 1280x720 camera: x 0-419 and 860-1279, y 180-439.",
+    "green_dominant_definition": "G > 1.16*R, G > 1.04*B, and G > 0.075 in normalized sRGB.",
+    "near_black_definition": "max(R,G,B) < 0.10 in normalized sRGB.",
+    "edge_definition": "neighboring-luma gradient magnitude > 0.055.",
+    "guide_seat": {
+      "before_sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d",
+      "after_sha256": "d6ddfba4754b49a76a392b25460a9f5a98cfca47361a6e0974d31e9253f44955",
+      "mean_luma_before": 0.183540,
+      "mean_luma_after": 0.182639,
+      "green_dominant_fraction_before": 0.561882,
+      "green_dominant_fraction_after": 0.673768,
+      "near_black_fraction_before": 0.209235,
+      "near_black_fraction_after": 0.280765,
+      "edge_fraction_before": 0.123511,
+      "edge_fraction_after": 0.214452
+    },
+    "river_eye": {
+      "before_sha256": "53f859c16e33d0c47bd4a63c4db1b4b3539a9f338f14b5e5fc85d112fb37d640",
+      "after_sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875",
+      "mean_luma_before": 0.209337,
+      "mean_luma_after": 0.207477,
+      "green_dominant_fraction_before": 0.602482,
+      "green_dominant_fraction_after": 0.731992,
+      "near_black_fraction_before": 0.176525,
+      "near_black_fraction_after": 0.238869,
+      "edge_fraction_before": 0.122714,
+      "edge_fraction_after": 0.228679
+    },
+    "verdict": "Retain as a bounded organic-bank improvement. Both views gain substantially more green bank cover and roughly double the measured small-scale edge structure without changing mean luminance materially. Increased near-black coverage and visibly procedural silhouettes prevent photoreal promotion."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed after the final shadow-floor correction",
+    "filtered_regeneration": "pacuare completed successfully with zero placement rejects",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_native_asset_audit": "RaftSim.M9.FPacuare passed 4/4",
+    "focused_runnable_map_gate": "RaftSim.P4.RiverMapLoads.L_UpperHuacas passed 1/1, including eight shoreline actors and minimum instance-density checks",
+    "focused_python_contracts": "19 passed",
+    "visual_gate": "matched fixed guide-seat and river-eye evidence retained as a technical improvement"
+  },
+  "remaining_photoreal_defects": [
+    "Canopy crowns, trunks, shrub lobes, and ground-cover forms remain visibly procedural and repetitive rather than scanned or species-authentic rainforest assets.",
+    "The denser bank layer increases near-black coverage in both fixed views; lighting, material response, ambient occlusion, and silhouette quality still need environment-art refinement.",
+    "The 30 m source context and bounded procedural bank relief still produce broad smooth landforms without surveyed bank breaklines or production wet-bank microgeometry.",
+    "Generic moss-rock morphology donors make no Pacuare lithology claim; roots, leaf litter, deadwood, epiphytes, vines, wind response, wetness variation, and seasonal ecology remain incomplete.",
+    "Water remains optically thin with weak rapid foam, breaking-wave volume, spray, mist, rock-contact plumes, refraction, reflection, caustics, and riverbed transitions.",
+    "Cooked hydraulics remain unconverged and discharge, bathymetry, stationing, hazards, and guide line are not calibrated to observed Upper Huacas behavior."
+  ],
+  "required_external_acceptance_gates": [
+    "Pacuare guide review of the Upper Huacas line, hazards, water levels, entry, exit, and rescue routes",
+    "geospatial review of exact stationing, planform, vertical datum, bank breaklines, higher-resolution terrain, rocks, and bathymetry",
+    "hydraulic calibration and convergence approval against observed Upper Huacas behavior across playable flow bands",
+    "ecology and environment-art approval of species, density, ground cover, geology, wet banks, lighting, and rainforest atmosphere",
+    "photoreal water/VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "role": "reference-runnable Upper Huacas map with the non-authoritative organic shoreline layer",
+      "sha256": "828d5e265c0470cee0ae50bff51dff62045f759ee656c4e89d44ea86eac40369"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
+      "role": "filtered generation manifest",
+      "sha256": "1d95bd2dfbbd23e1d6b26d6241a3ed1e344083fe4ba7e1d747cb47f7a2656abd"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_guide_before.png",
+      "role": "immutable release-head guide-seat baseline",
+      "sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_guide.png",
+      "role": "retained matched guide-seat result",
+      "sha256": "d6ddfba4754b49a76a392b25460a9f5a98cfca47361a6e0974d31e9253f44955"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_river_eye_before.png",
+      "role": "immutable release-head river-eye baseline",
+      "sha256": "53f859c16e33d0c47bd4a63c4db1b4b3539a9f338f14b5e5fc85d112fb37d640"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_river_eye.png",
+      "role": "retained matched river-eye result",
+      "sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
+      "role": "regenerated solver-crux context",
+      "sha256": "2ea7c9cdddf30430b480a59f0c0e188222ef7b1987cfc8596e911eecd0f2047a"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/polyhaven_rock_moss_set_01_source_manifest.json",
+      "role": "rights and provenance record for the six generic moss-rock morphology donors",
+      "sha256": "6bfd20104aa2a48bd86e3cca7040c4f414f57825b9930040419707319e8f3973"
+    }
+  ]
+}

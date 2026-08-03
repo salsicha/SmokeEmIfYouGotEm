@@ -46,17 +46,17 @@
   "retained_captures": [
     {
       "view": "guide_seat_downstream",
-      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_guide_before.png",
       "sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d"
     },
     {
       "view": "river_eye_downstream",
-      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_river_eye_before.png",
       "sha256": "53f859c16e33d0c47bd4a63c4db1b4b3539a9f338f14b5e5fc85d112fb37d640"
     },
     {
       "view": "solver_rapid_river_eye_downstream",
-      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_organic_shoreline_v1_solver_rapid_before.png",
       "sha256": "628fad30f6267f46c71bbc28e7d1dc46f55cda9e2cf5f6eb41703de5c527684d"
     }
   ],

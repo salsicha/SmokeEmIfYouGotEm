@@ -4152,3 +4152,17 @@ path is verified, and the completion goal can be marked complete.
   banks/shoreline/ecology, missing rapid-scale spray and mist, unconverged
   hydraulics, and all six external acceptance gates keep M9 and photoreal
   promotion open.
+- Pacuare organic shoreline V1 replaces Upper Huacas's visibly bare transition
+  between its smooth reach-local banks and repeated procedural canopy with six
+  moss-rock morphology variants, 5,200 short rainforest-floor patches, and
+  1,200 shrubs. All 9,000 new targets place across both full-route banks with
+  zero rejects, remain non-colliding, and begin beyond a 17.775 m minimum
+  centerline clearance. Landscape geometry/collision, cooked fields, wet/dry
+  masks, bathymetry, hydraulics, and raft forces are unchanged. Fixed guide and
+  river-eye bank bands gain 11.19 and 12.95 percentage points of green-dominant
+  cover and roughly double measured edge detail. The denser procedural forms
+  also increase near-black coverage and retain visibly synthetic silhouettes,
+  so the hash-locked review rejects photoreal promotion. The editor build, M9
+  Pacuare audit 4/4, live `L_UpperHuacas` P4 gate 1/1, and 19 focused Python
+  contracts pass; guide, geospatial, hydraulic, ecology/art, water/VFX, and
+  platform acceptance remain open.
