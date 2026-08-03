@@ -1,6 +1,6 @@
 # Runnable River Simulation & Playability Plan
 
-Written July 18, 2026; updated August 1, 2026. Goal: **all six runnable
+Written July 18, 2026; updated August 2, 2026. Goal: **all six runnable
 rivers playable in-engine with live finite-volume solver water and the full
 gameplay stack** (crew, flip/swim/recover, scoring, HUD, reactive audio). The
 first five use a validated signature-rapid pattern. Zambezi is restored at an
@@ -235,6 +235,21 @@ and external acceptance gates pass.
   contract, and cook list now all require `/Game/RaftSim/Maps/L_Zambezi`; the
   old ignored Landscape-candidate preview path is no longer accepted as a
   runnable destination.
+
+### 2026-08-02 — Zambezi current-head runnable registry recheck
+
+- Rechecked the six-river Free Run manifest, generated player selector, source
+  scenario, runtime catalog, cook list, and committed `L_Zambezi` package after
+  the intervening environment milestones. Every layer still resolves
+  `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi` at
+  `reference_free_run` tier.
+- `RaftSim.M6.CareerCatalog` passes 1/1 with no warnings or errors.
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` passes 1/1, loads PIE with the
+  vertical-slice game mode and live cooked-field water, and completes MapCheck
+  with 0 errors and 0 warnings. Twenty-one focused Python contracts pass.
+- This reaffirms runnable status only. Production terrain, bathymetry,
+  rapid-specific hydraulics, guide/rights review, photoreal art, and
+  target-hardware performance remain open.
 
 ### 2026-08-02 — Futaleufú and Chilko organic waterline structure retained
 

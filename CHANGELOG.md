@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Rechecked Zambezi at the current release head and retained it as the sixth
+  runnable river. `RaftSim.M6.CareerCatalog` again resolves the player-facing
+  `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi`, while
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` loads that saved package into PIE with
+  the vertical-slice game mode, curved coordinate map, live cooked-field water,
+  active breaking sites, visible rapid foam, and zero MapCheck errors or
+  warnings. This is a runnable-reference verification, not photoreal or
+  production-hydraulic promotion.
 - Rebuilt the shared runnable Futaleufú/Chilko fallback canopy as first-party
   Structure V3 geometry. Compound asymmetric crownlets, varied and staggered
   conifer whorls, overlapping distance-stable crown bodies, bounded shortened

@@ -17,6 +17,10 @@ open gates are documented in
 The August 2 runnable revalidation confirms that the frontend selector, source
 scenario, shipping cook, saved map, live PIE launch, and schema-v16 map audit
 all resolve to `/Game/RaftSim/Maps/L_Zambezi`.
+The current-head runnable-registry recheck repeats the native catalog and live
+PIE gates after the subsequent environment milestones: Zambezi remains river 6,
+loads with the vertical-slice game mode and live cooked-field water, and is not
+an environment-preview-only map.
 The versioned progression manifest also enumerates Zambezi in the six-river
 Free Run contract, so catalog tests fail if its scenario or map path is removed.
 The South Fork production campaign still resolves to the 49.1 km

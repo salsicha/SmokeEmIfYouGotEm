@@ -18,6 +18,28 @@ Editor. The stable package is also included in the shipping cook list. Do not
 use `L_ZambeziBatokaGorge_PhysicalCorridorCandidate`: that superseded preview
 package is not the runnable map.
 
+### Current runnable verification
+
+The current release head was rechecked after the later environment and character
+milestones. The player path is still:
+
+`Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
+
+The machine-readable Free Run manifest still counts six runnable rivers and
+lists `zambezi_batoka_gorge` at `reference_free_run` tier. The native
+`RaftSim.M6.CareerCatalog` gate passes with no warnings or errors. The native
+`RaftSim.P4.RiverMapLoads.L_Zambezi` gate loads the committed map into PIE,
+reports the vertical-slice game mode, binds the 5,908-point curved coordinate
+map and cooked field, exposes eight live breaking sites and visible rapid foam,
+and completes MapCheck with zero errors and zero warnings. Twenty-one focused
+Python source, scenario, shipping, named-rapid, and portfolio contracts also
+pass. The Unreal report contains one unrelated connectivity-probe timeout; it
+does not affect map load or gameplay acceptance.
+
+This verifies that Zambezi is runnable from a fresh checkout. It does not close
+the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
+seasonal-flow, guide, rights, photoreal-art, or target-performance gates.
+
 The Zambezi map build now combines three evidence layers without pretending they
 have equal authority:
 

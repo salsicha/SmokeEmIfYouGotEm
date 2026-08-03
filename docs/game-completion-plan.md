@@ -3982,3 +3982,16 @@ path is verified, and the completion goal can be marked complete.
   incomplete local ecology, and all six external acceptance gates. The layer is
   non-colliding presentation-only gap fill and changes no DEM, bathymetry,
   water geometry, hydraulic state, collision, or raft force.
+- Zambezi runnable registry recheck V3 verifies the sixth-river contract again
+  after the intervening environment milestones. The versioned Free Run
+  manifest, generated player selector, source scenario, native progression
+  catalog, shipping cook list, and committed map all resolve
+  `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi` at
+  `reference_free_run` tier. `RaftSim.M6.CareerCatalog` passes 1/1 with no
+  warnings or errors; `RaftSim.P4.RiverMapLoads.L_Zambezi` passes 1/1, loads
+  the map into PIE with the vertical-slice game mode, curved coordinate map,
+  live cooked-field water, eight active breaking sites, visible rapid foam,
+  and 0 MapCheck errors/warnings. Twenty-one focused Python contracts pass.
+  Runnable status is retained; high-resolution terrain, surveyed bathymetry,
+  rapid-specific hydraulic, seasonal-flow, guide, rights, photoreal-art, and
+  performance acceptance remain open.
