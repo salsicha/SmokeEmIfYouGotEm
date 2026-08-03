@@ -772,6 +772,24 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_temperate_near_bank_minimum_centerline_distance_cm\": %.3f,\n")
             TEXT("      \"landscape_dressing_temperate_near_bank_maximum_slope_degrees\": %.3f,\n")
             TEXT("      \"landscape_dressing_temperate_near_bank_placement_contract\": \"deterministic_64_candidate_source_landscape_search_across_both_full_route_dry_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_authority\": \"presentation_only_procedural_source_gap_fill_no_lithology_collision_bathymetry_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_target_height_range_m\": [0.10, 1.40],\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_gravel_placement_contract\": \"deterministic_48_candidate_source_landscape_search_across_both_full_route_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_authority\": \"presentation_only_procedural_source_gap_fill_no_species_ecology_survey_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_target_height_range_m\": [0.36, 1.10],\n")
+            TEXT("      \"landscape_dressing_chilko_organic_shoreline_ground_cover_placement_contract\": \"deterministic_48_candidate_source_landscape_search_across_both_full_route_dry_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_authority\": \"presentation_only_generic_rock_analog_no_lithology_collision_hydraulic_or_raft_force_authority\",\n")
             TEXT("      \"landscape_dressing_runnable_launch_talus_target_instance_count\": %d,\n")
@@ -1076,6 +1094,22 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingTemperateNearBankRejectedPlacementCount,
             Result.DressingTemperateNearBankMinimumCenterlineDistanceCm,
             Result.DressingTemperateNearBankMaximumSlopeDegrees,
+            Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount > 0
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_organic_shoreline_gravel_v1_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount,
+            Result.DressingChilkoOrganicShorelineGravelInstanceCount,
+            Result.DressingChilkoOrganicShorelineGravelRejectedPlacementCount,
+            Result.DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm,
+            Result.DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees,
+            Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount > 0
+                ? TEXT("source_grounded_short_meadow_ground_cover_v1_captured")
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount,
+            Result.DressingChilkoOrganicShorelineGroundCoverInstanceCount,
+            Result.DressingChilkoOrganicShorelineGroundCoverRejectedPlacementCount,
+            Result.DressingChilkoOrganicShorelineGroundCoverMinimumCenterlineDistanceCm,
+            Result.DressingChilkoOrganicShorelineGroundCoverMaximumSlopeDegrees,
             Result.DressingRunnableLaunchTalusTargetInstanceCount > 0
                 ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_launch_talus_captured")
                 : TEXT("not_enabled_for_this_river"),

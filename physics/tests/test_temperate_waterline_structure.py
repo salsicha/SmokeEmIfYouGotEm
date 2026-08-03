@@ -67,10 +67,12 @@ def test_saved_temperate_maps_record_dense_full_route_structure() -> None:
         "futaleufu_terminator": {
             "manifest": "landscape_candidate_manifest_futaleufu_terminator.json",
             "minimum_centerline_distance_cm": 2400.0 * 1.18 + 60.0,
+            "boulder_instance_count": 1620,
         },
         "chilko_river_lava_canyon": {
             "manifest": "landscape_candidate_manifest_chilko_river_lava_canyon.json",
             "minimum_centerline_distance_cm": 1800.0 * 1.20 + 60.0,
+            "boulder_instance_count": 5220,
         },
     }
 
@@ -80,7 +82,9 @@ def test_saved_temperate_maps_record_dense_full_route_structure() -> None:
         )["candidates"][0]
         assert candidate["river_id"] == river_id
         assert candidate["landscape_dressing_external_review_rock_mesh_count"] == 6
-        assert candidate["landscape_dressing_boulder_instance_count"] == 1620
+        assert candidate["landscape_dressing_boulder_instance_count"] == contract[
+            "boulder_instance_count"
+        ]
         assert candidate["landscape_dressing_temperate_waterline_status"] == (
             "source_grounded_rights_reviewed_cc0_six_variant_"
             "organic_waterline_structure_v1_captured"

@@ -347,6 +347,101 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestTrue(
             TEXT("temperate river has dense organic waterline structure"),
             WaterlineStructureInstanceCount >= 1250);
+
+        if (bChilkoLavaCanyonReferenceRun)
+        {
+            int32 OrganicShorelineActorCount = 0;
+            int32 OrganicShorelineGravelActorCount = 0;
+            int32 OrganicShorelineGravelInstanceCount = 0;
+            int32 OrganicShorelineGroundCoverActorCount = 0;
+            int32 OrganicShorelineGroundCoverInstanceCount = 0;
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                AActor* Actor = *It;
+                if (!Actor ||
+                    !Actor->Tags.Contains(
+                        TEXT("RaftSimChilkoOrganicShorelineV1")) ||
+                    !Actor->Tags.Contains(
+                        TEXT("RaftSimChilkoLavaCanyonRun")))
+                {
+                    continue;
+                }
+                const UHierarchicalInstancedStaticMeshComponent* Instances =
+                    Actor->FindComponentByClass<
+                        UHierarchicalInstancedStaticMeshComponent>();
+                Test->TestNotNull(
+                    TEXT("Chilko organic shoreline actor has one HISM"),
+                    Instances);
+                if (!Instances)
+                {
+                    continue;
+                }
+                Test->TestEqual(
+                    TEXT("Chilko organic shoreline remains non-colliding"),
+                    Instances->GetCollisionEnabled(),
+                    ECollisionEnabled::NoCollision);
+                Test->TestTrue(
+                    TEXT("Chilko organic shoreline stays outside the solver strip"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimOutsideProtectedSolverStrip")) &&
+                        Instances->ComponentTags.Contains(
+                            TEXT("RaftSimOutsideProtectedSolverStrip")));
+                Test->TestTrue(
+                    TEXT("Chilko organic shoreline is source-Landscape grounded"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimSourceLandscapeGrounded")));
+                Test->TestTrue(
+                    TEXT("Chilko organic shoreline disclaims hydraulic authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")) &&
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimProceduralSourceGapFill")));
+                if (Actor->Tags.Contains(
+                        TEXT("RaftSimChilkoShorelineGravel")))
+                {
+                    Test->TestTrue(
+                        TEXT("Chilko shoreline gravel disclaims lithology authority"),
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimGenericRockAnalogNoLithologyAuthority")));
+                    OrganicShorelineGravelInstanceCount +=
+                        Instances->GetInstanceCount();
+                    ++OrganicShorelineGravelActorCount;
+                }
+                if (Actor->Tags.Contains(
+                        TEXT("RaftSimChilkoShorelineGroundCover")))
+                {
+                    Test->TestTrue(
+                        TEXT("Chilko shoreline ground cover disclaims ecology authority"),
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimNoSpeciesOrEcologyAuthority")));
+                    Test->TestFalse(
+                        TEXT("Chilko shoreline ground cover suppresses self-shadowing"),
+                        Instances->CastShadow);
+                    OrganicShorelineGroundCoverInstanceCount +=
+                        Instances->GetInstanceCount();
+                    ++OrganicShorelineGroundCoverActorCount;
+                }
+                ++OrganicShorelineActorCount;
+            }
+            Test->TestEqual(
+                TEXT("Chilko organic shoreline has eight dedicated morphology actors"),
+                OrganicShorelineActorCount,
+                8);
+            Test->TestEqual(
+                TEXT("Chilko shoreline has six gravel morphology actors"),
+                OrganicShorelineGravelActorCount,
+                6);
+            Test->TestTrue(
+                TEXT("Chilko shoreline retains at least 3300 gravel instances"),
+                OrganicShorelineGravelInstanceCount >= 3300);
+            Test->TestEqual(
+                TEXT("Chilko shoreline has two short ground-cover morphologies"),
+                OrganicShorelineGroundCoverActorCount,
+                2);
+            Test->TestTrue(
+                TEXT("Chilko shoreline retains at least 3800 ground-cover instances"),
+                OrganicShorelineGroundCoverInstanceCount >= 3800);
+        }
     }
 
     if (bZambeziReferenceRun)

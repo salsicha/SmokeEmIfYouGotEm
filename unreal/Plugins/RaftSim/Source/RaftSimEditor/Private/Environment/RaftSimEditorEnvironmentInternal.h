@@ -691,6 +691,16 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 DressingTemperateNearBankRejectedPlacementCount = 0;
     float DressingTemperateNearBankMinimumCenterlineDistanceCm = 0.0f;
     float DressingTemperateNearBankMaximumSlopeDegrees = 0.0f;
+    int32 DressingChilkoOrganicShorelineGravelTargetInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGravelInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGravelRejectedPlacementCount = 0;
+    float DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm = 0.0f;
+    float DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees = 0.0f;
+    int32 DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGroundCoverInstanceCount = 0;
+    int32 DressingChilkoOrganicShorelineGroundCoverRejectedPlacementCount = 0;
+    float DressingChilkoOrganicShorelineGroundCoverMinimumCenterlineDistanceCm = 0.0f;
+    float DressingChilkoOrganicShorelineGroundCoverMaximumSlopeDegrees = 0.0f;
     int32 DressingRunnableLaunchTalusTargetInstanceCount = 0;
     int32 DressingRunnableLaunchTalusInstanceCount = 0;
     int32 DressingRunnableLaunchTalusRejectedPlacementCount = 0;
