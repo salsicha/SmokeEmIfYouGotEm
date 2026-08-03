@@ -4109,6 +4109,22 @@ path is verified, and the completion goal can be marked complete.
   foam/spray volume, terraced terrain, sparse repeated ground cover, missing
   surveyed Hance geography, unconverged hydraulics, and all six named external
   acceptance gates; M9 and photoreal promotion remain open.
+- Opposed Thumb + Localized Glove V3 closes the production lower-hand thumb
+  onto the paddle shaft without restoring the rejected oval radial cage. All
+  five assembled identities retain effectively zero palm error and zero
+  four-finger shaft error while adding a separate 0.0 cm distal-thumb contact
+  metric. Because the optimized body has one skeletal material section, a
+  dynamic wetsuit instance now follows both live middle-metacarpal centres and
+  blends only nearby body pixels through feathered 8.75 cm charcoal-neoprene
+  glove zones. Fixed front/profile close-grip cameras make the ten hands
+  directly reviewable. The editor build, 5/5 runtime roster capture, hash-
+  locked evidence, focused source contract, and renderer-enabled M5 production
+  character gate pass. The former lateral thumb spike is gone and fingers are
+  more legible against the shaft, but close evidence still rejects coarse hand
+  topology, simplified knuckles/webbing, incomplete upper T-grip contact,
+  uniform glove construction, wrist compression, and non-motion-captured
+  deformation. Named character-art and qualified guide approval remain open;
+  M9 and photoreal promotion are not advanced.
 - Pacuare live transmitting water V1 replaces Upper Huacas's uniform opaque
   gameplay carrier with a solver-owned core triangulated only through all-wet
   live cells. The smoothed live surface remains a 3.5%-14% hydraulic-detail
