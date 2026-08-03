@@ -568,3 +568,25 @@ and external acceptance gates pass.
   six external acceptance gates keep photoreal and production promotion open.
   Evidence is hash-locked in
   `colorado_hance_rapid_approach_launch_v1_review.json`.
+
+### 2026-08-03 — Pacuare layered rainforest humidity retained
+
+- `L_UpperHuacas` now serializes a four-actor Pacuare-only atmosphere contract:
+  movable sun, captured sky fill, physical SkyAtmosphere aerial perspective,
+  and two non-volumetric exponential humidity layers. Three volumetric
+  candidates were rejected because they deepened black canopy occlusion.
+- The retained views raise bank luminance and reduce near-black bank pixels by
+  37.47%-44.38%. UE 5.8 PIE replays stale fog state-stream values after normal
+  actor ticks, so the Pacuare runtime config alone reasserts density `0.0075`
+  and volumetric-off in `TG_PostUpdateWork`; other rivers do not pay this tick.
+- The editor build passes, Pacuare M9 passes 4/4, and Pacuare P4 passes 1/1 with
+  the exact runtime fog values. The unchanged runnable Zambezi map also passes
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` 1/1 with live solver water, 2,673 wet
+  vertices, eight active breaking sites, 125 visible rapid-foam vertices, and
+  4,224 optical-core triangles. Terrain, water geometry, collision, cooked
+  fields, hydraulics, bathymetry, and raft forces are unchanged.
+- This is a bounded readability improvement, not photoreal promotion. Generic
+  vegetation, coarse terrain, thin water/whitewater VFX, missing weather and
+  wind, unconverged hydraulics, performance, and all six external reviews
+  remain open. Evidence is hash-locked in
+  `pacuare_humid_atmosphere_v1_review.json`.

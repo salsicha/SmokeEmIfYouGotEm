@@ -1737,6 +1737,11 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;
     if (bPacuare)
     {
+        WaterConfig->bEnforceTaggedHeightFogPresentation = true;
+        WaterConfig->RuntimeHeightFogActorTag =
+            TEXT("RaftSimLayeredRainforestHumidity");
+        WaterConfig->RuntimeHeightFogDensity = 0.0075f;
+        WaterConfig->bRuntimeVolumetricFogEnabled = false;
         // A wet-cell-clipped transmitting core replaces the opaque rainforest
         // carrier as the river body. The low-coverage Default Lit surface is
         // retained only for solver geometry normals and a soft bank feather.
