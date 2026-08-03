@@ -195,6 +195,26 @@ and external acceptance gates pass.
   The editor build, four M9 Pacuare asset audits, the live P4 map gate, and 19
   focused Python contracts pass; all six external acceptance gates remain open.
 
+### 2026-08-03 — Pacuare compound canopy morphology V2 retained
+
+- Upper Huacas's four project-owned opaque rainforest fallback meshes now use
+  one higher-resolution core plus six smaller deterministically oriented
+  crownlets wherever V1 used one large faceted ellipsoid. The two canopy assets
+  contain 10,401/14,476 and 10,434/14,610 render vertices/triangles; the shrub
+  and ground-cover assets also exceed 5,900 vertices. Nanite, non-collision,
+  source-mask placement, and the existing 18,400 foliage transforms remain.
+- A Pacuare-only shadow-fill lift from `0.145` to `0.20` reduces near-black
+  canopy-bank coverage from 21.29% to 20.17% at guide seat and 19.02% to 17.68%
+  at river eye. Fixed-view crown-edge coverage rises from 18.56% to 25.58% and
+  18.85% to 25.54%, with higher gradient-orientation entropy in both views.
+- The result has finer breakup and more readable branch structure, but remains
+  an obviously procedural four-mesh fallback rather than species-authentic
+  rainforest art. Terrain, collision, water, cooked fields, bathymetry,
+  hydraulics, and raft forces are unchanged. The editor build, M9 Pacuare suite
+  4/4, runnable P4 map gate 1/1, MapCheck 0/0, 13 focused contracts, and all 79
+  Pacuare Python tests pass; photoreal promotion and all six external
+  acceptance gates remain open.
+
 ### 2026-08-03 — Pacuare live transmitting gameplay water retained
 
 - `L_UpperHuacas` now uses a solver-owned, wet-cell-clipped transmitting core

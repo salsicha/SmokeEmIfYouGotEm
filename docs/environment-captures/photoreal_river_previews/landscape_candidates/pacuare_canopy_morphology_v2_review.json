@@ -1,0 +1,167 @@
+{
+  "schema": "raftsim.environment.pacuare_canopy_morphology_review.v2",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "7b382eb2429f00d4640a3d4a32cf4da5cb5e2a81",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "status": "retained_canopy_breakup_improvement_photoreal_promotion_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "visual_crown_breakup_improved": true,
+    "shadow_readability_improved": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "runnable_map_package_changed": true,
+    "instance_placement_changed": false,
+    "landscape_geometry_changed": false,
+    "landscape_collision_changed": false,
+    "water_geometry_changed": false,
+    "cooked_fields_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "architecture": {
+    "terrain_authority": "The existing 1009x1009 reach-local Landscape remains the sole terrain rendering, collision, and height-query authority.",
+    "water_authority": "The existing live cooked-field water remains the sole gameplay water rendering and raft-force authority; capture-only ribbon and foam actors remain hidden in play.",
+    "morphology_change": "Each former single rainforest ellipsoid is replaced by one higher-resolution opaque core and six smaller deterministically rotated and tilted crownlets. The same four non-colliding HISM families and the same source-mask, slope-screened instance placement remain in use.",
+    "material_change": "The Pacuare-only opaque vegetation material shadow-fill factor rises from 0.145 to 0.20 and its deterministic per-instance energy range widens from 0.86-1.14 to 0.84-1.16.",
+    "claims_boundary": "The V2 meshes are project-owned deterministic presentation fallback geometry. They make no exact Pacuare species, ecology, season, survey, hydraulic, bathymetry, wind, or raft-force claim."
+  },
+  "runtime_contract": {
+    "opaque_mesh_family_count": 4,
+    "source_skeletal_mesh_count": 0,
+    "alpha_card_source_count": 0,
+    "foliage_instance_count": 18400,
+    "canopy_instance_count": 5993,
+    "understory_instance_count": 12407,
+    "collision": false,
+    "nanite": true,
+    "leaf_cluster_count_per_former_lobe": 6,
+    "canopy_tree_a_vertices": 10401,
+    "canopy_tree_a_triangles": 14476,
+    "canopy_tree_b_vertices": 10434,
+    "canopy_tree_b_triangles": 14610,
+    "riparian_shrub_vertices": 7114,
+    "riparian_shrub_triangles": 9924,
+    "ground_cover_vertices": 5946,
+    "ground_cover_triangles": 7273
+  },
+  "matched_capture_metrics": {
+    "scope": "Two fixed canopy-bank rectangles per 1280x720 camera: x 0-499 and 780-1279, y 0-399.",
+    "green_dominant_definition": "G > 1.16*R, G > 1.04*B, and G > 0.075 in normalized sRGB.",
+    "near_black_definition": "max(R,G,B) < 0.10 in normalized sRGB.",
+    "edge_definition": "neighboring-luma gradient magnitude > 0.055.",
+    "orientation_entropy_definition": "Normalized Shannon entropy of 18 unsigned gradient-orientation bins for green pixels whose neighboring-luma gradient exceeds 0.025; higher values mean less concentration in a few repeated edge directions.",
+    "guide_seat": {
+      "before_sha256": "d6ddfba4754b49a76a392b25460a9f5a98cfca47361a6e0974d31e9253f44955",
+      "after_sha256": "5a62ec14a117aac77961a711bf0c57cb99f216e7f167294986450ca401800b32",
+      "mean_luma_before": 0.203980,
+      "mean_luma_after": 0.209570,
+      "green_dominant_fraction_before": 0.641692,
+      "green_dominant_fraction_after": 0.588480,
+      "near_black_fraction_before": 0.212858,
+      "near_black_fraction_after": 0.201703,
+      "edge_fraction_before": 0.185634,
+      "edge_fraction_after": 0.255752,
+      "gradient_orientation_entropy_before": 0.940824,
+      "gradient_orientation_entropy_after": 0.950713
+    },
+    "river_eye": {
+      "before_sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875",
+      "after_sha256": "2fe6ae29a578171ed29758989e010c11e561e14845f8b213597561c53f6cb7cd",
+      "mean_luma_before": 0.217935,
+      "mean_luma_after": 0.223676,
+      "green_dominant_fraction_before": 0.677992,
+      "green_dominant_fraction_after": 0.611875,
+      "near_black_fraction_before": 0.190150,
+      "near_black_fraction_after": 0.176770,
+      "edge_fraction_before": 0.188487,
+      "edge_fraction_after": 0.255351,
+      "gradient_orientation_entropy_before": 0.924251,
+      "gradient_orientation_entropy_after": 0.939513
+    },
+    "verdict": "Retain as a bounded morphology and readability improvement. Both views gain materially more crown-edge structure, slightly higher gradient-orientation entropy, and lower near-black coverage. Green-dominant area falls because the smaller crownlets expose more branch and bank structure. The result remains visibly procedural and is not a photoreal pass."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed",
+    "filtered_regeneration": "pacuare completed successfully with the same saved instance counts",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "focused_native_asset_audit": "RaftSim.M9.FPacuare passed 4/4",
+    "focused_runnable_map_gate": "RaftSim.P4.RiverMapLoads.L_UpperHuacas passed 1/1",
+    "focused_python_contracts": "13 passed",
+    "complete_pacuare_python_suite": "79 passed",
+    "visual_gate": "matched fixed guide-seat and river-eye evidence retained as a technical improvement"
+  },
+  "remaining_photoreal_defects": [
+    "The V2 crowns still read as repeated procedural clusters rather than scanned or species-authentic tropical foliage, and the exposed trunks and branch junctions remain uniform.",
+    "A four-mesh family cannot represent Pacuare canopy strata, age classes, palms, vines, epiphytes, roots, deadwood, rainforest-floor diversity, wind, wetness, or season.",
+    "The 30 m source context and bounded procedural bank relief still produce broad smooth landforms without surveyed bank breaklines or production wet-bank microgeometry.",
+    "Water remains optically thin with weak rapid foam, breaking-wave volume, spray, mist, rock-contact plumes, reflection, refraction, caustics, and riverbed transitions.",
+    "Cooked hydraulics remain unconverged and discharge, bathymetry, stationing, hazards, and guide line are not calibrated to observed Upper Huacas behavior.",
+    "The corridor still lacks reviewed rainforest atmosphere, volumetric humidity, distance haze, production color grading, and target-hardware performance evidence."
+  ],
+  "required_external_acceptance_gates": [
+    "Pacuare guide review of the Upper Huacas line, hazards, water levels, entry, exit, and rescue routes",
+    "geospatial review of exact stationing, planform, vertical datum, bank breaklines, higher-resolution terrain, rocks, and bathymetry",
+    "hydraulic calibration and convergence approval against observed Upper Huacas behavior across playable flow bands",
+    "ecology and environment-art approval of species, density, canopy strata, ground cover, geology, wet banks, lighting, and rainforest atmosphere",
+    "photoreal water/VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "sha256": "8adf2d3219546a3a7c4c5dfe33667674bf8b0f2bd2b807dee419f7966c910557"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
+      "sha256": "cee554bc9c8a377d33327fc043bbbc8b475760467ff3c21e408e0db14c625899"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_canopy_morphology_v2_guide_before.png",
+      "sha256": "d6ddfba4754b49a76a392b25460a9f5a98cfca47361a6e0974d31e9253f44955"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_canopy_morphology_v2_guide.png",
+      "sha256": "5a62ec14a117aac77961a711bf0c57cb99f216e7f167294986450ca401800b32"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_canopy_morphology_v2_river_eye_before.png",
+      "sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_canopy_morphology_v2_river_eye.png",
+      "sha256": "2fe6ae29a578171ed29758989e010c11e561e14845f8b213597561c53f6cb7cd"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_canopy_morphology_v2_solver_rapid.png",
+      "sha256": "fd5d4ef3cd08583f2fa126d94ee90df73c52166aaadb15431ec2921e92dc5c3f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Materials/M_RaftSim_Pacuare_OpaqueRainforestVegetation.uasset",
+      "sha256": "a6b8fcde5d4a2f1798edcbb7e296345a371e1f8c7999958f7fc3a97f526597e1"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2.uasset",
+      "sha256": "657a3ca73d8edf33b6385fe1c915f3919059734aa9f0e59ef6f68b1c9e39ea51"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2.uasset",
+      "sha256": "45fd82df1a370583f953ffcf70cfc4c79f6c9123b66c0ef2c2e1acc5d0385dda"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2.uasset",
+      "sha256": "56160ec9351c98d4bfbfe2c21efa6d3bacc48742e9f3bae9ba025560208ee045"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2.uasset",
+      "sha256": "81cc74ec348a3960864ba0c3858ec8533a863dea77ec586c3f83a76d49f0e360"
+    }
+  ]
+}

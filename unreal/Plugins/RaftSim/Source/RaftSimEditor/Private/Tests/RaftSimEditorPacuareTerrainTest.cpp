@@ -43,17 +43,17 @@ bool FRaftSimPacuareOpaqueRainforestVegetationTest::RunTest(
 
     const TCHAR* MeshPaths[] = {
         TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
-             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1."
-             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1"),
+             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2."
+             "SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2"),
         TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
-             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1."
-             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1"),
+             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2."
+             "SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2"),
         TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
-             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1."
-             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1"),
+             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2."
+             "SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2"),
         TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/"
-             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1."
-             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1")};
+             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2."
+             "SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2")};
     for (const TCHAR* MeshPath : MeshPaths)
     {
         UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, MeshPath);
@@ -67,7 +67,8 @@ bool FRaftSimPacuareOpaqueRainforestVegetationTest::RunTest(
             Mesh->IsNaniteEnabled());
         TestTrue(
             FString::Printf(TEXT("%s has solid geometry"), MeshPath),
-            Mesh->GetNumVertices(0) > 100 && Mesh->GetNumTriangles(0) > 100);
+            Mesh->GetNumVertices(0) > 1000 &&
+                Mesh->GetNumTriangles(0) > 1000);
         TestEqual(
             FString::Printf(TEXT("%s has one material slot"), MeshPath),
             Mesh->GetStaticMaterials().Num(),

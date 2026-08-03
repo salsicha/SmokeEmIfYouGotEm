@@ -259,6 +259,147 @@ void AppendZambeziOpaqueLobe(
         Colors);
 }
 
+void AppendOrientedRainforestLobe(
+    const FVector& Center,
+    const FVector& Radii,
+    const FRotator& Rotation,
+    int32 Seed,
+    const FLinearColor& BaseColor,
+    int32 RingCount,
+    int32 SegmentCount,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& Uvs,
+    TArray<FLinearColor>& Colors)
+{
+    const int32 FirstVertex = Vertices.Num();
+    AppendOpaqueLobe(
+        Center,
+        Radii,
+        Seed,
+        BaseColor,
+        RingCount,
+        SegmentCount,
+        Vertices,
+        Triangles,
+        Normals,
+        Uvs,
+        Colors);
+    for (int32 VertexIndex = FirstVertex;
+         VertexIndex < Vertices.Num();
+         ++VertexIndex)
+    {
+        Vertices[VertexIndex] = Center + Rotation.RotateVector(
+            Vertices[VertexIndex] - Center);
+    }
+}
+
+void AppendRainforestOpaqueCrownlet(
+    const FVector& Center,
+    const FVector& Radii,
+    int32 Seed,
+    const FLinearColor& BaseColor,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& Uvs,
+    TArray<FLinearColor>& Colors)
+{
+    // One large low-resolution ellipsoid produced the repeated polygon fans
+    // visible from the Upper Huacas guide cameras.  The V2 fallback keeps an
+    // opaque, distance-stable core but wraps it in smaller oblique crownlets.
+    // This is morphology-only presentation geometry: it has no collision,
+    // species authority, wind authority, or terrain/hydraulic influence.
+    const float CoreScale = FMath::Lerp(
+        0.58f,
+        0.68f,
+        ZambeziVegetationUnitRandom(Seed, 6101));
+    AppendOpaqueLobe(
+        Center,
+        Radii * FVector(
+            CoreScale,
+            CoreScale * 0.86f,
+            CoreScale * 0.72f),
+        Seed,
+        ScalePreviewColor(BaseColor, 0.91f),
+        10,
+        20,
+        Vertices,
+        Triangles,
+        Normals,
+        Uvs,
+        Colors);
+
+    constexpr int32 LeafClusterCount = 6;
+    for (int32 ClusterIndex = 0;
+         ClusterIndex < LeafClusterCount;
+         ++ClusterIndex)
+    {
+        const int32 ClusterSeed = Seed + 89 + ClusterIndex * 47;
+        const float Angle =
+            UE_TWO_PI * static_cast<float>(ClusterIndex) /
+                static_cast<float>(LeafClusterCount) +
+            Seed * 0.031f +
+            FMath::Lerp(
+                -0.24f,
+                0.24f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6113));
+        const float RadialScale = FMath::Lerp(
+            0.32f,
+            0.48f,
+            ZambeziVegetationUnitRandom(ClusterSeed, 6121));
+        const FVector Offset(
+            FMath::Cos(Angle) * Radii.X * RadialScale,
+            FMath::Sin(Angle) * Radii.Y * RadialScale,
+            Radii.Z * FMath::Lerp(
+                -0.24f,
+                0.27f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6131)));
+        const FVector ClusterRadii = Radii * FVector(
+            FMath::Lerp(
+                0.38f,
+                0.52f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6133)),
+            FMath::Lerp(
+                0.22f,
+                0.34f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6143)),
+            FMath::Lerp(
+                0.24f,
+                0.38f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6151)));
+        const FRotator ClusterRotation(
+            FMath::Lerp(
+                -20.0f,
+                20.0f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6163)),
+            FMath::RadiansToDegrees(Angle),
+            FMath::Lerp(
+                -13.0f,
+                13.0f,
+                ZambeziVegetationUnitRandom(ClusterSeed, 6173)));
+        AppendOrientedRainforestLobe(
+            Center + Offset,
+            ClusterRadii,
+            ClusterRotation,
+            ClusterSeed,
+            ScalePreviewColor(
+                BaseColor,
+                FMath::Lerp(
+                    0.82f,
+                    1.16f,
+                    ZambeziVegetationUnitRandom(ClusterSeed, 6197))),
+            6,
+            12,
+            Vertices,
+            Triangles,
+            Normals,
+            Uvs,
+            Colors);
+    }
+}
+
 void AppendTemperateOpaqueLobe(
     const FVector& Center,
     const FVector& Radii,
@@ -273,13 +414,11 @@ void AppendTemperateOpaqueLobe(
 {
     if (bRainforestPalette)
     {
-        AppendOpaqueLobe(
+        AppendRainforestOpaqueCrownlet(
             Center,
             Radii,
             Seed,
             BaseColor,
-            8,
-            16,
             Vertices,
             Triangles,
             Normals,
@@ -1853,9 +1992,9 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
     OutMaterial = CreateOpaqueVegetationMaterial(
         PacuareRainforestVegetationMaterialPath,
         TEXT("Pacuare rainforest"),
-        0.145f,
-        0.86f,
-        1.14f,
+        0.20f,
+        0.84f,
+        1.16f,
         OutSummary);
     if (!OutMaterial)
     {
@@ -1863,7 +2002,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
     }
     OutCanopyTreeA = CreateTemperateOpaqueVegetationMesh(
         World,
-        TEXT("SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV1"),
+        TEXT("SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2"),
         ETemperateVegetationForm::BroadleafTree,
         7103,
         OutMaterial,
@@ -1878,7 +2017,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
     // in the Upper Huacas rainforest fallback.
     OutCanopyTreeB = CreateTemperateOpaqueVegetationMesh(
         World,
-        TEXT("SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV1"),
+        TEXT("SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2"),
         ETemperateVegetationForm::ConiferTree,
         7207,
         OutMaterial,
@@ -1889,7 +2028,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
         OutSummary);
     OutShrub = CreateTemperateOpaqueVegetationMesh(
         World,
-        TEXT("SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV1"),
+        TEXT("SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2"),
         ETemperateVegetationForm::RiparianShrub,
         7309,
         OutMaterial,
@@ -1900,7 +2039,7 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
         OutSummary);
     OutGroundCover = CreateTemperateOpaqueVegetationMesh(
         World,
-        TEXT("SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV1"),
+        TEXT("SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2"),
         ETemperateVegetationForm::GroundCover,
         7411,
         OutMaterial,
