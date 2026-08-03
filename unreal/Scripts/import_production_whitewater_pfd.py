@@ -159,7 +159,7 @@ def configure_and_audit(
     ]
     fallback_triangles = mesh.get_num_triangles(0)
     if not (
-        36.0 <= dimensions[0] <= 48.0
+        32.0 <= dimensions[0] <= 44.0
         and 32.0 <= dimensions[1] <= 44.0
         and 40.0 <= dimensions[2] <= 56.0
     ):

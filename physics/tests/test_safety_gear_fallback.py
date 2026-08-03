@@ -59,6 +59,11 @@ CURVED_SIDE_WEBBING_REVIEW_PATH = (
     REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_curved_side_webbing_pfd_v4_review.json"
 )
+TAPERED_SOFT_CELL_PFD_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_tapered_soft_cell_pfd_v5_review.json"
+)
 
 
 def test_safety_gear_geometry_and_material_contracts_are_source_locked() -> None:
@@ -228,21 +233,23 @@ def test_project_owned_production_pfd_source_and_import_are_hash_locked() -> Non
         "outline_corner_rounding": "four-pass closed Chaikin",
         "outline_corner_rounding_passes": 4,
         "flat_exterior_foam_faces": 0,
-        "carrier_shell_thickness_cm": 0.9,
-        "front_panel_foam_thickness_cm": 4.2,
-        "front_panel_edge_roll_cm": 1.0,
-        "front_panel_crown_depth_cm": 1.25,
-        "front_panel_lateral_wrap_depth_cm": 2.4,
-        "back_panel_foam_thickness_cm": 3.2,
-        "back_panel_edge_roll_cm": 0.92,
-        "back_panel_crown_depth_cm": 1.6,
-        "back_panel_lateral_wrap_depth_cm": 3.8,
+        "crown_profile": "eleven-ring soft cosine loft",
+        "carrier_shell_thickness_cm": 0.7,
+        "front_panel_foam_thickness_cm": 3.0,
+        "front_panel_edge_roll_cm": 0.75,
+        "front_panel_crown_depth_cm": 0.65,
+        "front_panel_lateral_wrap_depth_cm": 3.0,
+        "back_panel_foam_thickness_cm": 2.4,
+        "back_panel_edge_roll_cm": 0.65,
+        "back_panel_crown_depth_cm": 0.75,
+        "back_panel_lateral_wrap_depth_cm": 3.2,
         "rigid_side_foam_wings": 0,
         "side_webbing_connector_profile": "curved torso-following fabric",
         "side_webbing_connector_thickness_cm": 0.22,
         "side_webbing_connector_height_cm": 1.05,
         "front_pocket_flat_exterior_faces": 0,
-        "front_pocket_crown_depth_cm": 0.18,
+        "front_pocket_crown_depth_cm": 0.12,
+        "front_backup_webbing_profile": "curved torso-following fabric",
         "rescue_belt_profile": "flat torso-following webbing",
         "rescue_belt_thickness_cm": 0.36,
         "duplicate_tubular_side_adjustment_runs": 0,
@@ -322,7 +329,7 @@ def test_cloth_wet_pfd_review_is_hash_verified_and_fail_closed() -> None:
         assert hashlib.sha256(path.read_bytes()).hexdigest() == asset["sha256"]
 
 
-def test_curved_side_webbing_pfd_review_is_hash_verified_and_fail_closed() -> None:
+def test_superseded_curved_side_webbing_pfd_review_retains_immutable_evidence() -> None:
     review = json.loads(CURVED_SIDE_WEBBING_REVIEW_PATH.read_text(encoding="utf-8"))
 
     assert review["technical_candidate_passed"] is True
@@ -339,6 +346,80 @@ def test_curved_side_webbing_pfd_review_is_hash_verified_and_fail_closed() -> No
     )
     assert review["runtime_roster_metrics"]["captured_character_count"] == 5
     assert review["runtime_roster_metrics"]["characters_using_production_pfd"] == 5
+    assert review["runtime_roster_metrics"]["maximum_runtime_torso_error_cm"] == 0.0
+    assert review["reviewers"]["named_character_art_reviewer"] is None
+    assert review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
+    assert review["reviewers"]["human_approved"] is False
+
+    # The active generator, source mesh and runtime asset legitimately advance
+    # in V5. V4 remains a historical review by locking only its retained report
+    # and renderer artifacts rather than the mutable production paths.
+    hash_locked_paths = [
+        (
+            review["runtime_asset"]["import_report"],
+            review["runtime_asset"]["import_report_sha256"],
+        ),
+        (
+            review["runtime_roster_metrics"]["source_report"],
+            review["runtime_roster_metrics"]["source_report_sha256"],
+        ),
+        (review["validation"]["m5_report"], review["validation"]["m5_report_sha256"]),
+    ]
+    for relative_path, expected_hash in hash_locked_paths:
+        path = REPO_ROOT / relative_path
+        assert path.is_file()
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == expected_hash
+
+    for evidence in review["renderer_evidence"].values():
+        if not isinstance(evidence, dict) or "capture" not in evidence:
+            continue
+        capture = REPO_ROOT / evidence["capture"]
+        assert capture.is_file()
+        assert (
+            hashlib.sha256(capture.read_bytes()).hexdigest()
+            == evidence["capture_sha256"]
+        )
+
+    m5 = json.loads(
+        (REPO_ROOT / review["validation"]["m5_report"]).read_text(encoding="utf-8-sig")
+    )
+    assert m5["succeeded"] == 1
+    assert m5["failed"] == 0
+
+
+def test_tapered_soft_cell_pfd_review_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(
+        TAPERED_SOFT_CELL_PFD_REVIEW_PATH.read_text(encoding="utf-8")
+    )
+
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["promotion_allowed"] is False
+    assert review["supersedes"] == (
+        "docs/environment-captures/south_fork_full_reach/"
+        "m9_curved_side_webbing_pfd_v4_review.json"
+    )
+    assert review["source"]["generator_version"] == 12
+    assert review["runtime_asset"]["dimensions_cm"] == [33.345, 34.22, 42.8]
+    assert review["runtime_asset"]["authored_lod0_triangles"] == 40232
+    assert review["runtime_asset"]["nanite_enabled"] is True
+    assert review["construction"]["side_wings"] == 0
+    assert review["construction"]["side_webbing_connectors"] == 4
+    assert review["construction"]["shoulder_foam_pads"] == 0
+    assert review["soft_geometry"]["crown_profile"] == (
+        "eleven-ring soft cosine loft"
+    )
+    assert review["soft_geometry"]["front_panel_foam_thickness_cm"] == 3.0
+    assert review["soft_geometry"]["back_panel_foam_thickness_cm"] == 2.4
+    assert review["soft_geometry"]["front_backup_webbing_profile"] == (
+        "curved torso-following fabric"
+    )
+    assert review["runtime_roster_metrics"]["captured_character_count"] == 5
+    assert review["runtime_roster_metrics"]["characters_using_production_pfd"] == 5
+    assert (
+        review["runtime_roster_metrics"]["characters_with_live_pfd_material_response"]
+        == 5
+    )
     assert review["runtime_roster_metrics"]["maximum_runtime_torso_error_cm"] == 0.0
     assert review["reviewers"]["named_character_art_reviewer"] is None
     assert review["reviewers"]["qualified_whitewater_safety_reviewer"] is None
@@ -377,7 +458,14 @@ def test_curved_side_webbing_pfd_review_is_hash_verified_and_fail_closed() -> No
         )
 
     m5 = json.loads(
-        (REPO_ROOT / review["validation"]["m5_report"]).read_text(encoding="utf-8-sig")
+        (REPO_ROOT / review["validation"]["m5_report"]).read_text(
+            encoding="utf-8-sig"
+        )
     )
     assert m5["succeeded"] == 1
     assert m5["failed"] == 0
+    assert m5["tests"][0]["fullTestPath"] == (
+        "RaftSim.M5.CrewAvatarPoseProduction"
+    )
+    assert m5["tests"][0]["warnings"] == 0
+    assert m5["tests"][0]["errors"] == 0

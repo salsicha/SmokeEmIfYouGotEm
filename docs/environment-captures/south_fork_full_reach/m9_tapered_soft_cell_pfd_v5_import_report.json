@@ -1,31 +1,18 @@
 {
-  "schema": "raftsim.production_whitewater_pfd_source.v1",
+  "schema_version": 1,
+  "status": "production_mesh_imported",
+  "asset_path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd.SM_RaftSim_WhitewaterRescuePfd",
+  "source_fbx_sha256": "b9634b21b4737ec4e8aab3f8a40ad6a629dbb291888cd2d6a5b2ea991e179c33",
   "generator_version": 12,
   "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
-  "source_inputs": [],
-  "reference_only_sources": [
-    {
-      "url": "https://www.nrs.com/nrs-rapid-rescuer-pfd/pvdx",
-      "facts_used": "high profile, four-panel chest, thin back, front zip, two pockets, eight adjustment points, reflective/placard zones and quick-release rescue belt",
-      "asset_content_copied": false
-    },
-    {
-      "url": "https://astraldesigns.com/products/greenjacket",
-      "facts_used": "whitewater/rafting rescue use, contoured layered foam, adjustable shoulder webbing, fitted sides and rescue hardware",
-      "asset_content_copied": false
-    }
+  "dimensions_cm": [
+    33.345,
+    34.22,
+    42.8
   ],
-  "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
-  "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
-  "fbx_sha256": "b9634b21b4737ec4e8aab3f8a40ad6a629dbb291888cd2d6a5b2ea991e179c33",
-  "blend_sha256": "a9c4797a185c9dec7561a1139f0771cbd52f069367498e9bd2d199a83aea79d0",
-  "material_slots": [
-    "PfdShell",
-    "PfdWebbing",
-    "PfdHardware",
-    "PfdReflective",
-    "PfdLabel"
-  ],
+  "authored_lod0_triangles": 40232,
+  "nanite_fallback_triangles": 2616,
+  "nanite_enabled": true,
   "construction": {
     "front_carrier_panels": 2,
     "back_carrier_panels": 1,
@@ -75,23 +62,27 @@
     "duplicate_tubular_side_adjustment_runs": 0,
     "smooth_shaded": true
   },
-  "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native.",
-  "vertex_count": 20510,
-  "polygon_count": 21790,
-  "uv_channel_count": 1,
-  "bounds_min_cm": [
-    -15.92,
-    -17.11,
-    -18.8
+  "material_slots": [
+    {
+      "slot": "PfdShell",
+      "material": "/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"
+    },
+    {
+      "slot": "PfdWebbing",
+      "material": "/Game/RaftSim/Materials/M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing"
+    },
+    {
+      "slot": "PfdHardware",
+      "material": "/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"
+    },
+    {
+      "slot": "PfdReflective",
+      "material": "/Game/RaftSim/Materials/M_RaftSim_Helmet_White.M_RaftSim_Helmet_White"
+    },
+    {
+      "slot": "PfdLabel",
+      "material": "/Game/RaftSim/Materials/M_RaftSim_PFDWebbing.M_RaftSim_PFDWebbing"
+    }
   ],
-  "bounds_max_cm": [
-    17.425,
-    17.11,
-    24.0
-  ],
-  "dimensions_cm": [
-    33.345,
-    34.22,
-    42.8
-  ]
+  "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
 }
