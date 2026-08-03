@@ -59,6 +59,8 @@ constexpr TCHAR Cc0ScannedGroundCoverBaselineCaptureDirectoryRelativePath[] =
     TEXT("docs/environment-captures/south_fork_full_reach/photographic_v216_pre_cc0_scanned_ground_cover");
 constexpr TCHAR Cc0ScannedGroundCoverCandidateCaptureDirectoryRelativePath[] =
     TEXT("docs/environment-captures/south_fork_full_reach/photographic_v216_cc0_scanned_ground_cover");
+constexpr TCHAR PaddedSolverFoamTopologyCaptureDirectoryRelativePath[] =
+    TEXT("docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam");
 
 FString AbsoluteCapturePath(const FString& RelativePath)
 {
@@ -1312,6 +1314,9 @@ bool CaptureSouthForkView(
     const bool bCc0ScannedGroundCoverCandidateReviewCapture = FParse::Param(
         FCommandLine::Get(),
         TEXT("RaftSimCc0ScannedGroundCoverCandidateReview"));
+    const bool bPaddedSolverFoamTopologyReviewCapture = FParse::Param(
+        FCommandLine::Get(),
+        TEXT("RaftSimPaddedSolverFoamTopologyReview"));
     FlushAsyncLoading();
     // Settle every streamed resource before fixed-camera evidence so package
     // load completion cannot change distant shelves, materials, or canopy.
@@ -1561,6 +1566,11 @@ bool CaptureSouthForkView(
     {
         CaptureDirectory =
             Cc0ScannedGroundCoverCandidateCaptureDirectoryRelativePath;
+    }
+    if (bPaddedSolverFoamTopologyReviewCapture)
+    {
+        CaptureDirectory =
+            PaddedSolverFoamTopologyCaptureDirectoryRelativePath;
     }
     OutRelativePath = FString::Printf(
         TEXT("%s/%s.png"), CaptureDirectory, *CaptureId);

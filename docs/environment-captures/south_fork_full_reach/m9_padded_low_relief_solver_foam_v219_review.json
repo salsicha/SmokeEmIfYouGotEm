@@ -1,0 +1,126 @@
+{
+  "artifact": "M9 South Fork padded low-relief solver foam V219 review",
+  "recorded_local_date": "2026-08-03",
+  "milestone": "M9",
+  "status": "visual_milestone_retained_external_environment_art_water_geospatial_guide_and_performance_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "visual_milestone_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "summary": "V219 removes independently admitted half-triangles from the one-metre South Fork solver-foam overlay, admits only complete paired quads inside wet/deep hydraulic support, and retains two transparent support cells around active foam so a mesh diagonal cannot define the visible edge. Overlay separation is reduced from the V218 0.56 m control to a 0.14 m cap above the existing broad-water micro-relief. In the exact V218/V219 comparison, Meat Grinder's long bright polygon ribbons become lower irregular foam patches; Troublemaker retains sparse solver-authorized foam; and no new bank overlap is visible at Coloma Bridge or the other fixed views. This is a material presentation improvement, but the coarse terrain, flat water body, repeated vegetation, generic lighting, and absent named external approvals still fail the full photoreal acceptance gate.",
+  "implementation": {
+    "runnable_map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "water_tiles": 39,
+    "solver_foam_overlay_actors": 24,
+    "solver_foam_overlay_triangles": 534958,
+    "refined_cell_size_m": 1.0,
+    "complete_paired_quad_topology": true,
+    "transparent_padding_cells": 2,
+    "padding_requires_all_vertices_wet": true,
+    "minimum_padding_shoreline_depth_m": 0.10,
+    "maximum_overlay_separation_m": 0.14,
+    "material_mask": "project-owned flow-aligned foam lace multiplied by solver-derived vertex opacity and runtime raft/crew exclusion",
+    "collision": "NoCollision",
+    "cast_shadow": false
+  },
+  "authority": {
+    "visual_presentation_only": true,
+    "base_water_geometry_changed": false,
+    "base_water_material_changed": false,
+    "solver_foam_overlay_geometry_changed": true,
+    "hydraulics_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "raft_or_crew_physics_changed": false,
+    "calm_water_can_gain_overlay": false,
+    "shoreline_clipped_terrain_can_gain_padding": false
+  },
+  "objective_capture_comparison": {
+    "baseline": "photographic_v218_padded_solver_foam_topology",
+    "candidate": "photographic_v219_padded_low_relief_solver_foam",
+    "method": "exact fixed cameras after consecutive water-only regenerations; changed pixels use maximum RGB delta greater than 8",
+    "captures": [
+      {
+        "capture": "chili_bar_launch_downstream",
+        "baseline_sha256": "20c363ef55345a8dfd130ebe0d483af312d3d85d66c8d780a9dc2093fad3d70c",
+        "candidate_sha256": "12777eca4ba9c78612ab1adaa25ad76c78e0e449f791a467218ea72e23dce3f7",
+        "changed_pixel_fraction_gt8": 0.002172,
+        "mean_absolute_rgb_delta": 0.105526
+      },
+      {
+        "capture": "coloma_bridge_context",
+        "baseline_sha256": "f69ae722df1378022739096f692e3bdab5c767b68fbfd20233451609e6e96187",
+        "candidate_sha256": "74f2792a04982c05b78be29f0c78038c69dda931e14c7da20f89768f933dddb3",
+        "changed_pixel_fraction_gt8": 0.001845,
+        "mean_absolute_rgb_delta": 0.086397
+      },
+      {
+        "capture": "meat_grinder_guide_eye",
+        "baseline_sha256": "ea54caf7cd11d51966b74a768a82ed48701f52a87e4110a4199cf8e35a22ba6f",
+        "candidate_sha256": "c578d5542de029bb3a58e06eaf6ea5387bc12352a4c4230f0f1494ad0db0f85d",
+        "changed_pixel_fraction_gt8": 0.011408,
+        "mean_absolute_rgb_delta": 0.820565
+      },
+      {
+        "capture": "salmon_falls_takeout",
+        "baseline_sha256": "cfac0c3e9fc6f3d64ebf3e7da039aff71df41ee58005577c6b89e08a8a93dc73",
+        "candidate_sha256": "f8949eb80ed288eb335181a51736dc986ae63db85b5ce2c76c6b27c1d2154982",
+        "changed_pixel_fraction_gt8": 0.001000,
+        "mean_absolute_rgb_delta": 0.031240
+      },
+      {
+        "capture": "troublemaker_approach",
+        "baseline_sha256": "9d7878ad0bbd0a4af2136d62b29bbdd8be5ed08fd5d07901ceb1ae96375adeea",
+        "candidate_sha256": "024ea142a3ae4accfdca31b2a2034a91d44f2043772eb4139d27ec2a940b1e08",
+        "changed_pixel_fraction_gt8": 0.002348,
+        "mean_absolute_rgb_delta": 0.117915
+      }
+    ]
+  },
+  "review_decision": {
+    "retained": true,
+    "reason": "The complete-quad topology removes mesh-diagonal admission, and the shallow separation removes the most legible raised polygon fins while keeping the solver-authorized whitewater field readable.",
+    "observed_new_bank_overlap": false,
+    "observed_calm_water_foam": false,
+    "observed_long_bright_polygon_fins": false,
+    "canonical_capture_promotion": false
+  },
+  "rejected_experiments": [
+    "V217 static breaking-wave sheets: rejected because the added bright slanted polygons worsened Troublemaker and were unreadable at Meat Grinder and Coloma.",
+    "V218 complete-quad topology at the legacy 0.56 m overlay displacement: retained only as a matched technical control because it removed half-triangle admission but left long bright raised facet silhouettes."
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with Unreal Engine 5.8",
+    "focused_native": "RaftSim.M9.EShorelinePresentationCompletion passed after the final source change",
+    "focused_python": "physics/tests/test_editor_source_layout.py::test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_holes passed",
+    "map_generation": "13 terrain tiles, 39 water tiles, 24 solver-foam overlays, and 534958 paired-quad overlay triangles generated without environment-automation errors",
+    "capture_set": "five fixed 1280x720 photographic captures saved for the V218 control and V219 candidate",
+    "graphify": "graphify update completed after the final source change: 176081 nodes, 200444 edges, and 14817 communities"
+  },
+  "photoreal_rejection_reasons": [
+    "The broad water still lacks physically convincing breaking-wave volume, turbulent entrainment, and evolving foam advection at named rapids.",
+    "The 30 m/derived terrain and shoreline remain broad and visibly procedural at guide-eye distance.",
+    "Tree crowns, ground cover, bridge detail, distant relief, lighting, and atmosphere do not yet match an approved photographic reference set.",
+    "No named water-art, environment-art, geospatial, or South Fork guide reviewer has approved the five fixed frames.",
+    "Packaged desktop and target-VR performance qualification remain open."
+  ],
+  "reviewers": {
+    "named_water_art_reviewer": null,
+    "named_environment_art_reviewer": null,
+    "named_geospatial_reviewer": null,
+    "named_south_fork_guide_reviewer": null,
+    "water_art_approval": false,
+    "environment_art_approval": false,
+    "geospatial_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "A named water-art reviewer must approve or replace the foam scale, coverage, material response, and relationship to breaking-wave volume across all five fixed frames.",
+    "A named environment-art reviewer must approve the complete frame composition and photoreal match.",
+    "A named geospatial reviewer must confirm that the visual-only overlay does not imply surveyed water-surface or navigation authority.",
+    "A named South Fork guide must approve hazard and line readability at Chili Bar, Meat Grinder, Coloma Bridge, Troublemaker, and Salmon Falls.",
+    "Pass packaged Shipping desktop and target-VR performance, comfort, and readability qualification.",
+    "The wider product-owner, character, safety, accessibility, packaging, signing, media, and distribution acceptance gates remain open."
+  ]
+}

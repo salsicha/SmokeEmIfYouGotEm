@@ -1359,10 +1359,16 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert "RaftSimSolverFoamOverlay" in full_reach_source
     assert "MaximumOpacity >= 0.025f" in coverage_source
     assert "MeanOpacity >= 0.006f" in coverage_source
+    assert "ActiveCells.Init(0, CellCount)" in coverage_source
+    assert "OverlayCells.Init(0, CellCount)" in coverage_source
+    assert "constexpr int32 TransparentPaddingCells = 2" in coverage_source
+    assert "HydraulicPresentation[VertexIndex].A < 0.90f" in coverage_source
+    assert "ShorelineDepthsM[VertexIndex] <= 0.10f" in coverage_source
+    assert "OutTriangles.Append({I0, I1, I2, I1, I3, I2})" in coverage_source
     assert "SolverFoam <= 0.0f" in coverage_source
     assert "Sample.VerticalDisplacementCm" in coverage_source
     assert "Sample.VerticalDisplacementCm = FMath::Clamp(" in coverage_source
-    assert "56.0f);" in coverage_source
+    assert "14.0f);" in coverage_source
     assert 'TEXT("solver_and_guide_conditioned_whitewater_foam_overlays")' in (
         manifest_source
     )
@@ -1378,7 +1384,11 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert "BuildSouthForkRefinedWhitewaterOverlayGeometry" in full_reach_source
     assert "BuildSouthForkRefinedWhitewaterOverlayGeometry" in coverage_source
     assert "one-metre refined non-colliding" in manifest_source
-    assert "maximum vertical displacement 0.56 m" in manifest_source
+    assert "complete paired quads" in manifest_source
+    assert 'TEXT("whitewater_foam_complete_paired_quad_topology"), true' in (
+        manifest_source
+    )
+    assert "capped at 0.14 m" in manifest_source
     assert 'FMaterialParameterInfo(TEXT("TerrainSpecular"))' in coverage_source
     assert "bUseCorridorEdgeBlend ? 0.0f : 0.12f" in coverage_source
     assert "reflected the sky a" in coverage_source
