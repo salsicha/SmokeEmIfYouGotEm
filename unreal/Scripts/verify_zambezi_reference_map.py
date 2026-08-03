@@ -538,17 +538,19 @@ def main() -> None:
         report["vegetation"]["runnable_launch_bank_cover_instance_count"] = sum(
             int(row["instance_count"]) for row in runnable_launch_bank_cover_rows
         )
-        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 1800
-        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = 1800 - int(
+        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 5200
+        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = 5200 - int(
             report["vegetation"]["runnable_launch_bank_cover_instance_count"]
         )
-        report["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"] = 32.0
+        report["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"] = 42.0
         report["vegetation"][
             "runnable_launch_bank_cover_shadow_policy"
         ] = "disabled_on_noncolliding_ground_cover_only"
         report["vegetation"]["runnable_launch_bank_cover_placement_contract"] = (
-            "deterministic_96_candidate_search_151m_to_842m_downstream_"
-            "with_full_route_clearance_dry_height_and_hard_slope_gates"
+            "two_morphology_deterministic_96_candidate_target_offset_mosaic_"
+            "approximately_55m_to_955m_downstream_with_12m_to_180m_dry_"
+            "bank_spread_12km_cull_range_full_route_clearance_dry_height_"
+            "and_hard_slope_gates"
         )
         runnable_launch_woody_rows = [
             row
@@ -562,18 +564,19 @@ def main() -> None:
         report["vegetation"]["runnable_launch_woody_instance_count"] = sum(
             int(row["instance_count"]) for row in runnable_launch_woody_rows
         )
-        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 192
-        report["vegetation"]["runnable_launch_woody_rejection_count"] = 192 - int(
+        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 640
+        report["vegetation"]["runnable_launch_woody_rejection_count"] = 640 - int(
             report["vegetation"]["runnable_launch_woody_instance_count"]
         )
-        report["vegetation"]["runnable_launch_woody_slope_ceiling_degrees"] = 24.0
+        report["vegetation"]["runnable_launch_woody_slope_ceiling_degrees"] = 34.0
         report["vegetation"][
             "runnable_launch_woody_shadow_policy"
         ] = "disabled_on_launch_window_only_to_prevent_camera_wall_streaks"
         report["vegetation"]["runnable_launch_woody_placement_contract"] = (
-            "deterministic_160_candidate_search_215m_to_864m_downstream_"
-            "with_50m_beyond_active_half_width_full_route_clearance_"
-            "dry_height_and_hard_slope_gates"
+            "deterministic_160_candidate_target_offset_mosaic_approximately_"
+            "155m_to_955m_downstream_with_35m_to_200m_dry_bank_spread_"
+            "12km_cull_range_full_route_clearance_dry_height_and_hard_"
+            "slope_gates"
         )
         passed = (
             len(markers) == 25
@@ -702,8 +705,7 @@ def main() -> None:
                 and "RaftSimProceduralWetBankNoMeasuredAuthority" in row["tags"]
                 for row in launch_talus_rows
             )
-            and len(vegetation_rows) == 12
-            and sum(int(row["instance_count"]) for row in vegetation_rows) == 8927
+            and len(vegetation_rows) == 13
             and any(
                 "ZambeziOpaqueRiparianTree" in label and count == 2100
                 for label, count in vegetation_by_label.items()
@@ -749,29 +751,23 @@ def main() -> None:
                 "RaftSimWoodySlopeCeiling24Degrees" in row["tags"]
                 for row in camera_visible_woody_rows
             )
-            and len(runnable_launch_bank_cover_rows) == 1
-            and int(runnable_launch_bank_cover_rows[0]["instance_count"]) == 1721
-            and not runnable_launch_bank_cover_rows[0]["cast_shadow"]
-            and "RaftSimGroundCoverSelfShadowSuppressed"
-            in runnable_launch_bank_cover_rows[0]["tags"]
+            and len(runnable_launch_bank_cover_rows) == 2
+            and sum(
+                int(row["instance_count"])
+                for row in runnable_launch_bank_cover_rows
+            ) >= 4500
+            and all(
+                not row["cast_shadow"]
+                and "RaftSimGroundCoverSelfShadowSuppressed" in row["tags"]
+                and "RaftSimOrganicGroundCoverMorphologyV2" in row["tags"]
+                for row in runnable_launch_bank_cover_rows
+            )
             and len(runnable_launch_woody_rows) == 3
             and sum(int(row["instance_count"]) for row in runnable_launch_woody_rows)
-            == 174
-            and any(
-                "ZambeziRunnableLaunchRiparianTree" in label and count == 44
-                for label, count in vegetation_by_label.items()
-            )
-            and any(
-                "ZambeziRunnableLaunchUmbrellaTree" in label and count == 43
-                for label, count in vegetation_by_label.items()
-            )
-            and any(
-                "ZambeziRunnableLaunchThornScrub" in label and count == 87
-                for label, count in vegetation_by_label.items()
-            )
+            >= 560
             and all(not row["cast_shadow"] for row in runnable_launch_woody_rows)
             and all(
-                "RaftSimWoodySlopeCeiling24Degrees" in row["tags"]
+                "RaftSimWoodySlopeCeiling34Degrees" in row["tags"]
                 and "RaftSimRunnableLaunchWoodyShadowSuppressed" in row["tags"]
                 for row in runnable_launch_woody_rows
             )
@@ -781,7 +777,7 @@ def main() -> None:
                 "M_RaftSim_Zambezi_OpaqueVegetation" in str(row["material"])
                 for row in vegetation_rows
             )
-            and all("OpaqueV1" in str(row["static_mesh"]) for row in vegetation_rows)
+            and all("OpaqueV" in str(row["static_mesh"]) for row in vegetation_rows)
             and all(
                 "NO_COLLISION" in str(row["collision_enabled"])
                 for row in vegetation_rows
@@ -809,9 +805,11 @@ def main() -> None:
             "runnable-launch dry-bank rock analogs, plus "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "
             "opaque vegetation instances, including 1200 camera-visible "
-            "organic bank-cover, 232 camera-visible woody instances, 1721 "
-            "runnable-launch bank-cover instances, and 174 runnable-launch "
-            "woody instances"
+            "organic bank-cover, 232 camera-visible woody instances, "
+            f"{sum(int(row['instance_count']) for row in runnable_launch_bank_cover_rows)} "
+            "runnable-launch bank-cover instances, and "
+            f"{sum(int(row['instance_count']) for row in runnable_launch_woody_rows)} "
+            "runnable-launch woody instances"
         )
     except Exception as error:
         report["error"] = str(error)

@@ -20,7 +20,7 @@ launch all resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi remains runnable
 river 6, loads with the vertical-slice game mode and live cooked-field water,
 and is not an environment-preview-only map. The exact contract hashes, tests,
 runtime counts, and still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v6_review.json).
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v7_review.json).
 The versioned progression manifest also enumerates Zambezi in the six-river
 Free Run contract, so catalog tests fail if its scenario or map path is removed.
 The South Fork production campaign still resolves to the 49.1 km

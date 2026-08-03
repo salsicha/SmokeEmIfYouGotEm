@@ -1,0 +1,114 @@
+{
+  "schema": "raftsim.environment.zambezi_launch_ecology_review.v2",
+  "date": "2026-08-03",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "status": "visual_ecology_coverage_pass_photoreal_promotion_fail",
+  "decision": {
+    "runnable_launch_ecology_coverage": "pass",
+    "photoreal_environment_promotion": "fail",
+    "summary": "The retained runnable map replaces the thin launch shelf row with two ground-cover morphologies and a deterministic first-kilometre dry-bank mosaic. The matched gameplay frame shows broader right-bank cover and additional woody silhouettes with no visible waterline or camera-clipping defect. The coarse 30 m terrain, barren near left wall, synthetic vegetation, and flat water remain below the photoreal bar."
+  },
+  "evidence": {
+    "baseline_capture": "zambezi_launch_ecology_v2_baseline.png",
+    "baseline_sha256": "56a0b7ed822874809f8eb92add8e5a5db812eb0abfb6c865e745cfe459ced2db",
+    "accepted_capture": "zambezi_launch_ecology_v2.png",
+    "accepted_capture_sha256": "19ae9847d94d1792b74bbe0264863525dc1200792b1ffff1018a9ee3494008f4",
+    "capture_size_px": [1280, 720],
+    "capture_command": "RaftSim.CaptureRaft 3 <label> 8 4 22 waterinventory",
+    "capture_path": "matched default runnable L_Zambezi gameplay camera with raft and crew"
+  },
+  "accepted_generation_contract": {
+    "ground_cover": {
+      "target_instances": 5200,
+      "placed_instances": 5200,
+      "component_instances": [2600, 2600],
+      "morphology_count": 2,
+      "rejected_candidates": 0,
+      "maximum_placed_slope_degrees": 40.01,
+      "slope_ceiling_degrees": 42.0,
+      "longitudinal_window_m_downstream": [55, 955],
+      "target_dry_bank_spread_m_beyond_active_half_width": [12, 180],
+      "minimum_height_above_conditioned_water_m": 0.8,
+      "maximum_cull_distance_m": 1200,
+      "collision": "disabled",
+      "cast_shadow": false
+    },
+    "woody_ecology": {
+      "target_instances": 640,
+      "placed_instances": 611,
+      "riparian_tree_instances": 153,
+      "umbrella_tree_instances": 152,
+      "thorn_scrub_instances": 306,
+      "rejected_candidates": 29,
+      "maximum_placed_slope_degrees": 24.24,
+      "slope_ceiling_degrees": 34.0,
+      "longitudinal_window_m_downstream": [155, 955],
+      "target_dry_bank_spread_m_beyond_active_half_width": [35, 200],
+      "minimum_full_route_clearance_beyond_active_half_width_m": 50,
+      "minimum_height_above_conditioned_water_m": 3.0,
+      "maximum_cull_distance_m": 1200,
+      "collision": "disabled",
+      "cast_shadow": false
+    },
+    "saved_map": {
+      "vegetation_components": 13,
+      "vegetation_instances": 12843,
+      "map_check_errors": 0,
+      "map_check_warnings": 0
+    },
+    "authority": {
+      "placement_surface": "source Copernicus Landscape",
+      "procedural_species_claim": false,
+      "rendering_only": true,
+      "changes_collision": false,
+      "changes_water_geometry": false,
+      "changes_solver_state": false,
+      "changes_raft_forces": false
+    }
+  },
+  "rejected_iterations": [
+    {
+      "id": "local_search",
+      "ground_cover_placed": 3369,
+      "woody_placed": 492,
+      "reason": "Rejected before save: local candidate search failed the 4500/560 minimum-population acceptance gates."
+    },
+    {
+      "id": "slope_dominant_broad_search",
+      "ground_cover_placed": 5199,
+      "woody_placed": 611,
+      "reason": "Rejected visually: the broad search met population gates but slope-first scoring still collapsed cover onto easy shelves."
+    },
+    {
+      "id": "target_anchored_32_degree_cover",
+      "ground_cover_placed": 5196,
+      "woody_placed": 611,
+      "reason": "Rejected visually: target anchoring improved the right bank, but the 32-degree low-cover ceiling left gorge slopes unnecessarily bare."
+    }
+  ],
+  "validation": {
+    "editor_build": "pass",
+    "map_generation": "pass",
+    "map_check": "0 errors, 0 warnings",
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v16",
+      "result": "pass"
+    },
+    "manual_capture_review": {
+      "camera_clipped_launch_vegetation": "pass_none_visible",
+      "woody_waterline_intersection": "pass_none_visible",
+      "broad_right_bank_mosaic": "pass",
+      "photorealism": "fail"
+    }
+  },
+  "remaining_external_acceptance_gates": [
+    "Guide and geospatial approval of the playable centerline, stationing, access, portage, and rescue context.",
+    "Rights approval for all terrain, imagery, supplied-map, vegetation, and reference inputs.",
+    "Higher-resolution full-reach terrain or reviewed field-capture derivative replacing the 30 m DSM approximation.",
+    "Southern African gorge-woodland species, density, age, wind, season, and wetness approval.",
+    "Production terrain, vegetation, rock, water, breaking-water, foam, spray, mist, and lighting art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual/performance acceptance."
+  ]
+}

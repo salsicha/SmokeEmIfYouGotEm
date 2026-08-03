@@ -1,5 +1,5 @@
 {
-  "actor_count": 67,
+  "actor_count": 69,
   "launch_talus": {
     "asset_rights_status": "rights_reviewed_cc0_poly_haven_rock_moss_set_01_six_variant_visual_analog",
     "authority": "presentation_only_generic_rock_analog_no_lithology_collision_hydraulic_or_raft_force_authority",
@@ -623,7 +623,7 @@
     "camera_visible_woody_slope_ceiling_degrees": 24.0,
     "camera_visible_woody_slope_rejection_count": 8,
     "camera_visible_woody_target_instance_count": 240,
-    "component_count": 12,
+    "component_count": 13,
     "components": [
       {
         "actor_label": "RaftSim_LandscapeCandidate_ZambeziCameraRiparianTree_zambezi_batoka_gorge",
@@ -773,17 +773,39 @@
         ]
       },
       {
+        "actor_label": "RaftSim_LandscapeCandidate_ZambeziRunnableLaunchGroundCoverB_zambezi_batoka_gorge",
+        "cast_shadow": false,
+        "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
+        "component_count": 1,
+        "instance_count": 2600,
+        "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
+        "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2.SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2",
+        "tags": [
+          "RaftSimGroundCoverSelfShadowSuppressed",
+          "RaftSimNonCollisionRenderSurface",
+          "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimOrganicGroundCoverMorphologyV2",
+          "RaftSimProceduralVegetationFallback",
+          "RaftSimRunnableLaunchBankCover",
+          "RaftSimRunnableLaunchBankEcologyV1",
+          "RaftSimSlopeScreenedPlacement",
+          "RaftSimZambeziOpaqueVegetation",
+          "RaftSimZambeziRun"
+        ]
+      },
+      {
         "actor_label": "RaftSim_LandscapeCandidate_ZambeziRunnableLaunchGroundCover_zambezi_batoka_gorge",
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 1721,
+        "instance_count": 2600,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1.SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1",
         "tags": [
           "RaftSimGroundCoverSelfShadowSuppressed",
           "RaftSimNonCollisionRenderSurface",
           "RaftSimOpaqueVolumetricVegetation",
+          "RaftSimOrganicGroundCoverMorphologyV2",
           "RaftSimProceduralVegetationFallback",
           "RaftSimRunnableLaunchBankCover",
           "RaftSimRunnableLaunchBankEcologyV1",
@@ -797,7 +819,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 44,
+        "instance_count": 153,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1.SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1",
         "tags": [
@@ -808,7 +830,7 @@
           "RaftSimRunnableLaunchWoodyEcology",
           "RaftSimRunnableLaunchWoodyShadowSuppressed",
           "RaftSimSlopeScreenedPlacement",
-          "RaftSimWoodySlopeCeiling24Degrees",
+          "RaftSimWoodySlopeCeiling34Degrees",
           "RaftSimZambeziOpaqueVegetation",
           "RaftSimZambeziRun"
         ]
@@ -818,7 +840,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 87,
+        "instance_count": 306,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1.SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1",
         "tags": [
@@ -829,7 +851,7 @@
           "RaftSimRunnableLaunchWoodyEcology",
           "RaftSimRunnableLaunchWoodyShadowSuppressed",
           "RaftSimSlopeScreenedPlacement",
-          "RaftSimWoodySlopeCeiling24Degrees",
+          "RaftSimWoodySlopeCeiling34Degrees",
           "RaftSimZambeziOpaqueVegetation",
           "RaftSimZambeziRun"
         ]
@@ -839,7 +861,7 @@
         "cast_shadow": false,
         "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
         "component_count": 1,
-        "instance_count": 43,
+        "instance_count": 152,
         "material": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Materials/M_RaftSim_Zambezi_OpaqueVegetation.M_RaftSim_Zambezi_OpaqueVegetation",
         "static_mesh": "/Game/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1.SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1",
         "tags": [
@@ -850,31 +872,31 @@
           "RaftSimRunnableLaunchWoodyEcology",
           "RaftSimRunnableLaunchWoodyShadowSuppressed",
           "RaftSimSlopeScreenedPlacement",
-          "RaftSimWoodySlopeCeiling24Degrees",
+          "RaftSimWoodySlopeCeiling34Degrees",
           "RaftSimZambeziOpaqueVegetation",
           "RaftSimZambeziRun"
         ]
       }
     ],
     "ground_cover_shadow_policy": "disabled_on_full_corridor_camera_mosaic_and_launch_cover",
-    "instance_count": 8927,
+    "instance_count": 12843,
     "legacy_zambezi_pve_actor_count": 0,
     "legacy_zambezi_pve_actors": [],
     "material_contract": "opaque_one_sided_vertex_color_no_alpha_cards",
-    "runnable_launch_bank_cover_component_count": 1,
-    "runnable_launch_bank_cover_instance_count": 1721,
-    "runnable_launch_bank_cover_placement_contract": "deterministic_96_candidate_search_151m_to_842m_downstream_with_full_route_clearance_dry_height_and_hard_slope_gates",
-    "runnable_launch_bank_cover_rejection_count": 79,
+    "runnable_launch_bank_cover_component_count": 2,
+    "runnable_launch_bank_cover_instance_count": 5200,
+    "runnable_launch_bank_cover_placement_contract": "two_morphology_deterministic_96_candidate_target_offset_mosaic_approximately_55m_to_955m_downstream_with_12m_to_180m_dry_bank_spread_12km_cull_range_full_route_clearance_dry_height_and_hard_slope_gates",
+    "runnable_launch_bank_cover_rejection_count": 0,
     "runnable_launch_bank_cover_shadow_policy": "disabled_on_noncolliding_ground_cover_only",
-    "runnable_launch_bank_cover_slope_ceiling_degrees": 32.0,
-    "runnable_launch_bank_cover_target_instance_count": 1800,
+    "runnable_launch_bank_cover_slope_ceiling_degrees": 42.0,
+    "runnable_launch_bank_cover_target_instance_count": 5200,
     "runnable_launch_woody_component_count": 3,
-    "runnable_launch_woody_instance_count": 174,
-    "runnable_launch_woody_placement_contract": "deterministic_160_candidate_search_215m_to_864m_downstream_with_50m_beyond_active_half_width_full_route_clearance_dry_height_and_hard_slope_gates",
-    "runnable_launch_woody_rejection_count": 18,
+    "runnable_launch_woody_instance_count": 611,
+    "runnable_launch_woody_placement_contract": "deterministic_160_candidate_target_offset_mosaic_approximately_155m_to_955m_downstream_with_35m_to_200m_dry_bank_spread_12km_cull_range_full_route_clearance_dry_height_and_hard_slope_gates",
+    "runnable_launch_woody_rejection_count": 29,
     "runnable_launch_woody_shadow_policy": "disabled_on_launch_window_only_to_prevent_camera_wall_streaks",
-    "runnable_launch_woody_slope_ceiling_degrees": 24.0,
-    "runnable_launch_woody_target_instance_count": 192
+    "runnable_launch_woody_slope_ceiling_degrees": 34.0,
+    "runnable_launch_woody_target_instance_count": 640
   },
   "visual_terrain": {
     "active_water_half_width_m": 72.0,

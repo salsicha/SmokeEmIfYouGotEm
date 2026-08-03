@@ -34,10 +34,12 @@ constexpr float HanceDrylandShrubSlopeCeilingDegrees = 30.0f;
 constexpr int32 ZambeziEvidenceBankMosaicInstanceCount = 1200;
 constexpr int32 ZambeziEvidenceWoodyInstanceCount = 240;
 constexpr float ZambeziEvidenceWoodySlopeCeilingDegrees = 24.0f;
-constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 1800;
-constexpr float ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees = 32.0f;
-constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 192;
-constexpr float ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 24.0f;
+constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 5200;
+constexpr int32 ZambeziRunnableLaunchMinimumBankCoverInstanceCount = 4500;
+constexpr float ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees = 42.0f;
+constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 640;
+constexpr int32 ZambeziRunnableLaunchMinimumWoodyInstanceCount = 560;
+constexpr float ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 34.0f;
 constexpr int32 ZambeziRunnableLaunchTalusInstanceCount = 360;
 constexpr float ZambeziRunnableLaunchTalusSlopeCeilingDegrees = 48.0f;
 constexpr int32 TemperateWaterlineStructureTargetInstanceCount = 1440;
@@ -891,7 +893,8 @@ bool CreateZambeziOpaqueVegetationAssets(
     UStaticMesh*& OutRiparianTree,
     UStaticMesh*& OutUmbrellaTree,
     UStaticMesh*& OutThornScrub,
-    UStaticMesh*& OutGroundCover,
+    UStaticMesh*& OutGroundCoverA,
+    UStaticMesh*& OutGroundCoverB,
     UMaterialInterface*& OutMaterial,
     FString& OutSummary)
 {
@@ -933,7 +936,7 @@ bool CreateZambeziOpaqueVegetationAssets(
         false,
         false,
         OutSummary);
-    OutGroundCover = CreateZambeziOpaqueVegetationMesh(
+    OutGroundCoverA = CreateZambeziOpaqueVegetationMesh(
         World,
         TEXT("SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1"),
         EZambeziVegetationForm::SavannaGroundCover,
@@ -944,8 +947,20 @@ bool CreateZambeziOpaqueVegetationAssets(
         false,
         false,
         OutSummary);
+    OutGroundCoverB = CreateZambeziOpaqueVegetationMesh(
+        World,
+        TEXT("SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2"),
+        EZambeziVegetationForm::SavannaGroundCover,
+        5077,
+        OutMaterial,
+        ZambeziVegetationMeshRoot,
+        TEXT("Zambezi"),
+        false,
+        true,
+        OutSummary);
     const bool bComplete =
-        OutRiparianTree && OutUmbrellaTree && OutThornScrub && OutGroundCover;
+        OutRiparianTree && OutUmbrellaTree && OutThornScrub &&
+        OutGroundCoverA && OutGroundCoverB;
     if (!bComplete)
     {
         OutSummary += TEXT(
@@ -2501,6 +2516,7 @@ bool AddLandscapeCandidateBiomeDressing(
     UStaticMesh* ConiferTreeMesh = nullptr;
     UStaticMesh* ShrubMesh = nullptr;
     UStaticMesh* UnderstoryMesh = nullptr;
+    UStaticMesh* ZambeziGroundCoverMeshB = nullptr;
     UStaticMesh* TemperateBroadleafTreeMeshB = nullptr;
     UStaticMesh* TemperateConiferTreeMeshB = nullptr;
     UStaticMesh* TemperateShrubMeshB = nullptr;
@@ -2521,6 +2537,7 @@ bool AddLandscapeCandidateBiomeDressing(
                 ConiferTreeMesh,
                 ShrubMesh,
                 UnderstoryMesh,
+                ZambeziGroundCoverMeshB,
                 ZambeziOpaqueVegetationMaterial,
                 OutSummary))
         {
@@ -3068,6 +3085,17 @@ bool AddLandscapeCandidateBiomeDressing(
               ZambeziOpaqueVegetationMaterial)
         : nullptr;
     UHierarchicalInstancedStaticMeshComponent*
+        ZambeziRunnableLaunchGroundCoverInstancesB = bZambezi
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ZambeziGroundCoverMeshB,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ZambeziRunnableLaunchGroundCoverB_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              ZambeziOpaqueVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
         ZambeziRunnableLaunchRiparianTreeInstances = bZambezi
         ? AddLandscapeCandidateInstancedMeshComponent(
               World,
@@ -3185,6 +3213,7 @@ bool AddLandscapeCandidateBiomeDressing(
           !ZambeziCameraUmbrellaTreeInstances ||
           !ZambeziCameraThornScrubInstances ||
           !ZambeziRunnableLaunchGroundCoverInstances ||
+          !ZambeziRunnableLaunchGroundCoverInstancesB ||
           !ZambeziRunnableLaunchRiparianTreeInstances ||
           !ZambeziRunnableLaunchUmbrellaTreeInstances ||
           !ZambeziRunnableLaunchThornScrubInstances ||
@@ -3402,6 +3431,7 @@ bool AddLandscapeCandidateBiomeDressing(
             ZambeziCameraUmbrellaTreeInstances,
             ZambeziCameraThornScrubInstances,
             ZambeziRunnableLaunchGroundCoverInstances,
+            ZambeziRunnableLaunchGroundCoverInstancesB,
             ZambeziRunnableLaunchRiparianTreeInstances,
             ZambeziRunnableLaunchUmbrellaTreeInstances,
             ZambeziRunnableLaunchThornScrubInstances};
@@ -3415,6 +3445,7 @@ bool AddLandscapeCandidateBiomeDressing(
             ConiferTreeMesh,
             ShrubMesh,
             UnderstoryMesh,
+            ZambeziGroundCoverMeshB,
             BroadleafTreeMesh,
             ConiferTreeMesh,
             ShrubMesh};
@@ -3519,6 +3550,7 @@ bool AddLandscapeCandidateBiomeDressing(
         const TArray<UHierarchicalInstancedStaticMeshComponent*>
             RunnableLaunchComponents = {
                 ZambeziRunnableLaunchGroundCoverInstances,
+                ZambeziRunnableLaunchGroundCoverInstancesB,
                 ZambeziRunnableLaunchRiparianTreeInstances,
                 ZambeziRunnableLaunchUmbrellaTreeInstances,
                 ZambeziRunnableLaunchThornScrubInstances};
@@ -3531,21 +3563,36 @@ bool AddLandscapeCandidateBiomeDressing(
             }
             if (Component)
             {
+                Component->SetCullDistances(0, 120000);
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimRunnableLaunchBankEcologyV1"));
             }
         }
-        if (AActor* Owner = ZambeziRunnableLaunchGroundCoverInstances
-                ? ZambeziRunnableLaunchGroundCoverInstances->GetOwner()
-                : nullptr)
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            RunnableLaunchGroundCoverComponents = {
+                ZambeziRunnableLaunchGroundCoverInstances,
+                ZambeziRunnableLaunchGroundCoverInstancesB};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             RunnableLaunchGroundCoverComponents)
         {
-            Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchBankCover"));
-            Owner->Tags.AddUnique(TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchBankCover"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOrganicGroundCoverMorphologyV2"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimRunnableLaunchBankCover"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimOrganicGroundCoverMorphologyV2"));
+            }
         }
-        ZambeziRunnableLaunchGroundCoverInstances->ComponentTags.AddUnique(
-            TEXT("RaftSimRunnableLaunchBankCover"));
-        ZambeziRunnableLaunchGroundCoverInstances->ComponentTags.AddUnique(
-            TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
         const TArray<UHierarchicalInstancedStaticMeshComponent*>
             RunnableLaunchWoodyComponents = {
                 ZambeziRunnableLaunchRiparianTreeInstances,
@@ -3557,7 +3604,7 @@ bool AddLandscapeCandidateBiomeDressing(
             if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
             {
                 Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchWoodyEcology"));
-                Owner->Tags.AddUnique(TEXT("RaftSimWoodySlopeCeiling24Degrees"));
+                Owner->Tags.AddUnique(TEXT("RaftSimWoodySlopeCeiling34Degrees"));
                 Owner->Tags.AddUnique(
                     TEXT("RaftSimRunnableLaunchWoodyShadowSuppressed"));
             }
@@ -3566,7 +3613,7 @@ bool AddLandscapeCandidateBiomeDressing(
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimRunnableLaunchWoodyEcology"));
                 Component->ComponentTags.AddUnique(
-                    TEXT("RaftSimWoodySlopeCeiling24Degrees"));
+                    TEXT("RaftSimWoodySlopeCeiling34Degrees"));
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimRunnableLaunchWoodyShadowSuppressed"));
             }
@@ -3582,7 +3629,7 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
         OutResult.bDressingFoliageMaterialsValidated =
-            OutResult.DressingFoliageMaterialBoundSlotCount == 12 &&
+            OutResult.DressingFoliageMaterialBoundSlotCount == 13 &&
             ValidateZambeziOpaqueVegetationMaterial(
                 ZambeziOpaqueVegetationMaterial) &&
             Algo::AllOf(
@@ -5476,9 +5523,6 @@ bool AddLandscapeCandidateBiomeDressing(
         constexpr int32 BankSideCount = 2;
         const int32 GroundCoverInstancesPerSide =
             ZambeziRunnableLaunchBankCoverInstanceCount / BankSideCount;
-        const float GroundCoverMeshHeightCm = FMath::Max(
-            1.0f,
-            GetLandscapeCandidateEffectiveMeshBounds(UnderstoryMesh).GetSize().Z);
         int32 RunnableLaunchGroundCoverRejectedCount = 0;
         float RunnableLaunchGroundCoverMaximumSlopeDegrees = 0.0f;
         for (int32 CoverIndex = 0;
@@ -5491,38 +5535,40 @@ bool AddLandscapeCandidateBiomeDressing(
                 (static_cast<float>(AlongIndex) +
                  ZambeziVegetationUnitRandom(CoverIndex, 9101)) /
                 static_cast<float>(GroundCoverInstancesPerSide);
-            // Logical X -2360..-1720 corresponds to approximately 151-842 m
-            // down the source corridor. Keeping the layer ahead of the
-            // station-75 m launch avoids camera-clipped plants while retaining
-            // it inside the 600 m HISM cull range.
-            const float BaseLogicalX = FMath::Lerp(-2360.0f, -1720.0f, AlongT);
+            // The launch mosaic begins ahead of the station-75 m camera and
+            // continues through the first kilometre. Both morphology families
+            // use a 1.2 km HISM cull range, so the far bench remains part of
+            // the visible gorge instead of collapsing into one shoreline row.
+            const float BaseLogicalX = FMath::Lerp(-2460.0f, -1560.0f, AlongT);
             const float Side = SideIndex == 0 ? -1.0f : 1.0f;
-            const float BaseOffset = ActiveRiverHalfWidth + FMath::Lerp(
-                2500.0f,
+            const float TargetAdditionalOffset = FMath::Lerp(
+                1200.0f,
                 16000.0f,
                 FMath::Pow(
                     ZambeziVegetationUnitRandom(CoverIndex, 9113),
                     1.35f));
             FVector2D BestPoint = ResolveLogicalRiverPoint(
                 BaseLogicalX,
-                Side * BaseOffset);
+                Side * (ActiveRiverHalfWidth + TargetAdditionalOffset));
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestPlacementScore = TNumericLimits<float>::Max();
             for (int32 CandidateIndex = 0; CandidateIndex < 96; ++CandidateIndex)
             {
-                const float CandidatePhase =
-                    static_cast<float>(CoverIndex) * 0.7548777f +
-                    static_cast<float>(CandidateIndex) * 1.2207441f;
+                const int32 CandidateSeedIndex =
+                    CoverIndex * 193 + CandidateIndex;
                 const float CandidateLogicalX = BaseLogicalX +
-                    20.0f * FMath::Sin(CandidatePhase);
-                const float CandidateAdditionalOffset = FMath::Lerp(
-                    1800.0f,
-                    18000.0f,
-                    FMath::Pow(
+                    FMath::Lerp(
+                        -80.0f,
+                        80.0f,
                         ZambeziVegetationUnitRandom(
-                            CoverIndex * 101 + CandidateIndex,
-                            9127),
-                        1.22f));
+                            CandidateSeedIndex,
+                            9121));
+                const float CandidateAdditionalOffset = FMath::Lerp(
+                    1200.0f,
+                    18000.0f,
+                    ZambeziVegetationUnitRandom(
+                        CandidateSeedIndex,
+                        9127));
                 const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
                     CandidateLogicalX,
                     Side * (ActiveRiverHalfWidth + CandidateAdditionalOffset));
@@ -5545,7 +5591,10 @@ bool AddLandscapeCandidateBiomeDressing(
                     continue;
                 }
                 const float PlacementScore = SlopeDegrees +
-                    0.12f * CandidateAdditionalOffset / 18000.0f;
+                    0.00250f * FMath::Abs(
+                        CandidateAdditionalOffset - TargetAdditionalOffset) +
+                    0.00040f * FMath::Abs(
+                        CandidateLogicalX - BaseLogicalX);
                 if (PlacementScore < BestPlacementScore)
                 {
                     BestPlacementScore = PlacementScore;
@@ -5560,17 +5609,29 @@ bool AddLandscapeCandidateBiomeDressing(
             }
 
             const float TargetHeightCm = FMath::Lerp(
-                72.0f,
-                150.0f,
+                95.0f,
+                230.0f,
                 ZambeziVegetationUnitRandom(CoverIndex, 9133));
-            const float UniformScale = TargetHeightCm / GroundCoverMeshHeightCm;
+            UStaticMesh* GroundCoverMesh = UnderstoryMesh;
+            UHierarchicalInstancedStaticMeshComponent* GroundCoverInstances =
+                ZambeziRunnableLaunchGroundCoverInstances;
+            if ((CoverIndex & 1) != 0)
+            {
+                GroundCoverMesh = ZambeziGroundCoverMeshB;
+                GroundCoverInstances = ZambeziRunnableLaunchGroundCoverInstancesB;
+            }
+            const float SelectedMeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(
+                    GroundCoverMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / SelectedMeshHeightCm;
             const float FootprintScale = FMath::Lerp(
-                1.35f,
-                2.40f,
+                1.60f,
+                3.20f,
                 ZambeziVegetationUnitRandom(CoverIndex, 9151));
             AddGroundedInstance(
-                ZambeziRunnableLaunchGroundCoverInstances,
-                UnderstoryMesh,
+                GroundCoverInstances,
+                GroundCoverMesh,
                 BestPoint,
                 GetLandscapeHeight(BestPoint.X, BestPoint.Y),
                 FRotator(
@@ -5620,30 +5681,38 @@ bool AddLandscapeCandidateBiomeDressing(
                 (static_cast<float>(AlongIndex) +
                  ZambeziVegetationUnitRandom(WoodyIndex, 9203)) /
                 static_cast<float>(InstancesPerWoodyLane);
-            // Woody crowns begin roughly 215 m downstream so no trunk or crown
-            // can clip the guide camera at the launch itself.
-            const float BaseLogicalX = FMath::Lerp(-2300.0f, -1700.0f, AlongT);
+            // Woody forms begin ahead of the guide camera and fill the first
+            // kilometre as a broad dry-bank mosaic instead of a ridge row.
+            const float BaseLogicalX = FMath::Lerp(-2360.0f, -1560.0f, AlongT);
             const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float TargetAdditionalOffset = FMath::Lerp(
+                3500.0f,
+                18000.0f,
+                FMath::Pow(
+                    ZambeziVegetationUnitRandom(WoodyIndex, 9211),
+                    1.22f));
             FVector2D BestPoint = ResolveLogicalRiverPoint(
                 BaseLogicalX,
-                Side * (ActiveRiverHalfWidth + 2600.0f));
+                Side * (ActiveRiverHalfWidth + TargetAdditionalOffset));
             float BestSlopeDegrees = TNumericLimits<float>::Max();
             float BestPlacementScore = TNumericLimits<float>::Max();
             for (int32 CandidateIndex = 0; CandidateIndex < 160; ++CandidateIndex)
             {
-                const float CandidatePhase =
-                    static_cast<float>(WoodyIndex) * 0.6180339f +
-                    static_cast<float>(CandidateIndex) * 1.2207441f;
+                const int32 CandidateSeedIndex =
+                    WoodyIndex * 257 + CandidateIndex;
                 const float CandidateLogicalX = BaseLogicalX +
-                    58.0f * FMath::Sin(CandidatePhase);
-                const float CandidateAdditionalOffset = FMath::Lerp(
-                    6000.0f,
-                    18000.0f,
-                    FMath::Pow(
+                    FMath::Lerp(
+                        -100.0f,
+                        100.0f,
                         ZambeziVegetationUnitRandom(
-                            WoodyIndex * 59 + CandidateIndex,
-                            9221),
-                        1.18f));
+                            CandidateSeedIndex,
+                            9221));
+                const float CandidateAdditionalOffset = FMath::Lerp(
+                    3500.0f,
+                    20000.0f,
+                    ZambeziVegetationUnitRandom(
+                        CandidateSeedIndex,
+                        9227));
                 const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
                     CandidateLogicalX,
                     Side * (ActiveRiverHalfWidth + CandidateAdditionalOffset));
@@ -5666,7 +5735,10 @@ bool AddLandscapeCandidateBiomeDressing(
                     continue;
                 }
                 const float PlacementScore = SlopeDegrees +
-                    0.60f * CandidateAdditionalOffset / 18000.0f;
+                    0.00200f * FMath::Abs(
+                        CandidateAdditionalOffset - TargetAdditionalOffset) +
+                    0.00035f * FMath::Abs(
+                        CandidateLogicalX - BaseLogicalX);
                 if (PlacementScore < BestPlacementScore)
                 {
                     BestPlacementScore = PlacementScore;
@@ -5788,8 +5860,11 @@ bool AddLandscapeCandidateBiomeDressing(
          HanceDrylandShrubPlacedCount >=
              HanceDrylandMinimumShrubInstanceCount) &&
         (!bZambeziWoodland ||
-         RunnableLaunchGroundCoverPlacedCount >= 900) &&
-        (!bZambeziWoodland || RunnableLaunchWoodyPlacedCount >= 96) &&
+         RunnableLaunchGroundCoverPlacedCount >=
+             ZambeziRunnableLaunchMinimumBankCoverInstanceCount) &&
+        (!bZambeziWoodland ||
+         RunnableLaunchWoodyPlacedCount >=
+             ZambeziRunnableLaunchMinimumWoodyInstanceCount) &&
         (!bZambeziWoodland || RunnableLaunchTalusPlacedCount >= 300) &&
         OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
