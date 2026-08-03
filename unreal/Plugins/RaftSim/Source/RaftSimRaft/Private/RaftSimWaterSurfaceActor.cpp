@@ -600,13 +600,21 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         RiverWaterConfig->CookedFieldsDir.Contains(
             TEXT("chilko_river_lava_canyon"),
             ESearchCase::CaseSensitive);
+    const bool bUsesMigratedColoradoVolumeCore =
+        RiverWaterConfig &&
+        RiverWaterConfig->CookedFieldsDir.Contains(
+            TEXT("colorado_river_grand_canyon_rowing"),
+            ESearchCase::CaseSensitive);
     const bool bUsesMigratedColdWaterVolumeCore =
         // Backward-compatible rollout for already-versioned cold-water maps.
         // Future regeneration persists the explicit flag; unique cooked-field
-        // identities keep Colorado and Pacuare on their reviewed carriers
-        // until they receive separate visual acceptance.
+        // identities keep Pacuare on its reviewed carrier until separate
+        // visual acceptance.
         bUsesMigratedFutaleufuVolumeCore ||
         bUsesMigratedChilkoVolumeCore;
+    const bool bUsesMigratedLiveVolumeCore =
+        bUsesMigratedColdWaterVolumeCore ||
+        bUsesMigratedColoradoVolumeCore;
     UMaterialInterface* ResolvedVolumeCoreMaterialOverride =
         RiverWaterConfig
             ? RiverWaterConfig->LiveVolumeCoreMaterialOverride.Get()
@@ -651,6 +659,36 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                      "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace"));
         }
     }
+    if (bUsesMigratedColoradoVolumeCore)
+    {
+        // Preserve the reviewed L_Hance map binary while rolling out the
+        // river-local transmitting carrier. Regenerated maps serialize these
+        // same references; the cooked-field identity only migrates older maps.
+        if (!ResolvedVolumeCoreMaterialOverride)
+        {
+            ResolvedVolumeCoreMaterialOverride = LoadObject<UMaterialInterface>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+                     "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2."
+                     "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2"));
+        }
+        if (!ResolvedLiveWaterFlowNormalTexture)
+        {
+            ResolvedLiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                     "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+                     "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"));
+        }
+        if (!ResolvedLiveWaterFoamLaceTexture)
+        {
+            ResolvedLiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                     "T_RaftSim_ColoradoHanceWaterV1_FoamLace."
+                     "T_RaftSim_ColoradoHanceWaterV1_FoamLace"));
+        }
+    }
     if (ResolvedVolumeCoreMaterialOverride)
     {
         LiveVolumeCoreMaterial = ResolvedVolumeCoreMaterialOverride;
@@ -658,7 +696,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     bLiveVolumeCoreEnabled =
         bLiveSurfaceCarrierEnabled &&
         (RiverWaterConfig->bEnableLiveSolverVolumeCore ||
-            bUsesMigratedColdWaterVolumeCore) &&
+            bUsesMigratedLiveVolumeCore) &&
         LiveVolumeCoreMaterial != nullptr;
     if (bLiveVolumeCoreEnabled)
     {
@@ -671,49 +709,65 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             kLiveVolumeCoreActiveDetailCoverage;
     }
     const FLinearColor ResolvedLiveShallowSurfaceColor =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? FLinearColor(0.070f, 0.110f, 0.080f, 1.0f)
+            : bUsesMigratedFutaleufuVolumeCore
             ? FLinearColor(0.013f, 0.068f, 0.090f, 1.0f)
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveShallowSurfaceColor
                    : FLinearColor(0.025f, 0.120f, 0.150f, 1.0f));
     const FLinearColor ResolvedLiveDeepSurfaceColor =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? FLinearColor(0.018f, 0.038f, 0.028f, 1.0f)
+            : bUsesMigratedFutaleufuVolumeCore
             ? FLinearColor(0.002f, 0.017f, 0.029f, 1.0f)
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveDeepSurfaceColor
                    : FLinearColor(0.004f, 0.028f, 0.045f, 1.0f));
     const FLinearColor ResolvedLiveReflectedSkyColor =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? FLinearColor(0.12f, 0.17f, 0.18f, 1.0f)
+            : bUsesMigratedFutaleufuVolumeCore
             ? FLinearColor(0.055f, 0.100f, 0.138f, 1.0f)
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveReflectedSkyColor
                    : FLinearColor(0.11f, 0.23f, 0.31f, 1.0f));
     const float ResolvedLiveSurfaceSpecular =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? 0.30f
+            : bUsesMigratedFutaleufuVolumeCore
             ? 0.28f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSurfaceSpecular
                    : 0.20f);
     const float ResolvedLiveSurfaceRoughness =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? 0.32f
+            : bUsesMigratedFutaleufuVolumeCore
             ? 0.34f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSurfaceRoughness
                    : 0.085f);
     const float ResolvedLiveSkyReflectionStrength =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? 0.26f
+            : bUsesMigratedFutaleufuVolumeCore
             ? 0.24f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSkyReflectionStrength
                    : 0.62f);
     const float ResolvedLiveRippleStrength =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? 0.24f
+            : bUsesMigratedFutaleufuVolumeCore
             ? 0.26f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveRippleStrength
                    : 0.18f);
     const float ResolvedLiveFoamIntensity =
-        bUsesMigratedFutaleufuVolumeCore
+        bUsesMigratedColoradoVolumeCore
+            ? 0.55f
+            : bUsesMigratedFutaleufuVolumeCore
             ? 0.58f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveFoamIntensity

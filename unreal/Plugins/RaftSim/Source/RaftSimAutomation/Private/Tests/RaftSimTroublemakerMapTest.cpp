@@ -167,18 +167,19 @@ bool FRaftSimAssertRiverMapCommand::Update()
             bUsesSolverOwnedVisibleRiver);
         if (bUsesSolverOwnedVisibleRiver)
         {
-            if (bChilkoLavaCanyonReferenceRun ||
+            if (bColoradoHanceReferenceRun ||
+                bChilkoLavaCanyonReferenceRun ||
                 bFutaleufuTerminatorReferenceRun)
             {
                 Test->TestTrue(
-                    TEXT("accepted cold-water river enables the wet-cell-clipped optical core"),
+                    TEXT("accepted transmitting-water river enables the wet-cell-clipped optical core"),
                     It->IsLiveVolumeCoreEnabled());
                 Test->TestTrue(
-                    TEXT("accepted cold-water optical core has visible wet-cell triangles"),
+                    TEXT("accepted transmitting-water optical core has visible wet-cell triangles"),
                     It->IsLiveVolumeCoreVisible() &&
                         It->GetLiveVolumeCoreTriangleCount() > 0);
                 Test->TestTrue(
-                    TEXT("accepted cold-water detail skin stays below opaque-sheet coverage"),
+                    TEXT("accepted transmitting-water detail skin stays below opaque-sheet coverage"),
                     It->GetCalmLiveSurfaceCoverage() < 0.10f);
             }
             else
@@ -805,20 +806,61 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Colorado Hance solver owns the visible gameplay river"),
                 (*It)->bLiveSolverOwnsRuntimeRendering);
             Test->TestTrue(
-                TEXT("Colorado Hance visible carrier has complete calm-water coverage"),
-                (*It)->LiveSurfaceCalmCoverage >= 0.80f);
-            Test->TestTrue(
-                TEXT("Colorado Hance live sky reflection stays restrained"),
-                FMath::IsNearlyEqual(
-                    (*It)->LiveSkyReflectionStrength, 0.34f, 0.001f));
-            Test->TestTrue(
-                TEXT("Colorado Hance live carrier keeps moving micro-normal response"),
-                FMath::IsNearlyEqual(
-                    (*It)->LiveRippleStrength, 0.30f, 0.001f));
-            Test->TestTrue(
-                TEXT("Colorado Hance carrier foam is restrained beneath lace foam"),
-                FMath::IsNearlyEqual(
-                    (*It)->LiveFoamIntensity, 0.58f, 0.001f));
+                TEXT("Colorado Hance enables or safely migrates the transmitting volume core"),
+                (*It)->bEnableLiveSolverVolumeCore ||
+                    (*It)->CookedFieldsDir.Contains(
+                        TEXT("colorado_river_grand_canyon_rowing"),
+                        ESearchCase::CaseSensitive));
+            if ((*It)->bEnableLiveSolverVolumeCore)
+            {
+                Test->TestTrue(
+                    TEXT("regenerated Colorado Hance config stores restrained calm detail coverage"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceCalmCoverage, 0.035f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Colorado Hance config stores active-water detail response"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceActiveCoverage, 0.14f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Colorado Hance config binds river-local volume water"),
+                    (*It)->LiveVolumeCoreMaterialOverride &&
+                        (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
+                            TEXT("MI_RaftSim_ColoradoHance_LiveVolumeWaterV2")));
+                Test->TestTrue(
+                    TEXT("regenerated Colorado Hance config binds river-local flow normal"),
+                    (*It)->LiveWaterFlowNormalTexture &&
+                        (*It)->LiveWaterFlowNormalTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_ColoradoHanceWaterV1_FlowNormal")));
+                Test->TestTrue(
+                    TEXT("regenerated Colorado Hance config binds solver-masked foam lace"),
+                    (*It)->LiveWaterFoamLaceTexture &&
+                        (*It)->LiveWaterFoamLaceTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_ColoradoHanceWaterV1_FoamLace")));
+            }
+            else
+            {
+                Test->TestNotNull(
+                    TEXT("versioned Colorado Hance map can migrate to V2 live-volume water"),
+                    LoadObject<UMaterialInterface>(
+                        nullptr,
+                        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+                             "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2."
+                             "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2")));
+                Test->TestNotNull(
+                    TEXT("versioned Colorado Hance map can migrate to river-local flow normal"),
+                    LoadObject<UTexture2D>(
+                        nullptr,
+                        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+                             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal")));
+                Test->TestNotNull(
+                    TEXT("versioned Colorado Hance map can migrate to solver-masked foam lace"),
+                    LoadObject<UTexture2D>(
+                        nullptr,
+                        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                             "T_RaftSim_ColoradoHanceWaterV1_FoamLace."
+                             "T_RaftSim_ColoradoHanceWaterV1_FoamLace")));
+            }
             Test->TestTrue(
                 TEXT("Colorado Hance enables presentation-only subcell smoothing"),
                 (*It)->bEnableLivePresentationSurfaceSmoothing);

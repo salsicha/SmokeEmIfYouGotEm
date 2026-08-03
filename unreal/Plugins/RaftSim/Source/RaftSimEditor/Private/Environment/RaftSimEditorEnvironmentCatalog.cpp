@@ -77,7 +77,7 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.EmissiveFillScale = 0.20f;
         Settings.Roughness = 0.25f;
         Settings.Specular = 0.46f;
-        Settings.Opacity = 0.38f;
+        Settings.Opacity = 0.90f;
         Settings.NormalIntensity = 0.30f;
         Settings.SurfaceVariationStrength = 0.32f;
         Settings.PhaseG = 0.08f;

@@ -384,6 +384,24 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     ? FLinearColor(0.72f, 0.68f, 0.58f)
                     : FLinearColor(0.75f, 0.84f, 0.80f),
                 CombinedBreaker);
+            if (bColoradoHancePresentation && bUseSolverVisualizationFields)
+            {
+                // Suspended sediment makes Hance less transparent than the
+                // clear-water runs, but the V1 opaque card was not plausible.
+                // Alpha follows only the already sampled solver depth, wet-bank
+                // edge, and aeration. It never changes geometry, wetness,
+                // collision, bathymetry, hydraulics, or raft forces.
+                const float DepthOpacityT = SmoothPreviewStep(
+                    0.20f, 2.90f, SolverDepthM);
+                const float BankTransmission = FMath::Lerp(
+                    1.0f,
+                    0.42f,
+                    SmoothPreviewStep(0.70f, 1.0f, EdgeT));
+                const float WaterOpacity = FMath::Lerp(
+                    0.46f, 0.76f, DepthOpacityT) * BankTransmission;
+                SurfaceColor.A = FMath::Lerp(
+                    WaterOpacity, 0.93f, CombinedBreaker);
+            }
             if (bFutaleufuTerminatorPresentation &&
                 bUseSolverVisualizationFields)
             {
@@ -1710,13 +1728,38 @@ bool AddLandscapeCandidateRunnableGameplay(
     }
     else if (bColoradoHance)
     {
-        WaterConfig->LiveSurfaceCalmCoverage = 0.87f;
-        WaterConfig->LiveSurfaceActiveCoverage = 0.97f;
-        WaterConfig->LiveSurfaceSpecular = 0.38f;
-        WaterConfig->LiveSurfaceRoughness = 0.28f;
-        WaterConfig->LiveSkyReflectionStrength = 0.34f;
-        WaterConfig->LiveRippleStrength = 0.30f;
-        WaterConfig->LiveFoamIntensity = 0.58f;
+        // A solver-clipped transmitting core supplies the sediment-bearing
+        // river body. The existing Default Lit mesh becomes a low-coverage
+        // hydraulic detail skin, retaining geometry normals and lace foam
+        // without reading as an opaque stepped card.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateColoradoHanceLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                 "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+                 "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                 "T_RaftSim_ColoradoHanceWaterV1_FoamLace."
+                 "T_RaftSim_ColoradoHanceWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Colorado Hance river-local live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
+        WaterConfig->LiveSurfaceSpecular = 0.30f;
+        WaterConfig->LiveSurfaceRoughness = 0.32f;
+        WaterConfig->LiveSkyReflectionStrength = 0.26f;
+        WaterConfig->LiveRippleStrength = 0.24f;
+        WaterConfig->LiveFoamIntensity = 0.55f;
         WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
         WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.72f;
         WaterConfig->LivePresentationStandingWaveScale = 0.55f;
@@ -1726,11 +1769,11 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveRapidFoamCoverageGain = 0.82f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.095f, 0.145f, 0.110f, 1.0f);
+            FLinearColor(0.070f, 0.110f, 0.080f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.025f, 0.050f, 0.040f, 1.0f);
+            FLinearColor(0.018f, 0.038f, 0.028f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.10f, 0.15f, 0.17f, 1.0f);
+            FLinearColor(0.12f, 0.17f, 0.18f, 1.0f);
     }
     else if (bChilkoLavaCanyon)
     {

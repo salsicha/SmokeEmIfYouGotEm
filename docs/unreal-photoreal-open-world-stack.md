@@ -164,3 +164,15 @@ The source-conditioned corridor-scale candidates remain under `unreal/Content/Ra
 The recipe requires guide-seat review captures, desktop/VR/debug quality budgets, source and rights manifests, and replay alignment between rendered water features and solver/runtime telemetry before the environment can count as milestone-complete.
 
 Futaleufú Terminator now has a river-local transmitting-water V3 path without changing the committed runnable map. The live solver-conforming Single Layer Water core resolves a Futaleufú material instance, first-party flow normal, and solver-masked foam-lace texture from the existing cooked-field identity when an older map lacks serialized V3 references; future filtered regeneration stores those references explicitly. The capture-water generator also authors a translucent Default Lit ribbon with IOR 1.333 and CPU depth/bank/aeration opacity for future evidence. The current `L_Terminator` package stays byte-identical, and no solver, topology, collision, bathymetry, wet-mask, or raft-force authority moves. The retained identical-camera live frame has lower mean/highlight response and stronger cold-water color separation than V2, but still fails photoreal review because highlights, standing-wave shape, foam depth, spray/mist, shoreline material, terrain, and ecology remain synthetic or incomplete.
+
+Colorado Hance now uses the same split optical architecture without changing
+the runnable `L_Hance` package: a solver-clipped wet-cell volume core supplies
+the river body, while the existing plane-preserving live mesh is a low-coverage
+detail skin. The fixed capture ribbon is translucent Default Lit water with IOR
+1.333 and vertex opacity derived only from already sampled depth, wet-bank edge,
+and aeration. Project-owned Hance flow-normal and foam-lace textures are visual
+inputs only; solver state, wet/dry ownership, bathymetry, collision, buoyancy,
+and raft forces remain authoritative and unchanged. Fixed views retain the V2
+candidate because riverbed and bank readability improve over the opaque
+baseline, but coarse cross-river bands, weak hydraulic volume/VFX, duplicate
+camera evidence, and blockout canyon/ecology keep photoreal promotion closed.

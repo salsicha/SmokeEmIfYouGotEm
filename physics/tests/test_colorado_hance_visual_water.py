@@ -76,6 +76,13 @@ def test_hance_visual_water_is_hydraulic_hash_locked_and_non_authoritative():
     assert capture_filter["neighbor_offset_m"] == 4.0
     assert capture_filter["wet_interior_only"] is True
     assert capture_filter["render_height_scale"] == 0.06
+    capture_water = manifest["render_binding"]["capture_water_material"]
+    assert capture_water["version"] == "V2"
+    assert capture_water["blend_mode"] == "Translucent"
+    assert capture_water["opacity_parameter"] == 0.9
+    assert capture_water["refraction_ior"] == 1.333
+    assert capture_water["collision_enabled"] is False
+    assert capture_water["hidden_in_game"] is True
     assert manifest["render_binding"]["capture_foam_breakup"] == {
         "base_coverage": 0.22,
         "noise_smoothstep": [0.42, 0.74],
@@ -83,10 +90,25 @@ def test_hance_visual_water_is_hydraulic_hash_locked_and_non_authoritative():
         "maximum_opacity": 0.82,
     }
     assert manifest["render_binding"]["live_runtime_presentation"] == {
+        "wet_cell_clipped_volume_core": True,
+        "volume_core_material": (
+            "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+            "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2"
+        ),
+        "flow_normal": (
+            "/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+            "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"
+        ),
+        "foam_lace": (
+            "/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+            "T_RaftSim_ColoradoHanceWaterV1_FoamLace"
+        ),
+        "calm_detail_skin_coverage": 0.035,
+        "active_detail_skin_coverage": 0.14,
         "surface_smoothing_strength": 0.72,
         "standing_wave_scale": 0.55,
         "hydraulic_relief_scale": 0.55,
-        "carrier_foam_intensity": 0.58,
+        "carrier_foam_intensity": 0.55,
         "rapid_foam_focus": [0.30, 0.82],
         "rapid_foam_coverage_gain": 0.82,
     }
@@ -127,6 +149,7 @@ def test_hance_runnable_review_retains_immutable_evidence_and_is_honest():
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png",
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json",
         "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_visualization_manifest.json",
+        "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual/hance_conditioned_heightfield_1009.png",
     }
     for artifact in review["retained_artifacts"]:
         if artifact["path"] in superseded_paths:

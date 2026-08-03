@@ -520,6 +520,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesChilkoLavaCanyonDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
         const bool bUsesSingleLayerWater = false;
+        const bool bUsesTransmittingDefaultLitWater =
+            bUsesColoradoHanceDefaultLitWater ||
+            bUsesFutaleufuTerminatorDefaultLitWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesSouthForkOrganicFoothillSurface =
@@ -555,6 +558,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const FString WaterSingleLayerParameterKeyPrefix =
             bUsesSingleLayerWater
             ? TEXT("water_single_layer")
+            : bUsesTransmittingDefaultLitWater
+            ? TEXT("water_transmission")
             : TEXT("water_inactive_single_layer");
         const FString WaterSingleLayerParametersJson = FString::Printf(
             TEXT("      \"%s_refraction_ior\": %.6f,\n")
@@ -583,10 +588,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                   "      \"water_normal_primary_uv_tiling\": [2.400000, 6.200000],\n"
                   "      \"water_normal_secondary_uv_tiling\": [4.100000, 10.300000],\n"
                   "      \"water_normal_secondary_coordinate_policy\": \"uv_axes_swapped_for_cross_current_breakup\",\n")
+            : bUsesColoradoHanceDefaultLitWater
+            ? TEXT(
+                  "      \"water_normal_primary_uv_tiling\": [0.570000, 1.590000],\n"
+                  "      \"water_normal_secondary_uv_tiling\": [1.190000, 2.830000],\n"
+                  "      \"water_normal_secondary_coordinate_policy\": \"shared_uv_axes_opposed_flow\",\n")
             : TEXT(
                   "      \"water_normal_primary_uv_tiling\": [0.730000, 2.150000],\n"
                   "      \"water_normal_secondary_uv_tiling\": [1.110000, 3.300000],\n"
                   "      \"water_normal_secondary_coordinate_policy\": \"shared_uv_axes\",\n");
+        const FString WaterNormalSamplingPolicy =
+            bUsesColoradoHanceDefaultLitWater
+            ? TEXT("river_local_mirrored_dual_scale_uv_samples")
+            : TEXT("half_period_dual_sample_crossfade_prevents_frac_tile_boundaries");
         const FString DressingSourceSpeciesJson = bUsesOpaqueVolumetricVegetation
             ? TEXT("[]")
             : TEXT("[\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"]");
@@ -833,8 +847,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_surface_opacity\": %.6f,\n")
             TEXT("      \"water_normal_intensity\": %.6f,\n")
             TEXT("      \"water_surface_variation_strength\": %.6f,\n")
-            TEXT("      \"water_normal_atlas_sampling_policy\": \"half_period_dual_sample_crossfade_prevents_frac_tile_boundaries\",\n")
-            TEXT("      \"water_normal_atlas_phase_offset\": 0.500000,\n")
+            TEXT("      \"water_normal_atlas_sampling_policy\": \"%s\",\n")
+            TEXT("      \"water_normal_atlas_phase_offset\": %.6f,\n")
             TEXT("%s")
             TEXT("%s")
             TEXT("      \"water_render_width_scale\": %.6f,\n")
@@ -1143,7 +1157,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        : (bUsesPacuareRainforestDefaultLitWater
                               ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
                               : (bUsesColoradoHanceDefaultLitWater
-                                     ? TEXT("colorado_hance_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
+                                     ? TEXT("colorado_hance_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
                                      : (bUsesFutaleufuTerminatorDefaultLitWater
                                      ? TEXT("futaleufu_terminator_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
                                      : (bUsesChilkoLavaCanyonDefaultLitWater
@@ -1153,16 +1167,18 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
             *EscapeRaftSimJsonString(WaterMaterialParentPath),
             bUsesSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
-            bUsesFutaleufuTerminatorDefaultLitWater
+            bUsesTransmittingDefaultLitWater
                 ? TEXT("Translucent")
                 : TEXT("Opaque"),
             bUsesSingleLayerWater
                 ? TEXT("SingleLayerWaterMaterialOutput_scattering_absorption_phase_and_behind_water_scale")
-                : (bUsesFutaleufuTerminatorDefaultLitWater
+                : (bUsesTransmittingDefaultLitWater
                        ? TEXT("none_default_lit_depth_bank_transmission_and_physical_ior")
                        : TEXT("none_surface_only_solver_conditioned_shading")),
             bUsesSingleLayerWater
                 ? TEXT("active_on_zambezi_isolated_parent")
+                : bUsesTransmittingDefaultLitWater
+                ? TEXT("active_default_lit_transmission_parameters_and_refraction")
                 : TEXT("inactive_single_layer_evaluation_values_retained_in_manifest_only"),
             bHasSolverVisualizationFields
                 ? (bPacuareSolverVisualization
@@ -1217,9 +1233,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             WaterSettings.ReflectionTint.B,
             WaterSettings.Roughness,
             WaterSettings.Specular,
-            bUsesSingleLayerWater ? WaterSettings.Opacity : 1.0f,
+            (bUsesSingleLayerWater || bUsesTransmittingDefaultLitWater)
+                ? WaterSettings.Opacity
+                : 1.0f,
             WaterSettings.NormalIntensity,
             WaterSettings.SurfaceVariationStrength,
+            *WaterNormalSamplingPolicy,
+            bUsesColoradoHanceDefaultLitWater ? 0.0f : 0.5f,
             *WaterNormalProjectionManifestJson,
             *WaterSingleLayerParametersJson,
             WaterSettings.RenderWidthScale,

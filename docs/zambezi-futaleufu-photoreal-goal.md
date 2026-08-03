@@ -333,3 +333,15 @@ The July 15 canopy strategy checkpoint in `docs/futaleufu-canopy-strategy-review
 Futaleufú transmitting water V3 is now the retained runtime optical candidate on the unchanged runnable `L_Terminator` package. Two first-party generated visual textures supply river-local flow-normal detail and solver-masked foam breakup; their exact prompts, hashes, addressing, ownership, and no-authority limitations are pinned beside the source art. Newly generated maps persist the V3 material and textures, while a cooked-field-identity migration gives the same bindings and tuned cold-water optics to the already versioned map without resaving it together with unrelated terrain work. Solver mesh topology, wet/dry ownership, hydraulics, bathymetry, collision, and raft forces are unchanged. The identical live breaking-water camera reduces mean water-band luminance from 0.708139 to 0.691794 and the fraction above 0.90 from 0.074455 to 0.071194 while increasing blue-minus-red from 0.017644 to 0.031766. The native material, runnable-map, and water-render gates pass.
 
 This is a bounded technical improvement, not photoreal or production promotion. The retained frame still has a broad overexposed sun reflection, a smooth sheet-like standing-wave face, incomplete entrained-air depth, spray and mist, and blockout-quality banks, terrain materials, rocks, and vegetation. `futaleufu_terminator_transmitting_water_v3_review.json` keeps all six external guide, geospatial, hydraulic, ecology/geology/art, water-VFX/occlusion, and target-hardware/complete-run gates open.
+
+Colorado Hance transmitting water V2 extends the bounded river-local optical
+work to the unchanged runnable `L_Hance` map. Its capture ribbon now transmits
+the terrain beneath it using depth/bank/aeration alpha and physical IOR, while
+the live runtime resolves a wet-cell-clipped volume material, Hance flow normal,
+and solver-masked foam breakup from the cooked-field identity. The three fixed
+captures show much stronger riverbed and bank readability than the pre-change
+opaque gray carrier, and native material, capture, shared-water, and runnable-map
+checks pass. This is not a production or photoreal promotion: coarse hydraulic
+bands, thin sediment optics, duplicate guide/rapid framing, missing crest/roller
+volume and spray, terraced terrain, procedural ecology, unconverged hydraulics,
+and the six external review gates remain open.

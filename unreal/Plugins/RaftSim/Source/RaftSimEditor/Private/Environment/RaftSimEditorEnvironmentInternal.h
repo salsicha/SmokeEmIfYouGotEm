@@ -1032,6 +1032,11 @@ UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary);
 
 UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary);
 
+UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
+    FString& OutSummary);
+
+bool CaptureColoradoHanceWaterReview(FString& OutSummary);
+
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
 
@@ -2701,6 +2706,7 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
 namespace RaftSimPhotorealMaterials
 {
 bool BuildSouthForkWaterTextureAssets();
+bool BuildColoradoHanceWaterTextureAssets();
 bool BuildFutaleufuTerminatorWaterTextureAssets();
 bool BuildCrewSkinTextureAssets();
 bool BuildEquipmentTextileTextureAssets();
