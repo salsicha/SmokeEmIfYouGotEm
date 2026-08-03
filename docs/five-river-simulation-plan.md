@@ -176,6 +176,25 @@ and external acceptance gates pass.
   and all six external gates remain open. V2 is retained as a bounded runtime
   correction, not photoreal or B2 promotion.
 
+### 2026-08-03 — Pacuare organic shoreline and rainforest-floor transition retained
+
+- `L_UpperHuacas` now adds six rights-reviewed CC0 moss-rock morphology
+  variants, short rainforest-floor cover, and a shrub transition across both
+  complete 600 m banks. All 2,600 rock, 5,200 cover, and 1,200 shrub targets
+  place with zero rejects; the closest new instance remains 17.775 m from the
+  full route centerline and all eight dedicated HISM actors are non-colliding.
+- The 1009×1009 Landscape remains sole terrain render/collision/height
+  authority and live cooked water remains sole gameplay-water/raft-force
+  authority. The new dressing is explicitly procedural source-gap fill with no
+  exact lithology, species, ecology, survey, bathymetry, or hydraulic claim.
+- In fixed side-bank regions, green-dominant coverage rises from 56.19% to
+  67.38% at guide seat and 60.25% to 73.20% at river eye; measured small-scale
+  edge coverage rises from 12.35% to 21.45% and 12.27% to 22.87%. Near-black
+  coverage also rises, and the tree/ground-cover forms remain visibly
+  procedural, so the pass is retained only as a technical visual improvement.
+  The editor build, four M9 Pacuare asset audits, the live P4 map gate, and 19
+  focused Python contracts pass; all six external acceptance gates remain open.
+
 ### 2026-08-03 — Pacuare live transmitting gameplay water retained
 
 - `L_UpperHuacas` now uses a solver-owned, wet-cell-clipped transmitting core

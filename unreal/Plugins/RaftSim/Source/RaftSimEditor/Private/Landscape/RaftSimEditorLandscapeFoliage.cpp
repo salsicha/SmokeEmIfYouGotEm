@@ -56,6 +56,15 @@ constexpr int32 ChilkoOrganicShorelineGroundCoverMinimumInstanceCount = 7900;
 constexpr float ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees = 32.0f;
 constexpr float ChilkoOrganicShorelineStartStationCm = 250.0f;
 constexpr float ChilkoOrganicShorelineEndStationCm = 59750.0f;
+constexpr int32 PacuareOrganicShorelineRockTargetInstanceCount = 2600;
+constexpr int32 PacuareOrganicShorelineRockMinimumInstanceCount = 2350;
+constexpr float PacuareOrganicShorelineRockSlopeCeilingDegrees = 50.0f;
+constexpr int32 PacuareOrganicShorelineGroundCoverTargetInstanceCount = 5200;
+constexpr int32 PacuareOrganicShorelineGroundCoverMinimumInstanceCount = 4700;
+constexpr float PacuareOrganicShorelineGroundCoverSlopeCeilingDegrees = 44.0f;
+constexpr int32 PacuareOrganicShorelineShrubTargetInstanceCount = 1200;
+constexpr int32 PacuareOrganicShorelineShrubMinimumInstanceCount = 1050;
+constexpr float PacuareOrganicShorelineShrubSlopeCeilingDegrees = 38.0f;
 constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
     "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
 constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
@@ -1844,9 +1853,9 @@ bool CreatePacuareOpaqueRainforestVegetationAssets(
     OutMaterial = CreateOpaqueVegetationMaterial(
         PacuareRainforestVegetationMaterialPath,
         TEXT("Pacuare rainforest"),
-        0.085f,
-        1.0f,
-        1.0f,
+        0.145f,
+        0.86f,
+        1.14f,
         OutSummary);
     if (!OutMaterial)
     {
@@ -2450,7 +2459,7 @@ bool AddLandscapeCandidateBiomeDressing(
     const bool bUsesOpaqueVolumetricVegetation =
         bZambezi || bPacuare || bOpaqueTemperate;
     TArray<UStaticMesh*> ReviewedRockMeshes;
-    if (bSouthFork || bZambezi || bFutaleufu || bChilko)
+    if (bSouthFork || bZambezi || bPacuare || bFutaleufu || bChilko)
     {
         for (int32 RockIndex = 1; RockIndex <= 6; ++RockIndex)
         {
@@ -3205,6 +3214,45 @@ bool AddLandscapeCandidateBiomeDressing(
                 TemperateOpaqueVegetationMaterial)};
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
+        PacuareOrganicShorelineRockInstances;
+    if (bPacuare)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            PacuareOrganicShorelineRockInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_PacuareOrganicShorelineRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true));
+        }
+    }
+    UHierarchicalInstancedStaticMeshComponent*
+        PacuareOrganicShorelineGroundCoverInstances = bPacuare
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              UnderstoryMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOrganicShorelineGroundCover_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              false,
+              PacuareOpaqueRainforestVegetationMaterial)
+        : nullptr;
+    UHierarchicalInstancedStaticMeshComponent*
+        PacuareOrganicShorelineShrubInstances = bPacuare
+        ? AddLandscapeCandidateInstancedMeshComponent(
+              World,
+              ShrubMesh,
+              FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PacuareOrganicShorelineShrub_%s"),
+                  *Candidate.PreviewSpec.RiverId),
+              true,
+              PacuareOpaqueRainforestVegetationMaterial)
+        : nullptr;
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
     UMaterialInstanceConstant* ZambeziRunnableLaunchTalusMaterial = bZambezi
         ? LoadOrCreateZambeziRunnableLaunchTalusMaterial(OutSummary)
@@ -3287,6 +3335,15 @@ bool AddLandscapeCandidateBiomeDressing(
             {
                 return Component == nullptr;
             }) ||
+        Algo::AnyOf(
+            PacuareOrganicShorelineRockInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        (bPacuare &&
+         (!PacuareOrganicShorelineGroundCoverInstances ||
+          !PacuareOrganicShorelineShrubInstances)) ||
         Algo::AnyOf(
             ZambeziRunnableLaunchTalusInstances,
             [](UHierarchicalInstancedStaticMeshComponent* Component)
@@ -3541,6 +3598,78 @@ bool AddLandscapeCandidateBiomeDressing(
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
         }
+    }
+    if (bPacuare)
+    {
+        auto TagPacuareShorelineComponent = [](
+            UHierarchicalInstancedStaticMeshComponent* Component,
+            FName FamilyTag)
+        {
+            if (!Component)
+            {
+                return;
+            }
+            if (AActor* Owner = Component->GetOwner())
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimPacuareUpperHuacasRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPacuareOrganicShorelineV1"));
+                Owner->Tags.AddUnique(FamilyTag);
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralSourceGapFill"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimPacuareOrganicShorelineV1"));
+            Component->ComponentTags.AddUnique(FamilyTag);
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        };
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareOrganicShorelineRockInstances)
+        {
+            TagPacuareShorelineComponent(
+                Component,
+                TEXT("RaftSimPacuareShorelineMossRock"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+            }
+        }
+        TagPacuareShorelineComponent(
+            PacuareOrganicShorelineGroundCoverInstances,
+            TEXT("RaftSimPacuareShorelineGroundCover"));
+        TagPacuareShorelineComponent(
+            PacuareOrganicShorelineShrubInstances,
+            TEXT("RaftSimPacuareShorelineShrub"));
+        const TArray<UHierarchicalInstancedStaticMeshComponent*>
+            PacuareEcologyComponents = {
+                PacuareOrganicShorelineGroundCoverInstances,
+                PacuareOrganicShorelineShrubInstances};
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareEcologyComponents)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+            }
+        }
+        PacuareOrganicShorelineGroundCoverInstances->SetCastShadow(false);
+        if (AActor* Owner =
+                PacuareOrganicShorelineGroundCoverInstances->GetOwner())
+        {
+            Owner->Tags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+        }
+        PacuareOrganicShorelineGroundCoverInstances->ComponentTags.AddUnique(
+            TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
     }
     if (bZambezi)
     {
@@ -3817,7 +3946,18 @@ bool AddLandscapeCandidateBiomeDressing(
                             ECollisionEnabled::NoCollision &&
                         Component->GetMaterial(0) ==
                             OpaqueVegetationMaterial;
-                });
+                }) &&
+            (!bPacuare ||
+             (PacuareOrganicShorelineGroundCoverInstances &&
+              PacuareOrganicShorelineGroundCoverInstances->GetCollisionEnabled() ==
+                  ECollisionEnabled::NoCollision &&
+              PacuareOrganicShorelineGroundCoverInstances->GetMaterial(0) ==
+                  OpaqueVegetationMaterial &&
+              PacuareOrganicShorelineShrubInstances &&
+              PacuareOrganicShorelineShrubInstances->GetCollisionEnabled() ==
+                  ECollisionEnabled::NoCollision &&
+              PacuareOrganicShorelineShrubInstances->GetMaterial(0) ==
+                  OpaqueVegetationMaterial));
     }
     else
     {
@@ -5281,6 +5421,356 @@ bool AddLandscapeCandidateBiomeDressing(
         }
     }
 
+    int32 PacuareShorelineRockPlacedCount = 0;
+    int32 PacuareShorelineRockRejectedPlacementCount = 0;
+    int32 PacuareShorelineGroundCoverPlacedCount = 0;
+    int32 PacuareShorelineGroundCoverRejectedPlacementCount = 0;
+    int32 PacuareShorelineShrubPlacedCount = 0;
+    int32 PacuareShorelineShrubRejectedPlacementCount = 0;
+    float PacuareShorelineMinimumCenterlineDistanceCm =
+        TNumericLimits<float>::Max();
+    float PacuareShorelineMaximumSlopeDegrees = 0.0f;
+    if (bPacuare && bPhysicalCorridor &&
+        ReviewedRockMeshes.Num() == 6 &&
+        PacuareOrganicShorelineRockInstances.Num() == 6)
+    {
+        // Upper Huacas is only 78 m wide, so the 30 m source context leaves a
+        // narrow bank transition visible from the raft. Fill that unresolved
+        // band with deterministic, source-grounded moss-rock morphology,
+        // short rainforest floor cover, and shrubs. The complete visible
+        // river width and a hard centerline clearance remain protected. These
+        // HISM layers are non-colliding visual infill; Landscape height and
+        // collision plus cooked-field water retain all geography, bathymetry,
+        // hydraulic, and raft-force authority.
+        const float VisibleRiverHalfWidth =
+            FMath::Max(1700.0f, ActiveRiverHalfWidth * 1.32f);
+        constexpr int32 BankSideCount = 2;
+        const int32 RockInstancesPerSide =
+            PacuareOrganicShorelineRockTargetInstanceCount / BankSideCount;
+        for (int32 RockIndex = 0;
+             RockIndex < PacuareOrganicShorelineRockTargetInstanceCount;
+             ++RockIndex)
+        {
+            const float Side = RockIndex % 2 == 0 ? -1.0f : 1.0f;
+            const int32 AlongIndex = RockIndex / BankSideCount;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(RockIndex, 11101)) /
+                static_cast<float>(RockInstancesPerSide);
+            const float BaseLogicalX = FMath::Lerp(-2425.0f, 25325.0f, AlongT) +
+                FMath::Lerp(
+                    -72.0f,
+                    72.0f,
+                    ZambeziVegetationUnitRandom(RockIndex, 11107));
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (VisibleRiverHalfWidth + 260.0f));
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestCenterlineDistanceCm = 0.0f;
+            float BestScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 28;
+                 ++CandidateIndex)
+            {
+                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                    -90.0f,
+                    90.0f,
+                    ZambeziVegetationUnitRandom(
+                        RockIndex * 31 + CandidateIndex,
+                        11113));
+                const float AdditionalOffset = FMath::Lerp(
+                    45.0f,
+                    1650.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            RockIndex * 37 + CandidateIndex,
+                            11117),
+                        1.72f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (VisibleRiverHalfWidth + AdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float CenterlineDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                const float HeightAboveWaterCm = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y) -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (SlopeDegrees >
+                        PacuareOrganicShorelineRockSlopeCeilingDegrees ||
+                    CenterlineDistanceCm < VisibleRiverHalfWidth + 30.0f ||
+                    HeightAboveWaterCm < -5.0f ||
+                    HeightAboveWaterCm > 1450.0f)
+                {
+                    continue;
+                }
+                const float TargetDryHeightCm = FMath::Lerp(
+                    30.0f,
+                    430.0f,
+                    ZambeziVegetationUnitRandom(RockIndex, 11119));
+                const float Score =
+                    0.62f * FMath::Abs(
+                        HeightAboveWaterCm - TargetDryHeightCm) / 1450.0f +
+                    0.25f * AdditionalOffset / 1650.0f +
+                    0.13f * SlopeDegrees /
+                        PacuareOrganicShorelineRockSlopeCeilingDegrees;
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestPoint = CandidatePoint;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestCenterlineDistanceCm = CenterlineDistanceCm;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                ++PacuareShorelineRockRejectedPlacementCount;
+                continue;
+            }
+
+            const int32 ScaleClass = RockIndex % 30;
+            const float TargetHeightCm = ScaleClass == 0
+                ? FMath::Lerp(
+                      95.0f,
+                      155.0f,
+                      ZambeziVegetationUnitRandom(RockIndex, 11123))
+                : (ScaleClass < 7
+                       ? FMath::Lerp(
+                             38.0f,
+                             88.0f,
+                             ZambeziVegetationUnitRandom(RockIndex, 11129))
+                       : FMath::Lerp(
+                             12.0f,
+                             42.0f,
+                             ZambeziVegetationUnitRandom(RockIndex, 11131)));
+            const int32 VariantIndex = RockIndex % ReviewedRockMeshes.Num();
+            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
+            UHierarchicalInstancedStaticMeshComponent* RockComponent =
+                PacuareOrganicShorelineRockInstances[VariantIndex];
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                RockComponent,
+                RockMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.08f, 0.0f, 4.0f),
+                    360.0f * ZambeziVegetationUnitRandom(RockIndex, 11137),
+                    FMath::Lerp(
+                        -5.0f,
+                        5.0f,
+                        ZambeziVegetationUnitRandom(RockIndex, 11141))),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.68f,
+                        1.52f,
+                        ZambeziVegetationUnitRandom(RockIndex, 11149)),
+                    UniformScale * FMath::Lerp(
+                        0.70f,
+                        1.46f,
+                        ZambeziVegetationUnitRandom(RockIndex, 11159)),
+                    UniformScale));
+            ++PacuareShorelineRockPlacedCount;
+            ++OutResult.DressingBoulderInstanceCount;
+            PacuareShorelineMinimumCenterlineDistanceCm = FMath::Min(
+                PacuareShorelineMinimumCenterlineDistanceCm,
+                BestCenterlineDistanceCm);
+            PacuareShorelineMaximumSlopeDegrees = FMath::Max(
+                PacuareShorelineMaximumSlopeDegrees,
+                BestSlopeDegrees);
+        }
+
+        const int32 EcologyTargetCount =
+            PacuareOrganicShorelineGroundCoverTargetInstanceCount +
+            PacuareOrganicShorelineShrubTargetInstanceCount;
+        for (int32 EcologyIndex = 0;
+             EcologyIndex < EcologyTargetCount;
+             ++EcologyIndex)
+        {
+            const bool bShrub = EcologyIndex >=
+                PacuareOrganicShorelineGroundCoverTargetInstanceCount;
+            const int32 FamilyIndex = bShrub
+                ? EcologyIndex -
+                    PacuareOrganicShorelineGroundCoverTargetInstanceCount
+                : EcologyIndex;
+            const int32 FamilyTargetCount = bShrub
+                ? PacuareOrganicShorelineShrubTargetInstanceCount
+                : PacuareOrganicShorelineGroundCoverTargetInstanceCount;
+            const float Side = FamilyIndex % 2 == 0 ? -1.0f : 1.0f;
+            const int32 AlongIndex = FamilyIndex / BankSideCount;
+            const int32 InstancesPerSide = FamilyTargetCount / BankSideCount;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(EcologyIndex, 11201)) /
+                static_cast<float>(InstancesPerSide);
+            const float BaseLogicalX = FMath::Lerp(-2425.0f, 25325.0f, AlongT) +
+                FMath::Lerp(
+                    -105.0f,
+                    105.0f,
+                    ZambeziVegetationUnitRandom(EcologyIndex, 11213));
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (VisibleRiverHalfWidth + (bShrub ? 420.0f : 190.0f)));
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestCenterlineDistanceCm = 0.0f;
+            float BestScore = TNumericLimits<float>::Max();
+            const float SlopeCeilingDegrees = bShrub
+                ? PacuareOrganicShorelineShrubSlopeCeilingDegrees
+                : PacuareOrganicShorelineGroundCoverSlopeCeilingDegrees;
+            for (int32 CandidateIndex = 0; CandidateIndex < 24;
+                 ++CandidateIndex)
+            {
+                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                    -125.0f,
+                    125.0f,
+                    ZambeziVegetationUnitRandom(
+                        EcologyIndex * 29 + CandidateIndex,
+                        11227));
+                const float AdditionalOffset = FMath::Lerp(
+                    bShrub ? 230.0f : 75.0f,
+                    bShrub ? 1950.0f : 1800.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            EcologyIndex * 43 + CandidateIndex,
+                            11239),
+                        bShrub ? 1.18f : 1.48f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (VisibleRiverHalfWidth + AdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float CenterlineDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                const float HeightAboveWaterCm = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y) -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                const float MinimumDryHeightCm = bShrub ? 35.0f : 12.0f;
+                const float MaximumDryHeightCm = bShrub ? 2100.0f : 1650.0f;
+                if (SlopeDegrees > SlopeCeilingDegrees ||
+                    CenterlineDistanceCm < VisibleRiverHalfWidth +
+                        (bShrub ? 180.0f : 55.0f) ||
+                    HeightAboveWaterCm < MinimumDryHeightCm ||
+                    HeightAboveWaterCm > MaximumDryHeightCm)
+                {
+                    continue;
+                }
+                const float TargetDryHeightCm = FMath::Lerp(
+                    bShrub ? 210.0f : 75.0f,
+                    bShrub ? 980.0f : 620.0f,
+                    ZambeziVegetationUnitRandom(EcologyIndex, 11243));
+                const float Score =
+                    0.57f * FMath::Abs(
+                        HeightAboveWaterCm - TargetDryHeightCm) /
+                        MaximumDryHeightCm +
+                    0.28f * AdditionalOffset /
+                        (bShrub ? 1950.0f : 1800.0f) +
+                    0.15f * SlopeDegrees / SlopeCeilingDegrees;
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestPoint = CandidatePoint;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestCenterlineDistanceCm = CenterlineDistanceCm;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                if (bShrub)
+                {
+                    ++PacuareShorelineShrubRejectedPlacementCount;
+                }
+                else
+                {
+                    ++PacuareShorelineGroundCoverRejectedPlacementCount;
+                }
+                continue;
+            }
+
+            UStaticMesh* EcologyMesh = bShrub ? ShrubMesh : UnderstoryMesh;
+            UHierarchicalInstancedStaticMeshComponent* EcologyComponent = bShrub
+                ? PacuareOrganicShorelineShrubInstances
+                : PacuareOrganicShorelineGroundCoverInstances;
+            const float TargetHeightCm = FMath::Lerp(
+                bShrub ? 135.0f : 26.0f,
+                bShrub ? 360.0f : 118.0f,
+                ZambeziVegetationUnitRandom(EcologyIndex, 11251));
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(EcologyMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                EcologyComponent,
+                EcologyMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.025f, 0.0f, 1.0f),
+                    360.0f * ZambeziVegetationUnitRandom(EcologyIndex, 11257),
+                    FMath::Lerp(
+                        -1.2f,
+                        1.2f,
+                        ZambeziVegetationUnitRandom(EcologyIndex, 11261))),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        bShrub ? 0.76f : 0.66f,
+                        bShrub ? 1.28f : 1.46f,
+                        ZambeziVegetationUnitRandom(EcologyIndex, 11269)),
+                    UniformScale * FMath::Lerp(
+                        bShrub ? 0.78f : 0.70f,
+                        bShrub ? 1.24f : 1.40f,
+                        ZambeziVegetationUnitRandom(EcologyIndex, 11273)),
+                    UniformScale));
+            if (bShrub)
+            {
+                ++PacuareShorelineShrubPlacedCount;
+            }
+            else
+            {
+                ++PacuareShorelineGroundCoverPlacedCount;
+            }
+            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
+            PacuareShorelineMinimumCenterlineDistanceCm = FMath::Min(
+                PacuareShorelineMinimumCenterlineDistanceCm,
+                BestCenterlineDistanceCm);
+            PacuareShorelineMaximumSlopeDegrees = FMath::Max(
+                PacuareShorelineMaximumSlopeDegrees,
+                BestSlopeDegrees);
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareOrganicShorelineRockInstances)
+        {
+            Component->MarkRenderStateDirty();
+        }
+        PacuareOrganicShorelineGroundCoverInstances->MarkRenderStateDirty();
+        PacuareOrganicShorelineShrubInstances->MarkRenderStateDirty();
+        OutSummary += FString::Printf(
+            TEXT("Pacuare organic shoreline V1: %d/%d moss-rock analogs, ")
+            TEXT("%d/%d short rainforest-floor patches, and %d/%d shrubs ")
+            TEXT("placed across both full-route banks; rejected rock/cover/shrub ")
+            TEXT("targets=%d/%d/%d, minimum centerline distance %.1f cm, and ")
+            TEXT("maximum slope %.2f degrees. Source-Landscape-grounded, ")
+            TEXT("non-colliding procedural gap fill with no lithology, species, ")
+            TEXT("ecology, survey, hydraulic, bathymetry, or raft-force authority.\n"),
+            PacuareShorelineRockPlacedCount,
+            PacuareOrganicShorelineRockTargetInstanceCount,
+            PacuareShorelineGroundCoverPlacedCount,
+            PacuareOrganicShorelineGroundCoverTargetInstanceCount,
+            PacuareShorelineShrubPlacedCount,
+            PacuareOrganicShorelineShrubTargetInstanceCount,
+            PacuareShorelineRockRejectedPlacementCount,
+            PacuareShorelineGroundCoverRejectedPlacementCount,
+            PacuareShorelineShrubRejectedPlacementCount,
+            PacuareShorelineMinimumCenterlineDistanceCm,
+            PacuareShorelineMaximumSlopeDegrees);
+    }
+
     int32 TemperateNearBankPlacedCount = 0;
     int32 TemperateNearBankRejectedPlacementCount = 0;
     float TemperateNearBankMinimumCenterlineDistanceCm =
@@ -6345,6 +6835,8 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
+        PacuareShorelineGroundCoverPlacedCount +
+        PacuareShorelineShrubPlacedCount +
         TemperateNearBankPlacedCount +
         ChilkoShorelineGroundCoverPlacedCount +
         HanceDrylandGroundCoverPlacedCount +
@@ -6359,8 +6851,18 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingBoulderInstanceCount ==
             BoulderCount + TemperateWaterlinePlacedCount +
                 ChilkoShorelineGravelPlacedCount +
+                PacuareShorelineRockPlacedCount +
                 RunnableLaunchTalusPlacedCount &&
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
+        (!bPacuare ||
+         PacuareShorelineRockPlacedCount >=
+             PacuareOrganicShorelineRockMinimumInstanceCount) &&
+        (!bPacuare ||
+         PacuareShorelineGroundCoverPlacedCount >=
+             PacuareOrganicShorelineGroundCoverMinimumInstanceCount) &&
+        (!bPacuare ||
+         PacuareShorelineShrubPlacedCount >=
+             PacuareOrganicShorelineShrubMinimumInstanceCount) &&
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&

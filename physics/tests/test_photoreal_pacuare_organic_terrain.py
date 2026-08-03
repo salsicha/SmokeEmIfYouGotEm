@@ -144,9 +144,11 @@ def test_pacuare_manifest_records_opaque_volumetric_dressing_contract():
         "landscape_dressing_understory_material_asset",
     ):
         assert candidate[field] == expected_material
-    assert candidate["landscape_dressing_foliage_instance_count"] == 12000
-    assert candidate["landscape_dressing_canopy_tree_instance_count"] > 4500
-    assert candidate["landscape_dressing_understory_instance_count"] > 4500
+    assert candidate["landscape_dressing_external_review_rock_mesh_count"] == 6
+    assert candidate["landscape_dressing_boulder_instance_count"] == 2780
+    assert candidate["landscape_dressing_foliage_instance_count"] == 18400
+    assert candidate["landscape_dressing_canopy_tree_instance_count"] == 5993
+    assert candidate["landscape_dressing_understory_instance_count"] == 12407
     assert candidate["landscape_dressing_promotion_status"] == (
         "opaque_volumetric_procedural_fallback_removes_alpha_card_artifacts_but_"
         "requires_species_ecology_guide_visual_and_performance_review"

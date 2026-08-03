@@ -54,23 +54,23 @@
   "retained_artifacts": [
     {
       "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
-      "sha256": "260c2426c3f58ceab595b11ba4079e19d6e71d01af33f6af327bcd2bccb1f81b"
+      "sha256": "828d5e265c0470cee0ae50bff51dff62045f759ee656c4e89d44ea86eac40369"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "16da9111e63ce778abde5c7269d57d368fe1ddb38ed40e08135e7255e7b8d6df"
+      "sha256": "d6ddfba4754b49a76a392b25460a9f5a98cfca47361a6e0974d31e9253f44955"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "179bb042cdf6a144f720308a0cf0e18910ab4b26b0677f977df23c2fe167eb60"
+      "sha256": "afbaaa97a24ef9d88fad67a4d25619487d65e79d9ab7bc5a04e962ecde49a875"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
-      "sha256": "ce1904e43bbdf5babf8a198b2c027b5df459c66181554760347cf0c3a6388af7"
+      "sha256": "2ea7c9cdddf30430b480a59f0c0e188222ef7b1987cfc8596e911eecd0f2047a"
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
-      "sha256": "7dc1d7a104c8ad0790d38805173c2522310750af83b0f3da18f2687b9af7a0a1"
+      "sha256": "1d95bd2dfbbd23e1d6b26d6241a3ed1e344083fe4ba7e1d747cb47f7a2656abd"
     },
     {
       "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png",
