@@ -1,0 +1,27 @@
+{
+  "schema": "raftsim.first_party.generated_texture_provenance.v1",
+  "asset_id": "zambezi_batoka_foam_lace_v1",
+  "asset_role": "visual-only whitewater breakup mask multiplied by solver-authored aeration; no hydraulic, collision, wet-mask, bathymetry, or raft-force authority",
+  "generator": "OpenAI built-in image generation",
+  "generation_date_utc": "2026-08-03",
+  "generation_mode": "new image",
+  "generation_method": "project-directed generation of an orthographic sparse Zambezi whitewater lace and bubble-cluster mask",
+  "prompt": "Use case: stylized-concept. Asset type: tileable game texture; grayscale foam-lace mask for solver-masked Unreal water rendering. Primary request: create a square, seamless grayscale mask for sparse Zambezi River whitewater foam lace. Use a black-dominant field covering more than 70 percent of the image, with irregular branching lace, broken crest fragments, elongated downstream bubble clusters, turbulent holes, and intermittent high-volume river aeration patterns. Style/medium: production game data mask, not a beauty image; pure grayscale with white representing foam coverage and black representing no foam. Composition/framing: orthographic square texture, edge-to-edge, seamless/tileable with mirror addressing; distributed detail without a central focal point. Color palette: grayscale only, deep black dominant, sparse white and gray filaments. Constraints: crisp but organic multi-scale mask, useful under solver hydraulic masking; no text, no watermark, no logos, no banks, no rocks, no raft, no people, no colored water, no normal-map colors, no lighting or perspective. Avoid: broad opaque white sheets, uniform noise, repeated stripes, cellular honeycomb patterns, regular dots, obvious spirals, hard seams, photographs.",
+  "project_ownership": "first-party generated project asset",
+  "texture": {
+    "path": "unreal/SourceArt/RaftSim/Water/ZambeziBatoka/T_RaftSim_ZambeziBatoka_FoamLaceV1.png",
+    "sha256": "1fc472ef1d21fbee5f6659281a0327705edc8914766c803eb29b354f8d17e5b3",
+    "width": 1254,
+    "height": 1254,
+    "encoding": "RGB grayscale breakup mask sampled from the red channel",
+    "addressing": "mirror_x_mirror_y",
+    "srgb": false,
+    "compression": "mask"
+  },
+  "limitations": [
+    "The asset is procedural visual infill rather than measured Zambezi foam imagery or rapid-specific calibration.",
+    "Mirrored GPU addressing is required because opposite source-image borders are not byte-identical.",
+    "The material must multiply this texture by solver-derived foam and speed channels so it cannot paint whitewater into calm or dry cells.",
+    "In-engine visual, guide, water-VFX, and target-hardware acceptance remain required."
+  ]
+}

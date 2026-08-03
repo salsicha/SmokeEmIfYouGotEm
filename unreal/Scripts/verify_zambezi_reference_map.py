@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v16",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v17",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -318,6 +318,31 @@ def main() -> None:
         safe_launch_apron_tagged = bool(
             water_config and "RaftSimSafeLaunchApron" in water_config_tags
         )
+        live_volume_material = (
+            water_config.get_editor_property("live_volume_core_material_override")
+            if water_config
+            else None
+        )
+        live_flow_normal = (
+            water_config.get_editor_property("live_water_flow_normal_texture")
+            if water_config
+            else None
+        )
+        live_foam_lace = (
+            water_config.get_editor_property("live_water_foam_lace_texture")
+            if water_config
+            else None
+        )
+        solver_owned_water = bool(
+            water_config
+            and water_config.get_editor_property(
+                "live_solver_owns_runtime_rendering"
+            )
+        )
+        live_volume_core_enabled = bool(
+            water_config
+            and water_config.get_editor_property("enable_live_solver_volume_core")
+        )
         rapid_numbers = []
         for row in marker_rows:
             suffix = str(row["actor_label"]).removeprefix("RaftSim_ZambeziRapid_")
@@ -428,9 +453,59 @@ def main() -> None:
                     ),
                 },
                 "water_surface": {
-                    "authority": "render_only_source_aligned_physical_corridor",
-                    "shading_model_contract": "DefaultLit",
-                    "normal_motion_contract": "two_opposed_panned_atlas_layers",
+                    "authority": (
+                        "solver_wet_cell_geometry_with_render_only_transmitting_"
+                        "optics_and_capture_only_static_editor_ribbon"
+                    ),
+                    "gameplay_shading_contract": "solver_owned_transmitting_volume_core",
+                    "capture_shading_model_contract": "DefaultLit",
+                    "capture_normal_motion_contract": "two_opposed_panned_atlas_layers",
+                    "solver_owned_runtime_rendering": solver_owned_water,
+                    "live_volume_core_enabled": live_volume_core_enabled,
+                    "live_volume_material": (
+                        live_volume_material.get_path_name()
+                        if live_volume_material
+                        else None
+                    ),
+                    "live_flow_normal": (
+                        live_flow_normal.get_path_name() if live_flow_normal else None
+                    ),
+                    "live_foam_lace": (
+                        live_foam_lace.get_path_name() if live_foam_lace else None
+                    ),
+                    "calm_detail_coverage": (
+                        float(
+                            water_config.get_editor_property(
+                                "live_surface_calm_coverage"
+                            )
+                        )
+                        if water_config
+                        else None
+                    ),
+                    "active_detail_coverage": (
+                        float(
+                            water_config.get_editor_property(
+                                "live_surface_active_coverage"
+                            )
+                        )
+                        if water_config
+                        else None
+                    ),
+                    "presentation_smoothing_enabled": bool(
+                        water_config
+                        and water_config.get_editor_property(
+                            "enable_live_presentation_surface_smoothing"
+                        )
+                    ),
+                    "presentation_smoothing_strength": (
+                        float(
+                            water_config.get_editor_property(
+                                "live_presentation_surface_smoothing_strength"
+                            )
+                        )
+                        if water_config
+                        else None
+                    ),
                     "component_count": len(water_surface_rows),
                     "components": water_surface_rows,
                 },
@@ -649,6 +724,36 @@ def main() -> None:
                 for row in terrain_rows
             )
             and len(water_surface_rows) == 1
+            and solver_owned_water
+            and live_volume_core_enabled
+            and live_volume_material is not None
+            and "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1"
+            in live_volume_material.get_path_name()
+            and live_flow_normal is not None
+            and "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal"
+            in live_flow_normal.get_path_name()
+            and live_foam_lace is not None
+            and "T_RaftSim_ZambeziBatokaWaterV1_FoamLace"
+            in live_foam_lace.get_path_name()
+            and float(
+                water_config.get_editor_property("live_surface_calm_coverage")
+            ) < 0.10
+            and float(
+                water_config.get_editor_property("live_surface_active_coverage")
+            ) < 0.20
+            and bool(
+                water_config.get_editor_property(
+                    "enable_live_presentation_surface_smoothing"
+                )
+            )
+            and abs(
+                float(
+                    water_config.get_editor_property(
+                        "live_presentation_surface_smoothing_strength"
+                    )
+                )
+                - 0.55
+            ) <= 0.001
             and water_surface_rows[0]["procedural_mesh_count"] == 1
             and "MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate"
             in str(water_surface_rows[0]["material"])
@@ -661,6 +766,9 @@ def main() -> None:
             and "RaftSimSingleLayerWaterCaptureRejected"
             in water_surface_rows[0]["tags"]
             and "RaftSimMovingMultiScaleWaterNormals" in water_surface_rows[0]["tags"]
+            and "RaftSimCaptureOnlyStaticWater" in water_surface_rows[0]["tags"]
+            and "RaftSimLiveSolverWaterOwnsRuntimeRendering"
+            in water_surface_rows[0]["tags"]
             and len(launch_talus_rows) == 6
             and sum(int(row["instance_count"]) for row in launch_talus_rows) == 360
             and all(row["component_count"] == 1 for row in launch_talus_rows)
@@ -800,7 +908,8 @@ def main() -> None:
             f"{len(player_rafts)} raft, {len(water_configs)} runtime water config, "
             f"{len(terrain_rows)} conditioned visual-terrain tiles, "
             f"{len(adaptive_near_field_terrain_rows)} adaptive near-field banks, "
-            f"{len(water_surface_rows)} validated Default Lit water ribbon, and "
+            f"{len(water_surface_rows)} capture-only Default Lit water ribbon plus "
+            "one solver-owned transmitting gameplay core, and "
             f"{sum(int(row['instance_count']) for row in launch_talus_rows)} "
             "runnable-launch dry-bank rock analogs, plus "
             f"{sum(int(row['instance_count']) for row in vegetation_rows)} "

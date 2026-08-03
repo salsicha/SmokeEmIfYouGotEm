@@ -186,4 +186,31 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveReflectedSkyColor =
         FLinearColor(0.18f, 0.28f, 0.34f, 1.0f);
+
+    /** River-local optical coefficients for the non-colliding volume core.
+     * These presentation values do not alter solver depth, velocity, wet/dry,
+     * collision, buoyancy, raft forces, or scoring. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveWaterScattering =
+        FLinearColor(0.00011f, 0.00015f, 0.00019f, 0.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveWaterAbsorption =
+        FLinearColor(0.0075f, 0.0048f, 0.0032f, 0.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    FLinearColor LiveRiverbedColorScale =
+        FLinearColor(0.13f, 0.17f, 0.20f, 0.0f);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveShallowWaterOpacity = 0.58f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveDeepWaterOpacity = 0.79f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveFoamWaterOpacity = 0.91f;
 };

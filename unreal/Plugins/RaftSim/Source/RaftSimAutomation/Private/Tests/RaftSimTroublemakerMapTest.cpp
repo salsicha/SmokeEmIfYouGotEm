@@ -156,7 +156,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
     }
 
     const bool bUsesSolverOwnedVisibleRiver =
-        bPacuareReferenceRun || bColoradoHanceReferenceRun ||
+        bZambeziReferenceRun || bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
@@ -168,7 +168,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
             bUsesSolverOwnedVisibleRiver);
         if (bUsesSolverOwnedVisibleRiver)
         {
-            if (bColoradoHanceReferenceRun ||
+            if (bZambeziReferenceRun || bColoradoHanceReferenceRun ||
                 bChilkoLavaCanyonReferenceRun ||
                 bFutaleufuTerminatorReferenceRun)
             {
@@ -413,6 +413,43 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Test->TestTrue(
                     TEXT("Zambezi water config records the safe launch apron"),
                     (*It)->Tags.Contains(TEXT("RaftSimSafeLaunchApron")));
+                Test->TestTrue(
+                    TEXT("Zambezi solver owns the visible gameplay river"),
+                    (*It)->bLiveSolverOwnsRuntimeRendering);
+                Test->TestTrue(
+                    TEXT("Zambezi enables the wet-cell-clipped transmitting core"),
+                    (*It)->bEnableLiveSolverVolumeCore);
+                Test->TestTrue(
+                    TEXT("Zambezi config binds river-local transmitting water"),
+                    (*It)->LiveVolumeCoreMaterialOverride &&
+                        (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
+                            TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1")));
+                Test->TestTrue(
+                    TEXT("Zambezi config binds its first-party flow normal"),
+                    (*It)->LiveWaterFlowNormalTexture &&
+                        (*It)->LiveWaterFlowNormalTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_ZambeziBatokaWaterV1_FlowNormal")));
+                Test->TestTrue(
+                    TEXT("Zambezi config binds solver-masked foam lace"),
+                    (*It)->LiveWaterFoamLaceTexture &&
+                        (*It)->LiveWaterFoamLaceTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_ZambeziBatokaWaterV1_FoamLace")));
+                Test->TestTrue(
+                    TEXT("Zambezi live detail skin cannot become an opaque sheet"),
+                    (*It)->LiveSurfaceCalmCoverage < 0.10f &&
+                        (*It)->LiveSurfaceActiveCoverage < 0.20f);
+                Test->TestTrue(
+                    TEXT("Zambezi uses render-only surface smoothing"),
+                    (*It)->bEnableLivePresentationSurfaceSmoothing &&
+                        FMath::IsNearlyEqual(
+                            (*It)->LivePresentationSurfaceSmoothingStrength,
+                            0.55f,
+                            0.001f));
+                Test->TestTrue(
+                    TEXT("Zambezi live-water tags disclaim solver mutation"),
+                    (*It)->Tags.Contains(TEXT("RaftSimZambeziTransmittingWaterV1")) &&
+                        (*It)->Tags.Contains(TEXT("RaftSimSolverMaskedFoamLace")) &&
+                        (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
                 ++RuntimeWaterConfigCount;
             }
         }
@@ -420,6 +457,25 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Zambezi reference run has one procedural runtime water config"),
             RuntimeWaterConfigCount,
             1);
+        int32 CaptureOnlyStaticWaterCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (!(*It)->Tags.Contains(TEXT("RaftSimCaptureOnlyStaticWater")))
+            {
+                continue;
+            }
+            Test->TestTrue(
+                TEXT("Zambezi authored capture water is hidden during play"),
+                (*It)->IsHidden());
+            Test->TestTrue(
+                TEXT("Zambezi static water records live-solver ownership"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering")));
+            ++CaptureOnlyStaticWaterCount;
+        }
+        Test->TestTrue(
+            TEXT("Zambezi retains capture-only static water for editor review"),
+            CaptureOnlyStaticWaterCount >= 1);
         int32 BreakingSiteCount = 0;
         if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
         {

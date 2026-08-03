@@ -959,27 +959,30 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     TEXT("FlowRippleStrength"),
                     0.035f + ResolvedLiveRippleStrength * 0.16f);
                 VolumeMaterial->SetScalarParameterValue(
-                    TEXT("ShallowWaterOpacity"), 0.58f);
+                    TEXT("ShallowWaterOpacity"),
+                    RiverWaterConfig->LiveShallowWaterOpacity);
                 VolumeMaterial->SetScalarParameterValue(
-                    TEXT("DeepWaterOpacity"), 0.79f);
+                    TEXT("DeepWaterOpacity"),
+                    RiverWaterConfig->LiveDeepWaterOpacity);
                 VolumeMaterial->SetScalarParameterValue(
-                    TEXT("FoamWaterOpacity"), 0.91f);
+                    TEXT("FoamWaterOpacity"),
+                    RiverWaterConfig->LiveFoamWaterOpacity);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("RaftInteriorSurfaceOpacityScale"), 0.0f);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("RaftInteriorOpticalDepthScale"), 0.0f);
-                // Cold glacial water: red attenuates first while blue carries
-                // farther. Values are inverse centimetres and remain bounded
-                // around the shared photoreal parent calibration.
+                // River-local render-only optical coefficients. Defaults keep
+                // the accepted cold-water calibration; sediment-bearing rivers
+                // can transmit warmer bed light without changing hydraulics.
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("WaterScattering"),
-                    FLinearColor(0.00011f, 0.00015f, 0.00019f, 0.0f));
+                    RiverWaterConfig->LiveWaterScattering);
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("WaterAbsorption"),
-                    FLinearColor(0.0075f, 0.0048f, 0.0032f, 0.0f));
+                    RiverWaterConfig->LiveWaterAbsorption);
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("RiverbedColorScale"),
-                    FLinearColor(0.13f, 0.17f, 0.20f, 0.0f));
+                    RiverWaterConfig->LiveRiverbedColorScale);
                 if (ResolvedLiveWaterFlowNormalTexture)
                 {
                     VolumeMaterial->SetTextureParameterValue(

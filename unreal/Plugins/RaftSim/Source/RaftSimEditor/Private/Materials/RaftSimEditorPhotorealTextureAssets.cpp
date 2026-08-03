@@ -171,6 +171,62 @@ bool BuildFutaleufuTerminatorWaterTextureAssets()
         FoamLaceTexture != nullptr && bFoamLaceSaved;
 }
 
+bool BuildZambeziBatokaWaterTextureAssets()
+{
+    using namespace RaftSimEditorEnvironment;
+    FString Summary;
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FlowNormalSpec;
+    FlowNormalSpec.RiverId = TEXT("zambezi_batoka_gorge");
+    FlowNormalSpec.RiverAssetName = TEXT("ZambeziBatokaWaterV1");
+    FlowNormalSpec.MapKey = TEXT("FlowNormal");
+    FlowNormalSpec.MapKind =
+        TEXT("project_owned_zambezi_multiscale_river_flow_normal");
+    FlowNormalSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/ZambeziBatoka/"
+             "T_RaftSim_ZambeziBatoka_FlowNormalV1.png");
+    FlowNormalSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures");
+    FlowNormalSpec.CompressionSettings = TC_Normalmap;
+    FlowNormalSpec.bSRGB = false;
+    FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
+    FlowNormalSpec.AddressX = TA_Mirror;
+    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.bCompressionNoAlpha = true;
+    bool bFlowNormalSaved = false;
+    UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FlowNormalSpec, Summary, bFlowNormalSaved);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FoamLaceSpec;
+    FoamLaceSpec.RiverId = TEXT("zambezi_batoka_gorge");
+    FoamLaceSpec.RiverAssetName = TEXT("ZambeziBatokaWaterV1");
+    FoamLaceSpec.MapKey = TEXT("FoamLace");
+    FoamLaceSpec.MapKind =
+        TEXT("project_owned_zambezi_solver_masked_whitewater_lace");
+    FoamLaceSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/ZambeziBatoka/"
+             "T_RaftSim_ZambeziBatoka_FoamLaceV1.png");
+    FoamLaceSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures");
+    FoamLaceSpec.CompressionSettings = TC_Masks;
+    FoamLaceSpec.bSRGB = false;
+    FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
+    FoamLaceSpec.AddressX = TA_Mirror;
+    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.bCompressionNoAlpha = true;
+    bool bFoamLaceSaved = false;
+    UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FoamLaceSpec, Summary, bFoamLaceSaved);
+
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim Zambezi Batoka water textures:\n%s"),
+        *Summary);
+    return FlowNormalTexture != nullptr && bFlowNormalSaved &&
+        FoamLaceTexture != nullptr && bFoamLaceSaved;
+}
+
 bool BuildCrewSkinTextureAssets()
 {
     using namespace RaftSimEditorEnvironment;

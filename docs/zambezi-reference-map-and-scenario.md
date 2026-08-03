@@ -40,7 +40,7 @@ out. That warning does not change map load or gameplay acceptance.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v7_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v8_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
@@ -245,7 +245,7 @@ the earlier easiest-shelf rows while preserving the navigable corridor and
 removing the old floating black/green card failure. It does not establish
 correct species, woodland ecology, or photoreal vegetation.
 
-The physical-corridor presentation ribbon now uses the isolated opaque Default
+The physical-corridor editor-capture ribbon uses the isolated opaque Default
 Lit parent `M_RaftSim_Zambezi_DefaultLitWater`. It preserves the two opposed
 panners from the earlier sediment-water experiment: the primary normal uses
 2.4 x 6.2 UV tiling, while the secondary uses 4.1 x 10.3 and swaps its axes for
@@ -254,7 +254,9 @@ fill keep the surface readable when temporal reflection history is unavailable.
 The generated actor exposes `RaftSimZambeziDefaultLitWater`,
 `RaftSimMovingMultiScaleWaterNormals`,
 `RaftSimSingleLayerWaterCaptureRejected`, `RaftSimPhysicalCorridorWater`, and
-`RaftSimNonCollisionRenderSurface` tags.
+`RaftSimNonCollisionRenderSurface` tags. During gameplay this ribbon is tagged
+`RaftSimCaptureOnlyStaticWater` and hidden, so it cannot restore the former
+rectangular, opaque sheet.
 
 The retained fixed-route bracket uses 1.08 base-color scale, 0.32 emissive
 fill, 0.34 roughness, 0.38 specular, 0.16 normal intensity, 0.14 optical
@@ -274,13 +276,25 @@ SceneCapture2D evidence rejected that shading path. The current decision and
 measurements are recorded in
 `zambezi_default_lit_capture_water_v1_review.json`.
 
-The presentation ribbon stays non-colliding and render-only. The broad live
-solver carrier remains optically disabled, the separate solver-foam sheet and
-its raft/crew exclusion remain active, and the runtime water configuration and
-solver remain the gameplay authority. No terrain, collision, hydraulic state,
-bathymetry authority, or raft-force value changes. Realistic crest geometry,
-local bathymetric transmission, seasonal calibration, rapid-scale foam/spray,
-and guide/art approval remain open.
+The gameplay river now comes from the live solver mesh. A non-colliding,
+wet-cell-clipped volume core uses
+`MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1`, parented to the shared
+raft-transmitting water material, while the live Default Lit layer is limited
+to 0.035 calm and 0.16 active optical coverage. The two project-owned source
+textures under `unreal/SourceArt/RaftSim/Water/ZambeziBatoka/` supply a
+river-local normal and foam-lace breakup; the latter is always multiplied by
+solver foam and speed and cannot create whitewater in calm or dry cells. The
+matched gameplay capture changes `volume_core_enabled` from 0 to 1 and exposes
+4,224 wet-cell triangles at the same raft transform. The result removes the
+opaque gray foreground and retains readable raft and crew silhouettes, but is
+only a bounded optical milestone. Exact prompts, hashes, material values,
+before/after images, and remaining defects are recorded in
+`zambezi_live_transmitting_water_v1_review.json`.
+
+No terrain, collision, hydraulic state, bathymetry authority, wet/dry mask,
+scoring, or raft-force value changes. Realistic suspended sediment, caustics,
+crest geometry, local bathymetric transmission, seasonal calibration,
+rapid-scale foam/spray, and guide/art approval remain open.
 
 An August 1 organic-basalt material pass now conditions the same four
 render-only V15 terrain tiles. It keeps the reviewed 50 m world-aligned macro
@@ -385,8 +399,10 @@ Zambezi regeneration. `RaftSim.M6.CareerCatalog` confirms that the player-facing
 `zambezi_reference_run` opens `/Game/RaftSim/Maps/L_Zambezi`, and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` passes a live PIE launch with the cooked
 water field, upright five-person raft, all rapid markers, separate live foam,
-Niagara water pool, and four non-colliding visual-terrain tiles. The schema-v16
-saved-map audit and all seven focused Python contracts pass. This is runnable
+Niagara water pool, and four non-colliding visual-terrain tiles. The schema-v17
+saved-map audit also requires solver-owned rendering, the transmitting volume
+core, river-local texture bindings, low detail-skin coverage, smoothing, and a
+capture-only static ribbon. All focused Python contracts pass. This is runnable
 acceptance only; it does not close any production-hydraulic or photoreal gate
 below.
 
@@ -416,7 +432,7 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v16 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v17 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
@@ -441,8 +457,9 @@ non-colliding physical-corridor ribbon bound through the isolated Default Lit
 Zambezi parent with moving-normal and rejected-Single-Layer evidence tags. The
 saved material asset is covered by `RaftSim.M9.FZambeziDefaultLitWater`; grid-normal behavior is
 covered by `RaftSim.M9.FZambeziOrganicTerrainNormals`, and the talus instance
-and scalar contract are covered by `RaftSim.M9.FZambeziTalusMaterial`. Schema
-v16 additionally
+and scalar contract are covered by `RaftSim.M9.FZambeziTalusMaterial`; the
+river-local live material and first-party texture import contract are covered
+by `RaftSim.M9.FZambeziLiveTransmittingWater`. Schema v17 additionally
 requires global-station preservation, the global-station authority tag, all 25
 procedural rapid records, the Rapid 9 visualization-only portage policy, and
 the `RaftSimSafeLaunchApron` tag.
@@ -452,10 +469,10 @@ now fails unless the loaded map produces live breaking sites and production
 Niagara roller and aerosol activity, stays upright before and after the first
 crew command, retains five attached crew avatars, and has zero swimmers.
 
-The live surface now exposes its advected solver foam on a separate masked
+The live surface exposes its advected solver foam on a separate masked
 rapid-foam mesh instead of increasing opacity on the broad moving-water grid.
-The underlying live carrier remains optically disabled, preserving the prior
-rectangular-edge correction. The foam component copies the solver-displaced
+The wet-cell volume core supplies the transmitting river body without restoring
+the former rectangular static edge. The foam component copies the solver-displaced
 surface at a 1.4 cm presentation offset, combines only the solver foam field
 with the verified station/bank feather, and uses the existing material's
 pixel-level raft/crew exclusion. It has no collision, shadow, navigation,

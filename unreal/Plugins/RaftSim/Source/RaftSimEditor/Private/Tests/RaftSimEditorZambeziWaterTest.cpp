@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Engine/Texture2D.h"
 #include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
@@ -447,6 +448,101 @@ bool FRaftSimZambeziDefaultLitWaterTest::RunTest(const FString& Parameters)
         TEXT("Sediment surface tint"),
         TEXT("SurfaceTint"),
         FLinearColor(0.055f, 0.115f, 0.050f, 0.0f));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimZambeziLiveTransmittingWaterTest,
+    "RaftSim.M9.FZambeziLiveTransmittingWater",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
+    const FString& Parameters)
+{
+    FString AuthoringSummary;
+    UMaterialInstanceConstant* Instance =
+        RaftSimEditorEnvironment::LoadOrCreateZambeziBatokaLiveWaterInstance(
+            AuthoringSummary);
+    TestNotNull(
+        TEXT("Zambezi river-local live-volume authoring succeeds"),
+        Instance);
+    if (!Instance)
+    {
+        AddError(AuthoringSummary);
+        return false;
+    }
+
+    TestNotNull(TEXT("Zambezi live-volume parent exists"), Instance->Parent.Get());
+    if (Instance->Parent)
+    {
+        TestEqual(
+            TEXT("Zambezi uses shared raft-transmitting volume water"),
+            Instance->Parent->GetPathName(),
+            FString(TEXT(
+                "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+                "M_RaftSim_SouthForkRaftTransmissionWater."
+                "M_RaftSim_SouthForkRaftTransmissionWater")));
+    }
+
+    UTexture* FlowNormal = nullptr;
+    UTexture* FoamLace = nullptr;
+    TestTrue(
+        TEXT("Zambezi live volume binds its first-party flow normal"),
+        Instance->GetTextureParameterValue(
+            FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")),
+            FlowNormal));
+    TestTrue(
+        TEXT("Zambezi live volume binds its solver-masked foam lace"),
+        Instance->GetTextureParameterValue(
+            FMaterialParameterInfo(TEXT("WhitewaterFoamLace")),
+            FoamLace));
+    TestTrue(
+        TEXT("Zambezi flow normal is river-local"),
+        FlowNormal && FlowNormal->GetPathName().Contains(
+            TEXT("T_RaftSim_ZambeziBatokaWaterV1_FlowNormal")));
+    TestTrue(
+        TEXT("Zambezi foam lace is river-local"),
+        FoamLace && FoamLace->GetPathName().Contains(
+            TEXT("T_RaftSim_ZambeziBatokaWaterV1_FoamLace")));
+
+    if (const UTexture2D* FlowNormal2D = Cast<UTexture2D>(FlowNormal))
+    {
+        TestEqual(
+            TEXT("Zambezi flow normal imports as normal-map data"),
+            FlowNormal2D->CompressionSettings,
+            TC_Normalmap);
+        TestFalse(TEXT("Zambezi flow normal stays linear"), FlowNormal2D->SRGB);
+        TestEqual(TEXT("Zambezi flow normal mirrors in X"), FlowNormal2D->AddressX, TA_Mirror);
+        TestEqual(TEXT("Zambezi flow normal mirrors in Y"), FlowNormal2D->AddressY, TA_Mirror);
+    }
+    if (const UTexture2D* FoamLace2D = Cast<UTexture2D>(FoamLace))
+    {
+        TestEqual(
+            TEXT("Zambezi foam lace imports as mask data"),
+            FoamLace2D->CompressionSettings,
+            TC_Masks);
+        TestFalse(TEXT("Zambezi foam lace stays linear"), FoamLace2D->SRGB);
+        TestEqual(TEXT("Zambezi foam lace mirrors in X"), FoamLace2D->AddressX, TA_Mirror);
+        TestEqual(TEXT("Zambezi foam lace mirrors in Y"), FoamLace2D->AddressY, TA_Mirror);
+    }
+
+    auto TestScalar = [this, Instance](
+                          const TCHAR* ParameterName,
+                          float ExpectedValue)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its authored value"), ParameterName),
+            FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+    };
+    TestScalar(TEXT("HydraulicFoamCoverageGain"), 0.78f);
+    TestScalar(TEXT("SpeedAerationFraction"), 0.18f);
+    TestScalar(TEXT("FoamRoughness"), 0.70f);
+    TestScalar(TEXT("SlickNormalFloor"), 0.32f);
     return !HasAnyErrors();
 }
 

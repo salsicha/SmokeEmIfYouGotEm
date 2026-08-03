@@ -1035,6 +1035,9 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary);
 UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
     FString& OutSummary);
 
+UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterInstance(
+    FString& OutSummary);
+
 bool CaptureColoradoHanceWaterReview(FString& OutSummary);
 
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
@@ -2723,6 +2726,7 @@ namespace RaftSimPhotorealMaterials
 bool BuildSouthForkWaterTextureAssets();
 bool BuildColoradoHanceWaterTextureAssets();
 bool BuildFutaleufuTerminatorWaterTextureAssets();
+bool BuildZambeziBatokaWaterTextureAssets();
 bool BuildCrewSkinTextureAssets();
 bool BuildEquipmentTextileTextureAssets();
 bool CreatePhotorealRiverWaterMaterial(FString& OutSummary);
