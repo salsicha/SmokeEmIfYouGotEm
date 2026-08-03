@@ -250,6 +250,39 @@ remain open. Exact hashes, metrics, placement limits, captures, and blockers
 are recorded in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_waterline_structure_v1_review.json`.
 
+## Temperate Bank Ecology V4
+
+The runnable Terminator and Lava Canyon maps now use two deterministic baked
+morphologies for each broadleaf, conifer, riparian-shrub, and grass/forb
+ground-cover form. The four new B meshes change seed, proportions, crown width,
+height, and bounded growth lean before normals are rebuilt; this is real mesh
+variation rather than another per-instance scale bracket. The existing
+6,200-instance biome distribution remains intact.
+
+Each river also adds 1,800 source-Landscape-grounded near-bank patches across
+both sides of the complete route. A deterministic 64-choice search keeps every
+patch outside the full visible-water width, above the conditioned water surface,
+and below a 38-degree slope ceiling. All 1,800 targets place in both maps with
+zero rejects. Understory increases from 1,550 to 3,350 instances while canopy
+stays at 4,650, for 8,000 vegetation instances per river. The components are
+non-colliding presentation geometry with no species, ecology, survey, terrain,
+water, solver, bathymetry, hydraulic, or raft-force authority.
+
+Matched V3-to-V4 fixed views show 6.26-6.83% changed pixels in Futaleufú and
+6.35-6.56% in Chilko above eight RGB levels. The new grass/forb/shrub transition
+visibly reduces the empty jump from waterline rocks to tree line, and the wider
+canopy no longer comes from only one broadleaf and one conifer silhouette. The
+editor builds, both runnable-map tests pass 1/1 with zero warnings or errors,
+and all 14 focused M9 terrain/water audits pass.
+
+This is an accepted incremental runtime fallback, not a photoreal promotion.
+The vegetation remains visibly procedural, large bank benches remain smooth,
+reach-specific species/litter/roots/deadwood/wetness are incomplete, water is
+still dark and opaque, rapid-scale holes/rollers/aeration/VFX remain weak, and
+all six external acceptance gates remain open. Exact hashes, metrics, placement
+limits, reports, authority boundaries, and blockers are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_temperate_bank_ecology_v4_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

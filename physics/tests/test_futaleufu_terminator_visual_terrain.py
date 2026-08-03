@@ -104,5 +104,13 @@ def test_shared_temperate_canopy_breaks_repeated_geometry_and_placement() -> Non
     assert "constexpr int32 TemperateSpeciesPermutation = 7" in foliage_source
     assert "TemperateBlockOffset" in foliage_source
     assert "ZambeziVegetationUnitRandom(ClusterIndex, 9161)" in foliage_source
-    assert 'TEXT("RaftSimTemperateCanopyStructureV3")' in foliage_source
-    assert 'TEXT("RaftSimTemperateCanopyStructureV3")' in map_test_source
+    assert "SM_RaftSim_Temperate_BroadleafTree_B_OpaqueV1" in foliage_source
+    assert "SM_RaftSim_Temperate_ConiferTree_B_OpaqueV1" in foliage_source
+    assert "SM_RaftSim_Temperate_RiparianShrub_B_OpaqueV1" in foliage_source
+    assert "SM_RaftSim_Temperate_GroundCover_B_OpaqueV1" in foliage_source
+    assert "bSecondaryMorphology" in foliage_source
+    assert "TemperateNearBankEcologyTargetInstanceCount = 1800" in foliage_source
+    assert "CandidateIndex < 64" in foliage_source
+    assert 'TEXT("RaftSimTemperateBankEcologyV4")' in foliage_source
+    assert 'TEXT("RaftSimTemperateNearBankEcologyV4")' in foliage_source
+    assert 'TEXT("RaftSimTemperateBankEcologyV4")' in map_test_source

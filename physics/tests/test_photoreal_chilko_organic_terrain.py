@@ -115,6 +115,7 @@ def test_chilko_organic_terrain_review_retains_immutable_evidence_and_is_honest(
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+        "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_chilkoriverlavacanyon_physicalcorridor_SourceLandscapeCandidate.uasset",
     }
     for artifact in review["retained_artifacts"]:
         if artifact["path"] in superseded_paths:

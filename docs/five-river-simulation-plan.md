@@ -254,3 +254,22 @@ and external acceptance gates pass.
   coarse terrain, procedural ecology, opaque water, incomplete gravel/deadwood,
   sparse rapid VFX, unconverged hydraulics, and all six external acceptance
   gates remain open.
+
+### 2026-08-02 — Futaleufú and Chilko temperate bank ecology V4 retained
+
+- `L_Terminator` and `L_LavaCanyon` now alternate two deterministic baked
+  morphologies for each broadleaf, conifer, riparian-shrub, and grass/forb
+  ground-cover form. The shared family therefore has eight actual meshes rather
+  than four forms varied only by instance scale and rotation.
+- Each runnable map adds 1,800 dry near-bank grass, forb, and shrub patches. A
+  64-choice source-Landscape search enforces full-route centerline clearance,
+  the complete visible-water width, a 15 cm dry-height floor, and a 38-degree
+  slope ceiling. Both rivers place 1,800/1,800 with zero rejects; total foliage
+  rises to 8,000 while the existing 4,650-tree canopy count is unchanged.
+- The new layer is non-colliding procedural presentation gap fill with explicit
+  no-species/ecology/survey/hydraulic/raft-force authority. The editor builds,
+  both focused runtime map tests pass 1/1 with zero warnings/errors, and the M9
+  terrain/water audit passes 14/14. Fixed views retain the denser dry-bank
+  transition, but photoreal promotion remains rejected for stylized botanical
+  geometry, smooth coarse banks, dark opaque water, weak rapid VFX, incomplete
+  reach-specific ecology, unconverged hydraulics, and open external gates.

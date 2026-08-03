@@ -686,6 +686,11 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 DressingTemperateWaterlineRejectedPlacementCount = 0;
     float DressingTemperateWaterlineMinimumCenterlineDistanceCm = 0.0f;
     float DressingTemperateWaterlineMaximumSlopeDegrees = 0.0f;
+    int32 DressingTemperateNearBankTargetInstanceCount = 0;
+    int32 DressingTemperateNearBankInstanceCount = 0;
+    int32 DressingTemperateNearBankRejectedPlacementCount = 0;
+    float DressingTemperateNearBankMinimumCenterlineDistanceCm = 0.0f;
+    float DressingTemperateNearBankMaximumSlopeDegrees = 0.0f;
     int32 DressingRunnableLaunchTalusTargetInstanceCount = 0;
     int32 DressingRunnableLaunchTalusInstanceCount = 0;
     int32 DressingRunnableLaunchTalusRejectedPlacementCount = 0;
@@ -723,6 +728,10 @@ struct FRaftSimLandscapeImportCandidateResult
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static");
     FString DressingUnderstoryAssetPath =
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static");
+    FString DressingBroadleafVariantAssetPath;
+    FString DressingConiferVariantAssetPath;
+    FString DressingShrubVariantAssetPath;
+    FString DressingUnderstoryVariantAssetPath;
     FString DressingFoliageMaterialAssetPath;
     bool bDressingUsesOpaqueVolumetricVegetation = false;
     bool bDressingValidated = false;
