@@ -22,7 +22,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionPfd"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRescuePfd.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_pfd_manifest.json"
-GENERATOR_VERSION = 11
+GENERATOR_VERSION = 12
 MATERIAL_NAMES = [
     "PfdShell",
     "PfdWebbing",
@@ -209,18 +209,21 @@ def add_crowned_foam_panel(
 
     half_depth = thickness * 0.5
     # Depth is expressed from the torso-facing surface toward the visible shell.
-    # The two full-size rings retain flotation coverage while the inset rings
-    # roll both edges and the final rings create a broad, non-pointed crown.
+    # Closely spaced inset rings approximate a cosine loft: the face stays broad
+    # enough to read as flotation foam but rolls continuously into its seam
+    # instead of converging through a few visibly faceted triangles.
     ring_profiles = [
-        (-half_depth, 0.88),
-        (-half_depth + edge_roll * 0.72, 0.985),
+        (-half_depth, 0.90),
+        (-half_depth + edge_roll * 0.58, 0.975),
         (-half_depth + edge_roll, 1.0),
-        (half_depth - edge_roll, 1.0),
-        (half_depth - edge_roll * 0.28, 0.985),
-        (half_depth, 0.94),
-        (half_depth + crown_depth * 0.32, 0.86),
-        (half_depth + crown_depth * 0.66, 0.70),
-        (half_depth + crown_depth * 0.88, 0.46),
+        (half_depth - edge_roll * 0.78, 1.0),
+        (half_depth - edge_roll * 0.30, 0.992),
+        (half_depth, 0.965),
+        (half_depth + crown_depth * 0.24, 0.93),
+        (half_depth + crown_depth * 0.48, 0.84),
+        (half_depth + crown_depth * 0.69, 0.70),
+        (half_depth + crown_depth * 0.85, 0.52),
+        (half_depth + crown_depth * 0.96, 0.30),
     ]
     maximum_lateral_radius = max(abs(point[0] - centroid_y) for point in outline)
 
@@ -536,8 +539,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 f"FrontCarrier_{side:+.0f}",
-                12.8,
-                0.9,
+                12.5,
+                0.7,
                 mirrored_carrier(
                     [
                         (0.5, -16.0),
@@ -551,16 +554,16 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                     ]
                 ),
                 materials["PfdShell"],
-                0.24,
-                0.22,
-                lateral_wrap_depth=-1.6,
+                0.20,
+                0.14,
+                lateral_wrap_depth=-1.9,
             )
         )
     pieces.append(
         add_crowned_foam_panel(
             "RearCarrier",
             -11.8,
-            1.0,
+            0.8,
             [
                 (-14.0, -18.8),
                 (14.0, -18.8),
@@ -574,8 +577,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                 (-16.0, -12.5),
             ],
             materials["PfdShell"],
-            0.28,
-            0.30,
+            0.22,
+            0.18,
             outward_sign=-1.0,
             lateral_wrap_depth=2.0,
         )
@@ -594,42 +597,42 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 f"FrontUpperCell_{side:+.0f}",
-                15.2,
-                4.2,
+                14.2,
+                3.0,
                 mirrored(
                     [
-                        (0.7, -0.8),
-                        (13.2, -1.0),
-                        (15.5, 4.5),
-                        (14.6, 13.8),
-                        (10.2, 19.3),
-                        (4.5, 18.8),
+                        (0.8, -0.6),
+                        (11.9, -0.9),
+                        (14.2, 3.7),
+                        (13.5, 12.8),
+                        (9.8, 18.8),
+                        (4.7, 18.2),
                     ]
                 ),
                 materials["PfdShell"],
-                1.0,
-                1.25,
-                lateral_wrap_depth=-2.4,
+                0.75,
+                0.65,
+                lateral_wrap_depth=-3.0,
             )
         )
         pieces.append(
             add_crowned_foam_panel(
                 f"FrontLowerCell_{side:+.0f}",
-                15.2,
-                4.2,
+                14.2,
+                3.0,
                 mirrored(
                     [
-                        (0.7, -14.6),
-                        (13.7, -14.1),
-                        (15.4, -10.0),
-                        (14.9, -2.3),
-                        (1.2, -1.2),
+                        (0.8, -14.2),
+                        (12.1, -13.8),
+                        (14.0, -10.0),
+                        (13.6, -2.4),
+                        (1.1, -1.1),
                     ]
                 ),
                 materials["PfdShell"],
-                1.0,
-                1.25,
-                lateral_wrap_depth=-2.4,
+                0.75,
+                0.65,
+                lateral_wrap_depth=-3.0,
             )
         )
 
@@ -671,14 +674,14 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 name,
-                -13.8,
-                3.2,
+                -13.0,
+                2.4,
                 outline,
                 materials["PfdShell"],
-                0.92,
-                1.60,
+                0.65,
+                0.75,
                 outward_sign=-1.0,
-                lateral_wrap_depth=3.8,
+                lateral_wrap_depth=3.2,
             )
         )
     # Four open side adjustments match the referenced rescue-PFD construction.
@@ -715,13 +718,13 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
             add_flat_webbing_run(
                 f"ShoulderWebbingRun_{side:+.0f}",
                 [
-                    (18.5, 17.2),
-                    (12.5, 20.0),
+                    (14.8, 17.2),
+                    (12.4, 20.0),
                     (5.5, 21.4),
                     (0.0, 21.8),
                     (-7.0, 20.8),
-                    (-13.0, 18.5),
-                    (-16.0, 16.5),
+                    (-12.8, 18.5),
+                    (-14.8, 16.5),
                 ],
                 side * 11.0,
                 1.7,
@@ -737,8 +740,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_crowned_foam_panel(
                 f"ZipperedFrontPocket_{side:+.0f}",
-                18.85,
-                0.45,
+                15.45,
+                0.35,
                 [
                     (center_y - 4.1, center_z - 3.4),
                     (center_y + 4.1, center_z - 3.4),
@@ -750,8 +753,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
                     (center_y - 5.4, center_z - 2.1),
                 ],
                 materials["PfdShell"],
-                0.18,
-                0.18,
+                0.14,
+                0.12,
             )
         )
 
@@ -759,7 +762,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     pieces.append(
         add_curve(
             "FrontEntryZipper",
-            [(18.75, 0.0, -13.0), (18.95, 0.0, 2.0), (18.65, 0.0, 18.0)],
+            [(16.40, 0.0, -13.0), (16.55, 0.0, 2.0), (16.30, 0.0, 18.0)],
             0.22,
             materials["PfdHardware"],
             resolution=2,
@@ -769,7 +772,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_rounded_box(
                 f"BackupBuckle_{index + 1}",
-                (19.15, 0.0, z),
+                (16.72, 0.0, z),
                 (0.9, 3.2, 1.8),
                 materials["PfdHardware"],
                 0.32,
@@ -780,13 +783,23 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     # prevents the broad front from reading as a rigid plate carrier.
     for index, z in enumerate((-8.8, 4.8)):
         for side in (-1.0, 1.0):
+            lateral_samples = [0.8, 4.0, 7.5, 10.8, 13.2]
+            if side < 0.0:
+                lateral_samples.reverse()
             pieces.append(
-                add_rounded_box(
+                add_side_webbing_arc(
                     f"FrontBackupWebbing_{index + 1}_{side:+.0f}",
-                    (18.82, side * 7.3, z),
-                    (0.34, 12.6, 1.05),
+                    [
+                        (
+                            16.48 - 3.0 * (lateral / 14.2) ** 2,
+                            side * lateral,
+                        )
+                        for lateral in lateral_samples
+                    ],
+                    z,
+                    1.05,
+                    0.22,
                     materials["PfdWebbing"],
-                    0.18,
                 )
             )
 
@@ -813,16 +826,16 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
 
     # A distinct 2-inch-class quick-release rescue belt and tether ring.
     belt_points = [
-        (18.9, -11.0),
+        (15.0, -11.0),
         (10.0, -16.8),
         (-8.0, -16.8),
-        (-16.6, -11.0),
-        (-17.4, 0.0),
-        (-16.6, 11.0),
+        (-14.4, -11.0),
+        (-15.3, 0.0),
+        (-14.4, 11.0),
         (-8.0, 16.8),
         (10.0, 16.8),
-        (18.9, 11.0),
-        (19.4, 0.0),
+        (15.0, 11.0),
+        (16.7, 0.0),
     ]
     pieces.append(
         add_flat_belt_loop(
@@ -837,7 +850,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     pieces.append(
         add_rounded_box(
             "QuickReleaseBuckle",
-            (19.65, 0.0, -13.6),
+            (17.05, 0.0, -13.6),
             (0.75, 3.8, 2.2),
             materials["PfdHardware"],
             0.38,
@@ -846,7 +859,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     pieces.append(
         add_torus(
             "RescueTetherRing",
-            (-18.1, 0.0, -10.8),
+            (-15.6, 0.0, -10.8),
             1.8,
             0.32,
             materials["PfdHardware"],
@@ -859,7 +872,7 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_rounded_box(
                 f"ChestReflective_{side:+.0f}",
-                (18.75, side * 8.6, 12.5),
+                (15.45, side * 8.6, 12.5),
                 (0.36, 4.0, 1.4),
                 materials["PfdReflective"],
                 0.24,
@@ -868,8 +881,8 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
     pieces.append(
         add_rounded_box(
             "BackPlacard",
-            (-18.5, 0.0, 11.5),
-            (1.0, 18.0, 5.2),
+            (-15.25, 0.0, 11.5),
+            (0.7, 18.0, 5.2),
             materials["PfdLabel"],
             0.7,
         )
@@ -878,7 +891,11 @@ def build_pfd(materials: dict[str, bpy.types.Material]) -> list[bpy.types.Object
         pieces.append(
             add_rounded_box(
                 f"FrontLashTab_{side:+.0f}",
-                (18.75, side * 7.5, 2.3),
+                (
+                    16.45 - 3.0 * (abs(side) * 7.5 / 14.2) ** 2,
+                    side * 7.5,
+                    2.3,
+                ),
                 (0.34, 1.5, 1.5),
                 materials["PfdLabel"],
                 0.24,
@@ -939,7 +956,7 @@ def validate(mesh_object: bpy.types.Object) -> dict[str, object]:
     )
     dimensions = maximum - minimum
     if not (
-        36.0 <= dimensions.x <= 48.0
+        32.0 <= dimensions.x <= 44.0
         and 32.0 <= dimensions.y <= 44.0
         and 40.0 <= dimensions.z <= 56.0
     ):
@@ -971,6 +988,9 @@ def main() -> None:
     audit = validate(mesh_object)
     bpy.context.view_layer.objects.active = mesh_object
     mesh_object.select_set(True)
+    # Deterministic source builds must not overwrite the user's protected
+    # `.blend1` recovery file when Blender saves the generated working copy.
+    bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=str(BLEND_PATH), check_existing=False)
     bpy.ops.export_scene.fbx(
         filepath=str(FBX_PATH),
@@ -1038,21 +1058,23 @@ def main() -> None:
             "outline_corner_rounding": "four-pass closed Chaikin",
             "outline_corner_rounding_passes": 4,
             "flat_exterior_foam_faces": 0,
-            "carrier_shell_thickness_cm": 0.9,
-            "front_panel_foam_thickness_cm": 4.2,
-            "front_panel_edge_roll_cm": 1.0,
-            "front_panel_crown_depth_cm": 1.25,
-            "front_panel_lateral_wrap_depth_cm": 2.4,
-            "back_panel_foam_thickness_cm": 3.2,
-            "back_panel_edge_roll_cm": 0.92,
-            "back_panel_crown_depth_cm": 1.6,
-            "back_panel_lateral_wrap_depth_cm": 3.8,
+            "crown_profile": "eleven-ring soft cosine loft",
+            "carrier_shell_thickness_cm": 0.7,
+            "front_panel_foam_thickness_cm": 3.0,
+            "front_panel_edge_roll_cm": 0.75,
+            "front_panel_crown_depth_cm": 0.65,
+            "front_panel_lateral_wrap_depth_cm": 3.0,
+            "back_panel_foam_thickness_cm": 2.4,
+            "back_panel_edge_roll_cm": 0.65,
+            "back_panel_crown_depth_cm": 0.75,
+            "back_panel_lateral_wrap_depth_cm": 3.2,
             "rigid_side_foam_wings": 0,
             "side_webbing_connector_profile": "curved torso-following fabric",
             "side_webbing_connector_thickness_cm": 0.22,
             "side_webbing_connector_height_cm": 1.05,
             "front_pocket_flat_exterior_faces": 0,
-            "front_pocket_crown_depth_cm": 0.18,
+            "front_pocket_crown_depth_cm": 0.12,
+            "front_backup_webbing_profile": "curved torso-following fabric",
             "rescue_belt_profile": "flat torso-following webbing",
             "rescue_belt_thickness_cm": 0.36,
             "duplicate_tubular_side_adjustment_runs": 0,

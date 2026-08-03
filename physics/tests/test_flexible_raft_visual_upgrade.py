@@ -308,40 +308,46 @@ def test_raft_art_review_mode_is_explicitly_evidence_only() -> None:
     assert "M5_RescueProduction.png" in source
 
 
-def test_production_rescue_pfd_uses_integrated_soft_carrier_source_art() -> None:
+def test_production_rescue_pfd_uses_tapered_soft_cell_source_art() -> None:
     build_source = PRODUCTION_PFD_BUILD_SCRIPT.read_text(encoding="utf-8")
     manifest = json.loads(PRODUCTION_PFD_MANIFEST.read_text(encoding="utf-8"))
 
-    assert "GENERATOR_VERSION = 10" in build_source
+    assert "GENERATOR_VERSION = 12" in build_source
     assert '"FrontCarrier_' in build_source
     assert '"RearCarrier"' in build_source
     assert '"ProtectiveBackUpperCell"' in build_source
     assert '"ProtectiveBackLumbarCell"' in build_source
-    assert "lateral_wrap_depth=3.8" in build_source
+    assert "lateral_wrap_depth=3.2" in build_source
     assert "former single\n    # 31.5 x 42 cm plate" in build_source
     assert "ShoulderFoamBand" not in build_source
-    assert manifest["generator_version"] == 10
+    assert manifest["generator_version"] == 12
     assert manifest["construction"]["front_carrier_panels"] == 2
     assert manifest["construction"]["back_carrier_panels"] == 1
     assert manifest["construction"]["back_panels"] == 2
     assert manifest["construction"]["rear_flex_channels"] == 1
     assert manifest["soft_geometry"]["flat_exterior_foam_faces"] == 0
     assert manifest["soft_geometry"]["outline_corner_rounding_passes"] == 4
-    assert manifest["soft_geometry"]["carrier_shell_thickness_cm"] == 0.9
-    assert manifest["soft_geometry"]["front_panel_foam_thickness_cm"] == 4.2
-    assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 1.25
-    assert manifest["soft_geometry"]["front_panel_lateral_wrap_depth_cm"] == 2.4
-    assert manifest["soft_geometry"]["back_panel_foam_thickness_cm"] == 3.2
-    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 1.6
-    assert manifest["soft_geometry"]["back_panel_lateral_wrap_depth_cm"] == 3.8
+    assert manifest["soft_geometry"]["crown_profile"] == (
+        "eleven-ring soft cosine loft"
+    )
+    assert manifest["soft_geometry"]["carrier_shell_thickness_cm"] == 0.7
+    assert manifest["soft_geometry"]["front_panel_foam_thickness_cm"] == 3.0
+    assert manifest["soft_geometry"]["front_panel_crown_depth_cm"] == 0.65
+    assert manifest["soft_geometry"]["front_panel_lateral_wrap_depth_cm"] == 3.0
+    assert manifest["soft_geometry"]["back_panel_foam_thickness_cm"] == 2.4
+    assert manifest["soft_geometry"]["back_panel_crown_depth_cm"] == 0.75
+    assert manifest["soft_geometry"]["back_panel_lateral_wrap_depth_cm"] == 3.2
     assert manifest["construction"]["side_wings"] == 0
-    assert manifest["construction"]["side_webbing_connectors"] == 6
+    assert manifest["construction"]["side_webbing_connectors"] == 4
     assert manifest["soft_geometry"]["rigid_side_foam_wings"] == 0
     assert manifest["soft_geometry"]["rescue_belt_profile"] == (
         "flat torso-following webbing"
     )
     assert manifest["soft_geometry"]["duplicate_tubular_side_adjustment_runs"] == 0
     assert manifest["soft_geometry"]["front_pocket_flat_exterior_faces"] == 0
+    assert manifest["soft_geometry"]["front_backup_webbing_profile"] == (
+        "curved torso-following fabric"
+    )
     assert manifest["construction"]["shoulder_foam_pads"] == 0
     assert manifest["construction"]["shoulder_webbing_runs"] == 2
     assert manifest["ownership"] == (

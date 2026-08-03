@@ -1,0 +1,165 @@
+{
+  "artifact": "M9 tapered soft-cell production PFD V5 review",
+  "recorded_local_date": "2026-08-02",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_safety_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_curved_side_webbing_pfd_v4_review.json",
+  "summary": "V5 replaces the remaining thick front and rear flotation slabs with thinner tapered cells, an eleven-ring soft crown, stronger torso wrap, and curved front backup webbing. The front-to-back source bound drops from 39.025 to 33.345 cm while the four-cell chest, two-cell back, open sides, rescue hardware, and zero shoulder-foam contract remain intact. Fixed guide and broadest-identity views retain exactly zero centimetres of PFD torso-origin error and show no clipping.",
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_pfd.py",
+    "generator_version": 12,
+    "generator_sha256": "7974a2d162e14c306a18427f94efa033479d7aa7c67290d758f1d5029f643a24",
+    "importer": "unreal/Scripts/import_production_whitewater_pfd.py",
+    "importer_sha256": "b2bcb8f3d69d3a52dd39b43c2c846abb62f80b8cc8d352334aa284d3fa4fccf2",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/production_whitewater_pfd_manifest.json",
+    "manifest_sha256": "a9b51bdeb640b9f093296ae230cd50633400a032f7a17fe66cc9238a48ca63e6",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+    "fbx_sha256": "b9634b21b4737ec4e8aab3f8a40ad6a629dbb291888cd2d6a5b2ea991e179c33",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+    "blend_sha256": "a9c4797a185c9dec7561a1139f0771cbd52f069367498e9bd2d199a83aea79d0",
+    "external_asset_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "uasset": "unreal/Content/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd.uasset",
+    "uasset_sha256": "eb25d7ab3c3900172c36ebb4a88f66925f184d73a2f1311cec07a0efef44146e",
+    "dimensions_cm": [33.345, 34.22, 42.8],
+    "source_vertices": 20510,
+    "source_polygons": 21790,
+    "authored_lod0_triangles": 40232,
+    "nanite_fallback_triangles": 2616,
+    "nanite_enabled": true,
+    "material_slot_count": 5,
+    "import_report": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_import_report.json",
+    "import_report_sha256": "48124f84a85f2e018e6b18f6ef3734bd199f492512c7435c874a88d167d8030c",
+    "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
+  },
+  "construction": {
+    "front_carrier_panels": 2,
+    "back_carrier_panels": 1,
+    "front_foam_panels": 4,
+    "back_panels": 2,
+    "rear_flex_channels": 1,
+    "side_wings": 0,
+    "side_webbing_connectors": 4,
+    "side_adjustment_sliders": 4,
+    "shoulder_adjustment_points": 4,
+    "shoulder_foam_pads": 0,
+    "shoulder_webbing_runs": 2,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 4,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1
+  },
+  "soft_geometry": {
+    "crown_profile": "eleven-ring soft cosine loft",
+    "carrier_shell_thickness_cm": 0.7,
+    "front_panel_foam_thickness_cm": 3.0,
+    "front_panel_edge_roll_cm": 0.75,
+    "front_panel_crown_depth_cm": 0.65,
+    "front_panel_lateral_wrap_depth_cm": 3.0,
+    "back_panel_foam_thickness_cm": 2.4,
+    "back_panel_edge_roll_cm": 0.65,
+    "back_panel_crown_depth_cm": 0.75,
+    "back_panel_lateral_wrap_depth_cm": 3.2,
+    "rigid_side_foam_wings": 0,
+    "side_webbing_connector_profile": "curved torso-following fabric",
+    "front_backup_webbing_profile": "curved torso-following fabric",
+    "duplicate_tubular_side_adjustment_runs": 0,
+    "rescue_belt_profile": "flat torso-following webbing",
+    "flat_exterior_foam_faces": 0,
+    "smooth_shaded": true
+  },
+  "runtime_roster_metrics": {
+    "source_report": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_roster_capture.json",
+    "source_report_sha256": "8df85f1d4438535e05bc264f36790199e6c32c9b935e83cffe6ae5f2f9077bfb",
+    "captured_character_count": 5,
+    "characters_using_production_pfd": 5,
+    "characters_with_live_pfd_material_response": 5,
+    "broadest_identity": "MHC_RaftSim_Crew_03",
+    "maximum_runtime_torso_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "guide_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_full.png",
+      "capture_sha256": "3773daeee279b8e6304f07f2f741fe2495498a683a71b1bfc8592638d8202909"
+    },
+    "guide_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_profile.png",
+      "capture_sha256": "2003b831be21e90ae9290ff9f727bbec942a8330c44ed7bf47e6be6ab68f343b"
+    },
+    "guide_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_rear.png",
+      "capture_sha256": "ded6f4237b36b0dd811d35b03bd1518a468b3a19b11c61f9b8913f2f9c38fe87"
+    },
+    "guide_pfd_dry": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_pfd_dry.png",
+      "capture_sha256": "8009448e7de07faeae5dc73830cc7e5625a3bae48e6564b90a234f3df2a53add"
+    },
+    "guide_pfd_wet": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_pfd_wet.png",
+      "capture_sha256": "6a3ee8b33733e96579b4038814cbc84185ed2651bc17c865bdeb834f97f64141"
+    },
+    "broadest_full": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_broadest_full.png",
+      "capture_sha256": "e69e15d6c00b5aa7c8473b0cf7b99b1a8e57e724b6845ad95c71638e8bc0f07e"
+    },
+    "broadest_profile": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_broadest_profile.png",
+      "capture_sha256": "19ca26a62f7e582a6e8fc55b88c884c0295421cc84734a111a61665d71825a2e"
+    },
+    "broadest_rear": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_broadest_rear.png",
+      "capture_sha256": "a5758f3a28ead5dff7015d364d1143fda82aea05b85944aae5b1f6c15daf7ae0"
+    },
+    "technical_verdict": "pass: matched pixels show a materially thinner chest/back profile, continuous rolled cell highlights, curved front and side webbing seated on the shell, zero shoulder-pad silhouette, and no clipping on the guide or broadest identity",
+    "photoreal_verdict": "fail pending named approval or replacement of the simplified first-party character, fabric and hardware presentation, remaining pocket/webbing intersections, static identity fit, seated pose, and neutral review lighting"
+  },
+  "implementation": {
+    "front_to_back_bound_reduction_percent": 14.55,
+    "soft_crown_ring_count_before": 9,
+    "soft_crown_ring_count_after": 11,
+    "front_backup_webbing_curved_to_torso": true,
+    "open_side_articulation_retained": true,
+    "solid_side_carrier_panel_added": false,
+    "rigid_side_foam_removed": true,
+    "shoulder_foam_pads_after": 0,
+    "pfd_runtime_transform_changed": false,
+    "material_assignment_changed": false,
+    "collision_changed": false,
+    "crew_mass_changed": false,
+    "physics_forces_changed": false,
+    "d3_or_d4_changed": false,
+    "rescue_logic_changed": false
+  },
+  "validation": {
+    "source_generation": "Blender 5.2 regenerated and validated the deterministic FBX, Blend file, manifest, five material slots, UV channel, 20,510 vertices, 21,790 polygons, and plausible centimetre bounds without touching the protected Blend recovery file",
+    "source_import": "Unreal import succeeded with the exact FBX hash, generator version 12, 40,232 authored triangles, 2,616 Nanite fallback triangles, five material slots, and valid centimetre bounds",
+    "focused_python": "8/8 active PFD source, import, safety-gear, renderer-evidence, and flexible-raft integration checks pass",
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after compiling the tapered PFD bounds contract",
+    "renderer_turntable": "5/5 identities captured with production PFD selection, live material response, and exactly 0.0 cm maximum torso-origin error",
+    "m5_crew_presentation": "1/1 passed renderer-enabled with zero errors and zero warnings",
+    "m5_report": "docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_m5.json",
+    "m5_report_sha256": "73213178c52e21588f27e66a4e24be41d0c499ca746442d1b9b9eb92cf358b26"
+  },
+  "reviewers": {
+    "named_character_art_reviewer": null,
+    "qualified_whitewater_safety_reviewer": null,
+    "art_approval": false,
+    "safety_approval": false,
+    "human_approved": false
+  },
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the first-party PFD geometry, fabric response, hardware, webbing intersections, and identity-specific fit in motion.",
+    "A qualified whitewater safety reviewer must approve visible flotation coverage, four-side adjustment depiction, rescue belt and tether-ring depiction; this geometry review is not equipment certification.",
+    "M9 remains blocked from release promotion by the wider character, terrain, water, legal, audio, safety, accessibility, packaging, performance, signing, and distribution gates."
+  ]
+}

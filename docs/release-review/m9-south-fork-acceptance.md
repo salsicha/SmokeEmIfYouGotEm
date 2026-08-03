@@ -2563,6 +2563,37 @@ safety approval remain open. No collision, crew mass, animation, raft/water phys
 rescue, scoring, or progression authority changed. Exact hashes and the fail-closed verdict are
 in `docs/environment-captures/south_fork_full_reach/m9_integrated_soft_carrier_pfd_v3_review.json`.
 
+## Tapered soft-cell production PFD V5 — slab profile reduced, external review open
+
+The later V4 side-webbing pass removed the third adjustment run on each flank and curved the
+remaining four runs around the torso, but the chest and back cells still projected as thick
+vertical slabs. V5 reduces front foam from 4.2 to 3.0 cm, rear foam from 3.2 to 2.4 cm, and
+front/rear crown depth from 1.25/1.60 to 0.65/0.75 cm. Stronger lateral wrap, an eleven-ring
+soft crown, thinner carriers, and curved front backup webbing keep the hardware on the vest
+surface instead of a flat plane. The source front-to-back bound falls 14.55%, from 39.025 to
+33.345 cm, without adding side wings or shoulder flotation.
+
+![Tapered soft-cell guide front](../environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_full.png)
+
+![Tapered soft-cell guide profile](../environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_profile.png)
+
+![Tapered soft-cell guide rear](../environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_guide_rear.png)
+
+The deterministic generator-v12 source imports at 33.345 x 34.22 x 42.8 cm with 40,232
+authored triangles, a 2,616-triangle Nanite fallback, and five material slots. Fixed views for
+the guide and broadest roster identity show the reduced profile and no clipping. All five
+identities retain the production PFD, live wet-material response, and 0.0 cm maximum
+torso-origin error. The editor target builds and the renderer-enabled M5 crew-presentation
+test passes 1/1 with zero warnings and zero errors.
+
+This is a retained technical improvement, not photoreal or safety acceptance. The wider
+first-party character anatomy, fabric/hardware surfacing, pocket/webbing intersections,
+identity-specific deformation, seated review lighting, named character-art approval, and
+qualified whitewater-safety approval remain open. No collision, crew mass, animation,
+raft/water physics, D3/D4, rescue, scoring, or progression authority changed. Exact hashes and
+the fail-closed verdict are in
+`docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_review.json`.
+
 ## CC0 rendered-face-fitted helmet V1 — fallback fit retained, external review open
 
 The packaged CC0 fallback previously positioned the production helmet from a bone-space

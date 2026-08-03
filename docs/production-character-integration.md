@@ -130,6 +130,13 @@ frames, material-instance availability, and before/after presentation wetness. T
 that Cloth/fuzz and live wet response are wired to the production roster; it does not replace
 named character-art or whitewater-safety review.
 
+The current project-owned rescue-PFD source is generator V12. Its tapered soft-cell revision
+uses a 33.345 x 34.22 x 42.8 cm collisionless mesh, thinner torso-wrapped front/rear foam,
+zero shoulder flotation pads, and curved front/side adjustment webbing. The retained fixed-view
+review and exact hashes are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_review.json`;
+photoreal character-art and whitewater-safety acceptance remain open.
+
 Official setup references:
 
 - <https://dev.epicgames.com/documentation/en-us/metahuman/getting-started-with-metahuman-creator>
