@@ -25,6 +25,11 @@ EYE_REFERENCE_POSE_REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_eye_reference_pose_v1_review.json"
 )
+DISTINCT_PADDLE_GRIPS_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_distinct_paddle_grips_v2_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -630,8 +635,16 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "GetMaximumPaddleGripContactErrorCm()" in automation
     assert "ApplyFingerChainAroundGrip" in adapter
     assert "MeasurePaddleFingerContactErrorCm" in adapter
-    assert "WrapAnglesDegrees[] = {50.0f, 68.0f, 52.0f}" in adapter
-    assert "JointRadiiCm[] = {3.2f, 2.65f, 2.35f}" in adapter
+    assert "FAnatomicalGripDigitProfile" in adapter
+    assert "ResolveAnatomicalGripDigitProfile" in adapter
+    assert "Profile.PadCenterRadiusCm" in adapter
+    assert "Profile.FanDegrees * WrapSign" in adapter
+    assert 'for (const TCHAR* Digit : {TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})' in adapter
+    assert '{30.0f, 42.0f, 28.0f, 3.25f, 2.45f, 1.95f, 12.0f}' in adapter
+    assert '{28.0f, 40.0f, 28.0f, 3.00f, 2.35f, 1.90f, -12.0f}' in adapter
+    assert "FVector::DistSquared(GripCenterCm, Pose.PaddleTopCm) <= 4.0f" in adapter
+    assert "forcing every joint onto a radial contact arc creates a false" in adapter
+    assert "paddle_grip_contact_error_cm=" in capture
     assert "get_maximum_paddle_grip_contact_error_cm()" in capture
     assert "runtime_paddle_grip_contact_error_cm" in capture
     assert "%s_metacarpal_%s" in adapter
@@ -863,5 +876,51 @@ def test_cc0_eye_reference_pose_review_is_hash_verified_and_fail_closed() -> Non
 
     for asset_relpath, expected_hash in review["asset_sha256"].items():
         assert _sha256(REPO_ROOT / asset_relpath) == expected_hash
+    # Eye-reference V1 is immutable historical evidence. Later character
+    # presentation milestones intentionally change shared adapter and test
+    # sources without rewriting the earlier review record.
+    for source_relpath, historical_hash in review["implementation_sha256"].items():
+        assert (REPO_ROOT / source_relpath).is_file()
+        assert len(historical_hash) == 64
+
+
+def test_distinct_paddle_grips_v2_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(
+        DISTINCT_PADDLE_GRIPS_REVIEW_PATH.read_text(encoding="utf-8")
+    )
+    assert review["schema"] == "raftsim.m9.distinct_paddle_grips_review.v2"
+    assert review["passed"] is False
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["human_approved"] is False
+    assert review["promotion_allowed"] is False
+    assert review["implementation"]["upper_t_grip_hands"] == 5
+    assert review["implementation"]["lower_shaft_contact_hands"] == 5
+    assert review["implementation"]["contact_constrained_lower_finger_chains"] == 20
+    assert review["implementation"]["measured_maximum_runtime_lower_finger_contact_error_cm"] <= 0.25
+    assert review["implementation"]["physics_or_gameplay_changes"] is False
+
+    roster_path = REPO_ROOT / review["runtime_roster_metrics"]["report"]
+    assert _sha256(roster_path) == review["runtime_roster_metrics"]["report_sha256"]
+    roster = json.loads(roster_path.read_text(encoding="utf-8"))
+    assert roster["status"] == "capture_complete"
+    assert roster["captured_character_count"] == 5
+    assert max(
+        character["runtime_paddle_grip_contact_error_cm"]
+        for character in roster["characters"]
+    ) <= 0.25
+
+    for evidence_set in ("baseline", "candidate"):
+        for path, expected_hash in review["renderer_evidence"][evidence_set].values():
+            assert _sha256(REPO_ROOT / path) == expected_hash
+
+    m5 = review["validation"]["m5"]
+    m5_path = REPO_ROOT / m5["report"]
+    assert _sha256(m5_path) == m5["report_sha256"]
+    m5_payload = json.loads(m5_path.read_text(encoding="utf-8-sig"))
+    assert m5_payload["succeeded"] == 1
+    assert m5_payload["succeededWithWarnings"] == 0
+    assert m5_payload["failed"] == 0
+
     for source_relpath, expected_hash in review["implementation_sha256"].items():
         assert _sha256(REPO_ROOT / source_relpath) == expected_hash

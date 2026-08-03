@@ -59,7 +59,7 @@ public:
         return MaximumPaddleGripAnchorErrorCm;
     }
 
-    /** Maximum closed-finger grasp-centre error against the visible paddle. */
+    /** Maximum four-finger C-grip error against the lower paddle shaft. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetMaximumPaddleGripContactErrorCm() const
     {

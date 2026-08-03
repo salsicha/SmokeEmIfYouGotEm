@@ -1,0 +1,115 @@
+{
+  "schema": "raftsim.m9.distinct_paddle_grips_review.v2",
+  "reviewed_utc": "2026-08-03T10:00:00Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_closed_finger_paddle_grip_v1_review.json",
+  "summary": "Distinct Paddle Grips V2 removes the camera-facing ring silhouette from the upper T-grip hand while retaining deterministic shaft contact for the lower hand. The upper hand now uses the production skeleton's firm authored curl over the short transverse handle; the lower hand uses four identity-preserving, slightly fanned C-grip profiles rather than one uniform semicircular arc. Solved shoulders, elbows, wrists, palm anchors, paddle endpoints, physics, collision, and gameplay authority are unchanged.",
+  "root_cause": {
+    "upper_hand": "The prior solver treated the short transverse T-grip like the long shaft and projected all four finger chains onto a radial arc. Because that axis points nearly at the full-body review camera, the hand read as a circular ring around a dark centre.",
+    "lower_hand": "The prior lower hand used the same 50/68/52-degree sweep and 3.2/2.65/2.35 cm radii for every digit, collapsing identity-specific finger lengths and spacing into a uniform cage.",
+    "retained_solution": "The upper T-grip uses the existing firm skeletal curl with its palm still centred on the solved handle point. The lower shaft hand retains deterministic contact but uses separate index, middle, ring, and pinky sweep, radius, and fan profiles.",
+    "authority": "FRaftSimCrewAvatarPose shoulders, elbows, wrists, palm targets, and paddle endpoints remain authoritative; no force, mass, collision, rescue, raft, water, or progression code changed."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "visible_paddle_hands": 10,
+    "upper_t_grip_hands": 5,
+    "lower_shaft_contact_hands": 5,
+    "contact_constrained_lower_finger_chains": 20,
+    "lower_contact_joints_measured_per_avatar": 4,
+    "upper_hand_profile": "firm authored skeletal curl over transverse T-grip; palm-anchor metric retained",
+    "lower_hand_profile": "four asymmetric, fanned three-segment C-grips around shaft axis",
+    "index_sweep_degrees": [30.0, 42.0, 28.0],
+    "middle_sweep_degrees": [32.0, 46.0, 30.0],
+    "ring_sweep_degrees": [30.0, 44.0, 30.0],
+    "pinky_sweep_degrees": [28.0, 40.0, 28.0],
+    "lower_pad_center_radius_range_cm": [2.35, 2.50],
+    "maximum_allowed_runtime_palm_anchor_error_cm": 0.25,
+    "maximum_allowed_runtime_lower_finger_contact_error_cm": 0.25,
+    "measured_maximum_runtime_palm_anchor_error_cm": 1.880034572465661e-9,
+    "measured_maximum_runtime_lower_finger_contact_error_cm": 0.0,
+    "thumb_contact_metric_added": false,
+    "physics_or_gameplay_changes": false,
+    "crew_mass_changes": false,
+    "collision_changes": false,
+    "raft_or_water_changes": false
+  },
+  "rejected_iterations": [
+    "A constrained opposing-thumb branch was rejected because it produced a large oval loop around the lower shaft.",
+    "A radial-contact upper T-grip branch with shorter asymmetric sweeps was rejected because the camera-facing transverse axis still produced a donut silhouette.",
+    "A shaft-aligned wrist frame remains rejected from earlier V37/V38 work because it twisted the wrist and did not show a consistent multi-view improvement."
+  ],
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_roster_capture.json",
+    "report_sha256": "542aa3de7d17dd01cc13f04d5cf3788c69b3d4c691fe5b20c866d6a215100e58",
+    "status": "capture_complete",
+    "captured_character_count": 5,
+    "characters_with_articulated_paddle_grip": 5,
+    "maximum_paddle_grip_anchor_error_cm": 1.880034572465661e-9,
+    "maximum_lower_paddle_grip_contact_error_cm": 0.0
+  },
+  "renderer_evidence": {
+    "camera_contract": "Baseline and candidate use the same 1536x1024 full/profile/rear transforms, 36-degree FOV, map, lighting, pose, roster, safety gear, and materials.",
+    "baseline": {
+      "guide_full": ["docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_guide_full.png", "ed53c5698a6d1e0cd177af8d894d654774f6b9285f95474440c3065a8a74ab3a"],
+      "guide_profile": ["docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_guide_profile.png", "2cec771f88b9b02c5c6b0bd648396558831eb805f30d486d00b2edc19c7627ce"],
+      "guide_rear": ["docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_guide_rear.png", "a6d6357d4d24a008171fe9ca45cd3c1a9d6622afebe9a425acee44b4ace86454"],
+      "broadest_full": ["docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_broadest_full.png", "9b397df96cfe501be1bf3fd45cebc9420d344e87926cf0fcbd9b436b72ab4b7b"],
+      "broadest_profile": ["docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_broadest_profile.png", "94a7164e8654dd635dd733ef1895b5e2b4e8c766aea08066bc1b57ae9cde2090"],
+      "broadest_rear": ["docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_broadest_rear.png", "277fb3bfdf34f14ad13f6044fe2f05627d3515c3b63ccbb3afdd0c42e320598d"]
+    },
+    "candidate": {
+      "guide_full": ["docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_guide_full.png", "333590fc82575548d32c6f4d9c7aca7dac95ddff629448ba4809805734464289"],
+      "guide_profile": ["docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_guide_profile.png", "6afb25b30863829cbf6820fa0a91a0c2ff5c51e1f84eb6367fa2a71d2983051b"],
+      "guide_rear": ["docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_guide_rear.png", "ef336a1cc2cc942c6c7c9d3afe5ec07d62c1806dd708358181c5f1d6abb667d3"],
+      "broadest_full": ["docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_broadest_full.png", "3aa9227c8a36598e7229bb3ef108a00431d44e20312a6ddd7a79467e7b81ab8c"],
+      "broadest_profile": ["docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_broadest_profile.png", "1395758a87ae1cf39b9b46085ca933620f49c6b2b5cbba33fcb97ca1095e4dc9"],
+      "broadest_rear": ["docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_broadest_rear.png", "68981d3b50e3beece99d0e50546d484af88caca85b2e84129b2b6b5c9dd8c9b6"]
+    },
+    "technical_verdict": "pass: both front views replace the upper circular ring with a readable hand draped over the T-grip; profile and rear views retain connected wrists, centred palms, shaft contact, and unchanged paddle placement",
+    "photoreal_verdict": "fail: the hand mesh, wetsuit-covered skin response, knuckles, nails, thumb contact, wrist compression, and stroke deformation remain visibly synthetic"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "21/21 production-character and safety-gear contracts passed",
+    "broader_python_diagnostic": "42 passed; 2 unrelated photographic-water isolation tests failed because protected user-modified runtime VFX assets no longer match their historical review hashes. No protected asset was changed or staged by this milestone.",
+    "renderer_roster": "5/5 identities captured with fixed full, profile, and rear views",
+    "m5": {
+      "result": "1/1 RaftSim.M5.CrewAvatarPoseProduction passed renderer-enabled with 0 warnings and 0 errors",
+      "report": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_m5.json",
+      "report_sha256": "4ca000a5b8dcfc95af22a5922a5d24f246c3e9c16d2290b71dd07faec9cf1c54"
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp": "0e85226cc7714bb4a40f6be7889cd35f41ef2c893fdf6e279955eb46fd3df429",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h": "0a12302378b964e60813b57e782e7033052b45bdf8e28086bb71a84255916fcf",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "14351cb6c24ad4a99ffaf513ad80de97e5becec2e7ae05c8578ee372ac95a682",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "189f653344079e4e2db6ee842451bd967af9db76547edf4e09107f710149edf5",
+    "physics/tests/test_cc0_production_characters.py": "d315f4f7b2453d1f9d5013f16541d9074a4abea761c8d86161bfbc8f87bf6053"
+  },
+  "accepted": [
+    "All five upper hands retain the solved T-grip palm target while no longer using the camera-facing radial finger cage.",
+    "All five lower hands retain four deterministic shaft-contact chains with zero measured radial contact error and identity-specific C-grip profiles.",
+    "The maximum palm-anchor error remains effectively zero and no shoulder, elbow, wrist, paddle, physics, collision, mass, rescue, raft, or water authority changed.",
+    "The first constrained-thumb iteration and second radial-upper-hand iteration were visually rejected rather than promoted."
+  ],
+  "rejected_or_open": [
+    "The retained upper authored curl is a visual improvement over the ring silhouette but is not a contact-constrained or motion-captured T-grip solve.",
+    "The lower hand still has coarse finger-web and thumb silhouettes in the frontal pose, even though the four measured finger chains contact the shaft.",
+    "The single wetsuit body material covers the hands, so skin/glove construction and wet response remain indistinct.",
+    "No named character-art reviewer or qualified whitewater guide has approved the hand anatomy, grip safety, or stroke biomechanics."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace the hand topology, skinning, wrist compression, material regions, and deformation.",
+    "A qualified whitewater guide must approve upper T-grip and lower shaft placement in synchronized moving strokes.",
+    "M9 remains blocked by wider human, platform, signing, media, clean-build, performance, and promotion gates."
+  ]
+}

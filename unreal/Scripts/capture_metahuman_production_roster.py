@@ -350,7 +350,11 @@ def main() -> None:
                     f"shoulder_sleeve_vertex_count="
                     f"{actor.get_minimum_shoulder_sleeve_vertex_count()}, "
                     f"shoulder_sleeve_anchor_error_cm="
-                    f"{actor.get_maximum_shoulder_sleeve_anchor_error_cm():.3f}"
+                    f"{actor.get_maximum_shoulder_sleeve_anchor_error_cm():.3f}, "
+                    f"paddle_grip_anchor_error_cm="
+                    f"{visual_actor.get_maximum_paddle_grip_anchor_error_cm():.3f}, "
+                    f"paddle_grip_contact_error_cm="
+                    f"{visual_actor.get_maximum_paddle_grip_contact_error_cm():.3f}"
                 )
             skeletal_components = []
             wardrobe_mesh_count = 0
