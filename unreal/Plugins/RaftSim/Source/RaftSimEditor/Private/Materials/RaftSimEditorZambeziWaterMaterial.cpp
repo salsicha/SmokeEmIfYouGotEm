@@ -6,7 +6,7 @@
 namespace RaftSimEditorEnvironment
 {
 
-UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterInstance(
+UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
     FString& OutSummary)
 {
     if (!RaftSimPhotorealMaterials::BuildZambeziBatokaWaterTextureAssets())
@@ -18,13 +18,13 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterInstance(
 
     static const TCHAR* PackagePath = TEXT(
         "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
-        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1");
+        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2");
     static const TCHAR* AssetName =
-        TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1");
+        TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2");
     static const TCHAR* ObjectPath = TEXT(
         "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/"
-        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1."
-        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1");
+        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2."
+        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2");
     UMaterialInterface* SharedTransmissionParent = LoadObject<UMaterialInterface>(
         nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
@@ -85,17 +85,24 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterInstance(
     // This is only visual breakup. The shared parent multiplies the lace by
     // live solver foam/speed channels, so the texture cannot create a rapid,
     // wet a dry cell, or change any raft-facing hydraulic value.
-    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.78f);
-    SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.66f);
-    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.80f);
-    SetScalar(TEXT("SpeedAerationFraction"), 0.18f);
-    SetScalar(TEXT("FoamRoughness"), 0.70f);
-    SetScalar(TEXT("ReachHueVariation"), 0.10f);
-    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.12f);
-    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.54f);
-    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.40f);
-    SetScalar(TEXT("SlickNormalFloor"), 0.32f);
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.72f);
+    SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.72f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.76f);
+    SetScalar(TEXT("SpeedAerationFraction"), 0.14f);
+    SetScalar(TEXT("FoamRoughness"), 0.78f);
+    SetScalar(TEXT("ReachHueVariation"), 0.16f);
+    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.18f);
+    // V1's low-roughness slicks and broad fallback-reflection floor merged
+    // into one clipped white launch glare. V2 keeps reflected sky readable,
+    // but makes it a broken, sediment-coloured response rather than a flat
+    // luminous sheet. These parameters are render-only.
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.26f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.44f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.28f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.22f);
+    SetScalar(TEXT("SlickRoughnessScale"), 0.72f);
+    SetScalar(TEXT("FresnelSpecular"), 0.10f);
+    SetScalar(TEXT("LiveVolumeBankCoverageFloor"), 0.0f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();
@@ -113,8 +120,9 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterInstance(
         return nullptr;
     }
     OutSummary += TEXT(
-        "Built Zambezi Batoka river-local live-volume water V1 with "
-        "project-owned flow-normal and solver-masked foam-lace textures.\n");
+        "Built Zambezi Batoka river-local live-volume water V2 with "
+        "coverage-feathered banks, restrained glare, project-owned flow-normal, "
+        "and solver-masked foam-lace textures.\n");
     return Instance;
 }
 

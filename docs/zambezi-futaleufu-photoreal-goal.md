@@ -194,6 +194,20 @@ the raft/crew composition. The transition geometry is procedural reference
 infill and cannot support guide lines, navigation, seasonal, or real-world
 hydraulic claims.
 
+The August 3 V2 gameplay-water pass addresses the most visible launch-water
+edge and glare defects without changing that authority boundary. The shared
+raft-transmitting Single Layer Water parent now consumes the smooth wet-cell
+coverage already stored in live-core vertex alpha, while Zambezi expands its
+render-only bank blend from 4.5 m to 7.5 m and reduces the live detail skin,
+reflection, and specular response. Matched 1280x720 captures at the same raft
+transform retain all live solver counts; the measured water fraction above
+0.90 luminance falls from 7.3201 to 1.2097 percent and the sampled right-bank
+p99 vertical edge falls 14.8 percent. This is retained only as a technical
+optical improvement. The source DEM and wet-cell sampling remain too coarse for
+lifelike bank geometry, and all guide, geospatial, rights, seasonal-flow,
+hydraulic, geology/ecology/art, water/VFX, raft/character, and platform gates
+remain open in `zambezi_live_transmitting_water_v2_review.json`.
+
 The project-owned Futaleufu coigue family now has a separate far-corridor runtime representation and a 512-tree HISM review map. The full eight-form closeup family remains intact at 350.87 MiB; deterministic one-in-six far-card meshes plus the structural trunks reduce the final runtime far family to 19.33 MiB, 435,064 vertices, and 223,592 triangles, a 94.492 percent resource reduction. The corrected benchmark keeps crowns registered to their trunks, but it remains a technical candidate: the neutral stand is too dark and regular, has no mixed native ecology or corridor masks, and lacks near/mid/far transition, wind, packaged desktop, and on-device VR evidence. `futaleufu_native_canopy_coigue_v12_runtime_lod_review.json` keeps corridor substitution and production promotion closed.
 
 The V13 pass tests that retained LOD and placement path in the real Futaleufu physical corridor rather than another neutral stand. `RaftSim.CaptureFutaleufuNativeCanopyCorridorComparison` maps the source vegetation and water masks over the physical Landscape, samples authoritative terrain height, enforces a 65 m riparian setback, 15 m spacing, 100-900 m elevation and 39-degree slope bands, moist-aspect thinning, and deterministic macro/micro canopy gaps. It places 1,200 transient non-colliding trees per capture through all eight forms and three representation bands while hiding only the four temporary PVE foliage actors; the saved map, collision, dense visual terrain, river ribbon, water, rocks, custom C++ solver, and GeoClaw reference remain unchanged. The guide-seat view records 50 full, 126 intermediate, and 1,024 runtime-far trees; river-eye records 40, 157, and 1,003.

@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v9_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v10_review.json`.
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -363,6 +363,25 @@ and external acceptance gates pass.
   reference status is retained; terrain, bathymetry, calibrated hydraulics,
   guide/geospatial/rights review, photoreal art and water VFX, and target-
   hardware performance gates remain open.
+
+### 2026-08-03 — Zambezi V2 bank edge and launch optics retained
+
+- Regenerated the runnable `L_Zambezi` package with
+  `MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2`. The shared transmitting-water
+  parent now consumes live-core vertex-alpha wet-cell coverage, and the river-
+  local profile expands the render-only bank blend from 4.5 m to 7.5 m. Solver
+  wet/dry state, bathymetry, collision, buoyancy, raft forces, rapid records,
+  stationing, and scoring are unchanged.
+- Matched 1280x720 gameplay captures at the identical raft transform retain
+  2,673 wet vertices, eight breaking sites, 125 visible rapid-foam vertices,
+  and 4,224 volume-core triangles. The measured water fraction above 0.90
+  luminance falls from 7.3201 to 1.2097 percent, and the sampled right-bank p99
+  vertical edge falls 14.8 percent.
+- A clean 137-action editor build, saved-map schema V18, the focused V2
+  material test, water-rendering guard, and runnable map test pass; MapCheck is
+  0/0. The V10 runnable review and V2 matched-water review retain the bounded
+  improvement without claiming photoreal shoreline, hydraulic, ecology, art,
+  character, guide, rights, geospatial, seasonal-flow, or platform acceptance.
 
 ### 2026-08-02 — Futaleufú and Chilko organic waterline structure retained
 

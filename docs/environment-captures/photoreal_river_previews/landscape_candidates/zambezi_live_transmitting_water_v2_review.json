@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.environment.zambezi_live_transmitting_water_review.v2",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "2a14719ee2e9bfbfb7ddcc2e696c0751035c3f42",
+  "status": "technical_optical_milestone_retained_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "zambezi_reference_runnable": true,
+    "technical_candidate_passed": true,
+    "solver_owned_transmitting_water_retained": true,
+    "wet_cell_bank_coverage_consumed": true,
+    "rectangular_bank_seam_reduced": true,
+    "launch_glare_reduced": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "runnable_map_package_changed": true,
+    "gameplay_water_geometry_authority_changed": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_or_raft_forces_changed": false
+  },
+  "architecture": {
+    "runtime_volume": "The live ARaftSimWaterSurfaceActor remains the sole owner of Zambezi gameplay-water geometry. Its non-colliding wet-cell volume core now uses MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2 through the shared raft-transmitting Single Layer Water parent.",
+    "bank_edge": "The shared parent now multiplies its pre-existing optical-depth opacity by the smooth station/lateral wet-cell coverage already stored in live-core vertex alpha. Zambezi widens the render-only blend from 4.5 m to 7.5 m, approximately three 2.5 m sampled cells, so the optical body fades at both banks instead of ending at an opaque rectangular cell edge.",
+    "runtime_detail": "The live Default Lit detail skin is reduced to 0.025 calm / 0.13 active coverage. First-party flow-normal and foam-lace textures remain bounded by live solver foam and speed channels and cannot paint water or whitewater into dry cells.",
+    "capture_water": "The opaque physical-corridor ribbon remains available for deterministic editor review but is tagged RaftSimCaptureOnlyStaticWater and hidden during gameplay.",
+    "authority_boundary": "The new coverage multiply, bank blend, colours, reflection, roughness, smoothing, opacity, and foam parameters are render-only. Cooked depth, velocity, wet/dry state, curved stationing, bathymetry, collision, buoyancy, raft forces, rapid detection, and scoring are unchanged.",
+    "river_local_optics": {
+      "surface_specular": 0.22,
+      "surface_roughness": 0.42,
+      "sky_reflection_strength": 0.15,
+      "ripple_strength": 0.22,
+      "foam_intensity": 0.64,
+      "shallow_surface_color": [0.058, 0.095, 0.05],
+      "deep_surface_color": [0.013, 0.03, 0.016],
+      "reflected_sky_color": [0.075, 0.115, 0.14],
+      "shallow_water_opacity": 0.42,
+      "deep_water_opacity": 0.64,
+      "foam_water_opacity": 0.84,
+      "calm_detail_skin_coverage": 0.025,
+      "active_detail_skin_coverage": 0.13,
+      "presentation_smoothing_strength": 0.62,
+      "bank_blend_m": 7.5,
+      "fallback_sky_reflection_floor": 0.26,
+      "fallback_sky_reflection_variation": 0.44,
+      "slick_roughness_scale": 0.72,
+      "fresnel_specular": 0.1,
+      "live_volume_bank_coverage_floor": 0.0
+    }
+  },
+  "matched_runtime_evidence": {
+    "map": "/Game/RaftSim/Maps/L_Zambezi",
+    "command": "RaftSim.CaptureRaft 3 <label> 8 4 22 waterinventory",
+    "resolution_px": [1280, 720],
+    "raft_location_cm_before": [327541.206, -418921.334, 15729.241],
+    "raft_location_cm_after": [327541.206, -418921.334, 15729.241],
+    "wet_vertices": 2673,
+    "depth_mean_m": 0.8766,
+    "speed_mean_m_per_s": 0.3437,
+    "foam_mean": 0.0341,
+    "foam_max": 0.7285,
+    "active_breaking_sites": 8,
+    "edge_rejected_breaking_sites": 16,
+    "rapid_foam_vertices": 125,
+    "rapid_foam_visible": true,
+    "volume_core_enabled": true,
+    "volume_core_triangles": 4224,
+    "surface_smoothing_enabled": true,
+    "surface_smoothing_strength_before": 0.55,
+    "surface_smoothing_strength_after": 0.62,
+    "standing_wave_abs_max_m": 0.264,
+    "hydraulic_relief_abs_max_m": 0.0896
+  },
+  "fixed_camera_comparison": {
+    "method": "Matched 1280x720 offscreen gameplay captures at the identical saved-map launch transform, three-second crew-command timing, camera offsets, lighting, and scalability. Water luminance excludes rows 0-269 and the central raft/crew rectangle. Right-bank edge measurements cover x=850-1279, y=270-344 and are descriptive renderer measurements rather than acceptance thresholds.",
+    "baseline_sha256": "0722a269675f165dde74c7dece26301b8c9f93b380e5111208b7ae123876b003",
+    "retained_sha256": "bd7bb63421285d92fb3e2363e742c1b0623c6f55277b979b33c53d1cc2b87604",
+    "baseline_lower_rgb_mean": [156.839, 162.272, 144.903],
+    "retained_lower_rgb_mean": [157.352, 160.344, 139.913],
+    "full_frame_mean_absolute_channel_delta": 7.899356,
+    "baseline_water_luminance_p95": 0.925443,
+    "retained_water_luminance_p95": 0.885944,
+    "baseline_water_fraction_over_0_90": 0.073201,
+    "retained_water_fraction_over_0_90": 0.012097,
+    "baseline_water_fraction_over_0_95": 0.027364,
+    "retained_water_fraction_over_0_95": 0.0,
+    "baseline_right_bank_vertical_edge_p99": 0.270182,
+    "retained_right_bank_vertical_edge_p99": 0.230307,
+    "baseline_right_bank_strong_edge_fraction": 0.006533,
+    "retained_right_bank_strong_edge_fraction": 0.004365,
+    "verdict": "Retain as a bounded gameplay-water improvement. The matched image reduces the brightest launch-water fraction by 83.5 percent at the 0.90 luminance threshold, eliminates pixels above 0.95 in the measured water mask, and reduces the sampled right-bank p99 vertical edge by 14.8 percent. The coarse source terrain and wet-cell tessellation remain visible, so this does not constitute photoreal acceptance or a surveyed shoreline fix."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed after 137 compiled actions",
+    "saved_map_audit": "raftsim.unreal.zambezi_reference_scenario_map_validation.v18 passed; generator and map checks reported 0 errors / 0 warnings",
+    "focused_zambezi_native_audit": "RaftSim.M9.FZambeziLiveTransmittingWater passed 1/1",
+    "water_rendering_native_audit": "RaftSim.P2.WaterSurfaceRenders passed 1/1",
+    "live_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_Zambezi passed 1/1 with 4224 visible volume-core wet-cell triangles and MapCheck 0/0",
+    "focused_python_contracts": "19 passed",
+    "additional_python_regression": "34 passed; 2 editor-source-layout failures reproduced unchanged at the base commit (two pre-existing files exceed 3000 lines and the generated inventory is stale)",
+    "visual_gate": "matched fixed-camera before/after retained for this bounded milestone"
+  },
+  "remaining_photoreal_defects": [
+    "The GLO-30 terrain and solver-cell shoreline remain too coarse for lifelike Batoka bank breaklines, ledges, talus, rapid rocks, and the small-scale waterline geometry visible from the guide seat.",
+    "The launch walls remain rounded and visibly tessellated; ground cover and woody vegetation are procedural analogs without approved exact-species ecology or final art quality.",
+    "The launch reflection is materially less clipped but still reads as a broad smooth highlight; water still lacks approved suspended-sediment calibration, caustics, crest thickness, rollers, holes, spray, mist, and rock-contact plumes.",
+    "The procedural flow field is live and feature-tagged but is not calibrated rapid-specific Zambezi hydraulics or surveyed bathymetry.",
+    "Raft, crew, equipment, animation, hand/paddle contact, body anatomy, water/character occlusion, and complete-run visual acceptance remain open."
+  ],
+  "required_external_acceptance_gates": [
+    "local Zambezi guide approval of stations, lines, portages, access, hazards, and rescue routes",
+    "geospatial approval of centerline, horizontal and vertical datums, high-resolution terrain, bank breaklines, rapid rocks, and bathymetry",
+    "rights and distribution approval for the supplied map PDF, height image, reference imagery, and production derivatives",
+    "seasonal-flow and rapid-scale hydraulic validation against observed Zambezi behavior",
+    "southern African gorge geology, ecology, and environment-art approval",
+    "photoreal water/VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "role": "runnable map with V2 solver-owned gameplay water",
+      "sha256": "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset",
+      "role": "river-local bank-feathered live-volume material instance",
+      "sha256": "e5a27faca288004cbf0473edc5a136e5d3b5f3fb37df1687a0e722f5a74b5f03"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset",
+      "role": "shared raft-transmitting parent consuming live-core vertex-alpha coverage",
+      "sha256": "1fd7cabc1d42e46da3ac865287039170ce75e5483e8500cf2d8e9be8d2878e15"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_water_v2_before.png",
+      "role": "immutable release-head baseline gameplay capture",
+      "sha256": "0722a269675f165dde74c7dece26301b8c9f93b380e5111208b7ae123876b003"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_water_v2.png",
+      "role": "retained matched V2 gameplay capture",
+      "sha256": "bd7bb63421285d92fb3e2363e742c1b0623c6f55277b979b33c53d1cc2b87604"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "role": "saved-map V18 audit",
+      "sha256": "877df6c7b6d936feb223936af959d4ee9d55bf88a637e4cdebd011e23a0a1ae7"
+    }
+  ]
+}

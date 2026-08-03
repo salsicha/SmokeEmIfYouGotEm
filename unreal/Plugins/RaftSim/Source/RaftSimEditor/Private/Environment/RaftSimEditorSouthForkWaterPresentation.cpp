@@ -1,6 +1,11 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
+#include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionLinearInterpolate.h"
+#include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialParameterCollection.h"
 
 namespace RaftSimEditorEnvironment
@@ -84,6 +89,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
 
     bool bHasTransmissionGraph = false;
     bool bHasInteriorOpticalDepthGraph = false;
+    bool bHasBankCoverageGraph = false;
     UMaterialExpressionCustom* InteriorMaskExpression = nullptr;
     UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput = nullptr;
     for (const TObjectPtr<UMaterialExpression>& Expression :
@@ -100,6 +106,11 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             Expression->Desc == TEXT("RaftSimRaftInteriorWaterOpticalDepth"))
         {
             bHasInteriorOpticalDepthGraph = true;
+        }
+        if (Expression &&
+            Expression->Desc == TEXT("RaftSimLiveVolumeBankCoverage"))
+        {
+            bHasBankCoverageGraph = true;
         }
         if (!WaterOutput)
         {
@@ -284,6 +295,63 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             TransmittingScattering;
         WaterOutput->AbsorptionCoefficients.Expression =
             TransmittingAbsorption;
+        bNeedsSave = true;
+    }
+
+    if (!bHasBankCoverageGraph)
+    {
+        UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
+        UMaterialExpression* OriginalOpacity =
+            EditorData ? EditorData->Opacity.Expression : nullptr;
+        if (!EditorData || !OriginalOpacity)
+        {
+            OutSummary += TEXT(
+                "The raft-transmission water lacks an opacity graph required "
+                "for live wet-cell bank coverage.\n");
+            return nullptr;
+        }
+
+        // The procedural volume core already writes a smooth station/lateral
+        // wet-cell coverage into vertex alpha. V1 ignored that channel and
+        // ended the opaque Single Layer Water body on a hard rectangular cell
+        // edge. Consume the same coverage here. The scalar floor defaults to
+        // zero but remains explicit for bounded diagnostics.
+        Material->Modify();
+        UMaterialExpressionVertexColor* VertexColor =
+            NewObject<UMaterialExpressionVertexColor>(Material);
+        Material->GetExpressionCollection().AddExpression(VertexColor);
+        UMaterialExpressionComponentMask* Coverage =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        Coverage->Input.Expression = VertexColor;
+        Coverage->Input.OutputIndex = 4;
+        Coverage->R = true;
+        Coverage->G = false;
+        Coverage->B = false;
+        Coverage->A = false;
+        Material->GetExpressionCollection().AddExpression(Coverage);
+        UMaterialExpressionScalarParameter* CoverageFloor =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        CoverageFloor->ParameterName = TEXT("LiveVolumeBankCoverageFloor");
+        CoverageFloor->DefaultValue = 0.0f;
+        CoverageFloor->Group = TEXT("RaftSimLiveVolumeBankCoverage");
+        Material->GetExpressionCollection().AddExpression(CoverageFloor);
+        UMaterialExpressionConstant* FullCoverage =
+            NewObject<UMaterialExpressionConstant>(Material);
+        FullCoverage->R = 1.0f;
+        Material->GetExpressionCollection().AddExpression(FullCoverage);
+        UMaterialExpressionLinearInterpolate* CoverageScale =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        CoverageScale->Desc = TEXT("RaftSimLiveVolumeBankCoverage");
+        CoverageScale->A.Expression = CoverageFloor;
+        CoverageScale->B.Expression = FullCoverage;
+        CoverageScale->Alpha.Expression = Coverage;
+        Material->GetExpressionCollection().AddExpression(CoverageScale);
+        UMaterialExpressionMultiply* FeatheredOpacity =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FeatheredOpacity->A.Expression = OriginalOpacity;
+        FeatheredOpacity->B.Expression = CoverageScale;
+        Material->GetExpressionCollection().AddExpression(FeatheredOpacity);
+        EditorData->Opacity.Connect(0, FeatheredOpacity);
         bNeedsSave = true;
     }
 

@@ -461,7 +461,7 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
 {
     FString AuthoringSummary;
     UMaterialInstanceConstant* Instance =
-        RaftSimEditorEnvironment::LoadOrCreateZambeziBatokaLiveWaterInstance(
+        RaftSimEditorEnvironment::LoadOrCreateZambeziBatokaLiveWaterV2Instance(
             AuthoringSummary);
     TestNotNull(
         TEXT("Zambezi river-local live-volume authoring succeeds"),
@@ -483,6 +483,22 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
                 "M_RaftSim_SouthForkRaftTransmissionWater."
                 "M_RaftSim_SouthForkRaftTransmissionWater")));
     }
+
+    bool bHasCoverageFeather = false;
+    if (UMaterial* ParentMaterial = Instance->Parent
+            ? Instance->Parent->GetMaterial()
+            : nullptr)
+    {
+        for (const TObjectPtr<UMaterialExpression>& Expression :
+             ParentMaterial->GetExpressionCollection().Expressions)
+        {
+            bHasCoverageFeather |= Expression &&
+                Expression->Desc == TEXT("RaftSimLiveVolumeBankCoverage");
+        }
+    }
+    TestTrue(
+        TEXT("Zambezi volume parent consumes smooth wet-cell bank coverage"),
+        bHasCoverageFeather);
 
     UTexture* FlowNormal = nullptr;
     UTexture* FoamLace = nullptr;
@@ -539,10 +555,15 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
             FString::Printf(TEXT("%s keeps its authored value"), ParameterName),
             FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
     };
-    TestScalar(TEXT("HydraulicFoamCoverageGain"), 0.78f);
-    TestScalar(TEXT("SpeedAerationFraction"), 0.18f);
-    TestScalar(TEXT("FoamRoughness"), 0.70f);
-    TestScalar(TEXT("SlickNormalFloor"), 0.32f);
+    TestScalar(TEXT("HydraulicFoamCoverageGain"), 0.72f);
+    TestScalar(TEXT("SpeedAerationFraction"), 0.14f);
+    TestScalar(TEXT("FoamRoughness"), 0.78f);
+    TestScalar(TEXT("FallbackSkyReflectionFloor"), 0.26f);
+    TestScalar(TEXT("FallbackSkyReflectionVariation"), 0.44f);
+    TestScalar(TEXT("SlickRoughnessScale"), 0.72f);
+    TestScalar(TEXT("FresnelSpecular"), 0.10f);
+    TestScalar(TEXT("SlickNormalFloor"), 0.22f);
+    TestScalar(TEXT("LiveVolumeBankCoverageFloor"), 0.0f);
     return !HasAnyErrors();
 }
 
