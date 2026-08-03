@@ -3102,13 +3102,22 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     {
         WaterNormalAssetName = TEXT("ColoradoRiver");
     }
-    const FString NormalAtlasName = FString::Printf(
-        TEXT("T_RaftSim_%s_NormalAtlas"),
-        *WaterNormalAssetName);
-    const FString NormalAtlasObjectPath = FString::Printf(
-        TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
-        *NormalAtlasName,
-        *NormalAtlasName);
+    const bool bUsesFutaleufuRiverLocalFlowNormal =
+        Spec.RiverId == TEXT("futaleufu_terminator");
+    const FString NormalAtlasName = bUsesFutaleufuRiverLocalFlowNormal
+        ? TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")
+        : FString::Printf(
+              TEXT("T_RaftSim_%s_NormalAtlas"),
+              *WaterNormalAssetName);
+    const FString NormalAtlasObjectPath = bUsesFutaleufuRiverLocalFlowNormal
+        ? FString::Printf(
+              TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName)
+        : FString::Printf(
+              TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName);
     UTexture2D* WaterNormalAtlas = LoadObject<UTexture2D>(nullptr, *NormalAtlasObjectPath);
     if (!WaterNormalAtlas)
     {
@@ -3256,8 +3265,16 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetVector(TEXT("SolverDeepWaterTint"), Settings.SolverDeepWaterTint);
     SetVector(TEXT("SolverAerationTint"), Settings.SolverAerationTint);
     SetVector(TEXT("ReflectionTint"), Settings.ReflectionTint);
-    SetVector(TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
-    SetVector(TEXT("AtlasTileScale"), FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
+    SetVector(
+        TEXT("AtlasTileOrigin"),
+        bUsesFutaleufuRiverLocalFlowNormal
+            ? FLinearColor(0.0f, 0.0f, 0.0f, 0.0f)
+            : FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
+    SetVector(
+        TEXT("AtlasTileScale"),
+        bUsesFutaleufuRiverLocalFlowNormal
+            ? FLinearColor(1.0f, 1.0f, 0.0f, 0.0f)
+            : FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
     Instance->SetTextureParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("WaterNormalAtlas")),
         WaterNormalAtlas);
@@ -3286,8 +3303,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += FString::Printf(
-        TEXT("Built %s opaque %s solver-surface water candidate (roughness %.3f, opacity %.3f, normal %.3f, solver field %.0f).\n"),
+        TEXT("Built %s %s %s solver-surface water candidate (roughness %.3f, opacity %.3f, normal %.3f, solver field %.0f).\n"),
         *Spec.RiverId,
+        Spec.RiverId == TEXT("futaleufu_terminator")
+            ? TEXT("transmitting")
+            : TEXT("opaque"),
         bUseSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
         Settings.Roughness,
         bUseSingleLayerWater ? Settings.Opacity : 1.0f,

@@ -10,6 +10,7 @@ EDITOR_ROOT = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private"
 )
+TEXTURE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorPhotorealTextureAssets.cpp"
 WATER_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorFutaleufuWaterMaterial.cpp"
 BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
 CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
@@ -38,6 +39,17 @@ RAPID_LACE_REVIEW = MANIFEST.with_name(
 COLD_WATER_VOLUME_CORE_REVIEW = MANIFEST.with_name(
     "cold_water_live_volume_core_v2_review.json"
 )
+V3_REVIEW = MANIFEST.with_name(
+    "futaleufu_terminator_transmitting_water_v3_review.json"
+)
+FLOW_NORMAL_SOURCE = (
+    REPO_ROOT
+    / "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/"
+    "T_RaftSim_FutaleufuTerminator_FlowNormalV1.png"
+)
+FOAM_LACE_SOURCE = FLOW_NORMAL_SOURCE.with_name(
+    "T_RaftSim_FutaleufuTerminator_FoamLaceV1.png"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -50,7 +62,10 @@ def test_futaleufu_water_is_native_moving_and_non_displacing() -> None:
 
     assert "M_RaftSim_Futaleufu_TerminatorDefaultLitWater" in water
     assert "MSM_DefaultLit" in water
-    assert "BLEND_Opaque" in water
+    assert "BLEND_Translucent" in water
+    assert "TLM_SurfacePerPixelLighting" in water
+    assert "EditorOnlyData->Opacity" in water
+    assert "EditorOnlyData->Refraction" in water
     assert "UMaterialExpressionSingleLayerWaterMaterialOutput" not in water
     assert water.count("AddNormalSample(") == 3
     assert "0.00031f" in water
@@ -84,11 +99,14 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "bEnableLiveSolverVolumeCore = true",
         "LiveSurfaceCalmCoverage = 0.035f",
         "LiveSurfaceActiveCoverage = 0.14f",
-        "LiveSkyReflectionStrength = 0.34f",
-        "LiveRippleStrength = 0.30f",
-        "LiveFoamIntensity = 0.68f",
+        "LiveSkyReflectionStrength = 0.24f",
+        "LiveRippleStrength = 0.26f",
+        "LiveFoamIntensity = 0.58f",
         "LiveRapidFoamFocusStart = 0.08f",
         "LiveRapidFoamFocusEnd = 0.58f",
+        "LiveVolumeCoreMaterialOverride",
+        "LiveWaterFlowNormalTexture",
+        "LiveWaterFoamLaceTexture",
         "RaftSimFutaleufuDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
         "RaftSimColdWaterCpuChopV2",
@@ -102,6 +120,9 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveFoamIntensity",
         "LiveRapidFoamFocusStart",
         "LiveRapidFoamFocusEnd",
+        "LiveVolumeCoreMaterialOverride",
+        "LiveWaterFlowNormalTexture",
+        "LiveWaterFoamLaceTexture",
     ):
         assert parameter in config
     for parameter in (
@@ -114,6 +135,9 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
     assert 'TEXT("futaleufu_river_chile")' in runtime
     assert "kLiveVolumeCoreMinimumStationCoverage = 0.60f" in runtime
     assert "MinimumCellStationCoverage" in runtime
+    assert 'TEXT("WaterFlowNormalPrimary")' in runtime
+    assert 'TEXT("WhitewaterFoamLace")' in runtime
+    assert 'TEXT("SolverOverlayFoamLace")' in runtime
 
 
 def test_futaleufu_manifest_records_native_capture_water() -> None:
@@ -125,11 +149,11 @@ def test_futaleufu_manifest_records_native_capture_water() -> None:
         "M_RaftSim_Futaleufu_TerminatorDefaultLitWater"
     )
     assert candidate["water_material_status"] == (
-        "futaleufu_terminator_default_lit_native_moving_normal_candidate_"
-        "bound_cpu_cooked_field_color"
+        "futaleufu_terminator_transmitting_default_lit_river_local_normal_"
+        "candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color"
     )
     assert candidate["water_shading_model"] == "DefaultLit"
-    assert candidate["water_blend_mode"] == "Opaque"
+    assert candidate["water_blend_mode"] == "Translucent"
     assert candidate["water_solver_visualization_field_enable"] == 0.0
     assert candidate["water_solver_macro_normal_weight"] == 0.0
     assert candidate["water_solver_depth_color_weight"] == 0.0
@@ -235,13 +259,49 @@ def test_futaleufu_live_rapid_lace_review_is_hash_locked_and_fail_closed() -> No
     # versioned Lava Canyon map package from this two-river historical review.
     # Continue hash-locking the Terminator map, material, and all captures this
     # review still owns instead of rewriting its original evidence payload.
-    superseded_artifacts = {"unreal/Content/RaftSim/Maps/L_LavaCanyon.umap"}
+    superseded_artifacts = {
+        "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+        "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+    }
     for artifact in review["retained_artifacts"]:
         if artifact["path"] in superseded_artifacts:
             continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]
+
+
+def test_futaleufu_v3_visual_textures_are_first_party_and_fail_closed() -> None:
+    texture_source = TEXTURE_SOURCE.read_text(encoding="utf-8")
+    for texture, asset_id, map_kind in (
+        (
+            FLOW_NORMAL_SOURCE,
+            "futaleufu_terminator_flow_normal_v1",
+            "project_owned_patagonian_multiscale_river_flow_normal",
+        ),
+        (
+            FOAM_LACE_SOURCE,
+            "futaleufu_terminator_foam_lace_v1",
+            "project_owned_patagonian_solver_masked_whitewater_lace",
+        ),
+    ):
+        provenance = json.loads(
+            texture.with_suffix(".provenance.json").read_text(encoding="utf-8")
+        )
+        assert provenance["schema"] == (
+            "raftsim.first_party.generated_texture_provenance.v1"
+        )
+        assert provenance["asset_id"] == asset_id
+        assert provenance["project_ownership"] == (
+            "first-party generated project asset"
+        )
+        assert provenance["texture"]["sha256"] == _sha256(texture)
+        assert provenance["texture"]["width"] == 1254
+        assert provenance["texture"]["height"] == 1254
+        assert len(provenance["limitations"]) >= 4
+        assert map_kind in texture_source
+    assert "TA_Mirror" in texture_source
+    assert "solver_masked" in texture_source
 
 
 def test_cold_water_volume_core_v2_review_is_hash_locked_and_honest() -> None:
@@ -272,6 +332,45 @@ def test_cold_water_volume_core_v2_review_is_hash_locked_and_honest() -> None:
     assert review["visual_comparison"]["futaleufu_terminator"][
         "retained_water_band_blue_minus_red"
     ] > 0.0
+    assert len(review["required_external_acceptance_gates"]) == 6
+
+    for artifact in review["retained_artifacts"]:
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
+
+
+def test_futaleufu_transmitting_water_v3_review_is_hash_locked_and_honest() -> None:
+    review = json.loads(V3_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.futaleufu_terminator_transmitting_water_review.v3"
+    )
+    assert review["status"] == (
+        "technical_optical_candidate_retained_photoreal_and_external_"
+        "acceptance_open"
+    )
+    assert review["passed"] is False
+    decision = review["decision"]
+    assert decision["futaleufu_reference_runnable"] is True
+    assert decision["technical_candidate_passed"] is True
+    assert decision["transmitting_water_v3_retained"] is True
+    assert decision["photoreal_acceptance_passed"] is False
+    assert decision["retained_runnable_map_package_changed"] is False
+    assert decision["gameplay_water_geometry_changed"] is False
+    assert decision["hydraulics_changed"] is False
+    assert decision["collision_or_raft_forces_changed"] is False
+    assert review["live_pie_evidence"]["volume_core_triangles"] == 2438
+    assert review["live_pie_evidence"]["active_breaking_sites"] == 5
+    baseline = review["visual_comparison"]["baseline_v2"]
+    retained = review["visual_comparison"]["retained_v3"]
+    assert retained["mean_luminance"] < baseline["mean_luminance"]
+    assert (
+        retained["highlight_fraction_gt_0_90"]
+        < baseline["highlight_fraction_gt_0_90"]
+    )
+    assert retained["mean_blue_minus_red"] > baseline["mean_blue_minus_red"]
+    assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 
     for artifact in review["retained_artifacts"]:

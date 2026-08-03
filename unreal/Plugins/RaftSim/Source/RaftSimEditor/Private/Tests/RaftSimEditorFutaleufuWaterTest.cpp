@@ -40,13 +40,22 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
     TestTrue(
         TEXT("Futaleufu water uses scene lighting"),
         Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
-    TestEqual(TEXT("Futaleufu water remains opaque"), Parent->BlendMode, BLEND_Opaque);
+    TestEqual(
+        TEXT("Futaleufu capture water transmits the reviewed riverbed"),
+        Parent->BlendMode,
+        BLEND_Translucent);
     TestTrue(TEXT("Futaleufu water remains two-sided"), Parent->TwoSided);
     TestTrue(TEXT("Futaleufu water normals remain tangent-space"), Parent->bTangentSpaceNormal);
     const UMaterialEditorOnlyData* EditorOnlyData = Parent->GetEditorOnlyData();
     TestNotNull(TEXT("Futaleufu water graph remains inspectable"), EditorOnlyData);
     if (EditorOnlyData)
     {
+        TestNotNull(
+            TEXT("Futaleufu capture water binds CPU-authored transmission coverage"),
+            EditorOnlyData->Opacity.Expression);
+        TestNotNull(
+            TEXT("Futaleufu capture water binds physical refraction"),
+            EditorOnlyData->Refraction.Expression);
         TestNull(
             TEXT("Futaleufu optics never displace cooked ribbon geometry"),
             EditorOnlyData->WorldPositionOffset.Expression);
@@ -93,6 +102,8 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
     TestScalar(TEXT("SurfaceVariationStrength"), 0.44f);
     TestScalar(TEXT("CrossCurrentNormalWeight"), 0.34f);
     TestScalar(TEXT("RoughnessVariationAmplitude"), 0.12f);
+    TestScalar(TEXT("Opacity"), 0.88f);
+    TestScalar(TEXT("RefractionIor"), 1.333f);
     TestScalar(TEXT("SolverFieldEnable"), 0.0f);
     TestScalar(TEXT("SolverMacroNormalWeight"), 0.0f);
     TestScalar(TEXT("SolverDepthColorWeight"), 0.0f);
@@ -108,18 +119,72 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
 
     UTexture* NormalAtlas = nullptr;
     TestTrue(
-        TEXT("Futaleufu native normal atlas is bound"),
+        TEXT("Futaleufu river-local normal is bound"),
         Instance->GetTextureParameterValue(
             FMaterialParameterInfo(TEXT("WaterNormalAtlas")), NormalAtlas));
-    TestNotNull(TEXT("Futaleufu native normal atlas exists"), NormalAtlas);
+    TestNotNull(TEXT("Futaleufu river-local normal exists"), NormalAtlas);
     if (NormalAtlas)
     {
         TestEqual(
-            TEXT("Futaleufu never reuses Pacuare water normals"),
+            TEXT("Futaleufu uses its project-owned live flow normal"),
             NormalAtlas->GetPathName(),
-            FString(TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/"
-                         "T_RaftSim_Futaleufu_NormalAtlas."
-                         "T_RaftSim_Futaleufu_NormalAtlas")));
+            FString(TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                         "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+                         "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")));
+    }
+
+    FLinearColor AtlasTileOrigin;
+    TestTrue(
+        TEXT("Futaleufu standalone normal origin is bound"),
+        Instance->GetVectorParameterValue(
+            FMaterialParameterInfo(TEXT("AtlasTileOrigin")),
+            AtlasTileOrigin));
+    TestTrue(
+        TEXT("Futaleufu standalone normal starts at zero UV"),
+        AtlasTileOrigin.Equals(
+            FLinearColor(0.0f, 0.0f, 0.0f, 0.0f), 0.001f));
+    FLinearColor AtlasTileScale;
+    TestTrue(
+        TEXT("Futaleufu standalone normal scale is bound"),
+        Instance->GetVectorParameterValue(
+            FMaterialParameterInfo(TEXT("AtlasTileScale")),
+            AtlasTileScale));
+    TestTrue(
+        TEXT("Futaleufu standalone normal uses its complete texture"),
+        AtlasTileScale.Equals(
+            FLinearColor(1.0f, 1.0f, 0.0f, 0.0f), 0.001f));
+
+    UMaterialInstanceConstant* LiveVolumeInstance =
+        LoadObject<UMaterialInstanceConstant>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/"
+                 "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3."
+                 "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3"));
+    TestNotNull(
+        TEXT("Futaleufu river-local live-volume instance exists"),
+        LiveVolumeInstance);
+    if (LiveVolumeInstance)
+    {
+        UTexture* LiveNormal = nullptr;
+        UTexture* LiveFoam = nullptr;
+        TestTrue(
+            TEXT("Futaleufu live volume binds river-local normal"),
+            LiveVolumeInstance->GetTextureParameterValue(
+                FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")),
+                LiveNormal));
+        TestTrue(
+            TEXT("Futaleufu live volume binds river-local foam lace"),
+            LiveVolumeInstance->GetTextureParameterValue(
+                FMaterialParameterInfo(TEXT("WhitewaterFoamLace")),
+                LiveFoam));
+        TestTrue(
+            TEXT("Futaleufu live normal path is river-local"),
+            LiveNormal && LiveNormal->GetPathName().Contains(
+                TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")));
+        TestTrue(
+            TEXT("Futaleufu live foam path is river-local"),
+            LiveFoam && LiveFoam->GetPathName().Contains(
+                TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace")));
     }
     return !HasAnyErrors();
 }

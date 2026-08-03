@@ -60,6 +60,65 @@ bool BuildSouthForkWaterTextureAssets()
         FoamLaceTexture != nullptr && bFoamLaceSaved;
 }
 
+bool BuildFutaleufuTerminatorWaterTextureAssets()
+{
+    using namespace RaftSimEditorEnvironment;
+    FString Summary;
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FlowNormalSpec;
+    FlowNormalSpec.RiverId = TEXT("futaleufu_terminator");
+    FlowNormalSpec.RiverAssetName = TEXT("FutaleufuTerminatorWaterV1");
+    FlowNormalSpec.MapKey = TEXT("FlowNormal");
+    FlowNormalSpec.MapKind =
+        TEXT("project_owned_patagonian_multiscale_river_flow_normal");
+    FlowNormalSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/"
+             "T_RaftSim_FutaleufuTerminator_FlowNormalV1.png");
+    FlowNormalSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures");
+    FlowNormalSpec.CompressionSettings = TC_Normalmap;
+    FlowNormalSpec.bSRGB = false;
+    FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
+    // The generated project asset is visually continuous but not guaranteed
+    // byte-identical at opposite borders. Mirrored addressing guarantees a
+    // continuous derivative without blurring its irregular current ridges.
+    FlowNormalSpec.AddressX = TA_Mirror;
+    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.bCompressionNoAlpha = true;
+    bool bFlowNormalSaved = false;
+    UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FlowNormalSpec, Summary, bFlowNormalSaved);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FoamLaceSpec;
+    FoamLaceSpec.RiverId = TEXT("futaleufu_terminator");
+    FoamLaceSpec.RiverAssetName = TEXT("FutaleufuTerminatorWaterV1");
+    FoamLaceSpec.MapKey = TEXT("FoamLace");
+    FoamLaceSpec.MapKind =
+        TEXT("project_owned_patagonian_solver_masked_whitewater_lace");
+    FoamLaceSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/"
+             "T_RaftSim_FutaleufuTerminator_FoamLaceV1.png");
+    FoamLaceSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures");
+    FoamLaceSpec.CompressionSettings = TC_Masks;
+    FoamLaceSpec.bSRGB = false;
+    FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
+    FoamLaceSpec.AddressX = TA_Mirror;
+    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.bCompressionNoAlpha = true;
+    bool bFoamLaceSaved = false;
+    UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FoamLaceSpec, Summary, bFoamLaceSaved);
+
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim Futaleufu water textures:\n%s"),
+        *Summary);
+    return FlowNormalTexture != nullptr && bFlowNormalSaved &&
+        FoamLaceTexture != nullptr && bFoamLaceSaved;
+}
+
 bool BuildCrewSkinTextureAssets()
 {
     using namespace RaftSimEditorEnvironment;

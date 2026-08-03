@@ -5,6 +5,9 @@
 
 #include "RaftSimRiverWaterConfig.generated.h"
 
+class UMaterialInterface;
+class UTexture2D;
+
 /**
  * Placed in a river map to tell the water runtime to load a cooked steady-state
  * flow window (raftsim.cooked_flow_fields.v1) instead of the dev flat tank. The
@@ -79,6 +82,21 @@ public:
      * moving-window or wet-bank artifacts of a broad opaque sheet. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     bool bEnableLiveSolverVolumeCore = false;
+
+    /** Optional river-local parent/instance for the non-colliding optical
+     * core. Hydraulics and topology remain owned by the sampled solver mesh;
+     * this override changes only material response. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UMaterialInterface> LiveVolumeCoreMaterialOverride;
+
+    /** River-local first-party surface detail. These textures are multiplied
+     * by solver-authored activity masks and cannot create hydraulics or foam
+     * outside the live wet mesh. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UTexture2D> LiveWaterFlowNormalTexture;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UTexture2D> LiveWaterFoamLaceTexture;
 
     /** Coverage of the non-volumetric live detail surface in ordinary current.
      * A river using the volume core keeps this low: the core supplies depth,

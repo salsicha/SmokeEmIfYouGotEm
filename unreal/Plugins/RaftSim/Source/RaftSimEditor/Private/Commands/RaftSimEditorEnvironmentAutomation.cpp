@@ -797,10 +797,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"water_material_asset\": \"%s\",\n")
             TEXT("      \"water_material_parent\": \"%s\",\n")
             TEXT("      \"water_shading_model\": \"%s\",\n")
-            TEXT("      \"water_blend_mode\": \"Opaque\",\n")
+            TEXT("      \"water_blend_mode\": \"%s\",\n")
             TEXT("      \"water_custom_output\": \"%s\",\n")
             TEXT("      \"water_volume_parameter_status\": \"%s\",\n")
-            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_plus_cpu_authored_reach_local_or_validated_shader_solver_field\",\n")
+            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_or_standalone_texture_plus_cpu_authored_reach_local_or_validated_shader_solver_field\",\n")
             TEXT("      \"water_solver_visualization_field_status\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_manifest\": \"%s\",\n")
             TEXT("      \"water_solver_visualization_field_texture_count\": %d,\n")
@@ -1145,7 +1145,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                               : (bUsesColoradoHanceDefaultLitWater
                                      ? TEXT("colorado_hance_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
                                      : (bUsesFutaleufuTerminatorDefaultLitWater
-                                     ? TEXT("futaleufu_terminator_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
+                                     ? TEXT("futaleufu_terminator_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
                                      : (bUsesChilkoLavaCanyonDefaultLitWater
                                             ? TEXT("chilko_lava_canyon_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
                                             : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))))))
@@ -1153,9 +1153,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
             *EscapeRaftSimJsonString(WaterMaterialParentPath),
             bUsesSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),
+            bUsesFutaleufuTerminatorDefaultLitWater
+                ? TEXT("Translucent")
+                : TEXT("Opaque"),
             bUsesSingleLayerWater
                 ? TEXT("SingleLayerWaterMaterialOutput_scattering_absorption_phase_and_behind_water_scale")
-                : TEXT("none_surface_only_solver_conditioned_shading"),
+                : (bUsesFutaleufuTerminatorDefaultLitWater
+                       ? TEXT("none_default_lit_depth_bank_transmission_and_physical_ior")
+                       : TEXT("none_surface_only_solver_conditioned_shading")),
             bUsesSingleLayerWater
                 ? TEXT("active_on_zambezi_isolated_parent")
                 : TEXT("inactive_single_layer_evaluation_values_retained_in_manifest_only"),

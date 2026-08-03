@@ -1,6 +1,7 @@
 #include "RaftSimWaterSurfaceActor.h"
 
 #include "Engine/GameInstance.h"
+#include "Engine/Texture2D.h"
 #include "EngineUtils.h"
 #include "HAL/PlatformTime.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -13,6 +14,7 @@
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "UObject/UObjectGlobals.h"
 
 namespace
 {
@@ -588,18 +590,71 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     ResolvedActiveLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveSurfaceActiveCoverage, 0.0f, 1.0f)
         : 0.0f;
+    const bool bUsesMigratedFutaleufuVolumeCore =
+        RiverWaterConfig &&
+        RiverWaterConfig->CookedFieldsDir.Contains(
+            TEXT("futaleufu_river_chile"),
+            ESearchCase::CaseSensitive);
+    const bool bUsesMigratedChilkoVolumeCore =
+        RiverWaterConfig &&
+        RiverWaterConfig->CookedFieldsDir.Contains(
+            TEXT("chilko_river_lava_canyon"),
+            ESearchCase::CaseSensitive);
     const bool bUsesMigratedColdWaterVolumeCore =
         // Backward-compatible rollout for already-versioned cold-water maps.
         // Future regeneration persists the explicit flag; unique cooked-field
         // identities keep Colorado and Pacuare on their reviewed carriers
         // until they receive separate visual acceptance.
-        RiverWaterConfig &&
-        (RiverWaterConfig->CookedFieldsDir.Contains(
-             TEXT("chilko_river_lava_canyon"),
-             ESearchCase::CaseSensitive) ||
-         RiverWaterConfig->CookedFieldsDir.Contains(
-             TEXT("futaleufu_river_chile"),
-             ESearchCase::CaseSensitive));
+        bUsesMigratedFutaleufuVolumeCore ||
+        bUsesMigratedChilkoVolumeCore;
+    UMaterialInterface* ResolvedVolumeCoreMaterialOverride =
+        RiverWaterConfig
+            ? RiverWaterConfig->LiveVolumeCoreMaterialOverride.Get()
+            : nullptr;
+    UTexture2D* ResolvedLiveWaterFlowNormalTexture =
+        RiverWaterConfig
+            ? RiverWaterConfig->LiveWaterFlowNormalTexture.Get()
+            : nullptr;
+    UTexture2D* ResolvedLiveWaterFoamLaceTexture =
+        RiverWaterConfig
+            ? RiverWaterConfig->LiveWaterFoamLaceTexture.Get()
+            : nullptr;
+    if (bUsesMigratedFutaleufuVolumeCore)
+    {
+        // Keep the already-shipped Terminator map runnable without resaving
+        // its binary package together with unrelated in-progress terrain art.
+        // Newly generated maps persist the same references on the config;
+        // this cooked-field-identity fallback is therefore byte-compatible
+        // with both the old package and the regenerated V3 package.
+        if (!ResolvedVolumeCoreMaterialOverride)
+        {
+            ResolvedVolumeCoreMaterialOverride = LoadObject<UMaterialInterface>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/"
+                     "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3."
+                     "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3"));
+        }
+        if (!ResolvedLiveWaterFlowNormalTexture)
+        {
+            ResolvedLiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                     "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+                     "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal"));
+        }
+        if (!ResolvedLiveWaterFoamLaceTexture)
+        {
+            ResolvedLiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                     "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace."
+                     "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace"));
+        }
+    }
+    if (ResolvedVolumeCoreMaterialOverride)
+    {
+        LiveVolumeCoreMaterial = ResolvedVolumeCoreMaterialOverride;
+    }
     bLiveVolumeCoreEnabled =
         bLiveSurfaceCarrierEnabled &&
         (RiverWaterConfig->bEnableLiveSolverVolumeCore ||
@@ -615,6 +670,54 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         ResolvedActiveLiveSurfaceCoverage =
             kLiveVolumeCoreActiveDetailCoverage;
     }
+    const FLinearColor ResolvedLiveShallowSurfaceColor =
+        bUsesMigratedFutaleufuVolumeCore
+            ? FLinearColor(0.013f, 0.068f, 0.090f, 1.0f)
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveShallowSurfaceColor
+                   : FLinearColor(0.025f, 0.120f, 0.150f, 1.0f));
+    const FLinearColor ResolvedLiveDeepSurfaceColor =
+        bUsesMigratedFutaleufuVolumeCore
+            ? FLinearColor(0.002f, 0.017f, 0.029f, 1.0f)
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveDeepSurfaceColor
+                   : FLinearColor(0.004f, 0.028f, 0.045f, 1.0f));
+    const FLinearColor ResolvedLiveReflectedSkyColor =
+        bUsesMigratedFutaleufuVolumeCore
+            ? FLinearColor(0.055f, 0.100f, 0.138f, 1.0f)
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveReflectedSkyColor
+                   : FLinearColor(0.11f, 0.23f, 0.31f, 1.0f));
+    const float ResolvedLiveSurfaceSpecular =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.28f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveSurfaceSpecular
+                   : 0.20f);
+    const float ResolvedLiveSurfaceRoughness =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.34f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveSurfaceRoughness
+                   : 0.085f);
+    const float ResolvedLiveSkyReflectionStrength =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.24f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveSkyReflectionStrength
+                   : 0.62f);
+    const float ResolvedLiveRippleStrength =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.26f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveRippleStrength
+                   : 0.18f);
+    const float ResolvedLiveFoamIntensity =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.58f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveFoamIntensity
+                   : 0.52f);
     bLivePresentationSurfaceSmoothingEnabled =
         bLiveSurfaceCarrierEnabled &&
         RiverWaterConfig->bEnableLivePresentationSurfaceSmoothing;
@@ -776,31 +879,31 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             {
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("ShallowWaterColor"),
-                    RiverWaterConfig->LiveShallowSurfaceColor);
+                    ResolvedLiveShallowSurfaceColor);
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("DeepWaterColor"),
-                    RiverWaterConfig->LiveDeepSurfaceColor);
+                    ResolvedLiveDeepSurfaceColor);
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("ReflectedSkyColor"),
-                    RiverWaterConfig->LiveReflectedSkyColor);
+                    ResolvedLiveReflectedSkyColor);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("WaterRoughness"),
-                    RiverWaterConfig->LiveSurfaceRoughness);
+                    ResolvedLiveSurfaceRoughness);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("Specular"),
-                    RiverWaterConfig->LiveSurfaceSpecular);
+                    ResolvedLiveSurfaceSpecular);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("FallbackSkyReflectionStrength"),
-                    RiverWaterConfig->LiveSkyReflectionStrength);
+                    ResolvedLiveSkyReflectionStrength);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("HydraulicFoamIntensity"),
-                    RiverWaterConfig->LiveFoamIntensity);
+                    ResolvedLiveFoamIntensity);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("CalmRippleStrength"),
-                    0.025f + RiverWaterConfig->LiveRippleStrength * 0.08f);
+                    0.025f + ResolvedLiveRippleStrength * 0.08f);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("FlowRippleStrength"),
-                    0.035f + RiverWaterConfig->LiveRippleStrength * 0.16f);
+                    0.035f + ResolvedLiveRippleStrength * 0.16f);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("ShallowWaterOpacity"), 0.58f);
                 VolumeMaterial->SetScalarParameterValue(
@@ -823,6 +926,21 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("RiverbedColorScale"),
                     FLinearColor(0.13f, 0.17f, 0.20f, 0.0f));
+                if (ResolvedLiveWaterFlowNormalTexture)
+                {
+                    VolumeMaterial->SetTextureParameterValue(
+                        TEXT("WaterFlowNormalPrimary"),
+                        ResolvedLiveWaterFlowNormalTexture);
+                    VolumeMaterial->SetTextureParameterValue(
+                        TEXT("WaterFlowNormalCross"),
+                        ResolvedLiveWaterFlowNormalTexture);
+                }
+                if (ResolvedLiveWaterFoamLaceTexture)
+                {
+                    VolumeMaterial->SetTextureParameterValue(
+                        TEXT("WhitewaterFoamLace"),
+                        ResolvedLiveWaterFoamLaceTexture);
+                }
             }
         }
     }
@@ -838,6 +956,17 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     if (RapidFoamMaterial != nullptr)
     {
         RapidFoamMesh->SetMaterial(0, RapidFoamMaterial);
+        if (ResolvedLiveWaterFoamLaceTexture)
+        {
+            if (UMaterialInstanceDynamic* RapidFoamDynamic =
+                    RapidFoamMesh->CreateDynamicMaterialInstance(
+                        0, RapidFoamMaterial))
+            {
+                RapidFoamDynamic->SetTextureParameterValue(
+                    TEXT("SolverOverlayFoamLace"),
+                    ResolvedLiveWaterFoamLaceTexture);
+            }
+        }
     }
     if (WaterMaterial != nullptr)
     {
@@ -867,39 +996,48 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveWaterSpecular"),
                     bLiveSurfaceCarrierEnabled
-                        ? RiverWaterConfig->LiveSurfaceSpecular
+                        ? ResolvedLiveSurfaceSpecular
                         : 0.20f);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveWaterRoughness"),
                     bLiveSurfaceCarrierEnabled
-                        ? RiverWaterConfig->LiveSurfaceRoughness
+                        ? ResolvedLiveSurfaceRoughness
                         : 0.085f);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveSkyReflectionStrength"),
                     bLiveSurfaceCarrierEnabled
-                        ? RiverWaterConfig->LiveSkyReflectionStrength
+                        ? ResolvedLiveSkyReflectionStrength
                         : 0.62f);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveRippleStrength"),
                     bLiveSurfaceCarrierEnabled
-                        ? RiverWaterConfig->LiveRippleStrength
+                        ? ResolvedLiveRippleStrength
                         : 0.18f);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveFoamIntensity"),
                     bLiveSurfaceCarrierEnabled
-                        ? RiverWaterConfig->LiveFoamIntensity
+                        ? ResolvedLiveFoamIntensity
                         : 0.52f);
                 if (bLiveSurfaceCarrierEnabled)
                 {
                     LiveWaterMaterial->SetVectorParameterValue(
                         TEXT("LiveShallowSurfaceColor"),
-                        RiverWaterConfig->LiveShallowSurfaceColor);
+                        ResolvedLiveShallowSurfaceColor);
                     LiveWaterMaterial->SetVectorParameterValue(
                         TEXT("LiveDeepSurfaceColor"),
-                        RiverWaterConfig->LiveDeepSurfaceColor);
+                        ResolvedLiveDeepSurfaceColor);
                     LiveWaterMaterial->SetVectorParameterValue(
                         TEXT("LiveReflectedSkyColor"),
-                        RiverWaterConfig->LiveReflectedSkyColor);
+                        ResolvedLiveReflectedSkyColor);
+                    if (ResolvedLiveWaterFlowNormalTexture)
+                    {
+                        LiveWaterMaterial->SetTextureParameterValue(
+                            TEXT("LiveWaterFlowNormalPrimary"),
+                            ResolvedLiveWaterFlowNormalTexture);
+                        LiveWaterMaterial->SetTextureParameterValue(
+                            TEXT("LiveWaterFlowNormalCross"),
+                            ResolvedLiveWaterFlowNormalTexture);
+                    }
                 }
             }
         }

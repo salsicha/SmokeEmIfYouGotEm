@@ -1,0 +1,168 @@
+{
+  "schema": "raftsim.environment.futaleufu_terminator_transmitting_water_review.v3",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "79094de39b71c9ffa5932c09ef467267fcf43858",
+  "status": "technical_optical_candidate_retained_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "futaleufu_reference_runnable": true,
+    "technical_candidate_passed": true,
+    "transmitting_water_v3_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "retained_runnable_map_package_changed": false,
+    "generated_capture_water_material_changed": true,
+    "gameplay_water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_or_raft_forces_changed": false
+  },
+  "architecture": {
+    "runtime_volume": "The existing solver-conforming Single Layer Water core now resolves a Futaleufu-only V3 material instance from the cooked-field identity when an older runnable map does not serialize the new override. Newly regenerated maps persist the same material and texture references.",
+    "runtime_detail": "A project-owned flow normal replaces the inherited South Fork normal on the optical core and thin Default Lit detail surface. A project-owned foam-lace mask breaks up the rapid-foam mesh only after multiplication by solver-owned aeration and wet geometry.",
+    "capture_water": "Future filtered generation creates a translucent Default Lit capture ribbon with physical IOR 1.333 and CPU-authored depth, bank-feather, and solver-aeration vertex opacity. The retained runnable map package and its historical fixed captures remain byte-identical to the baseline to avoid absorbing unrelated in-progress terrain generation.",
+    "authority_boundary": "Both image-generated textures are visual-only. Solver fields, wet/dry ownership, river coordinates, live mesh topology, collision, buoyancy, bathymetry, raft forces, feature forcing, and rapid detection remain unchanged.",
+    "river_local_optics": {
+      "surface_specular": 0.28,
+      "surface_roughness": 0.34,
+      "sky_reflection_strength": 0.24,
+      "ripple_strength": 0.26,
+      "foam_intensity": 0.58,
+      "shallow_surface_color": [0.013, 0.068, 0.09],
+      "deep_surface_color": [0.002, 0.017, 0.029],
+      "reflected_sky_color": [0.055, 0.1, 0.138]
+    }
+  },
+  "live_pie_evidence": {
+    "camera": "breaking_water_side",
+    "camera_site_station_m": 189.0,
+    "camera_site_lateral_m": 12.0,
+    "camera_site_intensity_at_capture": 0.945,
+    "wet_vertices": 1575,
+    "volume_core_enabled": true,
+    "volume_core_triangles": 2438,
+    "active_breaking_sites": 5,
+    "rapid_foam_vertices": 53,
+    "rapid_foam_visible": true,
+    "standing_wave_abs_max_m": 0.2413,
+    "hydraulic_relief_abs_max_m": 0.3628
+  },
+  "visual_comparison": {
+    "method": "Direct sRGB metrics over rows 260 through 719 of the identical 1280x720 breaking_water_side camera. Highlight fractions use normalized luminance thresholds 0.90 and 0.95.",
+    "baseline_v2": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_live_volume_core_v2_breaking_water_side.png",
+      "mean_luminance": 0.708139,
+      "highlight_fraction_gt_0_90": 0.074455,
+      "highlight_fraction_gt_0_95": 0.012993,
+      "mean_blue_minus_red": 0.017644,
+      "mean_chroma": 0.043851
+    },
+    "retained_v3": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_transmitting_water_v3_breaking_water_side.png",
+      "mean_luminance": 0.691794,
+      "highlight_fraction_gt_0_90": 0.071194,
+      "highlight_fraction_gt_0_95": 0.01205,
+      "mean_blue_minus_red": 0.031766,
+      "mean_chroma": 0.05497
+    },
+    "verdict": "Retain as a bounded river-local optical improvement: V3 reduces the broad chalk-white response, increases cold-water color separation, and replaces the repeated foam breakup with sparser irregular lace. The sun reflection and large smooth right-hand face remain overexposed and sheet-like, so this is not photoreal acceptance."
+  },
+  "validation": {
+    "filtered_generation": "passed; 30 generated assets validated with no asset-validation errors",
+    "unreal_editor_build": "passed after final null-config regression fix",
+    "native_futaleufu_material_audit": "RaftSim.M9.FFutaleufuTerminatorWater passed 1/1",
+    "native_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_Terminator passed 1/1",
+    "native_water_render_audit": "RaftSim.P2.WaterSurfaceRenders passed 1/1 after the test exposed and the implementation fixed a no-river-config null dereference",
+    "focused_python": "8 passed including provenance and review hash locks",
+    "broader_python": "53 passed; 3 unrelated protected-source failures remain: a stale Landscape source-string assertion, the known oversized protected Landscape foliage source, and the stale editor source inventory",
+    "live_capture_exit_code": 0,
+    "protected_user_work_audit": "75 paths checked; 0 mismatches; 0 missing"
+  },
+  "remaining_photoreal_defects": [
+    "The broad sun reflection and rapid highlights are still overexposed, with 7.12 percent of the measured water band above normalized luminance 0.90.",
+    "The large right-hand standing-wave face remains too smooth and sheet-like; it lacks entrained-air depth, crest breakup, and small-scale spray.",
+    "The foam lace is visually improved but remains a generated breakup mask rather than rapid-specific observed foam calibration.",
+    "Bank geometry, ground material, vegetation silhouettes, rocks, atmosphere, and distance detail remain visibly procedural and blockout-quality.",
+    "No raft or passengers are framed in this water-only comparison, so visual raft/person occlusion still requires a dedicated production-art review even though the native render guard passes.",
+    "Named Terminator holes, rollers, rock-contact plumes, mist, recovery features, and complete-run water continuity remain incomplete or externally unaccepted."
+  ],
+  "required_external_acceptance_gates": [
+    "local guide review of Terminator stationing, lines, hazards, recovery, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datums",
+    "hydraulic convergence and calibration against observed Terminator behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, and season",
+    "photoreal water/VFX and character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "reviewers": {
+    "named_local_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "role": "unchanged runnable map package",
+      "sha256": "fcadfd0a79023ecf330d8719ce83402c66e71cb8227a1cd1c8723729a095048f"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/T_RaftSim_FutaleufuTerminator_FlowNormalV1.png",
+      "role": "first-party flow-normal source",
+      "sha256": "b4387efa54313e35c288daade289edccb7dd5a5bfcb92343c081530358847aff"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/T_RaftSim_FutaleufuTerminator_FlowNormalV1.provenance.json",
+      "role": "flow-normal generation and authority record",
+      "sha256": "9c78d64ce39bfb248e20a77f8038e30d6651c68fcd17efc680d14e97cdd73e1d"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/T_RaftSim_FutaleufuTerminator_FoamLaceV1.png",
+      "role": "first-party solver-masked foam-lace source",
+      "sha256": "1ded6e729354842a4b8bb306525d2ac04ec805ce4eed0999a83254d898c1d40c"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/T_RaftSim_FutaleufuTerminator_FoamLaceV1.provenance.json",
+      "role": "foam-lace generation and authority record",
+      "sha256": "721e2ef9554072a7fa97fe9112727ac56968cb38479c15af82b7dc6223f1db54"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Textures/T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal.uasset",
+      "role": "cooked river-local flow normal",
+      "sha256": "9e04709b602a9f61a8b7eca9f2bb96f44e0763b94b689089adad5efc1737e594"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Textures/T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace.uasset",
+      "role": "cooked solver-masked foam lace",
+      "sha256": "26cbce3f7ca1187f0f6777d2a036c924fe31de992aad286c30e7bcc517da1465"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3.uasset",
+      "role": "river-local runtime Single Layer Water instance",
+      "sha256": "011787906c9c1cf4a235dab6b9c7a2474c1f7d277e6163ff5d06fa6fb4acf73c"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater.uasset",
+      "role": "transmitting future-generation capture-water parent",
+      "sha256": "f1587ae36e7b7608ff2646386c37c38b622ed1d215a05afacb055c1eadac359f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate.uasset",
+      "role": "river-local capture-water instance",
+      "sha256": "2d493c5445a82c8d487cf415c1b792c968fd8ee684c700bd0b173e0dd8172618"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "role": "updated generated-water contract",
+      "sha256": "3eb1b4a34ad62b900dca8d4c3a98aa62448c8b75b1bd6209dc843f909cbe457f"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_transmitting_water_v3_breaking_water_side.png",
+      "role": "retained identical-camera live runtime evidence",
+      "sha256": "849a2faa7d08c5f933e9c5407f2886fbbf74939006abbe75d3db58ced755549f"
+    }
+  ]
+}
