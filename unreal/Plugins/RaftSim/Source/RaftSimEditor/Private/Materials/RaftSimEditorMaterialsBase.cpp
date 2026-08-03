@@ -377,6 +377,25 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         TerrainDetailAlbedo,
         SAMPLERTYPE_Color,
         DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* ChilkoRotatedDetailAlbedoSample = nullptr;
+    if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        // A second, non-harmonic and rotated projection prevents the close-range
+        // detail albedo from exposing a square repeat grid across long open banks.
+        // The organic helper chooses between the two projections with its
+        // existing world-space ground field, so this remains shade-only.
+        UMaterialExpressionLandscapeLayerCoords* RotatedDetailCoordinates =
+            NewObject<UMaterialExpressionLandscapeLayerCoords>(Material);
+        RotatedDetailCoordinates->MappingType = TCMT_XY;
+        RotatedDetailCoordinates->MappingScale = 217.0f;
+        RotatedDetailCoordinates->MappingRotation = 37.0f;
+        Material->GetExpressionCollection().AddExpression(RotatedDetailCoordinates);
+        ChilkoRotatedDetailAlbedoSample = AddTextureSample(
+            TEXT("ChilkoRotatedBroadDetailAlbedo"),
+            TerrainDetailAlbedo,
+            SAMPLERTYPE_Color,
+            RotatedDetailCoordinates);
+    }
     UMaterialExpressionTextureSampleParameter2D* MacroPackedSample = AddTextureSample(
         TEXT("SourceConditionedAORoughnessHeight"),
         SourcePackedSurface,
@@ -570,7 +589,9 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     {
         FinalBaseColor = BuildChilkoOrganicLavaCanyonBaseColor(
             Material,
-            FinalBaseColor);
+            FinalBaseColor,
+            ChilkoRotatedDetailAlbedoSample,
+            WetBankBlendMask);
     }
     if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
     {

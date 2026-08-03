@@ -77,8 +77,8 @@ def test_v4_saved_manifests_record_complete_bank_ecology() -> None:
         (
             "landscape_candidate_manifest_chilko_river_lava_canyon.json",
             "chilko_river_lava_canyon",
-            12200,
-            7550,
+            16400,
+            11750,
         ),
     ):
         candidate = json.loads(

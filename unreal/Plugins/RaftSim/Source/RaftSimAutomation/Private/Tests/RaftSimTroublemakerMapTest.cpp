@@ -360,7 +360,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 AActor* Actor = *It;
                 if (!Actor ||
                     !Actor->Tags.Contains(
-                        TEXT("RaftSimChilkoOrganicShorelineV1")) ||
+                        TEXT("RaftSimChilkoOrganicShorelineV2")) ||
                     !Actor->Tags.Contains(
                         TEXT("RaftSimChilkoLavaCanyonRun")))
                 {
@@ -433,14 +433,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 6);
             Test->TestTrue(
                 TEXT("Chilko shoreline retains at least 3300 gravel instances"),
-                OrganicShorelineGravelInstanceCount >= 3300);
+                OrganicShorelineGravelInstanceCount >= 6800);
             Test->TestEqual(
                 TEXT("Chilko shoreline has two short ground-cover morphologies"),
                 OrganicShorelineGroundCoverActorCount,
                 2);
             Test->TestTrue(
                 TEXT("Chilko shoreline retains at least 3800 ground-cover instances"),
-                OrganicShorelineGroundCoverInstanceCount >= 3800);
+                OrganicShorelineGroundCoverInstanceCount >= 7900);
         }
     }
 

@@ -156,6 +156,26 @@ and external acceptance gates pass.
   exact ecology/geology authority; water/VFX, hydraulic calibration, platform
   performance, and all six external gates remain open.
 
+### 2026-08-03 — Chilko full-reach shoreline and non-repeating wet bank retained
+
+- Auditing the prior “complete route” claim found that its hard-coded placement
+  range stopped at station 253 m, before the station-300 hero view, while the
+  runnable coordinate map spans 0-600 m. V2 now covers stations 2.5-597.5 m and
+  doubles the populations to 7,200 grounded gravel plus 8,400 grounded short-
+  cover instances to preserve local density. All 15,600 targets place with zero
+  rejects; all components remain non-colliding and presentation-only.
+- The Chilko terrain material now mixes non-harmonic 124/217-scale detail
+  projections, rotates the second 37 degrees, and uses the retained seven
+  world-space fields for thresholded silt, gravel, and oxide response. It is
+  shade-only with no world-position offset or terrain/physics authority.
+- Clean 70- and 6-action editor builds, filtered regeneration, two live
+  1280x720 captures, 28 Python checks, the M9 material audit, and the P4 map
+  gate pass; MapCheck reports 0 errors and 0 warnings. The same-camera bank
+  edge metric does not improve, the DEM-scale profile remains smooth, and the
+  vegetation, rocks, water/VFX, atmosphere, exact ecology/geology, performance,
+  and all six external gates remain open. V2 is retained as a bounded runtime
+  correction, not photoreal or B2 promotion.
+
 ### 2026-08-03 — Pacuare live transmitting gameplay water retained
 
 - `L_UpperHuacas` now uses a solver-owned, wet-cell-clipped transmitting core

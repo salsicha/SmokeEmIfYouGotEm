@@ -346,12 +346,12 @@ authority boundaries are recorded in
 
 ## Chilko Organic Shoreline V1
 
-The runnable Lava Canyon map now carries a Chilko-only, source-Landscape-
+The runnable Lava Canyon map introduced a Chilko-only, source-Landscape-
 grounded presentation layer for the visibly barren bank transition. Six
 existing rights-reviewed CC0 rock morphologies place 3,600 small-to-medium
 cobbles, while two project-owned opaque ground-cover morphologies place 4,200
 short, non-shadowing patches. A deterministic 48-choice search grounds every
-instance on both banks of the complete route, keeps it outside the active river
+instance on both banks of its original station range, keeps it outside the active river
 width, rejects wet or steep placements, and leaves terrain, collision,
 bathymetry, hydraulics, buoyancy, and raft forces unchanged. All 7,800 targets
 place with zero rejects; the maximum measured slope is 15.951 degrees.
@@ -374,6 +374,41 @@ incomplete. All six external acceptance gates remain open. Exact placement
 contracts, visual metrics, hashes, evidence, authority boundaries, and blockers
 are recorded in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_organic_shoreline_v1_review.json`.
+
+Subsequent V2 auditing found that V1's hard-coded placement range ended at
+station 253 m even though the runnable coordinate map spans 0-600 m. The V1
+review remains immutable evidence for its original camera and placement, but
+its “complete route” wording is superseded by the correction below.
+
+## Chilko Non-Repeating Wet Bank And Full-Reach Shoreline V2
+
+The runnable Lava Canyon map now covers stations 2.5-597.5 m with the bounded
+shoreline presentation layer. Gravel doubles to 7,200 six-form instances and
+short ground cover doubles to 8,400 two-form instances so the corrected full
+reach retains approximately the original local density. All 15,600 targets
+place with zero rejects. Every instance is source-Landscape grounded, outside
+the complete visible-water width, non-colliding, and excluded from terrain,
+bathymetry, solver, hydraulic, buoyancy, and raft-force authority.
+
+The Chilko Landscape material also replaces its single close-detail projection
+with a world-space-selected 124/217-scale pair; the second projection is rotated
+37 degrees. The existing seven non-harmonic world fields now choose between
+those projections and drive thresholded wet-bank silt, gravel, and iron-oxide
+patches. The graph remains Default Lit and has no world-position offset.
+
+The station-300 `breaking_water_side` frame and a fixed bank-facing close-up
+confirm that the earlier empty evidence bank now receives fine gravel, short
+cover, and non-square color variation. The matched global bank-band edge
+fraction changes from 0.220892 to 0.216543, so V2 is deliberately not claimed
+as a numeric edge-density improvement. It is retained for the audited full-
+reach correction and reduced square repetition, not as photoreal acceptance.
+
+The lower DEM-scale bank profile is still broad and smooth; ground shading,
+vegetation, and generic rock donors remain visibly synthetic; one oversized
+rock silhouette is still apparent; and water, rapid VFX, atmosphere, exact
+geology/ecology, and all six external reviews remain open. Exact parameters,
+hashes, captures, test results, authority boundaries, and blockers are recorded
+in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_nonrepeating_wet_bank_v2_review.json`.
 
 ## Flexible Raft Review
 

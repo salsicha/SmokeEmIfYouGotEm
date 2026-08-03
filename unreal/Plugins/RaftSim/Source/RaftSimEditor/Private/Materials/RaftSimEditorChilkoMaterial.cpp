@@ -6,9 +6,11 @@ namespace RaftSimEditorEnvironment
 {
 UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
     UMaterial* Material,
-    UMaterialExpression* SourceBaseColor)
+    UMaterialExpression* SourceBaseColor,
+    UMaterialExpression* RotatedDetailAlbedo,
+    UMaterialExpression* WetBankMask)
 {
-    if (!Material || !SourceBaseColor)
+    if (!Material || !SourceBaseColor || !RotatedDetailAlbedo || !WetBankMask)
     {
         return nullptr;
     }
@@ -24,7 +26,7 @@ UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
             NewObject<UMaterialExpressionScalarParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("ChilkoOrganicLavaCanyonV1");
+        Parameter->Group = TEXT("ChilkoOrganicLavaCanyonV2");
         Add(Parameter);
         return Parameter;
     };
@@ -34,7 +36,7 @@ UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
             NewObject<UMaterialExpressionVectorParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("ChilkoOrganicLavaCanyonV1");
+        Parameter->Group = TEXT("ChilkoOrganicLavaCanyonV2");
         Add(Parameter);
         return Parameter;
     };
@@ -74,29 +76,66 @@ UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
         Add(Result);
         return Result;
     };
+    auto Contrast = [Material, &Add, &Multiply, &Scalar](
+                        UMaterialExpression* Input,
+                        const TCHAR* ThresholdName,
+                        float Threshold,
+                        const TCHAR* GainName,
+                        float Gain)
+    {
+        UMaterialExpressionSubtract* AboveThreshold =
+            NewObject<UMaterialExpressionSubtract>(Material);
+        AboveThreshold->A.Expression = Input;
+        AboveThreshold->B.Expression = Scalar(ThresholdName, Threshold);
+        Add(AboveThreshold);
+        UMaterialExpressionSaturate* Result =
+            NewObject<UMaterialExpressionSaturate>(Material);
+        Result->Input.Expression = Multiply(
+            AboveThreshold,
+            Scalar(GainName, Gain));
+        Add(Result);
+        return Result;
+    };
 
-    // Four non-harmonic world-space fields preserve registered source color
+    // Seven non-harmonic world-space fields preserve registered source color
     // while breaking the nearly black bank plate into open-bench value,
     // dry-grass/mineral-soil patches, slope-bound basalt and scree, and
-    // metre-scale mineral response. This graph shades the existing Landscape
-    // only; it never invents terrain, rock, bathymetry, or collision geometry.
+    // metre-scale mineral response. Three additional fields vary only the
+    // existing source-conditioned wet-bank band with silt, gravel, oxidation,
+    // and fine mineral response so the waterline does not read as a uniform
+    // repeated strip. This graph shades the existing Landscape only; it never
+    // invents terrain, rock, bathymetry, or collision geometry.
     UMaterialExpressionNoise* MacroBenchNoise = Noise(0.00016f, 3);
     UMaterialExpressionNoise* GroundPatchNoise = Noise(0.00059f, 3);
     UMaterialExpressionNoise* ScreePatchNoise = Noise(0.00270f, 2);
     UMaterialExpressionNoise* FineMineralNoise = Noise(0.00790f, 2);
+    UMaterialExpressionNoise* WetBankMacroNoise = Noise(0.00091f, 3);
+    UMaterialExpressionNoise* WetBankMesoNoise = Noise(0.00347f, 2);
+    UMaterialExpressionNoise* WetBankFineNoise = Noise(0.01570f, 2);
+
+    UMaterialExpression* RotatedDetailInfluence = Lerp(
+        SourceBaseColor,
+        RotatedDetailAlbedo,
+        Scalar(TEXT("ChilkoRotatedDetailInfluence"), 0.24f));
+    UMaterialExpression* NonRepeatingSourceBaseColor = Lerp(
+        SourceBaseColor,
+        RotatedDetailInfluence,
+        GroundPatchNoise);
 
     UMaterialExpression* MacroValue = Lerp(
-        Scalar(TEXT("ChilkoMacroShadowScale"), 0.78f),
-        Scalar(TEXT("ChilkoMacroHighlightScale"), 1.22f),
+        Scalar(TEXT("ChilkoMacroShadowScale"), 0.72f),
+        Scalar(TEXT("ChilkoMacroHighlightScale"), 1.28f),
         MacroBenchNoise);
-    UMaterialExpression* SourceVariation = Multiply(SourceBaseColor, MacroValue);
+    UMaterialExpression* SourceVariation = Multiply(
+        NonRepeatingSourceBaseColor,
+        MacroValue);
 
     UMaterialExpression* MineralSoil = Vector(
         TEXT("ChilkoMineralSoilTint"),
-        FLinearColor(0.19f, 0.115f, 0.050f, 1.0f));
+        FLinearColor(0.145f, 0.085f, 0.035f, 1.0f));
     UMaterialExpression* DryGrass = Vector(
         TEXT("ChilkoDryGrassTint"),
-        FLinearColor(0.225f, 0.195f, 0.078f, 1.0f));
+        FLinearColor(0.255f, 0.215f, 0.082f, 1.0f));
     UMaterialExpression* GroundPalette = Lerp(
         MineralSoil,
         DryGrass,
@@ -104,7 +143,7 @@ UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
     UMaterialExpression* OpenBenchSurface = Lerp(
         SourceVariation,
         GroundPalette,
-        Scalar(TEXT("ChilkoOpenBenchPaletteWeight"), 0.40f));
+        Scalar(TEXT("ChilkoOpenBenchPaletteWeight"), 0.48f));
 
     UMaterialExpressionVertexNormalWS* VertexNormal =
         NewObject<UMaterialExpressionVertexNormalWS>(Material);
@@ -165,9 +204,56 @@ UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
         ScreeMask);
 
     UMaterialExpression* FineValue = Lerp(
-        Scalar(TEXT("ChilkoFineShadowScale"), 0.90f),
-        Scalar(TEXT("ChilkoFineHighlightScale"), 1.13f),
+        Scalar(TEXT("ChilkoFineShadowScale"), 0.86f),
+        Scalar(TEXT("ChilkoFineHighlightScale"), 1.17f),
         FineMineralNoise);
-    return Multiply(RockAndScree, FineValue);
+    UMaterialExpression* OrganicDrySurface = Multiply(RockAndScree, FineValue);
+
+    UMaterialExpression* WetBankSilt = Vector(
+        TEXT("ChilkoWetBankSiltTint"),
+        FLinearColor(0.032f, 0.046f, 0.040f, 1.0f));
+    UMaterialExpression* WetBankGravel = Vector(
+        TEXT("ChilkoWetBankGravelTint"),
+        FLinearColor(0.235f, 0.188f, 0.118f, 1.0f));
+    UMaterialExpression* WetBankOxide = Vector(
+        TEXT("ChilkoWetBankOxideTint"),
+        FLinearColor(0.205f, 0.084f, 0.034f, 1.0f));
+    UMaterialExpression* WetBankMacroPatch = Contrast(
+        WetBankMacroNoise,
+        TEXT("ChilkoWetBankMacroPatchThreshold"),
+        0.40f,
+        TEXT("ChilkoWetBankMacroPatchGain"),
+        3.80f);
+    UMaterialExpression* WetBankMesoPatch = Contrast(
+        WetBankMesoNoise,
+        TEXT("ChilkoWetBankMesoPatchThreshold"),
+        0.38f,
+        TEXT("ChilkoWetBankMesoPatchGain"),
+        4.20f);
+    UMaterialExpression* WetBankSiltGravel = Lerp(
+        WetBankSilt,
+        WetBankGravel,
+        WetBankMesoPatch);
+    UMaterialExpression* WetBankPalette = Lerp(
+        WetBankSiltGravel,
+        WetBankOxide,
+        Multiply(
+            WetBankMacroPatch,
+            Scalar(TEXT("ChilkoWetBankOxidePatchStrength"), 0.72f)));
+    UMaterialExpression* SourceInfluencedWetBank = Lerp(
+        OrganicDrySurface,
+        WetBankPalette,
+        Scalar(TEXT("ChilkoWetBankPaletteWeight"), 0.84f));
+    UMaterialExpression* WetBankFineValue = Lerp(
+        Scalar(TEXT("ChilkoWetBankFineShadowScale"), 0.70f),
+        Scalar(TEXT("ChilkoWetBankFineHighlightScale"), 1.32f),
+        WetBankFineNoise);
+    UMaterialExpression* OrganicWetBank = Multiply(
+        SourceInfluencedWetBank,
+        WetBankFineValue);
+    UMaterialExpression* OrganicWetBankMask = Multiply(
+        WetBankMask,
+        Scalar(TEXT("ChilkoWetBankOrganicBlendWeight"), 0.92f));
+    return Lerp(OrganicDrySurface, OrganicWetBank, OrganicWetBankMask);
 }
 } // namespace RaftSimEditorEnvironment
