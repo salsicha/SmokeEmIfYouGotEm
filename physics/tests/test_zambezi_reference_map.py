@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v6_review.json"
+    "zambezi_runnable_release_head_v7_review.json"
 )
 
 
@@ -45,23 +45,24 @@ def _sha256(path: Path) -> str:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v2"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v3"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "19481e98c9eff5b53042bcc7ba91b906e2f213e1"
+        "69c598e61a5f1ccf0be60c07dec4c1d12bb41e3a"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Revalidate the Zambezi runnable contract after the South Fork CC0 "
-            "scanned-ground-cover milestone."
+            "Revalidate and hash-lock the regenerated runnable Zambezi package "
+            "after the first-kilometre organic bank-ecology milestone."
         ),
-        "runtime_contract_changed_since_v5": False,
+        "map_runtime_package_changed_since_v6": True,
+        "player_selector_contract_changed_since_v6": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v5_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v6_review.json"
         ),
     }
     assert review["player_path"] == {
@@ -77,7 +78,7 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
 
     expected_hashes = {
         "unreal/Content/RaftSim/Maps/L_Zambezi.umap": (
-            "bcd30f3c063f665a4e5d88da2a49d66f79f50515f60dcb27258300d66624f483"
+            "ebadd25b1dca73ea36c38d6b00cd37f9f29a837c9fb5111384610759f5b0938b"
         ),
         "unreal/Content/RaftSim/UI/river_selection_catalog.json": (
             "1eaeba715f3f9c7e82bbc0c77eb151a5268a537a6ffe6f5e8686ceaf8db13c9e"
@@ -478,6 +479,10 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorNearFieldAndLighting.cpp"
     ).read_text(encoding="utf-8")
+    automation_cpp = (
+        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/"
+        "RaftSimEditorEnvironmentAutomation.cpp"
+    ).read_text(encoding="utf-8")
     assert "ScenarioRelativePath" in internal
     assert SCENARIO_RELATIVE.as_posix() in catalog_cpp
     assert "AddLandscapeCandidateScenarioMarkers" in build_cpp
@@ -540,8 +545,21 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimCameraVisibleWoodyEcology" in foliage_cpp
     assert "RaftSimOrganicWoodyBankLayer" in foliage_cpp
     assert "RaftSimWoodySlopeCeiling24Degrees" in foliage_cpp
-    assert "ZambeziRunnableLaunchBankCoverInstanceCount = 1800" in foliage_cpp
-    assert "ZambeziRunnableLaunchWoodyInstanceCount = 192" in foliage_cpp
+    assert "ZambeziRunnableLaunchBankCoverInstanceCount = 5200" in foliage_cpp
+    assert "ZambeziRunnableLaunchMinimumBankCoverInstanceCount = 4500" in foliage_cpp
+    assert "ZambeziRunnableLaunchWoodyInstanceCount = 640" in foliage_cpp
+    assert "ZambeziRunnableLaunchMinimumWoodyInstanceCount = 560" in foliage_cpp
+    assert "ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees = 42.0f" in foliage_cpp
+    assert "ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 34.0f" in foliage_cpp
+    assert "SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2" in foliage_cpp
+    assert "RaftSimOrganicGroundCoverMorphologyV2" in foliage_cpp
+    assert "Component->SetCullDistances(0, 120000)" in foliage_cpp
+    assert "TargetAdditionalOffset" in foliage_cpp
+    assert (
+        "one_project_owned_opaque_one_sided_vertex_color_material_bound_to_five_"
+        "volumetric_morphology_meshes_no_alpha_cards"
+        in automation_cpp
+    )
     assert "ZambeziRunnableLaunchTalusInstanceCount = 360" in foliage_cpp
     assert "ZambeziRunnableLaunchTalusReviewedSourceBlend = 0.42f" in foliage_cpp
     assert "ZambeziRunnableLaunchTalusWetBandWidthCm = 220.0f" in foliage_cpp
@@ -690,8 +708,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         >= component["conditioned_waterline_min_z_cm"]
         for component in talus["components"]
     )
-    assert validation["vegetation"]["component_count"] == 12
-    assert validation["vegetation"]["instance_count"] == 8927
+    assert validation["vegetation"]["component_count"] == 13
     assert validation["vegetation"]["camera_visible_bank_cover_component_count"] == 1
     assert validation["vegetation"]["camera_visible_bank_cover_instance_count"] == 1200
     assert validation["vegetation"]["camera_visible_woody_component_count"] == 3
@@ -702,22 +719,36 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         validation["vegetation"]["camera_visible_woody_slope_ceiling_degrees"] == 24.0
     )
     assert validation["vegetation"]["legacy_zambezi_pve_actor_count"] == 0
-    assert validation["vegetation"]["runnable_launch_bank_cover_component_count"] == 1
-    assert validation["vegetation"]["runnable_launch_bank_cover_instance_count"] == 1721
+    assert validation["vegetation"]["runnable_launch_bank_cover_component_count"] == 2
+    assert validation["vegetation"]["runnable_launch_bank_cover_instance_count"] >= 4500
     assert (
         validation["vegetation"]["runnable_launch_bank_cover_target_instance_count"]
-        == 1800
+        == 5200
     )
     assert validation["vegetation"]["runnable_launch_woody_component_count"] == 3
-    assert validation["vegetation"]["runnable_launch_woody_instance_count"] == 174
+    assert validation["vegetation"]["runnable_launch_woody_instance_count"] >= 560
     assert (
-        validation["vegetation"]["runnable_launch_woody_target_instance_count"] == 192
+        validation["vegetation"]["runnable_launch_woody_target_instance_count"] == 640
     )
-    assert sorted(
-        component["instance_count"]
+    assert (
+        validation["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"]
+        == 42.0
+    )
+    assert (
+        validation["vegetation"]["runnable_launch_woody_slope_ceiling_degrees"]
+        == 34.0
+    )
+    launch_ground_cover = [
+        component
         for component in validation["vegetation"]["components"]
-        if "RaftSimRunnableLaunchWoodyEcology" in component["tags"]
-    ) == [43, 44, 87]
+        if "RaftSimRunnableLaunchBankCover" in component["tags"]
+    ]
+    assert len(launch_ground_cover) == 2
+    assert all(
+        "RaftSimOrganicGroundCoverMorphologyV2" in component["tags"]
+        and "SavannaGroundCover_" in component["static_mesh"]
+        for component in launch_ground_cover
+    )
     assert sorted(
         component["instance_count"]
         for component in validation["vegetation"]["components"]

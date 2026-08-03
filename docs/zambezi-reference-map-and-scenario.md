@@ -40,7 +40,7 @@ out. That warning does not change map load or gameplay acceptance.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v6_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v7_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
@@ -186,7 +186,7 @@ volumetric gorge-haze actor. This is a deterministic presentation contract, not
 evidence of measured atmospheric conditions or final lighting approval.
 
 The active Zambezi dressing no longer loads the generic Procedural Vegetation
-Editor species or their masked leaf cards. The generator creates four
+Editor species or their masked leaf cards. The generator creates five
 project-owned, opaque, one-sided, vertex-colour Nanite meshes and places them as
 non-colliding hierarchical instances:
 
@@ -200,21 +200,26 @@ non-colliding hierarchical instances:
   camera-window thorn-scrub instances in three separately auditable woody
   components. Eight of 240 deterministic targets are rejected by the hard 24°
   slope ceiling, leaving 232 placed instances;
-- 1,721 of 1,800 launch-window savanna ground-cover targets in a separate
-  non-shadow-casting component. A deterministic 96-candidate search spans
-  approximately 151-842 m downstream, stays at least 15 m beyond the active
-  half-width relative to every route segment, requires ground at least 0.8 m
-  above conditioned water, and rejects slopes above 32°; and
-- 44 launch-window riparian trees, 43 umbrella trees, and 87 thorn-scrub
-  instances. Their deterministic 160-candidate search spans approximately
-  215-864 m downstream, requires 50 m of full-route clearance beyond the active
-  half-width and ground at least 3 m above conditioned water, and rejects slopes
-  above 24°. Eighteen of 192 targets fail those gates, leaving 174 placed
-  instances.
+- 5,200 launch-window savanna ground-cover instances, split evenly between
+  `SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1` and the second morphology
+  `SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2`. A deterministic
+  96-candidate target-offset search spans approximately 55-955 m downstream,
+  distributes cover 12-180 m beyond the active half-width, requires ground at
+  least 0.8 m above conditioned water, and rejects slopes above 42°; and
+- 153 launch-window riparian trees, 152 umbrella trees, and 306 thorn-scrub
+  instances. Their deterministic 160-candidate target-offset search spans
+  approximately 155-955 m downstream, distributes forms 35-200 m beyond the
+  active half-width, requires 50 m of full-route clearance and ground at least
+  3 m above conditioned water, and rejects slopes above 34°. Twenty-nine of 640
+  targets fail those gates, leaving 611 placed instances; the steepest retained
+  placement is 24.24°.
 
-All four use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
+All five use `M_RaftSim_Zambezi_OpaqueVegetation`, contain solid branch, crown,
 or blade geometry rather than alpha cards. The revised ground-cover mesh spans
-several metres with 54 tapered grass blades and 11 low solid forb clusters.
+several metres with tapered grass blades and low solid forb clusters. The two
+launch morphologies vary form, yaw, footprint, and height from 0.95-2.30 m, and
+their HISM components retain a 1.2 km cull range so the first-kilometre benches
+do not collapse into a single visible shoreline row.
 All dressing actors carry the
 `RaftSimZambeziOpaqueVegetation`, `RaftSimOpaqueVolumetricVegetation`,
 `RaftSimSlopeScreenedPlacement`, `RaftSimNonCollisionRenderSurface`, and
@@ -222,8 +227,9 @@ All dressing actors carry the
 carries `RaftSimOrganicBankMosaic` and `RaftSimCameraVisibleBankCover`.
 The woody-window components carry `RaftSimCameraVisibleWoodyEcology`,
 `RaftSimOrganicWoodyBankLayer`, and `RaftSimWoodySlopeCeiling24Degrees`.
-The four launch components carry `RaftSimRunnableLaunchBankEcologyV1`; the
-cover component adds `RaftSimRunnableLaunchBankCover`, while the three woody
+The five launch components carry `RaftSimRunnableLaunchBankEcologyV1`; the two
+cover components add `RaftSimRunnableLaunchBankCover` and
+`RaftSimOrganicGroundCoverMorphologyV2`, while the three woody
 components add `RaftSimRunnableLaunchWoodyEcology`. Launch cover and woody
 components do not cast shadows: this narrow presentation exception removes the
 rejected near-camera crown/wall streak under the low review sun, without
@@ -232,12 +238,12 @@ woody shadows, or physics authority. The full-corridor ground-cover and
 camera-mosaic components are likewise shadowless so dense grass blades do not
 paint synthetic black streaks across the coarse DEM; full-corridor and
 documentary trees and scrub still cast shadows.
-Placement selects the lowest-slope candidate on each dry bank, keeps a hard
-inner exclusion outside the 72 m active river half-width, starts beyond each
-camera target, and covers approximately the next 120-600 m of view. This makes
-solid grass/forb cover visible in both canonical images while preserving the
-navigable corridor and removing the old floating black/green card failure. It
-does not establish correct species, woodland ecology, or photoreal vegetation.
+Placement balances slope against deterministic longitudinal and lateral targets
+on each dry bank, keeps a hard inner exclusion outside the 72 m active river
+half-width, and covers the first kilometre ahead of the launch. This breaks up
+the earlier easiest-shelf rows while preserving the navigable corridor and
+removing the old floating black/green card failure. It does not establish
+correct species, woodland ecology, or photoreal vegetation.
 
 The physical-corridor presentation ribbon now uses the isolated opaque Default
 Lit parent `M_RaftSim_Zambezi_DefaultLitWater`. It preserves the two opposed
@@ -374,7 +380,7 @@ swimmers. The focused test passes, and the complete parameterized
 renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
 deliberately fails photoreal promotion while passing runnable launch acceptance.
 
-The runnable classification was reverified on August 2, 2026 after a filtered
+The runnable classification was reverified on August 3, 2026 after a filtered
 Zambezi regeneration. `RaftSim.M6.CareerCatalog` confirms that the player-facing
 `zambezi_reference_run` opens `/Game/RaftSim/Maps/L_Zambezi`, and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` passes a live PIE launch with the cooked
@@ -392,14 +398,17 @@ The visual fallback materially improves surface scale and canyon breakup, and
 the canonical guide-seat and river-eye views now contain visible solid bank
 cover plus restrained tree and thorn-scrub silhouettes instead of completely
 barren slopes. The default runnable launch now also exposes a restrained
-ecology layer ahead of the raft: the accepted capture contains no camera-clipped
+ecology layer ahead of the raft. The V2 retained map expands that layer from
+1,895 to 5,811 launch instances, uses two ground-cover morphologies, distributes
+them by target offset rather than lowest slope alone, and keeps them visible
+across the first kilometre. The accepted capture contains no camera-clipped
 plant and no woody silhouette visibly intersecting the waterline. The V1
 placement bracket that put cover on a 54.16° face and trees at the waterline was
 rejected rather than documented as progress. The 30 m DEM still yields rounded large-scale cliff silhouettes,
 however, and the project-owned tree crowns and small synthetic clumps remain
-repetitive and visibly procedural. The expanded launch layer makes more of the
-dry bank technically occupied, but the retained gameplay frame reads that
-ground cover as a thin, repeated shoreline band rather than organic vegetation.
+repetitive and visibly procedural. The expanded launch layer visibly breaks up
+the right-bank slope and adds notch/ridgeline silhouettes, but the near left
+wall remains too barren and coarse for production art acceptance.
 The views prove that the broken card foliage
 is absent and that multi-height bank ecology is rendered; they do not prove
 that the vegetation or terrain is photoreal. The runnable reference map is
@@ -413,12 +422,12 @@ non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
 the four-actor sun/sky/fill/fog atmosphere contract, absence of rejected
 high-density bank actors, the
-exact four vegetation mesh families and
-12 instance components with an 8,927-instance total, exactly one tagged
+exact five vegetation mesh families and
+13 instance components with a 12,843-instance total, exactly one tagged
 1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
 components with the 58/57/117 accepted split and 24° slope-ceiling contract,
-one 1,721-instance launch-cover component, three launch woody components with
-the 44/43/87 accepted split, their full-route/dry-height/slope placement tags, and
+two 2,600-instance launch-cover components, three launch woody components with
+the 153/152/306 accepted split, their full-route/dry-height/slope placement tags, and
 the bounded launch-window shadow exception,
 six separately tagged launch-talus components with 360 total source-grounded,
 shadow-casting, non-colliding rock analog instances and their explicit

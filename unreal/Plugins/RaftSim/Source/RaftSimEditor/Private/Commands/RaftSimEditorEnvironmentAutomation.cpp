@@ -1091,8 +1091,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 : TEXT("required_source_masks_missing"),
             Result.bDressingFoliageMaterialsValidated
                 ? (bUsesOpaqueVolumetricVegetation
-                       ? ((bUsesFutaleufuOrganicTemperateSurface ||
-                           bUsesChilkoOrganicLavaCanyonSurface)
+                       ? (bUsesZambeziDefaultLitWater
+                              ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_five_volumetric_morphology_meshes_no_alpha_cards")
+                              : (bUsesFutaleufuOrganicTemperateSurface ||
+                                 bUsesChilkoOrganicLavaCanyonSurface)
                               ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_eight_volumetric_morphology_meshes_no_alpha_cards")
                               : TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards"))
                        : bUsesColoradoOrganicHanceSurface
