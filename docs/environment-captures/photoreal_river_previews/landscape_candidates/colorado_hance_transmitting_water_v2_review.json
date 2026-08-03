@@ -6,10 +6,11 @@
   "passed": false,
   "supersedes_mutable_artifacts_from": "colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json",
   "superseded_mutable_artifacts_by": {
-    "review_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_rapid_approach_launch_v1_review.json",
-    "reason": "The later rapid-approach milestone intentionally resaved the runnable map at station 336 m and regenerated all three current camera views. The hashes below remain the immutable transmitting-water V2 historical record; the successor review owns the current map and capture hashes.",
+    "review_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_nonperiodic_canyon_dryland_ecology_v3_review.json",
+    "reason": "Later rapid-approach, organic-canyon, and nonperiodic-canyon milestones intentionally resaved the runnable map, regenerated all three current camera views, and refreshed the generated candidate manifest. The hashes below remain the immutable transmitting-water V2 historical record; the current V3 review owns those mutable artifact hashes.",
     "paths": [
       "unreal/Content/RaftSim/Maps/L_Hance.umap",
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json",
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png",
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png"

@@ -71,6 +71,21 @@ canyon is terraced, and the hydraulic field and external review gates remain
 open. The hash-locked review is
 `colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json`.
 
+The August 3 Hance V3 terrain/ecology pass keeps the complete plus-or-minus
+39 m C3 solver strip and runtime coordinate map unchanged while replacing the
+remaining sine-like outer-bank relief with deterministic seeded massing,
+incised drainage, irregular buttresses, talus, and a bounded debris-fan
+landform analog. An explicit 1.18 rise/run limiter constrains generated outer
+grades; the protected join remains below 8 mm and the dominant cross-bank band
+energy falls from 0.432 to 0.345. Four project-owned opaque dryland meshes now
+place 3,000 ground-cover and 480 shrub instances in two morphologies each,
+outside the solver strip and with no collision or ecology/geography/hydraulic
+authority. The fixed-camera result is retained because terrain massing and
+bank breakup improve, but it still fails photoreal review: vegetation is
+stylized, terrain is not a Hance survey, water/rocks/VFX remain synthetic, and
+all six external gates remain open. The hash-locked record is
+`colorado_hance_nonperiodic_canyon_dryland_ecology_v3_review.json`.
+
 The August 1 Upper Huacas integration supersedes Pacuare's broad,
 scale-mismatched DEM candidate as the active runnable map. `L_UpperHuacas` now
 owns a physical 600×78 m, 1009×1009 Landscape derived from the committed C3

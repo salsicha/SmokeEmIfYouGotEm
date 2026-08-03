@@ -12,8 +12,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8553565740585,
       "conditioned_visual_bed_elevation_m": 949.6241455078125,
-      "conditioned_visual_surface_normalized": 0.0985963766792776,
-      "conditioned_visual_bed_normalized": 0.0624233022028229
+      "conditioned_visual_surface_normalized": 0.09897618732764131,
+      "conditioned_visual_bed_normalized": 0.06266376778260561
     },
     {
       "station_m": 2.0,
@@ -23,8 +23,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8497756719589,
       "conditioned_visual_bed_elevation_m": 949.6084594726562,
-      "conditioned_visual_surface_normalized": 0.09853389905613381,
-      "conditioned_visual_bed_normalized": 0.06224769865780083
+      "conditioned_visual_surface_normalized": 0.09891346902966389,
+      "conditioned_visual_bed_normalized": 0.06248748778172852
     },
     {
       "station_m": 4.0,
@@ -34,8 +34,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8409336805344,
       "conditioned_visual_bed_elevation_m": 949.5931396484375,
-      "conditioned_visual_surface_normalized": 0.09843491387449033,
-      "conditioned_visual_bed_normalized": 0.06207619480643688
+      "conditioned_visual_surface_normalized": 0.09881410253962668,
+      "conditioned_visual_bed_normalized": 0.06231532326725322
     },
     {
       "station_m": 6.0,
@@ -45,8 +45,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8324778079987,
       "conditioned_visual_bed_elevation_m": 949.5784301757812,
-      "conditioned_visual_surface_normalized": 0.09834025125396618,
-      "conditioned_visual_bed_normalized": 0.06191152377783642
+      "conditioned_visual_surface_normalized": 0.0987190752619773,
+      "conditioned_visual_bed_normalized": 0.06215001789678092
     },
     {
       "station_m": 8.0,
@@ -56,8 +56,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8238598108292,
       "conditioned_visual_bed_elevation_m": 949.5648803710938,
-      "conditioned_visual_surface_normalized": 0.09824377366489546,
-      "conditioned_visual_bed_normalized": 0.06175983511248662
+      "conditioned_visual_surface_normalized": 0.09862222602420213,
+      "conditioned_visual_bed_normalized": 0.06199774489991433
     },
     {
       "station_m": 10.0,
@@ -67,8 +67,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8150918483734,
       "conditioned_visual_bed_elevation_m": 949.552734375,
-      "conditioned_visual_surface_normalized": 0.0981456172299192,
-      "conditioned_visual_bed_normalized": 0.06162386193949289
+      "conditioned_visual_surface_normalized": 0.0985236914733106,
+      "conditioned_visual_bed_normalized": 0.06186124793425463
     },
     {
       "station_m": 12.0,
@@ -78,8 +78,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.8061224222183,
       "conditioned_visual_bed_elevation_m": 949.5424194335938,
-      "conditioned_visual_surface_normalized": 0.0980452054296167,
-      "conditioned_visual_bed_normalized": 0.061508387234789665
+      "conditioned_visual_surface_normalized": 0.09842289286902746,
+      "conditioned_visual_bed_normalized": 0.061745328400603934
     },
     {
       "station_m": 14.0,
@@ -89,8 +89,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7969073057175,
       "conditioned_visual_bed_elevation_m": 949.5341796875,
-      "conditioned_visual_surface_normalized": 0.09794204315124475,
-      "conditioned_visual_bed_normalized": 0.06141614412748236
+      "conditioned_visual_surface_normalized": 0.0983193331913478,
+      "conditioned_visual_bed_normalized": 0.06165272995656344
     },
     {
       "station_m": 16.0,
@@ -100,8 +100,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7874442338943,
       "conditioned_visual_bed_elevation_m": 949.528076171875,
-      "conditioned_visual_surface_normalized": 0.09783610503862511,
-      "conditioned_visual_bed_normalized": 0.061347815899847315
+      "conditioned_visual_surface_normalized": 0.09821298698641691,
+      "conditioned_visual_bed_normalized": 0.061584138516533445
     },
     {
       "station_m": 18.0,
@@ -111,8 +111,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7777944803238,
       "conditioned_visual_bed_elevation_m": 949.5238647460938,
-      "conditioned_visual_surface_normalized": 0.09772807704310554,
-      "conditioned_visual_bed_normalized": 0.06130066942277913
+      "conditioned_visual_surface_normalized": 0.09810454284798822,
+      "conditioned_visual_bed_normalized": 0.061536810422912744
     },
     {
       "station_m": 20.0,
@@ -122,8 +122,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7678521871567,
       "conditioned_visual_bed_elevation_m": 949.520751953125,
-      "conditioned_visual_surface_normalized": 0.09761677409698802,
-      "conditioned_visual_bed_normalized": 0.06126582202668526
+      "conditioned_visual_surface_normalized": 0.09799281114327374,
+      "conditioned_visual_bed_normalized": 0.06150182878849744
     },
     {
       "station_m": 22.0,
@@ -133,8 +133,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7579095363617,
       "conditioned_visual_bed_elevation_m": 949.5178833007812,
-      "conditioned_visual_surface_normalized": 0.0975054671472634,
-      "conditioned_visual_bed_normalized": 0.06123370775969679
+      "conditioned_visual_surface_normalized": 0.09788107541952956,
+      "conditioned_visual_bed_normalized": 0.06146959081168334
     },
     {
       "station_m": 24.0,
@@ -144,8 +144,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7479944229126,
       "conditioned_visual_bed_elevation_m": 949.5140991210938,
-      "conditioned_visual_surface_normalized": 0.09739446847528453,
-      "conditioned_visual_bed_normalized": 0.06119134425856306
+      "conditioned_visual_surface_normalized": 0.09776964916107145,
+      "conditioned_visual_bed_normalized": 0.06142706411886475
     },
     {
       "station_m": 26.0,
@@ -155,8 +155,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7383146286011,
       "conditioned_visual_bed_elevation_m": 949.5084228515625,
-      "conditioned_visual_surface_normalized": 0.09728610417676958,
-      "conditioned_visual_bed_normalized": 0.06112779900686247
+      "conditioned_visual_surface_normalized": 0.09766086742414888,
+      "conditioned_visual_bed_normalized": 0.06136327407963685
     },
     {
       "station_m": 28.0,
@@ -166,8 +166,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.728905916214,
       "conditioned_visual_bed_elevation_m": 949.4999389648438,
-      "conditioned_visual_surface_normalized": 0.09718077461242733,
-      "conditioned_visual_bed_normalized": 0.06103282277044976
+      "conditioned_visual_surface_normalized": 0.09755513211173075,
+      "conditioned_visual_bed_normalized": 0.06126793197799515
     },
     {
       "station_m": 30.0,
@@ -177,8 +177,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7198921442032,
       "conditioned_visual_bed_elevation_m": 949.4880981445312,
-      "conditioned_visual_surface_normalized": 0.09707986636484592,
-      "conditioned_visual_bed_normalized": 0.06090026600883778
+      "conditioned_visual_surface_normalized": 0.09745383514776615,
+      "conditioned_visual_bed_normalized": 0.06113486458433696
     },
     {
       "station_m": 32.0,
@@ -188,8 +188,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.711477637291,
       "conditioned_visual_bed_elevation_m": 949.4727172851562,
-      "conditioned_visual_surface_normalized": 0.09698566682820828,
-      "conditioned_visual_bed_normalized": 0.06072807887519747
+      "conditioned_visual_surface_normalized": 0.09735927273788417,
+      "conditioned_visual_bed_normalized": 0.06096201415546136
     },
     {
       "station_m": 34.0,
@@ -199,8 +199,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.7035782337189,
       "conditioned_visual_bed_elevation_m": 949.4545288085938,
-      "conditioned_visual_surface_normalized": 0.09689723382031304,
-      "conditioned_visual_bed_normalized": 0.06052446075684504
+      "conditioned_visual_surface_normalized": 0.09727049907043128,
+      "conditioned_visual_bed_normalized": 0.060757611664171964
     },
     {
       "station_m": 36.0,
@@ -210,8 +210,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.696021437645,
       "conditioned_visual_bed_elevation_m": 949.4344482421875,
-      "conditioned_visual_surface_normalized": 0.0968126362680081,
-      "conditioned_visual_bed_normalized": 0.060299660887925745
+      "conditioned_visual_surface_normalized": 0.0971855756334207,
+      "conditioned_visual_bed_normalized": 0.06053194582647327
     },
     {
       "station_m": 38.0,
@@ -221,8 +221,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6886795759201,
       "conditioned_visual_bed_elevation_m": 949.4136962890625,
-      "conditioned_visual_surface_normalized": 0.09673044488356304,
-      "conditioned_visual_bed_normalized": 0.0600673449139666
+      "conditioned_visual_surface_normalized": 0.09710306763325337,
+      "conditioned_visual_bed_normalized": 0.06029873493037128
     },
     {
       "station_m": 40.0,
@@ -232,8 +232,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6815330982208,
       "conditioned_visual_bed_elevation_m": 949.3935546875,
-      "conditioned_visual_surface_normalized": 0.09665044080312371,
-      "conditioned_visual_bed_normalized": 0.05984186176277096
+      "conditioned_visual_surface_normalized": 0.09702275536297293,
+      "conditioned_visual_bed_normalized": 0.060072383178272286
     },
     {
       "station_m": 42.0,
@@ -243,8 +243,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.674268245697,
       "conditioned_visual_bed_elevation_m": 949.3748168945312,
-      "conditioned_visual_surface_normalized": 0.09656911152873827,
-      "conditioned_visual_bed_normalized": 0.059632094103931374
+      "conditioned_visual_surface_normalized": 0.09694111279386534,
+      "conditioned_visual_bed_normalized": 0.05986180745738019
     },
     {
       "station_m": 44.0,
@@ -254,8 +254,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.666993021965,
       "conditioned_visual_bed_elevation_m": 949.3582763671875,
-      "conditioned_visual_surface_normalized": 0.09648766614974727,
-      "conditioned_visual_bed_normalized": 0.05944692460704041
+      "conditioned_visual_surface_normalized": 0.09685935367289678,
+      "conditioned_visual_bed_normalized": 0.0596759246548989
     },
     {
       "station_m": 46.0,
@@ -265,8 +265,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6594804525375,
       "conditioned_visual_bed_elevation_m": 949.3438110351562,
-      "conditioned_visual_surface_normalized": 0.09640356371018555,
-      "conditioned_visual_bed_normalized": 0.059284986707545353
+      "conditioned_visual_surface_normalized": 0.0967749272558911,
+      "conditioned_visual_bed_normalized": 0.0595133629420278
     },
     {
       "station_m": 48.0,
@@ -276,8 +276,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6519201993942,
       "conditioned_visual_bed_elevation_m": 949.3311157226562,
-      "conditioned_visual_surface_normalized": 0.09631892745634542,
-      "conditioned_visual_bed_normalized": 0.05914286399406447
+      "conditioned_visual_surface_normalized": 0.0966899649682602,
+      "conditioned_visual_bed_normalized": 0.0593706927467654
     },
     {
       "station_m": 50.0,
@@ -287,8 +287,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6442898511887,
       "conditioned_visual_bed_elevation_m": 949.3192138671875,
-      "conditioned_visual_surface_normalized": 0.09623350649551606,
-      "conditioned_visual_bed_normalized": 0.05900962395017613
+      "conditioned_visual_surface_normalized": 0.09660421495081019,
+      "conditioned_visual_bed_normalized": 0.059236939438706906
     },
     {
       "station_m": 52.0,
@@ -298,8 +298,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.636810541153,
       "conditioned_visual_bed_elevation_m": 949.3071899414062,
-      "conditioned_visual_surface_normalized": 0.0961497763914135,
-      "conditioned_visual_bed_normalized": 0.05887501734173509
+      "conditioned_visual_surface_normalized": 0.09652016230356562,
+      "conditioned_visual_bed_normalized": 0.05910181430184781
     },
     {
       "station_m": 54.0,
@@ -309,8 +309,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6294655799866,
       "conditioned_visual_bed_elevation_m": 949.2939453125,
-      "conditioned_visual_surface_normalized": 0.09606755030904035,
-      "conditioned_visual_bed_normalized": 0.05872674508776705
+      "conditioned_visual_surface_normalized": 0.09643761947180765,
+      "conditioned_visual_bed_normalized": 0.058952970876982716
     },
     {
       "station_m": 56.0,
@@ -320,8 +320,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.622376203537,
       "conditioned_visual_bed_elevation_m": 949.2787475585938,
-      "conditioned_visual_surface_normalized": 0.09598818547119942,
-      "conditioned_visual_bed_normalized": 0.05855660780095579
+      "conditioned_visual_surface_normalized": 0.09635794890660093,
+      "conditioned_visual_bed_normalized": 0.05878217819130802
     },
     {
       "station_m": 58.0,
@@ -331,8 +331,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6156731843948,
       "conditioned_visual_bed_elevation_m": 949.26123046875,
-      "conditioned_visual_surface_normalized": 0.0959131458635492,
-      "conditioned_visual_bed_normalized": 0.058360505787643215
+      "conditioned_visual_surface_normalized": 0.09628262023313518,
+      "conditioned_visual_bed_normalized": 0.058585320758421926
     },
     {
       "station_m": 60.0,
@@ -342,8 +342,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.6093882322311,
       "conditioned_visual_bed_elevation_m": 949.2413330078125,
-      "conditioned_visual_surface_normalized": 0.09584278647258485,
-      "conditioned_visual_bed_normalized": 0.058137755765552974
+      "conditioned_visual_surface_normalized": 0.09621198980537615,
+      "conditioned_visual_bed_normalized": 0.058361712663924134
     },
     {
       "station_m": 62.0,
@@ -353,8 +353,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.603386759758,
       "conditioned_visual_bed_elevation_m": 949.2191772460938,
-      "conditioned_visual_surface_normalized": 0.09577560060750558,
-      "conditioned_visual_bed_normalized": 0.05788972429923777
+      "conditioned_visual_surface_normalized": 0.09614454512848417,
+      "conditioned_visual_bed_normalized": 0.05811272573661524
     },
     {
       "station_m": 64.0,
@@ -364,8 +364,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5977560281754,
       "conditioned_visual_bed_elevation_m": 949.1953735351562,
-      "conditioned_visual_surface_normalized": 0.09571256514844086,
-      "conditioned_visual_bed_normalized": 0.0576232442114611
+      "conditioned_visual_surface_normalized": 0.09608126684570335,
+      "conditioned_visual_bed_normalized": 0.05784521912049825
     },
     {
       "station_m": 66.0,
@@ -375,8 +375,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5924434661865,
       "conditioned_visual_bed_elevation_m": 949.1705322265625,
-      "conditioned_visual_surface_normalized": 0.09565309156514876,
-      "conditioned_visual_bed_normalized": 0.057345148324986474
+      "conditioned_visual_surface_normalized": 0.09602156415966943,
+      "conditioned_visual_bed_normalized": 0.057566051959576155
     },
     {
       "station_m": 68.0,
@@ -386,8 +386,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5872648954391,
       "conditioned_visual_bed_elevation_m": 949.1451416015625,
-      "conditioned_visual_surface_normalized": 0.09559511799997895,
-      "conditioned_visual_bed_normalized": 0.05706090289802469
+      "conditioned_visual_surface_normalized": 0.09596336727009243,
+      "conditioned_visual_bed_normalized": 0.05728071156905137
     },
     {
       "station_m": 70.0,
@@ -397,8 +397,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5822546482086,
       "conditioned_visual_bed_elevation_m": 949.1198120117188,
-      "conditioned_visual_surface_normalized": 0.0955390287992119,
-      "conditioned_visual_bed_normalized": 0.05677734075333926
+      "conditioned_visual_surface_normalized": 0.09590706200382249,
+      "conditioned_visual_bed_normalized": 0.05699605709292687
     },
     {
       "station_m": 72.0,
@@ -408,8 +408,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5773409605026,
       "conditioned_visual_bed_elevation_m": 949.0949096679688,
-      "conditioned_visual_surface_normalized": 0.0954840205723586,
-      "conditioned_visual_bed_normalized": 0.05649856158458829
+      "conditioned_visual_surface_normalized": 0.09585184187556865,
+      "conditioned_visual_bed_normalized": 0.05671620401760448
     },
     {
       "station_m": 74.0,
@@ -419,8 +419,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5725220441818,
       "conditioned_visual_bed_elevation_m": 949.0707397460938,
-      "conditioned_visual_surface_normalized": 0.09543007330138362,
-      "conditioned_visual_bed_normalized": 0.05622798180315351
+      "conditioned_visual_surface_normalized": 0.09579768679018247,
+      "conditioned_visual_bed_normalized": 0.05644458191508569
     },
     {
       "station_m": 76.0,
@@ -430,8 +430,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5676656961441,
       "conditioned_visual_bed_elevation_m": 949.04736328125,
-      "conditioned_visual_surface_normalized": 0.0953757069862001,
-      "conditioned_visual_bed_normalized": 0.0559662846913113
+      "conditioned_visual_surface_normalized": 0.09574311104635547,
+      "conditioned_visual_bed_normalized": 0.056181876699770796
     },
     {
       "station_m": 78.0,
@@ -441,8 +441,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5629307031631,
       "conditioned_visual_bed_elevation_m": 949.0250244140625,
-      "conditioned_visual_surface_normalized": 0.0953226992283551,
-      "conditioned_visual_bed_normalized": 0.05571620337816704
+      "conditioned_visual_surface_normalized": 0.09568989909326969,
+      "conditioned_visual_bed_normalized": 0.055930832029261
     },
     {
       "station_m": 80.0,
@@ -452,8 +452,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.558140873909,
       "conditioned_visual_bed_elevation_m": 949.0035400390625,
-      "conditioned_visual_surface_normalized": 0.09526907758408994,
-      "conditioned_visual_bed_normalized": 0.055475688016891685
+      "conditioned_visual_surface_normalized": 0.0956360708889649,
+      "conditioned_visual_bed_normalized": 0.05568939016035541
     },
     {
       "station_m": 82.0,
@@ -463,8 +463,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5534183979034,
       "conditioned_visual_bed_elevation_m": 948.9829711914062,
-      "conditioned_visual_surface_normalized": 0.09521620995249302,
-      "conditioned_visual_bed_normalized": 0.055245421889761594
+      "conditioned_visual_surface_normalized": 0.09558299960191825,
+      "conditioned_visual_bed_normalized": 0.055458237007454315
     },
     {
       "station_m": 84.0,
@@ -474,8 +474,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5487232208252,
       "conditioned_visual_bed_elevation_m": 948.9631958007812,
-      "conditioned_visual_surface_normalized": 0.09516364792957048,
-      "conditioned_visual_bed_normalized": 0.05502403843222405
+      "conditioned_visual_surface_normalized": 0.09553023510080455,
+      "conditioned_visual_bed_normalized": 0.05523600074175712
     },
     {
       "station_m": 86.0,
@@ -485,8 +485,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5440300703049,
       "conditioned_visual_bed_elevation_m": 948.944091796875,
-      "conditioned_visual_surface_normalized": 0.09511110859375478,
-      "conditioned_visual_bed_normalized": 0.05481017107972637
+      "conditioned_visual_surface_normalized": 0.09547749337419242,
+      "conditioned_visual_bed_normalized": 0.05502130953446323
     },
     {
       "station_m": 88.0,
@@ -496,8 +496,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5393303632736,
       "conditioned_visual_bed_elevation_m": 948.925537109375,
-      "conditioned_visual_surface_normalized": 0.0950584958584758,
-      "conditioned_visual_bed_normalized": 0.05460245326771583
+      "conditioned_visual_surface_normalized": 0.09542467796536933,
+      "conditioned_visual_bed_normalized": 0.05481279155677204
     },
     {
       "station_m": 90.0,
@@ -507,8 +507,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5347498655319,
       "conditioned_visual_bed_elevation_m": 948.9075317382812,
-      "conditioned_visual_surface_normalized": 0.0950072176588928,
-      "conditioned_visual_bed_normalized": 0.05440088499619246
+      "conditioned_visual_surface_normalized": 0.09537320223310931,
+      "conditioned_visual_bed_normalized": 0.054610446808683544
     },
     {
       "station_m": 92.0,
@@ -518,8 +518,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.530158996582,
       "conditioned_visual_bed_elevation_m": 948.8898315429688,
-      "conditioned_visual_surface_normalized": 0.09495582335470427,
-      "conditioned_visual_bed_normalized": 0.05420273313605083
+      "conditioned_visual_surface_normalized": 0.09532160994898832,
+      "conditioned_visual_bed_normalized": 0.054411531632596544
     },
     {
       "station_m": 94.0,
@@ -529,8 +529,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5255863666534,
       "conditioned_visual_bed_elevation_m": 948.8723754882812,
-      "conditioned_visual_surface_normalized": 0.09490463323447722,
-      "conditioned_visual_bed_normalized": 0.054007314405014606
+      "conditioned_visual_surface_normalized": 0.09527022263538147,
+      "conditioned_visual_bed_normalized": 0.05421536011411075
     },
     {
       "station_m": 96.0,
@@ -540,8 +540,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5211033821106,
       "conditioned_visual_bed_elevation_m": 948.8551635742188,
-      "conditioned_visual_surface_normalized": 0.09485444668509356,
-      "conditioned_visual_bed_normalized": 0.05381462880308378
+      "conditioned_visual_surface_normalized": 0.09521984275855006,
+      "conditioned_visual_bed_normalized": 0.05402193225322616
     },
     {
       "station_m": 98.0,
@@ -551,8 +551,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5166486501694,
       "conditioned_visual_bed_elevation_m": 948.8380737304688,
-      "conditioned_visual_surface_normalized": 0.09480457642066985,
-      "conditioned_visual_bed_normalized": 0.053623309765705666
+      "conditioned_visual_surface_normalized": 0.0951697803850641,
+      "conditioned_visual_bed_normalized": 0.053829876221142166
     },
     {
       "station_m": 100.0,
@@ -562,8 +562,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5122742652893,
       "conditioned_visual_bed_elevation_m": 948.8211059570312,
-      "conditioned_visual_surface_normalized": 0.09475560563330525,
-      "conditioned_visual_bed_normalized": 0.05343335729288024
+      "conditioned_visual_surface_normalized": 0.09512062095358166,
+      "conditioned_visual_bed_normalized": 0.053639192017858765
     },
     {
       "station_m": 102.0,
@@ -573,8 +573,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5078957080841,
       "conditioned_visual_bed_elevation_m": 948.8041381835938,
-      "conditioned_visual_surface_normalized": 0.09470658813719128,
-      "conditioned_visual_bed_normalized": 0.053243404820054824
+      "conditioned_visual_surface_normalized": 0.09507141463341952,
+      "conditioned_visual_bed_normalized": 0.05344850781457537
     },
     {
       "station_m": 104.0,
@@ -584,8 +584,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.5035983324051,
       "conditioned_visual_bed_elevation_m": 948.7872314453125,
-      "conditioned_visual_surface_normalized": 0.09465847945988629,
-      "conditioned_visual_bed_normalized": 0.053054135629505755
+      "conditioned_visual_surface_normalized": 0.09502312063299684,
+      "conditioned_visual_bed_normalized": 0.05325850952569228
     },
     {
       "station_m": 106.0,
@@ -595,8 +595,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4993960857391,
       "conditioned_visual_bed_elevation_m": 948.7703857421875,
-      "conditioned_visual_surface_normalized": 0.0946114357420667,
-      "conditioned_visual_bed_normalized": 0.05286554972123303
+      "conditioned_visual_surface_normalized": 0.0949758956944715,
+      "conditioned_visual_bed_normalized": 0.05306919715120949
     },
     {
       "station_m": 108.0,
@@ -606,8 +606,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4952327013016,
       "conditioned_visual_bed_elevation_m": 948.7535400390625,
-      "conditioned_visual_surface_normalized": 0.09456482708288401,
-      "conditioned_visual_bed_normalized": 0.05267696381296031
+      "conditioned_visual_surface_normalized": 0.09492910749050572,
+      "conditioned_visual_bed_normalized": 0.05287988477672669
     },
     {
       "station_m": 110.0,
@@ -617,8 +617,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.491103053093,
       "conditioned_visual_bed_elevation_m": 948.7366943359375,
-      "conditioned_visual_surface_normalized": 0.09451859609730327,
-      "conditioned_visual_bed_normalized": 0.05248837790468759
+      "conditioned_visual_surface_normalized": 0.0948826984150073,
+      "conditioned_visual_bed_normalized": 0.052690572402243896
     },
     {
       "station_m": 112.0,
@@ -628,8 +628,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4870542287827,
       "conditioned_visual_bed_elevation_m": 948.7199096679688,
-      "conditioned_visual_surface_normalized": 0.09447326992692444,
-      "conditioned_visual_bed_normalized": 0.05230047527869122
+      "conditioned_visual_surface_normalized": 0.09483719764021865,
+      "conditioned_visual_bed_normalized": 0.0525019459421614
     },
     {
       "station_m": 114.0,
@@ -639,8 +639,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4830659627914,
       "conditioned_visual_bed_elevation_m": 948.7031860351562,
-      "conditioned_visual_surface_normalized": 0.09442862170067916,
-      "conditioned_visual_bed_normalized": 0.0521132559349712
+      "conditioned_visual_surface_normalized": 0.09479237742112405,
+      "conditioned_visual_bed_normalized": 0.05231400539647921
     },
     {
       "station_m": 116.0,
@@ -650,8 +650,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4791141748428,
       "conditioned_visual_bed_elevation_m": 948.6865234375,
-      "conditioned_visual_surface_normalized": 0.09438438184235687,
-      "conditioned_visual_bed_normalized": 0.05192671987352754
+      "conditioned_visual_surface_normalized": 0.09474796714305775,
+      "conditioned_visual_bed_normalized": 0.052126750765197315
     },
     {
       "station_m": 118.0,
@@ -661,8 +661,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4752404689789,
       "conditioned_visual_bed_elevation_m": 948.6699829101562,
-      "conditioned_visual_surface_normalized": 0.09434101610491544,
-      "conditioned_visual_bed_normalized": 0.051741550376636566
+      "conditioned_visual_surface_normalized": 0.09470443435314027,
+      "conditioned_visual_bed_normalized": 0.05194086796271602
     },
     {
       "station_m": 120.0,
@@ -672,8 +672,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4713703393936,
       "conditioned_visual_bed_elevation_m": 948.6535034179688,
-      "conditioned_visual_surface_normalized": 0.09429769040354491,
-      "conditioned_visual_bed_normalized": 0.05155706416202195
+      "conditioned_visual_surface_normalized": 0.09466094175351969,
+      "conditioned_visual_bed_normalized": 0.051755671074635023
     },
     {
       "station_m": 122.0,
@@ -683,8 +683,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.467630982399,
       "conditioned_visual_bed_elevation_m": 948.63720703125,
-      "conditioned_visual_surface_normalized": 0.09425582868783287,
-      "conditioned_visual_bed_normalized": 0.051374627794236384
+      "conditioned_visual_surface_normalized": 0.09461891877908882,
+      "conditioned_visual_bed_normalized": 0.05157253192975493
     },
     {
       "station_m": 124.0,
@@ -694,8 +694,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4639151096344,
       "conditioned_visual_bed_elevation_m": 948.6209716796875,
-      "conditioned_visual_surface_normalized": 0.09421422987565295,
-      "conditioned_visual_bed_normalized": 0.051192874708727173
+      "conditioned_visual_surface_normalized": 0.09457715972094086,
+      "conditioned_visual_bed_normalized": 0.05139007869927513
     },
     {
       "station_m": 126.0,
@@ -705,8 +705,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4602499008179,
       "conditioned_visual_bed_elevation_m": 948.6047973632812,
-      "conditioned_visual_surface_normalized": 0.09417319824114383,
-      "conditioned_visual_bed_normalized": 0.051011804905494305
+      "conditioned_visual_surface_normalized": 0.09453597002533222,
+      "conditioned_visual_bed_normalized": 0.05120831138319564
     },
     {
       "station_m": 128.0,
@@ -716,8 +716,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4567300081253,
       "conditioned_visual_bed_elevation_m": 948.5887451171875,
-      "conditioned_visual_surface_normalized": 0.09413379340564813,
-      "conditioned_visual_bed_normalized": 0.05083210166681414
+      "conditioned_visual_surface_normalized": 0.09449641339545399,
+      "conditioned_visual_bed_normalized": 0.051027915895916744
     },
     {
       "station_m": 130.0,
@@ -727,8 +727,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4532412290573,
       "conditioned_visual_bed_elevation_m": 948.5726928710938,
-      "conditioned_visual_surface_normalized": 0.09409473688396908,
-      "conditioned_visual_bed_normalized": 0.05065239842813398
+      "conditioned_visual_surface_normalized": 0.09445720642115871,
+      "conditioned_visual_bed_normalized": 0.050847520408637846
     },
     {
       "station_m": 132.0,
@@ -738,8 +738,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.449894785881,
       "conditioned_visual_bed_elevation_m": 948.5567016601562,
-      "conditioned_visual_surface_normalized": 0.09405727379791105,
-      "conditioned_visual_bed_normalized": 0.05047337847173017
+      "conditioned_visual_surface_normalized": 0.09441959902067977,
+      "conditioned_visual_bed_normalized": 0.050667810835759254
     },
     {
       "station_m": 134.0,
@@ -749,8 +749,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4465546607971,
       "conditioned_visual_bed_elevation_m": 948.5406494140625,
-      "conditioned_visual_surface_normalized": 0.09401988144224492,
-      "conditioned_visual_bed_normalized": 0.05029367523305
+      "conditioned_visual_surface_normalized": 0.09438206262305866,
+      "conditioned_visual_bed_normalized": 0.050487415348480356
     },
     {
       "station_m": 136.0,
@@ -760,8 +760,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4433810710907,
       "conditioned_visual_bed_elevation_m": 948.524658203125,
-      "conditioned_visual_surface_normalized": 0.09398435343294609,
-      "conditioned_visual_bed_normalized": 0.050114655276646186
+      "conditioned_visual_surface_normalized": 0.09434639775359618,
+      "conditioned_visual_bed_normalized": 0.050307705775601765
     },
     {
       "station_m": 138.0,
@@ -771,8 +771,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4402966499329,
       "conditioned_visual_bed_elevation_m": 948.5086669921875,
-      "conditioned_visual_surface_normalized": 0.09394982365634787,
-      "conditioned_visual_bed_normalized": 0.04993563532024237
+      "conditioned_visual_surface_normalized": 0.09431173496220291,
+      "conditioned_visual_bed_normalized": 0.050127996202723166
     },
     {
       "station_m": 140.0,
@@ -782,8 +782,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4372538328171,
       "conditioned_visual_bed_elevation_m": 948.49267578125,
-      "conditioned_visual_surface_normalized": 0.09391575963270754,
-      "conditioned_visual_bed_normalized": 0.04975661536383856
+      "conditioned_visual_surface_normalized": 0.09427753971793014,
+      "conditioned_visual_bed_normalized": 0.049948286629844574
     },
     {
       "station_m": 142.0,
@@ -793,8 +793,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4335519075394,
       "conditioned_visual_bed_elevation_m": 948.4766845703125,
-      "conditioned_visual_surface_normalized": 0.09387431696120405,
-      "conditioned_visual_bed_normalized": 0.04957759540743475
+      "conditioned_visual_surface_normalized": 0.09423593740194007,
+      "conditioned_visual_bed_normalized": 0.04976857705696598
     },
     {
       "station_m": 144.0,
@@ -804,8 +804,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.4269046783447,
       "conditioned_visual_bed_elevation_m": 948.460693359375,
-      "conditioned_visual_surface_normalized": 0.09379990191625956,
-      "conditioned_visual_bed_normalized": 0.049398575451030935
+      "conditioned_visual_surface_normalized": 0.09416123569710583,
+      "conditioned_visual_bed_normalized": 0.04958886748408738
     },
     {
       "station_m": 146.0,
@@ -815,8 +815,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.3789631128311,
       "conditioned_visual_bed_elevation_m": 948.5741577148438,
-      "conditioned_visual_surface_normalized": 0.09326320103715034,
-      "conditioned_visual_bed_normalized": 0.05066879720276639
+      "conditioned_visual_surface_normalized": 0.09362246735146552,
+      "conditioned_visual_bed_normalized": 0.050863982354245045
     },
     {
       "station_m": 148.0,
@@ -826,8 +826,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.2916672229767,
       "conditioned_visual_bed_elevation_m": 949.2352905273438,
-      "conditioned_visual_surface_normalized": 0.09228593255779305,
-      "conditioned_visual_bed_normalized": 0.05807011082019428
+      "conditioned_visual_surface_normalized": 0.09264143426140678,
+      "conditioned_visual_bed_normalized": 0.058293807138294435
     },
     {
       "station_m": 150.0,
@@ -837,8 +837,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.3086568117142,
       "conditioned_visual_bed_elevation_m": 949.657470703125,
-      "conditioned_visual_surface_normalized": 0.09247612925065084,
-      "conditioned_visual_bed_normalized": 0.06279637432571022
+      "conditioned_visual_surface_normalized": 0.09283236362550122,
+      "conditioned_visual_bed_normalized": 0.0630382770451694
     },
     {
       "station_m": 152.0,
@@ -848,8 +848,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.3015801906586,
       "conditioned_visual_bed_elevation_m": 949.6414794921875,
-      "conditioned_visual_surface_normalized": 0.09239690720812938,
-      "conditioned_visual_bed_normalized": 0.06261735436930642
+      "conditioned_visual_surface_normalized": 0.09275283640568675,
+      "conditioned_visual_bed_normalized": 0.06285856747229081
     },
     {
       "station_m": 154.0,
@@ -859,8 +859,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.2919474840164,
       "conditioned_visual_bed_elevation_m": 949.62548828125,
-      "conditioned_visual_surface_normalized": 0.09228907005121434,
-      "conditioned_visual_bed_normalized": 0.062438334412902606
+      "conditioned_visual_surface_normalized": 0.0926445838410066,
+      "conditioned_visual_bed_normalized": 0.06267885789941222
     },
     {
       "station_m": 156.0,
@@ -870,8 +870,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.2793310880661,
       "conditioned_visual_bed_elevation_m": 949.6094360351562,
-      "conditioned_visual_surface_normalized": 0.0921478308003642,
-      "conditioned_visual_bed_normalized": 0.062258631174222444
+      "conditioned_visual_surface_normalized": 0.09250280051162897,
+      "conditioned_visual_bed_normalized": 0.06249846241213332
     },
     {
       "station_m": 158.0,
@@ -881,8 +881,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.2653788328171,
       "conditioned_visual_bed_elevation_m": 949.5934448242188,
-      "conditioned_visual_surface_normalized": 0.09199163674250471,
-      "conditioned_visual_bed_normalized": 0.062079611217818624
+      "conditioned_visual_surface_normalized": 0.09234600476668539,
+      "conditioned_visual_bed_normalized": 0.06231875283925472
     },
     {
       "station_m": 160.0,
@@ -892,8 +892,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.251082777977,
       "conditioned_visual_bed_elevation_m": 949.5774536132812,
-      "conditioned_visual_surface_normalized": 0.09183159388369798,
-      "conditioned_visual_bed_normalized": 0.06190059126141481
+      "conditioned_visual_surface_normalized": 0.09218534539453388,
+      "conditioned_visual_bed_normalized": 0.06213904326637613
     },
     {
       "station_m": 162.0,
@@ -903,8 +903,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.234099149704,
       "conditioned_visual_bed_elevation_m": 949.5614624023438,
-      "conditioned_visual_surface_normalized": 0.091641463917625,
-      "conditioned_visual_bed_normalized": 0.061721571305011
+      "conditioned_visual_surface_normalized": 0.09199448301426759,
+      "conditioned_visual_bed_normalized": 0.06195933369349753
     },
     {
       "station_m": 164.0,
@@ -914,8 +914,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.2149713039398,
       "conditioned_visual_bed_elevation_m": 949.5454711914062,
-      "conditioned_visual_surface_normalized": 0.09142732965798811,
-      "conditioned_visual_bed_normalized": 0.061542551348607186
+      "conditioned_visual_surface_normalized": 0.09177952387166108,
+      "conditioned_visual_bed_normalized": 0.06177962412061894
     },
     {
       "station_m": 166.0,
@@ -925,8 +925,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.2005219459534,
       "conditioned_visual_bed_elevation_m": 949.5294799804688,
-      "conditioned_visual_surface_normalized": 0.09126557058627632,
-      "conditioned_visual_bed_normalized": 0.06136353139220337
+      "conditioned_visual_surface_normalized": 0.09161714167544945,
+      "conditioned_visual_bed_normalized": 0.061599914547740345
     },
     {
       "station_m": 168.0,
@@ -936,8 +936,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.1893957853317,
       "conditioned_visual_bed_elevation_m": 949.5134887695312,
-      "conditioned_visual_surface_normalized": 0.09114101436616184,
-      "conditioned_visual_bed_normalized": 0.06118451143579956
+      "conditioned_visual_surface_normalized": 0.09149210564278694,
+      "conditioned_visual_bed_normalized": 0.061420204974861746
     },
     {
       "station_m": 170.0,
@@ -947,8 +947,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.17724776268,
       "conditioned_visual_bed_elevation_m": 949.4974365234375,
-      "conditioned_visual_surface_normalized": 0.09100501850606127,
-      "conditioned_visual_bed_normalized": 0.0610048081971194
+      "conditioned_visual_surface_normalized": 0.09135558590262567,
+      "conditioned_visual_bed_normalized": 0.06123980948758285
     },
     {
       "station_m": 172.0,
@@ -958,8 +958,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.1631520986557,
       "conditioned_visual_bed_elevation_m": 949.4814453125,
-      "conditioned_visual_surface_normalized": 0.0908472190017595,
-      "conditioned_visual_bed_normalized": 0.060825788240715585
+      "conditioned_visual_surface_normalized": 0.09119717852677671,
+      "conditioned_visual_bed_normalized": 0.061060099914704256
     },
     {
       "station_m": 174.0,
@@ -969,8 +969,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.1465607881546,
       "conditioned_visual_bed_elevation_m": 949.4654541015625,
-      "conditioned_visual_surface_normalized": 0.09066148099266204,
-      "conditioned_visual_bed_normalized": 0.060646768284311765
+      "conditioned_visual_surface_normalized": 0.09101072502207953,
+      "conditioned_visual_bed_normalized": 0.060880390341825665
     },
     {
       "station_m": 176.0,
@@ -980,8 +980,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.1198341846466,
       "conditioned_visual_bed_elevation_m": 949.449462890625,
-      "conditioned_visual_surface_normalized": 0.09036227942415523,
-      "conditioned_visual_bed_normalized": 0.06046774832790795
+      "conditioned_visual_surface_normalized": 0.09071037087631224,
+      "conditioned_visual_bed_normalized": 0.060700680768947066
     },
     {
       "station_m": 178.0,
@@ -991,8 +991,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.1019517183304,
       "conditioned_visual_bed_elevation_m": 949.4334716796875,
-      "conditioned_visual_surface_normalized": 0.09016208705893441,
-      "conditioned_visual_bed_normalized": 0.06028872837150414
+      "conditioned_visual_surface_normalized": 0.09050940733476029,
+      "conditioned_visual_bed_normalized": 0.060520971196068474
     },
     {
       "station_m": 180.0,
@@ -1002,8 +1002,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.0843327045441,
       "conditioned_visual_bed_elevation_m": 949.41748046875,
-      "conditioned_visual_surface_normalized": 0.08996484401760177,
-      "conditioned_visual_bed_normalized": 0.06010970841510033
+      "conditioned_visual_surface_normalized": 0.09031140447841277,
+      "conditioned_visual_bed_normalized": 0.060341261623189875
     },
     {
       "station_m": 182.0,
@@ -1013,8 +1013,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.071527004242,
       "conditioned_visual_bed_elevation_m": 949.4014892578125,
-      "conditioned_visual_surface_normalized": 0.08982148552406638,
-      "conditioned_visual_bed_normalized": 0.059930688458696514
+      "conditioned_visual_surface_normalized": 0.09016749374265294,
+      "conditioned_visual_bed_normalized": 0.06016155205031128
     },
     {
       "station_m": 184.0,
@@ -1024,8 +1024,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.0671571493149,
       "conditioned_visual_bed_elevation_m": 949.3854370117188,
-      "conditioned_visual_surface_normalized": 0.08977256544905822,
-      "conditioned_visual_bed_normalized": 0.05975098522001635
+      "conditioned_visual_surface_normalized": 0.09011838521887991,
+      "conditioned_visual_bed_normalized": 0.059981156563032385
     },
     {
       "station_m": 186.0,
@@ -1035,8 +1035,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.05710542202,
       "conditioned_visual_bed_elevation_m": 949.3694458007812,
-      "conditioned_visual_surface_normalized": 0.08966003739917176,
-      "conditioned_visual_bed_normalized": 0.05957196526361254
+      "conditioned_visual_surface_normalized": 0.0900054236910805,
+      "conditioned_visual_bed_normalized": 0.05980144699015379
     },
     {
       "station_m": 188.0,
@@ -1046,8 +1046,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.0349501371384,
       "conditioned_visual_bed_elevation_m": 949.3534545898438,
-      "conditioned_visual_surface_normalized": 0.08941201127099933,
-      "conditioned_visual_bed_normalized": 0.05939294530720872
+      "conditioned_visual_surface_normalized": 0.08975644212247787,
+      "conditioned_visual_bed_normalized": 0.059621737417275195
     },
     {
       "station_m": 190.0,
@@ -1057,8 +1057,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.0194281339645,
       "conditioned_visual_bed_elevation_m": 949.3374633789062,
-      "conditioned_visual_surface_normalized": 0.08923824404709496,
-      "conditioned_visual_bed_normalized": 0.05921392535080491
+      "conditioned_visual_surface_normalized": 0.08958200551655157,
+      "conditioned_visual_bed_normalized": 0.0594420278443966
     },
     {
       "station_m": 192.0,
@@ -1068,8 +1068,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 952.0059893131256,
       "conditioned_visual_bed_elevation_m": 949.3214721679688,
-      "conditioned_visual_surface_normalized": 0.08908779783447815,
-      "conditioned_visual_bed_normalized": 0.059034905394401094
+      "conditioned_visual_surface_normalized": 0.0894309797585652,
+      "conditioned_visual_bed_normalized": 0.05926231827151801
     },
     {
       "station_m": 194.0,
@@ -1079,8 +1079,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9936740398407,
       "conditioned_visual_bed_elevation_m": 949.3054809570312,
-      "conditioned_visual_surface_normalized": 0.08894992962079609,
-      "conditioned_visual_bed_normalized": 0.05885588543799728
+      "conditioned_visual_surface_normalized": 0.08929258045218594,
+      "conditioned_visual_bed_normalized": 0.05908260869863941
     },
     {
       "station_m": 196.0,
@@ -1090,8 +1090,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9792205095291,
       "conditioned_visual_bed_elevation_m": 949.2894897460938,
-      "conditioned_visual_surface_normalized": 0.08878812384033494,
-      "conditioned_visual_bed_normalized": 0.05867686548159347
+      "conditioned_visual_surface_normalized": 0.08913015136729459,
+      "conditioned_visual_bed_normalized": 0.05890289912576082
     },
     {
       "station_m": 198.0,
@@ -1101,8 +1101,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9646785259247,
       "conditioned_visual_bed_elevation_m": 949.2734375,
-      "conditioned_visual_surface_normalized": 0.08862532783438737,
-      "conditioned_visual_bed_normalized": 0.058497162242913306
+      "conditioned_visual_surface_normalized": 0.08896672824239342,
+      "conditioned_visual_bed_normalized": 0.05872250363848192
     },
     {
       "station_m": 200.0,
@@ -1112,8 +1112,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9492720365524,
       "conditioned_visual_bed_elevation_m": 949.2574462890625,
-      "conditioned_visual_surface_normalized": 0.08845285377557241,
-      "conditioned_visual_bed_normalized": 0.05831814228650949
+      "conditioned_visual_surface_normalized": 0.08879358978305676,
+      "conditioned_visual_bed_normalized": 0.05854279406560333
     },
     {
       "station_m": 202.0,
@@ -1123,8 +1123,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9339143633842,
       "conditioned_visual_bed_elevation_m": 949.241455078125,
-      "conditioned_visual_surface_normalized": 0.08828092620912498,
-      "conditioned_visual_bed_normalized": 0.05813912233010568
+      "conditioned_visual_surface_normalized": 0.08862099992127269,
+      "conditioned_visual_bed_normalized": 0.05836308449272473
     },
     {
       "station_m": 204.0,
@@ -1134,8 +1134,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9191143512726,
       "conditioned_visual_bed_elevation_m": 949.2254638671875,
-      "conditioned_visual_surface_normalized": 0.08811524160066342,
-      "conditioned_visual_bed_normalized": 0.05796010237370186
+      "conditioned_visual_surface_normalized": 0.08845467706645073,
+      "conditioned_visual_bed_normalized": 0.05818337491984614
     },
     {
       "station_m": 206.0,
@@ -1145,8 +1145,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.9039069414139,
       "conditioned_visual_bed_elevation_m": 949.20947265625,
-      "conditioned_visual_surface_normalized": 0.08794499621646078,
-      "conditioned_visual_bed_normalized": 0.05778108241729805
+      "conditioned_visual_surface_normalized": 0.08828377586697443,
+      "conditioned_visual_bed_normalized": 0.05800366534696754
     },
     {
       "station_m": 208.0,
@@ -1156,8 +1156,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.8812320232391,
       "conditioned_visual_bed_elevation_m": 949.1934814453125,
-      "conditioned_visual_surface_normalized": 0.08769115284718951,
-      "conditioned_visual_bed_normalized": 0.057602062460894235
+      "conditioned_visual_surface_normalized": 0.08802895464823329,
+      "conditioned_visual_bed_normalized": 0.05782395577408895
     },
     {
       "station_m": 210.0,
@@ -1167,8 +1167,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.8610119819641,
       "conditioned_visual_bed_elevation_m": 949.177490234375,
-      "conditioned_visual_surface_normalized": 0.0874647915715059,
-      "conditioned_visual_bed_normalized": 0.05742304250449042
+      "conditioned_visual_surface_normalized": 0.08780172138895578,
+      "conditioned_visual_bed_normalized": 0.05764424620121036
     },
     {
       "station_m": 212.0,
@@ -1178,8 +1178,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.843877196312,
       "conditioned_visual_bed_elevation_m": 949.1614379882812,
-      "conditioned_visual_surface_normalized": 0.08727296941417038,
-      "conditioned_visual_bed_normalized": 0.05724333926581026
+      "conditioned_visual_surface_normalized": 0.08760916029880751,
+      "conditioned_visual_bed_normalized": 0.05746385071393146
     },
     {
       "station_m": 214.0,
@@ -1189,8 +1189,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.8318059444427,
       "conditioned_visual_bed_elevation_m": 949.1454467773438,
-      "conditioned_visual_surface_normalized": 0.08713783299505803,
-      "conditioned_visual_bed_normalized": 0.05706431930940645
+      "conditioned_visual_surface_normalized": 0.08747350331035288,
+      "conditioned_visual_bed_normalized": 0.05728414114105287
     },
     {
       "station_m": 216.0,
@@ -1200,8 +1200,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.8214595317841,
       "conditioned_visual_bed_elevation_m": 949.1294555664062,
-      "conditioned_visual_surface_normalized": 0.08702200597293107,
-      "conditioned_visual_bed_normalized": 0.056885299353002634
+      "conditioned_visual_surface_normalized": 0.08735723010208953,
+      "conditioned_visual_bed_normalized": 0.05710443156817427
     },
     {
       "station_m": 218.0,
@@ -1211,8 +1211,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.8174782991409,
       "conditioned_visual_bed_elevation_m": 949.1134643554688,
-      "conditioned_visual_surface_normalized": 0.08697743648429186,
-      "conditioned_visual_bed_normalized": 0.05670627939659882
+      "conditioned_visual_surface_normalized": 0.08731248892391213,
+      "conditioned_visual_bed_normalized": 0.05692472199529568
     },
     {
       "station_m": 220.0,
@@ -1222,8 +1222,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.8019332885742,
       "conditioned_visual_bed_elevation_m": 949.0974731445312,
-      "conditioned_visual_surface_normalized": 0.08680341169499817,
-      "conditioned_visual_bed_normalized": 0.056527259440195
+      "conditioned_visual_surface_normalized": 0.08713779376040917,
+      "conditioned_visual_bed_normalized": 0.05674501242241708
     },
     {
       "station_m": 222.0,
@@ -1233,8 +1233,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.7853506207466,
       "conditioned_visual_bed_elevation_m": 949.0814819335938,
-      "conditioned_visual_surface_normalized": 0.08661777043973866,
-      "conditioned_visual_bed_normalized": 0.05634823948379119
+      "conditioned_visual_surface_normalized": 0.08695143738226283,
+      "conditioned_visual_bed_normalized": 0.056565302849538486
     },
     {
       "station_m": 224.0,
@@ -1244,8 +1244,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.7690758109093,
       "conditioned_visual_bed_elevation_m": 949.0654907226562,
-      "conditioned_visual_surface_normalized": 0.08643557562291407,
-      "conditioned_visual_bed_normalized": 0.056169219527387376
+      "conditioned_visual_surface_normalized": 0.08676854071884066,
+      "conditioned_visual_bed_normalized": 0.05638559327665989
     },
     {
       "station_m": 226.0,
@@ -1255,8 +1255,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.7542026638985,
       "conditioned_visual_bed_elevation_m": 949.0494384765625,
-      "conditioned_visual_surface_normalized": 0.08626907227680301,
-      "conditioned_visual_bed_normalized": 0.055989516288707214
+      "conditioned_visual_surface_normalized": 0.08660139597244725,
+      "conditioned_visual_bed_normalized": 0.056205197789380996
     },
     {
       "station_m": 228.0,
@@ -1266,8 +1266,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.7402503490448,
       "conditioned_visual_bed_elevation_m": 949.033447265625,
-      "conditioned_visual_surface_normalized": 0.08611287755167568,
-      "conditioned_visual_bed_normalized": 0.0558104963323034
+      "conditioned_visual_surface_normalized": 0.08644459955766538,
+      "conditioned_visual_bed_normalized": 0.0560254882165024
     },
     {
       "station_m": 230.0,
@@ -1277,8 +1277,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.7273136377335,
       "conditioned_visual_bed_elevation_m": 949.0174560546875,
-      "conditioned_visual_surface_normalized": 0.0859680524034104,
-      "conditioned_visual_bed_normalized": 0.05563147637589959
+      "conditioned_visual_surface_normalized": 0.08629921651736273,
+      "conditioned_visual_bed_normalized": 0.055845778643623806
     },
     {
       "station_m": 232.0,
@@ -1288,8 +1288,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.7150163650513,
       "conditioned_visual_bed_elevation_m": 949.00146484375,
-      "conditioned_visual_surface_normalized": 0.08583038570461844,
-      "conditioned_visual_bed_normalized": 0.055452456419495776
+      "conditioned_visual_surface_normalized": 0.08616101950214448,
+      "conditioned_visual_bed_normalized": 0.055666069070745214
     },
     {
       "station_m": 234.0,
@@ -1299,8 +1299,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.702401638031,
       "conditioned_visual_bed_elevation_m": 948.9854736328125,
-      "conditioned_visual_surface_normalized": 0.08568916513726804,
-      "conditioned_visual_bed_normalized": 0.05527343646309196
+      "conditioned_visual_surface_normalized": 0.08601925492823874,
+      "conditioned_visual_bed_normalized": 0.055486359497866615
     },
     {
       "station_m": 236.0,
@@ -1310,8 +1310,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6900024414062,
       "conditioned_visual_bed_elevation_m": 948.969482421875,
-      "conditioned_visual_surface_normalized": 0.08555035741045601,
-      "conditioned_visual_bed_normalized": 0.05509441650668814
+      "conditioned_visual_surface_normalized": 0.08587991248955905,
+      "conditioned_visual_bed_normalized": 0.05530664992498802
     },
     {
       "station_m": 238.0,
@@ -1321,8 +1321,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6772539615631,
       "conditioned_visual_bed_elevation_m": 948.9534912109375,
-      "conditioned_visual_surface_normalized": 0.08540763949405471,
-      "conditioned_visual_bed_normalized": 0.05491539655028433
+      "conditioned_visual_surface_normalized": 0.08573664479854952,
+      "conditioned_visual_bed_normalized": 0.055126940352109424
     },
     {
       "station_m": 240.0,
@@ -1332,8 +1332,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6643269062042,
       "conditioned_visual_bed_elevation_m": 948.9374389648438,
-      "conditioned_visual_surface_normalized": 0.0852629224431808,
-      "conditioned_visual_bed_normalized": 0.05473569331160417
+      "conditioned_visual_surface_normalized": 0.08559137027204848,
+      "conditioned_visual_bed_normalized": 0.054946544864830534
     },
     {
       "station_m": 242.0,
@@ -1343,8 +1343,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6437793970108,
       "conditioned_visual_bed_elevation_m": 948.9214477539062,
-      "conditioned_visual_surface_normalized": 0.08503289519794029,
-      "conditioned_visual_bed_normalized": 0.054556673355200355
+      "conditioned_visual_surface_normalized": 0.08536045692125219,
+      "conditioned_visual_bed_normalized": 0.054766835291951935
     },
     {
       "station_m": 244.0,
@@ -1354,8 +1354,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6287298202515,
       "conditioned_visual_bed_elevation_m": 948.9054565429688,
-      "conditioned_visual_surface_normalized": 0.08486441673899915,
-      "conditioned_visual_bed_normalized": 0.05437765339879654
+      "conditioned_visual_surface_normalized": 0.0851913294535454,
+      "conditioned_visual_bed_normalized": 0.05458712571907334
     },
     {
       "station_m": 246.0,
@@ -1365,8 +1365,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6156748533249,
       "conditioned_visual_bed_elevation_m": 948.8894653320312,
-      "conditioned_visual_surface_normalized": 0.08471826773132345,
-      "conditioned_visual_bed_normalized": 0.05419863344239273
+      "conditioned_visual_surface_normalized": 0.08504461745409217,
+      "conditioned_visual_bed_normalized": 0.054407416146194744
     },
     {
       "station_m": 248.0,
@@ -1376,8 +1376,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.6072789430618,
       "conditioned_visual_bed_elevation_m": 948.8734741210938,
-      "conditioned_visual_surface_normalized": 0.08462427638225438,
-      "conditioned_visual_bed_normalized": 0.05401961348598892
+      "conditioned_visual_surface_normalized": 0.08495026403375404,
+      "conditioned_visual_bed_normalized": 0.05422770657331615
     },
     {
       "station_m": 250.0,
@@ -1387,8 +1387,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.5762269496918,
       "conditioned_visual_bed_elevation_m": 948.8574829101562,
-      "conditioned_visual_surface_normalized": 0.08427665252055401,
-      "conditioned_visual_bed_normalized": 0.053840593529585104
+      "conditioned_visual_surface_normalized": 0.08460130106357173,
+      "conditioned_visual_bed_normalized": 0.05404799700043756
     },
     {
       "station_m": 252.0,
@@ -1398,8 +1398,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.5251109600067,
       "conditioned_visual_bed_elevation_m": 949.1126098632812,
-      "conditioned_visual_surface_normalized": 0.08370441429039609,
-      "conditioned_visual_bed_normalized": 0.056696713444729915
+      "conditioned_visual_surface_normalized": 0.084026858470733,
+      "conditioned_visual_bed_normalized": 0.05691511919369147
     },
     {
       "station_m": 254.0,
@@ -1409,8 +1409,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.5079777240753,
       "conditioned_visual_bed_elevation_m": 949.2216491699219,
-      "conditioned_visual_surface_normalized": 0.08351260948202462,
-      "conditioned_visual_bed_normalized": 0.05791739723142996
+      "conditioned_visual_surface_normalized": 0.08383431479638004,
+      "conditioned_visual_bed_normalized": 0.05814050526982739
     },
     {
       "station_m": 256.0,
@@ -1420,8 +1420,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.501366019249,
       "conditioned_visual_bed_elevation_m": 949.1043090820312,
-      "conditioned_visual_surface_normalized": 0.08343859212871754,
-      "conditioned_visual_bed_normalized": 0.05660378705514625
+      "conditioned_visual_surface_normalized": 0.08376001231516161,
+      "conditioned_visual_bed_normalized": 0.056821834835250676
     },
     {
       "station_m": 258.0,
@@ -1431,8 +1431,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4953840374947,
       "conditioned_visual_bed_elevation_m": 949.0695495605469,
-      "conditioned_visual_surface_normalized": 0.08337162446022457,
-      "conditioned_visual_bed_normalized": 0.05621465779876468
+      "conditioned_visual_surface_normalized": 0.08369278667538768,
+      "conditioned_visual_bed_normalized": 0.05643120658427984
     },
     {
       "station_m": 260.0,
@@ -1442,8 +1442,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4826062321663,
       "conditioned_visual_bed_elevation_m": 949.0395812988281,
-      "conditioned_visual_surface_normalized": 0.08322857824804204,
-      "conditioned_visual_bed_normalized": 0.05587916620107662
+      "conditioned_visual_surface_normalized": 0.08354918942394363,
+      "conditioned_visual_bed_normalized": 0.05609442261373255
     },
     {
       "station_m": 262.0,
@@ -1453,8 +1453,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4738805294037,
       "conditioned_visual_bed_elevation_m": 948.761474609375,
-      "conditioned_visual_surface_normalized": 0.08313089490597,
-      "conditioned_visual_bed_normalized": 0.05276579050888587
+      "conditioned_visual_surface_normalized": 0.08345112978839371,
+      "conditioned_visual_bed_normalized": 0.05296905364876569
     },
     {
       "station_m": 264.0,
@@ -1464,8 +1464,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4591579437256,
       "conditioned_visual_bed_elevation_m": 948.7454833984375,
-      "conditioned_visual_surface_normalized": 0.082966077078443,
-      "conditioned_visual_bed_normalized": 0.05258677055248206
+      "conditioned_visual_surface_normalized": 0.08328567705349947,
+      "conditioned_visual_bed_normalized": 0.05278934407588709
     },
     {
       "station_m": 266.0,
@@ -1475,8 +1475,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4532474279404,
       "conditioned_visual_bed_elevation_m": 948.7294921875,
-      "conditioned_visual_surface_normalized": 0.08289990946409977,
-      "conditioned_visual_bed_normalized": 0.052407750596078245
+      "conditioned_visual_surface_normalized": 0.08321925454982511,
+      "conditioned_visual_bed_normalized": 0.0526096345030085
     },
     {
       "station_m": 268.0,
@@ -1486,8 +1486,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4401932954788,
       "conditioned_visual_bed_elevation_m": 948.7134399414062,
-      "conditioned_visual_surface_normalized": 0.08275376979817393,
-      "conditioned_visual_bed_normalized": 0.052228047357398076
+      "conditioned_visual_surface_normalized": 0.08307255192810784,
+      "conditioned_visual_bed_normalized": 0.0524292390157296
     },
     {
       "station_m": 270.0,
@@ -1497,8 +1497,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4265015125275,
       "conditioned_visual_bed_elevation_m": 948.6974487304688,
-      "conditioned_visual_surface_normalized": 0.0826004917008102,
-      "conditioned_visual_bed_normalized": 0.05204902740099426
+      "conditioned_visual_surface_normalized": 0.0829186833764546,
+      "conditioned_visual_bed_normalized": 0.05224952944285101
     },
     {
       "station_m": 272.0,
@@ -1508,8 +1508,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.4097965955734,
       "conditioned_visual_bed_elevation_m": 948.6814575195312,
-      "conditioned_visual_surface_normalized": 0.08241348187919445,
-      "conditioned_visual_bed_normalized": 0.05187000744459045
+      "conditioned_visual_surface_normalized": 0.0827309531599928,
+      "conditioned_visual_bed_normalized": 0.05206981986997242
     },
     {
       "station_m": 274.0,
@@ -1519,8 +1519,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3770544528961,
       "conditioned_visual_bed_elevation_m": 948.6654663085938,
-      "conditioned_visual_surface_normalized": 0.08204693697039624,
-      "conditioned_visual_bed_normalized": 0.05169098748818664
+      "conditioned_visual_surface_normalized": 0.08236299625549907,
+      "conditioned_visual_bed_normalized": 0.05189011029709382
     },
     {
       "station_m": 276.0,
@@ -1530,8 +1530,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.349268078804,
       "conditioned_visual_bed_elevation_m": 948.898681640625,
-      "conditioned_visual_surface_normalized": 0.081735871379552,
-      "conditioned_visual_bed_normalized": 0.05430180906612164
+      "conditioned_visual_surface_normalized": 0.08205073238508594,
+      "conditioned_visual_bed_normalized": 0.054510989220640044
     },
     {
       "station_m": 278.0,
@@ -1541,8 +1541,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3504576683044,
       "conditioned_visual_bed_elevation_m": 948.8349609375,
-      "conditioned_visual_surface_normalized": 0.08174918871126235,
-      "conditioned_visual_bed_normalized": 0.05358846236961179
+      "conditioned_visual_surface_normalized": 0.08206410101750898,
+      "conditioned_visual_bed_normalized": 0.053794894586726864
     },
     {
       "station_m": 280.0,
@@ -1552,8 +1552,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3663010597229,
       "conditioned_visual_bed_elevation_m": 948.6434631347656,
-      "conditioned_visual_surface_normalized": 0.08192655384340314,
-      "conditioned_visual_bed_normalized": 0.0514446642275623
+      "conditioned_visual_surface_normalized": 0.08224214939144935,
+      "conditioned_visual_bed_normalized": 0.05164283815578567
     },
     {
       "station_m": 282.0,
@@ -1563,8 +1563,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3630903959274,
       "conditioned_visual_bed_elevation_m": 948.6014404296875,
-      "conditioned_visual_surface_normalized": 0.08189061079350285,
-      "conditioned_visual_bed_normalized": 0.05097422438029503
+      "conditioned_visual_surface_normalized": 0.08220606788257576,
+      "conditioned_visual_bed_normalized": 0.05117058609117914
     },
     {
       "station_m": 284.0,
@@ -1574,8 +1574,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3648209571838,
       "conditioned_visual_bed_elevation_m": 948.58544921875,
-      "conditioned_visual_surface_normalized": 0.08190998424820164,
-      "conditioned_visual_bed_normalized": 0.05079520442389122
+      "conditioned_visual_surface_normalized": 0.08222551596724208,
+      "conditioned_visual_bed_normalized": 0.050990876518300546
     },
     {
       "station_m": 286.0,
@@ -1585,8 +1585,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3597348928452,
       "conditioned_visual_bed_elevation_m": 948.5694580078125,
-      "conditioned_visual_surface_normalized": 0.08185304628273193,
-      "conditioned_visual_bed_normalized": 0.050616184467487405
+      "conditioned_visual_surface_normalized": 0.08216835866667802,
+      "conditioned_visual_bed_normalized": 0.05081116694542195
     },
     {
       "station_m": 288.0,
@@ -1596,8 +1596,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3537005186081,
       "conditioned_visual_bed_elevation_m": 948.553466796875,
-      "conditioned_visual_surface_normalized": 0.08178549208580056,
-      "conditioned_visual_bed_normalized": 0.05043716451108359
+      "conditioned_visual_surface_normalized": 0.08210054423905461,
+      "conditioned_visual_bed_normalized": 0.050631457372543355
     },
     {
       "station_m": 290.0,
@@ -1607,8 +1607,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3433047533035,
       "conditioned_visual_bed_elevation_m": 948.5374755859375,
-      "conditioned_visual_surface_normalized": 0.08166911256589546,
-      "conditioned_visual_bed_normalized": 0.05025814455467978
+      "conditioned_visual_surface_normalized": 0.08198371640469414,
+      "conditioned_visual_bed_normalized": 0.050451747799664756
     },
     {
       "station_m": 292.0,
@@ -1618,8 +1618,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3194679021835,
       "conditioned_visual_bed_elevation_m": 948.521484375,
-      "conditioned_visual_surface_normalized": 0.0814022614771953,
-      "conditioned_visual_bed_normalized": 0.050079124598275966
+      "conditioned_visual_surface_normalized": 0.08171583735849261,
+      "conditioned_visual_bed_normalized": 0.050272038226786164
     },
     {
       "station_m": 294.0,
@@ -1629,8 +1629,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.316113948822,
       "conditioned_visual_bed_elevation_m": 948.5054931640625,
-      "conditioned_visual_surface_normalized": 0.08136471431538843,
-      "conditioned_visual_bed_normalized": 0.04990010464187215
+      "conditioned_visual_surface_normalized": 0.08167814555839017,
+      "conditioned_visual_bed_normalized": 0.05009232865390757
     },
     {
       "station_m": 296.0,
@@ -1640,8 +1640,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.3080304861069,
       "conditioned_visual_bed_elevation_m": 948.4894409179688,
-      "conditioned_visual_surface_normalized": 0.08127422078437857,
-      "conditioned_visual_bed_normalized": 0.049720401403191984
+      "conditioned_visual_surface_normalized": 0.08158730343032389,
+      "conditioned_visual_bed_normalized": 0.049911933166628675
     },
     {
       "station_m": 298.0,
@@ -1651,8 +1651,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.2999165058136,
       "conditioned_visual_bed_elevation_m": 948.4734497070312,
-      "conditioned_visual_surface_normalized": 0.08118338561223054,
-      "conditioned_visual_bed_normalized": 0.04954138144678817
+      "conditioned_visual_surface_normalized": 0.08149611834505745,
+      "conditioned_visual_bed_normalized": 0.04973222359375008
     },
     {
       "station_m": 300.0,
@@ -1662,8 +1662,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.2948272228241,
       "conditioned_visual_bed_elevation_m": 948.4574584960938,
-      "conditioned_visual_surface_normalized": 0.08112641161429704,
-      "conditioned_visual_bed_normalized": 0.04936236149038436
+      "conditioned_visual_surface_normalized": 0.08143892487322618,
+      "conditioned_visual_bed_normalized": 0.049552514020871484
     },
     {
       "station_m": 302.0,
@@ -1673,8 +1673,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.2916413545609,
       "conditioned_visual_bed_elevation_m": 948.4414672851562,
-      "conditioned_visual_surface_normalized": 0.08109074614782152,
-      "conditioned_visual_bed_normalized": 0.049183341533980546
+      "conditioned_visual_surface_normalized": 0.08140312201707771,
+      "conditioned_visual_bed_normalized": 0.04937280444799289
     },
     {
       "station_m": 304.0,
@@ -1684,8 +1684,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 951.2818406820297,
       "conditioned_visual_bed_elevation_m": 948.4254760742188,
-      "conditioned_visual_surface_normalized": 0.08098102863011082,
-      "conditioned_visual_bed_normalized": 0.04900432157757673
+      "conditioned_visual_surface_normalized": 0.08129298184812017,
+      "conditioned_visual_bed_normalized": 0.04919309487511429
     },
     {
       "station_m": 306.0,
@@ -1695,8 +1695,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.9106582403183,
       "conditioned_visual_bed_elevation_m": 949.3094482421875,
-      "conditioned_visual_surface_normalized": 0.07682567949534237,
-      "conditioned_visual_bed_normalized": 0.05890029878596006
+      "conditioned_visual_surface_normalized": 0.07712162557493335,
+      "conditioned_visual_bed_normalized": 0.05912719313465891
     },
     {
       "station_m": 308.0,
@@ -1706,8 +1706,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.7741253972054,
       "conditioned_visual_bed_elevation_m": 949.29345703125,
-      "conditioned_visual_surface_normalized": 0.0752972084047353,
-      "conditioned_visual_bed_normalized": 0.058721278829556245
+      "conditioned_visual_surface_normalized": 0.07558726654386153,
+      "conditioned_visual_bed_normalized": 0.05894748356178032
     },
     {
       "station_m": 310.0,
@@ -1717,8 +1717,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2874315977097,
       "conditioned_visual_bed_elevation_m": 949.2774658203125,
-      "conditioned_visual_surface_normalized": 0.06984872153852759,
-      "conditioned_visual_bed_normalized": 0.05854225887315243
+      "conditioned_visual_surface_normalized": 0.07011779114441402,
+      "conditioned_visual_bed_normalized": 0.05876777398890172
     },
     {
       "station_m": 312.0,
@@ -1728,8 +1728,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.8564841747284,
       "conditioned_visual_bed_elevation_m": 947.0614624023438,
-      "conditioned_visual_surface_normalized": 0.07621920642097504,
-      "conditioned_visual_bed_normalized": 0.03373432926569725
+      "conditioned_visual_surface_normalized": 0.07651281625922178,
+      "conditioned_visual_bed_normalized": 0.033864279857210335
     },
     {
       "station_m": 314.0,
@@ -1739,8 +1739,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.853605389595,
       "conditioned_visual_bed_elevation_m": 947.0454711914062,
-      "conditioned_visual_surface_normalized": 0.07618697871845241,
-      "conditioned_visual_bed_normalized": 0.033555309309293437
+      "conditioned_visual_surface_normalized": 0.07648046440989982,
+      "conditioned_visual_bed_normalized": 0.033684570284331736
     },
     {
       "station_m": 316.0,
@@ -1750,8 +1750,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.8545545339584,
       "conditioned_visual_bed_elevation_m": 947.0294799804688,
-      "conditioned_visual_surface_normalized": 0.07619760429166393,
-      "conditioned_visual_bed_normalized": 0.033376289352889624
+      "conditioned_visual_surface_normalized": 0.07649113091469512,
+      "conditioned_visual_bed_normalized": 0.033504860711453144
     },
     {
       "station_m": 318.0,
@@ -1761,8 +1761,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.8549000024796,
       "conditioned_visual_bed_elevation_m": 947.0134887695312,
-      "conditioned_visual_surface_normalized": 0.07620147177611093,
-      "conditioned_visual_bed_normalized": 0.033197269396485804
+      "conditioned_visual_surface_normalized": 0.07649501329737493,
+      "conditioned_visual_bed_normalized": 0.03332515113857455
     },
     {
       "station_m": 320.0,
@@ -1772,8 +1772,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.8483389616013,
       "conditioned_visual_bed_elevation_m": 946.9974365234375,
-      "conditioned_visual_surface_normalized": 0.07612802160047466,
-      "conditioned_visual_bed_normalized": 0.03301756615780564
+      "conditioned_visual_surface_normalized": 0.07642128017869582,
+      "conditioned_visual_bed_normalized": 0.033144755651295654
     },
     {
       "station_m": 322.0,
@@ -1783,8 +1783,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.8351962566376,
       "conditioned_visual_bed_elevation_m": 946.9814453125,
-      "conditioned_visual_surface_normalized": 0.0759808903745267,
-      "conditioned_visual_bed_normalized": 0.03283854620140183
+      "conditioned_visual_surface_normalized": 0.07627358217729216,
+      "conditioned_visual_bed_normalized": 0.032965046078417055
     },
     {
       "station_m": 324.0,
@@ -1794,8 +1794,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.7953723669052,
       "conditioned_visual_bed_elevation_m": 946.9654541015625,
-      "conditioned_visual_surface_normalized": 0.07553506603817207,
-      "conditioned_visual_bed_normalized": 0.032659526244998016
+      "conditioned_visual_surface_normalized": 0.07582604044689174,
+      "conditioned_visual_bed_normalized": 0.032785336505538464
     },
     {
       "station_m": 326.0,
@@ -1805,8 +1805,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.6503434181213,
       "conditioned_visual_bed_elevation_m": 947.9141540527344,
-      "conditioned_visual_surface_normalized": 0.07391148192124347,
-      "conditioned_visual_bed_normalized": 0.04328012430745098
+      "conditioned_visual_surface_normalized": 0.0741962019973305,
+      "conditioned_visual_bed_normalized": 0.04344684698660121
     },
     {
       "station_m": 328.0,
@@ -1816,8 +1816,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.6392756700516,
       "conditioned_visual_bed_elevation_m": 948.2485961914062,
-      "conditioned_visual_surface_normalized": 0.07378757962362002,
-      "conditioned_visual_bed_normalized": 0.04702416954071318
+      "conditioned_visual_surface_normalized": 0.07407182240618392,
+      "conditioned_visual_bed_normalized": 0.04720531494304495
     },
     {
       "station_m": 330.0,
@@ -1827,8 +1827,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.6130089759827,
       "conditioned_visual_bed_elevation_m": 948.2177124023438,
-      "conditioned_visual_surface_normalized": 0.07349352669382836,
-      "conditioned_visual_bed_normalized": 0.04667842870887986
+      "conditioned_visual_surface_normalized": 0.073776636732597,
+      "conditioned_visual_bed_normalized": 0.04685824225649316
     },
     {
       "station_m": 332.0,
@@ -1838,8 +1838,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.5056282281876,
       "conditioned_visual_bed_elevation_m": 948.4983520507812,
-      "conditioned_visual_surface_normalized": 0.07229141030226671,
-      "conditioned_visual_bed_normalized": 0.04982016061553915
+      "conditioned_visual_surface_normalized": 0.0725698895764833,
+      "conditioned_visual_bed_normalized": 0.050012076669072474
     },
     {
       "station_m": 334.0,
@@ -1849,8 +1849,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.4715611934662,
       "conditioned_visual_bed_elevation_m": 948.4823608398438,
-      "conditioned_visual_surface_normalized": 0.07191003336374319,
-      "conditioned_visual_bed_normalized": 0.04964114065913534
+      "conditioned_visual_surface_normalized": 0.07218704350666744,
+      "conditioned_visual_bed_normalized": 0.049832367096193875
     },
     {
       "station_m": 336.0,
@@ -1860,8 +1860,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.4556496739388,
       "conditioned_visual_bed_elevation_m": 948.16943359375,
-      "conditioned_visual_surface_normalized": 0.07173190554445215,
-      "conditioned_visual_bed_normalized": 0.046137952428286666
+      "conditioned_visual_surface_normalized": 0.07200822950757126,
+      "conditioned_visual_bed_normalized": 0.04631568396585588
     },
     {
       "station_m": 338.0,
@@ -1871,8 +1871,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.4839985370636,
       "conditioned_visual_bed_elevation_m": 948.1534423828125,
-      "conditioned_visual_surface_normalized": 0.07204926814197794,
-      "conditioned_visual_bed_normalized": 0.04595893247188285
+      "conditioned_visual_surface_normalized": 0.07232681464184731,
+      "conditioned_visual_bed_normalized": 0.046135974392977286
     },
     {
       "station_m": 340.0,
@@ -1882,8 +1882,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.4541238546371,
       "conditioned_visual_bed_elevation_m": 948.137451171875,
-      "conditioned_visual_surface_normalized": 0.07171482415481124,
-      "conditioned_visual_bed_normalized": 0.04577991251547904
+      "conditioned_visual_surface_normalized": 0.07199108231740205,
+      "conditioned_visual_bed_normalized": 0.04595626482009869
     },
     {
       "station_m": 342.0,
@@ -1893,8 +1893,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.4264978170395,
       "conditioned_visual_bed_elevation_m": 948.1214599609375,
-      "conditioned_visual_surface_normalized": 0.07140555351447812,
-      "conditioned_visual_bed_normalized": 0.04560089255907523
+      "conditioned_visual_surface_normalized": 0.07168062031196626,
+      "conditioned_visual_bed_normalized": 0.045776555247220095
     },
     {
       "station_m": 344.0,
@@ -1904,8 +1904,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.4009354710579,
       "conditioned_visual_bed_elevation_m": 948.10546875,
-      "conditioned_visual_surface_normalized": 0.07111938568884626,
-      "conditioned_visual_bed_normalized": 0.04542187260267141
+      "conditioned_visual_surface_normalized": 0.07139335011735234,
+      "conditioned_visual_bed_normalized": 0.045596845674341496
     },
     {
       "station_m": 346.0,
@@ -1915,8 +1915,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.3743922710419,
       "conditioned_visual_bed_elevation_m": 948.0894775390625,
-      "conditioned_visual_surface_normalized": 0.07082223730350773,
-      "conditioned_visual_bed_normalized": 0.045242852646267595
+      "conditioned_visual_surface_normalized": 0.07109505706397735,
+      "conditioned_visual_bed_normalized": 0.045417136101462904
     },
     {
       "station_m": 348.0,
@@ -1926,8 +1926,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.3079676628113,
       "conditioned_visual_bed_elevation_m": 948.073486328125,
-      "conditioned_visual_surface_normalized": 0.07007862066834128,
-      "conditioned_visual_bed_normalized": 0.04506383268986378
+      "conditioned_visual_surface_normalized": 0.07034857588626027,
+      "conditioned_visual_bed_normalized": 0.045237426528584306
     },
     {
       "station_m": 350.0,
@@ -1937,8 +1937,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2541689872742,
       "conditioned_visual_bed_elevation_m": 948.0639343261719,
-      "conditioned_visual_surface_normalized": 0.06947635004688064,
-      "conditioned_visual_bed_normalized": 0.044956899013614944
+      "conditioned_visual_surface_normalized": 0.06974398521204585,
+      "conditioned_visual_bed_normalized": 0.04513008092493736
     },
     {
       "station_m": 352.0,
@@ -1948,8 +1948,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2101314663887,
       "conditioned_visual_bed_elevation_m": 948.0414428710938,
-      "conditioned_visual_surface_normalized": 0.06898335454454747,
-      "conditioned_visual_bed_normalized": 0.04470510949477981
+      "conditioned_visual_surface_normalized": 0.06924909060400831,
+      "conditioned_visual_bed_normalized": 0.044877321468426816
     },
     {
       "station_m": 354.0,
@@ -1959,8 +1959,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.1624981164932,
       "conditioned_visual_bed_elevation_m": 948.0254516601562,
-      "conditioned_visual_surface_normalized": 0.06845010410748026,
-      "conditioned_visual_bed_normalized": 0.044526089538375994
+      "conditioned_visual_surface_normalized": 0.06871378599212186,
+      "conditioned_visual_bed_normalized": 0.044697611895548224
     },
     {
       "station_m": 356.0,
@@ -1970,8 +1970,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.1134655475616,
       "conditioned_visual_bed_elevation_m": 948.0094604492188,
-      "conditioned_visual_surface_normalized": 0.06790118955768128,
-      "conditioned_visual_bed_normalized": 0.04434706958197218
+      "conditioned_visual_surface_normalized": 0.06816275692657618,
+      "conditioned_visual_bed_normalized": 0.04451790232266963
     },
     {
       "station_m": 358.0,
@@ -1981,8 +1981,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.0740344524384,
       "conditioned_visual_bed_elevation_m": 947.993408203125,
-      "conditioned_visual_surface_normalized": 0.06745976251644498,
-      "conditioned_visual_bed_normalized": 0.04416736634329201
+      "conditioned_visual_surface_normalized": 0.06771962943045114,
+      "conditioned_visual_bed_normalized": 0.044337506835390735
     },
     {
       "station_m": 360.0,
@@ -1992,8 +1992,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.0135614871979,
       "conditioned_visual_bed_elevation_m": 947.9773559570312,
-      "conditioned_visual_surface_normalized": 0.06678277391043687,
-      "conditioned_visual_bed_normalized": 0.04398766310461185
+      "conditioned_visual_surface_normalized": 0.06704003294482266,
+      "conditioned_visual_bed_normalized": 0.04415711134811184
     },
     {
       "station_m": 362.0,
@@ -2003,8 +2003,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.9530608057976,
       "conditioned_visual_bed_elevation_m": 947.9612426757812,
-      "conditioned_visual_surface_normalized": 0.06610547502487944,
-      "conditioned_visual_bed_normalized": 0.04380727658365534
+      "conditioned_visual_surface_normalized": 0.06636012498439328,
+      "conditioned_visual_bed_normalized": 0.04397602994643265
     },
     {
       "station_m": 364.0,
@@ -2014,8 +2014,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2799417972565,
       "conditioned_visual_bed_elevation_m": 947.5068969726562,
-      "conditioned_visual_surface_normalized": 0.06976487399528379,
-      "conditioned_visual_bed_normalized": 0.03872092331850271
+      "conditioned_visual_surface_normalized": 0.0700336206056319,
+      "conditioned_visual_bed_normalized": 0.03887008315059959
     },
     {
       "station_m": 366.0,
@@ -2025,8 +2025,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2725098133087,
       "conditioned_visual_bed_elevation_m": 946.8134155273438,
-      "conditioned_visual_surface_normalized": 0.06968167370185256,
-      "conditioned_visual_bed_normalized": 0.030957470094609085
+      "conditioned_visual_surface_normalized": 0.06995009980998287,
+      "conditioned_visual_bed_normalized": 0.03107672373439121
     },
     {
       "station_m": 368.0,
@@ -2036,8 +2036,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2451076507568,
       "conditioned_visual_bed_elevation_m": 946.6676025390625,
-      "conditioned_visual_surface_normalized": 0.06937490931955652,
-      "conditioned_visual_bed_normalized": 0.029325108736407902
+      "conditioned_visual_surface_normalized": 0.06964215371713256,
+      "conditioned_visual_bed_normalized": 0.02943807423207456
     },
     {
       "station_m": 370.0,
@@ -2047,8 +2047,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2327412366867,
       "conditioned_visual_bed_elevation_m": 946.6510620117188,
-      "conditioned_visual_surface_normalized": 0.06923646859006088,
-      "conditioned_visual_bed_normalized": 0.029139939239516934
+      "conditioned_visual_surface_normalized": 0.06950317968950773,
+      "conditioned_visual_bed_normalized": 0.029252191429593264
     },
     {
       "station_m": 372.0,
@@ -2058,8 +2058,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2272244691849,
       "conditioned_visual_bed_elevation_m": 946.6343994140625,
-      "conditioned_visual_surface_normalized": 0.06917470894712155,
-      "conditioned_visual_bed_normalized": 0.028953403178073264
+      "conditioned_visual_surface_normalized": 0.06944118213752123,
+      "conditioned_visual_bed_normalized": 0.02906493679831137
     },
     {
       "station_m": 374.0,
@@ -2069,8 +2069,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2228255271912,
       "conditioned_visual_bed_elevation_m": 946.61767578125,
-      "conditioned_visual_surface_normalized": 0.06912546324540356,
-      "conditioned_visual_bed_normalized": 0.028766183834353247
+      "conditioned_visual_surface_normalized": 0.0693917467326668,
+      "conditioned_visual_bed_normalized": 0.028876996252629177
     },
     {
       "station_m": 376.0,
@@ -2080,8 +2080,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2189366817474,
       "conditioned_visual_bed_elevation_m": 946.6008911132812,
-      "conditioned_visual_surface_normalized": 0.06908192802192875,
-      "conditioned_visual_bed_normalized": 0.028578281208356877
+      "conditioned_visual_surface_normalized": 0.06934804380382581,
+      "conditioned_visual_bed_normalized": 0.02868836979254668
     },
     {
       "station_m": 378.0,
@@ -2091,8 +2091,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2149716615677,
       "conditioned_visual_bed_elevation_m": 946.5841674804688,
-      "conditioned_visual_surface_normalized": 0.0690375400301442,
-      "conditioned_visual_bed_normalized": 0.028391061864636857
+      "conditioned_visual_surface_normalized": 0.06930348482166102,
+      "conditioned_visual_bed_normalized": 0.028500429246864488
     },
     {
       "station_m": 380.0,
@@ -2102,8 +2102,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2095744609833,
       "conditioned_visual_bed_elevation_m": 946.5674438476562,
-      "conditioned_visual_surface_normalized": 0.06897711892650793,
-      "conditioned_visual_bed_normalized": 0.02820384252091684
+      "conditioned_visual_surface_normalized": 0.0692428309652673,
+      "conditioned_visual_bed_normalized": 0.028312488701182293
     },
     {
       "station_m": 382.0,
@@ -2113,8 +2113,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.20516705513,
       "conditioned_visual_bed_elevation_m": 946.55078125,
-      "conditioned_visual_surface_normalized": 0.06892777847275554,
-      "conditioned_visual_bed_normalized": 0.02801730645947317
+      "conditioned_visual_surface_normalized": 0.06919330044337689,
+      "conditioned_visual_bed_normalized": 0.028125234069900397
     },
     {
       "station_m": 384.0,
@@ -2124,8 +2124,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.2003391981125,
       "conditioned_visual_bed_elevation_m": 946.5342407226562,
-      "conditioned_visual_surface_normalized": 0.06887373111160336,
-      "conditioned_visual_bed_normalized": 0.027832136962582205
+      "conditioned_visual_surface_normalized": 0.06913904488224847,
+      "conditioned_visual_bed_normalized": 0.027939351267419102
     },
     {
       "station_m": 386.0,
@@ -2135,8 +2135,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.1981822252274,
       "conditioned_visual_bed_elevation_m": 946.517822265625,
-      "conditioned_visual_surface_normalized": 0.06884958402271998,
-      "conditioned_visual_bed_normalized": 0.027648334030243936
+      "conditioned_visual_surface_normalized": 0.069114804774516,
+      "conditioned_visual_bed_normalized": 0.027754840293738408
     },
     {
       "station_m": 388.0,
@@ -2146,8 +2146,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.193470954895,
       "conditioned_visual_bed_elevation_m": 946.5015258789062,
-      "conditioned_visual_surface_normalized": 0.06879684183747849,
-      "conditioned_visual_bed_normalized": 0.027465897662458372
+      "conditioned_visual_surface_normalized": 0.06906185941706627,
+      "conditioned_visual_bed_normalized": 0.02757170114885831
     },
     {
       "station_m": 390.0,
@@ -2157,8 +2157,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.1820464134216,
       "conditioned_visual_bed_elevation_m": 946.4853515625,
-      "conditioned_visual_surface_normalized": 0.06866894527451693,
-      "conditioned_visual_bed_normalized": 0.027284827859225508
+      "conditioned_visual_surface_normalized": 0.06893347017396638,
+      "conditioned_visual_bed_normalized": 0.027389933832778816
     },
     {
       "station_m": 392.0,
@@ -2168,8 +2168,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.1490345001221,
       "conditioned_visual_bed_elevation_m": 946.46923828125,
-      "conditioned_visual_surface_normalized": 0.06829938031143867,
-      "conditioned_visual_bed_normalized": 0.027104441338268993
+      "conditioned_visual_surface_normalized": 0.06856248158141037,
+      "conditioned_visual_bed_normalized": 0.027208852431099623
     },
     {
       "station_m": 394.0,
@@ -2179,8 +2179,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.1198740005493,
       "conditioned_visual_bed_elevation_m": 946.4531860351562,
-      "conditioned_visual_surface_normalized": 0.06797293152762668,
-      "conditioned_visual_bed_normalized": 0.026924738099588827
+      "conditioned_visual_surface_normalized": 0.06823477525925456,
+      "conditioned_visual_bed_normalized": 0.02702845694382073
     },
     {
       "station_m": 396.0,
@@ -2190,8 +2190,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.0913351774216,
       "conditioned_visual_bed_elevation_m": 946.4371337890625,
-      "conditioned_visual_surface_normalized": 0.06765344234746933,
-      "conditioned_visual_bed_normalized": 0.026745034860908665
+      "conditioned_visual_surface_normalized": 0.06791405535037523,
+      "conditioned_visual_bed_normalized": 0.026848061456541835
     },
     {
       "station_m": 398.0,
@@ -2201,8 +2201,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.0464745759964,
       "conditioned_visual_bed_elevation_m": 946.421142578125,
-      "conditioned_visual_surface_normalized": 0.06715123254342314,
-      "conditioned_visual_bed_normalized": 0.026566014904504852
+      "conditioned_visual_surface_normalized": 0.06740991094550787,
+      "conditioned_visual_bed_normalized": 0.02666835188366324
     },
     {
       "station_m": 400.0,
@@ -2212,8 +2212,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 950.0068874359131,
       "conditioned_visual_bed_elevation_m": 946.4250183105469,
-      "conditioned_visual_surface_normalized": 0.06670805859496079,
-      "conditioned_visual_bed_normalized": 0.026609403329053104
+      "conditioned_visual_surface_normalized": 0.06696502981276174,
+      "conditioned_visual_bed_normalized": 0.026711907448082287
     },
     {
       "station_m": 402.0,
@@ -2223,8 +2223,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.790992975235,
       "conditioned_visual_bed_elevation_m": 947.8879089355469,
-      "conditioned_visual_surface_normalized": 0.06429114238458274,
-      "conditioned_visual_bed_normalized": 0.04298631292862029
+      "conditioned_visual_surface_normalized": 0.06453880321447877,
+      "conditioned_visual_bed_normalized": 0.043151903794472216
     },
     {
       "station_m": 404.0,
@@ -2234,8 +2234,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7792037725449,
       "conditioned_visual_bed_elevation_m": 947.7163696289062,
-      "conditioned_visual_surface_normalized": 0.06415916347692713,
-      "conditioned_visual_bed_normalized": 0.0410659480909374
+      "conditioned_visual_surface_normalized": 0.06440631590077239,
+      "conditioned_visual_bed_normalized": 0.04122414137242912
     },
     {
       "station_m": 406.0,
@@ -2245,8 +2245,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7160235643387,
       "conditioned_visual_bed_elevation_m": 947.7003784179688,
-      "conditioned_visual_surface_normalized": 0.06345186756526291,
-      "conditioned_visual_bed_normalized": 0.04088692813453358
+      "conditioned_visual_surface_normalized": 0.06369629536039624,
+      "conditioned_visual_bed_normalized": 0.04104443179955053
     },
     {
       "station_m": 408.0,
@@ -2256,8 +2256,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.8247405290604,
       "conditioned_visual_bed_elevation_m": 946.3610229492188,
-      "conditioned_visual_surface_normalized": 0.06466894276744099,
-      "conditioned_visual_bed_normalized": 0.025892981862299675
+      "conditioned_visual_surface_normalized": 0.06491805895110557,
+      "conditioned_visual_bed_normalized": 0.02599272619936776
     },
     {
       "station_m": 410.0,
@@ -2267,8 +2267,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7953845262527,
       "conditioned_visual_bed_elevation_m": 946.3251342773438,
-      "conditioned_visual_surface_normalized": 0.06434030534508757,
-      "conditioned_visual_bed_normalized": 0.02549121188380562
+      "conditioned_visual_surface_normalized": 0.0645881555593863,
+      "conditioned_visual_bed_normalized": 0.02558940853199137
     },
     {
       "station_m": 412.0,
@@ -2278,8 +2278,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7716860771179,
       "conditioned_visual_bed_elevation_m": 946.3091430664062,
-      "conditioned_visual_surface_normalized": 0.06407500365233047,
-      "conditioned_visual_bed_normalized": 0.025312191927401806
+      "conditioned_visual_surface_normalized": 0.0643218318776745,
+      "conditioned_visual_bed_normalized": 0.025409698959112773
     },
     {
       "station_m": 414.0,
@@ -2289,8 +2289,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7461017370224,
       "conditioned_visual_bed_elevation_m": 946.2931518554688,
-      "conditioned_visual_surface_normalized": 0.0637885896048627,
-      "conditioned_visual_bed_normalized": 0.025133171970997993
+      "conditioned_visual_surface_normalized": 0.0640343145127347,
+      "conditioned_visual_bed_normalized": 0.02522998938623418
     },
     {
       "station_m": 416.0,
@@ -2300,8 +2300,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.720316529274,
       "conditioned_visual_bed_elevation_m": 946.2970275878906,
-      "conditioned_visual_surface_normalized": 0.06349992686474716,
-      "conditioned_visual_bed_normalized": 0.025176560395546246
+      "conditioned_visual_surface_normalized": 0.06374453979278609,
+      "conditioned_visual_bed_normalized": 0.025273544950653228
     },
     {
       "station_m": 418.0,
@@ -2311,8 +2311,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5841604471207,
       "conditioned_visual_bed_elevation_m": 947.6043701171875,
-      "conditioned_visual_surface_normalized": 0.061975673574207295,
-      "conditioned_visual_bed_normalized": 0.039812125113834355
+      "conditioned_visual_surface_normalized": 0.0622144148094919,
+      "conditioned_visual_bed_normalized": 0.03996548844787866
     },
     {
       "station_m": 420.0,
@@ -2322,8 +2322,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5751892328262,
       "conditioned_visual_bed_elevation_m": 947.58837890625,
-      "conditioned_visual_surface_normalized": 0.06187524175586935,
-      "conditioned_visual_bed_normalized": 0.039633105157430536
+      "conditioned_visual_surface_normalized": 0.06211359611006031,
+      "conditioned_visual_bed_normalized": 0.039785778875000066
     },
     {
       "station_m": 422.0,
@@ -2333,8 +2333,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5923819541931,
       "conditioned_visual_bed_elevation_m": 947.5723876953125,
-      "conditioned_visual_surface_normalized": 0.06206771249755312,
-      "conditioned_visual_bed_normalized": 0.03945408520102672
+      "conditioned_visual_surface_normalized": 0.062306808283018246,
+      "conditioned_visual_bed_normalized": 0.03960606930212147
     },
     {
       "station_m": 424.0,
@@ -2344,8 +2344,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.705362200737,
       "conditioned_visual_bed_elevation_m": 946.2330017089844,
-      "conditioned_visual_surface_normalized": 0.06333251469982713,
-      "conditioned_visual_bed_normalized": 0.024459797287654638
+      "conditioned_visual_surface_normalized": 0.06357648272665321,
+      "conditioned_visual_bed_normalized": 0.024554020744738548
     },
     {
       "station_m": 426.0,
@@ -2355,8 +2355,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7256144285202,
       "conditioned_visual_bed_elevation_m": 946.1971435546875,
-      "conditioned_visual_surface_normalized": 0.06355923630014866,
-      "conditioned_visual_bed_normalized": 0.02405836895029876
+      "conditioned_visual_surface_normalized": 0.06380407769860276,
+      "conditioned_visual_bed_normalized": 0.02415104603456231
     },
     {
       "station_m": 428.0,
@@ -2366,8 +2366,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.7356402873993,
       "conditioned_visual_bed_elevation_m": 946.18115234375,
-      "conditioned_visual_surface_normalized": 0.06367147475578909,
-      "conditioned_visual_bed_normalized": 0.023879348993894947
+      "conditioned_visual_surface_normalized": 0.06391674851658798,
+      "conditioned_visual_bed_normalized": 0.023971336461683715
     },
     {
       "station_m": 430.0,
@@ -2377,8 +2377,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.6980174779892,
       "conditioned_visual_bed_elevation_m": 946.1651611328125,
-      "conditioned_visual_surface_normalized": 0.06325029128652537,
-      "conditioned_visual_bed_normalized": 0.023700329037491134
+      "conditioned_visual_surface_normalized": 0.06349394257424837,
+      "conditioned_visual_bed_normalized": 0.02379162688880512
     },
     {
       "station_m": 432.0,
@@ -2388,8 +2388,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.6406821012497,
       "conditioned_visual_bed_elevation_m": 946.1690368652344,
-      "conditioned_visual_surface_normalized": 0.0626084276600359,
-      "conditioned_visual_bed_normalized": 0.023743717462039387
+      "conditioned_visual_surface_normalized": 0.06284960637576033,
+      "conditioned_visual_bed_normalized": 0.02383518245322417
     },
     {
       "station_m": 434.0,
@@ -2399,8 +2399,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.502858042717,
       "conditioned_visual_bed_elevation_m": 947.4763793945312,
-      "conditioned_visual_surface_normalized": 0.06106550154603764,
-      "conditioned_visual_bed_normalized": 0.0383792821803275
+      "conditioned_visual_surface_normalized": 0.061300736637995436,
+      "conditioned_visual_bed_normalized": 0.0385271259504496
     },
     {
       "station_m": 436.0,
@@ -2410,8 +2410,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.4992432594299,
       "conditioned_visual_bed_elevation_m": 947.4603881835938,
-      "conditioned_visual_surface_normalized": 0.061025034420127924,
-      "conditioned_visual_bed_normalized": 0.03820026222392368
+      "conditioned_visual_surface_normalized": 0.06126011362557298,
+      "conditioned_visual_bed_normalized": 0.038347416377571004
     },
     {
       "station_m": 438.0,
@@ -2421,8 +2421,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.4671514034271,
       "conditioned_visual_bed_elevation_m": 947.4443664550781,
-      "conditioned_visual_surface_normalized": 0.060665769403551374,
-      "conditioned_visual_bed_normalized": 0.03802090062638169
+      "conditioned_visual_surface_normalized": 0.06089946465673088,
+      "conditioned_visual_bed_normalized": 0.03816736384749226
     },
     {
       "station_m": 440.0,
@@ -2432,8 +2432,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5822983980179,
       "conditioned_visual_bed_elevation_m": 946.1050109863281,
-      "conditioned_visual_surface_normalized": 0.06195482812663582,
-      "conditioned_visual_bed_normalized": 0.02302695435414778
+      "conditioned_visual_surface_normalized": 0.0621934890615765,
+      "conditioned_visual_bed_normalized": 0.02311565824730949
     },
     {
       "station_m": 442.0,
@@ -2443,8 +2443,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5653821229935,
       "conditioned_visual_bed_elevation_m": 946.0691528320312,
-      "conditioned_visual_surface_normalized": 0.061765452173231074,
-      "conditioned_visual_bed_normalized": 0.0226255260167919
+      "conditioned_visual_surface_normalized": 0.06200338359856836,
+      "conditioned_visual_bed_normalized": 0.022712683537133252
     },
     {
       "station_m": 444.0,
@@ -2454,8 +2454,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5539222955704,
       "conditioned_visual_bed_elevation_m": 946.0531616210938,
-      "conditioned_visual_surface_normalized": 0.0616371605877035,
-      "conditioned_visual_bed_normalized": 0.02244650606038809
+      "conditioned_visual_surface_normalized": 0.061874597811205787,
+      "conditioned_visual_bed_normalized": 0.022532973964254657
     },
     {
       "station_m": 446.0,
@@ -2465,8 +2465,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.5248301029205,
       "conditioned_visual_bed_elevation_m": 946.0371704101562,
-      "conditioned_visual_surface_normalized": 0.06131147649284532,
-      "conditioned_visual_bed_normalized": 0.022267486103984276
+      "conditioned_visual_surface_normalized": 0.061547659123720615,
+      "conditioned_visual_bed_normalized": 0.02235326439137606
     },
     {
       "station_m": 448.0,
@@ -2476,8 +2476,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.4402054548264,
       "conditioned_visual_bed_elevation_m": 946.0211181640625,
-      "conditioned_visual_surface_normalized": 0.06036411228936392,
-      "conditioned_visual_bed_normalized": 0.02208778286530411
+      "conditioned_visual_surface_normalized": 0.0605966455060875,
+      "conditioned_visual_bed_normalized": 0.022172868904097167
     },
     {
       "station_m": 450.0,
@@ -2487,8 +2487,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.3453578352928,
       "conditioned_visual_bed_elevation_m": 946.2473754882812,
-      "conditioned_visual_surface_normalized": 0.05930230297546876,
-      "conditioned_visual_bed_normalized": 0.024620710263735166
+      "conditioned_visual_surface_normalized": 0.059530745915272125,
+      "conditioned_visual_bed_normalized": 0.024715553586009194
     },
     {
       "station_m": 452.0,
@@ -2498,8 +2498,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.234160900116,
       "conditioned_visual_bed_elevation_m": 947.7599792480469,
-      "conditioned_visual_surface_normalized": 0.05805746475993902,
-      "conditioned_visual_bed_normalized": 0.04155415327738978
+      "conditioned_visual_surface_normalized": 0.05828111236318263,
+      "conditioned_visual_bed_normalized": 0.04171422721144346
     },
     {
       "station_m": 454.0,
@@ -2509,8 +2509,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 949.1359314918518,
       "conditioned_visual_bed_elevation_m": 947.7439880371094,
-      "conditioned_visual_surface_normalized": 0.05695779667015197,
-      "conditioned_visual_bed_normalized": 0.04137513332098597
+      "conditioned_visual_surface_normalized": 0.057177208157787346,
+      "conditioned_visual_bed_normalized": 0.04153451763856487
     },
     {
       "station_m": 456.0,
@@ -2520,8 +2520,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.7952698469162,
       "conditioned_visual_bed_elevation_m": 947.7279968261719,
-      "conditioned_visual_surface_normalized": 0.05314412470602252,
-      "conditioned_visual_bed_normalized": 0.041196113364582156
+      "conditioned_visual_surface_normalized": 0.05334884525601773,
+      "conditioned_visual_bed_normalized": 0.04135480806568627
     },
     {
       "station_m": 458.0,
@@ -2531,8 +2531,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.9190683364868,
       "conditioned_visual_bed_elevation_m": 946.1833801269531,
-      "conditioned_visual_surface_normalized": 0.054530036022708256,
-      "conditioned_visual_bed_normalized": 0.023904288796981737
+      "conditioned_visual_surface_normalized": 0.05474009534775274,
+      "conditioned_visual_bed_normalized": 0.023996372337294666
     },
     {
       "station_m": 460.0,
@@ -2542,8 +2542,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.8223588466644,
       "conditioned_visual_bed_elevation_m": 945.9251708984375,
-      "conditioned_visual_surface_normalized": 0.05344738326304517,
-      "conditioned_visual_bed_normalized": 0.02101366312688123
+      "conditioned_visual_surface_normalized": 0.0536532720185368,
+      "conditioned_visual_bed_normalized": 0.021094611466825598
     },
     {
       "station_m": 462.0,
@@ -2553,8 +2553,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.7549523115158,
       "conditioned_visual_bed_elevation_m": 945.9091186523438,
-      "conditioned_visual_surface_normalized": 0.05269277405735079,
-      "conditioned_visual_bed_normalized": 0.020833959888201064
+      "conditioned_visual_surface_normalized": 0.05289575592496957,
+      "conditioned_visual_bed_normalized": 0.020914215979546704
     },
     {
       "station_m": 464.0,
@@ -2564,8 +2564,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.7104012966156,
       "conditioned_visual_bed_elevation_m": 945.8931274414062,
-      "conditioned_visual_surface_normalized": 0.05219403004250712,
-      "conditioned_visual_bed_normalized": 0.02065493993179725
+      "conditioned_visual_surface_normalized": 0.05239509066013654,
+      "conditioned_visual_bed_normalized": 0.02073450640666811
     },
     {
       "station_m": 466.0,
@@ -2575,8 +2575,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.6827292442322,
       "conditioned_visual_bed_elevation_m": 945.8771362304688,
-      "conditioned_visual_surface_normalized": 0.05188424427139535,
-      "conditioned_visual_bed_normalized": 0.02047591997539344
+      "conditioned_visual_surface_normalized": 0.052084111539547416,
+      "conditioned_visual_bed_normalized": 0.020554796833789513
     },
     {
       "station_m": 468.0,
@@ -2586,8 +2586,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.6512579917908,
       "conditioned_visual_bed_elevation_m": 945.8611450195312,
-      "conditioned_visual_surface_normalized": 0.051531926847652156,
-      "conditioned_visual_bed_normalized": 0.020296900018989626
+      "conditioned_visual_surface_normalized": 0.051730436926892734,
+      "conditioned_visual_bed_normalized": 0.020375087260910918
     },
     {
       "station_m": 470.0,
@@ -2597,8 +2597,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.6105647683144,
       "conditioned_visual_bed_elevation_m": 945.8451538085938,
-      "conditioned_visual_surface_normalized": 0.051076370409734485,
-      "conditioned_visual_bed_normalized": 0.02011788006258581
+      "conditioned_visual_surface_normalized": 0.05127312560515602,
+      "conditioned_visual_bed_normalized": 0.020195377688032323
     },
     {
       "station_m": 472.0,
@@ -2608,8 +2608,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.5680952072144,
       "conditioned_visual_bed_elevation_m": 946.4124755859375,
-      "conditioned_visual_surface_normalized": 0.05060092805541077,
-      "conditioned_visual_bed_normalized": 0.026468988821263088
+      "conditioned_visual_surface_normalized": 0.05079585176295275,
+      "conditioned_visual_bed_normalized": 0.026570952038820643
     },
     {
       "station_m": 474.0,
@@ -2619,8 +2619,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.5359387993813,
       "conditioned_visual_bed_elevation_m": 946.396484375,
-      "conditioned_visual_surface_normalized": 0.05024094038775483,
-      "conditioned_visual_bed_normalized": 0.026289968864859275
+      "conditioned_visual_surface_normalized": 0.05043447735925174,
+      "conditioned_visual_bed_normalized": 0.026391242465942048
     },
     {
       "station_m": 476.0,
@@ -2630,8 +2630,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.5073879957199,
       "conditioned_visual_bed_elevation_m": 946.3804626464844,
-      "conditioned_visual_surface_normalized": 0.04992131708676002,
-      "conditioned_visual_bed_normalized": 0.026110607267317287
+      "conditioned_visual_surface_normalized": 0.05011362281287782,
+      "conditioned_visual_bed_normalized": 0.026211189935863303
     },
     {
       "station_m": 478.0,
@@ -2641,8 +2641,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.4837726354599,
       "conditioned_visual_bed_elevation_m": 945.7811279296875,
-      "conditioned_visual_surface_normalized": 0.049656945565383026,
-      "conditioned_visual_bed_normalized": 0.019401116954694205
+      "conditioned_visual_surface_normalized": 0.0498482328857305,
+      "conditioned_visual_bed_normalized": 0.019475853482117642
     },
     {
       "station_m": 480.0,
@@ -2652,8 +2652,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.4645354747772,
       "conditioned_visual_bed_elevation_m": 945.76513671875,
-      "conditioned_visual_surface_normalized": 0.04944158753651291,
-      "conditioned_visual_bed_normalized": 0.019222096998290392
+      "conditioned_visual_surface_normalized": 0.049632045259715644,
+      "conditioned_visual_bed_normalized": 0.01929614390923905
     },
     {
       "station_m": 482.0,
@@ -2663,8 +2663,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.4518797397614,
       "conditioned_visual_bed_elevation_m": 945.7491455078125,
-      "conditioned_visual_surface_normalized": 0.049299907888883096,
-      "conditioned_visual_bed_normalized": 0.01904307704188658
+      "conditioned_visual_surface_normalized": 0.049489819837072194,
+      "conditioned_visual_bed_normalized": 0.019116434336360455
     },
     {
       "station_m": 484.0,
@@ -2674,8 +2674,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.4390547275543,
       "conditioned_visual_bed_elevation_m": 945.733154296875,
-      "conditioned_visual_surface_normalized": 0.049156333200564964,
-      "conditioned_visual_bed_normalized": 0.018864057085482767
+      "conditioned_visual_surface_normalized": 0.04934569207370916,
+      "conditioned_visual_bed_normalized": 0.01893672476348186
     },
     {
       "station_m": 486.0,
@@ -2685,8 +2685,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.4268591403961,
       "conditioned_visual_bed_elevation_m": 945.7171630859375,
-      "conditioned_visual_surface_normalized": 0.04901980486072169,
-      "conditioned_visual_bed_normalized": 0.01868503712907895
+      "conditioned_visual_surface_normalized": 0.049208637802599216,
+      "conditioned_visual_bed_normalized": 0.018757015190603264
     },
     {
       "station_m": 488.0,
@@ -2696,8 +2696,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.4125738143921,
       "conditioned_visual_bed_elevation_m": 945.701171875,
-      "conditioned_visual_surface_normalized": 0.048859882110127595,
-      "conditioned_visual_bed_normalized": 0.018506017172675138
+      "conditioned_visual_surface_normalized": 0.049048099001338386,
+      "conditioned_visual_bed_normalized": 0.01857730561772467
     },
     {
       "station_m": 490.0,
@@ -2707,8 +2707,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3985441923141,
       "conditioned_visual_bed_elevation_m": 945.6851196289062,
-      "conditioned_visual_surface_normalized": 0.048702821938601405,
-      "conditioned_visual_bed_normalized": 0.018326313933994975
+      "conditioned_visual_surface_normalized": 0.04889043380630537,
+      "conditioned_visual_bed_normalized": 0.018396910130445775
     },
     {
       "station_m": 492.0,
@@ -2718,8 +2718,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3843488693237,
       "conditioned_visual_bed_elevation_m": 945.6691284179688,
-      "conditioned_visual_surface_normalized": 0.04854390676245779,
-      "conditioned_visual_bed_normalized": 0.01814729397759116
+      "conditioned_visual_surface_normalized": 0.04873090646084966,
+      "conditioned_visual_bed_normalized": 0.01821720055756718
     },
     {
       "station_m": 494.0,
@@ -2729,8 +2729,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3699749708176,
       "conditioned_visual_bed_elevation_m": 945.6531372070312,
-      "conditioned_visual_surface_normalized": 0.048382992451841564,
-      "conditioned_visual_bed_normalized": 0.017968274021187346
+      "conditioned_visual_surface_normalized": 0.048569372279902455,
+      "conditioned_visual_bed_normalized": 0.018037490984688584
     },
     {
       "station_m": 496.0,
@@ -2740,8 +2740,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3556447029114,
       "conditioned_visual_bed_elevation_m": 945.6371459960938,
-      "conditioned_visual_surface_normalized": 0.04822256658129008,
-      "conditioned_visual_bed_normalized": 0.017789254064783534
+      "conditioned_visual_surface_normalized": 0.04840832842057733,
+      "conditioned_visual_bed_normalized": 0.01785778141180999
     },
     {
       "station_m": 498.0,
@@ -2751,8 +2751,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3416483402252,
       "conditioned_visual_bed_elevation_m": 945.6211547851562,
-      "conditioned_visual_surface_normalized": 0.04806587874522308,
-      "conditioned_visual_bed_normalized": 0.01761023410837972
+      "conditioned_visual_surface_normalized": 0.04825103699530542,
+      "conditioned_visual_bed_normalized": 0.017678071838931397
     },
     {
       "station_m": 500.0,
@@ -2762,8 +2762,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3281850814819,
       "conditioned_visual_bed_elevation_m": 945.6051635742188,
-      "conditioned_visual_surface_normalized": 0.04791515895278858,
-      "conditioned_visual_bed_normalized": 0.017431214151975908
+      "conditioned_visual_surface_normalized": 0.04809973660362362,
+      "conditioned_visual_bed_normalized": 0.0174983622660528
     },
     {
       "station_m": 502.0,
@@ -2773,8 +2773,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3150550127029,
       "conditioned_visual_bed_elevation_m": 945.5891723632812,
-      "conditioned_visual_surface_normalized": 0.04776816918762438,
-      "conditioned_visual_bed_normalized": 0.01725219419557209
+      "conditioned_visual_surface_normalized": 0.04795218060793565,
+      "conditioned_visual_bed_normalized": 0.017318652693174206
     },
     {
       "station_m": 504.0,
@@ -2784,8 +2784,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.3018546104431,
       "conditioned_visual_bed_elevation_m": 945.5731201171875,
-      "conditioned_visual_surface_normalized": 0.047620392046399555,
-      "conditioned_visual_bed_normalized": 0.01707249095689193
+      "conditioned_visual_surface_normalized": 0.04780383420307546,
+      "conditioned_visual_bed_normalized": 0.01713825720589531
     },
     {
       "station_m": 506.0,
@@ -2795,8 +2795,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.2884417772293,
       "conditioned_visual_bed_elevation_m": 945.55712890625,
-      "conditioned_visual_surface_normalized": 0.04747023676256446,
-      "conditioned_visual_bed_normalized": 0.016893471000488117
+      "conditioned_visual_surface_normalized": 0.04765310049457985,
+      "conditioned_visual_bed_normalized": 0.016958547633016716
     },
     {
       "station_m": 508.0,
@@ -2806,8 +2806,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.2748485803604,
       "conditioned_visual_bed_elevation_m": 945.5411376953125,
-      "conditioned_visual_surface_normalized": 0.04731806232622132,
-      "conditioned_visual_bed_normalized": 0.0167144510440843
+      "conditioned_visual_surface_normalized": 0.047500339855444294,
+      "conditioned_visual_bed_normalized": 0.01677883806013812
     },
     {
       "station_m": 510.0,
@@ -2817,8 +2817,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.2610762119293,
       "conditioned_visual_bed_elevation_m": 945.525146484375,
-      "conditioned_visual_surface_normalized": 0.0471638820827271,
-      "conditioned_visual_bed_normalized": 0.016535431087680488
+      "conditioned_visual_surface_normalized": 0.047345565682434414,
+      "conditioned_visual_bed_normalized": 0.016599128487259526
     },
     {
       "station_m": 512.0,
@@ -2828,8 +2828,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.247377038002,
       "conditioned_visual_bed_elevation_m": 945.5091552734375,
-      "conditioned_visual_surface_normalized": 0.047010521244150213,
-      "conditioned_visual_bed_normalized": 0.016356411131276675
+      "conditioned_visual_surface_normalized": 0.047191614070834276,
+      "conditioned_visual_bed_normalized": 0.01641941891438093
     },
     {
       "station_m": 514.0,
@@ -2839,8 +2839,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.2333528995514,
       "conditioned_visual_bed_elevation_m": 945.4931640625,
-      "conditioned_visual_surface_normalized": 0.04685352246126605,
-      "conditioned_visual_bed_normalized": 0.016177391174872862
+      "conditioned_visual_surface_normalized": 0.04703401050092316,
+      "conditioned_visual_bed_normalized": 0.016239709341502335
     },
     {
       "station_m": 516.0,
@@ -2850,8 +2850,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.2185219526291,
       "conditioned_visual_bed_elevation_m": 945.4771728515625,
-      "conditioned_visual_surface_normalized": 0.046687491540791375,
-      "conditioned_visual_bed_normalized": 0.01599837121846905
+      "conditioned_visual_surface_normalized": 0.04686734000003308,
+      "conditioned_visual_bed_normalized": 0.016059999768623743
     },
     {
       "station_m": 518.0,
@@ -2861,8 +2861,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.2036479711533,
       "conditioned_visual_bed_elevation_m": 945.4611206054688,
-      "conditioned_visual_surface_normalized": 0.046520978852930446,
-      "conditioned_visual_bed_normalized": 0.015818667979788884
+      "conditioned_visual_surface_normalized": 0.04670018587590372,
+      "conditioned_visual_bed_normalized": 0.015879604281344845
     },
     {
       "station_m": 520.0,
@@ -2872,8 +2872,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.1885352134705,
       "conditioned_visual_bed_elevation_m": 945.4451293945312,
-      "conditioned_visual_surface_normalized": 0.04635179309007043,
-      "conditioned_visual_bed_normalized": 0.01563964802338507
+      "conditioned_visual_surface_normalized": 0.04653034837961851,
+      "conditioned_visual_bed_normalized": 0.015699894708466253
     },
     {
       "station_m": 522.0,
@@ -2883,8 +2883,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.1741775274277,
       "conditioned_visual_bed_elevation_m": 945.4291381835938,
-      "conditioned_visual_surface_normalized": 0.046191060276308864,
-      "conditioned_visual_bed_normalized": 0.015460628066981256
+      "conditioned_visual_surface_normalized": 0.04636899639468388,
+      "conditioned_visual_bed_normalized": 0.015520185135587656
     },
     {
       "station_m": 524.0,
@@ -2894,8 +2894,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.1591188013554,
       "conditioned_visual_bed_elevation_m": 945.4131469726562,
-      "conditioned_visual_surface_normalized": 0.04602247939175306,
-      "conditioned_visual_bed_normalized": 0.015281608110577443
+      "conditioned_visual_surface_normalized": 0.046199766106800884,
+      "conditioned_visual_bed_normalized": 0.015340475562709063
     },
     {
       "station_m": 526.0,
@@ -2905,8 +2905,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.1441444158554,
       "conditioned_visual_bed_elevation_m": 945.3971557617188,
-      "conditioned_visual_surface_normalized": 0.04585484269120218,
-      "conditioned_visual_bed_normalized": 0.015102588154173629
+      "conditioned_visual_surface_normalized": 0.046031483640086274,
+      "conditioned_visual_bed_normalized": 0.015160765989830467
     },
     {
       "station_m": 528.0,
@@ -2916,8 +2916,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.1295464038849,
       "conditioned_visual_bed_elevation_m": 945.3811645507812,
-      "conditioned_visual_surface_normalized": 0.04569141945347748,
-      "conditioned_visual_bed_normalized": 0.014923568197769816
+      "conditioned_visual_surface_normalized": 0.045867430867200465,
+      "conditioned_visual_bed_normalized": 0.014981056416951872
     },
     {
       "station_m": 530.0,
@@ -2927,8 +2927,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.114847779274,
       "conditioned_visual_bed_elevation_m": 945.3651733398438,
-      "conditioned_visual_surface_normalized": 0.045526869867625365,
-      "conditioned_visual_bed_normalized": 0.014744548241366003
+      "conditioned_visual_surface_normalized": 0.04570224740729541,
+      "conditioned_visual_bed_normalized": 0.014801346844073278
     },
     {
       "station_m": 532.0,
@@ -2938,8 +2938,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.1004193425179,
       "conditioned_visual_bed_elevation_m": 945.34912109375,
-      "conditioned_visual_surface_normalized": 0.04536534500692822,
-      "conditioned_visual_bed_normalized": 0.01456484500268584
+      "conditioned_visual_surface_normalized": 0.045540100324320584,
+      "conditioned_visual_bed_normalized": 0.014620951356794382
     },
     {
       "station_m": 534.0,
@@ -2949,8 +2949,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.0863863229752,
       "conditioned_visual_bed_elevation_m": 945.3331298828125,
-      "conditioned_visual_surface_normalized": 0.0452082468011347,
-      "conditioned_visual_bed_normalized": 0.014385825046282025
+      "conditioned_visual_surface_normalized": 0.04538239694850552,
+      "conditioned_visual_bed_normalized": 0.014441241783915787
     },
     {
       "station_m": 536.0,
@@ -2960,8 +2960,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.072483420372,
       "conditioned_visual_bed_elevation_m": 945.317138671875,
-      "conditioned_visual_surface_normalized": 0.04505260524105336,
-      "conditioned_visual_bed_normalized": 0.014206805089878212
+      "conditioned_visual_surface_normalized": 0.04522615582965907,
+      "conditioned_visual_bed_normalized": 0.014261532211037193
     },
     {
       "station_m": 538.0,
@@ -2971,8 +2971,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.0578943490982,
       "conditioned_visual_bed_elevation_m": 945.3011474609375,
-      "conditioned_visual_surface_normalized": 0.044889282093505865,
-      "conditioned_visual_bed_normalized": 0.014027785133474397
+      "conditioned_visual_surface_normalized": 0.045062203532515485,
+      "conditioned_visual_bed_normalized": 0.014081822638158598
     },
     {
       "station_m": 540.0,
@@ -2982,8 +2982,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.0421155691147,
       "conditioned_visual_bed_elevation_m": 945.28515625,
-      "conditioned_visual_surface_normalized": 0.044712640279712314,
-      "conditioned_visual_bed_normalized": 0.013848765177070585
+      "conditioned_visual_surface_normalized": 0.044884881263272315,
+      "conditioned_visual_bed_normalized": 0.013902113065280003
     },
     {
       "station_m": 542.0,
@@ -2993,8 +2993,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.0250623226166,
       "conditioned_visual_bed_elevation_m": 945.2691650390625,
-      "conditioned_visual_surface_normalized": 0.044521730944792864,
-      "conditioned_visual_bed_normalized": 0.01366974522066677
+      "conditioned_visual_surface_normalized": 0.044693236511893185,
+      "conditioned_visual_bed_normalized": 0.013722403492401409
     },
     {
       "station_m": 544.0,
@@ -3004,8 +3004,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 948.0074105262756,
       "conditioned_visual_bed_elevation_m": 945.253173828125,
-      "conditioned_visual_surface_normalized": 0.044324120906143814,
-      "conditioned_visual_bed_normalized": 0.013490725264262957
+      "conditioned_visual_surface_normalized": 0.044494865244490804,
+      "conditioned_visual_bed_normalized": 0.013542693919522814
     },
     {
       "station_m": 546.0,
@@ -3015,8 +3015,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.9905388355255,
       "conditioned_visual_bed_elevation_m": 945.2371215820312,
-      "conditioned_visual_surface_normalized": 0.04413524406908937,
-      "conditioned_visual_bed_normalized": 0.013311022025582793
+      "conditioned_visual_surface_normalized": 0.04430526082051726,
+      "conditioned_visual_bed_normalized": 0.01336229843224392
     },
     {
       "station_m": 548.0,
@@ -3026,8 +3026,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.9739826321602,
       "conditioned_visual_bed_elevation_m": 945.2211303710938,
-      "conditioned_visual_surface_normalized": 0.043949899080754376,
-      "conditioned_visual_bed_normalized": 0.013132002069178979
+      "conditioned_visual_surface_normalized": 0.04411920185056792,
+      "conditioned_visual_bed_normalized": 0.013182588859365324
     },
     {
       "station_m": 550.0,
@@ -3037,8 +3037,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.9576500654221,
       "conditioned_visual_bed_elevation_m": 945.2051391601562,
-      "conditioned_visual_surface_normalized": 0.04376705768138508,
-      "conditioned_visual_bed_normalized": 0.012952982112775166
+      "conditioned_visual_surface_normalized": 0.043935656113850925,
+      "conditioned_visual_bed_normalized": 0.013002879286486729
     },
     {
       "station_m": 552.0,
@@ -3048,8 +3048,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.941431760788,
       "conditioned_visual_bed_elevation_m": 945.1891479492188,
-      "conditioned_visual_surface_normalized": 0.04358549543448039,
-      "conditioned_visual_bed_normalized": 0.012773962156371353
+      "conditioned_visual_surface_normalized": 0.04375339445711965,
+      "conditioned_visual_bed_normalized": 0.012823169713608133
     },
     {
       "station_m": 554.0,
@@ -3059,8 +3059,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.9266992807388,
       "conditioned_visual_bed_elevation_m": 945.1731567382812,
-      "conditioned_visual_surface_normalized": 0.04342056684049061,
-      "conditioned_visual_bed_normalized": 0.012594942199967539
+      "conditioned_visual_surface_normalized": 0.04358783052907068,
+      "conditioned_visual_bed_normalized": 0.01264346014072954
     },
     {
       "station_m": 556.0,
@@ -3070,8 +3070,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.9124565124512,
       "conditioned_visual_bed_elevation_m": 945.1571655273438,
-      "conditioned_visual_surface_normalized": 0.04326112051913998,
-      "conditioned_visual_bed_normalized": 0.012415922243563726
+      "conditioned_visual_surface_normalized": 0.043427769992342866,
+      "conditioned_visual_bed_normalized": 0.012463750567850944
     },
     {
       "station_m": 558.0,
@@ -3081,8 +3081,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.8988527059555,
       "conditioned_visual_bed_elevation_m": 945.1411743164062,
-      "conditioned_visual_surface_normalized": 0.0431088273091199,
-      "conditioned_visual_bed_normalized": 0.012236902287159911
+      "conditioned_visual_surface_normalized": 0.04327489012199319,
+      "conditioned_visual_bed_normalized": 0.012284040994972349
     },
     {
       "station_m": 560.0,
@@ -3092,8 +3092,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.884674757719,
       "conditioned_visual_bed_elevation_m": 945.1251220703125,
-      "conditioned_visual_surface_normalized": 0.04295010664155397,
-      "conditioned_visual_bed_normalized": 0.012057199048479747
+      "conditioned_visual_surface_normalized": 0.04311555803439656,
+      "conditioned_visual_bed_normalized": 0.012103645507693455
     },
     {
       "station_m": 562.0,
@@ -3103,8 +3103,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.8705232739449,
       "conditioned_visual_bed_elevation_m": 945.109130859375,
-      "conditioned_visual_surface_normalized": 0.04279168224091255,
-      "conditioned_visual_bed_normalized": 0.011878179092075935
+      "conditioned_visual_surface_normalized": 0.042956523354996924,
+      "conditioned_visual_bed_normalized": 0.01192393593481486
     },
     {
       "station_m": 564.0,
@@ -3114,8 +3114,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.8556062579155,
       "conditioned_visual_bed_elevation_m": 945.0931396484375,
-      "conditioned_visual_surface_normalized": 0.04262468778566537,
-      "conditioned_visual_bed_normalized": 0.01169915913567212
+      "conditioned_visual_surface_normalized": 0.0427888856076283,
+      "conditioned_visual_bed_normalized": 0.011744226361936264
     },
     {
       "station_m": 566.0,
@@ -3125,8 +3125,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.8410440683365,
       "conditioned_visual_bed_elevation_m": 945.0771484375,
-      "conditioned_visual_surface_normalized": 0.042461665575917316,
-      "conditioned_visual_bed_normalized": 0.011520139179268307
+      "conditioned_visual_surface_normalized": 0.04262523540754969,
+      "conditioned_visual_bed_normalized": 0.01156451678905767
     },
     {
       "station_m": 568.0,
@@ -3136,8 +3136,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.8257442712784,
       "conditioned_visual_bed_elevation_m": 945.0611572265625,
-      "conditioned_visual_surface_normalized": 0.04229038592655029,
-      "conditioned_visual_bed_normalized": 0.011341119222864494
+      "conditioned_visual_surface_normalized": 0.042453295958737,
+      "conditioned_visual_bed_normalized": 0.011384807216179075
     },
     {
       "station_m": 570.0,
@@ -3147,8 +3147,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.8102022409439,
       "conditioned_visual_bed_elevation_m": 945.0451049804688,
-      "conditioned_visual_surface_normalized": 0.04211639450064899,
-      "conditioned_visual_bed_normalized": 0.01116141598418433
+      "conditioned_visual_surface_normalized": 0.04227863428714811,
+      "conditioned_visual_bed_normalized": 0.01120441172890018
     },
     {
       "station_m": 572.0,
@@ -3158,8 +3158,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7951235473156,
       "conditioned_visual_bed_elevation_m": 945.0291137695312,
-      "conditioned_visual_surface_normalized": 0.04194759008136411,
-      "conditioned_visual_bed_normalized": 0.010982396027780516
+      "conditioned_visual_surface_normalized": 0.0421091796034408,
+      "conditioned_visual_bed_normalized": 0.011024702156021585
     },
     {
       "station_m": 574.0,
@@ -3169,8 +3169,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7802027463913,
       "conditioned_visual_bed_elevation_m": 945.0130004882812,
-      "conditioned_visual_surface_normalized": 0.041780553254608575,
-      "conditioned_visual_bed_normalized": 0.010802009506824002
+      "conditioned_visual_surface_normalized": 0.041941499321341294,
+      "conditioned_visual_bed_normalized": 0.01084362075434239
     },
     {
       "station_m": 576.0,
@@ -3180,8 +3180,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7653920650482,
       "conditioned_visual_bed_elevation_m": 944.996826171875,
-      "conditioned_visual_surface_normalized": 0.04161474920520222,
-      "conditioned_visual_bed_normalized": 0.010620939703591136
+      "conditioned_visual_surface_normalized": 0.041775056565466935,
+      "conditioned_visual_bed_normalized": 0.010661853438262895
     },
     {
       "station_m": 578.0,
@@ -3191,8 +3191,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7507765293121,
       "conditioned_visual_bed_elevation_m": 944.9805908203125,
-      "conditioned_visual_surface_normalized": 0.041451129790730214,
-      "conditioned_visual_bed_normalized": 0.010439186618081922
+      "conditioned_visual_surface_normalized": 0.04161080686012635,
+      "conditioned_visual_bed_normalized": 0.010479400207783101
     },
     {
       "station_m": 580.0,
@@ -3202,8 +3202,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7363871335983,
       "conditioned_visual_bed_elevation_m": 944.9642333984375,
-      "conditioned_visual_surface_normalized": 0.04129004199047351,
-      "conditioned_visual_bed_normalized": 0.010256066968020006
+      "conditioned_visual_surface_normalized": 0.04144909852122594,
+      "conditioned_visual_bed_normalized": 0.010295575148502706
     },
     {
       "station_m": 582.0,
@@ -3213,8 +3213,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7222501039505,
       "conditioned_visual_bed_elevation_m": 944.9478149414062,
-      "conditioned_visual_surface_normalized": 0.04113177940228523,
-      "conditioned_visual_bed_normalized": 0.010072264035681738
+      "conditioned_visual_surface_normalized": 0.04129022627760959,
+      "conditioned_visual_bed_normalized": 0.01011106417482201
     },
     {
       "station_m": 584.0,
@@ -3224,8 +3224,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.7080467939377,
       "conditioned_visual_bed_elevation_m": 944.9312133789062,
-      "conditioned_visual_surface_normalized": 0.04097277481224998,
-      "conditioned_visual_bed_normalized": 0.00988641125651442
+      "conditioned_visual_surface_normalized": 0.041130609173824155,
+      "conditioned_visual_bed_normalized": 0.009924495457940417
     },
     {
       "station_m": 586.0,
@@ -3235,8 +3235,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.6936587393284,
       "conditioned_visual_bed_elevation_m": 944.9144897460938,
-      "conditioned_visual_surface_normalized": 0.040811702025519855,
-      "conditioned_visual_bed_normalized": 0.009699191912794402
+      "conditioned_visual_surface_normalized": 0.04096891590628508,
+      "conditioned_visual_bed_normalized": 0.009736554912258222
     },
     {
       "station_m": 588.0,
@@ -3246,8 +3246,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.6792018413544,
       "conditioned_visual_bed_elevation_m": 944.8977661132812,
-      "conditioned_visual_surface_normalized": 0.040649858544425294,
-      "conditioned_visual_bed_normalized": 0.009511972569074384
+      "conditioned_visual_surface_normalized": 0.040806448975530825,
+      "conditioned_visual_bed_normalized": 0.009548614366576027
     },
     {
       "station_m": 590.0,
@@ -3257,8 +3257,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.6646355390549,
       "conditioned_visual_bed_elevation_m": 944.8809814453125,
-      "conditioned_visual_surface_normalized": 0.04048679029319573,
-      "conditioned_visual_bed_normalized": 0.009324069943078014
+      "conditioned_visual_surface_normalized": 0.040642752556610796,
+      "conditioned_visual_bed_normalized": 0.009359987906493533
     },
     {
       "station_m": 592.0,
@@ -3268,8 +3268,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.6501935720444,
       "conditioned_visual_bed_elevation_m": 944.8641967773438,
-      "conditioned_visual_surface_normalized": 0.0403251139626971,
-      "conditioned_visual_bed_normalized": 0.009136167317081645
+      "conditioned_visual_surface_normalized": 0.04048045342034606,
+      "conditioned_visual_bed_normalized": 0.009171361446411038
     },
     {
       "station_m": 594.0,
@@ -3279,8 +3279,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.6360461711884,
       "conditioned_visual_bed_elevation_m": 944.8475341796875,
-      "conditioned_visual_surface_normalized": 0.04016673526990327,
-      "conditioned_visual_bed_normalized": 0.008949631255637977
+      "conditioned_visual_surface_normalized": 0.04032146462486872,
+      "conditioned_visual_bed_normalized": 0.008984106815129143
     },
     {
       "station_m": 596.0,
@@ -3290,8 +3290,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.621918797493,
       "conditioned_visual_bed_elevation_m": 944.8309326171875,
-      "conditioned_visual_surface_normalized": 0.040008580779106365,
-      "conditioned_visual_bed_normalized": 0.00876377847647066
+      "conditioned_visual_surface_normalized": 0.04016270089505397,
+      "conditioned_visual_bed_normalized": 0.00879753809824755
     },
     {
       "station_m": 598.0,
@@ -3301,8 +3301,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.6072297096252,
       "conditioned_visual_bed_elevation_m": 944.8145141601562,
-      "conditioned_visual_surface_normalized": 0.03984413795610993,
-      "conditioned_visual_bed_normalized": 0.008579975544132392
+      "conditioned_visual_surface_normalized": 0.03999762460927396,
+      "conditioned_visual_bed_normalized": 0.008613027124566854
     },
     {
       "station_m": 600.0,
@@ -3312,8 +3312,8 @@
       ],
       "conditioned_visual_surface_elevation_m": 947.5927879810333,
       "conditioned_visual_bed_elevation_m": 944.798095703125,
-      "conditioned_visual_surface_normalized": 0.03968246429468268,
-      "conditioned_visual_bed_normalized": 0.008396172611794126
+      "conditioned_visual_surface_normalized": 0.03983532815236236,
+      "conditioned_visual_bed_normalized": 0.00842851615088616
     }
   ]
 }
