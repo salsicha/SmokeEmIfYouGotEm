@@ -36,11 +36,11 @@ the full-corridor Zambezi reference run:
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_Zambezi` | **versioned reference runnable; production hydraulics gated** |
 
-Post-Hance release-head verification keeps Zambezi in ordinal position 6 of the
-six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
+Post-ground-cover release-head verification keeps Zambezi in ordinal position
+6 of the six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v5_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v6_review.json`.
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -273,6 +273,22 @@ and external acceptance gates pass.
   is runnable-reference acceptance only; high-resolution terrain, surveyed
   bathymetry, calibrated rapid hydraulics, guide/geospatial/rights review,
   photoreal art and water VFX, and target-hardware performance remain open.
+
+### 2026-08-03 — Zambezi post-ground-cover runnable revalidation
+
+- Rechecked the unchanged Zambezi runtime contract at the post-ground-cover
+  release head. Free Run still exposes **Zambezi: Boiling Pot to Mukuni Beach**
+  as river 6 and resolves `zambezi_reference_run` to the committed
+  `/Game/RaftSim/Maps/L_Zambezi` shipping package.
+- Eighteen focused Python contracts and a clean 135-action UE 5.8 editor build
+  pass. `RaftSim.M6.CareerCatalog` passes 1/1 with no warnings or errors;
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` passes 1/1 with MapCheck 0/0, the
+  vertical-slice game mode, 5,908 coordinate-map points, 2,673 wet vertices,
+  eight breaking sites, and 125 visible rapid-foam vertices.
+- The V6 hash-locked review supersedes V5 for release-head evidence. Runnable
+  reference status is retained; terrain, bathymetry, calibrated hydraulics,
+  guide/geospatial/rights review, photoreal art and water VFX, and target-
+  hardware performance gates remain open.
 
 ### 2026-08-02 — Futaleufú and Chilko organic waterline structure retained
 

@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reaffirmed Zambezi as the sixth runnable river on the post-ground-cover
+  release head. The unchanged committed `L_Zambezi` package remains selectable
+  as **Zambezi: Boiling Pot to Mukuni Beach** in Free Run and remains in the
+  shipping cook. Eighteen focused registry/source contracts, a clean 135-action
+  UE 5.8 editor build, the native career catalog, and the live PIE map-load gate
+  pass. The V6 review hash-locks the selector, manifest, scenario, cook list,
+  and map package while retaining reference-tier status and leaving production
+  terrain, bathymetry, hydraulics, photoreal art, guide/geospatial/rights, and
+  performance acceptance open.
 - Corrected Colorado Hance's runnable rapid framing without changing the
   committed cooked fields. `L_Hance` now launches at station 336 m instead of
   24 m, retaining a 69 m deep subcritical approach to an accepted interior

@@ -4081,17 +4081,19 @@ path is verified, and the completion goal can be marked complete.
   cross-river bands, duplicate guide/rapid views, missing rapid-scale foam and
   spray, terraced canyon geometry, unconverged hydraulics, and all six external
   acceptance gates keep photoreal and production promotion closed.
-- Zambezi runnable release-head recheck V5 retains Batoka Gorge as river 6 in
+- Zambezi runnable release-head recheck V6 retains Batoka Gorge as river 6 in
   the player-facing Free Run portfolio after the intervening Hance rapid-
-  approach milestone. The committed selector, progression manifest, source
-  scenario, catalog, cook list, and unchanged `L_Zambezi` package all resolve
+  approach and South Fork scanned-ground-cover milestones. The committed
+  selector, progression manifest, source scenario, catalog, cook list, and
+  unchanged `L_Zambezi` package all resolve
   `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi` at
-  `reference_free_run` tier. Ten focused Python contracts and both native gates
-  pass; the live map reports the vertical-slice game mode, 5,908 coordinate-map
-  points, 2,673 wet vertices, eight active breaking sites, and visible rapid
-  foam. The V5 review hash-locks this runnable contract while leaving terrain,
-  bathymetry, hydraulic, guide/geospatial/rights, photoreal-art/water-VFX, and
-  target-performance promotion gates open.
+  `reference_free_run` tier. Eighteen focused Python contracts, the exact UE
+  5.8 editor build, and both native gates pass; the live map reports the
+  vertical-slice game mode, 5,908 coordinate-map points, 2,673 wet vertices,
+  eight active breaking sites, and visible rapid foam. The V6 review hash-locks
+  this runnable contract while leaving terrain, bathymetry, hydraulic,
+  guide/geospatial/rights, photoreal-art/water-VFX, and target-performance
+  promotion gates open.
 - Colorado Hance rapid-approach launch V1 moves the reference-runnable
   `L_Hance` start from station 24 m to station 336 m after exact runtime-grid
   sampling proved all three committed release bands contain accepted interior

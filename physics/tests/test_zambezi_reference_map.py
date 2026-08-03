@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v5_review.json"
+    "zambezi_runnable_release_head_v6_review.json"
 )
 
 
@@ -48,20 +48,20 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v2"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "7e26194d3b29c4ac8b51df4aa9629231e14a2df5"
+        "19481e98c9eff5b53042bcc7ba91b906e2f213e1"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Revalidate the Zambezi runnable contract after the Colorado Hance "
-            "rapid-approach milestone."
+            "Revalidate the Zambezi runnable contract after the South Fork CC0 "
+            "scanned-ground-cover milestone."
         ),
-        "runtime_contract_changed_since_v4": False,
+        "runtime_contract_changed_since_v5": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v4_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v5_review.json"
         ),
     }
     assert review["player_path"] == {
