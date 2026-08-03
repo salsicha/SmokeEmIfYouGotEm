@@ -325,3 +325,25 @@ and external acceptance gates pass.
   are unchanged. The live evidence remains too pale and sheet-like for
   photoreal promotion; coarse banks, procedural ecology, missing calibrated
   rapid morphology/VFX, and all six external reviews remain open.
+
+### 2026-08-02 — Chilko bank-clipped live water volume retained
+
+- The live-water audit found an architectural mismatch: reach-local maps hide
+  the authored capture ribbon, while `M_RaftSim_LiveRiverSurface` was designed
+  as a non-transmitting detail overlay above authored Single Layer Water. Lava
+  Canyon then forced that overlay to `0.88-0.98` coverage, producing a pale
+  opaque sheet with no optical river body beneath it.
+- Chilko now pilots a second, non-colliding solver mesh shaded by the existing
+  raft-transmission Single Layer Water parent. It triangulates only cells whose
+  four samples are wet and at least `0.60` inside the station/bank feather,
+  sits 1 cm beneath the animated detail surface, and leaves the final soft bank
+  transition to that detail layer. PIE resolves 1,352 core triangles from
+  1,098 wet vertices while preserving the interior breaking site, six visible
+  rapid-foam vertices, the wet/dry field, collision, buoyancy, and raft forces.
+- The retained guide-side capture changes the water band from warm-gray
+  (`blue-red=-0.029955`) to blue-gray (`blue-red=0.023394`) and reduces mean
+  water-band luminance from `0.700035` to `0.683587`. It restores depth and
+  reflections without a rectangular bank overlay. Smooth banks, stylized
+  ecology, blown highlights, incomplete rapid VFX, and all six external gates
+  keep photoreal and production promotion rejected. Evidence is hash-locked in
+  `chilko_live_volume_core_v1_review.json`.

@@ -43,6 +43,12 @@ live moderate-release cooked field with the player raft and game mode. It is
 not surveyed Hance geography or photoreal-approved; its evidence and open gates
 are recorded in
 [the Hance runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_hance_reach_local_runnable_v1_review.json).
+Chilko's `L_LavaCanyon` now pilots a wet-cell-clipped Single Layer Water core
+beneath its live solver detail surface. This removes the high-coverage pale
+overlay while preserving bank feathering, raft-floor transmission, live rapid
+geometry, and solver authority. It is a retained technical candidate, not
+photoreal approval; comparison evidence and remaining defects are recorded in
+[the Chilko volume-core review](docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_live_volume_core_v1_review.json).
 See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
 milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 

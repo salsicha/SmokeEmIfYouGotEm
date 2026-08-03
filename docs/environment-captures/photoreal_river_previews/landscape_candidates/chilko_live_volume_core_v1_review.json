@@ -1,0 +1,83 @@
+{
+  "schema": "raftsim.environment.chilko_live_volume_core_review.v1",
+  "river_id": "chilko_river_lava_canyon",
+  "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+  "status": "technical_water_candidate_retained_photoreal_acceptance_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "volume_core_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_or_raft_forces_changed": false
+  },
+  "architecture": {
+    "problem": "The reach-local map hides its authored capture ribbon, but the remaining live material was a non-transmitting detail overlay forced to 0.88-0.98 coverage. That produced a pale opaque sheet without the Single Layer Water volume the material assumed beneath it.",
+    "retained_solution": "A second non-colliding solver-conforming mesh supplies Single Layer Water optical depth only through quads whose four vertices are wet and whose minimum station/bank coverage is at least 0.60. It sits 1 cm beneath the live detail surface and reuses the raft-floor transmission aperture.",
+    "pilot_scope": "Chilko only. Existing versioned Lava Canyon maps migrate from their unique cooked-field identity; future regeneration persists bEnableLiveSolverVolumeCore.",
+    "detail_surface_calm_coverage": 0.035,
+    "detail_surface_active_coverage": 0.14,
+    "minimum_core_vertex_coverage": 0.60,
+    "core_surface_offset_cm": -1.0
+  },
+  "live_pie_evidence": {
+    "wet_vertices": 1098,
+    "volume_core_enabled": true,
+    "volume_core_triangles": 1352,
+    "initial_active_breaking_sites": 1,
+    "initial_strongest_interior_coverage": 1.0,
+    "initial_strongest_interior_clearance_m": 15.0,
+    "initial_visible_rapid_foam_vertices": 6,
+    "rapid_foam_mesh_visible": true
+  },
+  "visual_comparison": {
+    "baseline_water_band_mean_luminance": 0.700035,
+    "retained_water_band_mean_luminance": 0.683587,
+    "baseline_water_band_blue_minus_red": -0.029955,
+    "retained_water_band_blue_minus_red": 0.023394,
+    "interpretation": "The retained capture changes the water body from warm chalk-gray to blue-gray, restores readable optical depth and reflections, and preserves a curved wet-bank intersection. Highlight clipping remains broadly unchanged and still requires an art-lighting pass."
+  },
+  "validation": {
+    "unreal_editor_build": "passed",
+    "python_chilko_and_live_water_contracts": "9 passed",
+    "native_water_surface_test": "passed",
+    "native_lava_canyon_map_test": "passed",
+    "other_rivers_opted_in": 0,
+    "known_unrelated_failures": [
+      "RaftSimEditorLandscapeFoliage.cpp exceeds the existing 3000-line editor source gate",
+      "the checked-in editor source inventory is stale against unrelated dirty source work",
+      "filtered Chilko map regeneration is blocked before save by an unrelated dirty opaque-vegetation shader gate"
+    ]
+  },
+  "remaining_photoreal_defects": [
+    "smooth low-frequency bank geometry and repeated ground material",
+    "stylized procedural tree and understory morphology",
+    "overexposed water highlight and incomplete calibrated sky/reflection response",
+    "rapid crest lacks production spray, mist, entrained-air depth, and guide-reviewed morphology",
+    "no external guide, geospatial, ecology/geology, environment-art, water-VFX, or target-hardware acceptance"
+  ],
+  "required_external_acceptance_gates": [
+    "guide and outfitter rapid/line review",
+    "geospatial and vertical-datum review",
+    "source rights and publication review",
+    "ecology/geology review",
+    "environment-art and water-VFX photoreal review",
+    "desktop and VR performance/comfort review"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_rapid_approach_v1_breaking_water_side.png",
+      "role": "pre-volume-core baseline",
+      "sha256": "ceb09b0aa0f5002cb4bfc2ad0a71f77d111c031b7ff9bd7c31fdc379ea60d8a5"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_volume_core_pilot_v1_breaking_water_side.png",
+      "role": "retained volume-core pilot",
+      "sha256": "972c15b6ccbe94d02009c98dc88e15b9198e3c044415df360179c75194f343e7"
+    }
+  ]
+}

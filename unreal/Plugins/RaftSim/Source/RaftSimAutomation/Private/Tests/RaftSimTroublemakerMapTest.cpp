@@ -165,9 +165,28 @@ bool FRaftSimAssertRiverMapCommand::Update()
             bUsesSolverOwnedVisibleRiver);
         if (bUsesSolverOwnedVisibleRiver)
         {
-            Test->TestTrue(
-                TEXT("solver-owned river has visible calm-water coverage"),
-                It->GetCalmLiveSurfaceCoverage() >= 0.80f);
+            if (bChilkoLavaCanyonReferenceRun)
+            {
+                Test->TestTrue(
+                    TEXT("Chilko enables the wet-cell-clipped optical core"),
+                    It->IsLiveVolumeCoreEnabled());
+                Test->TestTrue(
+                    TEXT("Chilko optical core has visible wet-cell triangles"),
+                    It->IsLiveVolumeCoreVisible() &&
+                        It->GetLiveVolumeCoreTriangleCount() > 0);
+                Test->TestTrue(
+                    TEXT("Chilko detail skin stays below opaque-sheet coverage"),
+                    It->GetCalmLiveSurfaceCoverage() < 0.10f);
+            }
+            else
+            {
+                Test->TestTrue(
+                    TEXT("solver-owned river has visible calm-water coverage"),
+                    It->GetCalmLiveSurfaceCoverage() >= 0.80f);
+                Test->TestFalse(
+                    TEXT("non-pilot rivers retain their reviewed water carrier"),
+                    It->IsLiveVolumeCoreEnabled());
+            }
             Test->TestTrue(
                 TEXT("solver-owned river has visible active-water coverage"),
                 It->GetActiveLiveSurfaceCoverage() >=
@@ -1155,8 +1174,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Chilko solver owns the visible gameplay river"),
                 (*It)->bLiveSolverOwnsRuntimeRendering);
             Test->TestTrue(
-                TEXT("Chilko visible carrier has complete calm-water coverage"),
-                (*It)->LiveSurfaceCalmCoverage >= 0.80f);
+                TEXT("Chilko enables or safely migrates the bank-clipped Single Layer Water core"),
+                (*It)->bEnableLiveSolverVolumeCore ||
+                    (*It)->CookedFieldsDir.Contains(
+                        TEXT("chilko_river_lava_canyon"),
+                        ESearchCase::CaseSensitive));
+            if ((*It)->bEnableLiveSolverVolumeCore)
+            {
+                Test->TestTrue(
+                    TEXT("regenerated Chilko config stores restrained calm detail coverage"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceCalmCoverage, 0.035f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Chilko config stores active-water detail response"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceActiveCoverage, 0.14f, 0.001f));
+            }
             Test->TestTrue(
                 TEXT("Chilko live sky reflection stays restrained"),
                 FMath::IsNearlyEqual(
