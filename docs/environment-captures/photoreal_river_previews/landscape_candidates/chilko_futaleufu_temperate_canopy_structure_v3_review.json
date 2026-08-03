@@ -1,0 +1,111 @@
+{
+  "schema": "raftsim.unreal.temperate_canopy_visual_review.v3",
+  "generated_on": "2026-08-02",
+  "status": "accepted_incremental_first_party_canopy_structure_v3_photoreal_gate_still_open",
+  "runtime_artifacts_promoted": true,
+  "photoreal_production_promoted": false,
+  "rivers": [
+    {
+      "river_id": "futaleufu_terminator",
+      "map_package": "/Game/RaftSim/Maps/L_Terminator",
+      "map_sha256": "4bcb60386aba7b444e84e55dc239b801c9ec862e50b72655e2fbb7b1881c6bcf",
+      "runtime_test": "RaftSim.P4.RiverMapLoads.L_Terminator",
+      "runtime_test_result": "1/1 success, 0 warnings, 0 errors",
+      "runtime_test_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_temperate_canopy_v3_map_load.json",
+      "captures": {
+        "guide_seat": {
+          "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_temperate_canopy_structure_v3_guide_seat_downstream.png",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_guide_seat_downstream.png",
+          "baseline_sha256": "421c593c2cfbcf4db6cba88646d26741f0a97731a378d52f540138a65fca44c1",
+          "candidate_sha256": "7e6ac01a5cfbea3da5e06d524e6b3fb09829732c22293e57938fa05194bff8bb",
+          "mean_absolute_rgb_delta": 2.054039,
+          "pixels_any_channel_gt_8_percent": 8.985677
+        },
+        "river_eye": {
+          "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_temperate_canopy_structure_v3_river_eye_downstream.png",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_river_eye_downstream.png",
+          "baseline_sha256": "6287c6a0c50f2729dd0b8e8d2a36761acc19ca834ee17609685a70d73af44853",
+          "candidate_sha256": "05b0123a35f7f3af5439bf9e142daa1f71b9d03267b79ed9a670410c419a5d5d",
+          "mean_absolute_rgb_delta": 2.192887,
+          "pixels_any_channel_gt_8_percent": 9.511827
+        },
+        "solver_rapid": {
+          "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_solver_rapid_river_eye_downstream.png",
+          "candidate_sha256": "7e6ac01a5cfbea3da5e06d524e6b3fb09829732c22293e57938fa05194bff8bb"
+        }
+      }
+    },
+    {
+      "river_id": "chilko_river_lava_canyon",
+      "map_package": "/Game/RaftSim/Maps/L_LavaCanyon",
+      "map_sha256": "94c14ee24dbab227b16e369037cd5af45ce9c57a62e4922fa05ec8e7a05f95b2",
+      "runtime_test": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+      "runtime_test_result": "1/1 success, 0 warnings, 0 errors",
+      "runtime_test_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_temperate_canopy_v3_map_load.json",
+      "captures": {
+        "guide_seat": {
+          "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_temperate_canopy_structure_v3_guide_seat_downstream.png",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+          "baseline_sha256": "a0b1adda132f59ed86c452e2313440d4b7fa9d17d627c4b42acffae09558e5c0",
+          "candidate_sha256": "be40066765a3dfd34f46ce52bc678cb7851ce67b864bd4d61057fa5d57d0d7f3",
+          "mean_absolute_rgb_delta": 4.385667,
+          "pixels_any_channel_gt_8_percent": 10.603624
+        },
+        "river_eye": {
+          "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_pre_temperate_canopy_structure_v3_river_eye_downstream.png",
+          "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+          "baseline_sha256": "446ec546f634ac8825a8ceb467ebd1148ed6f280c5f72ecd022cf2c29079d9a2",
+          "candidate_sha256": "eda070c055da715ae903e29afcda5fbf298f05250928703ae388e94dbfdb5375",
+          "mean_absolute_rgb_delta": 3.597386,
+          "pixels_any_channel_gt_8_percent": 9.260308
+        },
+        "solver_rapid": {
+          "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+          "candidate_sha256": "be40066765a3dfd34f46ce52bc678cb7851ce67b864bd4d61057fa5d57d0d7f3"
+        }
+      }
+    }
+  ],
+  "implementation": {
+    "shared_material": "/Game/RaftSim/Environment/TemperateRivers/Vegetation/Materials/M_RaftSim_Temperate_OpaqueVegetation",
+    "mesh_family_count": 4,
+    "instances_per_river": 6200,
+    "canopy_instances_per_river": 4650,
+    "understory_instances_per_river": 1550,
+    "temperate_crownlet": "one 9x18 distance-stable core plus three deterministic embedded 5x10 satellite volumes",
+    "conifer_change": "six-to-eight azimuth-varied branches per tier, bounded storm-shortened branches, staggered branch heights, eleven overlapping asymmetric crown-body volumes, and an 8.5 m trunk ending at the highest whorl",
+    "broadleaf_change": "the retained V2 branch family now uses compound four-volume crownlets instead of one ellipsoid per crown mass",
+    "runtime_tag": "RaftSimTemperateCanopyStructureV3",
+    "collision": "disabled presentation-only vegetation; river physics, bathymetry, solver fields, water authority, and raft forces unchanged",
+    "asset_sha256": {
+      "broadleaf": "53373458165b7a1da6600cc18e1962c6e9ac7f372a02df90c8a7ee4c41b9d9e3",
+      "conifer": "73c3d21978b8161e08fcc9a365e51c24e51071f0697c02d9709a5288503d7427",
+      "ground_cover": "153d9b1df903e7dfbc21baeadb6ffaecf7192cf8419dfa43bdcdbff6d8825927",
+      "riparian_shrub": "2c7e0e1b6b6f61ee4c9549da8fa4754d408b07feaa2898399e8391280b8f7b46"
+    }
+  },
+  "external_asset_audit": {
+    "decision": "no_external_tree_promoted",
+    "reason": "Every available external or native-review tree family was either explicitly rejected at the fixed cameras or contract-limited to isolated comparison use.",
+    "not_promoted": [
+      "Poly Haven Fir Tree 01: sparse pole silhouette in active river cameras",
+      "Poly Haven Tree Small 02: non-native structure analog and pale repeated crown",
+      "Poly Haven Futaleufu island and temperate forest sets: branch-card breakup and unstable distance crowns",
+      "Futaleufu cordilleran-cypress V1-V43: retained diagnostic research only; every production corridor substitution remains rejected",
+      "Poly Haven Pine Tree 01: rights-reviewed but still limited to isolated South Fork comparison, not automatic production replacement"
+    ]
+  },
+  "accepted_findings": [
+    "The conifer family retains a coherent tapered crown at guide-seat and river-eye distance instead of the repeated bare-pole/diamond-tip silhouette that dominated V2.",
+    "Broadleaf, shrub, ground-cover, and conifer forms all gain deterministic asymmetric crown edges without alpha cards or new external rights dependencies.",
+    "Both regenerated runnable maps preserve 6200 total vegetation instances, the 4650/1550 canopy-understory split, live solver water, player raft, game mode, and focused runtime-map contracts.",
+    "Two early V3 brackets that exposed spear trunks were rejected and not retained; the final trunk stops at the highest whorl and the conifer crown includes an overlapping distance-stable body."
+  ],
+  "remaining_photoreal_blockers": [
+    "The project-owned tree family still has only one broadleaf and one conifer morphology; individual crown volumes remain visibly procedural at close range.",
+    "Exact Patagonian and Chilcotin species identity, ecology, seasonal state, wind response, guide review, and measured desktop/VR performance remain external acceptance gates.",
+    "The retained fixed views still show broad simplified bank surfaces, sparse near-bank micro-vegetation, and water that is too flat, dark, and uniform for photoreal approval.",
+    "A production canopy still needs multiple dense distance-stable rights-reviewed adult tree variants or a more detailed first-party botanical pipeline with production LODs."
+  ],
+  "decision": "promote_v3_as_an_incremental_first_party_runtime_fallback_keep_photoreal_and_species_claims_review_gated"
+}
