@@ -1,0 +1,135 @@
+{
+  "schema": "raftsim.environment.chilko_lava_canyon_rapid_approach_launch_review.v1",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "baseline_commit": "37b9f262b297d9462a4301b1c33d2c2e76a08071",
+  "decision": {
+    "reference_runnable": true,
+    "rapid_approach_framing_retained": true,
+    "interior_solver_breaking_site_passed": true,
+    "production_promoted": false,
+    "photoreal_acceptance_passed": false,
+    "cooked_fields_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "water_collision_changed": false,
+    "raft_forces_changed": false
+  },
+  "corrected_diagnosis": {
+    "prior_observation": "The station-24 m launch clamped the 240 m live-water carrier to local stations 0-240 and therefore reported only four wet-mask-edge transitions, zero interior sites, and zero visible rapid-foam vertices.",
+    "finding": "The committed low, median, and high cooked fields already contain a solver-owned interior supercritical-to-subcritical transition near local station 300 m. The missing live rapid was a launch/window-framing defect, not missing cooked hydraulic structure.",
+    "retained_fix": "Launch Lava Canyon at 38 percent of its 600 m reach (station 228 m), leaving 72 m to the interpreted station-300 m crux and placing the jump inside the initial moving live-water carrier.",
+    "source_authority": "The field remains genuine finite-volume output over review-gated interpreted bed geometry derived from the MRDEM-30 corridor. It is not surveyed bathymetry, guide-approved stationing, calibrated production hydraulics, or navigation data."
+  },
+  "launch_contract": {
+    "prior_launch_progress": 0.04,
+    "prior_launch_station_m": 24.0,
+    "retained_launch_progress": 0.38,
+    "retained_launch_station_m": 228.0,
+    "interpreted_crux_station_m": 300.0,
+    "approach_distance_m": 72.0,
+    "launch_centerline_depth_m": 2.266,
+    "launch_centerline_speed_m_per_s": 1.585,
+    "launch_centerline_froude": 0.336,
+    "live_surface_length_m": 240.0,
+    "live_surface_width_m": 96.0,
+    "live_sample_spacing_m": 3.0,
+    "minimum_breaking_site_clearance_m": 15.0
+  },
+  "all_band_runtime_sampling_contract": {
+    "method": "The regression test bilinearly samples each committed 2 m cooked field onto the same 3 m, 240 m by 96 m launch-centered presentation grid and applies the runtime Froude, wetness, intensity, full-coverage, two-edge phase tolerance, and 15 m clearance rules.",
+    "cooked_manifest_sha256": "be660cd7e54fc6244d16f4ba50bd72ca42267f9d0e899e218652c4484dee856d",
+    "bands": {
+      "low_runnable": {
+        "accepted_candidates_before_6m_deduplication": 2,
+        "strongest_station_m": 300.0,
+        "strongest_lateral_m": -3.0,
+        "upstream_froude": 1.3398,
+        "tailwater_froude": 0.1842,
+        "intensity": 0.2427,
+        "edge_clearance_m": 15.0
+      },
+      "median_runnable": {
+        "accepted_candidates_before_6m_deduplication": 2,
+        "strongest_station_m": 300.0,
+        "strongest_lateral_m": -3.0,
+        "upstream_froude": 1.2935,
+        "tailwater_froude": 0.8038,
+        "intensity": 0.2096,
+        "edge_clearance_m": 15.0
+      },
+      "high_runnable": {
+        "accepted_candidates_before_6m_deduplication": 1,
+        "strongest_station_m": 300.0,
+        "strongest_lateral_m": -3.0,
+        "upstream_froude": 1.2751,
+        "tailwater_froude": 0.3752,
+        "intensity": 0.1965,
+        "edge_clearance_m": 15.0
+      }
+    }
+  },
+  "live_pie_evidence": {
+    "test": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+    "result": "passed_1_of_1",
+    "initial_active_breaking_sites": 1,
+    "initial_strongest_interior_intensity": 0.210,
+    "initial_strongest_interior_coverage": 1.0,
+    "initial_strongest_interior_clearance_m": 15.0,
+    "initial_visible_rapid_foam_vertices": 6,
+    "rapid_foam_mesh_visible": true,
+    "capture_after_six_seconds": {
+      "station_m": 300.0,
+      "lateral_m": -3.0,
+      "intensity": 0.373,
+      "presentation_coverage": 1.0,
+      "presentation_edge_clearance_m": 15.0
+    },
+    "edge_rejected_candidates": 36,
+    "edge_rejection_note": "Boundary candidates remain correctly suppressed; the retained site is an additional interior solver-owned jump, not a relaxed shoreline rule.",
+    "warnings": [
+      "The existing r.MotionVectorSimulation render-thread warning remains; no new test error or map warning was introduced."
+    ]
+  },
+  "visual_review": {
+    "verdict": "Retain as a runnable scenario-framing correction only. The live jump and solver-derived foam are present, but the frame remains too pale and sheet-like for photoreal water acceptance; banks are smooth, trees are visibly procedural, local geology/ecology detail is incomplete, and the site lacks production spray, mist, entrained-air volume, and guide-reviewed rapid morphology.",
+    "capture_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_rapid_approach_v1_breaking_water_side.png",
+    "capture_sha256": "ceb09b0aa0f5002cb4bfc2ad0a71f77d111c031b7ff9bd7c31fdc379ea60d8a5"
+  },
+  "required_external_acceptance_gates": [
+    "local guide review of Lava Canyon stationing, approach, lines, hazards, recovery, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datum",
+    "hydraulic convergence and calibration against observed Lava Canyon behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, and season",
+    "photoreal water/VFX and character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, raft, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_python": "31 focused Chilko scenario/cooked-field/live-water checks passed; a broader 66-check run had 64 passes and two unrelated pre-existing user-work source-inventory failures",
+    "native_tests": [
+      "RaftSim.M9.FChilkoLavaCanyonWater passed 1/1",
+      "RaftSim.P4.RiverMapLoads.L_LavaCanyon passed 1/1 with the existing r.MotionVectorSimulation warning",
+      "RaftSim.P2.WaterSurfaceRenders passed 1/1 with the existing r.MotionVectorSimulation warning"
+    ],
+    "protected_user_work_audit": "75 paths checked; 0 mismatches; 0 missing"
+  },
+  "reviewers": {
+    "named_local_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "6bc4be876e9b013462078a4ba296a6e29b832aa6ac650a30d24f7e2d2e018740"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_rapid_approach_v1_breaking_water_side.png",
+      "sha256": "ceb09b0aa0f5002cb4bfc2ad0a71f77d111c031b7ff9bd7c31fdc379ea60d8a5"
+    }
+  ]
+}

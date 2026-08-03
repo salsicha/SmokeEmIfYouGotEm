@@ -1609,7 +1609,18 @@ bool AddLandscapeCandidateRunnableGameplay(
         return false;
     }
 
-    const float StartProgress = bReachLocalRun ? 0.04f : 0.0025f;
+    // Lava Canyon's interpreted hydraulic crux is centered near local station
+    // 300 m.  Launching at the generic reach-local 4% point clamps the 240 m
+    // live-water carrier to stations 0-240, so the genuine cooked-field jump
+    // remains outside the initial gameplay surface even though the rapid is in
+    // the same 600 m scenario.  A 38% launch retains 72 m of calm/developing
+    // approach, starts in deep subcritical water, and places that solver-owned
+    // jump inside the moving carrier with the required bank/edge clearance.
+    // This changes scenario framing only; cooked hydraulics and raft forces are
+    // not synthesized or modified.
+    const float StartProgress = bChilkoLavaCanyon
+        ? 0.38f
+        : (bReachLocalRun ? 0.04f : 0.0025f);
     FVector2D StartTangent2D(1.0f, 0.0f);
     const FVector2D StartXY = SampleLandscapeCandidateCenterlineWorld(
         Candidate,
@@ -1779,6 +1790,10 @@ bool AddLandscapeCandidateRunnableGameplay(
     Raft->SetActorLabel(PlayerRaftLabel);
     Raft->Tags.AddUnique(RunTag);
     Raft->Tags.AddUnique(TEXT("RaftSimReferenceRunnable"));
+    if (bChilkoLavaCanyon)
+    {
+        Raft->Tags.AddUnique(TEXT("RaftSimChilkoRapidApproachLaunchV1"));
+    }
 
     bool bPlayerStartPositioned = false;
     for (TActorIterator<APlayerStart> It(World); It; ++It)

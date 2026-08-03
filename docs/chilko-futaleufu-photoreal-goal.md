@@ -315,6 +315,35 @@ target-hardware gates remain open. Exact evidence, hashes, the rejected Chilko
 diagnostic, and authority boundaries are in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_live_rapid_lace_v1_review.json`.
 
+## Chilko Rapid-Approach Launch V1
+
+The prior Chilko rejection correctly described the live surface at the old
+launch, but its missing-input diagnosis was too broad. The committed Lava
+Canyon low, median, and high cooked fields already contain a genuine
+supercritical-to-subcritical transition near local station 300 m. Launching at
+station 24 m clamped the 240 m live-water carrier to stations 0-240, so the
+runtime could only see four shoreline-boundary candidates and correctly
+rejected all of them.
+
+`L_LavaCanyon` now launches at station 228 m. That is deep, subcritical water
+and leaves 72 m of approach to the interpreted crux while placing the existing
+solver jump inside the initial carrier. A regression test bilinearly samples
+all three committed 2 m cooked fields onto the same 3 m runtime grid and
+applies the production Froude, wetness, phase-tolerance, coverage, intensity,
+and 15 m clearance contract. Every band exposes at least one interior site.
+The real PIE map reports one active station-300 m site, coverage 1.0, 15 m
+clearance, six visible rapid-foam vertices, and a visible rapid-foam mesh.
+Shoreline candidates remain suppressed; no detection threshold was relaxed.
+
+This is a scenario-framing correction, not new bathymetry or hydraulic
+calibration. Cooked fields, wet/dry masks, water collision, buoyancy, and raft
+forces are byte-identical. The retained live frame still reads pale and
+sheet-like, with smooth banks, visibly procedural forest, incomplete local
+geology/ecology, and weak spray/mist/entrained-air volume. Photoreal promotion
+and all six external gates remain open. Exact metrics, hashes, evidence, and
+authority boundaries are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_rapid_approach_launch_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

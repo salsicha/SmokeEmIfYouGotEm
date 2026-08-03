@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Corrected the Chilko Lava Canyon scenario framing after proving the committed
+  cooked fields already contain an interior solver-owned hydraulic jump near
+  local station 300 m. The runnable map now launches at station 228 m instead
+  of 24 m, retaining a 72 m subcritical approach while placing that jump inside
+  the initial 240 m moving live-water carrier. The PIE gate reports one
+  interior site, full presentation coverage, 15 m edge clearance, and visible
+  solver foam; all three flow bands pass the matching 3 m runtime sampling
+  contract. No cooked field, wet/dry mask, bathymetry, collision, or raft force
+  changed. Visual and external acceptance remain fail-closed because water is
+  still pale/sheet-like and terrain, ecology, rapid morphology, VFX,
+  calibration, guide review, and target-hardware approval remain incomplete.
 - Retained a narrowly bounded Futaleufú live rapid-lace improvement and rejected
   two unproven water brackets. Terminator now maps existing solver foam through
   a `0.08-0.58` focus window instead of `0.12-0.72`, increasing visible rapid

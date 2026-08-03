@@ -1112,6 +1112,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Chilko Lava Canyon player raft is marked reference-runnable"),
             PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
         Test->TestTrue(
+            TEXT("Chilko launches on the reviewed rapid-approach framing"),
+            PlayerRaft->Tags.Contains(TEXT("RaftSimChilkoRapidApproachLaunchV1")));
+        Test->TestTrue(
             TEXT("Chilko Lava Canyon launch keeps the raft upright"),
             PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
         Test->TestEqual(
@@ -1184,6 +1187,38 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Chilko Lava Canyon reference run has one runtime water config"),
             RuntimeWaterConfigCount,
             1);
+
+        int32 BreakingSiteCount = 0;
+        if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
+        {
+            TArray<ARaftSimWaterSurfaceActor::FBreakingSite> BreakingSites;
+            It->GetBreakingSites(BreakingSites);
+            BreakingSiteCount = BreakingSites.Num();
+            if (!BreakingSites.IsEmpty())
+            {
+                const ARaftSimWaterSurfaceActor::FBreakingSite& StrongestSite =
+                    BreakingSites[0];
+                Test->TestTrue(
+                    TEXT("Chilko strongest launch-window jump is in the interpreted Lava Canyon crux"),
+                    StrongestSite.RiverCoordinatesMeters.X >= 285.0f &&
+                        StrongestSite.RiverCoordinatesMeters.X <= 365.0f);
+                Test->TestTrue(
+                    TEXT("Chilko strongest launch-window jump has complete presentation coverage"),
+                    StrongestSite.PresentationCoverage >= 0.999f);
+                Test->TestTrue(
+                    TEXT("Chilko strongest launch-window jump retains 15 m bank/edge clearance"),
+                    StrongestSite.PresentationEdgeClearanceMeters >= 15.0f);
+            }
+            Test->TestTrue(
+                TEXT("Chilko launch window exposes visible solver-derived rapid foam"),
+                It->GetVisibleRapidFoamVertexCount() > 0);
+            Test->TestTrue(
+                TEXT("Chilko launch-window rapid-foam presentation is visible"),
+                It->IsRapidFoamMeshVisible());
+        }
+        Test->TestTrue(
+            TEXT("Chilko launch window activates an interior solver-owned breaking site"),
+            BreakingSiteCount > 0);
 
         int32 CaptureOnlyWaterCount = 0;
         int32 SolverFieldFoamCount = 0;
