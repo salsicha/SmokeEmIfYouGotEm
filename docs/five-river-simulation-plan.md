@@ -137,6 +137,25 @@ and external acceptance gates pass.
   shoreline/banks, repeated ecology, rapid-scale VFX, hydraulic calibration,
   and all six external reviews remain open.
 
+### 2026-08-03 — Chilko organic shoreline presentation retained
+
+- `L_LavaCanyon` now adds a Chilko-only non-colliding dry-bank presentation
+  layer: 3,600 instances from the existing six-form rights-reviewed CC0 rock
+  family and 4,200 instances from the existing two-form project-owned short
+  ground-cover family. Every instance is deterministically grounded on the
+  source Landscape outside the active river width and screened against the full
+  centerline, conditioned water height, and hard slope ceilings.
+- The first small, far-bank tuning was rejected after its same-camera frame
+  failed to visibly change the smooth bank. The retained bank-face tuning places
+  all 7,800 targets with zero rejects, keeps maximum placed slope below 15.952
+  degrees, and increases the matched bank-band green-dominant fraction from
+  `0.168841` to `0.265534` and edge fraction from `0.130677` to `0.218952`.
+- Terrain geometry/collision, water geometry, cooked fields, wet/dry masks,
+  bathymetry, hydraulics, buoyancy, and raft forces are unchanged. The lower
+  bank remains smooth; vegetation and rock forms remain procedural and lack
+  exact ecology/geology authority; water/VFX, hydraulic calibration, platform
+  performance, and all six external gates remain open.
+
 ### 2026-08-03 — Pacuare live transmitting gameplay water retained
 
 - `L_UpperHuacas` now uses a solver-owned, wet-cell-clipped transmitting core

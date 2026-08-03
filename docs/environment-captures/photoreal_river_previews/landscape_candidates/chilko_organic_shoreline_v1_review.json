@@ -1,0 +1,156 @@
+{
+  "schema": "raftsim.environment.chilko_organic_shoreline_review.v1",
+  "generated_utc": "2026-08-03T18:05:08Z",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "river_id": "chilko_river_lava_canyon",
+  "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+  "decision": {
+    "reference_runnable": true,
+    "organic_shoreline_v1_retained": true,
+    "initial_far_bank_small_scale_tuning_rejected": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false,
+    "runtime_artifacts_promoted": true,
+    "b2_asset_set_promoted": false
+  },
+  "implementation": {
+    "scope": "chilko_only_full_route_deterministic_source_landscape_grounded_presentation_layer",
+    "gravel": {
+      "morphology_actor_count": 6,
+      "target_instance_count": 3600,
+      "placed_instance_count": 3600,
+      "rejected_placement_count": 0,
+      "target_height_range_m": [0.1, 1.4],
+      "candidate_count_per_target": 48,
+      "maximum_slope_degrees": 42.0,
+      "maximum_placed_slope_degrees": 15.617,
+      "minimum_centerline_distance_cm": 2109.4,
+      "source": "existing_rights_reviewed_cc0_poly_haven_six_variant_rock_morphology_donors",
+      "authority": "presentation_only_procedural_source_gap_fill_no_lithology_collision_bathymetry_hydraulic_or_raft_force_authority"
+    },
+    "ground_cover": {
+      "morphology_actor_count": 2,
+      "target_instance_count": 4200,
+      "placed_instance_count": 4200,
+      "rejected_placement_count": 0,
+      "target_height_range_m": [0.36, 1.1],
+      "candidate_count_per_target": 48,
+      "maximum_slope_degrees": 32.0,
+      "maximum_placed_slope_degrees": 15.951,
+      "minimum_centerline_distance_cm": 2159.641,
+      "shadow_casting": false,
+      "source": "existing_project_owned_two_morphology_opaque_temperate_ground_cover_family",
+      "authority": "presentation_only_procedural_source_gap_fill_no_species_ecology_survey_collision_hydraulic_or_raft_force_authority"
+    },
+    "saved_map_totals": {
+      "rock_instances": 5220,
+      "foliage_instances": 12200,
+      "canopy_instances": 4650,
+      "understory_instances": 7550
+    }
+  },
+  "live_pie_evidence": {
+    "command": "RaftSim.CaptureAfter 8 chilko_organic_shoreline_v1_breaking_water_side breaking_water_side",
+    "camera": "breaking_water_side",
+    "camera_site_station_m": 300.0,
+    "camera_site_lateral_m": -3.0,
+    "camera_site_intensity_at_capture": 0.378,
+    "presentation_coverage": 1.0,
+    "presentation_edge_clearance_m": 15.0,
+    "resolution_px": [1280, 720],
+    "capture_exit_code": 0
+  },
+  "visual_comparison": {
+    "method": "Direct sRGB metrics over the identical 1280x720 breaking_water_side camera. The measured bank band is rows 140 through 259. Green dominance requires G-max(R,B)>0.04; edge fraction uses adjacent-pixel luminance-gradient magnitude >0.08.",
+    "baseline_transmitting_water_v2": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_transmitting_water_v2_breaking_water_side.png",
+      "sha256": "91056ee2e68a892de51a7f6bacf7c2fc1ed11e0a756d65e46f1f51252c7dd900",
+      "bank_mean_luminance": 0.511873,
+      "bank_luminance_standard_deviation": 0.193792,
+      "bank_mean_chroma": 0.128262,
+      "bank_green_dominant_fraction": 0.168841,
+      "bank_edge_fraction": 0.130677,
+      "bank_mean_edge_magnitude": 0.033148
+    },
+    "retained_organic_shoreline_v1": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_organic_shoreline_v1_breaking_water_side.png",
+      "sha256": "d8006e7a9a14b93512685034a175bd39773a27f709d37476852f83cca539ab3b",
+      "bank_mean_luminance": 0.50805,
+      "bank_luminance_standard_deviation": 0.18997,
+      "bank_mean_chroma": 0.132076,
+      "bank_green_dominant_fraction": 0.265534,
+      "bank_edge_fraction": 0.218952,
+      "bank_mean_edge_magnitude": 0.048663
+    },
+    "measured_change": {
+      "bank_green_dominant_fraction_relative_increase": 0.57269,
+      "bank_edge_fraction_relative_increase": 0.67551,
+      "bank_mean_edge_magnitude_relative_increase": 0.46805
+    },
+    "verdict": "Retain as a bounded technical shoreline improvement. The corrected bank-face tuning visibly replaces part of the barren upper bench with short cover and irregular rock silhouettes, materially increasing green coverage and bank-edge breakup without changing terrain or river physics. The lower wet-bank bench, plant forms, geology, terrain detail, forest, atmosphere, and water remain visibly procedural, so photoreal acceptance stays rejected."
+  },
+  "validation": {
+    "filtered_generation": "passed; the runnable Lava Canyon map, three canonical source captures, and manifest regenerated with 3600 gravel plus 4200 ground-cover instances and zero placement rejects",
+    "unreal_editor_build": "passed; full 137-action build plus final 3-action incremental build succeeded",
+    "live_capture": "passed; identical breaking_water_side runtime capture completed at 1280x720 with exit code 0",
+    "native_runnable_map_audit": "passed 1/1; RaftSim.P4.RiverMapLoads.L_LavaCanyon loaded the vertical-slice PIE map with MapCheck 0/0 and audited exactly six gravel plus two ground-cover actors, 3600 plus 4200 instances, non-collision, source grounding, solver-strip exclusion, authority disclaimers, and suppressed ground-cover shadows",
+    "focused_python": "passed 23/23; Chilko organic shoreline, shared temperate waterline structure, shared temperate bank ecology V4, and Lava Canyon water contracts"
+  },
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_organic_shoreline_v1_breaking_water_side.png",
+      "sha256": "d8006e7a9a14b93512685034a175bd39773a27f709d37476852f83cca539ab3b",
+      "immutable_evidence": true
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "sha256": "31505aae521b380ad8fc1202a73942f6f12c38a8285adf577fb22a728ee9ccf5",
+      "versioned_in_place": true
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "248d74b6e9ee250eac91ecdf94ab488b48502a6285e01b9a826710a3483d6964",
+      "versioned_in_place": true
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+      "sha256": "f34d40ebb4469bb3583e2f1b9c0111e4eb551014a1d7826eb8666920084f0c0f",
+      "versioned_in_place": true
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+      "sha256": "683d7ae171290c7462237454004062e3ad26b91ec794de73962b4e8439011f36",
+      "versioned_in_place": true
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+      "sha256": "a90f5a1d025ab14421a876c837b4ca3b0de5cb2893dcb531dc422f9987db6a38",
+      "versioned_in_place": true
+    }
+  ],
+  "remaining_photoreal_defects": [
+    "The lower water-adjacent bench remains broad and smooth; fine gravel, sediment sorting, roots, deadwood, leaf litter, wetness variation, and erosion microgeometry remain incomplete.",
+    "The short ground-cover family is project-owned procedural morphology rather than reviewed Chilcotin grass, forb, willow, or regeneration ecology and reads too bright and repetitive in the retained capture.",
+    "The six rock forms are generic CC0 morphology donors rather than surveyed Lava Canyon lithology, size distribution, burial, or hazard geometry.",
+    "The source Landscape and canonical captures retain tessellated-looking terrain, abrupt water/land contact shapes, and insufficient high-frequency near-field material response.",
+    "The conifer and broadleaf forest remains visibly stylized, over-repeated, and unsupported by reach-specific species, age-class, burn-history, or density review.",
+    "The rapid retains a broad sun reflection, smooth sheet-like standing-wave faces, sparse solver foam, and inadequate entrained-air depth, crest breakup, spray, and mist.",
+    "The cooked Lava Canyon field remains unconverged and its discharge, bathymetry, stationing, hazards, and guide line are not calibrated to observed river behavior.",
+    "Raft, crew, equipment, animation, complete-run rescue and capsize behavior, packaged performance, and VR presentation still require final acceptance."
+  ],
+  "required_external_acceptance_gates": [
+    "local Chilko guide review of Lava Canyon stationing, approach, lines, hazards, recovery, access, rescue routes, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, rocks, bathymetry, stationing, and vertical datums",
+    "hydraulic calibration and convergence approval against observed Lava Canyon behavior across playable discharge bands",
+    "Chilcotin ecology, geology, and environment-art approval of species, density, ground cover, wet banks, rocks, valley form, atmosphere, and season",
+    "photoreal water and VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ]
+}

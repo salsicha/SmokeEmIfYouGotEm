@@ -48,6 +48,12 @@ constexpr float TemperateWaterlineStructureSlopeCeilingDegrees = 55.0f;
 constexpr int32 TemperateNearBankEcologyTargetInstanceCount = 1800;
 constexpr int32 TemperateNearBankEcologyMinimumInstanceCount = 1600;
 constexpr float TemperateNearBankEcologySlopeCeilingDegrees = 38.0f;
+constexpr int32 ChilkoOrganicShorelineGravelTargetInstanceCount = 3600;
+constexpr int32 ChilkoOrganicShorelineGravelMinimumInstanceCount = 3300;
+constexpr float ChilkoOrganicShorelineGravelSlopeCeilingDegrees = 42.0f;
+constexpr int32 ChilkoOrganicShorelineGroundCoverTargetInstanceCount = 4200;
+constexpr int32 ChilkoOrganicShorelineGroundCoverMinimumInstanceCount = 3800;
+constexpr float ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees = 32.0f;
 constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
     "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
 constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
@@ -3158,6 +3164,45 @@ bool AddLandscapeCandidateBiomeDressing(
         }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ChilkoOrganicShorelineGravelInstances;
+    if (bChilko)
+    {
+        for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+        {
+            ChilkoOrganicShorelineGravelInstances.Add(
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGravelRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    true));
+        }
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ChilkoOrganicShorelineGroundCoverInstances;
+    if (bChilko)
+    {
+        ChilkoOrganicShorelineGroundCoverInstances = {
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                UnderstoryMesh,
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGroundCoverA_%s"),
+                    *Candidate.PreviewSpec.RiverId),
+                false,
+                TemperateOpaqueVegetationMaterial),
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                TemperateUnderstoryMeshB,
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGroundCoverB_%s"),
+                    *Candidate.PreviewSpec.RiverId),
+                false,
+                TemperateOpaqueVegetationMaterial)};
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
     UMaterialInstanceConstant* ZambeziRunnableLaunchTalusMaterial = bZambezi
         ? LoadOrCreateZambeziRunnableLaunchTalusMaterial(OutSummary)
@@ -3224,6 +3269,18 @@ bool AddLandscapeCandidateBiomeDressing(
         }) ||
         Algo::AnyOf(
             TemperateWaterlineStructureInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            ChilkoOrganicShorelineGravelInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            ChilkoOrganicShorelineGroundCoverInstances,
             [](UHierarchicalInstancedStaticMeshComponent* Component)
             {
                 return Component == nullptr;
@@ -3417,6 +3474,70 @@ bool AddLandscapeCandidateBiomeDressing(
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimNonCollisionRenderSurface"));
             }
+        }
+    }
+    if (bChilko)
+    {
+        auto TagChilkoShorelineComponent = [](
+            UHierarchicalInstancedStaticMeshComponent* Component,
+            FName FamilyTag)
+        {
+            if (!Component)
+            {
+                return;
+            }
+            if (AActor* Owner = Component->GetOwner())
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimChilkoLavaCanyonRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimChilkoOrganicShorelineV1"));
+                Owner->Tags.AddUnique(FamilyTag);
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralSourceGapFill"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimChilkoOrganicShorelineV1"));
+            Component->ComponentTags.AddUnique(FamilyTag);
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        };
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ChilkoOrganicShorelineGravelInstances)
+        {
+            TagChilkoShorelineComponent(
+                Component,
+                TEXT("RaftSimChilkoShorelineGravel"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+            }
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ChilkoOrganicShorelineGroundCoverInstances)
+        {
+            TagChilkoShorelineComponent(
+                Component,
+                TEXT("RaftSimChilkoShorelineGroundCover"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOrganicBankGroundCover"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
         }
     }
     if (bZambezi)
@@ -4253,6 +4374,391 @@ bool AddLandscapeCandidateBiomeDressing(
             : 0.0f;
     OutResult.DressingTemperateWaterlineMaximumSlopeDegrees =
         TemperateWaterlineMaximumSlopeDegrees;
+
+    int32 ChilkoShorelineGravelPlacedCount = 0;
+    int32 ChilkoShorelineGravelRejectedPlacementCount = 0;
+    float ChilkoShorelineGravelMinimumCenterlineDistanceCm =
+        TNumericLimits<float>::Max();
+    float ChilkoShorelineGravelMaximumSlopeDegrees = 0.0f;
+    if (bChilko && bPhysicalCorridor &&
+        ReviewedRockMeshes.Num() == 6 &&
+        ChilkoOrganicShorelineGravelInstances.Num() == 6)
+    {
+        // Break up the broad, visibly smooth Lava Canyon shoreline benches
+        // with small, irregular CC0 rock morphology donors. The conditioned
+        // source Landscape remains ground/collision authority; this layer is
+        // always outside the full visible-water width and cannot affect the
+        // solver, bathymetry, hydraulics, or raft forces.
+        const float VisibleRiverHalfWidth = ActiveRiverHalfWidth * 1.03f;
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerSide =
+            ChilkoOrganicShorelineGravelTargetInstanceCount / BankSideCount;
+        for (int32 GravelIndex = 0;
+             GravelIndex < ChilkoOrganicShorelineGravelTargetInstanceCount;
+             ++GravelIndex)
+        {
+            const int32 SideIndex = GravelIndex % BankSideCount;
+            const int32 AlongIndex = GravelIndex / BankSideCount;
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(GravelIndex, 10303)) /
+                static_cast<float>(InstancesPerSide);
+            const float BaseLogicalX =
+                FMath::Lerp(-2380.0f, 25300.0f, AlongT) +
+                72.0f * FMath::Sin(
+                    static_cast<float>(GravelIndex) * 0.7548777f);
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (VisibleRiverHalfWidth + 360.0f));
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestCenterlineDistanceCm = 0.0f;
+            float BestScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 48;
+                 ++CandidateIndex)
+            {
+                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                    -105.0f,
+                    105.0f,
+                    ZambeziVegetationUnitRandom(
+                        GravelIndex * 53 + CandidateIndex,
+                        10313));
+                const float AdditionalOffset = FMath::Lerp(
+                    70.0f,
+                    2400.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            GravelIndex * 59 + CandidateIndex,
+                            10321),
+                        1.90f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (VisibleRiverHalfWidth + AdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float CenterlineDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                const float HeightAboveWaterCm = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y) -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (SlopeDegrees >
+                        ChilkoOrganicShorelineGravelSlopeCeilingDegrees ||
+                    CenterlineDistanceCm < VisibleRiverHalfWidth + 45.0f ||
+                    HeightAboveWaterCm < -5.0f ||
+                    HeightAboveWaterCm > 650.0f)
+                {
+                    continue;
+                }
+                const float TargetDryHeightCm = FMath::Lerp(
+                    48.0f,
+                    260.0f,
+                    ZambeziVegetationUnitRandom(GravelIndex, 10331));
+                const float Score =
+                    0.58f * FMath::Abs(
+                        HeightAboveWaterCm - TargetDryHeightCm) / 650.0f +
+                    0.29f * AdditionalOffset / 2400.0f +
+                    0.13f * SlopeDegrees /
+                        ChilkoOrganicShorelineGravelSlopeCeilingDegrees;
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestPoint = CandidatePoint;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestCenterlineDistanceCm = CenterlineDistanceCm;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                ++ChilkoShorelineGravelRejectedPlacementCount;
+                continue;
+            }
+
+            const int32 ScaleClass = GravelIndex % 36;
+            const float TargetHeightCm = ScaleClass == 0
+                ? FMath::Lerp(
+                      80.0f,
+                      140.0f,
+                      ZambeziVegetationUnitRandom(GravelIndex, 10343))
+                : (ScaleClass < 8
+                       ? FMath::Lerp(
+                             32.0f,
+                             72.0f,
+                             ZambeziVegetationUnitRandom(
+                                 GravelIndex,
+                                 10351))
+                       : FMath::Lerp(
+                             10.0f,
+                             34.0f,
+                             ZambeziVegetationUnitRandom(
+                                 GravelIndex,
+                                 10357)));
+            const int32 VariantIndex = GravelIndex % ReviewedRockMeshes.Num();
+            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
+            UHierarchicalInstancedStaticMeshComponent* GravelComponent =
+                ChilkoOrganicShorelineGravelInstances[VariantIndex];
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                GravelComponent,
+                RockMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.08f, 0.0f, 3.4f),
+                    360.0f * ZambeziVegetationUnitRandom(
+                        GravelIndex,
+                        10369),
+                    FMath::Lerp(
+                        -4.0f,
+                        4.0f,
+                        ZambeziVegetationUnitRandom(
+                            GravelIndex,
+                            10373))),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.70f,
+                        1.48f,
+                        ZambeziVegetationUnitRandom(
+                            GravelIndex,
+                            10379)),
+                    UniformScale * FMath::Lerp(
+                        0.72f,
+                        1.44f,
+                        ZambeziVegetationUnitRandom(
+                            GravelIndex,
+                            10391)),
+                    UniformScale));
+            ++ChilkoShorelineGravelPlacedCount;
+            ++OutResult.DressingBoulderInstanceCount;
+            ChilkoShorelineGravelMinimumCenterlineDistanceCm = FMath::Min(
+                ChilkoShorelineGravelMinimumCenterlineDistanceCm,
+                BestCenterlineDistanceCm);
+            ChilkoShorelineGravelMaximumSlopeDegrees = FMath::Max(
+                ChilkoShorelineGravelMaximumSlopeDegrees,
+                BestSlopeDegrees);
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ChilkoOrganicShorelineGravelInstances)
+        {
+            Component->MarkRenderStateDirty();
+        }
+        OutSummary += FString::Printf(
+            TEXT("%s organic shoreline gravel V1: %d/%d source-grounded, ")
+            TEXT("non-colliding six-morphology cobbles across both full-route ")
+            TEXT("banks; %d targets rejected by visible-water clearance, ")
+            TEXT("dry-height, or %.1f-degree slope gates; minimum centerline ")
+            TEXT("distance %.1f cm and maximum placed slope %.2f degrees. ")
+            TEXT("Presentation-only procedural gap fill with no lithology, ")
+            TEXT("collision, bathymetry, hydraulic, or raft-force authority.\n"),
+            *Spec.RiverId,
+            ChilkoShorelineGravelPlacedCount,
+            ChilkoOrganicShorelineGravelTargetInstanceCount,
+            ChilkoShorelineGravelRejectedPlacementCount,
+            ChilkoOrganicShorelineGravelSlopeCeilingDegrees,
+            ChilkoShorelineGravelMinimumCenterlineDistanceCm,
+            ChilkoShorelineGravelMaximumSlopeDegrees);
+    }
+    OutResult.DressingChilkoOrganicShorelineGravelTargetInstanceCount =
+        bChilko ? ChilkoOrganicShorelineGravelTargetInstanceCount : 0;
+    OutResult.DressingChilkoOrganicShorelineGravelInstanceCount =
+        ChilkoShorelineGravelPlacedCount;
+    OutResult.DressingChilkoOrganicShorelineGravelRejectedPlacementCount =
+        ChilkoShorelineGravelRejectedPlacementCount;
+    OutResult.DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm =
+        ChilkoShorelineGravelPlacedCount > 0
+            ? ChilkoShorelineGravelMinimumCenterlineDistanceCm
+            : 0.0f;
+    OutResult.DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees =
+        ChilkoShorelineGravelMaximumSlopeDegrees;
+
+    int32 ChilkoShorelineGroundCoverPlacedCount = 0;
+    int32 ChilkoShorelineGroundCoverRejectedPlacementCount = 0;
+    float ChilkoShorelineGroundCoverMinimumCenterlineDistanceCm =
+        TNumericLimits<float>::Max();
+    float ChilkoShorelineGroundCoverMaximumSlopeDegrees = 0.0f;
+    if (bChilko && bPhysicalCorridor &&
+        ChilkoOrganicShorelineGroundCoverInstances.Num() == 2)
+    {
+        // Short, non-shadowing meadow patches soften the transition from the
+        // gravel band to the wider shrub/canopy layer. They are selected only
+        // on dry, low-slope source Landscape and make no species or ecology
+        // claim.
+        const float VisibleRiverHalfWidth = ActiveRiverHalfWidth * 1.03f;
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerSide =
+            ChilkoOrganicShorelineGroundCoverTargetInstanceCount /
+            BankSideCount;
+        for (int32 CoverIndex = 0;
+             CoverIndex < ChilkoOrganicShorelineGroundCoverTargetInstanceCount;
+             ++CoverIndex)
+        {
+            const int32 SideIndex = CoverIndex % BankSideCount;
+            const int32 AlongIndex = CoverIndex / BankSideCount;
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(CoverIndex, 10403)) /
+                static_cast<float>(InstancesPerSide);
+            const float BaseLogicalX =
+                FMath::Lerp(-2380.0f, 25300.0f, AlongT) +
+                88.0f * FMath::Sin(
+                    static_cast<float>(CoverIndex) * 0.618034f);
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (VisibleRiverHalfWidth + 620.0f));
+            float BestLogicalX = BaseLogicalX;
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestCenterlineDistanceCm = 0.0f;
+            float BestScore = TNumericLimits<float>::Max();
+            for (int32 CandidateIndex = 0; CandidateIndex < 48;
+                 ++CandidateIndex)
+            {
+                const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                    -130.0f,
+                    130.0f,
+                    ZambeziVegetationUnitRandom(
+                        CoverIndex * 61 + CandidateIndex,
+                        10411));
+                const float AdditionalOffset = FMath::Lerp(
+                    120.0f,
+                    4200.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            CoverIndex * 73 + CandidateIndex,
+                            10427),
+                        1.48f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (VisibleRiverHalfWidth + AdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float CenterlineDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                const float HeightAboveWaterCm = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y) -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                if (SlopeDegrees >
+                        ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees ||
+                    CenterlineDistanceCm < VisibleRiverHalfWidth + 85.0f ||
+                    HeightAboveWaterCm < 18.0f ||
+                    HeightAboveWaterCm > 1100.0f)
+                {
+                    continue;
+                }
+                const float TargetDryHeightCm = FMath::Lerp(
+                    125.0f,
+                    650.0f,
+                    ZambeziVegetationUnitRandom(CoverIndex, 10433));
+                const float Score =
+                    0.58f * FMath::Abs(
+                        HeightAboveWaterCm - TargetDryHeightCm) / 1100.0f +
+                    0.28f * AdditionalOffset / 4200.0f +
+                    0.14f * SlopeDegrees /
+                        ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees;
+                if (Score < BestScore)
+                {
+                    BestScore = Score;
+                    BestPoint = CandidatePoint;
+                    BestLogicalX = CandidateLogicalX;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestCenterlineDistanceCm = CenterlineDistanceCm;
+                }
+            }
+            if (BestScore == TNumericLimits<float>::Max())
+            {
+                ++ChilkoShorelineGroundCoverRejectedPlacementCount;
+                continue;
+            }
+
+            const int32 MorphologyIndex =
+                ZambeziVegetationUnitRandom(CoverIndex, 10439) > 0.48f ? 1 : 0;
+            UStaticMesh* CoverMesh = MorphologyIndex == 0
+                ? UnderstoryMesh
+                : TemperateUnderstoryMeshB;
+            UHierarchicalInstancedStaticMeshComponent* CoverComponent =
+                ChilkoOrganicShorelineGroundCoverInstances[MorphologyIndex];
+            const float TargetHeightCm = FMath::Lerp(
+                36.0f,
+                110.0f,
+                ZambeziVegetationUnitRandom(CoverIndex, 10453));
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(CoverMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                CoverComponent,
+                CoverMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.02f, 0.0f, 0.65f),
+                    360.0f * ZambeziVegetationUnitRandom(
+                        CoverIndex,
+                        10457),
+                    0.45f * FMath::Sin(BestLogicalX * 0.0013f)),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.74f,
+                        1.42f,
+                        ZambeziVegetationUnitRandom(
+                            CoverIndex,
+                            10463)),
+                    UniformScale * FMath::Lerp(
+                        0.76f,
+                        1.38f,
+                        ZambeziVegetationUnitRandom(
+                            CoverIndex,
+                            10477)),
+                    UniformScale));
+            ++ChilkoShorelineGroundCoverPlacedCount;
+            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
+            ChilkoShorelineGroundCoverMinimumCenterlineDistanceCm = FMath::Min(
+                ChilkoShorelineGroundCoverMinimumCenterlineDistanceCm,
+                BestCenterlineDistanceCm);
+            ChilkoShorelineGroundCoverMaximumSlopeDegrees = FMath::Max(
+                ChilkoShorelineGroundCoverMaximumSlopeDegrees,
+                BestSlopeDegrees);
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ChilkoOrganicShorelineGroundCoverInstances)
+        {
+            Component->MarkRenderStateDirty();
+        }
+        OutSummary += FString::Printf(
+            TEXT("%s organic shoreline ground cover V1: %d/%d short, ")
+            TEXT("non-shadowing, source-grounded patches across both full-route ")
+            TEXT("dry banks; %d targets rejected by visible-water clearance, ")
+            TEXT("dry-height, or %.1f-degree slope gates; minimum centerline ")
+            TEXT("distance %.1f cm and maximum placed slope %.2f degrees. ")
+            TEXT("Presentation-only procedural gap fill with no species, ")
+            TEXT("ecology, survey, hydraulic, collision, or raft-force authority.\n"),
+            *Spec.RiverId,
+            ChilkoShorelineGroundCoverPlacedCount,
+            ChilkoOrganicShorelineGroundCoverTargetInstanceCount,
+            ChilkoShorelineGroundCoverRejectedPlacementCount,
+            ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees,
+            ChilkoShorelineGroundCoverMinimumCenterlineDistanceCm,
+            ChilkoShorelineGroundCoverMaximumSlopeDegrees);
+    }
+    OutResult.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount =
+        bChilko ? ChilkoOrganicShorelineGroundCoverTargetInstanceCount : 0;
+    OutResult.DressingChilkoOrganicShorelineGroundCoverInstanceCount =
+        ChilkoShorelineGroundCoverPlacedCount;
+    OutResult.DressingChilkoOrganicShorelineGroundCoverRejectedPlacementCount =
+        ChilkoShorelineGroundCoverRejectedPlacementCount;
+    OutResult.DressingChilkoOrganicShorelineGroundCoverMinimumCenterlineDistanceCm =
+        ChilkoShorelineGroundCoverPlacedCount > 0
+            ? ChilkoShorelineGroundCoverMinimumCenterlineDistanceCm
+            : 0.0f;
+    OutResult.DressingChilkoOrganicShorelineGroundCoverMaximumSlopeDegrees =
+        ChilkoShorelineGroundCoverMaximumSlopeDegrees;
 
     if (bZambeziWoodland &&
         ReviewedRockMeshes.Num() == 6 &&
@@ -5831,6 +6337,7 @@ bool AddLandscapeCandidateBiomeDressing(
 
     const int32 ExpectedFoliageInstanceCount = FoliageClusterCount +
         TemperateNearBankPlacedCount +
+        ChilkoShorelineGroundCoverPlacedCount +
         HanceDrylandGroundCoverPlacedCount +
         HanceDrylandShrubPlacedCount +
         (bZambeziWoodland
@@ -5842,6 +6349,7 @@ bool AddLandscapeCandidateBiomeDressing(
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount ==
             BoulderCount + TemperateWaterlinePlacedCount +
+                ChilkoShorelineGravelPlacedCount +
                 RunnableLaunchTalusPlacedCount &&
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
         (!bOpaqueTemperate ||
@@ -5850,6 +6358,12 @@ bool AddLandscapeCandidateBiomeDressing(
         (!bOpaqueTemperate ||
          TemperateNearBankPlacedCount >=
              TemperateNearBankEcologyMinimumInstanceCount) &&
+        (!bChilko ||
+         ChilkoShorelineGravelPlacedCount >=
+             ChilkoOrganicShorelineGravelMinimumInstanceCount) &&
+        (!bChilko ||
+         ChilkoShorelineGroundCoverPlacedCount >=
+             ChilkoOrganicShorelineGroundCoverMinimumInstanceCount) &&
         ((Spec.bDesertCanyon && !bZambeziWoodland) ||
          OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&

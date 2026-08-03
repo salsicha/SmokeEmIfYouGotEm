@@ -344,6 +344,37 @@ and all six external gates remain open. Exact metrics, hashes, evidence, and
 authority boundaries are recorded in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_rapid_approach_launch_v1_review.json`.
 
+## Chilko Organic Shoreline V1
+
+The runnable Lava Canyon map now carries a Chilko-only, source-Landscape-
+grounded presentation layer for the visibly barren bank transition. Six
+existing rights-reviewed CC0 rock morphologies place 3,600 small-to-medium
+cobbles, while two project-owned opaque ground-cover morphologies place 4,200
+short, non-shadowing patches. A deterministic 48-choice search grounds every
+instance on both banks of the complete route, keeps it outside the active river
+width, rejects wet or steep placements, and leaves terrain, collision,
+bathymetry, hydraulics, buoyancy, and raft forces unchanged. All 7,800 targets
+place with zero rejects; the maximum measured slope is 15.951 degrees.
+
+The first far-bank/small-scale tuning passed the numeric gates but was rejected
+because it did not visibly break up the guide-eye bank. The retained tuning
+moves the layer toward the actual dry bank face while preserving solver-strip
+clearance. In the identical `breaking_water_side` frame, the measured bank-band
+green-dominant fraction rises from 0.168841 to 0.265534, edge fraction rises
+from 0.130677 to 0.218952, and mean edge magnitude rises from 0.033148 to
+0.048663. The upper bench now has readable short cover and irregular stone
+silhouettes instead of an uninterrupted tan surface.
+
+This is retained as a technical runtime improvement, not photoreal or B2 asset-
+set promotion. The lower wet-bank bench remains broad and smooth; cover is
+bright, stylized, repetitive, and not species-reviewed; rocks are generic
+morphology donors rather than Lava Canyon geology; the forest, terrain,
+atmosphere, water, VFX, hydraulic calibration, and raft/crew presentation remain
+incomplete. All six external acceptance gates remain open. Exact placement
+contracts, visual metrics, hashes, evidence, authority boundaries, and blockers
+are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_organic_shoreline_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.
