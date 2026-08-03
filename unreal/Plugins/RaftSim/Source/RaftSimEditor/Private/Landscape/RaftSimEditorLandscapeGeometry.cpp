@@ -1545,6 +1545,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
     const bool bReachLocalRun =
         bPacuare || bColoradoHance || bChilkoLavaCanyon || bFutaleufuTerminator;
+    const bool bSolverOwnedRuntimeWater = bReachLocalRun || bZambezi;
     if (!bZambezi && !bPacuare && !bColoradoHance && !bChilkoLavaCanyon &&
         !bFutaleufuTerminator)
     {
@@ -1714,7 +1715,7 @@ bool AddLandscapeCandidateRunnableGameplay(
     WaterConfig->CoordinateMapPath = CoordinateMapPath;
     WaterConfig->bEnableMovingWindowStreaming = false;
     WaterConfig->bMapProvidesTerrain = true;
-    WaterConfig->bLiveSolverOwnsRuntimeRendering = bReachLocalRun;
+    WaterConfig->bLiveSolverOwnsRuntimeRendering = bSolverOwnedRuntimeWater;
     if (bPacuare)
     {
         WaterConfig->LiveSurfaceCalmCoverage = 0.88f;
@@ -1842,6 +1843,67 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveReflectedSkyColor =
             FLinearColor(0.055f, 0.100f, 0.138f, 1.0f);
     }
+    else if (bZambezi)
+    {
+        // A transmitting wet-cell core replaces the opaque physical-corridor
+        // card during play. The cooked Zambezi field still owns geometry,
+        // wet/dry, stationing, forces, and foam masks; these river-local assets
+        // contribute only sediment-water optics and sub-grid surface breakup.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateZambeziBatokaLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures/"
+                 "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal."
+                 "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures/"
+                 "T_RaftSim_ZambeziBatokaWaterV1_FoamLace."
+                 "T_RaftSim_ZambeziBatokaWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Zambezi Batoka river-local live-water assets are incomplete.\n");
+            return false;
+        }
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.16f;
+        WaterConfig->LiveSurfaceSpecular = 0.30f;
+        WaterConfig->LiveSurfaceRoughness = 0.30f;
+        WaterConfig->LiveSkyReflectionStrength = 0.28f;
+        WaterConfig->LiveRippleStrength = 0.30f;
+        WaterConfig->LiveFoamIntensity = 0.72f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.55f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.82f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.82f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.10f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.66f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.92f;
+        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->LiveShallowSurfaceColor =
+            FLinearColor(0.080f, 0.120f, 0.060f, 1.0f);
+        WaterConfig->LiveDeepSurfaceColor =
+            FLinearColor(0.018f, 0.038f, 0.018f, 1.0f);
+        WaterConfig->LiveReflectedSkyColor =
+            FLinearColor(0.12f, 0.17f, 0.18f, 1.0f);
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.00018f, 0.00015f, 0.00009f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0060f, 0.0038f, 0.0068f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.17f, 0.14f, 0.085f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.48f;
+        WaterConfig->LiveDeepWaterOpacity = 0.70f;
+        WaterConfig->LiveFoamWaterOpacity = 0.86f;
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziTransmittingWaterV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
+    }
     WaterConfig->Tags.AddUnique(RunTag);
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));
@@ -1856,7 +1918,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimColoradoHanceLaceFoamV1"));
     }
-    if (bReachLocalRun)
+    if (bSolverOwnedRuntimeWater)
     {
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimLiveSolverWaterOwnsRuntimeRendering"));
@@ -2041,7 +2103,7 @@ bool AddLandscapeCandidateRunnableGameplay(
             "entry-marker-boulder geometry.\n");
     }
 
-    if (bReachLocalRun)
+    if (bSolverOwnedRuntimeWater)
     {
         // The authored ribbon is used for deterministic editor captures. In
         // gameplay, hide it so the solver-driven ARaftSimWaterSurfaceActor is

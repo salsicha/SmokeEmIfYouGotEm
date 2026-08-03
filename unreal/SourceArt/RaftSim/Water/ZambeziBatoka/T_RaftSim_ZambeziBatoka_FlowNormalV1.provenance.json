@@ -1,0 +1,27 @@
+{
+  "schema": "raftsim.first_party.generated_texture_provenance.v1",
+  "asset_id": "zambezi_batoka_flow_normal_v1",
+  "asset_role": "visual-only tangent-space live-water normal; no hydraulic, collision, wet-mask, bathymetry, or raft-force authority",
+  "generator": "OpenAI built-in image generation",
+  "generation_date_utc": "2026-08-03",
+  "generation_mode": "new image",
+  "generation_method": "project-directed generation of an orthographic Zambezi tangent-space normal with multiscale downstream and cross-current structure",
+  "prompt": "Use case: stylized-concept. Asset type: tileable game texture; tangent-space RGB normal-map data for Unreal water rendering. Primary request: create a square, seamless tangent-space normal map for high-volume sediment-bearing Zambezi River whitewater in Batoka Gorge. Encode irregular flow-aligned surface ridges at mixed real-world scales from roughly 0.25 to 5 meters, with cross-current interference, small eddy dimples, broken chaotic wavelets, and downstream directional structure. Style/medium: production game data texture, not a beauty image; flat-blue tangent-space normal-map appearance, RGB channels encoding surface normals. Composition/framing: orthographic square texture, edge-to-edge, seamless/tileable with mirror addressing; no single focal point. Color palette: tangent-space normal blue/purple/cyan only; dominant neutral flat-normal blue around RGB 128,128,255. Constraints: uniform data-map lighting; continuous usable normal data; no text, no watermark, no logos, no banks, no rocks, no raft, no people, no water color, no foam, no reflected sky, no photographic lighting. Avoid: repeated parallel bands, cellular honeycomb patterns, obvious spirals, concentric rings, isolated icon-like shapes, hard seams, baked shadows, baked highlights.",
+  "project_ownership": "first-party generated project asset",
+  "texture": {
+    "path": "unreal/SourceArt/RaftSim/Water/ZambeziBatoka/T_RaftSim_ZambeziBatoka_FlowNormalV1.png",
+    "sha256": "48352e03d2e535876ddd783cd249b4628938c264b965bd66951d4053540da716",
+    "width": 1254,
+    "height": 1254,
+    "encoding": "RGB tangent-space normal candidate",
+    "addressing": "mirror_x_mirror_y",
+    "srgb": false,
+    "compression": "normal_map"
+  },
+  "limitations": [
+    "The asset is procedural visual infill rather than measured Batoka surface photography.",
+    "Mirrored GPU addressing is required because opposite source-image borders are not byte-identical.",
+    "It may modulate only solver-owned wet geometry and cannot create hydraulic features.",
+    "In-engine visual, guide, water-VFX, and target-hardware acceptance remain required."
+  ]
+}
