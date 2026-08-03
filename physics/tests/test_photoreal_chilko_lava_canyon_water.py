@@ -269,7 +269,8 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     ):
         assert f'TEXT("{parameter}")' in runtime
     assert 'TEXT("LiveVolumeCoreMesh")' in runtime
-    assert "kLiveVolumeCoreMinimumCoverage = 0.60f" in runtime
+    assert "kLiveVolumeCoreMinimumStationCoverage = 0.60f" in runtime
+    assert "MinimumCellStationCoverage" in runtime
     assert "kLiveVolumeCoreCalmDetailCoverage = 0.035f" in runtime
     assert "kLiveVolumeCoreActiveDetailCoverage = 0.14f" in runtime
     assert "WetVertexMask[I0] != 0" in runtime

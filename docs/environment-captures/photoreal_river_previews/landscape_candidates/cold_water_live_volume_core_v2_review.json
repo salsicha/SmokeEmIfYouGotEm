@@ -1,0 +1,132 @@
+{
+  "schema": "raftsim.environment.cold_water_live_volume_core_review.v2",
+  "rivers": [
+    "futaleufu_river_chile",
+    "chilko_river_lava_canyon"
+  ],
+  "maps": [
+    "/Game/RaftSim/Maps/L_Terminator",
+    "/Game/RaftSim/Maps/L_LavaCanyon"
+  ],
+  "status": "technical_water_candidate_retained_photoreal_acceptance_open",
+  "passed": false,
+  "supersedes": {
+    "review": "chilko_live_volume_core_v1_review.json",
+    "scope": "current live-volume-core topology and Chilko rendered evidence only; the original review remains the historical pilot record"
+  },
+  "decision": {
+    "futaleufu_reference_runnable": true,
+    "chilko_reference_runnable": true,
+    "technical_candidate_passed": true,
+    "volume_core_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_or_raft_forces_changed": false
+  },
+  "architecture": {
+    "problem": "The live rapid surface is a detail overlay, not a transmitting river volume. Forcing it to near-opaque coverage made both cold-water reaches read as pale sheets. The first Chilko core pilot also multiplied its topology by bank-feather alpha and exposed an artificial one-cell dry strip beside the sampled wet bank when reused on Terminator.",
+    "retained_solution": "A second non-colliding solver-conforming mesh supplies Single Layer Water optical depth. Lateral topology accepts only quads whose four corners are wet, reaching the complete sampled wet bank without entering a dry cell. An independent 0.60 station-coverage threshold clips the rectangular moving-window ends. The mesh sits 1 cm beneath the live detail surface and reuses the raft-floor transmission aperture.",
+    "rollout_scope": "Futaleufu Terminator and Chilko Lava Canyon only. Existing versioned maps migrate from their unique cooked-field identities; future regeneration persists bEnableLiveSolverVolumeCore. Colorado and Pacuare remain on their separately reviewed carriers.",
+    "detail_surface_calm_coverage": 0.035,
+    "detail_surface_active_coverage": 0.14,
+    "minimum_core_station_coverage": 0.60,
+    "lateral_core_rule": "all four sampled cell vertices must be wet",
+    "core_surface_offset_cm": -1.0
+  },
+  "live_pie_evidence": {
+    "futaleufu_terminator": {
+      "wet_vertices": 1575,
+      "volume_core_enabled": true,
+      "volume_core_triangles": 2438,
+      "initial_active_breaking_sites": 5,
+      "initial_strongest_interior_intensity": 0.713,
+      "initial_strongest_interior_coverage": 1.0,
+      "initial_strongest_interior_clearance_m": 15.0,
+      "initial_visible_rapid_foam_vertices": 53,
+      "rapid_foam_mesh_visible": true
+    },
+    "chilko_lava_canyon": {
+      "wet_vertices": 1098,
+      "volume_core_enabled": true,
+      "volume_core_triangles": 1632,
+      "initial_active_breaking_sites": 1,
+      "initial_strongest_interior_intensity": 0.210,
+      "initial_strongest_interior_coverage": 1.0,
+      "initial_strongest_interior_clearance_m": 15.0,
+      "initial_visible_rapid_foam_vertices": 6,
+      "rapid_foam_mesh_visible": true
+    }
+  },
+  "visual_comparison": {
+    "futaleufu_terminator": {
+      "baseline_water_band_mean_luminance": 0.705063,
+      "retained_water_band_mean_luminance": 0.693355,
+      "baseline_water_band_highlight_fraction": 0.046663,
+      "retained_water_band_highlight_fraction": 0.065615,
+      "baseline_water_band_blue_minus_red": -0.030928,
+      "retained_water_band_blue_minus_red": 0.005841,
+      "verdict": "retain: the water changes from warm chalk-gray to a transmitting blue-gray body and the rejected bank-parallel dry strip is absent; the large rapid highlight remains too bright for photoreal acceptance"
+    },
+    "chilko_lava_canyon": {
+      "pilot_water_band_mean_luminance": 0.683587,
+      "retained_water_band_mean_luminance": 0.677159,
+      "pilot_water_band_highlight_fraction": 0.066228,
+      "retained_water_band_highlight_fraction": 0.053854,
+      "pilot_water_band_blue_minus_red": 0.023394,
+      "retained_water_band_blue_minus_red": 0.025393,
+      "verdict": "retain: the refined lateral topology preserves the blue-gray volume and rapid lace while reaching the sampled wet bank; no rectangular moving-window core end is visible"
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "passed",
+    "focused_python": "15 passed",
+    "broader_python_with_protected_editor_layout": "48 passed, 2 known unrelated failures",
+    "native_river_map_suite": "6 of 6 passed",
+    "native_futaleufu_terminator_map_test": "passed",
+    "native_chilko_lava_canyon_map_test": "passed",
+    "known_unrelated_failures": [
+      "RaftSimEditorLandscapeFoliage.cpp exceeds the existing 3000-line editor source gate",
+      "the checked-in editor source inventory is stale against unrelated protected source work"
+    ]
+  },
+  "remaining_photoreal_defects": [
+    "smooth low-frequency bank geometry and repeated or visibly tessellated ground material",
+    "stylized procedural tree, shrub, and understory morphology",
+    "overexposed rapid highlights and incomplete calibrated sky/reflection response",
+    "rapid crests lack production spray, mist, entrained-air depth, rock-contact plumes, and guide-reviewed morphology",
+    "no external guide, geospatial, hydraulic, ecology/geology, environment-art, water-VFX, or target-hardware acceptance"
+  ],
+  "required_external_acceptance_gates": [
+    "local guide review of Terminator and Lava Canyon stationing, lines, hazards, recovery, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datums",
+    "hydraulic convergence and calibration against observed rapid behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, and season",
+    "photoreal water/VFX and character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_live_rapid_lace_v1_breaking_water_side.png",
+      "role": "Futaleufu pre-volume-core baseline",
+      "sha256": "05c28c258484fb42360bf6eb8074b3ee7c2758b30d04e874949e0361cef99c8e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_live_volume_core_v2_breaking_water_side.png",
+      "role": "retained Futaleufu volume-core and completed-bank topology",
+      "sha256": "5c6459a69d48c828a667ed13e83f265323db2a534ceb4542aeba99fc71537c5d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_volume_core_pilot_v1_breaking_water_side.png",
+      "role": "Chilko first volume-core pilot",
+      "sha256": "972c15b6ccbe94d02009c98dc88e15b9198e3c044415df360179c75194f343e7"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_volume_core_v2_breaking_water_side.png",
+      "role": "retained Chilko completed-bank topology revalidation",
+      "sha256": "face5a4e939bb975af9c502acd4791f37aa735e51c4c764637358a49bff99ed6"
+    }
+  ]
+}

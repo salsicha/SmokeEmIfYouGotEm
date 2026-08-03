@@ -347,3 +347,31 @@ and external acceptance gates pass.
   ecology, blown highlights, incomplete rapid VFX, and all six external gates
   keep photoreal and production promotion rejected. Evidence is hash-locked in
   `chilko_live_volume_core_v1_review.json`.
+
+### 2026-08-02 — Cold-water live volume expanded and bank topology corrected
+
+- The retained Chilko Single Layer Water architecture now also serves
+  Futaleufú Terminator. Both maps use `0.035` calm and `0.14` active detail-
+  surface coverage above a non-colliding optical core, while Colorado and
+  Pacuare remain on their independently reviewed carrier architecture.
+- The first generalized trial exposed why the pilot's combined station/bank
+  alpha could not own core topology: it created an artificial one-cell dry
+  strip parallel to Terminator's sampled wet bank. The retained rule now uses
+  the four-corner wet mask laterally and applies the `0.60` threshold only to
+  station-end coverage. That reaches the complete sampled wet bank without
+  entering a cell with any dry corner or exposing the rectangular moving-
+  window ends.
+- Live PIE reports 2,438 core triangles from 1,575 wet Terminator vertices and
+  1,632 core triangles from 1,098 wet Lava Canyon vertices. Terminator retains
+  five interior breaking sites and 53 rapid-foam vertices; Chilko retains one
+  site and six vertices. The full six-map native suite passes, as do the
+  editor build and 15 focused source checks.
+- The retained Terminator frame changes the rapid body from warm chalk-gray
+  (`blue-red=-0.030928`) to blue-gray (`blue-red=0.005841`) and removes the
+  rejected bank-parallel dry strip. Chilko remains blue-gray while its water-
+  band highlight fraction falls from `0.066228` to `0.053854`. Smooth banks,
+  tessellated ground, stylized ecology, bright rapid highlights, incomplete
+  rapid VFX, and all six external gates keep photoreal and production promotion
+  rejected. Current evidence is hash-locked in
+  `cold_water_live_volume_core_v2_review.json`; the Chilko V1 review remains the
+  historical pilot record but no longer describes the current topology.
