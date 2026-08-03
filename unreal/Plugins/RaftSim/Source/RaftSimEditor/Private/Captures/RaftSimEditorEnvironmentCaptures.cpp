@@ -95,10 +95,21 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         }
     }
 
-    if (Spec.RiverId == TEXT("american_south_fork"))
+    // Every physical runnable river owns a distinct solver-rapid review
+    // camera. The source-Landscape builder repositions this provisional actor
+    // onto the river-local hydraulic evidence after the centerline loads. The
+    // old South-Fork-only condition left Hance and the other bonus rivers with
+    // no rapid camera, so capture fell back to a duplicate guide/river-eye
+    // frame and could not prove the named rapid was visible.
     {
-        constexpr float SolverRapidCameraX = 240.0f;
-        constexpr float SolverRapidTargetX = 4740.0f;
+        const bool bSouthForkSolverRapidCamera =
+            Spec.RiverId == TEXT("american_south_fork");
+        const float SolverRapidCameraX = bSouthForkSolverRapidCamera
+            ? 240.0f
+            : RiverEyeCameraX + 900.0f;
+        const float SolverRapidTargetX = bSouthForkSolverRapidCamera
+            ? 4740.0f
+            : RiverEyeTargetX + 900.0f;
         const float SolverRapidCameraY = GetPreviewRiverCenterY(Spec, SolverRapidCameraX);
         const float SolverRapidTargetY = GetPreviewRiverCenterY(Spec, SolverRapidTargetX);
         const float SolverRapidYawDeg = FMath::RadiansToDegrees(
@@ -110,12 +121,19 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
                 World->GetCurrentLevel(),
                 ACameraActor::StaticClass(),
                 FTransform(
-                    FRotator(-9.5f, SolverRapidYawDeg, 0.0f),
-                    FVector(SolverRapidCameraX, SolverRapidCameraY, 168.0f))));
+                    FRotator(
+                        Spec.bDesertCanyon ? -8.5f : -9.5f,
+                        SolverRapidYawDeg,
+                        0.0f),
+                    FVector(
+                        SolverRapidCameraX,
+                        SolverRapidCameraY,
+                        Spec.bDesertCanyon ? 185.0f : 168.0f))));
         if (SolverRapidCamera)
         {
             SolverRapidCamera->SetActorLabel(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"));
-            SolverRapidCamera->GetCameraComponent()->FieldOfView = 70.0f;
+            SolverRapidCamera->GetCameraComponent()->FieldOfView =
+                Spec.bDesertCanyon ? 64.0f : 70.0f;
             if (RiverEyeCamera && RiverEyeCamera->GetCameraComponent())
             {
                 SolverRapidCamera->GetCameraComponent()->PostProcessSettings =

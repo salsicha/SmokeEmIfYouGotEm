@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Corrected Colorado Hance's runnable rapid framing without changing the
+  committed cooked fields. `L_Hance` now launches at station 336 m instead of
+  24 m, retaining a 69 m deep subcritical approach to an accepted interior
+  solver transition near station 405 m. The live map reports seven active
+  breaking sites, 18 m strongest-interior clearance, hydraulic relief, and
+  visible rapid foam; low, moderate, and high bands pass the matching 3 m
+  runtime-sampling contract. A separately serialized solver-rapid camera also
+  replaces the duplicate guide/rapid evidence view. The three frames remain
+  photoreal-rejected for flat banded water, weak foam/spray volume, terraced
+  terrain, sparse repeated ground cover, and all six open external gates.
 - Reaffirmed Zambezi as the sixth runnable river after the latest environment
   milestones. The unchanged committed `L_Zambezi` package remains selectable
   as **Zambezi: Boiling Pot to Mukuni Beach** in Free Run and remains in the

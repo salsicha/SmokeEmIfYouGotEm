@@ -293,7 +293,15 @@ def test_hance_transmitting_water_v2_review_is_hash_locked_and_honest() -> None:
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 
+    supersession = review["superseded_mutable_artifacts_by"]
+    successor = REPO_ROOT / supersession["review_path"]
+    assert successor.is_file()
+    superseded_paths = set(supersession["paths"])
+    assert len(superseded_paths) == 4
     for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
-        assert _sha256(path) == artifact["sha256"]
+        if artifact["path"] in superseded_paths:
+            assert _sha256(path) != artifact["sha256"]
+        else:
+            assert _sha256(path) == artifact["sha256"]

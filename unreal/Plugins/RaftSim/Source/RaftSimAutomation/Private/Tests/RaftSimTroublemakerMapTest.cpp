@@ -765,6 +765,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Colorado Hance player raft is marked reference-runnable"),
             PlayerRaft->Tags.Contains(TEXT("RaftSimReferenceRunnable")));
         Test->TestTrue(
+            TEXT("Colorado Hance launches on the reviewed rapid approach"),
+            PlayerRaft->Tags.Contains(
+                TEXT("RaftSimColoradoHanceRapidApproachLaunchV1")));
+        Test->TestTrue(
             TEXT("Colorado Hance launch keeps the raft upright"),
             PlayerRaft->GetRaftMode() == ERaftSimRaftMode::Upright);
         Test->TestEqual(
@@ -893,12 +897,30 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     (*It)->Tags.Contains(TEXT("RaftSimRenderOnlyHydraulicSmoothing")) &&
                     (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")) &&
                     (*It)->Tags.Contains(TEXT("RaftSimColoradoHanceLaceFoamV1")));
+            Test->TestTrue(
+                TEXT("Colorado Hance config records rapid-approach framing"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimColoradoHanceRapidApproachLaunchV1")));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(
             TEXT("Colorado Hance reference run has one runtime water config"),
             RuntimeWaterConfigCount,
             1);
+
+        bool bHasSolverRapidCamera = false;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if ((*It)->GetActorLabel() ==
+                TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"))
+            {
+                bHasSolverRapidCamera = true;
+                break;
+            }
+        }
+        Test->TestTrue(
+            TEXT("Colorado Hance map retains a distinct solver-rapid camera"),
+            bHasSolverRapidCamera);
 
         int32 CaptureOnlyWaterCount = 0;
         int32 SolverFieldFoamCount = 0;

@@ -398,3 +398,25 @@ and external acceptance gates pass.
   rejected. Current evidence is hash-locked in
   `cold_water_live_volume_core_v2_review.json`; the Chilko V1 review remains the
   historical pilot record but no longer describes the current topology.
+
+### 2026-08-03 — Colorado Hance rapid-approach framing corrected
+
+- Re-sampled every committed Hance release band on the live renderer's exact
+  3 m grid. Low, moderate, and high bands each contain accepted interior
+  supercritical-to-subcritical candidates near local station 405 m; the prior
+  generic station-24 m launch kept that structure outside the useful runnable
+  approach framing.
+- `L_Hance` now launches at station 336 m in deep subcritical water, retaining
+  69 m of approach. The live map reports seven active breaking sites, full
+  strongest-interior presentation coverage, 18 m clearance, 0.2014 m maximum
+  hydraulic relief, and one visible rapid-foam vertex. A separately serialized
+  solver-rapid camera replaces the previously duplicated guide/rapid evidence
+  view, and all three fixed cameras are byte-distinct.
+- No cooked field, wet/dry mask, bathymetry, collision, buoyancy, or raft force
+  changed. The corrected scenario framing remains only reference-runnable:
+  flat muddy cross-river water bands, sparse foam without rapid-scale spray or
+  mist, terraced/tessellated canyon surfaces, repeated sparse ecology and
+  ground cover, missing surveyed geography, unconverged hydraulics, and all
+  six external acceptance gates keep photoreal and production promotion open.
+  Evidence is hash-locked in
+  `colorado_hance_rapid_approach_launch_v1_review.json`.
