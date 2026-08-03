@@ -1267,7 +1267,8 @@ bool FRaftSimM5StartRescueCommand::Update()
             It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f);
         Test->TestTrue(
             FString::Printf(
-                TEXT("MetaHuman crew %s centres its closed fingers on the solved grip "
+                TEXT("MetaHuman crew %s centres its staggered lower-hand C-grip "
+                     "fingers on the solved shaft grip "
                      "(error %.3f cm)"),
                 *It->GetName(),
                 It->GetMaximumPaddleGripContactErrorCm()),

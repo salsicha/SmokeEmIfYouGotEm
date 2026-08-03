@@ -61,6 +61,49 @@ const FName MetaHumanDrivenBones[] = {
 const TCHAR* GripDigits[] = {
     TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")};
 
+struct FAnatomicalGripDigitProfile
+{
+    float EntrySweepDegrees;
+    float MiddleSweepDegrees;
+    float TipSweepDegrees;
+    float ProximalRadiusCm;
+    float PadCenterRadiusCm;
+    float TipCenterRadiusCm;
+    float FanDegrees;
+};
+
+bool ResolveAnatomicalGripDigitProfile(
+    const TCHAR* Digit,
+    FAnatomicalGripDigitProfile& OutProfile)
+{
+    // The previous identical 50/68/52-degree arcs made all four fingers read
+    // as one circular ring. These asymmetric C-grips preserve the source
+    // skeleton's authored finger lengths and fan each digit slightly. The
+    // thumb keeps its authored curl: forcing it onto the same radial solver
+    // produced an artificial oval loop around the lower shaft.
+    if (FCString::Strcmp(Digit, TEXT("index")) == 0)
+    {
+        OutProfile = {30.0f, 42.0f, 28.0f, 3.25f, 2.45f, 1.95f, 12.0f};
+        return true;
+    }
+    if (FCString::Strcmp(Digit, TEXT("middle")) == 0)
+    {
+        OutProfile = {32.0f, 46.0f, 30.0f, 3.30f, 2.50f, 1.98f, 4.0f};
+        return true;
+    }
+    if (FCString::Strcmp(Digit, TEXT("ring")) == 0)
+    {
+        OutProfile = {30.0f, 44.0f, 30.0f, 3.18f, 2.45f, 1.95f, -5.0f};
+        return true;
+    }
+    if (FCString::Strcmp(Digit, TEXT("pinky")) == 0)
+    {
+        OutProfile = {28.0f, 40.0f, 28.0f, 3.00f, 2.35f, 1.90f, -12.0f};
+        return true;
+    }
+    return false;
+}
+
 FLinearColor ResolveSkinTone(int32 VariantIndex, bool bGuide)
 {
     if (bGuide)
@@ -1232,9 +1275,23 @@ float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleFingerContactErrorCm(
     {
         const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
         const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        // The top hand closes over the transverse T-grip with its authored
+        // skeletal curl. Projecting that short handle toward a head-on camera
+        // and forcing every joint onto a radial contact arc creates a false
+        // donut silhouette. The lower hand is the shaft-contact hand and is
+        // the one that must satisfy the deterministic radial contact metric.
+        if (FVector::DistSquared(GripCenterCm, Pose.PaddleTopCm) <= 4.0f)
+        {
+            continue;
+        }
         const FVector GripAxis = ResolvePaddleGripAxis(Pose, GripCenterCm);
         for (const TCHAR* Digit : {TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
         {
+            FAnatomicalGripDigitProfile Profile;
+            if (!ResolveAnatomicalGripDigitProfile(Digit, Profile))
+            {
+                return TNumericLimits<float>::Max();
+            }
             const FName DistalName(*FString::Printf(TEXT("%s_03_%s"), Digit, Side));
             if (Body->GetBoneIndex(DistalName) == INDEX_NONE)
             {
@@ -1249,7 +1306,7 @@ float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleFingerContactErrorCm(
                 GripAxis).Size();
             MaximumErrorCm = FMath::Max(
                 MaximumErrorCm,
-                FMath::Abs(RadialDistanceCm - 2.65f));
+                FMath::Abs(RadialDistanceCm - Profile.PadCenterRadiusCm));
         }
     }
     return MaximumErrorCm;
@@ -1335,6 +1392,11 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChainAroundGrip(
     {
         return;
     }
+    FAnatomicalGripDigitProfile Profile;
+    if (!ResolveAnatomicalGripDigitProfile(Digit, Profile))
+    {
+        return;
+    }
     const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
     const FName HandName(*FString::Printf(TEXT("hand_%s"), Side));
     const FName FirstName(*FString::Printf(TEXT("%s_01_%s"), Digit, Side));
@@ -1373,11 +1435,20 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChainAroundGrip(
     {
         WrapSign = bLeft ? -1.0f : 1.0f;
     }
+    RadialDirection = RadialDirection.RotateAngleAxis(
+        Profile.FanDegrees * WrapSign,
+        SafeGripAxis);
     const float AxialOffsetCm = FVector::DotProduct(
         SegmentStartCm - GripCenterCm,
         SafeGripAxis);
-    static const float WrapAnglesDegrees[] = {50.0f, 68.0f, 52.0f};
-    static const float JointRadiiCm[] = {3.2f, 2.65f, 2.35f};
+    const float WrapAnglesDegrees[] = {
+        Profile.EntrySweepDegrees,
+        Profile.MiddleSweepDegrees,
+        Profile.TipSweepDegrees};
+    const float JointRadiiCm[] = {
+        Profile.ProximalRadiusCm,
+        Profile.PadCenterRadiusCm,
+        Profile.TipCenterRadiusCm};
     const FName BoneNames[] = {FirstName, SecondName, ThirdName};
     float CumulativeAngleDegrees = 0.0f;
     for (int32 SegmentIndex = 0; SegmentIndex < 3; ++SegmentIndex)
@@ -1427,15 +1498,16 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(
     for (const bool bLeft : {true, false})
     {
         const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        if (FVector::DistSquared(GripCenterCm, Pose.PaddleTopCm) <= 4.0f)
+        {
+            continue;
+        }
         const FVector GripAxis = ResolvePaddleGripAxis(Pose, GripCenterCm);
-        ApplyFingerChainAroundGrip(
-            bLeft, TEXT("index"), GripCenterCm, GripAxis);
-        ApplyFingerChainAroundGrip(
-            bLeft, TEXT("middle"), GripCenterCm, GripAxis);
-        ApplyFingerChainAroundGrip(
-            bLeft, TEXT("ring"), GripCenterCm, GripAxis);
-        ApplyFingerChainAroundGrip(
-            bLeft, TEXT("pinky"), GripCenterCm, GripAxis);
+        for (const TCHAR* Digit : {TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
+        {
+            ApplyFingerChainAroundGrip(
+                bLeft, Digit, GripCenterCm, GripAxis);
+        }
     }
 }
 

@@ -3490,6 +3490,17 @@ path is verified, and the completion goal can be marked complete.
   are green. Coarse hand anatomy, thumb contact, wet skin/material response, synchronized stroke
   biomechanics, and named character-art/guide acceptance remain open, so M9 is not promoted and
   no milestone commit or push is permitted yet.
+- Distinct paddle grips V2 supersedes the uniform radial hand solve where it produced a
+  camera-facing ring around the upper T-grip. The retained presentation uses the firm authored
+  digit curl over each short transverse handle and reserves deterministic radial contact for the
+  lower shaft hand, where index, middle, ring, and pinky now have separate C-grip sweeps, pad
+  radii, and fan angles. Across all five production identities the maximum palm-anchor error
+  remains `1.880034572465661e-9` cm and the measured lower-finger shaft-contact error remains
+  `0.0` cm. The UE 5.8 editor build, focused source contract, five-identity fixed-camera roster,
+  and renderer-enabled M5 test pass. A constrained-thumb iteration and a shorter radial T-grip
+  iteration were visually rejected. The retained upper hand is materially more readable, but
+  coarse hand topology, wetsuit-covered hands, thumb contact, wrist compression, motion-captured
+  strokes, and named character-art/guide approval remain open, so photoreal promotion is false.
 - Tapered shoulder sleeves V2 supersedes the ball-like uniform sleeve silhouette retained by
   Visible Shoulders V1 without moving solved shoulder or elbow anchors. Each project-owned
   splash-jacket sleeve is now a closed 18-ring by 28-sided surface with a broad deltoid,
