@@ -37,6 +37,10 @@ LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_live_transmitting_water_v2_review.json"
 )
+RAPID_VFX_V1_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_solver_driven_rapid_vfx_v1_review.json"
+)
 
 
 def _load(path: Path) -> dict:
@@ -161,6 +165,34 @@ def test_zambezi_live_water_v2_review_and_matched_evidence_are_hash_locked():
     assert len(review["required_external_acceptance_gates"]) == 7
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert LIVE_WATER_V2_REVIEW.as_posix() in readme
+
+
+def test_zambezi_solver_driven_rapid_vfx_review_is_hash_locked():
+    review = _load(REPO_ROOT / RAPID_VFX_V1_REVIEW)
+    assert review["schema"] == (
+        "raftsim.environment.zambezi_solver_driven_rapid_vfx_review.v1"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["technical_candidate_retained"] is True
+    assert review["decision"]["bounded_multi_site_coverage_passed"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["water_or_hydraulic_authority_changed"] is False
+    assert review["implementation"]["active_site_budget_before"] == 2
+    assert review["implementation"]["active_site_budget_after"] == 6
+    assert review["implementation"]["preallocated_site_pool"] == 8
+    assert review["runtime_evidence"]["active_breaking_sites"] == 8
+    assert review["runtime_evidence"]["active_rapid_aerosol_emitters"] == 6
+    assert review["runtime_evidence"]["active_rapid_roller_emitters"] == 6
+    for key in ("baseline", "retained", "vfx_off_control"):
+        artifact = review["visual_evidence"][key]
+        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    for relative, expected in review["hash_locked_unchanged_authority"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    for relative, expected in review["changed_source_hashes"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    assert len(review["required_external_acceptance_gates"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert RAPID_VFX_V1_REVIEW.as_posix() in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():

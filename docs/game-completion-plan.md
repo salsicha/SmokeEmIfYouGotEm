@@ -4193,3 +4193,14 @@ path is verified, and the completion goal can be marked complete.
   authority changed. Generic ecology, coarse terrain, water/VFX, weather,
   calibration, performance, and all six external acceptance gates keep M9 and
   photoreal promotion open.
+- Solver-driven rapid VFX coverage V1 raises the shared camera-local production
+  budget from two to six accepted breaking sites within the existing bounded
+  eight-pair Niagara pool and 120 m cull. Zambezi's live P4 gate requires six
+  active aerosol and six active roller emitters from its eight solver-owned
+  sites; M4 passes 4/4, the exact editor build succeeds, and 43 focused Python
+  contracts pass. The map and Niagara assets are unchanged, and no water,
+  collision, buoyancy, force, score, or progression authority moves. Matched
+  renderer evidence retains the local coverage improvement but still rejects
+  photoreal promotion: sprites over the smooth heightfield do not form a
+  connected overturning crest/hole/entrained-air body, and all named guide,
+  geospatial, rights, hydraulic, art, and platform approvals remain open.

@@ -29,6 +29,14 @@ still-open production gates are recorded in the
 [release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v10_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
+The live rapid presentation now uses six of its eight preallocated Niagara
+site pairs around the camera instead of the former two-site ceiling. Zambezi's
+PIE gate requires all six aerosol and roller pairs to be active from its eight
+solver-owned launch-window breaking sites. The retained result improves bounded
+rapid-cluster coverage without changing the map, solver, collision, or raft
+forces; it remains visibly short of a coherent overturning whitewater volume.
+Evidence and the unchanged external gates are in the
+[solver-driven rapid VFX review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_solver_driven_rapid_vfx_v1_review.json).
 The versioned progression manifest also enumerates Zambezi in the six-river
 Free Run contract, so catalog tests fail if its scenario or map path is removed.
 The South Fork production campaign still resolves to the 49.1 km
