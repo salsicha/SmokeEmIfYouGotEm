@@ -21,7 +21,7 @@ package is not the runnable map.
 ### Current runnable verification
 
 The release head was rechecked again after the later environment, character,
-and water milestones. The player path is still:
+water, and Colorado Hance rapid-approach milestones. The player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
@@ -34,13 +34,12 @@ gate loads the committed map into PIE, reports the vertical-slice game mode,
 binds the 5,908-point curved coordinate map and cooked field, exposes 2,673 wet
 surface vertices, eight live breaking sites, and 125 visible rapid-foam
 vertices, and completes MapCheck with zero errors and zero warnings. The test
-passes with two unrelated log warnings: the external connectivity probe times
-out and Unreal reports the existing `r.MotionVectorSimulation` thread-safety
-warning. Neither warning changes map load or gameplay acceptance.
+passes with one unrelated log warning: the external connectivity probe times
+out. That warning does not change map load or gameplay acceptance.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v4_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v5_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,

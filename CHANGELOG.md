@@ -42,14 +42,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
   replaces the duplicate guide/rapid evidence view. The three frames remain
   photoreal-rejected for flat banded water, weak foam/spray volume, terraced
   terrain, sparse repeated ground cover, and all six open external gates.
-- Reaffirmed Zambezi as the sixth runnable river after the latest environment
-  milestones. The unchanged committed `L_Zambezi` package remains selectable
-  as **Zambezi: Boiling Pot to Mukuni Beach** in Free Run and remains in the
-  shipping cook. Focused registry/source contracts, the native career catalog,
-  and a live PIE map-load gate pass; the new V4 review hash-locks the selector,
-  manifest, scenario, cook list, and map package. This retains reference-tier
-  runnable status without claiming production terrain, bathymetry, hydraulics,
-  photoreal art, guide/geospatial/rights, or performance acceptance.
+- Reaffirmed Zambezi as the sixth runnable river again after the Colorado Hance
+  rapid-approach milestone. The unchanged committed `L_Zambezi` package remains
+  selectable as **Zambezi: Boiling Pot to Mukuni Beach** in Free Run and remains
+  in the shipping cook. Focused registry/source contracts, the native career
+  catalog, and a live PIE map-load gate pass; the new V5 review hash-locks the
+  selector, manifest, scenario, cook list, and map package. This retains
+  reference-tier runnable status without claiming production terrain,
+  bathymetry, hydraulics, photoreal art, guide/geospatial/rights, or performance
+  acceptance.
 - Replaced the production character's rotationally symmetric hip-to-knee tube
   with a 695-vertex directional thigh overlay. The retained mesh now follows a
   torso-aligned anterior axis, carries bounded quadriceps, hamstring, and
