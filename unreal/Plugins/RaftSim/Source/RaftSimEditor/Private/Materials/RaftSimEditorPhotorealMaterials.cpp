@@ -3104,6 +3104,16 @@ bool CreatePhotorealRiverWaterMaterial(FString& OutSummary)
     return bSucceeded;
 }
 
+bool CreateLiveRiverSurfaceMaterial(FString& OutSummary)
+{
+    UMaterial* Material = BuildLiveRiverSurfaceMaterial();
+    const bool bSucceeded = Material != nullptr;
+    OutSummary += FString::Printf(
+        TEXT("Solver-owned live river-water surface material authored: %s.\n"),
+        bSucceeded ? TEXT("yes") : TEXT("no"));
+    return bSucceeded;
+}
+
 bool CreateWaterVfxMaterial(FString& OutSummary)
 {
     const bool bSucceeded = BuildSprayMistMaterial() != nullptr;
@@ -3140,7 +3150,9 @@ static void HandleCreateLiveRiverSurfaceMaterial(const TArray<FString>&)
 {
     // Focused material iteration reuses the texture created by the full
     // photoreal bootstrap, avoiding unrelated texture-package resaves.
-    BuildLiveRiverSurfaceMaterial();
+    FString Summary;
+    CreateLiveRiverSurfaceMaterial(Summary);
+    UE_LOG(LogTemp, Display, TEXT("%s"), *Summary);
 }
 
 static void HandleCreatePhotorealTerrainMaterial(const TArray<FString>&)

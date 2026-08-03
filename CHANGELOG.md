@@ -32,6 +32,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Retained a narrowly bounded Futaleufú live rapid-lace improvement and rejected
+  two unproven water brackets. Terminator now maps existing solver foam through
+  a `0.08-0.58` focus window instead of `0.12-0.72`, increasing visible rapid
+  vertices from 47 to 53 while leaving the accepted shared calm material byte-
+  identical. The experimental shared normal/aeration rewrite was removed after
+  it rendered a pale frosted sheet. Chilko's lower threshold was also removed:
+  its current cooked window has zero interior breaking sites and all four
+  detected candidates are correctly rejected at the wet-mask edge. Filtered
+  river generation now reuses shared solver textures and foam material without
+  resaving them. The editor build, 42 focused Python checks, both river-water
+  audits, shared-material audit, both map-load gates, water/occlusion render
+  gate, and 75-file protected-work audit pass. The retained Futaleufú frame
+  remains too pale and sheet-like for photoreal promotion, and all external
+  guide, geospatial, hydraulic, art/VFX, and performance gates remain open.
 - Rechecked Zambezi at the current release head and retained it as the sixth
   runnable river. `RaftSim.M6.CareerCatalog` again resolves the player-facing
   `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi`, while

@@ -172,6 +172,7 @@ private:
     bool bCreateLandscapeImportCandidateMapsOnStartup = false;
     FString LandscapeImportCandidateRiverFilter;
     bool bCreatePhotorealRiverWaterMaterialOnStartup = false;
+    bool bCreateLiveRiverSurfaceMaterialOnStartup = false;
     bool bCreateWaterVfxMaterialOnStartup = false;
     bool bCreateSouthForkFullReachEnvironmentOnStartup = false;
     bool bCaptureSouthForkFullReachEnvironmentOnStartup = false;

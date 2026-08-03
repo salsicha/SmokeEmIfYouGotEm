@@ -3995,3 +3995,15 @@ path is verified, and the completion goal can be marked complete.
   Runnable status is retained; high-resolution terrain, surveyed bathymetry,
   rapid-specific hydraulic, seasonal-flow, guide, rights, photoreal-art, and
   performance acceptance remain open.
+- Futaleufú live rapid lace V1 retains a narrowly bounded solver-presentation
+  improvement and rejects the broader material rewrite. `L_Terminator` lowers
+  only its masked solver-foam focus from `0.12-0.72` to `0.08-0.58`, increasing
+  visible rapid vertices from 47 to 53 while the shared calm carrier remains
+  byte-identical. The equivalent Chilko bracket was reverted because the
+  current cooked Lava Canyon window has zero interior breaking sites and all
+  four detected candidates fail at the wet-mask edge; `L_LavaCanyon` keeps its
+  conservative defaults pending better rapid data. Filtered generation now
+  reuses shared solver presentation assets without resaving them. Build,
+  focused source contracts, native water/material/map/render gates, and the
+  protected 75-file audit pass. Photoreal water, terrain/ecology, calibrated
+  hydraulics, guide/art review, and target-hardware acceptance remain open.

@@ -396,6 +396,8 @@ void FRaftSimEditorModule::StartupModule()
         LandscapeImportCandidateRiverFilter);
     bCreatePhotorealRiverWaterMaterialOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreatePhotorealRiverWaterMaterial"));
+    bCreateLiveRiverSurfaceMaterialOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateLiveRiverSurfaceMaterial"));
     bCreateWaterVfxMaterialOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateWaterVfxMaterial"));
     bCreateSouthForkFullReachEnvironmentOnStartup =
@@ -451,6 +453,7 @@ void FRaftSimEditorModule::StartupModule()
         bCapturePhotorealEnvironmentPreviewsOnStartup ||
         bCreateLandscapeImportCandidateMapsOnStartup ||
         bCreatePhotorealRiverWaterMaterialOnStartup ||
+        bCreateLiveRiverSurfaceMaterialOnStartup ||
         bCreateWaterVfxMaterialOnStartup ||
         bCreateSouthForkFullReachEnvironmentOnStartup ||
         bCaptureSouthForkFullReachEnvironmentOnStartup ||

@@ -2277,7 +2277,8 @@ void RepositionLandscapeCandidatePhysicalCameras(
 bool BuildLandscapeImportCandidateMap(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FRaftSimLandscapeImportCandidateResult& OutResult,
-    FString& OutSummary);
+    FString& OutSummary,
+    bool bReuseSharedSolverPresentationAssets = false);
 
 float ComputeSouthForkInferredFarFieldReliefM(
     double WorldXM,
@@ -2700,5 +2701,6 @@ bool BuildSouthForkWaterTextureAssets();
 bool BuildCrewSkinTextureAssets();
 bool BuildEquipmentTextileTextureAssets();
 bool CreatePhotorealRiverWaterMaterial(FString& OutSummary);
+bool CreateLiveRiverSurfaceMaterial(FString& OutSummary);
 bool CreateWaterVfxMaterial(FString& OutSummary);
 }
