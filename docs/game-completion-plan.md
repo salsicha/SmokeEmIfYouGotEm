@@ -4058,3 +4058,15 @@ path is verified, and the completion goal can be marked complete.
   garment overlap seams, materials, expression, hands, and missing named
   character-art, qualified whitewater-safety, and product-owner approval keep
   M9 and photoreal promotion open.
+- Colorado Hance transmitting water V2 replaces the fixed-camera corridor's
+  dark opaque gray ribbon with a translucent Default Lit surface whose alpha
+  follows only cooked solver depth, wet-bank edge coverage, and aeration. A
+  river-local wet-cell volume core, first-party flow normal, and solver-masked
+  foam-lace texture migrate onto the unchanged runnable `L_Hance` package;
+  the smoothed live surface remains only a 3.5-14% hydraulic detail skin.
+  The editor build, V2 material audit, three-camera capture, shared water test,
+  and PIE map-load gate pass, while the map hash remains byte-identical. The
+  riverbed and banks are materially more readable, but thin sediment response,
+  cross-river bands, duplicate guide/rapid views, missing rapid-scale foam and
+  spray, terraced canyon geometry, unconverged hydraulics, and all six external
+  acceptance gates keep photoreal and production promotion closed.

@@ -13,6 +13,30 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 
 bool FRaftSimColoradoHanceWaterTest::RunTest(const FString& Parameters)
 {
+    FString AuthoringSummary;
+    UMaterialInterface* AuthoredCaptureMaterial = nullptr;
+    for (const RaftSimEditorEnvironment::FRaftSimLandscapeImportCandidateSpec& Candidate :
+         RaftSimEditorEnvironment::GetLandscapeImportCandidateSpecs())
+    {
+        if (Candidate.PreviewSpec.RiverId != TEXT("colorado_river"))
+        {
+            continue;
+        }
+        AuthoredCaptureMaterial =
+            RaftSimEditorEnvironment::LoadOrCreateLandscapeCandidateWaterMaterial(
+                Candidate.PreviewSpec,
+                AuthoringSummary,
+                true);
+        break;
+    }
+    TestNotNull(
+        TEXT("Colorado Hance isolated capture water refresh succeeds"),
+        AuthoredCaptureMaterial);
+    TestNotNull(
+        TEXT("Colorado Hance isolated live water refresh succeeds"),
+        RaftSimEditorEnvironment::LoadOrCreateColoradoHanceLiveWaterInstance(
+            AuthoringSummary));
+
     UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
         nullptr,
         TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
@@ -39,13 +63,26 @@ bool FRaftSimColoradoHanceWaterTest::RunTest(const FString& Parameters)
     TestTrue(
         TEXT("Hance water uses scene lighting"),
         Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
-    TestEqual(TEXT("Hance water remains opaque"), Parent->BlendMode, BLEND_Opaque);
+    TestEqual(
+        TEXT("Hance water is transmitting"),
+        Parent->BlendMode,
+        BLEND_Translucent);
+    TestEqual(
+        TEXT("Hance water uses per-pixel lit translucency"),
+        Parent->TranslucencyLightingMode,
+        TLM_SurfacePerPixelLighting);
     TestTrue(TEXT("Hance water remains two-sided"), Parent->TwoSided);
     TestTrue(TEXT("Hance water normals stay tangent-space"), Parent->bTangentSpaceNormal);
     const UMaterialEditorOnlyData* EditorOnlyData = Parent->GetEditorOnlyData();
     TestNotNull(TEXT("Hance water graph remains inspectable"), EditorOnlyData);
     if (EditorOnlyData)
     {
+        TestNotNull(
+            TEXT("Hance depth and bank alpha drive transmission"),
+            EditorOnlyData->Opacity.Expression);
+        TestNotNull(
+            TEXT("Hance binds physical water refraction"),
+            EditorOnlyData->Refraction.Expression);
         TestNull(
             TEXT("Hance optics never displace cooked ribbon geometry"),
             EditorOnlyData->WorldPositionOffset.Expression);
@@ -86,6 +123,8 @@ bool FRaftSimColoradoHanceWaterTest::RunTest(const FString& Parameters)
     TestScalar(TEXT("Specular"), 0.46f);
     TestScalar(TEXT("NormalIntensity"), 0.30f);
     TestScalar(TEXT("SurfaceVariationStrength"), 0.32f);
+    TestScalar(TEXT("Opacity"), 0.90f);
+    TestScalar(TEXT("RefractionIor"), 1.333f);
     TestScalar(TEXT("SolverFieldEnable"), 0.0f);
     TestScalar(TEXT("SolverMacroNormalWeight"), 0.0f);
     TestScalar(TEXT("SolverDepthColorWeight"), 0.0f);
@@ -101,11 +140,63 @@ bool FRaftSimColoradoHanceWaterTest::RunTest(const FString& Parameters)
     if (NormalAtlas)
     {
         TestEqual(
-            TEXT("Hance uses the Colorado water-normal atlas"),
+            TEXT("Hance uses its river-local flow normal"),
             NormalAtlas->GetPathName(),
-            FString(TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/"
-                         "T_RaftSim_ColoradoRiver_NormalAtlas."
-                         "T_RaftSim_ColoradoRiver_NormalAtlas")));
+            FString(TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                         "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+                         "T_RaftSim_ColoradoHanceWaterV1_FlowNormal")));
+    }
+    UMaterialInstanceConstant* LiveInstance =
+        LoadObject<UMaterialInstanceConstant>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+                 "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2."
+                 "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2"));
+    TestNotNull(TEXT("Colorado Hance live volume instance exists"), LiveInstance);
+    if (LiveInstance)
+    {
+        TestNotNull(
+            TEXT("Colorado Hance live volume parent exists"),
+            LiveInstance->Parent.Get());
+        if (LiveInstance->Parent)
+        {
+            TestEqual(
+                TEXT("Colorado Hance uses shared raft-transmitting volume water"),
+                LiveInstance->Parent->GetPathName(),
+                FString(TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+                             "M_RaftSim_SouthForkRaftTransmissionWater."
+                             "M_RaftSim_SouthForkRaftTransmissionWater")));
+        }
+        UTexture* LiveFlowNormal = nullptr;
+        UTexture* LiveFoamLace = nullptr;
+        TestTrue(
+            TEXT("Colorado Hance live flow normal is bound"),
+            LiveInstance->GetTextureParameterValue(
+                FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")),
+                LiveFlowNormal));
+        TestTrue(
+            TEXT("Colorado Hance live foam lace is bound"),
+            LiveInstance->GetTextureParameterValue(
+                FMaterialParameterInfo(TEXT("WhitewaterFoamLace")),
+                LiveFoamLace));
+        if (LiveFlowNormal)
+        {
+            TestEqual(
+                TEXT("Colorado Hance live water keeps the river-local normal"),
+                LiveFlowNormal->GetPathName(),
+                FString(TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+                             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal")));
+        }
+        if (LiveFoamLace)
+        {
+            TestEqual(
+                TEXT("Colorado Hance live water keeps solver-masked lace breakup"),
+                LiveFoamLace->GetPathName(),
+                FString(TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                             "T_RaftSim_ColoradoHanceWaterV1_FoamLace."
+                             "T_RaftSim_ColoradoHanceWaterV1_FoamLace")));
+        }
     }
     const RaftSimEditorEnvironment::FRaftSimLandscapeCandidateWaterSettings Settings =
         RaftSimEditorEnvironment::GetLandscapeCandidateWaterSettings(

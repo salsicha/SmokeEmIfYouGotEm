@@ -1,0 +1,129 @@
+{
+  "schema": "raftsim.environment.colorado_hance_transmitting_water_review.v2",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "fe1a04fd6777ec1b3ab4ed44b660a60ba3c4f452",
+  "status": "technical_optical_candidate_retained_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "supersedes_mutable_artifacts_from": "colorado_hance_subcell_smoothed_water_lace_foam_v1_review.json",
+  "decision": {
+    "colorado_hance_reference_runnable": true,
+    "technical_candidate_passed": true,
+    "transmitting_water_v2_retained": true,
+    "riverbed_and_bank_readability_improved": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "retained_runnable_map_package_changed": false,
+    "generated_capture_water_material_changed": true,
+    "gameplay_water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_or_raft_forces_changed": false
+  },
+  "architecture": {
+    "runtime_volume": "The solver-clipped wet-cell volume core resolves a Colorado-only V2 material instance from the cooked-field identity when the versioned runnable map does not serialize the new override. Newly regenerated maps persist the same material and river-local texture references.",
+    "runtime_detail": "The existing smoothed Default Lit mesh becomes a low-coverage hydraulic detail skin. A project-owned Hance flow normal supplies irregular multiscale response, and a project-owned foam-lace mask is multiplied by solver-owned speed and aeration so it cannot paint foam into calm or dry cells.",
+    "capture_water": "The non-colliding capture ribbon is now translucent Default Lit water with physical IOR 1.333. Vertex alpha is authored only from already sampled solver depth, wet-bank edge coverage, and aeration; the material scales it by 0.90 and adds no displacement.",
+    "authority_boundary": "Both image-generated textures and all material changes are visual-only. Solver fields, wet/dry ownership, curved river coordinates, bathymetry, collision, buoyancy, raft forces, feature forcing, and rapid detection remain unchanged.",
+    "river_local_optics": {
+      "surface_specular": 0.30,
+      "surface_roughness": 0.32,
+      "sky_reflection_strength": 0.26,
+      "ripple_strength": 0.24,
+      "foam_intensity": 0.55,
+      "shallow_surface_color": [0.07, 0.11, 0.08],
+      "deep_surface_color": [0.018, 0.038, 0.028],
+      "reflected_sky_color": [0.12, 0.17, 0.18],
+      "calm_detail_skin_coverage": 0.035,
+      "active_detail_skin_coverage": 0.14
+    }
+  },
+  "live_pie_evidence": {
+    "map": "/Game/RaftSim/Maps/L_Hance",
+    "wet_vertices": 1534,
+    "depth_mean_m": 0.6581,
+    "speed_mean_m_per_s": 0.2068,
+    "volume_core_enabled": true,
+    "volume_core_triangles": 2372,
+    "standing_wave_abs_max_m": 0.0533,
+    "hydraulic_relief_abs_max_m": 0.0164,
+    "surface_smoothing_enabled": true,
+    "surface_smoothing_strength": 0.72,
+    "diagnostic_scope": "The launch-window PIE audit proves runtime carrier activation and map compatibility; it does not prove downstream Hance rapid art or hydraulic calibration."
+  },
+  "fixed_camera_comparison": {
+    "method": "Direct RGB means over the lower half of each identical 1280x720 fixed camera, plus full-frame mean absolute channel delta. Values are in 0-255 sRGB. The pre-milestone images were copied to an external immutable review backup before capture.",
+    "guide_seat_downstream": {
+      "baseline_sha256": "6a60e97b9209baf5c84a56a8e1de4b4ae08064bbc24cc4e1862fd2885b6b8d30",
+      "baseline_lower_rgb_mean": [58.607, 69.076, 68.916],
+      "retained_lower_rgb_mean": [105.98, 82.021, 61.363],
+      "full_frame_mean_absolute_channel_delta": 12.131
+    },
+    "river_eye_downstream": {
+      "baseline_sha256": "8e8c195cad1e6efc1e59e3ed24586f71fae35ac23cdbb85200a01e3eb204d0a2",
+      "baseline_lower_rgb_mean": [77.184, 86.322, 85.564],
+      "retained_lower_rgb_mean": [118.544, 87.431, 61.164],
+      "full_frame_mean_absolute_channel_delta": 13.254
+    },
+    "solver_rapid_river_eye_downstream": {
+      "baseline_sha256": "6a60e97b9209baf5c84a56a8e1de4b4ae08064bbc24cc4e1862fd2885b6b8d30",
+      "baseline_lower_rgb_mean": [58.607, 69.076, 68.916],
+      "retained_lower_rgb_mean": [105.98, 82.021, 61.363],
+      "full_frame_mean_absolute_channel_delta": 12.131
+    },
+    "verdict": "Retain as a bounded optical improvement: the old dark gray opaque foreground is replaced by transmitting sediment-colored water through which the riverbed and bank geometry remain readable. Horizontal bands, thin-water appearance, duplicate guide and rapid views, and missing rapid-scale whitewater keep photoreal acceptance closed."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed",
+    "native_colorado_material_audit": "RaftSim.M9.FColoradoHanceWater passed 1/1",
+    "fixed_camera_capture": "RaftSim.M9.FColoradoHanceWaterCapture passed 1/1 and wrote all three saved-map cameras",
+    "native_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_Hance passed 1/1 after the acceptance contract was updated to recognize Colorado as a retained wet-cell volume-core river",
+    "native_water_render_audit": "RaftSim.P2.WaterSurfaceRenders passed 1/1",
+    "saved_map_identity": "L_Hance remained byte-identical at sha256 982a2110bfc3193498d6410875bea81567dc1550aaf094e36d0b0325305a060e",
+    "protected_user_work_audit": "75 paths checked; 0 mismatches; 0 missing"
+  },
+  "remaining_photoreal_defects": [
+    "Horizontal cross-river bands remain visible because a material cannot reconstruct continuous hydraulics from the coarse cooked visualization field.",
+    "The transmitting foreground is visually thin and too riverbed-dominant; physically credible suspended-sediment depth, extinction, caustics, and reflection balance remain incomplete.",
+    "The fixed guide-seat and solver-rapid cameras currently resolve to duplicate views, so the evidence does not independently frame the rapid crux.",
+    "Foam remains sparse and lacks convincing crests, holes, rollers, entrained-air volume, spray, mist, and rock-contact plumes.",
+    "Canyon walls remain visibly terraced and lack surveyed Hance strata, alcoves, talus, erosion cuts, and bank breaklines.",
+    "Ground cover, shrubs, riparian structure, woody debris, and boulder variation remain procedural, sparse, repeated, or ecologically unreviewed.",
+    "Terrain outside the protected solver strip remains deterministic procedural infill rather than surveyed and geospatially registered Hance geography.",
+    "The cooked hydraulic field is unconverged and uncalibrated against observed Hance behavior across playable releases."
+  ],
+  "required_external_acceptance_gates": [
+    "Colorado River guide or oarsman review of the Hance line, hazards, entry, exit, recovery, and playable flow bands",
+    "geospatial review of river-mile registration, planform, terrain, bank breaklines, bathymetry, rapid rocks, and vertical datum",
+    "hydraulic convergence and calibration against observed Hance behavior across playable discharge bands",
+    "geology, ecology, and environment-art approval of strata, boulders, shrubs, grass, ground cover, wet banks, and canyon context",
+    "photoreal water/VFX and raft/character-occlusion approval for depth, transmission, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "reviewers": {
+    "named_colorado_guide_or_oarsman": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_geology_or_ecology_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_Hance.umap", "role": "unchanged runnable map package", "sha256": "982a2110bfc3193498d6410875bea81567dc1550aaf094e36d0b0325305a060e"},
+    {"path": "unreal/SourceArt/RaftSim/Water/ColoradoHance/T_RaftSim_ColoradoHance_FlowNormalV1.png", "role": "first-party flow-normal source", "sha256": "de469b3a6c06768c5971156dabda2d0842610a7f3aa6ae3ed02f40d6efb69715"},
+    {"path": "unreal/SourceArt/RaftSim/Water/ColoradoHance/T_RaftSim_ColoradoHance_FlowNormalV1.provenance.json", "role": "flow-normal generation and authority record", "sha256": "b7437f2b310e5b9520503e53a72ac190a7bf1619f223cf1809175732bf5673be"},
+    {"path": "unreal/SourceArt/RaftSim/Water/ColoradoHance/T_RaftSim_ColoradoHance_FoamLaceV1.png", "role": "first-party solver-masked foam-lace source", "sha256": "2dd6739d4606e51e2f9befc0c2c9cea1fe958a2f130603749123e3778ffb1e57"},
+    {"path": "unreal/SourceArt/RaftSim/Water/ColoradoHance/T_RaftSim_ColoradoHance_FoamLaceV1.provenance.json", "role": "foam-lace generation and authority record", "sha256": "2979735204ad9f85ab2adb5f51a25d5dead9db835a66efa298503886fb7de8dc"},
+    {"path": "unreal/Content/RaftSim/Environment/ColoradoRun/Water/Textures/T_RaftSim_ColoradoHanceWaterV1_FlowNormal.uasset", "role": "cooked river-local flow normal", "sha256": "990402356d0d00ed8442ae48f0b186a2a7b657e8c4133c050048bc375ca19d57"},
+    {"path": "unreal/Content/RaftSim/Environment/ColoradoRun/Water/Textures/T_RaftSim_ColoradoHanceWaterV1_FoamLace.uasset", "role": "cooked solver-masked foam lace", "sha256": "4b00bf4d3bc5c73960ec3260e51e741b096fc2100a8007d603c83b70a04c1a33"},
+    {"path": "unreal/Content/RaftSim/Environment/ColoradoRun/Water/Materials/MI_RaftSim_ColoradoHance_LiveVolumeWaterV2.uasset", "role": "river-local runtime wet-cell volume-water instance", "sha256": "c62223430fafb98f5c4921ebadd684f63e9156cd4fe46ed22e6fb4bac50ef2de"},
+    {"path": "unreal/Content/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_Colorado_HanceDefaultLitWater.uasset", "role": "transmitting capture-water parent", "sha256": "c1e951c9f12a325a690c52c08b9a1c26e29c843baf471c5418b19ab9e0f34cf6"},
+    {"path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_ColoradoRiver_PhysicalCorridorWaterCandidate.uasset", "role": "river-local capture-water instance", "sha256": "759df1c340f8f7633001361e0834e679b9d89a4084c7d8f9594bfd6bfe0ff7d6"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_colorado_river.json", "role": "updated generated-water contract", "sha256": "34aee085b7ee70bdaeb6dbeebc0351d0a6ad81682464d968206a68671255e96b"},
+    {"path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/colorado_hance_moderate_visualization_manifest.json", "role": "updated capture and live presentation contract", "sha256": "cfa4d456c2200e9513dbf080a65bdd19e6f329fa619652184515fb97ca60f2ee"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_guide_seat_downstream.png", "role": "retained guide-seat fixed-camera evidence", "sha256": "6e327328ed0c327e51e78fda9fcd46124bacea31d63aacecfd799ee082a54fa3"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png", "role": "retained river-eye fixed-camera evidence", "sha256": "2ee514b637cb26084d412c3f5339736f9c46e5f4cdb721e82f0be3b33efb6557"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_solver_rapid_river_eye_downstream.png", "role": "retained solver-rapid fixed-camera evidence", "sha256": "bc6ea0dadd0160e296b6496e453428acd079818ed7c12d7b6ecdc46608f6e22e"}
+  ]
+}

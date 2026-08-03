@@ -60,6 +60,58 @@ bool BuildSouthForkWaterTextureAssets()
         FoamLaceTexture != nullptr && bFoamLaceSaved;
 }
 
+bool BuildColoradoHanceWaterTextureAssets()
+{
+    using namespace RaftSimEditorEnvironment;
+    FString Summary;
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FlowNormalSpec;
+    FlowNormalSpec.RiverId = TEXT("colorado_river");
+    FlowNormalSpec.RiverAssetName = TEXT("ColoradoHanceWaterV1");
+    FlowNormalSpec.MapKey = TEXT("FlowNormal");
+    FlowNormalSpec.MapKind =
+        TEXT("project_owned_colorado_multiscale_river_flow_normal");
+    FlowNormalSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/ColoradoHance/"
+             "T_RaftSim_ColoradoHance_FlowNormalV1.png");
+    FlowNormalSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures");
+    FlowNormalSpec.CompressionSettings = TC_Normalmap;
+    FlowNormalSpec.bSRGB = false;
+    FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
+    FlowNormalSpec.AddressX = TA_Mirror;
+    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.bCompressionNoAlpha = true;
+    bool bFlowNormalSaved = false;
+    UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FlowNormalSpec, Summary, bFlowNormalSaved);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FoamLaceSpec;
+    FoamLaceSpec.RiverId = TEXT("colorado_river");
+    FoamLaceSpec.RiverAssetName = TEXT("ColoradoHanceWaterV1");
+    FoamLaceSpec.MapKey = TEXT("FoamLace");
+    FoamLaceSpec.MapKind =
+        TEXT("project_owned_colorado_solver_masked_whitewater_lace");
+    FoamLaceSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/ColoradoHance/"
+             "T_RaftSim_ColoradoHance_FoamLaceV1.png");
+    FoamLaceSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures");
+    FoamLaceSpec.CompressionSettings = TC_Masks;
+    FoamLaceSpec.bSRGB = false;
+    FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
+    FoamLaceSpec.AddressX = TA_Mirror;
+    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.bCompressionNoAlpha = true;
+    bool bFoamLaceSaved = false;
+    UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FoamLaceSpec, Summary, bFoamLaceSaved);
+
+    UE_LOG(LogTemp, Display, TEXT("RaftSim Colorado Hance water textures:\n%s"), *Summary);
+    return FlowNormalTexture != nullptr && bFlowNormalSaved &&
+        FoamLaceTexture != nullptr && bFoamLaceSaved;
+}
+
 bool BuildFutaleufuTerminatorWaterTextureAssets()
 {
     using namespace RaftSimEditorEnvironment;

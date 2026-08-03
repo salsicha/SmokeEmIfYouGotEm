@@ -1,8 +1,9 @@
-"""Build a provenance-locked Hance capture-water derivative.
+"""Build a provenance-locked Hance visual-water derivative.
 
 The packed texture and derived foam mask are consumed only by the non-colliding
-authored ribbon used for deterministic editor captures.  Live gameplay loads
-the cooked arrays and keeps the custom C++ shallow-water solver authoritative.
+authored ribbon used for deterministic editor captures. The manifest also pins
+the separate live optical presentation, while gameplay loads the cooked arrays
+and keeps the custom C++ shallow-water solver authoritative.
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ from PIL import Image
 
 
 SCHEMA = "raftsim.unreal.colorado_hance_solver_visualization.v1"
-GENERATED_ON = "2026-08-01"
+GENERATED_ON = "2026-08-03"
 RIVER_ID = "colorado_river"
 FLOW_BAND = "moderate_release_planning"
 OUTPUT_SIZE = (1024, 256)
@@ -183,7 +184,10 @@ def build_colorado_hance_visual_water(repo_root: Path) -> dict[str, object]:
     manifest: dict[str, object] = {
         "schema": SCHEMA,
         "generated_on": GENERATED_ON,
-        "status": "reference_runnable_capture_visualization_not_production_promoted",
+        "status": (
+            "reference_runnable_transmitting_water_v2_retained_not_"
+            "production_promoted"
+        ),
         "river_id": RIVER_ID,
         "rapid_name": "Hance",
         "flow_band": FLOW_BAND,
@@ -299,6 +303,31 @@ def build_colorado_hance_visual_water(repo_root: Path) -> dict[str, object]:
                 "wet_interior_only": True,
                 "render_height_scale": RENDER_HEIGHT_SCALE,
             },
+            "capture_water_material": {
+                "asset": (
+                    "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+                    "M_RaftSim_Colorado_HanceDefaultLitWater"
+                ),
+                "version": "V2",
+                "shading_model": "DefaultLit",
+                "blend_mode": "Translucent",
+                "translucency_lighting_mode": "SurfacePerPixelLighting",
+                "opacity_parameter": 0.9,
+                "vertex_alpha_authority": (
+                    "already-sampled solver depth, wet-bank edge, and "
+                    "aeration only"
+                ),
+                "shallow_opacity": 0.46,
+                "deep_opacity": 0.76,
+                "aerated_opacity": 0.93,
+                "refraction_ior": 1.333,
+                "flow_normal": (
+                    "/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                    "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"
+                ),
+                "collision_enabled": False,
+                "hidden_in_game": True,
+            },
             "capture_foam_breakup": {
                 "base_coverage": 0.22,
                 "noise_smoothstep": [0.42, 0.74],
@@ -306,10 +335,25 @@ def build_colorado_hance_visual_water(repo_root: Path) -> dict[str, object]:
                 "maximum_opacity": 0.82,
             },
             "live_runtime_presentation": {
+                "wet_cell_clipped_volume_core": True,
+                "volume_core_material": (
+                    "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+                    "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2"
+                ),
+                "flow_normal": (
+                    "/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                    "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"
+                ),
+                "foam_lace": (
+                    "/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+                    "T_RaftSim_ColoradoHanceWaterV1_FoamLace"
+                ),
+                "calm_detail_skin_coverage": 0.035,
+                "active_detail_skin_coverage": 0.14,
                 "surface_smoothing_strength": 0.72,
                 "standing_wave_scale": 0.55,
                 "hydraulic_relief_scale": 0.55,
-                "carrier_foam_intensity": 0.58,
+                "carrier_foam_intensity": 0.55,
                 "rapid_foam_focus": [0.30, 0.82],
                 "rapid_foam_coverage_gain": 0.82,
             },

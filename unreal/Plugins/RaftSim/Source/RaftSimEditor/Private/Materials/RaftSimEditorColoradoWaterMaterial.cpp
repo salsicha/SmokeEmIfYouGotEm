@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 
@@ -18,6 +19,12 @@ ExpressionType* AddColoradoWaterExpression(UMaterial* Material)
 
 UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
 {
+    if (!RaftSimPhotorealMaterials::BuildColoradoHanceWaterTextureAssets())
+    {
+        OutSummary += TEXT(
+            "Failed to create the Colorado Hance river-local water textures.\n");
+        return nullptr;
+    }
     static const FString MaterialPackagePath =
         TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
              "M_RaftSim_Colorado_HanceDefaultLitWater");
@@ -58,7 +65,9 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
 
     UTexture2D* DefaultNormalTexture = LoadObject<UTexture2D>(
         nullptr,
-        TEXT("/Engine/EngineMaterials/DefaultNormal.DefaultNormal"));
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"));
     if (!DefaultNormalTexture)
     {
         OutSummary += TEXT("Failed to load the Colorado water normal fallback.\n");
@@ -68,7 +77,8 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     Material->SetShadingModel(MSM_DefaultLit);
-    Material->BlendMode = BLEND_Opaque;
+    Material->BlendMode = BLEND_Translucent;
+    Material->TranslucencyLightingMode = TLM_SurfacePerPixelLighting;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
 
@@ -78,7 +88,7 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
             AddColoradoWaterExpression<UMaterialExpressionScalarParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("ColoradoHanceWaterV1");
+        Parameter->Group = TEXT("ColoradoHanceWaterV2");
         return Parameter;
     };
     auto Vector = [Material](const TCHAR* Name, const FLinearColor& Value)
@@ -87,7 +97,7 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
             AddColoradoWaterExpression<UMaterialExpressionVectorParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("ColoradoHanceWaterV1");
+        Parameter->Group = TEXT("ColoradoHanceWaterV2");
         return Parameter;
     };
     auto Constant = [Material](float Value)
@@ -131,6 +141,11 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
     // optics only and never samples the South Fork shader field a second time.
     UMaterialExpressionVertexColor* VertexColor =
         AddColoradoWaterExpression<UMaterialExpressionVertexColor>(Material);
+    UMaterialExpressionComponentMask* VertexOpacity =
+        AddColoradoWaterExpression<UMaterialExpressionComponentMask>(Material);
+    VertexOpacity->Input.Expression = VertexColor;
+    VertexOpacity->Input.OutputIndex = 4;
+    VertexOpacity->R = true;
     UMaterialExpression* PhysicalSurfaceTint = Lerp(
         Vector(TEXT("SurfaceTint"), FLinearColor(0.072f, 0.115f, 0.088f, 0.0f)),
         VertexColor,
@@ -166,10 +181,9 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
         Scalar(TEXT("SurfaceVariationStrength"), 0.32f));
 
     UMaterialExpressionVectorParameter* AtlasTileOriginParameter = Vector(
-        TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
+        TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.0f, 0.0f, 0.0f));
     UMaterialExpressionVectorParameter* AtlasTileScaleParameter = Vector(
-        TEXT("AtlasTileScale"),
-        FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
+        TEXT("AtlasTileScale"), FLinearColor(1.0f, 1.0f, 0.0f, 0.0f));
     UMaterialExpressionComponentMask* AtlasTileOrigin =
         AddColoradoWaterExpression<UMaterialExpressionComponentMask>(Material);
     AtlasTileOrigin->Input.Expression = AtlasTileOriginParameter;
@@ -214,7 +228,7 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
         Sample->Texture = DefaultNormalTexture;
         Sample->SamplerType = SAMPLERTYPE_Normal;
         Sample->Coordinates.Expression = AtlasUv;
-        Sample->Group = TEXT("ColoradoHanceWaterV1");
+        Sample->Group = TEXT("ColoradoHanceWaterV2");
         return Sample;
     };
 
@@ -256,8 +270,12 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
     Scalar(TEXT("SolverFroudeVisualGain"), 0.0f);
     Vector(TEXT("SolverDeepWaterTint"), FLinearColor(0.050f, 0.065f, 0.046f, 0.0f));
     Vector(TEXT("SolverAerationTint"), FLinearColor(0.84f, 0.82f, 0.74f, 0.0f));
-    Scalar(TEXT("Opacity"), 0.38f);
-    Scalar(TEXT("RefractionIor"), 1.333f);
+    UMaterialExpressionScalarParameter* Opacity =
+        Scalar(TEXT("Opacity"), 0.90f);
+    UMaterialExpression* DepthTransmittingOpacity = Multiply(
+        VertexOpacity, Opacity);
+    UMaterialExpressionScalarParameter* RefractionIor =
+        Scalar(TEXT("RefractionIor"), 1.333f);
     Scalar(TEXT("PhaseG"), 0.08f);
     Vector(TEXT("ScatteringCoefficients"), FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f));
     Vector(TEXT("AbsorptionCoefficients"), FLinearColor(0.0014f, 0.0022f, 0.0040f, 0.0f));
@@ -272,6 +290,10 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->Opacity, DepthTransmittingOpacity);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->Refraction, RefractionIor);
     }
 
     Material->PostEditChange();
@@ -297,9 +319,232 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += TEXT(
-        "Built Colorado Hance opaque Default Lit water with native two-scale "
-        "moving normals, two world optical scales, CPU-authored cooked-field "
-        "color authority, and no displacement.\n");
+        "Built Colorado Hance transmitting Default Lit water V2 with a "
+        "river-local first-party flow normal, depth/bank-conditioned vertex "
+        "opacity, physical IOR, native two-scale moving normals, CPU-authored "
+        "cooked-field color authority, and no displacement.\n");
     return Material;
 }
+
+UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
+    FString& OutSummary)
+{
+    if (!RaftSimPhotorealMaterials::BuildColoradoHanceWaterTextureAssets())
+    {
+        OutSummary += TEXT(
+            "Failed to create Colorado Hance live-water texture assets.\n");
+        return nullptr;
+    }
+
+    static const TCHAR* PackagePath = TEXT(
+        "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+        "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2");
+    static const TCHAR* AssetName =
+        TEXT("MI_RaftSim_ColoradoHance_LiveVolumeWaterV2");
+    static const TCHAR* ObjectPath = TEXT(
+        "/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+        "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2."
+        "MI_RaftSim_ColoradoHance_LiveVolumeWaterV2");
+    UMaterialInterface* SharedTransmissionParent = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+             "M_RaftSim_SouthForkRaftTransmissionWater."
+             "M_RaftSim_SouthForkRaftTransmissionWater"));
+    UTexture2D* FlowNormal = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal."
+             "T_RaftSim_ColoradoHanceWaterV1_FlowNormal"));
+    UTexture2D* FoamLace = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/"
+             "T_RaftSim_ColoradoHanceWaterV1_FoamLace."
+             "T_RaftSim_ColoradoHanceWaterV1_FoamLace"));
+    UPackage* Package = CreatePackage(PackagePath);
+    if (!SharedTransmissionParent || !FlowNormal || !FoamLace || !Package)
+    {
+        OutSummary += TEXT(
+            "Colorado Hance live-water parent or river-local texture is missing.\n");
+        return nullptr;
+    }
+
+    UMaterialInstanceConstant* Instance =
+        LoadObject<UMaterialInstanceConstant>(nullptr, ObjectPath);
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(
+            Package,
+            AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Instance)
+        {
+            FAssetRegistryModule::AssetCreated(Instance);
+        }
+    }
+    if (!Instance)
+    {
+        OutSummary += TEXT(
+            "Failed to create the Colorado Hance live-water material instance.\n");
+        return nullptr;
+    }
+
+    Instance->Modify();
+    Instance->SetParentEditorOnly(SharedTransmissionParent);
+    Instance->ClearParameterValuesEditorOnly();
+    auto SetScalar = [Instance](const TCHAR* Name, float Value)
+    {
+        Instance->SetScalarParameterValueEditorOnly(
+            FMaterialParameterInfo(Name), Value);
+    };
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")), FlowNormal);
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WaterFlowNormalCross")), FlowNormal);
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WhitewaterFoamLace")), FoamLace);
+    // The lace remains an optical breakup input. The shared parent multiplies
+    // it by solver-authored speed/foam fields, so it cannot paint hydraulic
+    // features into calm water or dry cells.
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.68f);
+    SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.60f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.72f);
+    SetScalar(TEXT("SpeedAerationFraction"), 0.14f);
+    SetScalar(TEXT("FoamRoughness"), 0.66f);
+    SetScalar(TEXT("ReachHueVariation"), 0.08f);
+    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.10f);
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.58f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.38f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.34f);
+    Instance->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    Package->MarkPackageDirty();
+
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT(
+            "Failed to save the Colorado Hance live-water material instance.\n");
+        return nullptr;
+    }
+    OutSummary += TEXT(
+        "Built Colorado Hance river-local live-volume water V2 with "
+        "project-owned flow-normal and solver-masked foam-lace textures.\n");
+    return Instance;
+}
+
+static void HandleRefreshColoradoHanceWaterMaterials(const TArray<FString>&)
+{
+    FString Summary;
+    bool bCaptureSucceeded = false;
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate :
+         GetLandscapeImportCandidateSpecs())
+    {
+        if (Candidate.PreviewSpec.RiverId != TEXT("colorado_river"))
+        {
+            continue;
+        }
+        bCaptureSucceeded = LoadOrCreateLandscapeCandidateWaterMaterial(
+            Candidate.PreviewSpec,
+            Summary,
+            true) != nullptr;
+        break;
+    }
+    const bool bLiveSucceeded =
+        LoadOrCreateColoradoHanceLiveWaterInstance(Summary) != nullptr;
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim.RefreshColoradoHanceWaterMaterials: capture=%d live=%d\n%s"),
+        bCaptureSucceeded ? 1 : 0,
+        bLiveSucceeded ? 1 : 0,
+        *Summary);
+}
+
+static FAutoConsoleCommand GRefreshColoradoHanceWaterMaterialsCommand(
+    TEXT("RaftSim.RefreshColoradoHanceWaterMaterials"),
+    TEXT("Regenerate only Colorado Hance river-local capture and live water "
+         "materials/textures; do not rebuild or save the map."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleRefreshColoradoHanceWaterMaterials));
+
+bool CaptureColoradoHanceWaterReview(FString& OutSummary)
+{
+    FScopedPhotorealPreviewWorldGcLeakFatalOverride WorldGcLeakFatalOverride;
+    bool bCaptured = false;
+    const FString CaptureRoot = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(
+            GetRepoRoot(),
+            TEXT("docs/environment-captures/photoreal_river_previews/"
+                 "landscape_candidates")));
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate :
+         GetLandscapeImportCandidateSpecs())
+    {
+        if (Candidate.PreviewSpec.RiverId != TEXT("colorado_river"))
+        {
+            continue;
+        }
+        FString GuidePath = GetLandscapeCandidateCaptureRelativePath(
+            Candidate, TEXT("guide_seat_downstream"));
+        FString RiverEyePath = GetLandscapeCandidateCaptureRelativePath(
+            Candidate, TEXT("river_eye_downstream"));
+        FString RapidPath = GetLandscapeCandidateCaptureRelativePath(
+            Candidate, TEXT("solver_rapid_river_eye_downstream"));
+        const bool bGuide = CapturePreviewImageForSpec(
+            Candidate.PreviewSpec,
+            CaptureRoot,
+            GuidePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            TEXT("landscape_candidate_guide_seat_downstream"),
+            TEXT("Colorado Hance transmitting-water guide-seat downstream"),
+            true,
+            OutSummary);
+        const bool bRiverEye = CapturePreviewImageForSpec(
+            Candidate.PreviewSpec,
+            CaptureRoot,
+            RiverEyePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            TEXT("landscape_candidate_river_eye_downstream"),
+            TEXT("Colorado Hance transmitting-water river-eye downstream"),
+            true,
+            OutSummary);
+        const bool bRapid = CapturePreviewImageForSpec(
+            Candidate.PreviewSpec,
+            CaptureRoot,
+            RapidPath,
+            TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"),
+            TEXT("landscape_candidate_solver_rapid_river_eye_downstream"),
+            TEXT("Colorado Hance transmitting-water rapid river-eye"),
+            true,
+            OutSummary);
+        bCaptured = bGuide && bRiverEye && bRapid;
+        break;
+    }
+    return bCaptured;
+}
+
+static void HandleCaptureColoradoHanceWaterReview(const TArray<FString>&)
+{
+    FString Summary;
+    const bool bCaptured = CaptureColoradoHanceWaterReview(Summary);
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim.CaptureColoradoHanceWaterReview: succeeded=%d\n%s"),
+        bCaptured ? 1 : 0,
+        *Summary);
+}
+
+static FAutoConsoleCommand GCaptureColoradoHanceWaterReviewCommand(
+    TEXT("RaftSim.CaptureColoradoHanceWaterReview"),
+    TEXT("Capture the three saved Hance review cameras without rebuilding or "
+         "saving the map."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleCaptureColoradoHanceWaterReview));
 } // namespace RaftSimEditorEnvironment
