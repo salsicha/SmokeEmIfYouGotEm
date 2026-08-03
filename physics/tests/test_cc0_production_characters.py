@@ -392,8 +392,19 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "kProductionHipThighBridgeEndFraction = 1.06f" in host
     assert "kProductionHipThighBridgeRadiusCm = 8.0f" in host
     assert "BuildUnitHipThighBridgeMesh(" in host
-    assert "LeftBridgeSection->ProcVertexBuffer.Num() >= 350" in host
-    assert "RightBridgeSection->ProcVertexBuffer.Num() >= 350" in host
+    assert "constexpr int32 Rings = 20" in host
+    assert "constexpr int32 Sides = 32" in host
+    assert "const float Quadriceps" in host
+    assert "const float Hamstring" in host
+    assert "const float Adductor" in host
+    assert "DepthRadius * DirectionalDepth * CosTheta" in host
+    assert "SetAnatomicalThigh(" in host
+    assert "FRotationMatrix::MakeFromZX(SafeDirection, SafeForward)" in host
+    assert "LeftBridgeSection->ProcVertexBuffer.Num() >= 650" in host
+    assert "RightBridgeSection->ProcVertexBuffer.Num() >= 650" in host
+    assert "GetMinimumThighMeshVertexCount() const" in host
+    assert "GetMinimumThighForwardAlignment() const" in host
+    assert "GetMinimumThighForwardAlignment() >= 0.98f" in host
     assert "DistanceToBridgeCentreline" in host
     assert "HasContinuousThighKneeSilhouette() const" in host
     assert "GetMaximumThighKneeBridgeCoverageErrorCm() const" in host
@@ -467,7 +478,15 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "It->IsWaistHipMaterialOpaque()" in automation
     assert "HipThighCoverageErrorCm <= 0.25f" in automation
     assert "It->HasContinuousThighKneeSilhouette()" in automation
+    assert "ThighMeshVertexCount >= 650" in automation
+    assert "ThighForwardAlignment >= 0.98f" in automation
     assert "ThighKneeCoverageErrorCm <= 0.25f" in automation
+    assert "get_minimum_thigh_mesh_vertex_count() < 650" in (
+        REPO_ROOT / "unreal/Scripts/capture_metahuman_production_roster.py"
+    ).read_text(encoding="utf-8")
+    assert "get_minimum_thigh_forward_alignment() < 0.98" in (
+        REPO_ROOT / "unreal/Scripts/capture_metahuman_production_roster.py"
+    ).read_text(encoding="utf-8")
     assert "T_RaftSim_Hair_BraidedRows_N" in automation
     assert "has a named hair slot" in automation
     assert "Mesh->GetMaterials().Num()" in automation

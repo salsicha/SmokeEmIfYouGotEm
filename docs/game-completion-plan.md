@@ -4027,3 +4027,18 @@ path is verified, and the completion goal can be marked complete.
   forces are unchanged. This closes runnable scenario framing only; the pale
   sheet-like water, procedural forest, coarse banks, missing calibrated rapid
   morphology/VFX, and all six external gates keep photoreal promotion open.
+- Directional anatomical thigh V2 replaces the production roster's circular
+  hip-to-knee bridge with a closed 20-ring, 32-side garment mesh. A
+  torso-aligned anterior axis stabilizes bounded quadriceps, hamstring, and
+  adductor shaping across all poses and body profiles; the distal envelope now
+  tapers into the solved knee while the established `-0.15` to `1.06` bridge
+  retains buried hip and knee coverage. All five identities report 695
+  vertices per thigh, 1.000 minimum forward alignment, opaque continuous
+  silhouettes, and at most `2.386e-8` cm knee-centreline error. The editor
+  build, focused Python contract, native M5 production-character gate, and
+  fixed front/profile/rear roster capture pass. The initial 0.86-depth bracket
+  was rejected for exposing a hard overlay/body intersection; the retained
+  0.94 envelope is fuller and less capsule-like. Simplified skinned anatomy,
+  garment overlap seams, materials, expression, hands, and missing named
+  character-art, qualified whitewater-safety, and product-owner approval keep
+  M9 and photoreal promotion open.

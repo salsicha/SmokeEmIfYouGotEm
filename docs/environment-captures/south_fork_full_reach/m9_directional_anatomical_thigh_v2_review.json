@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.m9.directional_anatomical_thigh_review.v2",
+  "reviewed_on": "2026-08-02",
+  "status": "technical_candidate_retained",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "promotion_allowed": false,
+  "summary": "The retained production thigh overlay is no longer a rotationally symmetric swept tube. It has a torso-aligned anterior axis, bounded quadriceps/hamstring/adductor envelopes, a fuller proximal section, and a narrower distal transition into the solved knee. All five roster identities keep continuous opaque hip-to-knee coverage. Fixed front/profile/rear captures show a less capsule-like seated leg, but the complete character remains visibly synthetic and is not promoted as photoreal.",
+  "scope": {
+    "changed": [
+      "Production thigh procedural mesh topology and surface profile",
+      "Production thigh roll/orientation around the solved hip-to-knee axis",
+      "Runtime, native, Python, and renderer capture anatomy contracts"
+    ],
+    "unchanged": [
+      "Solved crew pose and body proportions",
+      "Packaged MetaHuman and CC0 identity geometry",
+      "Pelvis, knee, shin, boot, PFD, helmet, hands, and paddle meshes",
+      "Animation, collision, crew mass, raft physics, water, rescue, scoring, and progression"
+    ]
+  },
+  "implementation": {
+    "mesh_rings": 20,
+    "mesh_sides": 32,
+    "closed_mesh_vertex_count": 695,
+    "longitudinal_bridge_fraction": {
+      "start": -0.15,
+      "end": 1.06
+    },
+    "reference_radius_cm": 8.0,
+    "directional_cross_section": {
+      "depth_scale": 0.94,
+      "width_scale": 0.98,
+      "quadriceps_peak_fraction": 0.46,
+      "hamstring_peak_fraction": 0.34,
+      "adductor_peak_fraction": 0.28
+    },
+    "orientation": "Local +Z follows the solved hip-to-knee bridge and local +X follows torso forward projected into the thigh-normal plane.",
+    "normals": "Finite-difference longitudinal and circumferential surface tangents produce smooth authored normals.",
+    "rejected_bracket": "An initial 0.86 depth-scale candidate exposed a hard overlay/body intersection in profile. It was not retained; the final 0.94 envelope keeps the directional shape outside the assembled wetsuit body."
+  },
+  "runtime_evidence": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_roster_capture.json",
+    "report_sha256": "5a9078816af8b56b34898136e4635483d1c20058040720835eda80bb8d367fae",
+    "status": "capture_complete",
+    "captured_character_count": 5,
+    "minimum_vertex_count_each": 695,
+    "minimum_forward_alignment": 1.0,
+    "maximum_thigh_knee_centreline_error_cm": 2.3854980213400268e-08,
+    "maximum_hip_thigh_centreline_error_cm": 1.2774714264196518e-07,
+    "all_thigh_knee_silhouettes_continuous": true,
+    "all_waist_hip_materials_opaque": true
+  },
+  "camera_bracket": {
+    "resolution": [
+      1536,
+      1024
+    ],
+    "camera_contract": "The baseline and candidate use the same capture_metahuman_production_roster.py full/profile/rear camera transforms, 36 degree FOV, map, lighting, pose, roster, and presentation assets.",
+    "baseline": {
+      "guide_full_sha256": "718da2ce4a27a94f5971dbf51e7a82f6249596cac10720fd5fac306e2b54d307",
+      "guide_profile_sha256": "bb905af3a4137d4059924adec4ca2f2726cf3c51b201a17f83344fe4f06e4856",
+      "guide_rear_sha256": "dd8cee641a3a4761207b847d88b8c3ee8a030bf0cb3611a3838d1910806e8456",
+      "broadest_full_sha256": "7e1d502afbffd73f57d55976225fc0774f93f1cd9f0103343f0b4f2d1709629a",
+      "broadest_profile_sha256": "19ca26a62f7e582a6e8fc55b88c884c0295421cc84734a111a61665d71825a2e",
+      "broadest_rear_sha256": "a5758f3a28ead5dff7015d364d1143fda82aea05b85944aae5b1f6c15daf7ae0",
+      "smallest_full_sha256": "211867421c28014fbcecb05b95abb4262a94da2eaec5f08cf01b087a82b5a867",
+      "smallest_profile_sha256": "de4fc0b7628bdf49887316430e3d53a6aa62ab6a935f5f679f9985087ceae0bd",
+      "smallest_rear_sha256": "5814001cc8a38e966fc5a7794e7b12c92396084def75450c1e60c9aee1c579e9"
+    },
+    "candidate": {
+      "guide_full": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_guide_full.png",
+        "sha256": "ed53c5698a6d1e0cd177af8d894d654774f6b9285f95474440c3065a8a74ab3a"
+      },
+      "guide_profile": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_guide_profile.png",
+        "sha256": "2cec771f88b9b02c5c6b0bd648396558831eb805f30d486d00b2edc19c7627ce"
+      },
+      "guide_rear": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_guide_rear.png",
+        "sha256": "a6d6357d4d24a008171fe9ca45cd3c1a9d6622afebe9a425acee44b4ace86454"
+      },
+      "broadest_full": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_broadest_full.png",
+        "sha256": "9b397df96cfe501be1bf3fd45cebc9420d344e87926cf0fcbd9b436b72ab4b7b"
+      },
+      "broadest_profile": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_broadest_profile.png",
+        "sha256": "94a7164e8654dd635dd733ef1895b5e2b4e8c766aea08066bc1b57ae9cde2090"
+      },
+      "broadest_rear": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_broadest_rear.png",
+        "sha256": "277fb3bfdf34f14ad13f6044fe2f05627d3515c3b63ccbb3afdd0c42e320598d"
+      },
+      "smallest_full": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_smallest_full.png",
+        "sha256": "15b639da7caaf732fa6dce6045aa6efddd3696e786c47f5c49b76567d6db1060"
+      },
+      "smallest_profile": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_smallest_profile.png",
+        "sha256": "b7ef4c9f34048f371064db0e5bf1ae789c418030c7dcb683d0e945c3f61a1edf"
+      },
+      "smallest_rear": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_smallest_rear.png",
+        "sha256": "fff5b77530208985be4c88d0186a6d6244e162ef397d179d824e05fa4ff3fddb"
+      }
+    }
+  },
+  "visual_findings": {
+    "improved": [
+      "The profile silhouette is no longer rotationally symmetric and carries distinct anterior and posterior fullness.",
+      "The distal thigh narrows into the assembled knee instead of keeping the old maximum tube radius through the joint.",
+      "The broadest and smallest roster profiles preserve the same directional anatomy without losing hip or knee overlap.",
+      "The rear silhouette retains proximal mass but tapers toward each knee instead of reading as a constant round lobe."
+    ],
+    "remaining": [
+      "The thigh is still a procedural garment overlay over a simplified assembled body, not a fully skinned anatomical deformation.",
+      "Hard overlap boundaries and simplified wetsuit reflectance remain visible in profile and rear lighting.",
+      "The seated pose, hands, expression, garment/PPE intersections, and surrounding character presentation remain visibly synthetic.",
+      "No named character artist or qualified whitewater safety reviewer has approved the anatomy or PPE presentation."
+    ]
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final 0.94 depth-envelope refinement.",
+    "native_automation": {
+      "test": "RaftSim.M5.CrewAvatarPoseProduction",
+      "result": "passed",
+      "failed": 0
+    },
+    "python_source_contract": {
+      "test": "physics/tests/test_cc0_production_characters.py::test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions",
+      "result": "1 passed"
+    },
+    "renderer_capture": "capture_metahuman_production_roster.py completed all five identities and failed closed on vertex count, anterior alignment, continuity, and centreline coverage.",
+    "benign_engine_warning": "The renderer process emitted the existing google.com/generate_204 connectivity timeout during shutdown; it did not affect local capture output."
+  },
+  "source_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp": "6c93793c21ae9d4cc2c4dc499c1d08d44c2a3d226e096a0342614d0505238810",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h": "14e73e5fb9087122846448c4919d38357f10713bf6d8c093c2901ad1a4f6aa8e",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "c3653afc20606899eee1a83402da1f51b7dfe0e8ae1728468da27f59d4b163ae",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "02c1876c74b8b006c423e1a1de47f1bfcf09429b3722a87313b0bff520e4f48a",
+    "physics/tests/test_cc0_production_characters.py": "1dd6f6d726b8595b5e67b458879e0540f853d51c698fd0f658c36943113d7ee8"
+  },
+  "required_external_acceptance_gates": [
+    "A named character artist must approve the front/profile/rear anatomy and garment deformation across the full body-profile roster.",
+    "A qualified whitewater safety reviewer must approve the complete seated posture, PPE fit, mobility, and paddle-ready presentation.",
+    "The product owner must approve the integrated in-river moving-camera presentation before photoreal or M9 promotion."
+  ]
+}

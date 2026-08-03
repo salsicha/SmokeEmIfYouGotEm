@@ -32,6 +32,18 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced the production character's rotationally symmetric hip-to-knee tube
+  with a 695-vertex directional thigh overlay. The retained mesh now follows a
+  torso-aligned anterior axis, carries bounded quadriceps, hamstring, and
+  adductor envelopes, and tapers into the solved knee while preserving the
+  existing buried hip/knee overlap. All five fixed-view roster identities
+  report 1.000 forward alignment, continuous opaque coverage, and less than
+  `2.4e-8` cm maximum knee-centreline error; the focused native M5 gate, Python
+  source contract, editor build, and renderer capture pass. Identical-camera
+  front/profile/rear evidence retains this as a technical anatomy improvement,
+  not photoreal promotion: simplified skinned deformation, overlap seams,
+  materials, pose, and named character-art/whitewater-safety approval remain
+  open.
 - Corrected the Chilko Lava Canyon scenario framing after proving the committed
   cooked fields already contain an interior solver-owned hydraulic jump near
   local station 300 m. The runnable map now launches at station 228 m instead
