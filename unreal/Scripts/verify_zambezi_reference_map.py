@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v17",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v18",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -458,6 +458,9 @@ def main() -> None:
                         "optics_and_capture_only_static_editor_ribbon"
                     ),
                     "gameplay_shading_contract": "solver_owned_transmitting_volume_core",
+                    "bank_edge_contract": (
+                        "vertex_alpha_feathered_single_layer_water_volume_v2"
+                    ),
                     "capture_shading_model_contract": "DefaultLit",
                     "capture_normal_motion_contract": "two_opposed_panned_atlas_layers",
                     "solver_owned_runtime_rendering": solver_owned_water,
@@ -501,6 +504,15 @@ def main() -> None:
                         float(
                             water_config.get_editor_property(
                                 "live_presentation_surface_smoothing_strength"
+                            )
+                        )
+                        if water_config
+                        else None
+                    ),
+                    "bank_blend_m": (
+                        float(
+                            water_config.get_editor_property(
+                                "live_surface_bank_blend_meters"
                             )
                         )
                         if water_config
@@ -727,7 +739,7 @@ def main() -> None:
             and solver_owned_water
             and live_volume_core_enabled
             and live_volume_material is not None
-            and "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1"
+            and "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2"
             in live_volume_material.get_path_name()
             and live_flow_normal is not None
             and "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal"
@@ -752,8 +764,19 @@ def main() -> None:
                         "live_presentation_surface_smoothing_strength"
                     )
                 )
-                - 0.55
+                - 0.62
             ) <= 0.001
+            and abs(
+                float(
+                    water_config.get_editor_property(
+                        "live_surface_bank_blend_meters"
+                    )
+                )
+                - 7.5
+            ) <= 0.001
+            and "RaftSimZambeziTransmittingWaterV2" in water_config_tags
+            and "RaftSimOpacityFeatheredVolumeEdgeV2" in water_config_tags
+            and "RaftSimRestrainedSolarGlareV2" in water_config_tags
             and water_surface_rows[0]["procedural_mesh_count"] == 1
             and "MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate"
             in str(water_surface_rows[0]["material"])

@@ -223,3 +223,17 @@ procedural shore geometry, repeated ecology, missing spray/mist and entrained
 air, and uncalibrated hydraulics keep the result technical rather than
 photoreal. Solver arrays, wet/dry ownership, bathymetry, collision, buoyancy,
 and raft forces remain unchanged.
+
+Zambezi V2 now closes the corresponding live-core opacity mismatch. The shared
+raft-transmitting parent preserves its depth-, foam-, and raft-interior-aware
+optical graph, then multiplies opacity by the station/lateral wet-cell coverage
+already carried in live-core vertex alpha. The Zambezi map binds a new river-
+local instance, widens the presentation-only bank blend to 7.5 m, raises
+smoothing to 0.62, reduces the detail skin to 0.025/0.13 calm/active coverage,
+and restrains specular, reflection, and fallback-sky response. Exact-transform
+gameplay evidence reduces high launch-water luminance and the sampled right-
+bank edge while preserving solver counts and 4,224 optical-core triangles.
+This does not supersede terrain, shoreline, bathymetry, hydraulics, collision,
+buoyancy, or raft-force authority; coarse DEM and wet-cell geometry plus open
+art, guide, geospatial, rights, seasonal-flow, VFX, character, and performance
+review keep the runnable map below photoreal promotion.

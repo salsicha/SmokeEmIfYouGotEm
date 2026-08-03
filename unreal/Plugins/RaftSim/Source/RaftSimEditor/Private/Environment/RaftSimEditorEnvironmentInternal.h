@@ -1053,7 +1053,7 @@ UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary);
 UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
     FString& OutSummary);
 
-UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterInstance(
+UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
     FString& OutSummary);
 
 bool CaptureColoradoHanceWaterReview(FString& OutSummary);

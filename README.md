@@ -20,12 +20,15 @@ resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads
 with the vertical-slice game mode and live cooked-field water, and is not an
 environment-preview-only map. Its gameplay river is now a
 solver-owned, wet-cell-clipped transmitting core rather than the former opaque
-gray static ribbon; project-owned flow-normal and solver-masked foam textures
-have no hydraulic authority. The exact contract hashes, tests, runtime counts,
-and still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v9_review.json),
-with the matched visual evidence in the
-[transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v1_review.json).
+gray static ribbon. Its V2 optical body now consumes live wet-cell vertex-alpha
+coverage across a 7.5 m bank blend, reducing the hard rectangular shoreline,
+while restrained river-local reflection settings reduce clipped launch glare;
+project-owned flow-normal and solver-masked foam textures still have no
+hydraulic authority. The exact contract hashes, tests, runtime counts, and
+still-open production gates are recorded in the
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v10_review.json),
+with matched visual evidence in the
+[V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The versioned progression manifest also enumerates Zambezi in the six-river
 Free Run contract, so catalog tests fail if its scenario or map path is removed.
 The South Fork production campaign still resolves to the 49.1 km

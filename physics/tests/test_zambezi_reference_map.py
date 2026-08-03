@@ -31,7 +31,11 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v9_review.json"
+    "zambezi_runnable_release_head_v10_review.json"
+)
+LIVE_WATER_V2_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_live_transmitting_water_v2_review.json"
 )
 
 
@@ -45,25 +49,24 @@ def _sha256(path: Path) -> str:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v5"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v6"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "5dc8750384f957a2a7af3f938a889605afde319d"
+        "2a14719ee2e9bfbfb7ddcc2e696c0751035c3f42"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Revalidate the unchanged runnable Zambezi package at the current "
-            "release head after the Pacuare and Chilko transmitting-water "
-            "milestones."
+            "Rebuild and revalidate the runnable Zambezi package with a "
+            "coverage-feathered live-water bank edge and restrained launch optics."
         ),
-        "map_runtime_package_changed_since_v8": False,
-        "player_selector_contract_changed_since_v8": False,
+        "map_runtime_package_changed_since_v9": True,
+        "player_selector_contract_changed_since_v9": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v8_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v9_review.json"
         ),
     }
     assert review["player_path"] == {
@@ -79,19 +82,15 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
 
     expected_hashes = {
         "unreal/Content/RaftSim/Maps/L_Zambezi.umap": (
-            "a7c9993c577054de699f1689a8e2b29622373e072ba8b0b347dd5128a8bd4587"
+            "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
         ),
         "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/"
-        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1.uasset": (
-            "537f78ea6030cf11b1a110f6be31f672bee8ea9fd51ec0673e11eb4532d8fd69"
+        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset": (
+            "e5a27faca288004cbf0473edc5a136e5d3b5f3fb37df1687a0e722f5a74b5f03"
         ),
-        "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Textures/"
-        "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal.uasset": (
-            "b5550eea48bdd0345273b46965c6e3048284c014781db0b0c93ba15d8ffe3d50"
-        ),
-        "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Textures/"
-        "T_RaftSim_ZambeziBatokaWaterV1_FoamLace.uasset": (
-            "d6206518c321649ba0e022dbd21a123814609199c95e4edb66778029df1b5667"
+        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+        "M_RaftSim_SouthForkRaftTransmissionWater.uasset": (
+            "1fd7cabc1d42e46da3ac865287039170ce75e5483e8500cf2d8e9be8d2878e15"
         ),
         "unreal/Content/RaftSim/UI/river_selection_catalog.json": (
             "1eaeba715f3f9c7e82bbc0c77eb151a5268a537a6ffe6f5e8686ceaf8db13c9e"
@@ -121,6 +120,47 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert RUNNABLE_RELEASE_REVIEW.as_posix() in readme
     assert "Zambezi, Batoka Gorge" in readme
+
+
+def test_zambezi_live_water_v2_review_and_matched_evidence_are_hash_locked():
+    review = _load(REPO_ROOT / LIVE_WATER_V2_REVIEW)
+    assert review["schema"] == (
+        "raftsim.environment.zambezi_live_transmitting_water_review.v2"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["rectangular_bank_seam_reduced"] is True
+    assert review["decision"]["launch_glare_reduced"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["hydraulics_changed"] is False
+    assert review["decision"]["wet_dry_mask_changed"] is False
+    assert review["decision"]["bathymetry_changed"] is False
+    assert review["decision"]["collision_or_raft_forces_changed"] is False
+
+    comparison = review["fixed_camera_comparison"]
+    assert comparison["retained_water_luminance_p95"] < (
+        comparison["baseline_water_luminance_p95"]
+    )
+    assert comparison["retained_water_fraction_over_0_90"] < (
+        comparison["baseline_water_fraction_over_0_90"] * 0.20
+    )
+    assert comparison["retained_water_fraction_over_0_95"] == 0.0
+    assert comparison["retained_right_bank_vertical_edge_p99"] < (
+        comparison["baseline_right_bank_vertical_edge_p99"]
+    )
+    assert comparison["retained_right_bank_strong_edge_fraction"] < (
+        comparison["baseline_right_bank_strong_edge_fraction"]
+    )
+
+    locked_artifacts = {
+        entry["path"]: entry["sha256"] for entry in review["retained_artifacts"]
+    }
+    for relative, expected in locked_artifacts.items():
+        assert _sha256(REPO_ROOT / relative) == expected
+
+    assert len(review["required_external_acceptance_gates"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert LIVE_WATER_V2_REVIEW.as_posix() in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():
@@ -609,12 +649,15 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "RaftSimWaterSurfaceActor.cpp"
     ).read_text(encoding="utf-8")
     assert "bSolverOwnedRuntimeWater = bReachLocalRun || bZambezi" in geometry_cpp
-    assert "LoadOrCreateZambeziBatokaLiveWaterInstance" in geometry_cpp
+    assert "LoadOrCreateZambeziBatokaLiveWaterV2Instance" in geometry_cpp
     assert "bEnableLiveSolverVolumeCore = true" in geometry_cpp
-    assert "RaftSimZambeziTransmittingWaterV1" in geometry_cpp
+    assert "RaftSimZambeziTransmittingWaterV2" in geometry_cpp
+    assert "RaftSimOpacityFeatheredVolumeEdgeV2" in geometry_cpp
+    assert "RaftSimRestrainedSolarGlareV2" in geometry_cpp
     assert "RaftSimSolverMaskedFoamLace" in geometry_cpp
     assert "RaftSimNoSolverStateMutation" in geometry_cpp
-    assert "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1" in live_water_cpp
+    assert "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2" in live_water_cpp
+    assert "LiveVolumeBankCoverageFloor" in live_water_cpp
     assert "M_RaftSim_SouthForkRaftTransmissionWater" in live_water_cpp
     assert "BuildZambeziBatokaWaterTextureAssets" in texture_builder_cpp
     assert "ZambeziBatokaWaterV1" in texture_builder_cpp
@@ -676,7 +719,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v17")
+    assert validation["schema"].endswith(".v18")
     assert validation["runtime_hydraulics"]["preserves_global_river_stations"] is True
     assert validation["runtime_hydraulics"]["rapid_count"] == 25
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
@@ -746,8 +789,11 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["water_surface"]["capture_shading_model_contract"] == (
         "DefaultLit"
     )
-    assert "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1" in (
+    assert "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2" in (
         validation["water_surface"]["live_volume_material"]
+    )
+    assert validation["water_surface"]["bank_edge_contract"] == (
+        "vertex_alpha_feathered_single_layer_water_volume_v2"
     )
     assert "T_RaftSim_ZambeziBatokaWaterV1_FlowNormal" in (
         validation["water_surface"]["live_flow_normal"]
@@ -759,8 +805,9 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["water_surface"]["active_detail_coverage"] < 0.20
     assert validation["water_surface"]["presentation_smoothing_enabled"] is True
     assert abs(
-        validation["water_surface"]["presentation_smoothing_strength"] - 0.55
+        validation["water_surface"]["presentation_smoothing_strength"] - 0.62
     ) <= 0.001
+    assert abs(validation["water_surface"]["bank_blend_m"] - 7.5) <= 0.001
     assert all(
         "RaftSimCaptureOnlyStaticWater" in component["tags"]
         and "RaftSimLiveSolverWaterOwnsRuntimeRendering" in component["tags"]

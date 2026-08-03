@@ -1956,7 +1956,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         // contribute only sediment-water optics and sub-grid surface breakup.
         WaterConfig->bEnableLiveSolverVolumeCore = true;
         WaterConfig->LiveVolumeCoreMaterialOverride =
-            LoadOrCreateZambeziBatokaLiveWaterInstance(OutSummary);
+            LoadOrCreateZambeziBatokaLiveWaterV2Instance(OutSummary);
         WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
             nullptr,
             TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Textures/"
@@ -1975,37 +1975,43 @@ bool AddLandscapeCandidateRunnableGameplay(
                 "Zambezi Batoka river-local live-water assets are incomplete.\n");
             return false;
         }
-        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
-        WaterConfig->LiveSurfaceActiveCoverage = 0.16f;
-        WaterConfig->LiveSurfaceSpecular = 0.30f;
-        WaterConfig->LiveSurfaceRoughness = 0.30f;
-        WaterConfig->LiveSkyReflectionStrength = 0.28f;
-        WaterConfig->LiveRippleStrength = 0.30f;
-        WaterConfig->LiveFoamIntensity = 0.72f;
+        WaterConfig->LiveSurfaceCalmCoverage = 0.025f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.13f;
+        WaterConfig->LiveSurfaceSpecular = 0.22f;
+        WaterConfig->LiveSurfaceRoughness = 0.42f;
+        WaterConfig->LiveSkyReflectionStrength = 0.15f;
+        WaterConfig->LiveRippleStrength = 0.22f;
+        WaterConfig->LiveFoamIntensity = 0.64f;
         WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
-        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.55f;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.62f;
         WaterConfig->LivePresentationStandingWaveScale = 0.82f;
         WaterConfig->LivePresentationHydraulicReliefScale = 0.82f;
         WaterConfig->LiveRapidFoamFocusStart = 0.10f;
         WaterConfig->LiveRapidFoamFocusEnd = 0.66f;
         WaterConfig->LiveRapidFoamCoverageGain = 0.92f;
-        WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        // The transmitting core now consumes the same smooth vertex-alpha
+        // coverage as the detail skin. Three sampled cells provide a visible
+        // 0-to-1 transition instead of terminating the optical body as a hard
+        // rectangular polygon against either bank.
+        WaterConfig->LiveSurfaceBankBlendMeters = 7.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.080f, 0.120f, 0.060f, 1.0f);
+            FLinearColor(0.058f, 0.095f, 0.050f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.018f, 0.038f, 0.018f, 1.0f);
+            FLinearColor(0.013f, 0.030f, 0.016f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.12f, 0.17f, 0.18f, 1.0f);
+            FLinearColor(0.075f, 0.115f, 0.140f, 1.0f);
         WaterConfig->LiveWaterScattering =
             FLinearColor(0.00018f, 0.00015f, 0.00009f, 0.0f);
         WaterConfig->LiveWaterAbsorption =
             FLinearColor(0.0060f, 0.0038f, 0.0068f, 0.0f);
         WaterConfig->LiveRiverbedColorScale =
             FLinearColor(0.17f, 0.14f, 0.085f, 0.0f);
-        WaterConfig->LiveShallowWaterOpacity = 0.48f;
-        WaterConfig->LiveDeepWaterOpacity = 0.70f;
-        WaterConfig->LiveFoamWaterOpacity = 0.86f;
-        WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziTransmittingWaterV1"));
+        WaterConfig->LiveShallowWaterOpacity = 0.42f;
+        WaterConfig->LiveDeepWaterOpacity = 0.64f;
+        WaterConfig->LiveFoamWaterOpacity = 0.84f;
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziTransmittingWaterV2"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimOpacityFeatheredVolumeEdgeV2"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimRestrainedSolarGlareV2"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }

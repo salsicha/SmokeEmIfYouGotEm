@@ -8,6 +8,12 @@
 > written; it is not current launch or catalog authority. See
 > `docs/zambezi-reference-map-and-scenario.md` and
 > `physics/data/real_world/river_portfolio_plan.json`.
+> The August 3 V2 runnable-map update retains Zambezi in that sixth slot and
+> adds render-only vertex-alpha bank feathering plus restrained live-water
+> optics; it does not close the frozen plan's terrain, hydraulic, art, guide,
+> rights, or performance gates. Current evidence is in
+> `zambezi_runnable_release_head_v10_review.json` and
+> `zambezi_live_transmitting_water_v2_review.json`.
 
 Written July 15, 2026. This is a self-contained execution plan for an agent with no prior context. It consolidates the goals below into ordered, committable tasks, building on infrastructure that already exists in this repo. Read `docs/code-review-remediation-plan.md` first — its Finding 1 (water-solver validation honesty) and Finding 3 (LFS retention) are prerequisites woven into this plan.
 

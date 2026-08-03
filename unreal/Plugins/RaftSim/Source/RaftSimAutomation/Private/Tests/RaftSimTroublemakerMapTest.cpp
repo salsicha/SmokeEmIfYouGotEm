@@ -519,7 +519,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Zambezi config binds river-local transmitting water"),
                     (*It)->LiveVolumeCoreMaterialOverride &&
                         (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
-                            TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1")));
+                            TEXT("MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2")));
                 Test->TestTrue(
                     TEXT("Zambezi config binds its first-party flow normal"),
                     (*It)->LiveWaterFlowNormalTexture &&
@@ -539,11 +539,20 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     (*It)->bEnableLivePresentationSurfaceSmoothing &&
                         FMath::IsNearlyEqual(
                             (*It)->LivePresentationSurfaceSmoothingStrength,
-                            0.55f,
+                            0.62f,
                             0.001f));
                 Test->TestTrue(
+                    TEXT("Zambezi feathers the optical body across three bank cells"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceBankBlendMeters,
+                        7.5f,
+                        0.001f));
+                Test->TestTrue(
                     TEXT("Zambezi live-water tags disclaim solver mutation"),
-                    (*It)->Tags.Contains(TEXT("RaftSimZambeziTransmittingWaterV1")) &&
+                    (*It)->Tags.Contains(TEXT("RaftSimZambeziTransmittingWaterV2")) &&
+                        (*It)->Tags.Contains(
+                            TEXT("RaftSimOpacityFeatheredVolumeEdgeV2")) &&
+                        (*It)->Tags.Contains(TEXT("RaftSimRestrainedSolarGlareV2")) &&
                         (*It)->Tags.Contains(TEXT("RaftSimSolverMaskedFoamLace")) &&
                         (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
                 ++RuntimeWaterConfigCount;

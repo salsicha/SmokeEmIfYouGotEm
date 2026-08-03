@@ -608,15 +608,17 @@
       "RaftSimGlobalRiverStationAuthority",
       "RaftSimLiveSolverWaterOwnsRuntimeRendering",
       "RaftSimNoSolverStateMutation",
+      "RaftSimOpacityFeatheredVolumeEdgeV2",
       "RaftSimProceduralRuntimeWater",
+      "RaftSimRestrainedSolarGlareV2",
       "RaftSimSafeLaunchApron",
       "RaftSimSolverMaskedFoamLace",
       "RaftSimZambeziRun",
-      "RaftSimZambeziTransmittingWaterV1"
+      "RaftSimZambeziTransmittingWaterV2"
     ]
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v17",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v18",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,
@@ -1045,9 +1047,11 @@
     ]
   },
   "water_surface": {
-    "active_detail_coverage": 0.1599999964237213,
+    "active_detail_coverage": 0.12999999523162842,
     "authority": "solver_wet_cell_geometry_with_render_only_transmitting_optics_and_capture_only_static_editor_ribbon",
-    "calm_detail_coverage": 0.03500000014901161,
+    "bank_blend_m": 7.5,
+    "bank_edge_contract": "vertex_alpha_feathered_single_layer_water_volume_v2",
+    "calm_detail_coverage": 0.02500000037252903,
     "capture_normal_motion_contract": "two_opposed_panned_atlas_layers",
     "capture_shading_model_contract": "DefaultLit",
     "component_count": 1,
@@ -1073,9 +1077,9 @@
     "live_flow_normal": "/Game/RaftSim/Environment/ZambeziRun/Water/Textures/T_RaftSim_ZambeziBatokaWaterV1_FlowNormal.T_RaftSim_ZambeziBatokaWaterV1_FlowNormal",
     "live_foam_lace": "/Game/RaftSim/Environment/ZambeziRun/Water/Textures/T_RaftSim_ZambeziBatokaWaterV1_FoamLace.T_RaftSim_ZambeziBatokaWaterV1_FoamLace",
     "live_volume_core_enabled": true,
-    "live_volume_material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1.MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV1",
+    "live_volume_material": "/Game/RaftSim/Environment/ZambeziRun/Water/Materials/MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2",
     "presentation_smoothing_enabled": true,
-    "presentation_smoothing_strength": 0.550000011920929,
+    "presentation_smoothing_strength": 0.6200000047683716,
     "solver_owned_runtime_rendering": true
   }
 }
