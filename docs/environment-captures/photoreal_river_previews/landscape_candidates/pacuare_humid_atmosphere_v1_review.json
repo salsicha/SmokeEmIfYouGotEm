@@ -1,0 +1,129 @@
+{
+  "schema": "raftsim.environment.pacuare_humid_atmosphere_review.v1",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "779bb695f1300c7ff2ce74c42bd28063b311d507",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "status": "retained_layered_humidity_improvement_photoreal_promotion_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "visual_bank_readability_improved": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "runnable_map_package_changed": true,
+    "landscape_geometry_changed": false,
+    "landscape_collision_changed": false,
+    "water_geometry_changed": false,
+    "cooked_fields_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "raft_forces_changed": false
+  },
+  "architecture": {
+    "saved_actor_contract": "Four Pacuare-only actors share RaftSimPacuareHumidAtmosphereV1: one movable atmosphere sun, one captured sky fill, one physical SkyAtmosphere aerial-perspective actor, and one layered exponential-height-fog actor.",
+    "sky_transport": "The Pacuare SkyAtmosphere uses multi-scattering 1.08, Mie scattering scale 0.0048, anisotropy 0.72, and exponential distribution 0.90. The sky fill is 1.90 and the fog color is [0.58, 0.68, 0.60].",
+    "layered_humidity": "The non-volumetric height fog uses density 0.0075, height falloff 0.18, maximum opacity 0.62, and a 450 cm start distance. Its restrained water-level layer uses density 0.0012, -160 cm height offset, and 0.06 falloff.",
+    "runtime_state_stream_guard": "The committed map serializes the reviewed values. UE 5.8 PIE world duplication replays a stale exponential-fog state-stream value after ordinary actor ticks, so the Pacuare water-config actor alone reasserts the tagged presentation fields in TG_PostUpdateWork. Every other river leaves this tick disabled.",
+    "authority_boundary": "All humidity actors and the runtime guard are presentation-only. They do not modify Landscape samples, collision, cooked fields, wet/dry topology, bathymetry, solver state, water geometry, buoyancy, raft forces, routing, or scoring."
+  },
+  "rejected_iterations": {
+    "count": 3,
+    "policy": "No rejected volumetric frame is retained as current evidence.",
+    "reason": "All three volumetric candidates increased dark canopy occlusion and/or far-field contrast. The last rejected guide frame had bank mean luminance 0.147233 and near-black fraction 0.344385 versus baseline 0.172255 and 0.269913 under the earlier fixed region; the last rejected river-eye frame measured 0.176094 and 0.298849 versus 0.199945 and 0.221857.",
+    "retained_direction": "Use physical sky scattering plus two non-volumetric exponential layers; do not use translucent mist cards or volumetric fog for this Pacuare pass."
+  },
+  "matched_capture_metrics": {
+    "resolution_px": [1280, 720],
+    "bank_region": "Concatenated left and right banks: y 24%-66%, x 0%-30% and 70%-100%.",
+    "far_region": "Central distance field: y 12%-50%, x 34%-66%.",
+    "near_black_definition": "luminance < 0.035 in normalized sRGB",
+    "guide_seat": {
+      "mean_luminance_before": 0.253519,
+      "mean_luminance_after": 0.266406,
+      "bank_mean_luminance_before": 0.192423,
+      "bank_mean_luminance_after": 0.199256,
+      "bank_near_black_fraction_before": 0.029428,
+      "bank_near_black_fraction_after": 0.016368,
+      "bank_near_black_reduction_percent": 44.38,
+      "far_mean_luminance_before": 0.437976,
+      "far_mean_luminance_after": 0.479980,
+      "far_contrast_before": 0.198622,
+      "far_contrast_after": 0.212759
+    },
+    "river_eye": {
+      "mean_luminance_before": 0.257521,
+      "mean_luminance_after": 0.269987,
+      "bank_mean_luminance_before": 0.211764,
+      "bank_mean_luminance_after": 0.218275,
+      "bank_near_black_fraction_before": 0.022148,
+      "bank_near_black_fraction_after": 0.012350,
+      "bank_near_black_reduction_percent": 44.24,
+      "far_mean_luminance_before": 0.439617,
+      "far_mean_luminance_after": 0.481024,
+      "far_contrast_before": 0.199557,
+      "far_contrast_after": 0.213985
+    },
+    "solver_rapid": {
+      "mean_luminance_before": 0.255475,
+      "mean_luminance_after": 0.268433,
+      "bank_mean_luminance_before": 0.185763,
+      "bank_mean_luminance_after": 0.191709,
+      "bank_near_black_fraction_before": 0.034851,
+      "bank_near_black_fraction_after": 0.021792,
+      "bank_near_black_reduction_percent": 37.47,
+      "far_mean_luminance_before": 0.443578,
+      "far_mean_luminance_after": 0.489688,
+      "far_contrast_before": 0.191655,
+      "far_contrast_after": 0.205631
+    },
+    "verdict": "Retain as a bounded humidity and shadow-readability improvement. All views are brighter, bank near-black coverage falls 37.47%-44.38%, and the distant opening reads as humid air rather than an opaque mist card. Far-region standard deviation rises with the brighter sky opening, so this is not claimed as a full distance-contrast or photoreal pass."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed",
+    "focused_native_asset_audit": "RaftSim.M9.FPacuare passed 4/4",
+    "pacuare_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_UpperHuacas passed 1/1; PIE reported density 0.0075000, volumetric 0, maximum opacity 0.6200, start distance 450 cm, and the complete second layer",
+    "zambezi_regression_gate": "RaftSim.P4.RiverMapLoads.L_Zambezi passed 1/1 with live solver water and visible rapid foam",
+    "map_check": "0 errors and 0 warnings during direct L_UpperHuacas load",
+    "focused_python_contracts": "115 passed, 1160 deselected"
+  },
+  "implementation_files": [
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h",
+    "unreal/Plugins/RaftSim/Source/RaftSimWater/Private/RaftSimRiverWaterConfig.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+    "physics/tests/test_photoreal_pacuare_humid_atmosphere_v1.py"
+  ],
+  "remaining_photoreal_defects": [
+    "Canopy, understory, shrubs, and ground cover remain project-owned procedural fallback rather than approved Pacuare species assets.",
+    "The 1009x1009 reach-local terrain is too coarse for credible bank microtopography, roots, leaf litter, wet soils, and rock-scale geology.",
+    "The river surface still lacks production refraction, reflection, sediment response, subsurface depth cues, caustics, and contact wetness.",
+    "Whitewater remains thin and lacks calibrated crest thickness, rollers, holes, spray, aerosol, and rock-contact plume volume.",
+    "No production rain, cloud, wind, moving canopy, seasonal lighting, or time-of-day system is present.",
+    "Upper Huacas hydraulics remain unconverged and are not calibrated to observed discharge, bathymetry, hazards, or guide lines.",
+    "The retained atmosphere has not passed guide, ecology, environment-art, desktop-performance, or VR-performance approval."
+  ],
+  "required_external_acceptance_gates": [
+    "Pacuare guide review of the Upper Huacas line, hazards, water levels, entry, exit, and rescue routes",
+    "geospatial review of exact stationing, planform, vertical datum, bank breaklines, higher-resolution terrain, rocks, and bathymetry",
+    "hydraulic calibration and convergence approval against observed Upper Huacas behavior across playable flow bands",
+    "ecology and environment-art approval of species, density, canopy strata, ground cover, geology, wet banks, lighting, and rainforest atmosphere",
+    "photoreal water/VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap", "role": "runnable map with serialized Pacuare humidity contract and runtime state-stream guard", "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json", "role": "filtered Pacuare candidate manifest", "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_guide_before.png", "role": "immutable guide-seat baseline", "sha256": "5a62ec14a117aac77961a711bf0c57cb99f216e7f167294986450ca401800b32"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_guide.png", "role": "retained guide-seat humidity capture", "sha256": "b164f0c290ec2bac9d52e2ba995eda1573c0404a1c23402552445202a54d5180"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_river_eye_before.png", "role": "immutable river-eye baseline", "sha256": "2fe6ae29a578171ed29758989e010c11e561e14845f8b213597561c53f6cb7cd"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_river_eye.png", "role": "retained river-eye humidity capture", "sha256": "2b2dc20bbb4cc650e300e89f1b41c3bb54910d62dd30009c946406851f2783d1"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_solver_rapid_before.png", "role": "immutable solver-rapid baseline", "sha256": "fd5d4ef3cd08583f2fa126d94ee90df73c52166aaadb15431ec2921e92dc5c3f"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_solver_rapid.png", "role": "retained solver-rapid humidity capture", "sha256": "70f8af95eb90569c139781d25ea9e7fb946809b4281dc0958416b8c70a797c03"}
+  ]
+}

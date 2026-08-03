@@ -4180,3 +4180,16 @@ path is verified, and the completion goal can be marked complete.
   water/VFX, calibrated hydraulics, atmosphere, performance, and all six
   external approvals remain incomplete, so M9 and photoreal promotion stay
   open.
+- Pacuare humid-atmosphere V1 retains physical Mie aerial perspective plus a
+  pale main exponential haze and restrained water-level layer, with no
+  translucent mist cards and no volumetric fog. Three volumetric brackets were
+  rejected for dark canopy occlusion. Across guide, river-eye, and solver-rapid
+  fixed views, mean bank luminance rises and near-black bank coverage falls
+  37.47%-44.38%. The committed `L_UpperHuacas` package and a Pacuare-only
+  `TG_PostUpdateWork` presentation guard keep the reviewed `0.0075` density and
+  volumetric-off state through UE 5.8 PIE world duplication. The editor build,
+  M9 Pacuare 4/4, P4 Pacuare 1/1, and P4 Zambezi 1/1 gates pass. No terrain,
+  water geometry, collision, cooked-field, bathymetry, hydraulic, or raft-force
+  authority changed. Generic ecology, coarse terrain, water/VFX, weather,
+  calibration, performance, and all six external acceptance gates keep M9 and
+  photoreal promotion open.

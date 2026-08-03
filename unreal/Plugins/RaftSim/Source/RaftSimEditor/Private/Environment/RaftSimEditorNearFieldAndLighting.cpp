@@ -1815,6 +1815,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
+    const bool bPacuareHumidAtmosphere =
+        Spec.RiverId == TEXT("pacuare");
 
     // Batoka's coarse source DEM produces a conspicuous diagonal comb when lit
     // across its facets at the shared grazing angle.  Keep the shared rig for
@@ -1845,6 +1847,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             Sun->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
             Sun->Tags.AddUnique(TEXT("RaftSimAtmosphereSunLight"));
         }
+        if (bPacuareHumidAtmosphere)
+        {
+            Sun->Tags.AddUnique(TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            Sun->Tags.AddUnique(TEXT("RaftSimHumidityDirectionalLight"));
+        }
     }
 
     ASkyLight* SkyLight = Cast<ASkyLight>(
@@ -1855,6 +1862,12 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
         SkyLight->GetLightComponent()->SourceType = SLS_CapturedScene;
         SkyLight->GetLightComponent()->SetIntensity(CaptureSettings.SkyLightIntensity);
+        if (bPacuareHumidAtmosphere)
+        {
+            SkyLight->Tags.AddUnique(
+                TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            SkyLight->Tags.AddUnique(TEXT("RaftSimHumiditySkyFill"));
+        }
         if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
         {
             SkyLight->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
@@ -1867,6 +1880,22 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (Atmosphere)
     {
         Atmosphere->SetActorLabel(TEXT("RaftSim_SkyAtmosphere_SourceAware"));
+        if (bPacuareHumidAtmosphere && Atmosphere->GetComponent())
+        {
+            // A moist, low-altitude Mie response softens distance contrast
+            // while retaining the exact source Landscape silhouette.  These
+            // parameters affect light transport only and carry no terrain,
+            // water, solver, or gameplay authority.
+            USkyAtmosphereComponent* AtmosphereComponent =
+                Atmosphere->GetComponent();
+            AtmosphereComponent->SetMultiScatteringFactor(1.08f);
+            AtmosphereComponent->SetMieScatteringScale(0.0048f);
+            AtmosphereComponent->SetMieAnisotropy(0.72f);
+            AtmosphereComponent->SetMieExponentialDistribution(0.90f);
+            Atmosphere->Tags.AddUnique(
+                TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            Atmosphere->Tags.AddUnique(TEXT("RaftSimHumidAerialPerspective"));
+        }
         if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
         {
             Atmosphere->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
@@ -1881,6 +1910,30 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
         Fog->GetComponent()->SetFogDensity(CaptureSettings.FogDensity);
         Fog->GetComponent()->SetFogInscatteringColor(CaptureSettings.FogColor);
+        if (bPacuareHumidAtmosphere)
+        {
+            UExponentialHeightFogComponent* FogComponent =
+                Fog->GetComponent();
+            // UE 5.8's state-stream setters update the live render handle, but
+            // an existing generated package can retain the prior serialized
+            // density/volumetric values.  Modify the component and mirror the
+            // two serialization-critical fields before the map is saved so a
+            // PIE reload exactly matches the reviewed capture rig.
+            FogComponent->Modify();
+            FogComponent->FogDensity = CaptureSettings.FogDensity;
+            FogComponent->bEnableVolumetricFog = false;
+            FogComponent->SetFogHeightFalloff(0.18f);
+            FogComponent->SetFogMaxOpacity(0.62f);
+            FogComponent->SetStartDistance(450.0f);
+            FogComponent->SetSecondFogDensity(0.0012f);
+            FogComponent->SetSecondFogHeightOffset(-160.0f);
+            FogComponent->SetSecondFogHeightFalloff(0.06f);
+            FogComponent->SetVolumetricFog(false);
+            FogComponent->MarkPackageDirty();
+            Fog->Tags.AddUnique(TEXT("RaftSimPacuareHumidAtmosphereV1"));
+            Fog->Tags.AddUnique(TEXT("RaftSimLayeredRainforestHumidity"));
+            Fog->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+        }
         if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
         {
             // A shallow warm haze gives the kilometre-scale gorge readable

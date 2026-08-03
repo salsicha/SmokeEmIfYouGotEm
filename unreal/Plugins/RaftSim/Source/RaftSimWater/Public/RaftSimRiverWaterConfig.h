@@ -21,6 +21,9 @@ class RAFTSIMWATER_API ARaftSimRiverWaterConfig : public AActor
 public:
     ARaftSimRiverWaterConfig();
 
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
+
     /** Repo-relative directory of the cooked_flow_fields manifest. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
     FString CookedFieldsDir =
@@ -69,6 +72,22 @@ public:
     /** Full-reach production terrain exists in the map; suppress local bed proxy. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
     bool bMapProvidesTerrain = false;
+
+    /** Reassert a generated river map's reviewed height-fog values after PIE
+     * world duplication. UE 5.8 can otherwise restore stale state-stream
+     * values even though the serialized component is correct. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    bool bEnforceTaggedHeightFogPresentation = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    FName RuntimeHeightFogActorTag = NAME_None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "0.05"))
+    float RuntimeHeightFogDensity = 0.0025f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    bool bRuntimeVolumetricFogEnabled = false;
 
     /** The authored editor-capture ribbon is hidden during play, so the live
      * solver mesh must render the complete visible river rather than a
@@ -213,4 +232,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LiveFoamWaterOpacity = 0.91f;
+
+private:
+    void ApplyTaggedHeightFogPresentation();
 };

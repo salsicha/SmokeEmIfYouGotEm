@@ -291,7 +291,7 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     else if (RiverId == TEXT("pacuare"))
     {
         Settings.SunIntensity = 4.60f;
-        Settings.SkyLightIntensity = 1.45f;
+        Settings.SkyLightIntensity = 1.90f;
         Settings.FogDensity = 0.0075f;
         Settings.ExposureBias = -0.18f;
         Settings.Saturation = 1.04f;
@@ -299,7 +299,7 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
         Settings.Sharpen = 0.22f;
         Settings.Vignette = 0.05f;
         Settings.SunColor = FLinearColor(0.90f, 0.97f, 0.91f);
-        Settings.FogColor = FLinearColor(0.43f, 0.57f, 0.46f);
+        Settings.FogColor = FLinearColor(0.58f, 0.68f, 0.60f);
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {

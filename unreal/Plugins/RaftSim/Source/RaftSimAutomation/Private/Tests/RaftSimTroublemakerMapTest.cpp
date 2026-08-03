@@ -3,6 +3,7 @@
 // rests on wet, finite water. Runs once per map that exists.
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Components/ExponentialHeightFogComponent.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Containers/Set.h"
 #include "Engine/StaticMesh.h"
@@ -850,6 +851,107 @@ bool FRaftSimAssertRiverMapCommand::Update()
             PlayerRaft->GetSwimmerCount(),
             0);
 
+        int32 HumidAtmosphereActorCount = 0;
+        int32 HumidityDirectionalLightCount = 0;
+        int32 HumiditySkyFillCount = 0;
+        int32 HumidAerialPerspectiveCount = 0;
+        int32 LayeredHumidityCount = 0;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (!Actor ||
+                !Actor->Tags.Contains(
+                    TEXT("RaftSimPacuareHumidAtmosphereV1")))
+            {
+                continue;
+            }
+            ++HumidAtmosphereActorCount;
+            HumidityDirectionalLightCount += Actor->Tags.Contains(
+                TEXT("RaftSimHumidityDirectionalLight")) ? 1 : 0;
+            HumiditySkyFillCount += Actor->Tags.Contains(
+                TEXT("RaftSimHumiditySkyFill")) ? 1 : 0;
+            HumidAerialPerspectiveCount += Actor->Tags.Contains(
+                TEXT("RaftSimHumidAerialPerspective")) ? 1 : 0;
+            if (Actor->Tags.Contains(
+                    TEXT("RaftSimLayeredRainforestHumidity")))
+            {
+                const UExponentialHeightFogComponent* FogComponent =
+                    Actor->FindComponentByClass<
+                        UExponentialHeightFogComponent>();
+                Test->TestNotNull(
+                    TEXT("Pacuare humidity actor has a height-fog component"),
+                    FogComponent);
+                if (FogComponent)
+                {
+                    Test->AddInfo(FString::Printf(
+                        TEXT("Pacuare humidity runtime values: density=%.7f volumetric=%d max_opacity=%.4f start_cm=%.2f second_density=%.7f second_offset_cm=%.2f second_falloff=%.4f"),
+                        FogComponent->FogDensity,
+                        FogComponent->bEnableVolumetricFog ? 1 : 0,
+                        FogComponent->FogMaxOpacity,
+                        FogComponent->StartDistance,
+                        FogComponent->SecondFogData.FogDensity,
+                        FogComponent->SecondFogData.FogHeightOffset,
+                        FogComponent->SecondFogData.FogHeightFalloff));
+                    Test->TestTrue(
+                        TEXT("Pacuare humidity uses the reviewed fog density"),
+                        FMath::IsNearlyEqual(
+                            FogComponent->FogDensity, 0.0075f, 0.0001f));
+                    Test->TestTrue(
+                        TEXT("Pacuare humidity avoids rejected volumetric occlusion"),
+                        !FogComponent->bEnableVolumetricFog);
+                    Test->TestTrue(
+                        TEXT("Pacuare humidity keeps a bounded opacity"),
+                        FMath::IsNearlyEqual(
+                            FogComponent->FogMaxOpacity, 0.62f, 0.001f));
+                    Test->TestTrue(
+                        TEXT("Pacuare humidity begins beyond the guide camera"),
+                        FMath::IsNearlyEqual(
+                            FogComponent->StartDistance,
+                            450.0f,
+                            0.1f));
+                    Test->TestTrue(
+                        TEXT("Pacuare humidity uses a restrained water-level layer"),
+                        FMath::IsNearlyEqual(
+                            FogComponent->SecondFogData.FogDensity,
+                            0.0012f,
+                            0.0001f) &&
+                            FMath::IsNearlyEqual(
+                                FogComponent->SecondFogData.FogHeightOffset,
+                                -160.0f,
+                                0.1f) &&
+                            FMath::IsNearlyEqual(
+                                FogComponent->SecondFogData.FogHeightFalloff,
+                                0.06f,
+                                0.001f));
+                }
+                Test->TestTrue(
+                    TEXT("Pacuare humidity disclaims hydraulic authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")));
+                ++LayeredHumidityCount;
+            }
+        }
+        Test->TestEqual(
+            TEXT("Pacuare has a four-actor humid-atmosphere contract"),
+            HumidAtmosphereActorCount,
+            4);
+        Test->TestEqual(
+            TEXT("Pacuare links one humidity-aware directional light"),
+            HumidityDirectionalLightCount,
+            1);
+        Test->TestEqual(
+            TEXT("Pacuare links one humidity-aware sky fill"),
+            HumiditySkyFillCount,
+            1);
+        Test->TestEqual(
+            TEXT("Pacuare links one humid aerial-perspective sky"),
+            HumidAerialPerspectiveCount,
+            1);
+        Test->TestEqual(
+            TEXT("Pacuare links one layered humidity actor"),
+            LayeredHumidityCount,
+            1);
+
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
         {
@@ -879,6 +981,16 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Pacuare Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
+            Test->TestTrue(
+                TEXT("Pacuare reasserts the reviewed fog contract after PIE duplication"),
+                (*It)->bEnforceTaggedHeightFogPresentation &&
+                    (*It)->RuntimeHeightFogActorTag ==
+                        FName(TEXT("RaftSimLayeredRainforestHumidity")) &&
+                    FMath::IsNearlyEqual(
+                        (*It)->RuntimeHeightFogDensity,
+                        0.0075f,
+                        0.0001f) &&
+                    !(*It)->bRuntimeVolumetricFogEnabled);
             Test->TestTrue(
                 TEXT("Pacuare solver owns the visible gameplay river"),
                 (*It)->bLiveSolverOwnsRuntimeRendering);
