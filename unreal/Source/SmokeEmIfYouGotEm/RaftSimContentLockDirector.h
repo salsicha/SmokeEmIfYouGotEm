@@ -73,6 +73,8 @@ private:
     double LastPerformanceTickSeconds = 0.0;
     int32 PerformanceHitchCount = 0;
     int32 InvalidGpuTimingSampleCount = 0;
+    int32 BaselineHiddenScannedGroundCoverComponentCount = 0;
+    int32 BaselineHiddenScannedGroundCoverInstanceCount = 0;
     FString PerformanceOutputPath;
     TArray<float> CapturedWorkloadFrameMilliseconds;
     TArray<float> CapturedWallClockFrameMilliseconds;

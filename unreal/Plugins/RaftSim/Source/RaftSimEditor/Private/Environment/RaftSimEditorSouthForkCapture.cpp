@@ -55,6 +55,10 @@ constexpr TCHAR LiveOakIslandTreeMorphologyReviewCaptureDirectoryRelativePath[] 
     TEXT("docs/environment-captures/south_fork_full_reach/photographic_v213_live_oak_cc0_island_tree_morphology");
 constexpr TCHAR LiveOakIslandTreeMaterialV1ReviewCaptureDirectoryRelativePath[] =
     TEXT("docs/environment-captures/south_fork_full_reach/photographic_v214_live_oak_cc0_island_tree_material_v1");
+constexpr TCHAR Cc0ScannedGroundCoverBaselineCaptureDirectoryRelativePath[] =
+    TEXT("docs/environment-captures/south_fork_full_reach/photographic_v216_pre_cc0_scanned_ground_cover");
+constexpr TCHAR Cc0ScannedGroundCoverCandidateCaptureDirectoryRelativePath[] =
+    TEXT("docs/environment-captures/south_fork_full_reach/photographic_v216_cc0_scanned_ground_cover");
 
 FString AbsoluteCapturePath(const FString& RelativePath)
 {
@@ -1116,13 +1120,70 @@ void ConfigureSouthForkSettledSourceCaptureVisibility(
             }
         }
     }
+    const bool bScannedGroundCoverBaselineReview = FParse::Param(
+        FCommandLine::Get(),
+        TEXT("RaftSimCc0ScannedGroundCoverBaselineReview"));
+    int32 ScannedGroundCoverComponentCount = 0;
+    int32 BaselineHiddenScannedGroundCoverComponentCount = 0;
+    int32 ScannedGroundCoverCaptureInstanceCount = 0;
+    FVector FirstScannedGroundCoverMeshExtent = FVector::ZeroVector;
+    FVector FirstScannedGroundCoverInstanceScale = FVector::ZeroVector;
+    bool bRecordedFirstScannedGroundCover = false;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        TInlineComponentArray<UPrimitiveComponent*> PrimitiveComponents(*It);
+        for (UPrimitiveComponent* Component : PrimitiveComponents)
+        {
+            UInstancedStaticMeshComponent* Instanced =
+                Cast<UInstancedStaticMeshComponent>(Component);
+            if (Instanced && Instanced->GetName().StartsWith(
+                    TEXT("Cc0ScannedGroundCover")))
+            {
+                ++ScannedGroundCoverComponentCount;
+                ScannedGroundCoverCaptureInstanceCount +=
+                    Instanced->GetInstanceCount();
+                if (!bRecordedFirstScannedGroundCover &&
+                    Instanced->GetInstanceCount() > 0 &&
+                    Instanced->GetStaticMesh())
+                {
+                    FTransform FirstInstance;
+                    Instanced->GetInstanceTransform(
+                        0, FirstInstance, /*bWorldSpace=*/true);
+                    FirstScannedGroundCoverMeshExtent =
+                        Instanced->GetStaticMesh()->GetBounds().BoxExtent;
+                    FirstScannedGroundCoverInstanceScale =
+                        FirstInstance.GetScale3D();
+                    bRecordedFirstScannedGroundCover = true;
+                }
+                if (bScannedGroundCoverBaselineReview)
+                {
+                    OutVisibilityStates.Emplace(
+                        Instanced, Instanced->IsVisible());
+                    Instanced->SetVisibility(false, true);
+                    ++BaselineHiddenScannedGroundCoverComponentCount;
+                }
+            }
+        }
+    }
     OutSummary += FString::Printf(
         TEXT("Settled source capture isolated %d HLOD primitive components and "
-             "selected %s across %d flow-band components (%d inactive).\n"),
+             "selected %s across %d flow-band components (%d inactive); "
+             "CC0 scanned ground-cover components=%d, baseline hidden components=%d, "
+             "instances=%d, first mesh extent=(%.3f,%.3f,%.3f), "
+             "first scale=(%.3f,%.3f,%.3f).\n"),
         HiddenHlodComponentCount,
         *ActiveFlowBandTag.ToString(),
         FlowBandComponentCount,
-        HiddenInactiveFlowBandComponentCount);
+        HiddenInactiveFlowBandComponentCount,
+        ScannedGroundCoverComponentCount,
+        BaselineHiddenScannedGroundCoverComponentCount,
+        ScannedGroundCoverCaptureInstanceCount,
+        FirstScannedGroundCoverMeshExtent.X,
+        FirstScannedGroundCoverMeshExtent.Y,
+        FirstScannedGroundCoverMeshExtent.Z,
+        FirstScannedGroundCoverInstanceScale.X,
+        FirstScannedGroundCoverInstanceScale.Y,
+        FirstScannedGroundCoverInstanceScale.Z);
 }
 
 void RestoreSouthForkSettledSourceCaptureVisibility(
@@ -1245,6 +1306,12 @@ bool CaptureSouthForkView(
         FCommandLine::Get(), TEXT("RaftSimLiveOakIslandTreeMorphologyReview"));
     const bool bLiveOakIslandTreeMaterialV1ReviewCapture = FParse::Param(
         FCommandLine::Get(), TEXT("RaftSimLiveOakIslandTreeMaterialV1Review"));
+    const bool bCc0ScannedGroundCoverBaselineReviewCapture = FParse::Param(
+        FCommandLine::Get(),
+        TEXT("RaftSimCc0ScannedGroundCoverBaselineReview"));
+    const bool bCc0ScannedGroundCoverCandidateReviewCapture = FParse::Param(
+        FCommandLine::Get(),
+        TEXT("RaftSimCc0ScannedGroundCoverCandidateReview"));
     FlushAsyncLoading();
     // Settle every streamed resource before fixed-camera evidence so package
     // load completion cannot change distant shelves, materials, or canopy.
@@ -1484,6 +1551,16 @@ bool CaptureSouthForkView(
     {
         CaptureDirectory =
             LiveOakIslandTreeMaterialV1ReviewCaptureDirectoryRelativePath;
+    }
+    if (bCc0ScannedGroundCoverBaselineReviewCapture)
+    {
+        CaptureDirectory =
+            Cc0ScannedGroundCoverBaselineCaptureDirectoryRelativePath;
+    }
+    if (bCc0ScannedGroundCoverCandidateReviewCapture)
+    {
+        CaptureDirectory =
+            Cc0ScannedGroundCoverCandidateCaptureDirectoryRelativePath;
     }
     OutRelativePath = FString::Printf(
         TEXT("%s/%s.png"), CaptureDirectory, *CaptureId);

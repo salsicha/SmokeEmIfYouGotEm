@@ -30,6 +30,14 @@ granite shading with the fixed Landscape review, while leaving DEM geometry,
 collision, navigation, water, and raft physics unchanged. This is a retained
 technical improvement, not photoreal acceptance; evidence and remaining gates
 are in the [South Fork terrain review](docs/environment-captures/south_fork_full_reach/m9_south_fork_organic_foothill_terrain_v1_review.json).
+The August 3 ground-cover pass retains the 220,759 project-owned grass tufts
+and adds 442,938 non-colliding CC0 scanned grass forms under the source-density,
+slope, bank-distance, and solver/VFX wet-mask contracts. This materially breaks
+up the bare fixed-camera banks, but remains generic visual morphology rather
+than species-reviewed ecology or photoreal approval. A matched local performance
+A/B measures a 0.418 ms p95 candidate delta but leaves the pre-existing full-map
+60 FPS, packaged-window, and VR gates open; exact visual/performance evidence and
+open gates are in the [scanned ground-cover review](docs/environment-captures/south_fork_full_reach/m9_cc0_scanned_ground_cover_v216_review.json).
 Pacuare's `L_UpperHuacas` is again a runnable map: a physical 600 m reach-local
 Landscape, the committed Upper Huacas cooked solver field, explicit vertical
 datum alignment, player raft/start, and the full vertical-slice game mode now

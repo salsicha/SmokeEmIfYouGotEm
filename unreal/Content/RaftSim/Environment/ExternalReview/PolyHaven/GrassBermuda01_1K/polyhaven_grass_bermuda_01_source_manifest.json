@@ -1,0 +1,104 @@
+{
+  "schema": "raftsim.external_review_asset_source.v1",
+  "asset_id": "polyhaven_grass_bermuda_01_1k",
+  "asset_name": "Grass Bermuda 01",
+  "asset_type": "scanned_ground_cover_mesh_family",
+  "authors": ["Rico Cilliers"],
+  "publisher": "Poly Haven",
+  "product_page": "https://polyhaven.com/a/grass_bermuda_01",
+  "official_files_api": "https://api.polyhaven.com/files/grass_bermuda_01",
+  "official_info_api": "https://api.polyhaven.com/info/grass_bermuda_01",
+  "license": {
+    "name": "CC0 1.0 Universal",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "publisher_label": "CC0 License",
+    "commercial_use": true,
+    "attribution_required": false,
+    "redistribution_allowed": true
+  },
+  "publisher_metadata": {
+    "reported_collection_width_m": 3.1,
+    "reported_total_triangles": 224000,
+    "available_resolutions": ["1k", "2k", "4k", "8k"]
+  },
+  "acquisition": {
+    "date_utc": "2026-08-03",
+    "resolution": "1k",
+    "transport": "official Poly Haven CDN URLs returned by the official Files API",
+    "raw_payloads_committed": false,
+    "temporary_source_root": "/private/tmp/raftsim_grass_bermuda_01_source"
+  },
+  "files": [
+    {
+      "relative_path": "grass_bermuda_01_1k.fbx",
+      "bytes": 107212,
+      "official_md5": "e1f0ae4d7dc8de99b9c07f0dd6da6014",
+      "sha256": "ec188edf028e1a76ed2e63f7483165ea765f0212b317e4b73fdc3d64610500cd",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/fbx/1k/grass_bermuda_01/grass_bermuda_01_1k.fbx"
+    },
+    {
+      "relative_path": "grass_bermuda_01_1k_unreal.fbx",
+      "bytes": 107500,
+      "sha256": "26922691fd6f21becacfd9aa5946feaefa97ac80d96aa9fe113eed8a3f8d4f87",
+      "derived_from": "grass_bermuda_01_1k.fbx",
+      "preparation": "removed only the exact zero-area single_a and single_b forms; retained 19 publisher-authored mesh forms without geometry or material authorship changes"
+    },
+    {
+      "relative_path": "grass_bermuda_01_alpha_1k.png",
+      "bytes": 59564,
+      "official_md5": "274285abb11b3b7a0fd277b9923d1074",
+      "sha256": "e58b3052aad2f107cdd763e437f80ed8fb5a31bcc43b44023f7f767cb3d9888e",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/grass_bermuda_01/grass_bermuda_01_alpha_1k.png"
+    },
+    {
+      "relative_path": "grass_bermuda_01_diff_1k.jpg",
+      "bytes": 175425,
+      "official_md5": "234be9f52cfcd3380c7f782baaa841c3",
+      "sha256": "ef202eeb8f8fb3312446009acecc87e5679a7d612e4dee859d8a849e00af5fcb",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/grass_bermuda_01/grass_bermuda_01_diff_1k.jpg"
+    },
+    {
+      "relative_path": "grass_bermuda_01_nor_gl_1k.png",
+      "bytes": 3700624,
+      "official_md5": "8964e2fbf7b978e04221d2576759e706",
+      "sha256": "a76b2da43fd741ffbf37e9fd7f37db241d6684afcbe84962dac08cfdc59ff385",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/grass_bermuda_01/grass_bermuda_01_nor_gl_1k.png"
+    },
+    {
+      "relative_path": "grass_bermuda_01_rough_1k.png",
+      "bytes": 921654,
+      "official_md5": "a93c8e7e09ee4d034878e5024942c2cc",
+      "sha256": "e316fd8d508cd3afaf686cee2a7bee139f2461b85e5ddc4a8c456cad07363483",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/png/1k/grass_bermuda_01/grass_bermuda_01_rough_1k.png"
+    }
+  ],
+  "unreal_import": {
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K",
+    "retained_mesh_form_count": 19,
+    "production_mesh_form_count": 8,
+    "build_scale": 1000.0,
+    "nanite_enabled": false,
+    "nanite_reason": "the retained forms are 6-28 triangle masked cards and preserve their thin silhouettes with conventional instanced rasterization",
+    "effective_height_cm_range": [24.741, 146.851],
+    "effective_width_cm_range": [21.383, 91.619],
+    "normalized_production_patch_target": "approximately 1.9 m footprint by 0.70 m height before deterministic organic instance scale"
+  },
+  "review_boundaries": {
+    "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "baseline_flag": "RaftSimCc0ScannedGroundCoverBaselineReview",
+    "candidate_flag": "RaftSimCc0ScannedGroundCoverCandidateReview",
+    "source_conditioned_placement": true,
+    "exact_south_fork_species_claim": false,
+    "ecology_authority": false,
+    "collision_changed": false,
+    "terrain_changed": false,
+    "water_changed": false,
+    "hydraulics_changed": false,
+    "navigation_changed": false,
+    "raft_or_crew_physics_changed": false,
+    "production_map_integrated": true,
+    "production_approval": false,
+    "photoreal_acceptance": false,
+    "human_visual_acceptance_required": true
+  }
+}

@@ -2596,6 +2596,20 @@ int32 AddSouthForkGroundCoverInstances(
     float LateralSlope,
     const FLinearColor& SourceDensity);
 
+int32 AddSouthForkScannedGroundCoverInstances(
+    UHierarchicalInstancedStaticMeshComponent* const* GroundCoverComponents,
+    int32 GroundCoverComponentCount,
+    const FVector& GroundLocation,
+    const FVector& GroundNormal,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity);
+
+FVector GetSouthForkScannedGroundCoverScaleCalibration(int32 VariantIndex);
+
 TArray<FVector> BuildSouthForkSmoothedTerrainPresentationNormals(
     const TArray<FVector>& Vertices,
     int32 Width,
@@ -2637,6 +2651,7 @@ struct FSouthForkFullReachBuildMetrics
     int32 ScenicRockInstanceCount = 0;
     int32 ShoreCobbleInstanceCount = 0;
     int32 GroundCoverInstanceCount = 0;
+    int32 Cc0ScannedGroundCoverInstanceCount = 0;
     int32 SprayMistInstanceCount = 0;
     int32 InfrastructureActorCount = 0;
     int32 ReflectionProbeCount = 0;
