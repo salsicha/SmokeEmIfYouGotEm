@@ -73,15 +73,21 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     bool bLiveSolverOwnsRuntimeRendering = false;
 
-    /** Surface opacity in ordinary current when the live solver owns the
-     * visible river. Kept below one so depth and conditioned bed colour remain
-     * legible without exposing the terrain as the water surface. */
+    /** Render a solver-conforming Single Layer Water core beneath the live
+     * detail surface. The core is triangulated only through fully sampled wet
+     * cells, so it supplies optical depth without restoring the rectangular
+     * moving-window or wet-bank artifacts of a broad opaque sheet. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveSolverVolumeCore = false;
+
+    /** Coverage of the non-volumetric live detail surface in ordinary current.
+     * A river using the volume core keeps this low: the core supplies depth,
+     * while this layer carries geometric normals and a soft shoreline feather. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LiveSurfaceCalmCoverage = 0.86f;
 
-    /** Surface opacity in solver-active water when the live solver owns the
-     * visible river. */
+    /** Coverage of the non-volumetric detail surface in solver-active water. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LiveSurfaceActiveCoverage = 0.96f;

@@ -1713,8 +1713,13 @@ bool AddLandscapeCandidateRunnableGameplay(
     }
     else if (bChilkoLavaCanyon)
     {
-        WaterConfig->LiveSurfaceCalmCoverage = 0.88f;
-        WaterConfig->LiveSurfaceActiveCoverage = 0.98f;
+        // The translucent live material is a hydraulic-detail skin, not the
+        // river body. Chilko pilots the wet-cell-clipped Single Layer Water
+        // core; low skin coverage retains normals and a soft bank feather
+        // without turning the whole solver window into a pale opaque sheet.
+        WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
         WaterConfig->LiveSurfaceSpecular = 0.38f;
         WaterConfig->LiveSurfaceRoughness = 0.26f;
         WaterConfig->LiveSkyReflectionStrength = 0.38f;

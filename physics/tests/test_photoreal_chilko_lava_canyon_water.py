@@ -33,6 +33,7 @@ REVIEW = MANIFEST.with_name("chilko_futaleufu_cold_water_v2_review.json")
 RAPID_APPROACH_REVIEW = MANIFEST.with_name(
     "chilko_lava_canyon_rapid_approach_launch_v1_review.json"
 )
+VOLUME_CORE_REVIEW = MANIFEST.with_name("chilko_live_volume_core_v1_review.json")
 COOKED_FIELDS = (
     REPO_ROOT
     / "physics/data/real_world/chilko_river_lava_canyon/"
@@ -242,6 +243,9 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     ):
         assert token in catalog
     for token in (
+        "bEnableLiveSolverVolumeCore = true",
+        "LiveSurfaceCalmCoverage = 0.035f",
+        "LiveSurfaceActiveCoverage = 0.14f",
         "LiveSkyReflectionStrength = 0.38f",
         "LiveRippleStrength = 0.32f",
         "LiveFoamIntensity = 0.72f",
@@ -252,6 +256,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     ):
         assert token in geometry
     for parameter in (
+        "bEnableLiveSolverVolumeCore",
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
@@ -263,8 +268,36 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveFoamIntensity",
     ):
         assert f'TEXT("{parameter}")' in runtime
+    assert 'TEXT("LiveVolumeCoreMesh")' in runtime
+    assert "kLiveVolumeCoreMinimumCoverage = 0.60f" in runtime
+    assert "kLiveVolumeCoreCalmDetailCoverage = 0.035f" in runtime
+    assert "kLiveVolumeCoreActiveDetailCoverage = 0.14f" in runtime
+    assert "WetVertexMask[I0] != 0" in runtime
+    assert "LiveVolumeCoreTriangles != NewVolumeCoreTriangles" in runtime
+    assert "M_RaftSim_SouthForkRaftTransmissionWater" in runtime
+    assert 'TEXT("chilko_river_lava_canyon")' in runtime
     assert "float LiveRapidFoamFocusStart = 0.12f" in config
     assert "float LiveRapidFoamFocusEnd = 0.72f" in config
+
+
+def test_chilko_live_volume_core_review_is_hash_locked_and_honest() -> None:
+    review = json.loads(VOLUME_CORE_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == "raftsim.environment.chilko_live_volume_core_review.v1"
+    assert review["passed"] is False
+    assert review["decision"]["reference_runnable"] is True
+    assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["volume_core_retained"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["hydraulics_changed"] is False
+    assert review["live_pie_evidence"]["volume_core_triangles"] > 0
+    assert review["live_pie_evidence"]["initial_visible_rapid_foam_vertices"] > 0
+    assert review["visual_comparison"]["retained_water_band_blue_minus_red"] > 0.0
+    assert len(review["required_external_acceptance_gates"]) == 6
+    for artifact in review["retained_artifacts"]:
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
 
 
 def test_chilko_manifest_records_native_capture_water() -> None:

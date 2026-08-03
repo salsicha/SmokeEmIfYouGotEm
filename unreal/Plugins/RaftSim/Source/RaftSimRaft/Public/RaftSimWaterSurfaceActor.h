@@ -162,6 +162,23 @@ public:
         return ResolvedActiveLiveSurfaceCoverage;
     }
 
+    /** True when a bank-clipped Single Layer Water mesh supplies optical
+     * depth beneath the non-transmitting live detail surface. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsLiveVolumeCoreEnabled() const
+    {
+        return bLiveVolumeCoreEnabled;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsLiveVolumeCoreVisible() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetLiveVolumeCoreTriangleCount() const
+    {
+        return LiveVolumeCoreTriangleCount;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsLivePresentationSurfaceSmoothingEnabled() const
     {
@@ -181,6 +198,12 @@ public:
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
     TObjectPtr<UProceduralMeshComponent> SurfaceMesh;
+
+    /** Solver-conforming optical body rendered only through fully wet cells.
+     * It is offset one centimetre beneath SurfaceMesh and has no collision,
+     * shadow, navigation, sampling, buoyancy, D3, or D4 authority. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UProceduralMeshComponent> LiveVolumeCoreMesh;
 
     /** Non-colliding curled sheets generated only at solver-detected hydraulic
      * jumps. Kept separate from SurfaceMesh so they can overhang without ever
@@ -204,6 +227,9 @@ protected:
     /** Water material applied to the surface (single-layer water). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     TObjectPtr<UMaterialInterface> WaterMaterial;
+
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UMaterialInterface> LiveVolumeCoreMaterial;
 
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UMaterialInterface> BreakingWaterMaterial;
@@ -310,6 +336,8 @@ private:
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
+    TArray<FVector> LiveVolumeCoreVertices;
+    TArray<int32> LiveVolumeCoreTriangles;
     TArray<FVector> RapidFoamVertices;
     TArray<FLinearColor> RapidFoamVertexColors;
     TArray<FProcMeshTangent> Tangents;
@@ -333,8 +361,10 @@ private:
     int32 BreakingLipTriangleCount = 0;
     int32 BreakingRollerVolumeTriangleCount = 0;
     int32 VisibleRapidFoamVertexCount = 0;
+    int32 LiveVolumeCoreTriangleCount = 0;
     bool bBreakingRollerVolumeRenderingEnabled = true;
     bool bLiveSurfaceCarrierEnabled = false;
+    bool bLiveVolumeCoreEnabled = false;
     float ResolvedCalmLiveSurfaceCoverage = 0.0f;
     float ResolvedActiveLiveSurfaceCoverage = 0.0f;
     bool bLivePresentationSurfaceSmoothingEnabled = false;

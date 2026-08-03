@@ -24,6 +24,13 @@ constexpr float kPresentationFoamFroudeRange = 1.18f;
 // river metres. Keep the moving solver patch in the same river-coordinate
 // basis so normal-map scale does not stretch or pop as the grid recentres.
 constexpr float kWaterTextureRepeatMeters = 3.0f;
+// The opaque optical core stops inside the translucent bank feather. At the
+// production three-metre spacing this removes every cell touching a sampled
+// dry vertex while leaving the detail surface to bridge the final soft edge.
+constexpr float kLiveVolumeCoreMinimumCoverage = 0.60f;
+constexpr float kLiveVolumeCoreOffsetCm = 1.0f;
+constexpr float kLiveVolumeCoreCalmDetailCoverage = 0.035f;
+constexpr float kLiveVolumeCoreActiveDetailCoverage = 0.14f;
 
 struct FPresentationStandingWave
 {
@@ -198,6 +205,18 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     SurfaceMesh->SetCastShadow(false);
     SurfaceMesh->bUseAsyncCooking = true;
 
+    LiveVolumeCoreMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
+        TEXT("LiveVolumeCoreMesh"));
+    LiveVolumeCoreMesh->SetupAttachment(SurfaceMesh);
+    LiveVolumeCoreMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    LiveVolumeCoreMesh->SetCastShadow(false);
+    LiveVolumeCoreMesh->SetCanEverAffectNavigation(false);
+    LiveVolumeCoreMesh->SetMobility(EComponentMobility::Movable);
+    LiveVolumeCoreMesh->SetVisibility(false, true);
+    LiveVolumeCoreMesh->ComponentTags.AddUnique(
+        TEXT("RaftSimLiveSolverVolumeCore"));
+    LiveVolumeCoreMesh->bUseAsyncCooking = true;
+
     BreakingLipMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
         TEXT("BreakingLipMesh"));
     BreakingLipMesh->SetupAttachment(SurfaceMesh);
@@ -248,6 +267,19 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
         {
             WaterMaterial = FallbackMat.Object;
         }
+    }
+
+    // This project-owned parent is the shared photoreal Single Layer Water
+    // graph with the runtime raft-floor transmission aperture already wired.
+    // Its legacy SouthFork path is retained for asset compatibility; all
+    // river-specific optical values are supplied by the dynamic instance.
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> VolumeCoreMat(
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+             "M_RaftSim_SouthForkRaftTransmissionWater."
+             "M_RaftSim_SouthForkRaftTransmissionWater"));
+    if (VolumeCoreMat.Succeeded())
+    {
+        LiveVolumeCoreMaterial = VolumeCoreMat.Object;
     }
 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> BreakingWaterMat(
@@ -555,6 +587,27 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     ResolvedActiveLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveSurfaceActiveCoverage, 0.0f, 1.0f)
         : 0.0f;
+    bLiveVolumeCoreEnabled =
+        bLiveSurfaceCarrierEnabled &&
+        (RiverWaterConfig->bEnableLiveSolverVolumeCore ||
+            // Backward-compatible pilot migration for the already-versioned
+            // Lava Canyon package. Future regeneration persists the explicit
+            // flag; the unique cooked-field identity keeps every other river
+            // on its reviewed carrier until separately accepted.
+            RiverWaterConfig->CookedFieldsDir.Contains(
+                TEXT("chilko_river_lava_canyon"),
+                ESearchCase::CaseSensitive)) &&
+        LiveVolumeCoreMaterial != nullptr;
+    if (bLiveVolumeCoreEnabled)
+    {
+        // The core is the river body. Keep the Default Lit mesh as a thin
+        // normal/colour detail skin even when migrating an older map whose
+        // serialized carrier coverage predates the split architecture.
+        ResolvedCalmLiveSurfaceCoverage =
+            kLiveVolumeCoreCalmDetailCoverage;
+        ResolvedActiveLiveSurfaceCoverage =
+            kLiveVolumeCoreActiveDetailCoverage;
+    }
     bLivePresentationSurfaceSmoothingEnabled =
         bLiveSurfaceCarrierEnabled &&
         RiverWaterConfig->bEnableLivePresentationSurfaceSmoothing;
@@ -608,6 +661,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     Normals.SetNum(VertCount);
     UVs.SetNum(VertCount);
     VertexColors.SetNum(VertCount);
+    LiveVolumeCoreVertices.SetNum(VertCount);
+    LiveVolumeCoreTriangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     RapidFoamVertices.SetNum(VertCount);
     RapidFoamVertexColors.SetNum(VertCount);
     Tangents.SetNum(VertCount);
@@ -673,6 +728,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     GridStationN,
                     VertexSpacingMeters,
                     CurvedGridEdgeBlendMeters));
+            LiveVolumeCoreVertices[Index] = Vertices[Index];
             RapidFoamVertices[Index] = Vertices[Index];
             RapidFoamVertexColors[Index] = FLinearColor(
                 0.62f, 0.68f, 0.66f, 0.0f);
@@ -701,6 +757,68 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     SurfaceMesh->CreateMeshSection_LinearColor(
         0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents,
         /*bCreateCollision=*/false);
+    LiveVolumeCoreMesh->SetVisibility(false, true);
+    if (LiveVolumeCoreMaterial != nullptr)
+    {
+        LiveVolumeCoreMesh->SetMaterial(0, LiveVolumeCoreMaterial);
+        if (bLiveVolumeCoreEnabled)
+        {
+            if (UMaterialInstanceDynamic* VolumeMaterial =
+                    LiveVolumeCoreMesh->CreateDynamicMaterialInstance(
+                        0, LiveVolumeCoreMaterial))
+            {
+                VolumeMaterial->SetVectorParameterValue(
+                    TEXT("ShallowWaterColor"),
+                    RiverWaterConfig->LiveShallowSurfaceColor);
+                VolumeMaterial->SetVectorParameterValue(
+                    TEXT("DeepWaterColor"),
+                    RiverWaterConfig->LiveDeepSurfaceColor);
+                VolumeMaterial->SetVectorParameterValue(
+                    TEXT("ReflectedSkyColor"),
+                    RiverWaterConfig->LiveReflectedSkyColor);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("WaterRoughness"),
+                    RiverWaterConfig->LiveSurfaceRoughness);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("Specular"),
+                    RiverWaterConfig->LiveSurfaceSpecular);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("FallbackSkyReflectionStrength"),
+                    RiverWaterConfig->LiveSkyReflectionStrength);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("HydraulicFoamIntensity"),
+                    RiverWaterConfig->LiveFoamIntensity);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("CalmRippleStrength"),
+                    0.025f + RiverWaterConfig->LiveRippleStrength * 0.08f);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("FlowRippleStrength"),
+                    0.035f + RiverWaterConfig->LiveRippleStrength * 0.16f);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("ShallowWaterOpacity"), 0.58f);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("DeepWaterOpacity"), 0.79f);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("FoamWaterOpacity"), 0.91f);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("RaftInteriorSurfaceOpacityScale"), 0.0f);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("RaftInteriorOpticalDepthScale"), 0.0f);
+                // Cold glacial water: red attenuates first while blue carries
+                // farther. Values are inverse centimetres and remain bounded
+                // around the shared photoreal parent calibration.
+                VolumeMaterial->SetVectorParameterValue(
+                    TEXT("WaterScattering"),
+                    FLinearColor(0.00011f, 0.00015f, 0.00019f, 0.0f));
+                VolumeMaterial->SetVectorParameterValue(
+                    TEXT("WaterAbsorption"),
+                    FLinearColor(0.0075f, 0.0048f, 0.0032f, 0.0f));
+                VolumeMaterial->SetVectorParameterValue(
+                    TEXT("RiverbedColorScale"),
+                    FLinearColor(0.13f, 0.17f, 0.20f, 0.0f));
+            }
+        }
+    }
     RapidFoamMesh->CreateMeshSection_LinearColor(
         0,
         RapidFoamVertices,
@@ -2028,13 +2146,99 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
-    // The live carrier remains optically disabled because even a few percent
-    // of broad translucent coverage revealed its rectangular moving window.
-    // Present only solver-owned foam on a masked lace sheet. Vertex alpha
-    // combines advected foam with the already verified station/bank feather;
-    // the material's runtime raft ellipse then removes foam over the boat and
-    // crew at pixel resolution. This mesh never participates in water queries,
-    // collision, navigation, forces, buoyancy, D3, or D4.
+    // Build the opaque optical body only from quads whose four corners are wet
+    // and already inside the continuous edge feather. Topology changes only
+    // when the moving window recentres or a wet/dry boundary changes; ordinary
+    // 15 Hz refreshes update vertices without recooking the section. The core
+    // remains one centimetre under the translucent detail surface, has no
+    // collision, and cannot participate in sampling, buoyancy, D3, or D4.
+    if (bLiveVolumeCoreEnabled &&
+        LiveVolumeCoreVertices.Num() == Vertices.Num())
+    {
+        TArray<int32> NewVolumeCoreTriangles;
+        NewVolumeCoreTriangles.Reserve(Triangles.Num());
+        for (int32 Y = 0; Y < GridLateralN - 1; ++Y)
+        {
+            for (int32 X = 0; X < GridStationN - 1; ++X)
+            {
+                const int32 I0 = Y * GridStationN + X;
+                const int32 I1 = I0 + 1;
+                const int32 I2 = I0 + GridStationN;
+                const int32 I3 = I2 + 1;
+                const bool bFullyWetCell =
+                    WetVertexMask[I0] != 0 && WetVertexMask[I1] != 0 &&
+                    WetVertexMask[I2] != 0 && WetVertexMask[I3] != 0;
+                const float MinimumCellCoverage = FMath::Min(
+                    FMath::Min(VertexColors[I0].A, VertexColors[I1].A),
+                    FMath::Min(VertexColors[I2].A, VertexColors[I3].A));
+                if (!bFullyWetCell ||
+                    MinimumCellCoverage < kLiveVolumeCoreMinimumCoverage)
+                {
+                    continue;
+                }
+                NewVolumeCoreTriangles.Add(I0);
+                NewVolumeCoreTriangles.Add(I2);
+                NewVolumeCoreTriangles.Add(I1);
+                NewVolumeCoreTriangles.Add(I1);
+                NewVolumeCoreTriangles.Add(I2);
+                NewVolumeCoreTriangles.Add(I3);
+            }
+        }
+        for (int32 Index = 0; Index < Vertices.Num(); ++Index)
+        {
+            LiveVolumeCoreVertices[Index] =
+                Vertices[Index] -
+                Normals[Index].GetSafeNormal() * kLiveVolumeCoreOffsetCm;
+        }
+        const bool bTopologyChanged =
+            LiveVolumeCoreTriangles != NewVolumeCoreTriangles;
+        LiveVolumeCoreTriangles = MoveTemp(NewVolumeCoreTriangles);
+        LiveVolumeCoreTriangleCount = LiveVolumeCoreTriangles.Num() / 3;
+        if (LiveVolumeCoreTriangleCount > 0)
+        {
+            if (bTopologyChanged ||
+                LiveVolumeCoreMesh->GetProcMeshSection(0) == nullptr)
+            {
+                LiveVolumeCoreMesh->ClearMeshSection(0);
+                LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
+                    0,
+                    LiveVolumeCoreVertices,
+                    LiveVolumeCoreTriangles,
+                    Normals,
+                    UVs,
+                    VertexColors,
+                    Tangents,
+                    /*bCreateCollision=*/false);
+            }
+            else
+            {
+                LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
+                    0,
+                    LiveVolumeCoreVertices,
+                    Normals,
+                    UVs,
+                    VertexColors,
+                    Tangents);
+            }
+        }
+        else
+        {
+            LiveVolumeCoreMesh->ClearMeshSection(0);
+        }
+        LiveVolumeCoreMesh->SetVisibility(
+            LiveVolumeCoreTriangleCount > 0, true);
+    }
+    else
+    {
+        LiveVolumeCoreTriangleCount = 0;
+        LiveVolumeCoreTriangles.Reset();
+        LiveVolumeCoreMesh->SetVisibility(false, true);
+    }
+
+    // Present solver-owned foam on a separate masked lace sheet. Vertex alpha
+    // combines advected foam with the verified station/bank feather; the
+    // material's runtime raft ellipse removes foam over the boat and crew at
+    // pixel resolution. This mesh is presentation-only.
     VisibleRapidFoamVertexCount = 0;
     if (RapidFoamVertices.Num() == Vertices.Num() &&
         RapidFoamVertexColors.Num() == VertexColors.Num())
@@ -2082,6 +2286,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             TEXT("RaftSim live water presentation: material=%s wet_vertices=%d "
                  "foam_mean=%.4f foam_max=%.4f depth_mean=%.4f speed_mean=%.4f "
                  "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f "
+                 "volume_core_enabled=%d volume_core_triangles=%d "
                  "rapid_foam_vertices=%d rapid_foam_visible=%d "
                  "surface_smoothing=%d smoothing_strength=%.2f "
                  "standing_wave_scale=%.2f relief_scale=%.2f "
@@ -2096,6 +2301,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SpeedSum / WetVertexCount,
             MaximumAbsoluteStandingWaveM,
             MaximumAbsoluteHydraulicReliefM,
+            bLiveVolumeCoreEnabled ? 1 : 0,
+            LiveVolumeCoreTriangleCount,
             VisibleRapidFoamVertexCount,
             IsRapidFoamMeshVisible() ? 1 : 0,
             bLivePresentationSurfaceSmoothingEnabled ? 1 : 0,
@@ -2126,6 +2333,13 @@ bool ARaftSimWaterSurfaceActor::IsRapidFoamMeshVisible() const
     return RapidFoamMesh &&
         RapidFoamMesh->IsVisible() &&
         VisibleRapidFoamVertexCount > 0;
+}
+
+bool ARaftSimWaterSurfaceActor::IsLiveVolumeCoreVisible() const
+{
+    return LiveVolumeCoreMesh &&
+        LiveVolumeCoreMesh->IsVisible() &&
+        LiveVolumeCoreTriangleCount > 0;
 }
 
 void ARaftSimWaterSurfaceActor::GetBreakingSites(TArray<FBreakingSite>& OutSites) const

@@ -201,6 +201,7 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         }
     }
     UProceduralMeshComponent* RapidFoamMesh = nullptr;
+    UProceduralMeshComponent* LiveVolumeCoreMesh = nullptr;
     TArray<UProceduralMeshComponent*> ProceduralMeshes;
     Surface->GetComponents<UProceduralMeshComponent>(ProceduralMeshes);
     for (UProceduralMeshComponent* Candidate : ProceduralMeshes)
@@ -208,8 +209,35 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         if (Candidate && Candidate->GetFName() == TEXT("RapidFoamMesh"))
         {
             RapidFoamMesh = Candidate;
-            break;
         }
+        if (Candidate && Candidate->GetFName() == TEXT("LiveVolumeCoreMesh"))
+        {
+            LiveVolumeCoreMesh = Candidate;
+        }
+    }
+    Test->TestNotNull(
+        TEXT("surface exposes a separate solver-conforming optical core"),
+        LiveVolumeCoreMesh);
+    if (LiveVolumeCoreMesh)
+    {
+        Test->TestEqual(
+            TEXT("volume core remains non-colliding"),
+            LiveVolumeCoreMesh->GetCollisionEnabled(),
+            ECollisionEnabled::NoCollision);
+        Test->TestFalse(
+            TEXT("volume core does not cast a moving-grid shadow"),
+            LiveVolumeCoreMesh->CastShadow);
+        Test->TestTrue(
+            TEXT("volume core binds the raft-transmission Single Layer Water parent"),
+            LiveVolumeCoreMesh->GetMaterial(0) &&
+                LiveVolumeCoreMesh->GetMaterial(0)->GetPathName().Contains(
+                    TEXT("M_RaftSim_SouthForkRaftTransmissionWater")));
+        Test->TestFalse(
+            TEXT("dev tank does not opt into the river-wide optical core"),
+            Surface->IsLiveVolumeCoreEnabled());
+        Test->TestFalse(
+            TEXT("disabled dev-tank optical core stays hidden"),
+            Surface->IsLiveVolumeCoreVisible());
     }
     Test->TestNotNull(
         TEXT("surface exposes a separate solver-owned rapid-foam mesh"),
