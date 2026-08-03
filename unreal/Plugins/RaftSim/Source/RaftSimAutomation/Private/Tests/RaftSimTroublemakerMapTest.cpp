@@ -1438,19 +1438,34 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("regenerated Chilko config stores active-water detail response"),
                     FMath::IsNearlyEqual(
                         (*It)->LiveSurfaceActiveCoverage, 0.14f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Chilko config stores river-local volume water"),
+                    (*It)->LiveVolumeCoreMaterialOverride &&
+                        (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
+                            TEXT("MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2")));
+                Test->TestTrue(
+                    TEXT("regenerated Chilko config stores its river-local flow normal"),
+                    (*It)->LiveWaterFlowNormalTexture &&
+                        (*It)->LiveWaterFlowNormalTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal")));
+                Test->TestTrue(
+                    TEXT("regenerated Chilko config stores solver-masked foam lace"),
+                    (*It)->LiveWaterFoamLaceTexture &&
+                        (*It)->LiveWaterFoamLaceTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace")));
             }
             Test->TestTrue(
                 TEXT("Chilko live sky reflection stays restrained"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveSkyReflectionStrength, 0.38f, 0.001f));
+                    (*It)->LiveSkyReflectionStrength, 0.20f, 0.001f));
             Test->TestTrue(
                 TEXT("Chilko live carrier keeps moving micro-normal response"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveRippleStrength, 0.32f, 0.001f));
+                    (*It)->LiveRippleStrength, 0.24f, 0.001f));
             Test->TestTrue(
                 TEXT("Chilko solver foam remains optically legible"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveFoamIntensity, 0.72f, 0.001f));
+                    (*It)->LiveFoamIntensity, 0.56f, 0.001f));
             Test->TestTrue(
                 TEXT("Chilko retains conservative rapid-lace onset while edge-only jumps are rejected"),
                 FMath::IsNearlyEqual(
@@ -1460,9 +1475,24 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 FMath::IsNearlyEqual(
                     (*It)->LiveRapidFoamFocusEnd, 0.72f, 0.001f));
             Test->TestTrue(
-                TEXT("Chilko rapid lace retains full solver coverage"),
+                TEXT("Chilko rapid lace keeps restrained solver coverage"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveRapidFoamCoverageGain, 1.0f, 0.001f));
+                    (*It)->LiveRapidFoamCoverageGain, 0.90f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko applies render-only subcell smoothing"),
+                (*It)->bEnableLivePresentationSurfaceSmoothing &&
+                    FMath::IsNearlyEqual(
+                        (*It)->LivePresentationSurfaceSmoothingStrength,
+                        0.58f,
+                        0.001f));
+            Test->TestTrue(
+                TEXT("Chilko shallow water remains transmitting"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveShallowWaterOpacity, 0.42f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko records the visual-only transmitting-water contract"),
+                (*It)->Tags.Contains(TEXT("RaftSimChilkoTransmittingWaterV2")) &&
+                    (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(

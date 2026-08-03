@@ -6,11 +6,13 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from PIL import Image, ImageStat
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EDITOR_ROOT = REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private"
 WATER_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorChilkoWaterMaterial.cpp"
+TEXTURE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorPhotorealTextureAssets.cpp"
 BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
 CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
 GEOMETRY_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeGeometry.cpp"
@@ -34,6 +36,17 @@ RAPID_APPROACH_REVIEW = MANIFEST.with_name(
     "chilko_lava_canyon_rapid_approach_launch_v1_review.json"
 )
 VOLUME_CORE_REVIEW = MANIFEST.with_name("chilko_live_volume_core_v1_review.json")
+TRANSMITTING_REVIEW = MANIFEST.with_name(
+    "chilko_lava_canyon_transmitting_water_v2_review.json"
+)
+FLOW_NORMAL_SOURCE = (
+    REPO_ROOT
+    / "unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/"
+    "T_RaftSim_ChilkoLavaCanyon_FlowNormalV1.png"
+)
+FOAM_LACE_SOURCE = FLOW_NORMAL_SOURCE.with_name(
+    "T_RaftSim_ChilkoLavaCanyon_FoamLaceV1.png"
+)
 COOKED_FIELDS = (
     REPO_ROOT
     / "physics/data/real_world/chilko_river_lava_canyon/"
@@ -202,6 +215,11 @@ def test_chilko_rapid_approach_review_is_hash_locked_and_fail_closed() -> None:
     assert review["live_pie_evidence"]["initial_visible_rapid_foam_vertices"] > 0
     assert len(review["required_external_acceptance_gates"]) == 6
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] == "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap":
+            # The V2 transmitting-water milestone deliberately regenerates
+            # the runnable package; keep this V1 review immutable while its
+            # retained capture remains hash-locked below.
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]
@@ -213,7 +231,10 @@ def test_chilko_water_is_native_moving_and_non_displacing() -> None:
 
     assert "M_RaftSim_Chilko_LavaCanyonDefaultLitWater" in water
     assert "MSM_DefaultLit" in water
-    assert "BLEND_Opaque" in water
+    assert "BLEND_Translucent" in water
+    assert "TLM_SurfacePerPixelLighting" in water
+    assert "EditorOnlyData->Opacity" in water
+    assert "EditorOnlyData->Refraction" in water
     assert "UMaterialExpressionSingleLayerWaterMaterialOutput" not in water
     assert water.count("AddNormalSample(") == 3
     assert "0.00027f" in water
@@ -224,7 +245,7 @@ def test_chilko_water_is_native_moving_and_non_displacing() -> None:
     assert "SetCollision" not in water
     assert 'Spec.RiverId == TEXT("chilko_river_lava_canyon")' in base
     assert "LoadOrCreateChilkoLavaCanyonWaterParent" in base
-    assert 'TEXT("T_RaftSim_%s_NormalAtlas")' in base
+    assert "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal" in base
     assert "Hance, Terminator, and Chilko each sample their packed field once" in base
 
 
@@ -235,10 +256,10 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     config = CONFIG_HEADER.read_text(encoding="utf-8")
 
     for token in (
-        "Settings.BaseColorScale = 1.10f",
-        "Settings.EmissiveFillScale = 0.16f",
-        "Settings.NormalIntensity = 0.34f",
-        "Settings.SurfaceVariationStrength = 0.46f",
+        "Settings.BaseColorScale = 0.94f",
+        "Settings.EmissiveFillScale = 0.060f",
+        "Settings.NormalIntensity = 0.26f",
+        "Settings.SurfaceVariationStrength = 0.30f",
         "Settings.VertexTintWeight = 0.78f",
     ):
         assert token in catalog
@@ -246,9 +267,15 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "bEnableLiveSolverVolumeCore = true",
         "LiveSurfaceCalmCoverage = 0.035f",
         "LiveSurfaceActiveCoverage = 0.14f",
-        "LiveSkyReflectionStrength = 0.38f",
-        "LiveRippleStrength = 0.32f",
-        "LiveFoamIntensity = 0.72f",
+        "LiveSkyReflectionStrength = 0.20f",
+        "LiveRippleStrength = 0.24f",
+        "LiveFoamIntensity = 0.56f",
+        "LiveShallowWaterOpacity = 0.42f",
+        "LoadOrCreateChilkoLavaCanyonLiveWaterInstance",
+        "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal",
+        "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace",
+        "RaftSimChilkoTransmittingWaterV2",
+        "RaftSimNoSolverStateMutation",
         "RaftSimChilkoDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
         "RaftSimColdWaterCpuChopV2",
@@ -277,6 +304,9 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     assert "LiveVolumeCoreTriangles != NewVolumeCoreTriangles" in runtime
     assert "M_RaftSim_SouthForkRaftTransmissionWater" in runtime
     assert 'TEXT("chilko_river_lava_canyon")' in runtime
+    assert "MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2" in runtime
+    assert "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal" in runtime
+    assert "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace" in runtime
     assert "float LiveRapidFoamFocusStart = 0.12f" in config
     assert "float LiveRapidFoamFocusEnd = 0.72f" in config
 
@@ -310,25 +340,26 @@ def test_chilko_manifest_records_native_capture_water() -> None:
         "M_RaftSim_Chilko_LavaCanyonDefaultLitWater"
     )
     assert candidate["water_material_status"] == (
-        "chilko_lava_canyon_default_lit_native_moving_normal_candidate_"
-        "bound_cpu_cooked_field_color"
+        "chilko_lava_canyon_transmitting_default_lit_river_local_normal_"
+        "candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color"
     )
     assert candidate["water_shading_model"] == "DefaultLit"
-    assert candidate["water_blend_mode"] == "Opaque"
+    assert candidate["water_blend_mode"] == "Translucent"
     assert candidate["water_solver_visualization_field_enable"] == 0.0
     assert candidate["water_solver_macro_normal_weight"] == 0.0
     assert candidate["water_solver_depth_color_weight"] == 0.0
     assert candidate["water_solver_field_roughness_weight"] == 0.0
     assert candidate["water_solver_froude_aeration_weight"] == 0.0
     assert candidate["water_solver_visualization_field_texture_count"] == 1
-    assert candidate["water_base_color_scale"] == 1.10
+    assert candidate["water_base_color_scale"] == 0.94
     assert candidate["water_vertex_tint_weight"] == 0.78
-    assert candidate["water_emissive_fill_scale"] == 0.16
-    assert candidate["water_reflection_fill_intensity"] == 0.12
-    assert candidate["water_roughness"] == 0.22
-    assert candidate["water_specular"] == 0.48
-    assert candidate["water_normal_intensity"] == 0.34
-    assert candidate["water_surface_variation_strength"] == 0.46
+    assert candidate["water_emissive_fill_scale"] == 0.06
+    assert candidate["water_reflection_fill_intensity"] == 0.06
+    assert candidate["water_roughness"] == 0.34
+    assert candidate["water_specular"] == 0.34
+    assert candidate["water_surface_opacity"] == 0.90
+    assert candidate["water_normal_intensity"] == 0.26
+    assert candidate["water_surface_variation_strength"] == 0.30
     assert candidate["water_solver_render_geometry_collision_enabled"] is False
 
 
@@ -382,6 +413,74 @@ def test_chilko_native_water_review_is_hash_locked_and_honest() -> None:
     for artifact in review["retained_artifacts"]:
         if artifact["path"] in superseded_paths:
             continue
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
+
+
+def test_chilko_v2_visual_textures_are_first_party_and_solver_masked() -> None:
+    texture_source = TEXTURE_SOURCE.read_text(encoding="utf-8")
+    expected = {
+        FLOW_NORMAL_SOURCE: (
+            "chilko_lava_canyon_flow_normal_v1",
+            "44d04e0095653cecdc39f3166c2445f6920f8b59cc6c7ae6a85b6eaeb0d5e180",
+            "project_owned_chilko_multiscale_river_flow_normal",
+        ),
+        FOAM_LACE_SOURCE: (
+            "chilko_lava_canyon_foam_lace_v1",
+            "961e52ed6a57cd7b34a7369008e6d5cd0646c579147159fe3f0960006ccbed8e",
+            "project_owned_chilko_solver_masked_whitewater_lace",
+        ),
+    }
+    for texture, (asset_id, sha256, map_kind) in expected.items():
+        assert texture.is_file()
+        assert _sha256(texture) == sha256
+        provenance = json.loads(
+            texture.with_suffix(".provenance.json").read_text(encoding="utf-8")
+        )
+        assert provenance["asset_id"] == asset_id
+        assert provenance["project_ownership"] == (
+            "first-party generated project asset"
+        )
+        assert provenance["texture"]["sha256"] == sha256
+        assert provenance["texture"]["width"] == 1254
+        assert provenance["texture"]["height"] == 1254
+        assert "no hydraulic" in provenance["asset_role"]
+        assert len(provenance["limitations"]) >= 4
+        assert map_kind in texture_source
+    with Image.open(FLOW_NORMAL_SOURCE) as image:
+        assert image.size == (1254, 1254)
+        assert image.mode == "RGB"
+    with Image.open(FOAM_LACE_SOURCE).convert("L") as image:
+        assert image.size == (1254, 1254)
+        assert ImageStat.Stat(image).mean[0] < 50.0
+
+
+def test_chilko_transmitting_water_v2_review_is_honest_and_hash_locked() -> None:
+    review = json.loads(TRANSMITTING_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.chilko_lava_canyon_transmitting_water_review.v2"
+    )
+    assert review["status"] == (
+        "technical_optical_candidate_retained_photoreal_and_external_"
+        "acceptance_open"
+    )
+    assert review["passed"] is False
+    decision = review["decision"]
+    assert decision["reference_runnable"] is True
+    assert decision["technical_candidate_passed"] is True
+    assert decision["transmitting_water_v2_retained"] is True
+    assert decision["photoreal_acceptance_passed"] is False
+    assert decision["gameplay_water_geometry_changed"] is False
+    assert decision["hydraulics_changed"] is False
+    assert decision["collision_or_raft_forces_changed"] is False
+    assert review["runtime_contract"]["live_volume_core_enabled"] is True
+    assert review["runtime_contract"]["shallow_opacity"] == 0.42
+    assert review["runtime_contract"]["detail_surface_calm_coverage"] == 0.035
+    assert len(review["remaining_photoreal_defects"]) >= 6
+    assert len(review["required_external_acceptance_gates"]) == 6
+    for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]

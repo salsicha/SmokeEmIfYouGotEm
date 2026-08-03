@@ -227,6 +227,62 @@ bool BuildFutaleufuTerminatorWaterTextureAssets()
         FoamLaceTexture != nullptr && bFoamLaceSaved;
 }
 
+bool BuildChilkoLavaCanyonWaterTextureAssets()
+{
+    using namespace RaftSimEditorEnvironment;
+    FString Summary;
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FlowNormalSpec;
+    FlowNormalSpec.RiverId = TEXT("chilko_river_lava_canyon");
+    FlowNormalSpec.RiverAssetName = TEXT("ChilkoLavaCanyonWaterV1");
+    FlowNormalSpec.MapKey = TEXT("FlowNormal");
+    FlowNormalSpec.MapKind =
+        TEXT("project_owned_chilko_multiscale_river_flow_normal");
+    FlowNormalSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/"
+             "T_RaftSim_ChilkoLavaCanyon_FlowNormalV1.png");
+    FlowNormalSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures");
+    FlowNormalSpec.CompressionSettings = TC_Normalmap;
+    FlowNormalSpec.bSRGB = false;
+    FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
+    FlowNormalSpec.AddressX = TA_Mirror;
+    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.bCompressionNoAlpha = true;
+    bool bFlowNormalSaved = false;
+    UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FlowNormalSpec, Summary, bFlowNormalSaved);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec FoamLaceSpec;
+    FoamLaceSpec.RiverId = TEXT("chilko_river_lava_canyon");
+    FoamLaceSpec.RiverAssetName = TEXT("ChilkoLavaCanyonWaterV1");
+    FoamLaceSpec.MapKey = TEXT("FoamLace");
+    FoamLaceSpec.MapKind =
+        TEXT("project_owned_chilko_solver_masked_whitewater_lace");
+    FoamLaceSpec.SourceRelativePath =
+        TEXT("unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/"
+             "T_RaftSim_ChilkoLavaCanyon_FoamLaceV1.png");
+    FoamLaceSpec.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures");
+    FoamLaceSpec.CompressionSettings = TC_Masks;
+    FoamLaceSpec.bSRGB = false;
+    FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
+    FoamLaceSpec.AddressX = TA_Mirror;
+    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.bCompressionNoAlpha = true;
+    bool bFoamLaceSaved = false;
+    UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+        FoamLaceSpec, Summary, bFoamLaceSaved);
+
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim Chilko Lava Canyon water textures:\n%s"),
+        *Summary);
+    return FlowNormalTexture != nullptr && bFlowNormalSaved &&
+        FoamLaceTexture != nullptr && bFoamLaceSaved;
+}
+
 bool BuildZambeziBatokaWaterTextureAssets()
 {
     using namespace RaftSimEditorEnvironment;

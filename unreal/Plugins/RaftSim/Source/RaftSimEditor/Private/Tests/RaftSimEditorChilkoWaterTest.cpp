@@ -1,5 +1,7 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
+#include "Engine/Texture2D.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Misc/AutomationTest.h"
@@ -40,7 +42,14 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
     TestTrue(
         TEXT("Chilko water uses scene lighting"),
         Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
-    TestEqual(TEXT("Chilko water remains opaque"), Parent->BlendMode, BLEND_Opaque);
+    TestEqual(
+        TEXT("Chilko capture water transmits the riverbed"),
+        Parent->BlendMode,
+        BLEND_Translucent);
+    TestEqual(
+        TEXT("Chilko capture water uses per-pixel translucent lighting"),
+        Parent->TranslucencyLightingMode,
+        TLM_SurfacePerPixelLighting);
     TestTrue(TEXT("Chilko water remains two-sided"), Parent->TwoSided);
     TestTrue(TEXT("Chilko water normals remain tangent-space"), Parent->bTangentSpaceNormal);
     const UMaterialEditorOnlyData* EditorOnlyData = Parent->GetEditorOnlyData();
@@ -50,6 +59,12 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
         TestNull(
             TEXT("Chilko optics never displace cooked ribbon geometry"),
             EditorOnlyData->WorldPositionOffset.Expression);
+        TestNotNull(
+            TEXT("Chilko capture water binds depth/bank opacity"),
+            EditorOnlyData->Opacity.Expression);
+        TestNotNull(
+            TEXT("Chilko capture water binds physical refraction"),
+            EditorOnlyData->Refraction.Expression);
     }
 
     int32 PannerCount = 0;
@@ -83,14 +98,16 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
             FString::Printf(TEXT("%s keeps its reviewed value"), ParameterName),
             FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
     };
-    TestScalar(TEXT("BaseColorScale"), 1.10f);
+    TestScalar(TEXT("BaseColorScale"), 0.94f);
     TestScalar(TEXT("VertexTintWeight"), 0.78f);
-    TestScalar(TEXT("EmissiveFillScale"), 0.16f);
-    TestScalar(TEXT("ReflectionFillIntensity"), 0.12f);
-    TestScalar(TEXT("Roughness"), 0.22f);
-    TestScalar(TEXT("Specular"), 0.48f);
-    TestScalar(TEXT("NormalIntensity"), 0.34f);
-    TestScalar(TEXT("SurfaceVariationStrength"), 0.46f);
+    TestScalar(TEXT("EmissiveFillScale"), 0.060f);
+    TestScalar(TEXT("ReflectionFillIntensity"), 0.06f);
+    TestScalar(TEXT("Roughness"), 0.34f);
+    TestScalar(TEXT("Specular"), 0.34f);
+    TestScalar(TEXT("Opacity"), 0.90f);
+    TestScalar(TEXT("RefractionIor"), 1.333f);
+    TestScalar(TEXT("NormalIntensity"), 0.26f);
+    TestScalar(TEXT("SurfaceVariationStrength"), 0.30f);
     TestScalar(TEXT("CrossCurrentNormalWeight"), 0.38f);
     TestScalar(TEXT("RoughnessVariationAmplitude"), 0.14f);
     TestScalar(TEXT("SolverFieldEnable"), 0.0f);
@@ -109,18 +126,64 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
 
     UTexture* NormalAtlas = nullptr;
     TestTrue(
-        TEXT("Chilko native normal atlas is bound"),
+        TEXT("Chilko river-local flow normal is bound"),
         Instance->GetTextureParameterValue(
             FMaterialParameterInfo(TEXT("WaterNormalAtlas")), NormalAtlas));
-    TestNotNull(TEXT("Chilko native normal atlas exists"), NormalAtlas);
+    TestNotNull(TEXT("Chilko river-local flow normal exists"), NormalAtlas);
     if (NormalAtlas)
     {
         TestEqual(
-            TEXT("Chilko uses its own water-normal atlas"),
+            TEXT("Chilko uses its first-party flow normal"),
             NormalAtlas->GetPathName(),
-            FString(TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/"
-                         "T_RaftSim_Chilko_NormalAtlas."
-                         "T_RaftSim_Chilko_NormalAtlas")));
+            FString(TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/"
+                         "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal."
+                         "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal")));
+    }
+
+    FString AuthoringSummary;
+    UMaterialInstanceConstant* LiveInstance =
+        RaftSimEditorEnvironment::LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
+            AuthoringSummary);
+    TestNotNull(TEXT("Chilko live-volume authoring succeeds"), LiveInstance);
+    if (LiveInstance)
+    {
+        TestNotNull(TEXT("Chilko live-volume parent exists"), LiveInstance->Parent.Get());
+        if (LiveInstance->Parent)
+        {
+            TestTrue(
+                TEXT("Chilko uses the shared raft-transmitting parent"),
+                LiveInstance->Parent->GetPathName().Contains(
+                    TEXT("M_RaftSim_SouthForkRaftTransmissionWater")));
+        }
+        UTexture* LiveFlowNormal = nullptr;
+        UTexture* LiveFoamLace = nullptr;
+        TestTrue(
+            TEXT("Chilko live volume binds the river-local flow normal"),
+            LiveInstance->GetTextureParameterValue(
+                FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")),
+                LiveFlowNormal));
+        TestTrue(
+            TEXT("Chilko live volume binds solver-masked foam lace"),
+            LiveInstance->GetTextureParameterValue(
+                FMaterialParameterInfo(TEXT("WhitewaterFoamLace")),
+                LiveFoamLace));
+        TestTrue(
+            TEXT("Chilko live flow normal resolves to its own texture"),
+            LiveFlowNormal && LiveFlowNormal->GetPathName().Contains(
+                TEXT("T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal")));
+        TestTrue(
+            TEXT("Chilko live foam lace resolves to its own texture"),
+            LiveFoamLace && LiveFoamLace->GetPathName().Contains(
+                TEXT("T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace")));
+        float FoamCoverage = 0.0f;
+        TestTrue(
+            TEXT("Chilko live volume binds restrained hydraulic foam coverage"),
+            LiveInstance->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("HydraulicFoamCoverageGain")),
+                FoamCoverage));
+        TestTrue(
+            TEXT("Chilko hydraulic foam coverage remains reviewed"),
+            FMath::IsNearlyEqual(FoamCoverage, 0.64f, 0.001f));
     }
     return !HasAnyErrors();
 }

@@ -105,6 +105,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bFutaleufuTerminatorPresentation =
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bChilkoLavaCanyonPresentation =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
     const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
@@ -420,6 +422,23 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     0.44f, 0.80f, DepthOpacityT) * BankTransmission;
                 SurfaceColor.A = FMath::Lerp(
                     WaterOpacity, 0.93f, CombinedBreaker);
+            }
+            if (bChilkoLavaCanyonPresentation &&
+                bUseSolverVisualizationFields)
+            {
+                // Clear glacial water remains more transmitting than the
+                // shared cold-water V2 card. Alpha uses only local depth,
+                // wet-bank feather, and solver aeration already sampled here.
+                const float DepthOpacityT = SmoothPreviewStep(
+                    0.16f, 2.60f, SolverDepthM);
+                const float BankTransmission = FMath::Lerp(
+                    1.0f,
+                    0.44f,
+                    SmoothPreviewStep(0.72f, 1.0f, EdgeT));
+                const float WaterOpacity = FMath::Lerp(
+                    0.38f, 0.72f, DepthOpacityT) * BankTransmission;
+                SurfaceColor.A = FMath::Lerp(
+                    WaterOpacity, 0.91f, CombinedBreaker);
             }
             VertexColors.Add(SurfaceColor);
             if (bUseSolverVisualizationFields)
@@ -1827,25 +1846,63 @@ bool AddLandscapeCandidateRunnableGameplay(
     }
     else if (bChilkoLavaCanyon)
     {
-        // The translucent live material is a hydraulic-detail skin, not the
-        // river body. Chilko pilots the wet-cell-clipped Single Layer Water
-        // core; low skin coverage retains normals and a soft bank feather
-        // without turning the whole solver window into a pale opaque sheet.
+        // The wet-cell-clipped core owns optical depth while a low-coverage
+        // live skin preserves solver geometry and bank feather. River-local
+        // textures add sub-grid detail only after solver wetness/aeration.
         WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateChilkoLavaCanyonLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/"
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal."
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/"
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace."
+                 "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Chilko river-local live-water assets are incomplete.\n");
+            return false;
+        }
         WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
         WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
-        WaterConfig->LiveSurfaceSpecular = 0.38f;
-        WaterConfig->LiveSurfaceRoughness = 0.26f;
-        WaterConfig->LiveSkyReflectionStrength = 0.38f;
-        WaterConfig->LiveRippleStrength = 0.32f;
-        WaterConfig->LiveFoamIntensity = 0.72f;
+        WaterConfig->LiveSurfaceSpecular = 0.26f;
+        WaterConfig->LiveSurfaceRoughness = 0.36f;
+        WaterConfig->LiveSkyReflectionStrength = 0.20f;
+        WaterConfig->LiveRippleStrength = 0.24f;
+        WaterConfig->LiveFoamIntensity = 0.56f;
+        WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+        WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.58f;
+        WaterConfig->LivePresentationStandingWaveScale = 0.78f;
+        WaterConfig->LivePresentationHydraulicReliefScale = 0.78f;
+        WaterConfig->LiveRapidFoamFocusStart = 0.12f;
+        WaterConfig->LiveRapidFoamFocusEnd = 0.72f;
+        WaterConfig->LiveRapidFoamCoverageGain = 0.90f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.018f, 0.090f, 0.115f, 1.0f);
+            FLinearColor(0.012f, 0.075f, 0.105f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.003f, 0.022f, 0.036f, 1.0f);
+            FLinearColor(0.002f, 0.018f, 0.032f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.075f, 0.140f, 0.180f, 1.0f);
+            FLinearColor(0.045f, 0.090f, 0.135f, 1.0f);
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.00010f, 0.00024f, 0.00034f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0070f, 0.0030f, 0.0015f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.16f, 0.20f, 0.18f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.42f;
+        WaterConfig->LiveDeepWaterOpacity = 0.70f;
+        WaterConfig->LiveFoamWaterOpacity = 0.86f;
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimChilkoTransmittingWaterV2"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
     else if (bFutaleufuTerminator)
     {

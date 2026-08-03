@@ -4118,3 +4118,19 @@ path is verified, and the completion goal can be marked complete.
   promotion: rounded procedural banks, generic repeated rainforest vegetation,
   thin sediment/refraction response, sparse rapid foam and spray, unconverged
   hydraulics, and all six external acceptance gates remain open.
+- Chilko Lava Canyon transmitting water V2 replaces the inherited pale optical
+  response on the existing solver-clipped live core. The regenerated runnable
+  map serializes a Chilko-local transmitting instance, project-owned flow
+  normal, and project-owned foam-lace texture; the lace is multiplied by
+  solver foam and speed and has no authority over whitewater, wetness, or
+  hydraulics. The live surface remains a `0.035-0.14` detail skin with `0.58`
+  smoothing, while PIE reports 1,632 core triangles, 1,098 wet vertices, one
+  interior breaking site, and six visible rapid-foam vertices. The editor
+  build, focused M9 material audit, P4 runnable-map gate, P2 shared water gate,
+  and 11 Python contracts pass. In the identical live camera, >0.90 highlight
+  coverage falls from 5.74% to 3.38% and >0.95 coverage falls from 1.68% to
+  0.12%, with stronger cold-water separation. This is retained only as a
+  bounded technical improvement: smooth sheet-like wave faces, procedural
+  banks/shoreline/ecology, missing rapid-scale spray and mist, unconverged
+  hydraulics, and all six external acceptance gates keep M9 and photoreal
+  promotion open.
