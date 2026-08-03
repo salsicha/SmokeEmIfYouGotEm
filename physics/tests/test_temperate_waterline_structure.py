@@ -72,7 +72,7 @@ def test_saved_temperate_maps_record_dense_full_route_structure() -> None:
         "chilko_river_lava_canyon": {
             "manifest": "landscape_candidate_manifest_chilko_river_lava_canyon.json",
             "minimum_centerline_distance_cm": 1800.0 * 1.20 + 60.0,
-            "boulder_instance_count": 5220,
+            "boulder_instance_count": 8820,
         },
     }
 

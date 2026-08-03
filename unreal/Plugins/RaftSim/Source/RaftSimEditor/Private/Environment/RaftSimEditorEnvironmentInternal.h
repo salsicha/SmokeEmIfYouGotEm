@@ -971,7 +971,9 @@ UMaterialExpression* BuildFutaleufuOrganicTemperateBaseColor(
 
 UMaterialExpression* BuildChilkoOrganicLavaCanyonBaseColor(
     UMaterial* Material,
-    UMaterialExpression* SourceBaseColor);
+    UMaterialExpression* SourceBaseColor,
+    UMaterialExpression* RotatedDetailAlbedo,
+    UMaterialExpression* WetBankMask);
 
 struct FZambeziBatokaVisualMorphologyStats
 {

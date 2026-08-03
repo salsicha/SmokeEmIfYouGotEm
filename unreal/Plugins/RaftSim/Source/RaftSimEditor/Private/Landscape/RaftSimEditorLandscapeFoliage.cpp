@@ -48,12 +48,14 @@ constexpr float TemperateWaterlineStructureSlopeCeilingDegrees = 55.0f;
 constexpr int32 TemperateNearBankEcologyTargetInstanceCount = 1800;
 constexpr int32 TemperateNearBankEcologyMinimumInstanceCount = 1600;
 constexpr float TemperateNearBankEcologySlopeCeilingDegrees = 38.0f;
-constexpr int32 ChilkoOrganicShorelineGravelTargetInstanceCount = 3600;
-constexpr int32 ChilkoOrganicShorelineGravelMinimumInstanceCount = 3300;
+constexpr int32 ChilkoOrganicShorelineGravelTargetInstanceCount = 7200;
+constexpr int32 ChilkoOrganicShorelineGravelMinimumInstanceCount = 6800;
 constexpr float ChilkoOrganicShorelineGravelSlopeCeilingDegrees = 42.0f;
-constexpr int32 ChilkoOrganicShorelineGroundCoverTargetInstanceCount = 4200;
-constexpr int32 ChilkoOrganicShorelineGroundCoverMinimumInstanceCount = 3800;
+constexpr int32 ChilkoOrganicShorelineGroundCoverTargetInstanceCount = 8400;
+constexpr int32 ChilkoOrganicShorelineGroundCoverMinimumInstanceCount = 7900;
 constexpr float ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees = 32.0f;
+constexpr float ChilkoOrganicShorelineStartStationCm = 250.0f;
+constexpr float ChilkoOrganicShorelineEndStationCm = 59750.0f;
 constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
     "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
 constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
@@ -3489,7 +3491,7 @@ bool AddLandscapeCandidateBiomeDressing(
             if (AActor* Owner = Component->GetOwner())
             {
                 Owner->Tags.AddUnique(TEXT("RaftSimChilkoLavaCanyonRun"));
-                Owner->Tags.AddUnique(TEXT("RaftSimChilkoOrganicShorelineV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimChilkoOrganicShorelineV2"));
                 Owner->Tags.AddUnique(FamilyTag);
                 Owner->Tags.AddUnique(TEXT("RaftSimProceduralSourceGapFill"));
                 Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
@@ -3499,7 +3501,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
             }
             Component->ComponentTags.AddUnique(
-                TEXT("RaftSimChilkoOrganicShorelineV1"));
+                TEXT("RaftSimChilkoOrganicShorelineV2"));
             Component->ComponentTags.AddUnique(FamilyTag);
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimOutsideProtectedSolverStrip"));
@@ -4388,7 +4390,8 @@ bool AddLandscapeCandidateBiomeDressing(
         // with small, irregular CC0 rock morphology donors. The conditioned
         // source Landscape remains ground/collision authority; this layer is
         // always outside the full visible-water width and cannot affect the
-        // solver, bathymetry, hydraulics, or raft forces.
+        // solver, bathymetry, hydraulics, or raft forces. V2 covers the entire
+        // 0-600 m runnable corridor; V1 stopped before the 300 m evidence site.
         const float VisibleRiverHalfWidth = ActiveRiverHalfWidth * 1.03f;
         constexpr int32 BankSideCount = 2;
         const int32 InstancesPerSide =
@@ -4405,7 +4408,10 @@ bool AddLandscapeCandidateBiomeDressing(
                  ZambeziVegetationUnitRandom(GravelIndex, 10303)) /
                 static_cast<float>(InstancesPerSide);
             const float BaseLogicalX =
-                FMath::Lerp(-2380.0f, 25300.0f, AlongT) +
+                FMath::Lerp(
+                    ChilkoOrganicShorelineStartStationCm,
+                    ChilkoOrganicShorelineEndStationCm,
+                    AlongT) +
                 72.0f * FMath::Sin(
                     static_cast<float>(GravelIndex) * 0.7548777f);
             FVector2D BestPoint = ResolveLogicalRiverPoint(
@@ -4547,7 +4553,7 @@ bool AddLandscapeCandidateBiomeDressing(
             Component->MarkRenderStateDirty();
         }
         OutSummary += FString::Printf(
-            TEXT("%s organic shoreline gravel V1: %d/%d source-grounded, ")
+            TEXT("%s organic shoreline gravel V2: %d/%d source-grounded, ")
             TEXT("non-colliding six-morphology cobbles across both full-route ")
             TEXT("banks; %d targets rejected by visible-water clearance, ")
             TEXT("dry-height, or %.1f-degree slope gates; minimum centerline ")
@@ -4586,7 +4592,7 @@ bool AddLandscapeCandidateBiomeDressing(
         // Short, non-shadowing meadow patches soften the transition from the
         // gravel band to the wider shrub/canopy layer. They are selected only
         // on dry, low-slope source Landscape and make no species or ecology
-        // claim.
+        // claim. V2 spans the full runnable 0-600 m corridor.
         const float VisibleRiverHalfWidth = ActiveRiverHalfWidth * 1.03f;
         constexpr int32 BankSideCount = 2;
         const int32 InstancesPerSide =
@@ -4604,7 +4610,10 @@ bool AddLandscapeCandidateBiomeDressing(
                  ZambeziVegetationUnitRandom(CoverIndex, 10403)) /
                 static_cast<float>(InstancesPerSide);
             const float BaseLogicalX =
-                FMath::Lerp(-2380.0f, 25300.0f, AlongT) +
+                FMath::Lerp(
+                    ChilkoOrganicShorelineStartStationCm,
+                    ChilkoOrganicShorelineEndStationCm,
+                    AlongT) +
                 88.0f * FMath::Sin(
                     static_cast<float>(CoverIndex) * 0.618034f);
             FVector2D BestPoint = ResolveLogicalRiverPoint(
@@ -4732,7 +4741,7 @@ bool AddLandscapeCandidateBiomeDressing(
             Component->MarkRenderStateDirty();
         }
         OutSummary += FString::Printf(
-            TEXT("%s organic shoreline ground cover V1: %d/%d short, ")
+            TEXT("%s organic shoreline ground cover V2: %d/%d short, ")
             TEXT("non-shadowing, source-grounded patches across both full-route ")
             TEXT("dry banks; %d targets rejected by visible-water clearance, ")
             TEXT("dry-height, or %.1f-degree slope gates; minimum centerline ")

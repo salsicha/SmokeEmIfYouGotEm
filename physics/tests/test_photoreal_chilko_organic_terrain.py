@@ -36,13 +36,17 @@ def test_chilko_organic_material_is_default_lit_and_non_displacing() -> None:
     assert "SetCollision" not in material_source
 
 
-def test_chilko_organic_material_has_four_incommensurate_world_scales() -> None:
+def test_chilko_organic_material_has_seven_incommensurate_world_scales() -> None:
     source = MATERIAL_SOURCE.read_text(encoding="utf-8")
+    base_source = BASE_SOURCE.read_text(encoding="utf-8")
 
     assert "Noise(0.00016f, 3)" in source
     assert "Noise(0.00059f, 3)" in source
     assert "Noise(0.00270f, 2)" in source
     assert "Noise(0.00790f, 2)" in source
+    assert "Noise(0.00091f, 3)" in source
+    assert "Noise(0.00347f, 2)" in source
+    assert "Noise(0.01570f, 2)" in source
     assert "ChilkoOpenBenchPaletteWeight" in source
     assert "ChilkoBasaltSlopeStart" in source
     assert "ChilkoBasaltSlopeGain" in source
@@ -51,6 +55,16 @@ def test_chilko_organic_material_has_four_incommensurate_world_scales() -> None:
     assert "ChilkoWetBasaltTint" in source
     assert "ChilkoOxidizedBasaltTint" in source
     assert "ChilkoScreeTint" in source
+    assert "ChilkoWetBankSiltTint" in source
+    assert "ChilkoWetBankGravelTint" in source
+    assert "ChilkoWetBankOxideTint" in source
+    assert "ChilkoWetBankOrganicBlendWeight" in source
+    assert "ChilkoRotatedBroadDetailAlbedo" in base_source
+    assert "RotatedDetailCoordinates->MappingScale = 217.0f" in base_source
+    assert "RotatedDetailCoordinates->MappingRotation = 37.0f" in base_source
+    assert "ChilkoWetBankMacroPatchThreshold" in source
+    assert "ChilkoWetBankMesoPatchThreshold" in source
+    assert "WetBankBlendMask" in base_source
 
 
 def test_chilko_generated_manifest_records_shading_and_authority_separation() -> None:
@@ -59,13 +73,16 @@ def test_chilko_generated_manifest_records_shading_and_authority_separation() ->
     assert candidate["river_id"] == "chilko_river_lava_canyon"
     assert candidate["landscape_material_shading_model"] == "DefaultLit"
     assert candidate["landscape_material_organic_surface_status"].startswith(
-        "chilko_v1_four_scale_world_space"
+        "chilko_v2_dual_projection_seven_scale_world_space"
     )
     assert candidate["landscape_material_organic_world_noise_scales_per_cm"] == [
         0.00016,
         0.00059,
         0.0027,
         0.0079,
+        0.00091,
+        0.00347,
+        0.0157,
     ]
     assert candidate["landscape_material_geometry_authority_status"] == (
         "shade_only_no_world_position_offset_no_collision_or_solver_change"
@@ -115,6 +132,8 @@ def test_chilko_organic_terrain_review_retains_immutable_evidence_and_is_honest(
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorChilkoMaterial.cpp",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorChilkoTerrainTest.cpp",
         "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_chilkoriverlavacanyon_physicalcorridor_SourceLandscapeCandidate.uasset",
     }
     for artifact in review["retained_artifacts"]:

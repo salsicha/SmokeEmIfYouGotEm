@@ -975,7 +975,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("futaleufu_v1_three_scale_world_space_forest_floor_moss_leaf_litter_and_slope_aware_wet_granite_response")
                        : (bUsesChilkoOrganicLavaCanyonSurface
-                              ? TEXT("chilko_v1_four_scale_world_space_open_bench_dry_grass_mineral_soil_slope_aware_basalt_and_scree_response")
+                              ? TEXT("chilko_v2_dual_projection_seven_scale_world_space_open_bench_dry_grass_mineral_soil_slope_aware_basalt_scree_and_contrasted_nonrepeating_wet_bank_silt_gravel_oxide_response")
                               : TEXT("not_enabled_for_this_river"))))),
             bUsesSouthForkOrganicFoothillSurface
                 ? TEXT("[0.000130, 0.000730, 0.003100]")
@@ -986,7 +986,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                        : (bUsesFutaleufuOrganicTemperateSurface
                        ? TEXT("[0.000180, 0.000710, 0.004200]")
                        : (bUsesChilkoOrganicLavaCanyonSurface
-                              ? TEXT("[0.000160, 0.000590, 0.002700, 0.007900]")
+                              ? TEXT("[0.000160, 0.000590, 0.002700, 0.007900, 0.000910, 0.003470, 0.015700]")
                               : TEXT("[]"))))),
             MaterialSettings.MacroMappingScale,
             MaterialSettings.DetailMappingScale,
@@ -1095,7 +1095,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingTemperateNearBankMinimumCenterlineDistanceCm,
             Result.DressingTemperateNearBankMaximumSlopeDegrees,
             Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount > 0
-                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_organic_shoreline_gravel_v1_captured")
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_full_runnable_reach_organic_shoreline_gravel_v2_captured")
                 : TEXT("not_enabled_for_this_river"),
             Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount,
             Result.DressingChilkoOrganicShorelineGravelInstanceCount,
@@ -1103,7 +1103,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm,
             Result.DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees,
             Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount > 0
-                ? TEXT("source_grounded_short_meadow_ground_cover_v1_captured")
+                ? TEXT("source_grounded_full_runnable_reach_short_meadow_ground_cover_v2_captured")
                 : TEXT("not_enabled_for_this_river"),
             Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount,
             Result.DressingChilkoOrganicShorelineGroundCoverInstanceCount,
