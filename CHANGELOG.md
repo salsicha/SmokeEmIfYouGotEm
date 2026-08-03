@@ -54,12 +54,13 @@ All notable changes to this project are recorded here, newest first. Versioning 
   is a bounded readability improvement; procedural terrain and ecology, thin
   optics, sparse rapid VFX, unconverged hydraulics, and all six external gates
   keep photoreal and production promotion closed.
-- Reaffirmed Zambezi as the sixth runnable river on the post-ground-cover
-  release head. The unchanged committed `L_Zambezi` package remains selectable
+- Reaffirmed Zambezi as the sixth runnable river on the current release head
+  after the Pacuare and Chilko transmitting-water milestones. The unchanged
+  committed `L_Zambezi` package remains selectable
   as **Zambezi: Boiling Pot to Mukuni Beach** in Free Run and remains in the
-  shipping cook. Eighteen focused registry/source contracts, a clean 135-action
+  shipping cook. Eighteen focused registry/source contracts, a clean 136-action
   UE 5.8 editor build, the native career catalog, and the live PIE map-load gate
-  pass. The V6 review hash-locks the selector, manifest, scenario, cook list,
+  pass. The V9 review hash-locks the selector, manifest, scenario, cook list,
   and map package while retaining reference-tier status and leaving production
   terrain, bathymetry, hydraulics, photoreal art, guide/geospatial/rights, and
   performance acceptance open.

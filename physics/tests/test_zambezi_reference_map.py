@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v8_review.json"
+    "zambezi_runnable_release_head_v9_review.json"
 )
 
 
@@ -45,24 +45,25 @@ def _sha256(path: Path) -> str:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v4"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v5"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "cc293df2"
+        "5dc8750384f957a2a7af3f938a889605afde319d"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Revalidate and hash-lock the regenerated runnable Zambezi package "
-            "after the solver-owned transmitting-water milestone."
+            "Revalidate the unchanged runnable Zambezi package at the current "
+            "release head after the Pacuare and Chilko transmitting-water "
+            "milestones."
         ),
-        "map_runtime_package_changed_since_v7": True,
-        "player_selector_contract_changed_since_v7": False,
+        "map_runtime_package_changed_since_v8": False,
+        "player_selector_contract_changed_since_v8": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v7_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v8_review.json"
         ),
     }
     assert review["player_path"] == {
