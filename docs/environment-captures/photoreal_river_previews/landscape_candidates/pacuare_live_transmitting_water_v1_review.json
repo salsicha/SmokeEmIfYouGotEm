@@ -1,0 +1,93 @@
+{
+  "schema": "raftsim.environment.pacuare_live_water_review.v1",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "9d9c921a",
+  "status": "retained_technical_visual_improvement_photoreal_promotion_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "visual_improvement_passed": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "runnable_map_package_changed": true,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false,
+    "authored_capture_water_hidden_in_game": true
+  },
+  "architecture": {
+    "runtime_volume": "The live ARaftSimWaterSurfaceActor owns Pacuare gameplay rendering. Its non-colliding transmitting core is triangulated only through solver-sampled all-wet cells and binds a Pacuare-local instance of the shared raft-transmitting water parent.",
+    "runtime_detail": "The live Default Lit surface is retained only as a 0.035 calm / 0.14 active coverage hydraulic-detail skin. A first-party flow normal provides sub-grid optical breakup; a first-party foam-lace texture is multiplied by solver foam and speed and cannot create whitewater in calm or dry cells.",
+    "capture_water": "The deterministic packed-field ribbon and foam sheet remain capture-only actors. Both are hidden during gameplay while the live solver surface renders and the cooked field remains the force authority.",
+    "authority_boundary": "The new textures, material instance, smoothing, opacity, and color coefficients are visual-only. Cooked depth, velocity, wet/dry state, bathymetry, coordinate mapping, collision, buoyancy, raft forces, rapid detection, and scoring are unchanged."
+  },
+  "runtime_contract": {
+    "map": "/Game/RaftSim/Maps/L_UpperHuacas",
+    "live_volume_core_enabled": true,
+    "live_volume_core_triangles": 1480,
+    "wet_vertices": 987,
+    "depth_mean_m": 0.2047,
+    "speed_mean_m_per_s": 0.1595,
+    "foam_mean": 0.0022,
+    "foam_max": 0.2470,
+    "standing_wave_abs_max_m": 0.0813,
+    "hydraulic_relief_abs_max_m": 0.1018,
+    "surface_smoothing_enabled": true,
+    "surface_smoothing_strength": 0.62,
+    "shallow_opacity": 0.46,
+    "deep_opacity": 0.72,
+    "foam_opacity": 0.88,
+    "detail_surface_calm_coverage": 0.035,
+    "detail_surface_active_coverage": 0.14,
+    "rapid_foam_focus": [0.10, 0.66]
+  },
+  "matched_runtime_evidence": {
+    "command": "RaftSim.CaptureRaft 8 <label> 12 5 30 waterinventory",
+    "resolution_px": [1280, 720],
+    "raft_location_cm_before": [4427.285, -0.010, 323.398],
+    "raft_location_cm_after": [4435.117, -0.010, 323.290],
+    "baseline_sha256": "0cc840183562ba12edd84d30ef07b3d750e4d7200b52323b859798658d9fbd19",
+    "retained_sha256": "d2fbf110b381cbc7ed264aef9c9f20cad2a816f3ffc5338f82948aa2af2e0733",
+    "baseline_lower_rgb_mean": [156.255, 183.314, 161.193],
+    "retained_lower_rgb_mean": [159.924, 181.112, 162.024],
+    "full_frame_mean_absolute_channel_delta": 11.801,
+    "verdict": "Retain as a bounded gameplay-water improvement. The uniform pale opaque sheet is replaced by a wet-cell-clipped core with visible live wave relief and shallow riverbed color variation. The procedural terrain, repeated vegetation, weak rapid foam, missing spray and mist, and uncalibrated hydraulics remain visibly below the photoreal target."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed; the final contract correction rebuilt and linked in 2 actions",
+    "focused_native_audit": "RaftSim.M9.FPacuare passed 4/4 including FPacuareLiveTransmittingWater",
+    "live_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_UpperHuacas passed 1/1 with wet finite water and 1480 visible wet-cell volume-core triangles",
+    "focused_python_contracts": "4 passed",
+    "visual_gate": "matched over-raft before/after accepted for this bounded technical milestone"
+  },
+  "remaining_photoreal_defects": [
+    "The reach-local Landscape and procedural outer banks remain rounded, visibly regular, and insufficiently detailed at shoreline and rock scale.",
+    "Rainforest vegetation is generic procedural fallback with repeated silhouettes, sparse understory transitions, and no approved Pacuare species or seasonal ecology claim.",
+    "The transmitting core is optically thin and still lacks production sediment response, refraction, reflection, caustics, credible riverbed material transitions, and contact wetness.",
+    "Solver foam is sparse in the launch view and lacks credible crest thickness, rollers, holes, breaking-wave volume, spray, mist, and rock-contact plumes.",
+    "The cooked Upper Huacas field is unconverged and its discharge, bathymetry, stationing, hazards, and guide line are not calibrated to observed river behavior.",
+    "Raft, crew, equipment, animation, complete-run rescue/capsize behavior, packaged performance, and VR presentation still require final acceptance."
+  ],
+  "required_external_acceptance_gates": [
+    "Pacuare guide review of the Upper Huacas line, hazards, water levels, entry, exit, and rescue routes",
+    "geospatial review of exact stationing, planform, vertical datum, bank breaklines, higher-resolution terrain, rocks, and bathymetry",
+    "hydraulic calibration and convergence approval against observed Upper Huacas behavior across playable flow bands",
+    "ecology and environment-art approval of species, density, ground cover, geology, wet banks, and rainforest atmosphere",
+    "photoreal water/VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {"path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap", "role": "runnable map with solver-owned transmitting gameplay water", "sha256": "f4171706cb66980934e5e58476272437de0b608cf2129a6cd95a97463923adec"},
+    {"path": "unreal/SourceArt/RaftSim/Water/PacuareUpperHuacas/T_RaftSim_PacuareUpperHuacas_FlowNormalV1.png", "role": "first-party flow-normal source", "sha256": "9b975bb352087142f9e59cc0fb8c702d56581f9b16a9b9ecdbc5d3eb275f18de"},
+    {"path": "unreal/SourceArt/RaftSim/Water/PacuareUpperHuacas/T_RaftSim_PacuareUpperHuacas_FlowNormalV1.provenance.json", "role": "flow-normal generation and authority record", "sha256": "5184d79cdfc8dd770a8be1a3d2baf8957b4760592a587e1981ad5161652b0ac5"},
+    {"path": "unreal/SourceArt/RaftSim/Water/PacuareUpperHuacas/T_RaftSim_PacuareUpperHuacas_FoamLaceV1.png", "role": "first-party solver-masked foam-lace source", "sha256": "f60fcf09c44dc802497a4f41c4c35bcc00c114ed9af22e83d689d7d445015345"},
+    {"path": "unreal/SourceArt/RaftSim/Water/PacuareUpperHuacas/T_RaftSim_PacuareUpperHuacas_FoamLaceV1.provenance.json", "role": "foam-lace generation and authority record", "sha256": "5b507ff4ab523cf78e3602c3f6e9c4ef6d111e064babc41afe0ec13f10511d5d"},
+    {"path": "unreal/Content/RaftSim/Environment/PacuareRun/Water/Textures/T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal.uasset", "role": "cooked river-local flow normal", "sha256": "2dd7432cab04db691b0748ad6349c342bf19304d0728937d94742b8a78cd8cee"},
+    {"path": "unreal/Content/RaftSim/Environment/PacuareRun/Water/Textures/T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace.uasset", "role": "cooked solver-masked foam lace", "sha256": "c08d736f1a584656d1f1ebda682e591ef16d56e98a84d0a09d8a595da7fa5c67"},
+    {"path": "unreal/Content/RaftSim/Environment/PacuareRun/Water/Materials/MI_RaftSim_PacuareUpperHuacas_LiveVolumeWaterV1.uasset", "role": "river-local raft-transmitting live-volume instance", "sha256": "8fb5653798fb9b6221d6ba7c6b81230bfb8c1f6adedb11450d04434aef60338e"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_live_transmitting_water_v1_before.png", "role": "immutable release-head baseline gameplay capture", "sha256": "0cc840183562ba12edd84d30ef07b3d750e4d7200b52323b859798658d9fbd19"},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_live_transmitting_water_v1.png", "role": "retained matched gameplay capture", "sha256": "d2fbf110b381cbc7ed264aef9c9f20cad2a816f3ffc5338f82948aa2af2e0733"}
+  ]
+}

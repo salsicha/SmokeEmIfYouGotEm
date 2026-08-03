@@ -168,7 +168,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
             bUsesSolverOwnedVisibleRiver);
         if (bUsesSolverOwnedVisibleRiver)
         {
-            if (bZambeziReferenceRun || bColoradoHanceReferenceRun ||
+            if (bZambeziReferenceRun || bPacuareReferenceRun ||
+                bColoradoHanceReferenceRun ||
                 bChilkoLavaCanyonReferenceRun ||
                 bFutaleufuTerminatorReferenceRun)
             {
@@ -774,6 +775,52 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Pacuare Landscape owns runtime terrain"),
                 (*It)->bMapProvidesTerrain);
+            Test->TestTrue(
+                TEXT("Pacuare solver owns the visible gameplay river"),
+                (*It)->bLiveSolverOwnsRuntimeRendering);
+            Test->TestTrue(
+                TEXT("Pacuare enables the transmitting wet-cell volume core"),
+                (*It)->bEnableLiveSolverVolumeCore);
+            Test->TestTrue(
+                TEXT("Pacuare stores restrained calm detail coverage"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSurfaceCalmCoverage, 0.035f, 0.001f));
+            Test->TestTrue(
+                TEXT("Pacuare stores active-water detail response"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSurfaceActiveCoverage, 0.14f, 0.001f));
+            Test->TestTrue(
+                TEXT("Pacuare binds river-local volume water"),
+                (*It)->LiveVolumeCoreMaterialOverride &&
+                    (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
+                        TEXT("MI_RaftSim_PacuareUpperHuacas_LiveVolumeWaterV1")));
+            Test->TestTrue(
+                TEXT("Pacuare binds a river-local flow normal"),
+                (*It)->LiveWaterFlowNormalTexture &&
+                    (*It)->LiveWaterFlowNormalTexture->GetPathName().Contains(
+                        TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal")));
+            Test->TestTrue(
+                TEXT("Pacuare binds solver-masked foam lace"),
+                (*It)->LiveWaterFoamLaceTexture &&
+                    (*It)->LiveWaterFoamLaceTexture->GetPathName().Contains(
+                        TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace")));
+            Test->TestTrue(
+                TEXT("Pacuare enables render-only subcell smoothing"),
+                (*It)->bEnableLivePresentationSurfaceSmoothing);
+            Test->TestTrue(
+                TEXT("Pacuare smoothing strength is bounded"),
+                FMath::IsNearlyEqual(
+                    (*It)->LivePresentationSurfaceSmoothingStrength,
+                    0.62f,
+                    0.001f));
+            Test->TestTrue(
+                TEXT("Pacuare shallow transmission remains open enough for bed cues"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveShallowWaterOpacity, 0.46f, 0.001f));
+            Test->TestTrue(
+                TEXT("Pacuare config marks the transmitting visual-only upgrade"),
+                (*It)->Tags.Contains(TEXT("RaftSimPacuareTransmittingWaterV1")) &&
+                    (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
             ++RuntimeWaterConfigCount;
         }
         Test->TestEqual(

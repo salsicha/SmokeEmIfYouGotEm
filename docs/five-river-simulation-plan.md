@@ -117,6 +117,21 @@ and external acceptance gates pass.
   rounded and tessellated-looking, and biome/ground-cover fidelity is still
   provisional.
 
+### 2026-08-03 — Pacuare live transmitting gameplay water retained
+
+- `L_UpperHuacas` now uses a solver-owned, wet-cell-clipped transmitting core
+  for gameplay instead of the broad opaque Default Lit carrier. The live
+  surface remains as a 3.5%-14% hydraulic-detail skin; the authored packed-
+  field ribbon and foam sheet stay capture-only and hidden in play.
+- Project-owned flow-normal and foam-lace textures are recorded with generation
+  provenance and have no hydraulic authority. The foam lace is multiplied by
+  solver foam and speed and cannot create whitewater in calm or dry cells.
+- The editor build, four focused Pacuare native audits, the live Upper Huacas
+  PIE map-load gate, four Python contracts, and matched over-raft capture pass
+  for this bounded technical milestone. Rounded terrain, generic rainforest
+  ecology, thin optics, sparse foam/spray, unconverged hydraulics, and all six
+  external gates keep photoreal and production promotion closed.
+
 ### 2026-08-01 — Pacuare Upper Huacas physical runnable map restored
 
 - `L_UpperHuacas` now delegates to the source-Landscape builder instead of the

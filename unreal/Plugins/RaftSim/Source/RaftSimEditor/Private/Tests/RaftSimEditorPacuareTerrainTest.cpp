@@ -1,10 +1,12 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 
 #include "Engine/StaticMesh.h"
+#include "Engine/Texture2D.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -308,6 +310,101 @@ bool FRaftSimPacuareRainforestDefaultLitWaterTest::RunTest(
     TestVector(
         TEXT("ColorScaleBehindWater"),
         FLinearColor(0.60f, 0.65f, 0.55f, 0.0f));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareLiveTransmittingWaterTest,
+    "RaftSim.M9.FPacuareLiveTransmittingWater",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
+    const FString& Parameters)
+{
+    FString AuthoringSummary;
+    UMaterialInstanceConstant* Instance =
+        RaftSimEditorEnvironment::
+            LoadOrCreatePacuareUpperHuacasLiveWaterInstance(AuthoringSummary);
+    TestNotNull(
+        TEXT("Pacuare river-local live-volume authoring succeeds"),
+        Instance);
+    if (!Instance)
+    {
+        AddError(AuthoringSummary);
+        return false;
+    }
+
+    TestNotNull(TEXT("Pacuare live-volume parent exists"), Instance->Parent.Get());
+    if (Instance->Parent)
+    {
+        TestEqual(
+            TEXT("Pacuare uses shared raft-transmitting volume water"),
+            Instance->Parent->GetPathName(),
+            FString(TEXT(
+                "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+                "M_RaftSim_SouthForkRaftTransmissionWater."
+                "M_RaftSim_SouthForkRaftTransmissionWater")));
+    }
+
+    UTexture* FlowNormal = nullptr;
+    UTexture* FoamLace = nullptr;
+    TestTrue(
+        TEXT("Pacuare live volume binds its first-party flow normal"),
+        Instance->GetTextureParameterValue(
+            FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")),
+            FlowNormal));
+    TestTrue(
+        TEXT("Pacuare live volume binds its solver-masked foam lace"),
+        Instance->GetTextureParameterValue(
+            FMaterialParameterInfo(TEXT("WhitewaterFoamLace")),
+            FoamLace));
+    TestTrue(
+        TEXT("Pacuare flow normal is river-local"),
+        FlowNormal && FlowNormal->GetPathName().Contains(
+            TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FlowNormal")));
+    TestTrue(
+        TEXT("Pacuare foam lace is river-local"),
+        FoamLace && FoamLace->GetPathName().Contains(
+            TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace")));
+
+    if (const UTexture2D* FlowNormal2D = Cast<UTexture2D>(FlowNormal))
+    {
+        TestEqual(
+            TEXT("Pacuare flow normal imports as normal-map data"),
+            FlowNormal2D->CompressionSettings,
+            TC_Normalmap);
+        TestFalse(TEXT("Pacuare flow normal stays linear"), FlowNormal2D->SRGB);
+        TestEqual(TEXT("Pacuare flow normal mirrors in X"), FlowNormal2D->AddressX, TA_Mirror);
+        TestEqual(TEXT("Pacuare flow normal mirrors in Y"), FlowNormal2D->AddressY, TA_Mirror);
+    }
+    if (const UTexture2D* FoamLace2D = Cast<UTexture2D>(FoamLace))
+    {
+        TestEqual(
+            TEXT("Pacuare foam lace imports as mask data"),
+            FoamLace2D->CompressionSettings,
+            TC_Masks);
+        TestFalse(TEXT("Pacuare foam lace stays linear"), FoamLace2D->SRGB);
+        TestEqual(TEXT("Pacuare foam lace mirrors in X"), FoamLace2D->AddressX, TA_Mirror);
+        TestEqual(TEXT("Pacuare foam lace mirrors in Y"), FoamLace2D->AddressY, TA_Mirror);
+    }
+
+    auto TestScalar = [this, Instance](
+                          const TCHAR* ParameterName,
+                          float ExpectedValue)
+    {
+        float Value = 0.0f;
+        TestTrue(
+            FString::Printf(TEXT("%s is bound"), ParameterName),
+            Instance->GetScalarParameterValue(
+                FMaterialParameterInfo(ParameterName), Value));
+        TestTrue(
+            FString::Printf(TEXT("%s keeps its authored value"), ParameterName),
+            FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+    };
+    TestScalar(TEXT("HydraulicFoamCoverageGain"), 0.66f);
+    TestScalar(TEXT("SpeedAerationFraction"), 0.14f);
+    TestScalar(TEXT("FoamRoughness"), 0.74f);
+    TestScalar(TEXT("SlickNormalFloor"), 0.28f);
     return !HasAnyErrors();
 }
 

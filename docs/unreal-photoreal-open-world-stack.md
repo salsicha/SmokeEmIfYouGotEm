@@ -56,6 +56,23 @@ source run is unconverged, and the opaque water, coarse foam bands, generic
 foliage, interpreted geography, missing spray/mist, guide validation, and
 full-run runtime evidence remain rejected in the V2 review.
 
+The August 3 Pacuare live-water pass supersedes the opaque gameplay-water
+limitation above. `L_UpperHuacas` now renders gameplay water through the live
+`ARaftSimWaterSurfaceActor`: an all-wet-cell-clipped transmitting volume core
+under a 3.5%-14% solver detail skin. A Pacuare-local instance of the shared
+raft-transmitting parent binds first-party flow-normal and foam-lace textures;
+the lace is masked by solver foam and speed and cannot create whitewater in
+calm or dry cells. The prior packed-field ribbon and foam sheet remain
+capture-only and hidden in play. Matched over-raft evidence replaces the
+uniform pale sheet with visible live relief and shallow riverbed variation,
+and the focused native and PIE gates pass. This changes no cooked field,
+wet/dry state, bathymetry, coordinate mapping, collision, buoyancy, or raft
+force. Rounded procedural banks, generic repeated vegetation, thin water
+optics, sparse foam, missing spray/mist, unconverged hydraulics, and six
+external gates keep photoreal and production promotion closed; the exact
+contract is hash-locked in
+`pacuare_live_transmitting_water_v1_review.json`.
+
 The August 2 Colorado Hance water pass narrows the cooked-field capture relief
 ceiling from 45 cm to 9 cm and applies a plane-preserving cardinal five-tap
 filter only to all-wet presentation vertices. The live carrier uses the same
