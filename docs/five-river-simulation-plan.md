@@ -590,3 +590,21 @@ and external acceptance gates pass.
   wind, unconverged hydraulics, performance, and all six external reviews
   remain open. Evidence is hash-locked in
   `pacuare_humid_atmosphere_v1_review.json`.
+
+### 2026-08-03 — Bounded multi-site rapid VFX coverage retained
+
+- The shared production Niagara bridge now drives the nearest six accepted
+  breaking sites instead of two, still within the existing eight-pair pool and
+  120 m hard cull. Moderate-intensity aerosol and roller scale/rates increase
+  inside that bound; no transient Niagara actors are spawned.
+- The runnable Zambezi gate passes with eight solver-owned breaking sites, six
+  active aerosol emitters, six active roller emitters, 125 rapid-foam vertices,
+  2,673 wet vertices, 4,224 optical-core triangles, and MapCheck 0/0. M4 passes
+  4/4 and the focused Python/source suite passes 43 tests.
+- The map package and Niagara assets are byte-identical. Cooked fields, wet/dry
+  state, bathymetry, water geometry, collision, buoyancy, raft forces, scoring,
+  and progression do not change. Matched strongest-site and VFX-off evidence
+  shows bounded local breakup but not a convincing overturning rapid volume;
+  photoreal water art, validated hydraulics, target performance, and all named
+  external approvals remain open in
+  `zambezi_solver_driven_rapid_vfx_v1_review.json`.

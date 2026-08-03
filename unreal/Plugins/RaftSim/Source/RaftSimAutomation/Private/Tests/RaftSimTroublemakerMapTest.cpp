@@ -605,12 +605,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Zambezi uses the complete production Niagara water pool"),
                 It->IsProductionNiagaraReady());
-            Test->TestTrue(
-                TEXT("Zambezi emits a camera-local rapid roller"),
-                It->GetActiveRapidRollerNiagaraCount() > 0);
-            Test->TestTrue(
-                TEXT("Zambezi emits camera-local rapid aerosol"),
-                It->GetActiveRapidAerosolNiagaraCount() > 0);
+            Test->TestEqual(
+                TEXT("Zambezi emits a bounded multi-site rapid roller field"),
+                It->GetActiveRapidRollerNiagaraCount(),
+                6);
+            Test->TestEqual(
+                TEXT("Zambezi emits a bounded multi-site rapid aerosol field"),
+                It->GetActiveRapidAerosolNiagaraCount(),
+                6);
+            Test->TestEqual(
+                TEXT("Zambezi rapid aerosol and roller pools cover the same sites"),
+                It->GetActiveRapidAerosolNiagaraCount(),
+                It->GetActiveRapidRollerNiagaraCount());
         }
         else
         {

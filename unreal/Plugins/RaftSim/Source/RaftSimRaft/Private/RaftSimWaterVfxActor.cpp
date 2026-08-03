@@ -30,8 +30,10 @@ constexpr float GravityMps2 = 9.80665f;
 // Translucent whitewater is deliberately local. Rendering every detected
 // hydraulic jump along the kilometre-scale reach spends fill rate on effects
 // that contribute only a few pixels (or are fully hidden by the canyon). Keep
-// the preallocated fail-closed pool, but feed only the nearest useful sites.
-constexpr int32 MaxActiveRapidNiagaraSites = 2;
+// the preallocated fail-closed pool and expose a bounded six-site rapid field:
+// two sites left long approaches such as the runnable Batoka window reading as
+// isolated sparkles even when several solver-owned jumps were camera-visible.
+constexpr int32 MaxActiveRapidNiagaraSites = 6;
 constexpr float ContactNiagaraCullDistanceCm = 4500.0f;
 constexpr float RapidNiagaraFullDensityDistanceCm = 6000.0f;
 constexpr float RapidNiagaraCullDistanceCm = 12000.0f;
@@ -2806,7 +2808,7 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                     1.0f)
                 : 1.0f;
             const FVector Origin = Site.WorldPositionCm +
-                Downstream * 35.0f + FVector::UpVector * 34.0f;
+                Downstream * 35.0f + FVector::UpVector * 38.0f;
             const FVector DriftDirection =
                 (Downstream * 0.86f + FVector::UpVector * 0.28f).GetSafeNormal();
             const bool bEnabled = Intensity > 0.12f;
@@ -2815,12 +2817,12 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 bEnabled,
                 Origin,
                 DriftDirection,
-                FMath::Lerp(0.70f, 1.18f, Intensity),
-                FMath::Lerp(6.0f, 28.0f, Intensity) * DistanceDensity);
+                FMath::Lerp(1.05f, 1.65f, Intensity),
+                FMath::Lerp(18.0f, 52.0f, Intensity) * DistanceDensity);
             ActiveRapidNiagaraCount += bEnabled ? 1 : 0;
 
             const FVector RollerOrigin = Site.WorldPositionCm +
-                Downstream * 48.0f + FVector::UpVector * 12.0f;
+                Downstream * 48.0f + FVector::UpVector * 18.0f;
             const FVector RollerDirection =
                 (Downstream * 0.68f + FVector::UpVector * 0.73f)
                     .GetSafeNormal();
@@ -2829,8 +2831,8 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 bEnabled,
                 RollerOrigin,
                 RollerDirection,
-                FMath::Lerp(0.78f, 1.15f, Intensity),
-                FMath::Lerp(24.0f, 90.0f, Intensity) * DistanceDensity);
+                FMath::Lerp(1.10f, 1.55f, Intensity),
+                FMath::Lerp(48.0f, 145.0f, Intensity) * DistanceDensity);
             ActiveRapidRollerNiagaraCount += bEnabled ? 1 : 0;
         }
         for (int32 PoolIndex = ActiveSiteBudget;

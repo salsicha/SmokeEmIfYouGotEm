@@ -496,6 +496,19 @@ in `zambezi_live_solver_rapid_foam_v1.png` and
 `zambezi_live_solver_rapid_foam_v1_review.json`. This is a retained runtime
 readability baseline, not photoreal or real-world hydraulic acceptance.
 
+The shared live-water VFX bridge now presents the nearest six solver-owned
+breaking sites instead of limiting long rapid approaches to two Niagara pairs.
+At the runnable Zambezi launch, the native gate records six active aerosol and
+six active roller emitters from eight accepted breaking sites while preserving
+the eight-component pool, 120 m hard cull, deterministic missing-asset fallback,
+and the unchanged `L_Zambezi` package hash. Moderate-intensity aerosol and
+roller scale/rates are raised within that fixed pool so they contribute visible
+local breakup without manufacturing new rapid locations. The matched review
+still rejects photoreal promotion: the particles cannot supply the missing
+connected crest, hole, recirculating entrained-air volume, surveyed bathymetry,
+or seasonally validated hydraulics. Evidence is in
+`zambezi_solver_driven_rapid_vfx_v1_review.json`.
+
 ## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route
