@@ -307,3 +307,21 @@ and external acceptance gates pass.
   technical readability improvement only; the retained Futaleufú rapid frame
   still fails photoreal water/VFX review and every external acceptance gate
   remains open.
+
+### 2026-08-02 — Chilko rapid-approach launch framing corrected
+
+- Re-evaluated the committed Lava Canyon cooked fields on the live surface's
+  exact 3 m sampling grid. Low, median, and high bands all contain an interior
+  supercritical-to-subcritical transition near local station 300 m with the
+  required 15 m clearance. The earlier zero-site result came from the generic
+  station-24 m launch clamping the moving carrier to stations 0-240, not from
+  missing solver structure.
+- `L_LavaCanyon` now launches at station 228 m in deep subcritical water,
+  retaining 72 m of approach. The PIE map exposes one interior site at station
+  300 m, full presentation coverage, 15 m clearance, six visible rapid-foam
+  vertices, and a visible foam mesh. Boundary candidates remain rejected and
+  no threshold is relaxed.
+- Cooked fields, wet/dry masks, bathymetry, collision, buoyancy, and raft forces
+  are unchanged. The live evidence remains too pale and sheet-like for
+  photoreal promotion; coarse banks, procedural ecology, missing calibrated
+  rapid morphology/VFX, and all six external reviews remain open.

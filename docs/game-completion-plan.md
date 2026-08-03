@@ -4007,3 +4007,15 @@ path is verified, and the completion goal can be marked complete.
   focused source contracts, native water/material/map/render gates, and the
   protected 75-file audit pass. Photoreal water, terrain/ecology, calibrated
   hydraulics, guide/art review, and target-hardware acceptance remain open.
+- Chilko Lava Canyon rapid-approach launch V1 corrects the earlier conclusion
+  that an interior cooked-field rapid was missing. The committed low, median,
+  and high bands already contain an interior solver jump near local station
+  300 m; the generic station-24 m launch simply kept it outside the initial
+  240 m moving live-water surface. `L_LavaCanyon` now launches at station
+  228 m, retaining a 72 m subcritical approach. The all-band 3 m sampling
+  regression passes and the real PIE map reports one active interior site,
+  full coverage, 15 m clearance, six visible rapid-foam vertices, and visible
+  solver foam. Cooked data, wet/dry authority, bathymetry, collision, and raft
+  forces are unchanged. This closes runnable scenario framing only; the pale
+  sheet-like water, procedural forest, coarse banks, missing calibrated rapid
+  morphology/VFX, and all six external gates keep photoreal promotion open.
