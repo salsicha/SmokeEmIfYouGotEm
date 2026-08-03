@@ -18,6 +18,7 @@
 #include "Materials/MaterialExpressionConstant2Vector.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionDesaturation.h"
+#include "Materials/MaterialExpressionDistance.h"
 #include "Materials/MaterialExpressionDivide.h"
 #include "Materials/MaterialExpressionDotProduct.h"
 #include "Materials/MaterialExpressionFrac.h"
@@ -2337,7 +2338,8 @@ static UMaterial* BuildTexturedRaftMaterial(
     bool bUseAmbientOcclusion = true,
     bool bUseClothShading = false,
     float DrySpecularValue = 0.28f,
-    float WetSpecularValue = 0.56f)
+    float WetSpecularValue = 0.56f,
+    bool bUseDynamicPaddleGloveZones = false)
 {
     const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Materials/%s"), AssetName);
     const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, AssetName);
@@ -2528,6 +2530,158 @@ static UMaterial* BuildTexturedRaftMaterial(
     RuntimeWetSpecular->Alpha.Expression = Wetness;
     Add(RuntimeWetSpecular);
 
+    UMaterialExpression* PresentationBaseColor = RuntimeWetColor;
+    UMaterialExpression* PresentationRoughness = RuntimeWetRoughness;
+    UMaterialExpression* PresentationSpecular = RuntimeWetSpecular;
+    if (bUseDynamicPaddleGloveZones)
+    {
+        // The optimized MetaHuman rafting body is deliberately one material
+        // section, so assigning a second hand slot would require destructive
+        // mesh reauthoring. Two pose-driven world-space zones instead isolate
+        // the existing skinned hand topology as fitted charcoal neoprene
+        // gloves. A feathered wrist transition avoids a spherical cutoff and
+        // follows every live stroke because gameplay updates both centres
+        // from the solved middle-metacarpal bones.
+        UMaterialExpressionWorldPosition* WorldPosition =
+            NewObject<UMaterialExpressionWorldPosition>(Material);
+        Add(WorldPosition);
+        UMaterialExpressionScalarParameter* GloveRadius =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        GloveRadius->ParameterName = TEXT("PaddleGloveRadiusCm");
+        GloveRadius->DefaultValue = 8.75f;
+        GloveRadius->Group = TEXT("RaftSimPaddleGloves");
+        Add(GloveRadius);
+        UMaterialExpressionScalarParameter* GloveFeather =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        GloveFeather->ParameterName = TEXT("PaddleGloveFeatherCm");
+        GloveFeather->DefaultValue = 1.25f;
+        GloveFeather->Group = TEXT("RaftSimPaddleGloves");
+        Add(GloveFeather);
+
+        const auto BuildGloveMask = [&](const TCHAR* ParameterName)
+            -> UMaterialExpressionSaturate*
+        {
+            UMaterialExpressionVectorParameter* Center =
+                NewObject<UMaterialExpressionVectorParameter>(Material);
+            Center->ParameterName = ParameterName;
+            Center->DefaultValue = FLinearColor(1.0e7f, 1.0e7f, 1.0e7f, 1.0f);
+            Center->Group = TEXT("RaftSimPaddleGloves");
+            Add(Center);
+            UMaterialExpressionComponentMask* CenterXyz =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            CenterXyz->Input.Expression = Center;
+            CenterXyz->R = true;
+            CenterXyz->G = true;
+            CenterXyz->B = true;
+            Add(CenterXyz);
+            UMaterialExpressionDistance* Distance =
+                NewObject<UMaterialExpressionDistance>(Material);
+            Distance->A.Expression = WorldPosition;
+            Distance->B.Expression = CenterXyz;
+            Add(Distance);
+            UMaterialExpressionSubtract* InsideDistance =
+                NewObject<UMaterialExpressionSubtract>(Material);
+            InsideDistance->A.Expression = GloveRadius;
+            InsideDistance->B.Expression = Distance;
+            Add(InsideDistance);
+            UMaterialExpressionDivide* FeatheredDistance =
+                NewObject<UMaterialExpressionDivide>(Material);
+            FeatheredDistance->A.Expression = InsideDistance;
+            FeatheredDistance->B.Expression = GloveFeather;
+            Add(FeatheredDistance);
+            UMaterialExpressionSaturate* Mask =
+                NewObject<UMaterialExpressionSaturate>(Material);
+            Mask->Input.Expression = FeatheredDistance;
+            Add(Mask);
+            return Mask;
+        };
+        UMaterialExpressionSaturate* LeftGloveMask =
+            BuildGloveMask(TEXT("LeftPaddleGloveCenterWS"));
+        UMaterialExpressionSaturate* RightGloveMask =
+            BuildGloveMask(TEXT("RightPaddleGloveCenterWS"));
+        UMaterialExpressionAdd* CombinedGloveMasks =
+            NewObject<UMaterialExpressionAdd>(Material);
+        CombinedGloveMasks->A.Expression = LeftGloveMask;
+        CombinedGloveMasks->B.Expression = RightGloveMask;
+        Add(CombinedGloveMasks);
+        UMaterialExpressionSaturate* GloveMask =
+            NewObject<UMaterialExpressionSaturate>(Material);
+        GloveMask->Input.Expression = CombinedGloveMasks;
+        Add(GloveMask);
+
+        UMaterialExpressionConstant3Vector* DryGloveColor =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        DryGloveColor->Constant = FLinearColor(0.022f, 0.029f, 0.038f, 1.0f);
+        Add(DryGloveColor);
+        UMaterialExpressionConstant3Vector* WetGloveTint =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        WetGloveTint->Constant = FLinearColor(0.62f, 0.68f, 0.74f, 1.0f);
+        Add(WetGloveTint);
+        UMaterialExpressionMultiply* WetGloveColor =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        WetGloveColor->A.Expression = DryGloveColor;
+        WetGloveColor->B.Expression = WetGloveTint;
+        Add(WetGloveColor);
+        UMaterialExpressionLinearInterpolate* RuntimeGloveColor =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        RuntimeGloveColor->A.Expression = DryGloveColor;
+        RuntimeGloveColor->B.Expression = WetGloveColor;
+        RuntimeGloveColor->Alpha.Expression = Wetness;
+        Add(RuntimeGloveColor);
+        UMaterialExpressionLinearInterpolate* GloveBaseColor =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        GloveBaseColor->A.Expression = RuntimeWetColor;
+        GloveBaseColor->B.Expression = RuntimeGloveColor;
+        GloveBaseColor->Alpha.Expression = GloveMask;
+        Add(GloveBaseColor);
+
+        UMaterialExpressionConstant* DryGloveRoughness =
+            NewObject<UMaterialExpressionConstant>(Material);
+        DryGloveRoughness->R = 0.66f;
+        Add(DryGloveRoughness);
+        UMaterialExpressionConstant* WetGloveRoughness =
+            NewObject<UMaterialExpressionConstant>(Material);
+        WetGloveRoughness->R = 0.36f;
+        Add(WetGloveRoughness);
+        UMaterialExpressionLinearInterpolate* RuntimeGloveRoughness =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        RuntimeGloveRoughness->A.Expression = DryGloveRoughness;
+        RuntimeGloveRoughness->B.Expression = WetGloveRoughness;
+        RuntimeGloveRoughness->Alpha.Expression = Wetness;
+        Add(RuntimeGloveRoughness);
+        UMaterialExpressionLinearInterpolate* GloveRoughness =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        GloveRoughness->A.Expression = RuntimeWetRoughness;
+        GloveRoughness->B.Expression = RuntimeGloveRoughness;
+        GloveRoughness->Alpha.Expression = GloveMask;
+        Add(GloveRoughness);
+
+        UMaterialExpressionConstant* DryGloveSpecular =
+            NewObject<UMaterialExpressionConstant>(Material);
+        DryGloveSpecular->R = 0.30f;
+        Add(DryGloveSpecular);
+        UMaterialExpressionConstant* WetGloveSpecular =
+            NewObject<UMaterialExpressionConstant>(Material);
+        WetGloveSpecular->R = 0.48f;
+        Add(WetGloveSpecular);
+        UMaterialExpressionLinearInterpolate* RuntimeGloveSpecular =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        RuntimeGloveSpecular->A.Expression = DryGloveSpecular;
+        RuntimeGloveSpecular->B.Expression = WetGloveSpecular;
+        RuntimeGloveSpecular->Alpha.Expression = Wetness;
+        Add(RuntimeGloveSpecular);
+        UMaterialExpressionLinearInterpolate* GloveSpecular =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        GloveSpecular->A.Expression = RuntimeWetSpecular;
+        GloveSpecular->B.Expression = RuntimeGloveSpecular;
+        GloveSpecular->Alpha.Expression = GloveMask;
+        Add(GloveSpecular);
+
+        PresentationBaseColor = GloveBaseColor;
+        PresentationRoughness = GloveRoughness;
+        PresentationSpecular = GloveSpecular;
+    }
+
     UMaterialExpressionTextureSampleParameter2D* NormalSample =
         NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
     NormalSample->ParameterName = TEXT("TextileNormal");
@@ -2557,9 +2711,9 @@ static UMaterial* BuildTexturedRaftMaterial(
     Metallic->R = 0.0f;
     Add(Metallic);
     UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
-    EditorData->BaseColor.Connect(0, RuntimeWetColor);
-    EditorData->Roughness.Connect(0, RuntimeWetRoughness);
-    EditorData->Specular.Connect(0, RuntimeWetSpecular);
+    EditorData->BaseColor.Connect(0, PresentationBaseColor);
+    EditorData->Roughness.Connect(0, PresentationRoughness);
+    EditorData->Specular.Connect(0, PresentationSpecular);
     EditorData->Metallic.Connect(0, Metallic);
     // Emptying the expression collection does not clear serialized material
     // property inputs on an existing asset. Disconnect the prior normal graph
@@ -2728,7 +2882,15 @@ static UMaterial* BuildProductionCrewWetsuitMaterial()
         FLinearColor(0.012f, 0.018f, 0.025f, 1.0f),
         0.76f, 0.06f, 5.0f, 0.10f,
         /*bTwoSided=*/false,
-        /*bSkeletalMesh=*/true);
+        /*bSkeletalMesh=*/true,
+        /*SaturatedRoughnessScale=*/0.34f,
+        /*SaturatedRoughnessMax=*/0.32f,
+        /*bUseTextileAlbedo=*/true,
+        /*bUseAmbientOcclusion=*/true,
+        /*bUseClothShading=*/false,
+        /*DrySpecularValue=*/0.28f,
+        /*WetSpecularValue=*/0.56f,
+        /*bUseDynamicPaddleGloveZones=*/true);
 }
 
 static UMaterial* BuildSplashJacketMaterial()

@@ -66,6 +66,20 @@ public:
         return MaximumPaddleGripContactErrorCm;
     }
 
+    /** Maximum opposed-thumb pad error against the lower paddle shaft. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleThumbContactErrorCm() const
+    {
+        return MaximumPaddleThumbContactErrorCm;
+    }
+
+    /** The one-section body resolves both live metacarpals as glove zones. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasLocalizedPaddleGloveMaterial() const
+    {
+        return bLocalizedPaddleGlovesReady;
+    }
+
     /** True only when the reviewed, assembled character BP is the rendered body. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     bool IsUsingAssembledCharacter() const { return bUsingAssembledCharacter; }
@@ -179,6 +193,11 @@ private:
         const TCHAR* Digit,
         const FVector& GripCenterCm,
         const FVector& GripAxis);
+    void ApplyOpposedThumbPadToGrip(
+        bool bLeft,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis);
+    void UpdatePaddleGloveMaterial();
     void SynchronizeAssembledFollowers();
     void UpdateRigidAssembledFace();
     void SetBoneAtPoint(FName BoneName, const FVector& DesiredPointCm);
@@ -199,6 +218,8 @@ private:
         bool bLeft,
         const FVector& DesiredGripCm) const;
     float MeasurePaddleFingerContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasurePaddleThumbContactErrorCm(
         const FRaftSimCrewAvatarPose& Pose) const;
 
     UPROPERTY(VisibleAnywhere)
@@ -223,6 +244,7 @@ private:
 
     float MaximumPaddleGripAnchorErrorCm = 0.0f;
     float MaximumPaddleGripContactErrorCm = 0.0f;
+    float MaximumPaddleThumbContactErrorCm = 0.0f;
 
     UPROPERTY(Transient)
     TObjectPtr<USkeletalMeshComponent> AssembledFace;
@@ -232,6 +254,9 @@ private:
 
     UPROPERTY(Transient)
     TObjectPtr<UMaterialInstanceDynamic> FaceSkin;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> WetsuitPresentationMaterial;
 
     UPROPERTY(Transient)
     TArray<TObjectPtr<UMaterialInstanceDynamic>> CroppedFaceSkins;
@@ -249,6 +274,7 @@ private:
     bool bAssembledPresentationReady = false;
     bool bAssembledWardrobeSuppressedForSafetyGear = false;
     bool bAssembledBodyUsesWetsuit = false;
+    bool bLocalizedPaddleGlovesReady = false;
     bool bAssembledFaceUsesCroppedSkin = false;
     float AssembledFaceCropHeightCm = 0.0f;
     static constexpr float BodyScale = 1.0f;

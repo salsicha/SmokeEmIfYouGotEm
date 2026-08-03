@@ -1273,6 +1273,18 @@ bool FRaftSimM5StartRescueCommand::Update()
                 *It->GetName(),
                 It->GetMaximumPaddleGripContactErrorCm()),
             It->GetMaximumPaddleGripContactErrorCm() <= 0.25f);
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("MetaHuman crew %s opposes its lower thumb pad on the shaft "
+                     "(error %.3f cm)"),
+                *It->GetName(),
+                It->GetMaximumPaddleThumbContactErrorCm()),
+            It->GetMaximumPaddleThumbContactErrorCm() <= 0.25f);
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("MetaHuman crew %s localizes its paddle-glove material to live hands"),
+                *It->GetName()),
+            It->HasLocalizedPaddleGloveMaterial());
     }
     Test->TestEqual(
         TEXT("assembled roster is all-or-nothing"),

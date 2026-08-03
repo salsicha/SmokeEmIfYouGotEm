@@ -30,6 +30,11 @@ DISTINCT_PADDLE_GRIPS_REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_distinct_paddle_grips_v2_review.json"
 )
+OPPOSED_THUMB_GLOVE_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_opposed_thumb_glove_v3_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -551,6 +556,8 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "MetaHumanVisual->GetSolvedHeadWorldLocation()" in host
     assert 'f"{stem}_full_profile"' in capture
     assert 'f"{stem}_full_rear"' in capture
+    assert 'f"{stem}_grip"' in capture
+    assert 'f"{stem}_grip_profile"' in capture
     assert "GetProductionHelmetHeadErrorCm() const" in host
     assert "GetProductionHelmetForwardAlignment() const" in host
     assert "GetProductionHelmetFitScale() const" in host
@@ -592,7 +599,7 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
         / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
         "RaftSimMetaHumanCrewVisualActor.h"
     ).read_text(encoding="utf-8")
-    assert "AssembledBody->SetMaterial(MaterialIndex, ProductionWetsuit)" in adapter
+    assert "AssembledBody->SetMaterial(MaterialIndex, WetsuitPresentationMaterial)" in adapter
     assert "bAssembledWardrobeSuppressedForSafetyGear &= !Component->IsVisible()" in adapter
     assert "bHasWardrobe && bHasHair && ReviewedHairMesh" in adapter
     assert "bHasEyebrows && bHasEyelashes" in adapter
@@ -633,8 +640,16 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "middle_metacarpal_%s" in adapter
     assert "GetMaximumPaddleGripAnchorErrorCm()" in automation
     assert "GetMaximumPaddleGripContactErrorCm()" in automation
+    assert "GetMaximumPaddleThumbContactErrorCm()" in automation
+    assert "HasLocalizedPaddleGloveMaterial()" in automation
     assert "ApplyFingerChainAroundGrip" in adapter
     assert "MeasurePaddleFingerContactErrorCm" in adapter
+    assert "MeasurePaddleThumbContactErrorCm" in adapter
+    assert "ApplyOpposedThumbPadToGrip" in adapter
+    assert "PaddleThumbPadCenterRadiusCm" in adapter
+    assert "UpdatePaddleGloveMaterial" in adapter
+    assert "LeftPaddleGloveCenterWS" in adapter
+    assert "RightPaddleGloveCenterWS" in adapter
     assert "FAnatomicalGripDigitProfile" in adapter
     assert "ResolveAnatomicalGripDigitProfile" in adapter
     assert "Profile.PadCenterRadiusCm" in adapter
@@ -647,6 +662,8 @@ def test_metahuman_roster_is_local_assembled_complete_and_fail_closed() -> None:
     assert "paddle_grip_contact_error_cm=" in capture
     assert "get_maximum_paddle_grip_contact_error_cm()" in capture
     assert "runtime_paddle_grip_contact_error_cm" in capture
+    assert "runtime_paddle_thumb_contact_error_cm" in capture
+    assert "runtime_localized_paddle_glove_material" in capture
     assert "%s_metacarpal_%s" in adapter
     assert "ThumbCurlDegrees" in adapter
     assert "{58.0f, 72.0f, 50.0f}" in adapter
@@ -911,6 +928,55 @@ def test_distinct_paddle_grips_v2_is_hash_verified_and_fail_closed() -> None:
     ) <= 0.25
 
     for evidence_set in ("baseline", "candidate"):
+        for path, expected_hash in review["renderer_evidence"][evidence_set].values():
+            assert _sha256(REPO_ROOT / path) == expected_hash
+
+    m5 = review["validation"]["m5"]
+    m5_path = REPO_ROOT / m5["report"]
+    assert _sha256(m5_path) == m5["report_sha256"]
+    m5_payload = json.loads(m5_path.read_text(encoding="utf-8-sig"))
+    assert m5_payload["succeeded"] == 1
+    assert m5_payload["succeededWithWarnings"] == 0
+    assert m5_payload["failed"] == 0
+
+    # Distinct Grip V2 is immutable historical evidence. V3 deliberately
+    # changes the same adapter, material authoring, renderer, and tests while
+    # preserving the V2 hashes as an auditable baseline.
+    for source_relpath, historical_hash in review["implementation_sha256"].items():
+        assert (REPO_ROOT / source_relpath).is_file()
+        assert len(historical_hash) == 64
+
+
+def test_opposed_thumb_glove_v3_is_hash_verified_and_fail_closed() -> None:
+    review = json.loads(
+        OPPOSED_THUMB_GLOVE_REVIEW_PATH.read_text(encoding="utf-8")
+    )
+    assert review["schema"] == "raftsim.m9.opposed_thumb_glove_review.v3"
+    assert review["passed"] is False
+    assert review["technical_candidate_passed"] is True
+    assert review["photoreal_acceptance_passed"] is False
+    assert review["human_approved"] is False
+    assert review["promotion_allowed"] is False
+    assert review["implementation"]["lower_opposed_thumb_hands"] == 5
+    assert review["implementation"]["localized_glove_material_characters"] == 5
+    assert review["implementation"]["measured_maximum_runtime_thumb_contact_error_cm"] <= 0.25
+    assert review["implementation"]["physics_or_gameplay_changes"] is False
+
+    roster_path = REPO_ROOT / review["runtime_roster_metrics"]["report"]
+    assert _sha256(roster_path) == review["runtime_roster_metrics"]["report_sha256"]
+    roster = json.loads(roster_path.read_text(encoding="utf-8"))
+    assert roster["status"] == "capture_complete"
+    assert roster["captured_character_count"] == 5
+    assert all(
+        character["runtime_localized_paddle_glove_material"]
+        for character in roster["characters"]
+    )
+    assert max(
+        character["runtime_paddle_thumb_contact_error_cm"]
+        for character in roster["characters"]
+    ) <= 0.25
+
+    for evidence_set in ("baseline", "candidate", "candidate_close"):
         for path, expected_hash in review["renderer_evidence"][evidence_set].values():
             assert _sha256(REPO_ROOT / path) == expected_hash
 

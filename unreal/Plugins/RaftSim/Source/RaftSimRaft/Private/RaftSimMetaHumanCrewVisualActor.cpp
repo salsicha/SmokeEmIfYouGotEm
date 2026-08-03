@@ -31,6 +31,7 @@ const TCHAR* EyeMaterialPath = TEXT(
     "MI_eye_eyeball_unified_MH_preset_left_right");
 const TCHAR* ProductionBuildRoot = TEXT(
     "/Game/RaftSim/Characters/Production/MetaHumans");
+constexpr float PaddleThumbPadCenterRadiusCm = 2.20f;
 // MetaHuman identity templates face +Y; RaftSim avatars, strokes and safety
 // gear face +X. Rotate the reference bone bases without rotating solved joint
 // locations, preserving the host's centimetre-space pose contract.
@@ -416,6 +417,7 @@ void ARaftSimMetaHumanCrewVisualActor::ResetAssembledCharacter()
     bAssembledPresentationReady = false;
     bAssembledWardrobeSuppressedForSafetyGear = false;
     bAssembledBodyUsesWetsuit = false;
+    bLocalizedPaddleGlovesReady = false;
     bAssembledFaceUsesCroppedSkin = false;
     AssembledFaceCropHeightCm = 0.0f;
     AssembledBody = nullptr;
@@ -423,6 +425,7 @@ void ARaftSimMetaHumanCrewVisualActor::ResetAssembledCharacter()
     ReferenceAssembledFaceHeadComponentTransform = FTransform::Identity;
     AssembledFaceComponentScale = FVector::OneVector;
     CroppedFaceSkins.Reset();
+    WetsuitPresentationMaterial = nullptr;
     if (Face)
     {
         Face->SetVisibility(false, true);
@@ -642,14 +645,24 @@ bool ARaftSimMetaHumanCrewVisualActor::TryActivateAssembledCharacter()
         ResetAssembledCharacter();
         return false;
     }
+    WetsuitPresentationMaterial = UMaterialInstanceDynamic::Create(
+        ProductionWetsuit,
+        this,
+        TEXT("RaftSimWetsuitWithPaddleGloves"));
+    if (!WetsuitPresentationMaterial)
+    {
+        ResetAssembledCharacter();
+        return false;
+    }
     for (int32 MaterialIndex = 0;
          MaterialIndex < AssembledBody->GetNumMaterials();
          ++MaterialIndex)
     {
-        AssembledBody->SetMaterial(MaterialIndex, ProductionWetsuit);
+        AssembledBody->SetMaterial(MaterialIndex, WetsuitPresentationMaterial);
     }
     bAssembledBodyUsesWetsuit =
-        AssembledBody->GetMaterial(0) == ProductionWetsuit;
+        AssembledBody->GetMaterial(0) == WetsuitPresentationMaterial &&
+        WetsuitPresentationMaterial->Parent == ProductionWetsuit;
     int32 CroppedSkinSlotCount = 0;
     const float CropHeightCm =
         ReferenceAssembledFaceHeadComponentTransform.GetLocation().Z - 10.0f;
@@ -857,7 +870,19 @@ bool ARaftSimMetaHumanCrewVisualActor::EnsureAssetsLoaded()
         Face->SetVisibility(false, true);
         return false;
     }
-    Body->SetMaterial(0, WetsuitMaterial);
+    if (!WetsuitPresentationMaterial ||
+        WetsuitPresentationMaterial->Parent != WetsuitMaterial)
+    {
+        WetsuitPresentationMaterial = UMaterialInstanceDynamic::Create(
+            WetsuitMaterial,
+            this,
+            TEXT("RaftSimDiagnosticWetsuitWithPaddleGloves"));
+    }
+    Body->SetMaterial(
+        0,
+        WetsuitPresentationMaterial
+            ? static_cast<UMaterialInterface*>(WetsuitPresentationMaterial.Get())
+            : WetsuitMaterial);
 
     if (!FaceSkin || FaceSkin->Parent != SkinMaterial)
     {
@@ -1161,6 +1186,10 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPos
     MaximumPaddleGripContactErrorCm = Pose.bShowPaddle
         ? MeasurePaddleFingerContactErrorCm(Pose)
         : 0.0f;
+    MaximumPaddleThumbContactErrorCm = Pose.bShowPaddle
+        ? MeasurePaddleThumbContactErrorCm(Pose)
+        : 0.0f;
+    UpdatePaddleGloveMaterial();
     if (bUsingAssembledCharacter)
     {
         UpdateRigidAssembledFace();
@@ -1308,6 +1337,41 @@ float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleFingerContactErrorCm(
                 MaximumErrorCm,
                 FMath::Abs(RadialDistanceCm - Profile.PadCenterRadiusCm));
         }
+    }
+    return MaximumErrorCm;
+}
+
+float ARaftSimMetaHumanCrewVisualActor::MeasurePaddleThumbContactErrorCm(
+    const FRaftSimCrewAvatarPose& Pose) const
+{
+    if (!Body || !Pose.bShowPaddle)
+    {
+        return 0.0f;
+    }
+    float MaximumErrorCm = 0.0f;
+    for (const bool bLeft : {true, false})
+    {
+        const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        if (FVector::DistSquared(GripCenterCm, Pose.PaddleTopCm) <= 4.0f)
+        {
+            continue;
+        }
+        const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+        const FName ThumbPadName(*FString::Printf(TEXT("thumb_03_%s"), Side));
+        if (Body->GetBoneIndex(ThumbPadName) == INDEX_NONE)
+        {
+            return TNumericLimits<float>::Max();
+        }
+        const FVector GripAxis = ResolvePaddleGripAxis(Pose, GripCenterCm);
+        const FVector ThumbPadCm = Body->GetBoneTransformByName(
+            ThumbPadName,
+            EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+        const float RadialDistanceCm = FVector::VectorPlaneProject(
+            ThumbPadCm - GripCenterCm,
+            GripAxis).Size();
+        MaximumErrorCm = FMath::Max(
+            MaximumErrorCm,
+            FMath::Abs(RadialDistanceCm - PaddleThumbPadCenterRadiusCm));
     }
     return MaximumErrorCm;
 }
@@ -1472,6 +1536,89 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyFingerChainAroundGrip(
     }
 }
 
+void ARaftSimMetaHumanCrewVisualActor::ApplyOpposedThumbPadToGrip(
+    bool bLeft,
+    const FVector& GripCenterCm,
+    const FVector& GripAxis)
+{
+    if (!Body)
+    {
+        return;
+    }
+    const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+    const FName SecondName(*FString::Printf(TEXT("thumb_02_%s"), Side));
+    const FName ThirdName(*FString::Printf(TEXT("thumb_03_%s"), Side));
+    if (Body->GetBoneIndex(SecondName) == INDEX_NONE ||
+        Body->GetBoneIndex(ThirdName) == INDEX_NONE)
+    {
+        return;
+    }
+    const FVector SafeGripAxis = GripAxis.GetSafeNormal();
+    const FTransform CurrentSecond = Body->GetBoneTransformByName(
+        SecondName,
+        EBoneSpaces::ComponentSpace);
+    const FTransform CurrentThird = Body->GetBoneTransformByName(
+        ThirdName,
+        EBoneSpaces::ComponentSpace);
+    const FVector SecondCm = CurrentSecond.GetLocation() * BodyScale;
+    const FVector CurrentPadCm = CurrentThird.GetLocation() * BodyScale;
+    FVector PadRadialDirection = FVector::VectorPlaneProject(
+        CurrentPadCm - GripCenterCm,
+        SafeGripAxis).GetSafeNormal();
+    if (SafeGripAxis.IsNearlyZero() || PadRadialDirection.IsNearlyZero())
+    {
+        return;
+    }
+
+    // Preserve the authored thumb base and its side of the shaft, then bring
+    // only the distal pad onto the neoprene/paddle contact radius. Solving one
+    // distal segment avoids the rejected full radial thumb cage, which read as
+    // an oval loop, while retaining an unmistakably opposed fifth digit.
+    const float AxialOffsetCm = FVector::DotProduct(
+        CurrentPadCm - GripCenterCm,
+        SafeGripAxis);
+    const FVector TargetPadCm =
+        GripCenterCm + SafeGripAxis * AxialOffsetCm +
+        PadRadialDirection * PaddleThumbPadCenterRadiusCm;
+    SetSegmentBone(SecondName, ThirdName, SecondCm, TargetPadCm);
+    FTransform TargetThird = CurrentThird;
+    TargetThird.SetLocation(ToMeshSpace(TargetPadCm));
+    SetDrivenBoneTransform(ThirdName, TargetThird);
+}
+
+void ARaftSimMetaHumanCrewVisualActor::UpdatePaddleGloveMaterial()
+{
+    bLocalizedPaddleGlovesReady = false;
+    if (!Body || !WetsuitPresentationMaterial)
+    {
+        return;
+    }
+    const FName LeftPalmName(TEXT("middle_metacarpal_l"));
+    const FName RightPalmName(TEXT("middle_metacarpal_r"));
+    if (Body->GetBoneIndex(LeftPalmName) == INDEX_NONE ||
+        Body->GetBoneIndex(RightPalmName) == INDEX_NONE)
+    {
+        return;
+    }
+    const FVector LeftCenterWorld = Body->GetBoneTransformByName(
+        LeftPalmName,
+        EBoneSpaces::WorldSpace).GetLocation();
+    const FVector RightCenterWorld = Body->GetBoneTransformByName(
+        RightPalmName,
+        EBoneSpaces::WorldSpace).GetLocation();
+    if (LeftCenterWorld.ContainsNaN() || RightCenterWorld.ContainsNaN())
+    {
+        return;
+    }
+    WetsuitPresentationMaterial->SetVectorParameterValue(
+        TEXT("LeftPaddleGloveCenterWS"),
+        FLinearColor(LeftCenterWorld.X, LeftCenterWorld.Y, LeftCenterWorld.Z, 1.0f));
+    WetsuitPresentationMaterial->SetVectorParameterValue(
+        TEXT("RightPaddleGloveCenterWS"),
+        FLinearColor(RightCenterWorld.X, RightCenterWorld.Y, RightCenterWorld.Z, 1.0f));
+    bLocalizedPaddleGlovesReady = true;
+}
+
 void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(
     const FRaftSimCrewAvatarPose& Pose)
 {
@@ -1508,6 +1655,9 @@ void ARaftSimMetaHumanCrewVisualActor::ApplyPaddleGripPose(
             ApplyFingerChainAroundGrip(
                 bLeft, Digit, GripCenterCm, GripAxis);
         }
+        Body->RefreshBoneTransforms();
+        ApplyOpposedThumbPadToGrip(
+            bLeft, GripCenterCm, GripAxis);
     }
 }
 

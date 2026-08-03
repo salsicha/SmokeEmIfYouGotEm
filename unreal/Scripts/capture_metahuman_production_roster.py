@@ -317,6 +317,8 @@ def main() -> None:
                 or not visual_actor.has_articulated_paddle_grip_rig()
                 or visual_actor.get_maximum_paddle_grip_anchor_error_cm() > 0.25
                 or visual_actor.get_maximum_paddle_grip_contact_error_cm() > 0.25
+                or visual_actor.get_maximum_paddle_thumb_contact_error_cm() > 0.25
+                or not visual_actor.has_localized_paddle_glove_material()
                 or not visual_actor.is_assembled_body_using_wetsuit()
                 or not visual_actor.is_assembled_face_using_cropped_skin()
                 or not visual_actor.is_assembled_wardrobe_suppressed_for_safety_gear()
@@ -354,7 +356,11 @@ def main() -> None:
                     f"paddle_grip_anchor_error_cm="
                     f"{visual_actor.get_maximum_paddle_grip_anchor_error_cm():.3f}, "
                     f"paddle_grip_contact_error_cm="
-                    f"{visual_actor.get_maximum_paddle_grip_contact_error_cm():.3f}"
+                    f"{visual_actor.get_maximum_paddle_grip_contact_error_cm():.3f}, "
+                    f"paddle_thumb_contact_error_cm="
+                    f"{visual_actor.get_maximum_paddle_thumb_contact_error_cm():.3f}, "
+                    f"localized_paddle_gloves="
+                    f"{visual_actor.has_localized_paddle_glove_material()}"
                 )
             skeletal_components = []
             wardrobe_mesh_count = 0
@@ -497,6 +503,30 @@ def main() -> None:
                 world, capture_component, render_target, f"{stem}_full_rear"
             )
 
+            # A full-body frame cannot prove finger/thumb contact at release
+            # review scale. Keep two fixed close views centred on the solved
+            # seated grip envelope so the transverse T-grip, lower shaft hand,
+            # opposed thumb, wrist transition, and localized glove material
+            # remain directly comparable across identities and revisions.
+            grip_target = actor.get_actor_location() + unreal.Vector(
+                33.0, 0.0, 49.0
+            )
+            grip_location = grip_target + unreal.Vector(150.0, 0.0, 12.0)
+            capture.set_actor_location(grip_location, False, False)
+            capture.set_actor_rotation(look_at(grip_location, grip_target), False)
+            capture_component.set_editor_property("fov_angle", 28.0)
+            grip_path = export_capture(
+                world, capture_component, render_target, f"{stem}_grip"
+            )
+            grip_profile_location = grip_target + unreal.Vector(0.0, 145.0, 8.0)
+            capture.set_actor_location(grip_profile_location, False, False)
+            capture.set_actor_rotation(
+                look_at(grip_profile_location, grip_target), False
+            )
+            grip_profile_path = export_capture(
+                world, capture_component, render_target, f"{stem}_grip_profile"
+            )
+
             portrait_target = visual_actor.get_solved_head_world_location()
             portrait_location = unreal.Vector(
                 origin.x + 185.0,
@@ -632,6 +662,12 @@ def main() -> None:
                     "runtime_paddle_grip_contact_error_cm": (
                         visual_actor.get_maximum_paddle_grip_contact_error_cm()
                     ),
+                    "runtime_paddle_thumb_contact_error_cm": (
+                        visual_actor.get_maximum_paddle_thumb_contact_error_cm()
+                    ),
+                    "runtime_localized_paddle_glove_material": (
+                        visual_actor.has_localized_paddle_glove_material()
+                    ),
                     "runtime_hair_uses_cards": runtime_hair_uses_cards,
                     "runtime_hair_forced_lod": runtime_hair_forced_lod,
                     "runtime_hair_mesh_fallback": (
@@ -743,6 +779,10 @@ def main() -> None:
                     "full_profile_capture_sha256": sha256(full_profile_path),
                     "full_rear_capture": str(full_rear_path),
                     "full_rear_capture_sha256": sha256(full_rear_path),
+                    "grip_capture": str(grip_path),
+                    "grip_capture_sha256": sha256(grip_path),
+                    "grip_profile_capture": str(grip_profile_path),
+                    "grip_profile_capture_sha256": sha256(grip_profile_path),
                     "portrait_capture": str(portrait_path),
                     "portrait_capture_sha256": sha256(portrait_path),
                     "profile_capture": str(profile_path),
