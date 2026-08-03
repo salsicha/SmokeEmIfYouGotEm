@@ -646,9 +646,10 @@ FSouthForkAeratedWaterOverlaySample ComputeSouthForkAeratedWaterOverlaySample(
     }
 
     // A pair of incommensurate river-coordinate phases produces bounded
-    // crest shoulders instead of lifting the complete solver cell into a
-    // translucent slab. The overlay stays under 56 cm, carries no collision,
-    // and leaves the original water surface and solver arrays untouched.
+    // crest shoulders without lifting refined mesh facets into white polygon
+    // fins. The broad water already carries hydraulic micro-relief, so this
+    // overlay needs only a shallow separation (under 14 cm) to avoid z-fight;
+    // it carries no collision and leaves the water/solver arrays untouched.
     const float PhaseWarp =
         0.31f * FMath::Sin(StationM * 0.113f - LateralM * 0.071f);
     const float CrestPulse = 0.5f + 0.5f * FMath::Sin(
@@ -668,10 +669,10 @@ FSouthForkAeratedWaterOverlaySample ComputeSouthForkAeratedWaterOverlaySample(
         0.88f);
     Sample.VerticalDisplacementCm = FMath::Clamp(
         Authority *
-            (8.0f + 26.0f * SolverFoam + 22.0f * CrestPulse) *
+            (2.5f + 6.5f * SolverFoam + 5.0f * CrestPulse) *
             (0.42f + 0.58f * LaceCoverage),
         0.0f,
-        56.0f);
+        14.0f);
     Sample.Color = FMath::Lerp(
         FLinearColor(0.72f, 0.78f, 0.79f, 1.0f),
         FLinearColor(0.96f, 0.99f, 1.0f, 1.0f),
@@ -720,17 +721,54 @@ bool BuildSouthForkRefinedWhitewaterOverlayGeometry(
         OutColors[Index] = Sample.Color;
     }
 
-    OutTriangles.Reset();
-    OutTriangles.Reserve((OutWidth - 1) * (OutHeight - 1));
+    const int32 CellWidth = OutWidth - 1;
+    const int32 CellHeight = OutHeight - 1;
+    const int32 CellCount = CellWidth * CellHeight;
+    TArray<uint8> ActiveCells;
+    ActiveCells.Init(0, CellCount);
+    TArray<uint8> OverlayCells;
+    OverlayCells.Init(0, CellCount);
+
+    const auto CellIndex = [CellWidth](int32 Row, int32 Column)
+    {
+        return Row * CellWidth + Column;
+    };
+    const auto IsWetSupportedCell = [&HydraulicPresentation, &ShorelineDepthsM,
+                                     OutWidth](int32 Row, int32 Column)
+    {
+        const int32 I0 = Row * OutWidth + Column;
+        const int32 I1 = I0 + 1;
+        const int32 I2 = I0 + OutWidth;
+        const int32 I3 = I2 + 1;
+        const int32 CellVertices[] = {I0, I1, I2, I3};
+        for (const int32 VertexIndex : CellVertices)
+        {
+            if (HydraulicPresentation[VertexIndex].A < 0.90f ||
+                ShorelineDepthsM[VertexIndex] <= 0.10f)
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // Admission is cell-based, never triangle-based. This preserves the
+    // established solver-derived thresholds while preventing a single half of
+    // a refined quad from exposing its diagonal as a bright tessellated shard.
     for (int32 Row = 0; Row < OutHeight - 1; ++Row)
     {
         for (int32 Column = 0; Column < OutWidth - 1; ++Column)
         {
+            if (!IsWetSupportedCell(Row, Column))
+            {
+                continue;
+            }
             const int32 I0 = Row * OutWidth + Column;
             const int32 I1 = I0 + 1;
             const int32 I2 = I0 + OutWidth;
             const int32 I3 = I2 + 1;
             const int32 CellTriangles[] = {I0, I1, I2, I1, I3, I2};
+            bool bCellIsActive = false;
             for (int32 Triangle = 0; Triangle < 6; Triangle += 3)
             {
                 const int32 A = CellTriangles[Triangle];
@@ -742,9 +780,70 @@ bool BuildSouthForkRefinedWhitewaterOverlayGeometry(
                     (OutColors[A].A + OutColors[B].A + OutColors[C].A) / 3.0f;
                 if (MaximumOpacity >= 0.025f && MeanOpacity >= 0.006f)
                 {
-                    OutTriangles.Append({A, B, C});
+                    bCellIsActive = true;
+                    break;
                 }
             }
+            if (bCellIsActive)
+            {
+                ActiveCells[CellIndex(Row, Column)] = 1;
+            }
+        }
+    }
+
+    // Retain two one-metre cells of wet, zero-alpha-capable support around the
+    // active field. Vertex opacity and the project-owned foam lace can then
+    // fade to nothing before geometry ends; padding cannot cross onto dry or
+    // shoreline-clipped terrain and never creates foam in calm water.
+    constexpr int32 TransparentPaddingCells = 2;
+    for (int32 Row = 0; Row < CellHeight; ++Row)
+    {
+        for (int32 Column = 0; Column < CellWidth; ++Column)
+        {
+            if (ActiveCells[CellIndex(Row, Column)] == 0)
+            {
+                continue;
+            }
+            for (int32 RowOffset = -TransparentPaddingCells;
+                 RowOffset <= TransparentPaddingCells;
+                 ++RowOffset)
+            {
+                const int32 PaddedRow = Row + RowOffset;
+                if (PaddedRow < 0 || PaddedRow >= CellHeight)
+                {
+                    continue;
+                }
+                for (int32 ColumnOffset = -TransparentPaddingCells;
+                     ColumnOffset <= TransparentPaddingCells;
+                     ++ColumnOffset)
+                {
+                    const int32 PaddedColumn = Column + ColumnOffset;
+                    if (PaddedColumn < 0 || PaddedColumn >= CellWidth ||
+                        !IsWetSupportedCell(PaddedRow, PaddedColumn))
+                    {
+                        continue;
+                    }
+                    OverlayCells[CellIndex(PaddedRow, PaddedColumn)] = 1;
+                }
+            }
+        }
+    }
+
+    OutTriangles.Reset();
+    OutTriangles.Reserve(CellCount * 6);
+    for (int32 Row = 0; Row < CellHeight; ++Row)
+    {
+        for (int32 Column = 0; Column < CellWidth; ++Column)
+        {
+            if (OverlayCells[CellIndex(Row, Column)] == 0)
+            {
+                continue;
+            }
+            const int32 I0 = Row * OutWidth + Column;
+            const int32 I1 = I0 + 1;
+            const int32 I2 = I0 + OutWidth;
+            const int32 I3 = I2 + 1;
+            OutTriangles.Append({I0, I1, I2, I1, I3, I2});
         }
     }
     return true;

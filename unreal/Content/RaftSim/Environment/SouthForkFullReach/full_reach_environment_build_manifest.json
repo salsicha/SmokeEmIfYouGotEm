@@ -16,7 +16,9 @@
 	"solver_and_guide_conditioned_whitewater_foam_overlays": true,
 	"whitewater_foam_overlays_affect_gameplay_collision": false,
 	"whitewater_foam_overlays_affect_hydraulics": false,
-	"whitewater_foam_overlay_rule": "one-metre refined non-colliding aerated presentation sheet emitted only over positive solver-derived or review-gated guide-feature-conditioned cells; calm-water opacity and displacement are exactly zero; maximum vertical displacement 0.56 m",
+	"whitewater_foam_overlay_rule": "one-metre refined non-colliding aerated presentation sheet emitted only as complete paired quads over positive solver-derived or review-gated guide-feature-conditioned cells; two wet-supported transparent padding cells place geometry edges outside the visible project-owned foam lace and never cross shoreline-clipped terrain; calm-water opacity and displacement are exactly zero; shallow overlay separation is capped at 0.14 m above the broad hydraulic micro-relief to prevent polygon fins",
+	"whitewater_foam_complete_paired_quad_topology": true,
+	"whitewater_foam_transparent_padding_cells": 2,
 	"whitewater_guide_feature_geometry_authority": "procedural_infill_interpreted_from_guide_inventory_pending_human_review",
 	"terminal_visual_water_continuation": true,
 	"terminal_visual_water_affects_gameplay_collision": false,
@@ -50,7 +52,7 @@
 		"affects_gameplay_collision": false,
 		"affects_hydraulics": false
 	},
-	"detailed_mesh_reuse_requested": true,
+	"detailed_mesh_reuse_requested": false,
 	"capture_set_complete": true,
 	"hlod_generation_complete": false,
 	"hlod_status": "ready_for_WorldPartitionHLODsBuilder_commandlet",
@@ -65,7 +67,7 @@
 		"far_field_patches": 8,
 		"terrain_triangles": 1467648,
 		"water_triangles": 4161045,
-		"whitewater_foam_triangles": 382231,
+		"whitewater_foam_triangles": 534958,
 		"procedural_shoreline_completion_vertices": 10892,
 		"procedural_shoreline_transition_cells": 86243,
 		"terminal_visual_water_triangles": 720,
@@ -85,10 +87,10 @@
 		"local_reflection_probes": 13
 	},
 	"captures": [
-		"docs/environment-captures/south_fork_full_reach/chili_bar_launch_downstream.png",
-		"docs/environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png",
-		"docs/environment-captures/south_fork_full_reach/troublemaker_approach.png",
-		"docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
-		"docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png"
+		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/chili_bar_launch_downstream.png",
+		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/meat_grinder_guide_eye.png",
+		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/troublemaker_approach.png",
+		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/coloma_bridge_context.png",
+		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/salmon_falls_takeout.png"
 	]
 }

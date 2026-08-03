@@ -263,7 +263,7 @@ bool FRaftSimSouthForkShorelinePresentationTest::RunTest(const FString& Paramete
         TEXT("Positive solver foam produces a visible bounded overlay"),
         AeratedOverlay.Opacity > 0.5f &&
             AeratedOverlay.VerticalDisplacementCm > 0.0f &&
-            AeratedOverlay.VerticalDisplacementCm <= 48.0f);
+            AeratedOverlay.VerticalDisplacementCm <= 14.0f);
     TestTrue(
         TEXT("Aerated overlay sampling is deterministic"),
         FMath::IsNearlyEqual(
@@ -276,6 +276,93 @@ bool FRaftSimSouthForkShorelinePresentationTest::RunTest(const FString& Paramete
         TEXT("Overlay color alpha carries the computed opacity"),
         AeratedOverlay.Color.A,
         AeratedOverlay.Opacity);
+
+    constexpr int32 OverlayBaseWidth = 4;
+    constexpr int32 OverlayBaseHeight = 4;
+    TArray<FVector> OverlayBaseVertices;
+    TArray<FVector2D> OverlayBaseUvs;
+    TArray<FLinearColor> OverlayBaseHydraulics;
+    TArray<float> OverlayBaseDepths;
+    for (int32 Row = 0; Row < OverlayBaseHeight; ++Row)
+    {
+        for (int32 Column = 0; Column < OverlayBaseWidth; ++Column)
+        {
+            OverlayBaseVertices.Add(FVector(Column * 200.0f, Row * 200.0f, 0.0f));
+            OverlayBaseUvs.Add(FVector2D(Column, Row));
+            const bool bFoamCore =
+                (Row == 1 || Row == 2) && (Column == 1 || Column == 2);
+            OverlayBaseHydraulics.Add(FLinearColor(
+                bFoamCore ? 0.95f : 0.0f, 0.55f, 0.85f, 1.0f));
+            OverlayBaseDepths.Add(1.5f);
+        }
+    }
+    TArray<FVector> OverlayVertices;
+    TArray<int32> OverlayTriangles;
+    TArray<FVector2D> OverlayUvs;
+    TArray<FLinearColor> OverlayColors;
+    int32 OverlayWidth = 0;
+    int32 OverlayHeight = 0;
+    TestTrue(
+        TEXT("Refined aerated overlay geometry accepts an aligned wet grid"),
+        BuildSouthForkRefinedWhitewaterOverlayGeometry(
+            OverlayBaseVertices,
+            OverlayBaseUvs,
+            OverlayBaseHydraulics,
+            OverlayBaseDepths,
+            OverlayBaseWidth,
+            OverlayBaseHeight,
+            OverlayVertices,
+            OverlayTriangles,
+            OverlayUvs,
+            OverlayColors,
+            OverlayWidth,
+            OverlayHeight));
+    TestTrue(
+        TEXT("Refined aerated overlay emits bounded whole quad pairs"),
+        OverlayTriangles.Num() > 0 &&
+            OverlayTriangles.Num() % 6 == 0 &&
+            OverlayTriangles.Num() <=
+                (OverlayWidth - 1) * (OverlayHeight - 1) * 6);
+    for (int32 TriangleIndex = 0;
+         TriangleIndex + 5 < OverlayTriangles.Num();
+         TriangleIndex += 6)
+    {
+        const int32 I0 = OverlayTriangles[TriangleIndex];
+        const int32 I1 = OverlayTriangles[TriangleIndex + 1];
+        const int32 I2 = OverlayTriangles[TriangleIndex + 2];
+        TestTrue(
+            TEXT("Every admitted aerated cell contains both matching triangles"),
+            I1 == I0 + 1 &&
+                I2 == I0 + OverlayWidth &&
+                OverlayTriangles[TriangleIndex + 3] == I1 &&
+                OverlayTriangles[TriangleIndex + 4] == I2 + 1 &&
+                OverlayTriangles[TriangleIndex + 5] == I2);
+    }
+
+    TArray<FLinearColor> CalmOverlayHydraulics;
+    CalmOverlayHydraulics.Init(
+        FLinearColor(0.0f, 0.55f, 0.85f, 1.0f),
+        OverlayBaseWidth * OverlayBaseHeight);
+    TArray<int32> CalmOverlayTriangles;
+    TestTrue(
+        TEXT("Refined calm overlay geometry accepts an aligned wet grid"),
+        BuildSouthForkRefinedWhitewaterOverlayGeometry(
+            OverlayBaseVertices,
+            OverlayBaseUvs,
+            CalmOverlayHydraulics,
+            OverlayBaseDepths,
+            OverlayBaseWidth,
+            OverlayBaseHeight,
+            OverlayVertices,
+            CalmOverlayTriangles,
+            OverlayUvs,
+            OverlayColors,
+            OverlayWidth,
+            OverlayHeight));
+    TestEqual(
+        TEXT("Transparent padding cannot create geometry in calm water"),
+        CalmOverlayTriangles.Num(),
+        0);
 
     return !HasAnyErrors();
 }

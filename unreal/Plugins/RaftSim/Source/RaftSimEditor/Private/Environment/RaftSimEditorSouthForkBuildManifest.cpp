@@ -50,7 +50,11 @@ bool WriteSouthForkFullReachBuildManifest(
         TEXT("whitewater_foam_overlays_affect_hydraulics"), false);
     BuildRoot->SetStringField(
         TEXT("whitewater_foam_overlay_rule"),
-        TEXT("one-metre refined non-colliding aerated presentation sheet emitted only over positive solver-derived or review-gated guide-feature-conditioned cells; calm-water opacity and displacement are exactly zero; maximum vertical displacement 0.56 m"));
+        TEXT("one-metre refined non-colliding aerated presentation sheet emitted only as complete paired quads over positive solver-derived or review-gated guide-feature-conditioned cells; two wet-supported transparent padding cells place geometry edges outside the visible project-owned foam lace and never cross shoreline-clipped terrain; calm-water opacity and displacement are exactly zero; shallow overlay separation is capped at 0.14 m above the broad hydraulic micro-relief to prevent polygon fins"));
+    BuildRoot->SetBoolField(
+        TEXT("whitewater_foam_complete_paired_quad_topology"), true);
+    BuildRoot->SetNumberField(
+        TEXT("whitewater_foam_transparent_padding_cells"), 2);
     BuildRoot->SetStringField(
         TEXT("whitewater_guide_feature_geometry_authority"),
         TEXT("procedural_infill_interpreted_from_guide_inventory_pending_human_review"));
