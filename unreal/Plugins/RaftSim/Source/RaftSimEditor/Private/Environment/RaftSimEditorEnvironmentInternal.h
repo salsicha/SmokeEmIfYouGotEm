@@ -1033,6 +1033,9 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
 
 UMaterial* LoadOrCreateChilkoLavaCanyonWaterParent(FString& OutSummary);
 
+UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
+    FString& OutSummary);
+
 UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary);
 
 UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
@@ -2730,6 +2733,7 @@ bool BuildSouthForkWaterTextureAssets();
 bool BuildPacuareUpperHuacasWaterTextureAssets();
 bool BuildColoradoHanceWaterTextureAssets();
 bool BuildFutaleufuTerminatorWaterTextureAssets();
+bool BuildChilkoLavaCanyonWaterTextureAssets();
 bool BuildZambeziBatokaWaterTextureAssets();
 bool BuildCrewSkinTextureAssets();
 bool BuildEquipmentTextileTextureAssets();

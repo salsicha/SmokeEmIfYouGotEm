@@ -1,0 +1,27 @@
+{
+  "schema": "raftsim.first_party.generated_texture_provenance.v1",
+  "asset_id": "chilko_lava_canyon_foam_lace_v1",
+  "asset_role": "visual-only whitewater breakup mask multiplied by solver-authored aeration; no hydraulic, collision, wet-mask, bathymetry, or raft-force authority",
+  "generator": "OpenAI built-in image generation",
+  "generation_date_utc": "2026-08-03",
+  "generation_mode": "new image",
+  "generation_method": "project-directed generation of an orthographic sparse Chilko whitewater lace and entrained-air mask",
+  "prompt": "Use case: stylized-concept. Asset type: tileable grayscale breakup-mask texture for an Unreal Engine solver-driven whitewater material. Primary request: create a seamless square foam-lace breakup mask inspired by the cold, clear, fast Chilko River through Lava Canyon in British Columbia. Subject: sparse irregular branching whitewater lace, long torn downstream streaks, broken scalloped standing-wave crests, turbulent holes, detached entrained-air flecks, and small bubble clusters with large connected black open-water regions; a strong downstream direction with enough cross-current breakup to avoid stripes. Style/medium: physically plausible monochrome data texture, pure black background, white and mid-gray foam filaments, high dynamic range, crisp major strands with softer fine bubbles. Composition/framing: orthographic top-down data texture only, fills the square, seamless-looking on all four edges, no single focal feature. Constraints: mask data only; black must dominate at least 72 percent; no water color, no normal-map colors, no riverbank, no rocks, no horizon, no perspective, no baked lighting, no shadows, no text, no logos, no watermark. Avoid closed cellular honeycomb cracks, regular sine bands, radial spirals, thick smoke clouds, repeated motifs, and obvious tiling seams.",
+  "project_ownership": "first-party generated project asset",
+  "texture": {
+    "path": "unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/T_RaftSim_ChilkoLavaCanyon_FoamLaceV1.png",
+    "sha256": "961e52ed6a57cd7b34a7369008e6d5cd0646c579147159fe3f0960006ccbed8e",
+    "width": 1254,
+    "height": 1254,
+    "encoding": "RGB grayscale breakup mask sampled from the red channel",
+    "addressing": "mirror_x_mirror_y",
+    "srgb": false,
+    "compression": "mask"
+  },
+  "limitations": [
+    "The asset is procedural visual infill rather than measured Chilko foam imagery or rapid-specific calibration.",
+    "Mirrored GPU addressing is required because opposite source-image borders are not byte-identical.",
+    "The material must multiply this texture by solver-derived foam and speed channels so it cannot paint whitewater into calm or dry cells.",
+    "In-engine visual, guide, water-VFX, and target-hardware acceptance remain required."
+  ]
+}

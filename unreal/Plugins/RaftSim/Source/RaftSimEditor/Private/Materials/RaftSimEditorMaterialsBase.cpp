@@ -3106,13 +3106,17 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         Spec.RiverId == TEXT("colorado_river");
     const bool bUsesFutaleufuRiverLocalFlowNormal =
         Spec.RiverId == TEXT("futaleufu_terminator");
+    const bool bUsesChilkoRiverLocalFlowNormal =
+        Spec.RiverId == TEXT("chilko_river_lava_canyon");
     const FString NormalAtlasName = bUsesColoradoRiverLocalFlowNormal
         ? TEXT("T_RaftSim_ColoradoHanceWaterV1_FlowNormal")
         : (bUsesFutaleufuRiverLocalFlowNormal
         ? TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")
+        : (bUsesChilkoRiverLocalFlowNormal
+        ? TEXT("T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal")
         : FString::Printf(
               TEXT("T_RaftSim_%s_NormalAtlas"),
-              *WaterNormalAssetName));
+              *WaterNormalAssetName)));
     const FString NormalAtlasObjectPath = bUsesColoradoRiverLocalFlowNormal
         ? FString::Printf(
               TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Textures/%s.%s"),
@@ -3123,10 +3127,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
               TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/%s.%s"),
               *NormalAtlasName,
               *NormalAtlasName)
+        : (bUsesChilkoRiverLocalFlowNormal
+        ? FString::Printf(
+              TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Textures/%s.%s"),
+              *NormalAtlasName,
+              *NormalAtlasName)
         : FString::Printf(
               TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
               *NormalAtlasName,
-              *NormalAtlasName));
+              *NormalAtlasName)));
     UTexture2D* WaterNormalAtlas = LoadObject<UTexture2D>(nullptr, *NormalAtlasObjectPath);
     if (!WaterNormalAtlas)
     {
@@ -3248,13 +3257,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetScalar(TEXT("Roughness"), Settings.Roughness);
     SetScalar(TEXT("Specular"), Settings.Specular);
     SetScalar(TEXT("NormalIntensity"), Settings.NormalIntensity);
-    if (bUseSingleLayerWater || bUseIsolatedZambeziParent)
+    if (bUseSingleLayerWater || bUseIsolatedZambeziParent ||
+        bUsesChilkoRiverLocalFlowNormal)
     {
         SetScalar(
             TEXT("SurfaceVariationStrength"),
             Settings.SurfaceVariationStrength);
     }
-    if (bUseSingleLayerWater || bUsesColoradoRiverLocalFlowNormal)
+    if (bUseSingleLayerWater || bUsesColoradoRiverLocalFlowNormal ||
+        bUsesFutaleufuRiverLocalFlowNormal || bUsesChilkoRiverLocalFlowNormal)
     {
         SetScalar(TEXT("Opacity"), Settings.Opacity);
         SetScalar(TEXT("RefractionIor"), Settings.RefractionIor);
@@ -3276,12 +3287,14 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetVector(TEXT("ReflectionTint"), Settings.ReflectionTint);
     SetVector(
         TEXT("AtlasTileOrigin"),
-        (bUsesColoradoRiverLocalFlowNormal || bUsesFutaleufuRiverLocalFlowNormal)
+        (bUsesColoradoRiverLocalFlowNormal || bUsesFutaleufuRiverLocalFlowNormal ||
+         bUsesChilkoRiverLocalFlowNormal)
             ? FLinearColor(0.0f, 0.0f, 0.0f, 0.0f)
             : FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
     SetVector(
         TEXT("AtlasTileScale"),
-        (bUsesColoradoRiverLocalFlowNormal || bUsesFutaleufuRiverLocalFlowNormal)
+        (bUsesColoradoRiverLocalFlowNormal || bUsesFutaleufuRiverLocalFlowNormal ||
+         bUsesChilkoRiverLocalFlowNormal)
             ? FLinearColor(1.0f, 1.0f, 0.0f, 0.0f)
             : FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
     Instance->SetTextureParameterValueEditorOnly(
@@ -3315,7 +3328,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         TEXT("Built %s %s %s solver-surface water candidate (roughness %.3f, opacity %.3f, normal %.3f, solver field %.0f).\n"),
         *Spec.RiverId,
         (Spec.RiverId == TEXT("futaleufu_terminator") ||
-         Spec.RiverId == TEXT("colorado_river"))
+         Spec.RiverId == TEXT("colorado_river") ||
+         Spec.RiverId == TEXT("chilko_river_lava_canyon"))
             ? TEXT("transmitting")
             : TEXT("opaque"),
         bUseSingleLayerWater ? TEXT("SingleLayerWater") : TEXT("DefaultLit"),

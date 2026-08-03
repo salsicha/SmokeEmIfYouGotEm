@@ -1,0 +1,192 @@
+{
+  "schema": "raftsim.environment.chilko_lava_canyon_transmitting_water_review.v2",
+  "review_date_utc": "2026-08-03",
+  "baseline_commit": "9ba2b03c39e0036aa918b0669289d6e9d2302e5e",
+  "status": "technical_optical_candidate_retained_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "transmitting_water_v2_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "retained_runnable_map_package_changed": true,
+    "generated_capture_water_material_changed": true,
+    "gameplay_water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_or_raft_forces_changed": false
+  },
+  "architecture": {
+    "runtime_volume": "The live ARaftSimWaterSurfaceActor remains the gameplay-water renderer and cooked-field consumer. Lava Canyon now binds a Chilko-local V2 instance of the shared transmitting water parent, with a cooked-field identity fallback for older maps and the same serialized instance in the regenerated runnable map.",
+    "runtime_detail": "The retained Default Lit detail skin uses 0.035 calm and 0.14 active coverage. A first-party flow normal supplies sub-grid optical breakup, while a first-party foam-lace mask is multiplied by solver foam and speed and therefore cannot create whitewater in calm or dry cells.",
+    "capture_water": "Filtered generation now creates a translucent Default Lit capture ribbon with physical IOR 1.333 and CPU-authored depth, bank-feather, and solver-aeration vertex opacity. The canonical landscape-candidate captures are technical evidence only and remain visibly below the target.",
+    "authority_boundary": "The new textures, opacity, smoothing, optical coefficients, material instances, and capture shading are visual-only. Cooked depth, velocity, wet/dry state, bathymetry, coordinate mapping, live mesh topology, collision, buoyancy, raft forces, feature forcing, and rapid detection remain unchanged."
+  },
+  "runtime_contract": {
+    "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+    "live_volume_core_enabled": true,
+    "live_volume_core_triangles": 1632,
+    "wet_vertices": 1098,
+    "depth_mean_m": 0.4294,
+    "speed_mean_m_per_s": 0.1733,
+    "foam_mean": 0.0112,
+    "foam_max": 1.0,
+    "standing_wave_abs_max_m": 0.191,
+    "hydraulic_relief_abs_max_m": 0.2302,
+    "surface_smoothing_enabled": true,
+    "surface_smoothing_strength": 0.58,
+    "shallow_opacity": 0.42,
+    "deep_opacity": 0.70,
+    "foam_opacity": 0.86,
+    "detail_surface_calm_coverage": 0.035,
+    "detail_surface_active_coverage": 0.14,
+    "rapid_foam_focus": [0.12, 0.72],
+    "rapid_foam_vertices": 6,
+    "rapid_foam_visible": true
+  },
+  "live_pie_evidence": {
+    "command": "RaftSim.CaptureAfter 8 <label> breaking_water_side",
+    "camera": "breaking_water_side",
+    "camera_site_station_m": 300.0,
+    "camera_site_lateral_m": -3.0,
+    "camera_site_intensity_at_capture": 0.378,
+    "presentation_coverage": 1.0,
+    "presentation_edge_clearance_m": 15.0,
+    "resolution_px": [1280, 720],
+    "capture_exit_code": 0
+  },
+  "visual_comparison": {
+    "method": "Direct sRGB metrics over rows 260 through 719 of the identical 1280x720 breaking_water_side camera. Highlight fractions use normalized luminance thresholds 0.90 and 0.95.",
+    "baseline_v2": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_live_volume_core_v2_breaking_water_side.png",
+      "sha256": "face5a4e939bb975af9c502acd4791f37aa735e51c4c764637358a49bff99ed6",
+      "mean_luminance": 0.678937,
+      "highlight_fraction_gt_0_90": 0.057366,
+      "highlight_fraction_gt_0_95": 0.016782,
+      "mean_blue_minus_red": 0.026046,
+      "mean_chroma": 0.05391
+    },
+    "retained_v2": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_transmitting_water_v2_breaking_water_side.png",
+      "sha256": "91056ee2e68a892de51a7f6bacf7c2fc1ed11e0a756d65e46f1f51252c7dd900",
+      "mean_luminance": 0.677513,
+      "highlight_fraction_gt_0_90": 0.033813,
+      "highlight_fraction_gt_0_95": 0.00123,
+      "mean_blue_minus_red": 0.033418,
+      "mean_chroma": 0.060571
+    },
+    "verdict": "Retain as a bounded river-local optical improvement: V2 substantially reduces the broad chalk-white and extreme-highlight response, increases cold-water color separation, and replaces the prior regular glossy breakup with sparser solver-masked lace. The broad wave faces, sun reflection, shoreline, banks, and vegetation remain visibly procedural and sheet-like, so this is not photoreal acceptance."
+  },
+  "validation": {
+    "filtered_generation": "passed; the Lava Canyon map, local water assets, three canonical source captures, and manifest were regenerated",
+    "unreal_editor_build": "passed; full 138-action build and final 2-action incremental binding fix both succeeded",
+    "native_chilko_material_audit": "RaftSim.M9.FChilkoLavaCanyonWater passed 1/1 after exposing and fixing the missing SurfaceVariationStrength instance binding",
+    "native_runnable_map_audit": "RaftSim.P4.RiverMapLoads.L_LavaCanyon passed 1/1 with 1632 live wet-cell volume-core triangles",
+    "native_water_render_audit": "RaftSim.P2.WaterSurfaceRenders passed 1/1",
+    "focused_python_before_review": "7 passed",
+    "visual_gate": "identical-camera live runtime comparison retained for this bounded technical milestone"
+  },
+  "remaining_photoreal_defects": [
+    "The broad sun reflection and rapid highlights remain overexposed, with 3.38 percent of the measured water band above normalized luminance 0.90.",
+    "The large standing-wave faces remain too smooth and sheet-like and lack entrained-air depth, crest breakup, spray, mist, and rock-contact plumes.",
+    "The foam lace is a generated visual breakup mask rather than rapid-specific observed foam calibration, and only six rapid-foam vertices are active in the audited runtime state.",
+    "Bank geometry, shoreline contact, ground material, repeated vegetation silhouettes, rocks, atmosphere, and distance detail remain visibly procedural and blockout-quality.",
+    "The cooked Lava Canyon field remains unconverged and its discharge, bathymetry, stationing, hazards, and guide line are not calibrated to observed river behavior.",
+    "Raft, crew, equipment, animation, complete-run rescue and capsize behavior, packaged performance, and VR presentation still require final acceptance."
+  ],
+  "required_external_acceptance_gates": [
+    "local Chilko guide review of Lava Canyon stationing, approach, lines, hazards, recovery, access, rescue routes, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, rocks, bathymetry, stationing, and vertical datums",
+    "hydraulic calibration and convergence approval against observed Lava Canyon behavior across playable discharge bands",
+    "Chilcotin ecology, geology, and environment-art approval of species, density, ground cover, wet banks, rocks, valley form, atmosphere, and season",
+    "photoreal water and VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "reviewers": {
+    "named_local_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "role": "regenerated reference-runnable Lava Canyon map",
+      "sha256": "f520738f3e72eb47057e0a985483e1f6522def865eb8f6b5afcb680acb883f63"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/T_RaftSim_ChilkoLavaCanyon_FlowNormalV1.png",
+      "role": "first-party flow-normal source",
+      "sha256": "44d04e0095653cecdc39f3166c2445f6920f8b59cc6c7ae6a85b6eaeb0d5e180"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/T_RaftSim_ChilkoLavaCanyon_FlowNormalV1.provenance.json",
+      "role": "flow-normal generation and authority record",
+      "sha256": "901deddca1b2f0d1b055f2884d1d3fde1b9fb4e78ab236717971af70386bc55a"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/T_RaftSim_ChilkoLavaCanyon_FoamLaceV1.png",
+      "role": "first-party solver-masked foam-lace source",
+      "sha256": "961e52ed6a57cd7b34a7369008e6d5cd0646c579147159fe3f0960006ccbed8e"
+    },
+    {
+      "path": "unreal/SourceArt/RaftSim/Water/ChilkoLavaCanyon/T_RaftSim_ChilkoLavaCanyon_FoamLaceV1.provenance.json",
+      "role": "foam-lace generation and authority record",
+      "sha256": "61242ff7274a8bda6beb87c08944b603a5e9fd8f74082fd30d21b8c728c901e7"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Textures/T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal.uasset",
+      "role": "cooked river-local flow normal",
+      "sha256": "21ceacce9ca3fb1fe9f618cc24edac6fd10b93d74ccd9a7a917903c7d07caf71"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Textures/T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace.uasset",
+      "role": "cooked solver-masked foam lace",
+      "sha256": "c28cf15d4a0b4fab3f9592cc0ffb07bf66e2f3bfd9e04cd541d17f777608cc48"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2.uasset",
+      "role": "river-local runtime transmitting-water instance",
+      "sha256": "afad970e13ae58eb7eb65f357c61562a22ed9c85494850aad8a29a05e0296090"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_Chilko_LavaCanyonDefaultLitWater.uasset",
+      "role": "transmitting generated capture-water parent",
+      "sha256": "a5da437d4a8df491ea7d2f4bd7786069dd7177b216cd8abdb82600c7183c1f8f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Chilko_PhysicalCorridorWaterCandidate.uasset",
+      "role": "river-local capture-water instance",
+      "sha256": "4e0ff14044d881f87a63f405a1d45324067d001e023b1469a276a041f530a2fc"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "role": "updated generated-water contract",
+      "sha256": "27e32cccf9fc2b46bc88409767a1192385573878dc66bb5294b343fb34d55668"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+      "role": "regenerated guide-seat source candidate evidence",
+      "sha256": "dd5ef025ab16c81b91f76561b80e69caf0673cd173a16a5e9fd4eecadfe6cea0"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+      "role": "regenerated river-eye source candidate evidence",
+      "sha256": "a8cb2baea36f46e49a1d7e5f5fb4a683e5043f6b5c375accf6913e44c12861cb"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
+      "role": "regenerated solver-rapid source candidate evidence",
+      "sha256": "04e8d24314a22b47e1c9af6fbbf7babde18cc6be34ac3eca5a1ebe8c551038ce"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_transmitting_water_v2_breaking_water_side.png",
+      "role": "retained identical-camera live runtime evidence",
+      "sha256": "91056ee2e68a892de51a7f6bacf7c2fc1ed11e0a756d65e46f1f51252c7dd900"
+    }
+  ]
+}

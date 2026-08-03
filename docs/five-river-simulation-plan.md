@@ -117,6 +117,26 @@ and external acceptance gates pass.
   rounded and tessellated-looking, and biome/ground-cover fidelity is still
   provisional.
 
+### 2026-08-03 — Chilko river-local transmitting gameplay water retained
+
+- `L_LavaCanyon` now persists a Chilko-local transmitting-water V2 instance on
+  the solver-owned, all-wet-cell volume core. A project-owned flow normal
+  supplies sub-grid optical breakup, and a project-owned foam-lace texture is
+  multiplied by solver foam and speed so it cannot invent whitewater in calm
+  or dry cells. The live surface remains a `0.035-0.14` detail skin.
+- The regenerated runnable map retains 1,632 core triangles, 1,098 wet
+  vertices, one interior station-300 m breaking site, six visible rapid-foam
+  vertices, and the existing `0.12-0.72` focus. Cooked fields, wet/dry masks,
+  bathymetry, topology, collision, buoyancy, and raft forces do not change.
+- Against the identical 1280x720 `breaking_water_side` camera, water-band
+  coverage above 0.90 luminance falls from `0.057366` to `0.033813`, coverage
+  above 0.95 falls from `0.016782` to `0.001230`, and blue-minus-red rises from
+  `0.026046` to `0.033418`. The editor build, M9 water audit, P4 Lava Canyon
+  map gate, P2 water-render gate, and 11 Python contracts pass. The milestone
+  remains fail-closed for photoreal approval because the broad wave faces,
+  shoreline/banks, repeated ecology, rapid-scale VFX, hydraulic calibration,
+  and all six external reviews remain open.
+
 ### 2026-08-03 — Pacuare live transmitting gameplay water retained
 
 - `L_UpperHuacas` now uses a solver-owned, wet-cell-clipped transmitting core

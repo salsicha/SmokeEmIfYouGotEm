@@ -522,7 +522,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const bool bUsesSingleLayerWater = false;
         const bool bUsesTransmittingDefaultLitWater =
             bUsesColoradoHanceDefaultLitWater ||
-            bUsesFutaleufuTerminatorDefaultLitWater;
+            bUsesFutaleufuTerminatorDefaultLitWater ||
+            bUsesChilkoLavaCanyonDefaultLitWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const bool bUsesSouthForkOrganicFoothillSurface =
@@ -1163,7 +1164,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                                      : (bUsesFutaleufuTerminatorDefaultLitWater
                                      ? TEXT("futaleufu_terminator_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
                                      : (bUsesChilkoLavaCanyonDefaultLitWater
-                                            ? TEXT("chilko_lava_canyon_default_lit_native_moving_normal_candidate_bound_cpu_cooked_field_color")
+                                            ? TEXT("chilko_lava_canyon_transmitting_default_lit_river_local_normal_candidate_bound_cpu_depth_bank_opacity_and_cooked_field_color")
                                             : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))))))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),

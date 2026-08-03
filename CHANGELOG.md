@@ -32,6 +32,18 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced Chilko Lava Canyon's inherited pale gameplay-water response with a
+  river-local transmitting V2 path. The solver-owned wet-cell core now binds
+  project-owned flow-normal and solver-masked foam-lace textures, while the
+  live surface remains a 3.5%-14% detail skin. The regenerated map preserves
+  1,632 core triangles, 1,098 wet vertices, the station-300 m rapid, collision,
+  bathymetry, and raft forces. Identical-camera water-band coverage above 0.90
+  luminance falls from 5.74% to 3.38%, and coverage above 0.95 falls from 1.68%
+  to 0.12%. The editor build, focused material audit, live map-load gate,
+  shared water-render gate, and 11 Python contracts pass. Broad wave faces,
+  procedural shoreline/terrain/ecology, sparse rapid foam/spray/mist,
+  unconverged hydraulics, and all six external gates keep photoreal and
+  production promotion closed.
 - Replaced Pacuare Upper Huacas's uniform opaque gameplay-water sheet with a
   live solver-owned transmitting core clipped to all-wet cells. The smoothed
   surface remains a 3.5%-14% hydraulic-detail skin, while the authored packed-

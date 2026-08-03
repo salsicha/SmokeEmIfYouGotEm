@@ -75,6 +75,17 @@ cells, while an independent station mask clips the rectangular moving-window
 ends. This is a retained technical candidate, not photoreal approval;
 comparison evidence and remaining defects are recorded in
 [the cold-water volume-core review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_live_volume_core_v2_review.json).
+Lava Canyon's August 3 V2 optical pass now makes that solver-clipped core
+river-local: a project-owned flow normal, solver-masked foam lace, physical
+transmission, and restrained live-surface coverage replace the inherited pale
+sheet response. In the identical side-on frame, water-band pixels above 0.90
+luminance fall from 5.74% to 3.38% and extreme highlights above 0.95 fall from
+1.68% to 0.12%. The runnable map, editor material audit, PIE load gate, and
+shared water-render gate pass. This is still a technical candidate—not a
+photoreal pass—because shoreline/bank form, broad wave faces, ecology,
+rapid-scale spray and mist, hydraulic calibration, and all external reviews
+remain open in the
+[Chilko transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_transmitting_water_v2_review.json).
 See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
 milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 
@@ -83,8 +94,8 @@ milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 | South Fork American | Chili Bar to Salmon Falls plus Troublemaker | production campaign |
 | Colorado, Grand Canyon | Hance | runnable reference signature-rapid Free Run |
 | Pacuare | Upper Huacas | runnable reference signature-rapid Free Run |
-| Futaleufú | Terminator | signature-rapid Free Run |
-| Chilko | Lava Canyon | signature-rapid Free Run |
+| Futaleufú | Terminator | runnable reference signature-rapid Free Run |
+| Chilko | Lava Canyon | runnable reference signature-rapid Free Run |
 | Zambezi, Batoka Gorge | `L_Zambezi`: Boiling Pot to Mukuni Beach, Rapids 1–25 | runnable reference Free Run |
 
 To run Zambezi from the game, choose **Free Run**, then select **Zambezi:

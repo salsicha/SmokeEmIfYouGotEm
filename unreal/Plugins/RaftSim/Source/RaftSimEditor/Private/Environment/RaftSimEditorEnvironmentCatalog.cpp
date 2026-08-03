@@ -217,20 +217,21 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
         // Lava Canyon samples its median C++ field on the reach-local capture
-        // ribbon. Keep the glacial color restrained and let measured depth,
-        // speed, Froude number, and free-surface relief author the rapid cues.
-        Settings.BaseColorScale = 1.10f;
-        Settings.EmissiveFillScale = 0.16f;
-        Settings.Roughness = 0.22f;
-        Settings.Specular = 0.48f;
-        Settings.Opacity = 0.34f;
-        Settings.NormalIntensity = 0.34f;
-        Settings.SurfaceVariationStrength = 0.46f;
+        // ribbon. V3 replaces the pale opaque response with depth/bank
+        // transmission and a first-party river-local normal. The CPU sampled
+        // field remains the only hydraulic colour and geometry authority.
+        Settings.BaseColorScale = 0.94f;
+        Settings.EmissiveFillScale = 0.060f;
+        Settings.Roughness = 0.34f;
+        Settings.Specular = 0.34f;
+        Settings.Opacity = 0.90f;
+        Settings.NormalIntensity = 0.26f;
+        Settings.SurfaceVariationStrength = 0.30f;
         Settings.VertexTintWeight = 0.78f;
         Settings.RenderWidthScale = 1.20f;
         Settings.RenderNormalUpBlend = 0.82f;
         Settings.RenderDisplacementScale = 0.18f;
-        Settings.ReflectionFillIntensity = 0.12f;
+        Settings.ReflectionFillIntensity = 0.06f;
         Settings.SolverFieldEnable = 1.0f;
         Settings.SolverMacroNormalWeight = 0.18f;
         Settings.SolverDepthColorWeight = 0.30f;
@@ -243,10 +244,16 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.AnalyticChopScale = 0.72f;
         Settings.CrossCurrentChopAmplitudeCm = 7.0f;
         Settings.EmbeddedAerationWeight = 0.18f;
-        Settings.SurfaceTint = FLinearColor(0.028f, 0.20f, 0.25f, 0.0f);
-        Settings.SolverDeepWaterTint = FLinearColor(0.012f, 0.11f, 0.15f, 0.0f);
-        Settings.SolverAerationTint = FLinearColor(0.86f, 0.93f, 0.94f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.34f, 0.55f, 0.66f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.018f, 0.145f, 0.19f, 0.0f);
+        Settings.SolverDeepWaterTint = FLinearColor(0.004f, 0.075f, 0.11f, 0.0f);
+        Settings.SolverAerationTint = FLinearColor(0.78f, 0.90f, 0.94f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.22f, 0.38f, 0.52f, 0.0f);
+        Settings.ScatteringCoefficients =
+            FLinearColor(0.00010f, 0.00024f, 0.00034f, 0.0f);
+        Settings.AbsorptionCoefficients =
+            FLinearColor(0.0070f, 0.0030f, 0.0015f, 0.0f);
+        Settings.ColorScaleBehindWater =
+            FLinearColor(0.22f, 0.34f, 0.40f, 0.0f);
     }
     return Settings;
 }
