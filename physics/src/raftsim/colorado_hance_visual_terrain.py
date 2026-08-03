@@ -17,7 +17,7 @@ import numpy as np
 from PIL import Image
 
 
-SCHEMA = "raftsim.colorado.hance_visual_terrain.v2"
+SCHEMA = "raftsim.colorado.hance_visual_terrain.v3"
 DEFAULT_OUTPUT_RELATIVE = Path(
     "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/hance_visual"
 )
@@ -39,6 +39,60 @@ def _sha256(path: Path) -> str:
 def _smoothstep(edge0: float, edge1: float, value: np.ndarray) -> np.ndarray:
     t = np.clip((value - edge0) / (edge1 - edge0), 0.0, 1.0)
     return t * t * (3.0 - 2.0 * t)
+
+
+def _value_noise_2d(
+    x: np.ndarray,
+    y: np.ndarray,
+    scale_x: float,
+    scale_y: float,
+    seed: int,
+) -> np.ndarray:
+    """Deterministic, non-periodic value noise over the local metric grid."""
+
+    grid_x = x / scale_x
+    grid_y = y / scale_y
+    x0 = np.floor(grid_x)
+    y0 = np.floor(grid_y)
+    tx = _smoothstep(0.0, 1.0, grid_x - x0)
+    ty = _smoothstep(0.0, 1.0, grid_y - y0)
+
+    def hashed(ix: np.ndarray, iy: np.ndarray) -> np.ndarray:
+        phase = ix * 127.1 + iy * 311.7 + float(seed) * 74.7
+        raw = np.sin(phase) * 43758.5453123
+        return raw - np.floor(raw)
+
+    n00 = hashed(x0, y0)
+    n10 = hashed(x0 + 1.0, y0)
+    n01 = hashed(x0, y0 + 1.0)
+    n11 = hashed(x0 + 1.0, y0 + 1.0)
+    nx0 = n00 * (1.0 - tx) + n10 * tx
+    nx1 = n01 * (1.0 - tx) + n11 * tx
+    return nx0 * (1.0 - ty) + nx1 * ty
+
+
+def _fbm_2d(
+    x: np.ndarray,
+    y: np.ndarray,
+    scale_x: float,
+    scale_y: float,
+    seed: int,
+    octaves: int,
+) -> np.ndarray:
+    value = np.zeros_like(x, dtype=np.float64)
+    weight_sum = 0.0
+    amplitude = 1.0
+    for octave in range(octaves):
+        value += amplitude * _value_noise_2d(
+            x,
+            y,
+            scale_x / (2.03**octave),
+            scale_y / (1.97**octave),
+            seed + octave * 101,
+        )
+        weight_sum += amplitude
+        amplitude *= 0.52
+    return value / weight_sum
 
 
 def _resample_clamped_regular_grid(
@@ -133,96 +187,135 @@ def build_colorado_hance_visual_terrain(
     base = _resample_clamped_regular_grid(bed, source_x, source_y, target_x, target_y)
     xx, yy = np.meshgrid(target_x, target_y)
 
-    # Preserve the complete interpreted C3 bed. Outside it, construct broad
-    # asymmetric canyon walls with non-periodic massing, shallow eroded strata,
-    # incised gullies, alcoves, and talus. V1's metre-scale cross-bank sine
-    # bands read as manufactured terraces from the guide camera. V2 keeps the
-    # same broad canyon envelope but moves most variation into longitudinally
-    # warped erosion and reduces periodic cross-bank relief. Every added term
-    # remains exactly zero at the source boundary.
+    # Preserve the complete interpreted C3 bed. Outside it, V3 replaces the
+    # smooth quadratic/sine-dominated valley with non-periodic fractal canyon
+    # massing, incised drainage, irregular basement-rock buttresses, talus, and
+    # a review-gated debris-fan analog near the solver rapid. The latter follows
+    # the documented geomorphic class only: it is not a surveyed Red Canyon fan
+    # and never enters the solver strip. Every added term remains exactly zero
+    # at the source boundary.
     source_half_width_m = source_span_y_m * 0.5
     bank_distance = np.maximum(np.abs(yy) - source_half_width_m, 0.0)
-    bank_fade = _smoothstep(0.0, 10.0, bank_distance)
-    side_scale = np.where(yy >= 0.0, 1.08, 0.92)
-    longitudinal_mass = (
-        1.0
-        + 0.070 * np.sin(xx / 91.0 + 0.52 * np.sin(xx / 37.0))
-        + 0.035 * np.sin(xx / 29.0 - yy / 73.0 + 0.4)
+    bank_fade = _smoothstep(0.0, 11.0, bank_distance)
+    outer_bank_mask = bank_distance > 0.0
+    macro_noise = _fbm_2d(xx, yy, 104.0, 82.0, 1801, 4)
+    meso_noise = _fbm_2d(xx, yy, 31.0, 24.0, 2903, 4)
+    fine_noise = _fbm_2d(xx, yy, 9.2, 7.4, 3911, 3)
+    drainage_noise = _fbm_2d(
+        xx + (macro_noise - 0.5) * 38.0,
+        yy + (meso_noise - 0.5) * 24.0,
+        58.0,
+        46.0,
+        4933,
+        3,
     )
+    side_scale = np.where(yy >= 0.0, 1.10, 0.90)
+    longitudinal_mass = 0.86 + 0.30 * macro_noise
     broad_rise = side_scale * (
-        0.142 * bank_distance + 0.00330 * np.square(bank_distance)
+        0.128 * bank_distance + 0.00315 * np.square(bank_distance)
     ) * longitudinal_mass
-    warp = (
-        8.4 * np.sin(xx / 79.0 + 0.38 * np.sin(np.abs(yy) / 43.0))
-        + 3.1 * np.sin(xx / 31.0 - yy / 61.0)
-        + 1.7 * np.sin(xx / 13.0 + yy / 27.0 + 1.1)
+    roughness_gain = _smoothstep(4.0, 72.0, bank_distance)
+    # Fade sub-grid rock roughness before the finite Landscape boundary. This
+    # preserves the broad wall slope while preventing one noisy outermost cell
+    # from becoming a false vertical rim at coarse review resolutions.
+    outer_roughness_taper = 1.0 - _smoothstep(88.0, 118.0, bank_distance)
+    eroded_rock = bank_fade * roughness_gain * outer_roughness_taper * (
+        (macro_noise - 0.5) * (1.2 + 0.020 * bank_distance)
+        + (meso_noise - 0.5) * (1.5 + 0.015 * bank_distance)
+        + (fine_noise - 0.5) * 0.72
     )
-    eroded_strata = bank_fade * (
-        0.42 * np.sin((bank_distance + warp) / 17.0 + xx / 71.0)
-        + 0.21 * np.sin((bank_distance + 0.54 * warp) / 8.9 - xx / 39.0 + 0.7)
-        + 0.09 * np.sin(bank_distance / 4.1 + xx / 17.0 - yy / 33.0)
+    drainage_ridge = np.clip(1.0 - np.abs(drainage_noise * 2.0 - 1.0), 0.0, 1.0)
+    gullies = (
+        -bank_fade
+        * outer_roughness_taper
+        * _smoothstep(10.0, 54.0, bank_distance)
+        * (0.32 + 0.010 * bank_distance)
+        * np.power(drainage_ridge, 6.0)
     )
-    # Domain-warp the drainage axes so the narrow negative lobes do not form
-    # the evenly spaced, camera-facing grooves produced by a plain sinusoid.
-    # Each frequency bends at a different longitudinal and cross-bank scale;
-    # the smaller amplitude keeps the gullies subordinate to the canyon mass.
-    gully_phase_a = np.sin(
-        xx / 47.0
-        + 0.74 * np.sin(xx / 17.0 + bank_distance / 63.0)
-        + np.sign(yy) * 0.73
-        + bank_distance / 185.0
-        + 0.31 * np.sin(bank_distance / 29.0 - xx / 83.0)
+    buttress_ridge = np.clip(1.0 - np.abs(macro_noise * 2.0 - 1.0), 0.0, 1.0)
+    basement_buttresses = (
+        bank_fade
+        * outer_roughness_taper
+        * _smoothstep(16.0, 64.0, bank_distance)
+        * (0.7 + 2.7 * np.power(buttress_ridge, 3.0))
+        * (0.55 + 0.45 * meso_noise)
     )
-    gully_phase_b = np.sin(
-        xx / 23.0
-        + 0.53 * np.sin(xx / 9.0 - bank_distance / 41.0)
-        - np.sign(yy) * 0.41
-        - bank_distance / 97.0
-        + 0.22 * np.sin(bank_distance / 18.0 + xx / 57.0)
+    talus = (
+        bank_fade
+        * outer_roughness_taper
+        * _smoothstep(18.0, 92.0, bank_distance)
+        * ((meso_noise - 0.5) * 0.95 + np.abs(fine_noise - 0.5) * 0.62)
     )
-    gully_mask = _smoothstep(8.0, 58.0, bank_distance)
-    gullies = -bank_fade * gully_mask * (
-        (0.36 + 0.0065 * bank_distance)
-        * np.exp(-np.square(gully_phase_a / 0.22))
-        + (0.12 + 0.0025 * bank_distance)
-        * np.exp(-np.square(gully_phase_b / 0.17))
+
+    rapid_station_m = 405.0
+    fan_side_mask = yy < -source_half_width_m
+    fan_longitudinal = np.exp(-np.square((xx - rapid_station_m) / 86.0))
+    fan_cross_bank = np.exp(-np.square((bank_distance - 27.0) / 31.0))
+    debris_fan_analog = (
+        bank_fade
+        * fan_side_mask
+        * 8.8
+        * fan_longitudinal
+        * fan_cross_bank
+        * (0.72 + 0.48 * meso_noise)
     )
-    alcoves = bank_fade * (
-        -2.8
-        * np.exp(-np.square((xx - 205.0) / 72.0))
-        * np.exp(-np.square((np.abs(yy) - 92.0) / 34.0))
-        + 3.5
-        * np.exp(-np.square((xx - 430.0) / 88.0))
-        * np.exp(-np.square((np.abs(yy) - 126.0) / 42.0))
-    )
-    talus = bank_fade * (
-        0.30
-        * np.sin(
-            xx / 9.7
-            + yy / 7.3
-            + 0.70 * np.sin(xx / 41.0 - yy / 29.0)
-            + 0.24 * np.sin(xx / 15.0 + yy / 19.0)
-        )
-        + 0.16
-        * np.sin(
-            xx / 4.7
-            - yy / 5.9
-            + 1.9
-            + 0.42 * np.sin(xx / 21.0 - yy / 13.0)
-        )
-        + 0.08
-        * np.sin(
-            xx / 2.8
-            + yy / 3.7
-            - 0.6
-            + 0.35 * np.sin(xx / 11.0 + yy / 8.0)
-        )
+    opposite_side_mask = yy > source_half_width_m
+    opposing_bedrock_buttress = (
+        bank_fade
+        * opposite_side_mask
+        * 4.8
+        * np.exp(-np.square((xx - rapid_station_m) / 112.0))
+        * _smoothstep(7.0, 28.0, bank_distance)
+        * (1.0 - _smoothstep(70.0, 112.0, bank_distance))
+        * (0.78 + 0.34 * macro_noise)
     )
     procedural_infill = np.where(
-        bank_distance > 0.0,
-        broad_rise + eroded_strata + gullies + alcoves + talus,
+        outer_bank_mask,
+        broad_rise
+        + eroded_rock
+        + gullies
+        + basement_buttresses
+        + talus
+        + debris_fan_analog
+        + opposing_bedrock_buttress,
         0.0,
     )
+    # A heightfield cannot represent true overhangs. Limit only the generated
+    # outer-bank grade, walking away from each protected solver-strip edge, so
+    # isolated noise/taper extrema cannot become raster-scale cliff spikes.
+    # The 1.18 rise/run cap is about 49.7 degrees; it leaves the underlying C3
+    # bed, its boundary sample, and every in-strip value bit-exact.
+    maximum_outer_cross_bank_grade = 1.18
+    positive_outer_rows = np.flatnonzero(target_y > source_half_width_m)
+    previous_row = np.zeros(target_x.shape, dtype=np.float64)
+    previous_y_m = source_half_width_m
+    for row_index in positive_outer_rows:
+        maximum_delta_m = maximum_outer_cross_bank_grade * (
+            target_y[row_index] - previous_y_m
+        )
+        procedural_infill[row_index] = np.clip(
+            procedural_infill[row_index],
+            previous_row - maximum_delta_m,
+            previous_row + maximum_delta_m,
+        )
+        previous_row = procedural_infill[row_index].copy()
+        previous_y_m = target_y[row_index]
+
+    negative_outer_rows = np.flatnonzero(target_y < -source_half_width_m)[::-1]
+    previous_row = np.zeros(target_x.shape, dtype=np.float64)
+    previous_y_m = -source_half_width_m
+    for row_index in negative_outer_rows:
+        maximum_delta_m = maximum_outer_cross_bank_grade * (
+            previous_y_m - target_y[row_index]
+        )
+        procedural_infill[row_index] = np.clip(
+            procedural_infill[row_index],
+            previous_row - maximum_delta_m,
+            previous_row + maximum_delta_m,
+        )
+        previous_row = procedural_infill[row_index].copy()
+        previous_y_m = target_y[row_index]
+
     conditioned = base + procedural_infill
 
     terrain_min_m = float(conditioned.min())
@@ -375,7 +468,7 @@ def build_colorado_hance_visual_terrain(
             "runtime_vertical_datum_m": runtime_vertical_datum_m,
         },
         "procedural_infill": {
-            "algorithm": "deterministic_asymmetric_eroded_desert_canyon_v2",
+            "algorithm": "deterministic_nonperiodic_debris_fan_desert_canyon_v3",
             "source_solver_half_width_m": source_half_width_m,
             "protected_solver_strip_change_m": float(
                 np.max(np.abs(procedural_infill[protected_mask]))
@@ -384,6 +477,13 @@ def build_colorado_hance_visual_terrain(
                 np.max(np.abs(procedural_infill[source_join_mask]))
             ),
             "maximum_added_canyon_relief_m": float(procedural_infill.max()),
+            "maximum_outer_cross_bank_grade": maximum_outer_cross_bank_grade,
+            "maximum_modeled_debris_fan_analog_relief_m": float(
+                debris_fan_analog.max()
+            ),
+            "maximum_opposing_bedrock_buttress_relief_m": float(
+                opposing_bedrock_buttress.max()
+            ),
             "maximum_outer_adjacent_cross_bank_step_m": max(
                 outer_max_adjacent_steps_m
             ),
@@ -391,10 +491,21 @@ def build_colorado_hance_visual_terrain(
                 outer_profile_dominant_band_ratios
             ),
             "regular_terrace_reduction_policy": (
-                "replace metre-scale periodic cross-bank bands with shallow "
-                "domain-warped strata, longitudinal massing, incised gullies, "
-                "and lower-amplitude talus"
+                "replace sine-dominated cross-bank relief with seeded non-periodic "
+                "fractal massing, incised drainage, irregular basement-rock "
+                "buttresses, talus, and a bounded rapid-adjacent debris-fan analog"
             ),
+            "official_reference_contract": {
+                "usgs_hance_geomorphology": "https://pubs.usgs.gov/pp/1492/report.pdf",
+                "usgs_debris_fan_process": "https://pubs.usgs.gov/fs/FS-019-01/",
+                "nps_geologic_formations": "https://www.nps.gov/grca/learn/nature/geologicformations.htm",
+                "nps_river_corridor_ecology": "https://www.nps.gov/grca/learn/nature/naturalfeaturesandecosystems.htm",
+                "interpretation_boundary": (
+                    "references constrain landform and ecology classes only; no "
+                    "downloaded geometry, surveyed Hance registration, lithologic "
+                    "boundary, rapid-rock coordinate, or hydraulic input is claimed"
+                ),
+            },
             "authority": (
                 "visual and Landscape collision infill only outside the complete C3 "
                 "solver strip; cooked bed, water state, and raft forces are unchanged"

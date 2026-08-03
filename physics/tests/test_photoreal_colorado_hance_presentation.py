@@ -14,6 +14,7 @@ TEXTURE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorPhotorealTextureAssets.cp
 BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
 CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
 GEOMETRY_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeGeometry.cpp"
+FOLIAGE_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeFoliage.cpp"
 WATER_CONFIG_HEADER = (
     RUNTIME_ROOT / "RaftSimWater/Public/RaftSimRiverWaterConfig.h"
 )
@@ -29,6 +30,9 @@ REVIEW = MANIFEST.with_name(
 )
 V2_REVIEW = MANIFEST.with_name(
     "colorado_hance_transmitting_water_v2_review.json"
+)
+V3_TERRAIN_ECOLOGY_REVIEW = MANIFEST.with_name(
+    "colorado_hance_nonperiodic_canyon_dryland_ecology_v3_review.json"
 )
 FLOW_NORMAL_SOURCE = REPO_ROOT / (
     "unreal/SourceArt/RaftSim/Water/ColoradoHance/"
@@ -148,6 +152,79 @@ def test_hance_live_smoothing_is_render_only_and_plane_preserving() -> None:
     assert "RawPresentationSurfaceHeightMeters" in runtime
     assert "WaterSamples remains the authority for gameplay" in runtime
     assert "PresentationSurfaceHeightMeters[Index]" in runtime
+
+
+def test_hance_dryland_ecology_v2_is_organic_and_non_authoritative() -> None:
+    foliage = FOLIAGE_SOURCE.read_text(encoding="utf-8")
+
+    for token in (
+        "M_RaftSim_Hance_OpaqueDrylandVegetationV2",
+        "SM_RaftSim_Hance_DesertShrub_A_OpaqueV2",
+        "SM_RaftSim_Hance_DesertShrub_B_OpaqueV2",
+        "SM_RaftSim_Hance_DryGroundCover_A_OpaqueV2",
+        "SM_RaftSim_Hance_DryGroundCover_B_OpaqueV2",
+        "HanceDrylandGroundCoverInstanceCount = 3000",
+        "HanceDrylandShrubInstanceCount = 480",
+        "HanceDrylandMinimumGroundCoverInstanceCount = 2700",
+        "HanceDrylandMinimumShrubInstanceCount = 420",
+        "FMath::Lerp(\n                32.0f,\n                78.0f",
+        "FMath::Lerp(\n                78.0f,\n                195.0f",
+        "RaftSimHanceOpaqueDrylandVegetationV2",
+        "RaftSimOfficialReferenceConstrainedProceduralGapFill",
+        "RaftSimOutsideProtectedSolverStrip",
+        "RaftSimNoEcologyAuthority",
+        "RaftSimNoGeographyAuthority",
+        "RaftSimNoHydraulicAuthority",
+    ):
+        assert token in foliage
+    assert "RaftSimHanceOpaqueDrylandVegetationV1" not in foliage
+    assert "SM_RaftSim_Hance_DesertShrub_A_OpaqueV1" not in foliage
+    assert "SM_RaftSim_Hance_DryGroundCover_A_OpaqueV1" not in foliage
+
+
+def test_hance_v3_terrain_ecology_review_is_hash_locked_and_honest() -> None:
+    review = json.loads(V3_TERRAIN_ECOLOGY_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.colorado_hance_nonperiodic_canyon_"
+        "dryland_ecology_review.v3"
+    )
+    assert review["status"] == (
+        "retained_technical_visual_improvement_photoreal_promotion_fail"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["reference_runnable"] is True
+    assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["visual_improvement_passed"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["protected_solver_strip_changed"] is False
+    assert review["decision"]["runtime_coordinate_map_changed"] is False
+    assert review["decision"]["hydraulics_changed"] is False
+    assert review["decision"]["raft_forces_changed"] is False
+    assert review["terrain_contract"]["protected_strip_max_absolute_change_m"] == 0.0
+    assert review["terrain_contract"]["maximum_outer_cross_bank_grade"] == 1.18
+    assert (
+        review["terrain_contract"][
+            "outer_canyon_dominant_band_energy_ratio_after"
+        ]
+        < review["terrain_contract"][
+            "outer_canyon_dominant_band_energy_ratio_before"
+        ]
+    )
+    assert review["vegetation_contract"]["procedural_ground_cover_instances"] == 3000
+    assert review["vegetation_contract"]["procedural_desert_shrub_instances"] == 480
+    assert review["vegetation_contract"]["hierarchical_instanced_mesh_components"] == 4
+    assert review["vegetation_contract"]["collision_enabled"] is False
+    assert review["vegetation_contract"]["ecology_authority"] is False
+    assert review["vegetation_contract"]["geography_authority"] is False
+    assert review["vegetation_contract"]["hydraulic_authority"] is False
+    assert len(review["remaining_photoreal_defects"]) >= 7
+    assert len(review["required_external_acceptance_gates"]) == 6
+
+    for artifact in review["retained_artifacts"]:
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
 
 
 def test_hance_manifest_records_organic_terrain_and_native_water() -> None:
@@ -297,7 +374,7 @@ def test_hance_transmitting_water_v2_review_is_hash_locked_and_honest() -> None:
     successor = REPO_ROOT / supersession["review_path"]
     assert successor.is_file()
     superseded_paths = set(supersession["paths"])
-    assert len(superseded_paths) == 4
+    assert len(superseded_paths) == 5
     for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()

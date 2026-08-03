@@ -29,9 +29,16 @@ def test_hance_visual_terrain_preserves_solver_strip_and_aligns_runtime(tmp_path
     assert manifest["procedural_infill"]["protected_solver_strip_change_m"] == 0.0
     assert manifest["procedural_infill"]["maximum_source_join_step_m"] < 0.25
     assert manifest["procedural_infill"]["maximum_added_canyon_relief_m"] > 55.0
-    assert manifest["procedural_infill"]["algorithm"].endswith(
-        "eroded_desert_canyon_v2"
+    assert manifest["procedural_infill"]["algorithm"] == (
+        "deterministic_nonperiodic_debris_fan_desert_canyon_v3"
     )
+    assert manifest["procedural_infill"]["maximum_outer_cross_bank_grade"] == 1.18
+    assert 8.0 < manifest["procedural_infill"][
+        "maximum_modeled_debris_fan_analog_relief_m"
+    ] < 9.0
+    assert 4.5 < manifest["procedural_infill"][
+        "maximum_opposing_bedrock_buttress_relief_m"
+    ] < 5.2
     assert (
         manifest["procedural_infill"][
             "maximum_outer_adjacent_cross_bank_step_m"
@@ -42,10 +49,29 @@ def test_hance_visual_terrain_preserves_solver_strip_and_aligns_runtime(tmp_path
         manifest["procedural_infill"][
             "maximum_outer_mean_profile_dominant_band_energy_ratio"
         ]
-        < 0.46
+        < 0.40
     )
-    assert "domain-warped strata" in manifest["procedural_infill"][
+    assert "seeded non-periodic" in manifest["procedural_infill"][
         "regular_terrace_reduction_policy"
+    ]
+    official_references = manifest["procedural_infill"][
+        "official_reference_contract"
+    ]
+    assert official_references["usgs_hance_geomorphology"] == (
+        "https://pubs.usgs.gov/pp/1492/report.pdf"
+    )
+    assert official_references["usgs_debris_fan_process"] == (
+        "https://pubs.usgs.gov/fs/FS-019-01/"
+    )
+    assert official_references["nps_geologic_formations"] == (
+        "https://www.nps.gov/grca/learn/nature/geologicformations.htm"
+    )
+    assert official_references["nps_river_corridor_ecology"] == (
+        "https://www.nps.gov/grca/learn/nature/"
+        "naturalfeaturesandecosystems.htm"
+    )
+    assert "no downloaded geometry" in official_references[
+        "interpretation_boundary"
     ]
     assert (
         manifest["alignment"]["maximum_static_to_runtime_centerline_surface_error_m"]

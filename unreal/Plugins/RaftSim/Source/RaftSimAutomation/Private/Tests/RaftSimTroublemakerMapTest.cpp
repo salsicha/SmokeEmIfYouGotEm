@@ -4,6 +4,7 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
+#include "Containers/Set.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/Texture2D.h"
 #include "Engine/World.h"
@@ -979,12 +980,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 DrylandComponentCount = 0;
         int32 DrylandGroundCoverInstanceCount = 0;
         int32 DrylandShrubInstanceCount = 0;
+        TSet<FString> DrylandMeshPaths;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             AActor* Actor = *It;
             if (!Actor ||
                 !Actor->Tags.Contains(
-                    TEXT("RaftSimHanceOpaqueDrylandVegetationV1")))
+                    TEXT("RaftSimHanceOpaqueDrylandVegetationV2")))
             {
                 continue;
             }
@@ -1009,15 +1011,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     Instances->ComponentTags.Contains(
                         TEXT("RaftSimOutsideProtectedSolverStrip")));
             Test->TestTrue(
-                TEXT("Colorado Hance dryland dressing disclaims ecology authority"),
+                TEXT("Colorado Hance dryland dressing is reference-constrained non-authoritative gap fill"),
                 Actor->Tags.Contains(TEXT("RaftSimNoEcologyAuthority")) &&
+                    Actor->Tags.Contains(TEXT("RaftSimNoGeographyAuthority")) &&
+                    Actor->Tags.Contains(TEXT("RaftSimNoHydraulicAuthority")) &&
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimOfficialReferenceConstrainedProceduralGapFill")) &&
                     Actor->Tags.Contains(
                         TEXT("RaftSimProceduralVegetationFallback")));
             Test->TestTrue(
                 TEXT("Colorado Hance dryland dressing uses the isolated material"),
                 Instances->GetMaterial(0) &&
                     Instances->GetMaterial(0)->GetPathName().Contains(
-                        TEXT("M_RaftSim_Hance_OpaqueDrylandVegetation")));
+                        TEXT("M_RaftSim_Hance_OpaqueDrylandVegetationV2")));
+            if (const UStaticMesh* Mesh = Instances->GetStaticMesh())
+            {
+                DrylandMeshPaths.Add(Mesh->GetPathName());
+            }
 
             const FString ComponentName = Instances->GetName();
             if (ComponentName.Contains(TEXT("HanceDrylandGroundCover")))
@@ -1041,15 +1051,31 @@ bool FRaftSimAssertRiverMapCommand::Update()
             ++DrylandComponentCount;
         }
         Test->TestEqual(
-            TEXT("Colorado Hance has ground-cover and shrub HISM components"),
+            TEXT("Colorado Hance has two ground-cover and two shrub HISM components"),
             DrylandComponentCount,
-            2);
+            4);
         Test->TestTrue(
             TEXT("Colorado Hance has dense dryland ground cover"),
-            DrylandGroundCoverInstanceCount >= 1500);
+            DrylandGroundCoverInstanceCount >= 2700);
         Test->TestTrue(
             TEXT("Colorado Hance has distributed dryland shrubs"),
-            DrylandShrubInstanceCount >= 260);
+            DrylandShrubInstanceCount >= 420);
+        for (const TCHAR* MeshToken : {
+                 TEXT("SM_RaftSim_Hance_DesertShrub_A_OpaqueV2"),
+                 TEXT("SM_RaftSim_Hance_DesertShrub_B_OpaqueV2"),
+                 TEXT("SM_RaftSim_Hance_DryGroundCover_A_OpaqueV2"),
+                 TEXT("SM_RaftSim_Hance_DryGroundCover_B_OpaqueV2")})
+        {
+            const FString ExpectedMeshPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ColoradoRun/Vegetation/Meshes/%s.%s"),
+                MeshToken,
+                MeshToken);
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("Colorado Hance includes vegetation morphology %s"),
+                    MeshToken),
+                DrylandMeshPaths.Contains(ExpectedMeshPath));
+        }
         return true;
     }
 
