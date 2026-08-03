@@ -4070,3 +4070,14 @@ path is verified, and the completion goal can be marked complete.
   cross-river bands, duplicate guide/rapid views, missing rapid-scale foam and
   spray, terraced canyon geometry, unconverged hydraulics, and all six external
   acceptance gates keep photoreal and production promotion closed.
+- Zambezi runnable release-head recheck V4 retains Batoka Gorge as river 6 in
+  the player-facing Free Run portfolio after the intervening Hance water
+  milestone. The committed selector, progression manifest, source scenario,
+  catalog, cook list, and unchanged `L_Zambezi` package all resolve
+  `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi` at
+  `reference_free_run` tier. Ten focused Python contracts and both native gates
+  pass; the live map reports the vertical-slice game mode, 5,908 coordinate-map
+  points, 2,673 wet vertices, eight active breaking sites, and visible rapid
+  foam. The V4 review hash-locks this runnable contract while leaving terrain,
+  bathymetry, hydraulic, guide/geospatial/rights, photoreal-art/water-VFX, and
+  target-performance promotion gates open.

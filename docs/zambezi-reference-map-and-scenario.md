@@ -1,6 +1,6 @@
 # Zambezi reference map and scenario
 
-> Runtime status, August 2, 2026: the complete reference Free Run is one of the
+> Runtime status, August 3, 2026: the complete reference Free Run is one of the
 > six runnable rivers, is selectable from the player-facing Free Run catalog,
 > and is versioned at `/Game/RaftSim/Maps/L_Zambezi`.
 > Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
@@ -20,14 +20,14 @@ package is not the runnable map.
 
 ### Current runnable verification
 
-The release head was rechecked after the later environment, character, and
-water milestones. The player path is still:
+The release head was rechecked again after the later environment, character,
+and water milestones. The player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
 The machine-readable Free Run manifest counts six runnable rivers and lists
-`zambezi_batoka_gorge` at `reference_free_run` tier. The rebuilt editor passes
-11 focused Python registry/source contracts, and the native
+`zambezi_batoka_gorge` at `reference_free_run` tier. Ten focused Python
+registry, source, and release-record contracts pass, and the native
 `RaftSim.M6.CareerCatalog` gate resolves the player-facing scenario without an
 automation warning or error. The native `RaftSim.P4.RiverMapLoads.L_Zambezi`
 gate loads the committed map into PIE, reports the vertical-slice game mode,
@@ -40,7 +40,7 @@ warning. Neither warning changes map load or gameplay acceptance.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v2_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v4_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
