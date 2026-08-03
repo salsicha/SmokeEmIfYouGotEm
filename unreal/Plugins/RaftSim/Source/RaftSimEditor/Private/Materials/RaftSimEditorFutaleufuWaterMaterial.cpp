@@ -3,6 +3,7 @@
 #include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialInstanceConstant.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -19,6 +20,13 @@ ExpressionType* AddFutaleufuWaterExpression(UMaterial* Material)
 
 UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
 {
+    if (!RaftSimPhotorealMaterials::
+            BuildFutaleufuTerminatorWaterTextureAssets())
+    {
+        OutSummary += TEXT(
+            "Failed to create the Futaleufu river-local water textures.\n");
+        return nullptr;
+    }
     static const FString MaterialPackagePath =
         TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/"
              "M_RaftSim_Futaleufu_TerminatorDefaultLitWater");
@@ -59,7 +67,9 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
 
     UTexture2D* DefaultNormalTexture = LoadObject<UTexture2D>(
         nullptr,
-        TEXT("/Engine/EngineMaterials/DefaultNormal.DefaultNormal"));
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+             "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+             "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal"));
     if (!DefaultNormalTexture)
     {
         OutSummary += TEXT("Failed to load the Futaleufu water normal fallback.\n");
@@ -69,7 +79,8 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     Material->SetShadingModel(MSM_DefaultLit);
-    Material->BlendMode = BLEND_Opaque;
+    Material->BlendMode = BLEND_Translucent;
+    Material->TranslucencyLightingMode = TLM_SurfacePerPixelLighting;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
 
@@ -79,7 +90,7 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             AddFutaleufuWaterExpression<UMaterialExpressionScalarParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("FutaleufuTerminatorWaterV2");
+        Parameter->Group = TEXT("FutaleufuTerminatorWaterV3");
         return Parameter;
     };
     auto Vector = [Material](const TCHAR* Name, const FLinearColor& Value)
@@ -88,7 +99,7 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             AddFutaleufuWaterExpression<UMaterialExpressionVectorParameter>(Material);
         Parameter->ParameterName = Name;
         Parameter->DefaultValue = Value;
-        Parameter->Group = TEXT("FutaleufuTerminatorWaterV2");
+        Parameter->Group = TEXT("FutaleufuTerminatorWaterV3");
         return Parameter;
     };
     auto Multiply = [Material](UMaterialExpression* A, UMaterialExpression* B)
@@ -133,6 +144,13 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
     // into Terminator. The material only adds optical response to these pixels.
     UMaterialExpressionVertexColor* VertexColor =
         AddFutaleufuWaterExpression<UMaterialExpressionVertexColor>(Material);
+    UMaterialExpressionComponentMask* VertexOpacity =
+        AddFutaleufuWaterExpression<UMaterialExpressionComponentMask>(Material);
+    // VertexColor output 0 is RGB in UE 5.8. Alpha is the dedicated scalar
+    // output 4 and carries the CPU-authored depth/bank transmission coverage.
+    VertexOpacity->Input.Expression = VertexColor;
+    VertexOpacity->Input.OutputIndex = 4;
+    VertexOpacity->R = true;
     UMaterialExpression* PhysicalSurfaceTint = Lerp(
         Vector(TEXT("SurfaceTint"), FLinearColor(0.025f, 0.185f, 0.225f, 0.0f)),
         VertexColor,
@@ -181,10 +199,9 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
         Scalar(TEXT("SurfaceVariationStrength"), 0.44f));
 
     UMaterialExpressionVectorParameter* AtlasTileOriginParameter = Vector(
-        TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
+        TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.0f, 0.0f, 0.0f));
     UMaterialExpressionVectorParameter* AtlasTileScaleParameter = Vector(
-        TEXT("AtlasTileScale"),
-        FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
+        TEXT("AtlasTileScale"), FLinearColor(1.0f, 1.0f, 0.0f, 0.0f));
     UMaterialExpressionComponentMask* AtlasTileOrigin =
         AddFutaleufuWaterExpression<UMaterialExpressionComponentMask>(Material);
     AtlasTileOrigin->Input.Expression = AtlasTileOriginParameter;
@@ -264,7 +281,7 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
             Sample->Texture = DefaultNormalTexture;
             Sample->SamplerType = SAMPLERTYPE_Normal;
             Sample->Coordinates.Expression = AtlasUv;
-            Sample->Group = TEXT("FutaleufuTerminatorWaterV2");
+            Sample->Group = TEXT("FutaleufuTerminatorWaterV3");
             return Sample;
         };
         UMaterialExpression* PrimarySample = SampleAtlas(WrappedUvPrimary);
@@ -349,8 +366,12 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
     Scalar(TEXT("SolverFroudeVisualGain"), 0.0f);
     Vector(TEXT("SolverDeepWaterTint"), FLinearColor(0.006f, 0.095f, 0.13f, 0.0f));
     Vector(TEXT("SolverAerationTint"), FLinearColor(0.88f, 0.95f, 0.96f, 0.0f));
-    Scalar(TEXT("Opacity"), 0.34f);
-    Scalar(TEXT("RefractionIor"), 1.333f);
+    UMaterialExpressionScalarParameter* Opacity =
+        Scalar(TEXT("Opacity"), 0.88f);
+    UMaterialExpression* DepthTransmittingOpacity = Multiply(
+        VertexOpacity, Opacity);
+    UMaterialExpressionScalarParameter* RefractionIor =
+        Scalar(TEXT("RefractionIor"), 1.333f);
     Scalar(TEXT("PhaseG"), 0.15f);
     Vector(TEXT("ScatteringCoefficients"), FLinearColor(0.0012f, 0.0025f, 0.0018f, 0.0f));
     Vector(TEXT("AbsorptionCoefficients"), FLinearColor(0.0045f, 0.0018f, 0.0013f, 0.0f));
@@ -366,6 +387,10 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
         ConnectPreviewMaterialScalarInput(
             EditorOnlyData->Roughness, VariedRoughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->Opacity, DepthTransmittingOpacity);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->Refraction, RefractionIor);
     }
 
     Material->PostEditChange();
@@ -391,10 +416,125 @@ UMaterial* LoadOrCreateFutaleufuTerminatorWaterParent(FString& OutSummary)
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
     OutSummary += TEXT(
-        "Built Futaleufu Terminator opaque Default Lit water V2 with three "
-        "moving normal directions, three world optical scales, varied "
-        "roughness, CPU-authored cooked-field color authority, and no "
+        "Built Futaleufu Terminator transmitting Default Lit water V3 with "
+        "river-local first-party flow normals, depth/bank-conditioned vertex "
+        "opacity, physical IOR, three moving normal directions, three world "
+        "optical scales, CPU-authored cooked-field color authority, and no "
         "displacement.\n");
     return Material;
+}
+
+UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
+    FString& OutSummary)
+{
+    if (!RaftSimPhotorealMaterials::
+            BuildFutaleufuTerminatorWaterTextureAssets())
+    {
+        OutSummary += TEXT(
+            "Failed to create Futaleufu live-water texture assets.\n");
+        return nullptr;
+    }
+
+    static const TCHAR* PackagePath = TEXT(
+        "/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/"
+        "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3");
+    static const TCHAR* AssetName =
+        TEXT("MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3");
+    static const TCHAR* ObjectPath = TEXT(
+        "/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/"
+        "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3."
+        "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3");
+    UMaterialInterface* SharedTransmissionParent =
+        LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+                 "M_RaftSim_SouthForkRaftTransmissionWater."
+                 "M_RaftSim_SouthForkRaftTransmissionWater"));
+    UTexture2D* FlowNormal = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+             "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+             "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal"));
+    UTexture2D* FoamLace = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+             "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace."
+             "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace"));
+    UPackage* Package = CreatePackage(PackagePath);
+    if (!SharedTransmissionParent || !FlowNormal || !FoamLace || !Package)
+    {
+        OutSummary += TEXT(
+            "Futaleufu live-water parent or river-local texture is missing.\n");
+        return nullptr;
+    }
+
+    UMaterialInstanceConstant* Instance =
+        LoadObject<UMaterialInstanceConstant>(nullptr, ObjectPath);
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(
+            Package,
+            AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Instance)
+        {
+            FAssetRegistryModule::AssetCreated(Instance);
+        }
+    }
+    if (!Instance)
+    {
+        OutSummary += TEXT(
+            "Failed to create the Futaleufu live-water material instance.\n");
+        return nullptr;
+    }
+
+    Instance->Modify();
+    Instance->SetParentEditorOnly(SharedTransmissionParent);
+    Instance->ClearParameterValuesEditorOnly();
+    auto SetScalar = [Instance](const TCHAR* Name, float Value)
+    {
+        Instance->SetScalarParameterValueEditorOnly(
+            FMaterialParameterInfo(Name), Value);
+    };
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WaterFlowNormalPrimary")), FlowNormal);
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WaterFlowNormalCross")), FlowNormal);
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WhitewaterFoamLace")), FoamLace);
+    // Keep the high-energy solver field visible without the broad chalk-white
+    // pile in V2. The texture cannot create foam because the parent multiplies
+    // it by the solver-authored foam/speed mask before every optical output.
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.72f);
+    SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.54f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.78f);
+    SetScalar(TEXT("SpeedAerationFraction"), 0.16f);
+    SetScalar(TEXT("FoamRoughness"), 0.62f);
+    SetScalar(TEXT("ReachHueVariation"), 0.10f);
+    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.14f);
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.62f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.38f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.34f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.28f);
+    Instance->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    Package->MarkPackageDirty();
+
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT(
+            "Failed to save the Futaleufu live-water material instance.\n");
+        return nullptr;
+    }
+    OutSummary += TEXT(
+        "Built Futaleufu river-local live-volume water V3 with project-owned "
+        "flow-normal and solver-masked foam-lace textures.\n");
+    return Instance;
 }
 } // namespace RaftSimEditorEnvironment

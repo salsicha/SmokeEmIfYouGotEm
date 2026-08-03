@@ -3834,6 +3834,22 @@ path is verified, and the completion goal can be marked complete.
   candidate: broad plate-like water, weak rapid relief, sparse foam/spray,
   smooth source-scale banks, repeated vegetation, incomplete bank structure,
   and all six named external acceptance gates remain open.
+- Futaleufú transmitting water V3 retains the existing runnable
+  `L_Terminator` binary and upgrades only its optical path. A cooked-field-
+  identity migration binds the same river-local Single Layer Water instance,
+  first-party flow normal, and solver-masked foam-lace texture that future
+  filtered generation persists on the water config. Runtime specular,
+  roughness, reflection, ripple, foam, and cold-water colors are river-local;
+  the generated capture parent is now translucent Default Lit with physical
+  IOR and CPU depth/bank/aeration opacity. Solver geometry, hydraulics,
+  wet/dry ownership, bathymetry, collision, and raft forces do not change.
+  Against the identical V2 live camera, mean water-band luminance falls from
+  0.708139 to 0.691794, >0.90 highlight coverage falls from 0.074455 to
+  0.071194, and blue-minus-red rises from 0.017644 to 0.031766. The editor
+  build plus native M9 material, P4 runnable-map, and P2 render gates pass.
+  Broad overexposure, sheet-like standing-wave shape, missing spray/mist and
+  entrained-air depth, procedural terrain/ecology, and all six external
+  acceptance gates keep photoreal and production promotion open.
 - Zambezi stable runnable delivery V1 promotes the already-validated complete
   Batoka Gorge reference run from the ignored `EnvironmentPreviews` namespace
   to the versioned `/Game/RaftSim/Maps/L_Zambezi` package. The editor generator,

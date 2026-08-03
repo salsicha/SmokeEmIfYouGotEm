@@ -103,6 +103,8 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         SolverFoamMaterial;
     const bool bColoradoHancePresentation =
         Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    const bool bFutaleufuTerminatorPresentation =
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
     const float LandscapeMinX = GetLandscapeCandidateWorldMinX(Candidate);
     const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
@@ -382,6 +384,25 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                     ? FLinearColor(0.72f, 0.68f, 0.58f)
                     : FLinearColor(0.75f, 0.84f, 0.80f),
                 CombinedBreaker);
+            if (bFutaleufuTerminatorPresentation &&
+                bUseSolverVisualizationFields)
+            {
+                // The V3 capture ribbon is transmitting rather than an opaque
+                // card. CPU-authored alpha follows the already sampled local
+                // depth, fades through the wet-bank edge, and becomes nearly
+                // opaque only in solver-conditioned aeration. It changes no
+                // geometry, wet mask, collision, or runtime force input.
+                const float DepthOpacityT = SmoothPreviewStep(
+                    0.18f, 2.80f, SolverDepthM);
+                const float BankTransmission = FMath::Lerp(
+                    1.0f,
+                    0.48f,
+                    SmoothPreviewStep(0.72f, 1.0f, EdgeT));
+                const float WaterOpacity = FMath::Lerp(
+                    0.44f, 0.80f, DepthOpacityT) * BankTransmission;
+                SurfaceColor.A = FMath::Lerp(
+                    WaterOpacity, 0.93f, CombinedBreaker);
+            }
             VertexColors.Add(SurfaceColor);
             if (bUseSolverVisualizationFields)
             {
@@ -1740,22 +1761,42 @@ bool AddLandscapeCandidateRunnableGameplay(
         // core supplies optical depth while this low-coverage skin retains
         // geometric normals, rapid colour response, and the soft bank edge.
         WaterConfig->bEnableLiveSolverVolumeCore = true;
+        WaterConfig->LiveVolumeCoreMaterialOverride =
+            LoadOrCreateFutaleufuTerminatorLiveWaterInstance(OutSummary);
+        WaterConfig->LiveWaterFlowNormalTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal"));
+        WaterConfig->LiveWaterFoamLaceTexture = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace."
+                 "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace"));
+        if (!WaterConfig->LiveVolumeCoreMaterialOverride ||
+            !WaterConfig->LiveWaterFlowNormalTexture ||
+            !WaterConfig->LiveWaterFoamLaceTexture)
+        {
+            OutSummary += TEXT(
+                "Futaleufu river-local live-water assets are incomplete.\n");
+            return false;
+        }
         WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
         WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
-        WaterConfig->LiveSurfaceSpecular = 0.34f;
-        WaterConfig->LiveSurfaceRoughness = 0.28f;
-        WaterConfig->LiveSkyReflectionStrength = 0.34f;
-        WaterConfig->LiveRippleStrength = 0.30f;
-        WaterConfig->LiveFoamIntensity = 0.68f;
+        WaterConfig->LiveSurfaceSpecular = 0.28f;
+        WaterConfig->LiveSurfaceRoughness = 0.34f;
+        WaterConfig->LiveSkyReflectionStrength = 0.24f;
+        WaterConfig->LiveRippleStrength = 0.26f;
+        WaterConfig->LiveFoamIntensity = 0.58f;
         WaterConfig->LiveRapidFoamFocusStart = 0.08f;
         WaterConfig->LiveRapidFoamFocusEnd = 0.58f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.016f, 0.082f, 0.105f, 1.0f);
+            FLinearColor(0.013f, 0.068f, 0.090f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.003f, 0.021f, 0.034f, 1.0f);
+            FLinearColor(0.002f, 0.017f, 0.029f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.070f, 0.125f, 0.160f, 1.0f);
+            FLinearColor(0.055f, 0.100f, 0.138f, 1.0f);
     }
     WaterConfig->Tags.AddUnique(RunTag);
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));

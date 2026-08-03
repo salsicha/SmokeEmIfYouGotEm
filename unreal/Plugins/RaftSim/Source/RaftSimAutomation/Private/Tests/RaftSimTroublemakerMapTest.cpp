@@ -5,8 +5,10 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/Texture2D.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Materials/MaterialInterface.h"
 #include "Misc/AutomationTest.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimCrewAvatarActor.h"
@@ -1048,19 +1050,58 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("regenerated Futaleufu config stores active-water detail response"),
                     FMath::IsNearlyEqual(
                         (*It)->LiveSurfaceActiveCoverage, 0.14f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu config binds its river-local live-volume material"),
+                    (*It)->LiveVolumeCoreMaterialOverride &&
+                        (*It)->LiveVolumeCoreMaterialOverride->GetPathName().Contains(
+                            TEXT("MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3")));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu config binds its river-local flow normal"),
+                    (*It)->LiveWaterFlowNormalTexture &&
+                        (*It)->LiveWaterFlowNormalTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu config binds its solver-masked foam lace"),
+                    (*It)->LiveWaterFoamLaceTexture &&
+                        (*It)->LiveWaterFoamLaceTexture->GetPathName().Contains(
+                            TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace")));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu live sky reflection stays restrained"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSkyReflectionStrength, 0.24f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu live carrier keeps moving micro-normal response"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveRippleStrength, 0.26f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu solver foam remains optically legible"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveFoamIntensity, 0.58f, 0.001f));
             }
-            Test->TestTrue(
-                TEXT("Futaleufu live sky reflection stays restrained"),
-                FMath::IsNearlyEqual(
-                    (*It)->LiveSkyReflectionStrength, 0.34f, 0.001f));
-            Test->TestTrue(
-                TEXT("Futaleufu live carrier keeps moving micro-normal response"),
-                FMath::IsNearlyEqual(
-                    (*It)->LiveRippleStrength, 0.30f, 0.001f));
-            Test->TestTrue(
-                TEXT("Futaleufu solver foam remains optically legible"),
-                FMath::IsNearlyEqual(
-                    (*It)->LiveFoamIntensity, 0.68f, 0.001f));
+            else
+            {
+                Test->TestNotNull(
+                    TEXT("versioned Futaleufu map can migrate to the V3 live-volume material"),
+                    LoadObject<UMaterialInterface>(
+                        nullptr,
+                        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/"
+                             "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3."
+                             "MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3")));
+                Test->TestNotNull(
+                    TEXT("versioned Futaleufu map can migrate to the river-local flow normal"),
+                    LoadObject<UTexture2D>(
+                        nullptr,
+                        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                             "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal."
+                             "T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal")));
+                Test->TestNotNull(
+                    TEXT("versioned Futaleufu map can migrate to solver-masked foam lace"),
+                    LoadObject<UTexture2D>(
+                        nullptr,
+                        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Textures/"
+                             "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace."
+                             "T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace")));
+            }
             Test->TestTrue(
                 TEXT("Futaleufu rapid lace begins at low solver foam activity"),
                 FMath::IsNearlyEqual(
