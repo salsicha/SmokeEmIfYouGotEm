@@ -29,6 +29,10 @@ from raftsim.zambezi_reference_map import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+RUNNABLE_RELEASE_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_runnable_release_head_v4_review.json"
+)
 
 
 def _load(path: Path) -> dict:
@@ -37,6 +41,60 @@ def _load(path: Path) -> dict:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_zambezi_release_head_runnable_review_is_hash_locked():
+    review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
+    assert review["recorded_local_date"] == "2026-08-03"
+    assert review["verified_base_commit"] == (
+        "487dd10472e3bf50eadc1bd7a8f918d83004b0a6"
+    )
+    assert review["result"] == "pass"
+    assert review["classification"] == "runnable_reference_free_run"
+    assert review["production_fidelity_promoted"] is False
+    assert review["player_path"] == {
+        "game_mode": "Free Run",
+        "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
+        "river_id": "zambezi_batoka_gorge",
+        "scenario_id": "zambezi_reference_run",
+        "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+        "runnable_river_ordinal": 6,
+        "runnable_river_count": 6,
+        "tier": "reference_free_run",
+    }
+
+    expected_hashes = {
+        "unreal/Content/RaftSim/Maps/L_Zambezi.umap": (
+            "bcd30f3c063f665a4e5d88da2a49d66f79f50515f60dcb27258300d66624f483"
+        ),
+        "unreal/Content/RaftSim/UI/river_selection_catalog.json": (
+            "1eaeba715f3f9c7e82bbc0c77eb151a5268a537a6ffe6f5e8686ceaf8db13c9e"
+        ),
+        "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json": (
+            "bc01d8529015255abd2d36d722d7acd891edca741d5656d6e40983111c4c8da3"
+        ),
+        "physics/data/real_world/player_selection_model.json": (
+            "aac98ef3b0346f7bb178ad65ce4b93b6c14920f464782a151df3b4d9a4486a27"
+        ),
+        "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/"
+        "scenario.json": (
+            "ffa3d6b8f4f1c8d6c098c348af904676df694ab8e3875b8d9a45cee35ad9cab9"
+        ),
+        "unreal/Config/DefaultGame.ini": (
+            "6893114b91d1647e8e7d0232e3a8970fd49e0b2fc80b263ba5df4014f62b7999"
+        ),
+    }
+    locked_hashes = {
+        entry["path"]: entry["sha256"]
+        for entry in review["hash_locked_runtime_contract"]
+    }
+    assert locked_hashes == expected_hashes
+    for relative, expected in expected_hashes.items():
+        assert _sha256(REPO_ROOT / relative) == expected
+
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert RUNNABLE_RELEASE_REVIEW.as_posix() in readme
+    assert "Zambezi, Batoka Gorge" in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():

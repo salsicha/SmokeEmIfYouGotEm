@@ -1,6 +1,6 @@
 # Runnable River Simulation & Playability Plan
 
-Written July 18, 2026; updated August 2, 2026. Goal: **all six runnable
+Written July 18, 2026; updated August 3, 2026. Goal: **all six runnable
 rivers playable in-engine with live finite-volume solver water and the full
 gameplay stack** (crew, flip/swim/recover, scoring, HUD, reactive audio). The
 first five use a validated signature-rapid pattern. Zambezi is restored at an
@@ -40,7 +40,7 @@ Release-head verification keeps Zambezi in ordinal position 6 of the six-river
 Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v2_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v4_review.json`.
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -256,6 +256,23 @@ and external acceptance gates pass.
 - This reaffirms runnable status only. Production terrain, bathymetry,
   rapid-specific hydraulics, guide/rights review, photoreal art, and
   target-hardware performance remain open.
+
+### 2026-08-03 — Zambezi runnable release-head reaffirmed
+
+- Revalidated the committed `L_Zambezi` package after the intervening water and
+  character milestones without regenerating or changing its terrain, water, or
+  gameplay data. The frontend, six-river manifest, generated selector, source
+  scenario, and shipping cook list still resolve `zambezi_reference_run` to
+  `/Game/RaftSim/Maps/L_Zambezi` at `reference_free_run` tier.
+- Ten focused Python contracts pass. `RaftSim.M6.CareerCatalog` passes 1/1 with
+  no automation warnings or errors. `RaftSim.P4.RiverMapLoads.L_Zambezi`
+  passes 1/1 in PIE with the vertical-slice game mode, 5,908-point coordinate
+  map, live cooked-field water, eight active breaking sites, and visible rapid
+  foam.
+- The V4 hash-locked review makes this exact six-river contract durable. This
+  is runnable-reference acceptance only; high-resolution terrain, surveyed
+  bathymetry, calibrated rapid hydraulics, guide/geospatial/rights review,
+  photoreal art and water VFX, and target-hardware performance remain open.
 
 ### 2026-08-02 — Futaleufú and Chilko organic waterline structure retained
 
