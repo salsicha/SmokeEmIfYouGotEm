@@ -1460,14 +1460,22 @@ bool FRaftSimM5StartRescueCommand::Update()
                 HipThighCoverageErrorCm <= 0.25f);
             const float ThighKneeCoverageErrorCm =
                 It->GetMaximumThighKneeBridgeCoverageErrorCm();
+            const int32 ThighMeshVertexCount =
+                It->GetMinimumThighMeshVertexCount();
+            const float ThighForwardAlignment =
+                It->GetMinimumThighForwardAlignment();
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("avatar %s carries tapered thighs through both solved knees "
-                         "without a disconnected or oversized joint (maximum "
-                         "centreline error %.3f cm)"),
+                    TEXT("avatar %s carries directional anatomical thighs through "
+                         "both solved knees (minimum %d vertices, anterior alignment "
+                         "%.3f, maximum centreline error %.3f cm)"),
                     *It->GetName(),
+                    ThighMeshVertexCount,
+                    ThighForwardAlignment,
                     ThighKneeCoverageErrorCm),
                 It->HasContinuousThighKneeSilhouette() &&
+                    ThighMeshVertexCount >= 650 &&
+                    ThighForwardAlignment >= 0.98f &&
                     ThighKneeCoverageErrorCm <= 0.25f);
             const FVector ShoulderSleeveExtentCm =
                 It->GetMinimumShoulderSleeveExtentCm();

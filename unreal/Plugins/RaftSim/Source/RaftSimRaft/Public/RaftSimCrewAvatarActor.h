@@ -253,6 +253,14 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetMinimumHipThighBridgeExtentCm() const;
 
+    /** Smallest authored vertex count shared by the two anatomical thigh meshes. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    int32 GetMinimumThighMeshVertexCount() const;
+
+    /** Smallest dot product between either thigh's anterior axis and torso forward. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumThighForwardAlignment() const;
+
     /** Largest distance from either solved hip to its buried thigh-bridge centreline. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetMaximumHipThighBridgeCoverageErrorCm() const;
@@ -317,6 +325,12 @@ private:
         const FVector& StartCm,
         const FVector& EndCm,
         float RadiusCm);
+    static void SetAnatomicalThigh(
+        UProceduralMeshComponent* Component,
+        const FVector& StartCm,
+        const FVector& EndCm,
+        float RadiusCm,
+        const FVector& TorsoForward);
 
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> Root;

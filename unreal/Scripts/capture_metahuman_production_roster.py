@@ -334,6 +334,8 @@ def main() -> None:
                 or not actor.is_waist_hip_material_opaque()
                 or actor.get_maximum_hip_thigh_bridge_coverage_error_cm() > 0.25
                 or not actor.has_continuous_thigh_knee_silhouette()
+                or actor.get_minimum_thigh_mesh_vertex_count() < 650
+                or actor.get_minimum_thigh_forward_alignment() < 0.98
                 or actor.get_maximum_thigh_knee_bridge_coverage_error_cm() > 0.25
                 or not actor.has_visible_shoulder_silhouette()
                 or actor.get_minimum_shoulder_sleeve_vertex_count() < 1000
@@ -684,6 +686,12 @@ def main() -> None:
                     ),
                     "runtime_thigh_knee_silhouette": (
                         actor.has_continuous_thigh_knee_silhouette()
+                    ),
+                    "runtime_thigh_minimum_vertex_count": (
+                        actor.get_minimum_thigh_mesh_vertex_count()
+                    ),
+                    "runtime_thigh_minimum_forward_alignment": (
+                        actor.get_minimum_thigh_forward_alignment()
                     ),
                     "runtime_thigh_knee_bridge_coverage_error_cm": (
                         actor.get_maximum_thigh_knee_bridge_coverage_error_cm()

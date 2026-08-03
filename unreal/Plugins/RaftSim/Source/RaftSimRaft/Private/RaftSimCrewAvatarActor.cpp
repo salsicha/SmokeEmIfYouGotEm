@@ -193,39 +193,69 @@ void BuildUnitHipThighBridgeMesh(
     TArray<FProcMeshTangent>& Tangents)
 {
     // The production body needs only the wetsuit-covered transition from the
-    // retained pelvis through the assembled knee. A stretched sphere leaves a
-    // visible ball at each hip, while a short bridge exposes a diagonal gap at
-    // the knee. This closed, softly tapered tube keeps both narrow ends buried
-    // in overlapping meshes and carries fullness through the anatomical thigh.
-    constexpr int32 Rings = 14;
-    constexpr int32 Sides = 24;
-    const auto RadiusAt = [](float V)
+    // retained pelvis through the assembled knee. A circular swept tube reads
+    // as a synthetic capsule in profile and as two round lobes from the rear.
+    // This closed mesh keeps the proven overlap, but gives the cross-section a
+    // stable anterior axis plus bounded quadriceps, hamstring, and adductor
+    // envelopes. The denser topology keeps those changes smooth at review FOV.
+    constexpr int32 Rings = 20;
+    constexpr int32 Sides = 32;
+    const auto SurfacePoint = [](float V, float Theta)
     {
         const float SafeV = FMath::Clamp(V, 0.0f, 1.0f);
-        return 0.70f + 0.30f * FMath::Pow(
+        const float LongitudinalEnvelope = FMath::Pow(
             FMath::Max(FMath::Sin(PI * SafeV), 0.0f),
             0.72f);
+        const float ProximalBlend = FMath::Exp(-FMath::Square(SafeV / 0.22f));
+        const float DistalAlpha = FMath::Clamp((SafeV - 0.64f) / 0.36f, 0.0f, 1.0f);
+        const float DistalBlend = DistalAlpha * DistalAlpha * (3.0f - 2.0f * DistalAlpha);
+        const float BaseRadius =
+            0.69f + 0.31f * LongitudinalEnvelope +
+            0.055f * ProximalBlend - 0.065f * DistalBlend;
+
+        const float CosTheta = FMath::Cos(Theta);
+        const float SinTheta = FMath::Sin(Theta);
+        const float FrontWeight = FMath::Square(FMath::Max(CosTheta, 0.0f));
+        const float RearWeight = FMath::Square(FMath::Max(-CosTheta, 0.0f));
+        const float Quadriceps =
+            FMath::Exp(-FMath::Square((SafeV - 0.46f) / 0.27f));
+        const float Hamstring =
+            FMath::Exp(-FMath::Square((SafeV - 0.34f) / 0.30f));
+        const float Adductor =
+            FMath::Exp(-FMath::Square((SafeV - 0.28f) / 0.30f));
+
+        // Keep the authored overlay just outside the assembled wetsuit body so
+        // the shape reads as one garment volume instead of intersecting it.
+        const float DepthRadius = BaseRadius * 0.94f;
+        const float WidthRadius = BaseRadius * (0.98f + 0.035f * Adductor);
+        const float DirectionalDepth =
+            1.0f + 0.105f * Quadriceps * FrontWeight +
+            0.060f * Hamstring * RearWeight;
+        return FVector(
+            DepthRadius * DirectionalDepth * CosTheta,
+            WidthRadius * SinTheta,
+            -1.0f + 2.0f * SafeV);
     };
     for (int32 Ring = 0; Ring <= Rings; ++Ring)
     {
         const float V = static_cast<float>(Ring) / Rings;
-        const float Z = -1.0f + 2.0f * V;
-        const float Radius = RadiusAt(V);
-        const float SampleStep = 1.0f / Rings;
-        const float PreviousV = FMath::Max(V - SampleStep, 0.0f);
-        const float NextV = FMath::Min(V + SampleStep, 1.0f);
-        const float DeltaZ = 2.0f * FMath::Max(NextV - PreviousV, UE_SMALL_NUMBER);
-        const float RadiusSlope = (RadiusAt(NextV) - RadiusAt(PreviousV)) / DeltaZ;
         for (int32 Side = 0; Side <= Sides; ++Side)
         {
             const float U = static_cast<float>(Side) / Sides;
             const float Theta = 2.0f * PI * U;
-            const float CosTheta = FMath::Cos(Theta);
-            const float SinTheta = FMath::Sin(Theta);
-            Vertices.Add(FVector(Radius * CosTheta, Radius * SinTheta, Z) * kBaseRadiusCm);
-            Normals.Add(FVector(CosTheta, SinTheta, -RadiusSlope).GetSafeNormal());
+            const float SampleV = 0.0025f;
+            const float SampleTheta = 0.0025f;
+            const FVector Position = SurfacePoint(V, Theta);
+            const FVector TangentV =
+                SurfacePoint(FMath::Min(V + SampleV, 1.0f), Theta) -
+                SurfacePoint(FMath::Max(V - SampleV, 0.0f), Theta);
+            const FVector TangentTheta =
+                SurfacePoint(V, Theta + SampleTheta) -
+                SurfacePoint(V, Theta - SampleTheta);
+            Vertices.Add(Position * kBaseRadiusCm);
+            Normals.Add(FVector::CrossProduct(TangentTheta, TangentV).GetSafeNormal());
             UVs.Add(FVector2D(U, V));
-            Tangents.Add(FProcMeshTangent(-SinTheta, CosTheta, 0.0f));
+            Tangents.Add(FProcMeshTangent(TangentTheta.GetSafeNormal(), false));
         }
     }
     for (int32 Ring = 0; Ring < Rings; ++Ring)
@@ -1426,8 +1456,8 @@ bool ARaftSimCrewAvatarActor::HasVisibleWaistHipSilhouette() const
     const FVector ExtentCm = GetWaistHipExtentCm();
     const FVector ThighExtentCm = GetMinimumHipThighBridgeExtentCm();
     return Section && Section->ProcVertexBuffer.Num() >= 500 &&
-        LeftBridgeSection && LeftBridgeSection->ProcVertexBuffer.Num() >= 350 &&
-        RightBridgeSection && RightBridgeSection->ProcVertexBuffer.Num() >= 350 &&
+        LeftBridgeSection && LeftBridgeSection->ProcVertexBuffer.Num() >= 650 &&
+        RightBridgeSection && RightBridgeSection->ProcVertexBuffer.Num() >= 650 &&
         ExtentCm.X >= 14.0f && ExtentCm.Y >= 21.0f && ExtentCm.Z >= 13.8f &&
         ThighExtentCm.X >= 6.2f && ThighExtentCm.Y >= 6.2f &&
         ThighExtentCm.Z >= 9.5f && IsWaistHipMaterialOpaque() &&
@@ -1481,6 +1511,51 @@ FVector ARaftSimCrewAvatarActor::GetMinimumHipThighBridgeExtentCm() const
         FMath::Min(LeftExtentCm.Z, RightExtentCm.Z));
 }
 
+int32 ARaftSimCrewAvatarActor::GetMinimumThighMeshVertexCount() const
+{
+    if (!LeftThigh || !RightThigh)
+    {
+        return 0;
+    }
+    const FProcMeshSection* LeftSection = LeftThigh->GetProcMeshSection(0);
+    const FProcMeshSection* RightSection = RightThigh->GetProcMeshSection(0);
+    return LeftSection && RightSection
+        ? FMath::Min(
+            LeftSection->ProcVertexBuffer.Num(),
+            RightSection->ProcVertexBuffer.Num())
+        : 0;
+}
+
+float ARaftSimCrewAvatarActor::GetMinimumThighForwardAlignment() const
+{
+    if (!LeftThigh || !RightThigh)
+    {
+        return -1.0f;
+    }
+    const FRaftSimCrewAvatarPose Pose =
+        URaftSimCrewAvatarPoseLibrary::EvaluatePose(
+            CurrentAction, AnimationPhase, SeatSide);
+    const FVector TorsoForward =
+        Pose.TorsoRotation.RotateVector(FVector::ForwardVector).GetSafeNormal();
+    const auto ForwardAlignment = [&](const UProceduralMeshComponent* Thigh,
+                                      const FVector& HipCm,
+                                      const FVector& KneeCm)
+    {
+        const FVector ThighAxis = (KneeCm - HipCm).GetSafeNormal();
+        const FVector ExpectedForward =
+            FVector::VectorPlaneProject(TorsoForward, ThighAxis).GetSafeNormal();
+        const FVector MeshForward = Thigh->GetRelativeRotation()
+            .RotateVector(FVector::ForwardVector)
+            .GetSafeNormal();
+        return ExpectedForward.IsNearlyZero()
+            ? -1.0f
+            : FVector::DotProduct(MeshForward, ExpectedForward);
+    };
+    return FMath::Min(
+        ForwardAlignment(LeftThigh, Pose.LeftHipCm, Pose.LeftKneeCm),
+        ForwardAlignment(RightThigh, Pose.RightHipCm, Pose.RightKneeCm));
+}
+
 float ARaftSimCrewAvatarActor::GetMaximumHipThighBridgeCoverageErrorCm() const
 {
     if (!LeftThigh || !RightThigh)
@@ -1524,10 +1599,11 @@ bool ARaftSimCrewAvatarActor::HasContinuousThighKneeSilhouette() const
     const FProcMeshSection* LeftBridgeSection = LeftThigh->GetProcMeshSection(0);
     const FProcMeshSection* RightBridgeSection = RightThigh->GetProcMeshSection(0);
     const FVector ThighExtentCm = GetMinimumHipThighBridgeExtentCm();
-    return LeftBridgeSection && LeftBridgeSection->ProcVertexBuffer.Num() >= 350 &&
-        RightBridgeSection && RightBridgeSection->ProcVertexBuffer.Num() >= 350 &&
+    return LeftBridgeSection && LeftBridgeSection->ProcVertexBuffer.Num() >= 650 &&
+        RightBridgeSection && RightBridgeSection->ProcVertexBuffer.Num() >= 650 &&
         ThighExtentCm.X >= 7.2f && ThighExtentCm.Y >= 7.2f &&
         ThighExtentCm.Z >= 15.5f && IsWaistHipMaterialOpaque() &&
+        GetMinimumThighForwardAlignment() >= 0.98f &&
         GetMaximumThighKneeBridgeCoverageErrorCm() <= 0.25f;
 }
 
@@ -2906,6 +2982,38 @@ void ARaftSimCrewAvatarActor::SetRoundedLimb(
             FMath::Max(Delta.ContainsNaN() ? RadiusCm : Delta.Size() * 0.5f, RadiusCm)));
 }
 
+void ARaftSimCrewAvatarActor::SetAnatomicalThigh(
+    UProceduralMeshComponent* Component,
+    const FVector& StartCm,
+    const FVector& EndCm,
+    float RadiusCm,
+    const FVector& TorsoForward)
+{
+    const FVector Delta = EndCm - StartCm;
+    const FVector SafeDirection = Delta.ContainsNaN() || Delta.IsNearlyZero()
+        ? FVector::UpVector
+        : Delta.GetSafeNormal();
+    FVector SafeForward = FVector::VectorPlaneProject(
+        TorsoForward.ContainsNaN() ? FVector::ForwardVector : TorsoForward,
+        SafeDirection).GetSafeNormal();
+    if (SafeForward.IsNearlyZero())
+    {
+        SafeForward = FVector::VectorPlaneProject(
+            FVector::ForwardVector, SafeDirection).GetSafeNormal();
+    }
+    const FRotator Rotation = SafeForward.IsNearlyZero()
+        ? FRotationMatrix::MakeFromZ(SafeDirection).Rotator()
+        : FRotationMatrix::MakeFromZX(SafeDirection, SafeForward).Rotator();
+    SetEllipsoid(
+        Component,
+        (StartCm + EndCm) * 0.5f,
+        Rotation,
+        FVector(
+            RadiusCm,
+            RadiusCm,
+            FMath::Max(Delta.ContainsNaN() ? RadiusCm : Delta.Size() * 0.5f, RadiusCm)));
+}
+
 void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
 {
     if (!bVisualBuilt)
@@ -3046,17 +3154,37 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         Pose.RightHipCm,
         Pose.RightKneeCm,
         kProductionHipThighBridgeEndFraction);
-    SetRoundedLimb(
-        LeftThigh,
-        bUsingProductionVisual ? LeftThighBridgeStartCm : Pose.LeftHipCm,
-        bUsingProductionVisual ? LeftThighBridgeEndCm : Pose.LeftKneeCm,
-        (bUsingProductionVisual ? kProductionHipThighBridgeRadiusCm : 8.3f) * LimbBulk);
+    if (bUsingProductionVisual)
+    {
+        const FVector TorsoForward =
+            TorsoRotation.RotateVector(FVector::ForwardVector);
+        SetAnatomicalThigh(
+            LeftThigh,
+            LeftThighBridgeStartCm,
+            LeftThighBridgeEndCm,
+            kProductionHipThighBridgeRadiusCm * LimbBulk,
+            TorsoForward);
+        SetAnatomicalThigh(
+            RightThigh,
+            RightThighBridgeStartCm,
+            RightThighBridgeEndCm,
+            kProductionHipThighBridgeRadiusCm * LimbBulk,
+            TorsoForward);
+    }
+    else
+    {
+        SetRoundedLimb(
+            LeftThigh,
+            Pose.LeftHipCm,
+            Pose.LeftKneeCm,
+            8.3f * LimbBulk);
+        SetRoundedLimb(
+            RightThigh,
+            Pose.RightHipCm,
+            Pose.RightKneeCm,
+            8.3f * LimbBulk);
+    }
     SetRoundedLimb(LeftShin, Pose.LeftKneeCm, Pose.LeftFootCm, 6.7f * LimbBulk);
-    SetRoundedLimb(
-        RightThigh,
-        bUsingProductionVisual ? RightThighBridgeStartCm : Pose.RightHipCm,
-        bUsingProductionVisual ? RightThighBridgeEndCm : Pose.RightKneeCm,
-        (bUsingProductionVisual ? kProductionHipThighBridgeRadiusCm : 8.3f) * LimbBulk);
     SetRoundedLimb(RightShin, Pose.RightKneeCm, Pose.RightFootCm, 6.7f * LimbBulk);
     const FVector LeftFootDirection = (Pose.LeftFootCm - Pose.LeftKneeCm).GetSafeNormal();
     const FVector RightFootDirection = (Pose.RightFootCm - Pose.RightKneeCm).GetSafeNormal();
