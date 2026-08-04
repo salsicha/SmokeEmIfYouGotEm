@@ -838,9 +838,11 @@ static int32 HideBreakingWaterPresentationComponents(
 static int32 HideRapidNiagaraPresentationComponents(
     UWorld* World,
     bool bHideAerosol,
-    bool bHideRoller)
+    bool bHideRoller,
+    bool bHideCrestSpray)
 {
-    if (World == nullptr || (!bHideAerosol && !bHideRoller))
+    if (World == nullptr ||
+        (!bHideAerosol && !bHideRoller && !bHideCrestSpray))
     {
         return 0;
     }
@@ -854,7 +856,12 @@ static int32 HideRapidNiagaraPresentationComponents(
                 Component->GetName().StartsWith(TEXT("ProductionRapidAerosol_"));
             const bool bHideRollerComponent = Component && bHideRoller &&
                 Component->GetName().StartsWith(TEXT("ProductionRapidRoller_"));
-            if (bHideAerosolComponent || bHideRollerComponent)
+            const bool bHideCrestSprayComponent =
+                Component && bHideCrestSpray &&
+                Component->GetName().StartsWith(
+                    TEXT("ProductionRapidCrestSpray_"));
+            if (bHideAerosolComponent || bHideRollerComponent ||
+                bHideCrestSprayComponent)
             {
                 Component->SetVisibility(false, true);
                 ++HiddenComponentCount;
@@ -939,6 +946,8 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
         HasDiagnosticMode(TEXT("norapidaerosol"));
     const bool bHideRapidRollerDiagnostic =
         HasDiagnosticMode(TEXT("norapidroller"));
+    const bool bHideRapidCrestSprayDiagnostic =
+        HasDiagnosticMode(TEXT("norapidcrestspray"));
     const bool bHideDetailedTerrainDiagnostic = HasDiagnosticMode(TEXT("noterrain"));
     const bool bHideFarFieldDiagnostic = HasDiagnosticMode(TEXT("nofarfield"));
     const bool bHideDressingDiagnostic = HasDiagnosticMode(TEXT("nodressing"));
@@ -1376,7 +1385,8 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
              bHideTubesDiagnostic, bHideFloorDiagnostic,
              bHideFittingsDiagnostic, bHideBreakingLipDiagnostic,
              bHideBreakingRollerDiagnostic, bHideRapidAerosolDiagnostic,
-             bHideRapidRollerDiagnostic, LiveSurfaceCoverageDiagnostic,
+             bHideRapidRollerDiagnostic, bHideRapidCrestSprayDiagnostic,
+             LiveSurfaceCoverageDiagnostic,
              LiveWaterRoughnessDiagnostic, LiveWaterSpecularDiagnostic]()
         {
             UWorld* W = WeakWorld.Get();
@@ -1385,21 +1395,24 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
                 GEngine->Exec(W, TEXT("viewmode unlit"));
             }
             if (W != nullptr &&
-                (bHideRapidAerosolDiagnostic || bHideRapidRollerDiagnostic))
+                (bHideRapidAerosolDiagnostic || bHideRapidRollerDiagnostic ||
+                 bHideRapidCrestSprayDiagnostic))
             {
                 const int32 HiddenRapidNiagaraComponentCount =
                     HideRapidNiagaraPresentationComponents(
                         W,
                         bHideRapidAerosolDiagnostic,
-                        bHideRapidRollerDiagnostic);
+                        bHideRapidRollerDiagnostic,
+                        bHideRapidCrestSprayDiagnostic);
                 UE_LOG(
                     LogTemp,
                     Display,
                     TEXT("RaftSim.CaptureRapidWrapTest: hidden rapid Niagara "
-                         "components=%d aerosol=%d roller=%d"),
+                         "components=%d aerosol=%d roller=%d crestSpray=%d"),
                     HiddenRapidNiagaraComponentCount,
                     bHideRapidAerosolDiagnostic ? 1 : 0,
-                    bHideRapidRollerDiagnostic ? 1 : 0);
+                    bHideRapidRollerDiagnostic ? 1 : 0,
+                    bHideRapidCrestSprayDiagnostic ? 1 : 0);
             }
             if (W != nullptr && bHideLiveSurfaceDiagnostic)
             {
@@ -1707,7 +1720,8 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
                              "depthV10Triangles=%d depthV10Visible=%d "
                              "depthV10Frames=%d depthV10Frame=%d "
                              "depthV10DepthCm=%.2f "
-                             "productionNiagara=%d rapidRollerEmitters=%d"),
+                             "productionNiagara=%d rapidRollerEmitters=%d "
+                             "rapidCrestSprayEmitters=%d"),
                         Vfx.Spray,
                         Vfx.Mist,
                         Vfx.ImpactSheet,
@@ -1730,7 +1744,8 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
                         VfxIt->GetDepthBearingContactWaterV10CurrentFrame(),
                         VfxIt->GetDepthBearingContactWaterV10DepthCm(),
                         VfxIt->GetProductionNiagaraComponentCount(),
-                        VfxIt->GetActiveRapidRollerNiagaraCount());
+                        VfxIt->GetActiveRapidRollerNiagaraCount(),
+                        VfxIt->GetActiveRapidCrestSprayNiagaraCount());
                 }
             }
             if (W != nullptr)
@@ -1743,7 +1758,8 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
                          bHideBreakingLipDiagnostic,
                          bHideBreakingRollerDiagnostic,
                          bHideRapidAerosolDiagnostic,
-                         bHideRapidRollerDiagnostic]()
+                         bHideRapidRollerDiagnostic,
+                         bHideRapidCrestSprayDiagnostic]()
                     {
                         if (UWorld* DiagnosticWorld = WeakWorld.Get())
                         {
@@ -1759,7 +1775,8 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
                             HideRapidNiagaraPresentationComponents(
                                 DiagnosticWorld,
                                 bHideRapidAerosolDiagnostic,
-                                bHideRapidRollerDiagnostic);
+                                bHideRapidRollerDiagnostic,
+                                bHideRapidCrestSprayDiagnostic);
                             APlayerController* MutablePC =
                                 DiagnosticWorld->GetFirstPlayerController();
                             ARaftSimRaftActor* CurrentRaft = FindRaft(DiagnosticWorld);
@@ -1969,7 +1986,7 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureRapidWrapTestCommand(
          "[unlit] [nowater] [noauthoredwater] [norockvisual] "
          "[novfx] [notubes] [nofloor] [norigging] "
          "[nobreakinglip] [nobreakingroller] "
-         "[norapidaerosol] [norapidroller] "
+         "[norapidaerosol] [norapidroller] [norapidcrestspray] "
          "[taa] [nobloom] [nocloud] "
          "[nofittings] [norubber] [reviewedrock] [noshadowwater] [nodressing] "
          "[noboulderdressing] [waterinventory] [terrainvertexmacro] "

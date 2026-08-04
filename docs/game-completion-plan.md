@@ -98,6 +98,24 @@ recirculation, spray/mist, synthetic environments and characters, measured
 performance, and all seven external acceptance gates remain open in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json`.
 
+**Solver-anchored three-scale breaking-spray checkpoint, August 4:** all six
+runnable rivers now add a fine ballistic crest-droplet population to the same
+solver-selected sites already used by medium roller fragments and long-lived
+aerosol. The new project-owned Niagara system is preallocated in an eight-
+component pool, shares the existing six-site camera-local density budget and
+120 m cull, and raises the complete production pool from 19 to 27 components.
+It does not change solver detection, cooked water, geometry, collision,
+navigation, buoyancy, D3/D4, or raft forces. A crest-only South Fork isolation
+reports two active emitters and shows detached short-lived droplets; the full
+Zambezi frame keeps them subordinate to the water rather than creating an
+opaque plume. The final editor build, M4 4/4, renderer-backed Niagara asset gate
+1/1, P2, and all six P4 runnable-map gates pass. `L_Zambezi` therefore remains
+the sixth runnable Free Run river. Photoreal promotion remains fail-closed:
+sprite-based breakup, coherent entrained-air volume, collision-aware spray,
+measured hydraulics, target-platform qualification, and all seven named
+external approvals remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json`.
+
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
 be labeled `procedural_infill`, store its seed and inputs, blend continuously into known

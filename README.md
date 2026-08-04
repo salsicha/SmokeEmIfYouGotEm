@@ -227,6 +227,18 @@ slivers and retains the artifact-free masked connector, but the subtle result
 still lacks convincing aerated volume, hole/pile recirculation, spray, and mist;
 photoreal promotion remains open in the
 [solver-anchored aerated crest review](docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json).
+The rapid particle stack now completes a bounded third scale at those same
+solver-accepted sites: eight preallocated `RapidCrestSpray` components share
+the existing six-site camera budget and 120 m cull with roller fragments and
+downstream aerosol. A dedicated project-owned Niagara system supplies short-
+lived, velocity-aligned ballistic droplets; crest-only isolation makes them
+readable without forming a fountain or opaque layer in the full Zambezi view.
+M4 passes 4/4, the six-system renderer-backed Niagara gate passes 1/1, and P2
+plus all six P4 runnable-map gates pass 7/7, including `L_Zambezi`. This is
+presentation-only technical progress—not photoreal promotion—because the
+droplets remain sprite-based and coherent aerated volume, collision-aware
+breakup, measured hydraulics, final art, and external approvals remain open in
+the [three-scale breaking-spray review](docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json).
 Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
 path that was silently restoring the older reflective water defaults after
 regeneration. The runtime now keeps the river-local, wet-cell-clipped volume

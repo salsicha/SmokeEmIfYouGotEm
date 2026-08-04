@@ -1,0 +1,159 @@
+{
+  "schema": "raftsim.photoreal.solver_anchored_three_scale_breaking_spray.review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "fe3eb70ad1846e72ee283b0cc115f7b4fffb952a",
+  "extends": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+  "status": "technical_candidate_retained_external_acceptance_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "production_promoted": false,
+  "runtime_rolled_out": true,
+  "summary": "The production breaking-water stack now has a third, fine ballistic crest-droplet scale. Eight preallocated Niagara components consume the same solver-accepted sites, six-site camera-local budget, distance density, and 120 m cull as the retained roller fragments and aerosol. A dedicated project-owned Niagara profile makes the droplets readable in crest-only isolation while remaining subtle in the full Zambezi frame. The candidate changes presentation only and does not make the smooth underlying rapid photoreal.",
+  "scope": {
+    "rivers": [
+      "american_south_fork",
+      "colorado_river_hance",
+      "pacuare_upper_huacas",
+      "futaleufu_terminator",
+      "chilko_lava_canyon",
+      "zambezi_batoka_gorge"
+    ],
+    "new_niagara_asset": true,
+    "map_generation": false,
+    "existing_maps_resaved": false,
+    "fail_closed_default": true
+  },
+  "authority_boundary": {
+    "breaking_site_source": "ARaftSimWaterSurfaceActor::GetBreakingSites",
+    "solver_breaking_site_detection_changed": false,
+    "solver_or_cooked_fields_changed": false,
+    "water_samples_changed": false,
+    "wet_dry_topology_changed": false,
+    "authoritative_water_or_terrain_geometry_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "presentation_only": true
+  },
+  "implementation": {
+    "component_tag": "RaftSimSolverAnchoredThreeScaleBreakingSprayV1",
+    "niagara_asset": "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidCrestSpray.uasset",
+    "niagara_asset_sha256": "37f04615f018d3c371d57d261e0575ee54a8e11322dd33d79559bcc4bca29260",
+    "production_niagara_system_count": 6,
+    "production_niagara_component_count": 27,
+    "crest_spray_pool_size": 8,
+    "maximum_active_sites": 6,
+    "full_density_distance_m": 60.0,
+    "cull_distance_m": 120.0,
+    "three_scales": [
+      "fine ballistic crest droplets",
+      "medium folding-face roller fragments",
+      "long-lived downstream aerosol"
+    ],
+    "profile": {
+      "spawn_rate_per_second": [100.0, 220.0],
+      "lifetime_seconds": [0.32, 0.72],
+      "sprite_min_cm": [3.0, 5.0],
+      "sprite_max_cm": [12.0, 24.0],
+      "source_plane_cm": [120.0, 36.0],
+      "speed_cm_per_second": [240.0, 540.0],
+      "cone_angle_degrees": 34.0,
+      "gravity_cm_per_second_squared": [0.0, 0.0, -980.0],
+      "drag": 0.22,
+      "velocity_aligned": true,
+      "atlas_frames": [0, 10]
+    },
+    "collision": "disabled",
+    "affects_navigation": false
+  },
+  "matched_evidence": {
+    "zambezi_breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 three_scale_breaking_spray_v1_after breaking_water_side",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_before.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_after.png",
+      "resolution": [1280, 720],
+      "visual_verdict": "Retain as a bounded technical candidate. Fine flecks remain subordinate to the crest and do not create a fountain, slab, opaque plume, or new shoreline/raft occlusion. The full-frame change is subtle and is not photoreal acceptance evidence."
+    },
+    "south_fork_crest_only_isolation": {
+      "command": "RaftSim.CaptureRapidWrapTest three_scale_breaking_spray_v1_crest_only 960 breaking_water norockvisual norapidaerosol norapidroller nobreakinglip nobreakingroller",
+      "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_crest_only.png",
+      "resolution": [1280, 720],
+      "active_crest_spray_emitters": 2,
+      "production_niagara_components": 27,
+      "visual_verdict": "Passes technical isolation: detached, short-lived fine droplets are visible above the accepted breaking site after the aerosol, roller-particle, lip-mesh, and roller-mesh layers are hidden. They remain sprite particles and do not establish a coherent overturning volume."
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final profile and telemetry changes",
+    "m4_water_vfx": "4/4 passed; three clean and one with the established renderer warning",
+    "m5_production_niagara": "1/1 passed renderer-backed; all six project-owned systems loaded and compiled",
+    "shared_water_and_runnable_maps": "RaftSim.P2.WaterSurfaceRenders plus all six RaftSim.P4.RiverMapLoads passed 7/7; four clean and three with established warnings",
+    "matched_renderer_capture": "Zambezi breaking-water-side capture completed at 1280x720 with the same camera contract and eight-second delay as the exact-current baseline",
+    "isolation_telemetry": "South Fork crest-only capture reported productionNiagara=27 and rapidCrestSprayEmitters=2",
+    "map_packages_resaved": false
+  },
+  "remaining_photoreal_defects": [
+    "The isolated crest spray remains visibly sprite-based and is not collision-aware or flow-advected after emission.",
+    "The rapid still lacks a coherent entrained-air volume, overturning pile, deep hole, recirculation, rock-contact plumes, raft wake, paddle interaction, and camera-lens water.",
+    "The sampled live-water rise and rapid profile remain visibly smooth and analytical at close range.",
+    "Terrain, banks, boulders, vegetation, atmosphere, raft equipment, characters, anatomy, PPE, animation, and hand/paddle contact remain below the requested photoreal target in at least one runnable river.",
+    "No named guide, geospatial, hydraulic, environment-art, water-VFX, rights, hazard-readability, product, or target-platform reviewer has approved full-scene promotion."
+  ],
+  "required_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ],
+  "reviewers": {
+    "named_water_vfx_environment_art_reviewer": null,
+    "qualified_river_guides": null,
+    "geospatial_technical_art_reviewer": null,
+    "rights_provenance_reviewer": null,
+    "safety_readability_reviewer": null,
+    "target_platform_reviewer": null,
+    "product_owner": null
+  },
+  "source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "c3f048c9c42c19e08c8c0fd933ba0beb2627fd5dd7bfa448311d9e161cb88024",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h": "26e64ea7ff6d13eb8e4f08013b70171bfb93f0bb23a8978364e95b5a5a453e90",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp": "2eed38b13ca16fe9a1623ef7f7445559556ab74e7bf01f79950e660812a8ae1b",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "28785291d8ee93116f155af02626a67816bf129a5b05c80128ec6bfcb7440c9d",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterVfxTest.cpp": "7c4367f15ef7be9e8cc4377885509e03fdd7a421629ea35e68f980cbae727a5e",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimNiagaraWaterVfxTest.cpp": "9356b11179e98e4714a413207ff2caafea2c06407a6b46994807308413f904e1",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp": "3c8f2c2c633c9024cc08df452acad5ca7be9ad37d3982ee62513b1731d4d2e10",
+    "unreal/Scripts/create_niagara_water_vfx.py": "7bc7198ce8f8a09ccd05cd813371eb7367b32af684101c8742ad6e664c5a3185",
+    "physics/tests/test_flexible_raft_visual_upgrade.py": "d22d85fe396d27571c36bdd810d9ff87fd84549ad14fbbbb0d4fc6bed5683d8d",
+    "physics/tests/test_editor_source_layout.py": "9206cc1ddc960383cab928f06f87d70d769a89fe2fbd467038bd46582c03a41f"
+  },
+  "artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_before.png",
+      "sha256": "f97d06f70c3a13b838545b53a7ce8c47a419fcf1532430a592c0cb0021b32621"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_after.png",
+      "sha256": "1f2be0e48ca4eedec3087ed683d4293d53b03bb8219cacef797fe9f012ef62f1"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_crest_only.png",
+      "sha256": "8f21f8f34b3a9a388310e2929f7ea33ebd3387640db32e3913d77a93e81fc60b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_p2_p4.json",
+      "sha256": "419a8d9364a135399bcf26a35e091a48068107aad3d8f2887fac47afcdc047f0"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_m4.json",
+      "sha256": "c94a5431e914c1c08f0d1a3a29e6561ffd84d3366e67d082a69f4a8d9219b118"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_m5.json",
+      "sha256": "6b275f40ec09267c051c850d8fa4843fcacfd2d459dc81e9841ad073d7208c62"
+    }
+  ]
+}

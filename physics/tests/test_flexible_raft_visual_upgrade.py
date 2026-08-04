@@ -657,6 +657,7 @@ def test_contact_water_cards_follow_d4_segment_authority() -> None:
         "IsProductionNiagaraReady",
         "GetProductionNiagaraComponentCount",
         "GetActiveRapidAerosolNiagaraCount",
+        "GetActiveRapidCrestSprayNiagaraCount",
     ):
         assert contract in vfx_header
     for contract in (
@@ -669,11 +670,16 @@ def test_contact_water_cards_follow_d4_segment_authority() -> None:
         "NS_RaftSim_AeratedMist",
         "NS_RaftSim_RapidAerosol",
         "NS_RaftSim_RapidRoller",
+        "NS_RaftSim_RapidCrestSpray",
         "SetBreakingRollerVolumeRenderingEnabled",
         "ActiveRapidRollerNiagaraCount",
+        "RapidCrestSprayNiagara",
+        "ActiveRapidCrestSprayNiagaraCount",
+        "RaftSimSolverAnchoredThreeScaleBreakingSprayV1",
         "MaxActiveRapidNiagaraSites = 6",
         "FMath::Lerp(18.0f, 52.0f, Intensity)",
         "FMath::Lerp(48.0f, 145.0f, Intensity)",
+        "FMath::Lerp(100.0f, 220.0f, Intensity)",
         "ParticleSurfaceCenter",
         "MakeCameraFacingCardRotation",
         "ConfigureVfxComponent(SprayInstances, PlaneMesh, Material)",

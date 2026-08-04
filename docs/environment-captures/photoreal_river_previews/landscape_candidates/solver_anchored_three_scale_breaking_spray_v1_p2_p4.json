@@ -1,0 +1,186 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "E1FC1D4F89486B29280B278B273B85E3",
+			"instanceName": "Alexs-MacBook-Air.local-92380",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-15.26.41",
+	"succeeded": 4,
+	"succeededWithWarnings": 3,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 73.405349731445312,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "WaterSurfaceRenders",
+			"fullTestPath": "RaftSim.P2.WaterSurfaceRenders",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 2.8464484214782715,
+			"dateTime": "2026.08.04-15.25.27",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-15.25.27"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Hance",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Hance",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 6.1578826904296875,
+			"dateTime": "2026.08.04-15.25.30",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_LavaCanyon",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 5.8982977867126465,
+			"dateTime": "2026.08.04-15.25.36",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Terminator",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Terminator",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 5.8677239418029785,
+			"dateTime": "2026.08.04-15.25.42",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Troublemaker",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Troublemaker",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 4.5340418815612793,
+			"dateTime": "2026.08.04-15.25.48",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogTemp: RaftSim capsize: raft=RaftSimRaftActor_0 location_cm=V(X=-6000.00, Z=93.26) rotation_deg=R(P=0.36, Y=2.84, R=102.82) flip_margin_nm=-93.835 flip_threshold_nm=1800.000 retained_water_kg=251.268 retained_roll_moment_nm=-1893.835 wet_samples=6/12 contacts=0 wrapping=0 pinned=0",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-15.25.49"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_UpperHuacas",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 5.4189143180847168,
+			"dateTime": "2026.08.04-15.25.52",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Pacuare humidity runtime values: density=0.0075000 volumetric=0 max_opacity=0.6200 start_cm=450.00 second_density=0.0012000 second_offset_cm=-160.00 second_falloff=0.0600",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-15.25.58"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Zambezi",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E1FC1D4F89486B29280B278B273B85E3"
+			],
+			"duration": 42.682037353515625,
+			"dateTime": "2026.08.04-15.25.58",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-15.26.15"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

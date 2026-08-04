@@ -25,7 +25,7 @@ SUPERSEDING_SOURCE_HASHES = {
         "146bbad2c6a5c7c99dfe5fa7d423a4c122544ba2041aa80f30c9ae28b4122fcf"
     ),
     "physics/tests/test_editor_source_layout.py": (
-        "dd24e2ac24eceef1f28b2ec7dd41d3fcc6ae41d54dbbdd50ffa24e04a1f64ade"
+        "9206cc1ddc960383cab928f06f87d70d769a89fe2fbd467038bd46582c03a41f"
     ),
 }
 

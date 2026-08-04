@@ -262,6 +262,8 @@ ARaftSimWaterVfxActor::ARaftSimWaterVfxActor()
     AeratedMistNiagara->SetupAttachment(Root);
     constexpr int32 RapidNiagaraPoolSize = 8;
     RapidAerosolNiagara.Reserve(RapidNiagaraPoolSize);
+    RapidRollerNiagara.Reserve(RapidNiagaraPoolSize);
+    RapidCrestSprayNiagara.Reserve(RapidNiagaraPoolSize);
     for (int32 Index = 0; Index < RapidNiagaraPoolSize; ++Index)
     {
         UNiagaraComponent* Component = CreateDefaultSubobject<UNiagaraComponent>(
@@ -273,6 +275,14 @@ ARaftSimWaterVfxActor::ARaftSimWaterVfxActor()
                 *FString::Printf(TEXT("ProductionRapidRoller_%02d"), Index));
         RollerComponent->SetupAttachment(Root);
         RapidRollerNiagara.Add(RollerComponent);
+        UNiagaraComponent* CrestSprayComponent =
+            CreateDefaultSubobject<UNiagaraComponent>(
+                *FString::Printf(
+                    TEXT("ProductionRapidCrestSpray_%02d"), Index));
+        CrestSprayComponent->SetupAttachment(Root);
+        CrestSprayComponent->ComponentTags.AddUnique(
+            TEXT("RaftSimSolverAnchoredThreeScaleBreakingSprayV1"));
+        RapidCrestSprayNiagara.Add(CrestSprayComponent);
     }
     ContactWaterPatch = CreateDefaultSubobject<UProceduralMeshComponent>(
         TEXT("ContactWaterPatch"));
@@ -383,6 +393,11 @@ ARaftSimWaterVfxActor::ARaftSimWaterVfxActor()
     {
         ConfigureNiagaraComponent(
             Component, nullptr, 2, RapidNiagaraCullDistanceCm);
+    }
+    for (UNiagaraComponent* Component : RapidCrestSprayNiagara)
+    {
+        ConfigureNiagaraComponent(
+            Component, nullptr, 3, RapidNiagaraCullDistanceCm);
     }
     ContactWaterPatch->SetMaterial(
         0,
@@ -707,6 +722,19 @@ void ARaftSimWaterVfxActor::BeginPlay()
         LoadWaterSystem(TEXT("NS_RaftSim_RapidAerosol"));
     UNiagaraSystem* RapidRollerSystem =
         LoadWaterSystem(TEXT("NS_RaftSim_RapidRoller"));
+    UNiagaraSystem* RapidCrestSpraySystem =
+        LoadWaterSystem(TEXT("NS_RaftSim_RapidCrestSpray"));
+    // The retained V4/V5 photographic review rosters predate this sixth
+    // production system. Keep those opt-in reviews runnable by falling back to
+    // the production crest profile until a matching isolated review asset is
+    // explicitly authored; the normal production path never takes this lane.
+    if (!RapidCrestSpraySystem && PhotographicReviewVersion > 0)
+    {
+        RapidCrestSpraySystem = LoadObject<UNiagaraSystem>(
+            nullptr,
+            TEXT("/Game/RaftSim/VFX/Water/NS_RaftSim_RapidCrestSpray."
+                 "NS_RaftSim_RapidCrestSpray"));
+    }
     ConfigureNiagaraComponent(
         SolverSprayNiagara, SolverSpraySystem, 3,
         ContactNiagaraCullDistanceCm);
@@ -728,17 +756,28 @@ void ARaftSimWaterVfxActor::BeginPlay()
             Component, RapidRollerSystem, 2,
             RapidNiagaraCullDistanceCm);
     }
+    for (UNiagaraComponent* Component : RapidCrestSprayNiagara)
+    {
+        ConfigureNiagaraComponent(
+            Component, RapidCrestSpraySystem, 3,
+            RapidNiagaraCullDistanceCm);
+    }
     bProductionNiagaraReady = SolverSprayNiagara &&
         SolverSprayNiagara->GetAsset() && ContactDropletNiagara &&
         ContactDropletNiagara->GetAsset() && AeratedMistNiagara &&
         AeratedMistNiagara->GetAsset() && !RapidAerosolNiagara.IsEmpty() &&
-        !RapidRollerNiagara.IsEmpty();
+        !RapidRollerNiagara.IsEmpty() && !RapidCrestSprayNiagara.IsEmpty();
     for (const UNiagaraComponent* Component : RapidAerosolNiagara)
     {
         bProductionNiagaraReady = bProductionNiagaraReady &&
             Component && Component->GetAsset();
     }
     for (const UNiagaraComponent* Component : RapidRollerNiagara)
+    {
+        bProductionNiagaraReady = bProductionNiagaraReady &&
+            Component && Component->GetAsset();
+    }
+    for (const UNiagaraComponent* Component : RapidCrestSprayNiagara)
     {
         bProductionNiagaraReady = bProductionNiagaraReady &&
             Component && Component->GetAsset();
@@ -1040,6 +1079,10 @@ int32 ARaftSimWaterVfxActor::GetProductionNiagaraComponentCount() const
         Count += Component && Component->GetAsset() ? 1 : 0;
     }
     for (const UNiagaraComponent* Component : RapidRollerNiagara)
+    {
+        Count += Component && Component->GetAsset() ? 1 : 0;
+    }
+    for (const UNiagaraComponent* Component : RapidCrestSprayNiagara)
     {
         Count += Component && Component->GetAsset() ? 1 : 0;
     }
@@ -2660,8 +2703,15 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 Component, false, FVector::ZeroVector, FVector::ForwardVector,
                 1.0f, 0.0f);
         }
+        for (UNiagaraComponent* Component : RapidCrestSprayNiagara)
+        {
+            SetNiagaraEmission(
+                Component, false, FVector::ZeroVector, FVector::ForwardVector,
+                1.0f, 0.0f);
+        }
         ActiveRapidNiagaraCount = 0;
         ActiveRapidRollerNiagaraCount = 0;
+        ActiveRapidCrestSprayNiagaraCount = 0;
         return;
     }
     // Niagara supplies detached spray and entrained-air breakup, but it cannot
@@ -2686,8 +2736,15 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 Component, false, FVector::ZeroVector, FVector::ForwardVector,
                 1.0f, 0.0f);
         }
+        for (UNiagaraComponent* Component : RapidCrestSprayNiagara)
+        {
+            SetNiagaraEmission(
+                Component, false, FVector::ZeroVector, FVector::ForwardVector,
+                1.0f, 0.0f);
+        }
         ActiveRapidNiagaraCount = 0;
         ActiveRapidRollerNiagaraCount = 0;
+        ActiveRapidCrestSprayNiagaraCount = 0;
         return;
     }
 
@@ -2755,6 +2812,7 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
 
     ActiveRapidNiagaraCount = 0;
     ActiveRapidRollerNiagaraCount = 0;
+    ActiveRapidCrestSprayNiagaraCount = 0;
     if (bProductionNiagaraReady)
     {
         TArray<int32> RankedSiteIndices;
@@ -2787,7 +2845,9 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             MaxActiveRapidNiagaraSites,
             RankedSiteIndices.Num(),
             FMath::Min(
-                RapidAerosolNiagara.Num(), RapidRollerNiagara.Num()));
+                FMath::Min(
+                    RapidAerosolNiagara.Num(), RapidRollerNiagara.Num()),
+                RapidCrestSprayNiagara.Num()));
         for (int32 PoolIndex = 0;
              PoolIndex < ActiveSiteBudget;
              ++PoolIndex)
@@ -2799,6 +2859,7 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             {
                 Downstream = FVector::ForwardVector;
             }
+            const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
             const float Intensity = FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
             const float DistanceCm = bHasCamera
                 ? FVector::Distance(CameraLocation, Site.WorldPositionCm)
@@ -2838,6 +2899,30 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 FMath::Lerp(1.10f, 1.55f, Intensity),
                 FMath::Lerp(48.0f, 145.0f, Intensity) * DistanceDensity);
             ActiveRapidRollerNiagaraCount += bEnabled ? 1 : 0;
+
+            // Complete the rapid's particle scale stack with fine ballistic
+            // crest spray. The same accepted site, distance density and
+            // bounded pool own all three populations: droplets leave a narrow
+            // crest source, roller fragments occupy the folding face, and
+            // aerosol drifts downstream. A deterministic alternating lateral
+            // bias avoids six identical vertical fountains without inventing
+            // any new hydraulic or collision authority.
+            const float LateralBias =
+                (PoolIndex & 1) == 0 ? -0.12f : 0.12f;
+            const FVector CrestSprayOrigin = Site.WorldPositionCm +
+                Downstream * 18.0f + Across * (LateralBias * 85.0f) +
+                FVector::UpVector * 60.0f;
+            const FVector CrestSprayDirection =
+                (Downstream * 0.48f + Across * LateralBias +
+                 FVector::UpVector * 0.86f).GetSafeNormal();
+            SetNiagaraEmission(
+                RapidCrestSprayNiagara[PoolIndex],
+                bEnabled,
+                CrestSprayOrigin,
+                CrestSprayDirection,
+                FMath::Lerp(0.85f, 1.10f, Intensity),
+                FMath::Lerp(100.0f, 220.0f, Intensity) * DistanceDensity);
+            ActiveRapidCrestSprayNiagaraCount += bEnabled ? 1 : 0;
         }
         for (int32 PoolIndex = ActiveSiteBudget;
              PoolIndex < RapidAerosolNiagara.Num();
@@ -2854,6 +2939,14 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             SetNiagaraEmission(
                 RapidRollerNiagara[PoolIndex], false, FVector::ZeroVector,
                 FVector::ForwardVector, 1.0f, 0.0f);
+        }
+        for (int32 PoolIndex = ActiveSiteBudget;
+             PoolIndex < RapidCrestSprayNiagara.Num();
+             ++PoolIndex)
+        {
+            SetNiagaraEmission(
+                RapidCrestSprayNiagara[PoolIndex], false,
+                FVector::ZeroVector, FVector::ForwardVector, 1.0f, 0.0f);
         }
     }
 }
