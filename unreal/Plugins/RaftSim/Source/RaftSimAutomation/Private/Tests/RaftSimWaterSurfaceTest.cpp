@@ -595,7 +595,13 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         Surface->GetBreakingLipTriangleCount() <= 12288);
     Test->TestTrue(
         TEXT("connected breaking curtain stays inside its three-site triangle budget"),
-        Surface->GetBreakingRollerVolumeTriangleCount() <= 1512);
+        Surface->GetBreakingRollerVolumeTriangleCount() <= 3132);
+    Test->TestTrue(
+        TEXT("connected breaking curtain stays inside its three-site vertex budget"),
+        Surface->GetBreakingRollerVolumeVertexCount() <= 1710);
+    Test->TestTrue(
+        TEXT("connected breaking curtain never exceeds forty centimetres thickness"),
+        Surface->GetBreakingRollerVolumeMaximumThicknessCm() <= 40.01f);
     return true;
 }
 

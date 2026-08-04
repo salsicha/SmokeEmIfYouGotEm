@@ -1798,13 +1798,24 @@ def test_live_water_surface_avoids_double_volume_transmission():
     )
     assert "BreakingRollerVolumeMesh->SetCastShadow(false)" in source
     assert "constexpr int32 kMaximumRollerSites = 3" in source
-    assert "constexpr int32 kLayerCount = 1" in source
+    assert "constexpr int32 kSkinCount = 2" in source
     assert "constexpr int32 kAcrossSegments = 18" in source
     assert "constexpr int32 kLoopSegments = 14" in source
+    assert (
+        "const int32 MaskedConnectorTrianglesPerSite = kAcrossSegments * 2"
+        in source
+    )
+    assert "const float HalfThicknessCm" in source
+    assert "HalfThicknessCm * 2.0f" in source
+    assert "ProfileNormal * SkinSign * HalfThicknessCm" in source
+    assert "Join the two skins only at the plunge row" in source
+    assert 'TEXT("RaftSimSolverAnchoredAeratedCrestThicknessV1")' in source
     assert "const float ProfileLoopT = FMath::Lerp(0.48f, 1.0f, LoopT)" in source
     assert "BreakingRollerVolumeMesh->SetMaterial(0, RapidFoamMaterial)" in source
     assert 'TEXT("SolverOverlayFoamLace")' in source
     assert "BreakingRollerVolumeTriangleCount = RollerTriangles.Num() / 3" in source
+    assert "BreakingRollerVolumeVertexCount = RollerVertices.Num()" in source
+    assert "GetBreakingRollerVolumeMaximumThicknessCm" in header_source
     assert source.count("M_RaftSim_BreakingWaterLip") >= 2
     assert "PresentationCoverage = 0.0f" in header_source
     assert "RiverCoordinatesMeters = FVector2D::ZeroVector" in header_source

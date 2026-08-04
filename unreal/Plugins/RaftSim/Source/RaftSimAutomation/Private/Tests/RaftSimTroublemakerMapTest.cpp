@@ -189,14 +189,24 @@ bool FRaftSimAssertRiverMapCommand::Update()
         if (!PresentationBreakingSites.IsEmpty())
         {
             const int32 ExpectedConnectedCurtainTriangles =
-                FMath::Min(PresentationBreakingSites.Num(), 3) * 504;
+                FMath::Min(PresentationBreakingSites.Num(), 3) * 1044;
+            const int32 ExpectedConnectedCurtainVertices =
+                FMath::Min(PresentationBreakingSites.Num(), 3) * 570;
             Test->TestTrue(
                 TEXT("solver breaking sites retain a connected production water curtain"),
                 It->IsBreakingRollerVolumeVisible());
             Test->TestEqual(
-                TEXT("connected curtain uses one bounded membrane at the three strongest sites"),
+                TEXT("connected curtain uses one bounded two-skin crest envelope at the three strongest sites"),
                 It->GetBreakingRollerVolumeTriangleCount(),
                 ExpectedConnectedCurtainTriangles);
+            Test->TestEqual(
+                TEXT("connected crest envelope retains two coherent skins per selected site"),
+                It->GetBreakingRollerVolumeVertexCount(),
+                ExpectedConnectedCurtainVertices);
+            Test->TestTrue(
+                TEXT("connected crest envelope has visible but bounded full thickness"),
+                It->GetBreakingRollerVolumeMaximumThicknessCm() > 10.0f &&
+                    It->GetBreakingRollerVolumeMaximumThicknessCm() <= 40.01f);
         }
         if (bUsesSolverOwnedVisibleRiver)
         {

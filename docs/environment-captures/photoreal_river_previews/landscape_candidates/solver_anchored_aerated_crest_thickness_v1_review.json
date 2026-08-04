@@ -1,0 +1,126 @@
+{
+  "schema": "raftsim.photoreal.solver_anchored_aerated_crest_thickness.review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "f524e5f6f4cba13293b2328d013ba917ebc17241",
+  "extends": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
+  "status": "technical_candidate_retained_external_acceptance_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "production_promoted": false,
+  "runtime_rolled_out": true,
+  "summary": "Each of the three strongest solver-accepted breaking sites now uses one bounded two-skin aerated crest surface instead of a zero-thickness membrane. The skins share the same solver-shaped profile, separate only along the local profile normal, and join at the fully masked plunge boundary. A first visible-crown connector produced vertical slivers in the matched Zambezi capture and was rejected before release; the retained masked connector removes that artifact. The result adds subtle front-to-back parallax without changing physics, but it does not yet read as photoreal overturning whitewater.",
+  "scope": {
+    "rivers": [
+      "american_south_fork",
+      "colorado_river_hance",
+      "pacuare_upper_huacas",
+      "futaleufu_terminator",
+      "chilko_lava_canyon",
+      "zambezi_batoka_gorge"
+    ],
+    "breaking_sites_per_surface": 3,
+    "new_generation": false,
+    "existing_maps_resaved": false,
+    "fail_closed_default": true
+  },
+  "authority_boundary": {
+    "solver_breaking_site_detection_changed": false,
+    "solver_or_cooked_fields_changed": false,
+    "water_samples_changed": false,
+    "wet_dry_topology_changed": false,
+    "authoritative_water_or_terrain_geometry_changed": false,
+    "presentation_geometry_changed": true,
+    "collision_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "raft_and_crew_exclusion_retained": true,
+    "presentation_only": true
+  },
+  "implementation": {
+    "component_tag": "RaftSimSolverAnchoredAeratedCrestThicknessV1",
+    "skins_per_site": 2,
+    "vertices_per_site": 570,
+    "skin_triangles_per_site": 1008,
+    "masked_connector_triangles_per_site": 36,
+    "total_triangles_per_site": 1044,
+    "maximum_sites": 3,
+    "maximum_vertices_per_surface": 1710,
+    "maximum_triangles_per_surface": 3132,
+    "maximum_full_thickness_cm": 40.0,
+    "thickness_axis": "local solver-profile normal",
+    "visible_crown_connector": false,
+    "masked_plunge_connector": true,
+    "material": "existing river-local RapidFoamMaterial with SolverOverlayFoamLace",
+    "collision": "disabled",
+    "navigation_or_water_sampling_authority": false
+  },
+  "matched_evidence": {
+    "zambezi_breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 aerated_crest_thickness_v1_after breaking_water_side",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_before.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_after.png",
+      "resolution": [1280, 720],
+      "visual_verdict": "Retain as a bounded technical candidate. The final frame has no crown-cap slivers, slab, dome, tent, rail, card, or shoreline regression. The added depth is subtle and does not close the missing volumetric aeration, hole, pile, recirculation, spray, or mist defects."
+    }
+  },
+  "rejected_iteration": {
+    "visible_crown_connector": "Rejected before release because the matched Zambezi frame exposed repeated vertical dark or bright slivers along the cross-section. Moving the connection to the exactly zero-alpha plunge row removed the artifact while keeping each site's two skins in one connected procedural mesh."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final masked-connector source and native-test changes",
+    "source_contract": "test_live_water_surface_avoids_double_volume_transmission passed 1/1",
+    "shared_water_and_runnable_maps": "RaftSim.P2.WaterSurfaceRenders plus all six RaftSim.P4.RiverMapLoads completed 7/7 with zero failures; four succeeded cleanly and three succeeded with established warnings",
+    "automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_p2_p4.json",
+    "matched_renderer_capture": "The Zambezi breaking-water-side frame completed at 1280x720 with the same command, camera contract, and eight-second delay as the exact-current baseline",
+    "map_packages_resaved": false
+  },
+  "remaining_photoreal_defects": [
+    "The crest envelope remains a masked presentation surface rather than a genuinely resolved entrained-air volume with coherent overturn, pile, hole, and recirculation.",
+    "Spray, suspended droplets, mist, rock-contact plumes, raft wake, paddle interaction, wet fabric, and camera-lens water remain incomplete or unapproved.",
+    "The sampled live-water rise and rapid profile remain visibly smooth and analytical at close range.",
+    "Terrain, banks, boulders, vegetation, atmosphere, raft equipment, characters, anatomy, PPE, animation, and hand/paddle contact remain below the requested photoreal target in at least one runnable river.",
+    "No named guide, geospatial, hydraulic, environment-art, water-VFX, rights, hazard-readability, product, or target-platform reviewer has approved full-scene promotion."
+  ],
+  "required_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ],
+  "reviewers": {
+    "named_water_vfx_environment_art_reviewer": null,
+    "qualified_river_guides": null,
+    "geospatial_technical_art_reviewer": null,
+    "rights_provenance_reviewer": null,
+    "safety_readability_reviewer": null,
+    "target_platform_reviewer": null,
+    "product_owner": null
+  },
+  "source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "146bbad2c6a5c7c99dfe5fa7d423a4c122544ba2041aa80f30c9ae28b4122fcf",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "31feee3d61bb80e70535c9d011bef843a5a9e7b910a9ec38e38989eab5ac22f0",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "6f2526ae5772ad11d772b77e04f52bf09f098348cd5e0a4c167c962fa988a870",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "2c988a3c2823de09ccdea19674f131c334f13bb25def42c11189a4e47352ef39",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp": "2b94320e52f66d334079617bb42b398fd6a03ad7e5348fc4e2d8ac15f8e0e61e",
+    "physics/tests/test_editor_source_layout.py": "dd24e2ac24eceef1f28b2ec7dd41d3fcc6ae41d54dbbdd50ffa24e04a1f64ade",
+    "physics/tests/test_shared_flow_advected_foam.py": "42e66fcd649949b4da836247a64d8aea9fe7c3586e6bd86b0fb357ef6ca72959",
+    "physics/tests/test_m9_release_acceptance_packet.py": "9663c21dad0f7980e40a935df5c985475450fe72e8ae3b752395d185f392bccd"
+  },
+  "artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_before.png",
+      "sha256": "fd25c8a733ec038d828388df7390ca928c1b8cc1ee8a7cda883a29d05e11cba3"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_after.png",
+      "sha256": "672007160fdb8f6082d75cbb12416a6d459b417b0a57d5c500e982e7ef3bfbe8"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_p2_p4.json",
+      "sha256": "e42bd223bbf025d2795f6835c18155f4860646fbb4093b440a1919006e56cb7e"
+    }
+  ]
+}
