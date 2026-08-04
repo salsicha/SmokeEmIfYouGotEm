@@ -17,16 +17,17 @@ Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
 to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
 and do not delay a complete South Fork 1.0.
 
-**Runnable-portfolio checkpoint, August 4:** all six rivers are selectable Free
-Runs. Zambezi is explicitly river 6 and resolves through
+**Runnable-portfolio V17 checkpoint, August 4:** all six rivers are selectable
+Free Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
-package. Its rebuilt native catalog and progression gates, 27 focused Python
-contracts, focused Zambezi PIE gate, and six isolated runnable-map PIE gates
-pass at the current release head; this confirms runnable-reference status only and does not close
-its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
+package. Its native catalog and progression gates pass 2/2, all 27 focused
+Python contracts pass, and the isolated Zambezi PIE gate loads the current map
+with MapCheck 0/0, the vertical-slice game mode, 10 live breaking sites, and 645
+rapid-foam vertices. This confirms runnable-reference status only and does not
+close its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
 The selection and progression manifests now also mark it `runnable: true` with
 `availability: free_run`. See
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v16_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json`.
 
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt

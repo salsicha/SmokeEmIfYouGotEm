@@ -14,13 +14,13 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
-The August 4 V16 release-head certification confirms again that the frontend
+The August 4 V17 release-head certification confirms again that the frontend
 selector, source scenario, shipping cook, saved map, and live PIE launch all
 resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads
 with the vertical-slice game mode and live cooked-field water, and is not an
 environment-preview-only map. The focused career and progression gates, all 27
-Zambezi registry/source contracts, and all six runnable maps pass on the
-current release head. Its gameplay river is now a
+Zambezi registry/source contracts, and the isolated Zambezi map-load gate pass
+on the current release head. Its gameplay river is now a
 solver-owned, wet-cell-clipped transmitting core rather than the former opaque
 gray static ribbon. Its V2 optical body now consumes live wet-cell vertex-alpha
 coverage across a 7.5 m bank blend. The shared parent now applies that coverage
@@ -32,7 +32,7 @@ while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
 still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v16_review.json),
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The shared optical-bank change and its six-river no-regression evidence are

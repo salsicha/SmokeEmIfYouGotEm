@@ -1,0 +1,81 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "DB57778239423B264050468470854A49",
+			"instanceName": "Alexs-MacBook-Air.local-12646",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-17.59.40",
+	"succeeded": 0,
+	"succeededWithWarnings": 1,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 41.456722259521484,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "L_Zambezi",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"DB57778239423B264050468470854A49"
+			],
+			"duration": 41.456722259521484,
+			"dateTime": "2026.08.04-17.58.58",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.59.15"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.59.33"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.59.34"
+				}
+			],
+			"warnings": 3,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

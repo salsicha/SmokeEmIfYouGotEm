@@ -23,10 +23,10 @@ package is not the runnable map.
 The runnable map was regenerated and rechecked after the later environment,
 character, water, terrain, and rapid-presentation milestones, including the
 retained V19 elevation-stratified launch ecology, later cold-water highlight
-and depth passes, and the V2 irregular near-field terrain pass. The V16
-release-head certification supersedes V15 after the subsequent shared-water
-and solver-anchored rapid-presentation milestones. The versioned Zambezi map
-remains byte-identical and the player path is still:
+and depth passes, and the V2 irregular near-field terrain pass. The V17
+release-head certification supersedes V16 after the subsequent raft-safe
+breaking-water occlusion milestone. The versioned Zambezi map remains
+byte-identical and the player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
@@ -39,14 +39,17 @@ gate loads the committed map into PIE, reports the vertical-slice game mode,
 binds the 5,908-point curved coordinate map and cooked field, exposes 10,465 wet
 surface vertices, ten live breaking sites, 645 visible rapid-foam vertices,
 and 16,896 transmitting-water core triangles, and completes MapCheck with zero
-errors and zero warnings. Its only accepted automation warning is the external
-connectivity probe timeout, which has no map-load or gameplay authority.
+errors and zero warnings. The three accepted automation warnings are the
+external-connectivity probe timeout, a headless audio sample-rate diagnostic,
+and a render-thread-safety diagnostic for motion-vector simulation; none has
+map-load or gameplay authority.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v16_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json`.
 
-This verifies that Zambezi is runnable from a fresh checkout. It does not close
+This verifies the current committed Zambezi source, runtime registry, and map
+package. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
 seasonal-flow, guide, rights, photoreal-art, or target-performance gates.
 

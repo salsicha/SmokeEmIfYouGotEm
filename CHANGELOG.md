@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Re-certified Zambezi Batoka Gorge as runnable river 6 after the shared
+  raft/crew breaking-water occlusion milestone. The player catalog and Free
+  Run progression manifest explicitly retain `runnable: true`,
+  `availability: free_run`, and `zambezi_reference_run` →
+  `/Game/RaftSim/Maps/L_Zambezi`, and now link the V17 hash-locked review. The
+  map package remains byte-identical. The exact release source builds
+  successfully; 27 focused contracts pass, native catalog/progression gates
+  pass 2/2, and the
+  live Zambezi PIE gate passes 1/1 with MapCheck 0/0. This certifies runnable
+  reference play only; surveyed bathymetry, rapid-specific hydraulics,
+  photoreal art, guide/rights review, and platform qualification remain open.
 - Extended the live raft/crew foam exclusion into the shared connected-
   breaking-water material. A narrower raft-aligned footprint clears the former
   opaque water layer from raft fabric, fittings, passengers, and paddles while
