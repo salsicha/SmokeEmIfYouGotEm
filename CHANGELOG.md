@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced the rejected cold-water terrain-overlay approach with a default-off,
+  presentation-only bank boundary profile for runnable Futaleufú and Chilko.
+  Three station-anchored bands vary the existing alpha feather independently
+  on river left and right; the Single Layer Water core's outermost wet vertices
+  retreat inward by at most 0.90 m and less than one 1.50 m render cell. The
+  four-wet-corner topology, sampled wet mask, maps, materials, bathymetry,
+  collision, buoyancy, raft forces, D3, and D4 are unchanged. The fixed Chilko
+  close-up records a 3.84 px mean retreat and 16.69% higher detrended contact
+  variation without a rail or gap; the Futaleufú rapid-side frame is an honest
+  no-regression control, not a claimed visual gain. Photoreal and all six
+  external gates remain open.
 - Rejected and fully removed a source-conditioned Futaleufú/Chilko shoreline
   overlay after two fixed-camera brackets. The final 18 m bank strips passed
   generation at 11,438 vertices and 21,600 triangles per river, but Chilko's

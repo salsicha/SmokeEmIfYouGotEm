@@ -288,6 +288,15 @@ float ComputeLateralWetCoverage(
         1.0f);
     return LinearCoverage * LinearCoverage * (3.0f - 2.0f * LinearCoverage);
 }
+
+float ComputePresentationBankProfile(float StationMeters, bool bRiverLeft)
+{
+    const float SidePhase = bRiverLeft ? 2.173f : -0.827f;
+    return
+        0.55f * FMath::Sin(StationMeters * 0.052f + SidePhase) +
+        0.30f * FMath::Sin(StationMeters * 0.137f - SidePhase * 0.73f) +
+        0.15f * FMath::Sin(StationMeters * 0.319f + SidePhase * 1.61f);
+}
 }
 
 float ARaftSimWaterSurfaceActor::ComputePresentationSurfaceEdgeClearanceMeters(
@@ -313,6 +322,79 @@ float ARaftSimWaterSurfaceActor::ComputePresentationSurfaceEdgeClearanceMeters(
         MaximumWetLateralIndex - LateralIndex);
     return FMath::Min(StationEdgeSteps, LateralEdgeSteps) *
         FMath::Max(InVertexSpacingMeters, 0.0f);
+}
+
+float ARaftSimWaterSurfaceActor::ComputePresentationBankCoverage(
+    float StationMeters,
+    int32 LateralIndex,
+    int32 MinimumWetLateralIndex,
+    int32 MaximumWetLateralIndex,
+    float InVertexSpacingMeters,
+    float EdgeBlendMeters,
+    bool bEnableNaturalism,
+    float NaturalismAmplitudeMeters)
+{
+    const float BaseCoverage = ComputeLateralWetCoverage(
+        LateralIndex,
+        MinimumWetLateralIndex,
+        MaximumWetLateralIndex,
+        InVertexSpacingMeters,
+        EdgeBlendMeters);
+    const int32 RiverRightSteps =
+        LateralIndex - MinimumWetLateralIndex;
+    const int32 RiverLeftSteps =
+        MaximumWetLateralIndex - LateralIndex;
+    const int32 EdgeSteps = FMath::Min(RiverRightSteps, RiverLeftSteps);
+    if (!bEnableNaturalism || NaturalismAmplitudeMeters <= 0.0f ||
+        EdgeSteps <= 0 || MinimumWetLateralIndex < 0 ||
+        MaximumWetLateralIndex < MinimumWetLateralIndex)
+    {
+        return BaseCoverage;
+    }
+
+    // Anchor three incommensurate bands in global river station so the visual
+    // contour is deterministic across moving-window recentres. Independent
+    // side phases prevent the two banks from reading as a mirrored ribbon.
+    const bool bNearestRiverLeft = RiverLeftSteps < RiverRightSteps;
+    const float BankProfile = ComputePresentationBankProfile(
+        StationMeters, bNearestRiverLeft);
+    const float EdgeDistanceMeters =
+        EdgeSteps * FMath::Max(InVertexSpacingMeters, 0.0f);
+    const float ShiftedEdgeDistanceMeters = FMath::Max(
+        EdgeDistanceMeters +
+            BankProfile * FMath::Clamp(NaturalismAmplitudeMeters, 0.0f, 1.25f),
+        0.0f);
+    const float LinearCoverage = FMath::Clamp(
+        ShiftedEdgeDistanceMeters /
+            FMath::Max(EdgeBlendMeters, KINDA_SMALL_NUMBER),
+        0.0f,
+        1.0f);
+    return LinearCoverage * LinearCoverage *
+        (3.0f - 2.0f * LinearCoverage);
+}
+
+float ARaftSimWaterSurfaceActor::ComputePresentationBankRetreatMeters(
+    float StationMeters,
+    bool bRiverLeft,
+    float InVertexSpacingMeters,
+    bool bEnableNaturalism,
+    float NaturalismAmplitudeMeters)
+{
+    if (!bEnableNaturalism || NaturalismAmplitudeMeters <= 0.0f ||
+        InVertexSpacingMeters <= 0.0f)
+    {
+        return 0.0f;
+    }
+    const float BankProfile = FMath::Clamp(
+        ComputePresentationBankProfile(StationMeters, bRiverLeft),
+        -1.0f,
+        1.0f);
+    const float NormalizedRetreat =
+        0.35f + 0.65f * (0.5f + 0.5f * BankProfile);
+    return FMath::Min(
+        FMath::Clamp(NaturalismAmplitudeMeters, 0.0f, 1.25f) *
+            NormalizedRetreat,
+        InVertexSpacingMeters * 0.80f);
 }
 
 ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
@@ -1031,6 +1113,19 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     ResolvedRapidFoamCoverageGain = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveRapidFoamCoverageGain, 0.0f, 1.0f)
         : 1.0f;
+    bLivePresentationBankNaturalismEnabled =
+        bLiveSurfaceCarrierEnabled &&
+        (RiverWaterConfig->bEnableLivePresentationBankNaturalism ||
+            bUsesMigratedColdWaterVolumeCore);
+    ResolvedPresentationBankNaturalismAmplitudeMeters =
+        bLivePresentationBankNaturalismEnabled
+        ? FMath::Clamp(
+              RiverWaterConfig->bEnableLivePresentationBankNaturalism
+                  ? RiverWaterConfig->LivePresentationBankNaturalismAmplitudeMeters
+                  : 0.90f,
+              0.0f,
+              1.25f)
+        : 0.0f;
     if (bLiveSurfaceCarrierEnabled)
     {
         CurvedGridLateralEdgeBlendMeters = FMath::Clamp(
@@ -2671,12 +2766,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     GridStationN,
                     ResolvedVertexSpacingMeters,
                     CurvedGridEdgeBlendMeters);
-                const float LateralCoverage = ComputeLateralWetCoverage(
+                const float LateralCoverage = ComputePresentationBankCoverage(
+                    RiverCoordinatesM[Index].X,
                     Y,
                     MinimumWetLateralIndex[X],
                     MaximumWetLateralIndex[X],
                     ResolvedVertexSpacingMeters,
-                    CurvedGridLateralEdgeBlendMeters);
+                    CurvedGridLateralEdgeBlendMeters,
+                    bLivePresentationBankNaturalismEnabled,
+                    ResolvedPresentationBankNaturalismAmplitudeMeters);
                 VertexColors[Index].A = StationCoverage * LateralCoverage;
             }
         }
@@ -2735,6 +2833,58 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             LiveVolumeCoreVertices[Index] =
                 Vertices[Index] -
                 Normals[Index].GetSafeNormal() * kLiveVolumeCoreOffsetCm;
+        }
+        if (bLivePresentationBankNaturalismEnabled)
+        {
+            // The Single Layer Water volume still shades at nearly zero
+            // surface opacity, so alpha alone cannot break up its hard bank
+            // silhouette. Retreat only each station's two outermost wet core
+            // vertices toward their wet interior neighbour. The retreat is
+            // always inward and stays inside one presentation cell; sampled
+            // vertices, wet masks, topology, collision, and physics are not
+            // changed.
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                const int32 MinimumY = MinimumWetLateralIndex[X];
+                const int32 MaximumY = MaximumWetLateralIndex[X];
+                if (MinimumY < 0 || MaximumY <= MinimumY + 1 ||
+                    MaximumY >= GridLateralN)
+                {
+                    continue;
+                }
+                const int32 RiverRightIndex =
+                    MinimumY * GridStationN + X;
+                const int32 RiverRightInteriorIndex =
+                    (MinimumY + 1) * GridStationN + X;
+                const int32 RiverLeftIndex =
+                    MaximumY * GridStationN + X;
+                const int32 RiverLeftInteriorIndex =
+                    (MaximumY - 1) * GridStationN + X;
+                const float RiverRightRetreatMeters =
+                    ComputePresentationBankRetreatMeters(
+                        RiverCoordinatesM[RiverRightIndex].X,
+                        false,
+                        ResolvedVertexSpacingMeters,
+                        true,
+                        ResolvedPresentationBankNaturalismAmplitudeMeters);
+                const float RiverLeftRetreatMeters =
+                    ComputePresentationBankRetreatMeters(
+                        RiverCoordinatesM[RiverLeftIndex].X,
+                        true,
+                        ResolvedVertexSpacingMeters,
+                        true,
+                        ResolvedPresentationBankNaturalismAmplitudeMeters);
+                const float SafeSpacingMeters = FMath::Max(
+                    ResolvedVertexSpacingMeters, KINDA_SMALL_NUMBER);
+                LiveVolumeCoreVertices[RiverRightIndex] = FMath::Lerp(
+                    LiveVolumeCoreVertices[RiverRightIndex],
+                    LiveVolumeCoreVertices[RiverRightInteriorIndex],
+                    RiverRightRetreatMeters / SafeSpacingMeters);
+                LiveVolumeCoreVertices[RiverLeftIndex] = FMath::Lerp(
+                    LiveVolumeCoreVertices[RiverLeftIndex],
+                    LiveVolumeCoreVertices[RiverLeftInteriorIndex],
+                    RiverLeftRetreatMeters / SafeSpacingMeters);
+            }
         }
         const bool bTopologyChanged =
             LiveVolumeCoreTriangles != NewVolumeCoreTriangles;

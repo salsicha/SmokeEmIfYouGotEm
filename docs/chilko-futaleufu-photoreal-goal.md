@@ -527,6 +527,40 @@ terrain sheet. Exact images, hashes, archived experiment snapshots, authority
 boundaries, remaining defects, and external gates are recorded in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_review.json`.
 
+## Shared Cold-Water Presentation Bank Naturalism V1
+
+The follow-up changes the live water-coverage boundary instead of adding
+another bank overlay. A default-off `ARaftSimRiverWaterConfig` opt-in is
+serialized only by the Futaleufú and Chilko generators; their stable cooked-
+field identities apply the same migration to the two accepted map binaries.
+Three incommensurate global-station bands use independent left/right phases to
+vary the existing alpha feather. Because Single Layer Water still shades close
+to zero surface opacity, the same profile retreats only the optical core's two
+outermost wet vertices toward their wet interior neighbours. The shift never
+points outward, is capped at 0.90 m for these maps, and is hard-bounded below
+80% of one 1.50 m presentation cell.
+
+The four-wet-corner optical-core topology and every authoritative input remain
+unchanged: adapter samples, cooked wetness/depth/velocity, bathymetry,
+collision, buoyancy, raft forces, breaking-site selection, D3, and D4. The
+accepted `L_Terminator` and `L_LavaCanyon` packages remain byte-identical.
+
+In the identical Chilko bank close-up, a fixed blue/red contact diagnostic over
+columns 700-1239 measures the mean contact moving from row 377.97 to 374.13 and
+detrended variation rising from 2.642 px to 3.083 px, a 16.69% increase. Visual
+inspection confirms a continuous low-amplitude inset/advance contour without a
+pale rail, exposed gap, detached island, or outward wet expansion. Futaleufú's
+matched `breaking_water_side` frame remains artifact-free but is too distant
+from the bank to claim material visual improvement; it is retained only as a
+no-regression control.
+
+This is a bounded technical improvement, not photoreal promotion. Coarse DEM-
+scale banks, missing surveyed breaklines and bathymetry, pale broad water,
+streak-like foam, incomplete entrained air/spray/mist, generic environment art,
+performance evidence, and all six named external reviews remain open. Exact
+hashes, captures, tests, authority boundaries, and blockers are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

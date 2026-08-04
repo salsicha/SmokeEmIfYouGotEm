@@ -1,0 +1,127 @@
+{
+  "schema": "raftsim.environment.cold_water_presentation_bank_naturalism_review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "9842e54ac441e2cb30dab9805b245cce949281cc",
+  "status": "retained_bounded_presentation_improvement_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "technical_candidate_passed": true,
+    "chilko_close_bank_visual_improvement_passed": true,
+    "futaleufu_rapid_side_no_new_artifact_gate_passed": true,
+    "candidate_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "runnable_map_packages_changed": false,
+    "water_material_packages_changed": false,
+    "solver_wet_dry_mask_changed": false,
+    "live_water_topology_changed": false,
+    "bathymetry_or_collision_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "d3_or_d4_changed": false
+  },
+  "scope": {
+    "rivers": [
+      {
+        "river": "Futaleufu Terminator",
+        "map": "/Game/RaftSim/Maps/L_Terminator",
+        "compatibility_identity": "futaleufu_river_chile"
+      },
+      {
+        "river": "Chilko Lava Canyon",
+        "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+        "compatibility_identity": "chilko_river_lava_canyon"
+      }
+    ],
+    "new_generation": "Both cold-water branches explicitly serialize bEnableLivePresentationBankNaturalism=true and a 0.90 m maximum amplitude.",
+    "existing_maps": "The two stable cooked-field identities apply the same bounded presentation migration without resaving either accepted map package.",
+    "fail_closed_default": "The shared ARaftSimRiverWaterConfig default is disabled with zero amplitude; every non-cold river and config-less test tank preserve their prior coverage and geometry byte-for-byte at runtime."
+  },
+  "implementation": {
+    "coverage": "Three incommensurate station-space bands with independent river-left and river-right phases shift only the existing vertex-alpha bank feather. The outermost wet vertex remains exactly zero coverage.",
+    "visible_boundary": "Because Single Layer Water still shades close to zero surface opacity, the optical core's outermost wet vertex is also retreated only toward its wet interior neighbour. Retreat is smooth in global river station, never outward, capped at 0.90 m for these maps, and hard-clamped below 80 percent of one 1.50 m presentation cell.",
+    "topology": "The optical core is still triangulated only from quads whose four sampled corners are wet. No triangle is added, removed, or reclassified by the naturalism profile.",
+    "authority_boundary": "WaterAdapter samples, WetVertexMask, MinimumWetLateralIndex, MaximumWetLateralIndex, cooked surface/depth/velocity fields, collision, navigation, bathymetry, buoyancy, raft forces, breaking-site authority, D3, and D4 are unchanged. The core and detail meshes remain non-colliding presentation components."
+  },
+  "matched_evidence": {
+    "chilko_bank_closeup": {
+      "command": "RaftSim.CaptureAfter 8 <label> 30000 0 260 -4 90",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_bank_closeup.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_chilko_bank_closeup.png",
+      "diagnostic_region": "columns 700-1239, rows 340-419; first blue-minus-red > 8 shoreline sample per column",
+      "baseline_mean_edge_y_px": 377.97,
+      "candidate_mean_edge_y_px": 374.13,
+      "baseline_detrended_edge_std_px": 2.642,
+      "candidate_detrended_edge_std_px": 3.083,
+      "detrended_edge_std_increase_percent": 16.69,
+      "visual_verdict": "Retain. The transmitting body retreats by about four screen pixels on average and the formerly near-horizontal right-bank contact gains a continuous, low-amplitude inset/advance contour. No pale rail, exposed gap, detached water island, or water expansion beyond sampled wet topology appears."
+    },
+    "futaleufu_breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 <label> breaking_water_side",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_futaleufu_breaking_water_side.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_futaleufu_breaking_water_side.png",
+      "runtime_site_station_m": 151.5,
+      "runtime_site_lateral_m": 0.0,
+      "runtime_site_presentation_coverage": 1.0,
+      "runtime_site_edge_clearance_m": 28.5,
+      "visual_verdict": "No-regression control passes. The distant bank remains continuous and the retained breaking face has no new shoreline gap, rail, hole, or detached volume. This camera does not support a claim of material Futaleufu bank improvement."
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "passed",
+    "native_water_surface_test": "RaftSim.P2.WaterSurfaceRenders passed 1/1 after the final implementation",
+    "native_runnable_map_tests": "RaftSim.P4.RiverMapLoads.L_LavaCanyon and L_Terminator passed 2/2 with MapCheck at zero errors and warnings",
+    "map_regeneration_required": false,
+    "map_hashes_unchanged": true,
+    "focused_python": "recorded by physics/tests/test_cold_water_presentation_bank_naturalism.py",
+    "known_warning": "The existing r.MotionVectorSimulation render-thread warning remains non-fatal."
+  },
+  "remaining_photoreal_defects": [
+    "Futaleufu's broad pale breaking body and smooth standing-wave face are unchanged by this bank-only milestone.",
+    "Chilko still has a broad shallow-water tone transition even though its contact silhouette is less rectangular.",
+    "Both rivers still use coarse DEM-scale banks without surveyed shoreline and bathymetry breaklines.",
+    "Foam remains streak-like and rapid-specific entrained air, spray, mist, and rock-contact plumes are incomplete.",
+    "Terrain materials, generic vegetation and rocks, atmosphere, and character presentation remain below photoreal acceptance.",
+    "No named guide, geospatial reviewer, hydraulic reviewer, environment artist, water/VFX artist, or target-platform reviewer has signed off."
+  ],
+  "required_external_acceptance_gates": [
+    "local guide review of Terminator and Lava Canyon stationing, runnable lines, hazards, recovery, and flow bands",
+    "geospatial review of route registration, terrain, surveyed bank breaklines, bathymetry, rapid rocks, and vertical datums",
+    "hydraulic convergence and calibration against observed rapid behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, and season",
+    "photoreal water/VFX and character-occlusion approval for depth, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "reviewers": {
+    "named_local_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "source_hashes": {
+    "runtime_cpp_sha256": "a05ae134e6d1e5b768e7c8bb0dcb6c118ddc17867a26bff1520a61616f379d80",
+    "runtime_header_sha256": "a7737693568d76a878ce5fa8896f3fc61bd829a067835079524709e45a1ccf05",
+    "config_header_sha256": "bbb9cfd5986002338fcf9eeae0d8ffe439b27466425d0c0b217d6cc324d235e6",
+    "generator_cpp_sha256": "a31008c7db4c2eb37b666a1b111f6fda253c7727215eddd85a9d03aaa440a04a",
+    "native_test_cpp_sha256": "8f025c81f37c984fd0817315b598e2b2cf8774d558602b307b13306308aa9a93"
+  },
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_chilko_bank_closeup.png",
+      "sha256": "35cda46c8ae1a36c97cc7c90a112f265bea77e7d25d091de768cb7cb56479135"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_futaleufu_breaking_water_side.png",
+      "sha256": "7137da405ed79c8725c1c682d3af4324e9614c1e8b905ab8e3cc3a8c028e609d"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "cfea8027d1f84a03bcf71b93e304fbcbc9d273564a735ac48fff77e4970db308"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "7a272ebcf757842bf8db190b989fae1a419056dad330b27ac1005530f9212e38"
+    }
+  ]
+}

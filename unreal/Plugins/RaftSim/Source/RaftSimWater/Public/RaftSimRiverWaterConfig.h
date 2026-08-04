@@ -194,6 +194,20 @@ public:
         meta = (ClampMin = "1.5", ClampMax = "12.0"))
     float LiveSurfaceBankBlendMeters = 4.5f;
 
+    /** Breaks up the presentation-only bank feather in river-station space.
+     * The sampled wet mask, wet-cell topology, collision, bathymetry,
+     * buoyancy, raft forces, D3, and D4 remain unchanged. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLivePresentationBankNaturalism = false;
+
+    /** Maximum shift, in metres, applied inside the existing visual bank
+     * feather and as an inward-only retreat of the optical core's outermost
+     * wet vertex. This cannot extend visible water beyond solver-owned wet
+     * topology. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.25"))
+    float LivePresentationBankNaturalismAmplitudeMeters = 0.0f;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveShallowSurfaceColor =
         FLinearColor(0.10f, 0.23f, 0.24f, 1.0f);
