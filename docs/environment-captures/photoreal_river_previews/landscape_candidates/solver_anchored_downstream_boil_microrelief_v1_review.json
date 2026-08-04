@@ -1,0 +1,158 @@
+{
+  "schema": "raftsim.photoreal.solver_anchored_downstream_boil_microrelief.review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "e658fc42a8d4e14111d73f014f0befcb2879a9b7",
+  "extends": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+  "status": "technical_candidate_retained_external_acceptance_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "production_promoted": false,
+  "runtime_rolled_out": true,
+  "summary": "The shared live-water presentation now adds three animated, unequal, skewed upwelling and return-trough cells downstream of each of the three strongest solver-accepted breaking sites. The cells drift independently, use phase-warped shoulders and broken foam rims, and are bounded tightly enough to avoid bullseyes, domes, rails, cards, shoreline seams, and opaque overlays in the matched Zambezi view. This is presentation-only microrelief over the existing analytical rapid, not solved recirculation or measured bathymetry, and it does not establish photoreal whitewater.",
+  "scope": {
+    "rivers": [
+      "american_south_fork",
+      "colorado_river_hance",
+      "pacuare_upper_huacas",
+      "futaleufu_terminator",
+      "chilko_lava_canyon",
+      "zambezi_batoka_gorge"
+    ],
+    "shared_runtime_actor": "ARaftSimWaterSurfaceActor",
+    "new_generation": false,
+    "map_packages_resaved": false,
+    "diagnostic_default_enabled": true
+  },
+  "authority_boundary": {
+    "breaking_site_source": "ARaftSimWaterSurfaceActor::GetBreakingSites",
+    "solver_breaking_site_detection_changed": false,
+    "solver_or_cooked_fields_changed": false,
+    "water_samples_changed": false,
+    "wet_dry_topology_changed": false,
+    "authoritative_water_or_terrain_geometry_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "d3_or_d4_authority_changed": false,
+    "presentation_only": true
+  },
+  "implementation": {
+    "component_tag": "RaftSimSolverAnchoredDownstreamBoilMicroreliefV1",
+    "maximum_sites": 3,
+    "cells_per_site": 3,
+    "cell_type": "overlapping asymmetric elliptical Mexican-hat upwelling and return-trough profiles",
+    "downstream_extent_m": [3.8, 20.5],
+    "maximum_depression_m": 0.045,
+    "maximum_uplift_m": 0.070,
+    "maximum_local_foam_generation": 0.38,
+    "combined_plunge_pocket_and_boil_bounds_m": [-0.31, 0.21],
+    "temporal_phase_wrap_seconds": 4096.0,
+    "diagnostic_cvar": "RaftSim.Water.DownstreamBoilMicrorelief",
+    "diagnostic_cvar_default": 1,
+    "matched_baseline_only_value": 0,
+    "normal_recomputation": "limited to the modified presentation neighborhood",
+    "collision": "disabled",
+    "affects_navigation": false,
+    "map_packages_resaved": false
+  },
+  "matched_evidence": {
+    "zambezi_breaking_water_side": {
+      "baseline_command": "RaftSim.Water.DownstreamBoilMicrorelief 0,RaftSim.CaptureAfter 8 downstream_boil_microrelief_v1_before breaking_water_side",
+      "candidate_command": "RaftSim.CaptureAfter 8 downstream_boil_microrelief_v1_after breaking_water_side",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/downstream_boil_microrelief_v1_before.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/downstream_boil_microrelief_v1_after.png",
+      "resolution": [1280, 720],
+      "camera_contract": "breaking_water_side with an eight-second delay in the same Zambezi run",
+      "resolved_site": {
+        "river_station_m": 160.5,
+        "lateral_m": 0.0,
+        "intensity": 1.0,
+        "presentation_coverage": 1.0,
+        "presentation_edge_clearance_m": 48.0,
+        "distance_to_raft_cm": 8541.6
+      },
+      "image_metrics": {
+        "full_frame_mean_absolute_difference_0_to_1": 0.012728,
+        "full_frame_fraction_changed_above_0_02": 0.126801,
+        "full_frame_fraction_changed_above_0_05": 0.042650,
+        "background_mean_absolute_difference_0_to_1": 0.010398,
+        "water_mean_absolute_difference_0_to_1": 0.013755,
+        "central_tailwater_mean_absolute_difference_0_to_1": 0.014548,
+        "attribution_caveat": "Water, particles, exposure, and background motion continue between frames, so these whole-frame differences are supporting diagnostics rather than exclusive attribution to the boil layer."
+      },
+      "visual_verdict": "Retain as a bounded technical candidate. The candidate adds subtle irregular tailwater relief without a concentric bullseye, dome, rail, card, shoreline seam, or opaque overlay. It does not by itself make the analytical rapid or the complete scene photoreal."
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final downstream-boil source, CVar, telemetry, and native-test changes",
+    "m4_water_vfx": "4/4 passed",
+    "m4_automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_m4.json",
+    "m5_production_niagara": "1/1 passed renderer-backed; all production Niagara systems loaded and compiled",
+    "m5_automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_m5.json",
+    "shared_water_and_runnable_maps": "RaftSim.P2.WaterSurfaceRenders plus all six RaftSim.P4.RiverMapLoads passed 7/7 with zero failures or not-run tests",
+    "p2_p4_automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_p2_p4.json",
+    "focused_python_contracts": "The downstream-boil, aerated-crest, shared-foam, Zambezi runnable-reference, cold-water optical-depth, and cold-water bank-naturalism contracts passed 35/35 after explicit historical hash supersession",
+    "broad_python_regression": "The pre-supersession broad run passed 1304 tests, skipped 3, and reported 11 failures: two historical water-source hash guards corrected in this milestone and nine pre-existing stale/missing legacy evidence or editor-inventory failures outside this runtime-water scope",
+    "zambezi_runtime_telemetry": "L_Zambezi loaded with 10 accepted breaking sites, 10465 water vertices, 20480 water triangles, 1.5 m render spacing, and 645 rapid-foam vertices",
+    "map_packages_resaved": false
+  },
+  "remaining_photoreal_defects": [
+    "The boil cells are bounded procedural presentation cues; they are not calibrated recirculating solver velocity or validated site-specific bathymetry.",
+    "The sampled free surface and rapid profile remain smooth and analytical, without a genuinely resolved aerated volume, overturning pile, deep hole, or turbulent eddy field.",
+    "Spray is not collision-aware and rock-contact plumes, raft wake, paddle interaction, wet fabric, and camera-lens water remain incomplete or unapproved.",
+    "Terrain, banks, geology, ground cover, vegetation, atmosphere, raft equipment, characters, anatomy, PPE, animation, and hand/paddle contact remain below the requested photoreal target in at least one runnable river.",
+    "No named guide, geospatial, hydraulic, environment-art, water-VFX, rights, hazard-readability, product, or target-platform reviewer has approved full-scene promotion."
+  ],
+  "required_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ],
+  "reviewers": {
+    "named_water_vfx_environment_art_reviewer": null,
+    "qualified_river_guides": null,
+    "geospatial_technical_art_reviewer": null,
+    "rights_provenance_reviewer": null,
+    "safety_readability_reviewer": null,
+    "target_platform_reviewer": null,
+    "product_owner": null
+  },
+  "source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
+  },
+  "map_integrity": {
+    "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+    "sha256": "51f00471114eb84a7b482fe48dd13ddf45132693890aed7a347505924a84865b",
+    "package_resaved": false,
+    "runnable_river_index": 6
+  },
+  "artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/downstream_boil_microrelief_v1_before.png",
+      "sha256": "f3a71e946e8c4ab02ff8fc123f6b30d2aa8df5d7bb29785ec8293cb2be77ce03"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/downstream_boil_microrelief_v1_after.png",
+      "sha256": "597e93da39aeba4544cabc67260827da7fa384c05562e313240e7396d1cdafd1"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_m4.json",
+      "sha256": "6895c6491b51893bd28031829397ef1cea4f57fa288dc8b640f4f1a069e4e2ca"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_m5.json",
+      "sha256": "0cf3eb4762ac1df0832a5e01f5f6adb3bbcf866c0f468289b889d7784f838c65"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_p2_p4.json",
+      "sha256": "5bf9125db85849d9c9190d7b167626d52881ef2073f965809af190fba0f220dc"
+    }
+  ]
+}

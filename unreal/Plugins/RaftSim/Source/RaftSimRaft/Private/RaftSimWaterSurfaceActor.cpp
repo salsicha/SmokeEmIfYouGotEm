@@ -3,6 +3,7 @@
 #include "Engine/GameInstance.h"
 #include "Engine/Texture2D.h"
 #include "EngineUtils.h"
+#include "HAL/IConsoleManager.h"
 #include "HAL/PlatformTime.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
@@ -34,6 +35,13 @@ constexpr float kLiveVolumeCoreMinimumStationCoverage = 0.60f;
 constexpr float kLiveVolumeCoreOffsetCm = 1.0f;
 constexpr float kLiveVolumeCoreCalmDetailCoverage = 0.035f;
 constexpr float kLiveVolumeCoreActiveDetailCoverage = 0.14f;
+
+TAutoConsoleVariable<int32> CVarRaftSimDownstreamBoilMicrorelief(
+    TEXT("RaftSim.Water.DownstreamBoilMicrorelief"),
+    1,
+    TEXT("Enable solver-anchored presentation-only downstream boil microrelief. ")
+    TEXT("Default 1; set 0 only for matched visual diagnostics."),
+    ECVF_Default);
 
 struct FPresentationStandingWave
 {
@@ -408,6 +416,9 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     // translucent solver overlay must not cast a second hard rectangular
     // shadow from its moving grid or wet/dry boundary.
     SurfaceMesh->SetCastShadow(false);
+    SurfaceMesh->SetCanEverAffectNavigation(false);
+    SurfaceMesh->ComponentTags.AddUnique(
+        TEXT("RaftSimSolverAnchoredDownstreamBoilMicroreliefV1"));
     SurfaceMesh->bUseAsyncCooking = true;
 
     LiveVolumeCoreMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
@@ -695,6 +706,106 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
         0.0f,
         1.0f);
     return FVector2D(DisplacementMeters, FoamGeneration);
+}
+
+FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float Intensity,
+    float PhaseSeconds,
+    float SitePhaseRadians)
+{
+    const float SafeIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+    if (SafeIntensity <= KINDA_SMALL_NUMBER ||
+        DownstreamMeters <= 3.8f || DownstreamMeters >= 20.5f)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    // A hydraulic-jump site is required before this function is called. Three
+    // differently sized, skewed cells then make the downstream return legible
+    // on the refined render grid. Mexican-hat profiles provide a raised
+    // upwelling and a shallow compensating trough; offset centres, unequal
+    // radii, independent drift, and phase-warped shoulders prevent a repeated
+    // bullseye pattern. This is a visual approximation, not recirculating
+    // solver velocity or a claim about measured river bathymetry.
+    float DisplacementMeters = 0.0f;
+    float FoamGeneration = 0.0f;
+    auto AccumulateCell = [&DisplacementMeters, &FoamGeneration,
+                              DownstreamMeters, AcrossMeters, PhaseSeconds,
+                              SitePhaseRadians](
+                              float CenterDownstreamMeters,
+                              float CenterAcrossMeters,
+                              float DownstreamRadiusMeters,
+                              float AcrossRadiusMeters,
+                              float AmplitudeMeters,
+                              float DriftSpeed,
+                              float PhaseOffset,
+                              float Shear,
+                              float FoamWeight)
+    {
+        const float Phase =
+            PhaseSeconds * DriftSpeed + SitePhaseRadians + PhaseOffset;
+        const float DriftedDownstreamCenter =
+            CenterDownstreamMeters + 0.38f * FMath::Sin(Phase * 0.71f);
+        const float DriftedAcrossCenter =
+            CenterAcrossMeters + 0.52f * FMath::Sin(Phase);
+        const float LocalDownstream =
+            (DownstreamMeters - DriftedDownstreamCenter) /
+            DownstreamRadiusMeters;
+        const float LocalAcross =
+            (AcrossMeters - DriftedAcrossCenter -
+                Shear * (DownstreamMeters - DriftedDownstreamCenter)) /
+            AcrossRadiusMeters;
+        const float RadiusSquared =
+            LocalDownstream * LocalDownstream + LocalAcross * LocalAcross;
+        const float RadialEnvelope = FMath::Exp(-RadiusSquared);
+        const float ShoulderWarp = FMath::Clamp(
+            0.78f +
+                0.16f * FMath::Sin(
+                    1.73f * LocalDownstream - 1.19f * LocalAcross + Phase) +
+                0.08f * FMath::Sin(
+                    3.11f * LocalDownstream + 2.37f * LocalAcross -
+                    0.61f * Phase),
+            0.46f,
+            1.08f);
+        DisplacementMeters += AmplitudeMeters *
+            (1.0f - RadiusSquared) * RadialEnvelope * ShoulderWarp;
+
+        // A broken, phase-varying rim is carried into the existing advected
+        // foam field. It cannot create foam without a solver-accepted site.
+        const float Rim = FMath::Exp(
+            -FMath::Square((RadiusSquared - 0.88f) / 0.34f));
+        const float RimBreakup = FMath::Clamp(
+            0.58f + 0.34f * FMath::Sin(
+                2.43f * LocalDownstream + 1.67f * LocalAcross + 1.21f * Phase),
+            0.16f,
+            0.92f);
+        FoamGeneration = FMath::Max(
+            FoamGeneration, FoamWeight * Rim * RimBreakup);
+    };
+
+    AccumulateCell(7.2f, -0.8f, 2.3f, 1.8f, 0.046f,
+        1.03f, 0.0f, 0.18f, 0.34f);
+    AccumulateCell(10.7f, 1.5f, 2.8f, 2.2f, 0.034f,
+        0.79f, 2.11f, -0.12f, 0.29f);
+    AccumulateCell(14.2f, -1.3f, 3.3f, 2.5f, 0.026f,
+        1.31f, 4.73f, 0.09f, 0.23f);
+
+    const float FadeIn = FMath::SmoothStep(
+        0.0f, 1.0f, FMath::Clamp((DownstreamMeters - 3.8f) / 1.8f, 0.0f, 1.0f));
+    const float FadeOut = FMath::SmoothStep(
+        0.0f, 1.0f, FMath::Clamp((20.5f - DownstreamMeters) / 3.0f, 0.0f, 1.0f));
+    const float TailEnvelope = FadeIn * FadeOut * SafeIntensity;
+    return FVector2D(
+        FMath::Clamp(
+            DisplacementMeters * TailEnvelope,
+            -0.045f * SafeIntensity,
+            0.070f * SafeIntensity),
+        FMath::Clamp(
+            FoamGeneration * TailEnvelope,
+            0.0f,
+            0.38f * SafeIntensity));
 }
 
 void ARaftSimWaterSurfaceActor::BeginPlay()
@@ -2711,21 +2822,29 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // and foam. A bounded combined displacement prevents nearby accepted sites
     // from stacking into fabricated cliffs, while the pocket centre stays
     // darker than its broken shoulders and downstream aerated return.
-    constexpr int32 kMaximumPlungePocketSites = 3;
-    TArray<uint8> PlungePocketVertexMask;
-    PlungePocketVertexMask.Init(0, Vertices.Num());
-    const int32 PlungePocketSiteCount = FMath::Min(
-        BreakingSites.Num(), kMaximumPlungePocketSites);
+    constexpr int32 kMaximumBreakingPresentationSites = 3;
+    TArray<uint8> BreakingPresentationVertexMask;
+    BreakingPresentationVertexMask.Init(0, Vertices.Num());
+    const int32 BreakingPresentationSiteCount = FMath::Min(
+        BreakingSites.Num(), kMaximumBreakingPresentationSites);
+    const bool bDownstreamBoilMicroreliefEnabled =
+        CVarRaftSimDownstreamBoilMicrorelief.GetValueOnGameThread() != 0;
+    ActiveDownstreamBoilSiteCount = bDownstreamBoilMicroreliefEnabled
+        ? BreakingPresentationSiteCount
+        : 0;
+    MaximumAbsoluteDownstreamBoilDisplacementMeters = 0.0f;
     for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
     {
         if (WetVertexMask[VertexIndex] == 0)
         {
             continue;
         }
-        float CombinedDisplacementMeters = 0.0f;
+        float CombinedPocketDisplacementMeters = 0.0f;
+        float CombinedBoilDisplacementMeters = 0.0f;
         float PocketFoam = 0.0f;
+        float BoilFoam = 0.0f;
         for (int32 SiteIndex = 0;
-             SiteIndex < PlungePocketSiteCount;
+             SiteIndex < BreakingPresentationSiteCount;
              ++SiteIndex)
         {
             const FBreakingSite& Site = BreakingSites[SiteIndex];
@@ -2736,19 +2855,44 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     RelativeRiverPosition.X,
                     RelativeRiverPosition.Y,
                     Site.Intensity);
-            CombinedDisplacementMeters += Pocket.X;
+            CombinedPocketDisplacementMeters += Pocket.X;
             PocketFoam = FMath::Max(PocketFoam, Pocket.Y);
+
+            const float SitePhaseRadians = FMath::Fmod(
+                FMath::Abs(
+                    Site.RiverCoordinatesMeters.X * 0.137f +
+                    Site.RiverCoordinatesMeters.Y * 0.293f),
+                2.0f * PI);
+            const FVector2D Boil = bDownstreamBoilMicroreliefEnabled
+                ? ComputeBreakingDownstreamBoilPresentation(
+                      RelativeRiverPosition.X,
+                      RelativeRiverPosition.Y,
+                      Site.Intensity,
+                      PresentationPhaseSeconds,
+                      SitePhaseRadians)
+                : FVector2D::ZeroVector;
+            CombinedBoilDisplacementMeters += Boil.X;
+            BoilFoam = FMath::Max(BoilFoam, Boil.Y);
         }
-        CombinedDisplacementMeters = FMath::Clamp(
-            CombinedDisplacementMeters, -0.30f, 0.18f);
+        CombinedPocketDisplacementMeters = FMath::Clamp(
+            CombinedPocketDisplacementMeters, -0.30f, 0.18f);
+        CombinedBoilDisplacementMeters = FMath::Clamp(
+            CombinedBoilDisplacementMeters, -0.045f, 0.070f);
+        MaximumAbsoluteDownstreamBoilDisplacementMeters = FMath::Max(
+            MaximumAbsoluteDownstreamBoilDisplacementMeters,
+            FMath::Abs(CombinedBoilDisplacementMeters));
+        const float CombinedDisplacementMeters = FMath::Clamp(
+            CombinedPocketDisplacementMeters + CombinedBoilDisplacementMeters,
+            -0.31f,
+            0.21f);
         Vertices[VertexIndex].Z +=
             CombinedDisplacementMeters * kSurfCmPerM;
         SourceFoam[VertexIndex] = FMath::Max(
-            SourceFoam[VertexIndex], PocketFoam);
+            SourceFoam[VertexIndex], FMath::Max(PocketFoam, BoilFoam));
         if (FMath::Abs(CombinedDisplacementMeters) > 0.001f ||
-            PocketFoam > 0.05f)
+            PocketFoam > 0.05f || BoilFoam > 0.05f)
         {
-            PlungePocketVertexMask[VertexIndex] = 1;
+            BreakingPresentationVertexMask[VertexIndex] = 1;
         }
     }
 
@@ -2772,13 +2916,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             {
                 continue;
             }
-            const bool bPocketNeighbourhood =
-                PlungePocketVertexMask[Index] != 0 ||
-                PlungePocketVertexMask[UpstreamIndex] != 0 ||
-                PlungePocketVertexMask[DownstreamIndex] != 0 ||
-                PlungePocketVertexMask[RiverRightIndex] != 0 ||
-                PlungePocketVertexMask[RiverLeftIndex] != 0;
-            if (!bPocketNeighbourhood)
+            const bool bBreakingPresentationNeighbourhood =
+                BreakingPresentationVertexMask[Index] != 0 ||
+                BreakingPresentationVertexMask[UpstreamIndex] != 0 ||
+                BreakingPresentationVertexMask[DownstreamIndex] != 0 ||
+                BreakingPresentationVertexMask[RiverRightIndex] != 0 ||
+                BreakingPresentationVertexMask[RiverLeftIndex] != 0;
+            if (!bBreakingPresentationNeighbourhood)
             {
                 continue;
             }
@@ -2826,6 +2970,16 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 ? StrongestInteriorSite->PresentationEdgeClearanceMeters
                 : 0.0f,
             BreakingSiteInteriorClearanceMeters);
+    }
+    if (ActiveDownstreamBoilSiteCount > 0)
+    {
+        UE_LOG(
+            LogTemp,
+            VeryVerbose,
+            TEXT("RaftSim solver-anchored downstream boil microrelief: "
+                 "active_sites=%d abs_max_m=%.4f authority=presentation_only"),
+            ActiveDownstreamBoilSiteCount,
+            MaximumAbsoluteDownstreamBoilDisplacementMeters);
     }
 
     // --- Persistent advected foam ----------------------------------------
@@ -3280,6 +3434,9 @@ void ARaftSimWaterSurfaceActor::SetBreakingRollerVolumeRenderingEnabled(
 void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    PresentationPhaseSeconds = FMath::Fmod(
+        PresentationPhaseSeconds + FMath::Max(DeltaSeconds, 0.0f),
+        4096.0f);
     TimeSinceRefresh += DeltaSeconds;
     if (TimeSinceRefresh >= RefreshIntervalSeconds)
     {

@@ -25,6 +25,17 @@ REVIEW = (
     / "cold_water_balanced_light_v1_review.json"
 )
 
+SUPERSEDING_SOURCE_HASHES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    "RaftSimWaterSurfaceActor.cpp": (
+        "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/"
+    "RaftSimEditorZambeziWaterTest.cpp": (
+        "ab70174bd66c825076b5b14ddf6836c5d88e932bddbce55fb18f6f1ca02dbd74"
+    ),
+}
+
 
 def test_shared_parent_remaps_only_material_depth_response() -> None:
     source = PRESENTATION.read_text()
@@ -61,7 +72,9 @@ def test_balanced_light_review_is_fail_closed_and_hash_locked() -> None:
         ["baseline_luma_gte_200_percent"]
     )
     for path, expected in review["source_hashes"].items():
-        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == expected
+        assert hashlib.sha256((ROOT / path).read_bytes()).hexdigest() == (
+            SUPERSEDING_SOURCE_HASHES.get(path, expected)
+        )
     for artifact in review["artifacts"]:
         path = ROOT / artifact["path"]
         assert path.exists()

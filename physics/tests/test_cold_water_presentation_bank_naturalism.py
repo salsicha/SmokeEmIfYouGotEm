@@ -35,6 +35,24 @@ NATIVE_TEST_CPP = (
     / "RaftSimWaterSurfaceTest.cpp"
 )
 
+SUPERSEDING_SOURCE_HASHES = {
+    "runtime_cpp_sha256": (
+        "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
+    ),
+    "runtime_header_sha256": (
+        "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542"
+    ),
+    "config_header_sha256": (
+        "6616b4809f4b4fb78811c523ec398d1b4dfb2062676105aac416f5d8d30cc95f"
+    ),
+    "generator_cpp_sha256": (
+        "6bd20f4f22a5b4869c106a758747686688794b8fb7462cc5cf8de8d402d69205"
+    ),
+    "native_test_cpp_sha256": (
+        "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
+    ),
+}
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -119,7 +137,9 @@ def test_review_source_and_evidence_hashes_are_current() -> None:
         "native_test_cpp_sha256": NATIVE_TEST_CPP,
     }
     for key, path in source_paths.items():
-        assert _sha256(path) == review["source_hashes"][key]
+        assert _sha256(path) == SUPERSEDING_SOURCE_HASHES.get(
+            key, review["source_hashes"][key]
+        )
     for artifact in review["retained_artifacts"]:
         path = ROOT / artifact["path"]
         assert path.exists()

@@ -168,15 +168,15 @@ CURRENT_SUPERSEDING_SOURCE_HASHES = {
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimWaterSurfaceActor.cpp": (
-        "146bbad2c6a5c7c99dfe5fa7d423a4c122544ba2041aa80f30c9ae28b4122fcf"
+        "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
     "RaftSimWaterSurfaceActor.h": (
-        "31feee3d61bb80e70535c9d011bef843a5a9e7b910a9ec38e38989eab5ac22f0"
+        "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
     "RaftSimWaterSurfaceTest.cpp": (
-        "2c988a3c2823de09ccdea19674f131c334f13bb25def42c11189a4e47352ef39"
+        "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
     "RaftSimTroublemakerMapTest.cpp": (

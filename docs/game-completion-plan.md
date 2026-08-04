@@ -116,6 +116,21 @@ measured hydraulics, target-platform qualification, and all seven named
 external approvals remain open in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json`.
 
+**Solver-anchored downstream-boil checkpoint, August 4:** the shared live-water
+surface now animates three unequal, skewed microrelief cells behind each of the
+three strongest solver-accepted breaking sites. Upwellings, shallow return
+troughs, phase-warped shoulders, and broken foam rims occupy only 3.8-20.5 m of
+tailwater; boil displacement is bounded to -4.5/+7.0 cm and the combined
+plunge-pocket/boil presentation to -31/+21 cm. The layer is non-colliding,
+navigation-inert, and cannot alter sampled water, wet/dry topology, buoyancy,
+D3/D4, or raft forces. Matched Zambezi evidence shows subtle asymmetric breakup
+without a bullseye, dome, rail, card, shoreline seam, or opaque overlay. The
+editor build, M4 4/4, renderer-backed M5 1/1, P2, and all six P4 runnable-map
+gates pass 7/7; `L_Zambezi` remains river 6. Photoreal promotion remains fail-
+closed because this is procedural presentation, not calibrated recirculating
+flow or measured bathymetry, and all seven external approvals remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_review.json`.
+
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
 be labeled `procedural_infill`, store its seed and inputs, blend continuously into known
