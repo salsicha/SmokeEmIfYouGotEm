@@ -29,6 +29,17 @@ still-open production gates are recorded in the
 [release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v10_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
+The current Batoka V17 presentation pass also fills source-missing upper-scarp
+detail on the four non-colliding render tiles, but only above a hard 6 m
+height-over-water gate. It distributes 5,200 shadowless launch-cover instances
+across dry benches and moderate slopes instead of repeatedly selecting one flat
+contour. The hidden Copernicus Landscape remains collision and height-query
+authority; water, wet/dry state, solver samples, buoyancy, and raft forces are
+unchanged. The matched launch capture and rejected talus-shadow bracket are in
+the [V17 upper-scarp review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_upper_scarp_v17_review.json).
+That review passes the bounded organic-terrain improvement and still fails
+photoreal promotion because the 30 m source canyon remains rounded, bright,
+synthetic, and dependent on the listed external data and human acceptance gates.
 The live rapid presentation now uses six of its eight preallocated Niagara
 site pairs around the camera instead of the former two-site ceiling. Zambezi's
 PIE gate requires all six aerosol and roller pairs to be active from its eight

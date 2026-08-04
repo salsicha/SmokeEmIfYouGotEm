@@ -1,0 +1,180 @@
+{
+  "schema": "raftsim.environment.zambezi_organic_upper_scarp_review.v17",
+  "recorded_local_date": "2026-08-03",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "passed": false,
+  "status": "organic_terrain_and_ecology_improvement_pass_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_geospatial_geologic_hydraulic_or_navigation_authority",
+  "decision": {
+    "technical_candidate_retained": true,
+    "height_aware_upper_dry_scarp_infill_passed": true,
+    "wet_bank_protection_passed": true,
+    "launch_cover_distribution_improved": true,
+    "rejected_talus_shadow_wedge_removed": true,
+    "photoreal_acceptance_passed": false,
+    "source_landscape_collision_or_height_authority_changed": false,
+    "water_geometry_wet_dry_mask_or_solver_state_changed": false,
+    "raft_collision_buoyancy_or_forces_changed": false
+  },
+  "implementation": {
+    "source_terrain": "Copernicus GLO-30-derived 30 m heightfield",
+    "conditioned_visual_tile_count": 4,
+    "visual_tile_collision": false,
+    "active_water_half_width_m": 72.0,
+    "horizontal_shoreline_protection_radius_m": 100.0,
+    "minimum_dry_bank_buffer_beyond_widest_water_edge_m": 26.56,
+    "upper_cliff_morphology_fade_m_above_local_water": [
+      6.0,
+      18.0
+    ],
+    "ordinary_morphology_vertical_cap_m": 2.8,
+    "upper_dry_scarp_vertical_cap_m": 4.4,
+    "source_facet_reconstruction_vertical_cap_m": 3.2,
+    "procedural_upper_scarp_fields": [
+      "variable-height terraces",
+      "warped joint recesses",
+      "multi-scale erosion",
+      "incommensurate broad buttress and shallow-gully fields"
+    ],
+    "retained_actor_tags": [
+      "RaftSimProceduralVisualMorphology",
+      "RaftSimBatokaOrganicMorphologyV17",
+      "RaftSimBatokaHeightAwareFacetReconstructionV17",
+      "RaftSimBatokaUpperDryScarpInfillV17",
+      "RaftSimProtectedShorelineBuffer",
+      "RaftSimNonCollisionRenderSurface"
+    ],
+    "launch_ground_cover": {
+      "target_instances": 5200,
+      "placed_instances": 5200,
+      "rejected_instances": 0,
+      "maximum_selected_slope_degrees": 41.74,
+      "placement_change": "deterministic slope and dry-height targets replace the former absolute-slope minimum that collapsed cover onto one flat contour",
+      "palette_change": "lower-energy dry grass and leaf vertex colors reduce the former neon shoreline ribbon",
+      "cast_shadow": false,
+      "collision": false
+    },
+    "retained_launch_talus": {
+      "target_instances": 360,
+      "placed_instances": 360,
+      "maximum_placed_slope_degrees": 37.82,
+      "placement_size_and_orientation_contract": "unchanged_pre_v17_bounds_after_larger_steeper_bracket_rejection",
+      "collision": false,
+      "lithology_authority": false
+    }
+  },
+  "generated_map_evidence": {
+    "total_visual_vertices": 1631500,
+    "reconstructed_vertex_count": 97842,
+    "maximum_reconstruction_offset_m": 2.82,
+    "reconstructed_inside_horizontal_radius_vertex_count": 7124,
+    "minimum_reconstructed_inside_radius_height_above_local_water_m": 6.33,
+    "morphology_modified_vertex_count": 99790,
+    "near_bank_modified_vertex_count": 28464,
+    "upper_cliff_modified_inside_horizontal_radius_vertex_count": 7043,
+    "minimum_upper_cliff_modified_inside_radius_height_above_local_water_m": 6.45,
+    "nearest_modified_vertex_to_centerline_m": 53.97,
+    "map_check_errors": 0,
+    "map_check_warnings": 0
+  },
+  "matched_visual_evidence": {
+    "capture_command": "RaftSim.CaptureRaft 5 <label> 8 4 22",
+    "resolution_px": [
+      1280,
+      720
+    ],
+    "raft_world_position_cm": [
+      327581.099,
+      -418717.273,
+      15721.953
+    ],
+    "baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_upper_scarp_v17_before.png",
+      "sha256": "47a901acac63d720542614417c3ba5008a05cc413f80cd0cdea463ef75a02cca"
+    },
+    "retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_upper_scarp_v17_retained.png",
+      "sha256": "b54746392b9350fe9c7cd4f625fbb64a7673a2b3ead11c9128821236bdc0f20d"
+    },
+    "descriptive_cover_pixel_heuristic": {
+      "roi": "top 320 rows",
+      "definition": "R > 0.26, G > 0.24, B < 0.22, and G > 1.25 B",
+      "baseline_pixels": 22650,
+      "retained_pixels": 23439,
+      "interpretation": "The count supports increased readable dry-bank cover only; it is not a species, realism, or quality metric."
+    }
+  },
+  "rejected_bracket": {
+    "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_upper_scarp_v17_rejected_talus.png",
+    "sha256": "7c0898d8425bce60451d3711172a608c633b12f3224b1ff0b4e26c51970e75d0",
+    "reason": "Larger rocks biased toward steeper slopes cast a tall black wedge on the left wall.",
+    "left_wall_roi": "x=120..399, y=100..309",
+    "pixels_below_0_18_luminance": {
+      "baseline": 0,
+      "rejected": 2016,
+      "retained": 0
+    }
+  },
+  "hash_locked_retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "e1f4a8084809475e8844e8485de83a3af58d48bd04f392e69ccaba39ec3810e9"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1.uasset",
+      "sha256": "3d3811d1aac98aa91998723ba69ab4ff5a21ff2ddbc0ef1fcb3ef45553c0a5c7"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1.uasset",
+      "sha256": "7ec375ffe2f7285f0f992728aa20ff5081fa9085044655602db42c4fe505c198"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1.uasset",
+      "sha256": "a7539cff3aa805d30a99081566d379a67dcde97bb7a9b67c61f76ede724d97a2"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1.uasset",
+      "sha256": "56ad1c4b8aaccd865fc4f2c98e662758c1d227a6d6b189497264a51bc746756f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2.uasset",
+      "sha256": "6ecc678ffcfcc8c89a41af15b5994da39cae4f3470b6d0cd8fdbfe05702a6987"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "16ce18cb9e7ae94ffdd41f0b40002652ce3ed45158f6f3a5b137549e58595d36"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_guide_seat_downstream.png",
+      "sha256": "a99c31919db797e6a57b9cf630147becb801800d874d0e45f887362844f63d21"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_river_eye_downstream.png",
+      "sha256": "3abc29f9507eb2d7db2aca38f4e07177f157e9380c66fdc63ac61e91321fd42f"
+    }
+  ],
+  "validation": {
+    "editor_build": "pass",
+    "map_generation": "pass",
+    "saved_map_audit": "pass_25_markers_1_raft_1_runtime_water_4_conditioned_visual_tiles_12843_opaque_vegetation_instances",
+    "python_zambezi_contracts": "13/13_passed",
+    "focused_native_environment_tests": "RaftSim.P2.WaterSurfaceRenders_1/1_passed",
+    "all_six_river_map_loads": "RaftSim.P4.RiverMapLoads_6/6_passed"
+  },
+  "visual_findings": [
+    "The playable launch now shows cover at several dry elevations rather than only one bright shoreline contour.",
+    "Height-aware upper-scarp breakup reaches the formerly protected cliff face without moving the wet-bank silhouette or hidden collision Landscape.",
+    "The retained fixed frame has no black wall wedge from the rejected talus bracket.",
+    "The sun-facing wall remains too smooth, bright, and source-limited for photoreal promotion; the synthetic vegetation remains sparse and repetitive."
+  ],
+  "external_gates_remaining": [
+    "Rights-cleared higher-resolution terrain, lidar, stereo reconstruction, photogrammetry, or field-capture coverage for the playable reach.",
+    "Reach-specific geology and named-outcrop review rather than generic rock analogs and procedural scarp infill.",
+    "Guide and geospatial approval of centerline, datums, banks, channel sections, route, access, portage, rescue context, and hazards.",
+    "Approved southern African gorge species, density, age, season, wind, and wetness.",
+    "Production terrain, shoreline, vegetation, rock, water, breaking-water, foam, spray, mist, atmosphere, raft, and crew art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual and performance acceptance."
+  ]
+}

@@ -618,7 +618,7 @@
     ]
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v18",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v19",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,
@@ -970,9 +970,9 @@
     "full_strength_morphology_radius_m": 220.0,
     "inside_protected_radius_reconstruction_minimum_height_above_local_water_m": 6.0,
     "maximum_source_facet_reconstruction_offset_m": 3.2,
-    "maximum_visual_treatment_vertical_offset_m": 2.8,
+    "maximum_visual_treatment_vertical_offset_m": 4.4,
     "minimum_dry_bank_buffer_m": 26.56,
-    "morphology_contract": "v15_organic_basalt_with_100m_polyline_shoreline_protection_full_strength_by_220m_and_central_difference_grid_normals_plus_height_aware_source_facet_reconstruction",
+    "morphology_contract": "v17_organic_basalt_with_wet_bank_protection_and_height_aware_upper_dry_scarp_infill_plus_central_difference_grid_normals_and_source_facet_reconstruction",
     "physics_and_collision_authority": "source_copernicus_landscape",
     "protected_shoreline_radius_m": 100.0,
     "tiles": [
@@ -983,8 +983,9 @@
         "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
         "procedural_mesh_count": 1,
         "tags": [
-          "RaftSimBatokaHeightAwareFacetReconstructionV15",
-          "RaftSimBatokaOrganicMorphologyV15",
+          "RaftSimBatokaHeightAwareFacetReconstructionV17",
+          "RaftSimBatokaOrganicMorphologyV17",
+          "RaftSimBatokaUpperDryScarpInfillV17",
           "RaftSimBatokaWorldAlignedTerrain",
           "RaftSimCoarseSourceSelfShadowSuppressed",
           "RaftSimNonCollisionRenderSurface",
@@ -1000,8 +1001,9 @@
         "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
         "procedural_mesh_count": 1,
         "tags": [
-          "RaftSimBatokaHeightAwareFacetReconstructionV15",
-          "RaftSimBatokaOrganicMorphologyV15",
+          "RaftSimBatokaHeightAwareFacetReconstructionV17",
+          "RaftSimBatokaOrganicMorphologyV17",
+          "RaftSimBatokaUpperDryScarpInfillV17",
           "RaftSimBatokaWorldAlignedTerrain",
           "RaftSimCoarseSourceSelfShadowSuppressed",
           "RaftSimNonCollisionRenderSurface",
@@ -1017,8 +1019,9 @@
         "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
         "procedural_mesh_count": 1,
         "tags": [
-          "RaftSimBatokaHeightAwareFacetReconstructionV15",
-          "RaftSimBatokaOrganicMorphologyV15",
+          "RaftSimBatokaHeightAwareFacetReconstructionV17",
+          "RaftSimBatokaOrganicMorphologyV17",
+          "RaftSimBatokaUpperDryScarpInfillV17",
           "RaftSimBatokaWorldAlignedTerrain",
           "RaftSimCoarseSourceSelfShadowSuppressed",
           "RaftSimNonCollisionRenderSurface",
@@ -1034,8 +1037,9 @@
         "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
         "procedural_mesh_count": 1,
         "tags": [
-          "RaftSimBatokaHeightAwareFacetReconstructionV15",
-          "RaftSimBatokaOrganicMorphologyV15",
+          "RaftSimBatokaHeightAwareFacetReconstructionV17",
+          "RaftSimBatokaOrganicMorphologyV17",
+          "RaftSimBatokaUpperDryScarpInfillV17",
           "RaftSimBatokaWorldAlignedTerrain",
           "RaftSimCoarseSourceSelfShadowSuppressed",
           "RaftSimNonCollisionRenderSurface",

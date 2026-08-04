@@ -1063,6 +1063,9 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     constexpr float NearBankRoundedSlopeMaskStart = 0.055f;
     constexpr float NearBankRoundedSlopeMaskEnd = 0.34f;
     constexpr float MorphologyOffsetClampCm = 280.0f;
+    constexpr float UpperCliffMorphologyOffsetClampCm = 440.0f;
+    constexpr float UpperCliffMorphologyStartAboveWaterCm = 600.0f;
+    constexpr float UpperCliffMorphologyFullStrengthAboveWaterCm = 1800.0f;
     const float ActiveWaterHalfWidthCm =
         GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
     LocalStats.ProtectedShorelineRadiusCm =
@@ -1088,7 +1091,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             if (!Centerline[Index].bHasConditionedVisualSurface)
             {
                 OutSummary += TEXT(
-                    "Batoka V15 requires the source-conditioned visual water profile.\n");
+                    "Batoka V17 requires the source-conditioned visual water profile.\n");
                 return false;
             }
             CenterlineSurfaceZCm.Add(
@@ -1098,7 +1101,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         if (CenterlineWorldPoints.Num() < 2)
         {
             OutSummary += TEXT(
-                "Batoka V15 requires at least two source-aligned centerline points.\n");
+                "Batoka V17 requires at least two source-aligned centerline points.\n");
             return false;
         }
     }
@@ -1128,8 +1131,9 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         Actor->Tags.AddUnique(TEXT("RaftSimProceduralVisualMorphology"));
         Actor->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
         Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
-        Actor->Tags.AddUnique(TEXT("RaftSimBatokaOrganicMorphologyV15"));
-        Actor->Tags.AddUnique(TEXT("RaftSimBatokaHeightAwareFacetReconstructionV15"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaOrganicMorphologyV17"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaHeightAwareFacetReconstructionV17"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaUpperDryScarpInfillV17"));
         Actor->Tags.AddUnique(TEXT("RaftSimCoarseSourceSelfShadowSuppressed"));
         Actor->Tags.AddUnique(TEXT("RaftSimProtectedShorelineBuffer"));
         MeshComponent->SetCastShadow(false);
@@ -1139,7 +1143,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             Section->ProcIndexBuffer.IsEmpty() || Section->bEnableCollision)
         {
             OutSummary += FString::Printf(
-                TEXT("Batoka V15 refused to condition invalid or collision-enabled visual tile %s.\n"),
+                TEXT("Batoka V17 refused to condition invalid or collision-enabled visual tile %s.\n"),
                 *Actor->GetActorLabel());
             return false;
         }
@@ -1172,7 +1176,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         if (GridRowSize < 2 || Vertices.Num() % GridRowSize != 0)
         {
             OutSummary += FString::Printf(
-                TEXT("Batoka V15 refused non-grid visual tile %s.\n"),
+                TEXT("Batoka V17 refused non-grid visual tile %s.\n"),
                 *Actor->GetActorLabel());
             return false;
         }
@@ -1288,8 +1292,8 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                 0.0f,
                 1.0f);
             const float UpperCliffReconstructionFade = SmoothPreviewStep(
-                600.0f,
-                1800.0f,
+                UpperCliffMorphologyStartAboveWaterCm,
+                UpperCliffMorphologyFullStrengthAboveWaterCm,
                 HeightsAboveCenterlineWaterCm[VertexIndex]);
             const float ReconstructionProtectionFade = FMath::Max(
                 ShorelineProtectionFades[VertexIndex],
@@ -1334,7 +1338,20 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             const float CenterlineDistanceCm = CenterlineDistancesCm[VertexIndex];
             const float ShorelineProtectionFade =
                 ShorelineProtectionFades[VertexIndex];
-            if (ShorelineProtectionFade <= KINDA_SMALL_NUMBER)
+            // Horizontal distance alone protected the whole first cliff face in
+            // V15, including dry rock tens of metres above the water. Preserve
+            // that protection through the spray/wet-bank zone, then admit a
+            // bounded render-only morphology fade from 6-18 m above the local
+            // conditioned surface. The hidden source Landscape remains the
+            // collision, placement, and hydraulic authority.
+            const float UpperCliffMorphologyFade = SmoothPreviewStep(
+                UpperCliffMorphologyStartAboveWaterCm,
+                UpperCliffMorphologyFullStrengthAboveWaterCm,
+                HeightsAboveCenterlineWaterCm[VertexIndex]);
+            const float MorphologyProtectionFade = FMath::Max(
+                ShorelineProtectionFade,
+                UpperCliffMorphologyFade);
+            if (MorphologyProtectionFade <= KINDA_SMALL_NUMBER)
             {
                 ++LocalStats.ProtectedRiverCorridorVertexCount;
                 continue;
@@ -1355,9 +1372,14 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                     NearBankRoundedSlopeMaskEnd,
                     Steepness) *
                 NearBankEnvelope * 0.82f;
+            const float ProtectedUpperCliffBlend =
+                UpperCliffMorphologyFade * (1.0f - ShorelineProtectionFade);
+            const float UpperCliffScarpMask =
+                SmoothPreviewStep(0.035f, 0.24f, Steepness) *
+                NearBankEnvelope * ProtectedUpperCliffBlend;
             const float ScarpMask = FMath::Max(
-                FarScarpMask,
-                RoundedNearBankScarpMask);
+                FMath::Max(FarScarpMask, RoundedNearBankScarpMask),
+                UpperCliffScarpMask);
             const float TalusMask =
                 SmoothPreviewStep(0.08f, 0.30f, Steepness) *
                 (1.0f - SmoothPreviewStep(0.55f, 0.78f, Steepness));
@@ -1442,6 +1464,23 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             const float ErosionOffsetCm =
                 ErosionBroad * 72.0f + ErosionLocal * 28.0f;
 
+            // Two long, incommensurate fields add broad dry-scarp shoulders and
+            // shallow gullies that the 30 m DEM cannot resolve. They affect only
+            // upper rock inside the horizontal bank buffer and remain below the
+            // V17 4.4 m presentation cap.
+            const float UpperButtressBroad = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.0000067f + 11.0f,
+                    WorldPosition.Y * 0.0000067f - 29.0f));
+            const float UpperButtressLocal = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000017f - 47.0f,
+                    WorldPosition.Y * 0.000017f + 23.0f));
+            const float UpperButtressOffsetCm =
+                (UpperButtressBroad * 165.0f +
+                 UpperButtressLocal * 92.0f) *
+                UpperCliffScarpMask;
+
             const float TalusBroad = FMath::PerlinNoise2D(
                 FVector2D(
                     WorldPosition.X * 0.000075f + 31.0f,
@@ -1452,13 +1491,17 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                     WorldPosition.Y * 0.00021f + 29.0f));
             const float TalusOffsetCm =
                 (TalusBroad * 68.0f + TalusFine * 26.0f) * TalusMask;
+            const float EffectiveMorphologyOffsetClampCm = FMath::Lerp(
+                MorphologyOffsetClampCm,
+                UpperCliffMorphologyOffsetClampCm,
+                ProtectedUpperCliffBlend);
             const float OffsetCm = FMath::Clamp(
-                ShorelineProtectionFade *
+                MorphologyProtectionFade *
                     (ScarpMask *
                          (TerraceOffsetCm + JointRecessCm + ErosionOffsetCm) +
-                     TalusOffsetCm),
-                -MorphologyOffsetClampCm,
-                MorphologyOffsetClampCm);
+                     TalusOffsetCm + UpperButtressOffsetCm),
+                -EffectiveMorphologyOffsetClampCm,
+                EffectiveMorphologyOffsetClampCm);
             if (FMath::Abs(OffsetCm) <= 0.5f)
             {
                 continue;
@@ -1471,6 +1514,14 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
             if (CenterlineDistanceCm <= LocalStats.FullStrengthMorphologyRadiusCm)
             {
                 ++LocalStats.NearBankModifiedVertexCount;
+            }
+            if (CenterlineDistanceCm < LocalStats.ProtectedShorelineRadiusCm)
+            {
+                ++LocalStats.UpperCliffModifiedInsideProtectedRadiusVertexCount;
+                LocalStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm =
+                    FMath::Min(
+                        LocalStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm,
+                        HeightsAboveCenterlineWaterCm[VertexIndex]);
             }
             LocalStats.AbsoluteOffsetSumCm += FMath::Abs(OffsetCm);
             LocalStats.MinimumModifiedCenterlineDistanceCm = FMath::Min(
@@ -1506,7 +1557,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     }
     OutSummary += FString::Printf(
         TEXT("Applied the Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
-        bApplyVisualMorphology ? TEXT("V15 organic morphology plus V12 world-aligned material")
+        bApplyVisualMorphology ? TEXT("V17 height-aware organic morphology plus V12 world-aligned material")
                                : TEXT("V12 world-aligned material"),
         LocalStats.VisualTileCount);
     return LocalStats.VisualTileCount == 4;
@@ -1909,6 +1960,14 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaVisualMorphologyComparison(
         Object->SetNumberField(
             TEXT("near_bank_modified_vertex_count"),
             Stats.NearBankModifiedVertexCount);
+        Object->SetNumberField(
+            TEXT("upper_cliff_modified_inside_protected_radius_vertex_count"),
+            Stats.UpperCliffModifiedInsideProtectedRadiusVertexCount);
+        Object->SetNumberField(
+            TEXT("minimum_upper_cliff_modified_inside_radius_height_above_water_cm"),
+            Stats.UpperCliffModifiedInsideProtectedRadiusVertexCount > 0
+                ? Stats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm
+                : 0.0);
         Object->SetNumberField(
             TEXT("protected_river_corridor_vertex_count"),
             Stats.ProtectedRiverCorridorVertexCount);

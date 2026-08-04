@@ -983,6 +983,7 @@ struct FZambeziBatokaVisualMorphologyStats
     int64 NearBankModifiedVertexCount = 0;
     int64 ReconstructedVertexCount = 0;
     int64 ReconstructedInsideProtectedRadiusVertexCount = 0;
+    int64 UpperCliffModifiedInsideProtectedRadiusVertexCount = 0;
     int64 ProtectedRiverCorridorVertexCount = 0;
     int64 RejectedLowSlopeVertexCount = 0;
     double AbsoluteOffsetSumCm = 0.0;
@@ -994,6 +995,8 @@ struct FZambeziBatokaVisualMorphologyStats
     float MaximumOffsetCm = TNumericLimits<float>::Lowest();
     float MaximumAbsoluteReconstructionOffsetCm = 0.0f;
     float MinimumReconstructedInsideRadiusHeightAboveWaterCm =
+        TNumericLimits<float>::Max();
+    float MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm =
         TNumericLimits<float>::Max();
 };
 
