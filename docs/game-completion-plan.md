@@ -4338,3 +4338,15 @@ path is verified, and the completion goal can be marked complete.
   buoyancy, and forces are unchanged. Remaining water/VFX, terrain/ecology,
   character, calibration, performance, and external gates stay open in
   `cold_water_depth_attenuation_v2_review.json`.
+- Cold-water adaptive shoreline V1 is a fail-closed rejection, not a retained
+  renderer milestone. Two non-colliding source-conditioned bank meshes per
+  river passed generation; the final 18 m bracket exposed 11,438 vertices and
+  21,600 triangles at 2 m/1 m spacing with 5.91 m maximum inward breakup and
+  12.72 cm maximum measured microrelief. Matched Chilko evidence still showed
+  the broad pale rectangular shallow-water band, slightly lower bank-edge
+  density, and an intermediate pale rail. All candidate source and regenerated
+  packages were removed and the accepted runnable maps/materials restored.
+  M9 remains open; the next attempt must own the presentation water-coverage
+  boundary or consume reviewed bank/bathymetry breaklines while preserving
+  solver, collision, buoyancy, and force authority. Evidence and hashes are in
+  `cold_water_adaptive_shoreline_v1_review.json`.

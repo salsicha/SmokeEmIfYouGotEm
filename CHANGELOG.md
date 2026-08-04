@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Rejected and fully removed a source-conditioned Futaleufú/Chilko shoreline
+  overlay after two fixed-camera brackets. The final 18 m bank strips passed
+  generation at 11,438 vertices and 21,600 triangles per river, but Chilko's
+  pale rectangular shallow-water band remained and bank-transition edge
+  density slightly decreased; an intermediate bracket also introduced a pale
+  rail. The accepted runnable maps, terrain materials, collision, cooked
+  fields, wet/dry masks, bathymetry, hydraulics, buoyancy, and raft forces are
+  unchanged. Hash-locked rejection evidence and the required water-coverage or
+  surveyed-bank follow-up are retained.
 - Reaffirmed Zambezi Batoka Gorge as runnable river 6 on the current release
   head without changing its V19 map package. The player selection catalog and
   six-river progression manifest still map `zambezi_reference_run` to

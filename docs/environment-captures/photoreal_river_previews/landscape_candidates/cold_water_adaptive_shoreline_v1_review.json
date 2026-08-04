@@ -1,0 +1,156 @@
+{
+  "schema": "raftsim.environment.cold_water_adaptive_shoreline_review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "81254f9a9509be710addbb2cd50b011d042f4ad2",
+  "evaluated_rivers": [
+    "futaleufu_terminator",
+    "chilko_river_lava_canyon"
+  ],
+  "map_packages": [
+    "/Game/RaftSim/Maps/L_Terminator",
+    "/Game/RaftSim/Maps/L_LavaCanyon"
+  ],
+  "status": "rejected_not_retained_last_accepted_maps_restored",
+  "passed": false,
+  "decision": {
+    "reference_runnable_maps_remain_active": true,
+    "technical_mesh_candidate_passed": true,
+    "visual_shoreline_improvement_passed": false,
+    "no_new_artifact_gate_passed": false,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "candidate_source_retained": false,
+    "candidate_map_packages_retained": false,
+    "candidate_material_packages_retained": false,
+    "evidence_and_rejection_record_retained": true
+  },
+  "candidate_architecture": {
+    "scope": "Two source-conditioned procedural meshes followed each 600 m cold-water centerline, one per bank. Collision was disabled and explicit tags denied geography, hydraulic, bathymetry, wet/dry, buoyancy, and raft-force authority.",
+    "first_bracket": {
+      "band_width_m": 45.0,
+      "longitudinal_spacing_m": 2.5,
+      "lateral_spacing_m": 2.5,
+      "maximum_inward_overlap_m": 1.8,
+      "inner_edge_depth_below_water_m": 0.10,
+      "verdict": "Rejected because matched shoreline pixels were nearly unchanged while most of the bank-closeup delta occurred in open water."
+    },
+    "final_bracket": {
+      "band_width_m": 18.0,
+      "longitudinal_spacing_m": 2.0,
+      "lateral_spacing_m": 1.0,
+      "inward_overlap_range_m": [2.0, 6.5],
+      "measured_maximum_inward_overlap_m": 5.91,
+      "inner_edge_depth_below_water_m": 0.80,
+      "source_seam_lift_cm": 0.5,
+      "measured_maximum_microrelief_cm": 12.72,
+      "actor_count": 2,
+      "vertex_count": 11438,
+      "triangle_count": 21600,
+      "collision": false,
+      "verdict": "Rejected because the pale rectangular shallow-water band remained and the intermediate shallow shelf introduced a continuous pale rail. The final submerged ramp reduced that rail but did not materially naturalize the water-land intersection."
+    },
+    "material_experiment": "Vertex alpha drove a river-local cool wet-bank tint, darker albedo, restrained roughness, and restrained specular only on the candidate meshes; the accepted source terrain wrote zero alpha. This graph and its regenerated packages were not retained.",
+    "authority_boundary": "The experiment was presentation-only. It never owned Landscape collision, surveyed geography, bathymetry, cooked solver state, wet/dry masks, hydraulics, buoyancy, raft forces, score, or progression."
+  },
+  "matched_evidence": {
+    "method": "Direct normalized-sRGB comparison at 1280x720. Luminance is Rec.709-weighted sRGB. changed2pct is the fraction of pixels whose maximum channel delta exceeds 0.02. edge08 is the fraction whose adjacent-pixel luminance-gradient magnitude exceeds 0.08.",
+    "bank_closeup": {
+      "command": "RaftSim.CaptureAfter 8 cold_water_adaptive_shoreline_v1_chilko_bank_closeup 30000 0 260 -4 90",
+      "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_bank_closeup.png",
+      "baseline_sha256": "1baebe40e1d43a219f52edbaf1af5461b509ca56e06cd08356106493d336f29e",
+      "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_chilko_bank_closeup.png",
+      "candidate_sha256": "0b9c33c195ac111146ff21635929cd6380bf6ef1c2a91674122c97404409ca1a",
+      "bank_transition_rows_250_379": {
+        "mean_absolute_channel_delta": 0.048197,
+        "changed2pct_fraction": 0.434621,
+        "mean_luminance_before": 0.436408,
+        "mean_luminance_after": 0.420503,
+        "edge08_before": 0.209369,
+        "edge08_after": 0.208587
+      },
+      "water_rows_400_719": {
+        "mean_absolute_channel_delta": 0.121815,
+        "changed2pct_fraction": 0.942683,
+        "mean_luminance_before": 0.649463,
+        "mean_luminance_after": 0.531595
+      },
+      "verdict": "Most of the large image delta is a darker open-water state, not improved shoreline geometry. Bank-transition edge density slightly decreases and the pale rectangular shallow-water band remains."
+    },
+    "breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 cold_water_adaptive_shoreline_v1_chilko_breaking_water_side breaking_water_side",
+      "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_chilko_breaking_water_side.png",
+      "baseline_sha256": "e6d7848dd066d7c225a7af649e286e38b641c13545fa98ba5ea881ac4dadf09e",
+      "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_chilko_breaking_water_side.png",
+      "candidate_sha256": "a14748fd679b497f686a36ac2a00fefc01dd3c80329a111689faa7899f18d178",
+      "bank_transition_rows_250_379": {
+        "mean_absolute_channel_delta": 0.008687,
+        "changed2pct_fraction": 0.089129,
+        "mean_luminance_before": 0.595566,
+        "mean_luminance_after": 0.595410,
+        "edge08_before": 0.062828,
+        "edge08_after": 0.061852
+      },
+      "verdict": "The fixed rapid-side bank is visually and numerically almost unchanged; edge density slightly decreases, so the mesh does not clear the material-improvement gate."
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development passed after both geometry revisions",
+    "filtered_futaleufu_generation": "passed for the first bracket",
+    "filtered_chilko_generation": "passed for the first and final brackets",
+    "fixed_runtime_capture_exit_codes": [0, 0],
+    "candidate_native_map_promotion_tests": "not run after the visual rejection; promotion stopped before acceptance testing",
+    "restoration": "All candidate source, tracked generator output, runnable map changes, and terrain-material changes were restored before commit. Only rejection evidence and documentation remain."
+  },
+  "restored_release_assets": {
+    "terminator_map_sha256": "cfea8027d1f84a03bcf71b93e304fbcbc9d273564a735ac48fff77e4970db308",
+    "lava_canyon_map_sha256": "7a272ebcf757842bf8db190b989fae1a419056dad330b27ac1005530f9212e38",
+    "futaleufu_physical_terrain_material_sha256": "ef9522afaa7dbd0aa09cb938802edfb08daa9a477009ef2b7a3edb8bba68fbf1",
+    "chilko_physical_terrain_material_sha256": "a3563b91a3da0b67685a91d7a31af1300a4f4be64883ba453b0ee779ac48645f"
+  },
+  "external_archives": [
+    {
+      "path": "/private/tmp/raftsim-cold-water-shoreline-futaleufu-generator-diff-20260804.tar",
+      "sha256": "4f357da3a7845b49cc3ae6fe358ce3a7574fa2248b8a96937f3b48a07692db31",
+      "role": "complete first-bracket Futaleufu generator diff"
+    },
+    {
+      "path": "/private/tmp/raftsim-cold-water-shoreline-chilko-generator-diff-20260804.tar",
+      "sha256": "fc9eaed9c7f9332aba0327be26e1883a313178f89ceee3d0cd3fa104da65dd05",
+      "role": "complete first-bracket Chilko generator diff"
+    },
+    {
+      "path": "/private/tmp/raftsim-cold-water-shoreline-complete-final-diff-20260804.tar",
+      "sha256": "87d286fbb3f5b2061da504a8da32761703665ffae6b4b9ee02f477f673b8cb9d",
+      "entry_count": 71,
+      "role": "complete final tracked diff plus all untracked evidence before restoration"
+    }
+  ],
+  "remaining_photoreal_defects": [
+    "Chilko still shows a broad pale rectangular shallow-water band where the transmitting ribbon meets the far bank.",
+    "Futaleufu and Chilko bank breaklines remain too smooth at DEM scale for a convincing wet/dry intersection.",
+    "The correct next treatment needs water-coverage geometry or surveyed bank/bathymetry detail rather than another broad overlay sheet.",
+    "Foam remains streak-like and lacks connected entrained-air volume, spray, mist, and rock-contact plumes.",
+    "Terrain material frequency, vegetation and rock donors, ecology, geology, lighting, characters, equipment, and raft presentation remain below photoreal acceptance.",
+    "Measured seasonal hydraulics, target-platform performance, and human acceptance remain open."
+  ],
+  "required_external_acceptance_gates": [
+    "Futaleufu and Chilko guide review of runnable lines, hazards, water levels, entries, exits, rescue routes, and scenario authenticity",
+    "geospatial review of exact stationing, horizontal and vertical datums, bank breaklines, higher-resolution terrain, rocks, and bathymetry",
+    "data-rights and publication review for every DEM, satellite, guide, photo, and derived asset used for production",
+    "hydraulic calibration and convergence approval against observed behavior across playable seasonal flow bands",
+    "environment-art, geology, ecology, photoreal water/VFX, raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, wrap, recovery, complete-run gameplay, accessibility, and release acceptance"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_chilko_bank_closeup.png",
+      "role": "rejected fixed bank-facing evidence",
+      "sha256": "0b9c33c195ac111146ff21635929cd6380bf6ef1c2a91674122c97404409ca1a"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_chilko_breaking_water_side.png",
+      "role": "rejected fixed breaking-water-side evidence",
+      "sha256": "a14748fd679b497f686a36ac2a00fefc01dd3c80329a111689faa7899f18d178"
+    }
+  ]
+}

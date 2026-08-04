@@ -267,3 +267,16 @@ aerated separation, but direct-lit Futaleufú breaking water, Chilko shoreline
 geometry, foam volume, environment art, calibration, human review, and target
 performance remain below photoreal promotion. The fail-closed record is
 `cold_water_depth_attenuation_v2_review.json`.
+
+The subsequent cold-water adaptive-shoreline experiment is intentionally not
+part of the stack. It tested source-conditioned non-colliding bank overlays at
+45 m and then 18 m width; the final bracket reached 1 m lateral resolution,
+5.91 m inward breakup, and a submerged approach edge. Generation and mesh
+bounds passed, but matched Chilko captures retained the pale rectangular
+shallow-water band, slightly reduced bank-transition edge density, and exposed
+an intermediate pale rail. The candidate C++, native assertions, maps, terrain
+materials, and deterministic generator churn were restored before integration.
+Only rejection evidence remains in
+`cold_water_adaptive_shoreline_v1_review.json`. The next implementation must
+condition presentation water coverage or use reviewed bank/bathymetry
+breaklines without moving solver, collision, buoyancy, or force authority.
