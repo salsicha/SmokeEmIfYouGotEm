@@ -309,8 +309,10 @@ bool BuildLandscapeImportCandidateMap(
                  600.0f) ||
             MorphologyStats.ModifiedVertexCount <= 0 ||
             MorphologyStats.NearBankModifiedVertexCount <= 0 ||
-            MorphologyStats.MinimumModifiedCenterlineDistanceCm + 0.5f <
-                MorphologyStats.ProtectedShorelineRadiusCm)
+            MorphologyStats.UpperCliffModifiedInsideProtectedRadiusVertexCount <= 0 ||
+            MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm +
+                    0.5f <
+                600.0f)
         {
             OutSummary += TEXT(
                 "Runnable Zambezi map requires four conditioned Batoka visual-terrain "
@@ -321,10 +323,10 @@ bool BuildLandscapeImportCandidateMap(
             TEXT("Saved runnable Batoka visual terrain: %lld vertices received capped "
                  "source-facet reconstruction (maximum %.2f m; %lld upper-cliff vertices "
                  "inside the horizontal buffer, minimum %.2f m above local water), then "
-                 "%lld/%lld vertices "
-                 "received bounded morphology, including %lld dry near-bank vertices outside "
-                 "the %.1f m protected shoreline radius (nearest conditioned vertex "
-                 "%.2f m; full strength by %.1f m).\n"),
+                 "%lld/%lld vertices received bounded morphology, including %lld dry "
+                 "near-bank vertices and %lld upper-cliff vertices inside the %.1f m "
+                 "horizontal shoreline radius (minimum %.2f m above local water; nearest "
+                 "conditioned vertex %.2f m; full horizontal strength by %.1f m).\n"),
             MorphologyStats.ReconstructedVertexCount,
             MorphologyStats.MaximumAbsoluteReconstructionOffsetCm / 100.0f,
             MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount,
@@ -335,7 +337,10 @@ bool BuildLandscapeImportCandidateMap(
             MorphologyStats.ModifiedVertexCount,
             MorphologyStats.TotalVertexCount,
             MorphologyStats.NearBankModifiedVertexCount,
+            MorphologyStats.UpperCliffModifiedInsideProtectedRadiusVertexCount,
             MorphologyStats.ProtectedShorelineRadiusCm / 100.0f,
+            MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm /
+                100.0f,
             MorphologyStats.MinimumModifiedCenterlineDistanceCm / 100.0f,
             MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f);
 

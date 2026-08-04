@@ -103,33 +103,47 @@ is tagged as a mandatory commercial portage. Gameplay hides the labels; the
 World Outliner and editor viewport retain them for authoring.
 
 The saved runnable map also contains four render-only source-terrain tiles with
-the retained Batoka V12 world-aligned basalt material and V15 bounded organic
-morphology. Grid central differences replace triangle-averaged normals, and
-the initial authored relief uses slower wavelengths under a 2.2 m cap instead
-of sampling near the 12.5 m render-mesh Nyquist limit. The 72 m active-water
-half-width is followed by a hard 28 m dry-bank
-buffer, so terrain vertices remain untouched for the first 100 m from the full
-209-point source-aligned route polyline. The widest 73.44 m water edge retains
-at least 26.56 m of unchanged shoreline. Six bounded low-pass passes reconstruct
-source facets by at most 3.2 m; inside the 100 m horizontal buffer this is
-allowed only on rock at least 6 m above local water and reaches full strength
-at 18 m. From 100-220 m the 2.8 m-capped morphology fades in smoothly. The
-current deterministic build reconstructs 97,842 vertices with an observed
-2.82 m maximum, then conditions 89,494 of 1,631,500 vertices; its nearest
-morphology vertex is 103.73 m from the polyline. Variable-height terraces,
-warped joint recesses, multi-scale erosion, and talus variation replace the
-regular V14 strata. Because the 30 m DEM still produced false comb-like
-self-shadows, only the four non-colliding visual tiles have shadow casting
-disabled; the raft, rocks, vegetation, and gameplay geometry still cast
-shadows. A movable Zambezi review sun at -48 degrees pitch and -90 degrees yaw
-keeps that presentation deterministic. None of this changes the hidden
-Copernicus Landscape used for collision, height queries, or physics. The actor
-tags `RaftSimProceduralVisualMorphology`,
-`RaftSimBatokaOrganicMorphologyV15`,
-`RaftSimBatokaHeightAwareFacetReconstructionV15`,
+the retained Batoka V12 world-aligned basalt material and V17 height-aware
+organic morphology. Grid central differences replace triangle-averaged normals,
+and the initial authored relief uses slower wavelengths under a 2.2 m cap
+instead of sampling near the 12.5 m render-mesh Nyquist limit. The 72 m
+active-water half-width is followed by a hard 28 m dry-bank buffer. The widest
+73.44 m water edge therefore retains at least 26.56 m of unchanged shoreline.
+Six bounded low-pass passes reconstruct source facets by at most 3.2 m. Inside
+the 100 m horizontal radius, no morphology is permitted below 6 m above local
+conditioned water and it reaches full strength only at 18 m. Ordinary
+morphology remains capped at 2.8 m; dry upper-scarp infill may reach 4.4 m.
+From 100-220 m the original horizontal fade still applies. The deterministic
+build reconstructs 97,842 vertices with an observed 2.82 m maximum, then
+conditions 99,790 of 1,631,500 vertices. Of those, 7,043 lie inside the 100 m
+horizontal radius; their minimum height is 6.45 m above local water, and the
+nearest conditioned vertex is 53.97 m from the polyline. Variable-height
+terraces, warped joint recesses, multi-scale erosion, and two broad
+incommensurate buttress/gully fields fill visual detail that the 30 m source
+cannot resolve. Because that DEM still produces false comb-like self-shadows,
+only the four non-colliding visual tiles have shadow casting disabled; the raft,
+rocks, vegetation, and gameplay geometry still cast shadows. A movable Zambezi
+review sun at -48 degrees pitch and -90 degrees yaw keeps that presentation
+deterministic. None of this changes the hidden Copernicus Landscape used for
+collision, height queries, or physics. The actor tags
+`RaftSimProceduralVisualMorphology`, `RaftSimBatokaOrganicMorphologyV17`,
+`RaftSimBatokaHeightAwareFacetReconstructionV17`,
+`RaftSimBatokaUpperDryScarpInfillV17`,
 `RaftSimCoarseSourceSelfShadowSuppressed`, `RaftSimProtectedShorelineBuffer`,
 `RaftSimBatokaWorldAlignedTerrain`, and `RaftSimNonCollisionRenderSurface`
 make that authority boundary inspectable in the generated map.
+
+The runnable launch bank-cover search also no longer minimizes absolute slope,
+which had collapsed most synthetic cover onto one flat contour. It gives each
+of 5,200 deterministic, shadowless, non-colliding instances its own bounded
+slope and dry-height target and uses a lower-energy dry-season palette. All
+5,200 targets pass in the retained map; the maximum selected source slope is
+41.74 degrees. A larger, steeper talus bracket was rejected after its shadow
+formed a tall black wedge on the left wall. The retained map restores the
+previous 0.95-5.20 m talus size and placement bounds and has no such wedge in
+the matched launch frame. The technical pass, rejected bracket, hash locks,
+visual limitations, and external gates are recorded in
+`zambezi_organic_upper_scarp_v17_review.json`.
 
 The runnable launch also carries two adaptive, source-conditioned bank meshes
 covering stations 0-1,000 m. They bilinearly sample the four conditioned terrain

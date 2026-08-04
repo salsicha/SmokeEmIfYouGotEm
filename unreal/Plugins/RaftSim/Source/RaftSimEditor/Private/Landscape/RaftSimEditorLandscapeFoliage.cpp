@@ -678,20 +678,20 @@ UStaticMesh* CreateZambeziOpaqueVegetationMesh(
         ? FLinearColor(0.142f, 0.091f, 0.040f, 1.0f)
         : FLinearColor(0.215f, 0.155f, 0.082f, 1.0f);
     const FLinearColor LeafGreen = Form == EZambeziVegetationForm::UmbrellaTree
-        ? FLinearColor(0.085f, 0.135f, 0.034f, 1.0f)
-        : FLinearColor(0.072f, 0.122f, 0.030f, 1.0f);
+        ? FLinearColor(0.060f, 0.088f, 0.022f, 1.0f)
+        : FLinearColor(0.052f, 0.080f, 0.020f, 1.0f);
     const FLinearColor ScrubGreen = bHanceDrylandPalette
         ? FLinearColor(0.050f, 0.060f, 0.018f, 1.0f)
-        : FLinearColor(0.082f, 0.132f, 0.038f, 1.0f);
+        : FLinearColor(0.050f, 0.075f, 0.018f, 1.0f);
     const FLinearColor DryGrass = bHanceDrylandPalette
         ? FLinearColor(0.180f, 0.118f, 0.035f, 1.0f)
-        : FLinearColor(0.29f, 0.225f, 0.070f, 1.0f);
+        : FLinearColor(0.200f, 0.135f, 0.035f, 1.0f);
     const FLinearColor LowPlantGreen = bHanceDrylandPalette
         ? FLinearColor(0.055f, 0.068f, 0.018f, 1.0f)
-        : FLinearColor(0.12f, 0.20f, 0.045f, 1.0f);
+        : FLinearColor(0.065f, 0.095f, 0.022f, 1.0f);
     const FLinearColor BladeGreen = bHanceDrylandPalette
         ? FLinearColor(0.070f, 0.082f, 0.020f, 1.0f)
-        : FLinearColor(0.19f, 0.30f, 0.075f, 1.0f);
+        : FLinearColor(0.085f, 0.115f, 0.027f, 1.0f);
 
     if (Form == EZambeziVegetationForm::SavannaGroundCover)
     {
@@ -6691,6 +6691,18 @@ bool AddLandscapeCandidateBiomeDressing(
                 FMath::Pow(
                     ZambeziVegetationUnitRandom(CoverIndex, 9113),
                     1.35f));
+            const float TargetSlopeDegrees = FMath::Lerp(
+                4.0f,
+                26.0f,
+                FMath::Pow(
+                    ZambeziVegetationUnitRandom(CoverIndex, 9117),
+                    1.45f));
+            const float TargetDryHeightAboveWaterCm = FMath::Lerp(
+                250.0f,
+                6000.0f,
+                FMath::Pow(
+                    ZambeziVegetationUnitRandom(CoverIndex, 9119),
+                    1.40f));
             FVector2D BestPoint = ResolveLogicalRiverPoint(
                 BaseLogicalX,
                 Side * (ActiveRiverHalfWidth + TargetAdditionalOffset));
@@ -6734,10 +6746,17 @@ bool AddLandscapeCandidateBiomeDressing(
                 {
                     continue;
                 }
-                const float PlacementScore = SlopeDegrees +
-                    0.00250f * FMath::Abs(
+                // V17 distributes cover across dry benches and moderate
+                // slopes. The former absolute-slope score selected the same
+                // flattest contour repeatedly and read as a shoreline ribbon.
+                const float PlacementScore =
+                    0.72f * FMath::Abs(SlopeDegrees - TargetSlopeDegrees) +
+                    0.00150f * FMath::Abs(
                         CandidateAdditionalOffset - TargetAdditionalOffset) +
-                    0.00040f * FMath::Abs(
+                    0.00045f * FMath::Abs(
+                        DryHeightAboveWaterCm -
+                        TargetDryHeightAboveWaterCm) +
+                    0.00030f * FMath::Abs(
                         CandidateLogicalX - BaseLogicalX);
                 if (PlacementScore < BestPlacementScore)
                 {

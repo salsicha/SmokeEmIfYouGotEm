@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v18",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v19",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -386,16 +386,15 @@ def main() -> None:
                     "authority": "source_conditioned_plus_bounded_procedural_render_only",
                     "physics_and_collision_authority": "source_copernicus_landscape",
                     "morphology_contract": (
-                        "v15_organic_basalt_with_100m_polyline_shoreline_"
-                        "protection_full_strength_by_220m_and_central_"
-                        "difference_grid_normals_plus_height_aware_source_"
-                        "facet_reconstruction"
+                        "v17_organic_basalt_with_wet_bank_protection_and_"
+                        "height_aware_upper_dry_scarp_infill_plus_central_"
+                        "difference_grid_normals_and_source_facet_reconstruction"
                     ),
                     "active_water_half_width_m": 72.0,
                     "protected_shoreline_radius_m": 100.0,
                     "minimum_dry_bank_buffer_m": 26.56,
                     "full_strength_morphology_radius_m": 220.0,
-                    "maximum_visual_treatment_vertical_offset_m": 2.8,
+                    "maximum_visual_treatment_vertical_offset_m": 4.4,
                     "maximum_source_facet_reconstruction_offset_m": 3.2,
                     "inside_protected_radius_reconstruction_minimum_height_"
                     "above_local_water_m": 6.0,
@@ -729,8 +728,9 @@ def main() -> None:
             and all(
                 "RaftSimNonCollisionRenderSurface" in row["tags"]
                 and "RaftSimBatokaWorldAlignedTerrain" in row["tags"]
-                and "RaftSimBatokaOrganicMorphologyV15" in row["tags"]
-                and "RaftSimBatokaHeightAwareFacetReconstructionV15" in row["tags"]
+                and "RaftSimBatokaOrganicMorphologyV17" in row["tags"]
+                and "RaftSimBatokaHeightAwareFacetReconstructionV17" in row["tags"]
+                and "RaftSimBatokaUpperDryScarpInfillV17" in row["tags"]
                 and "RaftSimCoarseSourceSelfShadowSuppressed" in row["tags"]
                 and "RaftSimProtectedShorelineBuffer" in row["tags"]
                 for row in terrain_rows
