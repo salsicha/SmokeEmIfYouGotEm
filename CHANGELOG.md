@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Completed the shared live-volume bank mask: solver-owned vertex coverage now
+  fades Single Layer Water scattering and absorption and restores behind-water
+  color to identity at zero coverage, instead of fading only surface opacity
+  while leaving a pale optical rail. The updated versioned parent is shared by
+  all five river-local live-water instances. The exact editor
+  build, focused material audit, shared P2 water gate, and all six runnable P4
+  map gates pass. Matched Chilko/Futaleufú evidence retains the correction but
+  still rejects the broad pale shallow band, analytical breaking water,
+  procedural environments, and every external acceptance gate.
 - Replaced the rejected cold-water terrain-overlay approach with a default-off,
   presentation-only bank boundary profile for runnable Futaleufú and Chilko.
   Three station-anchored bands vary the existing alpha feather independently

@@ -487,6 +487,7 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
     }
 
     bool bHasCoverageFeather = false;
+    bool bHasOpticalCoverageFeather = false;
     if (UMaterial* ParentMaterial = Instance->Parent
             ? Instance->Parent->GetMaterial()
             : nullptr)
@@ -496,11 +497,17 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
         {
             bHasCoverageFeather |= Expression &&
                 Expression->Desc == TEXT("RaftSimLiveVolumeBankCoverage");
+            bHasOpticalCoverageFeather |= Expression &&
+                Expression->Desc ==
+                    TEXT("RaftSimLiveVolumeBankOpticalCoverage");
         }
     }
     TestTrue(
         TEXT("Zambezi volume parent consumes smooth wet-cell bank coverage"),
         bHasCoverageFeather);
+    TestTrue(
+        TEXT("Zambezi volume parent fades complete bank optical volume"),
+        bHasOpticalCoverageFeather);
 
     UTexture* FlowNormal = nullptr;
     UTexture* FoamLace = nullptr;

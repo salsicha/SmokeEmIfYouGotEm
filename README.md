@@ -23,7 +23,11 @@ Zambezi registry/source contracts, and all six runnable maps pass on the
 current release head. Its gameplay river is now a
 solver-owned, wet-cell-clipped transmitting core rather than the former opaque
 gray static ribbon. Its V2 optical body now consumes live wet-cell vertex-alpha
-coverage across a 7.5 m bank blend, reducing the hard rectangular shoreline,
+coverage across a 7.5 m bank blend. The shared parent now applies that coverage
+to scattering, absorption, and behind-water color as well as opacity, so a
+zero-coverage bank vertex cannot retain a pale water volume over dry land. This
+closes the material ownership defect without claiming that the broad shallow-
+water band or final shoreline art is solved,
 while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
@@ -31,6 +35,9 @@ still-open production gates are recorded in the
 [release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
+The shared optical-bank change and its six-river no-regression evidence are
+recorded in the
+[full optical bank-coverage review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json).
 The current Batoka V18 presentation pass keeps V17's source-missing upper-scarp
 infill on the four non-colliding render tiles, but reduces clipped launch-water
 glare and the chalky sun-facing scarp response. It distributes 7,200 shorter,

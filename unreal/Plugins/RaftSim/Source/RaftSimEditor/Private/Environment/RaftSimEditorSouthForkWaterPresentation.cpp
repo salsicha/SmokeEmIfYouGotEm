@@ -1,6 +1,7 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
@@ -90,7 +91,9 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
     bool bHasTransmissionGraph = false;
     bool bHasInteriorOpticalDepthGraph = false;
     bool bHasBankCoverageGraph = false;
+    bool bHasBankOpticalCoverageGraph = false;
     UMaterialExpressionCustom* InteriorMaskExpression = nullptr;
+    UMaterialExpression* BankCoverageScaleExpression = nullptr;
     UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput = nullptr;
     for (const TObjectPtr<UMaterialExpression>& Expression :
          Material->GetExpressionCollection().Expressions)
@@ -111,6 +114,12 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             Expression->Desc == TEXT("RaftSimLiveVolumeBankCoverage"))
         {
             bHasBankCoverageGraph = true;
+            BankCoverageScaleExpression = Expression.Get();
+        }
+        if (Expression &&
+            Expression->Desc == TEXT("RaftSimLiveVolumeBankOpticalCoverage"))
+        {
+            bHasBankOpticalCoverageGraph = true;
         }
         if (!WaterOutput)
         {
@@ -346,12 +355,72 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         CoverageScale->B.Expression = FullCoverage;
         CoverageScale->Alpha.Expression = Coverage;
         Material->GetExpressionCollection().AddExpression(CoverageScale);
+        BankCoverageScaleExpression = CoverageScale;
         UMaterialExpressionMultiply* FeatheredOpacity =
             NewObject<UMaterialExpressionMultiply>(Material);
         FeatheredOpacity->A.Expression = OriginalOpacity;
         FeatheredOpacity->B.Expression = CoverageScale;
         Material->GetExpressionCollection().AddExpression(FeatheredOpacity);
         EditorData->Opacity.Connect(0, FeatheredOpacity);
+        bNeedsSave = true;
+    }
+
+    if (!bHasBankOpticalCoverageGraph && BankCoverageScaleExpression &&
+        WaterOutput)
+    {
+        UMaterialExpression* OriginalScattering =
+            WaterOutput->ScatteringCoefficients.Expression;
+        UMaterialExpression* OriginalAbsorption =
+            WaterOutput->AbsorptionCoefficients.Expression;
+        UMaterialExpression* OriginalBehindWaterScale =
+            WaterOutput->ColorScaleBehindWater.Expression;
+        if (!OriginalScattering || !OriginalAbsorption ||
+            !OriginalBehindWaterScale)
+        {
+            OutSummary += TEXT(
+                "The raft-transmission water lacks optical inputs required "
+                "for complete live wet-cell bank coverage.\n");
+            return nullptr;
+        }
+
+        // Single Layer Water evaluates its optical volume independently of
+        // ordinary surface opacity. V1 faded the surface at the sampled bank,
+        // but scattering, absorption, and behind-water colour remained active
+        // and left a pale rectangular shallow-water rail. Reuse the exact same
+        // solver-owned vertex coverage for every optical term: coefficients
+        // fade to zero and behind-water colour returns to identity at the dry
+        // edge. This is a material-only presentation change; it cannot widen
+        // the wet topology or alter water samples, collision, or raft forces.
+        Material->Modify();
+        UMaterialExpressionMultiply* CoveredScattering =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        CoveredScattering->Desc =
+            TEXT("RaftSimLiveVolumeBankOpticalCoverage");
+        CoveredScattering->A.Expression = OriginalScattering;
+        CoveredScattering->B.Expression = BankCoverageScaleExpression;
+        Material->GetExpressionCollection().AddExpression(CoveredScattering);
+        UMaterialExpressionMultiply* CoveredAbsorption =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        CoveredAbsorption->A.Expression = OriginalAbsorption;
+        CoveredAbsorption->B.Expression = BankCoverageScaleExpression;
+        Material->GetExpressionCollection().AddExpression(CoveredAbsorption);
+        UMaterialExpressionConstant3Vector* IdentityBehindWater =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        IdentityBehindWater->Constant =
+            FLinearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        Material->GetExpressionCollection().AddExpression(IdentityBehindWater);
+        UMaterialExpressionLinearInterpolate* CoveredBehindWaterScale =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        CoveredBehindWaterScale->A.Expression = IdentityBehindWater;
+        CoveredBehindWaterScale->B.Expression = OriginalBehindWaterScale;
+        CoveredBehindWaterScale->Alpha.Expression =
+            BankCoverageScaleExpression;
+        Material->GetExpressionCollection().AddExpression(
+            CoveredBehindWaterScale);
+        WaterOutput->ScatteringCoefficients.Expression = CoveredScattering;
+        WaterOutput->AbsorptionCoefficients.Expression = CoveredAbsorption;
+        WaterOutput->ColorScaleBehindWater.Expression =
+            CoveredBehindWaterScale;
         bNeedsSave = true;
     }
 

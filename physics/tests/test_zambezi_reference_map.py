@@ -151,6 +151,8 @@ V17_SUPERSEDED_HISTORICAL_PATHS = {
     "physics/tests/test_zambezi_reference_map.py",
 }
 LATER_WATER_MILESTONE_SUPERSEDED_PATHS = {
+    "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+    "M_RaftSim_SouthForkRaftTransmissionWater.uasset",
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
