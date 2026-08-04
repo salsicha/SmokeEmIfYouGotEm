@@ -1817,6 +1817,9 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         GetPhotographicCaptureSettings(Spec.RiverId);
     const bool bPacuareHumidAtmosphere =
         Spec.RiverId == TEXT("pacuare");
+    const bool bColdWaterHighlightNaturalism =
+        Spec.RiverId == TEXT("futaleufu_terminator") ||
+        Spec.RiverId == TEXT("chilko_river_lava_canyon");
 
     // Batoka's coarse source DEM produces a conspicuous diagonal comb when lit
     // across its facets at the shared grazing angle.  Keep the shared rig for
@@ -1824,7 +1827,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     // gorge so the renderer does not amplify source sampling into fake ribs.
     const FRotator SunRotation = Spec.RiverId == TEXT("zambezi_batoka_gorge")
         ? FRotator(-48.0f, -90.0f, 0.0f)
-        : Spec.RiverId == TEXT("chilko_river_lava_canyon")
+        : bColdWaterHighlightNaturalism
         ? FRotator(-50.0f, 55.0f, 0.0f)
         : FRotator(-58.0f, -30.0f, 0.0f);
     ADirectionalLight* Sun = Cast<ADirectionalLight>(
@@ -1843,6 +1846,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         {
             Sun->Tags.AddUnique(
                 TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+        }
+        if (bColdWaterHighlightNaturalism)
+        {
+            Sun->Tags.AddUnique(
+                TEXT("RaftSimColdWaterHighlightNaturalismV1"));
         }
         if (UDirectionalLightComponent* SunComponent = Sun->GetComponent())
         {
@@ -1974,7 +1982,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         {
             ReflectionComponent->InfluenceRadius = 42000.0f;
             ReflectionComponent->Brightness =
-                Spec.RiverId == TEXT("chilko_river_lava_canyon")
+                bColdWaterHighlightNaturalism
                 ? 0.65f
                 : Spec.RiverId == TEXT("zambezi_batoka_gorge")
                 ? 0.62f
@@ -1986,6 +1994,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             {
                 RiverReflectionCapture->Tags.AddUnique(
                     TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+            }
+            if (bColdWaterHighlightNaturalism)
+            {
+                RiverReflectionCapture->Tags.AddUnique(
+                    TEXT("RaftSimColdWaterHighlightNaturalismV1"));
             }
             if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
             {

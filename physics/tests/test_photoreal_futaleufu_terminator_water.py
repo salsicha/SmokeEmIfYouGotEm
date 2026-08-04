@@ -42,6 +42,9 @@ COLD_WATER_VOLUME_CORE_REVIEW = MANIFEST.with_name(
 V3_REVIEW = MANIFEST.with_name(
     "futaleufu_terminator_transmitting_water_v3_review.json"
 )
+HIGHLIGHT_REVIEW = MANIFEST.with_name(
+    "cold_water_highlight_naturalism_v1_review.json"
+)
 FLOW_NORMAL_SOURCE = (
     REPO_ROOT
     / "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/"
@@ -99,8 +102,10 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "bEnableLiveSolverVolumeCore = true",
         "LiveSurfaceCalmCoverage = 0.035f",
         "LiveSurfaceActiveCoverage = 0.14f",
-        "LiveSkyReflectionStrength = 0.24f",
-        "LiveRippleStrength = 0.26f",
+        "LiveSurfaceSpecular = 0.18f",
+        "LiveSurfaceRoughness = 0.68f",
+        "LiveSkyReflectionStrength = 0.05f",
+        "LiveRippleStrength = 0.55f",
         "LiveFoamIntensity = 0.58f",
         "LiveRapidFoamFocusStart = 0.08f",
         "LiveRapidFoamFocusEnd = 0.58f",
@@ -111,8 +116,31 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "RaftSimCpuAuthoredCookedFieldColor",
         "RaftSimColdWaterCpuChopV2",
         "RaftSimColdWaterEmbeddedAerationV2",
+        "RaftSimColdWaterHighlightNaturalismV1",
     ):
         assert token in geometry
+    for token in (
+        'SetScalar(TEXT("ReachHueVariation"), 0.12f)',
+        'SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f)',
+        'SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f)',
+        'SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f)',
+        'SetScalar(TEXT("RippleGrazingFloor"), 0.75f)',
+        'SetScalar(TEXT("SlickNormalFloor"), 0.85f)',
+        'SetScalar(TEXT("SlickRoughnessScale"), 1.0f)',
+        'SetScalar(TEXT("FresnelSpecular"), 0.01f)',
+    ):
+        assert token in WATER_SOURCE.read_text(encoding="utf-8")
+    for token in (
+        "Settings.SunIntensity = 4.20f",
+        "Settings.SkyLightIntensity = 1.35f",
+        "Settings.ExposureBias = -0.30f",
+    ):
+        assert token in catalog
+    lighting = (
+        EDITOR_ROOT / "Environment/RaftSimEditorNearFieldAndLighting.cpp"
+    ).read_text(encoding="utf-8")
+    assert "RaftSimColdWaterHighlightNaturalismV1" in lighting
+    assert "bColdWaterHighlightNaturalism" in lighting
     for parameter in (
         "bEnableLiveSolverVolumeCore",
         "LiveSkyReflectionStrength",
@@ -133,6 +161,16 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         assert f'TEXT("{parameter}")' in runtime
     assert "bUsesMigratedColdWaterVolumeCore" in runtime
     assert 'TEXT("futaleufu_river_chile")' in runtime
+    assert "? 0.18f" in runtime
+    assert "? 0.68f" in runtime
+    assert "? 0.05f" in runtime
+    assert "? 0.55f" in runtime
+    assert "FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)" in geometry
+    assert "FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)" in geometry
+    assert "FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)" in geometry
+    assert "FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)" in runtime
+    assert "FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)" in runtime
+    assert "FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)" in runtime
     assert "kLiveVolumeCoreMinimumStationCoverage = 0.60f" in runtime
     assert "MinimumCellStationCoverage" in runtime
     assert 'TEXT("WaterFlowNormalPrimary")' in runtime
@@ -371,6 +409,71 @@ def test_futaleufu_transmitting_water_v3_review_is_hash_locked_and_honest() -> N
     )
     assert retained["mean_blue_minus_red"] > baseline["mean_blue_minus_red"]
     assert len(review["remaining_photoreal_defects"]) >= 6
+    assert len(review["required_external_acceptance_gates"]) == 6
+
+    superseded_artifacts = {
+        "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+        "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3.uasset",
+    }
+    for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_artifacts:
+            continue
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file()
+        assert _sha256(path) == artifact["sha256"]
+
+
+def test_cold_water_highlight_review_is_hash_locked_and_fail_closed() -> None:
+    review = json.loads(HIGHLIGHT_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.cold_water_highlight_naturalism_review.v1"
+    )
+    assert review["status"] == (
+        "technical_candidate_retained_photoreal_and_external_review_open"
+    )
+    assert review["passed"] is False
+    decision = review["decision"]
+    assert decision["futaleufu_reference_runnable"] is True
+    assert decision["chilko_reference_runnable"] is True
+    assert decision["technical_candidate_passed"] is True
+    assert decision["first_futaleufu_chroma_bracket_rejected"] is True
+    assert decision["chilko_used_as_no_regression_control"] is True
+    assert decision["photoreal_acceptance_passed"] is False
+    assert decision["terrain_geometry_changed"] is False
+    assert decision["water_geometry_changed"] is False
+    assert decision["hydraulics_changed"] is False
+    assert decision["wet_dry_mask_changed"] is False
+    assert decision["bathymetry_changed"] is False
+    assert decision["collision_changed"] is False
+    assert decision["buoyancy_or_raft_forces_changed"] is False
+
+    comparison = review["visual_comparison"]
+    baseline = comparison["futaleufu_baseline"]
+    retained = comparison["futaleufu_retained"]
+    assert retained["mean_luminance"] < baseline["mean_luminance"]
+    assert retained["p95_luminance"] < baseline["p95_luminance"]
+    assert retained["fraction_over_0_90"] < baseline["fraction_over_0_90"]
+    assert retained["fraction_over_0_95"] < (
+        baseline["fraction_over_0_95"] * 0.025
+    )
+    assert retained["mean_blue_minus_red"] > (
+        baseline["mean_blue_minus_red"] * 1.25
+    )
+
+    control_before = comparison["chilko_baseline_control"]
+    control_after = comparison["chilko_retained_control"]
+    assert abs(
+        control_after["mean_luminance"] - control_before["mean_luminance"]
+    ) < 0.0001
+    assert abs(
+        control_after["p95_luminance"] - control_before["p95_luminance"]
+    ) < 0.0001
+    assert abs(
+        control_after["mean_blue_minus_red"]
+        - control_before["mean_blue_minus_red"]
+    ) < 0.0001
+    assert len(review["remaining_photoreal_defects"]) >= 8
     assert len(review["required_external_acceptance_gates"]) == 6
 
     for artifact in review["retained_artifacts"]:

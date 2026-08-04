@@ -185,6 +185,29 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
             TEXT("Futaleufu live foam path is river-local"),
             LiveFoam && LiveFoam->GetPathName().Contains(
                 TEXT("T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace")));
+        auto TestLiveScalar = [this, LiveVolumeInstance](
+                                  const TCHAR* ParameterName,
+                                  float ExpectedValue)
+        {
+            float Value = 0.0f;
+            TestTrue(
+                FString::Printf(TEXT("live %s is bound"), ParameterName),
+                LiveVolumeInstance->GetScalarParameterValue(
+                    FMaterialParameterInfo(ParameterName), Value));
+            TestTrue(
+                FString::Printf(
+                    TEXT("live %s keeps its reviewed V4 value"),
+                    ParameterName),
+                FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
+        };
+        TestLiveScalar(TEXT("ReachHueVariation"), 0.12f);
+        TestLiveScalar(TEXT("CalmSurfaceColorVariation"), 0.22f);
+        TestLiveScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f);
+        TestLiveScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f);
+        TestLiveScalar(TEXT("RippleGrazingFloor"), 0.75f);
+        TestLiveScalar(TEXT("SlickNormalFloor"), 0.85f);
+        TestLiveScalar(TEXT("SlickRoughnessScale"), 1.0f);
+        TestLiveScalar(TEXT("FresnelSpecular"), 0.01f);
     }
     return !HasAnyErrors();
 }

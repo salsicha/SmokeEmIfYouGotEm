@@ -1666,11 +1666,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Test->TestTrue(
                     TEXT("regenerated Futaleufu live sky reflection stays restrained"),
                     FMath::IsNearlyEqual(
-                        (*It)->LiveSkyReflectionStrength, 0.24f, 0.001f));
+                        (*It)->LiveSkyReflectionStrength, 0.05f, 0.001f));
                 Test->TestTrue(
                     TEXT("regenerated Futaleufu live carrier keeps moving micro-normal response"),
                     FMath::IsNearlyEqual(
-                        (*It)->LiveRippleStrength, 0.26f, 0.001f));
+                        (*It)->LiveRippleStrength, 0.55f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu live carrier uses the turbulent V4 roughness"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceRoughness, 0.68f, 0.001f));
+                Test->TestTrue(
+                    TEXT("regenerated Futaleufu retains bounded dielectric energy"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceSpecular, 0.18f, 0.001f));
+                Test->TestTrue(
+                    TEXT("Futaleufu records the shared cold-water highlight contract"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimColdWaterHighlightNaturalismV1")));
                 Test->TestTrue(
                     TEXT("regenerated Futaleufu solver foam remains optically legible"),
                     FMath::IsNearlyEqual(
@@ -1879,6 +1891,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Chilko live carrier records the localized reflection contract"),
                 (*It)->Tags.Contains(
                     TEXT("RaftSimChilkoLocalizedReflectionWaterV3")));
+            Test->TestTrue(
+                TEXT("Chilko records the shared cold-water highlight contract"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimColdWaterHighlightNaturalismV1")));
             Test->TestTrue(
                 TEXT("Chilko solver foam remains optically legible"),
                 FMath::IsNearlyEqual(

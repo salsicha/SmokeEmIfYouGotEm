@@ -284,6 +284,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace",
         "RaftSimChilkoTransmittingWaterV2",
         "RaftSimChilkoLocalizedReflectionWaterV3",
+        "RaftSimColdWaterHighlightNaturalismV1",
         "RaftSimNoSolverStateMutation",
         "RaftSimChilkoDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",

@@ -318,10 +318,10 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
-        Settings.SunIntensity = 4.75f;
-        Settings.SkyLightIntensity = 1.55f;
+        Settings.SunIntensity = 4.20f;
+        Settings.SkyLightIntensity = 1.35f;
         Settings.FogDensity = 0.0055f;
-        Settings.ExposureBias = -0.16f;
+        Settings.ExposureBias = -0.30f;
         Settings.Saturation = 1.05f;
         Settings.SunColor = FLinearColor(0.91f, 0.96f, 1.0f);
         Settings.FogColor = FLinearColor(0.46f, 0.58f, 0.60f);

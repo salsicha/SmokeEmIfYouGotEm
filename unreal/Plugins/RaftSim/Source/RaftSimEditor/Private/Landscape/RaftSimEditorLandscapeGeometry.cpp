@@ -1912,6 +1912,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->Tags.AddUnique(TEXT("RaftSimChilkoTransmittingWaterV2"));
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimChilkoLocalizedReflectionWaterV3"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterHighlightNaturalismV1"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
@@ -1944,20 +1946,26 @@ bool AddLandscapeCandidateRunnableGameplay(
         }
         WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
         WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
-        WaterConfig->LiveSurfaceSpecular = 0.28f;
-        WaterConfig->LiveSurfaceRoughness = 0.34f;
-        WaterConfig->LiveSkyReflectionStrength = 0.24f;
-        WaterConfig->LiveRippleStrength = 0.26f;
+        // Match Terminator's direct-light and capture fallback energy to the
+        // accepted turbulent cold-water bracket. This changes presentation
+        // only; the cooked field still owns wetness, geometry and forces.
+        WaterConfig->LiveSurfaceSpecular = 0.18f;
+        WaterConfig->LiveSurfaceRoughness = 0.68f;
+        WaterConfig->LiveSkyReflectionStrength = 0.05f;
+        WaterConfig->LiveRippleStrength = 0.55f;
         WaterConfig->LiveFoamIntensity = 0.58f;
         WaterConfig->LiveRapidFoamFocusStart = 0.08f;
         WaterConfig->LiveRapidFoamFocusEnd = 0.58f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
         WaterConfig->LiveShallowSurfaceColor =
-            FLinearColor(0.013f, 0.068f, 0.090f, 1.0f);
+            FLinearColor(0.008f, 0.055f, 0.130f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
-            FLinearColor(0.002f, 0.017f, 0.029f, 1.0f);
+            FLinearColor(0.001f, 0.014f, 0.050f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.055f, 0.100f, 0.138f, 1.0f);
+            FLinearColor(0.018f, 0.080f, 0.160f, 1.0f);
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+        WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
     else if (bZambezi)
     {

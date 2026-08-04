@@ -711,6 +711,23 @@ and external acceptance gates pass.
   recirculation, spray/mist, and platform/art approvals keep photoreal and
   production promotion open in `zambezi_nonperiodic_live_wave_v1_review.json`.
 
+### 2026-08-04 — Futaleufú/Chilko cold-water highlight profile retained
+
+- The two runnable cold-water maps now serialize a shared presentation tag and
+  restrained highlight profile. Futaleufú adopts the reviewed high-roughness,
+  low-fallback-reflection response and a river-local blue shallow/deep/sky
+  bracket; Chilko remains the matched no-regression control.
+- The first Futaleufú bracket was rejected because it reduced clipping while
+  collapsing blue separation. The retained gameplay frame reduces >0.95
+  coverage 98.20%, lowers p95 1.26%, and raises blue-minus-red 29.79%. Chilko's
+  mean, p95, and color separation each remain within 0.0001 of baseline.
+- Both map packages regenerate with MapCheck 0/0. Solver samples, wet/dry
+  masks, water and terrain geometry, bathymetry, collision, buoyancy, D3/D4,
+  and raft forces are unchanged. Broad pale water, foam/rapid volume,
+  shoreline/environment art, measured hydraulics, platform performance, and
+  all six named reviews keep photoreal promotion open in
+  `cold_water_highlight_naturalism_v1_review.json`.
+
 ### 2026-08-03 — V17 Zambezi runnable status reaffirmed
 
 - Re-certified the regenerated V17 `L_Zambezi` package as river 6 in the
