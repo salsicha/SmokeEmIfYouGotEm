@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v22",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v23",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -316,6 +316,77 @@ def main() -> None:
                     ),
                 }
             )
+        dry_scarp_outcrop_actors = [
+            actor
+            for actor in actors
+            if "RaftSimZambeziDryScarpOutcropV20"
+            in {str(tag) for tag in actor.tags}
+        ]
+        dry_scarp_outcrop_rows = []
+        for actor in dry_scarp_outcrop_actors:
+            components = actor.get_components_by_class(
+                unreal.HierarchicalInstancedStaticMeshComponent
+            )
+            component = components[0] if components else None
+            material = component.get_material(0) if component else None
+            parent = (
+                material.get_editor_property("parent")
+                if material
+                and isinstance(material, unreal.MaterialInstanceConstant)
+                else None
+            )
+            static_mesh = (
+                component.get_editor_property("static_mesh") if component else None
+            )
+            custom_data_values = (
+                [
+                    float(value)
+                    for value in component.get_editor_property(
+                        "per_instance_sm_custom_data"
+                    )
+                ]
+                if component
+                else []
+            )
+            dry_scarp_outcrop_rows.append(
+                {
+                    "actor_label": actor.get_actor_label(),
+                    "tags": sorted(str(tag) for tag in actor.tags),
+                    "component_count": len(components),
+                    "instance_count": (
+                        component.get_instance_count() if component else 0
+                    ),
+                    "static_mesh": (
+                        static_mesh.get_path_name() if static_mesh else None
+                    ),
+                    "material": material.get_path_name() if material else None,
+                    "parent_material": parent.get_path_name() if parent else None,
+                    "collision_enabled": (
+                        str(component.get_collision_enabled()) if component else None
+                    ),
+                    "cast_shadow": (
+                        bool(component.get_editor_property("cast_shadow"))
+                        if component
+                        else None
+                    ),
+                    "num_custom_data_floats": (
+                        int(component.get_editor_property("num_custom_data_floats"))
+                        if component
+                        else 0
+                    ),
+                    "custom_data_value_count": len(custom_data_values),
+                    "conditioned_waterline_min_z_cm": (
+                        round(min(custom_data_values), 3)
+                        if custom_data_values
+                        else None
+                    ),
+                    "conditioned_waterline_max_z_cm": (
+                        round(max(custom_data_values), 3)
+                        if custom_data_values
+                        else None
+                    ),
+                }
+            )
         legacy_zambezi_pve_actors = [
             actor.get_actor_label()
             for actor in actors
@@ -411,8 +482,8 @@ def main() -> None:
                     "authority": "source_conditioned_plus_bounded_procedural_render_only",
                     "physics_and_collision_authority": "source_copernicus_landscape",
                     "morphology_contract": (
-                        "v18_exposure_safe_organic_basalt_with_wet_bank_protection_and_"
-                        "height_aware_upper_dry_scarp_infill_plus_central_"
+                        "v20_normal_oriented_dry_scarp_relief_with_wet_bank_"
+                        "protection_and_height_aware_upper_dry_scarp_infill_plus_central_"
                         "difference_grid_normals_and_source_facet_reconstruction"
                     ),
                     "active_water_half_width_m": 72.0,
@@ -420,6 +491,11 @@ def main() -> None:
                     "minimum_dry_bank_buffer_m": 26.56,
                     "full_strength_morphology_radius_m": 220.0,
                     "maximum_visual_treatment_vertical_offset_m": 4.4,
+                    "maximum_visual_treatment_horizontal_offset_m": 5.2,
+                    "normal_relief_authority": (
+                        "procedural_render_only_no_geospatial_collision_or_hydraulic_"
+                        "authority"
+                    ),
                     "maximum_source_facet_reconstruction_offset_m": 3.2,
                     "inside_protected_radius_reconstruction_minimum_height_"
                     "above_local_water_m": 6.0,
@@ -445,11 +521,13 @@ def main() -> None:
                         "active_water_half_width_m": 72.0,
                         "inner_dry_bank_buffer_m": 3.0,
                         "maximum_dry_shoreline_infill_m": 1.8,
-                        "maximum_procedural_refinement_m": 1.35,
+                        "maximum_procedural_refinement_m": 4.4,
                         "geomorphic_relief_contract": (
-                            "v2_domain_warped_broad_erosion_local_basalt_"
-                            "fracture_fine_talus_and_paired_joint_cut"
+                            "v20_adaptive_upper_dry_scarp_facade_over_v2_domain_"
+                            "warped_broad_erosion_local_basalt_fracture_fine_talus_"
+                            "and_paired_joint_cut"
                         ),
+                        "upper_dry_scarp_refinement_start_above_water_m": 6.0,
                         "minimum_rendered_dry_clearance_m": 0.295,
                         "wet_bank_contract": (
                             "conditioned_profile_vertex_red_render_only_"
@@ -591,6 +669,30 @@ def main() -> None:
                     "component_count": len(launch_talus_rows),
                     "components": sorted(
                         launch_talus_rows, key=lambda row: row["actor_label"]
+                    ),
+                },
+                "dry_scarp_outcrops": {
+                    "authority": (
+                        "procedural_presentation_only_generic_cc0_rock_analog_"
+                        "no_lithology_collision_hydraulic_or_navigation_authority"
+                    ),
+                    "placement_contract": (
+                        "v20_source_landscape_grounded_first_kilometre_6m_minimum_"
+                        "dry_height_full_route_clearance_and_55_degree_slope_ceiling"
+                    ),
+                    "target_instance_count": 320,
+                    "minimum_instance_count": 280,
+                    "instance_count": sum(
+                        int(row["instance_count"])
+                        for row in dry_scarp_outcrop_rows
+                    ),
+                    "component_count": len(dry_scarp_outcrop_rows),
+                    "minimum_height_above_local_water_m": 6.0,
+                    "slope_ceiling_degrees": 55.0,
+                    "target_height_range_m": [2.20, 8.50],
+                    "components": sorted(
+                        dry_scarp_outcrop_rows,
+                        key=lambda row: row["actor_label"],
                     ),
                 },
                 "vegetation": {
@@ -783,6 +885,7 @@ def main() -> None:
                 and "RaftSimProceduralWetBankNoMeasuredAuthority" in row["tags"]
                 and "RaftSimIrregularPlanarTopologyV2" in row["tags"]
                 and "RaftSimDomainWarpedGeomorphicReliefV2" in row["tags"]
+                and "RaftSimAdaptiveUpperDryScarpReliefV20" in row["tags"]
                 for row in adaptive_near_field_terrain_rows
             )
             and all(
@@ -796,6 +899,7 @@ def main() -> None:
                 and "RaftSimBatokaHeightAwareFacetReconstructionV17" in row["tags"]
                 and "RaftSimBatokaUpperDryScarpInfillV17" in row["tags"]
                 and "RaftSimBatokaExposureSafeScarpV18" in row["tags"]
+                and "RaftSimBatokaNormalOrientedDryScarpReliefV20" in row["tags"]
                 and "RaftSimCoarseSourceSelfShadowSuppressed" in row["tags"]
                 and "RaftSimProtectedShorelineBuffer" in row["tags"]
                 for row in terrain_rows
@@ -922,6 +1026,36 @@ def main() -> None:
                 and "RaftSimPerInstanceConditionedWaterline" in row["tags"]
                 and "RaftSimProceduralWetBankNoMeasuredAuthority" in row["tags"]
                 for row in launch_talus_rows
+            )
+            and len(dry_scarp_outcrop_rows) == 6
+            and sum(
+                int(row["instance_count"])
+                for row in dry_scarp_outcrop_rows
+            )
+            >= 280
+            and all(
+                row["component_count"] == 1
+                and not row["cast_shadow"]
+                and "NO_COLLISION" in str(row["collision_enabled"])
+                and int(row["num_custom_data_floats"]) == 1
+                and int(row["custom_data_value_count"])
+                == int(row["instance_count"])
+                and row["conditioned_waterline_min_z_cm"] is not None
+                and row["conditioned_waterline_max_z_cm"] is not None
+                and "RockMossSet01" in str(row["static_mesh"])
+                and "MI_RaftSim_Zambezi_BasaltTalusV1"
+                in str(row["material"])
+                and "M_RaftSim_RiverBoulder" in str(row["parent_material"])
+                and "RaftSimZambeziDryScarpOutcropV20" in row["tags"]
+                and "RaftSimProceduralGeologyFallback" in row["tags"]
+                and "RaftSimGenericRockAnalogNoLithologyAuthority"
+                in row["tags"]
+                and "RaftSimSourceLandscapeGrounded" in row["tags"]
+                and "RaftSimUpperDryScarpPlacement" in row["tags"]
+                and "RaftSimNonCollisionRenderSurface" in row["tags"]
+                and "RaftSimPresentationOnlyNoHydraulicAuthority"
+                in row["tags"]
+                for row in dry_scarp_outcrop_rows
             )
             and len(vegetation_rows) == 13
             and any(

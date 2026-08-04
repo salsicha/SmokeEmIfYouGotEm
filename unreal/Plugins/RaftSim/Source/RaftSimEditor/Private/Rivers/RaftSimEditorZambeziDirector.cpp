@@ -1064,6 +1064,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     constexpr float NearBankRoundedSlopeMaskEnd = 0.34f;
     constexpr float MorphologyOffsetClampCm = 280.0f;
     constexpr float UpperCliffMorphologyOffsetClampCm = 440.0f;
+    constexpr float UpperCliffHorizontalReliefClampCm = 520.0f;
     constexpr float UpperCliffMorphologyStartAboveWaterCm = 600.0f;
     constexpr float UpperCliffMorphologyFullStrengthAboveWaterCm = 1800.0f;
     const float ActiveWaterHalfWidthCm =
@@ -1135,6 +1136,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         Actor->Tags.AddUnique(TEXT("RaftSimBatokaHeightAwareFacetReconstructionV17"));
         Actor->Tags.AddUnique(TEXT("RaftSimBatokaUpperDryScarpInfillV17"));
         Actor->Tags.AddUnique(TEXT("RaftSimBatokaExposureSafeScarpV18"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaNormalOrientedDryScarpReliefV20"));
         Actor->Tags.AddUnique(TEXT("RaftSimCoarseSourceSelfShadowSuppressed"));
         Actor->Tags.AddUnique(TEXT("RaftSimProtectedShorelineBuffer"));
         MeshComponent->SetCastShadow(false);
@@ -1477,10 +1479,10 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                 FVector2D(
                     WorldPosition.X * 0.000017f - 47.0f,
                     WorldPosition.Y * 0.000017f + 23.0f));
+            const float UpperButtressSignalCm =
+                UpperButtressBroad * 165.0f + UpperButtressLocal * 92.0f;
             const float UpperButtressOffsetCm =
-                (UpperButtressBroad * 165.0f +
-                 UpperButtressLocal * 92.0f) *
-                UpperCliffScarpMask;
+                UpperButtressSignalCm * UpperCliffScarpMask;
 
             const float TalusBroad = FMath::PerlinNoise2D(
                 FVector2D(
@@ -1503,13 +1505,49 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                      TalusOffsetCm + UpperButtressOffsetCm),
                 -EffectiveMorphologyOffsetClampCm,
                 EffectiveMorphologyOffsetClampCm);
-            if (FMath::Abs(OffsetCm) <= 0.5f)
+
+            // A height-only offset cannot create readable facade depth on the
+            // rounded 30 m DEM wall. V20 projects the same deterministic dry-
+            // scarp signals onto the horizontal component of the source normal.
+            // It never changes Z, collision, hydraulics, or source authority.
+            // Fade all tile edges so independently generated render tiles remain
+            // watertight, and stay below half the 12.5 m dense-grid spacing.
+            const int32 GridX = VertexIndex % GridRowSize;
+            const int32 GridY = VertexIndex / GridRowSize;
+            const float TileSeamDistanceVertices = static_cast<float>(FMath::Min(
+                FMath::Min(GridX, GridRowSize - 1 - GridX),
+                FMath::Min(GridY, GridRowCount - 1 - GridY)));
+            const float NormalReliefTileSeamFade = SmoothPreviewStep(
+                0.0f,
+                5.0f,
+                TileSeamDistanceVertices);
+            const FVector WorldSourceNormal = ActorTransform.TransformVectorNoScale(
+                SourceNormals[VertexIndex]).GetSafeNormal();
+            const FVector HorizontalSourceNormal = FVector(
+                WorldSourceNormal.X,
+                WorldSourceNormal.Y,
+                0.0f).GetSafeNormal();
+            const float DryScarpNormalReliefMask =
+                UpperCliffMorphologyFade * ScarpMask;
+            const float HorizontalReliefSignalCm =
+                TerraceOffsetCm * 1.15f + JointRecessCm * 3.10f +
+                ErosionOffsetCm * 0.80f + UpperButtressSignalCm * 1.45f;
+            const float HorizontalReliefCm = HorizontalSourceNormal.IsNearlyZero()
+                ? 0.0f
+                : FMath::Clamp(
+                      NormalReliefTileSeamFade * DryScarpNormalReliefMask *
+                          HorizontalReliefSignalCm,
+                      -UpperCliffHorizontalReliefClampCm,
+                      UpperCliffHorizontalReliefClampCm);
+            if (FMath::Abs(OffsetCm) <= 0.5f &&
+                FMath::Abs(HorizontalReliefCm) <= 0.5f)
             {
                 continue;
             }
 
             const FVector LocalOffset = ActorTransform.InverseTransformVectorNoScale(
-                FVector(0.0f, 0.0f, OffsetCm));
+                FVector(0.0f, 0.0f, OffsetCm) +
+                HorizontalSourceNormal * HorizontalReliefCm);
             Vertices[VertexIndex] += LocalOffset;
             ++LocalStats.ModifiedVertexCount;
             if (CenterlineDistanceCm <= LocalStats.FullStrengthMorphologyRadiusCm)
@@ -1530,6 +1568,23 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
                 CenterlineDistanceCm);
             LocalStats.MinimumOffsetCm = FMath::Min(LocalStats.MinimumOffsetCm, OffsetCm);
             LocalStats.MaximumOffsetCm = FMath::Max(LocalStats.MaximumOffsetCm, OffsetCm);
+            if (FMath::Abs(HorizontalReliefCm) > 0.5f)
+            {
+                ++LocalStats.NormalReliefVertexCount;
+                LocalStats.AbsoluteHorizontalReliefSumCm +=
+                    FMath::Abs(HorizontalReliefCm);
+                LocalStats.MaximumAbsoluteHorizontalReliefCm = FMath::Max(
+                    LocalStats.MaximumAbsoluteHorizontalReliefCm,
+                    FMath::Abs(HorizontalReliefCm));
+                if (CenterlineDistanceCm < LocalStats.ProtectedShorelineRadiusCm)
+                {
+                    ++LocalStats.NormalReliefInsideProtectedRadiusVertexCount;
+                    LocalStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm =
+                        FMath::Min(
+                            LocalStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm,
+                            HeightsAboveCenterlineWaterCm[VertexIndex]);
+                }
+            }
         }
 
         TArray<FVector> ConditionedNormals =
@@ -1996,6 +2051,26 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaVisualMorphologyComparison(
             TEXT("mean_absolute_offset_cm"),
             Stats.ModifiedVertexCount > 0
                 ? Stats.AbsoluteOffsetSumCm / Stats.ModifiedVertexCount
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("normal_relief_vertex_count"),
+            Stats.NormalReliefVertexCount);
+        Object->SetNumberField(
+            TEXT("normal_relief_inside_protected_radius_vertex_count"),
+            Stats.NormalReliefInsideProtectedRadiusVertexCount);
+        Object->SetNumberField(
+            TEXT("minimum_normal_relief_inside_radius_height_above_water_cm"),
+            Stats.NormalReliefInsideProtectedRadiusVertexCount > 0
+                ? Stats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("maximum_absolute_horizontal_relief_cm"),
+            Stats.MaximumAbsoluteHorizontalReliefCm);
+        Object->SetNumberField(
+            TEXT("mean_absolute_horizontal_relief_cm"),
+            Stats.NormalReliefVertexCount > 0
+                ? Stats.AbsoluteHorizontalReliefSumCm /
+                      Stats.NormalReliefVertexCount
                 : 0.0);
         return Object;
     };

@@ -41,7 +41,7 @@ while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
 still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json),
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v18_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The shared optical-bank change and its six-river no-regression evidence are

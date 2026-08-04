@@ -1040,6 +1040,9 @@ bool AddZambeziAdaptiveNearFieldTerrain(
     constexpr float OuterBankDistanceCm = 60000.0f;
     constexpr float SurfaceLiftCm = 3.0f;
     constexpr float MaximumDryShorelineInfillCm = 180.0f;
+    constexpr float MaximumUpperDryScarpRefinementCm = 440.0f;
+    constexpr float UpperDryScarpRefinementStartAboveWaterCm = 600.0f;
+    constexpr float UpperDryScarpRefinementFullStrengthAboveWaterCm = 1800.0f;
     const float ActiveWaterHalfWidthCm =
         GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
     const float InnerBankDistanceCm = ActiveWaterHalfWidthCm + 300.0f;
@@ -1272,13 +1275,35 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                 WarpedPosition.Y * 0.00131f - LocalFracture * 1.3f));
             const float JointCut = -24.0f *
                 FMath::Pow(1.0f - FMath::Min(JointA, JointB), 5.0f);
-            float RefinementCm = RefinementFades[VertexIndex] * SlopeResponse *
+            const float BaseRefinementCm = RefinementFades[VertexIndex] * SlopeResponse *
                 (BroadErosion * 72.0f + LocalFracture * 43.0f +
                  FineTalus * 19.0f + JointCut);
-            RefinementCm = FMath::Clamp(RefinementCm, -135.0f, 135.0f);
+            const float PreRefinementDryHeightCm =
+                Position.Z - WaterSurfaceZ[VertexIndex];
+            const float UpperDryScarpFade = RefinementFades[VertexIndex] *
+                SmoothPreviewStep(
+                    UpperDryScarpRefinementStartAboveWaterCm,
+                    UpperDryScarpRefinementFullStrengthAboveWaterCm,
+                    PreRefinementDryHeightCm);
+            const float UpperDryScarpSignalCm = SlopeResponse *
+                (BroadErosion * 240.0f + LocalFracture * 150.0f +
+                 FineTalus * 55.0f + JointCut * 2.8f);
+            const float EffectiveRefinementClampCm = FMath::Lerp(
+                135.0f,
+                MaximumUpperDryScarpRefinementCm,
+                UpperDryScarpFade);
+            float RefinementCm = FMath::Clamp(
+                BaseRefinementCm + UpperDryScarpFade * UpperDryScarpSignalCm,
+                -EffectiveRefinementClampCm,
+                EffectiveRefinementClampCm);
             const float MinimumRefinementCm =
                 WaterSurfaceZ[VertexIndex] + 30.0f - Position.Z;
             RefinementCm = FMath::Max(RefinementCm, MinimumRefinementCm);
+            const float AppliedUpperDryScarpRefinementCm =
+                RefinementCm - FMath::Clamp(
+                    BaseRefinementCm,
+                    -135.0f,
+                    135.0f);
             Vertices[VertexIndex].Z += RefinementCm;
             if (FMath::Abs(RefinementCm) > 0.5f)
             {
@@ -1286,6 +1311,17 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                 OutStats.MaximumAbsoluteRefinementCm = FMath::Max(
                     OutStats.MaximumAbsoluteRefinementCm,
                     FMath::Abs(RefinementCm));
+            }
+            if (UpperDryScarpFade > KINDA_SMALL_NUMBER &&
+                FMath::Abs(AppliedUpperDryScarpRefinementCm) > 0.5f)
+            {
+                ++OutStats.UpperDryScarpRefinedVertexCount;
+                OutStats.MaximumAbsoluteUpperDryScarpRefinementCm = FMath::Max(
+                    OutStats.MaximumAbsoluteUpperDryScarpRefinementCm,
+                    FMath::Abs(AppliedUpperDryScarpRefinementCm));
+                OutStats.MinimumUpperDryScarpHeightAboveWaterCm = FMath::Min(
+                    OutStats.MinimumUpperDryScarpHeightAboveWaterCm,
+                    PreRefinementDryHeightCm);
             }
             OutStats.MinimumRenderedHeightAboveWaterCm = FMath::Min(
                 OutStats.MinimumRenderedHeightAboveWaterCm,
@@ -1406,6 +1442,7 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         Actor->Tags.AddUnique(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV2"));
         Actor->Tags.AddUnique(TEXT("RaftSimIrregularPlanarTopologyV2"));
         Actor->Tags.AddUnique(TEXT("RaftSimDomainWarpedGeomorphicReliefV2"));
+        Actor->Tags.AddUnique(TEXT("RaftSimAdaptiveUpperDryScarpReliefV20"));
         Actor->Tags.AddUnique(TEXT("RaftSimSourceConditionedTerrain"));
         Actor->Tags.AddUnique(TEXT("RaftSimProceduralInfill"));
         Actor->Tags.AddUnique(TEXT("RaftSimProtectedDryShoreline"));
@@ -1425,6 +1462,8 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                 TEXT("RaftSimIrregularPlanarTopologyV2"));
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimDomainWarpedGeomorphicReliefV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimAdaptiveUpperDryScarpReliefV20"));
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimNonCollisionRenderSurface"));
             Component->ComponentTags.AddUnique(
@@ -1452,6 +1491,8 @@ bool AddZambeziAdaptiveNearFieldTerrain(
              "sub-0.25m2 topology, %lld bounded refinement vertices (maximum %.2f m), "
              "%lld dry-shoreline "
              "infill vertices (maximum %.2f m), minimum rendered clearance %.2f m; "
+             "%lld upper dry-scarp vertices received V20 facade refinement "
+             "(maximum %.2f m; minimum source height %.2f m above local water); "
              "%lld vertices carry a bounded conditioned-waterline wet-bank mask "
              "(maximum mask %.3f, maximum affected dry height %.2f m); "
              "collision remains disabled and overlay self-shadow is suppressed "
@@ -1472,6 +1513,9 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         OutStats.DryShorelineInfillVertexCount,
         OutStats.MaximumDryShorelineInfillCm * 0.01f,
         OutStats.MinimumRenderedHeightAboveWaterCm * 0.01f,
+        OutStats.UpperDryScarpRefinedVertexCount,
+        OutStats.MaximumAbsoluteUpperDryScarpRefinementCm * 0.01f,
+        OutStats.MinimumUpperDryScarpHeightAboveWaterCm * 0.01f,
         OutStats.WetBankVertexCount,
         OutStats.MaximumWetBankMask,
         OutStats.MaximumWetBankHeightAboveWaterCm * 0.01f);
@@ -1484,11 +1528,17 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         OutStats.TopologyRejectedCellCount * 20 <=
             OutStats.TopologyCandidateCellCount &&
         OutStats.RefinedVertexCount > 0 &&
+        OutStats.UpperDryScarpRefinedVertexCount > 0 &&
+        OutStats.MinimumUpperDryScarpHeightAboveWaterCm + 0.5f >=
+            UpperDryScarpRefinementStartAboveWaterCm &&
+        OutStats.MaximumAbsoluteUpperDryScarpRefinementCm <=
+            MaximumUpperDryScarpRefinementCm + 0.5f &&
         OutStats.WetBankVertexCount > 0 &&
         OutStats.MaximumWetBankMask > 0.5f &&
         OutStats.MaximumWetBankHeightAboveWaterCm <= 325.5f &&
         OutStats.MinimumRenderedHeightAboveWaterCm >= 29.5f &&
-        OutStats.MaximumAbsoluteRefinementCm <= 135.5f &&
+        OutStats.MaximumAbsoluteRefinementCm <=
+            MaximumUpperDryScarpRefinementCm + 0.5f &&
         OutStats.MaximumDryShorelineInfillCm <=
             MaximumDryShorelineInfillCm + 0.5f &&
         OutStats.ShadowSuppressedActorCount == 2 &&

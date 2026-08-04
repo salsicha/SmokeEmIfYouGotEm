@@ -988,19 +988,25 @@ struct FZambeziBatokaVisualMorphologyStats
     int64 ReconstructedVertexCount = 0;
     int64 ReconstructedInsideProtectedRadiusVertexCount = 0;
     int64 UpperCliffModifiedInsideProtectedRadiusVertexCount = 0;
+    int64 NormalReliefVertexCount = 0;
+    int64 NormalReliefInsideProtectedRadiusVertexCount = 0;
     int64 ProtectedRiverCorridorVertexCount = 0;
     int64 RejectedLowSlopeVertexCount = 0;
     double AbsoluteOffsetSumCm = 0.0;
     double AbsoluteReconstructionOffsetSumCm = 0.0;
+    double AbsoluteHorizontalReliefSumCm = 0.0;
     float ProtectedShorelineRadiusCm = 0.0f;
     float FullStrengthMorphologyRadiusCm = 0.0f;
     float MinimumModifiedCenterlineDistanceCm = TNumericLimits<float>::Max();
     float MinimumOffsetCm = TNumericLimits<float>::Max();
     float MaximumOffsetCm = TNumericLimits<float>::Lowest();
     float MaximumAbsoluteReconstructionOffsetCm = 0.0f;
+    float MaximumAbsoluteHorizontalReliefCm = 0.0f;
     float MinimumReconstructedInsideRadiusHeightAboveWaterCm =
         TNumericLimits<float>::Max();
     float MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm =
+        TNumericLimits<float>::Max();
+    float MinimumNormalReliefInsideRadiusHeightAboveWaterCm =
         TNumericLimits<float>::Max();
 };
 
@@ -1011,6 +1017,7 @@ struct FZambeziAdaptiveNearFieldTerrainStats
     int64 TriangleCount = 0;
     int64 DryShorelineInfillVertexCount = 0;
     int64 RefinedVertexCount = 0;
+    int64 UpperDryScarpRefinedVertexCount = 0;
     int64 PlanarJitteredVertexCount = 0;
     int64 TopologyCandidateCellCount = 0;
     int64 TopologyRejectedCellCount = 0;
@@ -1022,6 +1029,8 @@ struct FZambeziAdaptiveNearFieldTerrainStats
     float MaximumDryShorelineInfillCm = 0.0f;
     float MinimumRenderedHeightAboveWaterCm = TNumericLimits<float>::Max();
     float MaximumAbsoluteRefinementCm = 0.0f;
+    float MaximumAbsoluteUpperDryScarpRefinementCm = 0.0f;
+    float MinimumUpperDryScarpHeightAboveWaterCm = TNumericLimits<float>::Max();
     float MaximumPlanarJitterCm = 0.0f;
     float MinimumPlanarCellAreaCm2 = TNumericLimits<float>::Max();
     float MaximumWetBankMask = 0.0f;
