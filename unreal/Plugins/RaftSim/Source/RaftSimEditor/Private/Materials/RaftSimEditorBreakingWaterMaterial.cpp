@@ -9,7 +9,9 @@
 #include "HAL/IConsoleManager.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAdd.h"
+#include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionPanner.h"
@@ -19,6 +21,8 @@
 #include "Materials/MaterialExpressionTextureSampleParameter2D.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialExpressionVertexColor.h"
+#include "Materials/MaterialExpressionWorldPosition.h"
+#include "Materials/MaterialParameterCollection.h"
 #include "Misc/PackageName.h"
 #include "UObject/Package.h"
 #include "UObject/SavePackage.h"
@@ -63,14 +67,22 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
              "T_RaftSim_SouthForkWater_FlowNormal."
              "T_RaftSim_SouthForkWater_FlowNormal"));
-    if (FoamLace == nullptr || FlowNormal == nullptr)
+    UMaterialParameterCollection* FoamOcclusionCollection =
+        LoadObject<UMaterialParameterCollection>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+                 "MPC_RaftSim_RaftFoamOcclusion"));
+    if (FoamLace == nullptr || FlowNormal == nullptr ||
+        FoamOcclusionCollection == nullptr)
     {
         UE_LOG(
             LogTemp,
             Error,
-            TEXT("RaftSim: breaking-water material inputs missing lace=%d normal=%d"),
+            TEXT("RaftSim: breaking-water material inputs missing lace=%d "
+                 "normal=%d raftOcclusion=%d"),
             FoamLace != nullptr ? 1 : 0,
-            FlowNormal != nullptr ? 1 : 0);
+            FlowNormal != nullptr ? 1 : 0,
+            FoamOcclusionCollection != nullptr ? 1 : 0);
         return nullptr;
     }
 
@@ -184,6 +196,85 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         Mask(VertexColor, true, false, false);
     EdgeFeather->Input.OutputIndex = 4;
 
+    // The connected crest, roller shell, and D4 contact shoulder all share
+    // this material. They must share the live solver-foam sheet's raft-aligned
+    // exclusion too: translucent depth sorting cannot be trusted to keep a
+    // presentation mesh behind the raft or its passengers. The runtime water
+    // actor already updates these parameters from the actual raft transform;
+    // this graph only consumes that presentation mask and changes no water,
+    // contact, collision, buoyancy, navigation, D3, D4, or raft-force state.
+    auto CollectionParameter =
+        [Material, FoamOcclusionCollection, &Add](FName Name, bool bScalar)
+            -> UMaterialExpressionCollectionParameter*
+    {
+        UMaterialExpressionCollectionParameter* Expression =
+            NewObject<UMaterialExpressionCollectionParameter>(Material);
+        Expression->Collection = FoamOcclusionCollection;
+        Expression->ParameterName = Name;
+        Expression->ExpressionGUID = FGuid::NewGuid();
+        const int32 ParameterIndex = bScalar
+            ? FoamOcclusionCollection->ScalarParameters.IndexOfByPredicate(
+                [Name](const FCollectionScalarParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                })
+            : FoamOcclusionCollection->VectorParameters.IndexOfByPredicate(
+                [Name](const FCollectionVectorParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                });
+        if (ParameterIndex != INDEX_NONE)
+        {
+            Expression->ParameterId = bScalar
+                ? FoamOcclusionCollection->ScalarParameters[ParameterIndex].Id
+                : FoamOcclusionCollection->VectorParameters[ParameterIndex].Id;
+        }
+        Add(Expression);
+        return Expression;
+    };
+    UMaterialExpressionWorldPosition* WorldPosition =
+        NewObject<UMaterialExpressionWorldPosition>(Material);
+    Add(WorldPosition);
+    UMaterialExpressionCollectionParameter* ExclusionEnabled =
+        CollectionParameter(TEXT("RaftFoamExclusionEnabled"), true);
+    UMaterialExpressionCollectionParameter* ExclusionCenter =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionCenterAndHalfWidthCm"), false);
+    UMaterialExpressionCollectionParameter* ExclusionForward =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionForwardAndHalfLengthCm"), false);
+    UMaterialExpressionCustom* RaftCrewExclusion =
+        NewObject<UMaterialExpressionCustom>(Material);
+    RaftCrewExclusion->Description =
+        TEXT("RaftSimBreakingWaterRaftCrewOcclusionV2");
+    RaftCrewExclusion->OutputType = CMOT_Float1;
+    RaftCrewExclusion->Code = TEXT(
+        "float2 Delta = WorldPosition.xy - CenterAndHalfWidth.xy;\n"
+        "float2 Forward = normalize(ForwardAndHalfLength.xy + float2(1e-5, 0.0));\n"
+        // The broad foam sheet keeps a larger rescue/readability clearance.
+        // Connected breaking water needs the actual raft silhouette so a D4
+        // contact plume just outside the tube remains visible.
+        "float Along = dot(Delta, Forward) / max(ForwardAndHalfLength.w * 0.86, 1.0);\n"
+        "float Across = dot(Delta, float2(-Forward.y, Forward.x)) / max(CenterAndHalfWidth.w * 0.47, 1.0);\n"
+        "float EllipseSquared = Along * Along + Across * Across;\n"
+        "float OutsideRaft = smoothstep(0.80, 1.30, EllipseSquared);\n"
+        "return lerp(1.0, OutsideRaft, saturate(Enabled));");
+    auto AddCustomInput = [RaftCrewExclusion](
+        FName Name, UMaterialExpression* Expression)
+    {
+        FCustomInput Input;
+        Input.InputName = Name;
+        Input.Input.Expression = Expression;
+        RaftCrewExclusion->Inputs.Add(Input);
+    };
+    AddCustomInput(TEXT("WorldPosition"), WorldPosition);
+    AddCustomInput(TEXT("CenterAndHalfWidth"), ExclusionCenter);
+    AddCustomInput(TEXT("ForwardAndHalfLength"), ExclusionForward);
+    AddCustomInput(TEXT("Enabled"), ExclusionEnabled);
+    Add(RaftCrewExclusion);
+    UMaterialExpression* OcclusionSafeEdgeFeather = Multiply(
+        EdgeFeather, RaftCrewExclusion);
+
     UMaterialExpression* LaceA = SampleLace(
         1.35f, 2.80f, 0.014f, 0.082f, TEXT("BreakingFoamLacePrimary"));
     UMaterialExpression* LaceB = SampleLace(
@@ -224,7 +315,7 @@ static UMaterial* BuildBreakingWaterLipMaterial()
             FLinearColor(0.73f, 0.78f, 0.77f, 1.0f)),
         FoamCoverage);
     UMaterialExpression* Opacity = Multiply(
-        EdgeFeather,
+        OcclusionSafeEdgeFeather,
         Lerp(
             Scalar(TEXT("BreakingWaterOpacity"), 0.38f),
             Scalar(TEXT("BreakingFoamOpacity"), 0.84f),
@@ -279,7 +370,38 @@ static UMaterial* BuildBreakingWaterLipMaterial()
 
 static void HandleCreateBreakingWaterLipMaterial(const TArray<FString>&)
 {
-    if (!RaftSimPhotorealMaterials::BuildSouthForkWaterTextureAssets())
+    UMaterialParameterCollection* ExistingOcclusionCollection =
+        LoadObject<UMaterialParameterCollection>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+                 "MPC_RaftSim_RaftFoamOcclusion"));
+    if (!ExistingOcclusionCollection)
+    {
+        FString OcclusionSummary;
+        if (!RaftSimEditorEnvironment::LoadOrCreateRaftFoamOcclusionCollection(
+                OcclusionSummary))
+        {
+            UE_LOG(
+                LogTemp,
+                Error,
+                TEXT("RaftSim: cannot author breaking water without the "
+                     "raft/crew occlusion collection: %s"),
+                *OcclusionSummary);
+            return;
+        }
+    }
+    UTexture2D* ExistingFoamLace = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
+             "T_RaftSim_SouthForkWater_FoamLace."
+             "T_RaftSim_SouthForkWater_FoamLace"));
+    UTexture2D* ExistingFlowNormal = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
+             "T_RaftSim_SouthForkWater_FlowNormal."
+             "T_RaftSim_SouthForkWater_FlowNormal"));
+    if ((!ExistingFoamLace || !ExistingFlowNormal) &&
+        !RaftSimPhotorealMaterials::BuildSouthForkWaterTextureAssets())
     {
         UE_LOG(
             LogTemp,

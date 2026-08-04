@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.environment.breaking_water_raft_crew_occlusion_review.v2",
+  "recorded_local_date": "2026-08-04",
+  "status": "technical_occlusion_milestone_retained_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "production_promoted": false,
+  "runtime_rolled_out": true,
+  "scope": {
+    "shared_material": "/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip",
+    "material_consumers": [
+      "connected breaking lip",
+      "aerated crest membrane",
+      "hydraulic roller volume",
+      "contact water patch",
+      "opt-in depth-bearing D4 contact water V10"
+    ],
+    "rivers": [
+      "South Fork American",
+      "Colorado Grand Canyon",
+      "Pacuare",
+      "Futaleufu",
+      "Chilko",
+      "Zambezi"
+    ],
+    "map_packages_resaved": false
+  },
+  "implementation": {
+    "marker": "RaftSimBreakingWaterRaftCrewOcclusionV2",
+    "runtime_parameter_collection": "/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion",
+    "runtime_parameter_collection_changed": false,
+    "parameters_consumed": [
+      "RaftFoamExclusionEnabled",
+      "RaftFoamExclusionCenterAndHalfWidthCm",
+      "RaftFoamExclusionForwardAndHalfLengthCm"
+    ],
+    "world_space_shape": "raft-aligned ellipse squared-distance mask",
+    "base_half_width_cm": 190.0,
+    "base_half_length_cm": 320.0,
+    "breaking_water_width_scale": 0.47,
+    "breaking_water_length_scale": 0.86,
+    "ellipse_squared_smoothstep": [0.80, 1.30],
+    "opacity_integration": "existing edge feather multiplied by the raft/crew exclusion before the shared opacity expression",
+    "missing_collection_behavior": "authoring fails closed",
+    "existing_texture_and_collection_behavior": "existing source assets are loaded without resave; only missing inputs are authored",
+    "depth_bearing_d4_review_default_enabled": false
+  },
+  "visual_evidence": {
+    "capture_resolution": [1280, 720],
+    "baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_before.png",
+      "sha256": "b980030b1db1d3ac03881308e3f25c508aead1a2d1175531dedcb7e3a7feef2b",
+      "verdict": "Reject: the shared breaking-water body renders as an opaque dark layer across the raft tubes, floor, and passengers."
+    },
+    "retained_normal_water": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_after.png",
+      "sha256": "93a1fdfe9d51e8b6c4fc12fa229c0ad9dc4ae65ac4e477cd791366e28d000e84",
+      "verdict": "Retain: raft fabric, tube silhouette, fittings, crew, and paddles remain readable without a rectangular cutout, detached halo, or opaque breaking-water layer."
+    },
+    "retained_waterless_isolation": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_waterless_after.png",
+      "sha256": "8a6e8f538a83d82c363b7e85a5a94bfcfcb72dd06deab9e6348d0bd5c463e4e3",
+      "verdict": "Retain: the D4 contact plume remains visibly connected immediately outside the starboard tube and rock while the raft interior and crew stay clear."
+    },
+    "attribution_limit": "The rigid-body contact pose evolves between launches, so whole-frame pixel deltas are descriptive only and are not used as exclusive material attribution."
+  },
+  "runtime_contact_evidence": {
+    "contact_command": "RaftSim.CaptureRapidWrapTest <label> 960 contact_port",
+    "contact_local_cm": [-100.0, -130.0, -20.0],
+    "dominant_contact_local_cm": [-53.75, -100.0],
+    "dominant_contact_indentation": 0.220,
+    "depth_bearing_v10_cached_frames": 6,
+    "depth_bearing_v10_depth_cm": 104.89,
+    "depth_bearing_v10_frame_triangle_counts": [10704, 10928, 11092, 10748, 10888, 10700],
+    "waterless_isolation_base_surface_visible": false,
+    "waterless_isolation_authored_water_visible": false,
+    "waterless_isolation_d4_plume_visible": true
+  },
+  "authority_boundary": {
+    "presentation_only": true,
+    "solver_or_cooked_fields_changed": false,
+    "solver_breaking_site_detection_changed": false,
+    "water_samples_changed": false,
+    "wet_dry_topology_changed": false,
+    "terrain_or_authoritative_water_geometry_changed": false,
+    "collision_changed": false,
+    "navigation_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "d3_authority_changed": false,
+    "d4_contact_geometry_or_authority_changed": false
+  },
+  "source_hashes": {
+    "unreal/Content/RaftSim/Materials/M_RaftSim_BreakingWaterLip.uasset": "6adcae47bc6f705aeb6989bd1f888b788c4d0d123a8ccb1a421f0605989a1f2c",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp": "20052e3a304102bd5614f2c6b660504910b735affb4dc2f4ba8475690d8d1113",
+    "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "c3f048c9c42c19e08c8c0fd933ba0beb2627fd5dd7bfa448311d9e161cb88024"
+  },
+  "map_integrity": {
+    "packages_resaved": false,
+    "sha256": {
+      "unreal/Content/RaftSim/Maps/L_Hance.umap": "8f3880216d49bf27046e316fb6ba7c5c92c262e6cba83183bccfa4b2aa7d0cd1",
+      "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap": "7a272ebcf757842bf8db190b989fae1a419056dad330b27ac1005530f9212e38",
+      "unreal/Content/RaftSim/Maps/L_Terminator.umap": "cfea8027d1f84a03bcf71b93e304fbcbc9d273564a735ac48fff77e4970db308",
+      "unreal/Content/RaftSim/Maps/L_Troublemaker.umap": "7d45616126cf6760ef54e181e1030dc0b58c0c4b28dbbcc3057779b539e7d6fa",
+      "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4",
+      "unreal/Content/RaftSim/Maps/L_Zambezi.umap": "51f00471114eb84a7b482fe48dd13ddf45132693890aed7a347505924a84865b"
+    }
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development: success",
+    "m4_automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_m4_gate.json",
+    "m4_result": "4/4 passed",
+    "m5_automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_m5_gate.json",
+    "m5_result": "1/1 passed",
+    "p2_p4_automation_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_p2_p4_gate.json",
+    "p2_p4_result": "7/7 passed",
+    "focused_python_result": "4/4 passed"
+  },
+  "automation_report_hashes": {
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_m4_gate.json": "18616d4e1639d7e108f624f9c16ee3890ada7255d983a1d1524f070da2a53f4d",
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_m5_gate.json": "54fb53717c42b286b8fec7b0fc61fe80ef7a37f39897d892dd209085a2a674a5",
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_p2_p4_gate.json": "addb872a7b43e75cdd9aebdc45452204f32eeb981e867e1863553afd2319ad6e"
+  },
+  "remaining_defects": [
+    "The opt-in D4 depth-bearing contact volume is still a review-only analytical body and remains default-off.",
+    "Connected crests, contact foam, spray, mist, refraction, and entrained air remain visibly analytical rather than production photoreal water.",
+    "Terrain, regional ecology, raft equipment, characters, garments, hands, and paddles still require production art and human review.",
+    "The shared mask protects the horizontal raft/crew footprint but is not a general-purpose per-pixel character depth solution.",
+    "Target-platform performance, memory, streaming, desktop, and VR qualification remain open."
+  ],
+  "required_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ],
+  "reviewers": {
+    "whitewater_water_vfx_and_environment_art": null,
+    "qualified_river_guides": null,
+    "geospatial_or_technical_art": null,
+    "rights_and_provenance": null,
+    "safety_and_gameplay_readability": null,
+    "target_platform_qualification": null,
+    "product_owner": null
+  }
+}

@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "56D445900C45D1370E4D84881F4CB82D",
+			"instanceName": "Alexs-MacBook-Air.local-7180",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-17.13.13",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.026619583368301392,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "ProductionNiagaraWaterVfx",
+			"fullTestPath": "RaftSim.M5.ProductionNiagaraWaterVfx",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"56D445900C45D1370E4D84881F4CB82D"
+			],
+			"duration": 0.026619583368301392,
+			"dateTime": "2026.08.04-17.13.12",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}
