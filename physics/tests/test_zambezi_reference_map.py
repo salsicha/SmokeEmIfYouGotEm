@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v11_review.json"
+    "zambezi_runnable_release_head_v12_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -176,24 +176,26 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v7"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v8"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "f3e662e50c2f6fba5dd7a5e457a11029108867bf"
+        "07f78311a7163257d3e3efe64b3c7e5c6189e996"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Reaffirm the regenerated V17 Zambezi package as a player-facing "
-            "runnable river after the upper-scarp and launch-cover terrain milestone."
+            "Reaffirm the V18 Zambezi package as a player-facing runnable river "
+            "at the current release head and make its availability and evidence "
+            "link explicit in both versioned runtime manifests."
         ),
-        "map_runtime_package_changed_since_v10": True,
-        "player_selector_contract_changed_since_v10": False,
+        "map_runtime_package_changed_since_v11": True,
+        "player_selector_metadata_changed_since_v11": True,
+        "frontend_scenario_mapping_changed_since_v11": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v10_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v11_review.json"
         ),
     }
     assert review["player_path"] == {
@@ -205,31 +207,28 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         "runnable_river_ordinal": 6,
         "runnable_river_count": 6,
         "tier": "reference_free_run",
+        "availability": "free_run",
     }
 
     expected_hashes = {
         "unreal/Content/RaftSim/Maps/L_Zambezi.umap": (
-            "e1f4a8084809475e8844e8485de83a3af58d48bd04f392e69ccaba39ec3810e9"
+            "52321a4e9a1e966d4f6fe2fdc38d6c970e37fd8c17f60128347a20528daf1fff"
         ),
         (
             "docs/environment-captures/photoreal_river_previews/"
             "landscape_candidates/zambezi_reference_scenario_map_validation.json"
         ): (
-            "16ce18cb9e7ae94ffdd41f0b40002652ce3ed45158f6f3a5b137549e58595d36"
+            "0db600e9d1089802fd597ff55d7ecfecfdc328ee49c6dc64fb9b4f824e28320f"
         ),
         "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/"
         "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset": (
-            "e5a27faca288004cbf0473edc5a136e5d3b5f3fb37df1687a0e722f5a74b5f03"
-        ),
-        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-        "M_RaftSim_SouthForkRaftTransmissionWater.uasset": (
-            "1fd7cabc1d42e46da3ac865287039170ce75e5483e8500cf2d8e9be8d2878e15"
+            "d212a77657cb6cf5a4b02a7d5d2922d87bff6654fda75f6dec5cca372f483c69"
         ),
         "unreal/Content/RaftSim/UI/river_selection_catalog.json": (
-            "1eaeba715f3f9c7e82bbc0c77eb151a5268a537a6ffe6f5e8686ceaf8db13c9e"
+            "e325c0c302613c7e497208b138515591bc06096dfc064ac762fa55bb7bba67ba"
         ),
         "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json": (
-            "bc01d8529015255abd2d36d722d7acd891edca741d5656d6e40983111c4c8da3"
+            "258f94f0308638465a1a4a0df85b7661f5aded9f562c5e25ee0e617ccc4a717a"
         ),
         "physics/data/real_world/player_selection_model.json": (
             "aac98ef3b0346f7bb178ad65ce4b93b6c14920f464782a151df3b4d9a4486a27"
@@ -266,50 +265,54 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         "river_selection_catalog_portfolio_role": "runnable_river",
         "river_selection_catalog_runnable": True,
         "river_selection_catalog_tier": "reference_free_run",
+        "river_selection_catalog_availability": "free_run",
         "progression_manifest_lists_zambezi": True,
+        "progression_manifest_runnable": True,
+        "progression_manifest_availability": "free_run",
+        "both_runtime_manifests_link_this_review": True,
         "frontend_catalog_lists_zambezi": True,
         "shipping_cook_lists_zambezi": True,
         "versioned_map_present": True,
         "superseded_preview_is_player_path": False,
     }
-    assert review["verification"]["focused_python_contracts"]["passed"] == 24
+    assert review["verification"]["editor_build"]["result"] == "success"
+    assert review["verification"]["focused_python_contracts"]["passed"] == 25
     assert review["verification"]["career_catalog"]["result"] == "success"
     assert review["verification"]["progression_migration"]["result"] == "success"
-    assert review["verification"]["all_river_map_loads"] == {
-        "test": "RaftSim.P4.RiverMapLoads",
-        "performed": 6,
-        "result": "success",
+    assert review["verification"]["zambezi_map_load"] == {
+        "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+        "performed": 1,
+        "result": "success_with_accepted_warning",
+        "duration_seconds": 32.69721603393555,
         "zambezi_mapcheck_errors": 0,
         "zambezi_mapcheck_warnings": 0,
-        "automation_warnings": 2,
-        "accepted_warnings": [
-            (
-                "Troublemaker test deliberately logs a capsize while validating "
-                "flexible-raft failure behavior"
-            ),
-            (
-                "Zambezi external connectivity probe timed out without affecting "
-                "map load or gameplay acceptance"
-            ),
-        ],
+        "automation_warnings": 1,
+        "accepted_warning": (
+            "The external connectivity probe timed out after 3 seconds; it has no "
+            "map-load or gameplay authority."
+        ),
         "automation_errors": 0,
     }
     assert review["verification"]["live_zambezi_map"] == {
         "map_package": "/Game/RaftSim/Maps/L_Zambezi",
         "game_mode": "RaftSimVerticalSliceGameMode",
         "coordinate_map_points": 5908,
+        "surface_vertices": 10465,
+        "surface_triangles": 20480,
         "wet_vertices": 10465,
         "active_breaking_sites": 10,
         "rapid_foam_vertices": 631,
         "rapid_foam_visible": True,
         "volume_core_enabled": True,
         "volume_core_triangles": 16896,
+        "standing_wave_absolute_max_m": 0.1046,
+        "hydraulic_relief_absolute_max_m": 0.0896,
         "surface_smoothing_enabled": True,
         "surface_smoothing_strength": 0.62,
         "bank_blend_m": 7.5,
     }
     assert review["verification"]["saved_map_evidence"]["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v19"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v20"
     )
     assert len(review["open_external_acceptance_gates"]) == 7
 
@@ -732,6 +735,10 @@ def test_zambezi_scenario_and_named_rapid_markers_use_pdf_relative_stationing():
     assert player_entry["portfolio_role"] == "runnable_river"
     assert player_entry["runnable"] is True
     assert player_entry["runnable_tier"] == "reference_free_run"
+    assert player_entry["availability"] == "free_run"
+    assert player_entry["runnable_release_review"] == (
+        RUNNABLE_RELEASE_REVIEW.as_posix()
+    )
     runtime_acceptance = player_entry["runtime_acceptance"]
     assert runtime_acceptance["result"] == "pass"
     assert runtime_acceptance["safe_launch_apron"] == (
@@ -929,6 +936,9 @@ def test_zambezi_reference_map_is_in_the_shipping_cook_and_regeneration_contract
         "scenario_id": "zambezi_reference_run",
         "map_package": map_package,
         "tier": "reference_free_run",
+        "runnable": True,
+        "availability": "free_run",
+        "runnable_release_review": RUNNABLE_RELEASE_REVIEW.as_posix(),
     }
 
     frontend_source = (

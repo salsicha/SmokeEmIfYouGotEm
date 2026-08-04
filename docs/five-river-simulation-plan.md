@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v11_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json`.
 
 The subsequent V18 Zambezi presentation pass preserves that same runnable
 selector and runtime contract while reducing clipped launch-water and scarp
@@ -719,3 +719,20 @@ and external acceptance gates pass.
   guide/geospatial/rights/seasonal-flow review, photoreal art, and target-
   hardware performance remain open in
   `zambezi_runnable_release_head_v11_review.json`.
+
+### 2026-08-03 — V18 Zambezi runnable status re-certified
+
+- The player selection catalog and six-river progression manifest now both
+  state `runnable: true`, `availability: free_run`, and link the V12
+  release-head review for `zambezi_batoka_gorge`. The runtime scenario mapping
+  remains `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`.
+- A clean 79-action UE 5.8 editor build, 25 focused Python contracts,
+  `RaftSim.M6.CareerCatalog`, `RaftSim.M6.ProgressionMigration`, and the live
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` gate pass. The PIE map binds its
+  5,908-point coordinate map, 10,465 wet surface vertices, ten breaking sites,
+  631 visible rapid-foam vertices, and 16,896 volume-core triangles; MapCheck
+  reports zero errors and warnings.
+- This keeps Zambezi runnable at the reference Free Run tier. It does not close
+  terrain, datum, rights, seasonal-flow, rapid-hydraulic, guide, photoreal-art,
+  or target-platform acceptance. Exact hashes and gates are in
+  `zambezi_runnable_release_head_v12_review.json`.

@@ -17,13 +17,15 @@ Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
 to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
 and do not delay a complete South Fork 1.0.
 
-**Runnable-portfolio checkpoint, August 2:** all six rivers are selectable Free
+**Runnable-portfolio checkpoint, August 3:** all six rivers are selectable Free
 Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
 package. Its rebuilt native catalog and live PIE gates pass at the current
 release head; this confirms runnable-reference status only and does not close
 its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
-See `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v2_review.json`.
+The selection and progression manifests now also mark it `runnable: true` with
+`availability: free_run`. See
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json`.
 
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt
@@ -4274,3 +4276,12 @@ path is verified, and the completion goal can be marked complete.
   six-map P4 suite pass. This restores current hash-locked runnable evidence
   after the terrain package changed without claiming validated Zambezi
   bathymetry/hydraulics, photoreal acceptance, or closure of any external gate.
+- Zambezi runnable release-head V12 re-certifies the retained V18
+  `/Game/RaftSim/Maps/L_Zambezi` package as river 6 and makes the runnable state
+  explicit in both versioned runtime manifests. Each now records
+  `runnable: true`, `availability: free_run`, and the current review path while
+  the frontend remains `zambezi_reference_run` → `L_Zambezi`. A 79-action
+  editor build, 25 focused Python contracts, M6 career/progression gates, and
+  the live Zambezi P4 gate pass with MapCheck 0/0. This is reference-runnable
+  certification only; all seven external data, hydraulic, art/human, and
+  platform gates remain open.

@@ -14,7 +14,7 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
-The August 3 V17 release-head revalidation confirms again that the frontend
+The August 3 V18 release-head certification confirms again that the frontend
 selector, source scenario, shipping cook, saved map, and live PIE launch all
 resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads
 with the vertical-slice game mode and live cooked-field water, and is not an
@@ -26,7 +26,7 @@ while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
 still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v11_review.json),
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The current Batoka V18 presentation pass keeps V17's source-missing upper-scarp
@@ -51,8 +51,10 @@ rapid-cluster coverage without changing the map, solver, collision, or raft
 forces; it remains visibly short of a coherent overturning whitewater volume.
 Evidence and the unchanged external gates are in the
 [solver-driven rapid VFX review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_solver_driven_rapid_vfx_v1_review.json).
-The versioned progression manifest also enumerates Zambezi in the six-river
-Free Run contract, so catalog tests fail if its scenario or map path is removed.
+The versioned selection and progression manifests explicitly mark Zambezi
+`runnable: true` and `availability: free_run`, link the current release-head
+review, and enumerate it in the six-river Free Run contract. Catalog tests fail
+if its scenario, availability, evidence link, or map path is removed.
 The South Fork production campaign still resolves to the 49.1 km
 `L_SouthForkAmerican_FullReach` gameplay map. Its August 2 organic foothill
 terrain pass now shares dry-grass, oak-litter, granitic-soil, and weathered-

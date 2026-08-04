@@ -58,7 +58,10 @@
           "river_id": "zambezi_batoka_gorge",
           "scenario_id": "zambezi_reference_run",
           "map_package": "/Game/RaftSim/Maps/L_Zambezi",
-          "tier": "reference_free_run"
+          "tier": "reference_free_run",
+          "runnable": true,
+          "availability": "free_run",
+          "runnable_release_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json"
         }
       ]
     },
