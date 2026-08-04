@@ -30,8 +30,8 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
 
-    /** Reproduces the deterministic presentation-only displacement authored
-     * into the full-reach seasonal water. It never changes a water sample,
+    /** Reproduces deterministic presentation-only, phase-warped wave packets
+     * over the full-reach seasonal water. It never changes a water sample,
      * collision, buoyancy, or any other solver authority. */
     static float ComputePresentationStandingWaveDisplacementMeters(
         const FVector2D& RiverCoordinatesMeters,

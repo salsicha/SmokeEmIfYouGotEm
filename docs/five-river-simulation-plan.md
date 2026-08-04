@@ -655,3 +655,20 @@ and external acceptance gates pass.
   the rapid still lacks a convincing aerated hole and recirculating body, so
   photoreal promotion and all named external gates remain open in
   `zambezi_connected_plunge_v1_review.json`.
+
+### 2026-08-04 — Shared nonperiodic live-wave field retained
+
+- The live-water renderer no longer adds its dominant continuous 11.5 cm
+  diagonal sinusoid. Four hydraulically activated, station-dominant crest
+  bands use smooth reach-scale energy packets and incommensurate phase warps;
+  two split phase-warped ripples preserve the 1.8 cm calm-water envelope.
+- Exact analytical station/lateral derivatives drive presentation normals.
+  The theoretical displacement bound drops from 0.248 m to 0.168 m, while
+  sampling, cooked fields, wet/dry state, collision, buoyancy, D3, and D4 stay
+  unchanged.
+- The editor build and `RaftSim.P2.WaterSurfaceRenders` pass; the complete P4
+  suite passes all six runnable rivers. The matched Zambezi maximum drops from
+  0.2343 m to 0.1046 m and the repeated center-band continuity is removed.
+  The retained sampled rise and missing measured bathymetry, aerated hole,
+  recirculation, spray/mist, and platform/art approvals keep photoreal and
+  production promotion open in `zambezi_nonperiodic_live_wave_v1_review.json`.

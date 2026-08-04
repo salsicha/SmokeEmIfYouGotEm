@@ -300,25 +300,39 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         SecondRapidWaveM);
     Test->TestTrue(
         FString::Printf(
-            TEXT("four-band rapid relief stays inside its 24.8 cm bound (%.3f m)"),
+            TEXT("localized rapid relief stays inside its 16.8 cm bound (%.3f m)"),
             FirstRapidWaveM),
-        FMath::Abs(FirstRapidWaveM) <= 0.2481f);
+        FMath::Abs(FirstRapidWaveM) <= 0.1681f);
 
     const float RefinedRapidWaveM =
         ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
             RapidCoordinateM + FVector2D(1.5f, 0.0f), 1.778f, 0.412f);
     Test->TestTrue(
         FString::Printf(
-            TEXT("refined grid resolves short river-coordinate rapid relief (delta %.4f m)"),
+            TEXT("refined grid resolves phase-warped river-coordinate relief (delta %.4f m)"),
             FMath::Abs(RefinedRapidWaveM - FirstRapidWaveM)),
-        FMath::Abs(RefinedRapidWaveM - FirstRapidWaveM) > 0.01f);
+        FMath::Abs(RefinedRapidWaveM - FirstRapidWaveM) > 0.004f);
+
+    const float FormerRepeatRapidWaveM =
+        ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
+            RapidCoordinateM + FVector2D(2.0f * UE_PI / 0.19f, 0.0f),
+            5.0f,
+            0.5f);
+    const float EnergeticRapidWaveM =
+        ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
+            RapidCoordinateM, 5.0f, 0.5f);
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("rapid relief does not repeat at the former dominant wavelength (delta %.4f m)"),
+            FMath::Abs(FormerRepeatRapidWaveM - EnergeticRapidWaveM)),
+        FMath::Abs(FormerRepeatRapidWaveM - EnergeticRapidWaveM) > 0.01f);
 
     const float CalmRippleM =
         ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
             RapidCoordinateM, 0.0f, 2.0f);
     Test->TestTrue(
         FString::Printf(
-            TEXT("calm water retains only the authored 1.8 cm ripple (%.3f m)"),
+            TEXT("calm water retains only the authored split 1.8 cm ripple (%.3f m)"),
             CalmRippleM),
         FMath::Abs(CalmRippleM) <= 0.0181f);
     Test->TestFalse(

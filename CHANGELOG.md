@@ -32,6 +32,13 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced the shared live-water renderer's dominant 11.5 cm diagonal
+  sinusoid with deterministic flow-aligned, phase-warped crest packets and
+  analytical normals. The theoretical presentation bound drops from 24.8 cm
+  to 16.8 cm and the matched Zambezi runtime maximum drops from 23.43 cm to
+  10.46 cm without changing solver samples, collision, buoyancy, or D3/D4.
+  The editor build, focused water gate, and all six runnable river gates pass;
+  photoreal hydraulic and external acceptance remain open.
 - Kept one connected, masked crest-to-plunge water membrane active beneath
   production Niagara at the three strongest accepted solver jumps. This
   replaces the production-path choice between disconnected particle spray and

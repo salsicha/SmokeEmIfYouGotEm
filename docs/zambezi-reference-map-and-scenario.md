@@ -548,6 +548,25 @@ photoreal or real-world hydraulic acceptance. Evidence, hashes, rejected
 iterations, remaining defects, and external gates are recorded in
 `zambezi_connected_plunge_v1_review.json`.
 
+The shared live-water presentation no longer uses the 11.5 cm band whose
+`0.19 * station + 0.61 * lateral` phase formed one continuous diagonal ramp.
+Two split calm ripples and four hydraulically activated, incommensurate
+phase-warped bands now make shorter station-dominant crest packets. Their
+analytical station/lateral derivatives continue to drive normals, the largest
+individual active band is 6.5 cm, and the combined theoretical envelope is
+16.8 cm instead of 24.8 cm. At the exact retained Zambezi camera, the logged
+standing-wave maximum falls from 23.43 cm to 10.46 cm and water pixels change
+while the upper-bank background remains effectively fixed. The sampled
+surface and its bounded hydraulic relief are deliberately not flattened.
+
+The editor build, focused water-surface test, and all six runnable-map PIE
+gates pass. The central repeated analytical band is removed, but the broad
+low-resolution sampled rise, unmeasured bathymetry, missing aerated hole and
+recirculation, synthetic terrain/ecology, and final spray/occlusion still fail
+photoreal and real-world hydraulic acceptance. Exact captures, telemetry,
+hashes, remaining defects, and external gates are recorded in
+`zambezi_nonperiodic_live_wave_v1_review.json`.
+
 ## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route
