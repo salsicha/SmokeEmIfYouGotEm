@@ -616,3 +616,21 @@ Initial source slice:
   and named art, guide, geospatial, rights, safety, platform, and product-owner
   approvals remain open in
   `docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json`.
+
+## August 4, 2026 — solver-anchored downstream boil microrelief
+
+- The shared `ARaftSimWaterSurfaceActor` now applies three unequal, skewed,
+  independently drifting tailwater cells to each of the three strongest
+  accepted breaking sites. Their upwellings, shallow return troughs, warped
+  shoulders, and broken foam rims fade across 3.8-20.5 m downstream and remain
+  within -4.5/+7.0 cm of render-only displacement; the combined retained
+  plunge-pocket and boil envelope stays within -31/+21 cm. The implementation
+  is non-colliding, navigation-inert, and never feeds solver samples, wet/dry
+  ownership, buoyancy, D3/D4, or raft forces. Matched Zambezi capture retains
+  the irregular surface without bullseyes, domes, rails, cards, shoreline
+  seams, or opaque overlays. The editor build, M4 4/4, renderer-backed M5 1/1,
+  and P2 plus all six runnable-map P4 gates 7/7 pass; `L_Zambezi` remains river
+  six. This is a bounded visual approximation rather than calibrated
+  recirculation or measured bathymetry, so photoreal promotion and all seven
+  external acceptance gates remain open in
+  `docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_review.json`.

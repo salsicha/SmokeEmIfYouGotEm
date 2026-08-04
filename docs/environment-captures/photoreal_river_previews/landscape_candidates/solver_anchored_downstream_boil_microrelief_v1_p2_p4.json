@@ -1,0 +1,273 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "8244023ED54A281C8CC7618DAA3E8B15",
+			"instanceName": "Alexs-MacBook-Air.local-95880",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-16.03.05",
+	"succeeded": 0,
+	"succeededWithWarnings": 7,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 76.556365966796875,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "WaterSurfaceRenders",
+			"fullTestPath": "RaftSim.P2.WaterSurfaceRenders",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 2.9649169445037842,
+			"dateTime": "2026.08.04-16.01.48",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.01.48"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.01.49"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Hance",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Hance",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 6.1053528785705566,
+			"dateTime": "2026.08.04-16.01.51",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.01.53"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_LavaCanyon",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 5.9421792030334473,
+			"dateTime": "2026.08.04-16.01.58",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.01.59"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Terminator",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Terminator",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 5.9550323486328125,
+			"dateTime": "2026.08.04-16.02.04",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.05"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Troublemaker",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Troublemaker",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 4.8161697387695312,
+			"dateTime": "2026.08.04-16.02.10",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.10"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogTemp: RaftSim capsize: raft=RaftSimRaftActor_0 location_cm=V(X=-6000.00, Z=95.36) rotation_deg=R(P=-2.12, Y=2.64, R=114.66) flip_margin_nm=222.597 flip_threshold_nm=1800.000 retained_water_kg=273.028 retained_roll_moment_nm=-1577.403 wet_samples=6/12 contacts=0 wrapping=0 pinned=0",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.11"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_UpperHuacas",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 5.729583740234375,
+			"dateTime": "2026.08.04-16.02.15",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.16"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Pacuare humidity runtime values: density=0.0075000 volumetric=0 max_opacity=0.6200 start_cm=450.00 second_density=0.0012000 second_offset_cm=-160.00 second_falloff=0.0600",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.20"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Zambezi",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"8244023ED54A281C8CC7618DAA3E8B15"
+			],
+			"duration": 45.043128967285156,
+			"dateTime": "2026.08.04-16.02.20",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.38"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogAudioMixerAudioUnit: Error querying Sample Rate: 2003332927",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-16.02.59"
+				}
+			],
+			"warnings": 2,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

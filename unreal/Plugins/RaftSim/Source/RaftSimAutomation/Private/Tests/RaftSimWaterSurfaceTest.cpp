@@ -523,6 +523,35 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     Test->TestTrue(
         TEXT("zero-intensity jumps add no plunge-pocket presentation"),
         DisabledPlungePocket.IsNearlyZero());
+    const FVector2D DownstreamBoil =
+        ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
+            7.2f, -0.8f, 1.0f, 0.0f, 0.0f);
+    const FVector2D AnimatedDownstreamBoil =
+        ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
+            7.2f, -0.8f, 1.0f, 0.9f, 0.0f);
+    const FVector2D UpstreamBoil =
+        ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
+            2.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    const FVector2D FarTailBoil =
+        ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
+            24.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+    const FVector2D DisabledDownstreamBoil =
+        ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
+            7.2f, -0.8f, 0.0f, 0.0f, 0.0f);
+    Test->TestTrue(
+        TEXT("accepted jumps form bounded asymmetric downstream boil relief"),
+        FMath::Abs(DownstreamBoil.X) > 0.01f &&
+            DownstreamBoil.X >= -0.0451f && DownstreamBoil.X <= 0.0701f &&
+            DownstreamBoil.Y >= 0.0f && DownstreamBoil.Y <= 0.3801f);
+    Test->TestTrue(
+        TEXT("downstream boil microrelief evolves without translating authority"),
+        FMath::Abs(AnimatedDownstreamBoil.X - DownstreamBoil.X) > 0.001f);
+    Test->TestTrue(
+        TEXT("boil microrelief cannot appear upstream or beyond its tailwater bound"),
+        UpstreamBoil.IsNearlyZero() && FarTailBoil.IsNearlyZero());
+    Test->TestTrue(
+        TEXT("zero-intensity jumps add no downstream boil presentation"),
+        DisabledDownstreamBoil.IsNearlyZero());
     Test->TestTrue(
         TEXT("presentation edge clearance is zero on a sampled riverbank"),
         FMath::IsNearlyZero(
@@ -602,6 +631,12 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     Test->TestTrue(
         TEXT("connected breaking curtain never exceeds forty centimetres thickness"),
         Surface->GetBreakingRollerVolumeMaximumThicknessCm() <= 40.01f);
+    Test->TestTrue(
+        TEXT("downstream boil presentation stays inside its three-site budget"),
+        Surface->GetActiveDownstreamBoilSiteCount() <= 3);
+    Test->TestTrue(
+        TEXT("combined downstream boil relief stays inside seven centimetres"),
+        Surface->GetMaximumAbsoluteDownstreamBoilDisplacementMeters() <= 0.0701f);
     return true;
 }
 

@@ -92,6 +92,19 @@ public:
         float AcrossMeters,
         float Intensity);
 
+    /** Animated render-only tailwater microrelief behind an accepted hydraulic
+     * jump. Overlapping asymmetric cells create bounded upwellings and return
+     * troughs without periodic rings. X is vertical displacement in metres;
+     * Y is local foam generation. The phase and site offset affect only the
+     * visible surface and never feed sampling, collision, buoyancy, D3, D4, or
+     * raft forces. */
+    static FVector2D ComputeBreakingDownstreamBoilPresentation(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float Intensity,
+        float PhaseSeconds,
+        float SitePhaseRadians);
+
     /** Distance from one sampled live-water vertex to the nearest moving-grid
      * station edge or sampled wet/dry bank, in metres. Breaking-water sheets
      * use this to remain wholly inside the owned live-water presentation
@@ -177,6 +190,20 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsBreakingRollerVolumeVisible() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetActiveDownstreamBoilSiteCount() const
+    {
+        return ActiveDownstreamBoilSiteCount;
+    }
+
+    /** Largest absolute render-only boil displacement generated during the
+     * latest refresh. This does not describe or modify the solver surface. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetMaximumAbsoluteDownstreamBoilDisplacementMeters() const
+    {
+        return MaximumAbsoluteDownstreamBoilDisplacementMeters;
+    }
 
     /** Number of live-water vertices currently contributing solver-owned,
      * advected rapid foam to the separate masked presentation sheet. The
@@ -430,6 +457,7 @@ private:
     TArray<FLinearColor> RapidFoamVertexColors;
     TArray<FProcMeshTangent> Tangents;
     float TimeSinceRefresh = 0.0f;
+    float PresentationPhaseSeconds = 0.0f;
     bool bLoggedPresentationDiagnostics = false;
     bool bLoggedHydraulicReliefDiagnostics = false;
     bool bLoggedRaftInteriorWaterTransmission = false;
@@ -450,6 +478,8 @@ private:
     int32 BreakingRollerVolumeTriangleCount = 0;
     int32 BreakingRollerVolumeVertexCount = 0;
     float BreakingRollerVolumeMaximumThicknessCm = 0.0f;
+    int32 ActiveDownstreamBoilSiteCount = 0;
+    float MaximumAbsoluteDownstreamBoilDisplacementMeters = 0.0f;
     int32 VisibleRapidFoamVertexCount = 0;
     int32 LiveVolumeCoreTriangleCount = 0;
     bool bBreakingRollerVolumeRenderingEnabled = true;

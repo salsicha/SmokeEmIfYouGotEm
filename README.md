@@ -239,6 +239,17 @@ presentation-only technical progress—not photoreal promotion—because the
 droplets remain sprite-based and coherent aerated volume, collision-aware
 breakup, measured hydraulics, final art, and external approvals remain open in
 the [three-scale breaking-spray review](docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json).
+The shared live-water surface now also gives the three strongest solver-
+accepted sites a bounded animated tailwater: three unequal, skewed boil cells
+per site form subtle upwellings, return troughs, and broken foam rims from
+3.8-20.5 m downstream. Per-site presentation displacement remains within
+-4.5/+7.0 cm and the combined plunge-pocket/boil envelope remains within
+-31/+21 cm; collision, navigation, sampled water, buoyancy, D3/D4, raft forces,
+and all saved maps are unchanged. The editor build, M4 4/4, renderer-backed M5
+1/1, P2, and all six P4 runnable-map gates pass 7/7, including `L_Zambezi` as
+runnable river 6. This is still presentation-only technical progress, not
+solved recirculation, measured bathymetry, or photoreal promotion; see the
+[downstream-boil review](docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_review.json).
 Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
 path that was silently restoring the older reflective water defaults after
 regeneration. The runtime now keeps the river-local, wet-cell-clipped volume

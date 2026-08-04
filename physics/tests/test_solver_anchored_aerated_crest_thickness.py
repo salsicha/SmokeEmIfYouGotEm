@@ -16,6 +16,16 @@ RUNTIME_SOURCE = (
 )
 
 SUPERSEDING_SOURCE_HASHES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
+        "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": (
+        "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+    "RaftSimWaterSurfaceTest.cpp": (
+        "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
+    ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": (
         "28785291d8ee93116f155af02626a67816bf129a5b05c80128ec6bfcb7440c9d"
     ),
@@ -27,7 +37,7 @@ SUPERSEDING_SOURCE_HASHES = {
         "9206cc1ddc960383cab928f06f87d70d769a89fe2fbd467038bd46582c03a41f"
     ),
     "physics/tests/test_shared_flow_advected_foam.py": (
-        "437b09b7c8db568f98d7f5d71be2b8486c5cfa8e062054f843450187f0c8a0b9"
+        "c5b1e241695b3d28f06f8f16186255e300dac082ec03fe1999d8a1a22f4b4d99"
     ),
 }
 
