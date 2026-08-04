@@ -1,0 +1,149 @@
+{
+  "schema": "raftsim.photoreal.shared_flow_advected_foam.review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "d0e93c3d817fafafe06d34699c041ac0645d6f40",
+  "extends": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+  "status": "technical_candidate_retained_external_acceptance_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "production_promoted": false,
+  "runtime_rolled_out": true,
+  "summary": "The shared solver-owned foam surface now uses scene lighting and two independently advected, incommensurate samples of each river's first-party lace instead of one static unlit rectangular tile. Matched cold-water evidence materially reduces continuous bright rails, but retained strokes, analytical wave geometry, incomplete aerated volume and spray, synthetic environments, and absent external acceptance keep the milestone fail-closed.",
+  "scope": {
+    "rivers": [
+      "american_south_fork",
+      "colorado_river_hance",
+      "pacuare_upper_huacas",
+      "futaleufu_terminator",
+      "chilko_lava_canyon",
+      "zambezi_batoka_gorge"
+    ],
+    "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate",
+    "new_generation": false,
+    "existing_maps_resaved": false,
+    "fail_closed_default": true
+  },
+  "authority_boundary": {
+    "solver_foam_generation_changed": false,
+    "solver_foam_advection_changed": false,
+    "water_samples_changed": false,
+    "wet_dry_topology_changed": false,
+    "water_or_terrain_geometry_changed": false,
+    "collision_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "raft_and_crew_exclusion_retained": true,
+    "presentation_material_only": true
+  },
+  "implementation": {
+    "shading_model": "Default Lit",
+    "blend_mode": "Masked",
+    "opacity_mask_clip": 0.18,
+    "primary_lace": {
+      "uv_tiling": [0.37, 0.89],
+      "panner_speed": [0.073, 0.006]
+    },
+    "detail_lace": {
+      "uv_tiling": [0.71, 1.57],
+      "panner_speed": [0.127, -0.011],
+      "gain": 0.46,
+      "floor": 0.54
+    },
+    "river_local_texture_parameter": "SolverOverlayFoamLace",
+    "roughness": 0.78,
+    "specular": 0.24,
+    "base_color_scale": 1.08,
+    "emissive_floor_scale": 0.06,
+    "solver_mask": "vertex alpha remains the first multiplier before lace breakup",
+    "raft_exclusion": "the runtime-updated raft ellipse remains the final opacity-mask multiplier"
+  },
+  "matched_evidence": {
+    "futaleufu_breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 shared_flow_advected_foam_v1_futaleufu_breaking_water_side breaking_water_side",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_futaleufu_breaking_water_side.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_futaleufu_breaking_water_side.png",
+      "diagnostic_region_xyxy": [0, 220, 900, 720],
+      "baseline_mean_luma": 176.194,
+      "candidate_mean_luma": 171.667,
+      "baseline_bright_neutral_percent": 15.375,
+      "candidate_bright_neutral_percent": 10.642,
+      "baseline_very_white_percent": 8.908,
+      "candidate_very_white_percent": 4.233,
+      "visual_verdict": "Retain. The dense rectangular white lattice becomes smaller disconnected patches and participates in direct light. Parallel analytical strokes and the smooth base wave remain visibly synthetic."
+    },
+    "chilko_bank_closeup": {
+      "command": "RaftSim.CaptureAfter 8 shared_flow_advected_foam_v1_chilko_bank_closeup 30000 0 260 -4 90",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_chilko_bank_closeup.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_chilko_bank_closeup.png",
+      "diagnostic_region_xyxy": [0, 400, 1280, 720],
+      "baseline_mean_luma": 90.958,
+      "candidate_mean_luma": 55.888,
+      "baseline_bright_neutral_percent": 5.431,
+      "candidate_bright_neutral_percent": 1.615,
+      "baseline_very_white_percent": 0.0,
+      "candidate_very_white_percent": 0.0,
+      "visual_verdict": "Retain as descriptive evidence only. Bright rails are less continuous and foam responds to scene light, but the matched frame also contains a different deterministic lace phase and a materially different direct-light distribution, so the luminance delta is not treated as an acceptance threshold."
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final material and native-test changes",
+    "native_material_audit": "RaftSim.M9.FSharedFlowAdvectedFoam passed 1/1 with zero warnings and zero errors",
+    "shared_water_and_runnable_maps": "RaftSim.P2.WaterSurfaceRenders plus all six RaftSim.P4.RiverMapLoads passed 7/7; warnings were the engine motion-vector flag, established Troublemaker capsize telemetry, and the established Zambezi connectivity timeout",
+    "matched_renderer_captures": "Futaleufu breaking-water-side and Chilko bank-closeup captures completed at 1280x720 with the same commands and camera contracts as the baseline",
+    "map_packages_resaved": false
+  },
+  "remaining_photoreal_defects": [
+    "The source lace itself still contains elongated high-contrast strokes, so some parallel line character remains after multiscale breakup.",
+    "The foam is a thin masked surface over low-resolution analytical wave geometry rather than a thick entrained-air body with resolved overturning crests, holes, pile, and recirculation.",
+    "Spray, suspended droplets, mist, rock-contact plumes, raft wake, paddle interaction, wet fabric, and camera-lens water remain incomplete or unapproved.",
+    "Terrain, banks, boulders, vegetation, atmosphere, raft equipment, characters, anatomy, PPE, animation, and hand/paddle contact remain below the requested photoreal target in at least one runnable river.",
+    "No named guide, geospatial, hydraulic, environment-art, water-VFX, rights, hazard-readability, product, or target-platform reviewer has approved full-scene promotion."
+  ],
+  "required_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ],
+  "reviewers": {
+    "named_water_vfx_environment_art_reviewer": null,
+    "qualified_river_guides": null,
+    "geospatial_technical_art_reviewer": null,
+    "rights_provenance_reviewer": null,
+    "safety_readability_reviewer": null,
+    "target_platform_reviewer": null,
+    "product_owner": null
+  },
+  "source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "b53081b42d81fc6c60d19c379303f937cd05169e8b4b7893136769b2efd701a9",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": "ab70174bd66c825076b5b14ddf6836c5d88e932bddbce55fb18f6f1ca02dbd74",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
+    "physics/tests/test_editor_source_layout.py": "4b54b097b12c6af28b2bea9ec73778e5eacd9a452d2284d68706e1573b542508",
+    "physics/tests/test_shared_flow_advected_foam.py": "087ea3adc60a4db28c25c1fbaab03e92a14ff0227b35bb0cb1eaf0d060f9d9be"
+  },
+  "artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset",
+      "sha256": "01a084b508cebade6abc05320697fc4968bedfc8bd853020f7e4826527852e11"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_futaleufu_breaking_water_side.png",
+      "sha256": "e1e3636f892652c2f352bb15b5e02f281a8a258af0c9f9bc28becf2974293723"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_chilko_bank_closeup.png",
+      "sha256": "3380c74ec45a9e717b89683f7bceaa717a1dbb87a7434a594c9826e726714380"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_native.json",
+      "sha256": "c5acfb43e8b9ad253fe539ffeed0fb6eef5b612a95ede5b174207c3bbfc221cb"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_p2_p4.json",
+      "sha256": "c46aefa98026cf06a56c0f7978724cac06387da5a46ec15be0773ddddb6648c5"
+    }
+  ]
+}

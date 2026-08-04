@@ -2877,7 +2877,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_Unlit);
+    // Foam is a rough, strongly scattering surface, but it still belongs in
+    // the scene's light transport.  The former unlit single-tile sheet kept
+    // the same value through sun and canyon shadow and therefore read as a
+    // graphic decal.  Default Lit plus a restrained emissive floor preserves
+    // legibility without flattening the river lighting.
+    Material->SetShadingModel(MSM_DefaultLit);
     // Aerated crests are predominantly scattering/opaque. A masked surface is
     // also deterministic in SceneCapture and packaged rendering, where this
     // generated candidate's translucent vertex-alpha pass could disappear
@@ -2899,24 +2904,82 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     {
         UMaterialExpressionTextureCoordinate* FoamCoordinates =
             NewObject<UMaterialExpressionTextureCoordinate>(Material);
-        // Mesh UV0 encodes station/lateral in three-metre units. One source
-        // tile therefore spans about 7.1 m downstream and 3.2 m across.
-        FoamCoordinates->UTiling = 0.42f;
-        FoamCoordinates->VTiling = 0.93f;
+        // Mesh UV0 encodes station/lateral in three-metre units.  U therefore
+        // follows the river and gives the material an explicit advection
+        // direction without inventing foam outside solver-owned vertex alpha.
+        FoamCoordinates->UTiling = 0.37f;
+        FoamCoordinates->VTiling = 0.89f;
         Material->GetExpressionCollection().AddExpression(FoamCoordinates);
+        UMaterialExpressionPanner* FoamPrimaryPanner =
+            NewObject<UMaterialExpressionPanner>(Material);
+        FoamPrimaryPanner->Desc = TEXT("RaftSimFlowAdvectedFoamPrimary");
+        FoamPrimaryPanner->SpeedX = 0.073f;
+        FoamPrimaryPanner->SpeedY = 0.006f;
+        FoamPrimaryPanner->Coordinate.Expression = FoamCoordinates;
+        Material->GetExpressionCollection().AddExpression(FoamPrimaryPanner);
         UMaterialExpressionTextureSampleParameter2D* FoamLaceSample =
             NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
         FoamLaceSample->ParameterName = TEXT("SolverOverlayFoamLace");
         FoamLaceSample->Texture = FoamLaceTexture;
         FoamLaceSample->SamplerType = SAMPLERTYPE_Masks;
-        FoamLaceSample->Coordinates.Expression = FoamCoordinates;
+        FoamLaceSample->Coordinates.Expression = FoamPrimaryPanner;
         Material->GetExpressionCollection().AddExpression(FoamLaceSample);
+
+        UMaterialExpressionTextureCoordinate* FoamDetailCoordinates =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        FoamDetailCoordinates->UTiling = 0.71f;
+        FoamDetailCoordinates->VTiling = 1.57f;
+        Material->GetExpressionCollection().AddExpression(FoamDetailCoordinates);
+        UMaterialExpressionPanner* FoamDetailPanner =
+            NewObject<UMaterialExpressionPanner>(Material);
+        FoamDetailPanner->Desc = TEXT("RaftSimFlowAdvectedFoamDetail");
+        FoamDetailPanner->SpeedX = 0.127f;
+        FoamDetailPanner->SpeedY = -0.011f;
+        FoamDetailPanner->Coordinate.Expression = FoamDetailCoordinates;
+        Material->GetExpressionCollection().AddExpression(FoamDetailPanner);
+        UMaterialExpressionTextureSampleParameter2D* FoamDetailSample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        // Reusing the same named texture parameter lets every river keep its
+        // first-party lace while the incommensurate coordinates prevent the
+        // former short rectangular repeat from dominating the silhouette.
+        FoamDetailSample->ParameterName = TEXT("SolverOverlayFoamLace");
+        FoamDetailSample->Texture = FoamLaceTexture;
+        FoamDetailSample->SamplerType = SAMPLERTYPE_Masks;
+        FoamDetailSample->Coordinates.Expression = FoamDetailPanner;
+        Material->GetExpressionCollection().AddExpression(FoamDetailSample);
+        UMaterialExpressionConstant* FoamDetailGain =
+            NewObject<UMaterialExpressionConstant>(Material);
+        FoamDetailGain->R = 0.46f;
+        Material->GetExpressionCollection().AddExpression(FoamDetailGain);
+        UMaterialExpressionMultiply* WeightedFoamDetail =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        WeightedFoamDetail->A.Expression = FoamDetailSample;
+        WeightedFoamDetail->A.OutputIndex = 1;
+        WeightedFoamDetail->B.Expression = FoamDetailGain;
+        Material->GetExpressionCollection().AddExpression(WeightedFoamDetail);
+        UMaterialExpressionConstant* FoamDetailFloor =
+            NewObject<UMaterialExpressionConstant>(Material);
+        FoamDetailFloor->R = 0.54f;
+        Material->GetExpressionCollection().AddExpression(FoamDetailFloor);
+        UMaterialExpressionAdd* FoamDetailEnvelope =
+            NewObject<UMaterialExpressionAdd>(Material);
+        FoamDetailEnvelope->A.Expression = FoamDetailFloor;
+        FoamDetailEnvelope->B.Expression = WeightedFoamDetail;
+        Material->GetExpressionCollection().AddExpression(FoamDetailEnvelope);
+        UMaterialExpressionMultiply* FlowAdvectedMultiscaleLace =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FlowAdvectedMultiscaleLace->Desc =
+            TEXT("RaftSimFlowAdvectedMultiscaleFoamV1");
+        FlowAdvectedMultiscaleLace->A.Expression = FoamLaceSample;
+        FlowAdvectedMultiscaleLace->A.OutputIndex = 1;
+        FlowAdvectedMultiscaleLace->B.Expression = FoamDetailEnvelope;
+        Material->GetExpressionCollection().AddExpression(
+            FlowAdvectedMultiscaleLace);
         UMaterialExpressionMultiply* SolverMaskedLace =
             NewObject<UMaterialExpressionMultiply>(Material);
         SolverMaskedLace->A.Expression = VertexColor;
         SolverMaskedLace->A.OutputIndex = 4;
-        SolverMaskedLace->B.Expression = FoamLaceSample;
-        SolverMaskedLace->B.OutputIndex = 1;
+        SolverMaskedLace->B.Expression = FlowAdvectedMultiscaleLace;
         Material->GetExpressionCollection().AddExpression(SolverMaskedLace);
         FoamMaskExpression = SolverMaskedLace;
         FoamMaskOutputIndex = 0;
@@ -3001,22 +3064,32 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     FoamMaskExpression = OcclusionSafeFoamMask;
     FoamMaskOutputIndex = 0;
     UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
-    Roughness->R = 0.82f;
+    Roughness->R = 0.78f;
     Material->GetExpressionCollection().AddExpression(Roughness);
     UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
-    Specular->R = 0.18f;
+    Specular->R = 0.24f;
     Material->GetExpressionCollection().AddExpression(Specular);
+    UMaterialExpressionConstant* BaseColorScale =
+        NewObject<UMaterialExpressionConstant>(Material);
+    BaseColorScale->R = 1.08f;
+    Material->GetExpressionCollection().AddExpression(BaseColorScale);
+    UMaterialExpressionMultiply* LitFoamBaseColor =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    LitFoamBaseColor->Desc = TEXT("RaftSimLitFoamBaseColorV1");
+    LitFoamBaseColor->A.Expression = VertexColor;
+    LitFoamBaseColor->B.Expression = BaseColorScale;
+    Material->GetExpressionCollection().AddExpression(LitFoamBaseColor);
     UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-    EmissiveScale->R = 0.82f;
+    EmissiveScale->R = 0.06f;
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
     UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-    EmissiveColor->A.Expression = VertexColor;
+    EmissiveColor->A.Expression = LitFoamBaseColor;
     EmissiveColor->B.Expression = EmissiveScale;
     Material->GetExpressionCollection().AddExpression(EmissiveColor);
 
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
-        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, LitFoamBaseColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
         EditorOnlyData->Opacity.Expression = nullptr;
         EditorOnlyData->OpacityMask.Expression = FoamMaskExpression;

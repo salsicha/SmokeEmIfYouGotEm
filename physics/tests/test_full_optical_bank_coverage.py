@@ -58,7 +58,7 @@ def test_review_is_fail_closed_and_hash_locked() -> None:
 
     current_source_replacements = {
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
-        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": "d9488a283135392d23bcff2819b4a2e5dd94daf6701019e98274b3aa789081f3",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": "ab70174bd66c825076b5b14ddf6836c5d88e932bddbce55fb18f6f1ca02dbd74",
     }
     for path, expected in review["source_hashes"].items():
         assert len(expected) == 64

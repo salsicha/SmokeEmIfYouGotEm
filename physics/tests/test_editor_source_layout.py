@@ -1335,10 +1335,23 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
         material_source
     )
     assert 'TEXT("SolverOverlayFoamLace")' in material_source
+    assert "Material->SetShadingModel(MSM_DefaultLit)" in material_source
+    assert 'TEXT("RaftSimFlowAdvectedFoamPrimary")' in material_source
+    assert 'TEXT("RaftSimFlowAdvectedFoamDetail")' in material_source
+    assert 'TEXT("RaftSimFlowAdvectedMultiscaleFoamV1")' in material_source
+    assert material_source.count(
+        'ParameterName = TEXT("SolverOverlayFoamLace")'
+    ) >= 2
+    assert "FoamPrimaryPanner->SpeedX = 0.073f" in material_source
+    assert "FoamDetailPanner->SpeedX = 0.127f" in material_source
     assert "SolverMaskedLace->A.Expression = VertexColor" in material_source
     assert "SolverMaskedLace->A.OutputIndex = 4" in material_source
-    assert "SolverMaskedLace->B.Expression = FoamLaceSample" in material_source
-    assert "SolverMaskedLace->B.OutputIndex = 1" in material_source
+    assert (
+        "SolverMaskedLace->B.Expression = FlowAdvectedMultiscaleLace"
+        in material_source
+    )
+    assert 'TEXT("RaftSimLitFoamBaseColorV1")' in material_source
+    assert "EmissiveScale->R = 0.06f" in material_source
     assert "MPC_RaftSim_RaftFoamOcclusion" in material_source
     assert 'TEXT("RaftFoamExclusionEnabled")' in material_source
     assert 'TEXT("RaftFoamExclusionCenterAndHalfWidthCm")' in material_source

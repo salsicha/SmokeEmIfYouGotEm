@@ -4,6 +4,7 @@
 #include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionMax.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionNoise.h"
@@ -12,6 +13,7 @@
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
+#include "Materials/MaterialExpressionTextureSampleParameter2D.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Misc/AutomationTest.h"
 
@@ -450,6 +452,87 @@ bool FRaftSimZambeziDefaultLitWaterTest::RunTest(const FString& Parameters)
         TEXT("Sediment surface tint"),
         TEXT("SurfaceTint"),
         FLinearColor(0.055f, 0.115f, 0.050f, 0.0f));
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimSharedFlowAdvectedFoamTest,
+    "RaftSim.M9.FSharedFlowAdvectedFoam",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimSharedFlowAdvectedFoamTest::RunTest(const FString& Parameters)
+{
+    UMaterial* Material = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "M_RaftSim_SolverFieldFoamCandidate."
+             "M_RaftSim_SolverFieldFoamCandidate"));
+    TestNotNull(TEXT("Shared solver-owned foam material exists"), Material);
+    if (!Material)
+    {
+        return false;
+    }
+
+    TestEqual(
+        TEXT("Foam remains deterministic masked geometry"),
+        Material->BlendMode,
+        BLEND_Masked);
+    TestTrue(
+        TEXT("Foam participates in scene lighting"),
+        Material->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestTrue(
+        TEXT("Sparse lace keeps the established coverage threshold"),
+        FMath::IsNearlyEqual(Material->OpacityMaskClipValue, 0.18f));
+
+    int32 FlowPannerCount = 0;
+    int32 RiverLaceSampleCount = 0;
+    bool bHasPrimaryAdvection = false;
+    bool bHasDetailAdvection = false;
+    bool bHasMultiscaleBreakup = false;
+    bool bHasLitBaseColor = false;
+    bool bHasRaftExclusion = false;
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (const UMaterialExpressionPanner* Panner =
+                Cast<UMaterialExpressionPanner>(Expression.Get()))
+        {
+            ++FlowPannerCount;
+            bHasPrimaryAdvection |=
+                Panner->Desc == TEXT("RaftSimFlowAdvectedFoamPrimary");
+            bHasDetailAdvection |=
+                Panner->Desc == TEXT("RaftSimFlowAdvectedFoamDetail");
+        }
+        if (const UMaterialExpressionTextureSampleParameter2D* Sample =
+                Cast<UMaterialExpressionTextureSampleParameter2D>(Expression.Get()))
+        {
+            RiverLaceSampleCount +=
+                Sample->ParameterName == TEXT("SolverOverlayFoamLace") ? 1 : 0;
+        }
+        bHasMultiscaleBreakup |= Expression &&
+            Expression->Desc == TEXT("RaftSimFlowAdvectedMultiscaleFoamV1");
+        bHasLitBaseColor |= Expression &&
+            Expression->Desc == TEXT("RaftSimLitFoamBaseColorV1");
+        if (const UMaterialExpressionCustom* Custom =
+                Cast<UMaterialExpressionCustom>(Expression.Get()))
+        {
+            bHasRaftExclusion |= Custom->Description ==
+                TEXT("Raft and crew foam-layer exclusion");
+        }
+    }
+
+    TestEqual(TEXT("Primary and detail foam layers move independently"),
+        FlowPannerCount, 2);
+    TestEqual(TEXT("Both layers consume the river-local lace parameter"),
+        RiverLaceSampleCount, 2);
+    TestTrue(TEXT("Primary lace follows the station axis"), bHasPrimaryAdvection);
+    TestTrue(TEXT("Detail lace uses independent incommensurate motion"),
+        bHasDetailAdvection);
+    TestTrue(TEXT("Two scales break up the former rectangular repeat"),
+        bHasMultiscaleBreakup);
+    TestTrue(TEXT("Foam uses a restrained lit base color"), bHasLitBaseColor);
+    TestTrue(TEXT("Raft and crew exclusion remains in the final mask"),
+        bHasRaftExclusion);
     return !HasAnyErrors();
 }
 
