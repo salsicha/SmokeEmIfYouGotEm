@@ -554,11 +554,11 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert foam_occlusion_review["implementation"]["water_samples_changed"] is False
     assert foam_occlusion_review["implementation"]["physics_forces_changed"] is False
     foam_replacement_hashes = {
-        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
-        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "94abec82cbde60c2aa152c9ebe3599d1c037579aaded1c757524b64e53db076b",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "146bbad2c6a5c7c99dfe5fa7d423a4c122544ba2041aa80f30c9ae28b4122fcf",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "31feee3d61bb80e70535c9d011bef843a5a9e7b910a9ec38e38989eab5ac22f0",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "b53081b42d81fc6c60d19c379303f937cd05169e8b4b7893136769b2efd701a9",
-        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "10679b95c7bc9100fe79f471c14c4e2fc97f5ff5c526268a4919150415b908e5",
+        "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "2c988a3c2823de09ccdea19674f131c334f13bb25def42c11189a4e47352ef39",
         "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37",
         "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": "01a084b508cebade6abc05320697fc4968bedfc8bd853020f7e4826527852e11",
         "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/MI_RaftSim_SouthForkProductionWater.uasset": "797336a64b97fce1b40facffb68ea642acb4add98989dd65ec5a04004ee63ff8",
@@ -713,7 +713,7 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert interior_review["implementation"]["physics_forces_changed"] is False
     assert interior_review["implementation"]["raft_mass_or_buoyancy_changed"] is False
     interior_replacement_hashes = {
-        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "146bbad2c6a5c7c99dfe5fa7d423a4c122544ba2041aa80f30c9ae28b4122fcf",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
     }
     for source_path, expected_hash in interior_review["implementation_sha256"].items():

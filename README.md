@@ -216,6 +216,17 @@ in the rapid-side diagnostic, but the remaining parallel strokes, thin surface,
 analytical rapid shape, and incomplete spray/mist still reject photoreal
 promotion. See the
 [shared flow-advected foam review](docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json).
+The strongest three solver-accepted breaking sites now replace that remaining
+zero-thickness rapid membrane with one connected two-skin aerated crest surface
+per site. Both skins follow the same solver profile, separate only along its
+local normal, stay within 40 cm full thickness, and join at the fully masked
+plunge boundary so no visible crown cap can read as a slab. P2 and all six P4
+runnable-map gates pass at exact 570-vertex/1,044-triangle topology per site.
+Matched Zambezi review rejected an intermediate visible connector with vertical
+slivers and retains the artifact-free masked connector, but the subtle result
+still lacks convincing aerated volume, hole/pile recirculation, spray, and mist;
+photoreal promotion remains open in the
+[solver-anchored aerated crest review](docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json).
 Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
 path that was silently restoring the older reflective water defaults after
 regeneration. The runtime now keeps the river-local, wet-cell-clipped volume

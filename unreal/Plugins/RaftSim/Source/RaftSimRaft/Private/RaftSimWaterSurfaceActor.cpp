@@ -442,6 +442,8 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     BreakingRollerVolumeMesh->SetMobility(EComponentMobility::Movable);
     BreakingRollerVolumeMesh->SetTranslucentSortPriority(2);
     BreakingRollerVolumeMesh->SetVisibility(false, true);
+    BreakingRollerVolumeMesh->ComponentTags.AddUnique(
+        TEXT("RaftSimSolverAnchoredAeratedCrestThicknessV1"));
     BreakingRollerVolumeMesh->bUseAsyncCooking = true;
 
     RapidFoamMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
@@ -1806,6 +1808,8 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
 void ARaftSimWaterSurfaceActor::HideBreakingRollerVolumeMesh()
 {
     BreakingRollerVolumeTriangleCount = 0;
+    BreakingRollerVolumeVertexCount = 0;
+    BreakingRollerVolumeMaximumThicknessCm = 0.0f;
     if (BreakingRollerVolumeMesh)
     {
         BreakingRollerVolumeMesh->ClearAllMeshSections();
@@ -1822,14 +1826,15 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
         return;
     }
 
-    // One alpha-perforated curtain supplies a connected overturning body under
-    // production Niagara. The former three-shell fallback read as a repeated
-    // translucent dome when it was visible beside particles. Keeping only one
-    // irregular plunge membrane at the three strongest solver sites removes
-    // that nested volume cue and bounds the population to 1,512 triangles.
+    // One alpha-perforated, two-skin crest envelope supplies a connected
+    // overturning body under production Niagara. This is not a return to the
+    // rejected nested shells: both skins follow the same irregular plunge
+    // profile, remain at most 40 cm apart, and connect only across the fully
+    // masked plunge boundary. The visible crown and masked sides remain open,
+    // avoiding any planar cross-section at the crest.
     // The component never owns collision or water samples.
     constexpr int32 kMaximumRollerSites = 3;
-    constexpr int32 kLayerCount = 1;
+    constexpr int32 kSkinCount = 2;
     constexpr int32 kAcrossSegments = 18;
     constexpr int32 kLoopSegments = 14;
     TArray<FVector> RollerVertices;
@@ -1838,24 +1843,29 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
     TArray<FVector2D> RollerUvs;
     TArray<FLinearColor> RollerColors;
     TArray<FProcMeshTangent> RollerTangents;
-    const int32 VerticesPerLayer =
+    const int32 VerticesPerSkin =
         (kAcrossSegments + 1) * (kLoopSegments + 1);
+    const int32 SkinTrianglesPerSite =
+        kSkinCount * kAcrossSegments * kLoopSegments * 2;
+    const int32 MaskedConnectorTrianglesPerSite = kAcrossSegments * 2;
     const int32 MaximumTrianglesPerSite =
-        kLayerCount * kAcrossSegments * kLoopSegments * 2;
+        SkinTrianglesPerSite + MaskedConnectorTrianglesPerSite;
     const int32 RollerSiteCount = FMath::Min(
         BreakingSites.Num(), kMaximumRollerSites);
     RollerVertices.Reserve(
-        RollerSiteCount * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kSkinCount * VerticesPerSkin);
     RollerTriangles.Reserve(
         RollerSiteCount * MaximumTrianglesPerSite * 3);
     RollerNormals.Reserve(
-        RollerSiteCount * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kSkinCount * VerticesPerSkin);
     RollerUvs.Reserve(
-        RollerSiteCount * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kSkinCount * VerticesPerSkin);
     RollerColors.Reserve(
-        RollerSiteCount * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kSkinCount * VerticesPerSkin);
     RollerTangents.Reserve(
-        RollerSiteCount * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kSkinCount * VerticesPerSkin);
+    BreakingRollerVolumeVertexCount = 0;
+    BreakingRollerVolumeMaximumThicknessCm = 0.0f;
 
     for (int32 SiteIndex = 0; SiteIndex < RollerSiteCount; ++SiteIndex)
     {
@@ -1876,11 +1886,13 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
             MinimumHalfWidthCm,
             360.0f);
 
-        for (int32 LayerIndex = 0; LayerIndex < kLayerCount; ++LayerIndex)
+        int32 SkinBaseVertices[kSkinCount] = {INDEX_NONE, INDEX_NONE};
+        for (int32 SkinIndex = 0; SkinIndex < kSkinCount; ++SkinIndex)
         {
-            const float LayerT = 0.45f;
-            const float LayerHalfWidthCm = SiteHalfWidthCm;
+            constexpr float ProfileLayerT = 0.45f;
+            const float SkinSign = SkinIndex == 0 ? -1.0f : 1.0f;
             const int32 BaseVertex = RollerVertices.Num();
+            SkinBaseVertices[SkinIndex] = BaseVertex;
 
             for (int32 AcrossIndex = 0;
                  AcrossIndex <= kAcrossSegments;
@@ -1914,7 +1926,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                     const float ProfileLoopT = FMath::Lerp(0.48f, 1.0f, LoopT);
                     FVector2D Profile =
                         ComputeBreakingRollerVolumeProfileCentimeters(
-                            ProfileLoopT, Intensity, LayerT);
+                            ProfileLoopT, Intensity, ProfileLayerT);
                     Profile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
                     // The membrane starts at the visible crown, so it must not
                     // use a symmetric endpoint fade. Keep the crown fully
@@ -1926,32 +1938,67 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                     const float Breakup = FMath::Clamp(
                         0.62f +
                             0.20f * FMath::Sin(
-                                SiteIndex * 1.67f + LayerIndex * 2.11f +
-                            SignedAcross * 10.3f + ProfileLoopT * 8.9f) +
+                                SiteIndex * 1.67f + SignedAcross * 10.3f +
+                                ProfileLoopT * 8.9f) +
                             0.18f * FMath::Sin(
-                                SiteIndex * 2.43f - LayerIndex * 1.37f -
-                                SignedAcross * 16.7f + ProfileLoopT * 15.1f),
+                                SiteIndex * 2.43f - SignedAcross * 16.7f +
+                                ProfileLoopT * 15.1f),
                         0.16f,
                         1.0f);
                     const float OrganicTravelCm =
                         FMath::Sin(
-                            SiteIndex * 1.13f + LayerIndex * 0.91f +
-                            SignedAcross * 4.7f + ProfileLoopT * 6.3f) *
+                            SiteIndex * 1.13f + SignedAcross * 4.7f +
+                            ProfileLoopT * 6.3f) *
                         13.0f * Intensity * EdgeTaper * LoopFeather;
                     const float OrganicLiftCm =
                         FMath::Sin(
-                            SiteIndex * 2.07f - LayerIndex * 1.29f +
-                            SignedAcross * 7.1f + ProfileLoopT * 11.7f) *
+                            SiteIndex * 2.07f + SignedAcross * 7.1f +
+                            ProfileLoopT * 11.7f) *
                         14.0f * Intensity * EdgeTaper * LoopFeather;
-                    const FVector Position =
+
+                    constexpr float ProfileDerivativeStep = 0.01f;
+                    const float PreviousLoopT = FMath::Lerp(
+                        0.48f,
+                        1.0f,
+                        FMath::Max(0.0f, LoopT - ProfileDerivativeStep));
+                    const float NextLoopT = FMath::Lerp(
+                        0.48f,
+                        1.0f,
+                        FMath::Min(1.0f, LoopT + ProfileDerivativeStep));
+                    FVector2D PreviousProfile =
+                        ComputeBreakingRollerVolumeProfileCentimeters(
+                            PreviousLoopT, Intensity, ProfileLayerT);
+                    FVector2D NextProfile =
+                        ComputeBreakingRollerVolumeProfileCentimeters(
+                            NextLoopT, Intensity, ProfileLayerT);
+                    PreviousProfile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
+                    NextProfile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
+                    const FVector LongitudinalTangent =
+                        Downstream * (NextProfile.X - PreviousProfile.X) +
+                        FVector::UpVector * (NextProfile.Y - PreviousProfile.Y);
+                    const FVector ProfileNormal = FVector::CrossProduct(
+                        LongitudinalTangent, Across).GetSafeNormal();
+                    // The envelope is thickest at the aerated crown and
+                    // collapses toward fully masked boundaries. Breakup
+                    // slightly modulates the thickness without detaching it
+                    // from the solver-selected profile.
+                    const float HalfThicknessCm =
+                        FMath::Lerp(6.0f, 20.0f, Intensity) * EdgeTaper *
+                        FMath::Lerp(0.35f, 1.0f, LoopFeather) *
+                        FMath::Lerp(0.72f, 1.0f, Breakup);
+                    BreakingRollerVolumeMaximumThicknessCm = FMath::Max(
+                        BreakingRollerVolumeMaximumThicknessCm,
+                        HalfThicknessCm * 2.0f);
+                    const FVector CentrePosition =
                         Site.WorldPositionCm +
                         Downstream * (Profile.X + OrganicTravelCm) +
-                        Across * (SignedAcross * LayerHalfWidthCm) +
+                        Across * (SignedAcross * SiteHalfWidthCm) +
                         FVector::UpVector * (Profile.Y + OrganicLiftCm + 4.0f);
-                    RollerVertices.Add(Position);
+                    RollerVertices.Add(
+                        CentrePosition + ProfileNormal * SkinSign * HalfThicknessCm);
                     RollerUvs.Add(FVector2D(
-                        AcrossT * 5.4f + LayerT * 0.31f,
-                        LoopT * 3.6f + LayerT * 0.37f));
+                        AcrossT * 5.4f + ProfileLayerT * 0.31f,
+                        LoopT * 3.6f + ProfileLayerT * 0.37f));
                     const float CoreDistance = (ProfileLoopT - 0.57f) / 0.18f;
                     const float AeratedCore =
                         FMath::Exp(-CoreDistance * CoreDistance) *
@@ -1965,29 +2012,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                         EdgeTaper * LoopFeather *
                             FMath::Lerp(0.84f, 1.0f, AeratedCore)));
 
-                    constexpr float ProfileDerivativeStep = 0.01f;
-                    const float PreviousLoopT = FMath::Lerp(
-                        0.48f,
-                        1.0f,
-                        FMath::Max(0.0f, LoopT - ProfileDerivativeStep));
-                    const float NextLoopT = FMath::Lerp(
-                        0.48f,
-                        1.0f,
-                        FMath::Min(1.0f, LoopT + ProfileDerivativeStep));
-                    FVector2D PreviousProfile =
-                        ComputeBreakingRollerVolumeProfileCentimeters(
-                            PreviousLoopT, Intensity, LayerT);
-                    FVector2D NextProfile =
-                        ComputeBreakingRollerVolumeProfileCentimeters(
-                            NextLoopT, Intensity, LayerT);
-                    PreviousProfile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
-                    NextProfile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
-                    const FVector LongitudinalTangent =
-                        Downstream * (NextProfile.X - PreviousProfile.X) +
-                        FVector::UpVector * (NextProfile.Y - PreviousProfile.Y);
-                    RollerNormals.Add(
-                        FVector::CrossProduct(LongitudinalTangent, Across)
-                            .GetSafeNormal());
+                    RollerNormals.Add(ProfileNormal * SkinSign);
                     RollerTangents.Add(FProcMeshTangent(Across, false));
                 }
             }
@@ -2005,7 +2030,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                     const int32 I1 = I0 + 1;
                     const int32 I2 = I0 + (kLoopSegments + 1);
                     const int32 I3 = I2 + 1;
-                    if (((AcrossIndex + LoopIndex + LayerIndex + SiteIndex) & 1) == 0)
+                    if (((AcrossIndex + LoopIndex + SkinIndex + SiteIndex) & 1) == 0)
                     {
                         RollerTriangles.Add(I0);
                         RollerTriangles.Add(I2);
@@ -2026,12 +2051,34 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                 }
             }
         }
+
+        // Join the two skins only at the plunge row, where LoopFeather is
+        // exactly zero. This makes the procedural mesh one connected surface
+        // without introducing a visible planar cap or box cue at the crest.
+        for (int32 AcrossIndex = 0;
+             AcrossIndex < kAcrossSegments;
+             ++AcrossIndex)
+        {
+            const int32 Inner0 = SkinBaseVertices[0] +
+                AcrossIndex * (kLoopSegments + 1) + kLoopSegments;
+            const int32 Inner1 = Inner0 + (kLoopSegments + 1);
+            const int32 Outer0 = SkinBaseVertices[1] +
+                AcrossIndex * (kLoopSegments + 1) + kLoopSegments;
+            const int32 Outer1 = Outer0 + (kLoopSegments + 1);
+            RollerTriangles.Add(Inner0);
+            RollerTriangles.Add(Inner1);
+            RollerTriangles.Add(Outer0);
+            RollerTriangles.Add(Outer0);
+            RollerTriangles.Add(Inner1);
+            RollerTriangles.Add(Outer1);
+        }
     }
 
     BreakingRollerVolumeMesh->CreateMeshSection_LinearColor(
         0, RollerVertices, RollerTriangles, RollerNormals, RollerUvs,
         RollerColors, RollerTangents, false);
     BreakingRollerVolumeTriangleCount = RollerTriangles.Num() / 3;
+    BreakingRollerVolumeVertexCount = RollerVertices.Num();
     BreakingRollerVolumeMesh->SetVisibility(
         BreakingRollerVolumeTriangleCount > 0, true);
 }

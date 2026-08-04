@@ -162,6 +162,20 @@ public:
     }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetBreakingRollerVolumeVertexCount() const
+    {
+        return BreakingRollerVolumeVertexCount;
+    }
+
+    /** Maximum full front-to-back thickness of the connected aerated crest
+     * envelope generated during the latest refresh. Presentation-only cm. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetBreakingRollerVolumeMaximumThicknessCm() const
+    {
+        return BreakingRollerVolumeMaximumThicknessCm;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsBreakingRollerVolumeVisible() const;
 
     /** Number of live-water vertices currently contributing solver-owned,
@@ -274,10 +288,11 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UProceduralMeshComponent> BreakingLipMesh;
 
-    /** Single connected aerated curtain generated only at accepted live
-     * hydraulic jumps. It complements detached Niagara spray without the old
-     * nested-shell dome cue. This is explicitly visual: no collision,
-     * navigation, water sampling, buoyancy, D3, or D4 authority. */
+    /** Single connected, thin two-skin aerated crest envelope generated only
+     * at accepted live hydraulic jumps. Its skins join at the fully masked
+     * plunge boundary while the visible crown stays open, avoiding a planar
+     * cap or the old nested-shell dome cue. This is explicitly visual: no
+     * collision, navigation, water sampling, buoyancy, D3, or D4 authority. */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UProceduralMeshComponent> BreakingRollerVolumeMesh;
 
@@ -433,6 +448,8 @@ private:
     TArray<FBreakingSite> BreakingSites;
     int32 BreakingLipTriangleCount = 0;
     int32 BreakingRollerVolumeTriangleCount = 0;
+    int32 BreakingRollerVolumeVertexCount = 0;
+    float BreakingRollerVolumeMaximumThicknessCm = 0.0f;
     int32 VisibleRapidFoamVertexCount = 0;
     int32 LiveVolumeCoreTriangleCount = 0;
     bool bBreakingRollerVolumeRenderingEnabled = true;

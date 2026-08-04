@@ -82,6 +82,22 @@ spray/mist, synthetic environments and characters, performance qualification,
 and all seven external acceptance gates remain open in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json`.
 
+**Solver-anchored aerated crest thickness checkpoint, August 4:** each of the
+three strongest accepted breaking sites on all six runnable rivers now uses one
+connected two-skin crest surface instead of a zero-thickness membrane. The
+skins share one solver-shaped profile, separate only along its local normal,
+remain at or below 40 cm full thickness, and join through a 36-triangle
+connector at the exactly zero-alpha plunge row. Each selected site is therefore
+570 vertices and 1,044 triangles, with no collision, water-sampling, wet/dry,
+buoyancy, D3, D4, or raft-force authority. A first visible-crown connector was
+rejected because matched Zambezi evidence exposed repeated vertical slivers;
+the retained masked connector removes them. The editor build, focused source
+guard, P2, and all six P4 river-map gates pass. This remains technical progress,
+not photoreal promotion: convincing entrained-air volume, coherent hole/pile
+recirculation, spray/mist, synthetic environments and characters, measured
+performance, and all seven external acceptance gates remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json`.
+
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
 be labeled `procedural_infill`, store its seed and inputs, blend continuously into known

@@ -1839,12 +1839,16 @@ static void HandleCaptureRapidWrapTest(const TArray<FString>& Args, UWorld* Worl
                                          "size=%s breakingLipTriangles=%d "
                                          "breakingLipVisible=%d "
                                          "breakingRollerTriangles=%d "
+                                         "breakingRollerVertices=%d "
+                                         "breakingRollerMaxThicknessCm=%.2f "
                                          "breakingRollerVisible=%d"),
                                     *Bounds.GetCenter().ToCompactString(),
                                     *Bounds.GetSize().ToCompactString(),
                                     It->GetBreakingLipTriangleCount(),
                                     It->IsBreakingLipVisible() ? 1 : 0,
                                     It->GetBreakingRollerVolumeTriangleCount(),
+                                    It->GetBreakingRollerVolumeVertexCount(),
+                                    It->GetBreakingRollerVolumeMaximumThicknessCm(),
                                     It->IsBreakingRollerVolumeVisible() ? 1 : 0);
                             }
                             for (TActorIterator<ARaftSimRockObstacleActor> It(DiagnosticWorld); It; ++It)
