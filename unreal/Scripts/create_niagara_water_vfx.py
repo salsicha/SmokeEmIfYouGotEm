@@ -13,6 +13,7 @@ ASSETS = (
     "NS_RaftSim_AeratedMist",
     "NS_RaftSim_RapidAerosol",
     "NS_RaftSim_RapidRoller",
+    "NS_RaftSim_RapidCrestSpray",
 )
 
 unreal.log(f"create_niagara_water_vfx: executing {COMMAND}")

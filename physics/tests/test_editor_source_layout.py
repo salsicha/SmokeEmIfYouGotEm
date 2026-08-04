@@ -1265,6 +1265,9 @@ def test_live_breaking_water_uses_sparse_foam_and_feathered_moderate_arches():
     assert "rapidRollerEmitters=%d" in capture_source
     assert 'HasDiagnosticMode(TEXT("norapidaerosol"))' in capture_source
     assert 'HasDiagnosticMode(TEXT("norapidroller"))' in capture_source
+    assert 'HasDiagnosticMode(TEXT("norapidcrestspray"))' in capture_source
+    assert 'TEXT("ProductionRapidCrestSpray_")' in capture_source
+    assert "rapidCrestSprayEmitters=%d" in capture_source
     assert "HideRapidNiagaraPresentationComponents(" in capture_source
     assert 'DiagnosticFloat(TEXT("terrainmacro="), -1.0f)' in capture_source
     assert 'TEXT("SourceMacroInfluence")' in capture_source

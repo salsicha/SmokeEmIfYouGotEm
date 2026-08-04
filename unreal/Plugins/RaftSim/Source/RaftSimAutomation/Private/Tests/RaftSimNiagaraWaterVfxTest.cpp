@@ -56,6 +56,7 @@ bool FRaftSimM5ProductionNiagaraWaterVfxTest::RunTest(const FString&)
         TEXT("NS_RaftSim_AeratedMist"),
         TEXT("NS_RaftSim_RapidAerosol"),
         TEXT("NS_RaftSim_RapidRoller"),
+        TEXT("NS_RaftSim_RapidCrestSpray"),
     };
     const FNiagaraVariable SpawnRateVariable(
         FNiagaraTypeDefinition::GetFloatDef(), TEXT("User.SpawnRate"));

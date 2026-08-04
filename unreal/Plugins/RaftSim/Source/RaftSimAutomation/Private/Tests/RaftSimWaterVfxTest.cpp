@@ -132,9 +132,9 @@ bool FRaftSimAssertWaterVfxPoolCommand::Update()
             TEXT("production Niagara water VFX replaces visible card rendering"),
             Vfx->IsProductionNiagaraReady());
         Test->TestEqual(
-            TEXT("three contact and sixteen rapid Niagara components are asset-bound"),
+            TEXT("three contact and twenty-four rapid Niagara components are asset-bound"),
             Vfx->GetProductionNiagaraComponentCount(),
-            19);
+            27);
     }
     return true;
 }

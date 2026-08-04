@@ -152,6 +152,22 @@ const FWaterNiagaraProfile WaterProfiles[] = {
         0,
         10,
     },
+    {
+        TEXT("NS_RaftSim_RapidCrestSpray"),
+        220.0f,
+        FVector2f(0.32f, 0.72f),
+        FVector2f(3.0f, 5.0f),
+        FVector2f(12.0f, 24.0f),
+        FVector2f(120.0f, 36.0f),
+        FVector2f(240.0f, 540.0f),
+        34.0f,
+        FVector3f(0.0f, 0.0f, -980.0f),
+        0.22f,
+        FLinearColor(0.70f, 0.82f, 0.86f, 0.74f),
+        true,
+        0,
+        10,
+    },
 };
 
 void SetVector2Range(
@@ -686,7 +702,7 @@ void CreatePhotographicV5ReviewNiagaraWaterVfxSystems(const TArray<FString>&)
 
 static FAutoConsoleCommand GCreateNiagaraWaterVfxSystemsCommand(
     TEXT("RaftSim.CreateNiagaraWaterVfxSystems"),
-    TEXT("Author five project-owned solver-driven Niagara water VFX systems."),
+    TEXT("Author six project-owned solver-driven Niagara water VFX systems."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&CreateNiagaraWaterVfxSystems));
 
 static FAutoConsoleCommand GCreatePhotographicV4ReviewNiagaraWaterVfxSystemsCommand(

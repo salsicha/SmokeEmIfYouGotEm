@@ -113,6 +113,13 @@ public:
         return ActiveRapidRollerNiagaraCount;
     }
 
+    /** Number of solver-jump fine ballistic crest-spray volumes emitting. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|VFX")
+    int32 GetActiveRapidCrestSprayNiagaraCount() const
+    {
+        return ActiveRapidCrestSprayNiagaraCount;
+    }
+
     /** Presentation-only high-resolution water shoulder at the authoritative
      * D4 contact. Zero means the patch is fail-closed and not being rendered. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|VFX")
@@ -228,6 +235,12 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|VFX")
     TArray<TObjectPtr<UNiagaraComponent>> RapidRollerNiagara;
 
+    /** Bounded pool of fine ballistic spray released from the solver-owned
+     * crest. It reuses the project-owned SolverSpray system at particle scale
+     * and complements, rather than replaces, roller fragments and aerosol. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|VFX")
+    TArray<TObjectPtr<UNiagaraComponent>> RapidCrestSprayNiagara;
+
     /** Non-colliding, solver-sampled contact-water shoulder. This mesh is
      * deliberately separate from the 3 m live-river mesh so a local contact
      * cannot invent a coarse hydraulic spike or influence physics. */
@@ -332,6 +345,7 @@ private:
     float DepthBearingContactWaterV10DepthCm = 0.0f;
     int32 ActiveRapidNiagaraCount = 0;
     int32 ActiveRapidRollerNiagaraCount = 0;
+    int32 ActiveRapidCrestSprayNiagaraCount = 0;
     bool bConnectedContactWaterV6Review = false;
     bool bConnectedContactWaterV7Review = false;
     bool bConnectedContactWaterV8Review = false;

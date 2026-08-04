@@ -596,3 +596,23 @@ Initial source slice:
   skips, one intentional fail-closed historical mismatch, and zero unexpected failures. Evidence
   is recorded in
   `docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json`.
+
+## August 4, 2026 — solver-anchored three-scale breaking spray
+
+- The production rapid VFX pool now adds eight preallocated
+  `NS_RaftSim_RapidCrestSpray` components to the existing roller and aerosol
+  pools. All three scales consume the same solver-accepted breaking sites,
+  camera ranking, six-site density budget, and 120 m cull; the complete pool is
+  27 components and remains collision-free, navigation-inert, and physically
+  non-authoritative. The dedicated fine profile uses a 1.2 m by 0.36 m source,
+  0.32-0.72 second velocity-aligned droplets, bounded ballistic launch, and a
+  project-owned SubUV material. Crest-only isolation proves visible detached
+  droplets while the full Zambezi frame remains subtle and artifact-free. The
+  editor build, M4 4/4, renderer-backed six-system asset gate 1/1, and shared
+  P2 plus all six runnable-map P4 gates 7/7 pass; `L_Zambezi` remains runnable
+  as river six. This closes a missing particle-scale layer, not the photoreal
+  water gate: the sprites are not collision-aware or post-emission advected,
+  the rapid lacks a coherent entrained-air volume and calibrated recirculation,
+  and named art, guide, geospatial, rights, safety, platform, and product-owner
+  approvals remain open in
+  `docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json`.

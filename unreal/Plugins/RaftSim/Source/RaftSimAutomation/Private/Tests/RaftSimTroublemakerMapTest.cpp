@@ -694,9 +694,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 It->GetActiveRapidAerosolNiagaraCount(),
                 6);
             Test->TestEqual(
-                TEXT("Zambezi rapid aerosol and roller pools cover the same sites"),
-                It->GetActiveRapidAerosolNiagaraCount(),
+                TEXT("Zambezi emits fine ballistic spray from the same solver-owned crests"),
+                It->GetActiveRapidCrestSprayNiagaraCount(),
+                6);
+            Test->TestEqual(
+                TEXT("Zambezi three-scale rapid particle pools cover the same sites"),
+                It->GetActiveRapidCrestSprayNiagaraCount(),
                 It->GetActiveRapidRollerNiagaraCount());
+            Test->TestEqual(
+                TEXT("Zambezi aerosol and crest-spray pools cover the same sites"),
+                It->GetActiveRapidAerosolNiagaraCount(),
+                It->GetActiveRapidCrestSprayNiagaraCount());
         }
         else
         {
