@@ -1,0 +1,139 @@
+{
+  "schema": "raftsim.environment.zambezi_plunge_pocket_review.v1",
+  "reviewed_utc": "2026-08-04",
+  "status": "retained_bounded_technical_improvement_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "technical_candidate_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_fidelity_promoted": false,
+    "all_six_river_maps_runnable": true,
+    "fixed_camera_review_completed": true,
+    "close_side_artifact_review_completed": true,
+    "pixel_delta_attributable_to_geometry_change": false,
+    "map_or_content_package_changed": false,
+    "cooked_water_or_hydraulic_authority_changed": false,
+    "collision_buoyancy_d3_or_d4_changed": false
+  },
+  "implementation": {
+    "runtime_owner": "ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation",
+    "scope": "shared render-only live-water presentation on the three strongest solver-accepted interior breaking sites",
+    "maximum_sites_per_river": 3,
+    "site_authority": "strict local supercritical-to-subcritical Froude transitions, sorted by solver-derived intensity and filtered for full presentation coverage, 15 m edge clearance, and 6 m deduplication",
+    "shape": "compact dark plunge core at 1.8 m downstream, irregular broken shoulders near 3.0 m lateral offset, and an aerated return centered 5.0 m downstream",
+    "maximum_per_site_depression_m": 0.28,
+    "maximum_per_site_return_m": 0.16,
+    "combined_depression_bound_m": 0.30,
+    "combined_return_bound_m": 0.18,
+    "foam_combination": "maximum-combined with the existing solver foam source",
+    "normal_update": "only vertices in or immediately adjacent to a modified pocket are recomputed",
+    "affects_water_sampling": false,
+    "affects_wet_or_dry_mask": false,
+    "affects_collision": false,
+    "affects_buoyancy_or_forces": false,
+    "affects_d3_d4_flip_wrap_pin_damage_rescue_or_progression": false,
+    "claims_measured_zambezi_bathymetry_or_seasonal_hydraulics": false
+  },
+  "runtime_evidence": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "p2_water_surface_renders": {
+      "result": "1/1 passed",
+      "contracts": [
+        "dark plunge core stays inside the 0.28 m per-site depression bound",
+        "downstream return rises and produces stronger foam than the plunge core",
+        "broken side shoulder produces bounded lift and foam",
+        "zero intensity produces zero presentation displacement and foam"
+      ]
+    },
+    "p4_all_river_map_loads": {
+      "result": "6/6 passed",
+      "maps": {
+        "L_Hance": {"active_breaking_sites": 9, "maximum_plunge_pocket_sites": 3},
+        "L_LavaCanyon": {"active_breaking_sites": 2, "maximum_plunge_pocket_sites": 2},
+        "L_Terminator": {"active_breaking_sites": 21, "maximum_plunge_pocket_sites": 3},
+        "L_Troublemaker": {"active_breaking_sites": 3, "maximum_plunge_pocket_sites": 3},
+        "L_UpperHuacas": {"active_breaking_sites": 1, "maximum_plunge_pocket_sites": 1},
+        "L_Zambezi": {"active_breaking_sites": 10, "maximum_plunge_pocket_sites": 3}
+      },
+      "accepted_warnings": [
+        "the deliberate Troublemaker capsize/failure-behavior warning",
+        "the offline generate_204 connectivity timeout while loading Zambezi"
+      ]
+    },
+    "zambezi_live_surface": {
+      "surface_vertices": 10465,
+      "surface_triangles": 20480,
+      "render_spacing_m": 1.5,
+      "analysis_stride": 2,
+      "refresh_cpu_ms": 4.097,
+      "wet_vertices": 10465,
+      "foam_mean": 0.0380,
+      "foam_max": 0.7285,
+      "rapid_foam_vertices": 645,
+      "standing_wave_abs_max_m": 0.1046,
+      "hydraulic_relief_abs_max_m": 0.0896,
+      "volume_core_triangles": 16896,
+      "active_breaking_sites": 10,
+      "strongest_interior_intensity": 0.572,
+      "strongest_interior_coverage": 1.0,
+      "strongest_interior_clearance_m": 48.0
+    }
+  },
+  "visual_evidence": {
+    "method": "Two 1280x720 offscreen Metal captures review the current runtime at the exact retained fixed camera and the solver-selected breaking_water_side preset. Metrics are descriptive and are not photoreal acceptance thresholds.",
+    "fixed_camera": {
+      "world_location_cm": [329839.27, -410612.4, 15666.84],
+      "pitch_degrees": -14.61,
+      "yaw_degrees": 166.95,
+      "prior_runtime_reference": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1.png",
+        "sha256": "38411673fd44b1d60191742d6fb3c9a085e1568ed52466c049087ffa3097556b"
+      },
+      "retained": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1.png",
+        "sha256": "debd006651f4141bc1b8a2d61842395c0bb66319c5583a31a282df9a2839332d"
+      },
+      "descriptive_comparison": {
+        "full_frame_mean_absolute_rgb_delta_0_1": 0.063115,
+        "water_rows_215_719_mean_absolute_rgb_delta_0_1": 0.062432,
+        "upper_background_rows_0_209_mean_absolute_rgb_delta_0_1": 0.063568,
+        "water_changed_pixel_fraction_max_channel_over_0_02": 0.758021,
+        "interpretation": "The similar delta in unrelated upper background and animated water proves that these captures do not provide deterministic pixel attribution for the small geometry change; no improvement percentage is claimed."
+      }
+    },
+    "close_side": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_side_v1.png",
+      "sha256": "93989a977c2fdf8be8b382dc85527cd3c98b4c28292d3e8f05f7aecb664237e1",
+      "camera_preset": "breaking_water_side",
+      "finding": "The bounded depression and return read as a shallow coherent trough with broken shoulders. The frame shows no dome, tent, rail, translucent card, or new shoreline intersection artifact."
+    },
+    "retention_basis": "The implementation has explicit geometry and authority bounds, its focused contracts and complete runnable-map matrix pass, and direct side review finds no manufactured-water artifact. The evidence does not prove lifelike Zambezi whitewater, so the candidate is retained only as technical progress."
+  },
+  "map_integrity": {
+    "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+    "sha256": "dd2a48c94618ff17c98bfe14024fc0642437a1ec91576ef482d8a71221997ff9"
+  },
+  "changed_source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "a91b0d3da131702908108fcb61ecfcc283acf6c6efc256244a6e7689baa7368f",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "84693abfd07c5ff00b7bf0f0a1ee6fd8cd3629c08f2329b69f7ad1895896d9c1",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "6d437c4c11fee28c552f3f50c9a8e9d83b2c5b15f3962b867c53e35c703b5c16"
+  },
+  "remaining_photoreal_defects": [
+    "The strongest rapid still lacks a convincing volumetric entrained-air body, deep aerated hole, coherent recirculation, and collision-aware spray and mist.",
+    "The bounded pocket is a deterministic render profile attached to solver-selected transitions, not a validated free-surface hydraulic simulation.",
+    "The sampled water and procedural bathymetry remain too low resolution to reproduce rapid-specific Zambezi tongues, boils, lateral waves, rocks, and seasonal changes.",
+    "The animated water/material capture path is not frame-deterministic, so matched image deltas cannot isolate small geometry changes without a frozen presentation clock.",
+    "The 30 m source terrain, synthetic ground cover, hard waterline transitions, and sparse near-field geology remain visibly procedural.",
+    "Raft, equipment, character animation, paddle contact, and final foam/crew occlusion still require named lifelike art acceptance.",
+    "A target-hardware GPU profile and named multi-discipline art review have not accepted the combined terrain, water, VFX, raft, and crew presentation."
+  ],
+  "required_external_acceptance_gates": [
+    "local Zambezi guide approval of rapid stations, lines, portages, access, hazards, rescue routes, and seasonal behavior",
+    "geospatial approval of centerline, horizontal and vertical datums, high-resolution terrain, bank breaklines, rapid rocks, and bathymetry",
+    "rights and distribution approval for the supplied map PDF, height image, reference imagery, and production derivatives",
+    "seasonal-flow and rapid-specific hydraulic validation against observed Zambezi behavior",
+    "southern African gorge geology, ecology, and environment-art approval",
+    "named photoreal water-VFX, raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ]
+}

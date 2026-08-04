@@ -4350,3 +4350,15 @@ path is verified, and the completion goal can be marked complete.
   boundary or consume reviewed bank/bathymetry breaklines while preserving
   solver, collision, buoyancy, and force authority. Evidence and hashes are in
   `cold_water_adaptive_shoreline_v1_review.json`.
+- Solver-anchored plunge-pocket V1 gives the three strongest accepted interior
+  jumps a bounded dark core, irregular side shoulders, and aerated downstream
+  return on the refined render mesh. The existing Froude-transition,
+  full-coverage, 15 m clearance, intensity-ordering, and 6 m deduplication
+  contracts retain site authority; the combined displacement is capped at
+  -0.30/+0.18 m. The editor build, P2 1/1, and all six P4 runnable-map gates
+  pass, with Zambezi retaining 10 accepted sites and 645 rapid-foam vertices.
+  Direct side review finds no dome, tent, rail, card, or shoreline regression.
+  Saved maps, cooked water, wetness, bathymetry, collision, buoyancy, forces,
+  D3, and D4 remain unchanged. Volumetric aeration/recirculation, spray/mist,
+  measured seasonal hydraulics, deterministic visual attribution, performance,
+  photoreal art, and all seven external approvals remain open.
