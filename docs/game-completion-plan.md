@@ -17,7 +17,7 @@ Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
 to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
 and do not delay a complete South Fork 1.0.
 
-**Runnable-portfolio checkpoint, August 3:** all six rivers are selectable Free
+**Runnable-portfolio checkpoint, August 4:** all six rivers are selectable Free
 Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
 package. Its rebuilt native catalog and live PIE gates pass at the current
@@ -25,7 +25,7 @@ release head; this confirms runnable-reference status only and does not close
 its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
 The selection and progression manifests now also mark it `runnable: true` with
 `availability: free_run`. See
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v13_review.json`.
 
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt
@@ -36,6 +36,16 @@ geometry, wet/dry, solver, buoyancy, or raft-force authority changed. The
 retained image still exposes smooth 30 m canyon geometry and repeated synthetic
 ecology, so photoreal promotion and all seven external gates remain open in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_review.json`.
+
+**Zambezi V19 ecology checkpoint, August 4:** six explicit left/right ×
+low/mid/high strata replace count-only launch vegetation acceptance. The saved
+map retains 6,512 ground-cover and 772 woody instances; every stratum exceeds
+its minimum, all instances remain outside water/route/slope gates, and 108
+unsafe or unsupported launch-camera targets stay rejected. The matched guide-
+eye frame breaks up the skyline row and adds irregular mid-slope canopy, but the
+30 m source still leaves the left wall smooth and bare. This is a retained
+technical ecology improvement, not photoreal promotion; see
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_review.json`.
 
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
@@ -4297,3 +4307,11 @@ path is verified, and the completion goal can be marked complete.
   the live Zambezi P4 gate pass with MapCheck 0/0. This is reference-runnable
   certification only; all seven external data, hydraulic, art/human, and
   platform gates remain open.
+- Zambezi runnable release-head V13 re-certifies the V19-regenerated
+  `/Game/RaftSim/Maps/L_Zambezi` package as river 6 after adding fail-closed
+  left/right low/mid/high ecology strata and a source-grounded launch-camera
+  face mosaic. The schema-v21 map audit records 6,512 launch-cover and 772
+  launch woody instances, with every stratum above minimum and 108 unsafe or
+  unsupported view targets explicitly rejected. The selector and progression
+  manifests still resolve `zambezi_reference_run` to `L_Zambezi`; photoreal,
+  hydraulic, guide, rights, and platform gates remain open.

@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v20",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v21",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -199,6 +199,24 @@ def main() -> None:
             static_mesh = (
                 component.get_editor_property("static_mesh") if component else None
             )
+            custom_data_values = (
+                [
+                    float(value)
+                    for value in component.get_editor_property(
+                        "per_instance_sm_custom_data"
+                    )
+                ]
+                if component
+                else []
+            )
+            ecology_stratum_counts = [
+                sum(
+                    1
+                    for value in custom_data_values
+                    if abs(value - float(stratum_index)) <= 0.001
+                )
+                for stratum_index in range(6)
+            ]
             vegetation_rows.append(
                 {
                     "actor_label": actor.get_actor_label(),
@@ -219,6 +237,13 @@ def main() -> None:
                         if component
                         else None
                     ),
+                    "num_custom_data_floats": (
+                        int(component.get_editor_property("num_custom_data_floats"))
+                        if component
+                        else 0
+                    ),
+                    "custom_data_value_count": len(custom_data_values),
+                    "ecology_stratum_counts": ecology_stratum_counts,
                 }
             )
         launch_talus_actors = [
@@ -633,15 +658,29 @@ def main() -> None:
             report["vegetation"]["runnable_launch_bank_cover_instance_count"]
         )
         report["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"] = 42.0
+        report["vegetation"]["runnable_launch_ecology_stratum_order"] = [
+            "left_low",
+            "left_mid",
+            "left_high",
+            "right_low",
+            "right_mid",
+            "right_high",
+        ]
+        report["vegetation"]["runnable_launch_bank_cover_stratum_counts"] = [
+            sum(int(row["ecology_stratum_counts"][index]) for row in runnable_launch_bank_cover_rows)
+            for index in range(6)
+        ]
+        report["vegetation"][
+            "runnable_launch_bank_cover_minimum_per_stratum"
+        ] = 450
         report["vegetation"][
             "runnable_launch_bank_cover_shadow_policy"
         ] = "disabled_on_noncolliding_ground_cover_only"
         report["vegetation"]["runnable_launch_bank_cover_placement_contract"] = (
-            "v18_lower_energy_short_cover_two_morphology_deterministic_96_"
-            "candidate_target_offset_mosaic_"
-            "approximately_55m_to_955m_downstream_with_12m_to_180m_dry_"
-            "bank_spread_12km_cull_range_full_route_clearance_dry_height_"
-            "and_hard_slope_gates"
+            "v19_elevation_stratified_lower_energy_two_morphology_"
+            "deterministic_256_candidate_patch_target_mosaic_approximately_"
+            "55m_to_955m_downstream_with_per_bank_low_mid_high_dry_height_"
+            "bands_12km_cull_range_full_route_clearance_and_hard_slope_gates"
         )
         runnable_launch_woody_rows = [
             row
@@ -655,19 +694,27 @@ def main() -> None:
         report["vegetation"]["runnable_launch_woody_instance_count"] = sum(
             int(row["instance_count"]) for row in runnable_launch_woody_rows
         )
-        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 640
-        report["vegetation"]["runnable_launch_woody_rejection_count"] = 640 - int(
+        report["vegetation"]["runnable_launch_woody_target_instance_count"] = 880
+        report["vegetation"]["runnable_launch_woody_rejection_count"] = 880 - int(
             report["vegetation"]["runnable_launch_woody_instance_count"]
         )
         report["vegetation"]["runnable_launch_woody_slope_ceiling_degrees"] = 34.0
+        report["vegetation"]["runnable_launch_woody_stratum_counts"] = [
+            sum(int(row["ecology_stratum_counts"][index]) for row in runnable_launch_woody_rows)
+            for index in range(6)
+        ]
+        report["vegetation"][
+            "runnable_launch_woody_minimum_per_stratum"
+        ] = 45
         report["vegetation"][
             "runnable_launch_woody_shadow_policy"
         ] = "disabled_on_launch_window_only_to_prevent_camera_wall_streaks"
         report["vegetation"]["runnable_launch_woody_placement_contract"] = (
-            "deterministic_160_candidate_target_offset_mosaic_approximately_"
-            "155m_to_955m_downstream_with_35m_to_200m_dry_bank_spread_"
-            "12km_cull_range_full_route_clearance_dry_height_and_hard_"
-            "slope_gates"
+            "v19_elevation_stratified_deterministic_400_candidate_patch_"
+            "target_mosaic_approximately_155m_to_955m_downstream_with_per_"
+            "bank_low_mid_high_dry_height_bands_12km_cull_range_full_route_"
+            "clearance_and_hard_slope_gates_plus_240_target_320_candidate_"
+            "launch_view_cone_face_mosaic"
         )
         passed = (
             len(markers) == 25
@@ -915,20 +962,46 @@ def main() -> None:
                 int(row["instance_count"])
                 for row in runnable_launch_bank_cover_rows
             ) >= 4500
+            and min(
+                report["vegetation"][
+                    "runnable_launch_bank_cover_stratum_counts"
+                ]
+            ) >= 450
             and all(
                 not row["cast_shadow"]
+                and int(row["num_custom_data_floats"]) == 1
+                and int(row["custom_data_value_count"])
+                == int(row["instance_count"])
+                and sum(int(value) for value in row["ecology_stratum_counts"])
+                == int(row["instance_count"])
                 and "RaftSimGroundCoverSelfShadowSuppressed" in row["tags"]
                 and "RaftSimOrganicGroundCoverMorphologyV2" in row["tags"]
                 and "RaftSimZambeziLowerEnergyLaunchEcologyV18" in row["tags"]
+                and "RaftSimZambeziElevationStratifiedEcologyV19"
+                in row["tags"]
+                and "RaftSimEcologyStratumCustomDataV1" in row["tags"]
                 for row in runnable_launch_bank_cover_rows
             )
             and len(runnable_launch_woody_rows) == 3
             and sum(int(row["instance_count"]) for row in runnable_launch_woody_rows)
             >= 560
+            and min(
+                report["vegetation"]["runnable_launch_woody_stratum_counts"]
+            ) >= 45
             and all(not row["cast_shadow"] for row in runnable_launch_woody_rows)
             and all(
-                "RaftSimWoodySlopeCeiling34Degrees" in row["tags"]
+                int(row["num_custom_data_floats"]) == 1
+                and int(row["custom_data_value_count"])
+                == int(row["instance_count"])
+                and sum(int(value) for value in row["ecology_stratum_counts"])
+                == int(row["instance_count"])
+                and "RaftSimWoodySlopeCeiling34Degrees" in row["tags"]
                 and "RaftSimRunnableLaunchWoodyShadowSuppressed" in row["tags"]
+                and "RaftSimZambeziElevationStratifiedEcologyV19"
+                in row["tags"]
+                and "RaftSimZambeziLaunchCameraFaceMosaicV19"
+                in row["tags"]
+                and "RaftSimEcologyStratumCustomDataV1" in row["tags"]
                 for row in runnable_launch_woody_rows
             )
             and not legacy_zambezi_pve_actors

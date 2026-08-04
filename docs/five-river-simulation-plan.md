@@ -1,6 +1,6 @@
 # Runnable River Simulation & Playability Plan
 
-Written July 18, 2026; updated August 3, 2026. Goal: **all six runnable
+Written July 18, 2026; updated August 4, 2026. Goal: **all six runnable
 rivers playable in-engine with live finite-volume solver water and the full
 gameplay stack** (crew, flip/swim/recover, scoring, HUD, reactive audio). The
 first five use a validated signature-rapid pattern. Zambezi is restored at an
@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v13_review.json`.
 
 The subsequent V18 Zambezi presentation pass preserves that same runnable
 selector and runtime contract while reducing clipped launch-water and scarp
@@ -50,6 +50,15 @@ water tests and all six P4 map-load gates pass. This is visual technical
 progress only—coarse terrain, ecology/geology specificity, calibrated
 hydraulics, production art, and external acceptance remain open in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_review.json`.
+
+V19 adds fail-closed launch ecology coverage across both banks and low, mid,
+and high dry-height bands. The schema-v21 saved-map audit records 6,512 ground-
+cover and 772 woody instances, with all six strata above minimum and a separate
+132-instance camera-face mosaic selected from 240 targets under the same route,
+waterline, and slope protections. The fixed frame is less skyline-banded but
+still fails photoreal promotion because the coarse source wall remains smooth
+and under-covered. Evidence is in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_review.json`.
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -735,4 +744,4 @@ and external acceptance gates pass.
 - This keeps Zambezi runnable at the reference Free Run tier. It does not close
   terrain, datum, rights, seasonal-flow, rapid-hydraulic, guide, photoreal-art,
   or target-platform acceptance. Exact hashes and gates are in
-  `zambezi_runnable_release_head_v12_review.json`.
+  `zambezi_runnable_release_head_v13_review.json`.

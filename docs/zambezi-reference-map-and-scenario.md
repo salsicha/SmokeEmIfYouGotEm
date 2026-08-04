@@ -1,6 +1,6 @@
 # Zambezi reference map and scenario
 
-> Runtime status, August 3, 2026: the complete reference Free Run is one of the
+> Runtime status, August 4, 2026: the complete reference Free Run is one of the
 > six runnable rivers, is selectable from the player-facing Free Run catalog,
 > and is versioned at `/Game/RaftSim/Maps/L_Zambezi`.
 > Production terrain, bathymetry, rapid hydraulics, guide, art, and performance
@@ -22,14 +22,14 @@ package is not the runnable map.
 
 The runnable map was regenerated and rechecked after the later environment,
 character, water, terrain, and rapid-presentation milestones, including the
-retained V18 launch-optics, scarp-shading, and launch-cover pass. The player
+retained V19 elevation-stratified launch ecology pass. The player
 path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
 The machine-readable selection and Free Run manifests count six runnable rivers,
 mark `zambezi_batoka_gorge` as `runnable: true` with `availability: free_run`,
-and list it at `reference_free_run` tier. Twenty-five focused Python registry,
+and list it at `reference_free_run` tier. Twenty-six focused Python registry,
 source, and release-record contracts pass, and the native
 `RaftSim.M6.CareerCatalog` gate resolves the player-facing scenario without an
 automation warning or error. The native `RaftSim.P4.RiverMapLoads.L_Zambezi`
@@ -44,11 +44,22 @@ changes map load or gameplay acceptance.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v13_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
 seasonal-flow, guide, rights, photoreal-art, or target-performance gates.
+
+The schema-v21 saved-map audit also requires left/right low, mid, and high
+elevation ecology strata. The retained map contains 6,512 launch ground-cover
+instances with stratum counts `[978, 1200, 1200, 734, 1200, 1200]`, plus 772
+woody instances with counts `[139, 122, 140, 112, 108, 151]`. All are source-
+Landscape-grounded, non-colliding, waterline-safe presentation instances. The
+supplemental launch-camera search retains 132 of 240 targets and records 108
+rejections rather than relaxing route-clearance, dry-height, or 34-degree slope
+rules. See the
+`zambezi_launch_stratified_ecology_v19_review.json` matched visual record; it
+does not claim production ecology or photoreal acceptance.
 
 The Zambezi map build now combines three evidence layers without pretending they
 have equal authority:
@@ -433,13 +444,13 @@ swimmers. The focused test passes, and the complete parameterized
 renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
 deliberately fails photoreal promotion while passing runnable launch acceptance.
 
-The runnable classification was reverified on August 3, 2026 against the V18
+The runnable classification was reverified on August 4, 2026 against the V19
 release package. `RaftSim.M6.CareerCatalog` confirms that the
 player-facing `zambezi_reference_run` opens `/Game/RaftSim/Maps/L_Zambezi`, and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` passes a live PIE launch with the cooked
 water field, upright five-person raft, all rapid markers, separate live foam,
 Niagara water pool, four non-colliding conditioned visual-terrain tiles, and
-two adaptive near-field terrain actors. The schema-v20
+two adaptive near-field terrain actors. The schema-v21
 saved-map audit also requires solver-owned rendering, the transmitting volume
 core, river-local texture bindings, low detail-skin coverage, smoothing, and a
 capture-only static ribbon. All focused Python contracts pass. This is runnable
@@ -472,19 +483,20 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v20 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v21 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V18-tagged visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
 the four-actor sun/sky/fill/fog atmosphere contract, absence of rejected
 high-density bank actors, the
 exact five vegetation mesh families and
-13 instance components with a 14,843-instance total, exactly one tagged
+13 instance components with a 14,316-instance total, exactly one tagged
 1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
 components with the 58/57/117 accepted split and 24° slope-ceiling contract,
-two 3,600-instance launch-cover components, three launch woody components with
-the 153/152/306 accepted split, their full-route/dry-height/slope placement tags, and
-the bounded launch-window shadow exception,
+two launch-cover components with 6,512 accepted instances, three launch woody
+components with 772 accepted instances, their six custom-data strata, full-
+route/dry-height/slope placement tags, the 132-of-240 launch-camera face
+mosaic, and the bounded launch-window shadow exception,
 six separately tagged launch-talus components with 360 total source-grounded,
 shadow-casting, non-colliding rock analog instances and their explicit
 no-lithology/no-hydraulic-authority contract, plus the Zambezi-specific
