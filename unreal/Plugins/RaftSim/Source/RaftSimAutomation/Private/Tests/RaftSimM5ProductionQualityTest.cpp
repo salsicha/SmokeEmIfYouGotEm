@@ -1238,6 +1238,15 @@ bool FRaftSimM5StartRescueCommand::Update()
             HeadShoulderClearanceCm >= 9.5f);
         Test->TestTrue(
             FString::Printf(
+                TEXT("CC0 crew body %s retains an anatomical inner-clavicle span "
+                     "(%.3f cm) while preserving both solved shoulder anchors "
+                     "(maximum error %.3f cm)"),
+                *It->GetName(),
+                It->GetPresentedClavicleRootSpanCm(),
+                It->GetMaximumPresentedShoulderAnchorErrorCm()),
+            It->HasAnatomicalShoulderTransition());
+        Test->TestTrue(
+            FString::Printf(
                 TEXT("CC0 crew body %s exposes articulated paddle-grip digits"),
                 *It->GetName()),
             It->HasArticulatedPaddleGripRig());

@@ -1,0 +1,422 @@
+{
+  "articulated_paddle_grip_count": 5,
+  "capture_resolution": [
+    1536,
+    1024
+  ],
+  "captured_character_count": 5,
+  "characters": [
+    {
+      "bounds_extent_cm": [
+        47.81001973172062,
+        52.5297122858271,
+        82.85840671470524
+      ],
+      "bounds_origin_cm": [
+        32.81001973172062,
+        20.739327475443122,
+        42.65059953628712
+      ],
+      "captures": {
+        "face": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_face.png",
+          "sha256": "20915244422fccf85b73565e22e65c567f35843344a69e6249165e325f9943b1"
+        },
+        "full": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_full.png",
+          "sha256": "24f4a234fcfaca30b3929535bed16f3d6a102f5786292c2a5a274972df3c967d"
+        },
+        "grip": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_grip.png",
+          "sha256": "5d1a2ce6206b3b093fd52da369b85c08bda82fe38c604562e1cb687d4a9a2594"
+        },
+        "grip_profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_grip_profile.png",
+          "sha256": "21483cd3a7f9b94abed0ae751c3d3330793194dc7497e0ebd2de6198bd6afc41"
+        },
+        "profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_profile.png",
+          "sha256": "52c65c007ede76d6438a1e3c0fded900a5faaa5735523c5d4fff48d3f763ea3b"
+        },
+        "rear": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_guide_rear.png",
+          "sha256": "b45eaecede89bd947dbd2bb22df5fcf8e0bb212eb921dfa207f2ffaf3c365ff4"
+        }
+      },
+      "guide": true,
+      "name": "RaftSim_CC0_Guide",
+      "runtime_active_paddle_grip_pose": true,
+      "runtime_articulated_paddle_grip": true,
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_eye_materials": [
+        "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+      ],
+      "runtime_face_forward": [
+        1.4313575093746008e-07,
+        -0.9479452324806752,
+        -0.3184334093921965
+      ],
+      "runtime_face_up": [
+        4.808210933155362e-08,
+        -0.31843340939219283,
+        0.9479452324806861
+      ],
+      "runtime_finite_pose": true,
+      "runtime_helmet_fit_scale": 0.9599999785423279,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 4.427224420400222e-10,
+      "runtime_lower_paddle_finger_closure_degrees": 230.6800079345703,
+      "runtime_maximum_presented_shoulder_anchor_error_cm": 4.664447939006777e-09,
+      "runtime_paddle_grip_anchor_error_cm": 5.6475824017354626e-09,
+      "runtime_paddle_thumb_closure_degrees": 55.20000076293945,
+      "runtime_presented_clavicle_root_span_cm": 10.880000114440918,
+      "runtime_presented_head_shoulder_clearance_cm": 21.931501388549805,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "runtime_solved_head_cm": [
+        5.9999938065755565,
+        8.530806830820218,
+        99.54161529496352
+      ],
+      "runtime_solved_head_minimum_z_cm": 79.93688255790448,
+      "runtime_upper_paddle_finger_closure_degrees": 134.3199920654297,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Guide.SK_RaftSim_CC0_Guide",
+      "status": "captured",
+      "variant_index": 0
+    },
+    {
+      "bounds_extent_cm": [
+        47.81001973172062,
+        52.5297122858271,
+        82.58568319877509
+      ],
+      "bounds_origin_cm": [
+        32.81001973172062,
+        20.739327475443122,
+        42.377876020356965
+      ],
+      "captures": {
+        "face": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_face.png",
+          "sha256": "7b700cfe999b3f7feaa107840af7058b86afdaa6b136cadab6430fe9b3a636d2"
+        },
+        "full": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_full.png",
+          "sha256": "282392a0f6207c833582ca945ab13fe49f551be6d37b970a0bf6e7feba2194d7"
+        },
+        "grip": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_grip.png",
+          "sha256": "d9265ddb399c62fb4771ea09b541df7ad662ec3696ad40c9b8ae23c525d1ce68"
+        },
+        "grip_profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_grip_profile.png",
+          "sha256": "b675a8af98a29d9d2a29dc5346d7f747d559980b78d78c1efa4e8ebe6ac8e779"
+        },
+        "profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_profile.png",
+          "sha256": "8da3f10931dad97eadecc88f0200d255d51808eb58d8d3729a8bbb2fee818d1e"
+        },
+        "rear": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew01_rear.png",
+          "sha256": "bc3ae1ceab405d76bf915a965ab5edd050abb9112b487a7f8450716254056459"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew01",
+      "runtime_active_paddle_grip_pose": true,
+      "runtime_articulated_paddle_grip": true,
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_eye_materials": [
+        "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+      ],
+      "runtime_face_forward": [
+        1.4118743565138488e-07,
+        -0.9350421251349662,
+        -0.3545366331185909
+      ],
+      "runtime_face_up": [
+        5.353354567563433e-08,
+        -0.3545366331185868,
+        0.9350421251349769
+      ],
+      "runtime_finite_pose": true,
+      "runtime_helmet_fit_scale": 0.9599999785423279,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 4.997179336996282e-10,
+      "runtime_lower_paddle_finger_closure_degrees": 230.6800079345703,
+      "runtime_maximum_presented_shoulder_anchor_error_cm": 7.105427357601002e-15,
+      "runtime_paddle_grip_anchor_error_cm": 5.689435589317782e-10,
+      "runtime_paddle_thumb_closure_degrees": 55.20000076293945,
+      "runtime_presented_clavicle_root_span_cm": 10.880000114440918,
+      "runtime_presented_head_shoulder_clearance_cm": 21.95591163635254,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "runtime_solved_head_cm": [
+        5.999999190040639,
+        8.137977936414464,
+        98.86554242283516
+      ],
+      "runtime_solved_head_minimum_z_cm": 79.54143345980575,
+      "runtime_upper_paddle_finger_closure_degrees": 134.3199920654297,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew01.SK_RaftSim_CC0_Crew01",
+      "status": "captured",
+      "variant_index": 0
+    },
+    {
+      "bounds_extent_cm": [
+        47.385019630392726,
+        52.33596676246455,
+        81.5942205519519
+      ],
+      "bounds_origin_cm": [
+        33.23501983304852,
+        20.933072998805663,
+        41.386413373533784
+      ],
+      "captures": {
+        "face": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_face.png",
+          "sha256": "e05231a599d4bb4d353bb80687e5dc8265f41f59acc3e7d4b6e7fea00e34aade"
+        },
+        "full": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_full.png",
+          "sha256": "14f33fd10f302ababd8742a1273a4ad99821ef3b42af56ec477b2ac992455ff3"
+        },
+        "grip": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_grip.png",
+          "sha256": "6fea1022f1de50368d9d7bd4e860ea88511e08a1eb23e61877764962a00b6d66"
+        },
+        "grip_profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_grip_profile.png",
+          "sha256": "c7fb98af2c2f35e75b64a594fcb223ee380e79f1812947dc608b3c5ba5f94bd6"
+        },
+        "profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_profile.png",
+          "sha256": "a148506143f7604eee4fe53ce40a39b15c80a57c3ece31c065c06f88c939f1e5"
+        },
+        "rear": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew02_rear.png",
+          "sha256": "857cccad9c08d553ad5d79aacb3308f499c5a8cf5c96b44bb86e2d54feeb72c9"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew02",
+      "runtime_active_paddle_grip_pose": true,
+      "runtime_articulated_paddle_grip": true,
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_eye_materials": [
+        "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+      ],
+      "runtime_face_forward": [
+        1.3203867273390662e-07,
+        -0.8744526134939204,
+        -0.4851109427271611
+      ],
+      "runtime_face_up": [
+        7.32497207829448e-08,
+        -0.48511094272715555,
+        0.8744526134939304
+      ],
+      "runtime_finite_pose": true,
+      "runtime_helmet_fit_scale": 0.9599999785423279,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 7.311353189543013e-10,
+      "runtime_lower_paddle_finger_closure_degrees": 230.6800079345703,
+      "runtime_maximum_presented_shoulder_anchor_error_cm": 8.881784197001252e-16,
+      "runtime_paddle_grip_anchor_error_cm": 1.1816445039244602e-14,
+      "runtime_paddle_thumb_closure_degrees": 55.20000076293945,
+      "runtime_presented_clavicle_root_span_cm": 10.880000114440918,
+      "runtime_presented_head_shoulder_clearance_cm": 21.98868179321289,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "runtime_solved_head_cm": [
+        6.000002121309192,
+        9.160472490243556,
+        96.73558996885004
+      ],
+      "runtime_solved_head_minimum_z_cm": 78.10381262191214,
+      "runtime_upper_paddle_finger_closure_degrees": 134.3199920654297,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew02.SK_RaftSim_CC0_Crew02",
+      "status": "captured",
+      "variant_index": 1
+    },
+    {
+      "bounds_extent_cm": [
+        48.23501932640904,
+        52.70808345164069,
+        80.68473735178834
+      ],
+      "bounds_origin_cm": [
+        32.38502013703221,
+        20.560956309629532,
+        40.47693017337022
+      ],
+      "captures": {
+        "face": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_face.png",
+          "sha256": "8f7f09d4f1179195124b313e3849c601e355e0ec67f83898c3c8bf884df173ed"
+        },
+        "full": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_full.png",
+          "sha256": "71c9543ca5c4f26365b2c99b5ea962c39cc6e5e2c6db1ffb93d07471a808df09"
+        },
+        "grip": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_grip.png",
+          "sha256": "5979aca82fabdae8ccbf22d8b0d7ce47f9bbe81a009f212a27f827b5125041f3"
+        },
+        "grip_profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_grip_profile.png",
+          "sha256": "f6fc0df629f02996d3916b180d1983f066eb93d6d17e4b2d94b9e21c8435899f"
+        },
+        "profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_profile.png",
+          "sha256": "e0dcbf570fc0e0e86f957a3e10c1ca4c82316407758706f3a80cc9f71a3fc87e"
+        },
+        "rear": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew03_rear.png",
+          "sha256": "7b9203b79d141ee969461819f4b063a68ae22bed552eaad961617d5b704ee385"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew03",
+      "runtime_active_paddle_grip_pose": true,
+      "runtime_articulated_paddle_grip": true,
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_eye_materials": [
+        "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+      ],
+      "runtime_face_forward": [
+        1.3976008669694924e-07,
+        -0.9255892321140592,
+        -0.3785294881439052
+      ],
+      "runtime_face_up": [
+        5.715637418753039e-08,
+        -0.37852948814390086,
+        0.9255892321140698
+      ],
+      "runtime_finite_pose": true,
+      "runtime_helmet_fit_scale": 0.9599999785423279,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 5.389839685676634e-10,
+      "runtime_lower_paddle_finger_closure_degrees": 230.6800079345703,
+      "runtime_maximum_presented_shoulder_anchor_error_cm": 4.3848932818058017e-10,
+      "runtime_paddle_grip_anchor_error_cm": 2.283501165933899e-09,
+      "runtime_paddle_thumb_closure_degrees": 55.20000076293945,
+      "runtime_presented_clavicle_root_span_cm": 10.880000114440918,
+      "runtime_presented_head_shoulder_clearance_cm": 21.964815139770508,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "runtime_solved_head_cm": [
+        6.000002060513287,
+        9.170206193008243,
+        94.99736157238085
+      ],
+      "runtime_solved_head_minimum_z_cm": 76.78506198167497,
+      "runtime_upper_paddle_finger_closure_degrees": 134.3199920654297,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew03.SK_RaftSim_CC0_Crew03",
+      "status": "captured",
+      "variant_index": 2
+    },
+    {
+      "bounds_extent_cm": [
+        47.640019893845256,
+        52.529117173076855,
+        82.52786489777452
+      ],
+      "bounds_origin_cm": [
+        32.98001956959599,
+        20.73992258819336,
+        42.3200577193564
+      ],
+      "captures": {
+        "face": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_face.png",
+          "sha256": "4e6e90dc71d48be42443ad27b0c5b71b448bacca05ed160151d028ca21d74bd0"
+        },
+        "full": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_full.png",
+          "sha256": "3a52071ebcd3de7d58c3351c285b0d05750384efdcf2bb57c9ea28ec7e2fd57d"
+        },
+        "grip": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_grip.png",
+          "sha256": "53aa8d13d5cd7babe36def5b7eafdf78a424be54b8a5e5349f226cc04ec35bb7"
+        },
+        "grip_profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_grip_profile.png",
+          "sha256": "56ba566c5623a0de1e806cadcb06faa3264c53e56d687b0cf77e6ef3e6f9e30a"
+        },
+        "profile": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_profile.png",
+          "sha256": "11400de671ee6cb8fc77f7804820f259b7db402216eff8c0b916817418c0a772"
+        },
+        "rear": {
+          "path": "../../../../../../../private/tmp/raftsim-zambezi-runnable-v21/unreal/Saved/RaftSimValidation/m9/cc0-exclusive-body-captures/raftsim_cc0_crew04_rear.png",
+          "sha256": "24efb557895965aeb0c3e383a1c2b6b23fcc20b9035a588e711523262661ff20"
+        }
+      },
+      "guide": false,
+      "name": "RaftSim_CC0_Crew04",
+      "runtime_active_paddle_grip_pose": true,
+      "runtime_articulated_paddle_grip": true,
+      "runtime_body_ready": true,
+      "runtime_exclusive_cc0_body_ownership": true,
+      "runtime_eye_materials": [
+        "/Game/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Eyes.M_RaftSim_CC0_Eyes"
+      ],
+      "runtime_face_forward": [
+        1.359173723618176e-07,
+        -0.9001400804538287,
+        -0.43560054586806557
+      ],
+      "runtime_face_up": [
+        6.577385947197395e-08,
+        -0.4356005458680606,
+        0.9001400804538389
+      ],
+      "runtime_finite_pose": true,
+      "runtime_helmet_fit_scale": 0.9599999785423279,
+      "runtime_helmet_forward_alignment": 1.0,
+      "runtime_helmet_head_error_cm": 6.377855465977689e-10,
+      "runtime_lower_paddle_finger_closure_degrees": 230.6800079345703,
+      "runtime_maximum_presented_shoulder_anchor_error_cm": 1.0695084378395999e-14,
+      "runtime_paddle_grip_anchor_error_cm": 5.151253867907712e-10,
+      "runtime_paddle_thumb_closure_degrees": 55.20000076293945,
+      "runtime_presented_clavicle_root_span_cm": 10.880000114440918,
+      "runtime_presented_head_shoulder_clearance_cm": 21.99039077758789,
+      "runtime_production_boots": true,
+      "runtime_production_helmet": true,
+      "runtime_production_pfd": true,
+      "runtime_solved_head_cm": [
+        6.000001306860701,
+        7.723917885674508,
+        98.59520779131532
+      ],
+      "runtime_solved_head_minimum_z_cm": 79.45759692335494,
+      "runtime_upper_paddle_finger_closure_degrees": 134.3199920654297,
+      "selected_mesh": "/Game/RaftSim/Characters/Production/CC0/SK_RaftSim_CC0_Crew04.SK_RaftSim_CC0_Crew04",
+      "status": "captured",
+      "variant_index": 3
+    }
+  ],
+  "exclusive_body_count": 5,
+  "maximum_paddle_grip_anchor_error_cm": 5.6475824017354626e-09,
+  "maximum_presented_shoulder_anchor_error_cm": 4.664447939006777e-09,
+  "minimum_lower_paddle_finger_closure_degrees": 230.6800079345703,
+  "minimum_paddle_thumb_closure_degrees": 55.20000076293945,
+  "minimum_presented_clavicle_root_span_cm": 10.880000114440918,
+  "minimum_presented_head_shoulder_clearance_cm": 21.931501388549805,
+  "minimum_upper_paddle_finger_closure_degrees": 134.3199920654297,
+  "schema": "raftsim.cc0.exclusive_body_capture.v2",
+  "script": "/private/tmp/raftsim-zambezi-runnable-v21/unreal/Scripts/capture_cc0_production_roster.py",
+  "script_sha256": "9235dd1ca9eafdbe7d3b5397d689f661658c85097c9badcb4dea80e222439413",
+  "status": "capture_complete"
+}

@@ -42,6 +42,12 @@ const float CrewHelmetAnchorDropsCm[] = {6.0f, 9.0f, 9.0f, 7.0f};
 
 constexpr float PaddlePalmAnchorAlongKnuckleFraction = 0.56f;
 constexpr float ProductionHeadClearanceLiftCm = 5.0f;
+// Keep the imported garment's inner shoulder weights distributed across the
+// upper chest. Driving both clavicle roots to one spine point pinched those
+// weights into a hard central ridge and stretched the remaining wetsuit into
+// broad triangular wings. The outer upper-arm joints remain on the gameplay
+// pose; only the render skeleton's inner clavicle roots use this bounded span.
+constexpr float ProductionClavicleRootLateralFraction = 0.32f;
 
 const TCHAR* CC0GripDigits[] = {
     TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")};
@@ -455,6 +461,12 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const FVector MidSpine = FMath::Lerp(HipCenter, ShoulderCenter, 0.55f);
     const FVector UpperSpine = FMath::Lerp(Pose.TorsoCenterCm, ShoulderCenter, 0.78f);
     const FVector NeckBase = ShoulderCenter + TorsoUp * 4.0f;
+    const FVector LeftClavicleRoot = UpperSpine +
+        (Pose.LeftShoulderCm - ShoulderCenter) *
+            ProductionClavicleRootLateralFraction;
+    const FVector RightClavicleRoot = UpperSpine +
+        (Pose.RightShoulderCm - ShoulderCenter) *
+            ProductionClavicleRootLateralFraction;
     // The MakeHuman body owns a longer anatomical neck than the compact host
     // collision pose. Driving its skull directly to the host head point left
     // only about 3 cm between the jaw and shoulder line in seated views, so
@@ -492,7 +504,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const FVector RightElbow =
         FMath::Lerp(Pose.RightShoulderCm, RightWristCm, 0.48f) +
         FVector(0.0f, 5.0f, -2.0f);
-    SetSegmentBone(TEXT("clavicle_l"), TEXT("upperarm_l"), UpperSpine, Pose.LeftShoulderCm);
+    SetSegmentBone(
+        TEXT("clavicle_l"),
+        TEXT("upperarm_l"),
+        LeftClavicleRoot,
+        Pose.LeftShoulderCm);
     SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), Pose.LeftShoulderCm, LeftElbow);
     SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm);
     if (Pose.bShowPaddle)
@@ -503,7 +519,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     {
         SetBoneAtPoint(TEXT("hand_l"), LeftWristCm);
     }
-    SetSegmentBone(TEXT("clavicle_r"), TEXT("upperarm_r"), UpperSpine, Pose.RightShoulderCm);
+    SetSegmentBone(
+        TEXT("clavicle_r"),
+        TEXT("upperarm_r"),
+        RightClavicleRoot,
+        Pose.RightShoulderCm);
     SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), Pose.RightShoulderCm, RightElbow);
     SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm);
     if (Pose.bShowPaddle)
@@ -527,6 +547,28 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     Body->RefreshBoneTransforms();
     ApplyPaddleGripPose(Pose);
     Body->RefreshBoneTransforms();
+    const FVector PresentedLeftClavicleRootCm =
+        Body->GetBoneTransformByName(
+            TEXT("clavicle_l"), EBoneSpaces::ComponentSpace).GetLocation() *
+        BodyScale;
+    const FVector PresentedRightClavicleRootCm =
+        Body->GetBoneTransformByName(
+            TEXT("clavicle_r"), EBoneSpaces::ComponentSpace).GetLocation() *
+        BodyScale;
+    const FVector PresentedLeftShoulderCm =
+        Body->GetBoneTransformByName(
+            TEXT("upperarm_l"), EBoneSpaces::ComponentSpace).GetLocation() *
+        BodyScale;
+    const FVector PresentedRightShoulderCm =
+        Body->GetBoneTransformByName(
+            TEXT("upperarm_r"), EBoneSpaces::ComponentSpace).GetLocation() *
+        BodyScale;
+    PresentedClavicleRootSpanCm = FVector::Distance(
+        PresentedLeftClavicleRootCm,
+        PresentedRightClavicleRootCm);
+    MaximumPresentedShoulderAnchorErrorCm = FMath::Max(
+        FVector::Distance(PresentedLeftShoulderCm, Pose.LeftShoulderCm),
+        FVector::Distance(PresentedRightShoulderCm, Pose.RightShoulderCm));
     bPaddleGripActive = Pose.bShowPaddle && HasArticulatedPaddleGripRig();
     MaximumPaddleGripAnchorErrorCm = bPaddleGripActive
         ? FMath::Max(

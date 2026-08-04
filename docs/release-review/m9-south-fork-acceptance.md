@@ -2721,6 +2721,28 @@ and product-owner release-media approval remain required. Exact hashes and the f
 verdict are in
 `docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json`.
 
+## CC0 clavicle span V1 — collapsed inner roots corrected, photoreal review open
+
+The packaged CC0 pose adapter previously moved both imported clavicle roots onto one
+upper-spine point before aiming them at the solved shoulders. V1 retains a bounded 32 percent
+of each shoulder half-span at the inner roots while keeping the upper-arm joints on the
+unchanged gameplay anchors. The five-identity renderer roster measures a 10.88 cm minimum and
+maximum clavicle-root span, `4.6645e-9` cm maximum outer-shoulder error, and unchanged
+head-clearance and paddle-grip contracts.
+
+![CC0 clavicle-span guide full](../environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/candidate_guide_full.png)
+
+![CC0 clavicle-span guide profile](../environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/candidate_guide_profile.png)
+
+The clean editor target builds, renderer-backed M5 passes 1/1 without warnings, and all six
+runnable-river P4 maps pass. A procedural torso-and-sleeve cover was rejected because it
+introduced detached cyan sleeves and duplicate garment volume; it is not in the retained
+runtime. The accepted rig correction is deliberately small and does not resolve the broad,
+angular wetsuit neckline, production cloth skinning, compression, folds, tailoring, or moving
+paddle biomechanics. Photoreal promotion and all named external decisions remain open. Exact
+hashes and matched evidence are in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json`.
+
 ## Required named decisions
 
 - [ ] Product owner: campaign, scope, disclosures, and every deferred/blocking item.

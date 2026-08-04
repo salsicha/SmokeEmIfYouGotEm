@@ -45,6 +45,11 @@ HEAD_SHOULDER_CLEARANCE_REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_head_shoulder_clearance_v1_review.json"
 )
+CLAVICLE_SPAN_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_cc0_clavicle_span_v1_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -370,9 +375,18 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "MeasureMinimumPaddleFingerClosureDegrees" in adapter
     assert "MeasureMinimumPaddleThumbClosureDegrees" in adapter
     assert "ProductionHeadClearanceLiftCm = 5.0f" in adapter
+    assert "ProductionClavicleRootLateralFraction = 0.32f" in adapter
     assert "const FVector PresentedHeadCenter" in adapter
     assert "Pose.HeadCenterCm + TorsoUp * ProductionHeadClearanceLiftCm" in adapter
     assert "GetPresentedHeadShoulderClearanceCm() const" in cc0_header
+    assert "GetPresentedClavicleRootSpanCm() const" in cc0_header
+    assert "GetMaximumPresentedShoulderAnchorErrorCm() const" in cc0_header
+    assert "HasAnatomicalShoulderTransition() const" in cc0_header
+    assert "PresentedClavicleRootSpanCm >= 8.5f" in cc0_header
+    assert "MaximumPresentedShoulderAnchorErrorCm <= 0.25f" in cc0_header
+    assert "LeftClavicleRoot" in adapter
+    assert "RightClavicleRoot" in adapter
+    assert "PresentedClavicleRootSpanCm = FVector::Distance" in adapter
     assert "ApplyProductionBodyMaterialOverrides(Body, Mesh)" in adapter
     assert "M_RaftSim_Wetsuit.M_RaftSim_Wetsuit" in adapter
     assert 'SlotName.Contains(TEXT("Wetsuit")' in adapter
@@ -1184,7 +1198,20 @@ def test_cc0_head_shoulder_clearance_v1_is_renderer_verified_and_fail_closed() -
         assert character["runtime_helmet_forward_alignment"] >= 0.999
         assert character["runtime_paddle_grip_anchor_error_cm"] <= 0.01
 
+    superseded_head_sources = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+            "RaftSimM5ProductionQualityTest.cpp"
+        ),
+        "unreal/Scripts/capture_cc0_production_roster.py",
+    }
     for relative, expected_hash in review["implementation_sha256"].items():
+        if relative in superseded_head_sources:
+            assert (REPO_ROOT / relative).is_file()
+            assert len(expected_hash) == 64
+            continue
         assert _sha256(REPO_ROOT / relative) == expected_hash
     for relative, expected_hash in review["evidence_sha256"].items():
         assert _sha256(REPO_ROOT / relative) == expected_hash
@@ -1198,6 +1225,69 @@ def test_cc0_head_shoulder_clearance_v1_is_renderer_verified_and_fail_closed() -
     )
     assert p4["succeeded"] == 0
     assert p4["succeededWithWarnings"] == 6
+    assert p4["failed"] == 0
+    assert {test["fullTestPath"] for test in p4["tests"]} == {
+        "RaftSim.P4.RiverMapLoads.L_Troublemaker",
+        "RaftSim.P4.RiverMapLoads.L_Hance",
+        "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+        "RaftSim.P4.RiverMapLoads.L_Terminator",
+        "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+        "RaftSim.P4.RiverMapLoads.L_Zambezi",
+    }
+    assert len(review["open_external_acceptance_gates"]) == 7
+    assert set(review["reviewers"].values()) == {None}
+
+
+def test_cc0_clavicle_span_v1_is_renderer_verified_and_fail_closed() -> None:
+    review = json.loads(CLAVICLE_SPAN_REVIEW_PATH.read_text(encoding="utf-8"))
+    assert review["schema"] == "raftsim.m9.cc0_clavicle_span_review.v1"
+    assert review["passed"] is False
+    assert review["decision"] == {
+        "technical_candidate_passed": True,
+        "runtime_rolled_out": True,
+        "matched_visual_improvement_retained": True,
+        "production_promoted": False,
+        "photoreal_acceptance_passed": False,
+        "human_approved": False,
+    }
+
+    measured = review["measured_transition"]
+    assert measured["clavicle_root_lateral_fraction"] == 0.32
+    assert measured["minimum_presented_clavicle_root_span_cm"] >= 8.5
+    assert measured["maximum_presented_clavicle_root_span_cm"] <= 12.0
+    assert measured["maximum_presented_shoulder_anchor_error_cm"] <= 0.25
+    assert measured["maximum_paddle_grip_anchor_error_cm"] <= 0.25
+
+    evidence_dir = REPO_ROOT / review["renderer_evidence"]["directory"]
+    roster = json.loads((evidence_dir / "roster_capture.json").read_text())
+    assert roster["status"] == "capture_complete"
+    assert roster["captured_character_count"] == 5
+    assert roster["minimum_presented_clavicle_root_span_cm"] == (
+        measured["minimum_presented_clavicle_root_span_cm"]
+    )
+    assert roster["maximum_presented_shoulder_anchor_error_cm"] == (
+        measured["maximum_presented_shoulder_anchor_error_cm"]
+    )
+    for character in roster["characters"]:
+        assert character["runtime_presented_clavicle_root_span_cm"] >= 8.5
+        assert (
+            character["runtime_maximum_presented_shoulder_anchor_error_cm"]
+            <= 0.25
+        )
+
+    for relative, expected_hash in review["implementation_sha256"].items():
+        assert _sha256(REPO_ROOT / relative) == expected_hash
+    for relative, expected_hash in review["evidence_sha256"].items():
+        assert _sha256(REPO_ROOT / relative) == expected_hash
+
+    m5 = json.loads((evidence_dir / "m5.json").read_text(encoding="utf-8-sig"))
+    assert m5["succeeded"] == 1
+    assert m5["succeededWithWarnings"] == 0
+    assert m5["failed"] == 0
+    p4 = json.loads(
+        (evidence_dir / "p4_all_river_maps.json").read_text(encoding="utf-8-sig")
+    )
+    assert p4["succeeded"] + p4["succeededWithWarnings"] == 6
     assert p4["failed"] == 0
     assert {test["fullTestPath"] for test in p4["tests"]} == {
         "RaftSim.P4.RiverMapLoads.L_Troublemaker",

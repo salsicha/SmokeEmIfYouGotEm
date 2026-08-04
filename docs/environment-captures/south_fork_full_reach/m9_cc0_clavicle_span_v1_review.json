@@ -1,0 +1,137 @@
+{
+  "schema": "raftsim.m9.cc0_clavicle_span_review.v1",
+  "recorded_local_date": "2026-08-04",
+  "passed": false,
+  "scope": "Packaged CC0 fallback render-skeleton shoulder transition only; body meshes, safety gear, gameplay pose, paddle, collision, mass, raft, water, and rescue authority are unchanged.",
+  "decision": {
+    "technical_candidate_passed": true,
+    "runtime_rolled_out": true,
+    "matched_visual_improvement_retained": true,
+    "production_promoted": false,
+    "photoreal_acceptance_passed": false,
+    "human_approved": false
+  },
+  "summary": "The CC0 adapter no longer collapses both imported inner-clavicle roots onto one upper-spine point. Each root now retains 32 percent of its solved shoulder half-span while both upper-arm joints remain on the authoritative gameplay shoulders. This removes a small central shoulder pinch without adding PFD pads, duplicate anatomy, or detached garment overlays. The matched pixel change is deliberately local and modest; the source body and wetsuit remain coarse and photoreal character acceptance stays open.",
+  "root_cause": {
+    "previous_pose": "Both component-space clavicle roots were translated to the same UpperSpine point before being aimed at their outer shoulder joints.",
+    "failure_mode": "That collapsed the imported inner-shoulder weight envelope to a single point and contributed to an unnaturally pinched, angular upper-wetsuit transition.",
+    "retained_fix": "Translate the left and right clavicle roots to bounded lateral points 32 percent of the way from shoulder centre to each solved outer shoulder, then aim them at the unchanged upper-arm anchors.",
+    "rejected_fix": "A smooth procedural torso-and-sleeve cover was rendered over the complete CC0 body and rejected because it produced detached cyan sleeves, duplicated garment volume, and did not hide the coarse neckline. It is absent from runtime and evidence."
+  },
+  "measured_transition": {
+    "clavicle_root_lateral_fraction": 0.32,
+    "captured_character_count": 5,
+    "minimum_presented_clavicle_root_span_cm": 10.880000114440918,
+    "maximum_presented_clavicle_root_span_cm": 10.880000114440918,
+    "minimum_contract_span_cm": 8.5,
+    "maximum_contract_span_cm": 12.0,
+    "maximum_presented_shoulder_anchor_error_cm": 4.664447939006777e-09,
+    "maximum_paddle_grip_anchor_error_cm": 5.6475824017354626e-09,
+    "minimum_presented_head_shoulder_clearance_cm": 21.931501388549805
+  },
+  "runtime_invariants": {
+    "exclusive_cc0_body_ownership": true,
+    "pfd_shoulder_foam_added": false,
+    "procedural_shoulder_cover_retained": false,
+    "solved_outer_shoulders_changed": false,
+    "paddle_grip_changed": false,
+    "helmet_fit_changed": false,
+    "body_meshes_changed": false,
+    "material_assets_changed": false,
+    "collision_or_mass_changed": false,
+    "physics_or_gameplay_changed": false
+  },
+  "renderer_evidence": {
+    "directory": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1",
+    "review_result": "Retain as a bounded rig correction. The guide and broadest-body identity keep their outer shoulder, hand, helmet, PFD, hip, and boot placements while the inner shoulder surface changes only around the newly separated clavicle roots.",
+    "photoreal_verdict": "Fail. The visible improvement is subtle; the black wetsuit shoulder and neckline remain broad, angular, and materially coarse. The static reference pose still lacks production cloth skinning, compression, folds, tailoring, and moving-stroke deformation.",
+    "pixel_change_metrics": {
+      "guide_full": {
+        "changed_fraction_over_8_rgb_levels": 0.003492,
+        "mean_absolute_rgb_difference": 0.1165,
+        "changed_bbox_xyxy": [748, 416, 1022, 988]
+      },
+      "guide_profile": {
+        "changed_fraction_over_8_rgb_levels": 0.000502,
+        "mean_absolute_rgb_difference": 0.0187,
+        "changed_bbox_xyxy": [557, 439, 689, 1023]
+      },
+      "crew03_full": {
+        "changed_fraction_over_8_rgb_levels": 0.002843,
+        "mean_absolute_rgb_difference": 0.11,
+        "changed_bbox_xyxy": [766, 394, 1015, 994]
+      }
+    }
+  },
+  "validation": {
+    "python": {
+      "command": "python -m pytest -q physics/tests/test_cc0_production_characters.py physics/tests/test_safety_gear_fallback.py",
+      "expected_after_review_lock": "24 passed"
+    },
+    "editor_build": {
+      "target": "SmokeEmIfYouGotEmEditor Mac Development",
+      "result": "success"
+    },
+    "roster_capture": {
+      "status": "capture_complete",
+      "captured_character_count": 5,
+      "rendered_views": 30
+    },
+    "m5": {
+      "test": "RaftSim.M5.CrewAvatarPoseProduction",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/m5.json"
+    },
+    "all_runnable_river_maps": {
+      "test_root": "RaftSim.P4.RiverMapLoads",
+      "performed": 6,
+      "succeeded": 2,
+      "succeeded_with_accepted_warnings": 4,
+      "failed": 0,
+      "maps": [
+        "L_Troublemaker",
+        "L_Hance",
+        "L_UpperHuacas",
+        "L_Terminator",
+        "L_LavaCanyon",
+        "L_Zambezi"
+      ],
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/p4_all_river_maps.json"
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "0eaee4a5610bb9f63d45771deca560d6a53e365e07cd003e3bfc451510c327b2",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "42e84480f51514b5b6ee99bf44b6c654e0d28c4dc47291ff59a3aa8c854b5d61",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "83fb2df2b2ce4277e591cffeac7f5cd8ee732650fc21c5e0e2b839d5505c8302",
+    "unreal/Scripts/capture_cc0_production_roster.py": "9235dd1ca9eafdbe7d3b5397d689f661658c85097c9badcb4dea80e222439413"
+  },
+  "evidence_sha256": {
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/baseline_guide_full.png": "56d07c8eeef7ad1ced83be6961f806d302b1d6a6c2ddf78b25d24548ad9e3443",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/baseline_guide_profile.png": "be89145214f0b8d0769a2d045c39e3ea4497e1e2a8ed40132db4dd7cf97fef27",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/baseline_crew03_full.png": "aa2a7a0b5a44fd433b1912ef5558a4c77342976d9a4256fadd6885bf46011fef",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/candidate_guide_full.png": "24f4a234fcfaca30b3929535bed16f3d6a102f5786292c2a5a274972df3c967d",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/candidate_guide_profile.png": "52c65c007ede76d6438a1e3c0fded900a5faaa5735523c5d4fff48d3f763ea3b",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/candidate_crew03_full.png": "71c9543ca5c4f26365b2c99b5ea962c39cc6e5e2c6db1ffb93d07471a808df09",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/roster_capture.json": "5c50c01441b91669725224cd7ec7854ec419d54a389ba558bcd0bbaafa2a90d7",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/m5.json": "5241fed20b8a5e67715d5285ea9afa3c3c53d9229138d91c7c6bf7773db58df8",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1/p4_all_river_maps.json": "6da4e72af23644bd3feac0ca378684b2606af9b19a4f6fd5eb3b6ffdf12ab4c0"
+  },
+  "reviewers": {
+    "character_art": null,
+    "animation": null,
+    "whitewater_guide": null,
+    "safety_readability": null,
+    "product_owner": null
+  },
+  "open_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, shoulder range of motion, paddle-stroke biomechanics, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ]
+}

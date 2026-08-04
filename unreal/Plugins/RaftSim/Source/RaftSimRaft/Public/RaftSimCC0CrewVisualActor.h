@@ -77,6 +77,29 @@ public:
         return PresentedHeadShoulderClearanceCm;
     }
 
+    /** Distance between the two rendered inner-clavicle roots. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetPresentedClavicleRootSpanCm() const
+    {
+        return PresentedClavicleRootSpanCm;
+    }
+
+    /** Error between rendered upper-arm roots and the authoritative pose. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPresentedShoulderAnchorErrorCm() const
+    {
+        return MaximumPresentedShoulderAnchorErrorCm;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasAnatomicalShoulderTransition() const
+    {
+        return bBodyReady &&
+            PresentedClavicleRootSpanCm >= 8.5f &&
+            PresentedClavicleRootSpanCm <= 12.0f &&
+            MaximumPresentedShoulderAnchorErrorCm <= 0.25f;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     bool HasActivePaddleGripPose() const
     {
@@ -163,5 +186,7 @@ private:
     float MinimumLowerPaddleFingerClosureDegrees = 0.0f;
     float MinimumPaddleThumbClosureDegrees = 0.0f;
     float PresentedHeadShoulderClearanceCm = 0.0f;
+    float PresentedClavicleRootSpanCm = 0.0f;
+    float MaximumPresentedShoulderAnchorErrorCm = 0.0f;
     static constexpr float BodyScale = 1.0f;
 };
