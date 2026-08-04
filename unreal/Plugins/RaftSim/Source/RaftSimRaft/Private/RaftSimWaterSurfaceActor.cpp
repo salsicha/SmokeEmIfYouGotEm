@@ -1068,6 +1068,15 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveShallowWaterOpacity
                    : 0.58f);
+    const float ResolvedLiveOpticalDepthResponseExponent =
+        (bUsesMigratedFutaleufuVolumeCore || bUsesMigratedChilkoVolumeCore)
+            ? 0.25f
+            : (RiverWaterConfig
+                   ? FMath::Clamp(
+                         RiverWaterConfig->LiveOpticalDepthResponseExponent,
+                         0.25f,
+                         2.0f)
+                   : 1.0f);
     const float ResolvedLiveDeepWaterOpacity =
         bUsesMigratedFutaleufuVolumeCore
             ? 0.86f
@@ -1106,7 +1115,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? 0.36f
             : bUsesMigratedFutaleufuVolumeCore
-            ? 0.68f
+            ? 0.42f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSurfaceRoughness
                    : 0.085f);
@@ -1126,7 +1135,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? 0.24f
             : bUsesMigratedFutaleufuVolumeCore
-            ? 0.55f
+            ? 0.72f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveRippleStrength
                    : 0.18f);
@@ -1353,6 +1362,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("ShallowWaterOpacity"),
                     ResolvedLiveShallowWaterOpacity);
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("OpticalDepthResponseExponent"),
+                    ResolvedLiveOpticalDepthResponseExponent);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("DeepWaterOpacity"),
                     ResolvedLiveDeepWaterOpacity);

@@ -318,7 +318,7 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     }
     else if (RiverId == TEXT("futaleufu_terminator"))
     {
-        Settings.SunIntensity = 4.20f;
+        Settings.SunIntensity = 2.40f;
         Settings.SkyLightIntensity = 1.35f;
         Settings.FogDensity = 0.0055f;
         Settings.ExposureBias = -0.30f;
@@ -328,7 +328,7 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        Settings.SunIntensity = 4.10f;
+        Settings.SunIntensity = 2.90f;
         Settings.SkyLightIntensity = 1.30f;
         Settings.FogDensity = 0.0030f;
         Settings.ExposureBias = -0.30f;

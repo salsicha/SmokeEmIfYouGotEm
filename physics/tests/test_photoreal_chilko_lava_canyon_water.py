@@ -273,11 +273,12 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveSurfaceCalmCoverage = 0.035f",
         "LiveSurfaceActiveCoverage = 0.14f",
         "LiveSurfaceSpecular = 0.18f",
-        "LiveSurfaceRoughness = 0.68f",
+        "LiveSurfaceRoughness = 0.42f",
         "LiveSkyReflectionStrength = 0.05f",
-        "LiveRippleStrength = 0.55f",
+        "LiveRippleStrength = 0.72f",
         "LiveFoamIntensity = 0.56f",
         "LiveShallowWaterOpacity = 0.36f",
+        "LiveOpticalDepthResponseExponent = 0.25f",
         "LiveDeepWaterOpacity = 0.84f",
         "LiveFoamWaterOpacity = 0.86f",
         "FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f)",
@@ -291,6 +292,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "RaftSimChilkoLocalizedReflectionWaterV3",
         "RaftSimColdWaterHighlightNaturalismV1",
         "RaftSimColdWaterDepthAttenuationV2",
+        "RaftSimColdWaterNonlinearOpticalDepthV1",
         "RaftSimNoSolverStateMutation",
         "RaftSimChilkoDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
@@ -308,10 +310,11 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         'SetScalar(TEXT("SlickNormalFloor"), 0.85f)',
         'SetScalar(TEXT("SlickRoughnessScale"), 1.0f)',
         'SetScalar(TEXT("FresnelSpecular"), 0.01f)',
+        'SetScalar(TEXT("OpticalDepthResponseExponent"), 0.25f)',
     ):
         assert token in live_material
     for token in (
-        "Settings.SunIntensity = 4.10f",
+        "Settings.SunIntensity = 2.90f",
         "Settings.SkyLightIntensity = 1.30f",
         "Settings.ExposureBias = -0.30f",
     ):
@@ -335,15 +338,29 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
+        "LiveOpticalDepthResponseExponent",
+        "bEnforceTaggedDirectionalLightPresentation",
+        "RuntimeDirectionalLightActorTag",
+        "RuntimeDirectionalLightIntensity",
+        "RuntimeDirectionalLightRotation",
     ):
         assert parameter in config
     for parameter in (
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
+        "OpticalDepthResponseExponent",
     ):
         assert f'TEXT("{parameter}")' in runtime
     assert 'TEXT("LiveVolumeCoreMesh")' in runtime
+    water_config_runtime = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimWater/Private"
+        / "RaftSimRiverWaterConfig.cpp"
+    ).read_text(encoding="utf-8")
+    assert "bMigratedChilkoHighlightResponse" in water_config_runtime
+    assert "2.90f" in water_config_runtime
+    assert "SetIntensity(RuntimeDirectionalLightIntensity)" in water_config_runtime
     assert "kLiveVolumeCoreMinimumStationCoverage = 0.60f" in runtime
     assert "MinimumCellStationCoverage" in runtime
     assert "kLiveVolumeCoreCalmDetailCoverage = 0.035f" in runtime
