@@ -145,7 +145,7 @@ default-off cold-water opt-in varies the existing bank alpha in global river
 station space and retreats only the optical core's outermost wet vertices
 inward, capped at 0.90 m and below one 1.50 m render cell. It never adds wet
 topology or moves the sampled solver surface. In the fixed Chilko close-up the
-contact retreats 3.84 pixels on average and gains 16.69% more detrended contour
+contact shifts 3.84 pixels on average and gains 16.69% more detrended contour
 variation without the rejected overlay's rail or gap. Futaleufú's matched
 rapid-side frame passes as a no-regression control but does not support a
 material bank-improvement claim. Both maps remain byte-identical and

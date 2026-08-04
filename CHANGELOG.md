@@ -39,7 +39,7 @@ All notable changes to this project are recorded here, newest first. Versioning 
   retreat inward by at most 0.90 m and less than one 1.50 m render cell. The
   four-wet-corner topology, sampled wet mask, maps, materials, bathymetry,
   collision, buoyancy, raft forces, D3, and D4 are unchanged. The fixed Chilko
-  close-up records a 3.84 px mean retreat and 16.69% higher detrended contact
+  close-up records a 3.84 px mean contact shift and 16.69% higher detrended contact
   variation without a rail or gap; the Futaleufú rapid-side frame is an honest
   no-regression control, not a claimed visual gain. Photoreal and all six
   external gates remain open.

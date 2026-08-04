@@ -547,7 +547,10 @@ accepted `L_Terminator` and `L_LavaCanyon` packages remain byte-identical.
 
 In the identical Chilko bank close-up, a fixed blue/red contact diagnostic over
 columns 700-1239 measures the mean contact moving from row 377.97 to 374.13 and
-detrended variation rising from 2.642 px to 3.083 px, a 16.69% increase. Visual
+detrended variation rising from 2.642 px to 3.083 px, a 16.69% increase. The
+screen-space diagnostic records a 3.84 px contact shift; perspective prevents
+using image Y alone to infer direction, while the runtime vertex operation is
+inward-only by construction. Visual
 inspection confirms a continuous low-amplitude inset/advance contour without a
 pale rail, exposed gap, detached island, or outward wet expansion. Futaleufú's
 matched `breaking_water_side` frame remains artifact-free but is too distant
