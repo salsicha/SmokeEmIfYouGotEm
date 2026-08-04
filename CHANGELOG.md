@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Re-certified the regenerated V19 Zambezi map as runnable river 6 and replaced
+  count-only launch ecology acceptance with six fail-closed bank/elevation
+  strata. The retained package contains 6,512 source-grounded ground-cover and
+  772 woody instances; a 132-instance launch-camera face mosaic breaks up the
+  former skyline row while 108 unsafe or unsupported targets remain rejected.
+  Schema-v21 validation, runnable manifests, and matched before/after evidence
+  are versioned. This is a technical ecology improvement, not photoreal or
+  production-hydraulic promotion.
 - Replaced the packaged CC0 crew's open reference hands with side-correct,
   palm-aligned articulated paddle grips. All five identities now use distinct
   upper T-grip and lower shaft-hand frames, curl every three-joint finger and

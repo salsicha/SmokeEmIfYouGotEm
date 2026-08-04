@@ -1,0 +1,143 @@
+{
+  "schema": "raftsim.environment.zambezi_launch_stratified_ecology_review.v19",
+  "recorded_local_date": "2026-08-04",
+  "verified_base_commit": "e6b15680bce7f41288a3df64060702eb44c43c84",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "passed": false,
+  "status": "elevation_stratified_ecology_technical_pass_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_geospatial_ecological_hydraulic_or_navigation_authority",
+  "decision": {
+    "technical_candidate_retained": true,
+    "six_strata_fail_closed": true,
+    "launch_camera_face_mosaic_passed": true,
+    "wet_bank_and_route_protection_passed": true,
+    "continuous_skyline_row_reduced": true,
+    "photoreal_acceptance_passed": false,
+    "terrain_collision_or_height_authority_changed": false,
+    "water_geometry_wet_dry_mask_or_solver_state_changed": false,
+    "raft_collision_buoyancy_or_forces_changed": false
+  },
+  "implementation": {
+    "source_terrain": "Copernicus GLO-30-derived 30 m heightfield",
+    "ecology_stratum_order": [
+      "left_low",
+      "left_mid",
+      "left_high",
+      "right_low",
+      "right_mid",
+      "right_high"
+    ],
+    "ground_cover": {
+      "target_instances": 7200,
+      "placed_instances": 6512,
+      "rejected_instances": 688,
+      "stratum_counts": [978, 1200, 1200, 734, 1200, 1200],
+      "minimum_per_stratum": 450,
+      "slope_ceiling_degrees": 42.0,
+      "candidate_searches_per_target": 256
+    },
+    "woody": {
+      "target_instances": 880,
+      "placed_instances": 772,
+      "rejected_instances": 108,
+      "stratum_counts": [139, 122, 140, 112, 108, 151],
+      "minimum_per_stratum": 45,
+      "slope_ceiling_degrees": 34.0,
+      "general_candidate_searches_per_target": 400,
+      "launch_camera_face_target_instances": 240,
+      "launch_camera_face_placed_instances": 132,
+      "launch_camera_face_minimum_instances": 120,
+      "launch_camera_face_candidate_searches_per_target": 320
+    },
+    "shared_safety_contract": [
+      "source Landscape grounded",
+      "conditioned waterline dry-bank gated",
+      "full-route clearance gated",
+      "hard slope ceiling",
+      "non-colliding",
+      "presentation-only",
+      "no solver, buoyancy, collision, or raft-force mutation"
+    ]
+  },
+  "rejected_iterations": [
+    {
+      "reason": "strict per-band search did not meet every fail-closed stratum minimum",
+      "map_saved": false
+    },
+    {
+      "reason": "widened search still left the right-low woody stratum below minimum",
+      "map_saved": false
+    },
+    {
+      "reason": "first technically valid dry-height targeting did not materially improve the matched frame",
+      "map_saved": true,
+      "visual_candidate_retained": false
+    },
+    {
+      "reason": "180-instance camera-face minimum exceeded the 132 safe sites offered by source terrain under unchanged gates",
+      "map_saved": false
+    }
+  ],
+  "matched_visual_evidence": {
+    "capture_command": "RaftSim.CaptureRaft 3 <label> 8 4 22 waterinventory",
+    "resolution_px": [1280, 720],
+    "baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_baseline.png",
+      "sha256": "c92951cad217ce535e0f3c87fa39b25c5b4aac21c7876a105d1587777cd02d5f"
+    },
+    "retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19.png",
+      "sha256": "19ffd97931483d78be35bc3326a202ced5da2fe039fb8c71ad2236e346d7f7d5"
+    },
+    "descriptive_cover_pixel_heuristic": {
+      "roi": "top 320 rows",
+      "definition": "R > 0.26, G > 0.24, B < 0.22, and G > 1.25 B",
+      "baseline_pixels": 22568,
+      "retained_pixels": 22849,
+      "baseline_left_center_right": [66, 8, 22494],
+      "retained_left_center_right": [24, 19, 22806],
+      "interpretation": "The count supports a small increase and broader center coverage only; visual inspection, not this color heuristic, supports the skyline-row decision. It is not a realism, species, or quality metric."
+    }
+  },
+  "visual_findings": [
+    "The former nearly continuous upper-right skyline row is broken into irregular canopy clusters at several depths and elevations.",
+    "New mid-slope woody structure is readable around the downstream bend without waterline or raft overlap.",
+    "The large left canyon wall remains smooth, bright, and sparsely vegetated because the 30 m source offers few safe dry-bank sites in the launch view cone.",
+    "Procedural crown forms, coarse terrain, ground materials, water, raft, and crew remain visibly synthetic; photoreal promotion fails."
+  ],
+  "hash_locked_retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "dd2a48c94618ff17c98bfe14024fc0642437a1ec91576ef482d8a71221997ff9"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "a65fabfb996e8c50905343e40a392c97576b3d9b754e4f90812b06bc9ae0abb5"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_baseline.png",
+      "sha256": "c92951cad217ce535e0f3c87fa39b25c5b4aac21c7876a105d1587777cd02d5f"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19.png",
+      "sha256": "19ffd97931483d78be35bc3326a202ced5da2fe039fb8c71ad2236e346d7f7d5"
+    }
+  ],
+  "validation": {
+    "editor_build": "pass",
+    "map_generation": "pass_fail_closed_after_four_rejected_brackets",
+    "saved_map_audit": "pass_schema_v21_25_markers_1_raft_1_runtime_water_4_conditioned_visual_tiles_14316_opaque_vegetation_instances",
+    "map_check_errors": 0,
+    "map_check_warnings": 0
+  },
+  "external_gates_remaining": [
+    "Rights-cleared higher-resolution terrain, lidar, stereo reconstruction, photogrammetry, or field-capture coverage for the playable reach.",
+    "Reach-specific geology and named-outcrop review rather than generic procedural surface analogs.",
+    "Local guide and geospatial approval of centerline, datums, banks, sections, route, access, portage, rescue context, and hazards.",
+    "Approved southern African gorge species, density, age, season, wind, wetness, and invasive-species policy.",
+    "Production terrain, shoreline, vegetation, rock, water, foam, spray, mist, atmosphere, raft, and crew art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual and performance acceptance."
+  ]
+}

@@ -14,7 +14,7 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
-The August 3 V18 release-head certification confirms again that the frontend
+The August 4 V19 release-head certification confirms again that the frontend
 selector, source scenario, shipping cook, saved map, and live PIE launch all
 resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads
 with the vertical-slice game mode and live cooked-field water, and is not an
@@ -26,7 +26,7 @@ while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
 still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json),
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v13_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The current Batoka V18 presentation pass keeps V17's source-missing upper-scarp
@@ -43,6 +43,14 @@ That review retains the bounded visual improvement and still fails photoreal
 promotion because the 30 m source canyon remains rounded and smooth, the
 synthetic vegetation repeats, and the listed external data and human acceptance
 gates remain open.
+The August 4 V19 ecology pass now fail-closes on six bank/elevation strata,
+retaining 6,512 dry-bank ground-cover instances and 772 woody instances. A
+source-grounded launch-camera mosaic breaks up the former continuous skyline
+row and adds mid-slope clusters without entering the wet or navigable corridor.
+The matched frame is a technical improvement only: the coarse left wall remains
+largely bare, so photoreal promotion is still false. Counts, rejected candidates,
+hashes, and exact before/after frames are in the
+[V19 stratified-ecology review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_review.json).
 The live rapid presentation now uses six of its eight preallocated Niagara
 site pairs around the camera instead of the former two-site ceiling. Zambezi's
 PIE gate requires all six aerosol and roller pairs to be active from its eight

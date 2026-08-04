@@ -1,0 +1,178 @@
+{
+  "schema": "raftsim.zambezi.runnable_release_head_review.v9",
+  "recorded_local_date": "2026-08-04",
+  "verified_base_commit": "e6b15680a4fa9914dbfb8e3ee0e43918b359d5fa",
+  "branch": "release/1.0",
+  "result": "pass",
+  "classification": "runnable_reference_free_run",
+  "production_fidelity_promoted": false,
+  "verification_context": {
+    "reason": "Reaffirm the V19-regenerated Zambezi package as player-facing runnable river 6 after adding fail-closed elevation-stratified launch ecology and matched visual evidence.",
+    "map_runtime_package_changed_since_v12": true,
+    "player_selector_metadata_changed_since_v12": true,
+    "frontend_scenario_mapping_changed_since_v12": false,
+    "supersedes_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json"
+  },
+  "player_path": {
+    "game_mode": "Free Run",
+    "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
+    "river_id": "zambezi_batoka_gorge",
+    "scenario_id": "zambezi_reference_run",
+    "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+    "runnable_river_ordinal": 6,
+    "runnable_river_count": 6,
+    "tier": "reference_free_run",
+    "availability": "free_run"
+  },
+  "registry_assertions": {
+    "river_selection_catalog_portfolio_role": "runnable_river",
+    "river_selection_catalog_runnable": true,
+    "river_selection_catalog_tier": "reference_free_run",
+    "river_selection_catalog_availability": "free_run",
+    "progression_manifest_lists_zambezi": true,
+    "progression_manifest_runnable": true,
+    "progression_manifest_availability": "free_run",
+    "both_runtime_manifests_link_this_review": true,
+    "frontend_catalog_lists_zambezi": true,
+    "shipping_cook_lists_zambezi": true,
+    "versioned_map_present": true,
+    "superseded_preview_is_player_path": false
+  },
+  "hash_locked_runtime_contract": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "dd2a48c94618ff17c98bfe14024fc0642437a1ec91576ef482d8a71221997ff9"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "a65fabfb996e8c50905343e40a392c97576b3d9b754e4f90812b06bc9ae0abb5"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset",
+      "sha256": "3cae052632413b6fcb7163237f7882bced8bdfac74bc2ff0d2fce5e00e228d3b"
+    },
+    {
+      "path": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+      "sha256": "fa2c5e80c9d266ef9c886a73817f4dcc059ee5754cf3643c1a8355d4c0651e69"
+    },
+    {
+      "path": "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json",
+      "sha256": "35d7cb4f7070f781333b001f9a5d1098c77415d32886b062c1d3c5a8584352c8"
+    },
+    {
+      "path": "physics/data/real_world/player_selection_model.json",
+      "sha256": "aac98ef3b0346f7bb178ad65ce4b93b6c14920f464782a151df3b4d9a4486a27"
+    },
+    {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
+      "sha256": "ffa3d6b8f4f1c8d6c098c348af904676df694ab8e3875b8d9a45cee35ad9cab9"
+    },
+    {
+      "path": "unreal/Config/DefaultGame.ini",
+      "sha256": "6893114b91d1647e8e7d0232e3a8970fd49e0b2fc80b263ba5df4014f62b7999"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimUI/Private/RaftSimVerticalSliceFrontend.cpp",
+      "sha256": "bedbc86c1edc9cb334d31daa585c860deb8ed6f612da4c0efa3a15beab4e8ce9"
+    },
+    {
+      "path": "unreal/Source/SmokeEmIfYouGotEm/Tests/RaftSimM6GameProgressionTest.cpp",
+      "sha256": "f30a40d2a2f63c180cf70d6ce20cee1c3e24a443ca5d069d11235f6d94130be2"
+    }
+  ],
+  "verification": {
+    "editor_build": {
+      "target": "SmokeEmIfYouGotEmEditor Mac Development",
+      "incremental_actions": 2,
+      "result": "success"
+    },
+    "focused_python_contracts": {
+      "command": "PYTHONPATH=physics/src python -m pytest -q physics/tests/test_zambezi_reference_map.py physics/tests/test_zambezi_sentinel_centerline.py physics/tests/test_named_rapid_registry.py",
+      "passed": 26,
+      "failed": 0,
+      "status": "success"
+    },
+    "career_catalog": {
+      "test": "RaftSim.M6.CareerCatalog",
+      "performed": 1,
+      "result": "success",
+      "automation_warnings": 0,
+      "automation_errors": 0
+    },
+    "progression_migration": {
+      "test": "RaftSim.M6.ProgressionMigration",
+      "performed": 1,
+      "result": "success",
+      "automation_warnings": 0,
+      "automation_errors": 0
+    },
+    "zambezi_map_load": {
+      "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "performed": 1,
+      "result": "success_with_accepted_warning",
+      "duration_seconds": 33.765,
+      "zambezi_mapcheck_errors": 0,
+      "zambezi_mapcheck_warnings": 0,
+      "automation_warnings": 2,
+      "accepted_warnings": [
+        "The external connectivity probe timed out after 3 seconds; it has no map-load or gameplay authority.",
+        "The pre-existing r.MotionVectorSimulation render-thread-safety log warning has no map-load or gameplay authority."
+      ],
+      "automation_errors": 0
+    },
+    "live_zambezi_map": {
+      "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+      "game_mode": "RaftSimVerticalSliceGameMode",
+      "coordinate_map_points": 5908,
+      "surface_vertices": 10465,
+      "surface_triangles": 20480,
+      "wet_vertices": 10465,
+      "active_breaking_sites": 10,
+      "rapid_foam_vertices": 631,
+      "rapid_foam_visible": true,
+      "volume_core_enabled": true,
+      "volume_core_triangles": 16896,
+      "standing_wave_absolute_max_m": 0.1046,
+      "hydraulic_relief_absolute_max_m": 0.0896,
+      "surface_smoothing_enabled": true,
+      "surface_smoothing_strength": 0.62,
+      "bank_blend_m": 7.5
+    },
+    "saved_map_evidence": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v21",
+      "passed": true,
+      "actor_count": 69,
+      "rapid_marker_count": 25,
+      "player_raft_count": 1,
+      "player_start_count": 1,
+      "water_config_count": 1,
+      "conditioned_visual_terrain_tile_count": 4,
+      "vegetation_components": 13,
+      "vegetation_instances": 14316,
+      "runnable_launch_ground_cover_instances": 6512,
+      "runnable_launch_ground_cover_strata": [978, 1200, 1200, 734, 1200, 1200],
+      "runnable_launch_woody_instances": 772,
+      "runnable_launch_woody_strata": [139, 122, 140, 112, 108, 151],
+      "solver_owned_runtime_rendering": true,
+      "live_volume_core_enabled": true,
+      "bank_edge_contract": "vertex_alpha_feathered_single_layer_water_volume_v2"
+    }
+  },
+  "authority_boundary": {
+    "runnable_claim": "Free Run launches the committed L_Zambezi package with the vertical-slice gameplay stack and live cooked-field water.",
+    "terrain": "Copernicus GLO-30 remains collision and height-query authority; source-missing upper-scarp and near-field detail is bounded, non-colliding procedural presentation infill.",
+    "ecology": "Project-owned procedural render-only ground-cover and woody analogs with six spatial-coverage strata and no exact-species claim.",
+    "water_rendering": "Solver wet-cell geometry with render-only transmitting optics, first-party flow normal, and solver-masked foam lace; no solver-state, collision, buoyancy, or raft-force authority.",
+    "hydraulics": "Feature-tagged procedural reference hydraulics, not validated rapid-specific real-world hydraulics.",
+    "navigation": "Not for navigation."
+  },
+  "open_external_acceptance_gates": [
+    "local Zambezi guide approval",
+    "geospatial and datum approval",
+    "source-rights and distribution approval",
+    "seasonal-flow approval",
+    "rapid-specific hydraulic validation",
+    "photoreal environment-art, ecology, water-VFX, raft, and character approval",
+    "desktop and VR target-hardware performance approval"
+  ]
+}
