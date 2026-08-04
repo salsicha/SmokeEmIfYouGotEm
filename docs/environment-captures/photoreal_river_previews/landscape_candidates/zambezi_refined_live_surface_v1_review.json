@@ -1,0 +1,148 @@
+{
+  "schema": "raftsim.environment.zambezi_refined_live_surface_review.v1",
+  "review_date_utc": "2026-08-03",
+  "status": "retained_bounded_technical_surface_improvement_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "technical_candidate_retained": true,
+    "all_six_river_maps_runnable": true,
+    "cross_river_topology_contract_passed": true,
+    "matched_visual_review_completed": true,
+    "photoreal_acceptance_passed": false,
+    "production_fidelity_promoted": false,
+    "map_package_changed": false,
+    "cooked_water_or_hydraulic_authority_changed": false,
+    "collision_buoyancy_d3_or_d4_changed": false
+  },
+  "implementation": {
+    "presentation_actor": "ARaftSimWaterSurfaceActor",
+    "authored_river_opt_in": "presence of ARaftSimRiverWaterConfig",
+    "base_analysis_spacing_m": 3.0,
+    "render_only_subdivision": 2,
+    "resolved_render_spacing_m": 1.5,
+    "analysis_stride_vertices": 2,
+    "curved_window_topology": {
+      "vertices": 10465,
+      "triangles": 20480
+    },
+    "legacy_straight_window_topology": {
+      "map": "L_Troublemaker",
+      "vertices": 17956,
+      "triangles": 35378
+    },
+    "configless_test_tank_compatibility_topology": {
+      "vertices": 4624,
+      "triangles": 8978,
+      "spacing_m": 3.0,
+      "analysis_stride_vertices": 1
+    },
+    "physical_analysis_footprint_preserved_m": 3.0,
+    "hydraulic_relief_five_sample_span_m": 12.0,
+    "presentation_wave_components": [
+      {"station_frequency": 0.19, "lateral_frequency": 0.61, "hydraulic_amplitude_m": 0.115},
+      {"station_frequency": 0.071, "lateral_frequency": -0.37, "hydraulic_amplitude_m": 0.055},
+      {"station_frequency": 0.79, "lateral_frequency": 1.31, "hydraulic_amplitude_m": 0.04},
+      {"station_frequency": 1.12, "lateral_frequency": -0.88, "hydraulic_amplitude_m": 0.02}
+    ],
+    "bounded_theoretical_standing_wave_envelope_m": 0.248,
+    "runtime_diagnostics_added": [
+      "surface vertex count",
+      "surface triangle count",
+      "resolved render spacing",
+      "physical analysis stride",
+      "refresh CPU milliseconds"
+    ]
+  },
+  "runtime_evidence": {
+    "p4_all_six_river_maps": {
+      "result": "6/6 passed",
+      "maps": {
+        "L_Hance": {"vertices": 10465, "triangles": 20480, "refresh_cpu_ms": 2.846},
+        "L_LavaCanyon": {"vertices": 10465, "triangles": 20480, "refresh_cpu_ms": 2.009},
+        "L_Terminator": {"vertices": 10465, "triangles": 20480, "refresh_cpu_ms": 4.351},
+        "L_Troublemaker": {"vertices": 17956, "triangles": 35378, "refresh_cpu_ms": 1.961},
+        "L_UpperHuacas": {"vertices": 10465, "triangles": 20480, "refresh_cpu_ms": 2.19},
+        "L_Zambezi": {"vertices": 10465, "triangles": 20480, "refresh_cpu_ms": 4.0}
+      },
+      "mapcheck_errors": 0,
+      "mapcheck_warnings": 0,
+      "known_environment_warnings": [
+        "South Fork capsize event emitted by the existing physical scenario during the settle window",
+        "offline generate_204 timeout while loading Zambezi"
+      ]
+    },
+    "zambezi_after": {
+      "wet_surface_vertices": 10465,
+      "active_breaking_sites": 10,
+      "visible_rapid_foam_vertices": 631,
+      "volume_core_triangles": 16896,
+      "standing_wave_abs_max_m": 0.2343,
+      "hydraulic_relief_abs_max_m": 0.0896
+    }
+  },
+  "visual_evidence": {
+    "method": "Separate deterministic five-second 1280x720 Metal captures at scalability 2 use the same fixed camera derived from the baseline's strongest accepted Zambezi breaking site. Metrics cover image rows 220 through 719; they describe the retained change and are not photoreal acceptance thresholds.",
+    "fixed_camera": {
+      "world_location_cm": [329839.27, -410612.4, 15666.84],
+      "pitch_degrees": -14.61,
+      "yaw_degrees": 166.95
+    },
+    "baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_before.png",
+      "sha256": "8fd68909bfaf9e1e7d5a23d779ee692b4af2c57829734088b021f3e59bbef2d4",
+      "render_spacing_m": 3.0,
+      "surface_vertices": 2673
+    },
+    "retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1.png",
+      "sha256": "3a744501ec3b92aec401c093fa42c6e49adf669307973a0ad97fdd29db6323ae",
+      "render_spacing_m": 1.5,
+      "surface_vertices": 10465
+    },
+    "descriptive_water_frame_metrics": {
+      "mean_absolute_channel_delta": 0.0352,
+      "baseline_gradient_mean": 0.021573,
+      "retained_gradient_mean": 0.02312,
+      "baseline_highpass_absolute_mean": 0.008313,
+      "retained_highpass_absolute_mean": 0.008948,
+      "highpass_absolute_mean_gain_fraction": 0.0763,
+      "baseline_edge_fraction_over_0_04": 0.119692,
+      "retained_edge_fraction_over_0_04": 0.134715,
+      "edge_fraction_gain_fraction": 0.1255
+    },
+    "finding": "The finer renderer and two short oblique bands add measurable local surface breakup and remove some large-triangle faceting without changing the sampled water. The broad diagonal swell remains visibly analytical, and the frame still lacks a connected overturning crest, aerated hole, and recirculating rapid body. The candidate is retained as bounded technical progress and explicitly fails photoreal promotion."
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "p2_water_surface_renders": "1/1 passed; config-less test tank remained 3 m",
+    "p4_all_river_map_loads": "6/6 passed",
+    "m4_river_coordinates_and_water_vfx": "4/4 passed",
+    "focused_python_contracts": "41 passed",
+    "known_unrelated_test_exclusion": "The pre-existing Colorado Hance V3 terrain/ecology review still hash-locks the already-superseded RaftSimEditorLandscapeFoliage.cpp revision; its one review-lock case was deselected because this milestone does not modify that file."
+  },
+  "hash_locked_unchanged_authority": {
+    "unreal/Content/RaftSim/Maps/L_Zambezi.umap": "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
+  },
+  "changed_source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "5666f016608bc70b99467ca1078333939e2c63870e1dbd065163e0a8b4c92bca",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "b97304a57c77de1c6f07ba66d85bb875599941dde8f7309d82dc2c2b859da2b3",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "613e7fd9893a1d073d53e0455ad16572bca43d6c0a60abf39123ef9db35f8c61",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp": "d2e96765ad743bbf30ea931be3435f6bf7ea2f72a11e129785fa806852612781"
+  },
+  "remaining_photoreal_defects": [
+    "The free surface still reads as a smooth analytical heightfield at rapid scale.",
+    "The strongest rapid lacks a coherent overturning crest, aerated plunge, recirculating roller body, and collision-aware spray.",
+    "The current source hydraulics remain procedural reference data rather than measured seasonal Zambezi behavior.",
+    "Terrain, waterline, ecology, raft, equipment, character animation, and final occlusion remain below the lifelike target.",
+    "A target-hardware GPU profile for the fourfold curved-window vertex increase has not been accepted."
+  ],
+  "required_external_acceptance_gates": [
+    "local Zambezi guide approval of rapid stations, lines, portages, access, hazards, rescue routes, and seasonal behavior",
+    "geospatial approval of centerline, horizontal and vertical datums, high-resolution terrain, bank breaklines, rapid rocks, and bathymetry",
+    "rights and distribution approval for the supplied map PDF, height image, reference imagery, and production derivatives",
+    "seasonal-flow and rapid-specific hydraulic validation against observed Zambezi behavior",
+    "southern African gorge geology, ecology, and environment-art approval",
+    "named photoreal water-VFX, raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ]
+}

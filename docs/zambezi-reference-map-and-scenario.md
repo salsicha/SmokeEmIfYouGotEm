@@ -509,6 +509,25 @@ connected crest, hole, recirculating entrained-air volume, surveyed bathymetry,
 or seasonally validated hydraulics. Evidence is in
 `zambezi_solver_driven_rapid_vfx_v1_review.json`.
 
+The live presentation grid is now independently refined from the solver's
+physical analysis spacing. `L_Zambezi` resolves its 240 x 96 m moving window at
+1.5 m for 10,465 render vertices and 20,480 triangles, while smoothing,
+hydraulic relief, derivatives, and breaking-site detection retain their 3 m
+neighbourhood. Two short oblique deterministic bands redistribute part of the
+broad standing-wave amplitude inside a reduced 0.248 m theoretical envelope.
+The complete six-map PIE suite passes; the Zambezi launch reports 10 accepted
+breaking sites, 631 visible rapid-foam vertices, 16,896 optical-core triangles,
+and a 4.000 ms initial null-RHI surface refresh. The Zambezi map remains
+byte-identical, and cooked hydraulics, wet/dry state, collision, buoyancy, D3,
+and D4 remain authoritative and unchanged.
+
+Matched fixed-camera evidence raises local high-pass detail by 7.63% and edge
+coverage by 12.55%, but it still shows a broad analytical diagonal swell rather
+than a coherent overturning rapid. The candidate therefore remains a bounded
+technical improvement, not photoreal or real-world hydraulic acceptance. Its
+images, hashes, cross-river runtime matrix, open defects, and seven external
+gates are recorded in `zambezi_refined_live_surface_v1_review.json`.
+
 ## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route

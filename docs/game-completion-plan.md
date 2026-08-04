@@ -4204,3 +4204,16 @@ path is verified, and the completion goal can be marked complete.
   photoreal promotion: sprites over the smooth heightfield do not form a
   connected overturning crest/hole/entrained-air body, and all named guide,
   geospatial, rights, hydraulic, art, and platform approvals remain open.
+- Shared live-surface refinement V1 resolves every authored runnable river at
+  1.5 m render spacing while keeping smoothing, hydraulic-relief, derivative,
+  and jump-detection neighbourhoods at the prior 3 m physical footprint. The
+  config-less development tank stays at 3 m. Five curved maps now expose
+  10,465 vertices and 20,480 triangles; South Fork's straight map exposes
+  17,956 vertices and 35,378 triangles. Two bounded short oblique bands add
+  subcell breakup without changing water samples, wet/dry state, collision,
+  buoyancy, D3, or D4. The editor build, P2 1/1, the complete six-map P4 suite,
+  and M4 4/4 pass. Fixed-camera Zambezi evidence retains a 7.63% high-pass and
+  12.55% edge-coverage increase but still fails photoreal promotion because a
+  broad analytical swell remains and no connected overturning rapid body is
+  present. Measured hydraulics, final water/VFX art, target-platform
+  performance, and all named external approvals remain open.

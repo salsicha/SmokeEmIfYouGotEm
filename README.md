@@ -86,6 +86,16 @@ cells, while an independent station mask clips the rectangular moving-window
 ends. This is a retained technical candidate, not photoreal approval;
 comparison evidence and remaining defects are recorded in
 [the cold-water volume-core review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_live_volume_core_v2_review.json).
+The shared live-water renderer now subdivides every authored river's visual
+surface from a 3 m analysis grid to 1.5 m presentation spacing. Solver-feature
+analysis retains its original physical footprint, the config-less test tank
+retains its original topology, and no cooked field, collision, buoyancy, D3,
+or D4 authority changes. All six runnable maps pass the native PIE matrix;
+matched Zambezi evidence shows a bounded increase in local surface breakup but
+still fails photoreal promotion because the broad analytical swell and missing
+connected overturning rapid body remain visible. Exact topology, runtime,
+visual, hash, and external-gate evidence is in the
+[refined live-surface review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json).
 Lava Canyon's August 3 V2 optical pass now makes that solver-clipped core
 river-local: a project-owned flow normal, solver-masked foam lace, physical
 transmission, and restrained live-surface coverage replace the inherited pale
