@@ -218,8 +218,9 @@ public:
         return Triangles.Num() / 3;
     }
 
-    /** Selects the non-colliding roller-mesh fallback. Production Niagara
-     * disables it only after all required particle assets are bound. */
+    /** Selects the non-colliding connected roller body. Production Niagara
+     * complements this geometry with detached spray; it does not replace the
+     * multi-valued water sheet. */
     void SetBreakingRollerVolumeRenderingEnabled(bool bEnabled);
 
 protected:
@@ -238,8 +239,9 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UProceduralMeshComponent> BreakingLipMesh;
 
-    /** Nested shell fallback generated only at accepted live hydraulic jumps.
-     * This is an explicitly visual entrained-air body: no collision,
+    /** Single connected aerated curtain generated only at accepted live
+     * hydraulic jumps. It complements detached Niagara spray without the old
+     * nested-shell dome cue. This is explicitly visual: no collision,
      * navigation, water sampling, buoyancy, D3, or D4 authority. */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UProceduralMeshComponent> BreakingRollerVolumeMesh;

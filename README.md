@@ -96,6 +96,15 @@ still fails photoreal promotion because the broad analytical swell and missing
 connected overturning rapid body remain visible. Exact topology, runtime,
 visual, hash, and external-gate evidence is in the
 [refined live-surface review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json).
+The strongest three accepted jumps now also retain one solver-shaped,
+crest-to-plunge membrane beneath the production Niagara spray. It uses the
+existing masked foam lace and raft/crew exclusion rather than the rejected
+three-shell translucent fallback, is capped at 1,512 non-colliding triangles,
+and is asserted on all six runnable rivers. Matched Zambezi evidence shows more
+crest breakup without dome/card artifacts, but the result remains a bounded
+technical improvement rather than a photoreal overturning-water pass; evidence
+and open gates are in the
+[connected plunge review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json).
 Lava Canyon's August 3 V2 optical pass now makes that solver-clipped core
 river-local: a project-owned flow normal, solver-masked foam lace, physical
 transmission, and restrained live-surface coverage replace the inherited pale

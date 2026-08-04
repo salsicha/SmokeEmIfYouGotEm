@@ -528,6 +528,26 @@ technical improvement, not photoreal or real-world hydraulic acceptance. Its
 images, hashes, cross-river runtime matrix, open defects, and seven external
 gates are recorded in `zambezi_refined_live_surface_v1_review.json`.
 
+The production water composition now retains one connected crest-to-plunge
+membrane at each of the three strongest accepted interior breaking sites while
+Niagara supplies detached spray and roller particles. The retained membrane
+uses only the overturning half of the solver-shaped circulation profile and the
+project-owned masked foam lace with the existing raft/crew exclusion. The
+former three-shell translucent fallback was re-tested and rejected because it
+restored broad dome and repeated tent artifacts. The new shared budget is 504
+triangles per site and 1,512 triangles total, with no collision, navigation,
+sampling, buoyancy, D3, or D4 authority.
+
+The focused water-surface test passes and the complete six-river PIE matrix
+passes with exact connected-sheet counts. In the matched fixed Zambezi frame,
+edge coverage rises 12.78% and high-pass detail 8.23% without translucent shell
+artifacts. The close side view changes only subtly, however, and the strongest
+rapid still depends on a broad analytical swell rather than a convincing
+aerated hole and recirculating body. This is retained technical progress, not
+photoreal or real-world hydraulic acceptance. Evidence, hashes, rejected
+iterations, remaining defects, and external gates are recorded in
+`zambezi_connected_plunge_v1_review.json`.
+
 ## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route

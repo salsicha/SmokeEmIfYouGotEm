@@ -1212,39 +1212,61 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     TEXT("BreakingFoamColor"),
                     FLinearColor(0.64f, 0.69f, 0.68f, 1.0f));
             }
-            if (UMaterialInstanceDynamic* RollerMaterial =
-                    BreakingRollerVolumeMesh->CreateDynamicMaterialInstance(
-                        0, BreakingWaterMaterial))
+            if (RapidFoamMaterial == nullptr)
             {
-                // The missing-asset fallback shells supply bounded entrained-
-                // air depth. Keep their carrier nearly clear while the moving
-                // lace texture provides time-coherent breakup.
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingWaterOpacity"), 0.018f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamOpacity"), 0.65f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamFloor"), 0.015f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamIntensityGain"), 0.36f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("PrimaryLaceGain"), 0.58f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("DetailLaceGain"), 0.33f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamCoreGain"), 1.12f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingWaterRoughness"), 0.22f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamRoughness"), 0.82f);
-                RollerMaterial->SetScalarParameterValue(
-                    TEXT("BreakingWaterSpecular"), 0.24f);
-                RollerMaterial->SetVectorParameterValue(
-                    TEXT("BreakingWaterColor"),
-                    FLinearColor(0.08f, 0.18f, 0.22f, 1.0f));
-                RollerMaterial->SetVectorParameterValue(
-                    TEXT("BreakingFoamColor"),
-                    FLinearColor(0.62f, 0.68f, 0.67f, 1.0f));
+                if (UMaterialInstanceDynamic* RollerMaterial =
+                        BreakingRollerVolumeMesh->CreateDynamicMaterialInstance(
+                            0, BreakingWaterMaterial))
+                {
+                    // Authoring-safe fallback when the masked solver-foam
+                    // material is absent. The release path below always
+                    // replaces this translucent instance.
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingWaterOpacity"), 0.003f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingFoamOpacity"), 0.86f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingFoamFloor"), 0.010f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingFoamIntensityGain"), 0.44f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("PrimaryLaceGain"), 0.68f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("DetailLaceGain"), 0.38f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingFoamCoreGain"), 1.12f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingWaterRoughness"), 0.22f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingFoamRoughness"), 0.82f);
+                    RollerMaterial->SetScalarParameterValue(
+                        TEXT("BreakingWaterSpecular"), 0.24f);
+                    RollerMaterial->SetVectorParameterValue(
+                        TEXT("BreakingWaterColor"),
+                        FLinearColor(0.08f, 0.18f, 0.22f, 1.0f));
+                    RollerMaterial->SetVectorParameterValue(
+                        TEXT("BreakingFoamColor"),
+                        FLinearColor(0.62f, 0.68f, 0.67f, 1.0f));
+                }
+            }
+        }
+    }
+    if (RapidFoamMaterial != nullptr)
+    {
+        // The connected plunge face is an aerated boundary, not a transparent
+        // water volume. Reuse the proven masked solver-foam lace so the face
+        // has irregular opaque bubbles and real holes instead of translucent
+        // shell shading. This material also carries the raft/crew exclusion.
+        BreakingRollerVolumeMesh->SetMaterial(0, RapidFoamMaterial);
+        if (ResolvedLiveWaterFoamLaceTexture)
+        {
+            if (UMaterialInstanceDynamic* RollerFoamMaterial =
+                    BreakingRollerVolumeMesh->CreateDynamicMaterialInstance(
+                        0, RapidFoamMaterial))
+            {
+                RollerFoamMaterial->SetTextureParameterValue(
+                    TEXT("SolverOverlayFoamLace"),
+                    ResolvedLiveWaterFoamLaceTexture);
             }
         }
     }
@@ -1455,11 +1477,14 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
         return;
     }
 
-    // Three nested, alpha-perforated shells supply a bounded visual body behind
-    // the breaking lip when the production Niagara systems are unavailable. At
-    // the 24-site detection cap this is no more than 36,288 triangles. The
-    // component never owns collision or water samples.
-    constexpr int32 kLayerCount = 3;
+    // One alpha-perforated curtain supplies a connected overturning body under
+    // production Niagara. The former three-shell fallback read as a repeated
+    // translucent dome when it was visible beside particles. Keeping only one
+    // irregular plunge membrane at the three strongest solver sites removes
+    // that nested volume cue and bounds the population to 1,512 triangles.
+    // The component never owns collision or water samples.
+    constexpr int32 kMaximumRollerSites = 3;
+    constexpr int32 kLayerCount = 1;
     constexpr int32 kAcrossSegments = 18;
     constexpr int32 kLoopSegments = 14;
     TArray<FVector> RollerVertices;
@@ -1472,20 +1497,22 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
         (kAcrossSegments + 1) * (kLoopSegments + 1);
     const int32 MaximumTrianglesPerSite =
         kLayerCount * kAcrossSegments * kLoopSegments * 2;
+    const int32 RollerSiteCount = FMath::Min(
+        BreakingSites.Num(), kMaximumRollerSites);
     RollerVertices.Reserve(
-        BreakingSites.Num() * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kLayerCount * VerticesPerLayer);
     RollerTriangles.Reserve(
-        BreakingSites.Num() * MaximumTrianglesPerSite * 3);
+        RollerSiteCount * MaximumTrianglesPerSite * 3);
     RollerNormals.Reserve(
-        BreakingSites.Num() * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kLayerCount * VerticesPerLayer);
     RollerUvs.Reserve(
-        BreakingSites.Num() * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kLayerCount * VerticesPerLayer);
     RollerColors.Reserve(
-        BreakingSites.Num() * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kLayerCount * VerticesPerLayer);
     RollerTangents.Reserve(
-        BreakingSites.Num() * kLayerCount * VerticesPerLayer);
+        RollerSiteCount * kLayerCount * VerticesPerLayer);
 
-    for (int32 SiteIndex = 0; SiteIndex < BreakingSites.Num(); ++SiteIndex)
+    for (int32 SiteIndex = 0; SiteIndex < RollerSiteCount; ++SiteIndex)
     {
         const FBreakingSite& Site = BreakingSites[SiteIndex];
         const float Intensity = FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
@@ -1496,21 +1523,18 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
         }
         const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
         const float MinimumHalfWidthCm = FMath::Lerp(
-            105.0f, 160.0f, Intensity);
+            170.0f, 250.0f, Intensity);
         const float ClearanceBoundHalfWidthCm = FMath::Max(
             0.0f, Site.PresentationEdgeClearanceMeters * kSurfCmPerM - 1200.0f);
         const float SiteHalfWidthCm = FMath::Clamp(
             ClearanceBoundHalfWidthCm,
             MinimumHalfWidthCm,
-            220.0f);
+            360.0f);
 
         for (int32 LayerIndex = 0; LayerIndex < kLayerCount; ++LayerIndex)
         {
-            const float LayerT = static_cast<float>(LayerIndex) /
-                static_cast<float>(kLayerCount - 1);
-            const float LayerHalfWidthCm =
-                SiteHalfWidthCm * FMath::Lerp(0.96f, 0.70f, LayerT);
-            const float LayerOpacity = FMath::Lerp(0.90f, 0.58f, LayerT);
+            const float LayerT = 0.45f;
+            const float LayerHalfWidthCm = SiteHalfWidthCm;
             const int32 BaseVertex = RollerVertices.Num();
 
             for (int32 AcrossIndex = 0;
@@ -1520,9 +1544,16 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                 const float AcrossT =
                     static_cast<float>(AcrossIndex) / kAcrossSegments;
                 const float SignedAcross = AcrossT * 2.0f - 1.0f;
-                const float EdgeTaper = FMath::Pow(
-                    FMath::Max(0.0f, 1.0f - SignedAcross * SignedAcross),
-                    1.25f);
+                // Preserve a broad crest through most of the span, then fade
+                // only the outer quarter. A parabolic height taper across the
+                // whole span made each site read as an isolated dome.
+                const float EdgeCoordinate = FMath::Clamp(
+                    (1.0f - FMath::Abs(SignedAcross)) / 0.24f,
+                    0.0f,
+                    1.0f);
+                const float EdgeTaper =
+                    EdgeCoordinate * EdgeCoordinate *
+                    (3.0f - 2.0f * EdgeCoordinate);
 
                 for (int32 LoopIndex = 0;
                      LoopIndex <= kLoopSegments;
@@ -1530,31 +1561,42 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                 {
                     const float LoopT =
                         static_cast<float>(LoopIndex) / kLoopSegments;
+                    // Render only the crest-to-plunge half of the circulation.
+                    // The downstream back of the old 270-degree shell was
+                    // visible through translucency and made every site look
+                    // like a smooth dome. Niagara supplies the detached air on
+                    // that side; this membrane depicts the multi-valued face.
+                    const float ProfileLoopT = FMath::Lerp(0.48f, 1.0f, LoopT);
                     FVector2D Profile =
                         ComputeBreakingRollerVolumeProfileCentimeters(
-                            LoopT, Intensity, LayerT);
-                    Profile.Y *= FMath::Lerp(0.45f, 1.0f, EdgeTaper);
+                            ProfileLoopT, Intensity, LayerT);
+                    Profile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
+                    // The membrane starts at the visible crown, so it must not
+                    // use a symmetric endpoint fade. Keep the crown fully
+                    // aerated and dissolve only as the sheet folds beneath the
+                    // sampled surface into the plunge.
                     const float LoopFeather = FMath::Pow(
-                        FMath::Max(0.0f, FMath::Sin(PI * LoopT)), 0.72f);
+                        FMath::Max(0.0f, FMath::Cos(0.5f * PI * LoopT)),
+                        0.58f);
                     const float Breakup = FMath::Clamp(
                         0.62f +
                             0.20f * FMath::Sin(
                                 SiteIndex * 1.67f + LayerIndex * 2.11f +
-                                SignedAcross * 10.3f + LoopT * 8.9f) +
+                            SignedAcross * 10.3f + ProfileLoopT * 8.9f) +
                             0.18f * FMath::Sin(
                                 SiteIndex * 2.43f - LayerIndex * 1.37f -
-                                SignedAcross * 16.7f + LoopT * 15.1f),
+                                SignedAcross * 16.7f + ProfileLoopT * 15.1f),
                         0.16f,
                         1.0f);
                     const float OrganicTravelCm =
                         FMath::Sin(
                             SiteIndex * 1.13f + LayerIndex * 0.91f +
-                            SignedAcross * 4.7f + LoopT * 6.3f) *
+                            SignedAcross * 4.7f + ProfileLoopT * 6.3f) *
                         13.0f * Intensity * EdgeTaper * LoopFeather;
                     const float OrganicLiftCm =
                         FMath::Sin(
                             SiteIndex * 2.07f - LayerIndex * 1.29f +
-                            SignedAcross * 7.1f + LoopT * 11.7f) *
+                            SignedAcross * 7.1f + ProfileLoopT * 11.7f) *
                         14.0f * Intensity * EdgeTaper * LoopFeather;
                     const FVector Position =
                         Site.WorldPositionCm +
@@ -1563,31 +1605,38 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                         FVector::UpVector * (Profile.Y + OrganicLiftCm + 4.0f);
                     RollerVertices.Add(Position);
                     RollerUvs.Add(FVector2D(
-                        AcrossT * 1.8f + LayerT * 0.31f,
-                        LoopT * 1.45f + LayerT * 0.37f));
-                    const float CoreDistance = (LoopT - 0.47f) / 0.24f;
+                        AcrossT * 5.4f + LayerT * 0.31f,
+                        LoopT * 3.6f + LayerT * 0.37f));
+                    const float CoreDistance = (ProfileLoopT - 0.57f) / 0.18f;
                     const float AeratedCore =
                         FMath::Exp(-CoreDistance * CoreDistance) *
                         FMath::Lerp(0.52f, 0.95f, Intensity) * Breakup;
+                    const float FoamBrightness = FMath::Lerp(
+                        0.62f, 0.86f, AeratedCore);
                     RollerColors.Add(FLinearColor(
-                        FMath::Lerp(0.58f, 0.96f, Intensity),
-                        0.18f + 0.12f * LayerT,
-                        AeratedCore,
-                        EdgeTaper * LoopFeather * Breakup * LayerOpacity));
+                        FoamBrightness * 0.94f,
+                        FoamBrightness,
+                        FoamBrightness * 0.98f,
+                        EdgeTaper * LoopFeather *
+                            FMath::Lerp(0.84f, 1.0f, AeratedCore)));
 
                     constexpr float ProfileDerivativeStep = 0.01f;
-                    const float PreviousLoopT = FMath::Max(
-                        0.0f, LoopT - ProfileDerivativeStep);
-                    const float NextLoopT = FMath::Min(
-                        1.0f, LoopT + ProfileDerivativeStep);
+                    const float PreviousLoopT = FMath::Lerp(
+                        0.48f,
+                        1.0f,
+                        FMath::Max(0.0f, LoopT - ProfileDerivativeStep));
+                    const float NextLoopT = FMath::Lerp(
+                        0.48f,
+                        1.0f,
+                        FMath::Min(1.0f, LoopT + ProfileDerivativeStep));
                     FVector2D PreviousProfile =
                         ComputeBreakingRollerVolumeProfileCentimeters(
                             PreviousLoopT, Intensity, LayerT);
                     FVector2D NextProfile =
                         ComputeBreakingRollerVolumeProfileCentimeters(
                             NextLoopT, Intensity, LayerT);
-                    PreviousProfile.Y *= FMath::Lerp(0.45f, 1.0f, EdgeTaper);
-                    NextProfile.Y *= FMath::Lerp(0.45f, 1.0f, EdgeTaper);
+                    PreviousProfile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
+                    NextProfile.Y *= FMath::Lerp(0.78f, 1.0f, EdgeTaper);
                     const FVector LongitudinalTangent =
                         Downstream * (NextProfile.X - PreviousProfile.X) +
                         FVector::UpVector * (NextProfile.Y - PreviousProfile.Y);

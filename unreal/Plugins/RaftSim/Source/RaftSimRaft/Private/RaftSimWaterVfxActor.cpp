@@ -2664,8 +2664,12 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
         ActiveRapidRollerNiagaraCount = 0;
         return;
     }
-    BreakingSurface->SetBreakingRollerVolumeRenderingEnabled(
-        !bProductionNiagaraReady);
+    // Niagara supplies detached spray and entrained-air breakup, but it cannot
+    // form the continuous multi-valued sheet of an overturning hydraulic. Keep
+    // the solver-anchored, non-colliding roller body present in production so
+    // the particles have connected water beneath them instead of floating over
+    // a single-valued heightfield.
+    BreakingSurface->SetBreakingRollerVolumeRenderingEnabled(true);
     TArray<ARaftSimWaterSurfaceActor::FBreakingSite> Sites;
     BreakingSurface->GetBreakingSites(Sites);
     if (Sites.IsEmpty())
