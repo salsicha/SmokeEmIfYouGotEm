@@ -65,43 +65,147 @@ FPresentationStandingWave ComputePresentationStandingWave(
         0.0f,
         1.0f);
 
-    const float PhaseA =
-        RiverCoordinatesMeters.X * 0.19f + RiverCoordinatesMeters.Y * 0.61f;
-    const float PhaseB =
-        RiverCoordinatesMeters.X * 0.071f - RiverCoordinatesMeters.Y * 0.37f;
-    // Two shorter, oblique river-coordinate bands break up the former broad
-    // analytical sheet. Their combined six-centimetre envelope is activated
-    // only by sampled hydraulic energy and is resolvable on the refined 1.5 m
-    // presentation mesh. It remains deterministic and render-only.
-    const float PhaseC =
-        RiverCoordinatesMeters.X * 0.79f + RiverCoordinatesMeters.Y * 1.31f;
-    const float PhaseD =
-        RiverCoordinatesMeters.X * 1.12f - RiverCoordinatesMeters.Y * 0.88f;
-    const float SinA = FMath::Sin(PhaseA);
-    const float SinB = FMath::Sin(PhaseB);
-    const float SinC = FMath::Sin(PhaseC);
-    const float SinD = FMath::Sin(PhaseD);
-    const float CosA = FMath::Cos(PhaseA);
-    const float CosB = FMath::Cos(PhaseB);
-    const float CosC = FMath::Cos(PhaseC);
-    const float CosD = FMath::Cos(PhaseD);
-
     FPresentationStandingWave Result;
-    Result.DisplacementMeters =
-        0.018f * SinA +
-        HydraulicEnergy *
-            (0.115f * SinA + 0.055f * SinB +
-                0.040f * SinC + 0.020f * SinD);
-    Result.StationSlope =
-        0.018f * 0.19f * CosA +
-        HydraulicEnergy *
-            (0.115f * 0.19f * CosA + 0.055f * 0.071f * CosB +
-                0.040f * 0.79f * CosC + 0.020f * 1.12f * CosD);
-    Result.LateralSlope =
-        0.018f * 0.61f * CosA +
-        HydraulicEnergy *
-            (0.115f * 0.61f * CosA - 0.055f * 0.37f * CosB +
-                0.040f * 1.31f * CosC - 0.020f * 0.88f * CosD);
+    auto AccumulateBand = [&Result](
+                              float AmplitudeMeters,
+                              float Envelope,
+                              float EnvelopeStationDerivative,
+                              float EnvelopeLateralDerivative,
+                              float Phase,
+                              float PhaseStationDerivative,
+                              float PhaseLateralDerivative)
+    {
+        const float SinPhase = FMath::Sin(Phase);
+        const float CosPhase = FMath::Cos(Phase);
+        Result.DisplacementMeters +=
+            AmplitudeMeters * Envelope * SinPhase;
+        Result.StationSlope +=
+            AmplitudeMeters *
+            (EnvelopeStationDerivative * SinPhase +
+                Envelope * CosPhase * PhaseStationDerivative);
+        Result.LateralSlope +=
+            AmplitudeMeters *
+            (EnvelopeLateralDerivative * SinPhase +
+                Envelope * CosPhase * PhaseLateralDerivative);
+    };
+
+    const float StationM = RiverCoordinatesMeters.X;
+    const float LateralM = RiverCoordinatesMeters.Y;
+
+    // Calm water retains two small phase-warped ripples instead of sharing a
+    // large diagonal phase with the rapid response. Their combined envelope
+    // remains the authored 1.8 cm maximum.
+    const float CalmWarpA = StationM * 0.11f - LateralM * 0.19f;
+    const float CalmPhaseA =
+        StationM * 0.73f + LateralM * 0.27f +
+        0.16f * FMath::Sin(CalmWarpA);
+    AccumulateBand(
+        0.011f,
+        1.0f,
+        0.0f,
+        0.0f,
+        CalmPhaseA,
+        0.73f + 0.16f * 0.11f * FMath::Cos(CalmWarpA),
+        0.27f - 0.16f * 0.19f * FMath::Cos(CalmWarpA));
+
+    const float CalmWarpB = StationM * 0.23f + LateralM * 0.13f;
+    const float CalmPhaseB =
+        StationM * 1.21f - LateralM * 0.33f +
+        0.10f * FMath::Sin(CalmWarpB);
+    AccumulateBand(
+        0.007f,
+        1.0f,
+        0.0f,
+        0.0f,
+        CalmPhaseB,
+        1.21f + 0.10f * 0.23f * FMath::Cos(CalmWarpB),
+        -0.33f + 0.10f * 0.13f * FMath::Cos(CalmWarpB));
+
+    // Build the energetic surface from flow-aligned, phase-warped crest
+    // packets. The former dominant band put 11.5 cm into one continuous
+    // diagonal sinusoid. This field limits every individual rapid band to
+    // 6.5 cm, varies its energy over the reach, and uses incommensurate warps
+    // so the pattern does not visibly tile at playable scales.
+    const float PacketWarp = StationM * 0.013f - LateralM * 0.091f;
+    const float PacketPhase =
+        StationM * 0.041f + LateralM * 0.067f +
+        0.60f * FMath::Sin(PacketWarp);
+    const float PacketPhaseStationDerivative =
+        0.041f + 0.60f * 0.013f * FMath::Cos(PacketWarp);
+    const float PacketPhaseLateralDerivative =
+        0.067f - 0.60f * 0.091f * FMath::Cos(PacketWarp);
+    const float PacketSignal = 0.5f + 0.5f * FMath::Sin(PacketPhase);
+    const float PacketSignalStationDerivative =
+        0.5f * FMath::Cos(PacketPhase) * PacketPhaseStationDerivative;
+    const float PacketSignalLateralDerivative =
+        0.5f * FMath::Cos(PacketPhase) * PacketPhaseLateralDerivative;
+    const float PrimaryPacket =
+        0.18f + 0.82f * PacketSignal * PacketSignal;
+    const float PrimaryPacketStationDerivative =
+        1.64f * PacketSignal * PacketSignalStationDerivative;
+    const float PrimaryPacketLateralDerivative =
+        1.64f * PacketSignal * PacketSignalLateralDerivative;
+    const float SecondaryPacket = 1.0f - 0.45f * PacketSignal;
+    const float SecondaryPacketStationDerivative =
+        -0.45f * PacketSignalStationDerivative;
+    const float SecondaryPacketLateralDerivative =
+        -0.45f * PacketSignalLateralDerivative;
+
+    const float PrimaryWarpA = StationM * 0.063f - LateralM * 0.14f;
+    const float PrimaryWarpB = StationM * 0.017f + LateralM * 0.23f;
+    const float PrimaryPhase =
+        StationM * 0.58f + LateralM * 0.09f +
+        0.35f * FMath::Sin(PrimaryWarpA) +
+        0.22f * FMath::Sin(PrimaryWarpB);
+    AccumulateBand(
+        0.065f,
+        HydraulicEnergy * PrimaryPacket,
+        HydraulicEnergy * PrimaryPacketStationDerivative,
+        HydraulicEnergy * PrimaryPacketLateralDerivative,
+        PrimaryPhase,
+        0.58f + 0.35f * 0.063f * FMath::Cos(PrimaryWarpA) +
+            0.22f * 0.017f * FMath::Cos(PrimaryWarpB),
+        0.09f - 0.35f * 0.14f * FMath::Cos(PrimaryWarpA) +
+            0.22f * 0.23f * FMath::Cos(PrimaryWarpB));
+
+    const float SecondaryWarp = StationM * 0.033f + LateralM * 0.17f;
+    const float SecondaryPhase =
+        StationM * 1.03f - LateralM * 0.12f +
+        0.28f * FMath::Sin(SecondaryWarp);
+    AccumulateBand(
+        0.043f,
+        HydraulicEnergy * SecondaryPacket,
+        HydraulicEnergy * SecondaryPacketStationDerivative,
+        HydraulicEnergy * SecondaryPacketLateralDerivative,
+        SecondaryPhase,
+        1.03f + 0.28f * 0.033f * FMath::Cos(SecondaryWarp),
+        -0.12f + 0.28f * 0.17f * FMath::Cos(SecondaryWarp));
+
+    const float DetailWarp = StationM * 0.12f - LateralM * 0.33f;
+    const float DetailPhase =
+        StationM * 1.47f + LateralM * 0.21f +
+        0.16f * FMath::Sin(DetailWarp);
+    AccumulateBand(
+        0.026f,
+        HydraulicEnergy,
+        0.0f,
+        0.0f,
+        DetailPhase,
+        1.47f + 0.16f * 0.12f * FMath::Cos(DetailWarp),
+        0.21f - 0.16f * 0.33f * FMath::Cos(DetailWarp));
+
+    const float CrossWarp = StationM * 0.027f + LateralM * 0.19f;
+    const float CrossPhase =
+        StationM * 0.36f - LateralM * 0.31f +
+        0.25f * FMath::Sin(CrossWarp);
+    AccumulateBand(
+        0.016f,
+        HydraulicEnergy,
+        0.0f,
+        0.0f,
+        CrossPhase,
+        0.36f + 0.25f * 0.027f * FMath::Cos(CrossWarp),
+        -0.31f + 0.25f * 0.19f * FMath::Cos(CrossWarp));
     return Result;
 }
 

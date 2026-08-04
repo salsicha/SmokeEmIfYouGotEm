@@ -49,6 +49,19 @@ CONNECTED_PLUNGE_V1_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_connected_plunge_v1_review.json"
 )
+NONPERIODIC_LIVE_WAVE_V1_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_nonperiodic_live_wave_v1_review.json"
+)
+LATER_WATER_MILESTONE_SUPERSEDED_PATHS = {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+    "RaftSimWaterSurfaceTest.cpp",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+    "RaftSimTroublemakerMapTest.cpp",
+}
 
 
 def _load(path: Path) -> dict:
@@ -197,6 +210,8 @@ def test_zambezi_solver_driven_rapid_vfx_review_is_hash_locked():
     for relative, expected in review["hash_locked_unchanged_authority"].items():
         assert _sha256(REPO_ROOT / relative) == expected
     for relative, expected in review["changed_source_hashes"].items():
+        if relative in LATER_WATER_MILESTONE_SUPERSEDED_PATHS:
+            continue
         assert _sha256(REPO_ROOT / relative) == expected
     assert len(review["required_external_acceptance_gates"]) == 7
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
@@ -234,6 +249,8 @@ def test_zambezi_refined_live_surface_review_is_hash_locked_and_honest():
     for relative, expected in review["hash_locked_unchanged_authority"].items():
         assert _sha256(REPO_ROOT / relative) == expected
     for relative, expected in review["changed_source_hashes"].items():
+        if relative in LATER_WATER_MILESTONE_SUPERSEDED_PATHS:
+            continue
         assert _sha256(REPO_ROOT / relative) == expected
     assert len(review["remaining_photoreal_defects"]) >= 5
     assert len(review["required_external_acceptance_gates"]) == 7
@@ -280,12 +297,61 @@ def test_zambezi_connected_plunge_review_is_hash_locked_and_honest():
             artifact = review["visual_evidence"][camera][key]
             assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
     for relative, expected in review["changed_source_hashes"].items():
+        if relative in LATER_WATER_MILESTONE_SUPERSEDED_PATHS:
+            continue
         assert _sha256(REPO_ROOT / relative) == expected
     assert len(review["rejected_iterations"]) == 4
     assert len(review["remaining_photoreal_defects"]) >= 5
     assert len(review["required_external_acceptance_gates"]) == 7
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert CONNECTED_PLUNGE_V1_REVIEW.as_posix() in readme
+
+
+def test_zambezi_nonperiodic_live_wave_review_is_hash_locked_and_honest():
+    review = _load(REPO_ROOT / NONPERIODIC_LIVE_WAVE_V1_REVIEW)
+    assert review["schema"] == (
+        "raftsim.environment.zambezi_nonperiodic_live_wave_review.v1"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["technical_candidate_retained"] is True
+    assert review["decision"]["all_six_river_maps_runnable"] is True
+    assert review["decision"]["former_dominant_periodic_band_removed"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["map_or_content_package_changed"] is False
+    assert review["decision"]["cooked_water_or_hydraulic_authority_changed"] is False
+    assert review["decision"]["collision_buoyancy_d3_or_d4_changed"] is False
+    implementation = review["implementation"]
+    assert implementation["maximum_individual_active_band_m"] <= 0.065
+    assert implementation["bounded_theoretical_standing_wave_envelope_m"] <= 0.168
+    assert implementation["affects_water_sampling"] is False
+    assert implementation["affects_collision"] is False
+    assert implementation["affects_buoyancy_or_forces"] is False
+    maps = review["runtime_evidence"]["p4_all_river_map_loads"]["maps"]
+    assert review["runtime_evidence"]["p4_all_river_map_loads"]["result"] == (
+        "6/6 passed"
+    )
+    assert len(maps) == 6
+    assert all(
+        evidence["standing_wave_abs_max_m"] <= 0.168
+        for evidence in maps.values()
+    )
+    camera = review["visual_evidence"]["fixed_camera"]
+    assert camera["retained"]["standing_wave_abs_max_m"] < (
+        camera["baseline"]["standing_wave_abs_max_m"]
+    )
+    assert camera["comparison"]["standing_wave_maximum_reduction_fraction"] > 0.5
+    for key in ("baseline", "retained"):
+        artifact = camera[key]
+        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    assert _sha256(REPO_ROOT / review["map_integrity"]["path"]) == (
+        review["map_integrity"]["sha256"]
+    )
+    for relative, expected in review["changed_source_hashes"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    assert len(review["remaining_photoreal_defects"]) >= 6
+    assert len(review["required_external_acceptance_gates"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert NONPERIODIC_LIVE_WAVE_V1_REVIEW.as_posix() in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():
@@ -796,8 +862,12 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     ).read_text(encoding="utf-8")
     assert "ResolvedVertexSpacingMeters" in runtime_water_cpp
     assert "PresentationAnalysisStride" in runtime_water_cpp
-    assert "const float PhaseC" in runtime_water_cpp
-    assert "const float PhaseD" in runtime_water_cpp
+    assert "const float PrimaryPacket" in runtime_water_cpp
+    assert "const float PrimaryPhase" in runtime_water_cpp
+    assert "const float SecondaryPhase" in runtime_water_cpp
+    assert "const float DetailPhase" in runtime_water_cpp
+    assert "const float CrossPhase" in runtime_water_cpp
+    assert "0.065f" in runtime_water_cpp
 
     source_art = REPO_ROOT / "unreal/SourceArt/RaftSim/Water/ZambeziBatoka"
     expected_assets = {

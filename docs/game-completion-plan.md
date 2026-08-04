@@ -4230,3 +4230,14 @@ path is verified, and the completion goal can be marked complete.
   analytical swell, so the milestone is retained only as technical progress;
   measured hydraulics, a convincing aerated hole/recirculating body, final
   water art, performance, and every named external approval remain open.
+- Nonperiodic live-wave V1 replaces the shared renderer's dominant 11.5 cm
+  diagonal sinusoid with four hydraulically activated station-dominant crest
+  bands, a smooth reach-scale energy packet, incommensurate phase warps, and
+  analytical presentation normals. The theoretical displacement bound drops
+  from 24.8 cm to 16.8 cm; the exact-camera Zambezi runtime maximum drops from
+  23.43 cm to 10.46 cm. The editor build, P2 1/1, and complete six-map P4 suite
+  pass without changing saved maps, solver samples, wet/dry state, collision,
+  buoyancy, D3, or D4. The retained image removes the continuous analytical
+  band, but the low-resolution sampled hydraulic rise, aerated-hole and
+  recirculation art, spray/mist, measured seasonal hydraulics, platform
+  performance, and every named external approval remain open.

@@ -1,0 +1,109 @@
+{
+  "schema": "raftsim.environment.zambezi_nonperiodic_live_wave_review.v1",
+  "reviewed_utc": "2026-08-04",
+  "status": "retained_bounded_technical_improvement_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "technical_candidate_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_fidelity_promoted": false,
+    "all_six_river_maps_runnable": true,
+    "matched_visual_review_completed": true,
+    "former_dominant_periodic_band_removed": true,
+    "map_or_content_package_changed": false,
+    "cooked_water_or_hydraulic_authority_changed": false,
+    "collision_buoyancy_d3_or_d4_changed": false
+  },
+  "implementation": {
+    "runtime_owner": "ARaftSimWaterSurfaceActor::ComputePresentationStandingWave",
+    "scope": "shared render-only live-water presentation on all runnable rivers",
+    "former_dominant_band": "0.115 m sinusoid with phase 0.19 * station + 0.61 * lateral",
+    "replacement": "two calm phase-warped ripples plus four hydraulically activated incommensurate, phase-warped crest bands with a smooth reach-scale energy packet",
+    "crest_alignment": "primary and secondary phases are station-dominant so crests remain approximately cross-channel rather than forming one bank-to-bank diagonal ramp",
+    "maximum_individual_active_band_m": 0.065,
+    "bounded_theoretical_standing_wave_envelope_m": 0.168,
+    "calm_ripple_envelope_m": 0.018,
+    "phase_and_envelope_derivatives": "analytical station and lateral derivatives feed the presentation normal",
+    "deterministic": true,
+    "affects_water_sampling": false,
+    "affects_collision": false,
+    "affects_buoyancy_or_forces": false,
+    "affects_d3_d4_flip_wrap_pin_damage_rescue_or_progression": false
+  },
+  "runtime_evidence": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "p2_water_surface_renders": "1/1 passed",
+    "p2_contracts": [
+      "deterministic displacement",
+      "0.1681 m bound",
+      "1.5 m refined-grid phase change",
+      "no repeat at the former dominant 33.07 m wavelength",
+      "0.0181 m calm-water bound"
+    ],
+    "p4_all_river_map_loads": {
+      "result": "6/6 passed",
+      "maps": {
+        "L_Hance": {"standing_wave_abs_max_m": 0.0946, "active_breaking_sites": 9},
+        "L_LavaCanyon": {"standing_wave_abs_max_m": 0.0725, "active_breaking_sites": 2},
+        "L_Terminator": {"standing_wave_abs_max_m": 0.0774, "active_breaking_sites": 21},
+        "L_Troublemaker": {"standing_wave_abs_max_m": 0.0884, "active_breaking_sites": 3},
+        "L_UpperHuacas": {"standing_wave_abs_max_m": 0.0266, "active_breaking_sites": 1},
+        "L_Zambezi": {"standing_wave_abs_max_m": 0.1046, "active_breaking_sites": 10}
+      },
+      "known_environment_warning": "offline generate_204 timeout while loading Zambezi"
+    }
+  },
+  "visual_evidence": {
+    "method": "Separate deterministic five-second 1280x720 Metal captures at scalability 2 use the identical saved map and fixed camera. Image metrics are descriptive and are not photoreal acceptance thresholds.",
+    "fixed_camera": {
+      "world_location_cm": [329839.27, -410612.4, 15666.84],
+      "pitch_degrees": -14.61,
+      "yaw_degrees": 166.95,
+      "baseline": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_before.png",
+        "sha256": "6ccfed56174ed30f96198d4005857356eaa01e1ad64034cdd3c46e7166ad5759",
+        "standing_wave_abs_max_m": 0.2343
+      },
+      "retained": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1.png",
+        "sha256": "38411673fd44b1d60191742d6fb3c9a085e1568ed52466c049087ffa3097556b",
+        "standing_wave_abs_max_m": 0.1046
+      },
+      "comparison": {
+        "standing_wave_maximum_reduction_fraction": 0.5536,
+        "full_frame_mean_absolute_rgb_delta_0_255": 9.1682,
+        "water_rows_215_719_mean_absolute_rgb_delta_0_255": 12.8809,
+        "upper_bank_rows_0_209_mean_absolute_rgb_delta_0_255": 0.3979,
+        "changed_pixel_fraction_max_channel_over_8": 0.3140
+      }
+    },
+    "finding": "The former continuous analytical diagonal band is removed and the center water now breaks into shorter, lower phase-warped crests. The large right-edge rise remains because it is present in the sampled surface and bounded hydraulic-relief term; this milestone intentionally does not flatten solver-authored geometry. Water still lacks a convincing high-resolution aerated hole, recirculating body, spray, and measured seasonal behavior, so photoreal acceptance remains open."
+  },
+  "map_integrity": {
+    "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+    "sha256": "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
+  },
+  "changed_source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "dce6237207244d0044c93631aa441baa690c35771aa7b3b7fb8e092bc45791fd",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "05451c199405931389546f1cfe0fa6f1e142b1ee481dbd67a553134e11fd8b0a",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "d8d3978358fe31c5fcd0ad941f0da29d320a88c5a19cabc8955d2267d150c18f",
+    "physics/tests/test_zambezi_reference_map.py": "4d83c6e57cd8855c5c1c668db38e95d092ee8e9786e1a1b6bccd9d79419eeaa7"
+  },
+  "remaining_photoreal_defects": [
+    "The retained sampled hydraulic rise is still broad and smooth because the source field and bathymetry are low resolution and procedural rather than seasonally measured Zambezi data.",
+    "The strongest rapid does not yet present a convincing aerated hole, recirculating entrained-air volume, converging tongues, or collision-aware spray and mist.",
+    "The phase-warped displacement is a deterministic presentation layer, not a validated free-surface hydraulic simulation.",
+    "The 30 m source terrain, synthetic ground cover, hard waterline transitions, and sparse near-field geology remain visibly procedural.",
+    "Raft, equipment, character animation, paddle contact, and final foam occlusion still require named lifelike art acceptance.",
+    "A target-hardware GPU profile and named multi-discipline art review have not accepted the combined terrain, water, VFX, raft, and crew presentation."
+  ],
+  "required_external_acceptance_gates": [
+    "local Zambezi guide approval of rapid stations, lines, portages, access, hazards, rescue routes, and seasonal behavior",
+    "geospatial approval of centerline, horizontal and vertical datums, high-resolution terrain, bank breaklines, rapid rocks, and bathymetry",
+    "rights and distribution approval for the supplied map PDF, height image, reference imagery, and production derivatives",
+    "seasonal-flow and rapid-specific hydraulic validation against observed Zambezi behavior",
+    "southern African gorge geology, ecology, and environment-art approval",
+    "named photoreal water-VFX, raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ]
+}

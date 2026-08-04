@@ -105,6 +105,15 @@ crest breakup without dome/card artifacts, but the result remains a bounded
 technical improvement rather than a photoreal overturning-water pass; evidence
 and open gates are in the
 [connected plunge review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json).
+The shared live-water displacement now replaces its former dominant 11.5 cm
+diagonal sinusoid with flow-aligned, phase-warped crest packets. The
+presentation envelope falls from 24.8 cm to 16.8 cm; the matched Zambezi
+runtime maximum falls from 23.43 cm to 10.46 cm while sampled surface relief,
+collision, buoyancy, and D3/D4 authority remain unchanged. P2 passes and all
+six runnable river maps pass P4. The retained frame removes the repeated
+analytical band, but the low-resolution sampled rise and missing aerated hole,
+recirculation, and collision-aware spray still fail photoreal promotion. See
+the [nonperiodic live-wave review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json).
 Lava Canyon's August 3 V2 optical pass now makes that solver-clipped core
 river-local: a project-owned flow normal, solver-masked foam lace, physical
 transmission, and restrained live-surface coverage replace the inherited pale
