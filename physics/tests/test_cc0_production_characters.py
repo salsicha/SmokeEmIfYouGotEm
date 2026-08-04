@@ -40,6 +40,11 @@ PALM_ALIGNED_GRIP_REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_cc0_palm_aligned_grip_v1_review.json"
 )
+HEAD_SHOULDER_CLEARANCE_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_cc0_head_shoulder_clearance_v1_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -328,6 +333,11 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
         / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
         "RaftSimCrewAvatarActor.h"
     ).read_text(encoding="utf-8")
+    cc0_header = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+        "RaftSimCC0CrewVisualActor.h"
+    ).read_text(encoding="utf-8")
     adapter = (
         REPO_ROOT
         / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
@@ -359,6 +369,10 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "bUpperTGrip" in adapter
     assert "MeasureMinimumPaddleFingerClosureDegrees" in adapter
     assert "MeasureMinimumPaddleThumbClosureDegrees" in adapter
+    assert "ProductionHeadClearanceLiftCm = 5.0f" in adapter
+    assert "const FVector PresentedHeadCenter" in adapter
+    assert "Pose.HeadCenterCm + TorsoUp * ProductionHeadClearanceLiftCm" in adapter
+    assert "GetPresentedHeadShoulderClearanceCm() const" in cc0_header
     assert "ApplyProductionBodyMaterialOverrides(Body, Mesh)" in adapter
     assert "M_RaftSim_Wetsuit.M_RaftSim_Wetsuit" in adapter
     assert 'SlotName.Contains(TEXT("Wetsuit")' in adapter
@@ -448,6 +462,8 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "runtime_upper_paddle_finger_closure_degrees" in capture
     assert "runtime_lower_paddle_finger_closure_degrees" in capture
     assert "runtime_paddle_thumb_closure_degrees" in capture
+    assert "head_shoulder_clearance_cm < 19.5" in capture
+    assert "runtime_presented_head_shoulder_clearance_cm" in capture
     assert '"face": (' in capture
     assert "get_solved_face_forward_world_vector()" in capture
     assert "runtime_eye_materials" in capture
@@ -502,6 +518,7 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "It->GetMinimumUpperPaddleFingerClosureDegrees() >= 120.0f" in automation
     assert "It->GetMinimumLowerPaddleFingerClosureDegrees() >= 210.0f" in automation
     assert "It->GetMinimumPaddleThumbClosureDegrees() >= 50.0f" in automation
+    assert "HeadShoulderClearanceCm >= 9.5f" in automation
     assert 'TEXT("%s %s detail is paired to head-dominant facial Skin")' in automation
     assert "P95ReferenceSeparationCm <= 1.25f" in automation
     assert "It->HasExclusiveCC0BodyOwnership()" in automation
@@ -1105,9 +1122,90 @@ def test_opposed_thumb_glove_v3_is_hash_verified_and_fail_closed() -> None:
     assert grip_m5_payload["succeeded"] == 1
     assert grip_m5_payload["succeededWithWarnings"] == 0
     assert grip_m5_payload["failed"] == 0
+    superseded_grip_sources = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+            "RaftSimM5ProductionQualityTest.cpp"
+        ),
+        "unreal/Scripts/capture_cc0_production_roster.py",
+    }
     for source_relpath, expected_hash in grip_review[
         "implementation_sha256"
     ].items():
+        if source_relpath in superseded_grip_sources:
+            assert (REPO_ROOT / source_relpath).is_file()
+            assert len(expected_hash) == 64
+            continue
         assert _sha256(REPO_ROOT / source_relpath) == expected_hash
     assert len(grip_review["rejected_iterations"]) == 4
     assert len(grip_review["open_gates"]) == 3
+
+
+def test_cc0_head_shoulder_clearance_v1_is_renderer_verified_and_fail_closed() -> None:
+    review = json.loads(
+        HEAD_SHOULDER_CLEARANCE_REVIEW_PATH.read_text(encoding="utf-8")
+    )
+    assert review["schema"] == "raftsim.m9.cc0_head_shoulder_clearance_review.v1"
+    assert review["passed"] is False
+    assert review["decision"] == {
+        "technical_candidate_passed": True,
+        "runtime_rolled_out": True,
+        "matched_visual_improvement_retained": True,
+        "production_promoted": False,
+        "photoreal_acceptance_passed": False,
+        "human_approved": False,
+    }
+
+    measured = review["measured_clearance"]
+    assert measured["render_head_lift_cm"] == 5.0
+    assert measured["candidate_minimum_presented_head_shoulder_clearance_cm"] >= 19.5
+    assert measured["seated_capture_minimum_cm"] == 19.5
+    assert measured["m5_dynamic_pose_minimum_cm"] == 9.5
+    assert abs(
+        measured["candidate_minimum_presented_head_shoulder_clearance_cm"]
+        - measured["baseline_minimum_presented_head_shoulder_clearance_cm_inferred"]
+        - measured["render_head_lift_cm"]
+    ) < 1.0e-6
+
+    evidence_dir = REPO_ROOT / review["renderer_evidence"]["directory"]
+    candidate_roster = json.loads(
+        (evidence_dir / "candidate_roster_capture.json").read_text(encoding="utf-8")
+    )
+    assert candidate_roster["status"] == "capture_complete"
+    assert len(candidate_roster["characters"]) == 5
+    assert candidate_roster["minimum_presented_head_shoulder_clearance_cm"] == (
+        measured["candidate_minimum_presented_head_shoulder_clearance_cm"]
+    )
+    for character in candidate_roster["characters"]:
+        assert character["runtime_presented_head_shoulder_clearance_cm"] >= 19.5
+        assert character["runtime_helmet_head_error_cm"] <= 1.0e-6
+        assert character["runtime_helmet_forward_alignment"] >= 0.999
+        assert character["runtime_paddle_grip_anchor_error_cm"] <= 0.01
+
+    for relative, expected_hash in review["implementation_sha256"].items():
+        assert _sha256(REPO_ROOT / relative) == expected_hash
+    for relative, expected_hash in review["evidence_sha256"].items():
+        assert _sha256(REPO_ROOT / relative) == expected_hash
+
+    m5 = json.loads((evidence_dir / "m5.json").read_text(encoding="utf-8-sig"))
+    assert m5["succeeded"] == 1
+    assert m5["succeededWithWarnings"] == 0
+    assert m5["failed"] == 0
+    p4 = json.loads(
+        (evidence_dir / "p4_all_river_maps.json").read_text(encoding="utf-8-sig")
+    )
+    assert p4["succeeded"] == 0
+    assert p4["succeededWithWarnings"] == 6
+    assert p4["failed"] == 0
+    assert {test["fullTestPath"] for test in p4["tests"]} == {
+        "RaftSim.P4.RiverMapLoads.L_Troublemaker",
+        "RaftSim.P4.RiverMapLoads.L_Hance",
+        "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+        "RaftSim.P4.RiverMapLoads.L_Terminator",
+        "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+        "RaftSim.P4.RiverMapLoads.L_Zambezi",
+    }
+    assert len(review["open_external_acceptance_gates"]) == 7
+    assert set(review["reviewers"].values()) == {None}

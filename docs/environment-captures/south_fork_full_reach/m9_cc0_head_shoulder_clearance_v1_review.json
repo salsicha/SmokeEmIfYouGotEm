@@ -1,0 +1,154 @@
+{
+  "schema": "raftsim.m9.cc0_head_shoulder_clearance_review.v1",
+  "recorded_local_date": "2026-08-04",
+  "passed": false,
+  "decision": {
+    "technical_candidate_passed": true,
+    "runtime_rolled_out": true,
+    "matched_visual_improvement_retained": true,
+    "production_promoted": false,
+    "photoreal_acceptance_passed": false,
+    "human_approved": false
+  },
+  "scope": {
+    "shipping_visual_path": "ARaftSimCC0CrewVisualActor",
+    "characters": 5,
+    "pose": "seated_idle",
+    "change": "Lift the rendered head pivot 5 cm along the solved torso-up axis before driving the neck/head bones.",
+    "helmet_placement": "Unchanged ownership: the live rendered-eye anchor still drives helmet fit.",
+    "excluded_authority": [
+      "gameplay host pose",
+      "collision",
+      "crew mass",
+      "hand targets",
+      "paddle targets",
+      "raft dynamics",
+      "rescue state"
+    ]
+  },
+  "measured_clearance": {
+    "render_head_lift_cm": 5.0,
+    "candidate_minimum_presented_head_shoulder_clearance_cm": 21.931501388549805,
+    "baseline_minimum_presented_head_shoulder_clearance_cm_inferred": 16.931501388549805,
+    "seated_capture_minimum_cm": 19.5,
+    "m5_dynamic_pose_minimum_cm": 9.5,
+    "inference_basis": "PresentedHeadCenter equals the unchanged host HeadCenter plus exactly 5 cm along the same normalized TorsoUp used by the clearance projection; ShoulderCenter is unchanged."
+  },
+  "runtime_invariants": {
+    "candidate_capture_status": "capture_complete",
+    "captured_character_count": 5,
+    "minimum_helmet_forward_alignment": 1.0,
+    "maximum_helmet_head_error_cm": 7.311353189543013e-10,
+    "maximum_paddle_grip_anchor_error_cm": 5.809241088172712e-9,
+    "exclusive_cc0_body_ownership": true,
+    "finite_pose": true
+  },
+  "renderer_evidence": {
+    "directory": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1",
+    "review_result": "Retain. The guide and broadest-shoulder crew member show a continuous visible neck between jaw and shoulder envelope without helmet drift or a stretched full-body silhouette.",
+    "remaining_visual_gaps": [
+      "The black wetsuit shoulder envelope remains broad and angular.",
+      "The PFD, shoulder, and neck transitions remain coarse procedural geometry.",
+      "Skin, facial expression, hair, clothing folds, and whole-body deformation remain below photoreal quality.",
+      "Moving-camera river integration still requires named art and product-owner approval."
+    ],
+    "pixel_change_metrics": {
+      "guide_full": {
+        "changed_fraction_over_8_rgb_levels": 0.013294,
+        "mean_absolute_rgb_difference": 0.7132,
+        "changed_bbox_xyxy": [786, 354, 1023, 819]
+      },
+      "guide_face": {
+        "changed_fraction_over_8_rgb_levels": 0.124517,
+        "mean_absolute_rgb_difference": 9.0842,
+        "changed_bbox_xyxy": [39, 0, 784, 883]
+      },
+      "guide_profile": {
+        "changed_fraction_over_8_rgb_levels": 0.010614,
+        "mean_absolute_rgb_difference": 0.6474,
+        "changed_bbox_xyxy": [523, 352, 931, 929]
+      },
+      "crew03_full": {
+        "changed_fraction_over_8_rgb_levels": 0.01097,
+        "mean_absolute_rgb_difference": 0.6979,
+        "changed_bbox_xyxy": [780, 380, 1035, 1003]
+      },
+      "crew03_face": {
+        "changed_fraction_over_8_rgb_levels": 0.115159,
+        "mean_absolute_rgb_difference": 9.3191,
+        "changed_bbox_xyxy": [13, 56, 786, 960]
+      }
+    }
+  },
+  "validation": {
+    "python": {
+      "command": "python -m pytest -q physics/tests/test_cc0_production_characters.py physics/tests/test_safety_gear_fallback.py",
+      "passed": 22,
+      "failed": 0
+    },
+    "editor_build": {
+      "target": "SmokeEmIfYouGotEmEditor Mac Development",
+      "compiled_actions": 6,
+      "result": "success"
+    },
+    "m5": {
+      "test": "RaftSim.M5.CrewAvatarPoseProduction",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/m5.json"
+    },
+    "all_runnable_river_maps": {
+      "test_root": "RaftSim.P4.RiverMapLoads",
+      "performed": 6,
+      "succeeded_with_accepted_warnings": 6,
+      "failed": 0,
+      "maps": [
+        "L_Troublemaker",
+        "L_Hance",
+        "L_UpperHuacas",
+        "L_Terminator",
+        "L_LavaCanyon",
+        "L_Zambezi"
+      ],
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/p4_all_river_maps.json"
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "c9cfbe77bc536121f5c6232908af785d0104d85183089a34143716e6741c9813",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "4cf41e7ffc76e03cd345b9c3880633ca9ac6f2a99659123e65053b499a5f131f",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "2e5c3c69c09849425232d489705ddcbc540e8a19bd1a209a9cff809b26472117",
+    "unreal/Scripts/capture_cc0_production_roster.py": "acbd5c7f7e1fe3917befd32078248fc1b5148d65a44d7c5d7557c43590eb09ac"
+  },
+  "evidence_sha256": {
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/baseline_guide_full.png": "57722e07b6b65186245fce4827e95e426c35482739a40b0649167f40199d186b",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/baseline_guide_face.png": "0dcc121276a59d474b2562ca67abf950f677e6f3d9d340cd5858f745a555691d",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/baseline_guide_profile.png": "bd61109fe34d5917c5ca2fcc33c0dc4361e744452028a55930cf1741fa6454cb",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/baseline_crew03_full.png": "4829e5b99098d6d37b0639994a82e174f56e9e6c149c3475ccd6494fe32e28ab",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/baseline_crew03_face.png": "c05d9ff78ff8f64cc984b0f6b23852a1c1b8ab38fc3cd7cd836fdeb008151c30",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/baseline_roster_capture.json": "1bd1fab270aea6fcfaeb282083398f0d250c9839a1e8f6471807ad2d9162e116",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/candidate_guide_full.png": "56d07c8eeef7ad1ced83be6961f806d302b1d6a6c2ddf78b25d24548ad9e3443",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/candidate_guide_face.png": "4e0184ed3651e88a57a0a54546db295791e01325036ecdfa0d619ab4deb772fe",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/candidate_guide_profile.png": "be89145214f0b8d0769a2d045c39e3ea4497e1e2a8ed40132db4dd7cf97fef27",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/candidate_crew03_full.png": "aa2a7a0b5a44fd433b1912ef5558a4c77342976d9a4256fadd6885bf46011fef",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/candidate_crew03_face.png": "16b2a443007af651ffc12bc8e22395d5b57f798bad724dfadd2b67019fc8ad80",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/candidate_roster_capture.json": "9aebdb9ced835109de1a5bd344b5b11389cf6b534bbcddc4935b5c9106873244",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/m5.json": "c817f84603934af7fd0b25b8a20135d7ed014f254030aa4bda0fd0fcbbf32573",
+    "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1/p4_all_river_maps.json": "2edafd792515bf8a006ef3917297c6b9c0785cdfdbe4e8d273e7675f131273ad"
+  },
+  "reviewers": {
+    "character_art": null,
+    "animation": null,
+    "safety_readability": null,
+    "product_owner": null
+  },
+  "open_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, and shoreline-contact presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, and rapid-geometry infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ]
+}

@@ -70,6 +70,13 @@ public:
         return MinimumPaddleThumbClosureDegrees;
     }
 
+    /** Render-only torso-up distance from the shoulder line to the presented head pivot. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetPresentedHeadShoulderClearanceCm() const
+    {
+        return PresentedHeadShoulderClearanceCm;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     bool HasActivePaddleGripPose() const
     {
@@ -155,5 +162,6 @@ private:
     float MinimumUpperPaddleFingerClosureDegrees = 0.0f;
     float MinimumLowerPaddleFingerClosureDegrees = 0.0f;
     float MinimumPaddleThumbClosureDegrees = 0.0f;
+    float PresentedHeadShoulderClearanceCm = 0.0f;
     static constexpr float BodyScale = 1.0f;
 };

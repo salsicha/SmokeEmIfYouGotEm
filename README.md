@@ -96,6 +96,14 @@ than species-reviewed ecology or photoreal approval. A matched local performance
 A/B measures a 0.418 ms p95 candidate delta but leaves the pre-existing full-map
 60 FPS, packaged-window, and VR gates open; exact visual/performance evidence and
 open gates are in the [scanned ground-cover review](docs/environment-captures/south_fork_full_reach/m9_cc0_scanned_ground_cover_v216_review.json).
+The current packaged CC0 character fallback also applies a 5 cm render-only
+head/neck lift along the solved torso-up axis. Its matched roster clears the
+seated head-to-shoulder threshold at a 21.9315 cm minimum without changing
+helmet alignment, hands, paddles, collision, mass, raft physics, or rescue
+authority. The [head/shoulder clearance review](docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1_review.json)
+retains this as a technical silhouette improvement, while coarse collar/PFD
+geometry, final anatomy and materials, photoreal promotion, and named human
+acceptance remain open.
 Pacuare's `L_UpperHuacas` is again a runnable map: a physical 600 m reach-local
 Landscape, the committed Upper Huacas cooked solver field, explicit vertical
 datum alignment, player raft/start, and the full vertical-slice game mode now

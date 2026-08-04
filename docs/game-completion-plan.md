@@ -3642,6 +3642,16 @@ path is verified, and the completion goal can be marked complete.
   cloth-like breakup and lower rigid gloss than V2, but regular procedural folds, abrupt
   torso/cuff integration, missing skinned deformation and identity tailoring, and open named
   character-art/guide acceptance keep photoreal promotion false.
+- CC0 head/shoulder clearance V1 moves only the rendered head and neck target 5 cm along the
+  already-solved torso-up axis. The shared gameplay pose, helmet-to-eye solve, hand and paddle
+  anchors, collision, mass, raft physics, and rescue state remain authoritative and unchanged.
+  Across all five seated identities, the minimum presented head-to-shoulder clearance rises
+  from an inferred 16.9315 cm baseline to a measured 21.9315 cm, clearing the 19.5 cm roster
+  threshold; M5 separately enforces a 9.5 cm lower envelope across dynamic and swimmer poses.
+  The exact editor build, 23 focused contracts, renderer roster, M5 gate, and all six runnable
+  P4 map gates pass. Matched closeups retain the continuous neck/shoulder improvement, but the
+  broad angular collar/PFD envelope, final anatomy and materials, photoreal promotion, and
+  named character-art/guide review remain open.
 - Runnable Batoka terrain integration makes the retained Zambezi V12 world-aligned basalt
   material and V13 bounded morphology part of normal map generation instead of an isolated
   comparison path. Four tagged, non-colliding render tiles receive deterministic lava-flow
