@@ -53,6 +53,10 @@ NONPERIODIC_LIVE_WAVE_V1_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_nonperiodic_live_wave_v1_review.json"
 )
+PLUNGE_POCKET_V1_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_plunge_pocket_v1_review.json"
+)
 ORGANIC_UPPER_SCARP_V17_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_organic_upper_scarp_v17_review.json"
@@ -583,6 +587,56 @@ def test_zambezi_nonperiodic_live_wave_review_is_hash_locked_and_honest():
     assert len(review["required_external_acceptance_gates"]) == 7
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert NONPERIODIC_LIVE_WAVE_V1_REVIEW.as_posix() in readme
+
+
+def test_zambezi_plunge_pocket_review_is_hash_locked_and_honest():
+    review = _load(REPO_ROOT / PLUNGE_POCKET_V1_REVIEW)
+    assert review["schema"] == "raftsim.environment.zambezi_plunge_pocket_review.v1"
+    assert review["passed"] is False
+    decision = review["decision"]
+    assert decision["technical_candidate_retained"] is True
+    assert decision["all_six_river_maps_runnable"] is True
+    assert decision["photoreal_acceptance_passed"] is False
+    assert decision["pixel_delta_attributable_to_geometry_change"] is False
+    assert decision["map_or_content_package_changed"] is False
+    assert decision["cooked_water_or_hydraulic_authority_changed"] is False
+    assert decision["collision_buoyancy_d3_or_d4_changed"] is False
+    implementation = review["implementation"]
+    assert implementation["maximum_sites_per_river"] == 3
+    assert implementation["maximum_per_site_depression_m"] <= 0.28
+    assert implementation["maximum_per_site_return_m"] <= 0.16
+    assert implementation["combined_depression_bound_m"] <= 0.30
+    assert implementation["combined_return_bound_m"] <= 0.18
+    assert implementation["affects_water_sampling"] is False
+    assert implementation["affects_wet_or_dry_mask"] is False
+    assert implementation["affects_collision"] is False
+    assert implementation["affects_buoyancy_or_forces"] is False
+    p4 = review["runtime_evidence"]["p4_all_river_map_loads"]
+    assert p4["result"] == "6/6 passed"
+    assert len(p4["maps"]) == 6
+    assert all(
+        evidence["maximum_plunge_pocket_sites"] <= 3
+        for evidence in p4["maps"].values()
+    )
+    assert review["runtime_evidence"]["zambezi_live_surface"][
+        "rapid_foam_vertices"
+    ] == 645
+    fixed_camera = review["visual_evidence"]["fixed_camera"]
+    for key in ("prior_runtime_reference", "retained"):
+        artifact = fixed_camera[key]
+        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    side = review["visual_evidence"]["close_side"]
+    assert _sha256(REPO_ROOT / side["path"]) == side["sha256"]
+    assert review["map_integrity"]["path"] == RUNNABLE_ZAMBEZI_MAP_PATH
+    assert review["map_integrity"]["sha256"] == _sha256(
+        REPO_ROOT / RUNNABLE_ZAMBEZI_MAP_PATH
+    )
+    for relative, expected in review["changed_source_hashes"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    assert len(review["remaining_photoreal_defects"]) >= 7
+    assert len(review["required_external_acceptance_gates"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert PLUNGE_POCKET_V1_REVIEW.as_posix() in readme
 
 
 def test_zambezi_organic_upper_scarp_v17_review_is_hash_locked_and_honest():

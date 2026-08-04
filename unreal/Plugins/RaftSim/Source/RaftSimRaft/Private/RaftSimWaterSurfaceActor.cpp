@@ -638,6 +638,63 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingRollerVolumeProfileCentimete
         CenterLiftCm + HeightRadiusCm * FMath::Sin(Theta));
 }
 
+FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float Intensity)
+{
+    const float SafeIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+    if (SafeIntensity <= KINDA_SMALL_NUMBER)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    // The accepted breaking site already proves a local supercritical-to-
+    // subcritical transition. Shape only its render surface into the minimum
+    // readable plan-view hydraulic structure: a compact dark plunge pocket,
+    // irregular side shoulders, and an aerated downstream return. The shape
+    // is sampled on the refined render grid and is not a claim about measured
+    // Zambezi bathymetry or seasonal hydraulics.
+    const float PlungeStation = (DownstreamMeters - 1.8f) / 2.2f;
+    const float PlungeAcross = AcrossMeters / 2.8f;
+    const float PlungeCore = FMath::Exp(
+        -(PlungeStation * PlungeStation + PlungeAcross * PlungeAcross));
+
+    const float ReturnStation = (DownstreamMeters - 5.0f) / 2.4f;
+    const float ReturnAcross = AcrossMeters / 3.4f;
+    const float AeratedReturn = FMath::Exp(
+        -(ReturnStation * ReturnStation + ReturnAcross * ReturnAcross));
+
+    const float ShoulderStation = (DownstreamMeters - 2.3f) / 3.2f;
+    const float ShoulderAcross =
+        (FMath::Abs(AcrossMeters) - 3.0f) / 1.15f;
+    const float BrokenShoulder = FMath::Exp(
+        -(ShoulderStation * ShoulderStation +
+            ShoulderAcross * ShoulderAcross));
+    const float ShoulderVariation = FMath::Clamp(
+        0.72f +
+            0.18f * FMath::Sin(DownstreamMeters * 2.17f + AcrossMeters * 1.31f) +
+            0.10f * FMath::Sin(DownstreamMeters * 4.03f - AcrossMeters * 2.27f),
+        0.36f,
+        1.0f);
+
+    const float DisplacementMeters = FMath::Clamp(
+        SafeIntensity *
+            (-0.30f * PlungeCore +
+                0.14f * AeratedReturn +
+                0.10f * BrokenShoulder * ShoulderVariation),
+        -0.28f * SafeIntensity,
+        0.16f * SafeIntensity);
+    const float FoamGeneration = FMath::Clamp(
+        SafeIntensity *
+            (0.16f * PlungeCore +
+                0.82f * AeratedReturn +
+                0.62f * BrokenShoulder * ShoulderVariation),
+        0.0f,
+        1.0f);
+    return FVector2D(DisplacementMeters, FoamGeneration);
+}
+
 void ARaftSimWaterSurfaceActor::BeginPlay()
 {
     Super::BeginPlay();
@@ -2586,6 +2643,92 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         if (!bTooClose)
         {
             BreakingSites.Add(Candidate);
+        }
+    }
+
+    // Give the three strongest accepted interior jumps a coherent plan-view
+    // plunge pocket beneath the connected crest-to-plunge membrane. The
+    // solver selects every site; this pass only changes presentation vertices
+    // and foam. A bounded combined displacement prevents nearby accepted sites
+    // from stacking into fabricated cliffs, while the pocket centre stays
+    // darker than its broken shoulders and downstream aerated return.
+    constexpr int32 kMaximumPlungePocketSites = 3;
+    TArray<uint8> PlungePocketVertexMask;
+    PlungePocketVertexMask.Init(0, Vertices.Num());
+    const int32 PlungePocketSiteCount = FMath::Min(
+        BreakingSites.Num(), kMaximumPlungePocketSites);
+    for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
+    {
+        if (WetVertexMask[VertexIndex] == 0)
+        {
+            continue;
+        }
+        float CombinedDisplacementMeters = 0.0f;
+        float PocketFoam = 0.0f;
+        for (int32 SiteIndex = 0;
+             SiteIndex < PlungePocketSiteCount;
+             ++SiteIndex)
+        {
+            const FBreakingSite& Site = BreakingSites[SiteIndex];
+            const FVector2D RelativeRiverPosition =
+                RiverCoordinatesM[VertexIndex] - Site.RiverCoordinatesMeters;
+            const FVector2D Pocket =
+                ComputeBreakingPlungePocketPresentation(
+                    RelativeRiverPosition.X,
+                    RelativeRiverPosition.Y,
+                    Site.Intensity);
+            CombinedDisplacementMeters += Pocket.X;
+            PocketFoam = FMath::Max(PocketFoam, Pocket.Y);
+        }
+        CombinedDisplacementMeters = FMath::Clamp(
+            CombinedDisplacementMeters, -0.30f, 0.18f);
+        Vertices[VertexIndex].Z +=
+            CombinedDisplacementMeters * kSurfCmPerM;
+        SourceFoam[VertexIndex] = FMath::Max(
+            SourceFoam[VertexIndex], PocketFoam);
+        if (FMath::Abs(CombinedDisplacementMeters) > 0.001f ||
+            PocketFoam > 0.05f)
+        {
+            PlungePocketVertexMask[VertexIndex] = 1;
+        }
+    }
+
+    // Recompute normals only in and immediately around the modified pocket.
+    // This makes the depression and return respond to light while leaving the
+    // established river-wide surface presentation byte-for-byte untouched.
+    for (int32 Y = 1; Y < GridLateralN - 1; ++Y)
+    {
+        for (int32 X = 1; X < GridStationN - 1; ++X)
+        {
+            const int32 Index = Y * GridStationN + X;
+            const int32 UpstreamIndex = Index - 1;
+            const int32 DownstreamIndex = Index + 1;
+            const int32 RiverRightIndex = Index - GridStationN;
+            const int32 RiverLeftIndex = Index + GridStationN;
+            if (WetVertexMask[Index] == 0 ||
+                WetVertexMask[UpstreamIndex] == 0 ||
+                WetVertexMask[DownstreamIndex] == 0 ||
+                WetVertexMask[RiverRightIndex] == 0 ||
+                WetVertexMask[RiverLeftIndex] == 0)
+            {
+                continue;
+            }
+            const bool bPocketNeighbourhood =
+                PlungePocketVertexMask[Index] != 0 ||
+                PlungePocketVertexMask[UpstreamIndex] != 0 ||
+                PlungePocketVertexMask[DownstreamIndex] != 0 ||
+                PlungePocketVertexMask[RiverRightIndex] != 0 ||
+                PlungePocketVertexMask[RiverLeftIndex] != 0;
+            if (!bPocketNeighbourhood)
+            {
+                continue;
+            }
+            const FVector StationTangent =
+                Vertices[DownstreamIndex] - Vertices[UpstreamIndex];
+            const FVector LateralTangent =
+                Vertices[RiverLeftIndex] - Vertices[RiverRightIndex];
+            Normals[Index] = FVector::CrossProduct(
+                StationTangent, LateralTangent).GetSafeNormal();
         }
     }
     RebuildBreakingLipMesh();

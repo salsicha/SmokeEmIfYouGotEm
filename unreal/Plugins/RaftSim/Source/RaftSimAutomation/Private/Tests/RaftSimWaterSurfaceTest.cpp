@@ -496,6 +496,33 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         TEXT("roller profile stays inside its bounded presentation envelope"),
         RollerEntry.X < 300.0f && RollerReturn.X > 50.0f &&
             OuterRollerCrown.Y < 130.0f);
+    const FVector2D PlungePocket =
+        ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+            1.8f, 0.0f, 1.0f);
+    const FVector2D AeratedReturn =
+        ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+            5.0f, 0.0f, 1.0f);
+    const FVector2D BrokenShoulder =
+        ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+            2.3f, 3.0f, 1.0f);
+    const FVector2D DisabledPlungePocket =
+        ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+            1.8f, 0.0f, 0.0f);
+    Test->TestTrue(
+        TEXT("breaking jump forms a bounded dark plunge pocket"),
+        PlungePocket.X < -0.24f && PlungePocket.X >= -0.2801f &&
+            PlungePocket.Y < AeratedReturn.Y);
+    Test->TestTrue(
+        TEXT("breaking jump rises into a strongly aerated downstream return"),
+        AeratedReturn.X > 0.08f && AeratedReturn.X <= 0.1601f &&
+            AeratedReturn.Y > 0.75f);
+    Test->TestTrue(
+        TEXT("breaking jump keeps a broken aerated side shoulder"),
+        BrokenShoulder.Y > PlungePocket.Y &&
+            BrokenShoulder.X > PlungePocket.X);
+    Test->TestTrue(
+        TEXT("zero-intensity jumps add no plunge-pocket presentation"),
+        DisabledPlungePocket.IsNearlyZero());
     Test->TestTrue(
         TEXT("presentation edge clearance is zero on a sampled riverbank"),
         FMath::IsNearlyZero(

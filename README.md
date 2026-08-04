@@ -180,6 +180,16 @@ six runnable river maps pass P4. The retained frame removes the repeated
 analytical band, but the low-resolution sampled rise and missing aerated hole,
 recirculation, and collision-aware spray still fail photoreal promotion. See
 the [nonperiodic live-wave review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json).
+The three strongest solver-accepted interior jumps now also shape the refined
+render mesh into a bounded plan-view plunge pocket, broken shoulders, and an
+aerated downstream return. Per-site displacement is capped at -0.28/+0.16 m
+and combined displacement at -0.30/+0.18 m; cooked water, wetness, collision,
+buoyancy, D3/D4, and saved maps remain unchanged. The editor build, P2 water
+contract, and all six P4 runnable-map gates pass. Close side review finds no
+dome, tent, rail, card, or shoreline artifact, but the result is retained only
+as technical progress because volumetric aeration, recirculation, spray,
+measured seasonal hydraulics, and named art acceptance remain open. See the
+[plunge-pocket review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json).
 Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
 path that was silently restoring the older reflective water defaults after
 regeneration. The runtime now keeps the river-local, wet-cell-clipped volume

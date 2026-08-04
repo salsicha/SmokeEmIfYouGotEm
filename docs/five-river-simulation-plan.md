@@ -811,3 +811,20 @@ and external acceptance gates pass.
   breaklines; external guide, geospatial, rights, hydraulic, art, human, and
   platform gates remain open in
   `cold_water_adaptive_shoreline_v1_review.json`.
+
+### 2026-08-04 — Solver-anchored plunge pockets retained
+
+- The three strongest accepted interior breaking sites on each runnable river
+  now shape only the refined presentation mesh into a compact plunge core,
+  broken shoulders, and aerated downstream return. The shared profile is
+  capped at -0.28/+0.16 m per site and -0.30/+0.18 m after combination.
+- Site ownership remains the existing solver-derived Froude transition with
+  full surface coverage, 15 m edge clearance, intensity ordering, and 6 m
+  deduplication. Cooked fields, wet/dry masks, terrain, bathymetry, collision,
+  buoyancy, forces, D3/D4, and saved map packages are unchanged.
+- The editor build, focused P2 water test, and all six P4 runnable-map gates
+  pass. Zambezi reports 10 accepted sites and 645 rapid-foam vertices. Side
+  review finds no manufactured dome, tent, rail, card, or shoreline artifact,
+  but missing volumetric aeration/recirculation, measured seasonal hydraulics,
+  photoreal art, and all seven external gates keep promotion open in
+  `zambezi_plunge_pocket_v1_review.json`.

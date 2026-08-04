@@ -611,6 +611,28 @@ photoreal and real-world hydraulic acceptance. Exact captures, telemetry,
 hashes, remaining defects, and external gates are recorded in
 `zambezi_nonperiodic_live_wave_v1_review.json`.
 
+The three strongest accepted interior transitions now receive a bounded
+plan-view plunge pocket beneath the connected crest membrane: a compact dark
+core, irregular side shoulders, and an aerated downstream return. Site
+selection still comes exclusively from the local solver-derived Froude
+transition, full-coverage/15 m clearance filter, intensity sort, and 6 m
+deduplication. Per-site presentation displacement is limited to -0.28/+0.16 m
+and the combined surface change to -0.30/+0.18 m. The pass changes only render
+vertices, their local normals, and maximum-combined foam; water samples,
+wet/dry authority, collision, buoyancy, forces, D3, D4, and the saved Zambezi
+map remain unchanged.
+
+The editor build, focused P2 water test, and complete six-river P4 matrix pass.
+The live Zambezi frame retains 10 accepted sites, 10,465 wet render vertices,
+645 rapid-foam vertices, 16,896 optical-core triangles, and the prior 10.46 cm
+standing-wave maximum. Direct side review shows a coherent shallow trough and
+no dome, tent, rail, card, or new shoreline-intersection artifact. Animated
+water and terrain variance prevents attributing matched pixel deltas to this
+small geometry change, so no image-improvement percentage is claimed. The
+candidate remains bounded technical progress, not photoreal or real-world
+hydraulic acceptance; evidence and open gates are recorded in
+`zambezi_plunge_pocket_v1_review.json`.
+
 ## Production status and gates
 
 The full Rapid 1–25 reference route is defined. Conflicting high-water route

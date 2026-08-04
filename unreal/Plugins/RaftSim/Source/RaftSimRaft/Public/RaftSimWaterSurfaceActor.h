@@ -81,6 +81,17 @@ public:
         float Intensity,
         float LayerNormalized);
 
+    /** Render-only plan-view structure around an accepted hydraulic jump.
+     * X is a bounded vertical displacement in metres and Y is local foam
+     * generation. DownstreamMeters is positive with the river station and
+     * AcrossMeters is signed river-left. The profile forms a dark plunge
+     * pocket, broken side shoulders, and an aerated downstream return without
+     * changing the sampled free surface or gameplay authority. */
+    static FVector2D ComputeBreakingPlungePocketPresentation(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float Intensity);
+
     /** Distance from one sampled live-water vertex to the nearest moving-grid
      * station edge or sampled wet/dry bank, in metres. Breaking-water sheets
      * use this to remain wholly inside the owned live-water presentation
