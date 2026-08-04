@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v13_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v14_review.json`.
 
 The subsequent V18 Zambezi presentation pass preserves that same runnable
 selector and runtime contract while reducing clipped launch-water and scarp
@@ -761,7 +761,24 @@ and external acceptance gates pass.
 - This keeps Zambezi runnable at the reference Free Run tier. It does not close
   terrain, datum, rights, seasonal-flow, rapid-hydraulic, guide, photoreal-art,
   or target-platform acceptance. Exact hashes and gates are in
-  `zambezi_runnable_release_head_v13_review.json`.
+  `zambezi_runnable_release_head_v14_review.json`.
+
+### 2026-08-04 — Zambezi runnable status reaffirmed after cold-water milestones
+
+- Re-certified the unchanged V19 `L_Zambezi` runtime package as runnable river
+  6 after the cold-water highlight and depth milestones. The selection catalog
+  and progression manifest continue to state `runnable: true`,
+  `availability: free_run`, and `reference_free_run`, and now link the V14
+  release-head review.
+- A clean 136-action UE 5.8 editor build, 26 focused Python contracts, the
+  native career and progression gates, the focused Zambezi PIE gate, and all
+  six runnable maps in isolated PIE sessions pass. Every map reports MapCheck
+  at zero errors and zero warnings; the only accepted automation warnings are
+  the deliberate Troublemaker failure-behavior capsize and Zambezi's external
+  connectivity timeout.
+- This changes selection evidence and documentation only. It does not promote
+  Zambezi terrain, bathymetry, hydraulics, art, ecology, water VFX, characters,
+  or target-platform performance.
 
 ### 2026-08-04 — Cold-water depth attenuation V2 retained
 

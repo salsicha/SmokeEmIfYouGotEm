@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v13_review.json"
+    "zambezi_runnable_release_head_v14_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -180,26 +180,25 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v9"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v10"
     assert review["recorded_local_date"] == "2026-08-04"
     assert review["verified_base_commit"] == (
-        "e6b15680a4fa9914dbfb8e3ee0e43918b359d5fa"
+        "81254f9a9509be710addbb2cd50b011d042f4ad2"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Reaffirm the V19-regenerated Zambezi package as player-facing "
-            "runnable river 6 after adding fail-closed elevation-stratified "
-            "launch ecology and matched visual evidence."
+            "Reaffirm the unchanged V19 Zambezi runtime package as player-facing "
+            "runnable river 6 after the cold-water highlight and depth milestones."
         ),
-        "map_runtime_package_changed_since_v12": True,
-        "player_selector_metadata_changed_since_v12": True,
-        "frontend_scenario_mapping_changed_since_v12": False,
+        "map_runtime_package_changed_since_v13": False,
+        "player_selector_metadata_changed_since_v13": True,
+        "frontend_scenario_mapping_changed_since_v13": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v12_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v13_review.json"
         ),
     }
     assert review["player_path"] == {
@@ -229,10 +228,10 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
             "3cae052632413b6fcb7163237f7882bced8bdfac74bc2ff0d2fce5e00e228d3b"
         ),
         "unreal/Content/RaftSim/UI/river_selection_catalog.json": (
-            "fa2c5e80c9d266ef9c886a73817f4dcc059ee5754cf3643c1a8355d4c0651e69"
+            "42893ba3dec78081ab16cdfb1392a62753672b9fe336c94820191660578f0586"
         ),
         "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json": (
-            "35d7cb4f7070f781333b001f9a5d1098c77415d32886b062c1d3c5a8584352c8"
+            "4eb8303f935c9c403b609cd9b06e848c367f18be88e8ebe101d21854c3fd4a39"
         ),
         "physics/data/real_world/player_selection_model.json": (
             "aac98ef3b0346f7bb178ad65ce4b93b6c14920f464782a151df3b4d9a4486a27"
@@ -292,6 +291,20 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     )
     assert review["verification"]["zambezi_map_load"]["zambezi_mapcheck_errors"] == 0
     assert review["verification"]["zambezi_map_load"]["zambezi_mapcheck_warnings"] == 0
+    assert review["verification"]["all_runnable_map_loads"]["performed"] == 6
+    assert review["verification"]["all_runnable_map_loads"]["result"].startswith(
+        "success"
+    )
+    assert review["verification"]["all_runnable_map_loads"]["maps"] == [
+        "L_Troublemaker",
+        "L_Hance",
+        "L_UpperHuacas",
+        "L_Terminator",
+        "L_LavaCanyon",
+        "L_Zambezi",
+    ]
+    assert review["verification"]["all_runnable_map_loads"]["mapcheck_errors"] == 0
+    assert review["verification"]["all_runnable_map_loads"]["mapcheck_warnings"] == 0
     assert review["verification"]["live_zambezi_map"] == {
         "map_package": "/Game/RaftSim/Maps/L_Zambezi",
         "game_mode": "RaftSimVerticalSliceGameMode",
