@@ -1674,11 +1674,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     FMath::IsNearlyEqual(
                         (*It)->LiveSkyReflectionStrength, 0.05f, 0.001f));
                 Test->TestTrue(
-                    TEXT("regenerated Futaleufu live carrier keeps moving micro-normal response"),
+                    TEXT("versioned Futaleufu config retains its serialized ripple baseline"),
                     FMath::IsNearlyEqual(
                         (*It)->LiveRippleStrength, 0.55f, 0.001f));
                 Test->TestTrue(
-                    TEXT("regenerated Futaleufu live carrier uses the turbulent V4 roughness"),
+                    TEXT("versioned Futaleufu config retains its serialized roughness baseline"),
                     FMath::IsNearlyEqual(
                         (*It)->LiveSurfaceRoughness, 0.68f, 0.001f));
                 Test->TestTrue(
@@ -1689,6 +1689,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Futaleufu records the shared cold-water highlight contract"),
                     (*It)->Tags.Contains(
                         TEXT("RaftSimColdWaterHighlightNaturalismV1")));
+                Test->TestTrue(
+                    TEXT("Futaleufu enforces the restrained runtime sun"),
+                    (*It)->bEnforceTaggedDirectionalLightPresentation &&
+                        (*It)->RuntimeDirectionalLightActorTag ==
+                            TEXT("RaftSimColdWaterHighlightNaturalismV1") &&
+                        FMath::IsNearlyEqual(
+                            (*It)->RuntimeDirectionalLightIntensity,
+                            2.40f,
+                            0.001f) &&
+                        (*It)->RuntimeDirectionalLightRotation.Equals(
+                            FRotator(-50.0f, 30.0f, 0.0f),
+                            0.001f));
                 Test->TestTrue(
                     TEXT("Futaleufu records the cold-water depth attenuation contract"),
                     (*It)->Tags.Contains(
@@ -1898,11 +1910,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 FMath::IsNearlyEqual(
                     (*It)->LiveSkyReflectionStrength, 0.05f, 0.001f));
             Test->TestTrue(
-                TEXT("Chilko live carrier keeps moving micro-normal response"),
+                TEXT("versioned Chilko config retains its serialized ripple baseline"),
                 FMath::IsNearlyEqual(
                     (*It)->LiveRippleStrength, 0.55f, 0.001f));
             Test->TestTrue(
-                TEXT("Chilko live carrier uses the turbulent V3 roughness"),
+                TEXT("versioned Chilko config retains its serialized roughness baseline"),
                 FMath::IsNearlyEqual(
                     (*It)->LiveSurfaceRoughness, 0.68f, 0.001f));
             Test->TestTrue(
@@ -1917,6 +1929,18 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Chilko records the shared cold-water highlight contract"),
                 (*It)->Tags.Contains(
                     TEXT("RaftSimColdWaterHighlightNaturalismV1")));
+            Test->TestTrue(
+                TEXT("Chilko enforces the restrained runtime sun"),
+                (*It)->bEnforceTaggedDirectionalLightPresentation &&
+                    (*It)->RuntimeDirectionalLightActorTag ==
+                        TEXT("RaftSimColdWaterHighlightNaturalismV1") &&
+                    FMath::IsNearlyEqual(
+                        (*It)->RuntimeDirectionalLightIntensity,
+                        2.90f,
+                        0.001f) &&
+                    (*It)->RuntimeDirectionalLightRotation.Equals(
+                        FRotator(-50.0f, 55.0f, 0.0f),
+                        0.001f));
             Test->TestTrue(
                 TEXT("Chilko solver foam remains optically legible"),
                 FMath::IsNearlyEqual(

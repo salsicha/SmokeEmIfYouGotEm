@@ -4,6 +4,7 @@
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionPower.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialExpressionVertexColor.h"
@@ -92,6 +93,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
     bool bHasInteriorOpticalDepthGraph = false;
     bool bHasBankCoverageGraph = false;
     bool bHasBankOpticalCoverageGraph = false;
+    bool bHasOpticalDepthResponseGraph = false;
     UMaterialExpressionCustom* InteriorMaskExpression = nullptr;
     UMaterialExpression* BankCoverageScaleExpression = nullptr;
     UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput = nullptr;
@@ -121,6 +123,11 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         {
             bHasBankOpticalCoverageGraph = true;
         }
+        if (Expression &&
+            Expression->Desc == TEXT("RaftSimOpticalDepthResponse"))
+        {
+            bHasOpticalDepthResponseGraph = true;
+        }
         if (!WaterOutput)
         {
             WaterOutput = Cast<UMaterialExpressionSingleLayerWaterMaterialOutput>(
@@ -132,6 +139,82 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
     // capture with Unreal's checkerboard fallback while its first shader map
     // is still pending.
     bNeedsSave = bNeedsSave || bHasTransmissionGraph;
+
+    if (!bHasOpticalDepthResponseGraph)
+    {
+        // Solver depth is packed as depth / 4 m in vertex green. Feeding that
+        // value directly into a linear shallow/deep blend leaves a one-metre
+        // bank shelf only 25% attenuated and produces a broad pale rail in
+        // guide-eye views. Remap only the material response with a parameterized
+        // power curve. The default exponent of one is identity; clear-water
+        // rivers opt into a sub-linear exponent so optical density accumulates
+        // rapidly after the genuinely shallow edge while retaining bed detail
+        // in the first few centimetres. Hydraulic depth and every gameplay
+        // consumer remain untouched.
+        UMaterialExpressionComponentMask* SolverDepthMask = nullptr;
+        for (const TObjectPtr<UMaterialExpression>& Expression :
+             Material->GetExpressionCollection().Expressions)
+        {
+            UMaterialExpressionComponentMask* Candidate =
+                Cast<UMaterialExpressionComponentMask>(Expression.Get());
+            if (!Candidate || Candidate->R || !Candidate->G || Candidate->B ||
+                Candidate->A || Candidate->Input.OutputIndex != 0 ||
+                !Cast<UMaterialExpressionVertexColor>(
+                    Candidate->Input.Expression))
+            {
+                continue;
+            }
+            SolverDepthMask = Candidate;
+            break;
+        }
+        if (!SolverDepthMask)
+        {
+            OutSummary += TEXT(
+                "The raft-transmission water lacks the solver depth channel "
+                "required for nonlinear optical attenuation.\n");
+            return nullptr;
+        }
+
+        Material->Modify();
+        UMaterialExpressionScalarParameter* ResponseExponent =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        ResponseExponent->ParameterName =
+            TEXT("OpticalDepthResponseExponent");
+        ResponseExponent->DefaultValue = 1.0f;
+        ResponseExponent->Group = TEXT("RaftSimOpticalDepth");
+        Material->GetExpressionCollection().AddExpression(ResponseExponent);
+        UMaterialExpressionPower* OpticalDepthResponse =
+            NewObject<UMaterialExpressionPower>(Material);
+        OpticalDepthResponse->Desc = TEXT("RaftSimOpticalDepthResponse");
+        OpticalDepthResponse->Base.Expression = SolverDepthMask;
+        OpticalDepthResponse->Exponent.Expression = ResponseExponent;
+        Material->GetExpressionCollection().AddExpression(
+            OpticalDepthResponse);
+
+        int32 RewiredDepthBlends = 0;
+        for (const TObjectPtr<UMaterialExpression>& Expression :
+             Material->GetExpressionCollection().Expressions)
+        {
+            UMaterialExpressionLinearInterpolate* DepthBlend =
+                Cast<UMaterialExpressionLinearInterpolate>(Expression.Get());
+            if (!DepthBlend ||
+                DepthBlend->Alpha.Expression != SolverDepthMask)
+            {
+                continue;
+            }
+            DepthBlend->Alpha.Expression = OpticalDepthResponse;
+            ++RewiredDepthBlends;
+        }
+        if (RewiredDepthBlends < 2)
+        {
+            OutSummary += FString::Printf(
+                TEXT("The raft-transmission water exposed only %d of the two "
+                     "required depth colour/opacity blends.\n"),
+                RewiredDepthBlends);
+            return nullptr;
+        }
+        bNeedsSave = true;
+    }
 
     if (!bHasTransmissionGraph)
     {

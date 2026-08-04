@@ -89,6 +89,22 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
     bool bRuntimeVolumetricFogEnabled = false;
 
+    /** Reassert a river-local directional-light intensity in runtime worlds.
+     * This prevents a capture-oriented broad sun lobe from clipping turbulent
+     * water after PIE/game-world duplication. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    bool bEnforceTaggedDirectionalLightPresentation = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    FName RuntimeDirectionalLightActorTag = NAME_None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "20.0"))
+    float RuntimeDirectionalLightIntensity = 4.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment|Presentation")
+    FRotator RuntimeDirectionalLightRotation = FRotator(-50.0f, 55.0f, 0.0f);
+
     /** The authored editor-capture ribbon is hidden during play, so the live
      * solver mesh must render the complete visible river rather than a
      * subordinate hydraulic-detail overlay. */
@@ -239,6 +255,13 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LiveShallowWaterOpacity = 0.58f;
 
+    /** Presentation-only power curve applied to the normalized solver depth
+     * before shallow/deep colour and opacity blending. One is linear; values
+     * below one concentrate optical attenuation near a clear-water bank. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.25", ClampMax = "2.0"))
+    float LiveOpticalDepthResponseExponent = 1.0f;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LiveDeepWaterOpacity = 0.79f;
@@ -249,4 +272,5 @@ public:
 
 private:
     void ApplyTaggedHeightFogPresentation();
+    void ApplyTaggedDirectionalLightPresentation();
 };

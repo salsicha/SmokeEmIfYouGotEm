@@ -554,9 +554,9 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert foam_occlusion_review["implementation"]["water_samples_changed"] is False
     assert foam_occlusion_review["implementation"]["physics_forces_changed"] is False
     foam_replacement_hashes = {
-        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "2bbd1b44363a5121817336091b9790e6e7badb3b99107b0071851cbe61a7792c",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
         "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "94abec82cbde60c2aa152c9ebe3599d1c037579aaded1c757524b64e53db076b",
-        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "11cfbde65e89209f2503255fe23b263b3f456b70d3c8551f63981ddbc890f928",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "4255d0a87e57e85a20b63a956b5a8857338dd34212b5fe1c7da06f9edac3ae00",
         "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "10679b95c7bc9100fe79f471c14c4e2fc97f5ff5c526268a4919150415b908e5",
         "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37",
@@ -712,8 +712,14 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
     assert interior_review["implementation"]["water_samples_changed"] is False
     assert interior_review["implementation"]["physics_forces_changed"] is False
     assert interior_review["implementation"]["raft_mass_or_buoyancy_changed"] is False
+    interior_replacement_hashes = {
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
+    }
     for source_path, expected_hash in interior_review["implementation_sha256"].items():
-        assert hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest() == expected_hash
+        assert hashlib.sha256((REPO_ROOT / source_path).read_bytes()).hexdigest() == (
+            interior_replacement_hashes.get(source_path, expected_hash)
+        )
     for renderer_key in ("contact_port", "contact_starboard"):
         renderer_evidence = interior_review["renderer_evidence"][renderer_key]
         for artifact_key in ("capture", "log"):

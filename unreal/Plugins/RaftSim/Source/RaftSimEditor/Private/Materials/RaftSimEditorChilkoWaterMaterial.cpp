@@ -470,6 +470,7 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
     SetScalar(TEXT("SlickNormalFloor"), 0.85f);
     SetScalar(TEXT("SlickRoughnessScale"), 1.0f);
     SetScalar(TEXT("FresnelSpecular"), 0.01f);
+    SetScalar(TEXT("OpticalDepthResponseExponent"), 0.25f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();

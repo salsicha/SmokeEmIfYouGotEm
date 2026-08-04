@@ -1982,9 +1982,9 @@ bool AddLandscapeCandidateRunnableGameplay(
         // The lower fallback sky term affects presentation only; it does not
         // alter solver wetness, geometry, sampling, buoyancy, or raft forces.
         WaterConfig->LiveSurfaceSpecular = 0.18f;
-        WaterConfig->LiveSurfaceRoughness = 0.68f;
+        WaterConfig->LiveSurfaceRoughness = 0.42f;
         WaterConfig->LiveSkyReflectionStrength = 0.05f;
-        WaterConfig->LiveRippleStrength = 0.55f;
+        WaterConfig->LiveRippleStrength = 0.72f;
         WaterConfig->LiveFoamIntensity = 0.56f;
         WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
         WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.58f;
@@ -2009,8 +2009,15 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveRiverbedColorScale =
             FLinearColor(0.060f, 0.080f, 0.095f, 0.0f);
         WaterConfig->LiveShallowWaterOpacity = 0.36f;
+        WaterConfig->LiveOpticalDepthResponseExponent = 0.25f;
         WaterConfig->LiveDeepWaterOpacity = 0.84f;
         WaterConfig->LiveFoamWaterOpacity = 0.86f;
+        WaterConfig->bEnforceTaggedDirectionalLightPresentation = true;
+        WaterConfig->RuntimeDirectionalLightActorTag =
+            TEXT("RaftSimColdWaterHighlightNaturalismV1");
+        WaterConfig->RuntimeDirectionalLightIntensity = 2.90f;
+        WaterConfig->RuntimeDirectionalLightRotation =
+            FRotator(-50.0f, 55.0f, 0.0f);
         WaterConfig->Tags.AddUnique(TEXT("RaftSimChilkoTransmittingWaterV2"));
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimChilkoLocalizedReflectionWaterV3"));
@@ -2018,6 +2025,8 @@ bool AddLandscapeCandidateRunnableGameplay(
             TEXT("RaftSimColdWaterHighlightNaturalismV1"));
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimColdWaterDepthAttenuationV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterNonlinearOpticalDepthV1"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
@@ -2054,9 +2063,9 @@ bool AddLandscapeCandidateRunnableGameplay(
         // accepted turbulent cold-water bracket. This changes presentation
         // only; the cooked field still owns wetness, geometry and forces.
         WaterConfig->LiveSurfaceSpecular = 0.18f;
-        WaterConfig->LiveSurfaceRoughness = 0.68f;
+        WaterConfig->LiveSurfaceRoughness = 0.42f;
         WaterConfig->LiveSkyReflectionStrength = 0.05f;
-        WaterConfig->LiveRippleStrength = 0.55f;
+        WaterConfig->LiveRippleStrength = 0.72f;
         WaterConfig->LiveFoamIntensity = 0.58f;
         WaterConfig->LiveRapidFoamFocusStart = 0.08f;
         WaterConfig->LiveRapidFoamFocusEnd = 0.58f;
@@ -2080,12 +2089,21 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveRiverbedColorScale =
             FLinearColor(0.055f, 0.075f, 0.090f, 0.0f);
         WaterConfig->LiveShallowWaterOpacity = 0.36f;
+        WaterConfig->LiveOpticalDepthResponseExponent = 0.25f;
         WaterConfig->LiveDeepWaterOpacity = 0.86f;
         WaterConfig->LiveFoamWaterOpacity = 0.88f;
+        WaterConfig->bEnforceTaggedDirectionalLightPresentation = true;
+        WaterConfig->RuntimeDirectionalLightActorTag =
+            TEXT("RaftSimColdWaterHighlightNaturalismV1");
+        WaterConfig->RuntimeDirectionalLightIntensity = 2.40f;
+        WaterConfig->RuntimeDirectionalLightRotation =
+            FRotator(-50.0f, 30.0f, 0.0f);
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimColdWaterHighlightNaturalismV1"));
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimColdWaterDepthAttenuationV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterNonlinearOpticalDepthV1"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
     else if (bZambezi)

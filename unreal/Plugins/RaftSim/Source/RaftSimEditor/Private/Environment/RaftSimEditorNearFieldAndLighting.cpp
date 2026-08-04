@@ -1827,6 +1827,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     // gorge so the renderer does not amplify source sampling into fake ribs.
     const FRotator SunRotation = Spec.RiverId == TEXT("zambezi_batoka_gorge")
         ? FRotator(-48.0f, -90.0f, 0.0f)
+        : Spec.RiverId == TEXT("futaleufu_terminator")
+        ? FRotator(-50.0f, 30.0f, 0.0f)
         : bColdWaterHighlightNaturalism
         ? FRotator(-50.0f, 55.0f, 0.0f)
         : FRotator(-58.0f, -30.0f, 0.0f);

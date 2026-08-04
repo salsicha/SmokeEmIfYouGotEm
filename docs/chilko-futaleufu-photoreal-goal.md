@@ -97,6 +97,33 @@ Both maps also replace the 12,000-instance, broadleaf-dominated PVE card fallbac
 
 The Unreal editor builds, and focused `RaftSim.P4.RiverMapLoads.L_Terminator` and `RaftSim.P4.RiverMapLoads.L_LavaCanyon` each pass 1/1 with new assertions for visible solver coverage, four opaque vegetation forms, and organic ground cover. Matched gameplay review accepts the renderer correction and rejects photoreal promotion: the water remains too uniform and bright toward the horizon, the near banks remain broad and dark, and the solid procedural foliage is visibly stylized and repetitive. Exact hashes, contracts, evidence, and open external gates are recorded in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_futaleufu_runtime_water_opaque_vegetation_v1_review.json`.
 
+## Cold-Water Balanced Light V1
+
+The runnable Chilko and Futaleufú maps now use a shared, parameterized nonlinear
+optical-depth response instead of feeding `depth / 4 m` directly into a linear
+shallow/deep material blend. The saved maps migrate by their cooked-field
+identity, so Chilko and Futaleufú use a 0.25 response exponent without resaving
+terrain or map packages; all other rivers retain the identity value of 1.0.
+The same migration narrows the former high-roughness matte sun sheet with 0.42
+surface roughness, stronger flow-normal response, and tagged runtime lights.
+Chilko uses intensity 2.90 at the retained azimuth; Futaleufú uses intensity
+2.40 and a 30-degree azimuth that keeps direct glint readable without placing a
+clipped lobe across the fixed rapid-side camera. Regenerated maps serialize the
+same values.
+
+Matched 1280x720 review retains this as a material and lighting improvement,
+not photoreal promotion. In the Chilko near-water diagnostic, mean luma falls
+from 152.210 to 101.011 and pixels at or above luma 200 fall from 6.556% to
+5.489%, producing a darker blue-green body. In the Futaleufú central rapid
+region, pixels at or above luma 200 fall from 44.778% to 26.411%; the previous
+broad white sheet resolves into directional glints and visible blue surface
+texture. The Unreal editor builds, the shared-water native audit passes 1/1,
+and P2 plus all six runnable P4 map gates pass 7/7. Foam remains too graphic,
+terrain and banks remain coarse, vegetation remains synthetic, and no named
+guide, geospatial, hydraulic, environment-art, water-VFX, rights, or target-
+platform reviewer has accepted the scene. Exact evidence and open gates are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json`.
+
 ## Temperate Canopy Variation V2
 
 The shared Futaleufu/Chilko opaque fallback now removes its fixed downriver

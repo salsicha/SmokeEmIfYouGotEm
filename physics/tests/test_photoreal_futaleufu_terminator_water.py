@@ -106,9 +106,9 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveSurfaceCalmCoverage = 0.035f",
         "LiveSurfaceActiveCoverage = 0.14f",
         "LiveSurfaceSpecular = 0.18f",
-        "LiveSurfaceRoughness = 0.68f",
+        "LiveSurfaceRoughness = 0.42f",
         "LiveSkyReflectionStrength = 0.05f",
-        "LiveRippleStrength = 0.55f",
+        "LiveRippleStrength = 0.72f",
         "LiveFoamIntensity = 0.58f",
         "LiveRapidFoamFocusStart = 0.08f",
         "LiveRapidFoamFocusEnd = 0.58f",
@@ -116,6 +116,7 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f)",
         "FLinearColor(0.055f, 0.075f, 0.090f, 0.0f)",
         "LiveShallowWaterOpacity = 0.36f",
+        "LiveOpticalDepthResponseExponent = 0.25f",
         "LiveDeepWaterOpacity = 0.86f",
         "LiveFoamWaterOpacity = 0.88f",
         "LiveVolumeCoreMaterialOverride",
@@ -127,6 +128,7 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "RaftSimColdWaterEmbeddedAerationV2",
         "RaftSimColdWaterHighlightNaturalismV1",
         "RaftSimColdWaterDepthAttenuationV2",
+        "RaftSimColdWaterNonlinearOpticalDepthV1",
     ):
         assert token in geometry
     for token in (
@@ -139,10 +141,11 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         'SetScalar(TEXT("SlickNormalFloor"), 0.85f)',
         'SetScalar(TEXT("SlickRoughnessScale"), 1.0f)',
         'SetScalar(TEXT("FresnelSpecular"), 0.01f)',
+        'SetScalar(TEXT("OpticalDepthResponseExponent"), 0.25f)',
     ):
         assert token in WATER_SOURCE.read_text(encoding="utf-8")
     for token in (
-        "Settings.SunIntensity = 4.20f",
+        "Settings.SunIntensity = 2.40f",
         "Settings.SkyLightIntensity = 1.35f",
         "Settings.ExposureBias = -0.30f",
     ):
@@ -157,6 +160,11 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
+        "LiveOpticalDepthResponseExponent",
+        "bEnforceTaggedDirectionalLightPresentation",
+        "RuntimeDirectionalLightActorTag",
+        "RuntimeDirectionalLightIntensity",
+        "RuntimeDirectionalLightRotation",
         "LiveRapidFoamFocusStart",
         "LiveRapidFoamFocusEnd",
         "LiveVolumeCoreMaterialOverride",
@@ -168,14 +176,24 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveSkyReflectionStrength",
         "LiveRippleStrength",
         "LiveFoamIntensity",
+        "OpticalDepthResponseExponent",
     ):
         assert f'TEXT("{parameter}")' in runtime
     assert "bUsesMigratedColdWaterVolumeCore" in runtime
+    water_config_runtime = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimWater/Private"
+        / "RaftSimRiverWaterConfig.cpp"
+    ).read_text(encoding="utf-8")
+    assert "bMigratedFutaleufuHighlightResponse" in water_config_runtime
+    assert "2.40f" in water_config_runtime
+    assert "FRotator(-50.0f, 30.0f, 0.0f)" in water_config_runtime
+    assert "SetIntensity(RuntimeDirectionalLightIntensity)" in water_config_runtime
     assert 'TEXT("futaleufu_river_chile")' in runtime
     assert "? 0.18f" in runtime
-    assert "? 0.68f" in runtime
+    assert "? 0.42f" in runtime
     assert "? 0.05f" in runtime
-    assert "? 0.55f" in runtime
+    assert "? 0.72f" in runtime
     assert "FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)" in geometry
     assert "FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)" in geometry
     assert "FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)" in geometry

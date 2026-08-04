@@ -58,6 +58,17 @@ Matched evidence removes the former long black bank seams but still exposes a
 rounded 30 m canyon, sparse/repeated cover, and flat-looking water; M9,
 photoreal promotion, target performance, and all external gates remain open.
 
+**Chilko/Futaleufú balanced-light checkpoint, August 4:** both runnable cold-
+water maps now migrate the live Single Layer Water body to a nonlinear optical-
+depth response, narrower 0.42 roughness, stronger flow-normal breakup, and
+tagged runtime directional-light values. Matched captures materially reduce the
+broad pale/matte water sheet, most clearly in Futaleufú where the central region
+above luma 200 falls from 44.778% to 26.411%. The editor build, shared material
+audit, P2 water gate, and all six P4 runnable-map gates pass. This is not a
+photoreal promotion: foam, bank/terrain resolution, vegetation, atmosphere,
+characters, and external acceptance remain open. See
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json`.
+
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
 be labeled `procedural_infill`, store its seed and inputs, blend continuously into known

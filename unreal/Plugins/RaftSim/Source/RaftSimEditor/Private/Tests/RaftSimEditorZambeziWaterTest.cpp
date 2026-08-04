@@ -488,6 +488,7 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
 
     bool bHasCoverageFeather = false;
     bool bHasOpticalCoverageFeather = false;
+    bool bHasOpticalDepthResponse = false;
     if (UMaterial* ParentMaterial = Instance->Parent
             ? Instance->Parent->GetMaterial()
             : nullptr)
@@ -500,6 +501,8 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
             bHasOpticalCoverageFeather |= Expression &&
                 Expression->Desc ==
                     TEXT("RaftSimLiveVolumeBankOpticalCoverage");
+            bHasOpticalDepthResponse |= Expression &&
+                Expression->Desc == TEXT("RaftSimOpticalDepthResponse");
         }
     }
     TestTrue(
@@ -508,6 +511,9 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
     TestTrue(
         TEXT("Zambezi volume parent fades complete bank optical volume"),
         bHasOpticalCoverageFeather);
+    TestTrue(
+        TEXT("Shared volume parent exposes a bounded optical-depth response"),
+        bHasOpticalDepthResponse);
 
     UTexture* FlowNormal = nullptr;
     UTexture* FoamLace = nullptr;

@@ -1,0 +1,132 @@
+{
+  "schema": "raftsim.environment.cold_water_balanced_light_review.v1",
+  "review_date_utc": "2026-08-04",
+  "baseline_commit": "5501c73949afd0414eba68ae45d37095f1d35ee2",
+  "extends": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json",
+  "status": "technical_water_and_lighting_improvement_retained_photoreal_rejected",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "production_promoted": false,
+  "runtime_rolled_out": true,
+  "human_approved": false,
+  "summary": "Chilko and Futaleufu now remap the normalized solver depth before shallow/deep optical blending, narrow the former high-roughness matte sun response, strengthen flow-normal breakup, and enforce river-local tagged directional-light intensity and rotation in runtime worlds. The fixed Chilko frame retains a darker blue-green water body. The fixed Futaleufu frame removes the large clipped central sun patch and resolves the standing-wave face into directional glints over visible blue surface texture. This is a renderer-visible improvement, not photoreal acceptance: foam, banks, terrain, vegetation, atmosphere, spray, mist, and characters remain visibly procedural.",
+  "root_cause": {
+    "depth_response": "Solver depth is packed as depth divided by four metres. A direct linear material blend kept one-metre shelves only 25 percent attenuated and widened the pale shallow-water transition.",
+    "highlight_response": "The retained 0.68 roughness spread the cold-water directional light into a broad matte lobe. Futaleufu's fixed rapid-side camera was also closely aligned with the shared 55-degree sun azimuth.",
+    "retained_solution": "A parameterized power curve defaults to identity for every river and uses exponent 0.25 for the two cold-water maps. Their migrated live-water response uses 0.42 roughness and 0.72 ripple strength. Tagged runtime light enforcement uses intensity 2.90 at yaw 55 for Chilko and intensity 2.40 at yaw 30 for Futaleufu; regenerated maps serialize the same values.",
+    "authority_boundary": "The change consumes the existing vertex-green depth channel and adjusts material and lighting presentation only. It changes no depth sample, wet/dry mask, water topology, terrain, bathymetry, collision, navigation, buoyancy, raft force, breaking-site ownership, D3, D4, score, or progression state."
+  },
+  "implementation": {
+    "shared_parent": "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater",
+    "optical_depth_parameter": "OpticalDepthResponseExponent",
+    "default_exponent": 1.0,
+    "cold_water_exponent": 0.25,
+    "cold_water_surface_roughness": 0.42,
+    "cold_water_ripple_strength": 0.72,
+    "chilko_runtime_light": {
+      "tag": "RaftSimColdWaterHighlightNaturalismV1",
+      "intensity": 2.9,
+      "rotation_pitch_yaw_roll": [-50.0, 55.0, 0.0]
+    },
+    "futaleufu_runtime_light": {
+      "tag": "RaftSimColdWaterHighlightNaturalismV1",
+      "intensity": 2.4,
+      "rotation_pitch_yaw_roll": [-50.0, 30.0, 0.0]
+    },
+    "versioned_map_packages_changed": false,
+    "shared_material_parent_changed": true,
+    "solver_or_gameplay_changes": false
+  },
+  "matched_evidence": {
+    "chilko_bank_closeup": {
+      "command": "RaftSim.CaptureAfter 8 cold_water_balanced_light_v1_chilko_bank_closeup 30000 0 260 -4 90",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_chilko_bank_closeup.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_chilko_bank_closeup.png",
+      "diagnostic_region_xyxy": [0, 400, 700, 720],
+      "baseline_mean_luma": 152.210,
+      "candidate_mean_luma": 101.011,
+      "baseline_luma_gte_200_percent": 6.556,
+      "candidate_luma_gte_200_percent": 5.489,
+      "visual_verdict": "Retain. The solver-wet body is materially darker and reads blue-green rather than pale gray. A bright shallow bank region and graphic white streaks remain, so final shoreline and water-art acceptance stay open."
+    },
+    "futaleufu_breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 cold_water_balanced_light_v1_futaleufu_breaking_water_side breaking_water_side",
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_futaleufu_breaking_water_side.png",
+      "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_futaleufu_breaking_water_side.png",
+      "diagnostic_region_xyxy": [250, 230, 900, 620],
+      "baseline_mean_luma": 197.072,
+      "candidate_mean_luma": 184.053,
+      "baseline_luma_gte_200_percent": 44.778,
+      "candidate_luma_gte_200_percent": 26.411,
+      "visual_verdict": "Retain. The broad clipped central hotspot is removed and the right-hand water body exposes blue directional texture. Whitewater remains too linear and graphic, and the synthetic terrain and canopy prevent photoreal acceptance."
+    }
+  },
+  "validation": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final source and native-test changes",
+    "native_material_authoring": "RaftSim.M9.FZambeziLiveTransmittingWater passed 1/1 with zero warnings and zero errors",
+    "shared_water_and_runnable_maps": "RaftSim.P2.WaterSurfaceRenders plus all six RaftSim.P4.RiverMapLoads passed 7/7; warnings were the engine motion-vector flag, established Troublemaker capsize telemetry, and the established Zambezi connectivity timeout",
+    "matched_renderer_captures": "Chilko bank-closeup and Futaleufu breaking-water-side captures completed at 1280x720 with the same cameras as the superseded optical-bank-coverage evidence",
+    "focused_python": "24/24 scoped source-contract tests passed; the broader selected run passed 26 tests before two unrelated absent gitignored M9 evidence reports and one superseded historical hash lock",
+    "mapcheck": "All six runnable-map gates completed with zero test errors after the versioned-map assertions retained their serialized baseline and runtime migration was tested separately"
+  },
+  "remaining_photoreal_defects": [
+    "Chilko still has a bright shallow bank region and regular high-contrast white streaks that read as procedural rather than captured foam and sun glitter.",
+    "Futaleufu still has graphic parallel foam lines, incomplete crest-hole-pile volume, and insufficient spray, suspended droplets, and mist.",
+    "Both rivers retain coarse or inferred banks, bathymetry, rapid rocks, and terrain where authoritative survey breaklines are unavailable.",
+    "Repeated procedural vegetation, sparse ground micro-ecology, rock repetition, atmosphere, and close character presentation remain below photoreal acceptance.",
+    "No named guide, geospatial, hydraulic, environment-art, water/VFX, rights, or target-platform reviewer has approved promotion."
+  ],
+  "required_external_acceptance_gates": [
+    "local guide review of stationing, runnable lines, hazards, recovery, portage, and playable flow bands",
+    "geospatial review of route registration, terrain, surveyed bank breaklines, bathymetry, rapid rocks, and vertical datums",
+    "hydraulic convergence and calibration against observed rapid behavior across playable discharge bands",
+    "ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, season, and lighting",
+    "photoreal water/VFX and character-occlusion approval for depth, foam, spray, mist, reflections, shoreline contact, rafts, and passengers",
+    "source-rights and publication review for every retained terrain, imagery, guide-data, and art input",
+    "target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "reviewers": {
+    "named_local_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_rights_reviewer": null,
+    "named_performance_reviewer": null
+  },
+  "source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
+    "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h": "6616b4809f4b4fb78811c523ec398d1b4dfb2062676105aac416f5d8d30cc95f",
+    "unreal/Plugins/RaftSim/Source/RaftSimWater/Private/RaftSimRiverWaterConfig.cpp": "74761aaef42260dcdce6312da06a0a3cdcbad5767251f4e5e2d49eb006550ee6",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp": "bbd23fa2a968a1abb7d0fef30db0725c6d1fd62f94575de57b08bca452e654ce",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp": "b125a8db1871ae0a7d3c057aeff9ad094800493c4b3210bce6d645f106602066",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp": "6bd20f4f22a5b4869c106a758747686688794b8fb7462cc5cf8de8d402d69205",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorChilkoWaterMaterial.cpp": "26264a20c87e4778f1cfdc3ca32e69a257714e796d8bc89e0928e0f19057b08d",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorFutaleufuWaterMaterial.cpp": "376d5a2445284e17356949525f45799c4401f9a89e76df145535a8a70a25ac4d",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": "d9488a283135392d23bcff2819b4a2e5dd94daf6701019e98274b3aa789081f3"
+  },
+  "artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset",
+      "sha256": "d7ab3d259165f92b4cd546ec66652fce455adb9c7e64221d284e52c30c84b3bf"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_chilko_bank_closeup.png",
+      "sha256": "52901f020f79d07a1089a650d733c436d89591beebc938fdca26888a2fb5407d"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_futaleufu_breaking_water_side.png",
+      "sha256": "2b354ea961363d1680c7138420f8159b3555965c86e46692ff8033bd95e46ba1"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_native.json",
+      "sha256": "b8b277c7459951f32dc44a98be7dc16ed60483d7999670167bc1d4898f8f3b2c"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_p2_p4.json",
+      "sha256": "43dcf99caea4b8843914d3adf81388b827f4d7dbcee37e7d11a4c35b55ea4030"
+    }
+  ]
+}

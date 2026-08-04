@@ -1415,6 +1415,11 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert "M_RaftSim_SouthForkRaftTransmissionWater" in water_presentation_source
     assert "RaftSimRaftInteriorWaterTransmission" in water_presentation_source
     assert "RaftSimRaftInteriorWaterOpticalDepth" in water_presentation_source
+    assert "RaftSimOpticalDepthResponse" in water_presentation_source
+    assert "OpticalDepthResponseExponent" in water_presentation_source
+    assert "DepthBlend->Alpha.Expression = OpticalDepthResponse" in (
+        water_presentation_source
+    )
     assert "pow(Along, 4.0) + pow(Across, 4.0)" in water_presentation_source
     assert 'TEXT("RaftInteriorSurfaceOpacityScale")), 0.0f' in (
         water_presentation_source
