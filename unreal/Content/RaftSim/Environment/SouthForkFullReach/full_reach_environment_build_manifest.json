@@ -6,9 +6,9 @@
 	"nanite_terrain": true,
 	"spatial_streaming_actors": true,
 	"deterministic_actor_guids": true,
-	"deterministic_actor_guid_count": 200,
+	"deterministic_actor_guid_count": 206,
 	"deterministic_actor_object_names": true,
-	"deterministic_actor_object_name_count": 200,
+	"deterministic_actor_object_name_count": 206,
 	"moving_live_water_configured": true,
 	"source_conditioned_vertex_materials": true,
 	"wet_bank_material_response": true,
@@ -26,6 +26,24 @@
 	"procedural_shoreline_completion_applied": true,
 	"procedural_shoreline_completion_rule": "solver wet-mask alpha gaps filled only where decoded terrain is 0.03-0.25 m below decoded water; partial cells emitted only when every dry vertex is inside the 0.05 m terrain-clipped bank skirt; deep gaps omitted; visual only, no collision or hydraulics",
 	"far_field_geography_complete": true,
+	"source_registered_dry_bank_microrelief_v1": true,
+	"dry_bank_microrelief":
+	{
+		"algorithm": "source_registered_world_space_multiscale_dry_bank_microrelief_v1",
+		"authority": "visual-only procedural completion over authoritative terrain; no collision, navigation, wetness, hydraulics, bathymetry, buoyancy, or raft-force authority",
+		"presentation_spacing_m": 2,
+		"source_spacing_m": 4,
+		"minimum_bank_distance_m": 14,
+		"maximum_bank_distance_m": 112,
+		"maximum_wet_mask": 0.10000000149011612,
+		"maximum_source_slope": 0.57999998331069946,
+		"maximum_vertical_displacement_cm": 42,
+		"full_patch_edge_fade_distance_m": 36,
+		"world_space_phase_continuity": true,
+		"wet_cells_emitted": false,
+		"affects_gameplay_collision": false,
+		"affects_hydraulics": false
+	},
 	"cc0_scanned_ground_cover_v1": true,
 	"cc0_scanned_ground_cover_mesh_forms": 8,
 	"cc0_scanned_ground_cover_imported_family_forms": 19,
@@ -61,6 +79,10 @@
 	"metrics":
 	{
 		"terrain_tiles": 13,
+		"dry_bank_microrelief_patches": 6,
+		"dry_bank_microrelief_vertices": 179896,
+		"dry_bank_microrelief_triangles": 219056,
+		"dry_bank_microrelief_maximum_displacement_cm": 42,
 		"water_tiles": 39,
 		"whitewater_foam_actors": 24,
 		"terminal_visual_water_actors": 1,
@@ -87,10 +109,10 @@
 		"local_reflection_probes": 13
 	},
 	"captures": [
-		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/chili_bar_launch_downstream.png",
-		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/meat_grinder_guide_eye.png",
-		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/troublemaker_approach.png",
-		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/coloma_bridge_context.png",
-		"docs/environment-captures/south_fork_full_reach/photographic_v219_padded_low_relief_solver_foam/salmon_falls_takeout.png"
+		"docs/environment-captures/south_fork_full_reach/chili_bar_launch_downstream.png",
+		"docs/environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png",
+		"docs/environment-captures/south_fork_full_reach/troublemaker_approach.png",
+		"docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
+		"docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png"
 	]
 }

@@ -4516,3 +4516,15 @@ path is verified, and the completion goal can be marked complete.
   local change, while the coarse wetsuit neckline, cloth skinning/deformation, motion review,
   photoreal character art, and all seven external approvals remain open in
   `m9_cc0_clavicle_span_v1_review.json`.
+- South Fork dry-bank microrelief V1 adds six source-registered Nanite
+  presentation patches around the five canonical full-reach review cameras.
+  The dry-only 2 m mesh exposes 179,896 vertices and 219,056 triangles, uses
+  world-space nonperiodic relief capped at 42 cm, and excludes wet cells, the
+  inner 14 m river corridor, steep faces, collision, navigation, water,
+  bathymetry, hydraulics, buoyancy, and raft forces. Exact-map hidden-layer
+  comparisons retain shallow bank-surface breakup without a shoreline or tile
+  seam. A shadow-casting bracket was rejected for black shelf bands; retained
+  actors cannot cast shadows. This is bounded technical progress, not
+  photoreal promotion: broad terrain texture, vegetation, water/VFX, measured
+  performance, and all seven external approvals remain open in
+  `docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/review.json`.
