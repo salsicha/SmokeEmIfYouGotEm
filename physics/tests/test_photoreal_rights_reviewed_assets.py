@@ -1092,7 +1092,7 @@ def test_batoka_basalt_iterations_are_isolated_hashed_and_source_bounded():
     assert "BatokaBasaltTint" in editor_source
     assert "BatokaWeatheredInterflowTint" in editor_source
     assert "BatokaTerrainColorCoverageFloor" in editor_source
-    assert "BatokaDetailColorWeight\"), 0.07f" in editor_source
+    assert "BatokaDetailColorWeight\"), 0.16f" in editor_source
     assert "BatokaDetailNormalWeight" in editor_source
     assert "BatokaDetailRoughnessWeight" in editor_source
     c1_report = json.loads(

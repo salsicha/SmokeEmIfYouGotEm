@@ -1523,7 +1523,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         UMaterialExpressionScalarParameter* BatokaDetailRoughnessWeight =
             NewObject<UMaterialExpressionScalarParameter>(Material);
         BatokaDetailRoughnessWeight->ParameterName = TEXT("BatokaDetailRoughnessWeight");
-        BatokaDetailRoughnessWeight->DefaultValue = 0.18f;
+        BatokaDetailRoughnessWeight->DefaultValue = 0.30f;
         BatokaDetailRoughnessWeight->Group = TEXT("BatokaOrganicBasaltV16");
         Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessWeight);
         UMaterialExpressionLinearInterpolate* BatokaTwoScaleRoughness =
@@ -1557,7 +1557,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     ForestDetailedNormal->Alpha.Expression = DetailNormalWeight;
     Material->GetExpressionCollection().AddExpression(ForestDetailedNormal);
     UMaterialExpressionConstant* RockNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
-    RockNormalWeight->R = bZambezi ? 0.38f : (bFutaleufu ? 0.42f : 0.42f);
+    RockNormalWeight->R = bZambezi ? 0.52f : (bFutaleufu ? 0.42f : 0.42f);
     Material->GetExpressionCollection().AddExpression(RockNormalWeight);
     UMaterialExpressionLinearInterpolate* RockDetailedNormal =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -1576,7 +1576,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         UMaterialExpressionScalarParameter* BatokaDetailNormalWeight =
             NewObject<UMaterialExpressionScalarParameter>(Material);
         BatokaDetailNormalWeight->ParameterName = TEXT("BatokaDetailNormalWeight");
-        BatokaDetailNormalWeight->DefaultValue = 0.24f;
+        BatokaDetailNormalWeight->DefaultValue = 0.38f;
         BatokaDetailNormalWeight->Group = TEXT("BatokaOrganicBasaltV16");
         Material->GetExpressionCollection().AddExpression(BatokaDetailNormalWeight);
         UMaterialExpressionLinearInterpolate* BatokaTwoScaleNormal =
@@ -1627,7 +1627,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         Material->GetExpressionCollection().AddExpression(BatokaMacroAoMask);
         UMaterialExpressionConstant* BatokaMacroAoWeight =
             NewObject<UMaterialExpressionConstant>(Material);
-        BatokaMacroAoWeight->R = 0.32f;
+        BatokaMacroAoWeight->R = 0.44f;
         Material->GetExpressionCollection().AddExpression(BatokaMacroAoWeight);
         UMaterialExpressionLinearInterpolate* BatokaRockAo =
             NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -1645,7 +1645,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     }
 
     UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
-    Specular->R = bRockCanyon ? 0.10f : 0.16f;
+    Specular->R = bZambezi ? 0.06f : (bRockCanyon ? 0.10f : 0.16f);
     Material->GetExpressionCollection().AddExpression(Specular);
     UMaterialExpression* FinalBaseColor = DetailedBaseColor;
     UMaterialExpression* FinalRoughness = DetailedRoughness;
@@ -1722,7 +1722,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         FinalSpecular = ConditionedWetSpecular;
     }
     UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-    EmissiveScale->R = bRockCanyon ? 0.008f : 0.025f;
+    EmissiveScale->R = bZambezi ? 0.002f : (bRockCanyon ? 0.008f : 0.025f);
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
     UMaterialExpressionMultiply* Emissive = NewObject<UMaterialExpressionMultiply>(Material);
     Emissive->A.Expression = FinalBaseColor;

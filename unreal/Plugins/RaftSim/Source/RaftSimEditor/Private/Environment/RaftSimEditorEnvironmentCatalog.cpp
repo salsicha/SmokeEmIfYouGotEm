@@ -303,12 +303,17 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     }
     else if (RiverId == TEXT("zambezi_batoka_gorge"))
     {
-        Settings.SunIntensity = 5.30f;
-        Settings.SkyLightIntensity = 1.65f;
+        // V18 keeps the dry-season directional read but moves the launch
+        // gorge below the clipped-water and chalk-scarp bracket retained by
+        // V17. These values are photographic presentation only.
+        Settings.SunIntensity = 4.35f;
+        Settings.SkyLightIntensity = 1.28f;
         Settings.FogDensity = 0.0038f;
-        Settings.ExposureBias = -0.18f;
-        Settings.Saturation = 1.04f;
-        Settings.SunColor = FLinearColor(1.0f, 0.91f, 0.78f);
+        Settings.ExposureBias = -0.30f;
+        Settings.Saturation = 1.01f;
+        Settings.Contrast = 1.05f;
+        Settings.Sharpen = 0.24f;
+        Settings.SunColor = FLinearColor(1.0f, 0.92f, 0.82f);
         Settings.FogColor = FLinearColor(0.58f, 0.50f, 0.39f);
     }
     else if (RiverId == TEXT("futaleufu_terminator"))

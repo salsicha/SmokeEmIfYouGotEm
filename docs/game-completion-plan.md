@@ -25,6 +25,16 @@ release head; this confirms runnable-reference status only and does not close
 its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
 See `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v2_review.json`.
 
+**Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
+uses a river-local exposure-safe reflection bracket, darker bounded basalt
+shading, and 7,200 shorter launch-cover instances. The schema-v20 map audit,
+five focused native environment tests, and all six PIE river-load gates pass;
+Zambezi MapCheck reports zero errors and warnings. No DEM, collision, water
+geometry, wet/dry, solver, buoyancy, or raft-force authority changed. The
+retained image still exposes smooth 30 m canyon geometry and repeated synthetic
+ecology, so photoreal promotion and all seven external gates remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_review.json`.
+
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
 be labeled `procedural_infill`, store its seed and inputs, blend continuously into known

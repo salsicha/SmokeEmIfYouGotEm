@@ -1986,12 +1986,12 @@ bool AddLandscapeCandidateRunnableGameplay(
                 "Zambezi Batoka river-local live-water assets are incomplete.\n");
             return false;
         }
-        WaterConfig->LiveSurfaceCalmCoverage = 0.025f;
-        WaterConfig->LiveSurfaceActiveCoverage = 0.13f;
-        WaterConfig->LiveSurfaceSpecular = 0.22f;
-        WaterConfig->LiveSurfaceRoughness = 0.42f;
-        WaterConfig->LiveSkyReflectionStrength = 0.15f;
-        WaterConfig->LiveRippleStrength = 0.22f;
+        WaterConfig->LiveSurfaceCalmCoverage = 0.0f;
+        WaterConfig->LiveSurfaceActiveCoverage = 0.06f;
+        WaterConfig->LiveSurfaceSpecular = 0.15f;
+        WaterConfig->LiveSurfaceRoughness = 0.66f;
+        WaterConfig->LiveSkyReflectionStrength = 0.055f;
+        WaterConfig->LiveRippleStrength = 0.48f;
         WaterConfig->LiveFoamIntensity = 0.64f;
         WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
         WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.62f;
@@ -2010,7 +2010,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveDeepSurfaceColor =
             FLinearColor(0.013f, 0.030f, 0.016f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.075f, 0.115f, 0.140f, 1.0f);
+            FLinearColor(0.030f, 0.052f, 0.064f, 1.0f);
         WaterConfig->LiveWaterScattering =
             FLinearColor(0.00018f, 0.00015f, 0.00009f, 0.0f);
         WaterConfig->LiveWaterAbsorption =
@@ -2023,6 +2023,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->Tags.AddUnique(TEXT("RaftSimZambeziTransmittingWaterV2"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimOpacityFeatheredVolumeEdgeV2"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimRestrainedSolarGlareV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimZambeziLocalizedReflectionWaterV18"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }

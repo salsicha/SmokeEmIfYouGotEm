@@ -22,7 +22,8 @@ package is not the runnable map.
 
 The runnable map was regenerated and rechecked after the later environment,
 character, water, terrain, and rapid-presentation milestones, including the
-retained V17 upper-scarp and launch-cover pass. The player path is still:
+retained V18 launch-optics, scarp-shading, and launch-cover pass. The player
+path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
@@ -103,8 +104,8 @@ is tagged as a mandatory commercial portage. Gameplay hides the labels; the
 World Outliner and editor viewport retain them for authoring.
 
 The saved runnable map also contains four render-only source-terrain tiles with
-the retained Batoka V12 world-aligned basalt material and V17 height-aware
-organic morphology. Grid central differences replace triangle-averaged normals,
+the retained Batoka V12 world-aligned basalt material, V17 height-aware organic
+morphology, and V18 exposure-safe shading. Grid central differences replace triangle-averaged normals,
 and the initial authored relief uses slower wavelengths under a 2.2 m cap
 instead of sampling near the 12.5 m render-mesh Nyquist limit. The 72 m
 active-water half-width is followed by a hard 28 m dry-bank buffer. The widest
@@ -128,22 +129,34 @@ deterministic. None of this changes the hidden Copernicus Landscape used for
 collision, height queries, or physics. The actor tags
 `RaftSimProceduralVisualMorphology`, `RaftSimBatokaOrganicMorphologyV17`,
 `RaftSimBatokaHeightAwareFacetReconstructionV17`,
-`RaftSimBatokaUpperDryScarpInfillV17`,
+`RaftSimBatokaUpperDryScarpInfillV17`, `RaftSimBatokaExposureSafeScarpV18`,
 `RaftSimCoarseSourceSelfShadowSuppressed`, `RaftSimProtectedShorelineBuffer`,
 `RaftSimBatokaWorldAlignedTerrain`, and `RaftSimNonCollisionRenderSurface`
 make that authority boundary inspectable in the generated map.
 
 The runnable launch bank-cover search also no longer minimizes absolute slope,
 which had collapsed most synthetic cover onto one flat contour. It gives each
-of 5,200 deterministic, shadowless, non-colliding instances its own bounded
-slope and dry-height target and uses a lower-energy dry-season palette. All
-5,200 targets pass in the retained map; the maximum selected source slope is
-41.74 degrees. A larger, steeper talus bracket was rejected after its shadow
+of 7,200 deterministic, shadowless, non-colliding instances its own bounded
+slope and dry-height target and uses a lower-energy dry-season palette. V18
+reduces target height from 0.95-2.30 m to 0.55-1.55 m and narrows the footprint
+range while increasing coverage. All 7,200 targets pass in the retained map;
+the maximum selected source slope is 41.98 degrees. A larger, steeper talus bracket was rejected after its shadow
 formed a tall black wedge on the left wall. The retained map restores the
 previous 0.95-5.20 m talus size and placement bounds and has no such wedge in
 the matched launch frame. The technical pass, rejected bracket, hash locks,
 visual limitations, and external gates are recorded in
-`zambezi_organic_upper_scarp_v17_review.json`.
+`zambezi_organic_upper_scarp_v17_review.json`; the later exposure, water, and
+cover evidence is in `zambezi_launch_optical_naturalism_v18_review.json`.
+
+V18 also localizes the launch-water reflection response. The calm detail skin
+is disabled, active coverage is 6%, roughness is 0.66, and river-local sky
+reflection strength is 0.055. A lower sun/skylight/exposure bracket and a broad
+bounded erosion-stain field reduce clipped water highlights and the chalky
+sun-facing scarp without moving water, terrain, collision, or solver geometry.
+In the matched 1280×720 launch view, the water p95 falls from 0.8859 to 0.8478,
+the fraction above 0.90 falls from 0.01685 to 0.00065, and the left-water
+fraction above 0.90 falls from 0.03989 to 0.00148. These are descriptive image
+metrics, not photoreal or hydraulic acceptance.
 
 The runnable launch also carries two adaptive, source-conditioned bank meshes
 covering stations 0-1,000 m. They bilinearly sample the four conditioned terrain
@@ -458,17 +471,17 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v18 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v20 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
-non-colliding, non-shadow-casting V15 visual-terrain tiles, the exact -48/-90
+non-colliding, non-shadow-casting V18-tagged visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding adaptive near-field banks,
 the four-actor sun/sky/fill/fog atmosphere contract, absence of rejected
 high-density bank actors, the
 exact five vegetation mesh families and
-13 instance components with a 12,843-instance total, exactly one tagged
+13 instance components with a 14,843-instance total, exactly one tagged
 1,200-instance camera-visible bank mosaic, three tagged camera-visible woody
 components with the 58/57/117 accepted split and 24° slope-ceiling contract,
-two 2,600-instance launch-cover components, three launch woody components with
+two 3,600-instance launch-cover components, three launch woody components with
 the 153/152/306 accepted split, their full-route/dry-height/slope placement tags, and
 the bounded launch-window shadow exception,
 six separately tagged launch-talus components with 360 total source-grounded,

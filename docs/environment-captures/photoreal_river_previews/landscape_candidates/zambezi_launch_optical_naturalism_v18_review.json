@@ -1,0 +1,211 @@
+{
+  "schema": "raftsim.environment.zambezi_launch_optical_naturalism_review.v18",
+  "recorded_local_date": "2026-08-03",
+  "verified_base_commit": "cd32c03964f87e6c6e32f74b089efa383f991d85",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "passed": false,
+  "status": "launch_optics_and_ecology_technical_pass_photoreal_promotion_fail",
+  "authority": "presentation_only_reference_free_run_not_geospatial_geologic_hydraulic_or_navigation_authority",
+  "decision": {
+    "technical_candidate_retained": true,
+    "launch_water_clipping_reduced": true,
+    "sun_facing_scarp_energy_reduced": true,
+    "lower_energy_launch_cover_passed": true,
+    "photoreal_acceptance_passed": false,
+    "terrain_collision_or_height_authority_changed": false,
+    "water_geometry_wet_dry_mask_or_solver_state_changed": false,
+    "raft_collision_buoyancy_or_forces_changed": false
+  },
+  "implementation": {
+    "lighting_and_capture": {
+      "sun_intensity": 4.35,
+      "skylight_intensity": 1.28,
+      "exposure_bias": -0.3,
+      "saturation": 1.01,
+      "contrast": 1.05,
+      "sharpen": 0.24,
+      "river_reflection_capture_brightness": 0.62,
+      "tags": [
+        "RaftSimZambeziExposureSafeReflectionRigV18"
+      ]
+    },
+    "live_water": {
+      "calm_detail_coverage": 0.0,
+      "active_detail_coverage": 0.06,
+      "surface_specular": 0.15,
+      "surface_roughness": 0.66,
+      "sky_reflection_strength": 0.055,
+      "ripple_strength": 0.48,
+      "fallback_sky_reflection_floor": 0.07,
+      "fallback_sky_reflection_variation": 0.26,
+      "ripple_grazing_floor": 0.72,
+      "slick_normal_floor": 0.82,
+      "slick_roughness_scale": 0.96,
+      "fresnel_specular": 0.018,
+      "tags": [
+        "RaftSimZambeziLocalizedReflectionWaterV18",
+        "RaftSimNoSolverStateMutation"
+      ]
+    },
+    "terrain_shading": {
+      "conditioned_visual_tile_count": 4,
+      "visual_tile_collision": false,
+      "geometry_offsets_changed_from_v17": false,
+      "basalt_tint": [
+        0.27,
+        0.29,
+        0.31
+      ],
+      "weathered_interflow_tint": [
+        0.45,
+        0.34,
+        0.3
+      ],
+      "erosion_stain_scale": 0.000035,
+      "erosion_shadow_scale": 0.7,
+      "erosion_highlight_scale": 0.98,
+      "detail_normal_weight": 0.38,
+      "detail_roughness_weight": 0.3,
+      "specular": 0.06,
+      "emissive_scale": 0.002,
+      "tags": [
+        "RaftSimBatokaExposureSafeScarpV18",
+        "RaftSimProtectedShorelineBuffer",
+        "RaftSimNonCollisionRenderSurface"
+      ]
+    },
+    "launch_ground_cover": {
+      "target_instances": 7200,
+      "placed_instances": 7200,
+      "target_height_range_cm": [
+        55.0,
+        155.0
+      ],
+      "footprint_scale_range": [
+        1.2,
+        2.45
+      ],
+      "cast_shadow": false,
+      "collision": false,
+      "tags": [
+        "RaftSimZambeziLowerEnergyLaunchEcologyV18"
+      ]
+    }
+  },
+  "generated_map_evidence": {
+    "scenario_marker_count": 25,
+    "player_raft_count": 1,
+    "runtime_water_config_count": 1,
+    "conditioned_visual_tile_count": 4,
+    "opaque_vegetation_instance_count": 14843,
+    "launch_ground_cover": {
+      "target_instances": 7200,
+      "placed_instances": 7200,
+      "rejected_instances": 0,
+      "maximum_selected_slope_degrees": 41.98
+    },
+    "map_check_errors": 0,
+    "map_check_warnings": 0
+  },
+  "matched_visual_evidence": {
+    "capture_command": "RaftSim.CaptureRaft 5 <label> 8 4 22",
+    "resolution_px": [
+      1280,
+      720
+    ],
+    "raft_world_position_cm": [
+      327581.099,
+      -418717.273,
+      15721.953
+    ],
+    "baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_upper_scarp_v17_retained.png",
+      "sha256": "b54746392b9350fe9c7cd4f625fbb64a7673a2b3ead11c9128821236bdc0f20d"
+    },
+    "retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_retained.png",
+      "sha256": "5120511c12326896e73b7615c8754c38847516791c4c94000b5b051acc4ca449"
+    },
+    "descriptive_luminance_metrics": {
+      "water_roi": "rows 285 through 649, full width",
+      "left_water_roi": "rows 285 through 649, columns 0 through 539",
+      "scarp_roi": "rows 0 through 304; pixels where R > 1.12 B, R > 0.95 G, and luminance < 0.92",
+      "baseline": {
+        "water_mean": 0.629329426,
+        "water_p95": 0.885944314,
+        "water_pixels_above_0_90_fraction": 0.016853596,
+        "left_water_mean": 0.783271585,
+        "left_water_pixels_above_0_90_fraction": 0.039888382,
+        "scarp_mean": 0.57980272,
+        "scarp_p95": 0.773771765,
+        "scarp_pixels_above_0_80_fraction": 0.012687195
+      },
+      "retained": {
+        "water_mean": 0.644180118,
+        "water_p95": 0.84783451,
+        "water_pixels_above_0_90_fraction": 0.000650685,
+        "left_water_mean": 0.757229544,
+        "left_water_pixels_above_0_90_fraction": 0.001476408,
+        "scarp_mean": 0.540374105,
+        "scarp_p95": 0.738461961,
+        "scarp_pixels_above_0_80_fraction": 0.00135868
+      },
+      "interpretation": "The fixed-frame measurements show reduced clipped highlights only; they are not perceptual realism, water accuracy, geology, or art-approval metrics."
+    }
+  },
+  "visual_reference_context": {
+    "source": "https://safpar.com/10-things-know-rafting-zambezi-river/",
+    "observations_used": "Dry-season rafting context and the steep-sided basalt-gorge character informed the restrained exposure and rock-tone bracket.",
+    "asset_imported": false,
+    "rights_or_redistribution_claim": false,
+    "geology_or_navigation_authority": false
+  },
+  "hash_locked_retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "52321a4e9a1e966d4f6fe2fdc38d6c970e37fd8c17f60128347a20528daf1fff"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset",
+      "sha256": "d212a77657cb6cf5a4b02a7d5d2922d87bff6654fda75f6dec5cca372f483c69"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.uasset",
+      "sha256": "c18368458a9c6226b25b327a9ece5ba8e6efac948ed93d237a231a929f18e9d3"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "0db600e9d1089802fd597ff55d7ecfecfdc328ee49c6dc64fb9b4f824e28320f"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_retained.png",
+      "sha256": "5120511c12326896e73b7615c8754c38847516791c4c94000b5b051acc4ca449"
+    }
+  ],
+  "validation": {
+    "editor_build": "pass",
+    "map_generation": "pass_30_assets_validated",
+    "saved_map_audit": "pass_25_markers_1_raft_1_runtime_water_4_conditioned_visual_tiles_14843_opaque_vegetation_instances",
+    "focused_native_environment_tests": "RaftSim.M9.FZambezi_5/5_passed",
+    "all_six_river_map_loads": "RaftSim.P4.RiverMapLoads_6/6_passed",
+    "zambezi_mapcheck": "0_errors_0_warnings",
+    "python_zambezi_contracts": "14/14_passed",
+    "related_python_environment_and_portfolio_suite": "80/80_passed"
+  },
+  "visual_findings": [
+    "The retained fixed frame removes most pixels above 0.90 luminance from the broad launch-water highlight while keeping the live solver surface readable.",
+    "The sun-facing scarp retains a dry-season read with lower highlight energy and broader mineral staining.",
+    "The launch cover is shorter, denser, and less silhouette-heavy while remaining source-grounded, non-colliding, and presentation-only.",
+    "The 30 m source still produces rounded, smooth canyon geometry, and the procedural vegetation still repeats visibly; the result does not pass photoreal promotion."
+  ],
+  "external_gates_remaining": [
+    "Rights-cleared higher-resolution terrain, lidar, stereo reconstruction, photogrammetry, or field-capture coverage for the playable reach.",
+    "Reach-specific geology and named-outcrop review rather than generic rock analogs and procedural scarp shading.",
+    "Guide and geospatial approval of centerline, datums, banks, channel sections, route, access, portage, rescue context, and hazards.",
+    "Approved southern African gorge species, density, age, season, wind, and wetness.",
+    "Production terrain, shoreline, vegetation, rock, water, breaking-water, foam, spray, mist, atmosphere, raft, and crew art approval.",
+    "Validated seasonal hydraulics, bathymetry, guide lines, hazard readability, and rescue behavior.",
+    "Measured packaged desktop and target-VR visual and performance acceptance."
+  ]
+}

@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v19",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v20",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -386,7 +386,7 @@ def main() -> None:
                     "authority": "source_conditioned_plus_bounded_procedural_render_only",
                     "physics_and_collision_authority": "source_copernicus_landscape",
                     "morphology_contract": (
-                        "v17_organic_basalt_with_wet_bank_protection_and_"
+                        "v18_exposure_safe_organic_basalt_with_wet_bank_protection_and_"
                         "height_aware_upper_dry_scarp_infill_plus_central_"
                         "difference_grid_normals_and_source_facet_reconstruction"
                     ),
@@ -437,7 +437,7 @@ def main() -> None:
                 "lighting": {
                     "authority": "presentation_only_no_physics_effect",
                     "source_facet_amplification_control": (
-                        "zambezi_specific_gorge_aligned_sun"
+                        "zambezi_specific_gorge_aligned_exposure_safe_sun_v18"
                     ),
                     "required_pitch_degrees": -48.0,
                     "required_yaw_degrees": -90.0,
@@ -459,6 +459,10 @@ def main() -> None:
                     "gameplay_shading_contract": "solver_owned_transmitting_volume_core",
                     "bank_edge_contract": (
                         "vertex_alpha_feathered_single_layer_water_volume_v2"
+                    ),
+                    "reflection_contract": (
+                        "v18_rough_local_response_with_restrained_sky_floor_and_"
+                        "no_calm_detail_overlay"
                     ),
                     "capture_shading_model_contract": "DefaultLit",
                     "capture_normal_motion_contract": "two_opposed_panned_atlas_layers",
@@ -624,8 +628,8 @@ def main() -> None:
         report["vegetation"]["runnable_launch_bank_cover_instance_count"] = sum(
             int(row["instance_count"]) for row in runnable_launch_bank_cover_rows
         )
-        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 5200
-        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = 5200 - int(
+        report["vegetation"]["runnable_launch_bank_cover_target_instance_count"] = 7200
+        report["vegetation"]["runnable_launch_bank_cover_rejection_count"] = 7200 - int(
             report["vegetation"]["runnable_launch_bank_cover_instance_count"]
         )
         report["vegetation"]["runnable_launch_bank_cover_slope_ceiling_degrees"] = 42.0
@@ -633,7 +637,8 @@ def main() -> None:
             "runnable_launch_bank_cover_shadow_policy"
         ] = "disabled_on_noncolliding_ground_cover_only"
         report["vegetation"]["runnable_launch_bank_cover_placement_contract"] = (
-            "two_morphology_deterministic_96_candidate_target_offset_mosaic_"
+            "v18_lower_energy_short_cover_two_morphology_deterministic_96_"
+            "candidate_target_offset_mosaic_"
             "approximately_55m_to_955m_downstream_with_12m_to_180m_dry_"
             "bank_spread_12km_cull_range_full_route_clearance_dry_height_"
             "and_hard_slope_gates"
@@ -731,6 +736,7 @@ def main() -> None:
                 and "RaftSimBatokaOrganicMorphologyV17" in row["tags"]
                 and "RaftSimBatokaHeightAwareFacetReconstructionV17" in row["tags"]
                 and "RaftSimBatokaUpperDryScarpInfillV17" in row["tags"]
+                and "RaftSimBatokaExposureSafeScarpV18" in row["tags"]
                 and "RaftSimCoarseSourceSelfShadowSuppressed" in row["tags"]
                 and "RaftSimProtectedShorelineBuffer" in row["tags"]
                 for row in terrain_rows
@@ -749,10 +755,31 @@ def main() -> None:
             in live_foam_lace.get_path_name()
             and float(
                 water_config.get_editor_property("live_surface_calm_coverage")
-            ) < 0.10
-            and float(
-                water_config.get_editor_property("live_surface_active_coverage")
-            ) < 0.20
+            ) <= 0.001
+            and abs(
+                float(
+                    water_config.get_editor_property("live_surface_active_coverage")
+                )
+                - 0.06
+            ) <= 0.001
+            and abs(
+                float(water_config.get_editor_property("live_surface_roughness"))
+                - 0.66
+            ) <= 0.001
+            and abs(
+                float(water_config.get_editor_property("live_surface_specular"))
+                - 0.15
+            ) <= 0.001
+            and abs(
+                float(
+                    water_config.get_editor_property("live_sky_reflection_strength")
+                )
+                - 0.055
+            ) <= 0.001
+            and abs(
+                float(water_config.get_editor_property("live_ripple_strength"))
+                - 0.48
+            ) <= 0.001
             and bool(
                 water_config.get_editor_property(
                     "enable_live_presentation_surface_smoothing"
@@ -777,6 +804,7 @@ def main() -> None:
             and "RaftSimZambeziTransmittingWaterV2" in water_config_tags
             and "RaftSimOpacityFeatheredVolumeEdgeV2" in water_config_tags
             and "RaftSimRestrainedSolarGlareV2" in water_config_tags
+            and "RaftSimZambeziLocalizedReflectionWaterV18" in water_config_tags
             and water_surface_rows[0]["procedural_mesh_count"] == 1
             and "MI_RaftSim_Zambezi_PhysicalCorridorWaterCandidate"
             in str(water_surface_rows[0]["material"])
@@ -891,6 +919,7 @@ def main() -> None:
                 not row["cast_shadow"]
                 and "RaftSimGroundCoverSelfShadowSuppressed" in row["tags"]
                 and "RaftSimOrganicGroundCoverMorphologyV2" in row["tags"]
+                and "RaftSimZambeziLowerEnergyLaunchEcologyV18" in row["tags"]
                 for row in runnable_launch_bank_cover_rows
             )
             and len(runnable_launch_woody_rows) == 3

@@ -587,8 +587,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
                             TEXT("T_RaftSim_ZambeziBatokaWaterV1_FoamLace")));
                 Test->TestTrue(
                     TEXT("Zambezi live detail skin cannot become an opaque sheet"),
-                    (*It)->LiveSurfaceCalmCoverage < 0.10f &&
-                        (*It)->LiveSurfaceActiveCoverage < 0.20f);
+                    FMath::IsNearlyZero(
+                        (*It)->LiveSurfaceCalmCoverage, 0.001f) &&
+                        FMath::IsNearlyEqual(
+                            (*It)->LiveSurfaceActiveCoverage,
+                            0.06f,
+                            0.001f));
+                Test->TestTrue(
+                    TEXT("Zambezi V18 keeps a rough localized reflection response"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveSurfaceRoughness, 0.66f, 0.001f) &&
+                        FMath::IsNearlyEqual(
+                            (*It)->LiveSurfaceSpecular, 0.15f, 0.001f) &&
+                        FMath::IsNearlyEqual(
+                            (*It)->LiveSkyReflectionStrength, 0.055f, 0.001f) &&
+                        FMath::IsNearlyEqual(
+                            (*It)->LiveRippleStrength, 0.48f, 0.001f));
                 Test->TestTrue(
                     TEXT("Zambezi uses render-only surface smoothing"),
                     (*It)->bEnableLivePresentationSurfaceSmoothing &&
@@ -608,6 +622,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
                         (*It)->Tags.Contains(
                             TEXT("RaftSimOpacityFeatheredVolumeEdgeV2")) &&
                         (*It)->Tags.Contains(TEXT("RaftSimRestrainedSolarGlareV2")) &&
+                        (*It)->Tags.Contains(
+                            TEXT("RaftSimZambeziLocalizedReflectionWaterV18")) &&
                         (*It)->Tags.Contains(TEXT("RaftSimSolverMaskedFoamLace")) &&
                         (*It)->Tags.Contains(TEXT("RaftSimNoSolverStateMutation")));
                 ++RuntimeWaterConfigCount;
@@ -696,6 +712,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("conditioned Batoka tile is render-only"),
                 Mesh->GetCollisionEnabled(),
                 ECollisionEnabled::NoCollision);
+            Test->TestTrue(
+                TEXT("conditioned Batoka tile records the V18 exposure-safe scarp pass"),
+                Actor->Tags.Contains(
+                    TEXT("RaftSimBatokaExposureSafeScarpV18")));
             const UMaterialInterface* Material = Mesh->GetMaterial(0);
             Test->TestNotNull(TEXT("conditioned Batoka tile has a material"), Material);
             if (Material)

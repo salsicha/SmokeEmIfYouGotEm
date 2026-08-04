@@ -96,12 +96,12 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
     // into one clipped white launch glare. V2 keeps reflected sky readable,
     // but makes it a broken, sediment-coloured response rather than a flat
     // luminous sheet. These parameters are render-only.
-    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.26f);
-    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.44f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.28f);
-    SetScalar(TEXT("SlickNormalFloor"), 0.22f);
-    SetScalar(TEXT("SlickRoughnessScale"), 0.72f);
-    SetScalar(TEXT("FresnelSpecular"), 0.10f);
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.07f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.26f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.72f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.82f);
+    SetScalar(TEXT("SlickRoughnessScale"), 0.96f);
+    SetScalar(TEXT("FresnelSpecular"), 0.018f);
     SetScalar(TEXT("LiveVolumeBankCoverageFloor"), 0.0f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
@@ -120,8 +120,8 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
         return nullptr;
     }
     OutSummary += TEXT(
-        "Built Zambezi Batoka river-local live-volume water V2 with "
-        "coverage-feathered banks, restrained glare, project-owned flow-normal, "
+        "Built Zambezi Batoka river-local live-volume water V18 with "
+        "coverage-feathered banks, localized glare, project-owned flow-normal, "
         "and solver-masked foam-lace textures.\n");
     return Instance;
 }

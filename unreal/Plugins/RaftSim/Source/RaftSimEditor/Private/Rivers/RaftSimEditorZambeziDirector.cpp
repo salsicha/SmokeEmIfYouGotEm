@@ -1134,6 +1134,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
         Actor->Tags.AddUnique(TEXT("RaftSimBatokaOrganicMorphologyV17"));
         Actor->Tags.AddUnique(TEXT("RaftSimBatokaHeightAwareFacetReconstructionV17"));
         Actor->Tags.AddUnique(TEXT("RaftSimBatokaUpperDryScarpInfillV17"));
+        Actor->Tags.AddUnique(TEXT("RaftSimBatokaExposureSafeScarpV18"));
         Actor->Tags.AddUnique(TEXT("RaftSimCoarseSourceSelfShadowSuppressed"));
         Actor->Tags.AddUnique(TEXT("RaftSimProtectedShorelineBuffer"));
         MeshComponent->SetCastShadow(false);
@@ -1557,7 +1558,7 @@ bool RaftSimEditorEnvironment::ApplyZambeziBatokaVisualTerrainTreatment(
     }
     OutSummary += FString::Printf(
         TEXT("Applied the Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
-        bApplyVisualMorphology ? TEXT("V17 height-aware organic morphology plus V12 world-aligned material")
+        bApplyVisualMorphology ? TEXT("V18 exposure-safe height-aware morphology plus world-aligned organic material")
                                : TEXT("V12 world-aligned material"),
         LocalStats.VisualTileCount);
     return LocalStats.VisualTileCount == 4;

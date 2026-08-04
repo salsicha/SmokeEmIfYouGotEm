@@ -42,6 +42,15 @@ six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 the hash-locked evidence is in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v11_review.json`.
 
+The subsequent V18 Zambezi presentation pass preserves that same runnable
+selector and runtime contract while reducing clipped launch-water and scarp
+highlights. The saved map audits 7,200 shorter launch-cover instances and
+14,843 total opaque vegetation instances; all five focused Zambezi material and
+water tests and all six P4 map-load gates pass. This is visual technical
+progress only—coarse terrain, ecology/geology specificity, calibrated
+hydraulics, production art, and external acceptance remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_review.json`.
+
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
 ## Workstreams

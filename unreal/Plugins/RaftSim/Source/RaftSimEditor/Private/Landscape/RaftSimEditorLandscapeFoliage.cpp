@@ -38,7 +38,7 @@ constexpr float HanceDrylandShrubSlopeCeilingDegrees = 30.0f;
 constexpr int32 ZambeziEvidenceBankMosaicInstanceCount = 1200;
 constexpr int32 ZambeziEvidenceWoodyInstanceCount = 240;
 constexpr float ZambeziEvidenceWoodySlopeCeilingDegrees = 24.0f;
-constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 5200;
+constexpr int32 ZambeziRunnableLaunchBankCoverInstanceCount = 7200;
 constexpr int32 ZambeziRunnableLaunchMinimumBankCoverInstanceCount = 4500;
 constexpr float ZambeziRunnableLaunchGroundCoverSlopeCeilingDegrees = 42.0f;
 constexpr int32 ZambeziRunnableLaunchWoodyInstanceCount = 640;
@@ -4092,12 +4092,16 @@ bool AddLandscapeCandidateBiomeDressing(
             if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
             {
                 Owner->Tags.AddUnique(TEXT("RaftSimRunnableLaunchBankEcologyV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimZambeziLowerEnergyLaunchEcologyV18"));
             }
             if (Component)
             {
                 Component->SetCullDistances(0, 120000);
                 Component->ComponentTags.AddUnique(
                     TEXT("RaftSimRunnableLaunchBankEcologyV1"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziLowerEnergyLaunchEcologyV18"));
             }
         }
         const TArray<UHierarchicalInstancedStaticMeshComponent*>
@@ -6948,8 +6952,8 @@ bool AddLandscapeCandidateBiomeDressing(
             }
 
             const float TargetHeightCm = FMath::Lerp(
-                95.0f,
-                230.0f,
+                55.0f,
+                155.0f,
                 ZambeziVegetationUnitRandom(CoverIndex, 9133));
             UStaticMesh* GroundCoverMesh = UnderstoryMesh;
             UHierarchicalInstancedStaticMeshComponent* GroundCoverInstances =
@@ -6965,8 +6969,8 @@ bool AddLandscapeCandidateBiomeDressing(
                     GroundCoverMesh).GetSize().Z);
             const float UniformScale = TargetHeightCm / SelectedMeshHeightCm;
             const float FootprintScale = FMath::Lerp(
-                1.60f,
-                3.20f,
+                1.20f,
+                2.45f,
                 ZambeziVegetationUnitRandom(CoverIndex, 9151));
             AddGroundedInstance(
                 GroundCoverInstances,

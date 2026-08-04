@@ -29,17 +29,20 @@ still-open production gates are recorded in the
 [release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v11_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
-The current Batoka V17 presentation pass also fills source-missing upper-scarp
-detail on the four non-colliding render tiles, but only above a hard 6 m
-height-over-water gate. It distributes 5,200 shadowless launch-cover instances
-across dry benches and moderate slopes instead of repeatedly selecting one flat
-contour. The hidden Copernicus Landscape remains collision and height-query
-authority; water, wet/dry state, solver samples, buoyancy, and raft forces are
-unchanged. The matched launch capture and rejected talus-shadow bracket are in
-the [V17 upper-scarp review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_upper_scarp_v17_review.json).
-That review passes the bounded organic-terrain improvement and still fails
-photoreal promotion because the 30 m source canyon remains rounded, bright,
-synthetic, and dependent on the listed external data and human acceptance gates.
+The current Batoka V18 presentation pass keeps V17's source-missing upper-scarp
+infill on the four non-colliding render tiles, but reduces clipped launch-water
+glare and the chalky sun-facing scarp response. It distributes 7,200 shorter,
+shadowless launch-cover instances across dry benches and moderate slopes. The
+hidden Copernicus Landscape remains collision and height-query authority;
+water geometry, wet/dry state, solver samples, buoyancy, and raft forces are
+unchanged. In the matched frame, water pixels above 0.90 luminance fall from
+1.685% to 0.065%, and the equivalent left-water fraction falls from 3.989% to
+0.148%. The exact map, optics, material, cover, runtime, and open-gate evidence
+is in the [V18 launch optical-naturalism review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_optical_naturalism_v18_review.json).
+That review retains the bounded visual improvement and still fails photoreal
+promotion because the 30 m source canyon remains rounded and smooth, the
+synthetic vegetation repeats, and the listed external data and human acceptance
+gates remain open.
 The live rapid presentation now uses six of its eight preallocated Niagara
 site pairs around the camera instead of the former two-site ceiling. Zambezi's
 PIE gate requires all six aerosol and roller pairs to be active from its eight
