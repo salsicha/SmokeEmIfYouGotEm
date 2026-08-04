@@ -319,7 +319,11 @@ def test_rights_reviewed_futaleufu_forest_set_is_isolated_and_visually_rejected(
         REVIEWED_FUTALEUFU_FOREST_VISUAL_REVIEW_PATH.read_text(encoding="utf-8")
     )
     editor_source = EDITOR_MODULE_PATH.read_text(encoding="utf-8")
-    active_manifest = LANDSCAPE_CANDIDATE_MANIFEST_PATH.read_text(encoding="utf-8")
+    active_manifest = (
+        REPO_ROOT
+        / "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+        "landscape_candidate_manifest_futaleufu_terminator.json"
+    ).read_text(encoding="utf-8")
 
     assert 'or "alpha" in texture_name' in shared_importer
     assert "RAFTSIM_FUTALEUFU_FOREST_SOURCE_ROOT" in script
@@ -411,8 +415,24 @@ def test_rights_reviewed_futaleufu_forest_set_is_isolated_and_visually_rejected(
         if capture.exists():
             assert _sha256(capture) == visual_review["reviewed_candidate"][hash_key]
 
-    assert "FutaleufuTemperateForestSet_1K" not in editor_source
-    assert "futaleufu_temperate_forest_set" not in active_manifest.lower()
+    # The rejected whole-set canopy policy remains historical evidence. The
+    # later V1 activation is deliberately narrower: only the small saplings
+    # and ferns are allowed in a non-colliding near-bank review stratum.
+    assert visual_review["active_map_policy"] == (
+        "futaleufu_temperate_forest_set_must_not_be_loaded_or_recorded_by_the_"
+        "default_landscape_candidate_generator"
+    )
+    assert "FutaleufuTemperateForestSet_1K" in editor_source
+    assert "SM_FirSaplingMedium" not in editor_source
+    assert "RaftSimFutaleufuScannedNearBankUnderstoryV1" in editor_source
+    assert "futaleufu_temperate_forest_set" in active_manifest.lower()
+    active_candidate = json.loads(active_manifest)["candidates"][0]
+    assert active_candidate[
+        "landscape_dressing_futaleufu_medium_fir_canopy_excluded"
+    ] is True
+    assert active_candidate[
+        "landscape_dressing_futaleufu_project_owned_canopy_preserved"
+    ] is True
 
 
 def test_rights_reviewed_futaleufu_island_tree_set_is_isolated_and_visually_rejected():

@@ -2,6 +2,15 @@
 
 > Status update, August 1, 2026: Zambezi Batoka Gorge and Futaleufu remain the immediate photoreal environment goal. Zambezi is restored as the sixth runnable environment in a clearly labeled reference Free Run, and its feature-tagged procedural flow field now activates the live rapid VFX stack without losing global station registration. Lifelike and production-hydraulic promotion remain blocked until authoritative full-reach centerline, high-resolution terrain, bathymetry, route, guide, and review evidence are attached. Chilko remains in the runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
 
+> Futaleufú update, August 4, 2026: `L_Terminator` now mixes seven
+> rights-reviewed CC0 small-fir and fern structure analogs into 1,440 of 1,800
+> screened near-bank placements while retaining procedural gap fill and the
+> complete project-owned canopy. Medium-fir canopy use remains rejected. The
+> editor, focused native contracts, and all six runnable maps pass, but the
+> candidate remains non-photoreal and non-authoritative for native species,
+> ecology, geography, hydraulics, or performance. See
+> `futaleufu_scanned_understory_v1_review.json` for hashes and open gates.
+
 ## Objective
 
 Make these two priority river environments photorealistic in Unreal:

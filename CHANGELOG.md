@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Added a bounded mixed near-bank ecology layer to the runnable Futaleufú
+  Terminator map. Seven rights-reviewed CC0 small-fir and fern meshes now
+  supply 1,440 of 1,800 deterministic screened placements; the remaining 360
+  procedural placements and all 4,650 project-owned canopy instances remain.
+  Medium firs are excluded, collision is disabled, and the assets carry no
+  native-species, ecology, geography, hydraulic, bathymetry, or raft-force
+  authority. The editor builds, focused native checks pass 2/2, all six
+  runnable maps pass PIE, and 20 focused Python contracts pass. Matched review
+  retains the runtime improvement but rejects photoreal promotion.
 - Raised only the rendered CC0 fallback head and neck presentation by 5 cm along
   the solved torso-up axis, restoring visible head-to-shoulder clearance without
   moving the authoritative body pose, helmet-to-eye solve, hands, paddle,

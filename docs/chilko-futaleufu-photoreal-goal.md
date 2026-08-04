@@ -12,6 +12,15 @@ The original five-river production portfolio is:
 
 Zambezi Batoka Gorge is now the sixth runnable environment and, with Futaleufu, forms the immediate environment priority. Its current classification is `reference_free_run`: the complete physical corridor and procedural water seed are playable, but authoritative full-reach terrain, centerline, bathymetry, rapid hydraulics, guide, and review evidence remain required for production-fidelity promotion. This priority change does not remove Chilko from the runnable portfolio or promote, delete, or rewrite any existing evidence.
 
+The August 4 Futaleufú near-bank candidate narrowly promotes the previously
+reviewed Poly Haven small-fir and fern subset as rights-reviewed CC0 structure
+analogs only. Seven meshes supply 1,440 of 1,800 screened near-bank instances;
+medium firs remain excluded and the project-owned 4,650-instance canopy is
+preserved. The saved map and all six runnable-river PIE gates pass. Photoreal,
+native-species/ecology, guide, geospatial, hydraulic, water-VFX, and measured
+performance acceptance remain open in
+`futaleufu_scanned_understory_v1_review.json`.
+
 ## Objective
 
 Complete photoreal, physically readable Unreal environments for Futaleufu and Chilko. Completion requires lifelike guide-seat and river-eye captures at reviewed flow levels, exact route and rapid stationing, validated C++ water windows, flexible-raft outcome runs, rights and publication review, and measured desktop, console-quality, handheld, and VR evidence.

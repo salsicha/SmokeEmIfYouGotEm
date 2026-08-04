@@ -1,0 +1,153 @@
+{
+  "schema": "raftsim.environment.futaleufu_scanned_understory_review.v1",
+  "generated_on": "2026-08-04",
+  "status": "accepted_bounded_cc0_near_bank_understory_candidate_photoreal_gate_still_open",
+  "passed": false,
+  "runtime_artifacts_promoted": true,
+  "photoreal_production_promoted": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "medium_fir_canopy_promoted": false,
+    "project_owned_canopy_preserved": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false,
+    "promotion": "retain_small_fir_and_fern_assets_as_non_authoritative_near_bank_structure_analogs_keep_canopy_and_photoreal_claims_review_gated"
+  },
+  "implementation": {
+    "runtime_tag": "RaftSimFutaleufuScannedNearBankUnderstoryV1",
+    "rights_tag": "RaftSimRightsReviewedCC0UnderstoryAnalog",
+    "source_grounding_tag": "RaftSimSourceLandscapeGrounded",
+    "solver_clearance_tag": "RaftSimOutsideProtectedSolverStrip",
+    "authority_tag": "RaftSimNoSpeciesOrEcologyAuthority",
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+    "license": "CC0 1.0 Universal",
+    "asset_root": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K",
+    "scanned_mesh_count": 7,
+    "small_fir_mesh_count": 3,
+    "fern_mesh_count": 4,
+    "medium_fir_mesh_count": 0,
+    "scanned_near_bank_instances": 1440,
+    "procedural_near_bank_instances": 360,
+    "total_near_bank_instances": 1800,
+    "near_bank_rejected_instances": 0,
+    "total_vegetation_instances": 8000,
+    "project_owned_canopy_instances": 4650,
+    "understory_instances": 3350,
+    "collision": "disabled",
+    "placement": "deterministic_source_landscape_grounded_dry_bank_slope_and_centerline_screened_outside_protected_solver_strip",
+    "authority": "presentation_only_rights_reviewed_structure_analogs_no_native_species_ecology_geography_collision_hydraulic_bathymetry_or_raft_force_authority"
+  },
+  "matched_capture_comparison": {
+    "valid_for_understory_visibility_review": true,
+    "valid_for_isolating_only_understory_color_response": false,
+    "reason": "The complete map regeneration refreshed current authored terrain and water material assets as well as foliage, so the large whole-frame delta is not attributable to understory alone.",
+    "views": [
+      {
+        "name": "guide_seat_downstream",
+        "size_px": [1280, 720],
+        "mean_absolute_rgb_delta": 31.471527,
+        "pixels_any_channel_gt_8_percent": 98.440864,
+        "baseline_mean_rgb": [55.316, 88.190, 99.490],
+        "candidate_mean_rgb": [37.674, 55.884, 58.301]
+      },
+      {
+        "name": "river_eye_downstream",
+        "size_px": [1280, 720],
+        "mean_absolute_rgb_delta": 30.800499,
+        "pixels_any_channel_gt_8_percent": 98.319336,
+        "baseline_mean_rgb": [55.015, 87.509, 98.003],
+        "candidate_mean_rgb": [38.546, 56.299, 58.327]
+      },
+      {
+        "name": "solver_rapid_river_eye_downstream",
+        "size_px": [1280, 720],
+        "mean_absolute_rgb_delta": 32.480748,
+        "pixels_any_channel_gt_8_percent": 98.733832,
+        "baseline_mean_rgb": [55.316, 88.190, 99.490],
+        "candidate_mean_rgb": [39.476, 56.906, 59.380]
+      }
+    ]
+  },
+  "accepted_findings": [
+    "The regenerated L_Terminator map loads in PIE and contains seven tagged, non-colliding scanned HISM actors with 1,440 total small-fir and fern instances.",
+    "The imported assets are rights-reviewed CC0 structure analogs with explicit materials, validated Nanite support, grounded pivots, and no medium-fir canopy promotion.",
+    "Near-bank and forest-floor cover is visibly denser and more continuous than the retained baseline while preserving 360 procedural gap-fill placements.",
+    "The project-owned 4,650-instance canopy and the complete 8,000-instance vegetation budget remain present.",
+    "Terrain geometry, terrain collision, water geometry, hydraulics, bathymetry, and raft-force inputs were not changed by this ecology slice."
+  ],
+  "remaining_photoreal_defects": [
+    "The project-owned adult canopy remains angular, repetitive, and visibly procedural at guide-seat and river-eye distances.",
+    "The small firs and ferns are non-native structure analogs; no qualified regional ecology review has accepted their species mix, density, season, or disturbance pattern.",
+    "Near-bank ground still lacks sufficient leaf litter, moss, roots, deadwood, wet sediment, microtopography, and continuous wetness transitions.",
+    "The foreground river remains too dark and opaque in the candidate captures, while rapid foam, aeration, spray, holes, rollers, and wave trains remain understated or uniform.",
+    "The broad bank and cliff surfaces retain smooth or tessellated procedural character because available elevation and imagery do not resolve sub-meter shoreline and geology detail.",
+    "Atmospheric depth, horizon lighting, and canopy response remain flat and stylized rather than photographic.",
+    "The environment-only canonical views do not validate raft, crew, paddle, water-occlusion, or gameplay readability in the improved bank context.",
+    "No measured desktop or VR performance profile has accepted the added Nanite understory population."
+  ],
+  "required_external_acceptance_gates": [
+    "A qualified Futaleufu rafting guide accepts route identity, named-rapid readability, scout lines, bank character, hazards, and gameplay sightlines in runnable guide-eye views.",
+    "A geospatial reviewer accepts DEM alignment, coordinate transforms, route stationing, shoreline placement, and the declared boundary between sourced terrain and procedural gap fill.",
+    "A regional ecologist or qualified environment-art specialist accepts species and structure analog use, density, age classes, season, wetness, disturbance, geology, and ground-cover composition.",
+    "A water-VFX and environment-art review accepts water transmission, raft and crew occlusion, waves, holes, rollers, aeration, spray, foam, bank intersections, and close-range asset quality.",
+    "Measured hydraulic and bathymetric evidence accepts flow bands, water-surface elevations, velocities, Froude behavior, rapid-specific features, and hazard response without presentation geometry standing in for physics.",
+    "Measured full-run desktop and VR profiles pass release frame-time, memory, streaming, shader, stability, and comfort budgets on named target hardware."
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after 137 actions; assertion-only rebuild then succeeded after 2 actions",
+    "focused_native_material_and_terrain_tests": "2/2 succeeded with zero warnings or errors",
+    "all_runnable_river_map_tests": "6/6 succeeded; Futaleufu 0 warnings/0 errors; two established non-failing warnings outside Futaleufu",
+    "python_tests": "20/20 milestone-focused tests and 192/192 broader Futaleufu, Chilko, temperate, water, terrain, canopy, rights, and retained-evidence regressions passed",
+    "visual_review": "technical candidate accepted; photoreal production promotion rejected"
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "e60cf910aae481bcd617db1ea14c4f295afe4bb8ecc54f1698608573203e531d",
+      "hash_locked": false
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+      "sha256": "393eca73b32183bf492699d81b6e2155c3f9a2d33bcb82673c516300552f42a2",
+      "hash_locked": false
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_baseline_guide_seat_downstream.png",
+      "sha256": "92b593d7ded103b32f1cdefb91420cf4f77c46143d6625cbcbbfba6dd6e35e8b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_baseline_river_eye_downstream.png",
+      "sha256": "ce1385c28769db44bc3f3a37dea02a3db5f46605dfde56834c46f52cd9ec79c5"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_baseline_solver_rapid_river_eye_downstream.png",
+      "sha256": "92b593d7ded103b32f1cdefb91420cf4f77c46143d6625cbcbbfba6dd6e35e8b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_candidate_guide_seat_downstream.png",
+      "sha256": "b735f2c211005fd85a14d991fb32f8d54857e8fbd5d4c1219ebd3af12d9a3957"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_candidate_river_eye_downstream.png",
+      "sha256": "15420e05f9eacdb06caed7f5e5ee237c413dab838a20b923658a39518cfb3162"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_candidate_solver_rapid_river_eye_downstream.png",
+      "sha256": "669daa311bdeb39ff7cf846c07bad850d6fca7072eb1ed31a3deca3faa111b5f"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_m9_material_tests.json",
+      "sha256": "5df1976a852c7b40e966f865d5f7127b3bbe8673c46c35d670d051336e8b58d1"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_p4_river_map_loads.json",
+      "sha256": "2c5c7e246e55a1d6d0cf42b0c113a6a5e878845531b10f8fbd2726e0b12cdc2d"
+    }
+  ]
+}

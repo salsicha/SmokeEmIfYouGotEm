@@ -735,6 +735,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_external_review_pine_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K\",\n")
             TEXT("      \"landscape_dressing_external_review_pine_assets\": [\"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_a_LOD0\", \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_b_LOD0\", \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_c_LOD0\"],\n")
             TEXT("      \"landscape_dressing_external_review_pine_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_authority\": \"rights_reviewed_cc0_structure_analogs_only_no_native_species_ecology_geography_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_futaleufu_scanned_understory_assets\": [\"SM_FirSapling_fir_sapling_a\", \"SM_FirSapling_fir_sapling_b\", \"SM_FirSapling_fir_sapling_c\", \"SM_Fern02_fern_02_a\", \"SM_Fern02_fern_02_b\", \"SM_Fern02_fern_02_c\", \"SM_Fern02_fern_02_d\"],\n")
+            TEXT("      \"landscape_dressing_futaleufu_medium_fir_canopy_excluded\": true,\n")
+            TEXT("      \"landscape_dressing_futaleufu_project_owned_canopy_preserved\": true,\n")
             TEXT("      \"landscape_dressing_external_review_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_broadleaf_asset\": \"%s\",\n")
@@ -765,7 +774,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_temperate_waterline_target_height_range_m\": [0.22, 2.60],\n")
             TEXT("      \"landscape_dressing_temperate_waterline_placement_contract\": \"deterministic_72_candidate_source_landscape_search_across_both_full_route_banks_outside_complete_visible_water_width_with_full_centerline_clearance_dry_height_and_hard_slope_gates\",\n")
             TEXT("      \"landscape_dressing_temperate_near_bank_status\": \"%s\",\n")
-            TEXT("      \"landscape_dressing_temperate_near_bank_authority\": \"presentation_only_procedural_source_gap_fill_no_species_survey_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_temperate_near_bank_authority\": \"%s\",\n")
             TEXT("      \"landscape_dressing_temperate_near_bank_target_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_temperate_near_bank_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_temperate_near_bank_rejected_placement_count\": %d,\n")
@@ -1020,7 +1029,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingSourceSkeletalMeshCount,
             Result.DressingConvertedStaticMeshCount,
             Result.DressingExternalReviewAssetCount,
-            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+            Result.DressingExternalRockMeshCount == 6 &&
+                    Result.DressingFutaleufuScannedUnderstoryMeshCount == 7
+                ? TEXT("rights_reviewed_cc0_six_rock_plus_seven_small_fir_and_fern_understory_analogs_loaded_with_explicit_materials")
+                : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_cc0_six_rock_and_three_pine_sets_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
                 : (Result.DressingExternalRockMeshCount == 6
                        ? TEXT("rights_reviewed_cc0_six_rock_set_loaded_with_explicit_materials_for_isolated_river_visual_comparison")
@@ -1039,6 +1051,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingExternalPineMaterialsValidated
                 ? TEXT("three_meshes_physical_scale_nanite_and_materials_validated_sparse_visual_comparison_only")
                 : TEXT("no_reviewed_pine_asset_selected_for_this_river"),
+            Result.DressingFutaleufuScannedUnderstoryMeshCount > 0
+                ? (Result.bDressingFutaleufuScannedUnderstoryMaterialsValidated
+                       ? TEXT("seven_small_fir_and_fern_meshes_nanite_and_material_validated_for_source_grounded_near_bank_review_candidate")
+                       : TEXT("scanned_understory_loaded_but_material_or_nanite_validation_failed"))
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingFutaleufuScannedUnderstoryMeshCount,
+            Result.DressingFutaleufuScannedUnderstoryInstanceCount,
             *EscapeRaftSimJsonString(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath
@@ -1065,7 +1084,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
              bUsesChilkoOrganicLavaCanyonSurface)
                 ? 8
                 : 0,
-            bUsesOpaqueVolumetricVegetation
+            bUsesFutaleufuOrganicTemperateSurface &&
+                    Result.DressingFutaleufuScannedUnderstoryMeshCount == 7
+                ? TEXT("project_owned_opaque_volumetric_nanite_canopy_plus_rights_reviewed_cc0_small_fir_and_fern_near_bank_hierarchical_instancing_plus_river_specific_rock_dressing")
+                : bUsesOpaqueVolumetricVegetation
                 ? TEXT("project_owned_opaque_volumetric_nanite_species_hierarchical_instancing_plus_river_specific_rock_dressing")
                 : bUsesColoradoOrganicHanceSurface
                 ? TEXT("project_owned_opaque_hance_dryland_ground_cover_and_shrub_hierarchical_instancing_zero_legacy_pve_instances_plus_dense_irregular_procedural_boulders")
@@ -1087,8 +1109,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingTemperateWaterlineMinimumCenterlineDistanceCm,
             Result.DressingTemperateWaterlineMaximumSlopeDegrees,
             Result.DressingTemperateNearBankTargetInstanceCount > 0
-                ? TEXT("source_grounded_dry_bank_grass_forb_shrub_ecology_v4_captured")
+                ? (bUsesFutaleufuOrganicTemperateSurface &&
+                           Result.DressingFutaleufuScannedUnderstoryInstanceCount > 0
+                       ? TEXT("source_grounded_mixed_cc0_scanned_fern_sapling_and_procedural_shrub_ecology_v5_captured")
+                       : TEXT("source_grounded_dry_bank_grass_forb_shrub_ecology_v4_captured"))
                 : TEXT("not_enabled_for_this_river"),
+            bUsesFutaleufuOrganicTemperateSurface &&
+                    Result.DressingFutaleufuScannedUnderstoryInstanceCount > 0
+                ? TEXT("presentation_only_mixed_rights_reviewed_cc0_structure_analogs_and_procedural_source_gap_fill_no_native_species_ecology_survey_collision_hydraulic_or_raft_force_authority")
+                : TEXT("presentation_only_procedural_source_gap_fill_no_species_survey_collision_hydraulic_or_raft_force_authority"),
             Result.DressingTemperateNearBankTargetInstanceCount,
             Result.DressingTemperateNearBankInstanceCount,
             Result.DressingTemperateNearBankRejectedPlacementCount,

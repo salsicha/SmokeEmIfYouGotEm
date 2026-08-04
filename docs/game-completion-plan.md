@@ -29,6 +29,18 @@ The selection and progression manifests now also mark it `runnable: true` with
 `availability: free_run`. See
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json`.
 
+**Futaleufú mixed-bank ecology checkpoint, August 4:** the regenerated runnable
+`L_Terminator` map uses seven rights-reviewed CC0 small-fir and fern meshes for
+1,440 of its 1,800 source-grounded, dry-bank, slope, centerline, and
+solver-clearance-screened near-bank instances. It preserves 360 procedural
+gap-fill placements, the 4,650-instance project-owned canopy, the 8,000 total
+vegetation budget, and all terrain, collision, water-geometry, hydraulic,
+bathymetric, and raft-force authority. Medium-fir canopy promotion remains
+disabled. The editor build, focused M9 checks 2/2, all runnable-map PIE gates
+6/6, and 20 focused Python contracts pass. The runtime candidate is retained,
+but photoreal promotion and all six external gates remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_review.json`.
+
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt
 shading, and 7,200 shorter launch-cover instances. The schema-v20 map audit,
