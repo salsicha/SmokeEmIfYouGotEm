@@ -1,0 +1,173 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "FD2FF72E8C41F9887F2B339ECDE7D265",
+			"instanceName": "Alexs-MacBook-Air.local-73938",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-12.48.46",
+	"succeeded": 5,
+	"succeededWithWarnings": 2,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 60.254299163818359,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "WaterSurfaceRenders",
+			"fullTestPath": "RaftSim.P2.WaterSurfaceRenders",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 2.382155179977417,
+			"dateTime": "2026.08.04-12.47.46",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Hance",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Hance",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 5.076573371887207,
+			"dateTime": "2026.08.04-12.47.48",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_LavaCanyon",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 4.9203100204467773,
+			"dateTime": "2026.08.04-12.47.53",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Terminator",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Terminator",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 4.903897762298584,
+			"dateTime": "2026.08.04-12.47.58",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Troublemaker",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Troublemaker",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 4.1903910636901855,
+			"dateTime": "2026.08.04-12.48.03",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogTemp: RaftSim capsize: raft=RaftSimRaftActor_0 location_cm=V(X=-6000.00, Z=93.26) rotation_deg=R(P=0.36, Y=2.84, R=102.82) flip_margin_nm=-93.836 flip_threshold_nm=1800.000 retained_water_kg=251.268 retained_roll_moment_nm=-1893.836 wet_samples=6/12 contacts=0 wrapping=0 pinned=0",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-12.48.04"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_UpperHuacas",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 4.6382989883422852,
+			"dateTime": "2026.08.04-12.48.07",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Pacuare humidity runtime values: density=0.0075000 volumetric=0 max_opacity=0.6200 start_cm=450.00 second_density=0.0012000 second_offset_cm=-160.00 second_falloff=0.0600",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-12.48.12"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Zambezi",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"FD2FF72E8C41F9887F2B339ECDE7D265"
+			],
+			"duration": 34.142673492431641,
+			"dateTime": "2026.08.04-12.48.12",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-12.48.26"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

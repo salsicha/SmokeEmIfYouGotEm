@@ -4372,3 +4372,16 @@ path is verified, and the completion goal can be marked complete.
   D3, and D4 remain unchanged. Volumetric aeration/recirculation, spray/mist,
   measured seasonal hydraulics, deterministic visual attribution, performance,
   photoreal art, and all seven external approvals remain open.
+- Full optical bank coverage V1 completes the shared live-volume boundary
+  contract that previously faded only ordinary surface opacity. The same
+  solver-owned vertex-alpha coverage now attenuates Single Layer Water
+  scattering and absorption and blends behind-water color to identity at a
+  zero-coverage bank vertex. All five river-local live-water instances consume
+  the updated versioned parent. The 70-action
+  editor build, focused material audit, P2 water test, and all six P4 runnable-
+  map gates pass; no map package, wet topology, cooked field, terrain,
+  bathymetry, collision, buoyancy, raft force, D3, or D4 value changes. Matched
+  Chilko/Futaleufú evidence shows no new gap or detached water, but the broad
+  pale shallow band, sheet-like rapid body, procedural environment art,
+  performance qualification, and all seven external gates remain open in
+  `cold_water_full_optical_bank_coverage_v1_review.json`.

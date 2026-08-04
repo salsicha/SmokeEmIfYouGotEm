@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "2C2880B84B471184D2E58CA5923F1CA7",
+			"instanceName": "Alexs-MacBook-Air.local-75832",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-13.05.03",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.16178800165653229,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FZambeziLiveTransmittingWater",
+			"fullTestPath": "RaftSim.M9.FZambeziLiveTransmittingWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"2C2880B84B471184D2E58CA5923F1CA7"
+			],
+			"duration": 0.16178800165653229,
+			"dateTime": "2026.08.04-13.05.03",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

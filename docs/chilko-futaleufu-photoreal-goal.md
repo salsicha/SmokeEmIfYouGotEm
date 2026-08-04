@@ -564,6 +564,33 @@ performance evidence, and all six named external reviews remain open. Exact
 hashes, captures, tests, authority boundaries, and blockers are in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_review.json`.
 
+## Shared Full Optical Bank Coverage V1
+
+The next retained slice closes the material half of the same boundary defect.
+The shared Single Layer Water parent formerly multiplied only ordinary surface
+opacity by the solver-owned vertex-alpha bank coverage. Its scattering,
+absorption, and behind-water color remained active close to zero opacity, so a
+pale rectangular optical rail could survive otherwise correct geometry and
+coverage work. The parent now multiplies scattering and absorption by that
+same coverage and blends behind-water color back to identity at a zero-coverage
+bank vertex. All five river-local live-water instances consume this updated
+versioned parent.
+
+No wet vertex, triangle, cooked field, bank mesh, bathymetry, collision,
+buoyancy, raft force, D3, or D4 value changes. The editor target, focused
+material audit, P2 water test, and every one of the six runnable P4 map gates
+pass. Matched Chilko and Futaleufú captures show no new gap, black edge,
+detached water, or rapid-face discontinuity.
+
+This is complete optical-coverage semantics, not photoreal acceptance. The
+Chilko frame still shows a broad pale transition inside the genuinely wet
+body, and Futaleufú remains overbright and sheet-like. Surveyed bank and
+bathymetry breaklines, calibrated hydraulics, final water/VFX, environment art,
+performance evidence, rights review, and named human approval remain open. The
+exact source and asset hashes, renderer evidence, tests, and seven external
+gates are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.
