@@ -27,9 +27,10 @@ path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
-The machine-readable Free Run manifest counts six runnable rivers and lists
-`zambezi_batoka_gorge` at `reference_free_run` tier. Twenty-four focused Python
-registry, source, and release-record contracts pass, and the native
+The machine-readable selection and Free Run manifests count six runnable rivers,
+mark `zambezi_batoka_gorge` as `runnable: true` with `availability: free_run`,
+and list it at `reference_free_run` tier. Twenty-five focused Python registry,
+source, and release-record contracts pass, and the native
 `RaftSim.M6.CareerCatalog` gate resolves the player-facing scenario without an
 automation warning or error. The native `RaftSim.P4.RiverMapLoads.L_Zambezi`
 gate loads the committed map into PIE, reports the vertical-slice game mode,
@@ -43,7 +44,7 @@ changes map load or gameplay acceptance.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v11_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
@@ -432,13 +433,13 @@ swimmers. The focused test passes, and the complete parameterized
 renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
 deliberately fails photoreal promotion while passing runnable launch acceptance.
 
-The runnable classification was reverified on August 3, 2026 after the V17
-filtered Zambezi regeneration. `RaftSim.M6.CareerCatalog` confirms that the
+The runnable classification was reverified on August 3, 2026 against the V18
+release package. `RaftSim.M6.CareerCatalog` confirms that the
 player-facing `zambezi_reference_run` opens `/Game/RaftSim/Maps/L_Zambezi`, and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` passes a live PIE launch with the cooked
 water field, upright five-person raft, all rapid markers, separate live foam,
 Niagara water pool, four non-colliding conditioned visual-terrain tiles, and
-two adaptive near-field terrain actors. The schema-v19
+two adaptive near-field terrain actors. The schema-v20
 saved-map audit also requires solver-owned rendering, the transmitting volume
 core, river-local texture bindings, low detail-skin coverage, smoothing, and a
 capture-only static ribbon. All focused Python contracts pass. This is runnable

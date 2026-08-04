@@ -214,6 +214,8 @@
       "portfolio_role": "runnable_river",
       "runnable": true,
       "runnable_tier": "reference_free_run",
+      "availability": "free_run",
+      "runnable_release_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v12_review.json",
       "runtime_acceptance": {
         "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
         "result": "pass",
