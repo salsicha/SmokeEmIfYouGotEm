@@ -35,6 +35,11 @@ OPPOSED_THUMB_GLOVE_REVIEW_PATH = (
     / "docs/environment-captures/south_fork_full_reach/"
     "m9_opposed_thumb_glove_v3_review.json"
 )
+PALM_ALIGNED_GRIP_REVIEW_PATH = (
+    REPO_ROOT
+    / "docs/environment-captures/south_fork_full_reach/"
+    "m9_cc0_palm_aligned_grip_v1_review.json"
+)
 
 
 def _sha256(path: Path) -> str:
@@ -346,6 +351,14 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "SetBoneTransformByName" in adapter
     assert "Body->AllocateTransformData()" in adapter
     assert "Body->RefreshBoneTransforms()" in adapter
+    assert "HasArticulatedPaddleGripRig() const" in adapter
+    assert "ApplyPaddleGripPose(Pose)" in adapter
+    assert "ResolvePaddleGripWristCm" in adapter
+    assert 'TEXT("middle_01_%s")' in adapter
+    assert "PaddlePalmAnchorAlongKnuckleFraction" in adapter
+    assert "bUpperTGrip" in adapter
+    assert "MeasureMinimumPaddleFingerClosureDegrees" in adapter
+    assert "MeasureMinimumPaddleThumbClosureDegrees" in adapter
     assert "ApplyProductionBodyMaterialOverrides(Body, Mesh)" in adapter
     assert "M_RaftSim_Wetsuit.M_RaftSim_Wetsuit" in adapter
     assert 'SlotName.Contains(TEXT("Wetsuit")' in adapter
@@ -428,6 +441,13 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "bSafetyGearOrPaddleOverlay || bBodyGapOverlay" in host
     assert "actor.activate_cc0_fallback_for_validation()" in capture
     assert "runtime_exclusive_cc0_body_ownership" in capture
+    assert '"grip": (' in capture
+    assert '"grip_profile": (' in capture
+    assert "visual_actor.has_articulated_paddle_grip_rig()" in capture
+    assert "runtime_paddle_grip_anchor_error_cm" in capture
+    assert "runtime_upper_paddle_finger_closure_degrees" in capture
+    assert "runtime_lower_paddle_finger_closure_degrees" in capture
+    assert "runtime_paddle_thumb_closure_degrees" in capture
     assert '"face": (' in capture
     assert "get_solved_face_forward_world_vector()" in capture
     assert "runtime_eye_materials" in capture
@@ -477,6 +497,11 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "MSM_ClearCoat" in automation
     assert 'TEXT("CC0 eyes use a corneal clear-coat shading layer")' in automation
     assert 'TEXT("CC0 helper-eye shell retains reviewed outward winding")' in automation
+    assert "It->HasArticulatedPaddleGripRig()" in automation
+    assert "It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f" in automation
+    assert "It->GetMinimumUpperPaddleFingerClosureDegrees() >= 120.0f" in automation
+    assert "It->GetMinimumLowerPaddleFingerClosureDegrees() >= 210.0f" in automation
+    assert "It->GetMinimumPaddleThumbClosureDegrees() >= 50.0f" in automation
     assert 'TEXT("%s %s detail is paired to head-dominant facial Skin")' in automation
     assert "P95ReferenceSeparationCm <= 1.25f" in automation
     assert "It->HasExclusiveCC0BodyOwnership()" in automation
@@ -988,5 +1013,101 @@ def test_opposed_thumb_glove_v3_is_hash_verified_and_fail_closed() -> None:
     assert m5_payload["succeededWithWarnings"] == 0
     assert m5_payload["failed"] == 0
 
+    # V3 remains immutable renderer/asset evidence. The production M5 runner
+    # and this evolving contract file are shared by the later CC0 palm-aligned
+    # milestone, whose replacement hashes are independently locked below.
+    superseded_shared_sources = {
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+            "RaftSimM5ProductionQualityTest.cpp"
+        ),
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+            "RaftSimEditorPhotorealMaterials.cpp"
+        ),
+        "physics/tests/test_cc0_production_characters.py",
+    }
     for source_relpath, expected_hash in review["implementation_sha256"].items():
+        if source_relpath in superseded_shared_sources:
+            assert (REPO_ROOT / source_relpath).is_file()
+            assert len(expected_hash) == 64
+            continue
         assert _sha256(REPO_ROOT / source_relpath) == expected_hash
+
+    grip_review = json.loads(
+        PALM_ALIGNED_GRIP_REVIEW_PATH.read_text(encoding="utf-8")
+    )
+    assert grip_review["schema"] == "raftsim.m9.cc0_palm_aligned_grip_review.v1"
+    assert grip_review["passed"] is False
+    assert grip_review["technical_candidate_passed"] is True
+    assert grip_review["photoreal_acceptance_passed"] is False
+    assert grip_review["human_approved"] is False
+    assert grip_review["promotion_allowed"] is False
+    implementation = grip_review["implementation"]
+    assert implementation["production_roster_count"] == 5
+    assert implementation["visible_paddle_hands"] == 10
+    assert implementation["upper_t_grip_hands"] == 5
+    assert implementation["lower_shaft_grip_hands"] == 5
+    assert implementation["articulated_four_finger_chains"] == 40
+    assert implementation["articulated_thumb_chains"] == 10
+    assert implementation["measured_maximum_palm_anchor_error_cm"] <= 0.25
+    assert (
+        implementation["measured_minimum_upper_finger_chain_closure_degrees"]
+        >= 120.0
+    )
+    assert (
+        implementation["measured_minimum_lower_finger_chain_closure_degrees"]
+        >= 210.0
+    )
+    assert implementation["measured_minimum_thumb_chain_closure_degrees"] >= 50.0
+    assert implementation["physics_or_gameplay_changes"] is False
+
+    runtime = grip_review["runtime_roster_metrics"]
+    roster_path = REPO_ROOT / runtime["report"]
+    assert _sha256(roster_path) == runtime["report_sha256"]
+    grip_roster = json.loads(roster_path.read_text(encoding="utf-8"))
+    assert grip_roster["schema"] == "raftsim.cc0.exclusive_body_capture.v2"
+    assert grip_roster["status"] == "capture_complete"
+    assert grip_roster["captured_character_count"] == 5
+    assert grip_roster["articulated_paddle_grip_count"] == 5
+    assert all(
+        character["runtime_articulated_paddle_grip"]
+        and character["runtime_active_paddle_grip_pose"]
+        for character in grip_roster["characters"]
+    )
+    assert max(
+        character["runtime_paddle_grip_anchor_error_cm"]
+        for character in grip_roster["characters"]
+    ) <= 0.25
+    assert min(
+        character["runtime_upper_paddle_finger_closure_degrees"]
+        for character in grip_roster["characters"]
+    ) >= 120.0
+    assert min(
+        character["runtime_lower_paddle_finger_closure_degrees"]
+        for character in grip_roster["characters"]
+    ) >= 210.0
+    assert min(
+        character["runtime_paddle_thumb_closure_degrees"]
+        for character in grip_roster["characters"]
+    ) >= 50.0
+    for path, expected_hash in grip_review["renderer_evidence"][
+        "matched_close_grip"
+    ].values():
+        assert _sha256(REPO_ROOT / path) == expected_hash
+
+    grip_m5 = grip_review["validation"]["m5"]
+    grip_m5_path = REPO_ROOT / grip_m5["report"]
+    assert _sha256(grip_m5_path) == grip_m5["report_sha256"]
+    grip_m5_payload = json.loads(
+        grip_m5_path.read_text(encoding="utf-8-sig")
+    )
+    assert grip_m5_payload["succeeded"] == 1
+    assert grip_m5_payload["succeededWithWarnings"] == 0
+    assert grip_m5_payload["failed"] == 0
+    for source_relpath, expected_hash in grip_review[
+        "implementation_sha256"
+    ].items():
+        assert _sha256(REPO_ROOT / source_relpath) == expected_hash
+    assert len(grip_review["rejected_iterations"]) == 4
+    assert len(grip_review["open_gates"]) == 3

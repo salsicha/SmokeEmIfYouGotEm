@@ -3513,6 +3513,18 @@ path is verified, and the completion goal can be marked complete.
   iteration were visually rejected. The retained upper hand is materially more readable, but
   coarse hand topology, wetsuit-covered hands, thumb contact, wrist compression, motion-captured
   strokes, and named character-art/guide approval remain open, so photoreal promotion is false.
+- CC0 palm-aligned paddle grip V1 closes the packaged fallback's open-reference-hand defect
+  without changing shoulder, elbow, wrist, paddle, physics, collision, or gameplay authority.
+  The adapter now caches the complete 53-bone source skeleton, aligns a virtual palm anchor to
+  each side-correct handle frame, closes all three joints in every finger and thumb, uses a
+  shallower five-hand T-grip and a deeper five-hand shaft wrap, and releases the pose for
+  swimmers. Across five identities and ten visible hands, the maximum palm-anchor error is
+  `5.809241088172712e-9` cm; minimum upper, lower, and thumb chain closure is respectively
+  `134.3199920654297`, `230.6800079345703`, and `55.20000076293945` degrees. The 15/15 focused
+  contracts, 45/45 related visual-isolation contracts, 30/30 renderer views, and renderer-enabled
+  M5 gate pass. Close evidence still exposes coarse topology, simplified webbing and knuckles,
+  weak thumb opposition, and no grip compression or moving-stroke validation, so the technical
+  candidate passes while photoreal and named character-art/guide promotion remain false.
 - Tapered shoulder sleeves V2 supersedes the ball-like uniform sleeve silhouette retained by
   Visible Shoulders V1 without moving solved shoulder or elbow anchors. Each project-owned
   splash-jacket sleeve is now a closed 18-ring by 28-sided surface with a broad deltoid,

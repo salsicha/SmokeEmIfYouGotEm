@@ -1,0 +1,117 @@
+{
+  "schema": "raftsim.m9.cc0_palm_aligned_grip_review.v1",
+  "reviewed_utc": "2026-08-04T06:43:00Z",
+  "milestone": "M9",
+  "status": "technical_palm_aligned_grip_accepted_photoreal_character_rejected",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "extends": "docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json",
+  "resolves_reported_defect": "The production CC0 character fingers no longer remain open beside the paddle; both hands now retain palm-aligned, side-correct articulated grip poses.",
+  "summary": "The five packaged CC0 guide and crew bodies now align each rendered palm to its assigned paddle handle and articulate all three joints of every finger and thumb. The upper hand closes over the T-grip while the lower hand closes farther around the shaft, preserving the MakeHuman source skeleton and bone lengths instead of collapsing joints onto a radial cage. Runtime and renderer evidence pass the bounded technical grip contract across all five identities. This does not pass photoreal character acceptance: close views still expose coarse hand topology, simplified knuckles and webbing, weak thumb opposition, no skin or glove compression, and no motion-captured grip transition.",
+  "root_cause": {
+    "production_path": "The shipping CC0 adapter cached and drove only the twenty large body bones. Wrist targets reached the paddle, but the source skeleton's thumb, index, middle, ring, and pinky chains remained in their open reference pose.",
+    "hand_frame": "The pose contract publishes handle centres, not wrist pivots. Applying those centres directly to the hand bone left the visible palm offset and gave upper and lower hands the same orientation.",
+    "retained_solution": "Cache the complete 53-bone reference skeleton, solve a virtual palm anchor 56 percent of the wrist-to-middle-knuckle vector onto each handle, align palm width to the upper T-grip or lower shaft axis with a side-correct approach, and curl the unchanged MakeHuman chains around their authored local axes.",
+    "authority": "FRaftSimCrewAvatarPose continues to own shoulders, elbows, wrists, paddle endpoints, action state, and swimmer release. The new code changes only poseable-mesh presentation and diagnostics; it cannot alter forces, mass, collision, rescue, raft, water, scoring, or progression."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "visible_paddle_hands": 10,
+    "upper_t_grip_hands": 5,
+    "lower_shaft_grip_hands": 5,
+    "articulated_four_finger_chains": 40,
+    "articulated_thumb_chains": 10,
+    "joints_per_chain": 3,
+    "palm_anchor_along_middle_knuckle_fraction": 0.56,
+    "upper_t_grip_curl_scale": 0.92,
+    "lower_shaft_curl_scale": 1.58,
+    "finger_joint_curl_degrees": [42.0, 62.0, 42.0],
+    "thumb_joint_curl_degrees": [15.0, 25.0, 20.0],
+    "maximum_allowed_palm_anchor_error_cm": 0.25,
+    "minimum_allowed_upper_finger_chain_closure_degrees": 120.0,
+    "minimum_allowed_lower_finger_chain_closure_degrees": 210.0,
+    "minimum_allowed_thumb_chain_closure_degrees": 50.0,
+    "measured_maximum_palm_anchor_error_cm": 5.809241088172712e-9,
+    "measured_minimum_upper_finger_chain_closure_degrees": 134.3199920654297,
+    "measured_minimum_lower_finger_chain_closure_degrees": 230.6800079345703,
+    "measured_minimum_thumb_chain_closure_degrees": 55.20000076293945,
+    "physics_or_gameplay_changes": false,
+    "crew_mass_changes": false,
+    "collision_changes": false,
+    "raft_or_water_changes": false
+  },
+  "rejected_iterations": [
+    "A positional radial-contact solve was rejected because it collapsed imported finger lengths and produced mitten, ring, and donut silhouettes.",
+    "Rotation around MakeHuman local Y was rejected because that axis twists these finger bones instead of flexing them.",
+    "A distal-thumb positional contact correction was rejected because it pinched the low-resolution thumb into a visible blob.",
+    "Using the same palm approach for both handles was rejected because the lower fingers closed toward empty palm space instead of wrapping the shaft."
+  ],
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/roster_capture.json",
+    "report_sha256": "ee56ee65b36a80beba2254c0dfce99d8956a6f84b6dc26c666454ef397e6156d",
+    "status": "capture_complete",
+    "captured_character_count": 5,
+    "characters_with_articulated_paddle_grip": 5,
+    "maximum_paddle_grip_anchor_error_cm": 5.809241088172712e-9,
+    "minimum_upper_paddle_finger_closure_degrees": 134.3199920654297,
+    "minimum_lower_paddle_finger_closure_degrees": 230.6800079345703,
+    "minimum_paddle_thumb_closure_degrees": 55.20000076293945
+  },
+  "renderer_evidence": {
+    "camera_contract": "All five identities use matched 1536x1024 renderer-backed front and profile close-grip views at 28-degree FOV with the same map, lighting, seated pose, safety gear, and paddle. Full, profile, rear, and face views remain in the same capture set for whole-character regression review.",
+    "matched_close_grip": {
+      "guide_grip": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_guide_grip.png", "f30ac2a60dcc9b3d5a86a7ec876e8dcc8dfeb3eb20461a442431e07a0fbf8078"],
+      "guide_grip_profile": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_guide_grip_profile.png", "1a7adf93b867c60309e8f4c07033b308d48206186b1ae2c1f07cb2bd82fb5be2"],
+      "crew01_grip": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew01_grip.png", "d07e3f0e4af6034e9524d5deb09b7839a75eac0d75e9ef5510f2a6655957b0c8"],
+      "crew01_grip_profile": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew01_grip_profile.png", "a7574fbe95b221c4f9a0749d301e958b027661d42600f083c480f4ddc7144e4d"],
+      "crew02_grip": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew02_grip.png", "bfbb3ef70962254f7d61b40bb79d3161d596a3ef88286649119ee84c55db26c4"],
+      "crew02_grip_profile": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew02_grip_profile.png", "95f13d5bc031887df1ce088a7c02b50d8f968e6d85760108eb7b2c3f1442f6f7"],
+      "crew03_grip": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew03_grip.png", "75533c29dc978bf07f3d219fbb4cedb9c939ba30199886e23ea3dde4aff1c7b3"],
+      "crew03_grip_profile": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew03_grip_profile.png", "c04f4af9384b50795596d55b5aa9ead4cab850b07611e9f5c06e3d7cacfa9d48"],
+      "crew04_grip": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew04_grip.png", "10ee757f4a06deb19aab2293e9303b9e9f4dda4320104de177a09e4828848822"],
+      "crew04_grip_profile": ["docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/captures/raftsim_cc0_crew04_grip_profile.png", "a823ba4fd3a12f8722c4796156fb5302df20360382b885a2ef081ef2d1bd3bff"]
+    },
+    "technical_verdict": "pass: every close pair shows four separated digits closing over the upper T-grip and the lower digits encircling the shaft; no production CC0 hand remains in the former flat open reference pose",
+    "photoreal_verdict": "fail: the evidence still shows low-resolution palm and fingertip topology, simplified knuckle folds and finger webbing, weak thumb opposition, no glove seams or skin compression, and no motion-captured grip transition"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final retained grip solver cleanup",
+    "focused_python": "15/15 CC0 production-character contracts passed",
+    "broader_python_diagnostic": "45/45 production-character, safety-gear, and flexible-raft visual-isolation contracts passed",
+    "renderer_roster": "5/5 identities and 30/30 views captured; all palm-anchor and closure assertions passed",
+    "m5": {
+      "result": "1/1 RaftSim.M5.CrewAvatarPoseProduction passed renderer-enabled with 0 warnings and 0 errors",
+      "report": "docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1/m5.json",
+      "report_sha256": "031afb891d47ae75a84d732f8c3a7f61e89d5becbfd3e56c90920b3b6f38633c"
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "9fc99ab2581a3f6c187bc73e006b1f373d8814084dd12d90309b4e4ffbb12d1e",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "3eb2dd388e40dba38c4cc5dced83ea294f2354a092cd42a175ba34257c1526dc",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "3e15c75decb1e8d8eccf6d7d168f6ba67edfa2944a57b9132f270e4548e9b899",
+    "unreal/Scripts/capture_cc0_production_roster.py": "9d9324f66e530326039c5a4349beae26c8fde2fde20cfa8e0dd4921baccd0d32"
+  },
+  "accepted": [
+    "All five packaged CC0 bodies expose complete left/right thumb, index, middle, ring, and pinky chains and keep active grips in seated paddle states.",
+    "The virtual palm anchor remains within effectively zero error of each handle without translating finger joints or changing imported bone lengths.",
+    "Upper T-grip and lower shaft grips use distinct axes, palm approaches, and closure amounts; the lower fingers visibly wrap the shaft in front and profile evidence.",
+    "A forced swimmer releases the paddle and active-grip pose, preventing frozen paddle hands in rescue states.",
+    "Shoulder, elbow, wrist, paddle, physics, collision, mass, rescue, raft, water, scoring, and progression authority are unchanged."
+  ],
+  "rejected_or_open": [
+    "Close views still show coarse palm, knuckle, fingertip, and finger-web topology inherited from the packaged CC0 source bodies.",
+    "Thumbs are rotationally closed but are not contact-constrained; their opposition and pad compression remain visibly simplified.",
+    "The bare-hand material does not provide wet skin compression, nail detail, glove seams, cuffs, palm reinforcement, or identity-specific fit.",
+    "The static seated validation pose does not prove synchronized stroke entry, pull, recovery, brace, or impact deformation in motion."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace hand topology, skinning, knuckle/webbing deformation, thumb opposition, material construction, and wet compression in motion.",
+    "A qualified whitewater guide must approve upper T-grip safety, lower finger/thumb placement, paddle side assignment, and synchronized moving stroke biomechanics.",
+    "M9 remains open for the wider human, clean-build, target-platform performance, signing, media, and promotion gates."
+  ]
+}

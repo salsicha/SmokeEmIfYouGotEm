@@ -1216,6 +1216,7 @@ bool FRaftSimM5StartRescueCommand::Update()
     const bool bExpectCC0Roster =
         bForceCC0Review || !bAssembledMetaHumanRoster;
     int32 CC0BodyCount = 0;
+    int32 CC0ActivePaddleGripCount = 0;
     for (TActorIterator<ARaftSimCC0CrewVisualActor> It(GetM5GameWorld()); It; ++It)
     {
         ++CC0BodyCount;
@@ -1227,6 +1228,43 @@ bool FRaftSimM5StartRescueCommand::Update()
             FString::Printf(TEXT("CC0 crew body %s has finite pose"), *It->GetName()),
             It->HasFinitePose());
         Test->TestTrue(
+            FString::Printf(
+                TEXT("CC0 crew body %s exposes articulated paddle-grip digits"),
+                *It->GetName()),
+            It->HasArticulatedPaddleGripRig());
+        if (It->HasActivePaddleGripPose())
+        {
+            ++CC0ActivePaddleGripCount;
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("CC0 crew body %s keeps both palms on the solved paddle handles "
+                         "(maximum error %.3f cm)"),
+                    *It->GetName(),
+                    It->GetMaximumPaddleGripAnchorErrorCm()),
+                It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f);
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("CC0 crew body %s closes every upper T-grip finger chain "
+                         "(minimum %.3f degrees)"),
+                    *It->GetName(),
+                    It->GetMinimumUpperPaddleFingerClosureDegrees()),
+                It->GetMinimumUpperPaddleFingerClosureDegrees() >= 120.0f);
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("CC0 crew body %s closes every lower shaft finger chain "
+                         "(minimum %.3f degrees)"),
+                    *It->GetName(),
+                    It->GetMinimumLowerPaddleFingerClosureDegrees()),
+                It->GetMinimumLowerPaddleFingerClosureDegrees() >= 210.0f);
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("CC0 crew body %s closes both opposed thumb chains "
+                         "(minimum %.3f degrees)"),
+                    *It->GetName(),
+                    It->GetMinimumPaddleThumbClosureDegrees()),
+                It->GetMinimumPaddleThumbClosureDegrees() >= 50.0f);
+        }
+        Test->TestTrue(
             FString::Printf(TEXT("CC0 crew body %s selected packaged mesh"), *It->GetName()),
             It->GetSelectedMeshPath().Contains(TEXT("/Production/CC0/SK_RaftSim_CC0_")));
     }
@@ -1234,6 +1272,10 @@ bool FRaftSimM5StartRescueCommand::Update()
         TEXT("CC0 roster is used exactly when assembled production art is unavailable"),
         CC0BodyCount,
         bExpectCC0Roster ? 5 : 0);
+    Test->TestEqual(
+        TEXT("four seated CC0 paddlers retain active grips while one forced swimmer releases"),
+        CC0ActivePaddleGripCount,
+        bExpectCC0Roster ? 4 : 0);
     int32 MetaHumanBodyCount = 0;
     for (TActorIterator<ARaftSimMetaHumanCrewVisualActor> It(GetM5GameWorld()); It; ++It)
     {

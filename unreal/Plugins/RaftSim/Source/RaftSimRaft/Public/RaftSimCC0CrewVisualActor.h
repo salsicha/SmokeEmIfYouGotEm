@@ -42,6 +42,40 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     bool HasFinitePose() const;
 
+    /** Both imported hands expose complete three-joint thumb/finger chains. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasArticulatedPaddleGripRig() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleGripAnchorErrorCm() const
+    {
+        return MaximumPaddleGripAnchorErrorCm;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumUpperPaddleFingerClosureDegrees() const
+    {
+        return MinimumUpperPaddleFingerClosureDegrees;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumLowerPaddleFingerClosureDegrees() const
+    {
+        return MinimumLowerPaddleFingerClosureDegrees;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMinimumPaddleThumbClosureDegrees() const
+    {
+        return MinimumPaddleThumbClosureDegrees;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    bool HasActivePaddleGripPose() const
+    {
+        return bPaddleGripActive;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FString GetSelectedMeshPath() const;
 
@@ -67,6 +101,12 @@ private:
     void CacheRenderedFaceAnchorVertices();
     bool TryGetRenderedFaceEyeCenterWorld(FVector& OutWorldLocation) const;
     void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
+    void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
+    void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
+    void SetPaddleGripHandTransform(
+        bool bLeft,
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& WristCm);
     void SetBoneAtPoint(FName BoneName, const FVector& DesiredPointCm);
     void SetSegmentBone(
         FName BoneName,
@@ -74,6 +114,26 @@ private:
         const FVector& DesiredStartCm,
         const FVector& DesiredEndCm);
     FVector ToMeshSpace(const FVector& PointCm) const;
+    FVector ResolvePaddleGripWristCm(
+        bool bLeft,
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
+    FQuat ResolvePaddleGripHandRotation(
+        bool bLeft,
+        const FRaftSimCrewAvatarPose& Pose) const;
+    FVector ResolvePaddleGripAxis(
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
+    bool IsUpperTGrip(
+        const FRaftSimCrewAvatarPose& Pose,
+        const FVector& DesiredGripCm) const;
+    float MeasurePaddleGripAnchorErrorCm(
+        bool bLeft,
+        const FVector& DesiredGripCm) const;
+    float MeasureMinimumPaddleFingerClosureDegrees(
+        const FRaftSimCrewAvatarPose& Pose,
+        bool bUpperTGrip) const;
+    float MeasureMinimumPaddleThumbClosureDegrees() const;
 
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> Root;
@@ -90,5 +150,10 @@ private:
     int32 CurrentVariantIndex = 0;
     bool bCurrentGuide = false;
     bool bBodyReady = false;
+    bool bPaddleGripActive = false;
+    float MaximumPaddleGripAnchorErrorCm = 0.0f;
+    float MinimumUpperPaddleFingerClosureDegrees = 0.0f;
+    float MinimumLowerPaddleFingerClosureDegrees = 0.0f;
+    float MinimumPaddleThumbClosureDegrees = 0.0f;
     static constexpr float BodyScale = 1.0f;
 };

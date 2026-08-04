@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Replaced the packaged CC0 crew's open reference hands with side-correct,
+  palm-aligned articulated paddle grips. All five identities now use distinct
+  upper T-grip and lower shaft-hand frames, curl every three-joint finger and
+  thumb chain, preserve source bone lengths, and release the grip for swimmers.
+  The editor build, 15 focused contracts, 45 related visual-isolation contracts,
+  30 renderer views, and renderer-enabled M5 gate pass. This is a technical
+  character fallback improvement, not photoreal promotion: coarse topology,
+  weak thumb opposition, compression, motion, and named character-art and guide
+  acceptance remain open.
 - Re-certified Zambezi Batoka Gorge as runnable river 6 at the V18 release
   head. The selection catalog and six-river progression manifest now both
   explicitly record `runnable: true`, `availability: free_run`, and the V12
