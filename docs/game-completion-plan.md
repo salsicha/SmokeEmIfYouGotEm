@@ -4327,3 +4327,13 @@ path is verified, and the completion goal can be marked complete.
   characters/occlusion, measured hydraulics, performance, and all six external
   reviews keep M9 and photoreal promotion open in
   `cold_water_highlight_naturalism_v1_review.json`.
+- Cold-water depth attenuation V2 regenerates `L_Terminator` and
+  `L_LavaCanyon` with explicit river-local depth transmission and narrows
+  speed-driven aeration so ordinary fast current does not become a milky body.
+  Futaleufú's matched clear right-body mean falls 5.65% and contrast rises
+  19.11%; Chilko mean falls 21.40%, p95 4.52%, and the far washed band 14.33%.
+  Both native water audits and the six-map runnable suite pass. Solver foam,
+  raft-interior transmission, cooked state, geometry, bathymetry, collision,
+  buoyancy, and forces are unchanged. Remaining water/VFX, terrain/ecology,
+  character, calibration, performance, and external gates stay open in
+  `cold_water_depth_attenuation_v2_review.json`.

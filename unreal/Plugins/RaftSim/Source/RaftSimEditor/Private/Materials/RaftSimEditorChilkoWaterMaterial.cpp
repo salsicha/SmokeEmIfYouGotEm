@@ -452,7 +452,10 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
     SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.64f);
     SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.58f);
     SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.72f);
-    SetScalar(TEXT("SpeedAerationFraction"), 0.13f);
+    // Cooked speed alone does not imply entrained air. A small shoulder keeps
+    // breaker transitions continuous while the solver foam mask retains sole
+    // ownership of the visibly aerated whitewater body.
+    SetScalar(TEXT("SpeedAerationFraction"), 0.020f);
     SetScalar(TEXT("FoamRoughness"), 0.70f);
     // Lava Canyon is fast, wind-textured water rather than a broad polished
     // mirror. Keep the dielectric response, but localize the capture fallback

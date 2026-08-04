@@ -473,6 +473,34 @@ performance evidence, and all six external approvals. Exact captures, hashes,
 thresholds, and blockers are in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_review.json`.
 
+## Shared Cold-Water Depth Attenuation V2
+
+The runnable `L_Terminator` and `L_LavaCanyon` maps now serialize an explicit
+depth/attenuation contract instead of relying on generic optical defaults.
+Cooked depth remains the sole green-channel depth source: shallows transmit a
+darker riverbed scale, deep cells use stronger absorption and opacity, and
+solver foam remains the only authority for fully aerated water. The former
+speed shoulder incorrectly made ordinary fast current partly milky; it is now
+bounded to 0.025 for Futaleufú and 0.020 for Chilko. Runtime cooked-field
+identity applies the same values to an older serialized package, while filtered
+generation stores them in the current map and river-local material instance.
+
+In matched gameplay frames, Futaleufú mean luminance falls 2.56%, its clear
+right-body mean falls 5.65%, and luminance contrast rises 19.11%. Chilko mean
+falls 21.40%, p95 falls 4.52%, its far washed band falls 14.33%, and contrast
+rises 37.33%. The upper tail remains white because solver foam and direct-lit
+breaking faces were deliberately preserved. Raft-interior surface opacity and
+optical depth remain zero, and no cooked field, wet mask, water geometry,
+bathymetry, collision, buoyancy, or raft force changes.
+
+This is a retained technical correction, not photoreal promotion. Futaleufú's
+left breaking body is still broad and pale, Chilko's far shoreline is still
+geometrically simple, both foam fields remain streak-like, and terrain,
+vegetation, rocks, atmosphere, spray/mist, characters, calibration,
+performance, and all six external reviews remain open. Exact hashes, metrics,
+authority boundaries, and blockers are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

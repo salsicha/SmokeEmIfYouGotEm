@@ -762,3 +762,18 @@ and external acceptance gates pass.
   terrain, datum, rights, seasonal-flow, rapid-hydraulic, guide, photoreal-art,
   or target-platform acceptance. Exact hashes and gates are in
   `zambezi_runnable_release_head_v13_review.json`.
+
+### 2026-08-04 — Cold-water depth attenuation V2 retained
+
+- Futaleufú `L_Terminator` and Chilko `L_LavaCanyon` now serialize river-local
+  scattering, absorption, riverbed transmission, shallow/deep opacity, and a
+  bounded fast-current aeration shoulder. Cooked depth and solver foam retain
+  authority; raft-interior transmission remains enabled.
+- Matched Futaleufú clear-water mean falls 5.65% on the right body and contrast
+  rises 19.11%. Chilko mean falls 21.40%, p95 4.52%, and the far washed band
+  14.33%. The editor build, both native water audits, and all six runnable-map
+  loads pass.
+- The pass changes presentation only. Broad breaking faces, foam/VFX, bank
+  microgeometry, regional art, measured hydraulics, character/raft review,
+  platform performance, and all external approvals remain open in
+  `cold_water_depth_attenuation_v2_review.json`.

@@ -45,6 +45,9 @@ V3_REVIEW = MANIFEST.with_name(
 HIGHLIGHT_REVIEW = MANIFEST.with_name(
     "cold_water_highlight_naturalism_v1_review.json"
 )
+DEPTH_ATTENUATION_REVIEW = MANIFEST.with_name(
+    "cold_water_depth_attenuation_v2_review.json"
+)
 FLOW_NORMAL_SOURCE = (
     REPO_ROOT
     / "unreal/SourceArt/RaftSim/Water/FutaleufuTerminator/"
@@ -109,6 +112,12 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "LiveFoamIntensity = 0.58f",
         "LiveRapidFoamFocusStart = 0.08f",
         "LiveRapidFoamFocusEnd = 0.58f",
+        "FLinearColor(0.000035f, 0.000070f, 0.000110f, 0.0f)",
+        "FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f)",
+        "FLinearColor(0.055f, 0.075f, 0.090f, 0.0f)",
+        "LiveShallowWaterOpacity = 0.36f",
+        "LiveDeepWaterOpacity = 0.86f",
+        "LiveFoamWaterOpacity = 0.88f",
         "LiveVolumeCoreMaterialOverride",
         "LiveWaterFlowNormalTexture",
         "LiveWaterFoamLaceTexture",
@@ -117,9 +126,11 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         "RaftSimColdWaterCpuChopV2",
         "RaftSimColdWaterEmbeddedAerationV2",
         "RaftSimColdWaterHighlightNaturalismV1",
+        "RaftSimColdWaterDepthAttenuationV2",
     ):
         assert token in geometry
     for token in (
+        'SetScalar(TEXT("SpeedAerationFraction"), 0.025f)',
         'SetScalar(TEXT("ReachHueVariation"), 0.12f)',
         'SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f)',
         'SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f)',
@@ -171,6 +182,11 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
     assert "FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)" in runtime
     assert "FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)" in runtime
     assert "FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)" in runtime
+    assert "FLinearColor(0.000035f, 0.000070f, 0.000110f, 0.0f)" in runtime
+    assert "FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f)" in runtime
+    assert "FLinearColor(0.055f, 0.075f, 0.090f, 0.0f)" in runtime
+    assert "? 0.025f" in runtime
+    assert 'TEXT("SpeedAerationFraction")' in runtime
     assert "kLiveVolumeCoreMinimumStationCoverage = 0.60f" in runtime
     assert "MinimumCellStationCoverage" in runtime
     assert 'TEXT("WaterFlowNormalPrimary")' in runtime
@@ -211,6 +227,60 @@ def test_futaleufu_manifest_records_native_capture_water() -> None:
     assert candidate["water_normal_intensity"] == 0.30
     assert candidate["water_surface_variation_strength"] == 0.44
     assert candidate["water_solver_render_geometry_collision_enabled"] is False
+
+
+def test_cold_water_depth_attenuation_v2_review_is_hash_locked_and_fail_closed() -> None:
+    review = json.loads(DEPTH_ATTENUATION_REVIEW.read_text(encoding="utf-8"))
+
+    assert review["schema"] == (
+        "raftsim.environment.cold_water_depth_attenuation_review.v2"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["technical_candidate_passed"] is True
+    assert review["decision"]["cold_water_depth_attenuation_v2_retained"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["production_promoted"] is False
+    for unchanged in (
+        "terrain_geometry_changed",
+        "water_geometry_changed",
+        "hydraulics_changed",
+        "wet_dry_mask_changed",
+        "bathymetry_changed",
+        "collision_changed",
+        "buoyancy_or_raft_forces_changed",
+        "raft_interior_transmission_changed",
+        "solver_foam_authority_changed",
+    ):
+        assert review["decision"][unchanged] is False
+
+    comparison = review["visual_comparison"]
+    fut_base = comparison["futaleufu_baseline"]
+    fut_retained = comparison["futaleufu_retained"]
+    chilko_base = comparison["chilko_baseline"]
+    chilko_retained = comparison["chilko_retained"]
+    assert fut_retained["mean_luminance"] < fut_base["mean_luminance"] * 0.98
+    assert (
+        fut_retained["right_body_mean_luminance"]
+        < fut_base["right_body_mean_luminance"] * 0.95
+    )
+    assert (
+        fut_retained["luminance_standard_deviation"]
+        > fut_base["luminance_standard_deviation"] * 1.15
+    )
+    assert chilko_retained["mean_luminance"] < chilko_base["mean_luminance"] * 0.80
+    assert chilko_retained["p95_luminance"] < chilko_base["p95_luminance"] * 0.96
+    assert (
+        chilko_retained["far_band_mean_luminance"]
+        < chilko_base["far_band_mean_luminance"] * 0.87
+    )
+    assert chilko_retained["fraction_over_0_95"] < 0.001
+    assert len(review["required_external_acceptance_gates"]) == 6
+    assert all(reviewer is None for reviewer in review["reviewers"].values())
+
+    for artifact in review["retained_artifacts"]:
+        path = REPO_ROOT / artifact["path"]
+        assert path.is_file(), artifact["path"]
+        assert _sha256(path) == artifact["sha256"], artifact["path"]
 
 
 def test_futaleufu_native_water_review_is_hash_locked_and_honest() -> None:
@@ -476,7 +546,14 @@ def test_cold_water_highlight_review_is_hash_locked_and_fail_closed() -> None:
     assert len(review["remaining_photoreal_defects"]) >= 8
     assert len(review["required_external_acceptance_gates"]) == 6
 
+    superseded_by_depth_v2 = {
+        "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+        "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+        "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3.uasset",
+    }
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_by_depth_v2:
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]
