@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v16_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json`.
 
 The subsequent V18 Zambezi presentation pass preserves that same runnable
 selector and runtime contract while reducing clipped launch-water and scarp
@@ -847,4 +847,4 @@ and external acceptance gates pass.
   canyon form, sparse/repeated ecology, flat-looking water, final geology and
   target performance remain open, so this is runnable-reference and bounded
   technical acceptance only. Current hashes and evidence are in
-  `zambezi_runnable_release_head_v16_review.json`.
+  `zambezi_runnable_release_head_v17_review.json`.

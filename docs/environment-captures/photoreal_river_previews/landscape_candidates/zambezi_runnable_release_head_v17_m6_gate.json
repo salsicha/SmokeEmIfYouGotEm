@@ -1,0 +1,59 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "44A126C07444AFEB5559ED9688E1DE1C",
+			"instanceName": "Alexs-MacBook-Air.local-13534",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-18.07.04",
+	"succeeded": 2,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.016100291162729263,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "CareerCatalog",
+			"fullTestPath": "RaftSim.M6.CareerCatalog",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"44A126C07444AFEB5559ED9688E1DE1C"
+			],
+			"duration": 0.0079045854508876801,
+			"dateTime": "2026.08.04-18.07.04",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "ProgressionMigration",
+			"fullTestPath": "RaftSim.M6.ProgressionMigration",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"44A126C07444AFEB5559ED9688E1DE1C"
+			],
+			"duration": 0.0081957057118415833,
+			"dateTime": "2026.08.04-18.07.04",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

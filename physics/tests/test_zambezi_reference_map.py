@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v16_review.json"
+    "zambezi_runnable_release_head_v17_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -211,17 +211,17 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v12"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v13"
     assert review["recorded_local_date"] == "2026-08-04"
     assert review["verified_parent_commit"] == (
-        "c7c4edd38cdbdf04c7a17360801f1c182005fb2a"
+        "1165e1d36408e8fc572abc889c3401c08c12a68d"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["photoreal_promotion"] is False
     assert review["supersedes_review"].endswith(
-        "zambezi_runnable_release_head_v15_review.json"
+        "zambezi_runnable_release_head_v16_review.json"
     )
     assert review["player_path"] == {
         "game_mode": "Free Run",
@@ -260,7 +260,16 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         "versioned_map_present": True,
         "superseded_preview_is_player_path": False,
     }
-    assert review["verification"]["clean_editor_build"]["result"] == "success"
+    assert review["verification"]["release_head_editor_build"]["result"] == "success"
+    assert review["verification"]["release_head_editor_build"][
+        "exact_committed_source"
+    ] is True
+    assert review["verification"]["release_head_editor_build"][
+        "incremental_actions"
+    ] == 7
+    assert review["verification"]["fresh_worktree_build_attempt"]["result"] == (
+        "infrastructure_failure"
+    )
     assert review["verification"]["native_catalog_and_progression"]["passed"] == 2
     assert review["verification"]["native_catalog_and_progression"]["failed"] == 0
     assert review["verification"]["focused_python_contracts"]["passed"] == 27
@@ -273,7 +282,14 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     )
     assert review["verification"]["zambezi_map_load"]["zambezi_mapcheck_errors"] == 0
     assert review["verification"]["zambezi_map_load"]["zambezi_mapcheck_warnings"] == 0
+    assert review["verification"]["zambezi_map_load"]["automation_warnings"] == 3
+    assert len(
+        review["verification"]["zambezi_map_load"]["accepted_warnings"]
+    ) == 3
+    assert review["verification"]["zambezi_map_load"]["surface_vertices"] == 10465
+    assert review["verification"]["zambezi_map_load"]["active_breaking_sites"] == 10
     assert review["verification"]["zambezi_map_load"]["rapid_foam_vertices"] == 645
+    assert review["verification"]["zambezi_map_load"]["volume_core_triangles"] == 16896
     assert review["verification"]["saved_map_audit"]["schema"] == (
         "raftsim.unreal.zambezi_reference_scenario_map_validation.v22"
     )
