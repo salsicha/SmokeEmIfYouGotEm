@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reaffirmed Zambezi Batoka Gorge as runnable river 6 on the current release
+  head without changing its V19 map package. The player selection catalog and
+  six-river progression manifest still map `zambezi_reference_run` to
+  `/Game/RaftSim/Maps/L_Zambezi` at `reference_free_run` tier and now link a
+  V14 hash-locked release review. A clean 136-action UE 5.8 editor build, 26
+  focused Python contracts, the native career and progression gates, the
+  focused Zambezi PIE gate, and six isolated runnable-map PIE gates pass with
+  MapCheck at zero errors and warnings. This is runnable-reference
+  certification only; production terrain, bathymetry, rapid hydraulics,
+  guide/rights/flow review, photoreal art, and platform performance remain
+  open.
 - Reworked the runnable Futaleufú and Chilko Single Layer Water cores so cooked
   depth now drives a strong shallow-transmission/deep-absorption relationship,
   while ordinary fast current no longer receives broad milky aeration. The
