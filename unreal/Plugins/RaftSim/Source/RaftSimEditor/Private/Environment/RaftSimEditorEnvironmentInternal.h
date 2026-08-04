@@ -1008,6 +1008,9 @@ struct FZambeziAdaptiveNearFieldTerrainStats
     int64 TriangleCount = 0;
     int64 DryShorelineInfillVertexCount = 0;
     int64 RefinedVertexCount = 0;
+    int64 PlanarJitteredVertexCount = 0;
+    int64 TopologyCandidateCellCount = 0;
+    int64 TopologyRejectedCellCount = 0;
     int64 WetBankVertexCount = 0;
     int32 ShadowSuppressedActorCount = 0;
     int32 CollisionEnabledActorCount = 0;
@@ -1016,6 +1019,8 @@ struct FZambeziAdaptiveNearFieldTerrainStats
     float MaximumDryShorelineInfillCm = 0.0f;
     float MinimumRenderedHeightAboveWaterCm = TNumericLimits<float>::Max();
     float MaximumAbsoluteRefinementCm = 0.0f;
+    float MaximumPlanarJitterCm = 0.0f;
+    float MinimumPlanarCellAreaCm2 = TNumericLimits<float>::Max();
     float MaximumWetBankMask = 0.0f;
     float MaximumWetBankHeightAboveWaterCm = 0.0f;
 };

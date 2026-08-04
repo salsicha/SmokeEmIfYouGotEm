@@ -619,7 +619,7 @@
     ]
   },
   "scenario_marker_count": 25,
-  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v21",
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v22",
   "vegetation": {
     "authority": "procedural_render_only_no_exact_species_claim",
     "camera_visible_bank_cover_component_count": 1,
@@ -1086,13 +1086,15 @@
       "actor_count": 2,
       "actors": [
         {
-          "actor_label": "RaftSim_ZambeziAdaptiveNearFieldTerrainV1_LeftBank",
+          "actor_label": "RaftSim_ZambeziAdaptiveNearFieldTerrainV2_LeftBank",
           "cast_shadow": false,
           "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
           "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
           "procedural_mesh_count": 1,
           "tags": [
             "RaftSimConditionedWaterlineWetBankV1",
+            "RaftSimDomainWarpedGeomorphicReliefV2",
+            "RaftSimIrregularPlanarTopologyV2",
             "RaftSimNearFieldSelfShadowSuppressed",
             "RaftSimNonCollisionRenderSurface",
             "RaftSimProceduralInfill",
@@ -1100,18 +1102,20 @@
             "RaftSimProtectedDryShoreline",
             "RaftSimSourceConditionedTerrain",
             "RaftSimVertexRedWetBankMask",
-            "RaftSimZambeziAdaptiveNearFieldTerrainV1",
+            "RaftSimZambeziAdaptiveNearFieldTerrainV2",
             "RaftSimZambeziRun"
           ]
         },
         {
-          "actor_label": "RaftSim_ZambeziAdaptiveNearFieldTerrainV1_RightBank",
+          "actor_label": "RaftSim_ZambeziAdaptiveNearFieldTerrainV2_RightBank",
           "cast_shadow": false,
           "collision_enabled": "<CollisionEnabled.NO_COLLISION: 0>",
           "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
           "procedural_mesh_count": 1,
           "tags": [
             "RaftSimConditionedWaterlineWetBankV1",
+            "RaftSimDomainWarpedGeomorphicReliefV2",
+            "RaftSimIrregularPlanarTopologyV2",
             "RaftSimNearFieldSelfShadowSuppressed",
             "RaftSimNonCollisionRenderSurface",
             "RaftSimProceduralInfill",
@@ -1119,23 +1123,27 @@
             "RaftSimProtectedDryShoreline",
             "RaftSimSourceConditionedTerrain",
             "RaftSimVertexRedWetBankMask",
-            "RaftSimZambeziAdaptiveNearFieldTerrainV1",
+            "RaftSimZambeziAdaptiveNearFieldTerrainV2",
             "RaftSimZambeziRun"
           ]
         }
       ],
       "authority": "source_conditioned_surface_with_bounded_procedural_dry_shoreline_and_basalt_erosion_infill",
-      "grid_spacing_m": 5.0,
+      "geomorphic_relief_contract": "v2_domain_warped_broad_erosion_local_basalt_fracture_fine_talus_and_paired_joint_cut",
+      "grid_spacing_m": 2.5,
       "inner_dry_bank_buffer_m": 3.0,
       "maximum_dry_shoreline_infill_m": 1.8,
       "maximum_lateral_extent_m": 600.0,
-      "maximum_procedural_refinement_m": 0.96,
+      "maximum_planar_jitter_m": 0.7,
+      "maximum_procedural_refinement_m": 1.35,
+      "minimum_planar_triangle_area_m2": 0.25,
       "minimum_rendered_dry_clearance_m": 0.295,
       "physics_and_collision_authority": "source_copernicus_landscape_only",
       "station_window_m": [
         0.0,
         1000.0
       ],
+      "topology_contract": "v2_deterministic_irregular_planar_grid_with_subquarter_cell_jitter_and_positive_triangle_area",
       "wet_bank_authority": "procedural_presentation_only_no_measured_wet_bank_collision_or_hydraulic_authority",
       "wet_bank_contract": "conditioned_profile_vertex_red_render_only_irregular_1.75m_to_3.25m_procedural_stain_ceiling"
     },

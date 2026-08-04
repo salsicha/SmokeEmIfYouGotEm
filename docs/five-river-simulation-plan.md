@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v14_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json`.
 
 The subsequent V18 Zambezi presentation pass preserves that same runnable
 selector and runtime contract while reducing clipped launch-water and scarp
@@ -828,3 +828,23 @@ and external acceptance gates pass.
   but missing volumetric aeration/recirculation, measured seasonal hydraulics,
   photoreal art, and all seven external gates keep promotion open in
   `zambezi_plunge_pocket_v1_review.json`.
+
+### 2026-08-04 — Zambezi irregular near-field terrain V2 retained
+
+- Regenerated the runnable `/Game/RaftSim/Maps/L_Zambezi` package with two
+  source-conditioned, non-colliding V2 bank meshes across stations 0-1,000 m.
+  The former regular 5 m surface is now an irregular 2.5 m grid with 169,222
+  vertices and 246,490 triangles; deterministic planar jitter remains below
+  0.47 m in the retained map.
+- The generator rejects inverted or sub-0.25 m² curved-offset cells before
+  triangulation. It rejects 985 of 124,230 candidates (0.793%), retains a
+  0.263 m² minimum triangle, preserves 0.33 m dry clearance, and adds bounded
+  domain-warped erosion/fracture/talus/joint relief with a 0.98 m observed
+  maximum. The Copernicus Landscape remains collision and physics authority.
+- The schema-v22 saved-map audit passes with MapCheck 0/0, the native focused
+  `RaftSim.P4.RiverMapLoads.L_Zambezi` PIE gate passes 1/1, and the matched
+  guide-eye frame removes the prior long black overlap seams. The rounded 30 m
+  canyon form, sparse/repeated ecology, flat-looking water, final geology and
+  target performance remain open, so this is runnable-reference and bounded
+  technical acceptance only. Current hashes and evidence are in
+  `zambezi_runnable_release_head_v15_review.json`.

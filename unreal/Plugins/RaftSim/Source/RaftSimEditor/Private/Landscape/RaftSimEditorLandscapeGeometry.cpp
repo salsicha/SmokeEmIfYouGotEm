@@ -1029,8 +1029,14 @@ bool AddZambeziAdaptiveNearFieldTerrain(
 
     constexpr float StartStationM = 0.0f;
     constexpr float EndStationM = 1000.0f;
-    constexpr float LongitudinalSpacingCm = 500.0f;
-    constexpr float LateralSpacingCm = 500.0f;
+    // V2 resolves the source-missing guide-eye bank at 2.5 m, then moves only
+    // interior presentation vertices by less than one quarter of a cell. The
+    // non-colliding mesh can therefore break the regular DEM tessellation
+    // without changing the source Landscape's collision or height authority.
+    constexpr float LongitudinalSpacingCm = 250.0f;
+    constexpr float LateralSpacingCm = 250.0f;
+    constexpr float MaximumStationJitterCm = 55.0f;
+    constexpr float MaximumLateralJitterCm = 42.0f;
     constexpr float OuterBankDistanceCm = 60000.0f;
     constexpr float SurfaceLiftCm = 3.0f;
     constexpr float MaximumDryShorelineInfillCm = 180.0f;
@@ -1109,8 +1115,35 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                     static_cast<float>(LateralStepCount);
                 const float BankDistanceCm = FMath::Lerp(
                     InnerBankDistanceCm, OuterBankDistanceCm, LateralT);
+                const float PlanarJitterFade =
+                    SmoothPreviewStep(0.0f, 2000.0f, StationM * 100.0f) *
+                    (1.0f - SmoothPreviewStep(
+                        EndStationM * 100.0f - 2000.0f,
+                        EndStationM * 100.0f,
+                        StationM * 100.0f)) *
+                    FMath::Sin(PI * LateralT);
+                const FVector2D JitterCoordinate(
+                    StationM * 0.071f + Side * 17.0f,
+                    BankDistanceCm * 0.00023f - Side * 29.0f);
+                const float StationJitterCm = PlanarJitterFade *
+                    MaximumStationJitterCm * FMath::PerlinNoise2D(
+                        JitterCoordinate);
+                const float LateralJitterCm = PlanarJitterFade *
+                    MaximumLateralJitterCm * FMath::PerlinNoise2D(FVector2D(
+                        JitterCoordinate.Y * 1.73f + 41.0f,
+                        JitterCoordinate.X * 0.67f - 37.0f));
+                const float PlanarJitterCm = FVector2D(
+                    StationJitterCm, LateralJitterCm).Size();
+                if (PlanarJitterCm > 0.5f)
+                {
+                    ++OutStats.PlanarJitteredVertexCount;
+                    OutStats.MaximumPlanarJitterCm = FMath::Max(
+                        OutStats.MaximumPlanarJitterCm,
+                        PlanarJitterCm);
+                }
                 const FVector2D WorldPoint =
-                    Center + BankNormal * (Side * BankDistanceCm);
+                    Center + Tangent * StationJitterCm +
+                    BankNormal * (Side * (BankDistanceCm + LateralJitterCm));
                 float DenseTerrainZ = 0.0f;
                 const bool bSampled = SampleDenseTerrainWorldZ(
                     WorldPoint, DenseTerrainZ);
@@ -1205,22 +1238,44 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                 0.28f,
                 1.0f,
                 SmoothPreviewStep(0.035f, 0.48f, Steepness));
+            // Domain warping prevents the three geomorphic bands from sharing
+            // the regular source-grid axes. The broad term follows weathered
+            // gorge mass, the middle term breaks basalt-scale faces, and the
+            // fine term gives talus-sized normal variation. A narrow paired
+            // joint network cuts rather than raises isolated ridges.
+            const float WarpX = FMath::PerlinNoise2D(FVector2D(
+                Position.X * 0.00017f + Side * 7.0f,
+                Position.Y * 0.00017f - Side * 13.0f));
+            const float WarpY = FMath::PerlinNoise2D(FVector2D(
+                Position.X * 0.00021f - Side * 19.0f,
+                Position.Y * 0.00021f + Side * 23.0f));
+            const FVector2D WarpedPosition(
+                Position.X + WarpX * 4200.0f,
+                Position.Y + WarpY * 4200.0f);
             const float BroadErosion = FMath::PerlinNoise2D(
                 FVector2D(
-                    Position.X * 0.00012f + Side * 17.0f,
-                    Position.Y * 0.00012f - Side * 11.0f));
+                    WarpedPosition.X * 0.00012f + Side * 17.0f,
+                    WarpedPosition.Y * 0.00012f - Side * 11.0f));
             const float LocalFracture = FMath::PerlinNoise2D(
                 FVector2D(
-                    Position.X * 0.00043f - Side * 29.0f,
-                    Position.Y * 0.00043f + Side * 23.0f));
+                    WarpedPosition.X * 0.00047f - Side * 29.0f,
+                    WarpedPosition.Y * 0.00047f + Side * 23.0f));
             const float FineTalus = FMath::PerlinNoise2D(
                 FVector2D(
-                    Position.X * 0.00092f + 41.0f,
-                    Position.Y * 0.00092f - 37.0f));
+                    WarpedPosition.X * 0.00108f + 41.0f,
+                    WarpedPosition.Y * 0.00108f - 37.0f));
+            const float JointA = FMath::Abs(FMath::Sin(
+                WarpedPosition.X * 0.00119f +
+                WarpedPosition.Y * 0.00061f + BroadErosion * 1.7f));
+            const float JointB = FMath::Abs(FMath::Sin(
+                WarpedPosition.X * -0.00073f +
+                WarpedPosition.Y * 0.00131f - LocalFracture * 1.3f));
+            const float JointCut = -24.0f *
+                FMath::Pow(1.0f - FMath::Min(JointA, JointB), 5.0f);
             float RefinementCm = RefinementFades[VertexIndex] * SlopeResponse *
-                (BroadErosion * 58.0f + LocalFracture * 31.0f +
-                 FineTalus * 14.0f);
-            RefinementCm = FMath::Clamp(RefinementCm, -96.0f, 96.0f);
+                (BroadErosion * 72.0f + LocalFracture * 43.0f +
+                 FineTalus * 19.0f + JointCut);
+            RefinementCm = FMath::Clamp(RefinementCm, -135.0f, 135.0f);
             const float MinimumRefinementCm =
                 WaterSurfaceZ[VertexIndex] + 30.0f - Position.Z;
             RefinementCm = FMath::Max(RefinementCm, MinimumRefinementCm);
@@ -1287,6 +1342,30 @@ bool AddZambeziAdaptiveNearFieldTerrain(
                 {
                     continue;
                 }
+                ++OutStats.TopologyCandidateCellCount;
+                const FVector2D A2(Vertices[A].X, Vertices[A].Y);
+                const FVector2D B2(Vertices[B].X, Vertices[B].Y);
+                const FVector2D C2(Vertices[C].X, Vertices[C].Y);
+                const FVector2D D2(Vertices[D].X, Vertices[D].Y);
+                const float CrossAbc = FVector2D::CrossProduct(
+                    B2 - A2, C2 - A2);
+                const float CrossBdc = FVector2D::CrossProduct(
+                    D2 - B2, C2 - B2);
+                const float AreaAbcCm2 = FMath::Abs(CrossAbc) * 0.5f;
+                const float AreaBdcCm2 = FMath::Abs(CrossBdc) * 0.5f;
+                constexpr float kMinimumPlanarTriangleAreaCm2 = 2500.0f;
+                const bool bExpectedWinding =
+                    CrossAbc * Side < 0.0f && CrossBdc * Side < 0.0f;
+                if (!bExpectedWinding ||
+                    AreaAbcCm2 < kMinimumPlanarTriangleAreaCm2 ||
+                    AreaBdcCm2 < kMinimumPlanarTriangleAreaCm2)
+                {
+                    ++OutStats.TopologyRejectedCellCount;
+                    continue;
+                }
+                OutStats.MinimumPlanarCellAreaCm2 = FMath::Min(
+                    OutStats.MinimumPlanarCellAreaCm2,
+                    FMath::Min(AreaAbcCm2, AreaBdcCm2));
                 if (Side < 0.0f)
                 {
                     Triangles.Append({A, C, B, B, C, D});
@@ -1309,7 +1388,7 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         AActor* Actor = AddPreviewProceduralMeshActor(
             World,
             FString::Printf(
-                TEXT("RaftSim_ZambeziAdaptiveNearFieldTerrainV1_%sBank"),
+                TEXT("RaftSim_ZambeziAdaptiveNearFieldTerrainV2_%sBank"),
                 Side < 0.0f ? TEXT("Left") : TEXT("Right")),
             Vertices,
             Triangles,
@@ -1324,7 +1403,9 @@ bool AddZambeziAdaptiveNearFieldTerrain(
             return false;
         }
         Actor->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
-        Actor->Tags.AddUnique(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1"));
+        Actor->Tags.AddUnique(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV2"));
+        Actor->Tags.AddUnique(TEXT("RaftSimIrregularPlanarTopologyV2"));
+        Actor->Tags.AddUnique(TEXT("RaftSimDomainWarpedGeomorphicReliefV2"));
         Actor->Tags.AddUnique(TEXT("RaftSimSourceConditionedTerrain"));
         Actor->Tags.AddUnique(TEXT("RaftSimProceduralInfill"));
         Actor->Tags.AddUnique(TEXT("RaftSimProtectedDryShoreline"));
@@ -1339,7 +1420,11 @@ bool AddZambeziAdaptiveNearFieldTerrain(
             Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
             Component->SetCastShadow(false);
             Component->ComponentTags.AddUnique(
-                TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1"));
+                TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimIrregularPlanarTopologyV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimDomainWarpedGeomorphicReliefV2"));
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimNonCollisionRenderSurface"));
             Component->ComponentTags.AddUnique(
@@ -1360,9 +1445,12 @@ bool AddZambeziAdaptiveNearFieldTerrain(
     }
 
     OutSummary += FString::Printf(
-        TEXT("Built %d source-conditioned Zambezi adaptive near-field bank actors "
+        TEXT("Built %d source-conditioned Zambezi adaptive near-field V2 bank actors "
              "over stations %.0f-%.0f m: %lld vertices, %lld triangles, %.1f m grid, "
-             "%lld bounded refinement vertices (maximum %.2f m), %lld dry-shoreline "
+             "%lld irregular-plan vertices (maximum jitter %.2f m, minimum triangle "
+             "area %.3f m2), %lld/%lld curved-offset cells rejected for inverted or "
+             "sub-0.25m2 topology, %lld bounded refinement vertices (maximum %.2f m), "
+             "%lld dry-shoreline "
              "infill vertices (maximum %.2f m), minimum rendered clearance %.2f m; "
              "%lld vertices carry a bounded conditioned-waterline wet-bank mask "
              "(maximum mask %.3f, maximum affected dry height %.2f m); "
@@ -1374,6 +1462,11 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         OutStats.VertexCount,
         OutStats.TriangleCount,
         LongitudinalSpacingCm * 0.01f,
+        OutStats.PlanarJitteredVertexCount,
+        OutStats.MaximumPlanarJitterCm * 0.01f,
+        OutStats.MinimumPlanarCellAreaCm2 * 0.0001f,
+        OutStats.TopologyRejectedCellCount,
+        OutStats.TopologyCandidateCellCount,
         OutStats.RefinedVertexCount,
         OutStats.MaximumAbsoluteRefinementCm * 0.01f,
         OutStats.DryShorelineInfillVertexCount,
@@ -1382,13 +1475,20 @@ bool AddZambeziAdaptiveNearFieldTerrain(
         OutStats.WetBankVertexCount,
         OutStats.MaximumWetBankMask,
         OutStats.MaximumWetBankHeightAboveWaterCm * 0.01f);
-    return OutStats.ActorCount == 2 && OutStats.VertexCount >= 40000 &&
-        OutStats.TriangleCount >= 60000 &&
+    return OutStats.ActorCount == 2 && OutStats.VertexCount >= 160000 &&
+        OutStats.TriangleCount >= 240000 &&
+        OutStats.PlanarJitteredVertexCount > 0 &&
+        OutStats.MaximumPlanarJitterCm <= 70.0f &&
+        OutStats.MinimumPlanarCellAreaCm2 >= 2500.0f &&
+        OutStats.TopologyCandidateCellCount > 0 &&
+        OutStats.TopologyRejectedCellCount * 20 <=
+            OutStats.TopologyCandidateCellCount &&
         OutStats.RefinedVertexCount > 0 &&
         OutStats.WetBankVertexCount > 0 &&
         OutStats.MaximumWetBankMask > 0.5f &&
         OutStats.MaximumWetBankHeightAboveWaterCm <= 325.5f &&
         OutStats.MinimumRenderedHeightAboveWaterCm >= 29.5f &&
+        OutStats.MaximumAbsoluteRefinementCm <= 135.5f &&
         OutStats.MaximumDryShorelineInfillCm <=
             MaximumDryShorelineInfillCm + 0.5f &&
         OutStats.ShadowSuppressedActorCount == 2 &&

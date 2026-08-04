@@ -1,0 +1,194 @@
+{
+  "schema": "raftsim.zambezi.runnable_release_head_review.v11",
+  "recorded_local_date": "2026-08-04",
+  "verified_parent_commit": "da0a30cf9205d4327eba03ccb6a772b4068ed259",
+  "branch": "release/1.0",
+  "result": "pass",
+  "classification": "runnable_reference_free_run",
+  "production_fidelity_promoted": false,
+  "photoreal_promotion": false,
+  "supersedes_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v14_review.json",
+  "player_path": {
+    "game_mode": "Free Run",
+    "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
+    "river_id": "zambezi_batoka_gorge",
+    "scenario_id": "zambezi_reference_run",
+    "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+    "runnable_river_ordinal": 6,
+    "runnable_river_count": 6,
+    "tier": "reference_free_run",
+    "availability": "free_run"
+  },
+  "registry_assertions": {
+    "river_selection_catalog_portfolio_role": "runnable_river",
+    "river_selection_catalog_runnable": true,
+    "river_selection_catalog_tier": "reference_free_run",
+    "river_selection_catalog_availability": "free_run",
+    "progression_manifest_lists_zambezi": true,
+    "progression_manifest_runnable": true,
+    "progression_manifest_availability": "free_run",
+    "both_runtime_manifests_link_this_review": true,
+    "frontend_catalog_lists_zambezi": true,
+    "shipping_cook_lists_zambezi": true,
+    "versioned_map_present": true,
+    "superseded_preview_is_player_path": false
+  },
+  "near_field_terrain_v2": {
+    "actor_count": 2,
+    "station_window_m": [0.0, 1000.0],
+    "grid_spacing_m": 2.5,
+    "vertex_count": 169222,
+    "triangle_count": 246490,
+    "planar_jittered_vertex_count": 161729,
+    "maximum_observed_planar_jitter_m": 0.47,
+    "topology_candidate_cell_count": 124230,
+    "topology_rejected_cell_count": 985,
+    "topology_rejected_cell_fraction": 0.007929,
+    "minimum_observed_accepted_triangle_area_m2": 0.263,
+    "minimum_contract_triangle_area_m2": 0.25,
+    "relief_vertex_count": 105653,
+    "maximum_observed_relief_m": 0.98,
+    "maximum_contract_relief_m": 1.35,
+    "dry_shoreline_infill_vertex_count": 45878,
+    "maximum_observed_dry_shoreline_infill_m": 1.80,
+    "minimum_observed_rendered_dry_clearance_m": 0.33,
+    "wet_bank_mask_vertex_count": 4005,
+    "collision_enabled": false,
+    "cast_shadow": false,
+    "physics_and_collision_authority": "source_copernicus_landscape_only"
+  },
+  "package_delta": {
+    "prior_map_size_bytes": 1750432702,
+    "current_map_size_bytes": 1831401385,
+    "delta_bytes": 80968683,
+    "delta_fraction": 0.046256
+  },
+  "verification": {
+    "editor_build": {
+      "target": "SmokeEmIfYouGotEmEditor Mac Development",
+      "implementation_rebuild_actions": 70,
+      "acceptance_rebuild_actions": 3,
+      "result": "success"
+    },
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v22",
+      "passed": true,
+      "mapcheck_errors": 0,
+      "mapcheck_warnings": 0,
+      "actor_count": 69,
+      "rapid_marker_count": 25,
+      "player_raft_count": 1,
+      "player_start_count": 1,
+      "water_config_count": 1,
+      "conditioned_visual_terrain_tile_count": 4,
+      "vegetation_components": 13,
+      "vegetation_instances": 14316,
+      "runnable_launch_ground_cover_instances": 6512,
+      "runnable_launch_woody_instances": 772,
+      "solver_owned_runtime_rendering": true,
+      "live_volume_core_enabled": true
+    },
+    "zambezi_map_load": {
+      "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "performed": 1,
+      "result": "success_with_accepted_warning",
+      "duration_seconds": 34.575405,
+      "zambezi_mapcheck_errors": 0,
+      "zambezi_mapcheck_warnings": 0,
+      "coordinate_map_points": 5908,
+      "surface_vertices": 10465,
+      "surface_triangles": 20480,
+      "active_breaking_sites": 10,
+      "rapid_foam_vertices": 645,
+      "volume_core_triangles": 16896,
+      "live_surface_refresh_cpu_ms": 4.194,
+      "automation_warnings": 1,
+      "accepted_warnings": [
+        "The external connectivity probe timed out after 3 seconds; it has no map-load or gameplay authority."
+      ],
+      "automation_errors": 0,
+      "report_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_bank_microgeometry_v2_pie_gate.json"
+    },
+    "focused_python_contracts": {
+      "tests": [
+        "physics/tests/test_zambezi_reference_map.py",
+        "physics/tests/test_zambezi_sentinel_centerline.py",
+        "physics/tests/test_named_rapid_registry.py"
+      ],
+      "passed": 27,
+      "failed": 0
+    }
+  },
+  "matched_visual_evidence": {
+    "command": "RaftSim.CaptureAfter 12 <label>",
+    "resolution": [1280, 720],
+    "baseline_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_bank_microgeometry_v2_before.png",
+    "baseline_sha256": "b388672400e3b88a5ceeac3de8da29d298abd25dc83cb42422cfeccf44141666",
+    "candidate_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_bank_microgeometry_v2.png",
+    "candidate_sha256": "15484306fcccb80b0d8a12b85a7b53d1a3eee359d01b0e6df8d3e3b78da4064f",
+    "bank_rows_250_569": {
+      "mean_absolute_channel_delta": 0.021540,
+      "changed_2pct_fraction": 0.328665,
+      "mean_luminance_before": 0.368796,
+      "mean_luminance_after": 0.378588,
+      "edge_005_before": 0.106611,
+      "edge_005_after": 0.097683
+    },
+    "verdict": "Retain as bounded topology and coverage progress: the long black curved-offset overlap seams and distorted shoreline strip visible in the baseline are absent. Do not claim photoreal progress from edge density, which decreases, or from the subtle silhouette change; the broad rounded canyon, sparse repeated cover, and flat-looking water remain obvious."
+  },
+  "hash_locked_current_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "51f00471114eb84a7b482fe48dd13ddf45132693890aed7a347505924a84865b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "b611b71b1bcbf98f85efe148cf7a61a0f7fbe39f3e0f1007a5b38e6902d6ba51"
+    },
+    {
+      "path": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+      "sha256": "0362b980e6c7da1b7fe8d3ef1097044b7f5093f90f46a515dbfc9d0ee71d899d"
+    },
+    {
+      "path": "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json",
+      "sha256": "3318f28fb9ad8f877f116f402556ecd26f70f72fc43b070dc3a3f508cf2ba038"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_bank_microgeometry_v2_before.png",
+      "sha256": "b388672400e3b88a5ceeac3de8da29d298abd25dc83cb42422cfeccf44141666"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_bank_microgeometry_v2.png",
+      "sha256": "15484306fcccb80b0d8a12b85a7b53d1a3eee359d01b0e6df8d3e3b78da4064f"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_bank_microgeometry_v2_pie_gate.json",
+      "sha256": "5dd0dffe6936a40ae3c66b0a1ec7fa8cfb80f0e10642cf873bb0566b5192e33e"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
+      "sha256": "c854015f228be6306454c22cd5f0a39044b96b76e34512a84dacb73f86d3d609"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "sha256": "10550582d54609696f2685aff1dcf67fd2a501d7a23a58435d9991aa446ed3e1"
+    }
+  ],
+  "authority_boundary": {
+    "runnable_claim": "Free Run launches the committed L_Zambezi package with the vertical-slice gameplay stack and live cooked-field water.",
+    "terrain": "Copernicus GLO-30 remains collision and height-query authority; V2 near-field relief is bounded, non-colliding procedural presentation infill.",
+    "ecology": "Project-owned procedural render-only ground-cover and woody analogs with no exact-species claim.",
+    "water_rendering": "Solver wet-cell geometry with render-only transmitting optics; no solver-state, collision, buoyancy, or raft-force authority moves to terrain presentation.",
+    "hydraulics": "Feature-tagged procedural reference hydraulics, not validated rapid-specific real-world hydraulics.",
+    "navigation": "Not for navigation."
+  },
+  "open_external_acceptance_gates": [
+    "local Zambezi guide approval",
+    "geospatial and datum approval",
+    "source-rights and distribution approval",
+    "seasonal-flow approval",
+    "rapid-specific hydraulic validation",
+    "photoreal environment-art, ecology, water-VFX, raft, and character approval",
+    "desktop and VR target-hardware performance approval"
+  ]
+}

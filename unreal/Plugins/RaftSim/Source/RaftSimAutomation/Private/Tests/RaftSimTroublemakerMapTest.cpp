@@ -745,7 +745,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             AActor* Actor = *It;
-            if (Actor->Tags.Contains(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV1")))
+            if (Actor->Tags.Contains(TEXT("RaftSimZambeziAdaptiveNearFieldTerrainV2")))
             {
                 UProceduralMeshComponent* Mesh =
                     Actor->FindComponentByClass<UProceduralMeshComponent>();
@@ -789,6 +789,12 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 Test->TestTrue(
                     TEXT("adaptive Zambezi bank records its self-shadow policy"),
                     Actor->Tags.Contains(TEXT("RaftSimNearFieldSelfShadowSuppressed")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank records its irregular topology contract"),
+                    Actor->Tags.Contains(TEXT("RaftSimIrregularPlanarTopologyV2")));
+                Test->TestTrue(
+                    TEXT("adaptive Zambezi bank records its geomorphic relief contract"),
+                    Actor->Tags.Contains(TEXT("RaftSimDomainWarpedGeomorphicReliefV2")));
                 Test->TestTrue(
                     TEXT("adaptive Zambezi bank binds the conditioned wet-bank treatment"),
                     Actor->Tags.Contains(TEXT("RaftSimConditionedWaterlineWetBankV1")) &&

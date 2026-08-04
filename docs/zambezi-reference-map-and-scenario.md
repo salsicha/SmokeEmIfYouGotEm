@@ -22,39 +22,35 @@ package is not the runnable map.
 
 The runnable map was regenerated and rechecked after the later environment,
 character, water, terrain, and rapid-presentation milestones, including the
-retained V19 elevation-stratified launch ecology and later cold-water highlight
-and depth passes. The V14 release-head certification is based on commit
-`81254f9a9509be710addbb2cd50b011d042f4ad2`; the Zambezi map package itself is
-unchanged from V13. The player
-path is still:
+retained V19 elevation-stratified launch ecology, later cold-water highlight
+and depth passes, and the V2 irregular near-field terrain pass. The V15
+release-head certification supersedes V14 because the versioned Zambezi map
+package now contains that denser terrain. The player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
 The machine-readable selection and Free Run manifests count six runnable rivers,
 mark `zambezi_batoka_gorge` as `runnable: true` with `availability: free_run`,
-and list it at `reference_free_run` tier. Twenty-six focused Python registry,
-source, and release-record contracts pass, and the native
-`RaftSim.M6.CareerCatalog` gate resolves the player-facing scenario without an
-automation warning or error. The native `RaftSim.P4.RiverMapLoads.L_Zambezi`
+and list it at `reference_free_run` tier. Twenty-seven focused Python registry,
+source, and release-record contracts remain fail-closed. The native
+`RaftSim.P4.RiverMapLoads.L_Zambezi`
 gate loads the committed map into PIE, reports the vertical-slice game mode,
 binds the 5,908-point curved coordinate map and cooked field, exposes 10,465 wet
-surface vertices, ten live breaking sites, 631 visible rapid-foam vertices,
+surface vertices, ten live breaking sites, 645 visible rapid-foam vertices,
 and 16,896 transmitting-water core triangles, and completes MapCheck with zero
-errors and zero warnings. The complete six-map suite passes with two accepted
-log warnings: the Troublemaker failure-behavior test deliberately records a
-capsize, and the Zambezi external connectivity probe times out. Neither warning
-changes map load or gameplay acceptance.
+errors and zero warnings. Its only accepted automation warning is the external
+connectivity probe timeout, which has no map-load or gameplay authority.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v14_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,
 seasonal-flow, guide, rights, photoreal-art, or target-performance gates.
 
-The schema-v21 saved-map audit also requires left/right low, mid, and high
-elevation ecology strata. The retained map contains 6,512 launch ground-cover
+The current schema-v22 saved-map audit retains the schema-v21 left/right low,
+mid, and high elevation ecology strata. The retained map contains 6,512 launch ground-cover
 instances with stratum counts `[978, 1200, 1200, 734, 1200, 1200]`, plus 772
 woody instances with counts `[139, 122, 140, 112, 108, 151]`. All are source-
 Landscape-grounded, non-colliding, waterline-safe presentation instances. The
@@ -174,17 +170,26 @@ fraction above 0.90 falls from 0.03989 to 0.00148. These are descriptive image
 metrics, not photoreal or hydraulic acceptance.
 
 The runnable launch also carries two adaptive, source-conditioned bank meshes
-covering stations 0-1,000 m. They bilinearly sample the four conditioned terrain
-tiles onto a 5 m grid, exclude the 72 m active-water half-width plus a 3 m inner
-dry-bank buffer, and extend no farther than 600 m laterally. Where the coarse
-source leaves a shoreline gap, a bounded correction raises only the render
-surface by at most 1.8 m; the retained map observes 0.33 m minimum dry clearance.
-Sub-metre erosion, fracture, and talus detail is capped at 0.96 m and observes a
-0.56 m maximum. The two actors contain 42,612 vertices and 61,748 triangles,
-remain non-colliding, and never replace the Copernicus Landscape's height-query,
-collision, or physics authority. Their first shadow-casting bracket was rejected
-because it projected large black wedges across the river; the retained actors
-are tagged `RaftSimNearFieldSelfShadowSuppressed` and do not cast shadows.
+covering stations 0-1,000 m. V2 bilinearly samples the four conditioned terrain
+tiles onto a deterministic irregular 2.5 m grid, excludes the 72 m active-water
+half-width plus a 3 m inner dry-bank buffer, and extends no farther than 600 m
+laterally. Station/lateral jitter is bounded to 0.55/0.42 m and fades to zero at
+the mesh boundary. Every curved-offset cell is checked before triangulation;
+985 of 124,230 candidates (0.793%) are omitted for wrong winding or a triangle
+below 0.25 m², while the accepted minimum is 0.263 m². This prevents the thin
+inverted overlap seams visible in the prior guide-eye capture.
+
+Where the coarse source leaves a shoreline gap, a bounded correction raises
+only the render surface by at most 1.8 m; the retained map observes 0.33 m
+minimum dry clearance. Domain-warped broad erosion, local basalt fracture, fine
+talus, and paired joint cuts are capped at 1.35 m and observe a 0.98 m maximum.
+The two actors contain 169,222 vertices and 246,490 triangles, remain
+non-colliding, and never replace the Copernicus Landscape's height-query,
+collision, or physics authority. They are tagged
+`RaftSimIrregularPlanarTopologyV2`, `RaftSimDomainWarpedGeomorphicReliefV2`,
+and `RaftSimNearFieldSelfShadowSuppressed`, and do not cast shadows. The matched
+frame confirms continuous shoreline/terrain coverage but does not promote the
+still-rounded source silhouette or sparse/repeated ecology to photoreal.
 
 The runnable first kilometre now has a separate six-component talus layer. The
 older physical-corridor boulder distribution begins about 5 km downstream, so
@@ -447,13 +452,13 @@ swimmers. The focused test passes, and the complete parameterized
 renderer-backed result is `zambezi_safe_launch_crew_v1.png`; its review record
 deliberately fails photoreal promotion while passing runnable launch acceptance.
 
-The runnable classification was reverified on August 4, 2026 against the V19
-release package. `RaftSim.M6.CareerCatalog` confirms that the
+The runnable classification was reverified on August 4, 2026 against the V2
+near-field terrain release package. The player-facing registry confirms that the
 player-facing `zambezi_reference_run` opens `/Game/RaftSim/Maps/L_Zambezi`, and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` passes a live PIE launch with the cooked
 water field, upright five-person raft, all rapid markers, separate live foam,
 Niagara water pool, four non-colliding conditioned visual-terrain tiles, and
-two adaptive near-field terrain actors. The schema-v21
+two V2 adaptive near-field terrain actors. The schema-v22
 saved-map audit also requires solver-owned rendering, the transmitting volume
 core, river-local texture bindings, low detail-skin coverage, smoothing, and a
 capture-only static ribbon. All focused Python contracts pass. This is runnable
@@ -486,10 +491,11 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v21 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v22 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
 non-colliding, non-shadow-casting V18-tagged visual-terrain tiles, the exact -48/-90
-degree presentation light, two tagged non-colliding adaptive near-field banks,
+degree presentation light, two tagged non-colliding V2 adaptive near-field
+banks with irregular-planar-topology and domain-warped-relief contracts,
 the four-actor sun/sky/fill/fog atmosphere contract, absence of rejected
 high-density bank actors, the
 exact five vegetation mesh families and
