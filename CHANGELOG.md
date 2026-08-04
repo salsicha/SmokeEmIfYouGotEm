@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Raised only the rendered CC0 fallback head and neck presentation by 5 cm along
+  the solved torso-up axis, restoring visible head-to-shoulder clearance without
+  moving the authoritative body pose, helmet-to-eye solve, hands, paddle,
+  collision, mass, raft, or rescue state. The matched five-character roster now
+  reports a 21.9315 cm minimum seated clearance, while helmet error remains
+  effectively zero and maximum grip-anchor error remains 5.81e-9 cm. The exact
+  editor build, 23 focused contracts, M5 gate, all-six-river P4 gate, and
+  before/after frames pass. This retains a technical silhouette improvement only;
+  coarse angular collar/PFD geometry, final anatomy and materials, photoreal
+  promotion, and named character-art/guide review remain open.
 - Re-certified Zambezi Batoka Gorge as runnable river 6 after the shared
   raft/crew breaking-water occlusion milestone. The player catalog and Free
   Run progression manifest explicitly retain `runnable: true`,

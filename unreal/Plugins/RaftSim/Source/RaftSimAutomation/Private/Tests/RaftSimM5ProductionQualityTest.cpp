@@ -1227,6 +1227,15 @@ bool FRaftSimM5StartRescueCommand::Update()
         Test->TestTrue(
             FString::Printf(TEXT("CC0 crew body %s has finite pose"), *It->GetName()),
             It->HasFinitePose());
+        const float HeadShoulderClearanceCm =
+            It->GetPresentedHeadShoulderClearanceCm();
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("CC0 crew body %s keeps the rendered jaw above the shoulder "
+                     "envelope (head-pivot clearance %.3f cm)"),
+                *It->GetName(),
+                HeadShoulderClearanceCm),
+            HeadShoulderClearanceCm >= 9.5f);
         Test->TestTrue(
             FString::Printf(
                 TEXT("CC0 crew body %s exposes articulated paddle-grip digits"),

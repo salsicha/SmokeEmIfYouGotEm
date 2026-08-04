@@ -159,6 +159,17 @@ This is a technical regression pass only: coarse hand topology, weak thumb oppos
 material compression, motion biomechanics, and named character-art and guide approval keep
 photoreal and production fallback acceptance open.
 
+The same capture now fail-closes on seated head-to-shoulder clearance. The retained V1
+presentation moves only the rendered head and neck target 5 cm along solved torso-up and
+reports a 21.9315 cm minimum across the five seated identities, above the 19.5 cm roster
+threshold. M5 enforces a separate 9.5 cm lower envelope across its dynamic and swimmer poses.
+Helmet-to-eye alignment, hands, paddle, collision, mass, raft physics, and rescue authority
+are unchanged. Matched baseline/candidate frames, runtime measurements, source and evidence
+hashes, and the still-open human gates are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1_review.json`.
+This is not a photoreal character approval: the broad angular collar/PFD envelope, final
+anatomy and materials, and named character-art and guide review remain open.
+
 Official setup references:
 
 - <https://dev.epicgames.com/documentation/en-us/metahuman/getting-started-with-metahuman-creator>

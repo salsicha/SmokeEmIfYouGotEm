@@ -211,6 +211,9 @@ def main() -> None:
                 raise RuntimeError(
                     f"Gameplay host did not select CC0 adapter: {character_name}"
                 )
+            head_shoulder_clearance_cm = (
+                visual_actor.get_presented_head_shoulder_clearance_cm()
+            )
             if (
                 not actor.is_using_production_visual()
                 or not actor.has_exclusive_cc0_body_ownership()
@@ -223,6 +226,7 @@ def main() -> None:
                 or not actor.has_finite_visual_transforms()
                 or not visual_actor.is_body_ready()
                 or not visual_actor.has_finite_pose()
+                or head_shoulder_clearance_cm < 19.5
             ):
                 raise RuntimeError(
                     f"Incomplete exclusive CC0 presentation: {character_name}"
@@ -411,6 +415,9 @@ def main() -> None:
                     "runtime_paddle_thumb_closure_degrees": (
                         thumb_closure_degrees
                     ),
+                    "runtime_presented_head_shoulder_clearance_cm": (
+                        head_shoulder_clearance_cm
+                    ),
                     "runtime_production_pfd": (
                         actor.has_production_whitewater_pfd()
                     ),
@@ -451,6 +458,10 @@ def main() -> None:
         )
         report["minimum_lower_paddle_finger_closure_degrees"] = min(
             character["runtime_lower_paddle_finger_closure_degrees"]
+            for character in report["characters"]
+        )
+        report["minimum_presented_head_shoulder_clearance_cm"] = min(
+            character["runtime_presented_head_shoulder_clearance_cm"]
             for character in report["characters"]
         )
         report["minimum_paddle_thumb_closure_degrees"] = min(

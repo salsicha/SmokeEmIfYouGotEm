@@ -41,6 +41,7 @@ constexpr float GuideHelmetAnchorDropCm = 5.0f;
 const float CrewHelmetAnchorDropsCm[] = {6.0f, 9.0f, 9.0f, 7.0f};
 
 constexpr float PaddlePalmAnchorAlongKnuckleFraction = 0.56f;
+constexpr float ProductionHeadClearanceLiftCm = 5.0f;
 
 const TCHAR* CC0GripDigits[] = {
     TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")};
@@ -454,14 +455,26 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const FVector MidSpine = FMath::Lerp(HipCenter, ShoulderCenter, 0.55f);
     const FVector UpperSpine = FMath::Lerp(Pose.TorsoCenterCm, ShoulderCenter, 0.78f);
     const FVector NeckBase = ShoulderCenter + TorsoUp * 4.0f;
-    const FVector HeadTop = Pose.HeadCenterCm + TorsoUp * 16.0f;
+    // The MakeHuman body owns a longer anatomical neck than the compact host
+    // collision pose. Driving its skull directly to the host head point left
+    // only about 3 cm between the jaw and shoulder line in seated views, so
+    // the wetsuit shoulder envelope read as a black bib covering the neck.
+    // Lift only the render skeleton along the solved torso-up axis. Helmet fit
+    // still comes from the live rendered eyes, while gameplay, collision,
+    // crew mass, hand targets, paddle, raft, and rescue authority stay put.
+    const FVector PresentedHeadCenter =
+        Pose.HeadCenterCm + TorsoUp * ProductionHeadClearanceLiftCm;
+    const FVector HeadTop = PresentedHeadCenter + TorsoUp * 16.0f;
+    PresentedHeadShoulderClearanceCm = FVector::DotProduct(
+        PresentedHeadCenter - ShoulderCenter,
+        TorsoUp);
 
     SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), HipCenter, LowerSpine);
     SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), LowerSpine, MidSpine);
     SetSegmentBone(TEXT("spine_02"), TEXT("spine_03"), MidSpine, UpperSpine);
     SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), UpperSpine, NeckBase);
-    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBase, Pose.HeadCenterCm);
-    SetSegmentBone(TEXT("head"), TEXT("head"), Pose.HeadCenterCm, HeadTop);
+    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBase, PresentedHeadCenter);
+    SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop);
 
     // The pose contract publishes palm/grip targets while the imported hand
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
