@@ -23,9 +23,10 @@ package is not the runnable map.
 The runnable map was regenerated and rechecked after the later environment,
 character, water, terrain, and rapid-presentation milestones, including the
 retained V19 elevation-stratified launch ecology, later cold-water highlight
-and depth passes, and the V2 irregular near-field terrain pass. The V15
-release-head certification supersedes V14 because the versioned Zambezi map
-package now contains that denser terrain. The player path is still:
+and depth passes, and the V2 irregular near-field terrain pass. The V16
+release-head certification supersedes V15 after the subsequent shared-water
+and solver-anchored rapid-presentation milestones. The versioned Zambezi map
+remains byte-identical and the player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
@@ -43,7 +44,7 @@ connectivity probe timeout, which has no map-load or gameplay authority.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v16_review.json`.
 
 This verifies that Zambezi is runnable from a fresh checkout. It does not close
 the open high-resolution terrain, surveyed bathymetry, rapid-specific hydraulic,

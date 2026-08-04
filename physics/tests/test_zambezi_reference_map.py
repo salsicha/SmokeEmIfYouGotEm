@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v15_review.json"
+    "zambezi_runnable_release_head_v16_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -211,17 +211,17 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v11"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v12"
     assert review["recorded_local_date"] == "2026-08-04"
     assert review["verified_parent_commit"] == (
-        "da0a30cf9205d4327eba03ccb6a772b4068ed259"
+        "c7c4edd38cdbdf04c7a17360801f1c182005fb2a"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["photoreal_promotion"] is False
     assert review["supersedes_review"].endswith(
-        "zambezi_runnable_release_head_v14_review.json"
+        "zambezi_runnable_release_head_v15_review.json"
     )
     assert review["player_path"] == {
         "game_mode": "Free Run",
@@ -242,11 +242,9 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     assert locked_hashes[RUNNABLE_ZAMBEZI_MAP_PATH] == (
         "51f00471114eb84a7b482fe48dd13ddf45132693890aed7a347505924a84865b"
     )
-    assert len(locked_hashes) == 9
+    assert len(locked_hashes) == 6
     for relative, expected in locked_hashes.items():
-        assert _sha256(REPO_ROOT / relative) == CURRENT_SUPERSEDING_SOURCE_HASHES.get(
-            relative, expected
-        )
+        assert _sha256(REPO_ROOT / relative) == expected
 
     assert review["registry_assertions"] == {
         "river_selection_catalog_portfolio_role": "runnable_river",
@@ -262,7 +260,9 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         "versioned_map_present": True,
         "superseded_preview_is_player_path": False,
     }
-    assert review["verification"]["editor_build"]["result"] == "success"
+    assert review["verification"]["clean_editor_build"]["result"] == "success"
+    assert review["verification"]["native_catalog_and_progression"]["passed"] == 2
+    assert review["verification"]["native_catalog_and_progression"]["failed"] == 0
     assert review["verification"]["focused_python_contracts"]["passed"] == 27
     assert review["verification"]["zambezi_map_load"]["test"] == (
         "RaftSim.P4.RiverMapLoads.L_Zambezi"
@@ -284,19 +284,35 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     assert review["verification"]["saved_map_audit"][
         "runnable_launch_woody_instances"
     ] == 772
-    terrain = review["near_field_terrain_v2"]
-    assert terrain["actor_count"] == 2
-    assert terrain["grid_spacing_m"] == 2.5
-    assert terrain["vertex_count"] == 169222
-    assert terrain["triangle_count"] == 246490
-    assert terrain["topology_rejected_cell_fraction"] < 0.01
-    assert terrain["minimum_observed_accepted_triangle_area_m2"] >= 0.25
-    assert terrain["minimum_observed_rendered_dry_clearance_m"] >= 0.295
-    assert terrain["collision_enabled"] is False
-    assert review["matched_visual_evidence"]["verdict"].startswith(
-        "Retain as bounded topology and coverage progress"
-    )
     assert len(review["open_external_acceptance_gates"]) == 7
+
+    selection = _load(
+        REPO_ROOT / "unreal/Content/RaftSim/UI/river_selection_catalog.json"
+    )
+    zambezi = next(
+        river
+        for river in selection["sections"]
+        if river["river_id"] == "zambezi_batoka_gorge"
+    )
+    assert zambezi["runnable"] is True
+    assert zambezi["availability"] == "free_run"
+    assert zambezi["map_package"] == "/Game/RaftSim/Maps/L_Zambezi"
+    assert zambezi["runnable_release_review"] == RUNNABLE_RELEASE_REVIEW.as_posix()
+
+    progression = _load(
+        REPO_ROOT / "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json"
+    )
+    free_run = progression["game_modes"]["free_run"]
+    progression_zambezi = next(
+        river
+        for river in free_run["runnable_rivers"]
+        if river["river_id"] == "zambezi_batoka_gorge"
+    )
+    assert progression_zambezi["runnable"] is True
+    assert progression_zambezi["availability"] == "free_run"
+    assert progression_zambezi["runnable_release_review"] == (
+        RUNNABLE_RELEASE_REVIEW.as_posix()
+    )
 
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert RUNNABLE_RELEASE_REVIEW.as_posix() in readme
