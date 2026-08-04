@@ -40,7 +40,7 @@ Current-release-head verification keeps Zambezi in ordinal position 6 of the
 six-river Free Run registry. The rebuilt `RaftSim.M6.CareerCatalog` and
 `RaftSim.P4.RiverMapLoads.L_Zambezi` gates both pass against the committed map;
 the hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v10_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v11_review.json`.
 
 Reference flow band for the initial cook: **each river's median/reference band** (all three bands cooked when the solver converges in bounded time; low/high are polish).
 
@@ -672,3 +672,21 @@ and external acceptance gates pass.
   The retained sampled rise and missing measured bathymetry, aerated hole,
   recirculation, spray/mist, and platform/art approvals keep photoreal and
   production promotion open in `zambezi_nonperiodic_live_wave_v1_review.json`.
+
+### 2026-08-03 — V17 Zambezi runnable status reaffirmed
+
+- Re-certified the regenerated V17 `L_Zambezi` package as river 6 in the
+  player-facing Free Run portfolio. The selector, progression manifest, source
+  model, scenario, frontend catalog, shipping cook list, and committed map all
+  resolve `zambezi_reference_run` to `/Game/RaftSim/Maps/L_Zambezi` at the
+  `reference_free_run` tier.
+- The current schema-v19 saved-map audit passes with 25 rapid markers, one
+  player raft, one start, one live-water config, four conditioned visual-terrain
+  tiles, two adaptive near-field terrain actors, and 12,843 opaque vegetation
+  instances. Twenty-four focused Python contracts and the native catalog,
+  progression, and six-river map-load gates pass.
+- This is runnable-reference acceptance, not production-fidelity promotion.
+  High-resolution terrain, surveyed bathymetry, rapid-specific hydraulics,
+  guide/geospatial/rights/seasonal-flow review, photoreal art, and target-
+  hardware performance remain open in
+  `zambezi_runnable_release_head_v11_review.json`.

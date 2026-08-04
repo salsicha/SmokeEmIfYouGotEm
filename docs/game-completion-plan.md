@@ -4241,3 +4241,12 @@ path is verified, and the completion goal can be marked complete.
   band, but the low-resolution sampled hydraulic rise, aerated-hole and
   recirculation art, spray/mist, measured seasonal hydraulics, platform
   performance, and every named external approval remain open.
+- Zambezi runnable release-head V11 re-certifies the V17-regenerated
+  `/Game/RaftSim/Maps/L_Zambezi` package as river 6 in Free Run. The six-river
+  progression manifest, player-selection and source catalogs, scenario,
+  frontend C++ catalog, shipping cook, and versioned map agree on
+  `zambezi_reference_run` at `reference_free_run` tier. The schema-v19 map
+  audit, 24 focused Python contracts, M6 career/progression gates, and complete
+  six-map P4 suite pass. This restores current hash-locked runnable evidence
+  after the terrain package changed without claiming validated Zambezi
+  bathymetry/hydraulics, photoreal acceptance, or closure of any external gate.
