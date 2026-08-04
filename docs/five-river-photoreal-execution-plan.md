@@ -408,6 +408,16 @@ Started July 16, 2026 from clean commit `119239d68`.
   - [x] Add the C5 non-authoritative recommendation packet: `physics/data/real_world/named_rapid_flexible_raft_rerun_recommendation.json` recommends the accepted-C4-plus-green-D6-to-C5 workflow, starts release-counting flexible-raft rerun review with South Fork Meat Grinder and Troublemaker, keeps Zambezi passive until Batoka source evidence exists, requires C4 decision hashes, D6 comparison hashes, flexible-raft replay, segment telemetry, crew weight distribution, wrap/pin/flip/release, swimmer/rescue readability, captures, hashes, and guide/safety/physics/technical/rights/owner signoff, and threads the packet through the five-river handoff, blocker matrix, and external action queue without marking C5 complete.
   - [x] Add the C5 flexible-raft rerun Markdown review form: `docs/named-rapid-c5-flexible-raft-rerun-review-form.md` exports the recommendation, C4/D6/C5 readiness gates, first South Fork rapid/flow/line matrix, accepted C4 and D6 hashes, flexible-raft replay, segment telemetry, crew-weight timeline, wrap/pin/flip/release and swimmer/rescue outcomes, conservation evidence, captures, SHA-256s, failure notes, reviewer signoffs, commands, rejected shortcuts, and promotion guardrails into one reviewer-facing intake packet, then threads the form and generator through the five-river handoff, blocker matrix, action queue, and external review runbook without allowing C5 completion, scoring-critical gameplay, playable promotion, or E2/E3 substitution.
 
+- [x] Add bounded South Fork dry-bank microrelief around all five canonical
+  full-reach review cameras: six source-tile-registered, 2 m Nanite patches
+  expose 179,896 vertices and 219,056 triangles with a 42 cm cap, dry/wet and
+  slope exclusions, world-space nonperiodic phase, and no collision,
+  navigation, water, hydraulic, buoyancy, or raft-force authority. Exact-map
+  layer-isolation captures reject a shadow-casting bracket and retain the
+  artifact-free non-shadowing candidate. This is technical terrain progress;
+  South Fork B2, human photoreal acceptance, and the seven external review
+  gates remain open.
+
 ## Definition of done (per river)
 
 1. Full-reach corridor from the named put-in to take-out with source-recorded terrain, centerline, imagery, and gauge-derived flow bands.

@@ -74,6 +74,15 @@ bool WriteSouthForkFullReachBuildManifest(
     BuildRoot->SetBoolField(
         TEXT("far_field_geography_complete"), Metrics.FarFieldPatchCount == 8);
     BuildRoot->SetBoolField(
+        TEXT("source_registered_dry_bank_microrelief_v1"),
+        Metrics.BankMicroreliefPatchCount >= 5 &&
+            Metrics.BankMicroreliefPatchCount <= 10 &&
+            Metrics.BankMicroreliefVertexCount > 0 &&
+            Metrics.BankMicroreliefTriangleCount > 0);
+    BuildRoot->SetObjectField(
+        TEXT("dry_bank_microrelief"),
+        BuildSouthForkBankMicroreliefManifest());
+    BuildRoot->SetBoolField(
         TEXT("cc0_scanned_ground_cover_v1"),
         Metrics.Cc0ScannedGroundCoverInstanceCount > 0);
     BuildRoot->SetNumberField(TEXT("cc0_scanned_ground_cover_mesh_forms"), 8);
@@ -111,6 +120,18 @@ bool WriteSouthForkFullReachBuildManifest(
 
     TSharedRef<FJsonObject> MetricRoot = MakeShared<FJsonObject>();
     MetricRoot->SetNumberField(TEXT("terrain_tiles"), Metrics.TerrainTileCount);
+    MetricRoot->SetNumberField(
+        TEXT("dry_bank_microrelief_patches"),
+        Metrics.BankMicroreliefPatchCount);
+    MetricRoot->SetNumberField(
+        TEXT("dry_bank_microrelief_vertices"),
+        Metrics.BankMicroreliefVertexCount);
+    MetricRoot->SetNumberField(
+        TEXT("dry_bank_microrelief_triangles"),
+        Metrics.BankMicroreliefTriangleCount);
+    MetricRoot->SetNumberField(
+        TEXT("dry_bank_microrelief_maximum_displacement_cm"),
+        Metrics.BankMicroreliefMaximumDisplacementCm);
     MetricRoot->SetNumberField(TEXT("water_tiles"), Metrics.WaterTileCount);
     MetricRoot->SetNumberField(
         TEXT("whitewater_foam_actors"), Metrics.WhitewaterFoamActorCount);
@@ -188,7 +209,8 @@ bool WriteSouthForkFullReachBuildManifest(
         *BuildManifestAbsolute,
         FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
     OutSummary += FString::Printf(
-        TEXT("Full reach: %d terrain tiles, %d water tiles, %d solver-foam overlays, "
+        TEXT("Full reach: %d terrain tiles, %d dry-bank microrelief patches, "
+             "%d water tiles, %d solver-foam overlays, "
              "%lld procedurally completed "
              "shoreline vertices, %lld shoreline transition cells, %d foliage, "
              "%d project-owned ground-cover tufts, "
@@ -196,6 +218,7 @@ bool WriteSouthForkFullReachBuildManifest(
              "%d boulders, %d overlap-suppressed boulder presentation instances, "
              "%d spray/mist instances, %d infrastructure actors.\n"),
         Metrics.TerrainTileCount,
+        Metrics.BankMicroreliefPatchCount,
         Metrics.WaterTileCount,
         Metrics.WhitewaterFoamActorCount,
         Metrics.ProceduralShorelineCompletionVertexCount,

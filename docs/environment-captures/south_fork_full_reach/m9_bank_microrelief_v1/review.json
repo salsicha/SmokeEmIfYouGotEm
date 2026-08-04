@@ -1,0 +1,149 @@
+{
+  "schema": "raftsim.south_fork_bank_microrelief_review.v1",
+  "reviewed_on": "2026-08-04",
+  "status": "technical_candidate_retained_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "scope": "Dry-bank presentation microrelief around the five canonical South Fork full-reach review cameras.",
+  "implementation": {
+    "review_windows": 5,
+    "tile_registered_patches": 6,
+    "presentation_spacing_m": 2.0,
+    "source_spacing_m": 4.0,
+    "vertices": 179896,
+    "triangles": 219056,
+    "maximum_vertical_displacement_cm": 42.0,
+    "minimum_bank_distance_m": 14.0,
+    "maximum_bank_distance_m": 112.0,
+    "maximum_wet_mask": 0.1,
+    "maximum_source_slope": 0.58,
+    "world_space_phase_continuity": true,
+    "casts_shadow": false
+  },
+  "authority": {
+    "visual_presentation_only": true,
+    "source_terrain_changed": false,
+    "terrain_collision_changed": false,
+    "navigation_changed": false,
+    "water_geometry_changed": false,
+    "wet_dry_topology_changed": false,
+    "bathymetry_changed": false,
+    "hydraulics_changed": false,
+    "buoyancy_changed": false,
+    "raft_forces_changed": false
+  },
+  "review_decision": {
+    "accepted": true,
+    "observed_shoreline_regression": false,
+    "observed_water_overlap": false,
+    "observed_tile_seam": false,
+    "observed_floating_shadow_shelf": false,
+    "summary": "Retain as bounded technical progress. The exact-map candidate adds shallow nonperiodic bank undulation without changing the river corridor or creating a shoreline seam. The effect is restrained at river-eye distance and does not make the broad terrain, vegetation, or water photoreal.",
+    "rejected_iteration": "A shadow-casting bracket was rejected because the raised visual sheet cast black shelf bands onto the source DEM. The retained actors explicitly disable shadow casting."
+  },
+  "objective_capture_comparison": [
+    {
+      "capture": "chili_bar_launch_downstream",
+      "baseline_sha256": "dbd835abec62eb3308d3e2b157c36baa9fa59a7c36613d63aea1cf56453221a4",
+      "candidate_sha256": "0a75d2dcf39f6a6792aacb96314b9df94f3d5d8d52bdbd72bf51b3b3f8fade1d",
+      "mean_absolute_rgb_delta": 1.118402,
+      "changed_pixel_fraction_gt8": 0.049451
+    },
+    {
+      "capture": "coloma_bridge_context",
+      "baseline_sha256": "4c925be634bcbeb64638c10850fca87e606ca58cbb316b6a6a86f4e3d0926eda",
+      "candidate_sha256": "eb10a7fe16c9f616cd2a6aa2d3799c8b326fba40f177ac2925a222fdfd0e8a4c",
+      "mean_absolute_rgb_delta": 1.604345,
+      "changed_pixel_fraction_gt8": 0.074783
+    },
+    {
+      "capture": "meat_grinder_guide_eye",
+      "baseline_sha256": "b67d5d77f1e89df829e8e1f1a01f7924a1af62a8cdb53c3dbb7e52f48be593a2",
+      "candidate_sha256": "3d9a24af2ed0af079aef146a518653119e9318979d4a16e7b3f7728d2f3a3358",
+      "mean_absolute_rgb_delta": 1.533114,
+      "changed_pixel_fraction_gt8": 0.055946
+    },
+    {
+      "capture": "salmon_falls_takeout",
+      "baseline_sha256": "e2123ceb96bd5367ddd21abdfd8f4bb965350da15035b585f71791491fc93ecb",
+      "candidate_sha256": "d02c02d9c4bd263c512dacad3c2758373fcce034ad1ca269bcb53d6ca2f599de",
+      "mean_absolute_rgb_delta": 1.529102,
+      "changed_pixel_fraction_gt8": 0.047297
+    },
+    {
+      "capture": "troublemaker_approach",
+      "baseline_sha256": "e74130aeee01e25d3a79e3bbb762c87c9691f21517e69720a0dbdc7982cc9708",
+      "candidate_sha256": "bd7ca3e2d79f12e74606683928e779e4278e384af76a8709921de2b5e75b5a03",
+      "mean_absolute_rgb_delta": 1.337488,
+      "changed_pixel_fraction_gt8": 0.056712
+    }
+  ],
+  "hash_locked_artifacts": [
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/baseline/chili_bar_launch_downstream.png",
+      "sha256": "dbd835abec62eb3308d3e2b157c36baa9fa59a7c36613d63aea1cf56453221a4"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/baseline/coloma_bridge_context.png",
+      "sha256": "4c925be634bcbeb64638c10850fca87e606ca58cbb316b6a6a86f4e3d0926eda"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/baseline/meat_grinder_guide_eye.png",
+      "sha256": "b67d5d77f1e89df829e8e1f1a01f7924a1af62a8cdb53c3dbb7e52f48be593a2"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/baseline/salmon_falls_takeout.png",
+      "sha256": "e2123ceb96bd5367ddd21abdfd8f4bb965350da15035b585f71791491fc93ecb"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/baseline/troublemaker_approach.png",
+      "sha256": "e74130aeee01e25d3a79e3bbb762c87c9691f21517e69720a0dbdc7982cc9708"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/candidate/chili_bar_launch_downstream.png",
+      "sha256": "0a75d2dcf39f6a6792aacb96314b9df94f3d5d8d52bdbd72bf51b3b3f8fade1d"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/candidate/coloma_bridge_context.png",
+      "sha256": "eb10a7fe16c9f616cd2a6aa2d3799c8b326fba40f177ac2925a222fdfd0e8a4c"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/candidate/meat_grinder_guide_eye.png",
+      "sha256": "3d9a24af2ed0af079aef146a518653119e9318979d4a16e7b3f7728d2f3a3358"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/candidate/salmon_falls_takeout.png",
+      "sha256": "d02c02d9c4bd263c512dacad3c2758373fcce034ad1ca269bcb53d6ca2f599de"
+    },
+    {
+      "path": "docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/candidate/troublemaker_approach.png",
+      "sha256": "bd7ca3e2d79f12e74606683928e779e4278e384af76a8709921de2b5e75b5a03"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+      "sha256": "08906d8ba844713c771e51292620ae4a528b218abd0f764a32212fda25f5061a"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_SouthForkAmerican_FullReach.umap",
+      "sha256": "2755cc35dd3f591e3b9f8a606379bb174196019f451cd6199ce635dd3a6eb802"
+    }
+  ],
+  "photoreal_rejection_reasons": [
+    "The broad foothill terrain still reads as low-frequency procedural ground at river-eye distance.",
+    "Vegetation species, silhouettes, density, and seasonal state still require regional human art review.",
+    "The water surface and whitewater still require final connected aeration, recirculation, and optical art.",
+    "No guide, geospatial, rights, hazard-readability, or owner art reviewer has approved these frames.",
+    "Target-platform runtime performance for the added Nanite presentation meshes has not been measured."
+  ],
+  "open_gates": [
+    "whitewater_guide_review",
+    "geospatial_and_terrain_review",
+    "hydrology_and_hydraulics_review",
+    "rights_and_attribution_review",
+    "human_environment_art_review",
+    "hazard_readability_review",
+    "target_platform_performance_review"
+  ]
+}

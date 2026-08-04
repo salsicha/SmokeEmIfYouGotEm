@@ -482,6 +482,269 @@ float StableUnitRandom(int32 A, int32 B, int32 C)
     return static_cast<float>(Value & 0x00FFFFFFu) / 16777215.0f;
 }
 
+bool AddSouthForkBankMicroreliefPresentationPatches(
+    UWorld* World,
+    const FString& TileId,
+    int32 GlobalRowStart,
+    const FVector2D& TileOriginM,
+    const TArray<FSouthForkCoordinatePoint>& CoordinatePoints,
+    int32 Width,
+    int32 Height,
+    const TArray<FVector>& SourceVertices,
+    const TArray<FVector2D>& SourceUvs,
+    const TArray<FLinearColor>& SourceColors,
+    const TArray<FVector>& SourceNormals,
+    const FRaftSimPreviewImage& VfxImage,
+    UMaterialInterface* TerrainMaterial,
+    bool bReuseExistingMeshes,
+    FSouthForkFullReachBuildMetrics& Metrics,
+    FString& OutSummary)
+{
+    if (!World || !TerrainMaterial || Width < 2 || Height < 2 ||
+        SourceVertices.Num() != Width * Height ||
+        SourceUvs.Num() != SourceVertices.Num() ||
+        SourceColors.Num() != SourceVertices.Num() ||
+        SourceNormals.Num() != SourceVertices.Num() ||
+        VfxImage.Pixels.Num() != SourceVertices.Num())
+    {
+        return false;
+    }
+
+    constexpr float ReviewStationsM[] = {
+        120.0f, 944.0f, 5100.0f, 8328.0f, 48940.0f};
+    constexpr float PatchHalfLengthM = 360.0f;
+    constexpr int32 SubdivisionFactor = 2;
+    constexpr int32 FirstSourceColumn = 36; // -112 m
+    constexpr int32 LastSourceColumn = 92;  // +112 m
+    static_assert(LastSourceColumn - FirstSourceColumn == 56);
+
+    auto Bilinear = [](const auto& V00, const auto& V01,
+                       const auto& V10, const auto& V11,
+                       float ColumnAlpha, float RowAlpha)
+    {
+        return FMath::Lerp(
+            FMath::Lerp(V00, V01, ColumnAlpha),
+            FMath::Lerp(V10, V11, ColumnAlpha), RowAlpha);
+    };
+
+    for (int32 ReviewIndex = 0;
+         ReviewIndex < UE_ARRAY_COUNT(ReviewStationsM);
+         ++ReviewIndex)
+    {
+        const float ReviewStationM = ReviewStationsM[ReviewIndex];
+        int32 FirstSourceRow = INDEX_NONE;
+        int32 LastSourceRow = INDEX_NONE;
+        for (int32 SourceRow = 0; SourceRow < Height; ++SourceRow)
+        {
+            const int32 CoordinateIndex = GlobalRowStart + SourceRow;
+            if (!CoordinatePoints.IsValidIndex(CoordinateIndex) ||
+                FMath::Abs(
+                    static_cast<float>(CoordinatePoints[CoordinateIndex].StationM) -
+                    ReviewStationM) > PatchHalfLengthM)
+            {
+                continue;
+            }
+            if (FirstSourceRow == INDEX_NONE)
+            {
+                FirstSourceRow = SourceRow;
+            }
+            LastSourceRow = SourceRow;
+        }
+        if (FirstSourceRow == INDEX_NONE ||
+            LastSourceRow - FirstSourceRow < 2)
+        {
+            continue;
+        }
+
+        FirstSourceRow = FMath::Max(FirstSourceRow - 1, 0);
+        LastSourceRow = FMath::Min(LastSourceRow + 1, Height - 1);
+        const int32 PatchWidth =
+            (LastSourceColumn - FirstSourceColumn) * SubdivisionFactor + 1;
+        const int32 PatchHeight =
+            (LastSourceRow - FirstSourceRow) * SubdivisionFactor + 1;
+        const int32 PatchVertexCount = PatchWidth * PatchHeight;
+        TArray<FVector> Vertices;
+        TArray<FVector2D> Uvs;
+        TArray<FLinearColor> Colors;
+        TArray<uint8> Eligible;
+        Vertices.SetNumUninitialized(PatchVertexCount);
+        Uvs.SetNumUninitialized(PatchVertexCount);
+        Colors.SetNumUninitialized(PatchVertexCount);
+        Eligible.Init(0, PatchVertexCount);
+        float PatchMaximumDisplacementCm = 0.0f;
+
+        for (int32 PatchRow = 0; PatchRow < PatchHeight; ++PatchRow)
+        {
+            const float SourceRowCoordinate =
+                FirstSourceRow +
+                static_cast<float>(PatchRow) / SubdivisionFactor;
+            const int32 SourceRow0 = FMath::Clamp(
+                FMath::FloorToInt(SourceRowCoordinate), 0, Height - 1);
+            const int32 SourceRow1 = FMath::Min(SourceRow0 + 1, Height - 1);
+            const float RowAlpha = SourceRowCoordinate - SourceRow0;
+            const int32 CoordinateIndex0 = FMath::Clamp(
+                GlobalRowStart + SourceRow0, 0, CoordinatePoints.Num() - 1);
+            const int32 CoordinateIndex1 = FMath::Clamp(
+                GlobalRowStart + SourceRow1, 0, CoordinatePoints.Num() - 1);
+            const float StationM = FMath::Lerp(
+                static_cast<float>(CoordinatePoints[CoordinateIndex0].StationM),
+                static_cast<float>(CoordinatePoints[CoordinateIndex1].StationM),
+                RowAlpha);
+            const float AlongEdgeDistanceM = FMath::Min(
+                PatchRow * (4.0f / SubdivisionFactor),
+                (PatchHeight - 1 - PatchRow) *
+                    (4.0f / SubdivisionFactor));
+
+            for (int32 PatchColumn = 0;
+                 PatchColumn < PatchWidth;
+                 ++PatchColumn)
+            {
+                const float SourceColumnCoordinate =
+                    FirstSourceColumn +
+                    static_cast<float>(PatchColumn) / SubdivisionFactor;
+                const int32 SourceColumn0 = FMath::Clamp(
+                    FMath::FloorToInt(SourceColumnCoordinate), 0, Width - 1);
+                const int32 SourceColumn1 = FMath::Min(
+                    SourceColumn0 + 1, Width - 1);
+                const float ColumnAlpha =
+                    SourceColumnCoordinate - SourceColumn0;
+                const int32 I00 = SourceRow0 * Width + SourceColumn0;
+                const int32 I01 = SourceRow0 * Width + SourceColumn1;
+                const int32 I10 = SourceRow1 * Width + SourceColumn0;
+                const int32 I11 = SourceRow1 * Width + SourceColumn1;
+                const int32 Destination = PatchRow * PatchWidth + PatchColumn;
+                FVector Position = Bilinear(
+                    SourceVertices[I00], SourceVertices[I01],
+                    SourceVertices[I10], SourceVertices[I11],
+                    ColumnAlpha, RowAlpha);
+                Uvs[Destination] = Bilinear(
+                    SourceUvs[I00], SourceUvs[I01],
+                    SourceUvs[I10], SourceUvs[I11],
+                    ColumnAlpha, RowAlpha);
+                Colors[Destination] = Bilinear(
+                    SourceColors[I00], SourceColors[I01],
+                    SourceColors[I10], SourceColors[I11],
+                    ColumnAlpha, RowAlpha);
+                const FVector SourceNormal = Bilinear(
+                    SourceNormals[I00], SourceNormals[I01],
+                    SourceNormals[I10], SourceNormals[I11],
+                    ColumnAlpha, RowAlpha).GetSafeNormal(
+                        UE_SMALL_NUMBER, FVector::UpVector);
+                const FLinearColor Vfx = Bilinear(
+                    VfxImage.Pixels[I00], VfxImage.Pixels[I01],
+                    VfxImage.Pixels[I10], VfxImage.Pixels[I11],
+                    ColumnAlpha, RowAlpha);
+                const float LateralM =
+                    -256.0f + 4.0f * SourceColumnCoordinate;
+                const FVector2D WorldM(
+                    Position.X / 100.0f + TileOriginM.X,
+                    Position.Y / 100.0f + TileOriginM.Y);
+                const float SourceSlope = FMath::Clamp(
+                    1.0f - SourceNormal.Z, 0.0f, 1.0f);
+                const float WetMask = FMath::Max(Vfx.R, Vfx.A);
+                const FSouthForkBankMicroreliefSample Sample =
+                    ComputeSouthForkBankMicroreliefSample(
+                        WorldM.X, WorldM.Y, StationM, LateralM,
+                        SourceSlope, WetMask, AlongEdgeDistanceM);
+                if (Sample.bEligible)
+                {
+                    Position.Z += Sample.VerticalDisplacementCm;
+                    Eligible[Destination] = 1;
+                    PatchMaximumDisplacementCm = FMath::Max(
+                        PatchMaximumDisplacementCm,
+                        Sample.VerticalDisplacementCm);
+                }
+                Vertices[Destination] = Position;
+            }
+        }
+
+        TArray<int32> Triangles;
+        Triangles.Reserve((PatchWidth - 1) * (PatchHeight - 1) * 6);
+        for (int32 Row = 0; Row < PatchHeight - 1; ++Row)
+        {
+            for (int32 Column = 0; Column < PatchWidth - 1; ++Column)
+            {
+                const int32 I0 = Row * PatchWidth + Column;
+                const int32 I1 = I0 + 1;
+                const int32 I2 = I0 + PatchWidth;
+                const int32 I3 = I2 + 1;
+                if (Eligible[I0] == 0 || Eligible[I1] == 0 ||
+                    Eligible[I2] == 0 || Eligible[I3] == 0)
+                {
+                    continue;
+                }
+                Triangles.Append({I0, I1, I2, I1, I3, I2});
+            }
+        }
+        if (Triangles.Num() < 1500)
+        {
+            OutSummary += FString::Printf(
+                TEXT("South Fork bank-microrelief patch at %.0f m emitted only %d triangles.\n"),
+                ReviewStationM, Triangles.Num() / 3);
+            return false;
+        }
+
+        const TArray<FVector> Normals =
+            ComputePreviewMeshNormals(Vertices, Triangles);
+        const TArray<FProcMeshTangent> Tangents =
+            BuildSouthForkFlowTangents(Vertices, PatchWidth, PatchHeight);
+        const FString AssetPath = FString::Printf(
+            TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/Presentation/"
+                 "SM_%s_BankMicroreliefV1_%05d"),
+            *TileId, FMath::RoundToInt(ReviewStationM));
+        UStaticMesh* Mesh = bReuseExistingMeshes
+            ? LoadSouthForkStaticMeshAsset(AssetPath)
+            : nullptr;
+        if (!Mesh)
+        {
+            Mesh = CreateSouthForkMeshAsset(
+                World, AssetPath,
+                FString::Printf(
+                    TEXT("%s_BankMicroreliefV1_%05d"),
+                    *TileId, FMath::RoundToInt(ReviewStationM)),
+                Vertices, Triangles, Normals, Uvs, Colors, Tangents,
+                TerrainMaterial,
+                /*bEnableNanite=*/true,
+                /*bComplexCollision=*/false,
+                OutSummary);
+        }
+        AStaticMeshActor* Actor = Mesh
+            ? PlaceSouthForkStaticMeshActor(
+                World, Mesh, TerrainMaterial,
+                FString::Printf(
+                    TEXT("RaftSim_SouthFork_%s_BankMicroreliefV1_%05d"),
+                    *TileId,
+                    FMath::RoundToInt(ReviewStationM)),
+                FTransform(FVector(
+                    TileOriginM.X * 100.0f,
+                    TileOriginM.Y * 100.0f,
+                    0.0f)),
+                TEXT("RaftSimFullReachTerrainPresentationV1"),
+                ECollisionEnabled::NoCollision)
+            : nullptr;
+        UStaticMeshComponent* Component = Actor
+            ? Actor->GetStaticMeshComponent()
+            : nullptr;
+        if (!Component)
+        {
+            return false;
+        }
+        Component->SetCanEverAffectNavigation(false);
+        // This is a visual derivative over the collision-authoritative DEM.
+        // It contributes geometric normals, but casting onto the source mesh
+        // would reveal the centimetre-scale separation as a dark shelf.
+        Component->SetCastShadow(false);
+        Actor->Tags.AddUnique(TEXT("RaftSimSouthForkDryBankMicroreliefV1"));
+        ++Metrics.BankMicroreliefPatchCount;
+        Metrics.BankMicroreliefVertexCount += Vertices.Num();
+        Metrics.BankMicroreliefTriangleCount += Triangles.Num() / 3;
+        Metrics.BankMicroreliefMaximumDisplacementCm = FMath::Max(
+            Metrics.BankMicroreliefMaximumDisplacementCm,
+            PatchMaximumDisplacementCm);
+    }
+    return true;
+}
+
 void AddSouthForkLighting(UWorld* World)
 {
     ADirectionalLight* Sun = SpawnStableSouthForkActor<ADirectionalLight>(
@@ -1147,6 +1410,19 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         }
         ++Metrics.TerrainTileCount;
         Metrics.TerrainTriangleCount += TerrainTriangles.Num() / 3;
+        if (!AddSouthForkBankMicroreliefPresentationPatches(
+                World, TileId, GlobalRowStart, TileOriginM,
+                CoordinatePoints, Width, Height,
+                TerrainVertices, TerrainUvs, TerrainColors, TerrainNormals,
+                VfxImage, TileTerrainMaterial,
+                bReuseExistingDetailedTerrainMeshes,
+                Metrics, OutSummary))
+        {
+            OutSummary += FString::Printf(
+                TEXT("Failed to add dry-bank microrelief presentation for %s.\n"),
+                *TileId);
+            return false;
+        }
         // Source-masked CC0/project-owned ecology, boulders, and aeration are
         // stored per tile as HISM clusters so World Partition can stream them.
         AActor* DressingActor = CreateInstancingActor(
@@ -1799,6 +2075,26 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 }
             }
         }
+    }
+
+    // Each of the five camera windows is guaranteed coverage. A window that
+    // crosses a source-tile seam emits one presentation patch per tile so it
+    // can preserve the source registration and world-space noise phase.
+    if (Metrics.BankMicroreliefPatchCount < 5 ||
+        Metrics.BankMicroreliefPatchCount > 10 ||
+        Metrics.BankMicroreliefVertexCount < 120000 ||
+        Metrics.BankMicroreliefTriangleCount < 180000 ||
+        Metrics.BankMicroreliefMaximumDisplacementCm <= 8.0f ||
+        Metrics.BankMicroreliefMaximumDisplacementCm > 42.0f)
+    {
+        OutSummary += FString::Printf(
+            TEXT("South Fork bank-microrelief gate failed: patches=%d vertices=%lld "
+                 "triangles=%lld maximum=%.2f cm.\n"),
+            Metrics.BankMicroreliefPatchCount,
+            Metrics.BankMicroreliefVertexCount,
+            Metrics.BankMicroreliefTriangleCount,
+            Metrics.BankMicroreliefMaximumDisplacementCm);
+        return false;
     }
 
     if (!CreateTerminalVisualWater(
@@ -2951,8 +3247,27 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
     // map and makes placement/coverage failures distinguishable from
     // translucency-compositing failures in offscreen evidence captures.
     TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenBaseWaterActors;
+    TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenBankMicroreliefActors;
     TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>
         DiagnosticOpaqueFoamMaterials;
+    if (FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimDiagnosticHideSouthForkBankMicrorelief")))
+    {
+        for (TActorIterator<AStaticMeshActor> It(World); It; ++It)
+        {
+            AStaticMeshActor* Actor = *It;
+            if (Actor && Actor->ActorHasTag(
+                    TEXT("RaftSimSouthForkDryBankMicroreliefV1")))
+            {
+                Actor->SetActorHiddenInGame(true);
+                DiagnosticHiddenBankMicroreliefActors.Add(Actor);
+            }
+        }
+        OutSummary += FString::Printf(
+            TEXT("Settled-map diagnostic hid %d dry-bank microrelief actors.\n"),
+            DiagnosticHiddenBankMicroreliefActors.Num());
+    }
     if (FParse::Param(
             FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkBaseWater")))
     {
@@ -3040,6 +3355,14 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
             OutSummary += FString::Printf(
                 TEXT("Could not resolve settled median water beneath capture %s.\n"),
                 Spec.Id);
+            for (const TWeakObjectPtr<AActor>& Actor :
+                 DiagnosticHiddenBankMicroreliefActors)
+            {
+                if (Actor.IsValid())
+                {
+                    Actor->SetActorHiddenInGame(false);
+                }
+            }
             RestoreSouthForkSettledSourceCaptureVisibility(
                 SourceCaptureVisibilityStates);
             RestoreSouthForkFullReachReviewLayers(
@@ -3057,6 +3380,14 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
                 SurfaceZCm + Spec.HeightM * 100.0f),
             FRotator(-5.0f, CaptureTangent.Rotation().Yaw, 0.0f),
             CapturePath, OutSummary);
+    }
+    for (const TWeakObjectPtr<AActor>& Actor :
+         DiagnosticHiddenBankMicroreliefActors)
+    {
+        if (Actor.IsValid())
+        {
+            Actor->SetActorHiddenInGame(false);
+        }
     }
     for (const TWeakObjectPtr<AActor>& Actor : DiagnosticHiddenBaseWaterActors)
     {

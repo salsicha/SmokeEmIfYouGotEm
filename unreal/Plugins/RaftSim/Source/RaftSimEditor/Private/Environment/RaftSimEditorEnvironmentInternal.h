@@ -2335,6 +2335,24 @@ float ComputeSouthForkInferredFarFieldReliefM(
     double WorldYM,
     float SourceSlope);
 
+struct FSouthForkBankMicroreliefSample
+{
+    bool bEligible = false;
+    float VerticalDisplacementCm = 0.0f;
+    float CombinedFade = 0.0f;
+};
+
+FSouthForkBankMicroreliefSample ComputeSouthForkBankMicroreliefSample(
+    double WorldXM,
+    double WorldYM,
+    float StationM,
+    float LateralM,
+    float SourceSlope,
+    float WetMask,
+    float PatchEdgeDistanceM);
+
+TSharedRef<FJsonObject> BuildSouthForkBankMicroreliefManifest();
+
 float ComputeSouthForkFarFieldCorridorReliefWeight(
     const FRaftSimPreviewImage& CorridorExclusionMask,
     int32 Row,
@@ -2680,6 +2698,7 @@ bool ShouldSuppressSouthForkBoulderPresentation(
 struct FSouthForkFullReachBuildMetrics
 {
     int32 TerrainTileCount = 0;
+    int32 BankMicroreliefPatchCount = 0;
     int32 WaterTileCount = 0;
     int32 WhitewaterFoamActorCount = 0;
     int32 TerminalVisualWaterActorCount = 0;
@@ -2699,6 +2718,9 @@ struct FSouthForkFullReachBuildMetrics
     int32 ReflectionProbeCount = 0;
     int32 StableActorIdentityCount = 0;
     int64 TerrainTriangleCount = 0;
+    int64 BankMicroreliefVertexCount = 0;
+    int64 BankMicroreliefTriangleCount = 0;
+    float BankMicroreliefMaximumDisplacementCm = 0.0f;
     int64 WaterTriangleCount = 0;
     int64 WhitewaterFoamTriangleCount = 0;
     int64 ProceduralShorelineCompletionVertexCount = 0;
