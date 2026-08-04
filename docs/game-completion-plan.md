@@ -26,7 +26,7 @@ pass at the current release head; this confirms runnable-reference status only a
 its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
 The selection and progression manifests now also mark it `runnable: true` with
 `availability: free_run`. See
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v16_review.json`.
 
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt
@@ -4458,3 +4458,14 @@ path is verified, and the completion goal can be marked complete.
   pale shallow band, sheet-like rapid body, procedural environment art,
   performance qualification, and all seven external gates remain open in
   `cold_water_full_optical_bank_coverage_v1_review.json`.
+- Zambezi runnable release-head V16 re-certifies
+  `/Game/RaftSim/Maps/L_Zambezi` as runnable river 6 after the subsequent
+  shared-water and solver-anchored rapid-presentation milestones. Both runtime
+  manifests continue to mark it `runnable: true` and `availability: free_run`;
+  the frontend route remains `Free Run` → `zambezi_reference_run` →
+  `L_Zambezi`. A clean UE 5.8 editor build, 27 focused Python contracts, the
+  two native catalog/progression gates, and the live Zambezi PIE gate pass with
+  MapCheck 0/0, 10 breaking sites, and 645 rapid-foam vertices. The map package
+  is unchanged. High-resolution terrain, surveyed bathymetry, rapid-specific
+  hydraulics, guide/geospatial/rights/art review, and target-platform
+  qualification remain open.

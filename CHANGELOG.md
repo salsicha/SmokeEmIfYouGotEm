@@ -32,6 +32,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Re-certified Zambezi Batoka Gorge as runnable river 6 on the current release
+  head. Both versioned runtime manifests explicitly retain `runnable: true`,
+  `availability: free_run`, and `zambezi_reference_run` →
+  `/Game/RaftSim/Maps/L_Zambezi`, and now link the V16 hash-locked review. The
+  map package is unchanged. A clean UE 5.8 build, 27 focused Python contracts,
+  native catalog/progression checks, and a live PIE load pass with MapCheck 0/0.
+  This reaffirms reference playability only; production terrain, bathymetry,
+  hydraulics, external review, photoreal art, and platform gates remain open.
 - Completed the shared live-volume bank mask: solver-owned vertex coverage now
   fades Single Layer Water scattering and absorption and restores behind-water
   color to identity at zero coverage, instead of fading only surface opacity
