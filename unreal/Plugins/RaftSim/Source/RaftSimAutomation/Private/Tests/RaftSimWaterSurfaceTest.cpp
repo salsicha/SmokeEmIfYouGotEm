@@ -509,6 +509,49 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
                 ComputePresentationSurfaceEdgeClearanceMeters(
                     40, 81, 10, 0, 20, 3.0f),
             30.0f));
+    const float StraightBankCoverage =
+        ARaftSimWaterSurfaceActor::ComputePresentationBankCoverage(
+            128.0f, 1, 0, 20, 1.5f, 4.5f, false, 0.90f);
+    const float NaturalRiverRightCoverage =
+        ARaftSimWaterSurfaceActor::ComputePresentationBankCoverage(
+            128.0f, 1, 0, 20, 1.5f, 4.5f, true, 0.90f);
+    const float NaturalRiverLeftCoverage =
+        ARaftSimWaterSurfaceActor::ComputePresentationBankCoverage(
+            128.0f, 19, 0, 20, 1.5f, 4.5f, true, 0.90f);
+    Test->TestTrue(
+        TEXT("disabled bank naturalism preserves the existing one-third feather"),
+        FMath::IsNearlyEqual(StraightBankCoverage, 7.0f / 27.0f, 1.0e-5f));
+    Test->TestFalse(
+        TEXT("enabled bank naturalism shifts the visual contour in station space"),
+        FMath::IsNearlyEqual(
+            NaturalRiverRightCoverage, StraightBankCoverage, 1.0e-3f));
+    Test->TestFalse(
+        TEXT("river-left and river-right presentation profiles are not mirrored"),
+        FMath::IsNearlyEqual(
+            NaturalRiverLeftCoverage, NaturalRiverRightCoverage, 1.0e-3f));
+    Test->TestTrue(
+        TEXT("bank naturalism never covers the outermost solver-wet vertex"),
+        FMath::IsNearlyZero(
+            ARaftSimWaterSurfaceActor::ComputePresentationBankCoverage(
+                128.0f, 0, 0, 20, 1.5f, 4.5f, true, 0.90f)));
+    const float RiverRightRetreat =
+        ARaftSimWaterSurfaceActor::ComputePresentationBankRetreatMeters(
+            128.0f, false, 1.5f, true, 0.90f);
+    const float RiverLeftRetreat =
+        ARaftSimWaterSurfaceActor::ComputePresentationBankRetreatMeters(
+            128.0f, true, 1.5f, true, 0.90f);
+    Test->TestTrue(
+        TEXT("natural bank retreat stays inward and inside one render cell"),
+        RiverRightRetreat > 0.0f && RiverRightRetreat <= 1.20f &&
+            RiverLeftRetreat > 0.0f && RiverLeftRetreat <= 1.20f);
+    Test->TestFalse(
+        TEXT("the two optical-core bank retreats use independent profiles"),
+        FMath::IsNearlyEqual(RiverRightRetreat, RiverLeftRetreat, 1.0e-3f));
+    Test->TestTrue(
+        TEXT("disabled optical-core bank retreat is exactly zero"),
+        FMath::IsNearlyZero(
+            ARaftSimWaterSurfaceActor::ComputePresentationBankRetreatMeters(
+                128.0f, false, 1.5f, false, 0.90f)));
     TArray<ARaftSimWaterSurfaceActor::FBreakingSite> BreakingSites;
     Surface->GetBreakingSites(BreakingSites);
     for (const ARaftSimWaterSurfaceActor::FBreakingSite& Site : BreakingSites)

@@ -1894,6 +1894,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveRapidFoamFocusEnd = 0.72f;
         WaterConfig->LiveRapidFoamCoverageGain = 0.90f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->bEnableLivePresentationBankNaturalism = true;
+        WaterConfig->LivePresentationBankNaturalismAmplitudeMeters = 0.90f;
         WaterConfig->LiveShallowSurfaceColor =
             FLinearColor(0.012f, 0.075f, 0.105f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =
@@ -1959,6 +1961,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveRapidFoamFocusStart = 0.08f;
         WaterConfig->LiveRapidFoamFocusEnd = 0.58f;
         WaterConfig->LiveSurfaceBankBlendMeters = 4.5f;
+        WaterConfig->bEnableLivePresentationBankNaturalism = true;
+        WaterConfig->LivePresentationBankNaturalismAmplitudeMeters = 0.90f;
         WaterConfig->LiveShallowSurfaceColor =
             FLinearColor(0.008f, 0.055f, 0.130f, 1.0f);
         WaterConfig->LiveDeepSurfaceColor =

@@ -93,6 +93,30 @@ public:
         int32 MaximumWetLateralIndex,
         float VertexSpacingMeters);
 
+    /** Presentation-only alpha coverage at a sampled wet bank. When enabled,
+     * an incommensurate station-space profile shifts the interior feather but
+     * never gives coverage to the outermost wet vertex or changes wet-cell
+     * topology. */
+    static float ComputePresentationBankCoverage(
+        float StationMeters,
+        int32 LateralIndex,
+        int32 MinimumWetLateralIndex,
+        int32 MaximumWetLateralIndex,
+        float VertexSpacingMeters,
+        float EdgeBlendMeters,
+        bool bEnableNaturalism,
+        float NaturalismAmplitudeMeters);
+
+    /** Inward-only, sub-cell retreat for the optical core's outermost wet
+     * vertex. This changes the visible volume silhouette without changing the
+     * sampled surface or wet-cell topology. */
+    static float ComputePresentationBankRetreatMeters(
+        float StationMeters,
+        bool bRiverLeft,
+        float VertexSpacingMeters,
+        bool bEnableNaturalism,
+        float NaturalismAmplitudeMeters);
+
     /** One detected breaking-water site (a supercritical-to-subcritical
      * hydraulic jump resolved by the live solver field), exposed so bounded
      * aerosol/mist presentation can anchor to genuine whitewater. Positions
@@ -412,4 +436,6 @@ private:
     float ResolvedRapidFoamFocusStart = 0.12f;
     float ResolvedRapidFoamFocusEnd = 0.72f;
     float ResolvedRapidFoamCoverageGain = 1.0f;
+    bool bLivePresentationBankNaturalismEnabled = false;
+    float ResolvedPresentationBankNaturalismAmplitudeMeters = 0.0f;
 };

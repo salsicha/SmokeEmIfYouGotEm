@@ -140,6 +140,18 @@ terrain materials remain byte-restored; the fail-closed evidence, hashes,
 authority boundary, and next-step requirement for water-coverage or surveyed
 bank geometry are recorded in the
 [cold-water adaptive-shoreline rejection](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_review.json).
+The replacement pass changes the visible presentation boundary itself. A
+default-off cold-water opt-in varies the existing bank alpha in global river
+station space and retreats only the optical core's outermost wet vertices
+inward, capped at 0.90 m and below one 1.50 m render cell. It never adds wet
+topology or moves the sampled solver surface. In the fixed Chilko close-up the
+contact retreats 3.84 pixels on average and gains 16.69% more detrended contour
+variation without the rejected overlay's rail or gap. Futaleufú's matched
+rapid-side frame passes as a no-regression control but does not support a
+material bank-improvement claim. Both maps remain byte-identical and
+reference-runnable, not photoreal-approved; exact implementation, hashes,
+captures, limitations, and open external gates are in the
+[cold-water presentation-bank review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_presentation_bank_naturalism_v1_review.json).
 The shared live-water renderer now subdivides every authored river's visual
 surface from a 3 m analysis grid to 1.5 m presentation spacing. Solver-feature
 analysis retains its original physical footprint, the config-less test tank
