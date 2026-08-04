@@ -557,10 +557,10 @@ def test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_cl
         "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880",
         "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "94abec82cbde60c2aa152c9ebe3599d1c037579aaded1c757524b64e53db076b",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822",
-        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "4255d0a87e57e85a20b63a956b5a8857338dd34212b5fe1c7da06f9edac3ae00",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": "b53081b42d81fc6c60d19c379303f937cd05169e8b4b7893136769b2efd701a9",
         "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "10679b95c7bc9100fe79f471c14c4e2fc97f5ff5c526268a4919150415b908e5",
         "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37",
-        "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": "1bf1a1d2f783e2eaf34e17f0b8894b67632ec1793e84478f1bff253e62694675",
+        "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": "01a084b508cebade6abc05320697fc4968bedfc8bd853020f7e4826527852e11",
         "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/MI_RaftSim_SouthForkProductionWater.uasset": "797336a64b97fce1b40facffb68ea642acb4add98989dd65ec5a04004ee63ff8",
     }
     for source_path, expected_hash in foam_occlusion_review[

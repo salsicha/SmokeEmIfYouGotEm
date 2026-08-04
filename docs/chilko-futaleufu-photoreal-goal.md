@@ -124,6 +124,34 @@ guide, geospatial, hydraulic, environment-art, water-VFX, rights, or target-
 platform reviewer has accepted the scene. Exact evidence and open gates are in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json`.
 
+## Shared Flow-Advected Foam V1
+
+The solver-owned masked foam shared by all six runnable rivers now samples each
+river-local first-party lace twice. A station-aligned primary layer and an
+incommensurate faster detail layer move independently, while the existing
+solver vertex alpha still decides where foam may exist and the raft/crew
+ellipse remains the final opacity-mask multiplier. The material is now Default
+Lit with 0.78 roughness, 0.24 specular response, and only a 0.06 emissive floor,
+so whitewater participates in sun and canyon shadow instead of remaining a
+flat unlit decal. No solver generation, advection, wet/dry topology, map,
+geometry, collision, buoyancy, or raft-force value changed.
+
+In Futaleufú's matched rapid-side water region, bright neutral coverage falls
+from 15.375% to 10.642% and very-white coverage from 8.908% to 4.233%. The
+dense rectangular lattice becomes smaller disconnected patches. Chilko also
+shows fewer continuous bright rails, although its direct-light distribution
+differs enough that those luminance metrics are descriptive rather than an
+acceptance threshold. The editor builds, the focused native material audit
+passes 1/1, and P2 plus all six P4 runnable-map gates pass 7/7.
+
+The retained result is still not photoreal. The source lace contains elongated
+parallel strokes, the foam remains a thin sheet over analytical rapid geometry,
+and resolved crest thickness, holes, recirculation, spray, droplets, mist,
+rock-contact plumes, raft wakes, synthetic banks/ecology, characters, and all
+seven external approvals remain open. Exact captures, hashes, validation, and
+the fail-closed decision are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json`.
+
 ## Temperate Canopy Variation V2
 
 The shared Futaleufu/Chilko opaque fallback now removes its fixed downriver

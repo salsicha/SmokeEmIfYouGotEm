@@ -206,6 +206,16 @@ dome, tent, rail, card, or shoreline artifact, but the result is retained only
 as technical progress because volumetric aeration, recirculation, spray,
 measured seasonal hydraulics, and named art acceptance remain open. See the
 [plunge-pocket review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json).
+The shared solver-foam surface now replaces its static unlit rectangular lace
+with two independently advected, incommensurate samples of each river's own
+first-party mask. The same solver alpha and raft/crew exclusion still own foam
+placement, while Default Lit response and a small emissive floor let the lace
+enter canyon shadow instead of reading as a white decal. P2 and all six P4
+runnable-map gates pass. Matched Futaleufú evidence halves very-white coverage
+in the rapid-side diagnostic, but the remaining parallel strokes, thin surface,
+analytical rapid shape, and incomplete spray/mist still reject photoreal
+promotion. See the
+[shared flow-advected foam review](docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json).
 Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
 path that was silently restoring the older reflective water defaults after
 regeneration. The runtime now keeps the river-local, wet-cell-clipped volume

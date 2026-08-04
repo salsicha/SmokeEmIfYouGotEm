@@ -1,0 +1,44 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "945286A1B245CAB732C589A83690A909",
+			"instanceName": "Alexs-MacBook-Air.local-83927",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-14.14.17",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.0080679580569267273,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FSharedFlowAdvectedFoam",
+			"fullTestPath": "RaftSim.M9.FSharedFlowAdvectedFoam",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"945286A1B245CAB732C589A83690A909"
+			],
+			"duration": 0.0080679580569267273,
+			"dateTime": "2026.08.04-14.14.17",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

@@ -69,6 +69,19 @@ photoreal promotion: foam, bank/terrain resolution, vegetation, atmosphere,
 characters, and external acceptance remain open. See
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json`.
 
+**Shared flow-advected foam checkpoint, August 4:** all six runnable rivers now
+use the shared solver-foam material as a lit, two-scale moving lace instead of a
+static unlit rectangular tile. Both incommensurate samples retain each river's
+first-party texture, solver vertex alpha remains the placement authority, and
+the runtime raft/crew ellipse remains the final exclusion. In Futaleufú's
+matched rapid-side diagnostic, very-white coverage falls from 8.908% to 4.233%.
+The editor build, focused native material audit, P2, and all six P4 runnable-map
+gates pass. This remains technical progress rather than photoreal promotion:
+parallel source strokes, thin foam geometry, incomplete crest/hole volume,
+spray/mist, synthetic environments and characters, performance qualification,
+and all seven external acceptance gates remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json`.
+
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must
 be labeled `procedural_infill`, store its seed and inputs, blend continuously into known
