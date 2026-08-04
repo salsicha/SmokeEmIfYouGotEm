@@ -57,12 +57,88 @@ ORGANIC_UPPER_SCARP_V17_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_organic_upper_scarp_v17_review.json"
 )
+LAUNCH_OPTICAL_NATURALISM_V18_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_launch_optical_naturalism_v18_review.json"
+)
 RUNNABLE_ZAMBEZI_MAP_PATH = "unreal/Content/RaftSim/Maps/L_Zambezi.umap"
 V17_SUPERSEDED_HISTORICAL_PATHS = {
     RUNNABLE_ZAMBEZI_MAP_PATH,
     (
         "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
         "zambezi_reference_scenario_map_validation.json"
+    ),
+    (
+        "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/"
+        "SM_RaftSim_Zambezi_RiparianTree_A_OpaqueV1.uasset"
+    ),
+    (
+        "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/"
+        "SM_RaftSim_Zambezi_UmbrellaTree_B_OpaqueV1.uasset"
+    ),
+    (
+        "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/"
+        "SM_RaftSim_Zambezi_ThornScrub_A_OpaqueV1.uasset"
+    ),
+    (
+        "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/"
+        "SM_RaftSim_Zambezi_SavannaGroundCover_A_OpaqueV1.uasset"
+    ),
+    (
+        "unreal/Content/RaftSim/Environment/ZambeziRun/Vegetation/Meshes/"
+        "SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2.uasset"
+    ),
+    (
+        "docs/environment-captures/photoreal_river_previews/"
+        "landscape_candidates/zambezi_batoka_gorge_guide_seat_downstream.png"
+    ),
+    (
+        "docs/environment-captures/photoreal_river_previews/"
+        "landscape_candidates/zambezi_batoka_gorge_river_eye_downstream.png"
+    ),
+    (
+        "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/"
+        "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset"
+    ),
+    (
+        "unreal/Content/RaftSim/Materials/LandscapeCandidates/"
+        "M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.uasset"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+        "RaftSimEditorEnvironmentCatalog.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+        "RaftSimEditorNearFieldAndLighting.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
+        "RaftSimEditorLandscapeFoliage.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
+        "RaftSimEditorLandscapeGeometry.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+        "RaftSimEditorBatokaMaterial.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+        "RaftSimEditorMaterialsBase.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+        "RaftSimEditorZambeziWaterMaterial.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Rivers/"
+        "RaftSimEditorZambeziDirector.cpp"
+    ),
+    (
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/"
+        "RaftSimEditorZambeziWaterTest.cpp"
     ),
     "physics/tests/test_zambezi_reference_map.py",
 }
@@ -90,7 +166,10 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
     # V17 intentionally supersedes only the generated map, its audit, and this
     # evolving contract runner; replacement artifacts are independently locked
     # by the V17 review below.
-    if relative in V17_SUPERSEDED_HISTORICAL_PATHS:
+    if (
+        relative in V17_SUPERSEDED_HISTORICAL_PATHS
+        or relative in LATER_WATER_MILESTONE_SUPERSEDED_PATHS
+    ):
         return
     assert _sha256(REPO_ROOT / relative) == expected
 
@@ -181,7 +260,7 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     }
     assert locked_hashes == expected_hashes
     for relative, expected in expected_hashes.items():
-        assert _sha256(REPO_ROOT / relative) == expected
+        _assert_historical_artifact_unchanged(relative, expected)
 
     assert review["registry_assertions"] == {
         "river_selection_catalog_portfolio_role": "runnable_river",
@@ -492,7 +571,8 @@ def test_zambezi_organic_upper_scarp_v17_review_is_hash_locked_and_honest():
         "retained": 0,
     }
     for artifact in review["hash_locked_retained_artifacts"]:
-        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+        if artifact["path"] not in V17_SUPERSEDED_HISTORICAL_PATHS:
+            assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
     assert review["validation"] == {
         "editor_build": "pass",
         "map_generation": "pass",
@@ -507,6 +587,52 @@ def test_zambezi_organic_upper_scarp_v17_review_is_hash_locked_and_honest():
         "all_six_river_map_loads": "RaftSim.P4.RiverMapLoads_6/6_passed",
     }
     assert len(review["external_gates_remaining"]) == 7
+
+
+def test_zambezi_launch_optical_naturalism_v18_review_is_hash_locked_and_honest():
+    review = _load(REPO_ROOT / LAUNCH_OPTICAL_NATURALISM_V18_REVIEW)
+    assert review["schema"] == (
+        "raftsim.environment.zambezi_launch_optical_naturalism_review.v18"
+    )
+    assert review["passed"] is False
+    assert review["decision"] == {
+        "technical_candidate_retained": True,
+        "launch_water_clipping_reduced": True,
+        "sun_facing_scarp_energy_reduced": True,
+        "lower_energy_launch_cover_passed": True,
+        "photoreal_acceptance_passed": False,
+        "terrain_collision_or_height_authority_changed": False,
+        "water_geometry_wet_dry_mask_or_solver_state_changed": False,
+        "raft_collision_buoyancy_or_forces_changed": False,
+    }
+    evidence = review["matched_visual_evidence"]
+    for key in ("baseline", "retained"):
+        artifact = evidence[key]
+        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    metrics = evidence["descriptive_luminance_metrics"]
+    assert metrics["retained"]["water_p95"] < metrics["baseline"]["water_p95"]
+    assert metrics["retained"]["water_pixels_above_0_90_fraction"] < (
+        metrics["baseline"]["water_pixels_above_0_90_fraction"] * 0.10
+    )
+    assert metrics["retained"]["left_water_pixels_above_0_90_fraction"] < (
+        metrics["baseline"]["left_water_pixels_above_0_90_fraction"] * 0.10
+    )
+    assert metrics["retained"]["scarp_p95"] < metrics["baseline"]["scarp_p95"]
+    assert review["generated_map_evidence"]["launch_ground_cover"] == {
+        "target_instances": 7200,
+        "placed_instances": 7200,
+        "rejected_instances": 0,
+        "maximum_selected_slope_degrees": 41.98,
+    }
+    for artifact in review["hash_locked_retained_artifacts"]:
+        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    assert review["validation"]["saved_map_audit"] == (
+        "pass_25_markers_1_raft_1_runtime_water_4_conditioned_visual_tiles_"
+        "14843_opaque_vegetation_instances"
+    )
+    assert len(review["external_gates_remaining"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert LAUNCH_OPTICAL_NATURALISM_V18_REVIEW.as_posix() in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():
@@ -957,7 +1083,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimCameraVisibleWoodyEcology" in foliage_cpp
     assert "RaftSimOrganicWoodyBankLayer" in foliage_cpp
     assert "RaftSimWoodySlopeCeiling24Degrees" in foliage_cpp
-    assert "ZambeziRunnableLaunchBankCoverInstanceCount = 5200" in foliage_cpp
+    assert "ZambeziRunnableLaunchBankCoverInstanceCount = 7200" in foliage_cpp
     assert "ZambeziRunnableLaunchMinimumBankCoverInstanceCount = 4500" in foliage_cpp
     assert "ZambeziRunnableLaunchWoodyInstanceCount = 640" in foliage_cpp
     assert "ZambeziRunnableLaunchMinimumWoodyInstanceCount = 560" in foliage_cpp
@@ -965,6 +1091,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "ZambeziRunnableLaunchWoodySlopeCeilingDegrees = 34.0f" in foliage_cpp
     assert "SM_RaftSim_Zambezi_SavannaGroundCover_B_OpaqueV2" in foliage_cpp
     assert "RaftSimOrganicGroundCoverMorphologyV2" in foliage_cpp
+    assert "RaftSimZambeziLowerEnergyLaunchEcologyV18" in foliage_cpp
     assert "Component->SetCullDistances(0, 120000)" in foliage_cpp
     assert "TargetAdditionalOffset" in foliage_cpp
     assert "TargetDryHeightAboveWaterCm" in foliage_cpp
@@ -1088,7 +1215,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v19")
+    assert validation["schema"].endswith(".v20")
     assert validation["runtime_hydraulics"]["preserves_global_river_stations"] is True
     assert validation["runtime_hydraulics"]["rapid_count"] == 25
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
@@ -1096,7 +1223,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     )
     assert validation["runtime_hydraulics"]["safe_launch_apron_tagged"] is True
     assert validation["visual_terrain"]["morphology_contract"] == (
-        "v17_organic_basalt_with_wet_bank_protection_and_height_aware_"
+        "v18_exposure_safe_organic_basalt_with_wet_bank_protection_and_height_aware_"
         "upper_dry_scarp_infill_plus_central_difference_grid_normals_"
         "and_source_facet_reconstruction"
     )
@@ -1238,7 +1365,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert validation["vegetation"]["runnable_launch_bank_cover_instance_count"] >= 4500
     assert (
         validation["vegetation"]["runnable_launch_bank_cover_target_instance_count"]
-        == 5200
+        == 7200
     )
     assert validation["vegetation"]["runnable_launch_woody_component_count"] == 3
     assert validation["vegetation"]["runnable_launch_woody_instance_count"] >= 560
@@ -1260,6 +1387,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert len(launch_ground_cover) == 2
     assert all(
         "RaftSimOrganicGroundCoverMorphologyV2" in component["tags"]
+        and "RaftSimZambeziLowerEnergyLaunchEcologyV18" in component["tags"]
         and "SavannaGroundCover_" in component["static_mesh"]
         for component in launch_ground_cover
     )

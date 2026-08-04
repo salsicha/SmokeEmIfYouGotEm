@@ -31,7 +31,8 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
     assert "Landscape->Import(" in editor_source
     assert "ApplyPreviewOnlyLandscapeChannelBurn" in editor_source
     assert "SegmentLengthCm / CenterSampleSpacingCm" in editor_source
-    assert "const int32 CrossSteps = bChilkoSourceScale ? 16 : 32" in editor_source
+    assert "const int32 CrossSteps = bChilkoSourceScale" in editor_source
+    assert "FMath::Max(8, WaterSettings.RibbonCrossSectionSteps)" in editor_source
     assert "bounded render-only current relief" in editor_source
     assert "bPhysicalCorridor ? 5000.0f : -1600.0f" in editor_source
     assert "const float CurrentThread" in editor_source
@@ -79,7 +80,7 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
     assert "bZambezi ? 0.30f" in editor_source
     assert "DetailRoughnessWeight->R = 0.38f" in editor_source
     assert "RockAlbedoWeight->R = bZambezi ? 0.20f" in editor_source
-    assert "RockNormalWeight->R = bZambezi ? 0.38f" in editor_source
+    assert "RockNormalWeight->R = bZambezi ? 0.52f" in editor_source
     assert "RockRoughnessWeight->R = 0.44f" in editor_source
     assert "RockSlopeStart->R = bRockCanyon ? 0.10f : 0.16f" in editor_source
     assert "RockSlopeGain->R = 3.3f" in editor_source
@@ -1324,7 +1325,7 @@ def test_zambezi_default_lit_water_candidate_is_isolated_and_review_gated():
 
     validation = json.loads(validation_path.read_text(encoding="utf-8"))
     assert validation["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v16"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v20"
     )
     assert validation["passed"] is True
     assert validation["water_surface"]["component_count"] == 1

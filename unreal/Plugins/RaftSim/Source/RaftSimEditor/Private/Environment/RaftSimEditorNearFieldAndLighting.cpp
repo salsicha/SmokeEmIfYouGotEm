@@ -1976,6 +1976,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             ReflectionComponent->Brightness =
                 Spec.RiverId == TEXT("chilko_river_lava_canyon")
                 ? 0.65f
+                : Spec.RiverId == TEXT("zambezi_batoka_gorge")
+                ? 0.62f
                 : 1.0f;
             ReflectionComponent->ReflectionSourceType = EReflectionSourceType::CapturedScene;
             ReflectionComponent->bRuntimeCapture = true;
@@ -1984,6 +1986,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             {
                 RiverReflectionCapture->Tags.AddUnique(
                     TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+            }
+            if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+            {
+                RiverReflectionCapture->Tags.AddUnique(
+                    TEXT("RaftSimZambeziExposureSafeReflectionRigV18"));
             }
             World->SendAllEndOfFrameUpdates();
             UReflectionCaptureComponent::UpdateReflectionCaptureContents(

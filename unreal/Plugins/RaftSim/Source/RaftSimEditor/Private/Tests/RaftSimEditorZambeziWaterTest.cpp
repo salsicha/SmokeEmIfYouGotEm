@@ -152,7 +152,7 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
         }
     }
 
-    TestEqual(TEXT("Two world-space mineral fields break repetition"), NoiseCount, 2);
+    TestEqual(TEXT("Three world-space mineral and erosion fields break repetition"), NoiseCount, 3);
     TestTrue(TEXT("Four primary 50 m macro channels remain"), MacroScaleCount >= 4);
     TestEqual(TEXT("One 83 m secondary macro color projection exists"), SecondaryMacroScaleCount, 1);
     TestEqual(TEXT("Three 4.8 m detail projections remain coherent"), DetailScaleCount, 3);
@@ -183,14 +183,16 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
     };
     TestScalar(TEXT("BatokaMacroAntiTileStrength"), 0.78f);
     TestScalar(TEXT("BatokaWeatheringVariationStrength"), 0.28f);
-    TestScalar(TEXT("BatokaMineralShadowScale"), 0.78f);
-    TestScalar(TEXT("BatokaMineralHighlightScale"), 1.02f);
-    TestScalar(TEXT("BatokaMacroWeight"), 0.86f);
+    TestScalar(TEXT("BatokaMineralShadowScale"), 0.62f);
+    TestScalar(TEXT("BatokaMineralHighlightScale"), 0.96f);
+    TestScalar(TEXT("BatokaMacroWeight"), 0.91f);
     TestScalar(TEXT("BatokaTerrainColorCoverageFloor"), 0.78f);
-    TestScalar(TEXT("BatokaDetailColorScale"), 0.86f);
-    TestScalar(TEXT("BatokaDetailColorWeight"), 0.07f);
-    TestScalar(TEXT("BatokaDetailNormalWeight"), 0.24f);
-    TestScalar(TEXT("BatokaDetailRoughnessWeight"), 0.18f);
+    TestScalar(TEXT("BatokaDetailColorScale"), 0.72f);
+    TestScalar(TEXT("BatokaDetailColorWeight"), 0.16f);
+    TestScalar(TEXT("BatokaErosionShadowScaleV18"), 0.70f);
+    TestScalar(TEXT("BatokaErosionHighlightScaleV18"), 0.98f);
+    TestScalar(TEXT("BatokaDetailNormalWeight"), 0.38f);
+    TestScalar(TEXT("BatokaDetailRoughnessWeight"), 0.30f);
     TestScalar(TEXT("BatokaWetBankAlbedoScale"), 0.62f);
     TestScalar(TEXT("BatokaWetBankRoughness"), 0.27f);
     TestScalar(TEXT("BatokaWetBankSpecular"), 0.34f);
@@ -204,13 +206,13 @@ bool FRaftSimZambeziOrganicBasaltMaterialTest::RunTest(const FString& Parameters
     {
         TestTrue(
             TEXT("Basalt is blue-gray and substantially darker than the old tan response"),
-            BasaltTint->Equals(FLinearColor(0.38f, 0.42f, 0.48f, 1.0f), 0.0001f));
+            BasaltTint->Equals(FLinearColor(0.27f, 0.29f, 0.31f, 1.0f), 0.0001f));
     }
     if (WeatheredTint)
     {
         TestTrue(
             TEXT("Weathering stays a bounded brown accent"),
-            WeatheredTint->Equals(FLinearColor(0.58f, 0.43f, 0.40f, 1.0f), 0.0001f));
+            WeatheredTint->Equals(FLinearColor(0.45f, 0.34f, 0.30f, 1.0f), 0.0001f));
     }
     const FLinearColor* WetBankTint = VectorDefaults.Find(TEXT("BatokaWetBankTint"));
     TestNotNull(TEXT("Conditioned wet-bank tint exists"), WetBankTint);
@@ -558,11 +560,12 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
     TestScalar(TEXT("HydraulicFoamCoverageGain"), 0.72f);
     TestScalar(TEXT("SpeedAerationFraction"), 0.14f);
     TestScalar(TEXT("FoamRoughness"), 0.78f);
-    TestScalar(TEXT("FallbackSkyReflectionFloor"), 0.26f);
-    TestScalar(TEXT("FallbackSkyReflectionVariation"), 0.44f);
-    TestScalar(TEXT("SlickRoughnessScale"), 0.72f);
-    TestScalar(TEXT("FresnelSpecular"), 0.10f);
-    TestScalar(TEXT("SlickNormalFloor"), 0.22f);
+    TestScalar(TEXT("FallbackSkyReflectionFloor"), 0.07f);
+    TestScalar(TEXT("FallbackSkyReflectionVariation"), 0.26f);
+    TestScalar(TEXT("RippleGrazingFloor"), 0.72f);
+    TestScalar(TEXT("SlickRoughnessScale"), 0.96f);
+    TestScalar(TEXT("FresnelSpecular"), 0.018f);
+    TestScalar(TEXT("SlickNormalFloor"), 0.82f);
     TestScalar(TEXT("LiveVolumeBankCoverageFloor"), 0.0f);
     return !HasAnyErrors();
 }

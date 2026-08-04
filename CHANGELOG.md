@@ -32,6 +32,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Refined the runnable Zambezi launch gorge with a presentation-only V18
+  exposure and material bracket. The live water now uses a rougher localized
+  reflection response with no calm detail overlay, the sun-facing scarp uses
+  darker two-scale basalt shading plus bounded erosion staining, and the first
+  kilometre carries 7,200 shorter launch-cover instances. In the matched frame,
+  water p95 luminance falls from 0.8859 to 0.8478 and pixels above 0.90 fall
+  96.14%; left-water pixels above 0.90 fall 96.30%. The schema-v20 saved-map
+  audit, five focused native Zambezi tests, and all six runnable-map PIE gates
+  pass with Zambezi MapCheck at zero errors and warnings. Collision, DEM,
+  water geometry, wet/dry state, hydraulics, buoyancy, and raft forces are
+  unchanged; coarse canyon geometry, procedural ecology, production art,
+  hydraulic calibration, and all seven external gates keep photoreal promotion
+  open.
 - Corrected Chilko Lava Canyon's legacy-config detection so regenerated maps
   retain their authored river-local optical values. A Chilko-only depth-
   coverage mask, restrained lighting/reflection rig, muted vegetation material,

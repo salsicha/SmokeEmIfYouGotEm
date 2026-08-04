@@ -101,12 +101,12 @@ UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
 
     UMaterialExpression* DarkMacro = Multiply(
         DeTiledMacro,
-        Vector(TEXT("BatokaBasaltTint"), FLinearColor(0.38f, 0.42f, 0.48f, 1.0f)));
+        Vector(TEXT("BatokaBasaltTint"), FLinearColor(0.27f, 0.29f, 0.31f, 1.0f)));
     UMaterialExpression* WeatheredMacro = Multiply(
         DeTiledMacro,
         Vector(
             TEXT("BatokaWeatheredInterflowTint"),
-            FLinearColor(0.58f, 0.43f, 0.40f, 1.0f)));
+            FLinearColor(0.45f, 0.34f, 0.30f, 1.0f)));
     UMaterialExpression* WeatheringAlpha = Multiply(
         MacroAntiTileNoise,
         Scalar(TEXT("BatokaWeatheringVariationStrength"), 0.28f));
@@ -118,31 +118,49 @@ UMaterialExpression* BuildBatokaOrganicBasaltBaseColor(
     // crushed black faces or returning the former chalky highlights.
     UMaterialExpressionNoise* FineMineralNoise =
         NewObject<UMaterialExpressionNoise>(Material);
-    FineMineralNoise->Scale = 0.00072f;
+    FineMineralNoise->Scale = 0.00115f;
     FineMineralNoise->bTurbulence = true;
-    FineMineralNoise->Levels = 2;
+    FineMineralNoise->Levels = 4;
     FineMineralNoise->OutputMin = 0.0f;
     FineMineralNoise->OutputMax = 1.0f;
     Add(FineMineralNoise);
     UMaterialExpression* MineralValueScale = Lerp(
-        Scalar(TEXT("BatokaMineralShadowScale"), 0.78f),
-        Scalar(TEXT("BatokaMineralHighlightScale"), 1.02f),
+        Scalar(TEXT("BatokaMineralShadowScale"), 0.62f),
+        Scalar(TEXT("BatokaMineralHighlightScale"), 0.96f),
         FineMineralNoise);
     UMaterialExpression* OrganicMacro =
         Multiply(WeatheredSurface, MineralValueScale);
     UMaterialExpression* MacroBaseColor = Lerp(
         SourceBaseColor,
         OrganicMacro,
-        Scalar(TEXT("BatokaMacroWeight"), 0.86f));
+        Scalar(TEXT("BatokaMacroWeight"), 0.91f));
 
     UMaterialExpression* ScaledDetail = Multiply(
         DetailAlbedo,
-        Scalar(TEXT("BatokaDetailColorScale"), 0.86f),
+        Scalar(TEXT("BatokaDetailColorScale"), 0.72f),
         DetailOutputIndex);
-    return Lerp(
+    UMaterialExpression* TwoScaleBasalt = Lerp(
         MacroBaseColor,
         ScaledDetail,
-        Scalar(TEXT("BatokaDetailColorWeight"), 0.07f));
+        Scalar(TEXT("BatokaDetailColorWeight"), 0.16f));
+
+    // Long erosion staining removes the remaining uniformly sun-bleached wall
+    // without inventing ledges or changing source geometry. The field is
+    // deliberately much broader than the mineral detail and is bounded above
+    // one, so it can only reduce the local albedo energy.
+    UMaterialExpressionNoise* ErosionStainNoise =
+        NewObject<UMaterialExpressionNoise>(Material);
+    ErosionStainNoise->Scale = 0.000035f;
+    ErosionStainNoise->bTurbulence = true;
+    ErosionStainNoise->Levels = 3;
+    ErosionStainNoise->OutputMin = 0.0f;
+    ErosionStainNoise->OutputMax = 1.0f;
+    Add(ErosionStainNoise);
+    UMaterialExpression* ErosionValueScale = Lerp(
+        Scalar(TEXT("BatokaErosionShadowScaleV18"), 0.70f),
+        Scalar(TEXT("BatokaErosionHighlightScaleV18"), 0.98f),
+        ErosionStainNoise);
+    return Multiply(TwoScaleBasalt, ErosionValueScale);
 }
 
 UMaterialExpression* BuildBatokaOrganicBasaltColorCoverage(
