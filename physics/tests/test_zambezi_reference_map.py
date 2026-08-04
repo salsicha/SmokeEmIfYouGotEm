@@ -41,6 +41,10 @@ RAPID_VFX_V1_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_solver_driven_rapid_vfx_v1_review.json"
 )
+REFINED_LIVE_SURFACE_V1_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_refined_live_surface_v1_review.json"
+)
 
 
 def _load(path: Path) -> dict:
@@ -193,6 +197,44 @@ def test_zambezi_solver_driven_rapid_vfx_review_is_hash_locked():
     assert len(review["required_external_acceptance_gates"]) == 7
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert RAPID_VFX_V1_REVIEW.as_posix() in readme
+
+
+def test_zambezi_refined_live_surface_review_is_hash_locked_and_honest():
+    review = _load(REPO_ROOT / REFINED_LIVE_SURFACE_V1_REVIEW)
+    assert review["schema"] == (
+        "raftsim.environment.zambezi_refined_live_surface_review.v1"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["technical_candidate_retained"] is True
+    assert review["decision"]["all_six_river_maps_runnable"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["cooked_water_or_hydraulic_authority_changed"] is False
+    assert review["implementation"]["base_analysis_spacing_m"] == 3.0
+    assert review["implementation"]["resolved_render_spacing_m"] == 1.5
+    assert review["implementation"]["analysis_stride_vertices"] == 2
+    assert review["implementation"]["bounded_theoretical_standing_wave_envelope_m"] <= 0.248
+    assert review["runtime_evidence"]["p4_all_six_river_maps"]["result"] == (
+        "6/6 passed"
+    )
+    assert len(review["runtime_evidence"]["p4_all_six_river_maps"]["maps"]) == 6
+    metrics = review["visual_evidence"]["descriptive_water_frame_metrics"]
+    assert metrics["retained_highpass_absolute_mean"] > (
+        metrics["baseline_highpass_absolute_mean"]
+    )
+    assert metrics["retained_edge_fraction_over_0_04"] > (
+        metrics["baseline_edge_fraction_over_0_04"]
+    )
+    for key in ("baseline", "retained"):
+        artifact = review["visual_evidence"][key]
+        assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    for relative, expected in review["hash_locked_unchanged_authority"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    for relative, expected in review["changed_source_hashes"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    assert len(review["remaining_photoreal_defects"]) >= 5
+    assert len(review["required_external_acceptance_gates"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert REFINED_LIVE_SURFACE_V1_REVIEW.as_posix() in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():
@@ -696,6 +738,15 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RiverWaterConfig->LiveWaterScattering" in runtime_water_cpp
     assert "RiverWaterConfig->LiveWaterAbsorption" in runtime_water_cpp
     assert "RiverWaterConfig->LiveRiverbedColorScale" in runtime_water_cpp
+    assert "RiverPresentationSubdivision = 2" in (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+        "RaftSimWaterSurfaceActor.h"
+    ).read_text(encoding="utf-8")
+    assert "ResolvedVertexSpacingMeters" in runtime_water_cpp
+    assert "PresentationAnalysisStride" in runtime_water_cpp
+    assert "const float PhaseC" in runtime_water_cpp
+    assert "const float PhaseD" in runtime_water_cpp
 
     source_art = REPO_ROOT / "unreal/SourceArt/RaftSim/Water/ZambeziBatoka"
     expected_assets = {

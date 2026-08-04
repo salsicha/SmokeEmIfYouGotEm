@@ -191,6 +191,33 @@ public:
         return ResolvedPresentationSurfaceSmoothingStrength;
     }
 
+    /** True when an authored river uses the render-only subdivided surface.
+     * This changes presentation sampling only; the adapter and all gameplay
+     * water authority remain at their authored resolution. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsRiverPresentationGridRefined() const
+    {
+        return PresentationAnalysisStride > 1;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetPresentationVertexSpacingMeters() const
+    {
+        return ResolvedVertexSpacingMeters;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetSurfaceVertexCount() const
+    {
+        return Vertices.Num();
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetSurfaceTriangleCount() const
+    {
+        return Triangles.Num() / 3;
+    }
+
     /** Selects the non-colliding roller-mesh fallback. Production Niagara
      * disables it only after all required particle assets are bound. */
     void SetBreakingRollerVolumeRenderingEnabled(bool bEnabled);
@@ -276,11 +303,18 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation", meta = (ClampMin = "9.0"))
     float BreakingSiteInteriorClearanceMeters = 15.0f;
 
-    /** World-space spacing between surface vertices in meters. The production
-     * hydraulic grid is four metres, so three-metre interpolation preserves
-     * every resolved feature without wastefully oversampling the solver. */
+    /** Base world-space analysis spacing in metres. Authored runtime rivers
+     * subdivide this render-only mesh while retaining three-metre
+     * neighbourhoods for solver-feature analysis. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     float VertexSpacingMeters = 3.0f;
+
+    /** Render-only subdivision applied to authored production-river windows.
+     * Two resolves the bounded short-wave bands that cannot be represented by
+     * the three-metre analysis grid. The adapter remains authoritative. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "1", ClampMax = "2"))
+    int32 RiverPresentationSubdivision = 2;
 
     /** Surface refresh interval (s); physics remains fixed-step while this
      * presentation mesh interpolates the much more slowly changing FV field. */
@@ -329,6 +363,8 @@ private:
     int32 GridStationN = 0;
     int32 GridLateralN = 0;
     bool bUsesCurvedRiverCoordinates = false;
+    float ResolvedVertexSpacingMeters = 3.0f;
+    int32 PresentationAnalysisStride = 1;
     float CurvedGridCenterStationM = 0.0f;
     TArray<FVector> Vertices;
     TArray<FVector2D> RiverCoordinatesM;

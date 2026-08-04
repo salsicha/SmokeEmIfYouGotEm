@@ -608,3 +608,29 @@ and external acceptance gates pass.
   photoreal water art, validated hydraulics, target performance, and all named
   external approvals remain open in
   `zambezi_solver_driven_rapid_vfx_v1_review.json`.
+
+### 2026-08-03 — Shared authored-river live-surface refinement retained
+
+- All six runnable maps now use a 2x render-only subdivision of the live-water
+  surface: the five curved windows resolve to 10,465 vertices and 20,480
+  triangles, while South Fork's legacy straight window resolves to 17,956
+  vertices and 35,378 triangles. Both use 1.5 m visual spacing. A river-water
+  config is the opt-in, so the config-less test tank retains its original
+  4,624-vertex, 3 m compatibility surface.
+- Smoothing, hydraulic relief, normal derivatives, and jump classification
+  retain a two-vertex stride on refined surfaces and therefore preserve the
+  original 3 m physical analysis neighbourhood. Two short oblique wave bands
+  replace part of the former broad-wave amplitude inside a reduced 0.248 m
+  theoretical displacement envelope. Sampling, wet/dry authority, cooked
+  fields, collision, buoyancy, D3, and D4 are unchanged.
+- The UE 5.8 editor builds; `RaftSim.P2.WaterSurfaceRenders` passes 1/1;
+  `RaftSim.P4.RiverMapLoads` passes all six maps; and `RaftSim.M4` passes 4/4.
+  Initial refresh diagnostics range from 1.961 ms to 4.351 ms in the
+  unattended null-RHI map suite. This is useful CPU evidence, not a desktop or
+  VR GPU acceptance result.
+- A fixed-camera Zambezi comparison increases measured high-pass surface detail
+  by 7.63% and edge coverage by 12.55%. The broad diagonal analytical swell
+  remains visible and the rapid still lacks a coherent overturning crest,
+  aerated plunge, and recirculating body, so photoreal and production promotion
+  remain failed. The evidence and all seven external gates are hash-locked in
+  `zambezi_refined_live_surface_v1_review.json`.

@@ -101,7 +101,7 @@
   },
   "changed_source_hashes": {
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "c0210cd635cf223b59291a4e7093f51300d5a022f2baaf0f8544b530a68504e7",
-    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp": "1a4c8482194a7f7ad65c739e26262527975e41f8f4d128dcfda3e028b90bf991"
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp": "d2e96765ad743bbf30ea931be3435f6bf7ea2f72a11e129785fa806852612781"
   },
   "remaining_photoreal_defects": [
     "The shallow-water heightfield still lacks a connected overturning crest, hole, and recirculating entrained-air body at rapid scale.",

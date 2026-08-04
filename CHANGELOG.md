@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Refined the render-only live-water mesh on all six authored river maps from
+  3 m to 1.5 m spacing while retaining 3 m physical neighbourhoods for
+  smoothing, hydraulic-relief detection, derivatives, and breaking-site
+  classification. Two bounded short oblique wave bands add subcell surface
+  breakup; topology and refresh-time diagnostics make the cost explicit. The
+  config-less test tank remains at 3 m, all six runnable PIE map gates pass,
+  and no cooked water, wet/dry state, collision, buoyancy, D3, or D4 authority
+  changes. Matched Zambezi evidence retains the technical improvement but
+  rejects photoreal promotion pending a connected overturning rapid body,
+  measured hydraulics, target-hardware performance, and external approvals.
 - Replaced Chilko Lava Canyon's inherited pale gameplay-water response with a
   river-local transmitting V2 path. The solver-owned wet-cell core now binds
   project-owned flow-normal and solver-masked foam-lace textures, while the

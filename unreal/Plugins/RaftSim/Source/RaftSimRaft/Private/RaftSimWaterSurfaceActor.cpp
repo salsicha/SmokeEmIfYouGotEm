@@ -69,23 +69,39 @@ FPresentationStandingWave ComputePresentationStandingWave(
         RiverCoordinatesMeters.X * 0.19f + RiverCoordinatesMeters.Y * 0.61f;
     const float PhaseB =
         RiverCoordinatesMeters.X * 0.071f - RiverCoordinatesMeters.Y * 0.37f;
+    // Two shorter, oblique river-coordinate bands break up the former broad
+    // analytical sheet. Their combined six-centimetre envelope is activated
+    // only by sampled hydraulic energy and is resolvable on the refined 1.5 m
+    // presentation mesh. It remains deterministic and render-only.
+    const float PhaseC =
+        RiverCoordinatesMeters.X * 0.79f + RiverCoordinatesMeters.Y * 1.31f;
+    const float PhaseD =
+        RiverCoordinatesMeters.X * 1.12f - RiverCoordinatesMeters.Y * 0.88f;
     const float SinA = FMath::Sin(PhaseA);
     const float SinB = FMath::Sin(PhaseB);
+    const float SinC = FMath::Sin(PhaseC);
+    const float SinD = FMath::Sin(PhaseD);
     const float CosA = FMath::Cos(PhaseA);
     const float CosB = FMath::Cos(PhaseB);
+    const float CosC = FMath::Cos(PhaseC);
+    const float CosD = FMath::Cos(PhaseD);
 
     FPresentationStandingWave Result;
     Result.DisplacementMeters =
         0.018f * SinA +
-        HydraulicEnergy * (0.16f * SinA + 0.09f * SinB);
+        HydraulicEnergy *
+            (0.115f * SinA + 0.055f * SinB +
+                0.040f * SinC + 0.020f * SinD);
     Result.StationSlope =
         0.018f * 0.19f * CosA +
         HydraulicEnergy *
-            (0.16f * 0.19f * CosA + 0.09f * 0.071f * CosB);
+            (0.115f * 0.19f * CosA + 0.055f * 0.071f * CosB +
+                0.040f * 0.79f * CosC + 0.020f * 1.12f * CosD);
     Result.LateralSlope =
         0.018f * 0.61f * CosA +
         HydraulicEnergy *
-            (0.16f * 0.61f * CosA - 0.09f * 0.37f * CosB);
+            (0.115f * 0.61f * CosA - 0.055f * 0.37f * CosB +
+                0.040f * 1.31f * CosC - 0.020f * 0.88f * CosD);
     return Result;
 }
 
@@ -857,14 +873,25 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
 
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
+    // Every shipped river map owns an explicit water configuration, including
+    // the legacy straight-coordinate South Fork reach. Keep config-less test
+    // tanks on the original three-metre mesh while refining production river
+    // presentation independently of the adapter coordinate representation.
+    const bool bUsesAuthoredRiverPresentation = RiverWaterConfig != nullptr;
+    const int32 ResolvedSubdivision = bUsesAuthoredRiverPresentation
+        ? FMath::Clamp(RiverPresentationSubdivision, 1, 2)
+        : 1;
+    ResolvedVertexSpacingMeters =
+        VertexSpacingMeters / static_cast<float>(ResolvedSubdivision);
+    PresentationAnalysisStride = ResolvedSubdivision;
     GridStationN = FMath::Max(
         2, FMath::RoundToInt(
             (bUsesCurvedRiverCoordinates ? CurvedGridLengthMeters : GridSizeMeters) /
-            VertexSpacingMeters) + 1);
+            ResolvedVertexSpacingMeters) + 1);
     GridLateralN = FMath::Max(
         2, FMath::RoundToInt(
             (bUsesCurvedRiverCoordinates ? CurvedGridWidthMeters : GridSizeMeters) /
-            VertexSpacingMeters) + 1);
+            ResolvedVertexSpacingMeters) + 1);
     const int32 VertCount = GridStationN * GridLateralN;
     Vertices.SetNum(VertCount);
     RiverCoordinatesM.SetNum(VertCount);
@@ -909,9 +936,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             if (bUsesCurvedRiverCoordinates)
             {
                 const float StationM = CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f +
-                    StationIndex * VertexSpacingMeters;
+                    StationIndex * ResolvedVertexSpacingMeters;
                 const float LateralM = -CurvedGridWidthMeters * 0.5f +
-                    LateralIndex * VertexSpacingMeters;
+                    LateralIndex * ResolvedVertexSpacingMeters;
                 RiverCoordinatesM[Index] = FVector2D(StationM, LateralM);
                 // Populated in one pass below so tangents can be derived from
                 // adjacent curved-world vertices as well as positions.
@@ -920,9 +947,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             else
             {
                 const float WorldX = GridOriginCm.X +
-                    StationIndex * VertexSpacingMeters * kSurfCmPerM;
+                    StationIndex * ResolvedVertexSpacingMeters * kSurfCmPerM;
                 const float WorldY = GridOriginCm.Y +
-                    LateralIndex * VertexSpacingMeters * kSurfCmPerM;
+                    LateralIndex * ResolvedVertexSpacingMeters * kSurfCmPerM;
                 Vertices[Index] = FVector(WorldX, WorldY, 0.0f);
                 RiverCoordinatesM[Index] = FVector2D(
                     WorldX / kSurfCmPerM, WorldY / kSurfCmPerM);
@@ -936,7 +963,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 ComputeStationEdgeCoverage(
                     StationIndex,
                     GridStationN,
-                    VertexSpacingMeters,
+                    ResolvedVertexSpacingMeters,
                     CurvedGridEdgeBlendMeters));
             LiveVolumeCoreVertices[Index] = Vertices[Index];
             RapidFoamVertices[Index] = Vertices[Index];
@@ -1648,8 +1675,9 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
             const int32 Index = LateralIndex * GridStationN + StationIndex;
             RiverCoordinatesM[Index] = FVector2D(
                 CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f +
-                    StationIndex * VertexSpacingMeters,
-                -CurvedGridWidthMeters * 0.5f + LateralIndex * VertexSpacingMeters);
+                    StationIndex * ResolvedVertexSpacingMeters,
+                -CurvedGridWidthMeters * 0.5f +
+                    LateralIndex * ResolvedVertexSpacingMeters);
             UVs[Index] = RiverCoordinatesM[Index] / kWaterTextureRepeatMeters;
         }
     }
@@ -1716,6 +1744,7 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedGridPlanarGeometry()
 
 void ARaftSimWaterSurfaceActor::RefreshSurface()
 {
+    const double RefreshStartSeconds = FPlatformTime::Seconds();
     RecenterCurvedGrid();
     TArray<uint8> WetVertexMask;
     WetVertexMask.Init(0, Vertices.Num());
@@ -1766,25 +1795,27 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
-    // Colorado's 4 m cooked visualization cells can otherwise read as broad
-    // transverse steps on the 3 m live presentation grid. The optional
-    // cardinal filter is Jacobi-style (always reads the untouched sampled
-    // field), preserves a linear grade exactly, and only writes this local
-    // render array. WaterSamples remains the authority for gameplay.
+    // Cooked visualization cells can otherwise read as broad transverse
+    // steps. The optional cardinal filter retains the original three-metre
+    // physical neighbourhood after render subdivision. It is Jacobi-style
+    // (always reads the untouched sampled field), preserves a linear grade
+    // exactly, and writes only this local render array.
+    // WaterSamples remains the authority for gameplay.
     if (bLivePresentationSurfaceSmoothingEnabled &&
         ResolvedPresentationSurfaceSmoothingStrength > 0.0f)
     {
         const TArray<float> RawPresentationSurfaceHeightMeters =
             PresentationSurfaceHeightMeters;
-        for (int32 Y = 1; Y < GridLateralN - 1; ++Y)
+        const int32 Stride = PresentationAnalysisStride;
+        for (int32 Y = Stride; Y < GridLateralN - Stride; ++Y)
         {
-            for (int32 X = 1; X < GridStationN - 1; ++X)
+            for (int32 X = Stride; X < GridStationN - Stride; ++X)
             {
                 const int32 Index = Y * GridStationN + X;
-                const int32 UpstreamIndex = Index - 1;
-                const int32 DownstreamIndex = Index + 1;
-                const int32 RiverRightIndex = Index - GridStationN;
-                const int32 RiverLeftIndex = Index + GridStationN;
+                const int32 UpstreamIndex = Index - Stride;
+                const int32 DownstreamIndex = Index + Stride;
+                const int32 RiverRightIndex = Index - Stride * GridStationN;
+                const int32 RiverLeftIndex = Index + Stride * GridStationN;
                 if (WetVertexMask[Index] == 0 ||
                     WetVertexMask[UpstreamIndex] == 0 ||
                     WetVertexMask[DownstreamIndex] == 0 ||
@@ -1805,18 +1836,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
-    // Amplify only solver-resolved station curvature. Five samples span 12 m
-    // on the production 3 m render grid, large enough to describe a readable
-    // rapid crest/hole pair while remaining below the 4 m cooked-field scale.
+    // Amplify only solver-resolved station curvature. The five analysis
+    // samples retain their original 12 m span on the subdivided render grid,
+    // large enough to describe a readable rapid crest/hole pair without
+    // misclassifying the new short presentation bands as solver relief.
+    const int32 AnalysisNearStride = PresentationAnalysisStride;
+    const int32 AnalysisFarStride = 2 * PresentationAnalysisStride;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
-        for (int32 X = 2; X < GridStationN - 2; ++X)
+        for (int32 X = AnalysisFarStride;
+             X < GridStationN - AnalysisFarStride;
+             ++X)
         {
             const int32 Index = Y * GridStationN + X;
-            const int32 UpstreamFarIndex = Index - 2;
-            const int32 UpstreamNearIndex = Index - 1;
-            const int32 DownstreamNearIndex = Index + 1;
-            const int32 DownstreamFarIndex = Index + 2;
+            const int32 UpstreamFarIndex = Index - AnalysisFarStride;
+            const int32 UpstreamNearIndex = Index - AnalysisNearStride;
+            const int32 DownstreamNearIndex = Index + AnalysisNearStride;
+            const int32 DownstreamFarIndex = Index + AnalysisFarStride;
             if (WetVertexMask[Index] == 0 ||
                 WetVertexMask[UpstreamFarIndex] == 0 ||
                 WetVertexMask[UpstreamNearIndex] == 0 ||
@@ -1898,14 +1934,22 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const float SafeNormalZ = FMath::Max(SampleNormal.Z, 0.1f);
                 float BaseStationSlope = -SampleNormal.X / SafeNormalZ;
                 float BaseLateralSlope = -SampleNormal.Y / SafeNormalZ;
+                const int32 DerivativeStride = PresentationAnalysisStride;
+                const float DerivativeSpanMeters = FMath::Max(
+                    2.0f * DerivativeStride * ResolvedVertexSpacingMeters,
+                    KINDA_SMALL_NUMBER);
                 if (bLivePresentationSurfaceSmoothingEnabled &&
-                    X > 0 && X < GridStationN - 1 &&
-                    Y > 0 && Y < GridLateralN - 1)
+                    X >= DerivativeStride &&
+                    X < GridStationN - DerivativeStride &&
+                    Y >= DerivativeStride &&
+                    Y < GridLateralN - DerivativeStride)
                 {
-                    const int32 UpstreamIndex = Index - 1;
-                    const int32 DownstreamIndex = Index + 1;
-                    const int32 RiverRightIndex = Index - GridStationN;
-                    const int32 RiverLeftIndex = Index + GridStationN;
+                    const int32 UpstreamIndex = Index - DerivativeStride;
+                    const int32 DownstreamIndex = Index + DerivativeStride;
+                    const int32 RiverRightIndex =
+                        Index - DerivativeStride * GridStationN;
+                    const int32 RiverLeftIndex =
+                        Index + DerivativeStride * GridStationN;
                     if (WetVertexMask[UpstreamIndex] != 0 &&
                         WetVertexMask[DownstreamIndex] != 0 &&
                         WetVertexMask[RiverRightIndex] != 0 &&
@@ -1914,40 +1958,40 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         BaseStationSlope =
                             (PresentationSurfaceHeightMeters[DownstreamIndex] -
                                 PresentationSurfaceHeightMeters[UpstreamIndex]) /
-                            FMath::Max(
-                                2.0f * VertexSpacingMeters,
-                                KINDA_SMALL_NUMBER);
+                            DerivativeSpanMeters;
                         BaseLateralSlope =
                             (PresentationSurfaceHeightMeters[RiverLeftIndex] -
                                 PresentationSurfaceHeightMeters[RiverRightIndex]) /
-                            FMath::Max(
-                                2.0f * VertexSpacingMeters,
-                                KINDA_SMALL_NUMBER);
+                            DerivativeSpanMeters;
                     }
                 }
 
                 float ReliefStationSlope = 0.0f;
-                if (X > 0 && X < GridStationN - 1 &&
-                    WetVertexMask[Index - 1] != 0 &&
-                    WetVertexMask[Index + 1] != 0)
+                if (X >= DerivativeStride &&
+                    X < GridStationN - DerivativeStride &&
+                    WetVertexMask[Index - DerivativeStride] != 0 &&
+                    WetVertexMask[Index + DerivativeStride] != 0)
                 {
                     ReliefStationSlope =
-                        (HydraulicReliefMeters[Index + 1] -
-                            HydraulicReliefMeters[Index - 1]) /
-                        FMath::Max(2.0f * VertexSpacingMeters, KINDA_SMALL_NUMBER);
+                        (HydraulicReliefMeters[Index + DerivativeStride] -
+                            HydraulicReliefMeters[Index - DerivativeStride]) /
+                        DerivativeSpanMeters;
                 }
                 float ReliefLateralSlope = 0.0f;
-                if (Y > 0 && Y < GridLateralN - 1)
+                if (Y >= DerivativeStride &&
+                    Y < GridLateralN - DerivativeStride)
                 {
-                    const int32 RiverRightIndex = Index - GridStationN;
-                    const int32 RiverLeftIndex = Index + GridStationN;
+                    const int32 RiverRightIndex =
+                        Index - DerivativeStride * GridStationN;
+                    const int32 RiverLeftIndex =
+                        Index + DerivativeStride * GridStationN;
                     if (WetVertexMask[RiverRightIndex] != 0 &&
                         WetVertexMask[RiverLeftIndex] != 0)
                     {
                         ReliefLateralSlope =
                             (HydraulicReliefMeters[RiverLeftIndex] -
                                 HydraulicReliefMeters[RiverRightIndex]) /
-                            FMath::Max(2.0f * VertexSpacingMeters, KINDA_SMALL_NUMBER);
+                            DerivativeSpanMeters;
                     }
                 }
                 const FVector PresentationLocalNormal = FVector(
@@ -2007,7 +2051,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     ? ComputeStationEdgeCoverage(
                         X,
                         GridStationN,
-                        VertexSpacingMeters,
+                        ResolvedVertexSpacingMeters,
                         CurvedGridEdgeBlendMeters)
                     : 0.0f);
         }
@@ -2027,10 +2071,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     FVector2D StrongestEdgeRejectedRiverCoordinates = FVector2D::ZeroVector;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
-        for (int32 X = 1; X < GridStationN; ++X)
+        for (int32 X = PresentationAnalysisStride; X < GridStationN; ++X)
         {
             const int32 Index = Y * GridStationN + X;
-            const int32 ImmediateUpstreamIndex = Index - 1;
+            const int32 ImmediateUpstreamIndex =
+                Index - PresentationAnalysisStride;
             if (WetVertexMask[Index] == 0 ||
                 WetVertexMask[ImmediateUpstreamIndex] == 0)
             {
@@ -2045,13 +2090,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             float UpstreamFroude = FroudeField[UpstreamIndex];
             // Cooked river fields and the presentation surface do not need to
             // share a vertex phase. Accept the same solver-owned jump across
-            // at most two three-metre presentation edges, so a five-metre
+            // at most two three-metre analysis edges, so a five-metre
             // hydraulic control cannot fall between samples and disappear.
             // This remains a strict local Froude transition; no marker, tag,
             // or art cue can create a breaking site by itself.
-            if (UpstreamFroude < 1.12f && X >= 2)
+            if (UpstreamFroude < 1.12f &&
+                X >= 2 * PresentationAnalysisStride)
             {
-                const int32 FarUpstreamIndex = Index - 2;
+                const int32 FarUpstreamIndex =
+                    Index - 2 * PresentationAnalysisStride;
                 if (WetVertexMask[FarUpstreamIndex] != 0 &&
                     FroudeField[FarUpstreamIndex] > UpstreamFroude)
                 {
@@ -2072,46 +2119,48 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 continue;
             }
 
+            const int32 UpstreamStationIndex =
+                X - (Index - UpstreamIndex);
             const float UpstreamStationCoverage = ComputeStationEdgeCoverage(
-                X - 1,
+                UpstreamStationIndex,
                 GridStationN,
-                VertexSpacingMeters,
+                ResolvedVertexSpacingMeters,
                 CurvedGridEdgeBlendMeters);
             const float LocalStationCoverage = ComputeStationEdgeCoverage(
                 X,
                 GridStationN,
-                VertexSpacingMeters,
+                ResolvedVertexSpacingMeters,
                 CurvedGridEdgeBlendMeters);
             const float UpstreamLateralCoverage = ComputeLateralWetCoverage(
                 Y,
-                MinimumWetLateralIndex[X - 1],
-                MaximumWetLateralIndex[X - 1],
-                VertexSpacingMeters,
+                MinimumWetLateralIndex[UpstreamStationIndex],
+                MaximumWetLateralIndex[UpstreamStationIndex],
+                ResolvedVertexSpacingMeters,
                 CurvedGridLateralEdgeBlendMeters);
             const float LocalLateralCoverage = ComputeLateralWetCoverage(
                 Y,
                 MinimumWetLateralIndex[X],
                 MaximumWetLateralIndex[X],
-                VertexSpacingMeters,
+                ResolvedVertexSpacingMeters,
                 CurvedGridLateralEdgeBlendMeters);
             const float PresentationCoverage = FMath::Min(
                 UpstreamStationCoverage * UpstreamLateralCoverage,
                 LocalStationCoverage * LocalLateralCoverage);
             const float PresentationEdgeClearanceMeters = FMath::Min(
                 ComputePresentationSurfaceEdgeClearanceMeters(
-                    X - 1,
+                    UpstreamStationIndex,
                     GridStationN,
                     Y,
-                    MinimumWetLateralIndex[X - 1],
-                    MaximumWetLateralIndex[X - 1],
-                    VertexSpacingMeters),
+                    MinimumWetLateralIndex[UpstreamStationIndex],
+                    MaximumWetLateralIndex[UpstreamStationIndex],
+                    ResolvedVertexSpacingMeters),
                 ComputePresentationSurfaceEdgeClearanceMeters(
                     X,
                     GridStationN,
                     Y,
                     MinimumWetLateralIndex[X],
                     MaximumWetLateralIndex[X],
-                    VertexSpacingMeters));
+                    ResolvedVertexSpacingMeters));
             // The base live-water surface deliberately fades at both its
             // moving-grid ends and sampled banks. Never bend that fading mesh
             // or attach a fully visible overhanging sheet to it: doing so
@@ -2153,15 +2202,22 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // decaying crests/troughs (bounded by the crest lift) give the
             // rapid readable hydraulic volume instead of a flat run-out, and
             // each surviving crest keeps generating a little foam.
-            for (int32 Tail = 1; Tail <= 6; ++Tail)
+            const int32 TailStepCount = FMath::Max(
+                1,
+                FMath::RoundToInt(18.0f / ResolvedVertexSpacingMeters));
+            for (int32 TailStep = 1; TailStep <= TailStepCount; ++TailStep)
             {
-                const int32 TailIndex = Index + Tail;
-                if (X + Tail >= GridStationN || WetVertexMask[TailIndex] == 0)
+                const int32 TailIndex = Index + TailStep;
+                if (X + TailStep >= GridStationN ||
+                    WetVertexMask[TailIndex] == 0)
                 {
                     break;
                 }
-                const float Decay = FMath::Exp(-0.42f * Tail);
-                const float Phase = FMath::Cos(2.05f * Tail);
+                const float TailDistanceMeters =
+                    TailStep * ResolvedVertexSpacingMeters;
+                const float Decay = FMath::Exp(-0.14f * TailDistanceMeters);
+                const float Phase = FMath::Cos(
+                    (2.05f / 3.0f) * TailDistanceMeters);
                 Vertices[TailIndex].Z += 0.62f * LiftCm * Decay * Phase;
                 SourceFoam[TailIndex] = FMath::Max(
                     SourceFoam[TailIndex],
@@ -2296,9 +2352,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const FVector2D BackPosition =
                     FieldPosition - FieldVelocity * FoamDeltaSeconds;
                 const float FractionalX =
-                    (BackPosition.X - FoamFieldOriginM.X) / VertexSpacingMeters;
+                    (BackPosition.X - FoamFieldOriginM.X) /
+                    ResolvedVertexSpacingMeters;
                 const float FractionalY =
-                    (BackPosition.Y - FoamFieldOriginM.Y) / VertexSpacingMeters;
+                    (BackPosition.Y - FoamFieldOriginM.Y) /
+                    ResolvedVertexSpacingMeters;
                 const int32 CellX = FMath::FloorToInt(FractionalX);
                 const int32 CellY = FMath::FloorToInt(FractionalY);
                 if (CellX >= 0 && CellX < GridStationN - 1 &&
@@ -2381,13 +2439,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const float StationCoverage = ComputeStationEdgeCoverage(
                     X,
                     GridStationN,
-                    VertexSpacingMeters,
+                    ResolvedVertexSpacingMeters,
                     CurvedGridEdgeBlendMeters);
                 const float LateralCoverage = ComputeLateralWetCoverage(
                     Y,
                     MinimumWetLateralIndex[X],
                     MaximumWetLateralIndex[X],
-                    VertexSpacingMeters,
+                    ResolvedVertexSpacingMeters,
                     CurvedGridLateralEdgeBlendMeters);
                 VertexColors[Index].A = StationCoverage * LateralCoverage;
             }
@@ -2421,12 +2479,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     ComputeStationEdgeCoverage(
                         X,
                         GridStationN,
-                        VertexSpacingMeters,
+                        ResolvedVertexSpacingMeters,
                         CurvedGridEdgeBlendMeters),
                     ComputeStationEdgeCoverage(
                         X + 1,
                         GridStationN,
-                        VertexSpacingMeters,
+                        ResolvedVertexSpacingMeters,
                         CurvedGridEdgeBlendMeters));
                 if (!bFullyWetCell ||
                     MinimumCellStationCoverage <
@@ -2536,12 +2594,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
     SurfaceMesh->UpdateMeshSection_LinearColor(
         0, Vertices, Normals, UVs, VertexColors, Tangents);
+    const double RefreshCpuMilliseconds =
+        (FPlatformTime::Seconds() - RefreshStartSeconds) * 1000.0;
     if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)
     {
         bLoggedPresentationDiagnostics = true;
         UE_LOG(
             LogTemp, Display,
-            TEXT("RaftSim live water presentation: material=%s wet_vertices=%d "
+            TEXT("RaftSim live water presentation: material=%s "
+                 "surface_vertices=%d surface_triangles=%d "
+                 "render_spacing_m=%.2f analysis_stride=%d refresh_cpu_ms=%.3f "
+                 "wet_vertices=%d "
                  "foam_mean=%.4f foam_max=%.4f depth_mean=%.4f speed_mean=%.4f "
                  "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f "
                  "volume_core_enabled=%d volume_core_triangles=%d "
@@ -2552,6 +2615,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SurfaceMesh->GetMaterial(0)
                 ? *SurfaceMesh->GetMaterial(0)->GetPathName()
                 : TEXT("none"),
+            Vertices.Num(),
+            Triangles.Num() / 3,
+            ResolvedVertexSpacingMeters,
+            PresentationAnalysisStride,
+            RefreshCpuMilliseconds,
             WetVertexCount,
             FoamSum / WetVertexCount,
             MaximumFoam,

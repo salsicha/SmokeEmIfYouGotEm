@@ -159,10 +159,27 @@ bool FRaftSimAssertRiverMapCommand::Update()
     const bool bUsesSolverOwnedVisibleRiver =
         bZambeziReferenceRun || bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
+    const bool bUsesLegacyStraightRiverCoordinates =
+        World->GetMapName().Contains(TEXT("L_Troublemaker"));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {
         ++LiveSurfaceActorCount;
+        Test->TestTrue(
+            TEXT("runnable river uses the refined authored-river presentation grid"),
+            It->IsRiverPresentationGridRefined());
+        Test->TestTrue(
+            TEXT("runnable river presentation vertices use 1.5 m spacing"),
+            FMath::IsNearlyEqual(
+                It->GetPresentationVertexSpacingMeters(), 1.5f, 0.001f));
+        Test->TestEqual(
+            TEXT("runnable river presentation window has the refined vertex count"),
+            It->GetSurfaceVertexCount(),
+            bUsesLegacyStraightRiverCoordinates ? 17956 : 10465);
+        Test->TestEqual(
+            TEXT("runnable river presentation window has the refined triangle count"),
+            It->GetSurfaceTriangleCount(),
+            bUsesLegacyStraightRiverCoordinates ? 35378 : 20480);
         Test->TestEqual(
             TEXT("live surface carrier follows the saved river ownership contract"),
             It->IsLiveSurfaceCarrierEnabled(),

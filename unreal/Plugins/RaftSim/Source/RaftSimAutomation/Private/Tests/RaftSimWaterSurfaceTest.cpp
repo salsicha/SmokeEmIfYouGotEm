@@ -56,6 +56,13 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         Test->AddError(TEXT("No water surface actor spawned with the raft"));
         return true;
     }
+    Test->TestFalse(
+        TEXT("straight dev tank retains the base presentation grid"),
+        Surface->IsRiverPresentationGridRefined());
+    Test->TestTrue(
+        TEXT("straight dev tank retains three-metre presentation spacing"),
+        FMath::IsNearlyEqual(
+            Surface->GetPresentationVertexSpacingMeters(), 3.0f, 0.001f));
 
     UMaterialParameterCollection* FoamOcclusionCollection =
         LoadObject<UMaterialParameterCollection>(
@@ -271,9 +278,18 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         SecondRapidWaveM);
     Test->TestTrue(
         FString::Printf(
-            TEXT("rapid standing wave remains inside its 26.8 cm authored bound (%.3f m)"),
+            TEXT("four-band rapid relief stays inside its 24.8 cm bound (%.3f m)"),
             FirstRapidWaveM),
-        FMath::Abs(FirstRapidWaveM) <= 0.2681f);
+        FMath::Abs(FirstRapidWaveM) <= 0.2481f);
+
+    const float RefinedRapidWaveM =
+        ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
+            RapidCoordinateM + FVector2D(1.5f, 0.0f), 1.778f, 0.412f);
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("refined grid resolves short river-coordinate rapid relief (delta %.4f m)"),
+            FMath::Abs(RefinedRapidWaveM - FirstRapidWaveM)),
+        FMath::Abs(RefinedRapidWaveM - FirstRapidWaveM) > 0.01f);
 
     const float CalmRippleM =
         ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMeters(
