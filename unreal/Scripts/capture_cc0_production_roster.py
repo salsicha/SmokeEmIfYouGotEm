@@ -214,6 +214,12 @@ def main() -> None:
             head_shoulder_clearance_cm = (
                 visual_actor.get_presented_head_shoulder_clearance_cm()
             )
+            clavicle_root_span_cm = (
+                visual_actor.get_presented_clavicle_root_span_cm()
+            )
+            shoulder_anchor_error_cm = (
+                visual_actor.get_maximum_presented_shoulder_anchor_error_cm()
+            )
             if (
                 not actor.is_using_production_visual()
                 or not actor.has_exclusive_cc0_body_ownership()
@@ -227,6 +233,7 @@ def main() -> None:
                 or not visual_actor.is_body_ready()
                 or not visual_actor.has_finite_pose()
                 or head_shoulder_clearance_cm < 19.5
+                or not visual_actor.has_anatomical_shoulder_transition()
             ):
                 raise RuntimeError(
                     f"Incomplete exclusive CC0 presentation: {character_name}"
@@ -418,6 +425,12 @@ def main() -> None:
                     "runtime_presented_head_shoulder_clearance_cm": (
                         head_shoulder_clearance_cm
                     ),
+                    "runtime_presented_clavicle_root_span_cm": (
+                        clavicle_root_span_cm
+                    ),
+                    "runtime_maximum_presented_shoulder_anchor_error_cm": (
+                        shoulder_anchor_error_cm
+                    ),
                     "runtime_production_pfd": (
                         actor.has_production_whitewater_pfd()
                     ),
@@ -462,6 +475,16 @@ def main() -> None:
         )
         report["minimum_presented_head_shoulder_clearance_cm"] = min(
             character["runtime_presented_head_shoulder_clearance_cm"]
+            for character in report["characters"]
+        )
+        report["minimum_presented_clavicle_root_span_cm"] = min(
+            character["runtime_presented_clavicle_root_span_cm"]
+            for character in report["characters"]
+        )
+        report["maximum_presented_shoulder_anchor_error_cm"] = max(
+            character[
+                "runtime_maximum_presented_shoulder_anchor_error_cm"
+            ]
             for character in report["characters"]
         )
         report["minimum_paddle_thumb_closure_degrees"] = min(

@@ -4505,3 +4505,14 @@ path is verified, and the completion goal can be marked complete.
   D3, or D4 authority changed. The horizontal footprint mask is not a general
   character-depth solution; water/VFX art, performance, and all seven external
   approvals remain open.
+- CC0 clavicle-span V1 removes the fallback rig's collapsed inner-shoulder root without
+  changing its complete body mesh or any gameplay anchor. Each imported clavicle now begins
+  at 32 percent of the solved shoulder half-span instead of placing both roots on one
+  upper-spine point; the outer upper arms remain within `4.6645e-9` cm of the authoritative
+  shoulders. All five identities report the same bounded 10.88 cm inner span, retain their
+  existing head clearance and paddle grips, and render 30 fixed views. The editor build,
+  renderer-backed M5 1/1, and all six P4 runnable-map gates pass. A duplicate procedural
+  torso/sleeve cover was visually rejected and removed. Matched pixels show only a modest
+  local change, while the coarse wetsuit neckline, cloth skinning/deformation, motion review,
+  photoreal character art, and all seven external approvals remain open in
+  `m9_cc0_clavicle_span_v1_review.json`.

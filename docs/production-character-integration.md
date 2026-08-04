@@ -170,6 +170,19 @@ hashes, and the still-open human gates are recorded in
 This is not a photoreal character approval: the broad angular collar/PFD envelope, final
 anatomy and materials, and named character-art and guide review remain open.
 
+The CC0 clavicle-span V1 follow-up corrects a smaller rig defect inside that still-open
+envelope. The adapter previously translated both imported clavicle roots to the same
+upper-spine point. It now retains 32 percent of each solved shoulder half-span at the inner
+clavicle while leaving both upper-arm joints on their authoritative pose anchors. All five
+captured identities report a 10.88 cm inner span, at most `4.6645e-9` cm shoulder-anchor
+error, and unchanged paddle and head clearance. A procedural torso/sleeve cover was visually
+rejected and is not present in runtime. Exact matched images, metrics, hashes, M5, and six-map
+P4 evidence are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json`.
+The correction is intentionally fail-closed: its pixel change is subtle, and production cloth
+skinning, neckline topology, tailoring, compression, motion review, and named approvals remain
+open.
+
 Official setup references:
 
 - <https://dev.epicgames.com/documentation/en-us/metahuman/getting-started-with-metahuman-creator>
