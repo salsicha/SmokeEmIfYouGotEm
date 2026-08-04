@@ -50,10 +50,11 @@
       "diagnostic_region": "columns 700-1239, rows 340-419; first blue-minus-red > 8 shoreline sample per column",
       "baseline_mean_edge_y_px": 377.97,
       "candidate_mean_edge_y_px": 374.13,
+      "absolute_mean_edge_shift_px": 3.84,
       "baseline_detrended_edge_std_px": 2.642,
       "candidate_detrended_edge_std_px": 3.083,
       "detrended_edge_std_increase_percent": 16.69,
-      "visual_verdict": "Retain. The transmitting body retreats by about four screen pixels on average and the formerly near-horizontal right-bank contact gains a continuous, low-amplitude inset/advance contour. No pale rail, exposed gap, detached water island, or water expansion beyond sampled wet topology appears."
+      "visual_verdict": "Retain. The segmented contact shifts by 3.84 screen pixels on average and the formerly near-horizontal right-bank contact gains a continuous, low-amplitude inset/advance contour. Screen-space Y is not treated as proof of retreat direction under perspective; the runtime operation itself is inward-only. No pale rail, exposed gap, detached water island, or water expansion beyond sampled wet topology appears."
     },
     "futaleufu_breaking_water_side": {
       "command": "RaftSim.CaptureAfter 8 <label> breaking_water_side",

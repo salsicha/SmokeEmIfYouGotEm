@@ -134,6 +134,7 @@ def test_review_records_improvement_without_claiming_futaleufu_visual_gain() -> 
         chilko["candidate_detrended_edge_std_px"]
         > chilko["baseline_detrended_edge_std_px"]
     )
+    assert chilko["absolute_mean_edge_shift_px"] == 3.84
     assert chilko["detrended_edge_std_increase_percent"] == 16.69
     assert "does not support a claim of material Futaleufu bank improvement" in (
         evidence["futaleufu_breaking_water_side"]["visual_verdict"]
