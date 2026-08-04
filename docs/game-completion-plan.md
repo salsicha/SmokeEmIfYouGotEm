@@ -4217,3 +4217,16 @@ path is verified, and the completion goal can be marked complete.
   broad analytical swell remains and no connected overturning rapid body is
   present. Measured hydraulics, final water/VFX art, target-platform
   performance, and all named external approvals remain open.
+- Connected plunge membrane V1 keeps one solver-shaped crest-to-plunge sheet
+  under the production Niagara composition at the three strongest accepted
+  breaking sites. It replaces the old 36,288-triangle three-shell fallback
+  with at most 1,512 non-colliding triangles, shows only the overturning half of
+  the circulation profile, and uses the existing masked foam lace with
+  raft/crew exclusion instead of a translucent volume. P2 passes 1/1 and the
+  complete six-map P4 suite passes; each active river reports the exact bounded
+  membrane count. Fixed-camera Zambezi evidence gains 12.78% edge coverage and
+  8.23% high-pass detail without the rejected dome, tent, gray-band, or card
+  artifacts. The close side view remains subtle and the base rapid is still an
+  analytical swell, so the milestone is retained only as technical progress;
+  measured hydraulics, a convincing aerated hole/recirculating body, final
+  water art, performance, and every named external approval remain open.

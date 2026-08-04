@@ -1,0 +1,141 @@
+{
+  "schema": "raftsim.environment.zambezi_connected_plunge_review.v1",
+  "reviewed_utc": "2026-08-04",
+  "status": "retained_bounded_technical_improvement_photoreal_and_external_acceptance_open",
+  "passed": false,
+  "decision": {
+    "technical_candidate_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_fidelity_promoted": false,
+    "all_six_river_maps_runnable": true,
+    "connected_production_water_contract_passed": true,
+    "matched_visual_review_completed": true,
+    "map_or_content_package_changed": false,
+    "cooked_water_or_hydraulic_authority_changed": false,
+    "collision_buoyancy_d3_or_d4_changed": false
+  },
+  "implementation": {
+    "solver_authority": "ARaftSimWaterSurfaceActor::GetBreakingSites",
+    "production_compositor": "ARaftSimWaterVfxActor::RefreshRapidAerosol",
+    "connected_component": "BreakingRollerVolumeMesh",
+    "production_behavior": "the connected solver-shaped membrane remains active while Niagara supplies detached aerosol and roller particles",
+    "topology": "one crest-to-plunge membrane per selected breaking site",
+    "selected_sites": "three strongest accepted interior solver sites",
+    "across_segments": 18,
+    "loop_segments": 14,
+    "triangles_per_site": 504,
+    "maximum_triangle_budget": 1512,
+    "visible_profile_fraction": [0.48, 1.0],
+    "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate",
+    "material_contract": "two-sided masked project-owned foam lace with raft and crew exclusion",
+    "collision": false,
+    "casts_shadow": false,
+    "affects_navigation": false,
+    "affects_water_sampling": false,
+    "affects_buoyancy_or_forces": false,
+    "affects_d3_d4_flip_wrap_pin_damage_rescue_or_progression": false
+  },
+  "rejected_iterations": [
+    {
+      "candidate": "production plus retained three-shell fallback",
+      "decision": "rejected and not retained",
+      "reason": "restored the documented broad translucent dome and repeated tent artifacts"
+    },
+    {
+      "candidate": "single full-loop translucent membrane",
+      "decision": "rejected and not retained",
+      "reason": "removed nested overdraw but still read as a smooth geometric mound"
+    },
+    {
+      "candidate": "crest-to-plunge translucent membrane",
+      "decision": "rejected and not retained",
+      "reason": "produced a gray shadow band and razor-thin translucent edge"
+    },
+    {
+      "candidate": "sparse masked plunge membrane",
+      "decision": "superseded",
+      "reason": "removed shell artifacts but left only isolated foam flecks before lace-density correction"
+    }
+  ],
+  "runtime_evidence": {
+    "unreal_editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "p2_water_surface_renders": "1/1 passed",
+    "p4_all_river_map_loads": {
+      "result": "6/6 passed",
+      "maps": {
+        "L_Hance": {"breaking_sites": 9, "connected_curtain_triangles": 1512},
+        "L_LavaCanyon": {"breaking_sites": 2, "connected_curtain_triangles": 1008},
+        "L_Terminator": {"breaking_sites": 21, "connected_curtain_triangles": 1512},
+        "L_Troublemaker": {"breaking_sites": 3, "connected_curtain_triangles": 1512},
+        "L_UpperHuacas": {"breaking_sites": 1, "connected_curtain_triangles": 504},
+        "L_Zambezi": {"breaking_sites": 10, "connected_curtain_triangles": 1512}
+      },
+      "known_environment_warning": "offline generate_204 timeout while loading Zambezi"
+    },
+    "focused_python_contracts": "3/3 passed"
+  },
+  "visual_evidence": {
+    "method": "Separate deterministic five-second 1280x720 Metal captures at scalability 2 use the same fixed camera and the same solver-selected side-camera preset. Metrics are descriptive and are not photoreal acceptance thresholds.",
+    "fixed_camera": {
+      "world_location_cm": [329839.27, -410612.4, 15666.84],
+      "pitch_degrees": -14.61,
+      "yaw_degrees": 166.95,
+      "baseline": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_before.png",
+        "sha256": "a825f928233164d833bfe13859b8ce4bf52a0a17c97b66fd4e0b52e4b986d3d7"
+      },
+      "retained": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1.png",
+        "sha256": "acc898296d94a9eab992be8fb265565508ebda6fdfdbe15c2d02ab3a7cdc1e9f"
+      },
+      "river_band_metrics": {
+        "baseline_bright_neutral_fraction": 0.068428,
+        "retained_bright_neutral_fraction": 0.074938,
+        "bright_neutral_gain_percentage_points": 0.651,
+        "baseline_edge_fraction_over_0_04": 0.138219,
+        "retained_edge_fraction_over_0_04": 0.155878,
+        "edge_fraction_gain_fraction": 0.12776,
+        "baseline_highpass_absolute_mean": 0.009381,
+        "retained_highpass_absolute_mean": 0.010153,
+        "highpass_gain_fraction": 0.08229
+      }
+    },
+    "solver_side_camera": {
+      "baseline": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_side_v1_before.png",
+        "sha256": "8c79d79920503866b019f80701e7505aa13ad2aef2279f9cf8f3b1ffcfac73eb"
+      },
+      "retained": {
+        "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_side_v1.png",
+        "sha256": "4938469664df88ac01070d7de677a848efca227c2ec397309e7cc8a07df8732c"
+      },
+      "finding": "The masked membrane does not introduce a translucent dome, card, gray band, or repeated tent in the close view, but its added volume is subtle from this angle."
+    },
+    "finding": "The retained membrane gives the primary approach crest a denser, connected foam-lace structure without reviving the rejected shell artifacts. It remains too subtle and too dependent on the analytical base swell to qualify as a photoreal overturning hydraulic."
+  },
+  "changed_source_hashes": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "11e8e508a7c9f528ef0426932ff2e106f4c2f7c87f475c598da3ca554abe91f4",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "577190bdbfc4b2aadb81300994c66f9d63569898ae4b6c2ea13445deb93989db",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "0c3e6db6a9bf30588147c8c5acde839a7cf5ee0dc6aea5dac1e4fc1e47e31532",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "058158311ca41bc2795c4560f83e8e5f1354eb4f4c696153629cf09a2c4e5b52",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp": "4501b0bdd250d895256fe8864eaf34233c8a769333ba88f29de5bf0a022050ca",
+    "physics/tests/test_editor_source_layout.py": "154d4d88bdfcf15b1bb33cf9e79c31d76053af4220ff3c49b1b9bd4ad950d5a7"
+  },
+  "remaining_photoreal_defects": [
+    "The strongest rapid still reads primarily as a broad analytical swell rather than a fully resolved overturning hydraulic.",
+    "The masked plunge face is subtle in close side view and does not yet provide a convincing aerated hole or recirculating entrained-air volume.",
+    "Niagara still reads as sprite breakup instead of collision-aware spray and mist tied to a high-resolution free-surface simulation.",
+    "The source hydraulics remain procedural reference data rather than measured seasonal Zambezi behavior.",
+    "Terrain, waterline, ecology, raft, equipment, character animation, and final occlusion remain below the lifelike target.",
+    "A target-hardware GPU profile and named art review have not accepted the combined surface, masked curtain, and Niagara composition."
+  ],
+  "required_external_acceptance_gates": [
+    "local Zambezi guide approval of rapid stations, lines, portages, access, hazards, rescue routes, and seasonal behavior",
+    "geospatial approval of centerline, horizontal and vertical datums, high-resolution terrain, bank breaklines, rapid rocks, and bathymetry",
+    "rights and distribution approval for the supplied map PDF, height image, reference imagery, and production derivatives",
+    "seasonal-flow and rapid-specific hydraulic validation against observed Zambezi behavior",
+    "southern African gorge geology, ecology, and environment-art approval",
+    "named photoreal water-VFX, raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ]
+}

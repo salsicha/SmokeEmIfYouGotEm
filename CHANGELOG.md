@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Kept one connected, masked crest-to-plunge water membrane active beneath
+  production Niagara at the three strongest accepted solver jumps. This
+  replaces the production-path choice between disconnected particle spray and
+  the rejected three-shell translucent dome, caps the mesh at 1,512
+  non-colliding triangles, and reuses the raft/crew-excluded solver foam lace.
+  The editor build, focused water test, and all six runnable river gates pass.
+  Fixed-camera Zambezi edge coverage rises 12.78% and high-pass detail 8.23%
+  without dome/card artifacts, but the subtle analytical result still fails
+  photoreal water and external acceptance.
 - Refined the render-only live-water mesh on all six authored river maps from
   3 m to 1.5 m spacing while retaining 3 m physical neighbourhoods for
   smoothing, hydraulic-relief detection, derivatives, and breaking-site

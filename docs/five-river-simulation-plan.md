@@ -634,3 +634,24 @@ and external acceptance gates pass.
   aerated plunge, and recirculating body, so photoreal and production promotion
   remain failed. The evidence and all seven external gates are hash-locked in
   `zambezi_refined_live_surface_v1_review.json`.
+
+### 2026-08-03 — Connected solver plunge membrane retained
+
+- Production Niagara no longer suppresses every connected rapid-water surface.
+  The three strongest accepted breaking sites retain one crest-to-plunge
+  membrane each while the bounded particle pools provide detached aerosol and
+  roller breakup.
+- The former three nested translucent shells were explicitly re-tested and
+  rejected because they restore dome and repeated tent artifacts. The retained
+  topology removes the downstream back of that loop, uses one masked
+  project-owned foam-lace sheet with raft/crew exclusion, and is bounded to
+  1,512 non-colliding triangles. Sampling, cooked fields, wet/dry state,
+  collision, navigation, buoyancy, D3, D4, scoring, and progression are
+  unchanged.
+- The editor build and P2 pass; P4 passes all six runnable rivers with exact
+  connected-sheet counts from 504 to 1,512 triangles. Matched fixed-camera
+  Zambezi evidence increases edge coverage 12.78% and high-pass detail 8.23%
+  without the rejected shell artifacts. The solver-side change is subtle and
+  the rapid still lacks a convincing aerated hole and recirculating body, so
+  photoreal promotion and all named external gates remain open in
+  `zambezi_connected_plunge_v1_review.json`.

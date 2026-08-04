@@ -184,6 +184,20 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("live surface carrier follows the saved river ownership contract"),
             It->IsLiveSurfaceCarrierEnabled(),
             bUsesSolverOwnedVisibleRiver);
+        TArray<ARaftSimWaterSurfaceActor::FBreakingSite> PresentationBreakingSites;
+        It->GetBreakingSites(PresentationBreakingSites);
+        if (!PresentationBreakingSites.IsEmpty())
+        {
+            const int32 ExpectedConnectedCurtainTriangles =
+                FMath::Min(PresentationBreakingSites.Num(), 3) * 504;
+            Test->TestTrue(
+                TEXT("solver breaking sites retain a connected production water curtain"),
+                It->IsBreakingRollerVolumeVisible());
+            Test->TestEqual(
+                TEXT("connected curtain uses one bounded membrane at the three strongest sites"),
+                It->GetBreakingRollerVolumeTriangleCount(),
+                ExpectedConnectedCurtainTriangles);
+        }
         if (bUsesSolverOwnedVisibleRiver)
         {
             if (bZambeziReferenceRun || bPacuareReferenceRun ||

@@ -209,6 +209,7 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     }
     UProceduralMeshComponent* RapidFoamMesh = nullptr;
     UProceduralMeshComponent* LiveVolumeCoreMesh = nullptr;
+    UProceduralMeshComponent* BreakingRollerVolumeMesh = nullptr;
     TArray<UProceduralMeshComponent*> ProceduralMeshes;
     Surface->GetComponents<UProceduralMeshComponent>(ProceduralMeshes);
     for (UProceduralMeshComponent* Candidate : ProceduralMeshes)
@@ -220,6 +221,10 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         if (Candidate && Candidate->GetFName() == TEXT("LiveVolumeCoreMesh"))
         {
             LiveVolumeCoreMesh = Candidate;
+        }
+        if (Candidate && Candidate->GetFName() == TEXT("BreakingRollerVolumeMesh"))
+        {
+            BreakingRollerVolumeMesh = Candidate;
         }
     }
     Test->TestNotNull(
@@ -264,6 +269,23 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
                 RapidFoamMesh->GetMaterial(0)->GetPathName().Contains(
                     TEXT("M_RaftSim_SolverFieldFoamCandidate")) &&
                 RapidFoamMesh->GetMaterial(0)->GetBlendMode() == BLEND_Masked);
+    }
+    Test->TestNotNull(
+        TEXT("surface exposes a separate connected breaking-water curtain"),
+        BreakingRollerVolumeMesh);
+    if (BreakingRollerVolumeMesh)
+    {
+        Test->TestEqual(
+            TEXT("connected breaking-water curtain remains non-colliding"),
+            BreakingRollerVolumeMesh->GetCollisionEnabled(),
+            ECollisionEnabled::NoCollision);
+        Test->TestTrue(
+            TEXT("connected breaking-water curtain uses masked aerated foam lace"),
+            BreakingRollerVolumeMesh->GetMaterial(0) &&
+                BreakingRollerVolumeMesh->GetMaterial(0)->GetPathName().Contains(
+                    TEXT("M_RaftSim_SolverFieldFoamCandidate")) &&
+                BreakingRollerVolumeMesh->GetMaterial(0)->GetBlendMode() ==
+                    BLEND_Masked);
     }
     const FVector2D RapidCoordinateM(960.0f, 0.0f);
     const float FirstRapidWaveM =
@@ -488,8 +510,8 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         TEXT("breaking lip population stays inside the 24-site triangle budget"),
         Surface->GetBreakingLipTriangleCount() <= 12288);
     Test->TestTrue(
-        TEXT("breaking roller fallback stays inside its 24-site triangle budget"),
-        Surface->GetBreakingRollerVolumeTriangleCount() <= 36288);
+        TEXT("connected breaking curtain stays inside its three-site triangle budget"),
+        Surface->GetBreakingRollerVolumeTriangleCount() <= 1512);
     return true;
 }
 

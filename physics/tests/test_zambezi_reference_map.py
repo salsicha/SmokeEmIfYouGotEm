@@ -45,6 +45,10 @@ REFINED_LIVE_SURFACE_V1_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_refined_live_surface_v1_review.json"
 )
+CONNECTED_PLUNGE_V1_REVIEW = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_connected_plunge_v1_review.json"
+)
 
 
 def _load(path: Path) -> dict:
@@ -235,6 +239,53 @@ def test_zambezi_refined_live_surface_review_is_hash_locked_and_honest():
     assert len(review["required_external_acceptance_gates"]) == 7
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert REFINED_LIVE_SURFACE_V1_REVIEW.as_posix() in readme
+
+
+def test_zambezi_connected_plunge_review_is_hash_locked_and_honest():
+    review = _load(REPO_ROOT / CONNECTED_PLUNGE_V1_REVIEW)
+    assert review["schema"] == (
+        "raftsim.environment.zambezi_connected_plunge_review.v1"
+    )
+    assert review["passed"] is False
+    assert review["decision"]["technical_candidate_retained"] is True
+    assert review["decision"]["all_six_river_maps_runnable"] is True
+    assert review["decision"]["connected_production_water_contract_passed"] is True
+    assert review["decision"]["photoreal_acceptance_passed"] is False
+    assert review["decision"]["map_or_content_package_changed"] is False
+    assert review["decision"]["collision_buoyancy_d3_or_d4_changed"] is False
+    assert review["implementation"]["selected_sites"] == (
+        "three strongest accepted interior solver sites"
+    )
+    assert review["implementation"]["maximum_triangle_budget"] == 1512
+    assert review["implementation"]["collision"] is False
+    assert review["implementation"]["affects_water_sampling"] is False
+    assert review["runtime_evidence"]["p4_all_river_map_loads"]["result"] == (
+        "6/6 passed"
+    )
+    maps = review["runtime_evidence"]["p4_all_river_map_loads"]["maps"]
+    assert len(maps) == 6
+    assert all(
+        0 < evidence["connected_curtain_triangles"] <= 1512
+        for evidence in maps.values()
+    )
+    metrics = review["visual_evidence"]["fixed_camera"]["river_band_metrics"]
+    assert metrics["retained_edge_fraction_over_0_04"] > (
+        metrics["baseline_edge_fraction_over_0_04"]
+    )
+    assert metrics["retained_highpass_absolute_mean"] > (
+        metrics["baseline_highpass_absolute_mean"]
+    )
+    for camera in ("fixed_camera", "solver_side_camera"):
+        for key in ("baseline", "retained"):
+            artifact = review["visual_evidence"][camera][key]
+            assert _sha256(REPO_ROOT / artifact["path"]) == artifact["sha256"]
+    for relative, expected in review["changed_source_hashes"].items():
+        assert _sha256(REPO_ROOT / relative) == expected
+    assert len(review["rejected_iterations"]) == 4
+    assert len(review["remaining_photoreal_defects"]) >= 5
+    assert len(review["required_external_acceptance_gates"]) == 7
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    assert CONNECTED_PLUNGE_V1_REVIEW.as_posix() in readme
 
 
 def test_supplied_reference_sources_and_digitized_rapid_order_are_locked():
