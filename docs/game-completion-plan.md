@@ -20,13 +20,13 @@ and do not delay a complete South Fork 1.0.
 **Runnable-portfolio checkpoint, August 4:** all six rivers are selectable Free
 Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
-package. Its rebuilt native catalog and progression gates, 26 focused Python
+package. Its rebuilt native catalog and progression gates, 27 focused Python
 contracts, focused Zambezi PIE gate, and six isolated runnable-map PIE gates
 pass at the current release head; this confirms runnable-reference status only and does not close
 its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
 The selection and progression manifests now also mark it `runnable: true` with
 `availability: free_run`. See
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v14_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json`.
 
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt
@@ -47,6 +47,16 @@ eye frame breaks up the skyline row and adds irregular mid-slope canopy, but the
 30 m source still leaves the left wall smooth and bare. This is a retained
 technical ecology improvement, not photoreal promotion; see
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_review.json`.
+
+**Zambezi near-field terrain V2 checkpoint, August 4:** the runnable map now
+uses two irregular 2.5 m source-conditioned bank meshes with fail-closed
+winding/area checks and bounded multi-scale geomorphic relief. The retained
+map has 169,222 adaptive vertices, 246,490 triangles, 0.263 m² minimum accepted
+triangle area, 0.33 m minimum dry clearance, and 0.98 m maximum observed added
+relief. The schema-v22 saved-map audit and focused live PIE map-load gate pass.
+Matched evidence removes the former long black bank seams but still exposes a
+rounded 30 m canyon, sparse/repeated cover, and flat-looking water; M9,
+photoreal promotion, target performance, and all external gates remain open.
 
 Where authoritative terrain, bathymetry, bank, or hazard geometry is unavailable, the
 project will generate deterministic, physically plausible infill. Generated infill must

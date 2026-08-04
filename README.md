@@ -14,11 +14,11 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
-The August 4 V20 release-head certification confirms again that the frontend
+The August 4 V15 release-head certification confirms again that the frontend
 selector, source scenario, shipping cook, saved map, and live PIE launch all
 resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads
 with the vertical-slice game mode and live cooked-field water, and is not an
-environment-preview-only map. The focused career and progression gates, all 26
+environment-preview-only map. The focused career and progression gates, all 27
 Zambezi registry/source contracts, and all six runnable maps pass on the
 current release head. Its gameplay river is now a
 solver-owned, wet-cell-clipped transmitting core rather than the former opaque
@@ -28,7 +28,7 @@ while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
 still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v14_review.json),
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v15_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The current Batoka V18 presentation pass keeps V17's source-missing upper-scarp
@@ -53,6 +53,15 @@ The matched frame is a technical improvement only: the coarse left wall remains
 largely bare, so photoreal promotion is still false. Counts, rejected candidates,
 hashes, and exact before/after frames are in the
 [V19 stratified-ecology review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19_review.json).
+The current near-field terrain V2 pass replaces the former regular 5 m bank
+grid with a deterministic irregular 2.5 m grid, rejects inverted or sub-0.25 m²
+curved-offset cells, and adds bounded domain-warped basalt erosion, fracture,
+talus, and joint relief. The regenerated runnable map retains 169,222 adaptive
+vertices and 246,490 triangles; its matched guide-eye frame removes the former
+long black overlap seams and keeps a continuous dry shoreline. This is bounded
+technical progress, not photoreal acceptance: the 30 m canyon silhouette,
+sparse/repeated cover, flat-looking water, final geology/ecology, and all
+external acceptance gates remain open in the current release-head review.
 The live rapid presentation now uses six of its eight preallocated Niagara
 site pairs around the camera instead of the former two-site ceiling. Zambezi's
 PIE gate requires all six aerosol and roller pairs to be active from its eight

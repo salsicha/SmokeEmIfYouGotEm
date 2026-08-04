@@ -20,7 +20,7 @@ def main() -> None:
     report_path = repo_root / REPORT_RELATIVE
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report: dict[str, object] = {
-        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v21",
+        "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v22",
         "map_package": MAP_PACKAGE,
         "passed": False,
     }
@@ -121,7 +121,7 @@ def main() -> None:
         adaptive_near_field_terrain_actors = [
             actor
             for actor in actors
-            if "RaftSimZambeziAdaptiveNearFieldTerrainV1"
+            if "RaftSimZambeziAdaptiveNearFieldTerrainV2"
             in {str(tag) for tag in actor.tags}
         ]
         adaptive_near_field_terrain_rows = []
@@ -434,12 +434,22 @@ def main() -> None:
                             "procedural_dry_shoreline_and_basalt_erosion_infill"
                         ),
                         "station_window_m": [0.0, 1000.0],
-                        "grid_spacing_m": 5.0,
+                        "grid_spacing_m": 2.5,
+                        "topology_contract": (
+                            "v2_deterministic_irregular_planar_grid_with_"
+                            "subquarter_cell_jitter_and_positive_triangle_area"
+                        ),
+                        "maximum_planar_jitter_m": 0.70,
+                        "minimum_planar_triangle_area_m2": 0.25,
                         "maximum_lateral_extent_m": 600.0,
                         "active_water_half_width_m": 72.0,
                         "inner_dry_bank_buffer_m": 3.0,
                         "maximum_dry_shoreline_infill_m": 1.8,
-                        "maximum_procedural_refinement_m": 0.96,
+                        "maximum_procedural_refinement_m": 1.35,
+                        "geomorphic_relief_contract": (
+                            "v2_domain_warped_broad_erosion_local_basalt_"
+                            "fracture_fine_talus_and_paired_joint_cut"
+                        ),
                         "minimum_rendered_dry_clearance_m": 0.295,
                         "wet_bank_contract": (
                             "conditioned_profile_vertex_red_render_only_"
@@ -771,6 +781,8 @@ def main() -> None:
                 and "RaftSimConditionedWaterlineWetBankV1" in row["tags"]
                 and "RaftSimVertexRedWetBankMask" in row["tags"]
                 and "RaftSimProceduralWetBankNoMeasuredAuthority" in row["tags"]
+                and "RaftSimIrregularPlanarTopologyV2" in row["tags"]
+                and "RaftSimDomainWarpedGeomorphicReliefV2" in row["tags"]
                 for row in adaptive_near_field_terrain_rows
             )
             and all(
