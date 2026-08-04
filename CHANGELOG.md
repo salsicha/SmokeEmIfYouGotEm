@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Unified the runnable Futaleufú Terminator and Chilko Lava Canyon maps under a
+  restrained cold-water highlight profile, regenerated both stable packages,
+  and corrected Futaleufú's shallow/deep/sky tint after rejecting a gray first
+  bracket. Matched Terminator evidence reduces >0.95 clipped coverage 98.20%
+  while increasing cold blue separation 29.79%; matched Chilko evidence stays
+  within 0.0001 for mean, p95, and blue separation as the no-regression
+  control. Solver state, wet/dry ownership, water/terrain geometry,
+  bathymetry, collision, buoyancy, and raft forces are unchanged. Broad pale
+  water, rapid VFX, environment art, calibration, performance, and all six
+  external gates keep photoreal promotion open.
 - Re-certified the regenerated V19 Zambezi map as runnable river 6 and replaced
   count-only launch ecology acceptance with six fail-closed bank/elevation
   strata. The retained package contains 6,512 source-grounded ground-cover and

@@ -510,12 +510,19 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
     SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.78f);
     SetScalar(TEXT("SpeedAerationFraction"), 0.16f);
     SetScalar(TEXT("FoamRoughness"), 0.62f);
-    SetScalar(TEXT("ReachHueVariation"), 0.10f);
-    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.14f);
-    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.62f);
-    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.38f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.34f);
-    SetScalar(TEXT("SlickNormalFloor"), 0.28f);
+    // Terminator's former low-roughness slicks and broad fallback-reflection
+    // floor converged into a clipped white guide-eye sheet. Preserve the
+    // dielectric response, but localize reflected sky and keep turbulent
+    // normal/roughness energy through the procedural slick patches. These are
+    // render-only controls; solver wetness, geometry and forces stay upstream.
+    SetScalar(TEXT("ReachHueVariation"), 0.12f);
+    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f);
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.75f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.85f);
+    SetScalar(TEXT("SlickRoughnessScale"), 1.0f);
+    SetScalar(TEXT("FresnelSpecular"), 0.01f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();
@@ -533,8 +540,9 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
         return nullptr;
     }
     OutSummary += TEXT(
-        "Built Futaleufu river-local live-volume water V3 with project-owned "
-        "flow-normal and solver-masked foam-lace textures.\n");
+        "Built Futaleufu river-local live-volume water V4 with project-owned "
+        "flow-normal and solver-masked foam-lace textures plus localized "
+        "sky reflection and turbulent slick response.\n");
     return Instance;
 }
 } // namespace RaftSimEditorEnvironment

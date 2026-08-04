@@ -231,6 +231,11 @@ def test_v2_review_locks_full_reach_correction_and_stays_fail_closed() -> None:
                 "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/"
                 "RaftSimEditorLandscapeFoliage.cpp"
             )
+            or artifact["path"]
+            == (
+                "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
+                "RaftSimEditorMaterialsBase.cpp"
+            )
         ):
             # V3 deliberately supersedes the mutable generator, manifest, and
             # runtime packages. The retained V2 captures and unchanged shader
@@ -288,7 +293,14 @@ def test_v3_review_locks_optical_naturalism_gain_and_stays_fail_closed() -> None
     assert len(review["remaining_photoreal_defects"]) >= 8
     assert len(review["required_external_acceptance_gates"]) == 6
 
+    superseded_artifacts = {
+        "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+        "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+        "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
+    }
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] in superseded_artifacts:
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]

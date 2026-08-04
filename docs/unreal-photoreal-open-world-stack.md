@@ -226,6 +226,20 @@ uncalibrated hydraulics keep the result technical rather than photoreal. Solver
 arrays, wet/dry ownership, bathymetry, collision, buoyancy, and raft forces
 remain unchanged.
 
+Futaleufú Terminator and Chilko Lava Canyon now also share an explicit
+`RaftSimColdWaterHighlightNaturalismV1` saved-map contract. Futaleufú uses the
+same restrained specular/roughness/fallback-reflection response as the accepted
+Chilko optical profile, a lower-energy photographic rig, and corrected
+river-local shallow/deep/sky colors. The first desaturated Futaleufú bracket is
+rejected evidence; the retained matched frame lowers clipped >0.95 coverage
+98.20% and raises blue-minus-red separation 29.79%, while the Chilko control
+stays numerically stable. This is still not production water: broad pale
+surfaces, solver-stroke foam, weak crest volume, spray/mist, bank transitions,
+environment art, character occlusion, calibration, and target performance
+remain open. The fail-closed comparison and hashes live in
+`cold_water_highlight_naturalism_v1_review.json`; no solver, geometry,
+collision, buoyancy, or force authority moved.
+
 Zambezi V2 now closes the corresponding live-core opacity mismatch. The shared
 raft-transmitting parent preserves its depth-, foam-, and raft-interior-aware
 optical graph, then multiplies opacity by the station/lateral wet-cell coverage

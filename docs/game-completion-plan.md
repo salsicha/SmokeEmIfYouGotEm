@@ -4315,3 +4315,15 @@ path is verified, and the completion goal can be marked complete.
   unsupported view targets explicitly rejected. The selector and progression
   manifests still resolve `zambezi_reference_run` to `L_Zambezi`; photoreal,
   hydraulic, guide, rights, and platform gates remain open.
+- Cold-water highlight naturalism V1 regenerates the stable Futaleufú
+  `L_Terminator` and Chilko `L_LavaCanyon` runnable packages under a shared
+  restrained reflection/highlight contract. The first Futaleufú color bracket
+  is explicitly rejected for desaturation; the retained bracket lowers matched
+  >0.95 water coverage 98.20%, lowers p95 1.26%, and raises blue-minus-red
+  29.79%, while Chilko remains within 0.0001 on matched mean, p95, and color
+  metrics. The change is presentation-only and leaves solver state, wetness,
+  terrain/water geometry, bathymetry, collision, buoyancy, and raft forces
+  unchanged. Broad pale water, rapid VFX, banks, regional ecology/geology,
+  characters/occlusion, measured hydraulics, performance, and all six external
+  reviews keep M9 and photoreal promotion open in
+  `cold_water_highlight_naturalism_v1_review.json`.

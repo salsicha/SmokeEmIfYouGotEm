@@ -869,7 +869,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? FLinearColor(0.012f, 0.075f, 0.105f, 1.0f)
             : bUsesMigratedFutaleufuVolumeCore
-            ? FLinearColor(0.013f, 0.068f, 0.090f, 1.0f)
+            ? FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveShallowSurfaceColor
                    : FLinearColor(0.025f, 0.120f, 0.150f, 1.0f));
@@ -879,7 +879,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? FLinearColor(0.002f, 0.018f, 0.032f, 1.0f)
             : bUsesMigratedFutaleufuVolumeCore
-            ? FLinearColor(0.002f, 0.017f, 0.029f, 1.0f)
+            ? FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveDeepSurfaceColor
                    : FLinearColor(0.004f, 0.028f, 0.045f, 1.0f));
@@ -889,7 +889,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? FLinearColor(0.045f, 0.090f, 0.135f, 1.0f)
             : bUsesMigratedFutaleufuVolumeCore
-            ? FLinearColor(0.055f, 0.100f, 0.138f, 1.0f)
+            ? FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveReflectedSkyColor
                    : FLinearColor(0.11f, 0.23f, 0.31f, 1.0f));
@@ -899,7 +899,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? 0.26f
             : bUsesMigratedFutaleufuVolumeCore
-            ? 0.28f
+            ? 0.18f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSurfaceSpecular
                    : 0.20f);
@@ -909,7 +909,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? 0.36f
             : bUsesMigratedFutaleufuVolumeCore
-            ? 0.34f
+            ? 0.68f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSurfaceRoughness
                    : 0.085f);
@@ -919,7 +919,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? 0.20f
             : bUsesMigratedFutaleufuVolumeCore
-            ? 0.24f
+            ? 0.05f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveSkyReflectionStrength
                    : 0.62f);
@@ -929,7 +929,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : bUsesLegacyChilkoPresentationDefaults
             ? 0.24f
             : bUsesMigratedFutaleufuVolumeCore
-            ? 0.26f
+            ? 0.55f
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveRippleStrength
                    : 0.18f);

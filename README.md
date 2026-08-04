@@ -110,6 +110,15 @@ cells, while an independent station mask clips the rectangular moving-window
 ends. This is a retained technical candidate, not photoreal approval;
 comparison evidence and remaining defects are recorded in
 [the cold-water volume-core review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_live_volume_core_v2_review.json).
+The August 4 cold-water highlight pass gives both runnable maps the same
+restrained dielectric/roughness/reflection rig and corrects Futaleufú's water
+color after rejecting an initially desaturated bracket. In the matched
+Terminator frame, coverage above 0.95 luminance falls 98.20%, p95 falls 1.26%,
+and blue-minus-red separation rises 29.79%; the Lava Canyon frame remains the
+no-regression control. This is a presentation-only technical improvement, not
+photoreal acceptance: broad pale water, foam/VFX, shoreline, terrain, ecology,
+characters, calibration, performance, and external review remain open in the
+[cold-water highlight review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_review.json).
 The shared live-water renderer now subdivides every authored river's visual
 surface from a 3 m analysis grid to 1.5 m presentation spacing. Solver-feature
 analysis retains its original physical footprint, the config-less test tank

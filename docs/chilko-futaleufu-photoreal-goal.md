@@ -446,6 +446,33 @@ hardware performance, and all six named external reviews remain open. Exact
 hashes, captures, measurements, authority boundaries, and blockers are in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_review.json`.
 
+## Shared Cold-Water Highlight Naturalism V1
+
+The stable `L_Terminator` and `L_LavaCanyon` packages now advertise one
+presentation-only cold-water highlight contract. Futaleufú receives Chilko's
+reviewed 0.18 specular, 0.68 roughness, 0.05 fallback-sky strength, 0.55 ripple,
+localized fallback reflection, turbulent slick-normal floor, -0.30 exposure,
+55-degree sun yaw, and 0.65 corridor-reflection brightness. A first bracket
+removed clipped highlights but also collapsed cold-water chroma; it was
+rejected. The retained bracket restores river-local shallow, deep, and sky
+blue separation without restoring the polished white/gold glare.
+
+Across rows 260-719 of the identical 1280x720 Terminator camera, p95 luminance
+falls from 0.888246 to 0.877031, >0.95 coverage falls from 0.001228 to
+0.000022, and mean blue-minus-red rises from 0.027372 to 0.035525. Lava
+Canyon's matched control changes by less than 0.0001 in mean luminance, p95,
+and blue-minus-red. The retained maps still use their solver-owned wet-cell
+cores, masks, rapid ownership, and forces; terrain, water topology, bathymetry,
+collision, buoyancy, and hydraulics do not change.
+
+This closes only the bounded highlight/color regression. Terminator still has
+a broad pale center/left body and smooth standing-wave face; both rivers still
+need observed foam, entrained air, spray/mist, shoreline microgeometry,
+regional environment art, character/raft occlusion review, calibrated flows,
+performance evidence, and all six external approvals. Exact captures, hashes,
+thresholds, and blockers are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.
