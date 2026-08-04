@@ -68,6 +68,10 @@ constexpr float ZambeziRunnableLaunchWoodyTargetMaximumDryHeightCm[] = {
     1800.0f, 5000.0f, 12000.0f};
 constexpr int32 ZambeziRunnableLaunchTalusInstanceCount = 360;
 constexpr float ZambeziRunnableLaunchTalusSlopeCeilingDegrees = 48.0f;
+constexpr int32 ZambeziDryScarpOutcropInstanceCount = 320;
+constexpr int32 ZambeziDryScarpOutcropMinimumInstanceCount = 280;
+constexpr float ZambeziDryScarpOutcropSlopeCeilingDegrees = 55.0f;
+constexpr float ZambeziDryScarpOutcropMinimumHeightAboveWaterCm = 600.0f;
 constexpr int32 TemperateWaterlineStructureTargetInstanceCount = 1440;
 constexpr int32 TemperateWaterlineStructureMinimumInstanceCount = 1250;
 constexpr float TemperateWaterlineStructureSlopeCeilingDegrees = 55.0f;
@@ -3619,6 +3623,8 @@ bool AddLandscapeCandidateBiomeDressing(
         : nullptr;
     TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        ZambeziDryScarpOutcropInstances;
     UMaterialInstanceConstant* ZambeziRunnableLaunchTalusMaterial = bZambezi
         ? LoadOrCreateZambeziRunnableLaunchTalusMaterial(OutSummary)
         : nullptr;
@@ -3641,6 +3647,22 @@ bool AddLandscapeCandidateBiomeDressing(
                 TalusComponent->SetNumCustomDataFloats(1);
             }
             ZambeziRunnableLaunchTalusInstances.Add(TalusComponent);
+
+            UHierarchicalInstancedStaticMeshComponent* OutcropComponent =
+                AddLandscapeCandidateInstancedMeshComponent(
+                    World,
+                    ReviewedRockMeshes[RockIndex],
+                    FString::Printf(
+                        TEXT("RaftSim_LandscapeCandidate_ZambeziDryScarpOutcropRock%02d_%s"),
+                        RockIndex + 1,
+                        *Candidate.PreviewSpec.RiverId),
+                    false,
+                    ZambeziRunnableLaunchTalusMaterial);
+            if (OutcropComponent)
+            {
+                OutcropComponent->SetNumCustomDataFloats(1);
+            }
+            ZambeziDryScarpOutcropInstances.Add(OutcropComponent);
         }
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedPineInstances;
@@ -4193,6 +4215,37 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimPerInstanceConditionedWaterline"));
             }
         }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ZambeziDryScarpOutcropInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziRun"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziDryScarpOutcropV20"));
+                Owner->Tags.AddUnique(TEXT("RaftSimZambeziBasaltAnalogMaterialV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProjectOwnedMineralRetone"));
+                Owner->Tags.AddUnique(TEXT("RaftSimRightsReviewedCC0RockAnalog"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralGeologyFallback"));
+                Owner->Tags.AddUnique(TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(TEXT("RaftSimUpperDryScarpPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSlopeScreenedPlacement"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPresentationOnlyNoHydraulicAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimPerInstanceConditionedWaterline"));
+            }
+            if (Component)
+            {
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimZambeziDryScarpOutcropV20"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimNonCollisionRenderSurface"));
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimPerInstanceConditionedWaterline"));
+            }
+        }
         if (AActor* MosaicOwner = ZambeziBankMosaicInstances
                 ? ZambeziBankMosaicInstances->GetOwner()
                 : nullptr)
@@ -4670,6 +4723,10 @@ bool AddLandscapeCandidateBiomeDressing(
     int32 RunnableLaunchTalusPlacedCount = 0;
     int32 RunnableLaunchTalusRejectedPlacementCount = 0;
     float RunnableLaunchTalusMaximumSlopeDegrees = 0.0f;
+    int32 DryScarpOutcropPlacedCount = 0;
+    int32 DryScarpOutcropRejectedPlacementCount = 0;
+    float DryScarpOutcropMaximumSlopeDegrees = 0.0f;
+    float DryScarpOutcropMinimumHeightAboveWaterCm = TNumericLimits<float>::Max();
     const int32 BoulderCount = bPhysicalCorridor
         ? 180
         : (Spec.bDesertCanyon ? 62 : (bRainforest ? 48 : 44));
@@ -5569,6 +5626,180 @@ bool AddLandscapeCandidateBiomeDressing(
         RunnableLaunchTalusRejectedPlacementCount;
     OutResult.DressingRunnableLaunchTalusMaximumSlopeDegrees =
         RunnableLaunchTalusMaximumSlopeDegrees;
+
+    if (bZambeziWoodland &&
+        ReviewedRockMeshes.Num() == 6 &&
+        ZambeziDryScarpOutcropInstances.Num() == 6)
+    {
+        // The source DEM does not resolve the individual ledges and detached
+        // blocks needed to read the launch wall at guide-eye distance. Place a
+        // separately auditable, non-colliding CC0 analog layer only on dry
+        // source-grounded scarps. It has no lithology, collision, hydraulic, or
+        // navigation authority and never enters the active channel.
+        constexpr int32 BankSideCount = 2;
+        const int32 InstancesPerSide =
+            ZambeziDryScarpOutcropInstanceCount / BankSideCount;
+        for (int32 OutcropIndex = 0;
+             OutcropIndex < ZambeziDryScarpOutcropInstanceCount;
+             ++OutcropIndex)
+        {
+            const int32 SideIndex = OutcropIndex % BankSideCount;
+            const int32 AlongIndex = OutcropIndex / BankSideCount;
+            const float AlongT =
+                (static_cast<float>(AlongIndex) +
+                 ZambeziVegetationUnitRandom(OutcropIndex, 10103)) /
+                static_cast<float>(InstancesPerSide);
+            const float BaseLogicalX = FMath::Lerp(-2400.0f, -1550.0f, AlongT);
+            const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+            FVector2D BestPoint = ResolveLogicalRiverPoint(
+                BaseLogicalX,
+                Side * (ActiveRiverHalfWidth + 4500.0f));
+            float BestSlopeDegrees = TNumericLimits<float>::Max();
+            float BestDryHeightAboveWaterCm = 0.0f;
+            float BestPlacementScore = TNumericLimits<float>::Max();
+            float BestLogicalX = BaseLogicalX;
+            for (int32 CandidateIndex = 0; CandidateIndex < 96; ++CandidateIndex)
+            {
+                const float CandidatePhase =
+                    static_cast<float>(OutcropIndex) * 0.6180339f +
+                    static_cast<float>(CandidateIndex) * 1.2207441f;
+                const float CandidateLogicalX =
+                    BaseLogicalX + 42.0f * FMath::Sin(CandidatePhase);
+                const float CandidateAdditionalOffset = FMath::Lerp(
+                    4500.0f,
+                    22000.0f,
+                    FMath::Pow(
+                        ZambeziVegetationUnitRandom(
+                            OutcropIndex * 137 + CandidateIndex,
+                            10111),
+                        1.18f));
+                const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                    CandidateLogicalX,
+                    Side * (ActiveRiverHalfWidth + CandidateAdditionalOffset));
+                const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float GroundZ = GetLandscapeHeight(
+                    CandidatePoint.X,
+                    CandidatePoint.Y);
+                const float DryHeightAboveWaterCm = GroundZ -
+                    GetConditionedWaterWorldZ(CandidateLogicalX);
+                const float FullRouteDistanceCm =
+                    GetMinimumCenterlineDistanceCm(CandidatePoint);
+                if (SlopeDegrees < 6.0f ||
+                    SlopeDegrees > ZambeziDryScarpOutcropSlopeCeilingDegrees ||
+                    DryHeightAboveWaterCm <
+                        ZambeziDryScarpOutcropMinimumHeightAboveWaterCm ||
+                    DryHeightAboveWaterCm > 12000.0f ||
+                    FullRouteDistanceCm < ActiveRiverHalfWidth + 3200.0f)
+                {
+                    continue;
+                }
+                const float PlacementScore =
+                    0.11f * FMath::Abs(SlopeDegrees - 26.0f) +
+                    0.22f * CandidateAdditionalOffset / 22000.0f +
+                    0.18f * FMath::Abs(DryHeightAboveWaterCm - 4200.0f) /
+                        12000.0f;
+                if (PlacementScore < BestPlacementScore)
+                {
+                    BestPlacementScore = PlacementScore;
+                    BestPoint = CandidatePoint;
+                    BestSlopeDegrees = SlopeDegrees;
+                    BestDryHeightAboveWaterCm = DryHeightAboveWaterCm;
+                    BestLogicalX = CandidateLogicalX;
+                }
+            }
+            if (BestPlacementScore == TNumericLimits<float>::Max())
+            {
+                ++DryScarpOutcropRejectedPlacementCount;
+                continue;
+            }
+
+            const int32 ScaleClass = OutcropIndex % 12;
+            const float TargetHeightCm = ScaleClass == 0
+                ? FMath::Lerp(
+                      650.0f,
+                      850.0f,
+                      ZambeziVegetationUnitRandom(OutcropIndex, 10141))
+                : (ScaleClass < 4
+                       ? FMath::Lerp(
+                             420.0f,
+                             650.0f,
+                             ZambeziVegetationUnitRandom(OutcropIndex, 10151))
+                       : FMath::Lerp(
+                             220.0f,
+                             420.0f,
+                             ZambeziVegetationUnitRandom(OutcropIndex, 10159)));
+            const int32 VariantIndex = OutcropIndex % ReviewedRockMeshes.Num();
+            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
+            const float UniformScale = TargetHeightCm / MeshHeightCm;
+            UHierarchicalInstancedStaticMeshComponent* OutcropComponent =
+                ZambeziDryScarpOutcropInstances[VariantIndex];
+            if (!OutcropComponent)
+            {
+                ++DryScarpOutcropRejectedPlacementCount;
+                continue;
+            }
+            const int32 InstanceIndex = AddGroundedInstance(
+                OutcropComponent,
+                RockMesh,
+                BestPoint,
+                GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                FRotator(
+                    FMath::Clamp(BestSlopeDegrees * 0.06f, 0.0f, 3.0f),
+                    360.0f * ZambeziVegetationUnitRandom(OutcropIndex, 10163),
+                    FMath::Lerp(
+                        -3.0f,
+                        3.0f,
+                        ZambeziVegetationUnitRandom(OutcropIndex, 10169))),
+                FVector(
+                    UniformScale * FMath::Lerp(
+                        0.88f,
+                        1.28f,
+                        ZambeziVegetationUnitRandom(OutcropIndex, 10177)),
+                    UniformScale * FMath::Lerp(
+                        0.78f,
+                        1.18f,
+                        ZambeziVegetationUnitRandom(OutcropIndex, 10181)),
+                    UniformScale));
+            OutcropComponent->SetCustomDataValue(
+                InstanceIndex,
+                0,
+                GetConditionedWaterWorldZ(BestLogicalX),
+                false);
+            ++DryScarpOutcropPlacedCount;
+            DryScarpOutcropMaximumSlopeDegrees = FMath::Max(
+                DryScarpOutcropMaximumSlopeDegrees,
+                BestSlopeDegrees);
+            DryScarpOutcropMinimumHeightAboveWaterCm = FMath::Min(
+                DryScarpOutcropMinimumHeightAboveWaterCm,
+                BestDryHeightAboveWaterCm);
+            ++OutResult.DressingBoulderInstanceCount;
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             ZambeziDryScarpOutcropInstances)
+        {
+            if (Component)
+            {
+                Component->MarkRenderStateDirty();
+            }
+        }
+        OutSummary += FString::Printf(
+            TEXT("Zambezi V20 dry-scarp outcrops: %d/%d source-grounded, "
+                 "non-shadow-casting, non-colliding generic rock analogs; %d rejected "
+                 "by route, 6 m dry-height, or %.1f-degree slope gates; minimum "
+                 "dry height %.2f m and maximum placed slope %.2f degrees. "
+                 "Presentation-only with no Batoka lithology or hydraulic authority.\n"),
+            DryScarpOutcropPlacedCount,
+            ZambeziDryScarpOutcropInstanceCount,
+            DryScarpOutcropRejectedPlacementCount,
+            ZambeziDryScarpOutcropSlopeCeilingDegrees,
+            DryScarpOutcropMinimumHeightAboveWaterCm / 100.0f,
+            DryScarpOutcropMaximumSlopeDegrees);
+    }
 
     const int32 FoliageClusterCount = bColoradoHance
         ? 0
@@ -7758,7 +7989,8 @@ bool AddLandscapeCandidateBiomeDressing(
             BoulderCount + TemperateWaterlinePlacedCount +
                 ChilkoShorelineGravelPlacedCount +
                 PacuareShorelineRockPlacedCount +
-                RunnableLaunchTalusPlacedCount &&
+                RunnableLaunchTalusPlacedCount +
+                DryScarpOutcropPlacedCount &&
         OutResult.DressingFoliageInstanceCount == ExpectedFoliageInstanceCount &&
         (!bPacuare ||
          PacuareShorelineRockPlacedCount >=
@@ -7800,6 +8032,15 @@ bool AddLandscapeCandidateBiomeDressing(
              ZambeziRunnableLaunchMinimumWoodyInstanceCount) &&
         bRunnableLaunchEcologyStrataValidated &&
         (!bZambeziWoodland || RunnableLaunchTalusPlacedCount >= 300) &&
+        (!bZambeziWoodland ||
+         DryScarpOutcropPlacedCount >=
+             ZambeziDryScarpOutcropMinimumInstanceCount) &&
+        (!bZambeziWoodland ||
+         DryScarpOutcropMinimumHeightAboveWaterCm + 0.5f >=
+             ZambeziDryScarpOutcropMinimumHeightAboveWaterCm) &&
+        (!bZambeziWoodland ||
+         DryScarpOutcropMaximumSlopeDegrees <=
+             ZambeziDryScarpOutcropSlopeCeilingDegrees + 0.01f) &&
         OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
         TEXT("Landscape biome dressing for %s: %d %s, %d foliage instances (%d canopy, %d understory), %d %s foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),

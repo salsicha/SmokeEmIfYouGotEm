@@ -1,0 +1,244 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "CDC83E61C54B752F4C4EF08681C5C44E",
+			"instanceName": "Alexs-MacBook-Air.local-39454",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-21.58.18",
+	"succeeded": 2,
+	"succeededWithWarnings": 4,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 64.612098693847656,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "L_Hance",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Hance",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"CDC83E61C54B752F4C4EF08681C5C44E"
+			],
+			"duration": 5.9333133697509766,
+			"dateTime": "2026.08.04-21.57.12",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.14"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_LavaCanyon",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_LavaCanyon",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"CDC83E61C54B752F4C4EF08681C5C44E"
+			],
+			"duration": 5.4640240669250488,
+			"dateTime": "2026.08.04-21.57.18",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Terminator",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Terminator",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"CDC83E61C54B752F4C4EF08681C5C44E"
+			],
+			"duration": 5.6002492904663086,
+			"dateTime": "2026.08.04-21.57.24",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "MapCheck: M_Fern02_Fronds Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds was missing the usage flag Nanite. If the material asset is not re-saved, it may not render correctly when run outside the editor. Fix",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.25"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "MapCheck: M_Fern02_Fronds Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds was missing the usage flag InstancedStaticMeshes. If the material asset is not re-saved, it may not render correctly when run outside the editor. Fix",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.25"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "MapCheck: M_FirSapling_Branches Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.M_FirSapling_Branches was missing the usage flag Nanite. If the material asset is not re-saved, it may not render correctly when run outside the editor. Fix",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.25"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "MapCheck: M_FirSapling_Twigs Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.M_FirSapling_Twigs was missing the usage flag Nanite. If the material asset is not re-saved, it may not render correctly when run outside the editor. Fix",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.25"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "MapCheck: M_FirSapling_Branches Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.M_FirSapling_Branches was missing the usage flag InstancedStaticMeshes. If the material asset is not re-saved, it may not render correctly when run outside the editor. Fix",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.25"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "MapCheck: M_FirSapling_Twigs Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.M_FirSapling_Twigs was missing the usage flag InstancedStaticMeshes. If the material asset is not re-saved, it may not render correctly when run outside the editor. Fix",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.25"
+				}
+			],
+			"warnings": 6,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Troublemaker",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Troublemaker",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"CDC83E61C54B752F4C4EF08681C5C44E"
+			],
+			"duration": 4.4378910064697266,
+			"dateTime": "2026.08.04-21.57.30",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogTemp: RaftSim capsize: raft=RaftSimRaftActor_0 location_cm=V(X=-6000.00, Z=93.26) rotation_deg=R(P=0.36, Y=2.84, R=102.82) flip_margin_nm=-93.834 flip_threshold_nm=1800.000 retained_water_kg=251.268 retained_roll_moment_nm=-1893.834 wet_samples=6/12 contacts=0 wrapping=0 pinned=0",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.30"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_UpperHuacas",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"CDC83E61C54B752F4C4EF08681C5C44E"
+			],
+			"duration": 5.1258978843688965,
+			"dateTime": "2026.08.04-21.57.34",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Pacuare humidity runtime values: density=0.0075000 volumetric=0 max_opacity=0.6200 start_cm=450.00 second_density=0.0012000 second_offset_cm=-160.00 second_falloff=0.0600",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.39"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "L_Zambezi",
+			"fullTestPath": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"CDC83E61C54B752F4C4EF08681C5C44E"
+			],
+			"duration": 38.050724029541016,
+			"dateTime": "2026.08.04-21.57.39",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.57.55"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

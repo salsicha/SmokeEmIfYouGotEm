@@ -46,7 +46,7 @@ map-load or gameplay authority.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v18_review.json`.
 
 This verifies the current committed Zambezi source, runtime registry, and map
 package. It does not close
@@ -483,11 +483,19 @@ them by target offset rather than lowest slope alone, and keeps them visible
 across the first kilometre. The accepted capture contains no camera-clipped
 plant and no woody silhouette visibly intersecting the waterline. The V1
 placement bracket that put cover on a 54.16° face and trees at the waterline was
-rejected rather than documented as progress. The 30 m DEM still yields rounded large-scale cliff silhouettes,
-however, and the project-owned tree crowns and small synthetic clumps remain
-repetitive and visibly procedural. The expanded launch layer visibly breaks up
-the right-bank slope and adds notch/ridgeline silhouettes, but the near left
-wall remains too barren and coarse for production art acceptance.
+rejected rather than documented as progress. V20 now adds three explicitly
+render-only layers to the source terrain: normal-oriented relief on the four
+dense visual tiles, 2.5 m adaptive upper-scarp facade refinement over the first
+kilometre, and 320 source-grounded CC0 rock-analog outcrops at least 6 m above
+local water. The retained outcrops are 2.2-8.5 m high, non-colliding,
+non-shadow-casting, outside the active route, and carry no lithology or
+hydraulic authority. The rejected 4.2-22 m shadow-casting bracket produced
+floating silhouettes and black wedges and is not versioned.
+
+The 30 m DEM still yields rounded large-scale cliff silhouettes, however, and
+the project-owned tree crowns and small synthetic clumps remain repetitive and
+visibly procedural. V20 adds sparse ledge and ridgeline structure, but the near
+left wall remains too barren and coarse for production art acceptance.
 The views prove that the broken card foliage
 is absent and that multi-height bank ecology is rendered; they do not prove
 that the vegetation or terrain is photoreal. The runnable reference map is
@@ -495,11 +503,13 @@ therefore not yet accepted as photoreal.
 
 The saved-map audit is written to
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json`.
-Schema v22 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
+Schema v23 requires all 25 rapid markers, the Rapid 9 portage, one raft, player
 start, runtime water configuration, the vertical-slice game mode, four
-non-colliding, non-shadow-casting V18-tagged visual-terrain tiles, the exact -48/-90
+non-colliding, non-shadow-casting V20-tagged visual-terrain tiles, the exact -48/-90
 degree presentation light, two tagged non-colliding V2 adaptive near-field
-banks with irregular-planar-topology and domain-warped-relief contracts,
+banks with irregular-planar-topology, domain-warped-relief, and V20 upper-dry-
+scarp contracts, six non-colliding V20 dry-scarp outcrop components with 320
+instances and the 6 m dry-height/no-authority contract,
 the four-actor sun/sky/fill/fog atmosphere contract, absence of rejected
 high-density bank actors, the
 exact five vegetation mesh families and

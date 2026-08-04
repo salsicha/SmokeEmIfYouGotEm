@@ -1,0 +1,129 @@
+{
+  "schema": "raftsim.unreal.zambezi_organic_dry_scarp_review.v20",
+  "recorded_local_date": "2026-08-04",
+  "verified_parent_commit": "9342018832cb05be0d6338cbdcfc0292cbaba1b8",
+  "result": "retained_technical_improvement_not_photoreal",
+  "river_id": "zambezi_batoka_gorge",
+  "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+  "runnable": true,
+  "player_path": "Free Run -> zambezi_reference_run -> L_Zambezi",
+  "production_fidelity_promoted": false,
+  "photoreal_promotion": false,
+  "purpose": "Break up the conspicuously smooth first-kilometre launch scarps while preserving the Copernicus terrain, shoreline, route, collision, and solver authorities.",
+  "retained_implementation": {
+    "dense_visual_tiles": {
+      "tile_count": 4,
+      "normal_oriented_relief_vertices": 71941,
+      "inside_protected_radius_vertices": 7038,
+      "minimum_inside_radius_height_above_local_water_m": 6.35,
+      "maximum_horizontal_displacement_m": 5.2,
+      "mean_horizontal_displacement_m": 0.53,
+      "collision_enabled": false,
+      "cast_shadow": false,
+      "tag": "RaftSimBatokaNormalOrientedDryScarpReliefV20"
+    },
+    "adaptive_near_field": {
+      "actor_count": 2,
+      "station_window_m": [0.0, 1000.0],
+      "grid_spacing_m": 2.5,
+      "upper_dry_scarp_refined_vertices": 108631,
+      "maximum_total_refinement_m": 4.13,
+      "maximum_upper_dry_scarp_delta_m": 3.16,
+      "minimum_source_height_above_local_water_m": 6.4,
+      "minimum_rendered_dry_clearance_m": 0.33,
+      "collision_enabled": false,
+      "cast_shadow": false,
+      "tag": "RaftSimAdaptiveUpperDryScarpReliefV20"
+    },
+    "dry_scarp_outcrops": {
+      "asset_source": "existing rights-reviewed CC0 Rock Moss Set 01 six-variant project kit",
+      "instance_count": 320,
+      "component_count": 6,
+      "target_height_range_m": [2.2, 8.5],
+      "minimum_height_above_local_water_m": 6.32,
+      "maximum_placed_slope_degrees": 35.83,
+      "route_clearance": "outside active channel and full-route clearance gate",
+      "collision_enabled": false,
+      "cast_shadow": false,
+      "tag": "RaftSimZambeziDryScarpOutcropV20",
+      "authority": "procedural presentation only; no Batoka lithology, geospatial, collision, hydraulic, raft-force, navigation, or rapid-line authority"
+    }
+  },
+  "rejected_brackets": [
+    {
+      "candidate": "coarse_dense_tile_horizontal_relief_only",
+      "reason": "Technically valid but mostly occluded by the 2.5 m adaptive launch overlay and visually too subtle at gameplay distance."
+    },
+    {
+      "candidate": "480_shadow_casting_outcrops_4.2m_to_22m",
+      "reason": "Produced floating silhouettes, oversized boulders, and severe black shadow wedges; not versioned."
+    },
+    {
+      "candidate": "320_shadow_casting_outcrops_2.2m_to_8.5m",
+      "reason": "Removed the giant forms but retained long low-sun shadow wedges; superseded by the non-shadow-casting retained layer."
+    }
+  ],
+  "matched_visual_review": {
+    "capture_command": "RaftSim.CaptureRaft 3 zambezi_organic_dry_scarp_v20_retained 8 4 22 waterinventory",
+    "resolution": [1280, 720],
+    "baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_launch_stratified_ecology_v19.png",
+      "sha256": "19ffd97931483d78be35bc3326a202ced5da2fe039fb8c71ad2236e346d7f7d5"
+    },
+    "retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_dry_scarp_v20_retained.png",
+      "sha256": "65203ff83030ba2c9556ffea7d0f647290083194a4a6c3099a742e1ad1c775b3"
+    },
+    "findings": [
+      "Sparse grounded forms now interrupt parts of the skyline and upper dry scarps without the rejected black shadow wedges.",
+      "The conditioned shoreline remains continuous and no outcrop enters the water or active route in the retained frame.",
+      "The dominant left wall still reads broad, bright, and smooth; the change is incremental rather than a photoreal promotion.",
+      "The water, raft, characters, and procedural vegetation remain visibly synthetic in this frame."
+    ]
+  },
+  "verification": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the retained source changes",
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v23",
+      "passed": true,
+      "actor_count": 75,
+      "rapid_marker_count": 25,
+      "mapcheck_errors": 0,
+      "mapcheck_warnings": 0
+    },
+    "native_m6": {
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v18_m6_gate.json",
+      "passed": 5,
+      "failed": 0
+    },
+    "all_river_p4": {
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v18_p4_all_gate.json",
+      "passed": 6,
+      "failed": 0,
+      "zambezi_mapcheck_errors": 0,
+      "zambezi_mapcheck_warnings": 0
+    }
+  },
+  "artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "7d8a9ac7b151e0fb719d5e5e7492e55601325be1640798effa97cfb5318e3e48"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "6636473cb7272c4e4a54038fce36a5b817c297061f3abdd6467fa3a7b9c7b93a"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_dry_scarp_v20_retained.log"
+    }
+  ],
+  "open_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, shoreline-contact, terrain, and ecology presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, rapid-geometry, and dry-scarp outcrop infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, terrain dressing, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ]
+}

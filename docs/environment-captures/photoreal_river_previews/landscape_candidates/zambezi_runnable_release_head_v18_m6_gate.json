@@ -1,0 +1,141 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "6367D26FA14A1786FFD1B78E39FCFE76",
+			"instanceName": "Alexs-MacBook-Air.local-39362",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-21.56.20",
+	"succeeded": 4,
+	"succeededWithWarnings": 1,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 23.022743225097656,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "CareerCatalog",
+			"fullTestPath": "RaftSim.M6.CareerCatalog",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"6367D26FA14A1786FFD1B78E39FCFE76"
+			],
+			"duration": 0.0077120400965213776,
+			"dateTime": "2026.08.04-21.55.57",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FullReachSession",
+			"fullTestPath": "RaftSim.M6.FullReachSession",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"6367D26FA14A1786FFD1B78E39FCFE76"
+			],
+			"duration": 14.755812644958496,
+			"dateTime": "2026.08.04-21.55.57",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.55.58"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogMaterial: Material /Game/RaftSim/Environment/ExternalReview/PolyHaven/GrassBermuda01_1K/M_GrassBermuda01_Foliage.M_GrassBermuda01_Foliage missing usage flag InstancedStaticMeshes! Default Material will be used in game.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.56.00"
+				},
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogMaterial:      The material will recompile every editor launch until resaved.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-21.56.00"
+				}
+			],
+			"warnings": 3,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "MainMenuRender",
+			"fullTestPath": "RaftSim.M6.MainMenuRender",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"6367D26FA14A1786FFD1B78E39FCFE76"
+			],
+			"duration": 3.433060884475708,
+			"dateTime": "2026.08.04-21.56.12",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "ProgressionMigration",
+			"fullTestPath": "RaftSim.M6.ProgressionMigration",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"6367D26FA14A1786FFD1B78E39FCFE76"
+			],
+			"duration": 0.0095750391483306885,
+			"dateTime": "2026.08.04-21.56.15",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "RuntimeShell",
+			"fullTestPath": "RaftSim.M6.RuntimeShell",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"6367D26FA14A1786FFD1B78E39FCFE76"
+			],
+			"duration": 4.8165807723999023,
+			"dateTime": "2026.08.04-21.56.15",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

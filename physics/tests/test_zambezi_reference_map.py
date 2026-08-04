@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v17_review.json"
+    "zambezi_runnable_release_head_v18_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -211,17 +211,17 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v13"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v14"
     assert review["recorded_local_date"] == "2026-08-04"
     assert review["verified_parent_commit"] == (
-        "1165e1d36408e8fc572abc889c3401c08c12a68d"
+        "9342018832cb05be0d6338cbdcfc0292cbaba1b8"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["photoreal_promotion"] is False
     assert review["supersedes_review"].endswith(
-        "zambezi_runnable_release_head_v16_review.json"
+        "zambezi_runnable_release_head_v17_review.json"
     )
     assert review["player_path"] == {
         "game_mode": "Free Run",
@@ -240,7 +240,7 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         for entry in review["hash_locked_current_artifacts"]
     }
     assert locked_hashes[RUNNABLE_ZAMBEZI_MAP_PATH] == (
-        "51f00471114eb84a7b482fe48dd13ddf45132693890aed7a347505924a84865b"
+        "7d8a9ac7b151e0fb719d5e5e7492e55601325be1640798effa97cfb5318e3e48"
     )
     assert len(locked_hashes) == 6
     for relative, expected in locked_hashes.items():
@@ -262,36 +262,34 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     }
     assert review["verification"]["release_head_editor_build"]["result"] == "success"
     assert review["verification"]["release_head_editor_build"][
-        "exact_committed_source"
+        "exact_candidate_source"
     ] is True
     assert review["verification"]["release_head_editor_build"][
-        "incremental_actions"
-    ] == 7
-    assert review["verification"]["fresh_worktree_build_attempt"]["result"] == (
-        "infrastructure_failure"
-    )
-    assert review["verification"]["native_catalog_and_progression"]["passed"] == 2
-    assert review["verification"]["native_catalog_and_progression"]["failed"] == 0
-    assert review["verification"]["focused_python_contracts"]["passed"] == 27
-    assert review["verification"]["zambezi_map_load"]["test"] == (
+        "final_incremental_actions"
+    ] == 2
+    assert review["verification"]["native_m6"]["passed"] == 5
+    assert review["verification"]["native_m6"]["failed"] == 0
+    assert review["verification"]["native_m6"]["catalog_and_progression_passed"] == 2
+    assert review["verification"]["focused_python_contracts"]["passed"] == 31
+    assert review["verification"]["all_river_map_load"]["passed"] == 6
+    assert review["verification"]["all_river_map_load"]["failed"] == 0
+    zambezi_load = review["verification"]["all_river_map_load"]["zambezi"]
+    assert zambezi_load["test"] == (
         "RaftSim.P4.RiverMapLoads.L_Zambezi"
     )
-    assert review["verification"]["zambezi_map_load"]["performed"] == 1
-    assert review["verification"]["zambezi_map_load"]["result"].startswith(
+    assert zambezi_load["result"].startswith(
         "success"
     )
-    assert review["verification"]["zambezi_map_load"]["zambezi_mapcheck_errors"] == 0
-    assert review["verification"]["zambezi_map_load"]["zambezi_mapcheck_warnings"] == 0
-    assert review["verification"]["zambezi_map_load"]["automation_warnings"] == 3
-    assert len(
-        review["verification"]["zambezi_map_load"]["accepted_warnings"]
-    ) == 3
-    assert review["verification"]["zambezi_map_load"]["surface_vertices"] == 10465
-    assert review["verification"]["zambezi_map_load"]["active_breaking_sites"] == 10
-    assert review["verification"]["zambezi_map_load"]["rapid_foam_vertices"] == 645
-    assert review["verification"]["zambezi_map_load"]["volume_core_triangles"] == 16896
+    assert zambezi_load["zambezi_mapcheck_errors"] == 0
+    assert zambezi_load["zambezi_mapcheck_warnings"] == 0
+    assert zambezi_load["automation_warnings"] == 1
+    assert len(zambezi_load["accepted_warnings"]) == 1
+    assert zambezi_load["surface_vertices"] == 10465
+    assert zambezi_load["active_breaking_sites"] == 10
+    assert zambezi_load["rapid_foam_vertices"] == 645
+    assert zambezi_load["volume_core_triangles"] == 16896
     assert review["verification"]["saved_map_audit"]["schema"] == (
-        "raftsim.unreal.zambezi_reference_scenario_map_validation.v22"
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v23"
     )
     assert review["verification"]["saved_map_audit"]["vegetation_instances"] == 14316
     assert review["verification"]["saved_map_audit"][
@@ -300,6 +298,9 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     assert review["verification"]["saved_map_audit"][
         "runnable_launch_woody_instances"
     ] == 772
+    assert review["verification"]["saved_map_audit"][
+        "dry_scarp_outcrop_instances"
+    ] == 320
     assert len(review["open_external_acceptance_gates"]) == 7
 
     selection = _load(
@@ -1143,6 +1144,9 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimZambeziAdaptiveNearFieldTerrainV2" in geometry_cpp
     assert "RaftSimIrregularPlanarTopologyV2" in geometry_cpp
     assert "RaftSimDomainWarpedGeomorphicReliefV2" in geometry_cpp
+    assert "RaftSimAdaptiveUpperDryScarpReliefV20" in geometry_cpp
+    assert "MaximumUpperDryScarpRefinementCm = 440.0f" in geometry_cpp
+    assert "UpperDryScarpRefinementStartAboveWaterCm = 600.0f" in geometry_cpp
     assert "LongitudinalSpacingCm = 250.0f" in geometry_cpp
     assert "LateralSpacingCm = 250.0f" in geometry_cpp
     assert "MaximumStationJitterCm = 55.0f" in geometry_cpp
@@ -1166,6 +1170,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "NearBankRoundedSlopeMaskStart = 0.055f" in director_cpp
     assert "MorphologyOffsetClampCm = 280.0f" in director_cpp
     assert "UpperCliffMorphologyOffsetClampCm = 440.0f" in director_cpp
+    assert "UpperCliffHorizontalReliefClampCm = 520.0f" in director_cpp
     assert "UpperCliffMorphologyStartAboveWaterCm = 600.0f" in director_cpp
     assert "UpperCliffMorphologyFullStrengthAboveWaterCm = 1800.0f" in director_cpp
     assert "ClosestCenterlinePoint" in director_cpp
@@ -1173,9 +1178,13 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimBatokaOrganicMorphologyV17" in director_cpp
     assert "RaftSimBatokaHeightAwareFacetReconstructionV17" in director_cpp
     assert "RaftSimBatokaUpperDryScarpInfillV17" in director_cpp
+    assert "RaftSimBatokaNormalOrientedDryScarpReliefV20" in director_cpp
     assert "RaftSimProtectedShorelineBuffer" in director_cpp
     assert "MorphologyProtectionFade" in director_cpp
     assert "UpperButtressOffsetCm" in director_cpp
+    assert "HorizontalSourceNormal * HorizontalReliefCm" in director_cpp
+    assert "NormalReliefTileSeamFade" in director_cpp
+    assert "DryScarpNormalReliefMask" in director_cpp
     assert "MorphologyStats.NearBankModifiedVertexCount <= 0" in build_cpp
     assert (
         "MorphologyStats.UpperCliffModifiedInsideProtectedRadiusVertexCount <= 0"
@@ -1185,6 +1194,8 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm"
         in build_cpp
     )
+    assert "MorphologyStats.NormalReliefVertexCount <= 0" in build_cpp
+    assert "MorphologyStats.MaximumAbsoluteHorizontalReliefCm > 520.5f" in build_cpp
     assert "CreateZambeziOpaqueVegetationAssets" in foliage_cpp
     assert "M_RaftSim_Zambezi_OpaqueVegetation" in foliage_cpp
     assert "Material->BlendMode = BLEND_Opaque" in foliage_cpp
@@ -1248,6 +1259,10 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     assert "RaftSimPerInstanceConditionedWaterline" in foliage_cpp
     assert "MI_RaftSim_Zambezi_BasaltTalusV1" in foliage_cpp
     assert "RaftSimRunnableLaunchTalusV1" in foliage_cpp
+    assert "ZambeziDryScarpOutcropInstanceCount = 320" in foliage_cpp
+    assert "ZambeziDryScarpOutcropMinimumInstanceCount = 280" in foliage_cpp
+    assert "RaftSimZambeziDryScarpOutcropV20" in foliage_cpp
+    assert "RaftSimUpperDryScarpPlacement" in foliage_cpp
     assert "RaftSimZambeziBasaltAnalogMaterialV1" in foliage_cpp
     assert "RaftSimProjectOwnedMineralRetone" in foliage_cpp
     assert "RaftSimGenericRockAnalogNoLithologyAuthority" in foliage_cpp
@@ -1355,7 +1370,7 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "NO_COLLISION" in tile["collision_enabled"]
         for tile in validation["visual_terrain"]["tiles"]
     )
-    assert validation["schema"].endswith(".v22")
+    assert validation["schema"].endswith(".v23")
     assert validation["runtime_hydraulics"]["preserves_global_river_stations"] is True
     assert validation["runtime_hydraulics"]["rapid_count"] == 25
     assert validation["runtime_hydraulics"]["rapid_9_policy"].startswith(
@@ -1363,8 +1378,8 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
     )
     assert validation["runtime_hydraulics"]["safe_launch_apron_tagged"] is True
     assert validation["visual_terrain"]["morphology_contract"] == (
-        "v18_exposure_safe_organic_basalt_with_wet_bank_protection_and_height_aware_"
-        "upper_dry_scarp_infill_plus_central_difference_grid_normals_"
+        "v20_normal_oriented_dry_scarp_relief_with_wet_bank_protection_and_height_"
+        "aware_upper_dry_scarp_infill_plus_central_difference_grid_normals_"
         "and_source_facet_reconstruction"
     )
     assert validation["visual_terrain"]["active_water_half_width_m"] == 72.0
@@ -1375,10 +1390,18 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         validation["visual_terrain"]["maximum_visual_treatment_vertical_offset_m"]
         == 4.4
     )
+    assert (
+        validation["visual_terrain"]["maximum_visual_treatment_horizontal_offset_m"]
+        == 5.2
+    )
+    assert validation["visual_terrain"]["normal_relief_authority"].startswith(
+        "procedural_render_only"
+    )
     assert all(
         "RaftSimBatokaOrganicMorphologyV17" in tile["tags"]
         and "RaftSimBatokaHeightAwareFacetReconstructionV17" in tile["tags"]
         and "RaftSimBatokaUpperDryScarpInfillV17" in tile["tags"]
+        and "RaftSimBatokaNormalOrientedDryScarpReliefV20" in tile["tags"]
         and "RaftSimProtectedShorelineBuffer" in tile["tags"]
         for tile in validation["visual_terrain"]["tiles"]
     )
@@ -1392,9 +1415,10 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         "v2_deterministic_irregular_planar_grid"
     )
     assert adaptive["maximum_dry_shoreline_infill_m"] == 1.8
-    assert adaptive["maximum_procedural_refinement_m"] == 1.35
+    assert adaptive["maximum_procedural_refinement_m"] == 4.4
+    assert adaptive["upper_dry_scarp_refinement_start_above_water_m"] == 6.0
     assert adaptive["geomorphic_relief_contract"].startswith(
-        "v2_domain_warped_broad_erosion"
+        "v20_adaptive_upper_dry_scarp_facade"
     )
     assert adaptive["wet_bank_contract"].startswith(
         "conditioned_profile_vertex_red_render_only"
@@ -1411,8 +1435,17 @@ def test_unreal_candidate_binds_the_zambezi_scenario_and_builds_editor_markers()
         and "RaftSimConditionedWaterlineWetBankV1" in actor["tags"]
         and "RaftSimVertexRedWetBankMask" in actor["tags"]
         and "RaftSimProceduralWetBankNoMeasuredAuthority" in actor["tags"]
+        and "RaftSimAdaptiveUpperDryScarpReliefV20" in actor["tags"]
         for actor in adaptive["actors"]
     )
+    outcrops = validation["dry_scarp_outcrops"]
+    assert outcrops["target_instance_count"] == 320
+    assert outcrops["minimum_instance_count"] == 280
+    assert outcrops["instance_count"] >= 280
+    assert outcrops["component_count"] == 6
+    assert outcrops["minimum_height_above_local_water_m"] == 6.0
+    assert outcrops["slope_ceiling_degrees"] == 55.0
+    assert outcrops["authority"].startswith("procedural_presentation_only")
     assert validation["lighting"]["atmosphere_actor_count"] == 4
     atmosphere_tags = {
         tag

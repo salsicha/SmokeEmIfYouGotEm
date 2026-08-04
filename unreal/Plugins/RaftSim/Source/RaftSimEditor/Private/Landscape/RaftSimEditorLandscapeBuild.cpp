@@ -312,7 +312,12 @@ bool BuildLandscapeImportCandidateMap(
             MorphologyStats.UpperCliffModifiedInsideProtectedRadiusVertexCount <= 0 ||
             MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm +
                     0.5f <
-                600.0f)
+                600.0f ||
+            MorphologyStats.NormalReliefVertexCount <= 0 ||
+            MorphologyStats.NormalReliefInsideProtectedRadiusVertexCount <= 0 ||
+            MorphologyStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm + 0.5f <
+                600.0f ||
+            MorphologyStats.MaximumAbsoluteHorizontalReliefCm > 520.5f)
         {
             OutSummary += TEXT(
                 "Runnable Zambezi map requires four conditioned Batoka visual-terrain "
@@ -326,7 +331,10 @@ bool BuildLandscapeImportCandidateMap(
                  "%lld/%lld vertices received bounded morphology, including %lld dry "
                  "near-bank vertices and %lld upper-cliff vertices inside the %.1f m "
                  "horizontal shoreline radius (minimum %.2f m above local water; nearest "
-                 "conditioned vertex %.2f m; full horizontal strength by %.1f m).\n"),
+                 "conditioned vertex %.2f m; full horizontal strength by %.1f m). "
+                 "V20 applied normal-oriented relief to %lld vertices (%lld inside "
+                 "the protected radius, minimum %.2f m above local water), with "
+                 "%.2f m maximum and %.2f m mean horizontal displacement.\n"),
             MorphologyStats.ReconstructedVertexCount,
             MorphologyStats.MaximumAbsoluteReconstructionOffsetCm / 100.0f,
             MorphologyStats.ReconstructedInsideProtectedRadiusVertexCount,
@@ -342,7 +350,13 @@ bool BuildLandscapeImportCandidateMap(
             MorphologyStats.MinimumUpperCliffModifiedInsideRadiusHeightAboveWaterCm /
                 100.0f,
             MorphologyStats.MinimumModifiedCenterlineDistanceCm / 100.0f,
-            MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f);
+            MorphologyStats.FullStrengthMorphologyRadiusCm / 100.0f,
+            MorphologyStats.NormalReliefVertexCount,
+            MorphologyStats.NormalReliefInsideProtectedRadiusVertexCount,
+            MorphologyStats.MinimumNormalReliefInsideRadiusHeightAboveWaterCm / 100.0f,
+            MorphologyStats.MaximumAbsoluteHorizontalReliefCm / 100.0f,
+            MorphologyStats.AbsoluteHorizontalReliefSumCm /
+                MorphologyStats.NormalReliefVertexCount / 100.0f);
 
         FZambeziAdaptiveNearFieldTerrainStats NearFieldStats;
         if (!AddZambeziAdaptiveNearFieldTerrain(
