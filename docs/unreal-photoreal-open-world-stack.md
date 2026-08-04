@@ -209,20 +209,22 @@ candidate because riverbed and bank readability improve over the opaque
 baseline, but coarse cross-river bands, weak hydraulic volume/VFX, duplicate
 camera evidence, and blockout canyon/ecology keep photoreal promotion closed.
 
-Chilko Lava Canyon now completes the river-local split-optics rollout for the
-five original playable rivers. Its regenerated `L_LavaCanyon` map persists a
-Chilko-only instance on the all-wet-cell transmitting core plus a restrained
-Default Lit hydraulic-detail skin. Project-owned flow-normal and foam-lace
-textures replace inherited optical inputs; the foam mask is multiplied by live
-solver foam and speed and cannot create wet cells or hydraulic features. A
-matching translucent capture parent uses physical IOR 1.333 and vertex alpha
-derived only from already-sampled depth, wet-bank coverage, and aeration. The
-identical side-on runtime comparison materially reduces broad and extreme
-highlights and increases blue/cyan separation, but smooth wave faces,
-procedural shore geometry, repeated ecology, missing spray/mist and entrained
-air, and uncalibrated hydraulics keep the result technical rather than
-photoreal. Solver arrays, wet/dry ownership, bathymetry, collision, buoyancy,
-and raft forces remain unchanged.
+Chilko Lava Canyon now retains the river-local split-optics values that its
+regenerated map actually serializes. The runtime compatibility path applies old
+Chilko defaults only to genuinely legacy maps; it no longer overrides the
+current live-solver config. A default-off shared depth-coverage mask is enabled
+for Chilko, and its redundant broad detail-skin coverage is zero, leaving the
+all-wet-cell transmitting core, moving normals, and solver-masked rapid foam as
+the visible water authorities. A restrained Chilko-only lighting/reflection rig
+and muted, smaller-scale full-reach bank dressing reduce the washed-out water
+and fluorescent/tall cover without changing Futaleufu's shared material
+defaults. Matched evidence reduces water-band mean luminance 6.18%, >0.90
+coverage 59.21%, >0.95 coverage 98.93%, and bank neon-green fraction 64.77%.
+The remaining pale shallow bank band, repeated foam strokes, smooth DEM-scale
+shore, generic ecology/geology, missing spray/mist and entrained air, and
+uncalibrated hydraulics keep the result technical rather than photoreal. Solver
+arrays, wet/dry ownership, bathymetry, collision, buoyancy, and raft forces
+remain unchanged.
 
 Zambezi V2 now closes the corresponding live-core opacity mismatch. The shared
 raft-transmitting parent preserves its depth-, foam-, and raft-interior-aware

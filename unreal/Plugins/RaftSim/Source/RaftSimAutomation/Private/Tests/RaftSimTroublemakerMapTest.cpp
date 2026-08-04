@@ -428,6 +428,12 @@ bool FRaftSimAssertRiverMapCommand::Update()
                         TEXT("RaftSimPresentationOnlyNoHydraulicAuthority")) &&
                         Actor->Tags.Contains(
                             TEXT("RaftSimProceduralSourceGapFill")));
+                Test->TestTrue(
+                    TEXT("Chilko organic shoreline retains the V3 naturalism contract"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimChilkoShorelineNaturalismV3")) &&
+                        Instances->ComponentTags.Contains(
+                            TEXT("RaftSimChilkoShorelineNaturalismV3")));
                 if (Actor->Tags.Contains(
                         TEXT("RaftSimChilkoShorelineGravel")))
                 {
@@ -435,6 +441,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
                         TEXT("Chilko shoreline gravel disclaims lithology authority"),
                         Actor->Tags.Contains(
                             TEXT("RaftSimGenericRockAnalogNoLithologyAuthority")));
+                    Test->TestTrue(
+                        TEXT("Chilko shoreline gravel uses the V3 sorted scale range"),
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimChilkoSortedGravelScaleV3")));
                     OrganicShorelineGravelInstanceCount +=
                         Instances->GetInstanceCount();
                     ++OrganicShorelineGravelActorCount;
@@ -449,6 +459,19 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     Test->TestFalse(
                         TEXT("Chilko shoreline ground cover suppresses self-shadowing"),
                         Instances->CastShadow);
+                    Test->TestTrue(
+                        TEXT("Chilko shoreline ground cover keeps its muted V3 tag"),
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimChilkoMutedGroundCoverV3")) &&
+                            Instances->ComponentTags.Contains(
+                                TEXT("RaftSimChilkoMutedGroundCoverV3")));
+                    const UMaterialInterface* GroundCoverMaterial =
+                        Instances->GetMaterial(0);
+                    Test->TestTrue(
+                        TEXT("Chilko shoreline ground cover uses its river-local material"),
+                        GroundCoverMaterial &&
+                            GroundCoverMaterial->GetPathName().Contains(
+                                TEXT("MI_RaftSim_Chilko_MutedGroundCoverV3")));
                     OrganicShorelineGroundCoverInstanceCount +=
                         Instances->GetInstanceCount();
                     ++OrganicShorelineGroundCoverActorCount;
@@ -464,14 +487,14 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 OrganicShorelineGravelActorCount,
                 6);
             Test->TestTrue(
-                TEXT("Chilko shoreline retains at least 3300 gravel instances"),
+                TEXT("Chilko shoreline retains at least 6800 gravel instances"),
                 OrganicShorelineGravelInstanceCount >= 6800);
             Test->TestEqual(
                 TEXT("Chilko shoreline has two short ground-cover morphologies"),
                 OrganicShorelineGroundCoverActorCount,
                 2);
             Test->TestTrue(
-                TEXT("Chilko shoreline retains at least 3800 ground-cover instances"),
+                TEXT("Chilko shoreline retains at least 7900 ground-cover instances"),
                 OrganicShorelineGroundCoverInstanceCount >= 7900);
         }
     }
@@ -1819,11 +1842,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Chilko live sky reflection stays restrained"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveSkyReflectionStrength, 0.20f, 0.001f));
+                    (*It)->LiveSkyReflectionStrength, 0.05f, 0.001f));
             Test->TestTrue(
                 TEXT("Chilko live carrier keeps moving micro-normal response"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveRippleStrength, 0.24f, 0.001f));
+                    (*It)->LiveRippleStrength, 0.55f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko live carrier uses the turbulent V3 roughness"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSurfaceRoughness, 0.68f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko live carrier retains a physical dielectric response"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveSurfaceSpecular, 0.18f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko live carrier records the localized reflection contract"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimChilkoLocalizedReflectionWaterV3")));
             Test->TestTrue(
                 TEXT("Chilko solver foam remains optically legible"),
                 FMath::IsNearlyEqual(

@@ -14,7 +14,9 @@ EDITOR_ROOT = REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private"
 WATER_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorChilkoWaterMaterial.cpp"
 TEXTURE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorPhotorealTextureAssets.cpp"
 BASE_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorMaterialsBase.cpp"
+PHOTOREAL_SOURCE = EDITOR_ROOT / "Materials/RaftSimEditorPhotorealMaterials.cpp"
 CATALOG_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorEnvironmentCatalog.cpp"
+LIGHTING_SOURCE = EDITOR_ROOT / "Environment/RaftSimEditorNearFieldAndLighting.cpp"
 GEOMETRY_SOURCE = EDITOR_ROOT / "Landscape/RaftSimEditorLandscapeGeometry.cpp"
 RUNTIME_SOURCE = (
     REPO_ROOT
@@ -252,6 +254,9 @@ def test_chilko_water_is_native_moving_and_non_displacing() -> None:
 def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     catalog = CATALOG_SOURCE.read_text(encoding="utf-8")
     geometry = GEOMETRY_SOURCE.read_text(encoding="utf-8")
+    live_material = WATER_SOURCE.read_text(encoding="utf-8")
+    photoreal = PHOTOREAL_SOURCE.read_text(encoding="utf-8")
+    lighting = LIGHTING_SOURCE.read_text(encoding="utf-8")
     runtime = RUNTIME_SOURCE.read_text(encoding="utf-8")
     config = CONFIG_HEADER.read_text(encoding="utf-8")
 
@@ -267,14 +272,18 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "bEnableLiveSolverVolumeCore = true",
         "LiveSurfaceCalmCoverage = 0.035f",
         "LiveSurfaceActiveCoverage = 0.14f",
-        "LiveSkyReflectionStrength = 0.20f",
-        "LiveRippleStrength = 0.24f",
+        "LiveSurfaceSpecular = 0.18f",
+        "LiveSurfaceRoughness = 0.68f",
+        "LiveSkyReflectionStrength = 0.05f",
+        "LiveRippleStrength = 0.55f",
         "LiveFoamIntensity = 0.56f",
         "LiveShallowWaterOpacity = 0.42f",
+        "FLinearColor(0.025f, 0.050f, 0.075f, 1.0f)",
         "LoadOrCreateChilkoLavaCanyonLiveWaterInstance",
         "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal",
         "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace",
         "RaftSimChilkoTransmittingWaterV2",
+        "RaftSimChilkoLocalizedReflectionWaterV3",
         "RaftSimNoSolverStateMutation",
         "RaftSimChilkoDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
@@ -282,6 +291,37 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "RaftSimColdWaterEmbeddedAerationV2",
     ):
         assert token in geometry
+    for token in (
+        'SetScalar(TEXT("ReachHueVariation"), 0.12f)',
+        'SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f)',
+        'SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f)',
+        'SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f)',
+        'SetScalar(TEXT("RippleGrazingFloor"), 0.75f)',
+        'SetScalar(TEXT("SlickNormalFloor"), 0.85f)',
+        'SetScalar(TEXT("SlickRoughnessScale"), 1.0f)',
+        'SetScalar(TEXT("FresnelSpecular"), 0.01f)',
+    ):
+        assert token in live_material
+    for token in (
+        "Settings.SunIntensity = 4.10f",
+        "Settings.SkyLightIntensity = 1.30f",
+        "Settings.ExposureBias = -0.30f",
+    ):
+        assert token in catalog
+    assert "RaftSimChilkoRestrainedReflectionRigV3" in lighting
+    assert "? 0.65f" in lighting
+    assert "? FRotator(-50.0f, 55.0f, 0.0f)" in lighting
+    for token in (
+        'Scalar(TEXT("LiveWetCoverageDepthGain"), 32.0f)',
+        'Scalar(TEXT("LiveWetCoverageEnable"), 0.0f)',
+        'TEXT("LiveWetCoverageEnable")',
+        "bUsesMigratedChilkoVolumeCore ? 1.0f : 0.0f",
+        "bUsesMigratedChilkoVolumeCore ? 0.85f : 0.50f",
+        "bUsesMigratedChilkoVolumeCore\n            ? 0.0f",
+        "bUsesLegacyChilkoPresentationDefaults",
+        "!RiverWaterConfig->bEnableLiveSolverVolumeCore",
+    ):
+        assert token in photoreal or token in runtime
     for parameter in (
         "bEnableLiveSolverVolumeCore",
         "LiveSkyReflectionStrength",

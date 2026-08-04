@@ -410,6 +410,42 @@ geology/ecology, and all six external reviews remain open. Exact parameters,
 hashes, captures, test results, authority boundaries, and blockers are recorded
 in `docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_nonrepeating_wet_bank_v2_review.json`.
 
+## Chilko Optical And Shoreline Naturalism V3
+
+The runnable Lava Canyon map now preserves its authored river-local optical
+values instead of entering a cooked-field compatibility branch that silently
+restored the older reflective defaults. A default-off shared live-water mask is
+enabled only for Chilko and derives coverage from the existing sampled depth;
+the redundant broad detail skin is suppressed there while the wet-cell-clipped
+transmitting core, moving normals, and separately solver-masked rapid foam
+remain. The change is presentation-only: cooked fields, wet/dry ownership,
+bathymetry, collision, buoyancy, hydraulics, and raft forces are unchanged.
+
+The full-reach 7,200-gravel and 8,400-ground-cover layer remains deterministic,
+source-Landscape-grounded, non-colliding, and outside the solver strip. Chilko
+now resolves a river-local muted vegetation material, bounds cover to 18-58 cm,
+and changes the gravel population to mostly 8-28 cm stones, a smaller 28-62 cm
+class, and a rare 65-85 cm class. Shared temperate material defaults remain
+identity values, so Futaleufu presentation is unchanged. A Chilko-only lower-
+energy photographic rig further restrains sun, skylight, and reflection
+brightness without changing any physical authority.
+
+Against the retained V2 `breaking_water_side` frame, water-band mean luminance
+falls from 0.679885 to 0.637845, 95th-percentile luminance falls from 0.884324
+to 0.835865, coverage above 0.90 falls 59.21%, and coverage above 0.95 falls
+98.93%. The measured bank neon-green fraction falls 64.77%. In the matched bank
+close-up, green-dominant coverage falls from 0.471736 to 0.319063 and the neon
+fraction falls 37.74%.
+
+The retained result passes the technical renderer, material, map-load, and
+MapCheck contracts but fails photoreal promotion. A pale shallow-water band is
+still visible on the far bank, foam remains repetitive and stroke-like, the
+DEM-scale bank profile remains smooth, vegetation and rock donors are generic,
+and rapid-scale entrained air, spray, mist, calibrated hydraulics, target-
+hardware performance, and all six named external reviews remain open. Exact
+hashes, captures, measurements, authority boundaries, and blockers are in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.

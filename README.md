@@ -125,17 +125,22 @@ six runnable river maps pass P4. The retained frame removes the repeated
 analytical band, but the low-resolution sampled rise and missing aerated hole,
 recirculation, and collision-aware spray still fail photoreal promotion. See
 the [nonperiodic live-wave review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json).
-Lava Canyon's August 3 V2 optical pass now makes that solver-clipped core
-river-local: a project-owned flow normal, solver-masked foam lace, physical
-transmission, and restrained live-surface coverage replace the inherited pale
-sheet response. In the identical side-on frame, water-band pixels above 0.90
-luminance fall from 5.74% to 3.38% and extreme highlights above 0.95 fall from
-1.68% to 0.12%. The runnable map, editor material audit, PIE load gate, and
-shared water-render gate pass. This is still a technical candidate—not a
-photoreal pass—because shoreline/bank form, broad wave faces, ecology,
-rapid-scale spray and mist, hydraulic calibration, and all external reviews
+Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
+path that was silently restoring the older reflective water defaults after
+regeneration. The runtime now keeps the river-local, wet-cell-clipped volume
+core, masks the redundant detail skin away from dry solver-grid vertices, and
+uses restrained Chilko lighting and reflection values. The full 600 m bank
+layer retains 7,200 gravel and 8,400 short-cover instances, but gives Chilko a
+muted material instance, a smaller bounded scale distribution, and fewer large
+rock silhouettes. In the matched side-on water band, mean luminance falls
+6.18%, pixels above 0.90 fall 59.21%, and pixels above 0.95 fall 98.93%; the
+matched bank neon-green fraction falls 64.77%. The editor build and all six
+runnable-map gates pass with MapCheck at zero errors and warnings. This remains
+a technical candidate—not a photoreal pass—because the far-bank shallow band,
+repeated foam strokes, DEM-scale bank form, ecology/geology specificity,
+rapid-scale spray and mist, hydraulic calibration, and all six external gates
 remain open in the
-[Chilko transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_lava_canyon_transmitting_water_v2_review.json).
+[Chilko optical/shoreline V3 review](docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_review.json).
 See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active
 milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 

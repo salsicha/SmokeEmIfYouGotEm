@@ -1877,10 +1877,14 @@ bool AddLandscapeCandidateRunnableGameplay(
         }
         WaterConfig->LiveSurfaceCalmCoverage = 0.035f;
         WaterConfig->LiveSurfaceActiveCoverage = 0.14f;
-        WaterConfig->LiveSurfaceSpecular = 0.26f;
-        WaterConfig->LiveSurfaceRoughness = 0.36f;
-        WaterConfig->LiveSkyReflectionStrength = 0.20f;
-        WaterConfig->LiveRippleStrength = 0.24f;
+        // Preserve water's dielectric F0 while replacing the former polished
+        // sheet response with a turbulent Lava Canyon roughness/ripple range.
+        // The lower fallback sky term affects presentation only; it does not
+        // alter solver wetness, geometry, sampling, buoyancy, or raft forces.
+        WaterConfig->LiveSurfaceSpecular = 0.18f;
+        WaterConfig->LiveSurfaceRoughness = 0.68f;
+        WaterConfig->LiveSkyReflectionStrength = 0.05f;
+        WaterConfig->LiveRippleStrength = 0.55f;
         WaterConfig->LiveFoamIntensity = 0.56f;
         WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
         WaterConfig->LivePresentationSurfaceSmoothingStrength = 0.58f;
@@ -1895,7 +1899,7 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveDeepSurfaceColor =
             FLinearColor(0.002f, 0.018f, 0.032f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
-            FLinearColor(0.045f, 0.090f, 0.135f, 1.0f);
+            FLinearColor(0.025f, 0.050f, 0.075f, 1.0f);
         WaterConfig->LiveWaterScattering =
             FLinearColor(0.00010f, 0.00024f, 0.00034f, 0.0f);
         WaterConfig->LiveWaterAbsorption =
@@ -1906,6 +1910,8 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveDeepWaterOpacity = 0.70f;
         WaterConfig->LiveFoamWaterOpacity = 0.86f;
         WaterConfig->Tags.AddUnique(TEXT("RaftSimChilkoTransmittingWaterV2"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimChilkoLocalizedReflectionWaterV3"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }

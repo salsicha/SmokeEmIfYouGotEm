@@ -1,5 +1,6 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionPerInstanceRandom.h"
+#include "Materials/MaterialInstanceConstant.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -15,6 +16,9 @@ constexpr TCHAR TemperateVegetationMaterialPath[] = TEXT(
     "M_RaftSim_Temperate_OpaqueVegetation");
 constexpr TCHAR TemperateVegetationMeshRoot[] = TEXT(
     "/Game/RaftSim/Environment/TemperateRivers/Vegetation/Meshes/");
+constexpr TCHAR ChilkoMutedGroundCoverMaterialPath[] = TEXT(
+    "/Game/RaftSim/Environment/ChilkoRun/Vegetation/Materials/"
+    "MI_RaftSim_Chilko_MutedGroundCoverV3");
 constexpr TCHAR PacuareRainforestVegetationMaterialPath[] = TEXT(
     "/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/"
     "M_RaftSim_Pacuare_OpaqueRainforestVegetation");
@@ -53,6 +57,9 @@ constexpr int32 ChilkoOrganicShorelineGravelMinimumInstanceCount = 6800;
 constexpr float ChilkoOrganicShorelineGravelSlopeCeilingDegrees = 42.0f;
 constexpr int32 ChilkoOrganicShorelineGroundCoverTargetInstanceCount = 8400;
 constexpr int32 ChilkoOrganicShorelineGroundCoverMinimumInstanceCount = 7900;
+constexpr float ChilkoOrganicShorelineGravelRareMaximumHeightCm = 85.0f;
+constexpr float ChilkoOrganicShorelineGroundCoverMinimumHeightCm = 18.0f;
+constexpr float ChilkoOrganicShorelineGroundCoverMaximumHeightCm = 58.0f;
 constexpr float ChilkoOrganicShorelineGroundCoverSlopeCeilingDegrees = 32.0f;
 constexpr float ChilkoOrganicShorelineStartStationCm = 250.0f;
 constexpr float ChilkoOrganicShorelineEndStationCm = 59750.0f;
@@ -557,6 +564,11 @@ UMaterial* CreateOpaqueVegetationMaterial(
         NewObject<UMaterialExpressionVertexColor>(Material));
     UMaterialExpressionPerInstanceRandom* InstanceRandom = Add(
         NewObject<UMaterialExpressionPerInstanceRandom>(Material));
+    UMaterialExpressionVectorParameter* VegetationColorScale = Add(
+        NewObject<UMaterialExpressionVectorParameter>(Material));
+    VegetationColorScale->ParameterName = TEXT("VegetationColorScale");
+    VegetationColorScale->DefaultValue = FLinearColor::White;
+    VegetationColorScale->Group = TEXT("RaftSimOpaqueVegetation");
     UMaterialExpressionConstant* EnergyMinimum = Add(
         NewObject<UMaterialExpressionConstant>(Material));
     EnergyMinimum->R = InstanceEnergyMinimum;
@@ -568,9 +580,13 @@ UMaterial* CreateOpaqueVegetationMaterial(
     InstanceEnergy->A.Expression = EnergyMinimum;
     InstanceEnergy->B.Expression = EnergyMaximum;
     InstanceEnergy->Alpha.Expression = InstanceRandom;
+    UMaterialExpressionMultiply* ScaledVertexColor = Add(
+        NewObject<UMaterialExpressionMultiply>(Material));
+    ScaledVertexColor->A.Expression = VertexColor;
+    ScaledVertexColor->B.Expression = VegetationColorScale;
     UMaterialExpressionMultiply* VariedVertexColor = Add(
         NewObject<UMaterialExpressionMultiply>(Material));
-    VariedVertexColor->A.Expression = VertexColor;
+    VariedVertexColor->A.Expression = ScaledVertexColor;
     VariedVertexColor->B.Expression = InstanceEnergy;
     UMaterialExpressionConstant* Roughness = Add(
         NewObject<UMaterialExpressionConstant>(Material));
@@ -584,10 +600,20 @@ UMaterial* CreateOpaqueVegetationMaterial(
     UMaterialExpressionConstant* ShadowFloor = Add(
         NewObject<UMaterialExpressionConstant>(Material));
     ShadowFloor->R = ShadowFillStrength;
+    UMaterialExpressionScalarParameter* VegetationShadowFillScale = Add(
+        NewObject<UMaterialExpressionScalarParameter>(Material));
+    VegetationShadowFillScale->ParameterName =
+        TEXT("VegetationShadowFillScale");
+    VegetationShadowFillScale->DefaultValue = 1.0f;
+    VegetationShadowFillScale->Group = TEXT("RaftSimOpaqueVegetation");
+    UMaterialExpressionMultiply* ScaledShadowFloor = Add(
+        NewObject<UMaterialExpressionMultiply>(Material));
+    ScaledShadowFloor->A.Expression = ShadowFloor;
+    ScaledShadowFloor->B.Expression = VegetationShadowFillScale;
     UMaterialExpressionMultiply* ShadowFill = Add(
         NewObject<UMaterialExpressionMultiply>(Material));
     ShadowFill->A.Expression = VariedVertexColor;
-    ShadowFill->B.Expression = ShadowFloor;
+    ShadowFill->B.Expression = ScaledShadowFloor;
 
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
     ConnectPreviewMaterialColorInput(
@@ -1980,6 +2006,80 @@ bool CreateTemperateOpaqueVegetationAssets(
     return bComplete;
 }
 
+UMaterialInstanceConstant* CreateChilkoMutedGroundCoverMaterial(
+    UMaterialInterface* Parent,
+    FString& OutSummary)
+{
+    if (!Parent)
+    {
+        return nullptr;
+    }
+    const FString AssetName =
+        FPackageName::GetLongPackageAssetName(
+            ChilkoMutedGroundCoverMaterialPath);
+    const FString ObjectPath = FString::Printf(
+        TEXT("%s.%s"),
+        ChilkoMutedGroundCoverMaterialPath,
+        *AssetName);
+    UPackage* Package = CreatePackage(ChilkoMutedGroundCoverMaterialPath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+    UMaterialInstanceConstant* Instance =
+        LoadObject<UMaterialInstanceConstant>(nullptr, *ObjectPath);
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(
+            Package,
+            *AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Instance)
+        {
+            FAssetRegistryModule::AssetCreated(Instance);
+        }
+    }
+    if (!Instance)
+    {
+        return nullptr;
+    }
+
+    Instance->Modify();
+    Instance->SetParentEditorOnly(Parent);
+    Instance->ClearParameterValuesEditorOnly();
+    // The current shared mesh palette becomes fluorescent under Lava
+    // Canyon's open-sky review lighting. Apply a Chilko-only dry-meadow olive
+    // retone and reduce the shadow fill while preserving the original mesh,
+    // instance distribution, opacity, roughness, and Futaleufu parent output.
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("VegetationColorScale")),
+        FLinearColor(0.62f, 0.38f, 0.24f, 1.0f));
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("VegetationShadowFillScale")),
+        0.28f);
+    Instance->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    Package->MarkPackageDirty();
+
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        ChilkoMutedGroundCoverMaterialPath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT(
+            "Failed to save the Chilko muted ground-cover material.\n");
+        return nullptr;
+    }
+    OutSummary += TEXT(
+        "Built a Chilko-only muted dry-meadow ground-cover material V3; "
+        "the shared Futaleufu temperate parent retains identity defaults.\n");
+    return Instance;
+}
+
 bool CreatePacuareOpaqueRainforestVegetationAssets(
     UWorld* World,
     UStaticMesh*& OutCanopyTreeA,
@@ -2680,6 +2780,7 @@ bool AddLandscapeCandidateBiomeDressing(
     UMaterialInterface* ZambeziOpaqueVegetationMaterial = nullptr;
     UMaterialInterface* PacuareOpaqueRainforestVegetationMaterial = nullptr;
     UMaterialInterface* TemperateOpaqueVegetationMaterial = nullptr;
+    UMaterialInterface* ChilkoMutedGroundCoverMaterial = nullptr;
     UStaticMesh* HanceDrylandShrubMeshA = nullptr;
     UStaticMesh* HanceDrylandShrubMeshB = nullptr;
     UStaticMesh* HanceDrylandGroundCoverMeshA = nullptr;
@@ -2760,6 +2861,19 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingFoliageMaterialAssetPath =
             TemperateOpaqueVegetationMaterial->GetPathName();
         OutResult.bDressingUsesOpaqueVolumetricVegetation = true;
+        if (bChilko)
+        {
+            ChilkoMutedGroundCoverMaterial =
+                CreateChilkoMutedGroundCoverMaterial(
+                    TemperateOpaqueVegetationMaterial,
+                    OutSummary);
+            if (!ChilkoMutedGroundCoverMaterial)
+            {
+                return false;
+            }
+            OutResult.DressingUnderstoryFoliageMaterialAssetPath =
+                ChilkoMutedGroundCoverMaterial->GetPathName();
+        }
     }
     else
     {
@@ -2954,6 +3068,10 @@ bool AddLandscapeCandidateBiomeDressing(
     UMaterialInterface* BroadleafFoliageMaterial = OpaqueVegetationMaterial;
     UMaterialInterface* ConiferFoliageMaterial = OpaqueVegetationMaterial;
     UMaterialInterface* UnderstoryFoliageMaterial = OpaqueVegetationMaterial;
+    if (bChilko)
+    {
+        UnderstoryFoliageMaterial = ChilkoMutedGroundCoverMaterial;
+    }
     if (!bUsesOpaqueVolumetricVegetation)
     {
         BroadleafFoliageMaterial =
@@ -2991,13 +3109,14 @@ bool AddLandscapeCandidateBiomeDressing(
                 OutSummary);
     }
     OutResult.DressingFoliageMaterialAssetCount = (bUsesOpaqueVolumetricVegetation
-        ? (OpaqueVegetationMaterial ? 1 : 0)
+        ? (OpaqueVegetationMaterial ? 1 : 0) +
+            (bChilko && ChilkoMutedGroundCoverMaterial ? 1 : 0)
         : (BroadleafFoliageMaterial ? 1 : 0) +
             (ConiferFoliageMaterial ? 1 : 0) +
             (UnderstoryFoliageMaterial ? 1 : 0)) +
         (bColoradoHance && HanceDrylandVegetationMaterial ? 1 : 0);
     const int32 ExpectedFoliageMaterialAssetCount =
-        (bUsesOpaqueVolumetricVegetation ? 1 : 3) +
+        (bUsesOpaqueVolumetricVegetation ? (bChilko ? 2 : 1) : 3) +
         (bColoradoHance ? 1 : 0);
     if (OutResult.DressingFoliageMaterialAssetCount !=
         ExpectedFoliageMaterialAssetCount)
@@ -3104,7 +3223,7 @@ bool AddLandscapeCandidateBiomeDressing(
                       TEXT("RaftSim_LandscapeCandidate_PveWholeUnderstory_%s"),
                       *Candidate.PreviewSpec.RiverId),
             true,
-            bUsesOpaqueVolumetricVegetation ? OpaqueVegetationMaterial : nullptr);
+            bUsesOpaqueVolumetricVegetation ? UnderstoryFoliageMaterial : nullptr);
     UHierarchicalInstancedStaticMeshComponent* TemperateBroadleafTreeInstancesB =
         bOpaqueTemperate
         ? AddLandscapeCandidateInstancedMeshComponent(
@@ -3147,7 +3266,9 @@ bool AddLandscapeCandidateBiomeDressing(
                   TEXT("RaftSim_LandscapeCandidate_TemperateOpaqueGroundCoverB_%s"),
                   *Candidate.PreviewSpec.RiverId),
               true,
-              TemperateOpaqueVegetationMaterial)
+              bChilko
+                  ? ChilkoMutedGroundCoverMaterial
+                  : TemperateOpaqueVegetationMaterial)
         : nullptr;
     UHierarchicalInstancedStaticMeshComponent* HanceDrylandGroundCoverInstancesA =
         bColoradoHance
@@ -3342,7 +3463,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGroundCoverA_%s"),
                     *Candidate.PreviewSpec.RiverId),
                 false,
-                TemperateOpaqueVegetationMaterial),
+                ChilkoMutedGroundCoverMaterial),
             AddLandscapeCandidateInstancedMeshComponent(
                 World,
                 TemperateUnderstoryMeshB,
@@ -3350,7 +3471,7 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSim_LandscapeCandidate_ChilkoOrganicShorelineGroundCoverB_%s"),
                     *Candidate.PreviewSpec.RiverId),
                 false,
-                TemperateOpaqueVegetationMaterial)};
+                ChilkoMutedGroundCoverMaterial)};
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
         PacuareOrganicShorelineRockInstances;
@@ -3630,9 +3751,19 @@ bool AddLandscapeCandidateBiomeDressing(
                 GroundOwner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
                 GroundOwner->Tags.AddUnique(
                     TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+                if (bChilko)
+                {
+                    GroundOwner->Tags.AddUnique(
+                        TEXT("RaftSimChilkoMutedGroundCoverV3"));
+                }
             }
             GroundCoverComponent->ComponentTags.AddUnique(
                 TEXT("RaftSimOrganicBankGroundCover"));
+            if (bChilko)
+            {
+                GroundCoverComponent->ComponentTags.AddUnique(
+                    TEXT("RaftSimChilkoMutedGroundCoverV3"));
+            }
         }
     }
     if (bOpaqueTemperate)
@@ -3688,6 +3819,8 @@ bool AddLandscapeCandidateBiomeDressing(
             {
                 Owner->Tags.AddUnique(TEXT("RaftSimChilkoLavaCanyonRun"));
                 Owner->Tags.AddUnique(TEXT("RaftSimChilkoOrganicShorelineV2"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimChilkoShorelineNaturalismV3"));
                 Owner->Tags.AddUnique(FamilyTag);
                 Owner->Tags.AddUnique(TEXT("RaftSimProceduralSourceGapFill"));
                 Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
@@ -3698,6 +3831,8 @@ bool AddLandscapeCandidateBiomeDressing(
             }
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimChilkoOrganicShorelineV2"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimChilkoShorelineNaturalismV3"));
             Component->ComponentTags.AddUnique(FamilyTag);
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimOutsideProtectedSolverStrip"));
@@ -3716,6 +3851,8 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimRightsReviewedCC0RockAnalog"));
                 Owner->Tags.AddUnique(
                     TEXT("RaftSimGenericRockAnalogNoLithologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimChilkoSortedGravelScaleV3"));
             }
         }
         for (UHierarchicalInstancedStaticMeshComponent* Component :
@@ -3731,11 +3868,15 @@ bool AddLandscapeCandidateBiomeDressing(
                     TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
                 Owner->Tags.AddUnique(
                     TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimChilkoMutedGroundCoverV3"));
             }
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimOrganicBankGroundCover"));
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimChilkoMutedGroundCoverV3"));
         }
     }
     if (bPacuare)
@@ -4070,21 +4211,52 @@ bool AddLandscapeCandidateBiomeDressing(
                 : 0;
         }
         OutResult.DressingNativeFoliageMaterialFallbackSlotCount = 0;
+        UMaterialInstanceConstant* ChilkoGroundCoverInstance =
+            Cast<UMaterialInstanceConstant>(ChilkoMutedGroundCoverMaterial);
+        FLinearColor ChilkoGroundCoverColorScale = FLinearColor::Black;
+        float ChilkoGroundCoverShadowFillScale = 0.0f;
+        const bool bChilkoGroundCoverMaterialValidated = !bChilko ||
+            (ChilkoGroundCoverInstance &&
+             ChilkoGroundCoverInstance->Parent == OpaqueVegetationMaterial &&
+             ChilkoGroundCoverInstance->GetVectorParameterValue(
+                 FMaterialParameterInfo(TEXT("VegetationColorScale")),
+                 ChilkoGroundCoverColorScale) &&
+             ChilkoGroundCoverInstance->GetScalarParameterValue(
+                 FMaterialParameterInfo(TEXT("VegetationShadowFillScale")),
+                 ChilkoGroundCoverShadowFillScale) &&
+             ChilkoGroundCoverColorScale.Equals(
+                 FLinearColor(0.62f, 0.38f, 0.24f, 1.0f),
+                 0.001f) &&
+             FMath::IsNearlyEqual(
+                 ChilkoGroundCoverShadowFillScale,
+                 0.28f,
+                 0.001f));
         OutResult.bDressingFoliageMaterialsValidated =
             OutResult.DressingFoliageMaterialBoundSlotCount ==
                 (bOpaqueTemperate ? 8 : 4) &&
             ValidateZambeziOpaqueVegetationMaterial(
                 OpaqueVegetationMaterial) &&
+            bChilkoGroundCoverMaterialValidated &&
             Algo::AllOf(
                 Components,
-                [OpaqueVegetationMaterial](
+                [bChilko,
+                 OpaqueVegetationMaterial,
+                 ChilkoMutedGroundCoverMaterial,
+                 UnderstoryInstances,
+                 TemperateUnderstoryInstancesB](
                     UHierarchicalInstancedStaticMeshComponent* Component)
                 {
+                    UMaterialInterface* ExpectedMaterial =
+                        bChilko &&
+                            (Component == UnderstoryInstances ||
+                             Component == TemperateUnderstoryInstancesB)
+                        ? ChilkoMutedGroundCoverMaterial
+                        : OpaqueVegetationMaterial;
                     return Component &&
                         Component->GetCollisionEnabled() ==
                             ECollisionEnabled::NoCollision &&
                         Component->GetMaterial(0) ==
-                            OpaqueVegetationMaterial;
+                            ExpectedMaterial;
                 }) &&
             (!bPacuare ||
              (PacuareOrganicShorelineGroundCoverInstances &&
@@ -4760,22 +4932,26 @@ bool AddLandscapeCandidateBiomeDressing(
                 continue;
             }
 
-            const int32 ScaleClass = GravelIndex % 36;
+            // Preserve a gravel/cobble-dominant bank. V2 devoted one in 36
+            // instances to 0.8-1.4 m silhouettes; that produced the isolated
+            // boulder-sized outlier in the matched close view. V3 makes the
+            // rare class half as frequent and hard-caps it at one metre.
+            const int32 ScaleClass = GravelIndex % 72;
             const float TargetHeightCm = ScaleClass == 0
                 ? FMath::Lerp(
-                      80.0f,
-                      140.0f,
+                      65.0f,
+                      ChilkoOrganicShorelineGravelRareMaximumHeightCm,
                       ZambeziVegetationUnitRandom(GravelIndex, 10343))
-                : (ScaleClass < 8
+                : (ScaleClass < 12
                        ? FMath::Lerp(
-                             32.0f,
-                             72.0f,
+                             28.0f,
+                             62.0f,
                              ZambeziVegetationUnitRandom(
                                  GravelIndex,
                                  10351))
                        : FMath::Lerp(
-                             10.0f,
-                             34.0f,
+                             8.0f,
+                             28.0f,
                              ZambeziVegetationUnitRandom(
                                  GravelIndex,
                                  10357)));
@@ -4832,7 +5008,7 @@ bool AddLandscapeCandidateBiomeDressing(
             Component->MarkRenderStateDirty();
         }
         OutSummary += FString::Printf(
-            TEXT("%s organic shoreline gravel V2: %d/%d source-grounded, ")
+            TEXT("%s organic shoreline gravel V3: %d/%d source-grounded, ")
             TEXT("non-colliding six-morphology cobbles across both full-route ")
             TEXT("banks; %d targets rejected by visible-water clearance, ")
             TEXT("dry-height, or %.1f-degree slope gates; minimum centerline ")
@@ -4972,8 +5148,8 @@ bool AddLandscapeCandidateBiomeDressing(
             UHierarchicalInstancedStaticMeshComponent* CoverComponent =
                 ChilkoOrganicShorelineGroundCoverInstances[MorphologyIndex];
             const float TargetHeightCm = FMath::Lerp(
-                36.0f,
-                110.0f,
+                ChilkoOrganicShorelineGroundCoverMinimumHeightCm,
+                ChilkoOrganicShorelineGroundCoverMaximumHeightCm,
                 ZambeziVegetationUnitRandom(CoverIndex, 10453));
             const float MeshHeightCm = FMath::Max(
                 1.0f,
@@ -5020,7 +5196,7 @@ bool AddLandscapeCandidateBiomeDressing(
             Component->MarkRenderStateDirty();
         }
         OutSummary += FString::Printf(
-            TEXT("%s organic shoreline ground cover V2: %d/%d short, ")
+            TEXT("%s organic shoreline ground cover V3: %d/%d short, ")
             TEXT("non-shadowing, source-grounded patches across both full-route ")
             TEXT("dry banks; %d targets rejected by visible-water clearance, ")
             TEXT("dry-height, or %.1f-degree slope gates; minimum centerline ")

@@ -1767,8 +1767,24 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         Scalar(TEXT("CalmLiveSurfaceCoverage"), 0.0f),
         Scalar(TEXT("ActiveLiveSurfaceCoverage"), 0.03f),
         HydraulicActivity);
-    UMaterialExpressionMultiply* SurfaceCoverage = Mul(
+    UMaterialExpressionMultiply* HydraulicSurfaceCoverage = Mul(
         StationEdgeCoverage, HydraulicCoverage);
+    // Older live detail skins retained calm alpha on the dry vertices of the
+    // rectangular solver grid. Keep the shared behavior as the default, but
+    // expose a river-local depth mask so Lava Canyon can fade the detail skin
+    // to zero before the wet/dry boundary instead of drawing water over land.
+    UMaterialExpressionSaturate* WetDepthCoverage =
+        Cast<UMaterialExpressionSaturate>(
+            Add(NewObject<UMaterialExpressionSaturate>(Material)));
+    WetDepthCoverage->Input.Expression = Mul(
+        DepthMask,
+        Scalar(TEXT("LiveWetCoverageDepthGain"), 32.0f));
+    UMaterialExpression* WetCoverage = Lerp(
+        Scalar(TEXT("LiveWetCoverageIdentity"), 1.0f),
+        WetDepthCoverage,
+        Scalar(TEXT("LiveWetCoverageEnable"), 0.0f));
+    UMaterialExpressionMultiply* SurfaceCoverage = Mul(
+        HydraulicSurfaceCoverage, WetCoverage);
     // Continuous alpha is essential for still captures and lower temporal-AA
     // histories: a masked temporal dither exposed a conspicuous stipple field
     // across otherwise calm water. This ordinary surface translucency does not

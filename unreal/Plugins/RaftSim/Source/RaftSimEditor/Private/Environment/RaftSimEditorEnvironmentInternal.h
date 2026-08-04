@@ -743,6 +743,7 @@ struct FRaftSimLandscapeImportCandidateResult
     FString DressingShrubVariantAssetPath;
     FString DressingUnderstoryVariantAssetPath;
     FString DressingFoliageMaterialAssetPath;
+    FString DressingUnderstoryFoliageMaterialAssetPath;
     bool bDressingUsesOpaqueVolumetricVegetation = false;
     bool bDressingValidated = false;
     FString WaterMaterialPath;
