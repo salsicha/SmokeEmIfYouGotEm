@@ -454,12 +454,19 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
     SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.72f);
     SetScalar(TEXT("SpeedAerationFraction"), 0.13f);
     SetScalar(TEXT("FoamRoughness"), 0.70f);
-    SetScalar(TEXT("ReachHueVariation"), 0.08f);
-    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.12f);
-    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.44f);
-    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.30f);
-    SetScalar(TEXT("SlickNormalFloor"), 0.26f);
+    // Lava Canyon is fast, wind-textured water rather than a broad polished
+    // mirror. Keep the dielectric response, but localize the capture fallback
+    // reflection and retain more micro-normal/roughness energy inside the
+    // shared parent's procedural slick patches. These parameters change only
+    // the Chilko material instance; solver geometry and wetness stay upstream.
+    SetScalar(TEXT("ReachHueVariation"), 0.12f);
+    SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f);
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.75f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.85f);
+    SetScalar(TEXT("SlickRoughnessScale"), 1.0f);
+    SetScalar(TEXT("FresnelSpecular"), 0.01f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();
@@ -477,8 +484,9 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
         return nullptr;
     }
     OutSummary += TEXT(
-        "Built Chilko river-local live-volume water V2 with first-party "
-        "flow-normal and solver-masked foam-lace textures.\n");
+        "Built Chilko river-local live-volume water V3 with first-party "
+        "flow-normal and solver-masked foam-lace textures plus localized "
+        "sky reflection and turbulent slick response.\n");
     return Instance;
 }
 } // namespace RaftSimEditorEnvironment

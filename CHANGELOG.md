@@ -32,6 +32,17 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Corrected Chilko Lava Canyon's legacy-config detection so regenerated maps
+  retain their authored river-local optical values. A Chilko-only depth-
+  coverage mask, restrained lighting/reflection rig, muted vegetation material,
+  and smaller full-reach gravel/cover distributions reduce the pale sheet,
+  clipped highlights, fluorescent cover, and oversized silhouettes without
+  changing cooked fields, hydraulics, collision, buoyancy, or raft forces.
+  Matched evidence reduces water-band mean luminance 6.18%, >0.90 coverage
+  59.21%, >0.95 coverage 98.93%, and bank neon-green fraction 64.77%. The
+  editor build and all six runnable-map gates pass; remaining shore form,
+  ecology/geology, foam/VFX, calibration, performance, and external reviews
+  keep photoreal promotion open.
 - Replaced the shared live-water renderer's dominant 11.5 cm diagonal
   sinusoid with deterministic flow-aligned, phase-warped crest packets and
   analytical normals. The theoretical presentation bound drops from 24.8 cm

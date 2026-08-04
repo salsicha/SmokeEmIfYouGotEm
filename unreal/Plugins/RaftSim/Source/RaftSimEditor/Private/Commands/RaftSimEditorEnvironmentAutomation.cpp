@@ -1095,7 +1095,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingTemperateNearBankMinimumCenterlineDistanceCm,
             Result.DressingTemperateNearBankMaximumSlopeDegrees,
             Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount > 0
-                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_full_runnable_reach_organic_shoreline_gravel_v2_captured")
+                ? TEXT("source_grounded_rights_reviewed_cc0_six_variant_full_runnable_reach_sorted_scale_organic_shoreline_gravel_v3_captured")
                 : TEXT("not_enabled_for_this_river"),
             Result.DressingChilkoOrganicShorelineGravelTargetInstanceCount,
             Result.DressingChilkoOrganicShorelineGravelInstanceCount,
@@ -1103,7 +1103,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingChilkoOrganicShorelineGravelMinimumCenterlineDistanceCm,
             Result.DressingChilkoOrganicShorelineGravelMaximumSlopeDegrees,
             Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount > 0
-                ? TEXT("source_grounded_full_runnable_reach_short_meadow_ground_cover_v2_captured")
+                ? TEXT("source_grounded_full_runnable_reach_muted_short_meadow_ground_cover_v3_captured")
                 : TEXT("not_enabled_for_this_river"),
             Result.DressingChilkoOrganicShorelineGroundCoverTargetInstanceCount,
             Result.DressingChilkoOrganicShorelineGroundCoverInstanceCount,
@@ -1128,8 +1128,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? (bUsesOpaqueVolumetricVegetation
                        ? (bUsesZambeziDefaultLitWater
                               ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_five_volumetric_morphology_meshes_no_alpha_cards")
-                              : (bUsesFutaleufuOrganicTemperateSurface ||
-                                 bUsesChilkoOrganicLavaCanyonSurface)
+                              : bUsesChilkoOrganicLavaCanyonSurface
+                              ? TEXT("one_project_owned_opaque_parent_plus_one_chilko_only_muted_ground_cover_instance_bound_to_eight_volumetric_morphology_meshes_no_alpha_cards")
+                              : bUsesFutaleufuOrganicTemperateSurface
                               ? TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_eight_volumetric_morphology_meshes_no_alpha_cards")
                               : TEXT("one_project_owned_opaque_one_sided_vertex_color_material_bound_to_four_volumetric_species_no_alpha_cards"))
                        : bUsesColoradoOrganicHanceSurface
@@ -1149,7 +1150,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                     : DefaultConiferMaterialAsset),
             *EscapeRaftSimJsonString(
                 bUsesOpaqueVolumetricVegetation
-                    ? Result.DressingFoliageMaterialAssetPath
+                    ? (!Result.DressingUnderstoryFoliageMaterialAssetPath.IsEmpty()
+                           ? Result.DressingUnderstoryFoliageMaterialAssetPath
+                           : Result.DressingFoliageMaterialAssetPath)
                     : DefaultUnderstoryMaterialAsset),
             FoliageSettings.BroadleafFrontTint.R,
             FoliageSettings.BroadleafFrontTint.G,

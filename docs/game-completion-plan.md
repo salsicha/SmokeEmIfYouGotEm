@@ -4152,6 +4152,20 @@ path is verified, and the completion goal can be marked complete.
   banks/shoreline/ecology, missing rapid-scale spray and mist, unconverged
   hydraulics, and all six external acceptance gates keep M9 and photoreal
   promotion open.
+- Chilko optical and shoreline naturalism V3 fixes the runtime compatibility
+  branch that was silently restoring V2 reflection values after map
+  regeneration. A default-off shared depth-coverage mask is enabled for
+  Chilko, its redundant broad detail skin is removed, and the wet-cell-clipped
+  transmitting core plus solver-masked rapid foam remain. The complete bank
+  layer keeps 7,200 gravel and 8,400 cover instances but uses a muted Chilko-
+  only material, 18-58 cm cover, predominantly 8-28 cm gravel, and a rare
+  65-85 cm class; shared Futaleufu defaults remain unchanged. Matched side-on
+  evidence reduces water mean luminance 6.18%, >0.90 coverage 59.21%, >0.95
+  coverage 98.93%, and bank neon-green fraction 64.77%. The editor build, M9
+  material audit, all six P4 runnable-map gates, MapCheck 0/0, and focused
+  contracts pass. The far-bank shallow band, repeated foam strokes, smooth
+  terrain, generic ecology/geology, incomplete rapid-scale VFX, calibration,
+  performance, and all six external reviews keep the milestone fail-closed.
 - Pacuare organic shoreline V1 replaces Upper Huacas's visibly bare transition
   between its smooth reach-local banks and repeated procedural canopy with six
   moss-rock morphology variants, 5,200 short rainforest-floor patches, and

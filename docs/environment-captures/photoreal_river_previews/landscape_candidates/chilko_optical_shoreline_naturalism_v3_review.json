@@ -1,0 +1,200 @@
+{
+  "schema": "raftsim.environment.chilko_optical_shoreline_naturalism_review.v3",
+  "generated_utc": "2026-08-04T04:20:12Z",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "river_id": "chilko_river_lava_canyon",
+  "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "nonrepeating_wet_bank_v2_superseded": true,
+    "initial_v3_optical_iteration_rejected": true,
+    "legacy_presentation_override_defect_corrected": true,
+    "runtime_artifacts_promoted": true,
+    "b2_asset_set_promoted": false,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false
+  },
+  "implementation": {
+    "live_water": {
+      "scope": "chilko_only_runtime_config_and_default_off_shared_wet_coverage_hook",
+      "legacy_defaults_apply_only_when_explicit_volume_core_flag_is_absent": true,
+      "live_surface_specular": 0.18,
+      "live_surface_roughness": 0.68,
+      "live_sky_reflection_strength": 0.05,
+      "live_ripple_strength": 0.55,
+      "live_reflected_sky_color": [0.025, 0.05, 0.075, 1.0],
+      "fallback_sky_reflection_floor": 0.08,
+      "fallback_sky_reflection_variation": 0.24,
+      "ripple_grazing_floor": 0.75,
+      "slick_normal_floor": 0.85,
+      "slick_roughness_scale": 1.0,
+      "fresnel_specular": 0.01,
+      "live_detail_skin_calm_coverage": 0.0,
+      "live_detail_skin_active_coverage": 0.0,
+      "solver_clipped_volume_core_retained": true,
+      "separate_solver_masked_rapid_foam_retained": true,
+      "shared_live_wet_coverage_default_enable": 0.0,
+      "chilko_live_wet_coverage_runtime_enable": 1.0,
+      "chilko_live_wet_coverage_depth_gain": 32.0,
+      "authority": "presentation_only_no_solver_geometry_wetness_buoyancy_collision_hydraulic_or_raft_force_authority"
+    },
+    "lighting": {
+      "scope": "chilko_only",
+      "sun_intensity": 4.1,
+      "sky_light_intensity": 1.3,
+      "exposure_bias": -0.3,
+      "sun_rotation_degrees": [-50.0, 55.0, 0.0],
+      "corridor_reflection_brightness": 0.65,
+      "tag": "RaftSimChilkoRestrainedReflectionRigV3"
+    },
+    "shoreline": {
+      "material_asset": "/Game/RaftSim/Environment/ChilkoRun/Vegetation/Materials/MI_RaftSim_Chilko_MutedGroundCoverV3",
+      "material_asset_count": 2,
+      "color_scale": [0.62, 0.38, 0.24, 1.0],
+      "shadow_fill_scale": 0.28,
+      "shared_temperate_parent_identity_defaults_retained": true,
+      "ground_cover_height_range_cm": [18.0, 58.0],
+      "gravel_scale_class_modulus": 72,
+      "rare_gravel_maximum_height_cm": 85.0,
+      "gravel_placed_instance_count": 7200,
+      "ground_cover_placed_instance_count": 8400,
+      "saved_map_rock_instance_count": 8820,
+      "saved_map_foliage_instance_count": 16400,
+      "saved_map_understory_instance_count": 11750,
+      "collision": "disabled_on_all_v3_shoreline_components",
+      "authority": "presentation_only_procedural_source_gap_fill_no_geology_ecology_survey_collision_bathymetry_hydraulic_or_raft_force_authority"
+    }
+  },
+  "live_evidence": {
+    "matched_breaking_water_side": {
+      "command": "RaftSim.CaptureAfter 8 chilko_optical_shoreline_naturalism_v3_breaking_water_side breaking_water_side",
+      "camera_site_station_m": 301.5,
+      "camera_site_lateral_m": -4.5,
+      "camera_site_intensity": 1.0,
+      "presentation_coverage": 1.0,
+      "presentation_edge_clearance_m": 15.0,
+      "resolution_px": [1280, 720],
+      "capture_exit_code": 0,
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_breaking_water_side.png",
+      "sha256": "6fdbae0d2ec37497b7812df196e34fd6ff60bb4f7bdacab4e35afbce5849d640"
+    },
+    "fixed_bank_closeup": {
+      "command": "RaftSim.CaptureAfter 8 chilko_optical_shoreline_naturalism_v3_bank_closeup 30000 0 260 -4 90",
+      "world_location_cm": [30000.0, 0.0, 260.0],
+      "rotation_degrees": [-4.0, 90.0, 0.0],
+      "resolution_px": [1280, 720],
+      "capture_exit_code": 0,
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_bank_closeup.png",
+      "sha256": "1baebe40e1d43a219f52edbaf1af5461b509ca56e06cd08356106493d336f29e"
+    },
+    "runtime_inventory": {
+      "surface_vertices": 10465,
+      "volume_core_triangles": 6854,
+      "visible_rapid_foam_vertices": 51,
+      "surface_smoothing_strength": 0.58,
+      "standing_wave_scale": 0.78,
+      "hydraulic_relief_scale": 0.78
+    }
+  },
+  "visual_comparison": {
+    "method": "Direct sRGB metrics over rows 250 through 719 for water and rows 150 through 379 for the bank. Highlight fractions use normalized luminance thresholds 0.90 and 0.95. Neon cover requires G > 0.5, G > 1.18R, and G > 1.08B.",
+    "v2_breaking_water_side": {
+      "water_mean_luminance": 0.679885357,
+      "water_p95_luminance": 0.884323922,
+      "water_fraction_over_0_90": 0.034054189,
+      "water_fraction_over_0_95": 0.001245013,
+      "bank_neon_green_fraction": 0.026548913
+    },
+    "v3_breaking_water_side": {
+      "water_mean_luminance": 0.637844525,
+      "water_p95_luminance": 0.835865098,
+      "water_fraction_over_0_90": 0.013889628,
+      "water_fraction_over_0_95": 0.000013298,
+      "bank_neon_green_fraction": 0.00935462
+    },
+    "v2_bank_closeup": {
+      "water_mean_luminance": 0.623144555,
+      "water_p95_luminance": 0.863599216,
+      "bank_green_dominant_fraction": 0.471735734,
+      "bank_neon_green_fraction": 0.118746603
+    },
+    "v3_bank_closeup": {
+      "water_mean_luminance": 0.589740696,
+      "water_p95_luminance": 0.833563922,
+      "bank_green_dominant_fraction": 0.3190625,
+      "bank_neon_green_fraction": 0.073933424
+    },
+    "verdict": "Retain as a bounded optical and shoreline naturalism improvement. In the matched breaking-water frame, mean water luminance falls 6.18 percent, p95 falls 5.48 percent, >0.90 highlight coverage falls 59.21 percent, >0.95 coverage falls 98.93 percent, and neon-bank coverage falls 64.77 percent. In the fixed close view, water p95 falls 3.48 percent and neon-bank coverage falls 37.74 percent. The result remains visibly procedural and does not pass photoreal acceptance."
+  },
+  "validation": {
+    "filtered_generation": "passed; Chilko-only generator completed with exit code 0, MapCheck 0 errors and 0 warnings, and wrote the V3 map, materials, canonical captures, and manifest",
+    "unreal_editor_build": "passed; clean 137-action build plus all focused incremental rebuilds succeeded",
+    "native_material_audit": "passed 1/1; RaftSim.M9.FChilkoLavaCanyonWater validates the retained capture material, river-local live instance, reviewed V3 scalar overrides, and first-party normal/foam textures",
+    "native_runnable_map_audit": "passed 6/6; RaftSim.P4.RiverMapLoads validates every runnable river including Lava Canyon and Terminator, with MapCheck 0 errors and 0 warnings per map",
+    "focused_python": "passed 17/17; current Chilko water and organic shoreline contracts",
+    "live_captures": "passed; matched and fixed-closeup 1280x720 captures completed with exit code 0"
+  },
+  "remaining_photoreal_defects": [
+    "The 30 m source terrain still produces broad smooth lower-bank geometry without surveyed breaklines, erosion cuts, roots, or fine sediment structure.",
+    "A pale shallow-water band remains visible along part of the far bank and needs a future depth/shore optical transition pass.",
+    "The current solver foam reads as bright repeated streaks rather than fully volumetric breaking water with entrained air, spray, mist, and turbulent occlusion.",
+    "Canopy trunks, crowns, spacing, and transitions remain visibly procedural and repetitive.",
+    "Ground cover is shorter and less fluorescent but remains generic procedural morphology with no local species or ecology authority.",
+    "The six rock meshes are generic CC0 morphology donors, not reviewed Lava Canyon lithology.",
+    "Atmosphere, weather, seasonal state, litter, roots, deadwood, and wet-bank gradients remain incomplete.",
+    "No local guide, geospatial, hydraulic, ecology/geology/art, complete photoreal, or target-hardware acceptance has been supplied."
+  ],
+  "required_external_acceptance_gates": [
+    "local Chilko guide review of Lava Canyon stationing, approach, lines, hazards, recovery, access, rescue routes, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, rocks, bathymetry, stationing, and vertical datums",
+    "hydraulic calibration and convergence approval against observed Lava Canyon behavior across playable discharge bands",
+    "Chilcotin ecology, geology, and environment-art approval of species, density, ground cover, wet banks, rocks, valley form, atmosphere, and season",
+    "photoreal water and VFX plus raft, equipment, character, animation, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_breaking_water_side.png",
+      "sha256": "6fdbae0d2ec37497b7812df196e34fd6ff60bb4f7bdacab4e35afbce5849d640"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_bank_closeup.png",
+      "sha256": "1baebe40e1d43a219f52edbaf1af5461b509ca56e06cd08356106493d336f29e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+      "sha256": "ad9e9267350ebdf6e03fae05adeaac8dca6fc097c217890ba0125e8e1f1dcc6b"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "e40190653b35199df91d9c43849c6a3d77914aa29d10d63724ba108e108022e3"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Vegetation/Materials/MI_RaftSim_Chilko_MutedGroundCoverV3.uasset",
+      "sha256": "1d9c9ed53064be83a1d79b5e4268bec4a4c609054fdb2e587162ea84a5e92c4f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2.uasset",
+      "sha256": "5256e78a0d5f689e2f93aff9653949c17c90aef799ffb3b3453d571e67cb32f1"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Materials/M_RaftSim_LiveRiverSurface.uasset",
+      "sha256": "b7b7d87fa6f9e484e6c98d95bf2106cb71b1817ffe8be49b9a26ede76413bef8"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "sha256": "1f50c03562ae56fc51355748fb36ac71967be4250ecda9b4fbabf1899d876f0d"
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
+      "sha256": "7837239b3c63baac9127fa9126ed79a89b8f99c56837f945cfd768e4d4762023"
+    }
+  ]
+}

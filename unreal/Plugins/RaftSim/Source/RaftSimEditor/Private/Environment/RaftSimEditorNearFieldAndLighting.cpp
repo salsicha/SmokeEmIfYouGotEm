@@ -1824,6 +1824,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     // gorge so the renderer does not amplify source sampling into fake ribs.
     const FRotator SunRotation = Spec.RiverId == TEXT("zambezi_batoka_gorge")
         ? FRotator(-48.0f, -90.0f, 0.0f)
+        : Spec.RiverId == TEXT("chilko_river_lava_canyon")
+        ? FRotator(-50.0f, 55.0f, 0.0f)
         : FRotator(-58.0f, -30.0f, 0.0f);
     ADirectionalLight* Sun = Cast<ADirectionalLight>(
         GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(SunRotation)));
@@ -1837,6 +1839,11 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         Sun->GetLightComponent()->SetIntensity(CaptureSettings.SunIntensity);
         Sun->GetLightComponent()->SetLightColor(CaptureSettings.SunColor);
         Sun->GetLightComponent()->SetCastShadows(true);
+        if (Spec.RiverId == TEXT("chilko_river_lava_canyon"))
+        {
+            Sun->Tags.AddUnique(
+                TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+        }
         if (UDirectionalLightComponent* SunComponent = Sun->GetComponent())
         {
             SunComponent->SetAtmosphereSunLight(true);
@@ -1966,10 +1973,18 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
                 Cast<USphereReflectionCaptureComponent>(RiverReflectionCapture->GetCaptureComponent()))
         {
             ReflectionComponent->InfluenceRadius = 42000.0f;
-            ReflectionComponent->Brightness = 1.0f;
+            ReflectionComponent->Brightness =
+                Spec.RiverId == TEXT("chilko_river_lava_canyon")
+                ? 0.65f
+                : 1.0f;
             ReflectionComponent->ReflectionSourceType = EReflectionSourceType::CapturedScene;
             ReflectionComponent->bRuntimeCapture = true;
             ReflectionComponent->MarkDirtyForRecapture();
+            if (Spec.RiverId == TEXT("chilko_river_lava_canyon"))
+            {
+                RiverReflectionCapture->Tags.AddUnique(
+                    TEXT("RaftSimChilkoRestrainedReflectionRigV3"));
+            }
             World->SendAllEndOfFrameUpdates();
             UReflectionCaptureComponent::UpdateReflectionCaptureContents(
                 World,

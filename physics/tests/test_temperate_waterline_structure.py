@@ -47,7 +47,10 @@ def test_temperate_waterline_generator_is_bounded_and_non_authoritative() -> Non
     ):
         assert token in source
 
-    assert "bSouthFork || bZambezi || bFutaleufu || bChilko" in source
+    assert (
+        "bSouthFork || bZambezi || bPacuare || bFutaleufu || bChilko"
+        in source
+    )
     assert "Landscape->Import" not in source[source.index("int32 TemperateWaterlinePlacedCount") :]
 
 

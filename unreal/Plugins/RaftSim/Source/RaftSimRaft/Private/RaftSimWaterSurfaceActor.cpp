@@ -720,6 +720,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         RiverWaterConfig->CookedFieldsDir.Contains(
             TEXT("chilko_river_lava_canyon"),
             ESearchCase::CaseSensitive);
+    const bool bUsesLegacyChilkoPresentationDefaults =
+        bUsesMigratedChilkoVolumeCore &&
+        !RiverWaterConfig->bEnableLiveSolverVolumeCore;
     const bool bUsesMigratedColoradoVolumeCore =
         RiverWaterConfig &&
         RiverWaterConfig->CookedFieldsDir.Contains(
@@ -853,15 +856,17 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         // The core is the river body. Keep the Default Lit mesh as a thin
         // normal/colour detail skin even when migrating an older map whose
         // serialized carrier coverage predates the split architecture.
-        ResolvedCalmLiveSurfaceCoverage =
-            kLiveVolumeCoreCalmDetailCoverage;
-        ResolvedActiveLiveSurfaceCoverage =
-            kLiveVolumeCoreActiveDetailCoverage;
+        ResolvedCalmLiveSurfaceCoverage = bUsesMigratedChilkoVolumeCore
+            ? 0.0f
+            : kLiveVolumeCoreCalmDetailCoverage;
+        ResolvedActiveLiveSurfaceCoverage = bUsesMigratedChilkoVolumeCore
+            ? 0.0f
+            : kLiveVolumeCoreActiveDetailCoverage;
     }
     const FLinearColor ResolvedLiveShallowSurfaceColor =
         bUsesMigratedColoradoVolumeCore
             ? FLinearColor(0.070f, 0.110f, 0.080f, 1.0f)
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? FLinearColor(0.012f, 0.075f, 0.105f, 1.0f)
             : bUsesMigratedFutaleufuVolumeCore
             ? FLinearColor(0.013f, 0.068f, 0.090f, 1.0f)
@@ -871,7 +876,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const FLinearColor ResolvedLiveDeepSurfaceColor =
         bUsesMigratedColoradoVolumeCore
             ? FLinearColor(0.018f, 0.038f, 0.028f, 1.0f)
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? FLinearColor(0.002f, 0.018f, 0.032f, 1.0f)
             : bUsesMigratedFutaleufuVolumeCore
             ? FLinearColor(0.002f, 0.017f, 0.029f, 1.0f)
@@ -881,7 +886,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const FLinearColor ResolvedLiveReflectedSkyColor =
         bUsesMigratedColoradoVolumeCore
             ? FLinearColor(0.12f, 0.17f, 0.18f, 1.0f)
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? FLinearColor(0.045f, 0.090f, 0.135f, 1.0f)
             : bUsesMigratedFutaleufuVolumeCore
             ? FLinearColor(0.055f, 0.100f, 0.138f, 1.0f)
@@ -891,7 +896,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const float ResolvedLiveSurfaceSpecular =
         bUsesMigratedColoradoVolumeCore
             ? 0.30f
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? 0.26f
             : bUsesMigratedFutaleufuVolumeCore
             ? 0.28f
@@ -901,7 +906,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const float ResolvedLiveSurfaceRoughness =
         bUsesMigratedColoradoVolumeCore
             ? 0.32f
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? 0.36f
             : bUsesMigratedFutaleufuVolumeCore
             ? 0.34f
@@ -911,7 +916,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const float ResolvedLiveSkyReflectionStrength =
         bUsesMigratedColoradoVolumeCore
             ? 0.26f
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? 0.20f
             : bUsesMigratedFutaleufuVolumeCore
             ? 0.24f
@@ -921,7 +926,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const float ResolvedLiveRippleStrength =
         bUsesMigratedColoradoVolumeCore
             ? 0.24f
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? 0.24f
             : bUsesMigratedFutaleufuVolumeCore
             ? 0.26f
@@ -931,7 +936,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const float ResolvedLiveFoamIntensity =
         bUsesMigratedColoradoVolumeCore
             ? 0.55f
-            : bUsesMigratedChilkoVolumeCore
+            : bUsesLegacyChilkoPresentationDefaults
             ? 0.56f
             : bUsesMigratedFutaleufuVolumeCore
             ? 0.58f
@@ -1252,6 +1257,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     bLiveSurfaceCarrierEnabled
                         ? ResolvedLiveFoamIntensity
                         : 0.52f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveWetCoverageEnable"),
+                    bUsesMigratedChilkoVolumeCore ? 1.0f : 0.0f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveWetCoverageDepthGain"), 32.0f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LiveRippleGrazingFloor"),
+                    bUsesMigratedChilkoVolumeCore ? 0.85f : 0.50f);
                 if (bLiveSurfaceCarrierEnabled)
                 {
                     LiveWaterMaterial->SetVectorParameterValue(

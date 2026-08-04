@@ -176,6 +176,26 @@ and external acceptance gates pass.
   and all six external gates remain open. V2 is retained as a bounded runtime
   correction, not photoreal or B2 promotion.
 
+### 2026-08-03 — Chilko optical and shoreline naturalism V3 retained
+
+- The live Lava Canyon runtime now distinguishes genuinely legacy maps from the
+  regenerated current config, so compatibility defaults no longer overwrite
+  the map's restrained river-local reflection, roughness, and specular values.
+  Chilko enables a default-off shared depth-coverage mask and removes only its
+  redundant broad detail skin; the wet-cell-clipped volume core and separately
+  solver-masked rapid foam remain visible.
+- The complete 600 m bank dressing retains 7,200 gravel and 8,400 cover
+  instances, with zero rejects, but uses a Chilko-local muted vegetation
+  material, 18-58 cm cover, mostly 8-28 cm gravel, and a rare 65-85 cm class.
+  Shared temperate defaults remain identity values, preserving Futaleufu.
+- In the matched side-on frame, water mean luminance falls 6.18%, >0.90
+  coverage falls 59.21%, >0.95 coverage falls 98.93%, and bank neon-green
+  fraction falls 64.77%. The editor build, M9 audit, all six runnable-map
+  gates, MapCheck 0/0, and focused contracts pass. A pale far-bank shallow
+  band, repetitive foam, smooth DEM-scale shores, generic ecology/geology,
+  incomplete rapid VFX, calibration/performance work, and all six external
+  gates keep photoreal and production promotion open.
+
 ### 2026-08-03 — Pacuare organic shoreline and rainforest-floor transition retained
 
 - `L_UpperHuacas` now adds six rights-reviewed CC0 moss-rock morphology

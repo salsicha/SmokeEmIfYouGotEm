@@ -323,10 +323,10 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     }
     else if (RiverId == TEXT("chilko_river_lava_canyon"))
     {
-        Settings.SunIntensity = 5.05f;
-        Settings.SkyLightIntensity = 1.60f;
+        Settings.SunIntensity = 4.10f;
+        Settings.SkyLightIntensity = 1.30f;
         Settings.FogDensity = 0.0030f;
-        Settings.ExposureBias = -0.16f;
+        Settings.ExposureBias = -0.30f;
         Settings.Saturation = 1.04f;
         Settings.Contrast = 1.03f;
         Settings.Sharpen = 0.24f;
