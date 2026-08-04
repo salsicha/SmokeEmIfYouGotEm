@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v10_review.json"
+    "zambezi_runnable_release_head_v11_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -97,24 +97,24 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v6"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v7"
     assert review["recorded_local_date"] == "2026-08-03"
     assert review["verified_base_commit"] == (
-        "2a14719ee2e9bfbfb7ddcc2e696c0751035c3f42"
+        "f3e662e50c2f6fba5dd7a5e457a11029108867bf"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["verification_context"] == {
         "reason": (
-            "Rebuild and revalidate the runnable Zambezi package with a "
-            "coverage-feathered live-water bank edge and restrained launch optics."
+            "Reaffirm the regenerated V17 Zambezi package as a player-facing "
+            "runnable river after the upper-scarp and launch-cover terrain milestone."
         ),
-        "map_runtime_package_changed_since_v9": True,
-        "player_selector_contract_changed_since_v9": False,
+        "map_runtime_package_changed_since_v10": True,
+        "player_selector_contract_changed_since_v10": False,
         "supersedes_review": (
             "docs/environment-captures/photoreal_river_previews/"
-            "landscape_candidates/zambezi_runnable_release_head_v9_review.json"
+            "landscape_candidates/zambezi_runnable_release_head_v10_review.json"
         ),
     }
     assert review["player_path"] == {
@@ -130,7 +130,13 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
 
     expected_hashes = {
         "unreal/Content/RaftSim/Maps/L_Zambezi.umap": (
-            "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
+            "e1f4a8084809475e8844e8485de83a3af58d48bd04f392e69ccaba39ec3810e9"
+        ),
+        (
+            "docs/environment-captures/photoreal_river_previews/"
+            "landscape_candidates/zambezi_reference_scenario_map_validation.json"
+        ): (
+            "16ce18cb9e7ae94ffdd41f0b40002652ce3ed45158f6f3a5b137549e58595d36"
         ),
         "unreal/Content/RaftSim/Environment/ZambeziRun/Water/Materials/"
         "MI_RaftSim_ZambeziBatoka_LiveVolumeWaterV2.uasset": (
@@ -156,6 +162,18 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         "unreal/Config/DefaultGame.ini": (
             "6893114b91d1647e8e7d0232e3a8970fd49e0b2fc80b263ba5df4014f62b7999"
         ),
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimUI/Private/"
+            "RaftSimVerticalSliceFrontend.cpp"
+        ): (
+            "bedbc86c1edc9cb334d31daa585c860deb8ed6f612da4c0efa3a15beab4e8ce9"
+        ),
+        (
+            "unreal/Source/SmokeEmIfYouGotEm/Tests/"
+            "RaftSimM6GameProgressionTest.cpp"
+        ): (
+            "f30a40d2a2f63c180cf70d6ce20cee1c3e24a443ca5d069d11235f6d94130be2"
+        ),
     }
     locked_hashes = {
         entry["path"]: entry["sha256"]
@@ -163,7 +181,58 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     }
     assert locked_hashes == expected_hashes
     for relative, expected in expected_hashes.items():
-        _assert_historical_artifact_unchanged(relative, expected)
+        assert _sha256(REPO_ROOT / relative) == expected
+
+    assert review["registry_assertions"] == {
+        "river_selection_catalog_portfolio_role": "runnable_river",
+        "river_selection_catalog_runnable": True,
+        "river_selection_catalog_tier": "reference_free_run",
+        "progression_manifest_lists_zambezi": True,
+        "frontend_catalog_lists_zambezi": True,
+        "shipping_cook_lists_zambezi": True,
+        "versioned_map_present": True,
+        "superseded_preview_is_player_path": False,
+    }
+    assert review["verification"]["focused_python_contracts"]["passed"] == 24
+    assert review["verification"]["career_catalog"]["result"] == "success"
+    assert review["verification"]["progression_migration"]["result"] == "success"
+    assert review["verification"]["all_river_map_loads"] == {
+        "test": "RaftSim.P4.RiverMapLoads",
+        "performed": 6,
+        "result": "success",
+        "zambezi_mapcheck_errors": 0,
+        "zambezi_mapcheck_warnings": 0,
+        "automation_warnings": 2,
+        "accepted_warnings": [
+            (
+                "Troublemaker test deliberately logs a capsize while validating "
+                "flexible-raft failure behavior"
+            ),
+            (
+                "Zambezi external connectivity probe timed out without affecting "
+                "map load or gameplay acceptance"
+            ),
+        ],
+        "automation_errors": 0,
+    }
+    assert review["verification"]["live_zambezi_map"] == {
+        "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+        "game_mode": "RaftSimVerticalSliceGameMode",
+        "coordinate_map_points": 5908,
+        "wet_vertices": 10465,
+        "active_breaking_sites": 10,
+        "rapid_foam_vertices": 631,
+        "rapid_foam_visible": True,
+        "volume_core_enabled": True,
+        "volume_core_triangles": 16896,
+        "surface_smoothing_enabled": True,
+        "surface_smoothing_strength": 0.62,
+        "bank_blend_m": 7.5,
+    }
+    assert review["verification"]["saved_map_evidence"]["schema"] == (
+        "raftsim.unreal.zambezi_reference_scenario_map_validation.v19"
+    )
+    assert len(review["open_external_acceptance_gates"]) == 7
 
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     assert RUNNABLE_RELEASE_REVIEW.as_posix() in readme
