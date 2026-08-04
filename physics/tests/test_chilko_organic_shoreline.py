@@ -295,6 +295,7 @@ def test_v3_review_locks_optical_naturalism_gain_and_stays_fail_closed() -> None
 
     superseded_artifacts = {
         "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+        "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2.uasset",
         "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
     }

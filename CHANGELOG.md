@@ -32,6 +32,15 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Reworked the runnable Futaleufú and Chilko Single Layer Water cores so cooked
+  depth now drives a strong shallow-transmission/deep-absorption relationship,
+  while ordinary fast current no longer receives broad milky aeration. The
+  retained matched bracket lowers Futaleufú's clear right-body mean 5.65% and
+  raises body contrast 19.11%; Chilko mean falls 21.40%, far-band mean 14.33%,
+  and p95 4.52%. Solver foam, raft-interior transmission, wetness, geometry,
+  bathymetry, collision, buoyancy, and raft forces are unchanged. Both maps and
+  river-local instances were regenerated and all six runnable map loads pass;
+  photoreal art, calibration, human review, and platform gates remain open.
 - Unified the runnable Futaleufú Terminator and Chilko Lava Canyon maps under a
   restrained cold-water highlight profile, regenerated both stable packages,
   and corrected Futaleufú's shallow/deep/sky tint after rejecting a gray first

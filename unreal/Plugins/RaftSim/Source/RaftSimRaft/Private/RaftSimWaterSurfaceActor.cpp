@@ -893,6 +893,64 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveReflectedSkyColor
                    : FLinearColor(0.11f, 0.23f, 0.31f, 1.0f));
+    // River-local depth transmission must also migrate older serialized maps.
+    // The cooked-field identity is stable, so runtime and newly regenerated
+    // packages receive the same render-only coefficients without moving any
+    // solver, geometry, collision, buoyancy, or force authority.
+    const FLinearColor ResolvedLiveWaterScattering =
+        bUsesMigratedFutaleufuVolumeCore
+            ? FLinearColor(0.000035f, 0.000070f, 0.000110f, 0.0f)
+            : bUsesMigratedChilkoVolumeCore
+            ? FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f)
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveWaterScattering
+                   : FLinearColor(0.00011f, 0.00015f, 0.00019f, 0.0f));
+    const FLinearColor ResolvedLiveWaterAbsorption =
+        bUsesMigratedFutaleufuVolumeCore
+            ? FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f)
+            : bUsesMigratedChilkoVolumeCore
+            ? FLinearColor(0.0110f, 0.0065f, 0.0045f, 0.0f)
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveWaterAbsorption
+                   : FLinearColor(0.0075f, 0.0048f, 0.0032f, 0.0f));
+    const FLinearColor ResolvedLiveRiverbedColorScale =
+        bUsesMigratedFutaleufuVolumeCore
+            ? FLinearColor(0.055f, 0.075f, 0.090f, 0.0f)
+            : bUsesMigratedChilkoVolumeCore
+            ? FLinearColor(0.060f, 0.080f, 0.095f, 0.0f)
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveRiverbedColorScale
+                   : FLinearColor(0.13f, 0.17f, 0.20f, 0.0f));
+    const float ResolvedLiveShallowWaterOpacity =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.36f
+            : bUsesMigratedChilkoVolumeCore
+            ? 0.36f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveShallowWaterOpacity
+                   : 0.58f);
+    const float ResolvedLiveDeepWaterOpacity =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.86f
+            : bUsesMigratedChilkoVolumeCore
+            ? 0.84f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveDeepWaterOpacity
+                   : 0.79f);
+    const float ResolvedLiveFoamWaterOpacity =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.88f
+            : bUsesMigratedChilkoVolumeCore
+            ? 0.86f
+            : (RiverWaterConfig
+                   ? RiverWaterConfig->LiveFoamWaterOpacity
+                   : 0.91f);
+    const float ResolvedSpeedAerationFraction =
+        bUsesMigratedFutaleufuVolumeCore
+            ? 0.025f
+            : bUsesMigratedChilkoVolumeCore
+            ? 0.020f
+            : -1.0f;
     const float ResolvedLiveSurfaceSpecular =
         bUsesMigratedColoradoVolumeCore
             ? 0.30f
@@ -1142,13 +1200,19 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     0.035f + ResolvedLiveRippleStrength * 0.16f);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("ShallowWaterOpacity"),
-                    RiverWaterConfig->LiveShallowWaterOpacity);
+                    ResolvedLiveShallowWaterOpacity);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("DeepWaterOpacity"),
-                    RiverWaterConfig->LiveDeepWaterOpacity);
+                    ResolvedLiveDeepWaterOpacity);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("FoamWaterOpacity"),
-                    RiverWaterConfig->LiveFoamWaterOpacity);
+                    ResolvedLiveFoamWaterOpacity);
+                if (ResolvedSpeedAerationFraction >= 0.0f)
+                {
+                    VolumeMaterial->SetScalarParameterValue(
+                        TEXT("SpeedAerationFraction"),
+                        ResolvedSpeedAerationFraction);
+                }
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("RaftInteriorSurfaceOpacityScale"), 0.0f);
                 VolumeMaterial->SetScalarParameterValue(
@@ -1158,13 +1222,13 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 // can transmit warmer bed light without changing hydraulics.
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("WaterScattering"),
-                    RiverWaterConfig->LiveWaterScattering);
+                    ResolvedLiveWaterScattering);
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("WaterAbsorption"),
-                    RiverWaterConfig->LiveWaterAbsorption);
+                    ResolvedLiveWaterAbsorption);
                 VolumeMaterial->SetVectorParameterValue(
                     TEXT("RiverbedColorScale"),
-                    RiverWaterConfig->LiveRiverbedColorScale);
+                    ResolvedLiveRiverbedColorScale);
                 if (ResolvedLiveWaterFlowNormalTexture)
                 {
                     VolumeMaterial->SetTextureParameterValue(

@@ -1,0 +1,202 @@
+{
+  "schema": "raftsim.environment.cold_water_depth_attenuation_review.v2",
+  "generated_utc": "2026-08-04T09:27:00Z",
+  "baseline_commit": "69f24184e4f5bd57b00f63ec1b97686f6caded9f",
+  "status": "technical_candidate_retained_photoreal_and_external_review_open",
+  "passed": false,
+  "decision": {
+    "futaleufu_reference_runnable": true,
+    "chilko_reference_runnable": true,
+    "technical_candidate_passed": true,
+    "cold_water_depth_attenuation_v2_retained": true,
+    "coefficient_brackets_a_and_b_rejected": true,
+    "speed_aeration_bracket_c_retained": true,
+    "photoreal_acceptance_passed": false,
+    "production_promoted": false,
+    "terrain_geometry_changed": false,
+    "water_geometry_changed": false,
+    "hydraulics_changed": false,
+    "wet_dry_mask_changed": false,
+    "bathymetry_changed": false,
+    "collision_changed": false,
+    "buoyancy_or_raft_forces_changed": false,
+    "raft_interior_transmission_changed": false,
+    "solver_foam_authority_changed": false
+  },
+  "implementation": {
+    "scope": "river_local_single_layer_water_depth_transmission_and_speed_aeration_presentation_only",
+    "depth_source": "cooked_solver_depth_meters_clamped_as_vertex_green_depth_divided_by_4_meters",
+    "futaleufu_terminator": {
+      "water_scattering_per_cm": [0.000035, 0.00007, 0.00011, 0.0],
+      "water_absorption_per_cm": [0.012, 0.008, 0.006, 0.0],
+      "riverbed_color_scale": [0.055, 0.075, 0.09, 0.0],
+      "shallow_water_opacity": 0.36,
+      "deep_water_opacity": 0.86,
+      "foam_water_opacity": 0.88,
+      "speed_aeration_fraction": 0.025
+    },
+    "chilko_lava_canyon": {
+      "water_scattering_per_cm": [0.00004, 0.00009, 0.00014, 0.0],
+      "water_absorption_per_cm": [0.011, 0.0065, 0.0045, 0.0],
+      "riverbed_color_scale": [0.06, 0.08, 0.095, 0.0],
+      "shallow_water_opacity": 0.36,
+      "deep_water_opacity": 0.84,
+      "foam_water_opacity": 0.86,
+      "speed_aeration_fraction": 0.02
+    },
+    "shared_contract": {
+      "tag": "RaftSimColdWaterDepthAttenuationV2",
+      "raft_interior_surface_opacity_scale": 0.0,
+      "raft_interior_optical_depth_scale": 0.0,
+      "solver_foam_lace_preserved": true,
+      "cooked_field_identity_migrates_older_serialized_maps": true,
+      "newly_regenerated_maps_serialize_the_same_values": true
+    },
+    "authority": "The material consumes cooked depth, speed, and foam presentation channels. It cannot change solver state, surface topology, wetness, bathymetry, collision, buoyancy, rapid forcing, or raft forces."
+  },
+  "live_evidence": {
+    "futaleufu_terminator": {
+      "map": "/Game/RaftSim/Maps/L_Terminator",
+      "command": "RaftSim.CaptureAfter 8 cold_water_depth_attenuation_v2_futaleufu_breaking_water_side breaking_water_side",
+      "resolution_px": [1280, 720],
+      "capture_exit_code": 0,
+      "active_breaking_sites": 21,
+      "volume_core_enabled": true,
+      "rapid_foam_visible": true
+    },
+    "chilko_lava_canyon": {
+      "map": "/Game/RaftSim/Maps/L_LavaCanyon",
+      "command": "RaftSim.CaptureAfter 8 cold_water_depth_attenuation_v2_chilko_breaking_water_side breaking_water_side",
+      "resolution_px": [1280, 720],
+      "capture_exit_code": 0,
+      "active_breaking_sites": 2,
+      "volume_core_enabled": true,
+      "rapid_foam_visible": true
+    }
+  },
+  "visual_comparison": {
+    "method": "Direct sRGB metrics over matched 1280x720 breaking_water_side gameplay captures. Water metrics use rows 260 through 719; far-band metrics use rows 220 through 339. Luminance is Rec.709-weighted sRGB.",
+    "futaleufu_baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_futaleufu_breaking_water_side.png",
+      "mean_luminance": 0.672516525,
+      "p95_luminance": 0.877031386,
+      "fraction_over_0_90": 0.031467391,
+      "fraction_over_0_95": 0.000022079,
+      "mean_blue_minus_red": 0.035525002,
+      "luminance_standard_deviation": 0.119402662,
+      "right_body_mean_luminance": 0.618371069
+    },
+    "futaleufu_retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_futaleufu_breaking_water_side.png",
+      "mean_luminance": 0.655310988,
+      "p95_luminance": 0.893000841,
+      "fraction_over_0_90": 0.045334579,
+      "fraction_over_0_95": 0.000591033,
+      "mean_blue_minus_red": 0.050134856,
+      "luminance_standard_deviation": 0.142217323,
+      "right_body_mean_luminance": 0.583409965
+    },
+    "chilko_baseline": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_chilko_breaking_water_side.png",
+      "mean_luminance": 0.635845065,
+      "p95_luminance": 0.832226753,
+      "fraction_over_0_90": 0.01399966,
+      "fraction_over_0_95": 0.000011889,
+      "mean_blue_minus_red": 0.027921872,
+      "luminance_standard_deviation": 0.108608104,
+      "far_band_mean_luminance": 0.703907669
+    },
+    "chilko_retained": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_chilko_breaking_water_side.png",
+      "mean_luminance": 0.499791324,
+      "p95_luminance": 0.794631422,
+      "fraction_over_0_90": 0.012340353,
+      "fraction_over_0_95": 0.000008492,
+      "mean_blue_minus_red": 0.053380784,
+      "luminance_standard_deviation": 0.149150938,
+      "far_band_mean_luminance": 0.603021145
+    },
+    "verdict": "Retain bracket C. Futaleufu mean falls 2.56 percent, right clear-water mean falls 5.65 percent, and body contrast rises 19.11 percent; the increased upper-tail fraction remains localized to preserved solver whitewater and direct-lit breaking faces. Chilko mean falls 21.40 percent, p95 falls 4.52 percent, far-band mean falls 14.33 percent, and contrast rises 37.33 percent. Both rivers now separate clear depth from aeration more strongly without hiding solver foam or turning the body opaque."
+  },
+  "validation": {
+    "filtered_generation": "passed for Futaleufu and Chilko; both runnable packages and both river-local live-volume material instances regenerated",
+    "unreal_editor_build": "passed after the retained coefficient and speed-aeration bracket",
+    "native_futaleufu_material_audit": "passed 1/1; RaftSim.M9.FFutaleufuTerminatorWater",
+    "native_chilko_material_audit": "passed 1/1; RaftSim.M9.FChilkoLavaCanyonWater",
+    "native_six_river_map_audit": "passed 6/6; Lava Canyon and Terminator report zero errors and warnings; the matrix retains one unrelated Troublemaker capsize warning and one Zambezi external-connectivity timeout warning",
+    "focused_python": "passed 21/21 across Futaleufu and Chilko water plus the V2 evidence/hash lock",
+    "affected_river_python": "passed 176/176 across all Futaleufu-, Chilko-, and temperate-named source, terrain, water, ecology, provenance, and historical review contracts",
+    "matched_live_captures": "passed; two 1280x720 retained frames captured after final map regeneration",
+    "generator_churn_archive": {
+      "path": "/private/tmp/raftsim-cold-water-depth-generator-churn-20260804.tar",
+      "sha256": "6b2e47b34fda015f47d38ecd402946195eda0e25b1ff2706d35d0136f45f6c5d"
+    },
+    "native_test_texture_resave_archive": {
+      "path": "/private/tmp/raftsim-cold-water-depth-native-chilko-resaves-20260804.tar",
+      "sha256": "de63613ee6685eb5f843b585488ea05c6edd2e09d79127bbecbd2811b7f2ade8"
+    }
+  },
+  "remaining_photoreal_defects": [
+    "Futaleufu's direct-lit central and left breaking body remains too broad and pale; p95 and bright-tail coverage increase when the surrounding clear current is darkened.",
+    "Futaleufu's right standing-wave face remains too smooth and needs crest-scale overturning structure, entrained-air depth, spray, and mist.",
+    "Chilko's far-bank transition is darker but still terminates in a pale, geometrically simple band with incomplete wet gravel and bank microgeometry.",
+    "Solver foam remains visibly streak-like and needs observed rapid-specific lace, bubble depth, decay, spray, and mist calibration.",
+    "Vegetation morphology, density, species, rocks, ground cover, terrain materials, atmosphere, and distance detail remain procedural and visibly synthetic.",
+    "No raft or passengers are framed in these water-only captures, so equipment, character, animation, grip, and occlusion acceptance remains open.",
+    "No local guide, geospatial, hydraulic, ecology/geology/art, complete photoreal, or target-hardware acceptance has been supplied."
+  ],
+  "required_external_acceptance_gates": [
+    "local Futaleufu and Chilko guide review of stationing, approaches, lines, hazards, recovery, access, rescue routes, and playable flow bands",
+    "geospatial review of route registration, terrain, bank breaklines, rapid rocks, bathymetry, stationing, and vertical datums",
+    "hydraulic calibration and convergence approval against observed behavior across playable discharge bands",
+    "regional ecology, geology, and environment-art approval of species, ground cover, wet banks, rocks, valley form, atmosphere, and season",
+    "photoreal water/VFX plus raft, equipment, character, animation, grip, and occlusion approval",
+    "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
+  ],
+  "reviewers": {
+    "named_local_guide": null,
+    "named_geospatial_reviewer": null,
+    "named_hydraulic_reviewer": null,
+    "named_environment_artist": null,
+    "named_water_vfx_artist": null,
+    "named_performance_reviewer": null
+  },
+  "retained_artifacts": [
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_futaleufu_breaking_water_side.png",
+      "sha256": "9cee8d3d2a2e035e75dfbb68627ab15b8915c8e836e20ffcf442620418772ae2"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_futaleufu_breaking_water_side.png",
+      "sha256": "40ea1227cf7665c28146854c4f000c75df0b745d69bf98736e2ea7d8badf352a"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_chilko_breaking_water_side.png",
+      "sha256": "36f7e1c3988c29c6339a0020e286150d4be1d0f0451271897d30e9080f9f08d9"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_chilko_breaking_water_side.png",
+      "sha256": "e6d7848dd066d7c225a7af649e286e38b641c13545fa98ba5ea881ac4dadf09e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_six_river_map_load.json",
+      "sha256": "51e2d1ac4c93eaa3a3bcfcfcb7d5dd7e996b0f61c01716961947dfd0531ea88b"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "sha256": "cfea8027d1f84a03bcf71b93e304fbcbc9d273564a735ac48fff77e4970db308"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
+      "sha256": "7a272ebcf757842bf8db190b989fae1a419056dad330b27ac1005530f9212e38"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3.uasset",
+      "sha256": "fc202398feb69af0774563ce4812af04aa679b7e1d10effc5626e3ee85125823"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2.uasset",
+      "sha256": "5d1a4a99710366ca8b25e00bd9beb5cd610c6705e266026ed3ca73b74aa77978"
+    }
+  ]
+}

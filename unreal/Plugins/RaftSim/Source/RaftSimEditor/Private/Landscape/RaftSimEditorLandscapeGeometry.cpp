@@ -1901,19 +1901,21 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->LiveReflectedSkyColor =
             FLinearColor(0.025f, 0.050f, 0.075f, 1.0f);
         WaterConfig->LiveWaterScattering =
-            FLinearColor(0.00010f, 0.00024f, 0.00034f, 0.0f);
+            FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f);
         WaterConfig->LiveWaterAbsorption =
-            FLinearColor(0.0070f, 0.0030f, 0.0015f, 0.0f);
+            FLinearColor(0.0110f, 0.0065f, 0.0045f, 0.0f);
         WaterConfig->LiveRiverbedColorScale =
-            FLinearColor(0.16f, 0.20f, 0.18f, 0.0f);
-        WaterConfig->LiveShallowWaterOpacity = 0.42f;
-        WaterConfig->LiveDeepWaterOpacity = 0.70f;
+            FLinearColor(0.060f, 0.080f, 0.095f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.36f;
+        WaterConfig->LiveDeepWaterOpacity = 0.84f;
         WaterConfig->LiveFoamWaterOpacity = 0.86f;
         WaterConfig->Tags.AddUnique(TEXT("RaftSimChilkoTransmittingWaterV2"));
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimChilkoLocalizedReflectionWaterV3"));
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterDepthAttenuationV2"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
@@ -1963,8 +1965,23 @@ bool AddLandscapeCandidateRunnableGameplay(
             FLinearColor(0.001f, 0.014f, 0.050f, 1.0f);
         WaterConfig->LiveReflectedSkyColor =
             FLinearColor(0.018f, 0.080f, 0.160f, 1.0f);
+        // Preserve dark bed detail in shallows while using the solver depth
+        // channel to absorb the broad, pale deep-water sheet. These values
+        // affect only Single Layer Water transmission; cooked depth, wetness,
+        // surface geometry, collision, and raft forces remain authoritative.
+        WaterConfig->LiveWaterScattering =
+            FLinearColor(0.000035f, 0.000070f, 0.000110f, 0.0f);
+        WaterConfig->LiveWaterAbsorption =
+            FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f);
+        WaterConfig->LiveRiverbedColorScale =
+            FLinearColor(0.055f, 0.075f, 0.090f, 0.0f);
+        WaterConfig->LiveShallowWaterOpacity = 0.36f;
+        WaterConfig->LiveDeepWaterOpacity = 0.86f;
+        WaterConfig->LiveFoamWaterOpacity = 0.88f;
         WaterConfig->Tags.AddUnique(
             TEXT("RaftSimColdWaterHighlightNaturalismV1"));
+        WaterConfig->Tags.AddUnique(
+            TEXT("RaftSimColdWaterDepthAttenuationV2"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
     else if (bZambezi)

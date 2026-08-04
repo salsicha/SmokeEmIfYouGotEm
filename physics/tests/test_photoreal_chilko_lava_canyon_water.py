@@ -277,7 +277,12 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "LiveSkyReflectionStrength = 0.05f",
         "LiveRippleStrength = 0.55f",
         "LiveFoamIntensity = 0.56f",
-        "LiveShallowWaterOpacity = 0.42f",
+        "LiveShallowWaterOpacity = 0.36f",
+        "LiveDeepWaterOpacity = 0.84f",
+        "LiveFoamWaterOpacity = 0.86f",
+        "FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f)",
+        "FLinearColor(0.0110f, 0.0065f, 0.0045f, 0.0f)",
+        "FLinearColor(0.060f, 0.080f, 0.095f, 0.0f)",
         "FLinearColor(0.025f, 0.050f, 0.075f, 1.0f)",
         "LoadOrCreateChilkoLavaCanyonLiveWaterInstance",
         "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal",
@@ -285,6 +290,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         "RaftSimChilkoTransmittingWaterV2",
         "RaftSimChilkoLocalizedReflectionWaterV3",
         "RaftSimColdWaterHighlightNaturalismV1",
+        "RaftSimColdWaterDepthAttenuationV2",
         "RaftSimNoSolverStateMutation",
         "RaftSimChilkoDefaultLitWater",
         "RaftSimCpuAuthoredCookedFieldColor",
@@ -293,6 +299,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     ):
         assert token in geometry
     for token in (
+        'SetScalar(TEXT("SpeedAerationFraction"), 0.020f)',
         'SetScalar(TEXT("ReachHueVariation"), 0.12f)',
         'SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f)',
         'SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f)',
@@ -348,6 +355,11 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
     assert "MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2" in runtime
     assert "T_RaftSim_ChilkoLavaCanyonWaterV1_FlowNormal" in runtime
     assert "T_RaftSim_ChilkoLavaCanyonWaterV1_FoamLace" in runtime
+    assert "FLinearColor(0.00004f, 0.00009f, 0.00014f, 0.0f)" in runtime
+    assert "FLinearColor(0.0110f, 0.0065f, 0.0045f, 0.0f)" in runtime
+    assert "FLinearColor(0.060f, 0.080f, 0.095f, 0.0f)" in runtime
+    assert "? 0.020f" in runtime
+    assert 'TEXT("SpeedAerationFraction")' in runtime
     assert "float LiveRapidFoamFocusStart = 0.12f" in config
     assert "float LiveRapidFoamFocusEnd = 0.72f" in config
 

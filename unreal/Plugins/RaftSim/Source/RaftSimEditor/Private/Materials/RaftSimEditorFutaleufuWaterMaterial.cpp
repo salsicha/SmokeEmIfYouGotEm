@@ -508,7 +508,10 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
     SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.72f);
     SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.54f);
     SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.78f);
-    SetScalar(TEXT("SpeedAerationFraction"), 0.16f);
+    // Fast clear current is not aerated by itself. Keep a small speed shoulder
+    // beneath the solver foam mask so breaking tongues retain transition, but
+    // do not scatter the full cold-water body into a chalk-white sheet.
+    SetScalar(TEXT("SpeedAerationFraction"), 0.025f);
     SetScalar(TEXT("FoamRoughness"), 0.62f);
     // Terminator's former low-roughness slicks and broad fallback-reflection
     // floor converged into a clipped white guide-eye sheet. Preserve the

@@ -1684,6 +1684,22 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     (*It)->Tags.Contains(
                         TEXT("RaftSimColdWaterHighlightNaturalismV1")));
                 Test->TestTrue(
+                    TEXT("Futaleufu records the cold-water depth attenuation contract"),
+                    (*It)->Tags.Contains(
+                        TEXT("RaftSimColdWaterDepthAttenuationV2")));
+                Test->TestTrue(
+                    TEXT("Futaleufu shallow water transmits dark bed detail"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveShallowWaterOpacity, 0.36f, 0.001f));
+                Test->TestTrue(
+                    TEXT("Futaleufu deep water retains absorbing optical depth"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveDeepWaterOpacity, 0.86f, 0.001f));
+                Test->TestTrue(
+                    TEXT("Futaleufu foam stays optically legible"),
+                    FMath::IsNearlyEqual(
+                        (*It)->LiveFoamWaterOpacity, 0.88f, 0.001f));
+                Test->TestTrue(
                     TEXT("regenerated Futaleufu solver foam remains optically legible"),
                     FMath::IsNearlyEqual(
                         (*It)->LiveFoamIntensity, 0.58f, 0.001f));
@@ -1921,7 +1937,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
             Test->TestTrue(
                 TEXT("Chilko shallow water remains transmitting"),
                 FMath::IsNearlyEqual(
-                    (*It)->LiveShallowWaterOpacity, 0.42f, 0.001f));
+                    (*It)->LiveShallowWaterOpacity, 0.36f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko deep water retains absorbing optical depth"),
+                FMath::IsNearlyEqual(
+                    (*It)->LiveDeepWaterOpacity, 0.84f, 0.001f));
+            Test->TestTrue(
+                TEXT("Chilko records the cold-water depth attenuation contract"),
+                (*It)->Tags.Contains(
+                    TEXT("RaftSimColdWaterDepthAttenuationV2")));
             Test->TestTrue(
                 TEXT("Chilko records the visual-only transmitting-water contract"),
                 (*It)->Tags.Contains(TEXT("RaftSimChilkoTransmittingWaterV2")) &&

@@ -253,3 +253,17 @@ This does not supersede terrain, shoreline, bathymetry, hydraulics, collision,
 buoyancy, or raft-force authority; coarse DEM and wet-cell geometry plus open
 art, guide, geospatial, rights, seasonal-flow, VFX, character, and performance
 review keep the runnable map below photoreal promotion.
+
+Futaleufú and Chilko V2 now add a depth-aware cold-water optical layer without
+moving any physical authority. The shared Single Layer Water parent already
+consumes cooked depth in vertex green; river-local configs now provide explicit
+scattering, absorption, dark riverbed scale, shallow/deep opacity, and a much
+narrower speed-driven aeration shoulder. Solver foam still owns visible
+aeration, and runtime forces raft-interior surface opacity and optical depth to
+zero. Cooked-field identity migrates older maps to the same parameters that
+filtered generation stores in `L_Terminator`, `L_LavaCanyon`, and their two
+river-local material instances. Matched evidence shows stronger clear/deep/
+aerated separation, but direct-lit Futaleufú breaking water, Chilko shoreline
+geometry, foam volume, environment art, calibration, human review, and target
+performance remain below photoreal promotion. The fail-closed record is
+`cold_water_depth_attenuation_v2_review.json`.

@@ -119,6 +119,16 @@ no-regression control. This is a presentation-only technical improvement, not
 photoreal acceptance: broad pale water, foam/VFX, shoreline, terrain, ecology,
 characters, calibration, performance, and external review remain open in the
 [cold-water highlight review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_highlight_naturalism_v1_review.json).
+The follow-on depth pass now uses cooked depth to separate transmitting
+shallows, absorbing deep current, and genuinely aerated whitewater. It removes
+the former assumption that ordinary fast current is broadly aerated, while
+preserving solver foam and the transparent raft-interior override. Matched
+Futaleufú evidence lowers the clear right-body mean 5.65% and raises water-body
+contrast 19.11%; matched Chilko evidence lowers mean luminance 21.40%, the far
+washed band 14.33%, and p95 4.52%. Both maps remain reference-runnable rather
+than photoreal-approved; exact coefficients, hashes, remaining defects, and
+external gates are in the
+[cold-water depth review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_review.json).
 The shared live-water renderer now subdivides every authored river's visual
 surface from a 3 m analysis grid to 1.5 m presentation spacing. Solver-feature
 analysis retains its original physical footprint, the config-less test tank
