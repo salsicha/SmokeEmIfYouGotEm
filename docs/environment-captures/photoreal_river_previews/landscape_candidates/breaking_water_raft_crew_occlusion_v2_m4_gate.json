@@ -1,0 +1,140 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "572A74544F477572B80DBF9B066CB272",
+			"instanceName": "Alexs-MacBook-Air.local-7046",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-17.12.27",
+	"succeeded": 3,
+	"succeededWithWarnings": 1,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 3.0214841365814209,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "CurvedRiverCoordinateMapDrivesLiveWater",
+			"fullTestPath": "RaftSim.M4.CurvedRiverCoordinateMapDrivesLiveWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"572A74544F477572B80DBF9B066CB272"
+			],
+			"duration": 0.059835873544216156,
+			"dateTime": "2026.08.04-17.12.23",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "real South Fork D3: samples=12 wet=12 speed=1.101 m/s retained=0.003 kg rollMoment=0.028 Nm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.12.23"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "MeatGrinderLiveD3LineCalibration",
+			"fullTestPath": "RaftSim.M4.MeatGrinderLiveD3LineCalibration",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"572A74544F477572B80DBF9B066CB272"
+			],
+			"duration": 0.071060210466384888,
+			"dateTime": "2026.08.04-17.12.23",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Meat Grinder hazard: samples=12 wet=12 speed=4.025 m/s mass=315.059 kg margin=-280.787 Nm risk=1.242 s roll=77.370 deg final=(966.00,0.40,444.79) m",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.12.24"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Meat Grinder control: samples=12 wet=12 speed=2.344 m/s mass=137.681 kg margin=1556.578 Nm risk=0.000 s roll=2.198 deg final=(930.00,8.00,446.74) m",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.12.24"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "WaterVfxClassifierUsesHydraulicsAndContacts",
+			"fullTestPath": "RaftSim.M4.WaterVfxClassifierUsesHydraulicsAndContacts",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"572A74544F477572B80DBF9B066CB272"
+			],
+			"duration": 0.0083040408790111542,
+			"dateTime": "2026.08.04-17.12.24",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "WaterVfxRuntimePoolSpawnsWithRaft",
+			"fullTestPath": "RaftSim.M4.WaterVfxRuntimePoolSpawnsWithRaft",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"572A74544F477572B80DBF9B066CB272"
+			],
+			"duration": 2.8822839260101318,
+			"dateTime": "2026.08.04-17.12.24",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Warning",
+						"message": "LogConsoleManager: Console variable 'r.MotionVectorSimulation' used in the render thread. Rendering artifacts could happen. Use ECVF_RenderThreadSafe or don't use in render thread.",
+						"context": "log",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.04-17.12.24"
+				}
+			],
+			"warnings": 1,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

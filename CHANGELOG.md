@@ -32,6 +32,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Extended the live raft/crew foam exclusion into the shared connected-
+  breaking-water material. A narrower raft-aligned footprint clears the former
+  opaque water layer from raft fabric, fittings, passengers, and paddles while
+  a waterless isolation retains the six-frame D4 contact plume immediately
+  outside the tube and rock. Existing mask and texture assets stay unchanged;
+  no map, solver, contact, collision, buoyancy, force, D3, or D4 authority
+  changes. The editor build, four focused Python contracts, M4 4/4, production
+  Niagara 1/1, P2, and all six runnable-map gates 7/7 pass. Photoreal water,
+  general character depth, platform qualification, and external approval remain
+  open.
 - Re-certified Zambezi Batoka Gorge as runnable river 6 on the current release
   head. Both versioned runtime manifests explicitly retain `runnable: true`,
   `availability: free_run`, and `zambezi_reference_run` →

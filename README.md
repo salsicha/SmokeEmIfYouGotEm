@@ -250,6 +250,17 @@ and all saved maps are unchanged. The editor build, M4 4/4, renderer-backed M5
 runnable river 6. This is still presentation-only technical progress, not
 solved recirculation, measured bathymetry, or photoreal promotion; see the
 [downstream-boil review](docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_review.json).
+The shared connected-breaking-water material now consumes the live raft-aligned
+foam-exclusion transform too. A narrower hull-footprint ellipse removes the
+opaque breaking-water layer that previously drew over raft fabric, fittings,
+crew, and paddles while leaving the physically legitimate D4 plume visible
+immediately outside the tube in waterless isolation. Existing source textures
+and the runtime parameter collection remain byte-identical; no solver sample,
+contact geometry, collision, buoyancy, D3/D4 authority, raft force, or map
+package changes. The editor build, M4 4/4, production Niagara 1/1, P2, and all
+six P4 runnable-map gates pass 7/7. This is retained technical readability
+progress rather than a general depth solution or photoreal water promotion;
+see the [breaking-water raft/crew occlusion review](docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json).
 Lava Canyon's August 3 V3 optical/shoreline pass fixes a legacy map-migration
 path that was silently restoring the older reflective water defaults after
 regeneration. The runtime now keeps the river-local, wet-cell-clipped volume

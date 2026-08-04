@@ -634,3 +634,23 @@ Initial source slice:
   recirculation or measured bathymetry, so photoreal promotion and all seven
   external acceptance gates remain open in
   `docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_review.json`.
+
+## August 4, 2026 — breaking-water raft/crew occlusion V2
+
+- `M_RaftSim_BreakingWaterLip` now consumes the existing runtime-updated
+  `MPC_RaftSim_RaftFoamOcclusion` transform. Its raft-aligned ellipse is narrowed
+  to 47% of the broad foam-sheet half-width and 86% of its half-length, with a
+  0.80-1.30 squared-distance feather. This clears connected breaking lips,
+  aerated crests, roller volume, contact patches, and the opt-in D4 review body
+  from the raft/crew footprint without suppressing the contact plume outside
+  the starboard tube. A normal-water frame verifies readable fabric, fittings,
+  crew, and paddles without a rectangular hole or halo; a waterless isolation
+  verifies the six-frame, 104.89 cm-deep D4 plume remains connected beside the
+  rock. The material author fails closed if the collection is absent and no
+  longer re-saves established collection or texture inputs. The editor build,
+  M4 4/4, production Niagara 1/1, P2, and all six P4 runnable-map gates 7/7
+  pass. This is presentation-only technical progress: it changes no solver,
+  wet/dry, terrain, collision, navigation, buoyancy, force, D3, D4, or map
+  authority. Per-pixel character depth, final water/VFX art, target-platform
+  qualification, and all seven external approvals remain open in
+  `docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json`.

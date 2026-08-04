@@ -4469,3 +4469,16 @@ path is verified, and the completion goal can be marked complete.
   is unchanged. High-resolution terrain, surveyed bathymetry, rapid-specific
   hydraulics, guide/geospatial/rights/art review, and target-platform
   qualification remain open.
+- Breaking-water raft/crew occlusion V2 extends the runtime-updated raft-aligned
+  foam mask to the shared connected-breaking-water material family. The
+  retained 0.47-width/0.86-length ellipse removes the opaque water layer over
+  raft fabric, fittings, crew, and paddles; waterless isolation keeps the
+  six-frame D4 contact plume visible immediately outside the starboard tube and
+  rock. The editor author now loads established mask/texture inputs without
+  resaving them and fails closed if the collection is absent. A clean editor
+  build, four focused Python contracts, M4 4/4, production Niagara 1/1, P2,
+  and all six P4 runnable-map gates 7/7 pass. No map, solver sample, wet/dry
+  topology, contact geometry, collision, navigation, buoyancy, raft-force,
+  D3, or D4 authority changed. The horizontal footprint mask is not a general
+  character-depth solution; water/VFX art, performance, and all seven external
+  approvals remain open.
