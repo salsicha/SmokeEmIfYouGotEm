@@ -4,8 +4,10 @@ The primary assembled-character turntable cannot prove the shipping fallback
 because it deliberately selects the MetaHuman adapter when that roster is
 installed. This capture forces the public validation path on the ordinary
 gameplay host, then records the guide and four crew identities from front,
-profile, and rear. Safety gear and the paddle remain host-owned; redundant
-procedural anatomy must be hidden behind the complete CC0 body.
+profile, rear, face, grip-front, and grip-profile views. Safety gear and the
+paddle remain host-owned; redundant procedural anatomy must be hidden behind
+the complete CC0 body. The close grip views fail closed on palm anchoring and
+finger/thumb chain closure before any evidence is promoted.
 """
 
 from __future__ import annotations
@@ -18,7 +20,7 @@ import traceback
 import unreal
 
 
-SCHEMA = "raftsim.cc0.exclusive_body_capture.v1"
+SCHEMA = "raftsim.cc0.exclusive_body_capture.v2"
 CHARACTER_NAMES = (
     "RaftSim_CC0_Guide",
     "RaftSim_CC0_Crew01",
@@ -264,28 +266,48 @@ def main() -> None:
                     f"minimum={minimum_solved_head_z:.3f}cm"
                 )
             face_target = unreal.Vector(origin.x, origin.y, 92.0)
+            # The deterministic seated-idle pose still holds the production
+            # paddle. These two matched close views frame both the inboard
+            # T-grip and outboard shaft hand so fingers cannot pass a full-body
+            # review merely by being hidden behind the PFD or paddle.
+            grip_target = unreal.Vector(34.0, -11.0, 52.0)
             views = {
                 "full": (
                     unreal.Vector(origin.x + 430.0, origin.y, 104.0),
                     target_point,
+                    36.0,
                 ),
                 "profile": (
                     unreal.Vector(origin.x, origin.y + 430.0, 104.0),
                     target_point,
+                    36.0,
                 ),
                 "rear": (
                     unreal.Vector(origin.x - 430.0, origin.y, 104.0),
                     target_point,
+                    36.0,
                 ),
                 "face": (
                     unreal.Vector(origin.x, origin.y + 115.0, 95.2),
                     face_target,
+                    36.0,
+                ),
+                "grip": (
+                    grip_target + unreal.Vector(155.0, 0.0, 18.0),
+                    grip_target,
+                    28.0,
+                ),
+                "grip_profile": (
+                    grip_target + unreal.Vector(0.0, 155.0, 18.0),
+                    grip_target,
+                    28.0,
                 ),
             }
             captures: dict[str, object] = {}
-            for view_name, (location, view_target) in views.items():
+            for view_name, (location, view_target, fov) in views.items():
                 capture.set_actor_location(location, False, False)
                 capture.set_actor_rotation(look_at(location, view_target), False)
+                capture_component.set_editor_property("fov_angle", fov)
                 path = export_capture(
                     world, capture_component, render_target, f"{stem}_{view_name}"
                 )
@@ -299,6 +321,18 @@ def main() -> None:
                 actor.get_production_helmet_forward_alignment()
             )
             helmet_fit_scale = actor.get_production_helmet_fit_scale()
+            paddle_grip_anchor_error_cm = (
+                visual_actor.get_maximum_paddle_grip_anchor_error_cm()
+            )
+            upper_finger_closure_degrees = (
+                visual_actor.get_minimum_upper_paddle_finger_closure_degrees()
+            )
+            lower_finger_closure_degrees = (
+                visual_actor.get_minimum_lower_paddle_finger_closure_degrees()
+            )
+            thumb_closure_degrees = (
+                visual_actor.get_minimum_paddle_thumb_closure_degrees()
+            )
             if helmet_head_error_cm > 1.0:
                 raise RuntimeError(
                     f"Helmet head error exceeds 1 cm for {character_name}: "
@@ -313,6 +347,34 @@ def main() -> None:
                 raise RuntimeError(
                     f"Helmet fit scale is invalid for {character_name}: "
                     f"{helmet_fit_scale:.6f}"
+                )
+            if not visual_actor.has_articulated_paddle_grip_rig():
+                raise RuntimeError(
+                    f"{character_name} has no complete articulated paddle-grip rig"
+                )
+            if not visual_actor.has_active_paddle_grip_pose():
+                raise RuntimeError(
+                    f"{character_name} did not retain an active seated paddle grip"
+                )
+            if paddle_grip_anchor_error_cm > 0.25:
+                raise RuntimeError(
+                    f"Palm anchor exceeds 0.25 cm for {character_name}: "
+                    f"{paddle_grip_anchor_error_cm:.6f}"
+                )
+            if upper_finger_closure_degrees < 120.0:
+                raise RuntimeError(
+                    f"Upper T-grip finger closure is below 120 degrees for "
+                    f"{character_name}: {upper_finger_closure_degrees:.6f}"
+                )
+            if lower_finger_closure_degrees < 210.0:
+                raise RuntimeError(
+                    f"Lower shaft finger closure is below 210 degrees for "
+                    f"{character_name}: {lower_finger_closure_degrees:.6f}"
+                )
+            if thumb_closure_degrees < 50.0:
+                raise RuntimeError(
+                    f"Opposed thumb closure is below 50 degrees for "
+                    f"{character_name}: {thumb_closure_degrees:.6f}"
                 )
 
             report["characters"].append(
@@ -331,6 +393,24 @@ def main() -> None:
                     ),
                     "runtime_body_ready": visual_actor.is_body_ready(),
                     "runtime_finite_pose": visual_actor.has_finite_pose(),
+                    "runtime_articulated_paddle_grip": (
+                        visual_actor.has_articulated_paddle_grip_rig()
+                    ),
+                    "runtime_active_paddle_grip_pose": (
+                        visual_actor.has_active_paddle_grip_pose()
+                    ),
+                    "runtime_paddle_grip_anchor_error_cm": (
+                        paddle_grip_anchor_error_cm
+                    ),
+                    "runtime_upper_paddle_finger_closure_degrees": (
+                        upper_finger_closure_degrees
+                    ),
+                    "runtime_lower_paddle_finger_closure_degrees": (
+                        lower_finger_closure_degrees
+                    ),
+                    "runtime_paddle_thumb_closure_degrees": (
+                        thumb_closure_degrees
+                    ),
                     "runtime_production_pfd": (
                         actor.has_production_whitewater_pfd()
                     ),
@@ -355,6 +435,27 @@ def main() -> None:
             1
             for character in report["characters"]
             if character["runtime_exclusive_cc0_body_ownership"]
+        )
+        report["articulated_paddle_grip_count"] = sum(
+            1
+            for character in report["characters"]
+            if character["runtime_articulated_paddle_grip"]
+        )
+        report["maximum_paddle_grip_anchor_error_cm"] = max(
+            character["runtime_paddle_grip_anchor_error_cm"]
+            for character in report["characters"]
+        )
+        report["minimum_upper_paddle_finger_closure_degrees"] = min(
+            character["runtime_upper_paddle_finger_closure_degrees"]
+            for character in report["characters"]
+        )
+        report["minimum_lower_paddle_finger_closure_degrees"] = min(
+            character["runtime_lower_paddle_finger_closure_degrees"]
+            for character in report["characters"]
+        )
+        report["minimum_paddle_thumb_closure_degrees"] = min(
+            character["runtime_paddle_thumb_closure_degrees"]
+            for character in report["characters"]
         )
         report["status"] = "capture_complete"
     except Exception as error:

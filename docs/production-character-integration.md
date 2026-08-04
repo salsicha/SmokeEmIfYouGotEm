@@ -137,6 +137,28 @@ review and exact hashes are recorded in
 `docs/environment-captures/south_fork_full_reach/m9_tapered_soft_cell_pfd_v5_review.json`;
 photoreal character-art and whitewater-safety acceptance remain open.
 
+The packaged CC0 fallback has a separate renderer-backed grip regression harness:
+
+```sh
+"/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd" \
+  "$PWD/unreal/SmokeEmIfYouGotEm.uproject" \
+  -unattended -nop4 -nosplash -RenderOffscreen \
+  -ExecutePythonScript="$PWD/unreal/Scripts/capture_cc0_production_roster.py"
+```
+
+It captures full, profile, rear, face, grip, and grip-profile views for all five identities
+(30 images total) and fails closed unless both hands expose complete three-joint finger and
+thumb chains. The retained palm-aligned grip V1 evidence measures at most
+`5.809241088172712e-9` cm palm-anchor error, at least `134.3199920654297` degrees of upper
+finger-chain closure, `230.6800079345703` degrees of lower closure, and
+`55.20000076293945` degrees of thumb closure. The runtime swimmer check also requires the
+grip to release when the paddle is released. Exact reports, images, hashes, rejected
+iterations, and open gates are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1_review.json`.
+This is a technical regression pass only: coarse hand topology, weak thumb opposition,
+material compression, motion biomechanics, and named character-art and guide approval keep
+photoreal and production fallback acceptance open.
+
 Official setup references:
 
 - <https://dev.epicgames.com/documentation/en-us/metahuman/getting-started-with-metahuman-creator>
