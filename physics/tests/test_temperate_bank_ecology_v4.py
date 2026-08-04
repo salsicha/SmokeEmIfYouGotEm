@@ -67,18 +67,33 @@ def test_v4_runtime_map_contract_requires_eight_forms_and_near_bank_density() ->
 
 
 def test_v4_saved_manifests_record_complete_bank_ecology() -> None:
-    for manifest_name, river_id, foliage_count, understory_count in (
+    for (
+        manifest_name,
+        river_id,
+        foliage_count,
+        understory_count,
+        near_bank_status,
+        near_bank_authority,
+    ) in (
         (
             "landscape_candidate_manifest_futaleufu_terminator.json",
             "futaleufu_terminator",
             8000,
             3350,
+            "source_grounded_mixed_cc0_scanned_fern_sapling_and_procedural_"
+            "shrub_ecology_v5_captured",
+            "presentation_only_mixed_rights_reviewed_cc0_structure_analogs_and_"
+            "procedural_source_gap_fill_no_native_species_ecology_survey_collision_"
+            "hydraulic_or_raft_force_authority",
         ),
         (
             "landscape_candidate_manifest_chilko_river_lava_canyon.json",
             "chilko_river_lava_canyon",
             16400,
             11750,
+            "source_grounded_dry_bank_grass_forb_shrub_ecology_v4_captured",
+            "presentation_only_procedural_source_gap_fill_no_species_survey_"
+            "collision_hydraulic_or_raft_force_authority",
         ),
     ):
         candidate = json.loads(
@@ -87,9 +102,7 @@ def test_v4_saved_manifests_record_complete_bank_ecology() -> None:
         assert candidate["river_id"] == river_id
         assert candidate["landscape_dressing_converted_species_static_mesh_count"] == 8
         assert candidate["landscape_dressing_temperate_morphology_mesh_count"] == 8
-        assert candidate["landscape_dressing_temperate_near_bank_status"] == (
-            "source_grounded_dry_bank_grass_forb_shrub_ecology_v4_captured"
-        )
+        assert candidate["landscape_dressing_temperate_near_bank_status"] == near_bank_status
         assert candidate["landscape_dressing_temperate_near_bank_target_instance_count"] == 1800
         assert candidate["landscape_dressing_temperate_near_bank_instance_count"] == 1800
         assert candidate["landscape_dressing_temperate_near_bank_rejected_placement_count"] == 0
@@ -98,8 +111,7 @@ def test_v4_saved_manifests_record_complete_bank_ecology() -> None:
         assert candidate["landscape_dressing_understory_instance_count"] == understory_count
         assert candidate["landscape_dressing_temperate_near_bank_maximum_slope_degrees"] <= 38.0
         assert candidate["landscape_dressing_temperate_near_bank_authority"] == (
-            "presentation_only_procedural_source_gap_fill_no_species_survey_"
-            "collision_hydraulic_or_raft_force_authority"
+            near_bank_authority
         )
 
 

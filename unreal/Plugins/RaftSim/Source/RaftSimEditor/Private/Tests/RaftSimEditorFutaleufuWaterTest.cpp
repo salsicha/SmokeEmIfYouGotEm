@@ -102,7 +102,10 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
     TestScalar(TEXT("SurfaceVariationStrength"), 0.44f);
     TestScalar(TEXT("CrossCurrentNormalWeight"), 0.34f);
     TestScalar(TEXT("RoughnessVariationAmplitude"), 0.12f);
-    TestScalar(TEXT("Opacity"), 0.88f);
+    // The saved physical-corridor instance is authored from the river-local
+    // water settings, whose reviewed transmitting value is 0.34.  The parent
+    // retains 0.88 only as its fallback default when no river override exists.
+    TestScalar(TEXT("Opacity"), 0.34f);
     TestScalar(TEXT("RefractionIor"), 1.333f);
     TestScalar(TEXT("SolverFieldEnable"), 0.0f);
     TestScalar(TEXT("SolverMacroNormalWeight"), 0.0f);

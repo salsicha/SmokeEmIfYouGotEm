@@ -335,6 +335,63 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("temperate near-bank ecology retains at least 1600 placed instances"),
             NearBankEcologyInstanceCount >= 1600);
 
+        if (bFutaleufuTerminatorReferenceRun)
+        {
+            int32 ScannedUnderstoryActorCount = 0;
+            int32 ScannedUnderstoryInstanceCount = 0;
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                AActor* Actor = *It;
+                if (!Actor ||
+                    !Actor->Tags.Contains(
+                        TEXT("RaftSimFutaleufuScannedNearBankUnderstoryV1")) ||
+                    !Actor->Tags.Contains(RiverRunTag))
+                {
+                    continue;
+                }
+                ++ScannedUnderstoryActorCount;
+                const UHierarchicalInstancedStaticMeshComponent* Instances =
+                    Actor->FindComponentByClass<
+                        UHierarchicalInstancedStaticMeshComponent>();
+                Test->TestNotNull(
+                    TEXT("Futaleufu scanned understory owns an HISM component"),
+                    Instances);
+                if (Instances)
+                {
+                    ScannedUnderstoryInstanceCount += Instances->GetInstanceCount();
+                    Test->TestEqual(
+                        TEXT("Futaleufu scanned understory remains non-colliding"),
+                        Instances->GetCollisionEnabled(),
+                        ECollisionEnabled::NoCollision);
+                }
+                Test->TestTrue(
+                    TEXT("Futaleufu scanned understory is source Landscape grounded"),
+                    Actor->Tags.Contains(TEXT("RaftSimSourceLandscapeGrounded")));
+                Test->TestTrue(
+                    TEXT("Futaleufu scanned understory stays outside the solver strip"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimOutsideProtectedSolverStrip")));
+                Test->TestTrue(
+                    TEXT("Futaleufu scanned understory records CC0 analog authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimRightsReviewedCC0UnderstoryAnalog")));
+                Test->TestTrue(
+                    TEXT("Futaleufu scanned understory disclaims species authority"),
+                    Actor->Tags.Contains(
+                        TEXT("RaftSimNoSpeciesOrEcologyAuthority")));
+                Test->TestFalse(
+                    TEXT("Futaleufu scanned understory is not promoted as canopy"),
+                    Actor->Tags.Contains(TEXT("RaftSimOpaqueVolumetricVegetation")));
+            }
+            Test->TestEqual(
+                TEXT("Futaleufu has seven scanned small-fir and fern actors"),
+                ScannedUnderstoryActorCount,
+                7);
+            Test->TestTrue(
+                TEXT("Futaleufu retains at least 1200 scanned near-bank instances"),
+                ScannedUnderstoryInstanceCount >= 1200);
+        }
+
         int32 WaterlineStructureActorCount = 0;
         int32 WaterlineStructureInstanceCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
@@ -1692,13 +1749,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     FMath::IsNearlyEqual(
                         (*It)->LiveSkyReflectionStrength, 0.05f, 0.001f));
                 Test->TestTrue(
-                    TEXT("versioned Futaleufu config retains its serialized ripple baseline"),
+                    TEXT("regenerated Futaleufu config uses its turbulent ripple bracket"),
                     FMath::IsNearlyEqual(
-                        (*It)->LiveRippleStrength, 0.55f, 0.001f));
+                        (*It)->LiveRippleStrength, 0.72f, 0.001f));
                 Test->TestTrue(
-                    TEXT("versioned Futaleufu config retains its serialized roughness baseline"),
+                    TEXT("regenerated Futaleufu config uses its turbulent roughness bracket"),
                     FMath::IsNearlyEqual(
-                        (*It)->LiveSurfaceRoughness, 0.68f, 0.001f));
+                        (*It)->LiveSurfaceRoughness, 0.42f, 0.001f));
                 Test->TestTrue(
                     TEXT("regenerated Futaleufu retains bounded dielectric energy"),
                     FMath::IsNearlyEqual(

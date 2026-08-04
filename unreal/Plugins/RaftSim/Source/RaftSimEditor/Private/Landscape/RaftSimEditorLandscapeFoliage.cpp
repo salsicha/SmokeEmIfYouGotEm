@@ -2527,6 +2527,44 @@ bool ValidateLandscapeCandidateReviewedPineMaterials(UStaticMesh* Mesh)
     return bHasNeedles && bHasWood;
 }
 
+bool ValidateFutaleufuScannedUnderstoryMaterials(UStaticMesh* Mesh)
+{
+    if (!Mesh || !Mesh->IsNaniteEnabled() ||
+        Mesh->GetStaticMaterials().IsEmpty())
+    {
+        return false;
+    }
+
+    const bool bFirSapling = Mesh->GetName().StartsWith(TEXT("SM_FirSapling_"));
+    const bool bFern = Mesh->GetName().StartsWith(TEXT("SM_Fern02_"));
+    if (!bFirSapling && !bFern)
+    {
+        return false;
+    }
+
+    bool bHasExpectedMaterial = false;
+    for (int32 MaterialIndex = 0;
+         MaterialIndex < Mesh->GetStaticMaterials().Num();
+         ++MaterialIndex)
+    {
+        UMaterialInterface* Material = Mesh->GetMaterial(MaterialIndex);
+        if (!Material)
+        {
+            return false;
+        }
+        const FString MaterialPath = Material->GetPathName();
+        if (!MaterialPath.Contains(
+                TEXT("/FutaleufuTemperateForestSet_1K/")))
+        {
+            return false;
+        }
+        bHasExpectedMaterial |= bFirSapling
+            ? MaterialPath.Contains(TEXT("M_FirSapling_"))
+            : MaterialPath.Contains(TEXT("M_Fern02_Fronds"));
+    }
+    return bHasExpectedMaterial;
+}
+
 FBox GetLandscapeCandidateEffectiveMeshBounds(UStaticMesh* Mesh)
 {
     if (!Mesh)
@@ -2790,6 +2828,50 @@ bool AddLandscapeCandidateBiomeDressing(
         }
     }
 
+    TArray<UStaticMesh*> FutaleufuScannedUnderstoryMeshes;
+    if (bFutaleufu)
+    {
+        static const TCHAR* AssetNames[] = {
+            TEXT("SM_FirSapling_fir_sapling_a"),
+            TEXT("SM_FirSapling_fir_sapling_b"),
+            TEXT("SM_FirSapling_fir_sapling_c"),
+            TEXT("SM_Fern02_fern_02_a"),
+            TEXT("SM_Fern02_fern_02_b"),
+            TEXT("SM_Fern02_fern_02_c"),
+            TEXT("SM_Fern02_fern_02_d")};
+        for (const TCHAR* AssetName : AssetNames)
+        {
+            const FString ObjectPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/%s.%s"),
+                AssetName,
+                AssetName);
+            if (UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+            {
+                FutaleufuScannedUnderstoryMeshes.Add(Mesh);
+            }
+        }
+        OutResult.DressingFutaleufuScannedUnderstoryMeshCount =
+            FutaleufuScannedUnderstoryMeshes.Num();
+        OutResult.DressingExternalReviewAssetCount +=
+            FutaleufuScannedUnderstoryMeshes.Num();
+        OutResult.bDressingFutaleufuScannedUnderstoryMaterialsValidated =
+            FutaleufuScannedUnderstoryMeshes.Num() == 7 &&
+            Algo::AllOf(
+                FutaleufuScannedUnderstoryMeshes,
+                [](UStaticMesh* Mesh)
+                {
+                    return ValidateFutaleufuScannedUnderstoryMaterials(Mesh);
+                });
+        if (!OutResult.bDressingFutaleufuScannedUnderstoryMaterialsValidated)
+        {
+            OutSummary += FString::Printf(
+                TEXT("%s scanned near-bank understory loaded %d/7 meshes or failed material/Nanite validation.\n"),
+                *Candidate.PreviewSpec.RiverId,
+                FutaleufuScannedUnderstoryMeshes.Num());
+            return false;
+        }
+    }
+
     UStaticMesh* BroadleafTreeMesh = nullptr;
     UStaticMesh* ConiferTreeMesh = nullptr;
     UStaticMesh* ShrubMesh = nullptr;
@@ -2945,7 +3027,8 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingAssetCount += Mesh ? 1 : 0;
         OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
     }
-    OutResult.DressingAssetCount += ReviewedRockMeshes.Num() + ReviewedPineMeshes.Num();
+    OutResult.DressingAssetCount += ReviewedRockMeshes.Num() +
+        ReviewedPineMeshes.Num() + FutaleufuScannedUnderstoryMeshes.Num();
     if (bColoradoHance)
     {
         if (!CreateHanceOpaqueDrylandVegetationAssets(
@@ -3572,6 +3655,22 @@ bool AddLandscapeCandidateBiomeDressing(
                 *Candidate.PreviewSpec.RiverId),
             true));
     }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
+        FutaleufuScannedUnderstoryInstances;
+    for (int32 MeshIndex = 0;
+         MeshIndex < FutaleufuScannedUnderstoryMeshes.Num();
+         ++MeshIndex)
+    {
+        FutaleufuScannedUnderstoryInstances.Add(
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                FutaleufuScannedUnderstoryMeshes[MeshIndex],
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_FutaleufuScannedUnderstory%02d_%s"),
+                    MeshIndex + 1,
+                    *Candidate.PreviewSpec.RiverId),
+                MeshIndex < 3));
+    }
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
         !ShrubInstances || !UnderstoryInstances ||
         (bOpaqueTemperate &&
@@ -3635,12 +3734,47 @@ bool AddLandscapeCandidateBiomeDressing(
         Algo::AnyOf(ReviewedPineInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
         {
             return Component == nullptr;
-        }))
+        }) ||
+        Algo::AnyOf(
+            FutaleufuScannedUnderstoryInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            })
+        )
     {
         OutSummary += FString::Printf(
             TEXT("Failed to create one or more Landscape biome dressing instance components for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
         return false;
+    }
+    if (bFutaleufu)
+    {
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             FutaleufuScannedUnderstoryInstances)
+        {
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimFutaleufuTerminatorRun"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimFutaleufuScannedNearBankUnderstoryV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0UnderstoryAnalog"));
+                Owner->Tags.AddUnique(TEXT("RaftSimSourceLandscapeGrounded"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimOutsideProtectedSolverStrip"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNonCollisionRenderSurface"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimNoHydraulicAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimFutaleufuScannedNearBankUnderstoryV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimOutsideProtectedSolverStrip"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimNonCollisionRenderSurface"));
+        }
     }
     if (bColoradoHance)
     {
@@ -6126,6 +6260,7 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     int32 TemperateNearBankPlacedCount = 0;
+    int32 FutaleufuScannedUnderstoryPlacedCount = 0;
     int32 TemperateNearBankRejectedPlacementCount = 0;
     float TemperateNearBankMinimumCenterlineDistanceCm =
         TNumericLimits<float>::Max();
@@ -6232,23 +6367,49 @@ bool AddLandscapeCandidateBiomeDressing(
                 continue;
             }
 
-            const bool bShrubPatch = PatchIndex % 6 == 0;
-            const bool bSecondaryMorphology =
-                ZambeziVegetationUnitRandom(PatchIndex, 10253) > 0.47f;
-            const int32 FamilyIndex =
-                (bShrubPatch ? 2 : 0) + (bSecondaryMorphology ? 1 : 0);
-            UStaticMesh* PatchMesh = NearBankMeshes[FamilyIndex];
-            UHierarchicalInstancedStaticMeshComponent* PatchComponent =
-                NearBankComponents[FamilyIndex];
-            const float TargetHeightCm = bShrubPatch
-                ? FMath::Lerp(
-                      155.0f,
-                      295.0f,
-                      ZambeziVegetationUnitRandom(PatchIndex, 10259))
-                : FMath::Lerp(
-                      58.0f,
-                      138.0f,
-                      ZambeziVegetationUnitRandom(PatchIndex, 10267));
+            const bool bUseScannedUnderstory = bFutaleufu && PatchIndex % 5 != 0;
+            UStaticMesh* PatchMesh = nullptr;
+            UHierarchicalInstancedStaticMeshComponent* PatchComponent = nullptr;
+            float TargetHeightCm = 0.0f;
+            if (bUseScannedUnderstory)
+            {
+                const int32 ScannedIndex = FMath::Min(
+                    FutaleufuScannedUnderstoryMeshes.Num() - 1,
+                    FMath::FloorToInt(
+                        ZambeziVegetationUnitRandom(PatchIndex, 10253) *
+                        FutaleufuScannedUnderstoryMeshes.Num()));
+                PatchMesh = FutaleufuScannedUnderstoryMeshes[ScannedIndex];
+                PatchComponent =
+                    FutaleufuScannedUnderstoryInstances[ScannedIndex];
+                TargetHeightCm = ScannedIndex < 3
+                    ? FMath::Lerp(
+                          75.0f,
+                          165.0f,
+                          ZambeziVegetationUnitRandom(PatchIndex, 10259))
+                    : FMath::Lerp(
+                          28.0f,
+                          70.0f,
+                          ZambeziVegetationUnitRandom(PatchIndex, 10267));
+            }
+            else
+            {
+                const bool bShrubPatch = PatchIndex % 6 == 0;
+                const bool bSecondaryMorphology =
+                    ZambeziVegetationUnitRandom(PatchIndex, 10253) > 0.47f;
+                const int32 FamilyIndex =
+                    (bShrubPatch ? 2 : 0) + (bSecondaryMorphology ? 1 : 0);
+                PatchMesh = NearBankMeshes[FamilyIndex];
+                PatchComponent = NearBankComponents[FamilyIndex];
+                TargetHeightCm = bShrubPatch
+                    ? FMath::Lerp(
+                          155.0f,
+                          295.0f,
+                          ZambeziVegetationUnitRandom(PatchIndex, 10259))
+                    : FMath::Lerp(
+                          58.0f,
+                          138.0f,
+                          ZambeziVegetationUnitRandom(PatchIndex, 10267));
+            }
             const float MeshHeightCm = FMath::Max(
                 1.0f,
                 GetLandscapeCandidateEffectiveMeshBounds(PatchMesh).GetSize().Z);
@@ -6273,6 +6434,8 @@ bool AddLandscapeCandidateBiomeDressing(
                         ZambeziVegetationUnitRandom(PatchIndex, 10291)),
                     UniformScale));
             ++TemperateNearBankPlacedCount;
+            FutaleufuScannedUnderstoryPlacedCount +=
+                bUseScannedUnderstory ? 1 : 0;
             ++OutResult.DressingFoliageInstanceCount;
             ++OutResult.DressingUnderstoryInstanceCount;
             TemperateNearBankMinimumCenterlineDistanceCm = FMath::Min(
@@ -6298,9 +6461,15 @@ bool AddLandscapeCandidateBiomeDressing(
                 TEXT("RaftSimOutsideProtectedSolverStrip"));
             Component->MarkRenderStateDirty();
         }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             FutaleufuScannedUnderstoryInstances)
+        {
+            Component->MarkRenderStateDirty();
+        }
         OutSummary += FString::Printf(
-            TEXT("%s near-bank ecology V4: %d/%d source-grounded, dry, ")
-            TEXT("non-colliding grass/forb/shrub patches; %d targets rejected ")
+            TEXT("%s near-bank ecology V5: %d/%d source-grounded, dry, ")
+            TEXT("non-colliding patches (%d rights-reviewed CC0 scanned small-fir ")
+            TEXT("or fern analogs); %d targets rejected ")
             TEXT("by full-route clearance, dry-height, or %.1f-degree slope ")
             TEXT("gates; minimum centerline distance %.1f cm and maximum placed ")
             TEXT("slope %.2f degrees. Procedural gap fill with no species, ")
@@ -6308,6 +6477,7 @@ bool AddLandscapeCandidateBiomeDressing(
             *Spec.RiverId,
             TemperateNearBankPlacedCount,
             TemperateNearBankEcologyTargetInstanceCount,
+            FutaleufuScannedUnderstoryPlacedCount,
             TemperateNearBankRejectedPlacementCount,
             TemperateNearBankEcologySlopeCeilingDegrees,
             TemperateNearBankMinimumCenterlineDistanceCm,
@@ -6317,6 +6487,8 @@ bool AddLandscapeCandidateBiomeDressing(
         bOpaqueTemperate ? TemperateNearBankEcologyTargetInstanceCount : 0;
     OutResult.DressingTemperateNearBankInstanceCount =
         TemperateNearBankPlacedCount;
+    OutResult.DressingFutaleufuScannedUnderstoryInstanceCount =
+        FutaleufuScannedUnderstoryPlacedCount;
     OutResult.DressingTemperateNearBankRejectedPlacementCount =
         TemperateNearBankRejectedPlacementCount;
     OutResult.DressingTemperateNearBankMinimumCenterlineDistanceCm =
@@ -7603,6 +7775,8 @@ bool AddLandscapeCandidateBiomeDressing(
         (!bOpaqueTemperate ||
          TemperateNearBankPlacedCount >=
              TemperateNearBankEcologyMinimumInstanceCount) &&
+        (!bFutaleufu ||
+         FutaleufuScannedUnderstoryPlacedCount >= 1200) &&
         (!bChilko ||
          ChilkoShorelineGravelPlacedCount >=
              ChilkoOrganicShorelineGravelMinimumInstanceCount) &&

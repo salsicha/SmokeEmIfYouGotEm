@@ -726,6 +726,9 @@ struct FRaftSimLandscapeImportCandidateResult
     bool bDressingExternalRockMaterialsValidated = false;
     int32 DressingExternalPineMeshCount = 0;
     bool bDressingExternalPineMaterialsValidated = false;
+    int32 DressingFutaleufuScannedUnderstoryMeshCount = 0;
+    int32 DressingFutaleufuScannedUnderstoryInstanceCount = 0;
+    bool bDressingFutaleufuScannedUnderstoryMaterialsValidated = false;
     bool bDressingExternalBroadleafReviewAssetLoaded = false;
     bool bDressingExternalBroadleafMaterialsValidated = false;
     bool bDressingExternalConiferReviewAssetLoaded = false;

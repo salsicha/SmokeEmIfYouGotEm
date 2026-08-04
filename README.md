@@ -14,6 +14,15 @@ rapid-specific hydraulics are explicitly procedural and remain blocked from
 production-fidelity claims. Its current map, regeneration path, validation, and
 open gates are documented in
 [docs/zambezi-reference-map-and-scenario.md](docs/zambezi-reference-map-and-scenario.md).
+Futaleufú's current `L_Terminator` map now mixes seven rights-reviewed CC0
+small-fir and fern structure analogs into its screened near-bank layer: 1,440
+of 1,800 placements use the scanned assets, 360 retain deterministic
+procedural gap fill, and the project-owned 4,650-instance canopy remains
+unchanged. Medium firs remain excluded from canopy use. The regenerated map,
+native Futaleufú material checks, and all six runnable-river PIE loads pass.
+This is a bounded runtime ecology improvement, not photoreal or native-species
+approval; exact evidence and six open external gates are recorded in the
+[scanned-understory review](docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_review.json).
 The August 4 V17 release-head certification confirms again that the frontend
 selector, source scenario, shipping cook, saved map, and live PIE launch all
 resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads

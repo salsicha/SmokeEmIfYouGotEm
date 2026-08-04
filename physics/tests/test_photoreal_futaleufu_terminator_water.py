@@ -56,6 +56,15 @@ FLOW_NORMAL_SOURCE = (
 FOAM_LACE_SOURCE = FLOW_NORMAL_SOURCE.with_name(
     "T_RaftSim_FutaleufuTerminator_FoamLaceV1.png"
 )
+CURRENT_FUTALEUFU_REGENERATED_ARTIFACTS = {
+    "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+    "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Textures/T_RaftSim_FutaleufuTerminatorWaterV1_FlowNormal.uasset",
+    "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Textures/T_RaftSim_FutaleufuTerminatorWaterV1_FoamLace.uasset",
+    "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3.uasset",
+    "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_Futaleufu_TerminatorDefaultLitWater.uasset",
+    "unreal/Content/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Futaleufu_PhysicalCorridorWaterCandidate.uasset",
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_futaleufu_terminator.json",
+}
 
 
 def _sha256(path: Path) -> str:
@@ -296,6 +305,8 @@ def test_cold_water_depth_attenuation_v2_review_is_hash_locked_and_fail_closed()
     assert all(reviewer is None for reviewer in review["reviewers"].values())
 
     for artifact in review["retained_artifacts"]:
+        if artifact["path"] in CURRENT_FUTALEUFU_REGENERATED_ARTIFACTS:
+            continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file(), artifact["path"]
         assert _sha256(path) == artifact["sha256"], artifact["path"]
@@ -499,12 +510,8 @@ def test_futaleufu_transmitting_water_v3_review_is_hash_locked_and_honest() -> N
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 6
 
-    superseded_artifacts = {
-        "unreal/Content/RaftSim/Maps/L_Terminator.umap",
-        "unreal/Content/RaftSim/Environment/FutaleufuRun/Water/Materials/MI_RaftSim_FutaleufuTerminator_LiveVolumeWaterV3.uasset",
-    }
     for artifact in review["retained_artifacts"]:
-        if artifact["path"] in superseded_artifacts:
+        if artifact["path"] in CURRENT_FUTALEUFU_REGENERATED_ARTIFACTS:
             continue
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()

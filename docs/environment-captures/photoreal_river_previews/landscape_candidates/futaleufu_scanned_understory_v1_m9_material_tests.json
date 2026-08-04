@@ -1,0 +1,59 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-MacBook-Air.local",
+			"instance": "F5B7D91D54439ECD310EB0BEB58A1F8F",
+			"instanceName": "Alexs-MacBook-Air.local-25783",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.04-19.46.58",
+	"succeeded": 2,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.016620628535747528,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FFutaleufuOrganicTemperateTerrain",
+			"fullTestPath": "RaftSim.M9.FFutaleufuOrganicTemperateTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"F5B7D91D54439ECD310EB0BEB58A1F8F"
+			],
+			"duration": 0.0082247518002986908,
+			"dateTime": "2026.08.04-19.46.58",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FFutaleufuTerminatorWater",
+			"fullTestPath": "RaftSim.M9.FFutaleufuTerminatorWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"F5B7D91D54439ECD310EB0BEB58A1F8F"
+			],
+			"duration": 0.0083958767354488373,
+			"dateTime": "2026.08.04-19.46.58",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}
