@@ -794,3 +794,20 @@ and external acceptance gates pass.
   microgeometry, regional art, measured hydraulics, character/raft review,
   platform performance, and all external approvals remain open in
   `cold_water_depth_attenuation_v2_review.json`.
+
+### 2026-08-04 — Cold-water adaptive shoreline V1 rejected
+
+- Tested two source-conditioned, non-colliding bank-mesh brackets on
+  Futaleufú and Chilko. The final 18 m strip generated two actors per river at
+  2 m longitudinal/1 m lateral spacing, totaling 11,438 vertices and 21,600
+  triangles; collision and geography/hydraulic authority stayed disabled.
+- Matched Chilko evidence failed the retain gate. The pale rectangular
+  shallow-water band remained, close-up bank-transition edge coverage changed
+  from 0.209369 to 0.208587, and an intermediate bracket introduced a pale
+  rail. The darker open-water delta was not credited as shoreline progress.
+- Restored both accepted runnable maps and terrain materials byte-for-byte and
+  retained only hash-locked rejection evidence. A future attempt must adjust
+  presentation water coverage or consume reviewed bank and bathymetry
+  breaklines; external guide, geospatial, rights, hydraulic, art, human, and
+  platform gates remain open in
+  `cold_water_adaptive_shoreline_v1_review.json`.

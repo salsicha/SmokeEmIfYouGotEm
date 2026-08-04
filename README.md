@@ -131,6 +131,15 @@ washed band 14.33%, and p95 4.52%. Both maps remain reference-runnable rather
 than photoreal-approved; exact coefficients, hashes, remaining defects, and
 external gates are in the
 [cold-water depth review](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_review.json).
+A follow-up adaptive-shoreline experiment was rejected and removed before
+release integration. Its 18 m, 1 m-resolution non-colliding bank strips passed
+generation and mesh bounds, but matched Chilko views retained the broad pale
+rectangular shallow-water band, slightly reduced bank-transition edge density,
+and briefly introduced a continuous pale rail. The accepted runnable maps and
+terrain materials remain byte-restored; the fail-closed evidence, hashes,
+authority boundary, and next-step requirement for water-coverage or surveyed
+bank geometry are recorded in the
+[cold-water adaptive-shoreline rejection](docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_review.json).
 The shared live-water renderer now subdivides every authored river's visual
 surface from a 3 m analysis grid to 1.5 m presentation spacing. Solver-feature
 analysis retains its original physical footprint, the config-less test tank

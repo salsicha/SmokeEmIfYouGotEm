@@ -501,6 +501,32 @@ performance, and all six external reviews remain open. Exact hashes, metrics,
 authority boundaries, and blockers are in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_depth_attenuation_v2_review.json`.
 
+## Rejected Cold-Water Adaptive Shoreline V1
+
+A source-conditioned, non-colliding shoreline experiment tested whether dense
+render-only bank geometry could replace the straight water-Landscape
+intersection without claiming terrain or hydraulic authority. The first 45 m
+sheet changed almost no shoreline pixels; most of its apparent bank-closeup
+delta was darker open water. A narrowed final bracket used an 18 m strip, 2 m
+longitudinal and 1 m lateral spacing, 2-6.5 m inward overlap, a submerged
+80 cm approach edge, and at most 12.72 cm measured microrelief. Each river
+generated two actors totaling 11,438 vertices and 21,600 triangles with
+collision disabled.
+
+The mesh contract passed, but the visual contract did not. Chilko's fixed
+bank-transition edge fraction fell from 0.209369 to 0.208587 in the close-up
+and from 0.062828 to 0.061852 in the rapid-side frame. The broad pale
+rectangular shallow-water band remained; an intermediate shallow shelf also
+created a continuous pale rail. No candidate source, map, material, or
+generator output is retained. `L_Terminator`, `L_LavaCanyon`, and both accepted
+physical-terrain materials were restored byte-for-byte.
+
+The next shoreline attempt must change the visible water-coverage boundary or
+use reviewed bank/bathymetry breaklines rather than overlay another broad
+terrain sheet. Exact images, hashes, archived experiment snapshots, authority
+boundaries, remaining defects, and external gates are recorded in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_adaptive_shoreline_v1_review.json`.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.
