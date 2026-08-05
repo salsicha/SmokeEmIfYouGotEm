@@ -17,6 +17,16 @@ Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
 to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
 and do not delay a complete South Fork 1.0.
 
+**Release-asset LFS normalization checkpoint, August 5:** 129 legacy binary paths
+that predated their matching `.gitattributes` rules now stage as 119 exact Git LFS
+objects instead of appearing perpetually modified after a clean checkout. A
+byte-for-byte audit verified every new pointer against the prior committed payload:
+245,078,504 source bytes, zero SHA-256 or size mismatches, and zero missing or
+corrupt local objects. This changes storage representation only; rendered images,
+DEM/imagery inputs, source-conditioned material maps, and gameplay data are
+unchanged. It closes a clean-worktree/reproducibility prerequisite but does not
+close M9 art, human-review, platform, signing, media, or promotion gates.
+
 **Runnable-portfolio V23 checkpoint, August 4:** all six rivers are selectable
 Free Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
