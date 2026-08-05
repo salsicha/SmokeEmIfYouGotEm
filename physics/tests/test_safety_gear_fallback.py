@@ -46,7 +46,8 @@ ROSTER_CAPTURE_SCRIPT = (
 SPLASH_JACKET_BUILD_SCRIPT = (
     REPO_ROOT / "unreal/Scripts/create_splash_jacket_material.py"
 )
-REFRESH_UTILITY = REPO_ROOT / "scripts/refresh_pfd_material_parameters.py"
+# Capital-S Scripts: the repo directory is case-sensitive on Linux.
+REFRESH_UTILITY = REPO_ROOT / "Scripts/refresh_pfd_material_parameters.py"
 REVIEW_PATH = (
     REPO_ROOT / "docs/environment-captures/south_fork_full_reach/"
     "m9_safety_gear_fallback_v306_review.json"

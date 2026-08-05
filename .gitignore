@@ -15,6 +15,8 @@ venv/
 build/
 dist/
 *.egg-info/
+# Per-host UE-linkable solver lib (rebuild via unreal/Scripts/build_solver_lib.sh)
+physics/cpp/build-ue/
 
 # Blender recovery/autosave backups are local-only.
 *.blend[0-9]*

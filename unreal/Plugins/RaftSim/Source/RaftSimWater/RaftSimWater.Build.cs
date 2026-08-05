@@ -24,6 +24,10 @@ public class RaftSimWater : ModuleRules
             PublicAdditionalLibraries.Add(SolverLib);
             PublicDefinitions.Add("RAFTSIM_HAS_LIVE_SOLVER=1");
             bEnableExceptions = true;
+            // The solver archive inflates compressed .npy payloads; macOS
+            // resolves zlib from the system SDK but Linux links against the
+            // engine's bundled zlib, so declare it for both.
+            AddEngineThirdPartyPrivateStaticDependencies(Target, "zlib");
         }
         else
         {
