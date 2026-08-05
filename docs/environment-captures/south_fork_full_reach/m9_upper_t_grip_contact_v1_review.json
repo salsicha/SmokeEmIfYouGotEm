@@ -1,0 +1,144 @@
+{
+  "schema": "raftsim.m9.upper_t_grip_contact_review.v1",
+  "reviewed_utc": "2026-08-05T03:32:00Z",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_external_character_art_and_guide_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "human_approved": false,
+  "named_character_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "promotion_allowed": false,
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+  "summary": "Upper T-Grip Contact V1 closes all four distal finger pads and the opposed thumb pad onto the modeled transverse paddle handle for all five assembled production characters. It preserves each imported palm, metacarpal, proximal joint, middle pad, the existing lower-hand C-grip, and every gameplay authority. The prior whole-chain radial solve remains rejected: this retained solver adjusts only each terminal segment, clamps pads inside the rounded handle ends, and records contact plus thumb-opposition metrics. Fixed front/profile close views show a more legible grasp without the rejected donut silhouette. This is a bounded technical character improvement, not photoreal acceptance: the body still exposes coarse mitten-like palm topology, simplified knuckles, finger webbing, glove construction, wrist compression, and non-motion-captured deformation.",
+  "root_cause": {
+    "open_upper_grip": "Opposed Thumb + Localized Glove V3 constrained the lower shaft hand but deliberately left the upper hand on its authored curl after a full radial T-grip solve produced a camera-facing donut. The upper distal pads could therefore remain visually separated from the 4.4 cm handle.",
+    "retained_solution": "Preserve the imported palm, metacarpal, proximal joint, and middle pad. For the four fingers, rotate only the second-to-third terminal segment so the distal pad reaches a 2.95 cm center radius around the 2.2 cm T-grip. Clamp axial placement to plus or minus 5.65 cm inside the rounded 14 cm handle. Place the distal thumb pad on the exact radial opposite of the middle finger and measure opposition independently.",
+    "rejected_solution": "Do not force all upper finger and thumb joints onto a common radial cage. That historical bracket made the hand read as a circular donut and discarded useful imported anatomy.",
+    "authority": "FRaftSimCrewAvatarPose shoulders, elbows, wrists, palm targets, paddle endpoints, lower-hand contact, and the modeled paddle remain authoritative. No force, mass, collision, rescue, raft, water, terrain, solver, scoring, progression, or map package changed."
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "visible_paddle_hands": 10,
+    "upper_t_grip_hands": 5,
+    "lower_shaft_contact_hands": 5,
+    "contact_constrained_upper_finger_chains": 20,
+    "contact_constrained_upper_thumb_pads": 5,
+    "retained_lower_finger_chains": 20,
+    "retained_lower_opposed_thumb_pads": 5,
+    "t_grip_physical_radius_cm": 2.2,
+    "finger_and_thumb_pad_center_radius_cm": 2.95,
+    "usable_handle_half_length_cm": 5.65,
+    "maximum_allowed_contact_error_cm": 0.25,
+    "maximum_allowed_thumb_opposition_dot": -0.95,
+    "measured_maximum_palm_anchor_error_cm": 1.880034572465661e-9,
+    "measured_maximum_lower_finger_contact_error_cm": 0.0,
+    "measured_maximum_lower_thumb_contact_error_cm": 0.0,
+    "measured_maximum_upper_finger_contact_error_cm": 1.1534009303204584e-9,
+    "measured_maximum_upper_thumb_contact_error_cm": 0.0,
+    "measured_maximum_upper_thumb_opposition_dot": -1.0,
+    "physics_or_gameplay_changes": false,
+    "crew_mass_changes": false,
+    "collision_changes": false,
+    "paddle_geometry_changes": false,
+    "raft_or_water_changes": false,
+    "map_package_changes": false
+  },
+  "runtime_roster_metrics": {
+    "report": "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_roster_metrics.json",
+    "report_sha256": "8057a64ce809c04f6a8aeb2991f65635442e6d7d621fc4ededae7e9ad355542b",
+    "status": "capture_complete",
+    "captured_character_count": 5,
+    "characters_with_contact_constrained_upper_grips": 5,
+    "characters_with_localized_paddle_glove_material": 5
+  },
+  "renderer_evidence": {
+    "camera_contract": "Baseline and candidate use the same 1536x1024 scene, fixed 28-degree front/profile close cameras, lighting, seated pose, guide and broadest-body identities, PPE, glove response, and paddle geometry.",
+    "baseline": {
+      "guide_grip": [
+        "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_guide_grip.png",
+        "0294ea12522c149efc61dea5a7aa1d284ef1fc7ce3bdb85942d865589e3709d0"
+      ],
+      "guide_grip_profile": [
+        "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_guide_grip_profile.png",
+        "ae8185450e313fa170f872099d72b45965909b84992f7487800ab09b6843e3cb"
+      ],
+      "broadest_grip": [
+        "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_broadest_grip.png",
+        "54bdce8e3a225c475af9b13982eadd67a6b89666f5064905f3feb78c7858a8a2"
+      ],
+      "broadest_grip_profile": [
+        "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_broadest_grip_profile.png",
+        "5bf9594186dafa7f2c9f4f62732de3946c49b8bb3bbe9c5831e32a234ae2d7e0"
+      ]
+    },
+    "candidate": {
+      "guide_grip": [
+        "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_guide_grip.png",
+        "d0b4a10e5ddec75ac94f2cc7a29fe7a0eea09f1f2984cf636e14d8452aebecca"
+      ],
+      "guide_grip_profile": [
+        "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_guide_grip_profile.png",
+        "ec139b1bbf634ced141e40250fce64e927d1c2203641bf0cd9b7f16a9855b768"
+      ],
+      "broadest_grip": [
+        "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_broadest_grip.png",
+        "98c69a17f03dedc84082cb5df984e5c30e4a4191f954e741b3d4cf18bea6a0b5"
+      ],
+      "broadest_grip_profile": [
+        "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_broadest_grip_profile.png",
+        "f81534d390d1edb61cf9a63e54531985da561d5dba7a84ca98b62d6d96c3814e"
+      ]
+    },
+    "technical_verdict": "pass: all reviewed upper distal pads meet the T-grip surface and remain inside its rounded ends; the thumb is visibly and numerically opposed; the imported palm and proximal finger volumes remain; no radial donut or detached finger spike is introduced",
+    "photoreal_verdict": "fail: close views still expose coarse hand topology, oversized mitten-like palm volumes, simplified knuckles and webbing, uniform glove construction, weak wrist compression, and no motion-captured skinning or stroke deformation"
+  },
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded in both the current six-river integration worktree and the assembled-character rendering worktree after the final opposition metric.",
+    "focused_python": "5/5 upper-T-grip evidence and source contracts passed.",
+    "renderer_roster": "5/5 assembled identities captured; every palm, lower contact, upper contact, opposition, glove, PPE, and finite-presentation assertion passed.",
+    "m5": {
+      "result": "1/1 RaftSim.M5.CrewAvatarPoseProduction passed renderer-enabled with 0 warnings and 0 errors.",
+      "report": "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_m5.json",
+      "report_sha256": "55f2cafe57e14e136dc64fa1a8ce14f1a1b94c3a417ca81074865be68ed601b0"
+    },
+    "p4_all_rivers": {
+      "result": "6/6 RaftSim.P4.RiverMapLoads tests passed; every test recorded zero errors and every MapCheck recorded 0 errors/0 warnings.",
+      "report": "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_p4.json",
+      "report_sha256": "fd593c1861804f58dd16fdd2d30da428c78b0e9c4dd0d74d62ceeb9a79ad260c",
+      "classified_test_warnings": [
+        "Unreal r.MotionVectorSimulation render-thread safety diagnostic on L_Hance",
+        "expected simulated raft capsize telemetry on L_Troublemaker",
+        "external generate_204 connectivity timeout on L_Zambezi"
+      ]
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp": "444e12c9bc8845e9329ff2b4e342a9b333d50c214cecdb43c0785d7550d986bc",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h": "99324c68e30dbde8db84a3f11b727108c2db8166cf579644e5ca9823211cf597",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "6b293b13521fb29514cff6f653f67055fbf96eb4c03e8155247acebe77d17f43",
+    "unreal/Scripts/capture_metahuman_production_roster.py": "bcdc85addbbbe654b858402b17cabf8ee18b1a2b239aa2b465f1bc4e37f87d56",
+    "physics/tests/test_cc0_production_characters.py": "24a71c5b8a6e9d0fd4e46e679f6261d2d8bf16a544f8f2fb2dd7b991e67a2e15",
+    "physics/tests/test_m9_upper_t_grip_contact_v1.py": "4e94b77dfc65437082ac14769b2505e753aa126272ebbc648e40b33272248511"
+  },
+  "accepted": [
+    "All five upper hands now close four distinct distal finger pads onto the transverse T-grip with at most 1.154e-9 cm measured contact/end-overrun error.",
+    "All five upper thumb pads contact at zero measured error and oppose the middle-finger pad at dot -1.0.",
+    "Every pad is clamped inside the modeled handle ends rather than merely satisfying an infinite-cylinder radial distance.",
+    "The retained distal-only correction avoids the rejected whole-chain radial cage and preserves the imported palm and proximal anatomy.",
+    "Existing lower-shaft finger/thumb contact, palm anchors, localized glove response, PPE, paddle geometry, character roster, and all gameplay authorities remain unchanged.",
+    "The renderer-enabled character gate and every runnable-river live map-load gate pass."
+  ],
+  "rejected_or_open": [
+    "The historical whole-chain upper radial solve remains rejected because it produced a camera-facing circular donut hand.",
+    "The retained distal correction cannot add missing knuckle, nail, webbing, seam, cuff, palm-reinforcement, or wet-compression topology to the one-section source body.",
+    "The fixed seated bracket does not prove motion-captured grip biomechanics, wrist compression, blade timing, or moving-stroke deformation.",
+    "No named character-art reviewer or qualified whitewater guide has approved the anatomy, glove construction, upper grip safety, or synchronized strokes."
+  ],
+  "open_gates": [
+    "A named character-art reviewer must approve or replace hand topology, skinning, glove construction, wrist compression, and deformation in motion.",
+    "A qualified whitewater guide must approve the upper T-grip, retained lower grip, and synchronized moving stroke biomechanics.",
+    "M9 remains fail-closed on wider photoreal character/environment, representative-media, performance, target-platform, signing, publication, and product-owner gates."
+  ]
+}

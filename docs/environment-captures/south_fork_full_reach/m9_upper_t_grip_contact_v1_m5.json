@@ -1,0 +1,165 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-Air.attlocal.net",
+			"instance": "0431B23F65440D5F466DF38221F2875A",
+			"instanceName": "Alexs-Air.attlocal.net-70788",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "Metal Bindless (SM6)",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.05-03.27.11",
+	"succeeded": 1,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.52619951963424683,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "CrewAvatarPoseProduction",
+			"fullTestPath": "RaftSim.M5.CrewAvatarPoseProduction",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"0431B23F65440D5F466DF38221F2875A"
+			],
+			"duration": 0.52619951963424683,
+			"dateTime": "2026.08.05-03.27.11",
+			"entries": [
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Guide RaftSim_CC0_Guide_Eyes detail bounds min=V(X=-4.56, Y=11.55, Z=168.95) max=V(X=4.56, Y=14.87, Z=171.87) separation median=0.199 p95=0.368 max=0.387 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Guide RaftSim_CC0_Guide_Brows detail bounds min=V(X=-4.77, Y=15.61, Z=172.26) max=V(X=4.77, Y=16.14, Z=173.09) separation median=0.453 p95=0.854 max=0.938 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew01 RaftSim_CC0_Crew01_Eyes detail bounds min=V(X=-4.40, Y=10.91, Z=165.30) max=V(X=4.40, Y=14.11, Z=168.14) separation median=0.183 p95=0.347 max=0.374 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew01 RaftSim_CC0_Crew01_Brows detail bounds min=V(X=-4.66, Y=14.84, Z=168.57) max=V(X=4.66, Y=15.37, Z=169.39) separation median=0.541 p95=0.931 max=1.006 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew02 RaftSim_CC0_Crew02_Eyes detail bounds min=V(X=-4.33, Y=10.13, Z=147.71) max=V(X=4.33, Y=13.09, Z=150.37) separation median=0.184 p95=0.274 max=0.324 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew02 RaftSim_CC0_Crew02_Brows detail bounds min=V(X=-4.63, Y=13.82, Z=150.89) max=V(X=4.63, Y=14.35, Z=151.72) separation median=0.612 p95=1.120 max=1.262 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew03 RaftSim_CC0_Crew03_Eyes detail bounds min=V(X=-4.34, Y=9.88, Z=149.54) max=V(X=4.34, Y=13.02, Z=152.43) separation median=0.162 p95=0.277 max=0.392 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew03 RaftSim_CC0_Crew03_Brows detail bounds min=V(X=-4.62, Y=13.75, Z=152.83) max=V(X=4.62, Y=14.28, Z=153.66) separation median=0.465 p95=0.859 max=0.962 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew04 RaftSim_CC0_Crew04_Eyes detail bounds min=V(X=-4.36, Y=9.46, Z=156.29) max=V(X=4.36, Y=12.58, Z=159.22) separation median=0.175 p95=0.298 max=0.383 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				},
+				{
+					"event":
+					{
+						"type": "Info",
+						"message": "Crew04 RaftSim_CC0_Crew04_Brows detail bounds min=V(X=-4.63, Y=13.32, Z=159.59) max=V(X=4.63, Y=13.85, Z=160.42) separation median=0.441 p95=0.855 max=0.933 cm",
+						"context": "",
+						"artifact": "00000000000000000000000000000000"
+					},
+					"filename": "",
+					"lineNumber": -1,
+					"timestamp": "2026.08.05-03.27.11"
+				}
+			],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

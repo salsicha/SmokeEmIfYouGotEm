@@ -1044,10 +1044,19 @@ def test_opposed_thumb_glove_v3_is_hash_verified_and_fail_closed() -> None:
     assert m5_payload["succeededWithWarnings"] == 0
     assert m5_payload["failed"] == 0
 
-    # V3 remains immutable renderer/asset evidence. The production M5 runner
-    # and this evolving contract file are shared by the later CC0 palm-aligned
-    # milestone, whose replacement hashes are independently locked below.
+    # V3 remains immutable renderer/asset evidence. The runtime adapter,
+    # capture harness, production M5 runner, and this evolving contract file
+    # are shared by later palm-aligned and upper-T-grip milestones, whose
+    # replacement hashes are independently locked by their successor reviews.
     superseded_shared_sources = {
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+            "RaftSimMetaHumanCrewVisualActor.cpp"
+        ),
+        (
+            "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+            "RaftSimMetaHumanCrewVisualActor.h"
+        ),
         (
             "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
             "RaftSimM5ProductionQualityTest.cpp"
@@ -1056,6 +1065,7 @@ def test_opposed_thumb_glove_v3_is_hash_verified_and_fail_closed() -> None:
             "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
             "RaftSimEditorPhotorealMaterials.cpp"
         ),
+        "unreal/Scripts/capture_metahuman_production_roster.py",
         "physics/tests/test_cc0_production_characters.py",
     }
     for source_relpath, expected_hash in review["implementation_sha256"].items():

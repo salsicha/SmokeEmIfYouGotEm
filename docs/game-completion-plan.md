@@ -4554,3 +4554,18 @@ path is verified, and the completion goal can be marked complete.
   photoreal approval. Adult canopy, sub-meter ground/bank detail, water/VFX,
   hydraulics, guide/geospatial/art review, and desktop/VR qualification remain
   open in `pacuare_scanned_fern_understory_v1_review.json`.
+- Upper T-grip Contact V1 closes the remaining assembled-roster handle gap
+  without restoring the rejected camera-facing radial cage. The imported palm,
+  metacarpal, proximal joint, and middle pad remain; only each terminal segment
+  moves. Twenty upper finger pads and five opposed thumb pads now meet the
+  modeled 4.4 cm transverse handle and remain inside its rounded ends across all
+  five identities. Maximum upper finger error is `1.154e-9` cm, upper thumb
+  error is zero, and the worst thumb/middle opposition is `-1.0`; existing palm
+  anchors and lower-shaft contact remain effectively exact. The editor target
+  builds in both integration and character-art worktrees, renderer-backed M5
+  passes 1/1 without warnings/errors, and all six P4 live map loads pass with
+  zero test errors and MapCheck 0/0. This is retained technical character
+  progress, not photoreal promotion: mitten-like palm topology, knuckles,
+  webbing, glove seams/compression, motion-captured deformation, character-art
+  review, and qualified-guide biomechanics approval remain open in
+  `m9_upper_t_grip_contact_v1_review.json`.

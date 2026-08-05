@@ -130,6 +130,19 @@ frames, material-instance availability, and before/after presentation wetness. T
 that Cloth/fuzz and live wet response are wired to the production roster; it does not replace
 named character-art or whitewater-safety review.
 
+The same assembled-roster capture now fail-closes on the complete upper paddle grip. The
+retained upper T-grip Contact V1 solver preserves the imported palm, metacarpal, proximal
+joint, and middle pad, then corrects only each terminal finger segment to a 2.95 cm pad-centre
+radius around the modeled 2.2 cm transverse handle. Axial contact is clamped to plus or minus
+5.65 cm inside the rounded ends, and the distal thumb pad must oppose the middle-finger pad at
+`dot <= -0.95`. All five identities pass with effectively zero upper contact error and
+`dot = -1.0`, while the lower-shaft grip and palm anchors remain unchanged. Exact close views,
+runtime metrics, M5, six-river map-load evidence, hashes, and the still-open topology/motion
+and human approvals are recorded in
+`docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_review.json`.
+This is a deterministic terminal-pad correction, not motion-captured grip deformation or
+photoreal hand approval.
+
 The current project-owned rescue-PFD source is generator V12. Its tapered soft-cell revision
 uses a 33.345 x 34.22 x 42.8 cm collisionless mesh, thinner torso-wrapped front/rear foam,
 zero shoulder flotation pads, and curved front/side adjustment webbing. The retained fixed-view
