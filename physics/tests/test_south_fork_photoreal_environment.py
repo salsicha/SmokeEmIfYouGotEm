@@ -13,6 +13,9 @@ from raftsim.south_fork_photoreal_environment import (
     INFRASTRUCTURE_CATALOG_RELATIVE_PATH,
     PHOTOREAL_ENVIRONMENT_MANIFEST_RELATIVE_PATH,
     RIVER_COORDINATE_MAP_RELATIVE_PATH,
+    _condition_far_field_aerial_sample,
+    _far_field_horizon_boundary_erosion_m,
+    _far_field_macro_source_edge_erosion_m,
     _guide_feature_aeration,
     _procedural_far_field_macro_palette,
     _solver_derived_hydraulic_aeration,
@@ -36,7 +39,7 @@ def test_environment_manifest_and_every_artifact_hash_are_valid():
     assert manifest == _load(PHOTOREAL_ENVIRONMENT_MANIFEST_RELATIVE_PATH)
     assert manifest["schema"] == "raftsim.south_fork.photoreal_environment.v1"
     assert manifest["algorithm"] == (
-        "south_fork_photoreal_environment_v29_guide_feature_breaking_relief"
+        "south_fork_photoreal_environment_v33_organic_horizon_termination"
     )
     assert manifest["not_for_navigation"] is True
     assert manifest["grid"]["tile_count"] == 13
@@ -67,6 +70,75 @@ def test_domain_warped_macro_infill_is_coordinate_stable_and_not_striped():
     ]
     vertical_lag = np.corrcoef(luminance[:-32].ravel(), luminance[32:].ravel())[0, 1]
     assert max(abs(horizontal_lag), abs(vertical_lag)) < 0.92
+
+
+def test_far_field_source_handoff_is_world_stable_and_nonrectilinear():
+    coordinates = np.linspace(-4_000.0, 4_000.0, 129, dtype=np.float32)
+    world_x, world_y = np.meshgrid(coordinates, coordinates)
+    first = _far_field_macro_source_edge_erosion_m(
+        world_x, world_y, 0x5FA4E004, 3
+    )
+    repeat = _far_field_macro_source_edge_erosion_m(
+        world_x, world_y, 0x5FA4E004, 3
+    )
+    neighboring_source = _far_field_macro_source_edge_erosion_m(
+        world_x, world_y, 0x5FA4E004, 4
+    )
+
+    assert first.dtype == np.float32
+    assert np.array_equal(first, repeat)
+    assert np.array_equal(
+        first[:, 32:97],
+        _far_field_macro_source_edge_erosion_m(
+            world_x[:, 32:97], world_y[:, 32:97], 0x5FA4E004, 3
+        ),
+    )
+    assert float(np.min(first)) >= 160.0
+    assert float(np.max(first)) <= 1040.0
+    assert float(np.std(first)) > 90.0
+    assert float(np.mean(np.abs(first - neighboring_source))) > 80.0
+    assert float(np.std(first[0])) > 60.0
+    assert float(np.std(first[:, 0])) > 60.0
+
+
+def test_far_field_aerial_conditioning_preserves_bounded_source_detail():
+    procedural = np.full((4, 5, 3), (92.0, 84.0, 61.0), dtype=np.float32)
+    source = np.full((4, 5, 3), (105.0, 95.0, 75.0), dtype=np.float32)
+    source[1, 2] = (230.0, 215.0, 190.0)
+    source[2, 3] = (20.0, 35.0, 25.0)
+    conditioned = _condition_far_field_aerial_sample(source, procedural, 96.0)
+
+    assert conditioned.dtype == np.float32
+    assert conditioned.shape == source.shape
+    assert np.all(conditioned >= 0.0)
+    assert np.all(conditioned <= 255.0)
+    assert np.max(np.abs(conditioned - procedural)) <= 26.0
+    assert np.linalg.norm(conditioned[1, 2] - conditioned[2, 3]) > 20.0
+
+
+def test_far_field_horizon_boundary_is_world_stable_and_nonrectilinear():
+    coordinates = np.linspace(-8_000.0, 8_000.0, 257, dtype=np.float32)
+    world_x, world_y = np.meshgrid(coordinates, coordinates)
+    first = _far_field_horizon_boundary_erosion_m(
+        world_x, world_y, 0x5FA4E004
+    )
+    repeat = _far_field_horizon_boundary_erosion_m(
+        world_x, world_y, 0x5FA4E004
+    )
+
+    assert first.dtype == np.float32
+    assert np.array_equal(first, repeat)
+    assert np.array_equal(
+        first[:, 48:209],
+        _far_field_horizon_boundary_erosion_m(
+            world_x[:, 48:209], world_y[:, 48:209], 0x5FA4E004
+        ),
+    )
+    assert float(np.min(first)) >= 120.0
+    assert float(np.max(first)) <= 720.0
+    assert float(np.std(first)) > 60.0
+    assert float(np.std(first[0])) > 50.0
+    assert float(np.std(first[:, 0])) > 50.0
 
 
 def test_saved_meat_grinder_water_matches_runtime_named_rapid_fields():
@@ -430,21 +502,23 @@ def test_far_field_geography_is_a_continuous_lowered_channel_underlay():
     far_field = manifest["far_field"]
 
     assert far_field["patch_count"] == 8
-    assert far_field["grid_size"] == [1593, 663]
+    assert far_field["grid_size"] == [1673, 743]
     assert far_field["macro_texture_size"] == 1024
     topology = dict(far_field["topology"])
     aerial_exposure = topology.pop("aerial_exposure_normalization")
     assert topology == {
-        "algorithm": "edge_weighted_official_source_mosaic_then_shared_grid_tiling",
-        "authoritative_vertex_fraction": pytest.approx(0.426457, abs=1e-6),
+        "algorithm": (
+            "source_detail_conditioned_organic_handoff_then_shared_grid_tiling_v3"
+        ),
+        "authoritative_vertex_fraction": pytest.approx(0.362343, abs=1e-6),
         "cell_size_m": 20.0,
         "corridor_alignment_below_detailed_m": 1.5,
         "corridor_alignment_fade_distance_m": 520.0,
         "corridor_alignment_full_distance_m": 124.0,
         "corridor_render_overlap_m": 12.0,
         "detailed_terrain_half_width_m": 112.0,
-        "global_bounds_local_m": [-29920.0, -6040.0, 1920.0, 7200.0],
-        "global_grid_dimensions": [1593, 663],
+        "global_bounds_local_m": [-30720.0, -6840.0, 2720.0, 8000.0],
+        "global_grid_dimensions": [1673, 743],
         "not_for_navigation": True,
         "procedural_infill_explicit": True,
         "procedural_infill_maximum_relief_m": 28.0,
@@ -454,10 +528,26 @@ def test_far_field_geography_is_a_continuous_lowered_channel_underlay():
         "procedural_route_extension_each_endpoint_m": 1800.0,
         "procedural_route_extension_not_for_navigation": True,
         "procedural_route_extension_step_m": 32.0,
-        "procedural_domain_padding_m": 1600.0,
+        "procedural_domain_padding_m": 2400.0,
+        "organic_horizon_boundary_erosion_range_m": [120.0, 720.0],
+        "organic_horizon_boundary_shape": (
+            "deterministic_world_space_domain_warped_nonrectilinear_v1"
+        ),
         "shared_edge_vertices": True,
         "shared_height_encoding": True,
         "source_edge_blend_distance_m": 720.0,
+        "macro_source_edge_blend_distance_m": 1320.0,
+        "macro_source_edge_erosion_range_m": [160.0, 1040.0],
+        "macro_source_edge_shape": (
+            "deterministic_world_space_domain_warped_nonrectilinear_v1"
+        ),
+        "macro_source_colour_conditioning": (
+            "bounded_official_luminance_and_chroma_detail_over_continuous_"
+            "procedural_palette_v1"
+        ),
+        "macro_source_luminance_detail_max": 16.0,
+        "macro_source_chroma_detail_max": 10.0,
+        "macro_source_detail_authority_max": 0.58,
         "source_window_ownership_cuts": False,
         "tile_layout": [4, 2],
         "valley_conditioning_full_distance_m": 180.0,
@@ -506,14 +596,14 @@ def test_far_field_geography_is_a_continuous_lowered_channel_underlay():
     for patch in far_field["patches"]:
         assert "USGS_3DEP" in patch["authority"]
         assert patch["topology"] == "shared_global_grid_streaming_tile"
-        assert patch["dimensions"] == [399, 332]
+        assert patch["dimensions"] == [419, 372]
         assert patch["macro_dimensions"] == [1024, 1024]
         assert patch["height_encoding"]["shared_across_all_tiles"] is True
         minimum_x, minimum_y, maximum_x, maximum_y = patch["bounds_local_m"]
         assert maximum_x > minimum_x
         assert maximum_y > minimum_y
         with Image.open(REPO_ROOT / patch["height"]["path"]) as image:
-            assert image.size == (399, 332)
+            assert image.size == (419, 372)
             assert image.mode == "I;16"
             height = np.asarray(image)
         with Image.open(REPO_ROOT / patch["macro_albedo"]["path"]) as image:
@@ -523,7 +613,7 @@ def test_far_field_geography_is_a_continuous_lowered_channel_underlay():
             assert np.std(macro) > 10.0
         with Image.open(REPO_ROOT / patch["corridor_exclusion_mask"]["path"]) as image:
             mask = np.asarray(image)
-            assert image.size == (399, 332)
+            assert image.size == (419, 372)
             assert image.mode == "L"
             total_visible += int(np.count_nonzero(mask))
             total_excluded += int(np.count_nonzero(mask == 0))
@@ -531,13 +621,13 @@ def test_far_field_geography_is_a_continuous_lowered_channel_underlay():
             REPO_ROOT / patch["source_window_ownership_mask"]["path"]
         ) as image:
             ownership = np.asarray(image)
-            assert image.size == (399, 332)
+            assert image.size == (419, 372)
             assert image.mode == "L"
             assert np.all(ownership == 255)
             assert patch["owned_vertex_fraction"] == 1.0
         with Image.open(REPO_ROOT / patch["river_distance_to_route"]["path"]) as image:
             river_distance = np.asarray(image)
-            assert image.size == (399, 332)
+            assert image.size == (419, 372)
             assert image.mode == "I;16"
             assert np.max(river_distance) > 11_000
             assert patch["river_distance_encoding"] == {
@@ -567,7 +657,7 @@ def test_far_field_geography_is_a_continuous_lowered_channel_underlay():
         for key in ("height", "macro", "mask", "ownership", "river_distance"):
             assert np.array_equal(north[key][-1], south[key][0])
 
-    assert 0 < total_visible < 8 * 399 * 332
+    assert 0 < total_visible < 8 * 419 * 372
     assert total_excluded > 0
 
 

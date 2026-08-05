@@ -4528,3 +4528,17 @@ path is verified, and the completion goal can be marked complete.
   photoreal promotion: broad terrain texture, vegetation, water/VFX, measured
   performance, and all seven external approvals remain open in
   `docs/environment-captures/south_fork_full_reach/m9_bank_microrelief_v1/review.json`.
+- South Fork organic horizon V1 removes the finite rectangular far-field edge
+  from all five canonical full-reach views. Eight regenerated Nanite patches
+  now span a 1,673 × 743 shared grid with 2.4 km procedural padding and a
+  deterministic 120–720 m nonrectilinear outer termination. Official aerial
+  imagery contributes bounded luminance/chroma detail at no more than 0.58
+  authority over one continuous procedural land-cover palette, preventing
+  mismatched source flights from drawing another rectangular color window.
+  The retained map contains 1,118,073 far-field vertices and 2,218,304
+  triangles; the Unreal build, 14 Python contracts, five-camera internal visual
+  review, MapCheck 0/0, and live `L_Troublemaker` runnable-map gate pass. This
+  is presentation-only procedural geography: collision, navigation, water,
+  hydraulics, buoyancy, and raft forces are unchanged. Photoreal promotion and
+  all seven external approvals remain open in
+  `docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/review.json`.

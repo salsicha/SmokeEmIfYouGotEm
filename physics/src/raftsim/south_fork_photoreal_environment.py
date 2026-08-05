@@ -59,7 +59,7 @@ FULL_HYDRAULICS_STREAMING_MANIFEST_RELATIVE_PATH = (
 
 SCHEMA = "raftsim.south_fork.photoreal_environment.v1"
 ALGORITHM_VERSION = (
-    "south_fork_photoreal_environment_v29_guide_feature_breaking_relief"
+    "south_fork_photoreal_environment_v33_organic_horizon_termination"
 )
 DEFAULT_SEED = 0x5FA4E004
 FLOW_BANDS = ("low_runnable", "median_runnable", "high_runnable")
@@ -69,11 +69,21 @@ FAR_FIELD_TILE_COLUMNS = 4
 FAR_FIELD_TILE_ROWS = 2
 FAR_FIELD_CELL_SIZE_M = 20.0
 FAR_FIELD_SOURCE_EDGE_BLEND_M = 720.0
+FAR_FIELD_MACRO_SOURCE_EDGE_BLEND_M = 1320.0
+FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MIN_M = 160.0
+FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MAX_M = 1040.0
+FAR_FIELD_MACRO_SOURCE_LUMINANCE_DETAIL_MAX = 16.0
+FAR_FIELD_MACRO_SOURCE_LUMINANCE_DETAIL_SCALE = 38.0
+FAR_FIELD_MACRO_SOURCE_CHROMA_DETAIL_GAIN = 0.42
+FAR_FIELD_MACRO_SOURCE_CHROMA_DETAIL_MAX = 10.0
+FAR_FIELD_MACRO_SOURCE_DETAIL_AUTHORITY_MAX = 0.58
 FAR_FIELD_AERIAL_EXPOSURE_GAIN_MIN = 0.68
 FAR_FIELD_AERIAL_EXPOSURE_GAIN_MAX = 1.18
 FAR_FIELD_AERIAL_CONTRAST_GAIN_MAX = 1.25
 FAR_FIELD_PROCEDURAL_INFILL_MAX_RELIEF_M = 28.0
-FAR_FIELD_DOMAIN_PADDING_M = 1600.0
+FAR_FIELD_DOMAIN_PADDING_M = 2400.0
+FAR_FIELD_HORIZON_BOUNDARY_EROSION_MIN_M = 120.0
+FAR_FIELD_HORIZON_BOUNDARY_EROSION_MAX_M = 720.0
 # Retained only by the uncalled v14 rollback generator below. The production
 # v17 path derives non-square streaming tiles from one shared global grid.
 FAR_FIELD_GRID_SIZE = 513
@@ -1123,11 +1133,14 @@ def _raster_blend_support(
     world_y: np.ndarray,
     bounds: list[float],
     ground_scale: float,
+    *,
+    edge_blend_m: float = FAR_FIELD_SOURCE_EDGE_BLEND_M,
+    boundary_erosion_m: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Return source coverage, edge blend weight, and rectangle distance."""
 
     minimum_x, minimum_y, maximum_x, maximum_y = map(float, bounds)
-    inside = (
+    inside_rectangle = (
         (world_x >= minimum_x)
         & (world_x <= maximum_x)
         & (world_y >= minimum_y)
@@ -1144,7 +1157,14 @@ def _raster_blend_support(
         )
         * ground_scale
     )
-    blend_t = np.clip(edge_distance_m / FAR_FIELD_SOURCE_EDGE_BLEND_M, 0.0, 1.0)
+    if boundary_erosion_m is None:
+        adjusted_edge_distance_m = edge_distance_m
+    else:
+        adjusted_edge_distance_m = edge_distance_m - np.maximum(
+            np.asarray(boundary_erosion_m, dtype=np.float32), 0.0
+        )
+    inside = inside_rectangle & (adjusted_edge_distance_m >= 0.0)
+    blend_t = np.clip(adjusted_edge_distance_m / edge_blend_m, 0.0, 1.0)
     smooth_t = blend_t * blend_t * (3.0 - 2.0 * blend_t)
     # A small nonzero edge weight keeps an authoritative sample defined at the
     # exact shared boundary while allowing a neighboring source interior to
@@ -1431,6 +1451,126 @@ def _procedural_far_field_macro_palette(
     return np.clip(palette, 0.0, 255.0).astype(np.float32)
 
 
+def _far_field_macro_source_edge_erosion_m(
+    local_x_m: np.ndarray,
+    local_y_m: np.ndarray,
+    seed: int,
+    source_index: int,
+) -> np.ndarray:
+    """Return a world-stable, non-rectilinear orthophoto edge inset."""
+
+    world_x = np.asarray(local_x_m, dtype=np.float32)
+    world_y = np.asarray(local_y_m, dtype=np.float32)
+    source_seed = seed ^ ((source_index + 1) * 0x9E3779B9)
+    warp_x = (
+        _world_space_value_noise(
+            world_x, world_y, 3_200.0, source_seed ^ 0xA511E9B3
+        )
+        - 0.5
+    ) * 940.0
+    warp_y = (
+        _world_space_value_noise(
+            world_x, world_y, 2_700.0, source_seed ^ 0x63D83595
+        )
+        - 0.5
+    ) * 760.0
+    warped_x = world_x + warp_x
+    warped_y = world_y + warp_y
+    broad = _world_space_value_noise(
+        warped_x, warped_y, 1_850.0, source_seed ^ 0xC2B2AE35
+    )
+    detail = _world_space_value_noise(
+        warped_x, warped_y, 570.0, source_seed ^ 0x27D4EB2F
+    )
+    drainage = 1.0 - np.abs(
+        _world_space_value_noise(
+            warped_x, warped_y, 910.0, source_seed ^ 0x165667B1
+        )
+        * 2.0
+        - 1.0
+    )
+    organic = np.clip(broad * 0.56 + detail * 0.27 + drainage * 0.17, 0.0, 1.0)
+    organic = organic * organic * (3.0 - 2.0 * organic)
+    return (
+        FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MIN_M
+        + (
+            FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MAX_M
+            - FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MIN_M
+        )
+        * organic
+    ).astype(np.float32)
+
+
+def _far_field_horizon_boundary_erosion_m(
+    local_x_m: np.ndarray,
+    local_y_m: np.ndarray,
+    seed: int,
+) -> np.ndarray:
+    """Return a continuous irregular inset for the finite terrain horizon."""
+
+    world_x = np.asarray(local_x_m, dtype=np.float32)
+    world_y = np.asarray(local_y_m, dtype=np.float32)
+    warp_x = (
+        _world_space_value_noise(world_x, world_y, 2_900.0, seed ^ 0x8DA6B343)
+        - 0.5
+    ) * 820.0
+    warp_y = (
+        _world_space_value_noise(world_x, world_y, 3_400.0, seed ^ 0xD8163841)
+        - 0.5
+    ) * 920.0
+    broad = _world_space_value_noise(
+        world_x + warp_x, world_y + warp_y, 1_450.0, seed ^ 0xCB1AB31F
+    )
+    detail = _world_space_value_noise(
+        world_x + warp_x, world_y + warp_y, 490.0, seed ^ 0x165667B1
+    )
+    organic = np.clip(broad * 0.72 + detail * 0.28, 0.0, 1.0)
+    organic = organic * organic * (3.0 - 2.0 * organic)
+    return (
+        FAR_FIELD_HORIZON_BOUNDARY_EROSION_MIN_M
+        + (
+            FAR_FIELD_HORIZON_BOUNDARY_EROSION_MAX_M
+            - FAR_FIELD_HORIZON_BOUNDARY_EROSION_MIN_M
+        )
+        * organic
+    ).astype(np.float32)
+
+
+def _condition_far_field_aerial_sample(
+    sampled_rgb: np.ndarray,
+    procedural_palette: np.ndarray,
+    source_reference_luminance: float,
+) -> np.ndarray:
+    """Transfer bounded orthophoto detail onto the shared procedural palette.
+
+    Far-field source windows were captured on different flights and seasons.
+    A per-window exposure gain cannot remove every broad colour cast, so raw
+    RGB still advertises the source rectangles at guide-eye distance. Preserve
+    bounded luminance/chroma detail from the official image while anchoring its
+    low-frequency colour to the continuous world-space land-cover palette.
+    """
+
+    source_luminance = (
+        sampled_rgb[..., 0] * 0.2126
+        + sampled_rgb[..., 1] * 0.7152
+        + sampled_rgb[..., 2] * 0.0722
+    )
+    luminance_detail = FAR_FIELD_MACRO_SOURCE_LUMINANCE_DETAIL_MAX * np.tanh(
+        (source_luminance - float(source_reference_luminance))
+        / FAR_FIELD_MACRO_SOURCE_LUMINANCE_DETAIL_SCALE
+    )
+    chroma_detail = (
+        sampled_rgb - source_luminance[..., None]
+    ) * FAR_FIELD_MACRO_SOURCE_CHROMA_DETAIL_GAIN
+    chroma_detail = np.clip(
+        chroma_detail,
+        -FAR_FIELD_MACRO_SOURCE_CHROMA_DETAIL_MAX,
+        FAR_FIELD_MACRO_SOURCE_CHROMA_DETAIL_MAX,
+    )
+    conditioned = procedural_palette + luminance_detail[..., None] + chroma_detail
+    return np.clip(conditioned, 0.0, 255.0).astype(np.float32)
+
+
 def _composite_stitched_macro(
     repo_root: Path,
     source_manifests: list[dict[str, Any]],
@@ -1445,6 +1585,7 @@ def _composite_stitched_macro(
     source_sum = np.zeros((*shape, 3), dtype=np.float32)
     source_weight_sum = np.zeros(shape, dtype=np.float32)
     nearest_source_distance_m = np.full(shape, np.inf, dtype=np.float32)
+    procedural_palette = _procedural_far_field_macro_palette(local_x_m, local_y_m, seed)
 
     # NAIP source windows span different flights and acquisition dates. The
     # final Salmon Falls image is more than twice as bright as the upper-run
@@ -1455,18 +1596,27 @@ def _composite_stitched_macro(
     aerial_sources, exposure_normalization = _load_exposure_normalized_aerial_sources(
         repo_root, source_manifests
     )
-    for source in aerial_sources:
+    for source_index, source in enumerate(aerial_sources):
         sampled = _bilinear_rgb(
             source["rgb"],
             world_x_epsg,
             world_y_epsg,
             source["effective_bounds"],
         )
+        sampled = _condition_far_field_aerial_sample(
+            sampled,
+            procedural_palette,
+            float(source["median_luminance"]) * float(source["exposure_gain"]),
+        )
         _, source_weight, rectangle_distance_m = _raster_blend_support(
             world_x_epsg,
             world_y_epsg,
             source["effective_bounds"],
             ground_scale,
+            edge_blend_m=FAR_FIELD_MACRO_SOURCE_EDGE_BLEND_M,
+            boundary_erosion_m=_far_field_macro_source_edge_erosion_m(
+                local_x_m, local_y_m, seed, source_index
+            ),
         )
         source_sum += sampled * source_weight[..., None]
         source_weight_sum += source_weight
@@ -1488,12 +1638,14 @@ def _composite_stitched_macro(
     # the same summer-Sierra classes form irregular, nested patches without a
     # preferred stripe direction. The field is evaluated once on the shared
     # global macro grid, retaining bit-identical streaming-tile edges.
-    procedural_palette = _procedural_far_field_macro_palette(local_x_m, local_y_m, seed)
     # Do not stretch the last orthophoto pixel across uncovered geography. The
-    # absolute source weight falls through the 256 m edge band, producing a
-    # smooth handoff to world-space procedural colour; uncovered cells use the
-    # procedural palette completely.
-    source_confidence = np.clip(source_weight_sum / 0.5, 0.0, 1.0)
+    # absolute source weight falls through the 1,320 m irregular edge band and
+    # remains authority-capped, producing a smooth handoff to world-space
+    # procedural colour; uncovered cells use the procedural palette completely.
+    source_confidence = (
+        np.clip(source_weight_sum, 0.0, 1.0)
+        * FAR_FIELD_MACRO_SOURCE_DETAIL_AUTHORITY_MAX
+    )
     source_confidence[missing] = 0.0
     macro = macro * source_confidence[..., None] + procedural_palette * (
         1.0 - source_confidence[..., None]
@@ -1695,8 +1847,20 @@ def _write_stitched_far_field_patches(
     height_m = (height_m - FAR_FIELD_UNDERLAY_MAX_DEPTH_M * underlay_weight**2).astype(
         np.float32
     )
+    domain_edge_distance_m = np.minimum.reduce(
+        (
+            local_x_m - minimum_x,
+            maximum_x - local_x_m,
+            local_y_m - minimum_y,
+            maximum_y - local_y_m,
+        )
+    )
+    horizon_boundary_erosion_m = _far_field_horizon_boundary_erosion_m(
+        local_x_m, local_y_m, seed
+    )
+    horizon_visible = domain_edge_distance_m >= horizon_boundary_erosion_m
     terrain_mask = np.where(
-        distance_m >= FAR_FIELD_CORRIDOR_EXCLUSION_M, 255, 0
+        (distance_m >= FAR_FIELD_CORRIDOR_EXCLUSION_M) & horizon_visible, 255, 0
     ).astype(np.uint8)
     river_distance_decimeters = np.rint(
         np.clip(distance_m * 10.0, 0.0, 65535.0)
@@ -1829,7 +1993,7 @@ def _write_stitched_far_field_patches(
             )
 
     topology = {
-        "algorithm": "edge_weighted_official_source_mosaic_then_shared_grid_tiling",
+        "algorithm": "source_detail_conditioned_organic_handoff_then_shared_grid_tiling_v3",
         "procedural_macro_land_cover": (
             "domain_warped_world_space_dry_grass_chaparral_woodland_rock_v2"
         ),
@@ -1841,6 +2005,25 @@ def _write_stitched_far_field_patches(
         "shared_height_encoding": True,
         "source_window_ownership_cuts": False,
         "source_edge_blend_distance_m": FAR_FIELD_SOURCE_EDGE_BLEND_M,
+        "macro_source_edge_blend_distance_m": FAR_FIELD_MACRO_SOURCE_EDGE_BLEND_M,
+        "macro_source_edge_erosion_range_m": [
+            FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MIN_M,
+            FAR_FIELD_MACRO_SOURCE_EDGE_EROSION_MAX_M,
+        ],
+        "macro_source_edge_shape": (
+            "deterministic_world_space_domain_warped_nonrectilinear_v1"
+        ),
+        "macro_source_colour_conditioning": (
+            "bounded_official_luminance_and_chroma_detail_over_continuous_"
+            "procedural_palette_v1"
+        ),
+        "macro_source_luminance_detail_max": (
+            FAR_FIELD_MACRO_SOURCE_LUMINANCE_DETAIL_MAX
+        ),
+        "macro_source_chroma_detail_max": FAR_FIELD_MACRO_SOURCE_CHROMA_DETAIL_MAX,
+        "macro_source_detail_authority_max": (
+            FAR_FIELD_MACRO_SOURCE_DETAIL_AUTHORITY_MAX
+        ),
         "aerial_exposure_normalization": aerial_exposure_normalization,
         "corridor_alignment_full_distance_m": FAR_FIELD_CORRIDOR_ALIGNMENT_FULL_M,
         "corridor_alignment_fade_distance_m": FAR_FIELD_CORRIDOR_ALIGNMENT_FADE_M,
@@ -1876,6 +2059,13 @@ def _write_stitched_far_field_patches(
         ),
         "procedural_infill_maximum_relief_m": FAR_FIELD_PROCEDURAL_INFILL_MAX_RELIEF_M,
         "procedural_domain_padding_m": FAR_FIELD_DOMAIN_PADDING_M,
+        "organic_horizon_boundary_erosion_range_m": [
+            FAR_FIELD_HORIZON_BOUNDARY_EROSION_MIN_M,
+            FAR_FIELD_HORIZON_BOUNDARY_EROSION_MAX_M,
+        ],
+        "organic_horizon_boundary_shape": (
+            "deterministic_world_space_domain_warped_nonrectilinear_v1"
+        ),
         "authoritative_vertex_fraction": round(
             float(np.count_nonzero(source_count)) / source_count.size, 6
         ),

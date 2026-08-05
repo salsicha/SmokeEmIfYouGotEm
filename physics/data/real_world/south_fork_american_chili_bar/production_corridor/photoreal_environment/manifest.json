@@ -11,7 +11,7 @@
     "unreal_world_partition_build_complete": false,
     "vegetation_and_vfx_masks_present": true
   },
-  "algorithm": "south_fork_photoreal_environment_v29_guide_feature_breaking_relief",
+  "algorithm": "south_fork_photoreal_environment_v33_organic_horizon_termination",
   "asset_policy": {
     "near_field_species": "South-Fork-curated project-owned or CC0 meshes only",
     "procedural_infill_explicit": true,
@@ -28,7 +28,7 @@
     "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/river_coordinate_map.json",
     "sha256": "5a696762e8b3b79d58300d8a49f53071a54c3e998357c22f379e702ef094e6e4"
   },
-  "determinism_signature_sha256": "acdafec0cf234a7b52d5a72e56dc65b47d26b10009f0edda634b8750f87942d7",
+  "determinism_signature_sha256": "0a65e829be74c737493e23280b4e4e52e5fc0e91b7d07532e5df1e430fd26942",
   "far_field": {
     "authority": "USGS 3DEP and USDA NAIP where available; deterministic corridor underlay conditioning and uncovered geography are procedural game infill",
     "continuous_underlay": true,
@@ -36,35 +36,35 @@
     "corridor_underlay_falloff_m": 136.0,
     "corridor_underlay_max_depth_m": 6.4,
     "grid_size": [
-      1593,
-      663
+      1673,
+      743
     ],
     "macro_texture_size": 1024,
     "not_for_navigation": true,
     "patch_count": 8,
     "patches": [
       {
-        "authoritative_vertex_fraction": 0.303673,
+        "authoritative_vertex_fraction": 0.22716,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
-          -29920.0,
+          -30720.0,
           580.0,
-          -21960.0,
-          7200.0
+          -22360.0,
+          8000.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 1038,
+          "byte_count": 1422,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_corridor_exclusion.png",
-          "sha256": "9354600113de9c6d94e48640d1edf170d8b315f5c401b789651450f58b662877"
+          "sha256": "3d161c7ee5c1ed31753e94679b211ee44578e92347398fb0a7de4f865ccc6c73"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 167604,
+          "byte_count": 193132,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_height.png",
-          "sha256": "6cf4bf535ef937c3a5780e9481a8d2bf05c052c1dd944af7a4420329fb7a58be"
+          "sha256": "6936aeb815d537d3371eeb19af5179d31630b50d096da22aa1ed373edeb8acea"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -74,16 +74,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 1088839,
+          "byte_count": 634881,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_macro_albedo.png",
-          "sha256": "8358c2fbc32e16f10f730bceb970eedd4a7140f94c7ecdc707ca0ecde17d7d96"
+          "sha256": "ff380a1158c0dd89772e699c67f79e37604287d284851b566031caeb1138a358"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 5240.371,
-        "maximum_procedural_infill_distance_m": 5240.371,
+        "maximum_macro_infill_distance_m": 6268.407,
+        "maximum_procedural_infill_distance_m": 6268.407,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_00",
         "river_distance_encoding": {
@@ -92,41 +92,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 76616,
+          "byte_count": 77125,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_river_distance_dm.png",
-          "sha256": "9dc2d7114b95191aa7142f95360c4270a580975375faf8fdb452630f7b9067ee"
+          "sha256": "39ab626382e0bac37b3a5976c0cde7b7f8eb94299ed60b616170f924f0ef2de6"
         },
         "source_window_id": "stitched_global_r0_c0",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.987967
+        "visible_vertex_fraction": 0.883632
       },
       {
-        "authoritative_vertex_fraction": 0.58168,
+        "authoritative_vertex_fraction": 0.525278,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
-          -21960.0,
+          -22360.0,
           580.0,
           -14000.0,
-          7200.0
+          8000.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 2081,
+          "byte_count": 2342,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_corridor_exclusion.png",
-          "sha256": "93cc7b5650cd5c31f1428d1207889fdb1fb1870c5600907522b63c5412a1b8fb"
+          "sha256": "ab07b2c7243fe1d757f1e7c783baa4206b6c98933a0bb7aae5896e44d968ecc9"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 182954,
+          "byte_count": 209576,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_height.png",
-          "sha256": "db02ef954ec8df79f54370bf1b88665ea7f45c4cd7f3efab65fc420d93cd7a79"
+          "sha256": "045b594ea5469ab571c3a767c08a40194ee0679399716481a6d611ed678fca5e"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -136,16 +136,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 1704357,
+          "byte_count": 823092,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_macro_albedo.png",
-          "sha256": "d5e53d59a90e2600beb2cd7f2cebb40b65279bd42045ae8c6eb0dd8e8355de32"
+          "sha256": "bd757328a1d330a732ffdb2af3dea80632eb83ada7f15fc0b190879c2920cb1f"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 2207.792,
-        "maximum_procedural_infill_distance_m": 2207.963,
+        "maximum_macro_infill_distance_m": 2969.405,
+        "maximum_procedural_infill_distance_m": 2968.935,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_01",
         "river_distance_encoding": {
@@ -154,41 +154,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 128918,
+          "byte_count": 145357,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_river_distance_dm.png",
-          "sha256": "a0f2f9685636bbb5814086afe3da90193ac04534bf264d3d0229de9bddeb0eca"
+          "sha256": "916d8d5400331a0e98cc0854b82a3a2944848a5a322d80035aa1b14b20e2d505"
         },
         "source_window_id": "stitched_global_r0_c1",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.944311
+        "visible_vertex_fraction": 0.896053
       },
       {
-        "authoritative_vertex_fraction": 0.683735,
+        "authoritative_vertex_fraction": 0.610215,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
           -14000.0,
           580.0,
-          -6040.0,
-          7200.0
+          -5640.0,
+          8000.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 1065,
+          "byte_count": 1259,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_corridor_exclusion.png",
-          "sha256": "89a24cc32650f086e804f6e2c6a105e11c245bf2b58aa228ccf293adaa5e8c58"
+          "sha256": "b148655f0c9fa5ec06274cf822c5da2dc3dc9f6f89b8231aca9d78c953982237"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 188515,
+          "byte_count": 219341,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_height.png",
-          "sha256": "e1df514e5c0282385b092331c4bc286a6f70d925714a81f7dd070f1cc8f9a5f0"
+          "sha256": "1ec72a1ccfb3d93ef97eb8eb64d3240e84800abe0820ab5d4703289fe67cbe3d"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -198,16 +198,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 1820066,
+          "byte_count": 982114,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_macro_albedo.png",
-          "sha256": "09897d2acad2adf2108c2cecee05d7853ddbe330dfdf46f9bfab5000c69732c3"
+          "sha256": "d1924af88de39b9732434c21c3d54798a6b75ced4486dab1077cecbe1dfb773f"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 2080.413,
-        "maximum_procedural_infill_distance_m": 2080.413,
+        "maximum_macro_infill_distance_m": 2880.413,
+        "maximum_procedural_infill_distance_m": 2880.413,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_02",
         "river_distance_encoding": {
@@ -216,41 +216,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 91218,
+          "byte_count": 100398,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_river_distance_dm.png",
-          "sha256": "a8f2a8fff7a31d864d1f71fab9037df9095efc741a0412b83b77076dd95d8a56"
+          "sha256": "7e2d0f7c0f82b681130174e90cf3ce36d170dbbe713fadcc4046be56b34e91d3"
         },
         "source_window_id": "stitched_global_r0_c2",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.989024
+        "visible_vertex_fraction": 0.905702
       },
       {
-        "authoritative_vertex_fraction": 0.155592,
+        "authoritative_vertex_fraction": 0.103106,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
-          -6040.0,
+          -5640.0,
           580.0,
-          1920.0,
-          7200.0
+          2720.0,
+          8000.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 884,
+          "byte_count": 1286,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_corridor_exclusion.png",
-          "sha256": "3d7b731315e51f9c733f5207fe41114ce2a5c04e7ee49e206262291a8544dd56"
+          "sha256": "312af83dcf67bc214492852c8a740e3fcf226e4e08d551ba2464de7bf4f3f7f2"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 169567,
+          "byte_count": 193803,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_height.png",
-          "sha256": "614c8980c5187c569251a0a45f7487f2d6ce5942668f1a63d6c736f5ebb6008a"
+          "sha256": "32a6662601babce6354767d295fc2d523511c424cd4abaa4f2e90b3685a16b42"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -260,16 +260,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 855068,
+          "byte_count": 610175,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_macro_albedo.png",
-          "sha256": "aefa503c100efc567a0e065bb63294d11ed5b67a9842312433217b4948e60924"
+          "sha256": "409576cb99381f03fea154fe7f772ec2237397deb0ea91d1bdfd2624fae2f373"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 6545.89,
-        "maximum_procedural_infill_distance_m": 6545.89,
+        "maximum_macro_infill_distance_m": 7635.278,
+        "maximum_procedural_infill_distance_m": 7635.278,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_03",
         "river_distance_encoding": {
@@ -278,41 +278,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 70553,
+          "byte_count": 74826,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_river_distance_dm.png",
-          "sha256": "b8abf2317218de19151d5f55dd9f72f00b1b2bd5a9ed163b2f882c84353df088"
+          "sha256": "fe2705e7668d93fa48fcf1f94e12cb77b62c52d6c2d90a5f93883ba312d2b013"
         },
         "source_window_id": "stitched_global_r0_c3",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.999087
+        "visible_vertex_fraction": 0.905741
       },
       {
-        "authoritative_vertex_fraction": 0.461561,
+        "authoritative_vertex_fraction": 0.38983,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
-          -29920.0,
-          -6040.0,
-          -21960.0,
+          -30720.0,
+          -6840.0,
+          -22360.0,
           580.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 1586,
+          "byte_count": 1993,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_corridor_exclusion.png",
-          "sha256": "a4d2eeb484a580bdcc0b83d6e460d3af5e7e28fcd8d8cad40fceadd67aacf395"
+          "sha256": "c71c5fd1fd7d98913a4d9e01af2f25bcff23af44bd3e0902edaefb2331ec8036"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 170773,
+          "byte_count": 196449,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_height.png",
-          "sha256": "7cc3c36564d8c77c040f7795e2eb29cc41c14091bc3fbc93447a42c5725f677f"
+          "sha256": "4dd0025d262eb3155863c2e88e7c92cd30a956de5a3aa70fefbaf8c00cbf4d52"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -322,16 +322,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 1355446,
+          "byte_count": 798825,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_macro_albedo.png",
-          "sha256": "bd2e7867f1b0aa22f02063c78508b3fbe763fa0259504536b559b1e7e7525f35"
+          "sha256": "31410bd02a3e5aab063caeaf761262d15bf55a1972808e798b5c0343681eab5f"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 2936.998,
-        "maximum_procedural_infill_distance_m": 2936.998,
+        "maximum_macro_infill_distance_m": 4050.966,
+        "maximum_procedural_infill_distance_m": 4050.966,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_04",
         "river_distance_encoding": {
@@ -340,41 +340,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 98311,
+          "byte_count": 112733,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_river_distance_dm.png",
-          "sha256": "88579f6ddd63f355afc82831878931f7a1a9e5439baa0f70bb1d797466e930f5"
+          "sha256": "f1f056dbecb43c9712da4b76a98ccab134df7bdec715caa9e6f30633a8462a48"
         },
         "source_window_id": "stitched_global_r1_c0",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.963969
+        "visible_vertex_fraction": 0.858059
       },
       {
-        "authoritative_vertex_fraction": 0.092739,
+        "authoritative_vertex_fraction": 0.081255,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
-          -21960.0,
-          -6040.0,
+          -22360.0,
+          -6840.0,
           -14000.0,
           580.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 834,
+          "byte_count": 1051,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_corridor_exclusion.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "26c0a0713865a8ca3a45306aaa7c86da1864a2cc533bd118258e2e10cf0d7c93"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 166541,
+          "byte_count": 194054,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_height.png",
-          "sha256": "83819225eb3219e047ad8a81bcb76df67a213c471ab6a648307f487fec439282"
+          "sha256": "ecd3ee97ffea54ecedcef929ba80a89e86d767862708da5669a5af4ddabef8ab"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -384,16 +384,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 756571,
+          "byte_count": 593198,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_macro_albedo.png",
-          "sha256": "563d6682e2a4b7b5109ecd735b1b4ad31ce53818bcc8195b050b2dbffe28dc99"
+          "sha256": "4af339a7bde5e063d2011444a95dd2ccc554b86edbda717828dd9a7efb1b8712"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 4432.311,
-        "maximum_procedural_infill_distance_m": 4425.676,
+        "maximum_macro_infill_distance_m": 4856.033,
+        "maximum_procedural_infill_distance_m": 4855.714,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_05",
         "river_distance_encoding": {
@@ -402,41 +402,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 91691,
+          "byte_count": 104705,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_river_distance_dm.png",
-          "sha256": "6b1b4bda836ccc8168adc549dd08f3955855b35b5e761549e679a4cd7bd25b67"
+          "sha256": "f549b7cc2aae2d99f8b78e0dbb8773e3e9240f99291c2134c4b42c3ca305f5f7"
         },
         "source_window_id": "stitched_global_r1_c1",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 1.0
+        "visible_vertex_fraction": 0.929152
       },
       {
-        "authoritative_vertex_fraction": 0.756024,
+        "authoritative_vertex_fraction": 0.674731,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
           -14000.0,
-          -6040.0,
-          -6040.0,
+          -6840.0,
+          -5640.0,
           580.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 1649,
+          "byte_count": 1970,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_corridor_exclusion.png",
-          "sha256": "c710469d2efa12fc2c2c5400e772f4aacd3b4a0cb2d8fc84671d39ccb6a02878"
+          "sha256": "0986b522a9377afeade88aaf1b3177be215bf22fe3067134895ae2de8591f057"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 181452,
+          "byte_count": 210069,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_height.png",
-          "sha256": "8b270b2b7279e9875f530ab3df4d09d211780315d48432e896dc203e24b20947"
+          "sha256": "c7d1d8a3f3d8a49d63226ae39f1302805ae1fd2e0845e0159a4434eedc57b7a0"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -446,16 +446,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 1960760,
+          "byte_count": 1065075,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_macro_albedo.png",
-          "sha256": "b38815886569518d5e75f18ae82146bfd3a8633cc46f4623205da4a968663915"
+          "sha256": "0a5c56568cbc3c3671e971e0097fb2e232c7d9a8f2dca32e214956ecb763e547"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 1612.628,
-        "maximum_procedural_infill_distance_m": 1612.628,
+        "maximum_macro_infill_distance_m": 2412.628,
+        "maximum_procedural_infill_distance_m": 2412.628,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_06",
         "river_distance_encoding": {
@@ -464,41 +464,41 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 106736,
+          "byte_count": 119461,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_river_distance_dm.png",
-          "sha256": "f971fad24c89e3fd1318e11bba8245e1a6a781b3ae094430a8710ba5b926514c"
+          "sha256": "ac6534b0cb859a092c487874d413618818e47acace7871da1e188894f9843936"
         },
         "source_window_id": "stitched_global_r1_c2",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.964029
+        "visible_vertex_fraction": 0.905754
       },
       {
-        "authoritative_vertex_fraction": 0.383625,
+        "authoritative_vertex_fraction": 0.293826,
         "authority": "USGS_3DEP_and_USDA_NAIP_global_mosaic_with_bounded_procedural_gap_infill",
         "bounds_local_m": [
-          -6040.0,
-          -6040.0,
-          1920.0,
+          -5640.0,
+          -6840.0,
+          2720.0,
           580.0
         ],
         "corridor_exclusion_mask": {
-          "byte_count": 1919,
+          "byte_count": 2243,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_corridor_exclusion.png",
-          "sha256": "9ff4b630ee372ec73cfebb1a0401e41e80b2944d95a4ccfce81dfffda609df8b"
+          "sha256": "d19a5ec560bb6adf8fe547a892a07235b494d64f494516fbb4fafbe84e02994a"
         },
         "dimensions": [
-          399,
-          332
+          419,
+          372
         ],
         "height": {
-          "byte_count": 174682,
+          "byte_count": 200722,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_height.png",
-          "sha256": "b0ae7a75ec952f57e6f42b99b148d7fcd79f8c3dbd07aa74fac133bde65b25ea"
+          "sha256": "1ae0ba468614cc24451d4923cf1a07b5ae77164a65344af5f8876faef4f5bd3c"
         },
         "height_encoding": {
           "maximum_elevation_m": 842.155151,
@@ -508,16 +508,16 @@
           "uint16_min": 0
         },
         "macro_albedo": {
-          "byte_count": 1320585,
+          "byte_count": 722384,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_macro_albedo.png",
-          "sha256": "51f4e049921c8ef0152b7ff720a03a266374a9ce58f4e7834829e320ac60eb6b"
+          "sha256": "e57f8e6248e28c5e779e1809e7aa4a367427f1682b0191b0576999ce9034a5f1"
         },
         "macro_dimensions": [
           1024,
           1024
         ],
-        "maximum_macro_infill_distance_m": 4761.486,
-        "maximum_procedural_infill_distance_m": 4761.486,
+        "maximum_macro_infill_distance_m": 5848.333,
+        "maximum_procedural_infill_distance_m": 5848.333,
         "owned_vertex_fraction": 1.0,
         "patch_id": "far_field_07",
         "river_distance_encoding": {
@@ -526,18 +526,18 @@
           "unit": "decimeter"
         },
         "river_distance_to_route": {
-          "byte_count": 103420,
+          "byte_count": 109981,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_river_distance_dm.png",
-          "sha256": "78d57b077c7714e034eefdb3672fa0a27c1fc8cd64fecf9b93790e819a7ff79e"
+          "sha256": "75f34415acccac952120014b0896cbcf1dcb8afc1cad95bb1a0ab8bdd11c9899"
         },
         "source_window_id": "stitched_global_r1_c3",
         "source_window_ownership_mask": {
-          "byte_count": 834,
+          "byte_count": 924,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_source_window_ownership.png",
-          "sha256": "b972c56ed37e74dd33976a2f701f872e4d69ba8ede501de7a2c51135b1a29eb1"
+          "sha256": "5ea442254833e822cf3c42320ae8c944b2ecc586b45e6380b50c4550d7c39e9e"
         },
         "topology": "shared_global_grid_streaming_tile",
-        "visible_vertex_fraction": 0.952774
+        "visible_vertex_fraction": 0.889387
       }
     ],
     "procedural_infill_explicit": true,
@@ -604,8 +604,8 @@
         ],
         "target_median_luminance": 96.186699
       },
-      "algorithm": "edge_weighted_official_source_mosaic_then_shared_grid_tiling",
-      "authoritative_vertex_fraction": 0.426457,
+      "algorithm": "source_detail_conditioned_organic_handoff_then_shared_grid_tiling_v3",
+      "authoritative_vertex_fraction": 0.362343,
       "cell_size_m": 20.0,
       "corridor_alignment_below_detailed_m": 1.5,
       "corridor_alignment_fade_distance_m": 520.0,
@@ -613,17 +613,32 @@
       "corridor_render_overlap_m": 12.0,
       "detailed_terrain_half_width_m": 112.0,
       "global_bounds_local_m": [
-        -29920.0,
-        -6040.0,
-        1920.0,
-        7200.0
+        -30720.0,
+        -6840.0,
+        2720.0,
+        8000.0
       ],
       "global_grid_dimensions": [
-        1593,
-        663
+        1673,
+        743
       ],
+      "macro_source_chroma_detail_max": 10.0,
+      "macro_source_colour_conditioning": "bounded_official_luminance_and_chroma_detail_over_continuous_procedural_palette_v1",
+      "macro_source_detail_authority_max": 0.58,
+      "macro_source_edge_blend_distance_m": 1320.0,
+      "macro_source_edge_erosion_range_m": [
+        160.0,
+        1040.0
+      ],
+      "macro_source_edge_shape": "deterministic_world_space_domain_warped_nonrectilinear_v1",
+      "macro_source_luminance_detail_max": 16.0,
       "not_for_navigation": true,
-      "procedural_domain_padding_m": 1600.0,
+      "organic_horizon_boundary_erosion_range_m": [
+        120.0,
+        720.0
+      ],
+      "organic_horizon_boundary_shape": "deterministic_world_space_domain_warped_nonrectilinear_v1",
+      "procedural_domain_padding_m": 2400.0,
       "procedural_infill_explicit": true,
       "procedural_infill_maximum_relief_m": 28.0,
       "procedural_macro_land_cover": "domain_warped_world_space_dry_grass_chaparral_woodland_rock_v2",

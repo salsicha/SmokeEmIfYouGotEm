@@ -1,0 +1,180 @@
+{
+  "schema": "raftsim.photoreal_review.south_fork_organic_horizon.v1",
+  "milestone": "south_fork_organic_horizon_v1",
+  "generated_on": "2026-08-04",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+  "scope": {
+    "far_field_patch_count": 8,
+    "fixed_camera_count": 5,
+    "presentation_only": true,
+    "affects_gameplay_collision": false,
+    "affects_navigation": false,
+    "affects_water_geometry": false,
+    "affects_hydraulics": false,
+    "affects_buoyancy": false,
+    "affects_raft_forces": false
+  },
+  "implementation": {
+    "algorithm": "south_fork_photoreal_environment_v33_organic_horizon_termination",
+    "global_grid_dimensions": [1673, 743],
+    "global_bounds_local_m": [-30720.0, -6840.0, 2720.0, 8000.0],
+    "procedural_domain_padding_m": 2400.0,
+    "organic_horizon_boundary_erosion_range_m": [120.0, 720.0],
+    "organic_horizon_boundary_shape": "deterministic_world_space_domain_warped_nonrectilinear_v1",
+    "source_detail_authority_max": 0.58,
+    "source_detail_conditioning": "bounded_official_luminance_and_chroma_detail_over_continuous_procedural_palette_v1",
+    "procedural_infill_explicit": true,
+    "not_for_navigation": true
+  },
+  "metrics": {
+    "far_field_vertices": 1118073,
+    "far_field_triangles": 2218304,
+    "far_field_macro_texture_count": 8,
+    "far_field_actor_package_count": 16,
+    "canonical_capture_dimensions": [1280, 720]
+  },
+  "verification": {
+    "python_artifact_contracts": "14 passed",
+    "editor_build": "Succeeded",
+    "environment_generation": "Succeeded",
+    "map_check": "0 errors, 0 warnings",
+    "runnable_map_test": "RaftSim.P4.RiverMapLoads.L_Troublemaker: Success",
+    "fixed_camera_internal_visual_review": "5 of 5 accepted"
+  },
+  "review_decision": {
+    "accepted": true,
+    "observed_rectangular_horizon_shelf": false,
+    "observed_source_window_colour_bar": false,
+    "observed_new_shoreline_regression": false,
+    "observed_new_water_or_physics_change": false,
+    "summary": "The finite rectangular terrain boundary is no longer visible in the five canonical shipping views. The expanded, irregular procedural termination produces continuous rolling terrain while source imagery contributes bounded geographic detail."
+  },
+  "objective_capture_comparison": [
+    {
+      "capture": "chili_bar_launch_downstream",
+      "baseline": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/baseline/chili_bar_launch_downstream.png",
+        "sha256": "0a75d2dcf39f6a6792aacb96314b9df94f3d5d8d52bdbd72bf51b3b3f8fade1d"
+      },
+      "candidate": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/candidate/chili_bar_launch_downstream.png",
+        "sha256": "b783bc577b3c232cbd9ca75efdfd1a0160107247789012ed3618a0e4f8bcf7f4"
+      },
+      "technical_result": "pass",
+      "observation": "The downstream horizon is continuous rolling terrain without the former pale straight shelf."
+    },
+    {
+      "capture": "coloma_bridge_context",
+      "baseline": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/baseline/coloma_bridge_context.png",
+        "sha256": "eb10a7fe16c9f616cd2a6aa2d3799c8b326fba40f177ac2925a222fdfd0e8a4c"
+      },
+      "candidate": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/candidate/coloma_bridge_context.png",
+        "sha256": "6d5a229ffb678e7b0c4dfa3e8771dbfb6678a918d82ed82ff42100e624eccafa"
+      },
+      "technical_result": "pass",
+      "observation": "The bridge context retains its dry banks while the distant terrain terminates as an irregular ridge."
+    },
+    {
+      "capture": "meat_grinder_guide_eye",
+      "baseline": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/baseline/meat_grinder_guide_eye.png",
+        "sha256": "3d9a24af2ed0af079aef146a518653119e9318979d4a16e7b3f7728d2f3a3358"
+      },
+      "candidate": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/candidate/meat_grinder_guide_eye.png",
+        "sha256": "8ec27eb50c980aeb5833c10675b8655529685dff03392ecc2ba2f86cb1fb337a"
+      },
+      "technical_result": "pass",
+      "observation": "The dominant pale horizontal band behind the river is removed without changing the river corridor."
+    },
+    {
+      "capture": "salmon_falls_takeout",
+      "baseline": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/baseline/salmon_falls_takeout.png",
+        "sha256": "d02c02d9c4bd263c512dacad3c2758373fcce034ad1ca269bcb53d6ca2f599de"
+      },
+      "candidate": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/candidate/salmon_falls_takeout.png",
+        "sha256": "0f61f948a698502e84884f074ae9a46baab6dc4c6e88da584dd1da379fcd3e43"
+      },
+      "technical_result": "pass",
+      "observation": "The takeout view retains complete land coverage with a distant nonrectilinear terrain silhouette."
+    },
+    {
+      "capture": "troublemaker_approach",
+      "baseline": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/baseline/troublemaker_approach.png",
+        "sha256": "bd7ca3e2d79f12e74606683928e779e4278e384af76a8709921de2b5e75b5a03"
+      },
+      "candidate": {
+        "path": "docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/candidate/troublemaker_approach.png",
+        "sha256": "ec21193faa06f1a5c4dddb75681397b55519df318edea53f88d47369c512b1ad"
+      },
+      "technical_result": "pass",
+      "observation": "Both sides of the approach now sit below an organic rolling ridge instead of a straight terrain sheet."
+    }
+  ],
+  "hash_locked_artifacts": [
+    {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/manifest.json",
+      "sha256": "020d0fe080f89f37ed688bf505ab2ff779d839f1df795cecb4490a63766c4338"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_SouthForkAmerican_FullReach.umap",
+      "sha256": "241d4c05bc7ee0b331542136807de020d8c101e04830d949ab3fe77777743dbd"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_00.uasset",
+      "sha256": "b037b5b560d63cf7f697eb9880cb8bde0dfa263c1db9157dfc4679668520016b"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_01.uasset",
+      "sha256": "f8c509bd77f282c9802b62c8fe9f044704513bb0a6909a4c151fc9ab60ad3fee"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_02.uasset",
+      "sha256": "cb178b643afff61967e20c88113860768224c44dbe88abe19bbec4703f78ee5c"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_03.uasset",
+      "sha256": "e7bb6e4d06fd2d0acfca1081b20c5e187d33e0cead176a28ea1662da9bb051a1"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_04.uasset",
+      "sha256": "b1b415a7fe2701fbd2b6a37d33e6ff3be6ab1524bd788b4f397c37f87ac497f7"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_05.uasset",
+      "sha256": "cfbd7d212ee4fba76aead5419dfcc6d5245846b9c606195499da02df35ac74da"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_06.uasset",
+      "sha256": "680dbbda16955b18a471e3f27c2558116cba385b0bceac2367bffd24dc05f768"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/SouthForkFullReach/FarField/SM_far_field_07.uasset",
+      "sha256": "2a21fea1be4e6ae167c0499c324bddbdfe97d449913265d1bad05cc4ac6a55df"
+    }
+  ],
+  "open_gates": [
+    {"gate": "whitewater_guide_review", "status": "required_open"},
+    {"gate": "geospatial_and_terrain_review", "status": "required_open"},
+    {"gate": "hydrology_and_hydraulics_review", "status": "required_open"},
+    {"gate": "rights_and_attribution_review", "status": "required_open"},
+    {"gate": "human_environment_art_review", "status": "required_open"},
+    {"gate": "hazard_readability_review", "status": "required_open"},
+    {"gate": "target_platform_performance_review", "status": "required_open"}
+  ],
+  "remaining_gaps": [
+    "The broad ground material, foliage diversity, river surface and rapid VFX still require photoreal art review.",
+    "Named-rapid geometry and hydraulic behavior still require external guide, geospatial and hydrology validation.",
+    "Source licensing, attribution and redistribution still require rights review.",
+    "Hazard readability and measured target-platform performance remain unapproved."
+  ]
+}

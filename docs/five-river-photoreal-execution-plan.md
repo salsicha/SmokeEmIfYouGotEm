@@ -417,6 +417,16 @@ Started July 16, 2026 from clean commit `119239d68`.
   artifact-free non-shadowing candidate. This is technical terrain progress;
   South Fork B2, human photoreal acceptance, and the seven external review
   gates remain open.
+- [x] Replace the South Fork's visible rectangular far-field termination with
+  eight regenerated Nanite patches on a 1,673 × 743 shared grid, 2.4 km of
+  explicit procedural padding, and a deterministic 120–720 m irregular outer
+  contour. Bound official aerial detail to 0.58 authority over the continuous
+  world-space land-cover palette so source-flight rectangles cannot dominate
+  the horizon. All five canonical cameras, MapCheck 0/0, 14 Python contracts,
+  the UE editor build, and the live `L_Troublemaker` runnable-map gate pass.
+  This closes the internal rectangular-horizon defect only; South Fork B2,
+  photoreal promotion, measured platform performance, and all seven external
+  reviews remain open.
 
 ## Definition of done (per river)
 
