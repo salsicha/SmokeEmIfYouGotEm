@@ -1,0 +1,54 @@
+{
+  "devices": [
+    {
+      "deviceName": "Alexs-Air.attlocal.net",
+      "instance": "24638B30334FD4EDCE1690886E595CC1",
+      "instanceName": "Alexs-Air.attlocal.net-57077",
+      "platform": "MacEditor",
+      "oSVersion": "macOS 26.5.2 25F84",
+      "model": "Default",
+      "gPU": "Apple M5",
+      "cPUModel": "Apple M5",
+      "rAMInGB": 32,
+      "renderMode": "SM6",
+      "rHI": "",
+      "appInstanceLog": ""
+    }
+  ],
+  "reportCreatedOn": "2026.08.05-00.53.38",
+  "succeeded": 0,
+  "succeededWithWarnings": 1,
+  "failed": 0,
+  "notRun": 0,
+  "inProcess": 0,
+  "totalDuration": 130.11018371582031,
+  "comparisonExported": false,
+  "comparisonExportDirectory": "",
+  "tests": [
+    {
+      "testDisplayName": "L_Zambezi",
+      "fullTestPath": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+      "tags": [],
+      "state": "Success",
+      "deviceInstance": ["24638B30334FD4EDCE1690886E595CC1"],
+      "duration": 130.11018371582031,
+      "dateTime": "2026.08.05-00.51.27",
+      "entries": [
+        {
+          "event": {
+            "type": "Warning",
+            "message": "LogHttp: HTTP request timed out after 3.00 seconds URL=https://www.google.com/generate_204",
+            "context": "log",
+            "artifact": "00000000000000000000000000000000"
+          },
+          "filename": "",
+          "lineNumber": -1,
+          "timestamp": "2026.08.05-00.52.08"
+        }
+      ],
+      "warnings": 1,
+      "errors": 0,
+      "artifacts": []
+    }
+  ]
+}

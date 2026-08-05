@@ -1,0 +1,104 @@
+{
+  "devices": [
+    {
+      "deviceName": "Alexs-Air.attlocal.net",
+      "instance": "52CDEDE92249BA49B6ED7BAFABC5D0F3",
+      "instanceName": "Alexs-Air.attlocal.net-57849",
+      "platform": "MacEditor",
+      "oSVersion": "macOS 26.5.2 25F84",
+      "model": "Default",
+      "gPU": "Apple M5",
+      "cPUModel": "Apple M5",
+      "rAMInGB": 32,
+      "renderMode": "SM6",
+      "rHI": "",
+      "appInstanceLog": ""
+    }
+  ],
+  "reportCreatedOn": "2026.08.05-01.01.51",
+  "succeeded": 5,
+  "succeededWithWarnings": 0,
+  "failed": 0,
+  "notRun": 0,
+  "inProcess": 0,
+  "totalDuration": 22.440635681152344,
+  "comparisonExported": false,
+  "comparisonExportDirectory": "",
+  "tests": [
+    {
+      "testDisplayName": "CareerCatalog",
+      "fullTestPath": "RaftSim.M6.CareerCatalog",
+      "tags": [],
+      "state": "Success",
+      "deviceInstance": [
+        "52CDEDE92249BA49B6ED7BAFABC5D0F3"
+      ],
+      "duration": 0.0080958344042301178,
+      "dateTime": "2026.08.05-01.01.29",
+      "entries": [],
+      "warnings": 0,
+      "errors": 0,
+      "artifacts": []
+    },
+    {
+      "testDisplayName": "FullReachSession",
+      "fullTestPath": "RaftSim.M6.FullReachSession",
+      "tags": [],
+      "state": "Success",
+      "deviceInstance": [
+        "52CDEDE92249BA49B6ED7BAFABC5D0F3"
+      ],
+      "duration": 14.660114288330078,
+      "dateTime": "2026.08.05-01.01.29",
+      "entries": [],
+      "warnings": 0,
+      "errors": 0,
+      "artifacts": []
+    },
+    {
+      "testDisplayName": "MainMenuRender",
+      "fullTestPath": "RaftSim.M6.MainMenuRender",
+      "tags": [],
+      "state": "Success",
+      "deviceInstance": [
+        "52CDEDE92249BA49B6ED7BAFABC5D0F3"
+      ],
+      "duration": 3.2952516078948975,
+      "dateTime": "2026.08.05-01.01.43",
+      "entries": [],
+      "warnings": 0,
+      "errors": 0,
+      "artifacts": []
+    },
+    {
+      "testDisplayName": "ProgressionMigration",
+      "fullTestPath": "RaftSim.M6.ProgressionMigration",
+      "tags": [],
+      "state": "Success",
+      "deviceInstance": [
+        "52CDEDE92249BA49B6ED7BAFABC5D0F3"
+      ],
+      "duration": 0.0077417902648448944,
+      "dateTime": "2026.08.05-01.01.47",
+      "entries": [],
+      "warnings": 0,
+      "errors": 0,
+      "artifacts": []
+    },
+    {
+      "testDisplayName": "RuntimeShell",
+      "fullTestPath": "RaftSim.M6.RuntimeShell",
+      "tags": [],
+      "state": "Success",
+      "deviceInstance": [
+        "52CDEDE92249BA49B6ED7BAFABC5D0F3"
+      ],
+      "duration": 4.4694333076477051,
+      "dateTime": "2026.08.05-01.01.47",
+      "entries": [],
+      "warnings": 0,
+      "errors": 0,
+      "artifacts": []
+    }
+  ]
+}

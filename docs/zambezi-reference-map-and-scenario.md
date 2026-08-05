@@ -23,30 +23,28 @@ package is not the runnable map.
 The runnable map was regenerated and rechecked after the later environment,
 character, water, terrain, and rapid-presentation milestones, including the
 retained V19 elevation-stratified launch ecology, later cold-water highlight
-and depth passes, and the V2 irregular near-field terrain pass. The V17
-release-head certification supersedes V16 after the subsequent raft-safe
-breaking-water occlusion milestone. The versioned Zambezi map remains
-byte-identical and the player path is still:
+and depth passes, the V2 irregular near-field terrain pass, and the subsequent
+South Fork environment and character milestones. The V22 release-head
+certification supersedes V18. The versioned Zambezi map remains byte-identical
+and the player path is still:
 
 `Free Run` → `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`
 
 The machine-readable selection and Free Run manifests count six runnable rivers,
 mark `zambezi_batoka_gorge` as `runnable: true` with `availability: free_run`,
-and list it at `reference_free_run` tier. Twenty-seven focused Python registry,
-source, and release-record contracts remain fail-closed. The native
+and list it at `reference_free_run` tier. Thirty-one focused Python Zambezi
+source/map contracts and all five M6 frontend/progression tests pass. The native
 `RaftSim.P4.RiverMapLoads.L_Zambezi`
 gate loads the committed map into PIE, reports the vertical-slice game mode,
 binds the 5,908-point curved coordinate map and cooked field, exposes 10,465 wet
 surface vertices, ten live breaking sites, 645 visible rapid-foam vertices,
 and 16,896 transmitting-water core triangles, and completes MapCheck with zero
-errors and zero warnings. The three accepted automation warnings are the
-external-connectivity probe timeout, a headless audio sample-rate diagnostic,
-and a render-thread-safety diagnostic for motion-vector simulation; none has
-map-load or gameplay authority.
+errors and zero warnings. The sole accepted automation warning is the
+external-connectivity probe timeout; it has no map-load or gameplay authority.
 
 The exact base commit, runtime-contract hashes, test commands, measured counts,
 authority boundary, and open external gates are preserved in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v18_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json`.
 
 This verifies the current committed Zambezi source, runtime registry, and map
 package. It does not close
