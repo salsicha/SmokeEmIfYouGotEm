@@ -1,0 +1,68 @@
+{
+  "schema": "raftsim.m9.upper_t_grip_contact.runtime.v1",
+  "source_schema": "raftsim.metahuman.production_capture.v1",
+  "status": "capture_complete",
+  "captured_character_count": 5,
+  "characters": [
+    {
+      "name": "MHC_RaftSim_Guide",
+      "palm_anchor_error_cm": 5.272233205566579e-10,
+      "lower_finger_contact_error_cm": 0.0,
+      "lower_thumb_contact_error_cm": 0.0,
+      "upper_finger_contact_error_cm": 4.206324177857823e-10,
+      "upper_thumb_contact_error_cm": 0.0,
+      "upper_thumb_opposition_dot": -1.0,
+      "localized_glove": true,
+      "grip_sha256": "d0b4a10e5ddec75ac94f2cc7a29fe7a0eea09f1f2984cf636e14d8452aebecca",
+      "grip_profile_sha256": "ec139b1bbf634ced141e40250fce64e927d1c2203641bf0cd9b7f16a9855b768"
+    },
+    {
+      "name": "MHC_RaftSim_Crew_01",
+      "palm_anchor_error_cm": 3.3358618645173976e-10,
+      "lower_finger_contact_error_cm": 0.0,
+      "lower_thumb_contact_error_cm": 0.0,
+      "upper_finger_contact_error_cm": 1.1534009303204584e-9,
+      "upper_thumb_contact_error_cm": 0.0,
+      "upper_thumb_opposition_dot": -1.0,
+      "localized_glove": true,
+      "grip_sha256": "a0e0a27694fd62ec9e59cc22a511d31e4535171ab6f64ee33b2f6b318d699982",
+      "grip_profile_sha256": "f729ad12aea32403945c8e217075b89f187e8a09cf476d995f433041c5a4cc1c"
+    },
+    {
+      "name": "MHC_RaftSim_Crew_02",
+      "palm_anchor_error_cm": 1.8606717278046858e-9,
+      "lower_finger_contact_error_cm": 0.0,
+      "lower_thumb_contact_error_cm": 0.0,
+      "upper_finger_contact_error_cm": 9.973843972943541e-10,
+      "upper_thumb_contact_error_cm": 0.0,
+      "upper_thumb_opposition_dot": -1.0,
+      "localized_glove": true,
+      "grip_sha256": "9a5278bf48c92bdf7dd4224a195766abd2c372ff4de18e1604306706746a922e",
+      "grip_profile_sha256": "aa43e7ddca2f5222b577088e8c4e8ee030576ac72b3ebfac013f942f169b9d59"
+    },
+    {
+      "name": "MHC_RaftSim_Crew_03",
+      "palm_anchor_error_cm": 1.8337016349789792e-9,
+      "lower_finger_contact_error_cm": 0.0,
+      "lower_thumb_contact_error_cm": 0.0,
+      "upper_finger_contact_error_cm": 9.181357896181908e-10,
+      "upper_thumb_contact_error_cm": 0.0,
+      "upper_thumb_opposition_dot": -1.0,
+      "localized_glove": true,
+      "grip_sha256": "98c69a17f03dedc84082cb5df984e5c30e4a4191f954e741b3d4cf18bea6a0b5",
+      "grip_profile_sha256": "f81534d390d1edb61cf9a63e54531985da561d5dba7a84ca98b62d6d96c3814e"
+    },
+    {
+      "name": "MHC_RaftSim_Crew_04",
+      "palm_anchor_error_cm": 1.880034572465661e-9,
+      "lower_finger_contact_error_cm": 0.0,
+      "lower_thumb_contact_error_cm": 0.0,
+      "upper_finger_contact_error_cm": 1.053437337361629e-9,
+      "upper_thumb_contact_error_cm": 0.0,
+      "upper_thumb_opposition_dot": -1.0,
+      "localized_glove": true,
+      "grip_sha256": "a85b9f7f1460117c5ee98b14757b08ba2b03caa9a06f2ff1ced7b9ff2d545ada",
+      "grip_profile_sha256": "12498e3d99efe51912a4533364b99ee19c7be46fca9684eb3a1c19a473a3a17e"
+    }
+  ]
+}

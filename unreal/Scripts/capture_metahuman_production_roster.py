@@ -318,6 +318,11 @@ def main() -> None:
                 or visual_actor.get_maximum_paddle_grip_anchor_error_cm() > 0.25
                 or visual_actor.get_maximum_paddle_grip_contact_error_cm() > 0.25
                 or visual_actor.get_maximum_paddle_thumb_contact_error_cm() > 0.25
+                or visual_actor.get_maximum_upper_t_grip_finger_contact_error_cm()
+                > 0.25
+                or visual_actor.get_maximum_upper_t_grip_thumb_contact_error_cm()
+                > 0.25
+                or visual_actor.get_maximum_upper_t_grip_thumb_opposition_dot() > -0.95
                 or not visual_actor.has_localized_paddle_glove_material()
                 or not visual_actor.is_assembled_body_using_wetsuit()
                 or not visual_actor.is_assembled_face_using_cropped_skin()
@@ -359,6 +364,12 @@ def main() -> None:
                     f"{visual_actor.get_maximum_paddle_grip_contact_error_cm():.3f}, "
                     f"paddle_thumb_contact_error_cm="
                     f"{visual_actor.get_maximum_paddle_thumb_contact_error_cm():.3f}, "
+                    f"upper_t_grip_finger_contact_error_cm="
+                    f"{visual_actor.get_maximum_upper_t_grip_finger_contact_error_cm():.3f}, "
+                    f"upper_t_grip_thumb_contact_error_cm="
+                    f"{visual_actor.get_maximum_upper_t_grip_thumb_contact_error_cm():.3f}, "
+                    f"upper_t_grip_thumb_opposition_dot="
+                    f"{visual_actor.get_maximum_upper_t_grip_thumb_opposition_dot():.3f}, "
                     f"localized_paddle_gloves="
                     f"{visual_actor.has_localized_paddle_glove_material()}"
                 )
@@ -664,6 +675,15 @@ def main() -> None:
                     ),
                     "runtime_paddle_thumb_contact_error_cm": (
                         visual_actor.get_maximum_paddle_thumb_contact_error_cm()
+                    ),
+                    "runtime_upper_t_grip_finger_contact_error_cm": (
+                        visual_actor.get_maximum_upper_t_grip_finger_contact_error_cm()
+                    ),
+                    "runtime_upper_t_grip_thumb_contact_error_cm": (
+                        visual_actor.get_maximum_upper_t_grip_thumb_contact_error_cm()
+                    ),
+                    "runtime_upper_t_grip_thumb_opposition_dot": (
+                        visual_actor.get_maximum_upper_t_grip_thumb_opposition_dot()
                     ),
                     "runtime_localized_paddle_glove_material": (
                         visual_actor.has_localized_paddle_glove_material()

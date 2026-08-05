@@ -114,6 +114,17 @@ authority. The [head/shoulder clearance review](docs/environment-captures/south_
 retains this as a technical silhouette improvement, while coarse collar/PFD
 geometry, final anatomy and materials, photoreal promotion, and named human
 acceptance remain open.
+The assembled five-character roster now also contact-constrains every upper
+T-grip without restoring the rejected radial "donut" hand. Only each terminal
+finger segment moves: all 20 upper finger pads meet the modeled transverse
+handle, all five thumb pads oppose the middle finger, and every pad is clamped
+inside the rounded handle ends. Palm anchors and the retained lower-shaft grip
+remain effectively exact; the editor build, renderer-backed M5 gate, and all
+six live river-map loads pass. The
+[upper T-grip review](docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_review.json)
+retains the visible contact improvement but still rejects photoreal promotion
+for coarse hand topology, glove construction, wrist compression, motion, and
+missing named character-art and guide approval.
 Pacuare's `L_UpperHuacas` is again a runnable map: a physical 600 m reach-local
 Landscape, the committed Upper Huacas cooked solver field, explicit vertical
 datum alignment, player raft/start, and the full vertical-slice game mode now

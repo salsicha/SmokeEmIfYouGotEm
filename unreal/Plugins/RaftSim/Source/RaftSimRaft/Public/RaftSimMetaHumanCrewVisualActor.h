@@ -73,6 +73,27 @@ public:
         return MaximumPaddleThumbContactErrorCm;
     }
 
+    /** Maximum distal finger-pad error against the transverse upper T-grip. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumUpperTGripFingerContactErrorCm() const
+    {
+        return MaximumUpperTGripFingerContactErrorCm;
+    }
+
+    /** Maximum opposed-thumb pad error against the transverse upper T-grip. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumUpperTGripThumbContactErrorCm() const
+    {
+        return MaximumUpperTGripThumbContactErrorCm;
+    }
+
+    /** Least-opposed upper thumb/finger radial pair; -1 is fully opposed. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumUpperTGripThumbOppositionDot() const
+    {
+        return MaximumUpperTGripThumbOppositionDot;
+    }
+
     /** The one-section body resolves both live metacarpals as glove zones. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     bool HasLocalizedPaddleGloveMaterial() const
@@ -197,6 +218,15 @@ private:
         bool bLeft,
         const FVector& GripCenterCm,
         const FVector& GripAxis);
+    void ApplyUpperFingerPadToTGrip(
+        bool bLeft,
+        const TCHAR* Digit,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis);
+    void ApplyUpperOpposedThumbPadToTGrip(
+        bool bLeft,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis);
     void UpdatePaddleGloveMaterial();
     void SynchronizeAssembledFollowers();
     void UpdateRigidAssembledFace();
@@ -220,6 +250,12 @@ private:
     float MeasurePaddleFingerContactErrorCm(
         const FRaftSimCrewAvatarPose& Pose) const;
     float MeasurePaddleThumbContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureUpperTGripFingerContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureUpperTGripThumbContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureUpperTGripThumbOppositionDot(
         const FRaftSimCrewAvatarPose& Pose) const;
 
     UPROPERTY(VisibleAnywhere)
@@ -245,6 +281,9 @@ private:
     float MaximumPaddleGripAnchorErrorCm = 0.0f;
     float MaximumPaddleGripContactErrorCm = 0.0f;
     float MaximumPaddleThumbContactErrorCm = 0.0f;
+    float MaximumUpperTGripFingerContactErrorCm = 0.0f;
+    float MaximumUpperTGripThumbContactErrorCm = 0.0f;
+    float MaximumUpperTGripThumbOppositionDot = -1.0f;
 
     UPROPERTY(Transient)
     TObjectPtr<USkeletalMeshComponent> AssembledFace;

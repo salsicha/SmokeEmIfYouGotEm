@@ -1342,6 +1342,27 @@ bool FRaftSimM5StartRescueCommand::Update()
             It->GetMaximumPaddleThumbContactErrorCm() <= 0.25f);
         Test->TestTrue(
             FString::Printf(
+                TEXT("MetaHuman crew %s closes its upper distal finger pads on the T-grip "
+                     "without a whole-chain radial cage (error %.3f cm)"),
+                *It->GetName(),
+                It->GetMaximumUpperTGripFingerContactErrorCm()),
+            It->GetMaximumUpperTGripFingerContactErrorCm() <= 0.25f);
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("MetaHuman crew %s opposes its upper thumb pad on the T-grip "
+                     "(error %.3f cm)"),
+                *It->GetName(),
+                It->GetMaximumUpperTGripThumbContactErrorCm()),
+            It->GetMaximumUpperTGripThumbContactErrorCm() <= 0.25f);
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("MetaHuman crew %s keeps the upper thumb opposite the middle "
+                     "finger across the T-grip (dot %.3f)"),
+                *It->GetName(),
+                It->GetMaximumUpperTGripThumbOppositionDot()),
+            It->GetMaximumUpperTGripThumbOppositionDot() <= -0.95f);
+        Test->TestTrue(
+            FString::Printf(
                 TEXT("MetaHuman crew %s localizes its paddle-glove material to live hands"),
                 *It->GetName()),
             It->HasLocalizedPaddleGloveMaterial());
