@@ -13,7 +13,17 @@ authors = [
 ]
 dependencies = [
   "numpy>=1.26",
-  "Pillow>=12.0",
+  # >=12.3 for Image.get_flattened_data, exercised by the test suite.
+  "Pillow>=12.3",
+]
+
+# Installed by `uv run`/`uv sync` by default so `uv run pytest -q` works on a
+# fresh checkout of any platform without relying on a PATH pytest. matplotlib
+# keeps the example-plot tests exercised rather than import-erroring.
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "matplotlib>=3.8",
 ]
 
 [project.optional-dependencies]

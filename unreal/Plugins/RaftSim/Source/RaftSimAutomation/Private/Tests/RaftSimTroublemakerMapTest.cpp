@@ -75,7 +75,7 @@ bool FRaftSimStartZambeziLaunchCommand::Update()
     }
     for (TActorIterator<ARaftSimRaftActor> It(World); It; ++It)
     {
-        if (It->GetActorLabel() == TEXT("RaftSim_Zambezi_PlayerRaft"))
+        if (It->GetActorLabelView() == TEXT("RaftSim_Zambezi_PlayerRaft"))
         {
             Test->TestEqual(
                 TEXT("Zambezi raft remains upright through initial settle"),
@@ -135,15 +135,15 @@ bool FRaftSimAssertRiverMapCommand::Update()
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
         PlayerRaft = *It;
-        bZambeziReferenceRun = PlayerRaft->GetActorLabel() ==
+        bZambeziReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_Zambezi_PlayerRaft");
-        bPacuareReferenceRun = PlayerRaft->GetActorLabel() ==
+        bPacuareReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_PacuareUpperHuacas_PlayerRaft");
-        bColoradoHanceReferenceRun = PlayerRaft->GetActorLabel() ==
+        bColoradoHanceReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_ColoradoHance_PlayerRaft");
-        bChilkoLavaCanyonReferenceRun = PlayerRaft->GetActorLabel() ==
+        bChilkoLavaCanyonReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
-        bFutaleufuTerminatorReferenceRun = PlayerRaft->GetActorLabel() ==
+        bFutaleufuTerminatorReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
         Test->TestTrue(
             FString::Printf(
@@ -620,7 +620,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
         {
-            if ((*It)->GetActorLabel() == TEXT("RaftSim_Zambezi_RuntimeWaterConfig"))
+            if ((*It)->GetActorLabelView() == TEXT("RaftSim_Zambezi_RuntimeWaterConfig"))
             {
                 Test->TestFalse(
                     TEXT("Zambezi preserves globally stationed cooked hydraulics"),
@@ -1116,7 +1116,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
         {
-            if ((*It)->GetActorLabel() !=
+            if ((*It)->GetActorLabelView() !=
                 TEXT("RaftSim_PacuareUpperHuacas_RuntimeWaterConfig"))
             {
                 continue;
@@ -1467,7 +1467,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
         {
-            if ((*It)->GetActorLabel() !=
+            if ((*It)->GetActorLabelView() !=
                 TEXT("RaftSim_ColoradoHance_RuntimeWaterConfig"))
             {
                 continue;
@@ -1599,7 +1599,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         bool bHasSolverRapidCamera = false;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
-            if ((*It)->GetActorLabel() ==
+            if ((*It)->GetActorLabelView() ==
                 TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"))
             {
                 bHasSolverRapidCamera = true;
@@ -1782,7 +1782,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
         {
-            if ((*It)->GetActorLabel() !=
+            if ((*It)->GetActorLabelView() !=
                 TEXT("RaftSim_FutaleufuTerminator_RuntimeWaterConfig"))
             {
                 continue;
@@ -2017,7 +2017,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 RuntimeWaterConfigCount = 0;
         for (TActorIterator<ARaftSimRiverWaterConfig> It(World); It; ++It)
         {
-            if ((*It)->GetActorLabel() !=
+            if ((*It)->GetActorLabelView() !=
                 TEXT("RaftSim_ChilkoLavaCanyon_RuntimeWaterConfig"))
             {
                 continue;

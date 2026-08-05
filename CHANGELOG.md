@@ -6,6 +6,25 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- Restored native Linux build/test support (originally landed 2026-08-01, lost in a
+  history rewrite): `<array>`/`<optional>` includes in the C++ solver,
+  a portable bash `build_solver_lib.sh` that uses the engine's bundled
+  clang/libc++ toolchain on Linux (a gcc/libstdc++ archive cannot link into UE
+  there), the engine zlib dependency in RaftSimWater, `package_linux.sh`
+  (now mirroring the Zambezi map pre-generation guard), untracked
+  `physics/cpp/build-ue/` again, pytest/matplotlib in the default uv dev group,
+  and Pillow floor 12.3. Fixed the game-target compile everywhere by replacing
+  editor-only `GetActorLabel()` with `GetActorLabelView()` in the river map
+  automation test, and a case-sensitive `scripts/`→`Scripts/` path in the
+  safety-gear test. Verified on Linux against a 5.8.1 source engine: editor and
+  game targets build; P1 tank, P2 river window, four M8 gates, and all six
+  P4 river map loads (including Zambezi) pass under NullRHI. Cross-platform
+  byte-reproduction tests (Hance/Pacuare visual terrain+water, Meat Grinder
+  committed package) are split or marked xfail off-macOS with recorded reasons;
+  the two in-place visual-water builders now restore committed bytes so
+  divergent regeneration cannot cascade into hash-lock tests; M9 packet audits
+  skip where their machine-local `unreal/Saved` evidence cannot exist.
+
 - A runnable Zambezi Batoka Gorge reference Free Run, including a curved runtime
   coordinate map, procedural full-corridor water seed, gameplay bootstrap, player-facing
   river catalog entry, and validation that keeps production terrain, bathymetry,

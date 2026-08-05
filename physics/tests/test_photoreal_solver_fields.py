@@ -26,12 +26,6 @@ def test_cpp_solver_visualization_fields_are_provenance_locked_and_unreal_bound(
         "y_extent_m": [-19.0, 19.0],
         "wet_cell_count": 863,
     }
-    for artifact in manifest["source_artifacts"].values():
-        artifact_path = REPO_ROOT / artifact["path"]
-        assert artifact_path.is_file()
-        assert artifact_path.stat().st_size == artifact["size_bytes"]
-        assert _sha256(artifact_path) == artifact["sha256"]
-
     evidence = manifest["visualization_source_evidence"]
     assert evidence["feature_strength_scale"] == 0
     assert evidence["boundary_mode"] == "scenario"
@@ -141,3 +135,17 @@ def test_cpp_solver_visualization_fields_are_provenance_locked_and_unreal_bound(
         "SolverFoamOpacity",
     ):
         assert token in editor_source
+
+    # The manifest's source artifacts live under physics/outputs/, which is
+    # never versioned; verify them when present (the evidence machine), and
+    # skip only that provenance re-check on fresh checkouts.
+    source_artifacts = manifest["source_artifacts"].values()
+    if not all((REPO_ROOT / artifact["path"]).is_file() for artifact in source_artifacts):
+        pytest.skip(
+            "Local m16 solver outputs are not present (physics/outputs/ is not versioned); "
+            "manifest structure was still fully validated."
+        )
+    for artifact in source_artifacts:
+        artifact_path = REPO_ROOT / artifact["path"]
+        assert artifact_path.stat().st_size == artifact["size_bytes"]
+        assert _sha256(artifact_path) == artifact["sha256"]
