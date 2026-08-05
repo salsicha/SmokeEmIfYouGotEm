@@ -975,14 +975,29 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             FCommandLine::Get(), TEXT("RaftSimReuseSouthForkDetailedTerrainMeshes"));
     const bool bReuseExistingWaterMeshes = bReuseExistingDetailedMeshes || FParse::Param(
         FCommandLine::Get(), TEXT("RaftSimReuseSouthForkWaterMeshes"));
-    const bool bReuseExistingFarFieldMeshes = bReuseExistingDetailedMeshes || FParse::Param(
-        FCommandLine::Get(), TEXT("RaftSimReuseSouthForkFarFieldMeshes"));
+    const bool bRebuildFarFieldMeshes = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimRebuildSouthForkFarFieldMeshes"));
+    const bool bReuseExistingFarFieldMeshes = !bRebuildFarFieldMeshes &&
+        (bReuseExistingDetailedMeshes || FParse::Param(
+            FCommandLine::Get(), TEXT("RaftSimReuseSouthForkFarFieldMeshes")));
+    const bool bRebuildFarFieldMacroTextures = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimRebuildSouthForkFarFieldMacroTextures"));
     const bool bReuseExistingMaterials = FParse::Param(
         FCommandLine::Get(), TEXT("RaftSimReuseSouthForkMaterials"));
     if (bReuseExistingDetailedMeshes)
     {
         OutSummary += TEXT(
             "Reusing existing hash-validated detailed South Fork terrain and water meshes.\n");
+    }
+    if (bRebuildFarFieldMacroTextures)
+    {
+        OutSummary += TEXT(
+            "Rebuilding South Fork far-field macro textures while reusing geometry.\n");
+    }
+    if (bRebuildFarFieldMeshes)
+    {
+        OutSummary += TEXT(
+            "Rebuilding South Fork far-field horizon geometry while reusing detailed terrain and water.\n");
     }
 
     const TSharedPtr<FJsonObject>* UnrealImport = nullptr;
@@ -2180,7 +2195,8 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 TEXT("Failed to decode far-field patch %s.\n"), *PatchId);
             return false;
         }
-        UTexture2D* PatchMacroTexture = bReuseExistingFarFieldMeshes
+        UTexture2D* PatchMacroTexture =
+            bReuseExistingFarFieldMeshes && !bRebuildFarFieldMacroTextures
             ? LoadSouthForkTerrainMacroTextureForReuse(PatchId, OutSummary)
             : CreateSouthForkTerrainMacroTexture(PatchId, MacroPath, OutSummary);
         UMaterialInstanceConstant* PatchTerrainMaterial =
@@ -3247,6 +3263,7 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
     // map and makes placement/coverage failures distinguishable from
     // translucency-compositing failures in offscreen evidence captures.
     TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenBaseWaterActors;
+    TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenFarFieldActors;
     TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenBankMicroreliefActors;
     TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>
         DiagnosticOpaqueFoamMaterials;
@@ -3267,6 +3284,26 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
         OutSummary += FString::Printf(
             TEXT("Settled-map diagnostic hid %d dry-bank microrelief actors.\n"),
             DiagnosticHiddenBankMicroreliefActors.Num());
+    }
+    if (FParse::Param(
+            FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkFarField")))
+    {
+        const FName FarFieldTag(TEXT("RaftSimFullReachFarField"));
+        const FName FarFieldDressingTag(TEXT("RaftSimFullReachFarFieldDressing"));
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            AActor* Actor = *It;
+            if (Actor &&
+                (Actor->ActorHasTag(FarFieldTag) ||
+                 Actor->ActorHasTag(FarFieldDressingTag)))
+            {
+                Actor->SetActorHiddenInGame(true);
+                DiagnosticHiddenFarFieldActors.Add(Actor);
+            }
+        }
+        OutSummary += FString::Printf(
+            TEXT("Settled-map diagnostic hid %d far-field actors.\n"),
+            DiagnosticHiddenFarFieldActors.Num());
     }
     if (FParse::Param(
             FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkBaseWater")))
@@ -3363,6 +3400,14 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
                     Actor->SetActorHiddenInGame(false);
                 }
             }
+            for (const TWeakObjectPtr<AActor>& Actor :
+                 DiagnosticHiddenFarFieldActors)
+            {
+                if (Actor.IsValid())
+                {
+                    Actor->SetActorHiddenInGame(false);
+                }
+            }
             RestoreSouthForkSettledSourceCaptureVisibility(
                 SourceCaptureVisibilityStates);
             RestoreSouthForkFullReachReviewLayers(
@@ -3383,6 +3428,13 @@ bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
     }
     for (const TWeakObjectPtr<AActor>& Actor :
          DiagnosticHiddenBankMicroreliefActors)
+    {
+        if (Actor.IsValid())
+        {
+            Actor->SetActorHiddenInGame(false);
+        }
+    }
+    for (const TWeakObjectPtr<AActor>& Actor : DiagnosticHiddenFarFieldActors)
     {
         if (Actor.IsValid())
         {
