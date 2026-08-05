@@ -16,6 +16,10 @@ build/
 dist/
 *.egg-info/
 
+# Blender recovery/autosave backups are local-only.
+*.blend[0-9]*
+*.blend~
+
 # Local simulation outputs
 outputs/
 *.telemetry.csv
