@@ -732,6 +732,12 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 DressingPacuareScannedFernMeshCount = 0;
     int32 DressingPacuareScannedFernInstanceCount = 0;
     bool bDressingPacuareScannedFernMaterialsValidated = false;
+    int32 DressingPacuareForestFloorMeshCount = 0;
+    int32 DressingPacuareForestFloorTargetInstanceCount = 0;
+    int32 DressingPacuareForestFloorInstanceCount = 0;
+    int32 DressingPacuareForestFloorRejectedPlacementCount = 0;
+    float DressingPacuareForestFloorMinimumCenterlineDistanceCm = 0.0f;
+    float DressingPacuareForestFloorMaximumSlopeDegrees = 0.0f;
     bool bDressingExternalBroadleafReviewAssetLoaded = false;
     bool bDressingExternalBroadleafMaterialsValidated = false;
     bool bDressingExternalConiferReviewAssetLoaded = false;

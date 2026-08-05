@@ -753,6 +753,17 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_pacuare_scanned_fern_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_pacuare_scanned_fern_assets\": [\"SM_Fern02_fern_02_a\", \"SM_Fern02_fern_02_b\", \"SM_Fern02_fern_02_c\", \"SM_Fern02_fern_02_d\"],\n")
             TEXT("      \"landscape_dressing_pacuare_scanned_fern_project_owned_canopy_preserved\": true,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_authority\": \"project_owned_procedural_infill_source_landscape_grounded_no_species_ecology_terrain_collision_water_hydraulic_bathymetric_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_deterministic_seed\": 18437,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_target_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_rejected_placement_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_minimum_centerline_distance_cm\": %.3f,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_maximum_slope_degrees\": %.3f,\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_forms\": [\"folded_leaf_litter_a\", \"folded_leaf_litter_b\", \"buttress_root_a\", \"deadwood_a\"],\n")
+            TEXT("      \"landscape_dressing_pacuare_forest_floor_placement_contract\": \"deterministic_32_candidate_full_route_both_bank_source_landscape_search_outside_complete_visible_water_and_protected_solver_strip_with_dry_height_slope_and_centerline_gates\",\n")
             TEXT("      \"landscape_dressing_external_review_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_broadleaf_asset\": \"%s\",\n")
@@ -1077,6 +1088,18 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 : TEXT("not_enabled_for_this_river"),
             Result.DressingPacuareScannedFernMeshCount,
             Result.DressingPacuareScannedFernInstanceCount,
+            Result.DressingPacuareForestFloorMeshCount == 4 &&
+                    Result.DressingPacuareForestFloorInstanceCount >= 2970
+                ? TEXT("four_project_owned_opaque_forest_floor_meshes_source_grounded_and_screened")
+                : (Result.DressingPacuareForestFloorMeshCount > 0
+                       ? TEXT("forest_floor_assets_or_placement_validation_failed")
+                       : TEXT("not_enabled_for_this_river")),
+            Result.DressingPacuareForestFloorMeshCount,
+            Result.DressingPacuareForestFloorTargetInstanceCount,
+            Result.DressingPacuareForestFloorInstanceCount,
+            Result.DressingPacuareForestFloorRejectedPlacementCount,
+            Result.DressingPacuareForestFloorMinimumCenterlineDistanceCm,
+            Result.DressingPacuareForestFloorMaximumSlopeDegrees,
             *EscapeRaftSimJsonString(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath

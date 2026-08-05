@@ -100,6 +100,13 @@ constexpr int32 PacuareScannedFernMinimumInstanceCount = 3300;
 constexpr int32 PacuareOrganicShorelineShrubTargetInstanceCount = 1200;
 constexpr int32 PacuareOrganicShorelineShrubMinimumInstanceCount = 1050;
 constexpr float PacuareOrganicShorelineShrubSlopeCeilingDegrees = 38.0f;
+constexpr int32 PacuareForestFloorLeafLitterTargetInstanceCount = 2600;
+constexpr int32 PacuareForestFloorLeafLitterMinimumInstanceCount = 2350;
+constexpr float PacuareForestFloorLeafLitterSlopeCeilingDegrees = 36.0f;
+constexpr int32 PacuareForestFloorWoodyTargetInstanceCount = 700;
+constexpr int32 PacuareForestFloorWoodyMinimumInstanceCount = 620;
+constexpr float PacuareForestFloorWoodySlopeCeilingDegrees = 32.0f;
+constexpr int32 PacuareForestFloorDeterministicSeed = 18437;
 constexpr TCHAR ZambeziRunnableLaunchTalusParentMaterialPath[] = TEXT(
     "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder");
 constexpr TCHAR ZambeziRunnableLaunchTalusMaterialAssetName[] = TEXT(
@@ -124,6 +131,13 @@ enum class ETemperateVegetationForm : uint8
     ConiferTree,
     RiparianShrub,
     GroundCover,
+};
+
+enum class EPacuareForestFloorForm : uint8
+{
+    FoldedLeafLitter,
+    ButtressRoot,
+    Deadwood,
 };
 
 float ZambeziVegetationUnitRandom(int32 Index, int32 Salt)
@@ -538,6 +552,389 @@ void AppendTemperateOpaqueLobe(
             Uvs,
             Colors);
     }
+}
+
+void AppendPacuareFoldedLeaf(
+    const FVector& Center,
+    float LengthCm,
+    float WidthCm,
+    float FoldHeightCm,
+    float CurlHeightCm,
+    const FRotator& Rotation,
+    const FLinearColor& TopColor,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& Uvs,
+    TArray<FLinearColor>& Colors)
+{
+    constexpr int32 StationCount = 6;
+    constexpr int32 VerticesPerStation = 6;
+    constexpr float ThicknessCm = 1.2f;
+    const int32 FirstVertex = Vertices.Num();
+    const FLinearColor BottomColor = ScalePreviewColor(TopColor, 0.58f);
+    for (int32 StationIndex = 0; StationIndex < StationCount; ++StationIndex)
+    {
+        const float T = static_cast<float>(StationIndex) /
+            static_cast<float>(StationCount - 1);
+        const float UnitX = 2.0f * T - 1.0f;
+        const float EdgeTaper = 0.10f + 0.90f *
+            FMath::Pow(FMath::Max(0.0f, FMath::Sin(PI * T)), 0.62f);
+        const float HalfWidth = 0.5f * WidthCm * EdgeTaper;
+        const float BaseZ = CurlHeightCm * UnitX * UnitX +
+            0.75f * FMath::Sin(PI * T);
+        const float RidgeZ = FoldHeightCm *
+            (0.22f + 0.78f * FMath::Sin(PI * T));
+        const float X = UnitX * 0.5f * LengthCm;
+        const FVector LocalPoints[VerticesPerStation] = {
+            FVector(X, -HalfWidth, BaseZ),
+            FVector(X, 0.0f, BaseZ + RidgeZ),
+            FVector(X, HalfWidth, BaseZ),
+            FVector(X, -HalfWidth, BaseZ - ThicknessCm),
+            FVector(X, 0.0f, BaseZ + RidgeZ - ThicknessCm),
+            FVector(X, HalfWidth, BaseZ - ThicknessCm)};
+        for (int32 PointIndex = 0;
+             PointIndex < VerticesPerStation;
+             ++PointIndex)
+        {
+            Vertices.Add(Center + Rotation.RotateVector(LocalPoints[PointIndex]));
+            Normals.Add(PointIndex < 3 ? FVector::UpVector : -FVector::UpVector);
+            Uvs.Add(FVector2D(T, PointIndex % 3 == 0
+                ? 0.0f
+                : (PointIndex % 3 == 1 ? 0.5f : 1.0f)));
+            Colors.Add(PointIndex < 3 ? TopColor : BottomColor);
+        }
+    }
+
+    for (int32 StationIndex = 0;
+         StationIndex < StationCount - 1;
+         ++StationIndex)
+    {
+        const int32 A = FirstVertex + StationIndex * VerticesPerStation;
+        const int32 B = A + VerticesPerStation;
+        Triangles.Append({
+            A + 0, B + 0, B + 1, A + 0, B + 1, A + 1,
+            A + 1, B + 1, B + 2, A + 1, B + 2, A + 2,
+            A + 3, B + 4, B + 3, A + 3, A + 4, B + 4,
+            A + 4, B + 5, B + 4, A + 4, A + 5, B + 5,
+            A + 0, A + 3, B + 3, A + 0, B + 3, B + 0,
+            A + 2, B + 5, A + 5, A + 2, B + 2, B + 5});
+    }
+    const int32 Start = FirstVertex;
+    const int32 End = FirstVertex +
+        (StationCount - 1) * VerticesPerStation;
+    Triangles.Append({
+        Start + 0, Start + 1, Start + 3,
+        Start + 1, Start + 4, Start + 3,
+        Start + 1, Start + 2, Start + 4,
+        Start + 2, Start + 5, Start + 4,
+        End + 0, End + 3, End + 1,
+        End + 1, End + 3, End + 4,
+        End + 1, End + 4, End + 2,
+        End + 2, End + 4, End + 5});
+}
+
+UStaticMesh* CreatePacuareForestFloorMesh(
+    UWorld* World,
+    const TCHAR* AssetToken,
+    EPacuareForestFloorForm Form,
+    int32 Seed,
+    UMaterialInterface* Material,
+    FString& OutSummary)
+{
+    if (!World || !AssetToken || !Material)
+    {
+        return nullptr;
+    }
+
+    TArray<FVector> Vertices;
+    TArray<int32> Triangles;
+    TArray<FVector> Normals;
+    TArray<FVector2D> Uvs;
+    TArray<FLinearColor> Colors;
+    const FLinearColor WetBark(0.040f, 0.029f, 0.018f, 1.0f);
+    const FLinearColor BarkBreak(0.094f, 0.062f, 0.031f, 1.0f);
+    const FLinearColor Moss(0.034f, 0.086f, 0.030f, 1.0f);
+    const FLinearColor LitterBrown(0.100f, 0.052f, 0.022f, 1.0f);
+    const FLinearColor LitterOlive(0.075f, 0.083f, 0.026f, 1.0f);
+
+    if (Form == EPacuareForestFloorForm::FoldedLeafLitter)
+    {
+        constexpr int32 LeafCount = 14;
+        for (int32 LeafIndex = 0; LeafIndex < LeafCount; ++LeafIndex)
+        {
+            const int32 LeafSeed = Seed + LeafIndex * 47;
+            const float Angle = UE_TWO_PI *
+                ZambeziVegetationUnitRandom(LeafSeed, 12001);
+            const float Radius = FMath::Lerp(
+                12.0f,
+                178.0f,
+                FMath::Sqrt(ZambeziVegetationUnitRandom(LeafSeed, 12007)));
+            const FVector Center(
+                FMath::Cos(Angle) * Radius,
+                FMath::Sin(Angle) * Radius,
+                FMath::Lerp(1.8f, 7.0f,
+                    ZambeziVegetationUnitRandom(LeafSeed, 12011)));
+            const FLinearColor LeafColor = FMath::Lerp(
+                LitterBrown,
+                LitterOlive,
+                ZambeziVegetationUnitRandom(LeafSeed, 12037));
+            AppendPacuareFoldedLeaf(
+                Center,
+                FMath::Lerp(38.0f, 82.0f,
+                    ZambeziVegetationUnitRandom(LeafSeed, 12041)),
+                FMath::Lerp(16.0f, 36.0f,
+                    ZambeziVegetationUnitRandom(LeafSeed, 12043)),
+                FMath::Lerp(2.4f, 8.5f,
+                    ZambeziVegetationUnitRandom(LeafSeed, 12049)),
+                FMath::Lerp(0.8f, 7.2f,
+                    ZambeziVegetationUnitRandom(LeafSeed, 12071)),
+                FRotator(
+                    FMath::Lerp(-8.0f, 8.0f,
+                        ZambeziVegetationUnitRandom(LeafSeed, 12073)),
+                    FMath::RadiansToDegrees(Angle) +
+                        FMath::Lerp(-85.0f, 85.0f,
+                            ZambeziVegetationUnitRandom(LeafSeed, 12097)),
+                    FMath::Lerp(-12.0f, 12.0f,
+                        ZambeziVegetationUnitRandom(LeafSeed, 12101))),
+                ScalePreviewColor(
+                    LeafColor,
+                    FMath::Lerp(0.72f, 1.12f,
+                        ZambeziVegetationUnitRandom(LeafSeed, 12107))),
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
+        }
+    }
+    else if (Form == EPacuareForestFloorForm::ButtressRoot)
+    {
+        AppendZambeziColoredSegment(
+            FVector::ZeroVector,
+            FVector(4.0f, -3.0f, 68.0f),
+            46.0f,
+            24.0f,
+            12,
+            WetBark,
+            BarkBreak,
+            Vertices,
+            Triangles,
+            Normals,
+            Uvs,
+            Colors);
+        constexpr int32 RootCount = 9;
+        for (int32 RootIndex = 0; RootIndex < RootCount; ++RootIndex)
+        {
+            const int32 RootSeed = Seed + RootIndex * 67;
+            const float Angle = UE_TWO_PI * static_cast<float>(RootIndex) /
+                    static_cast<float>(RootCount) +
+                FMath::Lerp(-0.18f, 0.18f,
+                    ZambeziVegetationUnitRandom(RootSeed, 12113));
+            const FVector Direction(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+            const FVector Tangent(-Direction.Y, Direction.X, 0.0f);
+            const float Length = FMath::Lerp(125.0f, 255.0f,
+                ZambeziVegetationUnitRandom(RootSeed, 12119));
+            const FVector Mid = Direction * Length * 0.48f +
+                Tangent * FMath::Lerp(-18.0f, 18.0f,
+                    ZambeziVegetationUnitRandom(RootSeed, 12143)) +
+                FVector::UpVector * 13.0f;
+            const FVector End = Direction * Length +
+                Tangent * FMath::Lerp(-26.0f, 26.0f,
+                    ZambeziVegetationUnitRandom(RootSeed, 12149)) +
+                FVector::UpVector * 4.0f;
+            AppendZambeziColoredSegment(
+                FVector(0.0f, 0.0f, 18.0f),
+                Mid,
+                20.0f,
+                9.0f,
+                8,
+                WetBark,
+                ScalePreviewColor(WetBark, 1.08f),
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
+            AppendZambeziColoredSegment(
+                Mid,
+                End,
+                9.0f,
+                2.4f,
+                7,
+                ScalePreviewColor(WetBark, 1.08f),
+                RootIndex % 3 == 0 ? Moss : BarkBreak,
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
+        }
+    }
+    else
+    {
+        FVector Start(-145.0f, -22.0f, 18.0f);
+        constexpr int32 SegmentCount = 5;
+        for (int32 SegmentIndex = 0;
+             SegmentIndex < SegmentCount;
+             ++SegmentIndex)
+        {
+            const float SegmentT = static_cast<float>(SegmentIndex + 1) /
+                static_cast<float>(SegmentCount);
+            const FVector End(
+                FMath::Lerp(-145.0f, 155.0f, SegmentT),
+                24.0f * FMath::Sin(SegmentT * PI * 1.4f + Seed * 0.03f),
+                16.0f + 10.0f * FMath::Sin(SegmentT * PI));
+            AppendZambeziColoredSegment(
+                Start,
+                End,
+                FMath::Lerp(22.0f, 10.0f,
+                    static_cast<float>(SegmentIndex) / SegmentCount),
+                FMath::Lerp(20.0f, 7.0f, SegmentT),
+                10,
+                SegmentIndex % 2 == 0 ? WetBark : BarkBreak,
+                SegmentIndex == SegmentCount - 1 ? BarkBreak : WetBark,
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
+            if (SegmentIndex == 1 || SegmentIndex == 3)
+            {
+                const float BranchSide = SegmentIndex == 1 ? -1.0f : 1.0f;
+                AppendZambeziColoredSegment(
+                    FMath::Lerp(Start, End, 0.62f),
+                    FMath::Lerp(Start, End, 0.62f) +
+                        FVector(42.0f, BranchSide * 88.0f, 28.0f),
+                    8.0f,
+                    2.2f,
+                    7,
+                    WetBark,
+                    BarkBreak,
+                    Vertices,
+                    Triangles,
+                    Normals,
+                    Uvs,
+                    Colors);
+            }
+            Start = End;
+        }
+        for (int32 MossIndex = 0; MossIndex < 5; ++MossIndex)
+        {
+            const float T = 0.16f + 0.15f * MossIndex;
+            AppendOpaqueLobe(
+                FVector(
+                    FMath::Lerp(-125.0f, 135.0f, T),
+                    12.0f * FMath::Sin(T * PI * 2.3f),
+                    37.0f),
+                FVector(18.0f, 13.0f, 7.0f),
+                Seed + MossIndex * 31,
+                ScalePreviewColor(Moss, 0.82f + 0.06f * MossIndex),
+                4,
+                8,
+                Vertices,
+                Triangles,
+                Normals,
+                Uvs,
+                Colors);
+        }
+    }
+
+    if (Vertices.IsEmpty() || Triangles.IsEmpty() ||
+        Colors.Num() != Vertices.Num() || Uvs.Num() != Vertices.Num())
+    {
+        OutSummary += FString::Printf(
+            TEXT("Pacuare forest-floor geometry contract failed for %s.\n"),
+            AssetToken);
+        return nullptr;
+    }
+    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    AActor* TemporaryActor = AddPreviewProceduralMeshActor(
+        World,
+        FString::Printf(TEXT("RaftSim_PacuareForestFloor_%s_BuildSource"), AssetToken),
+        Vertices,
+        Triangles,
+        Normals,
+        Uvs,
+        FLinearColor::White,
+        Material,
+        &Colors,
+        false);
+    if (!TemporaryActor)
+    {
+        return nullptr;
+    }
+    const FString PackagePath = FString(PacuareRainforestVegetationMeshRoot) +
+        AssetToken;
+    UStaticMesh* Mesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+        TemporaryActor,
+        PackagePath,
+        Material,
+        true,
+        ENaniteShapePreservation::None,
+        OutSummary);
+    TemporaryActor->Destroy();
+    if (Mesh)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Prepared Pacuare forest-floor %s: vertices=%d triangles=%d "
+                 "Nanite=%d collision=false.\n"),
+            AssetToken,
+            Mesh->GetNumVertices(0),
+            Mesh->GetNumTriangles(0),
+            Mesh->IsNaniteEnabled());
+    }
+    return Mesh;
+}
+
+bool CreatePacuareForestFloorAssets(
+    UWorld* World,
+    UMaterialInterface* Material,
+    TArray<UStaticMesh*>& OutMeshes,
+    FString& OutSummary)
+{
+    OutMeshes = {
+        CreatePacuareForestFloorMesh(
+            World,
+            TEXT("SM_RaftSim_Pacuare_FoldedLeafLitter_A_ForestFloorV1"),
+            EPacuareForestFloorForm::FoldedLeafLitter,
+            PacuareForestFloorDeterministicSeed,
+            Material,
+            OutSummary),
+        CreatePacuareForestFloorMesh(
+            World,
+            TEXT("SM_RaftSim_Pacuare_FoldedLeafLitter_B_ForestFloorV1"),
+            EPacuareForestFloorForm::FoldedLeafLitter,
+            PacuareForestFloorDeterministicSeed + 911,
+            Material,
+            OutSummary),
+        CreatePacuareForestFloorMesh(
+            World,
+            TEXT("SM_RaftSim_Pacuare_ButtressRoot_A_ForestFloorV1"),
+            EPacuareForestFloorForm::ButtressRoot,
+            PacuareForestFloorDeterministicSeed + 1901,
+            Material,
+            OutSummary),
+        CreatePacuareForestFloorMesh(
+            World,
+            TEXT("SM_RaftSim_Pacuare_Deadwood_A_ForestFloorV1"),
+            EPacuareForestFloorForm::Deadwood,
+            PacuareForestFloorDeterministicSeed + 2903,
+            Material,
+            OutSummary)};
+    const bool bComplete = OutMeshes.Num() == 4 &&
+        Algo::AllOf(OutMeshes, [](UStaticMesh* Mesh)
+        {
+            return Mesh && Mesh->IsNaniteEnabled() &&
+                Mesh->GetNumVertices(0) > 100 &&
+                Mesh->GetNumTriangles(0) > 100;
+        });
+    if (!bComplete)
+    {
+        OutSummary += TEXT(
+            "Failed to build the complete Pacuare forest-floor structure family.\n");
+    }
+    return bComplete;
 }
 
 UMaterial* CreateOpaqueVegetationMaterial(
@@ -2936,6 +3333,7 @@ bool AddLandscapeCandidateBiomeDressing(
     UStaticMesh* TemperateConiferTreeMeshB = nullptr;
     UStaticMesh* TemperateShrubMeshB = nullptr;
     UStaticMesh* TemperateUnderstoryMeshB = nullptr;
+    TArray<UStaticMesh*> PacuareForestFloorMeshes;
     UMaterialInterface* ZambeziOpaqueVegetationMaterial = nullptr;
     UMaterialInterface* PacuareOpaqueRainforestVegetationMaterial = nullptr;
     UMaterialInterface* TemperateOpaqueVegetationMaterial = nullptr;
@@ -2980,6 +3378,16 @@ bool AddLandscapeCandidateBiomeDressing(
         {
             return false;
         }
+        if (!CreatePacuareForestFloorAssets(
+                World,
+                PacuareOpaqueRainforestVegetationMaterial,
+                PacuareForestFloorMeshes,
+                OutSummary))
+        {
+            return false;
+        }
+        OutResult.DressingPacuareForestFloorMeshCount =
+            PacuareForestFloorMeshes.Num();
         OutResult.DressingBroadleafAssetPath = BroadleafTreeMesh->GetPathName();
         OutResult.DressingConiferAssetPath = ConiferTreeMesh->GetPathName();
         OutResult.DressingShrubAssetPath = ShrubMesh->GetPathName();
@@ -3084,7 +3492,7 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     OutResult.DressingAssetCount += ReviewedRockMeshes.Num() +
         ReviewedPineMeshes.Num() + FutaleufuScannedUnderstoryMeshes.Num() +
-        PacuareScannedFernMeshes.Num();
+        PacuareScannedFernMeshes.Num() + PacuareForestFloorMeshes.Num();
     if (bColoradoHance)
     {
         if (!CreateHanceOpaqueDrylandVegetationAssets(
@@ -3117,7 +3525,13 @@ bool AddLandscapeCandidateBiomeDressing(
                     ? ZambeziOpaqueVegetationMaterial
                     : (bPacuare
                            ? PacuareOpaqueRainforestVegetationMaterial
-                           : TemperateOpaqueVegetationMaterial))
+                           : TemperateOpaqueVegetationMaterial)) &&
+            (!bPacuare ||
+             (PacuareForestFloorMeshes.Num() == 4 &&
+              Algo::AllOf(PacuareForestFloorMeshes, [](UStaticMesh* Mesh)
+              {
+                  return Mesh && Mesh->IsNaniteEnabled();
+              })))
         : OutResult.DressingSourceSkeletalMeshCount == 4 &&
             OutResult.DressingConvertedStaticMeshCount == 4;
     if (!OutResult.bDressingAssetsLoaded)
@@ -3154,7 +3568,9 @@ bool AddLandscapeCandidateBiomeDressing(
         OutSummary += TEXT(
             "Pacuare replaces the repeated PVE alpha-card banks with two "
             "project-owned solid canopy forms plus opaque riparian shrub and "
-            "ground-cover meshes. The source-mask and slope-screened family is "
+            "ground-cover meshes. Four solid folded-leaf, root, and deadwood "
+            "forms add bounded source-grounded forest-floor structure. The "
+            "source-mask and slope-screened family is "
             "procedural rainforest infill, not exact species, ecology, or "
             "photoreal approval.\n");
     }
@@ -3690,6 +4106,23 @@ bool AddLandscapeCandidateBiomeDressing(
                 false));
     }
     TArray<UHierarchicalInstancedStaticMeshComponent*>
+        PacuareForestFloorInstances;
+    for (int32 MeshIndex = 0;
+         MeshIndex < PacuareForestFloorMeshes.Num();
+         ++MeshIndex)
+    {
+        PacuareForestFloorInstances.Add(
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                PacuareForestFloorMeshes[MeshIndex],
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_PacuareForestFloor%02d_%s"),
+                    MeshIndex + 1,
+                    *Candidate.PreviewSpec.RiverId),
+                MeshIndex >= 2,
+                PacuareOpaqueRainforestVegetationMaterial));
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
     TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziDryScarpOutcropInstances;
@@ -3817,6 +4250,12 @@ bool AddLandscapeCandidateBiomeDressing(
           !PacuareOrganicShorelineShrubInstances)) ||
         Algo::AnyOf(
             PacuareScannedFernInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
+        Algo::AnyOf(
+            PacuareForestFloorInstances,
             [](UHierarchicalInstancedStaticMeshComponent* Component)
             {
                 return Component == nullptr;
@@ -4203,6 +4642,38 @@ bool AddLandscapeCandidateBiomeDressing(
             Component->ComponentTags.AddUnique(
                 TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
             Component->SetCastShadow(false);
+        }
+        for (int32 ComponentIndex = 0;
+             ComponentIndex < PacuareForestFloorInstances.Num();
+             ++ComponentIndex)
+        {
+            UHierarchicalInstancedStaticMeshComponent* Component =
+                PacuareForestFloorInstances[ComponentIndex];
+            const FName FamilyTag = ComponentIndex < 2
+                ? FName(TEXT("RaftSimPacuareFoldedLeafLitter"))
+                : (ComponentIndex == 2
+                       ? FName(TEXT("RaftSimPacuareButtressRoot"))
+                       : FName(TEXT("RaftSimPacuareDeadwood")));
+            TagPacuareShorelineComponent(Component, FamilyTag);
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(TEXT("RaftSimPacuareForestFloorV1"));
+                Owner->Tags.AddUnique(TEXT("RaftSimProceduralInfill"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoTerrainCollisionOrWaterAuthority"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimPacuareForestFloorV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimProceduralInfill"));
+            if (ComponentIndex < 2)
+            {
+                Component->SetCastShadow(false);
+                Component->ComponentTags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            }
         }
         const TArray<UHierarchicalInstancedStaticMeshComponent*>
             PacuareEcologyComponents = {
@@ -6256,6 +6727,9 @@ bool AddLandscapeCandidateBiomeDressing(
     int32 PacuareScannedFernPlacedCount = 0;
     int32 PacuareShorelineShrubPlacedCount = 0;
     int32 PacuareShorelineShrubRejectedPlacementCount = 0;
+    int32 PacuareForestFloorLeafLitterPlacedCount = 0;
+    int32 PacuareForestFloorWoodyPlacedCount = 0;
+    int32 PacuareForestFloorRejectedPlacementCount = 0;
     float PacuareShorelineMinimumCenterlineDistanceCm =
         TNumericLimits<float>::Max();
     float PacuareShorelineMaximumSlopeDegrees = 0.0f;
@@ -6411,6 +6885,189 @@ bool AddLandscapeCandidateBiomeDressing(
             PacuareShorelineMaximumSlopeDegrees = FMath::Max(
                 PacuareShorelineMaximumSlopeDegrees,
                 BestSlopeDegrees);
+        }
+
+        const int32 ForestFloorTargetCount =
+            PacuareForestFloorLeafLitterTargetInstanceCount +
+            PacuareForestFloorWoodyTargetInstanceCount;
+        if (PacuareForestFloorMeshes.Num() == 4 &&
+            PacuareForestFloorInstances.Num() == 4)
+        {
+            for (int32 ForestFloorIndex = 0;
+                 ForestFloorIndex < ForestFloorTargetCount;
+                 ++ForestFloorIndex)
+            {
+                const bool bWoody = ForestFloorIndex >=
+                    PacuareForestFloorLeafLitterTargetInstanceCount;
+                const int32 FamilyIndex = bWoody
+                    ? ForestFloorIndex -
+                        PacuareForestFloorLeafLitterTargetInstanceCount
+                    : ForestFloorIndex;
+                const int32 FamilyTargetCount = bWoody
+                    ? PacuareForestFloorWoodyTargetInstanceCount
+                    : PacuareForestFloorLeafLitterTargetInstanceCount;
+                const float Side = FamilyIndex % 2 == 0 ? -1.0f : 1.0f;
+                const int32 AlongIndex = FamilyIndex / BankSideCount;
+                const int32 InstancesPerSide = FamilyTargetCount / BankSideCount;
+                const float AlongT =
+                    (static_cast<float>(AlongIndex) +
+                     ZambeziVegetationUnitRandom(
+                         ForestFloorIndex + PacuareForestFloorDeterministicSeed,
+                         12203)) /
+                    static_cast<float>(InstancesPerSide);
+                const float BaseLogicalX =
+                    FMath::Lerp(-2425.0f, 25325.0f, AlongT) +
+                    FMath::Lerp(
+                        -135.0f,
+                        135.0f,
+                        ZambeziVegetationUnitRandom(
+                            ForestFloorIndex + PacuareForestFloorDeterministicSeed,
+                            12211));
+                FVector2D BestPoint = ResolveLogicalRiverPoint(
+                    BaseLogicalX,
+                    Side * (VisibleRiverHalfWidth + (bWoody ? 310.0f : 120.0f)));
+                float BestSlopeDegrees = TNumericLimits<float>::Max();
+                float BestCenterlineDistanceCm = 0.0f;
+                float BestScore = TNumericLimits<float>::Max();
+                const float SlopeCeilingDegrees = bWoody
+                    ? PacuareForestFloorWoodySlopeCeilingDegrees
+                    : PacuareForestFloorLeafLitterSlopeCeilingDegrees;
+                for (int32 CandidateIndex = 0;
+                     CandidateIndex < 32;
+                     ++CandidateIndex)
+                {
+                    const int32 CandidateSeed =
+                        (ForestFloorIndex + PacuareForestFloorDeterministicSeed) * 41 +
+                        CandidateIndex;
+                    const float CandidateLogicalX = BaseLogicalX + FMath::Lerp(
+                        -150.0f,
+                        150.0f,
+                        ZambeziVegetationUnitRandom(CandidateSeed, 12227));
+                    const float AdditionalOffset = FMath::Lerp(
+                        bWoody ? 210.0f : 55.0f,
+                        bWoody ? 2350.0f : 2100.0f,
+                        FMath::Pow(
+                            ZambeziVegetationUnitRandom(CandidateSeed, 12239),
+                            bWoody ? 1.22f : 1.58f));
+                    const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                        CandidateLogicalX,
+                        Side * (VisibleRiverHalfWidth + AdditionalOffset));
+                    const float SlopeDegrees = GetLandscapeSlopeDegrees(
+                        CandidatePoint.X,
+                        CandidatePoint.Y);
+                    const float CenterlineDistanceCm =
+                        GetMinimumCenterlineDistanceCm(CandidatePoint);
+                    const float HeightAboveWaterCm = GetLandscapeHeight(
+                        CandidatePoint.X,
+                        CandidatePoint.Y) -
+                        GetConditionedWaterWorldZ(CandidateLogicalX);
+                    const float MinimumDryHeightCm = bWoody ? 60.0f : 18.0f;
+                    const float MaximumDryHeightCm = bWoody ? 2200.0f : 1750.0f;
+                    if (SlopeDegrees > SlopeCeilingDegrees ||
+                        CenterlineDistanceCm < VisibleRiverHalfWidth +
+                            (bWoody ? 180.0f : 45.0f) ||
+                        HeightAboveWaterCm < MinimumDryHeightCm ||
+                        HeightAboveWaterCm > MaximumDryHeightCm)
+                    {
+                        continue;
+                    }
+                    const float TargetDryHeightCm = FMath::Lerp(
+                        bWoody ? 260.0f : 65.0f,
+                        bWoody ? 1180.0f : 720.0f,
+                        ZambeziVegetationUnitRandom(
+                            ForestFloorIndex + PacuareForestFloorDeterministicSeed,
+                            12241));
+                    const float Score =
+                        0.55f * FMath::Abs(
+                            HeightAboveWaterCm - TargetDryHeightCm) /
+                            MaximumDryHeightCm +
+                        0.30f * AdditionalOffset /
+                            (bWoody ? 2350.0f : 2100.0f) +
+                        0.15f * SlopeDegrees / SlopeCeilingDegrees;
+                    if (Score < BestScore)
+                    {
+                        BestScore = Score;
+                        BestPoint = CandidatePoint;
+                        BestSlopeDegrees = SlopeDegrees;
+                        BestCenterlineDistanceCm = CenterlineDistanceCm;
+                    }
+                }
+                if (BestScore == TNumericLimits<float>::Max())
+                {
+                    ++PacuareForestFloorRejectedPlacementCount;
+                    continue;
+                }
+
+                const int32 MeshIndex = bWoody
+                    ? 2 + FamilyIndex % 2
+                    : FamilyIndex % 2;
+                UStaticMesh* ForestFloorMesh =
+                    PacuareForestFloorMeshes[MeshIndex];
+                UHierarchicalInstancedStaticMeshComponent* ForestFloorComponent =
+                    PacuareForestFloorInstances[MeshIndex];
+                const float TargetHeightCm = bWoody
+                    ? (MeshIndex == 2
+                           ? FMath::Lerp(
+                                 38.0f,
+                                 86.0f,
+                                 ZambeziVegetationUnitRandom(
+                                     ForestFloorIndex, 12251))
+                           : FMath::Lerp(
+                                 30.0f,
+                                 62.0f,
+                                 ZambeziVegetationUnitRandom(
+                                     ForestFloorIndex, 12253)))
+                    : FMath::Lerp(
+                          8.0f,
+                          18.0f,
+                          ZambeziVegetationUnitRandom(
+                              ForestFloorIndex, 12263));
+                const float MeshHeightCm = FMath::Max(
+                    1.0f,
+                    GetLandscapeCandidateEffectiveMeshBounds(
+                        ForestFloorMesh).GetSize().Z);
+                const float UniformScale = TargetHeightCm / MeshHeightCm;
+                AddGroundedInstance(
+                    ForestFloorComponent,
+                    ForestFloorMesh,
+                    BestPoint,
+                    GetLandscapeHeight(BestPoint.X, BestPoint.Y),
+                    FRotator(
+                        FMath::Clamp(BestSlopeDegrees * 0.035f, 0.0f, 1.4f),
+                        360.0f * ZambeziVegetationUnitRandom(
+                            ForestFloorIndex, 12269),
+                        FMath::Lerp(
+                            -2.0f,
+                            2.0f,
+                            ZambeziVegetationUnitRandom(
+                                ForestFloorIndex, 12277))),
+                    FVector(
+                        UniformScale * FMath::Lerp(
+                            0.78f,
+                            1.30f,
+                            ZambeziVegetationUnitRandom(
+                                ForestFloorIndex, 12281)),
+                        UniformScale * FMath::Lerp(
+                            0.76f,
+                            1.34f,
+                            ZambeziVegetationUnitRandom(
+                                ForestFloorIndex, 12289)),
+                        UniformScale));
+                if (bWoody)
+                {
+                    ++PacuareForestFloorWoodyPlacedCount;
+                }
+                else
+                {
+                    ++PacuareForestFloorLeafLitterPlacedCount;
+                }
+                PacuareShorelineMinimumCenterlineDistanceCm = FMath::Min(
+                    PacuareShorelineMinimumCenterlineDistanceCm,
+                    BestCenterlineDistanceCm);
+                PacuareShorelineMaximumSlopeDegrees = FMath::Max(
+                    PacuareShorelineMaximumSlopeDegrees,
+                    BestSlopeDegrees);
+            }
         }
 
         const int32 EcologyTargetCount =
@@ -6598,8 +7255,24 @@ bool AddLandscapeCandidateBiomeDressing(
         {
             Component->MarkRenderStateDirty();
         }
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareForestFloorInstances)
+        {
+            Component->MarkRenderStateDirty();
+        }
         OutResult.DressingPacuareScannedFernInstanceCount =
             PacuareScannedFernPlacedCount;
+        OutResult.DressingPacuareForestFloorTargetInstanceCount =
+            ForestFloorTargetCount;
+        OutResult.DressingPacuareForestFloorInstanceCount =
+            PacuareForestFloorLeafLitterPlacedCount +
+            PacuareForestFloorWoodyPlacedCount;
+        OutResult.DressingPacuareForestFloorRejectedPlacementCount =
+            PacuareForestFloorRejectedPlacementCount;
+        OutResult.DressingPacuareForestFloorMinimumCenterlineDistanceCm =
+            PacuareShorelineMinimumCenterlineDistanceCm;
+        OutResult.DressingPacuareForestFloorMaximumSlopeDegrees =
+            PacuareShorelineMaximumSlopeDegrees;
         OutSummary += FString::Printf(
             TEXT("Pacuare organic shoreline V1: %d/%d moss-rock analogs, ")
             TEXT("%d/%d short rainforest-floor patches (%d/%d rights-reviewed ")
@@ -6620,6 +7293,22 @@ bool AddLandscapeCandidateBiomeDressing(
             PacuareShorelineRockRejectedPlacementCount,
             PacuareShorelineGroundCoverRejectedPlacementCount,
             PacuareShorelineShrubRejectedPlacementCount,
+            PacuareShorelineMinimumCenterlineDistanceCm,
+            PacuareShorelineMaximumSlopeDegrees);
+        OutSummary += FString::Printf(
+            TEXT("Pacuare forest-floor structure V1: %d/%d folded-leaf litter ")
+            TEXT("clusters and %d/%d buttress-root/deadwood clusters placed; ")
+            TEXT("%d targets rejected, deterministic seed=%d, minimum ")
+            TEXT("centerline distance %.1f cm, maximum slope %.2f degrees. ")
+            TEXT("Opaque project-owned procedural infill is source-Landscape-")
+            TEXT("grounded and non-colliding with no species, ecology, terrain, ")
+            TEXT("water, hydraulic, bathymetric, or raft-force authority.\n"),
+            PacuareForestFloorLeafLitterPlacedCount,
+            PacuareForestFloorLeafLitterTargetInstanceCount,
+            PacuareForestFloorWoodyPlacedCount,
+            PacuareForestFloorWoodyTargetInstanceCount,
+            PacuareForestFloorRejectedPlacementCount,
+            PacuareForestFloorDeterministicSeed,
             PacuareShorelineMinimumCenterlineDistanceCm,
             PacuareShorelineMaximumSlopeDegrees);
     }
@@ -8138,6 +8827,12 @@ bool AddLandscapeCandidateBiomeDressing(
         (!bPacuare ||
          PacuareShorelineShrubPlacedCount >=
              PacuareOrganicShorelineShrubMinimumInstanceCount) &&
+        (!bPacuare ||
+         PacuareForestFloorLeafLitterPlacedCount >=
+             PacuareForestFloorLeafLitterMinimumInstanceCount) &&
+        (!bPacuare ||
+         PacuareForestFloorWoodyPlacedCount >=
+             PacuareForestFloorWoodyMinimumInstanceCount) &&
         (!bOpaqueTemperate ||
          TemperateWaterlinePlacedCount >=
              TemperateWaterlineStructureMinimumInstanceCount) &&

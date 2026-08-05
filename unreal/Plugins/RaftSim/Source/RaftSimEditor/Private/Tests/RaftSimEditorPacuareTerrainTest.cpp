@@ -483,4 +483,82 @@ bool FRaftSimPacuareScannedFernUnderstoryTest::RunTest(
     return !HasAnyErrors();
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareForestFloorStructureTest,
+    "RaftSim.M9.FPacuareForestFloorStructure",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareForestFloorStructureTest::RunTest(
+    const FString& Parameters)
+{
+    UMaterialInterface* Material = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Materials/"
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation."
+             "M_RaftSim_Pacuare_OpaqueRainforestVegetation"));
+    TestNotNull(TEXT("Pacuare forest-floor material exists"), Material);
+
+    struct FExpectedForestFloorMesh
+    {
+        const TCHAR* AssetName;
+        int32 MinimumVertexCount;
+        int32 MinimumTriangleCount;
+        float MinimumHorizontalSpanCm;
+    };
+    const FExpectedForestFloorMesh ExpectedMeshes[] = {
+        {TEXT("SM_RaftSim_Pacuare_FoldedLeafLitter_A_ForestFloorV1"),
+         430,
+         810,
+         280.0f},
+        {TEXT("SM_RaftSim_Pacuare_FoldedLeafLitter_B_ForestFloorV1"),
+         420,
+         790,
+         280.0f},
+        {TEXT("SM_RaftSim_Pacuare_ButtressRoot_A_ForestFloorV1"),
+         250,
+         240,
+         300.0f},
+        {TEXT("SM_RaftSim_Pacuare_Deadwood_A_ForestFloorV1"),
+         250,
+         300,
+         280.0f}};
+    for (const FExpectedForestFloorMesh& Expected : ExpectedMeshes)
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("/Game/RaftSim/Environment/PacuareRun/Vegetation/Meshes/%s.%s"),
+            Expected.AssetName,
+            Expected.AssetName);
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath);
+        TestNotNull(
+            FString::Printf(TEXT("%s exists"), Expected.AssetName),
+            Mesh);
+        if (!Mesh)
+        {
+            continue;
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s uses Nanite"), Expected.AssetName),
+            Mesh->IsNaniteEnabled());
+        TestTrue(
+            FString::Printf(TEXT("%s has bounded solid detail"), Expected.AssetName),
+            Mesh->GetNumVertices(0) >= Expected.MinimumVertexCount &&
+                Mesh->GetNumTriangles(0) >= Expected.MinimumTriangleCount);
+        TestTrue(
+            FString::Printf(TEXT("%s spans a visible floor patch"), Expected.AssetName),
+            FMath::Max(
+                Mesh->GetBounds().BoxExtent.X,
+                Mesh->GetBounds().BoxExtent.Y) * 2.0f >=
+                Expected.MinimumHorizontalSpanCm);
+        TestEqual(
+            FString::Printf(TEXT("%s has one material slot"), Expected.AssetName),
+            Mesh->GetStaticMaterials().Num(),
+            1);
+        TestEqual(
+            FString::Printf(TEXT("%s binds the rainforest material"), Expected.AssetName),
+            Mesh->GetMaterial(0),
+            Material);
+    }
+    return !HasAnyErrors();
+}
+
 #endif // WITH_AUTOMATION_TESTS

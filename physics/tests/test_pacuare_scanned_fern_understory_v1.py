@@ -118,7 +118,7 @@ def test_saved_manifest_records_scanned_fern_mix_and_runnable_map() -> None:
     assert candidate["runnable_gameplay_status"] == (
         "reference_runnable_upper_huacas_live_cooked_water_player_raft_and_game_mode"
     )
-    assert candidate["landscape_dressing_asset_count"] == 14
+    assert candidate["landscape_dressing_asset_count"] == 18
     assert candidate["landscape_dressing_external_review_asset_count"] == 10
     assert candidate["landscape_dressing_pacuare_scanned_fern_status"] == (
         "four_scanned_fern_meshes_nanite_and_material_validated_for_"

@@ -42,6 +42,20 @@ disabled. The editor build, focused M9 checks 2/2, all runnable-map PIE gates
 but photoreal promotion and all six external gates remain open in
 `docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_review.json`.
 
+**Pacuare forest-floor structure checkpoint, August 4:** four project-owned
+opaque Nanite forms now add 2,600 folded-leaf, 350 buttress-root, and 350
+deadwood instances beneath the runnable `L_UpperHuacas` bank vegetation.
+Deterministic seed 18437 places all 3,300 targets with zero rejects while
+retaining source-Landscape grounding, dry-height, slope, complete-visible-water,
+full-centerline, and protected-solver-strip gates. The layer is non-colliding
+and cannot alter terrain, water, cooked solver fields, hydraulics, bathymetry,
+buoyancy, or raft forces. The editor build, native Pacuare suite 6/6, all six
+runnable-map loads, and MapCheck 0/0 pass. This is retained organic-ground
+structure, not photoreal promotion: canopy, continuous litter/material detail,
+trunk-integrated roots, sub-meter terrain, water/VFX, target performance, and
+all six external gates remain open in
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_review.json`.
+
 **Zambezi V18 optical checkpoint, August 3:** the versioned runnable map now
 uses a river-local exposure-safe reflection bracket, darker bounded basalt
 shading, and 7,200 shorter launch-cover instances. The schema-v20 map audit,
@@ -4569,3 +4583,14 @@ path is verified, and the completion goal can be marked complete.
   webbing, glove seams/compression, motion-captured deformation, character-art
   review, and qualified-guide biomechanics approval remain open in
   `m9_upper_t_grip_contact_v1_review.json`.
+- Pacuare forest-floor structure V1 adds four project-owned opaque Nanite forms
+  under the existing screened rainforest layer: 2,600 folded-leaf, 350
+  buttress-root, and 350 deadwood instances, all accepted with deterministic
+  seed 18437 and zero rejects. Source-Landscape grounding, dry-height, slope,
+  complete-visible-water, centerline, and protected-solver-strip gates remain
+  fail-closed; the layer is non-colliding and presentation-only. The editor
+  build, native Pacuare 6/6, all-river P4 6/6, and MapCheck 0/0 pass. The
+  retained frames show subtle bank-surface breakup but remain photoreal-rejected
+  for procedural canopy, incomplete continuous litter and trunk-integrated
+  roots, smooth terrain, broad water, absent target performance, and all six
+  external approvals in `pacuare_forest_floor_structure_v1_review.json`.

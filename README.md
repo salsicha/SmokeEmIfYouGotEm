@@ -150,6 +150,16 @@ live `L_UpperHuacas` PIE gate, and MapCheck 0/0 pass. This is a bounded organic
 bank improvement, not a Pacuare species/ecology or photoreal approval; evidence
 and the six open external gates are in the
 [scanned-fern review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_scanned_fern_understory_v1_review.json).
+The August 4 forest-floor structure pass adds 2,600 folded-leaf, 350
+buttress-root, and 350 deadwood instances as four project-owned opaque Nanite
+forms. All 3,300 placements are source-Landscape grounded, screen against the
+complete visible-water and protected solver corridors, and retain no collision,
+water, terrain, hydraulic, bathymetric, or raft-force authority. Six native
+Pacuare tests and all six runnable-map loads pass with MapCheck 0/0. The new
+silhouettes break up bare ground but remain procedural visual infill—not exact
+ecology or photoreal approval; the retained captures and six open external gates
+are in the
+[forest-floor structure review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_review.json).
 Colorado's `L_Hance` is likewise restored as a reference-runnable physical
 reach: a 600×320 m Landscape preserves the complete 600×78 m interpreted Hance
 solver bed, procedurally fills missing outer-canyon terrain, and launches the
