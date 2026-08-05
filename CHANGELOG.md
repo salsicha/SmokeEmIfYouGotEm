@@ -32,6 +32,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Normalized 129 previously committed binary paths into the repository's existing
+  Git LFS policy. All 119 unique payloads (245,078,504 bytes) retain their exact
+  pre-normalization SHA-256 and size, and every referenced object is present in
+  the local LFS store. This repairs the false dirty-worktree state and makes
+  subsequent release-candidate asset commits reproducible; no image, terrain,
+  hydraulic, mesh, or gameplay content changed.
 - Re-certified Zambezi Batoka Gorge as runnable river 6 after the Pacuare
   forest-floor milestone. The player selection catalog and six-river Free Run manifest explicitly
   retain `runnable: true`, `availability: free_run`, and
