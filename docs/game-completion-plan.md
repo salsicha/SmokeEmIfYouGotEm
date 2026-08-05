@@ -17,17 +17,18 @@ Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
 to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
 and do not delay a complete South Fork 1.0.
 
-**Runnable-portfolio V17 checkpoint, August 4:** all six rivers are selectable
+**Runnable-portfolio V22 checkpoint, August 4:** all six rivers are selectable
 Free Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
-package. Its native catalog and progression gates pass 2/2, all 27 focused
-Python contracts pass, and the isolated Zambezi PIE gate loads the current map
-with MapCheck 0/0, the vertical-slice game mode, 10 live breaking sites, and 645
-rapid-foam vertices. This confirms runnable-reference status only and does not
-close its terrain, hydraulic, guide, rights, photoreal-art, or performance gates.
-The selection and progression manifests now also mark it `runnable: true` with
-`availability: free_run`. See
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v17_review.json`.
+package. All five native M6 frontend/progression gates pass, all 31 focused
+Python source/map contracts pass, and the isolated Zambezi PIE gate loads the current
+map with MapCheck 0/0, the vertical-slice game mode, 10 live breaking sites,
+and 645 rapid-foam vertices. This confirms runnable-reference status only and
+does not close its terrain, hydraulic, guide, rights, photoreal-art, or
+performance gates. The selection and progression manifests explicitly retain
+`runnable: true` with `availability: free_run` and point to the V22
+hash-locked evidence. See
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json`.
 
 **Futaleufú mixed-bank ecology checkpoint, August 4:** the regenerated runnable
 `L_Terminator` map uses seven rights-reviewed CC0 small-fir and fern meshes for

@@ -31,7 +31,7 @@ from raftsim.zambezi_reference_map import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RUNNABLE_RELEASE_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-    "zambezi_runnable_release_head_v18_review.json"
+    "zambezi_runnable_release_head_v22_review.json"
 )
 LIVE_WATER_V2_REVIEW = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -211,17 +211,17 @@ def _assert_historical_artifact_unchanged(relative: str, expected: str) -> None:
 
 def test_zambezi_release_head_runnable_review_is_hash_locked():
     review = _load(REPO_ROOT / RUNNABLE_RELEASE_REVIEW)
-    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v14"
+    assert review["schema"] == "raftsim.zambezi.runnable_release_head_review.v15"
     assert review["recorded_local_date"] == "2026-08-04"
     assert review["verified_parent_commit"] == (
-        "9342018832cb05be0d6338cbdcfc0292cbaba1b8"
+        "26fafc7b90a37ddaf3a7a5247cb4488ce5b4b80f"
     )
     assert review["result"] == "pass"
     assert review["classification"] == "runnable_reference_free_run"
     assert review["production_fidelity_promoted"] is False
     assert review["photoreal_promotion"] is False
     assert review["supersedes_review"].endswith(
-        "zambezi_runnable_release_head_v17_review.json"
+        "zambezi_runnable_release_head_v18_review.json"
     )
     assert review["player_path"] == {
         "game_mode": "Free Run",
@@ -262,18 +262,15 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
     }
     assert review["verification"]["release_head_editor_build"]["result"] == "success"
     assert review["verification"]["release_head_editor_build"][
-        "exact_candidate_source"
-    ] is True
-    assert review["verification"]["release_head_editor_build"][
-        "final_incremental_actions"
-    ] == 2
+        "verified_commit"
+    ] == review["verified_parent_commit"]
     assert review["verification"]["native_m6"]["passed"] == 5
     assert review["verification"]["native_m6"]["failed"] == 0
     assert review["verification"]["native_m6"]["catalog_and_progression_passed"] == 2
     assert review["verification"]["focused_python_contracts"]["passed"] == 31
-    assert review["verification"]["all_river_map_load"]["passed"] == 6
-    assert review["verification"]["all_river_map_load"]["failed"] == 0
-    zambezi_load = review["verification"]["all_river_map_load"]["zambezi"]
+    assert review["verification"]["focused_runnable_map_load"]["passed"] == 1
+    assert review["verification"]["focused_runnable_map_load"]["failed"] == 0
+    zambezi_load = review["verification"]["focused_runnable_map_load"]["zambezi"]
     assert zambezi_load["test"] == (
         "RaftSim.P4.RiverMapLoads.L_Zambezi"
     )
