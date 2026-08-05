@@ -23,13 +23,14 @@ native Futaleufú material checks, and all six runnable-river PIE loads pass.
 This is a bounded runtime ecology improvement, not photoreal or native-species
 approval; exact evidence and six open external gates are recorded in the
 [scanned-understory review](docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_scanned_understory_v1_review.json).
-The August 4 V22 release-head certification confirms again that the frontend
+The August 4 V23 release-head certification confirms again that the frontend
 selector, source scenario, shipping cook, saved map, and live PIE launch all
 resolve to `/Game/RaftSim/Maps/L_Zambezi`. Zambezi is runnable river 6, loads
 with the vertical-slice game mode and live cooked-field water, and is not an
 environment-preview-only map. The complete M6 frontend/progression suite passes
-5/5, all 31 focused Zambezi source/map contracts pass, and the isolated Zambezi
-map-load gate passes with MapCheck 0/0 on the current release head. Its gameplay
+5/5 without warnings or errors, five focused release/centerline/portfolio contracts pass,
+and the isolated Zambezi map-load gate passes with MapCheck 0/0 on the current
+release head. Its gameplay
 river is now a
 solver-owned, wet-cell-clipped transmitting core rather than the former opaque
 gray static ribbon. Its V2 optical body now consumes live wet-cell vertex-alpha
@@ -42,7 +43,7 @@ while restrained river-local reflection settings reduce clipped launch glare;
 project-owned flow-normal and solver-masked foam textures still have no
 hydraulic authority. The exact contract hashes, tests, runtime counts, and
 still-open production gates are recorded in the
-[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json),
+[release-head runnable review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_review.json),
 with matched visual evidence in the
 [V2 transmitting-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_live_transmitting_water_v2_review.json).
 The shared optical-bank change and its six-river no-regression evidence are

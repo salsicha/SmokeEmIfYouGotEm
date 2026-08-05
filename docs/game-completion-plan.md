@@ -17,18 +17,18 @@ Zambezi is the separate, full-corridor `reference_free_run` from the Boiling Pot
 to Mukuni Beach. All five remain the post-1.0 production-fidelity expansion path
 and do not delay a complete South Fork 1.0.
 
-**Runnable-portfolio V22 checkpoint, August 4:** all six rivers are selectable
+**Runnable-portfolio V23 checkpoint, August 4:** all six rivers are selectable
 Free Runs. Zambezi is explicitly river 6 and resolves through
 `zambezi_reference_run` to the committed `/Game/RaftSim/Maps/L_Zambezi`
-package. All five native M6 frontend/progression gates pass, all 31 focused
-Python source/map contracts pass, and the isolated Zambezi PIE gate loads the current
+package. All five native M6 frontend/progression gates pass without warnings,
+five focused Python release/centerline/portfolio contracts pass, and the isolated Zambezi PIE gate loads the current
 map with MapCheck 0/0, the vertical-slice game mode, 10 live breaking sites,
 and 645 rapid-foam vertices. This confirms runnable-reference status only and
 does not close its terrain, hydraulic, guide, rights, photoreal-art, or
 performance gates. The selection and progression manifests explicitly retain
-`runnable: true` with `availability: free_run` and point to the V22
+`runnable: true` with `availability: free_run` and point to the V23
 hash-locked evidence. See
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_review.json`.
 
 **Futaleufú mixed-bank ecology checkpoint, August 4:** the regenerated runnable
 `L_Terminator` map uses seven rights-reviewed CC0 small-fir and fern meshes for
@@ -4594,3 +4594,17 @@ path is verified, and the completion goal can be marked complete.
   for procedural canopy, incomplete continuous litter and trunk-integrated
   roots, smooth terrain, broad water, absent target performance, and all six
   external approvals in `pacuare_forest_floor_structure_v1_review.json`.
+- Zambezi runnable release-head V23 re-certifies the unchanged
+  `/Game/RaftSim/Maps/L_Zambezi` package as runnable river 6 after the Pacuare
+  forest-floor milestone. Both runtime manifests still expose `runnable: true`,
+  `availability: free_run`, and `zambezi_reference_run` at
+  `reference_free_run` tier, while advancing their evidence link to V23. Five
+  focused release/centerline/portfolio Python contracts pass; all five M6
+  frontend/progression tests pass without warnings; and the isolated live P4
+  load passes with MapCheck 0/0, 5,908 coordinate-map points, 10,465 surface
+  vertices, 10 breaking sites, 645 visible rapid-foam vertices, and 16,896
+  transmitting volume-core triangles. No map, scenario, cook, terrain,
+  hydraulics, collision, buoyancy, raft-force, or visual authority changed.
+  Production terrain, surveyed bathymetry, calibrated rapid hydraulics,
+  photoreal art, guide/geospatial/rights/readability review, and target-platform
+  qualification remain open in `zambezi_runnable_release_head_v23_review.json`.

@@ -1,0 +1,167 @@
+{
+  "schema": "raftsim.zambezi.runnable_release_head_review.v16",
+  "recorded_local_date": "2026-08-04",
+  "verified_parent_commit": "584988aed7380eba13a9d63dd2a2fa9169467791",
+  "branch": "release/1.0",
+  "result": "pass",
+  "classification": "runnable_reference_free_run",
+  "production_fidelity_promoted": false,
+  "photoreal_promotion": false,
+  "supersedes_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json",
+  "visual_milestone_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_organic_dry_scarp_v20_review.json",
+  "verification_context": {
+    "reason": "Re-certify the player-facing Zambezi run at the current release head after the Pacuare forest-floor milestone.",
+    "map_or_gameplay_contract_changed_since_v22": false,
+    "evidence_link_advanced": true
+  },
+  "player_path": {
+    "game_mode": "Free Run",
+    "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
+    "river_id": "zambezi_batoka_gorge",
+    "scenario_id": "zambezi_reference_run",
+    "map_package": "/Game/RaftSim/Maps/L_Zambezi",
+    "runnable_river_ordinal": 6,
+    "runnable_river_count": 6,
+    "tier": "reference_free_run",
+    "availability": "free_run"
+  },
+  "registry_assertions": {
+    "river_selection_catalog_portfolio_role": "runnable_river",
+    "river_selection_catalog_runnable": true,
+    "river_selection_catalog_tier": "reference_free_run",
+    "river_selection_catalog_availability": "free_run",
+    "progression_manifest_lists_zambezi": true,
+    "progression_manifest_runnable": true,
+    "progression_manifest_availability": "free_run",
+    "both_runtime_manifests_link_this_review": true,
+    "frontend_catalog_lists_zambezi": true,
+    "shipping_cook_lists_zambezi": true,
+    "versioned_map_present": true,
+    "superseded_preview_is_player_path": false
+  },
+  "verification": {
+    "release_head_editor_build": {
+      "target": "SmokeEmIfYouGotEmEditor Mac Development",
+      "result": "success",
+      "verified_commit": "584988aed7380eba13a9d63dd2a2fa9169467791",
+      "evidence": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_review.json",
+      "milestone_code_delta": false
+    },
+    "saved_map_audit": {
+      "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v23",
+      "passed": true,
+      "mapcheck_errors": 0,
+      "mapcheck_warnings": 0,
+      "actor_count": 75,
+      "rapid_marker_count": 25,
+      "player_raft_count": 1,
+      "player_start_count": 1,
+      "water_config_count": 1,
+      "conditioned_visual_terrain_tiles": 4,
+      "adaptive_near_field_actors": 2,
+      "dry_scarp_outcrop_components": 6,
+      "dry_scarp_outcrop_instances": 320,
+      "vegetation_instances": 14316,
+      "runnable_launch_ground_cover_instances": 6512,
+      "runnable_launch_woody_instances": 772,
+      "solver_owned_runtime_rendering": true,
+      "live_volume_core_enabled": true
+    },
+    "native_m6": {
+      "tests": "RaftSim.M6",
+      "passed": 5,
+      "failed": 0,
+      "succeeded_with_warnings": 0,
+      "catalog_and_progression_passed": 2,
+      "report_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_m6_gate.json"
+    },
+    "focused_runnable_map_load": {
+      "performed": 1,
+      "passed": 1,
+      "failed": 0,
+      "succeeded_with_warnings": 1,
+      "report_path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_p4_gate.json",
+      "zambezi": {
+        "test": "RaftSim.P4.RiverMapLoads.L_Zambezi",
+        "result": "success_with_accepted_warning",
+        "duration_seconds": 48.404781341552734,
+        "zambezi_mapcheck_errors": 0,
+        "zambezi_mapcheck_warnings": 0,
+        "game_mode": "RaftSimVerticalSliceGameMode",
+        "coordinate_map_points": 5908,
+        "surface_vertices": 10465,
+        "surface_triangles": 20480,
+        "active_breaking_sites": 10,
+        "rapid_foam_vertices": 645,
+        "volume_core_triangles": 16896,
+        "live_surface_refresh_cpu_ms": 6.568,
+        "automation_warnings": 1,
+        "accepted_warnings": [
+          "The external connectivity probe timed out after 3 seconds; it has no map-load or gameplay authority."
+        ],
+        "automation_errors": 0
+      }
+    },
+    "focused_python_contracts": {
+      "tests": [
+        "physics/tests/test_zambezi_reference_map.py::test_zambezi_release_head_runnable_review_is_hash_locked",
+        "physics/tests/test_zambezi_sentinel_centerline.py",
+        "physics/tests/test_named_rapid_registry.py::test_named_rapid_catalog_covers_six_runnable_rivers"
+      ],
+      "passed": 5,
+      "failed": 0
+    }
+  },
+  "hash_locked_current_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "sha256": "7d8a9ac7b151e0fb719d5e5e7492e55601325be1640798effa97cfb5318e3e48"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_reference_scenario_map_validation.json",
+      "sha256": "6636473cb7272c4e4a54038fce36a5b817c297061f3abdd6467fa3a7b9c7b93a"
+    },
+    {
+      "path": "unreal/Content/RaftSim/UI/river_selection_catalog.json",
+      "sha256": "7fda7de9a5ccd2486d3c7fe25436c2d39d5a15ffc387d852152eaa327c5b4b69"
+    },
+    {
+      "path": "unreal/Content/RaftSim/UI/m6_game_progression_manifest.json",
+      "sha256": "c80943b53b257136b57ed23ad369df8a1f74a0c07113b3753782b90c1610381b"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_m6_gate.json",
+      "sha256": "edcc0f5172a8a3299c7cfea86522cd08968215059524c0729cf4d05daf7d561f"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_p4_gate.json",
+      "sha256": "d69bd98cb75b8daa1b07458054260694dd721baa8d7c45f63b43ca94f202a703"
+    }
+  ],
+  "release_head_delta": {
+    "map_package_changed": false,
+    "runtime_registry_changed": true,
+    "runtime_registry_change": "Both manifests advance their runnable-release evidence link from V22 to V23; the river ID, scenario ID, map package, ordinal, tier, runnable flag, and availability remain unchanged.",
+    "documentation_changed": true,
+    "gameplay_or_physics_authority_changed": false,
+    "visual_change": "none"
+  },
+  "authority_boundary": {
+    "runnable_claim": "Free Run launches the committed L_Zambezi package with the vertical-slice gameplay stack and live cooked-field water.",
+    "terrain": "Copernicus GLO-30 remains collision and height-query authority; dense-tile relief, adaptive facade refinement, and dry-scarp outcrops are bounded non-colliding procedural presentation infill.",
+    "outcrops": "Rights-reviewed generic rock analogs only; no Batoka lithology, geospatial, collision, hydraulic, raft-force, navigation, or rapid-line authority.",
+    "ecology": "Project-owned procedural render-only ground-cover and woody analogs with no exact-species claim.",
+    "water_rendering": "Solver wet-cell geometry with render-only transmitting optics and raft-safe foam occlusion; no solver-state, collision, buoyancy, or raft-force authority changes.",
+    "hydraulics": "Feature-tagged procedural reference hydraulics, not validated rapid-specific real-world hydraulics.",
+    "navigation": "Not for navigation."
+  },
+  "open_external_acceptance_gates": [
+    "A named whitewater water-VFX and environment-art reviewer must approve the foam, crest, hole, spray, mist, reflection, transmission, shoreline-contact, terrain, and ecology presentation across representative flow bands.",
+    "Qualified guides for the represented rivers must approve rapid identity, aeration placement, line and hazard readability, and raft/swimmer occlusion at the represented flows.",
+    "A geospatial or technical-art reviewer must approve source alignment and the labeled procedural terrain, bank, bathymetry, rapid-geometry, and dry-scarp outcrop infill boundaries.",
+    "A rights and provenance reviewer must approve every production texture, mesh, reference-media use, attribution, and redistribution record.",
+    "A safety and gameplay-readability reviewer must approve that foam, spray, mist, vegetation, lighting, terrain dressing, raft, and characters do not hide hazards, swimmers, rescue targets, or solver failures.",
+    "Target-platform qualification must pass desktop performance, memory, streaming, fresh-machine rendering, and required VR or low-power readability budgets.",
+    "The product owner must approve the integrated moving-camera river, raft, equipment, character, animation, and water interaction presentation before M9 or photoreal promotion."
+  ]
+}
