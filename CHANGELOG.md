@@ -32,12 +32,12 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
-- Re-certified Zambezi Batoka Gorge as runnable river 6 on the current release
-  tip. The player selection catalog and six-river Free Run manifest explicitly
+- Re-certified Zambezi Batoka Gorge as runnable river 6 after the Pacuare
+  forest-floor milestone. The player selection catalog and six-river Free Run manifest explicitly
   retain `runnable: true`, `availability: free_run`, and
   `zambezi_reference_run` → `/Game/RaftSim/Maps/L_Zambezi`, and now link the
-  V22 hash-locked review. The committed map remains byte-identical. All 31
-  focused Python source/map contracts and all five M6 frontend/progression tests pass;
+  V23 hash-locked review. The committed 1.7 GB map remains byte-identical. Five
+  focused release/centerline/portfolio contracts and all five M6 frontend/progression tests pass without warnings;
   the live Zambezi PIE gate passes 1/1 with MapCheck 0/0, the vertical-slice
   game mode, cooked-field water, 10 live breaking sites, and 645 rapid-foam
   vertices. This certifies runnable reference play only; surveyed bathymetry,

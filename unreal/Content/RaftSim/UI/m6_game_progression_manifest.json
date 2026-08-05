@@ -61,7 +61,7 @@
           "tier": "reference_free_run",
           "runnable": true,
           "availability": "free_run",
-          "runnable_release_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json"
+          "runnable_release_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_review.json"
         }
       ]
     },

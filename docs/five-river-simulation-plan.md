@@ -36,12 +36,13 @@ the full-corridor Zambezi reference run:
 | Chilko | `chilko_river_lava_canyon` | **Lava Canyon** | `L_LavaCanyon` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Zambezi | `zambezi_batoka_gorge` | **Rapids 1–25 reference run** | `L_Zambezi` | **versioned reference runnable; production hydraulics gated** |
 
-Current-release-head V22 verification keeps Zambezi in ordinal position 6 of
+Current-release-head V23 verification keeps Zambezi in ordinal position 6 of
 the six-river Free Run registry. All five `RaftSim.M6` frontend/progression
 tests and `RaftSim.P4.RiverMapLoads.L_Zambezi` pass against the committed map;
-MapCheck reports 0 errors and 0 warnings, and 31 focused Python contracts pass.
+MapCheck reports 0 errors and 0 warnings, and five focused
+release/centerline/portfolio Python contracts pass.
 The hash-locked evidence is in
-`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v22_review.json`.
+`docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_runnable_release_head_v23_review.json`.
 
 The subsequent V18 Zambezi presentation pass preserves that same runnable
 selector and runtime contract while reducing clipped launch-water and scarp
