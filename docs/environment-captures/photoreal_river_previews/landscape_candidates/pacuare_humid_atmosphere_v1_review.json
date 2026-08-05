@@ -6,6 +6,7 @@
   "rapid_name": "Upper Huacas",
   "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
   "status": "retained_layered_humidity_improvement_photoreal_promotion_open",
+  "mutable_runtime_evidence_successor": "pacuare_scanned_fern_understory_v1_review.json",
   "passed": false,
   "decision": {
     "reference_runnable": true,
@@ -117,8 +118,8 @@
     "desktop and VR target-hardware performance, collision, capsize, recovery, and complete-run gameplay acceptance"
   ],
   "retained_artifacts": [
-    {"path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap", "role": "runnable map with serialized Pacuare humidity contract and runtime state-stream guard", "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4"},
-    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json", "role": "filtered Pacuare candidate manifest", "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435"},
+    {"path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap", "role": "runnable map with serialized Pacuare humidity contract and runtime state-stream guard", "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4", "hash_locked": false},
+    {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json", "role": "filtered Pacuare candidate manifest", "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435", "hash_locked": false},
     {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_guide_before.png", "role": "immutable guide-seat baseline", "sha256": "5a62ec14a117aac77961a711bf0c57cb99f216e7f167294986450ca401800b32"},
     {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_guide.png", "role": "retained guide-seat humidity capture", "sha256": "b164f0c290ec2bac9d52e2ba995eda1573c0404a1c23402552445202a54d5180"},
     {"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_river_eye_before.png", "role": "immutable river-eye baseline", "sha256": "2fe6ae29a578171ed29758989e010c11e561e14845f8b213597561c53f6cb7cd"},

@@ -3216,6 +3216,25 @@ static bool EnableReviewedEnvironmentMaterialUsages(const TCHAR* ObjectPath)
     return bNanite && bInstances && bSaved;
 }
 
+bool PromoteReviewedScannedUnderstoryMaterials(FString& OutSummary)
+{
+    bool bSucceeded = true;
+    for (const TCHAR* MaterialPath : {
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/"
+             "M_Fern02_Fronds.M_Fern02_Fronds"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/"
+             "M_FirSapling_Branches.M_FirSapling_Branches"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/"
+             "M_FirSapling_Twigs.M_FirSapling_Twigs")})
+    {
+        bSucceeded &= EnableReviewedEnvironmentMaterialUsages(MaterialPath);
+    }
+    OutSummary += FString::Printf(
+        TEXT("Reviewed scanned understory Nanite/HISM material usages persisted: %s.\n"),
+        bSucceeded ? TEXT("yes") : TEXT("no"));
+    return bSucceeded;
+}
+
 static void PromoteReviewedEnvironmentMaterials()
 {
     for (const TCHAR* MaterialPath : {
@@ -3243,6 +3262,8 @@ static void PromoteReviewedEnvironmentMaterials()
     {
         EnableReviewedEnvironmentMaterialUsages(MaterialPath);
     }
+    FString Summary;
+    PromoteReviewedScannedUnderstoryMaterials(Summary);
 }
 
 static void HandlePromoteReviewedEnvironmentMaterials(const TArray<FString>&)

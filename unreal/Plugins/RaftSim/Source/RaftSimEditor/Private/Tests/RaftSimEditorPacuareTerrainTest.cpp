@@ -409,4 +409,78 @@ bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
     return !HasAnyErrors();
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPacuareScannedFernUnderstoryTest,
+    "RaftSim.M9.FPacuareScannedFernUnderstory",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPacuareScannedFernUnderstoryTest::RunTest(
+    const FString& Parameters)
+{
+    static const TCHAR* AssetNames[] = {
+        TEXT("SM_Fern02_fern_02_a"),
+        TEXT("SM_Fern02_fern_02_b"),
+        TEXT("SM_Fern02_fern_02_c"),
+        TEXT("SM_Fern02_fern_02_d")};
+    for (const TCHAR* AssetName : AssetNames)
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/"
+                 "FutaleufuTemperateForestSet_1K/%s.%s"),
+            AssetName,
+            AssetName);
+        UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath);
+        TestNotNull(
+            FString::Printf(TEXT("Reviewed Pacuare fern analog %s exists"), AssetName),
+            Mesh);
+        if (!Mesh)
+        {
+            continue;
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s has Nanite enabled"), AssetName),
+            Mesh->IsNaniteEnabled());
+        TestTrue(
+            FString::Printf(TEXT("%s has material slots"), AssetName),
+            !Mesh->GetStaticMaterials().IsEmpty());
+        bool bHasFernFrondMaterial = false;
+        for (int32 MaterialIndex = 0;
+             MaterialIndex < Mesh->GetStaticMaterials().Num();
+             ++MaterialIndex)
+        {
+            const UMaterialInterface* Material = Mesh->GetMaterial(MaterialIndex);
+            TestNotNull(
+                FString::Printf(
+                    TEXT("%s material slot %d is bound"),
+                    AssetName,
+                    MaterialIndex),
+                Material);
+            if (Material)
+            {
+                const FString MaterialPath = Material->GetPathName();
+                TestTrue(
+                    FString::Printf(
+                        TEXT("%s material stays in the reviewed CC0 asset root"),
+                        AssetName),
+                    MaterialPath.Contains(
+                        TEXT("/FutaleufuTemperateForestSet_1K/")));
+                bHasFernFrondMaterial |=
+                    MaterialPath.Contains(TEXT("M_Fern02_Fronds"));
+                TestTrue(
+                    FString::Printf(
+                        TEXT("%s material supports instanced static meshes"),
+                        AssetName),
+                    Material->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes));
+                TestTrue(
+                    FString::Printf(TEXT("%s material supports Nanite"), AssetName),
+                    Material->GetUsageByFlag(MATUSAGE_Nanite));
+            }
+        }
+        TestTrue(
+            FString::Printf(TEXT("%s retains its scanned frond material"), AssetName),
+            bHasFernFrondMaterial);
+    }
+    return !HasAnyErrors();
+}
+
 #endif // WITH_AUTOMATION_TESTS

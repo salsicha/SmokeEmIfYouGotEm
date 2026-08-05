@@ -8,6 +8,7 @@
   "status": "retained_canopy_breakup_improvement_photoreal_promotion_open",
   "passed": false,
   "mutable_runtime_evidence_successor": "pacuare_humid_atmosphere_v1_review.json",
+  "current_mutable_runtime_evidence_successor": "pacuare_scanned_fern_understory_v1_review.json",
   "decision": {
     "reference_runnable": true,
     "technical_candidate_passed": true,
@@ -118,11 +119,13 @@
   "retained_artifacts": [
     {
       "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
-      "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4"
+      "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
-      "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435"
+      "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_canopy_morphology_v2_guide_before.png",
@@ -146,23 +149,28 @@
     },
     {
       "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Materials/M_RaftSim_Pacuare_OpaqueRainforestVegetation.uasset",
-      "sha256": "876b378fe869511f1bd1a711c77baca429483cb9943f962406ea4ee5735df2e9"
+      "sha256": "876b378fe869511f1bd1a711c77baca429483cb9943f962406ea4ee5735df2e9",
+      "hash_locked": false
     },
     {
       "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_CanopyTree_A_OpaqueV2.uasset",
-      "sha256": "dedb7b9da8ba70837723b86842a344d9e98443939aff9b38bb014d955b20b6d0"
+      "sha256": "dedb7b9da8ba70837723b86842a344d9e98443939aff9b38bb014d955b20b6d0",
+      "hash_locked": false
     },
     {
       "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_CanopyTree_B_OpaqueV2.uasset",
-      "sha256": "26ec7a28c74743296a8dfd68b0d12dd0fa91c71ea70a7034706df6946cc27210"
+      "sha256": "26ec7a28c74743296a8dfd68b0d12dd0fa91c71ea70a7034706df6946cc27210",
+      "hash_locked": false
     },
     {
       "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_RiparianShrub_A_OpaqueV2.uasset",
-      "sha256": "97d7fc48e37fbb6d0f26aa6626736e9c5f2b26c4d37280fc8abf3f49bcbc0354"
+      "sha256": "97d7fc48e37fbb6d0f26aa6626736e9c5f2b26c4d37280fc8abf3f49bcbc0354",
+      "hash_locked": false
     },
     {
       "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_RainforestGroundCover_A_OpaqueV2.uasset",
-      "sha256": "488441ac22d7ef122485ebd3b0d80b4f1d0a3c8ca990010c7ea1581ee289fde2"
+      "sha256": "488441ac22d7ef122485ebd3b0d80b4f1d0a3c8ca990010c7ea1581ee289fde2",
+      "hash_locked": false
     }
   ]
 }

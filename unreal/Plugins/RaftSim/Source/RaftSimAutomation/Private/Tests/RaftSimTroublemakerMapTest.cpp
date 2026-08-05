@@ -1243,6 +1243,8 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 OrganicShorelineRockInstanceCount = 0;
         int32 OrganicShorelineGroundCoverActorCount = 0;
         int32 OrganicShorelineGroundCoverInstanceCount = 0;
+        int32 ScannedFernActorCount = 0;
+        int32 ScannedFernInstanceCount = 0;
         int32 OrganicShorelineShrubActorCount = 0;
         int32 OrganicShorelineShrubInstanceCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
@@ -1307,6 +1309,23 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 OrganicShorelineGroundCoverInstanceCount +=
                     Instances->GetInstanceCount();
                 ++OrganicShorelineGroundCoverActorCount;
+                if (Actor->Tags.Contains(
+                        TEXT("RaftSimPacuareScannedFernUnderstoryV1")))
+                {
+                    Test->TestTrue(
+                        TEXT("Pacuare scanned ferns retain CC0 review provenance"),
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimRightsReviewedCC0UnderstoryAnalog")));
+                    const UStaticMesh* Mesh = Instances->GetStaticMesh();
+                    Test->TestTrue(
+                        TEXT("Pacuare scanned fern actor binds a reviewed fern mesh"),
+                        Mesh && Mesh->GetName().StartsWith(
+                            TEXT("SM_Fern02_fern_02_")) &&
+                            Mesh->GetPathName().Contains(
+                                TEXT("/FutaleufuTemperateForestSet_1K/")));
+                    ScannedFernInstanceCount += Instances->GetInstanceCount();
+                    ++ScannedFernActorCount;
+                }
             }
             if (Actor->Tags.Contains(
                     TEXT("RaftSimPacuareShorelineShrub")))
@@ -1322,9 +1341,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
             ++OrganicShorelineActorCount;
         }
         Test->TestEqual(
-            TEXT("Pacuare organic shoreline has eight dedicated morphology actors"),
+            TEXT("Pacuare organic shoreline has twelve dedicated morphology actors"),
             OrganicShorelineActorCount,
-            8);
+            12);
         Test->TestEqual(
             TEXT("Pacuare organic shoreline has six moss-rock variants"),
             OrganicShorelineRockActorCount,
@@ -1333,12 +1352,19 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("Pacuare organic shoreline retains dense moss-rock structure"),
             OrganicShorelineRockInstanceCount >= 2350);
         Test->TestEqual(
-            TEXT("Pacuare organic shoreline has one short ground-cover actor"),
+            TEXT("Pacuare organic shoreline has one procedural plus four scanned ground-cover actors"),
             OrganicShorelineGroundCoverActorCount,
-            1);
+            5);
         Test->TestTrue(
             TEXT("Pacuare organic shoreline retains dense rainforest-floor cover"),
             OrganicShorelineGroundCoverInstanceCount >= 4700);
+        Test->TestEqual(
+            TEXT("Pacuare uses all four reviewed scanned fern variants"),
+            ScannedFernActorCount,
+            4);
+        Test->TestTrue(
+            TEXT("Pacuare replaces most near-bank ground cover with scanned fern morphology"),
+            ScannedFernInstanceCount >= 3300);
         Test->TestEqual(
             TEXT("Pacuare organic shoreline has one shrub actor"),
             OrganicShorelineShrubActorCount,
