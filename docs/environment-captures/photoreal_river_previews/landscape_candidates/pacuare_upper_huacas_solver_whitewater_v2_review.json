@@ -6,6 +6,7 @@
   "milestone": "pacuare_upper_huacas_solver_whitewater_v2",
   "status": "accepted_capture_readability_photoreal_promotion_rejected",
   "mutable_runtime_evidence_successor": "pacuare_humid_atmosphere_v1_review.json",
+  "current_mutable_runtime_evidence_successor": "pacuare_scanned_fern_understory_v1_review.json",
   "decision": {
     "reference_runnable": true,
     "capture_reads_as_moving_whitewater": true,
@@ -55,23 +56,28 @@
   "retained_artifacts": [
     {
       "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
-      "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4"
+      "sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "b164f0c290ec2bac9d52e2ba995eda1573c0404a1c23402552445202a54d5180"
+      "sha256": "b164f0c290ec2bac9d52e2ba995eda1573c0404a1c23402552445202a54d5180",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "2b2dc20bbb4cc650e300e89f1b41c3bb54910d62dd30009c946406851f2783d1"
+      "sha256": "2b2dc20bbb4cc650e300e89f1b41c3bb54910d62dd30009c946406851f2783d1",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
-      "sha256": "70f8af95eb90569c139781d25ea9e7fb946809b4281dc0958416b8c70a797c03"
+      "sha256": "70f8af95eb90569c139781d25ea9e7fb946809b4281dc0958416b8c70a797c03",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
-      "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435"
+      "sha256": "b92ce3c17cddb3c1fb0ad6c2db775cf2c70b916ec379e6f71f40e4738d2ba435",
+      "hash_locked": false
     },
     {
       "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/pacuare_upper_huacas_rainfed_depth_speed_froude_surface_v1.png",

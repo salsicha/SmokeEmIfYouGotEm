@@ -128,6 +128,17 @@ matched result is retained as a technical improvement, while terrain,
 rainforest ecology, whitewater VFX, calibration, external review, and
 photoreal promotion remain open in the
 [Pacuare live-water review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_live_transmitting_water_v1_review.json).
+The August 4 scanned-fern pass replaces 3,640 of the 5,200 screened near-bank
+ground-cover placements with four rights-reviewed CC0 scanned fern forms while
+retaining 1,560 procedural patches for density and variation. All placements
+remain grounded on the source Landscape, outside the complete visible-water
+and protected solver corridors, non-colliding, and physically
+non-authoritative. Explicit Nanite and instanced-mesh material flags keep the
+forms valid outside the editor; the editor build, five native Pacuare tests,
+live `L_UpperHuacas` PIE gate, and MapCheck 0/0 pass. This is a bounded organic
+bank improvement, not a Pacuare species/ecology or photoreal approval; evidence
+and the six open external gates are in the
+[scanned-fern review](docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_scanned_fern_understory_v1_review.json).
 Colorado's `L_Hance` is likewise restored as a reference-runnable physical
 reach: a 600×320 m Landscape preserves the complete 600×78 m interpreted Hance
 solver bed, procedurally fills missing outer-canyon terrain, and launches the

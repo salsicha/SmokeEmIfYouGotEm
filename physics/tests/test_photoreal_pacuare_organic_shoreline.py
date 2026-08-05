@@ -48,9 +48,10 @@ def test_pacuare_organic_shoreline_source_is_dense_and_authority_bounded():
 
 def test_pacuare_runtime_gate_audits_saved_shoreline_instances():
     source = MAP_TEST_SOURCE.read_text(encoding="utf-8")
-    assert "Pacuare organic shoreline has eight dedicated morphology actors" in source
+    assert "Pacuare organic shoreline has twelve dedicated morphology actors" in source
     assert "OrganicShorelineRockInstanceCount >= 2350" in source
     assert "OrganicShorelineGroundCoverInstanceCount >= 4700" in source
+    assert "ScannedFernInstanceCount >= 3300" in source
     assert "OrganicShorelineShrubInstanceCount >= 1050" in source
     assert "Pacuare organic shoreline remains non-colliding" in source
     assert "Pacuare organic shoreline disclaims hydraulic authority" in source

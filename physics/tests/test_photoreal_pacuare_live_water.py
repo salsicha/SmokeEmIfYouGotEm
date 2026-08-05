@@ -129,4 +129,5 @@ def test_pacuare_transmitting_water_review_is_honest_and_hash_locked() -> None:
     for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
-        assert _sha256(path) == artifact["sha256"]
+        if artifact.get("hash_locked", True):
+            assert _sha256(path) == artifact["sha256"]

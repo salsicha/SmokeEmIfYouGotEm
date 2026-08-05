@@ -95,6 +95,8 @@ constexpr float PacuareOrganicShorelineRockSlopeCeilingDegrees = 50.0f;
 constexpr int32 PacuareOrganicShorelineGroundCoverTargetInstanceCount = 5200;
 constexpr int32 PacuareOrganicShorelineGroundCoverMinimumInstanceCount = 4700;
 constexpr float PacuareOrganicShorelineGroundCoverSlopeCeilingDegrees = 44.0f;
+constexpr int32 PacuareScannedFernTargetInstanceCount = 3640;
+constexpr int32 PacuareScannedFernMinimumInstanceCount = 3300;
 constexpr int32 PacuareOrganicShorelineShrubTargetInstanceCount = 1200;
 constexpr int32 PacuareOrganicShorelineShrubMinimumInstanceCount = 1050;
 constexpr float PacuareOrganicShorelineShrubSlopeCeilingDegrees = 38.0f;
@@ -2833,6 +2835,12 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     TArray<UStaticMesh*> FutaleufuScannedUnderstoryMeshes;
+    if ((bFutaleufu || bPacuare) &&
+        !RaftSimPhotorealMaterials::
+            PromoteReviewedScannedUnderstoryMaterials(OutSummary))
+    {
+        return false;
+    }
     if (bFutaleufu)
     {
         static const TCHAR* AssetNames[] = {
@@ -2872,6 +2880,49 @@ bool AddLandscapeCandidateBiomeDressing(
                 TEXT("%s scanned near-bank understory loaded %d/7 meshes or failed material/Nanite validation.\n"),
                 *Candidate.PreviewSpec.RiverId,
                 FutaleufuScannedUnderstoryMeshes.Num());
+            return false;
+        }
+    }
+
+    TArray<UStaticMesh*> PacuareScannedFernMeshes;
+    if (bPacuare)
+    {
+        static const TCHAR* AssetNames[] = {
+            TEXT("SM_Fern02_fern_02_a"),
+            TEXT("SM_Fern02_fern_02_b"),
+            TEXT("SM_Fern02_fern_02_c"),
+            TEXT("SM_Fern02_fern_02_d")};
+        for (const TCHAR* AssetName : AssetNames)
+        {
+            const FString ObjectPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/%s.%s"),
+                AssetName,
+                AssetName);
+            if (UStaticMesh* Mesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+            {
+                PacuareScannedFernMeshes.Add(Mesh);
+            }
+        }
+        OutResult.DressingPacuareScannedFernMeshCount =
+            PacuareScannedFernMeshes.Num();
+        OutResult.DressingExternalReviewAssetCount +=
+            PacuareScannedFernMeshes.Num();
+        OutResult.bDressingPacuareScannedFernMaterialsValidated =
+            PacuareScannedFernMeshes.Num() == 4 &&
+            Algo::AllOf(
+                PacuareScannedFernMeshes,
+                [](UStaticMesh* Mesh)
+                {
+                    return Mesh &&
+                        Mesh->GetName().StartsWith(TEXT("SM_Fern02_")) &&
+                        ValidateFutaleufuScannedUnderstoryMaterials(Mesh);
+                });
+        if (!OutResult.bDressingPacuareScannedFernMaterialsValidated)
+        {
+            OutSummary += FString::Printf(
+                TEXT("%s scanned fern morphology loaded %d/4 meshes or failed material/Nanite validation.\n"),
+                *Candidate.PreviewSpec.RiverId,
+                PacuareScannedFernMeshes.Num());
             return false;
         }
     }
@@ -3032,7 +3083,8 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
     }
     OutResult.DressingAssetCount += ReviewedRockMeshes.Num() +
-        ReviewedPineMeshes.Num() + FutaleufuScannedUnderstoryMeshes.Num();
+        ReviewedPineMeshes.Num() + FutaleufuScannedUnderstoryMeshes.Num() +
+        PacuareScannedFernMeshes.Num();
     if (bColoradoHance)
     {
         if (!CreateHanceOpaqueDrylandVegetationAssets(
@@ -3622,6 +3674,22 @@ bool AddLandscapeCandidateBiomeDressing(
               PacuareOpaqueRainforestVegetationMaterial)
         : nullptr;
     TArray<UHierarchicalInstancedStaticMeshComponent*>
+        PacuareScannedFernInstances;
+    for (int32 MeshIndex = 0;
+         MeshIndex < PacuareScannedFernMeshes.Num();
+         ++MeshIndex)
+    {
+        PacuareScannedFernInstances.Add(
+            AddLandscapeCandidateInstancedMeshComponent(
+                World,
+                PacuareScannedFernMeshes[MeshIndex],
+                FString::Printf(
+                    TEXT("RaftSim_LandscapeCandidate_PacuareScannedFern%02d_%s"),
+                    MeshIndex + 1,
+                    *Candidate.PreviewSpec.RiverId),
+                false));
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziRunnableLaunchTalusInstances;
     TArray<UHierarchicalInstancedStaticMeshComponent*>
         ZambeziDryScarpOutcropInstances;
@@ -3747,6 +3815,12 @@ bool AddLandscapeCandidateBiomeDressing(
         (bPacuare &&
          (!PacuareOrganicShorelineGroundCoverInstances ||
           !PacuareOrganicShorelineShrubInstances)) ||
+        Algo::AnyOf(
+            PacuareScannedFernInstances,
+            [](UHierarchicalInstancedStaticMeshComponent* Component)
+            {
+                return Component == nullptr;
+            }) ||
         Algo::AnyOf(
             ZambeziRunnableLaunchTalusInstances,
             [](UHierarchicalInstancedStaticMeshComponent* Component)
@@ -4106,6 +4180,30 @@ bool AddLandscapeCandidateBiomeDressing(
         TagPacuareShorelineComponent(
             PacuareOrganicShorelineShrubInstances,
             TEXT("RaftSimPacuareShorelineShrub"));
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareScannedFernInstances)
+        {
+            TagPacuareShorelineComponent(
+                Component,
+                TEXT("RaftSimPacuareShorelineGroundCover"));
+            if (AActor* Owner = Component ? Component->GetOwner() : nullptr)
+            {
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimPacuareScannedFernUnderstoryV1"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimRightsReviewedCC0UnderstoryAnalog"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimNoSpeciesOrEcologyAuthority"));
+                Owner->Tags.AddUnique(TEXT("RaftSimOrganicBankGroundCover"));
+                Owner->Tags.AddUnique(
+                    TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            }
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimPacuareScannedFernUnderstoryV1"));
+            Component->ComponentTags.AddUnique(
+                TEXT("RaftSimGroundCoverSelfShadowSuppressed"));
+            Component->SetCastShadow(false);
+        }
         const TArray<UHierarchicalInstancedStaticMeshComponent*>
             PacuareEcologyComponents = {
                 PacuareOrganicShorelineGroundCoverInstances,
@@ -4494,7 +4592,18 @@ bool AddLandscapeCandidateBiomeDressing(
               PacuareOrganicShorelineShrubInstances->GetCollisionEnabled() ==
                   ECollisionEnabled::NoCollision &&
               PacuareOrganicShorelineShrubInstances->GetMaterial(0) ==
-                  OpaqueVegetationMaterial));
+                  OpaqueVegetationMaterial &&
+              PacuareScannedFernInstances.Num() == 4 &&
+              Algo::AllOf(
+                  PacuareScannedFernInstances,
+                  [](UHierarchicalInstancedStaticMeshComponent* Component)
+                  {
+                      return Component &&
+                          Component->GetCollisionEnabled() ==
+                              ECollisionEnabled::NoCollision &&
+                          ValidateFutaleufuScannedUnderstoryMaterials(
+                              Component->GetStaticMesh());
+                  })));
     }
     else
     {
@@ -6144,6 +6253,7 @@ bool AddLandscapeCandidateBiomeDressing(
     int32 PacuareShorelineRockRejectedPlacementCount = 0;
     int32 PacuareShorelineGroundCoverPlacedCount = 0;
     int32 PacuareShorelineGroundCoverRejectedPlacementCount = 0;
+    int32 PacuareScannedFernPlacedCount = 0;
     int32 PacuareShorelineShrubPlacedCount = 0;
     int32 PacuareShorelineShrubRejectedPlacementCount = 0;
     float PacuareShorelineMinimumCenterlineDistanceCm =
@@ -6411,13 +6521,26 @@ bool AddLandscapeCandidateBiomeDressing(
                 continue;
             }
 
-            UStaticMesh* EcologyMesh = bShrub ? ShrubMesh : UnderstoryMesh;
+            const bool bUseScannedFern = !bShrub &&
+                FamilyIndex % 10 < 7 &&
+                PacuareScannedFernMeshes.Num() == 4 &&
+                PacuareScannedFernInstances.Num() == 4;
+            const int32 ScannedFernVariantIndex = bUseScannedFern
+                ? FamilyIndex % PacuareScannedFernMeshes.Num()
+                : INDEX_NONE;
+            UStaticMesh* EcologyMesh = bShrub
+                ? ShrubMesh
+                : (bUseScannedFern
+                       ? PacuareScannedFernMeshes[ScannedFernVariantIndex]
+                       : UnderstoryMesh);
             UHierarchicalInstancedStaticMeshComponent* EcologyComponent = bShrub
                 ? PacuareOrganicShorelineShrubInstances
-                : PacuareOrganicShorelineGroundCoverInstances;
+                : (bUseScannedFern
+                       ? PacuareScannedFernInstances[ScannedFernVariantIndex]
+                       : PacuareOrganicShorelineGroundCoverInstances);
             const float TargetHeightCm = FMath::Lerp(
-                bShrub ? 135.0f : 26.0f,
-                bShrub ? 360.0f : 118.0f,
+                bShrub ? 135.0f : (bUseScannedFern ? 38.0f : 26.0f),
+                bShrub ? 360.0f : (bUseScannedFern ? 96.0f : 118.0f),
                 ZambeziVegetationUnitRandom(EcologyIndex, 11251));
             const float MeshHeightCm = FMath::Max(
                 1.0f,
@@ -6452,6 +6575,7 @@ bool AddLandscapeCandidateBiomeDressing(
             else
             {
                 ++PacuareShorelineGroundCoverPlacedCount;
+                PacuareScannedFernPlacedCount += bUseScannedFern ? 1 : 0;
             }
             ++OutResult.DressingFoliageInstanceCount;
             ++OutResult.DressingUnderstoryInstanceCount;
@@ -6469,9 +6593,17 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         PacuareOrganicShorelineGroundCoverInstances->MarkRenderStateDirty();
         PacuareOrganicShorelineShrubInstances->MarkRenderStateDirty();
+        for (UHierarchicalInstancedStaticMeshComponent* Component :
+             PacuareScannedFernInstances)
+        {
+            Component->MarkRenderStateDirty();
+        }
+        OutResult.DressingPacuareScannedFernInstanceCount =
+            PacuareScannedFernPlacedCount;
         OutSummary += FString::Printf(
             TEXT("Pacuare organic shoreline V1: %d/%d moss-rock analogs, ")
-            TEXT("%d/%d short rainforest-floor patches, and %d/%d shrubs ")
+            TEXT("%d/%d short rainforest-floor patches (%d/%d rights-reviewed ")
+            TEXT("scanned fern morphology analogs), and %d/%d shrubs ")
             TEXT("placed across both full-route banks; rejected rock/cover/shrub ")
             TEXT("targets=%d/%d/%d, minimum centerline distance %.1f cm, and ")
             TEXT("maximum slope %.2f degrees. Source-Landscape-grounded, ")
@@ -6481,6 +6613,8 @@ bool AddLandscapeCandidateBiomeDressing(
             PacuareOrganicShorelineRockTargetInstanceCount,
             PacuareShorelineGroundCoverPlacedCount,
             PacuareOrganicShorelineGroundCoverTargetInstanceCount,
+            PacuareScannedFernPlacedCount,
+            PacuareScannedFernTargetInstanceCount,
             PacuareShorelineShrubPlacedCount,
             PacuareOrganicShorelineShrubTargetInstanceCount,
             PacuareShorelineRockRejectedPlacementCount,
@@ -7998,6 +8132,9 @@ bool AddLandscapeCandidateBiomeDressing(
         (!bPacuare ||
          PacuareShorelineGroundCoverPlacedCount >=
              PacuareOrganicShorelineGroundCoverMinimumInstanceCount) &&
+        (!bPacuare ||
+         PacuareScannedFernPlacedCount >=
+             PacuareScannedFernMinimumInstanceCount) &&
         (!bPacuare ||
          PacuareShorelineShrubPlacedCount >=
              PacuareOrganicShorelineShrubMinimumInstanceCount) &&

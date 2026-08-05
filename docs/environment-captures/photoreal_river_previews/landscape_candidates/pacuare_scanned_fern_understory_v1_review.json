@@ -1,0 +1,156 @@
+{
+  "schema": "raftsim.environment.pacuare_scanned_fern_understory_review.v1",
+  "generated_on": "2026-08-04",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "status": "accepted_bounded_cc0_scanned_fern_candidate_photoreal_gate_still_open",
+  "passed": false,
+  "runtime_artifacts_promoted": true,
+  "photoreal_production_promoted": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "project_owned_canopy_preserved": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "cooked_fields_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false,
+    "promotion": "retain_four_rights_reviewed_scanned_fern_assets_as_generic_near_bank_morphology_analogs_keep_species_ecology_and_photoreal_claims_review_gated"
+  },
+  "implementation": {
+    "runtime_tag": "RaftSimPacuareScannedFernUnderstoryV1",
+    "rights_tag": "RaftSimRightsReviewedCC0UnderstoryAnalog",
+    "source_grounding_tag": "RaftSimSourceLandscapeGrounded",
+    "solver_clearance_tag": "RaftSimOutsideProtectedSolverStrip",
+    "authority_tag": "RaftSimNoSpeciesOrEcologyAuthority",
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+    "source_manifest_reuse_boundary": "The source manifest was prepared for the Futaleufu asset review. Pacuare reuses only the same CC0 Fern 02 files and recorded rights provenance as generic humid-rainforest-floor morphology; it makes no Pacuare species, ecology, geography, or field-survey claim.",
+    "license": "CC0 1.0 Universal",
+    "asset_root": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K",
+    "scanned_mesh_count": 4,
+    "scanned_fern_target_instances": 3640,
+    "scanned_fern_instances": 3640,
+    "procedural_groundcover_instances": 1560,
+    "total_groundcover_instances": 5200,
+    "shrub_instances": 1200,
+    "moss_rock_instances": 2600,
+    "rejected_placements": 0,
+    "total_foliage_instances": 18400,
+    "canopy_instances": 5993,
+    "understory_instances": 12407,
+    "minimum_centerline_distance_cm": 1777.5,
+    "maximum_placed_slope_degrees": 29.55,
+    "collision": "disabled",
+    "shadow_policy": "scanned and procedural short ground cover self-shadow suppressed; shrubs and moss-rock analogs retain scene shading",
+    "material_packaging_contract": "Fern and active small-fir materials persist explicit Nanite and InstancedStaticMeshes usage flags; final Pacuare PIE MapCheck is zero errors and zero warnings.",
+    "placement": "deterministic_source_landscape_grounded_dry_bank_slope_and_centerline_screened_outside_complete_visible_water_width_and_protected_solver_strip",
+    "authority": "presentation_only_rights_reviewed_generic_fern_morphology_analogs_no_pacuare_species_ecology_geography_collision_hydraulic_bathymetry_or_raft_force_authority"
+  },
+  "matched_capture_comparison": {
+    "baseline": "The retained humid-atmosphere V1 guide, river-eye, and solver-rapid frames are the closest pre-change fixed-camera baseline.",
+    "valid_for_presence_and_silhouette_review": true,
+    "valid_for_isolating_only_fern_color_or_water_response": false,
+    "reason": "The complete deterministic map regeneration also refreshes temporal water and renderer state, so small whole-frame water deltas cannot be attributed to the fern substitution.",
+    "finding": "The four scanned forms add localized fine frond silhouettes and break up part of the former single procedural groundcover family without creating a new dominant color band or entering the water corridor. At the canonical camera distance the change is modest; adult canopy, broad bank shape, and water defects remain visually dominant."
+  },
+  "accepted_findings": [
+    "The regenerated L_UpperHuacas map remains reference-runnable and contains four tagged, non-colliding scanned-fern HISM actors with 3,640 instances.",
+    "Seventy percent of the accepted 5,200 near-bank groundcover targets now use four scanned fern forms; 1,560 procedural placements remain for density and morphological variation.",
+    "Every placement retains the established source-Landscape height, dry-bank, slope, full-centerline, complete-visible-water-width, and protected-solver-strip gates.",
+    "The CC0 source materials now persist explicit Nanite and hierarchical-instancing usage flags, removing the two packaging warnings found by the first runnable-map pass.",
+    "The project-owned canopy, shrub population, moss-rock layer, total foliage budget, cooked field, collision, water geometry, hydraulics, bathymetry, and raft forces remain unchanged.",
+    "The final editor build, five native Pacuare tests, focused runnable-map PIE gate, and MapCheck all pass."
+  ],
+  "remaining_photoreal_defects": [
+    "Adult canopy crowns, trunks, branches, and shrub lobes remain angular, repetitive, and visibly procedural at guide-seat and river-eye distances.",
+    "The reused fern assets are generic morphology analogs; no qualified Pacuare ecology review has accepted their species, density, age, season, disturbance, or wetness pattern.",
+    "Near-bank ground still lacks continuous leaf litter, roots, vines, epiphytes, deadwood, wet sediment, small plants, and sub-meter microtopography.",
+    "The broad smooth banks and 30 m source context do not resolve surveyed bank breaklines, boulders, bedrock structure, waterfalls, or rapid-scale gorge geometry.",
+    "The foreground water remains dark, broad, and visually smooth, with weak breaking-wave volume, aeration, foam complexity, spray, mist, rock-contact plumes, refraction, and riverbed transition.",
+    "Atmospheric depth, rainy-season lighting, cloud response, wind, moving canopy, and wet-surface variation remain incomplete.",
+    "The canonical environment-only frames do not validate raft, crew, paddle, water-occlusion, guide-line, hazard, or rescue readability in this updated bank context.",
+    "No measured desktop or VR performance profile has accepted the added scanned population on named target hardware."
+  ],
+  "required_external_acceptance_gates": [
+    "A qualified Pacuare rafting guide accepts Upper Huacas route identity, water levels, entry and exit, named hazards, guide lines, rescue routes, and gameplay sightlines in runnable guide-eye views.",
+    "A geospatial reviewer accepts coordinate transforms, vertical datum, route stationing, shoreline and bank breaklines, higher-resolution terrain, rocks, waterfalls, and the declared boundary between sourced terrain and procedural gap fill.",
+    "A hydraulic reviewer accepts calibrated and converged flow bands against observed Upper Huacas discharge, surface elevations, velocities, Froude behavior, rapid-specific features, and hazard response.",
+    "A regional ecologist and environment-art reviewer accepts species and morphology analog use, density, age classes, season, wetness, disturbance, geology, ground cover, lighting, and rainforest atmosphere.",
+    "A water-VFX and character/equipment art review accepts water transmission, raft and crew occlusion, waves, holes, rollers, aeration, spray, foam, bank intersections, paddles, animation, and close-range asset quality.",
+    "Measured full-run desktop and VR profiles pass release frame-time, memory, streaming, shader, collision, capsize, recovery, stability, comfort, and complete-run gameplay budgets on named target hardware."
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final material-usage integration build.",
+    "filtered_regeneration": "Pacuare completed successfully with 3,640/3,640 scanned ferns and zero rejected rock, groundcover, or shrub targets.",
+    "focused_native_material_terrain_water_and_asset_tests": "RaftSim.M9.FPacuare passed 5/5 with zero test warnings or errors.",
+    "focused_runnable_map_gate": "RaftSim.P4.RiverMapLoads.L_UpperHuacas passed 1/1 with zero test warnings or errors.",
+    "mapcheck": "0 errors, 0 warnings after scanned-material Nanite and InstancedStaticMeshes usage persistence.",
+    "pacuare_python_contracts": "89/89 Pacuare environment and Upper Huacas contracts passed; the final review/hash-lock file passes 5/5 in isolation.",
+    "visual_review": "technical candidate retained; photoreal production promotion rejected."
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "sha256": "1765fbff85a1f3ea9853d6d65342666e7f3e472966f85a7667c0d85cdbdd17c0",
+      "hash_locked": false
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
+      "sha256": "12429ddcf7f7bae962bb91eb950aa2f746a91b9a269310129749315456278532",
+      "hash_locked": false
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_guide.png",
+      "sha256": "b164f0c290ec2bac9d52e2ba995eda1573c0404a1c23402552445202a54d5180"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_river_eye.png",
+      "sha256": "2b2dc20bbb4cc650e300e89f1b41c3bb54910d62dd30009c946406851f2783d1"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_humid_atmosphere_v1_solver_rapid.png",
+      "sha256": "70f8af95eb90569c139781d25ea9e7fb946809b4281dc0958416b8c70a797c03"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "2324e47127af3b14e99d80b668aa173a2bc58a0155bd7b6d4dc097dbf654220e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "779b512781d80895d8d6bce4dd66db813218d6ba59a5d862d31f97c06784318e"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
+      "sha256": "3404c242891232843718134c62fffe5ec069546cfcc2b2e9d2b8c993b6d4339f"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "sha256": "ef633c5ef9e5e5653e551d41d188d24d23f365d31443cfca1693247fcba60500"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.uasset",
+      "sha256": "e423638ea6a07d3bde180ab98bfa1535d467233bd9f0fb86748e7df85bf1cd00"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.uasset",
+      "sha256": "a07008a263811286515cbb6c680b21321bbea7970782766035722b3be0cfba73"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.uasset",
+      "sha256": "329dd284789d1d296938146f42bb8fb94bb7e3aa0d438d73ae3c8120d9c88474"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_scanned_fern_understory_v1_m9_tests.json",
+      "sha256": "1991758cf489e13ce594c8e98f10c7ee4ea49feb098066db617882a4266f87b3"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_scanned_fern_understory_v1_p4_river_map_loads.json",
+      "sha256": "7adb1179676c223ee6f217af0f491fabeeddcdc024cbf8c24ab63f0b351ed378"
+    }
+  ]
+}

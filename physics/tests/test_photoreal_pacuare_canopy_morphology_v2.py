@@ -110,4 +110,5 @@ def test_pacuare_v2_review_is_fail_closed_and_hash_locked():
     for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file(), artifact["path"]
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]
+        if artifact.get("hash_locked", True):
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]

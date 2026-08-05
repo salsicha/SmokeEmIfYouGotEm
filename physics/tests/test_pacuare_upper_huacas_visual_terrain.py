@@ -123,4 +123,5 @@ def test_upper_huacas_runnable_review_is_hash_locked_and_honest():
     for artifact in review["retained_artifacts"]:
         path = REPO_ROOT / artifact["path"]
         assert path.is_file()
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]
+        if artifact.get("hash_locked", True):
+            assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]

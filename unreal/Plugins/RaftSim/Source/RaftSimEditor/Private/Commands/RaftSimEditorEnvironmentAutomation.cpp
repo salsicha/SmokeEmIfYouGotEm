@@ -744,6 +744,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_futaleufu_scanned_understory_assets\": [\"SM_FirSapling_fir_sapling_a\", \"SM_FirSapling_fir_sapling_b\", \"SM_FirSapling_fir_sapling_c\", \"SM_Fern02_fern_02_a\", \"SM_Fern02_fern_02_b\", \"SM_Fern02_fern_02_c\", \"SM_Fern02_fern_02_d\"],\n")
             TEXT("      \"landscape_dressing_futaleufu_medium_fir_canopy_excluded\": true,\n")
             TEXT("      \"landscape_dressing_futaleufu_project_owned_canopy_preserved\": true,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_authority\": \"rights_reviewed_cc0_generic_fern_morphology_analogs_only_no_pacuare_species_ecology_geography_collision_hydraulic_or_raft_force_authority\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_target_instance_count\": 3640,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_assets\": [\"SM_Fern02_fern_02_a\", \"SM_Fern02_fern_02_b\", \"SM_Fern02_fern_02_c\", \"SM_Fern02_fern_02_d\"],\n")
+            TEXT("      \"landscape_dressing_pacuare_scanned_fern_project_owned_canopy_preserved\": true,\n")
             TEXT("      \"landscape_dressing_external_review_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_broadleaf_asset\": \"%s\",\n")
@@ -1032,6 +1041,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.DressingExternalRockMeshCount == 6 &&
                     Result.DressingFutaleufuScannedUnderstoryMeshCount == 7
                 ? TEXT("rights_reviewed_cc0_six_rock_plus_seven_small_fir_and_fern_understory_analogs_loaded_with_explicit_materials")
+                : Result.DressingExternalRockMeshCount == 6 &&
+                        Result.DressingPacuareScannedFernMeshCount == 4
+                ? TEXT("rights_reviewed_cc0_six_rock_plus_four_scanned_fern_morphology_analogs_loaded_with_explicit_materials")
                 : Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
                 ? TEXT("rights_reviewed_cc0_six_rock_and_three_pine_sets_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
                 : (Result.DressingExternalRockMeshCount == 6
@@ -1058,6 +1070,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 : TEXT("not_enabled_for_this_river"),
             Result.DressingFutaleufuScannedUnderstoryMeshCount,
             Result.DressingFutaleufuScannedUnderstoryInstanceCount,
+            Result.DressingPacuareScannedFernMeshCount > 0
+                ? (Result.bDressingPacuareScannedFernMaterialsValidated
+                       ? TEXT("four_scanned_fern_meshes_nanite_and_material_validated_for_source_grounded_near_bank_review_candidate")
+                       : TEXT("scanned_fern_meshes_loaded_but_material_or_nanite_validation_failed"))
+                : TEXT("not_enabled_for_this_river"),
+            Result.DressingPacuareScannedFernMeshCount,
+            Result.DressingPacuareScannedFernInstanceCount,
             *EscapeRaftSimJsonString(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath

@@ -1,0 +1,15 @@
+{
+  "schema": "raftsim.environment.focused_runnable_map_test_evidence.v1",
+  "recorded_on": "2026-08-04",
+  "platform": "MacEditor Metal SM6",
+  "filter": "RaftSim.P4.RiverMapLoads.L_UpperHuacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "succeeded": 1,
+  "succeeded_with_warnings": 0,
+  "failed": 0,
+  "not_run": 0,
+  "mapcheck_errors": 0,
+  "mapcheck_warnings": 0,
+  "scanned_fern_material_usage_warnings": 0,
+  "source_report": "/private/tmp/raftsim-pacuare-scanned-fern-v1-final-p4/index.json"
+}

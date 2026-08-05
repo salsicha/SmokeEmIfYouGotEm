@@ -729,6 +729,9 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 DressingFutaleufuScannedUnderstoryMeshCount = 0;
     int32 DressingFutaleufuScannedUnderstoryInstanceCount = 0;
     bool bDressingFutaleufuScannedUnderstoryMaterialsValidated = false;
+    int32 DressingPacuareScannedFernMeshCount = 0;
+    int32 DressingPacuareScannedFernInstanceCount = 0;
+    bool bDressingPacuareScannedFernMaterialsValidated = false;
     bool bDressingExternalBroadleafReviewAssetLoaded = false;
     bool bDressingExternalBroadleafMaterialsValidated = false;
     bool bDressingExternalConiferReviewAssetLoaded = false;
@@ -2792,6 +2795,7 @@ bool BuildChilkoLavaCanyonWaterTextureAssets();
 bool BuildZambeziBatokaWaterTextureAssets();
 bool BuildCrewSkinTextureAssets();
 bool BuildEquipmentTextileTextureAssets();
+bool PromoteReviewedScannedUnderstoryMaterials(FString& OutSummary);
 bool CreatePhotorealRiverWaterMaterial(FString& OutSummary);
 bool CreateLiveRiverSurfaceMaterial(FString& OutSummary);
 bool CreateWaterVfxMaterial(FString& OutSummary);

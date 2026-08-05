@@ -4543,3 +4543,14 @@ path is verified, and the completion goal can be marked complete.
   hydraulics, buoyancy, and raft forces are unchanged. Photoreal promotion and
   all seven external approvals remain open in
   `docs/environment-captures/south_fork_full_reach/m9_organic_horizon_v1/review.json`.
+- Pacuare scanned-fern understory V1 replaces 3,640 of the 5,200 accepted
+  near-bank groundcover placements with four rights-reviewed CC0 scanned fern
+  forms while preserving 1,560 procedural patches, the project-owned canopy,
+  and every source-Landscape, dry-bank, slope, visible-water, centerline, and
+  protected-solver-strip gate. The active scanned materials now persist Nanite
+  and instanced-static-mesh usage flags; the final editor build, five native
+  Pacuare tests, live `L_UpperHuacas` PIE gate, and MapCheck 0/0 pass. This is
+  non-colliding presentation-only morphology, not Pacuare species/ecology or
+  photoreal approval. Adult canopy, sub-meter ground/bank detail, water/VFX,
+  hydraulics, guide/geospatial/art review, and desktop/VR qualification remain
+  open in `pacuare_scanned_fern_understory_v1_review.json`.
