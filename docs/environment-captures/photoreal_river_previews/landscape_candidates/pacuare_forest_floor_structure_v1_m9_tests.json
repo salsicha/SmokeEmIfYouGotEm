@@ -1,0 +1,119 @@
+﻿{
+	"devices": [
+		{
+			"deviceName": "Alexs-Air.attlocal.net",
+			"instance": "E4DCB5C7694CD19CF47E87A587DFCB2D",
+			"instanceName": "Alexs-Air.attlocal.net-75709",
+			"platform": "MacEditor",
+			"oSVersion": "macOS 26.5.2 25F84",
+			"model": "Default",
+			"gPU": "Apple M5",
+			"cPUModel": "Apple M5",
+			"rAMInGB": 32,
+			"renderMode": "SM6",
+			"rHI": "",
+			"appInstanceLog": ""
+		}
+	],
+	"reportCreatedOn": "2026.08.05-04.27.49",
+	"succeeded": 6,
+	"succeededWithWarnings": 0,
+	"failed": 0,
+	"notRun": 0,
+	"inProcess": 0,
+	"totalDuration": 0.21319225430488586,
+	"comparisonExported": false,
+	"comparisonExportDirectory": "",
+	"tests": [
+		{
+			"testDisplayName": "FPacuareForestFloorStructure",
+			"fullTestPath": "RaftSim.M9.FPacuareForestFloorStructure",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E4DCB5C7694CD19CF47E87A587DFCB2D"
+			],
+			"duration": 0.008351542055606842,
+			"dateTime": "2026.08.05-04.27.48",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareLiveTransmittingWater",
+			"fullTestPath": "RaftSim.M9.FPacuareLiveTransmittingWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E4DCB5C7694CD19CF47E87A587DFCB2D"
+			],
+			"duration": 0.16497962176799774,
+			"dateTime": "2026.08.05-04.27.48",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareOpaqueRainforestVegetation",
+			"fullTestPath": "RaftSim.M9.FPacuareOpaqueRainforestVegetation",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E4DCB5C7694CD19CF47E87A587DFCB2D"
+			],
+			"duration": 0.013280417770147324,
+			"dateTime": "2026.08.05-04.27.49",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareOrganicRainforestTerrain",
+			"fullTestPath": "RaftSim.M9.FPacuareOrganicRainforestTerrain",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E4DCB5C7694CD19CF47E87A587DFCB2D"
+			],
+			"duration": 0.0085922069847583771,
+			"dateTime": "2026.08.05-04.27.49",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareRainforestDefaultLitWater",
+			"fullTestPath": "RaftSim.M9.FPacuareRainforestDefaultLitWater",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E4DCB5C7694CD19CF47E87A587DFCB2D"
+			],
+			"duration": 0.008304789662361145,
+			"dateTime": "2026.08.05-04.27.49",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		},
+		{
+			"testDisplayName": "FPacuareScannedFernUnderstory",
+			"fullTestPath": "RaftSim.M9.FPacuareScannedFernUnderstory",
+			"tags": [],
+			"state": "Success",
+			"deviceInstance": [
+				"E4DCB5C7694CD19CF47E87A587DFCB2D"
+			],
+			"duration": 0.0096836648881435394,
+			"dateTime": "2026.08.05-04.27.49",
+			"entries": [],
+			"warnings": 0,
+			"errors": 0,
+			"artifacts": []
+		}
+	]
+}

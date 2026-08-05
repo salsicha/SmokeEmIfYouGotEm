@@ -1247,6 +1247,13 @@ bool FRaftSimAssertRiverMapCommand::Update()
         int32 ScannedFernInstanceCount = 0;
         int32 OrganicShorelineShrubActorCount = 0;
         int32 OrganicShorelineShrubInstanceCount = 0;
+        int32 ForestFloorActorCount = 0;
+        int32 ForestFloorLeafActorCount = 0;
+        int32 ForestFloorLeafInstanceCount = 0;
+        int32 ForestFloorRootActorCount = 0;
+        int32 ForestFloorRootInstanceCount = 0;
+        int32 ForestFloorDeadwoodActorCount = 0;
+        int32 ForestFloorDeadwoodInstanceCount = 0;
         for (TActorIterator<AActor> It(World); It; ++It)
         {
             AActor* Actor = *It;
@@ -1338,12 +1345,49 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     Instances->GetInstanceCount();
                 ++OrganicShorelineShrubActorCount;
             }
+            if (Actor->Tags.Contains(TEXT("RaftSimPacuareForestFloorV1")))
+            {
+                Test->TestTrue(
+                    TEXT("Pacuare forest floor retains procedural-infill authority"),
+                    Actor->Tags.Contains(TEXT("RaftSimProceduralInfill")) &&
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimNoSpeciesOrEcologyAuthority")) &&
+                        Actor->Tags.Contains(
+                            TEXT("RaftSimNoTerrainCollisionOrWaterAuthority")));
+                const UStaticMesh* Mesh = Instances->GetStaticMesh();
+                Test->TestTrue(
+                    TEXT("Pacuare forest floor binds a project-owned V1 mesh"),
+                    Mesh && Mesh->GetPathName().Contains(
+                        TEXT("/PacuareRun/Vegetation/Meshes/")) &&
+                        Mesh->GetName().EndsWith(TEXT("ForestFloorV1")));
+                if (Actor->Tags.Contains(
+                        TEXT("RaftSimPacuareFoldedLeafLitter")))
+                {
+                    Test->TestFalse(
+                        TEXT("Pacuare low leaf litter suppresses self-shadowing"),
+                        Instances->CastShadow);
+                    ForestFloorLeafInstanceCount += Instances->GetInstanceCount();
+                    ++ForestFloorLeafActorCount;
+                }
+                if (Actor->Tags.Contains(
+                        TEXT("RaftSimPacuareButtressRoot")))
+                {
+                    ForestFloorRootInstanceCount += Instances->GetInstanceCount();
+                    ++ForestFloorRootActorCount;
+                }
+                if (Actor->Tags.Contains(TEXT("RaftSimPacuareDeadwood")))
+                {
+                    ForestFloorDeadwoodInstanceCount += Instances->GetInstanceCount();
+                    ++ForestFloorDeadwoodActorCount;
+                }
+                ++ForestFloorActorCount;
+            }
             ++OrganicShorelineActorCount;
         }
         Test->TestEqual(
-            TEXT("Pacuare organic shoreline has twelve dedicated morphology actors"),
+            TEXT("Pacuare organic shoreline has sixteen dedicated morphology actors"),
             OrganicShorelineActorCount,
-            12);
+            16);
         Test->TestEqual(
             TEXT("Pacuare organic shoreline has six moss-rock variants"),
             OrganicShorelineRockActorCount,
@@ -1372,6 +1416,34 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestTrue(
             TEXT("Pacuare organic shoreline retains a layered shrub transition"),
             OrganicShorelineShrubInstanceCount >= 1050);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor has four dedicated solid morphology actors"),
+            ForestFloorActorCount,
+            4);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor has two folded-leaf litter variants"),
+            ForestFloorLeafActorCount,
+            2);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor places the complete leaf-litter population"),
+            ForestFloorLeafInstanceCount,
+            2600);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor has one buttress-root actor"),
+            ForestFloorRootActorCount,
+            1);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor places half its woody targets as roots"),
+            ForestFloorRootInstanceCount,
+            350);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor has one deadwood actor"),
+            ForestFloorDeadwoodActorCount,
+            1);
+        Test->TestEqual(
+            TEXT("Pacuare forest floor places half its woody targets as deadwood"),
+            ForestFloorDeadwoodInstanceCount,
+            350);
         return true;
     }
 

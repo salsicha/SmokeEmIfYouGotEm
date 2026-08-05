@@ -1,0 +1,142 @@
+{
+  "schema": "raftsim.environment.pacuare_forest_floor_structure_review.v1",
+  "generated_on": "2026-08-04",
+  "river_id": "pacuare",
+  "rapid_name": "Upper Huacas",
+  "map_package": "/Game/RaftSim/Maps/L_UpperHuacas",
+  "status": "accepted_bounded_project_owned_forest_floor_candidate_photoreal_gate_still_open",
+  "passed": false,
+  "runtime_artifacts_promoted": true,
+  "photoreal_production_promoted": false,
+  "decision": {
+    "reference_runnable": true,
+    "technical_candidate_passed": true,
+    "photoreal_acceptance_passed": false,
+    "procedural_gap_fill_disclosed": true,
+    "terrain_geometry_changed": false,
+    "terrain_collision_changed": false,
+    "water_geometry_changed": false,
+    "cooked_fields_changed": false,
+    "hydraulics_changed": false,
+    "bathymetry_changed": false,
+    "raft_forces_changed": false,
+    "promotion": "retain_project_owned_opaque_folded_leaf_root_and_deadwood_forms_as_screened_forest_floor_structure_keep_species_ecology_geography_and_photoreal_claims_review_gated"
+  },
+  "implementation": {
+    "runtime_tag": "RaftSimPacuareForestFloorV1",
+    "procedural_infill_tag": "RaftSimProceduralInfill",
+    "source_grounding_tag": "RaftSimSourceLandscapeGrounded",
+    "solver_clearance_tag": "RaftSimOutsideProtectedSolverStrip",
+    "collision_tag": "RaftSimNonCollisionRenderSurface",
+    "ecology_authority_tag": "RaftSimNoSpeciesOrEcologyAuthority",
+    "physical_authority_tag": "RaftSimNoTerrainCollisionOrWaterAuthority",
+    "deterministic_seed": 18437,
+    "mesh_count": 4,
+    "forms": [
+      "folded_leaf_litter_a",
+      "folded_leaf_litter_b",
+      "buttress_root_a",
+      "deadwood_a"
+    ],
+    "folded_leaf_instances": 2600,
+    "buttress_root_instances": 350,
+    "deadwood_instances": 350,
+    "total_instances": 3300,
+    "rejected_placements": 0,
+    "minimum_centerline_distance_cm": 1777.5,
+    "maximum_placed_slope_degrees": 29.571,
+    "placement_search_candidates_per_target": 32,
+    "collision": "disabled",
+    "rendering": "opaque_default_lit_vertex_color_material_four_nanite_static_meshes_in_four_hierarchical_instanced_components",
+    "placement": "deterministic_full_route_both_bank_source_landscape_grounded_dry_height_slope_centerline_complete_visible_water_and_protected_solver_strip_screening",
+    "authority": "project_owned_presentation_only_procedural_gap_fill_no_species_ecology_geography_terrain_collision_water_hydraulic_bathymetric_or_raft_force_authority"
+  },
+  "visual_review": {
+    "camera_set": "canonical_pacuare_guide_seat_river_eye_and_solver_rapid_views",
+    "finding": "The new brown folded-leaf and deadwood silhouettes add subtle irregular structure to previously uninterrupted near-bank ground. The change is visible but modest; blocky adult canopy, smooth broad terrain, sparse continuous litter coverage, and broad flat-looking water still dominate the scene.",
+    "valid_for_presence_and_bank_surface_breakup_review": true,
+    "valid_for_species_ecology_or_photoreal_acceptance": false
+  },
+  "accepted_findings": [
+    "The regenerated L_UpperHuacas map remains reference-runnable and contains four tagged, non-colliding forest-floor HISM actors with exactly 3,300 accepted instances.",
+    "Two folded-leaf forms contribute 2,600 instances, while one buttress-root form and one deadwood form contribute 350 instances each.",
+    "All placements retain source-Landscape grounding, dry-height, slope, complete-visible-water-width, full-centerline, and protected-solver-strip screening.",
+    "All four meshes are opaque, project-owned solid geometry using the existing Pacuare Default Lit vertex-color material and Nanite.",
+    "Terrain, collision, water, cooked solver fields, hydraulics, bathymetry, buoyancy, raft forces, and exact ecology authority remain unchanged.",
+    "The final editor build, six native Pacuare tests, all six runnable-map loads, and every map's MapCheck pass."
+  ],
+  "remaining_photoreal_defects": [
+    "Adult canopy crowns, trunks, branches, shrubs, and remaining procedural ground cover are angular, repetitive, and visibly synthetic.",
+    "The new forms are procedural visual gap fill and have not been accepted as Pacuare species, ecology, geology, wetness, disturbance, age, density, or seasonal evidence.",
+    "Leaf-litter coverage remains discontinuous and lacks a continuous layered forest-floor material response, decomposition, wetness, occlusion, vines, epiphytes, and small plants.",
+    "Buttress roots are scattered presentation forms rather than roots integrated into reviewed trunk bases and source-grounded tree architecture.",
+    "Broad smooth banks and the 30 m source context still lack surveyed breaklines, sub-meter microtopography, exposed rock structure, boulders, waterfalls, and rapid-scale gorge detail.",
+    "The foreground river remains broad and flat-looking with incomplete overturning wave volume, aeration, foam, spray, mist, refraction, rock-contact plumes, and shoreline transitions.",
+    "Atmospheric depth, rainy-season lighting, cloud response, wind, canopy motion, and coherent wet-surface variation remain incomplete.",
+    "The environment-only frames do not validate raft, crew, paddle, water-occlusion, guide-line, hazard, rescue, or close-range interaction quality.",
+    "No measured desktop or VR performance profile has accepted the added instance and Nanite cost on named target hardware."
+  ],
+  "required_external_acceptance_gates": [
+    "A qualified Pacuare rafting guide accepts Upper Huacas route identity, water levels, entry and exit, named hazards, guide lines, rescue routes, and gameplay sightlines in runnable guide-eye views.",
+    "A geospatial reviewer accepts coordinate transforms, vertical datum, route stationing, shoreline and bank breaklines, higher-resolution terrain, rocks, waterfalls, and the declared boundary between sourced terrain and procedural gap fill.",
+    "A hydraulic reviewer accepts calibrated and converged flow bands against observed Upper Huacas discharge, surface elevations, velocities, Froude behavior, rapid-specific features, and hazard response.",
+    "A regional ecologist and environment-art reviewer accepts species and morphology analog use, density, age classes, season, wetness, disturbance, geology, ground cover, lighting, and rainforest atmosphere.",
+    "A water-VFX and character/equipment art review accepts water transmission, raft and crew occlusion, waves, holes, rollers, aeration, spray, foam, bank intersections, paddles, animation, and close-range asset quality.",
+    "Measured full-run desktop and VR profiles pass release frame-time, memory, streaming, shader, collision, capsize, recovery, stability, comfort, and complete-run gameplay budgets on named target hardware."
+  ],
+  "validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after final source and gate integration.",
+    "filtered_regeneration": "Pacuare completed with 3,300/3,300 forest-floor targets, zero rejects, and deterministic seed 18437.",
+    "focused_native_pacuare_tests": "RaftSim.M9.FPacuare passed 6/6 with zero test warnings or errors.",
+    "all_river_map_gate": "RaftSim.P4.RiverMapLoads passed all six runnable maps with zero test errors.",
+    "mapcheck": "0 errors, 0 warnings for every loaded runnable map, including L_UpperHuacas.",
+    "python_contracts": "focused forest-floor, scanned-fern, and Upper Huacas contracts pass after review/hash locking.",
+    "visual_review": "technical candidate retained; photoreal production promotion rejected."
+  },
+  "retained_artifacts": [
+    {
+      "path": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "sha256": "7d44f1e6bcce7a8211222a9004f2a2273ea3826e9a941b05ceaab67778fca6fe"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_FoldedLeafLitter_A_ForestFloorV1.uasset",
+      "sha256": "f82ceb244beeefdbecd89e7be926ee8312ecf83dff7a7ae779451fe6eea54cea"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_FoldedLeafLitter_B_ForestFloorV1.uasset",
+      "sha256": "04de7bc5f365ddcbfcae3c0b46f24647b978d21f8038ea7013cb0252aa5005e7"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_ButtressRoot_A_ForestFloorV1.uasset",
+      "sha256": "fd376d6ef030a0335eb63470fd2eb6cb67e7f1f3298564163425b34eac8b6bae"
+    },
+    {
+      "path": "unreal/Content/RaftSim/Environment/PacuareRun/Vegetation/Meshes/SM_RaftSim_Pacuare_Deadwood_A_ForestFloorV1.uasset",
+      "sha256": "2791d62aba3b53ed4a5d7c4904f63d7fd3b8d080b6e24b0ff0ba461010b3d7f0"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_pacuare.json",
+      "sha256": "6be240c13cb9378ef5cdf34de83cccc6f526c5b328e99f4ba9c45ca353b53d70"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_guide.png",
+      "sha256": "d5bf222f5572c783126c14e34ddbb515e0c2a55fc9e4496646b8a8022f776390"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_river_eye.png",
+      "sha256": "c8be2bfed8ddc8371f0551769a47bbcd15185dfcb8c177dad5e65ae022018f94"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_solver_rapid.png",
+      "sha256": "4b2fd87b45a4bfc85916d1af893455d9cf0d6b287ee4c67e909f72f6b88c9bda"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_m9_tests.json",
+      "sha256": "ac556eec3ff32f159100c5364320689fe0cc685e08079b9ad025d4feb4795ca8"
+    },
+    {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_forest_floor_structure_v1_p4_river_map_loads.json",
+      "sha256": "2bb4d1c0bc7c876b8d9159b799cc9cb2425392722bb12f9876f684b9ae639ee5"
+    }
+  ]
+}

@@ -118,15 +118,18 @@
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
-      "sha256": "2324e47127af3b14e99d80b668aa173a2bc58a0155bd7b6d4dc097dbf654220e"
+      "sha256": "2324e47127af3b14e99d80b668aa173a2bc58a0155bd7b6d4dc097dbf654220e",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
-      "sha256": "779b512781d80895d8d6bce4dd66db813218d6ba59a5d862d31f97c06784318e"
+      "sha256": "779b512781d80895d8d6bce4dd66db813218d6ba59a5d862d31f97c06784318e",
+      "hash_locked": false
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_solver_rapid_river_eye_downstream.png",
-      "sha256": "3404c242891232843718134c62fffe5ec069546cfcc2b2e9d2b8c993b6d4339f"
+      "sha256": "3404c242891232843718134c62fffe5ec069546cfcc2b2e9d2b8c993b6d4339f",
+      "hash_locked": false
     },
     {
       "path": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
