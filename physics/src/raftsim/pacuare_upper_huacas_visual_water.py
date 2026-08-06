@@ -107,7 +107,9 @@ def _range(values: np.ndarray) -> list[float]:
     return [float(np.min(values)), float(np.max(values))]
 
 
-def build_pacuare_upper_huacas_visual_water(repo_root: Path) -> dict:
+def build_pacuare_upper_huacas_visual_water(
+    repo_root: Path, output_dir: Path | None = None
+) -> dict:
     """Generate the committed capture derivative and return its manifest."""
 
     repo_root = repo_root.resolve()
@@ -149,7 +151,11 @@ def build_pacuare_upper_huacas_visual_water(repo_root: Path) -> dict:
     image = Image.fromarray(
         np.clip(np.rint(packed * 255.0), 0, 255).astype(np.uint8), mode="RGBA"
     ).resize(OUTPUT_SIZE, Image.Resampling.BILINEAR)
-    packed_path = repo_root / PACKED_TEXTURE_RELATIVE
+    packed_path = (
+        output_dir / PACKED_TEXTURE_RELATIVE.name
+        if output_dir is not None
+        else repo_root / PACKED_TEXTURE_RELATIVE
+    )
     packed_path.parent.mkdir(parents=True, exist_ok=True)
     image.save(packed_path, optimize=True)
 
@@ -291,7 +297,11 @@ def build_pacuare_upper_huacas_visual_water(repo_root: Path) -> dict:
             ),
         },
     }
-    manifest_path = repo_root / MANIFEST_RELATIVE
+    manifest_path = (
+        output_dir / MANIFEST_RELATIVE.name
+        if output_dir is not None
+        else repo_root / MANIFEST_RELATIVE
+    )
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
 

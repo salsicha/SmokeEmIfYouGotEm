@@ -125,18 +125,16 @@ def test_hance_visual_water_is_hydraulic_hash_locked_and_non_authoritative():
     ),
     strict=False,
 )
-def test_committed_hance_visual_water_matches_generator():
-    committed_texture = (REPO_ROOT / PACKED_TEXTURE_RELATIVE).read_bytes()
-    committed_manifest = (REPO_ROOT / MANIFEST_RELATIVE).read_bytes()
-    try:
-        build_colorado_hance_visual_water(REPO_ROOT)
-        assert (REPO_ROOT / PACKED_TEXTURE_RELATIVE).read_bytes() == committed_texture
-        assert (REPO_ROOT / MANIFEST_RELATIVE).read_bytes() == committed_manifest
-    finally:
-        # The builder writes into the repo tree; put the committed bytes back so
-        # a divergent regeneration cannot cascade into later hash-lock tests.
-        (REPO_ROOT / PACKED_TEXTURE_RELATIVE).write_bytes(committed_texture)
-        (REPO_ROOT / MANIFEST_RELATIVE).write_bytes(committed_manifest)
+def test_committed_hance_visual_water_matches_generator(tmp_path: Path):
+    # Regenerate into tmp: the committed artifacts are never touched, so a
+    # divergent regeneration cannot cascade into later hash-lock tests.
+    build_colorado_hance_visual_water(REPO_ROOT, output_dir=tmp_path)
+    assert (tmp_path / PACKED_TEXTURE_RELATIVE.name).read_bytes() == (
+        REPO_ROOT / PACKED_TEXTURE_RELATIVE
+    ).read_bytes()
+    assert (tmp_path / MANIFEST_RELATIVE.name).read_bytes() == (
+        REPO_ROOT / MANIFEST_RELATIVE
+    ).read_bytes()
 
 
 def test_hance_runnable_review_retains_immutable_evidence_and_is_honest():

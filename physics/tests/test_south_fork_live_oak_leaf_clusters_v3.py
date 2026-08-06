@@ -19,12 +19,18 @@ from raftsim.south_fork_live_oak_leaf_clusters_v3 import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_dense_live_oak_leaf_clusters_v3_are_deterministic_and_isolated():
-    first = generate_south_fork_live_oak_leaf_clusters_v3(REPO_ROOT)
+def test_dense_live_oak_leaf_clusters_v3_are_deterministic_and_isolated(tmp_path):
+    # Regenerate into tmp so the committed atlases are never rewritten
+    # mid-suite; two independent output roots prove determinism.
+    first = generate_south_fork_live_oak_leaf_clusters_v3(
+        REPO_ROOT, output_dir=tmp_path / "first"
+    )
     first_hashes = {
         name: record["sha256"] for name, record in first["maps"].items()
     }
-    second = generate_south_fork_live_oak_leaf_clusters_v3(REPO_ROOT)
+    second = generate_south_fork_live_oak_leaf_clusters_v3(
+        REPO_ROOT, output_dir=tmp_path / "second"
+    )
 
     assert first_hashes == {
         name: record["sha256"] for name, record in second["maps"].items()

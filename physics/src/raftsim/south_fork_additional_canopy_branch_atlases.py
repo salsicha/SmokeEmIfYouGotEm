@@ -173,7 +173,9 @@ def _map_record(repo_root: Path, relative_path: Path, channels: str) -> dict:
     }
 
 
-def _generate_profile(repo_root: Path, profile: BranchAtlasProfile) -> dict:
+def _generate_profile(
+    repo_root: Path, output_root: Path, profile: BranchAtlasProfile
+) -> dict:
     source_path = repo_root / profile.source_path
     if not source_path.is_file():
         raise FileNotFoundError(source_path)
@@ -187,7 +189,9 @@ def _generate_profile(repo_root: Path, profile: BranchAtlasProfile) -> dict:
         (profile.normal_path, normal),
         (profile.packed_path, packed),
     ):
-        image.save(repo_root / path, optimize=True)
+        target_path = output_root / path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        image.save(target_path, optimize=True)
 
     alpha = np.asarray(albedo_opacity, dtype=np.uint8)[..., 3]
     source_height = OUTPUT_SIZE * SOURCE_ROWS // ATLAS_ROWS
@@ -234,17 +238,17 @@ def _generate_profile(repo_root: Path, profile: BranchAtlasProfile) -> dict:
         },
         "maps": {
             "albedo_opacity": _map_record(
-                repo_root,
+                output_root,
                 profile.albedo_opacity_path,
                 "RGB base color A=opacity mask",
             ),
             "normal": _map_record(
-                repo_root,
+                output_root,
                 profile.normal_path,
                 "RGB tangent-space normal",
             ),
             "ao_roughness_subsurface": _map_record(
-                repo_root,
+                output_root,
                 profile.packed_path,
                 "R=AO G=roughness B=subsurface transmission",
             ),
@@ -275,10 +279,15 @@ def _generate_profile(repo_root: Path, profile: BranchAtlasProfile) -> dict:
 
 def generate_south_fork_additional_canopy_branch_atlases(
     repo_root: Path,
+    output_dir: Path | None = None,
 ) -> dict:
     repo_root = repo_root.resolve()
+    # output_dir mirrors the repo layout (tests use tmp); default stays the
+    # in-place evidence-machine flow. Sources are always read from repo_root.
+    output_root = output_dir.resolve() if output_dir is not None else repo_root
     profiles = {
-        profile.key: _generate_profile(repo_root, profile) for profile in PROFILES
+        profile.key: _generate_profile(repo_root, output_root, profile)
+        for profile in PROFILES
     }
     manifest = {
         "schema": "raftsim.unreal.south_fork_additional_canopy_branch_atlases.v1",
@@ -293,7 +302,9 @@ def generate_south_fork_additional_canopy_branch_atlases(
             "affects_hydraulics": False,
         },
     }
-    (repo_root / MANIFEST_PATH).write_text(
+    manifest_target = output_root / MANIFEST_PATH
+    manifest_target.parent.mkdir(parents=True, exist_ok=True)
+    manifest_target.write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
     )
     return manifest

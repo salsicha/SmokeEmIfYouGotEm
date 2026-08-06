@@ -224,7 +224,13 @@ def _write_material_maps(
     }
 
 
-def build_colorado_lees_ferry_production_corridor(repo_root: Path) -> dict[str, object]:
+def build_colorado_lees_ferry_production_corridor(
+    repo_root: Path, output_dir: Path | None = None
+) -> dict[str, object]:
+    """Sources always read from the committed tree; ``output_dir`` redirects
+    the generated artifacts (tests use tmp) while recorded manifest paths stay
+    canonical. Default keeps the in-place evidence-machine flow."""
+
     repo_root = repo_root.resolve()
     source_root = repo_root / SOURCE_ROOT
     for relative_path, expected_hash in SOURCE_HASHES.items():
@@ -255,7 +261,8 @@ def build_colorado_lees_ferry_production_corridor(repo_root: Path) -> dict[str, 
     ground_width_m = (xmax - xmin) * ground_scale
     ground_height_m = (ymax - ymin) * ground_scale
     corridor_root = repo_root / CORRIDOR_RELATIVE_ROOT
-    derived_root = corridor_root / "derived"
+    output_root = output_dir.resolve() if output_dir is not None else corridor_root
+    derived_root = output_root / "derived"
     derived_root.mkdir(parents=True, exist_ok=True)
 
     heightfield_path = derived_root / "colorado_lees_ferry_reach_heightfield_2017.png"
@@ -303,7 +310,7 @@ def build_colorado_lees_ferry_production_corridor(repo_root: Path) -> dict[str, 
     alignment_path = derived_root / "colorado_lees_ferry_reach_centerline_alignment_2048.png"
     alignment.save(alignment_path)
 
-    centerline_path = corridor_root / "centerline_local.json"
+    centerline_path = output_root / "centerline_local.json"
     centerline_record = {
         "schema": "raftsim.production_corridor_centerline_local.v1",
         "status": "source_aligned_review_gated_not_gameplay_authority",
@@ -326,7 +333,7 @@ def build_colorado_lees_ferry_production_corridor(repo_root: Path) -> dict[str, 
         "bounds_epsg3857": list(aligned_bbox),
         "ground_span_m_approx": [ground_width_m, ground_height_m],
         "unreal_landscape": {
-            "heightfield": str(heightfield_path.relative_to(repo_root)),
+            "heightfield": str(CORRIDOR_RELATIVE_ROOT / "derived" / heightfield_path.name),
             "heightfield_size_px": [LANDSCAPE_SIZE, LANDSCAPE_SIZE],
             "horizontal_span_cm": [ground_width_m * 100.0, ground_height_m * 100.0],
             "elevation_min_m_navd88": elevation_min_m,
@@ -344,10 +351,15 @@ def build_colorado_lees_ferry_production_corridor(repo_root: Path) -> dict[str, 
             "source_bbox_epsg3857": list(SOURCE_BBOX_EPSG3857),
         },
         "derived_artifacts": {
-            "heightfield": str(heightfield_path.relative_to(repo_root)),
-            "local_centerline": str(centerline_path.relative_to(repo_root)),
-            "centerline_alignment_preview": str(alignment_path.relative_to(repo_root)),
-            **{name: str(path.relative_to(repo_root)) for name, path in material_maps.items()},
+            "heightfield": str(CORRIDOR_RELATIVE_ROOT / "derived" / heightfield_path.name),
+            "local_centerline": str(CORRIDOR_RELATIVE_ROOT / "centerline_local.json"),
+            "centerline_alignment_preview": str(
+                CORRIDOR_RELATIVE_ROOT / "derived" / alignment_path.name
+            ),
+            **{
+                name: str(CORRIDOR_RELATIVE_ROOT / "derived" / path.name)
+                for name, path in material_maps.items()
+            },
         },
         "terrain_albedo_conditioning": {
             "policy": "retain_raw_naip_and_generate_local_luminance_normalized_warm_shadow_render_derivative",
@@ -366,7 +378,7 @@ def build_colorado_lees_ferry_production_corridor(repo_root: Path) -> dict[str, 
             ],
         },
     }
-    manifest_path = corridor_root / "manifest.json"
+    manifest_path = output_root / "manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    manifest["manifest_path"] = str(manifest_path.relative_to(repo_root))
+    manifest["manifest_path"] = str(CORRIDOR_RELATIVE_ROOT / "manifest.json")
     return manifest

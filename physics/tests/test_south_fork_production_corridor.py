@@ -24,9 +24,16 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def test_south_fork_production_corridor_is_official_physical_and_reproducible():
-    manifest = build_south_fork_chili_bar_production_corridor(REPO_ROOT)
-    corridor_root = REPO_ROOT / CORRIDOR_RELATIVE_ROOT
+def test_south_fork_production_corridor_is_official_physical_and_reproducible(tmp_path):
+    # Regenerate into tmp so the committed corridor artifacts are never
+    # rewritten mid-suite; recorded manifest paths stay canonical, so map
+    # them into the tmp output root when reading generated files.
+    manifest = build_south_fork_chili_bar_production_corridor(
+        REPO_ROOT, output_dir=tmp_path
+    )
+
+    def generated(relative_path: str) -> Path:
+        return tmp_path / Path(relative_path).relative_to(CORRIDOR_RELATIVE_ROOT)
 
     assert manifest["status"] == (
         "official_source_attached_physical_landscape_inputs_generated_review_gated"
@@ -80,7 +87,7 @@ def test_south_fork_production_corridor_is_official_physical_and_reproducible():
         derived["centerline_alignment_preview"],
         derived["local_centerline"],
     ):
-        path = REPO_ROOT / artifact["path"]
+        path = generated(artifact["path"])
         assert path.is_file()
         assert _sha256(path) == artifact["sha256"]
 
@@ -92,23 +99,23 @@ def test_south_fork_production_corridor_is_official_physical_and_reproducible():
         "ao_roughness_height",
     }
     for artifact in material_maps.values():
-        path = REPO_ROOT / artifact["path"]
+        path = generated(artifact["path"])
         assert path.is_file()
         assert Image.open(path).size == (2048, 2048)
         assert _sha256(path) == artifact["sha256"]
 
-    zones = np.asarray(Image.open(REPO_ROOT / material_maps["material_zones"]["path"]))
+    zones = np.asarray(Image.open(generated(material_maps["material_zones"]["path"])))
     assert int(zones[..., 2].max()) == 255
     assert np.count_nonzero(zones[..., 2] > 128) > 20_000
     assert np.count_nonzero(zones[..., 1] > 128) > 100_000
 
-    heightfield = np.asarray(Image.open(REPO_ROOT / derived["heightfield"]["path"]))
+    heightfield = np.asarray(Image.open(generated(derived["heightfield"]["path"])))
     assert heightfield.shape == (2017, 2017)
     assert int(heightfield.min()) < 1000
     assert int(heightfield.max()) > 64000
 
     centerline = json.loads(
-        (REPO_ROOT / derived["local_centerline"]["path"]).read_text(encoding="utf-8")
+        generated(derived["local_centerline"]["path"]).read_text(encoding="utf-8")
     )
     assert centerline["status"] == "source_aligned_review_gated_not_gameplay_authority"
     assert centerline["source_point_count"] == 43

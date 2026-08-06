@@ -63,8 +63,13 @@ def _map_record(repo_root: Path, relative_path: Path, channels: str) -> dict:
     }
 
 
-def generate_south_fork_live_oak_woody_canopy_v1(repo_root: Path) -> dict:
+def generate_south_fork_live_oak_woody_canopy_v1(
+    repo_root: Path, output_dir: Path | None = None
+) -> dict:
     repo_root = repo_root.resolve()
+    # output_dir mirrors the repo layout (tests use tmp); default stays the
+    # in-place evidence-machine flow. Sources are always read from repo_root.
+    output_root = output_dir.resolve() if output_dir is not None else repo_root
     source_path = repo_root / BARK_SOURCE_PATH
     leaf_manifest_path = repo_root / LEAF_MANIFEST_PATH
     if not source_path.is_file():
@@ -83,7 +88,9 @@ def generate_south_fork_live_oak_woody_canopy_v1(repo_root: Path) -> dict:
         (BARK_NORMAL_PATH, normal),
         (BARK_PACKED_PATH, packed),
     ):
-        image.save(repo_root / relative_path, optimize=True)
+        target_path = output_root / relative_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        image.save(target_path, optimize=True)
 
     albedo_pixels = np.asarray(albedo, dtype=np.uint8)
     normal_pixels = np.asarray(normal, dtype=np.uint8)
@@ -113,13 +120,13 @@ def generate_south_fork_live_oak_woody_canopy_v1(repo_root: Path) -> dict:
         },
         "maps": {
             "bark_albedo": _map_record(
-                repo_root, BARK_ALBEDO_PATH, "RGB base color"
+                output_root, BARK_ALBEDO_PATH, "RGB base color"
             ),
             "bark_normal": _map_record(
-                repo_root, BARK_NORMAL_PATH, "RGB tangent-space normal"
+                output_root, BARK_NORMAL_PATH, "RGB tangent-space normal"
             ),
             "bark_ao_roughness_height": _map_record(
-                repo_root,
+                output_root,
                 BARK_PACKED_PATH,
                 "R=AO G=roughness B=height",
             ),
@@ -197,7 +204,9 @@ def generate_south_fork_live_oak_woody_canopy_v1(repo_root: Path) -> dict:
             ),
         },
     }
-    (repo_root / MANIFEST_PATH).write_text(
+    manifest_target = output_root / MANIFEST_PATH
+    manifest_target.parent.mkdir(parents=True, exist_ok=True)
+    manifest_target.write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
     )
     return manifest
