@@ -66,6 +66,23 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- First remediation round for the 2026-08-06 named human visual review:
+  CC0 water-detail texture intake (ambientCG, 16 textures, manifest +
+  reviewed-import script); two-scale froth on the solver foam mask in the
+  authored river-water and live-surface materials with froth colour
+  corrected from 48% gray to aerated white, plus a narrow
+  `RaftSim.CreateSouthForkTransmissionWater` recreation command for the
+  one-time-duplicate parent; bounded interface restoration for the
+  Chilko/Futaleufú/Colorado water instances; crew helmet dome coverage,
+  seating, and safety colours. Three latent headless-pipeline defects fixed
+  (candidate captures gained the 12-frame settle loop; the preview light
+  rig falls back to world spawns when editor placement is unavailable; the
+  rig SkyLight uses real-time capture instead of baking a black cubemap
+  into headlessly regenerated maps). Asset regeneration remains pending an
+  interactive session: headless candidate captures still render a
+  horizon-sun atmosphere, so no regenerated evidence was committed
+  (details in docs/release-review/2026-08-06-first-human-visual-review.md).
+
 - Hardened the locked-source gate to be machine-independent: it now audits
   only git-tracked locked sources (locks over never-versioned machine-local
   evidence such as `unreal/Saved/` captures cannot drift via a commit, differ

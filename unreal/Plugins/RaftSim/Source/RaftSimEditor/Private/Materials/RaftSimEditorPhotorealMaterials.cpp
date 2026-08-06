@@ -248,10 +248,63 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     ThresholdedFoam->MinDefault = 0.0f;
     ThresholdedFoam->MaxDefault = 1.0f;
     UMaterialExpression* FoamBreakupSource = nullptr;
+    // 2026-08-06 named human review: "the waves have no white froth." Break
+    // the solver foam mask up with the CC0 lace pair at two incommensurate
+    // tilings; sparse foam shows the lace intersection, saturated foam clots
+    // both scales together into connected froth. The first-party single-lace
+    // sample remains the first fallback, then procedural noise.
+    UTexture2D* FrothLaceLight = LoadObject<UTexture2D>(nullptr,
+        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
+             "T_CC0_Foam001_Opacity.T_CC0_Foam001_Opacity"));
+    UTexture2D* FrothLaceDense = LoadObject<UTexture2D>(nullptr,
+        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
+             "T_CC0_Foam003_Opacity.T_CC0_Foam003_Opacity"));
     UTexture2D* FoamLaceTexture = LoadObject<UTexture2D>(nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
              "T_RaftSim_SouthForkWater_FoamLace.T_RaftSim_SouthForkWater_FoamLace"));
-    if (FoamLaceTexture != nullptr)
+    if (FrothLaceLight != nullptr && FrothLaceDense != nullptr)
+    {
+        auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
+                               float UTiling, float VTiling, float SpeedX,
+                               float SpeedY) -> UMaterialExpression* {
+            UMaterialExpressionTextureCoordinate* FrothUv = Cast<
+                UMaterialExpressionTextureCoordinate>(Add(
+                    NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+            FrothUv->UTiling = UTiling;
+            FrothUv->VTiling = VTiling;
+            UMaterialExpressionPanner* FrothPan = Cast<UMaterialExpressionPanner>(
+                Add(NewObject<UMaterialExpressionPanner>(Material)));
+            FrothPan->SpeedX = SpeedX;
+            FrothPan->SpeedY = SpeedY;
+            FrothPan->Coordinate.Expression = FrothUv;
+            UMaterialExpressionTextureSampleParameter2D* FrothSampleNode = Cast<
+                UMaterialExpressionTextureSampleParameter2D>(Add(
+                    NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
+            FrothSampleNode->ParameterName = ParameterName;
+            FrothSampleNode->Texture = Texture;
+            FrothSampleNode->SamplerType = SAMPLERTYPE_Masks;
+            FrothSampleNode->Coordinates.Expression = FrothPan;
+            FrothSampleNode->Group = TEXT("RaftSimPhotorealWater");
+            return Mask(FrothSampleNode, true, false, false);
+        };
+        UMaterialExpression* LaceLight = FrothSample(
+            FrothLaceLight, TEXT("WhitewaterFoamLace"),
+            0.26f, 0.58f, 0.018f, 0.0f);
+        UMaterialExpression* LaceDense = FrothSample(
+            FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
+            0.47f, 1.03f, -0.011f, 0.006f);
+        UMaterialExpressionSaturate* ClottedFroth =
+            Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+        ClottedFroth->Input.Expression = AddNode(LaceLight, LaceDense);
+        UMaterialExpressionSaturate* FrothKnee =
+            Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+        FrothKnee->Input.Expression = Mul(
+            ThresholdedFoam, Scalar(TEXT("WhitewaterFrothKneeGain"), 1.60f));
+        FoamBreakupSource = Lerp(Mul(LaceLight, LaceDense), ClottedFroth, FrothKnee);
+    }
+    else if (FoamLaceTexture != nullptr)
     {
         UMaterialExpressionTextureCoordinate* FoamUv = Cast<
             UMaterialExpressionTextureCoordinate>(Add(
@@ -298,7 +351,14 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionClamp* FoamBroken =
         Cast<UMaterialExpressionClamp>(Add(NewObject<UMaterialExpressionClamp>(Material)));
     FoamBroken->Input.Expression = FoamRaw; FoamBroken->MinDefault = 0.0f; FoamBroken->MaxDefault = 1.0f;
-    UMaterialExpressionConstant3Vector* FoamColor = Const3(0.48f, 0.53f, 0.52f);
+    // Froth is bright aerated white, not 48% gray — the gray constant was a
+    // major cause of the "no white froth" review verdict.
+    UMaterialExpressionVectorParameter* FoamColor =
+        Cast<UMaterialExpressionVectorParameter>(
+            Add(NewObject<UMaterialExpressionVectorParameter>(Material)));
+    FoamColor->ParameterName = TEXT("WhitewaterFrothColor");
+    FoamColor->DefaultValue = FLinearColor(0.88f, 0.91f, 0.92f, 1.0f);
+    FoamColor->Group = TEXT("RaftSimPhotorealWater");
     UMaterialExpressionLinearInterpolate* BaseColor = Lerp(
         ReflectedWaterColor, FoamColor, FoamBroken);
     // --- Detail-normal ripples panned over the geometric wave normal --------
@@ -1642,22 +1702,90 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             FLinearColor(0.160f, 0.230f, 0.280f, 1.0f)),
         LiveSkyReflectionAlpha);
 
-    UMaterialExpressionNoise* FoamNoise =
-        Cast<UMaterialExpressionNoise>(Add(NewObject<UMaterialExpressionNoise>(Material)));
-    FoamNoise->Scale = 0.009f;
-    FoamNoise->bTurbulence = true;
-    FoamNoise->Levels = 4;
-    FoamNoise->OutputMin = 0.20f;
-    FoamNoise->OutputMax = 1.20f;
+    // Whitewater froth: the 2026-08-06 named human review rejected the flat
+    // noise-tinted foam ("waves have no white froth"). Break the solver's
+    // advected foam channel up with the CC0 lace masks at two incommensurate
+    // tilings (kills the visible repeat), and let coverage swing from open
+    // lace to clotted froth as the channel saturates. Null-guarded: absent
+    // textures degrade to the previous procedural-noise path.
+    UMaterialExpression* FoamPattern = nullptr;
+    UTexture2D* FrothLaceLight = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
+             "T_CC0_Foam001_Opacity.T_CC0_Foam001_Opacity"));
+    UTexture2D* FrothLaceDense = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
+             "T_CC0_Foam003_Opacity.T_CC0_Foam003_Opacity"));
+    if (FrothLaceLight != nullptr && FrothLaceDense != nullptr)
+    {
+        auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
+                               float UTiling, float VTiling, float SpeedX,
+                               float SpeedY) -> UMaterialExpression* {
+            UMaterialExpressionTextureCoordinate* FrothUv =
+                Cast<UMaterialExpressionTextureCoordinate>(
+                    Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+            FrothUv->UTiling = UTiling;
+            FrothUv->VTiling = VTiling;
+            UMaterialExpressionPanner* FrothPan =
+                Cast<UMaterialExpressionPanner>(
+                    Add(NewObject<UMaterialExpressionPanner>(Material)));
+            FrothPan->Coordinate.Expression = FrothUv;
+            FrothPan->SpeedX = SpeedX;
+            FrothPan->SpeedY = SpeedY;
+            UMaterialExpressionTextureSampleParameter2D* FrothSampleNode =
+                Cast<UMaterialExpressionTextureSampleParameter2D>(Add(
+                    NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
+            FrothSampleNode->ParameterName = ParameterName;
+            FrothSampleNode->Texture = Texture;
+            FrothSampleNode->SamplerType = SAMPLERTYPE_Masks;
+            FrothSampleNode->Coordinates.Expression = FrothPan;
+            return Mask(FrothSampleNode, true, false, false);
+        };
+        UMaterialExpression* LaceLight = FrothSample(
+            FrothLaceLight, TEXT("WhitewaterFrothLaceLight"),
+            0.22f, 0.53f, 0.021f, 0.004f);
+        UMaterialExpression* LaceDense = FrothSample(
+            FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
+            0.43f, 0.94f, -0.013f, 0.008f);
+        // Sparse solver foam shows the open lace intersection; saturated
+        // foam clots both scales together instead of brightening one repeat.
+        // The knee gain clots mid-strength aeration early enough to read as
+        // connected whitewater from guide-seat distance (v220 self-review:
+        // linear coverage read as isolated glints).
+        UMaterialExpressionSaturate* ClottedFroth =
+            Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+        ClottedFroth->Input.Expression = AddNode(LaceLight, LaceDense);
+        UMaterialExpressionSaturate* FrothKnee =
+            Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+        FrothKnee->Input.Expression = Mul(
+            FoamMask, Scalar(TEXT("WhitewaterFrothKneeGain"), 1.60f));
+        FoamPattern = Lerp(Mul(LaceLight, LaceDense), ClottedFroth, FrothKnee);
+    }
+    else
+    {
+        UMaterialExpressionNoise* FoamNoise =
+            Cast<UMaterialExpressionNoise>(Add(NewObject<UMaterialExpressionNoise>(Material)));
+        FoamNoise->Scale = 0.009f;
+        FoamNoise->bTurbulence = true;
+        FoamNoise->Levels = 4;
+        FoamNoise->OutputMin = 0.20f;
+        FoamNoise->OutputMax = 1.20f;
+        FoamPattern = FoamNoise;
+    }
     UMaterialExpressionMultiply* FoamRaw = Mul(
-        Mul(FoamMask, FoamNoise), Scalar(TEXT("LiveFoamIntensity"), 0.52f));
+        Mul(FoamMask, FoamPattern), Scalar(TEXT("LiveFoamIntensity"), 1.70f));
     UMaterialExpressionClamp* Foam =
         Cast<UMaterialExpressionClamp>(Add(NewObject<UMaterialExpressionClamp>(Material)));
     Foam->Input.Expression = FoamRaw;
     Foam->MinDefault = 0.0f;
     Foam->MaxDefault = 1.0f;
     UMaterialExpressionLinearInterpolate* BaseColor = Lerp(
-        ReflectedDepthColor, Const3(0.70f, 0.74f, 0.74f), Foam);
+        ReflectedDepthColor,
+        Vector(TEXT("WhitewaterFrothColor"), FLinearColor(0.90f, 0.93f, 0.94f, 1.0f)),
+        Foam);
 
     UMaterialExpressionLinearInterpolate* Roughness = Lerp(
         Scalar(TEXT("LiveWaterRoughness"), 0.085f),
@@ -1767,8 +1895,17 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         Scalar(TEXT("CalmLiveSurfaceCoverage"), 0.0f),
         Scalar(TEXT("ActiveLiveSurfaceCoverage"), 0.03f),
         HydraulicActivity);
+    // Froth must be visible to read as whitewater: aerated cells push the
+    // overlay toward opaque white while calm water keeps the old subtle
+    // coverage. Foam here is the textured, clamped froth term above.
+    UMaterialExpressionSaturate* CoverageWithFroth =
+        Cast<UMaterialExpressionSaturate>(
+            Add(NewObject<UMaterialExpressionSaturate>(Material)));
+    CoverageWithFroth->Input.Expression = AddNode(
+        HydraulicCoverage,
+        Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f)));
     UMaterialExpressionMultiply* HydraulicSurfaceCoverage = Mul(
-        StationEdgeCoverage, HydraulicCoverage);
+        StationEdgeCoverage, CoverageWithFroth);
     // Older live detail skins retained calm alpha on the dry vertices of the
     // rectangular solver grid. Keep the shared behavior as the default, but
     // expose a river-local depth mask so Lava Canyon can fade the detail skin
@@ -3359,6 +3496,34 @@ static void HandleCreatePhotorealTerrainMaterial(const TArray<FString>&)
     BuildPhotorealTerrainMaterial();
 }
 
+static void HandleCreateSouthForkTransmissionWater(const TArray<FString>&)
+{
+    // Recreate the shared raft-transmission water parent (and recalibrate the
+    // South Fork instance) from the CURRENT authored river-water material.
+    // The parent is a one-time duplicate, so froth/foam graph changes in
+    // BuildPhotorealRiverWaterMaterial never reach it unless the saved parent
+    // asset is removed first and this command is run.
+    FString Summary;
+    UMaterialInterface* Source = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater."
+             "M_RaftSim_PhotorealRiverWater"));
+    if (!Source)
+    {
+        UE_LOG(LogTemp, Error,
+            TEXT("RaftSim: authored river-water source material is missing; "
+                 "run RaftSim.CreatePhotorealRiverWaterMaterial first."));
+        return;
+    }
+    if (!RaftSimEditorEnvironment::LoadSouthForkProductionWaterPresentation(
+            Source, Summary))
+    {
+        UE_LOG(LogTemp, Error, TEXT("%s"), *Summary);
+        return;
+    }
+    UE_LOG(LogTemp, Display, TEXT("%s"), *Summary);
+}
+
 static void HandleCreateCrewFaceMaterial(const TArray<FString>&)
 {
     BuildCrewSkinTextureAssets();
@@ -3484,6 +3649,13 @@ static FAutoConsoleCommand GCreatePhotorealTerrainMaterialCommand(
     TEXT("Author only the source-conditioned South Fork terrain material."),
     FConsoleCommandWithArgsDelegate::CreateStatic(
         &HandleCreatePhotorealTerrainMaterial));
+
+static FAutoConsoleCommand GCreateSouthForkTransmissionWaterCommand(
+    TEXT("RaftSim.CreateSouthForkTransmissionWater"),
+    TEXT("Recreate the shared raft-transmission water parent from the current "
+         "authored river-water material (delete the saved parent asset first)."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleCreateSouthForkTransmissionWater));
 
 static FAutoConsoleCommand GCreateCrewFaceMaterialCommand(
     TEXT("RaftSim.CreateCrewFaceMaterial"),

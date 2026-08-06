@@ -82,3 +82,42 @@ packaged builds only, never committed), the quality gaps above now justify:
    and grip poses at source rather than patching attachments.
 
 No sign-in or download happens until the reviewer approves each source.
+
+## Remediation session addendum (same day, Linux machine)
+
+Reviewer approved CC0 sources (ambientCG) in lieu of Fab; intake landed as
+`/Game/RaftSim/Rendering/CC0WaterDetail` (16 textures, manifest committed).
+
+Landed in code (assets regenerate via the sanctioned builders):
+- Two-scale CC0 froth (open lace clotting to dense froth on the solver foam
+  mask) in the authored river-water material and the live-window surface
+  material; froth colour corrected from 48% gray to aerated white; a
+  `RaftSim.CreateSouthForkTransmissionWater` command so the shared
+  transmission parent — a one-time duplicate — can be recreated from the
+  updated source without a full map rebuild.
+- Interface restoration for the three rejected rivers (fresnel/sky/normal
+  energy to a bounded midpoint of the accepted South Fork values; the
+  near-zero values were an earlier over-correction against a clipped-white
+  sheet and are documented as such in the builders).
+- Crew helmet round 1: full dome with ear/nape coverage, seated lower and
+  centred, safety colours replacing the hair-black default.
+
+Headless-pipeline defects found by regenerating on Linux (all latent on the
+Mac, where interactive viewports masked them):
+1. Candidate captures fired with no settle frames (Lumen/TSR never
+   converged offscreen) — the settled-capture 12-frame loop is now shared.
+2. The preview light rig spawned via `GEditor->AddActor` with silent
+   per-actor null guards — now falls back to a plain world spawn.
+3. The rig SkyLight baked its cubemap at build time; headless sessions bake
+   an unrendered (black) sky into the SAVED map, so regenerated maps read as
+   unlit even in gameplay — the rig skylight now uses real-time capture.
+
+Open at session end: headless candidate captures still render the
+SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
+−50° atmosphere sun (verified by direct map probing); regenerated-asset
+churn from the dusk sessions was restored to the committed Mac-canonical
+state, so no defective evidence was committed. Next step is an interactive
+editor session on this machine (lighting is expected to behave as on the
+Mac) to validate the froth/interface changes visually and re-capture; the
+South Fork committed-capture parity question (builder state vs evolved
+assets) is queued behind that.

@@ -14,9 +14,11 @@
     "tests/test_photoreal_pacuare_organic_shoreline.py::test_pacuare_runtime_gate_audits_saved_shoreline_instances",
     "tests/test_photoreal_south_fork_bank_microrelief.py::test_saved_map_assets_and_exact_camera_review_are_hash_locked",
     "tests/test_photoreal_south_fork_organic_terrain.py::test_south_fork_organic_terrain_review_is_hash_locked_and_fail_closed",
+    "tests/test_shared_flow_advected_foam.py::test_shared_foam_review_is_fail_closed_and_hash_locked",
     "tests/test_solver_anchored_aerated_crest_thickness.py::test_aerated_crest_review_is_fail_closed_and_hash_locked",
     "tests/test_solver_anchored_downstream_boil_microrelief.py::test_boil_review_hash_locks_source_artifacts_and_zambezi_map",
     "tests/test_solver_anchored_three_scale_breaking_spray.py::test_three_scale_spray_review_is_fail_closed_and_hash_locked",
-    "tests/test_south_fork_hlod_evidence.py::test_checked_in_hlod_evidence_matches_current_actor_packages"
+    "tests/test_south_fork_hlod_evidence.py::test_checked_in_hlod_evidence_matches_current_actor_packages",
+    "tests/test_zambezi_reference_map.py::test_zambezi_connected_plunge_review_is_hash_locked_and_honest"
   ]
 }

@@ -24,8 +24,11 @@ constexpr float kProductionHipThighBridgeRadiusCm = 8.0f;
 constexpr float kProductionShoulderSleeveRadiusCm = 5.2f;
 constexpr float kProductionShoulderSleeveArmFraction = 1.0f;
 const FVector kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.68f);
-const FVector kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 9.5f);
-const FVector kProductionHelmetShellOffsetCm(2.5f, 0.0f, 0.0f);
+// 2026-08-06 named human review: helmets read as off-center caps. Seat the
+// shell lower on the skull and nearly centred so per-head measurement
+// variance is absorbed instead of amplified.
+const FVector kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 6.5f);
+const FVector kProductionHelmetShellOffsetCm(0.8f, 0.0f, 0.0f);
 const FVector kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f);
 constexpr float kProductionHelmetReferenceFit = 0.96f;
 
@@ -527,10 +530,15 @@ void BuildUnitHelmetShellMesh(
             const float U = static_cast<float>(Side) / Sides;
             const float Theta = 2.0f * PI * U;
             const float FacingFront = FMath::Max(FMath::Cos(Theta), 0.0f);
-            // Extend the rear and temples just below the skull equator. The
-            // front remains shorter to expose the eyes, but still reaches the
-            // brow instead of leaving a detached crown cap.
-            const float MaxPhi = FMath::Lerp(1.66f, 1.43f, FacingFront);
+            const float FacingSide = FMath::Abs(FMath::Sin(Theta));
+            // 2026-08-06 named human review: the former high scallop read as
+            // a cap, not a helmet. A whitewater dome covers occiput and ears:
+            // drop the rear to the nape, keep the brow clear in front, and
+            // pull the sides down over the ears.
+            const float MaxPhi = FMath::Min(
+                FMath::Lerp(1.90f, 1.38f, FacingFront) +
+                    0.16f * FacingSide * (1.0f - FacingFront),
+                2.05f);
             const float Phi = MaxPhi * V;
             const FVector Normal(
                 FMath::Sin(Phi) * FMath::Cos(Theta),
@@ -1933,11 +1941,14 @@ void ARaftSimCrewAvatarActor::ConfigureAppearance(
         }
     }
     ApplyPfdMaterialWetness();
+    // 2026-08-06 named human review: hair-dark shells read as haircuts, not
+    // equipment. Crew helmets cycle through safety colours only; the dark
+    // base material is reserved for the guide variant.
     static const TCHAR* HelmetPaths[] = {
-        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"),
-        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_White.M_RaftSim_Helmet_White"),
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_Red.M_RaftSim_Helmet_Red"),
-        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_Yellow.M_RaftSim_Helmet_Yellow")};
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_White.M_RaftSim_Helmet_White"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_Yellow.M_RaftSim_Helmet_Yellow"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet_White.M_RaftSim_Helmet_White")};
     const TCHAR* VisibleHelmetPath = bGuide
         ? TEXT("/Game/RaftSim/Materials/M_RaftSim_GuideHelmet.M_RaftSim_GuideHelmet")
         : HelmetPaths[VariantIndex];
