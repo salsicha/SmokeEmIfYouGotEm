@@ -66,6 +66,16 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Changed
 
+- Hardened the locked-source gate to be machine-independent: it now audits
+  only git-tracked locked sources (locks over never-versioned machine-local
+  evidence such as `unreal/Saved/` captures cannot drift via a commit, differ
+  per machine, and are audited by the packet/review tests where they live),
+  and it aborts with a distinct error when a checkout holds git-lfs pointers
+  instead of content rather than reporting false drift. Recorded debt
+  re-scoped from 298 to 187 tracked-source entries. CI checkouts for repo
+  guards and the physics suite now fetch LFS content (`lfs: true`), which the
+  suite has needed since the 2026-08-05 LFS normalization.
+
 - Test regeneration no longer mutates the repo tree: the South Fork and
   Colorado production-corridor builders, all four river visual-water builders,
   and all five canopy-atlas generators now take an optional `output_dir`

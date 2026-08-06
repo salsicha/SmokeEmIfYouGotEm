@@ -20,10 +20,19 @@ Modes:
              mismatches. Maintainer action for acknowledging pre-existing
              drift; entries should only ever be removed as locks are repaired.
 
-A "locked source" is any repo-relative path that appears as a key mapping to
-a 64-hex digest anywhere inside a review/evidence JSON under the scanned
-roots. The full-suite baseline lives in Scripts/full_suite_baseline.json and
-lists currently-failing test ids; the gate fails on any failure not in it.
+A "locked source" is any GIT-TRACKED repo-relative path that appears as a key
+mapping to a 64-hex digest anywhere inside a review/evidence JSON under the
+scanned roots. Locks over never-versioned machine-local evidence (for example
+unreal/Saved captures or physics/outputs) are out of scope for a COMMIT gate:
+a commit cannot drift them, they differ per machine, and the packet/review
+tests audit them on the machine that holds them. This keeps the gate's answer
+identical on macOS, Linux, and CI. The full-suite baseline lives in
+Scripts/full_suite_baseline.json and lists currently-failing test ids; the
+gate fails on any failure not in it.
+
+If a tracked locked source is present only as a git-lfs pointer (checkout
+without LFS content), the gate aborts with a distinct error instead of
+reporting false drift — fetch LFS content first.
 """
 
 from __future__ import annotations
@@ -44,11 +53,33 @@ BASELINE_PATH = REPO_ROOT / "Scripts/full_suite_baseline.json"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
 
+LFS_POINTER_PREFIX = b"version https://git-lfs.github.com/spec/v1"
+
+
 def _sha256(path: Path) -> str | None:
     try:
         return hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError:
         return None
+
+
+def _is_lfs_pointer(path: Path) -> bool:
+    try:
+        with path.open("rb") as handle:
+            return handle.read(len(LFS_POINTER_PREFIX)) == LFS_POINTER_PREFIX
+    except OSError:
+        return False
+
+
+def _tracked_files() -> set[str]:
+    output = subprocess.run(
+        ["git", "ls-files"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    return {line.strip() for line in output.splitlines() if line.strip()}
 
 
 def _iter_locks(node: object, review: str):
@@ -94,17 +125,26 @@ def load_debt() -> set[tuple[str, str, str]]:
 
 
 def find_violations(locks) -> list[dict]:
+    tracked = _tracked_files()
     violations = []
+    pointer_files: set[str] = set()
     hash_cache: dict[str, str | None] = {}
     for review, source, recorded in locks:
-        if source not in hash_cache:
-            hash_cache[source] = _sha256(REPO_ROOT / source)
-        actual = hash_cache[source]
-        # Locks may legitimately point at never-versioned machine-local
-        # evidence (unreal/Saved, physics/outputs); absence there is not
-        # drift on other checkouts.
-        if actual is None and source.startswith(("unreal/Saved/", "physics/outputs/")):
+        # Commit-gate scope: only git-tracked sources. Machine-local evidence
+        # (unreal/Saved, physics/outputs, ...) cannot drift via a commit and
+        # differs per machine; its audits run where it lives.
+        if source not in tracked:
             continue
+        if source not in hash_cache:
+            path = REPO_ROOT / source
+            if _is_lfs_pointer(path):
+                pointer_files.add(source)
+                hash_cache[source] = None
+            else:
+                hash_cache[source] = _sha256(path)
+        if source in pointer_files:
+            continue
+        actual = hash_cache[source]
         if actual != recorded:
             violations.append(
                 {
@@ -114,6 +154,17 @@ def find_violations(locks) -> list[dict]:
                     "actual_sha256": actual,
                 }
             )
+    if pointer_files:
+        print(
+            "locked-source gate: this checkout has git-lfs POINTERS instead of "
+            f"content for {len(pointer_files)} locked source(s), e.g. "
+            f"{sorted(pointer_files)[0]}"
+        )
+        print(
+            "  Fetch LFS content first (git lfs pull; in CI set `lfs: true` on "
+            "actions/checkout). Refusing to report drift against pointer bytes."
+        )
+        raise SystemExit(2)
     return violations
 
 
