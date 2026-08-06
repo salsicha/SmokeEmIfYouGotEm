@@ -25,8 +25,11 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_build_futaleufu_terminator_visual_water() -> None:
-    manifest = build_futaleufu_terminator_visual_water(REPO_ROOT)
+def test_build_futaleufu_terminator_visual_water(tmp_path: Path) -> None:
+    # Regenerate into tmp so the committed texture/manifest are never
+    # rewritten mid-suite (divergent bytes off macOS would cascade into
+    # downstream hash-lock tests).
+    manifest = build_futaleufu_terminator_visual_water(REPO_ROOT, output_dir=tmp_path)
 
     assert manifest["schema"] == SCHEMA
     assert manifest["flow_band"] == FLOW_BAND
@@ -44,7 +47,7 @@ def test_build_futaleufu_terminator_visual_water() -> None:
     assert manifest["render_binding"]["capture_only"] is True
     assert manifest["authority_policy"]["changes_solver_state"] is False
 
-    image = Image.open(REPO_ROOT / PACKED_TEXTURE_RELATIVE)
+    image = Image.open(tmp_path / PACKED_TEXTURE_RELATIVE.name)
     assert image.mode == "RGBA"
     assert image.size == (1024, 256)
 

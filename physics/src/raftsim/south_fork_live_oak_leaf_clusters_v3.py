@@ -139,8 +139,13 @@ def _map_record(repo_root: Path, relative_path: Path, channels: str) -> dict:
     }
 
 
-def generate_south_fork_live_oak_leaf_clusters_v3(repo_root: Path) -> dict:
+def generate_south_fork_live_oak_leaf_clusters_v3(
+    repo_root: Path, output_dir: Path | None = None
+) -> dict:
     repo_root = repo_root.resolve()
+    # output_dir mirrors the repo layout (tests use tmp); default stays the
+    # in-place evidence-machine flow. Sources are always read from repo_root.
+    output_root = output_dir.resolve() if output_dir is not None else repo_root
     chroma_source_path = repo_root / CHROMA_SOURCE_PATH
     alpha_source_path = repo_root / ALPHA_SOURCE_PATH
     if not chroma_source_path.is_file():
@@ -158,7 +163,9 @@ def generate_south_fork_live_oak_leaf_clusters_v3(repo_root: Path) -> dict:
         (NORMAL_PATH, normal),
         (PACKED_PATH, packed),
     ):
-        image.save(repo_root / relative_path, optimize=True)
+        target_path = output_root / relative_path
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        image.save(target_path, optimize=True)
 
     alpha = np.asarray(albedo_opacity, dtype=np.uint8)[..., 3]
     tile_size = OUTPUT_SIZE // ATLAS_COLUMNS
@@ -212,15 +219,15 @@ def generate_south_fork_live_oak_leaf_clusters_v3(repo_root: Path) -> dict:
         },
         "maps": {
             "albedo_opacity": _map_record(
-                repo_root,
+                output_root,
                 ALBEDO_OPACITY_PATH,
                 "RGB base color A=opacity mask",
             ),
             "normal": _map_record(
-                repo_root, NORMAL_PATH, "RGB tangent-space normal"
+                output_root, NORMAL_PATH, "RGB tangent-space normal"
             ),
             "ao_roughness_subsurface": _map_record(
-                repo_root,
+                output_root,
                 PACKED_PATH,
                 "R=AO G=roughness B=subsurface transmission",
             ),
@@ -263,7 +270,9 @@ def generate_south_fork_live_oak_leaf_clusters_v3(repo_root: Path) -> dict:
             ),
         },
     }
-    (repo_root / MANIFEST_PATH).write_text(
+    manifest_target = output_root / MANIFEST_PATH
+    manifest_target.parent.mkdir(parents=True, exist_ok=True)
+    manifest_target.write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
     )
     return manifest

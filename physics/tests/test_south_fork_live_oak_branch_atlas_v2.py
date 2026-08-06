@@ -22,10 +22,16 @@ from raftsim.south_fork_live_oak_branch_atlas_v2 import (
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_live_oak_branch_atlas_v2_generation_is_deterministic_and_fail_closed():
-    first = generate_south_fork_live_oak_branch_atlas_v2(REPO_ROOT)
+def test_live_oak_branch_atlas_v2_generation_is_deterministic_and_fail_closed(tmp_path):
+    # Regenerate into tmp so the committed atlases are never rewritten
+    # mid-suite; two independent output roots prove determinism.
+    first = generate_south_fork_live_oak_branch_atlas_v2(
+        REPO_ROOT, output_dir=tmp_path / "first"
+    )
     first_hashes = {name: record["sha256"] for name, record in first["maps"].items()}
-    second = generate_south_fork_live_oak_branch_atlas_v2(REPO_ROOT)
+    second = generate_south_fork_live_oak_branch_atlas_v2(
+        REPO_ROOT, output_dir=tmp_path / "second"
+    )
 
     assert first_hashes == {
         name: record["sha256"] for name, record in second["maps"].items()
