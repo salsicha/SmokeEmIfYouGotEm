@@ -49,8 +49,33 @@ All notable changes to this project are recorded here, newest first. Versioning 
   deterministic four-way-mirrored 1024×1024 albedo, normal, and packed PBR derivation;
   Unreal texture/material bindings; and a renderer-backed close-range rejection record.
 
+- A locked-source commit gate (release-1.0-plan.md §8): commits touching
+  hash-locked sources must refresh their review locks and pass the full
+  physics suite with no failures beyond `Scripts/full_suite_baseline.json`.
+  `Scripts/check_locked_source_gate.py --all` runs in CI repo guards;
+  `Scripts/install_git_hooks.sh` installs the pre-commit `--staged` mode.
+  Pre-existing drift is recorded explicitly: 298 stale lock entries across
+  49 review files (`Scripts/locked_source_debt.json`) and 16 known-failing
+  tests — both are burn-down lists that may only shrink.
+- Re-baselined the release plan platform matrix: native Linux x64 (Vulkan)
+  is a shipping tier (P6 packages all three platforms; the Proton report is
+  retained as extra coverage), and the six-river runnable-reference reality
+  replaces the stale "South Fork only / native Linux cut" rows. The
+  release-candidate workflow's native-Linux RC lane is recorded as pending
+  wiring.
+
 ### Changed
 
+- Test regeneration no longer mutates the repo tree: the South Fork and
+  Colorado production-corridor builders, all four river visual-water builders,
+  and all five canopy-atlas generators now take an optional `output_dir`
+  (sources still read from the committed tree; recorded manifest paths stay
+  canonical), and their tests regenerate into pytest tmp directories —
+  determinism is proven with two independent output roots. On macOS the old
+  in-place rewrites were byte-identical and invisible; on any other platform
+  they left ~46 committed files modified after a full suite run and cascaded
+  into downstream hash-lock failures mid-run. The `examples/generate_*` CLIs
+  keep the explicit in-place evidence-machine flow (default `output_dir`).
 - Normalized 129 previously committed binary paths into the repository's existing
   Git LFS policy. All 119 unique payloads (245,078,504 bytes) retain their exact
   pre-normalization SHA-256 and size, and every referenced object is present in
