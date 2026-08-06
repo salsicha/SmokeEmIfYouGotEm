@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Block oversized non-LFS files and tracked generated maps
         run: python3 Scripts/check_repo_guards.py
+      - name: Block hash-locked source drift not recorded as debt
+        run: python3 Scripts/check_locked_source_gate.py --all
 
   physics-tests:
     runs-on: ubuntu-latest

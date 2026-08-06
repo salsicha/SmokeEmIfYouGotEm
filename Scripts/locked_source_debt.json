@@ -1,0 +1,1496 @@
+{
+  "schema": "raftsim.locked_source_debt.v1",
+  "policy": "Acknowledged pre-existing lock drift. Entries may only be removed (as locks are repaired on the evidence machine); adding entries requires the same scrutiny as changing evidence.",
+  "entries": [
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
+      "recorded_sha256": "cfea8027d1f84a03bcf71b93e304fbcbc9d273564a735ac48fff77e4970db308"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Content/RaftSim/Maps/L_UpperHuacas.umap",
+      "recorded_sha256": "d91d21c08c9a8ba66c25646f97b618a7615e0a75d44a03a7b3ff400e311931f4"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "recorded_sha256": "51f00471114eb84a7b482fe48dd13ddf45132693890aed7a347505924a84865b"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
+      "recorded_sha256": "6bd20f4f22a5b4869c106a758747686688794b8fb7462cc5cf8de8d402d69205"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp",
+      "recorded_sha256": "d9488a283135392d23bcff2819b4a2e5dd94daf6701019e98274b3aa789081f3"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp",
+      "recorded_sha256": "a9056748a9357ed16711eac8998c5ca596a2504f89c42dea76965e372648b45f"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp",
+      "recorded_sha256": "e5059225d87c452b892302819aada7ee87f70610d7f91e06fb03709a815ce85d"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
+      "recorded_sha256": "badb27c0ca5dca2a31052dc6285bcfcbefe59ea0cd8cba4a11378a23a8af8fe0"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+      "recorded_sha256": "8a101150cec33ca7462a42a97bf90bd610eaf3aa6df8b6220fb4bac20531d99e"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
+      "recorded_sha256": "afafa1c44e23aff9e774578c0270b278b27bc7425b01f5682bb6c29e3686a58d"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_review.json",
+      "source": "physics/tests/test_photoreal_pacuare_organic_terrain.py",
+      "recorded_sha256": "5cc5708d582a61924a1af4a4d5f10368ab08124669bd8b3c7c89a99cb625c36e"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_review.json",
+      "source": "physics/tests/test_futaleufu_terminator_visual_water.py",
+      "recorded_sha256": "22556f2750af6f6ffce2e8c3ccbc873c61b6b5cb886bae81a659db1ffde20427"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
+      "source": "physics/tests/test_editor_source_layout.py",
+      "recorded_sha256": "4b54b097b12c6af28b2bea9ec73778e5eacd9a452d2284d68706e1573b542508"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
+      "source": "physics/tests/test_shared_flow_advected_foam.py",
+      "recorded_sha256": "087ea3adc60a4db28c25c1fbaab03e92a14ff0227b35bb0cb1eaf0d060f9d9be"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "146bbad2c6a5c7c99dfe5fa7d423a4c122544ba2041aa80f30c9ae28b4122fcf"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "31feee3d61bb80e70535c9d011bef843a5a9e7b910a9ec38e38989eab5ac22f0"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "6f2526ae5772ad11d772b77e04f52bf09f098348cd5e0a4c167c962fa988a870"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "2c988a3c2823de09ccdea19674f131c334f13bb25def42c11189a4e47352ef39"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "recorded_sha256": "2b94320e52f66d334079617bb42b398fd6a03ad7e5348fc4e2d8ac15f8e0e61e"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "physics/tests/test_editor_source_layout.py",
+      "recorded_sha256": "dd24e2ac24eceef1f28b2ec7dd41d3fcc6ae41d54dbbdd50ffa24e04a1f64ade"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "physics/tests/test_shared_flow_advected_foam.py",
+      "recorded_sha256": "42e66fcd649949b4da836247a64d8aea9fe7c3586e6bd86b0fb357ef6ca72959"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_aerated_crest_thickness_v1_review.json",
+      "source": "physics/tests/test_m9_release_acceptance_packet.py",
+      "recorded_sha256": "9663c21dad0f7980e40a935df5c985475450fe72e8ae3b752395d185f392bccd"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "recorded_sha256": "3c8f2c2c633c9024cc08df452acad5ca7be9ad37d3982ee62513b1731d4d2e10"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "11e8e508a7c9f528ef0426932ff2e106f4c2f7c87f475c598da3ca554abe91f4"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "577190bdbfc4b2aadb81300994c66f9d63569898ae4b6c2ea13445deb93989db"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "0c3e6db6a9bf30588147c8c5acde839a7cf5ee0dc6aea5dac1e4fc1e47e31532"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "058158311ca41bc2795c4560f83e8e5f1354eb4f4c696153629cf09a2c4e5b52"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "recorded_sha256": "4501b0bdd250d895256fe8864eaf34233c8a769333ba88f29de5bf0a022050ca"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
+      "source": "physics/tests/test_editor_source_layout.py",
+      "recorded_sha256": "154d4d88bdfcf15b1bb33cf9e79c31d76053af4220ff3c49b1b9bd4ad950d5a7"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "dce6237207244d0044c93631aa441baa690c35771aa7b3b7fb8e092bc45791fd"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "05451c199405931389546f1cfe0fa6f1e142b1ee481dbd67a553134e11fd8b0a"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "d8d3978358fe31c5fcd0ad941f0da29d320a88c5a19cabc8955d2267d150c18f"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json",
+      "source": "physics/tests/test_zambezi_reference_map.py",
+      "recorded_sha256": "4d83c6e57cd8855c5c1c668db38e95d092ee8e9786e1a1b6bccd9d79419eeaa7"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "a91b0d3da131702908108fcb61ecfcc283acf6c6efc256244a6e7689baa7368f"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "84693abfd07c5ff00b7bf0f0a1ee6fd8cd3629c08f2329b69f7ad1895896d9c1"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "6d437c4c11fee28c552f3f50c9a8e9d83b2c5b15f3962b867c53e35c703b5c16"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json",
+      "source": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "recorded_sha256": "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "5666f016608bc70b99467ca1078333939e2c63870e1dbd065163e0a8b4c92bca"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "b97304a57c77de1c6f07ba66d85bb875599941dde8f7309d82dc2c2b859da2b3"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "613e7fd9893a1d073d53e0455ad16572bca43d6c0a60abf39123ef9db35f8c61"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_refined_live_surface_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "recorded_sha256": "d2e96765ad743bbf30ea931be3435f6bf7ea2f72a11e129785fa806852612781"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_solver_driven_rapid_vfx_v1_review.json",
+      "source": "unreal/Content/RaftSim/Maps/L_Zambezi.umap",
+      "recorded_sha256": "28613a7b823f2fe90f35cd1ccb2ec2f9207fb5fb39bf0cc85ddb9e521e1db599"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_solver_driven_rapid_vfx_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "c0210cd635cf223b59291a4e7093f51300d5a022f2baaf0f8544b530a68504e7"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_solver_driven_rapid_vfx_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
+      "recorded_sha256": "d2e96765ad743bbf30ea931be3435f6bf7ea2f72a11e129785fa806852612781"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "83fb2df2b2ce4277e591cffeac7f5cd8ee732650fc21c5e0e2b839d5505c8302"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "771d0f799030ffe961d0ecf2b316a9fdb5a1cfc45710760be648f2d9f5558d89"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "40b5fdeb94fdc93ae322c82ad728c306c37140b97b426593431962a9e3d122fe"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+      "recorded_sha256": "c8114a63ada77ce276647eb0d3ba4b06175f86c4337cb4be9f99ab7b70bd3b48"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+      "recorded_sha256": "1397f655761127238c263e898cfcc88f3f937dfc60424a590933f2ce83b9aed7"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "28e2da76c33f4300969600f0046ccbab826e6c6b657e415d4f93ec34c3d6dd51"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "c9dae90d4fbe1121fcfe754ea2ef4d393b2b35edc7a0a95e869f32d220fb5d6b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "b85e746fe487521852b57936d7b8fc385beec2aab526bd6c0bbb370b63c35d29"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "7a6d11c4af69ed04ede810a33faa954c7f660f079f774e715e092465ff97937c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+      "recorded_sha256": "1a882475199a1ce3e11fce04ef1c8fcc9ae6aa798795d5cbe59c1d34906baaa5"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+      "recorded_sha256": "3721597565439ec28ae62417a55157258534a4173abfff1019124b55b574a785"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+      "recorded_sha256": "ec403f0d01a21d3156de6928aa2fb30d3f9fac1fa91e67c0f6113d736143a074"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_eye_reference_pose_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "45ea1cfc341b33ca5f1cc91f13eb4c37fa86451697a13150a16056bdbc10e8b3"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+      "recorded_sha256": "d3b8b253025a80fc0f3c449902876db0d316e9e7f7f5cbebd3dfbec76ad8672d"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+      "recorded_sha256": "65726402fe099337298de2531a48dc62f4a58a833a0513bd023f8b724aabafb5"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "b6cffc7383a3d6f9a22cf7d364937550dcc6fe21e49b748c16f9f286e2e714a2"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "2365406ddfd6f8b5506beda0781f527f5d73f9241c8075c044976694441bde66"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "5d8b81d7315e71293eee6de7c0b562f7442fc90ddbd805b63f92870e72420c09"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Scripts/build_cc0_production_character.py",
+      "recorded_sha256": "c6831a19efb3580e58e5a90bfa99452120847e682776cd6c99ffdc65f90c721f"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Scripts/canonicalize_cc0_helmet_hair.py",
+      "recorded_sha256": "d3fd78a63c5bf6fc4a4503108f38f5bb8ddc92abdcb30d13bf070c06f49f689b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Scripts/import_cc0_production_characters.py",
+      "recorded_sha256": "029cfcff26f3e41212f40a98de96d8221135f6a4a121232bbbb41ad245d58cf4"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "fcad88e9053f181110755c290ecb9b591c1bbcd7c7cee0c3bec539f6405d912b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_face_fitted_helmet_v1_review.json",
+      "source": "unreal/SourceArt/RaftSim/Characters/CC0Production/character_source_manifest.json",
+      "recorded_sha256": "30fd8454b1a13a3df35fc5dae17e672784981de93e91dd19dfd0672e9d33e896"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+      "recorded_sha256": "c9cfbe77bc536121f5c6232908af785d0104d85183089a34143716e6741c9813"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+      "recorded_sha256": "4cf41e7ffc76e03cd345b9c3880633ca9ac6f2a99659123e65053b499a5f131f"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "2e5c3c69c09849425232d489705ddcbc540e8a19bd1a209a9cff809b26472117"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_head_shoulder_clearance_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "acbd5c7f7e1fe3917befd32078248fc1b5148d65a44d7c5d7557c43590eb09ac"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+      "recorded_sha256": "9fc99ab2581a3f6c187bc73e006b1f373d8814084dd12d90309b4e4ffbb12d1e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+      "recorded_sha256": "3eb2dd388e40dba38c4cc5dced83ea294f2354a092cd42a175ba34257c1526dc"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "3e15c75decb1e8d8eccf6d7d168f6ba67edfa2944a57b9132f270e4548e9b899"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_palm_aligned_grip_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "9d9324f66e530326039c5a4349beae26c8fde2fde20cfa8e0dd4921baccd0d32"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+      "recorded_sha256": "5a226a3e606f9182dd33d78ec37b257ee35ad805410cc9c29ed0adb7fb026f39"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "96d1dd2e0d913f7c3f7c88b245d29ddea0c210708241cbda77a852e719b1a6da"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "fcad88e9053f181110755c290ecb9b591c1bbcd7c7cee0c3bec539f6405d912b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_skin_reflectance_v1_review.json",
+      "source": "unreal/Scripts/create_production_cc0_skin_materials.py",
+      "recorded_sha256": "5630861be6a302492cc9000ef3200a356a3cae8251c6efc5e610b10d54fc371c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+      "recorded_sha256": "39e4872b8513cc5526f7e7704b64c89621cafe225f9b992cfe196fa6d7518f17"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "7f0dabd107912b427b446e9bc1c3ba7be9c98cedc1eeb2c61a32925bceaa589f"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "a903d64b94dc80e7c470f2437818c0f733d23f92507c60a1928adfa81ee8b8e0"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v7_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+      "recorded_sha256": "602cbac30e4b26347256eacea996c1e403aa3982ec3ab9faa93332f7fc9ddc1b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v7_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "2375227ece7dfc99fb54a89b092fadc34e18a9fa0435b6ccc2ce6a3c8955f834"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v7_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "e3b8c39ab2348ddaf6f160839ea415f9a2a3a931793445f78838f413240293f0"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v7_review.json",
+      "source": "physics/tests/test_flexible_raft_visual_upgrade.py",
+      "recorded_sha256": "34cb2a830a719a8c878898c3bf48604b4a466e3a034f986a03c47fd1f5eb35cf"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+      "recorded_sha256": "5d0a5f13ee13beff6ee5483460515f0d6da07afd981f85072d33ba0e9f501c8a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "6be5f4b85685f11a34b8a61d0e6380132c513218659dd768d714ba85d7ebe9e2"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "b0fa7dc07a7e201bb4aa0f95dd00ffb554bbd98ab075293919c0bd660d6da2e3"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_review.json",
+      "source": "physics/tests/test_flexible_raft_visual_upgrade.py",
+      "recorded_sha256": "71b62ffb45308423ab8809c233556d7ca031bbd00a8b0b385d15988cc9dbab65"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_continuous_thigh_knee_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+      "recorded_sha256": "19c9a36c2741fb811723867313589b49c49e10a5c5bfd086e0c5ed6d529faa93"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "c20d0c1897ff45adc401451cd9cc07dc1edff355a25433f201d19843ee9e43f2"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "f27ef944be5a7ee54eeed09947d853014526cba1173a55bb856e4b8d3e402c0a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json",
+      "source": "physics/tests/test_flexible_raft_visual_upgrade.py",
+      "recorded_sha256": "6947d392e2968f4c163f60bac50253a66ef1bb66be8a856a1c65030a8cf7bf1b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+      "recorded_sha256": "5d0a5f13ee13beff6ee5483460515f0d6da07afd981f85072d33ba0e9f501c8a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "c9708f398aa9abb4c1a3c57a064bb184a8c8f5866591a378a16934e2e03f809a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "a41f304a5595ffa31dc3f615feed1fc8b9a4f5b1689dad45980f8a9c673324ab"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_review.json",
+      "source": "physics/tests/test_flexible_raft_visual_upgrade.py",
+      "recorded_sha256": "71b62ffb45308423ab8809c233556d7ca031bbd00a8b0b385d15988cc9dbab65"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "c3653afc20606899eee1a83402da1f51b7dfe0e8ae1728468da27f59d4b163ae"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "02c1876c74b8b006c423e1a1de47f1bfcf09429b3722a87313b0bff520e4f48a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "1dd6f6d726b8595b5e67b458879e0540f853d51c698fd0f658c36943113d7ee8"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp",
+      "recorded_sha256": "0e85226cc7714bb4a40f6be7889cd35f41ef2c893fdf6e279955eb46fd3df429"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h",
+      "recorded_sha256": "0a12302378b964e60813b57e782e7033052b45bdf8e28086bb71a84255916fcf"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "14351cb6c24ad4a99ffaf513ad80de97e5becec2e7ae05c8578ee372ac95a682"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "189f653344079e4e2db6ee842451bd967af9db76547edf4e09107f710149edf5"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_distinct_paddle_grips_v2_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "d315f4f7b2453d1f9d5013f16541d9074a4abea761c8d86161bfbc8f87bf6053"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "771d0f799030ffe961d0ecf2b316a9fdb5a1cfc45710760be648f2d9f5558d89"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "40b5fdeb94fdc93ae322c82ad728c306c37140b97b426593431962a9e3d122fe"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+      "recorded_sha256": "be41d3c245765c1abd72802d39e218d4d1351daf5ec0af7703ed30139a54c97c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "28e2da76c33f4300969600f0046ccbab826e6c6b657e415d4f93ec34c3d6dd51"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "5697537fb4801c45010ee0cfd5844f015036ce495d4618a1db1eba76271f5ffa"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "b85e746fe487521852b57936d7b8fc385beec2aab526bd6c0bbb370b63c35d29"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_folded_wet_splash_sleeves_v3_review.json",
+      "source": "physics/tests/test_safety_gear_fallback.py",
+      "recorded_sha256": "891b77ce33542ecaac115e9e5b836d7af0c05e2a98c41fd4639d368901a14f97"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h",
+      "recorded_sha256": "e0137f6f677af7607ebd6e7bf85a32eb014f674bb5ec739a60a223b71a21adf1"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp",
+      "recorded_sha256": "e78f35ffcf01d0731683e4e6291494c68c4b5070edfe51352753e9282259dd99"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "54775738c3c6858034da159a31993e103eccbc13ddeef1283062fbea02c8f287"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "e1f3b66343a8424849e862ab5fe35bfddf9fe9399f8adf27c274f70d34d9bd84"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "f515965e37d4e34a9eb08b7841cbc3c48334f0dd3ee855378e97cd0c0321427e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "fd658fed54cc43c8db89db0e16dbedf28bf712cca54f6897dc9c757f496aa1b4"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_identity_fitted_helmet_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "3f00f40ee9266baba14a0a9784f4d13de7b44129f98cfa0d9c120ad9b3e1a380"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Guide_Skin.uasset",
+      "recorded_sha256": "63ecf24137d8c28539efe8250643637d5eaff89724b79c2343d2eefddb96bee8"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew01_Skin.uasset",
+      "recorded_sha256": "ab8f03d6ac8b8639138ce732e539e0073d3056053b8fe0532f2a98a4b1adec86"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew02_Skin.uasset",
+      "recorded_sha256": "9f45a2b13edd59b5c787f5f1ebb0dff942086d0a3907e03624a31bf5b383a5b8"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew03_Skin.uasset",
+      "recorded_sha256": "0676d3627d60a17d611b3f01bdbb9b8ab9fd857a81c8eb6aa227a43d3567169a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Characters/Production/CC0/Materials/M_RaftSim_CC0_Crew04_Skin.uasset",
+      "recorded_sha256": "95650d32debc69d7a3faa1aba57cd9de10083fa84598706ec1a5e95b48642a2b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_Wetsuit.uasset",
+      "recorded_sha256": "149d3044045817dff75b45e5712e33509228887f384a2f1834c43f1ed93b758a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_RaftTube.uasset",
+      "recorded_sha256": "fe7d9966019542e4a4f52f7bef191f6080c6671e20081e989cbad69cd6bd80e6"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_RaftFloor.uasset",
+      "recorded_sha256": "bb9e83d61ecfc860965498547e8d8145b16e1c574b05ba91ed1436c25579e005"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_RiverBoulder.uasset",
+      "recorded_sha256": "257f22c4f6b24ca73349d4eb8af2c81e87817931af24de88fbc925d5b9bb9019"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_PhotorealRiverWater.uasset",
+      "recorded_sha256": "763dba183263d7485284c38eb3ca29ee0b9a33bf9977ef7e4e87db24f8282375"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_LiveRiverSurface.uasset",
+      "recorded_sha256": "a93bee0efa39cff66b308e7599d0921f37cb8e86478995e7df2adf2b3dd2c179"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v663_review.json",
+      "source": "unreal/Content/RaftSim/Materials/M_RaftSim_SprayMist.uasset",
+      "recorded_sha256": "1a91e96701d55cfa665e1a7d0f2f4661208be982800590daeecc49c7dbf60ecc"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opaque_profile_hips_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp",
+      "recorded_sha256": "70a86b06e4e7f2718b326a0cf6573eaca21a18594a8956b60b033904af4b251b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h",
+      "recorded_sha256": "9c7cb7770af6e5f2b61e97b50f6cb1064450eef28ff76f9230b003f60e6d8fc5"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "ee8f28fcf18c2054041ec9e1fbc34648b26a09a1399111556dcf46c8709e3706"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
+      "recorded_sha256": "bfd05386f107fa0034c6c791fb820799a4403ee68c350028392208d80f2316b2"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "354ab4af9cbc43f213d83500f41921e5c234a309b29f22c172d209c7b877297d"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_opposed_thumb_glove_v3_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "a2da7b6bfcd24c61d54ce167a747f00b66000fe1501f53b1e83cab6f839ff512"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_photographic_water_subuv_v4_review.json",
+      "source": "Textures/T_RaftSim_WaterParticleV4Review_SubUV.uasset",
+      "recorded_sha256": "25648ecefde9fba37204c5339f8c75f702f2da0b323cc2a5035e6564bc786f7f"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_photographic_water_subuv_v5_review.json",
+      "source": "Textures/T_RaftSim_WaterParticleV5Review_SubUV.uasset",
+      "recorded_sha256": "5e64f34d61dd0a6d905d654a90a6dd9f64f8624df72cf5158ed753381312c16b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "7a59e2b8fe9c34a675fc758f93ea6441a14573411c3a3afb720603b735f9d38d"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "0b8dffb7eec1b161dd7580799bbf9ebb03a2e30e3ec6ad617a9ee7da44cf30b6"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp",
+      "recorded_sha256": "e90582c83fe88827599b585d9f6fd46084f301091ea649c5ff6d588d863688f4"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
+      "recorded_sha256": "150ce7b05c4f8fbe834010d4b4dfaa22dbf1842263a9a672b6a5a6e87e6f026f"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "2ac60ad49b6cdf1c61b89b45eb38b028b4c5faa672a422be1aadf499b38d6925"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset",
+      "recorded_sha256": "be38a3e055260f3e27222c585dadc5b74a3b6c29977fc2e65be2d6a3e12b4d88"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset",
+      "recorded_sha256": "9a9fe8c419b5d30745368912bb596af81f5be74ef62bb3d9e7cbd799e91d1df7"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_crew_foam_occlusion_v1_review.json",
+      "source": "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/MI_RaftSim_SouthForkProductionWater.uasset",
+      "recorded_sha256": "7c85b8167535c243caaf775c882b7eb9a46a7ffb576d1bdb848a53d087040670"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
+      "recorded_sha256": "629ed847150c42a3f24955722b933b9f11287c5e2a038b6483a55a9225e0e85f"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp",
+      "recorded_sha256": "11cfbde65e89209f2503255fe23b263b3f456b70d3c8551f63981ddbc890f928"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
+      "recorded_sha256": "4255d0a87e57e85a20b63a956b5a8857338dd34212b5fe1c7da06f9edac3ae00"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "2bbd1b44363a5121817336091b9790e6e7badb3b99107b0071851cbe61a7792c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+      "recorded_sha256": "94abec82cbde60c2aa152c9ebe3599d1c037579aaded1c757524b64e53db076b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp",
+      "recorded_sha256": "004130b24f807743d262dd2c9a10fcb801144c5ad34fa1b436d0cf959b1f1236"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "2ddd24f9e6776061fe092e72b50b1ab63d030e1afbdb590ee72a9bac4ee89eba"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+      "recorded_sha256": "4aef3ebf7a7444f3da33261e00d6fb7477551cf8ce1d11cb2037e26c7b5dac2e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "0cc89193aed83231b417c39b9f90f009655b3eacfdd110bd824b693cfa130db3"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "e05dff0b236efeb17524f62af0956ada55277b3cf9827cb73599d6fee84cf829"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "d00eb3169a09ddb7bb2fd25dc2498757203b4e10193221107a0364bb2160d1a1"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "2bccc572fc18f1696ac4d3a08304805206b7aeb4f35a50196b8d4a653d85edb3"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "f8637574f9877696e2c1fb3435b3d45dcff785604ee7b010870de6a23d519f59"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "2c7fe2b2cd8a5815c0761a313e8b9385bf30080bf6f17368e043d9eec3e6697b"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "5eb02220e424fae003a01c275c17e9f1ea4a6a5df3ca4151c11bfaf4ad4dfbdb"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "d00eb3169a09ddb7bb2fd25dc2498757203b4e10193221107a0364bb2160d1a1"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "2bccc572fc18f1696ac4d3a08304805206b7aeb4f35a50196b8d4a653d85edb3"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "f8637574f9877696e2c1fb3435b3d45dcff785604ee7b010870de6a23d519f59"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_seated_waist_hip_v2_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "ddc58744fd846d0a86d6c843a7d4851a1927dc81d601ca7bfc13467db756d2af"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "200a3b0a75ab7c3b6c935f81bb59041ccdedc4c19441df8640470e6275940485"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "ba29b1ca9fa797c60bcaa5e0b5373a4c697dd774fc3a12fc3215082346672b04"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "b848b57df88121ae2a0094d547fb6fba4c74ef0a3326001481aeefd11d05903a"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "acb1f6b8d5ff21241651f1890b3f6761bf23f6cc6a248d5d89999ebc1a4dc209"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "47491f59738e92cc969f56e9e6f93992b5c9cfae46d3e6f20706a203af4ba27e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "4a642f4be9d9c0e8306bc6a7b06e2f8f3fdbb48ae03946806e690da342346b8c"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "b73256c4d0219c907e6506d7e7cbaefa09f3d52dad9bfe29fd43e63ab392925e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "890d1b5ebaf2b72a7594350886b0b019afc61458f078a730453028fb30670728"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",
+      "source": "unreal/Scripts/capture_metahuman_production_roster.py",
+      "recorded_sha256": "6295f9720059d2b92df4309be12fb47feed40501a1c0cba9ccb8182bd2239385"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "62050991368b32e7b6a43274cacb4a19493a5ac54e238c2b5f54ed39249dc5d6"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_bark_diff_1k.png",
+      "recorded_sha256": "508ca0a40d118beec98e8375b4611e8a16123eec94b5d2b4870617cf4d24e6fa"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_bark_disp_1k.png",
+      "recorded_sha256": "ab08f400d208487b7bfd5d9cd4386456ed8e5fbcfdd045eca1705e3ed4b3dab8"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_bark_nor_gl_1k.png",
+      "recorded_sha256": "b889e7080d6efb0592f83e64cc5a5afa5fb7787b4b7d1ae13a65602689e793e8"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_bark_rough_1k.png",
+      "recorded_sha256": "b198105d3022db6c459ae9c307ecdb7b644832ee20bcbfd89c3741cecc77881f"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_twig_alpha_1k.png",
+      "recorded_sha256": "3f399629337e7ac3af27a01b08ffb9c0d60224a9dd374a1427761a5c2eea9d6e"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_twig_diff_1k.png",
+      "recorded_sha256": "76f6d0c0044d76bac08fbbd3d2ac1c9b66bb046de7d0b1a22aa9b319308f3833"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_twig_nor_gl_1k.png",
+      "recorded_sha256": "cbb6b8179a9f7f6e84fd15d1f422bc342841d20845b2bad437612f03fb0067de"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "source": "textures/fir_tree_01_twig_rough_1k.png",
+      "recorded_sha256": "a4f0a4c8bc93946dea229def779ffe5d32c555c717e4bf7b0e4b4d86bc21987a"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/island_tree_01_1k.fbx",
+      "recorded_sha256": "3f193c0ca27977b001682aa4ba3eef654b31c1af60a166af4024a11cc19a2948"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_diff_1k.png",
+      "recorded_sha256": "519a34062e3eb42e14d9f2b6454669d8e71ccf0ab0b95fe05e00f31ee7ffdf29"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_nor_gl_1k.png",
+      "recorded_sha256": "039b67b309fd3cf7333fbd8e2a8db0f253a87def5e7e9d88b06401d8f605ed1f"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_rough_1k.png",
+      "recorded_sha256": "eab3874d010768431baac106ca2904e8bfb7736e6fa17fecf24855ca37bcf565"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_branches_diff_1k.png",
+      "recorded_sha256": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_branches_nor_gl_1k.png",
+      "recorded_sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_branches_rough_1k.png",
+      "recorded_sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_leaves_alpha_1k.png",
+      "recorded_sha256": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_leaves_diff_1k.png",
+      "recorded_sha256": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_leaves_nor_gl_1k.png",
+      "recorded_sha256": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_01/textures/island_tree_01_leaves_rough_1k.png",
+      "recorded_sha256": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/island_tree_02_1k.fbx",
+      "recorded_sha256": "ac2489d7c5b76cbe050a4f78d1984d614c2a7b0cfbe617b95836859613ab6d76"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_diff_1k.png",
+      "recorded_sha256": "398424083d2db299f5445e7c6422498688643f634767383ba8cd8bbfbfb0b27b"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_nor_gl_1k.png",
+      "recorded_sha256": "0c300f7a5da76c57b5e8475d32e3e60fa7605a29f52c1a38f2501f537aa2f3e2"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_rough_1k.png",
+      "recorded_sha256": "59add752a4dc6d898c54bef061e31a92b1632be6cdb638b15ea446f2d2d03603"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_branches_diff_1k.png",
+      "recorded_sha256": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_branches_nor_gl_1k.png",
+      "recorded_sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_branches_rough_1k.png",
+      "recorded_sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_leaves_alpha_1k.png",
+      "recorded_sha256": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_leaves_diff_1k.png",
+      "recorded_sha256": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_leaves_nor_gl_1k.png",
+      "recorded_sha256": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_02/textures/island_tree_02_leaves_rough_1k.png",
+      "recorded_sha256": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/island_tree_03_1k.fbx",
+      "recorded_sha256": "32b2a158689fde1df5f55bad89b1eb4f131bacf534fac45155fc1d4c49afba49"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_diff_1k.png",
+      "recorded_sha256": "264330f1ae3998fe5620ec85fd175628bfabd79f80d25f777e18274997fd916f"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_nor_gl_1k.png",
+      "recorded_sha256": "886c7e7468e9485626510308d03160d7b73789d584165bfa412e7b36ee5dc5b6"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_rough_1k.png",
+      "recorded_sha256": "7a49a0de9979eaf33a2226aebb6e540cb0bc2e5a2725b19046f1bf1026953fb8"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_branches_diff_1k.png",
+      "recorded_sha256": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_branches_nor_gl_1k.png",
+      "recorded_sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_branches_rough_1k.png",
+      "recorded_sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_leaves_alpha_1k.png",
+      "recorded_sha256": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_leaves_diff_1k.png",
+      "recorded_sha256": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_leaves_nor_gl_1k.png",
+      "recorded_sha256": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source": "island_tree_03/textures/island_tree_03_leaves_rough_1k.png",
+      "recorded_sha256": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/fir_sapling_medium_1k.fbx",
+      "recorded_sha256": "f09677355367e2a4a29b9542474049fcee311a2cc8aa561f9d316153cf5c33c4"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_branches_diff_1k.png",
+      "recorded_sha256": "508ca0a40d118beec98e8375b4611e8a16123eec94b5d2b4870617cf4d24e6fa"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_branches_nor_gl_1k.png",
+      "recorded_sha256": "b889e7080d6efb0592f83e64cc5a5afa5fb7787b4b7d1ae13a65602689e793e8"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_branches_rough_1k.png",
+      "recorded_sha256": "b198105d3022db6c459ae9c307ecdb7b644832ee20bcbfd89c3741cecc77881f"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_twigs_alpha_1k.png",
+      "recorded_sha256": "3f399629337e7ac3af27a01b08ffb9c0d60224a9dd374a1427761a5c2eea9d6e"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_twigs_diff_1k.png",
+      "recorded_sha256": "581df52e36fa3ea1d348df6b84e276fb3c88ee33cc182c2987eff61bf3daa513"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_twigs_nor_gl_1k.png",
+      "recorded_sha256": "cbb6b8179a9f7f6e84fd15d1f422bc342841d20845b2bad437612f03fb0067de"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling_medium/textures/fir_sapling_medium_twigs_rough_1k.png",
+      "recorded_sha256": "a4f0a4c8bc93946dea229def779ffe5d32c555c717e4bf7b0e4b4d86bc21987a"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/fir_sapling_1k.fbx",
+      "recorded_sha256": "5eafd5fd2914639960238a6beef97c4d64be9fb0a5b690fd03d13b2291f71db1"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_branches_diff_1k.png",
+      "recorded_sha256": "8813b75888f3d76ae8581a09b7f9fdb8d2b7b0d3c7977ba32be1678373eee657"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_branches_nor_gl_1k.png",
+      "recorded_sha256": "86e1b91b1f7bfdf4505b465ea0e6271ed526d7a6354a0260119aa143bacc0671"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_branches_rough_1k.png",
+      "recorded_sha256": "8d96bd806bd7ebe73b69ddc38516533f0a616c1bfd0e6670fe7a99a34b23e371"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_twigs_alpha_1k.png",
+      "recorded_sha256": "91e8a6114e2f180de3d2fa60d397d69fee0d3c745a15e012da705c86cd4de976"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_twigs_diff_1k.png",
+      "recorded_sha256": "c29cb18884dc4cd24a72d0e39f01c1baeadb798d0fe3d196d82b8cb11b18f061"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_twigs_nor_gl_1k.png",
+      "recorded_sha256": "5e1ca8d4c227fae4dab854028775b9cac49201966cb18817a1040194b33ec98b"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fir_sapling/textures/fir_sapling_twigs_rough_1k.png",
+      "recorded_sha256": "64e351910b74d2450029713dc08f7cd1ff0bb0c0c5a17ce271a0c87527e38812"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fern_02/fern_02_1k.fbx",
+      "recorded_sha256": "6d8238b9cc1bbb5f5766396c2db26f2219c0d0e5ca226fb81dcc44bdb35045e8"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fern_02/textures/fern_02_alpha_1k.png",
+      "recorded_sha256": "ea3c64284c7ebdeedf484d2d816eae92825ec526140c3bb83859ddc7a64001f9"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fern_02/textures/fern_02_diff_1k.png",
+      "recorded_sha256": "f8f504bce117647f1df386cd7bc99a79c664bb49f82d1dd6412c83a700c48e94"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fern_02/textures/fern_02_nor_gl_1k.png",
+      "recorded_sha256": "438c065c60754ad410c5b4690df6547d06d9907b8d2c9c3a908cb135ffd52b97"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/polyhaven_futaleufu_temperate_forest_set_source_manifest.json",
+      "source": "fern_02/textures/fern_02_rough_1k.png",
+      "recorded_sha256": "1485a265bcd40e5d9362c0ed56f9024df3ab5241dc9f83c8011165d2223c5d20"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_branches_diff_1k.png",
+      "recorded_sha256": "fe671f7fae88e269e4a517b6ff7be74ae3c2d1fdedfea206ebfa9941af0d9e20"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_branches_nor_gl_1k.png",
+      "recorded_sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_branches_rough_1k.png",
+      "recorded_sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_leaves_alpha_1k.png",
+      "recorded_sha256": "c708a7e928a2e4d26981b021a22deeefc0ebb0e467f60b53cfa636a7e24d68f7"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_leaves_diff_1k.png",
+      "recorded_sha256": "5729978e92649ee6cc70bdc457aac1b28b16a10bde0a55004b659a1923c8861b"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_leaves_nor_gl_1k.png",
+      "recorded_sha256": "4dc58cca117cb193629bf6a2b909bd281451c60a5d85f1b1d438d296b90a1091"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_leaves_rough_1k.png",
+      "recorded_sha256": "2f6b89e7a1983cfa6fc2050f993c2c91c9afc86ce285607fa5a5f8f6b1b4c879"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_trunk_diff_1k.png",
+      "recorded_sha256": "9ba4a3af9d38d54638df35a2bae4f30455f5fb25c080825f6e22af4e5d65c7f2"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_trunk_nor_gl_1k.png",
+      "recorded_sha256": "d2c1dd8a274983731e2418b4eb6b49bddcf375d170c70010b799d7417eafbfac"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K/polyhaven_jacaranda_tree_source_manifest.json",
+      "source": "textures/jacaranda_tree_trunk_rough_1k.png",
+      "recorded_sha256": "9262a1d4e8cc848a29bfc93333e8ad844c7e470e592787604b7e090e0ed149f2"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_bark_diff_1k.png",
+      "recorded_sha256": "91e79e9bd1d5d68922262b4eee752808c49c55c2941b531a65b586dae8984bc9"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_bark_disp_1k.png",
+      "recorded_sha256": "8cce79758590f833bd8435c428110bcd656ff8e242c899acbd416b6eeb7e8606"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_bark_nor_gl_1k.png",
+      "recorded_sha256": "d0cdc8ff2f74da8023a1f18512f9db643284d94a698a4ac491f63c4c11c95211"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_bark_rough_1k.png",
+      "recorded_sha256": "63c3785c47a2f4193e5054d9f8481da0bd41bc2bfc1a993cd8785fad6339fe97"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_a_diff_1k.png",
+      "recorded_sha256": "50e8911ac39d8eeb720d7412495d00f8639f2a0ad01dec1c22aa79efc16e9f08"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_a_nor_gl_1k.png",
+      "recorded_sha256": "e1dfe1dcfd4d92eb7dd732cff98ac32c8a3aa5a36b9eea220e22030ea604ec09"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_a_rough_1k.png",
+      "recorded_sha256": "ebda61e833608c3df8d65018330c9e0bb80ec39b30d9416de0cc088c520ca8b6"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_b_diff_1k.png",
+      "recorded_sha256": "41bd8a65e0a827646b3a33dc1607eba2082ddc25fe714752259447c49d0600cc"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_b_nor_gl_1k.png",
+      "recorded_sha256": "fe5f1dafe611a7f04142abf7878622a6212ed7c1737711d548ec3301b3210cf7"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_b_rough_1k.png",
+      "recorded_sha256": "ff399f6d054f903deee0e4d455c09f12ac3441f5c9547a0e9d06c163e6958dee"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_c_diff_1k.png",
+      "recorded_sha256": "edbceb8657a036e98831a3550433ab2d78928fcf9060e400ca84748cedcaf962"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_c_nor_gl_1k.png",
+      "recorded_sha256": "08a40a7486ad3a8d97cf3da0afe5951f1a038cb51395020e2c4a2113f46d1610"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_trunk_c_rough_1k.png",
+      "recorded_sha256": "48fcced840b4beed4e03e09a352a67dd36185c9cd4247090069391bfb9746de9"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_twig_diff_1k.png",
+      "recorded_sha256": "d02c031de64b8ad671f3dd0da19870fa4783d912ae6674aeab0702871deeaeaa"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_twig_nor_gl_1k.png",
+      "recorded_sha256": "4b79eda7fe8843d71f9289bd0d3897a1b0a7310b1872b390a589a04b510b0597"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+      "source": "textures/pine_tree_01_twig_rough_1k.png",
+      "recorded_sha256": "c12da3dd6c1588f50307d96807d78115757f110bc562811369d90b86bd6fddc7"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/polyhaven_rock_moss_set_01_source_manifest.json",
+      "source": "textures/rock_moss_set_01_diff_1k.jpg",
+      "recorded_sha256": "40cea65d8aa4ee73a93b04af19963834d061eee9779c3fc2c1cba76eef812ccc"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/polyhaven_rock_moss_set_01_source_manifest.json",
+      "source": "textures/rock_moss_set_01_nor_gl_1k.exr",
+      "recorded_sha256": "d86555deabb910ed82b2b770d852ba5aa931d373689ff7ae028574c7b310be99"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/polyhaven_rock_moss_set_01_source_manifest.json",
+      "source": "textures/rock_moss_set_01_rough_1k.jpg",
+      "recorded_sha256": "4d6ec46623abd8e2cdb855f59c7ce31873ad61b36b60e4de579e9e776a497c6b"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_branch_diff_1k.png",
+      "recorded_sha256": "a93ce54213c4a98cd01cb5c5f7ab46b77defcd66e1dd082e6912f6e60632e630"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_branch_nor_gl_1k.png",
+      "recorded_sha256": "0338a1400391893fdf6c6cbd1c22a573d6ab2300ad771d4916184bf206e1a671"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_branch_rough_1k.png",
+      "recorded_sha256": "f285a54d141f30e39c7741e84a813c5cbccd9e9ee397af687176213f77d3e9a5"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_diff_1k.jpg",
+      "recorded_sha256": "4e0093f407b3a1120a36de49a48ebe5a465a9a9b77e361c7a3e66866e115e404"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_leaves_alpha_1k.png",
+      "recorded_sha256": "4f143e2dda8a6a572f427ac378b92255d21761e4611de0d26e21816c01aa533b"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_leaves_diff_1k.png",
+      "recorded_sha256": "d3fc48522c76aa1f91076c6b86f302669822ebe4e2acabd67d42c4d57eaa5ba0"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_leaves_nor_gl_1k.png",
+      "recorded_sha256": "fa4ad390f2e68b745db8f568cad64c3272696c5e01312ae564795e37724d79b8"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_leaves_rough_1k.png",
+      "recorded_sha256": "f005213467e38bcb355b00c9a6eb9896b8d810ee885d5c7fa308d9f3326ef602"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_nor_gl_1k.exr",
+      "recorded_sha256": "cf999e30663267b55b6fab43ca97c1e96176bdc67268e6c25854d53f15267d64"
+    },
+    {
+      "review": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+      "source": "textures/tree_small_02_rough_1k.exr",
+      "recorded_sha256": "1ed5ad24397c065beb2b2d3521470730f24e957cbd5fb323ad3f9b6d267b4585"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c0.tif",
+      "recorded_sha256": "ea2b70bf25c0f82bb97494008fc410c57cfefcfab9d4d8d1f3287c7e80b6223d"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c1.tif",
+      "recorded_sha256": "71fe8f13b1740ae588c0cdd20810a9904828f2b59f614d70440f8ba5c5a889af"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c0.tif",
+      "recorded_sha256": "1e73fcc827cf2eea06795e2561748466456f7ebcc22c5d7a954b4bad6ee311d1"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c1.tif",
+      "recorded_sha256": "a1ee9f7a40682181332c9a8f070c60bff5fe213a80d4cad1bc1243a22e13efc3"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c0.png",
+      "recorded_sha256": "60c627be7f447ed90166f4bc25aae3204f4114471edbdeca5c8da9155226b728"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c1.png",
+      "recorded_sha256": "22fa3b69bfd54fc2f836e8f3d93c7b2fe230fc8359e710b21865a6005f5c8006"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c0.png",
+      "recorded_sha256": "53424d46e2675818694837c6337bf8af8e52bdae2b4966c6cb3deaddd06f613e"
+    },
+    {
+      "review": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+      "source": "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c1.png",
+      "recorded_sha256": "27726a165d82d37d3fa6c118a35d5257966f95d48c5fada00731962fdc505f3f"
+    }
+  ]
+}
