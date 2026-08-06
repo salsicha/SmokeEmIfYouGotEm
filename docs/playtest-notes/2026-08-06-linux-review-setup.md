@@ -7,25 +7,27 @@ record and the working instructions; per-session findings go in sibling
 
 ## Launching
 
+Always launch through the hybrid-graphics-safe wrapper (2026-08-06: the bare
+editor segfaulted in the NVIDIA driver's swapchain present on this machine;
+the wrapper pins Vulkan to the proprietary NVIDIA ICD and the Optimus layer —
+see the script header for the crash forensics):
+
 Editor (interactive PIE, recommended for review):
 
 ```bash
-__NV_PRIME_RENDER_OFFLOAD=1 ~/UnrealEngine/Engine/Binaries/Linux/UnrealEditor \
-  ~/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject
+~/repos/SmokeEmIfYouGotEm/unreal/Scripts/run_editor_linux.sh
 ```
 
 Standalone uncooked game (menu flow, closest to the shipped experience):
 
 ```bash
-__NV_PRIME_RENDER_OFFLOAD=1 ~/UnrealEngine/Engine/Binaries/Linux/UnrealEditor \
-  ~/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject -game -windowed -resx=2560 -resy=1440
+~/repos/SmokeEmIfYouGotEm/unreal/Scripts/run_editor_linux.sh -game -windowed -resx=2560 -resy=1440
 ```
 
 Direct-to-map (skip menus; substitute any map below):
 
 ```bash
-__NV_PRIME_RENDER_OFFLOAD=1 ~/UnrealEngine/Engine/Binaries/Linux/UnrealEditor \
-  ~/repos/SmokeEmIfYouGotEm/unreal/SmokeEmIfYouGotEm.uproject /Game/RaftSim/Maps/L_Troublemaker -game -windowed
+~/repos/SmokeEmIfYouGotEm/unreal/Scripts/run_editor_linux.sh /Game/RaftSim/Maps/L_Troublemaker -game -windowed
 ```
 
 Maps: `L_RaftSimBoot` (menu), `L_RaftSimTestTank` (Training Eddy),
