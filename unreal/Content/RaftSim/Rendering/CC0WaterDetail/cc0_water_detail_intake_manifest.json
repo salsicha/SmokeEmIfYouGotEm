@@ -1,0 +1,59 @@
+{
+  "schema": "raftsim.cc0_water_detail_intake.v1",
+  "reviewed_on": "2026-08-06",
+  "reviewer": "repo owner (salsicha), first named human visual review 2026-08-06",
+  "purpose": "Whitewater froth surfaces and water interface detail for the live-water presentation materials, answering the 2026-08-06 review rejections (no white froth; Colorado/Chilko/Futaleufu water does not read as liquid).",
+  "authority": "visual_water_presentation_only_no_hydraulic_collision_buoyancy_or_raft_force_authority",
+  "source": {
+    "provider": "ambientCG (ambientcg.com)",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://docs.ambientcg.com/license/",
+    "committed_to_repo": true,
+    "raw_downloads_committed": false,
+    "reimport_script": "unreal/Scripts/import_reviewed_cc0_water_detail_assets.py"
+  },
+  "assets": [
+    {
+      "asset_id": "Foam001",
+      "role": "light open lace froth",
+      "page_url": "https://ambientcg.com/a/Foam001",
+      "download": "https://ambientcg.com/get?file=Foam001_2K-JPG.zip",
+      "zip_sha256": "5509ae3eb4e5e9de6b780fdafec93c094c8467368566ef5b5ceb3369f9722d62"
+    },
+    {
+      "asset_id": "Foam002",
+      "role": "medium holed lace froth",
+      "page_url": "https://ambientcg.com/a/Foam002",
+      "download": "https://ambientcg.com/get?file=Foam002_2K-JPG.zip",
+      "zip_sha256": "9a0882264b843890cd289b1f434c25c9735bba60a7d6f4299e03f663dc350b01"
+    },
+    {
+      "asset_id": "Foam003",
+      "role": "dense clotted aerated froth",
+      "page_url": "https://ambientcg.com/a/Foam003",
+      "download": "https://ambientcg.com/get?file=Foam003_2K-JPG.zip",
+      "zip_sha256": "c3b1aba4bd61d4545c26dfde03196d3d9a2aa76c67a787bddd55ab3d937496d6"
+    },
+    {
+      "asset_id": "SurfaceImperfections001",
+      "role": "water interface sparkle detail (smudge streaks)",
+      "page_url": "https://ambientcg.com/a/SurfaceImperfections001",
+      "download": "https://ambientcg.com/get?file=SurfaceImperfections001_2K-JPG.zip",
+      "zip_sha256": "8fe9edfcd99c8d3d3e0a04c4246c0c69f36aa17b03982d808aa79b6da0bc8bd2"
+    },
+    {
+      "asset_id": "SurfaceImperfections009",
+      "role": "water interface sparkle detail (droplet noise)",
+      "page_url": "https://ambientcg.com/a/SurfaceImperfections009",
+      "download": "https://ambientcg.com/get?file=SurfaceImperfections009_2K-JPG.zip",
+      "zip_sha256": "8a9d87dda1660e34bd36a76d26f315c8ae8e18c2b3b03d44a5c1ae989a8cb2b1"
+    }
+  ],
+  "imported_textures": [
+    "T_CC0_Foam001_Color", "T_CC0_Foam001_Opacity", "T_CC0_Foam001_Normal", "T_CC0_Foam001_Roughness",
+    "T_CC0_Foam002_Color", "T_CC0_Foam002_Opacity", "T_CC0_Foam002_Normal", "T_CC0_Foam002_Roughness",
+    "T_CC0_Foam003_Color", "T_CC0_Foam003_Opacity", "T_CC0_Foam003_Normal", "T_CC0_Foam003_Roughness",
+    "T_CC0_WaterImperfections001_Normal", "T_CC0_WaterImperfections001_Mask",
+    "T_CC0_WaterImperfections009_Normal", "T_CC0_WaterImperfections009_Mask"
+  ]
+}

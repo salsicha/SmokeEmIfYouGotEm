@@ -511,8 +511,10 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "const FVector ProductionSkullCenterOffsetCm = bUsingProductionVisual" in host
     assert "constexpr float kProductionHelmetReferenceFit = 0.96f;" in host
     assert "const float CollarFit = bUsingProductionVisual ? 1.28f : 1.0f;" in host
-    assert "kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 9.5f)" in host
-    assert "kProductionHelmetShellOffsetCm(2.5f, 0.0f, 0.0f)" in host
+    # 2026-08-06 named human review: helmet seated lower on the skull.
+    assert "kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 6.5f)" in host
+    # 2026-08-06 named human review: helmet nearly centred, not pushed forward.
+    assert "kProductionHelmetShellOffsetCm(0.8f, 0.0f, 0.0f)" in host
     assert "kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f)" in host
     assert "FVector(0.0f, 0.0f, -4.0f)" in host
     assert "TorsoRotation.RotateVector(ProductionSkullCenterOffsetCm)" in host

@@ -1660,7 +1660,12 @@ def test_photoreal_materials_preserve_physical_detail_scale_and_natural_water_no
     assert 'Scalar(TEXT("HydraulicFoamColorBreakupBias"), 0.0f)' in source
     assert 'Scalar(TEXT("HydraulicFoamColorBreakupGain"), 0.78f)' in source
     assert 'Scalar(TEXT("HydraulicFoamColorCoreGain"), 1.25f)' in source
-    assert "Const3(0.48f, 0.53f, 0.52f)" in source
+    # 2026-08-06 named human review: froth is aerated white broken up by the
+    # CC0 two-scale lace, not a 48% gray constant over procedural noise.
+    assert 'FoamColor->ParameterName = TEXT("WhitewaterFrothColor")' in source
+    assert "FLinearColor(0.88f, 0.91f, 0.92f, 1.0f)" in source
+    assert 'TEXT("WhitewaterFrothLaceDense")' in source
+    assert 'Scalar(TEXT("WhitewaterFrothKneeGain"), 1.60f)' in source
     assert (
         "UMaterialExpressionMultiply* FoamRaw = Mul(FoamColorCore, FoamColorBreakup)"
         in source
@@ -1732,7 +1737,9 @@ def test_live_water_surface_avoids_double_volume_transmission():
     assert "Reusing reviewed shared solver-field textures" in (
         environment_automation_source
     )
-    assert 'Scalar(TEXT("LiveFoamIntensity"), 0.52f)' in material_source
+    # 2026-08-06 named human review: textured froth needs headroom to reach
+    # aerated white where the solver foam channel saturates.
+    assert 'Scalar(TEXT("LiveFoamIntensity"), 1.70f)' in material_source
     assert 'Scalar(TEXT("LiveWaterRoughness"), 0.085f)' in material_source
     assert 'Scalar(TEXT("LiveRippleStrength"), 0.18f)' in material_source
     assert 'TEXT("LiveShallowSurfaceColor")' in material_source
@@ -1748,7 +1755,10 @@ def test_live_water_surface_avoids_double_volume_transmission():
     )
     assert 'Scalar(TEXT("HydraulicCoverageSpeedGain"), 2.2f)' in material_source
     assert "SpeedCoverage" in material_source
-    assert "StationEdgeCoverage, HydraulicCoverage" in material_source
+    # 2026-08-06 named human review: aerated cells push the overlay toward
+    # opaque froth before the station-edge mask applies.
+    assert "StationEdgeCoverage, CoverageWithFroth" in material_source
+    assert 'Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f)' in material_source
     assert "StationEdgeCoverage->Input.OutputIndex = 4" in material_source
     assert 'TEXT("LiveWaterFlowNormalPrimary")' in material_source
     assert 'TEXT("LiveWaterFlowNormalCross")' in material_source

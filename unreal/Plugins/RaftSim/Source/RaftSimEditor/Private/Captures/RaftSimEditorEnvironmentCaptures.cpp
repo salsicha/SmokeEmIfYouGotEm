@@ -592,8 +592,40 @@ bool CapturePreviewImageForSpec(
             RiverEyeCenterArtifactCoverActor = nullptr;
         }
     };
-    CaptureComponent->CaptureScene();
-    FlushRenderingCommands();
+    // Persisted scene-capture state needs several rendered frames for TSR
+    // and Lumen history to converge — the settled South Fork capture path
+    // already does this; without it a fresh offscreen session (first seen on
+    // the Linux review machine) reads as an unlit pre-dawn scene. Evidence
+    // only; no actor, package, material, or gameplay authority is written.
+    constexpr int32 CandidateSettleFrameCount = 12;
+    for (int32 SettleFrameIndex = 0;
+         SettleFrameIndex < CandidateSettleFrameCount;
+         ++SettleFrameIndex)
+    {
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+        FPlatformProcess::Sleep(0.016f);
+    }
+    // The rig recaptures the SkyLight cubemap at build time, which snapshots
+    // an unrendered (black) sky in a fresh headless session — the scene's
+    // ambient design leans on that cubemap, so the saved captures read as
+    // unlit silhouettes (first seen on the Linux review machine; interactive
+    // Mac sessions repopulated it implicitly via viewport redraws).
+    // Recapture after the settle frames, then let the refreshed ambient
+    // propagate into the persisted capture history.
+    for (TActorIterator<ASkyLight> SkyIt(World); SkyIt; ++SkyIt)
+    {
+        if (SkyIt->GetLightComponent())
+        {
+            SkyIt->GetLightComponent()->RecaptureSky();
+        }
+    }
+    for (int32 AmbientFrameIndex = 0; AmbientFrameIndex < 6; ++AmbientFrameIndex)
+    {
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+        FPlatformProcess::Sleep(0.016f);
+    }
     FAssetCompilingManager::Get().FinishAllCompilation();
     if (GShaderCompilingManager)
     {

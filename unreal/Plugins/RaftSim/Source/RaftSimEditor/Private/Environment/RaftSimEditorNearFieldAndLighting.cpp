@@ -1809,10 +1809,35 @@ void AddPreviewNearFieldPhotorealReviewDressing(
 
 void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    if (!World || !GEditor)
+    if (!World)
     {
         return;
     }
+    // GEditor->AddActor returns null in unattended/offscreen sessions (first
+    // seen regenerating candidate maps headless on the Linux review machine),
+    // which silently skipped the entire rig behind per-actor null guards and
+    // saved dusk-lit maps. Fall back to a plain world spawn so headless
+    // regeneration produces the same authored rig as interactive runs.
+    auto SpawnRigActor = [World](UClass* ActorClass,
+                                 const FTransform& Transform) -> AActor*
+    {
+        AActor* Placed = GEditor
+            ? GEditor->AddActor(World->GetCurrentLevel(), ActorClass, Transform)
+            : nullptr;
+        if (!Placed)
+        {
+            FActorSpawnParameters Parameters;
+            Parameters.SpawnCollisionHandlingOverride =
+                ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            Parameters.OverrideLevel = World->GetCurrentLevel();
+            Placed = World->SpawnActor<AActor>(
+                ActorClass,
+                Transform.GetLocation(),
+                Transform.GetRotation().Rotator(),
+                Parameters);
+        }
+        return Placed;
+    };
     const FRaftSimPhotographicCaptureSettings CaptureSettings =
         GetPhotographicCaptureSettings(Spec.RiverId);
     const bool bPacuareHumidAtmosphere =
@@ -1833,7 +1858,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         ? FRotator(-50.0f, 55.0f, 0.0f)
         : FRotator(-58.0f, -30.0f, 0.0f);
     ADirectionalLight* Sun = Cast<ADirectionalLight>(
-        GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(SunRotation)));
+        SpawnRigActor(ADirectionalLight::StaticClass(), FTransform(SunRotation)));
     if (Sun)
     {
         // AddActor may preserve the DirectionalLight class template's rotation;
@@ -1872,12 +1897,19 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
 
     ASkyLight* SkyLight = Cast<ASkyLight>(
-        GEditor->AddActor(World->GetCurrentLevel(), ASkyLight::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 1000.0f))));
+        SpawnRigActor(ASkyLight::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 1000.0f))));
     if (SkyLight)
     {
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
         SkyLight->GetLightComponent()->SourceType = SLS_CapturedScene;
+        // A build-time cubemap bake snapshots whatever has rendered so far —
+        // in a headless regeneration session that is an unrendered (black)
+        // sky, and the saved map then reads as unlit silhouettes everywhere
+        // (first seen on the Linux review machine; interactive Mac sessions
+        // repopulated the bake implicitly). Real-time capture derives the
+        // ambient from the live sky in every session type instead.
+        SkyLight->GetLightComponent()->SetRealTimeCapture(true);
         SkyLight->GetLightComponent()->SetIntensity(CaptureSettings.SkyLightIntensity);
         if (bPacuareHumidAtmosphere)
         {
@@ -1893,7 +1925,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
-        GEditor->AddActor(World->GetCurrentLevel(), ASkyAtmosphere::StaticClass(), FTransform::Identity));
+        SpawnRigActor(ASkyAtmosphere::StaticClass(), FTransform::Identity));
     if (Atmosphere)
     {
         Atmosphere->SetActorLabel(TEXT("RaftSim_SkyAtmosphere_SourceAware"));
@@ -1921,7 +1953,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
 
     AExponentialHeightFog* Fog = Cast<AExponentialHeightFog>(
-        GEditor->AddActor(World->GetCurrentLevel(), AExponentialHeightFog::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 220.0f))));
+        SpawnRigActor(AExponentialHeightFog::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 220.0f))));
     if (Fog)
     {
         Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
@@ -1970,8 +2002,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     }
 
     ASphereReflectionCapture* RiverReflectionCapture = Cast<ASphereReflectionCapture>(
-        GEditor->AddActor(
-            World->GetCurrentLevel(),
+        SpawnRigActor(
             ASphereReflectionCapture::StaticClass(),
             FTransform(
                 FRotator::ZeroRotator,

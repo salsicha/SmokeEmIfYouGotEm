@@ -520,13 +520,18 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
     // render-only controls; solver wetness, geometry and forces stay upstream.
     SetScalar(TEXT("ReachHueVariation"), 0.12f);
     SetScalar(TEXT("CalmSurfaceColorVariation"), 0.22f);
-    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f);
-    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.75f);
-    SetScalar(TEXT("SlickNormalFloor"), 0.85f);
+    // 2026-08-06 named human review: the near-zero interface response made
+    // Terminator's turquoise body read as "a solid surface, not water".
+    // Restore a bounded liquid interface — midway to the accepted South Fork
+    // values — while keeping reflection localized so the rejected V2
+    // clipped-white guide-eye sheet cannot return.
+    SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f);
+    SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.58f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.62f);
     SetScalar(TEXT("SlickRoughnessScale"), 1.0f);
-    SetScalar(TEXT("FresnelSpecular"), 0.01f);
-    SetScalar(TEXT("OpticalDepthResponseExponent"), 0.25f);
+    SetScalar(TEXT("FresnelSpecular"), 0.10f);
+    SetScalar(TEXT("OpticalDepthResponseExponent"), 0.42f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();

@@ -24,8 +24,23 @@
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp",
+      "recorded_sha256": "b125a8db1871ae0a7d3c057aeff9ad094800493c4b3210bce6d645f106602066"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp",
       "recorded_sha256": "6bd20f4f22a5b4869c106a758747686688794b8fb7462cc5cf8de8d402d69205"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorChilkoWaterMaterial.cpp",
+      "recorded_sha256": "26264a20c87e4778f1cfdc3ca32e69a257714e796d8bc89e0928e0f19057b08d"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorFutaleufuWaterMaterial.cpp",
+      "recorded_sha256": "376d5a2445284e17356949525f45799c4401f9a89e76df145535a8a70a25ac4d"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
@@ -71,11 +86,6 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
       "recorded_sha256": "abb8816a3e507a92f2302b9de6a1ab35e162aba9379ae62842c05fda86772880"
-    },
-    {
-      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
-      "source": "physics/tests/test_editor_source_layout.py",
-      "recorded_sha256": "4b54b097b12c6af28b2bea9ec73778e5eacd9a452d2284d68706e1573b542508"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_review.json",
@@ -128,6 +138,11 @@
       "recorded_sha256": "3c8f2c2c633c9024cc08df452acad5ca7be9ad37d3982ee62513b1731d4d2e10"
     },
     {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+      "source": "physics/tests/test_editor_source_layout.py",
+      "recorded_sha256": "9206cc1ddc960383cab928f06f87d70d769a89fe2fbd467038bd46582c03a41f"
+    },
+    {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
       "recorded_sha256": "11e8e508a7c9f528ef0426932ff2e106f4c2f7c87f475c598da3ca554abe91f4"
@@ -151,11 +166,6 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
       "recorded_sha256": "4501b0bdd250d895256fe8864eaf34233c8a769333ba88f29de5bf0a022050ca"
-    },
-    {
-      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_connected_plunge_v1_review.json",
-      "source": "physics/tests/test_editor_source_layout.py",
-      "recorded_sha256": "154d4d88bdfcf15b1bb33cf9e79c31d76053af4220ff3c49b1b9bd4ad950d5a7"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json",
@@ -526,6 +536,11 @@
       "review": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_review.json",
       "source": "physics/tests/test_flexible_raft_visual_upgrade.py",
       "recorded_sha256": "71b62ffb45308423ab8809c233556d7ca031bbd00a8b0b385d15988cc9dbab65"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+      "recorded_sha256": "6c93793c21ae9d4cc2c4dc499c1d08d44c2a3d226e096a0342614d0505238810"
     },
     {
       "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",

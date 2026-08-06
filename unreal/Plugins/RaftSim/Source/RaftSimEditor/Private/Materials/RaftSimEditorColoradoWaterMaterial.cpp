@@ -414,8 +414,14 @@ UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
     SetScalar(TEXT("CalmSurfaceColorVariation"), 0.10f);
     SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.58f);
     SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.38f);
-    SetScalar(TEXT("SlickNormalFloor"), 0.34f);
+    // 2026-08-06 named human review: Hance read as "brown water or no
+    // water" — the flattened surface texture let the sediment bed dominate.
+    // Raise normal/ripple energy and lift the surface response over the bed
+    // so the interface reads as liquid; the sediment tint itself is a
+    // river-identity decision left to the Colorado-specific review.
+    SetScalar(TEXT("RippleGrazingFloor"), 0.55f);
+    SetScalar(TEXT("SlickNormalFloor"), 0.55f);
+    SetScalar(TEXT("OpticalDepthResponseExponent"), 0.45f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();

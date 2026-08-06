@@ -212,8 +212,18 @@ def _run_full_suite() -> int:
         )
     print("locked-source gate: running the full physics suite (required for "
           "commits touching locked sources)...")
+    import shutil
+
+    uv_binary = os.environ.get("RAFTSIM_UV", "").strip() or shutil.which("uv")
+    if not uv_binary:
+        print(
+            "locked-source gate: `uv` not found on PATH. Install uv or set "
+            "RAFTSIM_UV to its location, run the suite manually, then commit "
+            "with RAFTSIM_SKIP_LOCKED_GATE=1 if it passed the baseline."
+        )
+        return 1
     result = subprocess.run(
-        ["uv", "run", "pytest", "-q", "-rf", "--tb=no"],
+        [uv_binary, "run", "pytest", "-q", "-rf", "--tb=no"],
         cwd=REPO_ROOT / "physics",
         capture_output=True,
         text=True,
