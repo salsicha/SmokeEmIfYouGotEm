@@ -280,18 +280,23 @@ void URaftSimMainMenuWidget::RefreshFromSave()
     URaftSimVerticalSliceSaveGame* Save = SaveSubsystem ? SaveSubsystem->GetSave() : nullptr;
     if (Save != nullptr)
     {
+        // Adopt the saved mode and selection once, at first open. Re-running
+        // the selection restore on every refresh snapped the run back to the
+        // save after each Next/Previous click whenever the saved run was
+        // visible — in Free Run (everything visible) the buttons went dead
+        // (2026-08-07 playtest).
         if (!bModeInitialized)
         {
             SelectedMode = Save->ActiveGameMode;
             bModeInitialized = true;
-        }
-        for (int32 Index = 0; Index < ScenarioCatalog.Num(); ++Index)
-        {
-            if (ScenarioCatalog[Index].ScenarioId == Save->Selection.ScenarioId &&
-                IsScenarioVisible(Index))
+            for (int32 Index = 0; Index < ScenarioCatalog.Num(); ++Index)
             {
-                SelectedScenarioIndex = Index;
-                break;
+                if (ScenarioCatalog[Index].ScenarioId == Save->Selection.ScenarioId &&
+                    IsScenarioVisible(Index))
+                {
+                    SelectedScenarioIndex = Index;
+                    break;
+                }
             }
         }
     }
