@@ -490,7 +490,13 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "GuideHeadLocalEyeCenterCm" in adapter
     assert "CrewHeadLocalEyeCentersCm" in adapter
     assert "HeadTransform.TransformPosition(LocalEyeCenterCm / BodyScale)" in adapter
-    assert "HeadTransform.GetRotation().RotateVector(-FVector::UpVector)" in adapter
+    # 2026-08-07: the face axis is head-local +Z. The prior -Z reading was
+    # 180 degrees off (measured against the front-authored vest in an
+    # instrumented roster session) and had presented every asymmetric
+    # headgear shell rear-forward. The -90 axial twist is what turns the
+    # +Y-authored MPFB bodies to the pose's forward axis.
+    assert "HeadTransform.GetRotation().RotateVector(FVector::UpVector)" in adapter
+    assert "ProductionAxialFacingTwistDegrees = -90.0f" in adapter
     assert "HeadTransform.GetRotation().RotateVector(-FVector::YAxisVector)" in adapter
     assert "CacheRenderedFaceAnchorVertices()" in adapter
     assert "Section.MaterialIndex != EyeMaterialIndex" in adapter

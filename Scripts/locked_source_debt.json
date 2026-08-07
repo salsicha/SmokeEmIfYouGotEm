@@ -243,11 +243,6 @@
       "recorded_sha256": "d2e96765ad743bbf30ea931be3435f6bf7ea2f72a11e129785fa806852612781"
     },
     {
-      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json",
-      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
-      "recorded_sha256": "83fb2df2b2ce4277e591cffeac7f5cd8ee732650fc21c5e0e2b839d5505c8302"
-    },
-    {
       "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
       "recorded_sha256": "771d0f799030ffe961d0ecf2b316a9fdb5a1cfc45710760be648f2d9f5558d89"

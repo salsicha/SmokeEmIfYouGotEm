@@ -42,6 +42,14 @@ const float CrewHelmetAnchorDropsCm[] = {6.0f, 9.0f, 9.0f, 7.0f};
 
 constexpr float PaddlePalmAnchorAlongKnuckleFraction = 0.56f;
 constexpr float ProductionHeadClearanceLiftCm = 5.0f;
+// The CC0 bodies are exported with Blender's identity axes
+// (build_cc0_production_character.py: axis_forward="-Y"), which lands the
+// mesh facing Unreal +Y. Swing-only bone driving preserves that rest yaw,
+// so every pelvis/spine/neck/head kept facing +Y — the 2026-08-07 playtest
+// "all heads face right" and the 90-degree PFD-through-chest offset. This
+// twist turns the axial chain to the host's forward axis; limbs are driven
+// to explicit endpoints and keep their authored twist.
+constexpr float ProductionAxialFacingTwistDegrees = -90.0f;
 // Keep the imported garment's inner shoulder weights distributed across the
 // upper chest. Driving both clavicle roots to one spine point pinched those
 // weights into a hard central ridge and stretched the remaining wetsuit into
@@ -157,12 +165,15 @@ FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceForwardWorldVector() const
     }
     const FTransform HeadTransform = Body->GetBoneTransformByName(
         TEXT("head"), EBoneSpaces::ComponentSpace);
-    // Unreal's FBX conversion makes MPFB head-local -Z point through the
-    // rendered face and local -Y point through the crown. Publish that authored
-    // frame so asymmetric helmet geometry cannot inherit torso-only yaw or
-    // present its solid rear bowl toward the guide camera.
+    // MPFB head-local +Z points through the rendered face (local -Y stays
+    // the crown). The original -Z reading was 180 degrees off and was only
+    // ever validated against itself via the helmet-alignment dot product;
+    // the 2026-08-07 instrumented roster session measured the published
+    // vector at -X world while the rendered face and the front-authored
+    // vest demonstrably faced +X. Every asymmetric headgear placement had
+    // presented its rear bowl forward as a result.
     return Body->GetComponentTransform().TransformVectorNoScale(
-        HeadTransform.GetRotation().RotateVector(-FVector::UpVector)).GetSafeNormal();
+        HeadTransform.GetRotation().RotateVector(FVector::UpVector)).GetSafeNormal();
 }
 
 FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceUpWorldVector() const
@@ -175,6 +186,54 @@ FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceUpWorldVector() const
         TEXT("head"), EBoneSpaces::ComponentSpace);
     return Body->GetComponentTransform().TransformVectorNoScale(
         HeadTransform.GetRotation().RotateVector(-FVector::YAxisVector)).GetSafeNormal();
+}
+
+bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
+    FTransform& OutWorld) const
+{
+    if (!bBodyReady || !Body ||
+        Body->GetBoneIndex(TEXT("spine_01")) == INDEX_NONE ||
+        Body->GetBoneIndex(TEXT("spine_02")) == INDEX_NONE ||
+        Body->GetBoneIndex(TEXT("spine_03")) == INDEX_NONE ||
+        Body->GetBoneIndex(TEXT("neck_01")) == INDEX_NONE)
+    {
+        return false;
+    }
+    const auto BoneComponentLocation = [this](const TCHAR* BoneName)
+    {
+        return Body->GetBoneTransformByName(
+            FName(BoneName), EBoneSpaces::ComponentSpace).GetLocation();
+    };
+    const FVector Spine01 = BoneComponentLocation(TEXT("spine_01"));
+    const FVector Spine02 = BoneComponentLocation(TEXT("spine_02"));
+    const FVector Spine03 = BoneComponentLocation(TEXT("spine_03"));
+    const FVector NeckBase = BoneComponentLocation(TEXT("neck_01"));
+    const FTransform& ComponentTransform = Body->GetComponentTransform();
+    const FVector SpineUp = ComponentTransform.TransformVectorNoScale(
+        NeckBase - Spine01).GetSafeNormal();
+    if (SpineUp.IsNearlyZero())
+    {
+        return false;
+    }
+    const FVector FaceForward = GetSolvedFaceForwardWorldVector();
+    const FVector ChestForward = (FaceForward -
+        SpineUp * FVector::DotProduct(FaceForward, SpineUp)).GetSafeNormal();
+    if (ChestForward.IsNearlyZero())
+    {
+        return false;
+    }
+    // ApplyBodyPose maps the host torso anchor between spine_02 and
+    // spine_03 in HEIGHT, but the spinal column runs along the back of the
+    // body while the host anchor is the torso volume centre — the vest mesh
+    // is authored around the latter. Push the origin forward by the
+    // spine-to-chest-centre depth or the vest slides rearward off the body.
+    constexpr float ChestCenterForwardOfSpineCm = 9.0f;
+    OutWorld = FTransform(
+        FRotationMatrix::MakeFromZX(SpineUp, ChestForward).ToQuat(),
+        ComponentTransform.TransformPosition(
+            FMath::Lerp(Spine02, Spine03, 0.45f)) +
+            ChestForward * ChestCenterForwardOfSpineCm);
+    return true;
 }
 
 bool ARaftSimCC0CrewVisualActor::EnsureBodyLoaded()
@@ -403,7 +462,8 @@ void ARaftSimCC0CrewVisualActor::SetSegmentBone(
     FName BoneName,
     FName ReferenceEndBone,
     const FVector& DesiredStartCm,
-    const FVector& DesiredEndCm)
+    const FVector& DesiredEndCm,
+    float ShaftTwistDegrees)
 {
     if (!Body || DesiredStartCm.ContainsNaN() || DesiredEndCm.ContainsNaN())
     {
@@ -446,9 +506,18 @@ void ARaftSimCC0CrewVisualActor::SetSegmentBone(
         return;
     }
     const FQuat Swing = FQuat::FindBetweenNormals(ReferenceDirection, DesiredDirection);
+    // FindBetweenNormals is minimal-arc: it aligns the shaft but has no
+    // authority over rotation ABOUT the shaft, so a bone keeps its authored
+    // rest twist. The optional pre-twist spins the bone about its rest shaft
+    // before the swing, which is how the axial chain cancels the imported
+    // MPFB facing (see ProductionAxialFacingTwistDegrees).
+    const FQuat Twist = FMath::IsNearlyZero(ShaftTwistDegrees)
+        ? FQuat::Identity
+        : FQuat(ReferenceDirection,
+              FMath::DegreesToRadians(ShaftTwistDegrees));
     FTransform Target = *Reference;
     Target.SetLocation(ToMeshSpace(DesiredStartCm));
-    Target.SetRotation((Swing * Reference->GetRotation()).GetNormalized());
+    Target.SetRotation((Swing * Twist * Reference->GetRotation()).GetNormalized());
     Body->SetBoneTransformByName(BoneName, Target, EBoneSpaces::ComponentSpace);
 }
 
@@ -481,12 +550,18 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         PresentedHeadCenter - ShoulderCenter,
         TorsoUp);
 
-    SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), HipCenter, LowerSpine);
-    SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), LowerSpine, MidSpine);
-    SetSegmentBone(TEXT("spine_02"), TEXT("spine_03"), MidSpine, UpperSpine);
-    SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), UpperSpine, NeckBase);
-    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBase, PresentedHeadCenter);
-    SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop);
+    SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), HipCenter, LowerSpine,
+        ProductionAxialFacingTwistDegrees);
+    SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), LowerSpine, MidSpine,
+        ProductionAxialFacingTwistDegrees);
+    SetSegmentBone(TEXT("spine_02"), TEXT("spine_03"), MidSpine, UpperSpine,
+        ProductionAxialFacingTwistDegrees);
+    SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), UpperSpine, NeckBase,
+        ProductionAxialFacingTwistDegrees);
+    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBase, PresentedHeadCenter,
+        ProductionAxialFacingTwistDegrees);
+    SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop,
+        ProductionAxialFacingTwistDegrees);
 
     // The pose contract publishes palm/grip targets while the imported hand
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference

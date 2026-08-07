@@ -49,17 +49,32 @@
       "guide_full": {
         "changed_fraction_over_8_rgb_levels": 0.003492,
         "mean_absolute_rgb_difference": 0.1165,
-        "changed_bbox_xyxy": [748, 416, 1022, 988]
+        "changed_bbox_xyxy": [
+          748,
+          416,
+          1022,
+          988
+        ]
       },
       "guide_profile": {
         "changed_fraction_over_8_rgb_levels": 0.000502,
         "mean_absolute_rgb_difference": 0.0187,
-        "changed_bbox_xyxy": [557, 439, 689, 1023]
+        "changed_bbox_xyxy": [
+          557,
+          439,
+          689,
+          1023
+        ]
       },
       "crew03_full": {
         "changed_fraction_over_8_rgb_levels": 0.002843,
         "mean_absolute_rgb_difference": 0.11,
-        "changed_bbox_xyxy": [766, 394, 1015, 994]
+        "changed_bbox_xyxy": [
+          766,
+          394,
+          1015,
+          994
+        ]
       }
     }
   },
@@ -102,9 +117,9 @@
     }
   },
   "implementation_sha256": {
-    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "0eaee4a5610bb9f63d45771deca560d6a53e365e07cd003e3bfc451510c327b2",
-    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "42e84480f51514b5b6ee99bf44b6c654e0d28c4dc47291ff59a3aa8c854b5d61",
-    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "83fb2df2b2ce4277e591cffeac7f5cd8ee732650fc21c5e0e2b839d5505c8302",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp": "45651266eddcce7712ab2be4da408416bdda651855b491de087f065981cbf117",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h": "6aeb24979ec894a1dbfed8d61cf0fd0101bee16d65aefef6bfd774e63e1b8540",
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "6b293b13521fb29514cff6f653f67055fbf96eb4c03e8155247acebe77d17f43",
     "unreal/Scripts/capture_cc0_production_roster.py": "9235dd1ca9eafdbe7d3b5397d689f661658c85097c9badcb4dea80e222439413"
   },
   "evidence_sha256": {

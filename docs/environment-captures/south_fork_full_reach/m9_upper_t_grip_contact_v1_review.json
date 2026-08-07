@@ -32,10 +32,10 @@
     "usable_handle_half_length_cm": 5.65,
     "maximum_allowed_contact_error_cm": 0.25,
     "maximum_allowed_thumb_opposition_dot": -0.95,
-    "measured_maximum_palm_anchor_error_cm": 1.880034572465661e-9,
+    "measured_maximum_palm_anchor_error_cm": 1.880034572465661e-09,
     "measured_maximum_lower_finger_contact_error_cm": 0.0,
     "measured_maximum_lower_thumb_contact_error_cm": 0.0,
-    "measured_maximum_upper_finger_contact_error_cm": 1.1534009303204584e-9,
+    "measured_maximum_upper_finger_contact_error_cm": 1.1534009303204584e-09,
     "measured_maximum_upper_thumb_contact_error_cm": 0.0,
     "measured_maximum_upper_thumb_opposition_dot": -1.0,
     "physics_or_gameplay_changes": false,
@@ -119,7 +119,7 @@
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h": "99324c68e30dbde8db84a3f11b727108c2db8166cf579644e5ca9823211cf597",
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp": "6b293b13521fb29514cff6f653f67055fbf96eb4c03e8155247acebe77d17f43",
     "unreal/Scripts/capture_metahuman_production_roster.py": "bcdc85addbbbe654b858402b17cabf8ee18b1a2b239aa2b465f1bc4e37f87d56",
-    "physics/tests/test_cc0_production_characters.py": "d8216efa1f7d6f393b6647cd54be9933b6a8607a2f66d7de0a25e7938547a892",
+    "physics/tests/test_cc0_production_characters.py": "4251a45829992873ab9f1839ccf520a1af2e703069934aa9122d0967ebdedcd1",
     "physics/tests/test_m9_upper_t_grip_contact_v1.py": "4e94b77dfc65437082ac14769b2505e753aa126272ebbc648e40b33272248511"
   },
   "accepted": [
