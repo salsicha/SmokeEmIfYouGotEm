@@ -6,6 +6,7 @@
 
 #include "RaftSimMainMenuWidget.generated.h"
 
+class UAudioComponent;
 class UButton;
 class UTextBlock;
 class UVerticalBox;
@@ -22,6 +23,7 @@ class RAFTSIMUI_API URaftSimMainMenuWidget : public UUserWidget
 
 public:
     virtual void NativeConstruct() override;
+    virtual void NativeDestruct() override;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Frontend")
     ERaftSimGameMode GetSelectedMode() const { return SelectedMode; }
@@ -103,6 +105,15 @@ protected:
 
     UPROPERTY()
     TObjectPtr<USoundWaveProcedural> MenuConfirmTone;
+
+    // Single persistent player for MenuConfirmTone. USoundWaveProcedural's
+    // AudioBuffer is single-consumer: every PlaySound2D spawns another
+    // never-finishing mixer source over the same wave, and parallel source
+    // rendering then races RemoveAt on the shared buffer (Array RangeCheck
+    // crash, first hit on the 2026-08-07 Linux playtest during travel).
+    // Clicks only QueueAudio into this one always-playing component.
+    UPROPERTY()
+    TObjectPtr<UAudioComponent> MenuAudioComponent;
 
     TArray<FRaftSimCareerScenarioDefinition> ScenarioCatalog;
     ERaftSimGameMode SelectedMode = ERaftSimGameMode::TrainingEddy;

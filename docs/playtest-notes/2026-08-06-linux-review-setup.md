@@ -99,7 +99,9 @@ in-engine deterministic captures. The P6 trailer does not exist yet.
 raft; crew commands 1–5 visibly change paddling; Space triggers coordinated
 high-side lean; Esc pauses; settings persist after quit/relaunch.
 
-**B. Troublemaker scored run (20 min)** — menu → "Run Troublemaker". Leave
+**B. Troublemaker scored run (20 min)** — menu → **Change Mode** until
+`Mode: Free Run` (every run is `[ready]` in Free Run), **Next Run** until
+`Run: Troublemaker Rapid Challenge`, then **Start Selected Run**. Leave
 the scout eddy (run starts), read the tongue, run the gut or sneak. Judge:
 does the water push the raft believably (tongue acceleration, lateral
 shoves, hole grab)? Intentionally drop into the gut hole side-on to force a
@@ -107,15 +109,19 @@ flip: crew ejects as swimmers, raft capsizes; Space re-rights; wheel-select
 a swimmer, E when adjacent, R at range, F to reseat. Finish line scores and
 saves; a second run shows the previous best.
 
-**C. Full South Fork descent (60–90 min)** — menu → Guided Descent, Chili
-Bar put-in. The 49 km flagship: no loading breaks or visible streaming pops
+**C. Full South Fork descent (60–90 min)** — menu → **Change Mode** until
+`Mode: Guided Descent Career`, **Next Run** to `South Fork I: Chili Bar to
+Coloma`, **Start Selected Run** (later sections unlock by completing; the
+one-sitting full descent needs the Expedition Guide license, or use Free
+Run to open everything). The 49 km flagship: no loading breaks or visible streaming pops
 (watch `stat unit` for >33 ms hitches), rapid encounters trigger at all 20
 named rapids, career section unlocks advance, save/resume mid-river works,
 audio bed follows the water (roar rises into rapids, barks on commands,
 impact layer on flips). This descent IS review area 4: log per-rapid realism
 notes as you go — the packet needs them rapid-by-rapid.
 
-**D. Five reference rivers (15 min each)** — Free Run → each of Hance,
+**D. Five reference rivers (15 min each)** — Free Run mode → **Next Run**
+to each of Hance,
 Lava Canyon, Terminator, Upper Huacas, Zambezi. Raft floats on live water at
 the put-in, visible breaking/foam sites exist, a full reference descent
 completes without falling through the world or leaving the corridor, and
