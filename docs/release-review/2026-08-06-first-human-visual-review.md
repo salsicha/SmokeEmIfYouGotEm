@@ -139,6 +139,27 @@ second consumer. The playtest guide's menu paths were also corrected to the
 M6 selector flow (Change Mode / Next Run / Start Selected Run; Free Run
 unlocks every river).
 
+Third playtest findings (2026-08-07, Training Eddy): all crew heads faced
+right, helmets and PFDs clipped through the bodies, and seated crew bobbed
+on flat water. All four traced and fixed the same day on the CC0
+production-visual path:
+- Heads/PFD: the CC0 bodies are exported facing Unreal +Y and the
+  swing-only bone driver preserved that rest yaw in the whole axial chain;
+  a −90° about-shaft twist now turns pelvis→head to the pose's forward.
+- Face frame: the published head frame read head-local −Z as the face —
+  measured 180° off against the front-authored vest in an instrumented
+  roster session; corrected to +Z. Every asymmetric headgear placement had
+  been presenting its rear bowl forward.
+- PFD: now seated on the rendered spine (solved chest frame, spine plus
+  9 cm chest-depth) instead of the host waist-pivot abstraction.
+- Bob: SeatedIdle carried an ungated ±1.5/±2.0 cm torso/head oscillation at
+  paddle cadence over a fixed pelvis; resting crew now sit still. Renderer
+  invariants (clavicle span, anchor errors) verified unchanged.
+Queued from the same roster review: per-identity helmet trim angle (the
+anchor-drop constants were calibrated against the flipped face frame — the
+guide's shell rides high-back, crew04's dips forward) and the vest rear
+panel stack standing a few cm off the upper back in profile.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

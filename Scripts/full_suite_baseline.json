@@ -3,7 +3,6 @@
   "policy": "Known-failing test ids the locked-source gate tolerates. All are pre-existing hash-lock/evidence drift at the branch head (see Scripts/locked_source_debt.json); entries may only be removed as the underlying evidence is repaired on the capture machine.",
   "known_failures": [
     "tests/test_breaking_water_raft_crew_occlusion.py::test_occlusion_review_hash_locks_sources_maps_and_visual_evidence",
-    "tests/test_cc0_production_characters.py::test_cc0_clavicle_span_v1_is_renderer_verified_and_fail_closed",
     "tests/test_cold_water_adaptive_shoreline.py::test_last_accepted_maps_and_materials_are_hash_locked",
     "tests/test_cold_water_nonlinear_optical_depth.py::test_balanced_light_review_is_fail_closed_and_hash_locked",
     "tests/test_cold_water_presentation_bank_naturalism.py::test_review_source_and_evidence_hashes_are_current",

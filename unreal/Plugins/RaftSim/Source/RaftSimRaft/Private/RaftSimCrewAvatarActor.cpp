@@ -1183,8 +1183,9 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             break;
         case ERaftSimCrewAvatarAction::SeatedIdle:
         default:
-            Pose.TorsoCenterCm.Z += 1.5f * Wave;
-            Pose.HeadCenterCm.Z += 2.0f * Wave;
+            // Resting crew sit still. The former +/-1.5/2.0 cm stroke-cadence
+            // bob ran ungated by any water state, telescoping the upper body
+            // out of a fixed pelvis on flat water (2026-08-07 playtest).
             break;
     }
     if (UsesWaistPivotedUpperBodyArticulation(Action))
@@ -2440,6 +2441,42 @@ void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()
             ProductionHelmet->SetRelativeLocationAndRotation(
                 FittedLocation, FittedRotation);
             ProductionHelmet->SetRelativeScale3D(FVector(FittedScale));
+        }
+    }
+    if (HasProductionWhitewaterPfd())
+    {
+        // ApplyPose seats the vest on the host waist-pivot frame; a rendered
+        // CC0 spine leans and curves away from that abstraction, floating the
+        // rear panels off the back and sinking the lower front panel into the
+        // chest (2026-08-07 playtest). Re-seat it on the rendered spine in
+        // the same pass that re-seats the helmet.
+        if (const ARaftSimCC0CrewVisualActor* CC0Visual =
+                Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
+        {
+            FTransform ChestWorld;
+            if (CC0Visual->GetSolvedChestWorldTransform(ChestWorld))
+            {
+                UE_LOG(LogTemp, VeryVerbose,
+                    TEXT("[RaftSimPfdAlign] host=%s solved=%s hostFwd=%s ")
+                    TEXT("solvedFwd=%s solvedUp=%s"),
+                    *Root->GetComponentTransform()
+                         .TransformPosition(ProductionPfd->GetRelativeLocation())
+                         .ToCompactString(),
+                    *ChestWorld.GetLocation().ToCompactString(),
+                    *Root->GetComponentTransform()
+                         .TransformVectorNoScale(
+                             ProductionPfd->GetRelativeRotation()
+                                 .RotateVector(FVector::ForwardVector))
+                         .ToCompactString(),
+                    *ChestWorld.GetRotation()
+                         .RotateVector(FVector::ForwardVector)
+                         .ToCompactString(),
+                    *ChestWorld.GetRotation()
+                         .RotateVector(FVector::UpVector)
+                         .ToCompactString());
+                ProductionPfd->SetWorldLocationAndRotation(
+                    ChestWorld.GetLocation(), ChestWorld.GetRotation());
+            }
         }
     }
 }

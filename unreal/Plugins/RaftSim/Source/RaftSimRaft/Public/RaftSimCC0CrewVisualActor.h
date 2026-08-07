@@ -121,6 +121,13 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetSolvedFaceUpWorldVector() const;
 
+    /**
+     * Chest frame of the rendered spine (origin between the mid and upper
+     * spine, Z along the spine, X toward the face) for worn-gear placement.
+     * False until the body is loaded and posed.
+     */
+    bool GetSolvedChestWorldTransform(FTransform& OutWorld) const;
+
     /** Uniform shell scale for the five similarly sized authored skulls. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetRecommendedWhitewaterHelmetScale() const { return 0.96f; }
@@ -142,7 +149,8 @@ private:
         FName BoneName,
         FName ReferenceEndBone,
         const FVector& DesiredStartCm,
-        const FVector& DesiredEndCm);
+        const FVector& DesiredEndCm,
+        float ShaftTwistDegrees = 0.0f);
     FVector ToMeshSpace(const FVector& PointCm) const;
     FVector ResolvePaddleGripWristCm(
         bool bLeft,
