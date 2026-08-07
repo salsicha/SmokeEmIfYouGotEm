@@ -123,6 +123,22 @@ correct GPU/SM6 confirmed from the session log):
 - Terrain/trees/sky absent in the tank is authored (bare diorama), not a
   defect; the reviewer should judge environments on the river maps.
 
+Second interactive playtest finding (2026-08-07, boot menu): clicking
+through the mode/run selector crashed the game during the map switch —
+Array RangeCheck inside `USoundWaveProcedural::GeneratePCMData` on an audio
+render worker (crashinfo pid-358247). Root cause: every menu button played
+the one shared procedural confirm-tone wave through `PlaySound2D`; each
+play spawns a never-finishing mixer source over the same wave (procedural
+waves report indefinite duration), and the audio mixer renders sources on
+parallel task workers, so stacked sources raced the wave's single-consumer
+`AudioBuffer` — the window opens right after any click and widens when
+level travel stops all leaked sources at once. Fixed the same day: the menu
+now owns one persistent `UAudioComponent` playing the wave for the widget's
+whole life (silence between cues) and clicks only `QueueAudio` — never a
+second consumer. The playtest guide's menu paths were also corrected to the
+M6 selector flow (Change Mode / Next Run / Start Selected Run; Free Run
+unlocks every river).
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

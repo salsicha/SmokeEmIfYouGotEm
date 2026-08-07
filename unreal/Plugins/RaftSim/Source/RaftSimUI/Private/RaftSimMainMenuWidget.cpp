@@ -1,6 +1,7 @@
 #include "RaftSimMainMenuWidget.h"
 
 #include "Blueprint/WidgetTree.h"
+#include "Components/AudioComponent.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -159,7 +160,18 @@ void URaftSimMainMenuWidget::NativeConstruct()
         MenuConfirmTone->Duration = 0.11f;
         MenuConfirmTone->SoundGroup = SOUNDGROUP_UI;
         MenuConfirmTone->bLooping = false;
-        MenuConfirmTone->QueueAudio(MenuConfirmPcm.GetData(), MenuConfirmPcm.Num());
+    }
+    if (MenuAudioComponent == nullptr)
+    {
+        // One play for the widget's whole life; the source renders silence
+        // between clicks. Null in no-audio-device runs (-nullrhi automation).
+        MenuAudioComponent = UGameplayStatics::CreateSound2D(
+            this, MenuConfirmTone, 0.28f, 1.0f, 0.0f, nullptr,
+            /*bPersistAcrossLevelTransition=*/false, /*bAutoDestroy=*/false);
+        if (MenuAudioComponent != nullptr)
+        {
+            MenuAudioComponent->Play();
+        }
     }
     RefreshFromSave();
     if (StartButton != nullptr)
@@ -191,15 +203,31 @@ UButton* URaftSimMainMenuWidget::MakeMenuButton(
 
 void URaftSimMainMenuWidget::HandleMenuAudioCue()
 {
-    if (MenuConfirmTone == nullptr || MenuConfirmPcm.IsEmpty())
+    if (MenuConfirmTone == nullptr || MenuConfirmPcm.IsEmpty() ||
+        MenuAudioComponent == nullptr)
     {
         return;
+    }
+    if (!MenuAudioComponent->IsPlaying())
+    {
+        // Restart before queueing: overlap on an empty buffer is harmless,
+        // overlap on a filled one is the RemoveAt race this replaced.
+        MenuAudioComponent->Play();
     }
     if (MenuConfirmTone->GetAvailableAudioByteCount() < MenuConfirmPcm.Num() / 2)
     {
         MenuConfirmTone->QueueAudio(MenuConfirmPcm.GetData(), MenuConfirmPcm.Num());
     }
-    UGameplayStatics::PlaySound2D(this, MenuConfirmTone, 0.28f, 1.0f);
+}
+
+void URaftSimMainMenuWidget::NativeDestruct()
+{
+    if (MenuAudioComponent != nullptr)
+    {
+        MenuAudioComponent->Stop();
+        MenuAudioComponent = nullptr;
+    }
+    Super::NativeDestruct();
 }
 
 FName URaftSimMainMenuWidget::GetSelectedScenarioId() const
