@@ -4,6 +4,11 @@
   "entries": [
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+      "recorded_sha256": "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
       "source": "unreal/Content/RaftSim/Maps/L_Terminator.umap",
       "recorded_sha256": "cfea8027d1f84a03bcf71b93e304fbcbc9d273564a735ac48fff77e4970db308"
     },
@@ -186,11 +191,6 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_nonperiodic_live_wave_v1_review.json",
       "source": "physics/tests/test_zambezi_reference_map.py",
       "recorded_sha256": "4d83c6e57cd8855c5c1c668db38e95d092ee8e9786e1a1b6bccd9d79419eeaa7"
-    },
-    {
-      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json",
-      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
-      "recorded_sha256": "a91b0d3da131702908108fcb61ecfcc283acf6c6efc256244a6e7689baa7368f"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_plunge_pocket_v1_review.json",
