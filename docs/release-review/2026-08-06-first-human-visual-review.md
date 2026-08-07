@@ -112,6 +112,17 @@ Mac, where interactive viewports masked them):
    an unrendered (black) sky into the SAVED map, so regenerated maps read as
    unlit even in gameplay — the rig skylight now uses real-time capture.
 
+First interactive playtest findings (2026-08-07, Training Eddy via PIE,
+correct GPU/SM6 confirmed from the session log):
+- The dev-tank map's calm water overlay ran at its designed coverage 0.0 and
+  read as **no water at all** — fixed the same day: the tank (no river
+  config) now forces a visible calm surface; river maps keep their authored
+  coverage handoff.
+- The guide's own stroke (W/S) plays audio and applies impulse but has **no
+  first-person paddle model** — queued with the T-grip/boot round.
+- Terrain/trees/sky absent in the tank is authored (bare diorama), not a
+  defect; the reviewer should judge environments on the river maps.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

@@ -1598,6 +1598,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     bLiveSurfaceCarrierEnabled
                         ? ResolvedLiveFoamIntensity
                         : 0.52f);
+                if (!RiverWaterConfig)
+                {
+                    // Training Eddy / dev tank: with no river volume core the
+                    // calm overlay at coverage 0.0 reads as no water at all —
+                    // confirmed by the first human playtest (2026-08-07).
+                    // Give the tank an always-visible calm surface; river
+                    // maps keep their authored coverage handoff untouched.
+                    LiveWaterMaterial->SetScalarParameterValue(
+                        TEXT("CalmLiveSurfaceCoverage"), 0.42f);
+                    LiveWaterMaterial->SetScalarParameterValue(
+                        TEXT("ActiveLiveSurfaceCoverage"), 0.55f);
+                }
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveWetCoverageEnable"),
                     bUsesMigratedChilkoVolumeCore ? 1.0f : 0.0f);
