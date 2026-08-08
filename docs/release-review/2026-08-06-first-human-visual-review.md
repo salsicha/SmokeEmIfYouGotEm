@@ -174,6 +174,18 @@ re-verified on the roster renders. Also reported, queued next: gameplay
 camera defaults to the chase view (guide POV requested), no visible guide
 stroke/paddle on W, and a looping squeak in the South Fork soundscape.
 
+Same-day round 2 (2026-08-08): the three remaining SF I reports fixed.
+The "first-person" seat anchor sat 1.8 m behind the guide's eyes (an
+over-shoulder framing) — moved into the eye socket, with the guide
+avatar's head/helmet hidden only while the first-person camera is live
+(chase toggle is C, Free Run only). The guide's own W/S/turn strokes now
+hold the matching stroke pose on the stern avatar for a beat, so player
+inputs are visible on the body and paddle (they previously fired audio
+and impulse only). The looping squeak was the ambience layer's fixed
+1250 Hz bird chirp recurring every second in a 2 s PCM loop — replaced
+with sparse, deterministically pitch/time-varied chirps over a 16 s
+buffer at lower level.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

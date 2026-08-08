@@ -103,7 +103,12 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 
     GuideSeatAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("GuideSeatAnchor"));
     GuideSeatAnchor->SetupAttachment(Root);
-    GuideSeatAnchor->SetRelativeLocation(FVector(-180.0f, 0.0f, 45.0f));
+    // The pawn root rides the stern seat attach point (raft-relative
+    // (-165, 0, 55)); the seated guide avatar's eyes sit at roughly
+    // (-167, 0, 104) raft-relative. The former (-180, 0, 45) put the view
+    // 1.8 m BEHIND the guide's back — an over-shoulder framing the first
+    // South Fork playtest rejected. This anchor is the guide's own eyes.
+    GuideSeatAnchor->SetRelativeLocation(FVector(-2.0f, 0.0f, 49.0f));
 
     ViewOriginAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("ViewOriginAnchor"));
     ViewOriginAnchor->SetupAttachment(GuideSeatAnchor);
@@ -168,6 +173,16 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
     UpdateSwimmingAndRescueAim();
+    // With the view seated in the guide avatar's own eye socket, its head
+    // and helmet must not render into the first-person camera. The setter
+    // early-outs when unchanged, so per-tick sync is cheap and follows
+    // chase-camera toggles and swims automatically.
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        Raft->SetGuideFirstPersonView(
+            !CameraRuntimeState.bChaseCameraActive &&
+            MobilityMode == ERaftSimGuideMobilityMode::InRaft);
+    }
 }
 
 void ARaftSimGuidePawn::CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult)

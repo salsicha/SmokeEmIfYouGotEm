@@ -539,6 +539,11 @@
     },
     {
       "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+      "recorded_sha256": "14e73e5fb9087122846448c4919d38357f10713bf6d8c093c2901ad1a4f6aa8e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_directional_anatomical_thigh_v2_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
       "recorded_sha256": "c3653afc20606899eee1a83402da1f51b7dfe0e8ae1728468da27f59d4b163ae"
     },

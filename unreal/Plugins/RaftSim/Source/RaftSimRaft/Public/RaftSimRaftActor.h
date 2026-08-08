@@ -77,6 +77,13 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ApplyTurnStroke(float TurnScale);
 
+    /**
+     * First-person presentation for the possessed guide seat: hides the
+     * guide avatar's head and helmet so the camera can sit in its eye
+     * socket. Idempotent; the pawn syncs it every tick.
+     */
+    void SetGuideFirstPersonView(bool bFirstPerson);
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     USceneComponent* GetSternSeatAttachPoint() const { return SternSeatAttachPoint; }
 
@@ -432,6 +439,12 @@ private:
 
     float CrewReactionRemaining = 0.0f;
     float CrewStrokeTimer = 0.0f;
+
+    // The guide's own W/S/turn strokes hold this pose on the stern avatar
+    // for a beat so the player's inputs are visible on the body and paddle
+    // (first South Fork playtest: audio fired with no visible stroke).
+    ERaftSimCrewAvatarAction GuideStrokeAction = ERaftSimCrewAvatarAction::SeatedIdle;
+    float GuideStrokeActionSeconds = 0.0f;
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
     int32 HighSideResponseCount = 0;

@@ -2382,6 +2382,40 @@ void ARaftSimCrewAvatarActor::DispatchProductionPose()
         AnimationPhase,
         ActionIntensity,
         SeatSide);
+    if (ARaftSimCC0CrewVisualActor* CC0Visual =
+            Cast<ARaftSimCC0CrewVisualActor>(VisualActor))
+    {
+        CC0Visual->SetHeadHiddenForFirstPerson(bFirstPersonHeadHidden);
+    }
+}
+
+void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bHidden)
+{
+    if (bFirstPersonHeadHidden == bHidden)
+    {
+        return;
+    }
+    bFirstPersonHeadHidden = bHidden;
+    const bool bVisible = !bHidden;
+    if (!bUsingProductionVisual)
+    {
+        // Procedural fallback: the head and helmet trio are ordinary parts.
+        // (Production machines hide these through SetProceduralVisualVisible;
+        // re-showing them here would stack a second head over the CC0 body.)
+        if (Head) Head->SetVisibility(bVisible);
+        if (Helmet) Helmet->SetVisibility(bVisible);
+        if (HelmetRim) HelmetRim->SetVisibility(bVisible);
+        if (HelmetRetention) HelmetRetention->SetVisibility(bVisible);
+    }
+    if (ProductionHelmet)
+    {
+        ProductionHelmet->SetVisibility(bVisible && HasProductionWhitewaterHelmet());
+    }
+    if (ARaftSimCC0CrewVisualActor* CC0Visual =
+            Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
+    {
+        CC0Visual->SetHeadHiddenForFirstPerson(bHidden);
+    }
 }
 
 void ARaftSimCrewAvatarActor::AlignProductionHeadgearToSolvedHead()

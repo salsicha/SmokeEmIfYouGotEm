@@ -879,12 +879,21 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         default:
             break;
     }
-    for (ARaftSimCrewAvatarActor* Avatar : CrewAvatars)
+    GuideStrokeActionSeconds = FMath::Max(GuideStrokeActionSeconds - DeltaSeconds, 0.0f);
+    for (int32 Index = 0; Index < CrewAvatars.Num(); ++Index)
     {
-        if (Avatar && Avatar->GetAttachParentActor() == this)
+        ARaftSimCrewAvatarActor* Avatar = CrewAvatars[Index];
+        if (!Avatar || Avatar->GetAttachParentActor() != this)
         {
-            Avatar->SetAvatarAction(AvatarAction);
+            continue;
         }
+        // The stern (last) avatar is the guide; its own recent stroke wins
+        // over the crew command so player inputs read on the body.
+        const bool bGuideAvatar = Index == CrewAvatars.Num() - 1;
+        Avatar->SetAvatarAction(
+            bGuideAvatar && GuideStrokeActionSeconds > 0.0f
+                ? GuideStrokeAction
+                : AvatarAction);
     }
 
     // Paddle strokes on cadence for propulsion/turn commands. Rest, brace and
@@ -960,6 +969,10 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
     }
     RaftAdapter->AddExternalImpulse(LinearImpulseNs, AngularImpulseNms);
     ++PaddleStrokeCount;
+    GuideStrokeAction = Scale >= 0.0f
+        ? ERaftSimCrewAvatarAction::ForwardStroke
+        : ERaftSimCrewAvatarAction::BackStroke;
+    GuideStrokeActionSeconds = 1.0f;
 }
 
 void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
@@ -971,6 +984,19 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
     const float Scale = FMath::Clamp(TurnScale, -1.0f, 1.0f);
     RaftAdapter->AddExternalImpulse(
         FVector::ZeroVector, FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
+    ++PaddleStrokeCount;
+    GuideStrokeAction = Scale > 0.0f
+        ? ERaftSimCrewAvatarAction::TurnRight
+        : ERaftSimCrewAvatarAction::TurnLeft;
+    GuideStrokeActionSeconds = 1.0f;
+}
+
+void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)
+{
+    if (ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide")))
+    {
+        Guide->SetFirstPersonHeadHidden(bFirstPerson);
+    }
 }
 
 void ARaftSimRaftActor::Tick(float DeltaSeconds)

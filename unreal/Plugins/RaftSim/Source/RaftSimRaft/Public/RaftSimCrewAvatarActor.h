@@ -123,6 +123,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Animation")
     void SetAvatarAction(ERaftSimCrewAvatarAction NewAction, float Intensity = 1.0f);
 
+    /**
+     * Hides this avatar's head and helmet so a first-person camera can sit
+     * in its eye socket (possessed guide seat). Idempotent per value.
+     */
+    void SetFirstPersonHeadHidden(bool bHidden);
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Appearance")
     void ConfigureAppearance(int32 InVariantIndex, int32 InSeatSide, bool bInGuide);
 
@@ -401,6 +407,7 @@ private:
     bool bGuide = false;
     bool bVisualBuilt = false;
     bool bUsingProductionVisual = false;
+    bool bFirstPersonHeadHidden = false;
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;

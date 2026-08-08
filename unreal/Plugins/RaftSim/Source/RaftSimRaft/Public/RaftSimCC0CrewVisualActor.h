@@ -128,6 +128,10 @@ public:
      */
     bool GetSolvedChestWorldTransform(FTransform& OutWorld) const;
 
+    /** First-person guide seat: collapse the head bone like the boot-hidden
+     * feet so the camera can sit in the eye socket. Applied every pose. */
+    void SetHeadHiddenForFirstPerson(bool bHidden) { bHeadHiddenForFirstPerson = bHidden; }
+
     /** Uniform shell scale for the five similarly sized authored skulls. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     // 1.02 covers the full crown-to-occiput span of the largest MPFB skull
@@ -191,6 +195,7 @@ private:
     int32 CurrentVariantIndex = 0;
     bool bCurrentGuide = false;
     bool bBodyReady = false;
+    bool bHeadHiddenForFirstPerson = false;
     bool bPaddleGripActive = false;
     float MaximumPaddleGripAnchorErrorCm = 0.0f;
     float MinimumUpperPaddleFingerClosureDegrees = 0.0f;
