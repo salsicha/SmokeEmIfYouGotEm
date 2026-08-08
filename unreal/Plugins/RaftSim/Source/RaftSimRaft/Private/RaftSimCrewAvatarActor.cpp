@@ -27,7 +27,10 @@ const FVector kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.68f);
 // 2026-08-06 named human review: helmets read as off-center caps. Seat the
 // shell lower on the skull and nearly centred so per-head measurement
 // variance is absorbed instead of amplified.
-const FVector kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 6.5f);
+// Rearward bias re-tuned 2026-08-08 under the corrected face frame: with
+// the shell no longer worn backwards, the pure Z lift left the occiput
+// exposed behind the rim (first South Fork playtest).
+const FVector kProductionHelmetSkullCenterOffsetCm(-2.0f, 0.0f, 6.0f);
 const FVector kProductionHelmetShellOffsetCm(0.8f, 0.0f, 0.0f);
 const FVector kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f);
 constexpr float kProductionHelmetReferenceFit = 0.96f;

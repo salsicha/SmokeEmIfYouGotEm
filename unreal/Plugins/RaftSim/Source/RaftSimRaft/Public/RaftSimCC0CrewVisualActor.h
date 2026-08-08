@@ -130,7 +130,10 @@ public:
 
     /** Uniform shell scale for the five similarly sized authored skulls. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
-    float GetRecommendedWhitewaterHelmetScale() const { return 0.96f; }
+    // 1.02 covers the full crown-to-occiput span of the largest MPFB skull
+    // now that the corrected face frame wears the shell front-forward; the
+    // former 0.96 was tuned while the shell sat reversed (2026-08-08).
+    float GetRecommendedWhitewaterHelmetScale() const { return 1.02f; }
 
 private:
     bool EnsureBodyLoaded();
