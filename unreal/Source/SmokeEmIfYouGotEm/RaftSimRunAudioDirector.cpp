@@ -36,9 +36,9 @@ float StableNoise(uint32& State)
     return static_cast<float>((State >> 8) & 0x00FFFFFFu) / 8388607.5f - 1.0f;
 }
 
-TArray<uint8> BuildLayerPcm(ESynthLayer Layer)
+TArray<uint8> BuildLayerPcm(ESynthLayer Layer, int32 LoopSeconds)
 {
-    const int32 SampleCount = SampleRate * SecondsPerLoop;
+    const int32 SampleCount = SampleRate * LoopSeconds;
     TArray<int16> Samples;
     Samples.SetNumUninitialized(SampleCount);
     uint32 NoiseState = 0x6d2b79f5u ^ (static_cast<uint32>(Layer) * 0x9e3779b9u);
@@ -82,9 +82,30 @@ TArray<uint8> BuildLayerPcm(ESynthLayer Layer)
             }
             case ESynthLayer::Ambience:
             {
-                const float Bird = FMath::Pow(FMath::Max(0.0f, FMath::Sin(PI * Phase * 2.0f)), 16.0f) *
-                    FMath::Sin(2.0f * PI * (1250.0f + 220.0f * FMath::Sin(2.0f * PI * T)) * T);
-                Signal = Brown * 0.18f + Bird * 0.14f;
+                // The former per-second sin^16 chirp at a fixed 1250 Hz in a
+                // 2 s loop read as a squeak on a loop (2026-08-08 South Fork
+                // playtest). Chirps are now sparse and pitch/time-varied by a
+                // deterministic per-second hash over a longer buffer, so the
+                // ambience never repeats a metronomic tweet.
+                const int32 SecondIndex = static_cast<int32>(T);
+                const float Hash = FMath::Frac(
+                    FMath::Sin(static_cast<float>(SecondIndex) * 12.9898f + 4.233f) *
+                    43758.547f);
+                float Bird = 0.0f;
+                if (Hash < 0.30f)
+                {
+                    const float ChirpStart = 0.15f + 0.55f * FMath::Frac(Hash * 11.7f);
+                    const float ChirpPhase = FMath::Frac(T) - ChirpStart;
+                    constexpr float ChirpLengthSeconds = 0.16f;
+                    if (ChirpPhase > 0.0f && ChirpPhase < ChirpLengthSeconds)
+                    {
+                        const float Envelope = FMath::Square(
+                            FMath::Sin(PI * ChirpPhase / ChirpLengthSeconds));
+                        const float PitchHz = 950.0f + 650.0f * FMath::Frac(Hash * 7.31f);
+                        Bird = Envelope * FMath::Sin(2.0f * PI * PitchHz * T) * 0.09f;
+                    }
+                }
+                Signal = Brown * 0.18f + Bird;
                 break;
             }
             case ESynthLayer::Music:
@@ -201,7 +222,13 @@ void ARaftSimRunAudioDirector::InitializeProductionLayers()
     {
         USoundWaveProcedural* Wave = NewObject<USoundWaveProcedural>(this);
         ConfigureWave(Wave);
-        LayerPcm.Add(BuildLayerPcm(static_cast<ESynthLayer>(LayerIndex)));
+        // Ambience carries melodic content (bird chirps); a 2 s loop makes
+        // any melodic event metronomic. Noise-bed layers repeat invisibly.
+        const int32 LoopSeconds =
+            static_cast<ESynthLayer>(LayerIndex) == ESynthLayer::Ambience
+                ? 16
+                : SecondsPerLoop;
+        LayerPcm.Add(BuildLayerPcm(static_cast<ESynthLayer>(LayerIndex), LoopSeconds));
         Wave->QueueAudio(LayerPcm.Last().GetData(), LayerPcm.Last().Num());
         LayerWaves.Add(Wave);
         Components[LayerIndex]->SetSound(Wave);

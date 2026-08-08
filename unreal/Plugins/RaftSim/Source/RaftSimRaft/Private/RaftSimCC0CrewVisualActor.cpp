@@ -619,6 +619,10 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
 
     Body->SetBoneScaleByName(TEXT("foot_l"), FVector::ZeroVector, EBoneSpaces::ComponentSpace);
     Body->SetBoneScaleByName(TEXT("foot_r"), FVector::ZeroVector, EBoneSpaces::ComponentSpace);
+    Body->SetBoneScaleByName(
+        TEXT("head"),
+        bHeadHiddenForFirstPerson ? FVector::ZeroVector : FVector::OneVector,
+        EBoneSpaces::ComponentSpace);
     Body->RefreshBoneTransforms();
     ApplyPaddleGripPose(Pose);
     Body->RefreshBoneTransforms();

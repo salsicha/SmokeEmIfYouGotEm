@@ -56,6 +56,7 @@ interactive loads should be quick.
 | Rescue: reach grab (close) | E | A / Cross |
 | Rescue: throw line (far) | R | Right trigger |
 | Reseat rescued crew | F | B / Circle |
+| Chase camera toggle (Free Run only; default is guide POV) | C | Right-stick click |
 | Pause | Esc | Menu button |
 
 Console (` key): `stat fps`, `stat unit` (budgets: game thread ≤ 8 ms,
