@@ -160,6 +160,20 @@ anchor-drop constants were calibrated against the flipped face frame — the
 guide's shell rides high-back, crew04's dips forward) and the vest rear
 panel stack standing a few cm off the upper back in profile.
 
+First South Fork I playtest (2026-08-08): two defects traced same day.
+The map's sun sat at pitch −88 (near-zenith) while the bootstrap authors
+−42/−128 Sierra daylight — a leftover from a `sunpitch=` capture override
+saved into the map; a near-vertical sun disk whirls around the screen top
+with every raft/camera yaw, which read as "the sun is spinning quickly
+around the sky." Restored to the authored rotation (external-actor package
+only; the .umap and its integrity pins are untouched). The guide's occiput
+protruded behind the helmet rim: the shell centre offset and the 0.96
+recommended scale were both tuned while the shell was worn backwards —
+re-tuned under the corrected face frame (rear bias −2 cm, scale 1.02) and
+re-verified on the roster renders. Also reported, queued next: gameplay
+camera defaults to the chase view (guide POV requested), no visible guide
+stroke/paddle on W, and a looping squeak in the South Fork soundscape.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

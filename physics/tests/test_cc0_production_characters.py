@@ -518,7 +518,9 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert "constexpr float kProductionHelmetReferenceFit = 0.96f;" in host
     assert "const float CollarFit = bUsingProductionVisual ? 1.28f : 1.0f;" in host
     # 2026-08-06 named human review: helmet seated lower on the skull.
-    assert "kProductionHelmetSkullCenterOffsetCm(0.0f, 0.0f, 6.5f)" in host
+    # 2026-08-08: rear bias added once the corrected face frame exposed the
+    # occiput behind the rim in the first South Fork playtest.
+    assert "kProductionHelmetSkullCenterOffsetCm(-2.0f, 0.0f, 6.0f)" in host
     # 2026-08-06 named human review: helmet nearly centred, not pushed forward.
     assert "kProductionHelmetShellOffsetCm(0.8f, 0.0f, 0.0f)" in host
     assert "kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f)" in host
