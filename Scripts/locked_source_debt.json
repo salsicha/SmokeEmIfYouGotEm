@@ -4,6 +4,11 @@
   "entries": [
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset",
+      "recorded_sha256": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
       "recorded_sha256": "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
     },
@@ -51,16 +56,6 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp",
       "recorded_sha256": "d9488a283135392d23bcff2819b4a2e5dd94daf6701019e98274b3aa789081f3"
-    },
-    {
-      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json",
-      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp",
-      "recorded_sha256": "a9056748a9357ed16711eac8998c5ca596a2504f89c42dea76965e372648b45f"
-    },
-    {
-      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_full_optical_bank_coverage_v1_review.json",
-      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp",
-      "recorded_sha256": "e5059225d87c452b892302819aada7ee87f70610d7f91e06fb03709a815ce85d"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_organic_lit_terrain_v1_review.json",
