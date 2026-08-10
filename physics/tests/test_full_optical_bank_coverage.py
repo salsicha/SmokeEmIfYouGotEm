@@ -70,7 +70,7 @@ def test_review_is_fail_closed_and_hash_locked() -> None:
         # 2026-08-10: transmission parent regenerated so the CC0 froth chain
         # (in the builders since 2026-08-07) finally reaches the rendered
         # river bands; prior hash was the pre-froth cold-water-optical build.
-        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset": "8eb7adace7f1c61f2f0c5894e300bbb221f5e23e6d53fca0b66e7d05f0167b4b"
+        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset": "a90865bfd8a0ae081cf915a5071401f2e1eda8e13aab851223d4fd3d034e581a"
     }
     for artifact in review["artifacts"]:
         path = ROOT / artifact["path"]
