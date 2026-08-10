@@ -1013,9 +1013,15 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
     }
     const float Scale = FMath::Clamp(ForwardScale, -1.0f, 1.0f);
     const FVector StrokeDirection = GetActorForwardVector() * FMath::Sign(Scale);
+    const float Shortfall = GetPaddlePropulsionShortfall(StrokeDirection);
+    // Discrete per-stroke diagnostic: settles "back paddle doesn't seem to
+    // be implemented" style reports from the session log alone (input
+    // mapping, sign, and governor factor all visible per stroke).
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f"),
+        Scale, Shortfall);
     const FVector LinearImpulseNs = GetActorForwardVector() *
-        (PaddleStrokeImpulseNs * Scale *
-         GetPaddlePropulsionShortfall(StrokeDirection));
+        (PaddleStrokeImpulseNs * Scale * Shortfall);
 
     // Off-center strokes also yaw the raft a little.
     FVector AngularImpulseNms = FVector::ZeroVector;
