@@ -42,11 +42,17 @@
     "maximum_sites": 3,
     "cells_per_site": 3,
     "cell_type": "overlapping asymmetric elliptical Mexican-hat upwelling and return-trough profiles",
-    "downstream_extent_m": [3.8, 20.5],
+    "downstream_extent_m": [
+      3.8,
+      20.5
+    ],
     "maximum_depression_m": 0.045,
-    "maximum_uplift_m": 0.070,
+    "maximum_uplift_m": 0.07,
     "maximum_local_foam_generation": 0.38,
-    "combined_plunge_pocket_and_boil_bounds_m": [-0.31, 0.21],
+    "combined_plunge_pocket_and_boil_bounds_m": [
+      -0.31,
+      0.21
+    ],
     "temporal_phase_wrap_seconds": 4096.0,
     "diagnostic_cvar": "RaftSim.Water.DownstreamBoilMicrorelief",
     "diagnostic_cvar_default": 1,
@@ -62,7 +68,10 @@
       "candidate_command": "RaftSim.CaptureAfter 8 downstream_boil_microrelief_v1_after breaking_water_side",
       "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/downstream_boil_microrelief_v1_before.png",
       "candidate": "docs/environment-captures/photoreal_river_previews/landscape_candidates/downstream_boil_microrelief_v1_after.png",
-      "resolution": [1280, 720],
+      "resolution": [
+        1280,
+        720
+      ],
       "camera_contract": "breaking_water_side with an eight-second delay in the same Zambezi run",
       "resolved_site": {
         "river_station_m": 160.5,
@@ -75,7 +84,7 @@
       "image_metrics": {
         "full_frame_mean_absolute_difference_0_to_1": 0.012728,
         "full_frame_fraction_changed_above_0_02": 0.126801,
-        "full_frame_fraction_changed_above_0_05": 0.042650,
+        "full_frame_fraction_changed_above_0_05": 0.04265,
         "background_mean_absolute_difference_0_to_1": 0.010398,
         "water_mean_absolute_difference_0_to_1": 0.013755,
         "central_tailwater_mean_absolute_difference_0_to_1": 0.014548,
@@ -123,7 +132,7 @@
     "product_owner": null
   },
   "source_hashes": {
-    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "43493b187c00a634262e41386b6fd415be2cc165d2ae0d9debcaa77b7e70b54b",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "64ccef057ade47335fd0b80cbdb9d87047122bd45e836b2506ac408248695beb",
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542",
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
   },

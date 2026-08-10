@@ -170,7 +170,7 @@ CURRENT_SUPERSEDING_SOURCE_HASHES = {
     "RaftSimWaterSurfaceActor.cpp": (
         # 2026-08-10: SI telemetry fields (normalized means mislabeled as SI
         # mis-diagnosed a healthy 0.81 m/s pool as dead water).
-        "43493b187c00a634262e41386b6fd415be2cc165d2ae0d9debcaa77b7e70b54b"
+        "64ccef057ade47335fd0b80cbdb9d87047122bd45e836b2506ac408248695beb"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
     "RaftSimWaterSurfaceActor.h": (

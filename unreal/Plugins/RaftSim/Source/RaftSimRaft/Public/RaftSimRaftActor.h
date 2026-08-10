@@ -462,6 +462,8 @@ private:
     // keep coming; expires back to Rest unless an explicit command owns it.
     float GuidePaddleCommandSeconds = 0.0f;
     bool bCrewCommandFromGuidePaddle = false;
+
+    float GetPaddlePropulsionShortfall(const FVector& StrokeDirection) const;
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
     int32 HighSideResponseCount = 0;

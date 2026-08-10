@@ -1046,7 +1046,12 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.TorsoRotation.Roll = -Side * (2.0f + 1.5f * PowerAlpha);
             Pose.TorsoCenterCm.X += 5.0f * Wave;
             Pose.PaddleTopCm.X += Reach;
-            Pose.PaddleBottomCm.X -= 20.0f * Wave;
+            // Blade travels WITH the top hand: forward at the catch, back
+            // through the power phase. The former negated term swept the
+            // blade forward through the water during power — a back-paddle
+            // in mirror (2026-08-10 playtest: "their forward paddle looks
+            // like a back paddle").
+            Pose.PaddleBottomCm.X += 20.0f * Wave;
             Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
             ApplyMirroredPaddleGrip(Pose, Side);
             break;
@@ -1064,7 +1069,7 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.TorsoRotation.Roll = Side * (2.0f + 1.5f * PowerAlpha);
             Pose.TorsoCenterCm.X += 5.0f * BackWave;
             Pose.PaddleTopCm.X += Reach;
-            Pose.PaddleBottomCm.X -= 20.0f * BackWave;
+            Pose.PaddleBottomCm.X += 20.0f * BackWave;
             Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
             ApplyMirroredPaddleGrip(Pose, Side);
             Pose.TorsoRotation.Pitch *= -0.7f;
@@ -1080,7 +1085,7 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             const float StrokeDirection = -Turn * Side;
             Pose.TorsoRotation.Yaw = Turn * (18.0f + 8.0f * Wave);
             Pose.PaddleTopCm.X += 12.0f * StrokeDirection * Wave;
-            Pose.PaddleBottomCm.X -= 18.0f * StrokeDirection * Wave;
+            Pose.PaddleBottomCm.X += 18.0f * StrokeDirection * Wave;
             Pose.PaddleBottomCm.Z += StrokeRecoveryLiftCm(NormalizedPhase);
             ApplyMirroredPaddleGrip(Pose, Side, 0.42f);
             break;
