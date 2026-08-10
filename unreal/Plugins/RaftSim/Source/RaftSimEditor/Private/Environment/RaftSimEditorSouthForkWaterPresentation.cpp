@@ -630,7 +630,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         UMaterialExpression* PhaseB1 = SubtractPair(
             PhaseB0, ScaleBy(WaveTime, 0.55f));
         const auto Displacement =
-            [&](UMaterialExpression* A, UMaterialExpression* B)
+            [&](UMaterialExpression* A, UMaterialExpression* B, float BaseAmp)
         {
             UMaterialExpression* Hydraulic = AddPair(
                 ScaleBy(SineOf(A), 0.16f), ScaleBy(SineOf(B), 0.09f));
@@ -639,10 +639,14 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             Gated->A.Expression = Hydraulic;
             Gated->B.Expression = HydraulicEnergy;
             AddExpr(Gated);
-            return AddPair(ScaleBy(SineOf(A), 0.018f), Gated);
+            return AddPair(ScaleBy(SineOf(A), BaseAmp), Gated);
         };
+        // The static bake (0.018 base) always cancels exactly; the moving
+        // replacement may carry a stronger calm-water base so pools show a
+        // visible travelling swell (+/-3 cm) instead of a sub-perceptual one.
         UMaterialExpression* DeltaMeters = SubtractPair(
-            Displacement(PhaseA1, PhaseB1), Displacement(PhaseA0, PhaseB0));
+            Displacement(PhaseA1, PhaseB1, 0.030f),
+            Displacement(PhaseA0, PhaseB0, 0.018f));
         UMaterialExpression* DeltaCm = ScaleBy(DeltaMeters, 100.0f);
         UMaterialExpressionConstant3Vector* UpAxis =
             NewObject<UMaterialExpressionConstant3Vector>(Material);
