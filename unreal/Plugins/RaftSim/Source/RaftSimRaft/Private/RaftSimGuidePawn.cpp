@@ -1,6 +1,9 @@
 #include "RaftSimGuidePawn.h"
 
 #include "Camera/CameraComponent.h"
+#include "ProceduralMeshComponent.h"
+#include "RaftSimCrewAvatarActor.h"
+#include "RaftSimPaddleBladeMesh.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -188,6 +191,7 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
     UpdateSwimmingAndRescueAim();
+    UpdateFirstPersonPaddle(DeltaSeconds);
     // With the view seated in the guide avatar's own eye socket, its head
     // and helmet must not render into the first-person camera. The setter
     // early-outs when unchanged, so per-tick sync is cheap and follows
@@ -579,6 +583,7 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
 void ARaftSimGuidePawn::BeginPlay()
 {
     Super::BeginPlay();
+    BuildFirstPersonPaddle();
 
     if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
     {
@@ -814,4 +819,176 @@ void ARaftSimGuidePawn::HandleReseatCrew(const FInputActionValue&)
     {
         Raft->RequestSelectedReentry();
     }
+}
+
+namespace
+{
+void AppendPaddleBox(
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs,
+    TArray<FProcMeshTangent>& Tangents,
+    const FVector& HalfExtentCm,
+    const FVector& CenterCm)
+{
+    const FVector Axes[3] = {
+        FVector::ForwardVector, FVector::RightVector, FVector::UpVector};
+    for (int32 Face = 0; Face < 6; ++Face)
+    {
+        const int32 Axis = Face / 2;
+        const float Sign = (Face % 2 == 0) ? 1.0f : -1.0f;
+        const int32 UAxis = (Axis + 1) % 3;
+        const int32 VAxis = (Axis + 2) % 3;
+        const FVector FaceNormal = Axes[Axis] * Sign;
+        const int32 Start = Vertices.Num();
+        for (int32 Corner = 0; Corner < 4; ++Corner)
+        {
+            const float SU = (Corner == 1 || Corner == 2) ? 1.0f : -1.0f;
+            const float SV = (Corner >= 2) ? 1.0f : -1.0f;
+            Vertices.Add(
+                CenterCm + FaceNormal * HalfExtentCm[Axis] +
+                Axes[UAxis] * SU * HalfExtentCm[UAxis] +
+                Axes[VAxis] * SV * HalfExtentCm[VAxis]);
+            Normals.Add(FaceNormal);
+            UVs.Add(FVector2D(SU * 0.5f + 0.5f, SV * 0.5f + 0.5f));
+            Tangents.Add(FProcMeshTangent(Axes[UAxis], false));
+        }
+        if (Sign > 0.0f)
+        {
+            Triangles.Append({Start, Start + 1, Start + 2, Start, Start + 2, Start + 3});
+        }
+        else
+        {
+            Triangles.Append({Start, Start + 2, Start + 1, Start, Start + 3, Start + 2});
+        }
+    }
+}
+}
+
+void ARaftSimGuidePawn::BuildFirstPersonPaddle()
+{
+    if (FirstPersonPaddleShaft != nullptr || PaddleAnchor == nullptr)
+    {
+        return;
+    }
+    const auto MakePart = [this](const TCHAR* Name, const TCHAR* MaterialPath)
+    {
+        UProceduralMeshComponent* Part =
+            NewObject<UProceduralMeshComponent>(this, FName(Name));
+        Part->SetupAttachment(PaddleAnchor);
+        Part->RegisterComponent();
+        Part->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        // View-model: the crew avatar's paddle owns the world shadow.
+        Part->SetCastShadow(false);
+        if (UMaterialInterface* Material =
+                LoadObject<UMaterialInterface>(nullptr, MaterialPath))
+        {
+            Part->SetMaterial(0, Material);
+        }
+        return Part;
+    };
+    FirstPersonPaddleShaft = MakePart(
+        TEXT("FirstPersonPaddleShaft"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"));
+    FirstPersonPaddleGrip = MakePart(
+        TEXT("FirstPersonPaddleGrip"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"));
+    FirstPersonPaddleBlade = MakePart(
+        TEXT("FirstPersonPaddleBlade"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleBlade.M_RaftSim_PaddleBlade"));
+
+    TArray<FVector> Vertices, Normals;
+    TArray<int32> Triangles;
+    TArray<FVector2D> UVs;
+    TArray<FProcMeshTangent> Tangents;
+    TArray<FLinearColor> Colors;
+
+    // Guide stern paddle: T-grip at the anchor, shaft down local +Z, the
+    // shared commercial blade at the throat (total ~2.1 m).
+    AppendPaddleBox(Vertices, Triangles, Normals, UVs, Tangents,
+        FVector(2.0f, 2.0f, 85.0f), FVector(0.0f, 0.0f, 85.0f));
+    FirstPersonPaddleShaft->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+
+    Vertices.Reset(); Triangles.Reset(); Normals.Reset();
+    UVs.Reset(); Tangents.Reset();
+    AppendPaddleBox(Vertices, Triangles, Normals, UVs, Tangents,
+        FVector(7.0f, 2.5f, 2.5f), FVector(0.0f, 0.0f, -2.5f));
+    FirstPersonPaddleGrip->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+
+    Vertices.Reset(); Triangles.Reset(); Normals.Reset();
+    UVs.Reset(); Tangents.Reset();
+    RaftSimPaddleBladeMesh::BuildCommercialPaddleBladeMesh(
+        Vertices, Triangles, Normals, UVs, Tangents);
+    FirstPersonPaddleBlade->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+    FirstPersonPaddleBlade->SetRelativeLocation(FVector(0.0f, 0.0f, 172.0f));
+
+    PaddleAnchor->SetRelativeRotation(
+        FRotationMatrix::MakeFromZX(
+            FVector(0.38f, 0.52f, -0.77f), FVector::ForwardVector).Rotator());
+}
+
+void ARaftSimGuidePawn::UpdateFirstPersonPaddle(float DeltaSeconds)
+{
+    if (FirstPersonPaddleShaft == nullptr || PaddleAnchor == nullptr)
+    {
+        return;
+    }
+    const bool bShow = !CameraRuntimeState.bChaseCameraActive &&
+        MobilityMode == ERaftSimGuideMobilityMode::InRaft;
+    FirstPersonPaddleShaft->SetVisibility(bShow);
+    FirstPersonPaddleGrip->SetVisibility(bShow);
+    FirstPersonPaddleBlade->SetVisibility(bShow);
+    if (!bShow)
+    {
+        return;
+    }
+    ARaftSimRaftActor* Raft = ResolveRaft();
+    if (Raft == nullptr)
+    {
+        return;
+    }
+    // Shaft direction in view space: rest at the guide's relaxed ready
+    // angle; strokes sweep reach-to-exit over the raft's one-second guide
+    // stroke window, mirroring the impulse that already fired.
+    FVector ShaftDirection(0.38f, 0.52f, -0.77f);
+    const float Remaining = Raft->GetGuideStrokeSecondsRemaining();
+    if (Remaining > 0.0f)
+    {
+        const float T = 1.0f - FMath::Clamp(Remaining, 0.0f, 1.0f);
+        FVector Reach = ShaftDirection;
+        FVector Exit = ShaftDirection;
+        switch (Raft->GetGuideStrokeAction())
+        {
+            case ERaftSimCrewAvatarAction::ForwardStroke:
+                Reach = FVector(0.86f, 0.30f, -0.42f);
+                Exit = FVector(-0.30f, 0.55f, -0.78f);
+                break;
+            case ERaftSimCrewAvatarAction::BackStroke:
+                Reach = FVector(-0.45f, 0.50f, -0.74f);
+                Exit = FVector(0.80f, 0.30f, -0.52f);
+                break;
+            case ERaftSimCrewAvatarAction::TurnRight:
+                Reach = FVector(0.30f, 0.85f, -0.44f);
+                Exit = FVector(0.42f, -0.20f, -0.88f);
+                break;
+            case ERaftSimCrewAvatarAction::TurnLeft:
+                Reach = FVector(0.42f, -0.20f, -0.88f);
+                Exit = FVector(0.30f, 0.85f, -0.44f);
+                break;
+            default:
+                break;
+        }
+        ShaftDirection = FMath::Lerp(Reach, Exit, T).GetSafeNormal();
+    }
+    const FQuat TargetRotation = FRotationMatrix::MakeFromZX(
+        ShaftDirection, FVector::ForwardVector).ToQuat();
+    PaddleAnchor->SetRelativeRotation(
+        FQuat::Slerp(
+            PaddleAnchor->GetRelativeRotation().Quaternion(),
+            TargetRotation,
+            FMath::Clamp(DeltaSeconds * 10.0f, 0.0f, 1.0f)));
 }

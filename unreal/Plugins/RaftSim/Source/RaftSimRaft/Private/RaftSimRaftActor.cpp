@@ -1028,19 +1028,36 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     {
         DriftTelemetrySeconds = 0.0f;
         float WaterSpeedMps = 0.0f;
+        float SurfaceZCm = 0.0f;
+        bool bHullWet = false;
         if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
         {
             FRaftSimWaterSample Sample;
-            if (Water->SampleWaterAtWorldPosition(GetActorLocation(), Sample) &&
-                Sample.bWet)
+            if (Water->SampleWaterAtWorldPosition(GetActorLocation(), Sample))
             {
-                WaterSpeedMps = Sample.VelocityMetersPerSecond.Size2D();
+                bHullWet = Sample.bWet;
+                SurfaceZCm = Sample.SurfaceHeightMeters * 100.0f;
+                if (Sample.bWet)
+                {
+                    WaterSpeedMps = Sample.VelocityMetersPerSecond.Size2D();
+                }
             }
         }
         UE_LOG(LogTemp, Display,
-            TEXT("RaftSim raft drift: raft_speed_mps=%.3f water_speed_mps=%.3f"),
+            TEXT("RaftSim raft drift: raft_speed_mps=%.3f water_speed_mps=%.3f ")
+            TEXT("raft_z_cm=%.1f surface_z_cm=%.1f wet=%d retained_kg=%.0f ")
+            TEXT("pressure=%.2f integrity=%.2f dry_points=%d x_cm=%.0f y_cm=%.0f"),
             GetRaftVelocity().Size(),
-            WaterSpeedMps);
+            WaterSpeedMps,
+            GetActorLocation().Z,
+            SurfaceZCm,
+            bHullWet ? 1 : 0,
+            GetD3RetainedWaterMassKg(),
+            RaftCondition.PressureFraction,
+            RaftCondition.FabricIntegrity,
+            RaftAdapter->GetLastDrySupportPointCount(),
+            GetActorLocation().X,
+            GetActorLocation().Y);
     }
 
     RockObstacleRefreshRemaining -= DeltaSeconds;

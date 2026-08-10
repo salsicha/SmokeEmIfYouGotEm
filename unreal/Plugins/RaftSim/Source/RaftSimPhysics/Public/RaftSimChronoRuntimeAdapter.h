@@ -200,6 +200,10 @@ public:
     void SetWaterSurfaceSampler(
         TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler);
 
+    /** Tube support points whose water cell sampled dry on the last support
+     * pass — the direct instrument for fall-through-the-wet-mask sinks. */
+    int32 GetLastDrySupportPointCount() const { return LastDrySupportPointCount; }
+
     /**
      * Bind full live-water samples for D3. The adapter evaluates this at each
      * deformed tube segment in world centimetres and passes the resulting
@@ -279,6 +283,9 @@ private:
 
     // Buoyancy support stage (plain C++ members; deterministic).
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
+    int32 LastDrySupportPointCount = 0;
+    float LastWetCenterSurfaceZCm = 0.0f;
+    bool bHasLastWetCenterSurface = false;
     TFunction<bool(
         const FVector& WorldPositionCm,
         FRaftSimFlexUniformWater& OutWater)> FlexibleWaterFieldSampler;

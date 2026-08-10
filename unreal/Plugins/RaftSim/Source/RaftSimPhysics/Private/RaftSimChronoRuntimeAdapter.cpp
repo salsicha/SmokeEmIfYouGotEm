@@ -376,6 +376,15 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             FMath::Lerp(0.80, 1.0, static_cast<double>(FlexFabricIntegrity));
         const double SaturationDepthM =
             FMath::Max(2.0 * static_cast<double>(RaftConfig.TubeRadiusMeters), 1.0e-3);
+        LastDrySupportPointCount = 0;
+        float CenterSurfaceZCm = 0.0f;
+        const bool bCenterWet =
+            WaterSurfaceSampler(State.Position * 100.0, CenterSurfaceZCm);
+        if (bCenterWet)
+        {
+            LastWetCenterSurfaceZCm = CenterSurfaceZCm;
+            bHasLastWetCenterSurface = true;
+        }
         for (const FVector& LocalM : TubeSamplePointsM)
         {
             const FVector WorldOffset = State.Orientation.RotateVector(LocalM);
@@ -383,8 +392,23 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             float SurfaceZCm = 0.0f;
             if (!WaterSurfaceSampler(WorldPointM * 100.0, SurfaceZCm))
             {
-                // Dry water cell: no support from this tube point.
-                continue;
+                ++LastDrySupportPointCount;
+                if (!bHasLastWetCenterSurface)
+                {
+                    // Never been in water (spawn on land): nothing to hold.
+                    continue;
+                }
+                // Masked-dry cell under a tube point — a boulder patch or
+                // bar in the cooked wet mask, which has no collision actor
+                // of its own. Support the point at the current (or, when
+                // the whole hull is over the patch, the last) wet centre
+                // surface so the raft grounds at the waterline instead of
+                // falling through the hole in the mask. Drift telemetry
+                // 2026-08-10: dry_points 1->3 sank the hull 1.2 m, and the
+                // wider patch at station ~240 dropped it 2.3 m once the
+                // centre went dry — the playtest's "a hole opened in the
+                // water and the boat sank".
+                SurfaceZCm = bCenterWet ? CenterSurfaceZCm : LastWetCenterSurfaceZCm;
             }
             const double SubmersionM = static_cast<double>(SurfaceZCm) / 100.0 - WorldPointM.Z;
             const double Saturation = FMath::Clamp(SubmersionM / SaturationDepthM, 0.0, 1.0);

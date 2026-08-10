@@ -225,6 +225,26 @@ report: calm-water rendering on SF is the static authored band meshes
 pools read as frozen; and the first-person paddle rig (pawn anchors,
 never populated) so strokes read in view. Both queued next.
 
+Round 5 (2026-08-10) — "a hole opened in the water and the boat sank":
+instrumented free-drift telemetry (raft vs water speed, draft, wet state,
+retained water, tube pressure, fabric integrity, dry support points, and
+river position every 10 s) convicted the exact mechanism at station ~235:
+the cooked wet mask carries dry cells over boulder patches, those cells
+have no collision actor, and every buoyancy point sampling a dry cell
+contributed zero support — the hull fell through the hole in the mask
+(1.2 m under at three dry points; 2.3 m once the raft centre crossed the
+patch), then the run recovery teleported it back to the put-in. Damage
+and overwash were cleared by the same telemetry (pressure 1.0, retained
+water transient). Fix: dry-celled support points now ground at the
+current (or last) wet centre waterline, so the raft rides onto bars and
+boulder patches instead of submarining; verified by re-running the same
+drift — minimum draft stayed normal through the patch and the raft
+beached gently. Also in this round: the first-person paddle rig (the
+pawn's hand/paddle anchors, empty since creation, now carry the shared
+commercial blade on a stroke-swept shaft) and the standing drift
+telemetry line. Note for pilots: unpiloted rafts now ground on
+mid-channel bars — paddle off or steer around.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

@@ -89,6 +89,10 @@ public:
      * first-person camera on the real anatomy instead of a fixed offset. */
     bool GetGuideHeadWorldLocationCm(FVector& OutCm) const;
 
+    /** Guide stroke presentation state, for the pawn's first-person paddle. */
+    ERaftSimCrewAvatarAction GetGuideStrokeAction() const { return GuideStrokeAction; }
+    float GetGuideStrokeSecondsRemaining() const { return GuideStrokeActionSeconds; }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     USceneComponent* GetSternSeatAttachPoint() const { return SternSeatAttachPoint; }
 
