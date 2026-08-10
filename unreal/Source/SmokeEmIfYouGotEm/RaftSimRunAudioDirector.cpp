@@ -66,8 +66,21 @@ TArray<uint8> BuildLayerPcm(ESynthLayer Layer, int32 LoopSeconds)
                 break;
             case ESynthLayer::Paddle:
             {
-                const float Pulse = FMath::Exp(-18.0f * FMath::Fmod(Phase, 0.5f));
-                Signal = Pulse * (White * 0.45f + FMath::Sin(2.0f * PI * 86.0f * T) * 0.32f);
+                // Vertical blade entry: a low displacement plunk with a
+                // short bubble tail. The former broadband white burst plus
+                // an 86 Hz thump read as a flat-blade slap (2026-08-10
+                // playtest: "the paddles should be stabbing vertically
+                // into the water").
+                const float StrokePhase = FMath::Fmod(Phase, 0.5f);
+                const float Entry = FMath::Exp(-26.0f * StrokePhase);
+                const float PitchHz =
+                    200.0f - 130.0f * FMath::Min(StrokePhase * 9.0f, 1.0f);
+                const float Plunk =
+                    FMath::Sin(2.0f * PI * PitchHz * T) * Entry * 0.5f;
+                const float BubbleTail = Brown *
+                    FMath::Exp(-6.0f * StrokePhase) *
+                    (StrokePhase > 0.03f ? 0.34f : 0.0f);
+                Signal = Plunk + BubbleTail;
                 break;
             }
             case ESynthLayer::Fabric:
@@ -327,7 +340,20 @@ void ARaftSimRunAudioDirector::Tick(float DeltaSeconds)
     MixState.RiverBed = FMath::Clamp((0.12f + CurrentParameters.RiverRoar * 0.75f) * Duck, 0.0f, 1.0f);
     MixState.RapidFeatures = FMath::Clamp(CurrentParameters.RapidFeatureIntensity * 0.82f * Duck, 0.0f, 1.0f);
     MixState.FoamAndSpray = FMath::Clamp(CurrentParameters.SprayAndFoam * 0.64f, 0.0f, 1.0f);
-    MixState.Paddle = PaddleEnvelope * 0.82f;
+    // Rushing water buries the paddle: from the stern seat a stroke is
+    // inaudible inside a rapid, and only a soft plunk in flat pools
+    // (2026-08-10 playtest: "the rushing of the water should be loud
+    // enough you can't hear the paddles at all").
+    const float WaterLoudness = FMath::Clamp(
+        CurrentParameters.RiverRoar +
+            CurrentParameters.RapidFeatureIntensity * 0.8f,
+        0.0f, 1.0f);
+    // Duck ceiling 0.80 keeps a fresh stroke's mix contribution just above
+    // the M7 audibility floor (0.34 * 0.2 = 0.068) while rapids at full
+    // roar swamp it perceptually.
+    MixState.Paddle =
+        PaddleEnvelope * 0.34f * (1.0f - 0.80f * WaterLoudness);
+    MixState.PaddleStrokeEnvelope = PaddleEnvelope;
     MixState.FabricAndImpact = FMath::Clamp(FMath::Max(
         CurrentParameters.ImpactLayer, CurrentParameters.ScrapeLayer) * 0.9f, 0.0f, 1.0f);
     MixState.CrewAndRescue = CrewEnvelope * 0.78f;
