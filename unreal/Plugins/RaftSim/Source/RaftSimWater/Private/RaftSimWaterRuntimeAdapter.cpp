@@ -140,6 +140,43 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
     return true;
 }
 
+namespace
+{
+// Mirror of the render-side travelling wave. The band bake
+// (RaftSimEditorSouthForkFullReach.cpp) plus the transmission material's
+// RaftSimTravelingBakeWaveWPO block present this moving field; coupling it
+// into sampled surface heights makes the raft — rigid support, flex
+// segments (which is what lets the soft hull CURVE over wave shapes),
+// overwash, audio, and telemetry — feel the same waves the camera sees
+// (2026-08-10 playtest: "the water level goes up and down in the boat,
+// but the boat doesn't ride over the waves"). Constants must stay paired
+// with the WPO block; energy is recomputed from Froude and speed, the
+// same quantities the bake's vertex colours encoded.
+float PresentationTravelingWaveM(
+    float StationM, float LateralM, float TimeSeconds,
+    float SpeedMps, float DepthM)
+{
+    const float Froude =
+        SpeedMps / FMath::Sqrt(9.80665f * FMath::Max(DepthM, 0.1f));
+    const float FoamNorm = FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
+    const float SpeedNorm = FMath::Clamp(SpeedMps / 8.0f, 0.0f, 1.0f);
+    const float Energy =
+        FMath::Clamp(FoamNorm * 0.72f + SpeedNorm * 0.48f, 0.0f, 1.0f);
+    const float PhaseA =
+        StationM * 0.19f + LateralM * 0.61f - TimeSeconds * 0.90f;
+    const float PhaseB =
+        StationM * 0.071f - LateralM * 0.37f - TimeSeconds * 0.55f;
+    return 0.030f * FMath::Sin(PhaseA) +
+           Energy * (0.16f * FMath::Sin(PhaseA) + 0.09f * FMath::Sin(PhaseB));
+}
+
+static TAutoConsoleVariable<int32> CVarRaftSimPresentationWaveCoupling(
+    TEXT("RaftSim.Water.PresentationWaveCoupling"), 1,
+    TEXT("1: sampled water heights include the rendered travelling-wave "
+         "field so the raft rides what the camera sees; 0: matched-baseline "
+         "solver heights only."));
+}
+
 bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
     const FVector& WorldPosition,
     FRaftSimWaterSample& OutSample
@@ -167,6 +204,15 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
         if (Live.bValid)
         {
             OutSample.SurfaceHeightMeters = Live.SurfaceHeightM - RiverVerticalDatumM;
+            if (Live.bWet &&
+                CVarRaftSimPresentationWaveCoupling.GetValueOnAnyThread() != 0)
+            {
+                const UWorld* World = GetWorld();
+                OutSample.SurfaceHeightMeters += PresentationTravelingWaveM(
+                    SolverPositionM.X, SolverPositionM.Y,
+                    World ? World->GetTimeSeconds() : 0.0f,
+                    Live.VelocityMps.Size(), Live.DepthM);
+            }
             OutSample.BedHeightMeters = Live.BedHeightM - RiverVerticalDatumM;
             OutSample.DepthMeters = Live.DepthM;
             OutSample.VelocityMetersPerSecond =
