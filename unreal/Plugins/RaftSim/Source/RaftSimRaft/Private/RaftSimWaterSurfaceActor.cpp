@@ -2449,6 +2449,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     float MaximumFoam = 0.0f;
     float DepthSum = 0.0f;
     float SpeedSum = 0.0f;
+    // SI companions to the 0-1 presentation normals above. The normalized
+    // means were once logged under bare names and read as if they were
+    // metres and m/s, which mis-diagnosed a healthy 0.81 m/s put-in pool
+    // as dead water (2026-08-10).
+    float DepthMetersSum = 0.0f;
+    float SpeedMpsSum = 0.0f;
     float MaximumAbsoluteStandingWaveM = 0.0f;
     float MaximumAbsoluteHydraulicReliefM = 0.0f;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
@@ -2595,6 +2601,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 ++WetVertexCount;
                 DepthSum += DepthNorm;
                 SpeedSum += SpeedNorm;
+                DepthMetersSum += Sample.DepthMeters;
+                SpeedMpsSum += Speed;
                 MaximumAbsoluteStandingWaveM = FMath::Max(
                     MaximumAbsoluteStandingWaveM,
                     FMath::Abs(StandingWave.DisplacementMeters));
@@ -3353,7 +3361,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                  "surface_vertices=%d surface_triangles=%d "
                  "render_spacing_m=%.2f analysis_stride=%d refresh_cpu_ms=%.3f "
                  "wet_vertices=%d "
-                 "foam_mean=%.4f foam_max=%.4f depth_mean=%.4f speed_mean=%.4f "
+                 "foam_mean=%.4f foam_max=%.4f depth_mean_norm=%.4f speed_mean_norm=%.4f "
+                 "depth_mean_m=%.3f speed_mean_mps=%.3f "
                  "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f "
                  "volume_core_enabled=%d volume_core_triangles=%d "
                  "rapid_foam_vertices=%d rapid_foam_visible=%d "
@@ -3373,6 +3382,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MaximumFoam,
             DepthSum / WetVertexCount,
             SpeedSum / WetVertexCount,
+            DepthMetersSum / WetVertexCount,
+            SpeedMpsSum / WetVertexCount,
             MaximumAbsoluteStandingWaveM,
             MaximumAbsoluteHydraulicReliefM,
             bLiveVolumeCoreEnabled ? 1 : 0,

@@ -168,8 +168,9 @@ CURRENT_SUPERSEDING_SOURCE_HASHES = {
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimWaterSurfaceActor.cpp": (
-        # 2026-08-07: Training Eddy visible-water override (first playtest).
-        "1356c618a19d2ec9cd105dce2c116bc91d21b5a8b5ae2712a23c75d17a516ec1"
+        # 2026-08-10: SI telemetry fields (normalized means mislabeled as SI
+        # mis-diagnosed a healthy 0.81 m/s pool as dead water).
+        "43493b187c00a634262e41386b6fd415be2cc165d2ae0d9debcaa77b7e70b54b"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
     "RaftSimWaterSurfaceActor.h": (

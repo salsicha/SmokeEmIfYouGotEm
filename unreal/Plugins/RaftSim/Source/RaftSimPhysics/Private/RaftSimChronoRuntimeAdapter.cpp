@@ -398,13 +398,30 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             TorqueNm += FVector::CrossProduct(WorldOffset, PointForceN);
         }
 
-        // Quadratic water drag opposing velocity, scaled by submersion.
-        const double Speed = State.LinearVelocity.Length();
-        if (Speed > KINDA_SMALL_NUMBER && SubmergedFraction > 0.0)
+        // Quadratic water drag opposing velocity RELATIVE TO THE CURRENT,
+        // scaled by submersion. The former term opposed absolute velocity —
+        // identical in still water (every tank test passed) but structurally
+        // wrong in a river: a raft at rest in a current received zero
+        // horizontal force and could never be carried downstream (measured
+        // 2026-08-10 at Chili Bar: water 0.63-0.79 m/s at the hull, raft
+        // 0.001 m/s after two minutes free).
+        FVector WaterVelocityMps = FVector::ZeroVector;
+        if (FlexibleWaterFieldSampler)
         {
-            ForceN += State.LinearVelocity *
+            FRaftSimFlexUniformWater CenterWater;
+            if (FlexibleWaterFieldSampler(State.Position * 100.0, CenterWater) &&
+                CenterWater.bWet)
+            {
+                WaterVelocityMps = CenterWater.VelocityMps;
+            }
+        }
+        const FVector RelativeVelocity = State.LinearVelocity - WaterVelocityMps;
+        const double RelativeSpeed = RelativeVelocity.Length();
+        if (RelativeSpeed > KINDA_SMALL_NUMBER && SubmergedFraction > 0.0)
+        {
+            ForceN += RelativeVelocity *
                       (-static_cast<double>(RaftConfig.LinearDragCoefficient) *
-                       SubmergedFraction * Speed);
+                       SubmergedFraction * RelativeSpeed);
         }
 
         // Linear heave damping: quadratic drag alone is negligible at bobbing

@@ -444,6 +444,7 @@ private:
 
     float CrewReactionRemaining = 0.0f;
     float CrewStrokeTimer = 0.0f;
+    float DriftTelemetrySeconds = 0.0f;
 
     // The guide's own W/S/turn strokes hold this pose on the stern avatar
     // for a beat so the player's inputs are visible on the body and paddle

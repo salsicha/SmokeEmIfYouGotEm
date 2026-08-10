@@ -1019,6 +1019,30 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         return;
     }
 
+    // Throttled drift telemetry: raft speed against the sampled current at
+    // the hull. This is the direct instrument for "the river does not carry
+    // the boat" reports — if water_speed is real and raft_speed stays near
+    // zero without input, the water-to-hull drag coupling is the defect.
+    DriftTelemetrySeconds += DeltaSeconds;
+    if (DriftTelemetrySeconds >= 10.0f)
+    {
+        DriftTelemetrySeconds = 0.0f;
+        float WaterSpeedMps = 0.0f;
+        if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
+        {
+            FRaftSimWaterSample Sample;
+            if (Water->SampleWaterAtWorldPosition(GetActorLocation(), Sample) &&
+                Sample.bWet)
+            {
+                WaterSpeedMps = Sample.VelocityMetersPerSecond.Size2D();
+            }
+        }
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim raft drift: raft_speed_mps=%.3f water_speed_mps=%.3f"),
+            GetRaftVelocity().Size(),
+            WaterSpeedMps);
+    }
+
     RockObstacleRefreshRemaining -= DeltaSeconds;
     if (RockObstacleRefreshRemaining <= 0.0f)
     {
