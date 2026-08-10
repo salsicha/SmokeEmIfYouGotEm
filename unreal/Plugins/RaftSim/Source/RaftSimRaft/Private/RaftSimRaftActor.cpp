@@ -74,6 +74,7 @@ bool FlexVisualStateMatches(
 ARaftSimRaftActor::ARaftSimRaftActor()
 {
     PrimaryActorTick.bCanEverTick = true;
+    GuideStrokeAction = ERaftSimCrewAvatarAction::SeatedIdle;
 
     Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     SetRootComponent(Root);
