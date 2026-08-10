@@ -203,6 +203,28 @@ so its verification ran against stale binaries — output piping on gating
 commands is now banned in session memory, with module-timestamp checks
 required before claiming a build happened.
 
+Round 4 (2026-08-10) — "the water isn't flowing": the deepest finding of
+the playtest series, in three parts. (1) The reported dead water was a
+diagnosis trap: the live-window log printed 0-1 presentation normals
+under SI-looking names (speed_mean=0.1017 is 0.81 m/s), which briefly
+mis-read a healthy Chili Bar pool as a quiescent film — the cooked
+hydraulics, streaming manifest, config actor, and window solver were all
+correct and running (streaming handoff to chili_bar_hole confirmed at
+station 120 once the streamer got logs). Telemetry now prints both
+normalized and SI fields, and the streamer's four silent death paths log.
+(2) The raft truly was not carried: the rigid support stage's quadratic
+drag opposed ABSOLUTE velocity, not velocity relative to the current —
+identical in still water (every tank test passed), structurally unable
+to transport the raft in a river (measured: water 0.63-0.79 m/s at the
+hull, raft 0.001 m/s after two minutes). Drag now acts on the relative
+velocity via the flex water sampler; measured free drift reaches
+0.44 m/s in two minutes and tracks the local current downstream. First
+verified river transport in the project. (3) Still open from the same
+report: calm-water rendering on SF is the static authored band meshes
+(the animated live surface only fades in with hydraulic coverage), so
+pools read as frozen; and the first-person paddle rig (pawn anchors,
+never populated) so strokes read in view. Both queued next.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

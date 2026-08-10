@@ -41,6 +41,13 @@ void ARaftSimRiverWaterStreamingActor::BeginPlay()
     }
     if (!RiverConfig || !Raft || !WaterAdapter || !LoadStreamingManifest())
     {
+        // Four preconditions, one silent early-out: this actor spent its
+        // life impossible to distinguish from working (2026-08-10 audit).
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim river streaming disabled: config=%d raft=%d ")
+            TEXT("water=%d manifest=%d"),
+            RiverConfig != nullptr, Raft != nullptr, WaterAdapter != nullptr,
+            RiverConfig != nullptr && Raft != nullptr && WaterAdapter != nullptr);
         SetActorTickEnabled(false);
         return;
     }
@@ -178,6 +185,11 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
     ActiveFieldsDirectory = DesiredDirectory;
     LastWindowCenterStationM = RiverPosition.X;
     ++SuccessfulHandoffCount;
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim river streaming handoff %d: station=%.1f source=%s"),
+        SuccessfulHandoffCount,
+        RiverPosition.X,
+        *DesiredDirectory);
     return true;
 }
 
