@@ -806,6 +806,11 @@ void ReplaceColoredMeshSection(
         0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
 }
 
+} // pause the internal namespace: the blade builder is shared with the
+  // guide pawn's first-person paddle (RaftSimPaddleBladeMesh.h).
+
+namespace RaftSimPaddleBladeMesh
+{
 void BuildCommercialPaddleBladeMesh(
     TArray<FVector>& Vertices,
     TArray<int32>& Triangles,
@@ -893,7 +898,10 @@ void BuildCommercialPaddleBladeMesh(
              SideStart, SideStart + 2, SideStart + 3});
     }
 }
+} // namespace RaftSimPaddleBladeMesh
 
+namespace
+{
 float SmoothUnitInterval(float Alpha)
 {
     const float Bounded = FMath::Clamp(Alpha, 0.0f, 1.0f);
@@ -2698,7 +2706,8 @@ void ARaftSimCrewAvatarActor::RebuildPaddleMeshes()
     TArray<int32> Triangles;
     TArray<FVector2D> UVs;
     TArray<FProcMeshTangent> Tangents;
-    BuildCommercialPaddleBladeMesh(Vertices, Triangles, Normals, UVs, Tangents);
+    RaftSimPaddleBladeMesh::BuildCommercialPaddleBladeMesh(
+        Vertices, Triangles, Normals, UVs, Tangents);
     ReplaceMeshSection(PaddleBlade, Vertices, Triangles, Normals, UVs, Tangents);
 }
 

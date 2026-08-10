@@ -269,6 +269,21 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> PaddleAnchor;
 
+    // First-person guide paddle riding PaddleAnchor: the anchors existed
+    // from the pawn's creation with nothing attached, so the guide's own
+    // strokes fired audio and impulse with no visible paddle (reported in
+    // three consecutive playtests). Geometry is built in BeginPlay; the
+    // anchor is swept in Tick from the raft's guide-stroke state.
+    UPROPERTY()
+    TObjectPtr<class UProceduralMeshComponent> FirstPersonPaddleShaft;
+    UPROPERTY()
+    TObjectPtr<class UProceduralMeshComponent> FirstPersonPaddleBlade;
+    UPROPERTY()
+    TObjectPtr<class UProceduralMeshComponent> FirstPersonPaddleGrip;
+
+    void BuildFirstPersonPaddle();
+    void UpdateFirstPersonPaddle(float DeltaSeconds);
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> RaftContextAnchor;
 
