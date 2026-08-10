@@ -156,18 +156,21 @@ float PresentationTravelingWaveM(
     float StationM, float LateralM, float TimeSeconds,
     float SpeedMps, float DepthM)
 {
-    const float Froude =
-        SpeedMps / FMath::Sqrt(9.80665f * FMath::Max(DepthM, 0.1f));
-    const float FoamNorm = FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
-    const float SpeedNorm = FMath::Clamp(SpeedMps / 8.0f, 0.0f, 1.0f);
-    const float Energy =
-        FMath::Clamp(FoamNorm * 0.72f + SpeedNorm * 0.48f, 0.0f, 1.0f);
+    // Base swell only. The energetic term's render amplitude derives from
+    // BAKED band colours while a physics-side reconstruction can only use
+    // LIVE solver energy — the two diverge in exactly the water where the
+    // waves are big, and the 2026-08-10 playtest saw the hull visually
+    // buried under rendered crests it correctly was not riding ("the boat
+    // went below the water surface for no apparent reason"; drift
+    // telemetry showed constant 21 cm draft throughout). The universal
+    // base term is identical on both sides, so coupling it is exact; the
+    // energetic mismatch is bounded separately by halving the rendered
+    // energetic amplitude in the WPO block.
+    (void)SpeedMps;
+    (void)DepthM;
     const float PhaseA =
         StationM * 0.19f + LateralM * 0.61f - TimeSeconds * 0.90f;
-    const float PhaseB =
-        StationM * 0.071f - LateralM * 0.37f - TimeSeconds * 0.55f;
-    return 0.030f * FMath::Sin(PhaseA) +
-           Energy * (0.16f * FMath::Sin(PhaseA) + 0.09f * FMath::Sin(PhaseB));
+    return 0.030f * FMath::Sin(PhaseA);
 }
 
 static TAutoConsoleVariable<int32> CVarRaftSimPresentationWaveCoupling(
