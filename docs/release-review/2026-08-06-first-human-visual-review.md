@@ -186,6 +186,23 @@ and impulse only). The looping squeak was the ambience layer's fixed
 with sparse, deterministically pitch/time-varied chirps over a 16 s
 buffer at lower level.
 
+Round 3 corrections (2026-08-09, after the playtest re-reported both):
+the spinning sun's true root cause is the weather director, not the map —
+its StormDusk preset targets yaw −205, which actor-rotation normalization
+can never return, so the frame-rate interpolation chased the wrap around
+the full circle forever (weather cycles on T / left-stick click, adjacent
+to the steering keys). The −88 pitch previously found saved in the map
+was a mid-orbit snapshot of this chase, not the cause. Fixed by
+interpolating along the shortest arc to the normalized-equivalent goal.
+The first-person camera's fixed eye offset landed inside the chest on the
+real seated pose ("all that can be seen is the inside of the life vest");
+the view now seats on the guide avatar's posed head every frame. This
+round also exposed that the previous round had never compiled: the build
+wrapper piped Build.sh through tail and swallowed the failing exit code,
+so its verification ran against stale binaries — output piping on gating
+commands is now banned in session memory, with module-timestamp checks
+required before claiming a build happened.
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

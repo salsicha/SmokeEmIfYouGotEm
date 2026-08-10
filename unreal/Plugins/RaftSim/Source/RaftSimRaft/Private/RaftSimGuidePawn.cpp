@@ -170,6 +170,21 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 void ARaftSimGuidePawn::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    // Seat the view on the guide avatar's actual posed head each frame. The
+    // constructor offset was a fixed estimate that landed inside the chest
+    // (2026-08-09 playtest: "all that can be seen is the inside of the life
+    // vest"); the posed head tracks seat, lean, and identity exactly.
+    if (ARaftSimRaftActor* RaftForView = ResolveRaft())
+    {
+        FVector HeadWorldCm;
+        if (MobilityMode == ERaftSimGuideMobilityMode::InRaft &&
+            RaftForView->GetGuideHeadWorldLocationCm(HeadWorldCm))
+        {
+            GuideSeatAnchor->SetWorldLocation(
+                HeadWorldCm + GetActorForwardVector() * 9.0f +
+                GetActorUpVector() * 4.0f);
+        }
+    }
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
     UpdateSwimmingAndRescueAim();

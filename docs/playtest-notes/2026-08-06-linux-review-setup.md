@@ -57,6 +57,7 @@ interactive loads should be quick.
 | Rescue: throw line (far) | R | Right trigger |
 | Reseat rescued crew | F | B / Circle |
 | Chase camera toggle (Free Run only; default is guide POV) | C | Right-stick click |
+| Cycle weather (clear morning / overcast / storm dusk) | T | Left-stick click |
 | Pause | Esc | Menu button |
 
 Console (` key): `stat fps`, `stat unit` (budgets: game thread ≤ 8 ms,
