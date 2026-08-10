@@ -779,7 +779,10 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     {
         return;
     }
-    FVector SeatCm(-175.0f, 0.0f, 38.0f);
+    // Seat heights dropped 8 cm on 2026-08-10: from the guide camera the
+    // crews' glutes hovered visibly above the tubes ("their butts float
+    // above the boat").
+    FVector SeatCm(-175.0f, 0.0f, 30.0f);
     if (PassengerId != TEXT("guide"))
     {
         FString Id = PassengerId.ToString();
@@ -787,7 +790,7 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
         const int32 Index = FMath::Max(FCString::Atoi(*Id) - 1, 0);
         const float Side = (Index % 2 == 0) ? -1.0f : 1.0f;
         const float BowM = 1.15f - (Index / 2) * 1.05f;
-        SeatCm = FVector(BowM * kCmPerM, Side * 62.0f, 30.0f);
+        SeatCm = FVector(BowM * kCmPerM, Side * 62.0f, 22.0f);
     }
     Avatar->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
     Avatar->SetActorRelativeLocation(SeatCm);
