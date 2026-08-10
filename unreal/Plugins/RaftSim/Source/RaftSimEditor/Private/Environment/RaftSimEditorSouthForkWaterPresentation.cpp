@@ -1,12 +1,19 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
+#include "Materials/MaterialExpressionAdd.h"
+#include "Materials/MaterialExpressionClamp.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionPower.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionSine.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
+#include "Materials/MaterialExpressionSubtract.h"
+#include "Materials/MaterialExpressionTextureCoordinate.h"
+#include "Materials/MaterialExpressionTime.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialParameterCollection.h"
 
@@ -505,6 +512,153 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         WaterOutput->ColorScaleBehindWater.Expression =
             CoveredBehindWaterScale;
         bNeedsSave = true;
+    }
+
+    bool bHasTravelingWaveOffset = false;
+    for (UMaterialExpression* Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (Expression &&
+            Expression->Desc == TEXT("RaftSimTravelingBakeWaveWPO"))
+        {
+            bHasTravelingWaveOffset = true;
+            break;
+        }
+    }
+    if (!bHasTravelingWaveOffset)
+    {
+        // The band meshes bake a deterministic ripple/standing-wave layer
+        // into their geometry (RaftSimEditorSouthForkFullReach.cpp:
+        // Disp = 0.018*sin(A) + E*(0.16*sin(A) + 0.09*sin(B)), with
+        // A = Station*0.19 + Lateral*0.61, B = Station*0.071 - Lateral*0.37,
+        // E = clamp(VC.R*0.72 + VC.B*0.48), and UV authored at Station/3,
+        // Lateral/3). Static geometry is why four playtests reported "the
+        // surface isn't flowing" no matter what the normal layers did.
+        // This WPO reconstructs the identical field from UV and vertex
+        // colour, subtracts the static bake, and re-adds it time-phased —
+        // the same waves, now travelling downstream. No mesh rebuild.
+        Material->Modify();
+        UMaterialExpressionTextureCoordinate* RawUv =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        Material->GetExpressionCollection().AddExpression(RawUv);
+        const auto AddExpr = [Material](UMaterialExpression* E)
+        {
+            Material->GetExpressionCollection().AddExpression(E);
+            return E;
+        };
+        const auto MaskChannel = [&](UMaterialExpression* In, bool bR, bool bG)
+        {
+            UMaterialExpressionComponentMask* M =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            M->Input.Expression = In;
+            M->R = bR; M->G = bG; M->B = false; M->A = false;
+            AddExpr(M);
+            return static_cast<UMaterialExpression*>(M);
+        };
+        const auto ScaleBy = [&](UMaterialExpression* In, float K)
+        {
+            UMaterialExpressionConstant* C =
+                NewObject<UMaterialExpressionConstant>(Material);
+            C->R = K;
+            AddExpr(C);
+            UMaterialExpressionMultiply* M =
+                NewObject<UMaterialExpressionMultiply>(Material);
+            M->A.Expression = In;
+            M->B.Expression = C;
+            AddExpr(M);
+            return static_cast<UMaterialExpression*>(M);
+        };
+        const auto AddPair = [&](UMaterialExpression* A, UMaterialExpression* B)
+        {
+            UMaterialExpressionAdd* S = NewObject<UMaterialExpressionAdd>(Material);
+            S->A.Expression = A;
+            S->B.Expression = B;
+            AddExpr(S);
+            return static_cast<UMaterialExpression*>(S);
+        };
+        const auto SubtractPair =
+            [&](UMaterialExpression* A, UMaterialExpression* B)
+        {
+            UMaterialExpressionSubtract* S =
+                NewObject<UMaterialExpressionSubtract>(Material);
+            S->A.Expression = A;
+            S->B.Expression = B;
+            AddExpr(S);
+            return static_cast<UMaterialExpression*>(S);
+        };
+        const auto SineOf = [&](UMaterialExpression* In)
+        {
+            UMaterialExpressionSine* S = NewObject<UMaterialExpressionSine>(Material);
+            S->Input.Expression = In;
+            // The engine Sine node evaluates sin(2*pi*Input/Period); the
+            // baked phases are radians, so Period = 2*pi passes through.
+            S->Period = 6.2831853f;
+            AddExpr(S);
+            return static_cast<UMaterialExpression*>(S);
+        };
+        UMaterialExpression* StationM = ScaleBy(MaskChannel(RawUv, true, false), 3.0f);
+        UMaterialExpression* LateralM = ScaleBy(MaskChannel(RawUv, false, true), 3.0f);
+        UMaterialExpressionVertexColor* WpoVertexColor =
+            NewObject<UMaterialExpressionVertexColor>(Material);
+        AddExpr(WpoVertexColor);
+        UMaterialExpressionComponentMask* EnergyR =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        EnergyR->Input.Expression = WpoVertexColor;
+        EnergyR->R = true; EnergyR->G = false; EnergyR->B = false; EnergyR->A = false;
+        AddExpr(EnergyR);
+        UMaterialExpressionComponentMask* EnergyB =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        EnergyB->Input.Expression = WpoVertexColor;
+        EnergyB->R = false; EnergyB->G = false; EnergyB->B = true; EnergyB->A = false;
+        AddExpr(EnergyB);
+        UMaterialExpressionClamp* HydraulicEnergy =
+            NewObject<UMaterialExpressionClamp>(Material);
+        HydraulicEnergy->Input.Expression = AddPair(
+            ScaleBy(EnergyR, 0.72f), ScaleBy(EnergyB, 0.48f));
+        HydraulicEnergy->MinDefault = 0.0f;
+        HydraulicEnergy->MaxDefault = 1.0f;
+        AddExpr(HydraulicEnergy);
+        UMaterialExpression* PhaseA0 = AddPair(
+            ScaleBy(StationM, 0.19f), ScaleBy(LateralM, 0.61f));
+        UMaterialExpression* PhaseB0 = SubtractPair(
+            ScaleBy(StationM, 0.071f), ScaleBy(LateralM, 0.37f));
+        UMaterialExpressionTime* WaveTime =
+            NewObject<UMaterialExpressionTime>(Material);
+        AddExpr(WaveTime);
+        UMaterialExpression* PhaseA1 = SubtractPair(
+            PhaseA0, ScaleBy(WaveTime, 0.90f));
+        UMaterialExpression* PhaseB1 = SubtractPair(
+            PhaseB0, ScaleBy(WaveTime, 0.55f));
+        const auto Displacement =
+            [&](UMaterialExpression* A, UMaterialExpression* B)
+        {
+            UMaterialExpression* Hydraulic = AddPair(
+                ScaleBy(SineOf(A), 0.16f), ScaleBy(SineOf(B), 0.09f));
+            UMaterialExpressionMultiply* Gated =
+                NewObject<UMaterialExpressionMultiply>(Material);
+            Gated->A.Expression = Hydraulic;
+            Gated->B.Expression = HydraulicEnergy;
+            AddExpr(Gated);
+            return AddPair(ScaleBy(SineOf(A), 0.018f), Gated);
+        };
+        UMaterialExpression* DeltaMeters = SubtractPair(
+            Displacement(PhaseA1, PhaseB1), Displacement(PhaseA0, PhaseB0));
+        UMaterialExpression* DeltaCm = ScaleBy(DeltaMeters, 100.0f);
+        UMaterialExpressionConstant3Vector* UpAxis =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        UpAxis->Constant = FLinearColor(0.0f, 0.0f, 1.0f, 0.0f);
+        AddExpr(UpAxis);
+        UMaterialExpressionMultiply* Offset =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        Offset->Desc = TEXT("RaftSimTravelingBakeWaveWPO");
+        Offset->A.Expression = UpAxis;
+        Offset->B.Expression = DeltaCm;
+        AddExpr(Offset);
+        if (UMaterialEditorOnlyData* WpoEditorData = Material->GetEditorOnlyData())
+        {
+            WpoEditorData->WorldPositionOffset.Connect(0, Offset);
+            bNeedsSave = true;
+        }
     }
 
     if (bNeedsSave)
