@@ -12,6 +12,7 @@ class UStaticMeshComponent;
 class USceneComponent;
 class UMaterialInstanceDynamic;
 class ARaftSimCrewAvatarActor;
+enum class ERaftSimCrewAvatarAction : uint8;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
 
@@ -443,7 +444,9 @@ private:
     // The guide's own W/S/turn strokes hold this pose on the stern avatar
     // for a beat so the player's inputs are visible on the body and paddle
     // (first South Fork playtest: audio fired with no visible stroke).
-    ERaftSimCrewAvatarAction GuideStrokeAction = ERaftSimCrewAvatarAction::SeatedIdle;
+    // Initialized to SeatedIdle in the constructor; the enum is only
+    // forward-declared here.
+    ERaftSimCrewAvatarAction GuideStrokeAction;
     float GuideStrokeActionSeconds = 0.0f;
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
