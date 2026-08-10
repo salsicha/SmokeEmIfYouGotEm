@@ -630,10 +630,12 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         UMaterialExpression* PhaseB1 = SubtractPair(
             PhaseB0, ScaleBy(WaveTime, 0.55f));
         const auto Displacement =
-            [&](UMaterialExpression* A, UMaterialExpression* B, float BaseAmp)
+            [&](UMaterialExpression* A, UMaterialExpression* B, float BaseAmp,
+                float EnergyAmpScale)
         {
             UMaterialExpression* Hydraulic = AddPair(
-                ScaleBy(SineOf(A), 0.16f), ScaleBy(SineOf(B), 0.09f));
+                ScaleBy(SineOf(A), 0.16f * EnergyAmpScale),
+                ScaleBy(SineOf(B), 0.09f * EnergyAmpScale));
             UMaterialExpressionMultiply* Gated =
                 NewObject<UMaterialExpressionMultiply>(Material);
             Gated->A.Expression = Hydraulic;
@@ -641,12 +643,15 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             AddExpr(Gated);
             return AddPair(ScaleBy(SineOf(A), BaseAmp), Gated);
         };
-        // The static bake (0.018 base) always cancels exactly; the moving
-        // replacement may carry a stronger calm-water base so pools show a
-        // visible travelling swell (+/-3 cm) instead of a sub-perceptual one.
+        // The static bake (0.018 base, full energetic amplitude) always
+        // cancels exactly; the moving replacement carries a stronger calm
+        // base (+/-3 cm pools, matched by the physics-side coupling) and a
+        // HALVED energetic amplitude — the physics cannot reconstruct the
+        // baked energy term, so the rendered crests stay within grazing
+        // distance of the surface the hull actually rides.
         UMaterialExpression* DeltaMeters = SubtractPair(
-            Displacement(PhaseA1, PhaseB1, 0.030f),
-            Displacement(PhaseA0, PhaseB0, 0.018f));
+            Displacement(PhaseA1, PhaseB1, 0.030f, 0.5f),
+            Displacement(PhaseA0, PhaseB0, 0.018f, 1.0f));
         UMaterialExpression* DeltaCm = ScaleBy(DeltaMeters, 100.0f);
         UMaterialExpressionConstant3Vector* UpAxis =
             NewObject<UMaterialExpressionConstant3Vector>(Material);
