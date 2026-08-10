@@ -1059,6 +1059,20 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
         ? ERaftSimCrewAvatarAction::TurnRight
         : ERaftSimCrewAvatarAction::TurnLeft;
     GuideStrokeActionSeconds = 1.0f;
+    // Turn cadence drives the crew's opposing-sides pivot strokes, same
+    // ownership rules as W/S (2026-08-10 playtest: "left turn and right
+    // turn commands don't show the crew animating" — A/D only ever moved
+    // the guide).
+    const ERaftSimCrewCommand TurnCommand = Scale > 0.0f
+        ? ERaftSimCrewCommand::TurnRight
+        : ERaftSimCrewCommand::TurnLeft;
+    if (ActiveCrewCommand == ERaftSimCrewCommand::Rest ||
+        bCrewCommandFromGuidePaddle)
+    {
+        IssueCrewCommand(TurnCommand);
+        bCrewCommandFromGuidePaddle = true;
+    }
+    GuidePaddleCommandSeconds = 1.4f;
 }
 
 void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)
