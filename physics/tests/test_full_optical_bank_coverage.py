@@ -58,7 +58,7 @@ def test_review_is_fail_closed_and_hash_locked() -> None:
 
     current_source_replacements = {
         # 2026-08-10: ripple perceptibility retune (flow-weighted strengths).
-            "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "d95f310215641ee6873322892c387494f35b622439d5279a02bcf02f008d3465",
+            "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "fd493018cdd4f4bd702e6e9a5b8940b1f7b9e2a6399a65dab8746462e90ccbbd",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": "ab70174bd66c825076b5b14ddf6836c5d88e932bddbce55fb18f6f1ca02dbd74",
     }
     for path, expected in review["source_hashes"].items():
@@ -70,7 +70,7 @@ def test_review_is_fail_closed_and_hash_locked() -> None:
         # 2026-08-10: transmission parent regenerated so the CC0 froth chain
         # (in the builders since 2026-08-07) finally reaches the rendered
         # river bands; prior hash was the pre-froth cold-water-optical build.
-        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset": "dd75a701d6fc75b81e8cb10631765d894915b89e24b2236f43dfd844200f55fe"
+        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset": "db5bf95c03df504e3ccaf9a5c249922dc0f97192939a07daea65b4feb448a35a"
     }
     for artifact in review["artifacts"]:
         path = ROOT / artifact["path"]

@@ -27,7 +27,10 @@
       "target_instance_count": 3600,
       "placed_instance_count": 3600,
       "rejected_placement_count": 0,
-      "target_height_range_m": [0.1, 1.4],
+      "target_height_range_m": [
+        0.1,
+        1.4
+      ],
       "candidate_count_per_target": 48,
       "maximum_slope_degrees": 42.0,
       "maximum_placed_slope_degrees": 15.617,
@@ -40,7 +43,10 @@
       "target_instance_count": 4200,
       "placed_instance_count": 4200,
       "rejected_placement_count": 0,
-      "target_height_range_m": [0.36, 1.1],
+      "target_height_range_m": [
+        0.36,
+        1.1
+      ],
       "candidate_count_per_target": 48,
       "maximum_slope_degrees": 32.0,
       "maximum_placed_slope_degrees": 15.951,
@@ -64,7 +70,10 @@
     "camera_site_intensity_at_capture": 0.378,
     "presentation_coverage": 1.0,
     "presentation_edge_clearance_m": 15.0,
-    "resolution_px": [1280, 720],
+    "resolution_px": [
+      1280,
+      720
+    ],
     "capture_exit_code": 0
   },
   "visual_comparison": {
@@ -111,27 +120,27 @@
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
-      "sha256": "31505aae521b380ad8fc1202a73942f6f12c38a8285adf577fb22a728ee9ccf5",
+      "sha256": "ad9e9267350ebdf6e03fae05adeaac8dca6fc097c217890ba0125e8e1f1dcc6b",
       "versioned_in_place": true
     },
     {
       "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
-      "sha256": "248d74b6e9ee250eac91ecdf94ab488b48502a6285e01b9a826710a3483d6964",
+      "sha256": "7a272ebcf757842bf8db190b989fae1a419056dad330b27ac1005530f9212e38",
       "versioned_in_place": true
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
-      "sha256": "f34d40ebb4469bb3583e2f1b9c0111e4eb551014a1d7826eb8666920084f0c0f",
+      "sha256": "3074ffda673ff0c62f440906531cd0e13c46c87e52005ef683ebd8bb10867d21",
       "versioned_in_place": true
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
-      "sha256": "683d7ae171290c7462237454004062e3ad26b91ec794de73962b4e8439011f36",
+      "sha256": "0334740774adc7d46b1a542a03a3153e61c989ed0146fea4f88e024c59245f0b",
       "versioned_in_place": true
     },
     {
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_solver_rapid_river_eye_downstream.png",
-      "sha256": "a90f5a1d025ab14421a876c837b4ca3b0de5cb2893dcb531dc422f9987db6a38",
+      "sha256": "3c77b79176d9dd88b88ea94761ffa63f89f43689214187a4ca310ce60a8f55bd",
       "versioned_in_place": true
     }
   ],

@@ -1035,7 +1035,11 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
     // crew on forward/back paddle while strokes keep coming, and they rest
     // when the guide stops — unless an explicit command (number keys /
     // wheel) owns the crew (2026-08-10 playtest: "the crew are the ones
-    // who are supposed to paddle").
+    // who are supposed to paddle"). The 0.75 s window is shorter than the
+    // 0.8 s crew cadence, so a single tap is exactly ONE crew stroke
+    // (the former 1.4 s window fired two — "the crew paddles twice when
+    // you give one turn command"); holding refreshes the window through
+    // the 0.45 s stroke cooldown for continuous paddling.
     const ERaftSimCrewCommand CadenceCommand = Scale >= 0.0f
         ? ERaftSimCrewCommand::AllForward
         : ERaftSimCrewCommand::AllBackward;
@@ -1045,7 +1049,7 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
         IssueCrewCommand(CadenceCommand);
         bCrewCommandFromGuidePaddle = true;
     }
-    GuidePaddleCommandSeconds = 1.4f;
+    GuidePaddleCommandSeconds = 0.75f;
 }
 
 void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
@@ -1075,7 +1079,7 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
         IssueCrewCommand(TurnCommand);
         bCrewCommandFromGuidePaddle = true;
     }
-    GuidePaddleCommandSeconds = 1.4f;
+    GuidePaddleCommandSeconds = 0.75f;
 }
 
 void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)

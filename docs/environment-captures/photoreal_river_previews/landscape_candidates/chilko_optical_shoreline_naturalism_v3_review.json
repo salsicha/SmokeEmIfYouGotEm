@@ -29,7 +29,12 @@
       "live_surface_roughness": 0.68,
       "live_sky_reflection_strength": 0.05,
       "live_ripple_strength": 0.55,
-      "live_reflected_sky_color": [0.025, 0.05, 0.075, 1.0],
+      "live_reflected_sky_color": [
+        0.025,
+        0.05,
+        0.075,
+        1.0
+      ],
       "fallback_sky_reflection_floor": 0.08,
       "fallback_sky_reflection_variation": 0.24,
       "ripple_grazing_floor": 0.75,
@@ -50,17 +55,29 @@
       "sun_intensity": 4.1,
       "sky_light_intensity": 1.3,
       "exposure_bias": -0.3,
-      "sun_rotation_degrees": [-50.0, 55.0, 0.0],
+      "sun_rotation_degrees": [
+        -50.0,
+        55.0,
+        0.0
+      ],
       "corridor_reflection_brightness": 0.65,
       "tag": "RaftSimChilkoRestrainedReflectionRigV3"
     },
     "shoreline": {
       "material_asset": "/Game/RaftSim/Environment/ChilkoRun/Vegetation/Materials/MI_RaftSim_Chilko_MutedGroundCoverV3",
       "material_asset_count": 2,
-      "color_scale": [0.62, 0.38, 0.24, 1.0],
+      "color_scale": [
+        0.62,
+        0.38,
+        0.24,
+        1.0
+      ],
       "shadow_fill_scale": 0.28,
       "shared_temperate_parent_identity_defaults_retained": true,
-      "ground_cover_height_range_cm": [18.0, 58.0],
+      "ground_cover_height_range_cm": [
+        18.0,
+        58.0
+      ],
       "gravel_scale_class_modulus": 72,
       "rare_gravel_maximum_height_cm": 85.0,
       "gravel_placed_instance_count": 7200,
@@ -80,16 +97,30 @@
       "camera_site_intensity": 1.0,
       "presentation_coverage": 1.0,
       "presentation_edge_clearance_m": 15.0,
-      "resolution_px": [1280, 720],
+      "resolution_px": [
+        1280,
+        720
+      ],
       "capture_exit_code": 0,
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_breaking_water_side.png",
       "sha256": "6fdbae0d2ec37497b7812df196e34fd6ff60bb4f7bdacab4e35afbce5849d640"
     },
     "fixed_bank_closeup": {
       "command": "RaftSim.CaptureAfter 8 chilko_optical_shoreline_naturalism_v3_bank_closeup 30000 0 260 -4 90",
-      "world_location_cm": [30000.0, 0.0, 260.0],
-      "rotation_degrees": [-4.0, 90.0, 0.0],
-      "resolution_px": [1280, 720],
+      "world_location_cm": [
+        30000.0,
+        0.0,
+        260.0
+      ],
+      "rotation_degrees": [
+        -4.0,
+        90.0,
+        0.0
+      ],
+      "resolution_px": [
+        1280,
+        720
+      ],
       "capture_exit_code": 0,
       "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_optical_shoreline_naturalism_v3_bank_closeup.png",
       "sha256": "1baebe40e1d43a219f52edbaf1af5461b509ca56e06cd08356106493d336f29e"
@@ -116,7 +147,7 @@
       "water_mean_luminance": 0.637844525,
       "water_p95_luminance": 0.835865098,
       "water_fraction_over_0_90": 0.013889628,
-      "water_fraction_over_0_95": 0.000013298,
+      "water_fraction_over_0_95": 1.3298e-05,
       "bank_neon_green_fraction": 0.00935462
     },
     "v2_bank_closeup": {
@@ -174,7 +205,7 @@
     },
     {
       "path": "unreal/Content/RaftSim/Maps/L_LavaCanyon.umap",
-      "sha256": "e40190653b35199df91d9c43849c6a3d77914aa29d10d63724ba108e108022e3"
+      "sha256": "7a272ebcf757842bf8db190b989fae1a419056dad330b27ac1005530f9212e38"
     },
     {
       "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Vegetation/Materials/MI_RaftSim_Chilko_MutedGroundCoverV3.uasset",
@@ -182,19 +213,19 @@
     },
     {
       "path": "unreal/Content/RaftSim/Environment/ChilkoRun/Water/Materials/MI_RaftSim_ChilkoLavaCanyon_LiveVolumeWaterV2.uasset",
-      "sha256": "5256e78a0d5f689e2f93aff9653949c17c90aef799ffb3b3453d571e67cb32f1"
+      "sha256": "5d1a4a99710366ca8b25e00bd9beb5cd610c6705e266026ed3ca73b74aa77978"
     },
     {
       "path": "unreal/Content/RaftSim/Materials/M_RaftSim_LiveRiverSurface.uasset",
-      "sha256": "b7b7d87fa6f9e484e6c98d95bf2106cb71b1817ffe8be49b9a26ede76413bef8"
+      "sha256": "cc2362205e269436ff52d0bd6859bd5f7f2cf88ffd631f70b8e0f9eea506483f"
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
-      "sha256": "1f50c03562ae56fc51355748fb36ac71967be4250ecda9b4fbabf1899d876f0d"
+      "sha256": "64ccef057ade47335fd0b80cbdb9d87047122bd45e836b2506ac408248695beb"
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp",
-      "sha256": "7837239b3c63baac9127fa9126ed79a89b8f99c56837f945cfd768e4d4762023"
+      "sha256": "a3f416ee99b790f8795ffc95f7a600c0e097b5cc0da18845356c3b43ec21fd6a"
     }
   ]
 }

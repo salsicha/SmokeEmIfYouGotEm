@@ -30,7 +30,9 @@
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionNormalize.h"
 #include "Materials/MaterialExpressionOneMinus.h"
+#include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionTime.h"
 #include "Materials/MaterialExpressionPerInstanceCustomData.h"
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionSubtract.h"
@@ -384,6 +386,43 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
         CrossUv->UTiling = 1.31f;
         CrossUv->VTiling = 1.72f;
+        // Surface detail ADVECTS with the local current instead of crawling
+        // at a fixed rate: vertex colour B is speed/8 m/s and one UV tile is
+        // three metres, so offsetting U by time * (B*8/3) * tiling moves the
+        // ripple field downstream at the water's own speed. Drifting with
+        // the current now keeps the pattern with the boat while the banks
+        // slide by — the 2026-08-10 report ("the surface stays still while
+        // the boat moves forward") was this missing advection.
+        const auto Const = [&](float Value) -> UMaterialExpression*
+        {
+            UMaterialExpressionConstant* C =
+                NewObject<UMaterialExpressionConstant>(Material);
+            C->R = Value;
+            Add(C);
+            return C;
+        };
+        const auto FlowAdvected = [&](UMaterialExpressionTextureCoordinate* Base,
+                                      float UTilingValue,
+                                      float SlipFactor) -> UMaterialExpression*
+        {
+            UMaterialExpressionTime* AdvectTime =
+                Cast<UMaterialExpressionTime>(
+                    Add(NewObject<UMaterialExpressionTime>(Material)));
+            UMaterialExpression* RateUvPerSec = Mul(
+                SpeedMask,
+                Const(8.0f / 3.0f * UTilingValue * SlipFactor));
+            UMaterialExpression* OffsetU = Mul(
+                Mul(AdvectTime, RateUvPerSec), Const(-1.0f));
+            UMaterialExpressionAppendVector* Offset2D =
+                Cast<UMaterialExpressionAppendVector>(
+                    Add(NewObject<UMaterialExpressionAppendVector>(Material)));
+            Offset2D->A.Expression = OffsetU;
+            UMaterialExpression* ZeroV = Const(0.0f);
+            Offset2D->B.Expression = ZeroV;
+            return AddNode(Base, Offset2D);
+        };
+        UMaterialExpression* FlowUv = FlowAdvected(UV, 0.62f, 1.0f);
+        UMaterialExpression* FlowCrossUv = FlowAdvected(CrossUv, 1.31f, 0.85f);
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
                           float SpeedX,
@@ -404,10 +443,12 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Sample->Group = TEXT("RaftSimPhotorealWater");
             return Sample;
         };
+        // Residual panner speeds are only the churn RELATIVE to the moving
+        // water; bulk downstream motion comes from the flow-advected UVs.
         UMaterialExpression* PrimaryNormal = Ripple(
-            UV, TEXT("WaterFlowNormalPrimary"), 0.105f, 0.018f);
+            FlowUv, TEXT("WaterFlowNormalPrimary"), 0.020f, 0.012f);
         UMaterialExpression* CrossNormal = Ripple(
-            CrossUv, TEXT("WaterFlowNormalCross"), -0.036f, 0.081f);
+            FlowCrossUv, TEXT("WaterFlowNormalCross"), -0.014f, 0.026f);
         UMaterialExpression* CrossPerturbation = AddNode(
             CrossNormal, Const3(0.0f, 0.0f, -1.0f));
         UMaterialExpressionNormalize* CombinedNormal =
