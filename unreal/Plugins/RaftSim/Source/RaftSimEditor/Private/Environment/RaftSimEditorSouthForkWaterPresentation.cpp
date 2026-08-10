@@ -700,12 +700,17 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionFloor")), 0.68f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionVariation")), 0.32f);
+    // Ripple perceptibility retuned 2026-08-10 ("the surface of the water
+    // doesn't look like it is moving", third report): the flow-weighted
+    // term more than doubles so any real current visibly streams, calm
+    // gains a touch of life, and the grazing-angle Fresnel filter in the
+    // material keeps the anti-groove floor intact.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.055f);
+        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.075f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.075f);
+        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.160f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.110f);
+        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.150f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();

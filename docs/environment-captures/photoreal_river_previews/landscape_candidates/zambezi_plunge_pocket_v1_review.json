@@ -23,7 +23,7 @@
     "shape": "compact dark plunge core at 1.8 m downstream, irregular broken shoulders near 3.0 m lateral offset, and an aerated return centered 5.0 m downstream",
     "maximum_per_site_depression_m": 0.28,
     "maximum_per_site_return_m": 0.16,
-    "combined_depression_bound_m": 0.30,
+    "combined_depression_bound_m": 0.3,
     "combined_return_bound_m": 0.18,
     "foam_combination": "maximum-combined with the existing solver foam source",
     "normal_update": "only vertices in or immediately adjacent to a modified pocket are recomputed",
@@ -48,12 +48,30 @@
     "p4_all_river_map_loads": {
       "result": "6/6 passed",
       "maps": {
-        "L_Hance": {"active_breaking_sites": 9, "maximum_plunge_pocket_sites": 3},
-        "L_LavaCanyon": {"active_breaking_sites": 2, "maximum_plunge_pocket_sites": 2},
-        "L_Terminator": {"active_breaking_sites": 21, "maximum_plunge_pocket_sites": 3},
-        "L_Troublemaker": {"active_breaking_sites": 3, "maximum_plunge_pocket_sites": 3},
-        "L_UpperHuacas": {"active_breaking_sites": 1, "maximum_plunge_pocket_sites": 1},
-        "L_Zambezi": {"active_breaking_sites": 10, "maximum_plunge_pocket_sites": 3}
+        "L_Hance": {
+          "active_breaking_sites": 9,
+          "maximum_plunge_pocket_sites": 3
+        },
+        "L_LavaCanyon": {
+          "active_breaking_sites": 2,
+          "maximum_plunge_pocket_sites": 2
+        },
+        "L_Terminator": {
+          "active_breaking_sites": 21,
+          "maximum_plunge_pocket_sites": 3
+        },
+        "L_Troublemaker": {
+          "active_breaking_sites": 3,
+          "maximum_plunge_pocket_sites": 3
+        },
+        "L_UpperHuacas": {
+          "active_breaking_sites": 1,
+          "maximum_plunge_pocket_sites": 1
+        },
+        "L_Zambezi": {
+          "active_breaking_sites": 10,
+          "maximum_plunge_pocket_sites": 3
+        }
       },
       "accepted_warnings": [
         "the deliberate Troublemaker capsize/failure-behavior warning",
@@ -67,7 +85,7 @@
       "analysis_stride": 2,
       "refresh_cpu_ms": 4.097,
       "wet_vertices": 10465,
-      "foam_mean": 0.0380,
+      "foam_mean": 0.038,
       "foam_max": 0.7285,
       "rapid_foam_vertices": 645,
       "standing_wave_abs_max_m": 0.1046,
@@ -82,7 +100,11 @@
   "visual_evidence": {
     "method": "Two 1280x720 offscreen Metal captures review the current runtime at the exact retained fixed camera and the solver-selected breaking_water_side preset. Metrics are descriptive and are not photoreal acceptance thresholds.",
     "fixed_camera": {
-      "world_location_cm": [329839.27, -410612.4, 15666.84],
+      "world_location_cm": [
+        329839.27,
+        -410612.4,
+        15666.84
+      ],
       "pitch_degrees": -14.61,
       "yaw_degrees": 166.95,
       "prior_runtime_reference": {
@@ -114,7 +136,7 @@
     "sha256": "dd2a48c94618ff17c98bfe14024fc0642437a1ec91576ef482d8a71221997ff9"
   },
   "changed_source_hashes": {
-    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "43493b187c00a634262e41386b6fd415be2cc165d2ae0d9debcaa77b7e70b54b",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": "64ccef057ade47335fd0b80cbdb9d87047122bd45e836b2506ac408248695beb",
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h": "84693abfd07c5ff00b7bf0f0a1ee6fd8cd3629c08f2329b69f7ad1895896d9c1",
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp": "6d437c4c11fee28c552f3f50c9a8e9d83b2c5b15f3962b867c53e35c703b5c16"
   },

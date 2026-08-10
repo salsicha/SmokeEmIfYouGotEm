@@ -1425,9 +1425,11 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert 'TEXT("CalmSurfaceColorVariation")), 0.14f' in water_presentation_source
     assert 'TEXT("FallbackSkyReflectionFloor")), 0.68f' in water_presentation_source
     assert 'TEXT("FallbackSkyReflectionVariation")), 0.32f' in water_presentation_source
-    assert 'TEXT("CalmRippleStrength")), 0.055f' in water_presentation_source
-    assert 'TEXT("FlowRippleStrength")), 0.075f' in water_presentation_source
-    assert 'TEXT("FoamRippleStrength")), 0.110f' in water_presentation_source
+    # 2026-08-10: flow-weighted ripple perceptibility round (third "surface
+    # doesn't move" report); grazing anti-groove filter unchanged.
+    assert 'TEXT("CalmRippleStrength")), 0.075f' in water_presentation_source
+    assert 'TEXT("FlowRippleStrength")), 0.160f' in water_presentation_source
+    assert 'TEXT("FoamRippleStrength")), 0.150f' in water_presentation_source
     assert "M_RaftSim_SouthForkRaftTransmissionWater" in water_presentation_source
     assert "RaftSimRaftInteriorWaterTransmission" in water_presentation_source
     assert "RaftSimRaftInteriorWaterOpticalDepth" in water_presentation_source

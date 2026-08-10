@@ -2594,7 +2594,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // field below carries it downstream and decays it.
                 const float Froude = Speed / FMath::Sqrt(kGravity * Depth);
                 FroudeField[Index] = Froude;
-                Foam = FMath::Clamp((Froude - 1.0f) / 1.1f, 0.0f, 1.0f);
+                // Breaking onset at Fr 0.78 with a wider ramp: steep riffle
+                // and cascade waves (Fr 0.85-1.0 over rough beds) genuinely
+                // break white in the field, and the 2026-08-10 cascade run
+                // measured Fr 0.93 rendering clean under the former Fr>1.0
+                // gate. Named-rapid pockets (Fr 1.3+) keep their character.
+                Foam = FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
                 SourceFoam[Index] = Foam;
                 DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
                 SpeedNorm = FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f);
@@ -2685,7 +2690,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             const float DepthScale = FMath::Clamp(
                 WaterSamples[Index].DepthMeters / 0.6f, 0.3f, 1.0f);
             const float Intensity = FMath::Clamp(
-                (UpstreamFroude - 1.0f) / 1.4f, 0.0f, 1.0f) * DepthScale;
+                (UpstreamFroude - 0.85f) / 1.5f, 0.0f, 1.0f) * DepthScale;
             if (Intensity < 0.08f)
             {
                 continue;

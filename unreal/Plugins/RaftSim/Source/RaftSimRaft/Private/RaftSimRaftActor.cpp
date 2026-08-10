@@ -931,13 +931,22 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
     const float PerPaddler = PaddleStrokeImpulseNs * 0.5f;
     const float Crew = static_cast<float>(FMath::Max(1, PaddlerCount));
     const FVector Forward = GetActorForwardVector();
+    // Paddling drives the hull TO paddling speed over the water, not past
+    // it. Uncapped cadence impulses compounded to 9.7 m/s on 2026-08-10 -
+    // triple a paddled raft - which crossed the pool in seconds, slammed
+    // the cascade's wave train, shipped 294 kg of overwash, and rolled.
+    const float PaddleShortfall = GetPaddlePropulsionShortfall(Forward);
     switch (ActiveCrewCommand)
     {
         case ERaftSimCrewCommand::AllForward:
-            RaftAdapter->AddExternalImpulse(Forward * PerPaddler * Crew, FVector::ZeroVector);
+            RaftAdapter->AddExternalImpulse(
+                Forward * PerPaddler * Crew * PaddleShortfall, FVector::ZeroVector);
             break;
         case ERaftSimCrewCommand::AllBackward:
-            RaftAdapter->AddExternalImpulse(-Forward * PerPaddler * Crew, FVector::ZeroVector);
+            RaftAdapter->AddExternalImpulse(
+                -Forward * PerPaddler * Crew *
+                    GetPaddlePropulsionShortfall(-Forward),
+                FVector::ZeroVector);
             break;
         case ERaftSimCrewCommand::TurnLeft:
             RaftAdapter->AddExternalImpulse(
@@ -959,6 +968,33 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
     }
 }
 
+float ARaftSimRaftActor::GetPaddlePropulsionShortfall(
+    const FVector& StrokeDirection) const
+{
+    // 1.0 when the hull is at or below water speed in the stroke direction,
+    // fading to 0.0 as it approaches crewed paddling speed (~3 m/s) over
+    // the water. Keeps strokes honest: they close the gap to hull speed
+    // instead of compounding without bound.
+    constexpr float MaxPaddleSpeedOverWaterMps = 3.0f;
+    FVector WaterVelocityMps = FVector::ZeroVector;
+    if (Bridge != nullptr)
+    {
+        if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
+        {
+            FRaftSimWaterSample Sample;
+            if (Water->SampleWaterAtWorldPosition(GetActorLocation(), Sample) &&
+                Sample.bWet)
+            {
+                WaterVelocityMps = Sample.VelocityMetersPerSecond;
+            }
+        }
+    }
+    const float RelativeForwardMps = FVector::DotProduct(
+        GetRaftVelocity() - WaterVelocityMps, StrokeDirection);
+    return FMath::Clamp(
+        1.0f - RelativeForwardMps / MaxPaddleSpeedOverWaterMps, 0.0f, 1.0f);
+}
+
 FVector ARaftSimRaftActor::GetRaftVelocity() const
 {
     return RaftAdapter != nullptr
@@ -973,7 +1009,10 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
         return;
     }
     const float Scale = FMath::Clamp(ForwardScale, -1.0f, 1.0f);
-    const FVector LinearImpulseNs = GetActorForwardVector() * (PaddleStrokeImpulseNs * Scale);
+    const FVector StrokeDirection = GetActorForwardVector() * FMath::Sign(Scale);
+    const FVector LinearImpulseNs = GetActorForwardVector() *
+        (PaddleStrokeImpulseNs * Scale *
+         GetPaddlePropulsionShortfall(StrokeDirection));
 
     // Off-center strokes also yaw the raft a little.
     FVector AngularImpulseNms = FVector::ZeroVector;
