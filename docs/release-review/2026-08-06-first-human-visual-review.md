@@ -245,6 +245,26 @@ commercial blade on a stroke-swept shaft) and the standing drift
 telemetry line. Note for pilots: unpiloted rafts now ground on
 mid-channel bars — paddle off or steer around.
 
+Round 6 (2026-08-10) — "the surface isn't flowing / waves should break
+white". Two findings. First, the elevation report was re-verified against
+the cooked data: the full 337 m of real grade is present and correctly
+datum-mapped into the world (world Z = cooked Z − 120 m, exact at the
+put-in); the reach played so far is the genuinely-flat Chili Bar dam pool,
+with the 19 m first-kilometre cascade starting past the bar at ~station
+400. Second, the South Fork band-water material asset on disk predated
+the entire CC0 froth round — the builder gained white aerated breaks on
+2026-08-07, but the one-time-duplicated transmission parent the river
+actually renders with was never regenerated. Recreated in-session (the
+recreation command's shader validation cannot pass under -nullrhi and
+needs a fully initialized editor on Linux; it also needs the pinned
+NVIDIA environment offscreen — one attempt lost the GPU under the shader
+compile burst). The froth-review capture now shows white breaking lace
+on Meat Grinder where the committed water was previously clean. Open
+tuning: froth density/breadth on big rapids, capture-path exposure
+(renders darker than gameplay), and calm-pool surface-motion
+perceptibility (CalmRippleStrength 0.035 is a documented anti-groove
+floor; raising it needs a proper visual round).
+
 Open at session end: headless candidate captures still render the
 SkyAtmosphere as if the sun sat at the horizon despite a correctly bound
 −50° atmosphere sun (verified by direct map probing); regenerated-asset

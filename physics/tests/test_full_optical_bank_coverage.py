@@ -66,7 +66,10 @@ def test_review_is_fail_closed_and_hash_locked() -> None:
             path, expected
         )
     current_artifact_replacements = {
-        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset": "d7ab3d259165f92b4cd546ec66652fce455adb9c7e64221d284e52c30c84b3bf"
+        # 2026-08-10: transmission parent regenerated so the CC0 froth chain
+        # (in the builders since 2026-08-07) finally reaches the rendered
+        # river bands; prior hash was the pre-froth cold-water-optical build.
+        "unreal/Content/RaftSim/Environment/SouthForkFullReach/Water/Materials/M_RaftSim_SouthForkRaftTransmissionWater.uasset": "02ced8e03a20d90c8ee9d54282df8cf35285c5ec452d5ce7a3651489ccd2c145"
     }
     for artifact in review["artifacts"]:
         path = ROOT / artifact["path"]
