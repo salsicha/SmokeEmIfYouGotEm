@@ -116,7 +116,13 @@ bool FRaftSimM7AssertAudioResponse::Update()
     }
     const FRaftSimProductionAudioMixState Mix = Audio->GetProductionMixState();
     Test->TestEqual(TEXT("all production layers remain active"), Mix.ActiveLayerCount, 8);
-    Test->TestTrue(TEXT("paddle stroke opens paddle envelope"), Mix.Paddle > 0.05f);
+    // The audible Paddle channel is ducked by water loudness BY DESIGN
+    // (2026-08-10: rushing water must bury strokes), so the stroke's
+    // observability assertion moved to the pre-duck envelope; the channel
+    // itself must merely stay alive.
+    Test->TestTrue(TEXT("paddle stroke opens paddle envelope"),
+        Mix.PaddleStrokeEnvelope > 0.05f);
+    Test->TestTrue(TEXT("ducked paddle channel stays alive"), Mix.Paddle > 0.0f);
     Test->TestTrue(TEXT("crew command opens crew callout envelope"), Mix.CrewAndRescue > 0.05f);
     Test->TestTrue(TEXT("river bed is never a silent placeholder"), Mix.RiverBed > 0.05f);
     Test->TestTrue(TEXT("adaptive music bed is present"), Mix.Music >= 0.035f);

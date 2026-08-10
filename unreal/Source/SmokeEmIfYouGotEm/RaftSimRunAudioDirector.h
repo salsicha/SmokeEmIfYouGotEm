@@ -27,6 +27,11 @@ struct FRaftSimProductionAudioMixState
     float FoamAndSpray = 0.0f;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
     float Paddle = 0.0f;
+    /** Pre-duck stroke envelope: the water-loudness duck can push the
+     * audible Paddle channel toward zero by design (rapids bury strokes),
+     * so stroke observability lives here. */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
+    float PaddleStrokeEnvelope = 0.0f;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
     float FabricAndImpact = 0.0f;
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Audio")
