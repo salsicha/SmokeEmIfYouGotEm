@@ -3,6 +3,8 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Components/LightComponent.h"
+#include "Engine/DirectionalLight.h"
 #include "EngineUtils.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
@@ -18,6 +20,7 @@
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimRiverWaterStreamingActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "UnrealClient.h"
 #include "RaftSimRiverbedActor.h"
 #include "RaftSimWaterVfxActor.h"
 #include "RaftSimWaterSurfaceActor.h"
@@ -1043,10 +1046,30 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
                 }
             }
         }
+        float SunPitchDeg = 0.0f;
+        float SunIntensityLux = 0.0f;
+        if (TActorIterator<ADirectionalLight> SunIt{GetWorld()})
+        {
+            SunPitchDeg = SunIt->GetActorRotation().Pitch;
+            if (const ULightComponent* SunLight = SunIt->GetLightComponent())
+            {
+                SunIntensityLux = SunLight->Intensity;
+            }
+        }
+        // -RaftSimDriftScreenshot: grab the live player viewport alongside
+        // each drift sample, so first-person presentation (paddle rig, water
+        // look) can be inspected from headless -game -RenderOffscreen runs.
+        static const bool bDriftScreenshot =
+            FParse::Param(FCommandLine::Get(), TEXT("RaftSimDriftScreenshot"));
+        if (bDriftScreenshot)
+        {
+            FScreenshotRequest::RequestScreenshot(false);
+        }
         UE_LOG(LogTemp, Display,
             TEXT("RaftSim raft drift: raft_speed_mps=%.3f water_speed_mps=%.3f ")
             TEXT("raft_z_cm=%.1f surface_z_cm=%.1f wet=%d retained_kg=%.0f ")
-            TEXT("pressure=%.2f integrity=%.2f dry_points=%d x_cm=%.0f y_cm=%.0f"),
+            TEXT("pressure=%.2f integrity=%.2f dry_points=%d x_cm=%.0f y_cm=%.0f ")
+            TEXT("sun_pitch=%.1f sun_intensity=%.1f"),
             GetRaftVelocity().Size(),
             WaterSpeedMps,
             GetActorLocation().Z,
@@ -1057,7 +1080,9 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             RaftCondition.FabricIntegrity,
             RaftAdapter->GetLastDrySupportPointCount(),
             GetActorLocation().X,
-            GetActorLocation().Y);
+            GetActorLocation().Y,
+            SunPitchDeg,
+            SunIntensityLux);
     }
 
     RockObstacleRefreshRemaining -= DeltaSeconds;

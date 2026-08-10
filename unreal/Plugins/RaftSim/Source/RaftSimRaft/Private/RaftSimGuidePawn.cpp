@@ -129,7 +129,12 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 
     PaddleAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("PaddleAnchor"));
     PaddleAnchor->SetupAttachment(ViewOriginAnchor);
-    PaddleAnchor->SetRelativeLocation(FVector(25.0f, -65.0f, -20.0f));
+    // Chest-height carry, near the frame centre-line: at the original
+    // (25, -65, -20) the whole 1.7 m shaft hung below a level 90-degree
+    // view's bottom edge (verified against a headless first-person
+    // screenshot, 2026-08-10) — the paddle existed but never rendered
+    // in frame.
+    PaddleAnchor->SetRelativeLocation(FVector(35.0f, -30.0f, -12.0f));
 
     RaftContextAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("RaftContextAnchor"));
     RaftContextAnchor->SetupAttachment(Root);
@@ -954,7 +959,10 @@ void ARaftSimGuidePawn::UpdateFirstPersonPaddle(float DeltaSeconds)
     // Shaft direction in view space: rest at the guide's relaxed ready
     // angle; strokes sweep reach-to-exit over the raft's one-second guide
     // stroke window, mirroring the impulse that already fired.
-    FVector ShaftDirection(0.38f, 0.52f, -0.77f);
+    // Rest: a cross-body chest carry with the blade low right — the upper
+    // shaft rides the lower-right frame edge so the paddle is present at
+    // rest and sweeps fully through frame on strokes.
+    FVector ShaftDirection(0.42f, 0.80f, -0.42f);
     const float Remaining = Raft->GetGuideStrokeSecondsRemaining();
     if (Remaining > 0.0f)
     {
@@ -964,12 +972,12 @@ void ARaftSimGuidePawn::UpdateFirstPersonPaddle(float DeltaSeconds)
         switch (Raft->GetGuideStrokeAction())
         {
             case ERaftSimCrewAvatarAction::ForwardStroke:
-                Reach = FVector(0.86f, 0.30f, -0.42f);
-                Exit = FVector(-0.30f, 0.55f, -0.78f);
+                Reach = FVector(0.88f, 0.22f, -0.42f);
+                Exit = FVector(-0.20f, 0.60f, -0.77f);
                 break;
             case ERaftSimCrewAvatarAction::BackStroke:
-                Reach = FVector(-0.45f, 0.50f, -0.74f);
-                Exit = FVector(0.80f, 0.30f, -0.52f);
+                Reach = FVector(-0.30f, 0.62f, -0.72f);
+                Exit = FVector(0.88f, 0.22f, -0.42f);
                 break;
             case ERaftSimCrewAvatarAction::TurnRight:
                 Reach = FVector(0.30f, 0.85f, -0.44f);
