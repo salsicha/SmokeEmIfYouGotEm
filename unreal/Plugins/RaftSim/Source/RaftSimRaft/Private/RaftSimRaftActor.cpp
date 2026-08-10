@@ -797,6 +797,9 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
 
 void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
 {
+    // An explicit call (number keys / command wheel) owns the command until
+    // changed; guide-paddle cadence ownership ends here.
+    bCrewCommandFromGuidePaddle = false;
     if (Command != ActiveCrewCommand)
     {
         PendingCrewCommand = Command;
@@ -882,6 +885,15 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         case ERaftSimCrewCommand::Rest:
         default:
             break;
+    }
+    if (bCrewCommandFromGuidePaddle)
+    {
+        GuidePaddleCommandSeconds -= DeltaSeconds;
+        if (GuidePaddleCommandSeconds <= 0.0f)
+        {
+            bCrewCommandFromGuidePaddle = false;
+            IssueCrewCommand(ERaftSimCrewCommand::Rest);
+        }
     }
     GuideStrokeActionSeconds = FMath::Max(GuideStrokeActionSeconds - DeltaSeconds, 0.0f);
     for (int32 Index = 0; Index < CrewAvatars.Num(); ++Index)
@@ -977,6 +989,21 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
         ? ERaftSimCrewAvatarAction::ForwardStroke
         : ERaftSimCrewAvatarAction::BackStroke;
     GuideStrokeActionSeconds = 1.0f;
+    // The guide's call is the crew's stroke: W/S cadence puts the whole
+    // crew on forward/back paddle while strokes keep coming, and they rest
+    // when the guide stops — unless an explicit command (number keys /
+    // wheel) owns the crew (2026-08-10 playtest: "the crew are the ones
+    // who are supposed to paddle").
+    const ERaftSimCrewCommand CadenceCommand = Scale >= 0.0f
+        ? ERaftSimCrewCommand::AllForward
+        : ERaftSimCrewCommand::AllBackward;
+    if (ActiveCrewCommand == ERaftSimCrewCommand::Rest ||
+        bCrewCommandFromGuidePaddle)
+    {
+        IssueCrewCommand(CadenceCommand);
+        bCrewCommandFromGuidePaddle = true;
+    }
+    GuidePaddleCommandSeconds = 1.4f;
 }
 
 void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
