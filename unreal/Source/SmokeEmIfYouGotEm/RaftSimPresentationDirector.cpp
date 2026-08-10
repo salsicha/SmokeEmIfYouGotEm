@@ -81,22 +81,15 @@ void ARaftSimPresentationDirector::BeginPlay()
     Super::BeginPlay();
     ResolveEnvironmentActors();
 
-    ERaftSimWeatherVariant Initial = ERaftSimWeatherVariant::ClearMorning;
-    if (const URaftSimSaveSubsystem* Save = GetGameInstance()
-            ? GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>() : nullptr)
-    {
-        if (Save->GetSave() != nullptr)
-        {
-            const FString Id = Save->GetSave()->Selection.ScenarioId.ToString();
-            const uint32 StableScenarioHash = GetTypeHash(Id.ToLower());
-            Initial = static_cast<ERaftSimWeatherVariant>(StableScenarioHash % 3u);
-            if (Save->GetSave()->ActiveGameMode == ERaftSimGameMode::TrainingEddy)
-            {
-                Initial = ERaftSimWeatherVariant::ClearMorning;
-            }
-        }
-    }
-    SetWeatherVariant(Initial, true);
+    // Every run opens in the map's authored daylight; T / left-stick click
+    // cycles variants in-run. The former scenario-name hash silently
+    // condemned specific runs to fixed non-authored weather — measured
+    // 2026-08-10: hash("south_fork_upper") selects StormDusk, so South
+    // Fork I always played at a -16-degree, 1.55-intensity dusk sun over
+    // the authored -42/8.2 Sierra morning, and every reviewer session on
+    // the flagship section ran in the dark. Per-scenario weather belongs
+    // in the scenario catalog as an authored field, not in a hash.
+    SetWeatherVariant(ERaftSimWeatherVariant::ClearMorning, true);
 }
 
 void ARaftSimPresentationDirector::ResolveEnvironmentActors()
