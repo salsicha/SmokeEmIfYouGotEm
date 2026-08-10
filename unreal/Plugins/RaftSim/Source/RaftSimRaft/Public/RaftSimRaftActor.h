@@ -85,6 +85,10 @@ public:
      */
     void SetGuideFirstPersonView(bool bFirstPerson);
 
+    /** World-space centre of the guide avatar's posed head, for seating the
+     * first-person camera on the real anatomy instead of a fixed offset. */
+    bool GetGuideHeadWorldLocationCm(FVector& OutCm) const;
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     USceneComponent* GetSternSeatAttachPoint() const { return SternSeatAttachPoint; }
 

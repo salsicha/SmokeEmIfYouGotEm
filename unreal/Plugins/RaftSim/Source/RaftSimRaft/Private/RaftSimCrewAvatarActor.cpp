@@ -2389,6 +2389,11 @@ void ARaftSimCrewAvatarActor::DispatchProductionPose()
     }
 }
 
+FVector ARaftSimCrewAvatarActor::GetPoseHeadWorldLocationCm() const
+{
+    return Head ? Head->GetComponentLocation() : GetActorLocation();
+}
+
 void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bHidden)
 {
     if (bFirstPersonHeadHidden == bHidden)

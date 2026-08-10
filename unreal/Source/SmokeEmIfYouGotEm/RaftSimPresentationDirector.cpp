@@ -211,17 +211,25 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
     if (Sun != nullptr)
     {
         const FRotator CurrentRotation = Sun->GetActorRotation();
+        // SetActorRotation normalizes yaw into (-180, 180], so a raw preset
+        // like StormDusk's -205 can never be read back; interpolating toward
+        // the un-normalized value chased the wrap forever and orbited the
+        // sun around the scene (2026-08-09 playtest, and the mid-orbit
+        // rotation once saved into the South Fork map). Interpolate along
+        // the shortest arc to the normalized-equivalent goal instead.
+        const float YawGoal = CurrentRotation.Yaw +
+            FMath::FindDeltaAngleDegrees(CurrentRotation.Yaw, TargetSunYaw);
         float NewPitch = FMath::FInterpTo(
             CurrentRotation.Pitch, TargetSunPitch, GetWorld()->GetDeltaSeconds(), 0.5f);
         float NewYaw = FMath::FInterpTo(
-            CurrentRotation.Yaw, TargetSunYaw, GetWorld()->GetDeltaSeconds(), 0.5f);
+            CurrentRotation.Yaw, YawGoal, GetWorld()->GetDeltaSeconds(), 0.5f);
         if (FMath::IsNearlyEqual(NewPitch, TargetSunPitch, 0.02f))
         {
             NewPitch = TargetSunPitch;
         }
-        if (FMath::IsNearlyEqual(NewYaw, TargetSunYaw, 0.02f))
+        if (FMath::IsNearlyEqual(NewYaw, YawGoal, 0.02f))
         {
-            NewYaw = TargetSunYaw;
+            NewYaw = YawGoal;
         }
         if (!FMath::IsNearlyEqual(CurrentRotation.Pitch, NewPitch, 0.001f) ||
             !FMath::IsNearlyEqual(CurrentRotation.Yaw, NewYaw, 0.001f))

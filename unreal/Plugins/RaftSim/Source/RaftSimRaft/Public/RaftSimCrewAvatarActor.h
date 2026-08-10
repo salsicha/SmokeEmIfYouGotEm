@@ -129,6 +129,12 @@ public:
      */
     void SetFirstPersonHeadHidden(bool bHidden);
 
+    /**
+     * World-space centre of the posed head. Valid while the head is hidden
+     * for first person: the hidden part still tracks the pose every frame.
+     */
+    FVector GetPoseHeadWorldLocationCm() const;
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Appearance")
     void ConfigureAppearance(int32 InVariantIndex, int32 InSeatSide, bool bInGuide);
 

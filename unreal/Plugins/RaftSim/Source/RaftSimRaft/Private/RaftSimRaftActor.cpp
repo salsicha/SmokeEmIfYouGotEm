@@ -1000,6 +1000,17 @@ void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)
     }
 }
 
+bool ARaftSimRaftActor::GetGuideHeadWorldLocationCm(FVector& OutCm) const
+{
+    const ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide"));
+    if (Guide == nullptr)
+    {
+        return false;
+    }
+    OutCm = Guide->GetPoseHeadWorldLocationCm();
+    return true;
+}
+
 void ARaftSimRaftActor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
