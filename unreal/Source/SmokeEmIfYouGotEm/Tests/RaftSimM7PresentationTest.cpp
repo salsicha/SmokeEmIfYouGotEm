@@ -128,6 +128,14 @@ bool FRaftSimM7AssertAudioResponse::Update()
     Test->TestTrue(TEXT("adaptive music bed is present"), Mix.Music >= 0.035f);
     Test->TestTrue(TEXT("occlusion filter stays audible and finite"),
         FMath::IsFinite(Mix.OcclusionLowPassHz) && Mix.OcclusionLowPassHz >= 4000.0f);
+    // Leave the shared tank map at rest: the AllForward issued to open the
+    // callout envelope otherwise keeps the raft driving at the governor cap
+    // for whatever test reuses this world next (2026-08-11: P1 measured it
+    // as 2.44 m/s of phantom "self-propulsion").
+    if (ARaftSimRaftActor* Raft = FindM7Actor<ARaftSimRaftActor>(FindM7World()))
+    {
+        Raft->IssueCrewCommand(ERaftSimCrewCommand::Rest);
+    }
     return true;
 }
 
