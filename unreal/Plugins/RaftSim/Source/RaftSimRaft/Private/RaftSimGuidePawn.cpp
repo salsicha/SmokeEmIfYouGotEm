@@ -88,6 +88,17 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     MapRescueKey(RescueReachAction, EKeys::Gamepad_FaceButton_Bottom);
     MapRescueKey(RescueThrowLineAction, EKeys::Gamepad_RightTrigger);
     MapRescueKey(ReseatCrewAction, EKeys::Gamepad_FaceButton_Right);
+    // The guide's own stern draw/pry rides the mouse buttons: RMB = pry
+    // right, LMB = draw left (gamepad: left trigger = draw left; the right
+    // trigger belongs to the throw line). Runtime-transient action mapped
+    // into the loaded IMC exactly like the rescue fallback above —
+    // GActionSpecs mirrors the Milestone 23 input contract, so no new
+    // generated asset.
+    GuideSteerAction = CreateDefaultSubobject<UInputAction>(TEXT("IA_GuideSteerRuntime"));
+    GuideSteerAction->ValueType = EInputActionValueType::Axis1D;
+    MapRescueKey(GuideSteerAction, EKeys::RightMouseButton);
+    MapRescueKey(GuideSteerAction, EKeys::LeftMouseButton, /*bNegate=*/true);
+    MapRescueKey(GuideSteerAction, EKeys::Gamepad_LeftTrigger, /*bNegate=*/true);
     for (const TCHAR* CommandPath : {
              TEXT("/Game/RaftSim/Input/IA_GuideCommandForwardPaddle.IA_GuideCommandForwardPaddle"),
              TEXT("/Game/RaftSim/Input/IA_GuideCommandBackPaddle.IA_GuideCommandBackPaddle"),
@@ -178,6 +189,43 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 void ARaftSimGuidePawn::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    // Enhanced Input look starvation fallback. The 2026-08-11 playtest log
+    // proves IA_Look goes silent for the entire duration of any held
+    // paddle-command key (11 s of held-W strokes, zero look events, look
+    // resuming the frame the key lifts) while control rotation applies
+    // fine whenever the action does fire — the block is in the EI action
+    // plumbing, not the view pipeline. Until that root cause is
+    // understood, read the controller's raw mouse delta and apply exactly
+    // what HandleLook would have; the flag prevents double-application on
+    // frames where IA_Look did fire.
+    if (APlayerController* LookController = Cast<APlayerController>(GetController()))
+    {
+        if (!bLookInputHandledThisFrame)
+        {
+            float MouseDeltaX = 0.0f;
+            float MouseDeltaY = 0.0f;
+            LookController->GetInputMouseDelta(MouseDeltaX, MouseDeltaY);
+            if (FMath::Abs(MouseDeltaX) + FMath::Abs(MouseDeltaY) >
+                KINDA_SMALL_NUMBER)
+            {
+                AddControllerYawInput(MouseDeltaX);
+                AddControllerPitchInput(MouseDeltaY);
+                LookFallbackAccumulator +=
+                    FMath::Abs(MouseDeltaX) + FMath::Abs(MouseDeltaY);
+            }
+        }
+        const float NowSeconds = GetWorld()->GetTimeSeconds();
+        if (NowSeconds - LastLookFallbackLogSeconds > 1.0f &&
+            LookFallbackAccumulator > 0.0f)
+        {
+            LastLookFallbackLogSeconds = NowSeconds;
+            UE_LOG(LogTemp, Display,
+                TEXT("RaftSim look fallback: axis_sum=%.1f control_yaw=%.1f"),
+                LookFallbackAccumulator, GetControlRotation().Yaw);
+            LookFallbackAccumulator = 0.0f;
+        }
+    }
+    bLookInputHandledThisFrame = false;
     // Seat the view on the guide avatar's actual posed head each frame. The
     // constructor offset was a fixed estimate that landed inside the chest
     // (2026-08-09 playtest: "all that can be seen is the inside of the life
@@ -646,6 +694,12 @@ void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
             PaddleDrawAction, ETriggerEvent::Triggered, this,
             &ARaftSimGuidePawn::HandleTurnStroke);
     }
+    if (GuideSteerAction != nullptr)
+    {
+        EnhancedInput->BindAction(
+            GuideSteerAction, ETriggerEvent::Triggered, this,
+            &ARaftSimGuidePawn::HandleGuideSteer);
+    }
     if (LookAction != nullptr)
     {
         EnhancedInput->BindAction(
@@ -740,8 +794,32 @@ void ARaftSimGuidePawn::HandleTurnStroke(const FInputActionValue& Value)
     }
 }
 
+void ARaftSimGuidePawn::HandleGuideSteer(const FInputActionValue& Value)
+{
+    const float Axis = Value.Get<float>();
+    if (FMath::Abs(Axis) < 0.2f)
+    {
+        return;
+    }
+    const float Now = GetWorld()->GetTimeSeconds();
+    if (Now - LastSteerTimeSeconds < StrokeCooldownSeconds)
+    {
+        return;
+    }
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        LastSteerTimeSeconds = Now;
+        if (MobilityMode == ERaftSimGuideMobilityMode::Swimming)
+        {
+            return;
+        }
+        Raft->ApplyGuideSteerStroke(Axis);
+    }
+}
+
 void ARaftSimGuidePawn::HandleLook(const FInputActionValue& Value)
 {
+    bLookInputHandledThisFrame = true;
     const FVector2D Axis = Value.Get<FVector2D>();
     AddControllerYawInput(Axis.X);
     AddControllerPitchInput(Axis.Y);

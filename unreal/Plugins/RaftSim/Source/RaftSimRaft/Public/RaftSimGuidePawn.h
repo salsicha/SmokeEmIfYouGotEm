@@ -195,6 +195,7 @@ protected:
 
     void HandlePaddleStroke(const FInputActionValue& Value);
     void HandleTurnStroke(const FInputActionValue& Value);
+    void HandleGuideSteer(const FInputActionValue& Value);
     void HandleLook(const FInputActionValue& Value);
     void HandleHighSide(const FInputActionValue& Value);
     void HandleGuideCommand(FName CommandActionName);
@@ -236,6 +237,15 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TArray<TObjectPtr<UInputAction>> GuideCommandActions;
 
+    /**
+     * The guide's own stern draw/pry (mouse buttons). Runtime-transient by
+     * design: GActionSpecs mirrors the Milestone 23 input contract, so this
+     * action is created in code and mapped into the loaded IMC at runtime,
+     * the same pattern as the rescue-key fallback.
+     */
+    UPROPERTY()
+    TObjectPtr<UInputAction> GuideSteerAction;
+
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> AttachedRaft;
 
@@ -244,6 +254,14 @@ protected:
     float StrokeCooldownSeconds = 0.45f;
 
     float LastStrokeTimeSeconds = -1.0f;
+
+    /** The steering blade is independent of voice calls: its own cooldown. */
+    float LastSteerTimeSeconds = -1.0f;
+
+    /** Set by HandleLook each frame it fires; the Tick fallback skips those frames. */
+    bool bLookInputHandledThisFrame = false;
+    float LookFallbackAccumulator = 0.0f;
+    float LastLookFallbackLogSeconds = 0.0f;
 
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Guide")
     ERaftSimGuideMobilityMode MobilityMode = ERaftSimGuideMobilityMode::InRaft;

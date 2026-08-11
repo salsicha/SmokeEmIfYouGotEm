@@ -79,6 +79,14 @@ public:
     void ApplyTurnStroke(float TurnScale);
 
     /**
+     * The guide's OWN stern draw/pry: animates the guide and yaws the hull,
+     * never touches the crew. TurnScale in [-1, 1]; positive turns bow
+     * starboard. Separate from ApplyTurnStroke, which is a crew call.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void ApplyGuideSteerStroke(float TurnScale);
+
+    /**
      * First-person presentation for the possessed guide seat: hides the
      * guide avatar's head and helmet so the camera can sit in its eye
      * socket. Idempotent; the pawn syncs it every tick.
@@ -458,12 +466,15 @@ private:
     ERaftSimCrewAvatarAction GuideStrokeAction;
     float GuideStrokeActionSeconds = 0.0f;
 
-    // The guide's W/S power stroke is one stern paddler, not the whole
-    // boat: PaddleStrokeImpulseNs was originally sized as full-crew
-    // propulsion back when W was the only input. Crew power now comes
-    // solely from explicit commands; steering strokes stay un-scaled
-    // (stern leverage is the guide's real authority).
-    float GuideSoloStrokeScale = 0.35f;
+    // W/S/A/D are the guide's CALLS to the crew: a tap owns the crew for
+    // exactly one cadence stroke and expires back to Rest, while the
+    // number keys set standing orders that never expire. The guide's own
+    // blade lives solely on ApplyGuideSteerStroke (2026-08-11: "when the
+    // paddle command is given to the crew the guide should not also
+    // paddle" — the command IS the crew's stroke; the guide's paddle is
+    // for steering).
+    float GuidePaddleCommandSeconds = 0.0f;
+    bool bCrewCommandFromGuidePaddle = false;
 
     // Direct (non-cadence) stroke impulses wait for the guide pose's catch
     // (~0.29 of the stroke cycle) so the boat never moves before a blade

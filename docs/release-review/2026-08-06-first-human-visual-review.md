@@ -377,3 +377,36 @@ bow-wave overwash. Both layers fixed: P1 force-reloads the tank map
 (bForceReload), and M7 issues Rest after its audio assert so it leaves
 a calm world for whoever follows. Calm-water physics is clean: no
 phantom forces, no slosh, no slow drain.
+
+Round 10 (2026-08-11) — "crew animation no longer fires when paddle
+command given." Round 8's split read the request backwards. The
+request: W IS the crew's paddle command ("when the paddle command is
+given to the crew..."), and the defect was the GUIDE stroking along
+with it — his paddle is for steering, on separate controls. Round 8
+instead moved the crew off W/S/A/D onto the number keys and gave
+W/S/A/D to the guide's blade, so a W press showed no crew response at
+all. Corrected split: W/S/A/D are crew calls again (tap = one cadence
+stroke, hold = cadence, tap overrides a standing order and expires to
+Rest; the guide never animates on a call), the number keys remain
+standing orders, and the guide's own stern draw/pry moves to the mouse
+buttons (LMB draw left / RMB pry right, gamepad left trigger for left)
+with full yaw authority over any crew order, catch-delayed like every
+stroke. The steer action is runtime-transient (created and mapped into
+the loaded IMC in code, the rescue-fallback pattern) because
+GActionSpecs mirrors the Milestone 23 input contract. Seat measuring,
+tank coupling gate, and the P1/M7 test hygiene from Rounds 9's
+verification all carry forward unchanged.
+
+Round 10 addendum — "panning camera doesn't work when pressing paddle
+command key." The Round 7 look instrumentation paid off: the playtest
+session log shows IA_Look silent for the full duration of every held
+paddle key (11 s of held-W strokes with zero look events) and firing
+again the frame the key lifts, with control rotation applying correctly
+whenever the action does fire (yaw moved -148 -> 208 -> 204 across the
+look bursts). Verdict: Enhanced Input action-layer starvation, not the
+view pipeline. Shipped a deterministic fallback: the pawn reads the
+controller's raw mouse delta every frame IA_Look stays silent and
+applies the identical controller rotation, flag-guarded against
+double-application, with a once-per-second "RaftSim look fallback" log
+line so the next session shows which path drove the camera. EI root
+cause stays open as a polish item.

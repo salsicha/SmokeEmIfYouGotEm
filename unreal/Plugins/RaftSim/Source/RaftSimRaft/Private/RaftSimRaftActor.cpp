@@ -863,9 +863,10 @@ float ARaftSimRaftActor::ComputeSeatTubeTopZCm(
 
 void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
 {
-    // An explicit call (number keys / command wheel) owns the command until
-    // changed; it is the only crew-propulsion channel — the guide's own
-    // paddle (W/S/A/D) never issues commands.
+    // An explicit call (number keys / command wheel) sets a standing order
+    // that never expires; guide-paddle (W/S/A/D) cadence ownership ends
+    // here and is re-marked by the caller when the tap owns the crew.
+    bCrewCommandFromGuidePaddle = false;
     if (Command != ActiveCrewCommand)
     {
         PendingCrewCommand = Command;
@@ -961,6 +962,19 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 PendingDirectLinearImpulseNs, PendingDirectAngularImpulseNms);
             PendingDirectLinearImpulseNs = FVector::ZeroVector;
             PendingDirectAngularImpulseNms = FVector::ZeroVector;
+        }
+    }
+    // A W/S/A/D tap owns the crew for one stroke; expire back to Rest so a
+    // single tap reads as a single stroke while holding the key refreshes
+    // through the pawn's stroke cooldown. Standing orders (number keys)
+    // clear the flag in IssueCrewCommand and never expire.
+    if (bCrewCommandFromGuidePaddle)
+    {
+        GuidePaddleCommandSeconds -= DeltaSeconds;
+        if (GuidePaddleCommandSeconds <= 0.0f)
+        {
+            bCrewCommandFromGuidePaddle = false;
+            IssueCrewCommand(ERaftSimCrewCommand::Rest);
         }
     }
     GuideStrokeActionSeconds = FMath::Max(GuideStrokeActionSeconds - DeltaSeconds, 0.0f);
@@ -1083,30 +1097,22 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
     // be implemented" style reports from the session log alone (input
     // mapping, sign, and governor factor all visible per stroke).
     ++PaddleStrokeCount;
-    GuideStrokeAction = Scale >= 0.0f
-        ? ERaftSimCrewAvatarAction::ForwardStroke
-        : ERaftSimCrewAvatarAction::BackStroke;
-    GuideStrokeActionSeconds = 1.0f;
-    // This is the GUIDE'S OWN blade, never a crew command: "when the paddle
-    // command is given to the crew the guide should not also paddle, the
-    // guide needs separate controls" (2026-08-11). Crew propulsion lives
-    // exclusively on the explicit command channel (number keys / D-pad,
-    // IssueCrewCommand); W/S drive one stern paddler's worth of power.
+    (void)Side;
+    // W/S IS the crew's paddle command — the crew animates and propels, the
+    // guide does not stroke (first split shipped 2026-08-11 inverted this
+    // and the playtest immediately reported "crew animation no longer fires
+    // when paddle command given"). A tap owns the crew for one cadence
+    // stroke and expires back to Rest; an explicit standing order (number
+    // keys) is refreshed rather than fought.
+    const ERaftSimCrewCommand CadenceCommand = Scale >= 0.0f
+        ? ERaftSimCrewCommand::AllForward
+        : ERaftSimCrewCommand::AllBackward;
+    IssueCrewCommand(CadenceCommand);
+    bCrewCommandFromGuidePaddle = true;
+    GuidePaddleCommandSeconds = 0.75f;
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f"),
+        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f crew=1"),
         Scale, Shortfall);
-    const FVector LinearImpulseNs = GetActorForwardVector() *
-        (PaddleStrokeImpulseNs * GuideSoloStrokeScale * Scale * Shortfall);
-    // Off-center strokes also yaw the raft a little.
-    FVector AngularImpulseNms = FVector::ZeroVector;
-    if (Side != ERaftSimPaddleSide::Both)
-    {
-        const float LeverArmM = 0.9f;
-        const float SideSign = (Side == ERaftSimPaddleSide::Port) ? -1.0f : 1.0f;
-        AngularImpulseNms.Z = -SideSign * Scale * PaddleStrokeImpulseNs *
-            GuideSoloStrokeScale * LeverArmM * 0.35f;
-    }
-    QueueDirectStrokeImpulse(LinearImpulseNs, AngularImpulseNms);
 }
 
 void ARaftSimRaftActor::QueueDirectStrokeImpulse(
@@ -1133,16 +1139,37 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
     }
     const float Scale = FMath::Clamp(TurnScale, -1.0f, 1.0f);
     ++PaddleStrokeCount;
+    // A/D is the crew's turn command (opposing-sides pivot strokes), same
+    // ownership rules as W/S: tap = one crew stroke, then Rest. The guide
+    // never animates on a call; his own blade is ApplyGuideSteerStroke.
+    const ERaftSimCrewCommand TurnCommand = Scale > 0.0f
+        ? ERaftSimCrewCommand::TurnRight
+        : ERaftSimCrewCommand::TurnLeft;
+    IssueCrewCommand(TurnCommand);
+    bCrewCommandFromGuidePaddle = true;
+    GuidePaddleCommandSeconds = 0.75f;
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim guide turn: scale=%.2f crew=1"), Scale);
+}
+
+void ARaftSimRaftActor::ApplyGuideSteerStroke(float TurnScale)
+{
+    if (RaftAdapter == nullptr)
+    {
+        return;
+    }
+    const float Scale = FMath::Clamp(TurnScale, -1.0f, 1.0f);
+    ++PaddleStrokeCount;
     GuideStrokeAction = Scale > 0.0f
         ? ERaftSimCrewAvatarAction::TurnRight
         : ERaftSimCrewAvatarAction::TurnLeft;
     GuideStrokeActionSeconds = 1.0f;
-    // The guide's steering stroke — a stern draw/pry, HIS paddle, not a
-    // crew command ("the guide is using his paddle to steer, not paddle
-    // with the crew", 2026-08-11). Full yaw authority, un-scaled by
-    // GuideSoloStrokeScale: the stern lever arm is precisely where a raft
-    // guide's turning power comes from, and it must stay decisive even
-    // while the crew holds an all-forward order.
+    // The guide's own stern draw/pry ("the guide is using his paddle to
+    // steer, not paddle with the crew"). Full yaw authority — the stern
+    // lever arm is precisely where a raft guide's turning power comes
+    // from — and it works over a standing crew order, so "call all
+    // forward, steer with your own blade" is the actual technique. The
+    // impulse waits for the pose catch like every stroke.
     UE_LOG(LogTemp, Display,
         TEXT("RaftSim guide steer: scale=%.2f"), Scale);
     QueueDirectStrokeImpulse(

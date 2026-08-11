@@ -41,24 +41,27 @@ interactive loads should be quick.
 
 ## Controls (from the generated IMC_RaftSimDefault)
 
-Guide and crew are fully separate channels (2026-08-11): W/S/A/D move
-ONLY the guide's own paddle — one stern paddler's power, full steering
-authority — and never make the crew stroke. The crew paddles only on
-called commands (number keys / D-pad), and a called command holds — the
-crew keeps its cadence until Stop or a different call. Steering strokes
-(A/D) work over a standing crew command, which is the real technique:
-call "all forward", then steer with your own blade.
+W/S/A/D are the guide's CALLS — they command the crew's blades (the
+crew animates and propels; the guide never strokes on a call). A tap is
+one crew stroke; holding the key keeps the cadence. The number keys set
+standing orders that persist until Stop or a new call. The guide's own
+paddle is the steering blade on the mouse buttons, full stern
+authority, and it works over a standing order — call "all forward"
+with 1, then steer with your own blade (2026-08-11, second revision:
+the first split moved the crew off W/S/A/D entirely and the playtest
+immediately reported the crew no longer paddling on command).
 
 | Action | Keyboard/Mouse | Gamepad |
 |---|---|---|
-| Guide's own stroke, forward / back | W / S | Left stick Y |
-| Guide steering stroke (stern draw/pry), left / right | A / D | Left stick X |
+| Crew call: all forward / all back (tap = one stroke, hold = cadence) | W / S | Left stick Y |
+| Crew call: turn left / turn right (tap = one stroke) | A / D | Left stick X |
+| Guide's own steering blade: draw left / pry right | Left / Right mouse button | Left trigger (left only) |
 | Look | Mouse | Right stick |
-| Crew command: All Forward (holds until Stop) | 1 | D-pad up |
-| Crew command: All Back (holds until Stop) | 2 | D-pad down |
-| Crew command: Turn Left (holds until Stop) | 3 | D-pad left |
-| Crew command: Turn Right (holds until Stop) | 4 | D-pad right |
-| Crew command: Stop (crew rests) | 5 | Y / Triangle |
+| Crew standing order: All Forward (holds until Stop) | 1 | D-pad up |
+| Crew standing order: All Back (holds until Stop) | 2 | D-pad down |
+| Crew standing order: Turn Left (holds until Stop) | 3 | D-pad left |
+| Crew standing order: Turn Right (holds until Stop) | 4 | D-pad right |
+| Crew standing order: Stop (crew rests) | 5 | Y / Triangle |
 | High Side (also re-right when capsized) | Space | X / Square |
 | Rescue: select swimmer | Mouse wheel | Shoulder buttons |
 | Rescue: reach grab (close) | E | A / Cross |
