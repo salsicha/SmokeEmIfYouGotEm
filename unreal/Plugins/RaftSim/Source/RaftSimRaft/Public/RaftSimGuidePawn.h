@@ -284,6 +284,10 @@ protected:
     void BuildFirstPersonPaddle();
     void UpdateFirstPersonPaddle(float DeltaSeconds);
 
+    // Throttled look-input diagnostic (see HandleLook).
+    float LookDiagnosticAccumulator = 0.0f;
+    float LastLookDiagnosticSeconds = 0.0f;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> RaftContextAnchor;
 

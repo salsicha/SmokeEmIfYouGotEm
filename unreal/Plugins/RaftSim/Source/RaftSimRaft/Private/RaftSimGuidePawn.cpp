@@ -745,6 +745,23 @@ void ARaftSimGuidePawn::HandleLook(const FInputActionValue& Value)
     const FVector2D Axis = Value.Get<FVector2D>();
     AddControllerYawInput(Axis.X);
     AddControllerPitchInput(Axis.Y);
+    // Throttled instrumentation for the 2026-08-10 "can't look while
+    // holding a paddle key" report: shows whether Look fires and whether
+    // control rotation moves. If these lines appear during held-W with
+    // moving axis values but the view stays fixed, the block is below the
+    // controller (view pipeline); if they vanish while W is held, it is
+    // the Enhanced Input layer.
+    LookDiagnosticAccumulator += FMath::Abs(Axis.X) + FMath::Abs(Axis.Y);
+    const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
+    if (Now - LastLookDiagnosticSeconds > 1.0f && LookDiagnosticAccumulator > 0.0f)
+    {
+        LastLookDiagnosticSeconds = Now;
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim look: axis_sum=%.1f control_yaw=%.1f"),
+            LookDiagnosticAccumulator,
+            GetControlRotation().Yaw);
+        LookDiagnosticAccumulator = 0.0f;
+    }
 }
 
 void ARaftSimGuidePawn::HandleHighSide(const FInputActionValue&)
