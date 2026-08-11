@@ -779,9 +779,12 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     {
         return;
     }
-    // Seat heights dropped 8 cm on 2026-08-10: from the guide camera the
-    // crews' glutes hovered visibly above the tubes ("their butts float
-    // above the boat").
+    // Hand-tuned seat heights floated the crew twice ("their butts float
+    // above the boat", 2026-08-10 and again 2026-08-11): the visual raft
+    // component rides 15 cm below the hull frame and the seated pelvis
+    // bottom rides 25 cm above the avatar origin, so guessed constants
+    // kept landing in the air. Measure instead: rest the pelvis ON the
+    // rendered tube surface under the seat station.
     FVector SeatCm(-175.0f, 0.0f, 30.0f);
     if (PassengerId != TEXT("guide"))
     {
@@ -792,17 +795,77 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
         const float BowM = 1.15f - (Index / 2) * 1.05f;
         SeatCm = FVector(BowM * kCmPerM, Side * 62.0f, 22.0f);
     }
+    bool bTubeFound = false;
+    const float TubeTopZCm = ComputeSeatTubeTopZCm(SeatCm, bTubeFound);
+    if (bTubeFound)
+    {
+        // Slight sink reads as fabric compression under load instead of a
+        // tangent kiss that re-opens a hairline gap at glancing angles.
+        constexpr float SeatContactSinkCm = 1.5f;
+        SeatCm.Z = TubeTopZCm - Avatar->GetSeatedPelvisBottomLocalZCm() -
+            SeatContactSinkCm;
+    }
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim seat: id=%s measured=%d tube_top=%.1f seat_z=%.1f"),
+        *PassengerId.ToString(), bTubeFound ? 1 : 0, TubeTopZCm, SeatCm.Z);
     Avatar->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
     Avatar->SetActorRelativeLocation(SeatCm);
     Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
     Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
 }
 
+float ARaftSimRaftActor::ComputeSeatTubeTopZCm(
+    const FVector& SeatCm, bool& bOutFound) const
+{
+    // The uploaded RaftVisual sections are the surface the player actually
+    // sees — the production static-mesh extraction and the procedural
+    // fallback both land there, and the component carries its own vertical
+    // offset relative to the hull frame, so scanning it folds every source
+    // of disagreement into one measured number. Highest vertex wins inside
+    // a glute-sized column; rigging, D-rings, and thwarts all live outside
+    // the seat windows (verified against the builder's layout).
+    bOutFound = false;
+    float MaxZCm = 0.0f;
+    if (RaftVisual == nullptr)
+    {
+        return MaxZCm;
+    }
+    constexpr float WindowXCm = 22.0f;
+    constexpr float WindowYCm = 16.0f;
+    const FTransform VisualToActor = RaftVisual->GetRelativeTransform();
+    for (int32 SectionIndex = 0; SectionIndex < RaftVisual->GetNumSections();
+         ++SectionIndex)
+    {
+        const FProcMeshSection* Section =
+            RaftVisual->GetProcMeshSection(SectionIndex);
+        if (Section == nullptr)
+        {
+            continue;
+        }
+        for (const FProcMeshVertex& Vertex : Section->ProcVertexBuffer)
+        {
+            const FVector ActorCm =
+                VisualToActor.TransformPosition(FVector(Vertex.Position));
+            if (FMath::Abs(ActorCm.X - SeatCm.X) > WindowXCm ||
+                FMath::Abs(ActorCm.Y - SeatCm.Y) > WindowYCm)
+            {
+                continue;
+            }
+            if (!bOutFound || ActorCm.Z > MaxZCm)
+            {
+                MaxZCm = static_cast<float>(ActorCm.Z);
+                bOutFound = true;
+            }
+        }
+    }
+    return MaxZCm;
+}
+
 void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
 {
     // An explicit call (number keys / command wheel) owns the command until
-    // changed; guide-paddle cadence ownership ends here.
-    bCrewCommandFromGuidePaddle = false;
+    // changed; it is the only crew-propulsion channel — the guide's own
+    // paddle (W/S/A/D) never issues commands.
     if (Command != ActiveCrewCommand)
     {
         PendingCrewCommand = Command;
@@ -898,15 +961,6 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 PendingDirectLinearImpulseNs, PendingDirectAngularImpulseNms);
             PendingDirectLinearImpulseNs = FVector::ZeroVector;
             PendingDirectAngularImpulseNms = FVector::ZeroVector;
-        }
-    }
-    if (bCrewCommandFromGuidePaddle)
-    {
-        GuidePaddleCommandSeconds -= DeltaSeconds;
-        if (GuidePaddleCommandSeconds <= 0.0f)
-        {
-            bCrewCommandFromGuidePaddle = false;
-            IssueCrewCommand(ERaftSimCrewCommand::Rest);
         }
     }
     GuideStrokeActionSeconds = FMath::Max(GuideStrokeActionSeconds - DeltaSeconds, 0.0f);
@@ -1033,43 +1087,26 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
         ? ERaftSimCrewAvatarAction::ForwardStroke
         : ERaftSimCrewAvatarAction::BackStroke;
     GuideStrokeActionSeconds = 1.0f;
-    // The guide's call is the crew's stroke; the crew cadence is also the
-    // SOLE propulsion for the tap when it takes ownership. Stacking the
-    // guide's direct impulse on top made every tap two physical strokes
-    // with one visible animation (2026-08-10: "a left turn and right turn
-    // action still results in two strokes"). The direct impulse remains
-    // only when an explicit command owns the crew, as the guide's own
-    // stern correction over the crew's standing order.
-    const ERaftSimCrewCommand CadenceCommand = Scale >= 0.0f
-        ? ERaftSimCrewCommand::AllForward
-        : ERaftSimCrewCommand::AllBackward;
-    bool bCadenceTookStroke = false;
-    if (ActiveCrewCommand == ERaftSimCrewCommand::Rest ||
-        bCrewCommandFromGuidePaddle)
-    {
-        IssueCrewCommand(CadenceCommand);
-        bCrewCommandFromGuidePaddle = true;
-        bCadenceTookStroke = true;
-    }
-    GuidePaddleCommandSeconds = 0.75f;
+    // This is the GUIDE'S OWN blade, never a crew command: "when the paddle
+    // command is given to the crew the guide should not also paddle, the
+    // guide needs separate controls" (2026-08-11). Crew propulsion lives
+    // exclusively on the explicit command channel (number keys / D-pad,
+    // IssueCrewCommand); W/S drive one stern paddler's worth of power.
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f crew=%d"),
-        Scale, Shortfall, bCadenceTookStroke ? 1 : 0);
-    if (!bCadenceTookStroke)
+        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f"),
+        Scale, Shortfall);
+    const FVector LinearImpulseNs = GetActorForwardVector() *
+        (PaddleStrokeImpulseNs * GuideSoloStrokeScale * Scale * Shortfall);
+    // Off-center strokes also yaw the raft a little.
+    FVector AngularImpulseNms = FVector::ZeroVector;
+    if (Side != ERaftSimPaddleSide::Both)
     {
-        const FVector LinearImpulseNs = GetActorForwardVector() *
-            (PaddleStrokeImpulseNs * Scale * Shortfall);
-        // Off-center strokes also yaw the raft a little.
-        FVector AngularImpulseNms = FVector::ZeroVector;
-        if (Side != ERaftSimPaddleSide::Both)
-        {
-            const float LeverArmM = 0.9f;
-            const float SideSign = (Side == ERaftSimPaddleSide::Port) ? -1.0f : 1.0f;
-            AngularImpulseNms.Z =
-                -SideSign * Scale * PaddleStrokeImpulseNs * LeverArmM * 0.35f;
-        }
-        QueueDirectStrokeImpulse(LinearImpulseNs, AngularImpulseNms);
+        const float LeverArmM = 0.9f;
+        const float SideSign = (Side == ERaftSimPaddleSide::Port) ? -1.0f : 1.0f;
+        AngularImpulseNms.Z = -SideSign * Scale * PaddleStrokeImpulseNs *
+            GuideSoloStrokeScale * LeverArmM * 0.35f;
     }
+    QueueDirectStrokeImpulse(LinearImpulseNs, AngularImpulseNms);
 }
 
 void ARaftSimRaftActor::QueueDirectStrokeImpulse(
@@ -1100,33 +1137,17 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
         ? ERaftSimCrewAvatarAction::TurnRight
         : ERaftSimCrewAvatarAction::TurnLeft;
     GuideStrokeActionSeconds = 1.0f;
-    // Turn cadence drives the crew's opposing-sides pivot strokes under
-    // the same ownership rules as W/S, and — like W/S — it is the sole
-    // pivot impulse for the tap when it takes ownership: stacking the
-    // guide's direct yaw kick made one tap read as two strokes
-    // (2026-08-10: "a left turn and right turn action still results in
-    // two strokes, even though you only see one paddle animation").
-    const ERaftSimCrewCommand TurnCommand = Scale > 0.0f
-        ? ERaftSimCrewCommand::TurnRight
-        : ERaftSimCrewCommand::TurnLeft;
-    bool bCadenceTookStroke = false;
-    if (ActiveCrewCommand == ERaftSimCrewCommand::Rest ||
-        bCrewCommandFromGuidePaddle)
-    {
-        IssueCrewCommand(TurnCommand);
-        bCrewCommandFromGuidePaddle = true;
-        bCadenceTookStroke = true;
-    }
-    GuidePaddleCommandSeconds = 0.75f;
+    // The guide's steering stroke — a stern draw/pry, HIS paddle, not a
+    // crew command ("the guide is using his paddle to steer, not paddle
+    // with the crew", 2026-08-11). Full yaw authority, un-scaled by
+    // GuideSoloStrokeScale: the stern lever arm is precisely where a raft
+    // guide's turning power comes from, and it must stay decisive even
+    // while the crew holds an all-forward order.
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim guide turn: scale=%.2f crew=%d"),
-        Scale, bCadenceTookStroke ? 1 : 0);
-    if (!bCadenceTookStroke)
-    {
-        QueueDirectStrokeImpulse(
-            FVector::ZeroVector,
-            FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
-    }
+        TEXT("RaftSim guide steer: scale=%.2f"), Scale);
+    QueueDirectStrokeImpulse(
+        FVector::ZeroVector,
+        FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
 }
 
 void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)

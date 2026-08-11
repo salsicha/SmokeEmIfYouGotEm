@@ -458,10 +458,12 @@ private:
     ERaftSimCrewAvatarAction GuideStrokeAction;
     float GuideStrokeActionSeconds = 0.0f;
 
-    // W/S cadence drives the crew (AllForward/AllBackward) while strokes
-    // keep coming; expires back to Rest unless an explicit command owns it.
-    float GuidePaddleCommandSeconds = 0.0f;
-    bool bCrewCommandFromGuidePaddle = false;
+    // The guide's W/S power stroke is one stern paddler, not the whole
+    // boat: PaddleStrokeImpulseNs was originally sized as full-crew
+    // propulsion back when W was the only input. Crew power now comes
+    // solely from explicit commands; steering strokes stay un-scaled
+    // (stern leverage is the guide's real authority).
+    float GuideSoloStrokeScale = 0.35f;
 
     // Direct (non-cadence) stroke impulses wait for the guide pose's catch
     // (~0.29 of the stroke cycle) so the boat never moves before a blade
@@ -473,6 +475,8 @@ private:
     float GetPaddlePropulsionShortfall(const FVector& StrokeDirection) const;
     void QueueDirectStrokeImpulse(
         const FVector& LinearImpulseNs, const FVector& AngularImpulseNms);
+    /** Highest rendered raft-surface Z (actor frame) under a seat station. */
+    float ComputeSeatTubeTopZCm(const FVector& SeatCm, bool& bOutFound) const;
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
     int32 HighSideResponseCount = 0;

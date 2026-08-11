@@ -41,16 +41,24 @@ interactive loads should be quick.
 
 ## Controls (from the generated IMC_RaftSimDefault)
 
+Guide and crew are fully separate channels (2026-08-11): W/S/A/D move
+ONLY the guide's own paddle — one stern paddler's power, full steering
+authority — and never make the crew stroke. The crew paddles only on
+called commands (number keys / D-pad), and a called command holds — the
+crew keeps its cadence until Stop or a different call. Steering strokes
+(A/D) work over a standing crew command, which is the real technique:
+call "all forward", then steer with your own blade.
+
 | Action | Keyboard/Mouse | Gamepad |
 |---|---|---|
-| Guide paddle forward / back | W / S | Left stick Y |
-| Guide draw left / right | A / D | Left stick X |
+| Guide's own stroke, forward / back | W / S | Left stick Y |
+| Guide steering stroke (stern draw/pry), left / right | A / D | Left stick X |
 | Look | Mouse | Right stick |
-| Crew: All Forward | 1 | D-pad up |
-| Crew: All Back | 2 | D-pad down |
-| Crew: Turn Left | 3 | D-pad left |
-| Crew: Turn Right | 4 | D-pad right |
-| Crew: Stop | 5 | Y / Triangle |
+| Crew command: All Forward (holds until Stop) | 1 | D-pad up |
+| Crew command: All Back (holds until Stop) | 2 | D-pad down |
+| Crew command: Turn Left (holds until Stop) | 3 | D-pad left |
+| Crew command: Turn Right (holds until Stop) | 4 | D-pad right |
+| Crew command: Stop (crew rests) | 5 | Y / Triangle |
 | High Side (also re-right when capsized) | Space | X / Square |
 | Rescue: select swimmer | Mouse wheel | Shoulder buttons |
 | Rescue: reach grab (close) | E | A / Cross |

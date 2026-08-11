@@ -135,6 +135,13 @@ public:
      */
     FVector GetPoseHeadWorldLocationCm() const;
 
+    /**
+     * Actor-local Z of the lowest point of the seated pelvis (glute
+     * underside). Seat placement uses it to rest the body ON a surface
+     * instead of trusting a hand-tuned seat height.
+     */
+    float GetSeatedPelvisBottomLocalZCm() const;
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Appearance")
     void ConfigureAppearance(int32 InVariantIndex, int32 InSeatSide, bool bInGuide);
 

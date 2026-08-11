@@ -1748,6 +1748,17 @@ FVector ARaftSimCrewAvatarActor::GetBodyProportionScale() const
     return Profiles[FMath::Clamp(VariantIndex, 0, ProfileCount - 1)];
 }
 
+float ARaftSimCrewAvatarActor::GetSeatedPelvisBottomLocalZCm() const
+{
+    // Every seated pose keeps the solved hip centre at local Z = 40
+    // (URaftSimCrewAvatarPoseLibrary::EvaluatePose base skeleton); the
+    // pelvis ellipsoid spans kProductionSeatedPelvisReferenceExtentCm.Z
+    // scaled by this identity's stature below that centre.
+    constexpr float SeatedHipCenterLocalZCm = 40.0f;
+    return SeatedHipCenterLocalZCm -
+        kProductionSeatedPelvisReferenceExtentCm.Z * GetBodyProportionScale().Z;
+}
+
 FLinearColor ARaftSimCrewAvatarActor::GetSkinTone() const
 {
     // Linear-space outdoor skin references. These stay deliberately varied but
