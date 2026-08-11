@@ -463,7 +463,16 @@ private:
     float GuidePaddleCommandSeconds = 0.0f;
     bool bCrewCommandFromGuidePaddle = false;
 
+    // Direct (non-cadence) stroke impulses wait for the guide pose's catch
+    // (~0.29 of the stroke cycle) so the boat never moves before a blade
+    // visually reaches the water.
+    FVector PendingDirectLinearImpulseNs = FVector::ZeroVector;
+    FVector PendingDirectAngularImpulseNms = FVector::ZeroVector;
+    float DirectImpulseDelaySeconds = 0.0f;
+
     float GetPaddlePropulsionShortfall(const FVector& StrokeDirection) const;
+    void QueueDirectStrokeImpulse(
+        const FVector& LinearImpulseNs, const FVector& AngularImpulseNms);
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
     int32 HighSideResponseCount = 0;
