@@ -20,15 +20,30 @@ namespace
 
 UWorld* GetActiveGameWorld()
 {
+    // Resolve by map identity, never by context order: sequential automation
+    // tests leave the previous test's world alive until GC, and taking the
+    // first live game world here measured M7's river raft as the "tank"
+    // (2026-08-11: 0.39 kg of river overwash and 2.57 m/s of current carry
+    // failed the calm-water asserts while the real tank raft sat parked at
+    // origin — a standalone 150 s tank run showed speed 0.000 throughout).
+    // Every newer test in this module already selects its own world; this
+    // P1-era helper was the last first-world lookup.
+    UWorld* NewestGameWorld = nullptr;
     for (const FWorldContext& Context : GEngine->GetWorldContexts())
     {
-        if (Context.World() != nullptr &&
-            (Context.WorldType == EWorldType::PIE || Context.WorldType == EWorldType::Game))
+        UWorld* World = Context.World();
+        if (World == nullptr ||
+            (Context.WorldType != EWorldType::PIE && Context.WorldType != EWorldType::Game))
         {
-            return Context.World();
+            continue;
         }
+        if (World->GetMapName().Contains(TEXT("L_RaftSimTestTank")))
+        {
+            return World;
+        }
+        NewestGameWorld = World;
     }
-    return nullptr;
+    return NewestGameWorld;
 }
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
@@ -131,7 +146,12 @@ bool FRaftSimStrokeAndMeasureCommand::Update()
 
 bool FRaftSimTestTankRaftFloatsAndPaddlesTest::RunTest(const FString&)
 {
-    AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
+    // Force a fresh world even when the tank map is already loaded: M7's
+    // audio test drives this same map and leaves the raft under a standing
+    // AllForward cadence (2026-08-11: P1 after M7 measured that raft at
+    // 2.44 m/s with 0.32 kg of its own bow-wave overwash and failed the
+    // calm-water asserts; P1 alone was green all along).
+    AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"), /*bForceReload=*/true);
     // Let buoyancy settle from the 40 cm spawn drop, then assert + stroke.
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertRaftSettledCommand(this));

@@ -340,3 +340,40 @@ renders as glass (the same render/physics divergence class the coupling
 exists to close, inverted). The live window now carries an explicit
 travelling-wave-presentation flag: cooked river bands couple, tanks
 never do.
+
+Round 9 verification addendum: seat measurement vindicated the approach
+immediately — the production raft's real tube top sits at Z=39.7 cm in
+the hull frame where the derivation-from-constants chain predicted ~11,
+so paddlers dropped ~9 cm onto the tubes and the guide's hand-tuned 30
+was already correct (measured 29.8). P1 after the coupling gate:
+retained splash load at the 4 s settle check fell 0.52 -> 0.39 kg (the
+wave-slosh share is gone) and drains to zero by test end, so the
+remaining red is a drain-rate-vs-contract question. The same run also
+exposed a genuine open defect: drift telemetry shows the hull at
+2.57 m/s on dead-still water before the test's two strokes fire
+(stroke-time shortfall 0.26 proves ~2.2 m/s pre-stroke). Something in
+the water/support stack self-propels the hull on flat water; the river
+current has been masking it. Logged as the next physics round, with P1
+as its tripwire. M5.CrewAvatarPoseProduction's failures are all
+texture-platform-data reads that return size 0 under -nullrhi (asset
+gate needs a real RHI on Linux); no pose or seating assert failed.
+
+Round 9 resolution (2026-08-11, supersedes the addendum's "open physics
+defect"): the still-water self-propulsion was not real, and neither was
+the drain-rate question. A standalone 150 s tank run shows the raft
+parked at origin the whole time (speed 0.000, retained 0 kg, draft
+-21.5 cm constant), and P1 run alone in a fresh session passes as-is.
+The P1 reds were STALE TEST STATE, in two layers. First, P1's P1-era
+GetActiveGameWorld() took the first live game world instead of its own
+(every newer test in the module already resolves its own world; the
+tank test now resolves by map identity with newest-world fallback).
+Second — the actual mechanism in these runs — M7.ProductionAudio drives
+the SAME tank map: it strokes the raft and issues AllForward to open
+the callout envelope, and never rests it; AutomationOpenMap skips
+reloading an already-current map, so P1 inherited M7's raft still
+driving at the propulsion-governor cap (2.44-2.57 m/s, shortfall 0.26
+against the 3 m/s ceiling) and shipping 0.32-0.39 kg of its own
+bow-wave overwash. Both layers fixed: P1 force-reloads the tank map
+(bForceReload), and M7 issues Rest after its audio assert so it leaves
+a calm world for whoever follows. Calm-water physics is clean: no
+phantom forces, no slosh, no slow drain.
