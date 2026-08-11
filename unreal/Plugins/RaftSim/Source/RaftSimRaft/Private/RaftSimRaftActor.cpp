@@ -1017,45 +1017,48 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
     // Discrete per-stroke diagnostic: settles "back paddle doesn't seem to
     // be implemented" style reports from the session log alone (input
     // mapping, sign, and governor factor all visible per stroke).
-    UE_LOG(LogTemp, Display,
-        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f"),
-        Scale, Shortfall);
-    const FVector LinearImpulseNs = GetActorForwardVector() *
-        (PaddleStrokeImpulseNs * Scale * Shortfall);
-
-    // Off-center strokes also yaw the raft a little.
-    FVector AngularImpulseNms = FVector::ZeroVector;
-    if (Side != ERaftSimPaddleSide::Both)
-    {
-        const float LeverArmM = 0.9f;
-        const float SideSign = (Side == ERaftSimPaddleSide::Port) ? -1.0f : 1.0f;
-        AngularImpulseNms.Z = -SideSign * Scale * PaddleStrokeImpulseNs * LeverArmM * 0.35f;
-    }
-    RaftAdapter->AddExternalImpulse(LinearImpulseNs, AngularImpulseNms);
     ++PaddleStrokeCount;
     GuideStrokeAction = Scale >= 0.0f
         ? ERaftSimCrewAvatarAction::ForwardStroke
         : ERaftSimCrewAvatarAction::BackStroke;
     GuideStrokeActionSeconds = 1.0f;
-    // The guide's call is the crew's stroke: W/S cadence puts the whole
-    // crew on forward/back paddle while strokes keep coming, and they rest
-    // when the guide stops — unless an explicit command (number keys /
-    // wheel) owns the crew (2026-08-10 playtest: "the crew are the ones
-    // who are supposed to paddle"). The 0.75 s window is shorter than the
-    // 0.8 s crew cadence, so a single tap is exactly ONE crew stroke
-    // (the former 1.4 s window fired two — "the crew paddles twice when
-    // you give one turn command"); holding refreshes the window through
-    // the 0.45 s stroke cooldown for continuous paddling.
+    // The guide's call is the crew's stroke; the crew cadence is also the
+    // SOLE propulsion for the tap when it takes ownership. Stacking the
+    // guide's direct impulse on top made every tap two physical strokes
+    // with one visible animation (2026-08-10: "a left turn and right turn
+    // action still results in two strokes"). The direct impulse remains
+    // only when an explicit command owns the crew, as the guide's own
+    // stern correction over the crew's standing order.
     const ERaftSimCrewCommand CadenceCommand = Scale >= 0.0f
         ? ERaftSimCrewCommand::AllForward
         : ERaftSimCrewCommand::AllBackward;
+    bool bCadenceTookStroke = false;
     if (ActiveCrewCommand == ERaftSimCrewCommand::Rest ||
         bCrewCommandFromGuidePaddle)
     {
         IssueCrewCommand(CadenceCommand);
         bCrewCommandFromGuidePaddle = true;
+        bCadenceTookStroke = true;
     }
     GuidePaddleCommandSeconds = 0.75f;
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim guide stroke: scale=%.2f shortfall=%.2f crew=%d"),
+        Scale, Shortfall, bCadenceTookStroke ? 1 : 0);
+    if (!bCadenceTookStroke)
+    {
+        const FVector LinearImpulseNs = GetActorForwardVector() *
+            (PaddleStrokeImpulseNs * Scale * Shortfall);
+        // Off-center strokes also yaw the raft a little.
+        FVector AngularImpulseNms = FVector::ZeroVector;
+        if (Side != ERaftSimPaddleSide::Both)
+        {
+            const float LeverArmM = 0.9f;
+            const float SideSign = (Side == ERaftSimPaddleSide::Port) ? -1.0f : 1.0f;
+            AngularImpulseNms.Z =
+                -SideSign * Scale * PaddleStrokeImpulseNs * LeverArmM * 0.35f;
+        }
+        RaftAdapter->AddExternalImpulse(LinearImpulseNs, AngularImpulseNms);
+    }
 }
 
 void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
@@ -1065,27 +1068,35 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
         return;
     }
     const float Scale = FMath::Clamp(TurnScale, -1.0f, 1.0f);
-    RaftAdapter->AddExternalImpulse(
-        FVector::ZeroVector, FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
     ++PaddleStrokeCount;
     GuideStrokeAction = Scale > 0.0f
         ? ERaftSimCrewAvatarAction::TurnRight
         : ERaftSimCrewAvatarAction::TurnLeft;
     GuideStrokeActionSeconds = 1.0f;
-    // Turn cadence drives the crew's opposing-sides pivot strokes, same
-    // ownership rules as W/S (2026-08-10 playtest: "left turn and right
-    // turn commands don't show the crew animating" — A/D only ever moved
-    // the guide).
+    // Turn cadence drives the crew's opposing-sides pivot strokes under
+    // the same ownership rules as W/S, and — like W/S — it is the sole
+    // pivot impulse for the tap when it takes ownership: stacking the
+    // guide's direct yaw kick made one tap read as two strokes
+    // (2026-08-10: "a left turn and right turn action still results in
+    // two strokes, even though you only see one paddle animation").
     const ERaftSimCrewCommand TurnCommand = Scale > 0.0f
         ? ERaftSimCrewCommand::TurnRight
         : ERaftSimCrewCommand::TurnLeft;
+    bool bCadenceTookStroke = false;
     if (ActiveCrewCommand == ERaftSimCrewCommand::Rest ||
         bCrewCommandFromGuidePaddle)
     {
         IssueCrewCommand(TurnCommand);
         bCrewCommandFromGuidePaddle = true;
+        bCadenceTookStroke = true;
     }
     GuidePaddleCommandSeconds = 0.75f;
+    if (!bCadenceTookStroke)
+    {
+        RaftAdapter->AddExternalImpulse(
+            FVector::ZeroVector,
+            FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
+    }
 }
 
 void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)
