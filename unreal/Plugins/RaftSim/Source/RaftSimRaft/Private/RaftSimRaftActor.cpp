@@ -889,6 +889,17 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         default:
             break;
     }
+    if (DirectImpulseDelaySeconds > 0.0f)
+    {
+        DirectImpulseDelaySeconds -= DeltaSeconds;
+        if (DirectImpulseDelaySeconds <= 0.0f && RaftAdapter != nullptr)
+        {
+            RaftAdapter->AddExternalImpulse(
+                PendingDirectLinearImpulseNs, PendingDirectAngularImpulseNms);
+            PendingDirectLinearImpulseNs = FVector::ZeroVector;
+            PendingDirectAngularImpulseNms = FVector::ZeroVector;
+        }
+    }
     if (bCrewCommandFromGuidePaddle)
     {
         GuidePaddleCommandSeconds -= DeltaSeconds;
@@ -1057,7 +1068,23 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
             AngularImpulseNms.Z =
                 -SideSign * Scale * PaddleStrokeImpulseNs * LeverArmM * 0.35f;
         }
-        RaftAdapter->AddExternalImpulse(LinearImpulseNs, AngularImpulseNms);
+        QueueDirectStrokeImpulse(LinearImpulseNs, AngularImpulseNms);
+    }
+}
+
+void ARaftSimRaftActor::QueueDirectStrokeImpulse(
+    const FVector& LinearImpulseNs, const FVector& AngularImpulseNms)
+{
+    // Hold the kick until the guide pose's catch: instantaneous impulses
+    // at animation start made the boat move before any blade visually
+    // reached the water (2026-08-11: "the boat turns but the paddle
+    // animation comes after the motion"). 0.29 matches the crew cadence's
+    // PowerImpulsePhase.
+    PendingDirectLinearImpulseNs += LinearImpulseNs;
+    PendingDirectAngularImpulseNms += AngularImpulseNms;
+    if (DirectImpulseDelaySeconds <= 0.0f)
+    {
+        DirectImpulseDelaySeconds = CrewStrokeIntervalSeconds * 0.29f;
     }
 }
 
@@ -1091,9 +1118,12 @@ void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
         bCadenceTookStroke = true;
     }
     GuidePaddleCommandSeconds = 0.75f;
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim guide turn: scale=%.2f crew=%d"),
+        Scale, bCadenceTookStroke ? 1 : 0);
     if (!bCadenceTookStroke)
     {
-        RaftAdapter->AddExternalImpulse(
+        QueueDirectStrokeImpulse(
             FVector::ZeroVector,
             FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
     }

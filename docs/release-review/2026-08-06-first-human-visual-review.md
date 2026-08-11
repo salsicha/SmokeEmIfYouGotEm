@@ -274,3 +274,22 @@ editor session on this machine (lighting is expected to behave as on the
 Mac) to validate the froth/interface changes visually and re-capture; the
 South Fork committed-capture parity question (builder state vs evolved
 assets) is queued behind that.
+
+Round 7 (2026-08-10) — stroke-feel series. Three reports in quick
+succession, all in the guide-input path. (a) "one turn command gives two
+strokes": ApplyTurnStroke fired its own yaw impulse and also started a
+crew cadence that immediately took a stroke of its own; restructured so
+whichever path owns the stroke is the only one that impulses
+(bCadenceTookStroke), one tap = one stroke everywhere. (b) "can't look
+around while holding a paddle key": not reproducible in the input map on
+inspection; per-second look-axis instrumentation ("RaftSim look:" log
+line) shipped so the next session localizes it to either the Enhanced
+Input layer (no lines while key held) or the view pipeline (lines
+present, view fixed). (c) "the boat turns before the paddle animation":
+the crew-cadence path already phase-locked its impulse to the pose catch
+(PowerImpulsePhase 0.29 of the 0.8 s cycle), but the direct branch —
+used whenever no crew avatar owns the stroke — kicked the hull the same
+frame the pose began, ~0.23 s before the blade visually reached water.
+Direct impulses now queue through the same catch delay
+(QueueDirectStrokeImpulse, fired from Tick), so blade-in-water precedes
+hull response on every input path.
