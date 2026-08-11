@@ -768,6 +768,9 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     Window->CellYM = static_cast<float>(Dy);
     Window->SeedWetFractionValue =
         static_cast<double>(SeedWetCells) / static_cast<double>(Nx * Ny);
+    // Cooked river bands are rendered by the band water materials, whose
+    // WPO animates the travelling bake wave; tanks stay flat-rendered.
+    Window->bHasTravelingWavePresentation = true;
     return Window;
 }
 

@@ -96,6 +96,18 @@ public:
     bool HasNonFiniteState() const;
 
     /**
+     * True when the rendered surface above this window carries the
+     * travelling bake-wave WPO (cooked river bands). The adapter couples
+     * the presentation wave into sampled heights only then; a flat tank
+     * renders a flat sheet, and coupling a wave the camera cannot see is
+     * exactly the render/physics divergence the coupling exists to close.
+     */
+    bool HasTravelingWavePresentation() const
+    {
+        return bHasTravelingWavePresentation;
+    }
+
+    /**
      * Copy depth and velocity from every world-space cell shared with the
      * previous window, preserve its solver clock, and return the number of
      * transferred cells.  Zero means the windows do not overlap.
@@ -113,5 +125,6 @@ private:
     /** Datum removed from cooked bed/stage fields before solving, restored when sampling. */
     double ElevationDatumM = 0.0;
     double SeedWetFractionValue = 1.0;
+    bool bHasTravelingWavePresentation = false;
     uint64 StepCounter = 0;
 };

@@ -293,3 +293,50 @@ frame the pose began, ~0.23 s before the blade visually reached water.
 Direct impulses now queue through the same catch delay
 (QueueDirectStrokeImpulse, fired from Tick), so blade-in-water precedes
 hull response on every input path.
+
+Round 8 (2026-08-11) — "when the paddle command is given to the crew the
+guide should not also paddle; the guide needs separate controls since
+the guide is using his paddle to steer". Control-scheme split, and the
+right end state for a stern-guided paddle raft. Until now W/S/A/D did
+double duty: they issued crew cadence commands AND animated/impulsed the
+guide, a leftover from when the guide's blade was the boat's only
+propulsion. Now the channels are fully separate: the number keys /
+D-pad are the only crew-propulsion channel (All Forward / All Back /
+Turn Left / Turn Right / Stop — and a called command now holds its
+cadence until Stop or a new call, like a real standing order), while
+W/S/A/D drive only the guide's own paddle. The guide's W/S power stroke
+is scaled to one stern paddler (GuideSoloStrokeScale 0.35 of the old
+full-boat impulse, still governed by the propulsion shortfall); A/D
+stern draw/pry steering keeps full un-scaled yaw authority — stern
+leverage is precisely the guide's job — and works over a standing crew
+order, so "call all-forward, steer with your own blade" is now the
+actual technique. Guide-paddle cadence ownership
+(bCrewCommandFromGuidePaddle, the 0.75 s expiry) is deleted outright.
+All guide impulses still queue through the pose-catch delay from Round
+7. Controls table updated in the playtest setup doc.
+
+Round 9 (2026-08-11) — "the crew are still not sitting on the boat,
+their butts float above the boat" (second report; the 2026-08-10 8 cm
+seat drop was not enough). Root cause of the recurrence: seat heights
+were hand-tuned guesses layered over two hidden offsets — the RaftVisual
+component rides 15.4 cm BELOW the hull frame (-TubeRadius*0.55), and the
+seated pelvis's underside rides ~25 cm ABOVE the avatar origin (solved
+hip centre at local Z=40, pelvis half-height 15 x stature). Net effect:
+paddler glutes hovered ~35 cm over the rendered tube crown. Fix removes
+the guesswork permanently: at attach time the raft scans the actual
+uploaded visual mesh sections in a glute-sized column under each seat
+station (production extraction and procedural fallback both covered,
+component offset folded in), and places the avatar so the pelvis
+underside rests on the measured tube top with a 1.5 cm compression
+sink. Per-seat "RaftSim seat:" log lines record measured tube top and
+final seat Z for session-log verification. Guide camera follows
+automatically (it already rides the posed head).
+
+Also this round: finally running the P1 tank gate against the new
+controls caught a latent regression from the wave-coupling round — the
+presentation travelling wave was being added to EVERY live water field,
+so the dead-flat test tank sloshed 0.52 kg of water aboard a surface it
+renders as glass (the same render/physics divergence class the coupling
+exists to close, inverted). The live window now carries an explicit
+travelling-wave-presentation flag: cooked river bands couple, tanks
+never do.

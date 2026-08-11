@@ -207,7 +207,7 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
         if (Live.bValid)
         {
             OutSample.SurfaceHeightMeters = Live.SurfaceHeightM - RiverVerticalDatumM;
-            if (Live.bWet &&
+            if (Live.bWet && LiveWindow->HasTravelingWavePresentation() &&
                 CVarRaftSimPresentationWaveCoupling.GetValueOnAnyThread() != 0)
             {
                 const UWorld* World = GetWorld();
