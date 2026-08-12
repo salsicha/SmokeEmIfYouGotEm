@@ -37,6 +37,10 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     bHasLastWorldToRiverQuery = false;
     RiverVerticalDatumM = 0.0f;
     RiverCoordinateMapPath.Reset();
+    bRaftSupportSurfaceEnabled = false;
+    RaftSupportSurfaceSmoothingStrength = 0.0f;
+    RaftSupportStandingWaveScale = 0.0f;
+    RaftSupportHydraulicReliefScale = 0.0f;
 
     bool bManifestReady = !Config.bRequireAcceptedReportManifest;
     if (!Config.AcceptedReportSetManifestPath.IsEmpty())
@@ -142,6 +146,9 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
 
 namespace
 {
+constexpr float kCoupledSurfaceGravity = 9.80665f;
+constexpr float kCoupledFoamFroudeStart = 0.72f;
+constexpr float kCoupledFoamFroudeRange = 1.18f;
 // Mirror of the render-side travelling wave. The band bake
 // (RaftSimEditorSouthForkFullReach.cpp) plus the transmission material's
 // RaftSimTravelingBakeWaveWPO block present this moving field; coupling it
@@ -175,9 +182,201 @@ float PresentationTravelingWaveM(
 
 static TAutoConsoleVariable<int32> CVarRaftSimPresentationWaveCoupling(
     TEXT("RaftSim.Water.PresentationWaveCoupling"), 1,
-    TEXT("1: sampled water heights include the rendered travelling-wave "
-         "field so the raft rides what the camera sees; 0: matched-baseline "
-         "solver heights only."));
+    TEXT("1: sampled water heights include the rendered travelling wave, and "
+         "rigid support also follows the shared standing-wave and hydraulic-"
+         "relief surface; 0: matched-baseline solver heights only."));
+}
+FRaftSimWaterStandingWave URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWave(
+    const FVector2D& RiverCoordinatesMeters,
+    float SpeedMetersPerSecond,
+    float DepthMeters)
+{
+    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
+    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
+    const float Froude =
+        SafeSpeed / FMath::Sqrt(kCoupledSurfaceGravity * SafeDepth);
+    const float PresentationFoam = FMath::Clamp(
+        (Froude - kCoupledFoamFroudeStart) / kCoupledFoamFroudeRange,
+        0.0f,
+        1.0f);
+    const float SpeedNorm = FMath::Clamp(SafeSpeed / 8.0f, 0.0f, 1.0f);
+    const float HydraulicEnergy = FMath::Clamp(
+        PresentationFoam * 0.72f + SpeedNorm * 0.48f,
+        0.0f,
+        1.0f);
+
+    FRaftSimWaterStandingWave Result;
+    auto AccumulateBand = [&Result](
+                              float AmplitudeMeters,
+                              float Envelope,
+                              float EnvelopeStationDerivative,
+                              float EnvelopeLateralDerivative,
+                              float Phase,
+                              float PhaseStationDerivative,
+                              float PhaseLateralDerivative)
+    {
+        const float SinPhase = FMath::Sin(Phase);
+        const float CosPhase = FMath::Cos(Phase);
+        Result.DisplacementMeters +=
+            AmplitudeMeters * Envelope * SinPhase;
+        Result.StationSlope +=
+            AmplitudeMeters *
+            (EnvelopeStationDerivative * SinPhase +
+                Envelope * CosPhase * PhaseStationDerivative);
+        Result.LateralSlope +=
+            AmplitudeMeters *
+            (EnvelopeLateralDerivative * SinPhase +
+                Envelope * CosPhase * PhaseLateralDerivative);
+    };
+
+    const float StationM = RiverCoordinatesMeters.X;
+    const float LateralM = RiverCoordinatesMeters.Y;
+    const float CalmWarpA = StationM * 0.11f - LateralM * 0.19f;
+    const float CalmPhaseA =
+        StationM * 0.73f + LateralM * 0.27f +
+        0.16f * FMath::Sin(CalmWarpA);
+    AccumulateBand(
+        0.011f, 1.0f, 0.0f, 0.0f, CalmPhaseA,
+        0.73f + 0.16f * 0.11f * FMath::Cos(CalmWarpA),
+        0.27f - 0.16f * 0.19f * FMath::Cos(CalmWarpA));
+
+    const float CalmWarpB = StationM * 0.23f + LateralM * 0.13f;
+    const float CalmPhaseB =
+        StationM * 1.21f - LateralM * 0.33f +
+        0.10f * FMath::Sin(CalmWarpB);
+    AccumulateBand(
+        0.007f, 1.0f, 0.0f, 0.0f, CalmPhaseB,
+        1.21f + 0.10f * 0.23f * FMath::Cos(CalmWarpB),
+        -0.33f + 0.10f * 0.13f * FMath::Cos(CalmWarpB));
+
+    const float PacketWarp = StationM * 0.013f - LateralM * 0.091f;
+    const float PacketPhase =
+        StationM * 0.041f + LateralM * 0.067f +
+        0.60f * FMath::Sin(PacketWarp);
+    const float PacketPhaseStationDerivative =
+        0.041f + 0.60f * 0.013f * FMath::Cos(PacketWarp);
+    const float PacketPhaseLateralDerivative =
+        0.067f - 0.60f * 0.091f * FMath::Cos(PacketWarp);
+    const float PacketSignal = 0.5f + 0.5f * FMath::Sin(PacketPhase);
+    const float PacketSignalStationDerivative =
+        0.5f * FMath::Cos(PacketPhase) * PacketPhaseStationDerivative;
+    const float PacketSignalLateralDerivative =
+        0.5f * FMath::Cos(PacketPhase) * PacketPhaseLateralDerivative;
+    const float PrimaryPacket =
+        0.18f + 0.82f * PacketSignal * PacketSignal;
+    const float PrimaryPacketStationDerivative =
+        1.64f * PacketSignal * PacketSignalStationDerivative;
+    const float PrimaryPacketLateralDerivative =
+        1.64f * PacketSignal * PacketSignalLateralDerivative;
+    const float SecondaryPacket = 1.0f - 0.45f * PacketSignal;
+    const float SecondaryPacketStationDerivative =
+        -0.45f * PacketSignalStationDerivative;
+    const float SecondaryPacketLateralDerivative =
+        -0.45f * PacketSignalLateralDerivative;
+
+    const float PrimaryWarpA = StationM * 0.063f - LateralM * 0.14f;
+    const float PrimaryWarpB = StationM * 0.017f + LateralM * 0.23f;
+    const float PrimaryPhase =
+        StationM * 0.58f + LateralM * 0.09f +
+        0.35f * FMath::Sin(PrimaryWarpA) +
+        0.22f * FMath::Sin(PrimaryWarpB);
+    AccumulateBand(
+        0.065f,
+        HydraulicEnergy * PrimaryPacket,
+        HydraulicEnergy * PrimaryPacketStationDerivative,
+        HydraulicEnergy * PrimaryPacketLateralDerivative,
+        PrimaryPhase,
+        0.58f + 0.35f * 0.063f * FMath::Cos(PrimaryWarpA) +
+            0.22f * 0.017f * FMath::Cos(PrimaryWarpB),
+        0.09f - 0.35f * 0.14f * FMath::Cos(PrimaryWarpA) +
+            0.22f * 0.23f * FMath::Cos(PrimaryWarpB));
+
+    const float SecondaryWarp = StationM * 0.033f + LateralM * 0.17f;
+    const float SecondaryPhase =
+        StationM * 1.03f - LateralM * 0.12f +
+        0.28f * FMath::Sin(SecondaryWarp);
+    AccumulateBand(
+        0.043f,
+        HydraulicEnergy * SecondaryPacket,
+        HydraulicEnergy * SecondaryPacketStationDerivative,
+        HydraulicEnergy * SecondaryPacketLateralDerivative,
+        SecondaryPhase,
+        1.03f + 0.28f * 0.033f * FMath::Cos(SecondaryWarp),
+        -0.12f + 0.28f * 0.17f * FMath::Cos(SecondaryWarp));
+
+    const float DetailWarp = StationM * 0.12f - LateralM * 0.33f;
+    const float DetailPhase =
+        StationM * 1.47f + LateralM * 0.21f +
+        0.16f * FMath::Sin(DetailWarp);
+    AccumulateBand(
+        0.026f, HydraulicEnergy, 0.0f, 0.0f, DetailPhase,
+        1.47f + 0.16f * 0.12f * FMath::Cos(DetailWarp),
+        0.21f - 0.16f * 0.33f * FMath::Cos(DetailWarp));
+
+    const float CrossWarp = StationM * 0.027f + LateralM * 0.19f;
+    const float CrossPhase =
+        StationM * 0.36f - LateralM * 0.31f +
+        0.25f * FMath::Sin(CrossWarp);
+    AccumulateBand(
+        0.016f, HydraulicEnergy, 0.0f, 0.0f, CrossPhase,
+        0.36f + 0.25f * 0.027f * FMath::Cos(CrossWarp),
+        -0.31f + 0.25f * 0.19f * FMath::Cos(CrossWarp));
+    return Result;
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
+    float CenterSurfaceHeightMeters,
+    float UpstreamFarSurfaceHeightMeters,
+    float UpstreamNearSurfaceHeightMeters,
+    float DownstreamNearSurfaceHeightMeters,
+    float DownstreamFarSurfaceHeightMeters,
+    float SpeedMetersPerSecond,
+    float DepthMeters)
+{
+    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
+    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
+    const float Froude =
+        SafeSpeed / FMath::Sqrt(kCoupledSurfaceGravity * SafeDepth);
+    const float NearCriticalActivation = FMath::Clamp(
+        (Froude - 0.55f) / 0.85f, 0.0f, 1.0f);
+    const float SpeedActivation =
+        FMath::Clamp(SafeSpeed / 4.0f, 0.0f, 1.0f);
+    const float HydraulicActivation = FMath::Clamp(
+        NearCriticalActivation * 0.82f + SpeedActivation * 0.18f,
+        0.0f,
+        1.0f);
+    const float NeighbourSurfaceMeters =
+        UpstreamFarSurfaceHeightMeters * 0.125f +
+        UpstreamNearSurfaceHeightMeters * 0.375f +
+        DownstreamNearSurfaceHeightMeters * 0.375f +
+        DownstreamFarSurfaceHeightMeters * 0.125f;
+    const float SolverReliefMeters =
+        CenterSurfaceHeightMeters - NeighbourSurfaceMeters;
+    const float MaximumReliefMeters =
+        0.22f + 0.18f * FMath::Clamp(SafeDepth / 2.0f, 0.0f, 1.0f);
+    return FMath::Clamp(
+        SolverReliefMeters * 1.25f * HydraulicActivation,
+        -MaximumReliefMeters,
+        MaximumReliefMeters);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledSmoothedSurfaceHeightMeters(
+    float CenterSurfaceHeightMeters,
+    float UpstreamSurfaceHeightMeters,
+    float DownstreamSurfaceHeightMeters,
+    float RiverRightSurfaceHeightMeters,
+    float RiverLeftSurfaceHeightMeters,
+    float Strength)
+{
+    const float FilteredSurfaceHeightMeters =
+        CenterSurfaceHeightMeters * 0.44f +
+        (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters +
+            RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) *
+            0.14f;
+    return FMath::Lerp(
+        CenterSurfaceHeightMeters,
+        FilteredSurfaceHeightMeters,
+        FMath::Clamp(Strength, 0.0f, 1.0f));
 }
 
 bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
@@ -239,6 +438,172 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
     OutSample.VelocityMetersPerSecond = FVector::ZeroVector;
     OutSample.SurfaceNormal = FVector::UpVector;
     OutSample.bWet = true;
+    return true;
+}
+void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
+    bool bEnabled,
+    float SurfaceSmoothingStrength,
+    float StandingWaveScale,
+    float HydraulicReliefScale)
+{
+    bRaftSupportSurfaceEnabled = bEnabled;
+    RaftSupportSurfaceSmoothingStrength =
+        FMath::Clamp(SurfaceSmoothingStrength, 0.0f, 1.0f);
+    RaftSupportStandingWaveScale =
+        FMath::Clamp(StandingWaveScale, 0.0f, 1.0f);
+    RaftSupportHydraulicReliefScale =
+        FMath::Clamp(HydraulicReliefScale, 0.0f, 1.0f);
+
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim raft support surface: enabled=%d smoothing=%.2f ")
+        TEXT("standing=%.2f hydraulic=%.2f"),
+        bRaftSupportSurfaceEnabled ? 1 : 0,
+        RaftSupportSurfaceSmoothingStrength,
+        RaftSupportStandingWaveScale,
+        RaftSupportHydraulicReliefScale);
+}
+
+bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
+    const FVector& WorldPosition,
+    FRaftSimWaterSample& OutSample) const
+{
+    if (!SampleWaterAtWorldPosition(WorldPosition, OutSample))
+    {
+        return false;
+    }
+
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if (!bRaftSupportSurfaceEnabled ||
+        !OutSample.bWet ||
+        !LiveWindow.IsValid() ||
+        !LiveWindow->HasTravelingWavePresentation() ||
+        CVarRaftSimPresentationWaveCoupling.GetValueOnAnyThread() == 0)
+    {
+        return true;
+    }
+
+    FVector2D RiverCoordinatesM(
+        WorldPosition.X / 100.0f,
+        WorldPosition.Y / 100.0f);
+    FVector WorldTangent = FVector::ForwardVector;
+    FVector WorldLeftNormal = FVector::RightVector;
+    if (!WorldToRiverCoordinates(
+            WorldPosition,
+            RiverCoordinatesM,
+            WorldTangent,
+            WorldLeftNormal))
+    {
+        return true;
+    }
+
+    constexpr float AnalysisNearOffsetM = 3.0f;
+    constexpr float AnalysisFarOffsetM = 6.0f;
+    auto SamplePresentedBaseHeight = [this](
+                                         const FVector2D& CoordinatesM,
+                                         float& OutHeightM) -> bool
+    {
+        FRaftSimWaterSample Center;
+        if (!SampleWaterFieldAtRiverCoordinates(CoordinatesM, Center) ||
+            !Center.bWet)
+        {
+            return false;
+        }
+        OutHeightM = Center.SurfaceHeightMeters;
+        if (RaftSupportSurfaceSmoothingStrength <= KINDA_SMALL_NUMBER)
+        {
+            return true;
+        }
+
+        FRaftSimWaterSample Upstream;
+        FRaftSimWaterSample Downstream;
+        FRaftSimWaterSample RiverRight;
+        FRaftSimWaterSample RiverLeft;
+        if (!SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(-AnalysisNearOffsetM, 0.0f),
+                Upstream) ||
+            !SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(AnalysisNearOffsetM, 0.0f),
+                Downstream) ||
+            !SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(0.0f, -AnalysisNearOffsetM),
+                RiverRight) ||
+            !SampleWaterFieldAtRiverCoordinates(
+                CoordinatesM + FVector2D(0.0f, AnalysisNearOffsetM),
+                RiverLeft) ||
+            !Upstream.bWet ||
+            !Downstream.bWet ||
+            !RiverRight.bWet ||
+            !RiverLeft.bWet)
+        {
+            return true;
+        }
+
+        OutHeightM = ComputeCoupledSmoothedSurfaceHeightMeters(
+            Center.SurfaceHeightMeters,
+            Upstream.SurfaceHeightMeters,
+            Downstream.SurfaceHeightMeters,
+            RiverRight.SurfaceHeightMeters,
+            RiverLeft.SurfaceHeightMeters,
+            RaftSupportSurfaceSmoothingStrength);
+        return true;
+    };
+
+    FRaftSimWaterSample RawCenter;
+    float PresentedCenterHeightM = 0.0f;
+    if (!SampleWaterFieldAtRiverCoordinates(RiverCoordinatesM, RawCenter) ||
+        !RawCenter.bWet ||
+        !SamplePresentedBaseHeight(
+            RiverCoordinatesM,
+            PresentedCenterHeightM))
+    {
+        return true;
+    }
+
+    // Replace the unsmoothed solver base with the carrier's base. Preserve the
+    // already-coupled travelling swell added by SampleWaterAtWorldPosition.
+    OutSample.SurfaceHeightMeters +=
+        PresentedCenterHeightM - RawCenter.SurfaceHeightMeters;
+
+    const FRaftSimWaterStandingWave StandingWave =
+        ComputeCoupledStandingWave(
+            RiverCoordinatesM,
+            RawCenter.VelocityMetersPerSecond.Size2D(),
+            RawCenter.DepthMeters);
+    OutSample.SurfaceHeightMeters +=
+        StandingWave.DisplacementMeters * RaftSupportStandingWaveScale;
+
+    float UpstreamFarHeightM = 0.0f;
+    float UpstreamNearHeightM = 0.0f;
+    float DownstreamNearHeightM = 0.0f;
+    float DownstreamFarHeightM = 0.0f;
+    if (SamplePresentedBaseHeight(
+            RiverCoordinatesM + FVector2D(-AnalysisFarOffsetM, 0.0f),
+            UpstreamFarHeightM) &&
+        SamplePresentedBaseHeight(
+            RiverCoordinatesM + FVector2D(-AnalysisNearOffsetM, 0.0f),
+            UpstreamNearHeightM) &&
+        SamplePresentedBaseHeight(
+            RiverCoordinatesM + FVector2D(AnalysisNearOffsetM, 0.0f),
+            DownstreamNearHeightM) &&
+        SamplePresentedBaseHeight(
+            RiverCoordinatesM + FVector2D(AnalysisFarOffsetM, 0.0f),
+            DownstreamFarHeightM))
+    {
+        OutSample.SurfaceHeightMeters +=
+            ComputeCoupledHydraulicReliefMeters(
+                PresentedCenterHeightM,
+                UpstreamFarHeightM,
+                UpstreamNearHeightM,
+                DownstreamNearHeightM,
+                DownstreamFarHeightM,
+                RawCenter.VelocityMetersPerSecond.Size2D(),
+                RawCenter.DepthMeters) *
+            RaftSupportHydraulicReliefScale;
+    }
+#endif
+
     return true;
 }
 

@@ -166,6 +166,14 @@ struct FRaftSimWaterSample
     bool bWet = false;
 };
 
+/** Deterministic sub-grid rapid displacement shared by rendering and raft support. */
+struct FRaftSimWaterStandingWave
+{
+    float DisplacementMeters = 0.0f;
+    float StationSlope = 0.0f;
+    float LateralSlope = 0.0f;
+};
+
 UCLASS(BlueprintType)
 class RAFTSIMWATER_API URaftSimWaterRuntimeAdapter : public UObject
 {
@@ -278,6 +286,60 @@ public:
     bool SampleWaterAtWorldPosition(const FVector& WorldPosition, FRaftSimWaterSample& OutSample) const;
 
     /**
+     * Configure the solver-derived surface terms used by the visible live
+     * river, then sampled by raft support. D3/overwash keeps its existing
+     * water field and does not receive these amplified support terms.
+     */
+    void ConfigureRaftSupportSurface(
+        bool bEnabled,
+        float SurfaceSmoothingStrength,
+        float StandingWaveScale,
+        float HydraulicReliefScale);
+
+    /** Sample the same live crest/hole surface used by the visible carrier. */
+    bool SampleRaftSupportSurfaceAtWorldPosition(
+        const FVector& WorldPosition,
+        FRaftSimWaterSample& OutSample) const;
+    bool IsRaftSupportSurfaceEnabled() const
+    {
+        return bRaftSupportSurfaceEnabled;
+    }
+    float GetRaftSupportSurfaceSmoothingStrength() const
+    {
+        return RaftSupportSurfaceSmoothingStrength;
+    }
+    float GetRaftSupportStandingWaveScale() const
+    {
+        return RaftSupportStandingWaveScale;
+    }
+    float GetRaftSupportHydraulicReliefScale() const
+    {
+        return RaftSupportHydraulicReliefScale;
+    }
+
+    static FRaftSimWaterStandingWave ComputeCoupledStandingWave(
+        const FVector2D& RiverCoordinatesMeters,
+        float SpeedMetersPerSecond,
+        float DepthMeters);
+
+    static float ComputeCoupledHydraulicReliefMeters(
+        float CenterSurfaceHeightMeters,
+        float UpstreamFarSurfaceHeightMeters,
+        float UpstreamNearSurfaceHeightMeters,
+        float DownstreamNearSurfaceHeightMeters,
+        float DownstreamFarSurfaceHeightMeters,
+        float SpeedMetersPerSecond,
+        float DepthMeters);
+
+    static float ComputeCoupledSmoothedSurfaceHeightMeters(
+        float CenterSurfaceHeightMeters,
+        float UpstreamSurfaceHeightMeters,
+        float DownstreamSurfaceHeightMeters,
+        float RiverRightSurfaceHeightMeters,
+        float RiverLeftSurfaceHeightMeters,
+        float Strength);
+
+    /**
      * Sample the live solver directly in station/lateral coordinates. This is
      * the preferred path for river-aligned render meshes and other systems
      * that already know their authored river coordinates, because it avoids
@@ -353,6 +415,11 @@ private:
     mutable bool bHasLastWorldToRiverQuery = false;
     float RiverVerticalDatumM = 0.0f;
     FString RiverCoordinateMapPath;
+
+    bool bRaftSupportSurfaceEnabled = false;
+    float RaftSupportSurfaceSmoothingStrength = 0.0f;
+    float RaftSupportStandingWaveScale = 0.0f;
+    float RaftSupportHydraulicReliefScale = 0.0f;
 
     TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
 };

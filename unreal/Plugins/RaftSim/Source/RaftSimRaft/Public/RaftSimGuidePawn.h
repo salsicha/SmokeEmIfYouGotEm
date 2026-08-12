@@ -139,6 +139,12 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
     USceneComponent* GetPaddleAnchor() const { return PaddleAnchor; }
 
+    /** False in shipping play: the seated guide avatar owns the sole paddle. */
+    bool HasFirstPersonPaddleViewModel() const
+    {
+        return FirstPersonPaddleShaft || FirstPersonPaddleBlade || FirstPersonPaddleGrip;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
     USceneComponent* GetRaftBowReferenceAnchor() const { return RaftBowReferenceAnchor; }
 
@@ -183,6 +189,12 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Input")
     bool HasCompleteRescueInputBindings() const;
+
+    /** True when the paddle-stroke action retains this signed key mapping. */
+    bool HasPaddleStrokeKeyBinding(FKey Key, bool bNegated) const;
+
+    /** Mouse axes bypass the paddle-command Enhanced Input context. */
+    bool UsesIndependentMouseLook() const;
 
     /** Apply a saved flat-screen key binding without removing gamepad parity. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Input")
@@ -258,11 +270,6 @@ protected:
     /** The steering blade is independent of voice calls: its own cooldown. */
     float LastSteerTimeSeconds = -1.0f;
 
-    /** Set by HandleLook each frame it fires; the Tick fallback skips those frames. */
-    bool bLookInputHandledThisFrame = false;
-    float LookFallbackAccumulator = 0.0f;
-    float LastLookFallbackLogSeconds = 0.0f;
-
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Guide")
     ERaftSimGuideMobilityMode MobilityMode = ERaftSimGuideMobilityMode::InRaft;
 
@@ -301,10 +308,6 @@ protected:
 
     void BuildFirstPersonPaddle();
     void UpdateFirstPersonPaddle(float DeltaSeconds);
-
-    // Throttled look-input diagnostic (see HandleLook).
-    float LookDiagnosticAccumulator = 0.0f;
-    float LastLookDiagnosticSeconds = 0.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> RaftContextAnchor;

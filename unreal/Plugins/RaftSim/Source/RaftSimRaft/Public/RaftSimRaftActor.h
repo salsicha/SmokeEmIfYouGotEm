@@ -221,6 +221,15 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
     int32 GetPaddleStrokeCount() const { return PaddleStrokeCount; }
 
+    /** Shared normalized phase used by both visible crew strokes and propulsion. */
+    float GetCrewStrokePhase() const { return CrewStrokePhase; }
+
+    /** Phase of the most recent planted-blade impulse application. */
+    float GetLastCrewStrokeImpulsePhase() const { return LastCrewStrokeImpulsePhase; }
+
+    /** Number of physics impulse slices emitted inside planted power phases. */
+    int32 GetCrewStrokeImpulseApplicationCount() const { return CrewStrokeImpulseApplicationCount; }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
     int32 GetHighSideResponseCount() const { return HighSideResponseCount; }
 
@@ -294,11 +303,11 @@ protected:
 
     /** Total buoyancy at full submersion as a multiple of weight. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float BuoyancyWeightMultiple = 2.6f;
+    float BuoyancyWeightMultiple = 5.2f;
 
-    /** Linear drag coefficient (quadratic in speed) per submerged fraction. */
+    /** Hull-water drag coefficient (quadratic above the low-speed reference). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float LinearDragCoefficient = 45.0f;
+    float LinearDragCoefficient = 650.0f;
 
     /** Angular damping factor per second. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
@@ -455,7 +464,9 @@ private:
     float SurfaceWetness = 0.0f;
 
     float CrewReactionRemaining = 0.0f;
-    float CrewStrokeTimer = 0.0f;
+    float CrewStrokePhase = 0.0f;
+    float LastCrewStrokeImpulsePhase = -1.0f;
+    int32 CrewStrokeImpulseApplicationCount = 0;
     float DriftTelemetrySeconds = 0.0f;
 
     // The guide's own W/S/turn strokes hold this pose on the stern avatar

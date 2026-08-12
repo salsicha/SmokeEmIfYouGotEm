@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "Misc/AutomationTest.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimCrewAvatarActor.h"
 #include "Tests/AutomationCommon.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -46,11 +47,43 @@ UWorld* GetActiveGameWorld()
     return NewestGameWorld;
 }
 
+ARaftSimRaftActor* GetTestTankRaft()
+{
+    UWorld* World = GetActiveGameWorld();
+    if (World != nullptr)
+    {
+        if (TActorIterator<ARaftSimRaftActor> It(World); It)
+        {
+            return *It;
+        }
+    }
+    return nullptr;
+}
+
+int32 ReadIntegerTag(const ARaftSimRaftActor* Raft, const TCHAR* Prefix)
+{
+    for (const FName& Tag : Raft->Tags)
+    {
+        FString Value = Tag.ToString();
+        if (Value.RemoveFromStart(Prefix))
+        {
+            return FCString::Atoi(*Value);
+        }
+    }
+    return INDEX_NONE;
+}
+
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimAssertRaftSettledCommand, FAutomationTestBase*, Test);
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimStrokeAndMeasureCommand, FAutomationTestBase*, Test);
+
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimAssertCatchHasNoImpulseCommand, FAutomationTestBase*, Test);
+
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimAssertPowerPhaseHasImpulseCommand, FAutomationTestBase*, Test);
 
 bool FRaftSimAssertRaftSettledCommand::Update()
 {
@@ -77,6 +110,9 @@ bool FRaftSimAssertRaftSettledCommand::Update()
     Test->TestTrue(
         TEXT("raft settled near waterline (|Z| < 60 cm)"), FMath::Abs(ZCm) < 60.0f);
     Test->TestTrue(
+        TEXT("loaded raft center stays above the 25 cm settling envelope"),
+        ZCm > -25.0f);
+    Test->TestTrue(
         TEXT("raft vertical velocity settled (< 0.5 m/s)"),
         FMath::Abs(Raft->GetRaftVelocity().Z) < 0.5f);
     Test->TestTrue(
@@ -97,12 +133,83 @@ bool FRaftSimAssertRaftSettledCommand::Update()
             Raft->GetD3RetainedWaterMassKg()),
         Raft->GetD3RetainedWaterMassKg() < 0.001f);
 
-    // Kick off the paddle phase: record position, stroke, and let it run.
+    // Kick off the paddle phase: record position and the propulsion baseline,
+    // then issue one command. The timing commands below prove that propulsion
+    // is gated to the visibly submerged part of that same stroke.
     Raft->Tags.Add(FName(*FString::Printf(TEXT("P1StartX:%f"), Raft->GetActorLocation().X)));
-    Raft->ApplyPaddleStroke(ERaftSimPaddleSide::Both, 1.0f);
+    Raft->Tags.Add(FName(*FString::Printf(
+        TEXT("P1ImpulseStart:%d"),
+        Raft->GetCrewStrokeImpulseApplicationCount())));
     Raft->ApplyPaddleStroke(ERaftSimPaddleSide::Both, 1.0f);
     return true;
 }
+
+bool FRaftSimAssertCatchHasNoImpulseCommand::Update()
+{
+    ARaftSimRaftActor* Raft = GetTestTankRaft();
+    if (Raft == nullptr)
+    {
+        Test->AddError(TEXT("Raft disappeared before catch-phase timing check"));
+        return true;
+    }
+    if (Raft->GetActiveCrewCommand() != ERaftSimCrewCommand::AllForward)
+    {
+        return false;
+    }
+
+    const int32 InitialApplications = ReadIntegerTag(Raft, TEXT("P1ImpulseStart:"));
+    Test->TestTrue(
+        TEXT("paddle timing baseline tag exists"),
+        InitialApplications != INDEX_NONE);
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("active catch phase %.3f precedes planted blade phase %.3f"),
+            Raft->GetCrewStrokePhase(),
+            URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart()),
+        Raft->GetCrewStrokePhase() <
+            URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart());
+    if (InitialApplications != INDEX_NONE)
+    {
+        Test->TestEqual(
+            TEXT("catch animation applies no propulsion"),
+            Raft->GetCrewStrokeImpulseApplicationCount(),
+            InitialApplications);
+    }
+    Test->TestTrue(
+        TEXT("no planted-blade impulse phase recorded during catch"),
+        Raft->GetLastCrewStrokeImpulsePhase() < 0.0f);
+    return true;
+}
+
+bool FRaftSimAssertPowerPhaseHasImpulseCommand::Update()
+{
+    ARaftSimRaftActor* Raft = GetTestTankRaft();
+    if (Raft == nullptr)
+    {
+        Test->AddError(TEXT("Raft disappeared before power-phase timing check"));
+        return true;
+    }
+
+    const int32 InitialApplications = ReadIntegerTag(Raft, TEXT("P1ImpulseStart:"));
+    if (InitialApplications == INDEX_NONE)
+    {
+        Test->AddError(TEXT("Missing P1 impulse baseline tag"));
+        return true;
+    }
+    if (Raft->GetCrewStrokeImpulseApplicationCount() <= InitialApplications)
+    {
+        return false;
+    }
+
+    const float AppliedPhase = Raft->GetLastCrewStrokeImpulsePhase();
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("first propulsion slice occurs with blade planted (phase %.3f)"),
+            AppliedPhase),
+        URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(AppliedPhase));
+    return true;
+}
+
 
 bool FRaftSimStrokeAndMeasureCommand::Update()
 {
@@ -133,12 +240,15 @@ bool FRaftSimStrokeAndMeasureCommand::Update()
     const float TraveledCm = Raft->GetActorLocation().X - StartX;
     Test->TestTrue(
         FString::Printf(
-            TEXT("two forward strokes moved the raft forward (traveled %.1f cm > 40 cm)"),
+            TEXT("forward paddle command moved the raft (traveled %.1f cm > 40 cm)"),
             TraveledCm),
         TraveledCm > 40.0f);
     Test->TestTrue(
         TEXT("raft still near waterline after strokes (|Z| < 60 cm)"),
         FMath::Abs(Raft->GetActorLocation().Z) < 60.0f);
+    Test->TestTrue(
+        TEXT("paddling does not sink the loaded raft center"),
+        Raft->GetActorLocation().Z > -25.0f);
     return true;
 }
 
@@ -155,8 +265,11 @@ bool FRaftSimTestTankRaftFloatsAndPaddlesTest::RunTest(const FString&)
     // Let buoyancy settle from the 40 cm spawn drop, then assert + stroke.
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertRaftSettledCommand(this));
-    // Give the strokes three seconds to translate into hull motion.
-    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));
+    // Observe the exact transition into catch, then wait until the first
+    // propulsion slice and prove it landed inside the planted power phase.
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertCatchHasNoImpulseCommand(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertPowerPhaseHasImpulseCommand(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.4f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimStrokeAndMeasureCommand(this));
     return true;
 }

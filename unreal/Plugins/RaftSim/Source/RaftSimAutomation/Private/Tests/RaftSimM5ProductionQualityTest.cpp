@@ -790,6 +790,28 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
     TestTrue(TEXT("guide timing offset stays within coordinated cadence tolerance"),
              FMath::Abs(GuideTimingOffset) <= 0.05f);
     CrewTimingOffsetsMillis.Add(FMath::RoundToInt(GuideTimingOffset * 1000.0f));
+
+    const float PaddlePowerStart =
+        URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart();
+    const float PaddlePowerEnd =
+        URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseEnd();
+    TestTrue(
+        TEXT("propulsion window is confined to the planted middle of the power stroke"),
+        PaddlePowerStart > 0.0f && PaddlePowerEnd < 0.58f &&
+            PaddlePowerStart < PaddlePowerEnd);
+    TestFalse(TEXT("catch setup emits no paddle impulse"),
+              URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(0.0f));
+    TestTrue(TEXT("mid-stroke is the planted paddle-power interval"),
+             URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(0.36f));
+    TestFalse(TEXT("airborne recovery emits no paddle impulse"),
+              URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(0.79f));
+    for (int32 Variant = 0; Variant < 4; ++Variant)
+    {
+        const float Offset = URaftSimCrewAvatarPoseLibrary::GetDeterministicTimingOffset(
+            Variant, false);
+        TestTrue(TEXT("every paddler is planted at the shared impulse midpoint"),
+                 URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(0.36f + Offset));
+    }
     TestEqual(TEXT("all five crew timing offsets are deterministic and distinct"),
               CrewTimingOffsetsMillis.Num(), 5);
     const float TorsoShift = HighSide.TorsoCenterCm.Y - Seated.TorsoCenterCm.Y;
@@ -1186,6 +1208,8 @@ bool FRaftSimM5StartRescueCommand::Update()
     {
         Test->TestTrue(TEXT("shipping rescue input bindings are complete"),
                        Guide->HasCompleteRescueInputBindings());
+        Test->TestFalse(TEXT("guide has no duplicate camera-attached paddle"),
+                        Guide->HasFirstPersonPaddleViewModel());
     }
     Raft->ForceCrewOverboardForTesting(1);
     FVector TargetCm;
@@ -1262,25 +1286,25 @@ bool FRaftSimM5StartRescueCommand::Update()
                 It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f);
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("CC0 crew body %s closes every upper T-grip finger chain "
-                         "(minimum %.3f degrees)"),
+                    TEXT("CC0 crew body %s seats every distal finger pad on its "
+                         "shaft/T-grip handle (maximum error %.3f cm)"),
                     *It->GetName(),
-                    It->GetMinimumUpperPaddleFingerClosureDegrees()),
-                It->GetMinimumUpperPaddleFingerClosureDegrees() >= 120.0f);
+                    It->GetMaximumPaddleFingerContactErrorCm()),
+                It->GetMaximumPaddleFingerContactErrorCm() <= 0.25f);
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("CC0 crew body %s closes every lower shaft finger chain "
-                         "(minimum %.3f degrees)"),
+                    TEXT("CC0 crew body %s seats both thumb pads on their "
+                         "shaft/T-grip handles (maximum error %.3f cm)"),
                     *It->GetName(),
-                    It->GetMinimumLowerPaddleFingerClosureDegrees()),
-                It->GetMinimumLowerPaddleFingerClosureDegrees() >= 210.0f);
+                    It->GetMaximumPaddleThumbContactErrorCm()),
+                It->GetMaximumPaddleThumbContactErrorCm() <= 0.25f);
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("CC0 crew body %s closes both opposed thumb chains "
-                         "(minimum %.3f degrees)"),
+                    TEXT("CC0 crew body %s keeps thumbs opposed across both "
+                         "handles (maximum radial dot %.3f)"),
                     *It->GetName(),
-                    It->GetMinimumPaddleThumbClosureDegrees()),
-                It->GetMinimumPaddleThumbClosureDegrees() >= 50.0f);
+                    It->GetMaximumPaddleThumbOppositionDot()),
+                It->GetMaximumPaddleThumbOppositionDot() <= -0.80f);
         }
         Test->TestTrue(
             FString::Printf(TEXT("CC0 crew body %s selected packaged mesh"), *It->GetName()),

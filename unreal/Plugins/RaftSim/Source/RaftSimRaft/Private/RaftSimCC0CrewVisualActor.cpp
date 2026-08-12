@@ -60,6 +60,51 @@ constexpr float ProductionClavicleRootLateralFraction = 0.32f;
 const TCHAR* CC0GripDigits[] = {
     TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")};
 
+constexpr float PaddleShaftThumbPadCenterRadiusCm = 2.20f;
+constexpr float PaddleTGripPadCenterRadiusCm = 2.95f;
+constexpr float PaddleTGripUsableHalfLengthCm = 5.65f;
+
+struct FCC0GripDigitProfile
+{
+    float EntrySweepDegrees;
+    float MiddleSweepDegrees;
+    float TipSweepDegrees;
+    float ProximalRadiusCm;
+    float PadCenterRadiusCm;
+    float TipCenterRadiusCm;
+    float FanDegrees;
+};
+
+bool ResolveCC0GripDigitProfile(
+    const TCHAR* Digit,
+    FCC0GripDigitProfile& OutProfile)
+{
+    // Asymmetric C-grips keep the four digits distinct while placing their
+    // distal pads on the handle. The old shared local-X curl could rotate a
+    // mirrored chain away from the paddle and still pass its angle-only test.
+    if (FCString::Strcmp(Digit, TEXT("index")) == 0)
+    {
+        OutProfile = {30.0f, 42.0f, 28.0f, 3.25f, 2.45f, 1.95f, 12.0f};
+        return true;
+    }
+    if (FCString::Strcmp(Digit, TEXT("middle")) == 0)
+    {
+        OutProfile = {32.0f, 46.0f, 30.0f, 3.30f, 2.50f, 1.98f, 4.0f};
+        return true;
+    }
+    if (FCString::Strcmp(Digit, TEXT("ring")) == 0)
+    {
+        OutProfile = {30.0f, 44.0f, 30.0f, 3.18f, 2.45f, 1.95f, -5.0f};
+        return true;
+    }
+    if (FCString::Strcmp(Digit, TEXT("pinky")) == 0)
+    {
+        OutProfile = {28.0f, 40.0f, 28.0f, 3.00f, 2.35f, 1.90f, -12.0f};
+        return true;
+    }
+    return false;
+}
+
 const FName DrivenBones[] = {
     TEXT("pelvis"),
     TEXT("spine_01"),
@@ -654,6 +699,15 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
               MeasurePaddleGripAnchorErrorCm(true, Pose.LeftHandCm),
               MeasurePaddleGripAnchorErrorCm(false, Pose.RightHandCm))
         : 0.0f;
+    MaximumPaddleFingerContactErrorCm = bPaddleGripActive
+        ? MeasureMaximumPaddleFingerContactErrorCm(Pose)
+        : 0.0f;
+    MaximumPaddleThumbContactErrorCm = bPaddleGripActive
+        ? MeasureMaximumPaddleThumbContactErrorCm(Pose)
+        : 0.0f;
+    MaximumPaddleThumbOppositionDot = bPaddleGripActive
+        ? MeasureMaximumPaddleThumbOppositionDot(Pose)
+        : -1.0f;
     MinimumUpperPaddleFingerClosureDegrees = bPaddleGripActive
         ? MeasureMinimumPaddleFingerClosureDegrees(Pose, true)
         : 0.0f;
@@ -934,6 +988,143 @@ float ARaftSimCC0CrewVisualActor::MeasureMinimumPaddleThumbClosureDegrees() cons
         : MinimumClosureDegrees;
 }
 
+float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleFingerContactErrorCm(
+    const FRaftSimCrewAvatarPose& Pose) const
+{
+    if (!Body || !Pose.bShowPaddle)
+    {
+        return 0.0f;
+    }
+    float MaximumErrorCm = 0.0f;
+    for (const bool bLeft : {true, false})
+    {
+        const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+        const FVector GripCenterCm =
+            bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector GripAxis =
+            ResolvePaddleGripAxis(Pose, GripCenterCm);
+        const bool bUpperTGrip =
+            IsUpperTGrip(Pose, GripCenterCm);
+        for (const TCHAR* Digit : {
+                 TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
+        {
+            FCC0GripDigitProfile Profile;
+            const FName PadName(*FString::Printf(
+                TEXT("%s_03_%s"), Digit, Side));
+            if (!ResolveCC0GripDigitProfile(Digit, Profile) ||
+                Body->GetBoneIndex(PadName) == INDEX_NONE)
+            {
+                return TNumericLimits<float>::Max();
+            }
+            const FVector PadCm = Body->GetBoneTransformByName(
+                PadName, EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+            const FVector OffsetCm = PadCm - GripCenterCm;
+            const float RadialDistanceCm =
+                FVector::VectorPlaneProject(OffsetCm, GripAxis).Size();
+            const float TargetRadiusCm = bUpperTGrip
+                ? PaddleTGripPadCenterRadiusCm
+                : Profile.PadCenterRadiusCm;
+            float ErrorCm = FMath::Abs(
+                RadialDistanceCm - TargetRadiusCm);
+            if (bUpperTGrip)
+            {
+                ErrorCm = FMath::Max(
+                    ErrorCm,
+                    FMath::Max(
+                        FMath::Abs(FVector::DotProduct(OffsetCm, GripAxis)) -
+                            PaddleTGripUsableHalfLengthCm,
+                        0.0f));
+            }
+            MaximumErrorCm = FMath::Max(MaximumErrorCm, ErrorCm);
+        }
+    }
+    return MaximumErrorCm;
+}
+
+float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbContactErrorCm(
+    const FRaftSimCrewAvatarPose& Pose) const
+{
+    if (!Body || !Pose.bShowPaddle)
+    {
+        return 0.0f;
+    }
+    float MaximumErrorCm = 0.0f;
+    for (const bool bLeft : {true, false})
+    {
+        const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+        const FName PadName(*FString::Printf(TEXT("thumb_03_%s"), Side));
+        if (Body->GetBoneIndex(PadName) == INDEX_NONE)
+        {
+            return TNumericLimits<float>::Max();
+        }
+        const FVector GripCenterCm =
+            bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector GripAxis =
+            ResolvePaddleGripAxis(Pose, GripCenterCm);
+        const bool bUpperTGrip =
+            IsUpperTGrip(Pose, GripCenterCm);
+        const FVector PadCm = Body->GetBoneTransformByName(
+            PadName, EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+        const FVector OffsetCm = PadCm - GripCenterCm;
+        const float TargetRadiusCm = bUpperTGrip
+            ? PaddleTGripPadCenterRadiusCm
+            : PaddleShaftThumbPadCenterRadiusCm;
+        float ErrorCm = FMath::Abs(
+            FVector::VectorPlaneProject(OffsetCm, GripAxis).Size() -
+            TargetRadiusCm);
+        if (bUpperTGrip)
+        {
+            ErrorCm = FMath::Max(
+                ErrorCm,
+                FMath::Max(
+                    FMath::Abs(FVector::DotProduct(OffsetCm, GripAxis)) -
+                        PaddleTGripUsableHalfLengthCm,
+                    0.0f));
+        }
+        MaximumErrorCm = FMath::Max(MaximumErrorCm, ErrorCm);
+    }
+    return MaximumErrorCm;
+}
+
+float ARaftSimCC0CrewVisualActor::MeasureMaximumPaddleThumbOppositionDot(
+    const FRaftSimCrewAvatarPose& Pose) const
+{
+    if (!Body || !Pose.bShowPaddle)
+    {
+        return -1.0f;
+    }
+    float MaximumDot = -1.0f;
+    for (const bool bLeft : {true, false})
+    {
+        const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+        const FName MiddleName(*FString::Printf(TEXT("middle_03_%s"), Side));
+        const FName ThumbName(*FString::Printf(TEXT("thumb_03_%s"), Side));
+        if (Body->GetBoneIndex(MiddleName) == INDEX_NONE ||
+            Body->GetBoneIndex(ThumbName) == INDEX_NONE)
+        {
+            return 1.0f;
+        }
+        const FVector GripCenterCm =
+            bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector GripAxis =
+            ResolvePaddleGripAxis(Pose, GripCenterCm);
+        const FVector MiddleRadial = FVector::VectorPlaneProject(
+            Body->GetBoneTransformByName(
+                MiddleName, EBoneSpaces::ComponentSpace).GetLocation() *
+                BodyScale - GripCenterCm,
+            GripAxis).GetSafeNormal();
+        const FVector ThumbRadial = FVector::VectorPlaneProject(
+            Body->GetBoneTransformByName(
+                ThumbName, EBoneSpaces::ComponentSpace).GetLocation() *
+                BodyScale - GripCenterCm,
+            GripAxis).GetSafeNormal();
+        MaximumDot = FMath::Max(
+            MaximumDot,
+            FVector::DotProduct(MiddleRadial, ThumbRadial));
+    }
+    return MaximumDot;
+}
+
 void ARaftSimCC0CrewVisualActor::ApplyFingerChain(
     bool bLeft,
     const TCHAR* Digit,
@@ -979,6 +1170,162 @@ void ARaftSimCC0CrewVisualActor::ApplyFingerChain(
     }
 }
 
+void ARaftSimCC0CrewVisualActor::ApplyFingerChainAroundGrip(
+    bool bLeft,
+    const TCHAR* Digit,
+    const FVector& GripCenterCm,
+    const FVector& GripAxis,
+    bool bUpperTGrip)
+{
+    if (!Body || !Digit)
+    {
+        return;
+    }
+    FCC0GripDigitProfile Profile;
+    if (!ResolveCC0GripDigitProfile(Digit, Profile))
+    {
+        return;
+    }
+    const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+    const FName HandName(*FString::Printf(TEXT("hand_%s"), Side));
+    const FName FirstName(*FString::Printf(TEXT("%s_01_%s"), Digit, Side));
+    const FName SecondName(*FString::Printf(TEXT("%s_02_%s"), Digit, Side));
+    const FName ThirdName(*FString::Printf(TEXT("%s_03_%s"), Digit, Side));
+    if (Body->GetBoneIndex(HandName) == INDEX_NONE ||
+        Body->GetBoneIndex(FirstName) == INDEX_NONE ||
+        Body->GetBoneIndex(SecondName) == INDEX_NONE ||
+        Body->GetBoneIndex(ThirdName) == INDEX_NONE)
+    {
+        return;
+    }
+
+    const FVector SafeGripAxis = GripAxis.GetSafeNormal();
+    FVector SegmentStartCm = Body->GetBoneTransformByName(
+        FirstName, EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+    const FVector NaturalSecondCm = Body->GetBoneTransformByName(
+        SecondName, EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+    FVector RadialDirection = FVector::VectorPlaneProject(
+        SegmentStartCm - GripCenterCm, SafeGripAxis).GetSafeNormal();
+    const FVector NaturalTangent = FVector::VectorPlaneProject(
+        NaturalSecondCm - SegmentStartCm, SafeGripAxis).GetSafeNormal();
+    if (SafeGripAxis.IsNearlyZero() || RadialDirection.IsNearlyZero())
+    {
+        return;
+    }
+
+    // Choose the sweep from the imported chain's forward direction. This is
+    // the mirror-safe part the old local-X curl lacked: both hands now close
+    // toward their handle instead of one side being allowed to bend backward.
+    const float NaturalOrientation = FVector::DotProduct(
+        SafeGripAxis,
+        FVector::CrossProduct(RadialDirection, NaturalTangent));
+    float WrapSign = FMath::Abs(NaturalOrientation) > KINDA_SMALL_NUMBER
+        ? FMath::Sign(NaturalOrientation)
+        : (bLeft ? -1.0f : 1.0f);
+    RadialDirection = RadialDirection.RotateAngleAxis(
+        Profile.FanDegrees * WrapSign, SafeGripAxis);
+
+    float AxialOffsetCm = FVector::DotProduct(
+        SegmentStartCm - GripCenterCm, SafeGripAxis);
+    if (bUpperTGrip)
+    {
+        AxialOffsetCm = FMath::Clamp(
+            AxialOffsetCm,
+            -PaddleTGripUsableHalfLengthCm,
+            PaddleTGripUsableHalfLengthCm);
+    }
+    const float WrapAnglesDegrees[] = {
+        Profile.EntrySweepDegrees,
+        Profile.MiddleSweepDegrees,
+        Profile.TipSweepDegrees};
+    const float JointRadiiCm[] = {
+        bUpperTGrip ? 3.85f : Profile.ProximalRadiusCm,
+        bUpperTGrip ? PaddleTGripPadCenterRadiusCm : Profile.PadCenterRadiusCm,
+        bUpperTGrip ? 2.45f : Profile.TipCenterRadiusCm};
+    const FName BoneNames[] = {FirstName, SecondName, ThirdName};
+    float CumulativeAngleDegrees = 0.0f;
+    for (int32 SegmentIndex = 0; SegmentIndex < 3; ++SegmentIndex)
+    {
+        CumulativeAngleDegrees +=
+            WrapAnglesDegrees[SegmentIndex] * WrapSign;
+        const FVector TargetRadial = RadialDirection.RotateAngleAxis(
+            CumulativeAngleDegrees, SafeGripAxis);
+        const FVector SegmentEndCm =
+            GripCenterCm + SafeGripAxis * AxialOffsetCm +
+            TargetRadial * JointRadiiCm[SegmentIndex];
+        SetSegmentBone(
+            BoneNames[SegmentIndex],
+            SegmentIndex < 2
+                ? BoneNames[SegmentIndex + 1]
+                : BoneNames[SegmentIndex],
+            SegmentStartCm,
+            SegmentEndCm);
+        SegmentStartCm = SegmentEndCm;
+    }
+}
+
+void ARaftSimCC0CrewVisualActor::ApplyOpposedThumbPadToGrip(
+    bool bLeft,
+    const FVector& GripCenterCm,
+    const FVector& GripAxis,
+    bool bUpperTGrip)
+{
+    if (!Body)
+    {
+        return;
+    }
+    const TCHAR* Side = bLeft ? TEXT("l") : TEXT("r");
+    const FName MiddlePadName(*FString::Printf(TEXT("middle_03_%s"), Side));
+    const FName SecondName(*FString::Printf(TEXT("thumb_02_%s"), Side));
+    const FName ThirdName(*FString::Printf(TEXT("thumb_03_%s"), Side));
+    if (Body->GetBoneIndex(MiddlePadName) == INDEX_NONE ||
+        Body->GetBoneIndex(SecondName) == INDEX_NONE ||
+        Body->GetBoneIndex(ThirdName) == INDEX_NONE)
+    {
+        return;
+    }
+    const FVector SafeGripAxis = GripAxis.GetSafeNormal();
+    const FVector MiddlePadCm = Body->GetBoneTransformByName(
+        MiddlePadName, EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+    const FTransform CurrentSecond = Body->GetBoneTransformByName(
+        SecondName, EBoneSpaces::ComponentSpace);
+    const FTransform CurrentThird = Body->GetBoneTransformByName(
+        ThirdName, EBoneSpaces::ComponentSpace);
+    const FVector SecondCm = CurrentSecond.GetLocation() * BodyScale;
+    const FVector CurrentPadCm = CurrentThird.GetLocation() * BodyScale;
+    FVector OpposedRadial = -FVector::VectorPlaneProject(
+        MiddlePadCm - GripCenterCm, SafeGripAxis).GetSafeNormal();
+    if (OpposedRadial.IsNearlyZero())
+    {
+        OpposedRadial = FVector::VectorPlaneProject(
+            CurrentPadCm - GripCenterCm, SafeGripAxis).GetSafeNormal();
+    }
+    if (SafeGripAxis.IsNearlyZero() || OpposedRadial.IsNearlyZero())
+    {
+        return;
+    }
+    float AxialOffsetCm = FVector::DotProduct(
+        CurrentPadCm - GripCenterCm, SafeGripAxis);
+    if (bUpperTGrip)
+    {
+        AxialOffsetCm = FMath::Clamp(
+            AxialOffsetCm,
+            -PaddleTGripUsableHalfLengthCm,
+            PaddleTGripUsableHalfLengthCm);
+    }
+    const float PadRadiusCm = bUpperTGrip
+        ? PaddleTGripPadCenterRadiusCm
+        : PaddleShaftThumbPadCenterRadiusCm;
+    const FVector TargetPadCm =
+        GripCenterCm + SafeGripAxis * AxialOffsetCm +
+        OpposedRadial * PadRadiusCm;
+    SetSegmentBone(SecondName, ThirdName, SecondCm, TargetPadCm);
+    FTransform TargetThird = CurrentThird;
+    TargetThird.SetLocation(ToMeshSpace(TargetPadCm));
+    Body->SetBoneTransformByName(
+        ThirdName, TargetThird, EBoneSpaces::ComponentSpace);
+}
+
 void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
     const FRaftSimCrewAvatarPose& Pose)
 {
@@ -986,21 +1333,43 @@ void ARaftSimCC0CrewVisualActor::ApplyPaddleGripPose(
     {
         return;
     }
-    const float GripAlpha = Pose.bShowPaddle ? 1.0f : 0.16f;
+    const float GripAlpha = Pose.bShowPaddle ? 0.32f : 0.16f;
     for (const bool bLeft : {true, false})
     {
-        const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
-        const float HandleCurlScale = Pose.bShowPaddle
-            ? (IsUpperTGrip(Pose, GripCenterCm) ? 0.92f : 1.58f)
-            : 1.0f;
         for (const TCHAR* Digit : CC0GripDigits)
         {
-            ApplyFingerChain(bLeft, Digit, GripAlpha * HandleCurlScale);
+            ApplyFingerChain(bLeft, Digit, GripAlpha);
         }
     }
     if (!Pose.bShowPaddle)
     {
         return;
+    }
+    Body->RefreshBoneTransforms();
+    for (const bool bLeft : {true, false})
+    {
+        const FVector GripCenterCm =
+            bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+        const FVector GripAxis =
+            ResolvePaddleGripAxis(Pose, GripCenterCm);
+        const bool bUpperTGrip =
+            IsUpperTGrip(Pose, GripCenterCm);
+        for (const TCHAR* Digit : {
+                 TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")})
+        {
+            ApplyFingerChainAroundGrip(
+                bLeft,
+                Digit,
+                GripCenterCm,
+                GripAxis,
+                bUpperTGrip);
+        }
+        Body->RefreshBoneTransforms();
+        ApplyOpposedThumbPadToGrip(
+            bLeft,
+            GripCenterCm,
+            GripAxis,
+            bUpperTGrip);
     }
     Body->RefreshBoneTransforms();
 }

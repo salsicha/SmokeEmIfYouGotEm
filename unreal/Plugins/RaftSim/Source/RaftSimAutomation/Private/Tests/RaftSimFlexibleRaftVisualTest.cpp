@@ -411,4 +411,292 @@ bool FRaftSimFlexibleLiveWaterFieldD3Test::RunTest(const FString& Parameters)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimDryRapidCrestGroundingTest,
+    "RaftSim.M1.DryRapidCrestGroundingStopsRaft",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimDryRapidCrestGroundingTest::RunTest(const FString& Parameters)
+{
+    URaftSimChronoRuntimeAdapter* Adapter =
+        NewObject<URaftSimChronoRuntimeAdapter>();
+    TestNotNull(TEXT("adapter"), Adapter);
+    if (Adapter == nullptr)
+    {
+        return false;
+    }
+
+    FRaftSimRaftBodyConfig Body;
+    Body.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Body.MassKg = 220.0f;
+    Body.LengthMeters = 4.3f;
+    Body.WidthMeters = 2.0f;
+    Body.TubeRadiusMeters = 0.28f;
+    Body.InertiaTensorKgM2 = FVector(180.0f, 180.0f, 400.0f);
+    Adapter->ConfigureRaftBody(Body);
+
+    FRaftSimFlexParameters Flex;
+    Flex.MassKg = Body.MassKg;
+    Flex.LengthM = Body.LengthMeters;
+    Flex.WidthM = Body.WidthMeters;
+    Flex.TubeRadiusM = Body.TubeRadiusMeters;
+    Flex.GuideMassKg = 0.0;
+    Flex.PassengerMassKg = 0.0;
+    Flex.PassengerCount = 0;
+    Adapter->ConfigureFlexibleRaftModel(Flex, {});
+
+    // Model the top of a rapid where the cooked wet mask exposes a shallow
+    // bar. Water contributes no support there; the solver bed must stop the
+    // custom kinematic body instead of letting it fall through visual ground.
+    Adapter->SetWaterSurfaceSampler(
+        [](const FVector&, float&) -> bool
+        {
+            return false;
+        });
+    int32 GroundSampleCount = 0;
+    Adapter->SetGroundSurfaceSampler(
+        [&GroundSampleCount](
+            const FVector&,
+            float& OutGroundZCm,
+            FVector& OutGroundNormal) -> bool
+        {
+            ++GroundSampleCount;
+            OutGroundZCm = 0.0f;
+            OutGroundNormal = FVector::UpVector;
+            return true;
+        });
+
+    FRaftSimRaftKinematicState State;
+    State.WorldTransform.SetTranslation(FVector(0.0f, 0.0f, -50.0f));
+    State.LinearVelocityMetersPerSecond = FVector(3.0f, 0.0f, -4.0f);
+    Adapter->SetKinematicState(State);
+
+    bool bStayedFinite = true;
+    constexpr float Dt = 1.0f / 120.0f;
+    for (int32 StepIndex = 0; StepIndex < 120; ++StepIndex)
+    {
+        bStayedFinite &= Adapter->StepRaftDynamics(Dt);
+        const FRaftSimRaftKinematicState& Current =
+            Adapter->GetKinematicState();
+        bStayedFinite &= Current.WorldTransform.IsValid() &&
+            !Current.LinearVelocityMetersPerSecond.ContainsNaN();
+    }
+
+    const FRaftSimRaftKinematicState& Grounded =
+        Adapter->GetKinematicState();
+    const float GroundedZMeters =
+        Grounded.WorldTransform.GetTranslation().Z / 100.0f;
+    TestTrue(TEXT("dry-crest grounding remains finite"), bStayedFinite);
+    TestEqual(TEXT("all six water support points report dry"),
+              Adapter->GetLastDrySupportPointCount(), 6);
+    TestTrue(TEXT("ground sampler runs once per tube point per substep"),
+             GroundSampleCount >= 6 * 120);
+    TestEqual(TEXT("all six tube points remain grounded"),
+              Adapter->GetLastGroundedSupportPointCount(), 6);
+    TestTrue(
+        FString::Printf(
+            TEXT("terrain keeps tube center above its %.2f m radius (z %.4f m)"),
+            Body.TubeRadiusMeters,
+            GroundedZMeters),
+        GroundedZMeters >= Body.TubeRadiusMeters - 1.0e-4f);
+    TestTrue(TEXT("terrain removes downward velocity"),
+             Grounded.LinearVelocityMetersPerSecond.Z >= -1.0e-4f);
+    TestTrue(
+        FString::Printf(
+            TEXT("inelastic ground contact stops horizontal slide (%.4f m/s)"),
+            Grounded.LinearVelocityMetersPerSecond.Size2D()),
+        Grounded.LinearVelocityMetersPerSecond.Size2D() < 0.05f);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimDeepRapidMaskGapBuoyancyTest,
+    "RaftSim.M1.DeepRapidMaskGapRetainsBuoyancy",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimDeepRapidMaskGapBuoyancyTest::RunTest(const FString& Parameters)
+{
+    URaftSimChronoRuntimeAdapter* Adapter =
+        NewObject<URaftSimChronoRuntimeAdapter>();
+    TestNotNull(TEXT("adapter"), Adapter);
+    if (Adapter == nullptr)
+    {
+        return false;
+    }
+
+    FRaftSimRaftBodyConfig Body;
+    Body.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Body.MassKg = 605.0f;
+    Body.LengthMeters = 4.3f;
+    Body.WidthMeters = 2.0f;
+    Body.TubeRadiusMeters = 0.28f;
+    Body.BuoyancyWeightMultiple = 5.2f;
+    Body.LinearDragCoefficient = 650.0f;
+    Body.LowSpeedDragReferenceMps = 1.5f;
+    Body.InertiaTensorKgM2 = FVector(900.0f, 900.0f, 1100.0f);
+    Adapter->ConfigureRaftBody(Body);
+
+    FRaftSimFlexParameters Flex;
+    Flex.MassKg = Body.MassKg;
+    Flex.LengthM = Body.LengthMeters;
+    Flex.WidthM = Body.WidthMeters;
+    Flex.TubeRadiusM = Body.TubeRadiusMeters;
+    Flex.GuideMassKg = 0.0;
+    Flex.PassengerMassKg = 0.0;
+    Flex.PassengerCount = 0;
+    Adapter->ConfigureFlexibleRaftModel(Flex, {});
+
+    bool bWetMaskPresent = true;
+    Adapter->SetWaterSurfaceSampler(
+        [&bWetMaskPresent](
+            const FVector&,
+            float& OutSurfaceZCm) -> bool
+        {
+            OutSurfaceZCm = 0.0f;
+            return bWetMaskPresent;
+        });
+    Adapter->SetFlexibleWaterFieldSampler(
+        [&bWetMaskPresent](
+            const FVector&,
+            FRaftSimFlexUniformWater& OutWater) -> bool
+        {
+            OutWater.SurfaceHeightM = 0.0;
+            OutWater.VelocityMps = FVector(0.8, 0.0, 0.0);
+            OutWater.bWet = bWetMaskPresent;
+            return true;
+        });
+    Adapter->SetGroundSurfaceSampler(
+        [](const FVector&, float& OutGroundZCm, FVector& OutNormal) -> bool
+        {
+            // Deep channel beneath a false dry cell: this is not a shoal.
+            OutGroundZCm = -300.0f;
+            OutNormal = FVector::UpVector;
+            return true;
+        });
+
+    FRaftSimRaftKinematicState State;
+    State.WorldTransform.SetTranslation(FVector(0.0f, 0.0f, -12.0f));
+    State.LinearVelocityMetersPerSecond = FVector(0.8f, 0.0f, 0.0f);
+    Adapter->SetKinematicState(State);
+
+    constexpr float Dt = 1.0f / 120.0f;
+    bool bStayedFinite = true;
+    for (int32 StepIndex = 0; StepIndex < 120; ++StepIndex)
+    {
+        bStayedFinite &= Adapter->StepRaftDynamics(Dt);
+    }
+    const float WetZMeters =
+        Adapter->GetKinematicState().WorldTransform.GetTranslation().Z / 100.0f;
+
+    // Cross a two-second all-dry hole before the rapid. Its deep bed proves
+    // that the dry mask is missing water, not describing exposed terrain.
+    bWetMaskPresent = false;
+    for (int32 StepIndex = 0; StepIndex < 240; ++StepIndex)
+    {
+        bStayedFinite &= Adapter->StepRaftDynamics(Dt);
+    }
+    const FRaftSimRaftKinematicState& Bridged =
+        Adapter->GetKinematicState();
+    const float BridgedZMeters =
+        Bridged.WorldTransform.GetTranslation().Z / 100.0f;
+    TestTrue(TEXT("deep mask-gap crossing remains finite"), bStayedFinite);
+    TestEqual(TEXT("all six support probes still report the mask as dry"),
+              Adapter->GetLastDrySupportPointCount(), 6);
+    TestEqual(TEXT("deep channel does not falsely ground the raft"),
+              Adapter->GetLastGroundedSupportPointCount(), 0);
+    TestTrue(
+        FString::Printf(
+            TEXT("deep dry gap preserves the wet waterline (wet %.3f m, gap %.3f m)"),
+            WetZMeters,
+            BridgedZMeters),
+        FMath::Abs(BridgedZMeters - WetZMeters) < 0.20f);
+    TestTrue(TEXT("deep dry gap never sinks the hull below its tube envelope"),
+             BridgedZMeters > -0.45f);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPaddleCoastDownTest,
+    "RaftSim.M1.PaddleCoastDownUsesLowSpeedHullResistance",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPaddleCoastDownTest::RunTest(const FString& Parameters)
+{
+    URaftSimChronoRuntimeAdapter* Adapter =
+        NewObject<URaftSimChronoRuntimeAdapter>();
+    TestNotNull(TEXT("adapter"), Adapter);
+    if (Adapter == nullptr)
+    {
+        return false;
+    }
+
+    FRaftSimRaftBodyConfig Body;
+    Body.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Body.MassKg = 605.0f;
+    Body.LengthMeters = 4.3f;
+    Body.WidthMeters = 2.0f;
+    Body.TubeRadiusMeters = 0.28f;
+    Body.BuoyancyWeightMultiple = 5.2f;
+    Body.LinearDragCoefficient = 650.0f;
+    Body.LowSpeedDragReferenceMps = 1.5f;
+    Body.InertiaTensorKgM2 = FVector(900.0f, 900.0f, 1100.0f);
+    Adapter->ConfigureRaftBody(Body);
+
+    FRaftSimFlexParameters Flex;
+    Flex.MassKg = Body.MassKg;
+    Flex.LengthM = Body.LengthMeters;
+    Flex.WidthM = Body.WidthMeters;
+    Flex.TubeRadiusM = Body.TubeRadiusMeters;
+    Flex.GuideMassKg = 0.0;
+    Flex.PassengerMassKg = 0.0;
+    Flex.PassengerCount = 0;
+    Adapter->ConfigureFlexibleRaftModel(Flex, {});
+    Adapter->SetWaterSurfaceSampler(
+        [](const FVector&, float& OutSurfaceZCm) -> bool
+        {
+            OutSurfaceZCm = 0.0f;
+            return true;
+        });
+    Adapter->SetFlexibleWaterFieldSampler(
+        [](const FVector&, FRaftSimFlexUniformWater& OutWater) -> bool
+        {
+            OutWater.SurfaceHeightM = 0.0;
+            OutWater.VelocityMps = FVector::ZeroVector;
+            OutWater.bWet = true;
+            return true;
+        });
+
+    FRaftSimRaftKinematicState State;
+    State.WorldTransform.SetTranslation(FVector(0.0f, 0.0f, -12.0f));
+    State.LinearVelocityMetersPerSecond = FVector(2.0f, 0.0f, 0.0f);
+    Adapter->SetKinematicState(State);
+
+    bool bStayedFinite = true;
+    constexpr float Dt = 1.0f / 120.0f;
+    for (int32 StepIndex = 0; StepIndex < 600; ++StepIndex)
+    {
+        bStayedFinite &= Adapter->StepRaftDynamics(Dt);
+    }
+    const FRaftSimRaftKinematicState& Coasted =
+        Adapter->GetKinematicState();
+    const float SpeedMps =
+        Coasted.LinearVelocityMetersPerSecond.Size2D();
+    const float DistanceMeters =
+        Coasted.WorldTransform.GetTranslation().X / 100.0f;
+    TestTrue(TEXT("five-second coast-down remains finite"), bStayedFinite);
+    TestTrue(
+        FString::Printf(
+            TEXT("stopped paddling sheds speed below 0.50 m/s (%.3f m/s)"),
+            SpeedMps),
+        SpeedMps < 0.50f);
+    TestTrue(
+        FString::Printf(
+            TEXT("coasting hull stops within 5.5 m (%.3f m)"),
+            DistanceMeters),
+        DistanceMeters < 5.5f);
+    TestTrue(TEXT("coast-down keeps the loaded raft afloat"),
+             Coasted.WorldTransform.GetTranslation().Z > -45.0f);
+    return true;
+}
+
 #endif // WITH_AUTOMATION_TESTS

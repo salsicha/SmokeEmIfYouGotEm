@@ -291,13 +291,13 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         Multiply(
             Lace,
             AddValues(
-                Scalar(TEXT("BreakingFoamFloor"), 0.48f),
+                Scalar(TEXT("BreakingFoamFloor"), 0.60f),
                 Multiply(
                     Intensity,
                     Scalar(TEXT("BreakingFoamIntensityGain"), 0.95f)))),
         Multiply(
             AeratedCore,
-            Scalar(TEXT("BreakingFoamCoreGain"), 0.70f)));
+            Scalar(TEXT("BreakingFoamCoreGain"), 0.90f)));
     Add(Foam);
     // Whitewater coverage needs a visibly aerated, perforated boundary. Using
     // the raw linear mask in color and opacity let the solver crest-core
@@ -312,17 +312,17 @@ static UMaterial* BuildBreakingWaterLipMaterial()
             FLinearColor(0.18f, 0.31f, 0.32f, 1.0f)),
         Vector(
             TEXT("BreakingFoamColor"),
-            FLinearColor(0.73f, 0.78f, 0.77f, 1.0f)),
+            FLinearColor(0.96f, 0.98f, 1.00f, 1.0f)),
         FoamCoverage);
     UMaterialExpression* Opacity = Multiply(
         OcclusionSafeEdgeFeather,
         Lerp(
             Scalar(TEXT("BreakingWaterOpacity"), 0.38f),
-            Scalar(TEXT("BreakingFoamOpacity"), 0.84f),
+            Scalar(TEXT("BreakingFoamOpacity"), 0.96f),
             FoamCoverage));
     UMaterialExpression* Roughness = Lerp(
         Scalar(TEXT("BreakingWaterRoughness"), 0.24f),
-        Scalar(TEXT("BreakingFoamRoughness"), 0.74f),
+        Scalar(TEXT("BreakingFoamRoughness"), 0.82f),
         FoamCoverage);
 
     UMaterialExpressionTextureCoordinate* NormalUv =

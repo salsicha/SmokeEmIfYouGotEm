@@ -1,5 +1,8 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 
+#include "EngineUtils.h"
+#include "LandscapeProxy.h"
+
 void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
@@ -57,7 +60,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                     if (Water->HasLiveWindow())
                     {
                         FRaftSimWaterSample Sample;
-                        if (Water->SampleWaterAtWorldPosition(WorldPositionCm, Sample)
+                        if (Water->SampleRaftSupportSurfaceAtWorldPosition(WorldPositionCm, Sample)
                             && Sample.bWet)
                         {
                             OutWaterSurfaceZCm = Sample.SurfaceHeightMeters * 100.0f;
@@ -68,6 +71,88 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                 }
                 OutWaterSurfaceZCm = 0.0f;
                 return true;
+            });
+
+        // The custom raft state is kinematic to Unreal, so QueryOnly hull
+        // collision cannot resolve Landscape contact. Supply authoritative
+        // height-field data to the selected reduced runtime instead. Physical
+        // source Landscapes take precedence; maps without one use solver bed.
+        TArray<TWeakObjectPtr<ALandscapeProxy>> TerrainLandscapes;
+        if (UWorld* World = GetWorld())
+        {
+            for (TActorIterator<ALandscapeProxy> It(World); It; ++It)
+            {
+                TerrainLandscapes.Add(*It);
+            }
+        }
+        RaftRuntime->SetGroundSurfaceSampler(
+            [WeakWater, TerrainLandscapes](
+                const FVector& WorldPositionCm,
+                float& OutGroundZCm,
+                FVector& OutGroundNormal) -> bool
+            {
+                const ALandscapeProxy* HighestLandscape = nullptr;
+                TOptional<float> HighestLandscapeZCm;
+                for (const TWeakObjectPtr<ALandscapeProxy>& WeakLandscape :
+                     TerrainLandscapes)
+                {
+                    const ALandscapeProxy* Landscape = WeakLandscape.Get();
+                    if (Landscape == nullptr)
+                    {
+                        continue;
+                    }
+                    const TOptional<float> Height =
+                        Landscape->GetHeightAtLocation(
+                            WorldPositionCm, EHeightfieldSource::Complex);
+                    if (Height.IsSet() &&
+                        (!HighestLandscapeZCm.IsSet() ||
+                         Height.GetValue() > HighestLandscapeZCm.GetValue()))
+                    {
+                        HighestLandscape = Landscape;
+                        HighestLandscapeZCm = Height;
+                    }
+                }
+
+                if (HighestLandscape != nullptr && HighestLandscapeZCm.IsSet())
+                {
+                    OutGroundZCm = HighestLandscapeZCm.GetValue();
+                    constexpr float NormalProbeOffsetCm = 50.0f;
+                    const TOptional<float> HeightX =
+                        HighestLandscape->GetHeightAtLocation(
+                            WorldPositionCm +
+                                FVector(NormalProbeOffsetCm, 0.0f, 0.0f),
+                            EHeightfieldSource::Complex);
+                    const TOptional<float> HeightY =
+                        HighestLandscape->GetHeightAtLocation(
+                            WorldPositionCm +
+                                FVector(0.0f, NormalProbeOffsetCm, 0.0f),
+                            EHeightfieldSource::Complex);
+                    OutGroundNormal = FVector::UpVector;
+                    if (HeightX.IsSet() && HeightY.IsSet())
+                    {
+                        OutGroundNormal = FVector(
+                            -(HeightX.GetValue() - OutGroundZCm) /
+                                NormalProbeOffsetCm,
+                            -(HeightY.GetValue() - OutGroundZCm) /
+                                NormalProbeOffsetCm,
+                            1.0f).GetSafeNormal();
+                    }
+                    return true;
+                }
+
+                if (URaftSimWaterRuntimeAdapter* Water = WeakWater.Get();
+                    Water != nullptr && Water->HasLiveWindow())
+                {
+                    FRaftSimWaterSample Sample;
+                    if (Water->SampleWaterAtWorldPosition(
+                            WorldPositionCm, Sample))
+                    {
+                        OutGroundZCm = Sample.BedHeightMeters * 100.0f;
+                        OutGroundNormal = FVector::UpVector;
+                        return true;
+                    }
+                }
+                return false;
             });
 
         // D3 needs velocity as well as surface elevation, and a single raft-

@@ -25,6 +25,10 @@ void URaftSimChronoRuntimeAdapter::ConfigureRaftBody(const FRaftSimRaftBodyConfi
     };
     PendingLinearImpulseNs = FVector::ZeroVector;
     PendingAngularImpulseNms = FVector::ZeroVector;
+    LastWetSupportSurfaceZCm = 0.0f;
+    bHasLastWetSupportSurface = false;
+    LastWetWaterVelocityMps = FVector::ZeroVector;
+    LastDrySupportPointCount = 0;
 }
 
 void URaftSimChronoRuntimeAdapter::AddExternalImpulse(
@@ -38,6 +42,15 @@ void URaftSimChronoRuntimeAdapter::SetWaterSurfaceSampler(
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler)
 {
     WaterSurfaceSampler = MoveTemp(InSampler);
+}
+
+void URaftSimChronoRuntimeAdapter::SetGroundSurfaceSampler(
+    TFunction<bool(
+        const FVector& WorldPositionCm,
+        float& OutGroundZCm,
+        FVector& OutGroundNormal)> InSampler)
+{
+    GroundSurfaceSampler = MoveTemp(InSampler);
 }
 
 void URaftSimChronoRuntimeAdapter::SetFlexibleWaterFieldSampler(
@@ -233,8 +246,12 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         // below the overtopping plane in any moving current.
         /*BaseTubeTopFreeboardM=*/FlexParameters.TubeRadiusM *
             FMath::Lerp(0.82, 1.0, static_cast<double>(FlexPressureFraction)),
-        /*FluxCoefficient=*/0.65,
-        /*DrainageRatePerS=*/0.55,
+        // Production paddle rafts are open self-bailers. A lower inflow
+        // coefficient and faster drain retain the short-lived weight of a
+        // breaking wave without accumulating a second crew's mass during an
+        // otherwise routine rapid run.
+        /*FluxCoefficient=*/0.45,
+        /*DrainageRatePerS=*/1.20,
         /*WaterDensityKgM3=*/1000.0,
         /*GravityMps2=*/9.81,
         WaterBySegment,
@@ -243,7 +260,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         // raft. These are production coupling limits, not D6 fixture changes.
         /*MaximumIncomingSpeedMps=*/8.0,
         /*MaximumOvertoppingDepthM=*/2.0 * FlexParameters.TubeRadiusM,
-        /*MaximumRetainedVolumePerSegmentM3=*/0.05);
+        /*MaximumRetainedVolumePerSegmentM3=*/0.035);
 
     // D4: rock contact, wrap, pin, release, and shape recovery.
     const FRaftSimFlexRockContactSolve Contacts = RaftSimFlex::EvaluateRockContactWrapPinD4(
@@ -359,8 +376,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Z), 1.0e-3));
 
     // Buoyancy support stage (ported from the P1 actor integrator): gravity,
-    // multi-point tube buoyancy against the live water surface, quadratic
-    // drag, and heave damping. Engaged when the bridge has bound a water
+    // multi-point tube buoyancy against the live water surface, blended
+    // low-speed/quadratic drag, and heave damping. Engaged when the bridge has bound a water
     // sampler; forces are evaluated from the pre-impulse state, exactly as
     // the actor's integrator did.
     double SubmergedFraction = 0.0;
@@ -377,38 +394,89 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         const double SaturationDepthM =
             FMath::Max(2.0 * static_cast<double>(RaftConfig.TubeRadiusMeters), 1.0e-3);
         LastDrySupportPointCount = 0;
+        TArray<float> SurfaceZByPointCm;
+        TArray<uint8> WetPointFlags;
+        SurfaceZByPointCm.SetNumZeroed(TubeSamplePointsM.Num());
+        WetPointFlags.SetNumZeroed(TubeSamplePointsM.Num());
         float CenterSurfaceZCm = 0.0f;
         const bool bCenterWet =
             WaterSurfaceSampler(State.Position * 100.0, CenterSurfaceZCm);
-        if (bCenterWet)
+        double WetSurfaceSumZCm = 0.0;
+        int32 WetPointCount = 0;
+        for (int32 PointIndex = 0;
+             PointIndex < TubeSamplePointsM.Num();
+             ++PointIndex)
         {
-            LastWetCenterSurfaceZCm = CenterSurfaceZCm;
-            bHasLastWetCenterSurface = true;
-        }
-        for (const FVector& LocalM : TubeSamplePointsM)
-        {
-            const FVector WorldOffset = State.Orientation.RotateVector(LocalM);
+            const FVector WorldOffset =
+                State.Orientation.RotateVector(TubeSamplePointsM[PointIndex]);
             const FVector WorldPointM = State.Position + WorldOffset;
-            float SurfaceZCm = 0.0f;
-            if (!WaterSurfaceSampler(WorldPointM * 100.0, SurfaceZCm))
+            float& SurfaceZCm = SurfaceZByPointCm[PointIndex];
+            if (WaterSurfaceSampler(WorldPointM * 100.0, SurfaceZCm))
+            {
+                WetPointFlags[PointIndex] = 1;
+                WetSurfaceSumZCm += SurfaceZCm;
+                ++WetPointCount;
+            }
+            else
             {
                 ++LastDrySupportPointCount;
-                if (!bHasLastWetCenterSurface)
+            }
+        }
+        if (bCenterWet || WetPointCount > 0)
+        {
+            LastWetSupportSurfaceZCm = bCenterWet
+                ? CenterSurfaceZCm
+                : static_cast<float>(WetSurfaceSumZCm /
+                      static_cast<double>(WetPointCount));
+            bHasLastWetSupportSurface = true;
+        }
+
+        for (int32 PointIndex = 0;
+             PointIndex < TubeSamplePointsM.Num();
+             ++PointIndex)
+        {
+            const FVector& LocalM = TubeSamplePointsM[PointIndex];
+            const FVector WorldOffset = State.Orientation.RotateVector(LocalM);
+            const FVector WorldPointM = State.Position + WorldOffset;
+            float SurfaceZCm = SurfaceZByPointCm[PointIndex];
+            if (WetPointFlags[PointIndex] == 0)
+            {
+                bool bBridgeDeepMaskGap = false;
+                if (bHasLastWetSupportSurface)
                 {
-                    // Never been in water (spawn on land): nothing to hold.
+                    float GroundZCm = 0.0f;
+                    FVector GroundNormal = FVector::UpVector;
+                    if (GroundSurfaceSampler &&
+                        GroundSurfaceSampler(
+                            WorldPointM * 100.0, GroundZCm, GroundNormal))
+                    {
+                        // A genuinely dry solver cell is a shallow bar/bank:
+                        // its bed reaches within one tube diameter of the last
+                        // water surface and the terrain constraint should own
+                        // support. A dry cell over deep bed is a mask/window
+                        // hole; bridge it at the neighboring wet elevation so
+                        // the six-point hull cannot fall through before the
+                        // rapid.
+                        const float TubeDiameterCm =
+                            200.0f * RaftConfig.TubeRadiusMeters;
+                        bBridgeDeepMaskGap =
+                            GroundZCm + TubeDiameterCm <
+                            LastWetSupportSurfaceZCm;
+                    }
+                    else
+                    {
+                        // Without terrain evidence, bridge only a partial
+                        // hole that still has wet center/tube neighbors. Never
+                        // float a fully dry land spawn on stale state.
+                        bBridgeDeepMaskGap =
+                            bCenterWet || WetPointCount > 0;
+                    }
+                }
+                if (!bBridgeDeepMaskGap)
+                {
                     continue;
                 }
-                // Masked-dry cell under a tube point — a boulder patch or
-                // bar in the cooked wet mask, which has no collision actor
-                // of its own. Support the point at the current (or, when
-                // the whole hull is over the patch, the last) wet centre
-                // surface so the raft grounds at the waterline instead of
-                // falling through the hole in the mask. Drift telemetry
-                // 2026-08-10: dry_points 1->3 sank the hull 1.2 m, and the
-                // wider patch at station ~240 dropped it 2.3 m once the
-                // centre went dry — the playtest's "a hole opened in the
-                // water and the boat sank".
-                SurfaceZCm = bCenterWet ? CenterSurfaceZCm : LastWetCenterSurfaceZCm;
+                SurfaceZCm = LastWetSupportSurfaceZCm;
             }
             const double SubmersionM = static_cast<double>(SurfaceZCm) / 100.0 - WorldPointM.Z;
             const double Saturation = FMath::Clamp(SubmersionM / SaturationDepthM, 0.0, 1.0);
@@ -422,14 +490,16 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             TorqueNm += FVector::CrossProduct(WorldOffset, PointForceN);
         }
 
-        // Quadratic water drag opposing velocity RELATIVE TO THE CURRENT,
+        // Hull-water drag opposing velocity RELATIVE TO THE CURRENT,
         // scaled by submersion. The former term opposed absolute velocity —
         // identical in still water (every tank test passed) but structurally
         // wrong in a river: a raft at rest in a current received zero
         // horizontal force and could never be carried downstream (measured
         // 2026-08-10 at Chili Bar: water 0.63-0.79 m/s at the hull, raft
         // 0.001 m/s after two minutes free).
-        FVector WaterVelocityMps = FVector::ZeroVector;
+        FVector WaterVelocityMps = bHasLastWetSupportSurface
+            ? LastWetWaterVelocityMps
+            : FVector::ZeroVector;
         if (FlexibleWaterFieldSampler)
         {
             FRaftSimFlexUniformWater CenterWater;
@@ -437,15 +507,26 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 CenterWater.bWet)
             {
                 WaterVelocityMps = CenterWater.VelocityMps;
+                LastWetWaterVelocityMps = WaterVelocityMps;
             }
         }
         const FVector RelativeVelocity = State.LinearVelocity - WaterVelocityMps;
         const double RelativeSpeed = RelativeVelocity.Length();
         if (RelativeSpeed > KINDA_SMALL_NUMBER && SubmergedFraction > 0.0)
         {
+            // Pure v^2 drag becomes vanishingly small as a stroke coasts down,
+            // which left the loaded hull visibly gliding for tens of seconds.
+            // Clamp only the speed multiplier: direction and force still go
+            // continuously to zero with relative velocity, yielding a
+            // viscous low-speed region and quadratic high-speed resistance.
+            const double DragSpeedMps = FMath::Max(
+                RelativeSpeed,
+                FMath::Max(
+                    static_cast<double>(RaftConfig.LowSpeedDragReferenceMps),
+                    0.0));
             ForceN += RelativeVelocity *
                       (-static_cast<double>(RaftConfig.LinearDragCoefficient) *
-                       SubmergedFraction * RelativeSpeed);
+                       SubmergedFraction * DragSpeedMps);
         }
 
         // Linear heave damping: quadratic drag alone is negligible at bobbing
@@ -486,6 +567,86 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     {
         const FQuat Delta(State.AngularVelocity / AngularSpeed, AngularSpeed * Dt);
         State.Orientation = (Delta * State.Orientation).GetNormalized();
+    }
+
+    // Height-field contact constraint. ARaftSimRaftActor is advanced by this
+    // custom kinematic state, so child QueryOnly collision and an unswept
+    // SetActorLocationAndRotation cannot make Landscape or riverbed geometry
+    // stop it. Resolve non-penetration here, in the selected physics authority,
+    // using the same six tube footprint points as buoyancy.
+    LastGroundedSupportPointCount = 0;
+    LastMaximumGroundPenetrationM = 0.0f;
+    if (GroundSurfaceSampler && TubeSamplePointsM.Num() > 0)
+    {
+        const double ContactRadiusM =
+            FMath::Max(
+                static_cast<double>(RaftConfig.TubeRadiusMeters) *
+                    FMath::Lerp(0.82, 1.0, static_cast<double>(FlexPressureFraction)),
+                1.0e-3);
+        double VerticalCorrectionM = 0.0;
+        FVector DeepestContactNormal = FVector::UpVector;
+        for (const FVector& LocalM : TubeSamplePointsM)
+        {
+            const FVector WorldOffset = State.Orientation.RotateVector(LocalM);
+            const FVector WorldPointM = State.Position + WorldOffset;
+            float GroundZCm = 0.0f;
+            FVector GroundNormal = FVector::UpVector;
+            if (!GroundSurfaceSampler(
+                    WorldPointM * 100.0, GroundZCm, GroundNormal))
+            {
+                continue;
+            }
+
+            const double PenetrationM =
+                static_cast<double>(GroundZCm) / 100.0 + ContactRadiusM -
+                WorldPointM.Z;
+            if (PenetrationM <= 0.0)
+            {
+                continue;
+            }
+
+            ++LastGroundedSupportPointCount;
+            LastMaximumGroundPenetrationM = FMath::Max(
+                LastMaximumGroundPenetrationM,
+                static_cast<float>(PenetrationM));
+            if (PenetrationM > VerticalCorrectionM)
+            {
+                VerticalCorrectionM = PenetrationM;
+                DeepestContactNormal = GroundNormal.GetSafeNormal();
+                if (DeepestContactNormal.IsNearlyZero() ||
+                    DeepestContactNormal.Z < 0.05)
+                {
+                    DeepestContactNormal = FVector::UpVector;
+                }
+            }
+        }
+
+        if (VerticalCorrectionM > 0.0)
+        {
+            // Terrain is a height field, so vertical projection is the exact
+            // minimum translation that clears the deepest sampled tube. Clip
+            // inward velocity along its normal and damp contact motion; this
+            // stops a falling raft and prevents it tunnelling into a bank.
+            State.Position.Z += VerticalCorrectionM;
+            const double InwardSpeedMps = FVector::DotProduct(
+                State.LinearVelocity, DeepestContactNormal);
+            if (InwardSpeedMps < 0.0)
+            {
+                State.LinearVelocity -=
+                    DeepestContactNormal * InwardSpeedMps;
+            }
+            const FVector NormalVelocity =
+                DeepestContactNormal * FVector::DotProduct(
+                    State.LinearVelocity, DeepestContactNormal);
+            const FVector TangentialVelocity =
+                State.LinearVelocity - NormalVelocity;
+            const double GroundFrictionAlpha =
+                FMath::Clamp(5.0 * Dt, 0.0, 1.0);
+            State.LinearVelocity -=
+                TangentialVelocity * GroundFrictionAlpha;
+            State.AngularVelocity *=
+                FMath::Clamp(1.0 - 4.0 * Dt, 0.0, 1.0);
+        }
     }
 
     // Renderer-facing safety boundary: extreme coupled contact must never

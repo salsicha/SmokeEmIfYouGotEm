@@ -62,6 +62,15 @@ public:
         float MaximumIndentationM,
         bool bCameraUnderwater);
 
+    /** Ballistic roller fragments rise while travelling against the current,
+     * matching the upstream return on a hydraulic jump. */
+    static FVector ComputeRapidRollerLaunchDirection(
+        const FVector& WorldVelocityMps);
+
+    /** Fine crest spray shares the upstream return with a bounded cross-flow. */
+    static FVector ComputeRapidCrestSprayLaunchDirection(
+        const FVector& WorldVelocityMps, float LateralBias);
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|VFX")
     const FRaftSimWaterVfxState& GetLastPresentationState() const
     {

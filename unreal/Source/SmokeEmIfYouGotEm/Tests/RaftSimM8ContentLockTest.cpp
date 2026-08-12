@@ -8,6 +8,7 @@
 #include "HAL/FileManager.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
+#include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInterface.h"
 #include "MaterialShared.h"
@@ -165,6 +166,8 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
         float ActiveCoverage = 0.0f;
         float FoamCoverageGain = 0.0f;
         float SpeedCoverageGain = 0.0f;
+        float SpeedCoverageThresholdBias = 0.0f;
+        float FlowAdvectionScale = 0.0f;
         FLinearColor ShallowSurfaceColor = FLinearColor::Black;
         FLinearColor DeepSurfaceColor = FLinearColor::Black;
         TestTrue(TEXT("Calm live-water coverage resolves"),
@@ -183,6 +186,14 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
             LiveWaterMaterial->GetScalarParameterValue(
                 FMaterialParameterInfo(TEXT("HydraulicCoverageSpeedGain")),
                 SpeedCoverageGain));
+        TestTrue(TEXT("Ordinary-current coverage threshold resolves"),
+            LiveWaterMaterial->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("HydraulicCoverageSpeedThresholdBias")),
+                SpeedCoverageThresholdBias));
+        TestTrue(TEXT("Solver flow-advection scale resolves"),
+            LiveWaterMaterial->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("LiveFlowAdvectionScale")),
+                FlowAdvectionScale));
         TestTrue(TEXT("Shallow live-water surface colour resolves"),
             LiveWaterMaterial->GetVectorParameterValue(
                 FMaterialParameterInfo(TEXT("LiveShallowSurfaceColor")),
@@ -197,8 +208,41 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
             FMath::IsNearlyEqual(ActiveCoverage, 0.03f, KINDA_SMALL_NUMBER));
         TestTrue(TEXT("Foam contributes strongly to live coverage"),
             FMath::IsNearlyEqual(FoamCoverageGain, 0.95f, KINDA_SMALL_NUMBER));
-        TestTrue(TEXT("Speed contributes strongly to live coverage"),
-            FMath::IsNearlyEqual(SpeedCoverageGain, 2.2f, KINDA_SMALL_NUMBER));
+        TestTrue(TEXT("Ordinary solver speed contributes strongly to live coverage"),
+            FMath::IsNearlyEqual(SpeedCoverageGain, 3.2f, KINDA_SMALL_NUMBER) &&
+                FMath::IsNearlyEqual(
+                    SpeedCoverageThresholdBias, -0.03f, KINDA_SMALL_NUMBER));
+        TestTrue(TEXT("Live detail advects at physical solver speed by default"),
+            FMath::IsNearlyEqual(FlowAdvectionScale, 1.0f, KINDA_SMALL_NUMBER));
+
+        UMaterial* LiveWaterBaseMaterial = Cast<UMaterial>(LiveWaterMaterial);
+        TestNotNull(TEXT("Live-water interface is a base material"), LiveWaterBaseMaterial);
+        bool bHasSolverVelocityUv = false;
+        bool bHasPrimarySolverAdvection = false;
+        bool bHasCrossSolverAdvection = false;
+        if (LiveWaterBaseMaterial)
+        {
+            for (const TObjectPtr<UMaterialExpression>& Expression :
+                 LiveWaterBaseMaterial->GetExpressionCollection().Expressions)
+            {
+                if (const UMaterialExpressionTextureCoordinate* TexCoord =
+                        Cast<UMaterialExpressionTextureCoordinate>(Expression.Get()))
+                {
+                    bHasSolverVelocityUv |=
+                        TexCoord->CoordinateIndex == 1 &&
+                        TexCoord->Desc == TEXT("RaftSimSolverVelocityMpsUV1");
+                }
+                bHasPrimarySolverAdvection |= Expression &&
+                    Expression->Desc == TEXT("RaftSimSolverVelocityAdvectionPrimary");
+                bHasCrossSolverAdvection |= Expression &&
+                    Expression->Desc == TEXT("RaftSimSolverVelocityAdvectionCross");
+            }
+        }
+        TestTrue(TEXT("Live material reads solver velocity from UV1"), bHasSolverVelocityUv);
+        TestTrue(TEXT("Primary ripple layer is solver-velocity advected"),
+            bHasPrimarySolverAdvection);
+        TestTrue(TEXT("Cross ripple layer is solver-velocity advected"),
+            bHasCrossSolverAdvection);
         TestTrue(TEXT("Shallow live overlay uses calibrated gray-green radiance"),
             ShallowSurfaceColor.Equals(
                 FLinearColor(0.115f, 0.185f, 0.175f, 1.0f), KINDA_SMALL_NUMBER));
@@ -209,7 +253,6 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
         if (FApp::CanEverRender())
         {
             FAssetCompilingManager::Get().FinishAllCompilation();
-            UMaterial* LiveWaterBaseMaterial = Cast<UMaterial>(LiveWaterMaterial);
             FMaterialResource* LiveWaterResource = LiveWaterBaseMaterial
                 ? LiveWaterBaseMaterial->GetMaterialResource(GMaxRHIShaderPlatform)
                 : nullptr;

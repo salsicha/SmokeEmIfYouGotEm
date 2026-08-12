@@ -42,7 +42,8 @@ bool IsPropulsiveCrewCommand(ERaftSimCrewCommand Command)
     return Command == ERaftSimCrewCommand::AllForward ||
         Command == ERaftSimCrewCommand::AllBackward ||
         Command == ERaftSimCrewCommand::TurnLeft ||
-        Command == ERaftSimCrewCommand::TurnRight;
+        Command == ERaftSimCrewCommand::TurnRight ||
+        Command == ERaftSimCrewCommand::Stop;
 }
 
 bool FlexVisualStateMatches(
@@ -167,8 +168,20 @@ void ARaftSimRaftActor::BeginPlay()
         (FootprintLengthM * FootprintLengthM + FootprintWidthM * FootprintWidthM) / 12.0f;
     BodyConfig.InertiaTensorKgM2 =
         FVector(0.45f * YawInertia, 0.45f * YawInertia, YawInertia);
-    BodyConfig.BuoyancyWeightMultiple = BuoyancyWeightMultiple;
-    BodyConfig.LinearDragCoefficient = LinearDragCoefficient;
+    // Authored maps can retain the previous 2.6 instance value even after the
+    // CDO default changes. A 5.2 reserve settles the support frame about 14 cm
+    // below flat water instead of 21 cm, leaving the loaded 56 cm tubes and
+    // self-bailing floor above routine approach flow before flex compression.
+    constexpr float kMinimumLoadedBuoyancyReserve = 5.2f;
+    BodyConfig.BuoyancyWeightMultiple =
+        FMath::Max(BuoyancyWeightMultiple, kMinimumLoadedBuoyancyReserve);
+    // Authored maps may retain the old 45 N coefficient. At the loaded
+    // 605 kg production mass that let a stopped crew coast for tens of
+    // seconds and made strokes accumulate near the governor. Preserve the
+    // authoring control while enforcing the measured hull-resistance floor.
+    constexpr float kMinimumLoadedHullDrag = 650.0f;
+    BodyConfig.LinearDragCoefficient =
+        FMath::Max(LinearDragCoefficient, kMinimumLoadedHullDrag);
     BodyConfig.HeaveDampingNsPerM = HeaveDampingNsPerM;
     BodyConfig.AngularDampingPerSecond = AngularDampingPerSecond;
 
@@ -891,17 +904,11 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             ActiveCrewCommand = PendingCrewCommand;
             if (ActiveCrewCommand != PreviousCommand)
             {
-                // The visual stroke starts at its catch on this same command
-                // transition. Deliver the discrete reduced-model impulse near
-                // peak blade speed in the power phase, then repeat on the
-                // shared 0.8 s cadence instead of free-running a hidden timer
-                // while the crew rests.
-                constexpr float PowerImpulsePhase = 0.29f;
-                CrewStrokeTimer = IsPropulsiveCrewCommand(ActiveCrewCommand)
-                    ? FMath::Max(
-                        CrewStrokeIntervalSeconds * PowerImpulsePhase,
-                        FixedSubstepSeconds)
-                    : 0.0f;
+                // Start physics and presentation at the same catch. Propulsion
+                // advances from this normalized phase only while blades are
+                // visibly planted mid-stroke.
+                CrewStrokePhase = 0.0f;
+                LastCrewStrokeImpulsePhase = -1.0f;
             }
         }
     }
@@ -941,6 +948,8 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             AvatarAction = ERaftSimCrewAvatarAction::TurnRight;
             break;
         case ERaftSimCrewCommand::Stop:
+            AvatarAction = ERaftSimCrewAvatarAction::BackStroke;
+            break;
         case ERaftSimCrewCommand::GetDown:
             AvatarAction = ERaftSimCrewAvatarAction::Brace;
             break;
@@ -994,24 +1003,50 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 : AvatarAction);
     }
 
-    // Paddle strokes on cadence for propulsion/turn commands. Rest, brace and
-    // emergency weight-shift poses do not advance an invisible paddle cycle.
+    // Advance the same 0..1 cadence used by the visible stroke. The total
+    // per-stroke impulse is sliced only across the planted mid-stroke window;
+    // catch setup and airborne recovery contribute no propulsion.
     if (!IsPropulsiveCrewCommand(ActiveCrewCommand))
     {
-        CrewStrokeTimer = 0.0f;
+        CrewStrokePhase = 0.0f;
         return;
     }
-    CrewStrokeTimer -= DeltaSeconds;
-    if (CrewStrokeTimer > 0.0f)
+    const float StrokeInterval = FMath::Max(
+        CrewStrokeIntervalSeconds, FixedSubstepSeconds);
+    const float PhaseAdvance = FMath::Min(
+        DeltaSeconds / StrokeInterval, 1.0f);
+    const float PhaseStart = CrewStrokePhase;
+    const float UnwrappedPhaseEnd = PhaseStart + PhaseAdvance;
+    const float PowerStart =
+        URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart();
+    const float PowerEnd =
+        URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseEnd();
+    const auto MeasurePowerOverlap =
+        [PowerStart, PowerEnd](float SegmentStart, float SegmentEnd)
+        {
+            return FMath::Max(
+                0.0f,
+                FMath::Min(SegmentEnd, PowerEnd) -
+                    FMath::Max(SegmentStart, PowerStart));
+        };
+    float PowerOverlap = MeasurePowerOverlap(
+        PhaseStart, FMath::Min(UnwrappedPhaseEnd, 1.0f));
+    if (UnwrappedPhaseEnd > 1.0f)
+    {
+        PowerOverlap += MeasurePowerOverlap(0.0f, UnwrappedPhaseEnd - 1.0f);
+    }
+    CrewStrokePhase = FMath::Frac(UnwrappedPhaseEnd);
+    if (PowerOverlap <= KINDA_SMALL_NUMBER)
     {
         return;
     }
-    CrewStrokeTimer = FMath::Max(
-        CrewStrokeTimer + CrewStrokeIntervalSeconds,
-        FixedSubstepSeconds);
-
-    const float PerPaddler = PaddleStrokeImpulseNs * 0.5f;
+    const float ImpulseFraction = PowerOverlap /
+        FMath::Max(PowerEnd - PowerStart, KINDA_SMALL_NUMBER);
     const float Crew = static_cast<float>(FMath::Max(1, PaddlerCount));
+    const float PerPaddler =
+        PaddleStrokeImpulseNs * 0.5f * ImpulseFraction;
+    LastCrewStrokeImpulsePhase = FMath::Clamp(CrewStrokePhase, PowerStart, PowerEnd);
+    ++CrewStrokeImpulseApplicationCount;
     const FVector Forward = GetActorForwardVector();
     // Paddling drives the hull TO paddling speed over the water, not past
     // it. Uncapped cadence impulses compounded to 9.7 m/s on 2026-08-10 -
@@ -1054,10 +1089,10 @@ float ARaftSimRaftActor::GetPaddlePropulsionShortfall(
     const FVector& StrokeDirection) const
 {
     // 1.0 when the hull is at or below water speed in the stroke direction,
-    // fading to 0.0 as it approaches crewed paddling speed (~3 m/s) over
+    // fading to 0.0 as it approaches crewed paddling speed (~2.2 m/s) over
     // the water. Keeps strokes honest: they close the gap to hull speed
     // instead of compounding without bound.
-    constexpr float MaxPaddleSpeedOverWaterMps = 3.0f;
+    constexpr float MaxPaddleSpeedOverWaterMps = 2.2f;
     FVector WaterVelocityMps = FVector::ZeroVector;
     if (Bridge != nullptr)
     {
@@ -1118,16 +1153,19 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
 void ARaftSimRaftActor::QueueDirectStrokeImpulse(
     const FVector& LinearImpulseNs, const FVector& AngularImpulseNms)
 {
-    // Hold the kick until the guide pose's catch: instantaneous impulses
+    // Hold the kick until the guide pose's planted mid-stroke: instantaneous impulses
     // at animation start made the boat move before any blade visually
     // reached the water (2026-08-11: "the boat turns but the paddle
-    // animation comes after the motion"). 0.29 matches the crew cadence's
-    // PowerImpulsePhase.
+    // animation comes after the motion"). The same power-window midpoint is
+    // used for direct guide strokes and crew propulsion.
     PendingDirectLinearImpulseNs += LinearImpulseNs;
     PendingDirectAngularImpulseNms += AngularImpulseNms;
     if (DirectImpulseDelaySeconds <= 0.0f)
     {
-        DirectImpulseDelaySeconds = CrewStrokeIntervalSeconds * 0.29f;
+        const float PowerMidPhase = 0.5f * (
+            URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart() +
+            URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseEnd());
+        DirectImpulseDelaySeconds = CrewStrokeIntervalSeconds * PowerMidPhase;
     }
 }
 
@@ -1213,7 +1251,8 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     {
         DriftTelemetrySeconds = 0.0f;
         float WaterSpeedMps = 0.0f;
-        float SurfaceZCm = 0.0f;
+        float SolverSurfaceZCm = 0.0f;
+        float SupportSurfaceZCm = 0.0f;
         bool bHullWet = false;
         if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
         {
@@ -1221,11 +1260,19 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             if (Water->SampleWaterAtWorldPosition(GetActorLocation(), Sample))
             {
                 bHullWet = Sample.bWet;
-                SurfaceZCm = Sample.SurfaceHeightMeters * 100.0f;
+                SolverSurfaceZCm = Sample.SurfaceHeightMeters * 100.0f;
                 if (Sample.bWet)
                 {
                     WaterSpeedMps = Sample.VelocityMetersPerSecond.Size2D();
                 }
+            }
+            SupportSurfaceZCm = SolverSurfaceZCm;
+            FRaftSimWaterSample SupportSample;
+            if (Water->SampleRaftSupportSurfaceAtWorldPosition(
+                    GetActorLocation(), SupportSample) &&
+                SupportSample.bWet)
+            {
+                SupportSurfaceZCm = SupportSample.SurfaceHeightMeters * 100.0f;
             }
         }
         float SunPitchDeg = 0.0f;
@@ -1249,18 +1296,25 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         }
         UE_LOG(LogTemp, Display,
             TEXT("RaftSim raft drift: raft_speed_mps=%.3f water_speed_mps=%.3f ")
-            TEXT("raft_z_cm=%.1f surface_z_cm=%.1f wet=%d retained_kg=%.0f ")
-            TEXT("pressure=%.2f integrity=%.2f dry_points=%d x_cm=%.0f y_cm=%.0f ")
+            TEXT("raft_z_cm=%.1f surface_z_cm=%.1f solver_surface_z_cm=%.1f ")
+            TEXT("support_delta_cm=%.1f pitch_deg=%.1f wet=%d retained_kg=%.0f ")
+            TEXT("pressure=%.2f integrity=%.2f dry_points=%d ground_points=%d ")
+            TEXT("ground_penetration_m=%.3f x_cm=%.0f y_cm=%.0f ")
             TEXT("sun_pitch=%.1f sun_intensity=%.1f"),
             GetRaftVelocity().Size(),
             WaterSpeedMps,
             GetActorLocation().Z,
-            SurfaceZCm,
+            SupportSurfaceZCm,
+            SolverSurfaceZCm,
+            SupportSurfaceZCm - SolverSurfaceZCm,
+            GetActorRotation().Pitch,
             bHullWet ? 1 : 0,
             GetD3RetainedWaterMassKg(),
             RaftCondition.PressureFraction,
             RaftCondition.FabricIntegrity,
             RaftAdapter->GetLastDrySupportPointCount(),
+            RaftAdapter->GetLastGroundedSupportPointCount(),
+            RaftAdapter->GetLastMaximumGroundPenetrationMeters(),
             GetActorLocation().X,
             GetActorLocation().Y,
             SunPitchDeg,
@@ -2065,5 +2119,6 @@ void ARaftSimRaftActor::ResetMotionForTesting()
     ActiveCrewCommand = ERaftSimCrewCommand::Rest;
     PendingCrewCommand = ERaftSimCrewCommand::Rest;
     CrewReactionRemaining = 0.0f;
-    CrewStrokeTimer = 0.0f;
+    CrewStrokePhase = 0.0f;
+    LastCrewStrokeImpulsePhase = -1.0f;
 }

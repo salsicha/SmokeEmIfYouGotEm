@@ -3,6 +3,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Engine/Engine.h"
 #include "EngineUtils.h"
+#include "Framework/Application/IInputProcessor.h"
+#include "Framework/Application/SlateApplication.h"
 #include "GameFramework/PlayerInput.h"
 #include "HighResScreenshot.h"
 #include "InputCoreTypes.h"
@@ -15,6 +17,44 @@
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimTrainingDirector.h"
 #include "RaftSimVerticalSliceFrontend.h"
+
+class FRaftSimMouseLookInputProcessor final : public IInputProcessor
+{
+public:
+    explicit FRaftSimMouseLookInputProcessor(
+        ARaftSimGuidePlayerController* InController)
+        : Controller(InController)
+    {
+    }
+
+    virtual void Tick(
+        const float DeltaTime, FSlateApplication& SlateApp,
+        TSharedRef<ICursor> Cursor) override
+    {
+    }
+
+    virtual bool HandleMouseMoveEvent(
+        FSlateApplication& SlateApp, const FPointerEvent& MouseEvent) override
+    {
+        if (ARaftSimGuidePlayerController* PinnedController = Controller.Get())
+        {
+            const auto& CursorDelta = MouseEvent.GetCursorDelta();
+            PinnedController->AccumulateSlateMouseLook(
+                FVector2D(CursorDelta.X, CursorDelta.Y));
+        }
+        // Observe the delta without consuming it. Slate and the game viewport
+        // must remain free to finish their normal mouse routing.
+        return false;
+    }
+
+    virtual const TCHAR* GetDebugName() const override
+    {
+        return TEXT("RaftSimMouseLook");
+    }
+
+private:
+    TWeakObjectPtr<ARaftSimGuidePlayerController> Controller;
+};
 
 namespace
 {
@@ -35,6 +75,20 @@ T* FindActor(UWorld* World)
 void ARaftSimGuidePlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+    // In embedded PIE, Slate can retain the mouse move while a keyboard
+    // command is held before the game viewport produces MouseX/MouseY. Listen
+    // before widget routing and accumulate without ever consuming the event.
+    if (IsLocalController() && FSlateApplication::IsInitialized())
+    {
+        MouseLookInputProcessor =
+            MakeShared<FRaftSimMouseLookInputProcessor>(this);
+        if (!FSlateApplication::Get().RegisterInputPreProcessor(
+                MouseLookInputProcessor))
+        {
+            MouseLookInputProcessor.Reset();
+        }
+    }
 
     RunHud = CreateWidget<URaftSimRunHudWidget>(this, URaftSimRunHudWidget::StaticClass());
     if (RunHud != nullptr)
@@ -60,6 +114,20 @@ void ARaftSimGuidePlayerController::BeginPlay()
     {
         Guide->BeginScenarioCameraPresentation();
     }
+}
+
+void ARaftSimGuidePlayerController::EndPlay(
+    const EEndPlayReason::Type EndPlayReason)
+{
+    if (MouseLookInputProcessor.IsValid() &&
+        FSlateApplication::IsInitialized())
+    {
+        FSlateApplication::Get().UnregisterInputPreProcessor(
+            MouseLookInputProcessor);
+    }
+    MouseLookInputProcessor.Reset();
+    PendingSlateMouseLook = FVector2D::ZeroVector;
+    Super::EndPlay(EndPlayReason);
 }
 
 void ARaftSimGuidePlayerController::SetupInputComponent()
@@ -113,10 +181,47 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
     InputComponent->BindKey(EKeys::Gamepad_DPad_Up, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandForward);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Left, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandLeft);
     InputComponent->BindKey(EKeys::Gamepad_DPad_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandRight);
-    InputComponent->BindAxisKey(EKeys::MouseX, this, &ARaftSimGuidePlayerController::PhotoLookYaw);
-    InputComponent->BindAxisKey(EKeys::MouseY, this, &ARaftSimGuidePlayerController::PhotoLookPitch);
+    // Do not bind MouseX/MouseY here. The controller input component is above
+    // the pawn's Enhanced Input component, and legacy axis-key bindings
+    // consume their keys by default. Sample the mouse in PostProcessInput so
+    // camera look remains independent of held paddle actions.
     InputComponent->BindAxisKey(EKeys::Gamepad_RightX, this, &ARaftSimGuidePlayerController::PhotoLookYaw);
     InputComponent->BindAxisKey(EKeys::Gamepad_RightY, this, &ARaftSimGuidePlayerController::PhotoLookPitch);
+}
+
+void ARaftSimGuidePlayerController::PostProcessInput(
+    const float DeltaTime, const bool bGamePaused)
+{
+    Super::PostProcessInput(DeltaTime, bGamePaused);
+
+    // Prefer Slate's pre-routing delta in embedded PIE. Standalone and
+    // headless runs fall back to PlayerInput's raw OS accumulator. Never add
+    // both copies of the same hardware movement.
+    const FVector2D SlateMouseDelta = PendingSlateMouseLook;
+    PendingSlateMouseLook = FVector2D::ZeroVector;
+    if (bGamePaused || IsLookInputIgnored())
+    {
+        return;
+    }
+    float MouseDeltaX = 0.0f;
+    float MouseDeltaY = 0.0f;
+    GetInputMouseDelta(MouseDeltaX, MouseDeltaY);
+    if (!SlateMouseDelta.IsNearlyZero())
+    {
+        MouseDeltaX = SlateMouseDelta.X;
+        MouseDeltaY = SlateMouseDelta.Y;
+    }
+    MouseLookYaw(MouseDeltaX);
+    MouseLookPitch(MouseDeltaY);
+}
+
+void ARaftSimGuidePlayerController::AccumulateSlateMouseLook(
+    const FVector2D& Delta)
+{
+    if (IsLocalController())
+    {
+        PendingSlateMouseLook += Delta;
+    }
 }
 
 void ARaftSimGuidePlayerController::ApplySavedSettings()
@@ -375,6 +480,24 @@ void ARaftSimGuidePlayerController::CommandBackward() { ApplyCommand(1); }
 void ARaftSimGuidePlayerController::CommandLeft() { ApplyCommand(2); }
 void ARaftSimGuidePlayerController::CommandRight() { ApplyCommand(3); }
 void ARaftSimGuidePlayerController::CommandStop() { ApplyCommand(4); }
+
+void ARaftSimGuidePlayerController::MouseLookYaw(float Value)
+{
+    if (FMath::Abs(Value) <= KINDA_SMALL_NUMBER || bPauseVisible || bScoutVisible)
+    {
+        return;
+    }
+    AddYawInput(Value * (bPhotoMode ? 0.5f : 1.0f));
+}
+
+void ARaftSimGuidePlayerController::MouseLookPitch(float Value)
+{
+    if (FMath::Abs(Value) <= KINDA_SMALL_NUMBER || bPauseVisible || bScoutVisible)
+    {
+        return;
+    }
+    AddPitchInput(Value * (bPhotoMode ? -0.5f : 1.0f));
+}
 
 void ARaftSimGuidePlayerController::PhotoLookYaw(float Value)
 {

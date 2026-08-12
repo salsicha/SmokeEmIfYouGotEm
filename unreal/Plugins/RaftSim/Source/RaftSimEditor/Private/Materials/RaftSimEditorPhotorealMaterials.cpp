@@ -14,6 +14,8 @@
 #include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionClamp.h"
 #include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionCollectionParameter.h"
+#include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant2Vector.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
@@ -47,6 +49,7 @@
 #include "Materials/MaterialExpressionVertexNormalWS.h"
 #include "Materials/MaterialExpressionWorldPosition.h"
 #include "Materials/MaterialFunctionInterface.h"
+#include "Materials/MaterialParameterCollection.h"
 #include "Misc/PackageName.h"
 #include "AssetCompilingManager.h"
 #include "UObject/Package.h"
@@ -1625,6 +1628,18 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         return nullptr;
     }
 
+    UMaterialParameterCollection* FoamOcclusionCollection =
+        LoadObject<UMaterialParameterCollection>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion."
+                 "MPC_RaftSim_RaftFoamOcclusion"));
+    if (!FoamOcclusionCollection)
+    {
+        UE_LOG(LogTemp, Error,
+            TEXT("RaftSim: live river material is missing raft occlusion parameters"));
+        return nullptr;
+    }
+
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     Material->BlendMode = BLEND_Translucent;
@@ -1714,6 +1729,76 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     // scalar output 4, so select it before applying the component mask. Trying
     // to mask A from output 0 compiles in C++ but fails the Metal material.
     StationEdgeCoverage->Input.OutputIndex = 4;
+    // The live detail layer is translucent and spans the moving solver window.
+    // Without a per-pixel hull cutout Unreal can sort that whole component in
+    // front of the raft, making a correctly buoyant boat look submerged. Reuse
+    // the runtime foam-occlusion transform, but fit this ellipse to the actual
+    // 4.3 x 2.0 m tube silhouette so advecting detail remains visible beside it.
+    auto CollectionParameter =
+        [Material, FoamOcclusionCollection, &Add](FName Name, bool bScalar)
+            -> UMaterialExpressionCollectionParameter*
+    {
+        UMaterialExpressionCollectionParameter* Expression =
+            NewObject<UMaterialExpressionCollectionParameter>(Material);
+        Expression->Collection = FoamOcclusionCollection;
+        Expression->ParameterName = Name;
+        Expression->ExpressionGUID = FGuid::NewGuid();
+        const int32 ParameterIndex = bScalar
+            ? FoamOcclusionCollection->ScalarParameters.IndexOfByPredicate(
+                [Name](const FCollectionScalarParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                })
+            : FoamOcclusionCollection->VectorParameters.IndexOfByPredicate(
+                [Name](const FCollectionVectorParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                });
+        if (ParameterIndex != INDEX_NONE)
+        {
+            Expression->ParameterId = bScalar
+                ? FoamOcclusionCollection->ScalarParameters[ParameterIndex].Id
+                : FoamOcclusionCollection->VectorParameters[ParameterIndex].Id;
+        }
+        return Cast<UMaterialExpressionCollectionParameter>(Add(Expression));
+    };
+    UMaterialExpressionWorldPosition* RaftMaskWorldPosition =
+        Cast<UMaterialExpressionWorldPosition>(
+            Add(NewObject<UMaterialExpressionWorldPosition>(Material)));
+    UMaterialExpressionCollectionParameter* RaftMaskEnabled =
+        CollectionParameter(TEXT("RaftFoamExclusionEnabled"), true);
+    UMaterialExpressionCollectionParameter* RaftMaskCenter =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionCenterAndHalfWidthCm"), false);
+    UMaterialExpressionCollectionParameter* RaftMaskForward =
+        CollectionParameter(
+            TEXT("RaftFoamExclusionForwardAndHalfLengthCm"), false);
+    UMaterialExpressionCustom* RaftHullExclusion =
+        Cast<UMaterialExpressionCustom>(
+            Add(NewObject<UMaterialExpressionCustom>(Material)));
+    RaftHullExclusion->Description =
+        TEXT("RaftSimLiveSurfaceRaftHullExclusion");
+    RaftHullExclusion->OutputType = CMOT_Float1;
+    RaftHullExclusion->Code = TEXT(
+        "float2 Delta = WorldPosition.xy - CenterAndHalfWidth.xy;\n"
+        "float2 Forward = normalize(ForwardAndHalfLength.xy + float2(1e-5, 0.0));\n"
+        "float Along = dot(Delta, Forward) / max(ForwardAndHalfLength.w * 0.72, 1.0);\n"
+        "float Across = dot(Delta, float2(-Forward.y, Forward.x)) / max(CenterAndHalfWidth.w * 0.58, 1.0);\n"
+        "float EllipseSquared = Along * Along + Across * Across;\n"
+        "float OutsideHull = smoothstep(0.72, 1.30, EllipseSquared);\n"
+        "return lerp(1.0, OutsideHull, saturate(Enabled));");
+    auto AddRaftMaskInput = [RaftHullExclusion](
+        FName Name, UMaterialExpression* Expression)
+    {
+        FCustomInput Input;
+        Input.InputName = Name;
+        Input.Input.Expression = Expression;
+        RaftHullExclusion->Inputs.Add(Input);
+    };
+    AddRaftMaskInput(TEXT("WorldPosition"), RaftMaskWorldPosition);
+    AddRaftMaskInput(TEXT("CenterAndHalfWidth"), RaftMaskCenter);
+    AddRaftMaskInput(TEXT("ForwardAndHalfLength"), RaftMaskForward);
+    AddRaftMaskInput(TEXT("Enabled"), RaftMaskEnabled);
 
     // The underlying authored Single Layer Water includes volume scattering
     // and scene reflection, while this non-transmitting solver overlay is an
@@ -1851,6 +1936,50 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                 Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
         CrossUv->UTiling = 1.48f;
         CrossUv->VTiling = 1.33f;
+
+        // UV0 is river position divided by three metres. UV1 is populated by
+        // the live surface actor with the current solver velocity in m/s in
+        // that same (downstream, river-left) basis. Back-tracing the detail
+        // coordinates by velocity * time therefore moves every visible ripple
+        // with the water instead of sliding a fixed-rate texture over it.
+        UMaterialExpressionTextureCoordinate* FlowVelocityMps =
+            Cast<UMaterialExpressionTextureCoordinate>(
+                Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+        FlowVelocityMps->CoordinateIndex = 1;
+        FlowVelocityMps->Desc = TEXT("RaftSimSolverVelocityMpsUV1");
+        UMaterialExpressionTime* FlowTime =
+            Cast<UMaterialExpressionTime>(
+                Add(NewObject<UMaterialExpressionTime>(Material)));
+        UMaterialExpressionScalarParameter* FlowAdvectionScale =
+            Scalar(TEXT("LiveFlowAdvectionScale"), 1.0f);
+        const auto FlowAdvected = [&Add, &AddNode, &Mul, Material,
+                                   FlowVelocityMps, FlowTime,
+                                   FlowAdvectionScale](
+                                      UMaterialExpression* Base,
+                                      float UTiling,
+                                      float VTiling,
+                                      const TCHAR* Description)
+            -> UMaterialExpression*
+        {
+            UMaterialExpressionConstant2Vector* MetersPerSecondToUv =
+                Cast<UMaterialExpressionConstant2Vector>(
+                    Add(NewObject<UMaterialExpressionConstant2Vector>(Material)));
+            MetersPerSecondToUv->R = -UTiling / 3.0f;
+            MetersPerSecondToUv->G = -VTiling / 3.0f;
+            UMaterialExpression* OffsetUv = Mul(
+                Mul(
+                    Mul(FlowVelocityMps, MetersPerSecondToUv),
+                    FlowAdvectionScale),
+                FlowTime);
+            UMaterialExpressionAdd* AdvectedUv = AddNode(Base, OffsetUv);
+            AdvectedUv->Desc = Description;
+            return AdvectedUv;
+        };
+        UMaterialExpression* FlowUv = FlowAdvected(
+            UV, 0.74f, 1.02f, TEXT("RaftSimSolverVelocityAdvectionPrimary"));
+        UMaterialExpression* FlowCrossUv = FlowAdvected(
+            CrossUv, 1.48f, 1.33f,
+            TEXT("RaftSimSolverVelocityAdvectionCross"));
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
                           float SpeedX,
@@ -1871,10 +2000,13 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             Sample->Coordinates.Expression = Pan;
             return Sample;
         };
+        // These small residual rates are local capillary churn. Bulk motion,
+        // including lateral current and reverse eddies, comes from UV1 and is
+        // exactly proportional to the live solver velocity.
         UMaterialExpression* PrimaryNormal = Ripple(
-            UV, TEXT("LiveWaterFlowNormalPrimary"), 0.082f, 0.014f);
+            FlowUv, TEXT("LiveWaterFlowNormalPrimary"), 0.006f, 0.003f);
         UMaterialExpression* CrossNormal = Ripple(
-            CrossUv, TEXT("LiveWaterFlowNormalCross"), -0.029f, 0.071f);
+            FlowCrossUv, TEXT("LiveWaterFlowNormalCross"), -0.004f, 0.010f);
         UMaterialExpression* CrossPerturbation = AddNode(
             CrossNormal, Const3(0.0f, 0.0f, -1.0f));
         UMaterialExpressionNormalize* CombinedNormal =
@@ -1914,19 +2046,16 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     // for resolved geometry/normals, then ramp to full live-surface coverage
     // from the real solver foam and speed channels. This is presentation-only:
     // it neither modifies nor resamples the hydraulic grid or its wet/dry mask.
-    // A normalized speed channel is non-zero even in ordinary downstream
-    // current. Feeding it directly into opacity made the full moving window
-    // an olive translucent sheet and hid the reflected Single Layer Water
-    // underneath. Gate speed below approximately 2.2 m/s, while retaining
-    // immediate coverage from real solver foam and full coverage through
-    // genuinely fast water.
+    // Let ordinary current begin revealing the advected detail above 0.24 m/s;
+    // the bounded runtime coverage and wet/station feathers keep this from
+    // becoming the former rectangular olive sheet over authored water.
     UMaterialExpressionSaturate* SpeedCoverage =
         Cast<UMaterialExpressionSaturate>(Add(NewObject<UMaterialExpressionSaturate>(Material)));
     SpeedCoverage->Input.Expression = Mul(
         AddNode(
             SpeedMask,
-            Scalar(TEXT("HydraulicCoverageSpeedThresholdBias"), -0.28f)),
-        Scalar(TEXT("HydraulicCoverageSpeedGain"), 2.2f));
+            Scalar(TEXT("HydraulicCoverageSpeedThresholdBias"), -0.03f)),
+        Scalar(TEXT("HydraulicCoverageSpeedGain"), 3.2f));
     UMaterialExpressionSaturate* HydraulicActivity =
         Cast<UMaterialExpressionSaturate>(Add(NewObject<UMaterialExpressionSaturate>(Material)));
     HydraulicActivity->Input.Expression = AddNode(
@@ -1962,7 +2091,8 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         WetDepthCoverage,
         Scalar(TEXT("LiveWetCoverageEnable"), 0.0f));
     UMaterialExpressionMultiply* SurfaceCoverage = Mul(
-        HydraulicSurfaceCoverage, WetCoverage);
+        Mul(HydraulicSurfaceCoverage, WetCoverage),
+        RaftHullExclusion);
     // Continuous alpha is essential for still captures and lower temporal-AA
     // histories: a masked temporal dither exposed a conspicuous stipple field
     // across otherwise calm water. This ordinary surface translucency does not

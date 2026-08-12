@@ -102,6 +102,17 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
     static float GetDeterministicTimingOffset(int32 VariantIndex, bool bGuide);
 
+    /** Start of the planted-blade interval used by propulsion (normalized phase). */
+    static float GetPaddlePowerPhaseStart();
+
+    /** End of the planted-blade interval used by propulsion (normalized phase). */
+    static float GetPaddlePowerPhaseEnd();
+
+    /** True only while the visible blade is planted and driving mid-stroke. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Animation")
+    static bool IsPaddleBladeInPowerPhase(float NormalizedPhase);
+
+
 };
 
 /**

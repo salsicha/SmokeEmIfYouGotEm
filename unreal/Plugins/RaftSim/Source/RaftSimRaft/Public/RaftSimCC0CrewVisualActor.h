@@ -52,6 +52,27 @@ public:
         return MaximumPaddleGripAnchorErrorCm;
     }
 
+    /** Largest radial miss between any distal finger pad and its handle. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleFingerContactErrorCm() const
+    {
+        return MaximumPaddleFingerContactErrorCm;
+    }
+
+    /** Largest radial miss between either thumb pad and its handle. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleThumbContactErrorCm() const
+    {
+        return MaximumPaddleThumbContactErrorCm;
+    }
+
+    /** Worst middle-finger/thumb radial dot; negative means opposed. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
+    float GetMaximumPaddleThumbOppositionDot() const
+    {
+        return MaximumPaddleThumbOppositionDot;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     float GetMinimumUpperPaddleFingerClosureDegrees() const
     {
@@ -147,6 +168,17 @@ private:
     void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyPaddleGripPose(const FRaftSimCrewAvatarPose& Pose);
     void ApplyFingerChain(bool bLeft, const TCHAR* Digit, float GripAlpha);
+    void ApplyFingerChainAroundGrip(
+        bool bLeft,
+        const TCHAR* Digit,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis,
+        bool bUpperTGrip);
+    void ApplyOpposedThumbPadToGrip(
+        bool bLeft,
+        const FVector& GripCenterCm,
+        const FVector& GripAxis,
+        bool bUpperTGrip);
     void SetPaddleGripHandTransform(
         bool bLeft,
         const FRaftSimCrewAvatarPose& Pose,
@@ -179,6 +211,12 @@ private:
         const FRaftSimCrewAvatarPose& Pose,
         bool bUpperTGrip) const;
     float MeasureMinimumPaddleThumbClosureDegrees() const;
+    float MeasureMaximumPaddleFingerContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureMaximumPaddleThumbContactErrorCm(
+        const FRaftSimCrewAvatarPose& Pose) const;
+    float MeasureMaximumPaddleThumbOppositionDot(
+        const FRaftSimCrewAvatarPose& Pose) const;
 
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> Root;
@@ -198,6 +236,9 @@ private:
     bool bHeadHiddenForFirstPerson = false;
     bool bPaddleGripActive = false;
     float MaximumPaddleGripAnchorErrorCm = 0.0f;
+    float MaximumPaddleFingerContactErrorCm = 0.0f;
+    float MaximumPaddleThumbContactErrorCm = 0.0f;
+    float MaximumPaddleThumbOppositionDot = -1.0f;
     float MinimumUpperPaddleFingerClosureDegrees = 0.0f;
     float MinimumLowerPaddleFingerClosureDegrees = 0.0f;
     float MinimumPaddleThumbClosureDegrees = 0.0f;

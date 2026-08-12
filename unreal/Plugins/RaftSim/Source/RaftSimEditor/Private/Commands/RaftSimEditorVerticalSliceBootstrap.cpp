@@ -138,7 +138,9 @@ static void HandleCreateVerticalSliceInputAssets(const TArray<FString>&)
     AddKeyMapping(Context, Actions[TEXT("PaddleStroke")], EKeys::S, /*bNegate=*/true);
     AddKeyMapping(Context, Actions[TEXT("PaddleDraw")], EKeys::D);
     AddKeyMapping(Context, Actions[TEXT("PaddleDraw")], EKeys::A, /*bNegate=*/true);
-    AddKeyMapping(Context, Actions[TEXT("Look")], EKeys::Mouse2D);
+    // Mouse look is sampled directly by ARaftSimGuidePlayerController. Keeping
+    // it out of Enhanced Input prevents held paddle-axis keys from starving
+    // mouse deltas; IA_Look remains the independent gamepad look path.
     AddKeyMapping(Context, Actions[TEXT("HighSide")], EKeys::SpaceBar);
     AddKeyMapping(Context, Actions[TEXT("Pause")], EKeys::Escape);
     AddKeyMapping(Context, Actions[TEXT("GuideCommandForwardPaddle")], EKeys::One);
