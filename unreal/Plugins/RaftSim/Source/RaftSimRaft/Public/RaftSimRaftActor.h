@@ -108,6 +108,9 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     bool HasProductionWhitewaterRaft() const { return bUsingProductionRaftRestMesh; }
 
+    /** Highest rendered floor point in a centre-deck window, in world cm. */
+    bool GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const;
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     FVector GetRaftVelocity() const;
 

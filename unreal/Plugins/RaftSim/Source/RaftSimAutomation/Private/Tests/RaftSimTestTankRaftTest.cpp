@@ -112,6 +112,19 @@ bool FRaftSimAssertRaftSettledCommand::Update()
     Test->TestTrue(
         TEXT("loaded raft center stays above the 25 cm settling envelope"),
         ZCm > -25.0f);
+    float FloorCenterWorldZCm = 0.0f;
+    const bool bHasFloorCenter =
+        Raft->GetRenderedFloorCenterWorldZCm(FloorCenterWorldZCm);
+    Test->TestTrue(TEXT("rendered self-bailing floor centre is measurable"), bHasFloorCenter);
+    if (bHasFloorCenter)
+    {
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("loaded self-bailing floor remains at the calm waterline "
+                     "(floor %.1f cm >= -2.5 cm)"),
+                FloorCenterWorldZCm),
+            FloorCenterWorldZCm >= -2.5f);
+    }
     Test->TestTrue(
         TEXT("raft vertical velocity settled (< 0.5 m/s)"),
         FMath::Abs(Raft->GetRaftVelocity().Z) < 0.5f);
@@ -249,6 +262,18 @@ bool FRaftSimStrokeAndMeasureCommand::Update()
     Test->TestTrue(
         TEXT("paddling does not sink the loaded raft center"),
         Raft->GetActorLocation().Z > -25.0f);
+    float FloorCenterWorldZCm = 0.0f;
+    if (Test->TestTrue(
+            TEXT("rendered floor remains measurable after strokes"),
+            Raft->GetRenderedFloorCenterWorldZCm(FloorCenterWorldZCm)))
+    {
+        Test->TestTrue(
+            FString::Printf(
+                TEXT("paddling does not submerge the self-bailing floor "
+                     "(floor %.1f cm >= -2.5 cm)"),
+                FloorCenterWorldZCm),
+            FloorCenterWorldZCm >= -2.5f);
+    }
     return true;
 }
 
