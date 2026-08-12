@@ -436,6 +436,11 @@ void ARaftSimRaftActor::BuildRaftVisual()
     {
         return;
     }
+    // Constructor component transforms are based on CDO defaults. Re-resolve
+    // the presentation origin from the live instance radius so an authored
+    // override cannot silently move the visible waterline away from support.
+    RaftVisual->SetRelativeLocation(
+        FVector(0.0f, 0.0f, -TubeRadiusM * 0.55f * kCmPerM));
     const TArray<FLinearColor> NoColors;
     ProductionRaftRestSections.Reset();
     ProductionRaftDeformedSections.Reset();
@@ -550,6 +555,43 @@ void ARaftSimRaftActor::BuildRaftVisual()
     {
         RaftVisual->SetMaterial(4, RubberMat);
     }
+}
+
+bool ARaftSimRaftActor::GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const
+{
+    OutWorldZCm = 0.0f;
+    if (RaftVisual == nullptr)
+    {
+        return false;
+    }
+    // Material section one is the inflated self-bailing floor in both the
+    // production asset contract and the procedural fallback. Restrict the
+    // sample to the centre so raised perimeter seams cannot hide a wet deck.
+    const FProcMeshSection* FloorSection = RaftVisual->GetProcMeshSection(1);
+    if (FloorSection == nullptr)
+    {
+        return false;
+    }
+    constexpr float CenterHalfExtentCm = 30.0f;
+    bool bFound = false;
+    const FTransform LocalToWorld = RaftVisual->GetComponentTransform();
+    for (const FProcMeshVertex& Vertex : FloorSection->ProcVertexBuffer)
+    {
+        const FVector LocalCm(Vertex.Position);
+        if (FMath::Abs(LocalCm.X) > CenterHalfExtentCm ||
+            FMath::Abs(LocalCm.Y) > CenterHalfExtentCm)
+        {
+            continue;
+        }
+        const float WorldZCm =
+            static_cast<float>(LocalToWorld.TransformPosition(LocalCm).Z);
+        if (!bFound || WorldZCm > OutWorldZCm)
+        {
+            OutWorldZCm = WorldZCm;
+            bFound = true;
+        }
+    }
+    return bFound;
 }
 
 void ARaftSimRaftActor::UpdateFlexibleRaftVisual()

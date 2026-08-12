@@ -8,6 +8,11 @@ namespace RaftSimRaftMesh
 namespace
 {
 constexpr float kCmPerM = 100.0f;
+// The production source mesh predates the self-bailing-floor waterline fix:
+// its nominal top plane was authored at 15.5 cm while the parametric raft now
+// places that plane at the side-tube centre. Keep the immutable source asset
+// usable, but calibrate its floor to the runtime tube radius during deformation.
+constexpr float kProductionAuthoredFloorPlaneZCm = 15.5f;
 
 struct FPointDeformation
 {
@@ -747,6 +752,8 @@ void DeformProductionRaftRestMesh(
             RestSections, TubeRadiusM, Deformation, *ReusableCache);
     }
     const float TubeCm = FMath::Max(TubeRadiusM * kCmPerM, 1.0f);
+    const float ProductionFloorLiftCm =
+        TubeCm - kProductionAuthoredFloorPlaneZCm;
     const float PressureScale = FMath::Lerp(
         0.82f,
         1.0f,
@@ -770,7 +777,19 @@ void DeformProductionRaftRestMesh(
                       TubeCm,
                       Deformation)
                 : EvaluatePointDeformation(RestVertex, TubeCm, &Deformation);
-            FVector Vertex = RestVertex + Shape.OffsetCm;
+            // Match the procedural fallback: the laced floor follows 55% of
+            // tube displacement instead of inheriting the full accumulated
+            // perimeter sag. The old production path applied 100%, which
+            // depressed an already-low floor further under the seated crew.
+            const float DeformationScale = SectionIndex == 1 ? 0.55f : 1.0f;
+            FVector Vertex = RestVertex + Shape.OffsetCm * DeformationScale;
+            if (SectionIndex == 1)
+            {
+                // Bring the production self-bailer onto the same tube-centre
+                // plane as BuildInflatableRaft. This changes presentation only;
+                // the six-point tube support and loaded mass remain authoritative.
+                Vertex.Z += ProductionFloorLiftCm;
+            }
 
             // The imported rest topology previously translated through the D4
             // field but ignored D4's actual radial compression. Apply the same
@@ -860,7 +879,7 @@ void DeformProductionRaftRestMesh(
                             (1.0f / CompressedScale - 1.0f);
                     }
                     constexpr float LightingGradientScale = 0.52f;
-                    return Transformed + LightingGradientScale * (
+                    return Transformed + LightingGradientScale * DeformationScale * (
                         Shape.OffsetGradientX * Transformed.X +
                         Shape.OffsetGradientY * Transformed.Y);
                 };

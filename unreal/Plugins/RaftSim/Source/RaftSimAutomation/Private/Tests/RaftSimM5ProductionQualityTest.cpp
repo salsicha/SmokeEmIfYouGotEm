@@ -982,6 +982,7 @@ bool FRaftSimM5FlexibleFabricConditionTest::RunTest(const FString&)
                  ProductionRaft->GetNumTriangles(0) >= 30000);
 
         TArray<RaftSimRaftMesh::FMeshData> ProductionRest;
+        TArray<RaftSimRaftMesh::FMeshData> ProductionNeutral;
         TArray<RaftSimRaftMesh::FMeshData> ProductionBent;
         TestTrue(TEXT("production raft rest topology extracts"),
                  RaftSimRaftMesh::ExtractProductionRaftRestMesh(
@@ -990,6 +991,8 @@ bool FRaftSimM5FlexibleFabricConditionTest::RunTest(const FString&)
                   ProductionRest.Num(), 5);
         if (ProductionRest.Num() == 5)
         {
+            RaftSimRaftMesh::DeformProductionRaftRestMesh(
+                ProductionRest, 0.28f, {}, {}, ProductionNeutral);
             RaftSimRaftMesh::DeformProductionRaftRestMesh(
                 ProductionRest, 0.28f, {Contact}, {}, ProductionBent);
             RaftSimRaftMesh::FProductionRaftDeformationCache ProductionCache;
@@ -1003,6 +1006,11 @@ bool FRaftSimM5FlexibleFabricConditionTest::RunTest(const FString&)
                 &ProductionCache);
             TestEqual(TEXT("production deformation preserves section count"),
                       ProductionBent.Num(), ProductionRest.Num());
+            const float ProductionFloorLiftCm =
+                ProductionNeutral[1].Vertices[0].Z - ProductionRest[1].Vertices[0].Z;
+            TestTrue(
+                TEXT("production self-bailing floor is calibrated to tube-centre height"),
+                FMath::IsNearlyEqual(ProductionFloorLiftCm, 12.5f, 0.1f));
             float ProductionMaximumMoveCm = 0.0f;
             float ProductionMaximumNormalDelta = 0.0f;
             bool bProductionFiniteAndStable = ProductionBent.Num() == ProductionRest.Num();
@@ -1012,10 +1020,13 @@ bool FRaftSimM5FlexibleFabricConditionTest::RunTest(const FString&)
             {
                 const RaftSimRaftMesh::FMeshData& RestSection =
                     ProductionRest[SectionIndex];
+                const RaftSimRaftMesh::FMeshData& NeutralSection =
+                    ProductionNeutral[SectionIndex];
                 const RaftSimRaftMesh::FMeshData& BentSection =
                     ProductionBent[SectionIndex];
                 bProductionFiniteAndStable &=
                     !RestSection.Vertices.IsEmpty() &&
+                    NeutralSection.Vertices.Num() == RestSection.Vertices.Num() &&
                     BentSection.Vertices.Num() == RestSection.Vertices.Num() &&
                     BentSection.Normals.Num() == RestSection.Normals.Num() &&
                     BentSection.Tangents.Num() == RestSection.Tangents.Num() &&
@@ -1047,7 +1058,7 @@ bool FRaftSimM5FlexibleFabricConditionTest::RunTest(const FString&)
                     ProductionMaximumMoveCm = FMath::Max(
                         ProductionMaximumMoveCm,
                         FVector::Distance(
-                            RestSection.Vertices[VertexIndex],
+                            NeutralSection.Vertices[VertexIndex],
                             BentSection.Vertices[VertexIndex]));
                     ProductionMaximumNormalDelta = FMath::Max(
                         ProductionMaximumNormalDelta,
