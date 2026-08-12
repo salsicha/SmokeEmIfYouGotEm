@@ -1224,6 +1224,25 @@ float URaftSimCrewAvatarPoseLibrary::GetDeterministicTimingOffset(
         return 0.045f;
     }
     return PaddlerOffsets[FMath::Abs(VariantIndex) % UE_ARRAY_COUNT(PaddlerOffsets)];
+
+}
+float URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseStart()
+{
+    return 0.24f;
+}
+
+float URaftSimCrewAvatarPoseLibrary::GetPaddlePowerPhaseEnd()
+{
+    return 0.48f;
+}
+
+bool URaftSimCrewAvatarPoseLibrary::IsPaddleBladeInPowerPhase(
+    float NormalizedPhase)
+{
+    const float Wrapped =
+        FMath::Frac(1.0f + FMath::Frac(NormalizedPhase));
+    return Wrapped >= GetPaddlePowerPhaseStart() &&
+        Wrapped <= GetPaddlePowerPhaseEnd();
 }
 
 ARaftSimCrewAvatarActor::ARaftSimCrewAvatarActor()

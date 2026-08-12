@@ -21,8 +21,6 @@ namespace
 {
 constexpr float kSurfCmPerM = 100.0f;
 constexpr float kGravity = 9.80665f;
-constexpr float kPresentationFoamFroudeStart = 0.72f;
-constexpr float kPresentationFoamFroudeRange = 1.18f;
 // Static full-reach water uses one material repeat per approximately three
 // river metres. Keep the moving solver patch in the same river-coordinate
 // basis so normal-map scale does not stretch or pop as the grid recentres.
@@ -35,6 +33,11 @@ constexpr float kLiveVolumeCoreMinimumStationCoverage = 0.60f;
 constexpr float kLiveVolumeCoreOffsetCm = 1.0f;
 constexpr float kLiveVolumeCoreCalmDetailCoverage = 0.035f;
 constexpr float kLiveVolumeCoreActiveDetailCoverage = 0.14f;
+// Rivers that retain an authored Single Layer Water body still need the live
+// mesh to expose the current. This bounded translucent skin carries only
+// solver-velocity detail; the authored mesh remains the optical water volume.
+constexpr float kAuthoredCarrierCalmDetailCoverage = 0.12f;
+constexpr float kAuthoredCarrierActiveDetailCoverage = 0.42f;
 
 TAutoConsoleVariable<int32> CVarRaftSimDownstreamBoilMicrorelief(
     TEXT("RaftSim.Water.DownstreamBoilMicrorelief"),
@@ -43,219 +46,6 @@ TAutoConsoleVariable<int32> CVarRaftSimDownstreamBoilMicrorelief(
     TEXT("Default 1; set 0 only for matched visual diagnostics."),
     ECVF_Default);
 
-struct FPresentationStandingWave
-{
-    float DisplacementMeters = 0.0f;
-    float StationSlope = 0.0f;
-    float LateralSlope = 0.0f;
-};
-
-FPresentationStandingWave ComputePresentationStandingWave(
-    const FVector2D& RiverCoordinatesMeters,
-    float SpeedMetersPerSecond,
-    float DepthMeters)
-{
-    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
-    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
-    const float Froude = SafeSpeed / FMath::Sqrt(kGravity * SafeDepth);
-    // This intentionally matches the full-reach water authoring contract in
-    // south_fork_photoreal_environment.py. Runtime whitewater colour remains
-    // on the stricter supercritical threshold below; the earlier response here
-    // only restores the geometric shoulders hidden by the moving overlay.
-    const float PresentationFoam = FMath::Clamp(
-        (Froude - kPresentationFoamFroudeStart) /
-            kPresentationFoamFroudeRange,
-        0.0f,
-        1.0f);
-    const float SpeedNorm = FMath::Clamp(SafeSpeed / 8.0f, 0.0f, 1.0f);
-    const float HydraulicEnergy = FMath::Clamp(
-        PresentationFoam * 0.72f + SpeedNorm * 0.48f,
-        0.0f,
-        1.0f);
-
-    FPresentationStandingWave Result;
-    auto AccumulateBand = [&Result](
-                              float AmplitudeMeters,
-                              float Envelope,
-                              float EnvelopeStationDerivative,
-                              float EnvelopeLateralDerivative,
-                              float Phase,
-                              float PhaseStationDerivative,
-                              float PhaseLateralDerivative)
-    {
-        const float SinPhase = FMath::Sin(Phase);
-        const float CosPhase = FMath::Cos(Phase);
-        Result.DisplacementMeters +=
-            AmplitudeMeters * Envelope * SinPhase;
-        Result.StationSlope +=
-            AmplitudeMeters *
-            (EnvelopeStationDerivative * SinPhase +
-                Envelope * CosPhase * PhaseStationDerivative);
-        Result.LateralSlope +=
-            AmplitudeMeters *
-            (EnvelopeLateralDerivative * SinPhase +
-                Envelope * CosPhase * PhaseLateralDerivative);
-    };
-
-    const float StationM = RiverCoordinatesMeters.X;
-    const float LateralM = RiverCoordinatesMeters.Y;
-
-    // Calm water retains two small phase-warped ripples instead of sharing a
-    // large diagonal phase with the rapid response. Their combined envelope
-    // remains the authored 1.8 cm maximum.
-    const float CalmWarpA = StationM * 0.11f - LateralM * 0.19f;
-    const float CalmPhaseA =
-        StationM * 0.73f + LateralM * 0.27f +
-        0.16f * FMath::Sin(CalmWarpA);
-    AccumulateBand(
-        0.011f,
-        1.0f,
-        0.0f,
-        0.0f,
-        CalmPhaseA,
-        0.73f + 0.16f * 0.11f * FMath::Cos(CalmWarpA),
-        0.27f - 0.16f * 0.19f * FMath::Cos(CalmWarpA));
-
-    const float CalmWarpB = StationM * 0.23f + LateralM * 0.13f;
-    const float CalmPhaseB =
-        StationM * 1.21f - LateralM * 0.33f +
-        0.10f * FMath::Sin(CalmWarpB);
-    AccumulateBand(
-        0.007f,
-        1.0f,
-        0.0f,
-        0.0f,
-        CalmPhaseB,
-        1.21f + 0.10f * 0.23f * FMath::Cos(CalmWarpB),
-        -0.33f + 0.10f * 0.13f * FMath::Cos(CalmWarpB));
-
-    // Build the energetic surface from flow-aligned, phase-warped crest
-    // packets. The former dominant band put 11.5 cm into one continuous
-    // diagonal sinusoid. This field limits every individual rapid band to
-    // 6.5 cm, varies its energy over the reach, and uses incommensurate warps
-    // so the pattern does not visibly tile at playable scales.
-    const float PacketWarp = StationM * 0.013f - LateralM * 0.091f;
-    const float PacketPhase =
-        StationM * 0.041f + LateralM * 0.067f +
-        0.60f * FMath::Sin(PacketWarp);
-    const float PacketPhaseStationDerivative =
-        0.041f + 0.60f * 0.013f * FMath::Cos(PacketWarp);
-    const float PacketPhaseLateralDerivative =
-        0.067f - 0.60f * 0.091f * FMath::Cos(PacketWarp);
-    const float PacketSignal = 0.5f + 0.5f * FMath::Sin(PacketPhase);
-    const float PacketSignalStationDerivative =
-        0.5f * FMath::Cos(PacketPhase) * PacketPhaseStationDerivative;
-    const float PacketSignalLateralDerivative =
-        0.5f * FMath::Cos(PacketPhase) * PacketPhaseLateralDerivative;
-    const float PrimaryPacket =
-        0.18f + 0.82f * PacketSignal * PacketSignal;
-    const float PrimaryPacketStationDerivative =
-        1.64f * PacketSignal * PacketSignalStationDerivative;
-    const float PrimaryPacketLateralDerivative =
-        1.64f * PacketSignal * PacketSignalLateralDerivative;
-    const float SecondaryPacket = 1.0f - 0.45f * PacketSignal;
-    const float SecondaryPacketStationDerivative =
-        -0.45f * PacketSignalStationDerivative;
-    const float SecondaryPacketLateralDerivative =
-        -0.45f * PacketSignalLateralDerivative;
-
-    const float PrimaryWarpA = StationM * 0.063f - LateralM * 0.14f;
-    const float PrimaryWarpB = StationM * 0.017f + LateralM * 0.23f;
-    const float PrimaryPhase =
-        StationM * 0.58f + LateralM * 0.09f +
-        0.35f * FMath::Sin(PrimaryWarpA) +
-        0.22f * FMath::Sin(PrimaryWarpB);
-    AccumulateBand(
-        0.065f,
-        HydraulicEnergy * PrimaryPacket,
-        HydraulicEnergy * PrimaryPacketStationDerivative,
-        HydraulicEnergy * PrimaryPacketLateralDerivative,
-        PrimaryPhase,
-        0.58f + 0.35f * 0.063f * FMath::Cos(PrimaryWarpA) +
-            0.22f * 0.017f * FMath::Cos(PrimaryWarpB),
-        0.09f - 0.35f * 0.14f * FMath::Cos(PrimaryWarpA) +
-            0.22f * 0.23f * FMath::Cos(PrimaryWarpB));
-
-    const float SecondaryWarp = StationM * 0.033f + LateralM * 0.17f;
-    const float SecondaryPhase =
-        StationM * 1.03f - LateralM * 0.12f +
-        0.28f * FMath::Sin(SecondaryWarp);
-    AccumulateBand(
-        0.043f,
-        HydraulicEnergy * SecondaryPacket,
-        HydraulicEnergy * SecondaryPacketStationDerivative,
-        HydraulicEnergy * SecondaryPacketLateralDerivative,
-        SecondaryPhase,
-        1.03f + 0.28f * 0.033f * FMath::Cos(SecondaryWarp),
-        -0.12f + 0.28f * 0.17f * FMath::Cos(SecondaryWarp));
-
-    const float DetailWarp = StationM * 0.12f - LateralM * 0.33f;
-    const float DetailPhase =
-        StationM * 1.47f + LateralM * 0.21f +
-        0.16f * FMath::Sin(DetailWarp);
-    AccumulateBand(
-        0.026f,
-        HydraulicEnergy,
-        0.0f,
-        0.0f,
-        DetailPhase,
-        1.47f + 0.16f * 0.12f * FMath::Cos(DetailWarp),
-        0.21f - 0.16f * 0.33f * FMath::Cos(DetailWarp));
-
-    const float CrossWarp = StationM * 0.027f + LateralM * 0.19f;
-    const float CrossPhase =
-        StationM * 0.36f - LateralM * 0.31f +
-        0.25f * FMath::Sin(CrossWarp);
-    AccumulateBand(
-        0.016f,
-        HydraulicEnergy,
-        0.0f,
-        0.0f,
-        CrossPhase,
-        0.36f + 0.25f * 0.027f * FMath::Cos(CrossWarp),
-        -0.31f + 0.25f * 0.19f * FMath::Cos(CrossWarp));
-    return Result;
-}
-
-float ComputePresentationHydraulicRelief(
-    float CenterSurfaceHeightMeters,
-    float UpstreamFarSurfaceHeightMeters,
-    float UpstreamNearSurfaceHeightMeters,
-    float DownstreamNearSurfaceHeightMeters,
-    float DownstreamFarSurfaceHeightMeters,
-    float SpeedMetersPerSecond,
-    float DepthMeters)
-{
-    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
-    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
-    const float Froude = SafeSpeed / FMath::Sqrt(kGravity * SafeDepth);
-    const float NearCriticalActivation = FMath::Clamp(
-        (Froude - 0.55f) / 0.85f,
-        0.0f,
-        1.0f);
-    const float SpeedActivation = FMath::Clamp(SafeSpeed / 4.0f, 0.0f, 1.0f);
-    const float HydraulicActivation = FMath::Clamp(
-        NearCriticalActivation * 0.82f + SpeedActivation * 0.18f,
-        0.0f,
-        1.0f);
-
-    // Symmetric weights reproduce any local linear river grade exactly. The
-    // residual therefore responds to solver-resolved convex crests and
-    // concave holes rather than inventing relief on planar reaches.
-    const float NeighbourSurfaceMeters =
-        UpstreamFarSurfaceHeightMeters * 0.125f +
-        UpstreamNearSurfaceHeightMeters * 0.375f +
-        DownstreamNearSurfaceHeightMeters * 0.375f +
-        DownstreamFarSurfaceHeightMeters * 0.125f;
-    const float SolverReliefMeters =
-        CenterSurfaceHeightMeters - NeighbourSurfaceMeters;
-    const float MaximumReliefMeters =
-        0.22f + 0.18f * FMath::Clamp(SafeDepth / 2.0f, 0.0f, 1.0f);
-    return FMath::Clamp(
-        SolverReliefMeters * 1.25f * HydraulicActivation,
-        -MaximumReliefMeters,
-        MaximumReliefMeters);
-}
 
 float ComputeStationEdgeCoverage(
     int32 StationIndex,
@@ -545,7 +335,7 @@ float ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMete
     float SpeedMetersPerSecond,
     float DepthMeters)
 {
-    return ComputePresentationStandingWave(
+    return URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWave(
                RiverCoordinatesMeters,
                SpeedMetersPerSecond,
                DepthMeters)
@@ -561,7 +351,7 @@ float ARaftSimWaterSurfaceActor::ComputePresentationHydraulicReliefDisplacementM
     float SpeedMetersPerSecond,
     float DepthMeters)
 {
-    return ComputePresentationHydraulicRelief(
+    return URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
         CenterSurfaceHeightMeters,
         UpstreamFarSurfaceHeightMeters,
         UpstreamNearSurfaceHeightMeters,
@@ -579,14 +369,34 @@ float ARaftSimWaterSurfaceActor::ComputePresentationSmoothedSurfaceHeightMeters(
     float RiverLeftSurfaceHeightMeters,
     float Strength)
 {
-    const float FilteredSurfaceHeightMeters =
-        CenterSurfaceHeightMeters * 0.44f +
-        (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters +
-            RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) * 0.14f;
-    return FMath::Lerp(
-        CenterSurfaceHeightMeters,
-        FilteredSurfaceHeightMeters,
-        FMath::Clamp(Strength, 0.0f, 1.0f));
+    return URaftSimWaterRuntimeAdapter::
+        ComputeCoupledSmoothedSurfaceHeightMeters(
+            CenterSurfaceHeightMeters,
+            UpstreamSurfaceHeightMeters, DownstreamSurfaceHeightMeters,
+            RiverRightSurfaceHeightMeters, RiverLeftSurfaceHeightMeters,
+            Strength);
+}
+
+float ARaftSimWaterSurfaceActor::ComputeRaftHullSurfaceExclusion(
+    const FVector& WorldPositionCm,
+    const FVector& RaftCenterCm,
+    const FVector& RaftForward)
+{
+    FVector Forward = RaftForward.GetSafeNormal2D();
+    if (Forward.IsNearlyZero())
+    {
+        Forward = FVector::ForwardVector;
+    }
+    const FVector Delta = WorldPositionCm - RaftCenterCm;
+    const FVector Across(-Forward.Y, Forward.X, 0.0f);
+    constexpr float HullHalfLengthCm = 320.0f;
+    constexpr float HullHalfWidthCm = 190.0f;
+    const float Along =
+        FVector::DotProduct(Delta, Forward) / HullHalfLengthCm;
+    const float AcrossDistance =
+        FVector::DotProduct(Delta, Across) / HullHalfWidthCm;
+    const float EllipseSquared = Along * Along + AcrossDistance * AcrossDistance;
+    return FMath::SmoothStep(0.72f, 1.30f, EllipseSquared);
 }
 
 FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingLipProfileCentimeters(
@@ -698,11 +508,18 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
                 0.10f * BrokenShoulder * ShoulderVariation),
         -0.28f * SafeIntensity,
         0.16f * SafeIntensity);
+    // An accepted hydraulic jump is already a binary breaking-water event.
+    // Do not multiply its entire optical response by the raw detector score:
+    // moderate but valid jumps then fell below river-specific lace thresholds
+    // and appeared glassy. Intensity still controls the spread, while this
+    // remap guarantees a white, perforated aerated core at every accepted jump.
+    const float BreakingFrothStrength = FMath::Lerp(
+        0.62f, 1.0f, FMath::Sqrt(SafeIntensity));
     const float FoamGeneration = FMath::Clamp(
-        SafeIntensity *
-            (0.16f * PlungeCore +
-                0.82f * AeratedReturn +
-                0.62f * BrokenShoulder * ShoulderVariation),
+        BreakingFrothStrength *
+            (0.28f * PlungeCore +
+                1.00f * AeratedReturn +
+                0.78f * BrokenShoulder * ShoulderVariation),
         0.0f,
         1.0f);
     return FVector2D(DisplacementMeters, FoamGeneration);
@@ -958,10 +775,10 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
     ResolvedCalmLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveSurfaceCalmCoverage, 0.0f, 1.0f)
-        : 0.0f;
+        : (RiverWaterConfig ? kAuthoredCarrierCalmDetailCoverage : 0.0f);
     ResolvedActiveLiveSurfaceCoverage = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveSurfaceActiveCoverage, 0.0f, 1.0f)
-        : 0.0f;
+        : (RiverWaterConfig ? kAuthoredCarrierActiveDetailCoverage : 0.0f);
     const bool bUsesMigratedFutaleufuVolumeCore =
         RiverWaterConfig &&
         RiverWaterConfig->CookedFieldsDir.Contains(
@@ -1312,6 +1129,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             1.5f,
             12.0f);
     }
+    if (WaterAdapter)
+    {
+        WaterAdapter->ConfigureRaftSupportSurface(
+            bLiveSurfaceCarrierEnabled,
+            ResolvedPresentationSurfaceSmoothingStrength,
+            ResolvedPresentationStandingWaveScale,
+            ResolvedPresentationHydraulicReliefScale);
+    }
 
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
     // Every shipped river map owns an explicit water configuration, including
@@ -1338,6 +1163,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     RiverCoordinatesM.SetNum(VertCount);
     Normals.SetNum(VertCount);
     UVs.SetNum(VertCount);
+    FlowVelocityMetersPerSecond.SetNumZeroed(VertCount);
     VertexColors.SetNum(VertCount);
     LiveVolumeCoreVertices.SetNum(VertCount);
     LiveVolumeCoreTriangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
@@ -1397,6 +1223,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             }
             Normals[Index] = FVector::UpVector;
             UVs[Index] = RiverCoordinatesM[Index] / kWaterTextureRepeatMeters;
+            FlowVelocityMetersPerSecond[Index] = FVector2D::ZeroVector;
             VertexColors[Index] = FLinearColor(
                 0.0f,
                 0.0f,
@@ -1432,8 +1259,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         }
     }
 
+    const TArray<FVector2D> EmptyUVs;
     SurfaceMesh->CreateMeshSection_LinearColor(
-        0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents,
+        0,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        FlowVelocityMetersPerSecond,
+        EmptyUVs,
+        EmptyUVs,
+        VertexColors,
+        Tangents,
         /*bCreateCollision=*/false);
     LiveVolumeCoreMesh->SetVisibility(false, true);
     if (LiveVolumeCoreMaterial != nullptr)
@@ -1592,7 +1429,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     TEXT("LiveRippleStrength"),
                     bLiveSurfaceCarrierEnabled
                         ? ResolvedLiveRippleStrength
-                        : 0.18f);
+                        : 0.32f);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveFoamIntensity"),
                     bLiveSurfaceCarrierEnabled
@@ -1658,21 +1495,21 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 BreakingMaterial->SetScalarParameterValue(
                     TEXT("BreakingWaterOpacity"), 0.035f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamOpacity"), 0.86f);
+                    TEXT("BreakingFoamOpacity"), 0.96f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamFloor"), 0.02f);
+                    TEXT("BreakingFoamFloor"), 0.60f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamIntensityGain"), 0.62f);
+                    TEXT("BreakingFoamIntensityGain"), 0.90f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("PrimaryLaceGain"), 0.45f);
+                    TEXT("PrimaryLaceGain"), 0.65f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("DetailLaceGain"), 0.20f);
+                    TEXT("DetailLaceGain"), 0.35f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamCoreGain"), 1.25f);
+                    TEXT("BreakingFoamCoreGain"), 1.45f);
                 BreakingMaterial->SetScalarParameterValue(
                     TEXT("BreakingWaterRoughness"), 0.16f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamRoughness"), 0.78f);
+                    TEXT("BreakingFoamRoughness"), 0.82f);
                 BreakingMaterial->SetScalarParameterValue(
                     TEXT("BreakingWaterSpecular"), 0.30f);
                 BreakingMaterial->SetVectorParameterValue(
@@ -1680,7 +1517,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     FLinearColor(0.10f, 0.22f, 0.27f, 1.0f));
                 BreakingMaterial->SetVectorParameterValue(
                     TEXT("BreakingFoamColor"),
-                    FLinearColor(0.64f, 0.69f, 0.68f, 1.0f));
+                    FLinearColor(0.96f, 0.98f, 1.0f, 1.0f));
             }
             if (RapidFoamMaterial == nullptr)
             {
@@ -1694,17 +1531,17 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     RollerMaterial->SetScalarParameterValue(
                         TEXT("BreakingWaterOpacity"), 0.003f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("BreakingFoamOpacity"), 0.86f);
+                        TEXT("BreakingFoamOpacity"), 0.96f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("BreakingFoamFloor"), 0.010f);
+                        TEXT("BreakingFoamFloor"), 0.60f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("BreakingFoamIntensityGain"), 0.44f);
+                        TEXT("BreakingFoamIntensityGain"), 0.90f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("PrimaryLaceGain"), 0.68f);
+                        TEXT("PrimaryLaceGain"), 0.72f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("DetailLaceGain"), 0.38f);
+                        TEXT("DetailLaceGain"), 0.42f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("BreakingFoamCoreGain"), 1.12f);
+                        TEXT("BreakingFoamCoreGain"), 1.35f);
                     RollerMaterial->SetScalarParameterValue(
                         TEXT("BreakingWaterRoughness"), 0.22f);
                     RollerMaterial->SetScalarParameterValue(
@@ -1716,7 +1553,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                         FLinearColor(0.08f, 0.18f, 0.22f, 1.0f));
                     RollerMaterial->SetVectorParameterValue(
                         TEXT("BreakingFoamColor"),
-                        FLinearColor(0.62f, 0.68f, 0.67f, 1.0f));
+                        FLinearColor(0.96f, 0.98f, 1.0f, 1.0f));
                 }
             }
         }
@@ -2127,7 +1964,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                         FMath::Exp(-CoreDistance * CoreDistance) *
                         FMath::Lerp(0.52f, 0.95f, Intensity) * Breakup;
                     const float FoamBrightness = FMath::Lerp(
-                        0.62f, 0.86f, AeratedCore);
+                        0.88f, 1.0f, AeratedCore);
                     RollerColors.Add(FLinearColor(
                         FoamBrightness * 0.94f,
                         FoamBrightness,
@@ -2426,7 +2263,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 continue;
             }
             const FRaftSimWaterSample& Sample = WaterSamples[Index];
-            HydraulicReliefMeters[Index] = ComputePresentationHydraulicRelief(
+            HydraulicReliefMeters[Index] =
+                URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
                 PresentationSurfaceHeightMeters[Index],
                 PresentationSurfaceHeightMeters[UpstreamFarIndex],
                 PresentationSurfaceHeightMeters[UpstreamNearIndex],
@@ -2473,20 +2311,30 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
             float DepthNorm = 0.0f;
             float SpeedNorm = 0.0f;
+            FlowVelocityMetersPerSecond[Index] = FVector2D::ZeroVector;
             if (WetVertexMask[Index] != 0)
             {
                 const FRaftSimWaterSample& Sample = WaterSamples[Index];
                 const float Speed = Sample.VelocityMetersPerSecond.Size2D();
+                // Curved-grid field samples are already (downstream,
+                // river-left); legacy straight-grid samples are world XY,
+                // which is also the UV0 basis there. UV1 therefore carries a
+                // physical metres-per-second vector in the matching texture
+                // coordinate frame for every supported live window.
+                FlowVelocityMetersPerSecond[Index] = FVector2D(
+                    Sample.VelocityMetersPerSecond.X,
+                    Sample.VelocityMetersPerSecond.Y);
                 const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
-                const FPresentationStandingWave StandingWave =
-                    ComputePresentationStandingWave(
+                const FRaftSimWaterStandingWave StandingWave =
+                    URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWave(
                         RiverCoordinatesM[Index], Speed, Depth);
                 const float HydraulicRelief = HydraulicReliefMeters[Index];
                 // The authored seasonal surface remains beneath this live
                 // solver patch. Reapply its deterministic sub-grid ripple and
                 // sharpen only the large-scale relief already present in the
-                // sampled cooked surface. A 2 cm presentation lift prevents
-                // depth fighting. None of these terms changes physics.
+                // sampled cooked surface. Standing-wave and relief terms also
+                // drive rigid support; the 2 cm z-fight lift is render-only,
+                // and flexible D3 keeps the unamplified water field.
                 SurfaceZCm =
                     (PresentationSurfaceHeightMeters[Index] +
                         StandingWave.DisplacementMeters *
@@ -2769,10 +2617,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             Vertices[UpstreamIndex].Z += LiftCm;
             Vertices[Index].Z -= 0.45f * LiftCm;
 
+            const float BreakingFrothStrength = FMath::Lerp(
+                0.62f, 1.0f, FMath::Sqrt(Intensity));
             SourceFoam[UpstreamIndex] = FMath::Max(
-                SourceFoam[UpstreamIndex], 0.55f * Intensity + 0.15f);
+                SourceFoam[UpstreamIndex], 0.75f * BreakingFrothStrength);
             SourceFoam[Index] = FMath::Max(
-                SourceFoam[Index], 0.85f * Intensity + 0.15f);
+                SourceFoam[Index], 0.95f * BreakingFrothStrength);
 
             // Decaying tailwater wave train: the oscillatory surface every
             // hydraulic jump sheds downstream. Alternating, exponentially
@@ -2798,7 +2648,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 Vertices[TailIndex].Z += 0.62f * LiftCm * Decay * Phase;
                 SourceFoam[TailIndex] = FMath::Max(
                     SourceFoam[TailIndex],
-                    Intensity * FMath::Max(Phase, 0.0f) * 0.55f * Decay + 0.30f * Decay);
+                    Intensity * FMath::Max(Phase, 0.0f) * 0.65f * Decay + 0.38f * Decay);
             }
 
             FBreakingSite Site;
@@ -3337,7 +3187,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 0.0f,
                 1.0f);
             RapidFoamVertexColors[Index] = FLinearColor(
-                0.62f, 0.68f, 0.66f, FoamCoverage);
+                0.96f, 0.98f, 1.0f, FoamCoverage);
             if (FoamCoverage >= 0.18f)
             {
                 ++VisibleRapidFoamVertexCount;
@@ -3353,8 +3203,35 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         RapidFoamMesh->SetVisibility(VisibleRapidFoamVertexCount > 0, true);
     }
 
+    TArray<FLinearColor> SurfacePresentationColors = VertexColors;
+    if (IsValid(FoamOcclusionRaft))
+    {
+        const FVector RaftCenterCm = FoamOcclusionRaft->GetActorLocation();
+        const FVector RaftForward = FoamOcclusionRaft->GetActorForwardVector();
+        const FTransform SurfaceTransform = GetActorTransform();
+        for (int32 Index = 0; Index < SurfacePresentationColors.Num(); ++Index)
+        {
+            const FVector WorldPositionCm =
+                SurfaceTransform.TransformPosition(Vertices[Index]);
+            SurfacePresentationColors[Index].A *=
+                ComputeRaftHullSurfaceExclusion(
+                    WorldPositionCm,
+                    RaftCenterCm,
+                    RaftForward);
+        }
+    }
+
+    const TArray<FVector2D> EmptyUVs;
     SurfaceMesh->UpdateMeshSection_LinearColor(
-        0, Vertices, Normals, UVs, VertexColors, Tangents);
+        0,
+        Vertices,
+        Normals,
+        UVs,
+        FlowVelocityMetersPerSecond,
+        EmptyUVs,
+        EmptyUVs,
+        SurfacePresentationColors,
+        Tangents);
     const double RefreshCpuMilliseconds =
         (FPlatformTime::Seconds() - RefreshStartSeconds) * 1000.0;
     if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)

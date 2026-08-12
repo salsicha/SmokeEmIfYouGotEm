@@ -169,10 +169,10 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.5"))
     float LiveFoamIntensity = 0.52f;
 
-    /** Enables a render-only, plane-preserving five-tap filter over the
-     * sampled free surface. This removes cooked-cell stair steps without
-     * modifying the adapter samples, solver state, collision, buoyancy, or
-     * raft forces. */
+    /** Enables a plane-preserving five-tap filter over the visible carrier
+     * and rigid raft-support surface. This removes cooked-cell stair steps
+     * without mutating solver state, collision, flexible D3 overwash, or
+     * authored bathymetry. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     bool bEnableLivePresentationSurfaceSmoothing = false;
 
@@ -180,12 +180,14 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LivePresentationSurfaceSmoothingStrength = 0.0f;
 
-    /** River-local scale for the synthetic sub-grid standing-wave term. */
+    /** River-local scale for the solver-energy-gated sub-grid standing-wave
+     * term shared by the visible carrier and rigid raft support. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LivePresentationStandingWaveScale = 1.0f;
 
-    /** River-local scale for visual relief derived from solver curvature. */
+    /** River-local scale for carrier/support relief derived from solver
+     * surface curvature. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LivePresentationHydraulicReliefScale = 1.0f;

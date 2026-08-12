@@ -6,8 +6,9 @@ installed. This capture forces the public validation path on the ordinary
 gameplay host, then records the guide and four crew identities from front,
 profile, rear, face, grip-front, and grip-profile views. Safety gear and the
 paddle remain host-owned; redundant procedural anatomy must be hidden behind
-the complete CC0 body. The close grip views fail closed on palm anchoring and
-finger/thumb chain closure before any evidence is promoted.
+the complete CC0 body. The close grip views fail closed on palm anchoring,
+distal finger/thumb contact, and thumb opposition before any evidence is
+promoted.
 """
 
 from __future__ import annotations
@@ -335,6 +336,15 @@ def main() -> None:
             paddle_grip_anchor_error_cm = (
                 visual_actor.get_maximum_paddle_grip_anchor_error_cm()
             )
+            finger_contact_error_cm = (
+                visual_actor.get_maximum_paddle_finger_contact_error_cm()
+            )
+            thumb_contact_error_cm = (
+                visual_actor.get_maximum_paddle_thumb_contact_error_cm()
+            )
+            thumb_opposition_dot = (
+                visual_actor.get_maximum_paddle_thumb_opposition_dot()
+            )
             upper_finger_closure_degrees = (
                 visual_actor.get_minimum_upper_paddle_finger_closure_degrees()
             )
@@ -372,20 +382,20 @@ def main() -> None:
                     f"Palm anchor exceeds 0.25 cm for {character_name}: "
                     f"{paddle_grip_anchor_error_cm:.6f}"
                 )
-            if upper_finger_closure_degrees < 120.0:
+            if finger_contact_error_cm > 0.25:
                 raise RuntimeError(
-                    f"Upper T-grip finger closure is below 120 degrees for "
-                    f"{character_name}: {upper_finger_closure_degrees:.6f}"
+                    f"Finger pads miss a paddle handle for {character_name}: "
+                    f"{finger_contact_error_cm:.6f} cm"
                 )
-            if lower_finger_closure_degrees < 210.0:
+            if thumb_contact_error_cm > 0.25:
                 raise RuntimeError(
-                    f"Lower shaft finger closure is below 210 degrees for "
-                    f"{character_name}: {lower_finger_closure_degrees:.6f}"
+                    f"Thumb pads miss a paddle handle for {character_name}: "
+                    f"{thumb_contact_error_cm:.6f} cm"
                 )
-            if thumb_closure_degrees < 50.0:
+            if thumb_opposition_dot > -0.80:
                 raise RuntimeError(
-                    f"Opposed thumb closure is below 50 degrees for "
-                    f"{character_name}: {thumb_closure_degrees:.6f}"
+                    f"Thumbs are not opposed across the paddle for "
+                    f"{character_name}: radial dot {thumb_opposition_dot:.6f}"
                 )
 
             report["characters"].append(
@@ -412,6 +422,15 @@ def main() -> None:
                     ),
                     "runtime_paddle_grip_anchor_error_cm": (
                         paddle_grip_anchor_error_cm
+                    ),
+                    "runtime_paddle_finger_contact_error_cm": (
+                        finger_contact_error_cm
+                    ),
+                    "runtime_paddle_thumb_contact_error_cm": (
+                        thumb_contact_error_cm
+                    ),
+                    "runtime_paddle_thumb_opposition_dot": (
+                        thumb_opposition_dot
                     ),
                     "runtime_upper_paddle_finger_closure_degrees": (
                         upper_finger_closure_degrees
@@ -463,6 +482,18 @@ def main() -> None:
         )
         report["maximum_paddle_grip_anchor_error_cm"] = max(
             character["runtime_paddle_grip_anchor_error_cm"]
+            for character in report["characters"]
+        )
+        report["maximum_paddle_finger_contact_error_cm"] = max(
+            character["runtime_paddle_finger_contact_error_cm"]
+            for character in report["characters"]
+        )
+        report["maximum_paddle_thumb_contact_error_cm"] = max(
+            character["runtime_paddle_thumb_contact_error_cm"]
+            for character in report["characters"]
+        )
+        report["maximum_paddle_thumb_opposition_dot"] = max(
+            character["runtime_paddle_thumb_opposition_dot"]
             for character in report["characters"]
         )
         report["minimum_upper_paddle_finger_closure_degrees"] = min(

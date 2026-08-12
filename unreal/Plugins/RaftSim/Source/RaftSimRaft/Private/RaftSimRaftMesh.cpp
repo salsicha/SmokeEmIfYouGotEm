@@ -1112,7 +1112,10 @@ void BuildInflatableRaft(
     // Inset self-bailing floor: a slightly dished grid spanning inside the tubes.
     const float FloorAx = Ax - Tr * 0.2f;
     const float FloorAy = Ay - Tr * 0.2f;
-    const float FloorZ = Tr * 0.42f;
+    // The previous 0.42 R plane sat 16 cm below the seats on a 56 cm tube and
+    // remained visibly underwater even at correct hydrostatic equilibrium.
+    // An inflated self-bailing floor rides at the side-tube centre plane.
+    const float FloorZ = Tr;
     const int32 Nx = 16;
     const int32 Ny = 8;
     const int32 FloorBase = OutFloor.Vertices.Num();

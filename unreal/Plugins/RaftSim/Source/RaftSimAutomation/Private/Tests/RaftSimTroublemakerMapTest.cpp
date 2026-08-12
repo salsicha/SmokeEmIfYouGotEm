@@ -156,6 +156,48 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->AddError(TEXT("River map has no player raft"));
     }
 
+    if (PlayerRaft)
+    {
+        const UGameInstance* GI = World->GetGameInstance();
+        URaftSimPhysicsBridgeSubsystem* Bridge = GI
+            ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>()
+            : nullptr;
+        URaftSimWaterRuntimeAdapter* Water = Bridge
+            ? Bridge->GetWaterRuntime()
+            : nullptr;
+        FRaftSimWaterSample CenterWater;
+        if (Water &&
+            Water->SampleRaftSupportSurfaceAtWorldPosition(
+                PlayerRaft->GetActorLocation(), CenterWater) &&
+            CenterWater.bWet)
+        {
+            const float DraftBelowSurfaceCm =
+                CenterWater.SurfaceHeightMeters * 100.0f -
+                PlayerRaft->GetActorLocation().Z;
+            Test->TestTrue(
+                FString::Printf(
+                    TEXT("loaded raft center stays within 45 cm of visible support surface (draft %.1f cm)"),
+                    DraftBelowSurfaceCm),
+                DraftBelowSurfaceCm < 45.0f);
+        }
+        if (Water && bColoradoHanceReferenceRun)
+        {
+            Test->TestTrue(
+                TEXT("Colorado Hance couples visible rapid relief into raft support"),
+                Water->IsRaftSupportSurfaceEnabled());
+            Test->TestTrue(
+                TEXT("Colorado Hance support uses the reviewed smoothing strength"),
+                FMath::IsNearlyEqual(
+                    Water->GetRaftSupportSurfaceSmoothingStrength(), 0.72f, 0.001f));
+            Test->TestTrue(
+                TEXT("Colorado Hance support uses the visible standing-wave scale"),
+                FMath::IsNearlyEqual(
+                    Water->GetRaftSupportStandingWaveScale(), 0.55f, 0.001f) &&
+                FMath::IsNearlyEqual(
+                    Water->GetRaftSupportHydraulicReliefScale(), 0.55f, 0.001f));
+        }
+    }
+
     const bool bUsesSolverOwnedVisibleRiver =
         bZambeziReferenceRun || bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
@@ -242,7 +284,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
             if (bColoradoHanceReferenceRun)
             {
                 Test->TestTrue(
-                    TEXT("Colorado Hance live mesh applies render-only surface smoothing"),
+                    TEXT("Colorado Hance live mesh and raft support share surface smoothing"),
                     It->IsLivePresentationSurfaceSmoothingEnabled());
                 Test->TestTrue(
                     TEXT("Colorado Hance live smoothing keeps its reviewed strength"),
@@ -254,11 +296,45 @@ bool FRaftSimAssertRiverMapCommand::Update()
         }
         else
         {
-            Test->TestEqual(
-                TEXT("authored visible river keeps the live overlay transparent"),
-                It->GetActiveLiveSurfaceCoverage(),
-                0.0f);
+            Test->TestTrue(
+                TEXT("authored water retains a bounded live current-detail skin"),
+                FMath::IsNearlyEqual(
+                    It->GetCalmLiveSurfaceCoverage(), 0.12f, 0.001f) &&
+                    FMath::IsNearlyEqual(
+                        It->GetActiveLiveSurfaceCoverage(), 0.42f, 0.001f));
         }
+
+        UProceduralMeshComponent* LiveSurfaceMesh = nullptr;
+        TArray<UProceduralMeshComponent*> WaterMeshes;
+        It->GetComponents<UProceduralMeshComponent>(WaterMeshes);
+        for (UProceduralMeshComponent* Candidate : WaterMeshes)
+        {
+            if (Candidate && Candidate->GetFName() == TEXT("SurfaceMesh"))
+            {
+                LiveSurfaceMesh = Candidate;
+                break;
+            }
+        }
+        Test->TestNotNull(TEXT("live water exposes its velocity-carrying mesh"), LiveSurfaceMesh);
+        const FProcMeshSection* LiveSurfaceSection = LiveSurfaceMesh
+            ? LiveSurfaceMesh->GetProcMeshSection(0)
+            : nullptr;
+        int32 NonzeroSolverVelocityVertexCount = 0;
+        bool bAllSolverVelocityUvsFinite = true;
+        if (LiveSurfaceSection)
+        {
+            for (const FProcMeshVertex& Vertex : LiveSurfaceSection->ProcVertexBuffer)
+            {
+                bAllSolverVelocityUvsFinite &=
+                    FMath::IsFinite(Vertex.UV1.X) && FMath::IsFinite(Vertex.UV1.Y);
+                NonzeroSolverVelocityVertexCount +=
+                    Vertex.UV1.SizeSquared() > 0.0025f ? 1 : 0;
+            }
+        }
+        Test->TestTrue(TEXT("solver velocity UV1 remains finite"),
+            bAllSolverVelocityUvsFinite);
+        Test->TestTrue(TEXT("live water mesh receives nonzero solver velocity in UV1"),
+            NonzeroSolverVelocityVertexCount > 0);
     }
     Test->TestEqual(
         TEXT("river map has exactly one live solver surface actor"),
@@ -671,7 +747,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                         FMath::IsNearlyEqual(
                             (*It)->LiveRippleStrength, 0.48f, 0.001f));
                 Test->TestTrue(
-                    TEXT("Zambezi uses render-only surface smoothing"),
+                    TEXT("Zambezi uses shared render/support surface smoothing"),
                     (*It)->bEnableLivePresentationSurfaceSmoothing &&
                         FMath::IsNearlyEqual(
                             (*It)->LivePresentationSurfaceSmoothingStrength,
@@ -1182,7 +1258,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     (*It)->LiveWaterFoamLaceTexture->GetPathName().Contains(
                         TEXT("T_RaftSim_PacuareUpperHuacasWaterV1_FoamLace")));
             Test->TestTrue(
-                TEXT("Pacuare enables render-only subcell smoothing"),
+                TEXT("Pacuare enables shared render/support subcell smoothing"),
                 (*It)->bEnableLivePresentationSurfaceSmoothing);
             Test->TestTrue(
                 TEXT("Pacuare smoothing strength is bounded"),
@@ -1554,7 +1630,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                              "T_RaftSim_ColoradoHanceWaterV1_FoamLace")));
             }
             Test->TestTrue(
-                TEXT("Colorado Hance enables presentation-only subcell smoothing"),
+                TEXT("Colorado Hance enables shared render/support subcell smoothing"),
                 (*It)->bEnableLivePresentationSurfaceSmoothing);
             Test->TestTrue(
                 TEXT("Colorado Hance smoothing strength is reviewed"),
@@ -1579,7 +1655,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     FMath::IsNearlyEqual(
                         (*It)->LiveRapidFoamCoverageGain, 0.82f, 0.001f));
             Test->TestTrue(
-                TEXT("Colorado Hance config declares render-only smoothing authority"),
+                TEXT("Colorado Hance config preserves solver-state authority tags"),
                 (*It)->Tags.Contains(
                     TEXT("RaftSimColoradoHanceSubcellSmoothedWaterV1")) &&
                     (*It)->Tags.Contains(TEXT("RaftSimRenderOnlyHydraulicSmoothing")) &&
@@ -2131,7 +2207,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 FMath::IsNearlyEqual(
                     (*It)->LiveRapidFoamCoverageGain, 0.90f, 0.001f));
             Test->TestTrue(
-                TEXT("Chilko applies render-only subcell smoothing"),
+                TEXT("Chilko applies shared render/support subcell smoothing"),
                 (*It)->bEnableLivePresentationSurfaceSmoothing &&
                     FMath::IsNearlyEqual(
                         (*It)->LivePresentationSurfaceSmoothingStrength,

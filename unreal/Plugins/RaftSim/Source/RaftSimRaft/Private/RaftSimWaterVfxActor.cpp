@@ -1165,6 +1165,34 @@ FRaftSimWaterVfxState ARaftSimWaterVfxActor::EvaluatePresentation(
     return Result;
 }
 
+FVector ARaftSimWaterVfxActor::ComputeRapidRollerLaunchDirection(
+    const FVector& WorldVelocityMps)
+{
+    FVector Downstream = WorldVelocityMps.GetSafeNormal2D();
+    if (Downstream.IsNearlyZero())
+    {
+        Downstream = FVector::ForwardVector;
+    }
+    return (-Downstream * 0.68f + FVector::UpVector * 0.73f)
+        .GetSafeNormal();
+}
+
+FVector ARaftSimWaterVfxActor::ComputeRapidCrestSprayLaunchDirection(
+    const FVector& WorldVelocityMps,
+    float LateralBias)
+{
+    FVector Downstream = WorldVelocityMps.GetSafeNormal2D();
+    if (Downstream.IsNearlyZero())
+    {
+        Downstream = FVector::ForwardVector;
+    }
+    const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
+    return (-Downstream * 0.48f +
+            Across * FMath::Clamp(LateralBias, -0.2f, 0.2f) +
+            FVector::UpVector * 0.86f)
+        .GetSafeNormal();
+}
+
 bool ARaftSimWaterVfxActor::SampleCameraUnderwater() const
 {
     const UWorld* World = GetWorld();
@@ -2887,17 +2915,16 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             ActiveRapidNiagaraCount += bEnabled ? 1 : 0;
 
             const FVector RollerOrigin = Site.WorldPositionCm +
-                Downstream * 48.0f + FVector::UpVector * 18.0f;
-            const FVector RollerDirection =
-                (Downstream * 0.68f + FVector::UpVector * 0.73f)
-                    .GetSafeNormal();
+                -Downstream * 12.0f + FVector::UpVector * 32.0f;
+            const FVector RollerDirection = ComputeRapidRollerLaunchDirection(
+                Site.WorldVelocityMps);
             SetNiagaraEmission(
                 RapidRollerNiagara[PoolIndex],
                 bEnabled,
                 RollerOrigin,
                 RollerDirection,
                 FMath::Lerp(1.10f, 1.55f, Intensity),
-                FMath::Lerp(48.0f, 145.0f, Intensity) * DistanceDensity);
+                FMath::Lerp(140.0f, 320.0f, Intensity) * DistanceDensity);
             ActiveRapidRollerNiagaraCount += bEnabled ? 1 : 0;
 
             // Complete the rapid's particle scale stack with fine ballistic
@@ -2910,18 +2937,17 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             const float LateralBias =
                 (PoolIndex & 1) == 0 ? -0.12f : 0.12f;
             const FVector CrestSprayOrigin = Site.WorldPositionCm +
-                Downstream * 18.0f + Across * (LateralBias * 85.0f) +
+                -Downstream * 12.0f + Across * (LateralBias * 85.0f) +
                 FVector::UpVector * 60.0f;
-            const FVector CrestSprayDirection =
-                (Downstream * 0.48f + Across * LateralBias +
-                 FVector::UpVector * 0.86f).GetSafeNormal();
+            const FVector CrestSprayDirection = ComputeRapidCrestSprayLaunchDirection(
+                Site.WorldVelocityMps, LateralBias);
             SetNiagaraEmission(
                 RapidCrestSprayNiagara[PoolIndex],
                 bEnabled,
                 CrestSprayOrigin,
                 CrestSprayDirection,
                 FMath::Lerp(0.85f, 1.10f, Intensity),
-                FMath::Lerp(100.0f, 220.0f, Intensity) * DistanceDensity);
+                FMath::Lerp(180.0f, 360.0f, Intensity) * DistanceDensity);
             ActiveRapidCrestSprayNiagaraCount += bEnabled ? 1 : 0;
         }
         for (int32 PoolIndex = ActiveSiteBudget;

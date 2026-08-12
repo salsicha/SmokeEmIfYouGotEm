@@ -2247,12 +2247,12 @@ bool AddLandscapeCandidateRunnableGameplay(
 
     // Author the launch at loaded hydrostatic equilibrium instead of dropping
     // the raft from above the surface. The reduced body saturates over one
-    // tube diameter and provides 2.6x weight at full immersion, so the calm
-    // tube-center waterline is 2R / 2.6 below the sampled surface. Starting at
+    // tube diameter and provides 3.4x weight at full immersion, so the calm
+    // tube-center waterline is 2R / 3.4 below the sampled surface. Starting at
     // +58 cm caused an underdamped first plunge, false deck-water retention,
     // and a capsize before the guide could issue a command.
     constexpr float LaunchTubeRadiusCm = 28.0f;
-    constexpr float LaunchBuoyancyWeightMultiple = 2.6f;
+    constexpr float LaunchBuoyancyWeightMultiple = 3.4f;
     constexpr float LaunchHydrostaticOffsetCm =
         -(2.0f * LaunchTubeRadiusCm) / LaunchBuoyancyWeightMultiple;
     ARaftSimRaftActor* Raft = World->SpawnActor<ARaftSimRaftActor>(

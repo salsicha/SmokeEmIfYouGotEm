@@ -473,6 +473,9 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert '"grip_profile": (' in capture
     assert "visual_actor.has_articulated_paddle_grip_rig()" in capture
     assert "runtime_paddle_grip_anchor_error_cm" in capture
+    assert "runtime_paddle_finger_contact_error_cm" in capture
+    assert "runtime_paddle_thumb_contact_error_cm" in capture
+    assert "runtime_paddle_thumb_opposition_dot" in capture
     assert "runtime_upper_paddle_finger_closure_degrees" in capture
     assert "runtime_lower_paddle_finger_closure_degrees" in capture
     assert "runtime_paddle_thumb_closure_degrees" in capture
@@ -539,9 +542,15 @@ def test_cc0_runtime_prefers_packaged_bodies_and_keeps_quality_assertions() -> N
     assert 'TEXT("CC0 helper-eye shell retains reviewed outward winding")' in automation
     assert "It->HasArticulatedPaddleGripRig()" in automation
     assert "It->GetMaximumPaddleGripAnchorErrorCm() <= 0.25f" in automation
-    assert "It->GetMinimumUpperPaddleFingerClosureDegrees() >= 120.0f" in automation
-    assert "It->GetMinimumLowerPaddleFingerClosureDegrees() >= 210.0f" in automation
-    assert "It->GetMinimumPaddleThumbClosureDegrees() >= 50.0f" in automation
+    assert "It->GetMaximumPaddleFingerContactErrorCm() <= 0.25f" in automation
+    assert "It->GetMaximumPaddleThumbContactErrorCm() <= 0.25f" in automation
+    assert "It->GetMaximumPaddleThumbOppositionDot() <= -0.80f" in automation
+    assert "ApplyFingerChainAroundGrip" in adapter
+    assert "ApplyOpposedThumbPadToGrip" in adapter
+    assert "NaturalOrientation" in adapter
+    assert "FVector::CrossProduct(RadialDirection, NaturalTangent)" in adapter
+    assert "MeasureMaximumPaddleFingerContactErrorCm" in adapter
+    assert "MeasureMaximumPaddleThumbOppositionDot" in adapter
     assert "HeadShoulderClearanceCm >= 9.5f" in automation
     assert 'TEXT("%s %s detail is paired to head-dominant facial Skin")' in automation
     assert "P95ReferenceSeparationCm <= 1.25f" in automation

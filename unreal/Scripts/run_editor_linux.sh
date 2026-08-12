@@ -11,6 +11,11 @@
 # fragile when they all join surface negotiation. Restricting Vulkan to the
 # proprietary NVIDIA ICD and pinning the Optimus layer makes the editor
 # stable (verified 2026-08-06: full init + sustained presenting, no crash).
+# Apply the Vulkan workarounds required by this driver/UE combination:
+# disable async compute to avoid Xid 109 context-switch timeouts, force FIFO
+# presentation, and serialize RHI work onto the render thread. The recorded
+# NVIDIA crashes occurred on the dedicated RHI thread while WaitForFence ran
+# after an outdated swapchain was recreated.
 # Headless flows (-nullrhi / -RenderOffscreen) never hit this path and do
 # not need this script.
 set -euo pipefail
@@ -23,7 +28,8 @@ if [[ ! -f "$NVIDIA_ICD" ]]; then
   echo "warning: $NVIDIA_ICD not found; launching without the ICD pin" >&2
   exec env __NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia \
     "$UE_ROOT/Engine/Binaries/Linux/UnrealEditor" \
-    "$REPO_ROOT/unreal/SmokeEmIfYouGotEm.uproject" -nop4 "$@"
+    "$REPO_ROOT/unreal/SmokeEmIfYouGotEm.uproject" \
+    -nop4 -DisableAsyncCompute -vulkanpresentmode=2 -norhithread "$@"
 fi
 
 exec env \
@@ -32,4 +38,5 @@ exec env \
   __VK_LAYER_NV_optimus=NVIDIA_only \
   __GLX_VENDOR_LIBRARY_NAME=nvidia \
   "$UE_ROOT/Engine/Binaries/Linux/UnrealEditor" \
-  "$REPO_ROOT/unreal/SmokeEmIfYouGotEm.uproject" -nop4 "$@"
+  "$REPO_ROOT/unreal/SmokeEmIfYouGotEm.uproject" \
+  -nop4 -DisableAsyncCompute -vulkanpresentmode=2 -norhithread "$@"

@@ -42,6 +42,22 @@ bool FRaftSimWaterVfxClassifierTest::RunTest(const FString&)
     TestTrue(TEXT("aeration creates mist"), RapidState.Mist > 0.6f);
     TestEqual(TEXT("underwater state is explicit"), RapidState.Underwater, 1.0f);
 
+    const FVector Downstream =
+        Rapid.VelocityMetersPerSecond.GetSafeNormal2D();
+    const FVector RollerDirection =
+        ARaftSimWaterVfxActor::ComputeRapidRollerLaunchDirection(
+            Rapid.VelocityMetersPerSecond);
+    const FVector CrestDirection =
+        ARaftSimWaterVfxActor::ComputeRapidCrestSprayLaunchDirection(
+            Rapid.VelocityMetersPerSecond, 0.12f);
+    TestTrue(
+        TEXT("rapid roller travels visibly upstream while rising"),
+        FVector::DotProduct(RollerDirection, Downstream) < -0.55f &&
+            RollerDirection.Z > 0.65f);
+    TestTrue(
+        TEXT("crest spray travels upstream while rising"),
+        FVector::DotProduct(CrestDirection, Downstream) < -0.40f &&
+            CrestDirection.Z > 0.80f);
     FRaftSimWaterSample Dry;
     const FRaftSimWaterVfxState DryState =
         ARaftSimWaterVfxActor::EvaluatePresentation(

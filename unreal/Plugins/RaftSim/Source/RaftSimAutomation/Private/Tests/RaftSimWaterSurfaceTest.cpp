@@ -64,6 +64,34 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         FMath::IsNearlyEqual(
             Surface->GetPresentationVertexSpacingMeters(), 3.0f, 0.001f));
 
+    const FVector RaftMaskCenter(120.0f, -80.0f, 0.0f);
+    const FVector RaftMaskForward(0.0f, 1.0f, 0.0f);
+    const float HullCenterCoverage =
+        ARaftSimWaterSurfaceActor::
+            ComputeRaftHullSurfaceExclusion(
+                RaftMaskCenter, RaftMaskCenter, RaftMaskForward);
+    const float HullFeatherCoverage =
+        ARaftSimWaterSurfaceActor::
+            ComputeRaftHullSurfaceExclusion(
+                RaftMaskCenter + RaftMaskForward * 320.0f,
+                RaftMaskCenter,
+                RaftMaskForward);
+    const float HullOutsideCoverage =
+        ARaftSimWaterSurfaceActor::
+            ComputeRaftHullSurfaceExclusion(
+                RaftMaskCenter + RaftMaskForward * 500.0f,
+                RaftMaskCenter,
+                RaftMaskForward);
+    Test->TestTrue(
+        TEXT("live hydraulic detail is fully transparent over the raft center"),
+        FMath::IsNearlyZero(HullCenterCoverage));
+    Test->TestTrue(
+        TEXT("live hydraulic detail has a soft hull-edge feather"),
+        HullFeatherCoverage > 0.0f && HullFeatherCoverage < 1.0f);
+    Test->TestTrue(
+        TEXT("live hydraulic detail remains fully visible beyond the raft"),
+        FMath::IsNearlyEqual(HullOutsideCoverage, 1.0f));
+
     UMaterialParameterCollection* FoamOcclusionCollection =
         LoadObject<UMaterialParameterCollection>(
             nullptr,

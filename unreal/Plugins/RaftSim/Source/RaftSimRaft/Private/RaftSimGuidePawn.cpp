@@ -31,6 +31,18 @@ T* LoadGeneratedInputAsset(const TCHAR* Path)
     ConstructorHelpers::FObjectFinderOptional<T> Finder(Path);
     return Finder.Succeeded() ? Finder.Get() : nullptr;
 }
+
+bool HasNegateModifier(const FEnhancedActionKeyMapping& Mapping)
+{
+    for (const TObjectPtr<UInputModifier>& Modifier : Mapping.Modifiers)
+    {
+        if (Modifier != nullptr && Modifier->IsA<UInputModifierNegate>())
+        {
+            return true;
+        }
+    }
+    return false;
+}
 }
 
 ARaftSimGuidePawn::ARaftSimGuidePawn()
@@ -56,6 +68,17 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
         TEXT("/Game/RaftSim/Input/IA_RescueThrowLine.IA_RescueThrowLine"));
     ReseatCrewAction = LoadGeneratedInputAsset<UInputAction>(
         TEXT("/Game/RaftSim/Input/IA_ReseatCrew.IA_ReseatCrew"));
+
+    // The cooked IMC predates independent raw mouse look. Remove its mouse
+    // mapping at runtime so held paddle-axis keys cannot starve IA_Look and
+    // so the controller's raw MouseX/MouseY sampling never double-applies.
+    // The gamepad right stick stays mapped to IA_Look below.
+    if (DefaultMappingContext && LookAction)
+    {
+        DefaultMappingContext->UnmapKey(LookAction, EKeys::Mouse2D);
+        DefaultMappingContext->UnmapKey(LookAction, EKeys::MouseX);
+        DefaultMappingContext->UnmapKey(LookAction, EKeys::MouseY);
+    }
 
     // Shipping fallback: bind the already-cooked rescue actions even when an
     // older IMC asset is present. The editor bootstrap mirrors these mappings
@@ -189,43 +212,6 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
 void ARaftSimGuidePawn::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
-    // Enhanced Input look starvation fallback. The 2026-08-11 playtest log
-    // proves IA_Look goes silent for the entire duration of any held
-    // paddle-command key (11 s of held-W strokes, zero look events, look
-    // resuming the frame the key lifts) while control rotation applies
-    // fine whenever the action does fire — the block is in the EI action
-    // plumbing, not the view pipeline. Until that root cause is
-    // understood, read the controller's raw mouse delta and apply exactly
-    // what HandleLook would have; the flag prevents double-application on
-    // frames where IA_Look did fire.
-    if (APlayerController* LookController = Cast<APlayerController>(GetController()))
-    {
-        if (!bLookInputHandledThisFrame)
-        {
-            float MouseDeltaX = 0.0f;
-            float MouseDeltaY = 0.0f;
-            LookController->GetInputMouseDelta(MouseDeltaX, MouseDeltaY);
-            if (FMath::Abs(MouseDeltaX) + FMath::Abs(MouseDeltaY) >
-                KINDA_SMALL_NUMBER)
-            {
-                AddControllerYawInput(MouseDeltaX);
-                AddControllerPitchInput(MouseDeltaY);
-                LookFallbackAccumulator +=
-                    FMath::Abs(MouseDeltaX) + FMath::Abs(MouseDeltaY);
-            }
-        }
-        const float NowSeconds = GetWorld()->GetTimeSeconds();
-        if (NowSeconds - LastLookFallbackLogSeconds > 1.0f &&
-            LookFallbackAccumulator > 0.0f)
-        {
-            LastLookFallbackLogSeconds = NowSeconds;
-            UE_LOG(LogTemp, Display,
-                TEXT("RaftSim look fallback: axis_sum=%.1f control_yaw=%.1f"),
-                LookFallbackAccumulator, GetControlRotation().Yaw);
-            LookFallbackAccumulator = 0.0f;
-        }
-    }
-    bLookInputHandledThisFrame = false;
     // Seat the view on the guide avatar's actual posed head each frame. The
     // constructor offset was a fixed estimate that landed inside the chest
     // (2026-08-09 playtest: "all that can be seen is the inside of the life
@@ -244,7 +230,8 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     UpdateComfortCamera(DeltaSeconds);
     UpdateChaseCamera();
     UpdateSwimmingAndRescueAim();
-    UpdateFirstPersonPaddle(DeltaSeconds);
+    // The seated guide avatar owns the sole visible paddle; the former
+    // camera-attached view model duplicated it and floated ahead of the guide.
     // With the view seated in the guide avatar's own eye socket, its head
     // and helmet must not render into the first-person camera. The setter
     // early-outs when unchanged, so per-tick sync is cheap and follows
@@ -472,6 +459,41 @@ bool ARaftSimGuidePawn::HasCompleteRescueInputBindings() const
     return Bound.Num() == 4;
 }
 
+bool ARaftSimGuidePawn::HasPaddleStrokeKeyBinding(FKey Key, bool bNegated) const
+{
+    if (!DefaultMappingContext || !PaddleStrokeAction)
+    {
+        return false;
+    }
+    for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
+    {
+        if (Mapping.Action == PaddleStrokeAction && Mapping.Key == Key &&
+            HasNegateModifier(Mapping) == bNegated)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ARaftSimGuidePawn::UsesIndependentMouseLook() const
+{
+    if (!DefaultMappingContext || !LookAction)
+    {
+        return false;
+    }
+    for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
+    {
+        if (Mapping.Action == LookAction &&
+            (Mapping.Key == EKeys::Mouse2D || Mapping.Key == EKeys::MouseX ||
+             Mapping.Key == EKeys::MouseY))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool ARaftSimGuidePawn::ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey)
 {
     if (!DefaultMappingContext || !NewKey.IsValid() || NewKey.IsGamepadKey())
@@ -501,10 +523,18 @@ bool ARaftSimGuidePawn::ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey)
     {
         return false;
     }
+    // PaddleStroke and PaddleDraw are paired axes: the save stores the
+    // positive/primary key only (W or D), while the generated IMC owns the
+    // negated partner (S or A). Removing every keyboard mapping here used to
+    // silently delete S during normal startup when the saved W binding was
+    // applied. Rebind only the positive half and retain the negated half.
+    const bool bPairedAxisAction =
+        Target == PaddleStrokeAction || Target == PaddleDrawAction;
     TArray<FKey> KeyboardKeys;
     for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
     {
-        if (Mapping.Action == Target && !Mapping.Key.IsGamepadKey())
+        if (Mapping.Action == Target && !Mapping.Key.IsGamepadKey() &&
+            (!bPairedAxisAction || !HasNegateModifier(Mapping)))
         {
             KeyboardKeys.AddUnique(Mapping.Key);
         }
@@ -636,7 +666,8 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
 void ARaftSimGuidePawn::BeginPlay()
 {
     Super::BeginPlay();
-    BuildFirstPersonPaddle();
+    // Do not construct a second paddle. The posed guide avatar already owns
+    // the hand-held paddle in both camera modes.
 
     if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
     {
@@ -819,27 +850,9 @@ void ARaftSimGuidePawn::HandleGuideSteer(const FInputActionValue& Value)
 
 void ARaftSimGuidePawn::HandleLook(const FInputActionValue& Value)
 {
-    bLookInputHandledThisFrame = true;
     const FVector2D Axis = Value.Get<FVector2D>();
     AddControllerYawInput(Axis.X);
     AddControllerPitchInput(Axis.Y);
-    // Throttled instrumentation for the 2026-08-10 "can't look while
-    // holding a paddle key" report: shows whether Look fires and whether
-    // control rotation moves. If these lines appear during held-W with
-    // moving axis values but the view stays fixed, the block is below the
-    // controller (view pipeline); if they vanish while W is held, it is
-    // the Enhanced Input layer.
-    LookDiagnosticAccumulator += FMath::Abs(Axis.X) + FMath::Abs(Axis.Y);
-    const float Now = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
-    if (Now - LastLookDiagnosticSeconds > 1.0f && LookDiagnosticAccumulator > 0.0f)
-    {
-        LastLookDiagnosticSeconds = Now;
-        UE_LOG(LogTemp, Display,
-            TEXT("RaftSim look: axis_sum=%.1f control_yaw=%.1f"),
-            LookDiagnosticAccumulator,
-            GetControlRotation().Yaw);
-        LookDiagnosticAccumulator = 0.0f;
-    }
 }
 
 void ARaftSimGuidePawn::HandleHighSide(const FInputActionValue&)

@@ -73,9 +73,16 @@ struct FRaftSimRaftBodyConfig
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
     float BuoyancyWeightMultiple = 2.6f;
 
-    /** Quadratic water drag coefficient applied per submerged fraction. */
+    /** Hull-water drag coefficient applied per submerged fraction. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
-    float LinearDragCoefficient = 45.0f;
+    float LinearDragCoefficient = 650.0f;
+
+    /**
+     * Reference speed used to retain viscous hull resistance near rest.
+     * Above this speed the same term remains purely quadratic.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float LowSpeedDragReferenceMps = 1.5f;
 
     /**
      * Vertical (heave) damping in N·s/m applied per submerged fraction:
@@ -205,6 +212,29 @@ public:
     int32 GetLastDrySupportPointCount() const { return LastDrySupportPointCount; }
 
     /**
+     * Bind the authoritative terrain height sampled below each tube point.
+     * The selected reduced runtime resolves the contact; the callback only
+     * supplies world-space ground height and normal from Landscape or the
+     * solver bed. This keeps visual/query collision from becoming a second
+     * rigid-body authority.
+     */
+    void SetGroundSurfaceSampler(
+        TFunction<bool(
+            const FVector& WorldPositionCm,
+            float& OutGroundZCm,
+            FVector& OutGroundNormal)> InSampler);
+
+    int32 GetLastGroundedSupportPointCount() const
+    {
+        return LastGroundedSupportPointCount;
+    }
+
+    float GetLastMaximumGroundPenetrationMeters() const
+    {
+        return LastMaximumGroundPenetrationM;
+    }
+
+    /**
      * Bind full live-water samples for D3. The adapter evaluates this at each
      * deformed tube segment in world centimetres and passes the resulting
      * surface/velocity field into the authoritative overwash solve.
@@ -284,8 +314,15 @@ private:
     // Buoyancy support stage (plain C++ members; deterministic).
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
     int32 LastDrySupportPointCount = 0;
-    float LastWetCenterSurfaceZCm = 0.0f;
-    bool bHasLastWetCenterSurface = false;
+    float LastWetSupportSurfaceZCm = 0.0f;
+    bool bHasLastWetSupportSurface = false;
+    FVector LastWetWaterVelocityMps = FVector::ZeroVector;
+    TFunction<bool(
+        const FVector& WorldPositionCm,
+        float& OutGroundZCm,
+        FVector& OutGroundNormal)> GroundSurfaceSampler;
+    int32 LastGroundedSupportPointCount = 0;
+    float LastMaximumGroundPenetrationM = 0.0f;
     TFunction<bool(
         const FVector& WorldPositionCm,
         FRaftSimFlexUniformWater& OutWater)> FlexibleWaterFieldSampler;

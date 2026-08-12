@@ -62,6 +62,15 @@ public:
         float RiverLeftSurfaceHeightMeters,
         float Strength);
 
+    /** Per-vertex alpha retained by the live hydraulic detail layer around the
+     * moving raft. The feathered ellipse is presentation-only: it prevents a
+     * translucent water sheet from sorting over the hull without changing
+     * the sampled surface, buoyancy, contact, or solver state. */
+    static float ComputeRaftHullSurfaceExclusion(
+        const FVector& WorldPositionCm,
+        const FVector& RaftCenterCm,
+        const FVector& RaftForward);
+
     /** Deterministic cross-section for the presentation-only breaking-water
      * lip. X is downstream travel and Y is vertical lift in centimetres. The
      * final quarter curls back upstream and below the sampled free surface,
@@ -450,6 +459,10 @@ private:
     TArray<int32> Triangles;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
+    /** River-space solver velocity in metres per second. Sent through UV1 so
+     * the live material can advect detail in both the downstream and lateral
+     * directions without sacrificing foam/depth/speed/coverage vertex data. */
+    TArray<FVector2D> FlowVelocityMetersPerSecond;
     TArray<FLinearColor> VertexColors;
     TArray<FVector> LiveVolumeCoreVertices;
     TArray<int32> LiveVolumeCoreTriangles;

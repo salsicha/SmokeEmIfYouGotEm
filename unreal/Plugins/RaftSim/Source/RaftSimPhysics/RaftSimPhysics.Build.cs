@@ -5,7 +5,7 @@ public class RaftSimPhysics : ModuleRules
     public RaftSimPhysics(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "RaftSimCore", "RaftSimWater" });
+        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "Landscape", "RaftSimCore", "RaftSimWater" });
         PrivateDependencyModuleNames.AddRange(new[] { "Json" });
     }
 }
