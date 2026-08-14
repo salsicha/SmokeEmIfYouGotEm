@@ -238,35 +238,18 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
                 bActiveBand |= Tag == ActiveTag;
             }
         }
-        if (!bBakedFoamOverlay)
+        if (bBakedFoamOverlay && !bIsBandPresentation)
         {
-            // Vintage bakes placed foam actors before the overlay tag
-            // existed; catch them by material so they retire too.
-            if (const AStaticMeshActor* StaticActor =
-                    Cast<AStaticMeshActor>(Actor))
-            {
-                if (const UStaticMeshComponent* Component =
-                        StaticActor->GetStaticMeshComponent())
-                {
-                    const UMaterialInterface* Material =
-                        Component->GetNumMaterials() > 0
-                            ? Component->GetMaterial(0)
-                            : nullptr;
-                    bBakedFoamOverlay = Material &&
-                        Material->GetName().Contains(
-                            TEXT("SolverFieldFoamCandidate"));
-                }
-            }
-        }
-        if (bBakedFoamOverlay)
-        {
-            // The baked whitewater foam overlay sits at the BAKE's waterline,
-            // which diverges from the live solver surface — it renders as
-            // white sheets floating over the water and draped onto dry banks.
-            // The live overlay owns runtime foam now; retire the bake.
+            // A foam overlay without a band tag cannot be band-managed;
+            // retire it outright (pre-2026-08-14 vintage placements).
             Actor->SetActorHiddenInGame(true);
             continue;
         }
+        // Since the 2026-08-14 environment rebake, the foam overlay derives
+        // from the same shaped hydraulic fields the raft rides, so it is
+        // band-managed like the rest of the water presentation instead of
+        // retired (the former blanket hide targeted the old miscalibrated
+        // bake that floated over banks).
         if (bIsBandPresentation)
         {
             Actor->SetActorHiddenInGame(!bActiveBand);
