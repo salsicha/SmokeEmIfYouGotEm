@@ -1518,7 +1518,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 BreakingMaterial->SetScalarParameterValue(
                     TEXT("BreakingWaterOpacity"), 0.035f);
                 BreakingMaterial->SetScalarParameterValue(
-                    TEXT("BreakingFoamOpacity"), 0.96f);
+                    TEXT("BreakingFoamOpacity"), 0.86f);
                 BreakingMaterial->SetScalarParameterValue(
                     TEXT("BreakingFoamFloor"), 0.60f);
                 BreakingMaterial->SetScalarParameterValue(
@@ -1554,7 +1554,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     RollerMaterial->SetScalarParameterValue(
                         TEXT("BreakingWaterOpacity"), 0.003f);
                     RollerMaterial->SetScalarParameterValue(
-                        TEXT("BreakingFoamOpacity"), 0.96f);
+                        TEXT("BreakingFoamOpacity"), 0.86f);
                     RollerMaterial->SetScalarParameterValue(
                         TEXT("BreakingFoamFloor"), 0.60f);
                     RollerMaterial->SetScalarParameterValue(

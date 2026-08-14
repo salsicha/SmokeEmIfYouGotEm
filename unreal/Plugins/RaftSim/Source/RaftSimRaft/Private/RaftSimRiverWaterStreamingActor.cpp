@@ -2,6 +2,8 @@
 
 #include "Dom/JsonObject.h"
 #include "Engine/GameInstance.h"
+#include "Components/StaticMeshComponent.h"
+#include "Engine/StaticMeshActor.h"
 #include "EngineUtils.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
@@ -210,10 +212,12 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
 
 void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
 {
-    if (!RiverConfig)
-    {
-        return;
-    }
+    // No RiverConfig guard: the placed config actor unloads with its
+    // world-partition cell on long rides; CachedFlowBand is captured at
+    // BeginPlay. Re-run periodically from Tick — a single BeginPlay pass
+    // misses every actor whose cell streams in later ("white foam appears
+    // at distance and vanishes as the camera approaches", 2026-08-14).
+    static const FName SolverFoamOverlayTag(TEXT("RaftSimSolverFoamOverlay"));
     const FName ActiveTag(*FString::Printf(
         TEXT("RaftSimFlowBand_%s"), *CachedFlowBand.ToString()));
     for (TActorIterator<AActor> It(GetWorld()); It; ++It)
@@ -221,13 +225,47 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
         AActor* Actor = *It;
         bool bIsBandPresentation = false;
         bool bActiveBand = false;
+        bool bBakedFoamOverlay = false;
         for (const FName& Tag : Actor->Tags)
         {
+            if (Tag == SolverFoamOverlayTag)
+            {
+                bBakedFoamOverlay = true;
+            }
             if (Tag.ToString().StartsWith(TEXT("RaftSimFlowBand_")))
             {
                 bIsBandPresentation = true;
                 bActiveBand |= Tag == ActiveTag;
             }
+        }
+        if (!bBakedFoamOverlay)
+        {
+            // Vintage bakes placed foam actors before the overlay tag
+            // existed; catch them by material so they retire too.
+            if (const AStaticMeshActor* StaticActor =
+                    Cast<AStaticMeshActor>(Actor))
+            {
+                if (const UStaticMeshComponent* Component =
+                        StaticActor->GetStaticMeshComponent())
+                {
+                    const UMaterialInterface* Material =
+                        Component->GetNumMaterials() > 0
+                            ? Component->GetMaterial(0)
+                            : nullptr;
+                    bBakedFoamOverlay = Material &&
+                        Material->GetName().Contains(
+                            TEXT("SolverFieldFoamCandidate"));
+                }
+            }
+        }
+        if (bBakedFoamOverlay)
+        {
+            // The baked whitewater foam overlay sits at the BAKE's waterline,
+            // which diverges from the live solver surface — it renders as
+            // white sheets floating over the water and draped onto dry banks.
+            // The live overlay owns runtime foam now; retire the bake.
+            Actor->SetActorHiddenInGame(true);
+            continue;
         }
         if (bIsBandPresentation)
         {
@@ -244,5 +282,14 @@ void ARaftSimRiverWaterStreamingActor::Tick(float DeltaSeconds)
     {
         TimeSinceUpdateSeconds = 0.0f;
         UpdateWaterWindow(/*bForce=*/false);
+    }
+    // World partition streams presentation cells in behind the player; the
+    // BeginPlay visibility pass never saw those actors, so re-enforce band
+    // and foam-overlay visibility at a low cadence.
+    TimeSinceVisibilityReapplySeconds += DeltaSeconds;
+    if (TimeSinceVisibilityReapplySeconds >= 2.0f)
+    {
+        TimeSinceVisibilityReapplySeconds = 0.0f;
+        ApplyStaticFlowBandVisibility();
     }
 }
