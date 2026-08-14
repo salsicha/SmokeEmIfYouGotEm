@@ -51,6 +51,10 @@ void ARaftSimRiverWaterStreamingActor::BeginPlay()
         SetActorTickEnabled(false);
         return;
     }
+    CachedFlowBand = RiverConfig->FlowBand;
+    CachedMovingWindowAdvanceM = RiverConfig->MovingWindowAdvanceM;
+    CachedMovingWindowStationExtentM = RiverConfig->MovingWindowStationExtentM;
+    CachedMovingWindowLateralExtentM = RiverConfig->MovingWindowLateralExtentM;
     ApplyStaticFlowBandVisibility();
     UpdateWaterWindow(/*bForce=*/true);
 }
@@ -150,7 +154,7 @@ ARaftSimRiverWaterStreamingActor::SelectSource(float StationM) const
 
 bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
 {
-    if (!Raft || !RiverConfig || !WaterAdapter)
+    if (!Raft || !WaterAdapter)
     {
         return false;
     }
@@ -160,6 +164,12 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
     if (!WaterAdapter->WorldToRiverCoordinates(
             Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
     {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim river streaming: WorldToRiverCoordinates failed at ")
+            TEXT("raft=(%.0f, %.0f, %.0f)"),
+            Raft->GetActorLocation().X,
+            Raft->GetActorLocation().Y,
+            Raft->GetActorLocation().Z);
         return false;
     }
     const FSourceWindow* RapidWindow = SelectSource(RiverPosition.X);
@@ -168,18 +178,23 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
         : TransitFieldsDirectory;
     const bool bSourceChanged = DesiredDirectory != ActiveFieldsDirectory;
     if (!bForce && !bSourceChanged &&
-        FMath::Abs(RiverPosition.X - LastWindowCenterStationM) < RiverConfig->MovingWindowAdvanceM)
+        FMath::Abs(RiverPosition.X - LastWindowCenterStationM) < CachedMovingWindowAdvanceM)
     {
         return true;
     }
     const FVector2D Extent(
-        RiverConfig->MovingWindowStationExtentM,
-        RiverConfig->MovingWindowLateralExtentM);
+        CachedMovingWindowStationExtentM,
+        CachedMovingWindowLateralExtentM);
     if (!WaterAdapter->ConfigureMovingRiverWindow(
-            DesiredDirectory, RiverConfig->FlowBand.ToString(),
+            DesiredDirectory, CachedFlowBand.ToString(),
             FVector2D(RiverPosition.X, 0.0f), Extent,
             /*RoughnessManning=*/0.041f))
     {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim river streaming: ConfigureMovingRiverWindow FAILED ")
+            TEXT("station=%.1f source=%s"),
+            RiverPosition.X,
+            *DesiredDirectory);
         return false;
     }
     ActiveFieldsDirectory = DesiredDirectory;
@@ -200,7 +215,7 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
         return;
     }
     const FName ActiveTag(*FString::Printf(
-        TEXT("RaftSimFlowBand_%s"), *RiverConfig->FlowBand.ToString()));
+        TEXT("RaftSimFlowBand_%s"), *CachedFlowBand.ToString()));
     for (TActorIterator<AActor> It(GetWorld()); It; ++It)
     {
         AActor* Actor = *It;

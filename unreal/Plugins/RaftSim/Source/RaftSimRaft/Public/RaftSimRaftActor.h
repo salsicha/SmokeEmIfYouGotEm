@@ -263,6 +263,18 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ResetMotionForTesting();
 
+    /**
+     * Automation/authoring hook: hard-place the raft. Moves the solver body
+     * with the actor (a bare SetActorLocation is overwritten by the adapter
+     * mirror on the next tick) and clears all motion. When bApplyFacing is
+     * set, the hull is also yawed to FacingYawDegrees (e.g. downstream).
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void TeleportForTesting(
+        const FVector& WorldLocationCm,
+        float FacingYawDegrees = 0.0f,
+        bool bApplyFacing = false);
+
     /** Crew size seeded as swimmers on capsize (guide + paddlers). */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void SetCrewSize(int32 InCrewSize) { CrewSize = FMath::Clamp(InCrewSize, 0, 8); }

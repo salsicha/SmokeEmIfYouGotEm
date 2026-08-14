@@ -2698,6 +2698,11 @@ UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     // only the self-bailing floor instead of punching a water-free halo around
     // the complete raft and paddles.
     EnsureScalar(TEXT("RaftInteriorWaterTransmissionEnabled"), 0.0f);
+    // Shared presentation wave clock (seconds). The water surface actor
+    // accumulates it scaled by local flow speed each frame; the transmission
+    // WPO and the physics-side swell/band phases both consume it so waves
+    // visibly accelerate into rapids without desyncing render from support.
+    EnsureScalar(TEXT("RaftSimWaveClockSeconds"), 0.0f);
     EnsureVector(
         TEXT("RaftInteriorWaterCenterAndHalfWidthCm"),
         FLinearColor(0.0f, 0.0f, 0.0f, 82.0f));

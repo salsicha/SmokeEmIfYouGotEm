@@ -2,6 +2,8 @@
 
 #include "RaftSimLiveWaterWindow.h"
 
+#include "Algo/BinarySearch.h"
+
 URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 
 #include "Dom/JsonObject.h"
@@ -412,7 +414,9 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
                 const UWorld* World = GetWorld();
                 OutSample.SurfaceHeightMeters += PresentationTravelingWaveM(
                     SolverPositionM.X, SolverPositionM.Y,
-                    World ? World->GetTimeSeconds() : 0.0f,
+                    PresentationWaveClockSeconds >= 0.0f
+                        ? PresentationWaveClockSeconds
+                        : (World ? World->GetTimeSeconds() : 0.0f),
                     Live.VelocityMps.Size(), Live.DepthM);
             }
             OutSample.BedHeightMeters = Live.BedHeightM - RiverVerticalDatumM;
@@ -454,6 +458,10 @@ void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
     RaftSupportHydraulicReliefScale =
         FMath::Clamp(HydraulicReliefScale, 0.0f, 1.0f);
 
+    RaftSupportBreakingSites.Reset();
+    RaftSupportBreakingCrestLiftMeters = 0.0f;
+    RaftSupportBandField.Reset();
+
     UE_LOG(
         LogTemp,
         Display,
@@ -463,6 +471,210 @@ void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
         RaftSupportSurfaceSmoothingStrength,
         RaftSupportStandingWaveScale,
         RaftSupportHydraulicReliefScale);
+}
+
+bool URaftSimWaterRuntimeAdapter::FSupportBandField::Sample(
+    float StationM,
+    float LateralM,
+    float& OutElevationAbsM,
+    float& OutEnergy) const
+{
+    if (!IsValid())
+    {
+        return false;
+    }
+    if (StationM < RowStationsM[0] || StationM > RowStationsM.Last())
+    {
+        return false;
+    }
+    const float LateralIndexF = (LateralM - LateralOriginM) / LateralSpacingM;
+    if (LateralIndexF < 0.0f ||
+        LateralIndexF > static_cast<float>(Width - 1))
+    {
+        return false;
+    }
+    int32 RowHigh = Algo::UpperBound(RowStationsM, StationM);
+    RowHigh = FMath::Clamp(RowHigh, 1, RowStationsM.Num() - 1);
+    const int32 RowLow = RowHigh - 1;
+    const float RowSpanM = FMath::Max(
+        RowStationsM[RowHigh] - RowStationsM[RowLow], KINDA_SMALL_NUMBER);
+    const float RowAlpha = FMath::Clamp(
+        (StationM - RowStationsM[RowLow]) / RowSpanM, 0.0f, 1.0f);
+    const int32 ColumnLow = FMath::Clamp(
+        FMath::FloorToInt32(LateralIndexF), 0, Width - 2);
+    const float ColumnAlpha = FMath::Clamp(
+        LateralIndexF - static_cast<float>(ColumnLow), 0.0f, 1.0f);
+    const int32 Corners[4] = {
+        RowLow * Width + ColumnLow,
+        RowLow * Width + ColumnLow + 1,
+        RowHigh * Width + ColumnLow,
+        RowHigh * Width + ColumnLow + 1};
+    for (const int32 Corner : Corners)
+    {
+        if (Wet[Corner] == 0)
+        {
+            return false;
+        }
+    }
+    const auto Bilinear = [&](const TArray<float>& Field)
+    {
+        const float Low = FMath::Lerp(
+            Field[Corners[0]], Field[Corners[1]], ColumnAlpha);
+        const float High = FMath::Lerp(
+            Field[Corners[2]], Field[Corners[3]], ColumnAlpha);
+        return FMath::Lerp(Low, High, RowAlpha);
+    };
+    OutElevationAbsM = Bilinear(ElevationAbsM);
+    OutEnergy = FMath::Clamp(Bilinear(Energy), 0.0f, 1.0f);
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::LoadRaftSupportBandFieldFromFile(
+    const FString& AbsolutePath)
+{
+    RaftSupportBandField.Reset();
+    TUniquePtr<FArchive> Reader(
+        IFileManager::Get().CreateFileReader(*AbsolutePath));
+    if (!Reader.IsValid())
+    {
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim support band field: none at %s"), *AbsolutePath);
+        return false;
+    }
+    uint32 Magic = 0;
+    uint32 Version = 0;
+    *Reader << Magic;
+    *Reader << Version;
+    if (Magic != 0x52534246u /* 'RSBF' */ || Version != 1u)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim support band field: bad header in %s"), *AbsolutePath);
+        return false;
+    }
+    int32 Width = 0;
+    int32 RowCount = 0;
+    *Reader << Width;
+    *Reader << RowCount;
+    *Reader << RaftSupportBandField.LateralOriginM;
+    *Reader << RaftSupportBandField.LateralSpacingM;
+    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    {
+        RaftSupportBandField.Reset();
+        return false;
+    }
+    RaftSupportBandField.Width = Width;
+    *Reader << RaftSupportBandField.RowStationsM;
+    *Reader << RaftSupportBandField.ElevationAbsM;
+    *Reader << RaftSupportBandField.Energy;
+    *Reader << RaftSupportBandField.Wet;
+    if (Reader->IsError() || !RaftSupportBandField.IsValid() ||
+        RaftSupportBandField.RowStationsM.Num() != RowCount)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim support band field: malformed body in %s"),
+            *AbsolutePath);
+        RaftSupportBandField.Reset();
+        return false;
+    }
+    int32 WetCells = 0;
+    for (const uint8 Cell : RaftSupportBandField.Wet)
+    {
+        WetCells += Cell != 0 ? 1 : 0;
+    }
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim support band field: %d rows x %d columns, %d wet cells, ")
+        TEXT("stations %.0f-%.0f m (%s)"),
+        RowCount,
+        Width,
+        WetCells,
+        RaftSupportBandField.RowStationsM[0],
+        RaftSupportBandField.RowStationsM.Last(),
+        *AbsolutePath);
+    return true;
+}
+
+void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportBreakingSites(
+    TConstArrayView<FSupportBreakingSite> Sites,
+    float CrestLiftMeters,
+    float StationSpacingMeters)
+{
+    RaftSupportBreakingSites.Reset(Sites.Num());
+    RaftSupportBreakingSites.Append(Sites.GetData(), Sites.Num());
+    RaftSupportBreakingCrestLiftMeters = FMath::Max(CrestLiftMeters, 0.0f);
+    RaftSupportBreakingStationSpacingMeters =
+        FMath::Max(StationSpacingMeters, 0.05f);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
+    const FVector2D& RiverCoordinatesMeters,
+    TConstArrayView<FSupportBreakingSite> Sites,
+    float CrestLiftMeters,
+    float StationSpacingMeters)
+{
+    // Continuous mirror of the presentation mesh's breaking-water vertex
+    // displacements (RaftSimWaterSurfaceActor::RefreshSurface): the crest
+    // vertex leans up by CrestLift*Intensity, the first subcritical station
+    // dips 0.45x of it, and a decaying ~18 m tailwater train follows. Values
+    // at the station lattice equal the mesh vertices; between lattice points
+    // this interpolates linearly, exactly like the mesh triangles.
+    const float SpacingM = FMath::Max(StationSpacingMeters, 0.05f);
+    const int32 TailStepCount = FMath::Max(1, FMath::RoundToInt(18.0f / SpacingM));
+    float TotalM = 0.0f;
+    for (const FSupportBreakingSite& Site : Sites)
+    {
+        const float LiftM =
+            CrestLiftMeters * FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
+        if (LiftM <= 0.0f)
+        {
+            continue;
+        }
+        const float DownstreamM =
+            RiverCoordinatesMeters.X - Site.RiverCoordinatesMeters.X;
+        if (DownstreamM < -SpacingM ||
+            DownstreamM > (2 + TailStepCount) * SpacingM)
+        {
+            continue;
+        }
+        // Accepted sites deduplicate to 6 m along a jump line; a 3 m lateral
+        // falloff keeps neighbouring lobes continuous without doubling where
+        // they overlap.
+        const float LateralM =
+            RiverCoordinatesMeters.Y - Site.RiverCoordinatesMeters.Y;
+        const float LateralEnvelope =
+            FMath::Exp(-FMath::Square(LateralM / 3.0f));
+        if (LateralEnvelope < 0.02f)
+        {
+            continue;
+        }
+        const auto LatticeValueM = [LiftM, SpacingM, TailStepCount](
+                                       int32 StationStep) -> float
+        {
+            if (StationStep < 0 || StationStep > 1 + TailStepCount)
+            {
+                return 0.0f;
+            }
+            if (StationStep == 0)
+            {
+                return LiftM;
+            }
+            if (StationStep == 1)
+            {
+                return -0.45f * LiftM;
+            }
+            const float TailDistanceM = (StationStep - 1) * SpacingM;
+            return 0.62f * LiftM * FMath::Exp(-0.14f * TailDistanceM) *
+                FMath::Cos((2.05f / 3.0f) * TailDistanceM);
+        };
+        const float StepFloat = DownstreamM / SpacingM;
+        const int32 StepLow = FMath::FloorToInt32(StepFloat);
+        const float Alpha = StepFloat - static_cast<float>(StepLow);
+        TotalM += FMath::Lerp(
+                      LatticeValueM(StepLow), LatticeValueM(StepLow + 1), Alpha) *
+            LateralEnvelope;
+    }
+    // The mesh bounds tail crests by the crest lift; hold overlapping
+    // mirrored lobes to the same bound.
+    return FMath::Clamp(TotalM, -CrestLiftMeters, CrestLiftMeters);
 }
 
 bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
@@ -601,6 +813,49 @@ bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
                 RawCenter.VelocityMetersPerSecond.Size2D(),
                 RawCenter.DepthMeters) *
             RaftSupportHydraulicReliefScale;
+    }
+
+    if (RaftSupportBreakingSites.Num() > 0 &&
+        RaftSupportBreakingCrestLiftMeters > 0.0f)
+    {
+        OutSample.SurfaceHeightMeters +=
+            ComputeCoupledBreakingReliefMeters(
+                RiverCoordinatesM,
+                RaftSupportBreakingSites,
+                RaftSupportBreakingCrestLiftMeters,
+                RaftSupportBreakingStationSpacingMeters) *
+            RaftSupportHydraulicReliefScale;
+    }
+
+    // Legacy authored band water: carry the baked sculpt delta plus the same
+    // halved, band-gated energetic WPO term the render draws. Phases and time
+    // must stay paired with the transmission material's WPO block.
+    if (RaftSupportBandField.IsValid())
+    {
+        float BandElevationAbsM = 0.0f;
+        float BandEnergy = 0.0f;
+        if (RaftSupportBandField.Sample(
+                RiverCoordinatesM.X, RiverCoordinatesM.Y,
+                BandElevationAbsM, BandEnergy))
+        {
+            const UWorld* BandWorld = GetWorld();
+            const float BandTime = PresentationWaveClockSeconds >= 0.0f
+                ? PresentationWaveClockSeconds
+                : (BandWorld ? BandWorld->GetTimeSeconds() : 0.0f);
+            const float BandPhaseA = RiverCoordinatesM.X * 0.19f +
+                RiverCoordinatesM.Y * 0.61f - BandTime * 0.90f;
+            const float BandPhaseB = RiverCoordinatesM.X * 0.071f -
+                RiverCoordinatesM.Y * 0.37f - BandTime * 0.55f;
+            const float BakedBaseDeltaM = FMath::Clamp(
+                (BandElevationAbsM - RiverVerticalDatumM) -
+                    RawCenter.SurfaceHeightMeters,
+                -1.5f,
+                1.5f);
+            OutSample.SurfaceHeightMeters += BakedBaseDeltaM +
+                BandEnergy * 0.5f *
+                    (0.16f * FMath::Sin(BandPhaseA) +
+                     0.09f * FMath::Sin(BandPhaseB));
+        }
     }
 #endif
 

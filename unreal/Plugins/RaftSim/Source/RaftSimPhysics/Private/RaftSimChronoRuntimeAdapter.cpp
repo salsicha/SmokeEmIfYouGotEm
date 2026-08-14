@@ -391,8 +391,9 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             static_cast<double>(TubeSamplePointsM.Num()) *
             FMath::Lerp(0.48, 1.0, static_cast<double>(FlexPressureFraction)) *
             FMath::Lerp(0.80, 1.0, static_cast<double>(FlexFabricIntegrity));
-        const double SaturationDepthM =
-            FMath::Max(2.0 * static_cast<double>(RaftConfig.TubeRadiusMeters), 1.0e-3);
+        const double TubeRadiusM =
+            FMath::Max(static_cast<double>(RaftConfig.TubeRadiusMeters), 5.0e-4);
+        const double SaturationDepthM = 2.0 * TubeRadiusM;
         LastDrySupportPointCount = 0;
         TArray<float> SurfaceZByPointCm;
         TArray<uint8> WetPointFlags;
@@ -478,8 +479,18 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 }
                 SurfaceZCm = LastWetSupportSurfaceZCm;
             }
-            const double SubmersionM = static_cast<double>(SurfaceZCm) / 100.0 - WorldPointM.Z;
-            const double Saturation = FMath::Clamp(SubmersionM / SaturationDepthM, 0.0, 1.0);
+            // TubeSamplePointsM are chamber centres: the terrain constraint
+            // below subtracts the tube radius from these same points. The old
+            // buoyancy path instead treated the centre as the tube bottom, so
+            // a chamber produced no lift until its centre was underwater and
+            // the loaded South Fork raft settled with water across its floor.
+            // Measure immersed diameter from the physical tube bottom so the
+            // water and ground stages share one rigid-body datum.
+            const double TubeBottomM = WorldPointM.Z - TubeRadiusM;
+            const double ImmersedDepthM =
+                static_cast<double>(SurfaceZCm) / 100.0 - TubeBottomM;
+            const double Saturation = FMath::Clamp(
+                ImmersedDepthM / SaturationDepthM, 0.0, 1.0);
             if (Saturation <= 0.0)
             {
                 continue;

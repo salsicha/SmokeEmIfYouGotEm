@@ -4,6 +4,11 @@
   "entries": [
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp",
+      "recorded_sha256": "20052e3a304102bd5614f2c6b660504910b735affb4dc2f4ba8475690d8d1113"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
       "source": "unreal/Content/RaftSim/Materials/MPC_RaftSim_RaftFoamOcclusion.uasset",
       "recorded_sha256": "f87d48b55199399adbf56f955592095ce5e4107bea0527f408f9a872d666cd37"
     },
@@ -11,6 +16,11 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
       "recorded_sha256": "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "c3f048c9c42c19e08c8c0fd933ba0beb2627fd5dd7bfa448311d9e161cb88024"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/breaking_water_raft_crew_occlusion_v2_review.json",
@@ -31,6 +41,11 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp",
       "recorded_sha256": "ec22984153d4be835e4a6469b88df9e6486fb2d2dd73719261f66bd9a2582822"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimWater/Public/RaftSimRiverWaterConfig.h",
+      "recorded_sha256": "6616b4809f4b4fb78811c523ec398d1b4dfb2062676105aac416f5d8d30cc95f"
     },
     {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/cold_water_balanced_light_v1_review.json",
@@ -143,6 +158,31 @@
       "recorded_sha256": "9663c21dad0f7980e40a935df5c985475450fe72e8ae3b752395d185f392bccd"
     },
     {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_downstream_boil_microrelief_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+      "recorded_sha256": "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+      "recorded_sha256": "c3f048c9c42c19e08c8c0fd933ba0beb2627fd5dd7bfa448311d9e161cb88024"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+      "recorded_sha256": "26e64ea7ff6d13eb8e4f08013b70171bfb93f0bb23a8978364e95b5a5a453e90"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp",
+      "recorded_sha256": "2eed38b13ca16fe9a1623ef7f7445559556ab74e7bf01f79950e660812a8ae1b"
+    },
+    {
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterVfxTest.cpp",
+      "recorded_sha256": "7c4367f15ef7be9e8cc4377885509e03fdd7a421629ea35e68f980cbae727a5e"
+    },
+    {
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/solver_anchored_three_scale_breaking_spray_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
       "recorded_sha256": "3c8f2c2c633c9024cc08df452acad5ca7be9ad37d3982ee62513b1731d4d2e10"
@@ -251,6 +291,26 @@
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_solver_driven_rapid_vfx_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTroublemakerMapTest.cpp",
       "recorded_sha256": "d2e96765ad743bbf30ea931be3435f6bf7ea2f72a11e129785fa806852612781"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCC0CrewVisualActor.cpp",
+      "recorded_sha256": "68d59a8157b491f0955460729d966b4cb5744ef848bd0384c5e31dba1c439bfd"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCC0CrewVisualActor.h",
+      "recorded_sha256": "55b5ecf0cef8fa7c45f35067d49058de9d496e2e332a36ed00cb8533eaf30420"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "6b293b13521fb29514cff6f653f67055fbf96eb4c03e8155247acebe77d17f43"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_clavicle_span_v1_review.json",
+      "source": "unreal/Scripts/capture_cc0_production_roster.py",
+      "recorded_sha256": "9235dd1ca9eafdbe7d3b5397d689f661658c85097c9badcb4dea80e222439413"
     },
     {
       "review": "docs/environment-captures/south_fork_full_reach/m9_cc0_exclusive_body_v1_review.json",
@@ -848,6 +908,11 @@
       "recorded_sha256": "004130b24f807743d262dd2c9a10fcb801144c5ad34fa1b436d0cf959b1f1236"
     },
     {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_raft_interior_water_transmission_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftMesh.cpp",
+      "recorded_sha256": "226a24acfcf614a4fecef1064104e2ba98a6176f5d860364c986d8f8371accd6"
+    },
+    {
       "review": "docs/environment-captures/south_fork_full_reach/m9_seat_side_paddle_v1_review.json",
       "source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
       "recorded_sha256": "2ddd24f9e6776061fe092e72b50b1ab63d030e1afbdb590ee72a9bac4ee89eba"
@@ -936,6 +1001,16 @@
       "review": "docs/environment-captures/south_fork_full_reach/m9_tapered_shoulder_sleeves_v2_review.json",
       "source": "physics/tests/test_cc0_production_characters.py",
       "recorded_sha256": "47491f59738e92cc969f56e9e6f93992b5c9cfae46d3e6f20706a203af4ba27e"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_review.json",
+      "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+      "recorded_sha256": "6b293b13521fb29514cff6f653f67055fbf96eb4c03e8155247acebe77d17f43"
+    },
+    {
+      "review": "docs/environment-captures/south_fork_full_reach/m9_upper_t_grip_contact_v1_review.json",
+      "source": "physics/tests/test_cc0_production_characters.py",
+      "recorded_sha256": "e5b7e220efa709d2ac1292afbc1ee3b8a981ea8bfa123c2c807954d5da131027"
     },
     {
       "review": "docs/environment-captures/south_fork_full_reach/m9_visible_shoulders_v1_review.json",

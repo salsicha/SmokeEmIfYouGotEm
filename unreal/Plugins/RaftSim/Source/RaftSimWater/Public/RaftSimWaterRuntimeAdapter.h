@@ -296,6 +296,75 @@ public:
         float StandingWaveScale,
         float HydraulicReliefScale);
 
+    /** One breaking-water site mirrored from the presentation surface. */
+    struct FSupportBreakingSite
+    {
+        FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
+        float Intensity = 0.0f;
+    };
+
+    /**
+     * Station-indexed mirror of the authored band-water bake: absolute baked
+     * surface elevation and hydraulic band energy per (station row, lateral
+     * column). Lets rigid support carry the baked sculpt delta and the same
+     * halved energetic WPO term the legacy detail-overlay water renders, so
+     * the first rapid no longer draws above the ridden surface.
+     */
+    struct FSupportBandField
+    {
+        int32 Width = 0;
+        float LateralOriginM = 0.0f;
+        float LateralSpacingM = 1.0f;
+        TArray<float> RowStationsM;
+        TArray<float> ElevationAbsM;
+        TArray<float> Energy;
+        TArray<uint8> Wet;
+
+        bool IsValid() const
+        {
+            const int32 Cells = Width * RowStationsM.Num();
+            return Width > 1 && RowStationsM.Num() > 1 &&
+                ElevationAbsM.Num() == Cells && Energy.Num() == Cells &&
+                Wet.Num() == Cells;
+        }
+        void Reset()
+        {
+            *this = FSupportBandField();
+        }
+        /** Bilinear sample; false when out of range or any corner is dry. */
+        bool Sample(
+            float StationM,
+            float LateralM,
+            float& OutElevationAbsM,
+            float& OutEnergy) const;
+    };
+
+    /** Load the cooked support band field written by the editor export. */
+    bool LoadRaftSupportBandFieldFromFile(const FString& AbsolutePath);
+
+    /**
+     * Flow-warped presentation wave clock pushed by the visible water surface
+     * each frame. The coupled swell and band phases consume it so they stay
+     * paired with the rendered WPO when waves accelerate in fast water.
+     * Negative means unset; world seconds are used as the fallback.
+     */
+    void SetPresentationWaveClockSeconds(float Seconds)
+    {
+        PresentationWaveClockSeconds = Seconds;
+    }
+
+    /**
+     * Mirror the visible carrier's accepted breaking sites into raft support
+     * so the ridden surface rises with the rendered crest, dip, and tailwater
+     * train instead of leaving them render-only ("the boat submerges as it
+     * approaches the rapid"). StationSpacingMeters is the presentation vertex
+     * spacing the crest/dip/tail profile is authored against.
+     */
+    void ConfigureRaftSupportBreakingSites(
+        TConstArrayView<FSupportBreakingSite> Sites,
+        float CrestLiftMeters,
+        float StationSpacingMeters);
+
     /** Sample the same live crest/hole surface used by the visible carrier. */
     bool SampleRaftSupportSurfaceAtWorldPosition(
         const FVector& WorldPosition,
@@ -338,6 +407,12 @@ public:
         float RiverRightSurfaceHeightMeters,
         float RiverLeftSurfaceHeightMeters,
         float Strength);
+
+    static float ComputeCoupledBreakingReliefMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        TConstArrayView<FSupportBreakingSite> Sites,
+        float CrestLiftMeters,
+        float StationSpacingMeters);
 
     /**
      * Sample the live solver directly in station/lateral coordinates. This is
@@ -420,6 +495,11 @@ private:
     float RaftSupportSurfaceSmoothingStrength = 0.0f;
     float RaftSupportStandingWaveScale = 0.0f;
     float RaftSupportHydraulicReliefScale = 0.0f;
+    TArray<FSupportBreakingSite> RaftSupportBreakingSites;
+    float RaftSupportBreakingCrestLiftMeters = 0.0f;
+    float RaftSupportBreakingStationSpacingMeters = 1.0f;
+    FSupportBandField RaftSupportBandField;
+    float PresentationWaveClockSeconds = -1.0f;
 
     TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
 };

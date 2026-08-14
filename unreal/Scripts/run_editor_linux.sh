@@ -18,6 +18,14 @@
 # after an outdated swapchain was recreated.
 # Headless flows (-nullrhi / -RenderOffscreen) never hit this path and do
 # not need this script.
+# 2026-08-12: recurring VK_ERROR_DEVICE_LOST during the first Slate presents
+# (no kernel Xid, no validation-layer errors, empty fault report) turned out
+# to follow a degraded GNOME/mutter session; a fresh login clears it. A
+# r.Vulkan.DelayAcquireBackBuffer=0 workaround in the engine-local
+# ConsoleVariables.ini was retired the same day: it made the editor present
+# alternating black frames ("the editor flashes") under this driver/PRIME.
+# If startup device-lost returns: log out/in first; the cvar (still there,
+# commented) is a last-resort stopgap that trades crashes for flicker.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"

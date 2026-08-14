@@ -755,6 +755,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     {
         RiverWaterConfig = *ConfigIt;
     }
+    const bool bUsesAuthoredRiverPresentation = RiverWaterConfig != nullptr;
     bLiveSurfaceCarrierEnabled =
         RiverWaterConfig && RiverWaterConfig->bLiveSolverOwnsRuntimeRendering;
     if (!bLiveSurfaceCarrierEnabled)
@@ -1131,11 +1132,34 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
     if (WaterAdapter)
     {
+        // The live mesh applies standing-wave and hydraulic-relief geometry in
+        // both modes: as the sole river carrier and as a translucent detail
+        // overlay above legacy authored water. Keying rigid support only to
+        // carrier mode left older South Fork packages on the base solver plane
+        // while their visible first-rapid surface rose over the raft.
         WaterAdapter->ConfigureRaftSupportSurface(
-            bLiveSurfaceCarrierEnabled,
+            bUsesAuthoredRiverPresentation,
             ResolvedPresentationSurfaceSmoothingStrength,
             ResolvedPresentationStandingWaveScale,
             ResolvedPresentationHydraulicReliefScale);
+        // Legacy detail-overlay maps render the AUTHORED band water (baked
+        // sculpt + band-gated WPO), which the live solver cannot reconstruct.
+        // Mirror it into rigid support from the cooked band field the editor
+        // export writes beside the flow fields; carrier maps render the live
+        // mesh itself and need no mirror.
+        if (bUsesAuthoredRiverPresentation && !bLiveSurfaceCarrierEnabled &&
+            RiverWaterConfig)
+        {
+            const FString BandFieldPath = FPaths::ConvertRelativePathToFull(
+                FPaths::Combine(
+                    FPaths::ProjectDir(),
+                    TEXT(".."),
+                    RiverWaterConfig->CookedFieldsDir,
+                    FString::Printf(
+                        TEXT("support_band_field_%s.bin"),
+                        *RiverWaterConfig->FlowBand.ToString())));
+            WaterAdapter->LoadRaftSupportBandFieldFromFile(BandFieldPath);
+        }
     }
 
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
@@ -1143,7 +1167,6 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     // the legacy straight-coordinate South Fork reach. Keep config-less test
     // tanks on the original three-metre mesh while refining production river
     // presentation independently of the adapter coordinate representation.
-    const bool bUsesAuthoredRiverPresentation = RiverWaterConfig != nullptr;
     const int32 ResolvedSubdivision = bUsesAuthoredRiverPresentation
         ? FMath::Clamp(RiverPresentationSubdivision, 1, 2)
         : 1;
@@ -2341,7 +2364,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             ResolvedPresentationStandingWaveScale +
                         HydraulicRelief) *
                         kSurfCmPerM +
-                    2.0f;
+                    GetLiveSurfaceRenderLiftCm();
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
                 MinimumWetLateralIndex[X] = FMath::Min(
@@ -2689,6 +2712,24 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             BreakingSites.Add(Candidate);
         }
+    }
+
+    if (WaterAdapter)
+    {
+        // Mirror the accepted sites into rigid support so the ridden surface
+        // rises with the rendered crest, dip, and tailwater train. The 2 cm
+        // z-fight lift and the plunge-pocket pass below stay render-only.
+        TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite> SupportSites;
+        SupportSites.Reserve(BreakingSites.Num());
+        for (const FBreakingSite& Site : BreakingSites)
+        {
+            URaftSimWaterRuntimeAdapter::FSupportBreakingSite& SupportSite =
+                SupportSites.AddDefaulted_GetRef();
+            SupportSite.RiverCoordinatesMeters = Site.RiverCoordinatesMeters;
+            SupportSite.Intensity = Site.Intensity;
+        }
+        WaterAdapter->ConfigureRaftSupportBreakingSites(
+            SupportSites, BreakingCrestLiftMeters, ResolvedVertexSpacingMeters);
     }
 
     // Give the three strongest accepted interior jumps a coherent plan-view
@@ -3342,6 +3383,63 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
     PresentationPhaseSeconds = FMath::Fmod(
         PresentationPhaseSeconds + FMath::Max(DeltaSeconds, 0.0f),
         4096.0f);
+
+    // Advance the shared flow-warped wave clock EVERY frame (the refresh
+    // cadence below would stutter wave motion). Accumulating scale*dt keeps
+    // phase continuous when the rate changes; scaling raw time would snap.
+    // The same clock feeds the transmission WPO (via the collection) and the
+    // adapter's coupled swell/band phases, so waves visibly accelerate into
+    // rapids while render and rigid support stay paired.
+    if (PresentationWaveClockSeconds < 0.0f)
+    {
+        PresentationWaveClockSeconds =
+            GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
+    }
+    float TargetFlowClockScale = 1.0f;
+    if (!IsValid(FoamOcclusionRaft))
+    {
+        FoamOcclusionRaft = nullptr;
+        if (TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld()); RaftIt)
+        {
+            FoamOcclusionRaft = *RaftIt;
+        }
+    }
+    if (FoamOcclusionRaft && WaterAdapter)
+    {
+        FRaftSimWaterSample ClockSample;
+        if (WaterAdapter->SampleWaterAtWorldPosition(
+                FoamOcclusionRaft->GetActorLocation(), ClockSample) &&
+            ClockSample.bWet)
+        {
+            // ~1.2 m/s calm current reads as the baseline cadence; a 3 m/s
+            // rapid tongue runs the waves 2.5x. Clamped so pools never stall
+            // and fast chutes never strobe.
+            TargetFlowClockScale = FMath::Clamp(
+                ClockSample.VelocityMetersPerSecond.Size2D() / 1.2f,
+                0.75f,
+                2.5f);
+        }
+    }
+    SmoothedFlowClockScale += (TargetFlowClockScale - SmoothedFlowClockScale) *
+        FMath::Clamp(2.0f * DeltaSeconds, 0.0f, 1.0f);
+    PresentationWaveClockSeconds +=
+        SmoothedFlowClockScale * FMath::Max(DeltaSeconds, 0.0f);
+    if (WaterAdapter)
+    {
+        WaterAdapter->SetPresentationWaveClockSeconds(
+            PresentationWaveClockSeconds);
+    }
+    if (RaftFoamOcclusionCollection && GetWorld())
+    {
+        if (UMaterialParameterCollectionInstance* ClockParameters =
+                GetWorld()->GetParameterCollectionInstance(
+                    RaftFoamOcclusionCollection))
+        {
+            ClockParameters->SetScalarParameterValue(
+                TEXT("RaftSimWaveClockSeconds"), PresentationWaveClockSeconds);
+        }
+    }
+
     TimeSinceRefresh += DeltaSeconds;
     if (TimeSinceRefresh >= RefreshIntervalSeconds)
     {
