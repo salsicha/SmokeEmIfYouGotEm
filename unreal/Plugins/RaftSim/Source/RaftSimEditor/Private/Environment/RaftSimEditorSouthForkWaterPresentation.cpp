@@ -879,17 +879,20 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionFloor")), 0.68f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionVariation")), 0.32f);
-    // Ripple perceptibility retuned 2026-08-10 ("the surface of the water
-    // doesn't look like it is moving", third report): the flow-weighted
-    // term more than doubles so any real current visibly streams, calm
-    // gains a touch of life, and the grazing-angle Fresnel filter in the
-    // material keeps the anti-groove floor intact.
+    // Ripple perceptibility retuned 2026-08-14 (fourth "water doesn't look
+    // like it is moving" report, this time with an in-game screenshot and a
+    // held-boat-on-slope experiment). The parent clamps summed normal
+    // strength (ceiling now 0.30, was 0.14 — the old ceiling silently
+    // saturated every prior retune). These weights keep calm water just
+    // grained while fast water climbs toward the ceiling, and the parent's
+    // FlowStreakRoughness lanes supply the directional downstream cue the
+    // ripple amplitude alone cannot.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.075f);
+        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.12f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.160f);
+        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.30f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.150f);
+        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.25f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
     Package->MarkPackageDirty();

@@ -37,6 +37,7 @@
 #include "Materials/MaterialExpressionTime.h"
 #include "Materials/MaterialExpressionPerInstanceCustomData.h"
 #include "Materials/MaterialExpressionSaturate.h"
+#include "Materials/MaterialExpressionSine.h"
 #include "Materials/MaterialExpressionSubtract.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
@@ -421,6 +422,9 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     // Slick/riffle patch mask; built with the detail normal, reused by the
     // roughness section so slicks stay glassy while riffled patches keep grain.
     UMaterialExpression* RiffleMask = nullptr;
+    // Flow-streak lane field (-1..1); built beside the advected UVs, applied
+    // by the roughness section so moving matte lanes carry the current cue.
+    UMaterialExpression* FlowStreakField = nullptr;
     if (DetailNormal != nullptr)
     {
         UMaterialExpressionTextureCoordinate* UV =
@@ -473,6 +477,33 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         };
         UMaterialExpression* FlowUv = FlowAdvected(UV, 0.62f, 1.0f);
         UMaterialExpression* FlowCrossUv = FlowAdvected(CrossUv, 1.31f, 0.85f);
+        // Lane field for the roughness section: two incommensurate sine
+        // lanes (~2.5 m and ~1 m at this tiling), sheared slightly across
+        // stream so they read as water lanes rather than bars. Built from
+        // the advected UVs, so the lanes translate at the water's speed.
+        {
+            const auto CyclesSine =
+                [&](UMaterialExpression* Cycles) -> UMaterialExpression*
+            {
+                UMaterialExpressionSine* Sine =
+                    NewObject<UMaterialExpressionSine>(Material);
+                Sine->Period = 1.0f;
+                Sine->Input.Expression = Cycles;
+                Add(Sine);
+                return Sine;
+            };
+            UMaterialExpression* StreakU = Mask(FlowUv, true, false, false);
+            UMaterialExpression* StreakV = Mask(FlowUv, false, true, false);
+            FlowStreakField = Mul(
+                AddNode(
+                    CyclesSine(AddNode(
+                        Mul(StreakU, Const(1.9f)),
+                        Mul(StreakV, Const(0.45f)))),
+                    CyclesSine(AddNode(
+                        Mul(StreakU, Const(4.6f)),
+                        Mul(StreakV, Const(1.15f))))),
+                Const(0.5f));
+        }
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
                           float SpeedX,
@@ -522,7 +553,11 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 Add(NewObject<UMaterialExpressionClamp>(Material)));
         NormalStrength->Input.Expression = HydraulicNormalStrength;
         NormalStrength->MinDefault = 0.0f;
-        NormalStrength->MaxDefault = 0.14f;
+        // Ceiling raised 0.14 -> 0.30 (2026-08-14): at 0.14 the presentation
+        // ripple weights saturated everywhere, erasing the calm-vs-rapid
+        // contrast they encode. Grazing and slick filters below remain the
+        // anti-groove guards; the ceiling only bounds worst-case aeration.
+        NormalStrength->MaxDefault = 0.30f;
         // Repeated normal detail can collapse into long view-aligned specular
         // streaks when a guide-eye camera sees the river at a grazing angle.
         // Preserve the authored ripple response nearby and at steeper views,
@@ -579,6 +614,30 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionScalarParameter* FoamRoughScale = Scalar(TEXT("FoamRoughness"), 0.55f);
     UMaterialExpressionMultiply* FoamRough = Mul(FoamBroken, FoamRoughScale);
     UMaterialExpressionAdd* Roughness = AddNode(PatchedRough, FoamRough);
+
+    // --- Flow streaks: moving roughness lanes riding the advected UVs so
+    // current reads on glassy water. A boat held against the current must
+    // see the surface slide downstream; the flow-normal texture's ~6% slopes
+    // vanish under the fresnel mirror, but matte streaks crossing that
+    // mirror do not. Amplitude scales with the vertex speed channel so
+    // pools stay glass.
+    if (FlowStreakField != nullptr)
+    {
+        // SpeedMask is speed/8 m/s; ordinary current sits near 0.1 and
+        // would mute the lanes to nothing if used raw. Saturate a 5x gain
+        // instead so the gate reaches full strength by ~1.6 m/s while dead
+        // pools still zero out.
+        UMaterialExpressionSaturate* StreakSpeedGate =
+            NewObject<UMaterialExpressionSaturate>(Material);
+        StreakSpeedGate->Input.Expression = Mul(
+            SpeedMask, Scalar(TEXT("FlowStreakSpeedGain"), 5.0f));
+        Add(StreakSpeedGate);
+        Roughness = AddNode(
+            Roughness,
+            Mul(FlowStreakField,
+                Mul(StreakSpeedGate,
+                    Scalar(TEXT("FlowStreakRoughness"), 0.22f))));
+    }
 
     UMaterialExpressionFresnel* Fresnel =
         Cast<UMaterialExpressionFresnel>(Add(NewObject<UMaterialExpressionFresnel>(Material)));
@@ -1968,6 +2027,8 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         Foam);
 
     UMaterialExpression* FinalNormal = nullptr;
+    UMaterialExpression* RoughnessOutput = Roughness;
+    UMaterialExpression* BaseColorOutput = BaseColor;
     UTexture2D* DetailNormal = LoadObject<UTexture2D>(
         nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
@@ -2084,11 +2145,78 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             LiveFlatN,
             CombinedNormal,
             LiveGrazingFilteredNormalStrength);
+
+        // Flow streaks: lanes of roughness variation sampled at the same
+        // solver-advected coordinates as the ripple normals, so they slide
+        // downstream at exactly the water's speed. The ripple normal alone
+        // cannot carry the motion cue here — a ±6% slope texture at 0.18
+        // strength, halved again by the grazing floor, disappears into the
+        // constant-roughness fresnel mirror. Matte streaks crossing that
+        // mirror stay visible from the raft deck. Amplitude gates on the
+        // squared solver speed so calm pools keep their glass.
+        {
+            const auto CyclesSine =
+                [&](UMaterialExpression* Cycles) -> UMaterialExpression*
+            {
+                UMaterialExpressionSine* Sine =
+                    NewObject<UMaterialExpressionSine>(Material);
+                Sine->Period = 1.0f;
+                Sine->Input.Expression = Cycles;
+                Add(Sine);
+                return Sine;
+            };
+            const auto ConstExpr = [&](float Value) -> UMaterialExpression*
+            {
+                UMaterialExpressionConstant* C =
+                    NewObject<UMaterialExpressionConstant>(Material);
+                C->R = Value;
+                Add(C);
+                return C;
+            };
+            UMaterialExpression* StreakU = Mask(FlowUv, true, false, false);
+            UMaterialExpression* StreakV = Mask(FlowUv, false, true, false);
+            // Two incommensurate lane frequencies, each sheared slightly
+            // across-stream so the pattern reads as water lanes, not bars.
+            // FlowUv is ~4 m per unit: lanes land at roughly 3 m and 1.2 m.
+            UMaterialExpression* LaneA = CyclesSine(AddNode(
+                Mul(StreakU, ConstExpr(1.40f)),
+                Mul(StreakV, ConstExpr(0.35f))));
+            UMaterialExpression* LaneB = CyclesSine(AddNode(
+                Mul(StreakU, ConstExpr(3.37f)),
+                Mul(StreakV, ConstExpr(0.83f))));
+            UMaterialExpression* StreakField =
+                Mul(AddNode(LaneA, LaneB), ConstExpr(0.5f));
+            UMaterialExpressionDotProduct* SpeedSquared =
+                NewObject<UMaterialExpressionDotProduct>(Material);
+            SpeedSquared->A.Expression = FlowVelocityMps;
+            SpeedSquared->B.Expression = FlowVelocityMps;
+            Add(SpeedSquared);
+            UMaterialExpressionSaturate* SpeedGate =
+                NewObject<UMaterialExpressionSaturate>(Material);
+            SpeedGate->Input.Expression =
+                Mul(SpeedSquared, ConstExpr(0.5f));
+            Add(SpeedGate);
+            UMaterialExpression* GatedField = Mul(StreakField, SpeedGate);
+            RoughnessOutput = AddNode(
+                Roughness,
+                Mul(GatedField,
+                    Scalar(TEXT("LiveFlowStreakRoughness"), 0.20f)));
+            // Roughness lanes need reflection contrast to show; under a
+            // diffuse sky they vanish. A few percent of matching albedo
+            // modulation keeps the lanes readable in any light without
+            // painting visible stripes on still frames.
+            BaseColorOutput = Mul(
+                BaseColor,
+                AddNode(
+                    ConstExpr(1.0f),
+                    Mul(GatedField,
+                        Scalar(TEXT("LiveFlowStreakTint"), 0.05f))));
+        }
     }
 
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
-    Ed->BaseColor.Connect(0, BaseColor);
-    Ed->Roughness.Connect(0, Roughness);
+    Ed->BaseColor.Connect(0, BaseColorOutput);
+    Ed->Roughness.Connect(0, RoughnessOutput);
     Ed->Specular.Connect(0, Scalar(TEXT("LiveWaterSpecular"), 0.48f));
 
     // Calm reaches gain their colour and volumetric response from the authored

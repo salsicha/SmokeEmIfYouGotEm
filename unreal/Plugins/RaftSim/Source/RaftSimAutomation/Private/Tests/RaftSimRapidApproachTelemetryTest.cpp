@@ -396,16 +396,32 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
             State->RideFacingYawDegrees = Raft->GetActorRotation().Yaw;
             Raft->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
 
-            // Fixed observation camera above and behind the release point,
-            // aimed down the tongue: rendered-frame evidence ("the water
-            // surface isn't moving, there is no white water") that headless
-            // telemetry cannot capture. Screenshots fire during the ride.
-            const FRotator CameraFacing(
-                -18.0f, State->RideFacingYawDegrees, 0.0f);
+            // Fixed observation camera framed on the DETECTED DROP (not the
+            // release point 40 m upstream): the whitewater, ledge, and wave
+            // train all live at the drop, and a release-point camera reduces
+            // them to distant pixels. Offset to the side so the tongue reads
+            // in profile; rendered-frame evidence headless telemetry cannot
+            // capture.
+            float DropZCm = 0.0f;
+            FVector DropWorldCm = State->RideStartLocationCm;
+            float ApproachZCm = 0.0f;
+            FVector ApproachWorldCm = State->RideStartLocationCm;
+            const bool bFramedDrop =
+                SampleWetStation(DropStationM + 10.0f, DropZCm, DropWorldCm) &&
+                SampleWetStation(
+                    DropStationM - 30.0f, ApproachZCm, ApproachWorldCm);
             const FVector Downstream =
                 FRotator(0.0f, State->RideFacingYawDegrees, 0.0f).Vector();
-            const FVector CameraLocation = State->RideStartLocationCm -
-                Downstream * 900.0f + FVector(0.0f, 0.0f, 520.0f);
+            const FVector Side(-Downstream.Y, Downstream.X, 0.0f);
+            const FVector CameraLocation = bFramedDrop
+                ? ApproachWorldCm + Side * 1400.0f + FVector(0.0f, 0.0f, 650.0f)
+                : State->RideStartLocationCm -
+                    Downstream * 900.0f + FVector(0.0f, 0.0f, 520.0f);
+            const FVector LookTarget = bFramedDrop
+                ? DropWorldCm
+                : State->RideStartLocationCm + Downstream * 4000.0f;
+            const FRotator CameraFacing =
+                (LookTarget - CameraLocation).Rotation();
             if (ACameraActor* Camera = World->SpawnActor<ACameraActor>(
                     ACameraActor::StaticClass(), CameraLocation, CameraFacing))
             {
