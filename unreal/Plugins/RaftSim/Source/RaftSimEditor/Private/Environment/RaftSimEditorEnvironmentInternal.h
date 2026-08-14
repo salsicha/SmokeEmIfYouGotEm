@@ -1088,6 +1088,13 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
 
 bool CaptureColoradoHanceWaterReview(FString& OutSummary);
 
+/**
+ * Write the station-indexed support band fields (baked water elevation + band
+ * energy per flow band) beside the cooked flow fields, for rigid raft support
+ * to mirror the authored band water at runtime.
+ */
+bool ExportSouthForkSupportBandFields(FString& OutSummary);
+
 UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     FString& OutSummary);
 

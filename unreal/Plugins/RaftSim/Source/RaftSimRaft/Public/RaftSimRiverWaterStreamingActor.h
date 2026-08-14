@@ -53,6 +53,14 @@ private:
 
     UPROPERTY()
     TObjectPtr<ARaftSimRiverWaterConfig> RiverConfig;
+    // Config values cached at BeginPlay: the placed config actor lives in a
+    // world-partition cell near the put-in and unloads once the raft travels
+    // far enough — dereferencing it per tick silently froze window recentres
+    // at a streaming-dependent distance (2026-08-14).
+    FName CachedFlowBand;
+    float CachedMovingWindowAdvanceM = 80.0f;
+    float CachedMovingWindowStationExtentM = 320.0f;
+    float CachedMovingWindowLateralExtentM = 80.0f;
 
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;

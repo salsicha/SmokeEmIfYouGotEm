@@ -622,9 +622,25 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             ScaleBy(StationM, 0.19f), ScaleBy(LateralM, 0.61f));
         UMaterialExpression* PhaseB0 = SubtractPair(
             ScaleBy(StationM, 0.071f), ScaleBy(LateralM, 0.37f));
-        UMaterialExpressionTime* WaveTime =
-            NewObject<UMaterialExpressionTime>(Material);
-        AddExpr(WaveTime);
+        // Flow-warped clock instead of raw engine time: the runtime pushes an
+        // accumulated (speed-scaled) clock through the shared collection so
+        // the waves speed up entering rapids and the physics-side phases stay
+        // paired. Falls back to engine time if the collection is unavailable.
+        UMaterialExpression* WaveTime = nullptr;
+        if (UMaterialParameterCollection* WaveClockCollection =
+                LoadOrCreateRaftFoamOcclusionCollection(OutSummary))
+        {
+            WaveTime = AddRaftWaterCollectionParameter(
+                Material, WaveClockCollection,
+                TEXT("RaftSimWaveClockSeconds"), true);
+        }
+        if (!WaveTime)
+        {
+            UMaterialExpressionTime* FallbackTime =
+                NewObject<UMaterialExpressionTime>(Material);
+            AddExpr(FallbackTime);
+            WaveTime = FallbackTime;
+        }
         UMaterialExpression* PhaseA1 = SubtractPair(
             PhaseA0, ScaleBy(WaveTime, 0.90f));
         UMaterialExpression* PhaseB1 = SubtractPair(

@@ -110,8 +110,8 @@ bool FRaftSimAssertRaftSettledCommand::Update()
     Test->TestTrue(
         TEXT("raft settled near waterline (|Z| < 60 cm)"), FMath::Abs(ZCm) < 60.0f);
     Test->TestTrue(
-        TEXT("loaded raft center stays above the 25 cm settling envelope"),
-        ZCm > -25.0f);
+        TEXT("loaded tube-center frame settles above calm water"),
+        ZCm > 8.0f);
     float FloorCenterWorldZCm = 0.0f;
     const bool bHasFloorCenter =
         Raft->GetRenderedFloorCenterWorldZCm(FloorCenterWorldZCm);
@@ -120,10 +120,10 @@ bool FRaftSimAssertRaftSettledCommand::Update()
     {
         Test->TestTrue(
             FString::Printf(
-                TEXT("loaded self-bailing floor remains at the calm waterline "
-                     "(floor %.1f cm >= -2.5 cm)"),
+                TEXT("loaded self-bailing floor retains calm-water freeboard "
+                     "(floor %.1f cm >= 8.0 cm)"),
                 FloorCenterWorldZCm),
-            FloorCenterWorldZCm >= -2.5f);
+            FloorCenterWorldZCm >= 8.0f);
     }
     Test->TestTrue(
         TEXT("raft vertical velocity settled (< 0.5 m/s)"),
@@ -260,8 +260,8 @@ bool FRaftSimStrokeAndMeasureCommand::Update()
         TEXT("raft still near waterline after strokes (|Z| < 60 cm)"),
         FMath::Abs(Raft->GetActorLocation().Z) < 60.0f);
     Test->TestTrue(
-        TEXT("paddling does not sink the loaded raft center"),
-        Raft->GetActorLocation().Z > -25.0f);
+        TEXT("paddling keeps the loaded tube-center frame above water"),
+        Raft->GetActorLocation().Z > 8.0f);
     float FloorCenterWorldZCm = 0.0f;
     if (Test->TestTrue(
             TEXT("rendered floor remains measurable after strokes"),
@@ -269,10 +269,10 @@ bool FRaftSimStrokeAndMeasureCommand::Update()
     {
         Test->TestTrue(
             FString::Printf(
-                TEXT("paddling does not submerge the self-bailing floor "
-                     "(floor %.1f cm >= -2.5 cm)"),
+                TEXT("paddling retains self-bailing floor freeboard "
+                     "(floor %.1f cm >= 8.0 cm)"),
                 FloorCenterWorldZCm),
-            FloorCenterWorldZCm >= -2.5f);
+            FloorCenterWorldZCm >= 8.0f);
     }
     return true;
 }

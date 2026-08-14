@@ -104,9 +104,12 @@ ARaftSimRaftActor::ARaftSimRaftActor()
     RaftVisual = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("RaftVisual"));
     RaftVisual->SetupAttachment(Root);
     RaftVisual->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    // Tube bottoms build at z=0; drop so the raft floats with the lower tube in
-    // the water and the deck just above the surface.
-    RaftVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -TubeRadiusM * 0.55f * kCmPerM));
+    // Generated and production chamber centrelines live one radius above their
+    // local origin. Align those centres with the rigid-body origin used by both
+    // buoyancy and terrain contact; presentation must not carry a second
+    // waterline datum.
+    RaftVisual->SetRelativeLocation(
+        FVector(0.0f, 0.0f, -TubeRadiusM * kCmPerM));
 
     RescueLineVisual = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("RescueLineVisual"));
     RescueLineVisual->SetupAttachment(Root);
@@ -438,9 +441,10 @@ void ARaftSimRaftActor::BuildRaftVisual()
     }
     // Constructor component transforms are based on CDO defaults. Re-resolve
     // the presentation origin from the live instance radius so an authored
-    // override cannot silently move the visible waterline away from support.
+    // override cannot silently move the visible tube centres away from the
+    // rigid support points.
     RaftVisual->SetRelativeLocation(
-        FVector(0.0f, 0.0f, -TubeRadiusM * 0.55f * kCmPerM));
+        FVector(0.0f, 0.0f, -TubeRadiusM * kCmPerM));
     const TArray<FLinearColor> NoColors;
     ProductionRaftRestSections.Reset();
     ProductionRaftDeformedSections.Reset();
@@ -984,10 +988,12 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             AvatarAction = ERaftSimCrewAvatarAction::BackStroke;
             break;
         case ERaftSimCrewCommand::TurnLeft:
-            AvatarAction = ERaftSimCrewAvatarAction::TurnLeft;
-            break;
         case ERaftSimCrewCommand::TurnRight:
-            AvatarAction = ERaftSimCrewAvatarAction::TurnRight;
+            // Real pivot technique: the side you turn TOWARD back-paddles,
+            // the opposite side paddles forward. Resolved per paddler in the
+            // avatar loop below; the TurnLeft/TurnRight avatar poses remain
+            // the guide's own draw/pry presentation.
+            AvatarAction = ERaftSimCrewAvatarAction::ForwardStroke;
             break;
         case ERaftSimCrewCommand::Stop:
             AvatarAction = ERaftSimCrewAvatarAction::BackStroke;
@@ -1039,10 +1045,28 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         // The stern (last) avatar is the guide; its own recent stroke wins
         // over the crew command so player inputs read on the body.
         const bool bGuideAvatar = Index == CrewAvatars.Num() - 1;
+        ERaftSimCrewAvatarAction ThisAvatarAction = AvatarAction;
+        if (!bGuideAvatar &&
+            (ActiveCrewCommand == ERaftSimCrewCommand::TurnLeft ||
+             ActiveCrewCommand == ERaftSimCrewCommand::TurnRight))
+        {
+            // Seat sides alternate with spawn order (even index = port,
+            // Side -1). Left turn: port back-paddles, starboard drives
+            // forward; right turn mirrors. Both sides share the crew stroke
+            // phase, so the sliced yaw impulse stays on the same catch.
+            const bool bPortSeat = Index % 2 == 0;
+            const bool bBackPaddleSeat =
+                ActiveCrewCommand == ERaftSimCrewCommand::TurnLeft
+                    ? bPortSeat
+                    : !bPortSeat;
+            ThisAvatarAction = bBackPaddleSeat
+                ? ERaftSimCrewAvatarAction::BackStroke
+                : ERaftSimCrewAvatarAction::ForwardStroke;
+        }
         Avatar->SetAvatarAction(
             bGuideAvatar && GuideStrokeActionSeconds > 0.0f
                 ? GuideStrokeAction
-                : AvatarAction);
+                : ThisAvatarAction);
     }
 
     // Advance the same 0..1 cadence used by the visible stroke. The total
@@ -1295,6 +1319,8 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         float WaterSpeedMps = 0.0f;
         float SolverSurfaceZCm = 0.0f;
         float SupportSurfaceZCm = 0.0f;
+        float FloorCenterZCm = 0.0f;
+        bool bHasFloorCenter = false;
         bool bHullWet = false;
         if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
         {
@@ -1317,6 +1343,14 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
                 SupportSurfaceZCm = SupportSample.SurfaceHeightMeters * 100.0f;
             }
         }
+        bHasFloorCenter = GetRenderedFloorCenterWorldZCm(FloorCenterZCm);
+        const float FloorFreeboardCm = bHasFloorCenter
+            ? FloorCenterZCm - SupportSurfaceZCm
+            : 0.0f;
+        const float RenderedFloorFreeboardCm = bHasFloorCenter
+            ? FloorFreeboardCm -
+                ARaftSimWaterSurfaceActor::GetLiveSurfaceRenderLiftCm()
+            : 0.0f;
         float SunPitchDeg = 0.0f;
         float SunIntensityLux = 0.0f;
         if (TActorIterator<ADirectionalLight> SunIt{GetWorld()})
@@ -1339,7 +1373,8 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         UE_LOG(LogTemp, Display,
             TEXT("RaftSim raft drift: raft_speed_mps=%.3f water_speed_mps=%.3f ")
             TEXT("raft_z_cm=%.1f surface_z_cm=%.1f solver_surface_z_cm=%.1f ")
-            TEXT("support_delta_cm=%.1f pitch_deg=%.1f wet=%d retained_kg=%.0f ")
+            TEXT("support_delta_cm=%.1f floor_z_cm=%.1f floor_freeboard_cm=%.1f ")
+            TEXT("render_floor_freeboard_cm=%.1f pitch_deg=%.1f wet=%d retained_kg=%.0f ")
             TEXT("pressure=%.2f integrity=%.2f dry_points=%d ground_points=%d ")
             TEXT("ground_penetration_m=%.3f x_cm=%.0f y_cm=%.0f ")
             TEXT("sun_pitch=%.1f sun_intensity=%.1f"),
@@ -1349,6 +1384,9 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             SupportSurfaceZCm,
             SolverSurfaceZCm,
             SupportSurfaceZCm - SolverSurfaceZCm,
+            FloorCenterZCm,
+            FloorFreeboardCm,
+            RenderedFloorFreeboardCm,
             GetActorRotation().Pitch,
             bHullWet ? 1 : 0,
             GetD3RetainedWaterMassKg(),
@@ -2163,4 +2201,23 @@ void ARaftSimRaftActor::ResetMotionForTesting()
     CrewReactionRemaining = 0.0f;
     CrewStrokePhase = 0.0f;
     LastCrewStrokeImpulsePhase = -1.0f;
+}
+
+void ARaftSimRaftActor::TeleportForTesting(
+    const FVector& WorldLocationCm,
+    float FacingYawDegrees,
+    bool bApplyFacing)
+{
+    const FQuat Facing = bApplyFacing
+        ? FRotator(0.0f, FacingYawDegrees, 0.0f).Quaternion()
+        : GetActorQuat();
+    if (RaftAdapter != nullptr)
+    {
+        FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
+        State.WorldTransform.SetTranslation(WorldLocationCm);
+        State.WorldTransform.SetRotation(Facing);
+        RaftAdapter->SetKinematicState(State);
+    }
+    SetActorLocationAndRotation(WorldLocationCm, Facing);
+    ResetMotionForTesting();
 }

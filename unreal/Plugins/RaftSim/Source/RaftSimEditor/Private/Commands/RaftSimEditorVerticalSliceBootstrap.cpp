@@ -341,6 +341,12 @@ struct FRiverMapSpec
     const TCHAR* MapName;
     const TCHAR* CookedFieldsDir;
     const TCHAR* FlowBand;
+    // Raft put-in, meters along the corridor (station*100 = world X cm).
+    // Must be INSIDE the cooked wet domain: a put-in the fields don't cover
+    // leaves the raft dry and beached in automation PIE and fails the
+    // RiverMapLoads depth envelope (Troublemaker staged at -60 m while its
+    // wet centerline spans 0-300 m, 2026-08-13).
+    float PutInStationM;
 };
 
 // The five compact signature-rapid maps (docs/five-river-simulation-plan.md).
@@ -350,19 +356,19 @@ struct FRiverMapSpec
 static const FRiverMapSpec GRiverMaps[] = {
     {TEXT("L_Troublemaker"),
      TEXT("physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("median_runnable"), 10.0f},
     {TEXT("L_Hance"),
      TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("median_runnable"), -60.0f},
     {TEXT("L_UpperHuacas"),
      TEXT("physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("median_runnable"), -60.0f},
     {TEXT("L_Terminator"),
      TEXT("physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("median_runnable"), -60.0f},
     {TEXT("L_LavaCanyon"),
      TEXT("physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields"),
-     TEXT("median_runnable")},
+     TEXT("median_runnable"), -60.0f},
 };
 
 static bool BuildRiverMap(const FRiverMapSpec& Spec)
@@ -428,13 +434,15 @@ static bool BuildRiverMap(const FRiverMapSpec& Spec)
     UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: %s cooked_fields=%d"),
            Spec.MapName, bCookedFieldsExist ? 1 : 0);
 
-    // Raft at the upstream scout eddy; run flows downstream (+X).
+    // Raft at the per-river put-in; run flows downstream (+X). The runtime
+    // seats the hull on the sampled surface, so only station/lateral matter.
+    const float PutInXCm = Spec.PutInStationM * 100.0f;
     AddActorToWorld(
         World, ARaftSimRaftActor::StaticClass(),
-        FTransform(FVector(-6000.0f, 0.0f, 60.0f)));
+        FTransform(FVector(PutInXCm, 0.0f, 60.0f)));
     AddActorToWorld(
         World, APlayerStart::StaticClass(),
-        FTransform(FVector(-6600.0f, 0.0f, 200.0f)));
+        FTransform(FVector(PutInXCm - 600.0f, 0.0f, 200.0f)));
 
     // Deterministic hydraulic-crux rock garden. These are runtime-authoritative
     // D4 obstacles, not decorative boulders: the raft binds their transforms,

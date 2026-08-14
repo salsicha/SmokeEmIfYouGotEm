@@ -510,6 +510,85 @@ bool FRaftSimDryRapidCrestGroundingTest::RunTest(const FString& Parameters)
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimLoadedRaftBuoyancyDatumTest,
+    "RaftSim.M1.LoadedRaftBuoyancyUsesTubeBottomDatum",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimLoadedRaftBuoyancyDatumTest::RunTest(const FString& Parameters)
+{
+    URaftSimChronoRuntimeAdapter* Adapter =
+        NewObject<URaftSimChronoRuntimeAdapter>();
+    TestNotNull(TEXT("adapter"), Adapter);
+    if (Adapter == nullptr)
+    {
+        return false;
+    }
+
+    FRaftSimRaftBodyConfig Body;
+    Body.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Body.MassKg = 605.0f;
+    Body.LengthMeters = 4.3f;
+    Body.WidthMeters = 2.0f;
+    Body.TubeRadiusMeters = 0.28f;
+    Body.BuoyancyWeightMultiple = 5.2f;
+    Body.HeaveDampingNsPerM = 1500.0f;
+    Body.InertiaTensorKgM2 = FVector(900.0f, 900.0f, 1100.0f);
+    Adapter->ConfigureRaftBody(Body);
+
+    FRaftSimFlexParameters Flex;
+    Flex.MassKg = Body.MassKg;
+    Flex.LengthM = Body.LengthMeters;
+    Flex.WidthM = Body.WidthMeters;
+    Flex.TubeRadiusM = Body.TubeRadiusMeters;
+    Flex.GuideMassKg = 0.0;
+    Flex.PassengerMassKg = 0.0;
+    Flex.PassengerCount = 0;
+    Adapter->ConfigureFlexibleRaftModel(Flex, {});
+    Adapter->SetWaterSurfaceSampler(
+        [](const FVector&, float& OutSurfaceZCm) -> bool
+        {
+            OutSurfaceZCm = 0.0f;
+            return true;
+        });
+    Adapter->SetFlexibleWaterFieldSampler(
+        [](const FVector&, FRaftSimFlexUniformWater& OutWater) -> bool
+        {
+            OutWater.SurfaceHeightM = 0.0;
+            OutWater.VelocityMps = FVector::ZeroVector;
+            OutWater.bWet = true;
+            return true;
+        });
+
+    FRaftSimRaftKinematicState State;
+    State.WorldTransform.SetTranslation(FVector::ZeroVector);
+    Adapter->SetKinematicState(State);
+    constexpr float Dt = 1.0f / 120.0f;
+    bool bStayedFinite = true;
+    for (int32 StepIndex = 0; StepIndex < 1440; ++StepIndex)
+    {
+        bStayedFinite &= Adapter->StepRaftDynamics(Dt);
+    }
+
+    const FRaftSimRaftKinematicState& Settled = Adapter->GetKinematicState();
+    const float SettledCenterM =
+        Settled.WorldTransform.GetTranslation().Z / 100.0f;
+    const float ExpectedCenterM = Body.TubeRadiusMeters *
+        (1.0f - 2.0f / Body.BuoyancyWeightMultiple);
+    TestTrue(TEXT("loaded buoyancy solve remains finite"), bStayedFinite);
+    TestTrue(
+        FString::Printf(
+            TEXT("tube center settles above water at the bottom-datum "
+                 "equilibrium (actual %.3f m, expected %.3f m)"),
+            SettledCenterM,
+            ExpectedCenterM),
+        FMath::IsNearlyEqual(SettledCenterM, ExpectedCenterM, 0.04f));
+    TestTrue(
+        TEXT("loaded tube center cannot settle below the water surface"),
+        SettledCenterM > 0.10f);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimDeepRapidMaskGapBuoyancyTest,
     "RaftSim.M1.DeepRapidMaskGapRetainsBuoyancy",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

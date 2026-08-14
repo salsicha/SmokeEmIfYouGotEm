@@ -57,6 +57,51 @@
 
 namespace RaftSimPhotorealMaterials
 {
+
+// Churn panners (ripple normals, froth, foam lace) run on the shared
+// flow-warped clock the water surface actor accumulates each frame, so the
+// surface agitation visibly quickens in fast water ("the water doesn't speed
+// up going down the rapid" — a rider moves WITH the current, so velocity-true
+// UV advection reads near-static from the boat; churn frequency is the speed
+// cue the eye actually gets). Bulk downstream advection stays on raw engine
+// time: it is already velocity-proportional per vertex and warping it too
+// would double-scale the motion. Returns nullptr (raw time) if the shared
+// collection is unavailable.
+static UMaterialExpression* AddWaveClockTimeExpression(UMaterial* Material)
+{
+    FString CollectionSummary;
+    UMaterialParameterCollection* Collection =
+        RaftSimEditorEnvironment::LoadOrCreateRaftFoamOcclusionCollection(
+            CollectionSummary);
+    if (!Collection)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("Photoreal water: no foam-occlusion collection for the wave ")
+            TEXT("clock (%s); panners fall back to engine time."),
+            *CollectionSummary);
+        return nullptr;
+    }
+    static const FName ClockName(TEXT("RaftSimWaveClockSeconds"));
+    UMaterialExpressionCollectionParameter* Expression =
+        NewObject<UMaterialExpressionCollectionParameter>(Material);
+    Expression->Collection = Collection;
+    Expression->ParameterName = ClockName;
+    Expression->ExpressionGUID = FGuid::NewGuid();
+    const int32 ParameterIndex = Collection->ScalarParameters.IndexOfByPredicate(
+        [](const FCollectionScalarParameter& Parameter)
+        {
+            return Parameter.ParameterName ==
+                FName(TEXT("RaftSimWaveClockSeconds"));
+        });
+    if (ParameterIndex != INDEX_NONE)
+    {
+        Expression->ParameterId =
+            Collection->ScalarParameters[ParameterIndex].Id;
+    }
+    Material->GetExpressionCollection().AddExpression(Expression);
+    return Expression;
+}
+
 static UMaterial* BuildPhotorealRiverWaterMaterial(
     const TCHAR* PackagePath =
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater"),
@@ -282,6 +327,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             FrothPan->SpeedX = SpeedX;
             FrothPan->SpeedY = SpeedY;
             FrothPan->Coordinate.Expression = FrothUv;
+            FrothPan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* FrothSampleNode = Cast<
                 UMaterialExpressionTextureSampleParameter2D>(Add(
                     NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
@@ -320,6 +366,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Add(NewObject<UMaterialExpressionPanner>(Material)));
         FoamPan->SpeedX = 0.018f; FoamPan->SpeedY = 0.0f;
         FoamPan->Coordinate.Expression = FoamUv;
+        FoamPan->Time.Expression = AddWaveClockTimeExpression(Material);
         UMaterialExpressionTextureSampleParameter2D* FoamLaceSample = Cast<
             UMaterialExpressionTextureSampleParameter2D>(Add(
                 NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
@@ -436,6 +483,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Pan->SpeedX = SpeedX;
             Pan->SpeedY = SpeedY;
             Pan->Coordinate.Expression = Coordinates;
+            Pan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* Sample =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(
                     Add(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
@@ -1859,6 +1907,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             FrothPan->Coordinate.Expression = FrothUv;
             FrothPan->SpeedX = SpeedX;
             FrothPan->SpeedY = SpeedY;
+            FrothPan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* FrothSampleNode =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(Add(
                     NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
@@ -1991,6 +2040,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             Pan->SpeedX = SpeedX;
             Pan->SpeedY = SpeedY;
             Pan->Coordinate.Expression = Coordinates;
+            Pan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* Sample =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(
                     Add(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));

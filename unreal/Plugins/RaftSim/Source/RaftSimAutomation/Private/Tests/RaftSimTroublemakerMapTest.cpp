@@ -31,6 +31,12 @@ IMPLEMENT_COMPLEX_AUTOMATION_TEST(
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
         EAutomationTestFlags::ProductFilter)
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimSouthForkFullReachSupportParityTest,
+    "RaftSim.P4.SouthForkFullReachSupportParity",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+        EAutomationTestFlags::ProductFilter)
+
 namespace
 {
 
@@ -145,11 +151,16 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("RaftSim_ChilkoLavaCanyon_PlayerRaft");
         bFutaleufuTerminatorReferenceRun = PlayerRaft->GetActorLabelView() ==
             TEXT("RaftSim_FutaleufuTerminator_PlayerRaft");
+        // Sanity envelope against falling through the world or launching
+        // skyward. Rivers ride their real-world vertical datum, so the bound
+        // must admit legitimate elevations: South Fork rests near z=32155
+        // (321 m true elevation), which the former 20000 cm bound rejected
+        // even with the raft floating correctly at its put-in (2026-08-13).
         Test->TestTrue(
             FString::Printf(
                 TEXT("raft rests within depth envelope (z=%.0f)"),
                 PlayerRaft->GetActorLocation().Z),
-            FMath::Abs(PlayerRaft->GetActorLocation().Z) < 20000.0f);
+            FMath::Abs(PlayerRaft->GetActorLocation().Z) < 60000.0f);
     }
     else
     {
@@ -2339,6 +2350,104 @@ bool FRaftSimAssertRiverMapCommand::Update()
     return true;
 }
 
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimAssertSouthForkSupportParityCommand, FAutomationTestBase*, Test);
+bool FRaftSimAssertSouthForkSupportParityCommand::Update()
+{
+    UWorld* World = GetRiverTestWorld();
+    if (World == nullptr)
+    {
+        Test->AddError(TEXT("No world for South Fork support-parity test"));
+        return true;
+    }
+
+    ARaftSimWaterSurfaceActor* Surface = nullptr;
+    if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
+    {
+        Surface = *It;
+    }
+    Test->TestNotNull(TEXT("South Fork full reach has a live water surface"), Surface);
+
+    ARaftSimRaftActor* Raft = nullptr;
+    if (TActorIterator<ARaftSimRaftActor> It(World); It)
+    {
+        Raft = *It;
+    }
+    Test->TestNotNull(TEXT("South Fork full reach has a playable raft"), Raft);
+
+    const UGameInstance* GI = World->GetGameInstance();
+    URaftSimPhysicsBridgeSubsystem* Bridge =
+        GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+    URaftSimWaterRuntimeAdapter* Water =
+        Bridge ? Bridge->GetWaterRuntime() : nullptr;
+    Test->TestNotNull(TEXT("South Fork full reach has a water runtime"), Water);
+    if (Surface && Water)
+    {
+        // This exact map retains a legacy authored water body, so the live
+        // solver mesh is a detail overlay. It must still drive the matching
+        // rigid support displacement or the first rapid renders over the raft.
+        Test->TestFalse(
+            TEXT("South Fork full reach retains legacy detail-overlay mode"),
+            Surface->IsLiveSurfaceCarrierEnabled());
+        Test->TestTrue(
+            TEXT("South Fork detail overlay couples visible rapid relief into raft support"),
+            Water->IsRaftSupportSurfaceEnabled());
+        Test->TestTrue(
+            TEXT("South Fork support uses the rendered standing-wave scale"),
+            FMath::IsNearlyEqual(
+                Water->GetRaftSupportStandingWaveScale(),
+                Surface->GetLivePresentationStandingWaveScale(),
+                0.001f));
+        Test->TestTrue(
+            TEXT("South Fork support uses the rendered hydraulic-relief scale"),
+            FMath::IsNearlyEqual(
+                Water->GetRaftSupportHydraulicReliefScale(),
+                Surface->GetLivePresentationHydraulicReliefScale(),
+                0.001f));
+
+        if (Raft)
+        {
+            FRaftSimWaterSample SupportSample;
+            const bool bHasSupport =
+                Water->SampleRaftSupportSurfaceAtWorldPosition(
+                    Raft->GetActorLocation(), SupportSample) &&
+                SupportSample.bWet;
+            Test->TestTrue(
+                TEXT("South Fork raft center has a wet support sample"),
+                bHasSupport);
+            float FloorCenterZCm = 0.0f;
+            const bool bHasFloor =
+                Raft->GetRenderedFloorCenterWorldZCm(FloorCenterZCm);
+            Test->TestTrue(
+                TEXT("South Fork rendered self-bailing floor is measurable"),
+                bHasFloor);
+            if (bHasSupport && bHasFloor)
+            {
+                const float RenderSurfaceZCm =
+                    SupportSample.SurfaceHeightMeters * 100.0f +
+                    ARaftSimWaterSurfaceActor::GetLiveSurfaceRenderLiftCm();
+                const float RenderFreeboardCm =
+                    FloorCenterZCm - RenderSurfaceZCm;
+                Test->AddInfo(FString::Printf(
+                    TEXT("South Fork support waterline: raft_center=%.1f cm "
+                         "floor=%.1f cm render_surface=%.1f cm "
+                         "render_freeboard=%.1f cm"),
+                    Raft->GetActorLocation().Z,
+                    FloorCenterZCm,
+                    RenderSurfaceZCm,
+                    RenderFreeboardCm));
+                Test->TestTrue(
+                    FString::Printf(
+                        TEXT("South Fork floor remains visibly above the "
+                             "coupled rapid surface (%.1f cm >= 5.0 cm)"),
+                        RenderFreeboardCm),
+                    RenderFreeboardCm >= 5.0f);
+            }
+        }
+    }
+    return true;
+}
+
 } // namespace
 
 void FRaftSimRiverMapLoadsTest::GetTests(
@@ -2364,6 +2473,21 @@ bool FRaftSimRiverMapLoadsTest::RunTest(const FString& MapPath)
     }
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertRiverMapCommand(this));
+    return true;
+}
+
+bool FRaftSimSouthForkFullReachSupportParityTest::RunTest(const FString&)
+{
+    const FString MapPath =
+        TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach");
+    if (!MapExists(MapPath))
+    {
+        AddError(TEXT("South Fork full-reach map is missing"));
+        return false;
+    }
+    AutomationOpenMap(MapPath);
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkSupportParityCommand(this));
     return true;
 }
 

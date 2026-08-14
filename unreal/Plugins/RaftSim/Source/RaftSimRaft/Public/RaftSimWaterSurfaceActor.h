@@ -276,6 +276,24 @@ public:
         return ResolvedPresentationSurfaceSmoothingStrength;
     }
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetLivePresentationStandingWaveScale() const
+    {
+        return ResolvedPresentationStandingWaveScale;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetLivePresentationHydraulicReliefScale() const
+    {
+        return ResolvedPresentationHydraulicReliefScale;
+    }
+
+    /** Small geometry separation above the coupled physical support surface. */
+    static constexpr float GetLiveSurfaceRenderLiftCm()
+    {
+        return 2.0f;
+    }
+
     /** True when an authored river uses the render-only subdivided surface.
      * This changes presentation sampling only; the adapter and all gameplay
      * water authority remain at their authored resolution. */
@@ -470,6 +488,9 @@ private:
     TArray<FLinearColor> RapidFoamVertexColors;
     TArray<FProcMeshTangent> Tangents;
     float TimeSinceRefresh = 0.0f;
+    /** Flow-warped wave clock shared with the WPO collection and adapter. */
+    float PresentationWaveClockSeconds = -1.0f;
+    float SmoothedFlowClockScale = 1.0f;
     float PresentationPhaseSeconds = 0.0f;
     bool bLoggedPresentationDiagnostics = false;
     bool bLoggedHydraulicReliefDiagnostics = false;
