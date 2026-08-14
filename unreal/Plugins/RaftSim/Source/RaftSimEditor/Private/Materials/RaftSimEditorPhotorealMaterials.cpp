@@ -2104,7 +2104,11 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     SpeedCoverage->Input.Expression = Mul(
         AddNode(
             SpeedMask,
-            Scalar(TEXT("HydraulicCoverageSpeedThresholdBias"), -0.03f)),
+            // Reviewed value (-0.28): the 2026-07-30 bulk commit retuned this
+            // to -0.03, which engages hydraulic/whitewater coverage at nearly
+            // any water speed — the played result is a white haze hovering
+            // over slow water and margins ("haze over the river", 2026-08-14).
+            Scalar(TEXT("HydraulicCoverageSpeedThresholdBias"), -0.28f)),
         Scalar(TEXT("HydraulicCoverageSpeedGain"), 3.2f));
     UMaterialExpressionSaturate* HydraulicActivity =
         Cast<UMaterialExpressionSaturate>(Add(NewObject<UMaterialExpressionSaturate>(Material)));
