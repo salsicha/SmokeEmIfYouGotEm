@@ -1858,6 +1858,82 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                             HydraulicPresentation, ShorelineDepthM,
                             Metrics.ProceduralShorelineCompletionVertexCount);
                     }
+                    // Boulder pillows: fast water piles onto the upstream
+                    // face of an exposed boulder and sheds an aerated wake
+                    // downstream. The crescent relief is render-side only
+                    // and capped small (0.22 m) because the support band
+                    // field does not yet carry it; the aeration injection
+                    // feeds the drift-foam gate and the energetic wave
+                    // terms below, and the core dip pulls the interpolated
+                    // water film down the exposed rock face.
+                    float PillowReliefM = 0.0f;
+                    float PillowAeration = 0.0f;
+                    const float PillowSpeedMps = HydraulicPresentation.B * 8.0f;
+                    if (PillowSpeedMps > 1.1f)
+                    {
+                        for (const FSouthForkBoulderPresentationFootprint&
+                                 Footprint :
+                             AcceptedBoulderPresentationFootprints)
+                        {
+                            const float RadiusM =
+                                FMath::Max(Footprint.RadiusM, 0.75f);
+                            const float DeltaStationM =
+                                Point.StationM - Footprint.StationM;
+                            if (FMath::Abs(DeltaStationM) > RadiusM * 7.0f)
+                            {
+                                continue;
+                            }
+                            const float DeltaLateralM =
+                                LateralM - Footprint.LateralM;
+                            if (FMath::Abs(DeltaLateralM) > RadiusM * 2.2f)
+                            {
+                                continue;
+                            }
+                            const float DistanceM = FMath::Sqrt(
+                                DeltaStationM * DeltaStationM +
+                                DeltaLateralM * DeltaLateralM);
+                            const float SpeedT = FMath::Clamp(
+                                (PillowSpeedMps - 1.1f) / 1.6f, 0.0f, 1.0f);
+                            if (DistanceM < RadiusM * 0.7f)
+                            {
+                                PillowReliefM =
+                                    FMath::Min(PillowReliefM, 0.0f) -
+                                    0.18f *
+                                        (1.0f - DistanceM / (RadiusM * 0.7f));
+                                continue;
+                            }
+                            if (DeltaStationM < -0.35f * RadiusM &&
+                                DistanceM < RadiusM * 1.9f)
+                            {
+                                const float Ring = FMath::Clamp(
+                                    1.0f -
+                                        FMath::Abs(DistanceM - RadiusM * 1.1f) /
+                                            (RadiusM * 0.85f),
+                                    0.0f, 1.0f);
+                                PillowReliefM = FMath::Max(
+                                    PillowReliefM, 0.22f * SpeedT * Ring);
+                                PillowAeration = FMath::Max(
+                                    PillowAeration, 0.85f * SpeedT * Ring);
+                            }
+                            else if (DeltaStationM > RadiusM * 0.3f &&
+                                     FMath::Abs(DeltaLateralM) <
+                                         RadiusM * 1.05f)
+                            {
+                                const float WakeT = FMath::Clamp(
+                                    1.0f - DeltaStationM / (RadiusM * 6.5f),
+                                    0.0f, 1.0f);
+                                PillowAeration = FMath::Max(
+                                    PillowAeration,
+                                    0.55f * SpeedT * WakeT * WakeT);
+                            }
+                        }
+                        if (PillowAeration > 0.0f)
+                        {
+                            HydraulicPresentation.R = FMath::Clamp(
+                                HydraulicPresentation.R + PillowAeration,
+                                0.0f, 1.0f);
+                        }
+                    }
                     const float HydraulicEnergy = FMath::Clamp(
                         HydraulicPresentation.R * 0.72f +
                         HydraulicPresentation.B * 0.48f,
@@ -1874,7 +1950,8 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                         0.018f * FMath::Sin(WavePhaseA) +
                         HydraulicEnergy *
                             (0.16f * FMath::Sin(WavePhaseA) +
-                             0.09f * FMath::Sin(WavePhaseB));
+                             0.09f * FMath::Sin(WavePhaseB)) +
+                        PillowReliefM;
                     WaterVertices[Index] = FVector(
                         (WorldM.X - TileOriginM.X) * 100.0f,
                         (WorldM.Y - TileOriginM.Y) * 100.0f,

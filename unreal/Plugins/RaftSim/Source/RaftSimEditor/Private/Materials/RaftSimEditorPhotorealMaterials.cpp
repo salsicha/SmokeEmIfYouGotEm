@@ -39,6 +39,7 @@
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionSine.h"
 #include "Materials/MaterialExpressionSubtract.h"
+#include "Materials/MaterialExpressionVertexNormalWS.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialExpressionStaticSwitchParameter.h"
@@ -425,6 +426,11 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     // Flow-streak lane field (-1..1); built beside the advected UVs, applied
     // by the roughness section so moving matte lanes carry the current cue.
     UMaterialExpression* FlowStreakField = nullptr;
+    // Drift-foam fleck mask (0..1): sparse aperiodic lace strands advected
+    // with the current. Periodic lanes and ripple shimmer are directionally
+    // ambiguous to the eye (the aperture problem) — trackable flecks sliding
+    // downstream are what makes real rivers read as flowing.
+    UMaterialExpression* DriftFleckMask = nullptr;
     if (DetailNormal != nullptr)
     {
         UMaterialExpressionTextureCoordinate* UV =
@@ -455,18 +461,67 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Add(C);
             return C;
         };
-        const auto FlowAdvected = [&](UMaterialExpressionTextureCoordinate* Base,
-                                      float UTilingValue,
-                                      float SlipFactor) -> UMaterialExpression*
+        // Flowmap cycling. Speed varies across the channel, so a naive
+        // speed * absolute-time UV offset shears the sampled pattern without
+        // bound — minutes into a session the ripple/lace fields are dragged
+        // into featureless taffy streaks (and, because the lateral speed
+        // profile is symmetric, into patterns mirrored about the
+        // centerline). Two staggered phase clocks bound the accumulated
+        // offset to FlowCycleSeconds each and crossfade so the periodic
+        // reset is never visible: drift stays continuous, distortion stays
+        // bounded.
+        // The advection clock is the flow-warped wave clock, not raw time:
+        // tile compositing smooths the baked per-vertex speeds well below
+        // the live solve the hull rides (measured 1.3 vs 2.2 m/s at the
+        // first descent), so raw-time advection makes a drifting boat
+        // visibly outrun its own drift foam. The wave clock accelerates
+        // with the raft-local current (clamped 0.75-2.5x, ~1x with no fast
+        // water underneath), closing the gap exactly where the eye compares
+        // boat against foam. The live carrier stays on raw time — its UV1
+        // velocities are full-resolution, and warping them would
+        // double-scale.
+        UMaterialExpression* AdvectClock = AddWaveClockTimeExpression(Material);
+        UMaterialExpressionScalarParameter* CycleSeconds =
+            Scalar(TEXT("FlowCycleSeconds"), 9.0f);
+        UMaterialExpressionDivide* CycleT =
+            Cast<UMaterialExpressionDivide>(
+                Add(NewObject<UMaterialExpressionDivide>(Material)));
+        CycleT->A.Expression = AdvectClock;
+        CycleT->B.Expression = CycleSeconds;
+        const auto FracOf = [&](UMaterialExpression* In) -> UMaterialExpression*
         {
-            UMaterialExpressionTime* AdvectTime =
-                Cast<UMaterialExpressionTime>(
-                    Add(NewObject<UMaterialExpressionTime>(Material)));
+            UMaterialExpressionFrac* F =
+                NewObject<UMaterialExpressionFrac>(Material);
+            F->Input.Expression = In;
+            Add(F);
+            return F;
+        };
+        UMaterialExpression* PhaseA = FracOf(CycleT);
+        UMaterialExpression* PhaseB = FracOf(AddNode(CycleT, Const(0.5f)));
+        // Crossfade alpha toward the B layer: |2*PhaseA - 1| is 1 exactly
+        // when A resets and 0 when A is mid-cycle, so each layer carries
+        // the image only while its own offset is far from its reset jump.
+        UMaterialExpressionSubtract* PhaseACentered =
+            Cast<UMaterialExpressionSubtract>(
+                Add(NewObject<UMaterialExpressionSubtract>(Material)));
+        PhaseACentered->A.Expression = Mul(PhaseA, Const(2.0f));
+        PhaseACentered->B.Expression = Const(1.0f);
+        UMaterialExpressionMax* CycleAlpha =
+            Cast<UMaterialExpressionMax>(
+                Add(NewObject<UMaterialExpressionMax>(Material)));
+        CycleAlpha->A.Expression = PhaseACentered;
+        CycleAlpha->B.Expression = Mul(PhaseACentered, Const(-1.0f));
+        const auto FlowAdvectedAt = [&](UMaterialExpression* Base,
+                                        float UTilingValue,
+                                        float SlipFactor,
+                                        UMaterialExpression* Phase)
+            -> UMaterialExpression*
+        {
             UMaterialExpression* RateUvPerSec = Mul(
                 SpeedMask,
                 Const(8.0f / 3.0f * UTilingValue * SlipFactor));
             UMaterialExpression* OffsetU = Mul(
-                Mul(AdvectTime, RateUvPerSec), Const(-1.0f));
+                Mul(Mul(Phase, CycleSeconds), RateUvPerSec), Const(-1.0f));
             UMaterialExpressionAppendVector* Offset2D =
                 Cast<UMaterialExpressionAppendVector>(
                     Add(NewObject<UMaterialExpressionAppendVector>(Material)));
@@ -475,8 +530,12 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Offset2D->B.Expression = ZeroV;
             return AddNode(Base, Offset2D);
         };
-        UMaterialExpression* FlowUv = FlowAdvected(UV, 0.62f, 1.0f);
-        UMaterialExpression* FlowCrossUv = FlowAdvected(CrossUv, 1.31f, 0.85f);
+        UMaterialExpression* FlowUvA = FlowAdvectedAt(UV, 0.62f, 1.0f, PhaseA);
+        UMaterialExpression* FlowUvB = FlowAdvectedAt(UV, 0.62f, 1.0f, PhaseB);
+        UMaterialExpression* FlowCrossUvA =
+            FlowAdvectedAt(CrossUv, 1.31f, 0.85f, PhaseA);
+        UMaterialExpression* FlowCrossUvB =
+            FlowAdvectedAt(CrossUv, 1.31f, 0.85f, PhaseB);
         // Lane field for the roughness section: two incommensurate sine
         // lanes (~2.5 m and ~1 m at this tiling), sheared slightly across
         // stream so they read as water lanes rather than bars. Built from
@@ -492,17 +551,129 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 Add(Sine);
                 return Sine;
             };
-            UMaterialExpression* StreakU = Mask(FlowUv, true, false, false);
-            UMaterialExpression* StreakV = Mask(FlowUv, false, true, false);
-            FlowStreakField = Mul(
+            const auto LaneFieldAt =
+                [&](UMaterialExpression* Uv) -> UMaterialExpression*
+            {
+                UMaterialExpression* StreakU = Mask(Uv, true, false, false);
+                UMaterialExpression* StreakV = Mask(Uv, false, true, false);
+                return Mul(
+                    AddNode(
+                        CyclesSine(AddNode(
+                            Mul(StreakU, Const(1.9f)),
+                            Mul(StreakV, Const(0.45f)))),
+                        CyclesSine(AddNode(
+                            Mul(StreakU, Const(4.6f)),
+                            Mul(StreakV, Const(1.15f))))),
+                    Const(0.5f));
+            };
+            FlowStreakField = Lerp(
+                LaneFieldAt(FlowUvA), LaneFieldAt(FlowUvB), CycleAlpha);
+        }
+        if (FoamLaceTexture != nullptr)
+        {
+            // Two lace samples at incommensurate world scales (~14 m and
+            // ~5.7 m repeats), both back-traced by the local current, so
+            // their product is an aperiodic strand field that translates at
+            // the water's own speed. Gain/bias carve it down to sparse
+            // drift strands; squaring softens the cut edge.
+            const auto DriftLace = [&](const TCHAR* ParameterName,
+                                       float UTilingValue,
+                                       float VTilingValue,
+                                       UMaterialExpression* Phase)
+                -> UMaterialExpression*
+            {
+                UMaterialExpressionTextureCoordinate* LaceUv =
+                    Cast<UMaterialExpressionTextureCoordinate>(Add(
+                        NewObject<UMaterialExpressionTextureCoordinate>(
+                            Material)));
+                LaceUv->UTiling = UTilingValue;
+                LaceUv->VTiling = VTilingValue;
+                UMaterialExpressionTextureSampleParameter2D* Sample =
+                    Cast<UMaterialExpressionTextureSampleParameter2D>(Add(
+                        NewObject<UMaterialExpressionTextureSampleParameter2D>(
+                            Material)));
+                Sample->ParameterName = ParameterName;
+                Sample->Texture = FoamLaceTexture;
+                Sample->SamplerType = SAMPLERTYPE_Masks;
+                Sample->Coordinates.Expression =
+                    FlowAdvectedAt(LaceUv, UTilingValue, 1.0f, Phase);
+                Sample->Group = TEXT("RaftSimPhotorealWater");
+                return Mask(Sample, true, false, false);
+            };
+            const auto DriftMaskAt =
+                [&](UMaterialExpression* Phase,
+                    const TCHAR* NameA,
+                    const TCHAR* NameB) -> UMaterialExpression*
+            {
+                UMaterialExpression* StrandProduct = Mul(
+                    DriftLace(NameA, 0.21f, 0.30f, Phase),
+                    DriftLace(NameB, 0.53f, 0.76f, Phase));
+                UMaterialExpressionSaturate* StrandCut =
+                    NewObject<UMaterialExpressionSaturate>(Material);
+                StrandCut->Input.Expression = AddNode(
+                    Mul(StrandProduct, Scalar(TEXT("DriftFoamGain"), 5.0f)),
+                    Mul(Const(-1.0f), Scalar(TEXT("DriftFoamBias"), 0.45f)));
+                Add(StrandCut);
+                return Mul(StrandCut, StrandCut);
+            };
+            // Bubbles are born at breaking water — holes, rock wakes — not
+            // wherever water merely moves. Gate on the solver aeration
+            // channel (VC.R carries Froude + breaking-evidence foam), with
+            // only a high-speed residual for fast unbroken chutes. Flats
+            // (0.7-0.9 m/s, zero aeration) carry no drift foam at all.
+            UMaterialExpressionSaturate* ChuteGate =
+                NewObject<UMaterialExpressionSaturate>(Material);
+            ChuteGate->Input.Expression = AddNode(
+                SpeedMask,
+                Mul(Const(-1.0f),
+                    Scalar(TEXT("DriftFoamSpeedFloor"), 0.22f)));
+            Add(ChuteGate);
+            UMaterialExpressionSaturate* DriftGate =
+                NewObject<UMaterialExpressionSaturate>(Material);
+            DriftGate->Input.Expression = AddNode(
+                Mul(FoamMask,
+                    Scalar(TEXT("DriftFoamAerationGain"), 3.0f)),
+                Mul(ChuteGate,
+                    Scalar(TEXT("DriftFoamSpeedGain"), 2.5f)));
+            Add(DriftGate);
+            // Vertex alpha is the solver wet mask: shoreline-completed and
+            // dry-leveled skirt vertices carry foam-adjacent presentation
+            // values but must never froth on land. Geometry upness kills
+            // the strands on the near-vertical film the mesh interpolates
+            // across exposed boulders.
+            // VertexColor's default output is RGB (float3); wet lives on
+            // the node's dedicated alpha output pin (output index 4).
+            UMaterialExpressionComponentMask* WetGate =
+                NewObject<UMaterialExpressionComponentMask>(Material);
+            WetGate->R = true;
+            WetGate->G = false;
+            WetGate->B = false;
+            WetGate->A = false;
+            WetGate->Input.Connect(4, VertexColor);
+            Add(WetGate);
+            UMaterialExpressionVertexNormalWS* GeoNormal =
+                NewObject<UMaterialExpressionVertexNormalWS>(Material);
+            Add(GeoNormal);
+            UMaterialExpressionSaturate* UpGate =
+                NewObject<UMaterialExpressionSaturate>(Material);
+            UpGate->Input.Expression = Mul(
                 AddNode(
-                    CyclesSine(AddNode(
-                        Mul(StreakU, Const(1.9f)),
-                        Mul(StreakV, Const(0.45f)))),
-                    CyclesSine(AddNode(
-                        Mul(StreakU, Const(4.6f)),
-                        Mul(StreakV, Const(1.15f))))),
-                Const(0.5f));
+                    Mask(GeoNormal, false, false, true),
+                    Const(-0.7f)),
+                Const(5.0f));
+            Add(UpGate);
+            DriftFleckMask = Mul(
+                Mul(
+                    Lerp(
+                        DriftMaskAt(PhaseA,
+                                    TEXT("DriftFoamLaceA0"),
+                                    TEXT("DriftFoamLaceB0")),
+                        DriftMaskAt(PhaseB,
+                                    TEXT("DriftFoamLaceA1"),
+                                    TEXT("DriftFoamLaceB1")),
+                        CycleAlpha),
+                    DriftGate),
+                Mul(WetGate, UpGate));
         }
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
@@ -526,11 +697,16 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             return Sample;
         };
         // Residual panner speeds are only the churn RELATIVE to the moving
-        // water; bulk downstream motion comes from the flow-advected UVs.
-        UMaterialExpression* PrimaryNormal = Ripple(
-            FlowUv, TEXT("WaterFlowNormalPrimary"), 0.020f, 0.012f);
-        UMaterialExpression* CrossNormal = Ripple(
-            FlowCrossUv, TEXT("WaterFlowNormalCross"), -0.014f, 0.026f);
+        // water; bulk downstream motion comes from the cycled advected UVs
+        // (each phase pair crossfaded so the reset jump never shows).
+        UMaterialExpression* PrimaryNormal = Lerp(
+            Ripple(FlowUvA, TEXT("WaterFlowNormalPrimaryA"), 0.020f, 0.012f),
+            Ripple(FlowUvB, TEXT("WaterFlowNormalPrimaryB"), 0.020f, 0.012f),
+            CycleAlpha);
+        UMaterialExpression* CrossNormal = Lerp(
+            Ripple(FlowCrossUvA, TEXT("WaterFlowNormalCrossA"), -0.014f, 0.026f),
+            Ripple(FlowCrossUvB, TEXT("WaterFlowNormalCrossB"), -0.014f, 0.026f),
+            CycleAlpha);
         UMaterialExpression* CrossPerturbation = AddNode(
             CrossNormal, Const3(0.0f, 0.0f, -1.0f));
         UMaterialExpressionNormalize* CombinedNormal =
@@ -638,13 +814,31 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 Mul(StreakSpeedGate,
                     Scalar(TEXT("FlowStreakRoughness"), 0.22f))));
     }
+    if (DriftFleckMask != nullptr)
+    {
+        Roughness = AddNode(
+            Roughness,
+            Mul(DriftFleckMask, Scalar(TEXT("DriftFoamRoughness"), 0.45f)));
+    }
 
     UMaterialExpressionFresnel* Fresnel =
         Cast<UMaterialExpressionFresnel>(Add(NewObject<UMaterialExpressionFresnel>(Material)));
     Fresnel->Exponent = 5.0f;
     Fresnel->BaseReflectFraction = 0.02f;
     UMaterialExpressionScalarParameter* SpecBase = Scalar(TEXT("Specular"), 0.34f);
-    UMaterialExpressionAdd* Specular = AddNode(SpecBase, Mul(Fresnel, Scalar(TEXT("FresnelSpecular"), 0.18f)));
+    UMaterialExpression* Specular = AddNode(
+        SpecBase, Mul(Fresnel, Scalar(TEXT("FresnelSpecular"), 0.18f)));
+    if (DriftFleckMask != nullptr)
+    {
+        // Foam occludes the mirror: a scattering white patch has almost no
+        // coherent specular, and suppressing it here is what finally makes
+        // the strands sit ON the surface instead of shading beneath the
+        // grazing-angle reflection.
+        Specular = Lerp(
+            Specular,
+            Scalar(TEXT("DriftFoamSpecular"), 0.03f),
+            DriftFleckMask);
+    }
 
     // Single Layer Water opacity controls how much light enters the volume.
     // A low global value exposed the pale riverbed across the full guide view,
@@ -664,8 +858,30 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionScalarParameter* Metallic = Scalar(TEXT("Metallic"), 0.0f);
 
     // --- Wire the material outputs ------------------------------------------
+    UMaterialExpression* BaseColorOut = BaseColor;
+    if (DriftFleckMask != nullptr)
+    {
+        // Drift strands tint toward the froth colour so the trackable
+        // features are visible in any light, not only in specular zones.
+        // Kept modest: in Single Layer Water the base colour shades under
+        // the reflection layer and reads as submerged — the surface-foam
+        // read comes from the emissive term wired below, which composites
+        // on top of the mirror the way real drift foam occludes it.
+        BaseColorOut = Lerp(
+            BaseColor,
+            FoamColor,
+            Mul(DriftFleckMask, Scalar(TEXT("DriftFoamOpacity"), 0.35f)));
+    }
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
-    Ed->BaseColor.Connect(0, BaseColor);
+    Ed->BaseColor.Connect(0, BaseColorOut);
+    if (DriftFleckMask != nullptr)
+    {
+        Ed->EmissiveColor.Connect(
+            0,
+            Mul(FoamColor,
+                Mul(DriftFleckMask,
+                    Scalar(TEXT("DriftFoamSurfaceGlow"), 0.40f))));
+    }
     Ed->Metallic.Connect(0, Metallic);
     Ed->Specular.Connect(0, Specular);
     Ed->Roughness.Connect(0, Roughness);
@@ -2029,6 +2245,8 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     UMaterialExpression* FinalNormal = nullptr;
     UMaterialExpression* RoughnessOutput = Roughness;
     UMaterialExpression* BaseColorOutput = BaseColor;
+    UMaterialExpression* EmissiveOutput = nullptr;
+    UMaterialExpression* FleckOutput = nullptr;
     UTexture2D* DetailNormal = LoadObject<UTexture2D>(
         nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
@@ -2062,13 +2280,50 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                 Add(NewObject<UMaterialExpressionTime>(Material)));
         UMaterialExpressionScalarParameter* FlowAdvectionScale =
             Scalar(TEXT("LiveFlowAdvectionScale"), 1.0f);
-        const auto FlowAdvected = [&Add, &AddNode, &Mul, Material,
-                                   FlowVelocityMps, FlowTime,
-                                   FlowAdvectionScale](
-                                      UMaterialExpression* Base,
-                                      float UTiling,
-                                      float VTiling,
-                                      const TCHAR* Description)
+        // Flowmap cycling — see the band parent for the full note. Solver
+        // velocity varies per vertex, so velocity * absolute-time offsets
+        // shear the sampled fields without bound; two staggered bounded
+        // phases crossfaded hide each reset while keeping drift continuous.
+        UMaterialExpressionScalarParameter* CycleSeconds =
+            Scalar(TEXT("LiveFlowCycleSeconds"), 9.0f);
+        UMaterialExpressionDivide* CycleT =
+            Cast<UMaterialExpressionDivide>(
+                Add(NewObject<UMaterialExpressionDivide>(Material)));
+        CycleT->A.Expression = FlowTime;
+        CycleT->B.Expression = CycleSeconds;
+        const auto FracOf = [&](UMaterialExpression* In) -> UMaterialExpression*
+        {
+            UMaterialExpressionFrac* F =
+                NewObject<UMaterialExpressionFrac>(Material);
+            F->Input.Expression = In;
+            Add(F);
+            return F;
+        };
+        const auto ConstOf = [&](float Value) -> UMaterialExpression*
+        {
+            UMaterialExpressionConstant* C =
+                NewObject<UMaterialExpressionConstant>(Material);
+            C->R = Value;
+            Add(C);
+            return C;
+        };
+        UMaterialExpression* PhaseA = FracOf(CycleT);
+        UMaterialExpression* PhaseB = FracOf(AddNode(CycleT, ConstOf(0.5f)));
+        UMaterialExpressionSubtract* PhaseACentered =
+            Cast<UMaterialExpressionSubtract>(
+                Add(NewObject<UMaterialExpressionSubtract>(Material)));
+        PhaseACentered->A.Expression = Mul(PhaseA, ConstOf(2.0f));
+        PhaseACentered->B.Expression = ConstOf(1.0f);
+        UMaterialExpressionMax* CycleAlpha =
+            Cast<UMaterialExpressionMax>(
+                Add(NewObject<UMaterialExpressionMax>(Material)));
+        CycleAlpha->A.Expression = PhaseACentered;
+        CycleAlpha->B.Expression = Mul(PhaseACentered, ConstOf(-1.0f));
+        const auto FlowAdvectedAt = [&](UMaterialExpression* Base,
+                                        float UTiling,
+                                        float VTiling,
+                                        const TCHAR* Description,
+                                        UMaterialExpression* Phase)
             -> UMaterialExpression*
         {
             UMaterialExpressionConstant2Vector* MetersPerSecondToUv =
@@ -2080,16 +2335,23 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                 Mul(
                     Mul(FlowVelocityMps, MetersPerSecondToUv),
                     FlowAdvectionScale),
-                FlowTime);
+                Mul(Phase, CycleSeconds));
             UMaterialExpressionAdd* AdvectedUv = AddNode(Base, OffsetUv);
             AdvectedUv->Desc = Description;
             return AdvectedUv;
         };
-        UMaterialExpression* FlowUv = FlowAdvected(
-            UV, 0.74f, 1.02f, TEXT("RaftSimSolverVelocityAdvectionPrimary"));
-        UMaterialExpression* FlowCrossUv = FlowAdvected(
+        UMaterialExpression* FlowUvA = FlowAdvectedAt(
+            UV, 0.74f, 1.02f,
+            TEXT("RaftSimSolverVelocityAdvectionPrimaryA"), PhaseA);
+        UMaterialExpression* FlowUvB = FlowAdvectedAt(
+            UV, 0.74f, 1.02f,
+            TEXT("RaftSimSolverVelocityAdvectionPrimaryB"), PhaseB);
+        UMaterialExpression* FlowCrossUvA = FlowAdvectedAt(
             CrossUv, 1.48f, 1.33f,
-            TEXT("RaftSimSolverVelocityAdvectionCross"));
+            TEXT("RaftSimSolverVelocityAdvectionCrossA"), PhaseA);
+        UMaterialExpression* FlowCrossUvB = FlowAdvectedAt(
+            CrossUv, 1.48f, 1.33f,
+            TEXT("RaftSimSolverVelocityAdvectionCrossB"), PhaseB);
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
                           float SpeedX,
@@ -2114,10 +2376,18 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         // These small residual rates are local capillary churn. Bulk motion,
         // including lateral current and reverse eddies, comes from UV1 and is
         // exactly proportional to the live solver velocity.
-        UMaterialExpression* PrimaryNormal = Ripple(
-            FlowUv, TEXT("LiveWaterFlowNormalPrimary"), 0.006f, 0.003f);
-        UMaterialExpression* CrossNormal = Ripple(
-            FlowCrossUv, TEXT("LiveWaterFlowNormalCross"), -0.004f, 0.010f);
+        UMaterialExpression* PrimaryNormal = Lerp(
+            Ripple(FlowUvA, TEXT("LiveWaterFlowNormalPrimaryA"),
+                   0.006f, 0.003f),
+            Ripple(FlowUvB, TEXT("LiveWaterFlowNormalPrimaryB"),
+                   0.006f, 0.003f),
+            CycleAlpha);
+        UMaterialExpression* CrossNormal = Lerp(
+            Ripple(FlowCrossUvA, TEXT("LiveWaterFlowNormalCrossA"),
+                   -0.004f, 0.010f),
+            Ripple(FlowCrossUvB, TEXT("LiveWaterFlowNormalCrossB"),
+                   -0.004f, 0.010f),
+            CycleAlpha);
         UMaterialExpression* CrossPerturbation = AddNode(
             CrossNormal, Const3(0.0f, 0.0f, -1.0f));
         UMaterialExpressionNormalize* CombinedNormal =
@@ -2173,19 +2443,24 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                 Add(C);
                 return C;
             };
-            UMaterialExpression* StreakU = Mask(FlowUv, true, false, false);
-            UMaterialExpression* StreakV = Mask(FlowUv, false, true, false);
             // Two incommensurate lane frequencies, each sheared slightly
             // across-stream so the pattern reads as water lanes, not bars.
             // FlowUv is ~4 m per unit: lanes land at roughly 3 m and 1.2 m.
-            UMaterialExpression* LaneA = CyclesSine(AddNode(
-                Mul(StreakU, ConstExpr(1.40f)),
-                Mul(StreakV, ConstExpr(0.35f))));
-            UMaterialExpression* LaneB = CyclesSine(AddNode(
-                Mul(StreakU, ConstExpr(3.37f)),
-                Mul(StreakV, ConstExpr(0.83f))));
-            UMaterialExpression* StreakField =
-                Mul(AddNode(LaneA, LaneB), ConstExpr(0.5f));
+            const auto LaneFieldAt =
+                [&](UMaterialExpression* Uv) -> UMaterialExpression*
+            {
+                UMaterialExpression* StreakU = Mask(Uv, true, false, false);
+                UMaterialExpression* StreakV = Mask(Uv, false, true, false);
+                UMaterialExpression* LaneA = CyclesSine(AddNode(
+                    Mul(StreakU, ConstExpr(1.40f)),
+                    Mul(StreakV, ConstExpr(0.35f))));
+                UMaterialExpression* LaneB = CyclesSine(AddNode(
+                    Mul(StreakU, ConstExpr(3.37f)),
+                    Mul(StreakV, ConstExpr(0.83f))));
+                return Mul(AddNode(LaneA, LaneB), ConstExpr(0.5f));
+            };
+            UMaterialExpression* StreakField = Lerp(
+                LaneFieldAt(FlowUvA), LaneFieldAt(FlowUvB), CycleAlpha);
             UMaterialExpressionDotProduct* SpeedSquared =
                 NewObject<UMaterialExpressionDotProduct>(Material);
             SpeedSquared->A.Expression = FlowVelocityMps;
@@ -2211,13 +2486,163 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                     ConstExpr(1.0f),
                     Mul(GatedField,
                         Scalar(TEXT("LiveFlowStreakTint"), 0.05f))));
+            // Drift-foam strands: sparse aperiodic lace advected at solver
+            // speed — the trackable features that make current readable.
+            // Same construction as the band parent; see the note there.
+            UTexture2D* DriftLaceTexture = LoadObject<UTexture2D>(
+                nullptr,
+                TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/"
+                     "Textures/T_RaftSim_SouthForkWater_FoamLace."
+                     "T_RaftSim_SouthForkWater_FoamLace"));
+            if (DriftLaceTexture != nullptr)
+            {
+                const auto DriftLace = [&](const TCHAR* ParameterName,
+                                           float UTilingValue,
+                                           float VTilingValue,
+                                           UMaterialExpression* Phase)
+                    -> UMaterialExpression*
+                {
+                    UMaterialExpressionTextureCoordinate* LaceUv =
+                        Cast<UMaterialExpressionTextureCoordinate>(Add(
+                            NewObject<UMaterialExpressionTextureCoordinate>(
+                                Material)));
+                    LaceUv->UTiling = UTilingValue;
+                    LaceUv->VTiling = VTilingValue;
+                    UMaterialExpressionTextureSampleParameter2D* Sample =
+                        Cast<UMaterialExpressionTextureSampleParameter2D>(
+                            Add(NewObject<
+                                UMaterialExpressionTextureSampleParameter2D>(
+                                Material)));
+                    Sample->ParameterName = ParameterName;
+                    Sample->Texture = DriftLaceTexture;
+                    Sample->SamplerType = SAMPLERTYPE_Masks;
+                    Sample->Coordinates.Expression = FlowAdvectedAt(
+                        LaceUv, UTilingValue, VTilingValue,
+                        TEXT("RaftSimLiveDriftLaceAdvection"), Phase);
+                    UMaterialExpressionComponentMask* Red =
+                        Cast<UMaterialExpressionComponentMask>(Add(
+                            NewObject<UMaterialExpressionComponentMask>(
+                                Material)));
+                    Red->R = true;
+                    Red->G = false;
+                    Red->B = false;
+                    Red->A = false;
+                    Red->Input.Expression = Sample;
+                    return Red;
+                };
+                const auto DriftMaskAt =
+                    [&](UMaterialExpression* Phase,
+                        const TCHAR* NameA,
+                        const TCHAR* NameB) -> UMaterialExpression*
+                {
+                    UMaterialExpression* StrandProduct = Mul(
+                        DriftLace(NameA, 0.21f, 0.30f, Phase),
+                        DriftLace(NameB, 0.53f, 0.76f, Phase));
+                    UMaterialExpressionSaturate* StrandCut =
+                        NewObject<UMaterialExpressionSaturate>(Material);
+                    StrandCut->Input.Expression = AddNode(
+                        Mul(StrandProduct,
+                            Scalar(TEXT("LiveDriftFoamGain"), 5.0f)),
+                        Mul(ConstExpr(-1.0f),
+                            Scalar(TEXT("LiveDriftFoamBias"), 0.45f)));
+                    Add(StrandCut);
+                    return Mul(StrandCut, StrandCut);
+                };
+                // Aeration-born bubbles, as on the band parent: solver foam
+                // (VC.R) is the source; a residual only above ~1.6 m/s
+                // covers fast unbroken chutes. Flat reaches stay clean.
+                UMaterialExpressionSaturate* ChuteGate =
+                    NewObject<UMaterialExpressionSaturate>(Material);
+                ChuteGate->Input.Expression = Mul(
+                    AddNode(
+                        SpeedSquared,
+                        Mul(ConstExpr(-1.0f),
+                            Scalar(TEXT("LiveDriftFoamSpeedFloorSq"),
+                                   2.56f))),
+                    Scalar(TEXT("LiveDriftFoamSpeedGain"), 0.8f));
+                Add(ChuteGate);
+                UMaterialExpressionSaturate* DriftGate =
+                    NewObject<UMaterialExpressionSaturate>(Material);
+                DriftGate->Input.Expression = AddNode(
+                    Mul(FoamMask,
+                        Scalar(TEXT("LiveDriftFoamAerationGain"), 3.0f)),
+                    ChuteGate);
+                Add(DriftGate);
+                // Wet (vertex alpha) and geometry-upness gates — see the
+                // band parent note: no froth on dry-leveled skirts or on
+                // the near-vertical film across exposed rock.
+                // Alpha rides VertexColor's dedicated output pin — the
+                // default output is float3 RGB. See the band parent note.
+                UMaterialExpressionComponentMask* WetGate =
+                    NewObject<UMaterialExpressionComponentMask>(Material);
+                WetGate->R = true;
+                WetGate->G = false;
+                WetGate->B = false;
+                WetGate->A = false;
+                WetGate->Input.Connect(4, VertexColor);
+                Add(WetGate);
+                UMaterialExpressionVertexNormalWS* GeoNormal =
+                    NewObject<UMaterialExpressionVertexNormalWS>(Material);
+                Add(GeoNormal);
+                UMaterialExpressionSaturate* UpGate =
+                    NewObject<UMaterialExpressionSaturate>(Material);
+                UpGate->Input.Expression = Mul(
+                    AddNode(
+                        Mask(GeoNormal, false, false, true),
+                        ConstExpr(-0.7f)),
+                    ConstExpr(5.0f));
+                Add(UpGate);
+                UMaterialExpression* Fleck = Mul(
+                    Mul(
+                        Lerp(
+                            DriftMaskAt(PhaseA,
+                                        TEXT("LiveDriftFoamLaceA0"),
+                                        TEXT("LiveDriftFoamLaceB0")),
+                            DriftMaskAt(PhaseB,
+                                        TEXT("LiveDriftFoamLaceA1"),
+                                        TEXT("LiveDriftFoamLaceB1")),
+                            CycleAlpha),
+                        DriftGate),
+                    Mul(WetGate, UpGate));
+                FleckOutput = Fleck;
+                RoughnessOutput = AddNode(
+                    RoughnessOutput,
+                    Mul(Fleck,
+                        Scalar(TEXT("LiveDriftFoamRoughness"), 0.45f)));
+                BaseColorOutput = Lerp(
+                    BaseColorOutput,
+                    Const3(0.88f, 0.91f, 0.92f),
+                    Mul(Fleck,
+                        Scalar(TEXT("LiveDriftFoamOpacity"), 0.35f)));
+                // Surface read: emissive composites over the reflection
+                // layer, so the strands sit ON the water instead of
+                // shading beneath its mirror. See the band parent note.
+                EmissiveOutput = Mul(
+                    Const3(0.88f, 0.91f, 0.92f),
+                    Mul(Fleck,
+                        Scalar(TEXT("LiveDriftFoamSurfaceGlow"), 0.40f)));
+            }
         }
     }
 
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
     Ed->BaseColor.Connect(0, BaseColorOutput);
     Ed->Roughness.Connect(0, RoughnessOutput);
-    Ed->Specular.Connect(0, Scalar(TEXT("LiveWaterSpecular"), 0.48f));
+    if (EmissiveOutput != nullptr)
+    {
+        Ed->EmissiveColor.Connect(0, EmissiveOutput);
+    }
+    UMaterialExpression* SpecularOutput =
+        Scalar(TEXT("LiveWaterSpecular"), 0.48f);
+    if (FleckOutput != nullptr)
+    {
+        // Foam occludes the mirror — see the band parent note.
+        SpecularOutput = Lerp(
+            SpecularOutput,
+            Scalar(TEXT("LiveDriftFoamSpecular"), 0.03f),
+            FleckOutput);
+    }
+    Ed->Specular.Connect(0, SpecularOutput);
 
     // Calm reaches gain their colour and volumetric response from the authored
     // surface directly below. Retain a bounded share of the live mesh there
