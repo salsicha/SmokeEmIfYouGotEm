@@ -89,7 +89,7 @@
 		"far_field_patches": 8,
 		"terrain_triangles": 1467648,
 		"water_triangles": 4102232,
-		"whitewater_foam_triangles": 534448,
+		"whitewater_foam_triangles": 541826,
 		"procedural_shoreline_completion_vertices": 4688,
 		"procedural_shoreline_transition_cells": 69370,
 		"terminal_visual_water_triangles": 720,
