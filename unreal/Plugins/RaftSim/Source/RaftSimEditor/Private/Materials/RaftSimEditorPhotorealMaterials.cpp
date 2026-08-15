@@ -662,6 +662,19 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                     Const(-0.7f)),
                 Const(5.0f));
             Add(UpGate);
+            // Depth gate: the cook's foam Froude floors depth at 0.05 m,
+            // so ankle-deep bank margins score whitewater-level Froude and
+            // draw phantom foam strips that read as white on the shoreline
+            // sand. Real foam needs real water under it (~0.25 m onset).
+            UMaterialExpressionSaturate* DepthGate =
+                NewObject<UMaterialExpressionSaturate>(Material);
+            DepthGate->Input.Expression = Mul(
+                AddNode(
+                    DepthMask,
+                    Mul(Const(-1.0f),
+                        Scalar(TEXT("DriftFoamDepthFloor"), 0.06f))),
+                Scalar(TEXT("DriftFoamDepthGain"), 9.0f));
+            Add(DepthGate);
             DriftFleckMask = Mul(
                 Mul(
                     Lerp(
@@ -673,7 +686,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                                     TEXT("DriftFoamLaceB1")),
                         CycleAlpha),
                     DriftGate),
-                Mul(WetGate, UpGate));
+                Mul(Mul(WetGate, UpGate), DepthGate));
         }
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
@@ -2592,6 +2605,18 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                         ConstExpr(-0.7f)),
                     ConstExpr(5.0f));
                 Add(UpGate);
+                // Depth gate against shallow-margin phantom foam — see the
+                // band parent note.
+                UMaterialExpressionSaturate* DepthGate =
+                    NewObject<UMaterialExpressionSaturate>(Material);
+                DepthGate->Input.Expression = Mul(
+                    AddNode(
+                        DepthMask,
+                        Mul(ConstExpr(-1.0f),
+                            Scalar(TEXT("LiveDriftFoamDepthFloor"),
+                                   0.06f))),
+                    Scalar(TEXT("LiveDriftFoamDepthGain"), 9.0f));
+                Add(DepthGate);
                 UMaterialExpression* Fleck = Mul(
                     Mul(
                         Lerp(
@@ -2603,7 +2628,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                                         TEXT("LiveDriftFoamLaceB1")),
                             CycleAlpha),
                         DriftGate),
-                    Mul(WetGate, UpGate));
+                    Mul(Mul(WetGate, UpGate), DepthGate));
                 FleckOutput = Fleck;
                 RoughnessOutput = AddNode(
                     RoughnessOutput,
