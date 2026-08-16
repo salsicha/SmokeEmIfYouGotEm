@@ -7,9 +7,13 @@
 #include "HAL/PlatformTime.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "Dom/JsonObject.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
+#include "Misc/FileHelper.h"
 #include "ProceduralMeshComponent.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
@@ -1161,6 +1165,41 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             WaterAdapter->LoadRaftSupportBandFieldFromFile(BandFieldPath);
         }
     }
+    BoulderFootprintsSLR.Reset();
+    if (RiverWaterConfig && !RiverWaterConfig->CookedFieldsDir.IsEmpty())
+    {
+        const FString FootprintPath = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(
+                FPaths::ProjectDir(), TEXT(".."),
+                RiverWaterConfig->CookedFieldsDir,
+                TEXT("boulder_footprints.json")));
+        FString FootprintJson;
+        if (FFileHelper::LoadFileToString(FootprintJson, *FootprintPath))
+        {
+            TSharedPtr<FJsonObject> Root;
+            const TSharedRef<TJsonReader<>> Reader =
+                TJsonReaderFactory<>::Create(FootprintJson);
+            const TArray<TSharedPtr<FJsonValue>>* Boulders = nullptr;
+            if (FJsonSerializer::Deserialize(Reader, Root) && Root.IsValid() &&
+                Root->TryGetArrayField(TEXT("boulders"), Boulders))
+            {
+                for (const TSharedPtr<FJsonValue>& Value : *Boulders)
+                {
+                    const TSharedPtr<FJsonObject>* Entry = nullptr;
+                    if (Value->TryGetObject(Entry) && Entry != nullptr)
+                    {
+                        BoulderFootprintsSLR.Add(FVector3f(
+                            (*Entry)->GetNumberField(TEXT("station_m")),
+                            (*Entry)->GetNumberField(TEXT("lateral_m")),
+                            (*Entry)->GetNumberField(TEXT("radius_m"))));
+                    }
+                }
+                UE_LOG(LogTemp, Display,
+                    TEXT("RaftSim live water: %d boulder footprints loaded"),
+                    BoulderFootprintsSLR.Num());
+            }
+        }
+    }
 
     bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
     // Every shipped river map owns an explicit water configuration, including
@@ -1470,9 +1509,13 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     LiveWaterMaterial->SetScalarParameterValue(
                         TEXT("ActiveLiveSurfaceCoverage"), 0.55f);
                 }
+                // Always fade the live sheet out over solver-dry cells.
+                // With this disabled on corridor maps, the carrier drew a
+                // translucent veil across everything the leveled grid spans
+                // above the waterline — exposed boulder crowns read as
+                // shrouded to the tip (2026-08-15 playtest report).
                 LiveWaterMaterial->SetScalarParameterValue(
-                    TEXT("LiveWetCoverageEnable"),
-                    bUsesMigratedChilkoVolumeCore ? 1.0f : 0.0f);
+                    TEXT("LiveWetCoverageEnable"), 1.0f);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveWetCoverageDepthGain"), 32.0f);
                 LiveWaterMaterial->SetScalarParameterValue(
@@ -2318,6 +2361,54 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     float SpeedMpsSum = 0.0f;
     float MaximumAbsoluteStandingWaveM = 0.0f;
     float MaximumAbsoluteHydraulicReliefM = 0.0f;
+    // Per-rebuild wake state: prune boulder footprints to this window's
+    // station range, and cache the raft's river-frame position/velocity so
+    // every vertex can evaluate the analytic boat wake cheaply.
+    WindowBoulderFootprintsSLR.Reset();
+    if (BoulderFootprintsSLR.Num() > 0 && RiverCoordinatesM.Num() > 0)
+    {
+        float WindowMinStationM = FLT_MAX;
+        float WindowMaxStationM = -FLT_MAX;
+        for (const FVector2D& Coordinate : RiverCoordinatesM)
+        {
+            WindowMinStationM = FMath::Min(
+                WindowMinStationM, static_cast<float>(Coordinate.X));
+            WindowMaxStationM = FMath::Max(
+                WindowMaxStationM, static_cast<float>(Coordinate.X));
+        }
+        for (const FVector3f& Footprint : BoulderFootprintsSLR)
+        {
+            if (Footprint.X > WindowMinStationM - 40.0f &&
+                Footprint.X < WindowMaxStationM + 40.0f)
+            {
+                WindowBoulderFootprintsSLR.Add(Footprint);
+            }
+        }
+    }
+    bBoatWakeValid = false;
+    if (WaterAdapter && WaterAdapter->HasRiverCoordinateMap())
+    {
+        if (TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld()); RaftIt)
+        {
+            const FVector RaftLocationCm = RaftIt->GetActorLocation();
+            const FVector RaftVelocityCmS = RaftIt->GetVelocity();
+            FVector2D RaftSL;
+            FVector Tangent;
+            FVector LeftNormal;
+            if (WaterAdapter->WorldToRiverCoordinates(
+                    RaftLocationCm, RaftSL, Tangent, LeftNormal))
+            {
+                const FVector VelocityMps = RaftVelocityCmS * 0.01f;
+                BoatRiverPositionM = RaftSL;
+                BoatRiverVelocityMps = FVector2D(
+                    static_cast<float>(
+                        FVector::DotProduct(VelocityMps, Tangent)),
+                    static_cast<float>(
+                        FVector::DotProduct(VelocityMps, LeftNormal)));
+                bBoatWakeValid = true;
+            }
+        }
+    }
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 0; X < GridStationN; ++X)
@@ -2331,6 +2422,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             float SurfaceZCm = 0.0f;
             FVector NormalOut = FVector::UpVector;
             float Foam = 0.0f;
+            float WakeFoamAdd = 0.0f;
+            float BoulderCoreFade = 1.0f;
 
             float DepthNorm = 0.0f;
             float SpeedNorm = 0.0f;
@@ -2365,6 +2458,136 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         HydraulicRelief) *
                         kSurfCmPerM +
                     GetLiveSurfaceRenderLiftCm();
+                // Obstruction wakes and boulder holes on the live sheet.
+                // The solver grid does not know placed boulders exist, so
+                // without the sink the translucent carrier shrouds every
+                // exposed rock to its tip; pillow/arm amplitudes mirror the
+                // baked band-mesh terms so the two surfaces agree.
+                float WakeReliefM = 0.0f;
+                const float VertexStationM =
+                    static_cast<float>(RiverCoordinatesM[Index].X);
+                const float VertexLateralM =
+                    static_cast<float>(RiverCoordinatesM[Index].Y);
+                for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
+                {
+                    const float RadiusM = FMath::Max(Footprint.Z, 0.75f);
+                    const float DeltaStationM = VertexStationM - Footprint.X;
+                    if (DeltaStationM < -RadiusM * 3.0f ||
+                        DeltaStationM > RadiusM * 10.5f)
+                    {
+                        continue;
+                    }
+                    const float DeltaLateralM = VertexLateralM - Footprint.Y;
+                    if (FMath::Abs(DeltaLateralM) > RadiusM * 7.5f)
+                    {
+                        continue;
+                    }
+                    const float DistanceM = FMath::Sqrt(
+                        DeltaStationM * DeltaStationM +
+                        DeltaLateralM * DeltaLateralM);
+                    if (DistanceM < RadiusM * 0.7f)
+                    {
+                        const float SinkT = FMath::Clamp(
+                            1.0f - DistanceM / (RadiusM * 0.7f), 0.0f, 1.0f);
+                        SurfaceZCm -= (Depth + 1.0f) * 100.0f * SinkT;
+                        BoulderCoreFade =
+                            FMath::Min(BoulderCoreFade, 1.0f - SinkT);
+                        continue;
+                    }
+                    const float SpeedT = FMath::Clamp(
+                        (Speed - 1.1f) / 1.6f, 0.0f, 1.0f);
+                    if (DeltaStationM < -0.35f * RadiusM &&
+                        DistanceM < RadiusM * 1.9f)
+                    {
+                        const float Ring = FMath::Clamp(
+                            1.0f -
+                                FMath::Abs(DistanceM - RadiusM * 1.1f) /
+                                    (RadiusM * 0.85f),
+                            0.0f, 1.0f);
+                        WakeReliefM = FMath::Max(
+                            WakeReliefM, 0.22f * SpeedT * Ring);
+                        WakeFoamAdd = FMath::Max(
+                            WakeFoamAdd, 0.85f * SpeedT * Ring);
+                    }
+                    else if (DeltaStationM > RadiusM * 0.3f)
+                    {
+                        const float WakeT = FMath::Clamp(
+                            1.0f - DeltaStationM / (RadiusM * 10.0f),
+                            0.0f, 1.0f);
+                        if (FMath::Abs(DeltaLateralM) < RadiusM * 1.05f)
+                        {
+                            const float TrailT = FMath::Clamp(
+                                1.0f - DeltaStationM / (RadiusM * 6.5f),
+                                0.0f, 1.0f);
+                            WakeFoamAdd = FMath::Max(
+                                WakeFoamAdd,
+                                0.55f * SpeedT * TrailT * TrailT);
+                        }
+                        const float ArmOffsetM = FMath::Abs(
+                            FMath::Abs(DeltaLateralM) -
+                            DeltaStationM * 0.65f);
+                        const float ArmProfile = FMath::Clamp(
+                            1.0f - ArmOffsetM / 1.3f, 0.0f, 1.0f);
+                        if (ArmProfile > 0.0f)
+                        {
+                            const float ArmT =
+                                ArmProfile * WakeT * WakeT * SpeedT;
+                            WakeReliefM = FMath::Max(
+                                WakeReliefM,
+                                0.09f * FMath::Min(RadiusM, 2.0f) / 2.0f *
+                                    ArmT);
+                            WakeFoamAdd = FMath::Max(
+                                WakeFoamAdd, 0.40f * ArmT);
+                        }
+                    }
+                }
+                // Analytic boat wake: a turbulent transom trail plus a
+                // V-arm pair, trailing opposite the raft's velocity
+                // relative to the local current and fading over ~24 m.
+                if (bBoatWakeValid)
+                {
+                    const FVector2D RelPos(
+                        VertexStationM - BoatRiverPositionM.X,
+                        VertexLateralM - BoatRiverPositionM.Y);
+                    const FVector2D RelVel =
+                        BoatRiverVelocityMps -
+                        FVector2D(
+                            Sample.VelocityMetersPerSecond.X,
+                            Sample.VelocityMetersPerSecond.Y);
+                    const float RelSpeed = RelVel.Size();
+                    if (RelSpeed > 0.35f)
+                    {
+                        const FVector2D WakeDir = -RelVel / RelSpeed;
+                        const float AlongM =
+                            FVector2D::DotProduct(RelPos, WakeDir);
+                        if (AlongM > 0.5f && AlongM < 24.0f)
+                        {
+                            const float PerpM =
+                                (RelPos - AlongM * WakeDir).Size();
+                            const float SpeedFactor = FMath::Clamp(
+                                RelSpeed / 2.5f, 0.0f, 1.0f);
+                            const float AgeT = 1.0f - AlongM / 24.0f;
+                            const float TrailWidthM =
+                                1.1f + AlongM * 0.10f;
+                            const float TrailT = FMath::Clamp(
+                                1.0f - PerpM / TrailWidthM, 0.0f, 1.0f);
+                            WakeFoamAdd = FMath::Max(
+                                WakeFoamAdd,
+                                0.55f * SpeedFactor * TrailT * AgeT);
+                            const float ArmOffsetM = FMath::Abs(
+                                PerpM - AlongM * 0.53f);
+                            const float ArmT =
+                                FMath::Clamp(
+                                    1.0f - ArmOffsetM / 1.1f, 0.0f, 1.0f) *
+                                AgeT * SpeedFactor;
+                            WakeReliefM = FMath::Max(
+                                WakeReliefM, 0.055f * ArmT);
+                            WakeFoamAdd = FMath::Max(
+                                WakeFoamAdd, 0.30f * ArmT);
+                        }
+                    }
+                }
+                SurfaceZCm += WakeReliefM * 100.0f;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
                 MinimumWetLateralIndex[X] = FMath::Min(
@@ -2471,6 +2694,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // measured Fr 0.93 rendering clean under the former Fr>1.0
                 // gate. Named-rapid pockets (Fr 1.3+) keep their character.
                 Foam = FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
+                // Wake aeration joins solver foam; the boulder core fade
+                // keeps froth off the hole opened over exposed rock.
+                Foam = FMath::Max(Foam * BoulderCoreFade, WakeFoamAdd);
                 SourceFoam[Index] = Foam;
                 DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
                 SpeedNorm = FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f);

@@ -743,8 +743,14 @@ bool BuildSouthForkRefinedWhitewaterOverlayGeometry(
         const int32 CellVertices[] = {I0, I1, I2, I3};
         for (const int32 VertexIndex : CellVertices)
         {
+            // Depth floor raised 0.10 -> 0.35 m (2026-08-15): the cook's
+            // foam Froude floors depth at 0.05 m, so shallow bar margins
+            // carry phantom aeration; at 0.10 m admission the sheet rimmed
+            // point bars with white patches that read as texture on dry
+            // sand. Real breaking water on this reach sits well past
+            // 0.35 m; shallow rock collars return with the wake milestone.
             if (HydraulicPresentation[VertexIndex].A < 0.90f ||
-                ShorelineDepthsM[VertexIndex] <= 0.10f)
+                ShorelineDepthsM[VertexIndex] <= 0.35f)
             {
                 return false;
             }
@@ -778,7 +784,11 @@ bool BuildSouthForkRefinedWhitewaterOverlayGeometry(
                     OutColors[A].A, OutColors[B].A, OutColors[C].A);
                 const float MeanOpacity =
                     (OutColors[A].A + OutColors[B].A + OutColors[C].A) / 3.0f;
-                if (MaximumOpacity >= 0.025f && MeanOpacity >= 0.006f)
+                // Raised from 0.025/0.006 (2026-08-15): near-transparent
+                // admission built sheet geometry from phantom shallow-bar
+                // aeration; a visible sheet should exist only where the
+                // solver marks genuinely broken water.
+                if (MaximumOpacity >= 0.10f && MeanOpacity >= 0.04f)
                 {
                     bCellIsActive = true;
                     break;

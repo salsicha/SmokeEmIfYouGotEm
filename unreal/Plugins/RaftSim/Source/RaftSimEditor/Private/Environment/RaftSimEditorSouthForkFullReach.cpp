@@ -331,6 +331,32 @@ FVector CoordinateTangent(const TArray<FSouthForkCoordinatePoint>& Points, int32
     const FVector2D Tangent(Normal.Y, -Normal.X);
     return FVector(Tangent.X, Tangent.Y, 0.0f);
 }
+
+float ComputeSouthForkSignedCurvaturePerM(
+    const TArray<FSouthForkCoordinatePoint>& Points, int32 Index)
+{
+    // Signed heading change per meter (positive = turning river-left),
+    // smoothed over ~±40 m so digitization corners don't spike the bend
+    // superelevation term.
+    const int32 Count = Points.Num();
+    const int32 I0 = FMath::Clamp(Index - 10, 0, Count - 1);
+    const int32 I1 = FMath::Clamp(Index + 10, 0, Count - 1);
+    if (I1 <= I0 + 1)
+    {
+        return 0.0f;
+    }
+    const FVector T0 = CoordinateTangent(Points, I0);
+    const FVector T1 = CoordinateTangent(Points, I1);
+    const float DeltaHeadingRad = FMath::FindDeltaAngleRadians(
+        FMath::Atan2(T0.Y, T0.X), FMath::Atan2(T1.Y, T1.X));
+    const float DeltaStationM = static_cast<float>(
+        Points[I1].StationM - Points[I0].StationM);
+    if (DeltaStationM < 1.0f)
+    {
+        return 0.0f;
+    }
+    return DeltaHeadingRad / DeltaStationM;
+}
 void SetSpatiallyLoadedIfAllowed(AActor* Actor, bool bSpatiallyLoaded)
 {
     if (Actor && Actor->CanChangeIsSpatiallyLoadedFlag())
@@ -1828,6 +1854,9 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 const int32 CoordinateIndex = FMath::Clamp(
                     GlobalRowStart + Row, 0, CoordinatePoints.Num() - 1);
                 const FSouthForkCoordinatePoint& Point = CoordinatePoints[CoordinateIndex];
+                const float RowCurvaturePerM =
+                    ComputeSouthForkSignedCurvaturePerM(
+                        CoordinatePoints, CoordinateIndex);
                 TArray<float> RowSurfaceElevationsM;
                 TArray<FLinearColor> RowHydraulicPresentation;
                 int32 LeftWetColumn = INDEX_NONE;
@@ -1879,13 +1908,14 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                 FMath::Max(Footprint.RadiusM, 0.75f);
                             const float DeltaStationM =
                                 Point.StationM - Footprint.StationM;
-                            if (FMath::Abs(DeltaStationM) > RadiusM * 7.0f)
+                            if (DeltaStationM < -RadiusM * 3.0f ||
+                                DeltaStationM > RadiusM * 10.5f)
                             {
                                 continue;
                             }
                             const float DeltaLateralM =
                                 LateralM - Footprint.LateralM;
-                            if (FMath::Abs(DeltaLateralM) > RadiusM * 2.2f)
+                            if (FMath::Abs(DeltaLateralM) > RadiusM * 7.5f)
                             {
                                 continue;
                             }
@@ -1896,10 +1926,31 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                 (PillowSpeedMps - 1.1f) / 1.6f, 0.0f, 1.0f);
                             if (DistanceM < RadiusM * 0.7f)
                             {
-                                PillowReliefM =
-                                    FMath::Min(PillowReliefM, 0.0f) -
-                                    0.18f *
-                                        (1.0f - DistanceM / (RadiusM * 0.7f));
+                                // Large exposed boulders get a real hole:
+                                // sinking the core below the terrain lets
+                                // the terrain-clip pass cull those faces,
+                                // so no translucent film shrouds the rock.
+                                // Small rocks (under a grid cell) keep the
+                                // shallow dip — a 4 m hole around a 1 m
+                                // rock would read as a bathtub ring.
+                                if (RadiusM >= 2.2f)
+                                {
+                                    PillowReliefM = FMath::Min(
+                                        PillowReliefM,
+                                        -(ShorelineDepthM + 0.6f) *
+                                            FMath::Clamp(
+                                                1.0f - DistanceM /
+                                                    (RadiusM * 0.7f),
+                                                0.0f, 1.0f));
+                                }
+                                else
+                                {
+                                    PillowReliefM =
+                                        FMath::Min(PillowReliefM, 0.0f) -
+                                        0.18f *
+                                            (1.0f -
+                                             DistanceM / (RadiusM * 0.7f));
+                                }
                                 continue;
                             }
                             if (DeltaStationM < -0.35f * RadiusM &&
@@ -1915,16 +1966,44 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                 PillowAeration = FMath::Max(
                                     PillowAeration, 0.85f * SpeedT * Ring);
                             }
-                            else if (DeltaStationM > RadiusM * 0.3f &&
-                                     FMath::Abs(DeltaLateralM) <
-                                         RadiusM * 1.05f)
+                            else if (DeltaStationM > RadiusM * 0.3f)
                             {
+                                // Turbulent center trail plus the oblique
+                                // V-wake arm pair every obstruction sheds:
+                                // ridges at ~33 degrees off the flow axis
+                                // (|dL| = dS * tan 33), with amplitude and
+                                // aeration decaying over ten radii.
                                 const float WakeT = FMath::Clamp(
-                                    1.0f - DeltaStationM / (RadiusM * 6.5f),
+                                    1.0f - DeltaStationM / (RadiusM * 10.0f),
                                     0.0f, 1.0f);
-                                PillowAeration = FMath::Max(
-                                    PillowAeration,
-                                    0.55f * SpeedT * WakeT * WakeT);
+                                if (FMath::Abs(DeltaLateralM) <
+                                    RadiusM * 1.05f)
+                                {
+                                    const float TrailT = FMath::Clamp(
+                                        1.0f -
+                                            DeltaStationM / (RadiusM * 6.5f),
+                                        0.0f, 1.0f);
+                                    PillowAeration = FMath::Max(
+                                        PillowAeration,
+                                        0.55f * SpeedT * TrailT * TrailT);
+                                }
+                                const float ArmOffsetM = FMath::Abs(
+                                    FMath::Abs(DeltaLateralM) -
+                                    DeltaStationM * 0.65f);
+                                const float ArmProfile = FMath::Clamp(
+                                    1.0f - ArmOffsetM / 1.3f, 0.0f, 1.0f);
+                                if (ArmProfile > 0.0f)
+                                {
+                                    const float ArmT =
+                                        ArmProfile * WakeT * WakeT * SpeedT;
+                                    PillowReliefM = FMath::Max(
+                                        PillowReliefM,
+                                        0.09f *
+                                            FMath::Min(RadiusM, 2.0f) / 2.0f *
+                                            ArmT);
+                                    PillowAeration = FMath::Max(
+                                        PillowAeration, 0.40f * ArmT);
+                                }
                             }
                         }
                         if (PillowAeration > 0.0f)
@@ -1946,12 +2025,26 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                         Point.StationM * 0.19f + LateralM * 0.61f;
                     const float WavePhaseB =
                         Point.StationM * 0.071f - LateralM * 0.37f;
+                    // Bend superelevation: momentum carries water toward
+                    // the outside of a curve, tilting the cross-channel
+                    // surface by v^2 * curvature / g. Lateral is positive
+                    // river-left and curvature is positive turning left,
+                    // so the outside bank is the negative-lateral side on
+                    // a left bend. Slope capped at 0.008 (~0.3 m across
+                    // the channel). Mirrored into the support band field
+                    // by ExportSouthForkSupportBandFields.
+                    const float BendSlope = FMath::Clamp(
+                        PillowSpeedMps * PillowSpeedMps * RowCurvaturePerM /
+                            9.81f,
+                        -0.008f, 0.008f);
+                    const float SuperelevationM = -BendSlope * LateralM;
                     const float VisualDisplacementM =
                         0.018f * FMath::Sin(WavePhaseA) +
                         HydraulicEnergy *
                             (0.16f * FMath::Sin(WavePhaseA) +
                              0.09f * FMath::Sin(WavePhaseB)) +
-                        PillowReliefM;
+                        PillowReliefM +
+                        SuperelevationM;
                     WaterVertices[Index] = FVector(
                         (WorldM.X - TileOriginM.X) * 100.0f,
                         (WorldM.Y - TileOriginM.Y) * 100.0f,
@@ -2187,6 +2280,49 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             Metrics.BankMicroreliefTriangleCount,
             Metrics.BankMicroreliefMaximumDisplacementCm);
         return false;
+    }
+
+    // Persist the accepted boulder footprints beside the cooked flow
+    // fields: the live water surface needs them at runtime to open holes
+    // over exposed rock (no shroud) and to seed obstruction wakes. Written
+    // to both cooked-fields dirs, matching the support band field pattern.
+    {
+        FString FootprintJson =
+            TEXT("{\"schema\":\"raftsim.boulder_footprints.v1\",")
+            TEXT("\"boulders\":[");
+        for (int32 FootprintIndex = 0;
+             FootprintIndex < AcceptedBoulderPresentationFootprints.Num();
+             ++FootprintIndex)
+        {
+            const FSouthForkBoulderPresentationFootprint& Footprint =
+                AcceptedBoulderPresentationFootprints[FootprintIndex];
+            FootprintJson += FString::Printf(
+                TEXT("%s{\"station_m\":%.2f,\"lateral_m\":%.2f,")
+                TEXT("\"radius_m\":%.2f}"),
+                FootprintIndex > 0 ? TEXT(",") : TEXT(""),
+                Footprint.StationM, Footprint.LateralM, Footprint.RadiusM);
+        }
+        FootprintJson += TEXT("]}");
+        const TCHAR* FootprintDirs[] = {
+            TEXT("physics/data/real_world/south_fork_american_chili_bar/")
+            TEXT("scenario_troublemaker/cooked_flow_fields"),
+            TEXT("physics/data/real_world/south_fork_american_chili_bar/")
+            TEXT("full_hydraulics/full_reach_transit_seed")};
+        for (const TCHAR* FootprintDir : FootprintDirs)
+        {
+            const FString FootprintPath = AbsoluteRepoPath(FString::Printf(
+                TEXT("%s/boulder_footprints.json"), FootprintDir));
+            if (!FFileHelper::SaveStringToFile(FootprintJson, *FootprintPath))
+            {
+                OutSummary += FString::Printf(
+                    TEXT("Failed to write boulder footprints to %s.\n"),
+                    *FootprintPath);
+            }
+        }
+        OutSummary += FString::Printf(
+            TEXT("Wrote %d boulder footprints beside the cooked flow ")
+            TEXT("fields.\n"),
+            AcceptedBoulderPresentationFootprints.Num());
     }
 
     if (!CreateTerminalVisualWater(
@@ -3683,6 +3819,11 @@ bool ExportSouthForkSupportBandFields(FString& OutSummary)
             {
                 const int32 GlobalRow = FMath::Clamp(
                     GlobalRowStart + Row, 0, RowCount - 1);
+                // Mirror of the render-side bend superelevation so the
+                // hull rides the same tilted surface the water draws.
+                const float RowCurvaturePerM =
+                    ComputeSouthForkSignedCurvaturePerM(
+                        CoordinatePoints, GlobalRow);
                 TArray<float> RowSurfaceElevationsM;
                 TArray<FLinearColor> RowHydraulicPresentation;
                 int32 LeftWetColumn = INDEX_NONE;
@@ -3706,7 +3847,16 @@ bool ExportSouthForkSupportBandFields(FString& OutSummary)
                     }
                     const FLinearColor& HydraulicPresentation =
                         RowHydraulicPresentation[Column];
-                    ElevationAbsM[CellIndex] = RowSurfaceElevationsM[Column];
+                    const float ExportSpeedMps =
+                        HydraulicPresentation.B * 8.0f;
+                    const float ExportBendSlope = FMath::Clamp(
+                        ExportSpeedMps * ExportSpeedMps * RowCurvaturePerM /
+                            9.81f,
+                        -0.008f, 0.008f);
+                    const float ExportLateralM = -40.0f + 4.0f * Column;
+                    ElevationAbsM[CellIndex] =
+                        RowSurfaceElevationsM[Column] -
+                        ExportBendSlope * ExportLateralM;
                     Energy[CellIndex] = FMath::Clamp(
                         HydraulicPresentation.R * 0.72f +
                             HydraulicPresentation.B * 0.48f,

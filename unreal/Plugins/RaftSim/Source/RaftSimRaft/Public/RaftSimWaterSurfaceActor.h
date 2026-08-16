@@ -488,6 +488,17 @@ private:
     TArray<FLinearColor> RapidFoamVertexColors;
     TArray<FProcMeshTangent> Tangents;
     float TimeSinceRefresh = 0.0f;
+    /** Boulder footprints (station m, lateral m, radius m) loaded from the
+        cooked-fields sidecar; used to open holes in the live sheet over
+        exposed rock and to seed obstruction wakes. */
+    TArray<FVector3f> BoulderFootprintsSLR;
+    /** Footprints pruned to the current live window's station range. */
+    TArray<FVector3f> WindowBoulderFootprintsSLR;
+    /** Raft state in river coordinates, cached once per surface rebuild
+        for the analytic boat wake. */
+    FVector2D BoatRiverPositionM = FVector2D::ZeroVector;
+    FVector2D BoatRiverVelocityMps = FVector2D::ZeroVector;
+    bool bBoatWakeValid = false;
     /** Flow-warped wave clock shared with the WPO collection and adapter. */
     float PresentationWaveClockSeconds = -1.0f;
     float SmoothedFlowClockScale = 1.0f;
