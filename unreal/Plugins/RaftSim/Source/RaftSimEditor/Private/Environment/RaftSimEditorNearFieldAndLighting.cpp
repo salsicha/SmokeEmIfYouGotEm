@@ -1950,6 +1950,26 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             Atmosphere->Tags.AddUnique(TEXT("RaftSimZambeziAtmosphereV1"));
             Atmosphere->Tags.AddUnique(TEXT("RaftSimSourceAwareDrySeasonSky"));
         }
+        if (Spec.RiverId == TEXT("south_fork_american_chili_bar") &&
+            Atmosphere->GetComponent())
+        {
+            // Dry Sierra-summer air: deeper Rayleigh blue and far less Mie
+            // haze so the sky keeps saturation down to the horizon. The
+            // horizon sky is what grazing water mirrors — with the stock
+            // pale wash, the whole near-field river rendered as one smooth
+            // white sheet from deck-level cameras (the "broad white
+            // texture" reports; wave normals cannot texture a mirror of a
+            // featureless region). A saturated sky corridor tints that
+            // mirror blue instead. Light transport only — no terrain,
+            // water, solver, or gameplay authority.
+            USkyAtmosphereComponent* AtmosphereComponent =
+                Atmosphere->GetComponent();
+            AtmosphereComponent->SetRayleighScatteringScale(0.0442f);
+            AtmosphereComponent->SetMieScatteringScale(0.0018f);
+            AtmosphereComponent->SetMieAnisotropy(0.85f);
+            Atmosphere->Tags.AddUnique(
+                TEXT("RaftSimSouthForkDrySierraSkyV1"));
+        }
     }
 
     AExponentialHeightFog* Fog = Cast<AExponentialHeightFog>(
