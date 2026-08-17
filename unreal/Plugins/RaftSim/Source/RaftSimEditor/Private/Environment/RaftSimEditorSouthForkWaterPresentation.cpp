@@ -662,12 +662,90 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         // The static bake (0.018 base, full energetic amplitude) always
         // cancels exactly; the moving replacement carries a stronger calm
         // base (+/-3 cm pools, matched by the physics-side coupling) and a
-        // HALVED energetic amplitude — the physics cannot reconstruct the
-        // baked energy term, so the rendered crests stay within grazing
-        // distance of the surface the hull actually rides.
+        // FULL energetic amplitude (was halved 2026-08-14..16 while the
+        // physics could not reconstruct the term; the support sampler now
+        // carries the identical energetic sines, so both sides scale
+        // together — see RaftSimWaterRuntimeAdapter). High-aeration zones
+        // (rapids, boulder wakes) roll ~0.2 m crests the hull rides.
         UMaterialExpression* DeltaMeters = SubtractPair(
-            Displacement(PhaseA1, PhaseB1, 0.030f, 0.5f),
+            Displacement(PhaseA1, PhaseB1, 0.030f, 1.0f),
             Displacement(PhaseA0, PhaseB0, 0.018f, 1.0f));
+        // Boat wake as geometry: the same analytic V-arm field the base
+        // colour draws also lifts the surface, so the wake is water, not a
+        // decal. Reads the raft state the surface actor pushes into the
+        // shared collection every tick.
+        UMaterialExpression* WakeReliefMeters = nullptr;
+        if (UMaterialParameterCollection* WakeCollection =
+                LoadOrCreateRaftFoamOcclusionCollection(OutSummary))
+        {
+            UMaterialExpression* WakeBoatS = AddRaftWaterCollectionParameter(
+                Material, WakeCollection,
+                TEXT("RaftSimWakeBoatStationM"), true);
+            UMaterialExpression* WakeBoatL = AddRaftWaterCollectionParameter(
+                Material, WakeCollection,
+                TEXT("RaftSimWakeBoatLateralM"), true);
+            UMaterialExpression* WakeVelS = AddRaftWaterCollectionParameter(
+                Material, WakeCollection,
+                TEXT("RaftSimWakeBoatVelStationMps"), true);
+            UMaterialExpression* WakeVelL = AddRaftWaterCollectionParameter(
+                Material, WakeCollection,
+                TEXT("RaftSimWakeBoatVelLateralMps"), true);
+            UMaterialExpression* WakeEnable = AddRaftWaterCollectionParameter(
+                Material, WakeCollection,
+                TEXT("RaftSimWakeBoatEnable"), true);
+            if (WakeBoatS && WakeBoatL && WakeVelS && WakeVelL && WakeEnable)
+            {
+                UMaterialExpressionCustom* WakeReliefNode =
+                    NewObject<UMaterialExpressionCustom>(Material);
+                WakeReliefNode->Description =
+                    TEXT("RaftSimBoatWakeRelief");
+                WakeReliefNode->OutputType = CMOT_Float1;
+                WakeReliefNode->Code = TEXT(
+                    "float2 rel = float2(S - BoatS, L - BoatL);\n"
+                    "float2 rv = float2(VelS - WaterSpeed, VelL);\n"
+                    "float sp = max(length(rv), 1e-4);\n"
+                    "float2 dir = -rv / sp;\n"
+                    "float along = dot(rel, dir);\n"
+                    "float perp = length(rel - along * dir);\n"
+                    "float speedF = saturate((sp - 0.05) / 1.4);\n"
+                    "float age = sqrt(saturate(1.0 - along / 24.0));\n"
+                    "float armOff = abs(perp - along * 0.53);\n"
+                    "float arm = saturate(1.0 - armOff / 1.6) * age;\n"
+                    "float armWave = arm *\n"
+                    "    (0.6 + 0.4 * cos(armOff * 3.9));\n"
+                    "float hollow = saturate(1.0 - perp /\n"
+                    "    (0.9 + along * 0.08)) * age;\n"
+                    "float gate = step(0.5, Enable) * step(0.12, sp) *\n"
+                    "    step(0.5, along) * step(along, 24.0);\n"
+                    "return (0.18 * armWave - 0.06 * hollow) *\n"
+                    "    speedF * gate;\n");
+                WakeReliefNode->Inputs.Empty();
+                const auto AddWakeReliefInput =
+                    [WakeReliefNode](
+                        const TCHAR* Name, UMaterialExpression* Expr)
+                {
+                    FCustomInput Input;
+                    Input.InputName = FName(Name);
+                    Input.Input.Expression = Expr;
+                    WakeReliefNode->Inputs.Add(Input);
+                };
+                AddWakeReliefInput(TEXT("S"), StationM);
+                AddWakeReliefInput(TEXT("L"), LateralM);
+                AddWakeReliefInput(TEXT("BoatS"), WakeBoatS);
+                AddWakeReliefInput(TEXT("BoatL"), WakeBoatL);
+                AddWakeReliefInput(TEXT("VelS"), WakeVelS);
+                AddWakeReliefInput(TEXT("VelL"), WakeVelL);
+                AddWakeReliefInput(TEXT("Enable"), WakeEnable);
+                AddWakeReliefInput(
+                    TEXT("WaterSpeed"), ScaleBy(EnergyB, 8.0f));
+                AddExpr(WakeReliefNode);
+                WakeReliefMeters = WakeReliefNode;
+            }
+        }
+        if (WakeReliefMeters != nullptr)
+        {
+            DeltaMeters = AddPair(DeltaMeters, WakeReliefMeters);
+        }
         UMaterialExpression* DeltaCm = ScaleBy(DeltaMeters, 100.0f);
         UMaterialExpressionConstant3Vector* UpAxis =
             NewObject<UMaterialExpressionConstant3Vector>(Material);

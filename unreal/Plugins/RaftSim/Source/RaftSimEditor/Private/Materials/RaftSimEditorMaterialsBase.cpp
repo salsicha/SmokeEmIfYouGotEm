@@ -2703,6 +2703,16 @@ UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
     // WPO and the physics-side swell/band phases both consume it so waves
     // visibly accelerate into rapids without desyncing render from support.
     EnsureScalar(TEXT("RaftSimWaveClockSeconds"), 0.0f);
+    // Boat wake state in river coordinates, pushed per-tick by the water
+    // surface actor. The band water material evaluates the analytic wake
+    // per pixel from these — every raised live-actor mesh is depth-buried
+    // under the opaque band surface, so the band shader is the one place
+    // a dynamic boat wake reliably renders.
+    EnsureScalar(TEXT("RaftSimWakeBoatEnable"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatStationM"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatLateralM"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatVelStationMps"), 0.0f);
+    EnsureScalar(TEXT("RaftSimWakeBoatVelLateralMps"), 0.0f);
     EnsureVector(
         TEXT("RaftInteriorWaterCenterAndHalfWidthCm"),
         FLinearColor(0.0f, 0.0f, 0.0f, 82.0f));

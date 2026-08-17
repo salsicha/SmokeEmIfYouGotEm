@@ -851,8 +851,12 @@ bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
                     RawCenter.SurfaceHeightMeters,
                 -1.5f,
                 1.5f);
+            // Full energetic amplitude, mirrored with the transmission
+            // WPO block (both were 0.5 while paired; raised together
+            // 2026-08-16 so boulder-wake and rapid crests are real waves
+            // the hull physically rides).
             OutSample.SurfaceHeightMeters += BakedBaseDeltaM +
-                BandEnergy * 0.5f *
+                BandEnergy * 1.0f *
                     (0.16f * FMath::Sin(BandPhaseA) +
                      0.09f * FMath::Sin(BandPhaseB));
         }

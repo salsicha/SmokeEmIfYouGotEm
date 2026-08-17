@@ -494,10 +494,18 @@ private:
     TArray<FVector3f> BoulderFootprintsSLR;
     /** Footprints pruned to the current live window's station range. */
     TArray<FVector3f> WindowBoulderFootprintsSLR;
-    /** Raft state in river coordinates, cached once per surface rebuild
-        for the analytic boat wake. */
+    /** Samples raft position/velocity in river coordinates and low-pass
+        filters the velocity. Runs every Tick: per-refresh sampling made
+        the material-side wake jump and flash each refresh interval. */
+    void SampleBoatWakeState();
+    /** Raft state in river coordinates, refreshed every Tick for the
+        analytic boat wake. The solver moves the raft kinematically, so
+        GetVelocity() reads zero — velocity comes from differencing the
+        actor position, then smoothing. */
     FVector2D BoatRiverPositionM = FVector2D::ZeroVector;
     FVector2D BoatRiverVelocityMps = FVector2D::ZeroVector;
+    FVector LastBoatWorldPositionCm = FVector::ZeroVector;
+    double LastBoatSampleTimeSeconds = -1.0;
     bool bBoatWakeValid = false;
     /** Flow-warped wave clock shared with the WPO collection and adapter. */
     float PresentationWaveClockSeconds = -1.0f;
