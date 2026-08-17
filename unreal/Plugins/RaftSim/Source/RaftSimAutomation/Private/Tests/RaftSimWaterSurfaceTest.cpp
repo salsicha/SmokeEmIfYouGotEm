@@ -92,6 +92,60 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         TEXT("live hydraulic detail remains fully visible beyond the raft"),
         FMath::IsNearlyEqual(HullOutsideCoverage, 1.0f));
 
+    const FVector2D WakeBoatPosition = FVector2D::ZeroVector;
+    const FVector2D WakeTravelDirection(1.0f, 0.0f);
+    const float WakeArmAcrossMeters = 1.05f + 10.0f * 0.52f;
+    const float PortWakeM =
+        ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
+            FVector2D(-10.0f, WakeArmAcrossMeters),
+            WakeBoatPosition,
+            WakeTravelDirection,
+            1.0f,
+            0.0f);
+    const float StarboardWakeM =
+        ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
+            FVector2D(-10.0f, -WakeArmAcrossMeters),
+            WakeBoatPosition,
+            WakeTravelDirection,
+            1.0f,
+            0.0f);
+    const float AdjacentWakeTroughM =
+        ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
+            FVector2D(-10.0f, WakeArmAcrossMeters + 2.0f),
+            WakeBoatPosition,
+            WakeTravelDirection,
+            1.0f,
+            0.0f);
+    Test->TestTrue(
+        TEXT("paddle wake produces equal geometry ripples on both sides"),
+        PortWakeM > 0.005f &&
+            FMath::IsNearlyEqual(PortWakeM, StarboardWakeM, 1.0e-6f));
+    Test->TestTrue(
+        TEXT("paddle wake alternates signed crests and troughs"),
+        PortWakeM * AdjacentWakeTroughM < 0.0f);
+    Test->TestTrue(
+        TEXT("paddle wake geometry stays inside its 6 cm amplitude bound"),
+        FMath::Abs(PortWakeM) <= 0.0601f &&
+            FMath::Abs(AdjacentWakeTroughM) <= 0.0601f);
+    Test->TestTrue(
+        TEXT("paddle wake is absent ahead of the raft"),
+        FMath::IsNearlyZero(
+            ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
+                FVector2D(5.0f, 0.0f),
+                WakeBoatPosition,
+                WakeTravelDirection,
+                1.0f,
+                0.0f)));
+    Test->TestTrue(
+        TEXT("zero paddling strength removes the geometry wake"),
+        FMath::IsNearlyZero(
+            ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
+                FVector2D(-10.0f, WakeArmAcrossMeters),
+                WakeBoatPosition,
+                WakeTravelDirection,
+                0.0f,
+                0.0f)));
+
     UMaterialParameterCollection* FoamOcclusionCollection =
         LoadObject<UMaterialParameterCollection>(
             nullptr,
@@ -177,7 +231,20 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     if (Mesh != nullptr)
     {
         Test->TestTrue(
-            TEXT("surface mesh has a section built"), Mesh->GetNumSections() > 0);
+            TEXT("surface mesh has base and physical paddle-wake sections"),
+            Mesh->GetNumSections() > 1);
+        Test->TestTrue(
+            TEXT("paddle-wake section uses the texture-free ripple material"),
+            Mesh->GetMaterial(1) != nullptr &&
+                Mesh->GetMaterial(1)->GetPathName().Contains(
+                    TEXT("M_RaftSim_PaddleWakeRipple")));
+        Test->TestEqual(
+            TEXT("paddle-wake ripple uses translucent water shading"),
+            Mesh->GetMaterial(1)->GetBlendMode(),
+            BLEND_Translucent);
+        Test->TestFalse(
+            TEXT("paddle-wake section stays hidden without paddling"),
+            Mesh->IsMeshSectionVisible(1));
         Test->TestTrue(
             TEXT("live surface uses its presentation-safe non-transmitting material"),
             Mesh->GetMaterial(0) != nullptr &&

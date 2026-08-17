@@ -2210,6 +2210,18 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     UMaterialExpressionComponentMask* FoamMask = Mask(VertexColor, true, false, false);
     UMaterialExpressionComponentMask* DepthMask = Mask(VertexColor, false, true, false);
     UMaterialExpressionComponentMask* SpeedMask = Mask(VertexColor, false, false, true);
+    // UV2.x is a localized scalar derived from the actual signed wake
+    // displacement on the procedural mesh. It only reveals that displaced
+    // geometry; no wake image, normal map, or screen-space decal is sampled.
+    UMaterialExpressionTextureCoordinate* PaddleWakeMeshData =
+        Cast<UMaterialExpressionTextureCoordinate>(
+            Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+    PaddleWakeMeshData->CoordinateIndex = 2;
+    PaddleWakeMeshData->Desc = TEXT("RaftSimPaddleWakeGeometryUV2");
+    UMaterialExpressionComponentMask* PaddleWakeCoverage =
+        Mask(PaddleWakeMeshData, true, false, false);
+    UMaterialExpressionComponentMask* PaddleWakeSignedHeight =
+        Mask(PaddleWakeMeshData, false, true, false);
     UMaterialExpressionComponentMask* StationEdgeCoverage =
         Mask(VertexColor, true, false, false);
     // VertexColor's default expression output is RGB. Alpha is UE's dedicated
@@ -2409,6 +2421,15 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     UMaterialExpression* FinalNormal = nullptr;
     UMaterialExpression* RoughnessOutput = Roughness;
     UMaterialExpression* BaseColorOutput = BaseColor;
+    // Crest/trough contrast is derived from UV2.y, the normalized signed
+    // vertex displacement. It is physical-height shading, not a wake bitmap.
+    BaseColorOutput = Mul(
+        BaseColorOutput,
+        AddNode(
+            Scalar(TEXT("LivePaddleWakeHeightMidpoint"), 1.0f),
+            Mul(
+                PaddleWakeSignedHeight,
+                Scalar(TEXT("LivePaddleWakeHeightContrast"), 0.35f))));
     UMaterialExpression* EmissiveOutput = nullptr;
     UMaterialExpression* FleckOutput = nullptr;
     UTexture2D* DetailNormal = LoadObject<UTexture2D>(
@@ -2885,9 +2906,16 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     // glow blended to nothing (verified: 50+ wake vertices, no pixels).
     CoverageWithFroth->Input.Expression = AddNode(
         AddNode(
-            HydraulicCoverage,
-            Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f))),
-        Mul(FoamMask, Scalar(TEXT("SolverFoamOpacityGain"), 0.55f)));
+            AddNode(
+                HydraulicCoverage,
+                Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f))),
+            Mul(FoamMask, Scalar(TEXT("SolverFoamOpacityGain"), 0.55f))),
+        // Bounded reveal of the real displaced mesh. This is deliberately
+        // water-coloured and foam-independent so it reads as a ripple, not
+        // a return of the white wake streaks.
+        Mul(
+            PaddleWakeCoverage,
+            Scalar(TEXT("LivePaddleWakeGeometryCoverage"), 0.24f)));
     UMaterialExpressionMultiply* HydraulicSurfaceCoverage = Mul(
         StationEdgeCoverage, CoverageWithFroth);
     // Older live detail skins retained calm alpha on the dry vertices of the
@@ -2928,6 +2956,178 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     const bool bSaved = UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
     UE_LOG(LogTemp, Display, TEXT("RaftSim: %s saved=%d"), AssetName, bSaved ? 1 : 0);
     return Material;
+}
+
+// Texture-free surface response for the physically displaced paddle wake.
+// The draw section contains only signed bilateral-ripple triangles, while
+// UV2.y carries their mesh displacement for crest/trough colour response.
+// No bitmap, normal map, noise, decal, foam, or screen-space wake is sampled.
+static UMaterial* BuildPaddleWakeRippleMaterial()
+{
+    static const TCHAR* AssetName = TEXT("M_RaftSim_PaddleWakeRipple");
+    static const TCHAR* PackagePath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleWakeRipple");
+    static const TCHAR* ObjectPath =
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleWakeRipple."
+             "M_RaftSim_PaddleWakeRipple");
+    UPackage* Package = CreatePackage(PackagePath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+    UMaterial* Material = Cast<UMaterial>(
+        StaticLoadObject(UMaterial::StaticClass(), nullptr, ObjectPath));
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package, AssetName, RF_Public | RF_Standalone | RF_Transactional);
+        FAssetRegistryModule::AssetCreated(Material);
+    }
+    if (!Material)
+    {
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->BlendMode = BLEND_Translucent;
+    Material->TranslucencyLightingMode = TLM_SurfacePerPixelLighting;
+    Material->SetShadingModel(MSM_Unlit);
+    Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
+    Material->TwoSided = true;
+    Material->bTangentSpaceNormal = true;
+
+    auto Add = [Material](UMaterialExpression* Expression)
+        -> UMaterialExpression*
+    {
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    auto Constant = [&](float Value) -> UMaterialExpressionConstant*
+    {
+        UMaterialExpressionConstant* Expression =
+            NewObject<UMaterialExpressionConstant>(Material);
+        Expression->R = Value;
+        return Cast<UMaterialExpressionConstant>(Add(Expression));
+    };
+    auto Vector = [&](const TCHAR* Name, const FLinearColor& Value)
+        -> UMaterialExpressionVectorParameter*
+    {
+        UMaterialExpressionVectorParameter* Expression =
+            NewObject<UMaterialExpressionVectorParameter>(Material);
+        Expression->ParameterName = Name;
+        Expression->DefaultValue = Value;
+        Expression->Group = TEXT("RaftSimPaddleWake");
+        return Cast<UMaterialExpressionVectorParameter>(Add(Expression));
+    };
+    auto Scalar = [&](const TCHAR* Name, float Value)
+        -> UMaterialExpressionScalarParameter*
+    {
+        UMaterialExpressionScalarParameter* Expression =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        Expression->ParameterName = Name;
+        Expression->DefaultValue = Value;
+        Expression->Group = TEXT("RaftSimPaddleWake");
+        return Cast<UMaterialExpressionScalarParameter>(Add(Expression));
+    };
+    auto Mask = [&](UMaterialExpression* Input, bool R, bool G, bool B,
+                    bool A = false) -> UMaterialExpressionComponentMask*
+    {
+        UMaterialExpressionComponentMask* Expression =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        Expression->Input.Expression = Input;
+        Expression->R = R;
+        Expression->G = G;
+        Expression->B = B;
+        Expression->A = A;
+        return Cast<UMaterialExpressionComponentMask>(Add(Expression));
+    };
+    auto AddNode = [&](UMaterialExpression* A, UMaterialExpression* B)
+        -> UMaterialExpressionAdd*
+    {
+        UMaterialExpressionAdd* Expression =
+            NewObject<UMaterialExpressionAdd>(Material);
+        Expression->A.Expression = A;
+        Expression->B.Expression = B;
+        return Cast<UMaterialExpressionAdd>(Add(Expression));
+    };
+    auto Mul = [&](UMaterialExpression* A, UMaterialExpression* B)
+        -> UMaterialExpressionMultiply*
+    {
+        UMaterialExpressionMultiply* Expression =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        Expression->A.Expression = A;
+        Expression->B.Expression = B;
+        return Cast<UMaterialExpressionMultiply>(Add(Expression));
+    };
+    auto Lerp = [&](UMaterialExpression* A, UMaterialExpression* B,
+                    UMaterialExpression* Alpha)
+        -> UMaterialExpressionLinearInterpolate*
+    {
+        UMaterialExpressionLinearInterpolate* Expression =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        Expression->A.Expression = A;
+        Expression->B.Expression = B;
+        Expression->Alpha.Expression = Alpha;
+        return Cast<UMaterialExpressionLinearInterpolate>(Add(Expression));
+    };
+
+    UMaterialExpressionVertexColor* VertexColor =
+        Cast<UMaterialExpressionVertexColor>(
+            Add(NewObject<UMaterialExpressionVertexColor>(Material)));
+    UMaterialExpressionComponentMask* RippleCoverage =
+        Mask(VertexColor, true, false, false);
+    RippleCoverage->Input.OutputIndex = 4;
+
+    UMaterialExpressionTextureCoordinate* WakeMeshData =
+        Cast<UMaterialExpressionTextureCoordinate>(
+            Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+    WakeMeshData->CoordinateIndex = 2;
+    WakeMeshData->Desc = TEXT("RaftSimSignedPaddleWakeGeometryUV2");
+    UMaterialExpressionComponentMask* SignedHeight =
+        Mask(WakeMeshData, false, true, false);
+    UMaterialExpressionSaturate* Height01 =
+        Cast<UMaterialExpressionSaturate>(
+            Add(NewObject<UMaterialExpressionSaturate>(Material)));
+    Height01->Input.Expression = AddNode(
+        Constant(0.5f), Mul(SignedHeight, Constant(0.5f)));
+
+    UMaterialExpression* RippleBody = Lerp(
+        Vector(TEXT("PaddleWakeTroughColor"),
+            FLinearColor(0.025f, 0.058f, 0.072f, 1.0f)),
+        Vector(TEXT("PaddleWakeCrestColor"),
+            FLinearColor(0.135f, 0.225f, 0.220f, 1.0f)),
+        Height01);
+    UMaterialExpressionFresnel* Fresnel =
+        Cast<UMaterialExpressionFresnel>(
+            Add(NewObject<UMaterialExpressionFresnel>(Material)));
+    Fresnel->Exponent = 3.6f;
+    Fresnel->BaseReflectFraction = 0.025f;
+    UMaterialExpression* ReflectedRipple = Lerp(
+        RippleBody,
+        Vector(TEXT("PaddleWakeReflectedSkyColor"),
+            FLinearColor(0.16f, 0.23f, 0.28f, 1.0f)),
+        Mul(Fresnel, Scalar(TEXT("PaddleWakeReflectionStrength"), 0.85f)));
+
+    UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
+    EditorData->EmissiveColor.Connect(0, ReflectedRipple);
+    EditorData->Opacity.Connect(
+        0, Mul(RippleCoverage, Scalar(TEXT("PaddleWakeOpacity"), 0.70f)));
+
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    Package->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath, FPackageName::GetAssetPackageExtension());
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const bool bSaved =
+        UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim: %s texture-free ripple material saved=%d"),
+        AssetName, bSaved ? 1 : 0);
+    return bSaved ? Material : nullptr;
 }
 
 // One draw-call face material: RGB vertex colour carries deterministic skin,
@@ -4403,6 +4603,7 @@ static void HandleCreatePhotorealMaterials(const TArray<FString>&)
     // refracted and scattered twice. Its station ends use continuous alpha;
     // moving geometry normals retain hydraulic shape.
     BuildLiveRiverSurfaceMaterial();
+    BuildPaddleWakeRippleMaterial();
     BuildRaftCrewMaterials();
     // Full-reach environment infrastructure and hydraulic atmosphere.
     BuildSolidMaterial(TEXT("M_RaftSim_Asphalt"), FLinearColor(0.035f, 0.038f, 0.04f, 1.0f), 0.92f, 0.0f);
@@ -4428,7 +4629,9 @@ bool CreatePhotorealRiverWaterMaterial(FString& OutSummary)
 bool CreateLiveRiverSurfaceMaterial(FString& OutSummary)
 {
     UMaterial* Material = BuildLiveRiverSurfaceMaterial();
-    const bool bSucceeded = Material != nullptr;
+    UMaterial* PaddleWakeMaterial = BuildPaddleWakeRippleMaterial();
+    const bool bSucceeded =
+        Material != nullptr && PaddleWakeMaterial != nullptr;
     OutSummary += FString::Printf(
         TEXT("Solver-owned live river-water surface material authored: %s.\n"),
         bSucceeded ? TEXT("yes") : TEXT("no"));
