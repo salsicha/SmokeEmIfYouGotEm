@@ -501,5 +501,7 @@ private:
     FSupportBandField RaftSupportBandField;
     float PresentationWaveClockSeconds = -1.0f;
 
+#if RAFTSIM_HAS_LIVE_SOLVER
     TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
+#endif
 };
