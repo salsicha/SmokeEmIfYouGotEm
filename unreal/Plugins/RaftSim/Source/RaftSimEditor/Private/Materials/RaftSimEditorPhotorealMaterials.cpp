@@ -753,11 +753,91 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             CycleAlpha);
         UMaterialExpression* CrossPerturbation = AddNode(
             CrossNormal, Const3(0.0f, 0.0f, -1.0f));
+        // Third, fine octave (~0.75 m repeat): the two base octaves repeat
+        // at ~5 m and ~2.3 m, leaving the first few metres around the
+        // camera with no detail frequency at all — the near-field water
+        // stayed a smooth mirror sheet regardless of normal strength.
+        UMaterialExpressionTextureCoordinate* FineUvCoord =
+            Cast<UMaterialExpressionTextureCoordinate>(Add(
+                NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+        FineUvCoord->UTiling = 4.0f;
+        FineUvCoord->VTiling = 5.3f;
+        UMaterialExpression* FineUvA =
+            FlowAdvectedAt(FineUvCoord, 4.0f, 1.0f, PhaseA);
+        UMaterialExpression* FineUvB =
+            FlowAdvectedAt(FineUvCoord, 4.0f, 1.0f, PhaseB);
+        UMaterialExpression* FineNormal = Lerp(
+            Ripple(FineUvA, TEXT("WaterFlowNormalFineA"), 0.031f, -0.022f),
+            Ripple(FineUvB, TEXT("WaterFlowNormalFineB"), 0.031f, -0.022f),
+            CycleAlpha);
+        UMaterialExpression* FinePerturbation = AddNode(
+            Mul(FineNormal, Const3(0.6f, 0.6f, 0.6f)),
+            Const3(0.0f, 0.0f, -0.6f));
+        // Analytic wave normals: texture-sourced ripples mip-collapse to a
+        // flat mirror at grazing angles no matter their strength — the
+        // near-field water around a chase camera stayed one smooth pale
+        // sheet through every texture-side fix. Procedural sine slopes
+        // have no mips and survive every angle; they ride the same cycled
+        // advected UVs, so they translate with the current like the rest
+        // of the surface detail.
+        const auto AnalyticSlopeAt =
+            [&](UMaterialExpression* Uv) -> UMaterialExpression*
+        {
+            const auto SlopeWave = [&](float CyclesU, float CyclesV,
+                                       float Amplitude)
+                -> UMaterialExpression*
+            {
+                UMaterialExpressionSine* WaveSine =
+                    NewObject<UMaterialExpressionSine>(Material);
+                WaveSine->Period = 1.0f;
+                WaveSine->Input.Expression = AddNode(
+                    AddNode(
+                        Mul(Mask(Uv, true, false, false), Const(CyclesU)),
+                        Mul(Mask(Uv, false, true, false), Const(CyclesV))),
+                    Const(0.25f));
+                Add(WaveSine);
+                UMaterialExpressionAppendVector* SlopeDir =
+                    Cast<UMaterialExpressionAppendVector>(Add(
+                        NewObject<UMaterialExpressionAppendVector>(
+                            Material)));
+                const float Norm = FMath::Sqrt(
+                    CyclesU * CyclesU + CyclesV * CyclesV);
+                SlopeDir->A.Expression = Const(CyclesU / Norm * Amplitude);
+                SlopeDir->B.Expression = Const(CyclesV / Norm * Amplitude);
+                return Mul(WaveSine, SlopeDir);
+            };
+            return AddNode(
+                SlopeWave(1.9f, 0.45f, 0.34f),
+                SlopeWave(4.6f, 1.15f, 0.26f));
+        };
+        UMaterialExpression* AnalyticSlopeXy = Lerp(
+            AnalyticSlopeAt(FlowUvA), AnalyticSlopeAt(FlowUvB), CycleAlpha);
+        UMaterialExpressionAppendVector* AnalyticSlope3 =
+            Cast<UMaterialExpressionAppendVector>(Add(
+                NewObject<UMaterialExpressionAppendVector>(Material)));
+        AnalyticSlope3->A.Expression = AnalyticSlopeXy;
+        AnalyticSlope3->B.Expression = Const(0.0f);
+        // Steepness boost: the authored flow-normal texture averages only
+        // ±6% slope, and grazing-angle foreshortening crushes that to a
+        // perfect mirror — the sky corridor between the tree reflections
+        // rendered as one smooth white sheet no strength scalar could
+        // break. Amplifying the tangent XY of the sampled ripples steepens
+        // the actual wave slopes so the grazing reflection shatters into
+        // moving glints.
+        UMaterialExpression* SteepenedRipples = Mul(
+            AddNode(
+                AddNode(AddNode(PrimaryNormal, CrossPerturbation),
+                        FinePerturbation),
+                AnalyticSlope3),
+            Const3(1.0f, 1.0f, 0.0f));
+        UMaterialExpression* RippleXy = Mul(
+            SteepenedRipples,
+            Scalar(TEXT("FlowNormalSteepness"), 2.8f));
         UMaterialExpressionNormalize* CombinedNormal =
             Cast<UMaterialExpressionNormalize>(
                 Add(NewObject<UMaterialExpressionNormalize>(Material)));
         CombinedNormal->VectorInput.Expression = AddNode(
-            PrimaryNormal, CrossPerturbation);
+            RippleXy, Const3(0.0f, 0.0f, 1.0f));
         // A single 0.22 normal scalar previously gave ordinary current nearly
         // the same microfacet energy as aerated rapids. At guide-eye grazing
         // angles that field converged into camera-radial grooves. Keep calm
@@ -792,7 +872,14 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         RippleGrazingFresnel->Normal.Expression = FlatN;
         UMaterialExpression* GrazingFilteredNormalStrength = Lerp(
             NormalStrength,
-            Mul(NormalStrength, Scalar(TEXT("RippleGrazingFloor"), 0.25f)),
+            // Raised 0.25 -> 0.80 (2026-08-16): the low floor stripped
+            // nearly all wave normals from the grazing zone, so the sky
+            // corridor between the tree-line reflections rendered as one
+            // smooth white sheet from chase cameras ("broad white texture,
+            // no wave"). The camera-radial grooves this floor guarded
+            // against came from the unbounded advection shear, fixed by
+            // flowmap cycling — the heavy guard is no longer needed.
+            Mul(NormalStrength, Scalar(TEXT("RippleGrazingFloor"), 0.80f)),
             RippleGrazingFresnel);
         // Wind-riffle patches vs slicks: real rivers alternate between glassy
         // slicks and wind/current-textured patches at the ten-metre scale —
@@ -814,10 +901,103 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         RiffleMaskClamp->MaxDefault = 1.0f;
         RiffleMask = RiffleMaskClamp;
         UMaterialExpression* SlickFilteredNormalStrength = Lerp(
-            Mul(GrazingFilteredNormalStrength, Scalar(TEXT("SlickNormalFloor"), 0.30f)),
+            Mul(GrazingFilteredNormalStrength, Scalar(TEXT("SlickNormalFloor"), 0.55f)),
             GrazingFilteredNormalStrength,
             RiffleMask);
         FinalNormal = Lerp(FlatN, CombinedNormal, SlickFilteredNormalStrength);
+
+        // Boat wake as a per-pixel wave train: transverse ~0.9 m packet of
+        // ripple normals along each V-arm. The 4 m band mesh can only heave
+        // smoothly (its tall smooth arms mirrored the sky as one broad
+        // white sheet from the chase camera); pixel normals carry the wave
+        // read at any mesh density, with zero foam. Injected after the
+        // calm/grazing strength filters so the wake never mutes with calm
+        // water.
+        {
+            UMaterialExpression* WakeBoatS =
+                AddFoamCollectionScalarExpression(
+                    Material, TEXT("RaftSimWakeBoatStationM"));
+            UMaterialExpression* WakeBoatL =
+                AddFoamCollectionScalarExpression(
+                    Material, TEXT("RaftSimWakeBoatLateralM"));
+            UMaterialExpression* WakeVelS =
+                AddFoamCollectionScalarExpression(
+                    Material, TEXT("RaftSimWakeBoatVelStationMps"));
+            UMaterialExpression* WakeVelL =
+                AddFoamCollectionScalarExpression(
+                    Material, TEXT("RaftSimWakeBoatVelLateralMps"));
+            UMaterialExpression* WakeEnable =
+                AddFoamCollectionScalarExpression(
+                    Material, TEXT("RaftSimWakeBoatEnable"));
+            if (WakeBoatS && WakeBoatL && WakeVelS && WakeVelL && WakeEnable)
+            {
+                UMaterialExpressionTextureCoordinate* WakeRawUv =
+                    Cast<UMaterialExpressionTextureCoordinate>(Add(
+                        NewObject<UMaterialExpressionTextureCoordinate>(
+                            Material)));
+                WakeRawUv->UTiling = 1.0f;
+                WakeRawUv->VTiling = 1.0f;
+                UMaterialExpressionCustom* WakeSlopeNode =
+                    NewObject<UMaterialExpressionCustom>(Material);
+                WakeSlopeNode->Description = TEXT("RaftSimBoatWakeNormal");
+                WakeSlopeNode->OutputType = CMOT_Float2;
+                WakeSlopeNode->Code = TEXT(
+                    "float2 p = Uv * 3.0;\n"
+                    "float2 rel = p - float2(BoatS, BoatL);\n"
+                    "float2 rv = float2(VelS - WaterSpeed, VelL);\n"
+                    "float sp = max(length(rv), 1e-4);\n"
+                    "float2 dir = -rv / sp;\n"
+                    "float along = dot(rel, dir);\n"
+                    "float2 side = float2(-dir.y, dir.x);\n"
+                    "float perpS = dot(rel - along * dir, side);\n"
+                    "float ap = abs(perpS);\n"
+                    "float speedF = saturate((sp - 0.05) / 1.4);\n"
+                    "float age = sqrt(saturate(1.0 - along / 24.0));\n"
+                    "float armOff = ap - along * 0.53;\n"
+                    "float packet = exp(-armOff * armOff / 0.49);\n"
+                    "float slopeMag = 0.5 * speedF * age * packet *\n"
+                    "    cos(armOff * 6.98);\n"
+                    "float gate = step(0.5, Enable) * step(0.12, sp) *\n"
+                    "    step(0.5, along) * step(along, 24.0);\n"
+                    "float2 outward = side * sign(perpS);\n"
+                    "return outward * slopeMag * gate;\n");
+                WakeSlopeNode->Inputs.Empty();
+                const auto AddWakeSlopeInput =
+                    [WakeSlopeNode](
+                        const TCHAR* Name, UMaterialExpression* Expr)
+                {
+                    FCustomInput Input;
+                    Input.InputName = FName(Name);
+                    Input.Input.Expression = Expr;
+                    WakeSlopeNode->Inputs.Add(Input);
+                };
+                UMaterialExpressionConstant* WakeSpeedToMps =
+                    NewObject<UMaterialExpressionConstant>(Material);
+                WakeSpeedToMps->R = 8.0f;
+                Add(WakeSpeedToMps);
+                AddWakeSlopeInput(TEXT("Uv"), WakeRawUv);
+                AddWakeSlopeInput(TEXT("BoatS"), WakeBoatS);
+                AddWakeSlopeInput(TEXT("BoatL"), WakeBoatL);
+                AddWakeSlopeInput(TEXT("VelS"), WakeVelS);
+                AddWakeSlopeInput(TEXT("VelL"), WakeVelL);
+                AddWakeSlopeInput(TEXT("Enable"), WakeEnable);
+                AddWakeSlopeInput(
+                    TEXT("WaterSpeed"), Mul(SpeedMask, WakeSpeedToMps));
+                Add(WakeSlopeNode);
+                UMaterialExpressionAppendVector* WakeSlope3 =
+                    Cast<UMaterialExpressionAppendVector>(Add(
+                        NewObject<UMaterialExpressionAppendVector>(
+                            Material)));
+                WakeSlope3->A.Expression = WakeSlopeNode;
+                WakeSlope3->B.Expression = Const(0.0f);
+                UMaterialExpressionNormalize* WakeBlendedNormal =
+                    Cast<UMaterialExpressionNormalize>(Add(
+                        NewObject<UMaterialExpressionNormalize>(Material)));
+                WakeBlendedNormal->VectorInput.Expression =
+                    AddNode(FinalNormal, WakeSlope3);
+                FinalNormal = WakeBlendedNormal;
+            }
+        }
     }
 
     // --- Roughness: glassy water, rougher in foam; Fresnel-lifted specular ---
@@ -852,11 +1032,32 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         StreakSpeedGate->Input.Expression = Mul(
             SpeedMask, Scalar(TEXT("FlowStreakSpeedGain"), 5.0f));
         Add(StreakSpeedGate);
+        // No grazing fade here — analytic roughness lanes are the ONE
+        // texture that survives grazing angles (reflection-based detail
+        // cannot: the mirror shows the featureless horizon sky, and
+        // re-aiming rays inside a uniform region changes nothing).
         Roughness = AddNode(
             Roughness,
             Mul(FlowStreakField,
                 Mul(StreakSpeedGate,
                     Scalar(TEXT("FlowStreakRoughness"), 0.22f))));
+    }
+    // Grazing roughness boost: diffuse the near-field mirror so the pale
+    // sky corridor between the tree-line reflections stops rendering as
+    // one smooth white sheet ("broad white texture" from chase cameras).
+    // A rougher grazing surface blends sky with surroundings and lets the
+    // lane texture carry the water read.
+    {
+        UMaterialExpressionFresnel* GrazingRoughFresnel =
+            Cast<UMaterialExpressionFresnel>(
+                Add(NewObject<UMaterialExpressionFresnel>(Material)));
+        GrazingRoughFresnel->Exponent = 2.2f;
+        GrazingRoughFresnel->BaseReflectFraction = 0.0f;
+        GrazingRoughFresnel->Normal.Expression = Const3(0.0f, 0.0f, 1.0f);
+        Roughness = AddNode(
+            Roughness,
+            Mul(GrazingRoughFresnel,
+                Scalar(TEXT("GrazingRoughnessBoost"), 0.22f)));
     }
     if (DriftFleckMask != nullptr)
     {
@@ -2464,7 +2665,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             LiveNormalStrength,
             Mul(
                 LiveNormalStrength,
-                Scalar(TEXT("LiveRippleGrazingFloor"), 0.50f)),
+                Scalar(TEXT("LiveRippleGrazingFloor"), 0.80f)),
             LiveRippleGrazingFresnel);
         FinalNormal = Lerp(
             LiveFlatN,

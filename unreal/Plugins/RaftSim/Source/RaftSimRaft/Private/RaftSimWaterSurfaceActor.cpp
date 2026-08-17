@@ -31,6 +31,11 @@ static TAutoConsoleVariable<int32> CVarRaftSimLiveSheetDebugCoverage(
     TEXT("1 = force the live overlay sheet fully opaque to reveal its ")
     TEXT("actual rendered extent and vertex foam."));
 
+static TAutoConsoleVariable<int32> CVarRaftSimHideLiveOverlay(
+    TEXT("raftsim.HideLiveOverlay"), 0,
+    TEXT("1 = hide the live overlay surface mesh entirely (A/B test for ")
+    TEXT("near-field wash)."));
+
 namespace
 {
 constexpr float kSurfCmPerM = 100.0f;
@@ -2623,11 +2628,16 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                     1.0f - ArmOffsetM / 1.6f, 0.0f, 1.0f) *
                                 AgeT * SpeedFactor;
                             WakeReliefM = FMath::Max(
-                                WakeReliefM, 0.16f * ArmT);
+                                WakeReliefM, 0.07f * ArmT);
                         }
                     }
                 }
-                SurfaceZCm += WakeReliefM * 100.0f;
+                // WakeReliefM intentionally NOT applied: any positive
+                // relief on this buried overlay pokes its milky sheet
+                // through the opaque band surface — the reported broad
+                // white V chasing the boat was exactly this. The band
+                // shader's WPO owns all wake/pillow displacement.
+                (void)WakeReliefM;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
                 MinimumWetLateralIndex[X] = FMath::Min(
@@ -3779,6 +3789,15 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
             PresentationWaveClockSeconds);
     }
     SampleBoatWakeState();
+    if (SurfaceMesh)
+    {
+        const bool bHideOverlay =
+            CVarRaftSimHideLiveOverlay.GetValueOnGameThread() != 0;
+        if (bHideOverlay == SurfaceMesh->IsVisible())
+        {
+            SurfaceMesh->SetVisibility(!bHideOverlay, false);
+        }
+    }
     if (RaftFoamOcclusionCollection && GetWorld())
     {
         if (UMaterialParameterCollectionInstance* ClockParameters =

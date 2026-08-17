@@ -711,13 +711,16 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
                     "float age = sqrt(saturate(1.0 - along / 24.0));\n"
                     "float armOff = abs(perp - along * 0.53);\n"
                     "float arm = saturate(1.0 - armOff / 1.6) * age;\n"
-                    "float armWave = arm *\n"
-                    "    (0.6 + 0.4 * cos(armOff * 3.9));\n"
                     "float hollow = saturate(1.0 - perp /\n"
                     "    (0.9 + along * 0.08)) * age;\n"
                     "float gate = step(0.5, Enable) * step(0.12, sp) *\n"
                     "    step(0.5, along) * step(along, 24.0);\n"
-                    "return (0.18 * armWave - 0.06 * hollow) *\n"
+                    // Subtle heave only: the 4 m band mesh can only
+                    // express broad smooth displacement, and at chase-
+                    // camera grazing angles a tall smooth arm mirrors the
+                    // sky as one white sheet. The visible wave train
+                    // rides per-pixel normals in the surface material.
+                    "return (0.07 * arm - 0.03 * hollow) *\n"
                     "    speedF * gate;\n");
                 WakeReliefNode->Inputs.Empty();
                 const auto AddWakeReliefInput =
