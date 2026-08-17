@@ -54,3 +54,4 @@ unreal/Content/RaftSim/Environment/GeneratedLocalReview/
 
 # Packaged builds are release artifacts, never repo content (GitHub Releases instead)
 unreal/Packaged/
+*.log
