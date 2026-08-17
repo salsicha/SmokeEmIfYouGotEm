@@ -2577,66 +2577,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         }
                     }
                 }
-                // Analytic boat wake: a turbulent transom trail plus a
-                // V-arm pair, trailing opposite the raft's velocity
-                // relative to the local current and fading over ~24 m.
-                if (bBoatWakeValid)
-                {
-                    const FVector2D RelPos(
-                        VertexStationM - BoatRiverPositionM.X,
-                        VertexLateralM - BoatRiverPositionM.Y);
-                    const FVector2D RelVel =
-                        CVarRaftSimForceBoatWakeTest.GetValueOnGameThread()
-                            ? BoatRiverVelocityMps
-                            : BoatRiverVelocityMps -
-                                  FVector2D(
-                                      Sample.VelocityMetersPerSecond.X,
-                                      Sample.VelocityMetersPerSecond.Y);
-                    const float RelSpeed = RelVel.Size();
-                    MaxWakeRelSpeed = FMath::Max(MaxWakeRelSpeed, RelSpeed);
-                    // A paddled raft only ever exceeds the current by a few
-                    // tenths of a m/s — the wake must read at that scale.
-                    // Holding position against moving water (back-paddling)
-                    // gives the full current as relative speed and streams
-                    // the wake downstream, exactly like a rock's.
-                    if (RelSpeed > 0.12f)
-                    {
-                        const FVector2D WakeDir = -RelVel / RelSpeed;
-                        const float AlongM =
-                            FVector2D::DotProduct(RelPos, WakeDir);
-                        if (AlongM > 0.5f && AlongM < 24.0f)
-                        {
-                            const float PerpM =
-                                (RelPos - AlongM * WakeDir).Size();
-                            const float SpeedFactor = FMath::Clamp(
-                                (RelSpeed - 0.05f) / 1.4f, 0.0f, 1.0f);
-                            // Slow (sqrt) age falloff and a wide, growing
-                            // trail: the raised foam sheet is masked at
-                            // 0.18 against a sparse lace texture, so a
-                            // narrow fast-fading trail survived on only a
-                            // handful of vertices and read as nothing.
-                            // Displacement only — a paddled raft pushes
-                            // water aside without aerating it, so the boat
-                            // wake carries NO foam. White stays exclusive
-                            // to breaking water (boulder wakes, rapids).
-                            const float AgeT = FMath::Sqrt(
-                                1.0f - AlongM / 24.0f);
-                            const float ArmOffsetM = FMath::Abs(
-                                PerpM - AlongM * 0.53f);
-                            const float ArmT =
-                                FMath::Clamp(
-                                    1.0f - ArmOffsetM / 1.6f, 0.0f, 1.0f) *
-                                AgeT * SpeedFactor;
-                            WakeReliefM = FMath::Max(
-                                WakeReliefM, 0.07f * ArmT);
-                        }
-                    }
-                }
-                // WakeReliefM intentionally NOT applied: any positive
-                // relief on this buried overlay pokes its milky sheet
-                // through the opaque band surface — the reported broad
-                // white V chasing the boat was exactly this. The band
-                // shader's WPO owns all wake/pillow displacement.
+                // Boat wake presentation removed entirely: the WPO
+                // arms and normal trains read as flat white streaks
+                // at deck angles (playtest verdict). Boat state is
+                // still sampled for the future near-field patch.
                 (void)WakeReliefM;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
