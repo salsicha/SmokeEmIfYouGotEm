@@ -104,6 +104,37 @@ static UMaterialExpression* AddWaveClockTimeExpression(UMaterial* Material)
     return Expression;
 }
 
+static UMaterialExpression* AddFoamCollectionScalarExpression(
+    UMaterial* Material, const TCHAR* ParameterName)
+{
+    FString CollectionSummary;
+    UMaterialParameterCollection* Collection =
+        RaftSimEditorEnvironment::LoadOrCreateRaftFoamOcclusionCollection(
+            CollectionSummary);
+    if (!Collection)
+    {
+        return nullptr;
+    }
+    UMaterialExpressionCollectionParameter* Expression =
+        NewObject<UMaterialExpressionCollectionParameter>(Material);
+    Expression->Collection = Collection;
+    Expression->ParameterName = FName(ParameterName);
+    Expression->ExpressionGUID = FGuid::NewGuid();
+    const int32 ParameterIndex =
+        Collection->ScalarParameters.IndexOfByPredicate(
+            [ParameterName](const FCollectionScalarParameter& Parameter)
+            {
+                return Parameter.ParameterName == FName(ParameterName);
+            });
+    if (ParameterIndex == INDEX_NONE)
+    {
+        return nullptr;
+    }
+    Expression->ParameterId = Collection->ScalarParameters[ParameterIndex].Id;
+    Material->GetExpressionCollection().AddExpression(Expression);
+    return Expression;
+}
+
 static UMaterial* BuildPhotorealRiverWaterMaterial(
     const TCHAR* PackagePath =
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater"),
@@ -881,12 +912,16 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         // read comes from the emissive term wired below, which composites
         // on top of the mirror the way real drift foam occludes it.
         BaseColorOut = Lerp(
-            BaseColor,
+            BaseColorOut,
             FoamColor,
             Mul(DriftFleckMask, Scalar(TEXT("DriftFoamOpacity"), 0.35f)));
     }
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
     Ed->BaseColor.Connect(0, BaseColorOut);
+    // A displacement-hull boat wake carries NO whitening: a paddled raft
+    // pushes water aside without aerating it, so white stays exclusive to
+    // breaking water (solver aeration: rapids and obstruction wakes). The
+    // boat wake lives as pure geometry in the WPO block.
     if (DriftFleckMask != nullptr)
     {
         Ed->EmissiveColor.Connect(
@@ -1979,7 +2014,14 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     Material->BlendMode = BLEND_Translucent;
-    Material->TranslucencyLightingMode = TLM_SurfacePerPixelLighting;
+    // Volumetric non-directional, deliberately NOT per-pixel surface
+    // lighting: the overlay floats just above the authored water, and with
+    // per-pixel lighting it received its own crisp copy of every dynamic
+    // shadow — crew shadows projected twice at offset heights whenever the
+    // two surfaces diverged. The single true shadow belongs to the opaque
+    // Single Layer Water underneath; the overlay's froth reads through its
+    // emissive term regardless.
+    Material->TranslucencyLightingMode = TLM_VolumetricNonDirectional;
     Material->SetShadingModel(MSM_DefaultLit);
     Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
 
@@ -2650,6 +2692,31 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         }
     }
 
+    // Solver foam on the live sheet needs a direct white channel: the
+    // legacy froth path multiplies foam by a sparse lace pattern and the
+    // sheet's few-percent coverage, which renders boat/obstruction wake
+    // foam invisibly (verified: 50+ wake-foam vertices, zero visible
+    // pixels). Emissive white scaled by the raw foam channel — softly
+    // textured by the pattern, never zeroed by it — makes any foam the
+    // solver or wake system writes actually read.
+    {
+        UMaterialExpression* GlowTexture =
+            Scalar(TEXT("LiveSolverFoamGlowFloor"), 0.45f);
+        if (FoamPattern != nullptr)
+        {
+            GlowTexture = AddNode(
+                GlowTexture,
+                Mul(FoamPattern,
+                    Scalar(TEXT("LiveSolverFoamGlowPatternGain"), 0.55f)));
+        }
+        UMaterialExpression* SolverFoamGlow = Mul(
+            Const3(0.88f, 0.91f, 0.92f),
+            Mul(Mul(FoamMask, GlowTexture),
+                Scalar(TEXT("LiveSolverFoamGlow"), 0.55f)));
+        EmissiveOutput = EmissiveOutput != nullptr
+            ? AddNode(EmissiveOutput, SolverFoamGlow)
+            : SolverFoamGlow;
+    }
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
     Ed->BaseColor.Connect(0, BaseColorOutput);
     Ed->Roughness.Connect(0, RoughnessOutput);
@@ -2703,9 +2770,15 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     UMaterialExpressionSaturate* CoverageWithFroth =
         Cast<UMaterialExpressionSaturate>(
             Add(NewObject<UMaterialExpressionSaturate>(Material)));
+    // Raw solver foam must also open the sheet directly: the textured froth
+    // term is pattern-multiplied (sparse lace, mean ~0.16), so wake and
+    // obstruction foam raised opacity by only a few percent and the foam
+    // glow blended to nothing (verified: 50+ wake vertices, no pixels).
     CoverageWithFroth->Input.Expression = AddNode(
-        HydraulicCoverage,
-        Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f)));
+        AddNode(
+            HydraulicCoverage,
+            Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f))),
+        Mul(FoamMask, Scalar(TEXT("SolverFoamOpacityGain"), 0.55f)));
     UMaterialExpressionMultiply* HydraulicSurfaceCoverage = Mul(
         StationEdgeCoverage, CoverageWithFroth);
     // Older live detail skins retained calm alpha on the dry vertices of the
