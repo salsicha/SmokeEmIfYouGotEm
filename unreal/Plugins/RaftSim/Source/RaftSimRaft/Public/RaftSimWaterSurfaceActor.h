@@ -38,6 +38,17 @@ public:
         float SpeedMetersPerSecond,
         float DepthMeters);
 
+    /** Signed render-only wake carried by live mesh vertices while the crew
+     * paddles. The two arms fan behind BoatTravelDirection with alternating
+     * crests and troughs; no foam, color, roughness, or normal texture is
+     * generated. Strength is a smoothed 0-1 paddling envelope. */
+    static float ComputePaddleWakeDisplacementMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        const FVector2D& BoatRiverCoordinatesMeters,
+        const FVector2D& BoatTravelDirection,
+        float Strength,
+        float PhaseSeconds);
+
     /** Sharpens only relief already present in the sampled solver surface.
      * Symmetric station neighbours remove the local linear grade, so planar
      * or calm water receives no displacement. The bounded result is visual
@@ -361,6 +372,11 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     TObjectPtr<UMaterialInterface> WaterMaterial;
 
+    /** Surface-lit, texture-free material used only by the signed paddle-wake
+     * geometry section. Vertex alpha localizes it to the bilateral ripple. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<UMaterialInterface> PaddleWakeMaterial;
+
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UMaterialInterface> LiveVolumeCoreMaterial;
 
@@ -481,7 +497,15 @@ private:
      * the live material can advect detail in both the downstream and lateral
      * directions without sacrificing foam/depth/speed/coverage vertex data. */
     TArray<FVector2D> FlowVelocityMetersPerSecond;
+    /** Localized opacity gate for the physically displaced paddle-wake mesh.
+     * UV2.x carries a normalized signed-height magnitude; it is mesh data, not
+     * a sampled wake texture, and remains zero everywhere outside the ripple. */
+    TArray<FVector2D> BoatWakePresentationData;
     TArray<FLinearColor> VertexColors;
+    /** Per-vertex presentation data used while compacting section 1 down to
+     * only the physical paddle-wake triangles. Section 0 remains the normal
+     * river-wide hydraulic overlay. */
+    TArray<FLinearColor> PaddleWakeVertexColors;
     TArray<FVector> LiveVolumeCoreVertices;
     TArray<int32> LiveVolumeCoreTriangles;
     TArray<FVector> RapidFoamVertices;
@@ -494,19 +518,22 @@ private:
     TArray<FVector3f> BoulderFootprintsSLR;
     /** Footprints pruned to the current live window's station range. */
     TArray<FVector3f> WindowBoulderFootprintsSLR;
-    /** Samples raft position/velocity in river coordinates and low-pass
-        filters the velocity. Runs every Tick: per-refresh sampling made
-        the material-side wake jump and flash each refresh interval. */
+    /** Samples raft position/velocity, crew paddling, and water-relative
+        travel in river coordinates every Tick. */
     void SampleBoatWakeState();
     /** Raft state in river coordinates, refreshed every Tick for the
-        analytic boat wake. The solver moves the raft kinematically, so
+        geometry-only paddle wake. The solver moves the raft kinematically, so
         GetVelocity() reads zero — velocity comes from differencing the
         actor position, then smoothing. */
     FVector2D BoatRiverPositionM = FVector2D::ZeroVector;
     FVector2D BoatRiverVelocityMps = FVector2D::ZeroVector;
+    FVector2D BoatWakeTravelDirection = FVector2D(1.0, 0.0);
     FVector LastBoatWorldPositionCm = FVector::ZeroVector;
     double LastBoatSampleTimeSeconds = -1.0;
+    float BoatWakeRelativeSpeedMps = 0.0f;
+    float BoatWakePaddleEnvelope = 0.0f;
     bool bBoatWakeValid = false;
+    bool bBoatWakePaddling = false;
     /** Flow-warped wave clock shared with the WPO collection and adapter. */
     float PresentationWaveClockSeconds = -1.0f;
     float SmoothedFlowClockScale = 1.0f;

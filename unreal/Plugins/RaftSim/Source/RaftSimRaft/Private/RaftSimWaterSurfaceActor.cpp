@@ -23,8 +23,8 @@
 
 static TAutoConsoleVariable<int32> CVarRaftSimForceBoatWakeTest(
     TEXT("raftsim.ForceBoatWakeTest"), 0,
-    TEXT("1 = boat wake ignores water velocity (any boat motion over the ")
-    TEXT("ground wakes), for headless wake-rendering verification."));
+    TEXT("1 = force the geometry-only paddle wake on and use ground-relative ")
+    TEXT("boat motion, for headless wake-rendering verification."));
 
 static TAutoConsoleVariable<int32> CVarRaftSimLiveSheetDebugCoverage(
     TEXT("raftsim.LiveSheetDebugCoverage"), 0,
@@ -296,6 +296,14 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
         }
     }
 
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> PaddleWakeMat(
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleWakeRipple."
+             "M_RaftSim_PaddleWakeRipple"));
+    if (PaddleWakeMat.Succeeded())
+    {
+        PaddleWakeMaterial = PaddleWakeMat.Object;
+    }
+
     // This project-owned parent is the shared photoreal Single Layer Water
     // graph with the runtime raft-floor transmission aperture already wired.
     // Its legacy SouthFork path is retained for asset compatibility; all
@@ -359,6 +367,61 @@ float ARaftSimWaterSurfaceActor::ComputePresentationStandingWaveDisplacementMete
                SpeedMetersPerSecond,
                DepthMeters)
         .DisplacementMeters;
+}
+
+float ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
+    const FVector2D& RiverCoordinatesMeters,
+    const FVector2D& BoatRiverCoordinatesMeters,
+    const FVector2D& BoatTravelDirection,
+    float Strength,
+    float PhaseSeconds)
+{
+    const FVector2D TravelDirection = BoatTravelDirection.GetSafeNormal();
+    const float SafeStrength = FMath::Clamp(Strength, 0.0f, 1.0f);
+    if (TravelDirection.IsNearlyZero() || SafeStrength <= KINDA_SMALL_NUMBER)
+    {
+        return 0.0f;
+    }
+
+    const FVector2D WakeDirection = -TravelDirection;
+    const FVector2D WakeAcross(-WakeDirection.Y, WakeDirection.X);
+    const FVector2D RelativePosition =
+        RiverCoordinatesMeters - BoatRiverCoordinatesMeters;
+    const float AlongMeters =
+        FVector2D::DotProduct(RelativePosition, WakeDirection);
+    constexpr float WakeStartMeters = 1.0f;
+    constexpr float WakeLengthMeters = 16.0f;
+    if (AlongMeters <= WakeStartMeters || AlongMeters >= WakeLengthMeters)
+    {
+        return 0.0f;
+    }
+
+    // Kelvin-like arms open from the two tube edges. A signed sinusoid across
+    // each arm creates alternating mesh crests and troughs instead of a
+    // positive relief strip, foam decal, or normal-map train. The wavelength
+    // remains above the 1.5 m production presentation-grid Nyquist limit.
+    const float AcrossMeters =
+        FVector2D::DotProduct(RelativePosition, WakeAcross);
+    const float ArmCenterMeters = 1.05f + AlongMeters * 0.52f;
+    const float ArmDistanceMeters =
+        FMath::Abs(AcrossMeters) - ArmCenterMeters;
+    constexpr float ArmEnvelopeMeters = 1.00f;
+    const float ArmEnvelope = FMath::Exp(
+        -0.5f * FMath::Square(ArmDistanceMeters / ArmEnvelopeMeters));
+    const float StartEnvelope = FMath::SmoothStep(
+        WakeStartMeters, WakeStartMeters + 2.0f, AlongMeters);
+    const float EndEnvelope = 1.0f - FMath::SmoothStep(
+        WakeLengthMeters - 5.0f, WakeLengthMeters, AlongMeters);
+    constexpr float WakeWavelengthMeters = 5.4f;
+    const float WavePhase =
+        ArmDistanceMeters * (2.0f * UE_PI / WakeWavelengthMeters) +
+        AlongMeters * 0.15f - PhaseSeconds * 1.35f;
+    // Six centimetres is large enough for the displaced surface normals and
+    // silhouette to read from the chase camera, while remaining a small,
+    // signed water ripple rather than the raised white ribbons this replaces.
+    constexpr float MaximumAmplitudeMeters = 0.060f;
+    return MaximumAmplitudeMeters * SafeStrength * StartEnvelope *
+        EndEnvelope * ArmEnvelope * FMath::Sin(WavePhase);
 }
 
 float ARaftSimWaterSurfaceActor::ComputePresentationHydraulicReliefDisplacementMeters(
@@ -1262,7 +1325,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     Normals.SetNum(VertCount);
     UVs.SetNum(VertCount);
     FlowVelocityMetersPerSecond.SetNumZeroed(VertCount);
+    BoatWakePresentationData.SetNumZeroed(VertCount);
     VertexColors.SetNum(VertCount);
+    PaddleWakeVertexColors.SetNumZeroed(VertCount);
     LiveVolumeCoreVertices.SetNum(VertCount);
     LiveVolumeCoreTriangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     RapidFoamVertices.SetNum(VertCount);
@@ -1322,6 +1387,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             Normals[Index] = FVector::UpVector;
             UVs[Index] = RiverCoordinatesM[Index] / kWaterTextureRepeatMeters;
             FlowVelocityMetersPerSecond[Index] = FVector2D::ZeroVector;
+            BoatWakePresentationData[Index] = FVector2D::ZeroVector;
             VertexColors[Index] = FLinearColor(
                 0.0f,
                 0.0f,
@@ -1331,6 +1397,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     GridStationN,
                     ResolvedVertexSpacingMeters,
                     CurvedGridEdgeBlendMeters));
+            PaddleWakeVertexColors[Index] = FLinearColor::Transparent;
             LiveVolumeCoreVertices[Index] = Vertices[Index];
             RapidFoamVertices[Index] = Vertices[Index];
             RapidFoamVertexColors[Index] = FLinearColor(
@@ -1365,11 +1432,27 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         Normals,
         UVs,
         FlowVelocityMetersPerSecond,
-        EmptyUVs,
+        BoatWakePresentationData,
         EmptyUVs,
         VertexColors,
         Tangents,
         /*bCreateCollision=*/false);
+    // A second section uses identical displaced vertices but a localized
+    // vertex-alpha mask. This keeps the authored river handoff transparent
+    // while giving the real wake geometry enough optical weight to read.
+    SurfaceMesh->CreateMeshSection_LinearColor(
+        1,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        FlowVelocityMetersPerSecond,
+        BoatWakePresentationData,
+        EmptyUVs,
+        PaddleWakeVertexColors,
+        Tangents,
+        /*bCreateCollision=*/false);
+    SurfaceMesh->SetMeshSectionVisible(1, false);
     LiveVolumeCoreMesh->SetVisibility(false, true);
     if (LiveVolumeCoreMaterial != nullptr)
     {
@@ -1492,6 +1575,10 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         // Solver mesh normals still carry the resolved flow shape; spray/mist
         // actors add aeration.
         SurfaceMesh->SetMaterial(0, WaterMaterial);
+        SurfaceMesh->SetMaterial(
+            1, PaddleWakeMaterial != nullptr
+                ? PaddleWakeMaterial.Get()
+                : WaterMaterial.Get());
         // Most maps retain an authored Single Layer Water surface and use this
         // as a transparent hydraulic-detail overlay. Physical source-corridor
         // maps deliberately hide their capture ribbon during play; their
@@ -1552,6 +1639,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     bLiveSurfaceCarrierEnabled
                         ? ResolvedLiveFoamIntensity
                         : 0.52f);
+                LiveWaterMaterial->SetScalarParameterValue(
+                    TEXT("LivePaddleWakeGeometryCoverage"), 0.0f);
                 if (!RiverWaterConfig)
                 {
                     // Training Eddy / dev tank: with no river volume core the
@@ -1598,6 +1687,27 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     }
                 }
             }
+        }
+    }
+    if (PaddleWakeMaterial != nullptr)
+    {
+        if (UMaterialInstanceDynamic* PaddleWakeDynamic =
+                SurfaceMesh->CreateDynamicMaterialInstance(
+                    1, PaddleWakeMaterial))
+        {
+            PaddleWakeDynamic->SetVectorParameterValue(
+                TEXT("PaddleWakeTroughColor"),
+                FLinearColor(0.008f, 0.020f, 0.025f, 1.0f));
+            PaddleWakeDynamic->SetVectorParameterValue(
+                TEXT("PaddleWakeCrestColor"),
+                FLinearColor(0.035f, 0.075f, 0.090f, 1.0f));
+            PaddleWakeDynamic->SetVectorParameterValue(
+                TEXT("PaddleWakeReflectedSkyColor"),
+                FLinearColor(0.050f, 0.095f, 0.120f, 1.0f));
+            PaddleWakeDynamic->SetScalarParameterValue(
+                TEXT("PaddleWakeReflectionStrength"), 0.18f);
+            PaddleWakeDynamic->SetScalarParameterValue(
+                TEXT("PaddleWakeOpacity"), 0.58f);
         }
     }
     if (BreakingWaterMaterial != nullptr)
@@ -2416,9 +2526,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     float SpeedMpsSum = 0.0f;
     float MaximumAbsoluteStandingWaveM = 0.0f;
     float MaximumAbsoluteHydraulicReliefM = 0.0f;
-    // Per-rebuild wake state: prune boulder footprints to this window's
-    // station range, and cache the raft's river-frame position/velocity so
-    // every vertex can evaluate the analytic boat wake cheaply.
+    // Per-rebuild presentation state: prune boulder footprints to this
+    // window and use the tick-sampled raft state to build the paddle wake
+    // height field once for all vertex and normal passes.
     WindowBoulderFootprintsSLR.Reset();
     if (BoulderFootprintsSLR.Num() > 0 && RiverCoordinatesM.Num() > 0)
     {
@@ -2440,11 +2550,64 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
         }
     }
-    // Boat wake state refreshes every Tick (SampleBoatWakeState) so the
-    // material-side wake moves continuously instead of jumping at each
-    // surface refresh; the members are already fresh here.
+    // Build a signed height field on the existing live mesh. This is actual
+    // vertex displacement: it does not touch foam, base color, roughness, or
+    // the retired material-normal wake. The 15 Hz mesh refresh advances the
+    // phase while the smoothed paddling envelope prevents command-edge pops.
+    TArray<float> BoatWakeDisplacementMeters;
+    BoatWakeDisplacementMeters.SetNumZeroed(WaterSamples.Num());
+    float MaximumAbsoluteBoatWakeM = 0.0f;
+    if (bBoatWakeValid && BoatWakePaddleEnvelope > 0.001f)
+    {
+        const float RelativeSpeedScale = FMath::Lerp(
+            0.55f,
+            1.0f,
+            FMath::Clamp(BoatWakeRelativeSpeedMps / 0.9f, 0.0f, 1.0f));
+        const float WakeStrength =
+            BoatWakePaddleEnvelope * RelativeSpeedScale;
+        for (int32 WakeIndex = 0;
+             WakeIndex < BoatWakeDisplacementMeters.Num();
+             ++WakeIndex)
+        {
+            if (WetVertexMask[WakeIndex] == 0)
+            {
+                continue;
+            }
+            const float DisplacementM =
+                ComputePaddleWakeDisplacementMeters(
+                    RiverCoordinatesM[WakeIndex],
+                    BoatRiverPositionM,
+                    BoatWakeTravelDirection,
+                    WakeStrength,
+                    PresentationPhaseSeconds);
+            BoatWakeDisplacementMeters[WakeIndex] = DisplacementM;
+            MaximumAbsoluteBoatWakeM = FMath::Max(
+                MaximumAbsoluteBoatWakeM, FMath::Abs(DisplacementM));
+        }
+    }
+    // UV2.x reveals only the actual displaced crest and trough bands.
+    // Keeping the signed zero crossings transparent separates the geometry
+    // into readable ripple arcs rather than one broad wake-coloured sheet.
+    BoatWakePresentationData.SetNumZeroed(
+        BoatWakeDisplacementMeters.Num());
+    for (int32 WakeIndex = 0;
+         WakeIndex < BoatWakeDisplacementMeters.Num();
+         ++WakeIndex)
+    {
+        if (WetVertexMask[WakeIndex] == 0)
+        {
+            continue;
+        }
+        BoatWakePresentationData[WakeIndex].X = FMath::SmoothStep(
+            0.010f,
+            0.035f,
+            FMath::Abs(BoatWakeDisplacementMeters[WakeIndex]));
+        BoatWakePresentationData[WakeIndex].Y = FMath::Clamp(
+            BoatWakeDisplacementMeters[WakeIndex] / 0.060f,
+            -1.0f,
+            1.0f);
+    }
     int32 WakeFoamVertexCount = 0;
-    float MaxWakeRelSpeed = 0.0f;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 0; X < GridStationN; ++X)
@@ -2577,11 +2740,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         }
                     }
                 }
-                // Boat wake presentation removed entirely: the WPO
-                // arms and normal trains read as flat white streaks
-                // at deck angles (playtest verdict). Boat state is
-                // still sampled for the future near-field patch.
+                // Keep the legacy positive-only boulder relief off this
+                // translucent carrier; its foam still follows solver-owned
+                // obstruction wakes. The paddle wake below is signed, small,
+                // and therefore reads as displaced water instead of a lifted
+                // milky sheet.
                 (void)WakeReliefM;
+                SurfaceZCm +=
+                    BoatWakeDisplacementMeters[Index] * kSurfCmPerM;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
                 MinimumWetLateralIndex[X] = FMath::Min(
@@ -2652,15 +2818,45 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             DerivativeSpanMeters;
                     }
                 }
+                float BoatWakeStationSlope = 0.0f;
+                if (X >= DerivativeStride &&
+                    X < GridStationN - DerivativeStride &&
+                    WetVertexMask[Index - DerivativeStride] != 0 &&
+                    WetVertexMask[Index + DerivativeStride] != 0)
+                {
+                    BoatWakeStationSlope =
+                        (BoatWakeDisplacementMeters[
+                             Index + DerivativeStride] -
+                            BoatWakeDisplacementMeters[
+                                Index - DerivativeStride]) /
+                        DerivativeSpanMeters;
+                }
+                float BoatWakeLateralSlope = 0.0f;
+                if (Y >= DerivativeStride &&
+                    Y < GridLateralN - DerivativeStride &&
+                    WetVertexMask[
+                        Index - DerivativeStride * GridStationN] != 0 &&
+                    WetVertexMask[
+                        Index + DerivativeStride * GridStationN] != 0)
+                {
+                    BoatWakeLateralSlope =
+                        (BoatWakeDisplacementMeters[
+                             Index + DerivativeStride * GridStationN] -
+                            BoatWakeDisplacementMeters[
+                                Index - DerivativeStride * GridStationN]) /
+                        DerivativeSpanMeters;
+                }
                 const FVector PresentationLocalNormal = FVector(
                     -(BaseStationSlope +
                         StandingWave.StationSlope *
                             ResolvedPresentationStandingWaveScale +
-                        ReliefStationSlope),
+                        ReliefStationSlope +
+                        BoatWakeStationSlope),
                     -(BaseLateralSlope +
                         StandingWave.LateralSlope *
                             ResolvedPresentationStandingWaveScale +
-                        ReliefLateralSlope),
+                        ReliefLateralSlope +
+                        BoatWakeLateralSlope),
                     1.0f).GetSafeNormal();
                 if (bUsesCurvedRiverCoordinates)
                 {
@@ -3493,25 +3689,18 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
-    static double LastWakeDiagnosticSeconds = -100.0;
-    const double NowDiagSeconds = GetWorld()->GetTimeSeconds();
-    if (NowDiagSeconds - LastWakeDiagnosticSeconds > 3.0)
+    PaddleWakeVertexColors = VertexColors;
+    int32 VisiblePaddleWakeVertexCount = 0;
+    for (int32 Index = 0; Index < PaddleWakeVertexColors.Num(); ++Index)
     {
-        LastWakeDiagnosticSeconds = NowDiagSeconds;
-        UE_LOG(LogTemp, Display,
-            TEXT("RaftSim boat wake diag: valid=%d boatSL=(%.1f %.1f) ")
-            TEXT("boatVel=(%.2f %.2f) maxRelSpeed=%.2f wakeVerts=%d ")
-            TEXT("windowBoulders=%d rapidFoamVerts=%d rapidFoamVis=%d ")
-            TEXT("rapidFoamMat=%s"),
-            bBoatWakeValid ? 1 : 0,
-            BoatRiverPositionM.X, BoatRiverPositionM.Y,
-            BoatRiverVelocityMps.X, BoatRiverVelocityMps.Y,
-            MaxWakeRelSpeed, WakeFoamVertexCount,
-            WindowBoulderFootprintsSLR.Num(),
-            VisibleRapidFoamVertexCount,
-            RapidFoamMesh && RapidFoamMesh->IsVisible() ? 1 : 0,
-            RapidFoamMaterial ? *RapidFoamMaterial->GetName()
-                              : TEXT("none"));
+        PaddleWakeVertexColors[Index].R = 0.0f;
+        PaddleWakeVertexColors[Index].A =
+            SurfacePresentationColors[Index].A *
+            BoatWakePresentationData[Index].X;
+        if (PaddleWakeVertexColors[Index].A > 0.05f)
+        {
+            ++VisiblePaddleWakeVertexCount;
+        }
     }
 
     const TArray<FVector2D> EmptyUVs;
@@ -3521,10 +3710,118 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         Normals,
         UVs,
         FlowVelocityMetersPerSecond,
-        EmptyUVs,
+        BoatWakePresentationData,
         EmptyUVs,
         SurfacePresentationColors,
         Tangents);
+
+    // Rebuild section 1 from only the triangles touched by the wake. Its
+    // topology is the bilateral ripple, while vertex alpha softly feathers
+    // the signed displaced crest/trough bands without sampling a texture.
+    int32 PaddleWakeRenderTriangleCount = 0;
+    if (MaximumAbsoluteBoatWakeM > 0.001f)
+    {
+        TArray<FVector> RippleVertices;
+        TArray<int32> RippleTriangles;
+        TArray<FVector> RippleNormals;
+        TArray<FVector2D> RippleUVs;
+        TArray<FVector2D> RippleFlowVelocity;
+        TArray<FVector2D> RipplePresentationData;
+        TArray<FLinearColor> RippleColors;
+        TArray<FProcMeshTangent> RippleTangents;
+        const int32 ReserveVertexCount =
+            FMath::Max(VisiblePaddleWakeVertexCount * 12, 96);
+        RippleVertices.Reserve(ReserveVertexCount);
+        RippleTriangles.Reserve(ReserveVertexCount);
+        RippleNormals.Reserve(ReserveVertexCount);
+        RippleUVs.Reserve(ReserveVertexCount);
+        RippleFlowVelocity.Reserve(ReserveVertexCount);
+        RipplePresentationData.Reserve(ReserveVertexCount);
+        RippleColors.Reserve(ReserveVertexCount);
+        RippleTangents.Reserve(ReserveVertexCount);
+        TMap<int32, FVector> RippleVertexCache;
+        RippleVertexCache.Reserve(VisiblePaddleWakeVertexCount * 2);
+
+        auto AppendRippleVertex = [&](int32 SourceIndex)
+        {
+            RippleTriangles.Add(RippleVertices.Num());
+            FVector RippleVertex = Vertices[SourceIndex];
+            if (const FVector* CachedVertex =
+                    RippleVertexCache.Find(SourceIndex))
+            {
+                RippleVertex = *CachedVertex;
+            }
+            else
+            {
+                FRaftSimWaterSample SupportSample;
+                if (WaterAdapter &&
+                    WaterAdapter->SampleRaftSupportSurfaceAtWorldPosition(
+                        RippleVertex, SupportSample) &&
+                    SupportSample.bWet)
+                {
+                    const float SupportBaseZCm =
+                        SupportSample.SurfaceHeightMeters * kSurfCmPerM +
+                        GetLiveSurfaceRenderLiftCm();
+                    RippleVertex.Z =
+                        SupportBaseZCm +
+                        BoatWakeDisplacementMeters[SourceIndex] * kSurfCmPerM;
+                }
+                RippleVertexCache.Add(SourceIndex, RippleVertex);
+            }
+            RippleVertices.Add(RippleVertex);
+            RippleNormals.Add(Normals[SourceIndex]);
+            RippleUVs.Add(UVs[SourceIndex]);
+            RippleFlowVelocity.Add(
+                FlowVelocityMetersPerSecond[SourceIndex]);
+            RipplePresentationData.Add(
+                BoatWakePresentationData[SourceIndex]);
+            RippleColors.Add(PaddleWakeVertexColors[SourceIndex]);
+            RippleTangents.Add(Tangents[SourceIndex]);
+        };
+        auto AppendRippleTriangle = [&](int32 A, int32 B, int32 C)
+        {
+            const float Coverage = FMath::Max3(
+                PaddleWakeVertexColors[A].A,
+                PaddleWakeVertexColors[B].A,
+                PaddleWakeVertexColors[C].A);
+            if (Coverage <= 0.02f)
+            {
+                return;
+            }
+            AppendRippleVertex(A);
+            AppendRippleVertex(B);
+            AppendRippleVertex(C);
+        };
+        for (int32 WakeY = 0; WakeY < GridLateralN - 1; ++WakeY)
+        {
+            for (int32 WakeX = 0; WakeX < GridStationN - 1; ++WakeX)
+            {
+                const int32 I0 = WakeY * GridStationN + WakeX;
+                const int32 I1 = I0 + 1;
+                const int32 I2 = I0 + GridStationN;
+                const int32 I3 = I2 + 1;
+                AppendRippleTriangle(I0, I2, I1);
+                AppendRippleTriangle(I1, I2, I3);
+            }
+        }
+        PaddleWakeRenderTriangleCount = RippleTriangles.Num() / 3;
+        SurfaceMesh->CreateMeshSection_LinearColor(
+            1,
+            RippleVertices,
+            RippleTriangles,
+            RippleNormals,
+            RippleUVs,
+            RippleFlowVelocity,
+            RipplePresentationData,
+            EmptyUVs,
+            RippleColors,
+            RippleTangents,
+            /*bCreateCollision=*/false);
+    }
+    SurfaceMesh->SetMeshSectionVisible(
+        1, PaddleWakeRenderTriangleCount > 0);
+
+
     const double RefreshCpuMilliseconds =
         (FPlatformTime::Seconds() - RefreshStartSeconds) * 1000.0;
     if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)
@@ -3632,6 +3929,8 @@ void ARaftSimWaterSurfaceActor::SetBreakingRollerVolumeRenderingEnabled(
 void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
 {
     bBoatWakeValid = false;
+    bBoatWakePaddling = false;
+    BoatWakeRelativeSpeedMps = 0.0f;
     if (!WaterAdapter || !WaterAdapter->HasRiverCoordinateMap())
     {
         return;
@@ -3641,10 +3940,20 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
     {
         return;
     }
-    const FVector RaftLocationCm = RaftIt->GetActorLocation();
+    ARaftSimRaftActor* Raft = *RaftIt;
+    const ERaftSimCrewCommand CrewCommand = Raft->GetActiveCrewCommand();
+    const bool bForceWake =
+        CVarRaftSimForceBoatWakeTest.GetValueOnGameThread() != 0;
+    bBoatWakePaddling = bForceWake ||
+        CrewCommand == ERaftSimCrewCommand::AllForward ||
+        CrewCommand == ERaftSimCrewCommand::AllBackward ||
+        CrewCommand == ERaftSimCrewCommand::TurnLeft ||
+        CrewCommand == ERaftSimCrewCommand::TurnRight ||
+        CrewCommand == ERaftSimCrewCommand::Stop;
+
+    const FVector RaftLocationCm = Raft->GetActorLocation();
     // The solver drives the raft kinematically, so GetVelocity() is zero;
-    // difference positions instead, then low-pass the result — raw
-    // per-frame differences swing the wake's V-arms and read as flicker.
+    // difference positions instead, then low-pass the result.
     const double NowSeconds = GetWorld()->GetTimeSeconds();
     FVector RaftVelocityCmS = FVector::ZeroVector;
     double DeltaSampleSeconds = 0.0;
@@ -3677,6 +3986,38 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
     BoatRiverPositionM = RaftSL;
     BoatRiverVelocityMps +=
         (InstantVelocityMps - BoatRiverVelocityMps) * SmoothingAlpha;
+
+    FVector2D FallbackTravelDirection(
+        FVector::DotProduct(Raft->GetActorForwardVector(), Tangent),
+        FVector::DotProduct(Raft->GetActorForwardVector(), LeftNormal));
+    if (CrewCommand == ERaftSimCrewCommand::AllBackward ||
+        CrewCommand == ERaftSimCrewCommand::Stop)
+    {
+        FallbackTravelDirection *= -1.0f;
+    }
+    FallbackTravelDirection = FallbackTravelDirection.GetSafeNormal();
+    if (FallbackTravelDirection.IsNearlyZero())
+    {
+        FallbackTravelDirection = FVector2D(1.0, 0.0);
+    }
+
+    FVector2D RelativeVelocityMps = BoatRiverVelocityMps;
+    if (!bForceWake)
+    {
+        FRaftSimWaterSample BoatWaterSample;
+        if (WaterAdapter->SampleWaterAtWorldPosition(
+                RaftLocationCm, BoatWaterSample) &&
+            BoatWaterSample.bWet)
+        {
+            RelativeVelocityMps -= FVector2D(
+                BoatWaterSample.VelocityMetersPerSecond.X,
+                BoatWaterSample.VelocityMetersPerSecond.Y);
+        }
+    }
+    BoatWakeRelativeSpeedMps = RelativeVelocityMps.Size();
+    BoatWakeTravelDirection = BoatWakeRelativeSpeedMps > 0.08f
+        ? RelativeVelocityMps / BoatWakeRelativeSpeedMps
+        : FallbackTravelDirection;
     bBoatWakeValid = true;
 }
 
@@ -3733,6 +4074,15 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
             PresentationWaveClockSeconds);
     }
     SampleBoatWakeState();
+    const float WakeEnvelopeTarget =
+        bBoatWakeValid && bBoatWakePaddling ? 1.0f : 0.0f;
+    // Catch quickly with the planted blades, then let the displaced water
+    // settle over roughly a stroke interval after paddling stops.
+    BoatWakePaddleEnvelope = FMath::FInterpTo(
+        BoatWakePaddleEnvelope,
+        WakeEnvelopeTarget,
+        FMath::Max(DeltaSeconds, 0.0f),
+        WakeEnvelopeTarget > BoatWakePaddleEnvelope ? 5.0f : 1.1f);
     if (SurfaceMesh)
     {
         const bool bHideOverlay =
@@ -3750,9 +4100,17 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
         {
             ClockParameters->SetScalarParameterValue(
                 TEXT("RaftSimWaveClockSeconds"), PresentationWaveClockSeconds);
+            // Keep the legacy gate hard-disabled even when a saved material
+            // package still contains the retired wake expressions. Rebuilding
+            // the C++ material authoring graph does not rewrite an existing
+            // derived South Fork parent, so forwarding bBoatWakeValid here
+            // could reactivate the old white V-shaped trail until that asset
+            // happened to be regenerated. Position/velocity continue to be
+            // published only for compatibility; the new wake uses CPU mesh
+            // displacement and never enables this material path.
             ClockParameters->SetScalarParameterValue(
                 TEXT("RaftSimWakeBoatEnable"),
-                bBoatWakeValid ? 1.0f : 0.0f);
+                0.0f);
             ClockParameters->SetScalarParameterValue(
                 TEXT("RaftSimWakeBoatStationM"),
                 static_cast<float>(BoatRiverPositionM.X));
