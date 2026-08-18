@@ -52,11 +52,12 @@ constexpr float kLiveVolumeCoreMinimumStationCoverage = 0.60f;
 constexpr float kLiveVolumeCoreOffsetCm = 1.0f;
 constexpr float kLiveVolumeCoreCalmDetailCoverage = 0.035f;
 constexpr float kLiveVolumeCoreActiveDetailCoverage = 0.14f;
-// Rivers that retain an authored Single Layer Water body still need the live
-// mesh to expose the current. This bounded translucent skin carries only
-// solver-velocity detail; the authored mesh remains the optical water volume.
-constexpr float kAuthoredCarrierCalmDetailCoverage = 0.12f;
-constexpr float kAuthoredCarrierActiveDetailCoverage = 0.42f;
+// Rivers that retain an authored Single Layer Water body must not show a
+// second calm-water skin. Reveal the live geometry only where solver foam or
+// obstruction activity drives the material, and let those breaking crests
+// reach full coverage instead of reading as a translucent raised water level.
+constexpr float kAuthoredCarrierCalmDetailCoverage = 0.0f;
+constexpr float kAuthoredCarrierActiveDetailCoverage = 1.0f;
 
 TAutoConsoleVariable<int32> CVarRaftSimDownstreamBoilMicrorelief(
     TEXT("RaftSim.Water.DownstreamBoilMicrorelief"),
@@ -422,6 +423,21 @@ float ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
     constexpr float MaximumAmplitudeMeters = 0.060f;
     return MaximumAmplitudeMeters * SafeStrength * StartEnvelope *
         EndEnvelope * ArmEnvelope * FMath::Sin(WavePhase);
+}
+
+FVector2D ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float BoulderRadiusMeters,
+    float WaterSpeedMetersPerSecond,
+    float PhaseSeconds)
+{
+    return URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
+        DownstreamMeters,
+        AcrossMeters,
+        BoulderRadiusMeters,
+        WaterSpeedMetersPerSecond,
+        PhaseSeconds);
 }
 
 float ARaftSimWaterSurfaceActor::ComputePresentationHydraulicReliefDisplacementMeters(
@@ -838,8 +854,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         RiverWaterConfig = *ConfigIt;
     }
     const bool bUsesAuthoredRiverPresentation = RiverWaterConfig != nullptr;
+    const bool bUsesSouthForkFullReachSingleSurface =
+        RiverWaterConfig && RiverWaterConfig->CookedFieldsDir.Contains(
+            TEXT("south_fork_american_chili_bar/full_hydraulics"),
+            ESearchCase::IgnoreCase);
     bLiveSurfaceCarrierEnabled =
-        RiverWaterConfig && RiverWaterConfig->bLiveSolverOwnsRuntimeRendering;
+        RiverWaterConfig &&
+        (RiverWaterConfig->bLiveSolverOwnsRuntimeRendering ||
+            bUsesSouthForkFullReachSingleSurface);
     if (!bLiveSurfaceCarrierEnabled)
     {
         // Backward-compatible migration for already-versioned physical maps:
@@ -1022,8 +1044,11 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     bLiveVolumeCoreEnabled =
         bLiveSurfaceCarrierEnabled &&
         (RiverWaterConfig->bEnableLiveSolverVolumeCore ||
-            bUsesMigratedLiveVolumeCore) &&
+            bUsesMigratedLiveVolumeCore ||
+            bUsesSouthForkFullReachSingleSurface) &&
         LiveVolumeCoreMaterial != nullptr;
+    bSingleLiveWaterSurfaceEnabled =
+        bUsesSouthForkFullReachSingleSurface && bLiveVolumeCoreEnabled;
     if (bLiveVolumeCoreEnabled)
     {
         // The core is the river body. Keep the Default Lit mesh as a thin
@@ -1035,6 +1060,15 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         ResolvedActiveLiveSurfaceCoverage = bUsesMigratedChilkoVolumeCore
             ? 0.0f
             : kLiveVolumeCoreActiveDetailCoverage;
+        if (bSingleLiveWaterSurfaceEnabled)
+        {
+            // South Fork uses one solver-conforming Single Layer Water
+            // carrier. Foam/lips may remain separate sparse features, but a
+            // translucent second water sheet must never cover the hull or
+            // boulders above this surface.
+            ResolvedCalmLiveSurfaceCoverage = 0.0f;
+            ResolvedActiveLiveSurfaceCoverage = 0.0f;
+        }
     }
     const FLinearColor ResolvedLiveShallowSurfaceColor =
         bUsesMigratedColoradoVolumeCore
@@ -1453,6 +1487,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         Tangents,
         /*bCreateCollision=*/false);
     SurfaceMesh->SetMeshSectionVisible(1, false);
+    SurfaceMesh->SetMeshSectionVisible(0, !bSingleLiveWaterSurfaceEnabled);
     LiveVolumeCoreMesh->SetVisibility(false, true);
     if (LiveVolumeCoreMaterial != nullptr)
     {
@@ -2607,6 +2642,77 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             -1.0f,
             1.0f);
     }
+    if (WaterAdapter)
+    {
+        TArray<URaftSimWaterRuntimeAdapter::FSupportBoulderFootprint>
+            SupportFootprints;
+        SupportFootprints.Reserve(BoulderFootprintsSLR.Num());
+        for (const FVector3f& Footprint : BoulderFootprintsSLR)
+        {
+            URaftSimWaterRuntimeAdapter::FSupportBoulderFootprint& Support =
+                SupportFootprints.AddDefaulted_GetRef();
+            Support.RiverCoordinatesMeters = FVector2D(
+                Footprint.X, Footprint.Y);
+            Support.RadiusMeters = Footprint.Z;
+        }
+        WaterAdapter->ConfigureRaftSupportBoulderFootprints(
+            SupportFootprints);
+    }
+
+    // Build the obstruction field before the vertex pass so its signed relief
+    // participates in central-difference normals. The old boulder path found
+    // the same Y arms but discarded WakeReliefM, leaving only pale foam
+    // streaks. Keep the strongest overlapping footprint at each vertex to
+    // avoid stacking nearby rocks into an artificial wall of water.
+    TArray<float> BoulderWakeDisplacementMeters;
+    BoulderWakeDisplacementMeters.SetNumZeroed(WaterSamples.Num());
+    TArray<float> BoulderWakeFoam;
+    BoulderWakeFoam.SetNumZeroed(WaterSamples.Num());
+    float MaximumAbsoluteBoulderWakeM = 0.0f;
+    for (int32 WakeIndex = 0;
+         WakeIndex < BoulderWakeDisplacementMeters.Num();
+         ++WakeIndex)
+    {
+        if (WetVertexMask[WakeIndex] == 0)
+        {
+            continue;
+        }
+        const FVector2D& Coordinate = RiverCoordinatesM[WakeIndex];
+        const float WaterSpeedMps =
+            WaterSamples[WakeIndex].VelocityMetersPerSecond.Size2D();
+        for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
+        {
+            const float DownstreamM =
+                static_cast<float>(Coordinate.X) - Footprint.X;
+            const float AcrossM =
+                static_cast<float>(Coordinate.Y) - Footprint.Y;
+            const FVector2D Wake = ComputeBoulderWakePresentation(
+                DownstreamM,
+                AcrossM,
+                Footprint.Z,
+                WaterSpeedMps,
+                PresentationPhaseSeconds);
+            const float PillowM = URaftSimWaterRuntimeAdapter::
+                ComputeCoupledBoulderPillowDisplacementMeters(
+                    DownstreamM,
+                    AcrossM,
+                    Footprint.Z,
+                    WaterSpeedMps);
+            const float CoupledDisplacementM = Wake.X + PillowM;
+            if (FMath::Abs(CoupledDisplacementM) >
+                FMath::Abs(BoulderWakeDisplacementMeters[WakeIndex]))
+            {
+                BoulderWakeDisplacementMeters[WakeIndex] =
+                    CoupledDisplacementM;
+            }
+            BoulderWakeFoam[WakeIndex] = FMath::Max(
+                BoulderWakeFoam[WakeIndex], static_cast<float>(Wake.Y));
+        }
+        MaximumAbsoluteBoulderWakeM = FMath::Max(
+            MaximumAbsoluteBoulderWakeM,
+            FMath::Abs(BoulderWakeDisplacementMeters[WakeIndex]));
+    }
+    LastMaximumAbsoluteBoulderWakeM = MaximumAbsoluteBoulderWakeM;
     int32 WakeFoamVertexCount = 0;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
@@ -2656,13 +2762,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             ResolvedPresentationStandingWaveScale +
                         HydraulicRelief) *
                         kSurfCmPerM +
-                    GetLiveSurfaceRenderLiftCm();
+                    GetResolvedLiveSurfaceRenderLiftCm();
                 // Obstruction wakes and boulder holes on the live sheet.
                 // The solver grid does not know placed boulders exist, so
                 // without the sink the translucent carrier shrouds every
                 // exposed rock to its tip; pillow/arm amplitudes mirror the
                 // baked band-mesh terms so the two surfaces agree.
-                float WakeReliefM = 0.0f;
                 const float VertexStationM =
                     static_cast<float>(RiverCoordinatesM[Index].X);
                 const float VertexLateralM =
@@ -2693,8 +2798,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             FMath::Min(BoulderCoreFade, 1.0f - SinkT);
                         continue;
                     }
-                    const float SpeedT = FMath::Clamp(
-                        (Speed - 1.1f) / 1.6f, 0.0f, 1.0f);
+                    const float SpeedT = FMath::SmoothStep(
+                        0.45f, 1.65f, Speed);
                     if (DeltaStationM < -0.35f * RadiusM &&
                         DistanceM < RadiusM * 1.9f)
                     {
@@ -2703,16 +2808,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 FMath::Abs(DistanceM - RadiusM * 1.1f) /
                                     (RadiusM * 0.85f),
                             0.0f, 1.0f);
-                        WakeReliefM = FMath::Max(
-                            WakeReliefM, 0.22f * SpeedT * Ring);
                         WakeFoamAdd = FMath::Max(
                             WakeFoamAdd, 0.85f * SpeedT * Ring);
                     }
                     else if (DeltaStationM > RadiusM * 0.3f)
                     {
-                        const float WakeT = FMath::Clamp(
-                            1.0f - DeltaStationM / (RadiusM * 10.0f),
-                            0.0f, 1.0f);
                         if (FMath::Abs(DeltaLateralM) < RadiusM * 1.05f)
                         {
                             const float TrailT = FMath::Clamp(
@@ -2722,32 +2822,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 WakeFoamAdd,
                                 0.55f * SpeedT * TrailT * TrailT);
                         }
-                        const float ArmOffsetM = FMath::Abs(
-                            FMath::Abs(DeltaLateralM) -
-                            DeltaStationM * 0.65f);
-                        const float ArmProfile = FMath::Clamp(
-                            1.0f - ArmOffsetM / 1.3f, 0.0f, 1.0f);
-                        if (ArmProfile > 0.0f)
-                        {
-                            const float ArmT =
-                                ArmProfile * WakeT * WakeT * SpeedT;
-                            WakeReliefM = FMath::Max(
-                                WakeReliefM,
-                                0.09f * FMath::Min(RadiusM, 2.0f) / 2.0f *
-                                    ArmT);
-                            WakeFoamAdd = FMath::Max(
-                                WakeFoamAdd, 0.40f * ArmT);
-                        }
                     }
                 }
-                // Keep the legacy positive-only boulder relief off this
-                // translucent carrier; its foam still follows solver-owned
-                // obstruction wakes. The paddle wake below is signed, small,
-                // and therefore reads as displaced water instead of a lifted
-                // milky sheet.
-                (void)WakeReliefM;
+                WakeFoamAdd = FMath::Max(
+                    WakeFoamAdd, BoulderWakeFoam[Index]);
                 SurfaceZCm +=
-                    BoatWakeDisplacementMeters[Index] * kSurfCmPerM;
+                    (BoulderWakeDisplacementMeters[Index] +
+                        BoatWakeDisplacementMeters[Index]) * kSurfCmPerM;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
                 MinimumWetLateralIndex[X] = FMath::Min(
@@ -2846,16 +2927,46 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 Index - DerivativeStride * GridStationN]) /
                         DerivativeSpanMeters;
                 }
+                float BoulderWakeStationSlope = 0.0f;
+                if (X >= DerivativeStride &&
+                    X < GridStationN - DerivativeStride &&
+                    WetVertexMask[Index - DerivativeStride] != 0 &&
+                    WetVertexMask[Index + DerivativeStride] != 0)
+                {
+                    BoulderWakeStationSlope =
+                        (BoulderWakeDisplacementMeters[
+                             Index + DerivativeStride] -
+                            BoulderWakeDisplacementMeters[
+                                Index - DerivativeStride]) /
+                        DerivativeSpanMeters;
+                }
+                float BoulderWakeLateralSlope = 0.0f;
+                if (Y >= DerivativeStride &&
+                    Y < GridLateralN - DerivativeStride &&
+                    WetVertexMask[
+                        Index - DerivativeStride * GridStationN] != 0 &&
+                    WetVertexMask[
+                        Index + DerivativeStride * GridStationN] != 0)
+                {
+                    BoulderWakeLateralSlope =
+                        (BoulderWakeDisplacementMeters[
+                             Index + DerivativeStride * GridStationN] -
+                            BoulderWakeDisplacementMeters[
+                                Index - DerivativeStride * GridStationN]) /
+                        DerivativeSpanMeters;
+                }
                 const FVector PresentationLocalNormal = FVector(
                     -(BaseStationSlope +
                         StandingWave.StationSlope *
                             ResolvedPresentationStandingWaveScale +
                         ReliefStationSlope +
+                        BoulderWakeStationSlope +
                         BoatWakeStationSlope),
                     -(BaseLateralSlope +
                         StandingWave.LateralSlope *
                             ResolvedPresentationStandingWaveScale +
                         ReliefLateralSlope +
+                        BoulderWakeLateralSlope +
                         BoatWakeLateralSlope),
                     1.0f).GetSafeNormal();
                 if (bUsesCurvedRiverCoordinates)
@@ -2924,6 +3035,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     : 0.0f);
         }
     }
+    LastBoulderWakeFoamVertexCount = WakeFoamVertexCount;
 
     // --- Breaking water at hydraulic jumps -------------------------------
     // A supercritical station running into a subcritical neighbour is the
@@ -3522,9 +3634,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
         for (int32 Index = 0; Index < Vertices.Num(); ++Index)
         {
-            LiveVolumeCoreVertices[Index] =
-                Vertices[Index] -
-                Normals[Index].GetSafeNormal() * kLiveVolumeCoreOffsetCm;
+            LiveVolumeCoreVertices[Index] = bSingleLiveWaterSurfaceEnabled
+                ? Vertices[Index]
+                : Vertices[Index] -
+                    Normals[Index].GetSafeNormal() * kLiveVolumeCoreOffsetCm;
         }
         if (bLivePresentationBankNaturalismEnabled)
         {
@@ -3639,10 +3752,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // advected crests opaque enough to survive the material's lace
             // mask and gameplay-distance mips. This is a smooth response to
             // the solver-owned foam field, not an authored rapid marker.
+            // Authored-water rivers already own their broad foam/current
+            // presentation. On those maps this raised masked sheet is only
+            // the opaque lace on the animated boulder wake; using the whole
+            // persistent foam field would recreate a second river texture.
+            const float FoamSignal = bLiveSurfaceCarrierEnabled
+                ? VertexColors[Index].R
+                : BoulderWakeFoam[Index];
             const float FocusedFoam = FMath::SmoothStep(
                 ResolvedRapidFoamFocusStart,
                 ResolvedRapidFoamFocusEnd,
-                VertexColors[Index].R) * ResolvedRapidFoamCoverageGain;
+                FoamSignal) * ResolvedRapidFoamCoverageGain;
             const float FoamCoverage = FMath::Clamp(
                 FocusedFoam * VertexColors[Index].A,
                 0.0f,
@@ -3661,13 +3781,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             UVs,
             RapidFoamVertexColors,
             Tangents);
-        // The raised foam sheet exists for live-carrier maps where the
-        // solver mesh is the visible water. On authored-band rivers the
-        // band surface owns all whitewater presentation, and this sheet —
-        // depth-buried at rest — surfaces through the (now full-amplitude)
-        // wave troughs as a broad white flicker chasing the raft.
+        // Carrier maps use this for the full solver foam field. Authored-band
+        // maps use it only for boulder-wake lace, which is masked (opaque foam
+        // with real holes) rather than another translucent water surface.
         RapidFoamMesh->SetVisibility(
-            bLiveSurfaceCarrierEnabled && VisibleRapidFoamVertexCount > 0,
+            VisibleRapidFoamVertexCount > 0 &&
+                (bLiveSurfaceCarrierEnabled ||
+                    WindowBoulderFootprintsSLR.Num() > 0),
             true);
     }
 
@@ -3836,6 +3956,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                  "foam_mean=%.4f foam_max=%.4f depth_mean_norm=%.4f speed_mean_norm=%.4f "
                  "depth_mean_m=%.3f speed_mean_mps=%.3f "
                  "standing_wave_abs_max_m=%.4f hydraulic_relief_abs_max_m=%.4f "
+                 "boulder_wake_abs_max_m=%.4f wake_foam_vertices=%d "
                  "volume_core_enabled=%d volume_core_triangles=%d "
                  "rapid_foam_vertices=%d rapid_foam_visible=%d "
                  "surface_smoothing=%d smoothing_strength=%.2f "
@@ -3858,6 +3979,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SpeedMpsSum / WetVertexCount,
             MaximumAbsoluteStandingWaveM,
             MaximumAbsoluteHydraulicReliefM,
+            MaximumAbsoluteBoulderWakeM,
+            WakeFoamVertexCount,
             bLiveVolumeCoreEnabled ? 1 : 0,
             LiveVolumeCoreTriangleCount,
             VisibleRapidFoamVertexCount,
@@ -3882,6 +4005,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MaximumAbsoluteHydraulicReliefM,
             MaximumAbsoluteStandingWaveM,
             WetVertexCount);
+    }
+    if (!bLoggedBoulderWakeDiagnostics &&
+        MaximumAbsoluteBoulderWakeM > 0.01f)
+    {
+        bLoggedBoulderWakeDiagnostics = true;
+        UE_LOG(
+            LogTemp,
+            Display,
+            TEXT("RaftSim live boulder wakes activated: footprints_in_window=%d "
+                 "abs_max_m=%.4f wake_foam_vertices=%d masked_foam_visible=%d"),
+            WindowBoulderFootprintsSLR.Num(),
+            MaximumAbsoluteBoulderWakeM,
+            WakeFoamVertexCount,
+            IsRapidFoamMeshVisible() ? 1 : 0);
     }
 }
 

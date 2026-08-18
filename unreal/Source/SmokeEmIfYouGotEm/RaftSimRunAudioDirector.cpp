@@ -371,12 +371,12 @@ void ARaftSimRunAudioDirector::Tick(float DeltaSeconds)
 
 void ARaftSimRunAudioDirector::ApplyMixToComponents()
 {
-    const TArray<TPair<UAudioComponent*, float>> Layers = {
+    const TArray<TPair<UAudioComponent*, float>> AudioLayers = {
         {RiverAudio, MixState.RiverBed}, {RapidAudio, MixState.RapidFeatures},
         {FoamAudio, MixState.FoamAndSpray}, {PaddleAudio, MixState.Paddle},
         {FabricAudio, MixState.FabricAndImpact}, {CrewAudio, MixState.CrewAndRescue},
         {AmbienceAudio, MixState.CanyonAmbience}, {MusicAudio, MixState.Music}};
-    for (const TPair<UAudioComponent*, float>& Layer : Layers)
+    for (const TPair<UAudioComponent*, float>& Layer : AudioLayers)
     {
         if (Layer.Key != nullptr)
         {
@@ -386,7 +386,7 @@ void ARaftSimRunAudioDirector::ApplyMixToComponents()
     }
     if (FMath::Abs(MixState.ReverbStrength - LastAppliedReverb) > 0.03f)
     {
-        for (const TPair<UAudioComponent*, float>& Layer : Layers)
+        for (const TPair<UAudioComponent*, float>& Layer : AudioLayers)
         {
             if (Layer.Key != nullptr)
             {

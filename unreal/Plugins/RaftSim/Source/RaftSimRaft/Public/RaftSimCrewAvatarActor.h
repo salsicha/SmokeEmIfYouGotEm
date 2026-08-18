@@ -138,7 +138,7 @@ public:
      * Hides this avatar's head and helmet so a first-person camera can sit
      * in its eye socket (possessed guide seat). Idempotent per value.
      */
-    void SetFirstPersonHeadHidden(bool bHidden);
+    void SetFirstPersonHeadHidden(bool bShouldHide);
 
     /**
      * World-space centre of the posed head. Valid while the head is hidden

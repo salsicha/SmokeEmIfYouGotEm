@@ -459,6 +459,7 @@ void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
         FMath::Clamp(HydraulicReliefScale, 0.0f, 1.0f);
 
     RaftSupportBreakingSites.Reset();
+    RaftSupportBoulderFootprints.Reset();
     RaftSupportBreakingCrestLiftMeters = 0.0f;
     RaftSupportBandField.Reset();
 
@@ -471,6 +472,127 @@ void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportSurface(
         RaftSupportSurfaceSmoothingStrength,
         RaftSupportStandingWaveScale,
         RaftSupportHydraulicReliefScale);
+}
+
+void URaftSimWaterRuntimeAdapter::ConfigureRaftSupportBoulderFootprints(
+    TConstArrayView<FSupportBoulderFootprint> Footprints)
+{
+    RaftSupportBoulderFootprints.Reset(Footprints.Num());
+    RaftSupportBoulderFootprints.Append(
+        Footprints.GetData(), Footprints.Num());
+}
+
+FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float BoulderRadiusMeters,
+    float WaterSpeedMetersPerSecond,
+    float PhaseSeconds)
+{
+    const float RadiusMeters = FMath::Max(BoulderRadiusMeters, 0.75f);
+    const float StartMeters = 0.35f * RadiusMeters;
+    const float EndMeters = 10.0f * RadiusMeters;
+    if (DownstreamMeters <= StartMeters || DownstreamMeters >= EndMeters)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    const float ArmCenterMeters =
+        0.85f * RadiusMeters + 0.62f * DownstreamMeters;
+    const float ArmDistanceMeters =
+        FMath::Abs(FMath::Abs(AcrossMeters) - ArmCenterMeters);
+    const float ArmWidthMeters = FMath::Max(1.20f, 0.72f * RadiusMeters);
+    const float ArmEnvelope = FMath::Exp(
+        -0.5f * FMath::Square(ArmDistanceMeters / ArmWidthMeters));
+    const float StartEnvelope = FMath::SmoothStep(
+        StartMeters, StartMeters + 1.5f * RadiusMeters, DownstreamMeters);
+    const float EndEnvelope = 1.0f - FMath::SmoothStep(
+        7.2f * RadiusMeters, EndMeters, DownstreamMeters);
+    const float SpeedEnvelope = FMath::SmoothStep(
+        0.45f, 1.65f, FMath::Max(WaterSpeedMetersPerSecond, 0.0f));
+    const float Envelope =
+        ArmEnvelope * StartEnvelope * EndEnvelope * SpeedEnvelope;
+    if (Envelope <= KINDA_SMALL_NUMBER)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    const float WavelengthMeters = FMath::Max(3.8f, 2.8f * RadiusMeters);
+    const float WavePhase =
+        DownstreamMeters * (2.0f * UE_PI / WavelengthMeters) -
+        PhaseSeconds * 1.90f;
+    const float Wave = FMath::Sin(WavePhase);
+    const float BreakingProfile = Wave >= 0.0f
+        ? FMath::Pow(Wave, 0.58f)
+        : 0.42f * Wave;
+    const float RadiusAmplitude = FMath::Lerp(
+        0.72f, 1.0f,
+        FMath::Clamp((RadiusMeters - 0.75f) / 1.25f, 0.0f, 1.0f));
+    constexpr float MaximumCrestAmplitudeMeters = 0.16f;
+    const float DisplacementMeters = MaximumCrestAmplitudeMeters *
+        RadiusAmplitude * Envelope * BreakingProfile;
+    const float CrestFoam = FMath::Clamp(
+        0.92f * Envelope *
+            FMath::Pow(FMath::Max(Wave, 0.0f), 0.38f),
+        0.0f, 1.0f);
+    return FVector2D(DisplacementMeters, CrestFoam);
+}
+
+float URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderPillowDisplacementMeters(
+    float DownstreamMeters,
+    float AcrossMeters,
+    float BoulderRadiusMeters,
+    float WaterSpeedMetersPerSecond)
+{
+    const float RadiusMeters = FMath::Max(BoulderRadiusMeters, 0.75f);
+    if (DownstreamMeters >= -0.35f * RadiusMeters)
+    {
+        return 0.0f;
+    }
+    const float DistanceMeters = FVector2D(
+        DownstreamMeters, AcrossMeters).Size();
+    if (DistanceMeters >= 1.95f * RadiusMeters)
+    {
+        return 0.0f;
+    }
+    const float Ring = FMath::Clamp(
+        1.0f - FMath::Abs(DistanceMeters - 1.10f * RadiusMeters) /
+            (0.85f * RadiusMeters),
+        0.0f, 1.0f);
+    const float NoseEnvelope = FMath::SmoothStep(
+        -1.95f * RadiusMeters, -0.35f * RadiusMeters, DownstreamMeters);
+    const float SpeedEnvelope = FMath::SmoothStep(
+        0.45f, 1.65f, FMath::Max(WaterSpeedMetersPerSecond, 0.0f));
+    return 0.22f * Ring * NoseEnvelope * SpeedEnvelope;
+}
+
+float URaftSimWaterRuntimeAdapter::
+    ComputeConfiguredBoulderSupportDisplacementMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds) const
+{
+    float StrongestDisplacementM = 0.0f;
+    for (const FSupportBoulderFootprint& Footprint :
+         RaftSupportBoulderFootprints)
+    {
+        const float DownstreamM = RiverCoordinatesMeters.X -
+            Footprint.RiverCoordinatesMeters.X;
+        const float AcrossM = RiverCoordinatesMeters.Y -
+            Footprint.RiverCoordinatesMeters.Y;
+        const float PillowM = ComputeCoupledBoulderPillowDisplacementMeters(
+            DownstreamM, AcrossM, Footprint.RadiusMeters,
+            WaterSpeedMetersPerSecond);
+        const float WakeM = ComputeCoupledBoulderWakePresentation(
+            DownstreamM, AcrossM, Footprint.RadiusMeters,
+            WaterSpeedMetersPerSecond, PhaseSeconds).X;
+        const float CandidateM = PillowM + WakeM;
+        if (FMath::Abs(CandidateM) > FMath::Abs(StrongestDisplacementM))
+        {
+            StrongestDisplacementM = CandidateM;
+        }
+    }
+    return StrongestDisplacementM;
 }
 
 bool URaftSimWaterRuntimeAdapter::FSupportBandField::Sample(
@@ -825,6 +947,19 @@ bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
                 RaftSupportBreakingCrestLiftMeters,
                 RaftSupportBreakingStationSpacingMeters) *
             RaftSupportHydraulicReliefScale;
+    }
+
+    if (RaftSupportBoulderFootprints.Num() > 0)
+    {
+        const UWorld* SupportWorld = GetWorld();
+        const float PhaseSeconds = PresentationWaveClockSeconds >= 0.0f
+            ? PresentationWaveClockSeconds
+            : (SupportWorld ? SupportWorld->GetTimeSeconds() : 0.0f);
+        const float WaterSpeedMps =
+            RawCenter.VelocityMetersPerSecond.Size2D();
+        OutSample.SurfaceHeightMeters +=
+            ComputeConfiguredBoulderSupportDisplacementMeters(
+                RiverCoordinatesM, WaterSpeedMps, PhaseSeconds);
     }
 
     // Legacy authored band water: carry the baked sculpt delta plus the same

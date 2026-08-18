@@ -58,6 +58,7 @@ private:
     // far enough — dereferencing it per tick silently froze window recentres
     // at a streaming-dependent distance (2026-08-14).
     FName CachedFlowBand;
+    bool bCachedLiveSolverOwnsRuntimeRendering = false;
     float TimeSinceVisibilityReapplySeconds = 0.0f;
     float CachedMovingWindowAdvanceM = 80.0f;
     float CachedMovingWindowStationExtentM = 320.0f;

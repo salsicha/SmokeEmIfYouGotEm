@@ -151,7 +151,7 @@ public:
 
     /** First-person guide seat: collapse the head bone like the boot-hidden
      * feet so the camera can sit in the eye socket. Applied every pose. */
-    void SetHeadHiddenForFirstPerson(bool bHidden) { bHeadHiddenForFirstPerson = bHidden; }
+    void SetHeadHiddenForFirstPerson(bool bShouldHide) { bHeadHiddenForFirstPerson = bShouldHide; }
 
     /** Uniform shell scale for the five similarly sized authored skulls. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")

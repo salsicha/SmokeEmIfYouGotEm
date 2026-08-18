@@ -54,6 +54,11 @@ void ARaftSimRiverWaterStreamingActor::BeginPlay()
         return;
     }
     CachedFlowBand = RiverConfig->FlowBand;
+    bCachedLiveSolverOwnsRuntimeRendering =
+        RiverConfig->bLiveSolverOwnsRuntimeRendering ||
+        RiverConfig->CookedFieldsDir.Contains(
+            TEXT("south_fork_american_chili_bar/full_hydraulics"),
+            ESearchCase::IgnoreCase);
     CachedMovingWindowAdvanceM = RiverConfig->MovingWindowAdvanceM;
     CachedMovingWindowStationExtentM = RiverConfig->MovingWindowStationExtentM;
     CachedMovingWindowLateralExtentM = RiverConfig->MovingWindowLateralExtentM;
@@ -252,7 +257,8 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
         // bake that floated over banks).
         if (bIsBandPresentation)
         {
-            Actor->SetActorHiddenInGame(!bActiveBand);
+            Actor->SetActorHiddenInGame(
+                bCachedLiveSolverOwnsRuntimeRendering || !bActiveBand);
         }
     }
 }
