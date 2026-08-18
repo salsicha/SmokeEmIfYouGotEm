@@ -10,6 +10,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimWaterRuntimeAdapter.h"
 #include "Tests/AutomationCommon.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -145,6 +146,80 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
                 WakeTravelDirection,
                 0.0f,
                 0.0f)));
+
+    constexpr float BoulderRadiusM = 1.5f;
+    constexpr float BoulderWakeDownstreamM = 6.0f;
+    const float BoulderWakeArmAcrossM =
+        0.85f * BoulderRadiusM + 0.62f * BoulderWakeDownstreamM;
+    const FVector2D PortBoulderWake =
+        ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
+            BoulderWakeDownstreamM,
+            BoulderWakeArmAcrossM,
+            BoulderRadiusM,
+            1.4f,
+            0.0f);
+    const FVector2D StarboardBoulderWake =
+        ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
+            BoulderWakeDownstreamM,
+            -BoulderWakeArmAcrossM,
+            BoulderRadiusM,
+            1.4f,
+            0.0f);
+    const FVector2D OppositeRollPhase =
+        ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
+            BoulderWakeDownstreamM,
+            BoulderWakeArmAcrossM,
+            BoulderRadiusM,
+            1.4f,
+            UE_PI / 1.90f);
+    const FVector2D BoulderWakeCenterline =
+        ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
+            BoulderWakeDownstreamM,
+            0.0f,
+            BoulderRadiusM,
+            1.4f,
+            0.0f);
+    Test->TestTrue(
+        TEXT("boulder wake forms symmetric downstream Y arms"),
+        FMath::Abs(PortBoulderWake.X) > 0.01f &&
+            FMath::IsNearlyEqual(
+                PortBoulderWake.X, StarboardBoulderWake.X, 1.0e-6f) &&
+            FMath::Abs(BoulderWakeCenterline.X) <
+                0.15f * FMath::Abs(PortBoulderWake.X));
+    Test->TestTrue(
+        TEXT("boulder wake crests roll downstream through signed relief"),
+        PortBoulderWake.X * OppositeRollPhase.X < 0.0f);
+    Test->TestTrue(
+        TEXT("boulder wake breaking crests generate bounded foam"),
+        FMath::Max(PortBoulderWake.Y, OppositeRollPhase.Y) > 0.25f &&
+            PortBoulderWake.Y >= 0.0f && PortBoulderWake.Y <= 1.0f &&
+            OppositeRollPhase.Y >= 0.0f && OppositeRollPhase.Y <= 1.0f);
+    Test->TestTrue(
+        TEXT("boulder wake remains inside its 16 cm displacement bound"),
+        FMath::Abs(PortBoulderWake.X) <= 0.1601f &&
+            FMath::Abs(OppositeRollPhase.X) <= 0.1601f);
+    Test->TestTrue(
+        TEXT("boulder wake cannot appear upstream of the obstruction"),
+        ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
+            -2.0f, 0.0f, BoulderRadiusM, 1.4f, 0.0f).IsNearlyZero());
+    const float BoulderPillowM = URaftSimWaterRuntimeAdapter::
+        ComputeCoupledBoulderPillowDisplacementMeters(
+            -1.1f * BoulderRadiusM,
+            0.0f,
+            BoulderRadiusM,
+            1.8f);
+    Test->TestTrue(
+        TEXT("boulder nose forms a positive pressure pillow"),
+        BoulderPillowM > 0.10f && BoulderPillowM <= 0.2201f);
+    Test->TestTrue(
+        TEXT("boulder pressure pillow does not appear downstream"),
+        FMath::IsNearlyZero(
+            URaftSimWaterRuntimeAdapter::
+                ComputeCoupledBoulderPillowDisplacementMeters(
+                    1.1f * BoulderRadiusM,
+                    0.0f,
+                    BoulderRadiusM,
+                    1.8f)));
 
     UMaterialParameterCollection* FoamOcclusionCollection =
         LoadObject<UMaterialParameterCollection>(

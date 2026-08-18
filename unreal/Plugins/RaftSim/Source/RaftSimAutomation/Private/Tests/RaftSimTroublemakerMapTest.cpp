@@ -308,11 +308,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
         else
         {
             Test->TestTrue(
-                TEXT("authored water retains a bounded live current-detail skin"),
+                TEXT("authored water has no duplicate calm skin and lets breaking crests reach full coverage"),
                 FMath::IsNearlyEqual(
-                    It->GetCalmLiveSurfaceCoverage(), 0.12f, 0.001f) &&
+                    It->GetCalmLiveSurfaceCoverage(), 0.0f, 0.001f) &&
                     FMath::IsNearlyEqual(
-                        It->GetActiveLiveSurfaceCoverage(), 0.42f, 0.001f));
+                        It->GetActiveLiveSurfaceCoverage(), 1.0f, 0.001f));
         }
 
         UProceduralMeshComponent* LiveSurfaceMesh = nullptr;
@@ -2383,15 +2383,52 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
     Test->TestNotNull(TEXT("South Fork full reach has a water runtime"), Water);
     if (Surface && Water)
     {
-        // This exact map retains a legacy authored water body, so the live
-        // solver mesh is a detail overlay. It must still drive the matching
-        // rigid support displacement or the first rapid renders over the raft.
-        Test->TestFalse(
-            TEXT("South Fork full reach retains legacy detail-overlay mode"),
+        Test->TestTrue(
+            TEXT("South Fork live solver owns the runtime waterline"),
             Surface->IsLiveSurfaceCarrierEnabled());
         Test->TestTrue(
-            TEXT("South Fork detail overlay couples visible rapid relief into raft support"),
+            TEXT("South Fork uses one solver-conforming base water surface"),
+            Surface->IsSingleLiveWaterSurfaceEnabled());
+        Test->TestTrue(
+            TEXT("South Fork single surface uses the visible Single Layer Water core"),
+            Surface->IsLiveVolumeCoreVisible());
+        Test->TestFalse(
+            TEXT("South Fork does not render a translucent second base sheet"),
+            Surface->IsTranslucentBaseSheetVisible());
+        int32 TaggedAuthoredWaterCount = 0;
+        bool bAllTaggedAuthoredWaterHidden = true;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            for (const FName& Tag : It->Tags)
+            {
+                if (Tag.ToString().StartsWith(TEXT("RaftSimFlowBand_")))
+                {
+                    ++TaggedAuthoredWaterCount;
+                    bAllTaggedAuthoredWaterHidden &= It->IsHidden();
+                    break;
+                }
+            }
+        }
+        Test->TestTrue(
+            TEXT("South Fork loads an authored capture-water actor to retire"),
+            TaggedAuthoredWaterCount > 0);
+        Test->TestTrue(
+            TEXT("South Fork hides every authored base-water actor during play"),
+            bAllTaggedAuthoredWaterHidden);
+        Test->TestTrue(
+            TEXT("South Fork visible rapid relief is coupled into raft support"),
             Water->IsRaftSupportSurfaceEnabled());
+        Test->TestTrue(
+            TEXT("South Fork boulder pillows and Y wakes are configured for raft support"),
+            Water->GetRaftSupportBoulderFootprintCount() > 0);
+        const float MeatGrinderPillowSupportM =
+            Water->ComputeConfiguredBoulderSupportDisplacementMeters(
+                FVector2D(904.84f - 2.54f * 1.10f, -3.02f),
+                1.8f,
+                0.0f);
+        Test->TestTrue(
+            TEXT("Meat Grinder upstream pillow raises the ridden surface"),
+            MeatGrinderPillowSupportM > 0.10f);
         Test->TestTrue(
             TEXT("South Fork support uses the rendered standing-wave scale"),
             FMath::IsNearlyEqual(
@@ -2425,7 +2462,7 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
             {
                 const float RenderSurfaceZCm =
                     SupportSample.SurfaceHeightMeters * 100.0f +
-                    ARaftSimWaterSurfaceActor::GetLiveSurfaceRenderLiftCm();
+                    Surface->GetResolvedLiveSurfaceRenderLiftCm();
                 const float RenderFreeboardCm =
                     FloorCenterZCm - RenderSurfaceZCm;
                 Test->AddInfo(FString::Printf(
@@ -2444,6 +2481,100 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
                     RenderFreeboardCm >= 5.0f);
             }
         }
+    }
+    return true;
+}
+
+DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(
+    FRaftSimMoveSouthForkToBoulderWakeCommand,
+    FAutomationTestBase*, Test,
+    float, TargetStationM);
+bool FRaftSimMoveSouthForkToBoulderWakeCommand::Update()
+{
+    UWorld* World = GetRiverTestWorld();
+    const UGameInstance* GI = World ? World->GetGameInstance() : nullptr;
+    URaftSimPhysicsBridgeSubsystem* Bridge =
+        GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+    URaftSimWaterRuntimeAdapter* Water =
+        Bridge ? Bridge->GetWaterRuntime() : nullptr;
+    ARaftSimRaftActor* Raft = nullptr;
+    if (World)
+    {
+        if (TActorIterator<ARaftSimRaftActor> It(World); It)
+        {
+            Raft = *It;
+        }
+    }
+    if (!World || !Water || !Raft)
+    {
+        Test->AddError(TEXT("Could not move South Fork to the first Meat Grinder boulder"));
+        return true;
+    }
+
+    constexpr float BoulderStationM = 904.84f;
+    const float TargetLateralM = FMath::IsNearlyEqual(
+        TargetStationM, BoulderStationM, 0.1f)
+        ? -3.02f
+        : 0.0f;
+    FVector BoulderWorldCm = FVector::ZeroVector;
+    FVector DownstreamWorldCm = FVector::ZeroVector;
+    if (!Water->RiverToWorldPosition(
+            FVector2D(TargetStationM, TargetLateralM),
+            Water->GetRiverVerticalDatumM(), BoulderWorldCm) ||
+        !Water->RiverToWorldPosition(
+            FVector2D(TargetStationM + 1.0f, TargetLateralM),
+            Water->GetRiverVerticalDatumM(), DownstreamWorldCm))
+    {
+        Test->AddError(TEXT("Could not resolve the first Meat Grinder boulder in world space"));
+        return true;
+    }
+    BoulderWorldCm.Z = Raft->GetActorLocation().Z;
+    const float FacingYawDegrees =
+        (DownstreamWorldCm - BoulderWorldCm).Rotation().Yaw;
+    Raft->TeleportForTesting(
+        BoulderWorldCm, FacingYawDegrees, /*bApplyFacing=*/true);
+    if (FMath::IsNearlyEqual(TargetStationM, BoulderStationM, 0.1f))
+    {
+        Test->AddInfo(TEXT("Moved the live water window to the first Meat Grinder boulder"));
+    }
+    return true;
+}
+
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimAssertSouthForkBoulderWakeCommand, FAutomationTestBase*, Test);
+bool FRaftSimAssertSouthForkBoulderWakeCommand::Update()
+{
+    UWorld* World = GetRiverTestWorld();
+    ARaftSimWaterSurfaceActor* Surface = nullptr;
+    if (World)
+    {
+        if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
+        {
+            Surface = *It;
+        }
+    }
+    Test->TestNotNull(TEXT("South Fork boulder check has a live water surface"), Surface);
+    if (Surface)
+    {
+        Test->TestTrue(
+            TEXT("Meat Grinder live window loads a cooked boulder footprint"),
+            Surface->GetCurrentBoulderFootprintCount() > 0);
+        Test->TestTrue(
+            TEXT("Meat Grinder boulder produces displaced rolling wake geometry"),
+            Surface->GetMaximumAbsoluteBoulderWakeMeters() > 0.01f);
+        Test->TestTrue(
+            TEXT("Meat Grinder boulder produces breaking wake foam"),
+            Surface->GetBoulderWakeFoamVertexCount() > 0);
+        Test->TestTrue(
+            TEXT("Meat Grinder breaking wake uses the visible masked foam sheet"),
+            Surface->IsRapidFoamMeshVisible());
+        Test->TestTrue(
+            TEXT("South Fork single surface has no duplicate calm live skin"),
+            FMath::IsNearlyZero(Surface->GetCalmLiveSurfaceCoverage(), 0.001f));
+        Test->TestTrue(
+            TEXT("South Fork single surface has no duplicate active live skin"),
+            FMath::IsNearlyZero(
+                Surface->GetActiveLiveSurfaceCoverage(), 0.001f));
     }
     return true;
 }
@@ -2488,6 +2619,20 @@ bool FRaftSimSouthForkFullReachSupportParityTest::RunTest(const FString&)
     AutomationOpenMap(MapPath);
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkSupportParityCommand(this));
+    // Advance through overlapping 80 m windows, matching the streamer's
+    // runtime contract. A direct 120 -> 905 m teleport is correctly rejected
+    // because it cannot transfer solver state across the intervening reach.
+    const float TraverseStationsM[] = {
+        200.0f, 280.0f, 360.0f, 440.0f, 520.0f,
+        600.0f, 680.0f, 760.0f, 840.0f, 904.84f};
+    for (const float StationM : TraverseStationsM)
+    {
+        ADD_LATENT_AUTOMATION_COMMAND(
+            FRaftSimMoveSouthForkToBoulderWakeCommand(this, StationM));
+        ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.6f));
+    }
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkBoulderWakeCommand(this));
     return true;
 }
 

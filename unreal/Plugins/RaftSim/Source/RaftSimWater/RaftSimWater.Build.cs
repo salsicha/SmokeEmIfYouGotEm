@@ -14,11 +14,15 @@ public class RaftSimWater : ModuleRules
         PublicDefinitions.Add("RAFTSIM_WATER_RUNTIME_HEADER_ONLY_BRIDGE=1");
         PublicIncludePaths.Add(Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../../physics/cpp/include")));
 
-        // Live game water: link the first-party FV solver static library
-        // (build via unreal/Scripts/build_solver_lib.sh). Guarded so the
-        // module still compiles before the lib exists on a fresh checkout.
+        // Live game water: link the first-party FV solver static library.
+        // Windows builds produce an MSVC .lib via build_solver_lib.ps1;
+        // macOS/Linux produce an archive via build_solver_lib.sh. Guarded so
+        // the module still compiles before the lib exists on a fresh checkout.
+        string SolverLibName = Target.Platform == UnrealTargetPlatform.Win64
+            ? "raftsim_water.lib"
+            : "libraftsim_water.a";
         string SolverLib = Path.GetFullPath(
-            Path.Combine(ModuleDirectory, "../../../../../physics/cpp/build-ue/libraftsim_water.a"));
+            Path.Combine(ModuleDirectory, "../../../../../physics/cpp/build-ue", SolverLibName));
         if (File.Exists(SolverLib))
         {
             PublicAdditionalLibraries.Add(SolverLib);

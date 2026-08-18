@@ -3030,6 +3030,8 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     WaterConfig->MovingWindowLateralExtentM = 80.0f;
     WaterConfig->MovingWindowAdvanceM = 80.0f;
     WaterConfig->bMapProvidesTerrain = true;
+    WaterConfig->bLiveSolverOwnsRuntimeRendering = true;
+    WaterConfig->bEnableLiveSolverVolumeCore = true;
     SetSpatiallyLoadedIfAllowed(WaterConfig, false);
 
     const FRotator StartRotation = StartTangent.Rotation();

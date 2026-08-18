@@ -2437,14 +2437,14 @@ FVector ARaftSimCrewAvatarActor::GetPoseHeadWorldLocationCm() const
     return Head ? Head->GetComponentLocation() : GetActorLocation();
 }
 
-void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bHidden)
+void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bShouldHide)
 {
-    if (bFirstPersonHeadHidden == bHidden)
+    if (bFirstPersonHeadHidden == bShouldHide)
     {
         return;
     }
-    bFirstPersonHeadHidden = bHidden;
-    const bool bVisible = !bHidden;
+    bFirstPersonHeadHidden = bShouldHide;
+    const bool bVisible = !bShouldHide;
     if (!bUsingProductionVisual)
     {
         // Procedural fallback: the head and helmet trio are ordinary parts.
@@ -2462,7 +2462,7 @@ void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bHidden)
     if (ARaftSimCC0CrewVisualActor* CC0Visual =
             Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
     {
-        CC0Visual->SetHeadHiddenForFirstPerson(bHidden);
+        CC0Visual->SetHeadHiddenForFirstPerson(bShouldHide);
     }
 }
 

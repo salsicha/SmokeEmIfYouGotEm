@@ -303,6 +303,42 @@ public:
         float Intensity = 0.0f;
     };
 
+    /** Cooked obstruction footprint shared by the visible solver carrier and
+     * rigid raft support. Coordinates are (station, river-left, radius). */
+    struct FSupportBoulderFootprint
+    {
+        FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
+        float RadiusMeters = 0.75f;
+    };
+
+    void ConfigureRaftSupportBoulderFootprints(
+        TConstArrayView<FSupportBoulderFootprint> Footprints);
+    int32 GetRaftSupportBoulderFootprintCount() const
+    {
+        return RaftSupportBoulderFootprints.Num();
+    }
+
+    /** Signed rolling Y-wake displacement (X) and crest foam (Y). */
+    static FVector2D ComputeCoupledBoulderWakePresentation(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float BoulderRadiusMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds);
+
+    /** Positive upstream pressure pillow around a boulder nose. */
+    static float ComputeCoupledBoulderPillowDisplacementMeters(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float BoulderRadiusMeters,
+        float WaterSpeedMetersPerSecond);
+
+    /** Strongest configured pillow/Y-wake term at one river coordinate. */
+    float ComputeConfiguredBoulderSupportDisplacementMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds) const;
+
     /**
      * Station-indexed mirror of the authored band-water bake: absolute baked
      * surface elevation and hydraulic band energy per (station row, lateral
@@ -496,6 +532,7 @@ private:
     float RaftSupportStandingWaveScale = 0.0f;
     float RaftSupportHydraulicReliefScale = 0.0f;
     TArray<FSupportBreakingSite> RaftSupportBreakingSites;
+    TArray<FSupportBoulderFootprint> RaftSupportBoulderFootprints;
     float RaftSupportBreakingCrestLiftMeters = 0.0f;
     float RaftSupportBreakingStationSpacingMeters = 1.0f;
     FSupportBandField RaftSupportBandField;

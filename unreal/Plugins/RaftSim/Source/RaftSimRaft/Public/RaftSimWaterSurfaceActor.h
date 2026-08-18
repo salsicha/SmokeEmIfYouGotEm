@@ -49,6 +49,19 @@ public:
         float Strength,
         float PhaseSeconds);
 
+    /** Animated wake shed by a cooked boulder footprint. X is
+     * signed vertical displacement in metres and Y is crest foam generation.
+     * The two arms diverge downstream from the rock and carry alternating
+     * breaking crests and troughs. The same bounded displacement is sampled
+     * by rigid raft support; solver depth, velocity, wet/dry state, D3, and D4
+     * remain authoritative and unchanged. */
+    static FVector2D ComputeBoulderWakePresentation(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float BoulderRadiusMeters,
+        float WaterSpeedMetersPerSecond,
+        float PhaseSeconds);
+
     /** Sharpens only relief already present in the sampled solver surface.
      * Symmetric station neighbours remove the local linear grade, so planar
      * or calm water receives no displacement. The bounded result is visual
@@ -236,6 +249,24 @@ public:
     }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetCurrentBoulderFootprintCount() const
+    {
+        return WindowBoulderFootprintsSLR.Num();
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    float GetMaximumAbsoluteBoulderWakeMeters() const
+    {
+        return LastMaximumAbsoluteBoulderWakeM;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    int32 GetBoulderWakeFoamVertexCount() const
+    {
+        return LastBoulderWakeFoamVertexCount;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     bool IsRapidFoamMeshVisible() const;
 
     /** True when this mesh is the river-wide visible carrier instead of a
@@ -244,6 +275,20 @@ public:
     bool IsLiveSurfaceCarrierEnabled() const
     {
         return bLiveSurfaceCarrierEnabled;
+    }
+
+    /** True when the solver-conforming Single Layer Water mesh is the only
+     * base water surface; the translucent detail sheet is not rendered. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsSingleLiveWaterSurfaceEnabled() const
+    {
+        return bSingleLiveWaterSurfaceEnabled;
+    }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
+    bool IsTranslucentBaseSheetVisible() const
+    {
+        return SurfaceMesh && SurfaceMesh->IsMeshSectionVisible(0);
     }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
@@ -303,6 +348,12 @@ public:
     static constexpr float GetLiveSurfaceRenderLiftCm()
     {
         return 2.0f;
+    }
+    float GetResolvedLiveSurfaceRenderLiftCm() const
+    {
+        return bSingleLiveWaterSurfaceEnabled
+            ? 0.0f
+            : GetLiveSurfaceRenderLiftCm();
     }
 
     /** True when an authored river uses the render-only subdivided surface.
@@ -540,6 +591,7 @@ private:
     float PresentationPhaseSeconds = 0.0f;
     bool bLoggedPresentationDiagnostics = false;
     bool bLoggedHydraulicReliefDiagnostics = false;
+    bool bLoggedBoulderWakeDiagnostics = false;
     bool bLoggedRaftInteriorWaterTransmission = false;
     FVector LastLoggedRaftInteriorWaterCenter = FVector::ZeroVector;
     bool bLoggedBreakingSiteDiagnostics = false;
@@ -561,10 +613,13 @@ private:
     int32 ActiveDownstreamBoilSiteCount = 0;
     float MaximumAbsoluteDownstreamBoilDisplacementMeters = 0.0f;
     int32 VisibleRapidFoamVertexCount = 0;
+    float LastMaximumAbsoluteBoulderWakeM = 0.0f;
+    int32 LastBoulderWakeFoamVertexCount = 0;
     int32 LiveVolumeCoreTriangleCount = 0;
     bool bBreakingRollerVolumeRenderingEnabled = true;
     bool bLiveSurfaceCarrierEnabled = false;
     bool bLiveVolumeCoreEnabled = false;
+    bool bSingleLiveWaterSurfaceEnabled = false;
     float ResolvedCalmLiveSurfaceCoverage = 0.0f;
     float ResolvedActiveLiveSurfaceCoverage = 0.0f;
     bool bLivePresentationSurfaceSmoothingEnabled = false;

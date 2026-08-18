@@ -481,7 +481,7 @@ bool CapturePreviewImageForSpec(
                 {
                     CaptureComponent->HideComponent(PrimitiveComponent);
                     HiddenState.ComponentStates.Add(
-                        {PrimitiveComponent, PrimitiveComponent->IsVisible(), PrimitiveComponent->bHiddenInGame});
+                        {PrimitiveComponent, PrimitiveComponent->IsVisible(), PrimitiveComponent->bHiddenInGame != 0});
                     PrimitiveComponent->SetVisibility(false, true);
                     PrimitiveComponent->SetHiddenInGame(true, true);
                     ++CulledReviewOnlyForegroundComponentCount;
@@ -538,7 +538,7 @@ bool CapturePreviewImageForSpec(
             State.ComponentStates.Add(
                 {PrimitiveComponent,
                  PrimitiveComponent->IsVisible(),
-                 PrimitiveComponent->bHiddenInGame});
+                 PrimitiveComponent->bHiddenInGame != 0});
             PrimitiveComponent->SetVisibility(true, true);
             PrimitiveComponent->SetHiddenInGame(false, true);
         }
