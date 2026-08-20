@@ -1416,8 +1416,12 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     ).read_text(encoding="utf-8")
     assert 'TEXT("ShallowWaterOpacity")), 0.76f' in water_presentation_source
     assert 'TEXT("DeepWaterOpacity")), 0.82f' in water_presentation_source
-    assert 'TEXT("HydraulicFoamIntensity")), 0.0f' in water_presentation_source
-    assert 'TEXT("HydraulicFoamCoverageGain")), 0.82f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamIntensity")), 1.0f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamCoverageGain")), 0.95f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamColorBreakupBias")), 1.0f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.0f' in water_presentation_source
+    assert 'TEXT("DriftFoamAerationGain")), 0.0f' in water_presentation_source
+    assert 'TEXT("DriftFoamSpeedGain")), 0.0f' in water_presentation_source
     assert 'TEXT("WaterRoughness")), 0.24f' in water_presentation_source
     assert 'TEXT("Specular")), 0.28f' in water_presentation_source
     assert 'TEXT("FresnelSpecular")), 0.18f' in water_presentation_source
@@ -1430,7 +1434,7 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert 'TEXT("CalmRippleStrength")), 0.075f' in water_presentation_source
     assert 'TEXT("FlowRippleStrength")), 0.160f' in water_presentation_source
     assert 'TEXT("FoamRippleStrength")), 0.150f' in water_presentation_source
-    assert "M_RaftSim_SouthForkRaftTransmissionWater" in water_presentation_source
+    assert "M_RaftSim_SouthForkRaftTransmissionWaterV2" in water_presentation_source
     assert "RaftSimRaftInteriorWaterTransmission" in water_presentation_source
     assert "RaftSimRaftInteriorWaterOpticalDepth" in water_presentation_source
     assert "RaftSimOpticalDepthResponse" in water_presentation_source
@@ -1919,7 +1923,8 @@ def test_broad_water_uses_project_owned_flow_aligned_solver_masked_foam_lace():
     )
     assert "FoamUv->UTiling = 0.42f" in material_source
     assert "FoamUv->VTiling = 0.93f" in material_source
-    assert "FoamPan->SpeedX = 0.018f" in material_source
+    assert "RaftSimUnifiedCurrentFoamFallback" in material_source
+    assert "AddCurrentAdvectedCoordinates(" in material_source
     assert "FoamBreakupSource = Mask(FoamLaceSample, true, false, false)" in (
         material_source
     )

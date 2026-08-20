@@ -2395,6 +2395,15 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
         Test->TestFalse(
             TEXT("South Fork does not render a translucent second base sheet"),
             Surface->IsTranslucentBaseSheetVisible());
+        Test->TestFalse(
+            TEXT("South Fork integrates foam into its single water surface"),
+            Surface->IsRapidFoamMeshVisible());
+        Test->TestFalse(
+            TEXT("South Fork single surface has no flashing breaking-lip texture"),
+            Surface->IsBreakingLipVisible());
+        Test->TestFalse(
+            TEXT("South Fork single surface has no flashing roller texture"),
+            Surface->IsBreakingRollerVolumeVisible());
         int32 TaggedAuthoredWaterCount = 0;
         bool bAllTaggedAuthoredWaterHidden = true;
         for (TActorIterator<AActor> It(World); It; ++It)
@@ -2565,9 +2574,13 @@ bool FRaftSimAssertSouthForkBoulderWakeCommand::Update()
         Test->TestTrue(
             TEXT("Meat Grinder boulder produces breaking wake foam"),
             Surface->GetBoulderWakeFoamVertexCount() > 0);
-        Test->TestTrue(
-            TEXT("Meat Grinder breaking wake uses the visible masked foam sheet"),
+        Test->TestFalse(
+            TEXT("Meat Grinder wake foam stays in the unified water surface"),
             Surface->IsRapidFoamMeshVisible());
+        Test->TestFalse(
+            TEXT("Meat Grinder crest remains in the unified water surface"),
+            Surface->IsBreakingLipVisible() ||
+                Surface->IsBreakingRollerVolumeVisible());
         Test->TestTrue(
             TEXT("South Fork single surface has no duplicate calm live skin"),
             FMath::IsNearlyZero(Surface->GetCalmLiveSurfaceCoverage(), 0.001f));

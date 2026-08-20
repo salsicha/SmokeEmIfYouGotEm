@@ -135,6 +135,78 @@ static UMaterialExpression* AddFoamCollectionScalarExpression(
     return Expression;
 }
 
+// Move every visible water pattern from one continuous current integral.
+// Multiplying a changing velocity by absolute material time changes the whole
+// UV phase whenever the sampled flow changes; independent panners add a second
+// apparent velocity. Both show up as foam that outruns a passive raft and as
+// full-pattern flashes at live-window refreshes. The surface actor integrates
+// the current once per frame and publishes that displacement in river metres.
+static UMaterialExpression* AddCurrentAdvectedCoordinates(
+    UMaterial* Material,
+    UMaterialExpression* BaseCoordinates,
+    float UTiling,
+    float VTiling,
+    float SlipFactor,
+    const TCHAR* Description)
+{
+    FString CollectionSummary;
+    UMaterialParameterCollection* Collection =
+        RaftSimEditorEnvironment::LoadOrCreateRaftFoamOcclusionCollection(
+            CollectionSummary);
+    if (!Collection)
+    {
+        return BaseCoordinates;
+    }
+
+    static const FName AdvectionName(TEXT("RaftSimFoamAdvectionMeters"));
+    UMaterialExpressionCollectionParameter* Displacement =
+        NewObject<UMaterialExpressionCollectionParameter>(Material);
+    Displacement->Collection = Collection;
+    Displacement->ParameterName = AdvectionName;
+    Displacement->ExpressionGUID = FGuid::NewGuid();
+    const int32 ParameterIndex =
+        Collection->VectorParameters.IndexOfByPredicate(
+            [](const FCollectionVectorParameter& Parameter)
+            {
+                return Parameter.ParameterName ==
+                    FName(TEXT("RaftSimFoamAdvectionMeters"));
+            });
+    if (ParameterIndex == INDEX_NONE)
+    {
+        return BaseCoordinates;
+    }
+    Displacement->ParameterId = Collection->VectorParameters[ParameterIndex].Id;
+    Material->GetExpressionCollection().AddExpression(Displacement);
+
+    UMaterialExpressionComponentMask* RiverDisplacement =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    RiverDisplacement->Input.Expression = Displacement;
+    RiverDisplacement->R = true;
+    RiverDisplacement->G = true;
+    Material->GetExpressionCollection().AddExpression(RiverDisplacement);
+
+    // UV0 stores river station/lateral divided by three metres. Subtracting
+    // accumulated current back-traces the texture, which makes its features
+    // travel downstream with the water at exactly the integrated flow speed.
+    UMaterialExpressionConstant2Vector* MetersToUv =
+        NewObject<UMaterialExpressionConstant2Vector>(Material);
+    MetersToUv->R = -UTiling * SlipFactor / 3.0f;
+    MetersToUv->G = -VTiling * SlipFactor / 3.0f;
+    Material->GetExpressionCollection().AddExpression(MetersToUv);
+    UMaterialExpressionMultiply* AdvectionUv =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    AdvectionUv->A.Expression = RiverDisplacement;
+    AdvectionUv->B.Expression = MetersToUv;
+    Material->GetExpressionCollection().AddExpression(AdvectionUv);
+    UMaterialExpressionAdd* AdvectedCoordinates =
+        NewObject<UMaterialExpressionAdd>(Material);
+    AdvectedCoordinates->Desc = Description;
+    AdvectedCoordinates->A.Expression = BaseCoordinates;
+    AdvectedCoordinates->B.Expression = AdvectionUv;
+    Material->GetExpressionCollection().AddExpression(AdvectedCoordinates);
+    return AdvectedCoordinates;
+}
+
 static UMaterial* BuildPhotorealRiverWaterMaterial(
     const TCHAR* PackagePath =
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater"),
@@ -348,35 +420,31 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     if (FrothLaceLight != nullptr && FrothLaceDense != nullptr)
     {
         auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
-                               float UTiling, float VTiling, float SpeedX,
-                               float SpeedY) -> UMaterialExpression* {
+                               float UTiling, float VTiling) -> UMaterialExpression* {
             UMaterialExpressionTextureCoordinate* FrothUv = Cast<
                 UMaterialExpressionTextureCoordinate>(Add(
                     NewObject<UMaterialExpressionTextureCoordinate>(Material)));
             FrothUv->UTiling = UTiling;
             FrothUv->VTiling = VTiling;
-            UMaterialExpressionPanner* FrothPan = Cast<UMaterialExpressionPanner>(
-                Add(NewObject<UMaterialExpressionPanner>(Material)));
-            FrothPan->SpeedX = SpeedX;
-            FrothPan->SpeedY = SpeedY;
-            FrothPan->Coordinate.Expression = FrothUv;
-            FrothPan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* FrothSampleNode = Cast<
                 UMaterialExpressionTextureSampleParameter2D>(Add(
                     NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
             FrothSampleNode->ParameterName = ParameterName;
             FrothSampleNode->Texture = Texture;
             FrothSampleNode->SamplerType = SAMPLERTYPE_Masks;
-            FrothSampleNode->Coordinates.Expression = FrothPan;
+            FrothSampleNode->Coordinates.Expression =
+                AddCurrentAdvectedCoordinates(
+                    Material, FrothUv, UTiling, VTiling, 1.0f,
+                    TEXT("RaftSimUnifiedCurrentFoamFroth"));
             FrothSampleNode->Group = TEXT("RaftSimPhotorealWater");
             return Mask(FrothSampleNode, true, false, false);
         };
         UMaterialExpression* LaceLight = FrothSample(
             FrothLaceLight, TEXT("WhitewaterFoamLace"),
-            0.26f, 0.58f, 0.018f, 0.0f);
+            0.26f, 0.58f);
         UMaterialExpression* LaceDense = FrothSample(
             FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
-            0.47f, 1.03f, -0.011f, 0.006f);
+            0.47f, 1.03f);
         UMaterialExpressionSaturate* ClottedFroth =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
@@ -395,17 +463,15 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 NewObject<UMaterialExpressionTextureCoordinate>(Material)));
         // One tile covers 7.1 m downstream and 3.2 m across the channel.
         FoamUv->UTiling = 0.42f; FoamUv->VTiling = 0.93f;
-        UMaterialExpressionPanner* FoamPan = Cast<UMaterialExpressionPanner>(
-            Add(NewObject<UMaterialExpressionPanner>(Material)));
-        FoamPan->SpeedX = 0.018f; FoamPan->SpeedY = 0.0f;
-        FoamPan->Coordinate.Expression = FoamUv;
-        FoamPan->Time.Expression = AddWaveClockTimeExpression(Material);
         UMaterialExpressionTextureSampleParameter2D* FoamLaceSample = Cast<
             UMaterialExpressionTextureSampleParameter2D>(Add(
                 NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
         FoamLaceSample->ParameterName = TEXT("WhitewaterFoamLace");
         FoamLaceSample->Texture = FoamLaceTexture; FoamLaceSample->SamplerType = SAMPLERTYPE_Masks;
-        FoamLaceSample->Coordinates.Expression = FoamPan; FoamLaceSample->Group = TEXT("RaftSimPhotorealWater");
+        FoamLaceSample->Coordinates.Expression = AddCurrentAdvectedCoordinates(
+            Material, FoamUv, 0.42f, 0.93f, 1.0f,
+            TEXT("RaftSimUnifiedCurrentFoamFallback"));
+        FoamLaceSample->Group = TEXT("RaftSimPhotorealWater");
         FoamBreakupSource = Mask(FoamLaceSample, true, false, false);
     }
     else
@@ -492,81 +558,29 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Add(C);
             return C;
         };
-        // Flowmap cycling. Speed varies across the channel, so a naive
-        // speed * absolute-time UV offset shears the sampled pattern without
-        // bound — minutes into a session the ripple/lace fields are dragged
-        // into featureless taffy streaks (and, because the lateral speed
-        // profile is symmetric, into patterns mirrored about the
-        // centerline). Two staggered phase clocks bound the accumulated
-        // offset to FlowCycleSeconds each and crossfade so the periodic
-        // reset is never visible: drift stays continuous, distortion stays
-        // bounded.
-        // The advection clock is the flow-warped wave clock, not raw time:
-        // tile compositing smooths the baked per-vertex speeds well below
-        // the live solve the hull rides (measured 1.3 vs 2.2 m/s at the
-        // first descent), so raw-time advection makes a drifting boat
-        // visibly outrun its own drift foam. The wave clock accelerates
-        // with the raft-local current (clamped 0.75-2.5x, ~1x with no fast
-        // water underneath), closing the gap exactly where the eye compares
-        // boat against foam. The live carrier stays on raw time — its UV1
-        // velocities are full-resolution, and warping them would
-        // double-scale.
-        UMaterialExpression* AdvectClock = AddWaveClockTimeExpression(Material);
-        UMaterialExpressionScalarParameter* CycleSeconds =
-            Scalar(TEXT("FlowCycleSeconds"), 9.0f);
-        UMaterialExpressionDivide* CycleT =
-            Cast<UMaterialExpressionDivide>(
-                Add(NewObject<UMaterialExpressionDivide>(Material)));
-        CycleT->A.Expression = AdvectClock;
-        CycleT->B.Expression = CycleSeconds;
-        const auto FracOf = [&](UMaterialExpression* In) -> UMaterialExpression*
-        {
-            UMaterialExpressionFrac* F =
-                NewObject<UMaterialExpressionFrac>(Material);
-            F->Input.Expression = In;
-            Add(F);
-            return F;
-        };
-        UMaterialExpression* PhaseA = FracOf(CycleT);
-        UMaterialExpression* PhaseB = FracOf(AddNode(CycleT, Const(0.5f)));
-        // Crossfade alpha toward the B layer: |2*PhaseA - 1| is 1 exactly
-        // when A resets and 0 when A is mid-cycle, so each layer carries
-        // the image only while its own offset is far from its reset jump.
-        UMaterialExpressionSubtract* PhaseACentered =
-            Cast<UMaterialExpressionSubtract>(
-                Add(NewObject<UMaterialExpressionSubtract>(Material)));
-        PhaseACentered->A.Expression = Mul(PhaseA, Const(2.0f));
-        PhaseACentered->B.Expression = Const(1.0f);
-        UMaterialExpressionMax* CycleAlpha =
-            Cast<UMaterialExpressionMax>(
-                Add(NewObject<UMaterialExpressionMax>(Material)));
-        CycleAlpha->A.Expression = PhaseACentered;
-        CycleAlpha->B.Expression = Mul(PhaseACentered, Const(-1.0f));
+        // All surface channels share the actor's continuous current integral.
+        // There is no wrapping phase or velocity*absolute-time product, so a
+        // flow change cannot reset the pattern and produce a white flash.
+        UMaterialExpression* PhaseA = Const(0.0f);
+        UMaterialExpression* PhaseB = PhaseA;
+        UMaterialExpression* CycleAlpha = PhaseA;
         const auto FlowAdvectedAt = [&](UMaterialExpression* Base,
                                         float UTilingValue,
+                                        float VTilingValue,
                                         float SlipFactor,
-                                        UMaterialExpression* Phase)
+                                        UMaterialExpression*)
             -> UMaterialExpression*
         {
-            UMaterialExpression* RateUvPerSec = Mul(
-                SpeedMask,
-                Const(8.0f / 3.0f * UTilingValue * SlipFactor));
-            UMaterialExpression* OffsetU = Mul(
-                Mul(Mul(Phase, CycleSeconds), RateUvPerSec), Const(-1.0f));
-            UMaterialExpressionAppendVector* Offset2D =
-                Cast<UMaterialExpressionAppendVector>(
-                    Add(NewObject<UMaterialExpressionAppendVector>(Material)));
-            Offset2D->A.Expression = OffsetU;
-            UMaterialExpression* ZeroV = Const(0.0f);
-            Offset2D->B.Expression = ZeroV;
-            return AddNode(Base, Offset2D);
+            return AddCurrentAdvectedCoordinates(
+                Material, Base, UTilingValue, VTilingValue, SlipFactor,
+                TEXT("RaftSimUnifiedCurrentWaterSurface"));
         };
-        UMaterialExpression* FlowUvA = FlowAdvectedAt(UV, 0.62f, 1.0f, PhaseA);
-        UMaterialExpression* FlowUvB = FlowAdvectedAt(UV, 0.62f, 1.0f, PhaseB);
+        UMaterialExpression* FlowUvA =
+            FlowAdvectedAt(UV, 0.62f, 0.90f, 1.0f, PhaseA);
+        UMaterialExpression* FlowUvB = FlowUvA;
         UMaterialExpression* FlowCrossUvA =
-            FlowAdvectedAt(CrossUv, 1.31f, 0.85f, PhaseA);
-        UMaterialExpression* FlowCrossUvB =
-            FlowAdvectedAt(CrossUv, 1.31f, 0.85f, PhaseB);
+            FlowAdvectedAt(CrossUv, 1.31f, 1.72f, 0.85f, PhaseA);
+        UMaterialExpression* FlowCrossUvB = FlowCrossUvA;
         // Lane field for the roughness section: two incommensurate sine
         // lanes (~2.5 m and ~1 m at this tiling), sheared slightly across
         // stream so they read as water lanes rather than bars. Built from
@@ -627,7 +641,8 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 Sample->Texture = FoamLaceTexture;
                 Sample->SamplerType = SAMPLERTYPE_Masks;
                 Sample->Coordinates.Expression =
-                    FlowAdvectedAt(LaceUv, UTilingValue, 1.0f, Phase);
+                    FlowAdvectedAt(
+                        LaceUv, UTilingValue, VTilingValue, 1.0f, Phase);
                 Sample->Group = TEXT("RaftSimPhotorealWater");
                 return Mask(Sample, true, false, false);
             };
@@ -724,19 +739,13 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                           float SpeedX,
                           float SpeedY) -> UMaterialExpression*
         {
-            UMaterialExpressionPanner* Pan =
-                Cast<UMaterialExpressionPanner>(Add(NewObject<UMaterialExpressionPanner>(Material)));
-            Pan->SpeedX = SpeedX;
-            Pan->SpeedY = SpeedY;
-            Pan->Coordinate.Expression = Coordinates;
-            Pan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* Sample =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(
                     Add(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
             Sample->ParameterName = ParameterName;
             Sample->Texture = DetailNormal;
             Sample->SamplerType = SAMPLERTYPE_Normal;
-            Sample->Coordinates.Expression = Pan;
+            Sample->Coordinates.Expression = Coordinates;
             Sample->Group = TEXT("RaftSimPhotorealWater");
             return Sample;
         };
@@ -763,9 +772,8 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         FineUvCoord->UTiling = 4.0f;
         FineUvCoord->VTiling = 5.3f;
         UMaterialExpression* FineUvA =
-            FlowAdvectedAt(FineUvCoord, 4.0f, 1.0f, PhaseA);
-        UMaterialExpression* FineUvB =
-            FlowAdvectedAt(FineUvCoord, 4.0f, 1.0f, PhaseB);
+            FlowAdvectedAt(FineUvCoord, 4.0f, 5.3f, 1.0f, PhaseA);
+        UMaterialExpression* FineUvB = FineUvA;
         UMaterialExpression* FineNormal = Lerp(
             Ripple(FineUvA, TEXT("WaterFlowNormalFineA"), 0.031f, -0.022f),
             Ripple(FineUvB, TEXT("WaterFlowNormalFineB"), 0.031f, -0.022f),
@@ -2345,35 +2353,30 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     if (FrothLaceLight != nullptr && FrothLaceDense != nullptr)
     {
         auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
-                               float UTiling, float VTiling, float SpeedX,
-                               float SpeedY) -> UMaterialExpression* {
+                               float UTiling, float VTiling) -> UMaterialExpression* {
             UMaterialExpressionTextureCoordinate* FrothUv =
                 Cast<UMaterialExpressionTextureCoordinate>(
                     Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
             FrothUv->UTiling = UTiling;
             FrothUv->VTiling = VTiling;
-            UMaterialExpressionPanner* FrothPan =
-                Cast<UMaterialExpressionPanner>(
-                    Add(NewObject<UMaterialExpressionPanner>(Material)));
-            FrothPan->Coordinate.Expression = FrothUv;
-            FrothPan->SpeedX = SpeedX;
-            FrothPan->SpeedY = SpeedY;
-            FrothPan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* FrothSampleNode =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(Add(
                     NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
             FrothSampleNode->ParameterName = ParameterName;
             FrothSampleNode->Texture = Texture;
             FrothSampleNode->SamplerType = SAMPLERTYPE_Masks;
-            FrothSampleNode->Coordinates.Expression = FrothPan;
+            FrothSampleNode->Coordinates.Expression =
+                AddCurrentAdvectedCoordinates(
+                    Material, FrothUv, UTiling, VTiling, 1.0f,
+                    TEXT("RaftSimUnifiedCurrentLiveFroth"));
             return Mask(FrothSampleNode, true, false, false);
         };
         UMaterialExpression* LaceLight = FrothSample(
             FrothLaceLight, TEXT("WhitewaterFrothLaceLight"),
-            0.22f, 0.53f, 0.021f, 0.004f);
+            0.22f, 0.53f);
         UMaterialExpression* LaceDense = FrothSample(
             FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
-            0.43f, 0.94f, -0.013f, 0.008f);
+            0.43f, 0.94f);
         // Sparse solver foam shows the open lace intersection; saturated
         // foam clots both scales together instead of brightening one repeat.
         // The knee gain clots mid-strength aeration early enough to read as
@@ -2450,40 +2453,15 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         CrossUv->UTiling = 1.48f;
         CrossUv->VTiling = 1.33f;
 
-        // UV0 is river position divided by three metres. UV1 is populated by
-        // the live surface actor with the current solver velocity in m/s in
-        // that same (downstream, river-left) basis. Back-tracing the detail
-        // coordinates by velocity * time therefore moves every visible ripple
-        // with the water instead of sliding a fixed-rate texture over it.
+        // UV1 remains the local solver velocity and only gates how strongly
+        // flow detail appears. It no longer participates in UV phase, so a
+        // velocity update cannot move or flash the texture discontinuously.
         UMaterialExpressionTextureCoordinate* FlowVelocityMps =
             Cast<UMaterialExpressionTextureCoordinate>(
                 Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
         FlowVelocityMps->CoordinateIndex = 1;
-        FlowVelocityMps->Desc = TEXT("RaftSimSolverVelocityMpsUV1");
-        UMaterialExpressionTime* FlowTime =
-            Cast<UMaterialExpressionTime>(
-                Add(NewObject<UMaterialExpressionTime>(Material)));
-        UMaterialExpressionScalarParameter* FlowAdvectionScale =
-            Scalar(TEXT("LiveFlowAdvectionScale"), 1.0f);
-        // Flowmap cycling — see the band parent for the full note. Solver
-        // velocity varies per vertex, so velocity * absolute-time offsets
-        // shear the sampled fields without bound; two staggered bounded
-        // phases crossfaded hide each reset while keeping drift continuous.
-        UMaterialExpressionScalarParameter* CycleSeconds =
-            Scalar(TEXT("LiveFlowCycleSeconds"), 9.0f);
-        UMaterialExpressionDivide* CycleT =
-            Cast<UMaterialExpressionDivide>(
-                Add(NewObject<UMaterialExpressionDivide>(Material)));
-        CycleT->A.Expression = FlowTime;
-        CycleT->B.Expression = CycleSeconds;
-        const auto FracOf = [&](UMaterialExpression* In) -> UMaterialExpression*
-        {
-            UMaterialExpressionFrac* F =
-                NewObject<UMaterialExpressionFrac>(Material);
-            F->Input.Expression = In;
-            Add(F);
-            return F;
-        };
+        FlowVelocityMps->Desc = TEXT("RaftSimSolverVelocityMagnitudeUV1");
+
         const auto ConstOf = [&](float Value) -> UMaterialExpression*
         {
             UMaterialExpressionConstant* C =
@@ -2492,75 +2470,44 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             Add(C);
             return C;
         };
-        UMaterialExpression* PhaseA = FracOf(CycleT);
-        UMaterialExpression* PhaseB = FracOf(AddNode(CycleT, ConstOf(0.5f)));
-        UMaterialExpressionSubtract* PhaseACentered =
-            Cast<UMaterialExpressionSubtract>(
-                Add(NewObject<UMaterialExpressionSubtract>(Material)));
-        PhaseACentered->A.Expression = Mul(PhaseA, ConstOf(2.0f));
-        PhaseACentered->B.Expression = ConstOf(1.0f);
-        UMaterialExpressionMax* CycleAlpha =
-            Cast<UMaterialExpressionMax>(
-                Add(NewObject<UMaterialExpressionMax>(Material)));
-        CycleAlpha->A.Expression = PhaseACentered;
-        CycleAlpha->B.Expression = Mul(PhaseACentered, ConstOf(-1.0f));
+        UMaterialExpression* PhaseA = ConstOf(0.0f);
+        UMaterialExpression* PhaseB = PhaseA;
+        UMaterialExpression* CycleAlpha = PhaseA;
         const auto FlowAdvectedAt = [&](UMaterialExpression* Base,
                                         float UTiling,
                                         float VTiling,
                                         const TCHAR* Description,
-                                        UMaterialExpression* Phase)
+                                        UMaterialExpression*)
             -> UMaterialExpression*
         {
-            UMaterialExpressionConstant2Vector* MetersPerSecondToUv =
-                Cast<UMaterialExpressionConstant2Vector>(
-                    Add(NewObject<UMaterialExpressionConstant2Vector>(Material)));
-            MetersPerSecondToUv->R = -UTiling / 3.0f;
-            MetersPerSecondToUv->G = -VTiling / 3.0f;
-            UMaterialExpression* OffsetUv = Mul(
-                Mul(
-                    Mul(FlowVelocityMps, MetersPerSecondToUv),
-                    FlowAdvectionScale),
-                Mul(Phase, CycleSeconds));
-            UMaterialExpressionAdd* AdvectedUv = AddNode(Base, OffsetUv);
-            AdvectedUv->Desc = Description;
-            return AdvectedUv;
+            return AddCurrentAdvectedCoordinates(
+                Material, Base, UTiling, VTiling, 1.0f, Description);
         };
         UMaterialExpression* FlowUvA = FlowAdvectedAt(
             UV, 0.74f, 1.02f,
-            TEXT("RaftSimSolverVelocityAdvectionPrimaryA"), PhaseA);
-        UMaterialExpression* FlowUvB = FlowAdvectedAt(
-            UV, 0.74f, 1.02f,
-            TEXT("RaftSimSolverVelocityAdvectionPrimaryB"), PhaseB);
+            TEXT("RaftSimUnifiedCurrentWaterSurface"), PhaseA);
+        UMaterialExpression* FlowUvB = FlowUvA;
         UMaterialExpression* FlowCrossUvA = FlowAdvectedAt(
             CrossUv, 1.48f, 1.33f,
-            TEXT("RaftSimSolverVelocityAdvectionCrossA"), PhaseA);
-        UMaterialExpression* FlowCrossUvB = FlowAdvectedAt(
-            CrossUv, 1.48f, 1.33f,
-            TEXT("RaftSimSolverVelocityAdvectionCrossB"), PhaseB);
+            TEXT("RaftSimUnifiedCurrentWaterSurface"), PhaseA);
+        UMaterialExpression* FlowCrossUvB = FlowCrossUvA;
         auto Ripple = [&](UMaterialExpression* Coordinates,
                           const TCHAR* ParameterName,
                           float SpeedX,
                           float SpeedY) -> UMaterialExpression*
         {
-            UMaterialExpressionPanner* Pan =
-                Cast<UMaterialExpressionPanner>(
-                    Add(NewObject<UMaterialExpressionPanner>(Material)));
-            Pan->SpeedX = SpeedX;
-            Pan->SpeedY = SpeedY;
-            Pan->Coordinate.Expression = Coordinates;
-            Pan->Time.Expression = AddWaveClockTimeExpression(Material);
             UMaterialExpressionTextureSampleParameter2D* Sample =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(
                     Add(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
             Sample->ParameterName = ParameterName;
             Sample->Texture = DetailNormal;
             Sample->SamplerType = SAMPLERTYPE_Normal;
-            Sample->Coordinates.Expression = Pan;
+            Sample->Coordinates.Expression = Coordinates;
             return Sample;
         };
-        // These small residual rates are local capillary churn. Bulk motion,
-        // including lateral current and reverse eddies, comes from UV1 and is
-        // exactly proportional to the live solver velocity.
+        // Both normal scales use the same integrated-current coordinates.
+        // Their former residual panners are intentionally gone: independent
+        // phase motion made the surface appear to slip past a drifting raft.
         UMaterialExpression* PrimaryNormal = Lerp(
             Ripple(FlowUvA, TEXT("LiveWaterFlowNormalPrimaryA"),
                    0.006f, 0.003f),
@@ -2602,7 +2549,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             LiveGrazingFilteredNormalStrength);
 
         // Flow streaks: lanes of roughness variation sampled at the same
-        // solver-advected coordinates as the ripple normals, so they slide
+        // current-advected coordinates as the ripple normals, so they slide
         // downstream at exactly the water's speed. The ripple normal alone
         // cannot carry the motion cue here — a ±6% slope texture at 0.18
         // strength, halved again by the grazing floor, disappears into the

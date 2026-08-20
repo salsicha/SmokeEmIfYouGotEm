@@ -372,6 +372,20 @@ public:
             : GetLiveSurfaceRenderLiftCm();
     }
 
+    /** Hydraulic crop large enough to contain the complete put-in rapid. */
+    static constexpr float GetSouthForkHydraulicWindowLengthMeters()
+    {
+        return 400.0f;
+    }
+
+    /** South Fork's live optical carrier extends beyond the hydraulic crop.
+     * Its render-only end aprons continue the sampled water grade, keeping a
+     * crop boundary from exposing riverbed in the forward view. */
+    static constexpr float GetSouthForkSingleSurfaceLengthMeters()
+    {
+        return 600.0f;
+    }
+
     /** True when an authored river uses the render-only subdivided surface.
      * This changes presentation sampling only; the adapter and all gameplay
      * water authority remain at their authored resolution. */
@@ -641,6 +655,9 @@ private:
     bool bLiveSurfaceCarrierEnabled = false;
     bool bLiveVolumeCoreEnabled = false;
     bool bSingleLiveWaterSurfaceEnabled = false;
+    /** True once the loaded South Fork parent exposes the explicit WPO gate.
+     * Older saved parents are cancelled analytically by the live mesh. */
+    bool bHasTravelingWaveWPOStrengthParameter = false;
     float ResolvedCalmLiveSurfaceCoverage = 0.0f;
     float ResolvedActiveLiveSurfaceCoverage = 0.0f;
     bool bLivePresentationSurfaceSmoothingEnabled = false;

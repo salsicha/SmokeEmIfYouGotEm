@@ -9,10 +9,25 @@ MATERIAL_SOURCE = (
     / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials"
     / "RaftSimEditorMaterialsBase.cpp"
 )
+UNIFIED_WATER_MATERIAL_SOURCE = (
+    ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials"
+    / "RaftSimEditorPhotorealMaterials.cpp"
+)
 RUNTIME_SOURCE = (
     ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private"
     / "RaftSimWaterSurfaceActor.cpp"
+)
+STREAMING_RUNTIME_SOURCE = (
+    ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private"
+    / "RaftSimRiverWaterStreamingActor.cpp"
+)
+SOUTH_FORK_WATER_PRESENTATION_SOURCE = (
+    ROOT
+    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment"
+    / "RaftSimEditorSouthForkWaterPresentation.cpp"
 )
 REVIEW = (
     ROOT
@@ -28,16 +43,19 @@ SUPERSEDING_SOURCE_HASHES = {
         "4037533415156d0d7cb5270dbdfaeaa0bf8a63a26c70f2b6aa75d51849f9bf69"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
-        "ed5cd8a0397a2fc4d453c66871392d11f96cf56b526a29a3045ca1b00c7cbba4"
+        "1d5095918ea577aed2bd856cdf24ceebdc73e7e2498b62545256ee9a85a9d978"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": (
+        "096c5ec81671830c509a89d75f51ce385bb4a389bf68e325c48fa1e47bd182cd"
     ),
     "physics/tests/test_editor_source_layout.py": (
-        "a96866c9be97ba8c8de00c9f04b7ccb03186efd80ab50ed87e4589de693208c6"
+        "cae66b6b6be5655f450015c60edf0a7fd776c5d775c9f0406dbd7455476edee9"
     ),
 }
 
 SUPERSEDING_ARTIFACT_HASHES = {
     "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": (
-        "96cae44cf9b54a8aa563583de0823df5eae164ee192e1997340e7b6295db5d56"
+        "941c756e8a1ae7ab8d51de9c7a65b785c5f0feb8119c03126aeaa3b99906f4ef"
     ),
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_native.json": (
         "de9cd54f3671da6c0fa6676699bdb588b956e73b56d28619fa4284ee705c61b2"
@@ -77,6 +95,83 @@ def test_shared_foam_does_not_move_solver_or_physics_authority() -> None:
     assert "RaftSimFoamAdvectionMeters" in runtime
     assert "RapidFoamMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision)" in runtime
     assert "RapidFoamMesh->SetCastShadow(false)" in runtime
+
+
+def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> None:
+    runtime = RUNTIME_SOURCE.read_text()
+    material = UNIFIED_WATER_MATERIAL_SOURCE.read_text()
+    south_fork = SOUTH_FORK_WATER_PRESENTATION_SOURCE.read_text()
+    assert "!bSingleLiveWaterSurfaceEnabled &&" in runtime
+    assert "if (bSingleLiveWaterSurfaceEnabled)" in runtime
+    assert "HideBreakingLipMesh();" in runtime
+    assert "HideBreakingRollerVolumeMesh();" in runtime
+    assert 'TEXT("HydraulicFoamColorBreakupBias"), 1.0f' in runtime
+    assert 'TEXT("DriftFoamOpacity"), 0.0f' in runtime
+    assert 'TEXT("CalmRippleStrength"), 0.0f' in runtime
+    assert 'TEXT("FlowRippleStrength"), 0.0f' in runtime
+    assert 'TEXT("FoamRippleStrength"), 0.0f' in runtime
+    assert 'TEXT("LiveFlowStreakRoughness"), 0.0f' in runtime
+    assert 'TEXT("LiveFlowStreakTint"), 0.0f' in runtime
+    assert 'TEXT("FlowStreakRoughness"), 0.0f' in runtime
+    assert 'TEXT("FlowStreakSpeedGain"), 0.0f' in runtime
+    assert 'TEXT("CalmSurfaceColorVariation"), 0.0f' in runtime
+    assert 'TEXT("FallbackSkyReflectionVariation"), 0.0f' in runtime
+    assert 'TEXT("FallbackSkyReflectionFloor"), 1.0f' in runtime
+    assert 'TEXT("SouthForkTravelingWaveWPOStrength"), 0.0f' in runtime
+    assert "bHasTravelingWaveWPOStrengthParameter" in runtime
+    assert "LegacyMaterialWPOCounterM = 0.012f" in runtime
+    assert "PresentationWaveClockSeconds = 0.0f" in runtime
+    assert "bSingleLiveWaterSurfaceEnabled ? 8 : 1" in runtime
+    assert "bSingleLiveWaterSurfaceEnabled ||" in runtime
+    assert "bSingleLiveWaterSurfaceEnabled\n            ? 1.0f" in runtime
+    assert "ResolvedPresentationStandingWaveScale = bSingleLiveWaterSurfaceEnabled" in runtime
+    assert "FoamAttackBlend" in runtime
+    assert "SourceFoam[Index] > Advected" in runtime
+    assert "RaftSimUnifiedCurrentWaterSurface" in material
+    assert "RaftSimUnifiedCurrentFoamFroth" in material
+    assert "RaftSimUnifiedCurrentLiveFroth" in material
+    assert "MetersToUv->R = -UTiling * SlipFactor / 3.0f" in material
+    assert "MetersToUv->G = -VTiling * SlipFactor / 3.0f" in material
+    assert "M_RaftSim_SouthForkRaftTransmissionWaterV2" in south_fork
+    assert 'TEXT("HydraulicFoamColorBreakupBias")), 1.0f' in south_fork
+    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.0f' in south_fork
+    assert 'TEXT("DriftFoamAerationGain")), 0.0f' in south_fork
+    assert 'TEXT("DriftFoamSpeedGain")), 0.0f' in south_fork
+    assert 'TEXT("CalmRippleStrength")), 0.0f' in south_fork
+    assert 'TEXT("FlowRippleStrength")), 0.0f' in south_fork
+    assert 'TEXT("FoamRippleStrength")), 0.0f' in south_fork
+    assert 'TEXT("LiveFlowStreakRoughness")), 0.0f' in south_fork
+    assert 'TEXT("LiveFlowStreakTint")), 0.0f' in south_fork
+    assert 'TEXT("FlowStreakRoughness")), 0.0f' in south_fork
+    assert 'TEXT("FlowStreakSpeedGain")), 0.0f' in south_fork
+    assert 'TEXT("CalmSurfaceColorVariation")), 0.0f' in south_fork
+    assert 'TEXT("FallbackSkyReflectionVariation")), 0.0f' in south_fork
+    assert 'TEXT("FallbackSkyReflectionFloor")), 1.0f' in south_fork
+    assert 'TEXT("SouthForkTravelingWaveWPOStrength")), 0.0f' in south_fork
+    assert "RaftSimTravelingBakeWaveWPOStrengthGate" in south_fork
+
+
+def test_single_water_surface_continues_past_crop_without_changing_hydraulics() -> None:
+    runtime = RUNTIME_SOURCE.read_text()
+    assert "TArray<uint8> VolumeCoreWetMask = WetVertexMask" in runtime
+    assert "ExtendOpticalCore(FirstWetStation, -1)" in runtime
+    assert "ExtendOpticalCore(LastWetStation, 1)" in runtime
+    assert "Interior all-dry stations are not bridged" in runtime
+    assert "VolumeCoreWetMask[I0] != 0" in runtime
+    assert "VolumeCoreVertexColors[Index].R = 0.0f" in runtime
+    assert "WetVertexMask, WaterSamples, collision" in runtime
+
+
+def test_travel_keeps_shoreline_visibility_and_sampling_stable() -> None:
+    runtime = RUNTIME_SOURCE.read_text()
+    streaming = STREAMING_RUNTIME_SOURCE.read_text()
+    assert "Preserve the global presentation lattice" in runtime
+    assert "FMath::RoundToFloat(" in runtime
+    assert "Only the genuinely new leading edge is sampled anew" in runtime
+    assert "FWorldDelegates::LevelAddedToWorld.AddUObject" in streaming
+    assert "HandleLevelAddedToWorld" in streaming
+    assert "ApplyStaticFlowBandVisibilityToActor(Actor)" in streaming
+    assert "FWorldDelegates::LevelAddedToWorld.Remove" in streaming
 
 
 def test_shared_foam_review_is_fail_closed_and_hash_locked() -> None:

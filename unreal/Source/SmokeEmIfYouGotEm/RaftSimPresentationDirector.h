@@ -101,6 +101,9 @@ private:
 
     FRaftSimPresentationEnvironmentState CurrentState;
     FRaftSimPresentationEnvironmentState TargetState;
+    /** South Fork keeps sparse high clouds in its clear-morning preset so
+     * Single Layer Water can be reviewed against a changing captured sky. */
+    bool bClearMorningCloudsEnabled = false;
     float ElapsedSeconds = 0.0f;
     float TargetSunPitch = -42.0f;
     float TargetSunYaw = -128.0f;

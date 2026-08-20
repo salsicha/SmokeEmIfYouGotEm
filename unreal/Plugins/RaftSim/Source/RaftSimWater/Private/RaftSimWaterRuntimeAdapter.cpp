@@ -370,15 +370,27 @@ float URaftSimWaterRuntimeAdapter::ComputeCoupledSmoothedSurfaceHeightMeters(
     float RiverLeftSurfaceHeightMeters,
     float Strength)
 {
-    const float FilteredSurfaceHeightMeters =
-        CenterSurfaceHeightMeters * 0.44f +
-        (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters +
-            RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) *
-            0.14f;
+    const float SafeStrength = FMath::Clamp(Strength, 0.0f, 1.0f);
+    // A strength of one is reserved for South Fork's single live carrier.
+    // Its cooked field repeats station rows across the channel; the ordinary
+    // isotropic kernel retains 44% of an alternating row signal, which reads
+    // as white transverse stripes at grazing angles. This directional kernel
+    // has a zero at that station-row frequency, preserves a linear river
+    // grade exactly, and retains one quarter of the cross-channel shape.
+    const float FilteredSurfaceHeightMeters = SafeStrength >= 0.999f
+        ? CenterSurfaceHeightMeters * 0.25f +
+            (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters) *
+                0.25f +
+            (RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) *
+                0.125f
+        : CenterSurfaceHeightMeters * 0.44f +
+            (UpstreamSurfaceHeightMeters + DownstreamSurfaceHeightMeters +
+                RiverRightSurfaceHeightMeters + RiverLeftSurfaceHeightMeters) *
+                0.14f;
     return FMath::Lerp(
         CenterSurfaceHeightMeters,
         FilteredSurfaceHeightMeters,
-        FMath::Clamp(Strength, 0.0f, 1.0f));
+        SafeStrength);
 }
 
 bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
