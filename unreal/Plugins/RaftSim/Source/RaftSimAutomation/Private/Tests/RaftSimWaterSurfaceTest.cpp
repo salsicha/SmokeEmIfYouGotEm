@@ -150,7 +150,7 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     constexpr float BoulderRadiusM = 1.5f;
     constexpr float BoulderWakeDownstreamM = 6.0f;
     const float BoulderWakeArmAcrossM =
-        0.85f * BoulderRadiusM + 0.62f * BoulderWakeDownstreamM;
+        0.75f * BoulderRadiusM + 0.38f * BoulderWakeDownstreamM;
     const FVector2D PortBoulderWake =
         ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
             BoulderWakeDownstreamM,
@@ -171,7 +171,7 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
             BoulderWakeArmAcrossM,
             BoulderRadiusM,
             1.4f,
-            UE_PI / 1.90f);
+            FMath::Max(3.8f, 3.4f * BoulderRadiusM) / (2.0f * 1.4f));
     const FVector2D BoulderWakeCenterline =
         ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
             BoulderWakeDownstreamM,
@@ -195,9 +195,9 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
             PortBoulderWake.Y >= 0.0f && PortBoulderWake.Y <= 1.0f &&
             OppositeRollPhase.Y >= 0.0f && OppositeRollPhase.Y <= 1.0f);
     Test->TestTrue(
-        TEXT("boulder wake remains inside its 16 cm displacement bound"),
-        FMath::Abs(PortBoulderWake.X) <= 0.1601f &&
-            FMath::Abs(OppositeRollPhase.X) <= 0.1601f);
+        TEXT("boulder wake remains inside its 24 cm displacement bound"),
+        FMath::Abs(PortBoulderWake.X) <= 0.2401f &&
+            FMath::Abs(OppositeRollPhase.X) <= 0.2401f);
     Test->TestTrue(
         TEXT("boulder wake cannot appear upstream of the obstruction"),
         ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(

@@ -210,6 +210,26 @@ bool FRaftSimFullReachTransitWindowTest::RunTest(const FString&)
         Adapter->ConfigureMovingRiverWindow(
             TransitFieldsDir, TEXT("median_runnable"),
             FVector2D(5000.0, 0.0), FVector2D(240.0, 80.0)));
+    const FString BaselineFieldPath =
+        URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(FPaths::Combine(
+            TransitFieldsDir,
+            TEXT("support_band_field_median_runnable.bin")));
+    TestTrue(
+        TEXT("full-reach terrain-clipped presentation baseline loads"),
+        Adapter->LoadPresentationBaselineFieldFromFile(BaselineFieldPath));
+    FRaftSimWaterSample BaselineWater;
+    TestTrue(
+        TEXT("presentation baseline retains wet organic channel center"),
+        Adapter->SamplePresentationBaselineFieldAtRiverCoordinates(
+            FVector2D(5000.0, 0.0), BaselineWater));
+    TestTrue(
+        TEXT("presentation baseline carries a downstream visual current"),
+        BaselineWater.bWet &&
+            BaselineWater.VelocityMetersPerSecond.X > 0.0f);
+    TestFalse(
+        TEXT("presentation baseline does not wet far terrain outside bank"),
+        Adapter->SamplePresentationBaselineFieldAtRiverCoordinates(
+            FVector2D(5000.0, 100.0), BaselineWater));
     TestTrue(TEXT("transit crop steps genuine solver"), Adapter->StepWater(1.0f / 60.0f));
     TestTrue(
         TEXT("downstream transit crop transfers overlap"),
