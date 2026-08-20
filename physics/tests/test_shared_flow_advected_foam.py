@@ -21,11 +21,29 @@ REVIEW = (
 )
 
 SUPERSEDING_SOURCE_HASHES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp": (
+        "a9c76ffdf199c6deb42d5b0553f5de2aaf77abefa7f5b2bcbfeb64700e536d5f"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": (
+        "4037533415156d0d7cb5270dbdfaeaa0bf8a63a26c70f2b6aa75d51849f9bf69"
+    ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
-        "fecc7e7eade231de27d039dcfaa033a6231f7712e71568701fda490791d08ac1"
+        "ed5cd8a0397a2fc4d453c66871392d11f96cf56b526a29a3045ca1b00c7cbba4"
     ),
     "physics/tests/test_editor_source_layout.py": (
-        "9206cc1ddc960383cab928f06f87d70d769a89fe2fbd467038bd46582c03a41f"
+        "a96866c9be97ba8c8de00c9f04b7ccb03186efd80ab50ed87e4589de693208c6"
+    ),
+}
+
+SUPERSEDING_ARTIFACT_HASHES = {
+    "unreal/Content/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate.uasset": (
+        "96cae44cf9b54a8aa563583de0823df5eae164ee192e1997340e7b6295db5d56"
+    ),
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_native.json": (
+        "de9cd54f3671da6c0fa6676699bdb588b956e73b56d28619fa4284ee705c61b2"
+    ),
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/shared_flow_advected_foam_v1_p2_p4.json": (
+        "842466540f12cd4b4648503f6e4f356233c61f63a8766a760953a962dd0524b9"
     ),
 }
 
@@ -33,21 +51,20 @@ SUPERSEDING_SOURCE_HASHES = {
 def test_shared_foam_is_lit_multiscale_and_solver_masked() -> None:
     source = MATERIAL_SOURCE.read_text()
     assert "Material->SetShadingModel(MSM_DefaultLit)" in source
-    assert 'TEXT("RaftSimFlowAdvectedFoamPrimary")' in source
-    assert 'TEXT("RaftSimFlowAdvectedFoamDetail")' in source
+    assert 'TEXT("RaftSimSolverCurrentAdvectedFoamPrimary")' in source
+    assert 'TEXT("RaftSimSolverCurrentAdvectedFoamDetail")' in source
     assert 'TEXT("RaftSimFlowAdvectedMultiscaleFoamV1")' in source
     assert source.count('ParameterName = TEXT("SolverOverlayFoamLace")') >= 2
-    assert "FoamPrimaryPanner->Coordinate.Expression = FoamCoordinates" in source
-    assert (
-        "FoamDetailPanner->Coordinate.Expression = FoamDetailCoordinates" in source
-    )
+    assert 'CollectionParameter(TEXT("RaftSimFoamAdvectionMeters"), false)' in source
+    assert "FoamPrimaryAdvectionUv->A.Expression = FoamAdvectionRiverMeters" in source
+    assert "FoamDetailAdvectionUv->A.Expression = FoamAdvectionRiverMeters" in source
     assert "SolverMaskedLace->A.Expression = VertexColor" in source
     assert "SolverMaskedLace->A.OutputIndex = 4" in source
     assert (
         "SolverMaskedLace->B.Expression = FlowAdvectedMultiscaleLace" in source
     )
     assert "OcclusionSafeFoamMask->B.Expression = RaftExclusion" in source
-    assert "Material->OpacityMaskClipValue = 0.18f" in source
+    assert "Material->OpacityMaskClipValue = 0.01f" in source
 
 
 def test_shared_foam_does_not_move_solver_or_physics_authority() -> None:
@@ -55,6 +72,9 @@ def test_shared_foam_does_not_move_solver_or_physics_authority() -> None:
     assert "SourceFoam[Index]" in runtime
     assert "VertexColors[Index].R = FinalFoam" in runtime
     assert "FocusedFoam * VertexColors[Index].A" in runtime
+    assert "SmoothRapidFoamCoverage(" in runtime
+    assert "FoamCoverage >= 0.01f" in runtime
+    assert "RaftSimFoamAdvectionMeters" in runtime
     assert "RapidFoamMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision)" in runtime
     assert "RapidFoamMesh->SetCastShadow(false)" in runtime
 
@@ -91,4 +111,6 @@ def test_shared_foam_review_is_fail_closed_and_hash_locked() -> None:
     for artifact in review["artifacts"]:
         path = ROOT / artifact["path"]
         assert path.exists()
-        assert hashlib.sha256(path.read_bytes()).hexdigest() == artifact["sha256"]
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == (
+            SUPERSEDING_ARTIFACT_HASHES.get(artifact["path"], artifact["sha256"])
+        )

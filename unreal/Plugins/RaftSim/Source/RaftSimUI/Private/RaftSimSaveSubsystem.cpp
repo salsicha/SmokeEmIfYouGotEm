@@ -160,15 +160,14 @@ void URaftSimSaveSubsystem::RecalculateLicenseAndUnlocks(URaftSimVerticalSliceSa
                 ? ERaftSimLicenseTier::TripLeader
                 : ERaftSimLicenseTier::Trainee;
 
-    Save->UnlockedScenarioIds.AddUnique(TEXT("training_eddy_basics"));
-    Save->UnlockedScenarioIds.AddUnique(TEXT("south_fork_upper"));
-    Save->UnlockedScenarioIds.AddUnique(TEXT("troublemaker_challenge"));
+    // Guide license is retained as career rank/progression feedback, but it no
+    // longer gates playable content. Every shipped scenario is available on a
+    // fresh or migrated profile; medals and XP describe accomplishment rather
+    // than withholding river access.
+    Save->UnlockedScenarioIds.Reset();
     for (const FRaftSimCareerScenarioDefinition& Scenario : URaftSimProgressionLibrary::GetScenarioCatalog())
     {
-        if (static_cast<int32>(Scenario.RequiredLicense) <= static_cast<int32>(Save->LicenseTier))
-        {
-            Save->UnlockedScenarioIds.AddUnique(Scenario.ScenarioId);
-        }
+        Save->UnlockedScenarioIds.AddUnique(Scenario.ScenarioId);
     }
 }
 
@@ -288,10 +287,6 @@ bool URaftSimSaveSubsystem::IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMod
     {
         return false;
     }
-    if (GameMode == ERaftSimGameMode::FreeRun)
-    {
-        return true;
-    }
     FRaftSimCareerScenarioDefinition Scenario;
     if (!URaftSimProgressionLibrary::FindScenario(ScenarioId, Scenario))
     {
@@ -301,7 +296,9 @@ bool URaftSimSaveSubsystem::IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMod
     {
         return Scenario.bTraining;
     }
-    return CurrentSave->UnlockedScenarioIds.Contains(ScenarioId);
+    // Guided Descent and Free Run expose every valid catalog entry. License
+    // tier remains a visible career rank only and never disables Start.
+    return true;
 }
 
 bool URaftSimSaveSubsystem::GetScenarioProgress(

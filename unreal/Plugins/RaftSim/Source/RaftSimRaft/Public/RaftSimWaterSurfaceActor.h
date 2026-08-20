@@ -174,6 +174,22 @@ public:
         bool bEnableNaturalism,
         float NaturalismAmplitudeMeters);
 
+    /** Integrates the material's river-space foam displacement from the live
+     * water velocity. The material subtracts this displacement from its UVs,
+     * so a passive raft and the fine foam lace share the same current speed. */
+    static FVector2D AdvanceFoamTextureAdvectionMeters(
+        const FVector2D& CurrentDisplacementMeters,
+        const FVector2D& WaterVelocityMetersPerSecond,
+        float DeltaSeconds);
+
+    /** Asymmetric temporal response for the masked foam sheet. New crests
+     * appear promptly, while falling coverage crosses the mask threshold
+     * gradually instead of flashing between 15 Hz surface refreshes. */
+    static float SmoothRapidFoamCoverage(
+        float PreviousCoverage,
+        float TargetCoverage,
+        float DeltaSeconds);
+
     /** One detected breaking-water site (a supercritical-to-subcritical
      * hydraulic jump resolved by the live solver field), exposed so bounded
      * aerosol/mist presentation can anchor to genuine whitewater. Positions
@@ -561,6 +577,7 @@ private:
     TArray<int32> LiveVolumeCoreTriangles;
     TArray<FVector> RapidFoamVertices;
     TArray<FLinearColor> RapidFoamVertexColors;
+    TArray<float> SmoothedRapidFoamCoverage;
     TArray<FProcMeshTangent> Tangents;
     float TimeSinceRefresh = 0.0f;
     /** Boulder footprints (station m, lateral m, radius m) loaded from the
@@ -589,6 +606,10 @@ private:
     float PresentationWaveClockSeconds = -1.0f;
     float SmoothedFlowClockScale = 1.0f;
     float PresentationPhaseSeconds = 0.0f;
+    /** Cumulative solver-current displacement published to the foam material
+     * each frame. This replaces independent texture panners. */
+    FVector2D FoamTextureAdvectionMeters = FVector2D::ZeroVector;
+    FVector2D SmoothedFoamTextureVelocityMps = FVector2D::ZeroVector;
     bool bLoggedPresentationDiagnostics = false;
     bool bLoggedHydraulicReliefDiagnostics = false;
     bool bLoggedBoulderWakeDiagnostics = false;

@@ -2687,6 +2687,13 @@ UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
         Collection->VectorParameters.Add(Parameter);
     };
     EnsureScalar(TEXT("RaftFoamExclusionEnabled"), 0.0f);
+    // Cumulative solver-current displacement in river station/lateral metres.
+    // The masked lace subtracts it from river UVs, keeping fine foam features
+    // stationary relative to a passive raft instead of adding fixed panners
+    // on top of the physical current.
+    EnsureVector(
+        TEXT("RaftSimFoamAdvectionMeters"),
+        FLinearColor::Transparent);
     EnsureVector(
         TEXT("RaftFoamExclusionCenterAndHalfWidthCm"),
         FLinearColor(0.0f, 0.0f, 0.0f, 190.0f));
@@ -2903,13 +2910,46 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     // generated candidate's translucent vertex-alpha pass could disappear
     // even though the same mesh rendered correctly with an opaque material.
     Material->BlendMode = BLEND_Masked;
-    Material->OpacityMaskClipValue = 0.18f;
+    // Keep exact black texture holes masked, but let smoothed solver coverage
+    // decay for several frames before it falls below the hard mask. A clip
+    // near the old coverage threshold made whole lace islands blink whenever
+    // a marginal vertex crossed that threshold at the 15 Hz surface refresh.
+    Material->OpacityMaskClipValue = 0.01f;
     Material->TwoSided = true;
 
     UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
     Material->GetExpressionCollection().AddExpression(VertexColor);
     UMaterialExpression* FoamMaskExpression = VertexColor;
     int32 FoamMaskOutputIndex = 4;
+    auto CollectionParameter =
+        [Material, FoamOcclusionCollection](FName Name, bool bScalar)
+            -> UMaterialExpressionCollectionParameter*
+    {
+        UMaterialExpressionCollectionParameter* Expression =
+            NewObject<UMaterialExpressionCollectionParameter>(Material);
+        Expression->Collection = FoamOcclusionCollection;
+        Expression->ParameterName = Name;
+        Expression->ExpressionGUID = FGuid::NewGuid();
+        const int32 ParameterIndex = bScalar
+            ? FoamOcclusionCollection->ScalarParameters.IndexOfByPredicate(
+                [Name](const FCollectionScalarParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                })
+            : FoamOcclusionCollection->VectorParameters.IndexOfByPredicate(
+                [Name](const FCollectionVectorParameter& Parameter)
+                {
+                    return Parameter.ParameterName == Name;
+                });
+        if (ParameterIndex != INDEX_NONE)
+        {
+            Expression->ParameterId = bScalar
+                ? FoamOcclusionCollection->ScalarParameters[ParameterIndex].Id
+                : FoamOcclusionCollection->VectorParameters[ParameterIndex].Id;
+        }
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
     UTexture2D* FoamLaceTexture = LoadObject<UTexture2D>(
         nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
@@ -2925,19 +2965,43 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
         FoamCoordinates->UTiling = 0.37f;
         FoamCoordinates->VTiling = 0.89f;
         Material->GetExpressionCollection().AddExpression(FoamCoordinates);
-        UMaterialExpressionPanner* FoamPrimaryPanner =
-            NewObject<UMaterialExpressionPanner>(Material);
-        FoamPrimaryPanner->Desc = TEXT("RaftSimFlowAdvectedFoamPrimary");
-        FoamPrimaryPanner->SpeedX = 0.073f;
-        FoamPrimaryPanner->SpeedY = 0.006f;
-        FoamPrimaryPanner->Coordinate.Expression = FoamCoordinates;
-        Material->GetExpressionCollection().AddExpression(FoamPrimaryPanner);
+        UMaterialExpressionCollectionParameter* FoamAdvectionMeters =
+            CollectionParameter(TEXT("RaftSimFoamAdvectionMeters"), false);
+        UMaterialExpressionComponentMask* FoamAdvectionRiverMeters =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        FoamAdvectionRiverMeters->Input.Expression = FoamAdvectionMeters;
+        FoamAdvectionRiverMeters->R = true;
+        FoamAdvectionRiverMeters->G = true;
+        Material->GetExpressionCollection().AddExpression(
+            FoamAdvectionRiverMeters);
+        UMaterialExpressionConstant2Vector* FoamPrimaryMetersToUv =
+            NewObject<UMaterialExpressionConstant2Vector>(Material);
+        FoamPrimaryMetersToUv->R = -0.37f / 3.0f;
+        FoamPrimaryMetersToUv->G = -0.89f / 3.0f;
+        Material->GetExpressionCollection().AddExpression(
+            FoamPrimaryMetersToUv);
+        UMaterialExpressionMultiply* FoamPrimaryAdvectionUv =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FoamPrimaryAdvectionUv->A.Expression = FoamAdvectionRiverMeters;
+        FoamPrimaryAdvectionUv->B.Expression = FoamPrimaryMetersToUv;
+        Material->GetExpressionCollection().AddExpression(
+            FoamPrimaryAdvectionUv);
+        UMaterialExpressionAdd* SolverAdvectedPrimaryCoordinates =
+            NewObject<UMaterialExpressionAdd>(Material);
+        SolverAdvectedPrimaryCoordinates->Desc =
+            TEXT("RaftSimSolverCurrentAdvectedFoamPrimary");
+        SolverAdvectedPrimaryCoordinates->A.Expression = FoamCoordinates;
+        SolverAdvectedPrimaryCoordinates->B.Expression =
+            FoamPrimaryAdvectionUv;
+        Material->GetExpressionCollection().AddExpression(
+            SolverAdvectedPrimaryCoordinates);
         UMaterialExpressionTextureSampleParameter2D* FoamLaceSample =
             NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
         FoamLaceSample->ParameterName = TEXT("SolverOverlayFoamLace");
         FoamLaceSample->Texture = FoamLaceTexture;
         FoamLaceSample->SamplerType = SAMPLERTYPE_Masks;
-        FoamLaceSample->Coordinates.Expression = FoamPrimaryPanner;
+        FoamLaceSample->Coordinates.Expression =
+            SolverAdvectedPrimaryCoordinates;
         Material->GetExpressionCollection().AddExpression(FoamLaceSample);
 
         UMaterialExpressionTextureCoordinate* FoamDetailCoordinates =
@@ -2945,13 +3009,26 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
         FoamDetailCoordinates->UTiling = 0.71f;
         FoamDetailCoordinates->VTiling = 1.57f;
         Material->GetExpressionCollection().AddExpression(FoamDetailCoordinates);
-        UMaterialExpressionPanner* FoamDetailPanner =
-            NewObject<UMaterialExpressionPanner>(Material);
-        FoamDetailPanner->Desc = TEXT("RaftSimFlowAdvectedFoamDetail");
-        FoamDetailPanner->SpeedX = 0.127f;
-        FoamDetailPanner->SpeedY = -0.011f;
-        FoamDetailPanner->Coordinate.Expression = FoamDetailCoordinates;
-        Material->GetExpressionCollection().AddExpression(FoamDetailPanner);
+        UMaterialExpressionConstant2Vector* FoamDetailMetersToUv =
+            NewObject<UMaterialExpressionConstant2Vector>(Material);
+        FoamDetailMetersToUv->R = -0.71f / 3.0f;
+        FoamDetailMetersToUv->G = -1.57f / 3.0f;
+        Material->GetExpressionCollection().AddExpression(
+            FoamDetailMetersToUv);
+        UMaterialExpressionMultiply* FoamDetailAdvectionUv =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        FoamDetailAdvectionUv->A.Expression = FoamAdvectionRiverMeters;
+        FoamDetailAdvectionUv->B.Expression = FoamDetailMetersToUv;
+        Material->GetExpressionCollection().AddExpression(
+            FoamDetailAdvectionUv);
+        UMaterialExpressionAdd* SolverAdvectedDetailCoordinates =
+            NewObject<UMaterialExpressionAdd>(Material);
+        SolverAdvectedDetailCoordinates->Desc =
+            TEXT("RaftSimSolverCurrentAdvectedFoamDetail");
+        SolverAdvectedDetailCoordinates->A.Expression = FoamDetailCoordinates;
+        SolverAdvectedDetailCoordinates->B.Expression = FoamDetailAdvectionUv;
+        Material->GetExpressionCollection().AddExpression(
+            SolverAdvectedDetailCoordinates);
         UMaterialExpressionTextureSampleParameter2D* FoamDetailSample =
             NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
         // Reusing the same named texture parameter lets every river keep its
@@ -2960,7 +3037,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
         FoamDetailSample->ParameterName = TEXT("SolverOverlayFoamLace");
         FoamDetailSample->Texture = FoamLaceTexture;
         FoamDetailSample->SamplerType = SAMPLERTYPE_Masks;
-        FoamDetailSample->Coordinates.Expression = FoamDetailPanner;
+        FoamDetailSample->Coordinates.Expression =
+            SolverAdvectedDetailCoordinates;
         Material->GetExpressionCollection().AddExpression(FoamDetailSample);
         UMaterialExpressionConstant* FoamDetailGain =
             NewObject<UMaterialExpressionConstant>(Material);
@@ -3005,35 +3083,6 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     // A runtime-updated material collection cuts a feathered, raft-aligned
     // ellipse only from this presentation layer. Water depth, contact spray,
     // D3/D4 state, collision, and every solver-authored foam value are intact.
-    auto CollectionParameter =
-        [Material, FoamOcclusionCollection](FName Name, bool bScalar)
-            -> UMaterialExpressionCollectionParameter*
-    {
-        UMaterialExpressionCollectionParameter* Expression =
-            NewObject<UMaterialExpressionCollectionParameter>(Material);
-        Expression->Collection = FoamOcclusionCollection;
-        Expression->ParameterName = Name;
-        Expression->ExpressionGUID = FGuid::NewGuid();
-        const int32 ParameterIndex = bScalar
-            ? FoamOcclusionCollection->ScalarParameters.IndexOfByPredicate(
-                [Name](const FCollectionScalarParameter& Parameter)
-                {
-                    return Parameter.ParameterName == Name;
-                })
-            : FoamOcclusionCollection->VectorParameters.IndexOfByPredicate(
-                [Name](const FCollectionVectorParameter& Parameter)
-                {
-                    return Parameter.ParameterName == Name;
-                });
-        if (ParameterIndex != INDEX_NONE)
-        {
-            Expression->ParameterId = bScalar
-                ? FoamOcclusionCollection->ScalarParameters[ParameterIndex].Id
-                : FoamOcclusionCollection->VectorParameters[ParameterIndex].Id;
-        }
-        Material->GetExpressionCollection().AddExpression(Expression);
-        return Expression;
-    };
     UMaterialExpressionWorldPosition* WorldPosition =
         NewObject<UMaterialExpressionWorldPosition>(Material);
     Material->GetExpressionCollection().AddExpression(WorldPosition);

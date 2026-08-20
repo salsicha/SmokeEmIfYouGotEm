@@ -311,7 +311,8 @@ void URaftSimMainMenuWidget::RefreshFromSave()
     ModeText->SetText(FText::Format(NSLOCTEXT("RaftSim", "ModeLine", "Mode: {0}"), ModeName(SelectedMode)));
     ScenarioText->SetText(FText::Format(
         NSLOCTEXT("RaftSim", "ScenarioLine", "Run: {0}  [{1}]"), Scenario.DisplayName,
-        bUnlocked ? NSLOCTEXT("RaftSim", "Unlocked", "ready") : NSLOCTEXT("RaftSim", "Locked", "license locked")));
+        bUnlocked ? NSLOCTEXT("RaftSim", "Unlocked", "ready")
+                  : NSLOCTEXT("RaftSim", "Unavailable", "unavailable")));
     BriefingText->SetText(Scenario.Briefing);
     if (StartButton)
     {
@@ -320,7 +321,7 @@ void URaftSimMainMenuWidget::RefreshFromSave()
     if (Save)
     {
         ProfileText->SetText(FText::Format(
-            NSLOCTEXT("RaftSim", "ProfileLine", "License: {0}   XP {1}   completed {2}"),
+            NSLOCTEXT("RaftSim", "ProfileLine", "Guide rank: {0}   XP {1}   completed {2}"),
             URaftSimProgressionLibrary::LicenseDisplayName(Save->LicenseTier),
             FText::AsNumber(Save->CareerXp), FText::AsNumber(Save->CareerStats.CompletedRuns)));
         const FRaftSimVerticalSliceUserSettings& S = Save->Settings;

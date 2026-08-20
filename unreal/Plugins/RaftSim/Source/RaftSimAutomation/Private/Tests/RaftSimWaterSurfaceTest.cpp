@@ -239,6 +239,7 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         if (FoamOcclusion)
         {
             float Enabled = 0.0f;
+            FLinearColor FoamAdvectionMeters = FLinearColor::Transparent;
             FLinearColor CenterAndWidth = FLinearColor::Transparent;
             FLinearColor ForwardAndLength = FLinearColor::Transparent;
             float InteriorWaterEnabled = 0.0f;
@@ -248,6 +249,11 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
                 TEXT("foam exclusion enable parameter exists"),
                 FoamOcclusion->GetScalarParameterValue(
                     TEXT("RaftFoamExclusionEnabled"), Enabled));
+            Test->TestTrue(
+                TEXT("solver-current foam advection parameter exists"),
+                FoamOcclusion->GetVectorParameterValue(
+                    TEXT("RaftSimFoamAdvectionMeters"),
+                    FoamAdvectionMeters));
             Test->TestTrue(
                 TEXT("foam exclusion center parameter exists"),
                 FoamOcclusion->GetVectorParameterValue(
@@ -299,6 +305,33 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
                 215.0f);
         }
     }
+
+    const FVector2D AdvancedFoamMeters =
+        ARaftSimWaterSurfaceActor::AdvanceFoamTextureAdvectionMeters(
+            FVector2D(10.0f, 2.0f),
+            FVector2D(1.5f, -0.2f),
+            2.0f);
+    Test->TestTrue(
+        TEXT("foam texture phase integrates the physical river velocity"),
+        AdvancedFoamMeters.Equals(FVector2D(13.0f, 1.6f), 1.0e-5f));
+    const float RisingFoamCoverage =
+        ARaftSimWaterSurfaceActor::SmoothRapidFoamCoverage(
+            0.0f, 1.0f, 1.0f / 15.0f);
+    const float FallingFoamCoverage =
+        ARaftSimWaterSurfaceActor::SmoothRapidFoamCoverage(
+            0.10f, 0.0f, 1.0f / 15.0f);
+    Test->TestTrue(
+        TEXT("new foam responds within one surface refresh"),
+        RisingFoamCoverage > 0.0f && RisingFoamCoverage < 1.0f);
+    Test->TestTrue(
+        TEXT("marginal foam does not flash below the mask in one refresh"),
+        FallingFoamCoverage > 0.09f && FallingFoamCoverage < 0.10f);
+    const float DecayedFoamCoverage =
+        ARaftSimWaterSurfaceActor::SmoothRapidFoamCoverage(
+            0.10f, 0.0f, 2.0f);
+    Test->TestTrue(
+        TEXT("foam remains above the stable lace clip during a two-second decay"),
+        DecayedFoamCoverage > 0.01f && DecayedFoamCoverage < 0.10f);
 
     UProceduralMeshComponent* Mesh =
         Surface->FindComponentByClass<UProceduralMeshComponent>();

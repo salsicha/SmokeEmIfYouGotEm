@@ -948,4 +948,49 @@ static FAutoConsoleCommand GRefreshSouthForkFoamOcclusionMaterialsCommand(
     FConsoleCommandWithArgsDelegate::CreateStatic(
         &HandleRefreshSouthForkFoamOcclusionMaterials));
 
+static void HandleRefreshSolverCurrentFoamMaterial(
+    const TArray<FString>& Arguments)
+{
+    FString Summary;
+    UMaterialInterface* FoamMaterial =
+        LoadOrCreateLandscapeCandidateSolverFoamMaterial(Summary);
+    // The foam advection field lives in the same parameter collection as the
+    // Single Layer Water raft-interior aperture. Adding or reordering a
+    // collection parameter invalidates every material shader that consumes
+    // that collection, even when the water graph itself did not change. The
+    // former foam-only refresh saved the new collection and foam shader but
+    // left the sole South Fork water carrier with a stale collection layout;
+    // PIE then rendered a completely dry river until another editor process
+    // happened to compile the water parent. Refresh and save that dependency
+    // in the same transaction so the one-surface carrier is immediately
+    // renderable in the current and next run.
+    UMaterialInterface* WaterMaterial = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater."
+             "M_RaftSim_PhotorealRiverWater"));
+    const bool bWaterReady = WaterMaterial &&
+        LoadSouthForkProductionWaterPresentation(WaterMaterial, Summary);
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim solver-current foam refresh foam=%d water=%d\n%s"),
+        FoamMaterial ? 1 : 0,
+        bWaterReady ? 1 : 0,
+        *Summary);
+    if (Arguments.ContainsByPredicate([](const FString& Argument)
+        {
+            return Argument.Equals(TEXT("Quit"), ESearchCase::IgnoreCase);
+        }))
+    {
+        FPlatformMisc::RequestExit(false);
+    }
+}
+
+static FAutoConsoleCommand GRefreshSolverCurrentFoamMaterialCommand(
+    TEXT("RaftSim.RefreshSolverCurrentFoamMaterial"),
+    TEXT("Refresh the solver foam material, its parameter collection, and "
+         "dependent South Fork water carrier shader."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleRefreshSolverCurrentFoamMaterial));
+
 } // namespace RaftSimEditorEnvironment

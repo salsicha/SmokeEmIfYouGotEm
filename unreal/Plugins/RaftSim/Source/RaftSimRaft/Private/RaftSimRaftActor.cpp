@@ -178,11 +178,13 @@ void ARaftSimRaftActor::BeginPlay()
     constexpr float kMinimumLoadedBuoyancyReserve = 5.2f;
     BodyConfig.BuoyancyWeightMultiple =
         FMath::Max(BuoyancyWeightMultiple, kMinimumLoadedBuoyancyReserve);
-    // Authored maps may retain the old 45 N coefficient. At the loaded
-    // 605 kg production mass that let a stopped crew coast for tens of
-    // seconds and made strokes accumulate near the governor. Preserve the
-    // authoring control while enforcing the measured hull-resistance floor.
-    constexpr float kMinimumLoadedHullDrag = 650.0f;
+    // Authored maps may retain the old 45/650 N coefficients. Even 650 left
+    // the loaded production raft visibly slipping behind the foam/current for
+    // several seconds after a local flow change. Preserve the authoring
+    // control while enforcing a floor that captures passive drift promptly;
+    // paddle impulses still create velocity relative to the water and decay
+    // through this same physical hull resistance.
+    constexpr float kMinimumLoadedHullDrag = 1800.0f;
     BodyConfig.LinearDragCoefficient =
         FMath::Max(LinearDragCoefficient, kMinimumLoadedHullDrag);
     BodyConfig.HeaveDampingNsPerM = HeaveDampingNsPerM;
@@ -313,10 +315,29 @@ void ARaftSimRaftActor::BeginPlay()
     Adapter->ConfigureFlexibleRaftModel(
         FlexParameters, RaftSimFlex::BuildDefaultCrewSeats(FlexParameters));
 
-    // Seed the adapter's kinematic state from the spawn transform.
+    // Seed the adapter in the local water frame. Starting a floating raft at
+    // zero world velocity while the material immediately advects at the live
+    // solver velocity guarantees that the foam visibly outruns the boat until
+    // drag catches up. A passive raft already placed in the current should be
+    // carried with that current from its first physics frame.
     FRaftSimRaftKinematicState InitialState;
     InitialState.WorldTransform.SetTranslation(GetActorLocation());
     InitialState.WorldTransform.SetRotation(GetActorQuat());
+    if (const URaftSimWaterRuntimeAdapter* WaterAdapter =
+            BridgeSubsystem->GetWaterRuntime())
+    {
+        FRaftSimWaterSample SpawnWater;
+        if (WaterAdapter->SampleWaterAtWorldPosition(
+                GetActorLocation(), SpawnWater) &&
+            SpawnWater.bWet &&
+            !SpawnWater.VelocityMetersPerSecond.ContainsNaN())
+        {
+            InitialState.LinearVelocityMetersPerSecond = FVector(
+                SpawnWater.VelocityMetersPerSecond.X,
+                SpawnWater.VelocityMetersPerSecond.Y,
+                0.0f);
+        }
+    }
     Adapter->SetKinematicState(InitialState);
 
     Bridge = BridgeSubsystem;
@@ -1984,7 +2005,12 @@ void ARaftSimRaftActor::ResetToCheckpoint()
         RaftAdapter->ResetFlexiblePersistentState();
         FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
         State.WorldTransform = CheckpointTransform;
-        State.LinearVelocityMetersPerSecond = FVector::ZeroVector;
+        // Checkpoint restores happen in the river, not in an inertial vacuum.
+        // Rejoin the local current immediately so the reset boat and the
+        // solver-advected foam retain the same passive drift speed.
+        State.LinearVelocityMetersPerSecond =
+            SampleWaterVelocityMps(CheckpointTransform.GetLocation());
+        State.LinearVelocityMetersPerSecond.Z = 0.0f;
         State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
         RaftAdapter->SetKinematicState(State);
     }

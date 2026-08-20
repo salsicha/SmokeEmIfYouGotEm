@@ -778,4 +778,83 @@ bool FRaftSimPaddleCoastDownTest::RunTest(const FString& Parameters)
     return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimPassiveCurrentCaptureTest,
+    "RaftSim.M1.PassiveRaftCapturesCurrent",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimPassiveCurrentCaptureTest::RunTest(const FString& Parameters)
+{
+    URaftSimChronoRuntimeAdapter* Adapter =
+        NewObject<URaftSimChronoRuntimeAdapter>();
+    TestNotNull(TEXT("adapter"), Adapter);
+    if (Adapter == nullptr)
+    {
+        return false;
+    }
+
+    FRaftSimRaftBodyConfig Body;
+    Body.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
+    Body.MassKg = 605.0f;
+    Body.LengthMeters = 4.3f;
+    Body.WidthMeters = 2.0f;
+    Body.TubeRadiusMeters = 0.28f;
+    Body.BuoyancyWeightMultiple = 5.2f;
+    Body.LinearDragCoefficient = 1800.0f;
+    Body.LowSpeedDragReferenceMps = 1.5f;
+    Body.InertiaTensorKgM2 = FVector(900.0f, 900.0f, 1100.0f);
+    Adapter->ConfigureRaftBody(Body);
+
+    FRaftSimFlexParameters Flex;
+    Flex.MassKg = Body.MassKg;
+    Flex.LengthM = Body.LengthMeters;
+    Flex.WidthM = Body.WidthMeters;
+    Flex.TubeRadiusM = Body.TubeRadiusMeters;
+    Flex.GuideMassKg = 0.0;
+    Flex.PassengerMassKg = 0.0;
+    Flex.PassengerCount = 0;
+    Adapter->ConfigureFlexibleRaftModel(Flex, {});
+    Adapter->SetWaterSurfaceSampler(
+        [](const FVector&, float& OutSurfaceZCm) -> bool
+        {
+            OutSurfaceZCm = 0.0f;
+            return true;
+        });
+    constexpr float CurrentSpeedMps = 1.2f;
+    Adapter->SetFlexibleWaterFieldSampler(
+        [](const FVector&, FRaftSimFlexUniformWater& OutWater) -> bool
+        {
+            OutWater.SurfaceHeightM = 0.0;
+            OutWater.VelocityMps = FVector(1.2f, 0.0f, 0.0f);
+            OutWater.bWet = true;
+            return true;
+        });
+
+    FRaftSimRaftKinematicState State;
+    State.WorldTransform.SetTranslation(FVector(0.0f, 0.0f, -12.0f));
+    State.LinearVelocityMetersPerSecond = FVector::ZeroVector;
+    Adapter->SetKinematicState(State);
+
+    bool bStayedFinite = true;
+    constexpr float Dt = 1.0f / 120.0f;
+    for (int32 StepIndex = 0; StepIndex < 360; ++StepIndex)
+    {
+        bStayedFinite &= Adapter->StepRaftDynamics(Dt);
+    }
+    const float RaftSpeedMps =
+        Adapter->GetKinematicState().LinearVelocityMetersPerSecond.X;
+    TestTrue(TEXT("three-second passive drift remains finite"), bStayedFinite);
+    TestTrue(
+        FString::Printf(
+            TEXT("passive raft reaches at least 90%% of current speed "
+                 "(raft %.3f m/s, water %.3f m/s)"),
+            RaftSpeedMps,
+            CurrentSpeedMps),
+        RaftSpeedMps >= CurrentSpeedMps * 0.90f);
+    TestTrue(
+        TEXT("passive current capture does not accelerate beyond the water"),
+        RaftSpeedMps <= CurrentSpeedMps + 0.01f);
+    return true;
+}
+
 #endif // WITH_AUTOMATION_TESTS
