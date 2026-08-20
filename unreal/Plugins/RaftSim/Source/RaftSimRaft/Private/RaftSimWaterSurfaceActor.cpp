@@ -598,7 +598,22 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
     // irregular side shoulders, and an aerated downstream return. The shape
     // is sampled on the refined render grid and is not a claim about measured
     // Zambezi bathymetry or seasonal hydraulics.
-    const float PlungeStation = (DownstreamMeters - 1.8f) / 2.2f;
+    // A connected drop profile reads as one body of water: accelerating
+    // drawdown, a curling lip, the impact pocket, and a broad aerated roller.
+    // Every term is a displacement of the existing carrier mesh; no second
+    // sheet or translucent overlay is created.
+    const float DrawdownStation = (DownstreamMeters + 2.1f) / 2.7f;
+    const float DrawdownAcross = AcrossMeters / 4.2f;
+    const float Drawdown = FMath::Exp(
+        -(DrawdownStation * DrawdownStation +
+            DrawdownAcross * DrawdownAcross));
+
+    const float LipStation = (DownstreamMeters + 0.25f) / 0.95f;
+    const float LipAcross = AcrossMeters / 4.0f;
+    const float CurlingLip = FMath::Exp(
+        -(LipStation * LipStation + LipAcross * LipAcross));
+
+    const float PlungeStation = (DownstreamMeters - 1.8f) / 1.7f;
     const float PlungeAcross = AcrossMeters / 2.8f;
     const float PlungeCore = FMath::Exp(
         -(PlungeStation * PlungeStation + PlungeAcross * PlungeAcross));
@@ -623,7 +638,9 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
 
     const float DisplacementMeters = FMath::Clamp(
         SafeIntensity *
-            (-0.30f * PlungeCore +
+            (-0.075f * Drawdown +
+                0.15f * CurlingLip -
+                0.30f * PlungeCore +
                 0.14f * AeratedReturn +
                 0.10f * BrokenShoulder * ShoulderVariation),
         -0.28f * SafeIntensity,
@@ -637,12 +654,52 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
         0.62f, 1.0f, FMath::Sqrt(SafeIntensity));
     const float FoamGeneration = FMath::Clamp(
         BreakingFrothStrength *
-            (0.28f * PlungeCore +
+            (0.70f * CurlingLip +
+                0.34f * PlungeCore +
                 1.00f * AeratedReturn +
                 0.78f * BrokenShoulder * ShoulderVariation),
         0.0f,
         1.0f);
     return FVector2D(DisplacementMeters, FoamGeneration);
+}
+
+FVector2D ARaftSimWaterSurfaceActor::
+    ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float Intensity,
+        float BulkWaterSpeedMetersPerSecond)
+{
+    const float SafeIntensity = FMath::Clamp(Intensity, 0.0f, 1.0f);
+    if (SafeIntensity <= KINDA_SMALL_NUMBER ||
+        DownstreamMeters <= 0.2f || DownstreamMeters >= 14.5f)
+    {
+        return FVector2D::ZeroVector;
+    }
+
+    // At the visible surface of a hydraulic roller, aerated water returns
+    // upstream toward the impact toe, then converges into its most energetic
+    // core. This is deliberately an addition to foam transport only. The
+    // current, raft, and authoritative free surface remain solver-driven.
+    constexpr float RollerCenterMeters = 4.4f;
+    constexpr float RollerStationRadiusMeters = 4.0f;
+    constexpr float RollerAcrossRadiusMeters = 4.8f;
+    const float Station =
+        (DownstreamMeters - RollerCenterMeters) /
+        RollerStationRadiusMeters;
+    const float Across = AcrossMeters / RollerAcrossRadiusMeters;
+    const float Envelope = FMath::Exp(
+        -0.5f * (Station * Station + Across * Across));
+    const float Entry = FMath::SmoothStep(0.2f, 1.4f, DownstreamMeters);
+    const float Exit = 1.0f -
+        FMath::SmoothStep(10.5f, 14.5f, DownstreamMeters);
+    const float Strength = SafeIntensity * Envelope * Entry * Exit;
+    const float SafeBulkSpeed = FMath::Max(BulkWaterSpeedMetersPerSecond, 0.0f);
+    const float UpstreamReturnSpeed =
+        (0.80f + 0.75f * SafeBulkSpeed) * Strength;
+    const float InwardConvergenceSpeed =
+        -0.24f * SafeBulkSpeed * Across * Strength;
+    return FVector2D(-UpstreamReturnSpeed, InwardConvergenceSpeed);
 }
 
 FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
@@ -3793,6 +3850,32 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             FVector2D(WorldVelocity.X, WorldVelocity.Y), Left2D));
                     FieldPosition = RiverCoordinatesM[Index];
                 }
+                // Foam inside an accepted hydraulic jump must visibly turn
+                // back toward the impact toe instead of sliding through the
+                // froth patch at the bulk current speed. The return is local,
+                // continuous, and presentation-only; it cannot move the raft
+                // or create a second surface.
+                const float BulkWaterSpeedMetersPerSecond =
+                    FieldVelocity.Size();
+                FVector2D RollerVelocity = FVector2D::ZeroVector;
+                for (int32 SiteIndex = 0;
+                     SiteIndex < BreakingPresentationSiteCount;
+                     ++SiteIndex)
+                {
+                    const FBreakingSite& Site = BreakingSites[SiteIndex];
+                    const FVector2D RelativePosition =
+                        FieldPosition - Site.RiverCoordinatesMeters;
+                    RollerVelocity +=
+                        ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+                            RelativePosition.X,
+                            RelativePosition.Y,
+                            Site.Intensity,
+                            BulkWaterSpeedMetersPerSecond);
+                }
+                FieldVelocity += RollerVelocity.GetClampedToMaxSize(
+                    FMath::Max(
+                        1.0f,
+                        BulkWaterSpeedMetersPerSecond + 1.0f));
                 const FVector2D BackPosition =
                     FieldPosition - FieldVelocity * FoamDeltaSeconds;
                 const float FractionalX =

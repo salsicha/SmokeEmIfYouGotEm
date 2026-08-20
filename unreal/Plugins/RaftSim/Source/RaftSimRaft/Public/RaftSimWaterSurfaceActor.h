@@ -138,6 +138,17 @@ public:
         float PhaseSeconds,
         float SitePhaseRadians);
 
+    /** Extra presentation-foam velocity inside the surface return of a
+     * solver-accepted hydraulic jump. X is station velocity and Y is lateral
+     * velocity in metres per second. The localized upstream return and inward
+     * convergence make aerated water recirculate at the toe without changing
+     * solver velocity, raft forces, buoyancy, or the single water surface. */
+    static FVector2D ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+        float DownstreamMeters,
+        float AcrossMeters,
+        float Intensity,
+        float BulkWaterSpeedMetersPerSecond);
+
     /** Distance from one sampled live-water vertex to the nearest moving-grid
      * station edge or sampled wet/dry bank, in metres. Breaking-water sheets
      * use this to remain wholly inside the owned live-water presentation
