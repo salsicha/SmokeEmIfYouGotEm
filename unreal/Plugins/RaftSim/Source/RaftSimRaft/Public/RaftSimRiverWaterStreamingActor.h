@@ -7,6 +7,7 @@
 
 class ARaftSimRaftActor;
 class ARaftSimRiverWaterConfig;
+class ULevel;
 class URaftSimWaterRuntimeAdapter;
 
 /**
@@ -24,6 +25,7 @@ public:
     ARaftSimRiverWaterStreamingActor();
 
     virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void Tick(float DeltaSeconds) override;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Streaming")
@@ -47,6 +49,8 @@ private:
     const FSourceWindow* SelectSource(float StationM) const;
     bool UpdateWaterWindow(bool bForce);
     void ApplyStaticFlowBandVisibility() const;
+    void ApplyStaticFlowBandVisibilityToActor(AActor* Actor) const;
+    void HandleLevelAddedToWorld(ULevel* Level, UWorld* World);
 
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> Raft;
@@ -59,6 +63,8 @@ private:
     // at a streaming-dependent distance (2026-08-14).
     FName CachedFlowBand;
     bool bCachedLiveSolverOwnsRuntimeRendering = false;
+    bool bCachedSouthForkSingleSurface = false;
+    FDelegateHandle LevelAddedToWorldHandle;
     float TimeSinceVisibilityReapplySeconds = 0.0f;
     float CachedMovingWindowAdvanceM = 80.0f;
     float CachedMovingWindowStationExtentM = 320.0f;

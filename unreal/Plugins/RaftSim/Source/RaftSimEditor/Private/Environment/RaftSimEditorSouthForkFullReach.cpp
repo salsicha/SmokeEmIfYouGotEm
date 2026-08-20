@@ -10,6 +10,7 @@
 #include "HAL/IConsoleManager.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimWaterSurfaceActor.h"
 #include "RenderingThread.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
@@ -3026,12 +3027,23 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         TEXT("physics/data/real_world/south_fork_american_chili_bar/"
              "full_hydraulics/streaming_manifest.json");
     WaterConfig->bEnableMovingWindowStreaming = true;
-    WaterConfig->MovingWindowStationExtentM = 320.0f;
+    // Keep the genuine hydraulic crop large enough to cover the complete
+    // first 0-400 m rapid. The live carrier adds render-only continuity aprons
+    // outside this authoritative sampling window.
+    WaterConfig->MovingWindowStationExtentM =
+        ARaftSimWaterSurfaceActor::GetSouthForkHydraulicWindowLengthMeters();
     WaterConfig->MovingWindowLateralExtentM = 80.0f;
     WaterConfig->MovingWindowAdvanceM = 80.0f;
     WaterConfig->bMapProvidesTerrain = true;
     WaterConfig->bLiveSolverOwnsRuntimeRendering = true;
     WaterConfig->bEnableLiveSolverVolumeCore = true;
+    WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
+    WaterConfig->LivePresentationSurfaceSmoothingStrength = 1.0f;
+    // The generic coupled standing-wave field is an infinite sine train in
+    // river station and reads as white cross-channel stripes on this reach.
+    // South Fork keeps only measured solver relief and localized wake/crest
+    // geometry, so the raft still follows every visible physical feature.
+    WaterConfig->LivePresentationStandingWaveScale = 0.0f;
     SetSpatiallyLoadedIfAllowed(WaterConfig, false);
 
     const FRotator StartRotation = StartTangent.Rotation();

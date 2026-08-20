@@ -4,6 +4,8 @@
 #include "Engine/GameInstance.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMeshActor.h"
+#include "Engine/Level.h"
+#include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
@@ -11,6 +13,7 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -59,11 +62,38 @@ void ARaftSimRiverWaterStreamingActor::BeginPlay()
         RiverConfig->CookedFieldsDir.Contains(
             TEXT("south_fork_american_chili_bar/full_hydraulics"),
             ESearchCase::IgnoreCase);
+    bCachedSouthForkSingleSurface =
+        RiverConfig->CookedFieldsDir.Contains(
+            TEXT("south_fork_american_chili_bar/full_hydraulics"),
+            ESearchCase::IgnoreCase);
     CachedMovingWindowAdvanceM = RiverConfig->MovingWindowAdvanceM;
-    CachedMovingWindowStationExtentM = RiverConfig->MovingWindowStationExtentM;
+    CachedMovingWindowStationExtentM = bCachedSouthForkSingleSurface
+        ? FMath::Max(
+              RiverConfig->MovingWindowStationExtentM,
+              ARaftSimWaterSurfaceActor::
+                  GetSouthForkHydraulicWindowLengthMeters())
+        : RiverConfig->MovingWindowStationExtentM;
     CachedMovingWindowLateralExtentM = RiverConfig->MovingWindowLateralExtentM;
+    // World Partition can add a shoreline-water cell immediately after the
+    // periodic visibility sweep. Subscribe before the initial pass so every
+    // subsequently loaded actor receives its final runtime ownership state in
+    // the same level-add event, before a rendered frame can expose it.
+    LevelAddedToWorldHandle = FWorldDelegates::LevelAddedToWorld.AddUObject(
+        this,
+        &ARaftSimRiverWaterStreamingActor::HandleLevelAddedToWorld);
     ApplyStaticFlowBandVisibility();
     UpdateWaterWindow(/*bForce=*/true);
+}
+
+void ARaftSimRiverWaterStreamingActor::EndPlay(
+    const EEndPlayReason::Type EndPlayReason)
+{
+    if (LevelAddedToWorldHandle.IsValid())
+    {
+        FWorldDelegates::LevelAddedToWorld.Remove(LevelAddedToWorldHandle);
+        LevelAddedToWorldHandle.Reset();
+    }
+    Super::EndPlay(EndPlayReason);
 }
 
 bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
@@ -192,9 +222,25 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
     const FVector2D Extent(
         CachedMovingWindowStationExtentM,
         CachedMovingWindowLateralExtentM);
+    float WindowCenterStationM = RiverPosition.X;
+    float MinimumRiverStationM = 0.0f;
+    float MaximumRiverStationM = 0.0f;
+    if (bCachedSouthForkSingleSurface &&
+        WaterAdapter->GetRiverStationRangeM(
+            MinimumRiverStationM, MaximumRiverStationM))
+    {
+        // Match the render carrier's end clamp at the put-in/take-out. At the
+        // old unclamped station 120 centre, even a wider solver crop was cut
+        // back to 0-320 m while the 400 m surface asked for the whole grade.
+        const float HalfExtentM = 0.5f * CachedMovingWindowStationExtentM;
+        WindowCenterStationM = FMath::Clamp(
+            WindowCenterStationM,
+            MinimumRiverStationM + HalfExtentM,
+            MaximumRiverStationM - HalfExtentM);
+    }
     if (!WaterAdapter->ConfigureMovingRiverWindow(
             DesiredDirectory, CachedFlowBand.ToString(),
-            FVector2D(RiverPosition.X, 0.0f), Extent,
+            FVector2D(WindowCenterStationM, 0.0f), Extent,
             /*RoughnessManning=*/0.041f))
     {
         UE_LOG(LogTemp, Warning,
@@ -222,44 +268,60 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibility() const
     // BeginPlay. Re-run periodically from Tick — a single BeginPlay pass
     // misses every actor whose cell streams in later ("white foam appears
     // at distance and vanishes as the camera approaches", 2026-08-14).
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        ApplyStaticFlowBandVisibilityToActor(*It);
+    }
+}
+
+void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibilityToActor(
+    AActor* Actor) const
+{
+    if (!Actor)
+    {
+        return;
+    }
     static const FName SolverFoamOverlayTag(TEXT("RaftSimSolverFoamOverlay"));
     const FName ActiveTag(*FString::Printf(
         TEXT("RaftSimFlowBand_%s"), *CachedFlowBand.ToString()));
-    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    bool bIsBandPresentation = false;
+    bool bActiveBand = false;
+    bool bBakedFoamOverlay = false;
+    for (const FName& Tag : Actor->Tags)
     {
-        AActor* Actor = *It;
-        bool bIsBandPresentation = false;
-        bool bActiveBand = false;
-        bool bBakedFoamOverlay = false;
-        for (const FName& Tag : Actor->Tags)
+        bBakedFoamOverlay |= Tag == SolverFoamOverlayTag;
+        if (Tag.ToString().StartsWith(TEXT("RaftSimFlowBand_")))
         {
-            if (Tag == SolverFoamOverlayTag)
-            {
-                bBakedFoamOverlay = true;
-            }
-            if (Tag.ToString().StartsWith(TEXT("RaftSimFlowBand_")))
-            {
-                bIsBandPresentation = true;
-                bActiveBand |= Tag == ActiveTag;
-            }
+            bIsBandPresentation = true;
+            bActiveBand |= Tag == ActiveTag;
         }
-        if (bBakedFoamOverlay && !bIsBandPresentation)
-        {
-            // A foam overlay without a band tag cannot be band-managed;
-            // retire it outright (pre-2026-08-14 vintage placements).
-            Actor->SetActorHiddenInGame(true);
-            continue;
-        }
-        // Since the 2026-08-14 environment rebake, the foam overlay derives
-        // from the same shaped hydraulic fields the raft rides, so it is
-        // band-managed like the rest of the water presentation instead of
-        // retired (the former blanket hide targeted the old miscalibrated
-        // bake that floated over banks).
-        if (bIsBandPresentation)
-        {
-            Actor->SetActorHiddenInGame(
-                bCachedLiveSolverOwnsRuntimeRendering || !bActiveBand);
-        }
+    }
+    if (bBakedFoamOverlay && !bIsBandPresentation)
+    {
+        Actor->SetActorHiddenInGame(true);
+        return;
+    }
+    if (bIsBandPresentation)
+    {
+        // A live-owned river must have only one runtime carrier. Revealing
+        // the authored fallback beyond the solver crop exposes shoreline
+        // slivers and cross-channel stripes as its partition cell streams.
+        Actor->SetActorHiddenInGame(
+            bCachedLiveSolverOwnsRuntimeRendering || !bActiveBand);
+    }
+}
+
+void ARaftSimRiverWaterStreamingActor::HandleLevelAddedToWorld(
+    ULevel* Level,
+    UWorld* World)
+{
+    if (!Level || World != GetWorld())
+    {
+        return;
+    }
+    for (AActor* Actor : Level->Actors)
+    {
+        ApplyStaticFlowBandVisibilityToActor(Actor);
     }
 }
 
@@ -272,9 +334,9 @@ void ARaftSimRiverWaterStreamingActor::Tick(float DeltaSeconds)
         TimeSinceUpdateSeconds = 0.0f;
         UpdateWaterWindow(/*bForce=*/false);
     }
-    // World partition streams presentation cells in behind the player; the
-    // BeginPlay visibility pass never saw those actors, so re-enforce band
-    // and foam-overlay visibility at a low cadence.
+    // Safety audit for dynamically spawned legacy actors that are not part of
+    // a streamed level. Normal World Partition cells are handled immediately
+    // by HandleLevelAddedToWorld above.
     TimeSinceVisibilityReapplySeconds += DeltaSeconds;
     if (TimeSinceVisibilityReapplySeconds >= 2.0f)
     {

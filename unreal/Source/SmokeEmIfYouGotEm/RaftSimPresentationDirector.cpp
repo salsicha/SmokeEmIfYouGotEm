@@ -94,6 +94,11 @@ void ARaftSimPresentationDirector::BeginPlay()
 
 void ARaftSimPresentationDirector::ResolveEnvironmentActors()
 {
+    bClearMorningCloudsEnabled =
+        GetWorld() != nullptr &&
+        GetWorld()->GetMapName().Contains(
+            TEXT("L_SouthForkAmerican_FullReach"),
+            ESearchCase::IgnoreCase);
     Sun = FindFirst<ADirectionalLight>(GetWorld());
     SkyLight = FindFirst<ASkyLight>(GetWorld());
     HeightFog = FindFirst<AExponentialHeightFog>(GetWorld());
@@ -115,10 +120,12 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
-        // Weather changes alter skylight intensity directly. Recapturing the
-        // entire atmosphere and cloud volume every frame added ~3.7 ms on the
-        // Apple M5 reference machine without a visible gameplay benefit.
-        SkyLight->GetLightComponent()->SetRealTimeCaptureEnabled(false);
+        // South Fork deliberately keeps a visible high-cloud layer in clear
+        // weather while its water reflection is under review. Let that one map
+        // capture the same moving sky the camera sees; other rivers retain the
+        // cheaper static captured-scene fill.
+        SkyLight->GetLightComponent()->SetRealTimeCaptureEnabled(
+            bClearMorningCloudsEnabled);
     }
     if (HeightFog == nullptr)
     {
@@ -135,14 +142,19 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
         if (UVolumetricCloudComponent* Cloud =
                 VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
         {
-            // One-twelfth sampling resolves as a stippled screen-space pattern
-            // in the shipping chase camera. Clear weather disables the layer
-            // below; active overcast/storm layers retain a bounded but coherent
-            // half-resolution ray-march budget.
-            Cloud->SetViewSampleCountScale(0.5f);
-            Cloud->SetReflectionViewSampleCountScale(0.4f);
-            Cloud->SetShadowViewSampleCountScale(0.4f);
-            Cloud->SetShadowReflectionViewSampleCountScale(0.2f);
+            // The former half-resolution budget still produced visibly
+            // stippled cloud edges in the river reflection review. South Fork
+            // uses full view and reflection sampling; other maps retain their
+            // bounded weather-variant budget.
+            const float ViewSamples = bClearMorningCloudsEnabled ? 1.0f : 0.5f;
+            const float ReflectionSamples =
+                bClearMorningCloudsEnabled ? 1.0f : 0.4f;
+            Cloud->SetViewSampleCountScale(ViewSamples);
+            Cloud->SetReflectionViewSampleCountScale(ReflectionSamples);
+            Cloud->SetShadowViewSampleCountScale(
+                bClearMorningCloudsEnabled ? 0.75f : 0.4f);
+            Cloud->SetShadowReflectionViewSampleCountScale(
+                bClearMorningCloudsEnabled ? 0.75f : 0.2f);
         }
     }
 }
@@ -263,7 +275,8 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
                 VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
         {
             Cloud->SetVisibility(
-                CurrentState.Weather != ERaftSimWeatherVariant::ClearMorning,
+                bClearMorningCloudsEnabled ||
+                    CurrentState.Weather != ERaftSimWeatherVariant::ClearMorning,
                 true);
             Cloud->SetLayerBottomAltitude(
                 FMath::Max(0.5f, CurrentState.CloudLayerHeightKm - 2.0f));

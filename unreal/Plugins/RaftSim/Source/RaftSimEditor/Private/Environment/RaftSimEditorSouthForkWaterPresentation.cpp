@@ -59,13 +59,13 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
 {
     static const TCHAR* PackagePath = TEXT(
         "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-        "M_RaftSim_SouthForkRaftTransmissionWater");
+        "M_RaftSim_SouthForkRaftTransmissionWaterV2");
     static const TCHAR* ObjectName =
-        TEXT("M_RaftSim_SouthForkRaftTransmissionWater");
+        TEXT("M_RaftSim_SouthForkRaftTransmissionWaterV2");
     static const TCHAR* ObjectPath = TEXT(
         "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-        "M_RaftSim_SouthForkRaftTransmissionWater."
-        "M_RaftSim_SouthForkRaftTransmissionWater");
+        "M_RaftSim_SouthForkRaftTransmissionWaterV2."
+        "M_RaftSim_SouthForkRaftTransmissionWaterV2");
 
     UMaterial* SourceMaterial = SourceParent ? SourceParent->GetMaterial() : nullptr;
     UPackage* Package = CreatePackage(PackagePath);
@@ -515,6 +515,8 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
     }
 
     bool bHasTravelingWaveOffset = false;
+    bool bHasTravelingWaveStrengthGate = false;
+    UMaterialExpression* TravelingWaveOffsetExpression = nullptr;
     for (UMaterialExpression* Expression :
          Material->GetExpressionCollection().Expressions)
     {
@@ -522,7 +524,13 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             Expression->Desc == TEXT("RaftSimTravelingBakeWaveWPO"))
         {
             bHasTravelingWaveOffset = true;
-            break;
+            TravelingWaveOffsetExpression = Expression;
+        }
+        if (Expression &&
+            Expression->Desc ==
+                TEXT("RaftSimTravelingBakeWaveWPOStrengthGate"))
+        {
+            bHasTravelingWaveStrengthGate = true;
         }
     }
     if (!bHasTravelingWaveOffset)
@@ -681,6 +689,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         Offset->A.Expression = UpAxis;
         Offset->B.Expression = DeltaCm;
         AddExpr(Offset);
+        TravelingWaveOffsetExpression = Offset;
         if (UMaterialEditorOnlyData* WpoEditorData = Material->GetEditorOnlyData())
         {
             WpoEditorData->WorldPositionOffset.Connect(0, Offset);
@@ -688,62 +697,40 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         }
     }
 
+    if (TravelingWaveOffsetExpression && !bHasTravelingWaveStrengthGate)
+    {
+        // The same parent serves the static editor-review band and the live
+        // solver carrier. The latter already owns physical displacement; let
+        // its instance disable this legacy infinite sine train without
+        // deleting the authored-review behavior from the parent.
+        UMaterialExpressionScalarParameter* Strength =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        Strength->ParameterName = TEXT("SouthForkTravelingWaveWPOStrength");
+        Strength->DefaultValue = 1.0f;
+        Strength->Group = TEXT("RaftSimSouthForkWaterMotion");
+        Material->GetExpressionCollection().AddExpression(Strength);
+        UMaterialExpressionMultiply* GatedOffset =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        GatedOffset->Desc =
+            TEXT("RaftSimTravelingBakeWaveWPOStrengthGate");
+        GatedOffset->A.Expression = TravelingWaveOffsetExpression;
+        GatedOffset->B.Expression = Strength;
+        Material->GetExpressionCollection().AddExpression(GatedOffset);
+        if (UMaterialEditorOnlyData* WpoEditorData = Material->GetEditorOnlyData())
+        {
+            WpoEditorData->WorldPositionOffset.Connect(0, GatedOffset);
+            bNeedsSave = true;
+        }
+    }
+
     if (bNeedsSave)
     {
-        Material->SetShadingModel(MSM_SingleLayerWater);
-        Material->SetMaterialUsage(MATUSAGE_Water);
-        Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
-        Material->PostEditChange();
-        Material->ForceRecompileForRendering();
-        FAssetCompilingManager::Get().FinishAllCompilation();
-        if (GShaderCompilingManager)
-        {
-            GShaderCompilingManager->FinishAllCompilation();
-        }
-        FMaterialResource* MaterialResource =
-            Material->GetMaterialResource(GMaxRHIShaderPlatform);
-        if (MaterialResource &&
-            !MaterialResource->IsGameThreadShaderMapComplete())
-        {
-            MaterialResource->SubmitCompileJobs_GameThread(
-                EShaderCompileJobPriority::High);
-            MaterialResource->FinishCompilation();
-            if (GShaderCompilingManager)
-            {
-                GShaderCompilingManager->ProcessAsyncResults(false, true);
-            }
-        }
-        MaterialResource =
-            Material->GetMaterialResource(GMaxRHIShaderPlatform);
-        if (!MaterialResource ||
-            Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform) ||
-            !MaterialResource->GetCompileErrors().IsEmpty())
-        {
-            OutSummary += FString::Printf(
-                TEXT("South Fork raft-transmission water shader validation "
-                     "failed (resource=%d compiling_or_error=%d complete=%d "
-                     "valid=%d errors=%d): %s\n"),
-                MaterialResource ? 1 : 0,
-                Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform)
-                    ? 1
-                    : 0,
-                MaterialResource &&
-                        MaterialResource->IsGameThreadShaderMapComplete()
-                    ? 1
-                    : 0,
-                MaterialResource &&
-                        MaterialResource->HasValidGameThreadShaderMap()
-                    ? 1
-                    : 0,
-                MaterialResource
-                    ? MaterialResource->GetCompileErrors().Num()
-                    : -1,
-                MaterialResource
-                    ? *FString::Join(
-                          MaterialResource->GetCompileErrors(), TEXT(" | "))
-                    : TEXT("no platform material resource"));
-            return nullptr;
-        }
+        // This existing parent is already configured for Single Layer Water
+        // and instanced meshes. Save the serialized expression graph before
+        // asking Unreal to rebuild its rendering resources: PostEditChange
+        // can otherwise wait on this large parent's shader permutations and
+        // prevent the package from ever being written. The next material load
+        // performs normal compilation from the newly saved graph.
         Package->MarkPackageDirty();
         const FString Filename = FPackageName::LongPackageNameToFilename(
             PackagePath, FPackageName::GetAssetPackageExtension());
@@ -818,6 +805,19 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("DeepWaterOpacity")), 0.82f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FoamWaterOpacity")), 0.91f);
+    // South Fork's single solver-conforming carrier owns the whitewater.
+    // Force the breakup term to one and disable the separate drift-lace term:
+    // the resulting white is driven only by the advected vertex foam field,
+    // with no independently animated bitmap phase left to flash or outrun a
+    // passively drifting raft.
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupBias")), 1.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("DriftFoamAerationGain")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("DriftFoamSpeedGain")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("RaftInteriorSurfaceOpacityScale")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
@@ -849,17 +849,16 @@ bool LoadSouthForkProductionWaterPresentation(
         FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicWhitewaterGain")), 0.30f);
-    // Whitewater has one visual owner: the solver-conditioned masked foam
-    // sheet. Leaving the same foam in this opaque Single Layer Water parent
-    // double-composited it beneath the raised sheet and made aeration look
-    // painted over raft tubes and crew. The underlying water keeps depth,
-    // transmission, normals, and hydraulics; the dedicated sheet owns foam.
+    // Whitewater has one visual owner: this solver-conforming Single Layer
+    // Water carrier. The raised masked sheet is disabled on South Fork, so
+    // retain the advected vertex foam here and make its breakup solid. This
+    // preserves breaking crests without any independently moving foam image.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamIntensity")), 0.0f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamIntensity")), 1.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamCoverageGain")), 0.82f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamCoverageGain")), 0.95f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 0.62f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicFoamColorCoreGain")), 0.95f);
     // Fast, shallow Sierra water carries a broad distribution of short-wave
@@ -876,27 +875,35 @@ bool LoadSouthForkProductionWaterPresentation(
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionStrength")), 0.28f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("CalmSurfaceColorVariation")), 0.14f);
+        FMaterialParameterInfo(TEXT("CalmSurfaceColorVariation")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FallbackSkyReflectionFloor")), 0.68f);
+        FMaterialParameterInfo(TEXT("FallbackSkyReflectionFloor")), 1.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FallbackSkyReflectionVariation")), 0.32f);
-    // Ripple perceptibility retuned 2026-08-14 (fourth "water doesn't look
-    // like it is moving" report, this time with an in-game screenshot and a
-    // held-boat-on-slope experiment). The parent clamps summed normal
-    // strength (ceiling now 0.30, was 0.14 — the old ceiling silently
-    // saturated every prior retune). These weights keep calm water just
-    // grained while fast water climbs toward the ceiling, and the parent's
-    // FlowStreakRoughness lanes supply the directional downstream cue the
-    // ripple amplitude alone cannot.
+        FMaterialParameterInfo(TEXT("FallbackSkyReflectionVariation")), 0.0f);
+    // High-frequency normal-map glints were visually indistinguishable from a
+    // white foam texture and pixel-aliased on/off as the guide camera moved.
+    // The remaining analytic flow-streak fallback is a pair of sine fields;
+    // on this curved river they resolve as white cross-channel bars. Keep all
+    // synthetic texture motion flat and show motion through solver WPO,
+    // hydraulic relief, wakes, and persistent solver foam instead.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.12f);
+        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.30f);
+        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.25f);
-    Instance->PostEditChange();
-    FAssetCompilingManager::Get().FinishAllCompilation();
+        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("LiveFlowStreakRoughness")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("LiveFlowStreakTint")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("FlowStreakRoughness")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("FlowStreakSpeedGain")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("SouthForkTravelingWaveWPOStrength")), 0.0f);
+    // Persist authored overrides without forcing this command to wait on the
+    // parent shader map; loading the instance rebuilds its resources normally.
     Package->MarkPackageDirty();
     FSavePackageArgs SaveArgs;
     SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;

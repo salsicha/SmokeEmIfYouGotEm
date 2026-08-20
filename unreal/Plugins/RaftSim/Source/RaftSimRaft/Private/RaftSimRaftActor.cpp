@@ -216,11 +216,34 @@ void ARaftSimRaftActor::BeginPlay()
                 WaterAdapter->ConfigureRiverCoordinateMap(RiverConfig->CoordinateMapPath);
             if (bCoordinateMapReady && RiverConfig->bEnableMovingWindowStreaming)
             {
+                const bool bSouthForkSingleSurface =
+                    RiverConfig->CookedFieldsDir.Contains(
+                        TEXT("south_fork_american_chili_bar/full_hydraulics"),
+                        ESearchCase::IgnoreCase);
+                const float MovingStationExtentM = bSouthForkSingleSurface
+                    ? FMath::Max(
+                          RiverConfig->MovingWindowStationExtentM,
+                          ARaftSimWaterSurfaceActor::
+                              GetSouthForkHydraulicWindowLengthMeters())
+                    : RiverConfig->MovingWindowStationExtentM;
+                FVector2D MovingWindowCenterM = RiverConfig->WindowCenterM;
+                float MinimumRiverStationM = 0.0f;
+                float MaximumRiverStationM = 0.0f;
+                if (bSouthForkSingleSurface &&
+                    WaterAdapter->GetRiverStationRangeM(
+                        MinimumRiverStationM, MaximumRiverStationM))
+                {
+                    const float HalfExtentM = 0.5f * MovingStationExtentM;
+                    MovingWindowCenterM.X = FMath::Clamp(
+                        MovingWindowCenterM.X,
+                        MinimumRiverStationM + HalfExtentM,
+                        MaximumRiverStationM - HalfExtentM);
+                }
                 bRiverConfigured = WaterAdapter->ConfigureMovingRiverWindow(
                     RiverConfig->CookedFieldsDir, RiverConfig->FlowBand.ToString(),
-                    RiverConfig->WindowCenterM,
+                    MovingWindowCenterM,
                     FVector2D(
-                        RiverConfig->MovingWindowStationExtentM,
+                        MovingStationExtentM,
                         RiverConfig->MovingWindowLateralExtentM),
                     /*RoughnessManning=*/0.041f);
             }

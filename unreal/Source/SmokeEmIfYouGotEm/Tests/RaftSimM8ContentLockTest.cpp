@@ -167,7 +167,6 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
         float FoamCoverageGain = 0.0f;
         float SpeedCoverageGain = 0.0f;
         float SpeedCoverageThresholdBias = 0.0f;
-        float FlowAdvectionScale = 0.0f;
         FLinearColor ShallowSurfaceColor = FLinearColor::Black;
         FLinearColor DeepSurfaceColor = FLinearColor::Black;
         TestTrue(TEXT("Calm live-water coverage resolves"),
@@ -190,10 +189,6 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
             LiveWaterMaterial->GetScalarParameterValue(
                 FMaterialParameterInfo(TEXT("HydraulicCoverageSpeedThresholdBias")),
                 SpeedCoverageThresholdBias));
-        TestTrue(TEXT("Solver flow-advection scale resolves"),
-            LiveWaterMaterial->GetScalarParameterValue(
-                FMaterialParameterInfo(TEXT("LiveFlowAdvectionScale")),
-                FlowAdvectionScale));
         TestTrue(TEXT("Shallow live-water surface colour resolves"),
             LiveWaterMaterial->GetVectorParameterValue(
                 FMaterialParameterInfo(TEXT("LiveShallowSurfaceColor")),
@@ -211,15 +206,13 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
         TestTrue(TEXT("Ordinary solver speed contributes strongly to live coverage"),
             FMath::IsNearlyEqual(SpeedCoverageGain, 3.2f, KINDA_SMALL_NUMBER) &&
                 FMath::IsNearlyEqual(
-                    SpeedCoverageThresholdBias, -0.03f, KINDA_SMALL_NUMBER));
-        TestTrue(TEXT("Live detail advects at physical solver speed by default"),
-            FMath::IsNearlyEqual(FlowAdvectionScale, 1.0f, KINDA_SMALL_NUMBER));
+                    SpeedCoverageThresholdBias, -0.28f, KINDA_SMALL_NUMBER));
 
         UMaterial* LiveWaterBaseMaterial = Cast<UMaterial>(LiveWaterMaterial);
         TestNotNull(TEXT("Live-water interface is a base material"), LiveWaterBaseMaterial);
         bool bHasSolverVelocityUv = false;
-        bool bHasPrimarySolverAdvection = false;
-        bool bHasCrossSolverAdvection = false;
+        bool bHasUnifiedCurrentSurfaceAdvection = false;
+        bool bHasUnifiedCurrentFoamAdvection = false;
         if (LiveWaterBaseMaterial)
         {
             for (const TObjectPtr<UMaterialExpression>& Expression :
@@ -230,19 +223,20 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
                 {
                     bHasSolverVelocityUv |=
                         TexCoord->CoordinateIndex == 1 &&
-                        TexCoord->Desc == TEXT("RaftSimSolverVelocityMpsUV1");
+                        TexCoord->Desc == TEXT("RaftSimSolverVelocityMagnitudeUV1");
                 }
-                bHasPrimarySolverAdvection |= Expression &&
-                    Expression->Desc == TEXT("RaftSimSolverVelocityAdvectionPrimary");
-                bHasCrossSolverAdvection |= Expression &&
-                    Expression->Desc == TEXT("RaftSimSolverVelocityAdvectionCross");
+                bHasUnifiedCurrentSurfaceAdvection |= Expression &&
+                    Expression->Desc == TEXT("RaftSimUnifiedCurrentWaterSurface");
+                bHasUnifiedCurrentFoamAdvection |= Expression &&
+                    Expression->Desc == TEXT("RaftSimUnifiedCurrentLiveFroth");
             }
         }
-        TestTrue(TEXT("Live material reads solver velocity from UV1"), bHasSolverVelocityUv);
-        TestTrue(TEXT("Primary ripple layer is solver-velocity advected"),
-            bHasPrimarySolverAdvection);
-        TestTrue(TEXT("Cross ripple layer is solver-velocity advected"),
-            bHasCrossSolverAdvection);
+        TestTrue(TEXT("Live material reads solver velocity magnitude from UV1"),
+            bHasSolverVelocityUv);
+        TestTrue(TEXT("Water normals and streaks share continuous current advection"),
+            bHasUnifiedCurrentSurfaceAdvection);
+        TestTrue(TEXT("Live foam shares continuous current advection"),
+            bHasUnifiedCurrentFoamAdvection);
         TestTrue(TEXT("Shallow live overlay uses calibrated gray-green radiance"),
             ShallowSurfaceColor.Equals(
                 FLinearColor(0.115f, 0.185f, 0.175f, 1.0f), KINDA_SMALL_NUMBER));
@@ -266,6 +260,51 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
 #endif
             }
         }
+    }
+
+    UMaterialInterface* SouthForkWater = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+             "MI_RaftSim_SouthForkProductionWater."
+             "MI_RaftSim_SouthForkProductionWater"));
+    TestNotNull(TEXT("South Fork single water carrier loads"), SouthForkWater);
+    if (SouthForkWater)
+    {
+        float FoamIntensity = -1.0f;
+        float BreakupBias = -1.0f;
+        float BreakupGain = -1.0f;
+        float DriftAerationGain = -1.0f;
+        float DriftSpeedGain = -1.0f;
+        TestTrue(TEXT("South Fork solver foam intensity resolves"),
+            SouthForkWater->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("HydraulicFoamIntensity")),
+                FoamIntensity));
+        TestTrue(TEXT("South Fork solid foam breakup bias resolves"),
+            SouthForkWater->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupBias")),
+                BreakupBias));
+        TestTrue(TEXT("South Fork solid foam breakup gain resolves"),
+            SouthForkWater->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")),
+                BreakupGain));
+        TestTrue(TEXT("South Fork drift aeration gain resolves"),
+            SouthForkWater->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("DriftFoamAerationGain")),
+                DriftAerationGain));
+        TestTrue(TEXT("South Fork drift speed gain resolves"),
+            SouthForkWater->GetScalarParameterValue(
+                FMaterialParameterInfo(TEXT("DriftFoamSpeedGain")),
+                DriftSpeedGain));
+        TestTrue(TEXT("South Fork uses the rebuilt unified-current carrier"),
+            SouthForkWater->GetMaterial() &&
+                SouthForkWater->GetMaterial()->GetPathName().Contains(
+                    TEXT("M_RaftSim_SouthForkRaftTransmissionWaterV2")));
+        TestTrue(TEXT("South Fork foam is solver-only with no moving lace"),
+            FMath::IsNearlyEqual(FoamIntensity, 1.0f, KINDA_SMALL_NUMBER) &&
+                FMath::IsNearlyEqual(BreakupBias, 1.0f, KINDA_SMALL_NUMBER) &&
+                FMath::IsNearlyEqual(BreakupGain, 1.0f, KINDA_SMALL_NUMBER) &&
+                FMath::IsNearlyZero(DriftAerationGain, KINDA_SMALL_NUMBER) &&
+                FMath::IsNearlyZero(DriftSpeedGain, KINDA_SMALL_NUMBER));
     }
 
     const TCHAR* RequiredTerrainMicrodetailTextures[] = {

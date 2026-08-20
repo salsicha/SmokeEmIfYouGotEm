@@ -325,7 +325,7 @@ bool FRaftSimM7PrepareFullReachCapture::Update()
         Presentation->SetWeatherVariant(ERaftSimWeatherVariant::ClearMorning, true);
         Test->TestTrue(TEXT("full-reach authored atmosphere actors are bound"),
             Presentation->HasBoundEnvironmentActors());
-        Test->TestFalse(TEXT("clear morning suppresses the stippled cloud layer"),
+        Test->TestTrue(TEXT("full-reach clear morning retains reflective high clouds"),
             Presentation->IsCloudLayerVisible());
         ASkyLight* SkyLight = FindM7Actor<ASkyLight>(World);
         Test->TestNotNull(TEXT("full-reach captured-scene skylight is present"), SkyLight);
