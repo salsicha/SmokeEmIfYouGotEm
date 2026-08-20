@@ -72,6 +72,17 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
         Save->InputBindings.Contains(TEXT("Pause")) &&
         Save->InputBindings.Contains(TEXT("PaddleStroke")) &&
         Save->InputBindings.Contains(TEXT("RescueThrowLine")));
+    const TArray<FRaftSimCareerScenarioDefinition> InitialCatalog =
+        URaftSimProgressionLibrary::GetScenarioCatalog();
+    TestEqual(TEXT("fresh and migrated profiles expose every catalogued run"),
+        Save->UnlockedScenarioIds.Num(), InitialCatalog.Num());
+    for (const FRaftSimCareerScenarioDefinition& Scenario : InitialCatalog)
+    {
+        TestTrue(
+            FString::Printf(TEXT("run '%s' is available without a license gate"),
+                *Scenario.ScenarioId.ToString()),
+            Save->UnlockedScenarioIds.Contains(Scenario.ScenarioId));
+    }
 
     FRaftSimRunResult Result;
     Result.GameMode = ERaftSimGameMode::GuidedDescent;
@@ -84,7 +95,7 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     const ERaftSimMedal UpperMedal = URaftSimSaveSubsystem::ApplyRunResult(Save, Result);
     TestEqual(TEXT("clean authentic result earns gold"),
         static_cast<int32>(UpperMedal), static_cast<int32>(ERaftSimMedal::Gold));
-    TestTrue(TEXT("first gold unlocks Trip Leader section"),
+    TestTrue(TEXT("Trip Leader section remains available after first gold"),
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_coloma")));
 
     Result.ScenarioId = TEXT("south_fork_coloma");
@@ -92,7 +103,7 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     URaftSimSaveSubsystem::ApplyRunResult(Save, Result);
     TestEqual(TEXT("two gold runs promote Senior Guide"),
         static_cast<int32>(Save->LicenseTier), static_cast<int32>(ERaftSimLicenseTier::SeniorGuide));
-    TestTrue(TEXT("gorge and lower sections unlock together"),
+    TestTrue(TEXT("gorge and lower sections remain available"),
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_gorge")) &&
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_lower")));
 
@@ -104,7 +115,7 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     URaftSimSaveSubsystem::ApplyRunResult(Save, Result);
     TestEqual(TEXT("four gold sections promote Expedition Guide"),
         static_cast<int32>(Save->LicenseTier), static_cast<int32>(ERaftSimLicenseTier::ExpeditionGuide));
-    TestTrue(TEXT("full descent and bonus runs unlock"),
+    TestTrue(TEXT("full descent and bonus runs remain available"),
         Save->UnlockedScenarioIds.Contains(TEXT("south_fork_full_descent")) &&
         Save->UnlockedScenarioIds.Contains(TEXT("terminator_challenge")));
 

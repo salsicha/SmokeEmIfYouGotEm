@@ -3,6 +3,7 @@
 #include "Engine/Texture2D.h"
 #include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionComponentMask.h"
+#include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionMax.h"
@@ -15,6 +16,7 @@
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
 #include "Materials/MaterialExpressionTextureSampleParameter2D.h"
 #include "Materials/MaterialExpressionVertexColor.h"
+#include "Materials/MaterialParameterCollection.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -481,27 +483,31 @@ bool FRaftSimSharedFlowAdvectedFoamTest::RunTest(const FString& Parameters)
         TEXT("Foam participates in scene lighting"),
         Material->GetShadingModels().HasShadingModel(MSM_DefaultLit));
     TestTrue(
-        TEXT("Sparse lace keeps the established coverage threshold"),
-        FMath::IsNearlyEqual(Material->OpacityMaskClipValue, 0.18f));
+        TEXT("Sparse lace keeps a low, decay-safe coverage threshold"),
+        FMath::IsNearlyEqual(Material->OpacityMaskClipValue, 0.01f));
 
-    int32 FlowPannerCount = 0;
     int32 RiverLaceSampleCount = 0;
     bool bHasPrimaryAdvection = false;
     bool bHasDetailAdvection = false;
     bool bHasMultiscaleBreakup = false;
     bool bHasLitBaseColor = false;
     bool bHasRaftExclusion = false;
+    bool bHasPhysicalAdvectionParameter = false;
     for (const TObjectPtr<UMaterialExpression>& Expression :
          Material->GetExpressionCollection().Expressions)
     {
-        if (const UMaterialExpressionPanner* Panner =
-                Cast<UMaterialExpressionPanner>(Expression.Get()))
+        bHasPrimaryAdvection |= Expression &&
+            Expression->Desc ==
+                TEXT("RaftSimSolverCurrentAdvectedFoamPrimary");
+        bHasDetailAdvection |= Expression &&
+            Expression->Desc ==
+                TEXT("RaftSimSolverCurrentAdvectedFoamDetail");
+        if (const UMaterialExpressionCollectionParameter* CollectionParameter =
+                Cast<UMaterialExpressionCollectionParameter>(Expression.Get()))
         {
-            ++FlowPannerCount;
-            bHasPrimaryAdvection |=
-                Panner->Desc == TEXT("RaftSimFlowAdvectedFoamPrimary");
-            bHasDetailAdvection |=
-                Panner->Desc == TEXT("RaftSimFlowAdvectedFoamDetail");
+            bHasPhysicalAdvectionParameter |=
+                CollectionParameter->ParameterName ==
+                    TEXT("RaftSimFoamAdvectionMeters");
         }
         if (const UMaterialExpressionTextureSampleParameter2D* Sample =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(Expression.Get()))
@@ -521,12 +527,13 @@ bool FRaftSimSharedFlowAdvectedFoamTest::RunTest(const FString& Parameters)
         }
     }
 
-    TestEqual(TEXT("Primary and detail foam layers move independently"),
-        FlowPannerCount, 2);
     TestEqual(TEXT("Both layers consume the river-local lace parameter"),
         RiverLaceSampleCount, 2);
-    TestTrue(TEXT("Primary lace follows the station axis"), bHasPrimaryAdvection);
-    TestTrue(TEXT("Detail lace uses independent incommensurate motion"),
+    TestTrue(TEXT("Foam reads physical solver-current displacement"),
+        bHasPhysicalAdvectionParameter);
+    TestTrue(TEXT("Primary lace follows solver-current displacement"),
+        bHasPrimaryAdvection);
+    TestTrue(TEXT("Detail lace shares current with independent scale"),
         bHasDetailAdvection);
     TestTrue(TEXT("Two scales break up the former rectangular repeat"),
         bHasMultiscaleBreakup);
@@ -572,6 +579,8 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
     bool bHasCoverageFeather = false;
     bool bHasOpticalCoverageFeather = false;
     bool bHasOpticalDepthResponse = false;
+    int32 SharedCollectionBindingCount = 0;
+    int32 StaleSharedCollectionBindingCount = 0;
     if (UMaterial* ParentMaterial = Instance->Parent
             ? Instance->Parent->GetMaterial()
             : nullptr)
@@ -586,6 +595,47 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
                     TEXT("RaftSimLiveVolumeBankOpticalCoverage");
             bHasOpticalDepthResponse |= Expression &&
                 Expression->Desc == TEXT("RaftSimOpticalDepthResponse");
+            if (const UMaterialExpressionCollectionParameter* CollectionParameter =
+                    Cast<UMaterialExpressionCollectionParameter>(
+                        Expression.Get()))
+            {
+                const UMaterialParameterCollection* Collection =
+                    CollectionParameter->Collection;
+                if (!Collection || !Collection->GetPathName().Contains(
+                        TEXT("MPC_RaftSim_RaftFoamOcclusion")))
+                {
+                    continue;
+                }
+                ++SharedCollectionBindingCount;
+                FGuid CurrentParameterId;
+                if (const FCollectionScalarParameter* Scalar =
+                        Collection->ScalarParameters.FindByPredicate(
+                            [CollectionParameter](
+                                const FCollectionScalarParameter& Parameter)
+                            {
+                                return Parameter.ParameterName ==
+                                    CollectionParameter->ParameterName;
+                            }))
+                {
+                    CurrentParameterId = Scalar->Id;
+                }
+                else if (const FCollectionVectorParameter* Vector =
+                             Collection->VectorParameters.FindByPredicate(
+                                 [CollectionParameter](
+                                     const FCollectionVectorParameter& Parameter)
+                                 {
+                                     return Parameter.ParameterName ==
+                                         CollectionParameter->ParameterName;
+                                 }))
+                {
+                    CurrentParameterId = Vector->Id;
+                }
+                if (!CurrentParameterId.IsValid() ||
+                    CollectionParameter->ParameterId != CurrentParameterId)
+                {
+                    ++StaleSharedCollectionBindingCount;
+                }
+            }
         }
     }
     TestTrue(
@@ -597,6 +647,13 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
     TestTrue(
         TEXT("Shared volume parent exposes a bounded optical-depth response"),
         bHasOpticalDepthResponse);
+    TestTrue(
+        TEXT("Shared volume parent binds the live presentation collection"),
+        SharedCollectionBindingCount >= 4);
+    TestEqual(
+        TEXT("Shared volume parent has no stale collection parameter IDs"),
+        StaleSharedCollectionBindingCount,
+        0);
 
     UTexture* FlowNormal = nullptr;
     UTexture* FoamLace = nullptr;

@@ -117,6 +117,28 @@ float ComputePresentationBankProfile(float StationMeters, bool bRiverLeft)
 }
 }
 
+FVector2D ARaftSimWaterSurfaceActor::AdvanceFoamTextureAdvectionMeters(
+    const FVector2D& CurrentDisplacementMeters,
+    const FVector2D& WaterVelocityMetersPerSecond,
+    float DeltaSeconds)
+{
+    return CurrentDisplacementMeters +
+        WaterVelocityMetersPerSecond * FMath::Max(DeltaSeconds, 0.0f);
+}
+
+float ARaftSimWaterSurfaceActor::SmoothRapidFoamCoverage(
+    float PreviousCoverage,
+    float TargetCoverage,
+    float DeltaSeconds)
+{
+    const float Previous = FMath::Clamp(PreviousCoverage, 0.0f, 1.0f);
+    const float Target = FMath::Clamp(TargetCoverage, 0.0f, 1.0f);
+    const float ResponsePerSecond = Target > Previous ? 8.0f : 0.8f;
+    const float Blend = 1.0f - FMath::Exp(
+        -ResponsePerSecond * FMath::Max(DeltaSeconds, 0.0f));
+    return FMath::Lerp(Previous, Target, FMath::Clamp(Blend, 0.0f, 1.0f));
+}
+
 float ARaftSimWaterSurfaceActor::ComputePresentationSurfaceEdgeClearanceMeters(
     int32 StationIndex,
     int32 StationCount,
@@ -1366,6 +1388,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     LiveVolumeCoreTriangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     RapidFoamVertices.SetNum(VertCount);
     RapidFoamVertexColors.SetNum(VertCount);
+    SmoothedRapidFoamCoverage.SetNumZeroed(VertCount);
     Tangents.SetNum(VertCount);
     Triangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     FoamField.SetNumZeroed(VertCount);
@@ -3763,13 +3786,18 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 ResolvedRapidFoamFocusStart,
                 ResolvedRapidFoamFocusEnd,
                 FoamSignal) * ResolvedRapidFoamCoverageGain;
-            const float FoamCoverage = FMath::Clamp(
+            const float TargetFoamCoverage = FMath::Clamp(
                 FocusedFoam * VertexColors[Index].A,
                 0.0f,
                 1.0f);
+            const float FoamCoverage = SmoothRapidFoamCoverage(
+                SmoothedRapidFoamCoverage[Index],
+                TargetFoamCoverage,
+                FoamDeltaSeconds);
+            SmoothedRapidFoamCoverage[Index] = FoamCoverage;
             RapidFoamVertexColors[Index] = FLinearColor(
                 0.96f, 0.98f, 1.0f, FoamCoverage);
-            if (FoamCoverage >= 0.18f)
+            if (FoamCoverage >= 0.01f)
             {
                 ++VisibleRapidFoamVertexCount;
             }
@@ -3784,10 +3812,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // Carrier maps use this for the full solver foam field. Authored-band
         // maps use it only for boulder-wake lace, which is masked (opaque foam
         // with real holes) rather than another translucent water surface.
+        // Keep the component stable while the material's per-pixel mask and
+        // smoothed vertex coverage decide what is visible. Switching the
+        // entire component at a single threshold made marginal foam fields
+        // flash on and off from one 15 Hz refresh to the next.
         RapidFoamMesh->SetVisibility(
-            VisibleRapidFoamVertexCount > 0 &&
-                (bLiveSurfaceCarrierEnabled ||
-                    WindowBoulderFootprintsSLR.Num() > 0),
+            bLiveSurfaceCarrierEnabled ||
+                WindowBoulderFootprintsSLR.Num() > 0,
             true);
     }
 
@@ -4177,6 +4208,7 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
             GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
     }
     float TargetFlowClockScale = 1.0f;
+    FVector2D TargetFoamTextureVelocityMps = FVector2D::ZeroVector;
     if (!IsValid(FoamOcclusionRaft))
     {
         FoamOcclusionRaft = nullptr;
@@ -4199,12 +4231,48 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
                 ClockSample.VelocityMetersPerSecond.Size2D() / 1.2f,
                 0.75f,
                 2.5f);
+            FVector2D RiverPositionMeters;
+            FVector RiverTangent;
+            FVector RiverLeft;
+            if (WaterAdapter->WorldToRiverCoordinates(
+                    FoamOcclusionRaft->GetActorLocation(),
+                    RiverPositionMeters,
+                    RiverTangent,
+                    RiverLeft))
+            {
+                const FVector2D WorldVelocityMps(
+                    ClockSample.VelocityMetersPerSecond.X,
+                    ClockSample.VelocityMetersPerSecond.Y);
+                TargetFoamTextureVelocityMps = FVector2D(
+                    FVector2D::DotProduct(
+                        WorldVelocityMps,
+                        FVector2D(RiverTangent.X, RiverTangent.Y)),
+                    FVector2D::DotProduct(
+                        WorldVelocityMps,
+                        FVector2D(RiverLeft.X, RiverLeft.Y)));
+            }
+            else
+            {
+                TargetFoamTextureVelocityMps = FVector2D(
+                    ClockSample.VelocityMetersPerSecond.X,
+                    ClockSample.VelocityMetersPerSecond.Y);
+            }
         }
     }
     SmoothedFlowClockScale += (TargetFlowClockScale - SmoothedFlowClockScale) *
         FMath::Clamp(2.0f * DeltaSeconds, 0.0f, 1.0f);
     PresentationWaveClockSeconds +=
         SmoothedFlowClockScale * FMath::Max(DeltaSeconds, 0.0f);
+    const float FoamVelocityBlend = 1.0f - FMath::Exp(
+        -3.0f * FMath::Max(DeltaSeconds, 0.0f));
+    SmoothedFoamTextureVelocityMps = FMath::Lerp(
+        SmoothedFoamTextureVelocityMps,
+        TargetFoamTextureVelocityMps,
+        FMath::Clamp(FoamVelocityBlend, 0.0f, 1.0f));
+    FoamTextureAdvectionMeters = AdvanceFoamTextureAdvectionMeters(
+        FoamTextureAdvectionMeters,
+        SmoothedFoamTextureVelocityMps,
+        DeltaSeconds);
     if (WaterAdapter)
     {
         WaterAdapter->SetPresentationWaveClockSeconds(
@@ -4237,6 +4305,13 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
         {
             ClockParameters->SetScalarParameterValue(
                 TEXT("RaftSimWaveClockSeconds"), PresentationWaveClockSeconds);
+            ClockParameters->SetVectorParameterValue(
+                TEXT("RaftSimFoamAdvectionMeters"),
+                FLinearColor(
+                    FoamTextureAdvectionMeters.X,
+                    FoamTextureAdvectionMeters.Y,
+                    0.0f,
+                    0.0f));
             // Keep the legacy gate hard-disabled even when a saved material
             // package still contains the retired wake expressions. Rebuilding
             // the C++ material authoring graph does not rewrite an existing
@@ -4263,11 +4338,15 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
         }
     }
 
+    // The raft-aligned foam/interior masks are material parameters, so they
+    // must follow the boat every rendered frame rather than hopping at the
+    // lower-frequency hydraulic mesh refresh cadence.
+    UpdateRaftFoamExclusionParameters();
+
     TimeSinceRefresh += DeltaSeconds;
     if (TimeSinceRefresh >= RefreshIntervalSeconds)
     {
         TimeSinceRefresh = 0.0f;
-        UpdateRaftFoamExclusionParameters();
         RefreshSurface();
     }
 }

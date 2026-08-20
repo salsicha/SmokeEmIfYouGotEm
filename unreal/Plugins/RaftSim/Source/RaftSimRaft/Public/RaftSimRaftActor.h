@@ -322,7 +322,7 @@ protected:
 
     /** Hull-water drag coefficient (quadratic above the low-speed reference). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float LinearDragCoefficient = 650.0f;
+    float LinearDragCoefficient = 1800.0f;
 
     /** Angular damping factor per second. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
