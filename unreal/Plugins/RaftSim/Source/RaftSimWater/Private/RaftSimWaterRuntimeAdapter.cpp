@@ -503,23 +503,26 @@ FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
 {
     const float RadiusMeters = FMath::Max(BoulderRadiusMeters, 0.75f);
     const float StartMeters = 0.35f * RadiusMeters;
-    const float EndMeters = 10.0f * RadiusMeters;
+    const float EndMeters = 18.0f * RadiusMeters;
     if (DownstreamMeters <= StartMeters || DownstreamMeters >= EndMeters)
     {
         return FVector2D::ZeroVector;
     }
 
+    // A real obstruction wake opens gradually. The old 0.62 slope sent both
+    // breaking arms onto the banks within a few rock diameters and left the
+    // actual downstream wake nearly flat.
     const float ArmCenterMeters =
-        0.85f * RadiusMeters + 0.62f * DownstreamMeters;
+        0.75f * RadiusMeters + 0.38f * DownstreamMeters;
     const float ArmDistanceMeters =
         FMath::Abs(FMath::Abs(AcrossMeters) - ArmCenterMeters);
-    const float ArmWidthMeters = FMath::Max(1.20f, 0.72f * RadiusMeters);
+    const float ArmWidthMeters = FMath::Max(1.10f, 0.85f * RadiusMeters);
     const float ArmEnvelope = FMath::Exp(
         -0.5f * FMath::Square(ArmDistanceMeters / ArmWidthMeters));
     const float StartEnvelope = FMath::SmoothStep(
         StartMeters, StartMeters + 1.5f * RadiusMeters, DownstreamMeters);
     const float EndEnvelope = 1.0f - FMath::SmoothStep(
-        7.2f * RadiusMeters, EndMeters, DownstreamMeters);
+        14.0f * RadiusMeters, EndMeters, DownstreamMeters);
     const float SpeedEnvelope = FMath::SmoothStep(
         0.45f, 1.65f, FMath::Max(WaterSpeedMetersPerSecond, 0.0f));
     const float Envelope =
@@ -529,10 +532,12 @@ FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
         return FVector2D::ZeroVector;
     }
 
-    const float WavelengthMeters = FMath::Max(3.8f, 2.8f * RadiusMeters);
+    const float WavelengthMeters = FMath::Max(3.8f, 3.4f * RadiusMeters);
+    const float AdvectingSpeedMps =
+        FMath::Max(WaterSpeedMetersPerSecond, 0.45f);
     const float WavePhase =
-        DownstreamMeters * (2.0f * UE_PI / WavelengthMeters) -
-        PhaseSeconds * 1.90f;
+        (DownstreamMeters - AdvectingSpeedMps * PhaseSeconds) *
+        (2.0f * UE_PI / WavelengthMeters);
     const float Wave = FMath::Sin(WavePhase);
     const float BreakingProfile = Wave >= 0.0f
         ? FMath::Pow(Wave, 0.58f)
@@ -540,14 +545,23 @@ FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
     const float RadiusAmplitude = FMath::Lerp(
         0.72f, 1.0f,
         FMath::Clamp((RadiusMeters - 0.75f) / 1.25f, 0.0f, 1.0f));
-    constexpr float MaximumCrestAmplitudeMeters = 0.16f;
+    constexpr float MaximumCrestAmplitudeMeters = 0.24f;
     const float DisplacementMeters = MaximumCrestAmplitudeMeters *
         RadiusAmplitude * Envelope * BreakingProfile;
-    const float CrestFoam = FMath::Clamp(
+    const float CrestFoam =
         0.92f * Envelope *
-            FMath::Pow(FMath::Max(Wave, 0.0f), 0.38f),
-        0.0f, 1.0f);
-    return FVector2D(DisplacementMeters, CrestFoam);
+            FMath::Pow(FMath::Max(Wave, 0.0f), 0.38f);
+    // Aerated recirculation persists between rolling arm crests. This broad
+    // central froth is still born from the obstruction footprint and sampled
+    // water speed, but it prevents the wake from blinking off every time the
+    // signed arm wave enters its trough phase.
+    const float CentralTrail =
+        FMath::Exp(-0.5f * FMath::Square(
+            AcrossMeters / FMath::Max(1.15f * RadiusMeters, 1.0f))) *
+        StartEnvelope * EndEnvelope * SpeedEnvelope;
+    const float Foam = FMath::Clamp(
+        FMath::Max(CrestFoam, 0.58f * CentralTrail), 0.0f, 1.0f);
+    return FVector2D(DisplacementMeters, Foam);
 }
 
 float URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderPillowDisplacementMeters(
@@ -724,6 +738,99 @@ bool URaftSimWaterRuntimeAdapter::LoadRaftSupportBandFieldFromFile(
         RaftSupportBandField.RowStationsM[0],
         RaftSupportBandField.RowStationsM.Last(),
         *AbsolutePath);
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::LoadPresentationBaselineFieldFromFile(
+    const FString& AbsolutePath)
+{
+    PresentationBaselineField.Reset();
+    TUniquePtr<FArchive> Reader(
+        IFileManager::Get().CreateFileReader(*AbsolutePath));
+    if (!Reader.IsValid())
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim presentation baseline: none at %s"), *AbsolutePath);
+        return false;
+    }
+
+    uint32 Magic = 0;
+    uint32 Version = 0;
+    *Reader << Magic;
+    *Reader << Version;
+    if (Magic != 0x52534246u /* 'RSBF' */ || Version != 1u)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim presentation baseline: bad header in %s"),
+            *AbsolutePath);
+        return false;
+    }
+
+    int32 Width = 0;
+    int32 RowCount = 0;
+    *Reader << Width;
+    *Reader << RowCount;
+    *Reader << PresentationBaselineField.LateralOriginM;
+    *Reader << PresentationBaselineField.LateralSpacingM;
+    if (Width < 2 || Width > 512 || RowCount < 2 || RowCount > 200000)
+    {
+        PresentationBaselineField.Reset();
+        return false;
+    }
+    PresentationBaselineField.Width = Width;
+    *Reader << PresentationBaselineField.RowStationsM;
+    *Reader << PresentationBaselineField.ElevationAbsM;
+    *Reader << PresentationBaselineField.Energy;
+    *Reader << PresentationBaselineField.Wet;
+    if (Reader->IsError() || !PresentationBaselineField.IsValid() ||
+        PresentationBaselineField.RowStationsM.Num() != RowCount)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim presentation baseline: malformed body in %s"),
+            *AbsolutePath);
+        PresentationBaselineField.Reset();
+        return false;
+    }
+
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim presentation baseline: %d rows x %d columns, "
+             "stations %.0f-%.0f m; render-only organic shoreline"),
+        RowCount,
+        Width,
+        PresentationBaselineField.RowStationsM[0],
+        PresentationBaselineField.RowStationsM.Last());
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::
+    SamplePresentationBaselineFieldAtRiverCoordinates(
+        FVector2D StationLateralM,
+        FRaftSimWaterSample& OutSample) const
+{
+    float ElevationAbsM = 0.0f;
+    float Energy = 0.0f;
+    if (!PresentationBaselineField.Sample(
+            StationLateralM.X,
+            StationLateralM.Y,
+            ElevationAbsM,
+            Energy))
+    {
+        return false;
+    }
+
+    OutSample = FRaftSimWaterSample{};
+    OutSample.SurfaceHeightMeters = ElevationAbsM - RiverVerticalDatumM;
+    // The baseline binary intentionally stores only the terrain-clipped
+    // surface, wet mask, and hydraulic presentation energy. These bounded
+    // values feed optical depth and current cues only; no gameplay sampler
+    // calls this method.
+    OutSample.DepthMeters = FMath::Lerp(0.80f, 2.40f, Energy);
+    OutSample.BedHeightMeters =
+        OutSample.SurfaceHeightMeters - OutSample.DepthMeters;
+    OutSample.VelocityMetersPerSecond = FVector(
+        FMath::Lerp(1.0f, 2.8f, Energy), 0.0f, 0.0f);
+    OutSample.SurfaceNormal = FVector::UpVector;
+    OutSample.bWet = true;
     return true;
 }
 

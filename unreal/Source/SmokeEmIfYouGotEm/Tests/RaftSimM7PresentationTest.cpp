@@ -334,6 +334,9 @@ bool FRaftSimM7PrepareFullReachCapture::Update()
             Test->TestTrue(TEXT("clear morning retains authored outdoor fill"),
                 SkyLight->GetLightComponent()->Intensity >= 1.20f &&
                 SkyLight->GetLightComponent()->Intensity <= 1.25f);
+            Test->TestFalse(
+                TEXT("cloud reflection uses a stable one-shot sky capture"),
+                SkyLight->GetLightComponent()->IsRealTimeCaptureEnabled());
         }
     }
     if (Audio != nullptr)

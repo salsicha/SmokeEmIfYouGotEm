@@ -184,7 +184,14 @@ void ARaftSimRaftActor::BeginPlay()
     // control while enforcing a floor that captures passive drift promptly;
     // paddle impulses still create velocity relative to the water and decay
     // through this same physical hull resistance.
-    constexpr float kMinimumLoadedHullDrag = 1800.0f;
+    // The named-rapid handoff can raise the sampled current from a calm
+    // transit seed to nearly 3 m/s in one window update. At 1800 the loaded
+    // raft still ran at only ~74% of local water speed ten seconds later, so
+    // solver-advected froth visibly passed the boat. This floor gives the
+    // broad immersed hull a prompt current-capture time without adding any
+    // propulsion: the force remains strictly relative-water drag and falls to
+    // zero when raft and current match.
+    constexpr float kMinimumLoadedHullDrag = 9000.0f;
     BodyConfig.LinearDragCoefficient =
         FMath::Max(LinearDragCoefficient, kMinimumLoadedHullDrag);
     BodyConfig.HeaveDampingNsPerM = HeaveDampingNsPerM;

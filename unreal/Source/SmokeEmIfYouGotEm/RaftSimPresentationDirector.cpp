@@ -90,6 +90,15 @@ void ARaftSimPresentationDirector::BeginPlay()
     // the flagship section ran in the dark. Per-scenario weather belongs
     // in the scenario catalog as an authored field, not in a hash.
     SetWeatherVariant(ERaftSimWeatherVariant::ClearMorning, true);
+    if (bClearMorningCloudsEnabled &&
+        SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
+    {
+        // Capture after ApplyEnvironmentState has made the high clouds
+        // visible. A single coherent cubemap lets water reflect the cloudy
+        // sky without real-time capture time-slicing different cubemap faces
+        // across frames, which appeared as intermittent water flashes.
+        SkyLight->GetLightComponent()->RecaptureSky();
+    }
 }
 
 void ARaftSimPresentationDirector::ResolveEnvironmentActors()
@@ -120,12 +129,10 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
-        // South Fork deliberately keeps a visible high-cloud layer in clear
-        // weather while its water reflection is under review. Let that one map
-        // capture the same moving sky the camera sees; other rivers retain the
-        // cheaper static captured-scene fill.
-        SkyLight->GetLightComponent()->SetRealTimeCaptureEnabled(
-            bClearMorningCloudsEnabled);
+        // Cloud visibility is applied below and South Fork performs one
+        // explicit post-visibility recapture in BeginPlay. Continuous capture
+        // time-slices cubemap faces and can flash on broad smooth water.
+        SkyLight->GetLightComponent()->SetRealTimeCaptureEnabled(false);
     }
     if (HeightFog == nullptr)
     {

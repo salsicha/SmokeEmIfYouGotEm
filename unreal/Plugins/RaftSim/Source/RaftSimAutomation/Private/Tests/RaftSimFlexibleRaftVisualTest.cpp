@@ -800,7 +800,7 @@ bool FRaftSimPassiveCurrentCaptureTest::RunTest(const FString& Parameters)
     Body.WidthMeters = 2.0f;
     Body.TubeRadiusMeters = 0.28f;
     Body.BuoyancyWeightMultiple = 5.2f;
-    Body.LinearDragCoefficient = 1800.0f;
+    Body.LinearDragCoefficient = 9000.0f;
     Body.LowSpeedDragReferenceMps = 1.5f;
     Body.InertiaTensorKgM2 = FVector(900.0f, 900.0f, 1100.0f);
     Adapter->ConfigureRaftBody(Body);
@@ -846,11 +846,11 @@ bool FRaftSimPassiveCurrentCaptureTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("three-second passive drift remains finite"), bStayedFinite);
     TestTrue(
         FString::Printf(
-            TEXT("passive raft reaches at least 90%% of current speed "
+            TEXT("passive raft reaches at least 98%% of current speed "
                  "(raft %.3f m/s, water %.3f m/s)"),
             RaftSpeedMps,
             CurrentSpeedMps),
-        RaftSpeedMps >= CurrentSpeedMps * 0.90f);
+        RaftSpeedMps >= CurrentSpeedMps * 0.98f);
     TestTrue(
         TEXT("passive current capture does not accelerate beyond the water"),
         RaftSpeedMps <= CurrentSpeedMps + 0.01f);

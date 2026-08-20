@@ -43,7 +43,7 @@ SUPERSEDING_SOURCE_HASHES = {
         "4037533415156d0d7cb5270dbdfaeaa0bf8a63a26c70f2b6aa75d51849f9bf69"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
-        "1d5095918ea577aed2bd856cdf24ceebdc73e7e2498b62545256ee9a85a9d978"
+        "ea37013bac5fb61087a9e59f1ec926586e8bed3e37d2a7c5d58758de9b8ab9f0"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": (
         "096c5ec81671830c509a89d75f51ce385bb4a389bf68e325c48fa1e47bd182cd"
@@ -121,7 +121,7 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert "bHasTravelingWaveWPOStrengthParameter" in runtime
     assert "LegacyMaterialWPOCounterM = 0.012f" in runtime
     assert "PresentationWaveClockSeconds = 0.0f" in runtime
-    assert "bSingleLiveWaterSurfaceEnabled ? 8 : 1" in runtime
+    assert "bSingleLiveWaterSurfaceEnabled ? 32 : 1" in runtime
     assert "bSingleLiveWaterSurfaceEnabled ||" in runtime
     assert "bSingleLiveWaterSurfaceEnabled\n            ? 1.0f" in runtime
     assert "ResolvedPresentationStandingWaveScale = bSingleLiveWaterSurfaceEnabled" in runtime
@@ -154,12 +154,12 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
 def test_single_water_surface_continues_past_crop_without_changing_hydraulics() -> None:
     runtime = RUNTIME_SOURCE.read_text()
     assert "TArray<uint8> VolumeCoreWetMask = WetVertexMask" in runtime
-    assert "ExtendOpticalCore(FirstWetStation, -1)" in runtime
-    assert "ExtendOpticalCore(LastWetStation, 1)" in runtime
-    assert "Interior all-dry stations are not bridged" in runtime
+    assert "SamplePresentationBaselineFieldAtRiverCoordinates" in runtime
+    assert "bUseCopiedBoundaryOpticalApron = false" in runtime
+    assert "rectangular bank patch" in runtime
     assert "VolumeCoreWetMask[I0] != 0" in runtime
-    assert "VolumeCoreVertexColors[Index].R = 0.0f" in runtime
-    assert "WetVertexMask, WaterSamples, collision" in runtime
+    assert "FlowVelocityMetersPerSecond," in runtime
+    assert "VolumeCoreEmptyUVs" in runtime
 
 
 def test_travel_keeps_shoreline_visibility_and_sampling_stable() -> None:
@@ -172,6 +172,11 @@ def test_travel_keeps_shoreline_visibility_and_sampling_stable() -> None:
     assert "HandleLevelAddedToWorld" in streaming
     assert "ApplyStaticFlowBandVisibilityToActor(Actor)" in streaming
     assert "FWorldDelegates::LevelAddedToWorld.Remove" in streaming
+    assert "CreateMeshSection replaces an existing section atomically" in runtime
+    assert (
+        "LiveVolumeCoreMesh->ClearMeshSection(0);\n"
+        "                LiveVolumeCoreMesh->CreateMeshSection" not in runtime
+    )
 
 
 def test_shared_foam_review_is_fail_closed_and_hash_locked() -> None:

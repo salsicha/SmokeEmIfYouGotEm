@@ -379,6 +379,22 @@ public:
     bool LoadRaftSupportBandFieldFromFile(const FString& AbsolutePath);
 
     /**
+     * Load the full-reach, terrain-clipped seed used only to continue the
+     * visible river beyond a smaller moving hydraulic crop. This field never
+     * participates in buoyancy, force, contact, or gameplay sampling.
+     */
+    bool LoadPresentationBaselineFieldFromFile(const FString& AbsolutePath);
+
+    /**
+     * Sample the render-only full-reach baseline in station/lateral space.
+     * Returns false outside its organic wet mask. Velocity and depth are
+     * conservative presentation values derived from its cooked energy field;
+     * the live solver remains authoritative wherever its crop is valid.
+     */
+    bool SamplePresentationBaselineFieldAtRiverCoordinates(
+        FVector2D StationLateralM, FRaftSimWaterSample& OutSample) const;
+
+    /**
      * Flow-warped presentation wave clock pushed by the visible water surface
      * each frame. The coupled swell and band phases consume it so they stay
      * paired with the rendered WPO when waves accelerate in fast water.
@@ -536,6 +552,7 @@ private:
     float RaftSupportBreakingCrestLiftMeters = 0.0f;
     float RaftSupportBreakingStationSpacingMeters = 1.0f;
     FSupportBandField RaftSupportBandField;
+    FSupportBandField PresentationBaselineField;
     float PresentationWaveClockSeconds = -1.0f;
 
 #if RAFTSIM_HAS_LIVE_SOLVER

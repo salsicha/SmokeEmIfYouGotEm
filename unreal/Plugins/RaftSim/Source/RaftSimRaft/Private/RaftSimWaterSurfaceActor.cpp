@@ -1329,6 +1329,23 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                         *RiverWaterConfig->FlowBand.ToString())));
             WaterAdapter->LoadRaftSupportBandFieldFromFile(BandFieldPath);
         }
+        if (bSingleLiveWaterSurfaceEnabled && RiverWaterConfig)
+        {
+            // The named-rapid solver windows are intentionally smaller than
+            // the camera's one-piece river carrier. Continue only the visible
+            // surface from the full-reach terrain-clipped seed. Unlike the old
+            // copied boundary row, this field owns an organic wet mask at
+            // every station, so it cannot create a rectangular shoreline.
+            const FString BaselineFieldPath =
+                URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(
+                    FPaths::Combine(
+                        RiverWaterConfig->CookedFieldsDir,
+                        FString::Printf(
+                            TEXT("support_band_field_%s.bin"),
+                            *RiverWaterConfig->FlowBand.ToString())));
+            WaterAdapter->LoadPresentationBaselineFieldFromFile(
+                BaselineFieldPath);
+        }
     }
     BoulderFootprintsSLR.Reset();
     if (RiverWaterConfig && !RiverWaterConfig->CookedFieldsDir.IsEmpty())
@@ -2553,6 +2570,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     RecenterCurvedGrid();
     TArray<uint8> WetVertexMask;
     WetVertexMask.Init(0, Vertices.Num());
+    TArray<uint8> LiveSolverWetVertexMask;
+    LiveSolverWetVertexMask.Init(0, Vertices.Num());
     TArray<FRaftSimWaterSample> WaterSamples;
     WaterSamples.SetNum(Vertices.Num());
     TArray<float> PresentationSurfaceHeightMeters;
@@ -2590,7 +2609,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         RiverCoordinatesM[Index], Sample)
                     : WaterAdapter->SampleWaterAtWorldPosition(
                         FVector(V.X, V.Y, 0.0f), Sample);
-                WetVertexMask[Index] = bSampled && Sample.bWet ? 1 : 0;
+                // A valid live sample, including a dry one, is authoritative.
+                // Only a coordinate outside the finite hydraulic crop may use
+                // the full-reach render baseline. This keeps every physics and
+                // wet/dry decision inside the live window solver-owned.
+                const bool bBaselineSampled =
+                    !bSampled && bSingleLiveWaterSurfaceEnabled &&
+                    bUsesCurvedRiverCoordinates &&
+                    WaterAdapter->
+                        SamplePresentationBaselineFieldAtRiverCoordinates(
+                            RiverCoordinatesM[Index], Sample);
+                LiveSolverWetVertexMask[Index] =
+                    bSampled && Sample.bWet ? 1 : 0;
+                WetVertexMask[Index] =
+                    (bSampled || bBaselineSampled) && Sample.bWet ? 1 : 0;
                 if (WetVertexMask[Index] != 0)
                 {
                     PresentationSurfaceHeightMeters[Index] =
@@ -2617,7 +2649,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // hydraulic relief and localized wakes are added afterward. Other
         // maps retain the original one-pass presentation.
         const int32 SmoothingPassCount =
-            bSingleLiveWaterSurfaceEnabled ? 8 : 1;
+            bSingleLiveWaterSurfaceEnabled ? 32 : 1;
         for (int32 PassIndex = 0;
              PassIndex < SmoothingPassCount;
              ++PassIndex)
@@ -2865,6 +2897,62 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MaximumAbsoluteBoulderWakeM,
             FMath::Abs(BoulderWakeDisplacementMeters[WakeIndex]));
     }
+
+    // One surface, one current cue. Small irregular wave packets are displaced
+    // directly in the unified mesh and translated by the same integrated
+    // river-space current used by persistent foam. The packet envelopes break
+    // the crests laterally, so this reads as moving water rather than the old
+    // full-width white bars; no texture or second sheet can flash independently.
+    TArray<float> CurrentRippleDisplacementMeters;
+    CurrentRippleDisplacementMeters.SetNumZeroed(WaterSamples.Num());
+    if (bSingleLiveWaterSurfaceEnabled)
+    {
+        for (int32 RippleIndex = 0;
+             RippleIndex < CurrentRippleDisplacementMeters.Num();
+             ++RippleIndex)
+        {
+            if (WetVertexMask[RippleIndex] == 0)
+            {
+                continue;
+            }
+            const float SpeedMps = WaterSamples[RippleIndex].
+                VelocityMetersPerSecond.Size2D();
+            const float SpeedEnvelope = FMath::SmoothStep(
+                0.25f, 2.25f, SpeedMps);
+            const float AdvectedStationM =
+                static_cast<float>(RiverCoordinatesM[RippleIndex].X) -
+                FoamTextureAdvectionMeters.X;
+            const float AdvectedLateralM =
+                static_cast<float>(RiverCoordinatesM[RippleIndex].Y) -
+                FoamTextureAdvectionMeters.Y;
+            // Keep the fine crests stretched chiefly along the current.
+            // Their slowly varying downstream phase and faster cross-current
+            // phase form short oblique riffle streaks instead of coherent
+            // channel-wide bands perpendicular to the flow.
+            const float PacketA = FMath::Pow(
+                0.5f + 0.5f * FMath::Sin(
+                    AdvectedStationM * 0.13f +
+                    AdvectedLateralM * 0.57f),
+                5.0f);
+            const float PacketB = FMath::Pow(
+                0.5f + 0.5f * FMath::Sin(
+                    AdvectedStationM * 0.089f -
+                    AdvectedLateralM * 0.71f + 1.7f),
+                6.0f);
+            const float CrestA = FMath::Sin(
+                AdvectedStationM * 0.34f +
+                AdvectedLateralM * 1.12f +
+                0.45f * FMath::Sin(
+                    AdvectedStationM * 0.041f -
+                    AdvectedLateralM * 0.27f));
+            const float CrestB = FMath::Sin(
+                AdvectedStationM * 0.47f -
+                AdvectedLateralM * 1.39f + 0.8f);
+            CurrentRippleDisplacementMeters[RippleIndex] =
+                0.009f * SpeedEnvelope *
+                (PacketA * CrestA + 0.55f * PacketB * CrestB);
+        }
+    }
     LastMaximumAbsoluteBoulderWakeM = MaximumAbsoluteBoulderWakeM;
     int32 WakeFoamVertexCount = 0;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
@@ -3005,7 +3093,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 WakeFoamAdd = FMath::Max(
                     WakeFoamAdd, BoulderWakeFoam[Index]);
                 SurfaceZCm +=
-                    (BoulderWakeDisplacementMeters[Index] +
+                    (CurrentRippleDisplacementMeters[Index] +
+                        BoulderWakeDisplacementMeters[Index] +
                         BoatWakeDisplacementMeters[Index]) * kSurfCmPerM;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
@@ -3133,11 +3222,40 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 Index - DerivativeStride * GridStationN]) /
                         DerivativeSpanMeters;
                 }
+                float CurrentRippleStationSlope = 0.0f;
+                if (X >= DerivativeStride &&
+                    X < GridStationN - DerivativeStride &&
+                    WetVertexMask[Index - DerivativeStride] != 0 &&
+                    WetVertexMask[Index + DerivativeStride] != 0)
+                {
+                    CurrentRippleStationSlope =
+                        (CurrentRippleDisplacementMeters[
+                             Index + DerivativeStride] -
+                            CurrentRippleDisplacementMeters[
+                                Index - DerivativeStride]) /
+                        DerivativeSpanMeters;
+                }
+                float CurrentRippleLateralSlope = 0.0f;
+                if (Y >= DerivativeStride &&
+                    Y < GridLateralN - DerivativeStride &&
+                    WetVertexMask[
+                        Index - DerivativeStride * GridStationN] != 0 &&
+                    WetVertexMask[
+                        Index + DerivativeStride * GridStationN] != 0)
+                {
+                    CurrentRippleLateralSlope =
+                        (CurrentRippleDisplacementMeters[
+                             Index + DerivativeStride * GridStationN] -
+                            CurrentRippleDisplacementMeters[
+                                Index - DerivativeStride * GridStationN]) /
+                        DerivativeSpanMeters;
+                }
                 const FVector PresentationLocalNormal = FVector(
                     -(BaseStationSlope +
                         StandingWave.StationSlope *
                             ResolvedPresentationStandingWaveScale +
                         ReliefStationSlope +
+                        CurrentRippleStationSlope +
                         BoulderWakeStationSlope +
                         BoatWakeStationSlope -
                         LegacyMaterialWPOCounterStationSlope),
@@ -3145,6 +3263,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         StandingWave.LateralSlope *
                             ResolvedPresentationStandingWaveScale +
                         ReliefLateralSlope +
+                        CurrentRippleLateralSlope +
                         BoulderWakeLateralSlope +
                         BoatWakeLateralSlope -
                         LegacyMaterialWPOCounterLateralSlope),
@@ -3236,8 +3355,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             const int32 Index = Y * GridStationN + X;
             const int32 ImmediateUpstreamIndex =
                 Index - PresentationAnalysisStride;
-            if (WetVertexMask[Index] == 0 ||
-                WetVertexMask[ImmediateUpstreamIndex] == 0)
+            // The full-reach baseline is a visual continuity fallback only.
+            // Hydraulic breaking sites alter rigid raft support, so both
+            // sides of a detected transition must belong to the live solver.
+            if (LiveSolverWetVertexMask[Index] == 0 ||
+                LiveSolverWetVertexMask[ImmediateUpstreamIndex] == 0)
             {
                 continue;
             }
@@ -3259,7 +3381,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             {
                 const int32 FarUpstreamIndex =
                     Index - 2 * PresentationAnalysisStride;
-                if (WetVertexMask[FarUpstreamIndex] != 0 &&
+                if (LiveSolverWetVertexMask[FarUpstreamIndex] != 0 &&
                     FroudeField[FarUpstreamIndex] > UpstreamFroude)
                 {
                     UpstreamIndex = FarUpstreamIndex;
@@ -3822,15 +3944,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     Normals[Index].GetSafeNormal() * kLiveVolumeCoreOffsetCm;
         }
 
-        // South Fork hides the old segmented full-reach ribbon, making this
-        // smooth procedural core its sole optical water body. The hydraulic
-        // solver deliberately remains a smaller moving crop. Continue only
-        // the two crop-end station runs from their nearest sampled edge so a
-        // forward view cannot expose bare bed at that implementation boundary.
-        // This is presentation-only: WetVertexMask, WaterSamples, collision,
-        // buoyancy, wakes, foam generation, and riverbank topology are never
-        // modified. Interior all-dry stations are not bridged.
-        if (bSingleLiveWaterSurfaceEnabled)
+        // Retired compatibility apron. The full-reach presentation baseline
+        // now supplies a terrain-clipped wet mask outside the live crop. Never
+        // copy one boundary station downriver again: doing so creates the
+        // rectangular bank patch visible in close shoreline views.
+        constexpr bool bUseCopiedBoundaryOpticalApron = false;
+        if (bSingleLiveWaterSurfaceEnabled &&
+            bUseCopiedBoundaryOpticalApron)
         {
             int32 FirstWetStation = INDEX_NONE;
             int32 LastWetStation = INDEX_NONE;
@@ -4065,16 +4185,24 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         LiveVolumeCoreTriangleCount = LiveVolumeCoreTriangles.Num() / 3;
         if (LiveVolumeCoreTriangleCount > 0)
         {
+            const TArray<FVector2D> VolumeCoreEmptyUVs;
             if (bTopologyChanged ||
                 LiveVolumeCoreMesh->GetProcMeshSection(0) == nullptr)
             {
-                LiveVolumeCoreMesh->ClearMeshSection(0);
+                // CreateMeshSection replaces an existing section atomically.
+                // Clearing it first exposed an empty render state whenever a
+                // shoreline wet cell entered or left the moving window, which
+                // read as an occasional whole-texture flash and bank-water
+                // pop even though the replacement topology was valid.
                 LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
                     0,
                     LiveVolumeCoreVertices,
                     LiveVolumeCoreTriangles,
                     VolumeCoreNormals,
                     UVs,
+                    FlowVelocityMetersPerSecond,
+                    BoatWakePresentationData,
+                    VolumeCoreEmptyUVs,
                     VolumeCoreVertexColors,
                     Tangents,
                     /*bCreateCollision=*/false);
@@ -4086,6 +4214,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     LiveVolumeCoreVertices,
                     VolumeCoreNormals,
                     UVs,
+                    FlowVelocityMetersPerSecond,
+                    BoatWakePresentationData,
+                    VolumeCoreEmptyUVs,
                     VolumeCoreVertexColors,
                     Tangents);
             }
