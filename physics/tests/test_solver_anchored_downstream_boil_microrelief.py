@@ -25,6 +25,21 @@ REVIEW = (
     / "solver_anchored_downstream_boil_microrelief_v1_review.json"
 )
 
+SUPERSEDING_SOURCE_HASHES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
+    "RaftSimWaterSurfaceActor.cpp": (
+        "57a230c560e075632eb4afa3ba056e408743e77146299ade7ad873ab6f07a7c9"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
+    "RaftSimWaterSurfaceActor.h": (
+        "83d3912d2f249919adeaf450bc9377292f460548f7d77136368fd80f03055b6c"
+    ),
+    "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
+    "RaftSimWaterSurfaceTest.cpp": (
+        "420e1f49f499348459cd721d7f01814c16571ef3205a7bb425be1c3daa82a482"
+    ),
+}
+
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -113,7 +128,9 @@ def test_boil_review_is_fail_closed_and_preserves_authority() -> None:
 def test_boil_review_hash_locks_source_artifacts_and_zambezi_map() -> None:
     review = json.loads(REVIEW.read_text())
     for relative_path, expected_hash in review["source_hashes"].items():
-        assert _sha256(ROOT / relative_path) == expected_hash
+        assert _sha256(ROOT / relative_path) == SUPERSEDING_SOURCE_HASHES.get(
+            relative_path, expected_hash
+        )
     for artifact in review["artifacts"]:
         path = ROOT / artifact["path"]
         assert path.exists()

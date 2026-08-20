@@ -533,10 +533,14 @@ FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
     }
 
     const float WavelengthMeters = FMath::Max(3.8f, 3.4f * RadiusMeters);
-    const float AdvectingSpeedMps =
-        FMath::Max(WaterSpeedMetersPerSecond, 0.45f);
-    const float WavePhase =
-        (DownstreamMeters - AdvectingSpeedMps * PhaseSeconds) *
+    // The wake pattern belongs to the obstruction, not to a decal travelling
+    // downstream. Water and entrained air pass through this stationary wave
+    // train; translating the displacement phase made the white arms outrun
+    // both the rock and the raft and periodically replaced every crest with a
+    // trough. Keep the coupled geometry fixed in obstacle space. Only the
+    // aeration breathes, while the persistent foam field carries it with the
+    // sampled current.
+    const float WavePhase = DownstreamMeters *
         (2.0f * UE_PI / WavelengthMeters);
     const float Wave = FMath::Sin(WavePhase);
     const float BreakingProfile = Wave >= 0.0f
@@ -548,8 +552,14 @@ FVector2D URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderWakePresentation(
     constexpr float MaximumCrestAmplitudeMeters = 0.24f;
     const float DisplacementMeters = MaximumCrestAmplitudeMeters *
         RadiusAmplitude * Envelope * BreakingProfile;
+    const float FoamBreath = FMath::Clamp(
+        0.92f + 0.08f * FMath::Sin(
+            PhaseSeconds * (1.1f + 0.18f * WaterSpeedMetersPerSecond) +
+            0.11f * DownstreamMeters + 0.17f * FMath::Abs(AcrossMeters)),
+        0.84f,
+        1.0f);
     const float CrestFoam =
-        0.92f * Envelope *
+        0.92f * Envelope * FoamBreath *
             FMath::Pow(FMath::Max(Wave, 0.0f), 0.38f);
     // Aerated recirculation persists between rolling arm crests. This broad
     // central froth is still born from the obstruction footprint and sampled

@@ -165,13 +165,13 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
             BoulderRadiusM,
             1.4f,
             0.0f);
-    const FVector2D OppositeRollPhase =
+    const FVector2D LaterAerationPhase =
         ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
             BoulderWakeDownstreamM,
             BoulderWakeArmAcrossM,
             BoulderRadiusM,
             1.4f,
-            FMath::Max(3.8f, 3.4f * BoulderRadiusM) / (2.0f * 1.4f));
+            1.3f);
     const FVector2D BoulderWakeCenterline =
         ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
             BoulderWakeDownstreamM,
@@ -187,17 +187,18 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
             FMath::Abs(BoulderWakeCenterline.X) <
                 0.15f * FMath::Abs(PortBoulderWake.X));
     Test->TestTrue(
-        TEXT("boulder wake crests roll downstream through signed relief"),
-        PortBoulderWake.X * OppositeRollPhase.X < 0.0f);
+        TEXT("boulder wake crest geometry remains locked to the obstruction"),
+        FMath::IsNearlyEqual(
+            PortBoulderWake.X, LaterAerationPhase.X, 1.0e-6f));
     Test->TestTrue(
         TEXT("boulder wake breaking crests generate bounded foam"),
-        FMath::Max(PortBoulderWake.Y, OppositeRollPhase.Y) > 0.25f &&
+        FMath::Min(PortBoulderWake.Y, LaterAerationPhase.Y) > 0.25f &&
             PortBoulderWake.Y >= 0.0f && PortBoulderWake.Y <= 1.0f &&
-            OppositeRollPhase.Y >= 0.0f && OppositeRollPhase.Y <= 1.0f);
+            LaterAerationPhase.Y >= 0.0f && LaterAerationPhase.Y <= 1.0f);
     Test->TestTrue(
         TEXT("boulder wake remains inside its 24 cm displacement bound"),
         FMath::Abs(PortBoulderWake.X) <= 0.2401f &&
-            FMath::Abs(OppositeRollPhase.X) <= 0.2401f);
+            FMath::Abs(LaterAerationPhase.X) <= 0.2401f);
     Test->TestTrue(
         TEXT("boulder wake cannot appear upstream of the obstruction"),
         ARaftSimWaterSurfaceActor::ComputeBoulderWakePresentation(
@@ -702,6 +703,12 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     const FVector2D PlungePocket =
         ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
             1.8f, 0.0f, 1.0f);
+    const FVector2D JumpDrawdown =
+        ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+            -2.1f, 0.0f, 1.0f);
+    const FVector2D CurlingJumpLip =
+        ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
+            -0.25f, 0.0f, 1.0f);
     const FVector2D AeratedReturn =
         ARaftSimWaterSurfaceActor::ComputeBreakingPlungePocketPresentation(
             5.0f, 0.0f, 1.0f);
@@ -715,6 +722,10 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         TEXT("breaking jump forms a bounded dark plunge pocket"),
         PlungePocket.X < -0.24f && PlungePocket.X >= -0.2801f &&
             PlungePocket.Y < AeratedReturn.Y);
+    Test->TestTrue(
+        TEXT("breaking jump connects upstream drawdown to an aerated curling lip"),
+        JumpDrawdown.X < -0.03f &&
+            CurlingJumpLip.X > 0.02f && CurlingJumpLip.Y > 0.45f);
     Test->TestTrue(
         TEXT("breaking jump rises into a strongly aerated downstream return"),
         AeratedReturn.X > 0.08f && AeratedReturn.X <= 0.1601f &&
@@ -755,6 +766,34 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     Test->TestTrue(
         TEXT("zero-intensity jumps add no downstream boil presentation"),
         DisabledDownstreamBoil.IsNearlyZero());
+    const FVector2D RollerSurfaceReturn =
+        ARaftSimWaterSurfaceActor::
+            ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+                4.4f, 0.0f, 1.0f, 2.0f);
+    const FVector2D RiverLeftRollerConvergence =
+        ARaftSimWaterSurfaceActor::
+            ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+                4.4f, 2.4f, 1.0f, 2.0f);
+    const FVector2D RiverRightRollerConvergence =
+        ARaftSimWaterSurfaceActor::
+            ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+                4.4f, -2.4f, 1.0f, 2.0f);
+    Test->TestTrue(
+        TEXT("hydraulic roller foam returns upstream at the impact toe"),
+        RollerSurfaceReturn.X < -1.0f &&
+            FMath::IsNearlyZero(RollerSurfaceReturn.Y));
+    Test->TestTrue(
+        TEXT("hydraulic roller surface flow converges into the aerated core"),
+        RiverLeftRollerConvergence.Y < 0.0f &&
+            RiverRightRollerConvergence.Y > 0.0f);
+    Test->TestTrue(
+        TEXT("hydraulic roller return is bounded to accepted jump tailwater"),
+        ARaftSimWaterSurfaceActor::
+            ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+                18.0f, 0.0f, 1.0f, 2.0f).IsNearlyZero() &&
+        ARaftSimWaterSurfaceActor::
+            ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
+                4.4f, 0.0f, 0.0f, 2.0f).IsNearlyZero());
     Test->TestTrue(
         TEXT("presentation edge clearance is zero on a sampled riverbank"),
         FMath::IsNearlyZero(

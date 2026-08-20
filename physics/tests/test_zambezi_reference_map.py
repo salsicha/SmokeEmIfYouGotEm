@@ -168,17 +168,17 @@ CURRENT_SUPERSEDING_SOURCE_HASHES = {
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimWaterSurfaceActor.cpp": (
-        # 2026-08-10: SI telemetry fields (normalized means mislabeled as SI
-        # mis-diagnosed a healthy 0.81 m/s pool as dead water).
-        "64ccef057ade47335fd0b80cbdb9d87047122bd45e836b2506ac408248695beb"
+        # 2026-08-20: obstacle-locked wake geometry and solver-accepted
+        # hydraulic-jump surface recirculation remain presentation-only.
+        "57a230c560e075632eb4afa3ba056e408743e77146299ade7ad873ab6f07a7c9"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
     "RaftSimWaterSurfaceActor.h": (
-        "5f3d75a0deb3478d10c1252b6be126b318427458ede6e64737063b2e6fa6e542"
+        "83d3912d2f249919adeaf450bc9377292f460548f7d77136368fd80f03055b6c"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
     "RaftSimWaterSurfaceTest.cpp": (
-        "0ee7cd7e7145bed40c305c2e150b3caddf4192ccb554cf4d0f2abf995b94ad8b"
+        "420e1f49f499348459cd721d7f01814c16571ef3205a7bb425be1c3daa82a482"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
     "RaftSimTroublemakerMapTest.cpp": (

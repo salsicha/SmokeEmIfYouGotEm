@@ -43,7 +43,7 @@ SUPERSEDING_SOURCE_HASHES = {
         "4037533415156d0d7cb5270dbdfaeaa0bf8a63a26c70f2b6aa75d51849f9bf69"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
-        "ea37013bac5fb61087a9e59f1ec926586e8bed3e37d2a7c5d58758de9b8ab9f0"
+        "57a230c560e075632eb4afa3ba056e408743e77146299ade7ad873ab6f07a7c9"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": (
         "096c5ec81671830c509a89d75f51ce385bb4a389bf68e325c48fa1e47bd182cd"
