@@ -5,6 +5,7 @@
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionPower.h"
@@ -516,6 +517,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
 
     bool bHasTravelingWaveOffset = false;
     bool bHasTravelingWaveStrengthGate = false;
+    bool bHasSingleSurfaceTurbulence = false;
     UMaterialExpression* TravelingWaveOffsetExpression = nullptr;
     for (UMaterialExpression* Expression :
          Material->GetExpressionCollection().Expressions)
@@ -531,6 +533,11 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
                 TEXT("RaftSimTravelingBakeWaveWPOStrengthGate"))
         {
             bHasTravelingWaveStrengthGate = true;
+        }
+        if (Expression &&
+            Expression->Desc == TEXT("RaftSimSingleSurfaceTurbulenceWPO"))
+        {
+            bHasSingleSurfaceTurbulence = true;
         }
     }
     if (!bHasTravelingWaveOffset)
@@ -719,6 +726,104 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         if (UMaterialEditorOnlyData* WpoEditorData = Material->GetEditorOnlyData())
         {
             WpoEditorData->WorldPositionOffset.Connect(0, GatedOffset);
+            bNeedsSave = true;
+        }
+    }
+
+    if (!bHasSingleSurfaceTurbulence)
+    {
+        // Add genuine vertical shape to the same solver carrier that owns the
+        // shoreline, foam, and water samples. UV0 is authored in river
+        // station/lateral metres, while the shared displacement integral is
+        // advanced from the measured current. Subtracting that integral makes
+        // every crest packet travel with the water instead of sliding across
+        // it as an unrelated texture. Vertex colour supplies persistent
+        // solver foam, speed, and wet coverage, confining the larger boiling
+        // shapes to rapids and feathering them out at the organic shoreline.
+        Material->Modify();
+        UMaterialParameterCollection* FlowCollection =
+            LoadOrCreateRaftFoamOcclusionCollection(OutSummary);
+        if (!FlowCollection)
+        {
+            OutSummary += TEXT(
+                "Could not add current-advected 3D turbulence to the South "
+                "Fork water parent.\n");
+            return nullptr;
+        }
+
+        UMaterialExpressionTextureCoordinate* TurbulenceUv =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        Material->GetExpressionCollection().AddExpression(TurbulenceUv);
+        UMaterialExpressionVertexColor* TurbulenceVertexColor =
+            NewObject<UMaterialExpressionVertexColor>(Material);
+        Material->GetExpressionCollection().AddExpression(TurbulenceVertexColor);
+        UMaterialExpressionCollectionParameter* FlowDisplacement =
+            AddRaftWaterCollectionParameter(
+                Material, FlowCollection,
+                TEXT("RaftSimFoamAdvectionMeters"), false);
+        UMaterialExpressionCollectionParameter* WaveClock =
+            AddRaftWaterCollectionParameter(
+                Material, FlowCollection,
+                TEXT("RaftSimWaveClockSeconds"), true);
+        UMaterialExpressionScalarParameter* TurbulenceStrength =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        TurbulenceStrength->ParameterName =
+            TEXT("SouthForkTurbulenceWPOStrength");
+        TurbulenceStrength->DefaultValue = 0.0f;
+        TurbulenceStrength->Group = TEXT("RaftSimSouthForkWaterMotion");
+        Material->GetExpressionCollection().AddExpression(TurbulenceStrength);
+
+        UMaterialExpressionCustom* Turbulence =
+            NewObject<UMaterialExpressionCustom>(Material);
+        Turbulence->Desc = TEXT("RaftSimSingleSurfaceTurbulenceWPO");
+        Turbulence->Description = TEXT(
+            "Current-advected rolling crests and vertically boiling whitewater");
+        Turbulence->OutputType = CMOT_Float3;
+        Turbulence->Code = TEXT(
+            "float2 p = UV * 3.0 - FlowDisplacement.xy;\n"
+            "float rapid = saturate(max(Foam * 1.8, (Speed - 0.09) * 4.0)) * saturate(Wet);\n"
+            "float warp = sin(p.x * 0.29 - p.y * 0.61) + 0.55 * sin(p.x * 0.17 + p.y * 0.83 + 1.7);\n"
+            "float packet = pow(saturate(0.5 + 0.5 * sin(p.x * 0.27 + p.y * 0.49 + warp * 0.55)), 3.0);\n"
+            "float crestA = sin(p.x * 1.15 + p.y * 0.38 + warp * 0.75);\n"
+            "float crestB = sin(p.x * 0.71 - p.y * 1.43 - warp * 0.45);\n"
+            "float boilEnvelope = pow(saturate(0.5 + 0.5 * sin(p.x * 0.43 + p.y * 0.57 + warp)), 2.0);\n"
+            "float localPulse = 0.5 + 0.5 * sin(WaveClock * 2.1 + p.x * 0.88 - p.y * 0.93);\n"
+            "float displacementM = rapid * (0.075 * packet * crestA + 0.045 * crestB + 0.095 * boilEnvelope * (localPulse - 0.35));\n"
+            "return float3(0.0, 0.0, displacementM * 100.0 * Strength);");
+        const auto AddTurbulenceInput = [Turbulence](
+            FName Name, UMaterialExpression* Expression, int32 OutputIndex = 0)
+        {
+            FCustomInput Input;
+            Input.InputName = Name;
+            Input.Input.Connect(OutputIndex, Expression);
+            Turbulence->Inputs.Add(Input);
+        };
+        AddTurbulenceInput(TEXT("UV"), TurbulenceUv);
+        AddTurbulenceInput(TEXT("Foam"), TurbulenceVertexColor, 1);
+        AddTurbulenceInput(TEXT("Speed"), TurbulenceVertexColor, 3);
+        AddTurbulenceInput(TEXT("Wet"), TurbulenceVertexColor, 4);
+        AddTurbulenceInput(TEXT("FlowDisplacement"), FlowDisplacement);
+        AddTurbulenceInput(TEXT("WaveClock"), WaveClock);
+        AddTurbulenceInput(TEXT("Strength"), TurbulenceStrength);
+        Material->GetExpressionCollection().AddExpression(Turbulence);
+
+        if (UMaterialEditorOnlyData* WpoEditorData = Material->GetEditorOnlyData())
+        {
+            UMaterialExpression* ExistingWpo =
+                WpoEditorData->WorldPositionOffset.Expression;
+            if (ExistingWpo)
+            {
+                UMaterialExpressionAdd* CombinedWpo =
+                    NewObject<UMaterialExpressionAdd>(Material);
+                CombinedWpo->A.Expression = ExistingWpo;
+                CombinedWpo->B.Expression = Turbulence;
+                Material->GetExpressionCollection().AddExpression(CombinedWpo);
+                WpoEditorData->WorldPositionOffset.Connect(0, CombinedWpo);
+            }
+            else
+            {
+                WpoEditorData->WorldPositionOffset.Connect(0, Turbulence);
+            }
             bNeedsSave = true;
         }
     }

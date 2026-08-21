@@ -1701,6 +1701,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                             ExistingTravelingWaveWPOStrength);
                     VolumeMaterial->SetScalarParameterValue(
                         TEXT("SouthForkTravelingWaveWPOStrength"), 0.0f);
+                    VolumeMaterial->SetScalarParameterValue(
+                        TEXT("SouthForkTurbulenceWPOStrength"), 1.0f);
                 }
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("CalmRippleStrength"),
@@ -1710,20 +1712,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     0.035f + ResolvedLiveRippleStrength * 0.16f);
                 if (bSingleLiveWaterSurfaceEnabled)
                 {
-                    // The fine normal atlas creates camera-dependent white
-                    // specular flecks even when solver foam is exactly zero.
-                    // They read as a foam bitmap and shimmer between pixels as
-                    // the view moves. South Fork keeps current motion in its
-                    // displaced surface and broad advected roughness lanes;
-                    // flatten only this glitter-producing micro-normal layer.
-                    // Apply this after the shared ripple defaults above so
-                    // those defaults cannot silently restore the shimmer.
+                    // Keep a restrained current-advected normal response below
+                    // the geometric turbulence scale. It supplies bubbles and
+                    // torn surface grain between 1.5 m carrier vertices while
+                    // the new WPO provides real vertical crest/boil silhouette.
+                    // These layers use the same current integral as foam and
+                    // geometry, so no texture can outrun the drifting raft.
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("CalmRippleStrength"), 0.0f);
+                        TEXT("CalmRippleStrength"), 0.025f);
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("FlowRippleStrength"), 0.0f);
+                        TEXT("FlowRippleStrength"), 0.22f);
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("FoamRippleStrength"), 0.0f);
+                        TEXT("FoamRippleStrength"), 0.48f);
                 }
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("ShallowWaterOpacity"),

@@ -26,9 +26,13 @@ REVIEW = (
 )
 
 SUPERSEDING_SOURCE_HASHES = {
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+    "RaftSimEditorSouthForkWaterPresentation.cpp": (
+        "e0ad1c681a5e21cca8b3745b25eddd46341b3b59cbf708c54ee90563dac651ce"
+    ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/"
     "RaftSimWaterSurfaceActor.cpp": (
-        "6d6ec2c854435d98b2acd86a4242b774d31d89c7fb473c1631279483db879dcc"
+        "5926ec1037883be54b9e4c8f795ee7f1ba3e28011bf7858d3639c929dbce19ee"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/"
     "RaftSimEditorZambeziWaterTest.cpp": (
