@@ -404,20 +404,19 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     ThresholdedFoam->MaxDefault = 1.0f;
     UMaterialExpression* FoamBreakupSource = nullptr;
     // 2026-08-06 named human review: "the waves have no white froth." Break
-    // the solver foam mask up with the CC0 lace pair at two incommensurate
-    // tilings; sparse foam shows the lace intersection, saturated foam clots
-    // both scales together into connected froth. The first-party single-lace
-    // sample remains the first fallback, then procedural noise.
-    UTexture2D* FrothLaceLight = LoadObject<UTexture2D>(nullptr,
-        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
-             "T_CC0_Foam001_Opacity.T_CC0_Foam001_Opacity"));
+    // the solver foam mask up with the river-specific organic lace, an
+    // independent dense mask, and a bubble-scale organic sample at three
+    // incommensurate tilings. Sparse foam shows their perforated intersection;
+    // saturated foam clots the larger scales but never fills the small water
+    // pockets solid. The first-party single-lace sample remains the first
+    // fallback, then procedural noise.
     UTexture2D* FrothLaceDense = LoadObject<UTexture2D>(nullptr,
         TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
              "T_CC0_Foam003_Opacity.T_CC0_Foam003_Opacity"));
     UTexture2D* FoamLaceTexture = LoadObject<UTexture2D>(nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
              "T_RaftSim_SouthForkWater_FoamLace.T_RaftSim_SouthForkWater_FoamLace"));
-    if (FrothLaceLight != nullptr && FrothLaceDense != nullptr)
+    if (FoamLaceTexture != nullptr && FrothLaceDense != nullptr)
     {
         auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
                                float UTiling, float VTiling) -> UMaterialExpression* {
@@ -440,21 +439,32 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             return Mask(FrothSampleNode, true, false, false);
         };
         UMaterialExpression* LaceLight = FrothSample(
-            FrothLaceLight, TEXT("WhitewaterFoamLace"),
+            FoamLaceTexture, TEXT("WhitewaterFoamLace"),
             0.26f, 0.58f);
         UMaterialExpression* LaceDense = FrothSample(
             FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
             0.47f, 1.03f);
+        UMaterialExpression* BubbleCells = FrothSample(
+            FoamLaceTexture, TEXT("WhitewaterFrothBubbleCells"),
+            1.12f, 1.87f);
+        UMaterialExpression* BubblePerforation = Lerp(
+            Scalar(TEXT("WhitewaterFrothBubbleHoleFloor"), 0.045f),
+            Scalar(TEXT("WhitewaterFrothBubbleSolid"), 1.0f),
+            BubbleCells);
         UMaterialExpressionSaturate* ClottedFroth =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
-        ClottedFroth->Input.Expression = AddNode(LaceLight, LaceDense);
+        ClottedFroth->Input.Expression = Mul(
+            AddNode(LaceLight, LaceDense), BubblePerforation);
         UMaterialExpressionSaturate* FrothKnee =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
         FrothKnee->Input.Expression = Mul(
             ThresholdedFoam, Scalar(TEXT("WhitewaterFrothKneeGain"), 1.60f));
-        FoamBreakupSource = Lerp(Mul(LaceLight, LaceDense), ClottedFroth, FrothKnee);
+        FoamBreakupSource = Lerp(
+            Mul(Mul(LaceLight, LaceDense), BubblePerforation),
+            ClottedFroth,
+            FrothKnee);
     }
     else if (FoamLaceTexture != nullptr)
     {
@@ -2337,15 +2347,18 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
 
     // Whitewater froth: the 2026-08-06 named human review rejected the flat
     // noise-tinted foam ("waves have no white froth"). Break the solver's
-    // advected foam channel up with the CC0 lace masks at two incommensurate
-    // tilings (kills the visible repeat), and let coverage swing from open
-    // lace to clotted froth as the channel saturates. Null-guarded: absent
-    // textures degrade to the previous procedural-noise path.
+    // advected foam channel up with the river-specific organic lace and an
+    // independent CC0 dense mask at three incommensurate tilings (kills the
+    // visible repeat), and let coverage swing from open lace to clotted froth
+    // as the channel saturates. Null-guarded: absent textures degrade to the
+    // previous procedural-noise path.
     UMaterialExpression* FoamPattern = nullptr;
+    UMaterialExpression* FrothCellVariation = nullptr;
     UTexture2D* FrothLaceLight = LoadObject<UTexture2D>(
         nullptr,
-        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
-             "T_CC0_Foam001_Opacity.T_CC0_Foam001_Opacity"));
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/"
+             "Textures/T_RaftSim_SouthForkWater_FoamLace."
+             "T_RaftSim_SouthForkWater_FoamLace"));
     UTexture2D* FrothLaceDense = LoadObject<UTexture2D>(
         nullptr,
         TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
@@ -2377,21 +2390,45 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         UMaterialExpression* LaceDense = FrothSample(
             FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
             0.43f, 0.94f);
-        // Sparse solver foam shows the open lace intersection; saturated
-        // foam clots both scales together instead of brightening one repeat.
-        // The knee gain clots mid-strength aeration early enough to read as
-        // connected whitewater from guide-seat distance (v220 self-review:
-        // linear coverage read as isolated glints).
+        UMaterialExpression* BubbleCells = FrothSample(
+            FrothLaceLight, TEXT("WhitewaterFrothBubbleCells"),
+            1.17f, 1.83f);
+
+        // Three current-advected scales keep the white body legible without
+        // letting strong solver foam collapse into a featureless card. The
+        // broad vertex channel supplies the roller mass, intersecting lace
+        // tears medium openings through it, and a third incommensurate sample
+        // perforates that lace with bubble-sized dark water windows.
+        UMaterialExpression* BubblePerforation = Lerp(
+            Scalar(TEXT("WhitewaterFrothBubbleHoleFloor"), 0.08f),
+            Scalar(TEXT("WhitewaterFrothBubbleSolid"), 1.0f),
+            BubbleCells);
+        UMaterialExpression* TornLace = Mul(
+            Mul(LaceLight, LaceDense), BubblePerforation);
         UMaterialExpressionSaturate* ClottedFroth =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
-        ClottedFroth->Input.Expression = AddNode(LaceLight, LaceDense);
-        UMaterialExpressionSaturate* FrothKnee =
+        ClottedFroth->Input.Expression = AddNode(
+            Mul(LaceLight,
+                Scalar(TEXT("WhitewaterFrothLightFill"), 0.58f)),
+            Mul(LaceDense,
+                Scalar(TEXT("WhitewaterFrothDenseFill"), 0.52f)));
+        UMaterialExpressionSaturate* FrothCoreFill =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
-        FrothKnee->Input.Expression = Mul(
-            FoamMask, Scalar(TEXT("WhitewaterFrothKneeGain"), 1.60f));
-        FoamPattern = Lerp(Mul(LaceLight, LaceDense), ClottedFroth, FrothKnee);
+        // Even fully aerated vertices retain at least 42% of the torn-lace
+        // response. That preserves dark holes throughout a roller instead of
+        // filling the complete moving-grid cell solid white.
+        FrothCoreFill->Input.Expression = Mul(
+            FoamMask, Scalar(TEXT("WhitewaterFrothCoreFill"), 0.58f));
+        FoamPattern = Lerp(
+            TornLace,
+            Mul(ClottedFroth, BubblePerforation),
+            FrothCoreFill);
+        FrothCellVariation = Lerp(
+            TornLace,
+            BubblePerforation,
+            Scalar(TEXT("UnifiedSurfaceFeatureScaleBlend"), 0.55f));
     }
     else
     {
@@ -2411,14 +2448,42 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
     Foam->Input.Expression = FoamRaw;
     Foam->MinDefault = 0.0f;
     Foam->MaxDefault = 1.0f;
+    UMaterialExpression* FoamToneAlpha = FoamPattern;
+    if (FrothCellVariation != nullptr)
+    {
+        UMaterialExpressionSaturate* MultiscaleTone =
+            Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+        MultiscaleTone->Input.Expression = AddNode(
+            Mul(FoamPattern,
+                Scalar(TEXT("WhitewaterFrothLaceToneWeight"), 0.72f)),
+            Mul(FrothCellVariation,
+                Scalar(TEXT("WhitewaterFrothBubbleToneWeight"), 0.28f)));
+        FoamToneAlpha = MultiscaleTone;
+    }
+    UMaterialExpression* FoamColor = Lerp(
+        Vector(
+            TEXT("WhitewaterFrothShadowColor"),
+            FLinearColor(0.57f, 0.66f, 0.69f, 1.0f)),
+        Vector(
+            TEXT("WhitewaterFrothColor"),
+            FLinearColor(0.92f, 0.95f, 0.96f, 1.0f)),
+        FoamToneAlpha);
     UMaterialExpressionLinearInterpolate* BaseColor = Lerp(
-        ReflectedDepthColor,
-        Vector(TEXT("WhitewaterFrothColor"), FLinearColor(0.90f, 0.93f, 0.94f, 1.0f)),
-        Foam);
+        ReflectedDepthColor, FoamColor, Foam);
 
+    UMaterialExpression* FoamRoughness =
+        Scalar(TEXT("LiveFoamRoughness"), 0.58f);
+    if (FrothCellVariation != nullptr)
+    {
+        FoamRoughness = Lerp(
+            Scalar(TEXT("LiveFoamRoughnessOpenCell"), 0.43f),
+            Scalar(TEXT("LiveFoamRoughnessBubble"), 0.72f),
+            FrothCellVariation);
+    }
     UMaterialExpressionLinearInterpolate* Roughness = Lerp(
         Scalar(TEXT("LiveWaterRoughness"), 0.085f),
-        Scalar(TEXT("LiveFoamRoughness"), 0.58f),
+        FoamRoughness,
         Foam);
 
     UMaterialExpression* FinalNormal = nullptr;
@@ -2769,22 +2834,57 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         }
     }
 
-    // Solver foam on the live sheet needs a direct white channel: the
-    // legacy froth path multiplies foam by a sparse lace pattern and the
-    // sheet's few-percent coverage, which renders boat/obstruction wake
-    // foam invisibly (verified: 50+ wake-foam vertices, zero visible
-    // pixels). Emissive white scaled by the raw foam channel — softly
-    // textured by the pattern, never zeroed by it — makes any foam the
-    // solver or wake system writes actually read.
+    // Bright sky reflection can drive the nearly opaque unified carrier close
+    // to one flat value even outside foam. Reuse the same river-space,
+    // current-advected multiscale field as restrained tone structure, gated by
+    // the solver's real speed and aeration channels. This provides trackable
+    // moving cells and torn lanes without a panner, second sheet, periodic
+    // cross-channel stripe, or moving-grid phase reset.
+    if (FrothCellVariation != nullptr)
+    {
+        UMaterialExpressionSaturate* SurfaceFeatureActivity =
+            Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+        SurfaceFeatureActivity->Input.Expression = AddNode(
+            Mul(SpeedMask,
+                Scalar(TEXT("UnifiedSurfaceFeatureSpeedGain"), 4.5f)),
+            Mul(FoamMask,
+                Scalar(TEXT("UnifiedSurfaceFeatureFoamGain"), 1.5f)));
+        UMaterialExpression* SurfaceFeatureTone = Lerp(
+            Scalar(TEXT("UnifiedSurfaceFeatureDark"), 0.68f),
+            Scalar(TEXT("UnifiedSurfaceFeatureBright"), 1.03f),
+            FrothCellVariation);
+        UMaterialExpression* SurfaceFeatureBlend = Mul(
+            SurfaceFeatureActivity,
+            Scalar(TEXT("UnifiedSurfaceFeatureStrength"), 0.85f));
+        BaseColorOutput = Mul(
+            BaseColorOutput,
+            Lerp(
+                Scalar(TEXT("UnifiedSurfaceFeatureIdentity"), 1.0f),
+                SurfaceFeatureTone,
+                SurfaceFeatureBlend));
+        RoughnessOutput = Lerp(
+            RoughnessOutput,
+            AddNode(
+                RoughnessOutput,
+                Mul(FrothCellVariation,
+                    Scalar(TEXT("UnifiedSurfaceFeatureRoughness"), 0.12f))),
+            SurfaceFeatureBlend);
+    }
+
+    // Solver foam still needs a bounded direct channel so sparse obstruction
+    // wakes cannot disappear between lace openings. Keep that insurance small
+    // and let the three-scale pattern supply nearly all brightness; the old
+    // 45% constant floor was the source of smooth homogeneous white regions.
     {
         UMaterialExpression* GlowTexture =
-            Scalar(TEXT("LiveSolverFoamGlowFloor"), 0.45f);
+            Scalar(TEXT("LiveSolverFoamGlowFloor"), 0.08f);
         if (FoamPattern != nullptr)
         {
             GlowTexture = AddNode(
                 GlowTexture,
                 Mul(FoamPattern,
-                    Scalar(TEXT("LiveSolverFoamGlowPatternGain"), 0.55f)));
+                    Scalar(TEXT("LiveSolverFoamGlowPatternGain"), 0.92f)));
         }
         UMaterialExpression* SolverFoamGlow = Mul(
             Const3(0.88f, 0.91f, 0.92f),
@@ -2855,8 +2955,8 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         AddNode(
             AddNode(
                 HydraulicCoverage,
-                Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.00f))),
-            Mul(FoamMask, Scalar(TEXT("SolverFoamOpacityGain"), 0.55f))),
+                Mul(Foam, Scalar(TEXT("WhitewaterFrothOpacityGain"), 1.28f))),
+            Mul(FoamMask, Scalar(TEXT("SolverFoamOpacityGain"), 0.12f))),
         // Bounded reveal of the real displaced mesh. This is deliberately
         // water-coloured and foam-independent so it reads as a ripple, not
         // a return of the white wake streaks.

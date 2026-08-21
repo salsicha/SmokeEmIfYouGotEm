@@ -805,15 +805,15 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("DeepWaterOpacity")), 0.82f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FoamWaterOpacity")), 0.91f);
-    // South Fork's single solver-conforming carrier owns the whitewater.
-    // Force the breakup term to one and disable the separate drift-lace term:
-    // the resulting white is driven only by the advected vertex foam field,
-    // with no independently animated bitmap phase left to flash or outrun a
+    // South Fork's single solver-conforming carrier owns the whitewater. Its
+    // lace coordinates consume the same integrated-current displacement as
+    // the persistent vertex foam, so retain organic holes without restoring
+    // an independently animated drift sheet or a panner that can outrun a
     // passively drifting raft.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupBias")), 1.0f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupBias")), 0.06f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.0f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.08f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("DriftFoamAerationGain")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
@@ -851,14 +851,14 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("HydraulicWhitewaterGain")), 0.30f);
     // Whitewater has one visual owner: this solver-conforming Single Layer
     // Water carrier. The raised masked sheet is disabled on South Fork, so
-    // retain the advected vertex foam here and make its breakup solid. This
-    // preserves breaking crests without any independently moving foam image.
+    // retain the advected vertex foam here. The breakup shares that field's
+    // integrated motion and therefore adds detail without another foam sheet.
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicFoamIntensity")), 1.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicFoamCoverageGain")), 0.95f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.0f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.08f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicFoamColorCoreGain")), 0.95f);
     // Fast, shallow Sierra water carries a broad distribution of short-wave

@@ -170,7 +170,7 @@ CURRENT_SUPERSEDING_SOURCE_HASHES = {
     "RaftSimWaterSurfaceActor.cpp": (
         # 2026-08-20: obstacle-locked wake geometry and solver-accepted
         # hydraulic-jump surface recirculation remain presentation-only.
-        "57a230c560e075632eb4afa3ba056e408743e77146299ade7ad873ab6f07a7c9"
+        "6d6ec2c854435d98b2acd86a4242b774d31d89c7fb473c1631279483db879dcc"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/"
     "RaftSimWaterSurfaceActor.h": (
