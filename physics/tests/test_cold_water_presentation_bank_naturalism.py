@@ -37,7 +37,7 @@ NATIVE_TEST_CPP = (
 
 SUPERSEDING_SOURCE_HASHES = {
     "runtime_cpp_sha256": (
-        "6d6ec2c854435d98b2acd86a4242b774d31d89c7fb473c1631279483db879dcc"
+        "5926ec1037883be54b9e4c8f795ee7f1ba3e28011bf7858d3639c929dbce19ee"
     ),
     "runtime_header_sha256": (
         "83d3912d2f249919adeaf450bc9377292f460548f7d77136368fd80f03055b6c"

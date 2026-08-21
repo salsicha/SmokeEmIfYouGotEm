@@ -58,7 +58,7 @@ def test_review_is_fail_closed_and_hash_locked() -> None:
 
     current_source_replacements = {
         # 2026-08-10: ripple perceptibility retune (flow-weighted strengths).
-            "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "3db592b92ef779f4ae182bcafe3b030c0341be164aab256f8a0ea8ab2ff72d3d",
+            "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp": "e0ad1c681a5e21cca8b3745b25eddd46341b3b59cbf708c54ee90563dac651ce",
         "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorZambeziWaterTest.cpp": "ab70174bd66c825076b5b14ddf6836c5d88e932bddbce55fb18f6f1ca02dbd74",
     }
     for path, expected in review["source_hashes"].items():

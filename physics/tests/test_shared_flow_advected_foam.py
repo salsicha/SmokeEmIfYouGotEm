@@ -43,7 +43,7 @@ SUPERSEDING_SOURCE_HASHES = {
         "4037533415156d0d7cb5270dbdfaeaa0bf8a63a26c70f2b6aa75d51849f9bf69"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
-        "6d6ec2c854435d98b2acd86a4242b774d31d89c7fb473c1631279483db879dcc"
+        "5926ec1037883be54b9e4c8f795ee7f1ba3e28011bf7858d3639c929dbce19ee"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": (
         "4269db2aba4fac08b21b3d1d58aa9979096993f71a206f9319f3f20d8c94153c"
@@ -108,9 +108,9 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert 'TEXT("HydraulicFoamColorBreakupBias"), 0.06f' in runtime
     assert 'TEXT("HydraulicFoamColorBreakupGain"), 1.08f' in runtime
     assert 'TEXT("DriftFoamOpacity"), 0.0f' in runtime
-    assert 'TEXT("CalmRippleStrength"), 0.0f' in runtime
-    assert 'TEXT("FlowRippleStrength"), 0.0f' in runtime
-    assert 'TEXT("FoamRippleStrength"), 0.0f' in runtime
+    assert 'TEXT("CalmRippleStrength"), 0.025f' in runtime
+    assert 'TEXT("FlowRippleStrength"), 0.22f' in runtime
+    assert 'TEXT("FoamRippleStrength"), 0.48f' in runtime
     assert 'TEXT("LiveFlowStreakRoughness"), 0.0f' in runtime
     assert 'TEXT("LiveFlowStreakTint"), 0.0f' in runtime
     assert 'TEXT("FlowStreakRoughness"), 0.0f' in runtime
@@ -119,6 +119,7 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert 'TEXT("FallbackSkyReflectionVariation"), 0.0f' in runtime
     assert 'TEXT("FallbackSkyReflectionFloor"), 1.0f' in runtime
     assert 'TEXT("SouthForkTravelingWaveWPOStrength"), 0.0f' in runtime
+    assert 'TEXT("SouthForkTurbulenceWPOStrength"), 1.0f' in runtime
     assert "bHasTravelingWaveWPOStrengthParameter" in runtime
     assert "LegacyMaterialWPOCounterM = 0.012f" in runtime
     assert "PresentationWaveClockSeconds = 0.0f" in runtime
@@ -172,6 +173,11 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert 'TEXT("FallbackSkyReflectionFloor")), 1.0f' in south_fork
     assert 'TEXT("SouthForkTravelingWaveWPOStrength")), 0.0f' in south_fork
     assert "RaftSimTravelingBakeWaveWPOStrengthGate" in south_fork
+    assert "RaftSimSingleSurfaceTurbulenceWPO" in south_fork
+    assert 'TEXT("SouthForkTurbulenceWPOStrength")' in south_fork
+    assert 'TEXT("RaftSimFoamAdvectionMeters"), false' in south_fork
+    assert "float2 p = UV * 3.0 - FlowDisplacement.xy" in south_fork
+    assert "displacementM * 100.0 * Strength" in south_fork
 
 
 def test_single_water_surface_continues_past_crop_without_changing_hydraulics() -> None:
