@@ -43,13 +43,13 @@ SUPERSEDING_SOURCE_HASHES = {
         "4037533415156d0d7cb5270dbdfaeaa0bf8a63a26c70f2b6aa75d51849f9bf69"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp": (
-        "57a230c560e075632eb4afa3ba056e408743e77146299ade7ad873ab6f07a7c9"
+        "6d6ec2c854435d98b2acd86a4242b774d31d89c7fb473c1631279483db879dcc"
     ),
     "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp": (
-        "096c5ec81671830c509a89d75f51ce385bb4a389bf68e325c48fa1e47bd182cd"
+        "4269db2aba4fac08b21b3d1d58aa9979096993f71a206f9319f3f20d8c94153c"
     ),
     "physics/tests/test_editor_source_layout.py": (
-        "cae66b6b6be5655f450015c60edf0a7fd776c5d775c9f0406dbd7455476edee9"
+        "8b7b6640a4756178651a6a5fb2119fb244cc51bd3f00ec7d0a19228ab509ff23"
     ),
 }
 
@@ -105,7 +105,8 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert "if (bSingleLiveWaterSurfaceEnabled)" in runtime
     assert "HideBreakingLipMesh();" in runtime
     assert "HideBreakingRollerVolumeMesh();" in runtime
-    assert 'TEXT("HydraulicFoamColorBreakupBias"), 1.0f' in runtime
+    assert 'TEXT("HydraulicFoamColorBreakupBias"), 0.06f' in runtime
+    assert 'TEXT("HydraulicFoamColorBreakupGain"), 1.08f' in runtime
     assert 'TEXT("DriftFoamOpacity"), 0.0f' in runtime
     assert 'TEXT("CalmRippleStrength"), 0.0f' in runtime
     assert 'TEXT("FlowRippleStrength"), 0.0f' in runtime
@@ -125,16 +126,38 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert "bSingleLiveWaterSurfaceEnabled ||" in runtime
     assert "bSingleLiveWaterSurfaceEnabled\n            ? 1.0f" in runtime
     assert "ResolvedPresentationStandingWaveScale = bSingleLiveWaterSurfaceEnabled" in runtime
+    assert "FMath::Max(ConfiguredLiveFoamIntensity, 0.90f)" in runtime
+    assert "bSingleLiveWaterSurfaceEnabled ? 0.12f : 0.55f" in runtime
+    assert "0.028f * SpeedEnvelope" in runtime
     assert "FoamAttackBlend" in runtime
     assert "SourceFoam[Index] > Advected" in runtime
     assert "RaftSimUnifiedCurrentWaterSurface" in material
     assert "RaftSimUnifiedCurrentFoamFroth" in material
     assert "RaftSimUnifiedCurrentLiveFroth" in material
+    assert 'TEXT("WhitewaterFrothBubbleCells")' in material
+    assert 'TEXT("WhitewaterFrothBubbleHoleFloor"), 0.08f' in material
+    assert 'TEXT("WhitewaterFrothCoreFill"), 0.58f' in material
+    assert 'TEXT("WhitewaterFrothShadowColor")' in material
+    assert 'TEXT("LiveFoamRoughnessOpenCell"), 0.43f' in material
+    assert 'TEXT("LiveFoamRoughnessBubble"), 0.72f' in material
+    assert 'TEXT("LiveSolverFoamGlowFloor"), 0.08f' in material
+    assert 'TEXT("LiveSolverFoamGlowPatternGain"), 0.92f' in material
+    assert 'TEXT("SolverFoamOpacityGain"), 0.12f' in material
+    assert 'TEXT("WhitewaterFrothOpacityGain"), 1.28f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureScaleBlend"), 0.55f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureSpeedGain"), 4.5f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureFoamGain"), 1.5f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureDark"), 0.68f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureBright"), 1.03f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureStrength"), 0.85f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureRoughness"), 0.12f' in material
+    assert 'TEXT("LiveSolverFoamGlowFloor"), 0.45f' not in material
+    assert 'TEXT("SolverFoamOpacityGain"), 0.55f' not in material
     assert "MetersToUv->R = -UTiling * SlipFactor / 3.0f" in material
     assert "MetersToUv->G = -VTiling * SlipFactor / 3.0f" in material
     assert "M_RaftSim_SouthForkRaftTransmissionWaterV2" in south_fork
-    assert 'TEXT("HydraulicFoamColorBreakupBias")), 1.0f' in south_fork
-    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.0f' in south_fork
+    assert 'TEXT("HydraulicFoamColorBreakupBias")), 0.06f' in south_fork
+    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.08f' in south_fork
     assert 'TEXT("DriftFoamAerationGain")), 0.0f' in south_fork
     assert 'TEXT("DriftFoamSpeedGain")), 0.0f' in south_fork
     assert 'TEXT("CalmRippleStrength")), 0.0f' in south_fork

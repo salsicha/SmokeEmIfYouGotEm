@@ -1286,7 +1286,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveRippleStrength
                    : 0.18f);
-    const float ResolvedLiveFoamIntensity =
+    const float ConfiguredLiveFoamIntensity =
         bUsesMigratedColoradoVolumeCore
             ? 0.55f
             : bUsesLegacyChilkoPresentationDefaults
@@ -1296,6 +1296,13 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             : (RiverWaterConfig
                    ? RiverWaterConfig->LiveFoamIntensity
                    : 0.52f);
+    // The single South Fork carrier no longer has a separate whitewater sheet
+    // to supply optical body. Its material now preserves current-aligned lace
+    // and bubble perforations even at full aeration, so a stronger response is
+    // safe here: only solver/wake foam is amplified and calm water stays clean.
+    const float ResolvedLiveFoamIntensity = bSingleLiveWaterSurfaceEnabled
+        ? FMath::Max(ConfiguredLiveFoamIntensity, 0.90f)
+        : ConfiguredLiveFoamIntensity;
     bLivePresentationSurfaceSmoothingEnabled =
         bLiveSurfaceCarrierEnabled &&
         (bSingleLiveWaterSurfaceEnabled ||
@@ -1639,16 +1646,16 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 if (bSingleLiveWaterSurfaceEnabled)
                 {
                     // South Fork presents foam directly from the persistent
-                    // solver field. Do not let a saved parent/instance restore
-                    // animated lace breakup or the independent drift-fleck
-                    // layer: either one can make the otherwise continuous
-                    // vertex foam look like it blinks or outruns the water.
-                    // A solid breakup response preserves the solver-authored
-                    // crest shape without giving a bitmap temporal authority.
+                    // solver field. Its lace samples use the same accumulated
+                    // RaftSimFoamAdvectionMeters as the CPU foam transport, so
+                    // they can break up the white body without a panner,
+                    // refresh-phase reset, or texture that outruns the raft.
+                    // Keep a small floor for connected froth, but never force
+                    // the breakup response solid again.
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("HydraulicFoamColorBreakupBias"), 1.0f);
+                        TEXT("HydraulicFoamColorBreakupBias"), 0.06f);
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("HydraulicFoamColorBreakupGain"), 1.0f);
+                        TEXT("HydraulicFoamColorBreakupGain"), 1.08f);
                     VolumeMaterial->SetScalarParameterValue(
                         TEXT("DriftFoamAerationGain"), 0.0f);
                     VolumeMaterial->SetScalarParameterValue(
@@ -1834,7 +1841,9 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 const float OverlayFoamScale =
                     bLiveSurfaceCarrierEnabled ? 1.0f : 0.0f;
                 LiveWaterMaterial->SetScalarParameterValue(
-                    TEXT("SolverFoamOpacityGain"), 0.55f * OverlayFoamScale);
+                    TEXT("SolverFoamOpacityGain"),
+                    (bSingleLiveWaterSurfaceEnabled ? 0.12f : 0.55f) *
+                        OverlayFoamScale);
                 LiveWaterMaterial->SetScalarParameterValue(
                     TEXT("LiveSolverFoamGlow"), 0.55f * OverlayFoamScale);
                 LiveWaterMaterial->SetScalarParameterValue(
@@ -3006,7 +3015,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 AdvectedStationM * 0.47f -
                 AdvectedLateralM * 1.39f + 0.8f);
             CurrentRippleDisplacementMeters[RippleIndex] =
-                0.009f * SpeedEnvelope *
+                0.028f * SpeedEnvelope *
                 (PacketA * CrestA + 0.55f * PacketB * CrestB);
         }
     }

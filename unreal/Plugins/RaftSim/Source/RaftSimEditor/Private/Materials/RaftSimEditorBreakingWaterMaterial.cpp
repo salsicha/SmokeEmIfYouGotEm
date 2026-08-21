@@ -14,7 +14,6 @@
 #include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
-#include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
@@ -161,48 +160,6 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         Expression->B = bB;
         return Cast<UMaterialExpressionComponentMask>(Add(Expression));
     };
-    auto SampleLace = [&](float UTiling, float VTiling, float SpeedX, float SpeedY,
-                          const TCHAR* Name) -> UMaterialExpression*
-    {
-        UMaterialExpressionTextureCoordinate* Uv =
-            NewObject<UMaterialExpressionTextureCoordinate>(Material);
-        Uv->UTiling = UTiling;
-        Uv->VTiling = VTiling;
-        Add(Uv);
-        UMaterialExpressionPanner* Pan =
-            NewObject<UMaterialExpressionPanner>(Material);
-        Pan->Coordinate.Expression = Uv;
-        Pan->SpeedX = SpeedX;
-        Pan->SpeedY = SpeedY;
-        Add(Pan);
-        UMaterialExpressionTextureSampleParameter2D* Sample =
-            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
-        Sample->ParameterName = Name;
-        Sample->Texture = FoamLace;
-        Sample->SamplerType = SAMPLERTYPE_Masks;
-        Sample->Coordinates.Expression = Pan;
-        Add(Sample);
-        return Mask(Sample, true, false, false);
-    };
-
-    UMaterialExpressionVertexColor* VertexColor =
-        NewObject<UMaterialExpressionVertexColor>(Material);
-    Add(VertexColor);
-    UMaterialExpressionComponentMask* Intensity =
-        Mask(VertexColor, true, false, false);
-    UMaterialExpressionComponentMask* AeratedCore =
-        Mask(VertexColor, false, false, true);
-    UMaterialExpressionComponentMask* EdgeFeather =
-        Mask(VertexColor, true, false, false);
-    EdgeFeather->Input.OutputIndex = 4;
-
-    // The connected crest, roller shell, and D4 contact shoulder all share
-    // this material. They must share the live solver-foam sheet's raft-aligned
-    // exclusion too: translucent depth sorting cannot be trusted to keep a
-    // presentation mesh behind the raft or its passengers. The runtime water
-    // actor already updates these parameters from the actual raft transform;
-    // this graph only consumes that presentation mask and changes no water,
-    // contact, collision, buoyancy, navigation, D3, D4, or raft-force state.
     auto CollectionParameter =
         [Material, FoamOcclusionCollection, &Add](FName Name, bool bScalar)
             -> UMaterialExpressionCollectionParameter*
@@ -232,6 +189,67 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         Add(Expression);
         return Expression;
     };
+    UMaterialExpressionCollectionParameter* FoamAdvectionMeters =
+        CollectionParameter(TEXT("RaftSimFoamAdvectionMeters"), false);
+    auto AdvectedUv = [&](UMaterialExpression* Uv, float UTiling, float VTiling,
+                          const TCHAR* Description) -> UMaterialExpression*
+    {
+        UMaterialExpressionCustom* Advected =
+            NewObject<UMaterialExpressionCustom>(Material);
+        Advected->Description = Description;
+        Advected->OutputType = CMOT_Float2;
+        Advected->Code = FString::Printf(
+            TEXT("return UV + float2(-Displacement.y * %.9ff, "
+                 "-Displacement.x * %.9ff);"),
+            UTiling / 3.0f,
+            VTiling / 3.0f);
+        FCustomInput UvInput;
+        UvInput.InputName = TEXT("UV");
+        UvInput.Input.Expression = Uv;
+        Advected->Inputs.Add(UvInput);
+        FCustomInput DisplacementInput;
+        DisplacementInput.InputName = TEXT("Displacement");
+        DisplacementInput.Input.Expression = FoamAdvectionMeters;
+        Advected->Inputs.Add(DisplacementInput);
+        return Add(Advected);
+    };
+    auto SampleLace = [&](float UTiling, float VTiling,
+                          const TCHAR* Name) -> UMaterialExpression*
+    {
+        UMaterialExpressionTextureCoordinate* Uv =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        Uv->UTiling = UTiling;
+        Uv->VTiling = VTiling;
+        Add(Uv);
+        UMaterialExpressionTextureSampleParameter2D* Sample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        Sample->ParameterName = Name;
+        Sample->Texture = FoamLace;
+        Sample->SamplerType = SAMPLERTYPE_Masks;
+        Sample->Coordinates.Expression = AdvectedUv(
+            Uv, UTiling, VTiling, TEXT("RaftSimBreakingFoamCurrentAdvection"));
+        Add(Sample);
+        return Mask(Sample, true, false, false);
+    };
+
+    UMaterialExpressionVertexColor* VertexColor =
+        NewObject<UMaterialExpressionVertexColor>(Material);
+    Add(VertexColor);
+    UMaterialExpressionComponentMask* Intensity =
+        Mask(VertexColor, true, false, false);
+    UMaterialExpressionComponentMask* AeratedCore =
+        Mask(VertexColor, false, false, true);
+    UMaterialExpressionComponentMask* EdgeFeather =
+        Mask(VertexColor, true, false, false);
+    EdgeFeather->Input.OutputIndex = 4;
+
+    // The connected crest, roller shell, and D4 contact shoulder all share
+    // this material. They must share the live solver-foam sheet's raft-aligned
+    // exclusion too: translucent depth sorting cannot be trusted to keep a
+    // presentation mesh behind the raft or its passengers. The runtime water
+    // actor already updates these parameters from the actual raft transform;
+    // this graph only consumes that presentation mask and changes no water,
+    // contact, collision, buoyancy, navigation, D3, D4, or raft-force state.
     UMaterialExpressionWorldPosition* WorldPosition =
         NewObject<UMaterialExpressionWorldPosition>(Material);
     Add(WorldPosition);
@@ -276,28 +294,51 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         EdgeFeather, RaftCrewExclusion);
 
     UMaterialExpression* LaceA = SampleLace(
-        1.35f, 2.80f, 0.014f, 0.082f, TEXT("BreakingFoamLacePrimary"));
+        0.82f, 1.65f, TEXT("BreakingFoamLacePrimary"));
     UMaterialExpression* LaceB = SampleLace(
-        2.45f, 4.10f, -0.021f, 0.117f, TEXT("BreakingFoamLaceDetail"));
-    UMaterialExpressionSaturate* Lace =
+        1.73f, 3.15f, TEXT("BreakingFoamLaceDetail"));
+    UMaterialExpression* BubbleCells = SampleLace(
+        4.35f, 7.10f, TEXT("BreakingFoamBubbleCells"));
+
+    // Preserve open water all the way through a fully aerated roller. The old
+    // additive lace plus a raw 0.90 core term saturated almost every crest
+    // pixel, which made the whitewater one smooth homogeneous shell. A broad
+    // organic tear now intersects an independent detail field and bubble-scale
+    // perforations. The core may clot those features, but it cannot bypass
+    // them or fill their holes solid.
+    UMaterialExpression* BubblePerforation = Lerp(
+        Scalar(TEXT("BreakingFoamBubbleHoleFloor"), 0.035f),
+        Scalar(TEXT("BreakingFoamBubbleSolid"), 1.0f),
+        BubbleCells);
+    UMaterialExpression* TornLace = Multiply(
+        Multiply(LaceA, LaceB), BubblePerforation);
+    UMaterialExpressionSaturate* ClottedLace =
         NewObject<UMaterialExpressionSaturate>(Material);
-    Lace->Input.Expression = AddValues(
-        Multiply(LaceA, Scalar(TEXT("PrimaryLaceGain"), 0.78f)),
-        Multiply(LaceB, Scalar(TEXT("DetailLaceGain"), 0.48f)));
-    Add(Lace);
-    UMaterialExpressionSaturate* Foam =
-        NewObject<UMaterialExpressionSaturate>(Material);
-    Foam->Input.Expression = AddValues(
-        Multiply(
-            Lace,
-            AddValues(
-                Scalar(TEXT("BreakingFoamFloor"), 0.60f),
-                Multiply(
-                    Intensity,
-                    Scalar(TEXT("BreakingFoamIntensityGain"), 0.95f)))),
+    ClottedLace->Input.Expression = Multiply(
+        AddValues(
+            Multiply(LaceA, Scalar(TEXT("PrimaryLaceGain"), 0.82f)),
+            Multiply(LaceB, Scalar(TEXT("DetailLaceGain"), 0.38f))),
+        BubblePerforation);
+    Add(ClottedLace);
+    UMaterialExpression* Lace = Lerp(
+        TornLace,
+        ClottedLace,
         Multiply(
             AeratedCore,
-            Scalar(TEXT("BreakingFoamCoreGain"), 0.90f)));
+            Scalar(TEXT("BreakingFoamCoreClotBlend"), 0.52f)));
+    UMaterialExpressionSaturate* Foam =
+        NewObject<UMaterialExpressionSaturate>(Material);
+    Foam->Input.Expression = Multiply(
+        Lace,
+        AddValues(
+            Scalar(TEXT("BreakingFoamFloor"), 0.16f),
+            AddValues(
+                Multiply(
+                    Intensity,
+                    Scalar(TEXT("BreakingFoamIntensityGain"), 1.12f)),
+                Multiply(
+                    AeratedCore,
+                    Scalar(TEXT("BreakingFoamCoreGain"), 0.62f)))));
     Add(Foam);
     // Whitewater coverage needs a visibly aerated, perforated boundary. Using
     // the raw linear mask in color and opacity let the solver crest-core
@@ -306,13 +347,19 @@ static UMaterial* BuildBreakingWaterLipMaterial()
     // dense bubbles while quickly clearing the interstitial water.
     UMaterialExpression* FoamCoverage = Multiply(Foam, Foam);
 
-    UMaterialExpression* BaseColor = Lerp(
+    UMaterialExpression* FoamTone = Lerp(
         Vector(
-            TEXT("BreakingWaterColor"),
-            FLinearColor(0.18f, 0.31f, 0.32f, 1.0f)),
+            TEXT("BreakingFoamShadowColor"),
+            FLinearColor(0.46f, 0.58f, 0.61f, 1.0f)),
         Vector(
             TEXT("BreakingFoamColor"),
             FLinearColor(0.96f, 0.98f, 1.00f, 1.0f)),
+        BubbleCells);
+    UMaterialExpression* BaseColor = Lerp(
+        Vector(
+            TEXT("BreakingWaterColor"),
+            FLinearColor(0.12f, 0.25f, 0.28f, 1.0f)),
+        FoamTone,
         FoamCoverage);
     UMaterialExpression* Opacity = Multiply(
         OcclusionSafeEdgeFeather,
@@ -330,18 +377,16 @@ static UMaterial* BuildBreakingWaterLipMaterial()
     NormalUv->UTiling = 1.55f;
     NormalUv->VTiling = 3.20f;
     Add(NormalUv);
-    UMaterialExpressionPanner* NormalPan =
-        NewObject<UMaterialExpressionPanner>(Material);
-    NormalPan->Coordinate.Expression = NormalUv;
-    NormalPan->SpeedX = 0.011f;
-    NormalPan->SpeedY = 0.096f;
-    Add(NormalPan);
     UMaterialExpressionTextureSampleParameter2D* NormalSample =
         NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
     NormalSample->ParameterName = TEXT("BreakingFlowNormal");
     NormalSample->Texture = FlowNormal;
     NormalSample->SamplerType = SAMPLERTYPE_Normal;
-    NormalSample->Coordinates.Expression = NormalPan;
+    NormalSample->Coordinates.Expression = AdvectedUv(
+        NormalUv,
+        NormalUv->UTiling,
+        NormalUv->VTiling,
+        TEXT("RaftSimBreakingNormalCurrentAdvection"));
     Add(NormalSample);
 
     UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();

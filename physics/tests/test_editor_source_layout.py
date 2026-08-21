@@ -1418,8 +1418,8 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
     assert 'TEXT("DeepWaterOpacity")), 0.82f' in water_presentation_source
     assert 'TEXT("HydraulicFoamIntensity")), 1.0f' in water_presentation_source
     assert 'TEXT("HydraulicFoamCoverageGain")), 0.95f' in water_presentation_source
-    assert 'TEXT("HydraulicFoamColorBreakupBias")), 1.0f' in water_presentation_source
-    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.0f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamColorBreakupBias")), 0.06f' in water_presentation_source
+    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.08f' in water_presentation_source
     assert 'TEXT("DriftFoamAerationGain")), 0.0f' in water_presentation_source
     assert 'TEXT("DriftFoamSpeedGain")), 0.0f' in water_presentation_source
     assert 'TEXT("WaterRoughness")), 0.24f' in water_presentation_source
@@ -1853,9 +1853,13 @@ def test_live_water_surface_avoids_double_volume_transmission():
     assert "Material->TwoSided = true" in breaking_material_source
     assert "Sample->SamplerType = SAMPLERTYPE_Masks" in breaking_material_source
     assert "EdgeFeather->Input.OutputIndex = 4" in breaking_material_source
-    assert 'Scalar(TEXT("BreakingFoamCoreGain"), 0.70f)' in (breaking_material_source)
+    assert 'Scalar(TEXT("BreakingFoamCoreGain"), 0.62f)' in (breaking_material_source)
+    assert 'TEXT("RaftSimFoamAdvectionMeters")' in breaking_material_source
+    assert 'TEXT("BreakingFoamBubbleCells")' in breaking_material_source
+    assert 'TEXT("BreakingFoamBubbleHoleFloor"), 0.035f' in breaking_material_source
+    assert "MaterialExpressionPanner" not in breaking_material_source
     assert 'Scalar(TEXT("BreakingWaterOpacity"), 0.38f)' in breaking_material_source
-    assert 'Scalar(TEXT("BreakingFoamOpacity"), 0.84f)' in breaking_material_source
+    assert 'Scalar(TEXT("BreakingFoamOpacity"), 0.96f)' in breaking_material_source
 
     breaking_material_script = (
         REPO_ROOT / "unreal/Scripts/create_breaking_water_lip_material.py"
