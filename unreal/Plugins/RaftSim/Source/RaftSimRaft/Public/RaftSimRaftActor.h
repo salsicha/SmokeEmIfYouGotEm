@@ -336,9 +336,44 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float HeaveDampingNsPerM = 1500.0f;
 
-    /** Impulse in Newton-seconds delivered by one full paddle stroke. */
+    /** Impulse in Newton-seconds delivered by one full paddle stroke.
+     * Measured 2026-08-26: at 260 the hull drag returned the raft to water
+     * speed between strokes (continuous AllForward oscillated 0.85-1.3 m/s
+     * in a 1.05 m/s pool — "paddling doesn't make it go faster"), and 560
+     * still sustained only ~+0.5 m/s. The hull drag constant belongs to the
+     * measured physics contract, so feel is tuned here instead: sized so
+     * crew cadence sustains near the MaxPaddleSpeedOverWaterMps governor,
+     * which remains the actual speed authority (strokes fade to zero
+     * there, so this cannot overshoot). */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
-    float PaddleStrokeImpulseNs = 260.0f;
+    float PaddleStrokeImpulseNs = 1150.0f;
+
+    /** Paddling governor: strokes fade to zero as the hull reaches this
+     * speed over the water in the stroke direction. Uncapped strokes
+     * compounded to 9.7 m/s on 2026-08-10 (triple a paddled raft) and
+     * rolled the boat in the cascade wave train; tune feel here instead of
+     * removing the cap. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft", meta = (ClampMin = "0.5"))
+    float MaxPaddleSpeedOverWaterMps = 2.2f;
+
+    /** Impulse basis for the crew's opposing-sides pivot strokes
+     * (TurnLeft/TurnRight). Deliberately decoupled from
+     * PaddleStrokeImpulseNs: forward power is sized against hull drag,
+     * while yaw meets far less resistance — sharing one knob made turns
+     * 4.4x too strong when forward feel was fixed on 2026-08-27. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float CrewTurnStrokeImpulseNs = 260.0f;
+
+    /** Yaw impulse of one guide stern sweep (the mouse-button steer). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float GuideSteerYawImpulseNms = 300.0f;
+
+    /** Forward component of the guide's steer stroke: his blade sweeps, so
+     * steering also pulls the hull forward a little — or backward while the
+     * crew is back-paddling (a back-ferry). Governor-gated like every
+     * stroke, so it cannot compound. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float GuideSteerForwardImpulseNs = 170.0f;
 
     /** Fixed physics substep in seconds (120 Hz), forwarded to the bridge. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")

@@ -207,6 +207,135 @@ static UMaterialExpression* AddCurrentAdvectedCoordinates(
     return AdvectedCoordinates;
 }
 
+// Foam must travel with the same continuous current integral as the water,
+// but its breakup must not inherit one river-aligned frame at every scale.
+// Rotating and gently curl-warping the already-advected coordinates keeps the
+// physical drift exact while turning long parallel lace ribbons into short,
+// intersecting froth cells.  The deformation is deterministic and contains no
+// independent panner, so it cannot outrun the raft or reset at a window update.
+static UMaterialExpression* AddTurbulentFoamCoordinates(
+    UMaterial* Material,
+    UMaterialExpression* AdvectedCoordinates,
+    float RotationRadians,
+    float CurlStrength,
+    const TCHAR* Description)
+{
+    UMaterialExpressionCustom* TurbulentCoordinates =
+        NewObject<UMaterialExpressionCustom>(Material);
+    TurbulentCoordinates->Description = Description;
+    TurbulentCoordinates->OutputType = CMOT_Float2;
+    TurbulentCoordinates->Code = FString::Printf(
+        TEXT("float c = %.9ff;\n")
+        TEXT("float s = %.9ff;\n")
+        TEXT("float2 q = UV - 0.5;\n")
+        TEXT("q = float2(c * q.x - s * q.y, s * q.x + c * q.y);\n")
+        TEXT("float2 curl = float2(\n")
+        TEXT("    sin(q.y * 6.2831853 + sin(q.x * 3.71)),\n")
+        TEXT("    cos(q.x * 6.2831853 - sin(q.y * 4.13))) * %.9ff;\n")
+        TEXT("return q + curl + 0.5;"),
+        FMath::Cos(RotationRadians),
+        FMath::Sin(RotationRadians),
+        CurlStrength);
+    FCustomInput UvInput;
+    UvInput.InputName = TEXT("UV");
+    UvInput.Input.Expression = AdvectedCoordinates;
+    TurbulentCoordinates->Inputs.Add(UvInput);
+    Material->GetExpressionCollection().AddExpression(TurbulentCoordinates);
+    return TurbulentCoordinates;
+}
+
+// A broad solver foam value is intentionally continuous across a hydraulic
+// feature; using it directly can still turn any detailed lace into long white
+// lanes. This deterministic cellular gate partitions that mass into compact
+// bubble/boil clusters. It is evaluated on the same advected coordinate field,
+// so the clusters are carried by the current rather than panning independently.
+static UMaterialExpression* AddCellularFoamPatchMask(
+    UMaterial* Material,
+    UMaterialExpression* AdvectedCoordinates,
+    const TCHAR* Description)
+{
+    UMaterialExpressionCustom* Cells =
+        NewObject<UMaterialExpressionCustom>(Material);
+    Cells->Description = Description;
+    Cells->OutputType = CMOT_Float1;
+    Cells->Code = TEXT(
+        "float2 p = UV;\n"
+        "float2 baseCell = floor(p);\n"
+        "float2 withinCell = frac(p);\n"
+        "float nearest = 8.0;\n"
+        "[unroll] for (int y = -1; y <= 1; ++y)\n"
+        "{\n"
+        "  [unroll] for (int x = -1; x <= 1; ++x)\n"
+        "  {\n"
+        "    float2 lattice = baseCell + float2(x, y);\n"
+        "    float2 seed = frac(sin(float2(\n"
+        "      dot(lattice, float2(127.1, 311.7)),\n"
+        "      dot(lattice, float2(269.5, 183.3)))) * 43758.5453);\n"
+        "    float2 delta = float2(x, y) + seed - withinCell;\n"
+        "    float edgeWarp = 0.08 * sin(dot(delta, float2(7.31, 5.17)) + seed.x * 6.2831853)\n"
+        "                   + 0.05 * sin(dot(p, float2(11.7, -8.3)) + seed.y * 6.2831853);\n"
+        "    nearest = min(nearest, length(delta) + edgeWarp);\n"
+        "  }\n"
+        "}\n"
+        "float cluster = 1.0 - smoothstep(0.18, 0.46, nearest);\n"
+        "float coarse = 0.5 + 0.5 * sin(p.x * 5.17 + sin(p.y * 4.31));\n"
+        "float grain = 0.5 + 0.5 * sin(p.x * 13.7 + sin(p.y * 8.3))\n"
+        "                          * sin(p.y * 11.9 - sin(p.x * 6.1));\n"
+        "float tornInterior = 0.30 + 0.70 * saturate(0.34 * coarse + 0.86 * grain);\n"
+        "return saturate((cluster - 0.16) * 1.36) * tornInterior;");
+    FCustomInput UvInput;
+    UvInput.InputName = TEXT("UV");
+    UvInput.Input.Expression = AdvectedCoordinates;
+    Cells->Inputs.Add(UvInput);
+    Material->GetExpressionCollection().AddExpression(Cells);
+    return Cells;
+}
+
+// Voronoi islands read as round paint splotches when the solver foam channel
+// is broad.  Whitewater instead forms connected sheets, branching tongues and
+// torn seams.  This isotropic, domain-warped web supplies that larger shape;
+// the sampled foam lace below still supplies the bubble-scale holes.  Like all
+// other presentation detail, it receives the shared current-advected UVs and
+// therefore cannot slide independently of the water or the drifting raft.
+static UMaterialExpression* AddTurbulentFoamWebMask(
+    UMaterial* Material,
+    UMaterialExpression* AdvectedCoordinates,
+    const TCHAR* Description)
+{
+    UMaterialExpressionCustom* Web =
+        NewObject<UMaterialExpressionCustom>(Material);
+    Web->Description = Description;
+    Web->OutputType = CMOT_Float1;
+    Web->Code = TEXT(
+        "float2 p = UV;\n"
+        "float2 warp = float2(\n"
+        "  sin(p.y * 0.73 + sin(p.x * 0.47)) + 0.55 * sin(dot(p, float2(0.61, -0.39))),\n"
+        "  cos(p.x * 0.67 - sin(p.y * 0.43)) + 0.55 * cos(dot(p, float2(0.37, 0.59))));\n"
+        "float2 q = p + warp * 0.34;\n"
+        "float a = sin(q.x * 1.17 + sin(q.y * 0.83)) * cos(q.y * 1.31 - sin(q.x * 0.71));\n"
+        "float b = sin(dot(q, float2(1.43, 1.91)) + sin(q.x * 0.57))\n"
+        "        * cos(dot(q, float2(-1.73, 1.09)) - sin(q.y * 0.63));\n"
+        "float c = sin(q.x * 3.71 + sin(q.y * 2.87))\n"
+        "        * sin(q.y * 3.39 - sin(q.x * 2.53));\n"
+        "float sheetField = 0.58 * a + 0.42 * b;\n"
+        "float sheet = 1.0 - smoothstep(0.18, 0.66, abs(sheetField));\n"
+        "float branchField = abs(sin(q.x * 1.09 + sin(q.y * 1.47))\n"
+        "                      + 0.72 * sin(q.y * 1.23 - sin(q.x * 1.61)));\n"
+        "float branches = 1.0 - smoothstep(0.24, 0.78, branchField);\n"
+        "float grainA = 0.5 + 0.5 * c;\n"
+        "float grainB = 0.5 + 0.5 * sin(q.x * 6.31 + sin(q.y * 4.77))\n"
+        "                         * sin(q.y * 5.83 - sin(q.x * 4.19));\n"
+        "float tornGrain = smoothstep(0.24, 0.78, 0.62 * grainA + 0.38 * grainB);\n"
+        "float connectedWeb = saturate(sheet * 0.78 + branches * 0.52);\n"
+        "return saturate(connectedWeb * (0.16 + 0.84 * tornGrain));");
+    FCustomInput UvInput;
+    UvInput.InputName = TEXT("UV");
+    UvInput.Input.Expression = AdvectedCoordinates;
+    Web->Inputs.Add(UvInput);
+    Material->GetExpressionCollection().AddExpression(Web);
+    return Web;
+}
+
 static UMaterial* BuildPhotorealRiverWaterMaterial(
     const TCHAR* PackagePath =
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater"),
@@ -410,43 +539,67 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     // saturated foam clots the larger scales but never fills the small water
     // pockets solid. The first-party single-lace sample remains the first
     // fallback, then procedural noise.
-    UTexture2D* FrothLaceDense = LoadObject<UTexture2D>(nullptr,
-        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
-             "T_CC0_Foam003_Opacity.T_CC0_Foam003_Opacity"));
     UTexture2D* FoamLaceTexture = LoadObject<UTexture2D>(nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
              "T_RaftSim_SouthForkWater_FoamLace.T_RaftSim_SouthForkWater_FoamLace"));
+    // Independent rotation, scale, curl, and thresholding turn a second sample
+    // of the project-owned lace into the dense cellular layer. Keeping both
+    // samples on this proven texture also avoids an optional CC0 texture
+    // reference that can be unresolved during headless shader compilation.
+    UTexture2D* FrothLaceDense = FoamLaceTexture;
     if (FoamLaceTexture != nullptr && FrothLaceDense != nullptr)
     {
         auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
-                               float UTiling, float VTiling) -> UMaterialExpression* {
+                               float Tiling, float RotationRadians,
+                               float CurlStrength) -> UMaterialExpression* {
             UMaterialExpressionTextureCoordinate* FrothUv = Cast<
                 UMaterialExpressionTextureCoordinate>(Add(
                     NewObject<UMaterialExpressionTextureCoordinate>(Material)));
-            FrothUv->UTiling = UTiling;
-            FrothUv->VTiling = VTiling;
+            FrothUv->UTiling = Tiling;
+            FrothUv->VTiling = Tiling;
             UMaterialExpressionTextureSampleParameter2D* FrothSampleNode = Cast<
                 UMaterialExpressionTextureSampleParameter2D>(Add(
                     NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
             FrothSampleNode->ParameterName = ParameterName;
             FrothSampleNode->Texture = Texture;
             FrothSampleNode->SamplerType = SAMPLERTYPE_Masks;
-            FrothSampleNode->Coordinates.Expression =
+            FrothSampleNode->Coordinates.Expression = AddTurbulentFoamCoordinates(
+                Material,
                 AddCurrentAdvectedCoordinates(
-                    Material, FrothUv, UTiling, VTiling, 1.0f,
-                    TEXT("RaftSimUnifiedCurrentFoamFroth"));
+                    Material, FrothUv, Tiling, Tiling, 1.0f,
+                    TEXT("RaftSimUnifiedCurrentFoamFroth")),
+                RotationRadians,
+                CurlStrength,
+                TEXT("RaftSimIsotropicFoamPatchCoordinates"));
             FrothSampleNode->Group = TEXT("RaftSimPhotorealWater");
             return Mask(FrothSampleNode, true, false, false);
         };
-        UMaterialExpression* LaceLight = FrothSample(
+        auto CutFroth = [&](UMaterialExpression* Sample,
+                            const TCHAR* BiasName, float Bias,
+                            const TCHAR* GainName, float Gain)
+            -> UMaterialExpression* {
+            UMaterialExpressionSaturate* Cut = Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+            Cut->Input.Expression = Mul(
+                AddNode(Sample, Scalar(BiasName, -Bias)),
+                Scalar(GainName, Gain));
+            return Cut;
+        };
+        UMaterialExpression* LaceLight = CutFroth(FrothSample(
             FoamLaceTexture, TEXT("WhitewaterFoamLace"),
-            0.26f, 0.58f);
-        UMaterialExpression* LaceDense = FrothSample(
+            0.78f, 0.35f, 0.085f),
+            TEXT("WhitewaterFrothLightCutBias"), 0.22f,
+            TEXT("WhitewaterFrothLightCutGain"), 1.72f);
+        UMaterialExpression* LaceDense = CutFroth(FrothSample(
             FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
-            0.47f, 1.03f);
-        UMaterialExpression* BubbleCells = FrothSample(
+            1.37f, -0.62f, 0.060f),
+            TEXT("WhitewaterFrothDenseCutBias"), 0.20f,
+            TEXT("WhitewaterFrothDenseCutGain"), 1.62f);
+        UMaterialExpression* BubbleCells = CutFroth(FrothSample(
             FoamLaceTexture, TEXT("WhitewaterFrothBubbleCells"),
-            1.12f, 1.87f);
+            3.20f, 1.02f, 0.032f),
+            TEXT("WhitewaterFrothBubbleCutBias"), 0.16f,
+            TEXT("WhitewaterFrothBubbleCutGain"), 1.48f);
         UMaterialExpression* BubblePerforation = Lerp(
             Scalar(TEXT("WhitewaterFrothBubbleHoleFloor"), 0.045f),
             Scalar(TEXT("WhitewaterFrothBubbleSolid"), 1.0f),
@@ -455,7 +608,14 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
         ClottedFroth->Input.Expression = Mul(
-            AddNode(LaceLight, LaceDense), BubblePerforation);
+            Mul(
+                AddNode(
+                    Mul(LaceLight,
+                        Scalar(TEXT("WhitewaterFrothLightPatchWeight"), 0.72f)),
+                    Mul(LaceDense,
+                        Scalar(TEXT("WhitewaterFrothDensePatchWeight"), 0.58f))),
+                BubblePerforation),
+            Scalar(TEXT("WhitewaterFrothPatchContrast"), 1.18f));
         UMaterialExpressionSaturate* FrothKnee =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
@@ -493,6 +653,36 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         FoamNoise->OutputMin = 0.0f; FoamNoise->OutputMax = 1.0f;
         FoamBreakupSource = FoamNoise;
     }
+    UMaterialExpressionTextureCoordinate* FoamPatchUv = Cast<
+        UMaterialExpressionTextureCoordinate>(Add(
+            NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+    FoamPatchUv->UTiling = 4.20f;
+    FoamPatchUv->VTiling = 4.20f;
+    UMaterialExpression* FoamPatchCells = AddTurbulentFoamWebMask(
+        Material,
+        AddTurbulentFoamCoordinates(
+            Material,
+            AddCurrentAdvectedCoordinates(
+                Material, FoamPatchUv, 4.20f, 4.20f, 1.0f,
+                TEXT("RaftSimUnifiedCurrentFoamPatchAdvection")),
+            0.81f,
+            0.060f,
+            TEXT("RaftSimSolverFoamWebCurl")),
+        TEXT("RaftSimSolverFoamConnectedWebGate"));
+    UMaterialExpression* CompactFoamGate = Lerp(
+        Scalar(TEXT("WhitewaterFrothPatchOutsideFloor"), 0.02f),
+        Scalar(TEXT("WhitewaterFrothPatchInside"), 1.0f),
+        FoamPatchCells);
+    // Preserve torn lace throughout the roller. The former solid-cell refill
+    // erased the internal holes and made each Voronoi island a white blob.
+    // A non-zero web floor keeps adjacent tongues visually connected while
+    // the solver mask remains the sole authority for where foam can exist.
+    FoamBreakupSource = Mul(
+        Lerp(
+            Scalar(TEXT("WhitewaterFrothLaceModulationFloor"), 0.18f),
+            Scalar(TEXT("WhitewaterFrothLaceModulationCeiling"), 1.0f),
+            FoamBreakupSource),
+        CompactFoamGate);
     UMaterialExpressionMultiply* FoamColorBreakupContrast = Mul(
         AddNode(FoamBreakupSource,
             Scalar(TEXT("HydraulicFoamColorBreakupBias"), 0.0f)),
@@ -591,39 +781,16 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         UMaterialExpression* FlowCrossUvA =
             FlowAdvectedAt(CrossUv, 1.31f, 1.72f, 0.85f, PhaseA);
         UMaterialExpression* FlowCrossUvB = FlowCrossUvA;
-        // Lane field for the roughness section: two incommensurate sine
-        // lanes (~2.5 m and ~1 m at this tiling), sheared slightly across
-        // stream so they read as water lanes rather than bars. Built from
-        // the advected UVs, so the lanes translate at the water's speed.
-        {
-            const auto CyclesSine =
-                [&](UMaterialExpression* Cycles) -> UMaterialExpression*
-            {
-                UMaterialExpressionSine* Sine =
-                    NewObject<UMaterialExpressionSine>(Material);
-                Sine->Period = 1.0f;
-                Sine->Input.Expression = Cycles;
-                Add(Sine);
-                return Sine;
-            };
-            const auto LaneFieldAt =
-                [&](UMaterialExpression* Uv) -> UMaterialExpression*
-            {
-                UMaterialExpression* StreakU = Mask(Uv, true, false, false);
-                UMaterialExpression* StreakV = Mask(Uv, false, true, false);
-                return Mul(
-                    AddNode(
-                        CyclesSine(AddNode(
-                            Mul(StreakU, Const(1.9f)),
-                            Mul(StreakV, Const(0.45f)))),
-                        CyclesSine(AddNode(
-                            Mul(StreakU, Const(4.6f)),
-                            Mul(StreakV, Const(1.15f))))),
-                    Const(0.5f));
-            };
-            FlowStreakField = Lerp(
-                LaneFieldAt(FlowUvA), LaneFieldAt(FlowUvB), CycleAlpha);
-        }
+        // Trackable roughness patches replace the former pairs of long sine
+        // lanes. Those lanes survived the grazing reflection as bright,
+        // parallel paint strokes. Compact advected cells still reveal the
+        // current's motion, but have finite length in every direction.
+        FlowStreakField = AddCellularFoamPatchMask(
+            Material,
+            AddTurbulentFoamCoordinates(
+                Material, FlowUvA, 0.73f, 0.085f,
+                TEXT("RaftSimWaterRoughnessPatchCoordinates")),
+            TEXT("RaftSimWaterRoughnessPatchField"));
         if (FoamLaceTexture != nullptr)
         {
             // Two lace samples at incommensurate world scales (~14 m and
@@ -632,8 +799,9 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             // the water's own speed. Gain/bias carve it down to sparse
             // drift strands; squaring softens the cut edge.
             const auto DriftLace = [&](const TCHAR* ParameterName,
-                                       float UTilingValue,
-                                       float VTilingValue,
+                                       float TilingValue,
+                                       float RotationRadians,
+                                       float CurlStrength,
                                        UMaterialExpression* Phase)
                 -> UMaterialExpression*
             {
@@ -641,8 +809,8 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                     Cast<UMaterialExpressionTextureCoordinate>(Add(
                         NewObject<UMaterialExpressionTextureCoordinate>(
                             Material)));
-                LaceUv->UTiling = UTilingValue;
-                LaceUv->VTiling = VTilingValue;
+                LaceUv->UTiling = TilingValue;
+                LaceUv->VTiling = TilingValue;
                 UMaterialExpressionTextureSampleParameter2D* Sample =
                     Cast<UMaterialExpressionTextureSampleParameter2D>(Add(
                         NewObject<UMaterialExpressionTextureSampleParameter2D>(
@@ -650,9 +818,13 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 Sample->ParameterName = ParameterName;
                 Sample->Texture = FoamLaceTexture;
                 Sample->SamplerType = SAMPLERTYPE_Masks;
-                Sample->Coordinates.Expression =
+                Sample->Coordinates.Expression = AddTurbulentFoamCoordinates(
+                    Material,
                     FlowAdvectedAt(
-                        LaceUv, UTilingValue, VTilingValue, 1.0f, Phase);
+                        LaceUv, TilingValue, TilingValue, 1.0f, Phase),
+                    RotationRadians,
+                    CurlStrength,
+                    TEXT("RaftSimCompactDriftFoamCoordinates"));
                 Sample->Group = TEXT("RaftSimPhotorealWater");
                 return Mask(Sample, true, false, false);
             };
@@ -662,8 +834,8 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                     const TCHAR* NameB) -> UMaterialExpression*
             {
                 UMaterialExpression* StrandProduct = Mul(
-                    DriftLace(NameA, 0.21f, 0.30f, Phase),
-                    DriftLace(NameB, 0.53f, 0.76f, Phase));
+                    DriftLace(NameA, 0.84f, 0.43f, 0.060f, Phase),
+                    DriftLace(NameB, 1.75f, -0.79f, 0.035f, Phase));
                 UMaterialExpressionSaturate* StrandCut =
                     NewObject<UMaterialExpressionSaturate>(Material);
                 StrandCut->Input.Expression = AddNode(
@@ -733,15 +905,17 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             Add(DepthGate);
             DriftFleckMask = Mul(
                 Mul(
-                    Lerp(
-                        DriftMaskAt(PhaseA,
-                                    TEXT("DriftFoamLaceA0"),
-                                    TEXT("DriftFoamLaceB0")),
-                        DriftMaskAt(PhaseB,
-                                    TEXT("DriftFoamLaceA1"),
-                                    TEXT("DriftFoamLaceB1")),
-                        CycleAlpha),
-                    DriftGate),
+                    Mul(
+                        Lerp(
+                            DriftMaskAt(PhaseA,
+                                        TEXT("DriftFoamLaceA0"),
+                                        TEXT("DriftFoamLaceB0")),
+                            DriftMaskAt(PhaseB,
+                                        TEXT("DriftFoamLaceA1"),
+                                        TEXT("DriftFoamLaceB1")),
+                            CycleAlpha),
+                        DriftGate),
+                    CompactFoamGate),
                 Mul(Mul(WetGate, UpGate), DepthGate));
         }
         auto Ripple = [&](UMaterialExpression* Coordinates,
@@ -824,9 +998,26 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 SlopeDir->B.Expression = Const(CyclesV / Norm * Amplitude);
                 return Mul(WaveSine, SlopeDir);
             };
-            return AddNode(
-                SlopeWave(1.9f, 0.45f, 0.34f),
-                SlopeWave(4.6f, 1.15f, 0.26f));
+            // Balanced crossing directions form short, interacting chop.
+            // The previous two nearly downstream directions produced long
+            // specular ribbons that viewers understandably read as white
+            // streaks rather than wave faces.
+            UMaterialExpression* CrossingChop = AddNode(
+                AddNode(
+                    SlopeWave(2.6f, 1.8f, 0.18f),
+                    SlopeWave(-1.4f, 3.2f, 0.16f)),
+                AddNode(
+                    SlopeWave(4.1f, -2.7f, 0.12f),
+                    SlopeWave(0.8f, 5.3f, 0.10f)));
+            UMaterialExpression* ChopCells = AddCellularFoamPatchMask(
+                Material,
+                AddTurbulentFoamCoordinates(
+                    Material, Uv, -0.51f, 0.075f,
+                    TEXT("RaftSimCrossingChopPatchCoordinates")),
+                TEXT("RaftSimCrossingChopPatchField"));
+            return Mul(
+                CrossingChop,
+                Lerp(Const(0.22f), Const(1.0f), ChopCells));
         };
         UMaterialExpression* AnalyticSlopeXy = Lerp(
             AnalyticSlopeAt(FlowUvA), AnalyticSlopeAt(FlowUvB), CycleAlpha);
@@ -2359,40 +2550,62 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/"
              "Textures/T_RaftSim_SouthForkWater_FoamLace."
              "T_RaftSim_SouthForkWater_FoamLace"));
-    UTexture2D* FrothLaceDense = LoadObject<UTexture2D>(
-        nullptr,
-        TEXT("/Game/RaftSim/Rendering/CC0WaterDetail/"
-             "T_CC0_Foam003_Opacity.T_CC0_Foam003_Opacity"));
+    // The dense scale is a separately transformed sample of the same verified
+    // project-owned lace. Its incommensurate rotation and cutoff make it
+    // statistically independent without relying on an optional texture asset.
+    UTexture2D* FrothLaceDense = FrothLaceLight;
     if (FrothLaceLight != nullptr && FrothLaceDense != nullptr)
     {
         auto FrothSample = [&](UTexture2D* Texture, const TCHAR* ParameterName,
-                               float UTiling, float VTiling) -> UMaterialExpression* {
+                               float Tiling, float RotationRadians,
+                               float CurlStrength) -> UMaterialExpression* {
             UMaterialExpressionTextureCoordinate* FrothUv =
                 Cast<UMaterialExpressionTextureCoordinate>(
                     Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
-            FrothUv->UTiling = UTiling;
-            FrothUv->VTiling = VTiling;
+            FrothUv->UTiling = Tiling;
+            FrothUv->VTiling = Tiling;
             UMaterialExpressionTextureSampleParameter2D* FrothSampleNode =
                 Cast<UMaterialExpressionTextureSampleParameter2D>(Add(
                     NewObject<UMaterialExpressionTextureSampleParameter2D>(Material)));
             FrothSampleNode->ParameterName = ParameterName;
             FrothSampleNode->Texture = Texture;
             FrothSampleNode->SamplerType = SAMPLERTYPE_Masks;
-            FrothSampleNode->Coordinates.Expression =
+            FrothSampleNode->Coordinates.Expression = AddTurbulentFoamCoordinates(
+                Material,
                 AddCurrentAdvectedCoordinates(
-                    Material, FrothUv, UTiling, VTiling, 1.0f,
-                    TEXT("RaftSimUnifiedCurrentLiveFroth"));
+                    Material, FrothUv, Tiling, Tiling, 1.0f,
+                    TEXT("RaftSimUnifiedCurrentLiveFroth")),
+                RotationRadians,
+                CurlStrength,
+                TEXT("RaftSimIsotropicLiveFoamPatchCoordinates"));
             return Mask(FrothSampleNode, true, false, false);
         };
-        UMaterialExpression* LaceLight = FrothSample(
+        auto CutFroth = [&](UMaterialExpression* Sample,
+                            const TCHAR* BiasName, float Bias,
+                            const TCHAR* GainName, float Gain)
+            -> UMaterialExpression* {
+            UMaterialExpressionSaturate* Cut = Cast<UMaterialExpressionSaturate>(
+                Add(NewObject<UMaterialExpressionSaturate>(Material)));
+            Cut->Input.Expression = Mul(
+                AddNode(Sample, Scalar(BiasName, -Bias)),
+                Scalar(GainName, Gain));
+            return Cut;
+        };
+        UMaterialExpression* LaceLight = CutFroth(FrothSample(
             FrothLaceLight, TEXT("WhitewaterFrothLaceLight"),
-            0.22f, 0.53f);
-        UMaterialExpression* LaceDense = FrothSample(
+            0.78f, 0.35f, 0.085f),
+            TEXT("WhitewaterFrothLightCutBias"), 0.22f,
+            TEXT("WhitewaterFrothLightCutGain"), 1.72f);
+        UMaterialExpression* LaceDense = CutFroth(FrothSample(
             FrothLaceDense, TEXT("WhitewaterFrothLaceDense"),
-            0.43f, 0.94f);
-        UMaterialExpression* BubbleCells = FrothSample(
+            1.37f, -0.62f, 0.060f),
+            TEXT("WhitewaterFrothDenseCutBias"), 0.20f,
+            TEXT("WhitewaterFrothDenseCutGain"), 1.62f);
+        UMaterialExpression* BubbleCells = CutFroth(FrothSample(
             FrothLaceLight, TEXT("WhitewaterFrothBubbleCells"),
-            1.17f, 1.83f);
+            3.20f, 1.02f, 0.032f),
+            TEXT("WhitewaterFrothBubbleCutBias"), 0.16f,
+            TEXT("WhitewaterFrothBubbleCutGain"), 1.48f);
 
         // Three current-advected scales keep the white body legible without
         // letting strong solver foam collapse into a featureless card. The
@@ -2408,11 +2621,15 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         UMaterialExpressionSaturate* ClottedFroth =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
-        ClottedFroth->Input.Expression = AddNode(
-            Mul(LaceLight,
-                Scalar(TEXT("WhitewaterFrothLightFill"), 0.58f)),
-            Mul(LaceDense,
-                Scalar(TEXT("WhitewaterFrothDenseFill"), 0.52f)));
+        ClottedFroth->Input.Expression = Mul(
+            Mul(
+                AddNode(
+                    Mul(LaceLight,
+                        Scalar(TEXT("WhitewaterFrothLightFill"), 0.68f)),
+                    Mul(LaceDense,
+                        Scalar(TEXT("WhitewaterFrothDenseFill"), 0.56f))),
+                BubblePerforation),
+            Scalar(TEXT("WhitewaterFrothPatchContrast"), 1.18f));
         UMaterialExpressionSaturate* FrothCoreFill =
             Cast<UMaterialExpressionSaturate>(
                 Add(NewObject<UMaterialExpressionSaturate>(Material)));
@@ -2421,10 +2638,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         // filling the complete moving-grid cell solid white.
         FrothCoreFill->Input.Expression = Mul(
             FoamMask, Scalar(TEXT("WhitewaterFrothCoreFill"), 0.58f));
-        FoamPattern = Lerp(
-            TornLace,
-            Mul(ClottedFroth, BubblePerforation),
-            FrothCoreFill);
+        FoamPattern = Lerp(TornLace, ClottedFroth, FrothCoreFill);
         FrothCellVariation = Lerp(
             TornLace,
             BubblePerforation,
@@ -2440,6 +2654,36 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         FoamNoise->OutputMin = 0.20f;
         FoamNoise->OutputMax = 1.20f;
         FoamPattern = FoamNoise;
+    }
+    UMaterialExpressionTextureCoordinate* FoamPatchUv =
+        Cast<UMaterialExpressionTextureCoordinate>(
+            Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+    FoamPatchUv->UTiling = 4.20f;
+    FoamPatchUv->VTiling = 4.20f;
+    UMaterialExpression* FoamPatchCells = AddTurbulentFoamWebMask(
+        Material,
+        AddTurbulentFoamCoordinates(
+            Material,
+            AddCurrentAdvectedCoordinates(
+                Material, FoamPatchUv, 4.20f, 4.20f, 1.0f,
+                TEXT("RaftSimUnifiedCurrentLiveFoamPatchAdvection")),
+            0.81f,
+            0.060f,
+            TEXT("RaftSimLiveFoamWebCurl")),
+        TEXT("RaftSimLiveFoamConnectedWebGate"));
+    UMaterialExpression* CompactFoamGate = Lerp(
+        Scalar(TEXT("WhitewaterFrothPatchOutsideFloor"), 0.02f),
+        Scalar(TEXT("WhitewaterFrothPatchInside"), 1.0f),
+        FoamPatchCells);
+    FoamPattern = Mul(
+        Lerp(
+            Scalar(TEXT("WhitewaterFrothLaceModulationFloor"), 0.18f),
+            Scalar(TEXT("WhitewaterFrothLaceModulationCeiling"), 1.0f),
+            FoamPattern),
+        CompactFoamGate);
+    if (FrothCellVariation != nullptr)
+    {
+        FrothCellVariation = Mul(FrothCellVariation, CompactFoamGate);
     }
     UMaterialExpressionMultiply* FoamRaw = Mul(
         Mul(FoamMask, FoamPattern), Scalar(TEXT("LiveFoamIntensity"), 1.70f));
@@ -2613,25 +2857,10 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             CombinedNormal,
             LiveGrazingFilteredNormalStrength);
 
-        // Flow streaks: lanes of roughness variation sampled at the same
-        // current-advected coordinates as the ripple normals, so they slide
-        // downstream at exactly the water's speed. The ripple normal alone
-        // cannot carry the motion cue here — a ±6% slope texture at 0.18
-        // strength, halved again by the grazing floor, disappears into the
-        // constant-roughness fresnel mirror. Matte streaks crossing that
-        // mirror stay visible from the raft deck. Amplitude gates on the
-        // squared solver speed so calm pools keep their glass.
+        // Compact roughness cells sampled at the same current-advected
+        // coordinates as the ripple normals. These keep a trackable motion
+        // cue without reintroducing long matte or bright flow stripes.
         {
-            const auto CyclesSine =
-                [&](UMaterialExpression* Cycles) -> UMaterialExpression*
-            {
-                UMaterialExpressionSine* Sine =
-                    NewObject<UMaterialExpressionSine>(Material);
-                Sine->Period = 1.0f;
-                Sine->Input.Expression = Cycles;
-                Add(Sine);
-                return Sine;
-            };
             const auto ConstExpr = [&](float Value) -> UMaterialExpression*
             {
                 UMaterialExpressionConstant* C =
@@ -2640,24 +2869,12 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                 Add(C);
                 return C;
             };
-            // Two incommensurate lane frequencies, each sheared slightly
-            // across-stream so the pattern reads as water lanes, not bars.
-            // FlowUv is ~4 m per unit: lanes land at roughly 3 m and 1.2 m.
-            const auto LaneFieldAt =
-                [&](UMaterialExpression* Uv) -> UMaterialExpression*
-            {
-                UMaterialExpression* StreakU = Mask(Uv, true, false, false);
-                UMaterialExpression* StreakV = Mask(Uv, false, true, false);
-                UMaterialExpression* LaneA = CyclesSine(AddNode(
-                    Mul(StreakU, ConstExpr(1.40f)),
-                    Mul(StreakV, ConstExpr(0.35f))));
-                UMaterialExpression* LaneB = CyclesSine(AddNode(
-                    Mul(StreakU, ConstExpr(3.37f)),
-                    Mul(StreakV, ConstExpr(0.83f))));
-                return Mul(AddNode(LaneA, LaneB), ConstExpr(0.5f));
-            };
-            UMaterialExpression* StreakField = Lerp(
-                LaneFieldAt(FlowUvA), LaneFieldAt(FlowUvB), CycleAlpha);
+            UMaterialExpression* StreakField = AddCellularFoamPatchMask(
+                Material,
+                AddTurbulentFoamCoordinates(
+                    Material, FlowUvA, 0.67f, 0.080f,
+                    TEXT("RaftSimLiveWaterRoughnessPatchCoordinates")),
+                TEXT("RaftSimLiveWaterRoughnessPatchField"));
             UMaterialExpressionDotProduct* SpeedSquared =
                 NewObject<UMaterialExpressionDotProduct>(Material);
             SpeedSquared->A.Expression = FlowVelocityMps;
@@ -2694,8 +2911,9 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             if (DriftLaceTexture != nullptr)
             {
                 const auto DriftLace = [&](const TCHAR* ParameterName,
-                                           float UTilingValue,
-                                           float VTilingValue,
+                                           float TilingValue,
+                                           float RotationRadians,
+                                           float CurlStrength,
                                            UMaterialExpression* Phase)
                     -> UMaterialExpression*
                 {
@@ -2703,8 +2921,8 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                         Cast<UMaterialExpressionTextureCoordinate>(Add(
                             NewObject<UMaterialExpressionTextureCoordinate>(
                                 Material)));
-                    LaceUv->UTiling = UTilingValue;
-                    LaceUv->VTiling = VTilingValue;
+                    LaceUv->UTiling = TilingValue;
+                    LaceUv->VTiling = TilingValue;
                     UMaterialExpressionTextureSampleParameter2D* Sample =
                         Cast<UMaterialExpressionTextureSampleParameter2D>(
                             Add(NewObject<
@@ -2713,9 +2931,14 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                     Sample->ParameterName = ParameterName;
                     Sample->Texture = DriftLaceTexture;
                     Sample->SamplerType = SAMPLERTYPE_Masks;
-                    Sample->Coordinates.Expression = FlowAdvectedAt(
-                        LaceUv, UTilingValue, VTilingValue,
-                        TEXT("RaftSimLiveDriftLaceAdvection"), Phase);
+                    Sample->Coordinates.Expression = AddTurbulentFoamCoordinates(
+                        Material,
+                        FlowAdvectedAt(
+                            LaceUv, TilingValue, TilingValue,
+                            TEXT("RaftSimLiveDriftLaceAdvection"), Phase),
+                        RotationRadians,
+                        CurlStrength,
+                        TEXT("RaftSimCompactLiveDriftFoamCoordinates"));
                     UMaterialExpressionComponentMask* Red =
                         Cast<UMaterialExpressionComponentMask>(Add(
                             NewObject<UMaterialExpressionComponentMask>(
@@ -2733,8 +2956,8 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                         const TCHAR* NameB) -> UMaterialExpression*
                 {
                     UMaterialExpression* StrandProduct = Mul(
-                        DriftLace(NameA, 0.21f, 0.30f, Phase),
-                        DriftLace(NameB, 0.53f, 0.76f, Phase));
+                        DriftLace(NameA, 0.84f, 0.43f, 0.060f, Phase),
+                        DriftLace(NameB, 1.75f, -0.79f, 0.035f, Phase));
                     UMaterialExpressionSaturate* StrandCut =
                         NewObject<UMaterialExpressionSaturate>(Material);
                     StrandCut->Input.Expression = AddNode(
@@ -2803,15 +3026,17 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
                 Add(DepthGate);
                 UMaterialExpression* Fleck = Mul(
                     Mul(
-                        Lerp(
-                            DriftMaskAt(PhaseA,
-                                        TEXT("LiveDriftFoamLaceA0"),
-                                        TEXT("LiveDriftFoamLaceB0")),
-                            DriftMaskAt(PhaseB,
-                                        TEXT("LiveDriftFoamLaceA1"),
-                                        TEXT("LiveDriftFoamLaceB1")),
-                            CycleAlpha),
-                        DriftGate),
+                        Mul(
+                            Lerp(
+                                DriftMaskAt(PhaseA,
+                                            TEXT("LiveDriftFoamLaceA0"),
+                                            TEXT("LiveDriftFoamLaceB0")),
+                                DriftMaskAt(PhaseB,
+                                            TEXT("LiveDriftFoamLaceA1"),
+                                            TEXT("LiveDriftFoamLaceB1")),
+                                CycleAlpha),
+                            DriftGate),
+                        CompactFoamGate),
                     Mul(Mul(WetGate, UpGate), DepthGate));
                 FleckOutput = Fleck;
                 RoughnessOutput = AddNode(

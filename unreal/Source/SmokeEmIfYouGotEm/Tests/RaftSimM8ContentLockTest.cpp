@@ -298,13 +298,24 @@ bool FRaftSimM8RuntimeDataAndMaterialsTest::RunTest(const FString& Parameters)
         TestTrue(TEXT("South Fork uses the rebuilt unified-current carrier"),
             SouthForkWater->GetMaterial() &&
                 SouthForkWater->GetMaterial()->GetPathName().Contains(
-                    TEXT("M_RaftSim_SouthForkRaftTransmissionWaterV2")));
-        TestTrue(TEXT("South Fork foam is solver-only with no moving lace"),
-            FMath::IsNearlyEqual(FoamIntensity, 1.0f, KINDA_SMALL_NUMBER) &&
-                FMath::IsNearlyEqual(BreakupBias, 1.0f, KINDA_SMALL_NUMBER) &&
-                FMath::IsNearlyEqual(BreakupGain, 1.0f, KINDA_SMALL_NUMBER) &&
-                FMath::IsNearlyZero(DriftAerationGain, KINDA_SMALL_NUMBER) &&
-                FMath::IsNearlyZero(DriftSpeedGain, KINDA_SMALL_NUMBER));
+                    TEXT("M_RaftSim_SouthForkRaftTransmissionWaterV4")));
+        // Solver-owned foam with current-advected breakup: intensity stays
+        // fully solver-driven and both independent drift-lace sheets stay
+        // disabled. The breakup bias/gain pair is no longer analytically
+        // neutralised (the retired 1.0/1.0 lock); the V4 carrier's breakup
+        // rides the same integrated current displacement as the foam field,
+        // so it adds torn-lace detail without any independently panning
+        // texture that could outrun the raft.
+        TestEqual(TEXT("South Fork solver foam intensity stays fully on"),
+            FoamIntensity, 1.0f, KINDA_SMALL_NUMBER);
+        TestEqual(TEXT("South Fork foam breakup bias keeps the connected-froth floor"),
+            BreakupBias, 0.06f, KINDA_SMALL_NUMBER);
+        TestEqual(TEXT("South Fork foam breakup gain matches the authored value"),
+            BreakupGain, 1.08f, KINDA_SMALL_NUMBER);
+        TestEqual(TEXT("South Fork drift-lace aeration stays disabled"),
+            DriftAerationGain, 0.0f, KINDA_SMALL_NUMBER);
+        TestEqual(TEXT("South Fork drift-lace speed gain stays disabled"),
+            DriftSpeedGain, 0.0f, KINDA_SMALL_NUMBER);
     }
 
     const TCHAR* RequiredTerrainMicrodetailTextures[] = {

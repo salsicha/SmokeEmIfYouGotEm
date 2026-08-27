@@ -267,6 +267,15 @@ static bool ResolveBreakingWaterEvidenceCameraPose(
         LookAt = SelectedSite->WorldPositionCm +
             Downstream * 100.0f + FVector::UpVector * 40.0f;
     }
+    else if (CameraPreset == TEXT("breaking_water_high"))
+    {
+        // Elevated geometry review: the crest/pocket/wave-train/eddy shapes
+        // read from above where grazing sky reflection cannot flatten them.
+        OutLocation = SelectedSite->WorldPositionCm +
+            Downstream * 1500.0f - Across * 500.0f + FVector::UpVector * 1300.0f;
+        LookAt = SelectedSite->WorldPositionCm +
+            Downstream * 250.0f;
+    }
     else
     {
         // Default: review the breaking face from downstream and mostly along
@@ -408,6 +417,12 @@ static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
                     ACameraActor::StaticClass(), ResolvedCamLoc, ResolvedCamRot);
                 if (Cam != nullptr)
                 {
+                    // Match the gameplay cameras' fixed photographic
+                    // exposure: a default-exposure review camera pumps with
+                    // auto eye adaptation and captures a look the player
+                    // never sees.
+                    RaftSimCameraPresentation::Configure(
+                        Cam->GetCameraComponent());
                     if (APlayerController* PC = W->GetFirstPlayerController())
                     {
                         PC->SetViewTarget(Cam);
@@ -442,6 +457,297 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureAfterCommand(
          "[x y z pitch yaw|breaking_water|breaking_water_side|"
          "breaking_water_opposite]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureAfter));
+
+// Frames a diagonal stretch of the near-bank waterline from mid-channel so
+// temporal shoreline artifacts (wet cells toggling, streamed slivers) can be
+// reviewed across a burst of frames.
+static bool ResolveShorelineCameraPose(
+    UWorld* World,
+    const ARaftSimRaftActor& Raft,
+    bool bRiverLeft,
+    FVector& OutLocation,
+    FRotator& OutRotation)
+{
+    URaftSimWaterRuntimeAdapter* Adapter = nullptr;
+    if (const UGameInstance* GameInstance =
+            World ? World->GetGameInstance() : nullptr)
+    {
+        if (URaftSimPhysicsBridgeSubsystem* Bridge =
+                GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
+        {
+            Adapter = Bridge->GetWaterRuntime();
+        }
+    }
+    FVector2D RiverPosition;
+    FVector Tangent;
+    FVector LeftNormal;
+    const FVector RaftLocation = Raft.GetActorLocation();
+    if (Adapter == nullptr ||
+        !Adapter->WorldToRiverCoordinates(
+            RaftLocation, RiverPosition, Tangent, LeftNormal))
+    {
+        return false;
+    }
+    const FVector Toward =
+        (bRiverLeft ? LeftNormal : -LeftNormal).GetSafeNormal2D();
+    const FVector Along = Tangent.GetSafeNormal2D();
+    OutLocation = RaftLocation - Along * 300.0f + FVector::UpVector * 320.0f;
+    const FVector LookAt =
+        RaftLocation + Toward * 1500.0f + Along * 1400.0f;
+    OutRotation = (LookAt - OutLocation).Rotation();
+    return true;
+}
+
+// Burst variant of CaptureAfter for temporal artifacts: after the start
+// delay, resolve the camera once, then take <count> numbered screenshots at
+// <interval> seconds and exit. One -ExecCmds command, like CaptureAfter.
+static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    const float StartDelay =
+        Args.Num() > 0 ? FMath::Max(FCString::Atof(*Args[0]), 0.1f) : 3.0f;
+    const int32 Count =
+        Args.Num() > 1 ? FMath::Clamp(FCString::Atoi(*Args[1]), 1, 120) : 10;
+    const float Interval =
+        Args.Num() > 2 ? FMath::Max(FCString::Atof(*Args[2]), 0.05f) : 0.2f;
+    const FString Label = Args.Num() > 3 ? Args[3] : TEXT("RaftSimSeries");
+    const FString CameraPreset = Args.Num() > 4 ? Args[4] : FString();
+    bool bHasPose = false;
+    FVector CamLoc = FVector::ZeroVector;
+    FRotator CamRot = FRotator::ZeroRotator;
+    if (Args.Num() >= 9)
+    {
+        CamLoc = FVector(
+            FCString::Atof(*Args[4]),
+            FCString::Atof(*Args[5]),
+            FCString::Atof(*Args[6]));
+        CamRot = FRotator(
+            FCString::Atof(*Args[7]), FCString::Atof(*Args[8]), 0.0f);
+        bHasPose = true;
+    }
+    bool bPaddle = false;
+    float TargetStationM = -1.0f;
+    float TargetLateralM = 0.0f;
+    for (const FString& Arg : Args)
+    {
+        bPaddle |= Arg.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
+        if (Arg.StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
+        {
+            TargetStationM = FCString::Atof(*Arg.RightChop(8));
+        }
+        else if (Arg.StartsWith(TEXT("lateral="), ESearchCase::IgnoreCase))
+        {
+            TargetLateralM = FCString::Atof(*Arg.RightChop(8));
+        }
+    }
+
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+    if (bPaddle)
+    {
+        // Same paddle-in as CaptureRaft so a burst can happen mid-rapid.
+        FTimerHandle PaddleHandle;
+        World->GetTimerManager().SetTimer(
+            PaddleHandle,
+            FTimerDelegate::CreateLambda([WeakWorld]()
+            {
+                if (ARaftSimRaftActor* Raft = FindRaft(WeakWorld.Get()))
+                {
+                    Raft->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+                }
+            }),
+            1.0f,
+            false);
+    }
+    if (TargetStationM >= 0.0f)
+    {
+        // Walk the raft to the requested river station in sub-80 m hops,
+        // matching the streamer's runtime handoff contract (a long direct
+        // teleport is rejected because solver state cannot transfer across
+        // the skipped reach). Each hop lets physics resettle before the
+        // next; the capture start delay must cover the walk.
+        TSharedRef<FTimerHandle> MoveHandle = MakeShared<FTimerHandle>();
+        World->GetTimerManager().SetTimer(
+            *MoveHandle,
+            FTimerDelegate::CreateLambda(
+                [WeakWorld, MoveHandle, TargetStationM, TargetLateralM]()
+            {
+                UWorld* W = WeakWorld.Get();
+                if (W == nullptr)
+                {
+                    return;
+                }
+                URaftSimWaterRuntimeAdapter* Water = nullptr;
+                if (const UGameInstance* GameInstance = W->GetGameInstance())
+                {
+                    if (URaftSimPhysicsBridgeSubsystem* Bridge =
+                            GameInstance->GetSubsystem<
+                                URaftSimPhysicsBridgeSubsystem>())
+                    {
+                        Water = Bridge->GetWaterRuntime();
+                    }
+                }
+                ARaftSimRaftActor* Raft = FindRaft(W);
+                FVector2D RiverPosition;
+                FVector Tangent;
+                FVector LeftNormal;
+                if (Water == nullptr || Raft == nullptr ||
+                    !Water->WorldToRiverCoordinates(
+                        Raft->GetActorLocation(),
+                        RiverPosition,
+                        Tangent,
+                        LeftNormal))
+                {
+                    return;
+                }
+                const float RemainingM = TargetStationM - RiverPosition.X;
+                if (FMath::Abs(RemainingM) < 2.0f)
+                {
+                    W->GetTimerManager().ClearTimer(*MoveHandle);
+                    UE_LOG(LogTemp, Display,
+                        TEXT("RaftSim.CaptureSeries: raft arrived at "
+                             "station %.1f m"),
+                        RiverPosition.X);
+                    return;
+                }
+                const float StepStationM =
+                    RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);
+                const bool bFinalStep =
+                    FMath::Abs(TargetStationM - StepStationM) < 2.0f;
+                const float StepLateralM = bFinalStep ? TargetLateralM : 0.0f;
+                FVector StepWorldCm = FVector::ZeroVector;
+                FVector AheadWorldCm = FVector::ZeroVector;
+                if (!Water->RiverToWorldPosition(
+                        FVector2D(StepStationM, StepLateralM),
+                        Water->GetRiverVerticalDatumM(),
+                        StepWorldCm) ||
+                    !Water->RiverToWorldPosition(
+                        FVector2D(StepStationM + 1.0f, StepLateralM),
+                        Water->GetRiverVerticalDatumM(),
+                        AheadWorldCm))
+                {
+                    return;
+                }
+                StepWorldCm.Z = Raft->GetActorLocation().Z;
+                Raft->TeleportForTesting(
+                    StepWorldCm,
+                    (AheadWorldCm - StepWorldCm).Rotation().Yaw,
+                    /*bApplyFacing=*/true);
+            }),
+            0.7f,
+            /*bLoop=*/true,
+            /*FirstDelay=*/2.0f);
+    }
+    FTimerHandle StartHandle;
+    World->GetTimerManager().SetTimer(
+        StartHandle,
+        FTimerDelegate::CreateLambda(
+            [WeakWorld, Count, Interval, Label, CameraPreset, bHasPose,
+             CamLoc, CamRot]()
+        {
+            UWorld* W = WeakWorld.Get();
+            if (W == nullptr)
+            {
+                return;
+            }
+            FVector ResolvedLoc = CamLoc;
+            FRotator ResolvedRot = CamRot;
+            bool bCamera = bHasPose;
+            if (!bCamera && !CameraPreset.IsEmpty())
+            {
+                if (ARaftSimRaftActor* Raft = FindRaft(W))
+                {
+                    if (CameraPreset.StartsWith(TEXT("breaking_water")))
+                    {
+                        bCamera = ResolveBreakingWaterEvidenceCameraPose(
+                            W, *Raft, CameraPreset, ResolvedLoc, ResolvedRot);
+                    }
+                    else if (CameraPreset == TEXT("shore_left") ||
+                             CameraPreset == TEXT("shore_right"))
+                    {
+                        bCamera = ResolveShorelineCameraPose(
+                            W,
+                            *Raft,
+                            CameraPreset == TEXT("shore_left"),
+                            ResolvedLoc,
+                            ResolvedRot);
+                    }
+                }
+            }
+            if (bCamera)
+            {
+                ACameraActor* Cam = W->SpawnActor<ACameraActor>(
+                    ACameraActor::StaticClass(), ResolvedLoc, ResolvedRot);
+                if (Cam != nullptr)
+                {
+                    // Same fixed photographic exposure as gameplay cameras;
+                    // an auto-exposure review camera pumps frame to frame.
+                    RaftSimCameraPresentation::Configure(
+                        Cam->GetCameraComponent());
+                    if (APlayerController* PC = W->GetFirstPlayerController())
+                    {
+                        PC->SetViewTarget(Cam);
+                    }
+                }
+            }
+            TSharedRef<int32> Taken = MakeShared<int32>(0);
+            TSharedRef<FTimerHandle> LoopHandle = MakeShared<FTimerHandle>();
+            W->GetTimerManager().SetTimer(
+                *LoopHandle,
+                FTimerDelegate::CreateLambda(
+                    [WeakWorld, Taken, Count, Label, LoopHandle]()
+                {
+                    UWorld* W2 = WeakWorld.Get();
+                    if (W2 == nullptr)
+                    {
+                        return;
+                    }
+                    const FString OutPath = FPaths::Combine(
+                        FPaths::ProjectSavedDir(),
+                        TEXT("Screenshots"),
+                        FString::Printf(
+                            TEXT("%s_%03d.png"), *Label, *Taken));
+                    FScreenshotRequest::RequestScreenshot(
+                        OutPath, /*bShowUI=*/false,
+                        /*bAddFilenameSuffix=*/false);
+                    ++(*Taken);
+                    if (*Taken >= Count)
+                    {
+                        W2->GetTimerManager().ClearTimer(*LoopHandle);
+                        FTimerHandle ExitHandle;
+                        W2->GetTimerManager().SetTimer(
+                            ExitHandle,
+                            FTimerDelegate::CreateLambda(
+                                []() { FPlatformMisc::RequestExit(false); }),
+                            4.0f,
+                            false);
+                    }
+                }),
+                Interval,
+                /*bLoop=*/true,
+                /*FirstDelay=*/0.0f);
+        }),
+        StartDelay,
+        false);
+
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim.CaptureSeries: %d frames every %.2fs starting in %.1fs "
+             "-> %s_NNN.png (preset=%s)"),
+        Count, Interval, StartDelay, *Label, *CameraPreset);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
+    TEXT("RaftSim.CaptureSeries"),
+    TEXT("After a start delay, take a numbered burst of screenshots at a "
+         "fixed interval, then exit. Usage: RaftSim.CaptureSeries "
+         "<startSeconds> <count> <intervalSeconds> [label] "
+         "[x y z pitch yaw|shore_left|shore_right|breaking_water|"
+         "breaking_water_side|breaking_water_opposite] [paddle] "
+         "[station=<m>] [lateral=<m>] (station walks the raft there in "
+         "sub-80 m handoff-sized hops before the capture starts)"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureSeries));
 
 // Over-the-shoulder capture: order the crew to paddle downstream so the raft
 // runs into the rapid, then place the camera behind the raft's live position

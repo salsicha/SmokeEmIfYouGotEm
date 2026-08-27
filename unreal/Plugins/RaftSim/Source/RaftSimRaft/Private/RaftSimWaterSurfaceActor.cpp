@@ -329,15 +329,34 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
 
     // This project-owned parent is the shared photoreal Single Layer Water
     // graph with the runtime raft-floor transmission aperture already wired.
-    // Its legacy SouthFork path is retained for asset compatibility; all
-    // river-specific optical values are supplied by the dynamic instance.
+    // V4 is the parent the editor water-presentation command authors today
+    // and the one MI_RaftSim_SouthForkProductionWater derives from, so the
+    // live carrier renders the same current pixel graph as the authored
+    // water instead of a stale sibling. All river-specific optical values
+    // are supplied by the dynamic instance.
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> VolumeCoreMat(
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-             "M_RaftSim_SouthForkRaftTransmissionWaterV2."
-             "M_RaftSim_SouthForkRaftTransmissionWaterV2"));
+             "M_RaftSim_SouthForkRaftTransmissionWaterV4."
+             "M_RaftSim_SouthForkRaftTransmissionWaterV4"));
     if (VolumeCoreMat.Succeeded())
     {
         LiveVolumeCoreMaterial = VolumeCoreMat.Object;
+    }
+    else
+    {
+        // A checkout that has not run the editor water rebuild holds only the
+        // committed V2 parent. It exposes the same parameter contract (WPO
+        // gates, turbulence, foam/ripple scalars) over an older pixel graph;
+        // never leave the carrier without a Single Layer Water parent.
+        static ConstructorHelpers::FObjectFinder<UMaterialInterface>
+            FallbackVolumeCoreMat(
+                TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/"
+                     "Materials/M_RaftSim_SouthForkRaftTransmissionWaterV2."
+                     "M_RaftSim_SouthForkRaftTransmissionWaterV2"));
+        if (FallbackVolumeCoreMat.Succeeded())
+        {
+            LiveVolumeCoreMaterial = FallbackVolumeCoreMat.Object;
+        }
     }
 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> BreakingWaterMat(
@@ -1128,6 +1147,15 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         LiveVolumeCoreMaterial != nullptr;
     bSingleLiveWaterSurfaceEnabled =
         bUsesSouthForkFullReachSingleSurface && bLiveVolumeCoreEnabled;
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim water surface mode: carrier=%d volumeCore=%d "
+             "singleSurface=%d coreMaterial=%s"),
+        bLiveSurfaceCarrierEnabled ? 1 : 0,
+        bLiveVolumeCoreEnabled ? 1 : 0,
+        bSingleLiveWaterSurfaceEnabled ? 1 : 0,
+        LiveVolumeCoreMaterial
+            ? *LiveVolumeCoreMaterial->GetPathName()
+            : TEXT("none"));
     if (bLiveVolumeCoreEnabled)
     {
         // The core is the river body. Keep the Default Lit mesh as a thin
@@ -1494,7 +1522,13 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     Triangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     FoamField.SetNumZeroed(VertCount);
     bFoamFieldValid = false;
+    LiveVolumeCoreWetPresence.SetNumZeroed(VertCount);
+    SmoothedBreakingLiftCm.SetNumZeroed(VertCount);
+    ShoreSmoothedSurfaceZCm.Init(MAX_flt, VertCount);
     BreakingSites.Reset();
+    PersistentBreakingSites.Reset();
+    BreakingSiteShapeSeedSerial = 0;
+    LastBreakingSiteUpdateTimeSeconds = -1.0f;
 
     // Grid actor sits at world origin; vertices are in world cm relative to it.
     SetActorLocation(FVector::ZeroVector);
@@ -1701,8 +1735,19 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                             ExistingTravelingWaveWPOStrength);
                     VolumeMaterial->SetScalarParameterValue(
                         TEXT("SouthForkTravelingWaveWPOStrength"), 0.0f);
+                    // Current micro-relief is evaluated continuously in the
+                    // shader. Keep it below the solver-owned obstacle/wake
+                    // relief so the surface boils without lifting the raft
+                    // through an unrelated render-only amplitude.
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("SouthForkTurbulenceWPOStrength"), 1.0f);
+                        TEXT("SouthForkTurbulenceWPOStrength"), 0.16f);
+                    // Entrained-air milk must come from breaking foam, not
+                    // raw speed: a fast glassy tongue stays optically green.
+                    // The parent's larger default speed fraction predates the
+                    // roughness-gated foam generator that now confines
+                    // aeration to genuinely working water.
+                    VolumeMaterial->SetScalarParameterValue(
+                        TEXT("SpeedAerationFraction"), 0.05f);
                 }
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("CalmRippleStrength"),
@@ -1718,12 +1763,20 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     // the new WPO provides real vertical crest/boil silhouette.
                     // These layers use the same current integral as foam and
                     // geometry, so no texture can outrun the drifting raft.
+                    // Measured 2026-08-27 (fixed-camera frame bursts): pixel
+                    // change on the surface stayed ~constant from 0.05 s to
+                    // 0.2 s spacing — glint decorrelation, not motion — and
+                    // survived disabling Lumen reflections and TAA. The fine
+                    // ripple normals were carrying enough energy that their
+                    // sun glints flipped every frame and read as the texture
+                    // "suddenly changing". Tone the high-frequency layers;
+                    // geometry and foam keep the motion readable.
                     VolumeMaterial->SetScalarParameterValue(
                         TEXT("CalmRippleStrength"), 0.025f);
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("FlowRippleStrength"), 0.22f);
+                        TEXT("FlowRippleStrength"), 0.13f);
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("FoamRippleStrength"), 0.48f);
+                        TEXT("FoamRippleStrength"), 0.24f);
                 }
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("ShallowWaterOpacity"),
@@ -2089,6 +2142,10 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
     {
         const FBreakingSite& Site = BreakingSites[SiteIndex];
         const float Intensity = FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
+        // Organic variation is phased by the site's lifetime seed, never by
+        // its rank in the strongest-first list: intensity rank swaps between
+        // refreshes used to re-roll every fold and crest offset in one frame.
+        const float ShapeSeed = Site.ShapeSeed;
         FVector Downstream = Site.WorldVelocityMps.GetSafeNormal2D();
         if (Downstream.IsNearlyZero())
         {
@@ -2125,7 +2182,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
                 Profile.Y *= EdgeTaper;
                 const float OrganicFoldCm =
                     FMath::Sin(
-                        SiteIndex * 1.73f + SignedAcross * 5.1f + CurlT * 8.7f) *
+                        ShapeSeed * 1.73f + SignedAcross * 5.1f + CurlT * 8.7f) *
                     4.5f * Intensity * EdgeTaper * FMath::Sin(PI * CurlT);
                 // Break both the visible boundary and dense aerated core at
                 // two incommensurate lateral frequencies. This prevents a
@@ -2134,10 +2191,10 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
                 const float BoundaryVariation = FMath::Clamp(
                     0.68f +
                         0.18f * FMath::Sin(
-                            SiteIndex * 1.31f + SignedAcross * 7.7f +
+                            ShapeSeed * 1.31f + SignedAcross * 7.7f +
                             CurlT * 11.3f) +
                         0.14f * FMath::Sin(
-                            SiteIndex * 2.17f - SignedAcross * 13.1f +
+                            ShapeSeed * 2.17f - SignedAcross * 13.1f +
                             CurlT * 5.3f),
                     0.22f,
                     1.0f);
@@ -2148,9 +2205,9 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
                 const float CrestFragmentation = FMath::Clamp(
                     0.62f +
                         0.22f * FMath::Sin(
-                            SiteIndex * 2.31f + SignedAcross * 9.7f) +
+                            ShapeSeed * 2.31f + SignedAcross * 9.7f) +
                         0.16f * FMath::Sin(
-                            SiteIndex * 0.83f - SignedAcross * 17.3f),
+                            ShapeSeed * 0.83f - SignedAcross * 17.3f),
                     0.24f,
                     1.0f);
                 const float CrestCore = FMath::Exp(
@@ -2162,7 +2219,7 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingLipMesh()
                 // break the silhouette into connected shoulders while keeping
                 // every point attached to the solver-detected site.
                 const float AcrossPhase =
-                    SiteIndex * 1.19f + SignedAcross * 3.7f;
+                    ShapeSeed * 1.19f + SignedAcross * 3.7f;
                 const float CrestPhaseOffsetCm =
                     FMath::Sin(AcrossPhase) * 34.0f * Intensity * EdgeTaper;
                 const float TravelVariation = FMath::Clamp(
@@ -2299,6 +2356,9 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
     {
         const FBreakingSite& Site = BreakingSites[SiteIndex];
         const float Intensity = FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
+        // Lifetime seed, not list rank: rank swaps must not re-roll the
+        // membrane's breakup and travel phases between refreshes.
+        const float ShapeSeed = Site.ShapeSeed;
         FVector Downstream = Site.WorldVelocityMps.GetSafeNormal2D();
         if (Downstream.IsNearlyZero())
         {
@@ -2366,21 +2426,21 @@ void ARaftSimWaterSurfaceActor::RebuildBreakingRollerVolumeMesh()
                     const float Breakup = FMath::Clamp(
                         0.62f +
                             0.20f * FMath::Sin(
-                                SiteIndex * 1.67f + SignedAcross * 10.3f +
+                                ShapeSeed * 1.67f + SignedAcross * 10.3f +
                                 ProfileLoopT * 8.9f) +
                             0.18f * FMath::Sin(
-                                SiteIndex * 2.43f - SignedAcross * 16.7f +
+                                ShapeSeed * 2.43f - SignedAcross * 16.7f +
                                 ProfileLoopT * 15.1f),
                         0.16f,
                         1.0f);
                     const float OrganicTravelCm =
                         FMath::Sin(
-                            SiteIndex * 1.13f + SignedAcross * 4.7f +
+                            ShapeSeed * 1.13f + SignedAcross * 4.7f +
                             ProfileLoopT * 6.3f) *
                         13.0f * Intensity * EdgeTaper * LoopFeather;
                     const float OrganicLiftCm =
                         FMath::Sin(
-                            SiteIndex * 2.07f + SignedAcross * 7.1f +
+                            ShapeSeed * 2.07f + SignedAcross * 7.1f +
                             ProfileLoopT * 11.7f) *
                         14.0f * Intensity * EdgeTaper * LoopFeather;
 
@@ -2517,6 +2577,7 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
     {
         return;
     }
+    const float PreviousCenterStationM = CurvedGridCenterStationM;
     float DesiredCenterStationM = CurvedGridCenterStationM;
     TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld());
     if (RaftIt)
@@ -2570,6 +2631,70 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         }
     }
     UpdateCurvedGridPlanarGeometry();
+
+    // Vertex-indexed temporal state must travel with its river cell, not its
+    // array slot. The recentre shifts every index by a whole number of
+    // station cells; leaving these fields un-shifted applied each cell's
+    // smoothing history to a neighbour up to the recentre distance away,
+    // which stepped shoreline presence and foam coverage on every recentre.
+    const float SafeSpacingMeters = FMath::Max(
+        ResolvedVertexSpacingMeters, KINDA_SMALL_NUMBER);
+    const float ShiftCellsExact =
+        (CurvedGridCenterStationM - PreviousCenterStationM) / SafeSpacingMeters;
+    const int32 ShiftCells = FMath::RoundToInt(ShiftCellsExact);
+    if (ShiftCells != 0 &&
+        FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f)
+    {
+        const auto ShiftStationIndexedFloats =
+            [this, ShiftCells](TArray<float>& Values, float FillValue)
+        {
+            if (Values.Num() != GridStationN * GridLateralN)
+            {
+                return;
+            }
+            const TArray<float> Previous = Values;
+            for (int32 Y = 0; Y < GridLateralN; ++Y)
+            {
+                for (int32 X = 0; X < GridStationN; ++X)
+                {
+                    const int32 SourceX = X + ShiftCells;
+                    Values[Y * GridStationN + X] =
+                        SourceX >= 0 && SourceX < GridStationN
+                        ? Previous[Y * GridStationN + SourceX]
+                        : FillValue;
+                }
+            }
+        };
+        ShiftStationIndexedFloats(LiveVolumeCoreWetPresence, 0.0f);
+        ShiftStationIndexedFloats(SmoothedRapidFoamCoverage, 0.0f);
+        ShiftStationIndexedFloats(SmoothedBreakingLiftCm, 0.0f);
+        ShiftStationIndexedFloats(ShoreSmoothedSurfaceZCm, MAX_flt);
+        const auto ShiftStationIndexedVectors =
+            [this, ShiftCells](
+                TArray<FVector2D>& Values, const FVector2D& FillValue)
+        {
+            if (Values.Num() != GridStationN * GridLateralN)
+            {
+                return;
+            }
+            const TArray<FVector2D> Previous = Values;
+            for (int32 Y = 0; Y < GridLateralN; ++Y)
+            {
+                for (int32 X = 0; X < GridStationN; ++X)
+                {
+                    const int32 SourceX = X + ShiftCells;
+                    Values[Y * GridStationN + X] =
+                        SourceX >= 0 && SourceX < GridStationN
+                        ? Previous[Y * GridStationN + SourceX]
+                        : FillValue;
+                }
+            }
+        };
+        // UV1 flow velocity is temporally smoothed in place, so its state
+        // must travel with its river cell like the other smoothing fields.
+        ShiftStationIndexedVectors(
+            FlowVelocityMetersPerSecond, FVector2D::ZeroVector);
+    }
 }
 
 void ARaftSimWaterSurfaceActor::ClampCurvedGridCenter()
@@ -2630,10 +2755,190 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedGridPlanarGeometry()
     }
 }
 
+// The bounded plunge-pocket/boil budget follows this many strongest sites.
+// Shared by the presentation carve and the persistent-site weight easing.
+constexpr int32 kMaximumBreakingPresentationSites = 3;
+
+void ARaftSimWaterSurfaceActor::UpdatePersistentBreakingSites(
+    const TArray<FBreakingSite>& AcceptedCandidates)
+{
+    // Real time between hydraulic refreshes; clamped so an editor hitch or
+    // breakpoint cannot teleport every eased site to its newest detection.
+    const float NowSeconds = GetWorld()
+        ? static_cast<float>(GetWorld()->GetTimeSeconds())
+        : 0.0f;
+    const float DeltaSeconds = LastBreakingSiteUpdateTimeSeconds >= 0.0f
+        ? FMath::Clamp(NowSeconds - LastBreakingSiteUpdateTimeSeconds, 0.0f, 0.5f)
+        : FMath::Max(RefreshIntervalSeconds, 0.0f);
+    LastBreakingSiteUpdateTimeSeconds = NowSeconds;
+    const auto BlendFactor = [DeltaSeconds](float ResponsePerSecond)
+    {
+        return 1.0f - FMath::Exp(-ResponsePerSecond * DeltaSeconds);
+    };
+
+    // The detected front wanders across presentation lattice cells and the
+    // 6 m dedupe can hand one long jump line to a neighbouring survivor;
+    // both remain the same physical hydraulic. Anything beyond the dedupe
+    // spacing is a different feature and must spawn as its own site.
+    constexpr float kSiteMatchRadiusMeters = 6.0f;
+    constexpr int32 kMaxPersistentSites = 24;
+    constexpr float kPositionResponsePerSecond = 7.0f;
+    constexpr float kIntensityAttackPerSecond = 8.0f;
+    constexpr float kIntensityReleasePerSecond = 2.5f;
+    constexpr float kEnvelopeAttackPerSecond = 4.0f;
+    constexpr float kEnvelopeReleasePerSecond = 1.8f;
+    constexpr float kPresentationWeightAttackPerSecond = 3.0f;
+    constexpr float kPresentationWeightReleasePerSecond = 2.2f;
+
+    for (FPersistentBreakingSite& Persistent : PersistentBreakingSites)
+    {
+        Persistent.bMatchedThisRefresh = false;
+    }
+
+    // Candidates arrive strongest first, so the main jump claims its nearest
+    // persistent identity before a weak shoulder can steal it.
+    for (const FBreakingSite& Candidate : AcceptedCandidates)
+    {
+        FPersistentBreakingSite* Nearest = nullptr;
+        float NearestDistanceSquared =
+            kSiteMatchRadiusMeters * kSiteMatchRadiusMeters;
+        for (FPersistentBreakingSite& Persistent : PersistentBreakingSites)
+        {
+            if (Persistent.bMatchedThisRefresh)
+            {
+                continue;
+            }
+            const float DistanceSquared = FVector2D::DistSquared(
+                Persistent.Smoothed.RiverCoordinatesMeters,
+                Candidate.RiverCoordinatesMeters);
+            if (DistanceSquared < NearestDistanceSquared)
+            {
+                NearestDistanceSquared = DistanceSquared;
+                Nearest = &Persistent;
+            }
+        }
+        if (Nearest)
+        {
+            Nearest->bMatchedThisRefresh = true;
+            FBreakingSite& Smoothed = Nearest->Smoothed;
+            const float PositionBlend = BlendFactor(kPositionResponsePerSecond);
+            Smoothed.WorldPositionCm = FMath::Lerp(
+                Smoothed.WorldPositionCm,
+                Candidate.WorldPositionCm,
+                PositionBlend);
+            Smoothed.WorldVelocityMps = FMath::Lerp(
+                Smoothed.WorldVelocityMps,
+                Candidate.WorldVelocityMps,
+                PositionBlend);
+            Smoothed.RiverCoordinatesMeters = FMath::Lerp(
+                Smoothed.RiverCoordinatesMeters,
+                Candidate.RiverCoordinatesMeters,
+                PositionBlend);
+            Smoothed.PresentationCoverage = FMath::Lerp(
+                Smoothed.PresentationCoverage,
+                Candidate.PresentationCoverage,
+                PositionBlend);
+            Smoothed.PresentationEdgeClearanceMeters = FMath::Lerp(
+                Smoothed.PresentationEdgeClearanceMeters,
+                Candidate.PresentationEdgeClearanceMeters,
+                PositionBlend);
+            Nearest->RawIntensity = FMath::Lerp(
+                Nearest->RawIntensity,
+                Candidate.Intensity,
+                BlendFactor(Candidate.Intensity > Nearest->RawIntensity
+                    ? kIntensityAttackPerSecond
+                    : kIntensityReleasePerSecond));
+        }
+        else if (PersistentBreakingSites.Num() < kMaxPersistentSites)
+        {
+            FPersistentBreakingSite& Spawned =
+                PersistentBreakingSites.AddDefaulted_GetRef();
+            Spawned.Smoothed = Candidate;
+            // Golden-angle serial keeps every site's organic phases distinct
+            // and stable for its whole life; the retired rank index reshuffled
+            // them whenever two sites swapped intensity order. Reset with the
+            // grid so authored captures stay deterministic.
+            Spawned.Smoothed.ShapeSeed =
+                (BreakingSiteShapeSeedSerial++ % 4096) * 2.399963f;
+            Spawned.RawIntensity = Candidate.Intensity;
+            Spawned.Envelope = 0.0f;
+            Spawned.bMatchedThisRefresh = true;
+        }
+    }
+
+    // Spawn/despawn hysteresis: a one-refresh detection blip barely rises out
+    // of zero, and a site whose hydraulic vanishes releases over ~half a
+    // second instead of deleting a rendered crest in one frame.
+    for (int32 SiteIndex = PersistentBreakingSites.Num() - 1;
+         SiteIndex >= 0;
+         --SiteIndex)
+    {
+        FPersistentBreakingSite& Persistent = PersistentBreakingSites[SiteIndex];
+        if (Persistent.bMatchedThisRefresh)
+        {
+            Persistent.Envelope = FMath::Lerp(
+                Persistent.Envelope, 1.0f, BlendFactor(kEnvelopeAttackPerSecond));
+        }
+        else
+        {
+            Persistent.Envelope = FMath::Lerp(
+                Persistent.Envelope, 0.0f, BlendFactor(kEnvelopeReleasePerSecond));
+            Persistent.RawIntensity = FMath::Lerp(
+                Persistent.RawIntensity,
+                0.0f,
+                BlendFactor(kIntensityReleasePerSecond));
+            if (Persistent.Envelope < 0.02f)
+            {
+                PersistentBreakingSites.RemoveAt(SiteIndex);
+                continue;
+            }
+        }
+        Persistent.Smoothed.Intensity =
+            Persistent.RawIntensity * Persistent.Envelope;
+    }
+
+    // Strongest first, with a stable sort so equal-intensity neighbours keep
+    // their order instead of trading ranks on float noise.
+    PersistentBreakingSites.StableSort(
+        [](const FPersistentBreakingSite& A, const FPersistentBreakingSite& B)
+        {
+            return A.Smoothed.Intensity > B.Smoothed.Intensity;
+        });
+
+    // The pocket/boil budget follows the strongest sites, but membership
+    // changes ease through the weight instead of toggling a 30 cm carve in
+    // one refresh. During a handoff two sites briefly share partial weight;
+    // the combined displacement clamps in the carve pass still bound it.
+    BreakingSites.Reset(PersistentBreakingSites.Num());
+    for (int32 SiteIndex = 0; SiteIndex < PersistentBreakingSites.Num();
+         ++SiteIndex)
+    {
+        FPersistentBreakingSite& Persistent = PersistentBreakingSites[SiteIndex];
+        const float WeightTarget =
+            SiteIndex < kMaximumBreakingPresentationSites &&
+                Persistent.Smoothed.Intensity > 0.02f
+            ? 1.0f
+            : 0.0f;
+        Persistent.PresentationWeight = FMath::Lerp(
+            Persistent.PresentationWeight,
+            WeightTarget,
+            BlendFactor(WeightTarget > Persistent.PresentationWeight
+                ? kPresentationWeightAttackPerSecond
+                : kPresentationWeightReleasePerSecond));
+        FBreakingSite& Published = BreakingSites.Add_GetRef(Persistent.Smoothed);
+        Published.PresentationWeight = Persistent.PresentationWeight;
+    }
+}
+
 void ARaftSimWaterSurfaceActor::RefreshSurface()
 {
     const double RefreshStartSeconds = FPlatformTime::Seconds();
+    const float PreviousGridCenterStationM = CurvedGridCenterStationM;
     RecenterCurvedGrid();
+    const bool bGridRecentredThisRefresh = !FMath::IsNearlyEqual(
+        PreviousGridCenterStationM,
+        CurvedGridCenterStationM,
+        KINDA_SMALL_NUMBER);
     TArray<uint8> WetVertexMask;
     WetVertexMask.Init(0, Vertices.Num());
     TArray<uint8> LiveSolverWetVertexMask;
@@ -2964,61 +3269,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             FMath::Abs(BoulderWakeDisplacementMeters[WakeIndex]));
     }
 
-    // One surface, one current cue. Small irregular wave packets are displaced
-    // directly in the unified mesh and translated by the same integrated
-    // river-space current used by persistent foam. The packet envelopes break
-    // the crests laterally, so this reads as moving water rather than the old
-    // full-width white bars; no texture or second sheet can flash independently.
-    TArray<float> CurrentRippleDisplacementMeters;
-    CurrentRippleDisplacementMeters.SetNumZeroed(WaterSamples.Num());
-    if (bSingleLiveWaterSurfaceEnabled)
-    {
-        for (int32 RippleIndex = 0;
-             RippleIndex < CurrentRippleDisplacementMeters.Num();
-             ++RippleIndex)
-        {
-            if (WetVertexMask[RippleIndex] == 0)
-            {
-                continue;
-            }
-            const float SpeedMps = WaterSamples[RippleIndex].
-                VelocityMetersPerSecond.Size2D();
-            const float SpeedEnvelope = FMath::SmoothStep(
-                0.25f, 2.25f, SpeedMps);
-            const float AdvectedStationM =
-                static_cast<float>(RiverCoordinatesM[RippleIndex].X) -
-                FoamTextureAdvectionMeters.X;
-            const float AdvectedLateralM =
-                static_cast<float>(RiverCoordinatesM[RippleIndex].Y) -
-                FoamTextureAdvectionMeters.Y;
-            // Keep the fine crests stretched chiefly along the current.
-            // Their slowly varying downstream phase and faster cross-current
-            // phase form short oblique riffle streaks instead of coherent
-            // channel-wide bands perpendicular to the flow.
-            const float PacketA = FMath::Pow(
-                0.5f + 0.5f * FMath::Sin(
-                    AdvectedStationM * 0.13f +
-                    AdvectedLateralM * 0.57f),
-                5.0f);
-            const float PacketB = FMath::Pow(
-                0.5f + 0.5f * FMath::Sin(
-                    AdvectedStationM * 0.089f -
-                    AdvectedLateralM * 0.71f + 1.7f),
-                6.0f);
-            const float CrestA = FMath::Sin(
-                AdvectedStationM * 0.34f +
-                AdvectedLateralM * 1.12f +
-                0.45f * FMath::Sin(
-                    AdvectedStationM * 0.041f -
-                    AdvectedLateralM * 0.27f));
-            const float CrestB = FMath::Sin(
-                AdvectedStationM * 0.47f -
-                AdvectedLateralM * 1.39f + 0.8f);
-            CurrentRippleDisplacementMeters[RippleIndex] =
-                0.028f * SpeedEnvelope *
-                (PacketA * CrestA + 0.55f * PacketB * CrestB);
-        }
-    }
+    // Continuous current detail belongs in the single carrier's WPO. It is
+    // evaluated every rendered frame from the same integrated solver-current
+    // displacement as the foam. Sampling that phase here made the whole mesh
+    // jump between several-centimetre targets at the 15 Hz hydraulic refresh,
+    // which was most obvious while the camera moved with the raft. CPU vertex
+    // displacement remains reserved for solver relief and localized wakes.
     LastMaximumAbsoluteBoulderWakeM = MaximumAbsoluteBoulderWakeM;
     int32 WakeFoamVertexCount = 0;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
@@ -3052,9 +3308,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // which is also the UV0 basis there. UV1 therefore carries a
                 // physical metres-per-second vector in the matching texture
                 // coordinate frame for every supported live window.
-                FlowVelocityMetersPerSecond[Index] = FVector2D(
+                // Smoothed across refreshes: the material advects its ripple
+                // normals by this vector, so raw per-refresh solver noise in
+                // it stepped the ripple phase 15 times a second and read as
+                // specular/reflection jitter.
+                const FVector2D SampledFlowVelocityMps(
                     Sample.VelocityMetersPerSecond.X,
                     Sample.VelocityMetersPerSecond.Y);
+                const float FlowVelocityBlend = 1.0f - FMath::Exp(
+                    -4.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+                FlowVelocityMetersPerSecond[Index] =
+                    (SampledFlowVelocityMps -
+                     FlowVelocityMetersPerSecond[Index]).SizeSquared() > 25.0f
+                    ? SampledFlowVelocityMps
+                    : FMath::Lerp(
+                          FlowVelocityMetersPerSecond[Index],
+                          SampledFlowVelocityMps,
+                          FlowVelocityBlend);
                 const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
                 const FRaftSimWaterStandingWave StandingWave =
                     URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWave(
@@ -3095,6 +3365,36 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         HydraulicRelief - LegacyMaterialWPOCounterM) *
                         kSurfCmPerM +
                     GetResolvedLiveSurfaceRenderLiftCm();
+                // The visible waterline is the surface/terrain intersection:
+                // on a flat bank a few centimetres of per-refresh wave motion
+                // sweep that line metres sideways, reading as patches of
+                // water appearing and vanishing. Waves physically damp as
+                // they shoal, so blend the shallow surface toward a slow
+                // per-vertex reference; deep water stays fully dynamic and
+                // the wet edge merely breathes with the reference's slow
+                // drift. Render-only, like the rest of the shaping here.
+                if (ShoreSmoothedSurfaceZCm.Num() == Vertices.Num())
+                {
+                    float& SlowZCm = ShoreSmoothedSurfaceZCm[Index];
+                    if (SlowZCm == MAX_flt ||
+                        FMath::Abs(SlowZCm - SurfaceZCm) > 60.0f)
+                    {
+                        SlowZCm = SurfaceZCm;
+                    }
+                    else
+                    {
+                        SlowZCm = FMath::Lerp(
+                            SlowZCm,
+                            SurfaceZCm,
+                            1.0f - FMath::Exp(
+                                -0.8f * FMath::Max(
+                                    RefreshIntervalSeconds, 0.0f)));
+                    }
+                    const float ShoreDynamicDamp = FMath::SmoothStep(
+                        0.05f, 0.45f, Sample.DepthMeters);
+                    SurfaceZCm = FMath::Lerp(
+                        SlowZCm, SurfaceZCm, ShoreDynamicDamp);
+                }
                 // Obstruction wakes and boulder holes on the live sheet.
                 // The solver grid does not know placed boulders exist, so
                 // without the sink the translucent carrier shrouds every
@@ -3154,13 +3454,30 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 WakeFoamAdd,
                                 0.55f * SpeedT * TrailT * TrailT);
                         }
+                        // Eddy line: the shear seam between the sheltered
+                        // pocket and the passing current collects a fine
+                        // ragged foam string along each flank. The seam sits
+                        // just outside the wake trail and fades with it.
+                        const float SeamLateralT = FMath::Abs(DeltaLateralM) / RadiusM;
+                        if (SeamLateralT > 0.95f && SeamLateralT < 1.75f &&
+                            DeltaStationM < RadiusM * 6.0f)
+                        {
+                            const float SeamBand = 1.0f - FMath::Abs(
+                                (SeamLateralT - 1.35f) / 0.4f);
+                            const float SeamTrailT = FMath::Clamp(
+                                1.0f - DeltaStationM / (RadiusM * 6.0f),
+                                0.0f, 1.0f);
+                            WakeFoamAdd = FMath::Max(
+                                WakeFoamAdd,
+                                0.42f * SpeedT *
+                                    FMath::Max(SeamBand, 0.0f) * SeamTrailT);
+                        }
                     }
                 }
                 WakeFoamAdd = FMath::Max(
                     WakeFoamAdd, BoulderWakeFoam[Index]);
                 SurfaceZCm +=
-                    (CurrentRippleDisplacementMeters[Index] +
-                        BoulderWakeDisplacementMeters[Index] +
+                    (BoulderWakeDisplacementMeters[Index] +
                         BoatWakeDisplacementMeters[Index]) * kSurfCmPerM;
                 StationWetSurfaceZSum[X] += SurfaceZCm;
                 ++StationWetSurfaceCount[X];
@@ -3288,40 +3605,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 Index - DerivativeStride * GridStationN]) /
                         DerivativeSpanMeters;
                 }
-                float CurrentRippleStationSlope = 0.0f;
-                if (X >= DerivativeStride &&
-                    X < GridStationN - DerivativeStride &&
-                    WetVertexMask[Index - DerivativeStride] != 0 &&
-                    WetVertexMask[Index + DerivativeStride] != 0)
-                {
-                    CurrentRippleStationSlope =
-                        (CurrentRippleDisplacementMeters[
-                             Index + DerivativeStride] -
-                            CurrentRippleDisplacementMeters[
-                                Index - DerivativeStride]) /
-                        DerivativeSpanMeters;
-                }
-                float CurrentRippleLateralSlope = 0.0f;
-                if (Y >= DerivativeStride &&
-                    Y < GridLateralN - DerivativeStride &&
-                    WetVertexMask[
-                        Index - DerivativeStride * GridStationN] != 0 &&
-                    WetVertexMask[
-                        Index + DerivativeStride * GridStationN] != 0)
-                {
-                    CurrentRippleLateralSlope =
-                        (CurrentRippleDisplacementMeters[
-                             Index + DerivativeStride * GridStationN] -
-                            CurrentRippleDisplacementMeters[
-                                Index - DerivativeStride * GridStationN]) /
-                        DerivativeSpanMeters;
-                }
                 const FVector PresentationLocalNormal = FVector(
                     -(BaseStationSlope +
                         StandingWave.StationSlope *
                             ResolvedPresentationStandingWaveScale +
                         ReliefStationSlope +
-                        CurrentRippleStationSlope +
                         BoulderWakeStationSlope +
                         BoatWakeStationSlope -
                         LegacyMaterialWPOCounterStationSlope),
@@ -3329,7 +3617,6 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         StandingWave.LateralSlope *
                             ResolvedPresentationStandingWaveScale +
                         ReliefLateralSlope +
-                        CurrentRippleLateralSlope +
                         BoulderWakeLateralSlope +
                         BoatWakeLateralSlope -
                         LegacyMaterialWPOCounterLateralSlope),
@@ -3359,7 +3646,43 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // break white in the field, and the 2026-08-10 cascade run
                 // measured Fr 0.93 rendering clean under the former Fr>1.0
                 // gate. Named-rapid pockets (Fr 1.3+) keep their character.
-                Foam = FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
+                // Froude alone cannot tell a glassy accelerating tongue from
+                // a broken cascade at the same number: air entrains only
+                // where the surface is also locally steep and working. Gate
+                // the generic generator by the combined local surface slope
+                // (grade + standing waves + relief + boulder wakes) so smooth
+                // chutes stay green while rough-bed riffles still break
+                // white; the explicit site, tail, wake, and pocket sources
+                // add their aeration regardless of this gate.
+                const float SurfaceWorkingSlope =
+                    FMath::Abs(BaseStationSlope) +
+                    FMath::Abs(StandingWave.StationSlope *
+                        ResolvedPresentationStandingWaveScale) +
+                    FMath::Abs(StandingWave.LateralSlope *
+                        ResolvedPresentationStandingWaveScale) +
+                    FMath::Abs(ReliefStationSlope) +
+                    FMath::Abs(ReliefLateralSlope) +
+                    FMath::Abs(BoulderWakeStationSlope) +
+                    FMath::Abs(BoulderWakeLateralSlope);
+                const float RoughnessGate = FMath::SmoothStep(
+                    0.015f, 0.06f, SurfaceWorkingSlope);
+                Foam = RoughnessGate *
+                    FMath::Clamp((Froude - 0.78f) / 1.25f, 0.0f, 1.0f);
+                // Standing-wave crests aerate at their tops: a wave train
+                // below a drop reads as alternating white crest caps over
+                // green troughs, not a uniform sheet. Keyed to the same
+                // displacement the rigid support rides, so the caps sit on
+                // the actual rendered crests.
+                const float StandingCrestM =
+                    StandingWave.DisplacementMeters *
+                    ResolvedPresentationStandingWaveScale;
+                if (StandingCrestM > 0.045f && Froude > 0.6f)
+                {
+                    Foam = FMath::Max(
+                        Foam,
+                        0.55f * FMath::Clamp(
+                            (StandingCrestM - 0.045f) / 0.14f, 0.0f, 1.0f));
+                }
                 // Wake aeration joins solver foam; the boulder core fade
                 // keeps froth off the hole opened over exposed rock.
                 Foam = FMath::Max(Foam * BoulderCoreFade, WakeFoamAdd);
@@ -3409,6 +3732,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // pile, and record the site for bounded aerosol/mist. Visual only.
     BreakingSites.Reset();
     TArray<FBreakingSite> CandidateSites;
+    // Raw per-refresh crest/tail lift accumulates here and is eased into the
+    // carried vertices after the detection loop, so threshold flicker and
+    // lattice hops of the detected front cannot step the carved geometry.
+    TArray<float> BreakingLiftTargetCm;
+    BreakingLiftTargetCm.SetNumZeroed(Vertices.Num());
     int32 EdgeRejectedSiteCount = 0;
     float MaximumEdgeRejectedIntensity = 0.0f;
     float StrongestEdgeRejectedCoverage = 0.0f;
@@ -3537,8 +3865,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // Crest leans up; the first subcritical station dips, forming the
             // overturning face into the white pile.
             const float LiftCm = BreakingCrestLiftMeters * kSurfCmPerM * Intensity;
-            Vertices[UpstreamIndex].Z += LiftCm;
-            Vertices[Index].Z -= 0.45f * LiftCm;
+            BreakingLiftTargetCm[UpstreamIndex] += LiftCm;
+            BreakingLiftTargetCm[Index] -= 0.45f * LiftCm;
 
             const float BreakingFrothStrength = FMath::Lerp(
                 0.62f, 1.0f, FMath::Sqrt(Intensity));
@@ -3568,7 +3896,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const float Decay = FMath::Exp(-0.14f * TailDistanceMeters);
                 const float Phase = FMath::Cos(
                     (2.05f / 3.0f) * TailDistanceMeters);
-                Vertices[TailIndex].Z += 0.62f * LiftCm * Decay * Phase;
+                BreakingLiftTargetCm[TailIndex] += 0.62f * LiftCm * Decay * Phase;
                 SourceFoam[TailIndex] = FMath::Max(
                     SourceFoam[TailIndex],
                     Intensity * FMath::Max(Phase, 0.0f) * 0.65f * Decay + 0.38f * Decay);
@@ -3585,20 +3913,52 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             CandidateSites.Add(Site);
         }
     }
+    // Ease the accumulated crest/tail lift into the carried vertices. The
+    // slower release also keeps a momentary detection dropout from deleting
+    // a rendered crest outright; residue decays over roughly half a second.
+    if (SmoothedBreakingLiftCm.Num() != Vertices.Num())
+    {
+        SmoothedBreakingLiftCm.SetNumZeroed(Vertices.Num());
+    }
+    const float LiftAttackBlend = 1.0f - FMath::Exp(
+        -8.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+    const float LiftReleaseBlend = 1.0f - FMath::Exp(
+        -5.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+    for (int32 LiftIndex = 0; LiftIndex < Vertices.Num(); ++LiftIndex)
+    {
+        const float TargetCm = BreakingLiftTargetCm[LiftIndex];
+        float SmoothedCm = FMath::Lerp(
+            SmoothedBreakingLiftCm[LiftIndex],
+            TargetCm,
+            FMath::Abs(TargetCm) > FMath::Abs(SmoothedBreakingLiftCm[LiftIndex])
+                ? LiftAttackBlend
+                : LiftReleaseBlend);
+        if (TargetCm == 0.0f && FMath::Abs(SmoothedCm) < 0.05f)
+        {
+            SmoothedCm = 0.0f;
+        }
+        SmoothedBreakingLiftCm[LiftIndex] = SmoothedCm;
+        if (SmoothedCm != 0.0f)
+        {
+            Vertices[LiftIndex].Z += SmoothedCm;
+        }
+    }
+
     // Strongest sites first, deduplicated to 6 m so one long jump line yields a
     // handful of overlapping crest lobes rather than a wall of emitters.
     CandidateSites.Sort([](const FBreakingSite& A, const FBreakingSite& B)
         { return A.Intensity > B.Intensity; });
     constexpr int32 kMaxBreakingSites = 24;
     constexpr float kMinSiteSpacingCm = 600.0f;
+    TArray<FBreakingSite> AcceptedCandidates;
     for (const FBreakingSite& Candidate : CandidateSites)
     {
-        if (BreakingSites.Num() >= kMaxBreakingSites)
+        if (AcceptedCandidates.Num() >= kMaxBreakingSites)
         {
             break;
         }
         bool bTooClose = false;
-        for (const FBreakingSite& Accepted : BreakingSites)
+        for (const FBreakingSite& Accepted : AcceptedCandidates)
         {
             if (FVector::DistSquared2D(
                     Accepted.WorldPositionCm, Candidate.WorldPositionCm) <
@@ -3610,9 +3970,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
         if (!bTooClose)
         {
-            BreakingSites.Add(Candidate);
+            AcceptedCandidates.Add(Candidate);
         }
     }
+    // Detection has no frame-to-frame identity: candidates are re-found and
+    // re-ranked from the raw Froude field every refresh, so rank swaps,
+    // lattice hops of the detected front, and dedupe-survivor changes made
+    // every site-keyed presentation snap at the hydraulic cadence. Fold the
+    // detections into the persistent registry instead; it publishes the
+    // eased, faded BreakingSites consumed by the pocket/boil carve, rigid
+    // support, lips, rollers, and mist anchors below.
+    UpdatePersistentBreakingSites(AcceptedCandidates);
 
     if (WaterAdapter)
     {
@@ -3632,17 +4000,33 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SupportSites, BreakingCrestLiftMeters, ResolvedVertexSpacingMeters);
     }
 
-    // Give the three strongest accepted interior jumps a coherent plan-view
+    // Give the strongest accepted interior jumps a coherent plan-view
     // plunge pocket beneath the connected crest-to-plunge membrane. The
     // solver selects every site; this pass only changes presentation vertices
     // and foam. A bounded combined displacement prevents nearby accepted sites
     // from stacking into fabricated cliffs, while the pocket centre stays
     // darker than its broken shoulders and downstream aerated return.
-    constexpr int32 kMaximumBreakingPresentationSites = 3;
+    // Each site contributes through its eased PresentationWeight, so pocket
+    // ownership changing hands cannot toggle the carve in one refresh; while
+    // a handoff is in flight a retiring and an arriving site briefly overlap
+    // at partial weight inside the same combined clamps.
     TArray<uint8> BreakingPresentationVertexMask;
     BreakingPresentationVertexMask.Init(0, Vertices.Num());
     const int32 BreakingPresentationSiteCount = FMath::Min(
         BreakingSites.Num(), kMaximumBreakingPresentationSites);
+    TArray<FBreakingSite> WeightedPresentationSites;
+    for (const FBreakingSite& Site : BreakingSites)
+    {
+        if (Site.PresentationWeight > 0.01f)
+        {
+            WeightedPresentationSites.Add(Site);
+        }
+    }
+    // Entry-tongue foam suppression, filled alongside the pocket carve and
+    // consumed by the foam advection pass below so the accelerating V above
+    // each jump stays glassy instead of whitening with Froude-generated foam.
+    TArray<float> TongueFoamSuppression;
+    TongueFoamSuppression.SetNumZeroed(Vertices.Num());
     const bool bDownstreamBoilMicroreliefEnabled =
         CVarRaftSimDownstreamBoilMicrorelief.GetValueOnGameThread() != 0;
     ActiveDownstreamBoilSiteCount = bDownstreamBoilMicroreliefEnabled
@@ -3659,11 +4043,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         float CombinedBoilDisplacementMeters = 0.0f;
         float PocketFoam = 0.0f;
         float BoilFoam = 0.0f;
-        for (int32 SiteIndex = 0;
-             SiteIndex < BreakingPresentationSiteCount;
-             ++SiteIndex)
+        for (const FBreakingSite& Site : WeightedPresentationSites)
         {
-            const FBreakingSite& Site = BreakingSites[SiteIndex];
             const FVector2D RelativeRiverPosition =
                 RiverCoordinatesM[VertexIndex] - Site.RiverCoordinatesMeters;
             const FVector2D Pocket =
@@ -3671,8 +4052,42 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     RelativeRiverPosition.X,
                     RelativeRiverPosition.Y,
                     Site.Intensity);
-            CombinedPocketDisplacementMeters += Pocket.X;
-            PocketFoam = FMath::Max(PocketFoam, Pocket.Y);
+            CombinedPocketDisplacementMeters +=
+                Pocket.X * Site.PresentationWeight;
+            PocketFoam = FMath::Max(
+                PocketFoam, Pocket.Y * Site.PresentationWeight);
+
+            // Entry tongue: the smooth accelerating V upstream of the jump,
+            // narrowest at the crest and widening upstream. Its centreline
+            // dips slightly (the convergent draw-down into the drop) and its
+            // core suppresses foam so glassy fast water frames the pile.
+            const float UpstreamM = -RelativeRiverPosition.X;
+            if (UpstreamM > 1.0f && UpstreamM < 30.0f)
+            {
+                const float AlongT = (UpstreamM - 1.0f) / 29.0f;
+                const float HalfWidthM = FMath::Lerp(2.2f, 7.5f, AlongT);
+                const float LateralT =
+                    FMath::Abs(RelativeRiverPosition.Y) / HalfWidthM;
+                if (LateralT < 1.0f)
+                {
+                    const float UpstreamFade =
+                        1.0f - FMath::SmoothStep(0.55f, 1.0f, AlongT);
+                    const float CrestRamp =
+                        FMath::SmoothStep(0.0f, 0.08f, AlongT);
+                    const float LateralProfile = 1.0f - LateralT * LateralT;
+                    const float TongueMask =
+                        UpstreamFade * CrestRamp * LateralProfile *
+                        FMath::Clamp(Site.Intensity, 0.0f, 1.0f) *
+                        Site.PresentationWeight;
+                    if (TongueMask > 0.01f)
+                    {
+                        CombinedPocketDisplacementMeters -= 0.07f * TongueMask;
+                        TongueFoamSuppression[VertexIndex] = FMath::Max(
+                            TongueFoamSuppression[VertexIndex],
+                            TongueMask * LateralProfile);
+                    }
+                }
+            }
 
             const float SitePhaseRadians = FMath::Fmod(
                 FMath::Abs(
@@ -3687,8 +4102,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                       PresentationPhaseSeconds,
                       SitePhaseRadians)
                 : FVector2D::ZeroVector;
-            CombinedBoilDisplacementMeters += Boil.X;
-            BoilFoam = FMath::Max(BoilFoam, Boil.Y);
+            CombinedBoilDisplacementMeters +=
+                Boil.X * Site.PresentationWeight;
+            BoilFoam = FMath::Max(
+                BoilFoam, Boil.Y * Site.PresentationWeight);
         }
         CombinedPocketDisplacementMeters = FMath::Clamp(
             CombinedPocketDisplacementMeters, -0.30f, 0.18f);
@@ -3867,11 +4284,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const float BulkWaterSpeedMetersPerSecond =
                     FieldVelocity.Size();
                 FVector2D RollerVelocity = FVector2D::ZeroVector;
-                for (int32 SiteIndex = 0;
-                     SiteIndex < BreakingPresentationSiteCount;
-                     ++SiteIndex)
+                for (const FBreakingSite& Site : WeightedPresentationSites)
                 {
-                    const FBreakingSite& Site = BreakingSites[SiteIndex];
                     const FVector2D RelativePosition =
                         FieldPosition - Site.RiverCoordinatesMeters;
                     RollerVelocity +=
@@ -3879,12 +4293,55 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                             RelativePosition.X,
                             RelativePosition.Y,
                             Site.Intensity,
-                            BulkWaterSpeedMetersPerSecond);
+                            BulkWaterSpeedMetersPerSecond) *
+                        Site.PresentationWeight;
                 }
                 FieldVelocity += RollerVelocity.GetClampedToMaxSize(
                     FMath::Max(
                         1.0f,
                         BulkWaterSpeedMetersPerSecond + 1.0f));
+                // Boulder eddies (presentation transport only): the sheltered
+                // pocket behind an obstruction recirculates. The core returns
+                // upstream toward the rock while the downstream half draws
+                // surface water in toward the centreline, so foam entering
+                // over the shear seam circles and collects instead of washing
+                // straight through. Raft physics still rides the solver
+                // field; this only steers where the foam travels.
+                for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
+                {
+                    const float RadiusM = FMath::Max(Footprint.Z, 0.75f);
+                    const float DownstreamM = FieldPosition.X - Footprint.X;
+                    if (DownstreamM < RadiusM * 0.5f ||
+                        DownstreamM > RadiusM * 6.0f)
+                    {
+                        continue;
+                    }
+                    const float AcrossM = FieldPosition.Y - Footprint.Y;
+                    const float AcrossT = AcrossM / (RadiusM * 1.6f);
+                    if (FMath::Abs(AcrossT) > 1.0f)
+                    {
+                        continue;
+                    }
+                    const float AlongT = FMath::Clamp(
+                        (DownstreamM - RadiusM * 0.5f) / (RadiusM * 5.5f),
+                        0.0f, 1.0f);
+                    const float SpeedEnvelope = FMath::SmoothStep(
+                        0.45f, 1.65f, BulkWaterSpeedMetersPerSecond);
+                    const float PocketEnvelope =
+                        (1.0f - AlongT) *
+                        FMath::SmoothStep(1.0f, 0.55f, FMath::Abs(AcrossT)) *
+                        SpeedEnvelope;
+                    if (PocketEnvelope <= 0.01f)
+                    {
+                        continue;
+                    }
+                    const FVector2D EddyVelocity(
+                        -0.55f * BulkWaterSpeedMetersPerSecond,
+                        -AcrossT * 0.30f * BulkWaterSpeedMetersPerSecond *
+                            AlongT);
+                    FieldVelocity = FMath::Lerp(
+                        FieldVelocity, EddyVelocity, PocketEnvelope);
+                }
                 const FVector2D BackPosition =
                     FieldPosition - FieldVelocity * FoamDeltaSeconds;
                 const float FractionalX =
@@ -3922,7 +4379,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 : FMath::Max(RefreshIntervalSeconds, 1.0f / 60.0f);
             const float FoamAttackBlend = 1.0f - FMath::Exp(
                 -FoamAttackDeltaSeconds / 0.22f);
-            const float FinalFoam = FMath::Clamp(
+            float FinalFoam = FMath::Clamp(
                 SourceFoam[Index] > Advected
                     ? FMath::Lerp(
                           Advected,
@@ -3931,6 +4388,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     : Advected,
                 0.0f,
                 1.0f);
+            // Entry tongues stay glassy: damp both generated and advected
+            // foam in the tongue core so the V reads as clean fast water.
+            if (TongueFoamSuppression[Index] > 0.0f)
+            {
+                FinalFoam *= 1.0f - 0.9f * FMath::Min(
+                    TongueFoamSuppression[Index], 1.0f);
+            }
             NewFoamField[Index] = FinalFoam;
             VertexColors[Index].R = FinalFoam;
             FoamAdvectionSum += FinalFoam;
@@ -4026,8 +4490,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MinimumWetLateralIndex;
         TArray<int32> VolumeCoreMaximumWetLateralIndex =
             MaximumWetLateralIndex;
-        TArray<FVector> VolumeCoreNormals = Normals;
-        TArray<FLinearColor> VolumeCoreVertexColors = VertexColors;
+        LiveVolumeCoreNormals = Normals;
+        LiveVolumeCoreVertexColors = VertexColors;
         for (int32 Index = 0; Index < Vertices.Num(); ++Index)
         {
             LiveVolumeCoreVertices[Index] = bSingleLiveWaterSurfaceEnabled
@@ -4074,8 +4538,6 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                  &VolumeCoreWetMask,
                  &VolumeCoreMinimumWetLateralIndex,
                  &VolumeCoreMaximumWetLateralIndex,
-                 &VolumeCoreNormals,
-                 &VolumeCoreVertexColors,
                  &WetVertexMask,
                  &MinimumWetLateralIndex,
                  &MaximumWetLateralIndex,
@@ -4145,10 +4607,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 GradeCmPerMeter * TargetStationDeltaM -
                                 LegacyWPOCounterCm(Index);
                             VolumeCoreWetMask[Index] = 1;
-                            VolumeCoreNormals[Index] = Normals[BoundaryIndex];
-                            VolumeCoreVertexColors[Index] =
+                            LiveVolumeCoreNormals[Index] = Normals[BoundaryIndex];
+                            LiveVolumeCoreVertexColors[Index] =
                                 VertexColors[BoundaryIndex];
-                            VolumeCoreVertexColors[Index].R = 0.0f;
+                            LiveVolumeCoreVertexColors[Index].R = 0.0f;
                             const float StationCoverage =
                                 ComputeStationEdgeCoverage(
                                     X,
@@ -4165,7 +4627,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                     CurvedGridLateralEdgeBlendMeters,
                                     bLivePresentationBankNaturalismEnabled,
                                     ResolvedPresentationBankNaturalismAmplitudeMeters);
-                            VolumeCoreVertexColors[Index].A =
+                            LiveVolumeCoreVertexColors[Index].A =
                                 StationCoverage * LateralCoverage;
                         }
                     }
@@ -4175,6 +4637,100 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 ExtendOpticalCore(FirstWetStation, -1);
                 ExtendOpticalCore(LastWetStation, 1);
             }
+        }
+
+        // Wet membership flips at cell granularity every refresh; rendering
+        // the raw mask toggled whole rectangular bank quads in one frame.
+        // Ease a per-vertex presence envelope toward the mask instead: a
+        // cell's quads render while any presence remains, and the collapse
+        // pass below the bank retreat slides partially present vertices
+        // toward the channel so the shoreline expands and recedes as a
+        // lapping edge. Alpha cannot express this fade — the Single Layer
+        // Water body shades at near-zero surface opacity — so the envelope
+        // must move geometry.
+        if (LiveVolumeCoreWetPresence.Num() != Vertices.Num())
+        {
+            LiveVolumeCoreWetPresence.SetNumZeroed(Vertices.Num());
+        }
+        // Connectivity filter: the carrier must only render water that is
+        // reachable from genuine solver-wet channel cells without a step in
+        // surface height. The terrain-clipped baseline also marks raised
+        // bank benches as wet; rendered, those benches float above the
+        // adjacent channel as a second pale surface, and their wet-mask
+        // noise makes whole slabs appear and vanish. Flood-fill from the
+        // solver-wet channel with a per-cell height-step limit and cull the
+        // disconnected islands from presentation.
+        TArray<uint8> ConnectedWetMask;
+        ConnectedWetMask.Init(0, Vertices.Num());
+        {
+            TArray<int32> FloodQueue;
+            FloodQueue.Reserve(Vertices.Num() / 4);
+            for (int32 Index = 0; Index < Vertices.Num(); ++Index)
+            {
+                if (LiveSolverWetVertexMask[Index] != 0 &&
+                    VolumeCoreWetMask[Index] != 0)
+                {
+                    ConnectedWetMask[Index] = 1;
+                    FloodQueue.Add(Index);
+                }
+            }
+            constexpr float kMaxNeighbourSurfaceStepM = 0.55f;
+            for (int32 QueueIndex = 0; QueueIndex < FloodQueue.Num();
+                 ++QueueIndex)
+            {
+                const int32 Index = FloodQueue[QueueIndex];
+                const int32 X = Index % GridStationN;
+                const int32 Y = Index / GridStationN;
+                const int32 NeighbourIndices[4] = {
+                    X > 0 ? Index - 1 : INDEX_NONE,
+                    X < GridStationN - 1 ? Index + 1 : INDEX_NONE,
+                    Y > 0 ? Index - GridStationN : INDEX_NONE,
+                    Y < GridLateralN - 1 ? Index + GridStationN : INDEX_NONE};
+                for (const int32 NeighbourIndex : NeighbourIndices)
+                {
+                    if (NeighbourIndex == INDEX_NONE ||
+                        ConnectedWetMask[NeighbourIndex] != 0 ||
+                        VolumeCoreWetMask[NeighbourIndex] == 0)
+                    {
+                        continue;
+                    }
+                    if (FMath::Abs(
+                            PresentationSurfaceHeightMeters[NeighbourIndex] -
+                            PresentationSurfaceHeightMeters[Index]) >
+                        kMaxNeighbourSurfaceStepM)
+                    {
+                        continue;
+                    }
+                    ConnectedWetMask[NeighbourIndex] = 1;
+                    FloodQueue.Add(NeighbourIndex);
+                }
+            }
+        }
+        const float PresenceAttackBlend = 1.0f - FMath::Exp(
+            -3.5f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+        const float PresenceReleaseBlend = 1.0f - FMath::Exp(
+            -2.8f * FMath::Max(RefreshIntervalSeconds, 0.0f));
+        for (int32 Index = 0; Index < Vertices.Num(); ++Index)
+        {
+            const float PresenceTarget =
+                ConnectedWetMask[Index] != 0 ? 1.0f : 0.0f;
+            float Presence = FMath::Lerp(
+                LiveVolumeCoreWetPresence[Index],
+                PresenceTarget,
+                PresenceTarget > LiveVolumeCoreWetPresence[Index]
+                    ? PresenceAttackBlend
+                    : PresenceReleaseBlend);
+            // Snap the settled tails so long-stable cells compare exactly
+            // and topology only changes once a fade has fully finished.
+            if (Presence > 0.995f)
+            {
+                Presence = 1.0f;
+            }
+            else if (Presence < 0.005f)
+            {
+                Presence = 0.0f;
+            }
+            LiveVolumeCoreWetPresence[Index] = Presence;
         }
 
         TArray<int32> NewVolumeCoreTriangles;
@@ -4188,10 +4744,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const int32 I2 = I0 + GridStationN;
                 const int32 I3 = I2 + 1;
                 const bool bFullyWetCell =
-                    VolumeCoreWetMask[I0] != 0 &&
-                    VolumeCoreWetMask[I1] != 0 &&
-                    VolumeCoreWetMask[I2] != 0 &&
-                    VolumeCoreWetMask[I3] != 0;
+                    LiveVolumeCoreWetPresence[I0] > 0.0f &&
+                    LiveVolumeCoreWetPresence[I1] > 0.0f &&
+                    LiveVolumeCoreWetPresence[I2] > 0.0f &&
+                    LiveVolumeCoreWetPresence[I3] > 0.0f;
                 const float MinimumCellStationCoverage = FMath::Min(
                     ComputeStationEdgeCoverage(
                         X,
@@ -4271,6 +4827,40 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     RiverLeftRetreatMeters / SafeSpacingMeters);
             }
         }
+        // Presence-driven shoreline collapse. A partially present vertex
+        // slides onto its most-present lateral neighbour (after the bank
+        // retreat, so the water's edge stays inside the retreated contour);
+        // at zero presence its quads have collapsed to zero area and can
+        // leave the index list without a visible pop. Fading strips chain
+        // toward the channel because earlier rows collapse first.
+        for (int32 Y = 0; Y < GridLateralN; ++Y)
+        {
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                const int32 Index = Y * GridStationN + X;
+                const float Presence = LiveVolumeCoreWetPresence[Index];
+                if (Presence <= 0.0f || Presence >= 1.0f)
+                {
+                    continue;
+                }
+                const int32 TowardRightIndex =
+                    Y > 0 ? Index - GridStationN : Index;
+                const int32 TowardLeftIndex =
+                    Y < GridLateralN - 1 ? Index + GridStationN : Index;
+                const int32 AnchorIndex =
+                    LiveVolumeCoreWetPresence[TowardRightIndex] >=
+                        LiveVolumeCoreWetPresence[TowardLeftIndex]
+                    ? TowardRightIndex
+                    : TowardLeftIndex;
+                const float Expansion =
+                    Presence * Presence * (3.0f - 2.0f * Presence);
+                LiveVolumeCoreVertices[Index] = FMath::Lerp(
+                    LiveVolumeCoreVertices[AnchorIndex],
+                    LiveVolumeCoreVertices[Index],
+                    Expansion);
+                LiveVolumeCoreVertexColors[Index].A *= Expansion;
+            }
+        }
         const bool bTopologyChanged =
             LiveVolumeCoreTriangles != NewVolumeCoreTriangles;
         LiveVolumeCoreTriangles = MoveTemp(NewVolumeCoreTriangles);
@@ -4278,8 +4868,161 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         if (LiveVolumeCoreTriangleCount > 0)
         {
             const TArray<FVector2D> VolumeCoreEmptyUVs;
-            if (bTopologyChanged ||
-                LiveVolumeCoreMesh->GetProcMeshSection(0) == nullptr)
+            const bool bSectionMissing =
+                LiveVolumeCoreMesh->GetProcMeshSection(0) == nullptr;
+            const bool bRenderedStateShapeMatches =
+                RenderedLiveVolumeCoreVertices.Num() ==
+                    LiveVolumeCoreVertices.Num() &&
+                RenderedLiveVolumeCoreNormals.Num() ==
+                    LiveVolumeCoreNormals.Num() &&
+                RenderedLiveVolumeCoreVertexColors.Num() ==
+                    LiveVolumeCoreVertexColors.Num() &&
+                RenderedLiveVolumeCoreFlowVelocity.Num() ==
+                    FlowVelocityMetersPerSecond.Num() &&
+                RenderedLiveVolumeCoreWakeData.Num() ==
+                    BoatWakePresentationData.Num();
+            // A recentre shifts the lattice by whole station cells, so the
+            // previously rendered overlap can be carried into the new index
+            // space instead of discarding the in-flight interpolation.
+            // Hard-swapping the mid-blend surface for the fresh solve was the
+            // one remaining whole-carrier snap, repeating every
+            // CurvedGridRecenterDistanceMeters of travel. Vertices entering
+            // at the leading edge have no history and seed at their targets,
+            // inside the station-edge alpha feather.
+            bool bRecentreCarryApplied = false;
+            if (bSingleLiveWaterSurfaceEnabled && bGridRecentredThisRefresh &&
+                !bSectionMissing && bRenderedStateShapeMatches)
+            {
+                const float SafeSpacingMeters = FMath::Max(
+                    ResolvedVertexSpacingMeters, KINDA_SMALL_NUMBER);
+                const float ShiftCellsExact =
+                    (CurvedGridCenterStationM - PreviousGridCenterStationM) /
+                    SafeSpacingMeters;
+                const int32 ShiftCells = FMath::RoundToInt(ShiftCellsExact);
+                // The river-end clamp can land the centre off the shared
+                // lattice. Only an exact integer shift keeps every overlap
+                // vertex at its previous river coordinates; otherwise fall
+                // through to the hard swap below.
+                if (FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f)
+                {
+                    if (ShiftCells != 0)
+                    {
+                        const TArray<FVector> PreviousRenderedVertices =
+                            RenderedLiveVolumeCoreVertices;
+                        const TArray<FVector> PreviousRenderedNormals =
+                            RenderedLiveVolumeCoreNormals;
+                        const TArray<FLinearColor> PreviousRenderedColors =
+                            RenderedLiveVolumeCoreVertexColors;
+                        const TArray<FVector2D> PreviousRenderedFlow =
+                            RenderedLiveVolumeCoreFlowVelocity;
+                        const TArray<FVector2D> PreviousRenderedWake =
+                            RenderedLiveVolumeCoreWakeData;
+                        for (int32 Y = 0; Y < GridLateralN; ++Y)
+                        {
+                            for (int32 X = 0; X < GridStationN; ++X)
+                            {
+                                const int32 Index = Y * GridStationN + X;
+                                const int32 SourceX = X + ShiftCells;
+                                if (SourceX >= 0 && SourceX < GridStationN)
+                                {
+                                    const int32 SourceIndex =
+                                        Y * GridStationN + SourceX;
+                                    RenderedLiveVolumeCoreVertices[Index] =
+                                        PreviousRenderedVertices[SourceIndex];
+                                    RenderedLiveVolumeCoreNormals[Index] =
+                                        PreviousRenderedNormals[SourceIndex];
+                                    RenderedLiveVolumeCoreVertexColors[Index] =
+                                        PreviousRenderedColors[SourceIndex];
+                                    RenderedLiveVolumeCoreFlowVelocity[Index] =
+                                        PreviousRenderedFlow[SourceIndex];
+                                    RenderedLiveVolumeCoreWakeData[Index] =
+                                        PreviousRenderedWake[SourceIndex];
+                                }
+                                else
+                                {
+                                    RenderedLiveVolumeCoreVertices[Index] =
+                                        LiveVolumeCoreVertices[Index];
+                                    RenderedLiveVolumeCoreNormals[Index] =
+                                        LiveVolumeCoreNormals[Index];
+                                    RenderedLiveVolumeCoreVertexColors[Index] =
+                                        LiveVolumeCoreVertexColors[Index];
+                                    RenderedLiveVolumeCoreFlowVelocity[Index] =
+                                        FlowVelocityMetersPerSecond[Index];
+                                    RenderedLiveVolumeCoreWakeData[Index] =
+                                        BoatWakePresentationData[Index];
+                                }
+                            }
+                        }
+                    }
+                    bRecentreCarryApplied = true;
+                }
+            }
+            const bool bCanInterpolate =
+                bSingleLiveWaterSurfaceEnabled &&
+                (!bGridRecentredThisRefresh || bRecentreCarryApplied) &&
+                !bSectionMissing &&
+                bRenderedStateShapeMatches;
+            if (bCanInterpolate)
+            {
+                // Preserve the exact currently rendered state as the start of
+                // the next interval. Vertex positions, vertex normals, and
+                // optical/foam channels then advance every rendered frame;
+                // replacing these targets outright at 15 Hz made specular
+                // reflections appear to jump even with one visible surface.
+                LiveVolumeCoreInterpolationStartVertices =
+                    RenderedLiveVolumeCoreVertices;
+                LiveVolumeCoreInterpolationStartNormals =
+                    RenderedLiveVolumeCoreNormals;
+                LiveVolumeCoreInterpolationStartVertexColors =
+                    RenderedLiveVolumeCoreVertexColors;
+                LiveVolumeCoreInterpolationStartFlowVelocity =
+                    RenderedLiveVolumeCoreFlowVelocity;
+                LiveVolumeCoreInterpolationStartWakeData =
+                    RenderedLiveVolumeCoreWakeData;
+                LiveVolumeCoreInterpolationElapsedSeconds = 0.0f;
+                bLiveVolumeCoreInterpolationActive = true;
+                if (bTopologyChanged)
+                {
+                    // Wet/dry shoreline membership may change at the solver
+                    // cadence. Install only the new index list while keeping
+                    // the exact currently rendered positions, normals, and
+                    // alpha. Newly admitted bank triangles therefore emerge
+                    // from their previous dry/transparent state instead of
+                    // making the complete reflective carrier jump.
+                    LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
+                        0,
+                        RenderedLiveVolumeCoreVertices,
+                        LiveVolumeCoreTriangles,
+                        RenderedLiveVolumeCoreNormals,
+                        UVs,
+                        RenderedLiveVolumeCoreFlowVelocity,
+                        RenderedLiveVolumeCoreWakeData,
+                        VolumeCoreEmptyUVs,
+                        RenderedLiveVolumeCoreVertexColors,
+                        Tangents,
+                        /*bCreateCollision=*/false);
+                }
+                else if (bRecentreCarryApplied)
+                {
+                    // Same world-space geometry the previous frame drew, but
+                    // every index now maps to a shifted station. Push the
+                    // carried state together with the recentred UVs so the
+                    // river-anchored WPO and texture fields stay glued to
+                    // their coordinates for the frame this refresh renders.
+                    LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
+                        0,
+                        RenderedLiveVolumeCoreVertices,
+                        RenderedLiveVolumeCoreNormals,
+                        UVs,
+                        RenderedLiveVolumeCoreFlowVelocity,
+                        RenderedLiveVolumeCoreWakeData,
+                        VolumeCoreEmptyUVs,
+                        RenderedLiveVolumeCoreVertexColors,
+                        Tangents);
+                }
+            }
+            else if (bTopologyChanged || bGridRecentredThisRefresh ||
+                     bSectionMissing)
             {
                 // CreateMeshSection replaces an existing section atomically.
                 // Clearing it first exposed an empty render state whenever a
@@ -4290,27 +5033,43 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     0,
                     LiveVolumeCoreVertices,
                     LiveVolumeCoreTriangles,
-                    VolumeCoreNormals,
+                    LiveVolumeCoreNormals,
                     UVs,
                     FlowVelocityMetersPerSecond,
                     BoatWakePresentationData,
                     VolumeCoreEmptyUVs,
-                    VolumeCoreVertexColors,
+                    LiveVolumeCoreVertexColors,
                     Tangents,
                     /*bCreateCollision=*/false);
+                RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
+                RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
+                RenderedLiveVolumeCoreVertexColors =
+                    LiveVolumeCoreVertexColors;
+                RenderedLiveVolumeCoreFlowVelocity =
+                    FlowVelocityMetersPerSecond;
+                RenderedLiveVolumeCoreWakeData = BoatWakePresentationData;
+                bLiveVolumeCoreInterpolationActive = false;
             }
             else
             {
                 LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
                     0,
                     LiveVolumeCoreVertices,
-                    VolumeCoreNormals,
+                    LiveVolumeCoreNormals,
                     UVs,
                     FlowVelocityMetersPerSecond,
                     BoatWakePresentationData,
                     VolumeCoreEmptyUVs,
-                    VolumeCoreVertexColors,
+                    LiveVolumeCoreVertexColors,
                     Tangents);
+                RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
+                RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
+                RenderedLiveVolumeCoreVertexColors =
+                    LiveVolumeCoreVertexColors;
+                RenderedLiveVolumeCoreFlowVelocity =
+                    FlowVelocityMetersPerSecond;
+                RenderedLiveVolumeCoreWakeData = BoatWakePresentationData;
+                bLiveVolumeCoreInterpolationActive = false;
             }
         }
         else
@@ -4324,6 +5083,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     {
         LiveVolumeCoreTriangleCount = 0;
         LiveVolumeCoreTriangles.Reset();
+        bLiveVolumeCoreInterpolationActive = false;
         LiveVolumeCoreMesh->SetVisibility(false, true);
     }
 
@@ -4762,6 +5522,88 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
     bBoatWakeValid = true;
 }
 
+void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
+    float DeltaSeconds)
+{
+    if (!bLiveVolumeCoreInterpolationActive ||
+        !LiveVolumeCoreMesh ||
+        LiveVolumeCoreMesh->GetProcMeshSection(0) == nullptr ||
+        LiveVolumeCoreVertices.Num() == 0 ||
+        LiveVolumeCoreInterpolationStartVertices.Num() !=
+            LiveVolumeCoreVertices.Num() ||
+        LiveVolumeCoreInterpolationStartNormals.Num() !=
+            LiveVolumeCoreNormals.Num() ||
+        LiveVolumeCoreInterpolationStartVertexColors.Num() !=
+            LiveVolumeCoreVertexColors.Num() ||
+        LiveVolumeCoreInterpolationStartFlowVelocity.Num() !=
+            FlowVelocityMetersPerSecond.Num() ||
+        LiveVolumeCoreInterpolationStartWakeData.Num() !=
+            BoatWakePresentationData.Num())
+    {
+        return;
+    }
+
+    LiveVolumeCoreInterpolationElapsedSeconds +=
+        FMath::Max(DeltaSeconds, 0.0f);
+    const float Alpha = RefreshIntervalSeconds > KINDA_SMALL_NUMBER
+        ? FMath::Clamp(
+              LiveVolumeCoreInterpolationElapsedSeconds /
+                  RefreshIntervalSeconds,
+              0.0f,
+              1.0f)
+        : 1.0f;
+
+    RenderedLiveVolumeCoreVertices.SetNumUninitialized(
+        LiveVolumeCoreVertices.Num());
+    RenderedLiveVolumeCoreNormals.SetNumUninitialized(
+        LiveVolumeCoreNormals.Num());
+    RenderedLiveVolumeCoreVertexColors.SetNumUninitialized(
+        LiveVolumeCoreVertexColors.Num());
+    RenderedLiveVolumeCoreFlowVelocity.SetNumUninitialized(
+        FlowVelocityMetersPerSecond.Num());
+    RenderedLiveVolumeCoreWakeData.SetNumUninitialized(
+        BoatWakePresentationData.Num());
+    for (int32 Index = 0; Index < LiveVolumeCoreVertices.Num(); ++Index)
+    {
+        RenderedLiveVolumeCoreVertices[Index] = FMath::Lerp(
+            LiveVolumeCoreInterpolationStartVertices[Index],
+            LiveVolumeCoreVertices[Index],
+            Alpha);
+        RenderedLiveVolumeCoreNormals[Index] = FMath::Lerp(
+            LiveVolumeCoreInterpolationStartNormals[Index],
+            LiveVolumeCoreNormals[Index],
+            Alpha).GetSafeNormal();
+        RenderedLiveVolumeCoreVertexColors[Index] = FMath::Lerp(
+            LiveVolumeCoreInterpolationStartVertexColors[Index],
+            LiveVolumeCoreVertexColors[Index],
+            Alpha);
+        RenderedLiveVolumeCoreFlowVelocity[Index] = FMath::Lerp(
+            LiveVolumeCoreInterpolationStartFlowVelocity[Index],
+            FlowVelocityMetersPerSecond[Index],
+            Alpha);
+        RenderedLiveVolumeCoreWakeData[Index] = FMath::Lerp(
+            LiveVolumeCoreInterpolationStartWakeData[Index],
+            BoatWakePresentationData[Index],
+            Alpha);
+    }
+
+    const TArray<FVector2D> EmptyUVs;
+    LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
+        0,
+        RenderedLiveVolumeCoreVertices,
+        RenderedLiveVolumeCoreNormals,
+        UVs,
+        RenderedLiveVolumeCoreFlowVelocity,
+        RenderedLiveVolumeCoreWakeData,
+        EmptyUVs,
+        RenderedLiveVolumeCoreVertexColors,
+        Tangents);
+    if (Alpha >= 1.0f)
+    {
+        bLiveVolumeCoreInterpolationActive = false;
+    }
+}
+
 void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
@@ -4925,6 +5767,11 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
     // must follow the boat every rendered frame rather than hopping at the
     // lower-frequency hydraulic mesh refresh cadence.
     UpdateRaftFoamExclusionParameters();
+
+    // Solver sampling and topology stay at the bounded hydraulic cadence, but
+    // the one visible carrier must not expose that cadence through its normal
+    // field. Reflections are especially sensitive to even small normal steps.
+    UpdateLiveVolumeCoreInterpolation(DeltaSeconds);
 
     TimeSinceRefresh += DeltaSeconds;
     if (TimeSinceRefresh >= RefreshIntervalSeconds)

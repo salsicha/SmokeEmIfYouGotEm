@@ -28,18 +28,25 @@ inline void Configure(UCameraComponent* Camera, float ExposureBias = 1.25f)
     Settings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
     Settings.AutoExposureApplyPhysicalCameraExposure = 0;
 
+    // Local exposure is a per-frame regional adaptation: at full detail
+    // strength with a tight blurred-luminance blend it chased the churning
+    // water glints and repainted brightness around them every frame, which
+    // read as the water's texture/reflections "suddenly changing"
+    // (2026-08-27 fixed-camera frame-diff measurement). Softer detail and a
+    // larger, more-blurred luminance basis keep the highlight compression
+    // while decoupling it from sparkle.
     Settings.bOverride_LocalExposureMethod = true;
     Settings.LocalExposureMethod = ELocalExposureMethod::Bilateral;
     Settings.bOverride_LocalExposureHighlightContrastScale = true;
-    Settings.LocalExposureHighlightContrastScale = 0.78f;
+    Settings.LocalExposureHighlightContrastScale = 0.86f;
     Settings.bOverride_LocalExposureShadowContrastScale = true;
-    Settings.LocalExposureShadowContrastScale = 0.72f;
+    Settings.LocalExposureShadowContrastScale = 0.76f;
     Settings.bOverride_LocalExposureDetailStrength = true;
-    Settings.LocalExposureDetailStrength = 1.0f;
+    Settings.LocalExposureDetailStrength = 0.75f;
     Settings.bOverride_LocalExposureBlurredLuminanceBlend = true;
-    Settings.LocalExposureBlurredLuminanceBlend = 0.50f;
+    Settings.LocalExposureBlurredLuminanceBlend = 0.70f;
     Settings.bOverride_LocalExposureBlurredLuminanceKernelSizePercent = true;
-    Settings.LocalExposureBlurredLuminanceKernelSizePercent = 50.0f;
+    Settings.LocalExposureBlurredLuminanceKernelSizePercent = 65.0f;
 
     Settings.bOverride_ColorSaturation = true;
     Settings.ColorSaturation = FVector4(1.03f, 1.03f, 1.03f, 1.0f);

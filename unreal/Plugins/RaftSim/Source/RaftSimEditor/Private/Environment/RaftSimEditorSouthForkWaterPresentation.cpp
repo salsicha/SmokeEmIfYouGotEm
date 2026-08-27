@@ -60,13 +60,13 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
 {
     static const TCHAR* PackagePath = TEXT(
         "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-        "M_RaftSim_SouthForkRaftTransmissionWaterV2");
+        "M_RaftSim_SouthForkRaftTransmissionWaterV4");
     static const TCHAR* ObjectName =
-        TEXT("M_RaftSim_SouthForkRaftTransmissionWaterV2");
+        TEXT("M_RaftSim_SouthForkRaftTransmissionWaterV4");
     static const TCHAR* ObjectPath = TEXT(
         "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-        "M_RaftSim_SouthForkRaftTransmissionWaterV2."
-        "M_RaftSim_SouthForkRaftTransmissionWaterV2");
+        "M_RaftSim_SouthForkRaftTransmissionWaterV4."
+        "M_RaftSim_SouthForkRaftTransmissionWaterV4");
 
     UMaterial* SourceMaterial = SourceParent ? SourceParent->GetMaterial() : nullptr;
     UPackage* Package = CreatePackage(PackagePath);
@@ -1007,6 +1007,13 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("FlowStreakSpeedGain")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("SouthForkTravelingWaveWPOStrength")), 0.0f);
+    // The unified carrier's small-scale current relief is evaluated by the
+    // material every rendered frame from river-space UVs and the integrated
+    // solver-current displacement. A restrained amplitude retains visible 3D
+    // flow while avoiding the vertical stepping caused by resampling animated
+    // CPU vertices only at the 15 Hz hydraulic presentation refresh.
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("SouthForkTurbulenceWPOStrength")), 0.16f);
     // Persist authored overrides without forcing this command to wait on the
     // parent shader map; loading the instance rebuilds its resources normally.
     Package->MarkPackageDirty();

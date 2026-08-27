@@ -213,10 +213,22 @@ public:
         float Intensity = 0.0f;
         float PresentationCoverage = 0.0f;
         float PresentationEdgeClearanceMeters = 0.0f;
+        /** Stable phase seed for the organic shape variation built on this
+         * site. Assigned once when the persistent site spawns and kept for
+         * its whole life, so intensity-rank swaps between refreshes can no
+         * longer reshuffle the lip, roller, and mist patterns keyed to it. */
+        float ShapeSeed = 0.0f;
+        /** Smoothed 0..1 share of the bounded plunge-pocket/boil carve. It
+         * follows the strongest published sites, but eases through membership
+         * changes instead of toggling a 30 cm presentation in one refresh. */
+        float PresentationWeight = 0.0f;
     };
 
-    /** Copies the breaking sites found during the most recent surface refresh,
-     * strongest first, deduplicated to a minimum world spacing. */
+    /** Copies the published breaking sites, strongest first, deduplicated to
+     * a minimum world spacing. Detection runs every refresh, but sites are
+     * carried in a persistent registry — matched by river coordinates with
+     * eased position/intensity and a spawn/despawn fade — so presentation
+     * anchored to them never steps between refreshes. */
     void GetBreakingSites(TArray<FBreakingSite>& OutSites) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
@@ -553,6 +565,9 @@ protected:
 private:
     void BuildGrid();
     void RefreshSurface();
+    void UpdateLiveVolumeCoreInterpolation(float DeltaSeconds);
+    void UpdatePersistentBreakingSites(
+        const TArray<FBreakingSite>& AcceptedCandidates);
     void RecenterCurvedGrid();
     void ClampCurvedGridCenter();
     void UpdateCurvedGridPlanarGeometry();
@@ -598,13 +613,54 @@ private:
      * only the physical paddle-wake triangles. Section 0 remains the normal
      * river-wide hydraulic overlay. */
     TArray<FLinearColor> PaddleWakeVertexColors;
+    /** Latest sampled target for the one visible Single Layer Water carrier.
+     * The procedural mesh renders an interpolated copy so solver positions,
+     * normals, foam, and therefore reflections do not step at 15 Hz. */
     TArray<FVector> LiveVolumeCoreVertices;
+    TArray<FVector> LiveVolumeCoreNormals;
+    TArray<FLinearColor> LiveVolumeCoreVertexColors;
+    TArray<FVector> LiveVolumeCoreInterpolationStartVertices;
+    TArray<FVector> LiveVolumeCoreInterpolationStartNormals;
+    TArray<FLinearColor> LiveVolumeCoreInterpolationStartVertexColors;
+    TArray<FVector> RenderedLiveVolumeCoreVertices;
+    TArray<FVector> RenderedLiveVolumeCoreNormals;
+    TArray<FLinearColor> RenderedLiveVolumeCoreVertexColors;
+    /** UV1 flow velocity and UV2 wake data interpolate alongside positions.
+     * They previously stepped to fresh values at the 15 Hz refresh; UV1
+     * drives the ripple-normal advection phase, so those steps read as
+     * specular/reflection jitter on the moving surface. */
+    TArray<FVector2D> LiveVolumeCoreInterpolationStartFlowVelocity;
+    TArray<FVector2D> RenderedLiveVolumeCoreFlowVelocity;
+    TArray<FVector2D> LiveVolumeCoreInterpolationStartWakeData;
+    TArray<FVector2D> RenderedLiveVolumeCoreWakeData;
+    /** Slow per-vertex surface-height reference for the shoreline. The
+     * visible waterline is the surface/terrain intersection: on a flat bank
+     * a few centimetres of per-refresh wave motion sweep that line metres
+     * sideways, which reads as patches of water appearing and vanishing.
+     * Shallow water blends toward this slow reference so the waterline
+     * holds while deep water stays fully dynamic. FLT_MAX = uninitialised. */
+    TArray<float> ShoreSmoothedSurfaceZCm;
+    /** Per-vertex wet-presence envelope for the carrier. Wet membership is
+     * re-evaluated every refresh at cell granularity; rendering that mask
+     * directly toggled whole rectangular bank quads on and off. Presence
+     * eases toward the mask and drives a geometric collapse of partially
+     * present bank vertices toward the channel (alpha cannot fade a Single
+     * Layer Water body), so the shoreline laps instead of popping. */
+    TArray<float> LiveVolumeCoreWetPresence;
+    /** Per-vertex eased breaking crest/tail lift. Raw Froude detection
+     * re-decides the lifted cells every refresh, so threshold cells toggled
+     * their full lift in one 15 Hz step and the carved front hopped whole
+     * lattice cells; easing the applied lift keeps the crest train moving
+     * continuously through detection noise. */
+    TArray<float> SmoothedBreakingLiftCm;
     TArray<int32> LiveVolumeCoreTriangles;
     TArray<FVector> RapidFoamVertices;
     TArray<FLinearColor> RapidFoamVertexColors;
     TArray<float> SmoothedRapidFoamCoverage;
     TArray<FProcMeshTangent> Tangents;
     float TimeSinceRefresh = 0.0f;
+    float LiveVolumeCoreInterpolationElapsedSeconds = 0.0f;
+    bool bLiveVolumeCoreInterpolationActive = false;
     /** Boulder footprints (station m, lateral m, radius m) loaded from the
         cooked-fields sidecar; used to open holes in the live sheet over
         exposed rock and to seed obstruction wakes. */
@@ -652,6 +708,22 @@ private:
     bool bFoamFieldValid = false;
     double LastRefreshRealSeconds = 0.0;
     TArray<FBreakingSite> BreakingSites;
+    /** One hydraulic jump tracked across refreshes. Detection re-finds and
+     * re-ranks candidates from the raw Froude field every refresh, so rank,
+     * lattice phase, and dedupe survivors all change frame to frame; this
+     * registry gives every physical site one identity, eased state, and a
+     * spawn/despawn envelope so nothing keyed to a site can step at 15 Hz. */
+    struct FPersistentBreakingSite
+    {
+        FBreakingSite Smoothed;
+        float RawIntensity = 0.0f;
+        float Envelope = 0.0f;
+        float PresentationWeight = 0.0f;
+        bool bMatchedThisRefresh = false;
+    };
+    TArray<FPersistentBreakingSite> PersistentBreakingSites;
+    int32 BreakingSiteShapeSeedSerial = 0;
+    float LastBreakingSiteUpdateTimeSeconds = -1.0f;
     int32 BreakingLipTriangleCount = 0;
     int32 BreakingRollerVolumeTriangleCount = 0;
     int32 BreakingRollerVolumeVertexCount = 0;

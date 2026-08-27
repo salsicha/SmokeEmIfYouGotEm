@@ -2788,8 +2788,10 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
     }
 
     // Bounded population: a few slowly rising, downstream-drifting vapour
-    // puffs per breaking site. Every value is deterministic in site/instance
-    // index and SimulationPhase, matching the other card populations.
+    // puffs per breaking site. Every value is deterministic in the site's
+    // lifetime ShapeSeed, the instance index, and SimulationPhase; the
+    // retired strongest-first rank re-rolled every puff whenever two sites
+    // swapped intensity order between refreshes.
     constexpr int32 kMaxAerosolInstances = 90;
     int32 Budget = kMaxAerosolInstances;
     for (int32 SiteIndex = 0; SiteIndex < Sites.Num() && Budget > 0; ++SiteIndex)
@@ -2801,11 +2803,12 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             Downstream = FVector(1.0f, 0.0f, 0.0f);
         }
         const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
+        const int32 SiteSeed = FMath::RoundToInt(Site.ShapeSeed * 100.0f);
         const int32 PuffCount = FMath::Min(
             2 + FMath::RoundToInt(5.0f * Site.Intensity), Budget);
         for (int32 Puff = 0; Puff < PuffCount; ++Puff)
         {
-            const int32 Seed = SiteIndex * 17 + Puff;
+            const int32 Seed = SiteSeed + Puff;
             const float Rate = FMath::Lerp(
                 0.05f, 0.11f, DeterministicWave(Seed + 23, 0.0f, 1.0f));
             const float Rise = FMath::Fmod(
