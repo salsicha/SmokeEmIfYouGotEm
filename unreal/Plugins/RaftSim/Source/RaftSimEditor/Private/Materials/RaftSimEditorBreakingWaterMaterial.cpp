@@ -213,21 +213,45 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         Advected->Inputs.Add(DisplacementInput);
         return Add(Advected);
     };
-    auto SampleLace = [&](float UTiling, float VTiling,
-                          const TCHAR* Name) -> UMaterialExpression*
+    auto SampleLace = [&](float Tiling, float RotationRadians,
+                          float CurlStrength, const TCHAR* Name)
+        -> UMaterialExpression*
     {
         UMaterialExpressionTextureCoordinate* Uv =
             NewObject<UMaterialExpressionTextureCoordinate>(Material);
-        Uv->UTiling = UTiling;
-        Uv->VTiling = VTiling;
+        Uv->UTiling = Tiling;
+        Uv->VTiling = Tiling;
         Add(Uv);
+        UMaterialExpressionCustom* TurbulentCoordinates =
+            NewObject<UMaterialExpressionCustom>(Material);
+        TurbulentCoordinates->Description =
+            TEXT("RaftSimBreakingIsotropicFoamPatchCoordinates");
+        TurbulentCoordinates->OutputType = CMOT_Float2;
+        TurbulentCoordinates->Code = FString::Printf(
+            TEXT("float c = %.9ff;\n")
+            TEXT("float s = %.9ff;\n")
+            TEXT("float2 q = UV - 0.5;\n")
+            TEXT("q = float2(c*q.x - s*q.y, s*q.x + c*q.y);\n")
+            TEXT("float2 curl = float2(\n")
+            TEXT("  sin(q.y*6.2831853 + sin(q.x*3.71)),\n")
+            TEXT("  cos(q.x*6.2831853 - sin(q.y*4.13))) * %.9ff;\n")
+            TEXT("return q + curl + 0.5;"),
+            FMath::Cos(RotationRadians),
+            FMath::Sin(RotationRadians),
+            CurlStrength);
+        FCustomInput UvInput;
+        UvInput.InputName = TEXT("UV");
+        UvInput.Input.Expression = AdvectedUv(
+            Uv, Tiling, Tiling,
+            TEXT("RaftSimBreakingFoamCurrentAdvection"));
+        TurbulentCoordinates->Inputs.Add(UvInput);
+        Add(TurbulentCoordinates);
         UMaterialExpressionTextureSampleParameter2D* Sample =
             NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
         Sample->ParameterName = Name;
         Sample->Texture = FoamLace;
         Sample->SamplerType = SAMPLERTYPE_Masks;
-        Sample->Coordinates.Expression = AdvectedUv(
-            Uv, UTiling, VTiling, TEXT("RaftSimBreakingFoamCurrentAdvection"));
+        Sample->Coordinates.Expression = TurbulentCoordinates;
         Add(Sample);
         return Mask(Sample, true, false, false);
     };
@@ -293,12 +317,83 @@ static UMaterial* BuildBreakingWaterLipMaterial()
     UMaterialExpression* OcclusionSafeEdgeFeather = Multiply(
         EdgeFeather, RaftCrewExclusion);
 
-    UMaterialExpression* LaceA = SampleLace(
-        0.82f, 1.65f, TEXT("BreakingFoamLacePrimary"));
-    UMaterialExpression* LaceB = SampleLace(
-        1.73f, 3.15f, TEXT("BreakingFoamLaceDetail"));
-    UMaterialExpression* BubbleCells = SampleLace(
-        4.35f, 7.10f, TEXT("BreakingFoamBubbleCells"));
+    auto CutFroth = [&](UMaterialExpression* Sample,
+                        const TCHAR* BiasName, float Bias,
+                        const TCHAR* GainName, float Gain)
+        -> UMaterialExpression*
+    {
+        UMaterialExpressionSaturate* Cut =
+            NewObject<UMaterialExpressionSaturate>(Material);
+        Cut->Input.Expression = Multiply(
+            AddValues(Sample, Scalar(BiasName, -Bias)),
+            Scalar(GainName, Gain));
+        Add(Cut);
+        return Cut;
+    };
+    UMaterialExpression* LaceA = CutFroth(
+        SampleLace(0.95f, 0.35f, 0.085f,
+            TEXT("BreakingFoamLacePrimary")),
+        TEXT("BreakingFoamPrimaryCutBias"), 0.22f,
+        TEXT("BreakingFoamPrimaryCutGain"), 1.72f);
+    UMaterialExpression* LaceB = CutFroth(
+        SampleLace(1.85f, -0.62f, 0.060f,
+            TEXT("BreakingFoamLaceDetail")),
+        TEXT("BreakingFoamDetailCutBias"), 0.20f,
+        TEXT("BreakingFoamDetailCutGain"), 1.62f);
+    UMaterialExpression* BubbleCells = CutFroth(
+        SampleLace(4.20f, 1.02f, 0.032f,
+            TEXT("BreakingFoamBubbleCells")),
+        TEXT("BreakingFoamBubbleCutBias"), 0.16f,
+        TEXT("BreakingFoamBubbleCutGain"), 1.48f);
+    UMaterialExpressionTextureCoordinate* PatchUv =
+        NewObject<UMaterialExpressionTextureCoordinate>(Material);
+    PatchUv->UTiling = 1.65f;
+    PatchUv->VTiling = 1.65f;
+    Add(PatchUv);
+    UMaterialExpressionCustom* PatchCoordinates =
+        NewObject<UMaterialExpressionCustom>(Material);
+    PatchCoordinates->Description = TEXT("RaftSimBreakingFoamPatchCurl");
+    PatchCoordinates->OutputType = CMOT_Float2;
+    PatchCoordinates->Code = TEXT(
+        "float c=0.6894984; float s=0.7242872; float2 q=UV-0.5;\n"
+        "q=float2(c*q.x-s*q.y,s*q.x+c*q.y);\n"
+        "float2 curl=float2(sin(q.y*6.2831853+sin(q.x*3.71)),"
+        "cos(q.x*6.2831853-sin(q.y*4.13)))*0.045;\n"
+        "return q+curl+0.5;");
+    FCustomInput PatchUvInput;
+    PatchUvInput.InputName = TEXT("UV");
+    PatchUvInput.Input.Expression = AdvectedUv(
+        PatchUv, 1.65f, 1.65f,
+        TEXT("RaftSimBreakingFoamPatchCurrentAdvection"));
+    PatchCoordinates->Inputs.Add(PatchUvInput);
+    Add(PatchCoordinates);
+    UMaterialExpressionCustom* PatchCells =
+        NewObject<UMaterialExpressionCustom>(Material);
+    PatchCells->Description = TEXT("RaftSimBreakingFoamCompactCellGate");
+    PatchCells->OutputType = CMOT_Float1;
+    PatchCells->Code = TEXT(
+        "float2 baseCell=floor(UV); float2 withinCell=frac(UV); float nearest=8.0;\n"
+        "[unroll] for(int y=-1;y<=1;++y){[unroll] for(int x=-1;x<=1;++x){\n"
+        "float2 lattice=baseCell+float2(x,y);\n"
+        "float2 seed=frac(sin(float2(dot(lattice,float2(127.1,311.7)),"
+        "dot(lattice,float2(269.5,183.3))))*43758.5453);\n"
+        "float2 delta=float2(x,y)+seed-withinCell;\n"
+        "float edgeWarp=0.08*sin(dot(delta,float2(7.31,5.17))+seed.x*6.2831853)"
+        "+0.05*sin(dot(UV,float2(11.7,-8.3))+seed.y*6.2831853);\n"
+        "nearest=min(nearest,length(delta)+edgeWarp);}}\n"
+        "float cluster=1.0-smoothstep(0.18,0.46,nearest);\n"
+        "float coarse=0.5+0.5*sin(UV.x*5.17+sin(UV.y*4.31));\n"
+        "float grain=0.5+0.5*sin(UV.x*13.7+sin(UV.y*8.3))*sin(UV.y*11.9-sin(UV.x*6.1));\n"
+        "return saturate((cluster-0.16)*1.36)*(0.30+0.70*saturate(0.34*coarse+0.86*grain));");
+    FCustomInput PatchCoordinatesInput;
+    PatchCoordinatesInput.InputName = TEXT("UV");
+    PatchCoordinatesInput.Input.Expression = PatchCoordinates;
+    PatchCells->Inputs.Add(PatchCoordinatesInput);
+    Add(PatchCells);
+    UMaterialExpression* CompactPatchGate = Lerp(
+        Scalar(TEXT("BreakingFoamPatchOutsideFloor"), 0.0f),
+        Scalar(TEXT("BreakingFoamPatchInside"), 1.0f),
+        PatchCells);
 
     // Preserve open water all the way through a fully aerated roller. The old
     // additive lace plus a raw 0.90 core term saturated almost every crest
@@ -311,14 +406,17 @@ static UMaterial* BuildBreakingWaterLipMaterial()
         Scalar(TEXT("BreakingFoamBubbleSolid"), 1.0f),
         BubbleCells);
     UMaterialExpression* TornLace = Multiply(
-        Multiply(LaceA, LaceB), BubblePerforation);
+        Multiply(Multiply(LaceA, LaceB), BubblePerforation),
+        CompactPatchGate);
     UMaterialExpressionSaturate* ClottedLace =
         NewObject<UMaterialExpressionSaturate>(Material);
     ClottedLace->Input.Expression = Multiply(
-        AddValues(
-            Multiply(LaceA, Scalar(TEXT("PrimaryLaceGain"), 0.82f)),
-            Multiply(LaceB, Scalar(TEXT("DetailLaceGain"), 0.38f))),
-        BubblePerforation);
+        Multiply(
+            AddValues(
+                Multiply(LaceA, Scalar(TEXT("PrimaryLaceGain"), 0.82f)),
+                Multiply(LaceB, Scalar(TEXT("DetailLaceGain"), 0.38f))),
+            BubblePerforation),
+        CompactPatchGate);
     Add(ClottedLace);
     UMaterialExpression* Lace = Lerp(
         TornLace,

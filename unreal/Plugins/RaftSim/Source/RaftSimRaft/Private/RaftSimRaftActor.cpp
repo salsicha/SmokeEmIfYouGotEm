@@ -1170,6 +1170,18 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
     // triple a paddled raft - which crossed the pool in seconds, slammed
     // the cascade's wave train, shipped 294 kg of overwash, and rolled.
     const float PaddleShortfall = GetPaddlePropulsionShortfall(Forward);
+    if ((CrewStrokeImpulseApplicationCount & 7) == 0)
+    {
+        // Throttled propulsion diagnostic: answers "paddling does nothing"
+        // reports from the session log alone (speed, governor, impulse).
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim crew propulsion: raftSpeed=%.2f m/s "
+                 "shortfall=%.2f impulseNs=%.0f command=%d"),
+            GetRaftVelocity().Size2D(),
+            PaddleShortfall,
+            PerPaddler * Crew * PaddleShortfall,
+            static_cast<int32>(ActiveCrewCommand));
+    }
     switch (ActiveCrewCommand)
     {
         case ERaftSimCrewCommand::AllForward:
@@ -1183,13 +1195,22 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 FVector::ZeroVector);
             break;
         case ERaftSimCrewCommand::TurnLeft:
-            RaftAdapter->AddExternalImpulse(
-                FVector::ZeroVector, FVector(0.0f, 0.0f, -PerPaddler * Crew * 1.1f));
-            break;
         case ERaftSimCrewCommand::TurnRight:
+        {
+            // Yaw uses its own impulse basis: pivot strokes meet far less
+            // resistance than hull drag, so the forward knob must not scale
+            // them.
+            const float TurnPerPaddler =
+                CrewTurnStrokeImpulseNs * 0.5f * ImpulseFraction;
+            const float TurnSign =
+                ActiveCrewCommand == ERaftSimCrewCommand::TurnLeft
+                ? -1.0f
+                : 1.0f;
             RaftAdapter->AddExternalImpulse(
-                FVector::ZeroVector, FVector(0.0f, 0.0f, PerPaddler * Crew * 1.1f));
+                FVector::ZeroVector,
+                FVector(0.0f, 0.0f, TurnSign * TurnPerPaddler * Crew * 1.1f));
             break;
+        }
         case ERaftSimCrewCommand::Stop:
         {
             // Brace/back-paddle to shed speed.
@@ -1206,10 +1227,9 @@ float ARaftSimRaftActor::GetPaddlePropulsionShortfall(
     const FVector& StrokeDirection) const
 {
     // 1.0 when the hull is at or below water speed in the stroke direction,
-    // fading to 0.0 as it approaches crewed paddling speed (~2.2 m/s) over
-    // the water. Keeps strokes honest: they close the gap to hull speed
-    // instead of compounding without bound.
-    constexpr float MaxPaddleSpeedOverWaterMps = 2.2f;
+    // fading to 0.0 as it approaches the configured crewed paddling speed
+    // over the water. Keeps strokes honest: they close the gap to hull
+    // speed instead of compounding without bound.
     FVector WaterVelocityMps = FVector::ZeroVector;
     if (Bridge != nullptr)
     {
@@ -1226,7 +1246,10 @@ float ARaftSimRaftActor::GetPaddlePropulsionShortfall(
     const float RelativeForwardMps = FVector::DotProduct(
         GetRaftVelocity() - WaterVelocityMps, StrokeDirection);
     return FMath::Clamp(
-        1.0f - RelativeForwardMps / MaxPaddleSpeedOverWaterMps, 0.0f, 1.0f);
+        1.0f - RelativeForwardMps /
+            FMath::Max(MaxPaddleSpeedOverWaterMps, 0.5f),
+        0.0f,
+        1.0f);
 }
 
 FVector ARaftSimRaftActor::GetRaftVelocity() const
@@ -1319,17 +1342,27 @@ void ARaftSimRaftActor::ApplyGuideSteerStroke(float TurnScale)
         ? ERaftSimCrewAvatarAction::TurnRight
         : ERaftSimCrewAvatarAction::TurnLeft;
     GuideStrokeActionSeconds = 1.0f;
-    // The guide's own stern draw/pry ("the guide is using his paddle to
+    // The guide's own stern sweep ("the guide is using his paddle to
     // steer, not paddle with the crew"). Full yaw authority — the stern
     // lever arm is precisely where a raft guide's turning power comes
     // from — and it works over a standing crew order, so "call all
-    // forward, steer with your own blade" is the actual technique. The
+    // forward, steer with your own blade" is the actual technique. A real
+    // sweep also moves water aft, so the same stroke pulls the hull
+    // forward a little — or backward while the crew is back-paddling (the
+    // back-ferry) — through the same speed governor as every stroke. The
     // impulse waits for the pose catch like every stroke.
+    const float StrokeDirectionSign =
+        ActiveCrewCommand == ERaftSimCrewCommand::AllBackward ? -1.0f : 1.0f;
+    const FVector StrokeDirection =
+        GetActorForwardVector() * StrokeDirectionSign;
+    const float SweepShortfall = GetPaddlePropulsionShortfall(StrokeDirection);
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim guide steer: scale=%.2f"), Scale);
+        TEXT("RaftSim guide steer: scale=%.2f sweepDir=%.0f shortfall=%.2f"),
+        Scale, StrokeDirectionSign, SweepShortfall);
     QueueDirectStrokeImpulse(
-        FVector::ZeroVector,
-        FVector(0.0f, 0.0f, Scale * PaddleStrokeImpulseNs * 1.15f));
+        StrokeDirection *
+            GuideSteerForwardImpulseNs * FMath::Abs(Scale) * SweepShortfall,
+        FVector(0.0f, 0.0f, Scale * GuideSteerYawImpulseNms));
 }
 
 void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)

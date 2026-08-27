@@ -2130,13 +2130,11 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             ++Metrics.WaterTileCount;
             Metrics.WaterTriangleCount += WaterTriangles.Num() / 3;
 
-            // The broad Single Layer Water material retains the solver foam
-            // channel, but a grazing guide-eye view can flatten its strongest
-            // cells into the base surface. Author a second, non-colliding
-            // one-metre aerated sheet only over positive solver-derived or
-            // review-gated guide-feature-conditioned triangles. This
-            // gives those cells bounded geometric volume while calm water,
-            // collision, hydraulic state, and gameplay remain unchanged.
+            // Retain the legacy solver-foam geometry as review data, but do
+            // not render it over the river. The terrain-following Single Layer
+            // Water carrier now owns both hydraulic whitening and bounded 3D
+            // micro-relief; showing this raised mesh as well produces a second
+            // surface whose long grid-aligned islands read as painted streaks.
             TArray<FVector> WhitewaterVertices;
             TArray<int32> WhitewaterTriangles;
             TArray<FVector2D> WhitewaterUvs;
@@ -2209,9 +2207,15 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 }
                 WhitewaterActor->Tags.AddUnique(
                     FName(TEXT("RaftSimSolverFoamOverlay")));
-                WhitewaterActor->SetActorHiddenInGame(!bMedian);
+                WhitewaterActor->SetActorHiddenInGame(true);
                 UStaticMeshComponent* WhitewaterComponent =
                     WhitewaterActor->GetStaticMeshComponent();
+                // Editor-world scene captures do not consistently honor only
+                // AActor::HiddenInGame. Disable the component as well so the
+                // legacy raised sheet cannot reappear in review renders or
+                // as a second water surface while moving through the map.
+                WhitewaterComponent->SetVisibility(false, true);
+                WhitewaterComponent->SetHiddenInGame(true, true);
                 WhitewaterComponent->SetCastShadow(false);
                 WhitewaterComponent->TranslucencySortPriority = 2;
                 ++Metrics.WhitewaterFoamActorCount;
