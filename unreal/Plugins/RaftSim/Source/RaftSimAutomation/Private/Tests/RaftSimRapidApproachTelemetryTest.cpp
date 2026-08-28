@@ -70,6 +70,7 @@ struct FRaftSimApproachTelemetryState
     float LastWorldTimeSeconds = -1.0f;
     float NextHopSeconds = 0.0f;
     int32 HopCount = 0;
+    int32 ConsecutiveDryHolds = 0;
     float CurrentStationM = 0.0f;
     float RideStartElapsedSeconds = 0.0f;
     float NextSampleSeconds = 0.0f;
@@ -132,44 +133,35 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
         return true;
     }
 
-    // Wet centerline sample at a station; returns wet flag, out height/world.
+    // Wet channel sample at a station. The wetted channel is rarely centred
+    // on the river axis — entrance tongues hug a bank and several reaches
+    // bend away from lateral zero (Troublemaker's own approach reads dry on
+    // the centreline by station ~60 m) — so probe a small lateral fan
+    // outward from the axis and adopt the first wet hit. Transit then
+    // follows the channel instead of ending at the first off-axis reach.
     const auto SampleWetStation =
         [Water](float StationM, float& OutZCm, FVector& OutWorldCm) -> bool
     {
-        FRaftSimWaterSample Probe;
-        if (!Water->SampleWaterAtRiverCoordinates(
-                FVector2D(StationM, 0.0f), Probe) ||
-            !Probe.bWet)
+        constexpr float LateralProbesM[] = {
+            0.0f, -4.0f, 4.0f, -8.0f, 8.0f, -12.0f, 12.0f, -16.0f, 16.0f};
+        for (const float LateralM : LateralProbesM)
         {
-            return false;
-        }
-        OutZCm = Probe.SurfaceHeightMeters * 100.0f;
-        OutWorldCm = Probe.WorldPosition;
-        return true;
-    };
-
-    const auto TeleportToStation =
-        [&SampleWetStation, Raft](float StationM) -> bool
-    {
-        float ZCm = 0.0f;
-        float AheadZCm = 0.0f;
-        FVector WorldCm = FVector::ZeroVector;
-        FVector AheadWorldCm = FVector::ZeroVector;
-        if (!SampleWetStation(StationM, ZCm, WorldCm))
-        {
-            return false;
-        }
-        float FacingYaw = Raft->GetActorRotation().Yaw;
-        if (SampleWetStation(StationM + 5.0f, AheadZCm, AheadWorldCm))
-        {
-            const FVector Downstream =
-                (AheadWorldCm - WorldCm).GetSafeNormal2D();
-            if (!Downstream.IsNearlyZero())
+            FRaftSimWaterSample Probe;
+            if (Water->SampleWaterAtRiverCoordinates(
+                    FVector2D(StationM, LateralM), Probe) &&
+                Probe.bWet)
             {
-                FacingYaw = FMath::RadiansToDegrees(
-                    FMath::Atan2(Downstream.Y, Downstream.X));
+                OutZCm = Probe.SurfaceHeightMeters * 100.0f;
+                OutWorldCm = Probe.WorldPosition;
+                return true;
             }
         }
+        return false;
+    };
+
+    const auto TeleportToWorld =
+        [Raft](const FVector& WorldCm, float FacingYaw)
+    {
         Raft->TeleportForTesting(
             WorldCm + FVector(0.0f, 0.0f, 12.0f), FacingYaw, true);
         // The player pawn is the world-partition streaming source: named
@@ -190,6 +182,31 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
                 }
             }
         }
+    };
+
+    const auto TeleportToStation =
+        [&SampleWetStation, &TeleportToWorld, Raft](float StationM) -> bool
+    {
+        float ZCm = 0.0f;
+        float AheadZCm = 0.0f;
+        FVector WorldCm = FVector::ZeroVector;
+        FVector AheadWorldCm = FVector::ZeroVector;
+        if (!SampleWetStation(StationM, ZCm, WorldCm))
+        {
+            return false;
+        }
+        float FacingYaw = Raft->GetActorRotation().Yaw;
+        if (SampleWetStation(StationM + 5.0f, AheadZCm, AheadWorldCm))
+        {
+            const FVector Downstream =
+                (AheadWorldCm - WorldCm).GetSafeNormal2D();
+            if (!Downstream.IsNearlyZero())
+            {
+                FacingYaw = FMath::RadiansToDegrees(
+                    FMath::Atan2(Downstream.Y, Downstream.X));
+            }
+        }
+        TeleportToWorld(WorldCm, FacingYaw);
         return true;
     };
 
@@ -291,6 +308,7 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
             if (!bNearClear)
             {
                 ++State->HopCount;
+                ++State->ConsecutiveDryHolds;
                 if (State->HopCount > MaxHops)
                 {
                     Test->AddError(FString::Printf(
@@ -300,8 +318,43 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
                         State->StartStationM));
                     return true;
                 }
+                // Sustained dryness ahead means the hold can never release on
+                // its own: at a low-overlap source-grid boundary the active
+                // window's leading edge stops short of the next grid, and the
+                // window follows the raft, which is exactly what a hold
+                // prevents from moving. Since the adapter now reboots the
+                // window cold on a non-overlapping handoff instead of
+                // wedging, a blind creep along the coordinate map is safe:
+                // project the next station geometrically, move the raft, and
+                // let streaming bring the water up around it.
+                if (State->ConsecutiveDryHolds >= 20)
+                {
+                    const float BlindStationM =
+                        State->CurrentStationM + HopAdvanceM;
+                    FVector BlindWorldCm = FVector::ZeroVector;
+                    if (Water->RiverToWorldPosition(
+                            FVector2D(BlindStationM, 0.0f),
+                            Water->GetRiverVerticalDatumM(),
+                            BlindWorldCm))
+                    {
+                        // Only the plan-view projection is trustworthy here
+                        // (the surface is dry-unknown — that is why this is a
+                        // blind creep). 8 m of river drops millimetres, so
+                        // the hull's current height is the best local Z.
+                        BlindWorldCm.Z = Raft->GetActorLocation().Z;
+                        TeleportToWorld(
+                            BlindWorldCm, Raft->GetActorRotation().Yaw);
+                        State->CurrentStationM = BlindStationM;
+                        State->ConsecutiveDryHolds = 0;
+                        Test->AddInfo(FString::Printf(
+                            TEXT("approach-telemetry blind creep across dry ")
+                            TEXT("window boundary to station %.0f m"),
+                            BlindStationM));
+                    }
+                }
                 return false;
             }
+            State->ConsecutiveDryHolds = 0;
             const float RemainingM =
                 State->StartStationM - State->CurrentStationM;
             float NextStationM = State->CurrentStationM +

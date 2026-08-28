@@ -1,7 +1,10 @@
 #include "RaftSimWaterSurfaceActor.h"
 
+#include "CollisionQueryParams.h"
 #include "Engine/GameInstance.h"
+#include "Engine/HitResult.h"
 #include "Engine/Texture2D.h"
+#include "Engine/World.h"
 #include "EngineUtils.h"
 #include "HAL/IConsoleManager.h"
 #include "HAL/PlatformTime.h"
@@ -2685,6 +2688,30 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         ShiftStationIndexedFloats(SmoothedRapidFoamCoverage, 0.0f);
         ShiftStationIndexedFloats(SmoothedBreakingLiftCm, 0.0f);
         ShiftStationIndexedFloats(ShoreSmoothedSurfaceZCm, MAX_flt);
+        ShiftStationIndexedFloats(VisualBankTerrainZCm, 0.0f);
+        const auto ShiftStationIndexedBytes =
+            [this, ShiftCells](TArray<uint8>& Values, uint8 FillValue)
+        {
+            if (Values.Num() != GridStationN * GridLateralN)
+            {
+                return;
+            }
+            const TArray<uint8> Previous = Values;
+            for (int32 Y = 0; Y < GridLateralN; ++Y)
+            {
+                for (int32 X = 0; X < GridStationN; ++X)
+                {
+                    const int32 SourceX = X + ShiftCells;
+                    Values[Y * GridStationN + X] =
+                        SourceX >= 0 && SourceX < GridStationN
+                        ? Previous[Y * GridStationN + SourceX]
+                        : FillValue;
+                }
+            }
+        };
+        // Incoming columns re-probe (0); a re-probe also refreshes cells whose
+        // tile had not streamed in when first traced.
+        ShiftStationIndexedBytes(VisualBankProbeState, 0);
         const auto ShiftStationIndexedVectors =
             [this, ShiftCells](
                 TArray<FVector2D>& Values, const FVector2D& FillValue)
@@ -4817,6 +4844,102 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 }
             }
         }
+        // Rendered-terrain conformance: the solver's bed and the rendered
+        // Nanite terrain tiles disagree by a few centimetres, and on a gentle
+        // bank that vertical error stretches into metres of water column too
+        // thin to show any volume colour — a tint-free specular film hovering
+        // on the visible ground ("I still see the shiny texture on the
+        // shore", player screenshot 2026-08-28). Solver depth cannot see this
+        // because the error is between the two terrain representations, so
+        // probe the rendered tiles directly: cache a line-traced terrain Z
+        // under the shoreline bands and drop presentation wetness where the
+        // rendered water would sit too close above the rendered ground.
+        TArray<uint8> VisualFilmCullMask;
+        VisualFilmCullMask.Init(0, Vertices.Num());
+        {
+            constexpr float kVisualBankFilmMinDepthCm = 6.0f;
+            constexpr int32 kVisualBankBandRings = 3;
+            constexpr int32 kVisualBankProbeBudgetPerRefresh = 96;
+            if (VisualBankTerrainZCm.Num() != Vertices.Num())
+            {
+                VisualBankTerrainZCm.Init(0.0f, Vertices.Num());
+            }
+            if (VisualBankProbeState.Num() != Vertices.Num())
+            {
+                VisualBankProbeState.Init(0, Vertices.Num());
+            }
+            int32 ProbeBudget = kVisualBankProbeBudgetPerRefresh;
+            UWorld* ProbeWorld = GetWorld();
+            const FTransform CarrierTransform =
+                SurfaceMesh ? SurfaceMesh->GetComponentTransform()
+                            : GetActorTransform();
+            const auto EvaluateBandCell = [&](int32 X, int32 Y)
+            {
+                if (Y < 0 || Y >= GridLateralN)
+                {
+                    return;
+                }
+                const int32 Index = Y * GridStationN + X;
+                if (VolumeCoreWetMask[Index] == 0)
+                {
+                    return;
+                }
+                const FVector WaterWorld =
+                    CarrierTransform.TransformPosition(Vertices[Index]);
+                if (VisualBankProbeState[Index] == 0 && ProbeBudget > 0 &&
+                    ProbeWorld)
+                {
+                    --ProbeBudget;
+                    FHitResult Hit;
+                    FCollisionQueryParams ProbeParams(
+                        TEXT("RaftSimVisualBankProbe"), true, this);
+                    const FVector Start =
+                        WaterWorld + FVector(0.0f, 0.0f, 300.0f);
+                    const FVector End =
+                        WaterWorld - FVector(0.0f, 0.0f, 600.0f);
+                    if (ProbeWorld->LineTraceSingleByChannel(
+                            Hit, Start, End, ECC_WorldStatic, ProbeParams) &&
+                        Hit.GetActor() &&
+                        Hit.GetActor()->ActorHasTag(
+                            TEXT("RaftSimFullReachTerrain")))
+                    {
+                        VisualBankTerrainZCm[Index] =
+                            static_cast<float>(Hit.ImpactPoint.Z);
+                        VisualBankProbeState[Index] = 1;
+                    }
+                    else
+                    {
+                        // Boulder, missing tile, or unstreamed geometry: fail
+                        // open. A recentre re-probes the column later.
+                        VisualBankProbeState[Index] = 2;
+                    }
+                }
+                if (VisualBankProbeState[Index] == 1 &&
+                    static_cast<float>(WaterWorld.Z) -
+                            VisualBankTerrainZCm[Index] <
+                        kVisualBankFilmMinDepthCm)
+                {
+                    VisualFilmCullMask[Index] = 1;
+                }
+            };
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                const int32 MinimumY = VolumeCoreMinimumWetLateralIndex[X];
+                const int32 MaximumY = VolumeCoreMaximumWetLateralIndex[X];
+                if (MinimumY < 0 || MaximumY < MinimumY)
+                {
+                    continue;
+                }
+                for (int32 Ring = 0; Ring < kVisualBankBandRings; ++Ring)
+                {
+                    EvaluateBandCell(X, MinimumY + Ring);
+                    if (MaximumY - Ring > MinimumY + kVisualBankBandRings - 1)
+                    {
+                        EvaluateBandCell(X, MaximumY - Ring);
+                    }
+                }
+            }
+        }
         // Slow rates: wake lapping and window handoffs churn the bank wet
         // edge at cell granularity; the envelope averages those transients
         // while genuine water-level changes still track within a couple of
@@ -4829,9 +4952,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             // Solver-wet cells present fully; baseline shoreline water
             // presents through the crop-authority feather so ownership
-            // handovers are spatial gradients, never flips.
+            // handovers are spatial gradients, never flips. A rendered-
+            // terrain film cull overrides both: the release rate fades the
+            // sliver out instead of popping it.
             const float PresenceTarget =
-                ConnectedWetMask[Index] == 0
+                ConnectedWetMask[Index] == 0 || VisualFilmCullMask[Index] != 0
                 ? 0.0f
                 : FMath::Max(
                       LiveSolverWetVertexMask[Index] != 0 ? 1.0f : 0.0f,
@@ -4893,6 +5018,91 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 NewVolumeCoreTriangles.Add(I1);
                 NewVolumeCoreTriangles.Add(I2);
                 NewVolumeCoreTriangles.Add(I3);
+            }
+        }
+        // Per-station presence bounds of the rendered band, shared by the
+        // boundary stitching below and the sub-cell waterline extension.
+        TArray<int32> MinPresentY;
+        TArray<int32> MaxPresentY;
+        MinPresentY.Init(INDEX_NONE, GridStationN);
+        MaxPresentY.Init(INDEX_NONE, GridStationN);
+        for (int32 Y = 0; Y < GridLateralN; ++Y)
+        {
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                if (LiveVolumeCoreWetPresence[Y * GridStationN + X] > 0.0f)
+                {
+                    if (MinPresentY[X] == INDEX_NONE)
+                    {
+                        MinPresentY[X] = Y;
+                    }
+                    MaxPresentY[X] = Y;
+                }
+            }
+        }
+        // Diagonal boundary stitching: where the wet band's edge steps one
+        // row between adjacent station columns, the corner quad cannot
+        // exist (its dry corner fails the presence test), so the waterline
+        // rendered a right-angle notch no matter where the boundary
+        // vertices sat (player screenshot, 2026-08-27). Close each one-row
+        // step with a triangle so the edge runs diagonally between the two
+        // boundary vertices.
+        for (int32 X = 0; X < GridStationN - 1; ++X)
+        {
+            const float StitchStationCoverage = FMath::Min(
+                ComputeStationEdgeCoverage(
+                    X,
+                    GridStationN,
+                    ResolvedVertexSpacingMeters,
+                    CurvedGridEdgeBlendMeters),
+                ComputeStationEdgeCoverage(
+                    X + 1,
+                    GridStationN,
+                    ResolvedVertexSpacingMeters,
+                    CurvedGridEdgeBlendMeters));
+            if (StitchStationCoverage < kLiveVolumeCoreMinimumStationCoverage)
+            {
+                continue;
+            }
+            const auto CellIndex = [this](int32 StationX, int32 LateralY)
+            {
+                return LateralY * GridStationN + StationX;
+            };
+            // River-right bank (minimum lateral row).
+            const int32 MinA = MinPresentY[X];
+            const int32 MinB = MinPresentY[X + 1];
+            if (MinA != INDEX_NONE && MinB != INDEX_NONE)
+            {
+                if (MinB == MinA + 1)
+                {
+                    NewVolumeCoreTriangles.Add(CellIndex(X, MinA));
+                    NewVolumeCoreTriangles.Add(CellIndex(X, MinB));
+                    NewVolumeCoreTriangles.Add(CellIndex(X + 1, MinB));
+                }
+                else if (MinA == MinB + 1)
+                {
+                    NewVolumeCoreTriangles.Add(CellIndex(X + 1, MinB));
+                    NewVolumeCoreTriangles.Add(CellIndex(X, MinA));
+                    NewVolumeCoreTriangles.Add(CellIndex(X + 1, MinA));
+                }
+            }
+            // River-left bank (maximum lateral row).
+            const int32 MaxA = MaxPresentY[X];
+            const int32 MaxB = MaxPresentY[X + 1];
+            if (MaxA != INDEX_NONE && MaxB != INDEX_NONE)
+            {
+                if (MaxB == MaxA - 1)
+                {
+                    NewVolumeCoreTriangles.Add(CellIndex(X, MaxA));
+                    NewVolumeCoreTriangles.Add(CellIndex(X + 1, MaxB));
+                    NewVolumeCoreTriangles.Add(CellIndex(X, MaxB));
+                }
+                else if (MaxA == MaxB - 1)
+                {
+                    NewVolumeCoreTriangles.Add(CellIndex(X + 1, MaxB));
+                    NewVolumeCoreTriangles.Add(CellIndex(X + 1, MaxA));
+                    NewVolumeCoreTriangles.Add(CellIndex(X, MaxA));
+                }
             }
         }
         if (bLivePresentationBankNaturalismEnabled)
@@ -4958,61 +5168,118 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // that point: the edge becomes continuous along the bank, slides
         // smoothly as the water level moves, and hands over seamlessly
         // when a new cell turns wet (its extrapolation starts near zero).
-        for (int32 X = 0; X < GridStationN; ++X)
+        // Reach is computed per station for both banks, then smoothed along
+        // the station axis so neighbouring boundary vertices agree; without
+        // the smoothing, shallow-depth noise gave adjacent stations very
+        // different reaches and the waterline zig-zagged.
+        const auto ComputeBankReach =
+            [&](const TArray<int32>& BoundRows, int32 InteriorStep,
+                TArray<float>& OutReach)
         {
-            const int32 MinimumY = VolumeCoreMinimumWetLateralIndex[X];
-            const int32 MaximumY = VolumeCoreMaximumWetLateralIndex[X];
-            if (MinimumY < 0 || MaximumY <= MinimumY ||
-                MaximumY >= GridLateralN)
+            OutReach.Init(-1.0f, GridStationN);
+            for (int32 X = 0; X < GridStationN; ++X)
             {
-                continue;
-            }
-            const auto ExtendBoundaryToWaterline =
-                [&](int32 BoundaryY, int32 InteriorY)
-            {
+                const int32 BoundaryY = BoundRows[X];
+                const int32 InteriorY = BoundaryY + InteriorStep;
+                if (BoundaryY == INDEX_NONE || InteriorY < 0 ||
+                    InteriorY >= GridLateralN)
+                {
+                    continue;
+                }
                 const int32 BoundaryIndex = BoundaryY * GridStationN + X;
                 const int32 InteriorIndex = InteriorY * GridStationN + X;
                 if (WetVertexMask[BoundaryIndex] == 0 ||
                     WetVertexMask[InteriorIndex] == 0)
                 {
-                    return;
+                    continue;
                 }
                 const float BoundaryDepthM =
                     WaterSamples[BoundaryIndex].DepthMeters;
                 const float InteriorDepthM =
                     WaterSamples[InteriorIndex].DepthMeters;
-                // Presence scales the reach so the extension ramps in with a
-                // fading-in cell instead of snapping on the frame its
-                // envelope completes.
-                const float ExtendFraction = FMath::Clamp(
-                    BoundaryDepthM /
+                // Reach to the ~3 cm depth line, not the exact zero line:
+                // Single Layer Water renders a near-zero-depth strip as pure
+                // specular coat with no volume tint, so extending to zero
+                // depth painted a broad glossy film past the visible blue
+                // edge ("the shiny layer rides up onto the shore while the
+                // blue doesn't", player screenshot 2026-08-28). Stopping
+                // where a little depth remains keeps mesh edge and visible
+                // water edge together. Presence scales the reach so the
+                // extension ramps in with a fading-in cell instead of
+                // snapping on the frame its envelope completes.
+                constexpr float kShoreFilmDepthMarginM = 0.03f;
+                OutReach[X] = FMath::Clamp(
+                    (BoundaryDepthM - kShoreFilmDepthMarginM) /
                         FMath::Max(InteriorDepthM - BoundaryDepthM, 0.05f),
                     0.0f,
-                    1.0f) *
+                    0.85f) *
                     FMath::SmoothStep(
                         0.55f, 1.0f,
                         LiveVolumeCoreWetPresence[BoundaryIndex]);
-                if (ExtendFraction <= 0.0f)
+                // Do not re-bridge ground the rendered-terrain film cull just
+                // uncovered: extending toward a culled neighbour would lay the
+                // specular film right back over the visible bank.
+                const int32 OutwardY = BoundaryY - InteriorStep;
+                if (OutwardY >= 0 && OutwardY < GridLateralN &&
+                    VisualFilmCullMask[OutwardY * GridStationN + X] != 0)
                 {
-                    return;
+                    OutReach[X] *= 0.25f;
                 }
-                // Outward direction from the raw lattice (the retreat and
-                // collapse passes may already have moved the rendered
-                // boundary) — HORIZONTAL only. Extending along the
-                // boundary/interior slope rode the water sheet up the bank
-                // like a carpet, with a visible gap under the raised lip
-                // (player screenshots, 2026-08-27). Extending the water
-                // plane flat lets the rising terrain clip it at the true
-                // waterline instead.
+            }
+            // Two conservative box passes; only neighbours whose bound rows
+            // differ by at most one cell participate, so reach never
+            // smears across a genuine break in the bank.
+            for (int32 Pass = 0; Pass < 2; ++Pass)
+            {
+                TArray<float> Smoothed = OutReach;
+                for (int32 X = 0; X < GridStationN; ++X)
+                {
+                    if (OutReach[X] < 0.0f)
+                    {
+                        continue;
+                    }
+                    float Sum = OutReach[X] * 2.0f;
+                    float Weight = 2.0f;
+                    for (const int32 NeighbourX : {X - 1, X + 1})
+                    {
+                        if (NeighbourX < 0 || NeighbourX >= GridStationN ||
+                            OutReach[NeighbourX] < 0.0f ||
+                            BoundRows[NeighbourX] == INDEX_NONE ||
+                            FMath::Abs(BoundRows[NeighbourX] - BoundRows[X]) > 1)
+                        {
+                            continue;
+                        }
+                        Sum += OutReach[NeighbourX];
+                        Weight += 1.0f;
+                    }
+                    Smoothed[X] = Sum / Weight;
+                }
+                OutReach = MoveTemp(Smoothed);
+            }
+            // Apply: HORIZONTAL reach only. Extending along the boundary/
+            // interior slope rode the water sheet up the bank like a carpet
+            // with a visible gap under the raised lip (player screenshots,
+            // 2026-08-27); a flat reach lets rising terrain clip the water
+            // plane at the true waterline instead.
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                if (OutReach[X] <= 0.0f || BoundRows[X] == INDEX_NONE)
+                {
+                    continue;
+                }
+                const int32 BoundaryIndex = BoundRows[X] * GridStationN + X;
+                const int32 InteriorIndex =
+                    (BoundRows[X] + InteriorStep) * GridStationN + X;
                 FVector OutwardCm =
                     Vertices[BoundaryIndex] - Vertices[InteriorIndex];
                 OutwardCm.Z = 0.0;
                 LiveVolumeCoreVertices[BoundaryIndex] +=
-                    OutwardCm * ExtendFraction;
-            };
-            ExtendBoundaryToWaterline(MinimumY, MinimumY + 1);
-            ExtendBoundaryToWaterline(MaximumY, MaximumY - 1);
-        }
+                    OutwardCm * OutReach[X];
+            }
+        };
+        TArray<float> BankReachScratch;
+        ComputeBankReach(MinPresentY, +1, BankReachScratch);
+        ComputeBankReach(MaxPresentY, -1, BankReachScratch);
 
         // Presence-driven shoreline collapse. A partially present vertex
         // slides onto its most-present lateral neighbour (after the bank
@@ -5261,7 +5528,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
         else
         {
+            // ClearMeshSection keeps the section entry alive with zero
+            // vertices. The per-frame interpolation only null-checked the
+            // section, so leaving it armed here made every subsequent frame
+            // push the full-grid arrays at an empty section — an engine
+            // error ("different number of vertices [Previous: 0 ...]") per
+            // frame for as long as the core stayed dry.
             LiveVolumeCoreMesh->ClearMeshSection(0);
+            bLiveVolumeCoreInterpolationActive = false;
         }
         LiveVolumeCoreMesh->SetVisibility(
             LiveVolumeCoreTriangleCount > 0, true);
@@ -5737,9 +6011,16 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
 void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
     float DeltaSeconds)
 {
+    // The section pointer stays valid after ClearMeshSection (the entry is
+    // merely emptied), so an in-place update must also match the section's
+    // CURRENT vertex count or the engine rejects it with a per-frame error.
+    const FProcMeshSection* CoreSection = LiveVolumeCoreMesh
+        ? LiveVolumeCoreMesh->GetProcMeshSection(0)
+        : nullptr;
     if (!bLiveVolumeCoreInterpolationActive ||
         !LiveVolumeCoreMesh ||
-        LiveVolumeCoreMesh->GetProcMeshSection(0) == nullptr ||
+        CoreSection == nullptr ||
+        CoreSection->ProcVertexBuffer.Num() != LiveVolumeCoreVertices.Num() ||
         LiveVolumeCoreVertices.Num() == 0 ||
         LiveVolumeCoreInterpolationStartVertices.Num() !=
             LiveVolumeCoreVertices.Num() ||

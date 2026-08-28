@@ -260,7 +260,16 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         // raft. These are production coupling limits, not D6 fixture changes.
         /*MaximumIncomingSpeedMps=*/8.0,
         /*MaximumOvertoppingDepthM=*/2.0 * FlexParameters.TubeRadiusM,
-        /*MaximumRetainedVolumePerSegmentM3=*/0.035);
+        /*MaximumRetainedVolumePerSegmentM3=*/0.035,
+        // With the self-bailer retention caps above, retained deck water
+        // maxes out near 1300 Nm against the ~1800 Nm righting threshold, so
+        // weight alone can never trip a flip. Engage the overtopped-face
+        // dynamic-pressure side load with a one-tube-radius lever (pressure-
+        // scaled like the freeboard): a buried tube in a fast relative
+        // current now levers over, while drifting with the water — near-zero
+        // relative speed — still contributes nothing.
+        /*DynamicPressureRollLeverM=*/FlexParameters.TubeRadiusM *
+            FMath::Lerp(0.82, 1.0, static_cast<double>(FlexPressureFraction)));
 
     // D4: rock contact, wrap, pin, release, and shape recovery.
     const FRaftSimFlexRockContactSolve Contacts = RaftSimFlex::EvaluateRockContactWrapPinD4(
@@ -725,6 +734,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     LastFlexStepTelemetry.TubePitchLoadBiasNm = SeatSolve.TubeSolve.PitchLoadBiasNm;
     LastFlexStepTelemetry.TotalRetainedWaterMassKg = Overwash.TotalRetainedWaterMassKg;
     LastFlexStepTelemetry.RetainedWaterRollMomentNm = Overwash.RetainedWaterRollMomentNm;
+    LastFlexStepTelemetry.OvertoppingDynamicRollMomentNm =
+        Overwash.OvertoppingDynamicRollMomentNm;
     LastFlexStepTelemetry.ReferenceFlipThresholdNm = Overwash.ReferenceFlipThresholdNm;
     LastFlexStepTelemetry.ReferenceFlipMarginNm = Overwash.ReferenceFlipMarginNm;
     LastFlexStepTelemetry.bReferenceFlipRisk = Overwash.bReferenceFlipRisk;

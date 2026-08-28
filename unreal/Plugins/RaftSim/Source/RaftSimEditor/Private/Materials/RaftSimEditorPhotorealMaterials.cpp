@@ -1202,6 +1202,39 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             DriftFleckMask);
     }
 
+    // Shallow-margin de-gloss: the terrain-clipped shoreline keeps water down
+    // to a few millimetres of depth, and Single Layer Water renders that
+    // margin with no volume tint at all — a pure mirror coat over the visible
+    // bank. On a gentle bank the sub-decimetre zone is metres wide, so every
+    // shore wears a broad glossy film ("I still see the shiny texture on the
+    // shore", player screenshots 2026-08-27/28), strongest at the grazing
+    // angles a seated guide actually sees. Real ankle-deep water over
+    // sediment reads as damp ground, not chrome. Drive the margin toward a
+    // matte wet-sediment response with the same solver-authored depth channel
+    // the foam gates use (VC.G = depth / 2.5 m): matte below ~7 cm of water,
+    // authored gloss restored by ~20 cm.
+    UMaterialExpressionConstant* ShoreMarginMinusOne =
+        NewObject<UMaterialExpressionConstant>(Material);
+    ShoreMarginMinusOne->R = -1.0f;
+    Add(ShoreMarginMinusOne);
+    UMaterialExpressionSaturate* WetMarginGate =
+        NewObject<UMaterialExpressionSaturate>(Material);
+    WetMarginGate->Input.Expression = Mul(
+        AddNode(
+            DepthMask,
+            Mul(ShoreMarginMinusOne,
+                Scalar(TEXT("ShoreMarginDepthFloor"), 0.028f))),
+        Scalar(TEXT("ShoreMarginDepthGain"), 18.0f));
+    Add(WetMarginGate);
+    UMaterialExpression* RoughnessOutput = Lerp(
+        Scalar(TEXT("ShoreMarginRoughness"), 0.58f),
+        Roughness,
+        WetMarginGate);
+    Specular = Lerp(
+        Scalar(TEXT("ShoreMarginSpecular"), 0.07f),
+        Specular,
+        WetMarginGate);
+
     // Single Layer Water opacity controls how much light enters the volume.
     // A low global value exposed the pale riverbed across the full guide view,
     // making the moving normal atlas read as a frosted sheet. Preserve useful
@@ -1250,7 +1283,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     }
     Ed->Metallic.Connect(0, Metallic);
     Ed->Specular.Connect(0, Specular);
-    Ed->Roughness.Connect(0, Roughness);
+    Ed->Roughness.Connect(0, RoughnessOutput);
     Ed->Opacity.Connect(0, Opacity);
     if (FinalNormal != nullptr)
     {

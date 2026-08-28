@@ -656,7 +656,8 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
     const TMap<FString, FRaftSimFlexUniformWater>* WaterBySegment,
     double MaximumIncomingSpeedMps,
     double MaximumOvertoppingDepthM,
-    double MaximumRetainedVolumePerSegmentM3)
+    double MaximumRetainedVolumePerSegmentM3,
+    double DynamicPressureRollLeverM)
 {
     FRaftSimFlexOverwashSolve Solve;
     if (Dt <= 0.0)
@@ -745,9 +746,52 @@ FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
         Solve.RetainedWaterPitchMomentNm += Segment.RetainedWaterPitchMomentNm;
     }
 
+    // Overtopped-face dynamic pressure (production coupling term, off in the
+    // reference fixtures). Retained deck water alone can no longer reach the
+    // flip threshold: an open self-bailer's interior volume caps each
+    // segment's retained mass, and with the production caps the maximum
+    // whole-side flood moment sits below the loaded raft's righting
+    // threshold, which made D3-driven capsize unreachable at any flow. The
+    // physics the retained-mass model omits is the water itself: an
+    // overwashing current presses on the exposed face with q = rho v^2 / 2
+    // over the overtopped strip, and that side load — not deck weight — is
+    // what levers a buried tube over in a real side-surf. Accumulate it as a
+    // destabilizing magnitude only while a face is genuinely overtopped
+    // (bUpstreamExposed), so ordinary ferrying and drifting, where relative
+    // speed and overtopping are both near zero, contribute nothing.
+    if (DynamicPressureRollLeverM > 0.0)
+    {
+        for (const FRaftSimFlexSegmentOverwash& Segment : Solve.SegmentOverwash)
+        {
+            if (!Segment.bUpstreamExposed)
+            {
+                continue;
+            }
+            const FRaftSimFlexTubeSegment* LayoutSegment = Layout.FindByPredicate(
+                [&Segment](const FRaftSimFlexTubeSegment& Candidate)
+                {
+                    return Candidate.SegmentId == Segment.SegmentId;
+                });
+            if (LayoutSegment == nullptr)
+            {
+                continue;
+            }
+            const double LoadedDepthM = FMath::Min(
+                Segment.OvertoppingDepthM,
+                FMath::Max(0.0, MaximumOvertoppingDepthM));
+            const double DynamicPressurePa = 0.5 * WaterDensityKgM3 *
+                Segment.IncomingSpeedMps * Segment.IncomingSpeedMps;
+            Solve.OvertoppingDynamicRollMomentNm += DynamicPressurePa *
+                LoadedDepthM * LayoutSegment->TributaryLengthM *
+                DynamicPressureRollLeverM;
+        }
+    }
+
     Solve.ReferenceFlipThresholdNm = SeatTubeSolve.CrewTelemetry.RecoveryThresholds.FlipThresholdNm;
     Solve.ReferenceFlipMarginNm =
-        Solve.ReferenceFlipThresholdNm - FMath::Abs(Solve.RetainedWaterRollMomentNm);
+        Solve.ReferenceFlipThresholdNm -
+        (FMath::Abs(Solve.RetainedWaterRollMomentNm) +
+            Solve.OvertoppingDynamicRollMomentNm);
     Solve.bReferenceFlipRisk = Solve.ReferenceFlipMarginNm < 0.0;
     return Solve;
 }
