@@ -324,6 +324,13 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float LinearDragCoefficient = 9000.0f;
 
+    /** Bow-first slicing drag (see FRaftSimRaftBodyConfig): small enough
+     * that a stroke coasts down over a couple of seconds instead of
+     * snapping back to water speed, while the blunt coefficient above keeps
+     * current capture prompt. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float ForwardSlicingDragCoefficient = 1400.0f;
+
     /** Angular damping factor per second. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float AngularDampingPerSecond = 1.4f;

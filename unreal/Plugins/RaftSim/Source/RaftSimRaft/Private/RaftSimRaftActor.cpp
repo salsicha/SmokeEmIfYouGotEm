@@ -194,6 +194,9 @@ void ARaftSimRaftActor::BeginPlay()
     constexpr float kMinimumLoadedHullDrag = 9000.0f;
     BodyConfig.LinearDragCoefficient =
         FMath::Max(LinearDragCoefficient, kMinimumLoadedHullDrag);
+    // No floor: this coefficient exists precisely to stay far below the
+    // blunt one so bow-first paddle momentum coasts down physically.
+    BodyConfig.ForwardSlicingDragCoefficient = ForwardSlicingDragCoefficient;
     BodyConfig.HeaveDampingNsPerM = HeaveDampingNsPerM;
     BodyConfig.AngularDampingPerSecond = AngularDampingPerSecond;
 
