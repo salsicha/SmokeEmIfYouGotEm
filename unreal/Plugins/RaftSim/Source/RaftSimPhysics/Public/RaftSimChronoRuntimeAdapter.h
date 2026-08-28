@@ -85,6 +85,20 @@ struct FRaftSimRaftBodyConfig
     float LowSpeedDragReferenceMps = 1.5f;
 
     /**
+     * Drag coefficient for the bow-first slicing component of relative
+     * flow. The blunt coefficient above must stay large so an overtaking
+     * current captures the hull promptly (2026-08 requirement: advected
+     * froth must never pass the boat), but applying it to forward motion
+     * THROUGH the water erased paddle glide — the hull snapped back to
+     * water speed the instant blades left the water. A hull slices
+     * bow-first with far less resistance than it is bluntly pushed, so the
+     * forward component drags at this smaller coefficient and a stroke
+     * coasts down over a couple of seconds.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float ForwardSlicingDragCoefficient = 1400.0f;
+
+    /**
      * Vertical (heave) damping in N·s/m applied per submerged fraction:
      * roughly half of critical for the tube-buoyancy spring, so the raft
      * settles onto the waterline in a couple of oscillations.

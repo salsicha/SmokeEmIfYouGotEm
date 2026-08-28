@@ -93,6 +93,80 @@ as gameplay (RaftSimCameraPresentation::Configure); local exposure tempered
 normal layers toned (FlowRipple 0.13, FoamRipple 0.24). Pool-burst metric:
 sky 16.9 -> 2.5, water 22.1 -> 10.6 (remainder is genuine ripple motion).
 
+## 2026-08-27 second flicker pass (elimination complete)
+
+Player still saw reflection flicker after the exposure fix. Systematic
+static-camera elimination on the calm pool: Lumen reflections off, SSR off,
+volumetric clouds off (sky diff 2.5 -> 0.7, water unchanged), volumetric
+fog off, TAA off, real-time sky capture off, ripple/roughness energy cuts —
+water metric unchanged by all of them. An amplified per-pixel difference
+image then exposed a metric artifact: the "water region" numbers were
+dominated by wind-swaying trees, the bobbing raft, and the bank edge inside
+the sampled band — open-water pixels are temporally STABLE from a fixed
+camera. Conclusion: remaining perceived flicker occurs under CAMERA MOTION
+(TAA re-resolving high-frequency water specular each frame). Project AA
+switched TAA -> TSR (markedly stabler moving-image history; revert note in
+DefaultEngine.ini). WaterRoughness 0.31 + reduced ripple strengths kept —
+they soften glint streaks in motion. If flicker persists under TSR, next
+lever is the directional light's SourceAngle (softer sun disc = softer
+glints), an artistic call.
+
+## 2026-08-27 third pass (near-boat flicker, shore proximity, editor parity)
+
+- Near-boat residual flicker: the paddle-wake ripple overlay (SurfaceMesh
+  section 1) was RECREATED via CreateMeshSection every 15 Hz refresh right
+  where the guide looks; it now updates in place whenever its cell
+  membership is unchanged (LastPaddleWakeRippleSourceCells).
+- Shore water keyed to raft proximity: inside the moving solver crop a DRY
+  solver verdict overrides the baseline (by design), so shoreline ownership
+  flipped as the crop travelled with the raft. Added a per-station crop
+  authority feather (~30 m at the crop's ends, one-refresh lag): where the
+  solver says dry but the baseline says wet inside the feather, the cell
+  adopts the baseline sample and presents at 1-authority, so handover is a
+  spatial gradient. Presence envelope slowed (attack 2.2/s, release 1.4/s)
+  to average wake-lapping and window-handoff churn at the bank.
+- Editor flicker: PIE viewports default to resolution-scaled screen
+  percentage (upscaler noise -game never has). DefaultEditor.ini now pins
+  realtime editor viewports to Manual 100 %. Remaining editor-side causes
+  are per-user settings: disable Editor Preferences -> Performance ->
+  "Monitor Editor Performance" (it silently degrades scalability), keep
+  Engine Scalability pinned to High/Epic, and wait for the "Compiling
+  Shaders (N)" toast to finish before judging water after material changes.
+
+## 2026-08-27 hull glide (direction-split drag)
+
+"Boat speed fixed to water speed; stroke gains vanish instantly." Root
+cause: hull drag opposes relative-to-water velocity with a blunt
+coefficient floored at 9000 (deliberate — at 1800 an overtaking current
+took >10 s to capture the raft and advected froth visibly passed the
+boat), which also killed bow-first momentum in ~0.15 s. Drag is now
+direction-split in the runtime adapter: the bow-first slicing component of
+relative flow drags at ForwardSlicingDragCoefficient (1400, EditAnywhere,
+no floor) so a stroke coasts down over a couple of seconds, while reverse/
+lateral relative flow keeps the blunt 9000 response — and slicing fades out
+entirely above ~2 m/s relative speed, so window-handoff current jumps stay
+bluntly captured regardless of hull heading (a spun raft cannot out-glide
+the froth). Measured while paddling: sustained 1.9-2.5 m/s in a 1.05 m/s
+pool (previously dipping to water speed between every stroke). P1 tank,
+P2, P3, P4 all green.
+
+## 2026-08-27 shoreline sub-cell waterline + chop
+
+- Rectangles root cause: all prior smoothing changed WHEN the wet edge
+  moved, but the edge itself sat on lattice vertices, so every change moved
+  it a whole 1.5 m cell. Boundary vertices now extrapolate to the actual
+  depth-zero waterline from the shoreward depth gradient — continuous along
+  the bank and through cell turnover (a newly wet cell starts near zero
+  reach), ramped by the presence envelope.
+- Two same-day corrections from player screenshots: the extension is
+  HORIZONTAL only (extending along the bank slope rode the water up the
+  shore as a carpet with a visible gap under the lip), and it ramps with
+  presence rather than gating on completion.
+- Whitewater chop: turbulence WPO raised 0.16 -> 0.30 (flicker-era caution
+  no longer needed; foam-gated ±5 cm chop). Real discrete splashing at
+  rocks remains a follow-up feature: splash/droplet emitters keyed to
+  boulder footprints and flow speed in the water VFX actor.
+
 ## Repo audit (2026-08-27)
 
 - .git 9.8 GB, of which .git/lfs cache 8.0 GB; pack only 1.79 GiB.

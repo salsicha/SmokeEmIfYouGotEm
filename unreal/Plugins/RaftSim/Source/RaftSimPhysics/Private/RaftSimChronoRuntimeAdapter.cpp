@@ -535,9 +535,40 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 FMath::Max(
                     static_cast<double>(RaftConfig.LowSpeedDragReferenceMps),
                     0.0));
-            ForceN += RelativeVelocity *
+            // Direction-split hull drag. The blunt coefficient is sized for
+            // prompt current capture (an overtaking flow must not let froth
+            // pass the boat), but applied to bow-first motion THROUGH the
+            // water it erased paddle glide: the hull snapped back to water
+            // speed the instant a stroke ended. Slicing forward meets far
+            // less resistance than being bluntly pushed, so the positive
+            // component of relative velocity along the bow drags at the
+            // smaller slicing coefficient (with a gentler low-speed floor)
+            // and a stroke now coasts down over a couple of seconds.
+            // Reverse and lateral relative flow keep the blunt response.
+            FVector HullForward =
+                State.Orientation.RotateVector(FVector::ForwardVector);
+            HullForward.Z = 0.0;
+            // Slicing applies only in the paddle-speed regime: a named-rapid
+            // window handoff can step the sampled current by ~3 m/s, and
+            // that capture must stay blunt regardless of which way the hull
+            // happens to point (a spun raft must not out-glide the froth).
+            const double SlicingFraction = 1.0 - FMath::Clamp(
+                (RelativeSpeed - 2.0) / 1.2, 0.0, 1.0);
+            const FVector SlicingComponent =
+                HullForward.Normalize()
+                ? HullForward * FMath::Max(
+                      FVector::DotProduct(RelativeVelocity, HullForward), 0.0) *
+                      SlicingFraction
+                : FVector::ZeroVector;
+            const FVector BluntComponent = RelativeVelocity - SlicingComponent;
+            ForceN += BluntComponent *
                       (-static_cast<double>(RaftConfig.LinearDragCoefficient) *
                        SubmergedFraction * DragSpeedMps);
+            const double SlicingDragSpeedMps = FMath::Max(RelativeSpeed, 0.25);
+            ForceN += SlicingComponent *
+                      (-static_cast<double>(
+                           RaftConfig.ForwardSlicingDragCoefficient) *
+                       SubmergedFraction * SlicingDragSpeedMps);
         }
 
         // Linear heave damping: quadratic drag alone is negligible at bobbing

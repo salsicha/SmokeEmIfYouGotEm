@@ -640,6 +640,18 @@ private:
      * Shallow water blends toward this slow reference so the waterline
      * holds while deep water stays fully dynamic. FLT_MAX = uninitialised. */
     TArray<float> ShoreSmoothedSurfaceZCm;
+    /** Source-cell sequence of the paddle-wake ripple section's last build.
+     * When membership is unchanged the section updates in place instead of
+     * being recreated, so the near-raft overlay cannot hitch at 15 Hz. */
+    TArray<int32> LastPaddleWakeRippleSourceCells;
+    /** Per-station authority of the moving solver crop over wet/dry (0 =
+     * baseline owns, 1 = solver owns), feathered over ~30 m at the crop's
+     * travelling ends. Inside the crop a dry solver verdict is authoritative
+     * even where the static baseline says wet, so without the feather the
+     * shoreline visibly flipped ownership as the raft approached. One
+     * refresh of lag (recomputed after each sampling pass) is absorbed by
+     * the shoreline presence envelope. */
+    TArray<float> StationSolverCropAuthority;
     /** Per-vertex wet-presence envelope for the carrier. Wet membership is
      * re-evaluated every refresh at cell granularity; rendering that mask
      * directly toggled whole rectangular bank quads on and off. Presence
