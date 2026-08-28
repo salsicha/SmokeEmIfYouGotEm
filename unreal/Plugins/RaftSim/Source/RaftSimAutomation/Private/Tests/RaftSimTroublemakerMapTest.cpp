@@ -2350,8 +2350,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
     return true;
 }
 
-DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
-    FRaftSimAssertSouthForkSupportParityCommand, FAutomationTestBase*, Test);
+DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(
+    FRaftSimAssertSouthForkSupportParityCommand,
+    FAutomationTestBase*, Test,
+    TSharedPtr<float>, StartTimeSeconds);
 bool FRaftSimAssertSouthForkSupportParityCommand::Update()
 {
     UWorld* World = GetRiverTestWorld();
@@ -2366,20 +2368,47 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
     {
         Surface = *It;
     }
-    Test->TestNotNull(TEXT("South Fork full reach has a live water surface"), Surface);
 
     ARaftSimRaftActor* Raft = nullptr;
     if (TActorIterator<ARaftSimRaftActor> It(World); It)
     {
         Raft = *It;
     }
-    Test->TestNotNull(TEXT("South Fork full reach has a playable raft"), Raft);
 
     const UGameInstance* GI = World->GetGameInstance();
     URaftSimPhysicsBridgeSubsystem* Bridge =
         GI ? GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
     URaftSimWaterRuntimeAdapter* Water =
         Bridge ? Bridge->GetWaterRuntime() : nullptr;
+
+    // The water adapter is a game-instance subsystem, so it outlives
+    // AutomationOpenMap: a preceding test can leave its moving window
+    // kilometres downriver, and the fresh map's streaming actor takes a few
+    // seconds to reconfigure (cold-rebooting the window at the put-in).
+    // Sampling before that reads dry and failed this suite whenever it ran
+    // after a far-river ride. Hold the assert pass until the support surface
+    // answers wet at the raft, bounded so genuinely missing infrastructure
+    // still reports.
+    if (StartTimeSeconds.IsValid() && *StartTimeSeconds < 0.0f)
+    {
+        *StartTimeSeconds = World->GetTimeSeconds();
+    }
+    if (Raft && Water && StartTimeSeconds.IsValid() &&
+        World->GetTimeSeconds() - *StartTimeSeconds < 12.0f)
+    {
+        FRaftSimWaterSample ReadinessSample;
+        const bool bSupportReady =
+            Water->SampleRaftSupportSurfaceAtWorldPosition(
+                Raft->GetActorLocation(), ReadinessSample) &&
+            ReadinessSample.bWet;
+        if (!bSupportReady)
+        {
+            return false;
+        }
+    }
+
+    Test->TestNotNull(TEXT("South Fork full reach has a live water surface"), Surface);
+    Test->TestNotNull(TEXT("South Fork full reach has a playable raft"), Raft);
     Test->TestNotNull(TEXT("South Fork full reach has a water runtime"), Water);
     if (Surface && Water)
     {
@@ -2631,7 +2660,8 @@ bool FRaftSimSouthForkFullReachSupportParityTest::RunTest(const FString&)
     }
     AutomationOpenMap(MapPath);
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
-    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkSupportParityCommand(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkSupportParityCommand(
+        this, MakeShared<float>(-1.0f)));
     // Advance through overlapping 80 m windows, matching the streamer's
     // runtime contract. A direct 120 -> 905 m teleport is correctly rejected
     // because it cannot transfer solver state across the intervening reach.

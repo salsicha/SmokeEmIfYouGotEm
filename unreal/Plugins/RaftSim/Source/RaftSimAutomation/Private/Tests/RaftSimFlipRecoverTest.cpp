@@ -160,7 +160,11 @@ bool FRaftSimRaftFlipsAndRecoversTest::RunTest(const FString&)
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));    // settle
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimForceOverwashCommand(this));
-    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.50f));   // latch + partial roll
+    // Latch (0.35 s) + enough of the 0.85 s roll transition that the >20 deg
+    // mid-flip assert sits far from its bound. At the former 0.50 s wait the
+    // expected roll landed exactly on 20 deg and frame timing flipped the
+    // verdict (measured 18.0-21.1 deg across runs); 0.65 s lands mid-40s.
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.65f));   // latch + partial roll
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertCapsizeTransitionCommand(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.00f));   // settle inverted
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertCapsizeAndReflipCommand(this));

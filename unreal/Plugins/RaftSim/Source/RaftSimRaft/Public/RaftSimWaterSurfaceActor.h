@@ -659,6 +659,19 @@ private:
      * present bank vertices toward the channel (alpha cannot fade a Single
      * Layer Water body), so the shoreline laps instead of popping. */
     TArray<float> LiveVolumeCoreWetPresence;
+    /** Rendered-terrain surface Z (world cm) under each shoreline-band cell,
+     * cached from line traces against the visual terrain tiles. The solver's
+     * bed and the rendered Nanite tiles disagree by a few centimetres, and on
+     * a gentle bank that vertical error becomes metres of Single Layer Water
+     * hovering just above the visible ground — a tint-free specular film that
+     * reads as a glossy sheet on the shore. Presentation wetness is culled
+     * where the rendered water column over this cached surface is too thin to
+     * show volume colour. */
+    TArray<float> VisualBankTerrainZCm;
+    /** Probe state for VisualBankTerrainZCm: 0 = unqueried, 1 = terrain hit
+     * cached, 2 = traced but no full-reach terrain underneath (fail open —
+     * never culled). */
+    TArray<uint8> VisualBankProbeState;
     /** Per-vertex eased breaking crest/tail lift. Raw Froude detection
      * re-decides the lifted cells every refresh, so threshold cells toggled
      * their full lift in one 15 Hz step and the carved front hopped whole

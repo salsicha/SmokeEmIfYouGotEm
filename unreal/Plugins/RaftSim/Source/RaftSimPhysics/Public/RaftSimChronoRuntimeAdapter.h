@@ -139,6 +139,7 @@ struct FRaftSimFlexStepTelemetry
     double TubePitchLoadBiasNm = 0.0;
     double TotalRetainedWaterMassKg = 0.0;
     double RetainedWaterRollMomentNm = 0.0;
+    double OvertoppingDynamicRollMomentNm = 0.0;
     double ReferenceFlipThresholdNm = 0.0;
     double ReferenceFlipMarginNm = 0.0;
     bool bReferenceFlipRisk = false;

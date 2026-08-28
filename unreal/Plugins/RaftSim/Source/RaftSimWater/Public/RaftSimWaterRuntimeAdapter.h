@@ -214,8 +214,10 @@ public:
     /**
      * Load a globally stationed river crop and, when a live crop already
      * exists, transfer every overlapping water cell and preserve solver time.
-     * A non-overlapping replacement is rejected so gameplay cannot silently
-     * reset the river during a descent.
+     * A non-overlapping replacement (the raft teleported or restored far
+     * away) reboots the window cold at the new station with a logged
+     * warning; during a continuous descent windows always overlap, so
+     * ordinary gameplay never resets silently.
      */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool ConfigureMovingRiverWindow(

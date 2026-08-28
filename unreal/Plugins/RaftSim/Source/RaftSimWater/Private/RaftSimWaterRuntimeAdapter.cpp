@@ -1730,14 +1730,27 @@ bool URaftSimWaterRuntimeAdapter::ConfigureMovingRiverWindow(
         LastHandoffTransferredCellCount = Candidate->TransferOverlapStateFrom(*LiveWindow);
         if (LastHandoffTransferredCellCount <= 0)
         {
+            // Every caller centres the moving window on the raft itself, so a
+            // zero-overlap replacement means the raft genuinely jumped
+            // (teleport, checkpoint restore, station-walking automation). The
+            // old window is useless there — it no longer covers the raft —
+            // and rejecting the replacement wedged the window permanently:
+            // each retry was equally non-overlapping. Adopt the candidate as
+            // a fresh cold boot instead. State carry is impossible by
+            // definition (nothing overlaps), which is exactly what a cold
+            // start at the new station would have produced anyway.
             UE_LOG(
-                LogTemp, Error,
-                TEXT("RaftSim rejected non-overlapping moving-window handoff for '%s'"),
-                *BandId);
-            return false;
+                LogTemp, Warning,
+                TEXT("RaftSim moving-window handoff for '%s' has no overlap; "
+                     "rebooting the window cold at station %.1f m"),
+                *BandId,
+                WindowCenterM.X);
         }
-        ++MovingWindowHandoffCount;
-        bLastHandoffPreservedState = true;
+        else
+        {
+            ++MovingWindowHandoffCount;
+            bLastHandoffPreservedState = true;
+        }
     }
     LiveWindow = MoveTemp(Candidate);
     if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||

@@ -498,6 +498,48 @@ static bool ResolveShorelineCameraPose(
     return true;
 }
 
+// Guide-eye variant: ~0.7 m above the water looking across at the bank,
+// reproducing the grazing incidence the seated player actually sees (bank
+// sheen and reflection artifacts are invisible from the elevated preset).
+static bool ResolveShorelineLowCameraPose(
+    UWorld* World,
+    const ARaftSimRaftActor& Raft,
+    bool bRiverLeft,
+    FVector& OutLocation,
+    FRotator& OutRotation)
+{
+    if (!ResolveShorelineCameraPose(
+            World, Raft, bRiverLeft, OutLocation, OutRotation))
+    {
+        return false;
+    }
+    OutLocation.Z = Raft.GetActorLocation().Z + 70.0f;
+    URaftSimWaterRuntimeAdapter* Adapter = nullptr;
+    if (const UGameInstance* GameInstance = World->GetGameInstance())
+    {
+        if (URaftSimPhysicsBridgeSubsystem* Bridge =
+                GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
+        {
+            Adapter = Bridge->GetWaterRuntime();
+        }
+    }
+    FVector2D RiverPosition;
+    FVector Tangent;
+    FVector LeftNormal;
+    if (Adapter != nullptr &&
+        Adapter->WorldToRiverCoordinates(
+            Raft.GetActorLocation(), RiverPosition, Tangent, LeftNormal))
+    {
+        const FVector Toward =
+            (bRiverLeft ? LeftNormal : -LeftNormal).GetSafeNormal2D();
+        const FVector LookAt = Raft.GetActorLocation() +
+            Toward * 2200.0f + Tangent.GetSafeNormal2D() * 600.0f +
+            FVector::UpVector * 40.0f;
+        OutRotation = (LookAt - OutLocation).Rotation();
+    }
+    return true;
+}
+
 // Burst variant of CaptureAfter for temporal artifacts: after the start
 // delay, resolve the camera once, then take <count> numbered screenshots at
 // <interval> seconds and exit. One -ExecCmds command, like CaptureAfter.
@@ -671,6 +713,16 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                             W,
                             *Raft,
                             CameraPreset == TEXT("shore_left"),
+                            ResolvedLoc,
+                            ResolvedRot);
+                    }
+                    else if (CameraPreset == TEXT("shore_left_low") ||
+                             CameraPreset == TEXT("shore_right_low"))
+                    {
+                        bCamera = ResolveShorelineLowCameraPose(
+                            W,
+                            *Raft,
+                            CameraPreset == TEXT("shore_left_low"),
                             ResolvedLoc,
                             ResolvedRot);
                     }

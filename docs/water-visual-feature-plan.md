@@ -167,6 +167,133 @@ P2, P3, P4 all green.
   rocks remains a follow-up feature: splash/droplet emitters keyed to
   boulder footprints and flow speed in the water VFX actor.
 
+## 2026-08-28 shoreline corners (topological)
+
+Remaining right-angle notches were topological, not positional: where the
+wet band's edge steps one lateral row between adjacent stations, the
+corner quad cannot exist (its dry corner fails the presence test), so the
+edge rendered an L no matter where the boundary vertices sat. Each
+one-row step is now closed with a diagonal stitch triangle between the
+two boundary vertices, and the sub-cell reach is computed per station and
+box-smoothed along the bank (neighbours within one row of each other)
+so depth noise cannot zig-zag the waterline. Multi-row steps (very steep
+bank narrowing) remain unstitched — revisit if one shows up in review.
+
+## 2026-08-28 cloud and distant-tree jitter
+
+- Clouds: the volumetric cloud budget was starved (ViewRaySampleMaxCount 8
+  vs engine default 768, min 1, component scales 0.5), so per-frame
+  jittered sampling made the reconstruction boil. Raised to 64/2 in
+  DefaultEngine.ini — sky-band frame diff 2.42 -> 1.10; still a firm perf
+  budget with a revert note.
+- Sparse distant trees: sub-pixel geometry shimmer under TSR. The
+  dedicated anti-flicker period knob measured as a no-op here;
+  r.TSR.History.ScreenPercentage=200 cut the treeline band 4.62 -> 3.20.
+  Combined config verified: sky 1.03 / trees 3.24 / water unchanged.
+  Residual tree motion is genuine wind sway plus remaining sub-pixel
+  scatter; if still objectionable, the next lever is authoring-side
+  (earlier billboard LODs or no wind on far scatter LODs).
+
+## 2026-08-28 shore sheen ("shiny texture on the shore")
+
+Player report: a broad glossy band riding the bank above the waterline from
+the seated guide view. Isolated by elimination with a new low grazing-height
+shore camera preset (shore_left_low / shore_right_low, station=/lateral=
+walker): hiding the live overlay left it, retracting the carrier's shore
+extension left it, hiding static meshes removed it — the band is the
+terrain-clipped static water: its build clips at 5 mm depth
+(SouthForkMinimumVisibleWaterDepthM), and Single Layer Water renders a
+sub-decimetre column with no volume tint at all, so on a gentle bank the
+0-10 cm margin is a metres-wide pure mirror over the visible ground,
+strongest at grazing incidence (Fresnel -> 1). Fixes, both sides:
+
+- Material (root fix): BuildPhotorealRiverWaterMaterial now lerps roughness
+  and specular toward a matte wet-sediment response below ~7 cm of
+  solver-authored depth (VC.G; ShoreMarginDepthFloor 0.028, gain 18,
+  ShoreMarginRoughness 0.58, ShoreMarginSpecular 0.07), restoring authored
+  gloss by ~20 cm. The shallow margin now reads as damp ground / clear
+  shallow water with visible bed texture, not chrome. Applies to the static
+  water, the V4 transmission parent (regenerated from the fresh source via
+  unreal/Scripts/regenerate_water_froth_materials.py after moving the saved
+  V4 duplicate aside), and the carrier core (whose G channel is depth/4.0 vs
+  the cook's depth/2.5, so its matte onset is ~11 cm — acceptable; tune if
+  shallow chutes dull).
+- Carrier (conformance guard): the solver bed and rendered Nanite tiles
+  disagree by a few cm, which on a gentle bank becomes metres of core film
+  hovering above the visible ground. RefreshSurface now line-traces the
+  rendered terrain (actors tagged RaftSimFullReachTerrain) under the
+  shoreline bands (3 rings, 96 probes/refresh budget, cached per cell and
+  carried across recentres), and zeroes presentation wet-presence where the
+  rendered column is under 6 cm (kVisualBankFilmMinDepthCm); the bank-reach
+  extension also refuses to re-bridge culled ground (reach x0.25). Fail-open
+  when no terrain tile is under a cell (boulders, unstreamed tiles).
+
+Verified: grazing before/after crops at station 130 lateral 16 (mirror film
+gone, sediment texture continuous into the tint), elevated shore and open
+pool unchanged. RaftSim.P2.WaterSurfaceRenders, P2.RiverWindowLoads,
+P4.SouthForkFullReachSupportParity green. Pre-existing failures (verified
+failing at pushed HEAD a61d758f too, likely from the hull-drag overhaul):
+P2.RaftFlipsAndRecovers (raft no longer capsizes under the test's sustained
+overwash), P4.SouthForkApproachDraftTelemetry,
+P4.TroublemakerApproachDraftTelemetry — flagged as a separate task.
+
+## 2026-08-28 pre-existing test failures fixed (flip + approach telemetry)
+
+Root causes were three unrelated bugs, none of them the hull drag:
+
+- Capsize infeasibility: the self-bailer retention retune (6a0463f8; per-
+  segment cap 0.05 -> 0.035 m^3) capped the whole-side flood moment at
+  ~1370 Nm against the unchanged 1800 Nm righting threshold, so the D3
+  flip-risk latch could never fire at any flow — in the test or in gameplay.
+  The missing physics is the overwashing current itself: EvaluateOverwashFlipD3
+  now adds an overtopped-face dynamic-pressure side load
+  (q = rho v^2/2 over the overtopped strip, one pressure-scaled tube-radius
+  lever), accumulated only while a face is genuinely overtopped, as the
+  production coupling term DynamicPressureRollLeverM (default 0 keeps every
+  D6 fixture and the Python reference identical). Drifting with the current
+  contributes nothing (near-zero relative speed); a buried tube in fast
+  relative flow levers over. Flip-test capsize log now reads: retained
+  1373 Nm + dynamic 9615 Nm vs threshold 1800 -> flips, 5 swimmers, re-flip
+  recovers.
+- ProcMesh error spam ("different number of vertices [Previous: 0, New:
+  26065]", every frame in map-load/telemetry runs): ClearMeshSection keeps
+  the section entry alive with zero vertices, and the volume-core dry-clear
+  branch left the per-frame interpolation armed, whose guard only
+  null-checked the section. The clear now deactivates interpolation and the
+  guard also requires the section's current vertex count to match.
+- Moving-window wedge: a zero-overlap handoff (raft teleported/checkpointed
+  far away) was rejected with an Error and kept the stale window, wedging it
+  permanently since every retry was equally non-overlapping. The adapter now
+  reboots the window cold at the new station with a Warning; continuous
+  descents always overlap, so gameplay still never resets silently.
+- Approach-telemetry transit hardening (test-side): wet probes scan a small
+  lateral fan (the wet channel leaves the centreline by station ~60 on
+  Troublemaker's approach), and after 20 consecutive dry holds the seek
+  phase blind-creeps 8 m via the coordinate map — safe now that the window
+  reboots instead of wedging (previously it deadlocked at the ~6.9 km
+  source-grid boundary seeking Troublemaker at 8050 m).
+
+Two more latent issues surfaced by full-suite runs, both fixed:
+
+- SupportParity order-dependence: the water adapter is a game-instance
+  subsystem, so it outlives AutomationOpenMap; running after a far-river
+  ride left the moving window kilometres away and the parity asserts
+  sampled dry before the fresh map's streaming actor reconfigured. The
+  assert command now holds (bounded 12 s) until the raft's support sample
+  answers wet.
+- Flip-test timing: the mid-flip assert at 0.50 s after forced overwash
+  landed exactly on its 20 deg bound (latch 0.35 s + 0.85 s smoothstep
+  transition; measured 18.0-21.1 deg across runs). Wait extended to
+  0.65 s (~55 deg at assert); three consecutive green runs.
+
+All three tests green; full RaftSim.P2+P3+P4 15/15 with zero
+procedural-mesh or window-handoff error lines; SouthFork telemetry rides
+Troublemaker proper (drop 1.13 m at station 8170, draft spread ~16-24 cm
+over 121 samples). The physics/ Python reference suite could not run
+locally (no python/uv on this machine) but is unchanged by construction:
+the D3 reference path is bit-identical with the new parameter defaulted
+off, and the Python model itself was not touched.
+
 ## Repo audit (2026-08-27)
 
 - .git 9.8 GB, of which .git/lfs cache 8.0 GB; pack only 1.79 GiB.

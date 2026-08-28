@@ -1659,7 +1659,8 @@ void ARaftSimRaftActor::EnterCapsize()
         Warning,
         TEXT("RaftSim capsize: raft=%s location_cm=%s rotation_deg=%s "
              "flip_margin_nm=%.3f flip_threshold_nm=%.3f retained_water_kg=%.3f "
-             "retained_roll_moment_nm=%.3f wet_samples=%d/%d contacts=%d "
+             "retained_roll_moment_nm=%.3f dynamic_roll_moment_nm=%.3f "
+             "wet_samples=%d/%d contacts=%d "
              "wrapping=%d pinned=%d"),
         *GetName(),
         *GetActorLocation().ToCompactString(),
@@ -1668,6 +1669,7 @@ void ARaftSimRaftActor::EnterCapsize()
         EntryTelemetry.ReferenceFlipThresholdNm,
         EntryTelemetry.TotalRetainedWaterMassKg,
         EntryTelemetry.RetainedWaterRollMomentNm,
+        EntryTelemetry.OvertoppingDynamicRollMomentNm,
         EntryTelemetry.LiveWetSampleCount,
         EntryTelemetry.LiveWaterSampleCount,
         EntryTelemetry.ContactCount,
