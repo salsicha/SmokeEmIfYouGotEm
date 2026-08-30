@@ -70,7 +70,7 @@
 		"affects_gameplay_collision": false,
 		"affects_hydraulics": false
 	},
-	"detailed_mesh_reuse_requested": true,
+	"detailed_mesh_reuse_requested": false,
 	"capture_set_complete": true,
 	"hlod_generation_complete": false,
 	"hlod_status": "ready_for_WorldPartitionHLODsBuilder_commandlet",
@@ -88,10 +88,10 @@
 		"terminal_visual_water_actors": 1,
 		"far_field_patches": 8,
 		"terrain_triangles": 1467648,
-		"water_triangles": 4102232,
+		"water_triangles": 4099226,
 		"whitewater_foam_triangles": 303862,
 		"procedural_shoreline_completion_vertices": 4688,
-		"procedural_shoreline_transition_cells": 69370,
+		"procedural_shoreline_transition_cells": 81263,
 		"terminal_visual_water_triangles": 720,
 		"far_field_triangles": 2218304,
 		"foliage_instances": 82609,
@@ -109,8 +109,10 @@
 		"local_reflection_probes": 13
 	},
 	"captures": [
-		"docs/environment-captures/south_fork_full_reach/foam_patch_meat_grinder.png",
-		"docs/environment-captures/south_fork_full_reach/foam_patch_troublemaker.png",
-		"docs/environment-captures/south_fork_full_reach/foam_patch_satans_cesspool.png"
+		"docs/environment-captures/south_fork_full_reach/chili_bar_launch_downstream.png",
+		"docs/environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png",
+		"docs/environment-captures/south_fork_full_reach/troublemaker_approach.png",
+		"docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
+		"docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png"
 	]
 }

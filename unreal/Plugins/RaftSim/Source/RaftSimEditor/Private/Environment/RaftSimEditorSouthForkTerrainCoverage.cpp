@@ -8,7 +8,13 @@ constexpr int32 SouthForkFarFieldCorridorReliefTransitionCells = 3;
 constexpr float SouthForkMinimumCompletedShorelineDepthM = 0.03f;
 constexpr float SouthForkMaximumCompletedShorelineDepthM = 0.25f;
 constexpr float SouthForkMaximumTerrainClippedBankHeightM = 0.05f;
-constexpr float SouthForkMinimumVisibleWaterDepthM = 0.005f;
+// Raised from 5 mm (2026-08-29): Single Layer Water renders the sub-decimetre
+// margin as a tint-free film, and the static edge ran metres past the live
+// carrier's ~6 cm rendered-depth cull line, reading as a second waterline
+// ("where the blue surface and where the shiny surface intersect the shore
+// are different"). Clipping to the same visible-depth line makes the two
+// surfaces share one shoreline; the exposed strip below is rendered terrain.
+constexpr float SouthForkMinimumVisibleWaterDepthM = 0.06f;
 
 struct FSouthForkClippedWaterVertex
 {

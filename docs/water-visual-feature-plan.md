@@ -237,6 +237,93 @@ P2.RaftFlipsAndRecovers (raft no longer capsizes under the test's sustained
 overwash), P4.SouthForkApproachDraftTelemetry,
 P4.TroublemakerApproachDraftTelemetry — flagged as a separate task.
 
+## 2026-08-29 reflective-surface pops (proxy recreation)
+
+Player recording (2.9 s guide-view crop): the whole water surface's fine
+reflective detail toggled on for a single game frame and back, twice —
+each event a one-frame state B differing ~10 mean-RGB from both
+neighbours while A and C differed only ~3 (normal evolution). Signature
+of a temporal-history reset, not exposure or geometry.
+
+Cause (proven by A/B): the Single Layer Water core rebuilt its ONE
+26k-vertex mesh section with CreateMeshSection whenever shoreline
+membership changed. A recreated section is a new render proxy whose
+first frame carries no motion history, so TSR renders one raw sharp
+frame across the section's entire screen area. Membership churn (bank
+lapping, crop-feather sweep, film-cull flicker) recreated it up to 6
+times a second. A benchmark frame-dump A/B (raftsim.FreezeCoreTopology,
+kept as a probe cvar) zeroed both the one-frame-anomaly count (24 -> 0
+in 14 s) and the water band's diff tail (p90 5.7 -> 2.4).
+
+Fix, in layers (RaftSimWaterSurfaceActor):
+- Split the core into two sections sharing vertices and material:
+  a stable INTERIOR (section 0) and a thin bank BOUNDARY strip
+  (section 1). Only the boundary is allowed to churn.
+- Interior membership keys on hydraulic depth (VC.G), not presence —
+  every presence threshold sweeps with the raft's crop feather — with
+  double hysteresis: enter >= ~0.5 m held for ~2 s, exit < ~0.3 m held
+  for ~2 s, so rapid waves can neither admit nor evict. The partition
+  itself only moves when the grid recentres (per-vertex dwell completions
+  otherwise re-partition every refresh while a streamed edge settles),
+  and a recentre already recreates everything, so membership updates add
+  no extra invalidations.
+- Boundary adoption throttled to ~1 Hz (15-refresh hold, forced on
+  recentre/boot): the strip's recreation batches instead of firing per
+  refresh; the lapping edge still tracks inside the presence envelope's
+  attack time.
+- Film cull got enter/exit hysteresis (6 cm / 9 cm) — the single
+  threshold flickered with wave motion and was itself a churn source.
+- Diagnostics kept behind raftsim.LogWaterRenderStateEvents: every
+  section recreation / visibility flip / recentre logs frame + time for
+  correlating against -benchmark -dumpmovie frame diffs.
+
+Validated on the same benchmark profile (30 fps dump, paddling from
+launch): interior recreations 0 (was 87), boundary batches 13/15 s,
+one-frame anomalies 0 at the strictest threshold, water-band p90 2.58
+(baseline 5.72) — matching the freeze-everything probe while shoreline
+behaviour stays live. Shoreline stills unchanged (no seam between
+sections); RaftSim.P2 suite + P4.SouthForkFullReachSupportParity green.
+
+Follow-up (same day, player screenshots + 7.2 s recording): the 1 Hz
+boundary throttle traded per-refresh strip flashes for once-per-second
+BATCHED shoreline jumps — the recording's diff spikes sat at 1.0 s
+intervals exactly — and batched admissions landed as rectangular blocks.
+Superseded by a frozen waterline band: the boundary section now emits
+every cell within 4 rings of the waterline captured at band-rebuild time
+(recentres, band-edge escapes), and DRY cells render collapsed onto the
+finished waterline vertex of their column (directed pile pass; interior
+presence gaps collapse onto their nearest wet row so islands are not
+skinned). Wet/dry churn therefore moves vertices — per-frame smooth
+through the interpolation — and never touches an index list; the
+adoption throttle is gone; the diagonal stitch triangles are gone too
+(the collapsed dry quads ARE the corner fill, which also kills the
+remaining right-angle notches). Benchmark: ZERO core section events of
+any kind in 15 s (no creates, no band rebuilds), water-band median 1.95
+/ p90 2.44 / max 3.14 — byte-identical to the freeze-probe ideal.
+
+Static/live shoreline unification: the terrain-clipped static water kept
+water to 5 mm depth, so its (de-glossed but still distinct) margin ran
+metres past the carrier's ~6 cm rendered-depth cull line and the two
+waterline contours read as different edges ("where the blue surface and
+where the shiny surface intersect the shore are different").
+SouthForkMinimumVisibleWaterDepthM raised 0.005 -> 0.06 and the static
+water meshes regenerated in place via the new water-only rebuild flag
+(-RaftSimRebuildSouthForkWaterMeshes overrides every reuse umbrella;
+terrain, far field, and materials untouched). All 39 band meshes
+regenerated; shoreline stills show one edge.
+
+Hardening from the post-rebuild suite run: every in-place mesh-section
+update in the water actor now verifies the section's CURRENT vertex
+count and recreates on mismatch (a cleared section keeps its entry with
+zero vertices) — this also fixed a latent ripple-section bug that
+updated a full-grid section with empty arrays whenever a wake had no
+visible triangles. And the SupportParity test learned the second half of
+the suite-order leak: AutomationOpenMap is a no-op when the map is
+already loaded, so a preceding approach ride hands this test the SAME
+world with its raft still mid-river; the test now settles the raft onto
+the nearest wet centreline station before its readiness gate. Full
+RaftSim.P2+P3+P4: 15/15, zero procedural-mesh error lines.
+
 ## 2026-08-28 pre-existing test failures fixed (flip + approach telemetry)
 
 Root causes were three unrelated bugs, none of them the hull drag:
