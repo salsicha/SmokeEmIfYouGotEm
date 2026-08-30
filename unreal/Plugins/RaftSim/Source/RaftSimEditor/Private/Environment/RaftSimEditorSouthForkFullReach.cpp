@@ -1000,8 +1000,13 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     const bool bReuseExistingDetailedTerrainMeshes = bReuseExistingDetailedMeshes ||
         FParse::Param(
             FCommandLine::Get(), TEXT("RaftSimReuseSouthForkDetailedTerrainMeshes"));
-    const bool bReuseExistingWaterMeshes = bReuseExistingDetailedMeshes || FParse::Param(
-        FCommandLine::Get(), TEXT("RaftSimReuseSouthForkWaterMeshes"));
+    // Explicit water rebuild wins over every reuse umbrella so shoreline-clip
+    // retunes can regenerate only the water meshes against untouched terrain.
+    const bool bRebuildWaterMeshes = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimRebuildSouthForkWaterMeshes"));
+    const bool bReuseExistingWaterMeshes = !bRebuildWaterMeshes &&
+        (bReuseExistingDetailedMeshes || FParse::Param(
+            FCommandLine::Get(), TEXT("RaftSimReuseSouthForkWaterMeshes")));
     const bool bRebuildFarFieldMeshes = FParse::Param(
         FCommandLine::Get(), TEXT("RaftSimRebuildSouthForkFarFieldMeshes"));
     const bool bReuseExistingFarFieldMeshes = !bRebuildFarFieldMeshes &&

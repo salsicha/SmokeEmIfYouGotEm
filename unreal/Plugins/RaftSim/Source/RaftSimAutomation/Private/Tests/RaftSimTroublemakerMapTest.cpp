@@ -2381,17 +2381,58 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
     URaftSimWaterRuntimeAdapter* Water =
         Bridge ? Bridge->GetWaterRuntime() : nullptr;
 
-    // The water adapter is a game-instance subsystem, so it outlives
-    // AutomationOpenMap: a preceding test can leave its moving window
-    // kilometres downriver, and the fresh map's streaming actor takes a few
-    // seconds to reconfigure (cold-rebooting the window at the put-in).
-    // Sampling before that reads dry and failed this suite whenever it ran
-    // after a far-river ride. Hold the assert pass until the support surface
-    // answers wet at the raft, bounded so genuinely missing infrastructure
-    // still reports.
+    // Suite order leaks world state into this test twice over: the water
+    // adapter is a game-instance subsystem that outlives AutomationOpenMap,
+    // and AutomationOpenMap itself is a no-op when the requested map is
+    // already loaded — so a preceding approach ride can leave this "fresh"
+    // test with the SAME world, its raft kilometres downriver mid-run and
+    // the moving window chasing it. Pin the raft to a known wet put-in
+    // station on the first tick, then hold the assert pass until the
+    // support surface answers wet there, bounded so genuinely missing
+    // infrastructure still reports.
     if (StartTimeSeconds.IsValid() && *StartTimeSeconds < 0.0f)
     {
         *StartTimeSeconds = World->GetTimeSeconds();
+        if (Raft && Water)
+        {
+            // Settle the raft onto the nearest wet centreline station the
+            // live window can answer for, wherever the leftover world put
+            // it (mid-air over a rapid included): the assertions only need
+            // A raft on supported water, not a particular reach.
+            FVector2D RaftRiver;
+            FVector RiverTangent;
+            FVector RiverLeftNormal;
+            if (Water->WorldToRiverCoordinates(
+                    Raft->GetActorLocation(), RaftRiver, RiverTangent,
+                    RiverLeftNormal))
+            {
+                for (float OffsetM = 0.0f; OffsetM <= 120.0f; OffsetM += 10.0f)
+                {
+                    FRaftSimWaterSample PinSample;
+                    bool bPinned = false;
+                    for (const float SignedM : {OffsetM, -OffsetM})
+                    {
+                        if (Water->SampleWaterAtRiverCoordinates(
+                                FVector2D(RaftRiver.X + SignedM, 0.0f),
+                                PinSample) &&
+                            PinSample.bWet)
+                        {
+                            Raft->TeleportForTesting(
+                                PinSample.WorldPosition +
+                                    FVector(0.0f, 0.0f, 12.0f),
+                                Raft->GetActorRotation().Yaw,
+                                false);
+                            bPinned = true;
+                            break;
+                        }
+                    }
+                    if (bPinned)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
     }
     if (Raft && Water && StartTimeSeconds.IsValid() &&
         World->GetTimeSeconds() - *StartTimeSeconds < 12.0f)
