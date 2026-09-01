@@ -1558,6 +1558,25 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         {
             return false;
         }
+        // Scenic bank rocks that end up standing in or at the water must be
+        // hydrodynamically real: the player reads any exposed rock in current
+        // as an obstruction and expects a pressure pillow and wake ("theres
+        // no pillow on the rock", screenshots 2026-08-30/31 — every rock in
+        // them was scenic scatter at a wide pool's waterline, invisible to
+        // the footprint pipeline that only carried the rapid catalog).
+        // Collect placed scenic rocks here; the water pass below, which
+        // knows the local surface elevation, promotes the ones the river
+        // actually touches into AcceptedBoulderPresentationFootprints, and
+        // from there they flow into boulder_footprints.json for the live
+        // carrier's cutout, pillow, and wake exactly like catalog rocks.
+        struct FScenicRockWaterlineCandidate
+        {
+            int32 Row = 0;
+            float LateralM = 0.0f;
+            float RadiusM = 0.0f;
+            float BaseElevationM = 0.0f;
+        };
+        TArray<FScenicRockWaterlineCandidate> ScenicRockWaterlineCandidates;
         for (int32 Row = 2; Row < Height - 2; Row += 2)
         {
             const int32 CoordinateIndex = GlobalRowStart + Row;
@@ -1662,6 +1681,15 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                 FVector(RockScale)),
                             /*bWorldSpace=*/true);
                         ++Metrics.ScenicRockInstanceCount;
+                        // Same fitted-bounds radius rule as the catalog
+                        // placement below; only stones big enough to read
+                        // as obstructions are candidates for promotion.
+                        const float ScenicRadiusM = RockScale / 0.8481f;
+                        if (ScenicRadiusM >= 0.7f)
+                        {
+                            ScenicRockWaterlineCandidates.Add(
+                                {Row, LateralM, ScenicRadiusM, ElevationM});
+                        }
                     }
                 }
                 const float Selection = StableUnitRandom(CoordinateIndex, Column, 19);
@@ -1871,6 +1899,45 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                         WaterHeight.Values, Presentation.Pixels, WaterWidth, Row,
                         WaterMinimumM, WaterMaximumM, RowSurfaceElevationsM,
                         RowHydraulicPresentation, LeftWetColumn, RightWetColumn)) return false;
+                // Promote scenic rocks this row's water actually reaches.
+                // A base within 25 cm above the local surface stands at the
+                // waterline (waves lap it); anything lower is genuinely in
+                // the river. Duplicates of catalog rocks are suppressed the
+                // same way overlapping catalog placements are.
+                if (LeftWetColumn != INDEX_NONE && RightWetColumn != INDEX_NONE)
+                {
+                    for (const auto& Candidate : ScenicRockWaterlineCandidates)
+                    {
+                        if (Candidate.Row != Row ||
+                            FMath::Abs(Candidate.LateralM) > 40.0f)
+                        {
+                            continue;
+                        }
+                        const int32 CandidateColumn = FMath::Clamp(
+                            FMath::RoundToInt(
+                                (Candidate.LateralM + 40.0f) / 4.0f),
+                            LeftWetColumn, RightWetColumn);
+                        const float LocalSurfaceM =
+                            RowSurfaceElevationsM[CandidateColumn];
+                        if (LocalSurfaceM - Candidate.BaseElevationM <= -0.25f)
+                        {
+                            continue;
+                        }
+                        const float CandidateStationM =
+                            static_cast<float>(Point.StationM);
+                        if (ShouldSuppressSouthForkBoulderPresentation(
+                                AcceptedBoulderPresentationFootprints,
+                                CandidateStationM, Candidate.LateralM,
+                                Candidate.RadiusM))
+                        {
+                            continue;
+                        }
+                        AcceptedBoulderPresentationFootprints.Add(
+                            FSouthForkBoulderPresentationFootprint{
+                                CandidateStationM, Candidate.LateralM,
+                                Candidate.RadiusM});
+                    }
+                }
                 for (int32 Column = 0; Column < WaterWidth; ++Column)
                 {
                     const int32 Index = Row * WaterWidth + Column;

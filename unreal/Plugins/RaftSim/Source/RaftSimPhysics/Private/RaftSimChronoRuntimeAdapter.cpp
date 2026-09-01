@@ -406,8 +406,10 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         LastDrySupportPointCount = 0;
         TArray<float> SurfaceZByPointCm;
         TArray<uint8> WetPointFlags;
+        TArray<double> DragPointSaturation;
         SurfaceZByPointCm.SetNumZeroed(TubeSamplePointsM.Num());
         WetPointFlags.SetNumZeroed(TubeSamplePointsM.Num());
+        DragPointSaturation.SetNumZeroed(TubeSamplePointsM.Num());
         float CenterSurfaceZCm = 0.0f;
         const bool bCenterWet =
             WaterSurfaceSampler(State.Position * 100.0, CenterSurfaceZCm);
@@ -505,6 +507,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 continue;
             }
             SubmergedFraction += Saturation / static_cast<double>(TubeSamplePointsM.Num());
+            DragPointSaturation[PointIndex] = Saturation;
             const FVector PointForceN(0.0, 0.0, PerPointBuoyancyN * Saturation);
             ForceN += PointForceN;
             TorqueNm += FVector::CrossProduct(WorldOffset, PointForceN);
@@ -530,54 +533,105 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 LastWetWaterVelocityMps = WaterVelocityMps;
             }
         }
-        const FVector RelativeVelocity = State.LinearVelocity - WaterVelocityMps;
-        const double RelativeSpeed = RelativeVelocity.Length();
-        if (RelativeSpeed > KINDA_SMALL_NUMBER && SubmergedFraction > 0.0)
+        if (SubmergedFraction > 0.0)
         {
-            // Pure v^2 drag becomes vanishingly small as a stroke coasts down,
-            // which left the loaded hull visibly gliding for tens of seconds.
-            // Clamp only the speed multiplier: direction and force still go
-            // continuously to zero with relative velocity, yielding a
-            // viscous low-speed region and quadratic high-speed resistance.
-            const double DragSpeedMps = FMath::Max(
-                RelativeSpeed,
-                FMath::Max(
-                    static_cast<double>(RaftConfig.LowSpeedDragReferenceMps),
-                    0.0));
-            // Direction-split hull drag. The blunt coefficient is sized for
-            // prompt current capture (an overtaking flow must not let froth
-            // pass the boat), but applied to bow-first motion THROUGH the
-            // water it erased paddle glide: the hull snapped back to water
-            // speed the instant a stroke ended. Slicing forward meets far
-            // less resistance than being bluntly pushed, so the positive
-            // component of relative velocity along the bow drags at the
-            // smaller slicing coefficient (with a gentler low-speed floor)
-            // and a stroke now coasts down over a couple of seconds.
-            // Reverse and lateral relative flow keep the blunt response.
+            // Per-point hull drag with the current sampled along the hull.
+            // The former single centre force could translate the hull onto
+            // the local water velocity but carried NO torque, so nothing
+            // ever yawed the boat into a turning current: through a bend a
+            // paddled raft kept thrusting along its unturned axis and ran a
+            // straight line to the outside bank ("the boat's momentum was
+            // conserved and the boat followed a straight line", player
+            // experiment 2026-08-31 at the first rapid; free drift measured
+            // heading-locked to the water within a degree, so translation
+            // coupling was never the defect). Each tube sample point now
+            // drags against the water sampled AT that point with its own
+            // rotational velocity: differential current along the hull
+            // becomes the bend-following yaw torque, and rotation against
+            // uniform water becomes yaw damping. Weighted by each point's
+            // immersion over the point count, the total in uniform water is
+            // EXACTLY the former centre force with zero net torque — every
+            // tank and uniform-water parity fixture is bit-compatible.
             FVector HullForward =
                 State.Orientation.RotateVector(FVector::ForwardVector);
             HullForward.Z = 0.0;
-            // Slicing applies only in the paddle-speed regime: a named-rapid
-            // window handoff can step the sampled current by ~3 m/s, and
-            // that capture must stay blunt regardless of which way the hull
-            // happens to point (a spun raft must not out-glide the froth).
-            const double SlicingFraction = 1.0 - FMath::Clamp(
-                (RelativeSpeed - 2.0) / 1.2, 0.0, 1.0);
-            const FVector SlicingComponent =
-                HullForward.Normalize()
-                ? HullForward * FMath::Max(
-                      FVector::DotProduct(RelativeVelocity, HullForward), 0.0) *
-                      SlicingFraction
-                : FVector::ZeroVector;
-            const FVector BluntComponent = RelativeVelocity - SlicingComponent;
-            ForceN += BluntComponent *
-                      (-static_cast<double>(RaftConfig.LinearDragCoefficient) *
-                       SubmergedFraction * DragSpeedMps);
-            const double SlicingDragSpeedMps = FMath::Max(RelativeSpeed, 0.25);
-            ForceN += SlicingComponent *
-                      (-static_cast<double>(
-                           RaftConfig.ForwardSlicingDragCoefficient) *
-                       SubmergedFraction * SlicingDragSpeedMps);
+            const bool bHasHullForward = HullForward.Normalize();
+            for (int32 PointIndex = 0;
+                 PointIndex < TubeSamplePointsM.Num();
+                 ++PointIndex)
+            {
+                const double PointWeight = DragPointSaturation[PointIndex] /
+                    static_cast<double>(TubeSamplePointsM.Num());
+                if (PointWeight <= 0.0)
+                {
+                    continue;
+                }
+                const FVector WorldOffset = State.Orientation.RotateVector(
+                    TubeSamplePointsM[PointIndex]);
+                FVector PointWaterVelocityMps = WaterVelocityMps;
+                if (FlexibleWaterFieldSampler)
+                {
+                    FRaftSimFlexUniformWater PointWater;
+                    if (FlexibleWaterFieldSampler(
+                            (State.Position + WorldOffset) * 100.0,
+                            PointWater) &&
+                        PointWater.bWet)
+                    {
+                        PointWaterVelocityMps = PointWater.VelocityMps;
+                    }
+                }
+                const FVector PointVelocity = State.LinearVelocity +
+                    FVector::CrossProduct(State.AngularVelocity, WorldOffset);
+                const FVector RelativeVelocity =
+                    PointVelocity - PointWaterVelocityMps;
+                const double RelativeSpeed = RelativeVelocity.Length();
+                if (RelativeSpeed <= KINDA_SMALL_NUMBER)
+                {
+                    continue;
+                }
+                // Pure v^2 drag becomes vanishingly small as a stroke coasts
+                // down, which left the loaded hull visibly gliding for tens
+                // of seconds. Clamp only the speed multiplier: direction and
+                // force still go continuously to zero with relative
+                // velocity, yielding a viscous low-speed region and
+                // quadratic high-speed resistance.
+                const double DragSpeedMps = FMath::Max(
+                    RelativeSpeed,
+                    FMath::Max(
+                        static_cast<double>(
+                            RaftConfig.LowSpeedDragReferenceMps),
+                        0.0));
+                // Direction-split hull drag: slicing forward meets far less
+                // resistance than being bluntly pushed, so a stroke coasts
+                // down over a couple of seconds while reverse/lateral flow
+                // keeps the blunt current-capture response. Slicing applies
+                // only in the paddle-speed regime: a named-rapid window
+                // handoff can step the sampled current by ~3 m/s, and that
+                // capture must stay blunt regardless of which way the hull
+                // happens to point.
+                const double SlicingFraction = 1.0 - FMath::Clamp(
+                    (RelativeSpeed - 2.0) / 1.2, 0.0, 1.0);
+                const FVector SlicingComponent = bHasHullForward
+                    ? HullForward * FMath::Max(
+                          FVector::DotProduct(RelativeVelocity, HullForward),
+                          0.0) * SlicingFraction
+                    : FVector::ZeroVector;
+                const FVector BluntComponent =
+                    RelativeVelocity - SlicingComponent;
+                const double SlicingDragSpeedMps =
+                    FMath::Max(RelativeSpeed, 0.25);
+                const FVector PointDragForceN =
+                    BluntComponent *
+                        (-static_cast<double>(
+                             RaftConfig.LinearDragCoefficient) *
+                         PointWeight * DragSpeedMps) +
+                    SlicingComponent *
+                        (-static_cast<double>(
+                             RaftConfig.ForwardSlicingDragCoefficient) *
+                         PointWeight * SlicingDragSpeedMps);
+                ForceN += PointDragForceN;
+                TorqueNm += FVector::CrossProduct(WorldOffset, PointDragForceN);
+            }
         }
 
         // Linear heave damping: quadratic drag alone is negligible at bobbing

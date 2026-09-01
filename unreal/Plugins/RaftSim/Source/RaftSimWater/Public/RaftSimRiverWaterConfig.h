@@ -147,16 +147,18 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
-    float LiveSurfaceSpecular = 0.42f;
+    float LiveSurfaceSpecular = 0.28f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.02", ClampMax = "1.0"))
-    float LiveSurfaceRoughness = 0.16f;
+    float LiveSurfaceRoughness = 0.15f;
 
-    /** Strength of the bounded Fresnel sky tint on the solver-owned carrier. */
+    /** Strength of the bounded Fresnel sky tint on the solver-owned carrier.
+     * Matches MI_RaftSim_SouthForkProductionWater — at the previous 0.62 the
+     * carrier wore a milky sky veil the static tiles did not. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
-    float LiveSkyReflectionStrength = 0.62f;
+    float LiveSkyReflectionStrength = 0.15f;
 
     /** Strength of the two moving micro-normal layers. Geometry and solver
      * normals remain authoritative at zero and one alike. */
@@ -226,36 +228,40 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.25"))
     float LivePresentationBankNaturalismAmplitudeMeters = 0.0f;
 
+    /** Defaults are the South Fork clear-water calibration and match
+     * MI_RaftSim_SouthForkProductionWater so the live carrier and the static
+     * terrain-clipped tiles render one continuous body of water. Rivers with
+     * different optics override these in their environment passes. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveShallowSurfaceColor =
-        FLinearColor(0.10f, 0.23f, 0.24f, 1.0f);
+        FLinearColor(0.012f, 0.030f, 0.026f, 1.0f);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveDeepSurfaceColor =
-        FLinearColor(0.025f, 0.075f, 0.09f, 1.0f);
+        FLinearColor(0.006f, 0.020f, 0.019f, 1.0f);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveReflectedSkyColor =
-        FLinearColor(0.18f, 0.28f, 0.34f, 1.0f);
+        FLinearColor(0.075f, 0.130f, 0.150f, 1.0f);
 
     /** River-local optical coefficients for the non-colliding volume core.
      * These presentation values do not alter solver depth, velocity, wet/dry,
      * collision, buoyancy, raft forces, or scoring. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveWaterScattering =
-        FLinearColor(0.00011f, 0.00015f, 0.00019f, 0.0f);
+        FLinearColor(0.00010f, 0.00028f, 0.00020f, 0.0f);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveWaterAbsorption =
-        FLinearColor(0.0075f, 0.0048f, 0.0032f, 0.0f);
+        FLinearColor(0.0066f, 0.0026f, 0.0040f, 0.0f);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     FLinearColor LiveRiverbedColorScale =
-        FLinearColor(0.13f, 0.17f, 0.20f, 0.0f);
+        FLinearColor(0.60f, 0.64f, 0.58f, 0.0f);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
-    float LiveShallowWaterOpacity = 0.58f;
+    float LiveShallowWaterOpacity = 0.30f;
 
     /** Presentation-only power curve applied to the normalized solver depth
      * before shallow/deep colour and opacity blending. One is linear; values
@@ -266,7 +272,7 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
-    float LiveDeepWaterOpacity = 0.79f;
+    float LiveDeepWaterOpacity = 0.54f;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "1.0"))

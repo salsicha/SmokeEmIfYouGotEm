@@ -3,6 +3,7 @@
 #include "Components/PoseableMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/SkeletalMesh.h"
+#include "HAL/IConsoleManager.h"
 #include "Materials/MaterialInterface.h"
 #include "Rendering/SkeletalMeshRenderData.h"
 #include "Rendering/SkinWeightVertexBuffer.h"
@@ -50,6 +51,24 @@ constexpr float ProductionHeadClearanceLiftCm = 5.0f;
 // twist turns the axial chain to the host's forward axis; limbs are driven
 // to explicit endpoints and keep their authored twist.
 constexpr float ProductionAxialFacingTwistDegrees = -90.0f;
+// The legs need the SAME facing correction as the axial chain: glute flesh
+// weighted to the twisted pelvis rotates -90 degrees about the vertical
+// while thigh-weighted flesh kept the authored +Y facing, and the blend
+// band across each cheek smeared that disagreement into a sheared fold
+// (player "gash in the right butt cheek" report, 2026-08-30 — the stretch
+// side reads as a groove; the compressed left side hides as a bulge).
+// The rest thigh/calf shaft points DOWN while the pelvis shaft points UP,
+// so matching the axial -90-about-up needs +90 about the leg shafts. The
+// calves follow the thighs so the seam moves to the zero-scaled foot
+// boundary inside the production boots instead of the visible knee.
+// Sweepable at runtime for diagnosis.
+static TAutoConsoleVariable<float> CVarRaftSimCC0LegFacingTwistDegrees(
+    TEXT("raftsim.CC0LegFacingTwistDegrees"),
+    90.0f,
+    TEXT("Facing pre-twist (degrees) applied about each rest leg shaft when "
+         "driving CC0 thigh/calf segment bones. 90 matches the axial "
+         "-90-about-up facing correction; 0 restores the sheared legacy look."),
+    ECVF_Default);
 // Keep the imported garment's inner shoulder weights distributed across the
 // upper chest. Driving both clavicle roots to one spine point pinched those
 // weights into a hard central ridge and stretched the remaining wetsuit into
@@ -655,11 +674,41 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         SetBoneAtPoint(TEXT("hand_r"), RightWristCm);
     }
 
-    SetSegmentBone(TEXT("thigh_l"), TEXT("calf_l"), Pose.LeftHipCm, Pose.LeftKneeCm);
-    SetSegmentBone(TEXT("calf_l"), TEXT("foot_l"), Pose.LeftKneeCm, Pose.LeftFootCm);
+    const float LegFacingTwistDegrees =
+        CVarRaftSimCC0LegFacingTwistDegrees.GetValueOnGameThread();
+    // Leg skin squashes between explicitly placed bone heads (the foot
+    // bone is pinned at the pose foot target and scaled to zero), so pose
+    // spans are free of the source rig's limb lengths. Log the source
+    // lengths once anyway — they document how far the skin is being
+    // compressed, which matters when diagnosing shin/boot junctions
+    // ("the feet seem to be coming out of the shins", 2026-09-01: the
+    // real cause was a 10 cm shin drop inside a 12 cm boot cuff).
+    static bool bLoggedLegSegmentLengths = false;
+    if (!bLoggedLegSegmentLengths)
+    {
+        bLoggedLegSegmentLengths = true;
+        const FTransform* RefThigh = ReferenceComponentTransforms.Find(TEXT("thigh_l"));
+        const FTransform* RefCalf = ReferenceComponentTransforms.Find(TEXT("calf_l"));
+        const FTransform* RefFoot = ReferenceComponentTransforms.Find(TEXT("foot_l"));
+        if (RefThigh && RefCalf && RefFoot)
+        {
+            UE_LOG(LogTemp, Display,
+                TEXT("RaftSim CC0 leg segments: thigh=%.1fcm calf=%.1fcm (pose frame)"),
+                FVector::Distance(RefThigh->GetLocation(), RefCalf->GetLocation()) *
+                    BodyScale,
+                FVector::Distance(RefCalf->GetLocation(), RefFoot->GetLocation()) *
+                    BodyScale);
+        }
+    }
+    SetSegmentBone(TEXT("thigh_l"), TEXT("calf_l"), Pose.LeftHipCm, Pose.LeftKneeCm,
+        LegFacingTwistDegrees);
+    SetSegmentBone(TEXT("calf_l"), TEXT("foot_l"), Pose.LeftKneeCm, Pose.LeftFootCm,
+        LegFacingTwistDegrees);
     SetBoneAtPoint(TEXT("foot_l"), Pose.LeftFootCm);
-    SetSegmentBone(TEXT("thigh_r"), TEXT("calf_r"), Pose.RightHipCm, Pose.RightKneeCm);
-    SetSegmentBone(TEXT("calf_r"), TEXT("foot_r"), Pose.RightKneeCm, Pose.RightFootCm);
+    SetSegmentBone(TEXT("thigh_r"), TEXT("calf_r"), Pose.RightHipCm, Pose.RightKneeCm,
+        LegFacingTwistDegrees);
+    SetSegmentBone(TEXT("calf_r"), TEXT("foot_r"), Pose.RightKneeCm, Pose.RightFootCm,
+        LegFacingTwistDegrees);
     SetBoneAtPoint(TEXT("foot_r"), Pose.RightFootCm);
 
     Body->SetBoneScaleByName(TEXT("foot_l"), FVector::ZeroVector, EBoneSpaces::ComponentSpace);
@@ -763,14 +812,30 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         (ReferenceIndex->GetLocation() - ReferencePinky->GetLocation()).GetSafeNormal();
     const FVector ReferenceForward =
         (ReferenceMiddle->GetLocation() - ReferenceHand->GetLocation()).GetSafeNormal();
-    const FVector ReferenceNormal = FVector::CrossProduct(
-        ReferenceWidth, ReferenceForward).GetSafeNormal();
+    // Width x Forward from anatomical finger positions yields the PALM
+    // normal on the right hand but the BACK of the hand on the mirrored
+    // left, so a shared cross order aimed the left palm away from the
+    // shaft — the grip read flipped/backwards ("the hand gripping the
+    // paddle shaft seems to be bending the wrong way", 2026-08-31).
+    // Build both references as palm normals.
+    const FVector ReferenceNormal =
+        (bLeft ? FVector::CrossProduct(ReferenceForward, ReferenceWidth)
+               : FVector::CrossProduct(ReferenceWidth, ReferenceForward))
+            .GetSafeNormal();
     const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
+    // The knuckle line mirrors too: on a shared shaft axis the left hand's
+    // index-to-pinky direction runs opposite the right's, otherwise the
+    // left grip lands thumb-down (upside down).
     FVector DesiredWidth = ResolvePaddleGripAxis(Pose, GripCenterCm).GetSafeNormal();
+    if (bLeft)
+    {
+        DesiredWidth = -DesiredWidth;
+    }
     const FVector ShoulderCm = bLeft ? Pose.LeftShoulderCm : Pose.RightShoulderCm;
-    const FVector PalmApproachCm = IsUpperTGrip(Pose, GripCenterCm)
-        ? ShoulderCm - GripCenterCm
-        : GripCenterCm - ShoulderCm;
+    // Both grips approach palm-first from the shoulder side: the shaft hand
+    // wraps the far side of the shaft, and the T-grip hand caps the grip
+    // from above (palm away from the shoulder, never underhand).
+    const FVector PalmApproachCm = GripCenterCm - ShoulderCm;
     FVector DesiredNormal = FVector::VectorPlaneProject(
         PalmApproachCm, DesiredWidth).GetSafeNormal();
     if (ReferenceWidth.IsNearlyZero() || ReferenceNormal.IsNearlyZero() ||

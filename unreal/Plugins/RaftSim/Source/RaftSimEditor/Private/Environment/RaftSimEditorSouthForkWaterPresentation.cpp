@@ -236,9 +236,16 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         if (!EditorData || !OriginalOpacity || !OriginalBehindWaterScale ||
             !WaterOutput || !Collection)
         {
-            OutSummary += TEXT(
-                "The South Fork source water lacks an opacity, volume output, "
-                "or raft presentation collection required for interior transmission.\n");
+            OutSummary += FString::Printf(
+                TEXT("The South Fork source water lacks an opacity, volume ")
+                TEXT("output, or raft presentation collection required for ")
+                TEXT("interior transmission (editor_data=%d opacity=%d ")
+                TEXT("behind_scale=%d water_output=%d collection=%d).\n"),
+                EditorData != nullptr,
+                OriginalOpacity != nullptr,
+                OriginalBehindWaterScale != nullptr,
+                WaterOutput != nullptr,
+                Collection != nullptr);
             return nullptr;
         }
 
@@ -900,14 +907,17 @@ bool LoadSouthForkProductionWaterPresentation(
 
     Instance->Modify();
     Instance->SetParentEditorOnly(Parent);
-    // The parent remains reusable for other rivers. South Fork's shallow
-    // gravel bars need a narrower transmission range so a 2 m interpolated
-    // solver-depth transition does not expose a bright polygon against the
-    // deep channel while still retaining readable submerged geography.
+    // The parent remains reusable for other rivers. South Fork runs clear
+    // snowmelt over pale granite: outside aerated water the bed must stay
+    // legible through the surface, with the green volume tint supplied by
+    // absorption rather than an opaque body colour ("river water should be
+    // clear and transparent, the colour of the rocks beneath comes
+    // through", player reference photo 2026-08-31). Whitewater keeps a
+    // near-opaque white body so aeration contrasts with the clear pools.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("ShallowWaterOpacity")), 0.76f);
+        FMaterialParameterInfo(TEXT("ShallowWaterOpacity")), 0.30f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("DeepWaterOpacity")), 0.82f);
+        FMaterialParameterInfo(TEXT("DeepWaterOpacity")), 0.54f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FoamWaterOpacity")), 0.91f);
     // South Fork's single solver-conforming carrier owns the whitewater. Its
@@ -931,24 +941,30 @@ bool LoadSouthForkProductionWaterPresentation(
     // temporal reflection history. Calibrate the South Fork instance toward
     // the gray-green body colour and blue-sky response visible in the source
     // corridor instead of changing the shared parent or hydraulic channels.
+    // Clear-water optics: the diffuse body colour stays close to black (real
+    // clear water has almost no diffuse albedo — its colour is volumetric),
+    // red is absorbed roughly twice as fast as green so depth reads as the
+    // source corridor's emerald rather than gray-teal, scattering is halved
+    // so pools do not go milky, and the behind-water bed keeps most of its
+    // light so submerged granite stays visible wherever water is not aerated.
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("ShallowWaterColor")),
-        FLinearColor(0.026f, 0.050f, 0.058f, 0.0f));
+        FLinearColor(0.012f, 0.030f, 0.026f, 0.0f));
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("DeepWaterColor")),
-        FLinearColor(0.010f, 0.024f, 0.032f, 0.0f));
+        FLinearColor(0.006f, 0.020f, 0.019f, 0.0f));
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("ReflectedSkyColor")),
-        FLinearColor(0.100f, 0.160f, 0.220f, 0.0f));
+        FLinearColor(0.075f, 0.130f, 0.150f, 0.0f));
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("WaterScattering")),
-        FLinearColor(0.00018f, 0.00023f, 0.00028f, 0.0f));
+        FLinearColor(0.00010f, 0.00028f, 0.00020f, 0.0f));
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("WaterAbsorption")),
-        FLinearColor(0.0055f, 0.0044f, 0.0038f, 0.0f));
+        FLinearColor(0.0066f, 0.0026f, 0.0040f, 0.0f));
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("RiverbedColorScale")),
-        FLinearColor(0.22f, 0.23f, 0.23f, 0.0f));
+        FLinearColor(0.60f, 0.64f, 0.58f, 0.0f));
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("RaftInteriorBehindWaterScale")),
         FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
@@ -966,19 +982,22 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.08f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicFoamColorCoreGain")), 0.95f);
-    // Fast, shallow Sierra water carries a broad distribution of short-wave
-    // slopes, but it still retains coherent sky/shore reflection at grazing
-    // angles. Keep a moderately rough surface rather than the previous matte
-    // 0.38 response, and restore a bounded water-like Fresnel lobe without
-    // inventing foam or changing solver-authored vertex channels.
+    // Clear pools are glassy: a tight specular lobe reads as real mirror
+    // water (dark where it reflects the far bank, bright only in the sun and
+    // sky lanes), while the previous 0.24 roughness blurred sky and shore
+    // into a uniform pale sheet that swamped the transmission ("river water
+    // should be clear and transparent", 2026-08-31). The additive fallback
+    // sky term gets the same treatment — it exists for reflection-history-
+    // free captures, and at 0.28 it was a constant milky veil over the
+    // guide's whole view.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("WaterRoughness")), 0.24f);
+        FMaterialParameterInfo(TEXT("WaterRoughness")), 0.15f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("Specular")), 0.28f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FresnelSpecular")), 0.18f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FallbackSkyReflectionStrength")), 0.28f);
+        FMaterialParameterInfo(TEXT("FallbackSkyReflectionStrength")), 0.15f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("CalmSurfaceColorVariation")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(

@@ -273,6 +273,10 @@ protected:
     UPROPERTY(VisibleAnywhere, Category = "RaftSim|Guide")
     ERaftSimGuideMobilityMode MobilityMode = ERaftSimGuideMobilityMode::InRaft;
 
+    /** Hysteretic over-the-shoulder state: while true, the guide avatar's
+     * body is hidden from the possessed first-person view. */
+    bool bGuideRearGlanceBodyHidden = false;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> Root;
 

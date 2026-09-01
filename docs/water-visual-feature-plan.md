@@ -312,6 +312,451 @@ water meshes regenerated in place via the new water-only rebuild flag
 terrain, far field, and materials untouched). All 39 band meshes
 regenerated; shoreline stills show one edge.
 
+## 2026-09-01 pillow round 3: the aerated collar (why "no pillow" persisted)
+
+"Theres still no pillow on the rock" (km 0.87, glassy pool). The probe
+proved the field was working — 11 footprints in the window, ring speed
+~3 m/s upstream, 19 cm max pillow — and the catalog covers the site
+(radius-1.65 footprint at station 882). The real gap: the pillow was
+CLEAR-WATER GEOMETRY ONLY. A sub-20 cm smooth transparent mound is
+invisible at distance on a calm surface, and with the clear-water
+optics it got even harder to see. What a player recognises as a pillow
+is the aerated collar where climbing water breaks white — and the
+pillow fed the boulder foam channel nothing (only the downstream wake
+term wrote foam, which is why rocks had white tails but never a white
+bow cushion). The pillow ring now also writes boulder wake foam,
+speed-gated: PillowRingT * (0.12 + 0.75 * SmoothStep(0.35, 1.60,
+speed)) — a faint lap line on pool rocks, a bright cushion where fast
+water actually aerates.
+
+## 2026-09-01 crew polish: rest grips untwisted, seated fold fixed
+
+"The hands on the t-grip look twisted" — the resting hands anchored
+exactly on the T-grip point, which selects the crossbar-axis precision
+grip solve; with the shaft laid across the lap the crossbar points
+fore-aft and the relaxed wrist wrenched 90 degrees around it. Resting
+hands now drape over the SHAFT (off the 2 cm T-grip window), knuckles
+along it, palms on top.
+
+"The feet seem to be coming out of the shins" — measurement first: the
+CC0 source rig's thigh/calf are 41/46 cm (new one-shot log), but leg
+skin SQUASHES between explicitly placed bone heads (the foot bone is
+pinned at the pose target and scaled to zero), so rig lengths are not
+the constraint. The real cause: a 10 cm knee-to-foot drop inside a
+~12 cm production boot cuff — the boot swallowed the whole shin and
+read as a foot sprouting mid-shin. The seated fold is now anatomical
+for a low tube: knees drawn up (Z 34), heels pulled back under them,
+soles planted on the interior floor (Z 6) — a ~28 cm shin drop that
+enters the cuff from clearly above. M5+P2+P3 green.
+
+## 2026-08-31 resting paddles + mirrored paddle grips
+
+"When they aren't paddling the paddles should be out of the water in a
+neutral position with the shaft resting on the thigh." SeatedIdle had
+no pose case of its own, so idle crew held the STROKE-READY base
+paddle: T-grip high at the chest, blade planted in the water. A
+dedicated SeatedIdle case now lays the shaft across the tops of the
+thighs just behind the knees (forward of the PFD belly so it cannot
+thread the torso), T-grip inboard, blade hanging outboard just above
+the tube, hands loosely on the shaft in the lap. The stroke/turn/brace
+cases still articulate from the untouched catch-ready base. Verified
+from a side capture: all blades level at lap height, out of the water.
+
+"The hand gripping the paddle shaft seems to be bending the wrong way
+like it is upside down or backwards" (player recording). The CC0 grip
+solver built its reference hand basis with one cross-product order for
+BOTH hands: index-to-pinky x hand-to-middle is the PALM normal on the
+right hand but the BACK of the hand on the mirrored left, so the left
+grip solved 180 degrees flipped about the shaft — palm away, wrist
+bent backwards. Its knuckle axis was also unmirrored, which put the
+left grip thumb-down on a shared shaft axis. Both are now
+side-mirrored (palm-normal basis per hand, knuckle line negated for
+the left), and the T-grip hand caps the grip from above instead of
+approaching underhand (the palm-approach ternary aimed the top-hand
+palm at the shoulder — an upside-down underhand hold).
+
+## 2026-08-31 seated legs inboard (feet on the raft floor)
+
+"The crew's legs should be in the boat with their feet on the floor of
+the boat" (guide-POV screenshot: every paddler's lower legs folded
+along the TOP of their tube). Root cause: the pose library's leg
+targets were side-blind — feet 34 cm straight ahead of the seat at
+lateral +/-15 — and the seat origin rides the tube crest at raft
+|Y| 62, so the feet landed at raft |Y| 47-77: on the tube, never over
+the interior. The 2026-08-30 "tucked brace" only moved them along the
+tube. The base pose now aims the legs INBOARD using the seat side the
+library already receives: knees at |Y|~35-57 crossing the tube's
+inner shoulder, feet at |Y|~22-40 planted at the measured interior
+surface height. Measured, not guessed: AttachAvatarToSeat now probes
+the raft visual mesh at the foot window with the same scanner the
+seat height uses and logs floor_top/foot_local_z (interior
+cushion/floor tops ~raft 21 vs tube top ~27 at the stern pair).
+High-side lateral shifts and the M5 relative-pose assertions are
+unaffected (they compare against the same base). Verified over-stern
+capture: knees drape inboard, lower legs inside the hull, no
+tube-folded legs, glutes clean. M5 5/5 + P2 + P3 green.
+
+## 2026-08-31 beached paddling gate + clear-water optics
+
+"Paddling on dry land should be impossible, the boat should simply be
+too heavy to move" (recording of a beached raft crawling under
+AllForward). Every stroke impulse — crew commands and the guide's
+direct stroke path — is now scaled by GetPaddleWaterPurchase(): the
+two blade stations (+/-165 cm on the right vector) each contribute 0.5
+when the water sample there is wet and >10 cm deep, and a raft
+grounded on 3+ support points caps purchase at 0.35 even if a blade
+finds a puddle. Fully dry = zero impulse; the sim never fakes it with
+extra mass. Afloat, both blades reach water and purchase is exactly
+1.0, so on-water behaviour (and every propulsion test fixture) is
+numerically unchanged.
+
+"River water should be clear and transparent, the aerated foamy parts
+should contrast with the clear pools where the colour of the rocks
+beneath comes through" (player reference photo of the real South
+Fork). The calibration was doing the opposite: RiverbedColorScale
+crushed the behind-water bed to ~20% of its light, opacity 0.76-0.82
+occluded the rest, and the carrier painted a bright teal body colour
+(LiveShallowSurfaceColor 0.10/0.23/0.24) on top — the milk in the
+recording. New optics on BOTH layers (MI for the static tiles,
+RiverWaterConfig defaults for the live carrier, now matched so the
+two meshes read as one body of water):
+- RiverbedColorScale 0.60/0.64/0.58 — submerged granite keeps its
+  light wherever water is not aerated.
+- Shallow/Deep opacity 0.30/0.54 — see through the margins, keep an
+  emerald body in the deep channel; FoamWaterOpacity stays 0.91 so
+  whitewater is still an opaque white pile (the contrast the player
+  asked for).
+- Absorption 0.0066/0.0026/0.0040 per cm — red dies ~2.5x faster than
+  green, so depth tints emerald instead of gray-teal; scattering
+  green-forward at 0.00010/0.00028/0.00020 (still ~200x below the
+  aerated coefficient) so the body glows green instead of milky gray.
+- Body colours dropped to near-black green (0.012/0.030/0.026 shallow,
+  0.006/0.020/0.019 deep) — clear water has almost no diffuse albedo;
+  its colour now comes from the volume and the bed, as in the photo.
+- The milky veil itself was mostly SURFACE terms, and the carrier wore
+  more of it than the tiles: the additive fallback sky tint ran at
+  0.62 strength on the carrier (LiveSkyReflectionStrength default) vs
+  0.28 on the MI, over a brighter sky colour, with specular 0.42 vs
+  0.28 — the guide's near-field water was the milkiest on the river.
+  Both layers now run fallback 0.15 over a darker green-gray sky
+  colour (0.075/0.130/0.150) and specular 0.28. Roughness drops
+  0.24 -> 0.15 on the tiles so reflections resolve as a mirror
+  instead of a diffuse sheet; the carrier keeps a 0.20 anti-glint
+  margin (its panning micro-normals strobed under a tight lobe,
+  measured 2026-08-27 — the tiles run zero micro-normals so they can
+  go tighter).
+Captured verification (shore + steep + rapid series): bed visible
+through the margins and shallow bars, green volume in the channel,
+white wake/foam contrast intact, no carrier/tile seam. MI re-authored
+via RaftSim.CreateSouthForkTransmissionWater (no V4 graph change
+needed — all edits are instance/config values). P2+P3+P4 15/15.
+
+## 2026-08-31 bend-following hull + visible boat wake
+
+Player experiment: raft released at the top of the first rapid ran a
+straight line through the left-arc instead of being carried with the
+water. Heading telemetry (new water_dir/raft_dir fields in the drift
+log) split the diagnosis: in a FREE drift the raft heading locks to the
+turning water within a degree — translation drag was never the defect —
+but under paddle thrust the boat runs 2-3x water speed and NOTHING ever
+yawed the hull, because drag was a single centre force with zero
+torque. Fix: per-point hull drag — each tube sample point drags against
+the water sampled AT that point with its own rotational velocity, so
+differential current along the hull becomes the bend-following yaw
+torque and rotation against uniform water becomes yaw damping. Weighted
+by per-point immersion over the point count, the uniform-water total is
+exactly the former centre force with zero net torque, so every tank and
+parity fixture is unchanged by construction; P2+P3+P4 15/15 including
+the flip and both approach-draft telemetry parities. Paddled repro now
+turns with the bend (raft +2.7 deg while water turns +7.3 deg over the
+same reach; free drift still heading-locked).
+
+"There is no wake behind the boat as the crew paddles" — three stacked
+causes: (1) 6 cm Kelvin-arm amplitude vanished at the first-person
+grazing angle (now 11 cm, 22 m trail, foam gate 0.6-2.5 cm; contract
+bound updated); (2) the wake state subtracted WORLD-frame water
+velocity from RIVER-frame boat velocity, skewing direction/magnitude
+everywhere the channel is not world-X-aligned (now projected through
+the local tangent basis); (3) the carrier's V4 transmission material —
+a frozen duplicate — had NO wake surface response at all (that lived
+only in the live-overlay material). First material pass (0.30 roughness
++ a foam-colour tint) read as WHITE AERATED bands under a bright sky —
+"it should just be a ripple like a lateral wave" — so the colour term
+was removed entirely and roughness cut to a 0.06 whisper: the ripple
+reads through the wake slopes already folded into the vertex normals
+(moving specular), which is the honest look for a displacement wake.
+V4 regenerated via RaftSim.CreateSouthForkTransmissionWater.
+Regen note: the first pythonscript attempt hung and its zombie held
+MPC_RaftSim_RaftFoamOcclusion.uasset locked, which fails the
+transmission creator's collection precondition (now logged with
+per-condition detail) — kill stale UnrealEditor-Cmd processes before
+regenerating.
+
+## 2026-08-31 handed guide seat
+
+"The guide should be right handed or left handed... if right handed they
+sit on the right side of the boat." The guide's visual seat was a
+centred coxswain perch (-175, 0) no paddle guide uses. The guide now
+perches on a stern-quarter tube at the paddler lateral (+/-62 cm),
+side chosen by raftsim.GuideLeftHanded (default 0 = right-handed,
+right tube), and ConfigureAppearance's seat side follows so the stroke,
+T-grip hand, and blade land on the dominant side. Physics seat mass
+stays at the Python reference's centre-stern (D6 parity untouched).
+Verified over-stern capture: centre empty, guide on the right tube;
+M5 5/5 + P2 3/3 green.
+
+## 2026-08-31 pillow round 2: waterline rocks + readability floor
+
+Repeat "no pillow" reports (km 0.86/0.88/0.91/0.98/1.02) forced three
+deeper moves:
+
+- Runtime probe added (behind raftsim.LogWaterRenderStateEvents):
+  "RaftSim boulder pillow probe: footprints=N wet_ring_verts=N
+  max_pillow_m=... max_ring_speed_mps=..." per refresh — proved the
+  field computes and applies (19 cm at 2.96 m/s in-window) in scripted
+  runs, so remaining player-visible gaps are location/flow-specific.
+
+- Waterline scenic rocks promoted to footprints: the rocks players
+  photograph are bank scatter standing at wide pools' waterlines, which
+  the footprint pipeline (rapid catalog only) never covered. The
+  environment pass now records scenic rocks >= 0.7 m radius whose base
+  sits within 25 cm of the local water surface and writes them beside
+  the catalog: boulder_footprints.json grew 113 -> 209. Cutout, pillow,
+  and wake attach to them automatically.
+
+- Readability floor: rocks at pool edges stand in slow bank water where
+  the physical stagnation rise is a few invisible centimetres. Any
+  current >= 0.12 m/s now guarantees at least a 33 % envelope
+  (~4-7 cm mound); dead-still water still mounds nothing. Contract test
+  extended (slow-drift floor + still-water zero).
+
+Note: the player's specific km 0.86-0.88 rock still is not positively
+identified among the placement systems (not catalog by position, not
+promoted-scenic there, cobble too small) and exposure differs between
+sessions at equal stations for unestablished reasons — if it stays
+flat, the in-game probe line pins which link fails.
+
+## 2026-08-30 headless guide shadow + cutout membrane (+ pillow triage)
+
+Three-part player report:
+
+- "The guide doesn't cast a full shadow, head is missing" — the
+  first-person head hide zero-scales the CC0 head bone and hid the
+  production helmet outright, which removed both from the shadow pass.
+  While the hide is active, the always-posed procedural head/helmet
+  shells and the production helmet now cast hidden-primitive shadows
+  (SetCastHiddenShadow, toggled symmetrically so third-person never
+  double-shadows).
+
+- "There seems to be a hole in the water texture" — the immutable-
+  topology island collapse anchored each column to its own nearest wet
+  row, and adjacent columns choosing OPPOSITE sides of a presence gap
+  stretched visible membranes across it (pale faceted sheet beside the
+  rock). First fix (per-column 1.5 m sink) was WORSE at real boulder
+  cutouts: the funnel from the water rim to the sunk sheet rendered as
+  a crater of exposed bed with faceted water walls around every exposed
+  rock ("no pillow and hole in water" / "disappearing water", player
+  screenshots km 0.98/1.02). Final treatment: a cutout gap collapses
+  onto ONE sunken point at its boulder footprint's centre (nearest grid
+  vertex, rim-referenced Z minus 0.8 R) so every interior quad is
+  degenerate and the rim cone dives beneath the rock mesh that owns the
+  cutout; footprint-less bar gaps revert to the original same-column
+  collapse, whose occasional slivers read as wet sheen, not craters.
+  Note for anyone reproducing: the release schedule moves the water
+  level over run time, so rocks exposed in a player session can be
+  submerged (or beached) in a fresh scripted capture — the geometry
+  logic is level-independent.
+
+- "The water flowing downhill should form a pillow as it slams into the
+  rock" — the player's follow-up HUD shot pinned it: river km 0.86 =
+  the Meat Grinder cluster (footprints 874/883/905, the big r=2.54 rock
+  downstream of the readout). Current there measures 1.26 m/s, but the
+  pillow's speed envelope SmoothStep(0.45, 1.65) muted moderate drift
+  current (~11 % amplitude at the 0.7-0.9 m/s that carries the raft
+  past exposed rocks — a dead-flat nose on a metre-wide boulder in
+  visibly moving water). Envelope lowered to SmoothStep(0.25, 1.20):
+  full amplitude from ~1.2 m/s, a readable ~7 cm mound at 0.8, still
+  nothing in slack water. Contract test extended with a moderate-drift
+  assertion (>4 cm at 0.8 m/s at the nose probe); the 1.8 m/s bound
+  assertions are unchanged. Note: water level differs between sessions
+  (release schedule), so the same rock can be exposed for the player
+  and submerged in a fresh capture — footprint attachment and pillow
+  amplitude are level-independent. Six rapids (incl. Chili Bar Hole)
+  still have no catalog boulders at all — flagged as a future content
+  pass, not part of this fix.
+
+## 2026-08-30 water growing onto the shore (solver bank-bleed suppression)
+
+Player recording (PIE, scout view of the km 0.15-0.19 point bar while
+the raft drifted past): "the shore is still changing with the water
+growing onto the shore". Waterline tracking on the clip measured
+±0.5-1.5 m advance/retreat swings on 1-4 s periods, tracking the raft.
+A fixed-camera hold test in -game showed a frozen waterline (±2 px over
+20 s), so the motion is coupled to the raft's approach: the crop
+authority handover. The recede half of that handover was already fixed
+(feather + visual-submersion keep), but the ADVANCE half never was — a
+solver-WET verdict landed instantly at full presence with the solver's
+own level, and the solver's bank wetting is one coarse cell wider and
+centimetres higher than the authored margin. Every pass of the crop
+painted that extra water up the flat bar and then drained it again; on
+a near-flat shelf a few centimetres of level step sweep the visible
+waterline metres sideways (the slow shore reference faithfully follows
+a sustained step within ~1.25 s).
+
+Fix — presentation defers to the baseline in shallow water: a
+solver-wet cell where the baseline is dry presents dry below 0.35 m
+(bank bleed, also cleared from the solver-wet presence/foam mask), and
+a shore cell whose solver level agrees with the baseline within 8 cm
+presents the baseline's level, so the handover never steps the slow
+reference. Deep or strongly deviating water — floods, surges, rapids —
+keeps full solver authority; physics is untouched. Verified: fixed-
+camera hold, drift-past, 9 fps drift-past, and authority-arrival
+captures all show the waterline steady within a few pixels (the
+arrival's feather front settles ~8 px once, smoothly); zero render-
+state events; RaftSim.P2+P3+P4 15/15.
+
+## 2026-08-30 shore flicker in PIE (immutable core topology)
+
+Player recording from a live editor (PIE) session at ~9 fps: "the shore
+appears and disappears" — the near-shore water flashed to a transparent
+window over the bed roughly once a second while drifting, reading as the
+beach appearing for a frame. Pixel forensics on the recording proved the
+surface never left (the "bed" pixels carried the water's transmission
+tint, nothing like the dry bank sand in the same frame): each flash is
+ONE FRAME of the carrier rendering with cold shading caches right after
+a mesh-section recreation. At 30 fps TSR blends that frame into a
+barely-visible pop (the long-running "reflective surface pops" saga —
+same event class); at PIE-hitch framerates each one is a full 110 ms
+shore flash.
+
+The drift benchmark with raftsim.LogWaterRenderStateEvents=1 showed the
+real recreation rate: ~2/s interior ("core_create_interp_topology") plus
+~2/s boundary ("core_boundary_create") — the interior/boundary split and
+frozen band had NOT made the lists stable, because interior emission
+still keyed on live wet presence (bFullyWetCell), which churns with
+wakes and lapping even mid-channel.
+
+Fix — immutable full-lattice topology: the core's index list now covers
+EVERY cell passing the static station-coverage feather and is built
+exactly once per grid shape. Wet/dry churn, recentres (pure vertex
+remap + in-place update), band motion, dry-out, and re-wet are all
+vertex motion: the directed dry pile extends across whole columns, and
+fully-dry columns duplicate their nearest present column's piled profile
+(all-dry windows sink the degenerate lattice out of sight instead of
+clearing the section). The interior/boundary section split, the
+deep-water dwell latch, the partition snapshot, the frozen band's
+escape rebuilds, and the boundary section itself are all retired — the
+one remaining CreateMeshSection is the first build of a grid shape.
+Verified: the same 90 s drift benchmark now logs 6 grid_recentre events
+and ZERO section events across five streaming handoffs; frame scan of
+2824 dumped frames shows no step anomalies after the walk-in teleports;
+shoreline reads clean in spot frames.
+
+## 2026-08-30 crew presentation: "butt gash", buried necks, guide rear glance
+
+Player report, four items (one screenshot pair + recording). The shore
+item was the already-fixed recession bug on a pre-fix recording; the
+other three were crew-visual defects:
+
+- "A gash in the right butt cheek of each crew member" — root cause was
+  NOT anatomy. The procedural paddle blade material was solid dark
+  blood-red (0.30, 0.05, 0.002); on the forward-stroke exit the blade
+  sweeps past the paddler's hip, and against the black wetsuit glutes
+  the maroon shape (plus TSR silhouette noise on the fast-moving edge)
+  read as an open wound. Proven by capture bracketing: blob absent in
+  plant/recovery frames, present at stroke exit, and it survives `show
+  StaticMeshes` (so not boots; the blade is procedural). Fix: commercial
+  polyethylene blade yellow (0.68, 0.44, 0.02, roughness 0.48) via
+  RaftSim.CreateRaftCrewMaterials; the guide's first-person paddle
+  shares the asset. Verified in captures: blade reads as equipment,
+  glutes clean in every stroke phase. (The seated-pelvis fallback mesh
+  also gained numeric central-difference normals replacing analytic
+  ellipse normals — correct shading if the procedural body is ever
+  presented, invisible while the CC0 body owns anatomy.)
+
+- Helmet/PFD/wetsuit interpenetration with no visible neck — geometry
+  made a neck impossible: solved head centre Z 91 put the head underside
+  (~78) below the PFD shoulder foam top (~81). EvaluatePose head raised
+  to Z 96 (CC0 bone chain follows the pose contract, so the rendered
+  neck stretches with it), procedural fallback neck lengthened
+  (offset -13, Z extent 9) and it keeps its skin material in the
+  production path (the old wetsuit-material override made any exposed
+  band read as more neoprene). Verified: helmet rides clear of the
+  collar with an articulated neck column between. Note: the visible
+  column renders as the CC0 suit's own black neoprene collar (the CC0
+  skin atlases are hash-locked photographs; the suit coverage is
+  authored mesh geometry) — flagged to the player that true skin tone
+  there would need per-variant work if the collar look isn't enough.
+
+- Guide's own body blocking the rear view — first-person rear glance now
+  hides the guide avatar (actor-level, restores per-component state on
+  return) with 100 degrees enter / 85 degrees exit hysteresis on the
+  control-vs-raft yaw offset.
+
+- "The crew legs clip into the boat texture" (follow-up report) — the
+  seated base pose was a bench-sit with knees at 21 cm and feet planted
+  45 cm forward at 8 cm, which drove the shins through the raised
+  self-bailing floor cushions and the inboard knees into the thwart
+  base. The legs now hold a tucked paddler's brace: knees (19, ±13, 27),
+  feet (34, ±15, 17) resting on the cushion tops. Verified from the
+  guide seat and a top-down interior view (clean silhouettes, boots
+  with floor contact shadows); M5 crew pose + rescue loop stay green
+  (the high-side leg asserts are relative shifts, unaffected by base
+  constants).
+
+Validation surfaced two RaftSim.M5 failures that PREDATE this session
+(the M5 test file last changed 2026-08-07): the forward-stroke landmark
+assert still encoded the reversed blade motion fixed on 2026-08-10
+(expectation updated to the validated catch-forward/sweep-rearward
+stroke), and RuntimeRescueLoop's exclusive-ownership assert has failed
+since the guide-eye camera landed on 2026-08-08 — the first-person
+guide hides its own helmet by design, so HasExclusiveCC0BodyOwnership
+now accepts a helmet hidden specifically by the first-person head hide
+(and logs which clause failed whenever ownership is refused). M5 also
+proved NullRHI-hostile (texture sizes read 0, Niagara never readies):
+run it with a real RHI.
+
+## 2026-08-30 black shapes in the wake (resurrected ripple overlay)
+
+Player recording: paddling forward produced large faceted black shapes
+in the water instead of a wake. The paddle-wake ripple overlay
+(SurfaceMesh section 1) had been silently dead since authoring — its
+in-place update always failed the engine's vertex-count check against
+the full-grid section BuildGrid created — so its material was never
+reviewed on real geometry. The section-count hardening (recreate on
+mismatch) resurrected it, and it renders black. Per the standing
+one-visible-carrier constraint the overlay is a second sheet anyway;
+the wake belongs to the carrier's own signed vertex displacement
+(Kelvin-arm field, ~6 cm, 16 m), which the black mass was occluding.
+Retired behind raftsim.PaddleWakeRippleOverlay (default 0). Wake area
+renders clean; if the geometric wake reads too subtle in review, tune
+its amplitude/foam rather than reviving the overlay.
+
+## 2026-08-30 shore recession (authority-handover dry front)
+
+Player recording: "the water seems to suddenly recede from the shores
+for no reason" — bank bays and, in reproduction, whole shallow shelves
+draining behind a hard straight line that marches with the raft. Cause:
+the live solver's wetting is coarser than the visible margin, so as the
+crop's authority feather sweeps in, its dry verdicts drain baseline-wet
+shallow cells in plain view. The old 5 mm static water used to mask this
+(it skinned the same shelves regardless), so retracting it to the 6 cm
+line unmasked the sweep; the frozen band's dry pile then rendered the
+draining front as a razor edge.
+
+Fix — visual-submersion keep: where the rendered-terrain probe proves
+the water plane genuinely covers the visible ground by >= the film
+cull's release depth (9 cm), a solver-dry / baseline-wet cell keeps
+presenting the baseline at full strength regardless of crop authority.
+Physics stays solver-owned. Probes now also cover the whole
+solver/baseline disagreement set (not just the outer bank rings; budget
+raised to 192/refresh) so shelf interiors are defended too; boulder
+cutouts stay solver-owned because their traces hit the untagged boulder
+and fail open without granting the keep. Verified: the drift burst that
+previously emptied the entire view (recede_007) now holds a full river
+with one clean waterline; RaftSim.P2+P3+P4 15/15 with zero
+procedural-mesh or handoff error lines.
+
 Hardening from the post-rebuild suite run: every in-place mesh-section
 update in the water actor now verifies the section's CURRENT vertex
 count and recreates on mismatch (a cleared section keeps its entry with

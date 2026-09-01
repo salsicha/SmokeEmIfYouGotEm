@@ -6,6 +6,7 @@
 #include "Components/LightComponent.h"
 #include "Engine/DirectionalLight.h"
 #include "EngineUtils.h"
+#include "HAL/IConsoleManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "ProfilingDebugging/CpuProfilerTrace.h"
@@ -25,6 +26,17 @@
 #include "RaftSimWaterVfxActor.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
+
+// A commercial guide paddles from a stern quarter on their dominant side —
+// a right-handed guide sits the right tube, a lefty the left ("if they are
+// right handed they sit on the right side of the boat", player report
+// 2026-08-31; the old seat was a centred coxswain perch no paddle guide
+// uses). Presentation-side only: the physics seat mass stays at the Python
+// reference's centre-stern position so D6 parity is untouched.
+static TAutoConsoleVariable<int32> CVarRaftSimGuideLeftHanded(
+    TEXT("raftsim.GuideLeftHanded"), 0,
+    TEXT("0 = right-handed guide (sits the right stern quarter, paddles on ")
+    TEXT("the right; default), 1 = left-handed (mirrored)."));
 
 namespace
 {
@@ -863,7 +875,11 @@ void ARaftSimRaftActor::SpawnCrewVisuals()
     if (ARaftSimCrewAvatarActor* Guide = GetWorld()->SpawnActor<ARaftSimCrewAvatarActor>(
             ARaftSimCrewAvatarActor::StaticClass(), GetActorTransform(), GuideParams))
     {
-        Guide->ConfigureAppearance(0, 1, true);
+        // Seat side follows handedness so the stroke, T-grip hand, and
+        // blade all land on the dominant side the guide actually sits.
+        const bool bGuideLeftHanded =
+            CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0;
+        Guide->ConfigureAppearance(0, bGuideLeftHanded ? -1 : 1, true);
         CrewAvatars.Add(Guide);
         AttachAvatarToSeat(Guide, TEXT("guide"));
     }
@@ -898,7 +914,12 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     // bottom rides 25 cm above the avatar origin, so guessed constants
     // kept landing in the air. Measure instead: rest the pelvis ON the
     // rendered tube surface under the seat station.
-    FVector SeatCm(-175.0f, 0.0f, 30.0f);
+    // The guide perches on a stern-quarter tube on their dominant side,
+    // same lateral as the paddler seats; only the physics mass stays at
+    // the parity-pinned centre.
+    const float GuideSide =
+        CVarRaftSimGuideLeftHanded.GetValueOnGameThread() != 0 ? -1.0f : 1.0f;
+    FVector SeatCm(-175.0f, GuideSide * 62.0f, 30.0f);
     if (PassengerId != TEXT("guide"))
     {
         FString Id = PassengerId.ToString();
@@ -918,9 +939,21 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
         SeatCm.Z = TubeTopZCm - Avatar->GetSeatedPelvisBottomLocalZCm() -
             SeatContactSinkCm;
     }
+    // Probe the interior floor where this paddler's feet should plant
+    // (inboard of the tube, forward of the seat) with the same scanner the
+    // seat uses. The pose library's leg targets are calibrated against this
+    // measured value; the log keeps the calibration honest when the raft
+    // mesh changes.
+    FVector FootProbeCm = SeatCm;
+    FootProbeCm.X += 27.0f;
+    FootProbeCm.Y -= FMath::Sign(SeatCm.Y) * 32.0f;
+    bool bFloorFound = false;
+    const float FloorTopZCm = ComputeSeatTubeTopZCm(FootProbeCm, bFloorFound);
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim seat: id=%s measured=%d tube_top=%.1f seat_z=%.1f"),
-        *PassengerId.ToString(), bTubeFound ? 1 : 0, TubeTopZCm, SeatCm.Z);
+        TEXT("RaftSim seat: id=%s measured=%d tube_top=%.1f seat_z=%.1f "
+             "floor_found=%d floor_top=%.1f foot_local_z=%.1f"),
+        *PassengerId.ToString(), bTubeFound ? 1 : 0, TubeTopZCm, SeatCm.Z,
+        bFloorFound ? 1 : 0, FloorTopZCm, FloorTopZCm - SeatCm.Z);
     Avatar->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
     Avatar->SetActorRelativeLocation(SeatCm);
     Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
@@ -1185,16 +1218,22 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
             PerPaddler * Crew * PaddleShortfall,
             static_cast<int32>(ActiveCrewCommand));
     }
+    const float WaterPurchase = GetPaddleWaterPurchase();
+    if (WaterPurchase <= KINDA_SMALL_NUMBER)
+    {
+        return;
+    }
     switch (ActiveCrewCommand)
     {
         case ERaftSimCrewCommand::AllForward:
             RaftAdapter->AddExternalImpulse(
-                Forward * PerPaddler * Crew * PaddleShortfall, FVector::ZeroVector);
+                Forward * PerPaddler * Crew * PaddleShortfall * WaterPurchase,
+                FVector::ZeroVector);
             break;
         case ERaftSimCrewCommand::AllBackward:
             RaftAdapter->AddExternalImpulse(
                 -Forward * PerPaddler * Crew *
-                    GetPaddlePropulsionShortfall(-Forward),
+                    GetPaddlePropulsionShortfall(-Forward) * WaterPurchase,
                 FVector::ZeroVector);
             break;
         case ERaftSimCrewCommand::TurnLeft:
@@ -1211,19 +1250,61 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 : 1.0f;
             RaftAdapter->AddExternalImpulse(
                 FVector::ZeroVector,
-                FVector(0.0f, 0.0f, TurnSign * TurnPerPaddler * Crew * 1.1f));
+                FVector(0.0f, 0.0f,
+                    TurnSign * TurnPerPaddler * Crew * 1.1f * WaterPurchase));
             break;
         }
         case ERaftSimCrewCommand::Stop:
         {
             // Brace/back-paddle to shed speed.
             const FVector Vel = RaftAdapter->GetKinematicState().LinearVelocityMetersPerSecond;
-            RaftAdapter->AddExternalImpulse(-Vel.GetSafeNormal() * PerPaddler * Crew, FVector::ZeroVector);
+            RaftAdapter->AddExternalImpulse(
+                -Vel.GetSafeNormal() * PerPaddler * Crew * WaterPurchase,
+                FVector::ZeroVector);
             break;
         }
         default:
             break;
     }
+}
+
+float ARaftSimRaftActor::GetPaddleWaterPurchase() const
+{
+    // Paddles only move the boat when the blades reach water. On a dry bar
+    // the crew's strokes sweep sand, and a loaded raft is far too heavy to
+    // scoot from that ("paddling on dry land should be impossible", player
+    // recording 2026-08-31 — the beached raft crawled across the beach
+    // under AllForward). Each side's blade station is sampled where the
+    // blades actually plant; a half-beached raft keeps half its purchase,
+    // and a firmly grounded hull keeps only enough bite to work itself off
+    // a gravel touch, not to drive overland.
+    if (Bridge == nullptr)
+    {
+        return 1.0f;
+    }
+    const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime();
+    if (Water == nullptr)
+    {
+        return 1.0f;
+    }
+    const FVector RightCm = GetActorRightVector() * 165.0f;
+    float Purchase = 0.0f;
+    for (const float Side : {-1.0f, 1.0f})
+    {
+        FRaftSimWaterSample Sample;
+        if (Water->SampleWaterAtWorldPosition(
+                GetActorLocation() + RightCm * Side, Sample) &&
+            Sample.bWet && Sample.DepthMeters > 0.10f)
+        {
+            Purchase += 0.5f;
+        }
+    }
+    if (Purchase > 0.0f && RaftAdapter != nullptr &&
+        RaftAdapter->GetLastGroundedSupportPointCount() >= 3)
+    {
+        Purchase = FMath::Min(Purchase, 0.35f);
+    }
+    return Purchase;
 }
 
 float ARaftSimRaftActor::GetPaddlePropulsionShortfall(
@@ -1301,8 +1382,11 @@ void ARaftSimRaftActor::QueueDirectStrokeImpulse(
     // reached the water (2026-08-11: "the boat turns but the paddle
     // animation comes after the motion"). The same power-window midpoint is
     // used for direct guide strokes and crew propulsion.
-    PendingDirectLinearImpulseNs += LinearImpulseNs;
-    PendingDirectAngularImpulseNms += AngularImpulseNms;
+    // The guide's blade obeys the same water-purchase rule as the crew's:
+    // no water under the blade, no push.
+    const float WaterPurchase = GetPaddleWaterPurchase();
+    PendingDirectLinearImpulseNs += LinearImpulseNs * WaterPurchase;
+    PendingDirectAngularImpulseNms += AngularImpulseNms * WaterPurchase;
     if (DirectImpulseDelaySeconds <= 0.0f)
     {
         const float PowerMidPhase = 0.5f * (
@@ -1376,6 +1460,14 @@ void ARaftSimRaftActor::SetGuideFirstPersonView(bool bFirstPerson)
     }
 }
 
+void ARaftSimRaftActor::SetGuideFirstPersonBodyHidden(bool bShouldHide)
+{
+    if (ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide")))
+    {
+        Guide->SetFirstPersonBodyHidden(bShouldHide);
+    }
+}
+
 bool ARaftSimRaftActor::GetGuideHeadWorldLocationCm(FVector& OutCm) const
 {
     const ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide"));
@@ -1404,6 +1496,7 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     {
         DriftTelemetrySeconds = 0.0f;
         float WaterSpeedMps = 0.0f;
+        float WaterHeadingDeg = 0.0f;
         float SolverSurfaceZCm = 0.0f;
         float SupportSurfaceZCm = 0.0f;
         float FloorCenterZCm = 0.0f;
@@ -1419,6 +1512,9 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
                 if (Sample.bWet)
                 {
                     WaterSpeedMps = Sample.VelocityMetersPerSecond.Size2D();
+                    WaterHeadingDeg = FMath::RadiansToDegrees(FMath::Atan2(
+                        Sample.VelocityMetersPerSecond.Y,
+                        Sample.VelocityMetersPerSecond.X));
                 }
             }
             SupportSurfaceZCm = SolverSurfaceZCm;
@@ -1464,7 +1560,8 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             TEXT("render_floor_freeboard_cm=%.1f pitch_deg=%.1f wet=%d retained_kg=%.0f ")
             TEXT("pressure=%.2f integrity=%.2f dry_points=%d ground_points=%d ")
             TEXT("ground_penetration_m=%.3f x_cm=%.0f y_cm=%.0f ")
-            TEXT("sun_pitch=%.1f sun_intensity=%.1f"),
+            TEXT("sun_pitch=%.1f sun_intensity=%.1f ")
+            TEXT("water_dir_deg=%.1f raft_dir_deg=%.1f"),
             GetRaftVelocity().Size(),
             WaterSpeedMps,
             GetActorLocation().Z,
@@ -1485,7 +1582,10 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             GetActorLocation().X,
             GetActorLocation().Y,
             SunPitchDeg,
-            SunIntensityLux);
+            SunIntensityLux,
+            WaterHeadingDeg,
+            FMath::RadiansToDegrees(FMath::Atan2(
+                GetRaftVelocity().Y, GetRaftVelocity().X)));
     }
 
     RockObstacleRefreshRemaining -= DeltaSeconds;

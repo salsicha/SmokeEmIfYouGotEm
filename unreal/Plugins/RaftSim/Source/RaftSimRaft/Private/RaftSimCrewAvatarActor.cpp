@@ -308,11 +308,11 @@ void BuildUnitSeatedPelvisMesh(
     // pointed crotch wedge between a floating torso and two thighs.
     constexpr int32 Rings = 18;
     constexpr int32 Sides = 32;
-    for (int32 Ring = 0; Ring <= Rings; ++Ring)
+    const auto SurfacePoint = [](float V, float U) -> FVector
     {
-        const float V = static_cast<float>(Ring) / Rings;
         const float Z = 1.0f - 2.0f * V;
-        const float MidVolume = FMath::Pow(FMath::Sin(PI * V), 0.58f);
+        const float MidVolume = FMath::Pow(
+            FMath::Max(FMath::Sin(PI * V), 0.0f), 0.58f);
         const float UpperFit = FMath::Max(Z, 0.0f);
         const float LowerFit = FMath::Max(-Z, 0.0f);
         const float Depth = 0.72f + 0.28f * MidVolume - 0.02f * UpperFit;
@@ -320,31 +320,54 @@ void BuildUnitSeatedPelvisMesh(
         const float SeatBulge =
             FMath::Exp(-FMath::Square((Z + 0.35f) / 0.5f));
         const float PosteriorBias = 0.06f * MidVolume + 0.18f * SeatBulge;
+        const float Theta = 2.0f * PI * U;
+        const float CosTheta = FMath::Cos(Theta);
+        const float SinTheta = FMath::Sin(Theta);
+        const float SaddleLift = LowerFit *
+            FMath::Square(1.0f - FMath::Abs(SinTheta)) * 0.28f;
+        return FVector(
+            Depth * CosTheta - PosteriorBias,
+            Width * SinTheta,
+            Z + SaddleLift);
+    };
+    for (int32 Ring = 0; Ring <= Rings; ++Ring)
+    {
+        const float V = static_cast<float>(Ring) / Rings;
         for (int32 Side = 0; Side <= Sides; ++Side)
         {
             const float U = static_cast<float>(Side) / Sides;
-            const float Theta = 2.0f * PI * U;
-            const float CosTheta = FMath::Cos(Theta);
-            const float SinTheta = FMath::Sin(Theta);
-            const float SaddleLift = LowerFit *
-                FMath::Square(1.0f - FMath::Abs(SinTheta)) * 0.28f;
-            const FVector Point(
-                Depth * CosTheta - PosteriorBias,
-                Width * SinTheta,
-                Z + SaddleLift);
+            const FVector Point = SurfacePoint(V, U);
 
-            // The side normal follows the elliptical cross-section. A small
-            // vertical component rounds the transition into the hidden caps
-            // without turning the whole pelvis back into an oval.
-            const float CapBlend = FMath::Pow(FMath::Abs(Z), 3.0f);
-            const FVector ApproximateNormal(
-                CosTheta / FMath::Max(Depth, UE_SMALL_NUMBER),
-                SinTheta / FMath::Max(Width, UE_SMALL_NUMBER),
-                FMath::Sign(Z) * 0.32f * CapBlend);
+            // Numeric surface normals: the former analytic ellipse normal
+            // ignored the saddle and posterior displacements, so the shadow
+            // terminator disagreed with the real surface and the PFD's cast
+            // shadow cut across the sunward glute as a hard "gash" (player
+            // report, 2026-08-30). Central differences follow whatever the
+            // position formula does.
+            constexpr float E = 0.004f;
+            const FVector DPdU =
+                SurfacePoint(V, U + E) - SurfacePoint(V, U - E);
+            const FVector DPdV =
+                SurfacePoint(FMath::Clamp(V + E, 0.0f, 1.0f), U) -
+                SurfacePoint(FMath::Clamp(V - E, 0.0f, 1.0f), U);
+            FVector Normal = FVector::CrossProduct(DPdV, DPdU).GetSafeNormal();
+            if (Normal.IsNearlyZero())
+            {
+                Normal = FVector(Point.X, Point.Y, 0.0f).GetSafeNormal();
+            }
+            // Outward orientation: the surface wraps counter-clockwise, but
+            // guard against degenerate rows at the caps.
+            if (FVector::DotProduct(
+                    Normal, FVector(Point.X, Point.Y, 0.0f)) < 0.0f)
+            {
+                Normal = -Normal;
+            }
+            const float Theta = 2.0f * PI * U;
             Vertices.Add(Point * kBaseRadiusCm);
-            Normals.Add(ApproximateNormal.GetSafeNormal());
+            Normals.Add(Normal);
             UVs.Add(FVector2D(U, V));
-            Tangents.Add(FProcMeshTangent(-SinTheta, CosTheta, 0.0f));
+            Tangents.Add(FProcMeshTangent(
+                -FMath::Sin(Theta), FMath::Cos(Theta), 0.0f));
         }
     }
     for (int32 Ring = 0; Ring < Rings; ++Ring)
@@ -1016,17 +1039,42 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     const float Wave = StrokeWave(NormalizedPhase);
     FRaftSimCrewAvatarPose Pose;
     Pose.TorsoCenterCm = FVector(2.0f, 0.0f, 59.0f);
-    Pose.HeadCenterCm = FVector(6.0f, 0.0f, 91.0f);
+    // Head raised from 91 (2026-08-30): the PFD's shoulder foam tops out
+    // near world Z 81 while the head's underside sat at 78, so helmet, vest,
+    // and suit interpenetrated and no neck could ever show. Five centimetres
+    // opens a real collar gap the neck ellipsoid fills.
+    Pose.HeadCenterCm = FVector(6.0f, 0.0f, 96.0f);
     Pose.LeftShoulderCm = FVector(4.0f, -17.0f, 76.0f);
     Pose.RightShoulderCm = FVector(4.0f, 17.0f, 76.0f);
     Pose.LeftHandCm = FVector(28.0f, -25.0f, 55.0f);
     Pose.RightHandCm = FVector(42.0f, 12.0f, 42.0f);
     Pose.LeftHipCm = FVector(-4.0f, -10.0f, 40.0f);
     Pose.RightHipCm = FVector(-4.0f, 10.0f, 40.0f);
-    Pose.LeftKneeCm = FVector(22.0f, -14.0f, 21.0f);
-    Pose.RightKneeCm = FVector(22.0f, 14.0f, 21.0f);
-    Pose.LeftFootCm = FVector(45.0f, -17.0f, 8.0f);
-    Pose.RightFootCm = FVector(45.0f, 17.0f, 8.0f);
+    // Seated legs drop INBOARD, not straight ahead (2026-08-31): the seat
+    // origin rides the tube crest at raft |Y| 62, so the former side-blind
+    // targets (feet 34 cm forward at lateral +/-15) landed at raft |Y|
+    // 47-77 — the whole lower leg folded ON TOP of the tube ("the crew's
+    // legs should be in the boat with their feet on the floor of the
+    // boat"). A tube-sitting paddler's thighs cross the tube's inner
+    // shoulder and the feet plant on the self-bailing floor toward the
+    // centreline. Measured raft frame (seat log floor probe): tube top
+    // ~27, interior cushion/floor tops ~21 in the foot zone; seat origin
+    // ~raft 0. Knees hold just inside the tube at |Y|~35-57, feet reach
+    // the floor at |Y|~22-40 with soles at the cushion surface.
+    // The leg skin squashes between explicitly placed bone heads (the foot
+    // bone is pinned at the pose target), so spans need not match the
+    // source rig — but they DO have to clear the production boot: its cuff
+    // stands ~12 cm tall, and the previous 10 cm knee-to-foot drop left the
+    // boot swallowing the whole shin, reading as a foot sprouting mid-shin
+    // ("the feet seem to be coming out of the shins"). Sit the fold the way
+    // a paddler actually does on a low tube: knees drawn up, heels pulled
+    // back under them, soles planted on the interior floor — a ~28 cm shin
+    // drop that enters the boot cuff from clearly above it.
+    const float InboardSign = -Side;
+    Pose.LeftKneeCm = FVector(26.0f, InboardSign * 15.0f - 11.0f, 34.0f);
+    Pose.RightKneeCm = FVector(26.0f, InboardSign * 15.0f + 11.0f, 34.0f);
+    Pose.LeftFootCm = FVector(20.0f, InboardSign * 32.0f - 9.0f, 6.0f);
+    Pose.RightFootCm = FVector(20.0f, InboardSign * 32.0f + 9.0f, 6.0f);
     // The T-grip belongs inboard of the tube and the blade belongs outboard
     // in the water. The previous signs were reversed, so both blades aimed at
     // the raft centre; perspective happened to hide the error on port while
@@ -1037,6 +1085,43 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
 
     switch (Action)
     {
+        case ERaftSimCrewAvatarAction::SeatedIdle:
+        {
+            // At rest the paddle comes OUT of the water: the shaft lies
+            // across the tops of the thighs just behind the knees — forward
+            // of the PFD belly so it never threads through the torso — with
+            // the T-grip inboard and the blade hanging outboard above the
+            // tube, hands loosely on the shaft ("when they aren't paddling
+            // the paddles should be out of the water in a neutral position
+            // with the shaft resting on the thigh", 2026-08-31). The base
+            // catch-ready paddle below stays untouched for the strokes.
+            Pose.PaddleTopCm = FVector(18.0f, -30.0f * Side, 36.0f);
+            Pose.PaddleBottomCm = FVector(30.0f, 52.0f * Side, 40.0f);
+            // Resting hands drape over the SHAFT, not the T-grip: an exact
+            // T-grip anchor selects the crossbar-axis grip solve, and with
+            // the shaft laid laterally the crossbar points fore-aft, so the
+            // relaxed wrist wrenched 90 degrees around it ("the hands on
+            // the t-grip look twisted"). Off the 2 cm T-grip window both
+            // hands take the along-shaft grip: knuckles down the shaft,
+            // palms resting on it from above.
+            {
+                const FVector RestUpperHandCm = FMath::Lerp(
+                    Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.15f);
+                const FVector RestLowerHandCm = FMath::Lerp(
+                    Pose.PaddleTopCm, Pose.PaddleBottomCm, 0.45f);
+                if (Side < 0.0f)
+                {
+                    Pose.LeftHandCm = RestLowerHandCm;
+                    Pose.RightHandCm = RestUpperHandCm;
+                }
+                else
+                {
+                    Pose.LeftHandCm = RestUpperHandCm;
+                    Pose.RightHandCm = RestLowerHandCm;
+                }
+            }
+            break;
+        }
         case ERaftSimCrewAvatarAction::ForwardStroke:
         {
             const float Reach = 14.0f * Wave;
@@ -1197,7 +1282,6 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
             Pose.RightHandCm = FVector(70.0f, 25.0f, 38.0f);
             Pose.bShowPaddle = false;
             break;
-        case ERaftSimCrewAvatarAction::SeatedIdle:
         default:
             // Resting crew sit still. The former +/-1.5/2.0 cm stroke-cadence
             // bob ran ungated by any water state, telescoping the upper body
@@ -2307,6 +2391,10 @@ bool ARaftSimCrewAvatarActor::HasExclusiveCC0BodyOwnership() const
         Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor());
     if (!bUsingProductionVisual || !CC0Visual || !CC0Visual->IsBodyReady())
     {
+        UE_LOG(LogTemp, Display,
+            TEXT("%s: CC0 ownership false (production=%d cc0=%d ready=%d)"),
+            *GetName(), bUsingProductionVisual ? 1 : 0, CC0Visual != nullptr,
+            CC0Visual && CC0Visual->IsBodyReady());
         return false;
     }
     const UProceduralMeshComponent* RedundantBodyOverlays[] = {
@@ -2321,26 +2409,48 @@ bool ARaftSimCrewAvatarActor::HasExclusiveCC0BodyOwnership() const
     {
         if (!Overlay || Overlay->IsVisible())
         {
+            UE_LOG(LogTemp, Display,
+                TEXT("%s: CC0 ownership false (overlay %s visible)"),
+                *GetName(), Overlay ? *Overlay->GetName() : TEXT("<null>"));
             return false;
         }
     }
-    return HasProductionWhitewaterPfd() && ProductionPfd->IsVisible() &&
-        HasProductionWhitewaterHelmet() && ProductionHelmet->IsVisible() &&
+    // The first-person guide deliberately hides its own helmet (and CC0
+    // head) so the camera can sit in the eye socket; that presentation
+    // choice still counts as exclusive ownership of a complete wardrobe.
+    const bool bHelmetPresented =
+        ProductionHelmet->IsVisible() || bFirstPersonHeadHidden;
+    const bool bGearComplete =
+        HasProductionWhitewaterPfd() && ProductionPfd->IsVisible() &&
+        HasProductionWhitewaterHelmet() && bHelmetPresented &&
         HasProductionRiverBoots() && ProductionLeftBoot->IsVisible() &&
         ProductionRightBoot->IsVisible();
+    if (!bGearComplete)
+    {
+        UE_LOG(LogTemp, Display,
+            TEXT("%s: CC0 ownership false (pfd=%d/%d helmet=%d/%d/fp%d "
+                 "boots=%d/%d,%d)"),
+            *GetName(),
+            HasProductionWhitewaterPfd() ? 1 : 0,
+            ProductionPfd && ProductionPfd->IsVisible(),
+            HasProductionWhitewaterHelmet() ? 1 : 0,
+            ProductionHelmet && ProductionHelmet->IsVisible(),
+            bFirstPersonHeadHidden ? 1 : 0,
+            HasProductionRiverBoots() ? 1 : 0,
+            ProductionLeftBoot && ProductionLeftBoot->IsVisible(),
+            ProductionRightBoot && ProductionRightBoot->IsVisible());
+    }
+    return bGearComplete;
 }
 
 void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
 {
-    if (!bVisible && Neck)
-    {
-        if (UMaterialInterface* ProductionWetsuit = LoadObject<UMaterialInterface>(
-                nullptr,
-                TEXT("/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit")))
-        {
-            Neck->SetMaterial(0, ProductionWetsuit);
-        }
-    }
+    // The neck gap-fill used to be repainted with the wetsuit material in the
+    // production path, which made vest, suit, and helmet read as one unbroken
+    // neoprene mass. It keeps its skin material now (2026-08-30): the band it
+    // renders sits between the PFD collar and the helmet's chin line, exactly
+    // where a rafter's bare neck shows, and the wetsuit torso tip still
+    // supplies a short neoprene collar beneath it.
     const bool bHasProductionHelmet = HasProductionWhitewaterHelmet();
     const bool bHasProductionPfd = HasProductionWhitewaterPfd();
     const bool bHasProductionBoots = HasProductionRiverBoots();
@@ -2455,14 +2565,51 @@ void ARaftSimCrewAvatarActor::SetFirstPersonHeadHidden(bool bShouldHide)
         if (HelmetRim) HelmetRim->SetVisibility(bVisible);
         if (HelmetRetention) HelmetRetention->SetVisibility(bVisible);
     }
+    // The first-person camera must not render its own skull, but the sun
+    // still should: the CC0 head bone is zero-scaled for the view, which
+    // also removed it from the shadow pass, so the guide's shadow on the
+    // water was headless ("the guide doesn't cast a full shadow, head is
+    // missing", player screenshot 2026-08-30). The procedural head and
+    // helmet shells stay posed every frame even while replaced by the
+    // production layers, so while the first-person hide is active they
+    // cast hidden-primitive shadows as stand-ins; the toggle is symmetric
+    // so leaving first person never double-shadows the production helmet.
+    for (UProceduralMeshComponent* ShadowProxy :
+         {Head, Helmet, HelmetRim, HelmetRetention})
+    {
+        if (ShadowProxy)
+        {
+            ShadowProxy->SetCastHiddenShadow(bShouldHide);
+        }
+    }
     if (ProductionHelmet)
     {
         ProductionHelmet->SetVisibility(bVisible && HasProductionWhitewaterHelmet());
+        // Same rule as the procedural shells: invisible to the wearer's
+        // camera, present in the sun's.
+        ProductionHelmet->SetCastHiddenShadow(bShouldHide);
     }
     if (ARaftSimCC0CrewVisualActor* CC0Visual =
             Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
     {
         CC0Visual->SetHeadHiddenForFirstPerson(bShouldHide);
+    }
+}
+
+void ARaftSimCrewAvatarActor::SetFirstPersonBodyHidden(bool bShouldHide)
+{
+    if (bFirstPersonBodyHidden == bShouldHide)
+    {
+        return;
+    }
+    bFirstPersonBodyHidden = bShouldHide;
+    // Actor-level hiding leaves the layered per-component visibility state
+    // (procedural parts vs production replacement layers) untouched, so
+    // ending the glance restores exactly the pre-glance arrangement.
+    SetActorHiddenInGame(bShouldHide);
+    if (AActor* ProductionVisualActor = GetProductionVisualActor())
+    {
+        ProductionVisualActor->SetActorHiddenInGame(bShouldHide);
     }
 }
 
@@ -3192,12 +3339,15 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         ? FVector(4.0f, 0.0f, 0.0f)
         : FVector::ZeroVector;
     const float CollarFit = bUsingProductionVisual ? 1.28f : 1.0f;
+    // Lengthened with the raised head (2026-08-30) so skin spans the whole
+    // opening between the PFD collar foam and the helmet's chin line instead
+    // of ending inside the vest.
     SetEllipsoid(
         Neck,
-        Pose.HeadCenterCm - TorsoRotation.RotateVector(FVector(0.0f, 0.0f, 12.0f)) +
+        Pose.HeadCenterCm - TorsoRotation.RotateVector(FVector(0.0f, 0.0f, 13.0f)) +
             TorsoRotation.RotateVector(CollarOffset),
         Pose.TorsoRotation,
-        FVector(5.8f, 5.8f, 7.0f) * CollarFit);
+        FVector(5.8f, 5.8f, 9.0f) * CollarFit);
     SetEllipsoid(Head, Pose.HeadCenterCm, Pose.TorsoRotation,
                  FVector(11.0f, 10.0f, 13.0f) * HeadScale);
     // The component now contains an explicitly open top/back shell. Keep it

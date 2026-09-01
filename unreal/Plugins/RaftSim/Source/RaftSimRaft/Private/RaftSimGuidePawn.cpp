@@ -238,9 +238,27 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     // chase-camera toggles and swims automatically.
     if (ARaftSimRaftActor* Raft = ResolveRaft())
     {
-        Raft->SetGuideFirstPersonView(
+        const bool bFirstPersonSeat =
             !CameraRuntimeState.bChaseCameraActive &&
-            MobilityMode == ERaftSimGuideMobilityMode::InRaft);
+            MobilityMode == ERaftSimGuideMobilityMode::InRaft;
+        Raft->SetGuideFirstPersonView(bFirstPersonSeat);
+        // Over-the-shoulder glance: a seated human turns their head, not
+        // their torso, so a strongly rearward view must not fill with the
+        // inside of the guide's own arms and vest. Hide the avatar's body
+        // past ~100 degrees of view-vs-hull yaw, restore under ~85, so the
+        // toggle never flickers at the boundary.
+        const float ViewYawOffsetDegrees = FMath::Abs(FMath::UnwindDegrees(
+            GetControlRotation().Yaw - Raft->GetActorRotation().Yaw));
+        if (bGuideRearGlanceBodyHidden)
+        {
+            bGuideRearGlanceBodyHidden = ViewYawOffsetDegrees > 85.0f;
+        }
+        else
+        {
+            bGuideRearGlanceBodyHidden = ViewYawOffsetDegrees > 100.0f;
+        }
+        Raft->SetGuideFirstPersonBodyHidden(
+            bFirstPersonSeat && bGuideRearGlanceBodyHidden);
     }
 }
 

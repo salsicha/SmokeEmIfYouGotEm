@@ -720,10 +720,13 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
         TEXT("forward stroke articulates the upper body around the waist"),
         FVector::Distance(Forward.HeadCenterCm, Seated.HeadCenterCm) > 4.0f &&
             FVector::Distance(Forward.LeftShoulderCm, Seated.LeftShoulderCm) > 2.0f);
+    // The blade travels WITH the top hand since the 2026-08-10 stroke fix:
+    // planted forward at the catch, swept rearward through power. The old
+    // expectation here encoded the reversed "back-paddle in mirror" motion.
     TestTrue(
         TEXT("forward stroke has distinct catch and power-finish landmarks"),
         ForwardCatch.PaddleTopCm.X - ForwardFinish.PaddleTopCm.X >= 25.0f &&
-            ForwardFinish.PaddleBottomCm.X - ForwardCatch.PaddleBottomCm.X >= 35.0f);
+            ForwardCatch.PaddleBottomCm.X - ForwardFinish.PaddleBottomCm.X >= 35.0f);
     TestTrue(
         TEXT("forward recovery lifts the blade clear of the planted power path"),
         ForwardRecovery.PaddleBottomCm.Z - ForwardCatch.PaddleBottomCm.Z >= 24.0f);

@@ -93,6 +93,14 @@ public:
      */
     void SetGuideFirstPersonView(bool bFirstPerson);
 
+    /**
+     * Hides the guide avatar's whole body (gear and paddle included) while
+     * the possessed first-person view glances over the shoulder; otherwise
+     * the rearward camera fills with the inside of the guide's own arms.
+     * Idempotent; the pawn syncs it every tick.
+     */
+    void SetGuideFirstPersonBodyHidden(bool bShouldHide);
+
     /** World-space centre of the guide avatar's posed head, for seating the
      * first-person camera on the real anatomy instead of a fixed offset. */
     bool GetGuideHeadWorldLocationCm(FVector& OutCm) const;
@@ -552,6 +560,7 @@ private:
     float DirectImpulseDelaySeconds = 0.0f;
 
     float GetPaddlePropulsionShortfall(const FVector& StrokeDirection) const;
+    float GetPaddleWaterPurchase() const;
     void QueueDirectStrokeImpulse(
         const FVector& LinearImpulseNs, const FVector& AngularImpulseNms);
     /** Highest rendered raft-surface Z (actor frame) under a seat station. */

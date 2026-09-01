@@ -677,40 +677,19 @@ private:
      * churned shoreline membership every refresh; enter/exit depths are now
      * separated so a cell's verdict only flips on genuine level change. */
     TArray<uint8> VisualFilmCullState;
-    /** Boundary-band index list of the volume core (the outer, churny rows
-     * near the waterline). Kept in its own small mesh section so shoreline
-     * membership changes recreate only that thin strip's render state: a
-     * recreated proxy renders one frame with reset motion history, and
-     * recreating the whole 26k-vertex core made the entire reflective
-     * surface flash under TSR whenever a bank cell flipped (player
-     * recording, 2026-08-29). */
-    TArray<int32> LiveVolumeCoreBoundaryTriangles;
-    /** Hysteretic deep-water latch (enter >= ~0.9 m, exit < ~0.5 m) deciding
-     * which vertices may join the stable interior section. Depth is static
-     * in grid space between recentres — unlike presence, which churns with
-     * bank lapping and the moving crop feather — so the interior index list
-     * stays byte-identical through ordinary play. */
-    TArray<uint8> CoreInteriorDepthLatch;
-    /** Snapshot of the depth latch actually used to partition quads between
-     * the interior and boundary sections. Refreshed only when the grid
-     * recentres: per-vertex dwell counters otherwise complete on different
-     * refreshes and re-partition (hence recreate) the interior every refresh
-     * while a freshly streamed edge settles. A recentre already recreates
-     * the sections (every index shifts), so folding membership updates into
-     * that same event adds no extra invalidations. */
-    TArray<uint8> CoreInteriorPartitionMask;
-    /** Frozen per-station waterline band (rows MinPresentY-K .. MaxPresentY+K
-     * captured at the last band rebuild; INDEX_NONE = no water in column).
-     * The boundary section emits EVERY cell of this band — dry cells render
-     * collapsed onto the waterline, i.e. zero-area — so wet/dry membership
-     * changes move vertices instead of index lists and the section is never
-     * recreated between rebuilds. Rebuilds happen at recentres (which
-     * recreate everything anyway) and when the waterline reaches a band
-     * edge. This replaced a 1 Hz adoption throttle whose batched
-     * recreations read as a rhythmic shoreline jump (player recording,
-     * 2026-08-29). */
-    TArray<int32> CoreBandMinY;
-    TArray<int32> CoreBandMaxY;
+    /** Vertex count the immutable core index list was built for. The core's
+     * topology covers every lattice cell that passes the static
+     * station-coverage feather and is built exactly once per grid shape;
+     * wet/dry churn, recentres, waterline motion, and dry-out are all
+     * expressed as vertex motion (dry columns collapse to zero-area piles on
+     * the waterline), so after the first build the section's render proxy is
+     * never recreated. This retired the interior/boundary section split, the
+     * deep-water latch, and the frozen band's escape rebuilds, whose
+     * remaining recreations (~2/s while drifting) each rendered one frame
+     * with cold shading caches — imperceptible under 30 fps TSR but a
+     * visible shore flash at editor-hitch framerates ("the shore appears
+     * and disappears", player recording, 2026-08-30). */
+    int32 LiveVolumeCoreStaticTopologyVertexCount = 0;
     /** Per-vertex eased breaking crest/tail lift. Raw Froude detection
      * re-decides the lifted cells every refresh, so threshold cells toggled
      * their full lift in one 15 Hz step and the carved front hopped whole

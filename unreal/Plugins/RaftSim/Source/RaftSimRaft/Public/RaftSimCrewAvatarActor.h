@@ -141,6 +141,14 @@ public:
     void SetFirstPersonHeadHidden(bool bShouldHide);
 
     /**
+     * Hides the avatar's whole body (torso, gear, limbs, paddle) for the
+     * possessed guide's over-the-shoulder glance: with the camera in the eye
+     * socket, turning the view rearward otherwise fills the screen with the
+     * inside of the guide's own arms and vest. Idempotent per value.
+     */
+    void SetFirstPersonBodyHidden(bool bShouldHide);
+
+    /**
      * World-space centre of the posed head. Valid while the head is hidden
      * for first person: the hidden part still tracks the pose every frame.
      */
@@ -432,6 +440,7 @@ private:
     bool bVisualBuilt = false;
     bool bUsingProductionVisual = false;
     bool bFirstPersonHeadHidden = false;
+    bool bFirstPersonBodyHidden = false;
     float AnimationPhase = 0.0f;
     float AnimationPhaseOffset = 0.0f;
     float ActionIntensity = 1.0f;
