@@ -597,8 +597,23 @@ float URaftSimWaterRuntimeAdapter::ComputeCoupledBoulderPillowDisplacementMeters
         0.0f, 1.0f);
     const float NoseEnvelope = FMath::SmoothStep(
         -1.95f * RadiusMeters, -0.35f * RadiusMeters, DownstreamMeters);
-    const float SpeedEnvelope = FMath::SmoothStep(
-        0.45f, 1.65f, FMath::Max(WaterSpeedMetersPerSecond, 0.0f));
+    // Readability ramp lowered from (0.45, 1.65): the old floor muted the
+    // pillow to ~2 cm in the 0.7-0.9 m/s current that carries the raft past
+    // Meat Grinder's exposed boulders, and a metre-wide rock in visibly
+    // moving water with a dead-flat nose reads as a bug ("the water flowing
+    // downhill should form a pillow as it slams into the rock", player
+    // screenshots 2026-08-30 at river km 0.86). On top of the ramp, any
+    // genuinely moving water (>= ~0.12 m/s — bank-edge drift past pool
+    // rocks) guarantees a readable minimum mound: five separate "no pillow"
+    // reports were all rocks standing in slow edge water where the physical
+    // stagnation rise is a few invisible centimetres. Dead-still water
+    // still mounds nothing, and full amplitude still needs real current.
+    const float ClampedSpeed = FMath::Max(WaterSpeedMetersPerSecond, 0.0f);
+    float SpeedEnvelope = FMath::SmoothStep(0.25f, 1.20f, ClampedSpeed);
+    if (ClampedSpeed >= 0.12f)
+    {
+        SpeedEnvelope = FMath::Max(SpeedEnvelope, 0.33f);
+    }
     return 0.22f * Ring * NoseEnvelope * SpeedEnvelope;
 }
 

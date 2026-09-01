@@ -1267,12 +1267,33 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             FoamColor,
             Mul(DriftFleckMask, Scalar(TEXT("DriftFoamOpacity"), 0.35f)));
     }
+    // Boat-wake surface response: UV2 carries the carrier's actual signed
+    // wake field (x = coverage, y = signed height / 11 cm). The Kelvin arms
+    // displace this mesh and their slopes are already folded into the
+    // vertex normals, so the ripple reads through moving specular — the
+    // material adds only the faintest gloss break so the arcs stay legible
+    // when the reflection happens to be featureless. The first pass used
+    // 0.30 roughness plus a foam-colour tint, and under a bright sky those
+    // bands read as white aerated water ("the wake is appearing as white
+    // aerated water, it should just be a ripple", player recording
+    // 2026-08-31); a displacement wake must stay a clear lateral wave, so
+    // there is no colour term at all now.
+    UMaterialExpressionTextureCoordinate* BoatWakeUv =
+        Cast<UMaterialExpressionTextureCoordinate>(
+            Add(NewObject<UMaterialExpressionTextureCoordinate>(Material)));
+    BoatWakeUv->CoordinateIndex = 2;
+    BoatWakeUv->Desc = TEXT("RaftSimBoatWakeGeometryUV2");
+    UMaterialExpressionComponentMask* BoatWakeCoverage =
+        Mask(BoatWakeUv, true, false, false);
+    RoughnessOutput = AddNode(
+        RoughnessOutput,
+        Mul(BoatWakeCoverage, Scalar(TEXT("BoatWakeRoughness"), 0.06f)));
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
     Ed->BaseColor.Connect(0, BaseColorOut);
     // A displacement-hull boat wake carries NO whitening: a paddled raft
     // pushes water aside without aerating it, so white stays exclusive to
     // breaking water (solver aeration: rapids and obstruction wakes). The
-    // boat wake lives as pure geometry in the WPO block.
+    // boat wake lives as geometry plus the roughness/tint response above.
     if (DriftFleckMask != nullptr)
     {
         Ed->EmissiveColor.Connect(
@@ -4608,7 +4629,12 @@ static void BuildRaftCrewMaterials()
     BuildSolidMaterial(TEXT("M_RaftSim_PFDWebbing"), FLinearColor(0.008f, 0.010f, 0.012f, 1.0f), 0.72f, 0.0f);
     BuildSolidMaterial(TEXT("M_RaftSim_BootRubber"), FLinearColor(0.006f, 0.008f, 0.010f, 1.0f), 0.78f, 0.0f);
     BuildSolidMaterial(TEXT("M_RaftSim_PaddleShaft"), FLinearColor(0.035f, 0.035f, 0.042f, 1.0f), 0.34f, 0.10f);
-    BuildSolidMaterial(TEXT("M_RaftSim_PaddleBlade"), FLinearColor(0.30f, 0.05f, 0.002f, 1.0f), 0.58f, 0.0f);
+    // Commercial polyethylene blade yellow (Carlisle-style). The previous
+    // dark blood-red blade (0.30, 0.05, 0.002) sweeping past a paddler's hip
+    // on the stroke exit read as an open wound on the glute against the black
+    // wetsuit (player "gash in the butt cheek" report, 2026-08-30). A bright
+    // equipment color can never be mistaken for flesh.
+    BuildSolidMaterial(TEXT("M_RaftSim_PaddleBlade"), FLinearColor(0.68f, 0.44f, 0.02f, 1.0f), 0.48f, 0.08f);
 }
 
 static UMaterial* BuildSprayMistMaterial()

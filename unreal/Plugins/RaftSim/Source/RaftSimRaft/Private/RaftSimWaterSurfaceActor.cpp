@@ -39,6 +39,14 @@ static TAutoConsoleVariable<int32> CVarRaftSimHideLiveOverlay(
     TEXT("1 = hide the live overlay surface mesh entirely (A/B test for ")
     TEXT("near-field wash)."));
 
+static TAutoConsoleVariable<int32> CVarRaftSimPaddleWakeRippleOverlay(
+    TEXT("raftsim.PaddleWakeRippleOverlay"), 0,
+    TEXT("1 = build the legacy paddle-wake ripple overlay section. Default ")
+    TEXT("off: the overlay was silently dead for weeks (its in-place update ")
+    TEXT("always failed a vertex-count mismatch) and rendered as unreviewed ")
+    TEXT("black shapes once section handling was hardened; the visible wake ")
+    TEXT("is the carrier's own vertex displacement."));
+
 static TAutoConsoleVariable<int32> CVarRaftSimFreezeCoreTopology(
     TEXT("raftsim.FreezeCoreTopology"), 0,
     TEXT("1 = keep rendering the volume core's last-built index list instead ")
@@ -464,7 +472,7 @@ float ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
     const float AlongMeters =
         FVector2D::DotProduct(RelativePosition, WakeDirection);
     constexpr float WakeStartMeters = 1.0f;
-    constexpr float WakeLengthMeters = 16.0f;
+    constexpr float WakeLengthMeters = 22.0f;
     if (AlongMeters <= WakeStartMeters || AlongMeters >= WakeLengthMeters)
     {
         return 0.0f;
@@ -490,10 +498,13 @@ float ARaftSimWaterSurfaceActor::ComputePaddleWakeDisplacementMeters(
     const float WavePhase =
         ArmDistanceMeters * (2.0f * UE_PI / WakeWavelengthMeters) +
         AlongMeters * 0.15f - PhaseSeconds * 1.35f;
-    // Six centimetres is large enough for the displaced surface normals and
-    // silhouette to read from the chase camera, while remaining a small,
-    // signed water ripple rather than the raised white ribbons this replaces.
-    constexpr float MaximumAmplitudeMeters = 0.060f;
+    // Eleven centimetres: six read from the chase camera but disappeared
+    // entirely at the first-person stern's grazing angle against bright
+    // water ("there is no wake behind the boat as the crew paddles", player
+    // screenshot 2026-08-31). Still a signed water ripple, not the raised
+    // white ribbons this replaced; the trail also runs 22 m so the arms
+    // survive into the mid-distance where the eye expects them.
+    constexpr float MaximumAmplitudeMeters = 0.110f;
     return MaximumAmplitudeMeters * SafeStrength * StartEnvelope *
         EndEnvelope * ArmEnvelope * FMath::Sin(WavePhase);
 }
@@ -1547,7 +1558,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     PaddleWakeVertexColors.SetNumZeroed(VertCount);
     LiveVolumeCoreVertices.SetNum(VertCount);
     LiveVolumeCoreTriangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
-    LiveVolumeCoreBoundaryTriangles.Reset(GridStationN * 24);
+    // Force the immutable core topology to rebuild for this grid shape.
+    LiveVolumeCoreStaticTopologyVertexCount = 0;
     RapidFoamVertices.SetNum(VertCount);
     RapidFoamVertexColors.SetNum(VertCount);
     SmoothedRapidFoamCoverage.SetNumZeroed(VertCount);
@@ -1823,9 +1835,12 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     // sun-glint strobe: fine panning normals under a tight
                     // specular lobe decorrelate every frame. A slightly
                     // rougher lobe turns pixel-quantized blinking glints
-                    // into stable soft streaks.
+                    // into stable soft streaks. 0.31 also blurred sky and
+                    // shore into the milky sheet the clear-water pass
+                    // removed (2026-08-31): 0.20 keeps a damping margin
+                    // over the 0.15 tile lobe without repainting the veil.
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("WaterRoughness"), 0.31f);
+                        TEXT("WaterRoughness"), 0.20f);
                 }
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("ShallowWaterOpacity"),
@@ -1878,10 +1893,6 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 }
             }
         }
-        // The boundary-band section (1) shares slot 0's resolved material —
-        // the dynamic instance when one was created above — so both core
-        // sections shade identically and parameter updates reach the strip.
-        LiveVolumeCoreMesh->SetMaterial(1, LiveVolumeCoreMesh->GetMaterial(0));
     }
     RapidFoamMesh->CreateMeshSection_LinearColor(
         0,
@@ -2749,7 +2760,6 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         // tile had not streamed in when first traced.
         ShiftStationIndexedBytes(VisualBankProbeState, 0);
         ShiftStationIndexedBytes(VisualFilmCullState, 0);
-        ShiftStationIndexedBytes(CoreInteriorDepthLatch, 0);
         const auto ShiftStationIndexedVectors =
             [this, ShiftCells](
                 TArray<FVector2D>& Values, const FVector2D& FillValue)
@@ -3058,8 +3068,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // Sample the live field once per vertex. A separate presentation pass can
     // then compare same-lateral station neighbours without multiplying runtime
     // adapter queries or reaching outside the active cooked window.
+    // Cells where the live solver says dry but the baseline says wet — the
+    // handover disagreement set — request rendered-terrain probes so the
+    // visual-submersion keep below can cover whole shallow shelves, not just
+    // the outer bank rings.
+    TArray<uint8> BaselineKeepProbeWanted;
+    BaselineKeepProbeWanted.Init(0, Vertices.Num());
     if (WaterAdapter != nullptr)
     {
+        const FTransform BaselineKeepTransform =
+            SurfaceMesh ? SurfaceMesh->GetComponentTransform()
+                        : GetActorTransform();
         for (int32 Y = 0; Y < GridLateralN; ++Y)
         {
             for (int32 X = 0; X < GridStationN; ++X)
@@ -3101,7 +3120,39 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     StationSolverCropAuthority.IsValidIndex(StationIndex)
                     ? StationSolverCropAuthority[StationIndex]
                     : 1.0f;
-                if (bSampled && !Sample.bWet && CropAuthority < 0.999f &&
+                // Visual-submersion keep: the live solver's wetting is
+                // coarser than the visible margin, so as the crop's
+                // authority sweeps in with the raft its dry verdicts drained
+                // baseline-wet bank bays in plain view ("the water suddenly
+                // recedes from the shores for no reason", player recording
+                // 2026-08-30) — an effect the old 5 mm static water used to
+                // mask. Where the rendered-terrain probe proves the water
+                // plane genuinely covers the visible ground (>= the film
+                // cull's release depth, so the two verdicts cannot fight),
+                // the baseline keeps presenting at full strength regardless
+                // of crop authority. Physics stays solver-owned; unprobed
+                // cells (mid-channel boulder cutouts) keep solver authority.
+                bool bVisuallySubmerged = false;
+                if (bSampled && !Sample.bWet &&
+                    VisualBankProbeState.IsValidIndex(Index))
+                {
+                    if (VisualBankProbeState[Index] == 1)
+                    {
+                        constexpr float kBaselineKeepDepthCm = 9.0f;
+                        const float WaterWorldZCm = static_cast<float>(
+                            BaselineKeepTransform
+                                .TransformPosition(Vertices[Index]).Z);
+                        bVisuallySubmerged =
+                            WaterWorldZCm - VisualBankTerrainZCm[Index] >=
+                            kBaselineKeepDepthCm;
+                    }
+                    else if (VisualBankProbeState[Index] == 0)
+                    {
+                        BaselineKeepProbeWanted[Index] = 1;
+                    }
+                }
+                if (bSampled && !Sample.bWet &&
+                    (CropAuthority < 0.999f || bVisuallySubmerged) &&
                     bSingleLiveWaterSurfaceEnabled &&
                     bUsesCurvedRiverCoordinates)
                 {
@@ -3113,7 +3164,59 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     {
                         Sample = BaselineSample;
                         bBaselineSampled = true;
-                        FeatheredBaselineWet[Index] = 1.0f - CropAuthority;
+                        FeatheredBaselineWet[Index] = bVisuallySubmerged
+                            ? 1.0f
+                            : 1.0f - CropAuthority;
+                    }
+                }
+                // The mirrored half of the handover contract: the keep above
+                // stops solver-DRY verdicts from draining the stable baseline
+                // shoreline, but solver-WET verdicts used to land instantly
+                // at full strength with the solver's own level. The solver's
+                // bank wetting is one coarse cell wider and centimetres
+                // higher than the authored margin, so every pass of the crop
+                // grew water visibly up flat bars and then drained it again
+                // ("the shore is still changing with the water growing onto
+                // the shore", player recording 2026-08-30 — ±0.5-1.5 m
+                // waterline swings on a 1-4 s period tracking the raft).
+                // Presentation therefore defers to the baseline in shallow
+                // water: solver-wet where the baseline is dry presents dry
+                // (bank bleed), and a shore level that agrees with the
+                // baseline within a wave's height presents the baseline's
+                // level, so the slow shore reference never sees a handover
+                // step. Deep or strongly deviating water — real floods,
+                // surges, rapids — keeps full solver authority, and physics
+                // is untouched either way.
+                if (bSampled && Sample.bWet &&
+                    bSingleLiveWaterSurfaceEnabled &&
+                    bUsesCurvedRiverCoordinates)
+                {
+                    constexpr float kShoreSolverBleedMaxDepthM = 0.35f;
+                    constexpr float kShoreLevelAgreementM = 0.08f;
+                    if (Sample.DepthMeters < 0.45f)
+                    {
+                        FRaftSimWaterSample BaselineSample;
+                        const bool bBaselineWet = WaterAdapter->
+                            SamplePresentationBaselineFieldAtRiverCoordinates(
+                                RiverCoordinatesM[Index], BaselineSample) &&
+                            BaselineSample.bWet;
+                        if (!bBaselineWet &&
+                            Sample.DepthMeters < kShoreSolverBleedMaxDepthM)
+                        {
+                            Sample.bWet = false;
+                            // Presence and foam/advection continuity key on
+                            // the solver-wet mask; a suppressed bank-bleed
+                            // cell must not present through them either.
+                            LiveSolverWetVertexMask[Index] = 0;
+                        }
+                        else if (bBaselineWet &&
+                                 FMath::Abs(Sample.SurfaceHeightMeters -
+                                     BaselineSample.SurfaceHeightMeters) <
+                                     kShoreLevelAgreementM)
+                        {
+                            Sample.SurfaceHeightMeters =
+                                BaselineSample.SurfaceHeightMeters;
+                        }
                     }
                 }
                 WetVertexMask[Index] =
@@ -3363,11 +3466,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             continue;
         }
         BoatWakePresentationData[WakeIndex].X = FMath::SmoothStep(
-            0.010f,
-            0.035f,
+            0.006f,
+            0.025f,
             FMath::Abs(BoatWakeDisplacementMeters[WakeIndex]));
         BoatWakePresentationData[WakeIndex].Y = FMath::Clamp(
-            BoatWakeDisplacementMeters[WakeIndex] / 0.060f,
+            BoatWakeDisplacementMeters[WakeIndex] / 0.110f,
             -1.0f,
             1.0f);
     }
@@ -3398,6 +3501,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     TArray<float> BoulderWakeFoam;
     BoulderWakeFoam.SetNumZeroed(WaterSamples.Num());
     float MaximumAbsoluteBoulderWakeM = 0.0f;
+    float MaximumBoulderPillowM = 0.0f;
+    float MaximumBoulderRingSpeedMps = 0.0f;
+    int32 WetPillowRingVertexCount = 0;
     for (int32 WakeIndex = 0;
          WakeIndex < BoulderWakeDisplacementMeters.Num();
          ++WakeIndex)
@@ -3427,6 +3533,29 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     AcrossM,
                     Footprint.Z,
                     WaterSpeedMps);
+            if (PillowM > 0.0f)
+            {
+                ++WetPillowRingVertexCount;
+                MaximumBoulderPillowM =
+                    FMath::Max(MaximumBoulderPillowM, PillowM);
+                MaximumBoulderRingSpeedMps =
+                    FMath::Max(MaximumBoulderRingSpeedMps, WaterSpeedMps);
+                // The pillow itself is clear-water GEOMETRY — a sub-20 cm
+                // smooth mound that is invisible at any distance on a calm
+                // surface ("theres still no pillow on the rock", km 0.87,
+                // after the ring was verified live by this probe). What a
+                // player recognises as a pillow is the aerated collar where
+                // the climbing water breaks white, so the ring also feeds
+                // the boulder foam channel: a faint lap line at pool drift,
+                // a bright cushion where fast water actually aerates.
+                const float PillowRingT =
+                    FMath::Clamp(PillowM / 0.24f, 0.0f, 1.0f);
+                const float PillowAerationT =
+                    FMath::SmoothStep(0.35f, 1.60f, WaterSpeedMps);
+                BoulderWakeFoam[WakeIndex] = FMath::Max(
+                    BoulderWakeFoam[WakeIndex],
+                    PillowRingT * (0.12f + 0.75f * PillowAerationT));
+            }
             const float CoupledDisplacementM = Wake.X + PillowM;
             if (FMath::Abs(CoupledDisplacementM) >
                 FMath::Abs(BoulderWakeDisplacementMeters[WakeIndex]))
@@ -3440,6 +3569,28 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         MaximumAbsoluteBoulderWakeM = FMath::Max(
             MaximumAbsoluteBoulderWakeM,
             FMath::Abs(BoulderWakeDisplacementMeters[WakeIndex]));
+    }
+    if (CVarRaftSimLogWaterRenderStateEvents.GetValueOnGameThread() != 0 &&
+        WindowBoulderFootprintsSLR.Num() > 0)
+    {
+        // Pillow forensics ("theres no pillow on the rock", 2026-08-31):
+        // how much upstream mound the wet lattice actually received this
+        // refresh, and at what sampled ring speed.
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim boulder pillow probe: footprints=%d wet_ring_verts=%d "
+                 "max_pillow_m=%.4f max_ring_speed_mps=%.3f coupled_max_m=%.4f "
+                 "boat_wake_valid=%d paddling=%d wake_env=%.2f wake_rel_mps=%.2f "
+                 "wake_max_m=%.4f"),
+            WindowBoulderFootprintsSLR.Num(),
+            WetPillowRingVertexCount,
+            MaximumBoulderPillowM,
+            MaximumBoulderRingSpeedMps,
+            MaximumAbsoluteBoulderWakeM,
+            bBoatWakeValid ? 1 : 0,
+            bBoatWakePaddling ? 1 : 0,
+            BoatWakePaddleEnvelope,
+            BoatWakeRelativeSpeedMps,
+            MaximumAbsoluteBoatWakeM);
     }
 
     // Continuous current detail belongs in the single carrier's WPO. It is
@@ -4906,7 +5057,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             constexpr float kVisualBankFilmEnterDepthCm = 6.0f;
             constexpr float kVisualBankFilmExitDepthCm = 9.0f;
             constexpr int32 kVisualBankBandRings = 3;
-            constexpr int32 kVisualBankProbeBudgetPerRefresh = 96;
+            constexpr int32 kVisualBankProbeBudgetPerRefresh = 192;
             if (VisualBankTerrainZCm.Num() != Vertices.Num())
             {
                 VisualBankTerrainZCm.Init(0.0f, Vertices.Num());
@@ -5000,6 +5151,50 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     }
                 }
             }
+            // Solver/baseline disagreement cells (dry verdict over baseline
+            // water) need probes too: the visual-submersion keep defends a
+            // whole shallow shelf, and probing only the outer bank rings
+            // left the shelf interior to drain as a marching straight front
+            // when the crop's authority swept in ("the water suddenly
+            // recedes from the shores", player recording 2026-08-30). These
+            // cells are no longer wet, so they bypass the wet-mask guard.
+            if (ProbeWorld)
+            {
+                for (int32 Index = 0;
+                     Index < Vertices.Num() && ProbeBudget > 0;
+                     ++Index)
+                {
+                    if (BaselineKeepProbeWanted[Index] == 0 ||
+                        VisualBankProbeState[Index] != 0)
+                    {
+                        continue;
+                    }
+                    --ProbeBudget;
+                    const FVector WaterWorld =
+                        CarrierTransform.TransformPosition(Vertices[Index]);
+                    FHitResult Hit;
+                    FCollisionQueryParams ProbeParams(
+                        TEXT("RaftSimVisualBankProbe"), true, this);
+                    if (ProbeWorld->LineTraceSingleByChannel(
+                            Hit,
+                            WaterWorld + FVector(0.0f, 0.0f, 300.0f),
+                            WaterWorld - FVector(0.0f, 0.0f, 600.0f),
+                            ECC_WorldStatic,
+                            ProbeParams) &&
+                        Hit.GetActor() &&
+                        Hit.GetActor()->ActorHasTag(
+                            TEXT("RaftSimFullReachTerrain")))
+                    {
+                        VisualBankTerrainZCm[Index] =
+                            static_cast<float>(Hit.ImpactPoint.Z);
+                        VisualBankProbeState[Index] = 1;
+                    }
+                    else
+                    {
+                        VisualBankProbeState[Index] = 2;
+                    }
+                }
+            }
         }
         // Slow rates: wake lapping and window handoffs churn the bank wet
         // edge at cell granularity; the envelope averages those transients
@@ -5041,106 +5236,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             LiveVolumeCoreWetPresence[Index] = Presence;
         }
 
-        // Two index lists, one render lesson: a recreated mesh section is a
-        // new render proxy, and its first frame carries no motion history —
-        // TSR shows one raw sharp frame over the section's whole screen
-        // area. Recreating the full core whenever one bank cell flipped made
-        // the entire reflective surface pop ("the reflective surface still
-        // pops/flashes", player recording 2026-08-29; A/B: freezing the
-        // core's topology zeroed the pops). Deep-wet quads therefore live in
-        // a stable interior section that is byte-identical between window
-        // recentres, while every quad within a cell of the waterline — the
-        // membership that genuinely churns — lives in a small boundary
-        // section whose recreation only ever touches the thin bank strip.
-        // Interior eligibility keys on hydraulic DEPTH, not presence: depth
-        // is static in grid space between recentres, while presence churns
-        // with bank lapping, the film cull, and the crop feather — a
-        // presence-keyed interior re-partitioned (and so recreated) at the
-        // same cadence as the churn it was meant to isolate. VertexColor.G
-        // carries depth/4 m; enter deep at ~0.9 m, leave below ~0.5 m so
-        // wave motion cannot flip the latch mid-pool. Mid-channel presence
-        // never leaves 1.0 (the solver-wet verdict wins over the feather),
-        // so a latched vertex's quads stay emitted and the interior list
-        // holds byte-identical through ordinary play.
-        if (CoreInteriorDepthLatch.Num() != Vertices.Num())
-        {
-            CoreInteriorDepthLatch.Init(0, Vertices.Num());
-        }
-        // Depth AND dwell hysteresis: a vertex joins the interior only after
-        // ~0.9 m of water has held for ~2 s, and leaves only after dropping
-        // below ~0.5 m for ~2 s. Rapid waves oscillate a cell's sampled
-        // depth on a shorter period than the dwell, so riffles can neither
-        // admit nor evict interior vertices frame to frame; presence plays
-        // no part in the partition at all, because every presence threshold
-        // sweeps with the raft's crop feather. High bit = latched, low bits
-        // = dwell counter in refreshes.
-        constexpr float kInteriorDepthEnterG = 0.125f; // ~0.5 m
-        constexpr float kInteriorDepthExitG = 0.075f;  // ~0.3 m
-        constexpr uint8 kInteriorDwellRefreshes = 30;  // ~2 s at 15 Hz
-        TArray<uint8> DeepWetVertexMask;
-        DeepWetVertexMask.Init(0, Vertices.Num());
-        for (int32 Index = 0; Index < Vertices.Num(); ++Index)
-        {
-            const float DepthG = VertexColors[Index].G;
-            uint8 State = CoreInteriorDepthLatch[Index];
-            const bool bLatched = (State & 0x80) != 0;
-            uint8 Dwell = State & 0x7F;
-            if (!bLatched)
-            {
-                if (DepthG >= kInteriorDepthEnterG)
-                {
-                    if (++Dwell >= kInteriorDwellRefreshes)
-                    {
-                        State = 0x80;
-                    }
-                    else
-                    {
-                        State = Dwell;
-                    }
-                }
-                else
-                {
-                    State = 0;
-                }
-            }
-            else
-            {
-                if (DepthG < kInteriorDepthExitG)
-                {
-                    if (++Dwell >= kInteriorDwellRefreshes)
-                    {
-                        State = 0;
-                    }
-                    else
-                    {
-                        State = 0x80 | Dwell;
-                    }
-                }
-                else
-                {
-                    State = 0x80;
-                }
-            }
-            CoreInteriorDepthLatch[Index] = State;
-        }
-        // Partition only moves at recentres (or first build): the latch keeps
-        // integrating every refresh, but the section split reads this frozen
-        // snapshot so protracted per-vertex dwell completions cannot
-        // re-partition — and so recreate — the interior between recentres.
-        if (CoreInteriorPartitionMask.Num() != Vertices.Num() ||
-            bGridRecentredThisRefresh)
-        {
-            CoreInteriorPartitionMask.SetNumUninitialized(Vertices.Num());
-            for (int32 Index = 0; Index < Vertices.Num(); ++Index)
-            {
-                CoreInteriorPartitionMask[Index] =
-                    (CoreInteriorDepthLatch[Index] & 0x80) != 0 ? 1 : 0;
-            }
-        }
-        for (int32 Index = 0; Index < Vertices.Num(); ++Index)
-        {
-            DeepWetVertexMask[Index] = CoreInteriorPartitionMask[Index];
-        }
+        // One immutable index list, the terminal form of a long render
+        // lesson: a recreated mesh section is a new render proxy, and its
+        // first frame renders with no temporal history and cold shading
+        // caches — TSR pops at high framerate, and at PIE-hitch framerates
+        // the Single Layer Water shore strip loses its reflection for a
+        // whole visible frame and shows the bed through clear water ("the
+        // shore appears and disappears", player recording 2026-08-30; the
+        // drift benchmark logged ~2 section recreations per second from
+        // wet-membership churn despite the earlier interior/boundary split
+        // and frozen band). The split, the depth latch, and the band-escape
+        // rebuilds are therefore all retired: the core's topology now covers
+        // EVERY lattice cell that passes the static station-coverage feather
+        // and is built exactly once per grid shape. Wet/dry churn,
+        // recentres, band motion, the film cull, and the crop feather all
+        // move VERTICES (dry columns collapse to zero-area piles on the
+        // waterline), so after the first build the render proxy is never
+        // recreated and no frame ever renders without history.
         // Per-station presence bounds of the rendered band, needed by the
         // waterline band below and the sub-cell extension later.
         TArray<int32> MinPresentY;
@@ -5161,112 +5273,52 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 }
             }
         }
-        // Frozen waterline band: rebuilt only when the grid recentres or the
-        // waterline reaches a band edge. Between rebuilds the boundary
-        // section's membership rule below is presence-independent inside the
-        // band, so lapping, wake churn, and the film cull change GEOMETRY
-        // (dry cells collapse to zero area) instead of index lists.
-        constexpr int32 kWaterlineBandRings = 4;
-        bool bBandRebuildNeeded =
-            CoreBandMinY.Num() != GridStationN ||
-            CoreBandMaxY.Num() != GridStationN ||
-            bGridRecentredThisRefresh;
-        if (!bBandRebuildNeeded)
+        // Immutable full-lattice topology. Only the station-edge coverage
+        // feather trims cells, and that is a pure function of X and the grid
+        // constants, so the list is identical for every refresh of a given
+        // grid shape. Cells the water never reaches render as zero-area
+        // piles through the vertex collapse below.
+        if (LiveVolumeCoreStaticTopologyVertexCount != Vertices.Num())
         {
-            for (int32 X = 0; X < GridStationN; ++X)
+            LiveVolumeCoreStaticTopologyVertexCount = Vertices.Num();
+            LiveVolumeCoreTriangles.Reset(
+                (GridStationN - 1) * (GridLateralN - 1) * 6);
+            for (int32 Y = 0; Y < GridLateralN - 1; ++Y)
             {
-                if (MinPresentY[X] == INDEX_NONE)
+                for (int32 X = 0; X < GridStationN - 1; ++X)
                 {
-                    continue;
+                    const int32 I0 = Y * GridStationN + X;
+                    const int32 I1 = I0 + 1;
+                    const int32 I2 = I0 + GridStationN;
+                    const int32 I3 = I2 + 1;
+                    const float MinimumCellStationCoverage = FMath::Min(
+                        ComputeStationEdgeCoverage(
+                            X,
+                            GridStationN,
+                            ResolvedVertexSpacingMeters,
+                            CurvedGridEdgeBlendMeters),
+                        ComputeStationEdgeCoverage(
+                            X + 1,
+                            GridStationN,
+                            ResolvedVertexSpacingMeters,
+                            CurvedGridEdgeBlendMeters));
+                    if (MinimumCellStationCoverage <
+                        kLiveVolumeCoreMinimumStationCoverage)
+                    {
+                        continue;
+                    }
+                    LiveVolumeCoreTriangles.Add(I0);
+                    LiveVolumeCoreTriangles.Add(I2);
+                    LiveVolumeCoreTriangles.Add(I1);
+                    LiveVolumeCoreTriangles.Add(I1);
+                    LiveVolumeCoreTriangles.Add(I2);
+                    LiveVolumeCoreTriangles.Add(I3);
                 }
-                if (CoreBandMinY[X] == INDEX_NONE ||
-                    (MinPresentY[X] <= CoreBandMinY[X] &&
-                        CoreBandMinY[X] > 0) ||
-                    (MaxPresentY[X] >= CoreBandMaxY[X] &&
-                        CoreBandMaxY[X] < GridLateralN - 1))
-                {
-                    bBandRebuildNeeded = true;
-                    break;
-                }
-            }
-        }
-        if (bBandRebuildNeeded)
-        {
-            LogWaterRenderStateEvent(GetWorld(), TEXT("core_band_rebuild"));
-            CoreBandMinY.Init(INDEX_NONE, GridStationN);
-            CoreBandMaxY.Init(INDEX_NONE, GridStationN);
-            for (int32 X = 0; X < GridStationN; ++X)
-            {
-                if (MinPresentY[X] == INDEX_NONE)
-                {
-                    continue;
-                }
-                CoreBandMinY[X] = FMath::Max(
-                    0, MinPresentY[X] - kWaterlineBandRings);
-                CoreBandMaxY[X] = FMath::Min(
-                    GridLateralN - 1, MaxPresentY[X] + kWaterlineBandRings);
-            }
-        }
-        TArray<int32> NewVolumeCoreTriangles;
-        NewVolumeCoreTriangles.Reserve(Triangles.Num());
-        TArray<int32> NewVolumeCoreBoundaryTriangles;
-        NewVolumeCoreBoundaryTriangles.Reserve(GridStationN * 60);
-        for (int32 Y = 0; Y < GridLateralN - 1; ++Y)
-        {
-            for (int32 X = 0; X < GridStationN - 1; ++X)
-            {
-                const int32 I0 = Y * GridStationN + X;
-                const int32 I1 = I0 + 1;
-                const int32 I2 = I0 + GridStationN;
-                const int32 I3 = I2 + 1;
-                const float MinimumCellStationCoverage = FMath::Min(
-                    ComputeStationEdgeCoverage(
-                        X,
-                        GridStationN,
-                        ResolvedVertexSpacingMeters,
-                        CurvedGridEdgeBlendMeters),
-                    ComputeStationEdgeCoverage(
-                        X + 1,
-                        GridStationN,
-                        ResolvedVertexSpacingMeters,
-                        CurvedGridEdgeBlendMeters));
-                if (MinimumCellStationCoverage <
-                    kLiveVolumeCoreMinimumStationCoverage)
-                {
-                    continue;
-                }
-                const bool bFullyWetCell =
-                    LiveVolumeCoreWetPresence[I0] > 0.0f &&
-                    LiveVolumeCoreWetPresence[I1] > 0.0f &&
-                    LiveVolumeCoreWetPresence[I2] > 0.0f &&
-                    LiveVolumeCoreWetPresence[I3] > 0.0f;
-                const bool bInBand =
-                    CoreBandMinY.IsValidIndex(X) &&
-                    CoreBandMinY[X] != INDEX_NONE &&
-                    CoreBandMinY[X + 1] != INDEX_NONE &&
-                    Y >= FMath::Max(CoreBandMinY[X], CoreBandMinY[X + 1]) &&
-                    Y + 1 <= FMath::Min(CoreBandMaxY[X], CoreBandMaxY[X + 1]);
-                if (!bFullyWetCell && !bInBand)
-                {
-                    continue;
-                }
-                const bool bInteriorCell = bFullyWetCell &&
-                    DeepWetVertexMask[I0] != 0 && DeepWetVertexMask[I1] != 0 &&
-                    DeepWetVertexMask[I2] != 0 && DeepWetVertexMask[I3] != 0;
-                TArray<int32>& Target = bInteriorCell
-                    ? NewVolumeCoreTriangles
-                    : NewVolumeCoreBoundaryTriangles;
-                Target.Add(I0);
-                Target.Add(I2);
-                Target.Add(I1);
-                Target.Add(I1);
-                Target.Add(I2);
-                Target.Add(I3);
             }
         }
         // (The diagonal stitch triangles the one-row bank steps used to need
-        // are gone: the frozen band emits the dry corner cells themselves,
-        // collapsed onto the waterline, so the edge fill is real geometry.)
+        // are gone: every dry cell is emitted and collapses onto the
+        // waterline, so the edge fill is real geometry.)
         if (bLivePresentationBankNaturalismEnabled)
         {
             // The Single Layer Water volume still shades at nearly zero
@@ -5477,20 +5529,46 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 LiveVolumeCoreVertexColors[Index].A *= Expansion;
             }
         }
-        // Directed dry pile: every fully dry band vertex sits EXACTLY on the
-        // finished (retreated + extended) waterline vertex of its column, so
-        // the frozen band's dry quads are genuinely zero-area — the geometry
-        // that lets wet/dry churn stay off the index lists. The copy chains
-        // outward from the waterline in one pass on each bank.
+        // One collapse target per boulder footprint: the grid vertex nearest
+        // the footprint centre, where the cutout gap's whole funnel gathers
+        // and dives beneath the rock mesh.
+        TArray<int32> BoulderFootprintNearestVertex;
+        BoulderFootprintNearestVertex.Init(
+            INDEX_NONE, WindowBoulderFootprintsSLR.Num());
+        for (int32 FootprintIndex = 0;
+             FootprintIndex < WindowBoulderFootprintsSLR.Num();
+             ++FootprintIndex)
+        {
+            const FVector3f& Footprint =
+                WindowBoulderFootprintsSLR[FootprintIndex];
+            float BestDistanceSq = MAX_flt;
+            for (int32 Index = 0; Index < Vertices.Num(); ++Index)
+            {
+                const float DistanceSq = FVector2D(
+                    static_cast<float>(RiverCoordinatesM[Index].X) -
+                        Footprint.X,
+                    static_cast<float>(RiverCoordinatesM[Index].Y) -
+                        Footprint.Y).SizeSquared();
+                if (DistanceSq < BestDistanceSq)
+                {
+                    BestDistanceSq = DistanceSq;
+                    BoulderFootprintNearestVertex[FootprintIndex] = Index;
+                }
+            }
+        }
+        // Directed dry pile: every fully dry vertex in a column with any
+        // presence sits EXACTLY on the finished (retreated + extended)
+        // waterline vertex of its column, so every dry quad in the immutable
+        // full-lattice topology is genuinely zero-area — the geometry that
+        // keeps wet/dry churn off the index list entirely. The copy chains
+        // outward from the waterline across the WHOLE column on each bank.
         for (int32 X = 0; X < GridStationN; ++X)
         {
-            if (!CoreBandMinY.IsValidIndex(X) ||
-                CoreBandMinY[X] == INDEX_NONE ||
-                MinPresentY[X] == INDEX_NONE)
+            if (MinPresentY[X] == INDEX_NONE)
             {
                 continue;
             }
-            for (int32 Y = MinPresentY[X] - 1; Y >= CoreBandMinY[X]; --Y)
+            for (int32 Y = MinPresentY[X] - 1; Y >= 0; --Y)
             {
                 const int32 Index = Y * GridStationN + X;
                 const int32 AnchorIndex = (Y + 1) * GridStationN + X;
@@ -5502,7 +5580,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     LiveVolumeCoreVertexColors[AnchorIndex];
                 LiveVolumeCoreVertexColors[Index].A = 0.0f;
             }
-            for (int32 Y = MaxPresentY[X] + 1; Y <= CoreBandMaxY[X]; ++Y)
+            for (int32 Y = MaxPresentY[X] + 1; Y < GridLateralN; ++Y)
             {
                 const int32 Index = Y * GridStationN + X;
                 const int32 AnchorIndex = (Y - 1) * GridStationN + X;
@@ -5514,11 +5592,25 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     LiveVolumeCoreVertexColors[AnchorIndex];
                 LiveVolumeCoreVertexColors[Index].A = 0.0f;
             }
-            // Interior presence gaps inside the band (a near-bank gravel
-            // island): collapse each dry run's vertices onto its nearest wet
-            // row so band quads across the island are zero-area too. The
-            // island keeps its open edge as geometry, and the index lists
-            // stay presence-independent.
+            // Interior presence gaps. Two kinds, two treatments — both
+            // learned the hard way on 2026-08-30:
+            //
+            // A boulder-cutout gap collapses onto ONE sunken point at its
+            // footprint's centre, well below the rock's base. Every mutual
+            // quad inside the hole is then exactly degenerate, and the rim
+            // cone from the waterline dives underneath the rock mesh that
+            // owns the cutout, which occludes it. (A per-column 1.5 m sink
+            // rendered the funnel itself: a crater of exposed bed around
+            // every exposed rock, with steep faceted water walls and a
+            // stray deep-blue skirt triangle — "no pillow and hole in
+            // water" / "disappearing water", player screenshots at km
+            // 0.98/1.02.)
+            //
+            // A footprint-less gap (a shallow gravel bar) keeps the
+            // original same-column nearest-wet-row copy: adjacent columns
+            // can still disagree across the middle of the bar and leave
+            // thin slivers, but those read as wet sheen on a bar, not as
+            // a crater.
             int32 LastWetY = MinPresentY[X];
             for (int32 Y = MinPresentY[X] + 1; Y < MaxPresentY[X]; ++Y)
             {
@@ -5538,43 +5630,134 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const int32 AnchorY =
                     (Y - LastWetY <= NextWetY - Y) ? LastWetY : NextWetY;
                 const int32 AnchorIndex = AnchorY * GridStationN + X;
-                LiveVolumeCoreVertices[Index] =
-                    LiveVolumeCoreVertices[AnchorIndex];
-                LiveVolumeCoreNormals[Index] =
-                    LiveVolumeCoreNormals[AnchorIndex];
+                int32 FootprintSinkIndex = INDEX_NONE;
+                float FootprintSinkDropCm = 0.0f;
+                const FVector2D& GapRiverM = RiverCoordinatesM[Index];
+                for (int32 FootprintIndex = 0;
+                     FootprintIndex < WindowBoulderFootprintsSLR.Num();
+                     ++FootprintIndex)
+                {
+                    const FVector3f& Footprint =
+                        WindowBoulderFootprintsSLR[FootprintIndex];
+                    const float RadiusM = FMath::Max(Footprint.Z, 0.75f);
+                    const float DeltaStationM =
+                        static_cast<float>(GapRiverM.X) - Footprint.X;
+                    const float DeltaLateralM =
+                        static_cast<float>(GapRiverM.Y) - Footprint.Y;
+                    if (FMath::Abs(DeltaStationM) > RadiusM * 1.45f ||
+                        FMath::Abs(DeltaLateralM) > RadiusM * 1.45f)
+                    {
+                        continue;
+                    }
+                    if (FVector2D(DeltaStationM, DeltaLateralM).SizeSquared() >
+                        FMath::Square(RadiusM * 1.45f))
+                    {
+                        continue;
+                    }
+                    if (BoulderFootprintNearestVertex.IsValidIndex(
+                            FootprintIndex) &&
+                        BoulderFootprintNearestVertex[FootprintIndex] !=
+                            INDEX_NONE)
+                    {
+                        FootprintSinkIndex =
+                            BoulderFootprintNearestVertex[FootprintIndex];
+                        FootprintSinkDropCm = RadiusM * 80.0f;
+                    }
+                    break;
+                }
+                if (FootprintSinkIndex != INDEX_NONE)
+                {
+                    // Footprint centre in the horizontal plane; the column's
+                    // own wet rim supplies the height reference so the sink
+                    // depth follows the local water level, not a stale dry
+                    // sample at the gap centre.
+                    LiveVolumeCoreVertices[Index].X =
+                        LiveVolumeCoreVertices[FootprintSinkIndex].X;
+                    LiveVolumeCoreVertices[Index].Y =
+                        LiveVolumeCoreVertices[FootprintSinkIndex].Y;
+                    LiveVolumeCoreVertices[Index].Z =
+                        LiveVolumeCoreVertices[AnchorIndex].Z -
+                        FootprintSinkDropCm;
+                    LiveVolumeCoreNormals[Index] = FVector::UpVector;
+                }
+                else
+                {
+                    LiveVolumeCoreVertices[Index] =
+                        LiveVolumeCoreVertices[AnchorIndex];
+                    LiveVolumeCoreNormals[Index] =
+                        LiveVolumeCoreNormals[AnchorIndex];
+                }
                 LiveVolumeCoreVertexColors[Index] =
                     LiveVolumeCoreVertexColors[AnchorIndex];
                 LiveVolumeCoreVertexColors[Index].A = 0.0f;
             }
         }
-        bool bTopologyChanged =
-            LiveVolumeCoreTriangles != NewVolumeCoreTriangles;
-        bool bBoundaryTopologyChanged =
-            LiveVolumeCoreBoundaryTriangles != NewVolumeCoreBoundaryTriangles;
-        if (CVarRaftSimFreezeCoreTopology.GetValueOnGameThread() != 0 &&
-            LiveVolumeCoreMesh->GetProcMeshSection(0) != nullptr &&
-            LiveVolumeCoreTriangles.Num() > 0)
+        // Columns with no presence at all (the lattice corners past a bend,
+        // or the whole grid when the raft is beached): collapse every vertex
+        // onto the nearest present column's already-piled edge vertex so the
+        // quads bridging into them are zero-area too. Two sweeps give each
+        // dry column its nearest present column without a search per column.
         {
-            // A/B probe: hold the previous index lists so no section is
-            // recreated mid-play; membership churn then cannot reset the
-            // primitive's temporal history.
-            bTopologyChanged = false;
-            bBoundaryTopologyChanged = false;
+            TArray<int32> NearestPresentX;
+            NearestPresentX.Init(INDEX_NONE, GridStationN);
+            int32 Carry = INDEX_NONE;
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                if (MinPresentY[X] != INDEX_NONE)
+                {
+                    Carry = X;
+                }
+                NearestPresentX[X] = Carry;
+            }
+            Carry = INDEX_NONE;
+            for (int32 X = GridStationN - 1; X >= 0; --X)
+            {
+                if (MinPresentY[X] != INDEX_NONE)
+                {
+                    Carry = X;
+                }
+                else if (Carry != INDEX_NONE &&
+                         (NearestPresentX[X] == INDEX_NONE ||
+                          Carry - X < X - NearestPresentX[X]))
+                {
+                    NearestPresentX[X] = Carry;
+                }
+            }
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                if (MinPresentY[X] != INDEX_NONE)
+                {
+                    continue;
+                }
+                const int32 AnchorX = NearestPresentX[X];
+                for (int32 Y = 0; Y < GridLateralN; ++Y)
+                {
+                    const int32 Index = Y * GridStationN + X;
+                    if (AnchorX != INDEX_NONE)
+                    {
+                        const int32 AnchorIndex =
+                            Y * GridStationN + AnchorX;
+                        LiveVolumeCoreVertices[Index] =
+                            LiveVolumeCoreVertices[AnchorIndex];
+                        LiveVolumeCoreNormals[Index] =
+                            LiveVolumeCoreNormals[AnchorIndex];
+                        LiveVolumeCoreVertexColors[Index] =
+                            LiveVolumeCoreVertexColors[AnchorIndex];
+                    }
+                    else
+                    {
+                        // No water anywhere in the window: sink the whole
+                        // degenerate lattice out of sight instead of
+                        // clearing the section (a clear is a render-state
+                        // invalidation; this is just vertex motion).
+                        LiveVolumeCoreVertices[Index] =
+                            FVector(0.0f, 0.0f, -100000.0f);
+                    }
+                    LiveVolumeCoreVertexColors[Index].A = 0.0f;
+                }
+            }
         }
-        else
-        {
-            // No adoption throttle: the frozen band already makes both lists
-            // byte-stable through ordinary play (wet/dry churn moves
-            // vertices, not indices), so a changed list here means a real
-            // structural event — recentre, band-edge escape, or a mid-river
-            // presence hole opening outside the band.
-            LiveVolumeCoreTriangles = MoveTemp(NewVolumeCoreTriangles);
-            LiveVolumeCoreBoundaryTriangles =
-                MoveTemp(NewVolumeCoreBoundaryTriangles);
-        }
-        LiveVolumeCoreTriangleCount =
-            (LiveVolumeCoreTriangles.Num() +
-                LiveVolumeCoreBoundaryTriangles.Num()) / 3;
+        LiveVolumeCoreTriangleCount = LiveVolumeCoreTriangles.Num() / 3;
         if (LiveVolumeCoreTriangleCount > 0)
         {
             const TArray<FVector2D> VolumeCoreEmptyUVs;
@@ -5697,77 +5880,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     RenderedLiveVolumeCoreWakeData;
                 LiveVolumeCoreInterpolationElapsedSeconds = 0.0f;
                 bLiveVolumeCoreInterpolationActive = true;
-                if (bTopologyChanged)
-                {
-                    // Wet/dry shoreline membership may change at the solver
-                    // cadence. Install only the new index list while keeping
-                    // the exact currently rendered positions, normals, and
-                    // alpha. Newly admitted bank triangles therefore emerge
-                    // from their previous dry/transparent state instead of
-                    // making the complete reflective carrier jump.
-                    LogWaterRenderStateEvent(
-                        GetWorld(), TEXT("core_create_interp_topology"));
-                    LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
-                        0,
-                        RenderedLiveVolumeCoreVertices,
-                        LiveVolumeCoreTriangles,
-                        RenderedLiveVolumeCoreNormals,
-                        UVs,
-                        RenderedLiveVolumeCoreFlowVelocity,
-                        RenderedLiveVolumeCoreWakeData,
-                        VolumeCoreEmptyUVs,
-                        RenderedLiveVolumeCoreVertexColors,
-                        Tangents,
-                        /*bCreateCollision=*/false);
-                }
-                else if (bRecentreCarryApplied)
+                if (bRecentreCarryApplied)
                 {
                     // Same world-space geometry the previous frame drew, but
                     // every index now maps to a shifted station. Push the
                     // carried state together with the recentred UVs so the
                     // river-anchored WPO and texture fields stay glued to
                     // their coordinates for the frame this refresh renders.
+                    // With the immutable topology this is a plain in-place
+                    // update — a recentre no longer touches the index list.
                     LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
                         0,
-                        RenderedLiveVolumeCoreVertices,
-                        RenderedLiveVolumeCoreNormals,
-                        UVs,
-                        RenderedLiveVolumeCoreFlowVelocity,
-                        RenderedLiveVolumeCoreWakeData,
-                        VolumeCoreEmptyUVs,
-                        RenderedLiveVolumeCoreVertexColors,
-                        Tangents);
-                }
-                // Boundary band: recreating this small section invalidates
-                // only the thin waterline strip, so churn here is fine. A
-                // cleared section keeps its entry with zero vertices, so the
-                // in-place update also requires a matching vertex count.
-                const FProcMeshSection* BoundarySectionState =
-                    LiveVolumeCoreMesh->GetProcMeshSection(1);
-                if (bBoundaryTopologyChanged ||
-                    BoundarySectionState == nullptr ||
-                    BoundarySectionState->ProcVertexBuffer.Num() !=
-                        RenderedLiveVolumeCoreVertices.Num())
-                {
-                    LogWaterRenderStateEvent(
-                        GetWorld(), TEXT("core_boundary_create"));
-                    LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
-                        1,
-                        RenderedLiveVolumeCoreVertices,
-                        LiveVolumeCoreBoundaryTriangles,
-                        RenderedLiveVolumeCoreNormals,
-                        UVs,
-                        RenderedLiveVolumeCoreFlowVelocity,
-                        RenderedLiveVolumeCoreWakeData,
-                        VolumeCoreEmptyUVs,
-                        RenderedLiveVolumeCoreVertexColors,
-                        Tangents,
-                        /*bCreateCollision=*/false);
-                }
-                else if (bRecentreCarryApplied)
-                {
-                    LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
-                        1,
                         RenderedLiveVolumeCoreVertices,
                         RenderedLiveVolumeCoreNormals,
                         UVs,
@@ -5778,37 +5901,18 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         Tangents);
                 }
             }
-            else if (bTopologyChanged || bGridRecentredThisRefresh ||
-                     bSectionMissing)
+            else if (bSectionMissing)
             {
-                // CreateMeshSection replaces an existing section atomically.
-                // Clearing it first exposed an empty render state whenever a
-                // shoreline wet cell entered or left the moving window, which
-                // read as an occasional whole-texture flash and bank-water
-                // pop even though the replacement topology was valid.
+                // The only remaining render-state invalidation: first build
+                // of a grid shape (or an engine-side loss of the section).
+                // Everything else — recentres, wet/dry churn, dry-out,
+                // re-wet — is vertex motion on this one immortal section.
                 LogWaterRenderStateEvent(
-                    GetWorld(),
-                    bSectionMissing
-                        ? TEXT("core_create_hard_section_missing")
-                        : (bGridRecentredThisRefresh
-                               ? TEXT("core_create_hard_recentre")
-                               : TEXT("core_create_hard_topology")));
+                    GetWorld(), TEXT("core_create_hard_section_missing"));
                 LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
                     0,
                     LiveVolumeCoreVertices,
                     LiveVolumeCoreTriangles,
-                    LiveVolumeCoreNormals,
-                    UVs,
-                    FlowVelocityMetersPerSecond,
-                    BoatWakePresentationData,
-                    VolumeCoreEmptyUVs,
-                    LiveVolumeCoreVertexColors,
-                    Tangents,
-                    /*bCreateCollision=*/false);
-                LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
-                    1,
-                    LiveVolumeCoreVertices,
-                    LiveVolumeCoreBoundaryTriangles,
                     LiveVolumeCoreNormals,
                     UVs,
                     FlowVelocityMetersPerSecond,
@@ -5838,39 +5942,6 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     VolumeCoreEmptyUVs,
                     LiveVolumeCoreVertexColors,
                     Tangents);
-                const FProcMeshSection* BoundaryUpdateState =
-                    LiveVolumeCoreMesh->GetProcMeshSection(1);
-                if (bBoundaryTopologyChanged ||
-                    BoundaryUpdateState == nullptr ||
-                    BoundaryUpdateState->ProcVertexBuffer.Num() !=
-                        LiveVolumeCoreVertices.Num())
-                {
-                    LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
-                        1,
-                        LiveVolumeCoreVertices,
-                        LiveVolumeCoreBoundaryTriangles,
-                        LiveVolumeCoreNormals,
-                        UVs,
-                        FlowVelocityMetersPerSecond,
-                        BoatWakePresentationData,
-                        VolumeCoreEmptyUVs,
-                        LiveVolumeCoreVertexColors,
-                        Tangents,
-                        /*bCreateCollision=*/false);
-                }
-                else
-                {
-                    LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
-                        1,
-                        LiveVolumeCoreVertices,
-                        LiveVolumeCoreNormals,
-                        UVs,
-                        FlowVelocityMetersPerSecond,
-                        BoatWakePresentationData,
-                        VolumeCoreEmptyUVs,
-                        LiveVolumeCoreVertexColors,
-                        Tangents);
-                }
                 RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
                 RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
                 RenderedLiveVolumeCoreVertexColors =
@@ -5880,34 +5951,21 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 RenderedLiveVolumeCoreWakeData = BoatWakePresentationData;
                 bLiveVolumeCoreInterpolationActive = false;
             }
+            // The mesh stays visible for the section's whole life: an
+            // all-dry window is already invisible geometrically (every
+            // vertex collapsed or sunk), and a visibility flip is itself a
+            // render-state invalidation.
+            if (!LiveVolumeCoreMesh->IsVisible())
+            {
+                LiveVolumeCoreMesh->SetVisibility(true, true);
+            }
         }
-        else
-        {
-            // ClearMeshSection keeps the section entry alive with zero
-            // vertices. The per-frame interpolation only null-checked the
-            // section, so leaving it armed here made every subsequent frame
-            // push the full-grid arrays at an empty section — an engine
-            // error ("different number of vertices [Previous: 0 ...]") per
-            // frame for as long as the core stayed dry.
-            LogWaterRenderStateEvent(GetWorld(), TEXT("core_clear"));
-            LiveVolumeCoreMesh->ClearMeshSection(0);
-            LiveVolumeCoreMesh->ClearMeshSection(1);
-            bLiveVolumeCoreInterpolationActive = false;
-        }
-        if (LiveVolumeCoreMesh->IsVisible() !=
-            (LiveVolumeCoreTriangleCount > 0))
-        {
-            LogWaterRenderStateEvent(
-                GetWorld(), TEXT("core_visibility_flip"));
-        }
-        LiveVolumeCoreMesh->SetVisibility(
-            LiveVolumeCoreTriangleCount > 0, true);
     }
     else
     {
         LiveVolumeCoreTriangleCount = 0;
         LiveVolumeCoreTriangles.Reset();
-        LiveVolumeCoreBoundaryTriangles.Reset();
+        LiveVolumeCoreStaticTopologyVertexCount = 0;
         bLiveVolumeCoreInterpolationActive = false;
         LiveVolumeCoreMesh->SetVisibility(false, true);
     }
@@ -6034,6 +6092,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // the signed displaced crest/trough bands without sampling a texture.
     int32 PaddleWakeRenderTriangleCount = 0;
     if (MaximumAbsoluteBoatWakeM > 0.001f &&
+        CVarRaftSimPaddleWakeRippleOverlay.GetValueOnGameThread() != 0 &&
         CVarRaftSimFreezeCoreTopology.GetValueOnGameThread() < 2)
     {
         TArray<FVector> RippleVertices;
@@ -6375,9 +6434,17 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
                 RaftLocationCm, BoatWaterSample) &&
             BoatWaterSample.bWet)
         {
+            // The boat velocity above lives in river coordinates
+            // (tangent/left-normal components); the world sampler returns a
+            // WORLD-frame vector. Subtracting them raw skewed the relative
+            // velocity by the river's world heading, bending the wake off
+            // the true travel line everywhere the channel is not aligned
+            // with world +X.
             RelativeVelocityMps -= FVector2D(
-                BoatWaterSample.VelocityMetersPerSecond.X,
-                BoatWaterSample.VelocityMetersPerSecond.Y);
+                static_cast<float>(FVector::DotProduct(
+                    BoatWaterSample.VelocityMetersPerSecond, Tangent)),
+                static_cast<float>(FVector::DotProduct(
+                    BoatWaterSample.VelocityMetersPerSecond, LeftNormal)));
         }
     }
     BoatWakeRelativeSpeedMps = RelativeVelocityMps.Size();
@@ -6475,25 +6542,6 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
         EmptyUVs,
         RenderedLiveVolumeCoreVertexColors,
         Tangents);
-    // The boundary band shares the full vertex arrays; keep it moving on
-    // the same eased state every frame.
-    const FProcMeshSection* BoundarySection =
-        LiveVolumeCoreMesh->GetProcMeshSection(1);
-    if (BoundarySection != nullptr &&
-        BoundarySection->ProcVertexBuffer.Num() ==
-            RenderedLiveVolumeCoreVertices.Num())
-    {
-        LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
-            1,
-            RenderedLiveVolumeCoreVertices,
-            RenderedLiveVolumeCoreNormals,
-            UVs,
-            RenderedLiveVolumeCoreFlowVelocity,
-            RenderedLiveVolumeCoreWakeData,
-            EmptyUVs,
-            RenderedLiveVolumeCoreVertexColors,
-            Tangents);
-    }
     // The chase never "completes": it keeps easing toward the latest
     // refresh targets every frame until a hard swap or grid teardown
     // deactivates it.

@@ -125,9 +125,9 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         TEXT("paddle wake alternates signed crests and troughs"),
         PortWakeM * AdjacentWakeTroughM < 0.0f);
     Test->TestTrue(
-        TEXT("paddle wake geometry stays inside its 6 cm amplitude bound"),
-        FMath::Abs(PortWakeM) <= 0.0601f &&
-            FMath::Abs(AdjacentWakeTroughM) <= 0.0601f);
+        TEXT("paddle wake geometry stays inside its 11 cm amplitude bound"),
+        FMath::Abs(PortWakeM) <= 0.1101f &&
+            FMath::Abs(AdjacentWakeTroughM) <= 0.1101f);
     Test->TestTrue(
         TEXT("paddle wake is absent ahead of the raft"),
         FMath::IsNearlyZero(
@@ -212,6 +212,34 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
     Test->TestTrue(
         TEXT("boulder nose forms a positive pressure pillow"),
         BoulderPillowM > 0.10f && BoulderPillowM <= 0.2201f);
+    // Moderate drift current must still read: the raft passes Meat
+    // Grinder's exposed boulders at ~0.8 m/s, and the pillow there has to
+    // be visible, not the ~2 cm the old 0.45-1.65 ramp allowed.
+    const float ModerateCurrentPillowM = URaftSimWaterRuntimeAdapter::
+        ComputeCoupledBoulderPillowDisplacementMeters(
+            -1.1f * BoulderRadiusM,
+            0.0f,
+            BoulderRadiusM,
+            0.8f);
+    Test->TestTrue(
+        TEXT("boulder pillow stays readable in moderate drift current"),
+        ModerateCurrentPillowM > 0.04f &&
+            ModerateCurrentPillowM < BoulderPillowM);
+    // Slow bank-edge drift past a pool rock still guarantees a readable
+    // minimum mound; dead-still water guarantees none.
+    const float SlowDriftPillowM = URaftSimWaterRuntimeAdapter::
+        ComputeCoupledBoulderPillowDisplacementMeters(
+            -1.1f * BoulderRadiusM, 0.0f, BoulderRadiusM, 0.3f);
+    Test->TestTrue(
+        TEXT("boulder pillow keeps a readable floor in slow drift"),
+        SlowDriftPillowM > 0.03f &&
+            SlowDriftPillowM <= ModerateCurrentPillowM);
+    Test->TestTrue(
+        TEXT("still water forms no pillow"),
+        FMath::IsNearlyZero(
+            URaftSimWaterRuntimeAdapter::
+                ComputeCoupledBoulderPillowDisplacementMeters(
+                    -1.1f * BoulderRadiusM, 0.0f, BoulderRadiusM, 0.05f)));
     Test->TestTrue(
         TEXT("boulder pressure pillow does not appear downstream"),
         FMath::IsNearlyZero(
