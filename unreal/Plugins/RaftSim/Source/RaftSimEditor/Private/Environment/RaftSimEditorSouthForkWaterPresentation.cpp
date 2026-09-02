@@ -183,6 +183,47 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             return nullptr;
         }
 
+        // The colour/opacity lerps no longer key on the raw mask: the base
+        // graph wraps it in the live-level EffectiveDepthMask (a Saturate
+        // over DepthMask + delta) so level-tracking tiles shade by their
+        // real depth. Interpose the power response on whatever expression
+        // the depth blends actually share — the raw mask on legacy parents,
+        // the effective mask on current ones. Matching only the raw mask
+        // found 0 of 2 blends and silently aborted every V4 regeneration
+        // after the effective mask landed (discovered when the V4 asset
+        // vanished from the working tree, 2026-09-02).
+        const auto UsesSolverDepth =
+            [SolverDepthMask](UMaterialExpression* Alpha) -> bool
+        {
+            if (Alpha == SolverDepthMask)
+            {
+                return true;
+            }
+            if (UMaterialExpressionSaturate* Saturated =
+                    Cast<UMaterialExpressionSaturate>(Alpha))
+            {
+                if (UMaterialExpressionAdd* Sum = Cast<UMaterialExpressionAdd>(
+                        Saturated->Input.Expression))
+                {
+                    return Sum->A.Expression == SolverDepthMask ||
+                        Sum->B.Expression == SolverDepthMask;
+                }
+            }
+            return false;
+        };
+        UMaterialExpression* SharedDepthAlpha = nullptr;
+        for (const TObjectPtr<UMaterialExpression>& Expression :
+             Material->GetExpressionCollection().Expressions)
+        {
+            UMaterialExpressionLinearInterpolate* DepthBlend =
+                Cast<UMaterialExpressionLinearInterpolate>(Expression.Get());
+            if (DepthBlend && UsesSolverDepth(DepthBlend->Alpha.Expression))
+            {
+                SharedDepthAlpha = DepthBlend->Alpha.Expression;
+                break;
+            }
+        }
+
         Material->Modify();
         UMaterialExpressionScalarParameter* ResponseExponent =
             NewObject<UMaterialExpressionScalarParameter>(Material);
@@ -194,7 +235,8 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         UMaterialExpressionPower* OpticalDepthResponse =
             NewObject<UMaterialExpressionPower>(Material);
         OpticalDepthResponse->Desc = TEXT("RaftSimOpticalDepthResponse");
-        OpticalDepthResponse->Base.Expression = SolverDepthMask;
+        OpticalDepthResponse->Base.Expression =
+            SharedDepthAlpha ? SharedDepthAlpha : SolverDepthMask;
         OpticalDepthResponse->Exponent.Expression = ResponseExponent;
         Material->GetExpressionCollection().AddExpression(
             OpticalDepthResponse);
@@ -205,8 +247,9 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         {
             UMaterialExpressionLinearInterpolate* DepthBlend =
                 Cast<UMaterialExpressionLinearInterpolate>(Expression.Get());
-            if (!DepthBlend ||
-                DepthBlend->Alpha.Expression != SolverDepthMask)
+            if (!DepthBlend || DepthBlend->Alpha.Expression == nullptr ||
+                DepthBlend->Alpha.Expression !=
+                    OpticalDepthResponse->Base.Expression)
             {
                 continue;
             }
