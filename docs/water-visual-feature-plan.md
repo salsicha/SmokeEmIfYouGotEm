@@ -312,6 +312,39 @@ water meshes regenerated in place via the new water-only rebuild flag
 terrain, far field, and materials untouched). All 39 band meshes
 regenerated; shoreline stills show one edge.
 
+## 2026-09-01 live-level shore clip, palm sense, hard beach gate
+
+"The shiny water texture runs over the left bank ... the shiny surface
+and the water coloured surface meet the bank at different places." The
+static terrain-clipped tiles are cooked at ONE flow band
+(median_runnable) while the release schedule moves the live level
+through the day — measured live-minus-cooked at the report site
+(station 380, morning): -0.36 m. The cooked sheet therefore kept
+rendering metres up the bank past the solver waterline as a glossy
+apron (the "shiny" surface), while the carrier's colored water ended
+at the true line. Fix: the runtime samples live vs baseline level at
+the boat each frame and publishes the smoothed delta through the
+foam-occlusion MPC (RaftSimLiveWaterLevelDeltaM, also in the pillow
+probe log as level_delta_m); the tile material recomputes each pixel's
+cooked depth (VC.G x 2.5) against today's level and retires everything
+above it — opacity, specular, body colour, drift emissive to zero,
+roughness to matte — over a 6 cm feather. Tiles enable it via the MI
+(ApplyLiveLevelShoreClip=1); the carrier follows the solver by
+construction and keeps it off. Verified capture at station 380: one
+waterline, no apron. V4 regenerated (graph change: delete + recreate).
+
+"The hands look twisted" (round 2): the first mirror fix chose the
+back-of-hand sense for BOTH hands — every resting hand lay palm-up
+under the shaft. Cross orders swapped to the empirically verified palm
+sense; close-up confirms knuckles-up palm-down grips both sides.
+
+"Paddling on dry ground still moves the boat": the first gate only
+CAPPED thrust when grounded (0.35), so a beached raft whose blade tips
+reached nearby water still crawled. A grounded hull (3+ support
+points) whose CENTRE sample is dry now gets zero purchase; the reduced
+bite survives only when the hull itself still stands in water, which
+keeps working off a mid-river gravel touch possible.
+
 ## 2026-09-01 pillow round 3: the aerated collar (why "no pillow" persisted)
 
 "Theres still no pillow on the rock" (km 0.87, glassy pool). The probe

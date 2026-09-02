@@ -1288,6 +1288,57 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     RoughnessOutput = AddNode(
         RoughnessOutput,
         Mul(BoatWakeCoverage, Scalar(TEXT("BoatWakeRoughness"), 0.06f)));
+    // Live-level shore clip (static tiles only): the terrain-clipped water
+    // meshes are cooked at one flow band, but the release schedule moves
+    // the live level through the day, so on a low morning their glossy
+    // sheet kept rendering metres above the real waterline ("the shiny
+    // water texture runs over the left bank ... the shiny surface and the
+    // water coloured surface meet the bank at different places",
+    // 2026-09-01). The runtime publishes live-minus-cooked level near the
+    // raft; recompute this pixel's cooked depth (VC.G stores depth/2.5 on
+    // the static cook) against today's level and retire everything the
+    // cook placed above it — transmissive, matte, colourless, so the bank
+    // simply shows through. The live carrier follows the solver by
+    // construction and keeps the clip disabled via its dynamic instance.
+    UMaterialExpression* OpacityOut = Opacity;
+    if (UMaterialExpression* LiveLevelDeltaM = AddFoamCollectionScalarExpression(
+            Material, TEXT("RaftSimLiveWaterLevelDeltaM")))
+    {
+        UMaterialExpressionScalarParameter* ShoreClipEnabled =
+            Scalar(TEXT("ApplyLiveLevelShoreClip"), 0.0f);
+        UMaterialExpressionConstant* CookedDepthBasis =
+            NewObject<UMaterialExpressionConstant>(Material);
+        CookedDepthBasis->R = 2.5f;
+        Add(CookedDepthBasis);
+        UMaterialExpressionConstant* ClipFeatherInv =
+            NewObject<UMaterialExpressionConstant>(Material);
+        ClipFeatherInv->R = 1.0f / 0.06f;
+        Add(ClipFeatherInv);
+        UMaterialExpressionConstant* FullyKept =
+            NewObject<UMaterialExpressionConstant>(Material);
+        FullyKept->R = 1.0f;
+        Add(FullyKept);
+        UMaterialExpressionSaturate* LiveDepthGate =
+            NewObject<UMaterialExpressionSaturate>(Material);
+        LiveDepthGate->Input.Expression = Mul(
+            AddNode(Mul(DepthMask, CookedDepthBasis), LiveLevelDeltaM),
+            ClipFeatherInv);
+        Add(LiveDepthGate);
+        UMaterialExpressionLinearInterpolate* ShoreClipAlpha =
+            Lerp(FullyKept, LiveDepthGate, ShoreClipEnabled);
+        OpacityOut = Mul(OpacityOut, ShoreClipAlpha);
+        Specular = Mul(Specular, ShoreClipAlpha);
+        UMaterialExpressionConstant* DrainedRoughness =
+            NewObject<UMaterialExpressionConstant>(Material);
+        DrainedRoughness->R = 0.9f;
+        Add(DrainedRoughness);
+        RoughnessOutput = Lerp(DrainedRoughness, RoughnessOutput, ShoreClipAlpha);
+        BaseColorOut = Mul(BaseColorOut, ShoreClipAlpha);
+        if (DriftFleckMask != nullptr)
+        {
+            DriftFleckMask = Mul(DriftFleckMask, ShoreClipAlpha);
+        }
+    }
     UMaterialEditorOnlyData* Ed = Material->GetEditorOnlyData();
     Ed->BaseColor.Connect(0, BaseColorOut);
     // A displacement-hull boat wake carries NO whitening: a paddled raft
@@ -1305,7 +1356,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     Ed->Metallic.Connect(0, Metallic);
     Ed->Specular.Connect(0, Specular);
     Ed->Roughness.Connect(0, RoughnessOutput);
-    Ed->Opacity.Connect(0, Opacity);
+    Ed->Opacity.Connect(0, OpacityOut);
     if (FinalNormal != nullptr)
     {
         Ed->Normal.Connect(0, FinalNormal);

@@ -1864,6 +1864,10 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     TEXT("RaftInteriorSurfaceOpacityScale"), 0.0f);
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("RaftInteriorOpticalDepthScale"), 0.0f);
+                // The carrier's vertices FOLLOW the live level; only the
+                // static cooked tiles retire their above-waterline sheet.
+                VolumeMaterial->SetScalarParameterValue(
+                    TEXT("ApplyLiveLevelShoreClip"), 0.0f);
                 // River-local render-only optical coefficients. Defaults keep
                 // the accepted cold-water calibration; sediment-bearing rivers
                 // can transmit warmer bed light without changing hydraulics.
@@ -3580,7 +3584,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             TEXT("RaftSim boulder pillow probe: footprints=%d wet_ring_verts=%d "
                  "max_pillow_m=%.4f max_ring_speed_mps=%.3f coupled_max_m=%.4f "
                  "boat_wake_valid=%d paddling=%d wake_env=%.2f wake_rel_mps=%.2f "
-                 "wake_max_m=%.4f"),
+                 "wake_max_m=%.4f level_delta_m=%.3f"),
             WindowBoulderFootprintsSLR.Num(),
             WetPillowRingVertexCount,
             MaximumBoulderPillowM,
@@ -3590,7 +3594,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             bBoatWakePaddling ? 1 : 0,
             BoatWakePaddleEnvelope,
             BoatWakeRelativeSpeedMps,
-            MaximumAbsoluteBoatWakeM);
+            MaximumAbsoluteBoatWakeM,
+            LiveVsBaselineLevelDeltaM);
     }
 
     // Continuous current detail belongs in the single carrier's WPO. It is
@@ -6665,6 +6670,42 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
             SurfaceMesh->SetVisibility(!bHideOverlay, false);
         }
     }
+    if (WaterAdapter)
+    {
+        // Live-minus-cooked level near the raft: the static flow-band tiles
+        // are cooked at one discharge, and on a low-release morning their
+        // glossy sheet kept rendering metres up the bank past the solver's
+        // waterline. Sample both fields along the channel at the boat and
+        // publish the smoothed delta for the tile material's shore clip.
+        float LevelDeltaSumM = 0.0f;
+        int32 LevelDeltaCount = 0;
+        for (const float StationOffsetM : {-20.0f, 0.0f, 20.0f})
+        {
+            const FVector2D ProbeM(
+                BoatRiverPositionM.X + StationOffsetM, BoatRiverPositionM.Y);
+            FRaftSimWaterSample LiveSample;
+            FRaftSimWaterSample BaselineSample;
+            if (WaterAdapter->SampleWaterAtRiverCoordinates(
+                    ProbeM, LiveSample) &&
+                LiveSample.bWet &&
+                WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(
+                    ProbeM, BaselineSample) &&
+                BaselineSample.bWet)
+            {
+                LevelDeltaSumM += LiveSample.SurfaceHeightMeters -
+                    BaselineSample.SurfaceHeightMeters;
+                ++LevelDeltaCount;
+            }
+        }
+        if (LevelDeltaCount > 0)
+        {
+            LiveVsBaselineLevelDeltaM = FMath::FInterpTo(
+                LiveVsBaselineLevelDeltaM,
+                LevelDeltaSumM / LevelDeltaCount,
+                FMath::Max(DeltaSeconds, 0.0f),
+                0.8f);
+        }
+    }
     if (RaftFoamOcclusionCollection && GetWorld())
     {
         if (UMaterialParameterCollectionInstance* ClockParameters =
@@ -6673,6 +6714,8 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
         {
             ClockParameters->SetScalarParameterValue(
                 TEXT("RaftSimWaveClockSeconds"), PresentationWaveClockSeconds);
+            ClockParameters->SetScalarParameterValue(
+                TEXT("RaftSimLiveWaterLevelDeltaM"), LiveVsBaselineLevelDeltaM);
             ClockParameters->SetVectorParameterValue(
                 TEXT("RaftSimFoamAdvectionMeters"),
                 FLinearColor(

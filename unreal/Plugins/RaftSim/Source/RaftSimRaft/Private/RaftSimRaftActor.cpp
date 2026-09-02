@@ -1302,7 +1302,19 @@ float ARaftSimRaftActor::GetPaddleWaterPurchase() const
     if (Purchase > 0.0f && RaftAdapter != nullptr &&
         RaftAdapter->GetLastGroundedSupportPointCount() >= 3)
     {
-        Purchase = FMath::Min(Purchase, 0.35f);
+        // A grounded hull whose CENTRE stands over dry ground is parked on
+        // land: whatever water a blade tip can still reach, the crew cannot
+        // drag a loaded raft across sand ("paddling on dry ground still
+        // moves the boat", 2026-09-01 — the first pass only capped the
+        // grounded case, so a beached raft at the waterline kept 35% of its
+        // thrust). Reduced bite survives only while the hull itself still
+        // stands in water, which is what lets a crew work off a gravel
+        // touch mid-river.
+        FRaftSimWaterSample CenterSample;
+        const bool bCenterInWater = Water->SampleWaterAtWorldPosition(
+            GetActorLocation(), CenterSample) &&
+            CenterSample.bWet && CenterSample.DepthMeters > 0.05f;
+        Purchase = bCenterInWater ? FMath::Min(Purchase, 0.35f) : 0.0f;
     }
     return Purchase;
 }

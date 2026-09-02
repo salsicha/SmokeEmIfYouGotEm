@@ -812,15 +812,17 @@ FQuat ARaftSimCC0CrewVisualActor::ResolvePaddleGripHandRotation(
         (ReferenceIndex->GetLocation() - ReferencePinky->GetLocation()).GetSafeNormal();
     const FVector ReferenceForward =
         (ReferenceMiddle->GetLocation() - ReferenceHand->GetLocation()).GetSafeNormal();
-    // Width x Forward from anatomical finger positions yields the PALM
-    // normal on the right hand but the BACK of the hand on the mirrored
-    // left, so a shared cross order aimed the left palm away from the
-    // shaft — the grip read flipped/backwards ("the hand gripping the
-    // paddle shaft seems to be bending the wrong way", 2026-08-31).
-    // Build both references as palm normals.
+    // The reference basis must be the PALM normal on BOTH hands, and the
+    // cross order that achieves it mirrors with the hand: anatomical
+    // finger positions flip the product's sense between left and right.
+    // First pass used one shared order (left grip solved backwards,
+    // 2026-08-31); the "consistent" swap then chose the back-of-hand
+    // sense for BOTH — every resting hand lay palm-up under the shaft
+    // ("the hands look twisted", 2026-09-01). This orientation is the
+    // empirically verified palm sense for this rig.
     const FVector ReferenceNormal =
-        (bLeft ? FVector::CrossProduct(ReferenceForward, ReferenceWidth)
-               : FVector::CrossProduct(ReferenceWidth, ReferenceForward))
+        (bLeft ? FVector::CrossProduct(ReferenceWidth, ReferenceForward)
+               : FVector::CrossProduct(ReferenceForward, ReferenceWidth))
             .GetSafeNormal();
     const FVector GripCenterCm = bLeft ? Pose.LeftHandCm : Pose.RightHandCm;
     // The knuckle line mirrors too: on a shared shaft axis the left hand's
