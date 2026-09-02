@@ -80,9 +80,21 @@ struct FRaftSimRaftBodyConfig
     /**
      * Reference speed used to retain viscous hull resistance near rest.
      * Above this speed the same term remains purely quadratic.
+     * 1.5 welded the hull to the local streamline: with the blunt 9000
+     * coefficient the lateral relative velocity decayed in ~0.1 s, so a
+     * drifting raft tracked a bend's turning water to within 0.1 degree
+     * and never carried to the outside of the turn (drift telemetry,
+     * 2026-09-02). 0.25 overshot the other way — a free drift lagged the
+     * turning water by 1-2.5 degrees even on gentle pool reaches and
+     * beached itself on the outside bank within minutes ("while drifting
+     * the boat moves sideways across the river and runs into the left
+     * shore"). 0.55 keeps a clearly visible outside set in real bends
+     * while a hands-off pool drift stays in the channel; the >=1.5 m/s
+     * capture regime that keeps advected froth behind the boat is
+     * numerically unchanged.
      */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
-    float LowSpeedDragReferenceMps = 1.5f;
+    float LowSpeedDragReferenceMps = 0.55f;
 
     /**
      * Drag coefficient for the bow-first slicing component of relative

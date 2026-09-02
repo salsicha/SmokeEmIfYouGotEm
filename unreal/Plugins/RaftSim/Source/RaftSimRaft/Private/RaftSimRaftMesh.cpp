@@ -969,22 +969,34 @@ void BuildInflatableRaft(
             &Deformation, &Condition);
     }
 
+    // Four load-rated D-rings on the outer side tubes. The first pass stood
+    // each ring VERTICALLY at a point 2-3 cm off the curving tube flank —
+    // a bare metal oval tangent-kissing the fabric, which read as floating
+    // hardware from the guide seat ("the D rings aren't attached to the
+    // boat", run close-up 2026-09-02). A real fitting is a bonded patch
+    // that follows the tube surface with the ring lying flat against it,
+    // so both are built in the tube's tangent frame at the upper-outer
+    // shoulder and share the hull deformation field.
+    const float RingPhiRadians = FMath::DegreesToRadians(63.0f);
+    const float RingSinPhi = FMath::Sin(RingPhiRadians);
+    const float RingCosPhi = FMath::Cos(RingPhiRadians);
     if (OutMetalFittings)
     {
-        // Four load-rated D-rings sit on the outer side tubes where a real
-        // paddle raft carries bow/stern rigging and recovery attachments.
-        // The rings are deliberately modest at gameplay scale but keep enough
-        // radial topology for a metallic highlight instead of reading as cards.
-        const float RingY = Ay + Tr * 1.02f;
-        const float RingZ = Tr * 1.42f;
         for (const float Side : {-1.0f, 1.0f})
         {
+            const FVector RadialDir(0.0f, Side * RingSinPhi, RingCosPhi);
+            const FVector SurfaceTangentUp(
+                0.0f, -Side * RingCosPhi, RingSinPhi);
             for (const float RingX : {-L * 0.23f, L * 0.23f})
             {
+                const FVector SurfaceCenterCm(
+                    RingX,
+                    Side * (Ay + Tr * RingSinPhi),
+                    Tr + Tr * RingCosPhi);
                 AppendOvalTube(
-                    FVector(RingX, Side * RingY, RingZ),
+                    SurfaceCenterCm + RadialDir * 0.9f,
                     FVector(7.5f, 0.0f, 0.0f),
-                    FVector(0.0f, 0.0f, 5.5f),
+                    SurfaceTangentUp * 5.5f,
                     /*TubeCm=*/0.78f,
                     /*PathSegments=*/16,
                     /*RadialSegments=*/6,
@@ -1003,6 +1015,31 @@ void BuildInflatableRaft(
         {
             AppendSideChafeStrip(
                 L * 0.34f, Ay, Tr, Tr, Side, *OutRubberDetails, &Deformation);
+        }
+
+        // Bonded mounting patches under the metal D-rings: the rim of glued
+        // fabric that visually anchors each ring to the tube.
+        for (const float Side : {-1.0f, 1.0f})
+        {
+            const FVector RadialDir(0.0f, Side * RingSinPhi, RingCosPhi);
+            const FVector SurfaceTangentUp(
+                0.0f, -Side * RingCosPhi, RingSinPhi);
+            for (const float RingX : {-L * 0.23f, L * 0.23f})
+            {
+                const FVector SurfaceCenterCm(
+                    RingX,
+                    Side * (Ay + Tr * RingSinPhi),
+                    Tr + Tr * RingCosPhi);
+                AppendOvalTube(
+                    SurfaceCenterCm + RadialDir * 0.25f,
+                    FVector(10.5f, 0.0f, 0.0f),
+                    SurfaceTangentUp * 8.0f,
+                    /*TubeCm=*/1.35f,
+                    /*PathSegments=*/14,
+                    /*RadialSegments=*/5,
+                    *OutRubberDetails,
+                    &Deformation);
+            }
         }
 
         // Transverse chamber weld/protection bands make the continuous sweep

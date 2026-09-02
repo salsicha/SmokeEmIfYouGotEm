@@ -1837,8 +1837,12 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     // rougher lobe turns pixel-quantized blinking glints
                     // into stable soft streaks. 0.31 also blurred sky and
                     // shore into the milky sheet the clear-water pass
-                    // removed (2026-08-31): 0.20 keeps a damping margin
-                    // over the 0.15 tile lobe without repainting the veil.
+                    // removed (2026-08-31): 0.20 damps the glints without
+                    // repainting the veil, and the static tiles' MI now
+                    // matches it EXACTLY — with both sheets at the same
+                    // level (WPO sink) any roughness gap reads as a
+                    // reflection-sharpness seam at the carrier window edge
+                    // (2026-09-02).
                     VolumeMaterial->SetScalarParameterValue(
                         TEXT("WaterRoughness"), 0.20f);
                 }

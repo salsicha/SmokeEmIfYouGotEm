@@ -258,6 +258,11 @@ protected:
     UPROPERTY()
     TObjectPtr<UInputAction> GuideSteerAction;
 
+    /** F9 debug screen-recording toggle; runtime-transient like the
+     * steer action so no generated input asset is required. */
+    UPROPERTY()
+    TObjectPtr<UInputAction> ToggleRecordingAction;
+
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> AttachedRaft;
 
