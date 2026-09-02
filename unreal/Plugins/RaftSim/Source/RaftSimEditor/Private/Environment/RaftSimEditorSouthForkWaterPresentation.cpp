@@ -914,6 +914,10 @@ bool LoadSouthForkProductionWaterPresentation(
     // clear and transparent, the colour of the rocks beneath comes
     // through", player reference photo 2026-08-31). Whitewater keeps a
     // near-opaque white body so aeration contrasts with the clear pools.
+    // Static tiles retire everything the cook placed above the live level
+    // (RaftSimLiveWaterLevelDeltaM); the live carrier keeps this off.
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("ApplyLiveLevelShoreClip")), 1.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("ShallowWaterOpacity")), 0.30f);
     Instance->SetScalarParameterValueEditorOnly(

@@ -690,6 +690,10 @@ private:
      * visible shore flash at editor-hitch framerates ("the shore appears
      * and disappears", player recording, 2026-08-30). */
     int32 LiveVolumeCoreStaticTopologyVertexCount = 0;
+    /** Smoothed live-minus-cooked water level near the raft, in metres.
+     * Published to the foam-occlusion collection so the static flow-band
+     * tiles can retire the sheet they cooked above today's live level. */
+    float LiveVsBaselineLevelDeltaM = 0.0f;
     /** Per-vertex eased breaking crest/tail lift. Raw Froude detection
      * re-decides the lifted cells every refresh, so threshold cells toggled
      * their full lift in one 15 Hz step and the carved front hopped whole

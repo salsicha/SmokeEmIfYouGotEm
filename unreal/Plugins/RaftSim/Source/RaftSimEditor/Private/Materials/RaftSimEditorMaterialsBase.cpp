@@ -2687,6 +2687,12 @@ UMaterialParameterCollection* LoadOrCreateRaftFoamOcclusionCollection(
         Collection->VectorParameters.Add(Parameter);
     };
     EnsureScalar(TEXT("RaftFoamExclusionEnabled"), 0.0f);
+    // Live water level minus the cooked presentation baseline, in metres,
+    // sampled near the raft each frame. The static terrain-clipped tiles are
+    // cooked at one flow band while the release schedule moves the live
+    // level through the day; this delta lets their material retire the sheet
+    // it cooked above today's waterline instead of glossing the dry bank.
+    EnsureScalar(TEXT("RaftSimLiveWaterLevelDeltaM"), 0.0f);
     // Cumulative solver-current displacement in river station/lateral metres.
     // The masked lace subtracts it from river UVs, keeping fine foam features
     // stationary relative to a passive raft instead of adding fixed panners
