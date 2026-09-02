@@ -4717,13 +4717,18 @@ static void BuildRaftCrewMaterials()
     // wetsuit (player "gash in the butt cheek" report, 2026-08-30). A bright
     // equipment color can never be mistaken for flesh. Near-saturated
     // (2026-09-02): 0.68/0.44 rendered amber-olive under the morning sun.
-    // NOT two-sided: the blade mesh's top shell winds with downward
-    // normals, so single-sided culling shows the upward-lit underside
-    // faces — enabling TwoSided painted the unlit black backs over them
-    // and every blade went solid black ("the paddles are black now").
+    // TWO-SIDED, second attempt (2026-09-02): the blade shell's top winds
+    // with downward normals, so single-sided culling leaves the top open —
+    // from the guide's high-behind seat you see through onto the
+    // underside's unlit outer face and the resting blade reads black.
+    // Two-sided lighting flips the normal per backface (TwoSidedSign), so
+    // both faces light correctly; the earlier "two-sided made it black"
+    // observation was the V4-missing shader-compile failure era, not this
+    // flag.
     BuildSolidMaterial(
         TEXT("M_RaftSim_PaddleBlade"),
-        FLinearColor(0.90f, 0.70f, 0.045f, 1.0f), 0.52f, 0.08f);
+        FLinearColor(0.90f, 0.70f, 0.045f, 1.0f), 0.52f, 0.08f,
+        /*bTwoSided=*/true);
 }
 
 static UMaterial* BuildSprayMistMaterial()

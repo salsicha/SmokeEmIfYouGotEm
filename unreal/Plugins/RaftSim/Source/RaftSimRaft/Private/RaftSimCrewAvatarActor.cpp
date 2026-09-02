@@ -892,9 +892,17 @@ void BuildCommercialPaddleBladeMesh(
             FVector::RightVector,
             FVector2D(Point.X / 20.0f + 0.5f, (Point.Y + 5.0f) / 44.0f));
     }
+    // The outline traverses counter-clockwise viewed from +Y, so the cap
+    // triangles must wind {centre, next, current} for UE's clockwise front
+    // faces. The original {centre, current, next} left winding and normal
+    // disagreeing on BOTH caps: from the guide's high-behind seat every
+    // culling/two-sided/TwoSidedSign combination resolved the face-up
+    // resting blade to a down-facing normal — a black slab from above,
+    // yellow only from the side ("the paddles are still black", repeated
+    // 2026-09-02 while side captures kept disproving it).
     for (int32 Index = 0; Index < OutlineCount; ++Index)
     {
-        Triangles.Append({FrontCenter, FrontStart + Index, FrontStart + (Index + 1) % OutlineCount});
+        Triangles.Append({FrontCenter, FrontStart + (Index + 1) % OutlineCount, FrontStart + Index});
     }
 
     const int32 BackCenter = Vertices.Num();
@@ -909,7 +917,7 @@ void BuildCommercialPaddleBladeMesh(
     }
     for (int32 Index = 0; Index < OutlineCount; ++Index)
     {
-        Triangles.Append({BackCenter, BackStart + (Index + 1) % OutlineCount, BackStart + Index});
+        Triangles.Append({BackCenter, BackStart + Index, BackStart + (Index + 1) % OutlineCount});
     }
 
     for (int32 Index = 0; Index < OutlineCount; ++Index)
@@ -1430,6 +1438,25 @@ void ARaftSimCrewAvatarActor::Tick(float DeltaSeconds)
     ApplyPose(Pose);
     DispatchProductionPose();
     AlignProductionHeadgearToSolvedHead();
+    // The gap-fill overlay set (torso/pelvis/thigh/sleeve shells) depends
+    // on whether the CC0 body is READY, and readiness can flip after the
+    // one-shot visibility pass at spawn. That race left shoulder sleeves
+    // rendering over the finished body on some launches — anchored to the
+    // procedural elbow, they burst out of the CC0 forearm mid-stroke
+    // ("a strange black shape pops up out of the fore arm", 2026-09-02;
+    // the empty-helmet neck race was the same class). Re-apply the pass
+    // whenever readiness changes.
+    if (bUsingProductionVisual)
+    {
+        const ARaftSimCC0CrewVisualActor* CC0Visual =
+            Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor());
+        const bool bBodyReadyNow = CC0Visual && CC0Visual->IsBodyReady();
+        if (bBodyReadyNow != bLastAppliedCC0BodyReady)
+        {
+            bLastAppliedCC0BodyReady = bBodyReadyNow;
+            SetProceduralVisualVisible(false);
+        }
+    }
 }
 
 bool ARaftSimCrewAvatarActor::HasFiniteVisualTransforms() const
@@ -2416,14 +2443,18 @@ bool ARaftSimCrewAvatarActor::HasExclusiveCC0BodyOwnership() const
             CC0Visual && CC0Visual->IsBodyReady());
         return false;
     }
+    // Neck is deliberately NOT in this list: the CC0 wetsuit renders no
+    // visible skin between the PFD collar and the helmet's chin line, so
+    // the skin neck band is production dressing (2026-08-30 collar-gap
+    // design), not redundant anatomy — hiding it read as headless crew
+    // ("there should be a skin tone head in the helmet", 2026-09-02).
     const UProceduralMeshComponent* RedundantBodyOverlays[] = {
         Pelvis,
         Torso,
         LeftThigh,
         RightThigh,
         LeftShoulderSleeve,
-        RightShoulderSleeve,
-        Neck};
+        RightShoulderSleeve};
     for (const UProceduralMeshComponent* Overlay : RedundantBodyOverlays)
     {
         if (!Overlay || Overlay->IsVisible())
@@ -2492,7 +2523,14 @@ void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
                 Part == PfdBuckle || Part == Helmet ||
                 Part == HelmetRim || Part == HelmetRetention ||
                 Part == LeftBoot || Part == RightBoot ||
-                Part == PaddleShaft || Part == PaddleBlade || Part == PaddleGrip;
+                Part == PaddleShaft || Part == PaddleBlade || Part == PaddleGrip ||
+                // The skin neck band is deliberate production dressing (it
+                // fills the gap between the PFD collar and the helmet's chin
+                // line, 2026-08-30) but sat in the CC0-not-ready gap-fill
+                // list, so its visibility depended on load timing — when the
+                // body readied first, every helmet read as empty ("there
+                // should be a skin tone head in the helmet", 2026-09-02).
+                Part == Neck;
             const bool bBodyGapOverlay = !bCompleteCC0Body &&
                 (Part == Pelvis || Part == Torso ||
                  Part == LeftThigh || Part == RightThigh ||
@@ -3355,25 +3393,31 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         // scalloped neckline tucks UNDER the vest instead of draping black
         // flaps across its top panel ("shoulders still covered with black
         // material", third report 2026-09-02).
+        // Lift softened from 1.2/+5% (2026-09-02): the taller collar closed
+        // the last visible sliver of neck between vest foam and helmet rim,
+        // and every helmet read as empty ("the crew don't have heads").
         ProductionPfd->SetRelativeLocationAndRotation(
-            Pose.TorsoCenterCm + FVector(0.0f, 0.0f, 1.2f),
+            Pose.TorsoCenterCm + FVector(0.0f, 0.0f, 0.5f),
             Pose.TorsoRotation);
         ProductionPfd->SetRelativeScale3D(
-            Profile * FVector(1.0f, 1.0f, 1.05f));
+            Profile * FVector(1.0f, 1.0f, 1.02f));
     }
     const FVector CollarOffset = bUsingProductionVisual
         ? FVector(4.0f, 0.0f, 0.0f)
         : FVector::ZeroVector;
     const float CollarFit = bUsingProductionVisual ? 1.28f : 1.0f;
     // Lengthened with the raised head (2026-08-30) so skin spans the whole
-    // opening between the PFD collar foam and the helmet's chin line instead
-    // of ending inside the vest.
+    // opening between the PFD collar foam and the helmet's chin line, and
+    // raised/tallened again (2026-09-02) so the skin column continues UP
+    // into the helmet shell: from the guide's high-behind view the gap
+    // under the rear rim showed hollow black ("there should be a skin tone
+    // head in the helmet but it seems to be missing").
     SetEllipsoid(
         Neck,
-        Pose.HeadCenterCm - TorsoRotation.RotateVector(FVector(0.0f, 0.0f, 13.0f)) +
+        Pose.HeadCenterCm - TorsoRotation.RotateVector(FVector(0.0f, 0.0f, 11.0f)) +
             TorsoRotation.RotateVector(CollarOffset),
         Pose.TorsoRotation,
-        FVector(5.8f, 5.8f, 9.0f) * CollarFit);
+        FVector(5.8f, 5.8f, 10.5f) * CollarFit);
     SetEllipsoid(Head, Pose.HeadCenterCm, Pose.TorsoRotation,
                  FVector(11.0f, 10.0f, 13.0f) * HeadScale);
     // The component now contains an explicitly open top/back shell. Keep it
@@ -3416,8 +3460,27 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         ProductionHelmet->SetRelativeScale3D(FVector(HeadScale * HelmetFit));
     }
 
-    const FVector LeftElbow = FMath::Lerp(Pose.LeftShoulderCm, Pose.LeftHandCm, 0.48f) + FVector(0.0f, -5.0f, -2.0f);
-    const FVector RightElbow = FMath::Lerp(Pose.RightShoulderCm, Pose.RightHandCm, 0.48f) + FVector(0.0f, 5.0f, -2.0f);
+    // Elbow drop clamps to the SAME 9 cm bound as the CC0 adapter
+    // (RaftSimCC0CrewVisualActor::ApplyBodyPose): the two rigs solving
+    // different elbows let the shoulder-sleeve capsule — anchored to THIS
+    // elbow — burst out of the CC0 forearm at power phases ("a strange
+    // black shape pops up out of the fore arm when the crew is paddling",
+    // player recording 2026-09-02).
+    const auto ClampProceduralElbowDrop =
+        [](const FVector& ShoulderCm, FVector ElbowCm)
+    {
+        constexpr float kMaxElbowDropCm = 9.0f;
+        ElbowCm.Z = FMath::Max(ElbowCm.Z, ShoulderCm.Z - kMaxElbowDropCm);
+        return ElbowCm;
+    };
+    const FVector LeftElbow = ClampProceduralElbowDrop(
+        Pose.LeftShoulderCm,
+        FMath::Lerp(Pose.LeftShoulderCm, Pose.LeftHandCm, 0.48f) +
+            FVector(0.0f, -5.0f, -2.0f));
+    const FVector RightElbow = ClampProceduralElbowDrop(
+        Pose.RightShoulderCm,
+        FMath::Lerp(Pose.RightShoulderCm, Pose.RightHandCm, 0.48f) +
+            FVector(0.0f, 5.0f, -2.0f));
     const FVector LeftShoulderSleeveEnd = FMath::Lerp(
         Pose.LeftShoulderCm, LeftElbow, kProductionShoulderSleeveArmFraction);
     const FVector RightShoulderSleeveEnd = FMath::Lerp(
