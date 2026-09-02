@@ -431,8 +431,34 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionVectorParameter* DeepColor =
         Vector(TEXT("DeepWaterColor"), FLinearColor(0.006f, 0.015f, 0.021f, 0.0f));
     UMaterialExpressionComponentMask* DepthMask = Mask(VertexColor, false, true, false); // G
+    // Level-tracking tiles shade by their LIVE depth, not the cooked one:
+    // when the release wave stands the sheet half a metre above its cooked
+    // level, VC.G still says "ankle deep", so every depth-driven response
+    // (body colour, opacity, shore de-gloss) rendered the raised water as
+    // a pale shallow membrane hovering over the flooded bar ("water
+    // texture is missing", station 920 at live +0.5 m). The published
+    // delta corrects the basis wherever ApplyLiveLevelShoreClip is on;
+    // the carrier keeps it at 0 and is untouched.
+    UMaterialExpression* EffectiveDepthMask = DepthMask;
+    if (UMaterialExpression* EarlyLevelDeltaM = AddFoamCollectionScalarExpression(
+            Material, TEXT("RaftSimLiveWaterLevelDeltaM")))
+    {
+        UMaterialExpressionScalarParameter* EarlyClipEnabled =
+            Scalar(TEXT("ApplyLiveLevelShoreClip"), 0.0f);
+        UMaterialExpressionConstant* InverseDepthBasis =
+            NewObject<UMaterialExpressionConstant>(Material);
+        InverseDepthBasis->R = 1.0f / 2.5f;
+        Add(InverseDepthBasis);
+        UMaterialExpressionSaturate* LiveDepthMask =
+            NewObject<UMaterialExpressionSaturate>(Material);
+        LiveDepthMask->Input.Expression = AddNode(
+            DepthMask,
+            Mul(Mul(EarlyLevelDeltaM, InverseDepthBasis), EarlyClipEnabled));
+        Add(LiveDepthMask);
+        EffectiveDepthMask = LiveDepthMask;
+    }
     UMaterialExpressionLinearInterpolate* DepthWaterColor =
-        Lerp(ShallowColor, DeepColor, DepthMask);
+        Lerp(ShallowColor, DeepColor, EffectiveDepthMask);
 
     // Natural optical variation: a real river drifts between olive, green and
     // gray-teal at the tens-of-metres scale (upwelling, dissolved load, bed
@@ -1221,7 +1247,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         NewObject<UMaterialExpressionSaturate>(Material);
     WetMarginGate->Input.Expression = Mul(
         AddNode(
-            DepthMask,
+            EffectiveDepthMask,
             Mul(ShoreMarginMinusOne,
                 Scalar(TEXT("ShoreMarginDepthFloor"), 0.028f))),
         Scalar(TEXT("ShoreMarginDepthGain"), 18.0f));
@@ -1245,7 +1271,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionScalarParameter* DeepOpacity =
         Scalar(TEXT("DeepWaterOpacity"), 0.80f);
     UMaterialExpressionLinearInterpolate* DepthOpacity =
-        Lerp(ShallowOpacity, DeepOpacity, DepthMask);
+        Lerp(ShallowOpacity, DeepOpacity, EffectiveDepthMask);
     UMaterialExpressionScalarParameter* FoamOpacity =
         Scalar(TEXT("FoamWaterOpacity"), 0.90f);
     UMaterialExpressionLinearInterpolate* Opacity =
@@ -4684,8 +4710,15 @@ static void BuildRaftCrewMaterials()
     // dark blood-red blade (0.30, 0.05, 0.002) sweeping past a paddler's hip
     // on the stroke exit read as an open wound on the glute against the black
     // wetsuit (player "gash in the butt cheek" report, 2026-08-30). A bright
-    // equipment color can never be mistaken for flesh.
-    BuildSolidMaterial(TEXT("M_RaftSim_PaddleBlade"), FLinearColor(0.68f, 0.44f, 0.02f, 1.0f), 0.48f, 0.08f);
+    // equipment color can never be mistaken for flesh. Near-saturated
+    // (2026-09-02): 0.68/0.44 rendered amber-olive under the morning sun.
+    // NOT two-sided: the blade mesh's top shell winds with downward
+    // normals, so single-sided culling shows the upward-lit underside
+    // faces — enabling TwoSided painted the unlit black backs over them
+    // and every blade went solid black ("the paddles are black now").
+    BuildSolidMaterial(
+        TEXT("M_RaftSim_PaddleBlade"),
+        FLinearColor(0.90f, 0.70f, 0.045f, 1.0f), 0.52f, 0.08f);
 }
 
 static UMaterial* BuildSprayMistMaterial()

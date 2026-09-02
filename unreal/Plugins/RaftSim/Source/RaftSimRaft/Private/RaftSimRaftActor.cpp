@@ -1,4 +1,4 @@
-#include "RaftSimRaftActor.h"
+﻿#include "RaftSimRaftActor.h"
 
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -27,7 +27,7 @@
 #include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
 
-// A commercial guide paddles from a stern quarter on their dominant side —
+// A commercial guide paddles from a stern quarter on their dominant side â€”
 // a right-handed guide sits the right tube, a lefty the left ("if they are
 // right handed they sit on the right side of the boat", player report
 // 2026-08-31; the old seat was a centred coxswain perch no paddle guide
@@ -95,7 +95,7 @@ ARaftSimRaftActor::ARaftSimRaftActor()
     Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     SetRootComponent(Root);
 
-    // Collision/buoyancy footprint box — kept for the raft-body physics but
+    // Collision/buoyancy footprint box â€” kept for the raft-body physics but
     // hidden; the visible raft is the procedural inflatable mesh below.
     HullMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HullMesh"));
     HullMesh->SetupAttachment(Root);
@@ -933,9 +933,14 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     const float TubeTopZCm = ComputeSeatTubeTopZCm(SeatCm, bTubeFound);
     if (bTubeFound)
     {
-        // Slight sink reads as fabric compression under load instead of a
-        // tangent kiss that re-opens a hairline gap at glancing angles.
-        constexpr float SeatContactSinkCm = 1.5f;
+        // Sink reads as fabric compression under load instead of a tangent
+        // kiss that re-opens a hairline gap at glancing angles. Raised from
+        // 1.5 (2026-09-02): the contact estimate assumes the procedural
+        // pelvis ellipsoid's depth, but the rendered CC0 glute — pulled
+        // forward-up by the knees-up seated fold — does not reach that low,
+        // and every paddler hovered a visible couple of centimetres off
+        // the tube ("the crew butts aren't sitting on the boat").
+        constexpr float SeatContactSinkCm = 4.0f;
         SeatCm.Z = TubeTopZCm - Avatar->GetSeatedPelvisBottomLocalZCm() -
             SeatContactSinkCm;
     }
@@ -964,7 +969,7 @@ float ARaftSimRaftActor::ComputeSeatTubeTopZCm(
     const FVector& SeatCm, bool& bOutFound) const
 {
     // The uploaded RaftVisual sections are the surface the player actually
-    // sees — the production static-mesh extraction and the procedural
+    // sees â€” the production static-mesh extraction and the procedural
     // fallback both land there, and the component carries its own vertical
     // offset relative to the hull frame, so scanning it folds every source
     // of disagreement into one measured number. Highest vertex wins inside
@@ -1231,11 +1236,30 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
                 FVector::ZeroVector);
             break;
         case ERaftSimCrewCommand::AllBackward:
+        {
+            // The raw stroke impulse is sized for the FORWARD feel, where
+            // the propulsion governor fades it near cruise. Backward it
+            // met no such brake until sternway built, so on the softened
+            // hull drag one crew back stroke delivered a ~10 m/s delta on
+            // the 220 kg body â€” +3 m/s of way erased instantly ("a single
+            // back paddle stroke suddenly stopped the boat but it should
+            // have had lots of forward momentum"). Back-paddling against
+            // the boat's own way is mechanically the crew's weakest
+            // stroke: cap each stroke at a fixed speed change so shedding
+            // real momentum takes the several strokes it takes on a real
+            // raft.
+            constexpr float kBackStrokeMaxDeltaVPerStrokeMps = 0.85f;
+            const float BodyMassKg = FMath::Max(
+                RaftAdapter->GetRaftBodyConfig().MassKg, 100.0f);
+            const float RequestedNs = PerPaddler * Crew *
+                GetPaddlePropulsionShortfall(-Forward) * WaterPurchase;
+            const float CapNs = BodyMassKg * kBackStrokeMaxDeltaVPerStrokeMps *
+                ImpulseFraction;
             RaftAdapter->AddExternalImpulse(
-                -Forward * PerPaddler * Crew *
-                    GetPaddlePropulsionShortfall(-Forward) * WaterPurchase,
+                -Forward * FMath::Min(RequestedNs, CapNs),
                 FVector::ZeroVector);
             break;
+        }
         case ERaftSimCrewCommand::TurnLeft:
         case ERaftSimCrewCommand::TurnRight:
         {
@@ -1256,10 +1280,22 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         }
         case ERaftSimCrewCommand::Stop:
         {
-            // Brace/back-paddle to shed speed.
+            // Brace/back-paddle to shed speed. Same per-stroke cap as the
+            // back stroke, and never more than the momentum that remains â€”
+            // with the softened hull drag an uncapped brake impulse
+            // overshoots and visibly REVERSES a slow raft instead of
+            // holding it.
+            constexpr float kBrakeMaxDeltaVPerStrokeMps = 0.85f;
             const FVector Vel = RaftAdapter->GetKinematicState().LinearVelocityMetersPerSecond;
+            const float BodyMassKg = FMath::Max(
+                RaftAdapter->GetRaftBodyConfig().MassKg, 100.0f);
+            const float RequestedNs =
+                PerPaddler * Crew * WaterPurchase;
+            const float CapNs = FMath::Min(
+                BodyMassKg * kBrakeMaxDeltaVPerStrokeMps * ImpulseFraction,
+                BodyMassKg * Vel.Size());
             RaftAdapter->AddExternalImpulse(
-                -Vel.GetSafeNormal() * PerPaddler * Crew * WaterPurchase,
+                -Vel.GetSafeNormal() * FMath::Min(RequestedNs, CapNs),
                 FVector::ZeroVector);
             break;
         }
@@ -1273,7 +1309,7 @@ float ARaftSimRaftActor::GetPaddleWaterPurchase() const
     // Paddles only move the boat when the blades reach water. On a dry bar
     // the crew's strokes sweep sand, and a loaded raft is far too heavy to
     // scoot from that ("paddling on dry land should be impossible", player
-    // recording 2026-08-31 — the beached raft crawled across the beach
+    // recording 2026-08-31 â€” the beached raft crawled across the beach
     // under AllForward). Each side's blade station is sampled where the
     // blades actually plant; a half-beached raft keeps half its purchase,
     // and a firmly grounded hull keeps only enough bite to work itself off
@@ -1305,7 +1341,7 @@ float ARaftSimRaftActor::GetPaddleWaterPurchase() const
         // A grounded hull whose CENTRE stands over dry ground is parked on
         // land: whatever water a blade tip can still reach, the crew cannot
         // drag a loaded raft across sand ("paddling on dry ground still
-        // moves the boat", 2026-09-01 — the first pass only capped the
+        // moves the boat", 2026-09-01 â€” the first pass only capped the
         // grounded case, so a beached raft at the waterline kept 35% of its
         // thrust). Reduced bite survives only while the hull itself still
         // stands in water, which is what lets a crew work off a gravel
@@ -1369,7 +1405,7 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
     // mapping, sign, and governor factor all visible per stroke).
     ++PaddleStrokeCount;
     (void)Side;
-    // W/S IS the crew's paddle command — the crew animates and propels, the
+    // W/S IS the crew's paddle command â€” the crew animates and propels, the
     // guide does not stroke (first split shipped 2026-08-11 inverted this
     // and the playtest immediately reported "crew animation no longer fires
     // when paddle command given"). A tap owns the crew for one cadence
@@ -1442,13 +1478,13 @@ void ARaftSimRaftActor::ApplyGuideSteerStroke(float TurnScale)
         : ERaftSimCrewAvatarAction::TurnLeft;
     GuideStrokeActionSeconds = 1.0f;
     // The guide's own stern sweep ("the guide is using his paddle to
-    // steer, not paddle with the crew"). Full yaw authority — the stern
+    // steer, not paddle with the crew"). Full yaw authority â€” the stern
     // lever arm is precisely where a raft guide's turning power comes
-    // from — and it works over a standing crew order, so "call all
+    // from â€” and it works over a standing crew order, so "call all
     // forward, steer with your own blade" is the actual technique. A real
     // sweep also moves water aft, so the same stroke pulls the hull
-    // forward a little — or backward while the crew is back-paddling (the
-    // back-ferry) — through the same speed governor as every stroke. The
+    // forward a little â€” or backward while the crew is back-paddling (the
+    // back-ferry) â€” through the same speed governor as every stroke. The
     // impulse waits for the pose catch like every stroke.
     const float StrokeDirectionSign =
         ActiveCrewCommand == ERaftSimCrewCommand::AllBackward ? -1.0f : 1.0f;
@@ -1501,7 +1537,7 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
 
     // Throttled drift telemetry: raft speed against the sampled current at
     // the hull. This is the direct instrument for "the river does not carry
-    // the boat" reports — if water_speed is real and raft_speed stays near
+    // the boat" reports â€” if water_speed is real and raft_speed stays near
     // zero without input, the water-to-hull drag coupling is the defect.
     DriftTelemetrySeconds += DeltaSeconds;
     if (DriftTelemetrySeconds >= 10.0f)

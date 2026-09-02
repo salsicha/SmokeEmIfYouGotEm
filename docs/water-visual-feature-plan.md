@@ -312,6 +312,145 @@ water meshes regenerated in place via the new water-only rebuild flag
 terrain, far field, and materials untouched). All 39 band meshes
 regenerated; shoreline stills show one edge.
 
+## 2026-09-02 D-rings bonded to the tube
+
+"The D rings aren't attached to the boat" (run-complete close-up).
+The rings were bare metal ovals standing VERTICALLY, tangent-kissing
+the curving tube flank at one point — centres 2-3 cm off the surface,
+no mounting hardware, so up close they floated. Each ring is now
+built in the tube's tangent frame at the upper-outer shoulder (lying
+flat against the fabric) over a bonded rubber mounting patch, both
+riding the same hull deformation field as the tube. M5+P2 8/8 (ring
+topology, four-ring count, and fold-coupling asserts unchanged).
+
+## 2026-09-02 round 3: black blades, seated contact, splayed boots, drift trim
+
+"The paddles are black now": the two-sided blade material was the
+bug, not the fix — the blade mesh's top shell winds with downward
+normals, so single-sided culling had always shown the upward-lit
+underside faces; TwoSided painted the unlit black backs over them.
+Reverted to single-sided; the near-saturated yellow stays.
+
+"The crew butts aren't sitting on the boat": the seat-height formula
+assumes the procedural pelvis ellipsoid's depth below the hip centre,
+but the rendered CC0 glute — pulled forward-up by the knees-up seated
+fold — does not reach that low. SeatContactSinkCm 1.5 -> 4.0 presses
+every paddler onto the tube.
+
+"The shoes are still cylinders": the boot mesh (Blender-built) is
+boot-shaped, but dead-ahead toes hid its whole length behind the round
+cuff from the guide seat. Seated feet now splay outward 16 degrees per
+side, showing heel and toe.
+
+"While drifting the boat moves sideways into the left shore": drift
+telemetry showed the 0.25 blunt floor overshooting — the raft lagged
+the turning water by up to 4.7 degrees on a gentle pool reach (the
+"outside carry" running away) and beached itself in minutes.
+LowSpeedDragReferenceMps 0.25 -> 0.55: bends keep a visible outside
+set, hands-off pool drift stays in the channel.
+
+## 2026-09-02 positive-delta water, one-stroke stops, crew polish round 2
+
+First F9 recordings from the player immediately paid off. At km 0.92
+the probe read live +0.51 m OVER the cooked band (the release wave) —
+the level sink was designed for negative mornings and RAISED the whole
+sheet uniformly: its shoreline rim hung in mid-air over the beach
+(white polygon shards), rock cutout rims floated as gap rings, and
+the raised sheet shaded itself with COOKED depth (VC.G says ankle
+deep) so it rendered as a pale membrane over the flooded bar ("water
+texture is missing"). Two-part fix, both gated by
+ApplyLiveLevelShoreClip so the carrier is untouched: (1) raising now
+tapers to zero at the cooked shoreline (scaled by cooked depth), so
+the sheet tilts from its pinned bank edge up to the live level —
+sinking stays full-strength since buried edges are invisible; (2) an
+EffectiveDepthMask (cooked + delta) now drives body colour, opacity,
+and the shore de-gloss, so raised water shades as the depth it really
+is. Station 920 verification: spray collar on the rock, foamy rapid
+water, the flooded bar reads as shallows. V4 regen for this REQUIRES
+the delete-and-recreate route — the patcher's Desc probe will not
+upgrade an existing sink node.
+
+"A single back paddle stroke suddenly stopped the boat": the stroke
+impulse (1150 Ns/paddler) is sized for the governor-faded FORWARD
+feel; backward it met no brake until sternway built, and on the 220 kg
+chrono body one crew stroke is a ~10 m/s delta. The old weld-stiff
+drag floor masked it; the bend-carry fix exposed it. Back strokes now
+cap at 0.85 m/s of speed change per full stroke, and the Stop brake
+additionally never exceeds the momentum that remains (an uncapped
+brake now visibly REVERSED a slow raft).
+
+Crew round 2 (from the same recordings): shoulders 76 -> 73 so the
+wetsuit's scalloped neckline tucks to the vest top (elbow-drop clamp
+tightened 14 -> 12); boots widened 0.88/0.92 -> 0.98/1.04 so heel and
+toe break the shin's tube silhouette (sole-down caps track); blade
+colour raised to near-saturated Carlisle yellow and made two-sided
+(0.68/0.44 rendered amber-olive, and back faces went black).
+
+## 2026-09-02 shoulder yoke, sunlit blades, debug screen recorder
+
+"What is the black material sticking out the top of the life jacket?
+It seems much to high to be shoulders." A show-SkeletalMeshes A/B
+proved it was the CC0 body's own deltoid/trapezius skin: swinging the
+upper-arm bones steeply down to the new lap-resting hands rolls the
+shoulder skin up beside the neck into a black yoke reaching the chin.
+The CC0 adapter now caps the elbow's drop below the shoulder at 14 cm
+— the forearm still reaches the true wrist, so hands stay on the
+shaft and the arm simply bends more. All four crew read as rounded
+wetsuit shoulders at the vest line.
+
+"Their paddles look like they are in shade" — at rest the blade face
+derived from ForwardVector, which stands the lap-rest blade
+edge-up like a knife: a 2 cm sliver catching no skylight. The face
+axis is now action-aware (up at SeatedIdle, forward for strokes);
+resting blades lie flat and read bright Carlisle yellow.
+
+Debug screen recorder (new): F9 (or RaftSim.ToggleRecording
+[delaySeconds]) toggles an H.264 MP4 capture of the game viewport,
+UI included — FFrameGrabber into a Windows Media Foundation sink
+writer at 30 fps / 12 Mbps, clips in Saved/VideoCaptures (override
+with raftsim.RecordingDir). Verified headless: 17.4 s / 521-frame
+clip, clean finalize on game exit. PIE is not supported (standalone
+game viewport only).
+
+Also: the boots sole-down checker's Z-scale bound tracks the taller
+0.85 cuff (was pinned to the 0.68 era, failing M5.RuntimeRescueLoop).
+
+## 2026-09-02 sink the cooked sheet, bend carry, ankle taper
+
+"The glossy surface and the water surface are still separate ... the
+glossy surface still runs over the shore." The pixel-side shore clip
+only retired the tile margin below the live waterline; the REST of the
+cooked sheet still rendered at its cooked height — a full glossy
+surface floating 0.36-0.66 m (measured) above the live carrier,
+meeting the bank higher up. Terminal fix: a live-level WPO sink
+appended to the V4 parent (Desc-probed like the turbulence blocks) —
+the whole cooked sheet moves down by the published
+RaftSimLiveWaterLevelDeltaM (clamped +/-1.5 m) wherever
+ApplyLiveLevelShoreClip=1 (tiles only). The sheet then LIVES at the
+live level: its cooked shoreline edge sinks under the bank and the
+terrain depth-test draws today's waterline. Verified at station 280
+(delta -0.66): one surface, one waterline. No V4 delete needed — the
+patcher appends to the existing asset.
+
+"The boat should be pushed to the outside of the turn by the water but
+isn't." Drift telemetry through a 4-degree reach: raft_dir tracked
+water_dir to within 0.1 DEGREE at every sample — the hull was
+velocity-welded to the streamline. Cause: LowSpeedDragReferenceMps 1.5
+under the blunt 9000 coefficient gives a ~0.1 s lateral decay; outward
+slip in a bend computes to centimetres. The blunt floor now matches
+the slicing term's 0.25 (the >=1.5 m/s capture regime that keeps
+froth behind the boat is numerically unchanged): rerun shows the raft
+lagging the turning water by 0.2-0.3 degrees on the same gentle reach
+— real momentum carry that compounds into an outside set through the
+sharp arcs. Test fixtures that pin 1.5 keep their own value.
+
+"Their ankles look like cylindars": zero-scaled foot bones collapsed
+every ankle-blend vertex onto one point (calf chopped into a
+featureless tube) and the 0.68-height boot cuff from the
+short-shin era read as a squat ring. Foot bones now keep a third of
+their scale (a tapering ankle cone that hides inside the cuff) and the
+cuff rises to 0.85 so the shin enters from clearly above.
+
 ## 2026-09-01 live-level shore clip, palm sense, hard beach gate
 
 "The shiny water texture runs over the left bank ... the shiny surface

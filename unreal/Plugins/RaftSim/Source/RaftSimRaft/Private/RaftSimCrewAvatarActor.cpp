@@ -26,8 +26,12 @@ constexpr float kProductionShoulderSleeveArmFraction = 1.0f;
 // Z was 0.68 while the seated shins were short and near-horizontal; with the
 // anatomical fold's ~28 cm shin drop a taller cuff swallows the lower shin
 // so the ankle reads as wetsuit-into-bootie instead of a bare tube meeting a
-// squat ring ("their ankles look like cylindars", 2026-09-02).
-const FVector kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.85f);
+// squat ring ("their ankles look like cylindars", 2026-09-02). X/Y widened
+// the same day: at 0.88/0.92 the boot body barely exceeded the shin's own
+// diameter, so from the guide seat the whole lower leg still stacked into
+// one uniform tube ("the boots are still cylindars") — a chunkier bootie
+// lets heel and toe break the silhouette.
+const FVector kProductionRiverBootPresentationScale(0.98f, 1.04f, 0.85f);
 // 2026-08-06 named human review: helmets read as off-center caps. Seat the
 // shell lower on the skull and nearly centred so per-head measurement
 // variance is absorbed instead of amplified.
@@ -1048,8 +1052,13 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     // and suit interpenetrated and no neck could ever show. Five centimetres
     // opens a real collar gap the neck ellipsoid fills.
     Pose.HeadCenterCm = FVector(6.0f, 0.0f, 96.0f);
-    Pose.LeftShoulderCm = FVector(4.0f, -17.0f, 76.0f);
-    Pose.RightShoulderCm = FVector(4.0f, 17.0f, 76.0f);
+    // Shoulders dropped from 76 (2026-09-02): the CC0 wetsuit's shoulder
+    // crest rode the joint targets, so at 76 its scalloped neckline flapped
+    // above the PFD's shoulder line ("the black flaps are still on the
+    // shoulders"). At 73 the crest tucks to the vest top, and the collar
+    // gap under the raised head widens rather than shrinks.
+    Pose.LeftShoulderCm = FVector(4.0f, -17.0f, 73.0f);
+    Pose.RightShoulderCm = FVector(4.0f, 17.0f, 73.0f);
     Pose.LeftHandCm = FVector(28.0f, -25.0f, 55.0f);
     Pose.RightHandCm = FVector(42.0f, 12.0f, 42.0f);
     Pose.LeftHipCm = FVector(-4.0f, -10.0f, 40.0f);
@@ -1935,7 +1944,12 @@ bool ARaftSimCrewAvatarActor::HasFittedUprightProductionRiverBoots() const
         return SourceBounds.Min.Z < 0.0f && SourceBounds.Max.Z > 0.0f &&
             FVector::DotProduct(LocalUp, FVector::UpVector) >= 0.999f &&
             Scale.X > 0.0f && Scale.Y > 0.0f && Scale.Z > 0.0f &&
-            Scale.X <= 0.93f && Scale.Y <= 1.0f && Scale.Z <= 0.72f;
+            // Bounds track kProductionRiverBootPresentationScale plus the
+            // per-avatar profile headroom (ratio ~1.06 carried from the
+            // original 0.68/0.72 pair): taller 0.85 cuff for the anatomical
+            // seated fold, wider 0.98/1.04 body so the bootie breaks the
+            // shin's cylinder silhouette (both 2026-09-02).
+            Scale.X <= 1.06f && Scale.Y <= 1.12f && Scale.Z <= 0.92f;
     };
     return IsFittedAndSoleDown(ProductionLeftBoot) &&
         IsFittedAndSoleDown(ProductionRightBoot);
@@ -3489,29 +3503,38 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         // translating from the source sole bound so the tread remains on the
         // exact previously solved support plane. The solved foot points remain
         // the single animation authority.
-        const FVector ToeForward =
-            FRotator(0.0f, Pose.TorsoRotation.Yaw, 0.0f).RotateVector(
-                FVector::ForwardVector);
-        const FRotator ProductionBootRotation =
-            FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector).Rotator();
         const FVector ProductionBootScale =
             kProductionRiverBootPresentationScale * Profile;
         const auto PlaceProductionBoot = [
-            &ProductionBootRotation,
+            &Pose,
             &ProductionBootScale,
-            &Profile](UStaticMeshComponent* Boot, const FVector& SolvedFootCm)
+            &Profile](UStaticMeshComponent* Boot,
+                      const FVector& SolvedFootCm,
+                      float SplayYawDegrees)
         {
+            // Seated feet splay outward: dead-ahead toes hid the boot's
+            // whole length behind its round cuff from the guide seat, so
+            // the footwear read as a plain tube ("the shoes are still
+            // cylinders", 2026-09-02). The yaw also shows heel and toe
+            // breaking the shin's silhouette.
+            const FVector ToeForward =
+                FRotator(
+                    0.0f, Pose.TorsoRotation.Yaw + SplayYawDegrees, 0.0f)
+                    .RotateVector(FVector::ForwardVector);
+            const FRotator BootRotation =
+                FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector)
+                    .Rotator();
             const float SourceSoleZCm =
                 Boot->GetStaticMesh()->GetBoundingBox().Min.Z;
             FVector FittedLocationCm = SolvedFootCm;
             FittedLocationCm.Z += SourceSoleZCm * Profile.Z *
                 (1.0f - kProductionRiverBootPresentationScale.Z);
             Boot->SetRelativeLocationAndRotation(
-                FittedLocationCm, ProductionBootRotation);
+                FittedLocationCm, BootRotation);
             Boot->SetRelativeScale3D(ProductionBootScale);
         };
-        PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm);
-        PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm);
+        PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm, -16.0f);
+        PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm, 16.0f);
     }
 
     PaddleShaft->SetVisibility(Pose.bShowPaddle);
@@ -3521,8 +3544,18 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
     {
         SetRoundedLimb(PaddleShaft, Pose.PaddleTopCm, Pose.PaddleBottomCm, 1.65f);
         const FVector Direction = (Pose.PaddleBottomCm - Pose.PaddleTopCm).GetSafeNormal();
-        const FVector PreferredBladeNormal = FVector::ForwardVector -
-            Direction * FVector::DotProduct(FVector::ForwardVector, Direction);
+        // In the water the power face aims forward; a RESTING paddle lies
+        // flat across the thighs. Deriving the face from ForwardVector left
+        // the lap-rest blade standing edge-up like a knife — a sliver that
+        // caught no skylight and read as unlit ("their paddles look like
+        // they are in shade", 2026-09-02). Face up at rest, forward for
+        // every working stroke.
+        const FVector PreferredFaceAxis =
+            CurrentAction == ERaftSimCrewAvatarAction::SeatedIdle
+                ? FVector::UpVector
+                : FVector::ForwardVector;
+        const FVector PreferredBladeNormal = PreferredFaceAxis -
+            Direction * FVector::DotProduct(PreferredFaceAxis, Direction);
         const FVector BladeNormal = PreferredBladeNormal.GetSafeNormal(
             SMALL_NUMBER,
             FVector::RightVector);

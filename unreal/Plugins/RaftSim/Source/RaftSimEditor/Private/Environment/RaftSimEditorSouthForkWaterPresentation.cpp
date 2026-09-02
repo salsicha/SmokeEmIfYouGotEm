@@ -525,6 +525,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
     bool bHasTravelingWaveOffset = false;
     bool bHasTravelingWaveStrengthGate = false;
     bool bHasSingleSurfaceTurbulence = false;
+    bool bHasLiveLevelSink = false;
     UMaterialExpression* TravelingWaveOffsetExpression = nullptr;
     for (UMaterialExpression* Expression :
          Material->GetExpressionCollection().Expressions)
@@ -545,6 +546,11 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             Expression->Desc == TEXT("RaftSimSingleSurfaceTurbulenceWPO"))
         {
             bHasSingleSurfaceTurbulence = true;
+        }
+        if (Expression &&
+            Expression->Desc == TEXT("RaftSimLiveLevelSinkWPO"))
+        {
+            bHasLiveLevelSink = true;
         }
     }
     if (!bHasTravelingWaveOffset)
@@ -835,6 +841,97 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         }
     }
 
+    if (!bHasLiveLevelSink)
+    {
+        // The band meshes are cooked at ONE flow band while the release
+        // schedule moves the live level through the day, so the whole
+        // cooked sheet floated (measured 36 cm on a morning run) above the
+        // live carrier: two stacked surfaces meeting the bank at different
+        // places ("the glossy surface and the water surface are still
+        // separate ... the glossy surface still runs over the shore",
+        // 2026-09-02 — the pixel-side shore clip alone only retired the
+        // sub-threshold margin, not the floating channel sheet). Sink the
+        // entire sheet by the published live-minus-cooked delta; where the
+        // bank stands taller than the sunk sheet the terrain depth-test
+        // hides the edge, which is exactly the live waterline. The solver
+        // carrier keeps ApplyLiveLevelShoreClip at 0 and never moves.
+        Material->Modify();
+        if (UMaterialParameterCollection* SinkCollection =
+                LoadOrCreateRaftFoamOcclusionCollection(OutSummary))
+        {
+            UMaterialExpressionCollectionParameter* LevelDelta =
+                AddRaftWaterCollectionParameter(
+                    Material, SinkCollection,
+                    TEXT("RaftSimLiveWaterLevelDeltaM"), true);
+            UMaterialExpressionScalarParameter* SinkEnabled =
+                NewObject<UMaterialExpressionScalarParameter>(Material);
+            SinkEnabled->ParameterName = TEXT("ApplyLiveLevelShoreClip");
+            SinkEnabled->DefaultValue = 0.0f;
+            SinkEnabled->Group = TEXT("RaftSimSouthForkWaterMotion");
+            Material->GetExpressionCollection().AddExpression(SinkEnabled);
+            UMaterialExpressionVertexColor* SinkVertexColor =
+                NewObject<UMaterialExpressionVertexColor>(Material);
+            Material->GetExpressionCollection().AddExpression(SinkVertexColor);
+            UMaterialExpressionCustom* Sink =
+                NewObject<UMaterialExpressionCustom>(Material);
+            Sink->Desc = TEXT("RaftSimLiveLevelSinkWPO");
+            Sink->Description = TEXT(
+                "Sink the cooked band sheet to the live water level");
+            Sink->OutputType = CMOT_Float3;
+            // Sinking (negative delta) applies in full: buried edges are
+            // invisible. RAISING must taper to zero at the cooked
+            // shoreline — a uniformly raised sheet hangs its rim in
+            // mid-air over the bank and floats pale shelves across bars
+            // and rock cutouts ("water texture is missing", station 920,
+            // measured live +0.51 m over the cooked band on the release
+            // wave). Scaling the raise by cooked depth (VC.G stores
+            // depth/2.5) tilts the sheet from its pinned shoreline up to
+            // the live level in the channel, approximating where the
+            // higher waterline meets the sloped bank.
+            Sink->Code = TEXT(
+                "float OffsetM = clamp(DeltaM, -1.5, 1.5);\n"
+                "if (OffsetM > 0.0)\n"
+                "{\n"
+                "    float CookedDepthM = CookedDepthNorm * 2.5;\n"
+                "    OffsetM *= saturate(CookedDepthM / (OffsetM + 0.4));\n"
+                "}\n"
+                "return float3(0.0, 0.0, OffsetM * 100.0 * Enabled);");
+            FCustomInput DeltaInput;
+            DeltaInput.InputName = TEXT("DeltaM");
+            DeltaInput.Input.Connect(0, LevelDelta);
+            Sink->Inputs.Add(DeltaInput);
+            FCustomInput EnabledInput;
+            EnabledInput.InputName = TEXT("Enabled");
+            EnabledInput.Input.Connect(0, SinkEnabled);
+            Sink->Inputs.Add(EnabledInput);
+            FCustomInput DepthInput;
+            DepthInput.InputName = TEXT("CookedDepthNorm");
+            DepthInput.Input.Connect(2, SinkVertexColor);
+            Sink->Inputs.Add(DepthInput);
+            Material->GetExpressionCollection().AddExpression(Sink);
+            if (UMaterialEditorOnlyData* WpoEditorData =
+                    Material->GetEditorOnlyData())
+            {
+                if (UMaterialExpression* ExistingWpo =
+                        WpoEditorData->WorldPositionOffset.Expression)
+                {
+                    UMaterialExpressionAdd* CombinedWpo =
+                        NewObject<UMaterialExpressionAdd>(Material);
+                    CombinedWpo->A.Expression = ExistingWpo;
+                    CombinedWpo->B.Expression = Sink;
+                    Material->GetExpressionCollection().AddExpression(
+                        CombinedWpo);
+                    WpoEditorData->WorldPositionOffset.Connect(0, CombinedWpo);
+                }
+                else
+                {
+                    WpoEditorData->WorldPositionOffset.Connect(0, Sink);
+                }
+                bNeedsSave = true;
+            }
+        }
+    }
+
     if (bNeedsSave)
     {
         // This existing parent is already configured for Single Layer Water
@@ -993,9 +1090,14 @@ bool LoadSouthForkProductionWaterPresentation(
     // should be clear and transparent", 2026-08-31). The additive fallback
     // sky term gets the same treatment — it exists for reflection-history-
     // free captures, and at 0.28 it was a constant milky veil over the
-    // guide's whole view.
+    // guide's whole view. Roughness MATCHES the live carrier's 0.20
+    // exactly: once the level sink put both sheets at the same height, a
+    // 0.15 tile lobe rendered glass-sharp tree reflections against the
+    // carrier's softer ones — a visible quality seam at the carrier window
+    // edge ("the glossy surface and the water surface still seem
+    // different", 2026-09-02).
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("WaterRoughness")), 0.15f);
+        FMaterialParameterInfo(TEXT("WaterRoughness")), 0.20f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("Specular")), 0.28f);
     Instance->SetScalarParameterValueEditorOnly(

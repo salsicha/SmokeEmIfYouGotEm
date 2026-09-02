@@ -4,6 +4,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RaftSimCrewAvatarActor.h"
 #include "RaftSimPaddleBladeMesh.h"
+#include "RaftSimScreenRecorderSubsystem.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -122,6 +123,11 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     MapRescueKey(GuideSteerAction, EKeys::RightMouseButton);
     MapRescueKey(GuideSteerAction, EKeys::LeftMouseButton, /*bNegate=*/true);
     MapRescueKey(GuideSteerAction, EKeys::Gamepad_LeftTrigger, /*bNegate=*/true);
+    // F9 toggles the debug screen recorder (clips in Saved/VideoCaptures).
+    ToggleRecordingAction = CreateDefaultSubobject<UInputAction>(
+        TEXT("IA_ToggleRecordingRuntime"));
+    ToggleRecordingAction->ValueType = EInputActionValueType::Boolean;
+    MapRescueKey(ToggleRecordingAction, EKeys::F9);
     for (const TCHAR* CommandPath : {
              TEXT("/Game/RaftSim/Input/IA_GuideCommandForwardPaddle.IA_GuideCommandForwardPaddle"),
              TEXT("/Game/RaftSim/Input/IA_GuideCommandBackPaddle.IA_GuideCommandBackPaddle"),
@@ -782,6 +788,23 @@ void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
         EnhancedInput->BindAction(
             ReseatCrewAction, ETriggerEvent::Started, this,
             &ARaftSimGuidePawn::HandleReseatCrew);
+    }
+    if (ToggleRecordingAction != nullptr)
+    {
+        EnhancedInput->BindActionValueLambda(
+            ToggleRecordingAction, ETriggerEvent::Started,
+            [this](const FInputActionValue&)
+            {
+                if (URaftSimScreenRecorderSubsystem* Recorder =
+                        GetGameInstance()
+                            ? GetGameInstance()
+                                  ->GetSubsystem<
+                                      URaftSimScreenRecorderSubsystem>()
+                            : nullptr)
+                {
+                    Recorder->ToggleRecording();
+                }
+            });
     }
     for (const TObjectPtr<UInputAction>& CommandAction : GuideCommandActions)
     {

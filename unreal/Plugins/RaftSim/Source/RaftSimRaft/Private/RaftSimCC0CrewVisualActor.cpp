@@ -637,12 +637,30 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const FVector RightWristCm = Pose.bShowPaddle
         ? ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm)
         : Pose.RightHandCm;
-    const FVector LeftElbow =
+    FVector LeftElbow =
         FMath::Lerp(Pose.LeftShoulderCm, LeftWristCm, 0.48f) +
         FVector(0.0f, -5.0f, -2.0f);
-    const FVector RightElbow =
+    FVector RightElbow =
         FMath::Lerp(Pose.RightShoulderCm, RightWristCm, 0.48f) +
         FVector(0.0f, 5.0f, -2.0f);
+    // Swinging the upper-arm bone steeply DOWN from the rig's near-lateral
+    // rest pose rolls the deltoid/trapezius skin up beside the neck — with
+    // lap-resting hands every idle paddler wore a black shoulder yoke
+    // reaching the chin ("what is the black material sticking out the top
+    // of the life jacket? it seems much to high to be shoulders",
+    // 2026-09-02, confirmed skeletal by a show-SkeletalMeshes A/B). Cap
+    // the elbow's drop below the shoulder; the forearm still reaches the
+    // true wrist, so hands stay put and the arm simply bends more.
+    const auto ClampElbowDrop = [](const FVector& ShoulderCm, FVector ElbowCm)
+    {
+        // 14 still left visible skin flaps once the shoulders themselves
+        // dropped to 73; 12 keeps the deltoid mass at the vest line.
+        constexpr float kMaxElbowDropCm = 12.0f;
+        ElbowCm.Z = FMath::Max(ElbowCm.Z, ShoulderCm.Z - kMaxElbowDropCm);
+        return ElbowCm;
+    };
+    LeftElbow = ClampElbowDrop(Pose.LeftShoulderCm, LeftElbow);
+    RightElbow = ClampElbowDrop(Pose.RightShoulderCm, RightElbow);
     SetSegmentBone(
         TEXT("clavicle_l"),
         TEXT("upperarm_l"),
