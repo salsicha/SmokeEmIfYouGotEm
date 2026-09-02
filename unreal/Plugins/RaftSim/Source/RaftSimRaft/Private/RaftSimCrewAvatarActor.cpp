@@ -23,7 +23,11 @@ constexpr float kProductionHipThighBridgeEndFraction = 1.06f;
 constexpr float kProductionHipThighBridgeRadiusCm = 8.0f;
 constexpr float kProductionShoulderSleeveRadiusCm = 5.2f;
 constexpr float kProductionShoulderSleeveArmFraction = 1.0f;
-const FVector kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.68f);
+// Z was 0.68 while the seated shins were short and near-horizontal; with the
+// anatomical fold's ~28 cm shin drop a taller cuff swallows the lower shin
+// so the ankle reads as wetsuit-into-bootie instead of a bare tube meeting a
+// squat ring ("their ankles look like cylindars", 2026-09-02).
+const FVector kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.85f);
 // 2026-08-06 named human review: helmets read as off-center caps. Seat the
 // shell lower on the skull and nearly centred so per-head measurement
 // variance is absorbed instead of amplified.
