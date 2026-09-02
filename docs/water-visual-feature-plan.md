@@ -312,6 +312,47 @@ water meshes regenerated in place via the new water-only rebuild flag
 terrain, far field, and materials untouched). All 39 band meshes
 regenerated; shoreline stills show one edge.
 
+## 2026-09-02 round 6: the forearm shape, and the end of visibility races
+
+"A strange black shape pops up out of the fore arm when the crew is
+paddling" (player F9 recording): the shoulder-sleeve capsule anchors
+to the PROCEDURAL elbow, but the 9 cm elbow-drop clamp existed only
+in the CC0 adapter — at power phases the two solutions diverged ~7 cm
+and the sleeve burst out of the rendered forearm. The clamp now
+applies identically in ApplyPose, so gear and body solve one elbow.
+
+Root of the whole bug family: SetProceduralVisualVisible ran once at
+spawn with CC0 readiness evaluated at that moment; parts in the
+gap-fill list stayed visible (or hidden) on load-order luck — the
+empty helmets and the stroke-time sleeve burst were both instances.
+Tick now re-applies the pass whenever readiness flips.
+
+M5 fallout fixed: the exclusive-ownership checker listed Neck as
+redundant anatomy, but the CC0 body renders NO visible skin between
+collar and chin — the neck band is production dressing (2026-08-30
+design) and is no longer counted against ownership.
+
+## 2026-09-02 round 5: blade winding truth, heads in helmets
+
+"The paddles are still black" (fourth report) — final root cause, and
+it was the MESH all along: BuildCommercialPaddleBladeMesh's outline
+traverses counter-clockwise, so both cap faces wound {centre,
+current, next} DISAGREE with their stored +/-Y normals. From the
+guide's high-behind seat every render combination (single-sided cull,
+two-sided, TwoSidedSign flip) resolves the face-up resting blade to a
+down-facing normal: black slab from above, bright yellow from the
+side — which is why side captures kept "disproving" the report. Caps
+now wind {centre, next, current}; verified yellow from the guide
+angle. Material stays two-sided for robustness.
+
+"The crew don't have heads — there should be a skin tone head in the
+helmet": two stacked causes. The round-4 vest lift closed the last
+visible neck sliver (softened to +0.5 cm / +2% Z), and the skin neck
+band lived in the CC0-not-ready gap-fill list, so its visibility
+depended on load timing. The neck is now in the always-visible
+production overlay list and extends higher into the helmet shell.
+Verified: skin necks under all four helmets from the guide seat.
+
 ## 2026-09-02 round 4: tonal boots, vest layering, scheduled drag floor
 
 Third repeats of three reports forced different tools:

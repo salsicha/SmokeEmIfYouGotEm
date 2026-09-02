@@ -339,6 +339,10 @@ private:
     bool TryActivateCC0FallbackVisual();
     /** Shows the full fallback, or only project-owned rafting gear over a rigged body. */
     void SetProceduralVisualVisible(bool bVisible);
+    /** Last CC0-body readiness the overlay visibility pass saw; Tick
+     * re-applies the pass when readiness flips so gap-fill parts cannot
+     * linger visible (or hidden) on load-order luck. */
+    bool bLastAppliedCC0BodyReady = false;
     void DispatchProductionPose();
     bool ResolveProductionHeadFit(
         FVector& OutSolvedHeadWorldLocation,
