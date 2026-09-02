@@ -94,7 +94,24 @@ struct FRaftSimRaftBodyConfig
      * numerically unchanged.
      */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
-    float LowSpeedDragReferenceMps = 0.55f;
+    float LowSpeedDragReferenceMps = 0.35f;
+
+    /**
+     * Slow-water counterpart to LowSpeedDragReferenceMps: the effective
+     * floor blends from this value in still water down to
+     * LowSpeedDragReferenceMps once the sampled current reaches ~2 m/s.
+     * Resolves the tension between two field reports: a soft constant
+     * floor let a hands-off pool drift wander into the bank ("the boat
+     * still drifts into the left riverbank"), while a stiff one welded
+     * the hull to the streamline through bends ("the boat should be
+     * pushed to the outside of the turn"). Slow pools now track the
+     * channel; fast water frees the hull's inertia to carry outside.
+     * Fixtures that pin LowSpeedDragReferenceMps at the legacy 1.5 get a
+     * constant 1.5 floor (the max of both ends), preserving their
+     * behaviour exactly.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float SlowWaterDragReferenceMps = 1.2f;
 
     /**
      * Drag coefficient for the bow-first slicing component of relative

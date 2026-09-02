@@ -653,9 +653,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // true wrist, so hands stay put and the arm simply bends more.
     const auto ClampElbowDrop = [](const FVector& ShoulderCm, FVector ElbowCm)
     {
-        // 14 still left visible skin flaps once the shoulders themselves
-        // dropped to 73; 12 keeps the deltoid mass at the vest line.
-        constexpr float kMaxElbowDropCm = 12.0f;
+        // 14 still left visible skin flaps once the shoulders dropped, and
+        // 12 left the neckline scallops draping the vest top; 9 with the
+        // 71 cm shoulders and the raised vest shell finally tucks the
+        // neoprene under the PFD.
+        constexpr float kMaxElbowDropCm = 9.0f;
         ElbowCm.Z = FMath::Max(ElbowCm.Z, ShoulderCm.Z - kMaxElbowDropCm);
         return ElbowCm;
     };
@@ -744,6 +746,12 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         TEXT("head"),
         bHeadHiddenForFirstPerson ? FVector::ZeroVector : FVector::OneVector,
         EBoneSpaces::ComponentSpace);
+    // Do NOT bone-scale neck_01/spine_03 to tame the wetsuit's scalloped
+    // neckline: component-space scales there crush every vertex weighted
+    // downstream — chest, shoulders, and arm roots collapsed while the
+    // separately-placed helmets stayed put (tried and reverted,
+    // 2026-09-02). The cape is authored mesh; a real trim is a Blender
+    // pass on the CC0 wetsuit source.
     Body->RefreshBoneTransforms();
     ApplyPaddleGripPose(Pose);
     Body->RefreshBoneTransforms();

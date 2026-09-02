@@ -4704,7 +4704,12 @@ static void BuildRaftCrewMaterials()
     BuildSplashJacketMaterial();
     BuildProductionCrewWetsuitMaterial();
     BuildSolidMaterial(TEXT("M_RaftSim_PFDWebbing"), FLinearColor(0.008f, 0.010f, 0.012f, 1.0f), 0.72f, 0.0f);
-    BuildSolidMaterial(TEXT("M_RaftSim_BootRubber"), FLinearColor(0.006f, 0.008f, 0.010f, 1.0f), 0.78f, 0.0f);
+    // Charcoal, not black: at 0.006 the boot rendered the same value as the
+    // wetsuit shin above it, so leg and boot fused into one featureless
+    // column regardless of the mesh's actual shape ("the boots are still
+    // cylinders", third report 2026-09-02). A visibly lighter rubber lets
+    // the cuff, heel, and sole separate from the neoprene.
+    BuildSolidMaterial(TEXT("M_RaftSim_BootRubber"), FLinearColor(0.030f, 0.032f, 0.036f, 1.0f), 0.68f, 0.0f);
     BuildSolidMaterial(TEXT("M_RaftSim_PaddleShaft"), FLinearColor(0.035f, 0.035f, 0.042f, 1.0f), 0.34f, 0.10f);
     // Commercial polyethylene blade yellow (Carlisle-style). The previous
     // dark blood-red blade (0.30, 0.05, 0.002) sweeping past a paddler's hip

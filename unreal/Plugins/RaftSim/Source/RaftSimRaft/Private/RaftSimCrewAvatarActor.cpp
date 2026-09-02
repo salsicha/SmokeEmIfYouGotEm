@@ -1052,13 +1052,14 @@ FRaftSimCrewAvatarPose URaftSimCrewAvatarPoseLibrary::EvaluatePose(
     // and suit interpenetrated and no neck could ever show. Five centimetres
     // opens a real collar gap the neck ellipsoid fills.
     Pose.HeadCenterCm = FVector(6.0f, 0.0f, 96.0f);
-    // Shoulders dropped from 76 (2026-09-02): the CC0 wetsuit's shoulder
-    // crest rode the joint targets, so at 76 its scalloped neckline flapped
-    // above the PFD's shoulder line ("the black flaps are still on the
-    // shoulders"). At 73 the crest tucks to the vest top, and the collar
-    // gap under the raised head widens rather than shrinks.
-    Pose.LeftShoulderCm = FVector(4.0f, -17.0f, 73.0f);
-    Pose.RightShoulderCm = FVector(4.0f, 17.0f, 73.0f);
+    // Shoulders dropped from 76 (2026-09-02, then again the same day): the
+    // CC0 wetsuit's shoulder crest rides the joint targets, and its
+    // scalloped neckline kept flapping above the PFD's shoulder line
+    // ("shoulders still covered with black material"). 71 plus the raised
+    // vest shell finally puts the neoprene under the vest; the collar gap
+    // beneath the raised head widens rather than shrinks.
+    Pose.LeftShoulderCm = FVector(4.0f, -17.0f, 71.0f);
+    Pose.RightShoulderCm = FVector(4.0f, 17.0f, 71.0f);
     Pose.LeftHandCm = FVector(28.0f, -25.0f, 55.0f);
     Pose.RightHandCm = FVector(42.0f, 12.0f, 42.0f);
     Pose.LeftHipCm = FVector(-4.0f, -10.0f, 40.0f);
@@ -3349,9 +3350,16 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
     PfdBuckle->SetRelativeScale3D(FVector::OneVector);
     if (HasProductionWhitewaterPfd())
     {
+        // The vest wears OVER the wetsuit: its shoulder line rises a few
+        // percent and the shell lifts slightly so the CC0 wetsuit's
+        // scalloped neckline tucks UNDER the vest instead of draping black
+        // flaps across its top panel ("shoulders still covered with black
+        // material", third report 2026-09-02).
         ProductionPfd->SetRelativeLocationAndRotation(
-            Pose.TorsoCenterCm, Pose.TorsoRotation);
-        ProductionPfd->SetRelativeScale3D(Profile);
+            Pose.TorsoCenterCm + FVector(0.0f, 0.0f, 1.2f),
+            Pose.TorsoRotation);
+        ProductionPfd->SetRelativeScale3D(
+            Profile * FVector(1.0f, 1.0f, 1.05f));
     }
     const FVector CollarOffset = bUsingProductionVisual
         ? FVector(4.0f, 0.0f, 0.0f)
