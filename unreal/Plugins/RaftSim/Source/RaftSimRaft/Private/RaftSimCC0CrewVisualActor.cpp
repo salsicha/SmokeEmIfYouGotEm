@@ -711,8 +711,17 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         LegFacingTwistDegrees);
     SetBoneAtPoint(TEXT("foot_r"), Pose.RightFootCm);
 
-    Body->SetBoneScaleByName(TEXT("foot_l"), FVector::ZeroVector, EBoneSpaces::ComponentSpace);
-    Body->SetBoneScaleByName(TEXT("foot_r"), FVector::ZeroVector, EBoneSpaces::ComponentSpace);
+    // Not zero: fully collapsing the foot bone yanks every ankle-blend
+    // vertex onto one point, chopping the calf into a featureless tube with
+    // no taper ("their ankles look like cylindars", 2026-09-02). A third of
+    // the rest scale keeps a short tapering ankle cone that disappears into
+    // the production boot cuff, while the shrunken foot mesh itself stays
+    // hidden inside the boot volume.
+    constexpr float kHiddenFootBoneScale = 0.35f;
+    Body->SetBoneScaleByName(
+        TEXT("foot_l"), FVector(kHiddenFootBoneScale), EBoneSpaces::ComponentSpace);
+    Body->SetBoneScaleByName(
+        TEXT("foot_r"), FVector(kHiddenFootBoneScale), EBoneSpaces::ComponentSpace);
     Body->SetBoneScaleByName(
         TEXT("head"),
         bHeadHiddenForFirstPerson ? FVector::ZeroVector : FVector::OneVector,
