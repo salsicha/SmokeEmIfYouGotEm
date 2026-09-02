@@ -125,7 +125,9 @@ def configure_and_audit(
         bounds.max.y - bounds.min.y,
         bounds.max.z - bounds.min.z,
     ]
-    if not (28.0 <= dimensions[0] <= 40.0 and 12.0 <= dimensions[1] <= 18.0 and 20.0 <= dimensions[2] <= 28.0):
+    # Generator v2 (2026-09-02) trades the 15 cm cuff for a short tapered
+    # bootie cuff, so the plausible height window starts at 15 cm.
+    if not (28.0 <= dimensions[0] <= 40.0 and 12.0 <= dimensions[1] <= 18.0 and 15.0 <= dimensions[2] <= 28.0):
         raise RuntimeError(f"River-boot import has implausible centimetre bounds: {dimensions}")
     if not (5_000 <= authored_triangles <= 40_000):
         raise RuntimeError(f"River-boot production triangle budget changed: {authored_triangles}")

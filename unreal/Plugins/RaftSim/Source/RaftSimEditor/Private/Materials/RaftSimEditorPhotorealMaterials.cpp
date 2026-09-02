@@ -4039,16 +4039,22 @@ static void BuildProductionCC0SkinMaterials()
         // These bounded linear-space gains normalize the five hash-locked
         // photographic atlases into one renderer bracket. They do not change
         // identity, hue family, texture pixels, or source provenance.
+        // Gains roughly doubled (2026-09-02): at 0.36-0.48 the light atlases
+        // sat near 40% reflectance, and inside the helmet's shadow with the
+        // sun behind the crew every face rendered as a black dome while the
+        // sunlit hands read as skin ("I still don't see faces inside the
+        // helmets"). The atlases keep their relative bracket; the dark
+        // atlases sit at unity.
         {TEXT("M_RaftSim_CC0_Guide_Skin"), TEXT("T_RaftSim_CC0_LightMale"),
-         FLinearColor(0.36f, 0.36f, 0.36f, 1.0f)},
+         FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)},
         {TEXT("M_RaftSim_CC0_Crew01_Skin"), TEXT("T_RaftSim_CC0_DarkMale"),
-         FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)},
+         FLinearColor(1.0f, 1.0f, 1.0f, 1.0f)},
         {TEXT("M_RaftSim_CC0_Crew02_Skin"), TEXT("T_RaftSim_CC0_AsianMale"),
-         FLinearColor(0.48f, 0.48f, 0.48f, 1.0f)},
+         FLinearColor(0.88f, 0.88f, 0.88f, 1.0f)},
         {TEXT("M_RaftSim_CC0_Crew03_Skin"), TEXT("T_RaftSim_CC0_LightFemale"),
-         FLinearColor(0.42f, 0.42f, 0.42f, 1.0f)},
+         FLinearColor(0.80f, 0.80f, 0.80f, 1.0f)},
         {TEXT("M_RaftSim_CC0_Crew04_Skin"), TEXT("T_RaftSim_CC0_DarkFemale"),
-         FLinearColor(0.72f, 0.72f, 0.72f, 1.0f)},
+         FLinearColor(1.0f, 1.0f, 1.0f, 1.0f)},
     };
     for (const FSkinSpec& SkinSpec : SkinSpecs)
     {
@@ -4725,9 +4731,13 @@ static void BuildRaftCrewMaterials()
     // both faces light correctly; the earlier "two-sided made it black"
     // observation was the V4-missing shader-compile failure era, not this
     // flag.
+    // Golden amber rather than the near-saturated 0.90/0.70 signal yellow
+    // ("the blades are too yellow", 2026-09-02) — sRGB ~232/178/52, the
+    // moulded-polyethylene tone of a commercial blade — with the soft sheen
+    // of the plastic rather than a dead-matte or metallic finish.
     BuildSolidMaterial(
         TEXT("M_RaftSim_PaddleBlade"),
-        FLinearColor(0.90f, 0.70f, 0.045f, 1.0f), 0.52f, 0.08f,
+        FLinearColor(0.80f, 0.45f, 0.034f, 1.0f), 0.42f, 0.0f,
         /*bTwoSided=*/true);
 }
 

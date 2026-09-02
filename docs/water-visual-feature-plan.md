@@ -312,6 +312,134 @@ water meshes regenerated in place via the new water-only rebuild flag
 terrain, far field, and materials untouched). All 39 band meshes
 regenerated; shoreline stills show one edge.
 
+## 2026-09-02 round 7: real boots, and faces that were never dark by mistake
+
+"The boots are still cylinders" (fourth report): tone, splay, and
+scale had all landed, so the remaining problem was the SOURCE — the
+Blender-built boot was a low foot shell under a 15 cm near-cylindrical
+cuff. Generator v2 (build_production_whitewater_boot.py, Blender 5.2
+at C:\Program Files\Blender Foundation\Blender 5.2): short tapered
+cuff (3.4-10.8 cm), fuller lasted foot with a rounder toe, full heel
+block and counter, seam band and pull tab relocated. Rebuilt FBX,
+reimported through the full editor (the pythonscript commandlet lacks
+StaticMeshEditorSubsystem — run import scripts via
+-ExecCmds="py <script>, QUIT_EDITOR"), plausibility window lowered to
+15 cm height, runtime Z scale back to 1.0 with the checker cap
+following. Verified from the guide seat: gray short booties with a
+visible toe box.
+
+"I still don't see faces inside the helmets": the heads were never
+dark — they were GONE. Diagnosis chain from a bow camera at eye
+height: unlit view showed the "head" with exactly the wetsuit base
+colour; hiding skeletal meshes removed it; swapping the wetsuit slot's
+material recoloured it; the Blender FBX audit and the render-section
+dump both had the head polygons on the skin slot; pose forensics then
+showed the rendered eye centroid 0.1 cm from the head joint against a
+8.9 cm rest offset. The imported rig carries the FBX metre-to-
+centimetre conversion as a 100x root scale, so every rest
+component-space bone scale is (100,100,100) — and the first-person
+head toggle "restored" crew heads with FVector::OneVector, i.e. 1 % of
+rest. Skull, eyes and brows collapsed onto the joint; the collar's
+head-rigid seam ring stretched from the chest to that point (the black
+spike over every face, and the "flap above the life jacket" from
+behind); the helmet fit had been anchoring to the joint all along.
+Bone scales are now taken relative to the rest scale (the hidden foot
+scale had really been 0.35 % too).
+
+Underneath that, a second real fault: the host pose is a compact
+collision silhouette (hips to neck base ~35 cm) while the MPFB rig's
+spine runs ~57 cm, and skin keeps its rest offset from each bone
+origin — driving spine bones to the host's interpolated points stacked
+the chest on itself (spine_03 alone carries 35 cm of upper chest and
+collar, landing at chin height: "black material ... much too high to
+be shoulders"). The CC0 adapter now walks the axial chain with the
+rig's own rest lengths from the hips, hangs the arms from the rig's
+chest top, tips the crown 20 degrees forward so the gaze runs level,
+and lifts the vest 8 cm to the collarbones. The skin reflectance gains
+raised earlier in the day (light male 0.72, asian male 0.88, light
+female 0.80, dark atlases at unity) stay: they are a legitimate
+exposure correction, just not the fix.
+
+"The blades are too yellow, they look blocky and unrealistic": the
+blade was an eleven-point flat slab, 1.2 cm square-edged, with one
+constant normal per cap — a cut-out. BuildCommercialPaddleBladeMesh
+is now a spoon outline (3 cm throat, 9.2 cm shoulders, superellipse
+tip) over a lens cross-section (1.4 cm spine at the throat thinning to
+0.5 cm at the tip, 0.2 cm rim) on an 18x9 grid per face with true
+surface normals; front-face winding is enforced numerically against
+the outward normal instead of by hand. Material toned from the
+near-saturated signal yellow to golden amber (0.80/0.45/0.034,
+roughness 0.42, no metallic).
+
+"While drifting the boat still drifts into the left riverbank": the
+10-second "raft drift" log now also carries lateral_m (river-corridor
+lateral coordinate), water_lat_mps / raft_lat_mps (cross-stream
+components along the corridor's left normal), roll_deg,
+surf_slope_lat (support-surface slope across ±1 m) and tangent_dir_deg.
+A 130 s hands-off drift from the put-in did NOT reproduce a crab: the
+water heading tracked the corridor tangent within 0.6°, the raft
+heading within 1.1°, and both cross-stream velocities stayed at
+±0.02 m/s with no grounded points. Note lateral_m is measured along
+the AUTHORED corridor normals (a ruled surface, not a perpendicular
+projection), so it creeps ~8 cm/s through this bend while the raft is
+not actually moving across the stream — do not read it as drift. The
+report needs a repro (river km, guide inputs at the time, an F9 clip).
+
+### 2026-09-02 reach survey: the inverse river projection was ambiguous
+
+`WorldToRiverCoordinates` scores each candidate corridor segment by how
+well its ruled surface (centre + left-normal × lateral) reconstructs the
+query point. A straight segment's lateral line reconstructs ANY point of
+the plane exactly, so a segment hundreds of metres away ties with the
+true one and wins on candidate order. The reach survey caught it: a raft
+placed exactly on the 9300 m centreline projected to station 9694 /
+lateral −553 m; the same ambiguity flipped hops between 7553 and 7641 m
+and cold-rebooted the moving window there, and recurred at 10.3–10.6 and
+11.4–11.7 km. Because every world-space water probe goes through this
+inverse, the field read dry at those points, the static sheet's live-level
+clip retired the rendered river, and the raft fell through the channel.
+Fix: reconstructions with |lateral| > 256 m (the authored corridor
+half-width) are rejected inside the candidate cost. Regression: the M4
+coordinate-map test now sweeps the whole corridor every 50 m at lateral
+0/±30 m and requires forward→inverse agreement (station ≤ 4.1 m, lateral
+≤ 0.5 m).
+
+### 2026-09-02 reach survey: capsize recovery assumed a river at Z=0
+
+`EnterCapsize` clamped the recorded capsize point to world Z ±2 m ("guard
+against a diverged sink") and `RequestReflip` re-righted the hull at
+that Z. On the full reach the river runs at ~190–345 m, so every capsize
+parked the recovery point hundreds of metres under the riverbed; the
+re-flipped hull materialised inside terrain and the physics threw it
+400 m into the sky at 40 m/s (survey runs at 2400 m and 9200–9500 m:
+roll 180, freeboard 7–47 m, raft 1.6 km off-corridor two seconds after
+the capsize line). The clamp is now ±2 m around the LOCAL water surface
+(falling back to the raft's own Z, then the checkpoint), and the re-flip
+samples the surface at the guide's position and rights the hull 40 cm
+above it. Tanks at the origin behave as before (P2.RaftFlipsAndRecovers,
+M5.RuntimeRescueLoop).
+
+### Review tooling added with the 2026-09-02 inspection
+
+- `RaftSim.CaptureRaftSeries <delay> <count> <interval> <label> <backM>
+  <sideM> <upM> <aheadM> [paddle] [cmd=<crew cmd>]` — a burst of frames
+  from a camera ATTACHED to the raft (the fixed-camera CaptureSeries loses
+  a paddling raft within a stroke). Bow-on: `-4.5 0 1.4 0`; side:
+  `0.3 6.5 1.6 0.3`; guide-like rear: `3.2 0 2.3 4`; three-quarter:
+  `-3.8 3.6 2.4 0.5`.
+- `RaftSim.SurveyReach <startM> <endM> <stepM> <settleS> <label>
+  [radiusM]` — walks the raft down the corridor in sub-80 m hops, settles,
+  shoots chase (twice, 0.4 s apart, for a motion diff) and shore cameras,
+  and logs one `RaftSim survey station:` line per stop with raft support,
+  water, a 5 m water sweep over ±min(step/2, 60) m at the centreline and
+  ±6 m, and rock counts. `endM 0` means the whole corridor. The South Fork
+  corridor is 49 078 m; at 100 m that is 491 stations and ~18 s each.
+- `RaftSim.ManoeuvreCheck [label]` — fixed crew-command timeline (forward,
+  stop, back, turn left, turn right) with 1 Hz speed/heading/yaw-rate log.
+- Scratch helpers used for review: montage.ps1 (contact sheets) and
+  parse_survey.ps1 (station log → CSV + anomaly summary); the survey
+  report lives in docs/reports/.
+
 ## 2026-09-02 round 6: the forearm shape, and the end of visibility races
 
 "A strange black shape pops up out of the fore arm when the crew is

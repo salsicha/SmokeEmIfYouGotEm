@@ -31,7 +31,10 @@ constexpr float kProductionShoulderSleeveArmFraction = 1.0f;
 // diameter, so from the guide seat the whole lower leg still stacked into
 // one uniform tube ("the boots are still cylindars") — a chunkier bootie
 // lets heel and toe break the silhouette.
-const FVector kProductionRiverBootPresentationScale(0.98f, 1.04f, 0.85f);
+// Z back to 1.0 with boot generator v2 (2026-09-02): the source now carries
+// a short tapered cuff, so the squash that kept the old 15 cm cuff below the
+// flexed knee is no longer needed.
+const FVector kProductionRiverBootPresentationScale(0.98f, 1.04f, 1.0f);
 // 2026-08-06 named human review: helmets read as off-center caps. Seat the
 // shell lower on the skull and nearly centred so per-head measurement
 // variance is absorbed instead of amplified.
@@ -849,24 +852,72 @@ void BuildCommercialPaddleBladeMesh(
     TArray<FVector2D>& UVs,
     TArray<FProcMeshTangent>& Tangents)
 {
-    // A compact, convex whitewater-paddle profile in centimetres. The local
-    // +Z axis follows the shaft toward the blade tip, while Y supplies a thin
-    // beveled extrusion that still reads edge-on from the guide camera.
-    static const FVector2D Outline[] = {
-        FVector2D(-3.0f, -5.0f),
-        FVector2D(-6.0f, 3.0f),
-        FVector2D(-9.0f, 19.0f),
-        FVector2D(-8.5f, 30.0f),
-        FVector2D(-5.0f, 36.0f),
-        FVector2D(0.0f, 39.0f),
-        FVector2D(5.0f, 36.0f),
-        FVector2D(8.5f, 30.0f),
-        FVector2D(9.0f, 19.0f),
-        FVector2D(6.0f, 3.0f),
-        FVector2D(3.0f, -5.0f)};
-    constexpr int32 OutlineCount = static_cast<int32>(UE_ARRAY_COUNT(Outline));
-    constexpr float HalfThicknessCm = 1.2f;
-    constexpr float CenterZCm = 17.0f;
+    // A moulded whitewater-paddle blade in centimetres: local +Z runs from
+    // the throat (z -5, where the shaft enters) to the tip (z 39), +Y is the
+    // power face. The old eleven-point flat slab with 1.2 cm square edges
+    // and per-cap constant normals read as a cut-out ("the blades look
+    // blocky and unrealistic", 2026-09-02). This is a smooth spoon outline
+    // over a lens cross-section — a 1.4 cm spine at the throat thinning to
+    // 0.5 cm at the tip and 0.2 cm at the rim — with true surface normals.
+    constexpr int32 RowCount = 18;
+    constexpr int32 ColumnCount = 9;
+    constexpr float ThroatZCm = -5.0f;
+    constexpr float TipZCm = 39.0f;
+    constexpr float RimHalfThicknessCm = 0.2f;
+
+    const auto HalfWidthCm = [](float Along)
+    {
+        // Throat 3 cm half-width, shoulders 9.2 cm by 45 % of the length,
+        // then a superellipse tip.
+        constexpr float ThroatHalfWidth = 3.0f;
+        constexpr float ShoulderHalfWidth = 9.2f;
+        constexpr float TipStart = 0.6f;
+        if (Along <= TipStart)
+        {
+            const float Rise = FMath::Clamp(Along / 0.45f, 0.0f, 1.0f);
+            const float Smooth = Rise * Rise * (3.0f - 2.0f * Rise);
+            return FMath::Lerp(ThroatHalfWidth, ShoulderHalfWidth, Smooth);
+        }
+        const float TipAlpha = FMath::Clamp((Along - TipStart) / (1.0f - TipStart), 0.0f, 1.0f);
+        constexpr float Exponent = 2.4f;
+        return ShoulderHalfWidth *
+            FMath::Pow(FMath::Max(1.0f - FMath::Pow(TipAlpha, Exponent), 0.0f), 1.0f / Exponent);
+    };
+    const auto SpineHalfThicknessCm = [](float Along)
+    {
+        return FMath::Lerp(1.4f, 0.5f, Along);
+    };
+    // Surface point for a face: Along in [0,1] down the blade, Across in
+    // [-1,1] rim to rim, Side +1 for the power face and -1 for the back.
+    const auto SurfacePoint = [&](float Along, float Across, float Side)
+    {
+        const float Z = FMath::Lerp(ThroatZCm, TipZCm, Along);
+        const float HalfWidth = HalfWidthCm(Along);
+        const float Lens = 1.0f - Across * Across;
+        const float HalfThickness =
+            RimHalfThicknessCm + (SpineHalfThicknessCm(Along) - RimHalfThicknessCm) * Lens;
+        return FVector(Across * HalfWidth, Side * HalfThickness, Z);
+    };
+    const auto SurfaceNormal = [&](float Along, float Across, float Side)
+    {
+        constexpr float Step = 0.01f;
+        const FVector AlongTangent =
+            SurfacePoint(FMath::Min(Along + Step, 1.0f), Across, Side) -
+            SurfacePoint(FMath::Max(Along - Step, 0.0f), Across, Side);
+        const FVector AcrossTangent =
+            SurfacePoint(Along, FMath::Min(Across + Step, 1.0f), Side) -
+            SurfacePoint(Along, FMath::Max(Across - Step, -1.0f), Side);
+        FVector Normal = FVector::CrossProduct(AlongTangent, AcrossTangent).GetSafeNormal();
+        if (Normal.IsNearlyZero())
+        {
+            Normal = FVector::RightVector * Side;
+        }
+        if (FVector::DotProduct(Normal, FVector::RightVector * Side) < 0.0f)
+        {
+            Normal = -Normal;
+        }
+        return Normal;
+    };
 
     Vertices.Reset();
     Triangles.Reset();
@@ -880,61 +931,89 @@ void BuildCommercialPaddleBladeMesh(
         Normals.Add(Normal);
         UVs.Add(UV);
         Tangents.Add(FProcMeshTangent(FVector::ForwardVector, false));
+        return Vertices.Num() - 1;
+    };
+    // UE front faces wind clockwise seen from the side the normal points
+    // to, which in this left-handed frame means cross(B-A, C-A) must point
+    // AGAINST the outward normal (the 2026-09-02 black-slab lesson, now
+    // enforced numerically instead of by hand).
+    const auto AddTriangle = [&](int32 A, int32 B, int32 C, const FVector& Outward)
+    {
+        const FVector Winding = FVector::CrossProduct(
+            Vertices[B] - Vertices[A], Vertices[C] - Vertices[A]);
+        if (FVector::DotProduct(Winding, Outward) > 0.0f)
+        {
+            Swap(B, C);
+        }
+        Triangles.Append({A, B, C});
     };
 
-    const int32 FrontCenter = Vertices.Num();
-    AddVertex(FVector(0.0f, HalfThicknessCm, CenterZCm), FVector::RightVector, FVector2D(0.5f, 0.5f));
-    const int32 FrontStart = Vertices.Num();
-    for (const FVector2D& Point : Outline)
+    int32 FaceStart[2] = {0, 0};
+    for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
     {
-        AddVertex(
-            FVector(Point.X, HalfThicknessCm, Point.Y),
-            FVector::RightVector,
-            FVector2D(Point.X / 20.0f + 0.5f, (Point.Y + 5.0f) / 44.0f));
-    }
-    // The outline traverses counter-clockwise viewed from +Y, so the cap
-    // triangles must wind {centre, next, current} for UE's clockwise front
-    // faces. The original {centre, current, next} left winding and normal
-    // disagreeing on BOTH caps: from the guide's high-behind seat every
-    // culling/two-sided/TwoSidedSign combination resolved the face-up
-    // resting blade to a down-facing normal — a black slab from above,
-    // yellow only from the side ("the paddles are still black", repeated
-    // 2026-09-02 while side captures kept disproving it).
-    for (int32 Index = 0; Index < OutlineCount; ++Index)
-    {
-        Triangles.Append({FrontCenter, FrontStart + (Index + 1) % OutlineCount, FrontStart + Index});
-    }
-
-    const int32 BackCenter = Vertices.Num();
-    AddVertex(FVector(0.0f, -HalfThicknessCm, CenterZCm), -FVector::RightVector, FVector2D(0.5f, 0.5f));
-    const int32 BackStart = Vertices.Num();
-    for (const FVector2D& Point : Outline)
-    {
-        AddVertex(
-            FVector(Point.X, -HalfThicknessCm, Point.Y),
-            -FVector::RightVector,
-            FVector2D(Point.X / 20.0f + 0.5f, (Point.Y + 5.0f) / 44.0f));
-    }
-    for (int32 Index = 0; Index < OutlineCount; ++Index)
-    {
-        Triangles.Append({BackCenter, BackStart + Index, BackStart + (Index + 1) % OutlineCount});
+        const float Side = SideIndex == 0 ? 1.0f : -1.0f;
+        FaceStart[SideIndex] = Vertices.Num();
+        for (int32 Row = 0; Row < RowCount; ++Row)
+        {
+            const float Along = static_cast<float>(Row) / (RowCount - 1);
+            for (int32 Column = 0; Column < ColumnCount; ++Column)
+            {
+                const float Across = -1.0f + 2.0f * Column / (ColumnCount - 1);
+                AddVertex(
+                    SurfacePoint(Along, Across, Side),
+                    SurfaceNormal(Along, Across, Side),
+                    FVector2D(0.5f + 0.5f * Across, Along));
+            }
+        }
+        for (int32 Row = 0; Row + 1 < RowCount; ++Row)
+        {
+            for (int32 Column = 0; Column + 1 < ColumnCount; ++Column)
+            {
+                const int32 A = FaceStart[SideIndex] + Row * ColumnCount + Column;
+                const int32 B = A + 1;
+                const int32 C = A + ColumnCount;
+                const int32 D = C + 1;
+                const FVector Outward = Normals[A];
+                AddTriangle(A, B, D, Outward);
+                AddTriangle(A, D, C, Outward);
+            }
+        }
     }
 
-    for (int32 Index = 0; Index < OutlineCount; ++Index)
+    // Rim strip: the two faces meet along a 0.4 cm edge on both flanks.
+    for (int32 Flank = 0; Flank < 2; ++Flank)
     {
-        const FVector2D& A = Outline[Index];
-        const FVector2D& B = Outline[(Index + 1) % OutlineCount];
-        const FVector Edge(B.X - A.X, 0.0f, B.Y - A.Y);
-        const FVector SideNormal(-Edge.Z, 0.0f, Edge.X);
-        const FVector SafeSideNormal = SideNormal.GetSafeNormal();
-        const int32 SideStart = Vertices.Num();
-        AddVertex(FVector(A.X, HalfThicknessCm, A.Y), SafeSideNormal, FVector2D(0.0f, 0.0f));
-        AddVertex(FVector(A.X, -HalfThicknessCm, A.Y), SafeSideNormal, FVector2D(0.0f, 1.0f));
-        AddVertex(FVector(B.X, -HalfThicknessCm, B.Y), SafeSideNormal, FVector2D(1.0f, 1.0f));
-        AddVertex(FVector(B.X, HalfThicknessCm, B.Y), SafeSideNormal, FVector2D(1.0f, 0.0f));
-        Triangles.Append(
-            {SideStart, SideStart + 1, SideStart + 2,
-             SideStart, SideStart + 2, SideStart + 3});
+        const int32 Column = Flank == 0 ? 0 : ColumnCount - 1;
+        const float Across = Flank == 0 ? -1.0f : 1.0f;
+        for (int32 Row = 0; Row + 1 < RowCount; ++Row)
+        {
+            const float Along = static_cast<float>(Row) / (RowCount - 1);
+            const float NextAlong = static_cast<float>(Row + 1) / (RowCount - 1);
+            const FVector FrontA = SurfacePoint(Along, Across, 1.0f);
+            const FVector FrontB = SurfacePoint(NextAlong, Across, 1.0f);
+            const FVector BackA = SurfacePoint(Along, Across, -1.0f);
+            const FVector BackB = SurfacePoint(NextAlong, Across, -1.0f);
+            const FVector Outward = FVector(Across, 0.0f, 0.0f);
+            const int32 IA = AddVertex(FrontA, Outward, FVector2D(0.0f, Along));
+            const int32 IB = AddVertex(FrontB, Outward, FVector2D(0.0f, NextAlong));
+            const int32 IC = AddVertex(BackB, Outward, FVector2D(1.0f, NextAlong));
+            const int32 ID = AddVertex(BackA, Outward, FVector2D(1.0f, Along));
+            if (!FrontA.Equals(FrontB) || !BackA.Equals(BackB))
+            {
+                AddTriangle(IA, IB, IC, Outward);
+                AddTriangle(IA, IC, ID, Outward);
+            }
+        }
+    }
+    // Throat end cap so the shaft junction is closed.
+    {
+        const FVector Outward(0.0f, 0.0f, -1.0f);
+        const int32 Center = AddVertex(FVector(0.0f, 0.0f, ThroatZCm), Outward, FVector2D(0.5f, 0.0f));
+        for (int32 Column = 0; Column + 1 < ColumnCount; ++Column)
+        {
+            AddTriangle(Center, FaceStart[0] + Column, FaceStart[0] + Column + 1, Outward);
+            AddTriangle(Center, FaceStart[1] + Column, FaceStart[1] + Column + 1, Outward);
+        }
     }
 }
 } // namespace RaftSimPaddleBladeMesh
@@ -1977,7 +2056,7 @@ bool ARaftSimCrewAvatarActor::HasFittedUprightProductionRiverBoots() const
             // original 0.68/0.72 pair): taller 0.85 cuff for the anatomical
             // seated fold, wider 0.98/1.04 body so the bootie breaks the
             // shin's cylinder silhouette (both 2026-09-02).
-            Scale.X <= 1.06f && Scale.Y <= 1.12f && Scale.Z <= 0.92f;
+            Scale.X <= 1.06f && Scale.Y <= 1.12f && Scale.Z <= 1.08f;
     };
     return IsFittedAndSoleDown(ProductionLeftBoot) &&
         IsFittedAndSoleDown(ProductionRightBoot);
@@ -3460,7 +3539,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
         ProductionHelmet->SetRelativeScale3D(FVector(HeadScale * HelmetFit));
     }
 
-    // Elbow drop clamps to the SAME 9 cm bound as the CC0 adapter
+    // Elbow drop clamps to the SAME bound as the CC0 adapter
     // (RaftSimCC0CrewVisualActor::ApplyBodyPose): the two rigs solving
     // different elbows let the shoulder-sleeve capsule — anchored to THIS
     // elbow — burst out of the CC0 forearm at power phases ("a strange
@@ -3469,7 +3548,7 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
     const auto ClampProceduralElbowDrop =
         [](const FVector& ShoulderCm, FVector ElbowCm)
     {
-        constexpr float kMaxElbowDropCm = 9.0f;
+        constexpr float kMaxElbowDropCm = 24.0f;
         ElbowCm.Z = FMath::Max(ElbowCm.Z, ShoulderCm.Z - kMaxElbowDropCm);
         return ElbowCm;
     };

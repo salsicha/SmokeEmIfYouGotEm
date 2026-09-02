@@ -1400,6 +1400,19 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
             const FVector2D Left = FMath::Lerp(
                 PointA.LeftNormal, PointB.LeftNormal, Alpha).GetSafeNormal();
             const double Lateral = FVector2D::DotProduct(PositionM - Center, Left);
+            // A segment's lateral line reconstructs ANY point of the plane
+            // exactly, so without a bound a segment hundreds of metres away
+            // ties with the true one and wins on candidate order: the
+            // 2026-09-02 reach survey saw a point ON the 9300 m centreline
+            // resolve to station 9694 / lateral -553 m, which dried every
+            // water probe there and dropped the raft through the river. The
+            // corridor is authored to +/-256 m, so reject reconstructions
+            // outside it.
+            constexpr double CorridorHalfWidthM = 256.0;
+            if (FMath::Abs(Lateral) > CorridorHalfWidthM)
+            {
+                return TNumericLimits<double>::Max();
+            }
             return (PositionM - (Center + Left * Lateral)).SquaredLength();
         };
         double LowerAlpha = 0.0;

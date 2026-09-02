@@ -42,7 +42,6 @@ constexpr float GuideHelmetAnchorDropCm = 5.0f;
 const float CrewHelmetAnchorDropsCm[] = {6.0f, 9.0f, 9.0f, 7.0f};
 
 constexpr float PaddlePalmAnchorAlongKnuckleFraction = 0.56f;
-constexpr float ProductionHeadClearanceLiftCm = 5.0f;
 // The CC0 bodies are exported with Blender's identity axes
 // (build_cc0_production_character.py: axis_forward="-Y"), which lands the
 // mesh facing Unreal +Y. Swing-only bone driving preserves that rest yaw,
@@ -51,6 +50,12 @@ constexpr float ProductionHeadClearanceLiftCm = 5.0f;
 // twist turns the axial chain to the host's forward axis; limbs are driven
 // to explicit endpoints and keep their authored twist.
 constexpr float ProductionAxialFacingTwistDegrees = -90.0f;
+// Forward crown tip that levels the rendered gaze (see ApplyBodyPose).
+constexpr float ProductionHeadLevelPitchDegrees = 20.0f;
+// The vest mesh is authored around a torso whose shoulders sit closer to
+// the chest anchor than this rig's; lift it along the spine so its top
+// reaches the collarbones instead of the armpits.
+constexpr float ProductionVestLiftAlongSpineCm = 8.0f;
 // The legs need the SAME facing correction as the axial chain: glute flesh
 // weighted to the twisted pelvis rotates -90 degrees about the vertical
 // while thigh-weighted flesh kept the authored +Y facing, and the blend
@@ -74,7 +79,10 @@ static TAutoConsoleVariable<float> CVarRaftSimCC0LegFacingTwistDegrees(
 // weights into a hard central ridge and stretched the remaining wetsuit into
 // broad triangular wings. The outer upper-arm joints remain on the gameplay
 // pose; only the render skeleton's inner clavicle roots use this bounded span.
-constexpr float ProductionClavicleRootLateralFraction = 0.32f;
+// Fraction of the rig's 37.5 cm shoulder span that spreads the inner
+// clavicle roots (the authored roots sit 4.8 cm apart); 0.28 keeps the
+// rendered span near 10.5 cm, inside the anatomical gate.
+constexpr float ProductionClavicleRootLateralFraction = 0.28f;
 
 const TCHAR* CC0GripDigits[] = {
     TEXT("thumb"), TEXT("index"), TEXT("middle"), TEXT("ring"), TEXT("pinky")};
@@ -146,6 +154,20 @@ const FName DrivenBones[] = {
     TEXT("calf_r"),
     TEXT("foot_r")};
 
+// Diagnostic: log where the driven axial joints land and which bones move
+// the highest wetsuit vertex (raftsim.CC0PoseForensics 1).
+TAutoConsoleVariable<int32> CVarCC0PoseForensics(
+    TEXT("raftsim.CC0PoseForensics"),
+    0,
+    TEXT("Log driven joint heights and the wetsuit apex influences once per body."));
+
+// Diagnostic: draw the CC0 wetsuit section with another material so its
+// geometry can be told apart from every other charcoal surface in a capture.
+TAutoConsoleVariable<FString> CVarCC0WetsuitDebugMaterial(
+    TEXT("raftsim.CC0WetsuitDebugMaterial"),
+    TEXT(""),
+    TEXT("Object path of a material to draw the CC0 wetsuit section with (debug only)."));
+
 void ApplyProductionBodyMaterialOverrides(
     UPoseableMeshComponent* Body,
     const USkeletalMesh* Mesh)
@@ -157,6 +179,15 @@ void ApplyProductionBodyMaterialOverrides(
     UMaterialInterface* ProductionWetsuit = LoadObject<UMaterialInterface>(
         nullptr,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"));
+    const FString DebugWetsuitPath = CVarCC0WetsuitDebugMaterial.GetValueOnGameThread();
+    if (!DebugWetsuitPath.IsEmpty())
+    {
+        if (UMaterialInterface* DebugWetsuit =
+                LoadObject<UMaterialInterface>(nullptr, *DebugWetsuitPath))
+        {
+            ProductionWetsuit = DebugWetsuit;
+        }
+    }
     if (ProductionWetsuit == nullptr)
     {
         return;
@@ -174,6 +205,17 @@ void ApplyProductionBodyMaterialOverrides(
             // fallback wardrobe. This is a presentation-only override.
             Body->SetMaterial(MaterialIndex, ProductionWetsuit);
         }
+    }
+    // Slot forensics ("I still don't see faces inside the helmets",
+    // 2026-09-02): which material each CC0 section actually renders with.
+    for (int32 MaterialIndex = 0; MaterialIndex < Slots.Num(); ++MaterialIndex)
+    {
+        const UMaterialInterface* Assigned = Body->GetMaterial(MaterialIndex);
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim CC0 slot %d '%s' -> %s"),
+            MaterialIndex,
+            *Slots[MaterialIndex].MaterialSlotName.ToString(),
+            Assigned ? *Assigned->GetPathName() : TEXT("<none>"));
     }
 }
 }
@@ -217,8 +259,11 @@ FVector ARaftSimCC0CrewVisualActor::GetSolvedHeadWorldLocation() const
     const FVector LocalEyeCenterCm = bCurrentGuide
         ? GuideHeadLocalEyeCenterCm
         : CrewHeadLocalEyeCentersCm[FMath::Clamp(CurrentVariantIndex, 0, 3)];
+    // Rotate-and-translate only: the head's component transform carries the
+    // importer's 100x unit scale, which would blow the offset up 100-fold.
     return Body->GetComponentTransform().TransformPosition(
-        HeadTransform.TransformPosition(LocalEyeCenterCm / BodyScale));
+        HeadTransform.GetLocation() +
+        HeadTransform.GetRotation().RotateVector(LocalEyeCenterCm / BodyScale));
 }
 
 FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceForwardWorldVector() const
@@ -296,7 +341,8 @@ bool ARaftSimCC0CrewVisualActor::GetSolvedChestWorldTransform(
         FRotationMatrix::MakeFromZX(SpineUp, ChestForward).ToQuat(),
         ComponentTransform.TransformPosition(
             FMath::Lerp(Spine02, Spine03, 0.45f)) +
-            ChestForward * ChestCenterForwardOfSpineCm);
+            ChestForward * ChestCenterForwardOfSpineCm +
+            SpineUp * ProductionVestLiftAlongSpineCm);
     return true;
 }
 
@@ -363,6 +409,157 @@ void ARaftSimCC0CrewVisualActor::CacheReferencePose()
         }
     }
     CacheRenderedFaceAnchorVertices();
+}
+
+void ARaftSimCC0CrewVisualActor::LogPoseForensics(
+    const FVector& NeckBaseCm,
+    const FVector& HeadCenterCm) const
+{
+    if (!Body)
+    {
+        return;
+    }
+    USkeletalMesh* Mesh = Cast<USkeletalMesh>(Body->GetSkinnedAsset());
+    FSkeletalMeshRenderData* RenderData = Mesh ? Mesh->GetResourceForRendering() : nullptr;
+    FSkinWeightVertexBuffer* SkinWeights = Body->GetSkinWeightBuffer(0);
+    if (!Mesh || !RenderData || RenderData->LODRenderData.IsEmpty() || !SkinWeights)
+    {
+        return;
+    }
+    const FSkeletalMeshLODRenderData& LODData = RenderData->LODRenderData[0];
+    const TArray<FSkeletalMaterial>& Materials = Mesh->GetMaterials();
+    const FReferenceSkeleton& RefSkeleton = Mesh->GetRefSkeleton();
+    TArray<FMatrix44f> CachedRefToLocals;
+    Body->CacheRefToLocalMatrices(CachedRefToLocals);
+    auto DrivenZ = [this](const TCHAR* BoneName)
+    {
+        return Body->GetBoneTransformByName(
+            FName(BoneName), EBoneSpaces::ComponentSpace).GetLocation().Z * BodyScale;
+    };
+    auto RestZ = [this](const TCHAR* BoneName)
+    {
+        const FTransform* Reference = ReferenceComponentTransforms.Find(BoneName);
+        return Reference ? Reference->GetLocation().Z * BodyScale : -1.0f;
+    };
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim CC0 pose forensics %s: rest z pelvis=%.1f spine_03=%.1f neck_01=%.1f head=%.1f upperarm_l=%.1f | driven z pelvis=%.1f spine_03=%.1f neck_01=%.1f head=%.1f upperarm_l=%.1f | targets neck base=%.1f head=%.1f"),
+        *Mesh->GetName(),
+        RestZ(TEXT("pelvis")), RestZ(TEXT("spine_03")), RestZ(TEXT("neck_01")),
+        RestZ(TEXT("head")), RestZ(TEXT("upperarm_l")),
+        DrivenZ(TEXT("pelvis")), DrivenZ(TEXT("spine_03")), DrivenZ(TEXT("neck_01")),
+        DrivenZ(TEXT("head")), DrivenZ(TEXT("upperarm_l")),
+        NeckBaseCm.Z, HeadCenterCm.Z);
+    const FTransform DrivenHead = Body->GetBoneTransformByName(
+        TEXT("head"), EBoneSpaces::ComponentSpace);
+    const FTransform* RestHead = ReferenceComponentTransforms.Find(TEXT("head"));
+    if (RestHead)
+    {
+        auto Axes = [](const FTransform& Transform)
+        {
+            const FVector X = Transform.GetRotation().RotateVector(FVector::XAxisVector);
+            const FVector Y = Transform.GetRotation().RotateVector(FVector::YAxisVector);
+            const FVector Z = Transform.GetRotation().RotateVector(FVector::ZAxisVector);
+            return FString::Printf(TEXT("X=(%.2f,%.2f,%.2f) Y=(%.2f,%.2f,%.2f) Z=(%.2f,%.2f,%.2f)"),
+                X.X, X.Y, X.Z, Y.X, Y.Y, Y.Z, Z.X, Z.Y, Z.Z);
+        };
+        FVector DrivenEyes = FVector::ZeroVector;
+        FVector RestEyes = FVector::ZeroVector;
+        for (const int32 VertexIndex : RenderedFaceAnchorVertexIndices)
+        {
+            DrivenEyes += FVector(USkinnedMeshComponent::GetSkinnedVertexPosition(
+                Body, VertexIndex, LODData, *SkinWeights, CachedRefToLocals));
+            RestEyes += FVector(
+                LODData.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(VertexIndex));
+        }
+        if (RenderedFaceAnchorVertexIndices.Num() > 0)
+        {
+            DrivenEyes /= RenderedFaceAnchorVertexIndices.Num();
+            RestEyes /= RenderedFaceAnchorVertexIndices.Num();
+        }
+        const FVector DrivenEyeOffset = DrivenEyes - DrivenHead.GetLocation();
+        const FVector RestEyeOffset = RestEyes - RestHead->GetLocation();
+        auto ScaleString = [](const FVector& Scale)
+        {
+            return FString::Printf(TEXT("(%.2f,%.2f,%.2f)"), Scale.X, Scale.Y, Scale.Z);
+        };
+        const int32 HeadIndex = RefSkeleton.FindBoneIndex(TEXT("head"));
+        const FVector RefPoseHeadScale = RefSkeleton.GetRefBonePose().IsValidIndex(HeadIndex)
+            ? RefSkeleton.GetRefBonePose()[HeadIndex].GetScale3D()
+            : FVector::ZeroVector;
+        const FVector LocalHeadScale = Body->GetBoneSpaceTransforms().IsValidIndex(HeadIndex)
+            ? Body->GetBoneSpaceTransforms()[HeadIndex].GetScale3D()
+            : FVector::ZeroVector;
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim CC0 pose forensics %s: scales head driven=%s rest=%s local=%s refpose=%s | neck_01 driven=%s | spine_03 driven=%s | head-hidden=%d"),
+            *Mesh->GetName(),
+            *ScaleString(DrivenHead.GetScale3D()),
+            *ScaleString(RestHead->GetScale3D()),
+            *ScaleString(LocalHeadScale),
+            *ScaleString(RefPoseHeadScale),
+            *ScaleString(Body->GetBoneTransformByName(
+                TEXT("neck_01"), EBoneSpaces::ComponentSpace).GetScale3D()),
+            *ScaleString(Body->GetBoneTransformByName(
+                TEXT("spine_03"), EBoneSpaces::ComponentSpace).GetScale3D()),
+            bHeadHiddenForFirstPerson ? 1 : 0);
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim CC0 pose forensics %s: head joint driven=(%.1f, %.1f, %.1f) axes %s | rest axes %s | eyes minus joint driven=(%.1f, %.1f, %.1f) rest=(%.1f, %.1f, %.1f)"),
+            *Mesh->GetName(),
+            DrivenHead.GetLocation().X, DrivenHead.GetLocation().Y, DrivenHead.GetLocation().Z,
+            *Axes(DrivenHead),
+            *Axes(*RestHead),
+            DrivenEyeOffset.X, DrivenEyeOffset.Y, DrivenEyeOffset.Z,
+            RestEyeOffset.X, RestEyeOffset.Y, RestEyeOffset.Z);
+    }
+    for (const FSkelMeshRenderSection& Section : LODData.RenderSections)
+    {
+        if (!Materials.IsValidIndex(Section.MaterialIndex) ||
+            !Materials[Section.MaterialIndex].MaterialSlotName.ToString().Contains(
+                TEXT("Wetsuit"), ESearchCase::IgnoreCase))
+        {
+            continue;
+        }
+        float ApexZ = TNumericLimits<float>::Lowest();
+        uint32 ApexVertex = Section.BaseVertexIndex;
+        FVector ApexDriven = FVector::ZeroVector;
+        const uint32 EndVertex = Section.BaseVertexIndex + Section.NumVertices;
+        for (uint32 VertexIndex = Section.BaseVertexIndex; VertexIndex < EndVertex; ++VertexIndex)
+        {
+            const FVector Driven(USkinnedMeshComponent::GetSkinnedVertexPosition(
+                Body, VertexIndex, LODData, *SkinWeights, CachedRefToLocals));
+            if (Driven.Z > ApexZ)
+            {
+                ApexZ = Driven.Z;
+                ApexVertex = VertexIndex;
+                ApexDriven = Driven;
+            }
+        }
+        FString Influences;
+        const FSkinWeightInfo ApexWeights = SkinWeights->GetVertexSkinWeights(ApexVertex);
+        for (int32 Influence = 0; Influence < MAX_TOTAL_INFLUENCES; ++Influence)
+        {
+            if (ApexWeights.InfluenceWeights[Influence] == 0)
+            {
+                continue;
+            }
+            const int32 LocalBone = ApexWeights.InfluenceBones[Influence];
+            const int32 SkeletonBone = Section.BoneMap.IsValidIndex(LocalBone)
+                ? Section.BoneMap[LocalBone]
+                : INDEX_NONE;
+            Influences += FString::Printf(TEXT(" %s:%.2f"),
+                SkeletonBone != INDEX_NONE
+                    ? *RefSkeleton.GetBoneName(SkeletonBone).ToString()
+                    : TEXT("?"),
+                ApexWeights.InfluenceWeights[Influence] / 65535.0f);
+        }
+        const FVector RestPosition(
+            LODData.StaticVertexBuffers.PositionVertexBuffer.VertexPosition(ApexVertex));
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim CC0 pose forensics %s: wetsuit apex driven=(%.1f, %.1f, %.1f) rest=(%.1f, %.1f, %.1f) influences:%s"),
+            *Mesh->GetName(),
+            ApexDriven.X * BodyScale, ApexDriven.Y * BodyScale, ApexDriven.Z * BodyScale,
+            RestPosition.X, RestPosition.Y, RestPosition.Z,
+            *Influences);
+    }
 }
 
 bool ARaftSimCC0CrewVisualActor::HasArticulatedPaddleGripRig() const
@@ -594,38 +791,92 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     const FVector MidSpine = FMath::Lerp(HipCenter, ShoulderCenter, 0.55f);
     const FVector UpperSpine = FMath::Lerp(Pose.TorsoCenterCm, ShoulderCenter, 0.78f);
     const FVector NeckBase = ShoulderCenter + TorsoUp * 4.0f;
-    const FVector LeftClavicleRoot = UpperSpine +
-        (Pose.LeftShoulderCm - ShoulderCenter) *
-            ProductionClavicleRootLateralFraction;
-    const FVector RightClavicleRoot = UpperSpine +
-        (Pose.RightShoulderCm - ShoulderCenter) *
-            ProductionClavicleRootLateralFraction;
-    // The MakeHuman body owns a longer anatomical neck than the compact host
-    // collision pose. Driving its skull directly to the host head point left
-    // only about 3 cm between the jaw and shoulder line in seated views, so
-    // the wetsuit shoulder envelope read as a black bib covering the neck.
-    // Lift only the render skeleton along the solved torso-up axis. Helmet fit
-    // still comes from the live rendered eyes, while gameplay, collision,
-    // crew mass, hand targets, paddle, raft, and rescue authority stay put.
-    const FVector PresentedHeadCenter =
-        Pose.HeadCenterCm + TorsoUp * ProductionHeadClearanceLiftCm;
-    const FVector HeadTop = PresentedHeadCenter + TorsoUp * 16.0f;
-    PresentedHeadShoulderClearanceCm = FVector::DotProduct(
-        PresentedHeadCenter - ShoulderCenter,
-        TorsoUp);
+    // The host pose is a compact collision silhouette: hips to neck base
+    // span about 35 cm where this rig's spine runs about 57. Skin keeps its
+    // rest offset from each bone origin, so driving the spine bones to the
+    // host's interpolated points stacked the chest on top of itself —
+    // spine_03 alone carries 35 cm of upper chest and collar, which landed
+    // at chin height: the neoprene collar spiked over every face ("I still
+    // don't see faces inside the helmets") and the chest top stood above
+    // the vest ("black material ... much too high to be shoulders",
+    // 2026-09-02; the collar took the wetsuit slot's material when that
+    // slot was swapped, and its apex vertex was 99% spine_03). Walk the
+    // axial chain with the rig's own rest lengths from the hips, borrowing
+    // only the host's segment directions; helmet fit still follows the
+    // rendered eyes and gameplay authority stays with the host pose.
+    auto RestLengthCm = [this](const TCHAR* FromBone, const TCHAR* ToBone)
+    {
+        const FTransform* From = ReferenceComponentTransforms.Find(FromBone);
+        const FTransform* To = ReferenceComponentTransforms.Find(ToBone);
+        return (From && To)
+            ? static_cast<float>(
+                  FVector::Distance(From->GetLocation(), To->GetLocation())) * BodyScale
+            : 0.0f;
+    };
+    auto Advance = [&TorsoUp](
+        const FVector& StartCm, const FVector& HostDirection, float LengthCm)
+    {
+        FVector Direction = HostDirection.GetSafeNormal();
+        if (Direction.IsNearlyZero())
+        {
+            Direction = TorsoUp;
+        }
+        return StartCm + Direction * LengthCm;
+    };
+    const FVector PelvisCm = HipCenter;
+    const FVector Spine01Cm = Advance(
+        PelvisCm, LowerSpine - HipCenter, RestLengthCm(TEXT("pelvis"), TEXT("spine_01")));
+    const FVector Spine02Cm = Advance(
+        Spine01Cm, MidSpine - LowerSpine, RestLengthCm(TEXT("spine_01"), TEXT("spine_02")));
+    const FVector Spine03Cm = Advance(
+        Spine02Cm, UpperSpine - MidSpine, RestLengthCm(TEXT("spine_02"), TEXT("spine_03")));
+    const FVector NeckBaseCm = Advance(
+        Spine03Cm, NeckBase - UpperSpine, RestLengthCm(TEXT("spine_03"), TEXT("neck_01")));
+    const FVector PresentedHeadCenter = Advance(
+        NeckBaseCm, Pose.HeadCenterCm - NeckBase, RestLengthCm(TEXT("neck_01"), TEXT("head")));
+    // Aligning the authored neck-to-head shaft with the torso-up axis leaves
+    // the rendered face pitched about 20 degrees skyward (forensics: face
+    // vector (0.94, 0, 0.35)); tip the crown forward by that much so the
+    // gaze runs level downriver and the helmet brim sits over the brow.
+    const FVector TorsoRight = Pose.TorsoRotation.Quaternion().RotateVector(FVector::RightVector);
+    const FVector HeadUp = TorsoUp.RotateAngleAxis(ProductionHeadLevelPitchDegrees, TorsoRight);
+    const FVector HeadTop = PresentedHeadCenter + HeadUp * 16.0f;
 
-    SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), HipCenter, LowerSpine,
+    SetSegmentBone(TEXT("pelvis"), TEXT("spine_01"), PelvisCm, Spine01Cm,
         ProductionAxialFacingTwistDegrees);
-    SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), LowerSpine, MidSpine,
+    SetSegmentBone(TEXT("spine_01"), TEXT("spine_02"), Spine01Cm, Spine02Cm,
         ProductionAxialFacingTwistDegrees);
-    SetSegmentBone(TEXT("spine_02"), TEXT("spine_03"), MidSpine, UpperSpine,
+    SetSegmentBone(TEXT("spine_02"), TEXT("spine_03"), Spine02Cm, Spine03Cm,
         ProductionAxialFacingTwistDegrees);
-    SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), UpperSpine, NeckBase,
+    SetSegmentBone(TEXT("spine_03"), TEXT("neck_01"), Spine03Cm, NeckBaseCm,
         ProductionAxialFacingTwistDegrees);
-    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBase, PresentedHeadCenter,
+    SetSegmentBone(TEXT("neck_01"), TEXT("head"), NeckBaseCm, PresentedHeadCenter,
         ProductionAxialFacingTwistDegrees);
     SetSegmentBone(TEXT("head"), TEXT("head"), PresentedHeadCenter, HeadTop,
         ProductionAxialFacingTwistDegrees);
+
+    // The shoulders hang from the rig's chest top, not the host shoulder
+    // line: children of the driven spine already sit at their rest offsets,
+    // so read them back rather than pulling the deltoids down to the
+    // host's compact silhouette.
+    Body->RefreshBoneTransforms();
+    auto DrivenBoneCm = [this](const TCHAR* BoneName)
+    {
+        return Body->GetBoneTransformByName(
+            FName(BoneName), EBoneSpaces::ComponentSpace).GetLocation() * BodyScale;
+    };
+    const FVector LeftShoulderCm = DrivenBoneCm(TEXT("upperarm_l"));
+    const FVector RightShoulderCm = DrivenBoneCm(TEXT("upperarm_r"));
+    const FVector RigShoulderCenterCm = (LeftShoulderCm + RightShoulderCm) * 0.5f;
+    const FVector RigClavicleCenterCm =
+        (DrivenBoneCm(TEXT("clavicle_l")) + DrivenBoneCm(TEXT("clavicle_r"))) * 0.5f;
+    const FVector LeftClavicleRoot = RigClavicleCenterCm +
+        (LeftShoulderCm - RigShoulderCenterCm) * ProductionClavicleRootLateralFraction;
+    const FVector RightClavicleRoot = RigClavicleCenterCm +
+        (RightShoulderCm - RigShoulderCenterCm) * ProductionClavicleRootLateralFraction;
+    PresentedHeadShoulderClearanceCm = FVector::DotProduct(
+        PresentedHeadCenter - RigShoulderCenterCm,
+        TorsoUp);
 
     // The pose contract publishes palm/grip targets while the imported hand
     // bone is a wrist pivot. Offset each wrist by its own hash-locked reference
@@ -638,37 +889,30 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         ? ResolvePaddleGripWristCm(false, Pose, Pose.RightHandCm)
         : Pose.RightHandCm;
     FVector LeftElbow =
-        FMath::Lerp(Pose.LeftShoulderCm, LeftWristCm, 0.48f) +
+        FMath::Lerp(LeftShoulderCm, LeftWristCm, 0.48f) +
         FVector(0.0f, -5.0f, -2.0f);
     FVector RightElbow =
-        FMath::Lerp(Pose.RightShoulderCm, RightWristCm, 0.48f) +
+        FMath::Lerp(RightShoulderCm, RightWristCm, 0.48f) +
         FVector(0.0f, 5.0f, -2.0f);
     // Swinging the upper-arm bone steeply DOWN from the rig's near-lateral
-    // rest pose rolls the deltoid/trapezius skin up beside the neck — with
-    // lap-resting hands every idle paddler wore a black shoulder yoke
-    // reaching the chin ("what is the black material sticking out the top
-    // of the life jacket? it seems much to high to be shoulders",
-    // 2026-09-02, confirmed skeletal by a show-SkeletalMeshes A/B). Cap
-    // the elbow's drop below the shoulder; the forearm still reaches the
-    // true wrist, so hands stay put and the arm simply bends more.
+    // rest pose rolls the deltoid skin up beside the neck, so keep a bound
+    // on the elbow's drop below the shoulder; the forearm still reaches the
+    // true wrist, so hands stay put and the arm simply bends more. The old
+    // 9 cm bound was fighting the compressed-torso chest, not the deltoid.
     const auto ClampElbowDrop = [](const FVector& ShoulderCm, FVector ElbowCm)
     {
-        // 14 still left visible skin flaps once the shoulders dropped, and
-        // 12 left the neckline scallops draping the vest top; 9 with the
-        // 71 cm shoulders and the raised vest shell finally tucks the
-        // neoprene under the PFD.
-        constexpr float kMaxElbowDropCm = 9.0f;
+        constexpr float kMaxElbowDropCm = 24.0f;
         ElbowCm.Z = FMath::Max(ElbowCm.Z, ShoulderCm.Z - kMaxElbowDropCm);
         return ElbowCm;
     };
-    LeftElbow = ClampElbowDrop(Pose.LeftShoulderCm, LeftElbow);
-    RightElbow = ClampElbowDrop(Pose.RightShoulderCm, RightElbow);
+    LeftElbow = ClampElbowDrop(LeftShoulderCm, LeftElbow);
+    RightElbow = ClampElbowDrop(RightShoulderCm, RightElbow);
     SetSegmentBone(
         TEXT("clavicle_l"),
         TEXT("upperarm_l"),
         LeftClavicleRoot,
-        Pose.LeftShoulderCm);
-    SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), Pose.LeftShoulderCm, LeftElbow);
+        LeftShoulderCm);
+    SetSegmentBone(TEXT("upperarm_l"), TEXT("lowerarm_l"), LeftShoulderCm, LeftElbow);
     SetSegmentBone(TEXT("lowerarm_l"), TEXT("hand_l"), LeftElbow, LeftWristCm);
     if (Pose.bShowPaddle)
     {
@@ -682,8 +926,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         TEXT("clavicle_r"),
         TEXT("upperarm_r"),
         RightClavicleRoot,
-        Pose.RightShoulderCm);
-    SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), Pose.RightShoulderCm, RightElbow);
+        RightShoulderCm);
+    SetSegmentBone(TEXT("upperarm_r"), TEXT("lowerarm_r"), RightShoulderCm, RightElbow);
     SetSegmentBone(TEXT("lowerarm_r"), TEXT("hand_r"), RightElbow, RightWristCm);
     if (Pose.bShowPaddle)
     {
@@ -738,13 +982,29 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     // the production boot cuff, while the shrunken foot mesh itself stays
     // hidden inside the boot volume.
     constexpr float kHiddenFootBoneScale = 0.35f;
+    // Bone scales are RELATIVE TO THE REST SCALE: the importer applies the
+    // FBX metre-to-centimetre conversion as a 100x root scale, so every
+    // rest component-space bone scale is (100,100,100). Restoring the
+    // head with FVector::OneVector after the first-person hide made it
+    // 1 % of rest — the skull, eyes and brows collapsed onto the head
+    // joint and the collar's head-rigid ring stretched into a spike from
+    // the chest to that point ("the crew don't have heads, you can see the
+    // back of the helmet", 2026-09-02; forensics: rendered eye centroid
+    // sat 0.1 cm from the joint against a 8.9 cm rest offset).
+    auto RestScale = [this](const TCHAR* BoneName)
+    {
+        const FTransform* Reference = ReferenceComponentTransforms.Find(BoneName);
+        return Reference ? Reference->GetScale3D() : FVector::OneVector;
+    };
     Body->SetBoneScaleByName(
-        TEXT("foot_l"), FVector(kHiddenFootBoneScale), EBoneSpaces::ComponentSpace);
+        TEXT("foot_l"), RestScale(TEXT("foot_l")) * kHiddenFootBoneScale,
+        EBoneSpaces::ComponentSpace);
     Body->SetBoneScaleByName(
-        TEXT("foot_r"), FVector(kHiddenFootBoneScale), EBoneSpaces::ComponentSpace);
+        TEXT("foot_r"), RestScale(TEXT("foot_r")) * kHiddenFootBoneScale,
+        EBoneSpaces::ComponentSpace);
     Body->SetBoneScaleByName(
         TEXT("head"),
-        bHeadHiddenForFirstPerson ? FVector::ZeroVector : FVector::OneVector,
+        bHeadHiddenForFirstPerson ? FVector::ZeroVector : RestScale(TEXT("head")),
         EBoneSpaces::ComponentSpace);
     // Do NOT bone-scale neck_01/spine_03 to tame the wetsuit's scalloped
     // neckline: component-space scales there crush every vertex weighted
@@ -755,6 +1015,11 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
     Body->RefreshBoneTransforms();
     ApplyPaddleGripPose(Pose);
     Body->RefreshBoneTransforms();
+    if (CVarCC0PoseForensics.GetValueOnGameThread() && !bLoggedPoseForensics)
+    {
+        bLoggedPoseForensics = true;
+        LogPoseForensics(NeckBaseCm, PresentedHeadCenter);
+    }
     const FVector PresentedLeftClavicleRootCm =
         Body->GetBoneTransformByName(
             TEXT("clavicle_l"), EBoneSpaces::ComponentSpace).GetLocation() *
@@ -775,8 +1040,8 @@ void ARaftSimCC0CrewVisualActor::ApplyBodyPose(const FRaftSimCrewAvatarPose& Pos
         PresentedLeftClavicleRootCm,
         PresentedRightClavicleRootCm);
     MaximumPresentedShoulderAnchorErrorCm = FMath::Max(
-        FVector::Distance(PresentedLeftShoulderCm, Pose.LeftShoulderCm),
-        FVector::Distance(PresentedRightShoulderCm, Pose.RightShoulderCm));
+        FVector::Distance(PresentedLeftShoulderCm, LeftShoulderCm),
+        FVector::Distance(PresentedRightShoulderCm, RightShoulderCm));
     bPaddleGripActive = Pose.bShowPaddle && HasArticulatedPaddleGripRig();
     MaximumPaddleGripAnchorErrorCm = bPaddleGripActive
         ? FMath::Max(

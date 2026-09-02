@@ -1550,6 +1550,16 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         float FloorCenterZCm = 0.0f;
         bool bHasFloorCenter = false;
         bool bHullWet = false;
+        // Lateral telemetry for the "drifts sideways into the left bank"
+        // report (2026-09-02): river-frame lateral offset, the cross-stream
+        // components of water and raft velocity, and the cross-stream
+        // support-surface slope, so a steady bank-ward creep can be pinned
+        // on the flow field, the surface tilt, or the hull model.
+        float RiverLateralM = 0.0f;
+        float WaterLateralMps = 0.0f;
+        float RaftLateralMps = 0.0f;
+        float SurfaceSlopeLateral = 0.0f;
+        float RiverTangentDeg = 0.0f;
         if (const URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
         {
             FRaftSimWaterSample Sample;
@@ -1572,6 +1582,33 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
                 SupportSample.bWet)
             {
                 SupportSurfaceZCm = SupportSample.SurfaceHeightMeters * 100.0f;
+            }
+            FVector2D RiverPosition;
+            FVector RiverTangent;
+            FVector RiverLeftNormal;
+            if (Water->WorldToRiverCoordinates(
+                    GetActorLocation(), RiverPosition, RiverTangent, RiverLeftNormal))
+            {
+                const FVector LeftDirection = RiverLeftNormal.GetSafeNormal2D();
+                RiverLateralM = RiverPosition.Y;
+                RiverTangentDeg = FMath::RadiansToDegrees(
+                    FMath::Atan2(RiverTangent.Y, RiverTangent.X));
+                WaterLateralMps = Sample.bWet
+                    ? FVector::DotProduct(Sample.VelocityMetersPerSecond, LeftDirection)
+                    : 0.0f;
+                RaftLateralMps = FVector::DotProduct(GetRaftVelocity(), LeftDirection);
+                FRaftSimWaterSample LeftSample;
+                FRaftSimWaterSample RightSample;
+                const FVector LateralOffsetCm = LeftDirection * 100.0f;
+                if (Water->SampleRaftSupportSurfaceAtWorldPosition(
+                        GetActorLocation() + LateralOffsetCm, LeftSample) &&
+                    Water->SampleRaftSupportSurfaceAtWorldPosition(
+                        GetActorLocation() - LateralOffsetCm, RightSample) &&
+                    LeftSample.bWet && RightSample.bWet)
+                {
+                    SurfaceSlopeLateral =
+                        (LeftSample.SurfaceHeightMeters - RightSample.SurfaceHeightMeters) / 2.0f;
+                }
             }
         }
         bHasFloorCenter = GetRenderedFloorCenterWorldZCm(FloorCenterZCm);
@@ -1609,6 +1646,8 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             TEXT("pressure=%.2f integrity=%.2f dry_points=%d ground_points=%d ")
             TEXT("ground_penetration_m=%.3f x_cm=%.0f y_cm=%.0f ")
             TEXT("sun_pitch=%.1f sun_intensity=%.1f ")
+            TEXT("lateral_m=%.2f water_lat_mps=%.3f raft_lat_mps=%.3f ")
+            TEXT("roll_deg=%.2f surf_slope_lat=%.4f tangent_dir_deg=%.1f ")
             TEXT("water_dir_deg=%.1f raft_dir_deg=%.1f"),
             GetRaftVelocity().Size(),
             WaterSpeedMps,
@@ -1631,6 +1670,12 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             GetActorLocation().Y,
             SunPitchDeg,
             SunIntensityLux,
+            RiverLateralM,
+            WaterLateralMps,
+            RaftLateralMps,
+            GetActorRotation().Roll,
+            SurfaceSlopeLateral,
+            RiverTangentDeg,
             WaterHeadingDeg,
             FMath::RadiansToDegrees(FMath::Atan2(
                 GetRaftVelocity().Y, GetRaftVelocity().X)));
@@ -1826,9 +1871,35 @@ void ARaftSimRaftActor::EnterCapsize()
     RaftMode = ERaftSimRaftMode::Capsized;
     FlipRiskLatchSeconds = 0.0f;
     // Right the boat here on re-flip. Guard against a diverged sink so the
-    // recovery point stays near where the crew went overboard.
+    // recovery point stays near where the crew went overboard — relative to
+    // the LOCAL water surface, not world Z=0: the old absolute ±2 m clamp
+    // assumed a tank at the origin, and on the South Fork full reach (river
+    // at ~300 m) it parked the recovery point 300 m under the riverbed, so
+    // every capsize re-flipped the hull inside terrain and the physics threw
+    // it 400 m into the sky at 40 m/s (2026-09-02 reach survey, 2400 m and
+    // 9400 m).
     CapsizeLocation = GetActorLocation();
-    CapsizeLocation.Z = FMath::Clamp(CapsizeLocation.Z, -200.0f, 200.0f);
+    {
+        float ReferenceZCm = CapsizeLocation.Z;
+        if (Bridge != nullptr)
+        {
+            if (const URaftSimWaterRuntimeAdapter* WaterAdapter = Bridge->GetWaterRuntime())
+            {
+                FRaftSimWaterSample Sample;
+                if (WaterAdapter->SampleWaterAtWorldPosition(CapsizeLocation, Sample) &&
+                    Sample.bWet && FMath::IsFinite(Sample.SurfaceHeightMeters))
+                {
+                    ReferenceZCm = Sample.SurfaceHeightMeters * kCmPerM;
+                }
+            }
+        }
+        if (!FMath::IsFinite(ReferenceZCm))
+        {
+            ReferenceZCm = CheckpointTransform.GetLocation().Z;
+        }
+        CapsizeLocation.Z = FMath::Clamp(
+            CapsizeLocation.Z, ReferenceZCm - 200.0f, ReferenceZCm + 200.0f);
+    }
 
     if (RaftAdapter != nullptr)
     {
@@ -2374,6 +2445,20 @@ void ARaftSimRaftActor::RequestReflip()
         {
             ReflipLocation.X = GuideWorldCm.X;
             ReflipLocation.Y = GuideWorldCm.Y;
+        }
+    }
+    // Re-right the hull ON the local water surface: the guide may have
+    // drifted down a drop since the capsize point was recorded.
+    if (Bridge != nullptr)
+    {
+        if (const URaftSimWaterRuntimeAdapter* WaterAdapter = Bridge->GetWaterRuntime())
+        {
+            FRaftSimWaterSample Sample;
+            if (WaterAdapter->SampleWaterAtWorldPosition(ReflipLocation, Sample) &&
+                Sample.bWet && FMath::IsFinite(Sample.SurfaceHeightMeters))
+            {
+                ReflipLocation.Z = Sample.SurfaceHeightMeters * kCmPerM + 40.0f;
+            }
         }
     }
 
