@@ -312,6 +312,48 @@ water meshes regenerated in place via the new water-only rebuild flag
 terrain, far field, and materials untouched). All 39 band meshes
 regenerated; shoreline stills show one edge.
 
+## 2026-09-02 round 4: tonal boots, vest layering, scheduled drag floor
+
+Third repeats of three reports forced different tools:
+- "Boots are still cylinders": the mesh was never the remaining
+  problem — boot rubber (0.005) and upper tint (0.018) rendered the
+  same value as the wetsuit shin, so leg and boot fused into one
+  column. The production boot materials brightened to charcoal
+  (rubber 0.034, upper tint 0.048; python regen) and the procedural
+  fallback boot to match. Footwear finally separates.
+- "Shoulders still covered with black material": shoulders 73 -> 71,
+  elbow clamp 12 -> 9, and the PFD shell lifts 1.2 cm with +5% Z so
+  the vest wins the layering. RESIDUAL: the wetsuit's authored
+  scalloped neckline still shows at the vest top; the real fix is a
+  Blender trim of the CC0 wetsuit source. Bone-scaling neck_01 or
+  spine_03 to shrink it is OFF THE TABLE - component-space scales
+  there crush every vertex weighted downstream (tried, catastrophic,
+  reverted same day).
+- "The boat still drifts sideways" vs the earlier "should be pushed
+  to the outside of the turn": resolved with a water-speed-scheduled
+  viscous floor - SlowWaterDragReferenceMps (1.2) in still water
+  blending to LowSpeedDragReferenceMps (0.35) by ~2 m/s of current.
+  Pools track the channel hands-off; fast bends keep the outside
+  carry. Fixtures pinning the legacy 1.5 get a constant floor via the
+  max-of-both-ends rule. Verified: 160 s hands-off from the put-in
+  with zero ground contacts. RESIDUAL FINDING: the tail-end lag
+  toward the left grows near the bend approach IDENTICALLY across
+  floor values 0.25/0.55/scheduled - it is not drag slip but the
+  buoyant hull sliding down the water surface's lateral slope (the
+  same gravity term that makes the raft outrun slow water
+  downstream). If the slow left set still reads wrong in play, the
+  next investigation is lateral surface-gradient telemetry, not more
+  drag tuning.
+
+Also: the V4 regen validator broke silently after EffectiveDepthMask
+rewired the depth blends - "exposed only 0 of the two required depth
+colour/opacity blends" meant NO V4 was created, the carrier fell back
+to V2, the MI ran orphaned, and missing-parent churn under VRAM
+exhaustion cascaded into black shader-fallback materials (the black
+paddle saga's true root). The validator now traces the shared depth
+alpha through the effective-mask chain. ALWAYS Test-Path V4 after a
+delete+regen.
+
 ## 2026-09-02 D-rings bonded to the tube
 
 "The D rings aren't attached to the boat" (run-complete close-up).

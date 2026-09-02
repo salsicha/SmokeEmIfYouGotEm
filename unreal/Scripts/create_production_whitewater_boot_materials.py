@@ -1,4 +1,4 @@
-"""Build and assign dedicated PBR materials for the production river boot."""
+﻿"""Build and assign dedicated PBR materials for the production river boot."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def build_upper() -> unreal.Material:
     tint = unreal.MaterialEditingLibrary.create_material_expression(
         material, unreal.MaterialExpressionConstant3Vector, -700, 20
     )
-    tint.constant = unreal.LinearColor(0.018, 0.023, 0.028, 1.0)
+    tint.constant = unreal.LinearColor(0.048, 0.052, 0.058, 1.0)
     tinted = unreal.MaterialEditingLibrary.create_material_expression(
         material, unreal.MaterialExpressionMultiply, -390, -120
     )
@@ -117,7 +117,7 @@ def build_rubber() -> unreal.Material:
     base = unreal.MaterialEditingLibrary.create_material_expression(
         material, unreal.MaterialExpressionConstant3Vector, -420, -80
     )
-    base.constant = unreal.LinearColor(0.005, 0.007, 0.009, 1.0)
+    base.constant = unreal.LinearColor(0.034, 0.036, 0.040, 1.0)
     roughness = constant(material, 0.62, -420, 90)
     specular = constant(material, 0.28, -420, 230)
     unreal.MaterialEditingLibrary.connect_material_property(
@@ -189,7 +189,7 @@ def main() -> None:
                 upper.get_editor_property("used_with_nanite")
             ),
             "project_owned_texture_set": "WetsuitNeoprene",
-            "base_tint_linear": [0.018, 0.023, 0.028],
+            "base_tint_linear": [0.048, 0.052, 0.058],
             "specular": 0.24,
         },
         "rubber": {
@@ -197,7 +197,7 @@ def main() -> None:
             "nanite_usage_persisted": bool(
                 rubber.get_editor_property("used_with_nanite")
             ),
-            "base_color_linear": [0.005, 0.007, 0.009],
+            "base_color_linear": [0.034, 0.036, 0.040],
             "roughness": 0.62,
             "specular": 0.28,
         },
@@ -217,3 +217,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+

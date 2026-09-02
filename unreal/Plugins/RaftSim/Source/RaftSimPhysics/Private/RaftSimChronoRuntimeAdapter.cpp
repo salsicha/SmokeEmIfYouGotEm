@@ -556,6 +556,21 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 State.Orientation.RotateVector(FVector::ForwardVector);
             HullForward.Z = 0.0;
             const bool bHasHullForward = HullForward.Normalize();
+            // Water-speed-scheduled viscous floor: stiff in slow pools so a
+            // hands-off drift tracks the channel, easing to the soft fast-
+            // water floor by ~2 m/s so the hull's inertia can carry it to
+            // the outside of a bend. Taking the max of both ends keeps
+            // fixtures that pin the legacy 1.5 reference on a constant
+            // floor.
+            const double SlowEndFloorMps = FMath::Max(
+                static_cast<double>(RaftConfig.SlowWaterDragReferenceMps),
+                static_cast<double>(RaftConfig.LowSpeedDragReferenceMps));
+            const double ScheduledLowSpeedFloorMps = FMath::Lerp(
+                SlowEndFloorMps,
+                FMath::Max(
+                    static_cast<double>(RaftConfig.LowSpeedDragReferenceMps),
+                    0.0),
+                FMath::Clamp(WaterVelocityMps.Size2D() / 2.0, 0.0, 1.0));
             for (int32 PointIndex = 0;
                  PointIndex < TubeSamplePointsM.Num();
                  ++PointIndex)
@@ -596,11 +611,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 // velocity, yielding a viscous low-speed region and
                 // quadratic high-speed resistance.
                 const double DragSpeedMps = FMath::Max(
-                    RelativeSpeed,
-                    FMath::Max(
-                        static_cast<double>(
-                            RaftConfig.LowSpeedDragReferenceMps),
-                        0.0));
+                    RelativeSpeed, ScheduledLowSpeedFloorMps);
                 // Direction-split hull drag: slicing forward meets far less
                 // resistance than being bluntly pushed, so a stroke coasts
                 // down over a couple of seconds while reverse/lateral flow
