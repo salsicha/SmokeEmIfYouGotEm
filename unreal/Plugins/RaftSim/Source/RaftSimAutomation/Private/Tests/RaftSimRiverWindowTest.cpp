@@ -322,6 +322,67 @@ bool FRaftSimCurvedRiverCoordinateMapTest::RunTest(const FString&)
         TEXT("nearby cached lateral round trip stays sub-centimetre"),
         FMath::IsNearlyEqual(NearbyRoundTrip.Y, NearbyExpected.Y, 0.01f));
 
+    // Whole-corridor forward/inverse agreement. Every 50 m, a point placed
+    // on the centreline and on both banks must project back to the same
+    // station and lateral: the 2026-09-02 reach survey found the inverse
+    // resolving a centreline point at 9300 m to station 9694 / lateral
+    // -553 m (a far segment's lateral line reconstructs any point exactly),
+    // which dried every water probe there and dropped the raft through the
+    // river. Cold queries only: successive samples sit 50 m apart, so the
+    // nearby-seed fast path never engages.
+    {
+        float MinimumStationM = 0.0f;
+        float MaximumStationM = 0.0f;
+        TestTrue(
+            TEXT("coordinate map reports its station domain"),
+            Adapter->GetRiverStationRangeM(MinimumStationM, MaximumStationM));
+        int32 Samples = 0;
+        int32 Failures = 0;
+        float WorstStationErrorM = 0.0f;
+        float WorstLateralErrorM = 0.0f;
+        FString FirstFailures;
+        const float LateralsM[] = {0.0f, 30.0f, -30.0f};
+        for (float StationM = MinimumStationM + 50.0f; StationM < MaximumStationM - 50.0f;
+             StationM += 50.0f)
+        {
+            for (const float LateralM : LateralsM)
+            {
+                FVector ProbeWorld;
+                FVector2D ProbeRiver;
+                FVector ProbeTangent;
+                FVector ProbeLeft;
+                if (!Adapter->RiverToWorldPosition(
+                        FVector2D(StationM, LateralM), Adapter->GetRiverVerticalDatumM(), ProbeWorld))
+                {
+                    continue;
+                }
+                ++Samples;
+                const bool bInverted = Adapter->WorldToRiverCoordinates(
+                    ProbeWorld, ProbeRiver, ProbeTangent, ProbeLeft);
+                const float StationErrorM = bInverted ? FMath::Abs(ProbeRiver.X - StationM) : 1.0e6f;
+                const float LateralErrorM = bInverted ? FMath::Abs(ProbeRiver.Y - LateralM) : 1.0e6f;
+                WorstStationErrorM = FMath::Max(WorstStationErrorM, StationErrorM);
+                WorstLateralErrorM = FMath::Max(WorstLateralErrorM, LateralErrorM);
+                if (StationErrorM > 4.1f || LateralErrorM > 0.5f)
+                {
+                    ++Failures;
+                    if (Failures <= 5)
+                    {
+                        FirstFailures += FString::Printf(
+                            TEXT(" [%.0f m, lat %.0f -> %.1f m, lat %.1f]"),
+                            StationM, LateralM, ProbeRiver.X, ProbeRiver.Y);
+                    }
+                }
+            }
+        }
+        TestTrue(TEXT("corridor round-trip sweep sampled the whole map"), Samples > 1000);
+        TestEqual(
+            FString::Printf(
+                TEXT("corridor forward/inverse round trip agrees everywhere (%d samples, worst station %.1f m, worst lateral %.2f m, first failures:%s)"),
+                Samples, WorstStationErrorM, WorstLateralErrorM, *FirstFailures),
+            Failures, 0);
+    }
+
     const FString TransitFieldsDir = TEXT(
         "physics/data/real_world/south_fork_american_chili_bar/"
         "full_hydraulics/full_reach_transit_seed");

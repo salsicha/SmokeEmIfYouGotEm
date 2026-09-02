@@ -163,6 +163,7 @@ public:
 private:
     bool EnsureBodyLoaded();
     void CacheReferencePose();
+    void LogPoseForensics(const FVector& NeckBaseCm, const FVector& HeadCenterCm) const;
     void CacheRenderedFaceAnchorVertices();
     bool TryGetRenderedFaceEyeCenterWorld(FVector& OutWorldLocation) const;
     void ApplyBodyPose(const FRaftSimCrewAvatarPose& Pose);
@@ -229,6 +230,7 @@ private:
 
     /** LOD0 rendered-eye vertices; their live centroid anchors the fitted helmet. */
     TArray<int32> RenderedFaceAnchorVertexIndices;
+    bool bLoggedPoseForensics = false;
 
     int32 CurrentVariantIndex = 0;
     bool bCurrentGuide = false;

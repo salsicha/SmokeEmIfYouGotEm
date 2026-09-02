@@ -1,4 +1,4 @@
-"""Build RaftSim's project-owned production whitewater river boot in Blender.
+﻿"""Build RaftSim's project-owned production whitewater river boot in Blender.
 
 Run with Blender, not the system Python::
 
@@ -25,7 +25,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoo
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRiverBoot.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRiverBoot.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_river_boot_manifest.json"
-GENERATOR_VERSION = 1
+GENERATOR_VERSION = 2
 
 
 def reset_scene() -> None:
@@ -81,12 +81,15 @@ def build_foot_shell(upper: bpy.types.Material) -> bpy.types.Object:
     for section in range(sections + 1):
         t = section / sections
         x = -5.0 + 29.0 * t
-        toe_taper = max((t - 0.70) / 0.30, 0.0)
-        heel_taper = max((0.12 - t) / 0.12, 0.0)
-        half_width = 5.65 + 0.90 * math.sin(math.pi * t) - 1.45 * toe_taper
-        half_width -= 0.45 * heel_taper
-        half_height = 4.9 - 0.85 * t + 0.55 * math.sin(math.pi * t)
-        center_z = 1.25 + 0.85 * t
+        # Generator v2 (2026-09-02): a fuller lasted foot with a rounder toe
+        # and a full heel block, under a short tapered cuff, so the boot reads
+        # as footwear from the guide seat instead of a tall cylinder.
+        toe_taper = max((t - 0.64) / 0.36, 0.0)
+        heel_taper = max((0.10 - t) / 0.10, 0.0)
+        half_width = 6.45 + 0.85 * math.sin(math.pi * t) - 1.75 * toe_taper
+        half_width -= 0.25 * heel_taper
+        half_height = 5.7 - 0.95 * t + 0.65 * math.sin(math.pi * t)
+        center_z = 1.35 + 0.95 * t
         for side in range(sides):
             angle = math.tau * side / sides
             cos_a = math.cos(angle)
@@ -124,8 +127,8 @@ def build_cuff(upper: bpy.types.Material) -> bpy.types.Object:
     faces: list[tuple[int, ...]] = []
     for ring in range(rings + 1):
         t = ring / rings
-        z = 3.2 + 14.8 * t
-        radius_scale = 1.0 - 0.10 * t + 0.025 * math.sin(math.pi * t)
+        z = 3.4 + 7.4 * t
+        radius_scale = 1.0 - 0.14 * t + 0.02 * math.sin(math.pi * t)
         center_x = -2.15 - 0.35 * t
         for side in range(sides):
             angle = math.tau * side / sides
@@ -161,8 +164,8 @@ def build_details(
     details: list[bpy.types.Object] = []
     details.append(rounded_box("Outsole", (9.25, 0.0, -3.55), (31.5, 13.5, 2.3), 0.85, sole))
     details.append(rounded_box("ToeRand", (19.6, 0.0, 0.15), (7.4, 12.0, 5.9), 2.2, reinforcement))
-    details.append(rounded_box("HeelRand", (-5.55, 0.0, 2.4), (2.4, 11.7, 8.5), 0.9, reinforcement))
-    details.append(rounded_box("PullTab", (-7.25, 0.0, 13.1), (1.0, 2.1, 7.4), 0.45, reinforcement))
+    details.append(rounded_box("HeelRand", (-5.85, 0.0, 3.1), (3.4, 12.6, 9.8), 1.1, reinforcement))
+    details.append(rounded_box("PullTab", (-7.05, 0.0, 9.9), (1.0, 2.1, 4.2), 0.45, reinforcement))
 
     lug_count = 0
     for x in (-1.0, 5.5, 12.0, 18.5):
@@ -181,11 +184,11 @@ def build_details(
 
     # Molded ankle and vamp seam bands break the single-volume silhouette.
     bpy.ops.mesh.primitive_torus_add(
-        major_radius=5.75,
-        minor_radius=0.24,
+        major_radius=5.35,
+        minor_radius=0.26,
         major_segments=48,
         minor_segments=8,
-        location=(-2.35, 0.0, 13.9),
+        location=(-2.5, 0.0, 8.3),
     )
     ankle_seam = bpy.context.object
     ankle_seam.name = "AnkleSeamBand"

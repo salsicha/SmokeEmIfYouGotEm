@@ -166,10 +166,12 @@ bool FRaftSimM5CrewAvatarPoseTest::RunTest(const FString&)
                          BootMaterials[2].MaterialInterface->GetPathName().Contains(
                              TEXT("M_RaftSim_RiverBootRubber")));
         }
+        // Same window as import_production_whitewater_boot.py: generator v2
+        // (2026-09-02) is a short-cuff bootie, so the height floor is 15 cm.
         TestTrue(TEXT("production river boot has plausible centimetre bounds"),
-                 DimensionsCm.X >= 30.0f && DimensionsCm.X <= 36.0f &&
-                 DimensionsCm.Y >= 12.0f && DimensionsCm.Y <= 15.0f &&
-                 DimensionsCm.Z >= 22.0f && DimensionsCm.Z <= 25.0f);
+                 DimensionsCm.X >= 28.0f && DimensionsCm.X <= 40.0f &&
+                 DimensionsCm.Y >= 12.0f && DimensionsCm.Y <= 18.0f &&
+                 DimensionsCm.Z >= 15.0f && DimensionsCm.Z <= 28.0f);
         TestTrue(TEXT("production river boot retains a nontrivial Nanite fallback"),
                  ProductionRiverBoot->GetNumTriangles(0) >= 1500);
         TestTrue(TEXT("production river boot has a Nanite render resource"),
