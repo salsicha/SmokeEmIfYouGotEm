@@ -440,6 +440,54 @@ M5.RuntimeRescueLoop).
   parse_survey.ps1 (station log → CSV + anomaly summary); the survey
   report lives in docs/reports/.
 
+## 2026-09-02 Colorado Hance inspection (crew, reach survey, physics)
+
+Same pass as the South Fork inspection, on `L_Hance`; the report with
+figures is docs/reports/2026-09-02-colorado-hance-inspection.md.
+
+- **Guide head spike from external cameras** (RaftSimGuidePawn.cpp): the
+  first-person head hide (zero-scaled CC0 head bone) stayed active while a
+  review camera was the view target, and the wetsuit collar collapsed into
+  the neck joint as a black cone. The seat now counts as first person only
+  while the possessing controller's view target is the pawn. Closes the
+  "guide hidden from external cameras" follow-up of the South Fork report.
+- **Corridor ends rendered dry although the solver is wet** (first and
+  last ~18 m of Hance; the same gap is the "station 0 on dry gravel" of the
+  full reach). Two mechanisms in RaftSimWaterSurfaceActor.cpp: the station
+  edge blend (36 m smoothstep) faded coverage at the grid's first/last rows
+  even where those rows ARE the corridor's end, and — the part that kept
+  the gap after the coverage fix — the volume core's immutable topology is
+  built once per grid shape, at the launch, so cells whose coverage was
+  below 0.6 there never received triangles, whatever their coverage read
+  later at the put-in. `CorridorEndPadState()` now feeds both
+  `StationEdgeCoverage()` (full coverage on a corridor-end row) and the
+  topology cache key, and a section whose index buffer no longer matches
+  the rebuilt triangle list is recreated instead of updated in place (an
+  in-place `UpdateMeshSection` keeps the old indices). Probe cvar:
+  `raftsim.LogLatticeEdgeRows 1` logs wet extents/coverage of the twelve
+  rows at a corridor end.
+- **Pool corrugation and glossy parallelograms** on Hance (regular
+  diagonal ridges on the deep slow water from the shore camera, and pale
+  sharper-reflecting patches with straight edges): a Froude gate on the
+  calm bands of `ComputeCoupledStandingWave` was built, photographed at
+  100 m, changed nothing, and was reverted. Layer isolation
+  (`RaftSim.HideTaggedActors`): hiding the static Default Lit ribbon
+  changes nothing (it renders no visible pixels on Hance), hiding the live
+  water actor removes all water, and the overlay was already excluded — so
+  both artefacts sit in the live volume core. They match the dominant
+  diagonal streak of the mirrored `T_RaftSim_ColoradoHance_FlowNormalV1.png`
+  (alternate mirrored tiles flip the streak direction and catch the sun).
+  Open: needs a direction-free normal texture (or wrap addressing on a
+  tileable source) and a calmer normal strength on slow water.
+- Review tooling: `RaftSim.SurveyReach` works on Landscape maps (terrain
+  trace accepts `ALandscapeProxy`, RaftSimRaft depends on Landscape) and
+  counts the reference maps' ProcMesh boulders by component name; the last
+  corridor station no longer reads unreachable; `RaftSim.CaptureRaftSeries`
+  takes `station=`/`lateral=` and walks first (and no longer reads a freed
+  label after clearing its own walk timer — copy captures out before
+  `ClearTimer` on the executing handle); `RaftSim.HideTaggedActors
+  <tag|class=Name>` for layer isolation.
+
 ## 2026-09-02 round 6: the forearm shape, and the end of visibility races
 
 "A strange black shape pops up out of the fore arm when the crew is

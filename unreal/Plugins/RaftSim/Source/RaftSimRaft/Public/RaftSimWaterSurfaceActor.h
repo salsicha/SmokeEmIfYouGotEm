@@ -570,6 +570,8 @@ private:
         const TArray<FBreakingSite>& AcceptedCandidates);
     void RecenterCurvedGrid();
     void ClampCurvedGridCenter();
+    float StationEdgeCoverage(int32 StationIndex) const;
+    int32 CorridorEndPadState() const;
     void UpdateCurvedGridPlanarGeometry();
     void RebuildBreakingLipMesh();
     void HideBreakingLipMesh();
@@ -690,6 +692,7 @@ private:
      * visible shore flash at editor-hitch framerates ("the shore appears
      * and disappears", player recording, 2026-08-30). */
     int32 LiveVolumeCoreStaticTopologyVertexCount = 0;
+    int32 LiveVolumeCoreStaticTopologyEdgeState = -1;
     /** Smoothed live-minus-cooked water level near the raft, in metres.
      * Published to the foam-occlusion collection so the static flow-band
      * tiles can retire the sheet they cooked above today's live level. */

@@ -28,18 +28,83 @@
 #include "GameFramework/PlayerController.h"
 #include "HAL/IConsoleManager.h"
 #include "HAL/PlatformMisc.h"
+#include "LandscapeProxy.h"
 #include "Misc/Paths.h"
 #include "RaftSimCameraPresentation.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
+#include "ProceduralMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
 
 namespace RaftSimSurveyCommand
 {
+
+// Terrain under a station. The full-reach map tags its near-terrain tiles;
+// the single-rapid reference maps (Hance, Terminator, Lava Canyon, Upper
+// Huacas) carve their bed into a Landscape; Zambezi tags a near-field terrain
+// mesh. Water surfaces and dressing never count, and neither does the coarse
+// untagged far-terrain proxy of the full reach.
+static bool IsSurveyTerrainHit(const FHitResult& Hit)
+{
+    const AActor* Actor = Hit.GetActor();
+    if (!Actor)
+    {
+        return false;
+    }
+    return Actor->ActorHasTag(TEXT("RaftSimFullReachTerrain")) ||
+        Actor->ActorHasTag(TEXT("RaftSimSourceConditionedTerrain")) ||
+        Actor->IsA<ALandscapeProxy>();
+}
+
+// Height for a teleport that must never land inside the landscape. Prefer
+// the local water surface; when the live window has not reached the
+// destination yet, stand the raft just above the terrain instead of carrying
+// the old Z along — dropping onto the water from a few metres tumbled the
+// raft and tripped the capsize latch, and a hop that kept the upstream Z
+// buried the raft in a rising bank at 9300 m and the physics ejected it
+// 550 m off-corridor at 50 m/s.
+static float SurveyTeleportZ(
+    UWorld* World,
+    ARaftSimRaftActor* Raft,
+    URaftSimWaterRuntimeAdapter* Water,
+    const FVector& XYCm,
+    float FallbackZCm)
+{
+    float ZCm = FallbackZCm;
+    bool bResolved = false;
+    FRaftSimWaterSample Sample;
+    if (Water->SampleWaterAtWorldPosition(FVector(XYCm.X, XYCm.Y, FallbackZCm), Sample) && Sample.bWet)
+    {
+        ZCm = Sample.SurfaceHeightMeters * 100.0f + 40.0f;
+        bResolved = true;
+    }
+    // Only real terrain counts: a coarse far-terrain proxy spans the full
+    // reach valley tens of metres above the river and is collidable, and the
+    // first-hit version of this trace stood the raft on it (2400 m).
+    TArray<FHitResult> Hits;
+    FCollisionQueryParams Params(SCENE_QUERY_STAT(RaftSimSurveyHop), true);
+    Params.AddIgnoredActor(Raft);
+    World->LineTraceMultiByChannel(
+        Hits,
+        FVector(XYCm.X, XYCm.Y, FallbackZCm + 30000.0f),
+        FVector(XYCm.X, XYCm.Y, FallbackZCm - 30000.0f),
+        ECC_WorldStatic, Params);
+    for (const FHitResult& Hit : Hits)
+    {
+        if (IsSurveyTerrainHit(Hit))
+        {
+            ZCm = bResolved
+                ? FMath::Max(ZCm, Hit.ImpactPoint.Z + 100.0f)
+                : Hit.ImpactPoint.Z + 150.0f;
+            break;
+        }
+    }
+    return ZCm;
+}
 
 static ARaftSimRaftActor* FindRaft(UWorld* World)
 {
@@ -71,6 +136,35 @@ static URaftSimWaterRuntimeAdapter* FindWater(UWorld* World)
 {
     URaftSimPhysicsBridgeSubsystem* Bridge = FindBridge(World);
     return Bridge ? Bridge->GetWaterRuntime() : nullptr;
+}
+
+// World point of a river station plus a point one metre downstream for the
+// heading. The last station of a corridor has no downstream neighbour, so the
+// heading is mirrored from the upstream one there (the 600 m station of
+// Hance read "unreachable" before this).
+static bool StationPointAndHeading(
+    URaftSimWaterRuntimeAdapter* Water,
+    float StationM,
+    float LateralM,
+    FVector& OutPointCm,
+    FVector& OutAheadCm)
+{
+    const float DatumM = Water->GetRiverVerticalDatumM();
+    if (!Water->RiverToWorldPosition(FVector2D(StationM, LateralM), DatumM, OutPointCm))
+    {
+        return false;
+    }
+    if (Water->RiverToWorldPosition(FVector2D(StationM + 1.0f, LateralM), DatumM, OutAheadCm))
+    {
+        return true;
+    }
+    FVector BehindCm;
+    if (Water->RiverToWorldPosition(FVector2D(StationM - 1.0f, LateralM), DatumM, BehindCm))
+    {
+        OutAheadCm = OutPointCm + (OutPointCm - BehindCm);
+        return true;
+    }
+    return false;
 }
 
 static ACameraActor* PlaceCamera(
@@ -383,12 +477,22 @@ static void LogSurveyStation(FSurveyState& State)
             }
         }
     }
+    // Dressing rocks come in two forms: the full reach instances reviewed
+    // boulder meshes on tagged HISM actors, while the single-rapid reference
+    // maps (Hance, Terminator, Lava Canyon, Upper Huacas, Zambezi) spawn one
+    // procedural-mesh actor per irregular boulder whose mesh component keeps
+    // the "IrregularBoulder" label in its object name. Editor labels do not
+    // survive into -game, so both censuses key on component and mesh names.
+    const auto IsRockName = [](const FString& Name)
+    {
+        return Name.Contains(TEXT("Boulder")) || Name.Contains(TEXT("Rock"));
+    };
     int32 DressingRockInstances = 0;
     int32 DressingRockComponents = 0;
     for (TActorIterator<AActor> It(World); It; ++It)
     {
         AActor* Actor = *It;
-        if (!Actor || !Actor->ActorHasTag(TEXT("RaftSimFullReachDressing")))
+        if (!Actor || Actor == Raft)
         {
             continue;
         }
@@ -399,10 +503,7 @@ static void LogSurveyStation(FSurveyState& State)
             {
                 continue;
             }
-            const FString MeshName = Component->GetStaticMesh()->GetName();
-            const FString ComponentName = Component->GetName();
-            if (!MeshName.Contains(TEXT("Boulder")) && !MeshName.Contains(TEXT("Rock")) &&
-                !ComponentName.Contains(TEXT("Rock")) && !ComponentName.Contains(TEXT("Boulder")))
+            if (!IsRockName(Component->GetStaticMesh()->GetName()) && !IsRockName(Component->GetName()))
             {
                 continue;
             }
@@ -421,6 +522,17 @@ static void LogSurveyStation(FSurveyState& State)
                     ++DressingRockInstances;
                 }
             }
+        }
+        TInlineComponentArray<UProceduralMeshComponent*> ProceduralComponents(Actor);
+        for (UProceduralMeshComponent* Component : ProceduralComponents)
+        {
+            if (!Component || !IsRockName(Component->GetName()) ||
+                FVector::Dist2D(Component->Bounds.Origin, RaftLocation) > RadiusCm)
+            {
+                continue;
+            }
+            ++DressingRockComponents;
+            ++DressingRockInstances;
         }
     }
 
@@ -444,7 +556,7 @@ static void LogSurveyStation(FSurveyState& State)
             World->LineTraceMultiByChannel(Hits, TraceStart, TraceEnd, ECC_WorldStatic, Params);
             for (const FHitResult& Hit : Hits)
             {
-                if (Hit.GetActor() && Hit.GetActor()->ActorHasTag(TEXT("RaftSimFullReachTerrain")))
+                if (IsSurveyTerrainHit(Hit))
                 {
                     bTerrainHit = true;
                     TerrainZCm = Hit.ImpactPoint.Z;
@@ -514,8 +626,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         FVector LeftNormal;
         FVector TargetWorldCm;
         FVector TargetAheadCm;
-        if (!Water->RiverToWorldPosition(FVector2D(TargetStationM, 0.0f), Water->GetRiverVerticalDatumM(), TargetWorldCm) ||
-            !Water->RiverToWorldPosition(FVector2D(TargetStationM + 1.0f, 0.0f), Water->GetRiverVerticalDatumM(), TargetAheadCm))
+        if (!StationPointAndHeading(Water, TargetStationM, 0.0f, TargetWorldCm, TargetAheadCm))
         {
             UE_LOG(LogTemp, Warning,
                 TEXT("RaftSim survey unreachable: index=%d station_m=%.0f reason=no_forward_map"),
@@ -532,42 +643,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         // ejected it 550 m off-corridor at 50 m/s.
         const auto SafeTeleportZ = [World, Raft, Water](const FVector& XYCm, float FallbackZCm)
         {
-            // Prefer the local water surface; when the live window has not
-            // reached the destination yet, stand the raft just above the
-            // tagged riverbed instead of carrying the upstream Z along —
-            // dropping onto the water from a few metres tumbled the raft
-            // and tripped the capsize latch (dense 9200–9700 re-walk).
-            float ZCm = FallbackZCm;
-            bool bResolved = false;
-            FRaftSimWaterSample Sample;
-            if (Water->SampleWaterAtWorldPosition(FVector(XYCm.X, XYCm.Y, FallbackZCm), Sample) && Sample.bWet)
-            {
-                ZCm = Sample.SurfaceHeightMeters * 100.0f + 40.0f;
-                bResolved = true;
-            }
-            // Only the tagged near-terrain tiles count: a coarse far-terrain
-            // proxy spans the valley tens of metres above the river and is
-            // collidable, and the first-hit version of this trace stood the
-            // raft on it (2400 m, iso_base run).
-            TArray<FHitResult> Hits;
-            FCollisionQueryParams Params(SCENE_QUERY_STAT(RaftSimSurveyHop), true);
-            Params.AddIgnoredActor(Raft);
-            World->LineTraceMultiByChannel(
-                Hits,
-                FVector(XYCm.X, XYCm.Y, FallbackZCm + 30000.0f),
-                FVector(XYCm.X, XYCm.Y, FallbackZCm - 30000.0f),
-                ECC_WorldStatic, Params);
-            for (const FHitResult& Hit : Hits)
-            {
-                if (Hit.GetActor() && Hit.GetActor()->ActorHasTag(TEXT("RaftSimFullReachTerrain")))
-                {
-                    ZCm = bResolved
-                        ? FMath::Max(ZCm, Hit.ImpactPoint.Z + 100.0f)
-                        : Hit.ImpactPoint.Z + 150.0f;
-                    break;
-                }
-            }
-            return ZCm;
+            return SurveyTeleportZ(World, Raft, Water, XYCm, FallbackZCm);
         };
         if (!Water->WorldToRiverCoordinates(Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
         {
@@ -626,8 +702,7 @@ static void SurveyTick(TSharedRef<FSurveyState> State)
         const float StepStationM = RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);
         FVector StepWorldCm;
         FVector AheadWorldCm;
-        if (!Water->RiverToWorldPosition(FVector2D(StepStationM, 0.0f), Water->GetRiverVerticalDatumM(), StepWorldCm) ||
-            !Water->RiverToWorldPosition(FVector2D(StepStationM + 1.0f, 0.0f), Water->GetRiverVerticalDatumM(), AheadWorldCm))
+        if (!StationPointAndHeading(Water, StepStationM, 0.0f, StepWorldCm, AheadWorldCm))
         {
             ++State->StationHops;
             return;
@@ -782,36 +857,36 @@ static FAutoConsoleCommandWithWorldAndArgs GSurveyReachCommand(
 // CaptureRaftSeries
 // ---------------------------------------------------------------------------
 
-static void HandleCaptureRaftSeries(const TArray<FString>& Args, UWorld* World)
+struct FRaftSeriesSpec
 {
-    if (World == nullptr || Args.Num() < 8)
-    {
-        UE_LOG(LogTemp, Warning,
-            TEXT("RaftSim.CaptureRaftSeries <delay> <count> <interval> <label> <backM> <sideM> <upM> <aheadM> [paddle] [cmd=<crew cmd>]"));
-        return;
-    }
-    const float Delay = FMath::Max(FCString::Atof(*Args[0]), 0.5f);
-    const int32 Count = FMath::Clamp(FCString::Atoi(*Args[1]), 1, 200);
-    const float Interval = FMath::Max(FCString::Atof(*Args[2]), 0.05f);
-    const FString Label = Args[3];
-    const FVector RelativeLocation(
-        -FCString::Atof(*Args[4]) * 100.0f,
-        FCString::Atof(*Args[5]) * 100.0f,
-        FCString::Atof(*Args[6]) * 100.0f);
-    const float AheadM = FCString::Atof(*Args[7]);
+    float Delay = 10.0f;
+    int32 Count = 16;
+    float Interval = 0.5f;
+    FString Label;
+    FVector RelativeLocation = FVector::ZeroVector;
+    float AheadM = 4.0f;
     bool bPaddle = false;
     ERaftSimCrewCommand Command = ERaftSimCrewCommand::AllForward;
-    for (int32 Index = 8; Index < Args.Num(); ++Index)
+    float StationM = -1.0f;
+    float LateralM = 0.0f;
+};
+
+// Issues the crew command (1 s), then after the delay attaches the camera
+// and shoots the burst. Runs immediately, or once a station walk arrives.
+static void StartRaftSeries(UWorld* World, const FRaftSeriesSpec& Spec)
+{
+    if (World == nullptr)
     {
-        if (Args[Index].Equals(TEXT("paddle"), ESearchCase::IgnoreCase))
-        {
-            bPaddle = true;
-        }
-        else if (Args[Index].StartsWith(TEXT("cmd="), ESearchCase::IgnoreCase))
-        {
-            bPaddle = ParseCrewCommand(Args[Index].RightChop(4), Command) || bPaddle;
-        }
+        return;
     }
+    const float Delay = Spec.Delay;
+    const int32 Count = Spec.Count;
+    const float Interval = Spec.Interval;
+    const FString Label = Spec.Label;
+    const FVector RelativeLocation = Spec.RelativeLocation;
+    const float AheadM = Spec.AheadM;
+    const bool bPaddle = Spec.bPaddle;
+    const ERaftSimCrewCommand Command = Spec.Command;
     TWeakObjectPtr<UWorld> WeakWorld(World);
     if (bPaddle)
     {
@@ -892,10 +967,132 @@ static void HandleCaptureRaftSeries(const TArray<FString>& Args, UWorld* World)
         Count, Interval, Delay, *Label);
 }
 
+static void HandleCaptureRaftSeries(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr || Args.Num() < 8)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim.CaptureRaftSeries <delay> <count> <interval> <label> <backM> <sideM> <upM> <aheadM> "
+                 "[paddle] [cmd=<crew cmd>] [station=<m>] [lateral=<m>]"));
+        return;
+    }
+    FRaftSeriesSpec Spec;
+    Spec.Delay = FMath::Max(FCString::Atof(*Args[0]), 0.5f);
+    Spec.Count = FMath::Clamp(FCString::Atoi(*Args[1]), 1, 200);
+    Spec.Interval = FMath::Max(FCString::Atof(*Args[2]), 0.05f);
+    Spec.Label = Args[3];
+    Spec.RelativeLocation = FVector(
+        -FCString::Atof(*Args[4]) * 100.0f,
+        FCString::Atof(*Args[5]) * 100.0f,
+        FCString::Atof(*Args[6]) * 100.0f);
+    Spec.AheadM = FCString::Atof(*Args[7]);
+    for (int32 Index = 8; Index < Args.Num(); ++Index)
+    {
+        if (Args[Index].Equals(TEXT("paddle"), ESearchCase::IgnoreCase))
+        {
+            Spec.bPaddle = true;
+        }
+        else if (Args[Index].StartsWith(TEXT("cmd="), ESearchCase::IgnoreCase))
+        {
+            Spec.bPaddle = ParseCrewCommand(Args[Index].RightChop(4), Spec.Command) || Spec.bPaddle;
+        }
+        else if (Args[Index].StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
+        {
+            Spec.StationM = FCString::Atof(*Args[Index].RightChop(8));
+        }
+        else if (Args[Index].StartsWith(TEXT("lateral="), ESearchCase::IgnoreCase))
+        {
+            Spec.LateralM = FCString::Atof(*Args[Index].RightChop(8));
+        }
+    }
+    if (Spec.StationM < 0.0f)
+    {
+        StartRaftSeries(World, Spec);
+        return;
+    }
+    // Walk the raft to the requested station first, in the survey's
+    // sub-80 m hops with terrain-safe heights, then run the burst from
+    // there. The delay counts from arrival, so a walk-in never eats it.
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+    TSharedRef<FTimerHandle> WalkHandle = MakeShared<FTimerHandle>();
+    TSharedRef<int32> Hops = MakeShared<int32>(0);
+    World->GetTimerManager().SetTimer(
+        *WalkHandle,
+        FTimerDelegate::CreateLambda([WeakWorld, WalkHandle, Hops, Spec]()
+        {
+            UWorld* W = WeakWorld.Get();
+            ARaftSimRaftActor* Raft = FindRaft(W);
+            URaftSimWaterRuntimeAdapter* Water = FindWater(W);
+            if (!W || !Raft || !Water)
+            {
+                return;
+            }
+            const auto Arrive = [&]()
+            {
+                UE_LOG(LogTemp, Display,
+                    TEXT("RaftSim.CaptureRaftSeries: walk finished after %d hops at %s"),
+                    *Hops, *Raft->GetActorLocation().ToString());
+                // Clearing the timer that is executing destroys this closure
+                // and everything it captured (Spec, Hops, WalkHandle), so copy
+                // out what the burst needs first and touch nothing captured
+                // afterwards — the first version read a freed label and the
+                // burst wrote its frames under garbage names.
+                const FRaftSeriesSpec SpecCopy = Spec;
+                UWorld* const WorldCopy = W;
+                WorldCopy->GetTimerManager().ClearTimer(*WalkHandle);
+                StartRaftSeries(WorldCopy, SpecCopy);
+            };
+            FVector TargetWorldCm;
+            FVector TargetAheadCm;
+            if (!StationPointAndHeading(Water, Spec.StationM, Spec.LateralM, TargetWorldCm, TargetAheadCm))
+            {
+                UE_LOG(LogTemp, Warning,
+                    TEXT("RaftSim.CaptureRaftSeries: station %.0f m has no forward map; shooting from the current position"),
+                    Spec.StationM);
+                Arrive();
+                return;
+            }
+            const float WorldErrorM = FVector::Dist2D(Raft->GetActorLocation(), TargetWorldCm) / 100.0f;
+            if (WorldErrorM < 6.0f || *Hops >= 60)
+            {
+                Arrive();
+                return;
+            }
+            ++(*Hops);
+            FVector2D RiverPosition;
+            FVector Tangent;
+            FVector LeftNormal;
+            FVector StepWorldCm = TargetWorldCm;
+            FVector AheadWorldCm = TargetAheadCm;
+            if (Water->WorldToRiverCoordinates(Raft->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
+            {
+                const float RemainingM = Spec.StationM - RiverPosition.X;
+                const float StepStationM = RiverPosition.X + FMath::Clamp(RemainingM, -79.0f, 79.0f);
+                const bool bFinalStep = FMath::Abs(Spec.StationM - StepStationM) < 2.0f;
+                const float StepLateralM = bFinalStep ? Spec.LateralM : 0.0f;
+                if (!StationPointAndHeading(Water, StepStationM, StepLateralM, StepWorldCm, AheadWorldCm))
+                {
+                    StepWorldCm = TargetWorldCm;
+                    AheadWorldCm = TargetAheadCm;
+                }
+            }
+            StepWorldCm.Z = SurveyTeleportZ(W, Raft, Water, StepWorldCm, Raft->GetActorLocation().Z);
+            Raft->TeleportForTesting(StepWorldCm, (AheadWorldCm - StepWorldCm).Rotation().Yaw, true);
+            UE_LOG(LogTemp, Display,
+                TEXT("RaftSim.CaptureRaftSeries: walk hop %d -> %s (target station %.0f m, error %.1f m)"),
+                *Hops, *StepWorldCm.ToString(), Spec.StationM, WorldErrorM);
+        }),
+        0.7f, true, 2.0f);
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim.CaptureRaftSeries: walking to station %.0f m (lateral %.1f m) before the %s burst"),
+        Spec.StationM, Spec.LateralM, *Spec.Label);
+}
+
 static FAutoConsoleCommandWithWorldAndArgs GCaptureRaftSeriesCommand(
     TEXT("RaftSim.CaptureRaftSeries"),
     TEXT("Burst of frames from a camera attached to the raft. Usage: RaftSim.CaptureRaftSeries "
-         "<delay> <count> <interval> <label> <backM> <sideM> <upM> <aheadM> [paddle] [cmd=<crew cmd>]"),
+         "<delay> <count> <interval> <label> <backM> <sideM> <upM> <aheadM> [paddle] [cmd=<crew cmd>] "
+         "[station=<m>] [lateral=<m>] (station walks the raft there first)"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRaftSeries));
 
 // ---------------------------------------------------------------------------
@@ -990,5 +1187,101 @@ static FAutoConsoleCommandWithWorldAndArgs GManoeuvreCheckCommand(
     TEXT("Run a fixed crew-command timeline and log speed/heading each second. "
          "Usage: RaftSim.ManoeuvreCheck [label]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleManoeuvreCheck));
+
+// ---------------------------------------------------------------------------
+// HideTaggedActors (layer isolation for review captures)
+// ---------------------------------------------------------------------------
+
+static void HandleHideTaggedActors(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr || Args.Num() < 1)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim.HideTaggedActors <tag> [tag...] hides every actor carrying one of the tags"));
+        return;
+    }
+    // "capture=<label>" runs a three-quarter raft-attached burst after the
+    // hide (8 frames at 0.25 s from 8 s), because -ExecCmds does not chain a
+    // second RaftSim command after this one.
+    // The live water surface actor and the crew are spawned by BeginPlay
+    // chains that finish after -ExecCmds has run, so the hide itself waits
+    // two seconds (an immediate pass hid nothing on Hance).
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+    const TArray<FString> Specs = Args;
+    FTimerHandle HideHandle;
+    World->GetTimerManager().SetTimer(
+        HideHandle,
+        FTimerDelegate::CreateLambda([WeakWorld, Specs]()
+    {
+    UWorld* World = WeakWorld.Get();
+    if (!World)
+    {
+        return;
+    }
+    const TArray<FString>& HideSpecs = Specs;
+    FString CaptureLabel;
+    int32 Hidden = 0;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor)
+        {
+            continue;
+        }
+        for (const FString& Tag : HideSpecs)
+        {
+            if (Tag.StartsWith(TEXT("capture="), ESearchCase::IgnoreCase))
+            {
+                CaptureLabel = Tag.RightChop(8);
+                continue;
+            }
+            // "class=<UClass name>" hides by class instead of by tag (the live
+            // water surface actor carries no review tag of its own).
+            const bool bClassMatch = Tag.StartsWith(TEXT("class="), ESearchCase::IgnoreCase) &&
+                Actor->GetClass()->GetName().Equals(Tag.RightChop(6), ESearchCase::IgnoreCase);
+            // "component=<substring>" matches any component object name (the
+            // reference maps' river ribbon is a plain AActor whose ProcMesh is
+            // named after its editor label, and its tags may predate the map).
+            bool bComponentMatch = false;
+            if (Tag.StartsWith(TEXT("component="), ESearchCase::IgnoreCase))
+            {
+                const FString Needle = Tag.RightChop(10);
+                for (const UActorComponent* Component : Actor->GetComponents())
+                {
+                    if (Component && Component->GetName().Contains(Needle))
+                    {
+                        bComponentMatch = true;
+                        break;
+                    }
+                }
+            }
+            if (bClassMatch || bComponentMatch || Actor->ActorHasTag(FName(*Tag)))
+            {
+                Actor->SetActorHiddenInGame(true);
+                ++Hidden;
+                break;
+            }
+        }
+    }
+    UE_LOG(LogTemp, Display, TEXT("RaftSim.HideTaggedActors: hid %d actors"), Hidden);
+    if (!CaptureLabel.IsEmpty())
+    {
+        FRaftSeriesSpec Spec;
+        Spec.Delay = 8.0f;
+        Spec.Count = 8;
+        Spec.Interval = 0.25f;
+        Spec.Label = CaptureLabel;
+        Spec.RelativeLocation = FVector(-300.0f, 300.0f, 200.0f);
+        Spec.AheadM = 2.0f;
+        StartRaftSeries(World, Spec);
+    }
+    }),
+        2.0f, false);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GHideTaggedActorsCommand(
+    TEXT("RaftSim.HideTaggedActors"),
+    TEXT("Hide every actor carrying one of the given tags (e.g. RaftSimPhysicalCorridorWater to drop a "
+         "reference map's static river ribbon and see the live carrier alone)."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleHideTaggedActors));
 
 } // namespace RaftSimSurveyCommand

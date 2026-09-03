@@ -53,6 +53,10 @@ static TAutoConsoleVariable<int32> CVarRaftSimFreezeCoreTopology(
     TEXT("of recreating the section on membership changes (A/B probe for ")
     TEXT("recreation-driven temporal-history pops)."));
 
+static TAutoConsoleVariable<int32> CVarRaftSimLogLatticeEdgeRows(
+    TEXT("raftsim.LogLatticeEdgeRows"), 0,
+    TEXT("Log wet extents and coverage of the lattice rows at a corridor end (review probe)."));
+
 static TAutoConsoleVariable<int32> CVarRaftSimLogWaterRenderStateEvents(
     TEXT("raftsim.LogWaterRenderStateEvents"), 0,
     TEXT("1 = log every water render-state invalidation (section recreation, ")
@@ -1631,11 +1635,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 0.0f,
                 0.0f,
                 0.0f,
-                ComputeStationEdgeCoverage(
-                    StationIndex,
-                    GridStationN,
-                    ResolvedVertexSpacingMeters,
-                    CurvedGridEdgeBlendMeters));
+                StationEdgeCoverage(StationIndex));
             PaddleWakeVertexColors[Index] = FLinearColor::Transparent;
             LiveVolumeCoreVertices[Index] = Vertices[Index];
             RapidFoamVertices[Index] = Vertices[Index];
@@ -2794,6 +2794,54 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         ShiftStationIndexedVectors(
             FlowVelocityMetersPerSecond, FVector2D::ZeroVector);
     }
+}
+
+int32 ARaftSimWaterSurfaceActor::CorridorEndPadState() const
+{
+    // Bit 1: the grid's first row sits at the corridor's first station;
+    // bit 2: its last row sits at the corridor's last station. Both the
+    // station edge blend and the core's immutable topology key on this.
+    int32 State = 0;
+    float MinimumStationM = 0.0f;
+    float MaximumStationM = 0.0f;
+    if (WaterAdapter && GridStationN > 1 &&
+        WaterAdapter->GetRiverStationRangeM(MinimumStationM, MaximumStationM))
+    {
+        const float GridStartM =
+            CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f;
+        const float GridEndM =
+            GridStartM + static_cast<float>(GridStationN - 1) *
+                ResolvedVertexSpacingMeters;
+        const float ToleranceM = ResolvedVertexSpacingMeters * 1.5f;
+        if (GridStartM <= MinimumStationM + ToleranceM)
+        {
+            State |= 1;
+        }
+        if (GridEndM >= MaximumStationM - ToleranceM)
+        {
+            State |= 2;
+        }
+    }
+    return State;
+}
+
+float ARaftSimWaterSurfaceActor::StationEdgeCoverage(int32 StationIndex) const
+{
+    // The station blend hides the moving window's leading and trailing rows,
+    // where the next window continues the river. At the corridor's own ends
+    // there is nothing to hand off to, and fading there left the first 36 m
+    // of Hance solver-wet but unrendered — the raft floated above bare
+    // landscape at the put-in apron (survey 2026-09-02) — and the same apron
+    // gap exists at the full reach's station 0. Rows that sit at a corridor
+    // end keep full coverage; the lateral bank blend is untouched.
+    const int32 PadState = CorridorEndPadState();
+    const int32 UpstreamPad = (PadState & 1) ? GridStationN : 0;
+    const int32 DownstreamPad = (PadState & 2) ? GridStationN : 0;
+    return ComputeStationEdgeCoverage(
+        StationIndex + UpstreamPad,
+        GridStationN + UpstreamPad + DownstreamPad,
+        ResolvedVertexSpacingMeters,
+        CurvedGridEdgeBlendMeters);
 }
 
 void ARaftSimWaterSurfaceActor::ClampCurvedGridCenter()
@@ -4048,11 +4096,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 DepthNorm,
                 SpeedNorm,
                 WetVertexMask[Index] != 0
-                    ? ComputeStationEdgeCoverage(
-                        X,
-                        GridStationN,
-                        ResolvedVertexSpacingMeters,
-                        CurvedGridEdgeBlendMeters)
+                    ? StationEdgeCoverage(X)
                     : 0.0f);
         }
     }
@@ -4130,16 +4174,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
             const int32 UpstreamStationIndex =
                 X - (Index - UpstreamIndex);
-            const float UpstreamStationCoverage = ComputeStationEdgeCoverage(
-                UpstreamStationIndex,
-                GridStationN,
-                ResolvedVertexSpacingMeters,
-                CurvedGridEdgeBlendMeters);
-            const float LocalStationCoverage = ComputeStationEdgeCoverage(
-                X,
-                GridStationN,
-                ResolvedVertexSpacingMeters,
-                CurvedGridEdgeBlendMeters);
+            const float UpstreamStationCoverage = StationEdgeCoverage(UpstreamStationIndex);
+            const float LocalStationCoverage = StationEdgeCoverage(X);
             const float UpstreamLateralCoverage = ComputeLateralWetCoverage(
                 Y,
                 MinimumWetLateralIndex[UpstreamStationIndex],
@@ -4776,6 +4812,56 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 StationWetSurfaceCount[NearestWetStation];
         }
     }
+    // Review probe (raftsim.LogLatticeEdgeRows 1): when the grid's first or
+    // last row sits at the corridor's end, log the wet extents and coverage
+    // of the twelve rows at each end so a "water missing at the put-in"
+    // report can be attributed to sampling, wet extents, or coverage.
+    if (CVarRaftSimLogLatticeEdgeRows.GetValueOnGameThread() != 0 && WaterAdapter)
+    {
+        static int32 LoggedEdgeRefreshes = 0;
+        float ProbeMinimumStationM = 0.0f;
+        float ProbeMaximumStationM = 0.0f;
+        if (LoggedEdgeRefreshes < 3 && GridStationN > 24 && GridLateralN > 2 &&
+            WaterAdapter->GetRiverStationRangeM(ProbeMinimumStationM, ProbeMaximumStationM))
+        {
+            const float GridStartM = CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f;
+            const float GridEndM = GridStartM +
+                static_cast<float>(GridStationN - 1) * ResolvedVertexSpacingMeters;
+            const bool bAtStart = GridStartM <= ProbeMinimumStationM + ResolvedVertexSpacingMeters * 1.5f;
+            const bool bAtEnd = GridEndM >= ProbeMaximumStationM - ResolvedVertexSpacingMeters * 1.5f;
+            if (bAtStart || bAtEnd)
+            {
+                ++LoggedEdgeRefreshes;
+                const int32 CentreY = GridLateralN / 2;
+                auto LogRow = [&](int32 X)
+                {
+                    int32 WetCount = 0;
+                    for (int32 Y = 0; Y < GridLateralN; ++Y)
+                    {
+                        WetCount += WetVertexMask[Y * GridStationN + X] != 0 ? 1 : 0;
+                    }
+                    UE_LOG(LogTemp, Display,
+                        TEXT("RaftSim lattice edge row: x=%d station_m=%.1f wet_vertices=%d centre_wet=%d wet_lateral=[%d,%d] coverage=%.3f ref_z_cm=%.0f"),
+                        X, RiverCoordinatesM[X].X, WetCount,
+                        WetVertexMask[CentreY * GridStationN + X] != 0 ? 1 : 0,
+                        MinimumWetLateralIndex[X], MaximumWetLateralIndex[X],
+                        StationEdgeCoverage(X), StationReferenceSurfaceZ[X]);
+                };
+                UE_LOG(LogTemp, Display,
+                    TEXT("RaftSim lattice edge probe: grid_start_m=%.1f grid_end_m=%.1f corridor=[%.1f,%.1f] rows=%d lateral=%d spacing=%.2f at_start=%d at_end=%d"),
+                    GridStartM, GridEndM, ProbeMinimumStationM, ProbeMaximumStationM,
+                    GridStationN, GridLateralN, ResolvedVertexSpacingMeters, bAtStart ? 1 : 0, bAtEnd ? 1 : 0);
+                if (bAtStart)
+                {
+                    for (int32 X = 0; X < 12; ++X) { LogRow(X); }
+                }
+                if (bAtEnd)
+                {
+                    for (int32 X = GridStationN - 12; X < GridStationN; ++X) { LogRow(X); }
+                }
+            }
+        }
+    }
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 0; X < GridStationN; ++X)
@@ -4789,11 +4875,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
             else
             {
-                const float StationCoverage = ComputeStationEdgeCoverage(
-                    X,
-                    GridStationN,
-                    ResolvedVertexSpacingMeters,
-                    CurvedGridEdgeBlendMeters);
+                const float StationCoverage = StationEdgeCoverage(X);
                 const float LateralCoverage = ComputePresentationBankCoverage(
                     RiverCoordinatesM[Index].X,
                     Y,
@@ -4945,11 +5027,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                                 VertexColors[BoundaryIndex];
                             LiveVolumeCoreVertexColors[Index].R = 0.0f;
                             const float StationCoverage =
-                                ComputeStationEdgeCoverage(
-                                    X,
-                                    GridStationN,
-                                    ResolvedVertexSpacingMeters,
-                                    CurvedGridEdgeBlendMeters);
+                                StationEdgeCoverage(X);
                             const float LateralCoverage =
                                 ComputePresentationBankCoverage(
                                     RiverCoordinatesM[Index].X,
@@ -5287,9 +5365,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // constants, so the list is identical for every refresh of a given
         // grid shape. Cells the water never reaches render as zero-area
         // piles through the vertex collapse below.
-        if (LiveVolumeCoreStaticTopologyVertexCount != Vertices.Num())
+        // The topology is immutable per grid shape, but which edge rows carry
+        // triangles depends on whether the grid sits at a corridor end (the
+        // 36 m blend excludes them elsewhere). Built once at the launch, the
+        // core then had no triangles for the first 18 m of Hance when the raft
+        // reached the put-in, whatever the vertex coverage said.
+        const int32 TopologyEdgeState = CorridorEndPadState();
+        if (LiveVolumeCoreStaticTopologyVertexCount != Vertices.Num() ||
+            LiveVolumeCoreStaticTopologyEdgeState != TopologyEdgeState)
         {
             LiveVolumeCoreStaticTopologyVertexCount = Vertices.Num();
+            LiveVolumeCoreStaticTopologyEdgeState = TopologyEdgeState;
             LiveVolumeCoreTriangles.Reset(
                 (GridStationN - 1) * (GridLateralN - 1) * 6);
             for (int32 Y = 0; Y < GridLateralN - 1; ++Y)
@@ -5301,16 +5387,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     const int32 I2 = I0 + GridStationN;
                     const int32 I3 = I2 + 1;
                     const float MinimumCellStationCoverage = FMath::Min(
-                        ComputeStationEdgeCoverage(
-                            X,
-                            GridStationN,
-                            ResolvedVertexSpacingMeters,
-                            CurvedGridEdgeBlendMeters),
-                        ComputeStationEdgeCoverage(
-                            X + 1,
-                            GridStationN,
-                            ResolvedVertexSpacingMeters,
-                            CurvedGridEdgeBlendMeters));
+                        StationEdgeCoverage(X),
+                        StationEdgeCoverage(X + 1));
                     if (MinimumCellStationCoverage <
                         kLiveVolumeCoreMinimumStationCoverage)
                     {
@@ -5775,9 +5853,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // update against it raises a per-call engine error.
             const FProcMeshSection* CoreSectionState =
                 LiveVolumeCoreMesh->GetProcMeshSection(0);
+            // A rebuilt topology (corridor-end rows gained or lost) must also
+            // recreate the section: an in-place update keeps the old index
+            // buffer.
             const bool bSectionMissing = CoreSectionState == nullptr ||
                 CoreSectionState->ProcVertexBuffer.Num() !=
-                    LiveVolumeCoreVertices.Num();
+                    LiveVolumeCoreVertices.Num() ||
+                CoreSectionState->ProcIndexBuffer.Num() !=
+                    LiveVolumeCoreTriangles.Num();
             const bool bRenderedStateShapeMatches =
                 RenderedLiveVolumeCoreVertices.Num() ==
                     LiveVolumeCoreVertices.Num() &&
