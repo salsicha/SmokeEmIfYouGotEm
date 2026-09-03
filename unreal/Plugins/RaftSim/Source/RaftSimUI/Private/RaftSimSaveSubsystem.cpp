@@ -320,7 +320,7 @@ bool URaftSimSaveSubsystem::GetScenarioProgress(
 }
 
 bool URaftSimSaveSubsystem::FindBestCheckpoint(
-    float MinimumStationM, FTransform& OutTransform) const
+    float MinimumStationM, FTransform& OutTransform, float MaximumStationM) const
 {
     if (CurrentSave == nullptr)
     {
@@ -330,6 +330,7 @@ bool URaftSimSaveSubsystem::FindBestCheckpoint(
     for (const FRaftSimScenarioProgress& Progress : CurrentSave->ScenarioProgress)
     {
         if (Progress.bHasCheckpoint && Progress.FurthestStationM >= MinimumStationM &&
+            Progress.FurthestStationM <= MaximumStationM &&
             (Best == nullptr || Progress.FurthestStationM < Best->FurthestStationM))
         {
             Best = &Progress;

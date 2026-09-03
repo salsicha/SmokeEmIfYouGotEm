@@ -6,6 +6,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- Troublemaker Rapid now runs on the production full reach as a
+  station-bounded Free Run section (7900–8700 m) instead of the legacy
+  compact `L_Troublemaker` slice, whose authored-band presentation read as
+  a milky void with the raft hovering above it. Two runtime fixes behind
+  that: a section that starts mid-reach with no saved checkpoint now begins
+  at its start station (window reseed + raft move, the checkpoint path
+  without the checkpoint), and a fixed river window without a coordinate
+  map rejects a support band cooked for a different station frame (the
+  compact map's whole-reach band clamped its raft 1.5 m above the water).
+  `RaftSim.MenuScreen main start=<scenario id>` presses a river button for
+  review runs. The approach-telemetry gate (`RaftSim.P4.SouthForkApproachDraftTelemetry`)
+  now scans for wet water from the raft's own station rather than the
+  put-in, since the saved section decides where the window boots.
+
 - Main menu restructured around the rivers: the front end now shows one
   button per runnable river run (South Fork American full run and
   Troublemaker, Hance, Upper Huacas, Terminator, Lava Canyon, Zambezi, and

@@ -212,12 +212,28 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
 
     if (State->Phase == FRaftSimApproachTelemetryState::EPhase::Start)
     {
-        float FirstWetStationM = -1.0f;
-        // Always probe from the reach start: the moving window boots around
+        // Probe from the raft's own station: the moving window boots around
         // the staged raft, so distant stations are dry until the raft (and
-        // with it the window) actually travels there.
-        for (float StationM = 0.0f;
-             StationM <= 2000.0f;
+        // with it the window) actually travels there. A run that begins
+        // mid-reach (a section selected in the save, e.g. Troublemaker at
+        // 7900 m) leaves the put-in reach dry by design.
+        float ScanStartM = 0.0f;
+        {
+            FVector2D RaftRiverM;
+            FVector RaftTangent;
+            FVector RaftLeftNormal;
+            if (Water->WorldToRiverCoordinates(
+                    Raft->GetActorLocation(), RaftRiverM, RaftTangent, RaftLeftNormal))
+            {
+                ScanStartM = FMath::Max(0.0f, static_cast<float>(RaftRiverM.X) - 50.0f);
+            }
+        }
+        Test->AddInfo(FString::Printf(
+            TEXT("approach-telemetry scanning for wet water from station %.0f m"),
+            ScanStartM));
+        float FirstWetStationM = -1.0f;
+        for (float StationM = ScanStartM;
+             StationM <= ScanStartM + 2000.0f;
              StationM += 5.0f)
         {
             float ZCm = 0.0f;

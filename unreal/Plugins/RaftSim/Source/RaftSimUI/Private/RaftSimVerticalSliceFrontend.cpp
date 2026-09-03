@@ -68,9 +68,14 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             ERaftSimLicenseTier::ExpeditionGuide, 5, 120.0f, 48900.0f, false, true),
         MakeScenario(
             TEXT("troublemaker_challenge"), TEXT("Troublemaker Rapid Challenge"),
-            TEXT("A short technical challenge at the commercial flow band."),
-            TEXT("/Game/RaftSim/Maps/L_Troublemaker"),
-            ERaftSimLicenseTier::Trainee, 10, -1.0f, -1.0f),
+            TEXT("A short technical challenge at the commercial flow band: the approach, "
+                 "Troublemaker itself and its runout on the production full reach."),
+            // The compact L_Troublemaker slice is a legacy authored-band map
+            // (raft rode a whole-reach support band 1.5 m above its water,
+            // milky presentation); the production reach renders the rapid
+            // properly, so the run is a station-bounded section of it.
+            TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
+            ERaftSimLicenseTier::Trainee, 10, 7900.0f, 8700.0f),
         MakeScenario(
             TEXT("hance_challenge"), TEXT("Hance Rapid Free Run"),
             TEXT("Bonus large-volume Colorado rapid slice."),

@@ -56,7 +56,12 @@ public:
     bool GetScenarioProgress(FName ScenarioId, FRaftSimScenarioProgress& OutProgress) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Career")
-    bool FindBestCheckpoint(float MinimumStationM, FTransform& OutTransform) const;
+    // Nearest saved checkpoint at or beyond MinimumStationM and, when given, not
+    // beyond MaximumStationM: a section resumes from the previous section's
+    // finish, never from a checkpoint kilometres further down the river.
+    bool FindBestCheckpoint(
+        float MinimumStationM, FTransform& OutTransform,
+        float MaximumStationM = 1000000000.0f) const;
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Settings")
     void RestoreDefaultSettings();
