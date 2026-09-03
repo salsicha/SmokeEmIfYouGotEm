@@ -6,6 +6,27 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- Main menu restructured around the rivers: the front end now shows one
+  button per runnable river run (South Fork American full run and
+  Troublemaker, Hance, Upper Huacas, Terminator, Lava Canyon, Zambezi, and
+  the Training Eddy) that starts that run directly as a Free Run, plus
+  `Guided Descent Career...` (the former mode/section selector on its own
+  screen) and `Settings...` (subtitles + captions, UI / text size,
+  color-safe cues, motion comfort, hold / toggle controls, difficulty +
+  assists, ghost / route assist, pause rebind, restore defaults, credits,
+  legal + data notice). Escape or the gamepad's B returns to the main
+  screen. `RaftSim.MenuScreen <main|career|settings> [capture=<label>]`
+  screenshots a screen from the boot level for review.
+
+- Reference-map inspection passes (Hance, Upper Huacas, Terminator, Lava
+  Canyon; reports under `docs/reports/2026-09-02-*-inspection.md`): the
+  guide's head no longer renders as a black spike from external cameras,
+  the live water lattice keeps its volume-core triangles and coverage at a
+  corridor's true ends (the first and last ~18 m of every reference reach
+  rendered dry), and the survey tooling walks Landscape-based maps
+  (`RaftSim.SurveyReach`, `RaftSim.CaptureRaftSeries station=`,
+  `RaftSim.HideTaggedActors`, review cvars for the water presentation).
+
 - Restored native Linux build/test support (originally landed 2026-08-01, lost in a
   history rewrite): `<array>`/`<optional>` includes in the C++ solver,
   a portable bash `build_solver_lib.sh` that uses the engine's bundled

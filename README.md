@@ -340,9 +340,13 @@ milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 | Chilko | Lava Canyon | runnable reference signature-rapid Free Run |
 | Zambezi, Batoka Gorge | `L_Zambezi`: Boiling Pot to Mukuni Beach, Rapids 1–25 | runnable reference Free Run |
 
-To run Zambezi from the game, choose **Free Run**, then select **Zambezi:
-Boiling Pot to Mukuni Beach**. Free Run scenarios are available without a
-career-license unlock. In the Unreal Editor, the same runnable map can be
+To run any river from the game, press its button on the main menu: each
+runnable river has its own button (South Fork American full run and
+Troublemaker, Hance, Upper Huacas, Terminator, Lava Canyon, Zambezi, and the
+Training Eddy) and starts that run immediately as a Free Run, which needs no
+career-license unlock. The Guided Descent career keeps its own screen behind
+**Guided Descent Career**, and accessibility, assists, bindings, credits and
+the legal notice live behind **Settings**. In the Unreal Editor, the same runnable map can be
 opened directly at `/Game/RaftSim/Maps/L_Zambezi`; the older
 `L_ZambeziBatokaGorge_PhysicalCorridorCandidate` preview is not the gameplay
 map.
