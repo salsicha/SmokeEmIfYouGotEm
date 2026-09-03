@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "generator": "unreal/Scripts/build_production_whitewater_boot.py",
-  "generator_version": 2,
+  "generator_version": 3,
   "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
   "license": "RaftSim project source license",
   "source_inputs": [],
   "fbx": "unreal\\SourceArt\\RaftSim\\Equipment\\ProductionRiverBoot\\SM_RaftSim_WhitewaterRiverBoot.fbx",
-  "fbx_sha256": "b216eb1d21800540ee871d7247f8cb3e030b095c36d919839f712202db31d7fb",
+  "fbx_sha256": "bc1aeb0b871c6914396c96df435f77c96345aafbc741ffa83486227ca7d4cbcb",
   "blend": "unreal\\SourceArt\\RaftSim\\Equipment\\ProductionRiverBoot\\SM_RaftSim_WhitewaterRiverBoot.blend",
-  "blend_sha256": "bd1046142bf5e976310d15d5034b976abab3e05e85dd8edc9351497223df346c",
+  "blend_sha256": "c5d092b68ca6a770ba9fc2ced97ef359a9f3d785a573fdd874ed670d36a63669",
   "object_name": "SM_RaftSim_WhitewaterRiverBoot",
   "material_slots": [
     "BootUpper",
@@ -20,12 +20,12 @@
   "bounds_cm": {
     "min": [
       -8.11,
-      -7.3,
+      -7.1,
       -5.575
     ],
     "max": [
       25.0,
-      7.3,
+      7.1,
       12.0
     ]
   },

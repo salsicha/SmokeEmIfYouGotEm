@@ -25,7 +25,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoo
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRiverBoot.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRiverBoot.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_river_boot_manifest.json"
-GENERATOR_VERSION = 2
+GENERATOR_VERSION = 3
 
 
 def reset_scene() -> None:
@@ -84,20 +84,29 @@ def build_foot_shell(upper: bpy.types.Material) -> bpy.types.Object:
         # Generator v2 (2026-09-02): a fuller lasted foot with a rounder toe
         # and a full heel block, under a short tapered cuff, so the boot reads
         # as footwear from the guide seat instead of a tall cylinder.
-        toe_taper = max((t - 0.64) / 0.36, 0.0)
+        # Generator v3 (2026-09-02): the v2 cross-section used superellipse
+        # exponents below one, which pushes the sides OUT into a box with
+        # rounded corners - the boots read as square blocks from the guide
+        # seat. The upper now follows an ellipse that pinches slightly toward
+        # the instep, the sole side stays flatter for a lasted footprint, and
+        # the toe closes on a quarter-circle instead of a linear taper.
+        toe_taper = max((t - 0.60) / 0.40, 0.0)
+        toe_round = math.sqrt(max(1.0 - toe_taper * toe_taper, 0.0))
         heel_taper = max((0.10 - t) / 0.10, 0.0)
-        half_width = 6.45 + 0.85 * math.sin(math.pi * t) - 1.75 * toe_taper
+        half_width = (6.35 + 0.75 * math.sin(math.pi * t)) * (0.42 + 0.58 * toe_round)
         half_width -= 0.25 * heel_taper
-        half_height = 5.7 - 0.95 * t + 0.65 * math.sin(math.pi * t)
-        center_z = 1.35 + 0.95 * t
+        half_height = (5.7 - 0.95 * t + 0.65 * math.sin(math.pi * t)) * (0.55 + 0.45 * toe_round)
+        center_z = 1.35 + 0.95 * t + 0.6 * (1.0 - toe_round)
         for side in range(sides):
             angle = math.tau * side / sides
             cos_a = math.cos(angle)
             sin_a = math.sin(angle)
             # A softened superellipse reads as a lasted boot rather than a
             # scaled sphere while retaining smooth deterministic topology.
-            y = half_width * math.copysign(abs(cos_a) ** 0.82, cos_a)
-            z = center_z + half_height * math.copysign(abs(sin_a) ** 0.72, sin_a)
+            # Instep: a slightly pinched ellipse; sole side: flatter footprint.
+            exponent = 1.12 if sin_a >= 0.0 else 0.92
+            y = half_width * math.copysign(abs(cos_a) ** exponent, cos_a)
+            z = center_z + half_height * math.copysign(abs(sin_a) ** exponent, sin_a)
             vertices.append((x, y, z))
     for section in range(sections):
         for side in range(sides):
@@ -163,7 +172,7 @@ def build_details(
 ) -> tuple[list[bpy.types.Object], dict[str, int]]:
     details: list[bpy.types.Object] = []
     details.append(rounded_box("Outsole", (9.25, 0.0, -3.55), (31.5, 13.5, 2.3), 0.85, sole))
-    details.append(rounded_box("ToeRand", (19.6, 0.0, 0.15), (7.4, 12.0, 5.9), 2.2, reinforcement))
+    details.append(rounded_box("ToeRand", (19.0, 0.0, 0.0), (6.8, 9.6, 5.0), 2.0, reinforcement))
     details.append(rounded_box("HeelRand", (-5.85, 0.0, 3.1), (3.4, 12.6, 9.8), 1.1, reinforcement))
     details.append(rounded_box("PullTab", (-7.05, 0.0, 9.9), (1.0, 2.1, 4.2), 0.45, reinforcement))
 

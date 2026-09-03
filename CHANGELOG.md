@@ -6,6 +6,13 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- River boots regenerated (generator v3): the v2 upper used superellipse
+  exponents below one, which bulges the cross-section into a rounded box,
+  so the boots read as square blocks from the guide seat. The upper now
+  lofts an ellipse that pinches toward the instep over a flatter sole
+  side, the toe closes on a quarter-circle, and the toe rand hugs the
+  narrower toe. Same footprint (33 x 14 x 18 cm), same materials.
+
 - Troublemaker Rapid now runs on the production full reach as a
   station-bounded Free Run section (7900–8700 m) instead of the legacy
   compact `L_Troublemaker` slice, whose authored-band presentation read as
