@@ -440,6 +440,52 @@ M5.RuntimeRescueLoop).
   parse_survey.ps1 (station log → CSV + anomaly summary); the survey
   report lives in docs/reports/.
 
+## 2026-09-02 Pacuare, Futaleufú and Chilko inspections (same pass)
+
+Reports: docs/reports/2026-09-02-pacuare-upper-huacas-inspection.md,
+docs/reports/2026-09-02-futaleufu-terminator-inspection.md,
+docs/reports/2026-09-02-chilko-lava-canyon-inspection.md. All three
+600 m reaches survey wet at every station, never ground or capsize, and
+render to both corridor ends after the Hance corridor-end fix; crew and
+guide render correctly from every angle; manoeuvre envelopes match South
+Fork. What the pass found and did not fix:
+
+- **Bright bars across the channel on pools** (worst on Upper Huacas, wave
+  scale 0.78): bisected with four single-station A/Bs — live overlay hidden,
+  presentation standing-wave field forced to 0 (new review cvar
+  `raftsim.PresentationStandingWaveScale`), a Froude gate on the calm bands
+  (reverted), and every vertex normal forced straight up (new review cvar
+  `raftsim.FlatWaterNormals`). None changed the bars, and the cooked field
+  beneath is a clean grade. They are the live core MATERIAL's normal/ripple
+  layers tiled in river coordinates; the fix is on the texture/material
+  side (same conclusion as Hance's mirrored flow-normal corrugation).
+- **One-cell surface pits in the cooked fields** (`h.npy`/`bed.npy`, 2 m
+  cells): a supercritical shock cell behind every wave hump. Terminator
+  87 cells > 0.5 m (max 1.99 m; 1.5 m and 2.6 m pits at 152 m and 190 m
+  render as stepped walls, survey sweep reports a 2.55 m/5 m drop), Hance
+  35 (max 1.03 m), Upper Huacas 13 (0.65 m), Lava Canyon 7 (0.76 m). The
+  render is faithful; the raft rides over them on the smoothed support
+  surface. Belongs in the cooking limiter or a despike in the cooked-field
+  loader, not in shading.
+- **Terminator foam plateaus with rectangular cell cut-outs** over the entry
+  waves and holes, and **concentric ring ripples** on its pools (cold-water
+  CPU chop V2). Presentation, open.
+- **Chilko's D4 broach rocks pin an undamaged raft on nothing visible**: the
+  flexible model's rock contact is planar (`XyDistance`, a port of
+  `_contact_payload` in flexible_raft_d4.py), so the four rocks whose visual
+  crests sit 1.0–1.1 m under the water stop the hull like surface rocks
+  (paddle-through: integrity 1.00 → 0.74 at 250 m, then pinned on the left
+  bank; manoeuvre check stalled at 0.05 m/s in 2.4 m/s water at 300 m).
+  Design decision: height-aware contact in both the Python reference and
+  the C++ port, or raise those crests. Flagged, unchanged.
+- Chilko: a landscape gravel bar sits 68 cm above the solver water at the
+  centreline at 340 m (landscape/bed authoring mismatch).
+- Review tooling: `RaftSim.HideTaggedActors` now hides two seconds after
+  the map is up and takes `component=<substring>` and `capture=<label>`;
+  the per-river batch (crew bursts, whole-corridor survey at 10 m,
+  manoeuvre check, paddle-through) is `river_batch.ps1 -Map <L_...> -Tag
+  <tag>` in the session scratch.
+
 ## 2026-09-02 Colorado Hance inspection (crew, reach survey, physics)
 
 Same pass as the South Fork inspection, on `L_Hance`; the report with
