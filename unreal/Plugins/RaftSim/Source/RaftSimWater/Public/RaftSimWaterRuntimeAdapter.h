@@ -559,5 +559,6 @@ private:
 
 #if RAFTSIM_HAS_LIVE_SOLVER
     TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
+    FVector2D LastFixedWindowExtentM = FVector2D::ZeroVector;
 #endif
 };

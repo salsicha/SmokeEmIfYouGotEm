@@ -749,6 +749,27 @@ bool URaftSimWaterRuntimeAdapter::LoadRaftSupportBandFieldFromFile(
         RaftSupportBandField.Reset();
         return false;
     }
+    // A band cooked for the whole reach (stations 0-49 km) sampled with a
+    // compact map's local 0-300 m stations reads the wrong river: the
+    // Troublemaker map rode its band 1.5 m (the clamp) above the solver
+    // water with the raft hovering over the visible surface (2026-09-02).
+    // Without a coordinate map there is no global station authority, so a
+    // band whose span dwarfs the fixed window cannot be the window's own.
+    if (!HasRiverCoordinateMap() && LastFixedWindowExtentM.X > 0.0f &&
+        RaftSupportBandField.RowStationsM.Num() >= 2)
+    {
+        const float BandSpanM =
+            RaftSupportBandField.RowStationsM.Last() - RaftSupportBandField.RowStationsM[0];
+        if (BandSpanM > 4.0f * LastFixedWindowExtentM.X)
+        {
+            UE_LOG(
+                LogTemp, Warning,
+                TEXT("RaftSim support band field: %s spans %.0f m but the fixed window without a coordinate map spans %.0f m; ignoring the band"),
+                *AbsolutePath, BandSpanM, LastFixedWindowExtentM.X);
+            RaftSupportBandField.Reset();
+            return false;
+        }
+    }
     int32 WetCells = 0;
     for (const uint8 Cell : RaftSupportBandField.Wet)
     {
@@ -1708,6 +1729,7 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
         ResolveRuntimeDataPath(CookedFieldsManifestDir), BandId,
         WindowCenterM, WindowExtentM, RoughnessManning, Error,
         bRecenterHydraulicCrux);
+    LastFixedWindowExtentM = WindowExtentM;
     LastHandoffTransferredCellCount = 0;
     bLastHandoffPreservedState = false;
     if (!LiveWindow.IsValid())

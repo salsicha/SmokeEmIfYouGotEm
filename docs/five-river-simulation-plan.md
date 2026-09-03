@@ -29,7 +29,7 @@ the full-corridor Zambezi reference run:
 
 | River | Corridor dir | Signature rapid | Map | Status |
 |---|---|---|---|---|
-| South Fork American | `south_fork_american_chili_bar` | **Troublemaker** (+ Meat Grinder) | `L_Troublemaker` | **DONE, playable** |
+| South Fork American | `south_fork_american_chili_bar` | **Troublemaker** (+ Meat Grinder) | `L_Troublemaker` (menu run since 2026-09-02: `L_SouthForkAmerican_FullReach` 7900–8700 m) | **DONE, playable** |
 | Colorado Grand Canyon | `colorado_river_grand_canyon_rowing` | **Hance** | `L_Hance` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Pacuare | `pacuare_river_costa_rica` | **Upper Huacas** | `L_UpperHuacas` | **reference runnable on physical reach-local Landscape; photoreal gates open** |
 | Futaleufú | `futaleufu_river_chile` | **Terminator** | `L_Terminator` | **reference runnable on physical reach-local Landscape; photoreal gates open** |

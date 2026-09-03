@@ -789,6 +789,12 @@ static void HandleMenuScreenCommand(const TArray<FString>& Args, UWorld* World)
         *Args[0], Menu->GetRunButtonCount());
     for (int32 Index = 1; Index < Args.Num(); ++Index)
     {
+        if (Args[Index].StartsWith(TEXT("start="), ESearchCase::IgnoreCase))
+        {
+            // Review: press a river button by scenario id (Free Run).
+            Menu->StartScenario(FName(*Args[Index].RightChop(6)), ERaftSimGameMode::FreeRun);
+            continue;
+        }
         if (Args[Index].StartsWith(TEXT("capture="), ESearchCase::IgnoreCase))
         {
             const FString Path = FPaths::Combine(

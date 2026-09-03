@@ -119,6 +119,36 @@ bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTang
     return FMath::IsFinite(OutStationM);
 }
 
+// A section that starts mid-reach with no saved checkpoint (a Free Run of a
+// named rapid, or a fresh profile on a later career section) begins at its
+// start station instead of the map's put-in: the same window reseed and
+// raft move the checkpoint restore does, with a transform built from the
+// corridor (heading downstream, hull just above the local water surface).
+static bool BuildStationStartTransform(
+    URaftSimWaterRuntimeAdapter* Water, float StationM, FTransform& OutTransform)
+{
+    FVector PointCm;
+    FVector AheadCm;
+    const float DatumM = Water->GetRiverVerticalDatumM();
+    if (!Water->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, PointCm) ||
+        !Water->RiverToWorldPosition(FVector2D(StationM + 1.0f, 0.0f), DatumM, AheadCm))
+    {
+        return false;
+    }
+    FRaftSimWaterSample Sample;
+    if (Water->SampleWaterAtWorldPosition(PointCm, Sample) && Sample.bWet)
+    {
+        PointCm.Z = Sample.SurfaceHeightMeters * 100.0f + 40.0f;
+    }
+    else
+    {
+        PointCm.Z += 100.0f;
+    }
+    OutTransform = FTransform(
+        FRotator(0.0f, (AheadCm - PointCm).Rotation().Yaw, 0.0f), PointCm);
+    return true;
+}
+
 void ARaftSimRunManager::TryRestoreSessionCheckpoint()
 {
     if (!bCheckpointRestorePending || bCheckpointRestoreAttempted || Raft == nullptr)
@@ -134,11 +164,42 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
         return;
     }
     bCheckpointRestoreAttempted = true;
-    FTransform Checkpoint;
-    if (!Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint))
+    // Only when this map is the scenario's own level and the start station
+    // lies inside its corridor. Automation opens maps with whatever run the
+    // save last selected; reseeding the window at a South Fork station on a
+    // 600 m reference map left it dead (P4 RiverMapLoads on Hance, Lava
+    // Canyon and Zambezi after the Troublemaker section landed, 2026-09-02).
+    FRaftSimCareerScenarioDefinition Definition;
+    float MinimumStationM = 0.0f;
+    float MaximumStationM = 0.0f;
+    const FString MapName = GetWorld()
+        ? GetWorld()->GetMapName().Replace(*GetWorld()->StreamingLevelsPrefix, TEXT(""))
+        : FString();
+    const bool bOwnLevel =
+        URaftSimProgressionLibrary::FindScenario(ScenarioId, Definition) &&
+        !MapName.IsEmpty() &&
+        Definition.LevelName.ToString().EndsWith(TEXT("/") + MapName, ESearchCase::IgnoreCase);
+    const bool bInsideCorridor =
+        Water->GetRiverStationRangeM(MinimumStationM, MaximumStationM) &&
+        StartStationM >= MinimumStationM && StartStationM <= MaximumStationM;
+    if (!bOwnLevel || !bInsideCorridor)
     {
         bCheckpointRestorePending = false;
         return;
+    }
+    FTransform Checkpoint;
+    const float CheckpointCeilingM =
+        FinishStationM > StartStationM ? FinishStationM : TNumericLimits<float>::Max();
+    if (!Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint, CheckpointCeilingM))
+    {
+        if (!BuildStationStartTransform(Water, StartStationM, Checkpoint))
+        {
+            bCheckpointRestorePending = false;
+            return;
+        }
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim run: no checkpoint near station %.0f m; starting the section at its start station"),
+            StartStationM);
     }
     // A resumed section is an intentional discontinuity. Seed a fresh live
     // window at its saved station before moving the authoritative raft body;
