@@ -6,6 +6,14 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ### Added
 
+- Guide helmet seated on the guide's skull: the five CC0 heads share an
+  eye-line helmet anchor, and the guide skull is the deepest of them (eyes
+  8.7 cm ahead of the head joint against 6.7–7.9 cm for the crew), so the
+  shell sat forward with the rear rim crossing mid-skull and the occiput
+  bare. The guide anchor now pulls back along the face and the guide shell
+  is sized for that skull; `raftsim.CC0GuideHelmetBackCm` and
+  `raftsim.CC0GuideHelmetScale` override both for review.
+
 - River boots regenerated (generator v3): the v2 upper used superellipse
   exponents below one, which bulges the cross-section into a rounded box,
   so the boots read as square blocks from the guide seat. The upper now

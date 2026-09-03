@@ -153,12 +153,12 @@ public:
      * feet so the camera can sit in the eye socket. Applied every pose. */
     void SetHeadHiddenForFirstPerson(bool bShouldHide) { bHeadHiddenForFirstPerson = bShouldHide; }
 
-    /** Uniform shell scale for the five similarly sized authored skulls. */
+    /** Shell scale per authored skull: 1.02 covers the crown-to-occiput span
+     * of the four crew heads now that the corrected face frame wears the
+     * shell front-forward (the former 0.96 was tuned while the shell sat
+     * reversed, 2026-08-08); the deeper guide skull takes a larger shell. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
-    // 1.02 covers the full crown-to-occiput span of the largest MPFB skull
-    // now that the corrected face frame wears the shell front-forward; the
-    // former 0.96 was tuned while the shell sat reversed (2026-08-08).
-    float GetRecommendedWhitewaterHelmetScale() const { return 1.02f; }
+    float GetRecommendedWhitewaterHelmetScale() const;
 
 private:
     bool EnsureBodyLoaded();

@@ -40,6 +40,15 @@ const FVector CrewHeadLocalEyeCentersCm[] = {
 // the common shell reference; the other three already seat at the brow.
 constexpr float GuideHelmetAnchorDropCm = 5.0f;
 const float CrewHelmetAnchorDropsCm[] = {6.0f, 9.0f, 9.0f, 7.0f};
+// The guide skull is the deepest of the five (eyes 8.7 cm ahead of the head
+// joint against 6.7-7.9 cm for the crew, forensics 2026-09-03) and the
+// common eye-line anchor left the shell seated forward on it: the rear rim
+// crossed mid-skull with the occiput bare ("the guide's helmet is not
+// centered on his head"). Pull the guide anchor back along the face and
+// size the shell for that skull.
+constexpr float GuideHelmetAnchorBackCm = 3.0f;
+constexpr float GuideHelmetFitScale = 1.08f;
+constexpr float CrewHelmetFitScale = 1.02f;
 
 constexpr float PaddlePalmAnchorAlongKnuckleFraction = 0.56f;
 // The CC0 bodies are exported with Blender's identity axes
@@ -161,6 +170,28 @@ TAutoConsoleVariable<int32> CVarCC0PoseForensics(
     0,
     TEXT("Log driven joint heights and the wetsuit apex influences once per body."));
 
+// Review overrides for the guide helmet seat (-1 keeps the authored value).
+TAutoConsoleVariable<float> CVarCC0GuideHelmetBackCm(
+    TEXT("raftsim.CC0GuideHelmetBackCm"),
+    -1.0f,
+    TEXT("Guide helmet anchor pull-back along the face in cm (-1 = authored)."));
+TAutoConsoleVariable<float> CVarCC0GuideHelmetScale(
+    TEXT("raftsim.CC0GuideHelmetScale"),
+    -1.0f,
+    TEXT("Guide helmet shell scale (-1 = authored)."));
+
+float ResolvedGuideHelmetBackCm()
+{
+    const float Override = CVarCC0GuideHelmetBackCm.GetValueOnGameThread();
+    return Override >= 0.0f ? Override : GuideHelmetAnchorBackCm;
+}
+
+float ResolvedGuideHelmetScale()
+{
+    const float Override = CVarCC0GuideHelmetScale.GetValueOnGameThread();
+    return Override > 0.0f ? Override : GuideHelmetFitScale;
+}
+
 // Diagnostic: draw the CC0 wetsuit section with another material so its
 // geometry can be told apart from every other charcoal surface in a capture.
 TAutoConsoleVariable<FString> CVarCC0WetsuitDebugMaterial(
@@ -252,7 +283,8 @@ FVector ARaftSimCC0CrewVisualActor::GetSolvedHeadWorldLocation() const
             ? GuideHelmetAnchorDropCm
             : CrewHelmetAnchorDropsCm[FMath::Clamp(CurrentVariantIndex, 0, 3)];
         return RenderedEyeCenterWorld -
-            GetSolvedFaceUpWorldVector() * AnchorDropCm;
+            GetSolvedFaceUpWorldVector() * AnchorDropCm -
+            GetSolvedFaceForwardWorldVector() * (bCurrentGuide ? ResolvedGuideHelmetBackCm() : 0.0f);
     }
     const FTransform HeadTransform = Body->GetBoneTransformByName(
         TEXT("head"), EBoneSpaces::ComponentSpace);
@@ -263,7 +295,13 @@ FVector ARaftSimCC0CrewVisualActor::GetSolvedHeadWorldLocation() const
     // importer's 100x unit scale, which would blow the offset up 100-fold.
     return Body->GetComponentTransform().TransformPosition(
         HeadTransform.GetLocation() +
-        HeadTransform.GetRotation().RotateVector(LocalEyeCenterCm / BodyScale));
+        HeadTransform.GetRotation().RotateVector(LocalEyeCenterCm / BodyScale)) -
+        GetSolvedFaceForwardWorldVector() * (bCurrentGuide ? ResolvedGuideHelmetBackCm() : 0.0f);
+}
+
+float ARaftSimCC0CrewVisualActor::GetRecommendedWhitewaterHelmetScale() const
+{
+    return bCurrentGuide ? ResolvedGuideHelmetScale() : CrewHelmetFitScale;
 }
 
 FVector ARaftSimCC0CrewVisualActor::GetSolvedFaceForwardWorldVector() const
