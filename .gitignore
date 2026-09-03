@@ -34,6 +34,10 @@ unreal/Intermediate/
 unreal/Plugins/*/Binaries/
 unreal/Plugins/*/Intermediate/
 unreal/Saved/
+unreal/.vs/
+unreal/.vsconfig
+unreal/*.sln
+unreal/*.slnx
 
 # Locally regenerated from installed UE sample content; never open-source redistributed.
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/
