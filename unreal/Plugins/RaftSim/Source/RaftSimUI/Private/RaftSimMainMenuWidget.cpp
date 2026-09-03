@@ -1,5 +1,6 @@
 #include "RaftSimMainMenuWidget.h"
 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/AudioComponent.h"
 #include "Components/Button.h"
@@ -9,12 +10,17 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 #include "Components/VerticalBoxSlot.h"
+#include "Engine/World.h"
+#include "HAL/IConsoleManager.h"
+#include "HAL/PlatformMisc.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Misc/Paths.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimVerticalSliceFrontend.h"
 #include "Sound/SoundWaveProcedural.h"
 #include "TimerManager.h"
+#include "UnrealClient.h"
 
 namespace
 {
@@ -29,6 +35,37 @@ FText ModeName(ERaftSimGameMode Mode)
         default:
             return NSLOCTEXT("RaftSim", "TrainingEddy", "Training Eddy");
     }
+}
+
+struct FRunButtonSpec
+{
+    const TCHAR* ScenarioId;
+    const TCHAR* Label;
+    ERaftSimGameMode Mode;
+};
+
+// River-facing labels for the main screen, in menu order. Anything else in
+// the catalog that is a reference/challenge run (section 10+) or training is
+// appended with its catalog display name, so a new river map shows up
+// without touching this list.
+const FRunButtonSpec RunButtonSpecs[] = {
+    {TEXT("south_fork_full_descent"), TEXT("South Fork American: Chili Bar to Salmon Falls"),
+        ERaftSimGameMode::FreeRun},
+    {TEXT("troublemaker_challenge"), TEXT("South Fork American: Troublemaker Rapid"),
+        ERaftSimGameMode::FreeRun},
+    {TEXT("hance_challenge"), TEXT("Colorado, Grand Canyon: Hance"), ERaftSimGameMode::FreeRun},
+    {TEXT("upper_huacas_challenge"), TEXT("Pacuare: Upper Huacas"), ERaftSimGameMode::FreeRun},
+    {TEXT("terminator_challenge"), TEXT("Futaleufu: Terminator"), ERaftSimGameMode::FreeRun},
+    {TEXT("lava_canyon_challenge"), TEXT("Chilko: Lava Canyon"), ERaftSimGameMode::FreeRun},
+    {TEXT("zambezi_reference_run"),
+        TEXT("Zambezi, Batoka Gorge: Boiling Pot to Mukuni Beach"), ERaftSimGameMode::FreeRun},
+    {TEXT("training_eddy_basics"), TEXT("Training Eddy: Guide School (flat-water tank)"),
+        ERaftSimGameMode::TrainingEddy},
+};
+
+bool IsStandaloneRun(const FRaftSimCareerScenarioDefinition& Scenario)
+{
+    return Scenario.bTraining || Scenario.bFullDescent || Scenario.SectionIndex >= 10;
 }
 
 TArray<uint8> BuildMenuConfirmTone()
@@ -51,11 +88,50 @@ TArray<uint8> BuildMenuConfirmTone()
     FMemory::Memcpy(Bytes.GetData(), Samples.GetData(), Bytes.Num());
     return Bytes;
 }
+
+UTextBlock* MakeHeading(UWidgetTree* Tree, UVerticalBox* Parent, const FText& Text, int32 Size)
+{
+    UTextBlock* Heading = Tree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    Heading->SetText(Text);
+    FSlateFontInfo Font = Heading->GetFont();
+    Font.Size = Size;
+    Heading->SetFont(Font);
+    UVerticalBoxSlot* HeadingSlot = Parent->AddChildToVerticalBox(Heading);
+    HeadingSlot->SetPadding(FMargin(0.0f, 18.0f, 0.0f, 4.0f));
+    return Heading;
+}
+}
+
+void URaftSimMenuRunButton::HandleClicked()
+{
+    if (URaftSimMainMenuWidget* Menu = Owner.Get())
+    {
+        Menu->StartScenario(ScenarioId, Mode);
+    }
 }
 
 UWidget* URaftSimMainMenuWidget::GetDefaultFocusWidget() const
 {
-    return StartButton.Get();
+    return FirstRunButton != nullptr ? FirstRunButton.Get() : StartButton.Get();
+}
+
+URaftSimMainMenuWidget* URaftSimMainMenuWidget::FindInWorld(UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return nullptr;
+    }
+    TArray<UUserWidget*> Widgets;
+    UWidgetBlueprintLibrary::GetAllWidgetsOfClass(
+        World, Widgets, URaftSimMainMenuWidget::StaticClass(), false);
+    for (UUserWidget* Widget : Widgets)
+    {
+        if (URaftSimMainMenuWidget* Menu = Cast<URaftSimMainMenuWidget>(Widget))
+        {
+            return Menu;
+        }
+    }
+    return nullptr;
 }
 
 TSharedRef<SWidget> URaftSimMainMenuWidget::RebuildWidget()
@@ -69,6 +145,10 @@ void URaftSimMainMenuWidget::BuildWidgetTree()
     if (WidgetTree == nullptr || WidgetTree->RootWidget != nullptr)
     {
         return;
+    }
+    if (ScenarioCatalog.IsEmpty())
+    {
+        ScenarioCatalog = URaftSimProgressionLibrary::GetScenarioCatalog();
     }
     UCanvasPanel* Canvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass());
     WidgetTree->RootWidget = Canvas;
@@ -94,63 +174,142 @@ void URaftSimMainMenuWidget::BuildWidgetTree()
 
     ProfileText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
     Column->AddChildToVerticalBox(ProfileText);
-    ModeText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-    Column->AddChildToVerticalBox(ModeText);
-    ScenarioText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-    Column->AddChildToVerticalBox(ScenarioText);
-    BriefingText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
-    BriefingText->SetAutoWrapText(true);
-    Column->AddChildToVerticalBox(BriefingText);
 
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "CycleMode", "Change Mode"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleMode));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "PreviousScenario", "Previous Run"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandlePreviousScenario));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "NextScenario", "Next Run"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleNextScenario));
-    StartButton = MakeMenuButton(Column, NSLOCTEXT("RaftSim", "StartSelected", "Start Selected Run"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleStart));
-
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "Subtitles", "Toggle Subtitles + Captions"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleToggleSubtitles));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "UiScale", "Cycle UI / Text Size"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleUiScale));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "ColorCues", "Cycle Color-Safe Cues"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleColorCues));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "MotionComfort", "Cycle Motion Comfort"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleMotion));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "InteractionStyle", "Hold / Toggle Controls"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleInteraction));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "AssistLevel", "Cycle Difficulty + Assists"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleAssist));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "GhostRoute", "Toggle Ghost / Route Assist"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleToggleGhostRoute));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "RebindPause", "Rebind Pause: Escape / Pause"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRebindPause));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "Defaults", "Restore Settings Defaults"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRestoreDefaults));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "Credits", "Credits"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCredits));
-    MakeMenuButton(Column, NSLOCTEXT("RaftSim", "Legal", "Legal + Data Notice"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleLegal));
+    // --- Main screen: one button per river run, then Career / Settings / Quit.
+    MainPanel = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+    Column->AddChildToVerticalBox(MainPanel);
+    MakeHeading(WidgetTree, MainPanel,
+        NSLOCTEXT("RaftSim", "RiversHeading", "Rivers - pick a run"), 28);
+    BuildRunButtons(MainPanel);
+    MakeHeading(WidgetTree, MainPanel, FText::GetEmpty(), 10);
+    MakeMenuButton(MainPanel, NSLOCTEXT("RaftSim", "OpenCareer", "Guided Descent Career..."),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleOpenCareer));
+    MakeMenuButton(MainPanel, NSLOCTEXT("RaftSim", "OpenSettings", "Settings..."),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleOpenSettings));
     MakeMenuButton(
-        Column, NSLOCTEXT("RaftSim", "Quit", "Quit"),
+        MainPanel, NSLOCTEXT("RaftSim", "Quit", "Quit"),
         GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleQuit));
 
+    // --- Career screen: the guided-descent mode and section selector.
+    CareerPanel = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+    Column->AddChildToVerticalBox(CareerPanel);
+    MakeHeading(WidgetTree, CareerPanel,
+        NSLOCTEXT("RaftSim", "CareerHeading", "Guided Descent Career"), 28);
+    ModeText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    CareerPanel->AddChildToVerticalBox(ModeText);
+    ScenarioText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    CareerPanel->AddChildToVerticalBox(ScenarioText);
+    BriefingText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
+    BriefingText->SetAutoWrapText(true);
+    CareerPanel->AddChildToVerticalBox(BriefingText);
+    FirstCareerButton = MakeMenuButton(CareerPanel, NSLOCTEXT("RaftSim", "CycleMode", "Change Mode"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleMode));
+    MakeMenuButton(CareerPanel, NSLOCTEXT("RaftSim", "PreviousScenario", "Previous Run"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandlePreviousScenario));
+    MakeMenuButton(CareerPanel, NSLOCTEXT("RaftSim", "NextScenario", "Next Run"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleNextScenario));
+    StartButton = MakeMenuButton(CareerPanel, NSLOCTEXT("RaftSim", "StartSelected", "Start Selected Run"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleStart));
+    MakeMenuButton(CareerPanel, NSLOCTEXT("RaftSim", "BackFromCareer", "Back"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleBack));
+
+    // --- Settings screen.
+    SettingsPanel = WidgetTree->ConstructWidget<UVerticalBox>(UVerticalBox::StaticClass());
+    Column->AddChildToVerticalBox(SettingsPanel);
+    MakeHeading(WidgetTree, SettingsPanel, NSLOCTEXT("RaftSim", "SettingsHeading", "Settings"), 28);
+    FirstSettingsButton = MakeMenuButton(SettingsPanel,
+        NSLOCTEXT("RaftSim", "Subtitles", "Toggle Subtitles + Captions"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleToggleSubtitles));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "UiScale", "Cycle UI / Text Size"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleUiScale));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "ColorCues", "Cycle Color-Safe Cues"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleColorCues));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "MotionComfort", "Cycle Motion Comfort"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleMotion));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "InteractionStyle", "Hold / Toggle Controls"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleInteraction));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "AssistLevel", "Cycle Difficulty + Assists"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCycleAssist));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "GhostRoute", "Toggle Ghost / Route Assist"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleToggleGhostRoute));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "RebindPause", "Rebind Pause: Escape / Pause"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRebindPause));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "Defaults", "Restore Settings Defaults"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRestoreDefaults));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "Credits", "Credits"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleCredits));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "Legal", "Legal + Data Notice"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleLegal));
+    MakeMenuButton(SettingsPanel, NSLOCTEXT("RaftSim", "BackFromSettings", "Back"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleBack));
     SettingsSummaryText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
     SettingsSummaryText->SetText(FText::GetEmpty());
     SettingsSummaryText->SetAutoWrapText(true);
-    Column->AddChildToVerticalBox(SettingsSummaryText);
+    UVerticalBoxSlot* SummarySlot = SettingsPanel->AddChildToVerticalBox(SettingsSummaryText);
+    SummarySlot->SetPadding(FMargin(0.0f, 12.0f, 0.0f, 0.0f));
+
+    // Shared status line under every screen (loading, notices, credits).
     InformationText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
     InformationText->SetAutoWrapText(true);
-    Column->AddChildToVerticalBox(InformationText);
+    UVerticalBoxSlot* InformationSlot = Column->AddChildToVerticalBox(InformationText);
+    InformationSlot->SetPadding(FMargin(0.0f, 12.0f, 0.0f, 0.0f));
+
+    CareerPanel->SetVisibility(ESlateVisibility::Collapsed);
+    SettingsPanel->SetVisibility(ESlateVisibility::Collapsed);
+    ActiveScreen = ERaftSimMenuScreen::Main;
+}
+
+void URaftSimMainMenuWidget::BuildRunButtons(UVerticalBox* Parent)
+{
+    RunButtons.Reset();
+    FirstRunButton = nullptr;
+    TSet<FName> Placed;
+    auto AddRunButton = [this, Parent, &Placed](
+                            const FRaftSimCareerScenarioDefinition& Scenario,
+                            const FText& Label, ERaftSimGameMode Mode)
+    {
+        URaftSimMenuRunButton* Proxy = NewObject<URaftSimMenuRunButton>(this);
+        Proxy->Owner = this;
+        Proxy->ScenarioId = Scenario.ScenarioId;
+        Proxy->Mode = Mode;
+        Proxy->Button = MakeButtonWithTarget(Parent, Label, Proxy,
+            GET_FUNCTION_NAME_CHECKED(URaftSimMenuRunButton, HandleClicked));
+        RunButtons.Add(Proxy);
+        Placed.Add(Scenario.ScenarioId);
+        if (FirstRunButton == nullptr)
+        {
+            FirstRunButton = Proxy->Button;
+        }
+    };
+    for (const FRunButtonSpec& Spec : RunButtonSpecs)
+    {
+        const FName ScenarioId(Spec.ScenarioId);
+        const FRaftSimCareerScenarioDefinition* Scenario = ScenarioCatalog.FindByPredicate(
+            [ScenarioId](const FRaftSimCareerScenarioDefinition& Candidate)
+            { return Candidate.ScenarioId == ScenarioId; });
+        if (Scenario != nullptr)
+        {
+            AddRunButton(*Scenario, FText::FromString(Spec.Label), Spec.Mode);
+        }
+    }
+    for (const FRaftSimCareerScenarioDefinition& Scenario : ScenarioCatalog)
+    {
+        if (!Placed.Contains(Scenario.ScenarioId) && IsStandaloneRun(Scenario))
+        {
+            AddRunButton(Scenario, Scenario.DisplayName,
+                Scenario.bTraining ? ERaftSimGameMode::TrainingEddy : ERaftSimGameMode::FreeRun);
+        }
+    }
 }
 
 void URaftSimMainMenuWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    ScenarioCatalog = URaftSimProgressionLibrary::GetScenarioCatalog();
+    if (ScenarioCatalog.IsEmpty())
+    {
+        ScenarioCatalog = URaftSimProgressionLibrary::GetScenarioCatalog();
+    }
     if (MenuConfirmTone == nullptr)
     {
         MenuConfirmPcm = BuildMenuConfirmTone();
@@ -174,14 +333,20 @@ void URaftSimMainMenuWidget::NativeConstruct()
         }
     }
     RefreshFromSave();
-    if (StartButton != nullptr)
+    if (UWidget* Focus = GetDefaultFocusWidget())
     {
-        StartButton->SetKeyboardFocus();
+        Focus->SetKeyboardFocus();
     }
 }
 
 UButton* URaftSimMainMenuWidget::MakeMenuButton(
     UVerticalBox* Parent, const FText& Label, FName ClickHandlerName)
+{
+    return MakeButtonWithTarget(Parent, Label, this, ClickHandlerName);
+}
+
+UButton* URaftSimMainMenuWidget::MakeButtonWithTarget(
+    UVerticalBox* Parent, const FText& Label, UObject* Target, FName ClickHandlerName)
 {
     UButton* Button = WidgetTree->ConstructWidget<UButton>(UButton::StaticClass());
     UTextBlock* ButtonText = WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass());
@@ -193,7 +358,7 @@ UButton* URaftSimMainMenuWidget::MakeMenuButton(
         URaftSimMainMenuWidget, HandleMenuAudioCue));
     Button->OnClicked.Add(ClickDelegate);
     ClickDelegate.Unbind();
-    ClickDelegate.BindUFunction(this, ClickHandlerName);
+    ClickDelegate.BindUFunction(Target, ClickHandlerName);
     Button->OnClicked.Add(ClickDelegate);
 
     UVerticalBoxSlot* ButtonSlot = Parent->AddChildToVerticalBox(Button);
@@ -229,6 +394,60 @@ void URaftSimMainMenuWidget::NativeDestruct()
     }
     Super::NativeDestruct();
 }
+
+FReply URaftSimMainMenuWidget::NativeOnPreviewKeyDown(
+    const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+    // Escape and the gamepad's B/Circle step back to the main screen from
+    // the career and settings screens, matching the on-screen Back buttons.
+    const FKey Key = InKeyEvent.GetKey();
+    if (ActiveScreen != ERaftSimMenuScreen::Main &&
+        (Key == EKeys::Escape || Key == EKeys::Gamepad_FaceButton_Right))
+    {
+        ShowScreen(ERaftSimMenuScreen::Main);
+        return FReply::Handled();
+    }
+    return Super::NativeOnPreviewKeyDown(InGeometry, InKeyEvent);
+}
+
+void URaftSimMainMenuWidget::ShowScreen(ERaftSimMenuScreen Screen)
+{
+    ActiveScreen = Screen;
+    if (MainPanel)
+    {
+        MainPanel->SetVisibility(Screen == ERaftSimMenuScreen::Main
+            ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+    }
+    if (CareerPanel)
+    {
+        CareerPanel->SetVisibility(Screen == ERaftSimMenuScreen::Career
+            ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+    }
+    if (SettingsPanel)
+    {
+        SettingsPanel->SetVisibility(Screen == ERaftSimMenuScreen::Settings
+            ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+    }
+    UButton* Focus = nullptr;
+    switch (Screen)
+    {
+        case ERaftSimMenuScreen::Career: Focus = FirstCareerButton; break;
+        case ERaftSimMenuScreen::Settings: Focus = FirstSettingsButton; break;
+        default: Focus = FirstRunButton; break;
+    }
+    if (Focus != nullptr)
+    {
+        Focus->SetKeyboardFocus();
+    }
+    if (InformationText && Screen != ERaftSimMenuScreen::Settings && PendingLevelName.IsNone())
+    {
+        InformationText->SetText(FText::GetEmpty());
+    }
+}
+
+void URaftSimMainMenuWidget::HandleOpenCareer() { ShowScreen(ERaftSimMenuScreen::Career); }
+void URaftSimMainMenuWidget::HandleOpenSettings() { ShowScreen(ERaftSimMenuScreen::Settings); }
+void URaftSimMainMenuWidget::HandleBack() { ShowScreen(ERaftSimMenuScreen::Main); }
 
 FName URaftSimMainMenuWidget::GetSelectedScenarioId() const
 {
@@ -273,6 +492,17 @@ void URaftSimMainMenuWidget::SelectNextScenario(int32 Direction)
     RefreshFromSave();
 }
 
+void URaftSimMainMenuWidget::SetRunButtonsEnabled(bool bEnabled)
+{
+    for (URaftSimMenuRunButton* Proxy : RunButtons)
+    {
+        if (Proxy && Proxy->Button)
+        {
+            Proxy->Button->SetIsEnabled(bEnabled);
+        }
+    }
+}
+
 void URaftSimMainMenuWidget::RefreshFromSave()
 {
     URaftSimSaveSubsystem* SaveSubsystem = GetGameInstance()
@@ -283,7 +513,7 @@ void URaftSimMainMenuWidget::RefreshFromSave()
         // Adopt the saved mode and selection once, at first open. Re-running
         // the selection restore on every refresh snapped the run back to the
         // save after each Next/Previous click whenever the saved run was
-        // visible — in Free Run (everything visible) the buttons went dead
+        // visible - in Free Run (everything visible) the buttons went dead
         // (2026-08-07 playtest).
         if (!bModeInitialized)
         {
@@ -316,7 +546,15 @@ void URaftSimMainMenuWidget::RefreshFromSave()
     BriefingText->SetText(Scenario.Briefing);
     if (StartButton)
     {
-        StartButton->SetIsEnabled(bUnlocked);
+        StartButton->SetIsEnabled(bUnlocked && PendingLevelName.IsNone());
+    }
+    for (URaftSimMenuRunButton* Proxy : RunButtons)
+    {
+        if (Proxy && Proxy->Button)
+        {
+            Proxy->Button->SetIsEnabled(PendingLevelName.IsNone() && SaveSubsystem &&
+                SaveSubsystem->IsScenarioUnlocked(Proxy->ScenarioId, Proxy->Mode));
+        }
     }
     if (Save)
     {
@@ -325,31 +563,60 @@ void URaftSimMainMenuWidget::RefreshFromSave()
             URaftSimProgressionLibrary::LicenseDisplayName(Save->LicenseTier),
             FText::AsNumber(Save->CareerXp), FText::AsNumber(Save->CareerStats.CompletedRuns)));
         const FRaftSimVerticalSliceUserSettings& S = Save->Settings;
+        const FName* PauseKey = Save->InputBindings.Find(TEXT("Pause"));
         SettingsSummaryText->SetText(FText::FromString(FString::Printf(
-            TEXT("Subtitles %s | UI %.0f%% | text %.0f%% | motion %.0f%% | assist %d | ghost %s"),
+            TEXT("Subtitles %s | UI %.0f%% | text %.0f%% | colour cues %d | motion %.0f%% | controls %s | assist %d | ghost %s | pause %s"),
             S.bSubtitlesEnabled ? TEXT("on") : TEXT("off"), S.UiScale * 100.0f,
-            S.TextScale * 100.0f, S.MotionIntensity * 100.0f,
-            static_cast<int32>(S.AssistLevel), S.bGhostEnabled ? TEXT("on") : TEXT("off"))));
+            S.TextScale * 100.0f, static_cast<int32>(S.ColorCueMode),
+            S.MotionIntensity * 100.0f,
+            S.CommandWheelStyle == ERaftSimInteractionStyle::Hold ? TEXT("hold") : TEXT("toggle"),
+            static_cast<int32>(S.AssistLevel), S.bGhostEnabled ? TEXT("on") : TEXT("off"),
+            PauseKey ? *PauseKey->ToString() : TEXT("Escape"))));
     }
 }
 
-void URaftSimMainMenuWidget::HandleStart()
+void URaftSimMainMenuWidget::StartScenario(FName ScenarioId, ERaftSimGameMode Mode)
 {
-    if (!ScenarioCatalog.IsValidIndex(SelectedScenarioIndex))
+    if (!PendingLevelName.IsNone())
+    {
+        return; // a travel is already queued
+    }
+    const int32 Index = ScenarioCatalog.IndexOfByPredicate(
+        [ScenarioId](const FRaftSimCareerScenarioDefinition& Candidate)
+        { return Candidate.ScenarioId == ScenarioId; });
+    if (Index == INDEX_NONE || GetGameInstance() == nullptr)
     {
         return;
     }
     URaftSimSaveSubsystem* Save = GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>();
-    const FRaftSimCareerScenarioDefinition& Scenario = ScenarioCatalog[SelectedScenarioIndex];
-    if (Save && Save->BeginSession(SelectedMode, Scenario.ScenarioId))
+    const FRaftSimCareerScenarioDefinition& Scenario = ScenarioCatalog[Index];
+    if (Save == nullptr || !Save->BeginSession(Mode, ScenarioId))
     {
-        PendingLevelName = Scenario.LevelName;
-        StartButton->SetIsEnabled(false);
         InformationText->SetText(FText::Format(
-            NSLOCTEXT("RaftSim", "LoadingRun", "LOADING — {0}\nPreparing live water, crew, weather, and checkpoint…"),
-            Scenario.DisplayName));
-        GetWorld()->GetTimerManager().SetTimer(
-            PendingTravelTimer, this, &URaftSimMainMenuWidget::OpenPendingLevel, 0.18f, false);
+            NSLOCTEXT("RaftSim", "RunUnavailable", "{0} is not available in {1}."),
+            Scenario.DisplayName, ModeName(Mode)));
+        return;
+    }
+    SelectedMode = Mode;
+    SelectedScenarioIndex = Index;
+    PendingLevelName = Scenario.LevelName;
+    SetRunButtonsEnabled(false);
+    if (StartButton)
+    {
+        StartButton->SetIsEnabled(false);
+    }
+    InformationText->SetText(FText::Format(
+        NSLOCTEXT("RaftSim", "LoadingRun", "LOADING - {0}\nPreparing live water, crew, weather, and checkpoint..."),
+        Scenario.DisplayName));
+    GetWorld()->GetTimerManager().SetTimer(
+        PendingTravelTimer, this, &URaftSimMainMenuWidget::OpenPendingLevel, 0.18f, false);
+}
+
+void URaftSimMainMenuWidget::HandleStart()
+{
+    if (ScenarioCatalog.IsValidIndex(SelectedScenarioIndex))
+    {
+        StartScenario(ScenarioCatalog[SelectedScenarioIndex].ScenarioId, SelectedMode);
     }
 }
 
@@ -464,6 +731,7 @@ void URaftSimMainMenuWidget::HandleRestoreDefaults()
     if (URaftSimSaveSubsystem* Save = GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>())
     {
         Save->RestoreDefaultSettings(); RefreshFromSave();
+        InformationText->SetText(NSLOCTEXT("RaftSim", "DefaultsRestored", "Settings restored to defaults."));
     }
 }
 
@@ -492,3 +760,58 @@ void URaftSimMainMenuWidget::HandleQuit()
     UKismetSystemLibrary::QuitGame(
         this, GetOwningPlayer(), EQuitPreference::Quit, /*bIgnorePlatformRestrictions=*/false);
 }
+
+// ---------------------------------------------------------------------------
+// Review hook: RaftSim.MenuScreen <main|career|settings> [capture=<label>]
+// Shows a menu screen in the boot level and optionally screenshots it two
+// seconds later and exits (one -ExecCmds entry does the whole review).
+// ---------------------------------------------------------------------------
+
+static void HandleMenuScreenCommand(const TArray<FString>& Args, UWorld* World)
+{
+    URaftSimMainMenuWidget* Menu = URaftSimMainMenuWidget::FindInWorld(World);
+    if (Menu == nullptr || Args.Num() < 1)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim.MenuScreen <main|career|settings> [capture=<label>]: no main menu in this world"));
+        return;
+    }
+    ERaftSimMenuScreen Screen = ERaftSimMenuScreen::Main;
+    if (Args[0].Equals(TEXT("career"), ESearchCase::IgnoreCase))
+    {
+        Screen = ERaftSimMenuScreen::Career;
+    }
+    else if (Args[0].Equals(TEXT("settings"), ESearchCase::IgnoreCase))
+    {
+        Screen = ERaftSimMenuScreen::Settings;
+    }
+    Menu->ShowScreen(Screen);
+    UE_LOG(LogTemp, Display, TEXT("RaftSim.MenuScreen: showing %s (%d run buttons)"),
+        *Args[0], Menu->GetRunButtonCount());
+    for (int32 Index = 1; Index < Args.Num(); ++Index)
+    {
+        if (Args[Index].StartsWith(TEXT("capture="), ESearchCase::IgnoreCase))
+        {
+            const FString Path = FPaths::Combine(
+                FPaths::ProjectSavedDir(), TEXT("Screenshots"), Args[Index].RightChop(8) + TEXT(".png"));
+            FTimerHandle CaptureHandle;
+            World->GetTimerManager().SetTimer(
+                CaptureHandle,
+                FTimerDelegate::CreateLambda([Path]()
+                {
+                    // bInShowUI: the whole point is the widget, not the boot level's sky.
+                    FScreenshotRequest::RequestScreenshot(Path, /*bInShowUI=*/true, false);
+                }),
+                2.0f, false);
+            FTimerHandle ExitHandle;
+            World->GetTimerManager().SetTimer(
+                ExitHandle,
+                FTimerDelegate::CreateLambda([]() { FPlatformMisc::RequestExit(false); }),
+                4.5f, false);
+        }
+    }
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GMenuScreenCommand(
+    TEXT("RaftSim.MenuScreen"),
+    TEXT("Show a main-menu screen (main|career|settings) and optionally capture=<label> it, then exit."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleMenuScreenCommand));
