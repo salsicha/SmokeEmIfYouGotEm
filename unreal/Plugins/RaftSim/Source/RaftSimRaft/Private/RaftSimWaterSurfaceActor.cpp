@@ -53,6 +53,14 @@ static TAutoConsoleVariable<int32> CVarRaftSimFreezeCoreTopology(
     TEXT("of recreating the section on membership changes (A/B probe for ")
     TEXT("recreation-driven temporal-history pops)."));
 
+static TAutoConsoleVariable<float> CVarRaftSimPresentationStandingWaveScale(
+    TEXT("raftsim.PresentationStandingWaveScale"), -1.0f,
+    TEXT("Review override for the presentation standing-wave scale (-1 = use the river config)."));
+
+static TAutoConsoleVariable<int32> CVarRaftSimFlatWaterNormals(
+    TEXT("raftsim.FlatWaterNormals"), 0,
+    TEXT("Review bisect: 1 replaces the live water vertex normals with straight up."));
+
 static TAutoConsoleVariable<int32> CVarRaftSimLogLatticeEdgeRows(
     TEXT("raftsim.LogLatticeEdgeRows"), 0,
     TEXT("Log wet extents and coverage of the lattice rows at a corridor end (review probe)."));
@@ -1402,6 +1410,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         ? FMath::Clamp(
               RiverWaterConfig->LivePresentationStandingWaveScale, 0.0f, 1.0f)
         : 1.0f;
+    // Review override: raftsim.PresentationStandingWaveScale >= 0 forces the
+    // presentation (and coupled support) standing-wave scale for A/B captures
+    // of the channel-spanning bright bars (Pacuare 2026-09-02).
+    if (CVarRaftSimPresentationStandingWaveScale.GetValueOnGameThread() >= 0.0f)
+    {
+        ResolvedPresentationStandingWaveScale = FMath::Clamp(
+            CVarRaftSimPresentationStandingWaveScale.GetValueOnGameThread(), 0.0f, 1.0f);
+    }
     ResolvedPresentationHydraulicReliefScale = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(
               RiverWaterConfig->LivePresentationHydraulicReliefScale, 0.0f, 1.0f)
@@ -4088,6 +4104,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
 
             Vertices[Index].Z = SurfaceZCm;
+            // Review bisect: raftsim.FlatWaterNormals 1 discards the solved vertex
+            // normal so any remaining banding must come from the material.
+            if (CVarRaftSimFlatWaterNormals.GetValueOnGameThread() != 0)
+            {
+                NormalOut = FVector::UpVector;
+            }
             Normals[Index] = NormalOut;
             // R = foam, G = depth, B = flow speed (consumed by the photoreal
             // water material for whitewater, depth colour, and flow response).
