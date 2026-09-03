@@ -1516,7 +1516,8 @@ bool FRaftSimM5StartRescueCommand::Update()
                     TEXT("avatar %s uses a bounded CC0 helmet fit (scale %.4f)"),
                     *It->GetName(),
                     HelmetFitScale),
-                HelmetFitScale >= 0.90f && HelmetFitScale <= 1.02f);
+                // 1.02 for the crew skulls, 1.08 for the deeper guide skull.
+                HelmetFitScale >= 0.90f && HelmetFitScale <= 1.10f);
         }
         else if (Cast<ARaftSimMetaHumanCrewVisualActor>(It->GetProductionVisualActor()))
         {
