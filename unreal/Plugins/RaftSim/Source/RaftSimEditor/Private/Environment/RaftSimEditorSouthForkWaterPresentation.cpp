@@ -16,6 +16,7 @@
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTime.h"
 #include "Materials/MaterialExpressionVertexColor.h"
+#include "Materials/MaterialExpressionWorldPosition.h"
 #include "Materials/MaterialParameterCollection.h"
 
 namespace RaftSimEditorEnvironment
@@ -567,7 +568,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
 
     bool bHasTravelingWaveOffset = false;
     bool bHasTravelingWaveStrengthGate = false;
-    bool bHasSingleSurfaceTurbulence = false;
+    bool bHasRaftLocalGpuFluid = false;
     bool bHasLiveLevelSink = false;
     UMaterialExpression* TravelingWaveOffsetExpression = nullptr;
     for (UMaterialExpression* Expression :
@@ -586,9 +587,9 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             bHasTravelingWaveStrengthGate = true;
         }
         if (Expression &&
-            Expression->Desc == TEXT("RaftSimSingleSurfaceTurbulenceWPO"))
+            Expression->Desc == TEXT("RaftSimRaftLocalGpuFluidWPOV2"))
         {
-            bHasSingleSurfaceTurbulence = true;
+            bHasRaftLocalGpuFluid = true;
         }
         if (Expression &&
             Expression->Desc == TEXT("RaftSimLiveLevelSinkWPO"))
@@ -786,16 +787,14 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         }
     }
 
-    if (!bHasSingleSurfaceTurbulence)
+    if (!bHasRaftLocalGpuFluid)
     {
-        // Add genuine vertical shape to the same solver carrier that owns the
-        // shoreline, foam, and water samples. UV0 is authored in river
-        // station/lateral metres, while the shared displacement integral is
-        // advanced from the measured current. Subtracting that integral makes
-        // every crest packet travel with the water instead of sliding across
-        // it as an unrelated texture. Vertex colour supplies persistent
-        // solver foam, speed, and wet coverage, confining the larger boiling
-        // shapes to rapids and feathering them out at the organic shoreline.
+        // A bounded GPU heightfield deforms the SAME solver-owned carrier.
+        // UV0 is river station/lateral space and the displacement integral is
+        // measured from the local solver current, so the structure advects
+        // with a drifting raft. World position and raft centre confine the
+        // expensive multi-band field to a 100 m window. Vertex colour gates
+        // its sharp crests and recirculating boils to wet, aerated rapid water.
         Material->Modify();
         UMaterialParameterCollection* FlowCollection =
             LoadOrCreateRaftFoamOcclusionCollection(OutSummary);
@@ -821,30 +820,52 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             AddRaftWaterCollectionParameter(
                 Material, FlowCollection,
                 TEXT("RaftSimWaveClockSeconds"), true);
+        UMaterialExpressionCollectionParameter* RaftCenter =
+            AddRaftWaterCollectionParameter(
+                Material, FlowCollection,
+                TEXT("RaftFoamExclusionCenterAndHalfWidthCm"), false);
+        UMaterialExpressionWorldPosition* FluidWorldPosition =
+            NewObject<UMaterialExpressionWorldPosition>(Material);
+        Material->GetExpressionCollection().AddExpression(FluidWorldPosition);
         UMaterialExpressionScalarParameter* TurbulenceStrength =
             NewObject<UMaterialExpressionScalarParameter>(Material);
         TurbulenceStrength->ParameterName =
-            TEXT("SouthForkTurbulenceWPOStrength");
+            TEXT("RaftSimLocalFluidWPOStrength");
         TurbulenceStrength->DefaultValue = 0.0f;
-        TurbulenceStrength->Group = TEXT("RaftSimSouthForkWaterMotion");
+        TurbulenceStrength->Group = TEXT("RaftSimLocalFluid");
         Material->GetExpressionCollection().AddExpression(TurbulenceStrength);
+        UMaterialExpressionScalarParameter* FluidWindowMeters =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        FluidWindowMeters->ParameterName =
+            TEXT("RaftSimLocalFluidWindowMeters");
+        FluidWindowMeters->DefaultValue = 100.0f;
+        FluidWindowMeters->Group = TEXT("RaftSimLocalFluid");
+        Material->GetExpressionCollection().AddExpression(FluidWindowMeters);
 
         UMaterialExpressionCustom* Turbulence =
             NewObject<UMaterialExpressionCustom>(Material);
-        Turbulence->Desc = TEXT("RaftSimSingleSurfaceTurbulenceWPO");
+        Turbulence->Desc = TEXT("RaftSimRaftLocalGpuFluidWPOV2");
         Turbulence->Description = TEXT(
-            "Current-advected rolling crests and vertically boiling whitewater");
+            "Bounded current-driven GPU heightfield: sharp crest packets and recirculating boils");
         Turbulence->OutputType = CMOT_Float3;
         Turbulence->Code = TEXT(
             "float2 p = UV * 3.0 - FlowDisplacement.xy;\n"
-            "float rapid = saturate(max(Foam * 1.8, (Speed - 0.09) * 4.0)) * saturate(Wet);\n"
-            "float warp = sin(p.x * 0.29 - p.y * 0.61) + 0.55 * sin(p.x * 0.17 + p.y * 0.83 + 1.7);\n"
-            "float packet = pow(saturate(0.5 + 0.5 * sin(p.x * 0.27 + p.y * 0.49 + warp * 0.55)), 3.0);\n"
-            "float crestA = sin(p.x * 1.15 + p.y * 0.38 + warp * 0.75);\n"
-            "float crestB = sin(p.x * 0.71 - p.y * 1.43 - warp * 0.45);\n"
-            "float boilEnvelope = pow(saturate(0.5 + 0.5 * sin(p.x * 0.43 + p.y * 0.57 + warp)), 2.0);\n"
-            "float localPulse = 0.5 + 0.5 * sin(WaveClock * 2.1 + p.x * 0.88 - p.y * 0.93);\n"
-            "float displacementM = rapid * (0.075 * packet * crestA + 0.045 * crestB + 0.095 * boilEnvelope * (localPulse - 0.35));\n"
+            "float halfWindowCm = max(WindowMeters * 50.0, 1000.0);\n"
+            "float localWindow = 1.0 - smoothstep(halfWindowCm * 0.82, halfWindowCm, distance(WorldPosition.xy, RaftCenter.xy));\n"
+            "float rapid = saturate(max(Foam * 1.9, (Speed - 0.09) * 4.2)) * saturate(Wet) * localWindow;\n"
+            "float warpA = sin(p.x * 0.233 - p.y * 0.617 + 0.17 * sin(p.y * 0.19));\n"
+            "float warpB = sin(p.x * 0.149 + p.y * 0.823 + 1.73 + 0.23 * sin(p.x * 0.071));\n"
+            "float warp = warpA + 0.57 * warpB;\n"
+            "float packetA = pow(saturate(0.5 + 0.5 * sin(p.x * 0.271 + p.y * 0.487 + warp * 0.61)), 4.0);\n"
+            "float packetB = pow(saturate(0.5 + 0.5 * sin(p.x * 0.119 - p.y * 0.337 - warp * 0.43 + 2.1)), 3.0);\n"
+            "float phaseA = p.x * 1.11 + p.y * 0.37 + warp * 0.72;\n"
+            "float phaseB = p.x * 0.683 - p.y * 1.397 - warp * 0.48 + 0.31 * sin(p.x * 0.097);\n"
+            "float crestA = sin(phaseA) + 0.34 * sin(phaseA * 2.0 + 0.72) + 0.15 * sin(phaseA * 3.0 + 1.31);\n"
+            "float crestB = sin(phaseB) + 0.27 * sin(phaseB * 2.0 - 0.44);\n"
+            "float boilCell = pow(saturate(0.5 + 0.5 * sin(p.x * 0.421 + p.y * 0.563 + warp)), 2.4);\n"
+            "float recirculation = sin(WaveClock * 2.13 + p.x * 0.887 - p.y * 0.919 + warp * 0.7);\n"
+            "float splashPulse = pow(saturate(0.5 + 0.5 * sin(WaveClock * 3.71 + p.x * 1.73 + p.y * 1.19)), 6.0);\n"
+            "float displacementM = rapid * (0.115 * packetA * crestA + 0.070 * packetB * crestB + 0.105 * boilCell * recirculation + 0.075 * Foam * splashPulse);\n"
             "return float3(0.0, 0.0, displacementM * 100.0 * Strength);");
         const auto AddTurbulenceInput = [Turbulence](
             FName Name, UMaterialExpression* Expression, int32 OutputIndex = 0)
@@ -860,7 +881,10 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         AddTurbulenceInput(TEXT("Wet"), TurbulenceVertexColor, 4);
         AddTurbulenceInput(TEXT("FlowDisplacement"), FlowDisplacement);
         AddTurbulenceInput(TEXT("WaveClock"), WaveClock);
+        AddTurbulenceInput(TEXT("RaftCenter"), RaftCenter);
+        AddTurbulenceInput(TEXT("WorldPosition"), FluidWorldPosition);
         AddTurbulenceInput(TEXT("Strength"), TurbulenceStrength);
+        AddTurbulenceInput(TEXT("WindowMeters"), FluidWindowMeters);
         Material->GetExpressionCollection().AddExpression(Turbulence);
 
         if (UMaterialEditorOnlyData* WpoEditorData = Material->GetEditorOnlyData())
@@ -1234,6 +1258,57 @@ static FAutoConsoleCommand GRefreshSouthForkFoamOcclusionMaterialsCommand(
     TEXT("Refresh the South Fork water, foam, raft-floor, and exclusion materials."),
     FConsoleCommandWithArgsDelegate::CreateStatic(
         &HandleRefreshSouthForkFoamOcclusionMaterials));
+
+static void HandleRefreshAllRiverFluidMaterials(const TArray<FString>&)
+{
+    FString Summary;
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim all-river fluid material refresh: loading source water"));
+    UMaterialInterface* SourceWater = LoadObject<UMaterialInterface>(
+        nullptr,
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater."
+             "M_RaftSim_PhotorealRiverWater"));
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim all-river fluid material refresh: rebuilding shared parent"));
+    const bool bSharedParentReady = SourceWater &&
+        LoadSouthForkProductionWaterPresentation(SourceWater, Summary);
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim all-river fluid material refresh: rebuilding river instances"));
+    const bool bPacuareReady =
+        LoadOrCreatePacuareUpperHuacasLiveWaterInstance(Summary) != nullptr;
+    const bool bFutaleufuReady =
+        LoadOrCreateFutaleufuTerminatorLiveWaterInstance(Summary) != nullptr;
+    const bool bChilkoReady =
+        LoadOrCreateChilkoLavaCanyonLiveWaterInstance(Summary) != nullptr;
+    const bool bColoradoReady =
+        LoadOrCreateColoradoHanceLiveWaterInstance(Summary) != nullptr;
+    const bool bZambeziReady =
+        LoadOrCreateZambeziBatokaLiveWaterV2Instance(Summary) != nullptr;
+    UE_LOG(
+        LogRaftSimEditorEnvironment,
+        Display,
+        TEXT("RaftSim all-river fluid material refresh parent=%d pacuare=%d "
+             "futaleufu=%d chilko=%d colorado=%d zambezi=%d\n%s"),
+        bSharedParentReady ? 1 : 0,
+        bPacuareReady ? 1 : 0,
+        bFutaleufuReady ? 1 : 0,
+        bChilkoReady ? 1 : 0,
+        bColoradoReady ? 1 : 0,
+        bZambeziReady ? 1 : 0,
+        *Summary);
+}
+
+static FAutoConsoleCommand GRefreshAllRiverFluidMaterialsCommand(
+    TEXT("RaftSim.RefreshAllRiverFluidMaterials"),
+    TEXT("Refresh the shared bounded GPU fluid parent and every river-local instance."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandleRefreshAllRiverFluidMaterials));
 
 static void HandleRefreshSolverCurrentFoamMaterial(
     const TArray<FString>& Arguments)

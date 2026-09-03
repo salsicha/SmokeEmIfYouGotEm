@@ -535,11 +535,11 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     float VertexSpacingMeters = 3.0f;
 
-    /** Render-only subdivision applied to authored production-river windows.
-     * Two resolves the bounded short-wave bands that cannot be represented by
-     * the three-metre analysis grid. The adapter remains authoritative. */
+    /** Legacy render subdivision fallback. River configs now request up to
+     * six subdivisions (0.5 m) for bounded rapid windows while retaining the
+     * three-metre neighbourhood used for hydraulic feature analysis. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Presentation",
-        meta = (ClampMin = "1", ClampMax = "2"))
+        meta = (ClampMin = "1", ClampMax = "6"))
     int32 RiverPresentationSubdivision = 2;
 
     /** Surface refresh interval (s); physics remains fixed-step while this
@@ -797,6 +797,8 @@ private:
     float ResolvedPresentationSurfaceSmoothingStrength = 0.0f;
     float ResolvedPresentationStandingWaveScale = 1.0f;
     float ResolvedPresentationHydraulicReliefScale = 1.0f;
+    float ResolvedRaftLocalFluidWindowMeters = 100.0f;
+    float ResolvedRaftLocalFluidHeightfieldStrength = 0.0f;
     float ResolvedRapidFoamFocusStart = 0.12f;
     float ResolvedRapidFoamFocusEnd = 0.72f;
     float ResolvedRapidFoamCoverageGain = 1.0f;

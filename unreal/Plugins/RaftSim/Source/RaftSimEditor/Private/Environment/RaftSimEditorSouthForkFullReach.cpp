@@ -3115,11 +3115,17 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     WaterConfig->bEnableLiveSolverVolumeCore = true;
     WaterConfig->bEnableLivePresentationSurfaceSmoothing = true;
     WaterConfig->LivePresentationSurfaceSmoothingStrength = 1.0f;
-    // The generic coupled standing-wave field is an infinite sine train in
-    // river station and reads as white cross-channel stripes on this reach.
-    // South Fork keeps only measured solver relief and localized wake/crest
-    // geometry, so the raft still follows every visible physical feature.
-    WaterConfig->LivePresentationStandingWaveScale = 0.0f;
+    // The coupled field is phase-warped and packeted rather than an infinite
+    // transverse sine train; keep it active so the visible crest geometry and
+    // rigid raft support share the same large-scale wave shape.
+    WaterConfig->LivePresentationStandingWaveScale = 0.82f;
+    WaterConfig->bEnableLiveRapidSurfaceRefinement = true;
+    WaterConfig->LiveRapidSurfaceSubdivision = 6;
+    WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
+    WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
+    WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimHalfMeterRapidCarrierV1"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimRaftLocalGpuFluidV2"));
     SetSpatiallyLoadedIfAllowed(WaterConfig, false);
 
     const FRotator StartRotation = StartTangent.Rotation();

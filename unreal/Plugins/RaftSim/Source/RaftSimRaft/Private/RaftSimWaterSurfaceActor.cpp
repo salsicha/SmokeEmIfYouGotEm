@@ -1200,8 +1200,11 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             bUsesMigratedLiveVolumeCore ||
             bUsesSouthForkFullReachSingleSurface) &&
         LiveVolumeCoreMaterial != nullptr;
-    bSingleLiveWaterSurfaceEnabled =
-        bUsesSouthForkFullReachSingleSurface && bLiveVolumeCoreEnabled;
+    // Every production river with a solver-clipped optical core now renders
+    // that core as its one water surface. The former low-opacity Default Lit
+    // skin duplicated normals/reflections and was especially visible while a
+    // moving window crossed the shoreline.
+    bSingleLiveWaterSurfaceEnabled = bLiveVolumeCoreEnabled;
     UE_LOG(LogTemp, Display,
         TEXT("RaftSim water surface mode: carrier=%d volumeCore=%d "
              "singleSurface=%d coreMaterial=%s"),
@@ -1404,9 +1407,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     // ridges become bright bars spanning the channel. The cooked solver
     // surface, hydraulic relief, boulder wakes, and breaking sites continue
     // to provide actual crest geometry and matching raft support.
-    ResolvedPresentationStandingWaveScale = bSingleLiveWaterSurfaceEnabled
-        ? 0.0f
-        : bLiveSurfaceCarrierEnabled
+    ResolvedPresentationStandingWaveScale = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(
               RiverWaterConfig->LivePresentationStandingWaveScale, 0.0f, 1.0f)
         : 1.0f;
@@ -1422,6 +1423,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         ? FMath::Clamp(
               RiverWaterConfig->LivePresentationHydraulicReliefScale, 0.0f, 1.0f)
         : 1.0f;
+    ResolvedRaftLocalFluidWindowMeters = RiverWaterConfig
+        ? FMath::Clamp(
+              RiverWaterConfig->LiveRaftLocalFluidWindowMeters, 20.0f, 200.0f)
+        : 100.0f;
+    ResolvedRaftLocalFluidHeightfieldStrength =
+        RiverWaterConfig &&
+            RiverWaterConfig->bEnableLiveRaftLocalFluidHeightfield
+        ? FMath::Clamp(
+              RiverWaterConfig->LiveRaftLocalFluidHeightfieldStrength,
+              0.0f,
+              1.0f)
+        : 0.0f;
     ResolvedRapidFoamFocusStart = bLiveSurfaceCarrierEnabled
         ? FMath::Clamp(RiverWaterConfig->LiveRapidFoamFocusStart, 0.0f, 0.95f)
         : 0.12f;
@@ -1466,6 +1479,11 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             ResolvedPresentationSurfaceSmoothingStrength,
             ResolvedPresentationStandingWaveScale,
             ResolvedPresentationHydraulicReliefScale);
+        WaterAdapter->ConfigureRaftSupportLocalFluid(
+            bSingleLiveWaterSurfaceEnabled &&
+                ResolvedRaftLocalFluidHeightfieldStrength > 0.0f,
+            ResolvedRaftLocalFluidHeightfieldStrength,
+            FoamTextureAdvectionMeters);
         // Legacy detail-overlay maps render the AUTHORED band water (baked
         // sculpt + band-gated WPO), which the live solver cannot reconstruct.
         // Mirror it into rigid support from the cooked band field the editor
@@ -1553,8 +1571,22 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     // the legacy straight-coordinate South Fork reach. Keep config-less test
     // tanks on the original three-metre mesh while refining production river
     // presentation independently of the adapter coordinate representation.
+    // A bounded rapid window can afford the 0.5 m lattice required for a
+    // crest to span several vertices. Do not multiply a many-kilometre
+    // full-reach carrier: it keeps its existing far-field density and the
+    // raft-local GPU layer supplies sub-grid motion around the camera.
+    const bool bBoundedRapidPresentation =
+        (bUsesCurvedRiverCoordinates
+             ? CurvedGridLengthMeters
+             : GridSizeMeters) <= 600.0f;
+    const int32 ConfiguredRapidSubdivision =
+        RiverWaterConfig &&
+            RiverWaterConfig->bEnableLiveRapidSurfaceRefinement &&
+            bBoundedRapidPresentation
+        ? RiverWaterConfig->LiveRapidSurfaceSubdivision
+        : RiverPresentationSubdivision;
     const int32 ResolvedSubdivision = bUsesAuthoredRiverPresentation
-        ? FMath::Clamp(RiverPresentationSubdivision, 1, 2)
+        ? FMath::Clamp(ConfiguredRapidSubdivision, 1, 6)
         : 1;
     ResolvedVertexSpacingMeters =
         VertexSpacingMeters / static_cast<float>(ResolvedSubdivision);
@@ -1807,8 +1839,16 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     // visible chop. 0.30 gives ~±5 cm of foam-gated chop;
                     // the raft's render-vs-support mismatch stays inside
                     // the tube draft.
+                    // Disable the retired unbounded field and enable the
+                    // V2 raft-local GPU heightfield on this same carrier.
                     VolumeMaterial->SetScalarParameterValue(
-                        TEXT("SouthForkTurbulenceWPOStrength"), 0.30f);
+                        TEXT("SouthForkTurbulenceWPOStrength"), 0.0f);
+                    VolumeMaterial->SetScalarParameterValue(
+                        TEXT("RaftSimLocalFluidWPOStrength"),
+                        ResolvedRaftLocalFluidHeightfieldStrength);
+                    VolumeMaterial->SetScalarParameterValue(
+                        TEXT("RaftSimLocalFluidWindowMeters"),
+                        ResolvedRaftLocalFluidWindowMeters);
                     // Entrained-air milk must come from breaking foam, not
                     // raw speed: a fast glassy tongue stays optically green.
                     // The parent's larger default speed fraction predates the
@@ -2888,7 +2928,7 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedGridPlanarGeometry()
         for (int32 StationIndex = 0; StationIndex < GridStationN; ++StationIndex)
         {
             const int32 Index = LateralIndex * GridStationN + StationIndex;
-            FVector WorldPosition;
+            FVector WorldPosition = FVector::ZeroVector;
             const bool bMapped = WaterAdapter && WaterAdapter->RiverToWorldPosition(
                 RiverCoordinatesM[Index], WaterAdapter->GetRiverVerticalDatumM(),
                 WorldPosition);
@@ -6759,6 +6799,11 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
     {
         WaterAdapter->SetPresentationWaveClockSeconds(
             PresentationWaveClockSeconds);
+        WaterAdapter->ConfigureRaftSupportLocalFluid(
+            bSingleLiveWaterSurfaceEnabled &&
+                ResolvedRaftLocalFluidHeightfieldStrength > 0.0f,
+            ResolvedRaftLocalFluidHeightfieldStrength,
+            FoamTextureAdvectionMeters);
     }
     SampleBoatWakeState();
     const float WakeEnvelopeTarget =

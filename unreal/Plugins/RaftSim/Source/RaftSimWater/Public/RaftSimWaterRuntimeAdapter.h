@@ -298,6 +298,19 @@ public:
         float StandingWaveScale,
         float HydraulicReliefScale);
 
+    /** Mirror the raft-local GPU heightfield into ridden support. The shader
+     * still owns sub-grid rendering, but this analytic twin prevents the raft
+     * from passing through a visible crest. */
+    void ConfigureRaftSupportLocalFluid(
+        bool bEnabled,
+        float Strength,
+        FVector2D AdvectedDistanceMeters)
+    {
+        bRaftSupportLocalFluidEnabled = bEnabled;
+        RaftSupportLocalFluidStrength = FMath::Clamp(Strength, 0.0f, 1.0f);
+        RaftSupportLocalFluidAdvectionMeters = AdvectedDistanceMeters;
+    }
+
     /** One breaking-water site mirrored from the presentation surface. */
     struct FSupportBreakingSite
     {
@@ -445,6 +458,14 @@ public:
         float SpeedMetersPerSecond,
         float DepthMeters);
 
+    static float ComputeCoupledLocalFluidHeightfieldMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        const FVector2D& AdvectedDistanceMeters,
+        float SpeedMetersPerSecond,
+        float DepthMeters,
+        float WaveClockSeconds,
+        float Strength);
+
     static float ComputeCoupledHydraulicReliefMeters(
         float CenterSurfaceHeightMeters,
         float UpstreamFarSurfaceHeightMeters,
@@ -549,6 +570,9 @@ private:
     float RaftSupportSurfaceSmoothingStrength = 0.0f;
     float RaftSupportStandingWaveScale = 0.0f;
     float RaftSupportHydraulicReliefScale = 0.0f;
+    bool bRaftSupportLocalFluidEnabled = false;
+    float RaftSupportLocalFluidStrength = 0.0f;
+    FVector2D RaftSupportLocalFluidAdvectionMeters = FVector2D::ZeroVector;
     TArray<FSupportBreakingSite> RaftSupportBreakingSites;
     TArray<FSupportBoulderFootprint> RaftSupportBoulderFootprints;
     float RaftSupportBreakingCrestLiftMeters = 0.0f;

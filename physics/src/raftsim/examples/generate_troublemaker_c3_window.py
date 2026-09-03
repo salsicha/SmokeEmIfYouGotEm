@@ -12,6 +12,7 @@ import argparse
 from pathlib import Path
 
 from raftsim.troublemaker_c3_window import (
+    TroublemakerWindowParameters,
     SCENARIO_ROOT_RELATIVE,
     run_troublemaker_behavioral_validation,
     write_troublemaker_scenario_packages,
@@ -33,10 +34,16 @@ def main() -> None:
         help="Uncommitted solver run directory (default: physics/outputs/troublemaker_c3_window).",
     )
     parser.add_argument("--steps", type=int, default=4800, help="Solver steps per band (fixed_dt 0.05 s).")
+    parser.add_argument(
+        "--cell-size-m", type=float, default=0.5,
+        help="Named-rapid hydraulic cell size (default: 0.5 m).",
+    )
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[4]
-    manifest = write_troublemaker_scenario_packages(repo_root)
+    manifest = write_troublemaker_scenario_packages(
+        repo_root, TroublemakerWindowParameters(cell_size_m=args.cell_size_m)
+    )
     print(f"wrote={SCENARIO_ROOT_RELATIVE}/window_manifest.json")
     for band_id, entry in manifest["flow_band_packages"].items():
         print(
