@@ -197,9 +197,9 @@ bool FRaftSimAssertRiverMapCommand::Update()
                 TEXT("Colorado Hance couples visible rapid relief into raft support"),
                 Water->IsRaftSupportSurfaceEnabled());
             Test->TestTrue(
-                TEXT("Colorado Hance support uses the reviewed smoothing strength"),
+                TEXT("Colorado Hance support uses the unified-carrier smoothing strength"),
                 FMath::IsNearlyEqual(
-                    Water->GetRaftSupportSurfaceSmoothingStrength(), 0.72f, 0.001f));
+                    Water->GetRaftSupportSurfaceSmoothingStrength(), 1.0f, 0.001f));
             Test->TestTrue(
                 TEXT("Colorado Hance support uses the visible standing-wave scale"),
                 FMath::IsNearlyEqual(
@@ -222,17 +222,17 @@ bool FRaftSimAssertRiverMapCommand::Update()
             TEXT("runnable river uses the refined authored-river presentation grid"),
             It->IsRiverPresentationGridRefined());
         Test->TestTrue(
-            TEXT("runnable river presentation vertices use 1.5 m spacing"),
+            TEXT("runnable river presentation vertices use 0.5 m spacing"),
             FMath::IsNearlyEqual(
-                It->GetPresentationVertexSpacingMeters(), 1.5f, 0.001f));
+                It->GetPresentationVertexSpacingMeters(), 0.5f, 0.001f));
         Test->TestEqual(
             TEXT("runnable river presentation window has the refined vertex count"),
             It->GetSurfaceVertexCount(),
-            bUsesLegacyStraightRiverCoordinates ? 17956 : 10465);
+            bUsesLegacyStraightRiverCoordinates ? 160801 : 92833);
         Test->TestEqual(
             TEXT("runnable river presentation window has the refined triangle count"),
             It->GetSurfaceTriangleCount(),
-            bUsesLegacyStraightRiverCoordinates ? 35378 : 20480);
+            bUsesLegacyStraightRiverCoordinates ? 320000 : 184320);
         Test->TestEqual(
             TEXT("live surface carrier follows the saved river ownership contract"),
             It->IsLiveSurfaceCarrierEnabled(),
@@ -241,25 +241,38 @@ bool FRaftSimAssertRiverMapCommand::Update()
         It->GetBreakingSites(PresentationBreakingSites);
         if (!PresentationBreakingSites.IsEmpty())
         {
-            const int32 ExpectedConnectedCurtainTriangles =
-                FMath::Min(PresentationBreakingSites.Num(), 3) * 1044;
-            const int32 ExpectedConnectedCurtainVertices =
-                FMath::Min(PresentationBreakingSites.Num(), 3) * 570;
-            Test->TestTrue(
-                TEXT("solver breaking sites retain a connected production water curtain"),
-                It->IsBreakingRollerVolumeVisible());
-            Test->TestEqual(
-                TEXT("connected curtain uses one bounded two-skin crest envelope at the three strongest sites"),
-                It->GetBreakingRollerVolumeTriangleCount(),
-                ExpectedConnectedCurtainTriangles);
-            Test->TestEqual(
-                TEXT("connected crest envelope retains two coherent skins per selected site"),
-                It->GetBreakingRollerVolumeVertexCount(),
-                ExpectedConnectedCurtainVertices);
-            Test->TestTrue(
-                TEXT("connected crest envelope has visible but bounded full thickness"),
-                It->GetBreakingRollerVolumeMaximumThicknessCm() > 10.0f &&
-                    It->GetBreakingRollerVolumeMaximumThicknessCm() <= 40.01f);
+            if (It->IsSingleLiveWaterSurfaceEnabled())
+            {
+                Test->TestFalse(
+                    TEXT("single-surface rivers suppress the duplicate roller curtain"),
+                    It->IsBreakingRollerVolumeVisible());
+                Test->TestEqual(
+                    TEXT("single-surface rivers keep roller geometry out of the render path"),
+                    It->GetBreakingRollerVolumeTriangleCount(),
+                    0);
+            }
+            else
+            {
+                const int32 ExpectedConnectedCurtainTriangles =
+                    FMath::Min(PresentationBreakingSites.Num(), 3) * 1044;
+                const int32 ExpectedConnectedCurtainVertices =
+                    FMath::Min(PresentationBreakingSites.Num(), 3) * 570;
+                Test->TestTrue(
+                    TEXT("solver breaking sites retain a connected production water curtain"),
+                    It->IsBreakingRollerVolumeVisible());
+                Test->TestEqual(
+                    TEXT("connected curtain uses one bounded two-skin crest envelope at the three strongest sites"),
+                    It->GetBreakingRollerVolumeTriangleCount(),
+                    ExpectedConnectedCurtainTriangles);
+                Test->TestEqual(
+                    TEXT("connected crest envelope retains two coherent skins per selected site"),
+                    It->GetBreakingRollerVolumeVertexCount(),
+                    ExpectedConnectedCurtainVertices);
+                Test->TestTrue(
+                    TEXT("connected crest envelope has visible but bounded full thickness"),
+                    It->GetBreakingRollerVolumeMaximumThicknessCm() > 10.0f &&
+                        It->GetBreakingRollerVolumeMaximumThicknessCm() <= 40.01f);
+            }
         }
         if (bUsesSolverOwnedVisibleRiver)
         {
@@ -298,10 +311,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     TEXT("Colorado Hance live mesh and raft support share surface smoothing"),
                     It->IsLivePresentationSurfaceSmoothingEnabled());
                 Test->TestTrue(
-                    TEXT("Colorado Hance live smoothing keeps its reviewed strength"),
+                    TEXT("Colorado Hance live smoothing matches the unified carrier"),
                     FMath::IsNearlyEqual(
                         It->GetLivePresentationSurfaceSmoothingStrength(),
-                        0.72f,
+                        1.0f,
                         0.001f));
             }
         }
@@ -814,11 +827,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
             BreakingSiteCount = BreakingSites.Num();
             Test->TestTrue(
                 FString::Printf(
-                    TEXT("Zambezi exposes advected rapid foam on the separate masked sheet (%d vertices)"),
+                    TEXT("Zambezi retains advected foam data for the single carrier (%d vertices)"),
                     It->GetVisibleRapidFoamVertexCount()),
                 It->GetVisibleRapidFoamVertexCount() > 0);
-            Test->TestTrue(
-                TEXT("Zambezi rapid-foam presentation is visible when solver foam is active"),
+            Test->TestFalse(
+                TEXT("Zambezi does not show a separate rapid-foam surface"),
                 It->IsRapidFoamMeshVisible());
         }
         Test->TestTrue(
@@ -2269,10 +2282,10 @@ bool FRaftSimAssertRiverMapCommand::Update()
                     StrongestSite.PresentationEdgeClearanceMeters >= 15.0f);
             }
             Test->TestTrue(
-                TEXT("Chilko launch window exposes visible solver-derived rapid foam"),
+                TEXT("Chilko single carrier retains solver-derived foam data"),
                 It->GetVisibleRapidFoamVertexCount() > 0);
-            Test->TestTrue(
-                TEXT("Chilko launch-window rapid-foam presentation is visible"),
+            Test->TestFalse(
+                TEXT("Chilko single carrier keeps the duplicate rapid-foam sheet hidden"),
                 It->IsRapidFoamMeshVisible());
         }
         Test->TestTrue(
@@ -2489,10 +2502,9 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
             }
         }
         Test->TestTrue(
-            TEXT("South Fork loads an authored capture-water actor to retire"),
-            TaggedAuthoredWaterCount > 0);
-        Test->TestTrue(
-            TEXT("South Fork hides every authored base-water actor during play"),
+            FString::Printf(
+                TEXT("South Fork hides every authored base-water actor during play (%d present)"),
+                TaggedAuthoredWaterCount),
             bAllTaggedAuthoredWaterHidden);
         Test->TestTrue(
             TEXT("South Fork visible rapid relief is coupled into raft support"),

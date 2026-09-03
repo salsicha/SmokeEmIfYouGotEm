@@ -194,6 +194,36 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LivePresentationHydraulicReliefScale = 1.0f;
 
+    /** Use the fine presentation lattice on bounded named-rapid windows. The
+     * solver remains authoritative; this only gives coupled crests, boulder
+     * wakes, and the raft-local GPU heightfield enough vertices to form a
+     * three-dimensional surface instead of one-cell ramps. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveRapidSurfaceRefinement = true;
+
+    /** Subdivision of the three-metre analysis lattice in bounded rapid
+     * windows. Six produces 0.5 m presentation cells. Full-reach carriers
+     * retain their coarse far field and use the raft-local shader layer. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "1", ClampMax = "6"))
+    int32 LiveRapidSurfaceSubdivision = 6;
+
+    /** Enables the current-driven GPU heightfield on the existing live water
+     * carrier. It never creates a second mesh or changes wet/dry, collision,
+     * buoyancy, or solver state. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveRaftLocalFluidHeightfield = true;
+
+    /** Diameter of the raft-centred GPU fluid window. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "20.0", ClampMax = "200.0"))
+    float LiveRaftLocalFluidWindowMeters = 100.0f;
+
+    /** Vertical strength of the foam- and Froude-gated GPU crest/boil field. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
+        meta = (ClampMin = "0.0", ClampMax = "1.0"))
+    float LiveRaftLocalFluidHeightfieldStrength = 0.65f;
+
     /** Solver-foam focus remap for the separate masked lace sheet. */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation",
         meta = (ClampMin = "0.0", ClampMax = "0.95"))

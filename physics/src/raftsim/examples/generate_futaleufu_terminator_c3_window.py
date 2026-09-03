@@ -12,6 +12,7 @@ import argparse
 from pathlib import Path
 
 from raftsim.futaleufu_terminator_c3_window import (
+    TerminatorWindowParameters,
     SCENARIO_ROOT_RELATIVE,
     run_terminator_behavioral_validation,
     write_terminator_scenario_packages,
@@ -45,7 +46,13 @@ def main() -> None:
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[4]
-    manifest = write_terminator_scenario_packages(repo_root)
+    manifest = write_terminator_scenario_packages(
+        repo_root, TerminatorWindowParameters(cell_size_m=args.cell_size_m)
+    )
+    parser.add_argument(
+        "--cell-size-m", type=float, default=0.5,
+        help="Named-rapid hydraulic cell size (default: 0.5 m).",
+    )
     print(f"wrote={SCENARIO_ROOT_RELATIVE}/window_manifest.json")
     for band_id, entry in manifest["flow_band_packages"].items():
         print(

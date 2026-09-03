@@ -179,6 +179,9 @@ class CookedBandResult:
     scenario_input_hashes: dict[str, str]
     discharge_target_m3s: float
     discharge_target_cfs: float | None = None
+    shock_limiter_diagnostics: dict[str, float | int | str] = field(
+        default_factory=dict
+    )
 
 
 def sha256_of_file(path: Path) -> str:
@@ -219,6 +222,95 @@ def _convergence_windows(
             )
         )
     return tuple(windows)
+
+
+def apply_monotone_surface_shock_limiter(
+    arrays: dict[str, np.ndarray],
+    *,
+    maximum_isolated_excursion_m: float = 0.18,
+    maximum_neighbour_spread_m: float = 0.14,
+) -> tuple[dict[str, np.ndarray], dict[str, float | int | str]]:
+    """Remove only unsupported one-cell free-surface pits/spikes.
+
+    Genuine hydraulic jumps have a resolved gradient across their neighbours;
+    a cooked shock pit instead disagrees with a mutually consistent four-cell
+    ring.  The limiter therefore touches an interior wet cell only when all
+    four axial neighbours are wet and their surface elevations form a narrow
+    bracket.  It clips the centre to that bracket plus a bounded excursion and
+    preserves cell discharge by rescaling depth-averaged velocity.
+
+    This is shared by every authored river cooker.  It is deliberately a
+    reconstruction limiter rather than a blur: beds, banks, dry topology, and
+    multi-cell drops are unchanged.
+    """
+    required = {"h", "u", "v", "bed", "wet_mask"}
+    missing = required.difference(arrays)
+    if missing:
+        raise ValueError(f"shock limiter missing cooked arrays: {sorted(missing)}")
+
+    h = np.asarray(arrays["h"], dtype=np.float64)
+    bed = np.asarray(arrays["bed"], dtype=np.float64)
+    wet = np.asarray(arrays["wet_mask"], dtype=bool)
+    if h.shape != bed.shape or wet.shape != h.shape or h.ndim != 2:
+        raise ValueError("shock limiter expects equally shaped 2-D cooked fields")
+
+    eta = bed + h
+    north = eta[:-2, 1:-1]
+    south = eta[2:, 1:-1]
+    west = eta[1:-1, :-2]
+    east = eta[1:-1, 2:]
+    ring = np.stack((north, south, west, east), axis=0)
+    ring_min = np.min(ring, axis=0)
+    ring_max = np.max(ring, axis=0)
+    ring_median = np.median(ring, axis=0)
+    centre = eta[1:-1, 1:-1]
+    ring_is_wet = (
+        wet[:-2, 1:-1]
+        & wet[2:, 1:-1]
+        & wet[1:-1, :-2]
+        & wet[1:-1, 2:]
+    )
+    isolated = (
+        wet[1:-1, 1:-1]
+        & ring_is_wet
+        & ((ring_max - ring_min) <= maximum_neighbour_spread_m)
+        & (np.abs(centre - ring_median) > maximum_isolated_excursion_m)
+    )
+
+    limited_eta = eta.copy()
+    clipped_centre = ring_median + np.clip(
+        centre - ring_median,
+        -maximum_isolated_excursion_m,
+        maximum_isolated_excursion_m,
+    )
+    limited_eta[1:-1, 1:-1][isolated] = clipped_centre[isolated]
+    limited_h = np.maximum(limited_eta - bed, 0.0)
+
+    old_u = np.asarray(arrays["u"], dtype=np.float64)
+    old_v = np.asarray(arrays["v"], dtype=np.float64)
+    depth_ratio = np.ones_like(h)
+    changed = np.zeros_like(wet)
+    changed[1:-1, 1:-1] = isolated
+    safe_changed = changed & (limited_h > 1.0e-4)
+    depth_ratio[safe_changed] = h[safe_changed] / limited_h[safe_changed]
+    limited_u = np.where(safe_changed, old_u * depth_ratio, old_u)
+    limited_v = np.where(safe_changed, old_v * depth_ratio, old_v)
+    correction = limited_eta - eta
+
+    limited = dict(arrays)
+    limited["h"] = np.ascontiguousarray(limited_h, dtype=np.float32)
+    limited["u"] = np.ascontiguousarray(limited_u, dtype=np.float32)
+    limited["v"] = np.ascontiguousarray(limited_v, dtype=np.float32)
+    limited["bed"] = np.ascontiguousarray(bed, dtype=np.float32)
+    limited["wet_mask"] = np.ascontiguousarray(wet, dtype=np.uint8)
+    diagnostics: dict[str, float | int | str] = {
+        "method": "four_neighbour_monotone_free_surface_v1",
+        "limited_cell_count": int(np.count_nonzero(changed)),
+        "maximum_absolute_correction_m": float(np.max(np.abs(correction))),
+        "maximum_isolated_excursion_m": float(maximum_isolated_excursion_m),
+        "maximum_neighbour_spread_m": float(maximum_neighbour_spread_m),
+    }
+    return limited, diagnostics
 
 
 def _is_converged(windows: tuple[ConvergenceWindow, ...], thresholds: ConvergenceThresholds) -> bool:
@@ -262,13 +354,16 @@ def _band_result_from_run(
     converged = _is_converged(windows, config.thresholds)
 
     final = frame_fields[-1]
-    arrays = {
+    raw_arrays = {
         "h": np.ascontiguousarray(final["h"], dtype=np.float32),
         "u": np.ascontiguousarray(final["u"], dtype=np.float32),
         "v": np.ascontiguousarray(final["v"], dtype=np.float32),
         "bed": np.ascontiguousarray(scenario.bed, dtype=np.float32),
         "wet_mask": np.ascontiguousarray(final["wet"], dtype=np.uint8),
     }
+    arrays, shock_limiter_diagnostics = apply_monotone_surface_shock_limiter(
+        raw_arrays
+    )
     scenario_input_hashes = {
         name: sha256_of_file(scenario_input_dir / name)
         for name in ("scenario.json", "bed.npy", "initial_state.npz")
@@ -283,6 +378,7 @@ def _band_result_from_run(
         scenario_input_hashes=scenario_input_hashes,
         discharge_target_m3s=discharge_target_m3s,
         discharge_target_cfs=discharge_target_cfs,
+        shock_limiter_diagnostics=shock_limiter_diagnostics,
     )
 
 
@@ -406,6 +502,7 @@ def _band_manifest_entry(
         "effective_manning_n": scenario.roughness * config.roughness_scale,
         "arrays": array_entries,
         "field_stats": _field_stats(result.arrays),
+        "surface_shock_limiter": result.shock_limiter_diagnostics,
         "scenario_input_sha256": result.scenario_input_hashes,
         "convergence": {
             "converged": result.converged,

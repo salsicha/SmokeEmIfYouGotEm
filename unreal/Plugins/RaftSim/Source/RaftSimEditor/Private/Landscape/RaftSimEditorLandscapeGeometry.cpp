@@ -2225,6 +2225,16 @@ bool AddLandscapeCandidateRunnableGameplay(
         WaterConfig->Tags.AddUnique(TEXT("RaftSimSolverMaskedFoamLace"));
         WaterConfig->Tags.AddUnique(TEXT("RaftSimNoSolverStateMutation"));
     }
+    // Shared rapid-water contract for every physical river: a half-metre
+    // bounded carrier plus a 100 m raft-local GPU heightfield. Both deform the
+    // solver-owned surface; neither adds another water sheet.
+    WaterConfig->bEnableLiveRapidSurfaceRefinement = true;
+    WaterConfig->LiveRapidSurfaceSubdivision = 6;
+    WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
+    WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
+    WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimHalfMeterRapidCarrierV1"));
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimRaftLocalGpuFluidV2"));
     WaterConfig->Tags.AddUnique(RunTag);
     WaterConfig->Tags.AddUnique(TEXT("RaftSimProceduralRuntimeWater"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimGlobalRiverStationAuthority"));

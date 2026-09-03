@@ -326,6 +326,76 @@ FRaftSimWaterStandingWave URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWav
     return Result;
 }
 
+float URaftSimWaterRuntimeAdapter::ComputeCoupledLocalFluidHeightfieldMeters(
+    const FVector2D& RiverCoordinatesMeters,
+    const FVector2D& AdvectedDistanceMeters,
+    float SpeedMetersPerSecond,
+    float DepthMeters,
+    float WaveClockSeconds,
+    float Strength)
+{
+    const float SafeSpeed = FMath::Max(SpeedMetersPerSecond, 0.0f);
+    const float SafeDepth = FMath::Max(DepthMeters, 0.05f);
+    const float Froude =
+        SafeSpeed / FMath::Sqrt(kCoupledSurfaceGravity * SafeDepth);
+    const float Foam = FMath::Clamp(
+        (Froude - kCoupledFoamFroudeStart) / kCoupledFoamFroudeRange,
+        0.0f,
+        1.0f);
+    const float SpeedNorm = FMath::Clamp(SafeSpeed / 8.0f, 0.0f, 1.0f);
+    const float Rapid = FMath::Clamp(
+        FMath::Max(Foam * 1.9f, (SpeedNorm - 0.09f) * 4.2f),
+        0.0f,
+        1.0f);
+    if (Rapid <= KINDA_SMALL_NUMBER || Strength <= KINDA_SMALL_NUMBER)
+    {
+        return 0.0f;
+    }
+
+    const FVector2D P = RiverCoordinatesMeters - AdvectedDistanceMeters;
+    const float WarpA = FMath::Sin(
+        P.X * 0.233f - P.Y * 0.617f +
+        0.17f * FMath::Sin(P.Y * 0.19f));
+    const float WarpB = FMath::Sin(
+        P.X * 0.149f + P.Y * 0.823f + 1.73f +
+        0.23f * FMath::Sin(P.X * 0.071f));
+    const float Warp = WarpA + 0.57f * WarpB;
+    const float PacketA = FMath::Pow(FMath::Clamp(
+        0.5f + 0.5f * FMath::Sin(
+            P.X * 0.271f + P.Y * 0.487f + Warp * 0.61f),
+        0.0f, 1.0f), 4.0f);
+    const float PacketB = FMath::Pow(FMath::Clamp(
+        0.5f + 0.5f * FMath::Sin(
+            P.X * 0.119f - P.Y * 0.337f - Warp * 0.43f + 2.1f),
+        0.0f, 1.0f), 3.0f);
+    const float PhaseA =
+        P.X * 1.11f + P.Y * 0.37f + Warp * 0.72f;
+    const float PhaseB =
+        P.X * 0.683f - P.Y * 1.397f - Warp * 0.48f +
+        0.31f * FMath::Sin(P.X * 0.097f);
+    const float CrestA = FMath::Sin(PhaseA) +
+        0.34f * FMath::Sin(PhaseA * 2.0f + 0.72f) +
+        0.15f * FMath::Sin(PhaseA * 3.0f + 1.31f);
+    const float CrestB = FMath::Sin(PhaseB) +
+        0.27f * FMath::Sin(PhaseB * 2.0f - 0.44f);
+    const float BoilCell = FMath::Pow(FMath::Clamp(
+        0.5f + 0.5f * FMath::Sin(
+            P.X * 0.421f + P.Y * 0.563f + Warp),
+        0.0f, 1.0f), 2.4f);
+    const float Recirculation = FMath::Sin(
+        WaveClockSeconds * 2.13f + P.X * 0.887f -
+        P.Y * 0.919f + Warp * 0.7f);
+    const float SplashPulse = FMath::Pow(FMath::Clamp(
+        0.5f + 0.5f * FMath::Sin(
+            WaveClockSeconds * 3.71f + P.X * 1.73f + P.Y * 1.19f),
+        0.0f, 1.0f), 6.0f);
+    return FMath::Clamp(Strength, 0.0f, 1.0f) * Rapid *
+        (0.115f * PacketA * CrestA +
+         0.070f * PacketB * CrestB +
+         0.105f * BoilCell * Recirculation +
+         0.075f * Foam * SplashPulse);
+}
+
 float URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
     float CenterSurfaceHeightMeters,
     float UpstreamFarSurfaceHeightMeters,
@@ -1072,6 +1142,17 @@ bool URaftSimWaterRuntimeAdapter::SampleRaftSupportSurfaceAtWorldPosition(
             RawCenter.DepthMeters);
     OutSample.SurfaceHeightMeters +=
         StandingWave.DisplacementMeters * RaftSupportStandingWaveScale;
+    if (bRaftSupportLocalFluidEnabled)
+    {
+        OutSample.SurfaceHeightMeters +=
+            ComputeCoupledLocalFluidHeightfieldMeters(
+                RiverCoordinatesM,
+                RaftSupportLocalFluidAdvectionMeters,
+                RawCenter.VelocityMetersPerSecond.Size2D(),
+                RawCenter.DepthMeters,
+                PresentationWaveClockSeconds,
+                RaftSupportLocalFluidStrength);
+    }
 
     float UpstreamFarHeightM = 0.0f;
     float UpstreamNearHeightM = 0.0f;

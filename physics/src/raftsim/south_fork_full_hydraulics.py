@@ -21,6 +21,7 @@ from typing import Any
 import numpy as np
 
 from .dual_solver import CppSolverRunConfig, run_cpp_solver_scenario
+from .cooked_flow_fields import apply_monotone_surface_shock_limiter
 from .named_rapid_registry import SOURCE_CATALOG_RELATIVE_PATH
 from .scenario2_5d import (
     BoundaryCondition2_5D,
@@ -65,7 +66,11 @@ COOKED_SCHEMA = "raftsim.cooked_flow_fields.v1"
 GENERATOR_VERSION = "south_fork_full_hydraulics_v1"
 FLOW_BAND_IDS = ("low_runnable", "median_runnable", "high_runnable")
 WINDOW_LENGTH_M = 400.0
-CELL_SIZE_M = 4.0
+# Named-rapid cruxes are solved at half-metre resolution so metre-scale
+# standing waves span multiple finite-volume cells. The long transit seed
+# remains four metres; it carries reach-scale discharge between rapid crops.
+RAPID_CELL_SIZE_M = 0.5
+TRANSIT_CELL_SIZE_M = 4.0
 CROSS_HALF_WIDTH_M = 40.0
 SOLVER_STEPS = 480
 SOLVER_FRAME_INTERVAL = 480
@@ -337,7 +342,7 @@ def _apply_feature_geometry(
     x, y = grid.meshgrid()
     for feature in features:
         cx, cy = feature.center
-        radius = max(feature.radius, CELL_SIZE_M)
+        radius = max(feature.radius, RAPID_CELL_SIZE_M)
         dx = x - cx
         dy = y - cy
         radial = np.exp(-0.5 * ((dx / radius) ** 2 + (dy / radius) ** 2))
@@ -391,13 +396,13 @@ def _sample_m2_window(
         np.clip(rapid_station - WINDOW_LENGTH_M * 0.5, 0.0, reach_end - WINDOW_LENGTH_M)
     )
     rapid_x = rapid_station - window_start
-    nx = int(round(WINDOW_LENGTH_M / CELL_SIZE_M)) + 1
-    ny = int(round(2.0 * CROSS_HALF_WIDTH_M / CELL_SIZE_M)) + 1
+    nx = int(round(WINDOW_LENGTH_M / RAPID_CELL_SIZE_M)) + 1
+    ny = int(round(2.0 * CROSS_HALF_WIDTH_M / RAPID_CELL_SIZE_M)) + 1
     grid = GridSpec2_5D(
         nx=nx,
         ny=ny,
-        dx=CELL_SIZE_M,
-        dy=CELL_SIZE_M,
+        dx=RAPID_CELL_SIZE_M,
+        dy=RAPID_CELL_SIZE_M,
         origin_x=window_start,
         origin_y=-CROSS_HALF_WIDTH_M,
     )
@@ -622,7 +627,7 @@ def _evaluate_fields(
     x, y = scenario.grid.meshgrid()
     feature_envelopes = []
     for feature in features:
-        radius = max(feature.radius * 1.6, CELL_SIZE_M * 1.5)
+        radius = max(feature.radius * 1.6, RAPID_CELL_SIZE_M * 1.5)
         mask = (x - feature.center[0]) ** 2 + (y - feature.center[1]) ** 2 <= radius**2
         if not mask.any():
             passed = False
@@ -721,8 +726,8 @@ def _write_full_reach_transit_seed(
     target_stations = np.linspace(source_stations[0], source_stations[-1], nx)
     target_lateral = np.arange(
         -CROSS_HALF_WIDTH_M,
-        CROSS_HALF_WIDTH_M + CELL_SIZE_M * 0.5,
-        CELL_SIZE_M,
+        CROSS_HALF_WIDTH_M + TRANSIT_CELL_SIZE_M * 0.5,
+        TRANSIT_CELL_SIZE_M,
         dtype=np.float64,
     )
     columns = [int(np.argmin(np.abs(source_lateral - y))) for y in target_lateral]
@@ -750,7 +755,7 @@ def _write_full_reach_transit_seed(
         }[band_id]
         depth = np.maximum(surface[None, :] + stage_offset - bed, 0.0)
         wet = depth > 0.025
-        area = np.sum(depth, axis=0) * CELL_SIZE_M
+        area = np.sum(depth, axis=0) * TRANSIT_CELL_SIZE_M
         discharge = float(band["discharge_m3s"])
         velocity = np.clip(discharge / np.maximum(area, 1.0), 0.0, 8.0)
         u = np.where(wet, velocity[None, :], 0.0)
@@ -816,7 +821,7 @@ def _write_full_reach_transit_seed(
                         "initial_volume_m3": round(
                             float(np.sum(depth))
                             * float(target_stations[1] - target_stations[0])
-                            * CELL_SIZE_M,
+                            * TRANSIT_CELL_SIZE_M,
                             6,
                         ),
                     },
@@ -836,7 +841,7 @@ def _write_full_reach_transit_seed(
             "nx": int(target_stations.size),
             "ny": int(target_lateral.size),
             "dx_m": dx,
-            "dy_m": CELL_SIZE_M,
+            "dy_m": TRANSIT_CELL_SIZE_M,
             "origin_x_m": float(target_stations[0]),
             "origin_y_m": float(target_lateral[0]),
             "downstream_axis": "+x",
@@ -1110,13 +1115,16 @@ def write_south_fork_full_hydraulics(
             )
             cooked_band_dir = cooked_root / band_id
             cooked_band_dir.mkdir(parents=True, exist_ok=True)
-            arrays = {
+            raw_arrays = {
                 "h": fields["h"].astype(np.float32),
                 "u": fields["u"].astype(np.float32),
                 "v": fields["v"].astype(np.float32),
                 "bed": fields["bed"].astype(np.float32),
                 "wet_mask": fields["wet_mask"].astype(np.uint8),
             }
+            arrays, shock_limiter = apply_monotone_surface_shock_limiter(
+                raw_arrays
+            )
             array_records = {}
             for name, array in arrays.items():
                 path = cooked_band_dir / f"{name}.npy"
@@ -1132,6 +1140,7 @@ def write_south_fork_full_hydraulics(
                     "target_discharge_m3s": float(band["discharge_m3s"]),
                     "scenario_package": str(package_dir.relative_to(repo_root)),
                     "arrays": array_records,
+                    "surface_shock_limiter": shock_limiter,
                     "runtime_boundaries": runtime_boundaries,
                     "validation": evaluation,
                     "solver_return_code": run.returncode,

@@ -571,6 +571,28 @@ bool FRaftSimAssertWaterSurfaceCommand::Update()
         TEXT("near-critical flow adds hydraulic standing-wave response"),
         FMath::IsNearlyEqual(FirstRapidWaveM, CalmRippleM, 1.0e-4f));
 
+    const float LocalFluidA = URaftSimWaterRuntimeAdapter::
+        ComputeCoupledLocalFluidHeightfieldMeters(
+            RapidCoordinateM, FVector2D::ZeroVector,
+            5.0f, 0.5f, 1.0f, 0.65f);
+    const float LocalFluidB = URaftSimWaterRuntimeAdapter::
+        ComputeCoupledLocalFluidHeightfieldMeters(
+            RapidCoordinateM, FVector2D(1.0f, 0.2f),
+            5.0f, 0.5f, 1.4f, 0.65f);
+    Test->TestTrue(
+        TEXT("raft-local fluid heightfield has bounded evolving 3D relief"),
+        FMath::Abs(LocalFluidA) <= 0.30f &&
+            FMath::Abs(LocalFluidB) <= 0.30f &&
+            !FMath::IsNearlyEqual(LocalFluidA, LocalFluidB, 1.0e-4f));
+    Test->TestTrue(
+        TEXT("raft-local fluid heightfield stays flat in still water"),
+        FMath::IsNearlyZero(
+            URaftSimWaterRuntimeAdapter::
+                ComputeCoupledLocalFluidHeightfieldMeters(
+                    RapidCoordinateM, FVector2D::ZeroVector,
+                    0.0f, 2.0f, 1.0f, 0.65f),
+            1.0e-6f));
+
     const float SolverCrestReliefM =
         ARaftSimWaterSurfaceActor::ComputePresentationHydraulicReliefDisplacementMeters(
             -2.731f,

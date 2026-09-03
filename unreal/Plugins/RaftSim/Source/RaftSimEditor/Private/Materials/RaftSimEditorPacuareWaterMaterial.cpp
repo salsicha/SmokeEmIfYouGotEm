@@ -384,8 +384,8 @@ UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
     UMaterialInterface* SharedTransmissionParent = LoadObject<UMaterialInterface>(
         nullptr,
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-             "M_RaftSim_SouthForkRaftTransmissionWater."
-             "M_RaftSim_SouthForkRaftTransmissionWater"));
+             "M_RaftSim_SouthForkRaftTransmissionWaterV4."
+             "M_RaftSim_SouthForkRaftTransmissionWaterV4"));
     UTexture2D* FlowNormal = LoadObject<UTexture2D>(
         nullptr,
         TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Textures/"
