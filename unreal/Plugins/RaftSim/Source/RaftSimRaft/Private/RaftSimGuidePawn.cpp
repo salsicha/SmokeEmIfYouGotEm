@@ -244,7 +244,16 @@ void ARaftSimGuidePawn::Tick(float DeltaSeconds)
     // chase-camera toggles and swims automatically.
     if (ARaftSimRaftActor* Raft = ResolveRaft())
     {
+        // The hide only makes sense while this pawn's own camera is the
+        // view: review cameras, cinematics, and the capture commands set
+        // another view target, and from there the zero-scaled head read as
+        // a black spike where the wetsuit collar collapsed into the neck
+        // joint (Hance three-quarter burst, 2026-09-02).
+        const APlayerController* ViewingController = Cast<APlayerController>(GetController());
+        const bool bViewedThroughOwnCamera =
+            ViewingController == nullptr || ViewingController->GetViewTarget() == this;
         const bool bFirstPersonSeat =
+            bViewedThroughOwnCamera &&
             !CameraRuntimeState.bChaseCameraActive &&
             MobilityMode == ERaftSimGuideMobilityMode::InRaft;
         Raft->SetGuideFirstPersonView(bFirstPersonSeat);
