@@ -2,7 +2,7 @@
 # Launch the Unreal editor for RaftSim on Linux hybrid-graphics machines.
 # Usage: unreal/Scripts/run_editor_linux.sh [extra UnrealEditor args...]
 #   e.g. unreal/Scripts/run_editor_linux.sh -game -windowed -resx=2560 -resy=1440
-#        unreal/Scripts/run_editor_linux.sh /Game/RaftSim/Maps/L_Troublemaker -game
+#        unreal/Scripts/run_editor_linux.sh /Game/RaftSim/Maps/L_SouthForkAmerican_FullReach -game
 #
 # Why the env pins: on Intel+NVIDIA laptops the interactive editor segfaulted
 # inside the NVIDIA driver at swapchain AcquireImageIndex during present

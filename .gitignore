@@ -23,6 +23,9 @@ physics/cpp/build-ue/
 *.blend~
 
 # Local simulation outputs
+/tmp/
+# Accidental POSIX hook-path artifacts must not be tracked on Windows.
+/dev/null/
 outputs/
 *.telemetry.csv
 pyclaw.log

@@ -308,7 +308,7 @@ def test_chilko_capture_and_live_profiles_are_river_local() -> None:
         # (the former near-zero response read as "no water at all").
         'SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f)',
         'SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f)',
-        'SetScalar(TEXT("RippleGrazingFloor"), 0.58f)',
+        'SetScalar(TEXT("RippleGrazingFloor"), 0.12f)',
         'SetScalar(TEXT("SlickNormalFloor"), 0.62f)',
         'SetScalar(TEXT("SlickRoughnessScale"), 1.0f)',
         'SetScalar(TEXT("FresnelSpecular"), 0.10f)',

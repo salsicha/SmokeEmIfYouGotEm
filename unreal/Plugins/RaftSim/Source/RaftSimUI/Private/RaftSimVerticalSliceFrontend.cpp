@@ -70,12 +70,14 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("troublemaker_challenge"), TEXT("Troublemaker Rapid Challenge"),
             TEXT("A short technical challenge at the commercial flow band: the approach, "
                  "Troublemaker itself and its runout on the production full reach."),
-            // The compact L_Troublemaker slice is a legacy authored-band map
-            // (raft rode a whole-reach support band 1.5 m above its water,
-            // milky presentation); the production reach renders the rapid
-            // properly, so the run is a station-bounded section of it.
+            // One scene owns South Fork gameplay, including this challenge.
+            // Its geographic reconstruction and visual acceptance remain open.
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::Trainee, 10, 7900.0f, 8700.0f),
+            // Match the user-reviewed run: a short calm setup, the main hole
+            // near 8.36 km, then the hard river-right / river-left S-turn. A
+            // start farther upstream made the named challenge spend minutes
+            // in the broad transit pool and read as an entirely flat river.
+            ERaftSimLicenseTier::Trainee, 10, 8320.0f, 8525.0f),
         MakeScenario(
             TEXT("hance_challenge"), TEXT("Hance Rapid Free Run"),
             TEXT("Bonus large-volume Colorado rapid slice."),

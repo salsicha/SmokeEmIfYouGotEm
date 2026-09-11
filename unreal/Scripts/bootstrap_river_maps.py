@@ -1,4 +1,4 @@
-"""Generate the five compact signature-rapid maps.
+"""Generate the four compact signature-rapid maps (not South Fork).
 
 The source-scale Zambezi reference run is built separately by
 RaftSim.CreateLandscapeImportCandidateMaps and the packaging preflight.

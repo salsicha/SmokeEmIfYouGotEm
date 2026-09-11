@@ -6,6 +6,6 @@ public class RaftSimAutomation : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "Niagara", "RaftSimCore", "RaftSimWater", "RaftSimPhysics", "RaftSimCrew", "RaftSimRaft", "ProceduralMeshComponent" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Json", "PhysicsCore", "Projects" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Json", "PhysicsCore", "Projects", "RaftSimWaterDetail", "RenderCore", "RHI" });
     }
 }

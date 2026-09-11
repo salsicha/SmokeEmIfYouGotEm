@@ -34,6 +34,18 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Contact")
     void ConfigureContact(float InRadiusM, float InFrictionCoefficient);
 
+    /**
+     * Keep this actor as a D4 contact authority while suppressing its own
+     * renderer. Full-reach maps use this beside their batched HISM boulder so
+     * presentation stays cheap and the raft still contacts the exact catalog
+     * footprint. Unreal collision remains disabled; D4 is the sole authority.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Contact")
+    void SetContactProxyOnly(bool bInContactProxyOnly);
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Contact")
+    bool IsContactProxyOnly() const { return bContactProxyOnly; }
+
     /** Select the reviewed scan or deterministic project-owned fallback shell. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Contact")
     void SetPreferReviewedVisual(bool bInPreferReviewedVisual);
@@ -75,6 +87,9 @@ protected:
     // Fail closed to the deterministic shell. The optional scan remains
     // available for explicit renderer diagnostics until it passes that gate.
     bool bPreferReviewedVisual = false;
+
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Contact")
+    bool bContactProxyOnly = false;
 
 private:
     void RebuildVisualGeometry();

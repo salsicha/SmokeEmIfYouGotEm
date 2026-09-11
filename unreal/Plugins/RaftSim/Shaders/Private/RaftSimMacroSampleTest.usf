@@ -1,0 +1,18 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimCrestSurfaceSample.ush"
+int2 GridSize;
+uint QueryCount;
+uint ReconstructCrest;
+Texture2D<float4> Atlas;
+StructuredBuffer<float4> Queries;
+RWStructuredBuffer<float4> Results;
+[numthreads(64,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    if (id.x>=QueryCount)return;
+    float4 q=Queries[id.x];
+    if (ReconstructCrest!=0 && int(q.z)==0)Results[id.x]=RaftSimCrestMacroSample(Atlas,q.xy,GridSize);
+    else if (ReconstructCrest!=0 && int(q.z)==1)Results[id.x]=float4(RaftSimCrestCorrection(Atlas,q.xy,GridSize),0);
+    else if (ReconstructCrest!=0 && int(q.z)==2)Results[id.x]=float4(RaftSimCrestCorrection(Atlas,q.xy,GridSize,false),0);
+    else Results[id.x]=RaftSimMacroSample(Atlas,q.xy,GridSize,int(q.z));
+}

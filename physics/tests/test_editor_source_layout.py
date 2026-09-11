@@ -1628,8 +1628,8 @@ def test_photoreal_materials_preserve_physical_detail_scale_and_natural_water_no
         'FlowNormalSpec.MapKind = TEXT("project_owned_multiscale_river_flow_normal")'
         in source
     )
-    assert "FlowNormalSpec.AddressX = TA_Mirror" in source
-    assert "FlowNormalSpec.AddressY = TA_Mirror" in source
+    assert "FlowNormalSpec.AddressX = TA_Wrap" in source
+    assert "FlowNormalSpec.AddressY = TA_Wrap" in source
     assert 'TEXT("WaterFlowNormalPrimary")' in source
     assert 'TEXT("WaterFlowNormalCross")' in source
     assert "CombinedNormal->VectorInput.Expression" in source
@@ -1640,8 +1640,8 @@ def test_photoreal_materials_preserve_physical_detail_scale_and_natural_water_no
     assert 'Scalar(TEXT("CalmRippleStrength"), 0.035f)' in source
     assert 'Scalar(TEXT("FoamRippleStrength"), 0.085f)' in source
     assert 'Scalar(TEXT("FlowRippleStrength"), 0.045f)' in source
-    assert "NormalStrength->MaxDefault = 0.14f" in source
-    assert 'Scalar(TEXT("RippleGrazingFloor"), 0.25f)' in source
+    assert "NormalStrength->MaxDefault = 0.30f" in source
+    assert 'Scalar(TEXT("RippleGrazingFloor"), 0.12f)' in source
     assert "GrazingFilteredNormalStrength" in source
     assert "RippleGrazingFresnel->Normal.Expression = FlatN" in source
     assert 'Scalar(TEXT("WaterRoughness"), 0.24f)' in source
@@ -2175,6 +2175,19 @@ def test_full_reach_far_field_breaks_up_grid_and_repeated_tree_silhouettes():
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/"
         "RaftSimEditorPhotorealMaterials.cpp"
     ).read_text(encoding="utf-8")
+    assert 'MaterialExpressionShadowReplace.h' in material_source
+    assert 'RaftSimSuppressFlatFoliageCardShadowV1' in material_source
+    assert 'ShadowSwitch->Default = OriginalOpacity;' in material_source
+    assert 'ShadowSwitch->Shadow.Connect(0, NoCardShadow);' in material_source
+    assert 'EditorData->OpacityMask.Connect(0, ShadowSwitch);' in material_source
+    assert material_source.count('SuppressReviewedMaskedFoliageCardShadows(') == 3
+    assert (
+        '"M_PineTree01_Needles.M_PineTree01_Needles"));' in material_source
+    )
+    assert (
+        '"M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked"));'
+        in material_source
+    )
     assert 'TEXT("AerialCanopyGroundCorrection")' not in material_source
     assert 'TEXT("SourceMacroContrast")' not in material_source
     assert 'TEXT("GeologicOutcropStrength")' not in material_source

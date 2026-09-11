@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(raftsim_water VERSION 0.1.0 LANGUAGES CXX)
+include(CTest)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,6 +33,10 @@ add_library(raftsim_water
   src/solver_runtime.cpp
 )
 target_include_directories(raftsim_water PUBLIC include)
+option(RAFTSIM_PROFILE_SOLVER "Emit opt-in native solver stage timings at thread exit" OFF)
+if(RAFTSIM_PROFILE_SOLVER)
+  target_compile_definitions(raftsim_water PRIVATE RAFTSIM_PROFILE_SOLVER=1)
+endif()
 target_link_libraries(raftsim_water PUBLIC ZLIB::ZLIB)
 target_compile_options(raftsim_water PRIVATE
   $<$<CXX_COMPILER_ID:AppleClang,Clang,GNU>:-Wall -Wextra -Wpedantic>
@@ -42,6 +47,15 @@ target_link_libraries(raftsim_water_solver PRIVATE raftsim_water)
 
 add_executable(raftsim_water_tests tests/raftsim_water_tests.cpp)
 target_link_libraries(raftsim_water_tests PRIVATE raftsim_water)
+
+if(BUILD_TESTING)
+  foreach(fixture wet_dry_shoreline lake_at_rest_balance transcritical_bump)
+    add_test(NAME water_${fixture}
+      COMMAND raftsim_water_tests
+      "${CMAKE_CURRENT_SOURCE_DIR}/../data/validation/milestone17/analytic_fixtures/fixtures/${fixture}/scenario")
+    set_tests_properties(water_${fixture} PROPERTIES TIMEOUT 120)
+  endforeach()
+endif()
 
 add_executable(raftsim_chrono_bridge_fixtures tools/chrono_bridge_fixture_catalog.cpp)
 target_link_libraries(raftsim_chrono_bridge_fixtures PRIVATE raftsim_water)

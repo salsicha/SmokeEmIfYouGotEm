@@ -11,6 +11,7 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
+#include "HAL/IConsoleManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
 #include "Math/RotationMatrix.h"
@@ -21,12 +22,22 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimSecondaryWaterComponent.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
 {
 constexpr float CmPerM = 100.0f;
 constexpr float GravityMps2 = 9.80665f;
+static TAutoConsoleVariable<int32> CVarChilkoCrestSpray(
+    TEXT("raftsim.ChilkoCrestSpray"), 1,
+    TEXT("Chilko: surface-anchored spray sized and faded with persistent crest ownership. 0 restores the legacy elevated fountains for comparison."));
+static TAutoConsoleVariable<int32> CVarChilkoSprayPlane(
+    TEXT("raftsim.ChilkoSprayPlane"), 1,
+    TEXT("Keep Chilko rapid source strips horizontal independently of the upward launch direction. 0 restores tilted source planes."));
+static TAutoConsoleVariable<int32> CVarSouthForkCrestSpray(
+    TEXT("raftsim.SouthForkCrestSpray"), 0,
+    TEXT("South Fork review: attach rapid spray to wet persistent crests with horizontal source planes. Does not change particle assets or emitter budgets."));
 // Translucent whitewater is deliberately local. Rendering every detected
 // hydraulic jump along the kilometre-scale reach spends fill rate on effects
 // that contribute only a few pixels (or are fully hidden by the canyon). Keep
@@ -178,7 +189,8 @@ void SetNiagaraEmission(
     const FVector& Location,
     const FVector& Direction,
     float UniformScale,
-    float SpawnRate)
+    float SpawnRate,
+    bool bHorizontalSourcePlane = false)
 {
     if (!Component || !Component->GetAsset())
     {
@@ -204,6 +216,9 @@ void SetNiagaraEmission(
         FRotationMatrix::MakeFromX(LaunchDirection).Rotator());
     Component->SetWorldScale3D(FVector(FMath::Max(UniformScale, 0.05f)));
     Component->SetVariableFloat(TEXT("User.SpawnRate"), SpawnRate);
+    Component->SetVariableQuat(TEXT("User.SourcePlaneRotation"), bHorizontalSourcePlane
+        ? ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(LaunchDirection)
+        : FQuat::Identity);
     if (!Component->IsActive())
     {
         Component->Activate(true);
@@ -232,6 +247,7 @@ FRotator MakeCameraFacingCardRotation(
 ARaftSimWaterVfxActor::ARaftSimWaterVfxActor()
 {
     PrimaryActorTick.bCanEverTick = true;
+    SecondaryWaterReview = CreateDefaultSubobject<URaftSimSecondaryWaterComponent>(TEXT("SecondaryWaterReview"));
 
     Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     SetRootComponent(Root);
@@ -724,6 +740,46 @@ void ARaftSimWaterVfxActor::BeginPlay()
         LoadWaterSystem(TEXT("NS_RaftSim_RapidRoller"));
     UNiagaraSystem* RapidCrestSpraySystem =
         LoadWaterSystem(TEXT("NS_RaftSim_RapidCrestSpray"));
+    if (PhotographicReviewVersion == 0 && GetWorld() &&
+        GetWorld()->GetMapName().EndsWith(TEXT("L_LavaCanyon")) &&
+        !FParse::Param(FCommandLine::Get(), TEXT("RaftSimChilkoLegacySpray")))
+    {
+        auto* ChilkoRoller = LoadObject<UNiagaraSystem>(nullptr,
+            TEXT("/Game/RaftSim/VFX/Water/Chilko/NS_RaftSim_ChilkoRapidRoller.NS_RaftSim_ChilkoRapidRoller"));
+        auto* ChilkoSpray = LoadObject<UNiagaraSystem>(nullptr,
+            TEXT("/Game/RaftSim/VFX/Water/Chilko/NS_RaftSim_ChilkoRapidCrestSpray.NS_RaftSim_ChilkoRapidCrestSpray"));
+        if (ChilkoRoller && ChilkoSpray)
+        {
+            RapidRollerSystem = ChilkoRoller;
+            RapidCrestSpraySystem = ChilkoSpray;
+            UE_LOG(LogTemp, Display, TEXT("Chilko ballistic spray selected: falling clumps/droplets, unchanged emitter counts"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Chilko ballistic spray assets missing; retaining legacy pair"));
+        }
+    }
+    if (PhotographicReviewVersion == 0 && GetWorld() &&
+        IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray")))
+    {
+        // Review the already-authored falling-water profiles on this scene.
+        // Reuse assets without mutating Chilko, shared sources or spawn budgets.
+        auto* BallisticRoller = LoadObject<UNiagaraSystem>(nullptr,
+            TEXT("/Game/RaftSim/VFX/Water/Chilko/NS_RaftSim_ChilkoRapidRoller.NS_RaftSim_ChilkoRapidRoller"));
+        auto* BallisticSpray = LoadObject<UNiagaraSystem>(nullptr,
+            TEXT("/Game/RaftSim/VFX/Water/Chilko/NS_RaftSim_ChilkoRapidCrestSpray.NS_RaftSim_ChilkoRapidCrestSpray"));
+        if (BallisticRoller && BallisticSpray)
+        {
+            RapidRollerSystem = BallisticRoller;
+            RapidCrestSpraySystem = BallisticSpray;
+            UE_LOG(LogTemp, Display, TEXT("South Fork ballistic spray review selected: existing falling profiles, unchanged emitter budgets"));
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("South Fork ballistic spray review assets missing; retaining legacy pair"));
+        }
+    }
     // The retained V4/V5 photographic review rosters predate this sixth
     // production system. Keep those opt-in reviews runnable by falling back to
     // the production crest profile until a matching isolated review asset is
@@ -1175,6 +1231,34 @@ FVector ARaftSimWaterVfxActor::ComputeRapidRollerLaunchDirection(
     }
     return (-Downstream * 0.68f + FVector::UpVector * 0.73f)
         .GetSafeNormal();
+}
+
+bool ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(const FString& MapName)
+{
+    FString Name = MapName;
+    int32 Slash;
+    if (Name.FindLastChar(TEXT('/'), Slash)) Name = Name.Mid(Slash + 1);
+    if (Name.StartsWith(TEXT("UEDPIE_")))
+    {
+        const int32 Separator = Name.Find(TEXT("_"), ESearchCase::CaseSensitive,
+            ESearchDir::FromStart, 7);
+        if (Separator == INDEX_NONE || !Name.Mid(7, Separator - 7).IsNumeric()) return false;
+        Name = Name.Mid(Separator + 1);
+    }
+    return Name == TEXT("L_SouthForkAmerican_FullReach") ||
+        Name == TEXT("SouthForkRegisteredRockPlayable");
+}
+
+FQuat ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(const FVector& Direction)
+{
+    FVector Launch = Direction.GetSafeNormal();
+    if (Launch.IsNearlyZero()) Launch = FVector::ForwardVector;
+    FVector Horizontal = Launch.GetSafeNormal2D();
+    if (Horizontal.IsNearlyZero()) Horizontal = FVector::ForwardVector;
+    const FVector Across(-Horizontal.Y, Horizontal.X, 0.0f);
+    const FQuat EmitterRotation = FRotationMatrix::MakeFromX(Launch).ToQuat();
+    const FQuat SurfaceRotation = FRotationMatrix::MakeFromXZ(Across, FVector::UpVector).ToQuat();
+    return (EmitterRotation.Inverse() * SurfaceRotation).GetNormalized();
 }
 
 FVector ARaftSimWaterVfxActor::ComputeRapidCrestSprayLaunchDirection(
@@ -2844,12 +2928,42 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
     ActiveRapidNiagaraCount = 0;
     ActiveRapidRollerNiagaraCount = 0;
     ActiveRapidCrestSprayNiagaraCount = 0;
+    if (SecondaryWaterReview && SecondaryWaterReview->IsReviewReady())
+    {
+        // An explicit replacement experiment, never additive double spray.
+        for (auto* Pool : { &RapidAerosolNiagara, &RapidRollerNiagara, &RapidCrestSprayNiagara })
+            for (UNiagaraComponent* Component : *Pool)
+                SetNiagaraEmission(Component, false, FVector::ZeroVector, FVector::ForwardVector, 1, 0);
+        RapidAerosolInstances->ClearInstances();
+        return;
+    }
     if (bProductionNiagaraReady)
     {
+        const bool bSouthForkBallisticReview =
+            IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
+            FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray"));
+        const bool bSouthForkCrestOwnedSpray =
+            IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&
+            (CVarSouthForkCrestSpray.GetValueOnGameThread() != 0 ||
+                FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray")));
+        const bool bCrestOwnedSpray = bSouthForkCrestOwnedSpray ||
+            (GetWorld()->GetMapName().EndsWith(TEXT("L_LavaCanyon")) &&
+                CVarChilkoCrestSpray.GetValueOnGameThread() != 0);
+        const bool bHorizontalSourcePlane = bSouthForkCrestOwnedSpray ||
+            (bCrestOwnedSpray && CVarChilkoSprayPlane.GetValueOnGameThread() != 0);
+        const bool bLogSprayReview = bSouthForkCrestOwnedSpray &&
+            !bLoggedSouthForkSprayReview && GetWorld()->GetTimeSeconds() >= 10.0f &&
+            FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray"));
         TArray<int32> RankedSiteIndices;
         RankedSiteIndices.Reserve(Sites.Num());
         for (int32 SiteIndex = 0; SiteIndex < Sites.Num(); ++SiteIndex)
         {
+            const float SprayPresence = bSouthForkBallisticReview
+                ? Sites[SiteIndex].PersistenceWeight : Sites[SiteIndex].PresentationWeight;
+            if (bCrestOwnedSpray && SprayPresence <= 0.01f)
+            {
+                continue;
+            }
             const float DistanceSquared = bHasCamera
                 ? FVector::DistSquared(
                     CameraLocation, Sites[SiteIndex].WorldPositionCm)
@@ -2892,6 +3006,45 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             }
             const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
             const float Intensity = FMath::Clamp(Site.Intensity, 0.0f, 1.0f);
+            const float CrestOwnership = bCrestOwnedSpray
+                ? FMath::Clamp(bSouthForkBallisticReview
+                    ? Site.PersistenceWeight : Site.PresentationWeight, 0.0f, 1.0f) : 1.0f;
+            FVector SurfaceOrigin = Site.WorldPositionCm;
+            float SupportHeightM = SurfaceOrigin.Z / CmPerM;
+            bool bWetCrest = true;
+            if (bCrestOwnedSpray && (!bSouthForkBallisticReview || bLogSprayReview))
+            {
+                FRaftSimWaterSample Support;
+                bWetCrest = WaterAdapter && WaterAdapter->SampleRaftSupportSurfaceAtWorldPosition(
+                    SurfaceOrigin, Support) && Support.bWet;
+                if (bWetCrest)
+                {
+                    SupportHeightM = Support.SurfaceHeightMeters;
+                    // The published site follows the optical carrier. The
+                    // raft-support approximation has a different smoothing
+                    // stencil and was measured 60–78 cm below it here. Retain
+                    // the carrier anchor; support is only the wetness check.
+                    if (!bSouthForkBallisticReview)
+                    {
+                        SurfaceOrigin.Z = SupportHeightM * CmPerM;
+                    }
+                }
+            }
+            if (bSouthForkBallisticReview && bWetCrest)
+            {
+                // Check the bounded source strip's centre and cardinal
+                // extents: a wet centre alone can scatter spray over the bank.
+                bWetCrest = BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(
+                    Site.RiverCoordinatesMeters, SurfaceOrigin);
+                for (const FVector2D Offset : {FVector2D(0, -1.5), FVector2D(0, 1.5),
+                     FVector2D(-0.8, 0), FVector2D(0.8, 0)})
+                {
+                    if (!bWetCrest) break;
+                    FVector FootprintPoint;
+                    bWetCrest = BreakingSurface->SampleVisibleCarrierAtRiverCoordinates(
+                        Site.RiverCoordinatesMeters + Offset, FootprintPoint);
+                }
+            }
             const float DistanceCm = bHasCamera
                 ? FVector::Distance(CameraLocation, Site.WorldPositionCm)
                 : 0.0f;
@@ -2903,22 +3056,36 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                     0.0f,
                     1.0f)
                 : 1.0f;
-            const FVector Origin = Site.WorldPositionCm +
-                Downstream * 35.0f + FVector::UpVector * 38.0f;
+            const FVector Origin = SurfaceOrigin +
+                Downstream * 35.0f + FVector::UpVector * (bCrestOwnedSpray ? 6.0f : 38.0f);
             const FVector DriftDirection =
                 (Downstream * 0.86f + FVector::UpVector * 0.28f).GetSafeNormal();
-            const bool bEnabled = Intensity > 0.12f;
+            const bool bEnabled = Intensity > 0.12f && bWetCrest && CrestOwnership > 0.01f;
+            const float OwnedDensity = DistanceDensity * CrestOwnership;
+            if (bLogSprayReview)
+            {
+                FVector2D Projected = FVector2D::ZeroVector;
+                FVector Tangent, Left;
+                const bool bProjected = WaterAdapter && WaterAdapter->WorldToRiverCoordinates(
+                    Site.WorldPositionCm, Projected, Tangent, Left);
+                UE_LOG(LogTemp, Display, TEXT("South Fork spray source: slot=%d station=%.3f lateral=%.3f projected=%d projected_s=%.3f projected_l=%.3f site_z_m=%.3f support_z_m=%.3f carrier_z_m=%.3f intensity=%.3f ownership=%.3f geometry_weight=%.3f crest_height_m=%.3f wet=%d enabled=%d density=%.3f"),
+                    PoolIndex, Site.RiverCoordinatesMeters.X, Site.RiverCoordinatesMeters.Y,
+                    bProjected, Projected.X, Projected.Y, Site.WorldPositionCm.Z / CmPerM,
+                    SupportHeightM, SurfaceOrigin.Z / CmPerM, Intensity, CrestOwnership,
+                    Site.PresentationWeight, Site.HydraulicCrestDimensionsMeters.X, bWetCrest, bEnabled, OwnedDensity);
+            }
             SetNiagaraEmission(
                 RapidAerosolNiagara[PoolIndex],
                 bEnabled,
                 Origin,
                 DriftDirection,
-                FMath::Lerp(1.05f, 1.65f, Intensity),
-                FMath::Lerp(18.0f, 52.0f, Intensity) * DistanceDensity);
+                bCrestOwnedSpray ? FMath::Lerp(0.65f, 1.35f, Intensity)
+                    : FMath::Lerp(1.05f, 1.65f, Intensity),
+                FMath::Lerp(18.0f, 52.0f, Intensity) * OwnedDensity, bHorizontalSourcePlane);
             ActiveRapidNiagaraCount += bEnabled ? 1 : 0;
 
-            const FVector RollerOrigin = Site.WorldPositionCm +
-                -Downstream * 12.0f + FVector::UpVector * 32.0f;
+            const FVector RollerOrigin = SurfaceOrigin +
+                -Downstream * 12.0f + FVector::UpVector * (bCrestOwnedSpray ? 3.0f : 32.0f);
             const FVector RollerDirection = ComputeRapidRollerLaunchDirection(
                 Site.WorldVelocityMps);
             SetNiagaraEmission(
@@ -2926,8 +3093,9 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 bEnabled,
                 RollerOrigin,
                 RollerDirection,
-                FMath::Lerp(1.10f, 1.55f, Intensity),
-                FMath::Lerp(140.0f, 320.0f, Intensity) * DistanceDensity);
+                bCrestOwnedSpray ? FMath::Lerp(0.45f, 1.10f, Intensity)
+                    : FMath::Lerp(1.10f, 1.55f, Intensity),
+                FMath::Lerp(140.0f, 320.0f, Intensity) * OwnedDensity, bHorizontalSourcePlane);
             ActiveRapidRollerNiagaraCount += bEnabled ? 1 : 0;
 
             // Complete the rapid's particle scale stack with fine ballistic
@@ -2938,10 +3106,11 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
             // bias avoids six identical vertical fountains without inventing
             // any new hydraulic or collision authority.
             const float LateralBias =
-                (PoolIndex & 1) == 0 ? -0.12f : 0.12f;
-            const FVector CrestSprayOrigin = Site.WorldPositionCm +
+                bCrestOwnedSpray ? 0.12f * FMath::Sin(Site.ShapeSeed)
+                    : ((PoolIndex & 1) == 0 ? -0.12f : 0.12f);
+            const FVector CrestSprayOrigin = SurfaceOrigin +
                 -Downstream * 12.0f + Across * (LateralBias * 85.0f) +
-                FVector::UpVector * 60.0f;
+                FVector::UpVector * (bCrestOwnedSpray ? 3.0f : 60.0f);
             const FVector CrestSprayDirection = ComputeRapidCrestSprayLaunchDirection(
                 Site.WorldVelocityMps, LateralBias);
             SetNiagaraEmission(
@@ -2949,9 +3118,16 @@ void ARaftSimWaterVfxActor::RefreshRapidAerosol()
                 bEnabled,
                 CrestSprayOrigin,
                 CrestSprayDirection,
-                FMath::Lerp(0.85f, 1.10f, Intensity),
-                FMath::Lerp(180.0f, 360.0f, Intensity) * DistanceDensity);
+                bCrestOwnedSpray ? FMath::Lerp(0.40f, 1.10f, Intensity)
+                    : FMath::Lerp(0.85f, 1.10f, Intensity),
+                FMath::Lerp(180.0f, 360.0f, Intensity) * OwnedDensity, bHorizontalSourcePlane);
             ActiveRapidCrestSprayNiagaraCount += bEnabled ? 1 : 0;
+        }
+        if (bLogSprayReview)
+        {
+            bLoggedSouthForkSprayReview = true;
+            UE_LOG(LogTemp, Display, TEXT("South Fork spray source summary: published=%d ranked=%d budget=%d emitting=%d"),
+                Sites.Num(), RankedSiteIndices.Num(), ActiveSiteBudget, ActiveRapidCrestSprayNiagaraCount);
         }
         for (int32 PoolIndex = ActiveSiteBudget;
              PoolIndex < RapidAerosolNiagara.Num();

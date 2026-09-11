@@ -130,6 +130,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FString GetSelectedMeshPath() const;
 
+    /** Posed glute underside samples, in the owning avatar's local frame.
+     * Evaluated only on seating/validation, never in the animation tick. */
+    TArray<FVector> GetSeatedContactPointsLocalCm() const;
+
     /** World-space anchor of the coherently posed head/hair island. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Production")
     FVector GetSolvedHeadWorldLocation() const;
@@ -228,8 +232,13 @@ private:
     UPROPERTY()
     TMap<FName, FTransform> ReferenceComponentTransforms;
 
-    /** LOD0 rendered-eye vertices; their live centroid anchors the fitted helmet. */
+    /** LOD0 rendered-eye vertices used once to calibrate the fitted helmet. */
     TArray<int32> RenderedFaceAnchorVertexIndices;
+    /** Rest-pose eye centroid in head-bone space. The eyes are rigidly carried
+     * by the head, so transforming this cached point gives the same helmet
+     * anchor without CPU-skinning the eye section on every frame. */
+    FVector RenderedFaceAnchorHeadLocal = FVector::ZeroVector;
+    bool bHasRenderedFaceAnchorHeadLocal = false;
     bool bLoggedPoseForensics = false;
 
     int32 CurrentVariantIndex = 0;

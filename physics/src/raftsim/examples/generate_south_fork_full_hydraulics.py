@@ -16,17 +16,27 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--solver", type=Path, required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
+    parser.add_argument(
+        "--rapid",
+        type=str,
+        default=None,
+        help="Regenerate exactly one named rapid while preserving the complete matrix.",
+    )
     args = parser.parse_args()
 
     output = write_south_fork_full_hydraulics(
-        args.repo_root, args.solver, args.work_dir
+        args.repo_root, args.solver, args.work_dir, only_rapid_name=args.rapid
     )
     manifest = build_south_fork_full_hydraulics_manifest(args.repo_root)
     print(f"wrote={output}")
     print(f"status={manifest['status']}")
-    print(f"rapid_count={manifest['matrix']['rapid_count']}")
-    print(f"combination_count={manifest['matrix']['combination_count']}")
-    print(f"passed={manifest['matrix']['passed_combination_count']}")
+    if args.rapid is not None:
+        print(f"targeted_rapid={args.rapid}")
+        print("targeted_flow_bands=3")
+    else:
+        print(f"rapid_count={manifest['matrix']['rapid_count']}")
+        print(f"combination_count={manifest['matrix']['combination_count']}")
+        print(f"passed={manifest['matrix']['passed_combination_count']}")
 
 
 if __name__ == "__main__":

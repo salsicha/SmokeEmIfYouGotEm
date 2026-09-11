@@ -8,6 +8,8 @@
 #include "Engine/World.h"
 #include "EngineUtils.h"
 #include "Misc/FileHelper.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
@@ -158,6 +160,30 @@ bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
         }
         FSourceWindow Window;
         Window.FieldsDirectory = FPaths::GetPath(ManifestPath);
+#if !UE_BUILD_SHIPPING
+        // Explicit, process-local preview of a diagnostic cook. Keep the
+        // production manifest and every other rapid/flow band untouched.
+        FString ReviewFieldsDirectory;
+        if (WindowId == TEXT("south_fork_troublemaker_live_window") &&
+            FParse::Value(FCommandLine::Get(),
+                TEXT("RaftSimTroublemakerReviewFields="), ReviewFieldsDirectory))
+        {
+            ReviewFieldsDirectory =
+                URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(ReviewFieldsDirectory);
+            if (RiverConfig->FlowBand != FName(TEXT("median_runnable")) ||
+                !FPaths::FileExists(ReviewFieldsDirectory / TEXT("manifest.json")))
+            {
+                UE_LOG(LogTemp, Error,
+                    TEXT("Troublemaker review fields require median_runnable and an existing manifest: %s"),
+                    *ReviewFieldsDirectory);
+                return false;
+            }
+            Window.FieldsDirectory = ReviewFieldsDirectory;
+            UE_LOG(LogTemp, Display,
+                TEXT("Troublemaker DIAGNOSTIC field override (not production promotion): %s"),
+                *Window.FieldsDirectory);
+        }
+#endif
         Window.WindowId = WindowId;
         Window.StartStationM = static_cast<float>((*Range)[0]->AsNumber());
         Window.EndStationM = static_cast<float>((*Range)[1]->AsNumber());
@@ -222,7 +248,13 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
     const FVector2D Extent(
         CachedMovingWindowStationExtentM,
         CachedMovingWindowLateralExtentM);
-    float WindowCenterStationM = RiverPosition.X;
+    // Spend most of the finite-volume budget downstream of the raft. This
+    // exposes an approaching hole and wave train in the forward camera while
+    // retaining enough solved water behind the hull for wake/support probes.
+    const float DownstreamLookAheadM = bCachedSouthForkSingleSurface
+        ? 0.30f * CachedMovingWindowStationExtentM
+        : 0.0f;
+    float WindowCenterStationM = RiverPosition.X + DownstreamLookAheadM;
     float MinimumRiverStationM = 0.0f;
     float MaximumRiverStationM = 0.0f;
     if (bCachedSouthForkSingleSurface &&
@@ -296,6 +328,14 @@ void ARaftSimRiverWaterStreamingActor::ApplyStaticFlowBandVisibilityToActor(
             bActiveBand |= Tag == ActiveTag;
         }
     }
+    if (bBakedFoamOverlay || bIsBandPresentation)
+    {
+        // These tagged meshes are presentation carriers, never riverbed or
+        // obstacle collision. Old cooked cells can retain collision even
+        // while hidden, intercepting the live surface's shoreline probes.
+        // Apply on every streamed cell as well as the initial visibility pass.
+        Actor->SetActorEnableCollision(false);
+    }
     if (bBakedFoamOverlay && !bIsBandPresentation)
     {
         Actor->SetActorHiddenInGame(true);
@@ -319,9 +359,18 @@ void ARaftSimRiverWaterStreamingActor::HandleLevelAddedToWorld(
     {
         return;
     }
+    bool bTerrainArrived = false;
     for (AActor* Actor : Level->Actors)
     {
         ApplyStaticFlowBandVisibilityToActor(Actor);
+        bTerrainArrived |= Actor && Actor->ActorHasTag(TEXT("RaftSimFullReachTerrain"));
+    }
+    if (bTerrainArrived)
+    {
+        for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
+        {
+            It->InvalidateMissedTerrainProbes();
+        }
     }
 }
 

@@ -627,6 +627,11 @@ def configure_mesh(
     if lod_count < 3:
         raise RuntimeError(f"{variant} generated only {lod_count} skeletal LODs")
 
+    # Seating samples the posed glute once when boarding. Retain source
+    # buffers in cooked builds without switching to CPU animation.
+    subsystem.set_allow_cpu_access(mesh, True)
+    mesh_changed = True
+
     if mesh_changed:
         unreal.EditorAssetLibrary.save_loaded_asset(mesh, only_if_is_dirty=False)
     return {

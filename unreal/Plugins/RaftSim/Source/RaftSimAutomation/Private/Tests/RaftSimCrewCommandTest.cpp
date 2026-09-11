@@ -91,7 +91,10 @@ bool FRaftSimAssertForwardThenTurn::Update()
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimHelmetFitArtReview"));
     const bool bHelmetLinerArtReview =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimHelmetLinerArtReview"));
-    if (bCrewStrokeArtReview || bHelmetFitArtReview || bHelmetLinerArtReview)
+    const bool bRearEquipmentArtReview =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimRearEquipmentArtReview"));
+    if (bCrewStrokeArtReview || bHelmetFitArtReview || bHelmetLinerArtReview ||
+        bRearEquipmentArtReview)
     {
         for (TActorIterator<ARaftSimGuidePawn> It(Raft->GetWorld()); It; ++It)
         {
@@ -106,11 +109,16 @@ bool FRaftSimAssertForwardThenTurn::Update()
             Camera->bUsePawnControlRotation = false;
             Camera->SetUsingAbsoluteLocation(true);
             Camera->SetUsingAbsoluteRotation(true);
-            Camera->SetFieldOfView(58.0f);
-            const FVector ViewLocation = Raft->GetActorLocation() +
-                Raft->GetActorForwardVector() * 680.0f +
-                Raft->GetActorRightVector() * 520.0f +
-                FVector(0.0f, 0.0f, 260.0f);
+            Camera->SetFieldOfView(bRearEquipmentArtReview ? 46.0f : 58.0f);
+            const FVector ViewLocation = bRearEquipmentArtReview
+                ? Raft->GetActorLocation() -
+                    Raft->GetActorForwardVector() * 380.0f +
+                    Raft->GetActorRightVector() * 35.0f +
+                    FVector(0.0f, 0.0f, 180.0f)
+                : Raft->GetActorLocation() +
+                    Raft->GetActorForwardVector() * 680.0f +
+                    Raft->GetActorRightVector() * 520.0f +
+                    FVector(0.0f, 0.0f, 260.0f);
             Camera->SetWorldLocationAndRotation(
                 ViewLocation,
                 (Raft->GetActorLocation() + FVector(0.0f, 0.0f, 55.0f) -
@@ -126,6 +134,8 @@ bool FRaftSimAssertForwardThenTurn::Update()
         FScreenshotRequest::RequestScreenshot(
             bHelmetLinerArtReview
                 ? TEXT("M9_HelmetLiner_v178.png")
+                : bRearEquipmentArtReview
+                ? TEXT("M9_RearEquipmentFit_v1.png")
                 : bHelmetFitArtReview
                 ? TEXT("M9_HelmetFit_v176.png")
                 : TEXT("M9_CrewStroke_v175.png"),
@@ -155,7 +165,8 @@ bool FRaftSimCrewRespondsToCommandsTest::RunTest(const FString&)
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertForwardThenTurn(this));
     if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimCrewStrokeArtReview")) ||
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimHelmetFitArtReview")) ||
-        FParse::Param(FCommandLine::Get(), TEXT("RaftSimHelmetLinerArtReview")))
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimHelmetLinerArtReview")) ||
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimRearEquipmentArtReview")))
     {
         ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
     }

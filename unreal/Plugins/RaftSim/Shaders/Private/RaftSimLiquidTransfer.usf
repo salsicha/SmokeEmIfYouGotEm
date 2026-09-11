@@ -1,0 +1,52 @@
+#include "/Engine/Public/Platform.ush"
+uint ColumnCount;
+uint Depth;
+StructuredBuffer<uint4> Groups;
+StructuredBuffer<uint4> Contributors;
+#define DECLARE_OWNER(N) Texture3D<float4> Deposits_##N; RWTexture3D<float4> Totals_##N;
+DECLARE_OWNER(0) DECLARE_OWNER(1) DECLARE_OWNER(2) DECLARE_OWNER(3)
+DECLARE_OWNER(4) DECLARE_OWNER(5) DECLARE_OWNER(6) DECLARE_OWNER(7)
+DECLARE_OWNER(8) DECLARE_OWNER(9) DECLARE_OWNER(10) DECLARE_OWNER(11)
+DECLARE_OWNER(12) DECLARE_OWNER(13) DECLARE_OWNER(14) DECLARE_OWNER(15)
+
+float4 ReadDeposit(uint Owner,uint3 P)
+{
+    // Explicit resource cases also work on RHIs without dynamic resource indexing.
+#define READ_CASE(N) case N: return Deposits_##N.Load(int4(P,0));
+    switch(Owner) {
+        READ_CASE(0) READ_CASE(1) READ_CASE(2) READ_CASE(3)
+        READ_CASE(4) READ_CASE(5) READ_CASE(6) READ_CASE(7)
+        READ_CASE(8) READ_CASE(9) READ_CASE(10) READ_CASE(11)
+        READ_CASE(12) READ_CASE(13) READ_CASE(14) READ_CASE(15)
+    }
+#undef READ_CASE
+    return 0;
+}
+void WriteTotal(uint Owner,uint3 P,float4 V)
+{
+#define WRITE_CASE(N) case N: Totals_##N[P]=V; break;
+    switch(Owner) {
+        WRITE_CASE(0) WRITE_CASE(1) WRITE_CASE(2) WRITE_CASE(3)
+        WRITE_CASE(4) WRITE_CASE(5) WRITE_CASE(6) WRITE_CASE(7)
+        WRITE_CASE(8) WRITE_CASE(9) WRITE_CASE(10) WRITE_CASE(11)
+        WRITE_CASE(12) WRITE_CASE(13) WRITE_CASE(14) WRITE_CASE(15)
+    }
+#undef WRITE_CASE
+}
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    if(Id.x>=ColumnCount || Id.y>=Depth) return;
+    uint4 Owner=Groups[2*Id.x];uint Count=Groups[2*Id.x+1].x;
+    float4 Sum=ReadDeposit(Owner.x,uint3(Owner.yz,Id.y));
+    for(uint I=0;I<Count;++I) {
+        uint4 C=Contributors[Owner.w+I];
+        Sum+=ReadDeposit(C.x,uint3(C.yz,Id.y));
+    }
+    // No normalization, threshold, clamp, or half conversion before summation.
+    WriteTotal(Owner.x,uint3(Owner.yz,Id.y),Sum);
+    for(uint J=0;J<Count;++J) {
+        uint4 C=Contributors[Owner.w+J];
+        WriteTotal(C.x,uint3(C.yz,Id.y),Sum);
+    }
+}

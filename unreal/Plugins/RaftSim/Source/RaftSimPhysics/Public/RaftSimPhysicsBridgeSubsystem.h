@@ -135,6 +135,6 @@ private:
     float AccumulatedSeconds = 0.0f;
     int32 PhysicsFrame = 0;
 
-    void RunOneFixedWaterTick();
+    bool RunOneFixedWaterTick(bool bAdvanceWaterSolver);
     void RefreshContactRuntimeSummary();
 };

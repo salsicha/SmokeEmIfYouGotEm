@@ -1,0 +1,82 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidHalf.ush"
+
+int3 GridSize;
+float3 CellCm;
+float BandwidthCm;
+Texture3D<float4> SourceScalar;
+Texture3D<float4> CoverageSource;
+StructuredBuffer<float> SeedDistance;
+StructuredBuffer<float> PreviousDistance;
+RWStructuredBuffer<float> NextDistance;
+RWTexture3D<float4> SurfaceOutput;
+
+uint Linear(int3 p) { return p.x+GridSize.x*(p.y+GridSize.y*p.z); }
+float Phi(int3 p) { return SourceScalar.Load(int4(clamp(p,0,GridSize-1),0)).r; }
+float Distance(int3 p)
+{
+    return any(p<0) || any(p>=GridSize) ? BandwidthCm : PreviousDistance[Linear(p)];
+}
+void SortPair(inout float2 a,inout float2 b) { if(a.x>b.x) { float2 t=a;a=b;b=t; } }
+
+[numthreads(8,4,4)]
+void MainCS(uint3 DispatchId:SV_DispatchThreadID)
+{
+    int3 p=int3(DispatchId);
+    if(any(p>=GridSize)) return;
+    uint index=Linear(p);
+#if RAFTSIM_REDISTANCE_STAGE == 0
+    float phi=Phi(p),edgeDistance=BandwidthCm;
+    bool seed=phi==0;
+    float3 gradient=0;
+    [unroll] for(int axis=0;axis<3;++axis)
+    {
+        int3 step=0;step[axis]=1;
+        float minus=Phi(p-step),plus=Phi(p+step);
+        gradient[axis]=(plus-minus)/(CellCm[axis]*((p[axis]==0 || p[axis]==GridSize[axis]-1)?1:2));
+        [unroll] for(int side=0;side<2;++side)
+        {
+            float neighbor=side==0?minus:plus;
+            bool crossing=((phi<0)!=(neighbor<0)) || neighbor==0;
+            if(crossing)
+            {
+                seed=true;
+                float denominator=abs(phi)+abs(neighbor);
+                if(denominator>0) edgeDistance=min(edgeDistance,abs(phi)*CellCm[axis]/denominator);
+            }
+        }
+    }
+    float norm=length(gradient);
+    float linearDistance=norm>1.e-12?abs(phi)/norm:BandwidthCm;
+    NextDistance[index]=phi==0?0:seed?min(linearDistance,edgeDistance):BandwidthCm;
+#elif RAFTSIM_REDISTANCE_STAGE == 1
+    float seed=SeedDistance[index];
+    if(seed<BandwidthCm) { NextDistance[index]=seed;return; }
+    float2 a=float2(min(Distance(p-int3(1,0,0)),Distance(p+int3(1,0,0))),CellCm.x);
+    float2 b=float2(min(Distance(p-int3(0,1,0)),Distance(p+int3(0,1,0))),CellCm.y);
+    float2 c=float2(min(Distance(p-int3(0,0,1)),Distance(p+int3(0,0,1))),CellCm.z);
+    SortPair(a,b);SortPair(b,c);SortPair(a,b);
+    float value=a.x+a.y;
+    if(value>b.x)
+    {
+        // Shift by the smallest neighbor to avoid subtracting large nearly
+        // equal quadratic terms far from the interface (cm units).
+        float delta=b.x-a.x;
+        float wa=rcp(a.y*a.y),wb=rcp(b.y*b.y);
+        float A=wa+wb,B=delta*wb,C=delta*delta*wb-1;
+        value=a.x+(B+sqrt(max(B*B-A*C,0)))/A;
+        if(value>c.x)
+        {
+            float dc=c.x-a.x,wc=rcp(c.y*c.y);
+            A+=wc;B+=dc*wc;C+=dc*dc*wc;
+            value=a.x+(B+sqrt(max(B*B-A*C,0)))/A;
+        }
+    }
+    NextDistance[index]=min(PreviousDistance[index],value);
+#else
+    float4 source=SourceScalar.Load(int4(p,0));
+    float distance=PreviousDistance[index]*(source.r<=0?-1:1);
+    float3 metadata=CoverageSource.Load(int4(p,0)).gba;
+    SurfaceOutput[p]=float4(distance,HalfNearestEven(metadata.x),HalfNearestEven(metadata.y),HalfNearestEven(metadata.z));
+#endif
+}

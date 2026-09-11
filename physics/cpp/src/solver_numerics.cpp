@@ -467,7 +467,12 @@ InterfaceFluxPair muscl_hydrostatic_flux_x(
     if (bed_coupling) {
         double left_bed = left.eta - h_left;
         double right_bed = right.eta - h_right;
-        if (h_left > config.dry_tolerance && h_right > config.dry_tolerance &&
+        // The uncalibrated MUSCL path uses hydrostatic reconstruction at all
+        // interfaces, including wet/wet bed steps. Switching to a non-augmented
+        // f-wave whenever a 10 cm bed threshold is crossed is not wet/dry safe.
+        // Keep the legacy fixture path unchanged for its historical calibrations.
+        if (!config.disable_fixture_calibrations &&
+            h_left > config.dry_tolerance && h_right > config.dry_tolerance &&
             is_abrupt_bed_jump(left_bed, right_bed)) {
             FwaveComponents parts = fwave_interface_components(
                 h_left, left.u, left.v, h_right, right.u, right.v, right_bed - left_bed, config);
@@ -505,7 +510,8 @@ InterfaceFluxPair muscl_hydrostatic_flux_y(
     if (bed_coupling) {
         double south_bed = south.eta - h_south;
         double north_bed = north.eta - h_north;
-        if (h_south > config.dry_tolerance && h_north > config.dry_tolerance &&
+        if (!config.disable_fixture_calibrations &&
+            h_south > config.dry_tolerance && h_north > config.dry_tolerance &&
             is_abrupt_bed_jump(south_bed, north_bed)) {
             FwaveComponents parts = fwave_interface_components(
                 h_south, south.v, south.u, h_north, north.v, north.u, north_bed - south_bed, config);

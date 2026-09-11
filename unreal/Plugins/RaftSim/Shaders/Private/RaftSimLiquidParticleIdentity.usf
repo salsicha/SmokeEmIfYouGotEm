@@ -1,0 +1,28 @@
+#include "/Engine/Public/Platform.ush"
+uint Capacity;
+uint IntStride;
+uint CountOffset;
+int4 Offsets;
+Buffer<int> Integers;
+Buffer<uint> Counts;
+RWBuffer<uint> CountsUav;
+RWStructuredBuffer<int4> Identities;
+RWStructuredBuffer<uint> PackedCount;
+
+[numthreads(64,1,1)]
+void MainCS(uint3 DispatchId:SV_DispatchThreadID)
+{
+    uint i=DispatchId.x;
+#if RAFTSIM_ID_COUNT_UAV
+    uint n=CountsUav[CountOffset];
+#else
+    uint n=Counts[CountOffset];
+#endif
+    if(i==0) PackedCount[0]=n;
+    if(i>=Capacity) return;
+    int4 result=0;
+    if(i<n)
+        result=int4(Integers[Offsets.x*IntStride+i],Integers[Offsets.y*IntStride+i],
+                    Integers[Offsets.z*IntStride+i],Integers[Offsets.w*IntStride+i]);
+    Identities[i]=result;
+}

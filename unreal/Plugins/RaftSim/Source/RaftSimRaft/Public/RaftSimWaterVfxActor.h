@@ -71,6 +71,14 @@ public:
     static FVector ComputeRapidCrestSprayLaunchDirection(
         const FVector& WorldVelocityMps, float LateralBias);
 
+    /** Local source rotation that keeps a broad crest strip horizontal while
+     * the independent emitter X axis launches particles upward. */
+    static FQuat ComputeRapidSourcePlaneRotation(const FVector& LaunchDirection);
+
+    // Explicit review eligibility shared by asset selection and source anchoring.
+    // Does not enable the option or identify a survey candidate as a verified rapid.
+    static bool IsSouthForkSprayReviewMap(const FString& MapName);
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|VFX")
     const FRaftSimWaterVfxState& GetLastPresentationState() const
     {
@@ -282,6 +290,9 @@ protected:
     float RefreshIntervalSeconds = 1.0f / 20.0f;
 
 private:
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Water|Review")
+    TObjectPtr<class URaftSimSecondaryWaterComponent> SecondaryWaterReview;
+
     void RefreshVfx(float DeltaSeconds);
     void RefreshRapidAerosol();
     void ClearInstances();
@@ -360,4 +371,5 @@ private:
     bool bConnectedContactWaterV8Review = false;
     bool bDepthBearingContactWaterV10Review = false;
     bool bProductionNiagaraReady = false;
+    bool bLoggedSouthForkSprayReview = false;
 };

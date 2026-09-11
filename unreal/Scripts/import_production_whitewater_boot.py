@@ -43,6 +43,10 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
         raise RuntimeError("Production river boot must retain twelve outsole lugs")
     if construction.get("vamp_drain_bands") != 3:
         raise RuntimeError("Production river boot must retain three vamp bands")
+    if construction.get("curved_lasted_outsole") is not True:
+        raise RuntimeError("Production river boot must use the curved lasted outsole")
+    if construction.get("curved_toe_and_heel_rands") is not True:
+        raise RuntimeError("Production river boot must use curved toe and heel rands")
     fbx_path = REPO_ROOT / str(manifest["fbx"])
     if not fbx_path.is_file() or sha256(fbx_path) != manifest.get("fbx_sha256"):
         raise RuntimeError("Production river-boot FBX is absent or stale")
@@ -115,6 +119,9 @@ def configure_and_audit(
     authored_triangles = mesh.get_num_triangles(0)
     nanite = subsystem.get_nanite_settings(mesh)
     nanite.enabled = True
+    nanite.fallback_relative_error = 0.0
+    nanite.fallback_percent_triangles = 1.0
+    nanite.fallback_target = unreal.NaniteFallbackTarget.PERCENT_TRIANGLES
     subsystem.set_nanite_settings(mesh, nanite)
     mesh.modify()
     unreal.EditorAssetLibrary.save_loaded_asset(mesh, only_if_is_dirty=False)

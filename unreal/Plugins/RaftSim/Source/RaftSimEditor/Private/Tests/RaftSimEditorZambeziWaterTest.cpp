@@ -572,8 +572,8 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
             Instance->Parent->GetPathName(),
             FString(TEXT(
                 "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-                "M_RaftSim_SouthForkRaftTransmissionWater."
-                "M_RaftSim_SouthForkRaftTransmissionWater")));
+                "M_RaftSim_SouthForkRaftTransmissionWaterV4."
+                "M_RaftSim_SouthForkRaftTransmissionWaterV4")));
     }
 
     bool bHasCoverageFeather = false;
@@ -683,8 +683,8 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
             FlowNormal2D->CompressionSettings,
             TC_Normalmap);
         TestFalse(TEXT("Zambezi flow normal stays linear"), FlowNormal2D->SRGB);
-        TestEqual(TEXT("Zambezi flow normal mirrors in X"), FlowNormal2D->AddressX, TA_Mirror);
-        TestEqual(TEXT("Zambezi flow normal mirrors in Y"), FlowNormal2D->AddressY, TA_Mirror);
+        TestEqual(TEXT("Zambezi flow normal wraps in X"), FlowNormal2D->AddressX, TA_Wrap);
+        TestEqual(TEXT("Zambezi flow normal wraps in Y"), FlowNormal2D->AddressY, TA_Wrap);
     }
     if (const UTexture2D* FoamLace2D = Cast<UTexture2D>(FoamLace))
     {
@@ -693,8 +693,8 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
             FoamLace2D->CompressionSettings,
             TC_Masks);
         TestFalse(TEXT("Zambezi foam lace stays linear"), FoamLace2D->SRGB);
-        TestEqual(TEXT("Zambezi foam lace mirrors in X"), FoamLace2D->AddressX, TA_Mirror);
-        TestEqual(TEXT("Zambezi foam lace mirrors in Y"), FoamLace2D->AddressY, TA_Mirror);
+        TestEqual(TEXT("Zambezi foam lace wraps in X"), FoamLace2D->AddressX, TA_Wrap);
+        TestEqual(TEXT("Zambezi foam lace wraps in Y"), FoamLace2D->AddressY, TA_Wrap);
     }
 
     auto TestScalar = [this, Instance](
@@ -715,7 +715,7 @@ bool FRaftSimZambeziLiveTransmittingWaterTest::RunTest(
     TestScalar(TEXT("FoamRoughness"), 0.78f);
     TestScalar(TEXT("FallbackSkyReflectionFloor"), 0.07f);
     TestScalar(TEXT("FallbackSkyReflectionVariation"), 0.26f);
-    TestScalar(TEXT("RippleGrazingFloor"), 0.72f);
+    TestScalar(TEXT("RippleGrazingFloor"), 0.14f);
     TestScalar(TEXT("SlickRoughnessScale"), 0.96f);
     TestScalar(TEXT("FresnelSpecular"), 0.018f);
     TestScalar(TEXT("SlickNormalFloor"), 0.82f);

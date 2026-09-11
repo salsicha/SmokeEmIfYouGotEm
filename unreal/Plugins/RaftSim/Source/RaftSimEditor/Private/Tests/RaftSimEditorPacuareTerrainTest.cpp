@@ -339,12 +339,12 @@ bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
     if (Instance->Parent)
     {
         TestEqual(
-            TEXT("Pacuare uses shared raft-transmitting volume water"),
+            TEXT("Pacuare uses its current-carried raft-transmitting water parent"),
             Instance->Parent->GetPathName(),
             FString(TEXT(
-                "/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-                "M_RaftSim_SouthForkRaftTransmissionWater."
-                "M_RaftSim_SouthForkRaftTransmissionWater")));
+                "/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
+                "M_RaftSim_PacuareCurrentWaterV2."
+                "M_RaftSim_PacuareCurrentWaterV2")));
     }
 
     UTexture* FlowNormal = nullptr;
@@ -375,8 +375,8 @@ bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
             FlowNormal2D->CompressionSettings,
             TC_Normalmap);
         TestFalse(TEXT("Pacuare flow normal stays linear"), FlowNormal2D->SRGB);
-        TestEqual(TEXT("Pacuare flow normal mirrors in X"), FlowNormal2D->AddressX, TA_Mirror);
-        TestEqual(TEXT("Pacuare flow normal mirrors in Y"), FlowNormal2D->AddressY, TA_Mirror);
+        TestEqual(TEXT("Pacuare flow normal wraps in X"), FlowNormal2D->AddressX, TA_Wrap);
+        TestEqual(TEXT("Pacuare flow normal wraps in Y"), FlowNormal2D->AddressY, TA_Wrap);
     }
     if (const UTexture2D* FoamLace2D = Cast<UTexture2D>(FoamLace))
     {
@@ -385,8 +385,8 @@ bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
             FoamLace2D->CompressionSettings,
             TC_Masks);
         TestFalse(TEXT("Pacuare foam lace stays linear"), FoamLace2D->SRGB);
-        TestEqual(TEXT("Pacuare foam lace mirrors in X"), FoamLace2D->AddressX, TA_Mirror);
-        TestEqual(TEXT("Pacuare foam lace mirrors in Y"), FoamLace2D->AddressY, TA_Mirror);
+        TestEqual(TEXT("Pacuare foam lace wraps in X"), FoamLace2D->AddressX, TA_Wrap);
+        TestEqual(TEXT("Pacuare foam lace wraps in Y"), FoamLace2D->AddressY, TA_Wrap);
     }
 
     auto TestScalar = [this, Instance](
@@ -402,7 +402,10 @@ bool FRaftSimPacuareLiveTransmittingWaterTest::RunTest(
             FString::Printf(TEXT("%s keeps its authored value"), ParameterName),
             FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
     };
-    TestScalar(TEXT("HydraulicFoamCoverageGain"), 0.66f);
+    TestScalar(TEXT("HydraulicFoamCoverageGain"), 4.5f);
+    TestScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
+    TestScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+    TestScalar(TEXT("PacuareCurrentNormalStrength"), 0.24f);
     TestScalar(TEXT("SpeedAerationFraction"), 0.14f);
     TestScalar(TEXT("FoamRoughness"), 0.74f);
     TestScalar(TEXT("SlickNormalFloor"), 0.28f);

@@ -238,6 +238,8 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
     bool HasRiverCoordinateMap() const { return RiverCoordinatePoints.Num() >= 2; }
 
+    double GetRiverWorldYSign() const { return HasRiverCoordinateMap() ? RiverWorldYSign : 1.0; }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool WorldToRiverCoordinates(
         const FVector& WorldPositionCm, FVector2D& OutStationLateralM,
@@ -316,6 +318,14 @@ public:
     {
         FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
         float Intensity = 0.0f;
+        /** Negative selects the legacy fixed-lift profile. Otherwise this is
+         * the already faded unresolved crest height, independent of foam. */
+        float PhysicalCrestHeightMeters = -1.0f;
+        float PhysicalCrestLengthMeters = 3.0f;
+        float SpillingFraction = 1.0f;
+        /** Spatial evaluation: distant owners must not change this point's
+         * overlap cap. False retains the legacy global-owner cap. */
+        bool bLocalEnvelopeCap = false;
     };
 
     /** Cooked obstruction footprint shared by the visible solver carrier and
@@ -464,7 +474,24 @@ public:
         float SpeedMetersPerSecond,
         float DepthMeters,
         float WaveClockSeconds,
-        float Strength);
+        float Strength,
+        float HydraulicFeatureEnergy = 0.0f);
+
+    /** Converts bounded solver-resolved surface relief into irregular rapid
+     * lobes. Shared by the visible carrier and raft support so a hydraulic
+     * ledge can energize local crests without turning calm reaches into chop. */
+    static float ComputeCoupledHydraulicFeatureEnergy(
+        const FVector2D& RiverCoordinatesMeters,
+        float HydraulicReliefMeters);
+
+    /** Standing crest/hole relief driven by a sustained downstream surface
+     * fall over the shared 12 m analysis span. Unlike curvature relief this
+     * remains active through the face of a smoothed rapid ramp. */
+    static float ComputeCoupledRapidGradeWaveMeters(
+        const FVector2D& RiverCoordinatesMeters,
+        float UpstreamFarSurfaceHeightMeters,
+        float DownstreamFarSurfaceHeightMeters,
+        float SpeedMetersPerSecond);
 
     static float ComputeCoupledHydraulicReliefMeters(
         float CenterSurfaceHeightMeters,
@@ -483,11 +510,18 @@ public:
         float RiverLeftSurfaceHeightMeters,
         float Strength);
 
+    /** Local undular/jump scale minus the rise already resolved by the solver.
+     * X is additional crest height, Y is the authored depth-scaled face length.
+     * This is a bounded subgrid reconstruction, not an additional fluid solver. */
+    static FVector2D ComputeHydraulicCrestDimensionsMeters(
+        float UpstreamDepthMeters, float UpstreamFroude, float ResolvedRiseMeters);
+
     static float ComputeCoupledBreakingReliefMeters(
         const FVector2D& RiverCoordinatesMeters,
         TConstArrayView<FSupportBreakingSite> Sites,
         float CrestLiftMeters,
-        float StationSpacingMeters);
+        float StationSpacingMeters,
+        float* OutCrestFoam = nullptr);
 
     /**
      * Sample the live solver directly in station/lateral coordinates. This is
@@ -564,6 +598,10 @@ private:
     mutable FVector2D LastWorldToRiverPositionM = FVector2D::ZeroVector;
     mutable bool bHasLastWorldToRiverQuery = false;
     float RiverVerticalDatumM = 0.0f;
+    // Coordinate-map source remains metric ENU. Captured geographic scenes
+    // use -1 to map north to Unreal -Y without reversing source river-left.
+    // Legacy maps omit this and retain their existing +Y convention.
+    double RiverWorldYSign = 1.0;
     FString RiverCoordinateMapPath;
 
     bool bRaftSupportSurfaceEnabled = false;

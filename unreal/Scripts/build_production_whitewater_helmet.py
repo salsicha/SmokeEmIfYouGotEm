@@ -25,7 +25,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet"
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterHelmet.fbx"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_helmet_manifest.json"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterHelmet.blend"
-GENERATOR_VERSION = 3
+GENERATOR_VERSION = 7
 
 
 def reset_scene() -> None:
@@ -58,8 +58,11 @@ def build_shell(shell_material: bpy.types.Material) -> bpy.types.Object:
     rings = 32
     sides = 72
     thickness = 0.36
-    outer_scale = Vector((13.4, 12.35, 14.45))
-    shell_center = Vector((2.5, 0.0, 0.0))
+    # V4 carries the bowl farther around the occiput. The previous shell
+    # ended almost tangent to the rear skull, so normal head-size variation
+    # visibly pushed skin through the back while the brow still looked roomy.
+    outer_scale = Vector((14.25, 12.8, 14.6))
+    shell_center = Vector((1.8, 0.0, 0.0))
     vertices: list[tuple[float, float, float]] = []
     faces: list[tuple[int, ...]] = []
 
@@ -78,7 +81,7 @@ def build_shell(shell_material: bpy.types.Material) -> bpy.types.Object:
                 max_phi = (
                     1.72
                     - 0.24 * facing_front
-                    + 0.08 * facing_rear
+                    + 0.17 * facing_rear
                     + 0.035 * side_bias
                 )
                 phi = max_phi * v
@@ -250,8 +253,8 @@ def build_details(
     details.append(
         add_uv_piece(
             "OccipitalLiner",
-            (-7.8, 0.0, 4.6),
-            (0.75, 6.8, 4.8),
+            (-6.4, 0.0, 5.1),
+            (0.55, 5.4, 3.7),
             liner_material,
         )
     )
@@ -264,9 +267,9 @@ def build_details(
                 (11.0, -8.3, 1.9),
                 (5.5, -11.5, -0.4),
                 (-4.8, -11.8, -1.6),
-                (-10.6, -7.0, -2.2),
-                (-11.8, 0.0, -2.6),
-                (-10.6, 7.0, -2.2),
+                (-11.2, -7.0, -2.8),
+                (-12.6, 0.0, -3.6),
+                (-11.2, 7.0, -2.8),
                 (-4.8, 11.8, -1.6),
                 (5.5, 11.5, -0.4),
                 (11.0, 8.3, 1.9),
@@ -356,6 +359,10 @@ def main() -> None:
 
     shell = build_shell(shell_material)
     vent_count = cut_vents(shell)
+    # The bowl already extends below the occiput. A second ellipsoid here
+    # protruded outside it as a bun, and intersected the continuous rear wall.
+    # Fit the complete bowl to the skull instead of covering fit errors with
+    # another visible surface.
     details = build_details(liner_material, webbing_material, hardware_material)
     helmet = join_for_export([shell, *details])
     bpy.context.scene.unit_settings.system = "METRIC"
@@ -398,6 +405,7 @@ def main() -> None:
         "object_name": helmet.name,
         "material_slots": [slot.name for slot in helmet.data.materials],
         "physical_cut_through_vents": vent_count,
+        "rear_occipital_shell": True,
         "retention_anchor_count": 4,
         "vertex_count": len(helmet.data.vertices),
         "polygon_count": len(helmet.data.polygons),

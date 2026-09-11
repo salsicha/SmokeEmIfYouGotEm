@@ -52,10 +52,13 @@ public class RaftSimEditor : ModuleRules
             "InputCore",
             "MeshUtilities",
             "Niagara",
+            "NiagaraCore",
+            "NiagaraEditor",
             "NiagaraShader",
             "EnhancedInput",
             "RaftSimRaft",
             "RaftSimWater",
+            "RaftSimWaterDetail",
             "Projects",
             "ProceduralMeshComponent",
             "ProceduralVegetation",
@@ -65,5 +68,8 @@ public class RaftSimEditor : ModuleRules
             "RHI",
             "UnrealEd"
         });
+        // The generic platform SHA256 entry point is unimplemented on desktop.
+        // Use the engine's bundled implementation for source-geometry provenance.
+        AddEngineThirdPartyPrivateStaticDependencies(Target, "OpenSSL");
     }
 }

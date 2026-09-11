@@ -425,7 +425,12 @@ UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
     }
 
     Instance->Modify();
-    Instance->SetParentEditorOnly(SharedTransmissionParent);
+    UMaterial* CurrentParent = LoadOrCreateCurrentGradientWaterParent(
+        SharedTransmissionParent->GetMaterial(),
+        TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_PacuareCurrentWaterV2"),
+        TEXT("Pacuare"), 0.06f, 0.24f, OutSummary);
+    if (!CurrentParent) return nullptr;
+    Instance->SetParentEditorOnly(CurrentParent);
     Instance->ClearParameterValuesEditorOnly();
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
     {
@@ -440,16 +445,19 @@ UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
         FMaterialParameterInfo(TEXT("WhitewaterFoamLace")), FoamLace);
     // Texture detail is visual-only. The shared parent multiplies lace by
     // live solver foam/speed, so this cannot paint foam into calm or dry cells.
-    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.66f);
+    // The old 0.28 cutoff erased the resolved aeration (observed max 0.22).
+    // Only existing aeration generates froth; fast calm water is not foam.
+    SetScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 4.5f);
     SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.62f);
-    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.72f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
     SetScalar(TEXT("SpeedAerationFraction"), 0.14f);
     SetScalar(TEXT("FoamRoughness"), 0.74f);
     SetScalar(TEXT("ReachHueVariation"), 0.08f);
     SetScalar(TEXT("CalmSurfaceColorVariation"), 0.14f);
     SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.48f);
     SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.34f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.36f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.10f);
     SetScalar(TEXT("SlickNormalFloor"), 0.28f);
     Instance->PostEditChange();
     FAssetCompilingManager::Get().FinishAllCompilation();
@@ -472,4 +480,14 @@ UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
         "flow-normal and solver-masked foam-lace textures.\n");
     return Instance;
 }
+static FAutoConsoleCommand GRefreshPacuareCurrentWater(
+    TEXT("RaftSim.RefreshPacuareCurrentWater"),
+    TEXT("Refresh only the Pacuare live water material and its texture dependencies."),
+    FConsoleCommandDelegate::CreateLambda([]
+    {
+        FString Summary;
+        const bool bReady = LoadOrCreatePacuareUpperHuacasLiveWaterInstance(Summary) != nullptr;
+        UE_LOG(LogRaftSimEditorEnvironment, Display,
+            TEXT("Pacuare current water refresh: ready=%d\n%s"), bReady ? 1 : 0, *Summary);
+    }));
 } // namespace RaftSimEditorEnvironment

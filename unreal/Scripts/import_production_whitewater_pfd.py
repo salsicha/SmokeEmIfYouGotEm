@@ -147,6 +147,9 @@ def configure_and_audit(
     source_triangles = mesh.get_num_triangles(0)
     nanite = subsystem.get_nanite_settings(mesh)
     nanite.enabled = True
+    nanite.fallback_relative_error = 0.0
+    nanite.fallback_percent_triangles = 1.0
+    nanite.fallback_target = unreal.NaniteFallbackTarget.PERCENT_TRIANGLES
     subsystem.set_nanite_settings(mesh, nanite)
     mesh.modify()
     unreal.EditorAssetLibrary.save_loaded_asset(mesh, only_if_is_dirty=False)

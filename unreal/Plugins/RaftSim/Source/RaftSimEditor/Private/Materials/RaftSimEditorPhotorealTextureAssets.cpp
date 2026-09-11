@@ -22,11 +22,11 @@ bool BuildSouthForkWaterTextureAssets()
     FlowNormalSpec.CompressionSettings = TC_Normalmap;
     FlowNormalSpec.bSRGB = false;
     FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    // The generated source is visually periodic but not pixel-identical at
-    // the boundary. Mirrored addressing guarantees continuous sampling at
-    // every repeat without destructively filtering the authored field.
-    FlowNormalSpec.AddressX = TA_Mirror;
-    FlowNormalSpec.AddressY = TA_Mirror;
+    // Wrap preserves the direction of the current gradient across repeats.
+    // Mirroring reversed that gradient at every boundary, which the grazing
+    // guide camera exposed as regularly spaced reflection bars.
+    FlowNormalSpec.AddressX = TA_Wrap;
+    FlowNormalSpec.AddressY = TA_Wrap;
     FlowNormalSpec.bCompressionNoAlpha = true;
     bool bFlowNormalSaved = false;
     UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -48,8 +48,8 @@ bool BuildSouthForkWaterTextureAssets()
     FoamLaceSpec.CompressionSettings = TC_Masks;
     FoamLaceSpec.bSRGB = false;
     FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
-    FoamLaceSpec.AddressX = TA_Mirror;
-    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.AddressX = TA_Wrap;
+    FoamLaceSpec.AddressY = TA_Wrap;
     FoamLaceSpec.bCompressionNoAlpha = true;
     bool bFoamLaceSaved = false;
     UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -79,8 +79,8 @@ bool BuildPacuareUpperHuacasWaterTextureAssets()
     FlowNormalSpec.CompressionSettings = TC_Normalmap;
     FlowNormalSpec.bSRGB = false;
     FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    FlowNormalSpec.AddressX = TA_Mirror;
-    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.AddressX = TA_Wrap;
+    FlowNormalSpec.AddressY = TA_Wrap;
     FlowNormalSpec.bCompressionNoAlpha = true;
     bool bFlowNormalSaved = false;
     UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -100,8 +100,8 @@ bool BuildPacuareUpperHuacasWaterTextureAssets()
     FoamLaceSpec.CompressionSettings = TC_Masks;
     FoamLaceSpec.bSRGB = false;
     FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
-    FoamLaceSpec.AddressX = TA_Mirror;
-    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.AddressX = TA_Wrap;
+    FoamLaceSpec.AddressY = TA_Wrap;
     FoamLaceSpec.bCompressionNoAlpha = true;
     bool bFoamLaceSaved = false;
     UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -135,8 +135,8 @@ bool BuildColoradoHanceWaterTextureAssets()
     FlowNormalSpec.CompressionSettings = TC_Normalmap;
     FlowNormalSpec.bSRGB = false;
     FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    FlowNormalSpec.AddressX = TA_Mirror;
-    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.AddressX = TA_Wrap;
+    FlowNormalSpec.AddressY = TA_Wrap;
     FlowNormalSpec.bCompressionNoAlpha = true;
     bool bFlowNormalSaved = false;
     UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -156,8 +156,8 @@ bool BuildColoradoHanceWaterTextureAssets()
     FoamLaceSpec.CompressionSettings = TC_Masks;
     FoamLaceSpec.bSRGB = false;
     FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
-    FoamLaceSpec.AddressX = TA_Mirror;
-    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.AddressX = TA_Wrap;
+    FoamLaceSpec.AddressY = TA_Wrap;
     FoamLaceSpec.bCompressionNoAlpha = true;
     bool bFoamLaceSaved = false;
     UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -187,11 +187,10 @@ bool BuildFutaleufuTerminatorWaterTextureAssets()
     FlowNormalSpec.CompressionSettings = TC_Normalmap;
     FlowNormalSpec.bSRGB = false;
     FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    // The generated project asset is visually continuous but not guaranteed
-    // byte-identical at opposite borders. Mirrored addressing guarantees a
-    // continuous derivative without blurring its irregular current ridges.
-    FlowNormalSpec.AddressX = TA_Mirror;
-    FlowNormalSpec.AddressY = TA_Mirror;
+    // Keep downstream derivatives continuous in direction across repeats;
+    // mirror addressing turned each repeat into a visible reflection ridge.
+    FlowNormalSpec.AddressX = TA_Wrap;
+    FlowNormalSpec.AddressY = TA_Wrap;
     FlowNormalSpec.bCompressionNoAlpha = true;
     bool bFlowNormalSaved = false;
     UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -211,8 +210,8 @@ bool BuildFutaleufuTerminatorWaterTextureAssets()
     FoamLaceSpec.CompressionSettings = TC_Masks;
     FoamLaceSpec.bSRGB = false;
     FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
-    FoamLaceSpec.AddressX = TA_Mirror;
-    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.AddressX = TA_Wrap;
+    FoamLaceSpec.AddressY = TA_Wrap;
     FoamLaceSpec.bCompressionNoAlpha = true;
     bool bFoamLaceSaved = false;
     UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -246,8 +245,8 @@ bool BuildChilkoLavaCanyonWaterTextureAssets()
     FlowNormalSpec.CompressionSettings = TC_Normalmap;
     FlowNormalSpec.bSRGB = false;
     FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    FlowNormalSpec.AddressX = TA_Mirror;
-    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.AddressX = TA_Wrap;
+    FlowNormalSpec.AddressY = TA_Wrap;
     FlowNormalSpec.bCompressionNoAlpha = true;
     bool bFlowNormalSaved = false;
     UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -267,8 +266,8 @@ bool BuildChilkoLavaCanyonWaterTextureAssets()
     FoamLaceSpec.CompressionSettings = TC_Masks;
     FoamLaceSpec.bSRGB = false;
     FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
-    FoamLaceSpec.AddressX = TA_Mirror;
-    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.AddressX = TA_Wrap;
+    FoamLaceSpec.AddressY = TA_Wrap;
     FoamLaceSpec.bCompressionNoAlpha = true;
     bool bFoamLaceSaved = false;
     UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -302,8 +301,8 @@ bool BuildZambeziBatokaWaterTextureAssets()
     FlowNormalSpec.CompressionSettings = TC_Normalmap;
     FlowNormalSpec.bSRGB = false;
     FlowNormalSpec.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    FlowNormalSpec.AddressX = TA_Mirror;
-    FlowNormalSpec.AddressY = TA_Mirror;
+    FlowNormalSpec.AddressX = TA_Wrap;
+    FlowNormalSpec.AddressY = TA_Wrap;
     FlowNormalSpec.bCompressionNoAlpha = true;
     bool bFlowNormalSaved = false;
     UTexture2D* FlowNormalTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(
@@ -323,8 +322,8 @@ bool BuildZambeziBatokaWaterTextureAssets()
     FoamLaceSpec.CompressionSettings = TC_Masks;
     FoamLaceSpec.bSRGB = false;
     FoamLaceSpec.LODGroup = TEXTUREGROUP_World;
-    FoamLaceSpec.AddressX = TA_Mirror;
-    FoamLaceSpec.AddressY = TA_Mirror;
+    FoamLaceSpec.AddressX = TA_Wrap;
+    FoamLaceSpec.AddressY = TA_Wrap;
     FoamLaceSpec.bCompressionNoAlpha = true;
     bool bFoamLaceSaved = false;
     UTexture2D* FoamLaceTexture = CreateOrUpdateFirstPartyMaterialTextureAsset(

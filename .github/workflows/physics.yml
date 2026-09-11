@@ -39,4 +39,4 @@ jobs:
           cmake --build build -j
       - name: Run solver unit tests
         working-directory: physics/cpp
-        run: ctest --test-dir build --output-on-failure || ./build/raftsim_water_tests
+        run: ctest --test-dir build --output-on-failure --no-tests=error

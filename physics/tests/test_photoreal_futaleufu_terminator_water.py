@@ -148,7 +148,7 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
         # (the former near-zero response read as "a solid surface, not water").
         'SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f)',
         'SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f)',
-        'SetScalar(TEXT("RippleGrazingFloor"), 0.58f)',
+        'SetScalar(TEXT("RippleGrazingFloor"), 0.12f)',
         'SetScalar(TEXT("SlickNormalFloor"), 0.62f)',
         'SetScalar(TEXT("SlickRoughnessScale"), 1.0f)',
         'SetScalar(TEXT("FresnelSpecular"), 0.10f)',
@@ -208,10 +208,12 @@ def test_futaleufu_capture_and_live_profiles_are_river_local() -> None:
     assert "FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)" in geometry
     assert "FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)" in geometry
     assert "FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)" in geometry
-    assert "FLinearColor(0.008f, 0.055f, 0.130f, 1.0f)" in runtime
-    assert "FLinearColor(0.001f, 0.014f, 0.050f, 1.0f)" in runtime
-    assert "FLinearColor(0.018f, 0.080f, 0.160f, 1.0f)" in runtime
-    assert "FLinearColor(0.000035f, 0.000070f, 0.000110f, 0.0f)" in runtime
+    # The static capture retains its historical palette; the live carrier
+    # uses the September current-water calibration without recooking physics.
+    assert "FLinearColor(0.012f, 0.085f, 0.100f, 1.0f)" in runtime
+    assert "FLinearColor(0.003f, 0.035f, 0.046f, 1.0f)" in runtime
+    assert "FLinearColor(0.035f, 0.100f, 0.120f, 1.0f)" in runtime
+    assert "FLinearColor(0.000035f, 0.000100f, 0.000110f, 0.0f)" in runtime
     assert "FLinearColor(0.0120f, 0.0080f, 0.0060f, 0.0f)" in runtime
     assert "FLinearColor(0.055f, 0.075f, 0.090f, 0.0f)" in runtime
     assert "? 0.025f" in runtime
@@ -439,7 +441,7 @@ def test_futaleufu_v3_visual_textures_are_first_party_and_fail_closed() -> None:
         assert provenance["texture"]["height"] == 1254
         assert len(provenance["limitations"]) >= 4
         assert map_kind in texture_source
-    assert "TA_Mirror" in texture_source
+    assert "TA_Wrap" in texture_source
     assert "solver_masked" in texture_source
 
 

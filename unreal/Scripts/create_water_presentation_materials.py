@@ -11,6 +11,8 @@ import unreal
 
 COMMANDS = (
     "RaftSim.CreatePhotorealRiverWaterMaterial",
+    "RaftSim.CreateLiveRiverSurfaceMaterial",
+    "RaftSim.RefreshAllRiverFluidMaterials",
     "RaftSim.CreateWaterVfxMaterial",
     "RaftSim.CreateNiagaraWaterVfxSystems",
 )

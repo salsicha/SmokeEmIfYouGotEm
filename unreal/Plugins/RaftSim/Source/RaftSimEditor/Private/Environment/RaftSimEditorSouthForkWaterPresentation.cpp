@@ -1,9 +1,11 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
 #include "Materials/MaterialExpressionAdd.h"
+#include "Materials/MaterialExpressionAppendVector.h"
 #include "Materials/MaterialExpressionClamp.h"
 #include "Materials/MaterialExpressionCollectionParameter.h"
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant.h"
+#include "Materials/MaterialExpressionConstant2Vector.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
@@ -16,6 +18,7 @@
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTime.h"
 #include "Materials/MaterialExpressionVertexColor.h"
+#include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialExpressionWorldPosition.h"
 #include "Materials/MaterialParameterCollection.h"
 
@@ -23,6 +26,79 @@ namespace RaftSimEditorEnvironment
 {
 namespace
 {
+static const TCHAR* kRaftLocalGpuFluidWpoCode = TEXT(
+    "float2 stationaryP = UV * 3.0;\n"
+    "float2 advectedP = stationaryP - FlowDisplacement.xy;\n"
+    "float halfWindowCm = max(WindowMeters * 50.0, 1000.0);\n"
+    "float localWindow = 1.0 - smoothstep(halfWindowCm * 0.82, halfWindowCm, distance(WorldPosition.xy, RaftCenter.xy));\n"
+    // Speed alone is not whitewater. The old speed term activated this
+    // multi-band displacement across every ordinary current, producing the
+    // broad pale chevrons/bars seen in the approach pool. Vertex foam already
+    // contains solver slope and hydraulic-feature energy, so it confines 3D
+    // boiling to water that is actually working.
+    // Foam can persist in ankle-deep margins after a crest passes. It is not
+    // permission to lift that shallow margin into an airborne shore blob.
+    "float depthGate = smoothstep(0.10, 0.60, max(DepthNorm, 0.0) * 4.0);\n"
+    "float rapid = smoothstep(0.025, 0.42, Foam) * saturate(Wet) * depthGate * localWindow;\n"
+    // Rotated value-noise fields replace the former sum of long sine phase
+    // lines. Those phase lines were mathematically continuous but still had
+    // infinite parallel crests, which reflected as horizontal and vertical
+    // bars from a guide-eye camera. Two non-commensurate rotations produce
+    // compact, irregular upwellings with no privileged river/grid axis.
+    "float2 anchorA = float2(0.731 * stationaryP.x + 0.682 * stationaryP.y, -0.682 * stationaryP.x + 0.731 * stationaryP.y) * 0.205;\n"
+    "float2 anchorAi = floor(anchorA);\n"
+    "float2 anchorAf = frac(anchorA);\n"
+    "float2 anchorAs = anchorAf * anchorAf * (3.0 - 2.0 * anchorAf);\n"
+    "float anchorA00 = frac(sin(dot(anchorAi + float2(0.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\n"
+    "float anchorA10 = frac(sin(dot(anchorAi + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);\n"
+    "float anchorA01 = frac(sin(dot(anchorAi + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\n"
+    "float anchorA11 = frac(sin(dot(anchorAi + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);\n"
+    "float anchorNoiseA = lerp(lerp(anchorA00, anchorA10, anchorAs.x), lerp(anchorA01, anchorA11, anchorAs.x), anchorAs.y);\n"
+    "float2 anchorB = float2(-0.417 * stationaryP.x + 0.909 * stationaryP.y, -0.909 * stationaryP.x - 0.417 * stationaryP.y) * 0.397 + float2(17.31, -9.17);\n"
+    "float2 anchorBi = floor(anchorB);\n"
+    "float2 anchorBf = frac(anchorB);\n"
+    "float2 anchorBs = anchorBf * anchorBf * (3.0 - 2.0 * anchorBf);\n"
+    "float anchorB00 = frac(sin(dot(anchorBi + float2(0.0, 0.0), float2(269.5, 183.3))) * 24634.6345);\n"
+    "float anchorB10 = frac(sin(dot(anchorBi + float2(1.0, 0.0), float2(269.5, 183.3))) * 24634.6345);\n"
+    "float anchorB01 = frac(sin(dot(anchorBi + float2(0.0, 1.0), float2(269.5, 183.3))) * 24634.6345);\n"
+    "float anchorB11 = frac(sin(dot(anchorBi + float2(1.0, 1.0), float2(269.5, 183.3))) * 24634.6345);\n"
+    "float anchorNoiseB = lerp(lerp(anchorB00, anchorB10, anchorBs.x), lerp(anchorB01, anchorB11, anchorBs.x), anchorBs.y);\n"
+    "float anchorNoise = saturate(0.64 * anchorNoiseA + 0.36 * anchorNoiseB);\n"
+    "float crestCluster = pow(saturate((anchorNoise - 0.43) * 1.82), 2.6);\n"
+    "float anchorTrough = pow(saturate((0.46 - anchorNoise) * 1.95), 2.2);\n"
+    "float crestBreath = 0.90 + 0.10 * sin(WaveClock * 0.71 + anchorNoiseB * 6.2831853);\n"
+    "float2 boilA = float2(0.847 * advectedP.x - 0.532 * advectedP.y, 0.532 * advectedP.x + 0.847 * advectedP.y) * 0.315 + float2(-4.11, 13.73);\n"
+    "float2 boilAi = floor(boilA);\n"
+    "float2 boilAf = frac(boilA);\n"
+    "float2 boilAs = boilAf * boilAf * (3.0 - 2.0 * boilAf);\n"
+    "float boilA00 = frac(sin(dot(boilAi + float2(0.0, 0.0), float2(157.7, 113.5))) * 31973.417);\n"
+    "float boilA10 = frac(sin(dot(boilAi + float2(1.0, 0.0), float2(157.7, 113.5))) * 31973.417);\n"
+    "float boilA01 = frac(sin(dot(boilAi + float2(0.0, 1.0), float2(157.7, 113.5))) * 31973.417);\n"
+    "float boilA11 = frac(sin(dot(boilAi + float2(1.0, 1.0), float2(157.7, 113.5))) * 31973.417);\n"
+    "float boilNoiseA = lerp(lerp(boilA00, boilA10, boilAs.x), lerp(boilA01, boilA11, boilAs.x), boilAs.y);\n"
+    "float2 boilB = float2(-0.615 * advectedP.x - 0.789 * advectedP.y, 0.789 * advectedP.x - 0.615 * advectedP.y) * 0.611 + float2(8.37, 2.91);\n"
+    "float2 boilBi = floor(boilB);\n"
+    "float2 boilBf = frac(boilB);\n"
+    "float2 boilBs = boilBf * boilBf * (3.0 - 2.0 * boilBf);\n"
+    "float boilB00 = frac(sin(dot(boilBi + float2(0.0, 0.0), float2(101.3, 271.9))) * 41719.213);\n"
+    "float boilB10 = frac(sin(dot(boilBi + float2(1.0, 0.0), float2(101.3, 271.9))) * 41719.213);\n"
+    "float boilB01 = frac(sin(dot(boilBi + float2(0.0, 1.0), float2(101.3, 271.9))) * 41719.213);\n"
+    "float boilB11 = frac(sin(dot(boilBi + float2(1.0, 1.0), float2(101.3, 271.9))) * 41719.213);\n"
+    "float boilNoiseB = lerp(lerp(boilB00, boilB10, boilBs.x), lerp(boilB01, boilB11, boilBs.x), boilBs.y);\n"
+    // Noise is advected, so multiplying it by elapsed time makes its temporal
+    // derivative grow for the entire run. Use bounded phase offsets instead:
+    // the boils must not accelerate into flicker as a session gets older.
+    "float boilPhase = WaveClock * 1.70 + 2.90 * boilNoiseB + 6.2831853 * boilNoiseA;\n"
+    "float boilPulse = sin(boilPhase);\n"
+    "float splashPulse = pow(saturate(0.5 + 0.5 * sin(boilPhase * 1.73 + anchorNoiseA * 4.7)), 6.0);\n"
+    // Full-scale relief remains bounded and foam-gated. Solver/obstacle
+    // geometry owns coherent standing-wave crests; this layer supplies only
+    // compact crest clusters, recirculating boils, and transient splashes.
+    "float anchoredRelief = crestBreath * (0.72 * crestCluster - 0.20 * anchorTrough);\n"
+    "float carriedBoils = 0.25 * (boilNoiseA - 0.5) * (0.45 + boilNoiseB) + 0.17 * boilPulse * (0.30 + 0.70 * boilNoiseB) + 0.20 * splashPulse;\n"
+    "float displacementM = clamp(rapid * (anchoredRelief + carriedBoils), -0.50, 0.78);\n"
+    "return float3(0.0, 0.0, displacementM * 100.0 * Strength);");
+
 UMaterialExpressionCollectionParameter* AddRaftWaterCollectionParameter(
     UMaterial* Material,
     UMaterialParameterCollection* Collection,
@@ -587,9 +663,35 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             bHasTravelingWaveStrengthGate = true;
         }
         if (Expression &&
-            Expression->Desc == TEXT("RaftSimRaftLocalGpuFluidWPOV2"))
+            (Expression->Desc == TEXT("RaftSimRaftLocalGpuFluidWPOV2") ||
+             Expression->Desc == TEXT("RaftSimRaftLocalGpuFluidWPOV3") ||
+             Expression->Desc == TEXT("RaftSimRaftLocalGpuFluidWPOV4") ||
+             Expression->Desc == TEXT("RaftSimRaftLocalGpuFluidWPOV5")))
         {
             bHasRaftLocalGpuFluid = true;
+            if (UMaterialExpressionCustom* ExistingFluid =
+                    Cast<UMaterialExpressionCustom>(Expression))
+            {
+                ExistingFluid->Modify();
+                ExistingFluid->Desc = TEXT("RaftSimRaftLocalGpuFluidWPOV5");
+                ExistingFluid->Description = TEXT(
+                    "Axis-free cellular crest clusters and current-carried boils");
+                ExistingFluid->Code = kRaftLocalGpuFluidWpoCode;
+                if (!ExistingFluid->Inputs.ContainsByPredicate([](const FCustomInput& Input)
+                    { return Input.InputName == TEXT("DepthNorm"); }))
+                {
+                    const FCustomInput* FoamInput = ExistingFluid->Inputs.FindByPredicate(
+                        [](const FCustomInput& Input) { return Input.InputName == TEXT("Foam"); });
+                    if (FoamInput && FoamInput->Input.Expression)
+                    {
+                        FCustomInput DepthInput;
+                        DepthInput.InputName = TEXT("DepthNorm");
+                        DepthInput.Input.Connect(2, FoamInput->Input.Expression);
+                        ExistingFluid->Inputs.Add(DepthInput);
+                    }
+                }
+                bNeedsSave = true;
+            }
         }
         if (Expression &&
             Expression->Desc == TEXT("RaftSimLiveLevelSinkWPO"))
@@ -844,29 +946,11 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
 
         UMaterialExpressionCustom* Turbulence =
             NewObject<UMaterialExpressionCustom>(Material);
-        Turbulence->Desc = TEXT("RaftSimRaftLocalGpuFluidWPOV2");
+        Turbulence->Desc = TEXT("RaftSimRaftLocalGpuFluidWPOV5");
         Turbulence->Description = TEXT(
-            "Bounded current-driven GPU heightfield: sharp crest packets and recirculating boils");
+            "Axis-free cellular crest clusters and current-carried boils");
         Turbulence->OutputType = CMOT_Float3;
-        Turbulence->Code = TEXT(
-            "float2 p = UV * 3.0 - FlowDisplacement.xy;\n"
-            "float halfWindowCm = max(WindowMeters * 50.0, 1000.0);\n"
-            "float localWindow = 1.0 - smoothstep(halfWindowCm * 0.82, halfWindowCm, distance(WorldPosition.xy, RaftCenter.xy));\n"
-            "float rapid = saturate(max(Foam * 1.9, (Speed - 0.09) * 4.2)) * saturate(Wet) * localWindow;\n"
-            "float warpA = sin(p.x * 0.233 - p.y * 0.617 + 0.17 * sin(p.y * 0.19));\n"
-            "float warpB = sin(p.x * 0.149 + p.y * 0.823 + 1.73 + 0.23 * sin(p.x * 0.071));\n"
-            "float warp = warpA + 0.57 * warpB;\n"
-            "float packetA = pow(saturate(0.5 + 0.5 * sin(p.x * 0.271 + p.y * 0.487 + warp * 0.61)), 4.0);\n"
-            "float packetB = pow(saturate(0.5 + 0.5 * sin(p.x * 0.119 - p.y * 0.337 - warp * 0.43 + 2.1)), 3.0);\n"
-            "float phaseA = p.x * 1.11 + p.y * 0.37 + warp * 0.72;\n"
-            "float phaseB = p.x * 0.683 - p.y * 1.397 - warp * 0.48 + 0.31 * sin(p.x * 0.097);\n"
-            "float crestA = sin(phaseA) + 0.34 * sin(phaseA * 2.0 + 0.72) + 0.15 * sin(phaseA * 3.0 + 1.31);\n"
-            "float crestB = sin(phaseB) + 0.27 * sin(phaseB * 2.0 - 0.44);\n"
-            "float boilCell = pow(saturate(0.5 + 0.5 * sin(p.x * 0.421 + p.y * 0.563 + warp)), 2.4);\n"
-            "float recirculation = sin(WaveClock * 2.13 + p.x * 0.887 - p.y * 0.919 + warp * 0.7);\n"
-            "float splashPulse = pow(saturate(0.5 + 0.5 * sin(WaveClock * 3.71 + p.x * 1.73 + p.y * 1.19)), 6.0);\n"
-            "float displacementM = rapid * (0.115 * packetA * crestA + 0.070 * packetB * crestB + 0.105 * boilCell * recirculation + 0.075 * Foam * splashPulse);\n"
-            "return float3(0.0, 0.0, displacementM * 100.0 * Strength);");
+        Turbulence->Code = kRaftLocalGpuFluidWpoCode;
         const auto AddTurbulenceInput = [Turbulence](
             FName Name, UMaterialExpression* Expression, int32 OutputIndex = 0)
         {
@@ -879,6 +963,7 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         AddTurbulenceInput(TEXT("Foam"), TurbulenceVertexColor, 1);
         AddTurbulenceInput(TEXT("Speed"), TurbulenceVertexColor, 3);
         AddTurbulenceInput(TEXT("Wet"), TurbulenceVertexColor, 4);
+        AddTurbulenceInput(TEXT("DepthNorm"), TurbulenceVertexColor, 2);
         AddTurbulenceInput(TEXT("FlowDisplacement"), FlowDisplacement);
         AddTurbulenceInput(TEXT("WaveClock"), WaveClock);
         AddTurbulenceInput(TEXT("RaftCenter"), RaftCenter);
@@ -999,8 +1084,126 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
         }
     }
 
+    // V4 was duplicated before the shared parent's analytic-normal amplitude
+    // gate existed. Setting AnalyticChopStrength on its instance did nothing,
+    // leaving infinite crossing sine slopes in calm-water reflections. Migrate
+    // the actual normal branch, without rebuilding the transmission graph.
+    UMaterialExpressionScalarParameter* ChopGate = nullptr;
+    UMaterialExpressionScalarParameter* SteepnessParameter = nullptr;
+    for (UMaterialExpression* Expression : Material->GetExpressions())
+    {
+        if (auto* Parameter = Cast<UMaterialExpressionScalarParameter>(Expression))
+        {
+            if (Parameter->ParameterName == TEXT("AnalyticChopStrength")) ChopGate = Parameter;
+            if (Parameter->ParameterName == TEXT("FlowNormalSteepness")) SteepnessParameter = Parameter;
+        }
+    }
+    UMaterialExpressionAppendVector* LegacyAnalyticSlope = nullptr;
+    if (!ChopGate && SteepnessParameter)
+    {
+        for (UMaterialExpression* Expression : Material->GetExpressions())
+        {
+            auto* Steepness = Cast<UMaterialExpressionMultiply>(Expression);
+            if (!Steepness || Steepness->B.Expression != SteepnessParameter) continue;
+            auto* XYMask = Cast<UMaterialExpressionMultiply>(Steepness->A.Expression);
+            auto* CombinedSlopes = XYMask ? Cast<UMaterialExpressionAdd>(XYMask->A.Expression) : nullptr;
+            auto* Analytic = CombinedSlopes ? Cast<UMaterialExpressionAppendVector>(CombinedSlopes->B.Expression) : nullptr;
+            auto* ZeroZ = Analytic ? Cast<UMaterialExpressionConstant>(Analytic->B.Expression) : nullptr;
+            if (Analytic && ZeroZ && FMath::IsNearlyZero(ZeroZ->R) &&
+                Cast<UMaterialExpressionLinearInterpolate>(Analytic->A.Expression))
+            {
+                LegacyAnalyticSlope = Analytic;
+                break;
+            }
+        }
+        if (LegacyAnalyticSlope)
+        {
+            ChopGate = NewObject<UMaterialExpressionScalarParameter>(Material);
+            ChopGate->ParameterName = TEXT("AnalyticChopStrength");
+            ChopGate->DefaultValue = 0.0f;
+            Material->GetExpressionCollection().AddExpression(ChopGate);
+            auto* GatedSlope = NewObject<UMaterialExpressionMultiply>(Material);
+            GatedSlope->A = LegacyAnalyticSlope->A;
+            GatedSlope->B.Connect(0, ChopGate);
+            GatedSlope->Desc = TEXT("RaftSimLegacyAnalyticNormalGate");
+            Material->GetExpressionCollection().AddExpression(GatedSlope);
+            LegacyAnalyticSlope->A.Connect(0, GatedSlope);
+            OutSummary += TEXT("Migrated the legacy ungated analytic water-normal branch.\n");
+            bNeedsSave = true;
+        }
+    }
+
+    // The procedural carrier uploads half-precision vertex UVs. At an 8 km
+    // station adjacent rows otherwise quantize to identical values, producing
+    // six-metre foam bars. Reconstruct absolute coordinates AFTER interpolation.
+    // Static tiles retain their existing coordinates because the origin is zero.
+    const TArray<TObjectPtr<UMaterialExpression>> OriginalExpressions(Material->GetExpressions());
+    UMaterialExpressionVectorParameter* RiverOrigin = nullptr;
+    for (UMaterialExpression* Expression : OriginalExpressions)
+    {
+        if (auto* Parameter = Cast<UMaterialExpressionVectorParameter>(Expression);
+            Parameter && Parameter->ParameterName == TEXT("RaftSimWaterUVOrigin"))
+        {
+            RiverOrigin = Parameter;
+        }
+    }
+    for (UMaterialExpression* Expression : OriginalExpressions)
+    {
+        auto* Coordinate = Cast<UMaterialExpressionTextureCoordinate>(Expression);
+        if (!Coordinate || Coordinate->CoordinateIndex != 0 ||
+            Coordinate->Desc.Contains(TEXT("RaftSimFullPrecisionRiverUV")))
+        {
+            continue;
+        }
+        if (!RiverOrigin)
+        {
+            RiverOrigin = NewObject<UMaterialExpressionVectorParameter>(Material);
+            RiverOrigin->ParameterName = TEXT("RaftSimWaterUVOrigin");
+            RiverOrigin->DefaultValue = FLinearColor::Transparent;
+            Material->GetExpressionCollection().AddExpression(RiverOrigin);
+        }
+        auto* OriginXY = NewObject<UMaterialExpressionComponentMask>(Material);
+        OriginXY->Input.Connect(0, RiverOrigin);
+        OriginXY->R = OriginXY->G = true;
+        OriginXY->B = OriginXY->A = false;
+        Material->GetExpressionCollection().AddExpression(OriginXY);
+        auto* Tiling = NewObject<UMaterialExpressionConstant2Vector>(Material);
+        Tiling->R = Coordinate->UTiling;
+        Tiling->G = Coordinate->VTiling;
+        Material->GetExpressionCollection().AddExpression(Tiling);
+        auto* ScaledOrigin = NewObject<UMaterialExpressionMultiply>(Material);
+        ScaledOrigin->A.Connect(0, OriginXY);
+        ScaledOrigin->B.Connect(0, Tiling);
+        Material->GetExpressionCollection().AddExpression(ScaledOrigin);
+        auto* AbsoluteUV = NewObject<UMaterialExpressionAdd>(Material);
+        AbsoluteUV->A.Connect(0, Coordinate);
+        AbsoluteUV->B.Connect(0, ScaledOrigin);
+        Material->GetExpressionCollection().AddExpression(AbsoluteUV);
+        for (UMaterialExpression* Consumer : OriginalExpressions)
+        {
+            if (!Consumer)
+            {
+                continue;
+            }
+            for (FExpressionInputIterator Input{Consumer}; Input; ++Input)
+            {
+                if (Input->Expression == Coordinate)
+                {
+                    Input->Expression = AbsoluteUV;
+                }
+            }
+        }
+        Coordinate->Desc += TEXT(" RaftSimFullPrecisionRiverUV");
+        bNeedsSave = true;
+    }
+
     if (bNeedsSave)
     {
+        // Expression edits are not independently represented in shader DDC
+        // keys. Invalidate the saved identity and refresh parameter/texture
+        // metadata even when deferring shader compilation until next load.
+        Material->StateId = FGuid::NewGuid();
+        Material->UpdateCachedExpressionData();
         // This existing parent is already configured for Single Layer Water
         // and instanced meshes. Save the serialized expression graph before
         // asking Unreal to rebuild its rendering resources: PostEditChange
@@ -1094,9 +1297,9 @@ bool LoadSouthForkProductionWaterPresentation(
     // an independently animated drift sheet or a panner that can outrun a
     // passively drifting raft.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupBias")), 0.06f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupBias")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.08f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 3.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("DriftFoamAerationGain")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
@@ -1143,13 +1346,17 @@ bool LoadSouthForkProductionWaterPresentation(
     // retain the advected vertex foam here. The breakup shares that field's
     // integrated motion and therefore adds detail without another foam sheet.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamIntensity")), 1.0f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamIntensity")), 0.90f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HydraulicFoamCoverageGain")), 0.95f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 1.08f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorBreakupGain")), 3.0f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("HydraulicFoamColorCoreGain")), 0.95f);
+        FMaterialParameterInfo(TEXT("HydraulicFoamColorCoreGain")), 1.25f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WhitewaterFrothLaceModulationFloor")), 0.02f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("FoamRoughness")), 0.80f);
     // Clear pools are glassy: a tight specular lobe reads as real mirror
     // water (dark where it reflects the far bank, bright only in the sun and
     // sky lanes), while the previous 0.24 roughness blurred sky and shore
@@ -1164,7 +1371,7 @@ bool LoadSouthForkProductionWaterPresentation(
     // edge ("the glossy surface and the water surface still seem
     // different", 2026-09-02).
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("WaterRoughness")), 0.20f);
+        FMaterialParameterInfo(TEXT("WaterRoughness")), 0.22f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("Specular")), 0.28f);
     Instance->SetScalarParameterValueEditorOnly(
@@ -1177,18 +1384,22 @@ bool LoadSouthForkProductionWaterPresentation(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionFloor")), 1.0f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("FallbackSkyReflectionVariation")), 0.0f);
-    // High-frequency normal-map glints were visually indistinguishable from a
-    // white foam texture and pixel-aliased on/off as the guide camera moved.
-    // The remaining analytic flow-streak fallback is a pair of sine fields;
-    // on this curved river they resolve as white cross-channel bars. Keep all
-    // synthetic texture motion flat and show motion through solver WPO,
-    // hydraulic relief, wakes, and persistent solver foam instead.
+    // Match the precision-correct live carrier. Full-precision static tile UVs
+    // now preserve small-scale detail without the former row-collapse bars.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.0f);
+        FMaterialParameterInfo(TEXT("CalmRippleStrength")), 0.08f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.0f);
+        FMaterialParameterInfo(TEXT("FlowRippleStrength")), 0.14f);
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.0f);
+        FMaterialParameterInfo(TEXT("FoamRippleStrength")), 0.25f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("AnalyticChopStrength")), 0.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("RippleGrazingFloor")), 0.50f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("FlowNormalSteepness")), 2.0f);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("SlickNormalFloor")), 0.60f);
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("LiveFlowStreakRoughness")), 0.0f);
     Instance->SetScalarParameterValueEditorOnly(
@@ -1205,7 +1416,7 @@ bool LoadSouthForkProductionWaterPresentation(
     // flow while avoiding the vertical stepping caused by resampling animated
     // CPU vertices only at the 15 Hz hydraulic presentation refresh.
     Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("SouthForkTurbulenceWPOStrength")), 0.16f);
+        FMaterialParameterInfo(TEXT("SouthForkTurbulenceWPOStrength")), 0.0f);
     // Persist authored overrides without forcing this command to wait on the
     // parent shader map; loading the instance rebuilds its resources normally.
     Package->MarkPackageDirty();

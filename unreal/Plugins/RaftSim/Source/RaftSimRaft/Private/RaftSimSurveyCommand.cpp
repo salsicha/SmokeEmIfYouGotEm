@@ -37,6 +37,7 @@
 #include "RaftSimRockObstacleActor.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
 
@@ -541,10 +542,16 @@ static void LogSurveyStation(FSurveyState& State)
     float TerrainZCm = 0.0f;
     float TerrainClearanceCm = 0.0f;
     bool bTerrainHit = false;
+    FRaftSimWaterSample FixedCentreWater;
+    bool bFixedCentreWet = false;
     {
         FVector CentreWorld;
         if (Water->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, CentreWorld))
         {
+            // Compare terrain and water at the SAME fixed coordinates, not
+            // the raft's downstream/lateral drift position at capture time.
+            bFixedCentreWet = Water->SampleWaterAtWorldPosition(
+                CentreWorld, FixedCentreWater) && FixedCentreWater.bWet;
             // Water tiles and dressing sit in the same channel, so take the
             // first hit that belongs to a terrain tile rather than the first
             // hit of any kind.
@@ -560,12 +567,83 @@ static void LogSurveyStation(FSurveyState& State)
                 {
                     bTerrainHit = true;
                     TerrainZCm = Hit.ImpactPoint.Z;
-                    TerrainClearanceCm = SupportZCm - TerrainZCm;
-                    if (bCentreSampled && Centre.bWet && TerrainClearanceCm < -20.0f)
+                    TerrainClearanceCm = bFixedCentreWet
+                        ? FixedCentreWater.SurfaceHeightMeters * 100.0f - TerrainZCm
+                        : 0.0f;
+                    if (bFixedCentreWet && TerrainClearanceCm < -20.0f)
                     {
                         Anomalies.Add(FString::Printf(TEXT("terrain_above_water_%.0fcm"), -TerrainClearanceCm));
                     }
                     break;
+                }
+            }
+            if (!bTerrainHit)
+            {
+                // A channel multi-trace stops at its first blocking hit;
+                // filtering the returned list cannot see terrain behind a
+                // boulder/proxy. Diagnose the actual obstruction and query
+                // only tagged terrain components, without altering collision
+                // or silently upgrading a missing survey result to success.
+                for (const FHitResult& Hit : Hits)
+                {
+                    const UStaticMeshComponent* Mesh = Cast<UStaticMeshComponent>(Hit.GetComponent());
+                    UE_LOG(LogTemp, Display,
+                        TEXT("RaftSim terrain miss blocker: station_m=%.0f actor=%s component=%s z_cm=%.1f blocking=%d mesh=%s hidden=%d"),
+                        StationM, *GetNameSafe(Hit.GetActor()),
+                        *GetNameSafe(Hit.GetComponent()), Hit.ImpactPoint.Z,
+                        Hit.bBlockingHit ? 1 : 0,
+                        *GetPathNameSafe(Mesh ? Mesh->GetStaticMesh() : nullptr),
+                        Hit.GetActor() && Hit.GetActor()->IsHidden() ? 1 : 0);
+                }
+                int32 TerrainComponentsAtXY = 0;
+                for (TActorIterator<AActor> It(World); It; ++It)
+                {
+                    if (!It->ActorHasTag(TEXT("RaftSimFullReachTerrain")) &&
+                        !It->ActorHasTag(TEXT("RaftSimSourceConditionedTerrain")) &&
+                        !It->IsA<ALandscapeProxy>())
+                    {
+                        continue;
+                    }
+                    TInlineComponentArray<UPrimitiveComponent*> TerrainComponents(*It);
+                    for (UPrimitiveComponent* Component : TerrainComponents)
+                    {
+                        const FBox Bounds = Component->Bounds.GetBox();
+                        if (CentreWorld.X < Bounds.Min.X || CentreWorld.X > Bounds.Max.X ||
+                            CentreWorld.Y < Bounds.Min.Y || CentreWorld.Y > Bounds.Max.Y)
+                        {
+                            continue;
+                        }
+                        ++TerrainComponentsAtXY;
+                        FHitResult DirectHit;
+                        const bool bDirectHit = Component->LineTraceComponent(
+                            DirectHit, TraceStart, TraceEnd, Params);
+                        UE_LOG(LogTemp, Display,
+                            TEXT("RaftSim terrain miss direct: station_m=%.0f actor=%s component=%s collision=%d visible=%d bounds_z_cm=(%.1f,%.1f) hit=%d hit_z_cm=%.1f"),
+                            StationM, *It->GetName(), *Component->GetName(),
+                            static_cast<int32>(Component->GetCollisionEnabled()),
+                            Component->IsVisible() ? 1 : 0, Bounds.Min.Z, Bounds.Max.Z,
+                            bDirectHit ? 1 : 0, bDirectHit ? DirectHit.ImpactPoint.Z : 0.0);
+                    }
+                }
+                UE_LOG(LogTemp, Display,
+                    TEXT("RaftSim terrain miss summary: station_m=%.0f world_xy_cm=(%.1f,%.1f) blockers=%d terrain_components_at_xy=%d"),
+                    StationM, CentreWorld.X, CentreWorld.Y, Hits.Num(), TerrainComponentsAtXY);
+                int32 TerrainRayBudget = 4;
+                FHitResult FilteredHit;
+                if (ARaftSimWaterSurfaceActor::TraceTerrainSurface(World,
+                        TraceStart, TraceEnd, Params, TerrainRayBudget, FilteredHit))
+                {
+                    bTerrainHit = true;
+                    TerrainZCm = FilteredHit.ImpactPoint.Z;
+                    TerrainClearanceCm = bFixedCentreWet
+                        ? FixedCentreWater.SurfaceHeightMeters * 100.0f - TerrainZCm : 0.0f;
+                    UE_LOG(LogTemp, Display,
+                        TEXT("RaftSim terrain filtered hit: station_m=%.0f rays=%d z_cm=%.1f"),
+                        StationM, 4 - TerrainRayBudget, TerrainZCm);
+                    if (bFixedCentreWet && TerrainClearanceCm < -20.0f)
+                    {
+                        Anomalies.Add(FString::Printf(TEXT("terrain_above_water_%.0fcm"), -TerrainClearanceCm));
+                    }
                 }
             }
         }
@@ -576,8 +654,10 @@ static void LogSurveyStation(FSurveyState& State)
         State.AnomalyTotal += Anomalies.Num();
     }
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim survey terrain: index=%d station_m=%.0f terrain_hit=%d terrain_z_cm=%.0f terrain_clearance_cm=%.0f"),
-        State.StationIndex, StationM, bTerrainHit ? 1 : 0, TerrainZCm, TerrainClearanceCm);
+        TEXT("RaftSim survey terrain: index=%d station_m=%.0f terrain_hit=%d terrain_z_cm=%.0f terrain_clearance_cm=%.0f fixed_water_wet=%d fixed_surface_z_cm=%.0f fixed_solver_bed_z_cm=%.0f"),
+        State.StationIndex, StationM, bTerrainHit ? 1 : 0, TerrainZCm, TerrainClearanceCm,
+        bFixedCentreWet ? 1 : 0, FixedCentreWater.SurfaceHeightMeters * 100.0f,
+        (FixedCentreWater.SurfaceHeightMeters - FixedCentreWater.DepthMeters) * 100.0f);
     UE_LOG(LogTemp, Display,
         TEXT("RaftSim survey station: index=%d station_m=%.0f x_cm=%.0f y_cm=%.0f z_cm=%.0f ")
         TEXT("lateral_m=%.2f raft_speed_mps=%.2f water_speed_mps=%.2f heading_err_deg=%.1f ")
@@ -930,6 +1010,13 @@ static void StartRaftSeries(UWorld* World, const FRaftSeriesSpec& Spec)
             }
             TSharedRef<int32> Taken = MakeShared<int32>(0);
             TSharedRef<FTimerHandle> LoopHandle = MakeShared<FTimerHandle>();
+            // PNG readback can exceed the requested interval. Catch-up timer
+            // calls used to overwrite the one pending screenshot repeatedly
+            // in a single frame, leaving holes in the numbered sequence.
+            FTimerManagerTimerParameters CaptureTimer;
+            CaptureTimer.bLoop = true;
+            CaptureTimer.bMaxOncePerFrame = true;
+            CaptureTimer.FirstDelay = 0.3f;
             W->GetTimerManager().SetTimer(
                 *LoopHandle,
                 FTimerDelegate::CreateLambda([WeakWorld, Taken, Count, Label, LoopHandle]()
@@ -944,9 +1031,10 @@ static void StartRaftSeries(UWorld* World, const FRaftSeriesSpec& Spec)
                     if (ARaftSimRaftActor* Raft2 = FindRaft(W2))
                     {
                         UE_LOG(LogTemp, Display,
-                            TEXT("RaftSim.CaptureRaftSeries: frame %d speed=%.2f cmd=%s"),
+                            TEXT("RaftSim.CaptureRaftSeries: frame %d speed=%.2f cmd=%s world_s=%.6f render_frame=%llu"),
                             *Taken, Raft2->GetRaftVelocity().Size(),
-                            CrewCommandName(Raft2->GetActiveCrewCommand()));
+                            CrewCommandName(Raft2->GetActiveCrewCommand()),
+                            W2->GetTimeSeconds(), static_cast<unsigned long long>(GFrameCounter));
                     }
                     ++(*Taken);
                     if (*Taken >= Count)
@@ -959,7 +1047,7 @@ static void StartRaftSeries(UWorld* World, const FRaftSeriesSpec& Spec)
                             3.0f, false);
                     }
                 }),
-                Interval, true, 0.3f);
+                Interval, CaptureTimer);
         }),
         Delay, false);
     UE_LOG(LogTemp, Display,

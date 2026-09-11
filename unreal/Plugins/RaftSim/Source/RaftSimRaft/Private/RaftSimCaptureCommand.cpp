@@ -35,11 +35,111 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimWaterVfxActor.h"
+#include "RaftSimScreenRecorderSubsystem.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
 
 namespace RaftSimCaptureCommand
 {
+
+// Inspect the material actually bound to gameplay water, not just the saved
+// parent or an editor-only capture sheet. Overrides live only in this process.
+static void HandleWaterMaterialProbe(const TArray<FString>& Args, UWorld* World)
+{
+    if (!World) return;
+    if (!Args.IsEmpty() && Args.Last().StartsWith(TEXT("delay=")))
+    {
+        const float Delay = FCString::Atof(*Args.Last().Mid(6));
+        if (!FMath::IsFinite(Delay) || Delay <= 0.0f || Delay > 60.0f) return;
+        TArray<FString> DeferredArgs = Args;
+        DeferredArgs.Pop();
+        const TWeakObjectPtr<UWorld> WeakWorld(World);
+        FTimerHandle Handle;
+        World->GetTimerManager().SetTimer(Handle, FTimerDelegate::CreateLambda([WeakWorld, DeferredArgs]()
+        {
+            if (WeakWorld.IsValid()) HandleWaterMaterialProbe(DeferredArgs, WeakWorld.Get());
+        }), Delay, false);
+        return;
+    }
+    UE_LOG(LogTemp, Display, TEXT("WaterProbe world_s=%.3f"), World->GetTimeSeconds());
+    for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
+    {
+        TInlineComponentArray<UMeshComponent*> Components(*It);
+        for (UMeshComponent* Component : Components)
+        {
+            for (int32 Slot = 0; Slot < Component->GetNumMaterials(); ++Slot)
+            {
+                UMaterialInterface* Material = Component->GetMaterial(Slot);
+                if (!Material) continue;
+                FLinearColor Origin;
+                if (Material->GetVectorParameterValue(
+                        FHashedMaterialParameterInfo(TEXT("RaftSimWaterUVOrigin")), Origin))
+                {
+                    UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s river_uv_origin=(%.3f,%.3f)"),
+                        *Component->GetName(), Origin.R, Origin.G);
+                }
+                if (auto* Procedural = Cast<UProceduralMeshComponent>(Component))
+                {
+                    if (const FProcMeshSection* Section = Procedural->GetProcMeshSection(Slot))
+                    {
+                        int32 MaximumFoam = 0;
+                        double FoamSum = 0;
+                        float MaxAbsUV = 0;
+                        int32 WetCount = 0;
+                        int32 FoamOver20 = 0;
+                        int32 FoamOver50 = 0;
+                        for (const FProcMeshVertex& Vertex : Section->ProcVertexBuffer)
+                        {
+                            MaximumFoam = FMath::Max(MaximumFoam, int32(Vertex.Color.R));
+                            FoamSum += Vertex.Color.R / 255.0;
+                            MaxAbsUV = FMath::Max(MaxAbsUV, FMath::Abs(float(Vertex.UV0.X)));
+                            if (Vertex.Color.A > 127)
+                            {
+                                ++WetCount;
+                                FoamOver20 += Vertex.Color.R > 51 ? 1 : 0;
+                                FoamOver50 += Vertex.Color.R > 127 ? 1 : 0;
+                            }
+                        }
+                        UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s vertices=%d foam_mean=%.4f foam_max=%.4f max_abs_u=%.3f"),
+                            *Component->GetName(), Section->ProcVertexBuffer.Num(),
+                            FoamSum / FMath::Max(1, Section->ProcVertexBuffer.Num()), MaximumFoam / 255.0, MaxAbsUV);
+                        UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s slot=%d visible=%d wet_vertices=%d foam_over20=%d foam_over50=%d"),
+                            *Component->GetName(), Slot, Component->IsVisible() && Section->bSectionVisible,
+                            WetCount, FoamOver20, FoamOver50);
+                    }
+                }
+                if (Args.Num() >= 2)
+                {
+                    UMaterialInstanceDynamic* Dynamic = Cast<UMaterialInstanceDynamic>(Material);
+                    if (!Dynamic) Dynamic = Component->CreateDynamicMaterialInstance(Slot, Material);
+                    if (Dynamic)
+                    {
+                        Dynamic->SetScalarParameterValue(FName(*Args[0]), FCString::Atof(*Args[1]));
+                        Material = Dynamic;
+                    }
+                }
+                for (const TCHAR* Name : {TEXT("CalmRippleStrength"), TEXT("FlowRippleStrength"),
+                    TEXT("FoamRippleStrength"), TEXT("FlowStreakRoughness"),
+                    TEXT("HydraulicFoamIntensity"), TEXT("WaterRoughness"),
+                    TEXT("HydraulicFoamCoverageGain"), TEXT("HydraulicFoamColorBreakupGain"),
+                    TEXT("HydraulicFoamColorCoreGain"), TEXT("WhitewaterFrothLaceModulationFloor"),
+                    TEXT("SouthForkTravelingWaveWPOStrength"), TEXT("RaftSimLocalFluidWPOStrength")})
+                {
+                    float Value = 0;
+                    const bool Found = Material->GetScalarParameterValue(
+                        FHashedMaterialParameterInfo(FName(Name)), Value);
+                    UE_LOG(LogTemp, Display, TEXT("WaterProbe component=%s material=%s parameter=%s found=%d value=%.4f"),
+                        *Component->GetName(), *Material->GetName(), Name, Found, Value);
+                }
+            }
+        }
+    }
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GWaterMaterialProbeCommand(
+    TEXT("RaftSim.WaterMaterialProbe"),
+    TEXT("Log actual gameplay water values; optionally override <parameter> <value> for this run only. Optional final delay=<seconds> inspects the settled field."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleWaterMaterialProbe));
 
 static void LogVisibleWaterPresentationInventory(UWorld* World)
 {
@@ -560,7 +660,10 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     bool bHasPose = false;
     FVector CamLoc = FVector::ZeroVector;
     FRotator CamRot = FRotator::ZeroRotator;
-    if (Args.Num() >= 9)
+    // Named options such as focus/record/paddle can also make nine arguments.
+    // Only five numeric values denote an explicit camera pose.
+    if (Args.Num() >= 9 && Args[4].IsNumeric() && Args[5].IsNumeric() &&
+        Args[6].IsNumeric() && Args[7].IsNumeric() && Args[8].IsNumeric())
     {
         CamLoc = FVector(
             FCString::Atof(*Args[4]),
@@ -573,9 +676,13 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     bool bPaddle = false;
     float TargetStationM = -1.0f;
     float TargetLateralM = 0.0f;
+    float FocusStationM = -1.0f;
+    float FocusLateralM = 0.0f;
+    bool bRecord=false;
     for (const FString& Arg : Args)
     {
         bPaddle |= Arg.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
+        bRecord |= Arg.Equals(TEXT("record"), ESearchCase::IgnoreCase);
         if (Arg.StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
         {
             TargetStationM = FCString::Atof(*Arg.RightChop(8));
@@ -583,6 +690,14 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         else if (Arg.StartsWith(TEXT("lateral="), ESearchCase::IgnoreCase))
         {
             TargetLateralM = FCString::Atof(*Arg.RightChop(8));
+        }
+        else if (Arg.StartsWith(TEXT("focusstation="), ESearchCase::IgnoreCase))
+        {
+            FocusStationM = FCString::Atof(*Arg.RightChop(13));
+        }
+        else if (Arg.StartsWith(TEXT("focuslateral="), ESearchCase::IgnoreCase))
+        {
+            FocusLateralM = FCString::Atof(*Arg.RightChop(13));
         }
     }
 
@@ -687,7 +802,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         StartHandle,
         FTimerDelegate::CreateLambda(
             [WeakWorld, Count, Interval, Label, CameraPreset, bHasPose,
-             CamLoc, CamRot]()
+             CamLoc, CamRot, FocusStationM, FocusLateralM, bRecord]()
         {
             UWorld* W = WeakWorld.Get();
             if (W == nullptr)
@@ -697,6 +812,44 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
             FVector ResolvedLoc = CamLoc;
             FRotator ResolvedRot = CamRot;
             bool bCamera = bHasPose;
+            // A fixed, explicit river-space target avoids selecting a different
+            // ranked breaking site or drifting beyond a hole during warm-up.
+            // This moves only the review camera; raft and water keep evolving.
+            if (CameraPreset.StartsWith(TEXT("river_station")))
+            {
+                const UGameInstance* GI = W->GetGameInstance();
+                URaftSimPhysicsBridgeSubsystem* Bridge = GI ?
+                    GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+                URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
+                FRaftSimWaterSample Sample;
+                FVector Focus, Ahead;
+                if (!Water || !FMath::IsFinite(FocusStationM) || FocusStationM < 0.0f ||
+                    !FMath::IsFinite(FocusLateralM) ||
+                    !Water->SampleWaterAtRiverCoordinates(FVector2D(FocusStationM, FocusLateralM), Sample) ||
+                    !Sample.bWet ||
+                    !Water->RiverToWorldPosition(FVector2D(FocusStationM, FocusLateralM), Water->GetRiverVerticalDatumM(), Focus) ||
+                    !Water->RiverToWorldPosition(FVector2D(FocusStationM + 1.0f, FocusLateralM), Water->GetRiverVerticalDatumM(), Ahead))
+                {
+                    UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: invalid or dry fixed river focus %.3f,%.3f; refusing misleading fallback capture"), FocusStationM, FocusLateralM);
+                    FPlatformMisc::RequestExit(false);
+                    return;
+                }
+                // SampleWater already returns world-space surface elevation;
+                // RiverToWorldPosition instead accepts source-datum elevation.
+                // Resolve XY in that map, then assign world Z exactly once.
+                Focus.Z = Ahead.Z = Sample.SurfaceHeightMeters * 100.0f;
+                const FVector Downstream = (Ahead - Focus).GetSafeNormal2D();
+                const FVector Across(-Downstream.Y, Downstream.X, 0.0f);
+                ResolvedLoc = Focus - Downstream * 800.0f + FVector::UpVector * 240.0f;
+                if (CameraPreset == TEXT("river_station_side"))
+                    ResolvedLoc = Focus - Downstream * 150.0f - Across * 850.0f + FVector::UpVector * 350.0f;
+                else if (CameraPreset == TEXT("river_station_downstream"))
+                    ResolvedLoc = Focus + Downstream * 850.0f + FVector::UpVector * 240.0f;
+                ResolvedRot = (Focus + FVector::UpVector * 35.0f - ResolvedLoc).Rotation();
+                bCamera = true;
+                UE_LOG(LogTemp, Display, TEXT("RaftSim.CaptureSeries: fixed river focus station=%.3f lateral=%.3f surface_m=%.3f camera=%s"),
+                    FocusStationM, FocusLateralM, Sample.SurfaceHeightMeters, *ResolvedLoc.ToCompactString());
+            }
             if (!bCamera && !CameraPreset.IsEmpty())
             {
                 if (ARaftSimRaftActor* Raft = FindRaft(W))
@@ -745,6 +898,16 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                 }
             }
             TSharedRef<int32> Taken = MakeShared<int32>(0);
+            if (bRecord)
+            {
+                UGameInstance* GI=W->GetGameInstance();
+                auto* Recorder=GI ? GI->GetSubsystem<URaftSimScreenRecorderSubsystem>() : nullptr;
+                if (!Recorder || !Recorder->StartRecording())
+                {
+                    UE_LOG(LogTemp,Error,TEXT("CaptureSeries recording unavailable; refusing still-only motion evidence"));
+                    FPlatformMisc::RequestExit(false);return;
+                }
+            }
             TSharedRef<FTimerHandle> LoopHandle = MakeShared<FTimerHandle>();
             W->GetTimerManager().SetTimer(
                 *LoopHandle,
@@ -756,6 +919,11 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     {
                         return;
                     }
+                    // A hitch can dispatch this repeating timer several
+                    // times before one render. Screenshot requests share a
+                    // single slot: overwriting it silently dropped numbered
+                    // evidence frames. Count only accepted requests.
+                    if (FScreenshotRequest::IsScreenshotRequested()) return;
                     const FString OutPath = FPaths::Combine(
                         FPaths::ProjectSavedDir(),
                         TEXT("Screenshots"),
@@ -764,6 +932,21 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     FScreenshotRequest::RequestScreenshot(
                         OutPath, /*bShowUI=*/false,
                         /*bAddFilenameSuffix=*/false);
+                    const UGameInstance* GI = W2->GetGameInstance();
+                    URaftSimPhysicsBridgeSubsystem* Bridge = GI ?
+                        GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>() : nullptr;
+                    URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
+                    ARaftSimRaftActor* Raft = FindRaft(W2);
+                    FVector2D RaftRiver = FVector2D::ZeroVector;
+                    FVector Tangent, LeftNormal;
+                    const bool bRiver = Water && Raft && Water->WorldToRiverCoordinates(
+                        Raft->GetActorLocation(), RaftRiver, Tangent, LeftNormal);
+                    APlayerController* PC = W2->GetFirstPlayerController();
+                    const APlayerCameraManager* Camera = PC ? PC->PlayerCameraManager : nullptr;
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim capture-series request: index=%d world_s=%.3f frame=%llu raft_river_valid=%d raft_station_m=%.3f raft_lateral_m=%.3f camera_valid=%d camera_world_cm=%s"),
+                        *Taken, W2->GetTimeSeconds(), static_cast<unsigned long long>(GFrameCounter),
+                        bRiver, RaftRiver.X, RaftRiver.Y, Camera != nullptr,
+                        Camera ? *Camera->GetCameraLocation().ToCompactString() : TEXT("unavailable"));
                     ++(*Taken);
                     if (*Taken >= Count)
                     {
@@ -796,7 +979,9 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
          "fixed interval, then exit. Usage: RaftSim.CaptureSeries "
          "<startSeconds> <count> <intervalSeconds> [label] "
          "[x y z pitch yaw|shore_left|shore_right|breaking_water|"
-         "breaking_water_side|breaking_water_opposite] [paddle] "
+         "breaking_water_side|breaking_water_opposite|river_station|"
+         "river_station_side|river_station_downstream] [paddle] "
+         "[focusstation=<m>] [focuslateral=<m>] [record] "
          "[station=<m>] [lateral=<m>] (station walks the raft there in "
          "sub-80 m handoff-sized hops before the capture starts)"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureSeries));

@@ -1,0 +1,109 @@
+#include "/Engine/Public/Platform.ush"
+uint Owners;
+uint SourceOwner;
+uint SourceCapacity;
+uint TotalCapacity;
+uint Components;
+uint ExitsEnabled;
+uint TotalExitCapacity;
+StructuredBuffer<uint> SourceCounts;
+StructuredBuffer<uint2> OwnerRanges;
+StructuredBuffer<uint> SourceCapacities;
+StructuredBuffer<uint> SourceWords;
+StructuredBuffer<uint4> SourceRoutes;
+StructuredBuffer<uint> SourceExitCounts;
+StructuredBuffer<uint4> SourceExitRecords;
+StructuredBuffer<uint2> ExitOwnerRanges;
+RWStructuredBuffer<uint> ExitWords;
+RWStructuredBuffer<uint2> ExitReferences;
+RWStructuredBuffer<uint4> ExitRecords;
+RWStructuredBuffer<uint> ExitCounts;
+RWStructuredBuffer<uint> Words;
+RWStructuredBuffer<uint2> References;
+RWStructuredBuffer<uint> Counts;
+RWStructuredBuffer<uint> Control;
+
+[numthreads(1,1,1)]
+void CheckCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint errors=0,live=0,exterior=0;
+#if FINALIZE
+    errors=Control[1];
+#endif
+    for(uint s=0;s<Owners;++s)
+    {
+        uint row=s*(Owners+3),sum=0;
+        uint outside=SourceCounts[row+Owners],invalid=SourceCounts[row+Owners+1],n=SourceCounts[row+Owners+2];
+        for(uint d=0;d<Owners;++d) { uint count=SourceCounts[row+d];if(count>n) errors|=8;sum+=count; }
+        if(outside>n || invalid>n) errors|=8;
+        if(invalid || n>SourceCapacities[s]) errors|=1;
+        if(!ExitsEnabled && outside) errors|=2; // Default remains fail-closed.
+        if(ExitsEnabled)
+        {
+            uint e=s*8,approved=0;
+            for(uint f=0;f<4;++f)
+            {
+                uint count=SourceExitCounts[e+1+f];if(count>n) errors|=64;approved+=count;
+#if FINALIZE
+                if(errors==0 && ExitCounts[s*5+f]!=count) errors|=64;
+#endif
+            }
+            if(SourceExitCounts[e+7]!=n || SourceExitCounts[e]!=sum || approved!=outside ||
+                SourceExitCounts[e+5]!=0 || SourceExitCounts[e+6]!=0 ||
+                SourceExitCounts[e]+approved+SourceExitCounts[e+5]+SourceExitCounts[e+6]!=n) errors|=64;
+#if FINALIZE
+            if(errors==0 && ExitCounts[s*5+4]!=approved) errors|=64;
+#endif
+        }
+        if(sum+outside+invalid!=n) errors|=8;
+        live+=n;exterior+=outside;
+    }
+    for(uint d=0;d<Owners;++d)
+    {
+        uint total=0;
+        for(uint s=0;s<Owners;++s) total+=SourceCounts[s*(Owners+3)+d];
+        if(total>OwnerRanges[d].y) errors|=4;
+#if FINALIZE
+        if(errors==0 && Counts[d]!=total) errors|=8;
+#else
+        Counts[d]=0;
+#endif
+    }
+    Control[0]=errors==0?1:0;Control[1]=errors;Control[2]=live;Control[3]=exterior;
+}
+
+[numthreads(64,1,1)]
+void AppendCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x;
+    if(Control[0]==0 || i>=SourceCapacity || i>=SourceCounts[SourceOwner*(Owners+3)+Owners+2]) return;
+    uint4 route=SourceRoutes[i];
+    if(ExitsEnabled)
+    {
+        uint4 candidate=SourceExitRecords[i];
+        if(route.y!=SourceOwner || route.z!=i) { InterlockedOr(Control[1],8);return; }
+        if(candidate.x==2)
+        {
+            float fraction=asfloat(candidate.w);
+            if(route.x!=0xffffffff || route.w!=2 || candidate.y>=4 || candidate.z==0xffffffff ||
+                !isfinite(fraction) || fraction<0 || fraction>1)
+            { InterlockedOr(Control[1],64);return; }
+            uint slot;InterlockedAdd(ExitCounts[SourceOwner*5+4],1,slot);
+            uint2 range=ExitOwnerRanges[SourceOwner];
+            if(slot>=range.y) { InterlockedOr(Control[1],64);return; }
+            uint output=range.x+slot;
+            for(uint c=0;c<Components;++c) ExitWords[c*TotalExitCapacity+output]=SourceWords[c*SourceCapacity+i];
+            ExitReferences[output]=uint2(SourceOwner,i);ExitRecords[output]=candidate;
+            InterlockedAdd(ExitCounts[SourceOwner*5+candidate.y],1);return;
+        }
+        if(candidate.x!=1) { InterlockedOr(Control[1],64);return; }
+    }
+    if(route.x>=Owners || route.y!=SourceOwner || route.z!=i || route.w!=1)
+    { InterlockedOr(Control[1],8);return; }
+    uint d=route.x,slot;InterlockedAdd(Counts[d],1,slot);
+    uint2 range=OwnerRanges[d];
+    if(slot>=range.y) { InterlockedOr(Control[1],4);return; }
+    uint output=range.x+slot;
+    for(uint c=0;c<Components;++c) Words[c*TotalCapacity+output]=SourceWords[c*SourceCapacity+i];
+    References[output]=uint2(SourceOwner,i);
+}

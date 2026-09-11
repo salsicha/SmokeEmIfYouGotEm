@@ -185,6 +185,11 @@ def test_project_owned_production_helmet_source_and_import_are_hash_locked() -> 
     )
     assert manifest["source_inputs"] == []
     assert manifest["physical_cut_through_vents"] == 6
+    assert manifest["rear_occipital_shell"] is True
+    # Rear coverage belongs to the continuous bowl, not the old added bun.
+    assert '"RearOccipitalShell"' not in build_script
+    assert "+ 0.17 * facing_rear" in build_script
+    assert "molded rear skull coverage" in import_script
     assert manifest["retention_anchor_count"] == 4
     assert 8_000 <= manifest["polygon_count"] <= 20_000
     assert 8_000 <= manifest["vertex_count"] <= 20_000

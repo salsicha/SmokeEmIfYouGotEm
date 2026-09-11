@@ -168,6 +168,12 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
         LiveVolumeInstance);
     if (LiveVolumeInstance)
     {
+        TestNotNull(TEXT("Futaleufu current parent exists"), LiveVolumeInstance->Parent.Get());
+        if (LiveVolumeInstance->Parent)
+        {
+            TestEqual(TEXT("Futaleufu has an isolated current-carried parent"),
+                LiveVolumeInstance->Parent->GetName(), FString(TEXT("M_RaftSim_FutaleufuCurrentWaterV5")));
+        }
         UTexture* LiveNormal = nullptr;
         UTexture* LiveFoam = nullptr;
         TestTrue(
@@ -204,13 +210,17 @@ bool FRaftSimFutaleufuTerminatorWaterTest::RunTest(
                 FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
         };
         TestLiveScalar(TEXT("ReachHueVariation"), 0.12f);
+        TestLiveScalar(TEXT("HydraulicFoamCoverageGain"), 3.5f);
+        TestLiveScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
+        TestLiveScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+        TestLiveScalar(TEXT("FutaleufuCurrentNormalStrength"), 0.22f);
         TestLiveScalar(TEXT("CalmSurfaceColorVariation"), 0.22f);
-        TestLiveScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f);
-        TestLiveScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f);
-        TestLiveScalar(TEXT("RippleGrazingFloor"), 0.75f);
-        TestLiveScalar(TEXT("SlickNormalFloor"), 0.85f);
+        TestLiveScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f);
+        TestLiveScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
+        TestLiveScalar(TEXT("RippleGrazingFloor"), 0.12f);
+        TestLiveScalar(TEXT("SlickNormalFloor"), 0.62f);
         TestLiveScalar(TEXT("SlickRoughnessScale"), 1.0f);
-        TestLiveScalar(TEXT("FresnelSpecular"), 0.01f);
+        TestLiveScalar(TEXT("FresnelSpecular"), 0.10f);
     }
     return !HasAnyErrors();
 }

@@ -1,0 +1,47 @@
+#include "/Engine/Public/Platform.ush"
+uint Capacity;
+uint SourceOwner;
+uint Owners;
+uint FloatStride;
+uint IntStride;
+uint FloatComponents;
+uint IntComponents;
+uint PositionOffset;
+uint CountOffset;
+int2 ParentCells;
+float3 LowerWorldCm;
+float3 AxisX;
+float3 AxisY;
+float2 SpacingCm;
+Buffer<float> Floats;
+Buffer<int> Integers;
+RWBuffer<uint> NativeCounts;
+StructuredBuffer<int4> Bounds;
+RWStructuredBuffer<uint> Words;
+RWStructuredBuffer<uint4> Routes;
+RWStructuredBuffer<uint> Counts;
+
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x,n=NativeCounts[CountOffset];
+    if(i==0) { Counts[Owners+2]=n;if(n>Capacity) InterlockedAdd(Counts[Owners+1],n-Capacity); }
+    if(i>=Capacity) return;
+    Routes[i]=uint4(0xffffffff,SourceOwner,i,0);
+    [loop] for(uint c=0;c<FloatComponents;++c) Words[c*Capacity+i]=i<n?asuint(Floats[c*FloatStride+i]):0;
+    [loop] for(uint c=0;c<IntComponents;++c) Words[(FloatComponents+c)*Capacity+i]=i<n?asuint(Integers[c*IntStride+i]):0;
+    if(i>=n) return;
+    float3 p=float3(Floats[PositionOffset*FloatStride+i],Floats[(PositionOffset+1)*FloatStride+i],Floats[(PositionOffset+2)*FloatStride+i]);
+    if(!all(isfinite(p))) { Routes[i].w=4;InterlockedAdd(Counts[Owners+1],1);return; }
+    float3 delta=p-LowerWorldCm;
+    float2 q=float2(dot(delta,AxisX),dot(delta,AxisY))/SpacingCm;
+    if(any(q<0)||any(q>float2(ParentCells))) { Routes[i].w=2;InterlockedAdd(Counts[Owners],1);return; }
+    int2 cell=min(int2(floor(q)),ParentCells-1);
+    [loop] for(uint owner=0;owner<Owners;++owner)
+    {
+        int4 b=Bounds[owner];
+        if(all(cell>=b.xy)&&all(cell<b.zw))
+        { Routes[i]=uint4(owner,SourceOwner,i,1);InterlockedAdd(Counts[owner],1);return; }
+    }
+    Routes[i].w=4;InterlockedAdd(Counts[Owners+1],1);
+}

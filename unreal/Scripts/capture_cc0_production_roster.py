@@ -364,7 +364,7 @@ def main() -> None:
                     f"Helmet faces away from {character_name}: "
                     f"{helmet_forward_alignment:.6f}"
                 )
-            if not 0.90 <= helmet_fit_scale <= 1.02:
+            if not 0.80 <= helmet_fit_scale <= 0.94:
                 raise RuntimeError(
                     f"Helmet fit scale is invalid for {character_name}: "
                     f"{helmet_fit_scale:.6f}"

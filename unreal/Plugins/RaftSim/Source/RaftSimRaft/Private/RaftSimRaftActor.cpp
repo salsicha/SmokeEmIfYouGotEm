@@ -249,6 +249,10 @@ void ARaftSimRaftActor::BeginPlay()
                               GetSouthForkHydraulicWindowLengthMeters())
                     : RiverConfig->MovingWindowStationExtentM;
                 FVector2D MovingWindowCenterM = RiverConfig->WindowCenterM;
+                if (bSouthForkSingleSurface)
+                {
+                    MovingWindowCenterM.X += 0.30f * MovingStationExtentM;
+                }
                 float MinimumRiverStationM = 0.0f;
                 float MaximumRiverStationM = 0.0f;
                 if (bSouthForkSingleSurface &&
@@ -908,12 +912,11 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     {
         return;
     }
-    // Hand-tuned seat heights floated the crew twice ("their butts float
-    // above the boat", 2026-08-10 and again 2026-08-11): the visual raft
-    // component rides 15 cm below the hull frame and the seated pelvis
-    // bottom rides 25 cm above the avatar origin, so guessed constants
-    // kept landing in the air. Measure instead: rest the pelvis ON the
-    // rendered tube surface under the seat station.
+    Avatar->InitializeAvatarVisual();
+    Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
+    // Both the raft component's offset and the posed body's underside
+    // matter. Seat the visible mesh on the rendered tube, not the old
+    // placeholder pelvis or a fixed actor-height guess.
     // The guide perches on a stern-quarter tube on their dominant side,
     // same lateral as the paddler seats; only the physics mass stays at
     // the parity-pinned centre.
@@ -931,15 +934,21 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     }
     bool bTubeFound = false;
     const float TubeTopZCm = ComputeSeatTubeTopZCm(SeatCm, bTubeFound);
-    if (bTubeFound)
+    float RenderedSeatZCm = 0.0f;
+    const bool bRenderedContact = ComputeRenderedSeatOriginZCm(
+        SeatCm, Avatar->GetSeatedContactPointsLocalCm(), RenderedSeatZCm);
+    if (bRenderedContact)
     {
-        // Sink reads as fabric compression under load instead of a tangent
-        // kiss that re-opens a hairline gap at glancing angles. Raised from
-        // 1.5 (2026-09-02): the contact estimate assumes the procedural
-        // pelvis ellipsoid's depth, but the rendered CC0 glute — pulled
-        // forward-up by the knees-up seated fold — does not reach that low,
-        // and every paddler hovered a visible couple of centimetres off
-        // the tube ("the crew butts aren't sitting on the boat").
+        // Fit the actual posed glute to the triangle directly beneath it.
+        // A small overlap represents compressed neoprene, not a guessed
+        // correction to an unrelated procedural body's pelvis extent.
+        constexpr float RenderedContactCompressionCm = 1.0f;
+        SeatCm.Z = RenderedSeatZCm - RenderedContactCompressionCm;
+    }
+    else if (bTubeFound)
+    {
+        // Preserve the legacy placement for adapters without contact
+        // samples. The production CC0 path above does not use this guess.
         constexpr float SeatContactSinkCm = 4.0f;
         SeatCm.Z = TubeTopZCm - Avatar->GetSeatedPelvisBottomLocalZCm() -
             SeatContactSinkCm;
@@ -955,14 +964,79 @@ void ARaftSimRaftActor::AttachAvatarToSeat(
     bool bFloorFound = false;
     const float FloorTopZCm = ComputeSeatTubeTopZCm(FootProbeCm, bFloorFound);
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim seat: id=%s measured=%d tube_top=%.1f seat_z=%.1f "
+        TEXT("RaftSim seat: id=%s measured=%d rendered_contact=%d tube_top=%.1f seat_z=%.1f "
              "floor_found=%d floor_top=%.1f foot_local_z=%.1f"),
-        *PassengerId.ToString(), bTubeFound ? 1 : 0, TubeTopZCm, SeatCm.Z,
+        *PassengerId.ToString(), bTubeFound ? 1 : 0, bRenderedContact ? 1 : 0, TubeTopZCm, SeatCm.Z,
         bFloorFound ? 1 : 0, FloorTopZCm, FloorTopZCm - SeatCm.Z);
     Avatar->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
     Avatar->SetActorRelativeLocation(SeatCm);
     Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
     Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
+}
+
+void ARaftSimRaftActor::InitializeCrewSeatingForValidation()
+{
+    BuildRaftVisual();
+    SpawnCrewVisuals();
+}
+
+float ARaftSimRaftActor::GetCrewSeatContactClearanceCm(
+    ARaftSimCrewAvatarActor* Avatar) const
+{
+    if (!Avatar)
+    {
+        return BIG_NUMBER;
+    }
+    const FVector Seat = GetActorTransform().InverseTransformPosition(Avatar->GetActorLocation());
+    float ContactZ = 0.0f;
+    return ComputeRenderedSeatOriginZCm(Seat, Avatar->GetSeatedContactPointsLocalCm(), ContactZ)
+        ? static_cast<float>(Seat.Z) - ContactZ : BIG_NUMBER;
+}
+
+bool ARaftSimRaftActor::ComputeRenderedSeatOriginZCm(
+    const FVector& SeatCm, const TArray<FVector>& ContactPoints, float& OutZCm) const
+{
+    // Section zero is the inflatable tube, excluding rigging and fittings.
+    const FProcMeshSection* Tube = RaftVisual ? RaftVisual->GetProcMeshSection(0) : nullptr;
+    if (!Tube || ContactPoints.IsEmpty())
+    {
+        return false;
+    }
+    bool bFound = false;
+    const FTransform ToActor = RaftVisual->GetRelativeTransform();
+    for (int32 I = 0; I + 2 < Tube->ProcIndexBuffer.Num(); I += 3)
+    {
+        const FVector A = ToActor.TransformPosition(FVector(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I]].Position));
+        const FVector B = ToActor.TransformPosition(FVector(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I + 1]].Position));
+        const FVector C = ToActor.TransformPosition(FVector(Tube->ProcVertexBuffer[Tube->ProcIndexBuffer[I + 2]].Position));
+        if (FMath::Max3(A.X, B.X, C.X) < SeatCm.X - 24.0 ||
+            FMath::Min3(A.X, B.X, C.X) > SeatCm.X + 6.0 ||
+            FMath::Max3(A.Y, B.Y, C.Y) < SeatCm.Y - 22.0 ||
+            FMath::Min3(A.Y, B.Y, C.Y) > SeatCm.Y + 22.0)
+        {
+            continue;
+        }
+        const double Denom = (B.Y - C.Y) * (A.X - C.X) + (C.X - B.X) * (A.Y - C.Y);
+        if (FMath::Abs(Denom) < 1.e-8)
+        {
+            continue;
+        }
+        for (const FVector& P : ContactPoints)
+        {
+            const double X = SeatCm.X + P.X, Y = SeatCm.Y + P.Y;
+            const double U = ((B.Y - C.Y) * (X - C.X) + (C.X - B.X) * (Y - C.Y)) / Denom;
+            const double V = ((C.Y - A.Y) * (X - C.X) + (A.X - C.X) * (Y - C.Y)) / Denom;
+            const double W = 1.0 - U - V;
+            if (U < -1.e-6 || V < -1.e-6 || W < -1.e-6)
+            {
+                continue;
+            }
+            const float RequiredZ = static_cast<float>(U * A.Z + V * B.Z + W * C.Z - P.Z);
+            OutZCm = bFound ? FMath::Max(OutZCm, RequiredZ) : RequiredZ;
+            bFound = true;
+        }
+    }
+    return bFound;
 }
 
 float ARaftSimRaftActor::ComputeSeatTubeTopZCm(

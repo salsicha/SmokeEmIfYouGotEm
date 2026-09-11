@@ -34,14 +34,14 @@ constexpr float kProductionShoulderSleeveArmFraction = 1.0f;
 // Z back to 1.0 with boot generator v2 (2026-09-02): the source now carries
 // a short tapered cuff, so the squash that kept the old 15 cm cuff below the
 // flexed knee is no longer needed.
-const FVector kProductionRiverBootPresentationScale(0.98f, 1.04f, 1.0f);
+const FVector kProductionRiverBootPresentationScale(1.0f, 0.96f, 0.96f);
 // 2026-08-06 named human review: helmets read as off-center caps. Seat the
 // shell lower on the skull and nearly centred so per-head measurement
 // variance is absorbed instead of amplified.
 // Rearward bias re-tuned 2026-08-08 under the corrected face frame: with
 // the shell no longer worn backwards, the pure Z lift left the occiput
 // exposed behind the rim (first South Fork playtest).
-const FVector kProductionHelmetSkullCenterOffsetCm(-2.0f, 0.0f, 6.0f);
+const FVector kProductionHelmetSkullCenterOffsetCm(-2.6f, 0.0f, 5.7f);
 const FVector kProductionHelmetShellOffsetCm(0.8f, 0.0f, 0.0f);
 const FVector kProductionHelmetRetentionOffsetCm(0.0f, 0.0f, 3.0f);
 constexpr float kProductionHelmetReferenceFit = 0.96f;
@@ -1982,6 +1982,16 @@ float ARaftSimCrewAvatarActor::GetSeatedPelvisBottomLocalZCm() const
         kProductionSeatedPelvisReferenceExtentCm.Z * GetBodyProportionScale().Z;
 }
 
+TArray<FVector> ARaftSimCrewAvatarActor::GetSeatedContactPointsLocalCm() const
+{
+    if (const ARaftSimCC0CrewVisualActor* CC0 =
+            Cast<ARaftSimCC0CrewVisualActor>(GetProductionVisualActor()))
+    {
+        return CC0->GetSeatedContactPointsLocalCm();
+    }
+    return {};
+}
+
 FLinearColor ARaftSimCrewAvatarActor::GetSkinTone() const
 {
     // Linear-space outdoor skin references. These stay deliberately varied but
@@ -2522,12 +2532,10 @@ bool ARaftSimCrewAvatarActor::HasExclusiveCC0BodyOwnership() const
             CC0Visual && CC0Visual->IsBodyReady());
         return false;
     }
-    // Neck is deliberately NOT in this list: the CC0 wetsuit renders no
-    // visible skin between the PFD collar and the helmet's chin line, so
-    // the skin neck band is production dressing (2026-08-30 collar-gap
-    // design), not redundant anatomy — hiding it read as headless crew
-    // ("there should be a skin tone head in the helmet", 2026-09-02).
+    // The restored CC0 head and neck own this anatomy. The old gap filler
+    // intersected the collar as pale spikes and a second chest in profile.
     const UProceduralMeshComponent* RedundantBodyOverlays[] = {
+        Neck,
         Pelvis,
         Torso,
         LeftThigh,
@@ -2574,12 +2582,9 @@ bool ARaftSimCrewAvatarActor::HasExclusiveCC0BodyOwnership() const
 
 void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
 {
-    // The neck gap-fill used to be repainted with the wetsuit material in the
-    // production path, which made vest, suit, and helmet read as one unbroken
-    // neoprene mass. It keeps its skin material now (2026-08-30): the band it
-    // renders sits between the PFD collar and the helmet's chin line, exactly
-    // where a rafter's bare neck shows, and the wetsuit torso tip still
-    // supplies a short neoprene collar beneath it.
+    // Gap-fill anatomy is only for incomplete adapters. A complete CC0 body
+    // owns its neck as well as its head and limbs; a second neck intersects
+    // the skinned collar and produces flesh-coloured spikes in profile.
     const bool bHasProductionHelmet = HasProductionWhitewaterHelmet();
     const bool bHasProductionPfd = HasProductionWhitewaterPfd();
     const bool bHasProductionBoots = HasProductionRiverBoots();
@@ -2602,14 +2607,7 @@ void ARaftSimCrewAvatarActor::SetProceduralVisualVisible(bool bVisible)
                 Part == PfdBuckle || Part == Helmet ||
                 Part == HelmetRim || Part == HelmetRetention ||
                 Part == LeftBoot || Part == RightBoot ||
-                Part == PaddleShaft || Part == PaddleBlade || Part == PaddleGrip ||
-                // The skin neck band is deliberate production dressing (it
-                // fills the gap between the PFD collar and the helmet's chin
-                // line, 2026-08-30) but sat in the CC0-not-ready gap-fill
-                // list, so its visibility depended on load timing — when the
-                // body readied first, every helmet read as empty ("there
-                // should be a skin tone head in the helmet", 2026-09-02).
-                Part == Neck;
+                Part == PaddleShaft || Part == PaddleBlade || Part == PaddleGrip;
             const bool bBodyGapOverlay = !bCompleteCC0Body &&
                 (Part == Pelvis || Part == Torso ||
                  Part == LeftThigh || Part == RightThigh ||
@@ -3683,8 +3681,8 @@ void ARaftSimCrewAvatarActor::ApplyPose(const FRaftSimCrewAvatarPose& Pose)
                 FittedLocationCm, BootRotation);
             Boot->SetRelativeScale3D(ProductionBootScale);
         };
-        PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm, -16.0f);
-        PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm, 16.0f);
+        PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm, -28.0f);
+        PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm, 28.0f);
     }
 
     PaddleShaft->SetVisibility(Pose.bShowPaddle);

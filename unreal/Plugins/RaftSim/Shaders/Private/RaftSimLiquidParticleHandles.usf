@@ -1,0 +1,58 @@
+#include "/Engine/Public/Platform.ush"
+uint Owner;
+uint TotalCapacity;
+uint IndexPlane;
+uint TagPlane;
+uint NewAcquireTag;
+uint2 ParticleRange;
+uint2 IDRange;
+StructuredBuffer<uint> Words;
+StructuredBuffer<uint2> References;
+StructuredBuffer<uint> Counts;
+RWStructuredBuffer<int2> Handles;
+RWStructuredBuffer<int> IDToIndex;
+RWStructuredBuffer<uint> FreeIDs;
+RWStructuredBuffer<uint> FreeCounts;
+RWStructuredBuffer<uint> IncomingCounts;
+RWStructuredBuffer<uint> Control;
+
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x;
+#if HANDLE_MODE==3
+    if(i!=0) return;
+    if(Control[0]!=0)
+    {
+        if(IncomingCounts[Owner]>FreeCounts[Owner]) InterlockedOr(Control[1],16);
+        else FreeCounts[Owner]-=IncomingCounts[Owner];
+    }
+    Control[0]=Control[1]==0?1:0;
+#else
+    if(Control[0]==0) return;
+#if HANDLE_MODE==1
+    if(i>=IDRange.y || IDToIndex[IDRange.x+i]!=-1) return;
+    uint slot;InterlockedAdd(FreeCounts[Owner],1,slot);
+    FreeIDs[IDRange.x+slot]=i;
+#else
+    if(i>=ParticleRange.y || i>=Counts[Owner]) return;
+    uint p=ParticleRange.x+i;
+#if HANDLE_MODE==0
+    if(References[p].x!=Owner) return;
+    int index=asint(Words[IndexPlane*TotalCapacity+p]);
+    int tag=asint(Words[TagPlane*TotalCapacity+p]);
+    if(index<0 || uint(index)>=IDRange.y) { InterlockedOr(Control[1],16);return; }
+    int previous;InterlockedCompareExchange(IDToIndex[IDRange.x+index],-1,int(i),previous);
+    if(previous!=-1) { InterlockedOr(Control[1],16);return; }
+    Handles[p]=int2(index,tag);
+#else
+    if(References[p].x==Owner) return;
+    uint free;InterlockedAdd(IncomingCounts[Owner],1,free);
+    if(free>=FreeCounts[Owner]) { InterlockedOr(Control[1],16);return; }
+    // Pop from the tail so the remaining prefix is still a valid native free list.
+    uint index=FreeIDs[IDRange.x+FreeCounts[Owner]-1-free];
+    Handles[p]=int2(index,asint(NewAcquireTag));IDToIndex[IDRange.x+index]=i;
+#endif
+#endif
+#endif
+}

@@ -70,6 +70,14 @@ public:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
 
+    /** Uses the gameplay mesh/seat path without starting river physics. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Validation")
+    void InitializeCrewSeatingForValidation();
+
+    /** Minimum signed glute-to-tube clearance; negative is compression. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Validation")
+    float GetCrewSeatContactClearanceCm(ARaftSimCrewAvatarActor* Avatar) const;
+
     /** Apply one paddle stroke impulse. ForwardScale in [-1, 1]; negative = back-paddle. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ApplyPaddleStroke(ERaftSimPaddleSide Side, float ForwardScale);
@@ -565,6 +573,8 @@ private:
         const FVector& LinearImpulseNs, const FVector& AngularImpulseNms);
     /** Highest rendered raft-surface Z (actor frame) under a seat station. */
     float ComputeSeatTubeTopZCm(const FVector& SeatCm, bool& bOutFound) const;
+    bool ComputeRenderedSeatOriginZCm(
+        const FVector& SeatCm, const TArray<FVector>& ContactPoints, float& OutZCm) const;
     float RescueFailureResetRemaining = -1.0f;
     int32 PaddleStrokeCount = 0;
     int32 HighSideResponseCount = 0;

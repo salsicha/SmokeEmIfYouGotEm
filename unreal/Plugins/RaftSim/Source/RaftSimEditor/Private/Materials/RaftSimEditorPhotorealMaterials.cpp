@@ -41,6 +41,7 @@
 #include "Materials/MaterialExpressionSubtract.h"
 #include "Materials/MaterialExpressionVertexNormalWS.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionShadowReplace.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialExpressionStaticSwitchParameter.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
@@ -1045,8 +1046,14 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
                 CrossingChop,
                 Lerp(Const(0.22f), Const(1.0f), ChopCells));
         };
-        UMaterialExpression* AnalyticSlopeXy = Lerp(
-            AnalyticSlopeAt(FlowUvA), AnalyticSlopeAt(FlowUvB), CycleAlpha);
+        // The analytic sinusoids are only a bounded anti-mip fallback. At full
+        // amplitude their infinite phase lines become bright perspective
+        // streaks and cross-channel bars. Real rapid shape is supplied by the
+        // solver/obstacle geometry; retain only a faint, parameterized residue
+        // for platforms that completely lose the normal-map mip.
+        UMaterialExpression* AnalyticSlopeXy = Mul(
+            Lerp(AnalyticSlopeAt(FlowUvA), AnalyticSlopeAt(FlowUvB), CycleAlpha),
+            Scalar(TEXT("AnalyticChopStrength"), 0.08f));
         UMaterialExpressionAppendVector* AnalyticSlope3 =
             Cast<UMaterialExpressionAppendVector>(Add(
                 NewObject<UMaterialExpressionAppendVector>(Material)));
@@ -1114,7 +1121,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             // no wave"). The camera-radial grooves this floor guarded
             // against came from the unbounded advection shear, fixed by
             // flowmap cycling — the heavy guard is no longer needed.
-            Mul(NormalStrength, Scalar(TEXT("RippleGrazingFloor"), 0.80f)),
+            Mul(NormalStrength, Scalar(TEXT("RippleGrazingFloor"), 0.12f)),
             RippleGrazingFresnel);
         // Wind-riffle patches vs slicks: real rivers alternate between glassy
         // slicks and wind/current-textured patches at the ten-metre scale —
@@ -2968,7 +2975,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
         CombinedNormal->VectorInput.Expression = AddNode(
             PrimaryNormal, CrossPerturbation);
         UMaterialExpressionScalarParameter* LiveNormalStrength =
-            Scalar(TEXT("LiveRippleStrength"), 0.18f);
+            Scalar(TEXT("LiveRippleStrength"), 0.10f);
         UMaterialExpressionConstant3Vector* LiveFlatN =
             Const3(0.0f, 0.0f, 1.0f);
         UMaterialExpressionFresnel* LiveRippleGrazingFresnel =
@@ -2981,7 +2988,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             LiveNormalStrength,
             Mul(
                 LiveNormalStrength,
-                Scalar(TEXT("LiveRippleGrazingFloor"), 0.80f)),
+                Scalar(TEXT("LiveRippleGrazingFloor"), 0.15f)),
             LiveRippleGrazingFresnel);
         FinalNormal = Lerp(
             LiveFlatN,
@@ -3207,12 +3214,12 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             Mul(FoamMask,
                 Scalar(TEXT("UnifiedSurfaceFeatureFoamGain"), 1.5f)));
         UMaterialExpression* SurfaceFeatureTone = Lerp(
-            Scalar(TEXT("UnifiedSurfaceFeatureDark"), 0.68f),
-            Scalar(TEXT("UnifiedSurfaceFeatureBright"), 1.03f),
+            Scalar(TEXT("UnifiedSurfaceFeatureDark"), 0.92f),
+            Scalar(TEXT("UnifiedSurfaceFeatureBright"), 1.02f),
             FrothCellVariation);
         UMaterialExpression* SurfaceFeatureBlend = Mul(
             SurfaceFeatureActivity,
-            Scalar(TEXT("UnifiedSurfaceFeatureStrength"), 0.85f));
+            Scalar(TEXT("UnifiedSurfaceFeatureStrength"), 0.22f));
         BaseColorOutput = Mul(
             BaseColorOutput,
             Lerp(
@@ -3224,7 +3231,7 @@ static UMaterial* BuildLiveRiverSurfaceMaterial()
             AddNode(
                 RoughnessOutput,
                 Mul(FrothCellVariation,
-                    Scalar(TEXT("UnifiedSurfaceFeatureRoughness"), 0.12f))),
+                    Scalar(TEXT("UnifiedSurfaceFeatureRoughness"), 0.035f))),
             SurfaceFeatureBlend);
     }
 
@@ -4973,6 +4980,86 @@ static bool EnableReviewedEnvironmentMaterialUsages(const TCHAR* ObjectPath)
     return bNanite && bInstances && bSaved;
 }
 
+static bool SuppressReviewedMaskedFoliageCardShadows(const TCHAR* ObjectPath)
+{
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, ObjectPath);
+    if (!Material)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim: reviewed foliage material missing: %s"), ObjectPath);
+        return false;
+    }
+
+    // The reviewed pine keeps wood and needles in separate material slots. The
+    // needle slot is a collection of broad alpha-cutout cards; allowing those
+    // planes into the shadow pass projects their card edges as long diagonal
+    // bars across both the canopy and riverbank. Preserve their normal camera
+    // opacity while making only the shadow-pass opacity zero. Bark, branches,
+    // and trunks continue to cast fully geometric shadows from their slots.
+    if (Material->BlendMode != BLEND_Masked)
+    {
+        UE_LOG(LogTemp, Display,
+            TEXT("RaftSim: reviewed foliage material is not masked; shadow-pass repair skipped: %s"),
+            ObjectPath);
+        return true;
+    }
+
+    static const FString ShadowSwitchDescription(
+        TEXT("RaftSimSuppressFlatFoliageCardShadowV1"));
+    for (const TObjectPtr<UMaterialExpression>& Expression :
+         Material->GetExpressionCollection().Expressions)
+    {
+        if (Expression && Expression->Desc == ShadowSwitchDescription)
+        {
+            UE_LOG(LogTemp, Display,
+                TEXT("RaftSim: reviewed foliage shadow-pass repair already present: %s"),
+                ObjectPath);
+            return true;
+        }
+    }
+
+    UMaterialEditorOnlyData* EditorData = Material->GetEditorOnlyData();
+    if (!EditorData || !EditorData->OpacityMask.Expression)
+    {
+        UE_LOG(LogTemp, Warning,
+            TEXT("RaftSim: masked reviewed foliage has no opacity input: %s"),
+            ObjectPath);
+        return false;
+    }
+
+    Material->Modify();
+    const FExpressionInput OriginalOpacity = EditorData->OpacityMask;
+
+    UMaterialExpressionConstant* NoCardShadow =
+        NewObject<UMaterialExpressionConstant>(Material);
+    NoCardShadow->R = 0.0f;
+    NoCardShadow->Desc = TEXT("RaftSimFlatFoliageCardShadowOpacity");
+    Material->GetExpressionCollection().AddExpression(NoCardShadow);
+
+    UMaterialExpressionShadowReplace* ShadowSwitch =
+        NewObject<UMaterialExpressionShadowReplace>(Material);
+    ShadowSwitch->Desc = ShadowSwitchDescription;
+    ShadowSwitch->Default = OriginalOpacity;
+    ShadowSwitch->Shadow.Connect(0, NoCardShadow);
+    Material->GetExpressionCollection().AddExpression(ShadowSwitch);
+    EditorData->OpacityMask.Connect(0, ShadowSwitch);
+
+    Material->PostEditChange();
+    UPackage* Package = Material->GetOutermost();
+    Package->MarkPackageDirty();
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        Package->GetName(), FPackageName::GetAssetPackageExtension());
+    const bool bSaved = UPackage::SavePackage(
+        Package, Material, *Filename, SaveArgs);
+    UE_LOG(LogTemp, Display,
+        TEXT("RaftSim: suppressed masked foliage-card shadows for %s saved=%d"),
+        ObjectPath, bSaved ? 1 : 0);
+    return bSaved;
+}
+
 bool PromoteReviewedScannedUnderstoryMaterials(FString& OutSummary)
 {
     bool bSucceeded = true;
@@ -5019,6 +5106,12 @@ static void PromoteReviewedEnvironmentMaterials()
     {
         EnableReviewedEnvironmentMaterialUsages(MaterialPath);
     }
+    SuppressReviewedMaskedFoliageCardShadows(
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_Needles.M_PineTree01_Needles"));
+    SuppressReviewedMaskedFoliageCardShadows(
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked"));
     FString Summary;
     PromoteReviewedScannedUnderstoryMaterials(Summary);
 }
@@ -5031,6 +5124,11 @@ static void HandlePromoteReviewedEnvironmentMaterials(const TArray<FString>&)
 static void HandleCreatePhotorealMaterials(const TArray<FString>&)
 {
     BuildSouthForkWaterTextureAssets();
+    BuildPacuareUpperHuacasWaterTextureAssets();
+    BuildColoradoHanceWaterTextureAssets();
+    BuildFutaleufuTerminatorWaterTextureAssets();
+    BuildChilkoLavaCanyonWaterTextureAssets();
+    BuildZambeziBatokaWaterTextureAssets();
     BuildPhotorealRiverWaterMaterial();
     BuildPhotorealTerrainMaterial();
     // The live solver mesh rides 2 cm above the authored Single Layer Water.
@@ -5052,11 +5150,20 @@ static void HandleCreatePhotorealMaterials(const TArray<FString>&)
 
 bool CreatePhotorealRiverWaterMaterial(FString& OutSummary)
 {
-    const bool bTextureSaved = BuildSouthForkWaterTextureAssets();
+    // Texture addressing is part of the shared presentation contract. Refresh
+    // every river here so an editor command cannot leave old mirrored assets
+    // behind; mirrored flow normals reverse their derivative at each tile edge
+    // and show up as long streaks and cross-river bars at grazing angles.
+    bool bTextureSaved = BuildSouthForkWaterTextureAssets();
+    bTextureSaved &= BuildPacuareUpperHuacasWaterTextureAssets();
+    bTextureSaved &= BuildColoradoHanceWaterTextureAssets();
+    bTextureSaved &= BuildFutaleufuTerminatorWaterTextureAssets();
+    bTextureSaved &= BuildChilkoLavaCanyonWaterTextureAssets();
+    bTextureSaved &= BuildZambeziBatokaWaterTextureAssets();
     UMaterial* Material = BuildPhotorealRiverWaterMaterial();
     const bool bSucceeded = bTextureSaved && Material != nullptr;
     OutSummary += FString::Printf(
-        TEXT("South Fork photoreal river-water material authored: %s.\n"),
+        TEXT("All-river photoreal water textures and shared material authored: %s.\n"),
         bSucceeded ? TEXT("yes") : TEXT("no"));
     return bSucceeded;
 }

@@ -3,6 +3,8 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionCustom.h"
+#include "Materials/MaterialExpressionCollectionParameter.h"
 
 namespace RaftSimEditorEnvironment
 {
@@ -16,6 +18,7 @@ ExpressionType* AddColoradoWaterExpression(UMaterial* Material)
     return Expression;
 }
 } // namespace
+
 
 UMaterial* LoadOrCreateColoradoHanceWaterParent(FString& OutSummary)
 {
@@ -389,7 +392,12 @@ UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
     }
 
     Instance->Modify();
-    Instance->SetParentEditorOnly(SharedTransmissionParent);
+    UMaterial* CurrentParent = LoadOrCreateCurrentGradientWaterParent(
+        SharedTransmissionParent->GetMaterial(),
+        TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/M_RaftSim_ColoradoCurrentWaterV3"),
+        TEXT("Colorado"), 0.04f, 0.32f, OutSummary);
+    if (!CurrentParent) return nullptr;
+    Instance->SetParentEditorOnly(CurrentParent);
     Instance->ClearParameterValuesEditorOnly();
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
     {
@@ -405,9 +413,10 @@ UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
     // The lace remains an optical breakup input. The shared parent multiplies
     // it by solver-authored speed/foam fields, so it cannot paint hydraulic
     // features into calm water or dry cells.
-    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.68f);
+    SetScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 4.0f);
     SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.60f);
-    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.72f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
     SetScalar(TEXT("SpeedAerationFraction"), 0.14f);
     SetScalar(TEXT("FoamRoughness"), 0.66f);
     SetScalar(TEXT("ReachHueVariation"), 0.08f);
@@ -419,7 +428,7 @@ UMaterialInstanceConstant* LoadOrCreateColoradoHanceLiveWaterInstance(
     // Raise normal/ripple energy and lift the surface response over the bed
     // so the interface reads as liquid; the sediment tint itself is a
     // river-identity decision left to the Colorado-specific review.
-    SetScalar(TEXT("RippleGrazingFloor"), 0.55f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.12f);
     SetScalar(TEXT("SlickNormalFloor"), 0.55f);
     SetScalar(TEXT("OpticalDepthResponseExponent"), 0.45f);
     Instance->PostEditChange();

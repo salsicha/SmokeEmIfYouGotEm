@@ -1,0 +1,52 @@
+#include "/Engine/Public/Platform.ush"
+int3 SolverSize;
+int3 RenderSize;
+Texture3D<float4> Boundary;
+Texture3D<float> SourceScalar;
+RWTexture3D<float> Core;
+RWTexture3D<float> OutputScalar;
+RWStructuredBuffer<float2> Audit;
+RWStructuredBuffer<uint> Diagnostics;
+
+[numthreads(64,1,1)]
+void MainCS(uint3 DispatchId:SV_DispatchThreadID)
+{
+    uint i=DispatchId.x;
+#if RAFTSIM_OCCUPANCY_STAGE == 0
+    if(i>=uint(SolverSize.x*SolverSize.y*SolverSize.z)) return;
+    int3 p=int3(i%SolverSize.x,(i/SolverSize.x)%SolverSize.y,i/(SolverSize.x*SolverSize.y));
+    float category=Boundary.Load(int4(p,0)).w;
+    if(!isfinite(category) || category<0 || category>3 || category!=round(category))
+        InterlockedAdd(Diagnostics[2],1);
+    bool inside=all(p>0) && all(p<SolverSize-1);
+    bool fluid=inside;
+    if(inside)
+    {
+        [unroll] for(int z=-1;z<=1;++z) [unroll] for(int y=-1;y<=1;++y) [unroll] for(int x=-1;x<=1;++x)
+            fluid=fluid && Boundary.Load(int4(p+int3(x,y,z),0)).w==0;
+    }
+    Core[p]=fluid?1:0;
+#else
+    if(i>=uint(RenderSize.x*RenderSize.y*RenderSize.z)) return;
+    int3 p=int3(i%RenderSize.x,(i/RenderSize.x)%RenderSize.y,i/(RenderSize.x*RenderSize.y));
+    float3 coordinate=(float3(p)+.5)*float3(SolverSize)/float3(RenderSize)-.5;
+    int3 low=int3(floor(coordinate));float3 f=coordinate-low;
+    float confidence=0;
+    [unroll] for(int z=0;z<2;++z) [unroll] for(int y=0;y<2;++y) [unroll] for(int x=0;x<2;++x)
+    {
+        float3 w=lerp(1-f,f,float3(x,y,z));
+        confidence+=Core[clamp(low+int3(x,y,z),0,SolverSize-1)]*w.x*w.y*w.z;
+    }
+    float before=SourceScalar.Load(int4(p,0));
+    float after=min(before,.5-confidence);
+    int3 parent=p/(RenderSize/SolverSize);
+    bool valid=isfinite(before) && before<=.5 &&
+        !((before>0 && after<=0) && Boundary.Load(int4(parent,0)).w!=0);
+    if(!valid) InterlockedAdd(Diagnostics[2],1);
+    // The distance source becomes explicitly invalid on bad classification.
+    // Callers must reject diagnostics rather than interpret a failed field.
+    if(!valid || (Diagnostics[0]|Diagnostics[1]|Diagnostics[2]|Diagnostics[3])!=0)
+        after=asfloat(0x7fc00000);
+    OutputScalar[p]=after;Audit[i]=float2(after,confidence);
+#endif
+}

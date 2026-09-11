@@ -1,11 +1,13 @@
 #include "raftsim_water/chrono_coupling.hpp"
 #include "raftsim_water/solver.hpp"
+#include "../src/solver_internal.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <exception>
 #include <filesystem>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -69,6 +71,155 @@ raftsim::SolverConfig finite_volume_second_order_config() {
     return config;
 }
 
+void assert_boundary_flux_diagnostic(const raftsim::Scenario& source) {
+    raftsim::Scenario scenario = source;
+    for (auto& boundary : scenario.boundaries) {
+        boundary.kind = (boundary.edge == "west") ? "inflow" :
+            ((boundary.edge == "east") ? "outflow" : "wall");
+        boundary.has_stage = boundary.edge == "west" || boundary.edge == "east";
+        boundary.stage = 1.0;
+        boundary.has_depth = false;
+        boundary.has_velocity = boundary.edge == "west";
+        boundary.velocity_x = 0.5;
+        boundary.velocity_y = 0.0;
+    }
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
+            scenario.bed(row, col) = 0.0;
+            scenario.initial.h(row, col) = 1.0;
+            scenario.initial.u(row, col) = 0.5;
+            scenario.initial.v(row, col) = 0.0;
+        }
+    }
+    auto config = finite_volume_second_order_config();
+    config.roughness_scale = 0.0;
+    raftsim::ReducedShallowWaterSolver solver(scenario, config);
+    const auto before = solver.make_frame();
+    const auto flux = solver.inspect_boundary_mass_fluxes();
+    const auto faces = solver.inspect_numerical_mass_flux_grid();
+    expect(faces.x_faces.nx()==scenario.grid.nx+1 && faces.x_faces.ny()==scenario.grid.ny &&
+        faces.y_faces.nx()==scenario.grid.nx && faces.y_faces.ny()==scenario.grid.ny+1,
+        "numerical face grid dimensions incorrect");
+    double face_west=0.0,face_east=0.0,face_south=0.0,face_north=0.0;
+    for (std::size_t row=0;row<scenario.grid.ny;++row) {
+        face_west+=faces.x_faces(row,0)*scenario.grid.dy;
+        face_east-=faces.x_faces(row,scenario.grid.nx)*scenario.grid.dy;
+        for (std::size_t col=1;col<scenario.grid.nx;++col)
+            expect(std::abs(faces.x_faces(row,col)-0.5)<1e-12,"interior face flux differs from uniform h*u");
+    }
+    for (std::size_t col=0;col<scenario.grid.nx;++col) {
+        face_south+=faces.y_faces(0,col)*scenario.grid.dx;
+        face_north-=faces.y_faces(scenario.grid.ny,col)*scenario.grid.dx;
+    }
+    expect(std::abs(face_west-flux.west)+std::abs(face_east-flux.east)+
+        std::abs(face_south-flux.south)+std::abs(face_north-flux.north)<1e-12,
+        "numerical face grid disagrees with exact boundary flux audit");
+    const double expected = 0.5 * scenario.grid.ny * scenario.grid.dy;
+    expect(std::abs(flux.west - expected) < 1e-10, "uniform west boundary flux units/sign incorrect");
+    expect(std::abs(flux.east + expected) < 1e-10, "uniform east boundary flux units/sign incorrect");
+    expect(std::abs(flux.north) + std::abs(flux.south) < 1e-10, "wall boundary leaked volume");
+    expect(max_abs_diff(solver.state().h, before.state.h) == 0.0 &&
+        max_abs_diff(solver.state().u, before.state.u) == 0.0 &&
+        max_abs_diff(solver.state().v, before.state.v) == 0.0 && solver.time() == before.time,
+        "boundary inspection mutated live state");
+
+    auto raised = solver.state();
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario.grid.nx; ++col) raised.h(row, col) = 1.1;
+    }
+    solver.replace_state(raised, 0.0);
+    const auto backwater = solver.inspect_boundary_mass_fluxes();
+    expect(backwater.west < expected, "stage/velocity inlet incorrectly treated as prescribed discharge");
+    const double mass_before = raftsim::compute_mass(scenario, solver.state());
+    const double dt = 1e-5;
+    solver.step(dt);
+    const double measured_rate = (raftsim::compute_mass(scenario, solver.state()) - mass_before) / dt;
+    const double face_rate = backwater.west + backwater.east + backwater.south + backwater.north;
+    expect(std::abs(measured_rate - face_rate) < 1e-3 * std::max(1.0, std::abs(face_rate)),
+        "boundary face flux does not match small-step volume balance");
+    config.experimental_west_discharge_m3s = expected;
+    raftsim::ReducedShallowWaterSolver prescribed(scenario, config);
+    prescribed.replace_state(raised, 0.0);
+    const auto fixed_flux = prescribed.inspect_boundary_mass_fluxes();
+    expect(std::abs(fixed_flux.west - expected) < 1e-10,
+        "prescribed inlet discharge changed under backwater");
+    const double fixed_mass = raftsim::compute_mass(scenario, prescribed.state());
+    prescribed.step(dt);
+    const double fixed_rate = (raftsim::compute_mass(scenario, prescribed.state()) - fixed_mass) / dt;
+    expect(std::abs(fixed_rate - (fixed_flux.west + fixed_flux.east)) < 1e-3 * std::max(1.0, std::abs(fixed_rate)),
+        "prescribed discharge is not conservative at the domain face");
+    // Uniform flow is preserved, and the new branch is opt-in only.
+    raftsim::ReducedShallowWaterSolver uniform(scenario, config);
+    uniform.step(0.01);
+    expect(max_abs_diff(uniform.state().h, before.state.h) < 1e-12 &&
+        max_abs_diff(uniform.state().u, before.state.u) < 1e-12,
+        "prescribed characteristic boundary disturbed matching uniform flow");
+    auto supercritical = raised;
+    for (std::size_t row = 0; row < scenario.grid.ny; ++row) supercritical.u(row, 0) = 10.0;
+    prescribed.replace_state(supercritical, 0.0);
+    bool critical_rejected = false;
+    try { prescribed.inspect_boundary_mass_fluxes(); }
+    catch (const std::runtime_error&) { critical_rejected = true; }
+    expect(critical_rejected, "unsupported supercritical discharge boundary was accepted");
+    auto mixed_config = config;
+    mixed_config.experimental_west_supercritical_stage = true;
+    raftsim::ReducedShallowWaterSolver mixed(scenario, mixed_config);
+    mixed.replace_state(supercritical, 0.0);
+    const auto mixed_flux = mixed.inspect_boundary_mass_fluxes();
+    expect(std::abs(mixed_flux.west - expected) < 1e-10,
+        "mixed-regime boundary lost prescribed total discharge");
+    const double mixed_mass_before = raftsim::compute_mass(scenario, mixed.state());
+    mixed.step(dt);
+    const double mixed_rate = (raftsim::compute_mass(scenario, mixed.state())-mixed_mass_before)/dt;
+    expect(std::abs(mixed_rate-(mixed_flux.west+mixed_flux.east+mixed_flux.north+mixed_flux.south)) < 1e-3,
+        "mixed-regime boundary violates face-flux volume balance");
+    auto mixed_fringe = raised;
+    mixed_fringe.h(0,0) = 0.085847;
+    mixed_fringe.u(0,0) = 0.979504;
+    mixed.replace_state(mixed_fringe,0.0);
+    expect(std::abs(mixed.inspect_boundary_mass_fluxes().west-expected)<1e-10,
+        "natural shallow supercritical fringe lost net inflow");
+    mixed_config.experimental_west_discharge_m3s = -1.0;
+    bool missing_q_rejected = false;
+    try { raftsim::ReducedShallowWaterSolver invalid_mixed(scenario,mixed_config); }
+    catch (const std::runtime_error&) { missing_q_rejected = true; }
+    expect(missing_q_rejected,"mixed-regime stage accepted without explicit discharge");
+    auto film_scenario = scenario;
+    for (auto& boundary : film_scenario.boundaries) boundary.kind = "wall";
+    for (std::size_t row=0;row<scenario.grid.ny;++row) {
+        for (std::size_t col=0;col<scenario.grid.nx;++col) {
+            film_scenario.initial.h(row,col)=0.5*config.dry_tolerance;
+            film_scenario.initial.u(row,col)=0.0;
+            film_scenario.initial.v(row,col)=0.0;
+        }
+    }
+    auto film_config=finite_volume_second_order_config();
+    raftsim::ReducedShallowWaterSolver film(film_scenario,film_config);
+    const double film_mass=raftsim::compute_mass(film_scenario,film.state());
+    film.step(.01);
+    expect(std::abs(raftsim::compute_mass(film_scenario,film.state())-film_mass)<1e-12,
+        "positive sub-dry-tolerance water volume disappeared");
+    auto fringe = raised;
+    fringe.h(0, 0) = 0.00001;
+    fringe.u(0, 0) = -0.13; // both characteristics leave through the west face
+    prescribed.replace_state(fringe, 0.0);
+    expect(std::abs(prescribed.inspect_boundary_mass_fluxes().west - expected) < 1e-10,
+        "draining fringe was forced as inflow or lost net discharge accounting");
+    auto dry_bank = scenario;
+    dry_bank.bed(0, 0) = 2.0; // above the inlet's authored stage/flow segment
+    dry_bank.initial.h(0, 0) = 0.0003;
+    dry_bank.initial.u(0, 0) = 10.0;
+    raftsim::ReducedShallowWaterSolver bounded_inlet(dry_bank, config);
+    expect(std::abs(bounded_inlet.inspect_boundary_mass_fluxes().west - expected) < 1e-10,
+        "inlet injected flow into an unrelated dry-bank film");
+    config.experimental_west_discharge_m3s = -1.0;
+    config.spatial_order = 1;
+    bool rejected = false;
+    try { raftsim::ReducedShallowWaterSolver(scenario, config).inspect_boundary_mass_fluxes(); }
+    catch (const std::runtime_error&) { rejected = true; }
+    expect(rejected, "unsupported diagnostic mode was silently accepted");
+}
+
 void assert_finite_volume_second_order_is_deterministic(const raftsim::Scenario& scenario) {
     raftsim::SolverConfig config = finite_volume_second_order_config();
     raftsim::ReducedShallowWaterSolver first(scenario, config);
@@ -79,6 +230,35 @@ void assert_finite_volume_second_order_is_deterministic(const raftsim::Scenario&
     expect(max_abs_diff(first_frames.back().state.h, second_frames.back().state.h) < 1.0e-12, "second-order depth run is not deterministic");
     expect(max_abs_diff(first_frames.back().state.u, second_frames.back().state.u) < 1.0e-12, "second-order u run is not deterministic");
     expect(max_abs_diff(first_frames.back().state.v, second_frames.back().state.v) < 1.0e-12, "second-order v run is not deterministic");
+}
+
+void assert_finite_volume_cfl_failure_is_bounded(const raftsim::Scenario& scenario) {
+    raftsim::ReducedShallowWaterSolver solver(scenario, finite_volume_second_order_config());
+    raftsim::WaterState unstable = solver.state();
+    // Finite but absurd depth used to request billions of hidden substeps.
+    unstable.h(scenario.grid.ny / 2, scenario.grid.nx / 2) = 1.0e24;
+    solver.replace_state(std::move(unstable), 2.0);
+    bool rejected = false;
+    try { solver.step(0.1); }
+    catch (const std::runtime_error& error) {
+        rejected = std::string(error.what()).find("CFL work limit exceeded") != std::string::npos;
+    }
+    expect(rejected, "unstable CFL workload was not rejected before integration");
+    expect(solver.time() == 2.0, "rejected CFL step advanced simulation time");
+}
+
+void assert_validation_rejects_clipped_or_nonfinite_flow(const raftsim::Scenario& scenario) {
+    auto config = finite_volume_second_order_config();
+    raftsim::ReducedShallowWaterSolver solver(scenario, config);
+    auto frame = solver.make_frame();
+    frame.state.u(0,0) = config.max_velocity;
+    auto result = raftsim::validate_frames(scenario, {frame}, config);
+    expect(!result.passed && result.velocity_limit_reached,
+        "velocity-clamped unstable flow was reported as passing");
+    frame = solver.make_frame();
+    frame.state.v(0,0) = std::numeric_limits<double>::quiet_NaN();
+    result = raftsim::validate_frames(scenario, {frame}, config);
+    expect(!result.passed && !result.finite_state, "NaN was ignored by flow validation");
 }
 
 void assert_live_state_can_be_replaced(const raftsim::Scenario& scenario) {
@@ -115,6 +295,34 @@ void assert_live_state_can_be_replaced(const raftsim::Scenario& scenario) {
     expect(rejected, "shape-mismatched replacement state was accepted");
 }
 
+void assert_muscl_scratch_is_not_state(const raftsim::Scenario& scenario) {
+    auto config = finite_volume_second_order_config();
+    config.disable_fixture_calibrations = true;
+    raftsim::ReducedShallowWaterSolver reused(scenario, config);
+    const std::size_t row = scenario.grid.ny / 2;
+    const std::size_t col = scenario.grid.nx / 2;
+    for (int iteration = 0; iteration < 6; ++iteration) {
+        auto replacement = reused.state();
+        replacement.h(row, col) = iteration % 2 == 0 ? 0.0 : 0.25;
+        replacement.u(row, col) = 0.15;
+        replacement.v(row, col) = -0.1;
+        raftsim::ReducedShallowWaterSolver fresh(scenario, config);
+        fresh.replace_state(replacement, reused.time());
+        reused.replace_state(replacement, reused.time());
+        const auto before = reused.state();
+        (void)reused.inspect_boundary_mass_fluxes();
+        expect(before.h.values() == reused.state().h.values(), "flux audit mutated live depth");
+        fresh.step(0.001);
+        reused.step(0.001);
+        const auto& a = fresh.state();
+        const auto& b = reused.state();
+        expect(a.h.values() == b.h.values() && a.u.values() == b.u.values() &&
+            a.v.values() == b.v.values() && a.eta.values() == b.eta.values() &&
+            a.hu.values() == b.hu.values() && a.hv.values() == b.hv.values() &&
+            a.wet.values == b.wet.values, "RK scratch leaked across wet/dry state replacement");
+    }
+}
+
 void assert_finite_volume_second_order_is_well_balanced(const raftsim::Scenario& scenario) {
     // A lake-at-rest state over the scenario bathymetry (with reflective walls) must
     // stay exactly at rest under the second-order MUSCL path, including partially
@@ -148,6 +356,41 @@ void assert_finite_volume_second_order_is_well_balanced(const raftsim::Scenario&
     expect(max_abs_diff(frames.back().state.v, frames.front().state.v) < 1.0e-12, "lake at rest v drifted under second-order path");
 }
 
+void assert_emergent_step_uses_hydrostatic_flux() {
+    using namespace raftsim::solver_detail;
+    auto config = finite_volume_second_order_config();
+    // Both centres are wet but the lower pool is below the raised neighbour's
+    // bed. The interface is a wet/dry problem, not a fully submerged bed step.
+    const MusclFaceState lower{0.10, 0.10, 0.0, 0.0};
+    const MusclFaceState upper{0.08, 0.38, 0.0, 0.0};
+    const MusclFaceState dry{0.0, 0.30, 0.0, 0.0};
+    const auto x = muscl_hydrostatic_flux_x(lower, upper, true, config);
+    const auto reference_x = muscl_hydrostatic_flux_x(dry, upper, true, config);
+    expect(std::abs(x.left.h - reference_x.left.h) < 1e-12,
+        "emergent x-step bypassed hydrostatic reconstruction");
+    expect(std::abs(x.left.h - x.right.h) < 1e-12, "emergent x-step leaked mass");
+    expect(std::abs(x.left.hu - reference_x.left.hu - 0.5*config.gravity*0.01) < 1e-12,
+        "emergent x-step lost lower-side pressure correction");
+    const auto y = muscl_hydrostatic_flux_y(lower, upper, true, config);
+    expect(std::abs(y.left.h - x.left.h) < 1e-12, "emergent step is axis dependent");
+    expect(std::abs(y.left.hv - x.left.hu) < 1e-12, "emergent y-step pressure mismatch");
+    const auto reversed = muscl_hydrostatic_flux_x(upper, lower, true, config);
+    expect(std::abs(reversed.left.h + x.left.h) < 1e-12, "emergent step reversal mismatch");
+    expect(std::abs(reversed.right.hu - x.left.hu) < 1e-12, "reversed pressure mismatch");
+    // The uncalibrated solver must also retain the hydrostatic flux while a
+    // moving surface fully submerges the step, not switch methods at that instant.
+    const MusclFaceState deep_lower{0.8, 0.8, 0.4, -0.2};
+    const MusclFaceState deep_upper{0.7, 1.0, -0.1, 0.3};
+    const ConservedState left_star{0.5, 0.5*0.4, 0.5*-0.2};
+    const ConservedState right_star{0.7, 0.7*-0.1, 0.7*0.3};
+    const auto expected = finite_volume_flux_x(left_star, right_star, config);
+    const auto submerged = muscl_hydrostatic_flux_x(deep_lower, deep_upper, true, config);
+    expect(std::abs(submerged.left.h - expected.h) < 1e-12,
+        "submerged step switched away from hydrostatic mass flux");
+    expect(std::abs(submerged.left.hu - expected.hu - 0.5*config.gravity*(0.64-0.25)) < 1e-12,
+        "submerged step pressure correction mismatch");
+}
+
 void assert_output_can_be_written(const raftsim::Scenario& scenario, const std::string& output_dir) {
     raftsim::SolverConfig config;
     raftsim::ReducedShallowWaterSolver solver(scenario, config);
@@ -165,6 +408,20 @@ void assert_chrono_coupling_samples_water_and_contact(const raftsim::Scenario& s
     raftsim::Frame frame = solver.make_frame();
     double x = scenario.grid.origin_x + static_cast<double>(scenario.grid.nx / 2) * scenario.grid.dx;
     double y = scenario.grid.origin_y + static_cast<double>(scenario.grid.ny / 2) * scenario.grid.dy;
+    // A wet/dry shoreline fixture need not have water at its grid centre.
+    // Exercise buoyancy at an actually wet location, not an assumed one.
+    if (raftsim::sample_water_field(scenario, frame, x, y).depth <= 0.0) {
+        double deepest = 0.0;
+        for (std::size_t row=0;row<scenario.grid.ny;++row) {
+            for (std::size_t col=0;col<scenario.grid.nx;++col) {
+                if (frame.state.h(row,col)>deepest) {
+                    deepest=frame.state.h(row,col);
+                    x=scenario.grid.origin_x+col*scenario.grid.dx;
+                    y=scenario.grid.origin_y+row*scenario.grid.dy;
+                }
+            }
+        }
+    }
     raftsim::WaterFieldSample water = raftsim::sample_water_field(scenario, frame, x, y);
     expect(water.depth >= 0.0, "sampled negative water depth");
     expect(water.normal.z > 0.0, "sampled invalid water normal");
@@ -199,10 +456,15 @@ int main(int argc, char** argv) {
         }
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
         assert_scenario_loads(scenario);
+        assert_boundary_flux_diagnostic(scenario);
         assert_solver_is_deterministic(scenario);
         assert_finite_volume_second_order_is_deterministic(scenario);
+        assert_finite_volume_cfl_failure_is_bounded(scenario);
+        assert_validation_rejects_clipped_or_nonfinite_flow(scenario);
         assert_live_state_can_be_replaced(scenario);
+        assert_muscl_scratch_is_not_state(scenario);
         assert_finite_volume_second_order_is_well_balanced(scenario);
+        assert_emergent_step_uses_hydrostatic_flux();
         assert_chrono_coupling_samples_water_and_contact(scenario);
         if (argc == 3) {
             assert_output_can_be_written(scenario, argv[2]);

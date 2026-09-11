@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.8",
+	"EngineAssociation": "{E40F0E2C-4472-E92A-9D2C-2383C5355E29}",
 	"Category": "Simulation",
 	"Description": "Photorealistic whitewater guide game with custom shallow-water physics, flexible raft/contact simulation, AI crew systems, rescue, progression, and immersive audio.",
 	"Modules": [

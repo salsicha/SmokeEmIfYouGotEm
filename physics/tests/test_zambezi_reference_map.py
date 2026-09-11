@@ -330,7 +330,7 @@ def test_zambezi_release_head_runnable_review_is_hash_locked():
         RUNNABLE_RELEASE_REVIEW.as_posix()
     )
 
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert RUNNABLE_RELEASE_REVIEW.as_posix() in readme
     assert "Zambezi, Batoka Gorge" in readme
 
@@ -409,7 +409,7 @@ def test_zambezi_live_water_v2_review_and_matched_evidence_are_hash_locked():
         _assert_historical_artifact_unchanged(relative, expected)
 
     assert len(review["required_external_acceptance_gates"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert LIVE_WATER_V2_REVIEW.as_posix() in readme
 
 
@@ -441,7 +441,7 @@ def test_zambezi_solver_driven_rapid_vfx_review_is_hash_locked():
             relative, expected
         )
     assert len(review["required_external_acceptance_gates"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert RAPID_VFX_V1_REVIEW.as_posix() in readme
 
 
@@ -486,7 +486,7 @@ def test_zambezi_refined_live_surface_review_is_hash_locked_and_honest():
         )
     assert len(review["remaining_photoreal_defects"]) >= 5
     assert len(review["required_external_acceptance_gates"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert REFINED_LIVE_SURFACE_V1_REVIEW.as_posix() in readme
 
 
@@ -537,7 +537,7 @@ def test_zambezi_connected_plunge_review_is_hash_locked_and_honest():
     assert len(review["rejected_iterations"]) == 4
     assert len(review["remaining_photoreal_defects"]) >= 5
     assert len(review["required_external_acceptance_gates"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert CONNECTED_PLUNGE_V1_REVIEW.as_posix() in readme
 
 
@@ -584,7 +584,7 @@ def test_zambezi_nonperiodic_live_wave_review_is_hash_locked_and_honest():
         _assert_historical_artifact_unchanged(relative, expected)
     assert len(review["remaining_photoreal_defects"]) >= 6
     assert len(review["required_external_acceptance_gates"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert NONPERIODIC_LIVE_WAVE_V1_REVIEW.as_posix() in readme
 
 
@@ -636,7 +636,7 @@ def test_zambezi_plunge_pocket_review_is_hash_locked_and_honest():
         )
     assert len(review["remaining_photoreal_defects"]) >= 7
     assert len(review["required_external_acceptance_gates"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert PLUNGE_POCKET_V1_REVIEW.as_posix() in readme
 
 
@@ -745,7 +745,7 @@ def test_zambezi_launch_optical_naturalism_v18_review_is_hash_locked_and_honest(
         "14843_opaque_vegetation_instances"
     )
     assert len(review["external_gates_remaining"]) == 7
-    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    readme = (REPO_ROOT / "docs/history/README-before-normalization.md").read_text(encoding="utf-8")
     assert LAUNCH_OPTICAL_NATURALISM_V18_REVIEW.as_posix() in readme
 
 

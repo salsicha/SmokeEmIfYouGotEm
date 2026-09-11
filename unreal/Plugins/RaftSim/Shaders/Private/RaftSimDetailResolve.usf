@@ -1,0 +1,26 @@
+#include "/Engine/Public/Platform.ush"
+int2 GridSize;
+float CellMeters;
+StructuredBuffer<float4> MeanFlow;
+StructuredBuffer<float4> DetailState;
+RWTexture2D<float4> SurfaceOutput;
+uint Index(int2 p) { return p.y*GridSize.x+p.x; }
+float Weight(int2 p)
+{
+    float edge=min(min(p.x,p.y),min(GridSize.x-1-p.x,GridSize.y-1-p.y))*CellMeters;
+    return smoothstep(0,4,edge)*smoothstep(0.02,0.4,MeanFlow[Index(p)].x);
+}
+float Height(int2 p) { p=clamp(p,0,GridSize-1);return DetailState[Index(p)].x*Weight(p); }
+[numthreads(8,8,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    int2 p=int2(id.xy);
+    if (any(p>=GridSize))return;
+    float weight=Weight(p);
+    if (weight<=0) { SurfaceOutput[p]=0;return; }
+    float dx=(Height(p+int2(1,0))-Height(p-int2(1,0)))/(2*CellMeters);
+    float dy=(Height(p+int2(0,1))-Height(p-int2(0,1)))/(2*CellMeters);
+    // Density -> bounded coverage only here, never discard transported mass.
+    float foam=(1-exp(-max(DetailState[Index(p)].w,0)))*weight;
+    SurfaceOutput[p]=float4(Height(p),dx,dy,foam);
+}

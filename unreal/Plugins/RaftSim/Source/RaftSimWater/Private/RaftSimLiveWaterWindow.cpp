@@ -729,7 +729,13 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     raftsim::SolverConfig Config;
     Config.solver_mode = TCHAR_TO_UTF8(*(*Solver)->GetStringField(TEXT("solver_mode")));
     Config.flux_scheme = TCHAR_TO_UTF8(*(*Solver)->GetStringField(TEXT("flux_scheme")));
-    Config.spatial_order = static_cast<int>((*Solver)->GetNumberField(TEXT("spatial_order")));
+    // The cooked 0.5 m state already contains the rapid's high-resolution
+    // ledges, holes, and wave train. Reconstructing every interface twice on
+    // the game thread costs ~51 ms per 160 x 80 m step at Troublemaker and
+    // does not add visible geometry. First-order runtime evolution preserves
+    // the same cells and conservative FV authority at less than half that
+    // cost; offline cooking remains second-order.
+    Config.spatial_order = 1;
     Config.cfl = (*Solver)->GetNumberField(TEXT("cfl"));
     Config.dry_tolerance = (*Solver)->GetNumberField(TEXT("dry_tolerance"));
     Config.roughness_scale = (*Solver)->GetNumberField(TEXT("roughness_scale"));
@@ -741,6 +747,38 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     (*Solver)->TryGetBoolField(TEXT("preserve_initial_mass"), Config.preserve_initial_mass);
     // Game water is always the genuine solver, whatever the manifest says.
     Config.disable_fixture_calibrations = true;
+
+    // Explicit geographically registered replay, never inferred from a river name. These
+    // candidates must retain the offline boundary and roughness for meaningful
+    // geometry/raft comparisons. Do not transplant a total-discharge boundary
+    // to a crop covering only part of the inlet.
+    bool bReplayOfflineSolver = false;
+    (*Solver)->TryGetBoolField(TEXT("runtime_replay_offline_config"), bReplayOfflineSolver);
+    if (bReplayOfflineSolver)
+    {
+        double PrescribedDischarge = -1.0;
+        double Manning = 0.0;
+        bool bMixedStage = false;
+        if (Col0 != 0 || Col1 != FullNx - 1 || Row0 != 0 || Row1 != FullNy - 1 ||
+            !(*Solver)->TryGetNumberField(TEXT("experimental_west_discharge_m3s"), PrescribedDischarge) ||
+            !FMath::IsFinite(PrescribedDischarge) || PrescribedDischarge < 0.0 ||
+            !(*Solver)->TryGetNumberField(TEXT("roughness_manning"), Manning) ||
+            !FMath::IsFinite(Manning) || Manning <= 0.0 || Manning > 0.2 ||
+            (*Solver)->GetIntegerField(TEXT("spatial_order")) != 2 ||
+            Config.solver_mode != "finite_volume")
+        {
+            OutError = TEXT("Survey replay requires the complete grid and explicit valid MUSCL discharge/roughness settings");
+            return nullptr;
+        }
+        (*Solver)->TryGetBoolField(TEXT("experimental_west_supercritical_stage"), bMixedStage);
+        Config.spatial_order = 2;
+        Config.boundary_mode = "scenario";
+        Config.experimental_west_discharge_m3s = PrescribedDischarge;
+        Config.experimental_west_supercritical_stage = bMixedStage;
+        Scenario.roughness = Manning;
+        UE_LOG(LogTemp, Display, TEXT("RaftSim survey replay: MUSCL full grid, Q=%.6f m3/s, Manning=%.4f"),
+            PrescribedDischarge, Manning);
+    }
 
     const FVector2D RuntimeOriginM = bRecenterHydraulicCrux
         ? FVector2D(
@@ -770,7 +808,9 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
         static_cast<double>(SeedWetCells) / static_cast<double>(Nx * Ny);
     // Cooked river bands are rendered by the band water materials, whose
     // WPO animates the travelling bake wave; tanks stay flat-rendered.
-    Window->bHasTravelingWavePresentation = true;
+    // A survey replay has no authored travelling-wave material. Adding the
+    // legacy wave here would move raft support away from the measured field.
+    Window->bHasTravelingWavePresentation = !bReplayOfflineSolver;
     return Window;
 }
 

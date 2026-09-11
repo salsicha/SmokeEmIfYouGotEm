@@ -1,0 +1,187 @@
+#include "/Engine/Public/Platform.ush"
+
+int2 GridSize;
+float CellMeters;
+float StepSeconds;
+float MomentumDamping;
+float FoamDecay;
+float FoamSource;
+uint Periodic;
+uint SecondOrder;
+uint RKStage;
+float2 OriginMeters;
+float TurbulentHeadMeters;
+float SimulationSeconds;
+StructuredBuffer<float4> MeanFlow;
+StructuredBuffer<float4> PreviousState;
+StructuredBuffer<float4> StepInitialState;
+RWStructuredBuffer<float4> NextState;
+#if RAFTSIM_ACTIVITY_MEMORY
+float ActivitySource;
+float ActivityDecay;
+StructuredBuffer<float> PreviousActivity;
+StructuredBuffer<float> StepInitialActivity;
+RWStructuredBuffer<float> NextActivity;
+#endif
+
+uint Index(int2 p) { return p.y*GridSize.x+p.x; }
+bool Outside(int2 p) { return any(p<0) || any(p>=GridSize); }
+int2 Wrap(int2 p) { return (p+GridSize)%GridSize; }
+
+#if RAFTSIM_ACTIVITY_MEMORY
+float IncomingActivity(int2 p,int2 offset,float localActivity)
+{
+    int2 n=p+offset;
+    if (Periodic!=0)n=Wrap(n);
+    else if (Outside(n))return 0;
+    float4 neighbor=MeanFlow[Index(n)],center=MeanFlow[Index(p)];
+    if (neighbor.x<=0.01)return 0;
+    float inward=-0.5*dot(float2(offset),center.yz+neighbor.yz);
+    return max(inward,0)*(PreviousActivity[Index(n)]-localActivity);
+}
+float AdvectActivity(int2 p)
+{
+    float a=PreviousActivity[Index(p)];
+    // Intensive activity, not foam density or liquid mass. Incoming upwind
+    // differences preserve constants under compression and do not clip state.
+    // Sum of incoming rates <= 2*global max(|u|+|v|); existing .45 CFL
+    // therefore bounds their convex update weight by .9.
+    return a+(StepSeconds/CellMeters)*(IncomingActivity(p,int2(1,0),a)+IncomingActivity(p,int2(-1,0),a)+
+        IncomingActivity(p,int2(0,1),a)+IncomingActivity(p,int2(0,-1),a));
+}
+#endif
+
+float4 LimitedSlope(int2 p,uint axis)
+{
+    int2 direction=axis==0 ? int2(1,0) : int2(0,1);
+    int2 l=p-direction,r=p+direction;
+    if (Periodic!=0) { l=Wrap(l);r=Wrap(r); }
+    else if (Outside(l) || Outside(r))return 0;
+    if (MeanFlow[Index(l)].x<=0.01 || MeanFlow[Index(r)].x<=0.01)return 0;
+    float4 s=PreviousState[Index(p)];
+    float4 dl=s-PreviousState[Index(l)],dr=PreviousState[Index(r)]-s;
+    // Monotonized-central limiter: retain the centered slope where smooth,
+    // bounded by twice either one-sided difference. In particular nonnegative
+    // cell densities produce nonnegative face densities without mass clipping.
+    return 0.5*(sign(dl)+sign(dr))*min(0.5*abs(dl+dr),2*min(abs(dl),abs(dr)));
+}
+
+uint Hash(uint3 p)
+{
+    uint h=p.x*1597334677u^p.y*3812015801u^p.z*958689121u;
+    h^=h>>16;h*=2246822519u;h^=h>>13;return h;
+}
+float Noise(float3 p)
+{
+    int3 c=int3(floor(p));float3 f=frac(p);f=f*f*f*(f*(f*6-15)+10);
+    float sum=0;
+    [unroll]for(int z=0;z<2;z++)[unroll]for(int y=0;y<2;y++)[unroll]for(int x=0;x<2;x++)
+        sum+=(float(Hash(uint3(c+int3(x,y,z)))&65535u)/32767.5-1)*
+            (x ? f.x : 1-f.x)*(y ? f.y : 1-f.y)*(z ? f.z : 1-f.z);
+    return sum;
+}
+float Head(int2 p)
+{
+    if (Outside(p))return 0;
+    float4 flow=MeanFlow[Index(p)];
+    float2 pos=OriginMeters+float2(p)*CellMeters;
+    float2 q=float2(dot(pos,float2(0.819,0.574)),dot(pos,float2(-0.574,0.819)))*0.43;
+    float activity=flow.w;
+#if RAFTSIM_ACTIVITY_MEMORY
+    // Preserve instantaneous excitation and allow transported activity to
+    // persist after the source. Both are [0,1], so the existing head bound
+    // is unchanged. This is an authored closure, not measured TKE.
+    activity+=(1-activity)*PreviousActivity[Index(p)];
+#endif
+    return TurbulentHeadMeters*activity*smoothstep(0.02,0.4,flow.x)*Noise(float3(q,SimulationSeconds*0.8));
+}
+
+// Positive-axis perturbation flux over the FV mean state. A dry neighbour is
+// a reflecting wall, never a shallow-water epsilon denominator. At each wet
+// face both adjacent cells evaluate exactly the same height and foam flux.
+// Momentum includes the local hydrostatic source: subtract local eta from the
+// face pressure. This balances a constant perturbation over uneven depth.
+float4 Face(int2 l,int2 r,uint axis,float localEta)
+{
+    bool outL=Outside(l),outR=Outside(r);
+    if (Periodic!=0) { l=Wrap(l);r=Wrap(r);outL=false;outR=false; }
+    float4 fl=outL ? 0 : MeanFlow[Index(l)];
+    float4 fr=outR ? 0 : MeanFlow[Index(r)];
+    bool wetL=!outL && fl.x>0.01,wetR=!outR && fr.x>0.01;
+    if (!wetL && !wetR)return 0;
+    float4 sl=wetL ? PreviousState[Index(l)] : 0;
+    float4 sr=wetR ? PreviousState[Index(r)] : 0;
+    if (!wetL || !wetR)
+    {
+        // Wall pressure equals the owning cell's hydrostatic pressure;
+        // its balanced pressure difference and mass/foam flux are all zero.
+        return 0;
+    }
+    if (SecondOrder!=0)
+    {
+        sl.xyz+=0.5*LimitedSlope(l,axis).xyz;
+        sr.xyz-=0.5*LimitedSlope(r,axis).xyz;
+    }
+    float depth=min(fl.x,fr.x);
+    float velocity=0.5*(axis==0 ? fl.y+fr.y : fl.z+fr.z);
+    float speed=abs(velocity)+sqrt(9.81*depth);
+    float4 a=velocity*sl,b=velocity*sr;
+    if (axis==0) { a.x+=sl.y;b.x+=sr.y;a.y+=9.81*depth*sl.x;b.y+=9.81*depth*sr.x; }
+    else { a.x+=sl.z;b.x+=sr.z;a.z+=9.81*depth*sl.x;b.z+=9.81*depth*sr.x; }
+    float4 flux=0.5*(a+b)-0.5*speed*(sr-sl);
+    if (axis==0)flux.y-=9.81*depth*localEta;
+    else flux.z-=9.81*depth*localEta;
+    // Foam retains first-order upwind spatial flux: the limited face-density
+    // trial introduced a measurable centroid bias. RK2 still advances its
+    // conservative flux; it follows mean current, not gravity-wave phase.
+    flux.w=velocity*(velocity>=0 ? sl.w : sr.w);
+    return flux;
+}
+
+[numthreads(8,8,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    int2 p=int2(id.xy);
+    if (Outside(p))return;
+    uint i=Index(p);
+    float4 flow=MeanFlow[i];
+    if (flow.x<=0.01)
+    {
+        NextState[i]=0;
+#if RAFTSIM_ACTIVITY_MEMORY
+        NextActivity[i]=0;
+#endif
+        return;
+    }
+#if RAFTSIM_ACTIVITY_MEMORY
+    float activity=AdvectActivity(p);
+    if (SecondOrder!=0 && RKStage==0)NextActivity[i]=activity;
+    else
+    {
+        if (SecondOrder!=0)activity=0.5*StepInitialActivity[i]+0.5*activity;
+        float production=ActivitySource*flow.w,total=production+ActivityDecay;
+        float retention=exp(-total*StepSeconds);
+        NextActivity[i]=activity*retention+(total>0 ? production*(1-retention)/total : 0);
+    }
+#endif
+    float4 previous=PreviousState[i];
+    float4 s=previous-(StepSeconds/CellMeters)*(
+        Face(p,p+int2(1,0),0,previous.x)-Face(p-int2(1,0),p,0,previous.x)+
+        Face(p,p+int2(0,1),1,previous.x)-Face(p-int2(0,1),p,1,previous.x));
+    // Time-continuous, source-localized pressure fluctuations excite the
+    // persistent wave state. Noise is forcing, not the rendered height field.
+    if (TurbulentHeadMeters>0)
+    {
+        float2 gradient=float2(Head(p+int2(1,0))-Head(p-int2(1,0)),
+            Head(p+int2(0,1))-Head(p-int2(0,1)))/(2*CellMeters);
+        s.yz-=StepSeconds*9.81*flow.x*gradient;
+    }
+    if (SecondOrder!=0 && RKStage==0) { NextState[i]=s;return; }
+    if (SecondOrder!=0)s=0.5*StepInitialState[i]+0.5*s;
+    s.yz*=exp(-MomentumDamping*StepSeconds);
+    // Exact source/decay integration after conservative current advection.
+    float source=FoamSource*flow.w;
+    float decay=exp(-FoamDecay*StepSeconds);
+    s.w=s.w*decay+(FoamDecay>0 ? source*(1-decay)/FoamDecay : source*StepSeconds);
+    NextState[i]=s;
+}

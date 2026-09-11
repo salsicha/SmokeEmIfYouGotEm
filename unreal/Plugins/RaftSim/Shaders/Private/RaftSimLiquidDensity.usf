@@ -1,0 +1,179 @@
+#include "/Engine/Public/Platform.ush"
+uint ClockIndex;
+uint ClockHasTick;
+Texture3D<float4> ClockSurface;
+RWStructuredBuffer<float4> ClockTimeline;
+int3 GridSize;
+int3 BinSize;
+float3 MinimumMeters;
+float3 BinMinimumMeters;
+float3 ExtentMeters;
+float RadiusMeters;
+float FootprintMeters;
+uint SmoothSparse;
+uint Capacity;
+uint UseCountBuffer;
+uint CountOffset;
+uint FloatStride;
+uint PositionOffset;
+uint SourceCountOffset;
+float4x4 SimulationToLocalCm;
+float PackedUnitsScale;
+Buffer<float> NiagaraFloats;
+Buffer<uint> NiagaraCounts;
+RWBuffer<uint> NiagaraCountsUav;
+RWStructuredBuffer<float4> PackedPositions;
+RWStructuredBuffer<uint> PackedCount;
+StructuredBuffer<float4> Positions;
+StructuredBuffer<uint> CountBuffer;
+RWStructuredBuffer<uint> Heads;
+RWStructuredBuffer<uint> Next;
+RWStructuredBuffer<uint> DensityFixed;
+RWStructuredBuffer<uint> Diagnostics;
+RWStructuredBuffer<float4> KernelRows;
+RWStructuredBuffer<float4> Bounds;
+RWTexture3D<float> Scalar;
+static const uint Invalid=0xffffffff;
+static const float FixedScale=1048576.0;
+uint Count() { return UseCountBuffer!=0?min(CountBuffer[CountOffset],Capacity):Capacity; }
+uint BinIndex(int3 p) { return p.x+BinSize.x*(p.y+BinSize.y*p.z); }
+float Cubic(float q)
+{
+    return 2.54647908947*(q<.5?1-6*q*q+6*q*q*q:q<1?2*(1-q)*(1-q)*(1-q):0);
+}
+void Rotate(inout float3x3 a,inout float3x3 v,int p,int q)
+{
+    if(abs(a[p][q])<1.e-12) return;
+    float tau=(a[q][q]-a[p][p])/(2*a[p][q]);
+    float t=(tau>=0?1:-1)/(abs(tau)+sqrt(1+tau*tau));
+    float c=rsqrt(1+t*t),s=t*c;
+    float app=a[p][p],aqq=a[q][q],apq=a[p][q];
+    a[p][p]=app-t*apq;a[q][q]=aqq+t*apq;a[p][q]=a[q][p]=0;
+    [unroll] for(int k=0;k<3;++k)
+    {
+        if(k!=p && k!=q)
+        {
+            float akp=a[k][p],akq=a[k][q];
+            a[k][p]=a[p][k]=c*akp-s*akq;a[k][q]=a[q][k]=s*akp+c*akq;
+        }
+        float vkp=v[k][p],vkq=v[k][q];v[k][p]=c*vkp-s*vkq;v[k][q]=s*vkp+c*vkq;
+    }
+}
+
+[numthreads(64,1,1)]
+void MainCS(uint3 DispatchId:SV_DispatchThreadID)
+{
+    uint i=DispatchId.x;
+#if RAFTSIM_DENSITY_STAGE == 0
+    if(i==0 && UseCountBuffer!=0 && CountBuffer[CountOffset]>Capacity) InterlockedAdd(Diagnostics[0],1);
+    if(i>=Count()) return;
+    float3 position=Positions[i].xyz;
+    if(!all(isfinite(position))) { InterlockedAdd(Diagnostics[0],1);return; }
+    int3 bin=int3(floor((position-BinMinimumMeters)/(2*RadiusMeters)));
+    // Open-domain particles outside the rendering window are not inserted.
+    if(any(bin<0) || any(bin>=BinSize)) return;
+    uint old;InterlockedExchange(Heads[BinIndex(bin)],i,old);Next[i]=old;
+#elif RAFTSIM_DENSITY_STAGE == 1
+    if(i>=Capacity) return;
+    KernelRows[3*i]=0;KernelRows[3*i+1]=0;KernelRows[3*i+2]=0;Bounds[i]=0;
+    if(i>=Count()) return;
+    float3 position=Positions[i].xyz;
+    int3 bin=int3(floor((position-BinMinimumMeters)/(2*RadiusMeters)));
+    if(!all(isfinite(position)) || any(bin<0) || any(bin>=BinSize)) return;
+    float weight=0,numberDensity=0;float3 mean=0;float3x3 moment=0;uint neighbors=0;
+    [loop] for(int z=-1;z<=1;++z) [loop] for(int y=-1;y<=1;++y) [loop] for(int x=-1;x<=1;++x)
+    {
+        int3 key=bin+int3(x,y,z);if(any(key<0) || any(key>=BinSize)) continue;
+        uint current=Heads[BinIndex(key)],hops=0;
+        [loop] while(current!=Invalid && hops<Capacity)
+        {
+            if(current>=Count()) { InterlockedAdd(Diagnostics[1],1);break; }
+            float3 delta=Positions[current].xyz-position;
+            float q=length(delta)/(2*RadiusMeters);
+            if(q<1)
+            {
+                float w=1-q*q*q;weight+=w;mean+=w*delta;
+                moment+=w*float3x3(delta*delta.x,delta*delta.y,delta*delta.z);
+                numberDensity+=Cubic(2*q)/(RadiusMeters*RadiusMeters*RadiusMeters);++neighbors;
+            }
+            current=Next[current];++hops;
+        }
+        if(hops==Capacity && current!=Invalid) InterlockedAdd(Diagnostics[1],1);
+    }
+    if(weight<=0 || numberDensity<=0) { InterlockedAdd(Diagnostics[2],1);return; }
+    mean/=weight;
+    float3x3 covariance=moment/weight-float3x3(mean*mean.x,mean*mean.y,mean*mean.z);
+    float3x3 basis=float3x3(1,0,0,0,1,0,0,0,1);
+    [unroll] for(int sweep=0;sweep<8;++sweep) { Rotate(covariance,basis,0,1);Rotate(covariance,basis,0,2);Rotate(covariance,basis,1,2); }
+    float3 eigen=float3(covariance[0][0],covariance[1][1],covariance[2][2]);
+    float largest=max(eigen.x,max(eigen.y,eigen.z));
+    eigen=max(eigen,max(largest/4,RadiusMeters*RadiusMeters*1.e-12));
+    float3 axes=RadiusMeters*eigen/(.15*4*RadiusMeters*RadiusMeters);
+    if(SmoothSparse!=0)
+    {
+        // A entering/leaving neighbor contributes zero weight at the support
+        // boundary. Blend shape continuously instead of switching at N=25.
+        float confidence=saturate((weight-1-8)/16);
+        confidence=confidence*confidence*(3-2*confidence);
+        if(largest<=RadiusMeters*RadiusMeters*1.e-10) confidence=0;
+        axes=lerp(RadiusMeters*.5,axes,confidence);
+    }
+    else if(neighbors<=25 || largest<=RadiusMeters*RadiusMeters*1.e-10) axes=RadiusMeters*.5;
+    axes=sqrt(axes*axes+FootprintMeters*FootprintMeters/.9);
+    float3x3 matrix=mul(float3x3(basis[0]/axes,basis[1]/axes,basis[2]/axes),transpose(basis));
+    float3 bounds=sqrt(float3(dot(basis[0]*axes,basis[0]*axes),dot(basis[1]*axes,basis[1]*axes),dot(basis[2]*axes,basis[2]*axes)));
+    if(!all(isfinite(axes)) || !all(isfinite(bounds))) { InterlockedAdd(Diagnostics[2],1);return; }
+    KernelRows[3*i]=float4(matrix[0],rcp(axes.x*axes.y*axes.z*numberDensity));
+    KernelRows[3*i+1]=float4(matrix[1],neighbors);KernelRows[3*i+2]=float4(matrix[2],largest);
+    Bounds[i]=float4(bounds,1);
+#elif RAFTSIM_DENSITY_STAGE == 2
+    if(i>=Count() || Bounds[i].w==0) return;
+    float3 center=Positions[i].xyz,spacing=ExtentMeters/GridSize,bounds=Bounds[i].xyz;
+    int3 low=max(int3(ceil((center-bounds-MinimumMeters)/spacing-.5)),0);
+    int3 high=min(int3(floor((center+bounds-MinimumMeters)/spacing-.5)),GridSize-1);
+    float4 a=KernelRows[3*i],b=KernelRows[3*i+1],c=KernelRows[3*i+2];
+    [loop] for(int z=low.z;z<=high.z;++z) [loop] for(int y=low.y;y<=high.y;++y) [loop] for(int x=low.x;x<=high.x;++x)
+    {
+        float3 delta=MinimumMeters+(float3(x,y,z)+.5)*spacing-center;
+        float q=length(float3(dot(a.xyz,delta),dot(b.xyz,delta),dot(c.xyz,delta)));
+        if(q>=1) continue;
+        float contribution=a.w*Cubic(q)*FixedScale;
+        if(!isfinite(contribution) || contribution>=4294967040.0) { InterlockedAdd(Diagnostics[3],1);continue; }
+        uint amount=uint(round(max(contribution,0))),previous;
+        InterlockedAdd(DensityFixed[x+GridSize.x*(y+GridSize.y*z)],amount,previous);
+        if(previous>Invalid-amount) InterlockedAdd(Diagnostics[3],1);
+    }
+#elif RAFTSIM_DENSITY_STAGE == 3
+    if(i>=uint(GridSize.x*GridSize.y*GridSize.z)) return;
+    int3 p=int3(i%GridSize.x,(i/GridSize.x)%GridSize.y,i/(GridSize.x*GridSize.y));
+    // A failed bounded reconstruction is explicitly invalid, never silently
+    // interpreted as accepted physical water. Diagnostic callers must reject it.
+    bool valid=(Diagnostics[0]|Diagnostics[1]|Diagnostics[2]|Diagnostics[3])==0;
+    Scalar[p]=valid?.5-float(DensityFixed[i])/FixedScale:asfloat(0x7fc00000);
+#elif RAFTSIM_DENSITY_STAGE == 4
+#if RAFTSIM_COUNT_UAV
+    // Between dependent Niagara dispatch groups the counter remains UAV.
+    // Read it in that state, without modifying it or imposing a stale SRV state.
+    uint actualCount=NiagaraCountsUav[SourceCountOffset];
+#else
+    uint actualCount=NiagaraCounts[SourceCountOffset];
+#endif
+    if(i==0) PackedCount[0]=actualCount;
+    if(i>=Capacity) return;
+    float3 position=0;
+    if(i<min(actualCount,Capacity))
+    {
+        position=float3(NiagaraFloats[(PositionOffset+0)*FloatStride+i],
+                        NiagaraFloats[(PositionOffset+1)*FloatStride+i],
+                        NiagaraFloats[(PositionOffset+2)*FloatStride+i]);
+        position=mul(float4(position,1),SimulationToLocalCm).xyz*PackedUnitsScale;
+    }
+    PackedPositions[i]=float4(position,0);
+#else
+    if(i!=0) return;
+    float4 clockValue=ClockSurface.Load(int4(0,0,0,0));
+    float age=clockValue.b+clockValue.a;
+    float previous=ClockIndex?ClockTimeline[ClockIndex-1].x:age;
+    ClockTimeline[ClockIndex]=float4(age,max(age-previous,0),age<previous?1:0,ClockHasTick);
+#endif
+}

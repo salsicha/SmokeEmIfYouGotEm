@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import base64
 import json
+import os
 import plistlib
 import stat
 import sys
@@ -17,6 +18,30 @@ assert SPEC is not None and SPEC.loader is not None
 release = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = release
 SPEC.loader.exec_module(release)
+
+
+def set_fixture_execute_bit(executable: Path, monkeypatch, enabled: bool = True) -> None:
+    """Model a POSIX package's execute bit without weakening its real validator.
+
+    Windows chmod cannot set Unix execute bits. Override only this fixture's
+    stat mode there; POSIX hosts exercise actual permissions on the temp file.
+    """
+    mode = executable.stat().st_mode
+    desired = mode | stat.S_IXUSR if enabled else mode & ~stat.S_IXUSR
+    if os.name != 'nt':
+        executable.chmod(desired)
+        return
+    original_stat = Path.stat
+
+    def fixture_stat(path, *args, **kwargs):
+        result = original_stat(path, *args, **kwargs)
+        if path == executable:
+            fields = list(result)
+            fields[stat.ST_MODE] = desired
+            return os.stat_result(fields)
+        return result
+
+    monkeypatch.setattr(Path, 'stat', fixture_stat)
 
 
 def test_release_version_matches_project_configuration() -> None:
@@ -43,13 +68,13 @@ def test_sha256_file_matches_known_digest(tmp_path: Path) -> None:
 
 
 def test_macos_package_inspection_requires_executable_and_runtime_data(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch,
 ) -> None:
     app = tmp_path / "SmokeEmIfYouGotEm.app"
     executable = app / "Contents" / "MacOS" / "SmokeEmIfYouGotEm"
     executable.parent.mkdir(parents=True)
     executable.write_text("#!/bin/sh\n", encoding="utf-8")
-    executable.chmod(executable.stat().st_mode | stat.S_IXUSR)
+    set_fixture_execute_bit(executable, monkeypatch)
     with (app / "Contents" / "Info.plist").open("wb") as stream:
         plistlib.dump(
             {
@@ -70,12 +95,12 @@ def test_macos_package_inspection_requires_executable_and_runtime_data(
     assert inspection.runtime_data_file_count == 3
 
 
-def test_package_inspection_rejects_incomplete_runtime_stage(tmp_path: Path) -> None:
+def test_package_inspection_rejects_incomplete_runtime_stage(tmp_path: Path, monkeypatch) -> None:
     app = tmp_path / "SmokeEmIfYouGotEm.app"
     executable = app / "Contents" / "MacOS" / "SmokeEmIfYouGotEm"
     executable.parent.mkdir(parents=True)
     executable.write_text("#!/bin/sh\n", encoding="utf-8")
-    executable.chmod(executable.stat().st_mode | stat.S_IXUSR)
+    set_fixture_execute_bit(executable, monkeypatch)
     with (app / "Contents" / "Info.plist").open("wb") as stream:
         plistlib.dump(
             {
@@ -90,12 +115,12 @@ def test_package_inspection_rejects_incomplete_runtime_stage(tmp_path: Path) -> 
         )
 
 
-def test_macos_package_inspection_rejects_wrong_bundle_version(tmp_path: Path) -> None:
+def test_macos_package_inspection_rejects_wrong_bundle_version(tmp_path: Path, monkeypatch) -> None:
     app = tmp_path / "RaftSim.app"
     executable = app / "Contents" / "MacOS" / "RaftSim-Shipping"
     executable.parent.mkdir(parents=True)
     executable.write_text("#!/bin/sh\n", encoding="utf-8")
-    executable.chmod(executable.stat().st_mode | stat.S_IXUSR)
+    set_fixture_execute_bit(executable, monkeypatch)
     with (app / "Contents" / "Info.plist").open("wb") as stream:
         plistlib.dump(
             {
@@ -112,6 +137,22 @@ def test_macos_package_inspection_rejects_wrong_bundle_version(tmp_path: Path) -
         release.inspect_package(
             app, "macos", release.RELEASE_VERSION, minimum_runtime_files=1
         )
+
+
+def test_macos_package_inspection_rejects_missing_execute_bit(tmp_path: Path, monkeypatch) -> None:
+    app = tmp_path / 'RaftSim.app'
+    executable = app / 'Contents' / 'MacOS' / 'RaftSim-Shipping'
+    executable.parent.mkdir(parents=True)
+    executable.write_text('#!/bin/sh\n', encoding='utf-8')
+    set_fixture_execute_bit(executable, monkeypatch, enabled=False)
+    with (app / 'Contents' / 'Info.plist').open('wb') as stream:
+        plistlib.dump({'CFBundleExecutable':'RaftSim-Shipping',
+                      'CFBundleShortVersionString':release.RELEASE_VERSION},stream)
+    runtime = app / 'Contents' / 'UE' / 'RaftSimRuntimeData'
+    runtime.mkdir(parents=True)
+    (runtime / 'manifest.json').write_text('{}\n', encoding='utf-8')
+    with pytest.raises(release.ReleaseError, match='executable'):
+        release.inspect_package(app, 'macos', release.RELEASE_VERSION, minimum_runtime_files=1)
 
 
 def test_windows_package_inspection_finds_archived_executable_recursively(

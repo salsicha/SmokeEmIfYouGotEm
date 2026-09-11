@@ -592,9 +592,11 @@ def test_production_river_boot_replaces_only_the_procedural_footwear_overlay() -
         "BootReinforcement",
     ]
     assert manifest["construction"] == {
+        "curved_lasted_outsole": True,
+        "curved_toe_and_heel_rands": True,
         "outsole_lugs": 12,
-        "vamp_drain_bands": 3,
         "pull_tabs": 1,
+        "vamp_drain_bands": 3,
     }
     assert manifest["vertex_count"] >= 4_000
     assert manifest["polygon_count"] >= 4_000
@@ -607,6 +609,8 @@ def test_production_river_boot_replaces_only_the_procedural_footwear_overlay() -
     material_source = PRODUCTION_BOOT_MATERIAL_SCRIPT.read_text(encoding="utf-8")
     assert "Visual-only river footwear" in build_source
     assert "outsole_lugs" in build_source
+    assert "build_lasted_volume" in build_source
+    assert "curved_toe_and_heel_rands" in build_source
     assert "nanite.enabled = True" in import_source
     assert "existing_nanite.enabled = False" in import_source
     assert "Production river boot must retain twelve outsole lugs" in import_source
@@ -629,10 +633,10 @@ def test_production_river_boot_replaces_only_the_procedural_footwear_overlay() -
         "HasFittedUprightProductionRiverBoots()",
         "bReplacedBootLayer",
         "SM_RaftSim_WhitewaterRiverBoot",
-        "kProductionRiverBootPresentationScale(0.88f, 0.92f, 0.68f)",
+        "kProductionRiverBootPresentationScale(1.0f, 0.96f, 0.96f)",
         "FRotationMatrix::MakeFromXZ(ToeForward, FVector::UpVector)",
-        "PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm)",
-        "PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm)",
+        "PlaceProductionBoot(ProductionLeftBoot, Pose.LeftFootCm, -28.0f)",
+        "PlaceProductionBoot(ProductionRightBoot, Pose.RightFootCm, 28.0f)",
         "SourceSoleZCm * Profile.Z",
         "SetCollisionEnabled(ECollisionEnabled::NoCollision)",
     ):

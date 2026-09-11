@@ -155,11 +155,13 @@ public:
     FVector GetPoseHeadWorldLocationCm() const;
 
     /**
-     * Actor-local Z of the lowest point of the seated pelvis (glute
-     * underside). Seat placement uses it to rest the body ON a surface
-     * instead of trusting a hand-tuned seat height.
+     * Legacy procedural pelvis estimate for adapters without skinned
+     * contact samples. CC0 seating uses GetSeatedContactPointsLocalCm.
      */
     float GetSeatedPelvisBottomLocalZCm() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew|Appearance")
+    TArray<FVector> GetSeatedContactPointsLocalCm() const;
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew|Appearance")
     void ConfigureAppearance(int32 InVariantIndex, int32 InSeatSide, bool bInGuide);

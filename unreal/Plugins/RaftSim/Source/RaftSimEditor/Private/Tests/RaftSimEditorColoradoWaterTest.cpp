@@ -161,11 +161,11 @@ bool FRaftSimColoradoHanceWaterTest::RunTest(const FString& Parameters)
         if (LiveInstance->Parent)
         {
             TestEqual(
-                TEXT("Colorado Hance uses shared raft-transmitting volume water"),
+                TEXT("Colorado Hance uses its current-driven transmitting water"),
                 LiveInstance->Parent->GetPathName(),
-                FString(TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
-                             "M_RaftSim_SouthForkRaftTransmissionWater."
-                             "M_RaftSim_SouthForkRaftTransmissionWater")));
+                FString(TEXT("/Game/RaftSim/Environment/ColoradoRun/Water/Materials/"
+                             "M_RaftSim_ColoradoCurrentWaterV3."
+                             "M_RaftSim_ColoradoCurrentWaterV3")));
         }
         UTexture* LiveFlowNormal = nullptr;
         UTexture* LiveFoamLace = nullptr;

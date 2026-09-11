@@ -4,6 +4,7 @@
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
+#include "Materials/MaterialExpressionCustom.h"
 #include "Misc/AutomationTest.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -151,9 +152,31 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
         if (LiveInstance->Parent)
         {
             TestTrue(
-                TEXT("Chilko uses the shared raft-transmitting parent"),
+                TEXT("Chilko uses its isolated current-carried parent"),
                 LiveInstance->Parent->GetPathName().Contains(
-                    TEXT("M_RaftSim_SouthForkRaftTransmissionWater")));
+                    TEXT("M_RaftSim_ChilkoCurrentWaterV4")));
+            if (UMaterial* LiveParent = Cast<UMaterial>(LiveInstance->Parent))
+            {
+                UMaterialExpressionCustom* Density = nullptr;
+                int32 DensityNodeCount = 0;
+                bool bConnected = false;
+                for (UMaterialExpression* Expression : LiveParent->GetExpressions())
+                    if (auto* Custom = Cast<UMaterialExpressionCustom>(Expression))
+                        if (Custom->Desc == TEXT("ChilkoDensityFoamV1"))
+                        { Density = Custom; ++DensityNodeCount; }
+                TestEqual(TEXT("one idempotent density-foam node"), DensityNodeCount, 1);
+                if (Density)
+                {
+                    TestEqual(TEXT("density response retains four live inputs"), Density->Inputs.Num(), 4);
+                    TestTrue(TEXT("dense response filters its moving boundary"), Density->Code.Contains(TEXT("fwidth(Lace)")));
+                    for (UMaterialExpression* Expression : LiveParent->GetExpressions())
+                        if (auto* Lerp = Cast<UMaterialExpressionLinearInterpolate>(Expression))
+                            if (auto* Color = Cast<UMaterialExpressionVectorParameter>(Lerp->B.Expression))
+                                if (Color->ParameterName == TEXT("WhitewaterFrothColor"))
+                                    bConnected |= Lerp->Alpha.Expression == Density;
+                }
+                TestTrue(TEXT("saved foam-colour branch uses density response"), bConnected);
+            }
         }
         UTexture* LiveFlowNormal = nullptr;
         UTexture* LiveFoamLace = nullptr;
@@ -183,7 +206,7 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
                 FoamCoverage));
         TestTrue(
             TEXT("Chilko hydraulic foam coverage remains reviewed"),
-            FMath::IsNearlyEqual(FoamCoverage, 0.64f, 0.001f));
+            FMath::IsNearlyEqual(FoamCoverage, 4.0f, 0.001f));
 
         auto TestLiveScalar = [this, LiveInstance](
                                   const TCHAR* ParameterName,
@@ -201,13 +224,18 @@ bool FRaftSimChilkoLavaCanyonWaterTest::RunTest(const FString& Parameters)
                 FMath::IsNearlyEqual(Value, ExpectedValue, 0.001f));
         };
         TestLiveScalar(TEXT("ReachHueVariation"), 0.12f);
+        TestLiveScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
+        TestLiveScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+        TestLiveScalar(TEXT("ChilkoCurrentNormalStrength"), 0.18f);
+        TestLiveScalar(TEXT("WhitewaterFrothLaceModulationFloor"), 0.10f);
+        TestLiveScalar(TEXT("HydraulicFoamColorBreakupBias"), 0.0f);
         TestLiveScalar(TEXT("CalmSurfaceColorVariation"), 0.22f);
-        TestLiveScalar(TEXT("FallbackSkyReflectionFloor"), 0.08f);
-        TestLiveScalar(TEXT("FallbackSkyReflectionVariation"), 0.24f);
-        TestLiveScalar(TEXT("RippleGrazingFloor"), 0.75f);
-        TestLiveScalar(TEXT("SlickNormalFloor"), 0.85f);
+        TestLiveScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f);
+        TestLiveScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
+        TestLiveScalar(TEXT("RippleGrazingFloor"), 0.12f);
+        TestLiveScalar(TEXT("SlickNormalFloor"), 0.62f);
         TestLiveScalar(TEXT("SlickRoughnessScale"), 1.0f);
-        TestLiveScalar(TEXT("FresnelSpecular"), 0.01f);
+        TestLiveScalar(TEXT("FresnelSpecular"), 0.10f);
     }
     return !HasAnyErrors();
 }

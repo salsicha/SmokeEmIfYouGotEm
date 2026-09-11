@@ -489,7 +489,12 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
     }
 
     Instance->Modify();
-    Instance->SetParentEditorOnly(SharedTransmissionParent);
+    UMaterial* CurrentParent = LoadOrCreateCurrentGradientWaterParent(
+        SharedTransmissionParent->GetMaterial(),
+        TEXT("/Game/RaftSim/Environment/FutaleufuRun/Water/Materials/M_RaftSim_FutaleufuCurrentWaterV5"),
+        TEXT("Futaleufu"), 0.07f, 0.22f, OutSummary);
+    if (!CurrentParent) return nullptr;
+    Instance->SetParentEditorOnly(CurrentParent);
     Instance->ClearParameterValuesEditorOnly();
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
     {
@@ -502,12 +507,13 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
         FMaterialParameterInfo(TEXT("WaterFlowNormalCross")), FlowNormal);
     Instance->SetTextureParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("WhitewaterFoamLace")), FoamLace);
-    // Keep the high-energy solver field visible without the broad chalk-white
-    // pile in V2. The texture cannot create foam because the parent multiplies
-    // it by the solver-authored foam/speed mask before every optical output.
-    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.72f);
+    // Measured aeration peaks at 0.2614: the old 0.28 cutoff discarded it.
+    // Reveal resolved aeration, not white paint driven merely by flow speed.
+    SetScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+    SetScalar(TEXT("FutaleufuCurrentNormalStrength"), 0.22f);
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 3.5f);
     SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.54f);
-    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.78f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
     // Fast clear current is not aerated by itself. Keep a small speed shoulder
     // beneath the solver foam mask so breaking tongues retain transition, but
     // do not scatter the full cold-water body into a chalk-white sheet.
@@ -527,7 +533,7 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
     // clipped-white guide-eye sheet cannot return.
     SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f);
     SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.58f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.12f);
     SetScalar(TEXT("SlickNormalFloor"), 0.62f);
     SetScalar(TEXT("SlickRoughnessScale"), 1.0f);
     SetScalar(TEXT("FresnelSpecular"), 0.10f);
@@ -554,4 +560,14 @@ UMaterialInstanceConstant* LoadOrCreateFutaleufuTerminatorLiveWaterInstance(
         "sky reflection and turbulent slick response.\n");
     return Instance;
 }
+static FAutoConsoleCommand GRefreshFutaleufuCurrentWater(
+    TEXT("RaftSim.RefreshFutaleufuCurrentWater"),
+    TEXT("Refresh only Futaleufu live water and its texture dependencies."),
+    FConsoleCommandDelegate::CreateLambda([]
+    {
+        FString Summary;
+        const bool bReady = LoadOrCreateFutaleufuTerminatorLiveWaterInstance(Summary) != nullptr;
+        UE_LOG(LogRaftSimEditorEnvironment, Display,
+            TEXT("Futaleufu current water refresh: ready=%d\n%s"), bReady ? 1 : 0, *Summary);
+    }));
 } // namespace RaftSimEditorEnvironment

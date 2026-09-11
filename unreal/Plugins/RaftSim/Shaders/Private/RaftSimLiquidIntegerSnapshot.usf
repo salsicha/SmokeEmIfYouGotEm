@@ -1,0 +1,9 @@
+#include "/Engine/Public/Platform.ush"
+uint Elements;
+Buffer<int> SourceIntegers;
+RWStructuredBuffer<int> SnapshotIntegers;
+[numthreads(64,1,1)]
+void MainCS(uint3 Id : SV_DispatchThreadID)
+{
+    if (Id.x<Elements) SnapshotIntegers[Id.x]=SourceIntegers[Id.x];
+}

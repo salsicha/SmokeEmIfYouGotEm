@@ -1,0 +1,16 @@
+#include "/Engine/Public/Platform.ush"
+int3 Size;
+Texture3D<float4> Total;
+RWTexture3D<float4> NativeVelocity;
+RWTexture3D<float> NativeSupport;
+[numthreads(4,4,4)]
+void MainCS(uint3 P:SV_DispatchThreadID)
+{
+    if(any(P>=uint3(Size))) return;
+    float4 Deposit=Total.Load(int4(P,0));
+    // Normalize ONCE, after all owners contribute. Zero support is explicitly
+    // cleared every step; an empty physical owner may still receive halo mass.
+    bool Supported=Deposit.w>0;
+    NativeVelocity[P]=float4(Supported?Deposit.xyz/Deposit.w:float3(0,0,0),0);
+    NativeSupport[P]=Supported?3:0;
+}

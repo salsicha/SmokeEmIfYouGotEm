@@ -98,7 +98,7 @@ UMaterialInstanceConstant* LoadOrCreateZambeziBatokaLiveWaterV2Instance(
     // luminous sheet. These parameters are render-only.
     SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.07f);
     SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.26f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.72f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.14f);
     SetScalar(TEXT("SlickNormalFloor"), 0.82f);
     SetScalar(TEXT("SlickRoughnessScale"), 0.96f);
     SetScalar(TEXT("FresnelSpecular"), 0.018f);

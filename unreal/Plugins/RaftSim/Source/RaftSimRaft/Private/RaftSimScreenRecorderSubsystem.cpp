@@ -8,7 +8,7 @@
 #include "TimerManager.h"
 #include "Widgets/SViewport.h"
 #include "HAL/IConsoleManager.h"
-#include "Misc/App.h"
+#include "HAL/PlatformTime.h"
 #include "Misc/DateTime.h"
 #include "Misc/Paths.h"
 #include "Slate/SceneViewport.h"
@@ -33,6 +33,12 @@ namespace
 constexpr double kRecordingFrameRate = 30.0;
 constexpr double kRecordingFrameIntervalSeconds = 1.0 / kRecordingFrameRate;
 constexpr uint32 kRecordingBitsPerSecond = 12u * 1000u * 1000u;
+
+struct FRecordingFramePayload : IFramePayload
+{
+    explicit FRecordingFramePayload(double InSeconds) : Seconds(InSeconds) {}
+    double Seconds;
+};
 }
 
 #if PLATFORM_WINDOWS
@@ -65,7 +71,7 @@ public:
         }
     }
 
-    bool WriteFrame(const TArray<FColor>& Pixels, double TimeSeconds)
+    bool WriteFrame(const TArray<FColor>& Pixels, double TimeSeconds, double DurationSeconds)
     {
         if (!SinkWriter || Pixels.Num() < Width * Height)
         {
@@ -101,7 +107,7 @@ public:
                 Sample->SetSampleTime(
                     static_cast<LONGLONG>(TimeSeconds * 10'000'000.0));
                 Sample->SetSampleDuration(static_cast<LONGLONG>(
-                    kRecordingFrameIntervalSeconds * 10'000'000.0));
+                    DurationSeconds * 10'000'000.0));
                 bWritten =
                     SUCCEEDED(SinkWriter->WriteSample(StreamIndex, Sample));
                 Sample->Release();
@@ -215,7 +221,7 @@ public:
     {
         return nullptr;
     }
-    bool WriteFrame(const TArray<FColor>&, double) { return false; }
+    bool WriteFrame(const TArray<FColor>&, double, double) { return false; }
     void Finalize() {}
     int32 Width = 0;
     int32 Height = 0;
@@ -317,14 +323,17 @@ bool URaftSimScreenRecorderSubsystem::StartRecording()
     FrameGrabber =
         new FFrameGrabber(SceneViewport.ToSharedRef(), CaptureSize);
     FrameGrabber->StartCapturingFrames();
-    RecordingStartSeconds = FApp::GetCurrentTime();
+    RecordingStartSeconds = FPlatformTime::Seconds();
     NextFrameDueSeconds = RecordingStartSeconds;
     EncodedFrameCount = 0;
+    PendingPixels.Reset();
+    PendingFrameSeconds = FirstFrameSeconds = -1.0;
+    EncodedDurationSeconds = 0.0;
     ShowStatus(
         FString::Printf(TEXT("REC ● %s"), *ActiveClipPath),
         FColor::Red);
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim recording started: %s (%dx%d @ %.0f fps)"),
+        TEXT("RaftSim recording started: %s (%dx%d; target %.0f fps, actual capture-time timestamps)"),
         *ActiveClipPath, CaptureSize.X, CaptureSize.Y, kRecordingFrameRate);
     return true;
 }
@@ -336,30 +345,62 @@ void URaftSimScreenRecorderSubsystem::StopRecording()
         return;
     }
     FrameGrabber->StopCapturingFrames();
-    // Drain whatever the render thread already produced before finalizing.
+    // Finish render-thread readbacks before draining the last frames.
+    // Request timestamps travel with each frame; readback latency must not
+    // become playback time, nor may a hitch be hidden by frameCount / 30.
+    FrameGrabber->Shutdown();
     for (FCapturedFrameData& Frame : FrameGrabber->GetCapturedFrames())
     {
-        Encoder->WriteFrame(
-            Frame.ColorBuffer,
-            EncodedFrameCount * kRecordingFrameIntervalSeconds);
-        ++EncodedFrameCount;
+        QueueCapturedFrame(MoveTemp(Frame));
     }
-    FrameGrabber->Shutdown();
+    WritePendingFrame(FPlatformTime::Seconds() - RecordingStartSeconds);
+    PendingPixels.Reset();
+    PendingFrameSeconds = -1.0;
     delete FrameGrabber;
     FrameGrabber = nullptr;
     Encoder->Finalize();
     delete Encoder;
     Encoder = nullptr;
-    const double DurationSeconds =
-        EncodedFrameCount * kRecordingFrameIntervalSeconds;
+    const double DurationSeconds = EncodedDurationSeconds;
     ShowStatus(
         FString::Printf(
             TEXT("Recording saved (%.1f s): %s"),
             DurationSeconds, *ActiveClipPath),
         FColor::Green);
     UE_LOG(LogTemp, Display,
-        TEXT("RaftSim recording saved: %s (%lld frames, %.1f s)"),
+        TEXT("RaftSim recording saved: %s (%lld source_frames, %.3f s; encoder may repeat frames to preserve duration)"),
         *ActiveClipPath, EncodedFrameCount, DurationSeconds);
+}
+
+void URaftSimScreenRecorderSubsystem::WritePendingFrame(double EndSeconds)
+{
+    if (!Encoder || PendingFrameSeconds < 0.0 || PendingPixels.IsEmpty()) return;
+    const double Duration = FMath::Max(EndSeconds-PendingFrameSeconds, 0.0001);
+    const double PresentationSeconds = PendingFrameSeconds-FirstFrameSeconds;
+    if (Encoder->WriteFrame(PendingPixels, PresentationSeconds, Duration))
+    {
+        ++EncodedFrameCount;
+        EncodedDurationSeconds = PresentationSeconds + Duration;
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("RaftSim recording failed to encode frame at %.6f s"), PresentationSeconds);
+    }
+}
+
+void URaftSimScreenRecorderSubsystem::QueueCapturedFrame(FCapturedFrameData&& Frame)
+{
+    const FRecordingFramePayload* Payload = Frame.GetPayload<FRecordingFramePayload>();
+    if (!Payload || !FMath::IsFinite(Payload->Seconds) || Payload->Seconds < 0.0 ||
+        (PendingFrameSeconds >= 0.0 && Payload->Seconds <= PendingFrameSeconds))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("RaftSim recording rejected missing or non-increasing capture timestamp"));
+        return;
+    }
+    if (FirstFrameSeconds < 0.0) FirstFrameSeconds = Payload->Seconds;
+    WritePendingFrame(Payload->Seconds);
+    PendingFrameSeconds = Payload->Seconds;
+    PendingPixels = MoveTemp(Frame.ColorBuffer);
 }
 
 bool URaftSimScreenRecorderSubsystem::PumpCapturedFrames(float)
@@ -375,10 +416,13 @@ bool URaftSimScreenRecorderSubsystem::PumpCapturedFrames(float)
         StopRecording();
         return true;
     }
-    const double NowSeconds = FApp::GetCurrentTime();
+    // FApp's cached frame clock predates blocking encoder startup. Reading
+    // the monotonic clock here avoids manufacturing a long first-frame hold.
+    const double NowSeconds = FPlatformTime::Seconds();
     if (NowSeconds >= NextFrameDueSeconds)
     {
-        FrameGrabber->CaptureThisFrame(FFramePayloadPtr());
+        FrameGrabber->CaptureThisFrame(MakeShared<FRecordingFramePayload, ESPMode::ThreadSafe>(
+            NowSeconds - RecordingStartSeconds));
         // Catch up in whole intervals so a hitch does not queue a burst.
         NextFrameDueSeconds = FMath::Max(
             NextFrameDueSeconds + kRecordingFrameIntervalSeconds,
@@ -386,10 +430,7 @@ bool URaftSimScreenRecorderSubsystem::PumpCapturedFrames(float)
     }
     for (FCapturedFrameData& Frame : FrameGrabber->GetCapturedFrames())
     {
-        Encoder->WriteFrame(
-            Frame.ColorBuffer,
-            EncodedFrameCount * kRecordingFrameIntervalSeconds);
-        ++EncodedFrameCount;
+        QueueCapturedFrame(MoveTemp(Frame));
     }
     return true;
 }

@@ -11,6 +11,51 @@
 
 #if WITH_AUTOMATION_TESTS
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSouthForkSprayMapTest,
+    "RaftSim.M4.SouthForkSprayReviewMap", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimSouthForkSprayMapTest::RunTest(const FString&)
+{
+    for (const FString Name : {TEXT("L_SouthForkAmerican_FullReach"),
+        TEXT("SouthForkRegisteredRockPlayable"), TEXT("UEDPIE_0_SouthForkRegisteredRockPlayable"),
+        TEXT("/Game/RaftSim/Maps/Review/UEDPIE_12_SouthForkRegisteredRockPlayable")})
+        TestTrue(*Name, ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(Name));
+    for (const FString Name : {TEXT("SouthForkSurveyPlayable"), TEXT("L_LavaCanyon"),
+        TEXT("OtherSouthForkRegisteredRockPlayable"), TEXT("SouthForkRegisteredRockPlayable_Old"),
+        TEXT("UEDPIE_bad_SouthForkRegisteredRockPlayable"), TEXT("")})
+        TestFalse(*Name, ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(Name));
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimRapidSourcePlaneTest,
+    "RaftSim.M4.RapidSourcePlane", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimRapidSourcePlaneTest::RunTest(const FString&)
+{
+    for (float Yaw : {0.0f, 45.0f, 90.0f, 180.0f, 275.0f})
+    {
+        for (float Pitch : {-20.0f, 16.0f, 47.0f, 60.0f, 89.0f})
+        {
+            const FVector Launch = FRotator(Pitch, Yaw, 0).Vector();
+            const FQuat Emitter = FRotationMatrix::MakeFromX(Launch).ToQuat();
+            const FQuat Local = ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(Launch);
+            const FQuat SourceWorld = Emitter * Local;
+            TestTrue(TEXT("source normal stays up regardless of launch pitch/yaw"),
+                SourceWorld.RotateVector(FVector::UpVector).Equals(FVector::UpVector, 1.e-5));
+            for (const FVector Corner : {FVector(-120,-35,0), FVector(120,35,0)})
+            {
+                TestTrue(TEXT("wide source corners cannot become aerial fountains"),
+                    FMath::Abs(SourceWorld.RotateVector(Corner).Z) < 0.001);
+            }
+            TestTrue(TEXT("launch orientation remains independent"),
+                Emitter.RotateVector(FVector::ForwardVector).Equals(Launch, 1.e-5));
+        }
+    }
+    TestFalse(TEXT("zero launch has a finite fallback"),
+        ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(FVector::ZeroVector).ContainsNaN());
+    return true;
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     FRaftSimWaterVfxClassifierTest,
     "RaftSim.M4.WaterVfxClassifierUsesHydraulicsAndContacts",

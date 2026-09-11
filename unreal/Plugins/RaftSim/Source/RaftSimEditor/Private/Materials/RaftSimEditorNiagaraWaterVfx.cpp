@@ -440,6 +440,24 @@ FNiagaraEmitterStateData* FindEmitterState(UNiagaraStatelessEmitter* Emitter)
         : nullptr;
 }
 
+bool BindRapidSourcePlane(UNiagaraSystem* System)
+{
+    if (!System || System->GetEmitterHandles().IsEmpty()) return false;
+    UNiagaraStatelessEmitter* Emitter = System->GetEmitterHandles()[0].GetStatelessEmitter();
+    auto* Shape = Emitter ? Cast<UNiagaraStatelessModule_ShapeLocation>(
+        Emitter->GetModule(UNiagaraStatelessModule_ShapeLocation::StaticClass())) : nullptr;
+    if (!Shape) return false;
+    System->Modify();
+    Emitter->Modify();
+    const FNiagaraVariable Rotation(FNiagaraTypeDefinition::GetQuatDef(),
+        TEXT("User.SourcePlaneRotation"));
+    System->GetExposedParameters().AddParameter(Rotation);
+    System->GetExposedParameters().SetParameterValue<FQuat4f>(FQuat4f::Identity, Rotation, true);
+    Shape->ShapeRotation.Mode = ENiagaraDistributionMode::Binding;
+    Shape->ShapeRotation.ParameterBinding = Rotation;
+    return true;
+}
+
 bool ConfigureSystem(
     UNiagaraSystem* System,
     UMaterial* Material,
@@ -541,6 +559,10 @@ bool ConfigureSystem(
     Shape->PlaneSize.InitConstant(Profile.SourcePlaneCm);
     Shape->bPlaneEdgesOnly = false;
     Shape->CoordinateSpace = ENiagaraCoordinateSpace::Local;
+    if (FString(Profile.AssetName).StartsWith(TEXT("NS_RaftSim_Rapid")))
+    {
+        BindRapidSourcePlane(System);
+    }
     Velocity->VelocityType = ENSM_VelocityType::InCone;
     Velocity->ConeRotationType = ENSM_ConeRotationType::Direction;
     Velocity->ConeDirection.InitConstant(FVector3f::XAxisVector);
@@ -687,6 +709,93 @@ void CreateNiagaraWaterVfxSystems(const TArray<FString>&)
 {
     CreateNiagaraWaterVfxSystemsImpl(EWaterParticleAtlasVariant::Production);
 }
+
+void UpgradeRapidSourcePlanes(const TArray<FString>&)
+{
+    int32 Saved = 0;
+    for (const TCHAR* Name : {TEXT("NS_RaftSim_RapidAerosol"),
+         TEXT("NS_RaftSim_RapidRoller"), TEXT("NS_RaftSim_RapidCrestSpray")})
+    {
+        const FString Path = FString::Printf(TEXT("/Game/RaftSim/VFX/Water/%s.%s"), Name, Name);
+        UNiagaraSystem* System = LoadObject<UNiagaraSystem>(nullptr, *Path);
+        if (!BindRapidSourcePlane(System))
+        {
+            UE_LOG(LogTemp, Error, TEXT("Rapid source-plane upgrade failed: %s"), Name);
+            continue;
+        }
+        System->GetEmitterHandles()[0].GetStatelessEmitter()->PostEditChange();
+        System->PostEditChange();
+        System->RequestCompile(true);
+        System->WaitForCompilationComplete(false, false);
+        System->GetOutermost()->MarkPackageDirty();
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(
+            FPackageName::LongPackageNameToFilename(System->GetOutermost()->GetName(), FPackageName::GetAssetPackageExtension())), true);
+        Saved += SaveSystem(System) ? 1 : 0;
+    }
+    UE_LOG(LogTemp, Display, TEXT("Rapid source-plane upgrade: saved %d/3 systems; other modules/materials preserved"), Saved);
+}
+
+static FAutoConsoleCommand GUpgradeRapidSourcePlanes(
+    TEXT("RaftSim.UpgradeRapidSourcePlanes"),
+    TEXT("Add independent source-plane rotation to three existing rapid Niagara assets without rebuilding their other modules/materials."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(&UpgradeRapidSourcePlanes));
+
+void CreateChilkoBallisticSpray(const TArray<FString>&)
+{
+    int32 Saved = 0;
+    for (bool bRoller : {true, false})
+    {
+        const FString SourceName = bRoller ? TEXT("NS_RaftSim_RapidRoller") : TEXT("NS_RaftSim_RapidCrestSpray");
+        const FString Name = bRoller ? TEXT("NS_RaftSim_ChilkoRapidRoller") : TEXT("NS_RaftSim_ChilkoRapidCrestSpray");
+        const FString PackagePath = TEXT("/Game/RaftSim/VFX/Water/Chilko/") + Name;
+        UNiagaraSystem* System = LoadObject<UNiagaraSystem>(nullptr, *(PackagePath + TEXT(".") + Name));
+        if (!System)
+        {
+            UNiagaraSystem* Source = LoadObject<UNiagaraSystem>(nullptr,
+                *FString::Printf(TEXT("/Game/RaftSim/VFX/Water/%s.%s"), *SourceName, *SourceName));
+            if (!Source) continue;
+            System = Cast<UNiagaraSystem>(StaticDuplicateObject(Source, CreatePackage(*PackagePath), *Name));
+            if (!System) continue;
+            System->SetFlags(RF_Public | RF_Standalone);
+            FAssetRegistryModule::AssetCreated(System);
+        }
+        if (System->GetEmitterHandles().IsEmpty()) continue;
+        auto* Emitter = System->GetEmitterHandles()[0].GetStatelessEmitter();
+        if (!Emitter) continue;
+        auto* Initialize = Cast<UNiagaraStatelessModule_InitializeParticle>(Emitter->GetModule(UNiagaraStatelessModule_InitializeParticle::StaticClass()));
+        auto* Velocity = Cast<UNiagaraStatelessModule_AddVelocity>(Emitter->GetModule(UNiagaraStatelessModule_AddVelocity::StaticClass()));
+        auto* Gravity = Cast<UNiagaraStatelessModule_GravityForce>(Emitter->GetModule(UNiagaraStatelessModule_GravityForce::StaticClass()));
+        if (!Initialize || !Velocity || !Gravity || !BindRapidSourcePlane(System)) continue;
+        System->Modify();
+        Emitter->Modify();
+        // Airborne water falls, rather than floating upward and fading before
+        // its apex. Keep emission counts/materials/source strips unchanged.
+        Gravity->GravityDistribution.InitConstant(FVector3f(0, 0, -980.665f));
+        Velocity->ConeVelocityDistribution.InitRange(bRoller ? 120.0f : 180.0f, bRoller ? 260.0f : 380.0f);
+        Initialize->LifetimeDistribution.InitRange(bRoller ? 0.65f : 0.85f, bRoller ? 1.0f : 1.15f);
+        SetVector2Range(Initialize->SpriteSizeDistribution,
+            bRoller ? FVector2f(6, 7) : FVector2f(2, 3),
+            bRoller ? FVector2f(14, 18) : FVector2f(6, 10));
+        Initialize->SpriteRotationDistribution.InitRange(-0.5f, 0.5f);
+        for (UNiagaraRendererProperties* Renderer : Emitter->GetRenderers())
+            if (auto* Sprite = Cast<UNiagaraSpriteRendererProperties>(Renderer))
+                Sprite->Alignment = ENiagaraSpriteAlignment::Unaligned;
+        Emitter->PostEditChange();
+        System->PostEditChange();
+        System->RequestCompile(true);
+        System->WaitForCompilationComplete(false, false);
+        System->GetOutermost()->MarkPackageDirty();
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(
+            FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension())), true);
+        Saved += SaveSystem(System) ? 1 : 0;
+    }
+    UE_LOG(LogTemp, Display, TEXT("Chilko ballistic spray: saved %d/2 isolated systems; shared source assets unchanged"), Saved);
+}
+
+static FAutoConsoleCommand GCreateChilkoBallisticSpray(
+    TEXT("RaftSim.CreateChilkoBallisticSpray"),
+    TEXT("Author Chilko-only falling spray variants while retaining source-plane binding, spawn rates and shared materials."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(&CreateChilkoBallisticSpray));
 
 void CreatePhotographicV4ReviewNiagaraWaterVfxSystems(const TArray<FString>&)
 {

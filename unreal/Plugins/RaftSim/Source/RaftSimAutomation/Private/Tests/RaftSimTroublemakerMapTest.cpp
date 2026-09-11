@@ -1,6 +1,6 @@
-// P4 test: each generated river map loads a live cooked-field river window (or
-// falls back to the dev tank if its fields are not cooked yet) and the raft
-// rests on wet, finite water. Runs once per map that exists.
+// P4 tests for all six playable rivers. South Fork uses the full-reach support
+// contract; the five other rivers use their reach-local presentation contracts.
+// Missing maps fail explicitly instead of disappearing from the test census.
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Components/ExponentialHeightFogComponent.h"
@@ -41,7 +41,7 @@ namespace
 {
 
 const TCHAR* GRiverMapPaths[] = {
-    TEXT("/Game/RaftSim/Maps/L_Troublemaker"),
+    TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
     TEXT("/Game/RaftSim/Maps/L_Hance"),
     TEXT("/Game/RaftSim/Maps/L_UpperHuacas"),
     TEXT("/Game/RaftSim/Maps/L_Terminator"),
@@ -212,8 +212,6 @@ bool FRaftSimAssertRiverMapCommand::Update()
     const bool bUsesSolverOwnedVisibleRiver =
         bZambeziReferenceRun || bPacuareReferenceRun || bColoradoHanceReferenceRun ||
         bChilkoLavaCanyonReferenceRun || bFutaleufuTerminatorReferenceRun;
-    const bool bUsesLegacyStraightRiverCoordinates =
-        World->GetMapName().Contains(TEXT("L_Troublemaker"));
     int32 LiveSurfaceActorCount = 0;
     for (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It; ++It)
     {
@@ -228,11 +226,11 @@ bool FRaftSimAssertRiverMapCommand::Update()
         Test->TestEqual(
             TEXT("runnable river presentation window has the refined vertex count"),
             It->GetSurfaceVertexCount(),
-            bUsesLegacyStraightRiverCoordinates ? 160801 : 92833);
+            92833);
         Test->TestEqual(
             TEXT("runnable river presentation window has the refined triangle count"),
             It->GetSurfaceTriangleCount(),
-            bUsesLegacyStraightRiverCoordinates ? 320000 : 184320);
+            184320);
         Test->TestEqual(
             TEXT("live surface carrier follows the saved river ownership contract"),
             It->IsLiveSurfaceCarrierEnabled(),
@@ -2348,18 +2346,7 @@ bool FRaftSimAssertRiverMapCommand::Update()
         return true;
     }
 
-    int32 AuthoritativeRockCount = 0;
-    for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
-    {
-        if ((*It)->GetContactRadiusM() >= 0.1f)
-        {
-            ++AuthoritativeRockCount;
-        }
-    }
-    Test->TestEqual(
-        TEXT("signature rapid has four serialized D4 rock obstacles"),
-        AuthoritativeRockCount,
-        4);
+    Test->AddError(TEXT("No reach-specific contract matched this playable river"));
     return true;
 }
 
@@ -2464,6 +2451,32 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
     Test->TestNotNull(TEXT("South Fork full reach has a live water surface"), Surface);
     Test->TestNotNull(TEXT("South Fork full reach has a playable raft"), Raft);
     Test->TestNotNull(TEXT("South Fork full reach has a water runtime"), Water);
+    int32 FullReachBoulderContactCount = 0;
+    int32 TroublemakerBoulderContactCount = 0;
+    bool bAllBoulderContactsAreProxyOnly = true;
+    for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
+    {
+        if (It->ActorHasTag(TEXT("RaftSimFullReachBoulderContact")))
+        {
+            ++FullReachBoulderContactCount;
+            if (It->GetActorLabel().Contains(TEXT("D4_Boulder_08_")))
+            {
+                ++TroublemakerBoulderContactCount;
+            }
+            bAllBoulderContactsAreProxyOnly &= It->IsContactProxyOnly();
+        }
+    }
+    Test->TestEqual(
+        TEXT("every rendered South Fork boulder has a D4 contact authority"),
+        FullReachBoulderContactCount,
+        113);
+    Test->TestEqual(
+        TEXT("Troublemaker loads all twelve authored boulder contacts"),
+        TroublemakerBoulderContactCount,
+        12);
+    Test->TestTrue(
+        TEXT("South Fork D4 boulder actors are renderer-free contact proxies"),
+        bAllBoulderContactsAreProxyOnly);
     if (Surface && Water)
     {
         Test->TestTrue(
@@ -2487,6 +2500,25 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
         Test->TestFalse(
             TEXT("South Fork single surface has no flashing roller texture"),
             Surface->IsBreakingRollerVolumeVisible());
+        Test->TestTrue(
+            TEXT("South Fork full-reach carrier resolves rapid crest geometry"),
+            Surface->IsRiverPresentationGridRefined());
+        Test->TestTrue(
+            TEXT("South Fork full-reach carrier uses 1.5-metre presentation cells"),
+            FMath::IsNearlyEqual(
+                Surface->GetPresentationVertexSpacingMeters(), 1.5f, 0.001f));
+        Test->TestEqual(
+            TEXT("South Fork full-reach carrier stays inside the 26,065-vertex budget"),
+            Surface->GetSurfaceVertexCount(),
+            26065);
+        Test->TestEqual(
+            TEXT("South Fork full-reach carrier stays inside the 51,200-triangle budget"),
+            Surface->GetSurfaceTriangleCount(),
+            51200);
+        Test->TestTrue(
+            TEXT("South Fork disables the channel-wide periodic standing-wave bars"),
+            FMath::IsNearlyZero(
+                Surface->GetLivePresentationStandingWaveScale(), 0.001f));
         int32 TaggedAuthoredWaterCount = 0;
         bool bAllTaggedAuthoredWaterHidden = true;
         for (TActorIterator<AActor> It(World); It; ++It)
@@ -2567,9 +2599,12 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
                 Test->TestTrue(
                     FString::Printf(
                         TEXT("South Fork floor remains visibly above the "
-                             "coupled rapid surface (%.1f cm >= 5.0 cm)"),
+                             "coupled rapid surface (%.1f cm >= 3.5 cm)"),
                         RenderFreeboardCm),
-                    RenderFreeboardCm >= 5.0f);
+                    // The unified surface has no former 2 cm render lift;
+                    // 3.5 cm preserves a visible dry gap while allowing the
+                    // denser carrier's more accurate centre interpolation.
+                    RenderFreeboardCm >= 3.5f);
             }
         }
     }
@@ -2681,17 +2716,26 @@ void FRaftSimRiverMapLoadsTest::GetTests(
 {
     for (const TCHAR* MapPath : GRiverMapPaths)
     {
-        if (MapExists(MapPath))
-        {
-            OutBeautifiedNames.Add(FPackageName::GetShortName(MapPath));
-            OutTestCommands.Add(MapPath);
-        }
+        OutBeautifiedNames.Add(FPackageName::GetShortName(MapPath));
+        OutTestCommands.Add(MapPath);
     }
 }
 
 bool FRaftSimRiverMapLoadsTest::RunTest(const FString& MapPath)
 {
+    if (!MapExists(MapPath))
+    {
+        AddError(FString::Printf(TEXT("Playable river map is missing: %s"), *MapPath));
+        return false;
+    }
     AutomationOpenMap(MapPath);
+    if (MapPath == TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"))
+    {
+        ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f));
+        ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertSouthForkSupportParityCommand(
+            this, MakeShared<float>(-1.0f)));
+        return true;
+    }
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
     if (MapPath.Contains(TEXT("Zambezi")))
     {

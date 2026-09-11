@@ -1,0 +1,14 @@
+#pragma once
+float HalfNearestEven(float value)
+{
+    // Typed RGBA16f UAV conversion on the tested D3D12 path truncates.
+    float magnitude=abs(value);
+    uint packed=f32tof16(magnitude);
+    float candidate=f16tof32(packed);
+    if(candidate==magnitude || !isfinite(candidate)) return value;
+    uint adjacent=candidate>magnitude?packed-1:packed+1;
+    float alternate=f16tof32(adjacent);
+    float firstError=abs(candidate-magnitude),secondError=abs(alternate-magnitude);
+    if(secondError<firstError || (secondError==firstError && (adjacent&1)==0)) candidate=alternate;
+    return value<0?-candidate:candidate;
+}

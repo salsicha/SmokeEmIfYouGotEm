@@ -31,8 +31,17 @@ class CppSolverRunConfig:
     preserve_initial_mass: bool = True
     disable_fixture_calibrations: bool = False
     allow_validation_failure: bool = True
+    experimental_west_discharge_m3s: float | None = None
+    experimental_west_supercritical_stage: bool = False
 
     def __post_init__(self) -> None:
+        if self.experimental_west_supercritical_stage and self.experimental_west_discharge_m3s is None:
+            raise ValueError('mixed-regime inlet stage requires explicit prescribed discharge')
+        if self.experimental_west_discharge_m3s is not None:
+            if not math.isfinite(self.experimental_west_discharge_m3s) or self.experimental_west_discharge_m3s < 0:
+                raise ValueError('experimental west discharge must be finite and nonnegative')
+            if self.solver_mode != 'finite_volume' or self.boundary_mode != 'scenario' or not self.disable_fixture_calibrations:
+                raise ValueError('experimental west discharge requires uncalibrated scenario finite_volume mode')
         if self.steps is not None and self.steps < 0:
             raise ValueError("steps must be non-negative when provided.")
         if self.frame_interval is not None and self.frame_interval < 1:
@@ -255,6 +264,10 @@ def _run_cpp_solver(
         command_parts.append("--no-preserve-initial-mass")
     if config.disable_fixture_calibrations:
         command_parts.append("--disable-fixture-calibrations")
+    if config.experimental_west_discharge_m3s is not None:
+        command_parts.extend(['--experimental-west-discharge', str(config.experimental_west_discharge_m3s)])
+    if config.experimental_west_supercritical_stage:
+        command_parts.append('--experimental-west-supercritical-stage')
     command = tuple(command_parts)
     start = time.perf_counter()
     completed = subprocess.run(command, check=False, capture_output=True, text=True)

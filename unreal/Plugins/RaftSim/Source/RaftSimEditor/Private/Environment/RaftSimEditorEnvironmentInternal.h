@@ -1065,6 +1065,11 @@ UMaterial* LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(
 
 UMaterial* LoadOrCreatePacuareRainforestWaterParent(FString& OutSummary);
 
+// Isolated per-river parent; preserves the shared water's physical interfaces.
+UMaterial* LoadOrCreateCurrentGradientWaterParent(
+    UMaterial* Shared, const FString& Path, const FString& RiverLabel,
+    float FoamCutoff, float NormalStrength, FString& Summary);
+
 UMaterialInstanceConstant* LoadOrCreatePacuareUpperHuacasLiveWaterInstance(
     FString& OutSummary);
 

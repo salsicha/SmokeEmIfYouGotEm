@@ -41,6 +41,11 @@
   ],
   "Modules": [
     {
+      "Name": "RaftSimWaterDetail",
+      "Type": "Runtime",
+      "LoadingPhase": "PostConfigInit"
+    },
+    {
       "Name": "RaftSimCore",
       "Type": "Runtime",
       "LoadingPhase": "Default"

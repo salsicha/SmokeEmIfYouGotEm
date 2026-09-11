@@ -1,0 +1,16 @@
+#ifndef RAFTSIM_MACRO_SURFACE_SAMPLE
+#define RAFTSIM_MACRO_SURFACE_SAMPLE
+// Match the carrier's (A,C,B)/(B,C,D) triangles, including nonplanar cells.
+// Bilinear filtering would silently invent a different macro water surface.
+float4 RaftSimMacroSample(Texture2D<float4> atlas,float2 gridPosition,int2 size,int band)
+{
+    float2 p=clamp(gridPosition,0,float2(size-1));
+    int2 cell=clamp(int2(floor(p)),0,size-2);
+    float2 f=p-float2(cell);int2 row=cell+int2(0,band*size.y);
+    float4 b=atlas.Load(int3(row+int2(1,0),0));
+    float4 c=atlas.Load(int3(row+int2(0,1),0));
+    if (f.x+f.y<=1)
+        return atlas.Load(int3(row,0))*(1-f.x-f.y)+b*f.x+c*f.y;
+    return b*(1-f.y)+c*(1-f.x)+atlas.Load(int3(row+1,0))*(f.x+f.y-1);
+}
+#endif

@@ -25,7 +25,7 @@ OUTPUT_ROOT = REPO_ROOT / "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoo
 FBX_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRiverBoot.fbx"
 BLEND_PATH = OUTPUT_ROOT / "SM_RaftSim_WhitewaterRiverBoot.blend"
 MANIFEST_PATH = OUTPUT_ROOT / "production_whitewater_river_boot_manifest.json"
-GENERATOR_VERSION = 3
+GENERATOR_VERSION = 6
 
 
 def reset_scene() -> None:
@@ -73,6 +73,105 @@ def rounded_box(
     return obj
 
 
+def add_curve(
+    name: str,
+    points: list[tuple[float, float, float]],
+    radius: float,
+    assigned_material: bpy.types.Material,
+) -> bpy.types.Object:
+    curve = bpy.data.curves.new(name, "CURVE")
+    curve.dimensions = "3D"
+    curve.resolution_u = 3
+    curve.bevel_depth = radius
+    curve.bevel_resolution = 4
+    spline = curve.splines.new("BEZIER")
+    spline.bezier_points.add(len(points) - 1)
+    for point, coordinate in zip(spline.bezier_points, points):
+        point.co = coordinate
+        point.handle_left_type = "AUTO"
+        point.handle_right_type = "AUTO"
+    obj = bpy.data.objects.new(name, curve)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(assigned_material)
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.convert(target="MESH")
+    shade_smooth(obj)
+    return obj
+
+
+def build_lasted_volume(
+    name: str,
+    assigned_material: bpy.types.Material,
+    x_min: float,
+    x_max: float,
+    center_z: float,
+    half_width: float,
+    half_height: float,
+    section_count: int,
+    side_count: int,
+) -> bpy.types.Object:
+    """Build a rounded heel-to-toe volume with an anatomical plan outline."""
+
+    vertices: list[tuple[float, float, float]] = []
+    faces: list[tuple[int, ...]] = []
+    for section in range(section_count + 1):
+        t = section / section_count
+        x = x_min + (x_max - x_min) * t
+        if t < 0.18:
+            end_round = math.sqrt(max(1.0 - ((0.18 - t) / 0.18) ** 2, 0.0))
+        elif t > 0.70:
+            end_round = math.sqrt(max(1.0 - ((t - 0.70) / 0.30) ** 2, 0.0))
+        else:
+            end_round = 1.0
+        width = half_width * (0.18 + 0.82 * end_round)
+        height = half_height * (0.42 + 0.58 * end_round)
+        arch = 0.16 * math.sin(math.pi * t)
+        for side in range(side_count):
+            angle = math.tau * side / side_count
+            vertices.append(
+                (
+                    x,
+                    width * math.cos(angle),
+                    center_z + arch + height * math.sin(angle),
+                )
+            )
+    for section in range(section_count):
+        for side in range(side_count):
+            next_side = (side + 1) % side_count
+            a = section * side_count + side
+            b = section * side_count + next_side
+            c = (section + 1) * side_count + next_side
+            d = (section + 1) * side_count + side
+            faces.append((a, b, c, d))
+    faces.append(tuple(reversed(tuple(range(side_count)))))
+    faces.append(
+        tuple(section_count * side_count + side for side in range(side_count))
+    )
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(obj)
+    obj.data.materials.append(assigned_material)
+    shade_smooth(obj)
+    return obj
+
+
+def foot_section(t: float) -> tuple[float, float, float]:
+    """Shared shoe last for the upper, toe reinforcement and stitched bands."""
+    toe_taper = max((t - 0.74) / 0.26, 0.0)
+    toe_round = math.sqrt(max(1.0 - toe_taper * toe_taper, 0.0))
+    heel_round = 0.62 + 0.38 * math.sqrt(
+        max(1.0 - (max(0.12 - t, 0.0) / 0.12) ** 2, 0.0))
+    width = (5.15 + 1.45 * math.sin(math.pi * min(t / 0.88, 1.0)))
+    width *= heel_round * (0.30 + 0.70 * toe_round)
+    bottom = -2.75 + 0.70 * toe_taper * toe_taper
+    top = 4.05 + 3.55 * math.exp(-((t - 0.34) / 0.24) ** 2)
+    top += -0.55 * t + 0.45 * (1.0 - toe_round)
+    return width, bottom, top
+
+
 def build_foot_shell(upper: bpy.types.Material) -> bpy.types.Object:
     sections = 36
     sides = 48
@@ -81,31 +180,20 @@ def build_foot_shell(upper: bpy.types.Material) -> bpy.types.Object:
     for section in range(sections + 1):
         t = section / sections
         x = -5.0 + 29.0 * t
-        # Generator v2 (2026-09-02): a fuller lasted foot with a rounder toe
-        # and a full heel block, under a short tapered cuff, so the boot reads
-        # as footwear from the guide seat instead of a tall cylinder.
-        # Generator v3 (2026-09-02): the v2 cross-section used superellipse
-        # exponents below one, which pushes the sides OUT into a box with
-        # rounded corners - the boots read as square blocks from the guide
-        # seat. The upper now follows an ellipse that pinches slightly toward
-        # the instep, the sole side stays flatter for a lasted footprint, and
-        # the toe closes on a quarter-circle instead of a linear taper.
-        toe_taper = max((t - 0.60) / 0.40, 0.0)
-        toe_round = math.sqrt(max(1.0 - toe_taper * toe_taper, 0.0))
-        heel_taper = max((0.10 - t) / 0.10, 0.0)
-        half_width = (6.35 + 0.75 * math.sin(math.pi * t)) * (0.42 + 0.58 * toe_round)
-        half_width -= 0.25 * heel_taper
-        half_height = (5.7 - 0.95 * t + 0.65 * math.sin(math.pi * t)) * (0.55 + 0.45 * toe_round)
-        center_z = 1.35 + 0.95 * t + 0.6 * (1.0 - toe_round)
+        # V5 uses an actual shoe last rather than a constant rounded tube. The
+        # heel is narrow, the ball is broad, the toe stays full until its final
+        # quarter, and the upper has a raised instep followed by a low toe box.
+        half_width, bottom_z, top_z = foot_section(t)
+        center_z = 0.5 * (bottom_z + top_z)
+        half_height = 0.5 * (top_z - bottom_z)
         for side in range(sides):
             angle = math.tau * side / sides
             cos_a = math.cos(angle)
             sin_a = math.sin(angle)
-            # A softened superellipse reads as a lasted boot rather than a
-            # scaled sphere while retaining smooth deterministic topology.
-            # Instep: a slightly pinched ellipse; sole side: flatter footprint.
-            exponent = 1.12 if sin_a >= 0.0 else 0.92
-            y = half_width * math.copysign(abs(cos_a) ** exponent, cos_a)
+            # A lightly pinched crown and flatter lower quarter distinguish
+            # the fabric upper from both the ankle and the rubber outsole.
+            exponent = 1.18 if sin_a >= 0.0 else 0.82
+            y = half_width * math.copysign(abs(cos_a) ** 1.08, cos_a)
             z = center_z + half_height * math.copysign(abs(sin_a) ** exponent, sin_a)
             vertices.append((x, y, z))
     for section in range(sections):
@@ -136,13 +224,19 @@ def build_cuff(upper: bpy.types.Material) -> bpy.types.Object:
     faces: list[tuple[int, ...]] = []
     for ring in range(rings + 1):
         t = ring / rings
-        z = 3.4 + 7.4 * t
-        radius_scale = 1.0 - 0.14 * t + 0.02 * math.sin(math.pi * t)
-        center_x = -2.15 - 0.35 * t
         for side in range(sides):
             angle = math.tau * side / sides
-            x = center_x + math.cos(angle) * 5.65 * radius_scale
-            y = math.sin(angle) * 6.20 * radius_scale
+            cos_a = math.cos(angle)
+            sin_a = math.sin(angle)
+            # Low front collar, higher heel counter, oval ankle opening. The
+            # previous constant-height circular cap was the cylinder visible
+            # in the chase camera. This collar is open so the shin enters it.
+            top_z = 8.45 - 1.35 * cos_a
+            z = 3.45 + (top_z - 3.45) * t
+            radius_scale = 1.0 - 0.17 * t
+            center_x = -2.45 - 0.20 * t
+            x = center_x + cos_a * 4.45 * radius_scale
+            y = sin_a * 5.25 * radius_scale
             vertices.append((x, y, z))
     for ring in range(rings):
         for side in range(sides):
@@ -153,8 +247,7 @@ def build_cuff(upper: bpy.types.Material) -> bpy.types.Object:
             d = (ring + 1) * sides + side
             faces.append((a, b, c, d))
     faces.append(tuple(reversed(tuple(range(sides)))))
-    top = tuple(rings * sides + side for side in range(sides))
-    faces.append(top)
+    # Deliberately no top face: the collar is a real opening, not a solid cap.
     mesh = bpy.data.meshes.new("SM_RaftSim_WhitewaterRiverBoot_Cuff")
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
@@ -162,6 +255,11 @@ def build_cuff(upper: bpy.types.Material) -> bpy.types.Object:
     bpy.context.collection.objects.link(obj)
     obj.data.materials.append(upper)
     shade_smooth(obj)
+    # Thin neoprene wall makes the open cuff readable from inside as well.
+    wall = obj.modifiers.new("NeopreneCuffWall", "SOLIDIFY")
+    wall.thickness = 0.18
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.modifier_apply(modifier=wall.name)
     return obj
 
 
@@ -171,10 +269,32 @@ def build_details(
     reinforcement: bpy.types.Material,
 ) -> tuple[list[bpy.types.Object], dict[str, int]]:
     details: list[bpy.types.Object] = []
-    details.append(rounded_box("Outsole", (9.25, 0.0, -3.55), (31.5, 13.5, 2.3), 0.85, sole))
-    details.append(rounded_box("ToeRand", (19.0, 0.0, 0.0), (6.8, 9.6, 5.0), 2.0, reinforcement))
-    details.append(rounded_box("HeelRand", (-5.85, 0.0, 3.1), (3.4, 12.6, 9.8), 1.1, reinforcement))
-    details.append(rounded_box("PullTab", (-7.05, 0.0, 9.9), (1.0, 2.1, 4.2), 0.45, reinforcement))
+    # V4 removes the three large beveled cubes that dominated the gameplay
+    # silhouette. The outsole now follows a rounded lasted footprint, while
+    # toe and heel protection are curved overlays matching the upper.
+    details.append(
+        build_lasted_volume(
+            "Outsole", sole, -6.6, 24.8, -3.95, 6.45, 1.15, 42, 36
+        )
+    )
+    details.append(
+        build_lasted_volume(
+            "ToeRand", reinforcement, 17.2, 24.5, -0.05, 5.45, 3.35, 22, 36
+        )
+    )
+    bpy.ops.mesh.primitive_uv_sphere_add(
+        segments=40,
+        ring_count=24,
+        location=(-5.55, 0.0, 1.45),
+        scale=(1.35, 5.15, 3.65),
+    )
+    heel_rand = bpy.context.object
+    heel_rand.name = "HeelRand"
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    heel_rand.data.materials.append(reinforcement)
+    shade_smooth(heel_rand)
+    details.append(heel_rand)
+    details.append(rounded_box("PullTab", (-6.1, 0.0, 7.7), (0.9, 1.8, 3.5), 0.40, reinforcement))
 
     lug_count = 0
     for x in (-1.0, 5.5, 12.0, 18.5):
@@ -197,26 +317,44 @@ def build_details(
         minor_radius=0.26,
         major_segments=48,
         minor_segments=8,
-        location=(-2.5, 0.0, 8.3),
+        location=(-2.45, 0.0, 5.15),
     )
     ankle_seam = bpy.context.object
     ankle_seam.name = "AnkleSeamBand"
-    ankle_seam.scale.y = 1.08
+    ankle_seam.scale.x = 0.78
+    ankle_seam.scale.y = 0.96
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
     ankle_seam.data.materials.append(reinforcement)
     shade_smooth(ankle_seam)
     details.append(ankle_seam)
 
     for index, x in enumerate((4.0, 9.0, 14.0)):
-        band = rounded_box(
+        width, bottom, top = foot_section((x + 5.0) / 29.0)
+        center = (bottom + top) * 0.5
+        height = (top - bottom) * 0.5
+        # Stitch the band to the actual last. Former fixed heights alternated
+        # between disappearing inside the instep and floating over the toe.
+        points = []
+        for sample in range(17):
+            angle = math.pi * (0.06 + 0.88 * sample / 16)
+            cosine, sine = math.cos(angle), math.sin(angle)
+            y = (width + 0.08) * math.copysign(abs(cosine) ** 1.08, cosine)
+            z = center + height * sine ** 1.18 + 0.10
+            points.append((x, y, z))
+        band = add_curve(
             f"VampDrainBand_{index:02d}",
-            (x, 0.0, 5.0 - index * 0.25),
-            (0.55, 11.5 - index * 0.55, 1.15),
-            0.25,
+            points,
+            0.13,
             reinforcement,
         )
         details.append(band)
-    return details, {"outsole_lugs": lug_count, "vamp_drain_bands": 3, "pull_tabs": 1}
+    return details, {
+        "outsole_lugs": lug_count,
+        "vamp_drain_bands": 3,
+        "pull_tabs": 1,
+        "curved_lasted_outsole": True,
+        "curved_toe_and_heel_rands": True,
+    }
 
 
 def join_for_export(objects: list[bpy.types.Object]) -> bpy.types.Object:

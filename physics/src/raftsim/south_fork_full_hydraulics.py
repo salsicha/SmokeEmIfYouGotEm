@@ -63,7 +63,7 @@ FLOW_PRESETS_RELATIVE_PATH = (
 SCHEMA = "raftsim.south_fork.full_hydraulics.v1"
 STREAMING_SCHEMA = "raftsim.south_fork.moving_water_streaming.v1"
 COOKED_SCHEMA = "raftsim.cooked_flow_fields.v1"
-GENERATOR_VERSION = "south_fork_full_hydraulics_v1"
+GENERATOR_VERSION = "south_fork_full_hydraulics_v2_troublemaker_s_bend"
 FLOW_BAND_IDS = ("low_runnable", "median_runnable", "high_runnable")
 WINDOW_LENGTH_M = 400.0
 # Named-rapid cruxes are solved at half-metre resolution so metre-scale
@@ -91,16 +91,25 @@ def _load_json(repo_root: Path, relative_path: str) -> dict[str, Any]:
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    # Write canonical LF bytes on every host.  These manifests are hashed into
+    # the parent matrix, so platform newline translation must not change their
+    # identity on Windows checkouts.
+    path.write_bytes(
+        (json.dumps(payload, indent=2, sort_keys=True) + "\n").encode("utf-8")
     )
 
 
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
+    if path.suffix.lower() == ".json":
+        # Existing committed manifests may be materialized with CRLF by Git.
+        # Hash their canonical LF representation so validation remains stable
+        # across Windows and Unix without weakening binary artifact checks.
+        digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
+    else:
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
     return digest.hexdigest()
 
 
@@ -253,6 +262,50 @@ def _make_features(
     return tuple(features)
 
 
+def _smoothstep_array(a: float, b: float, values: np.ndarray) -> np.ndarray:
+    """Cubic Hermite ramp used by authored rapid-planform transitions."""
+
+    scaled = np.clip((values - a) / max(b - a, 1.0e-6), 0.0, 1.0)
+    return scaled * scaled * (3.0 - 2.0 * scaled)
+
+
+def _troublemaker_s_bend_centerline_m(
+    station_m: np.ndarray,
+    rapid_station_m: float,
+) -> np.ndarray:
+    """Interpreted thalweg for the user-reviewed Troublemaker sequence.
+
+    The committed planform records one long geographic bend, while the supplied
+    rafting footage establishes the playable hydraulic sequence more precisely:
+    a central hole, an immediate move river-right, then a sharp correction back
+    river-left.  Keep the hole on the original centerline, move the high-energy
+    tongue to river-right through the first turn, cross it through center, and
+    carry it river-left into the gunsight/runout before feathering it home.
+
+    This is game bathymetry interpreted from visual evidence, not navigation
+    data or a surveyed channel centerline.
+    """
+
+    station = np.asarray(station_m, dtype=np.float64)
+    right_turn = _smoothstep_array(
+        rapid_station_m + 2.0, rapid_station_m + 24.0, station
+    ) * (
+        1.0
+        - _smoothstep_array(
+            rapid_station_m + 42.0, rapid_station_m + 64.0, station
+        )
+    )
+    left_turn = _smoothstep_array(
+        rapid_station_m + 48.0, rapid_station_m + 72.0, station
+    ) * (
+        1.0
+        - _smoothstep_array(
+            rapid_station_m + 108.0, rapid_station_m + 138.0, station
+        )
+    )
+    return -9.5 * right_turn + 8.0 * left_turn
+
+
 def _shape_rapid_channel(
     bed: np.ndarray,
     grid: GridSpec2_5D,
@@ -278,7 +331,28 @@ def _shape_rapid_channel(
     x_local = x - grid.origin_x
     surface_row = surface[None, :]
     half_row = np.maximum(half_width[None, :], 4.0)
-    lateral_norm = np.abs(y) / half_row
+    channel_center_m: np.ndarray | float = 0.0
+    effective_half_row = half_row
+    troublemaker_envelope = np.zeros_like(x_local)
+    if rapid_name == "Troublemaker":
+        channel_center_m = _troublemaker_s_bend_centerline_m(x, grid.origin_x + rapid_x)
+        troublemaker_envelope = _smoothstep_array(
+            rapid_x - 42.0, rapid_x - 18.0, x_local
+        ) * (
+            1.0 - _smoothstep_array(rapid_x + 140.0, rapid_x + 168.0, x_local)
+        )
+        # The reference is a compact rock-confined rapid, not the broad pool
+        # inherited from the full-reach DEM.  Narrow only the reviewed crux and
+        # blend continuously into the source-backed approach and runout.
+        interpreted_half_width_m = np.minimum(half_row, 17.5)
+        effective_half_row = (
+            half_row * (1.0 - troublemaker_envelope)
+            + interpreted_half_width_m * troublemaker_envelope
+        )
+
+    lateral_norm = np.abs(y - channel_center_m) / np.maximum(
+        effective_half_row, 4.0
+    )
     in_channel = lateral_norm < 1.0
     core = np.exp(-0.5 * (lateral_norm / 0.55) ** 2)
     jitter = _stable_unit(f"{rapid_name}:channel_shape") - 0.5
@@ -288,6 +362,19 @@ def _shape_rapid_channel(
         return s * s * (3.0 - 2.0 * s)
 
     shaped = bed.copy()
+
+    if rapid_name == "Troublemaker":
+        # Turn the excess DEM pool into gently rising gravel/rock shoulders.
+        # A feathered lateral ramp produces one continuous organic shoreline;
+        # there are no rectangular wet-mask patches to stream in and out.
+        outside_weight = _smoothstep_array(0.84, 1.08, lateral_norm)
+        bank_distance_m = np.maximum(
+            np.abs(y - channel_center_m) - effective_half_row, 0.0
+        )
+        interpreted_bank = surface_row + 0.22 + 0.075 * bank_distance_m
+        bank_weight = troublemaker_envelope * outside_weight
+        raised_bank = np.maximum(shaped, interpreted_bank)
+        shaped = shaped * (1.0 - bank_weight) + raised_bank * bank_weight
 
     # Entry shoal: raise the bed toward the crux so depth thins from the
     # pool's ~2.4 m to ~1.0-1.3 m, then release through the runout.
@@ -304,13 +391,35 @@ def _shape_rapid_channel(
     pinch = strength * 0.85 * smoothstep(0.5, 0.95, lateral_norm) * pinch_zone
     shaped += np.where(in_channel, pinch, 0.0)
 
-    # Ledge: the drop the smooth waterline spreads over 100 m concentrates
-    # into a step at the crux.
-    ledge_drop = strength * 0.7
+    # Ledge/hole: the drop the smooth waterline spreads over 100 m
+    # concentrates at the crux. Troublemaker receives the deeper control and
+    # plunge bowl visible in the reference; the downstream shoulder is what
+    # lets the live solver form a retained, aerated recirculation rather than
+    # merely painting foam over a flat plane.
+    ledge_drop = strength * (0.82 if rapid_name == "Troublemaker" else 0.7)
     ledge = -ledge_drop * (
         0.5 + 0.5 * np.tanh((x_local - rapid_x) / 4.0)
     )
     shaped += np.where(in_channel, ledge * (0.4 + 0.6 * core), 0.0)
+
+    if rapid_name == "Troublemaker":
+        hole_center_x = rapid_x - 7.0
+        plunge_pool = np.exp(
+            -0.5
+            * (
+                ((x_local - (hole_center_x + 9.0)) / 8.5) ** 2
+                + ((y - channel_center_m) / 7.5) ** 2
+            )
+        )
+        rebound = np.exp(
+            -0.5
+            * (
+                ((x_local - (hole_center_x + 23.0)) / 5.5) ** 2
+                + ((y - channel_center_m) / 8.5) ** 2
+            )
+        )
+        shaped -= 0.45 * plunge_pool
+        shaped += 0.22 * rebound
 
     # Runout undulations: 16 m wavelength bed waves through the tailout give
     # the surface its wave train; decay over ~90 m.
@@ -477,6 +586,41 @@ def _build_scenario(
     velocity_by_column = np.clip(discharge / np.maximum(area_by_column, 1.0), 0.0, 8.0)
     u = np.where(wet, velocity_by_column[None, :], 0.0)
     v = np.zeros_like(u)
+    if str(rapid["name"]) == "Troublemaker":
+        station_axis = grid.x_coordinates()
+        thalweg_center_m = _troublemaker_s_bend_centerline_m(
+            station_axis, float(rapid["station_m"])
+        )
+        thalweg_slope = np.gradient(thalweg_center_m, grid.dx)
+        x_mesh, y_mesh = grid.meshgrid()
+        local_center_m = _troublemaker_s_bend_centerline_m(
+            x_mesh, float(rapid["station_m"])
+        )
+        bend_core = np.exp(
+            -0.5 * ((y_mesh - local_center_m) / 9.0) ** 2
+        )
+        bend_envelope = _smoothstep_array(
+            float(rapid["station_m"]) - 28.0,
+            float(rapid["station_m"]) + 2.0,
+            x_mesh,
+        ) * (
+            1.0
+            - _smoothstep_array(
+                float(rapid["station_m"]) + 138.0,
+                float(rapid["station_m"]) + 168.0,
+                x_mesh,
+            )
+        )
+        # dy/dx times downstream speed is the cross-stream component of a
+        # velocity tangent to the S-shaped tongue.  This makes the current,
+        # not an invisible gameplay assist, carry the raft through both turns.
+        v += (
+            u
+            * thalweg_slope[None, :]
+            * bend_core
+            * bend_envelope
+            * 0.9
+        )
     for feature in features:
         if feature.kind not in {"eddy_line", "lateral"}:
             continue
@@ -553,6 +697,12 @@ def _build_scenario(
                 "bathymetry_authority": "procedural_infill",
                 "feature_geometry_authority": (
                     "procedural_infill_interpreted_from_guide_inventory"
+                ),
+                "troublemaker_sequence_reference": (
+                    "user-reviewed footage: central hole, sharp river-right turn, "
+                    "sharp river-left turn"
+                    if str(rapid["name"]) == "Troublemaker"
+                    else None
                 ),
                 "not_for_navigation": True,
             },
@@ -694,7 +844,7 @@ def _array_record(
 ) -> dict[str, Any]:
     dtype, units, description = ARRAY_CONTRACT[name]
     return {
-        "file": str(path.relative_to(root)),
+        "file": path.relative_to(root).as_posix(),
         "dtype": dtype,
         "shape": list(array.shape),
         "units": units,
@@ -966,9 +1116,9 @@ def _build_streaming_manifest(
                     "segment_kind": "procedural_transit_live_window",
                     "station_range_m": [round(cursor, 3), round(start, 3)],
                     "seed_source": PROCEDURAL_GEOGRAPHY_GRID_RELATIVE_PATH,
-                    "cooked_fields_manifest": str(
-                        transit_manifest_path.relative_to(repo_root)
-                    ),
+                    "cooked_fields_manifest": transit_manifest_path.relative_to(
+                        repo_root
+                    ).as_posix(),
                 }
             )
         coverage_segments.append(
@@ -985,9 +1135,9 @@ def _build_streaming_manifest(
                 "segment_kind": "procedural_transit_live_window",
                 "station_range_m": [round(cursor, 3), round(reach_end, 3)],
                 "seed_source": PROCEDURAL_GEOGRAPHY_GRID_RELATIVE_PATH,
-                "cooked_fields_manifest": str(
-                    transit_manifest_path.relative_to(repo_root)
-                ),
+                "cooked_fields_manifest": transit_manifest_path.relative_to(
+                    repo_root
+                ).as_posix(),
             }
         )
     return {
@@ -998,7 +1148,9 @@ def _build_streaming_manifest(
         "station_range_m": [0.0, reach_end],
         "rapid_window_count": len(windows),
         "full_reach_transit_seed": {
-            "cooked_fields_manifest": str(transit_manifest_path.relative_to(repo_root)),
+            "cooked_fields_manifest": transit_manifest_path.relative_to(
+                repo_root
+            ).as_posix(),
             "sha256": _sha256(transit_manifest_path),
             "flow_bands": list(FLOW_BAND_IDS),
             "authority": "procedural_transit_initial_condition",
@@ -1029,8 +1181,14 @@ def write_south_fork_full_hydraulics(
     repo_root: Path,
     executable: Path,
     work_dir: Path,
+    only_rapid_name: str | None = None,
 ) -> Path:
-    """Generate, solve, validate, and write the 20 x 3 hydraulic matrix."""
+    """Generate and solve the hydraulic matrix or one named rapid in place.
+
+    A targeted cook replaces that rapid's scenarios, arrays, and manifest, then
+    refreshes its hash in the existing complete matrix.  It deliberately leaves
+    every other rapid and the path-only streaming manifest byte-for-byte intact.
+    """
 
     repo_root = repo_root.resolve()
     executable = executable.resolve()
@@ -1038,6 +1196,12 @@ def write_south_fork_full_hydraulics(
     root = repo_root / FULL_HYDRAULICS_ROOT_RELATIVE_PATH
     root.mkdir(parents=True, exist_ok=True)
     rapid_records = _rapid_records(repo_root)
+    if only_rapid_name is not None:
+        rapid_records = [
+            rapid for rapid in rapid_records if rapid["name"] == only_rapid_name
+        ]
+        if len(rapid_records) != 1:
+            raise ValueError(f"Unknown or ambiguous rapid name: {only_rapid_name!r}")
     flow_bands = _flow_bands(repo_root)
     rapid_entries = []
     all_combo_results = []
@@ -1138,7 +1302,7 @@ def write_south_fork_full_hydraulics(
                     "band_id": band_id,
                     "target_discharge_cfs": float(band["discharge_cfs"]),
                     "target_discharge_m3s": float(band["discharge_m3s"]),
-                    "scenario_package": str(package_dir.relative_to(repo_root)),
+                    "scenario_package": package_dir.relative_to(repo_root).as_posix(),
                     "arrays": array_records,
                     "surface_shock_limiter": shock_limiter,
                     "runtime_boundaries": runtime_boundaries,
@@ -1218,13 +1382,43 @@ def write_south_fork_full_hydraulics(
                 "window_id": cooked_manifest["window_id"],
                 "station_range_m": cooked_manifest["station_range_m"],
                 "catalog_feature_count": len(rapid["feature_inventory"]),
-                "cooked_fields_manifest": str(
-                    cooked_manifest_path.relative_to(repo_root)
-                ),
+                "cooked_fields_manifest": cooked_manifest_path.relative_to(
+                    repo_root
+                ).as_posix(),
                 "all_bands_passed": cooked_manifest["all_bands_passed"],
                 "manifest_sha256": _sha256(cooked_manifest_path),
             }
         )
+
+    if only_rapid_name is not None:
+        if not all(all_combo_results):
+            raise RuntimeError(
+                f"{only_rapid_name} hydraulic cook failed validation; inspect "
+                f"{root / 'rapids' / _slug(only_rapid_name) / 'cooked' / 'manifest.json'}"
+            )
+        manifest_path = repo_root / FULL_HYDRAULICS_MANIFEST_RELATIVE_PATH
+        manifest = _load_json(repo_root, FULL_HYDRAULICS_MANIFEST_RELATIVE_PATH)
+        replacement = rapid_entries[0]
+        matches = [
+            index
+            for index, entry in enumerate(manifest["rapids"])
+            if entry["rapid_name"] == only_rapid_name
+        ]
+        if len(matches) != 1:
+            raise RuntimeError(
+                f"Complete hydraulic matrix has no unique {only_rapid_name!r} entry"
+            )
+        manifest["rapids"][matches[0]] = replacement
+        manifest["generator"] = GENERATOR_VERSION
+        manifest["targeted_refresh"] = {
+            "rapid_name": only_rapid_name,
+            "flow_bands": list(FLOW_BAND_IDS),
+            "solver_binary_sha256": solver_hash,
+            "other_rapid_artifacts_preserved": True,
+            "streaming_manifest_preserved": True,
+        }
+        _write_json(manifest_path, manifest)
+        return manifest_path
 
     transit_manifest_path = _write_full_reach_transit_seed(
         repo_root, flow_bands, solver_hash

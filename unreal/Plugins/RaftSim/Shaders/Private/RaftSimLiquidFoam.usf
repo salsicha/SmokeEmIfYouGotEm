@@ -1,0 +1,141 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidHalf.ush"
+int3 RenderSize;
+int3 FlowSize;
+float3 ExtentCm;
+float2 PhysicalHalfExtentCm;
+float SourceScale;
+float DecayRate;
+uint HasHistory;
+uint ClockIndex;
+Texture3D<float4> CurrentSurface;
+Texture3D<float4> HistorySurface;
+Texture3D<float4> Velocity;
+Texture3D<float4> Boundary;
+SamplerState LinearClamp;
+StructuredBuffer<float4> Clock;
+RWTexture3D<float4> OutputSurface;
+RWStructuredBuffer<float4> Audit;
+RWStructuredBuffer<uint> Diagnostics;
+
+float4 FloatTrilinear(Texture3D<float4> texture,int3 size,float3 unit)
+{
+    // Keep both the RK2 velocity and transported coverage in float32 during
+    // interpolation. Half-texture hardware filtering loses enough fractional
+    // precision to move high-contrast froth by more than the transport budget.
+    float3 position=unit*float3(size)-.5;
+    int3 low=int3(floor(position));float3 t=position-float3(low);
+    float4 value=0;
+    [unroll] for(int z=0;z<2;++z)
+    [unroll] for(int y=0;y<2;++y)
+    [unroll] for(int x=0;x<2;++x)
+    {
+        int3 bit=int3(x,y,z),q=clamp(low+bit,0,size-1);
+        float3 w=lerp(1-t,t,float3(bit));
+        value+=texture.Load(int4(q,0))*(w.x*w.y*w.z);
+    }
+    return value;
+}
+
+float3 Flow(float3 unit) { return FloatTrilinear(Velocity,FlowSize,unit).xyz; }
+
+float3 FlowAtRenderCell(int3 p)
+{
+    // RenderSize == 2*FlowSize. The source stencil always has exact quarter
+    // weights. Hardware filtering of RGBA16F can round the interpolated value
+    // back to half precision before differentiation (observed in live readback).
+    // Load half texels exactly and interpolate in float; keep the same field,
+    // stencil and source thresholds, without normalizing away strong gradients.
+    float3 position=float3(p)*.5-.25;
+    int3 low=int3(floor(position));float3 t=position-float3(low);
+    float3 value=0;
+    [unroll] for(int z=0;z<2;++z)
+    [unroll] for(int y=0;y<2;++y)
+    [unroll] for(int x=0;x<2;++x)
+    {
+        int3 bit=int3(x,y,z),q=clamp(low+bit,0,FlowSize-1);
+        float3 w=lerp(1-t,t,float3(bit));
+        value+=Velocity.Load(int4(q,0)).xyz*(w.x*w.y*w.z);
+    }
+    return value;
+}
+
+float DistanceAtRenderCell(int3 p)
+{
+    return CurrentSurface.Load(int4(clamp(p,0,RenderSize-1),0)).r;
+}
+
+[numthreads(8,4,4)]
+void MainCS(uint3 DispatchId:SV_DispatchThreadID)
+{
+    int3 p=int3(DispatchId);if(any(p>=RenderSize)) return;
+    uint index=p.x+RenderSize.x*(p.y+RenderSize.y*p.z);
+    float4 current=CurrentSurface.Load(int4(p,0)),clock=Clock[ClockIndex];
+    float dt=clock.y;
+    if(!all(isfinite(current)) || !all(isfinite(clock)) || dt<0 || dt>.25)
+    {
+        InterlockedAdd(Diagnostics[2],1);current.g=asfloat(0x7fc00000);
+        OutputSurface[p]=current;Audit[index]=asfloat(0x7fc00000);return;
+    }
+    // Initial/reset state is clean. Paused rendering is an exact coverage copy,
+    // not another decay/advection/source step against the wall clock.
+    if(HasHistory==0 || clock.z!=0 || dt==0)
+    {
+        float foam=(HasHistory!=0 && clock.z==0)?HistorySurface.Load(int4(p,0)).g:0;
+        current.g=foam;OutputSurface[p]=current;Audit[index]=float4(0,foam,dt,foam);return;
+    }
+    float3 unit=(float3(p)+.5)/RenderSize,du=1.0/float3(FlowSize);
+    float cell=max(ExtentCm.x/RenderSize.x,max(ExtentCm.y/RenderSize.y,ExtentCm.z/RenderSize.z));
+    int3 parent=clamp(int3(unit*FlowSize),0,FlowSize-1);
+    float category=Boundary.Load(int4(parent,0)).w;
+    if(!isfinite(category) || category<0 || category>3 || category!=round(category))
+    {
+        InterlockedAdd(Diagnostics[2],1);current.g=asfloat(0x7fc00000);
+        OutputSurface[p]=current;Audit[index]=asfloat(0x7fc00000);return;
+    }
+    float foam=0,oldFoam=0,rate=0;
+    // Match the half-stored SDF at the support boundary. A float reciprocal
+    // can otherwise turn exactly 50 cm into an architecture-dependent cell.
+    float supportDistance=HalfNearestEven(3*cell);
+    if(abs(current.r)<supportDistance && category!=1 && category!=3)
+    {
+        float3 velocity=FlowAtRenderCell(p);
+        float3 midVelocity=Flow(unit-.5*dt*velocity/ExtentCm);
+        float3 previousUnit=unit-dt*midVelocity/ExtentCm;
+        if(all(previousUnit>0) && all(previousUnit<1))
+        {
+            oldFoam=FloatTrilinear(HistorySurface,RenderSize,previousUnit).g;
+        }
+        float3 dx=(FlowAtRenderCell(p+int3(2,0,0))-FlowAtRenderCell(p-int3(2,0,0)))/(2*du.x*ExtentCm.x);
+        float3 dy=(FlowAtRenderCell(p+int3(0,2,0))-FlowAtRenderCell(p-int3(0,2,0)))/(2*du.y*ExtentCm.y);
+        float3 dz=(FlowAtRenderCell(p+int3(0,0,2))-FlowAtRenderCell(p-int3(0,0,2)))/(2*du.z*ExtentCm.z);
+        float curl=length(float3(dy.z-dz.y,dz.x-dx.z,dx.y-dy.x));
+        // Surface-tangential convergence, not global-XY divergence. Use the
+        // rendered SDF at solver-scale offsets; no extra visible surface.
+        float3 gradient=float3(
+            (DistanceAtRenderCell(p+int3(2,0,0))-DistanceAtRenderCell(p-int3(2,0,0)))/(2*du.x*ExtentCm.x),
+            (DistanceAtRenderCell(p+int3(0,2,0))-DistanceAtRenderCell(p-int3(0,2,0)))/(2*du.y*ExtentCm.y),
+            (DistanceAtRenderCell(p+int3(0,0,2))-DistanceAtRenderCell(p-int3(0,0,2)))/(2*du.z*ExtentCm.z));
+        float normalLength=length(gradient);
+        float3 n=normalLength>.2?gradient/normalLength:float3(0,0,0);
+        float compression=normalLength>.2?max(-(dx.x+dy.y+dz.z-dot(n,dx*n.x+dy*n.y+dz*n.z)),0):0;
+        // sqrt(2 S:S), S=(J+transpose(J))/2. Rigid rotation has curl but
+        // zero strain: it must not whiten water just because it is rotating.
+        float strain=sqrt(2*(dx.x*dx.x+dy.y*dy.y+dz.z*dz.z)+
+            (dx.y+dy.x)*(dx.y+dy.x)+(dx.z+dz.x)*(dx.z+dz.x)+(dy.z+dz.y)*(dy.z+dz.y));
+        curl=normalLength>.2?min(curl,strain):0;
+        float surfaceBand=saturate(1-abs(current.r)/(2*cell));
+        float3 physical=abs((unit-.5)*ExtentCm);
+        float edge=saturate(min(PhysicalHalfExtentCm.x-physical.x,PhysicalHalfExtentCm.y-physical.y)/(2*max(du.x*ExtentCm.x,du.y*ExtentCm.y)));
+        rate=min(8.0,SourceScale*surfaceBand*edge*saturate((length(velocity)-50)/150)*
+            (max(curl-1.2,0)*.35+max(compression-.8,0)*.5));
+        float total=rate+DecayRate;
+        float equilibrium=total>0?rate/total:0;
+        foam=saturate(total>0?equilibrium+(oldFoam-equilibrium)*exp(-total*dt):oldFoam);
+        if(!all(isfinite(velocity)) || !all(isfinite(midVelocity)) || !all(isfinite(previousUnit)) ||
+            !isfinite(oldFoam) || oldFoam<0 || oldFoam>1 || !isfinite(rate) || !isfinite(foam))
+        { InterlockedAdd(Diagnostics[2],1);foam=asfloat(0x7fc00000); }
+    }
+    current.g=HalfNearestEven(foam);OutputSurface[p]=current;
+    Audit[index]=float4(rate,oldFoam,dt,foam);
+}

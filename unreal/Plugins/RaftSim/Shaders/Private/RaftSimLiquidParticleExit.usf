@@ -1,0 +1,87 @@
+#include "/Engine/Public/Platform.ush"
+uint Capacity;
+uint SourceOwner;
+uint Owners;
+uint PositionOffset;
+uint StepStartOffset;
+int2 ParentCells;
+float3 LowerWorldCm;
+float3 AxisX;
+float3 AxisY;
+float2 SpacingCm;
+float HeightCm;
+int4 BedOffsets;
+int4 BedCounts;
+StructuredBuffer<float2> BedKnots;
+StructuredBuffer<float3> FaceRows;
+StructuredBuffer<uint> Words;
+StructuredBuffer<uint> SourceCounts;
+StructuredBuffer<uint4> Routes;
+RWStructuredBuffer<uint4> Records;
+RWStructuredBuffer<uint> Counts;
+
+float3 Point(uint offset,uint i)
+{
+    float3 p=asfloat(uint3(Words[offset*Capacity+i],Words[(offset+1)*Capacity+i],Words[(offset+2)*Capacity+i]))-LowerWorldCm;
+    return float3(dot(p,AxisX),dot(p,AxisY),p.z);
+}
+
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x,n=SourceCounts[Owners+2];
+    if(i==0) { Counts[7]=n;if(n>Capacity) InterlockedAdd(Counts[6],n-Capacity); }
+    if(i>=max(Capacity,1u)) return;
+    Records[i]=uint4(0,0xffffffff,0xffffffff,0);
+    if(i>=Capacity || i>=n) return;
+    uint4 route=Routes[i];float3 a=Point(StepStartOffset,i),b=Point(PositionOffset,i);
+    float3 extent=float3(float2(ParentCells)*SpacingCm,HeightCm);
+    // No invented previous endpoint, outside birth, nonfinite state or stale
+    // source index can authorize an exit. Auxiliary payload is never touched.
+    if(route.y!=SourceOwner || route.z!=i || !all(isfinite(a)) || !all(isfinite(b)) ||
+        any(a<0) || any(a>extent) || (route.w!=1 && route.w!=2))
+    { Records[i].x=8;InterlockedAdd(Counts[6],1);return; }
+    bool xyInside=all(b.xy>=0)&&all(b.xy<=extent.xy);
+    if((xyInside && (route.w!=1 || route.x>=Owners)) || (!xyInside && (route.w!=2 || route.x!=0xffffffff)))
+    { Records[i].x=8;InterlockedAdd(Counts[6],1);return; }
+    if(xyInside && b.z>=0 && b.z<=extent.z)
+    { Records[i].x=1;InterlockedAdd(Counts[0],1);return; }
+    float3 delta=b-a;float first=2;uint face=0xffffffff;bool tied=false;
+    // First outward intersection with the full 3D box. A floor/roof crossing
+    // cannot be misreported as a later horizontal outlet crossing.
+    [unroll] for(uint axis=0;axis<3;++axis)
+    {
+        if(b[axis]>=0 && b[axis]<=extent[axis]) continue;
+        uint candidate=2*axis+(b[axis]>extent[axis]?1:0);
+        float t=((candidate&1)?extent[axis]-a[axis]:-a[axis])/delta[axis];
+        float tolerance=8*1.192092896e-7;
+        if(t<first-tolerance) { first=t;face=candidate;tied=false; }
+        else if(abs(t-first)<=tolerance) tied=true;
+    }
+    Records[i]=uint4(4,face,0xffffffff,asuint(first));
+    if(tied || face>=4 || !isfinite(first) || first<0 || first>1)
+    { InterlockedAdd(Counts[5],1);return; }
+    float3 hit=a+first*delta;uint tangent=face<2?1:0;
+    uint column=min(uint(max(floor(hit[tangent]/SpacingCm[tangent]),0)),uint(ParentCells[tangent]-1));
+    uint offset=face==0?0:face==1?ParentCells.y:face==2?2*ParentCells.y:2*ParentCells.y+ParentCells.x;
+    uint row=offset+column;Records[i].z=row;float3 profile=FaceRows[row];
+    if(BedCounts[face]>0)
+    {
+        // The finite-volume row still owns stage and signed discharge. Bed
+        // contact is pointwise: preserve every original terrain triangle edge.
+        uint low=BedOffsets[face],high=low+BedCounts[face]-1;
+        while(high-low>1)
+        {
+            uint mid=(low+high)/2;
+            if(hit[tangent]<BedKnots[mid].x) high=mid;else low=mid;
+        }
+        float2 aBed=BedKnots[low],bBed=BedKnots[high];
+        profile.x=lerp(aBed.y,bBed.y,saturate((hit[tangent]-aBed.x)/(bBed.x-aBed.x)));
+    }
+    float z=hit.z+LowerWorldCm.z;
+    // Use the SAME outgoing row condition as the pressure-stage boundary.
+    // Above-stage spray may exit over a wet opening; below-bed leaks may not.
+    if(profile.z>=0 || profile.y<=profile.x || z<=profile.x)
+    { InterlockedAdd(Counts[5],1);return; }
+    Records[i].x=2;InterlockedAdd(Counts[1+face],1);
+}

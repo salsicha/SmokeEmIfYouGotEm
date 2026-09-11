@@ -7,6 +7,7 @@
 
 class FFrameGrabber;
 class FRaftSimWmfVideoEncoder;
+struct FCapturedFrameData;
 
 /**
  * Debug screen recorder: captures the game viewport's back buffer (UI
@@ -32,6 +33,8 @@ public:
 
 private:
     bool PumpCapturedFrames(float DeltaSeconds);
+    void QueueCapturedFrame(FCapturedFrameData&& Frame);
+    void WritePendingFrame(double EndSeconds);
     void ShowStatus(const FString& Message, const FColor& Color) const;
 
     // Raw pointers with explicit teardown: UHT's generated vtable-helper
@@ -45,4 +48,8 @@ private:
     double RecordingStartSeconds = 0.0;
     double NextFrameDueSeconds = 0.0;
     int64 EncodedFrameCount = 0;
+    TArray<FColor> PendingPixels;
+    double PendingFrameSeconds = -1.0;
+    double FirstFrameSeconds = -1.0;
+    double EncodedDurationSeconds = 0.0;
 };

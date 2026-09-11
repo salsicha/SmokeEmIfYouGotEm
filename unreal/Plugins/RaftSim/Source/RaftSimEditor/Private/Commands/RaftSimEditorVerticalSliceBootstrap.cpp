@@ -344,19 +344,15 @@ struct FRiverMapSpec
     // Raft put-in, meters along the corridor (station*100 = world X cm).
     // Must be INSIDE the cooked wet domain: a put-in the fields don't cover
     // leaves the raft dry and beached in automation PIE and fails the
-    // RiverMapLoads depth envelope (Troublemaker staged at -60 m while its
-    // wet centerline spans 0-300 m, 2026-08-13).
+    // RiverMapLoads depth envelope.
     float PutInStationM;
 };
 
-// The five compact signature-rapid maps (docs/five-river-simulation-plan.md).
-// Zambezi uses its separately generated source-scale reference corridor. Each
+// Four compact signature-rapid maps. South Fork challenges use the full-reach
+// map; Zambezi uses its separately generated source-scale reference corridor. Each
 // compact map points at its signature rapid's cooked flow fields; a map with no cooked
 // package yet falls back to the dev tank at runtime until its fields land.
 static const FRiverMapSpec GRiverMaps[] = {
-    {TEXT("L_Troublemaker"),
-     TEXT("physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields"),
-     TEXT("median_runnable"), 10.0f},
     {TEXT("L_Hance"),
      TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields"),
      TEXT("median_runnable"), -60.0f},
@@ -500,7 +496,7 @@ static void HandleCreateRiverMaps(const TArray<FString>& Args)
 
 static FAutoConsoleCommand GCreateRiverMapsCommand(
     TEXT("RaftSim.CreateRiverMaps"),
-    TEXT("Generate the five compact signature-rapid maps (L_Troublemaker, L_Hance, "
+    TEXT("Generate the four compact signature-rapid maps (L_Hance, "
          "L_UpperHuacas, L_Terminator, L_LavaCanyon) with live cooked-field "
          "river water. Optional args filter by map-name substring."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateRiverMaps));

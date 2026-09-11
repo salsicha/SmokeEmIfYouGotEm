@@ -29,6 +29,7 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RenderTimer.h"
 #include "DynamicRHI.h"
+#include "RHIGlobals.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
@@ -1083,7 +1084,11 @@ void ARaftSimContentLockDirector::FinishPerformanceCapture()
         TEXT("platform"), ANSI_TO_TCHAR(FPlatformProperties::IniPlatformName()));
     Report->SetStringField(TEXT("build_configuration"), LexToString(FApp::GetBuildConfiguration()));
     Report->SetStringField(TEXT("cpu_brand"), FPlatformMisc::GetCPUBrand());
-    Report->SetStringField(TEXT("gpu_brand"), FPlatformMisc::GetPrimaryGPUBrand());
+    // Hybrid laptops can report the integrated display device as "primary"
+    // while D3D12 actually renders on the discrete GPU. Record the active RHI.
+    Report->SetStringField(TEXT("gpu_brand"), GRHIAdapterName.IsEmpty() ? TEXT("unavailable") : GRHIAdapterName);
+    Report->SetStringField(TEXT("gpu_brand_source"), TEXT("active_rhi_adapter"));
+    Report->SetStringField(TEXT("platform_primary_gpu_brand"), FPlatformMisc::GetPrimaryGPUBrand());
     Report->SetBoolField(
         TEXT("running_from_packaged_build"), bRunningFromPackagedBuild);
     Report->SetBoolField(TEXT("render_offscreen"), bRenderOffscreen);

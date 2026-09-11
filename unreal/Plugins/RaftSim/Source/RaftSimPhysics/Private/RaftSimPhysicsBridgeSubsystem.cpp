@@ -2,6 +2,8 @@
 
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
+#include "Components/StaticMeshComponent.h"
+#include "CollisionQueryParams.h"
 
 void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -78,19 +80,67 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
         // height-field data to the selected reduced runtime instead. Physical
         // source Landscapes take precedence; maps without one use solver bed.
         TArray<TWeakObjectPtr<ALandscapeProxy>> TerrainLandscapes;
+        TArray<TWeakObjectPtr<UStaticMeshComponent>> CapturedGroundMeshes;
         if (UWorld* World = GetWorld())
         {
             for (TActorIterator<ALandscapeProxy> It(World); It; ++It)
             {
                 TerrainLandscapes.Add(*It);
             }
+            // Opt in only geometry that owns the physical ground. Scenery,
+            // foliage, raft visuals and water must never become contact beds.
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                TInlineComponentArray<UStaticMeshComponent*> Meshes(*It);
+                for (UStaticMeshComponent* Mesh : Meshes)
+                {
+                    if (It->ActorHasTag(TEXT("RaftSimPhysicalGround")) ||
+                        Mesh->ComponentHasTag(TEXT("RaftSimPhysicalGround")))
+                    {
+                        CapturedGroundMeshes.Add(Mesh);
+                    }
+                }
+            }
         }
         RaftRuntime->SetGroundSurfaceSampler(
-            [WeakWater, TerrainLandscapes](
+            [WeakWater, TerrainLandscapes, CapturedGroundMeshes](
                 const FVector& WorldPositionCm,
                 float& OutGroundZCm,
                 FVector& OutGroundNormal) -> bool
             {
+                // The survey mesh and hydraulic bed share a source, but a
+                // coarser hydraulic raster cannot resolve every exposed rock.
+                // Query the full collision triangles at the requested XY;
+                // use component bounds, not raft height, even after a fall.
+                TOptional<float> CapturedGroundZCm;
+                FVector CapturedNormal = FVector::UpVector;
+                FCollisionQueryParams Params(SCENE_QUERY_STAT(RaftSimCapturedGround), true);
+                for (const TWeakObjectPtr<UStaticMeshComponent>& WeakMesh : CapturedGroundMeshes)
+                {
+                    UStaticMeshComponent* Mesh = WeakMesh.Get();
+                    if (!Mesh || !Mesh->IsQueryCollisionEnabled()) continue;
+                    const FBox Bounds = Mesh->Bounds.GetBox();
+                    if (WorldPositionCm.X < Bounds.Min.X || WorldPositionCm.X > Bounds.Max.X ||
+                        WorldPositionCm.Y < Bounds.Min.Y || WorldPositionCm.Y > Bounds.Max.Y) continue;
+                    FHitResult Hit;
+                    if (Mesh->LineTraceComponent(Hit,
+                            FVector(WorldPositionCm.X, WorldPositionCm.Y, Bounds.Max.Z + 100.0),
+                            FVector(WorldPositionCm.X, WorldPositionCm.Y, Bounds.Min.Z - 100.0), Params) &&
+                        (!CapturedGroundZCm.IsSet() || Hit.ImpactPoint.Z > CapturedGroundZCm.GetValue()))
+                    {
+                        // Component traces report geometric intersections;
+                        // Chaos uses an overlap-all filter and need not set
+                        // bBlockingHit as a world-channel trace would.
+                        CapturedGroundZCm = Hit.ImpactPoint.Z;
+                        CapturedNormal = Hit.ImpactNormal.GetSafeNormal();
+                    }
+                }
+                if (CapturedGroundZCm.IsSet())
+                {
+                    OutGroundZCm = CapturedGroundZCm.GetValue();
+                    OutGroundNormal = CapturedNormal.Z > 0.05 ? CapturedNormal : FVector::UpVector;
+                    return true;
+                }
                 const ALandscapeProxy* HighestLandscape = nullptr;
                 TOptional<float> HighestLandscapeZCm;
                 for (const TWeakObjectPtr<ALandscapeProxy>& WeakLandscape :
@@ -188,10 +238,29 @@ FRaftSimPhysicsTickOutput URaftSimPhysicsBridgeSubsystem::TickBridge(const FRaft
 {
     AccumulatedSeconds += FMath::Max(Input.FrameDeltaSeconds, 0.0f);
 
-    while (AccumulatedSeconds + KINDA_SMALL_NUMBER >= WaterStepSeconds)
+    // A 0.5 m rapid window is intentionally much more expensive than the
+    // earlier 2 m field. Never solve it repeatedly inside one rendered frame:
+    // a single hitch otherwise requested as many as 15 second-order solves,
+    // each made the next frame later, and the game locked into a ~1 FPS
+    // catch-up spiral. Raft/Chrono ticks may catch up against the latest
+    // authoritative water state; the live fluid itself advances at most once
+    // per render frame. Four raft ticks cover a stable 15 FPS floor, and any
+    // still-older wall-clock debt is discarded so recovery is immediate.
+    constexpr int32 kMaximumRaftCatchUpTicksPerFrame = 4;
+    int32 CatchUpTickCount = 0;
+    while (AccumulatedSeconds + KINDA_SMALL_NUMBER >= WaterStepSeconds &&
+           CatchUpTickCount < kMaximumRaftCatchUpTicksPerFrame)
     {
-        RunOneFixedWaterTick();
+        if (!RunOneFixedWaterTick(/*bAdvanceWaterSolver=*/CatchUpTickCount == 0))
+        {
+            break;
+        }
         AccumulatedSeconds -= WaterStepSeconds;
+        ++CatchUpTickCount;
+    }
+    if (AccumulatedSeconds >= WaterStepSeconds)
+    {
+        AccumulatedSeconds = FMath::Fmod(AccumulatedSeconds, WaterStepSeconds);
     }
 
     return LastOutput;
@@ -205,16 +274,16 @@ void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent(
     RefreshContactRuntimeSummary();
 }
 
-void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
+bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick(bool bAdvanceWaterSolver)
 {
     if (!WaterRuntime || !RaftRuntime)
     {
-        return;
+        return false;
     }
 
-    if (!WaterRuntime->StepWater(WaterStepSeconds))
+    if (bAdvanceWaterSolver && !WaterRuntime->StepWater(WaterStepSeconds))
     {
-        return;
+        return false;
     }
 
     const int32 Substeps = FMath::Max(1, FMath::CeilToInt(WaterStepSeconds / ChronoSubstepSeconds));
@@ -230,6 +299,7 @@ void URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
     LastOutput.RaftState = RaftRuntime->GetKinematicState();
     LastOutput.WaterSamplesApplied = 0;
     RefreshContactRuntimeSummary();
+    return true;
 }
 
 void URaftSimPhysicsBridgeSubsystem::RefreshContactRuntimeSummary()

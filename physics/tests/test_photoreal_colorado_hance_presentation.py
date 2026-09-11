@@ -343,7 +343,7 @@ def test_hance_v2_visual_textures_are_first_party_and_fail_closed() -> None:
         assert provenance["texture"]["addressing"] == "mirror_x_mirror_y"
         assert len(provenance["limitations"]) >= 4
     assert "BuildColoradoHanceWaterTextureAssets" in texture_source
-    assert "TA_Mirror" in texture_source
+    assert "TA_Wrap" in texture_source
 
 
 def test_hance_transmitting_water_v2_review_is_hash_locked_and_honest() -> None:

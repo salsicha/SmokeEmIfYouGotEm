@@ -3,6 +3,8 @@
 #include "Components/BoxComponent.h"
 #include "Engine/GameInstance.h"
 #include "EngineUtils.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "RaftSimEncounterVolume.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
@@ -72,6 +74,19 @@ void ARaftSimRunManager::ConfigureSession(
     StartStationM = Scenario.StartStationM;
     FinishStationM = Scenario.FinishStationM;
     bCheckpointRestorePending = StartStationM > 200.0f && !Scenario.bFullDescent;
+    // GameMode configures this again after BeginPlay, so apply the ephemeral
+    // review start here. Never modify the selected scenario or saved checkpoint.
+    float ReviewStationM = -1.0f;
+    if (GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
+        FParse::Value(FCommandLine::Get(), TEXT("RaftSimWaterReviewStation="), ReviewStationM) &&
+        FMath::IsFinite(ReviewStationM) && ReviewStationM >= 0.0f && ReviewStationM <= 48900.0f)
+    {
+        ScenarioId = TEXT("south_fork_full_descent");
+        GameModeKind = ERaftSimGameMode::FreeRun;
+        StartStationM = ReviewStationM;
+        FinishStationM = 48900.0f;
+        bCheckpointRestorePending = true;
+    }
 }
 
 float ARaftSimRunManager::GetProgressFraction() const
@@ -190,7 +205,14 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
     FTransform Checkpoint;
     const float CheckpointCeilingM =
         FinishStationM > StartStationM ? FinishStationM : TNumericLimits<float>::Max();
-    if (!Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint, CheckpointCeilingM))
+    float ReviewStationM = -1.0f;
+    const bool bReviewStart = FParse::Value(
+        FCommandLine::Get(), TEXT("RaftSimWaterReviewStation="), ReviewStationM)
+        && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))
+        && FMath::IsFinite(ReviewStationM)
+        && ReviewStationM >= 0.0f && ReviewStationM <= 48900.0f
+        && FMath::IsNearlyEqual(ReviewStationM, StartStationM);
+    if (bReviewStart || !Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint, CheckpointCeilingM))
     {
         if (!BuildStationStartTransform(Water, StartStationM, Checkpoint))
         {
@@ -211,7 +233,7 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
             Config->CookedFieldsDir, Config->FlowBand.ToString(),
             FVector2D(StartStationM, 0.0f),
             FVector2D(Config->MovingWindowStationExtentM, Config->MovingWindowLateralExtentM),
-            0.041f);
+            0.041f, Config->bRecenterHydraulicCrux);
     }
     Raft->SetCheckpointTransform(Checkpoint, true);
     CurrentStationM = StartStationM;

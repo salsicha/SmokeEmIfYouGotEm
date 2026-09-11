@@ -21,7 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_DIR = REPO_ROOT / "unreal/SourceArt/RaftSim/Water"
 OUTPUT_PATH = OUTPUT_DIR / "T_RaftSim_SouthForkWater_FoamLace.png"
 PROVENANCE_PATH = OUTPUT_PATH.with_suffix(".provenance.json")
-GENERATOR_VERSION = "raftsim-production-whitewater-foam-lace-v4"
+GENERATOR_VERSION = "raftsim-production-whitewater-foam-lace-v5"
 TEXTURE_SIZE = 1024
 RANDOM_SEED = 20260728
 
@@ -35,11 +35,19 @@ def resized_noise(
     """Return a normalized, softly interpolated deterministic noise octave."""
 
     source = np.rint(rng.random((height, width)) * 255.0).astype(np.uint8)
-    image = Image.fromarray(source, mode="L").resize(
-        (TEXTURE_SIZE, TEXTURE_SIZE), Image.Resampling.BICUBIC
+    # Resample the middle copy of a 3x3 periodic source. Filtering therefore
+    # sees the opposite edge instead of black/clamped pixels, and the runtime
+    # can use ordinary wrapping without the derivative reversal produced by
+    # mirrored addressing (the reversal rendered as cross-river bars).
+    tiled = np.tile(source, (3, 3))
+    image = Image.fromarray(tiled, mode="L").resize(
+        (TEXTURE_SIZE * 3, TEXTURE_SIZE * 3), Image.Resampling.BICUBIC
     )
     if blur_radius > 0.0:
         image = image.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+    image = image.crop(
+        (TEXTURE_SIZE, TEXTURE_SIZE, TEXTURE_SIZE * 2, TEXTURE_SIZE * 2)
+    )
     return np.asarray(image, dtype=np.float32) / 255.0
 
 
@@ -55,13 +63,14 @@ def smoothstep(low: float, high: float, value: np.ndarray) -> np.ndarray:
 
 def build_texture() -> Image.Image:
     rng = np.random.default_rng(RANDOM_SEED)
-    # More samples across V than U produce short streamwise masses. Independent
-    # octaves prevent a single grid or contour scale from surviving at distance.
-    low = resized_noise(rng, 34, 92, 9.0)
-    medium = resized_noise(rng, 82, 176, 3.8)
-    detail = resized_noise(rng, 176, 286, 1.4)
-    breakup = resized_noise(rng, 118, 214, 2.4)
-    micro = resized_noise(rng, 310, 420, 0.7)
+    # Isotropic octaves form finite boils and torn cellular rafts. The previous
+    # strongly rectangular source grids survived mip filtering as long white
+    # streaks aligned with the river.
+    low = resized_noise(rng, 48, 48, 9.0)
+    medium = resized_noise(rng, 104, 104, 3.8)
+    detail = resized_noise(rng, 208, 208, 1.4)
+    breakup = resized_noise(rng, 148, 148, 2.4)
+    micro = resized_noise(rng, 384, 384, 0.7)
     turbulent = normalize(low * 0.48 + medium * 0.32 + detail * 0.20)
 
     # Foam appears both as aerated masses at turbulence peaks and as irregular
@@ -78,7 +87,12 @@ def build_texture() -> Image.Image:
     combined = np.power(np.clip(combined, 0.0, 1.0), 0.86)
     # Retain a soft shoulder but remove low gray haze before texture mips.
     combined = np.clip((combined - 0.055) / 0.945, 0.0, 1.0)
-    return Image.fromarray(np.rint(combined * 255.0).astype(np.uint8), mode="L")
+    output = np.rint(combined * 255.0).astype(np.uint8)
+    # Exact C0 closure protects the smallest mips and platform compressors from
+    # resurrecting a one-pixel tile seam.
+    output[:, -1] = output[:, 0]
+    output[-1, :] = output[0, :]
+    return Image.fromarray(output, mode="L")
 
 
 def sha256(path: Path) -> str:
@@ -102,7 +116,7 @@ def main() -> None:
         "dimensions_px": [TEXTURE_SIZE, TEXTURE_SIZE],
         "format": "8_bit_grayscale_png",
         "random_seed": RANDOM_SEED,
-        "tile_contract": "multiscale_fields_with_mirrored_runtime_addressing",
+        "tile_contract": "periodic_multiscale_fields_with_wrap_addressing",
         "multiscale_octaves": 5,
         "authored_polyline_count": 0,
         "sha256": sha256(OUTPUT_PATH),

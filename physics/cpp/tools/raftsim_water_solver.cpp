@@ -1,10 +1,13 @@
 #include "raftsim_water/solver.hpp"
 
 #include <cmath>
+#include <chrono>
+#include <algorithm>
 #include <cstdlib>
 #include <exception>
 #include <filesystem>
 #include <iostream>
+#include <iomanip>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -30,6 +33,11 @@ struct CliArgs {
     double bed_slope_source_scale = 0.0;
     bool preserve_initial_mass = true;
     bool disable_fixture_calibrations = false;
+    bool inspect_boundary_flux = false;
+    bool inspect_face_fluxes = false;
+    bool progress = false;
+    double experimental_west_discharge_m3s = -1.0;
+    bool experimental_west_supercritical_stage = false;
 };
 
 void print_usage(const char* program) {
@@ -51,6 +59,11 @@ void print_usage(const char* program) {
         << "  --bed-slope-source-scale <x>   Scale finite-volume bed slope source term (default: 0.0)\n"
         << "  --no-preserve-initial-mass     Disable reduced-mode global mass correction\n"
         << "  --disable-fixture-calibrations Run only base dynamics, without fixture-specific treatments\n"
+        << "  --inspect-boundary-flux        Print initial-state face flux JSON and exit without stepping/writing\n"
+        << "  --inspect-face-fluxes          Print all exact numerical mass fluxes as JSON, without stepping\n"
+        << "  --progress                     Log elapsed simulation time and maximum depth at saved frames\n"
+        << "  --experimental-west-discharge <m3/s>  Offline subcritical constant-Q inlet trial (default: disabled)\n"
+        << "  --experimental-west-supercritical-stage  Use external stage on supercritical constant-Q faces\n"
         << "  --help                         Show this help\n";
 }
 
@@ -114,6 +127,18 @@ CliArgs parse_args(int argc, char** argv) {
             args.preserve_initial_mass = false;
         } else if (flag == "--disable-fixture-calibrations") {
             args.disable_fixture_calibrations = true;
+        } else if (flag == "--inspect-boundary-flux") {
+            args.inspect_boundary_flux = true;
+        } else if (flag == "--inspect-face-fluxes") {
+            args.inspect_face_fluxes = true;
+        } else if (flag == "--progress") {
+            args.progress = true;
+        } else if (flag == "--experimental-west-supercritical-stage") {
+            args.experimental_west_supercritical_stage = true;
+        } else if (flag == "--experimental-west-discharge") {
+            args.experimental_west_discharge_m3s = parse_double(require_value(flag), flag);
+            if (!std::isfinite(args.experimental_west_discharge_m3s) || args.experimental_west_discharge_m3s < 0.0)
+                throw std::runtime_error("Experimental west discharge must be finite and nonnegative.");
         } else {
             throw std::runtime_error("Unknown argument: " + flag);
         }
@@ -171,13 +196,65 @@ int main(int argc, char** argv) {
         config.bed_slope_source_scale = args.bed_slope_source_scale;
         config.preserve_initial_mass = args.preserve_initial_mass;
         config.disable_fixture_calibrations = args.disable_fixture_calibrations;
+        config.experimental_west_discharge_m3s = args.experimental_west_discharge_m3s;
+        config.experimental_west_supercritical_stage = args.experimental_west_supercritical_stage;
         raftsim::ReducedShallowWaterSolver solver(std::move(scenario), config);
-        std::vector<raftsim::Frame> frames = solver.run(steps, args.frame_interval);
+        if (args.inspect_face_fluxes) {
+            const auto flux = solver.inspect_numerical_mass_flux_grid();
+            const auto& grid = solver.scenario().grid;
+            std::cout << std::setprecision(17)
+                      << "{\"units\":\"m2/s\",\"sign\":\"positive_grid_axis\",\"layout\":\"row_major\","
+                      << "\"nx\":" << grid.nx << ",\"ny\":" << grid.ny
+                      << ",\"dx_m\":" << grid.dx << ",\"dy_m\":" << grid.dy;
+            auto write_array = [](const char* name, const raftsim::Array2D& array) {
+                std::cout << ",\"" << name << "\":[";
+                bool first = true;
+                for (double value : array.values()) {
+                    if (!first) std::cout << ',';
+                    std::cout << value;
+                    first = false;
+                }
+                std::cout << ']';
+            };
+            write_array("x_faces", flux.x_faces);
+            write_array("y_faces", flux.y_faces);
+            std::cout << "}\n";
+            return 0;
+        }
+        if (args.inspect_boundary_flux) {
+            const auto flux = solver.inspect_boundary_mass_fluxes();
+            std::cout << std::setprecision(17)
+                      << "{\"units\":\"m3/s\",\"sign\":\"positive_into_domain\","
+                      << "\"west\":" << flux.west << ",\"east\":" << flux.east
+                      << ",\"south\":" << flux.south << ",\"north\":" << flux.north
+                      << ",\"net\":" << flux.west + flux.east + flux.south + flux.north << "}\n";
+            return 0;
+        }
+        const auto solve_start = std::chrono::steady_clock::now();
+        std::vector<raftsim::Frame> frames;
+        if (!args.progress) {
+            frames = solver.run(steps, args.frame_interval);
+        } else {
+            frames.push_back(solver.make_frame());
+            for (int index = 1; index <= steps; ++index) {
+                solver.step(solver.scenario().fixed_dt);
+                if (index == 1 || index % args.frame_interval == 0 || index == steps) {
+                    const auto& depth = solver.state().h.values();
+                    std::cerr << "progress step=" << index << "/" << steps
+                              << " time=" << solver.time() << " max_depth="
+                              << *std::max_element(depth.begin(), depth.end()) << std::endl;
+                }
+                if (index % args.frame_interval == 0 || index == steps) frames.push_back(solver.make_frame());
+            }
+        }
+        const auto solve_end = std::chrono::steady_clock::now();
         raftsim::ValidationSummary validation = raftsim::validate_frames(solver.scenario(), frames, config);
 
         fs::path output_root(args.output_dir);
         fs::path run_dir = output_root / solver.scenario().scenario_id;
+        const auto export_start = std::chrono::steady_clock::now();
         raftsim::write_solver_output(solver.scenario(), frames, validation, config, run_dir.string());
+        const auto export_end = std::chrono::steady_clock::now();
 
         std::cout << "scenario_id=" << solver.scenario().scenario_id << "\n";
         std::cout << "solver=raftsim_water_cpp_v1\n";
@@ -189,6 +266,12 @@ int main(int argc, char** argv) {
                   << (config.disable_fixture_calibrations ? "true" : "false") << "\n";
         std::cout << "steps=" << steps << "\n";
         std::cout << "frames=" << frames.size() << "\n";
+        // Separate arithmetic/frame capture from CSV export. Whole-process
+        // wall time can hide a solver speedup behind repeated file formatting.
+        std::cout << "solve_and_capture_seconds="
+                  << std::chrono::duration<double>(solve_end - solve_start).count() << "\n";
+        std::cout << "export_seconds="
+                  << std::chrono::duration<double>(export_end - export_start).count() << "\n";
         std::cout << "output=" << run_dir.string() << "\n";
         std::cout << "validation_passed=" << (validation.passed ? "true" : "false") << "\n";
         std::cout << "mass_relative_drift=" << validation.mass_relative_drift << "\n";

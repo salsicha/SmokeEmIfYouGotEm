@@ -138,6 +138,18 @@ UStaticMesh* CreateSouthForkMeshAsset(
     {
         return nullptr;
     }
+    const bool bRiverWaterMesh = AssetPackagePath.Contains(TEXT("/SouthForkFullReach/Water/")) &&
+        (Label.Contains(TEXT("_Water_")) || AssetPackagePath.Contains(TEXT("SalmonFalls_VisualContinuation")));
+    if (bRiverWaterMesh)
+    {
+        // These static tiles retain absolute station/3 UVs, unlike the rebased
+        // procedural carrier. Half precision merges rows near the lower reach.
+        for (int32 Lod = 0; Lod < Mesh->GetNumSourceModels(); ++Lod)
+        {
+            Mesh->GetSourceModel(Lod).BuildSettings.bUseFullPrecisionUVs = true;
+        }
+        Mesh->Build(false);
+    }
     if (bComplexCollision)
     {
         Mesh->CreateBodySetup();
@@ -147,6 +159,9 @@ UStaticMesh* CreateSouthForkMeshAsset(
             BodySetup->InvalidatePhysicsData();
             BodySetup->CreatePhysicsMeshes();
         }
+    }
+    if (bComplexCollision || bRiverWaterMesh)
+    {
         Mesh->MarkPackageDirty();
         const FString Filename = FPackageName::LongPackageNameToFilename(
             AssetPackagePath, FPackageName::GetAssetPackageExtension());

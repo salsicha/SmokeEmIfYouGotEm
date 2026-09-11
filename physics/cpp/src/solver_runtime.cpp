@@ -1,4 +1,5 @@
 #include "solver_internal.hpp"
+#include "solver_profile.hpp"
 
 namespace raftsim {
 
@@ -9,6 +10,20 @@ ReducedShallowWaterSolver::ReducedShallowWaterSolver(Scenario scenario, SolverCo
       config_(config),
       state_(scenario_.initial),
       initial_mass_(compute_mass(scenario_, scenario_.initial)) {
+    if (!std::isfinite(config_.experimental_west_discharge_m3s)) {
+        throw std::runtime_error("Experimental west discharge must be finite.");
+    }
+    if (config_.experimental_west_supercritical_stage && config_.experimental_west_discharge_m3s < 0.0) {
+        throw std::runtime_error("Mixed-regime inlet stage requires explicit prescribed discharge.");
+    }
+    if (config_.experimental_west_discharge_m3s >= 0.0) {
+        const auto* west = boundary_for_edge(scenario_, "west");
+        if (config_.solver_mode != "finite_volume" || !config_.disable_fixture_calibrations ||
+            config_.spatial_order != 2 || config_.boundary_mode != "scenario" ||
+            west == nullptr || west->kind != "inflow" || !west->has_stage || west->has_depth) {
+            throw std::runtime_error("Experimental discharge requires uncalibrated MUSCL and a west inflow stage defining its wetted footprint.");
+        }
+    }
     recompute_state(state_);
 }
 
@@ -116,6 +131,7 @@ void ReducedShallowWaterSolver::step_reduced(double dt) {
 }
 
 void ReducedShallowWaterSolver::step_finite_volume(double dt) {
+    RAFTSIM_PROFILE_SCOPE(total_profile, Total);
     if (finite_volume_fixture_geoclaw_profile_enabled(scenario_, config_)) {
         apply_boundaries();
         WaterState next = state_;
@@ -126,7 +142,17 @@ void ReducedShallowWaterSolver::step_finite_volume(double dt) {
         return;
     }
     double stable_dt = finite_volume_stable_dt();
-    int substeps = std::max(1, static_cast<int>(std::ceil(dt / std::max(stable_dt, 1.0e-9))));
+    const double required_substeps = std::ceil(dt / stable_dt);
+    // A corrupted/highly unstable state must not turn one frame into millions
+    // of hidden CFL iterations (or overflow the integer conversion). This is
+    // failure detection, not a clamp that advances physics at an unsafe dt.
+    if (!std::isfinite(stable_dt) || stable_dt <= 0.0 ||
+        !std::isfinite(required_substeps) || required_substeps > 4096.0) {
+        throw std::runtime_error("Finite-volume CFL work limit exceeded at time=" +
+            std::to_string(time_) + " stable_dt=" + std::to_string(stable_dt) +
+            " requested_dt=" + std::to_string(dt));
+    }
+    int substeps = std::max(1, static_cast<int>(required_substeps));
     double sub_dt = dt / static_cast<double>(substeps);
     for (int i = 0; i < substeps; ++i) {
         step_finite_volume_once(sub_dt);
@@ -159,14 +185,72 @@ bool ReducedShallowWaterSolver::finite_volume_second_order_enabled() const {
 // (h, eta, u, v) with well-balanced hydrostatic interface states. Friction and
 // feature forcing are intentionally excluded; the caller applies them once per
 // substep after combining the Heun stages.
+BoundaryMassFluxes ReducedShallowWaterSolver::inspect_boundary_mass_fluxes() const {
+    if (config_.solver_mode != "finite_volume" || !config_.disable_fixture_calibrations ||
+        !finite_volume_second_order_enabled()) {
+        throw std::runtime_error("Boundary flux inspection requires uncalibrated second-order finite_volume mode.");
+    }
+    BoundaryMassFluxes fluxes;
+    WaterState scratch = state_;
+    // Reuse the exact reconstructed faces and Riemann fluxes used by stepping.
+    // dt=0 and a scratch destination make this a non-mutating instantaneous audit.
+    finite_volume_second_order_flux_update(state_, 0.0, scratch, &fluxes);
+    return fluxes;
+}
+
+NumericalMassFluxGrid ReducedShallowWaterSolver::inspect_numerical_mass_flux_grid() const {
+    if (config_.solver_mode != "finite_volume" || !config_.disable_fixture_calibrations ||
+        !finite_volume_second_order_enabled()) {
+        throw std::runtime_error("Face flux inspection requires uncalibrated second-order finite_volume mode.");
+    }
+    NumericalMassFluxGrid fluxes{Array2D(scenario_.grid.ny, scenario_.grid.nx+1),
+                                 Array2D(scenario_.grid.ny+1, scenario_.grid.nx)};
+    WaterState scratch = state_;
+    finite_volume_second_order_flux_update(state_, 0.0, scratch, nullptr, &fluxes);
+    return fluxes;
+}
+
 void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     const WaterState& from,
     double dt,
-    WaterState& to
+    WaterState& to,
+    BoundaryMassFluxes* boundary_fluxes,
+    NumericalMassFluxGrid* face_fluxes
 ) const {
+    RAFTSIM_PROFILE_SCOPE(reconstruction_profile, Reconstruction);
     const std::size_t ny = scenario_.grid.ny;
     const std::size_t nx = scenario_.grid.nx;
     const bool bed_coupling = config_.bed_slope_source_scale != 0.0;
+    const bool prescribed_west = config_.experimental_west_discharge_m3s >= 0.0;
+    double west_conveyance = 0.0;
+    double west_outward_discharge = 0.0;
+    std::vector<bool> west_inlet;
+    if (prescribed_west) {
+        west_inlet.resize(ny, false);
+        const auto* boundary = boundary_for_edge(scenario_, "west");
+        for (std::size_t row = 0; row < ny; ++row) {
+            // Keep the external inflow segment inside its authored wetted
+            // cross-section. Stage defines this fixed footprint only; it does
+            // not constrain the evolving free surface in the inlet segment.
+            west_inlet[row] = boundary->stage - scenario_.bed(row, 0) > config_.dry_tolerance;
+            if (!west_inlet[row]) continue;
+            const double h = from.h(row, 0);
+            if (h > config_.dry_tolerance) {
+                const double c = std::sqrt(config_.gravity * h);
+                if (from.u(row, 0) <= -c) {
+                    // Both characteristics leave through this face (typically a
+                    // draining wet/dry fringe). Extrapolate its outgoing flux;
+                    // compensate in the subcritical inflow so net Q stays exact.
+                    west_outward_discharge += h * from.u(row, 0) * scenario_.grid.dy;
+                } else {
+                    west_conveyance += std::pow(h, 5.0 / 3.0) * scenario_.grid.dy;
+                }
+            }
+        }
+        if (west_conveyance <= 1e-12) {
+            throw std::runtime_error("Experimental discharge needs a wet subcritical inlet segment.");
+        }
+    }
 
     // With bed coupling disabled (bed_slope_source_scale == 0) the legacy contract is
     // that topography does not influence the finite-volume dynamics, so the bed is
@@ -174,14 +258,30 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     auto cell_bed = [&](std::size_t row, std::size_t col) -> double {
         return bed_coupling ? scenario_.bed(row, col) : 0.0;
     };
-    auto cell_primitive = [&](std::size_t row, std::size_t col) -> solver_detail::MusclFaceState {
-        double h = std::max(0.0, from.h(row, col));
-        if (h <= config_.dry_tolerance) {
-            return solver_detail::MusclFaceState{0.0, cell_bed(row, col), 0.0, 0.0};
+    // Each immutable RK stage revisits the same primitives for slopes and
+    // opposite faces. Materialize them once; do not cache across stages or
+    // replace_state(), where depths and wet/dry transitions may have changed.
+    std::vector<solver_detail::MusclFaceState> primitives(ny * nx);
+    for (std::size_t row = 0; row < ny; ++row) {
+        for (std::size_t col = 0; col < nx; ++col) {
+            const double h = std::max(0.0, from.h(row, col));
+            // Dry tolerance suppresses velocity, never positive film volume.
+            primitives[row * nx + col] = solver_detail::MusclFaceState{
+                h, cell_bed(row, col) + h,
+                h <= config_.dry_tolerance ? 0.0 : from.u(row, col),
+                h <= config_.dry_tolerance ? 0.0 : from.v(row, col)};
         }
-        return solver_detail::MusclFaceState{h, cell_bed(row, col) + h, from.u(row, col), from.v(row, col)};
+    }
+    auto cell_primitive = [&](std::size_t row, std::size_t col) -> const solver_detail::MusclFaceState& {
+        return primitives[row * nx + col];
     };
     auto ghost_primitive = [&](std::size_t row, std::size_t col, const char* edge) -> solver_detail::MusclFaceState {
+        // A flow boundary must not also pin stage/velocity during reconstruction.
+        if (prescribed_west && std::string(edge) == "west") {
+            auto ghost = cell_primitive(row, col);
+            if (!west_inlet[row]) ghost.u = -ghost.u;
+            return ghost;
+        }
         ConservedState q = boundary_conserved(scenario_, from, config_, row, col, edge);
         if (q.h <= config_.dry_tolerance) {
             return solver_detail::MusclFaceState{0.0, cell_bed(row, col), 0.0, 0.0};
@@ -216,9 +316,17 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
                 slope.y_u = 0.5 * mc_limited(center.u - south.u, north.u - center.u);
                 slope.y_v = 0.5 * mc_limited(center.v - south.v, north.v - center.v);
             }
+            if (config_.disable_fixture_calibrations) {
+                // On a cell-constant bed the opposite face depths must remain
+                // nonnegative and average to the cell depth before hydrostatic
+                // reconstruction. Limit the free-surface half-slopes accordingly.
+                slope.x_eta = clamp(slope.x_eta, -center.h, center.h);
+                slope.y_eta = clamp(slope.y_eta, -center.h, center.h);
+            }
         }
     }
 
+    RAFTSIM_PROFILE_FINISH(reconstruction_profile);
     // The bed at each face shared by two wet cells across a smooth bed variation is
     // the arithmetic mean of the adjacent cell-center beds (a continuous piecewise-
     // linear bed); the face depth derives from the reconstructed free surface minus
@@ -232,7 +340,12 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     auto build_face = [&](std::size_t row, std::size_t col, bool has_wet_neighbor, double neighbor_bed,
                           double eta_face, double u_face, double v_face) -> solver_detail::MusclFaceState {
         double center_bed = cell_bed(row, col);
-        bool average_bed = has_wet_neighbor && !is_abrupt_bed_jump(center_bed, neighbor_bed);
+        // The uncalibrated hydrostatic scheme uses the stored bed on each side.
+        // Averaging unrelated face beds can create more reconstructed face water
+        // than a shallow cell contains; clipping its drained depth then destroys
+        // the mass/momentum balance. No source bed or collision vertex is altered.
+        bool average_bed = !config_.disable_fixture_calibrations &&
+            has_wet_neighbor && !is_abrupt_bed_jump(center_bed, neighbor_bed);
         double face_bed = average_bed ? 0.5 * (center_bed + neighbor_bed) : center_bed;
         double h_face = std::max(0.0, eta_face - face_bed);
         return solver_detail::MusclFaceState{h_face, h_face > 0.0 ? face_bed + h_face : eta_face, u_face, v_face};
@@ -300,27 +413,92 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
         return solver_detail::MusclFaceState{state.h, state.eta, state.u, -state.v};
     };
 
+    // Interior faces are shared by adjacent cells. Retain the complete pair:
+    // hydrostatic bed corrections differ on its two sides. A rolling row uses
+    // O(nx) storage, and never survives this immutable-from RK stage.
+    RAFTSIM_PROFILE_SCOPE(flux_profile, Flux);
+    std::vector<InterfaceFluxPair> previous_north(nx);
+    std::vector<bool> previous_north_valid(nx, false);
     for (std::size_t row = 0; row < ny; ++row) {
+        InterfaceFluxPair previous_east{};
+        bool previous_east_valid = false;
         for (std::size_t col = 0; col < nx; ++col) {
             solver_detail::MusclFaceState center = cell_primitive(row, col);
+            // Captured Cartesian corridors contain a large dry hillside area.
+            // An interior cell and its four neighbours at exactly zero depth
+            // have identically zero mass/momentum flux. Skip their Riemann work,
+            // not shoreline cells, positive films, or external boundary faces.
+            // Re-evaluate each RK stage so advancing wet fronts remain active.
+            if (center.h == 0.0 && row > 0 && row + 1 < ny && col > 0 && col + 1 < nx &&
+                from.h(row, col - 1) == 0.0 && from.h(row, col + 1) == 0.0 &&
+                from.h(row - 1, col) == 0.0 && from.h(row + 1, col) == 0.0) {
+                to.h(row, col) = 0.0;
+                to.u(row, col) = 0.0;
+                to.v(row, col) = 0.0;
+                previous_east_valid = false;
+                previous_north_valid[col] = false;
+                continue;
+            }
             solver_detail::MusclFaceState center_west = west_face(row, col);
             solver_detail::MusclFaceState center_east = east_face(row, col);
             solver_detail::MusclFaceState center_south = south_face(row, col);
             solver_detail::MusclFaceState center_north = north_face(row, col);
 
-            InterfaceFluxPair west_pair = muscl_hydrostatic_flux_x(
+            InterfaceFluxPair west_pair = previous_east_valid ? previous_east : muscl_hydrostatic_flux_x(
                 col > 0 ? east_face(row, col - 1)
-                        : (west_wall ? mirror_x(center_west) : ghost_primitive(row, col, "west")),
+                        : ((west_wall || (prescribed_west && !west_inlet[row]))
+                            ? mirror_x(center_west) : ghost_primitive(row, col, "west")),
                 center_west,
                 bed_coupling,
                 config_);
+            if (prescribed_west && col == 0 && west_inlet[row] && center_west.h > config_.dry_tolerance &&
+                center_west.u > -std::sqrt(config_.gravity * center_west.h)) {
+                // Split total Q by local depth-based conveyance. Preserve the
+                // outgoing shallow-water characteristic u-2*sqrt(g*h), solving
+                // q/h-2*sqrt(g*h)=Rminus for the free boundary depth. Apply the
+                // physical face flux directly so the integrated mass flux is Q,
+                // not the flux of another imposed-stage ghost Riemann problem.
+                const double q = (config_.experimental_west_discharge_m3s - west_outward_discharge) *
+                    std::pow(from.h(row, 0), 5.0 / 3.0) / west_conveyance;
+                const double invariant = center_west.u - 2.0 * std::sqrt(config_.gravity * center_west.h);
+                const bool incoming_supercritical = center_west.u >= std::sqrt(config_.gravity * center_west.h);
+                if (incoming_supercritical && !config_.experimental_west_supercritical_stage)
+                    throw std::runtime_error("Experimental discharge requires a subcritical inlet characteristic: row=" +
+                        std::to_string(row) + " h=" + std::to_string(center_west.h) +
+                        " u=" + std::to_string(center_west.u) + " time=" + std::to_string(time_));
+                double low = 0.0;
+                double high = std::max(1.0, center_west.h);
+                auto residual = [&](double h) { return q / h - 2.0 * std::sqrt(config_.gravity * h) - invariant; };
+                while (residual(high) > 0.0) high *= 2.0;
+                for (int iteration = 0; iteration < 56; ++iteration) {
+                    const double mid = 0.5 * (low + high);
+                    if (residual(mid) > 0.0) low = mid; else high = mid;
+                }
+                double h = 0.5 * (low + high);
+                if (config_.experimental_west_supercritical_stage &&
+                    (incoming_supercritical || q / h >= std::sqrt(config_.gravity * h))) {
+                    // There is no outgoing characteristic to preserve at a
+                    // supercritical inlet. Supply the second external datum,
+                    // rather than extrapolating an interior invariant or
+                    // silently deleting the shallow bank's discharge.
+                    const auto* boundary = boundary_for_edge(scenario_, "west");
+                    h = boundary->stage - scenario_.bed(row, 0);
+                    if (h <= config_.dry_tolerance) {
+                        throw std::runtime_error("Mixed-regime inlet stage is dry at an active inflow face.");
+                    }
+                } else if (q / h >= std::sqrt(config_.gravity * h)) {
+                    throw std::runtime_error("Experimental discharge cannot impose a supercritical inflow with one characteristic.");
+                }
+                const FluxState flux{q, q * q / h + 0.5 * config_.gravity * h * h, q * center_west.v};
+                west_pair = InterfaceFluxPair{flux, flux};
+            }
             InterfaceFluxPair east_pair = muscl_hydrostatic_flux_x(
                 center_east,
                 col + 1 < nx ? west_face(row, col + 1)
                              : (east_wall ? mirror_x(center_east) : ghost_primitive(row, col, "east")),
                 bed_coupling,
                 config_);
-            InterfaceFluxPair south_pair = muscl_hydrostatic_flux_y(
+            InterfaceFluxPair south_pair = previous_north_valid[col] ? previous_north[col] : muscl_hydrostatic_flux_y(
                 row > 0 ? north_face(row - 1, col)
                         : (south_wall ? mirror_y(center_south) : ghost_primitive(row, col, "south")),
                 center_south,
@@ -332,10 +510,28 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
                              : (north_wall ? mirror_y(center_north) : ghost_primitive(row, col, "north")),
                 bed_coupling,
                 config_);
+            previous_east = east_pair;
+            previous_east_valid = true;
+            previous_north[col] = north_pair;
+            previous_north_valid[col] = true;
             const FluxState& flux_w = west_pair.right;
             const FluxState& flux_e = east_pair.left;
             const FluxState& flux_s = south_pair.right;
             const FluxState& flux_n = north_pair.left;
+
+            if (face_fluxes != nullptr) {
+                if (col == 0) face_fluxes->x_faces(row, 0) = flux_w.h;
+                face_fluxes->x_faces(row, col+1) = flux_e.h;
+                if (row == 0) face_fluxes->y_faces(0, col) = flux_s.h;
+                face_fluxes->y_faces(row+1, col) = flux_n.h;
+            }
+
+            if (boundary_fluxes != nullptr) {
+                if (col == 0) boundary_fluxes->west += flux_w.h * scenario_.grid.dy;
+                if (col + 1 == nx) boundary_fluxes->east -= flux_e.h * scenario_.grid.dy;
+                if (row == 0) boundary_fluxes->south += flux_s.h * scenario_.grid.dx;
+                if (row + 1 == ny) boundary_fluxes->north -= flux_n.h * scenario_.grid.dx;
+            }
 
             double h_next = center.h -
                 dt * ((flux_e.h - flux_w.h) / scenario_.grid.dx + (flux_n.h - flux_s.h) / scenario_.grid.dy);
@@ -360,7 +556,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
 
             h_next = std::max(0.0, h_next);
             if (h_next <= config_.dry_tolerance) {
-                to.h(row, col) = 0.0;
+                to.h(row, col) = h_next;
                 to.u(row, col) = 0.0;
                 to.v(row, col) = 0.0;
                 continue;
@@ -375,12 +571,25 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
 void ReducedShallowWaterSolver::step_finite_volume_once_second_order(double dt) {
     // Heun (SSP RK2) time integration over the MUSCL spatial operator, followed by
     // the same friction damping and feature forcing treatment as the legacy path.
-    WaterState predictor = state_;
+    auto ensure_primitives = [&](WaterState& scratch) {
+        if (scratch.h.empty()) {
+            scratch.h = Array2D(scenario_.grid.ny, scenario_.grid.nx);
+            scratch.u = Array2D(scenario_.grid.ny, scenario_.grid.nx);
+            scratch.v = Array2D(scenario_.grid.ny, scenario_.grid.nx);
+        }
+    };
+    ensure_primitives(muscl_predictor_);
+    ensure_primitives(muscl_corrector_);
+    WaterState& predictor = muscl_predictor_;
     finite_volume_second_order_flux_update(state_, dt, predictor);
-    WaterState corrector = predictor;
+    WaterState& corrector = muscl_corrector_;
     finite_volume_second_order_flux_update(predictor, dt, corrector);
 
-    WaterState next = state_;
+    if (muscl_next_.h.empty()) {
+        muscl_next_ = state_;
+    }
+    WaterState& next = muscl_next_;
+    RAFTSIM_PROFILE_SCOPE(combine_profile, CombineFriction);
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
             double h_start = std::max(0.0, state_.h(row, col));
@@ -389,7 +598,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once_second_order(double dt) 
             double hu_next = 0.5 * (h_start * state_.u(row, col) + h_end * corrector.u(row, col));
             double hv_next = 0.5 * (h_start * state_.v(row, col) + h_end * corrector.v(row, col));
             if (h_next <= config_.dry_tolerance) {
-                next.h(row, col) = 0.0;
+                next.h(row, col) = h_next;
                 next.u(row, col) = 0.0;
                 next.v(row, col) = 0.0;
                 continue;
@@ -405,11 +614,14 @@ void ReducedShallowWaterSolver::step_finite_volume_once_second_order(double dt) 
             next.v(row, col) = clamp(v_next * damping, -config_.max_velocity, config_.max_velocity);
         }
     }
+    RAFTSIM_PROFILE_FINISH(combine_profile);
     if (config_.feature_strength_scale > 0.0) {
         apply_feature_forcing(dt, next);
     }
     recompute_state(next);
-    state_ = std::move(next);
+    // Keep both full-state allocations for the next step. Every primitive is
+    // assigned above, and recompute_state overwrites every derived field.
+    std::swap(state_, muscl_next_);
 }
 
 void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
@@ -1045,6 +1257,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
 }
 
 double ReducedShallowWaterSolver::finite_volume_stable_dt() const {
+    RAFTSIM_PROFILE_SCOPE(cfl_profile, CFL);
     double max_speed = 0.0;
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
@@ -1205,6 +1418,7 @@ void ReducedShallowWaterSolver::apply_feature_forcing(double dt, WaterState& nex
 }
 
 void ReducedShallowWaterSolver::recompute_state(WaterState& next) const {
+    RAFTSIM_PROFILE_SCOPE(recompute_profile, Recompute);
     for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
             double h = std::max(0.0, next.h(row, col));
@@ -1252,7 +1466,7 @@ double compute_mass(const Scenario& scenario, const WaterState& state) {
     return sum * scenario.grid.dx * scenario.grid.dy;
 }
 
-ValidationSummary validate_frames(const Scenario& scenario, const std::vector<Frame>& frames, const SolverConfig&) {
+ValidationSummary validate_frames(const Scenario& scenario, const std::vector<Frame>& frames, const SolverConfig& config) {
     if (frames.empty()) {
         return {};
     }
@@ -1266,10 +1480,22 @@ ValidationSummary validate_frames(const Scenario& scenario, const std::vector<Fr
         for (std::size_t row = 0; row < scenario.grid.ny; ++row) {
             for (std::size_t col = 0; col < scenario.grid.nx; ++col) {
                 summary.max_velocity = std::max(summary.max_velocity, std::hypot(frame.state.u(row, col), frame.state.v(row, col)));
+                summary.finite_state = summary.finite_state &&
+                    std::isfinite(frame.state.h(row,col)) && std::isfinite(frame.state.eta(row,col)) &&
+                    std::isfinite(frame.state.u(row,col)) && std::isfinite(frame.state.v(row,col)) &&
+                    std::isfinite(frame.state.hu(row,col)) && std::isfinite(frame.state.hv(row,col));
+                // The runtime safety clamp is not proof of physically bounded
+                // flow. A component clamped at 60 m/s used to pass the unrelated
+                // 100 m/s magnitude threshold even during a numerical blow-up.
+                summary.velocity_limit_reached = summary.velocity_limit_reached ||
+                    std::abs(frame.state.u(row,col)) >= config.max_velocity * (1.0 - 1e-9) ||
+                    std::abs(frame.state.v(row,col)) >= config.max_velocity * (1.0 - 1e-9);
             }
         }
     }
-    summary.passed = summary.min_depth >= -1.0e-9 && summary.max_velocity <= 100.0 && summary.mass_relative_drift <= 0.50;
+    summary.passed = summary.finite_state && !summary.velocity_limit_reached &&
+        std::isfinite(summary.mass_relative_drift) && summary.min_depth >= -1.0e-9 &&
+        summary.max_velocity <= 100.0 && summary.mass_relative_drift <= 0.50;
     return summary;
 }
 

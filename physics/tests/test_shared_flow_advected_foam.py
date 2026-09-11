@@ -105,12 +105,14 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert "if (bSingleLiveWaterSurfaceEnabled)" in runtime
     assert "HideBreakingLipMesh();" in runtime
     assert "HideBreakingRollerVolumeMesh();" in runtime
-    assert 'TEXT("HydraulicFoamColorBreakupBias"), 0.06f' in runtime
-    assert 'TEXT("HydraulicFoamColorBreakupGain"), 1.08f' in runtime
+    assert 'TEXT("HydraulicFoamColorBreakupBias"), bRebaseWaterTextureCoordinates ? 0.0f : 0.06f' in runtime
+    assert 'TEXT("HydraulicFoamColorBreakupGain"), bRebaseWaterTextureCoordinates ? 3.0f : 1.08f' in runtime
     assert 'TEXT("DriftFoamOpacity"), 0.0f' in runtime
-    assert 'TEXT("CalmRippleStrength"), 0.025f' in runtime
-    assert 'TEXT("FlowRippleStrength"), 0.22f' in runtime
-    assert 'TEXT("FoamRippleStrength"), 0.48f' in runtime
+    assert 'TEXT("CalmRippleStrength"), bRebaseWaterTextureCoordinates ? 0.08f : 0.0f' in runtime
+    assert 'TEXT("FlowRippleStrength"), bRebaseWaterTextureCoordinates ? 0.14f : 0.0f' in runtime
+    assert 'TEXT("FoamRippleStrength"), bRebaseWaterTextureCoordinates ? 0.25f : 0.0f' in runtime
+    assert 'TEXT("AnalyticChopStrength"), 0.0f' in runtime
+    assert 'TEXT("RippleGrazingFloor"), bRebaseWaterTextureCoordinates ? 0.50f : 0.015f' in runtime
     assert 'TEXT("LiveFlowStreakRoughness"), 0.0f' in runtime
     assert 'TEXT("LiveFlowStreakTint"), 0.0f' in runtime
     assert 'TEXT("FlowStreakRoughness"), 0.0f' in runtime
@@ -119,17 +121,20 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert 'TEXT("FallbackSkyReflectionVariation"), 0.0f' in runtime
     assert 'TEXT("FallbackSkyReflectionFloor"), 1.0f' in runtime
     assert 'TEXT("SouthForkTravelingWaveWPOStrength"), 0.0f' in runtime
-    assert 'TEXT("SouthForkTurbulenceWPOStrength"), 1.0f' in runtime
+    assert 'TEXT("RaftSimLocalFluidWPOStrength")' in runtime
     assert "bHasTravelingWaveWPOStrengthParameter" in runtime
     assert "LegacyMaterialWPOCounterM = 0.012f" in runtime
     assert "PresentationWaveClockSeconds = 0.0f" in runtime
-    assert "bSingleLiveWaterSurfaceEnabled ? 32 : 1" in runtime
+    assert "bSingleLiveWaterSurfaceEnabled ? 16 : 1" in runtime
+    assert "HydraulicSourceSurfaceHeightMeters" in runtime
+    assert "PassIndex == 3" in runtime
     assert "bSingleLiveWaterSurfaceEnabled ||" in runtime
     assert "bSingleLiveWaterSurfaceEnabled\n            ? 1.0f" in runtime
-    assert "ResolvedPresentationStandingWaveScale = bSingleLiveWaterSurfaceEnabled" in runtime
+    assert "ResolvedPresentationStandingWaveScale = bLiveSurfaceCarrierEnabled" in runtime
     assert "FMath::Max(ConfiguredLiveFoamIntensity, 0.90f)" in runtime
     assert "bSingleLiveWaterSurfaceEnabled ? 0.12f : 0.55f" in runtime
-    assert "0.028f * SpeedEnvelope" in runtime
+    assert "ComputeCoupledRapidGradeWaveMeters" in runtime
+    assert "ComputeCoupledHydraulicFeatureEnergy" in runtime
     assert "FoamAttackBlend" in runtime
     assert "SourceFoam[Index] > Advected" in runtime
     assert "RaftSimUnifiedCurrentWaterSurface" in material
@@ -148,22 +153,22 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert 'TEXT("UnifiedSurfaceFeatureScaleBlend"), 0.55f' in material
     assert 'TEXT("UnifiedSurfaceFeatureSpeedGain"), 4.5f' in material
     assert 'TEXT("UnifiedSurfaceFeatureFoamGain"), 1.5f' in material
-    assert 'TEXT("UnifiedSurfaceFeatureDark"), 0.68f' in material
-    assert 'TEXT("UnifiedSurfaceFeatureBright"), 1.03f' in material
-    assert 'TEXT("UnifiedSurfaceFeatureStrength"), 0.85f' in material
-    assert 'TEXT("UnifiedSurfaceFeatureRoughness"), 0.12f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureDark"), 0.92f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureBright"), 1.02f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureStrength"), 0.22f' in material
+    assert 'TEXT("UnifiedSurfaceFeatureRoughness"), 0.035f' in material
     assert 'TEXT("LiveSolverFoamGlowFloor"), 0.45f' not in material
     assert 'TEXT("SolverFoamOpacityGain"), 0.55f' not in material
     assert "MetersToUv->R = -UTiling * SlipFactor / 3.0f" in material
     assert "MetersToUv->G = -VTiling * SlipFactor / 3.0f" in material
-    assert "M_RaftSim_SouthForkRaftTransmissionWaterV2" in south_fork
-    assert 'TEXT("HydraulicFoamColorBreakupBias")), 0.06f' in south_fork
-    assert 'TEXT("HydraulicFoamColorBreakupGain")), 1.08f' in south_fork
+    assert "M_RaftSim_SouthForkRaftTransmissionWaterV4" in south_fork
+    assert 'TEXT("HydraulicFoamColorBreakupBias")), 0.0f' in south_fork
+    assert 'TEXT("HydraulicFoamColorBreakupGain")), 3.0f' in south_fork
     assert 'TEXT("DriftFoamAerationGain")), 0.0f' in south_fork
     assert 'TEXT("DriftFoamSpeedGain")), 0.0f' in south_fork
-    assert 'TEXT("CalmRippleStrength")), 0.0f' in south_fork
-    assert 'TEXT("FlowRippleStrength")), 0.0f' in south_fork
-    assert 'TEXT("FoamRippleStrength")), 0.0f' in south_fork
+    assert 'TEXT("CalmRippleStrength")), 0.08f' in south_fork
+    assert 'TEXT("FlowRippleStrength")), 0.14f' in south_fork
+    assert 'TEXT("FoamRippleStrength")), 0.25f' in south_fork
     assert 'TEXT("LiveFlowStreakRoughness")), 0.0f' in south_fork
     assert 'TEXT("LiveFlowStreakTint")), 0.0f' in south_fork
     assert 'TEXT("FlowStreakRoughness")), 0.0f' in south_fork
@@ -173,10 +178,17 @@ def test_single_water_surface_owns_foam_without_a_flashing_second_sheet() -> Non
     assert 'TEXT("FallbackSkyReflectionFloor")), 1.0f' in south_fork
     assert 'TEXT("SouthForkTravelingWaveWPOStrength")), 0.0f' in south_fork
     assert "RaftSimTravelingBakeWaveWPOStrengthGate" in south_fork
-    assert "RaftSimSingleSurfaceTurbulenceWPO" in south_fork
+    assert "RaftSimRaftLocalGpuFluidWPOV5" in south_fork
     assert 'TEXT("SouthForkTurbulenceWPOStrength")' in south_fork
     assert 'TEXT("RaftSimFoamAdvectionMeters"), false' in south_fork
-    assert "float2 p = UV * 3.0 - FlowDisplacement.xy" in south_fork
+    assert "float2 stationaryP = UV * 3.0" in south_fork
+    assert "float2 advectedP = stationaryP - FlowDisplacement.xy" in south_fork
+    assert "Axis-free cellular crest clusters and current-carried boils" in south_fork
+    assert "float anchorNoise = saturate" in south_fork
+    assert "float boilNoiseA = lerp" in south_fork
+    assert "clamp(rapid * (anchoredRelief + carriedBoils), -0.50, 0.78)" in south_fork
+    assert "float anchorWarpA = sin" not in south_fork
+    assert "float brokenChop = sin" not in south_fork
     assert "displacementM * 100.0 * Strength" in south_fork
 
 

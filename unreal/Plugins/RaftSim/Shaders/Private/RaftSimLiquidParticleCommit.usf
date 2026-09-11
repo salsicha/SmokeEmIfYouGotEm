@@ -1,0 +1,48 @@
+#include "/Engine/Public/Platform.ush"
+uint Owners;
+uint Owner;
+uint TotalCapacity;
+uint WordOffset;
+uint HandleTableOffset;
+uint HandleCapacity;
+uint FloatComponents;
+uint IntComponents;
+uint IndexComponent;
+uint TagComponent;
+uint FloatStride;
+uint IntStride;
+uint IDCapacity;
+uint CountOffset;
+StructuredBuffer<uint> Capacities;
+StructuredBuffer<uint> Counts;
+RWStructuredBuffer<uint> Control;
+StructuredBuffer<uint> CommitControl;
+StructuredBuffer<uint> Words;
+StructuredBuffer<int2> Handles;
+StructuredBuffer<int> HandleTable;
+RWBuffer<float> NativeFloats;
+RWBuffer<int> NativeIntegers;
+RWBuffer<int> NativeIDTable;
+RWBuffer<uint> NativeCounts;
+
+[numthreads(1,1,1)]
+void GateCS(uint3 Id:SV_DispatchThreadID)
+{
+    for(uint owner=0;owner<Owners;++owner) if(Counts[owner]>Capacities[owner]) Control[1]|=32;
+    Control[0]=Control[1]==0?1:0;
+}
+
+[numthreads(64,1,1)]
+void CommitCS(uint3 Id:SV_DispatchThreadID)
+{
+    if(CommitControl[0]==0) return;
+    uint i=Id.x,n=Counts[Owner];
+    if(i==0) NativeCounts[CountOffset]=n;
+    if(i<IDCapacity) NativeIDTable[i]=i<HandleCapacity?HandleTable[HandleTableOffset+i]:-1;
+    if(i>=n) return;
+    uint p=WordOffset+i;
+    for(uint c=0;c<FloatComponents;++c) NativeFloats[c*FloatStride+i]=asfloat(Words[c*TotalCapacity+p]);
+    int2 handle=Handles[p];
+    for(uint c=0;c<IntComponents;++c)
+        NativeIntegers[c*IntStride+i]=c==IndexComponent?handle.x:c==TagComponent?handle.y:asint(Words[(FloatComponents+c)*TotalCapacity+p]);
+}

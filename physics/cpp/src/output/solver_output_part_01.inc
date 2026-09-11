@@ -77,6 +77,8 @@ void write_solver_output(
             << "  \"mass_final\": " << validation.mass_final << ",\n"
             << "  \"mass_relative_drift\": " << validation.mass_relative_drift << ",\n"
             << "  \"max_velocity\": " << validation.max_velocity << ",\n"
+            << "  \"finite_state\": " << (validation.finite_state ? "true" : "false") << ",\n"
+            << "  \"velocity_limit_reached\": " << (validation.velocity_limit_reached ? "true" : "false") << ",\n"
             << "  \"min_depth\": " << validation.min_depth << "\n"
             << "}\n";
     }
@@ -103,6 +105,8 @@ void write_solver_output(
                  << "  \"preserve_initial_mass\": " << (config.preserve_initial_mass ? "true" : "false") << ",\n"
                  << "  \"disable_fixture_calibrations\": true,\n"
                  << "  \"fixture_calibration_mode\": \"disabled\",\n"
+                 << "  \"experimental_west_discharge_m3s\": " << config.experimental_west_discharge_m3s << ",\n"
+                 << "  \"experimental_west_supercritical_stage\": " << (config.experimental_west_supercritical_stage ? "true" : "false") << ",\n"
                  << "  \"cascading\": {\n"
                  << "    \"present\": " << (scenario.cascading.present ? "true" : "false") << ",\n"
                  << "    \"schema_version\": \"" << json_escape(scenario.cascading.schema_version) << "\",\n"

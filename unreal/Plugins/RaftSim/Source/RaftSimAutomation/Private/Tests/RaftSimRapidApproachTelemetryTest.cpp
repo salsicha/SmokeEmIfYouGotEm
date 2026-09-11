@@ -604,7 +604,7 @@ bool FRaftSimApproachDriftTelemetryCommand::Update()
     // the thick of the rapid for foam coverage.
     const float RideElapsed =
         State->ElapsedSeconds - State->RideStartElapsedSeconds;
-    const float ShotTimes[3] = {8.0f, 8.8f, 20.0f};
+    const float ShotTimes[3] = {8.0f, 8.8f, 36.0f};
     if (State->ScreenshotsFired < 3 &&
         RideElapsed >= ShotTimes[State->ScreenshotsFired])
     {
@@ -756,7 +756,7 @@ bool RunApproachTelemetryOnMap(
 bool FRaftSimTroublemakerApproachDraftTelemetryTest::RunTest(const FString&)
 {
     return RunApproachTelemetryOnMap(
-        *this, TEXT("/Game/RaftSim/Maps/L_Troublemaker"));
+        *this, TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"), 8320.0f);
 }
 
 bool FRaftSimSouthForkApproachDraftTelemetryTest::RunTest(const FString&)

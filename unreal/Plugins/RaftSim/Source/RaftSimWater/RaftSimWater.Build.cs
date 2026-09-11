@@ -26,6 +26,21 @@ public class RaftSimWater : ModuleRules
         if (File.Exists(SolverLib))
         {
             PublicAdditionalLibraries.Add(SolverLib);
+            // Rebuilding the first-party archive must invalidate cached UBT
+            // dependency state; otherwise a successful editor build can keep
+            // running the previous solver after build_solver_lib.ps1.
+            ExternalDependencies.Add(SolverLib);
+            // ExternalDependencies invalidates the UBT makefile but does not
+            // reliably dirty already-linked modular DLLs when this archive is
+            // rebuilt outside UBT. Put its content identity in the compile
+            // environment so every linked consumer actually rebuilds.
+            using (var SolverStream = File.OpenRead(SolverLib))
+            using (var SolverHash = System.Security.Cryptography.SHA256.Create())
+            {
+                string SolverDigest = BitConverter.ToString(
+                    SolverHash.ComputeHash(SolverStream)).Replace("-", "").ToLowerInvariant();
+                PublicDefinitions.Add("RAFTSIM_LIVE_SOLVER_BUILD_SHA256=\"" + SolverDigest + "\"");
+            }
             PublicDefinitions.Add("RAFTSIM_HAS_LIVE_SOLVER=1");
             bEnableExceptions = true;
             // The solver archive inflates compressed .npy payloads; macOS

@@ -434,7 +434,12 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
     }
 
     Instance->Modify();
-    Instance->SetParentEditorOnly(SharedTransmissionParent);
+    UMaterial* CurrentParent = LoadOrCreateCurrentGradientWaterParent(
+        SharedTransmissionParent->GetMaterial(),
+        TEXT("/Game/RaftSim/Environment/ChilkoRun/Water/Materials/M_RaftSim_ChilkoCurrentWaterV4"),
+        TEXT("Chilko"), 0.045f, 0.18f, OutSummary);
+    if (!CurrentParent) return nullptr;
+    Instance->SetParentEditorOnly(CurrentParent);
     Instance->ClearParameterValuesEditorOnly();
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
     {
@@ -447,11 +452,15 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
         FMaterialParameterInfo(TEXT("WaterFlowNormalCross")), FlowNormal);
     Instance->SetTextureParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("WhitewaterFoamLace")), FoamLace);
-    // These are render-only gains. The shared parent multiplies lace by the
-    // live solver foam/speed mask before every colour and opacity output.
-    SetScalar(TEXT("HydraulicFoamCoverageGain"), 0.64f);
+    // The measured 0.2614 aeration peak was below the inherited 0.28 cutoff.
+    // Reveal the resolved crest signal without whitening clear fast current.
+    SetScalar(TEXT("HydraulicWhitewaterGain"), 0.0f);
+    SetScalar(TEXT("ChilkoCurrentNormalStrength"), 0.18f);
+    SetScalar(TEXT("HydraulicFoamCoverageGain"), 4.0f);
     SetScalar(TEXT("HydraulicFoamColorBreakupGain"), 0.58f);
-    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 0.72f);
+    SetScalar(TEXT("HydraulicFoamColorCoreGain"), 1.8f);
+    SetScalar(TEXT("WhitewaterFrothLaceModulationFloor"), 0.10f);
+    SetScalar(TEXT("HydraulicFoamColorBreakupBias"), 0.0f);
     // Cooked speed alone does not imply entrained air. A small shoulder keeps
     // breaker transitions continuous while the solver foam mask retains sole
     // ownership of the visibly aerated whitewater body.
@@ -471,7 +480,7 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
     // so the earlier clipped-white sheet cannot return.
     SetScalar(TEXT("FallbackSkyReflectionFloor"), 0.38f);
     SetScalar(TEXT("FallbackSkyReflectionVariation"), 0.30f);
-    SetScalar(TEXT("RippleGrazingFloor"), 0.58f);
+    SetScalar(TEXT("RippleGrazingFloor"), 0.12f);
     SetScalar(TEXT("SlickNormalFloor"), 0.62f);
     SetScalar(TEXT("SlickRoughnessScale"), 1.0f);
     SetScalar(TEXT("FresnelSpecular"), 0.10f);
@@ -498,4 +507,14 @@ UMaterialInstanceConstant* LoadOrCreateChilkoLavaCanyonLiveWaterInstance(
         "sky reflection and turbulent slick response.\n");
     return Instance;
 }
+static FAutoConsoleCommand GRefreshChilkoCurrentWater(
+    TEXT("RaftSim.RefreshChilkoCurrentWater"),
+    TEXT("Refresh only Chilko live water and its texture dependencies."),
+    FConsoleCommandDelegate::CreateLambda([]
+    {
+        FString Summary;
+        const bool bReady = LoadOrCreateChilkoLavaCanyonLiveWaterInstance(Summary) != nullptr;
+        UE_LOG(LogRaftSimEditorEnvironment, Display,
+            TEXT("Chilko current water refresh: ready=%d\n%s"), bReady ? 1 : 0, *Summary);
+    }));
 } // namespace RaftSimEditorEnvironment

@@ -37,6 +37,8 @@ def load_and_verify_manifest() -> tuple[dict[str, object], Path]:
         raise RuntimeError("Helmet ownership declaration is missing or changed")
     if manifest.get("physical_cut_through_vents") != 6:
         raise RuntimeError("Production helmet must retain six physical vents")
+    if manifest.get("rear_occipital_shell") is not True:
+        raise RuntimeError("Production helmet must retain molded rear skull coverage")
     if manifest.get("material_slots") != EXPECTED_SLOTS:
         raise RuntimeError(f"Unexpected source slots: {manifest.get('material_slots')}")
     fbx_path = REPO_ROOT / str(manifest["fbx"])
@@ -119,6 +121,9 @@ def configure_and_audit(
     source_triangles = mesh.get_num_triangles(0)
     nanite_settings = subsystem.get_nanite_settings(mesh)
     nanite_settings.enabled = True
+    nanite_settings.fallback_relative_error = 0.0
+    nanite_settings.fallback_percent_triangles = 1.0
+    nanite_settings.fallback_target = unreal.NaniteFallbackTarget.PERCENT_TRIANGLES
     subsystem.set_nanite_settings(mesh, nanite_settings)
     mesh.modify()
     unreal.EditorAssetLibrary.save_loaded_asset(mesh, only_if_is_dirty=False)

@@ -3,14 +3,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
+#include "RaftSimSurfaceRefinement.h"
 
 #include "RaftSimWaterSurfaceActor.generated.h"
 
 class UProceduralMeshComponent;
 class UMaterialInterface;
 class UMaterialParameterCollection;
+class UTextureRenderTarget2D;
+class FRaftSimWaterTextureHistory;
 class ARaftSimRaftActor;
 class URaftSimWaterRuntimeAdapter;
+struct FCollisionQueryParams;
+struct FHitResult;
 
 /**
  * Renders the live solver's free surface (water-rendering v1, P2): a procedural
@@ -27,8 +32,25 @@ class RAFTSIMRAFT_API ARaftSimWaterSurfaceActor : public AActor
 public:
     ARaftSimWaterSurfaceActor();
 
+    // Terrain-only measurement; every ray, including skipped blockers, consumes
+    // the caller's budget. Never changes collision responses or wet physics.
+    static bool TraceTerrainSurface(UWorld* World, const FVector& Start,
+        const FVector& End, const FCollisionQueryParams& Params,
+        int32& RemainingRayBudget, FHitResult& OutHit);
+    void InvalidateMissedTerrainProbes();
+    // Geometry replacement invalidates successful measurements as well.
+    void InvalidateTerrainProbes();
+
     virtual void BeginPlay() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
     virtual void Tick(float DeltaSeconds) override;
+
+    /** Integral UV-period origin keeps half-precision vertex UVs small without
+     * changing the absolute shader phase when the carrier recenters. */
+    static float ComputeWaterTextureOriginMeters(float CenterStationMeters)
+    {
+        return FMath::RoundToFloat(CenterStationMeters / 384.0f) * 384.0f;
+    }
 
     /** Reproduces deterministic presentation-only, phase-warped wave packets
      * over the full-reach seasonal water. It never changes a water sample,
@@ -175,6 +197,28 @@ public:
         bool bEnableNaturalism,
         float NaturalismAmplitudeMeters);
 
+    /** Attenuates presentation-only vertical displacement at a sampled bank.
+     * The outer wet vertex is pinned to the solver surface and the next two
+     * rows ease into full rapid relief. This prevents local GPU turbulence,
+     * hydraulic crests, and wake fields from lifting the carrier over dry
+     * terrain while retaining their full shape in the channel. */
+    static float ComputePresentationShoreDisplacementWeight(
+        int32 LateralIndex,
+        int32 MinimumWetLateralIndex,
+        int32 MaximumWetLateralIndex,
+        float VertexSpacingMeters);
+
+    /** Whether an obstacle centre has enough sampled water around it to own a
+     * pressure pillow and wake. Bank-dressing rocks on the outer wet sample
+     * are excluded so they cannot create standing waves with no visible
+     * in-channel obstruction. */
+    static bool IsBoulderFootprintHydraulicallyExposed(
+        float BoulderLateralMeters,
+        float BoulderRadiusMeters,
+        float MinimumWetLateralMeters,
+        float MaximumWetLateralMeters,
+        float VertexSpacingMeters);
+
     /** Inward-only, sub-cell retreat for the optical core's outermost wet
      * vertex. This changes the visible volume silhouette without changing the
      * sampled surface or wet-cell topology. */
@@ -211,6 +255,8 @@ public:
         FVector WorldVelocityMps = FVector::ZeroVector;
         FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
         float Intensity = 0.0f;
+        FVector2D HydraulicCrestDimensionsMeters = FVector2D::ZeroVector;
+        float HydraulicSpillingFraction = 0.0f;
         float PresentationCoverage = 0.0f;
         float PresentationEdgeClearanceMeters = 0.0f;
         /** Stable phase seed for the organic shape variation built on this
@@ -222,6 +268,9 @@ public:
          * follows the strongest published sites, but eases through membership
          * changes instead of toggling a 30 cm presentation in one refresh. */
         float PresentationWeight = 0.0f;
+        /** Detection lifetime fade, independent of the strongest-site geometry
+         * budget. Local spray can use this without changing raft-support relief. */
+        float PersistenceWeight = 0.0f;
     };
 
     /** Copies the published breaking sites, strongest first, deduplicated to
@@ -230,6 +279,13 @@ public:
      * eased position/intensity and a spawn/despawn fade — so presentation
      * anchored to them never steps between refreshes. */
     void GetBreakingSites(TArray<FBreakingSite>& OutSites) const;
+    /** Bounded lookup on the currently presented single carrier.
+     * Uses known river coordinates, not nearest-bend projection. Rejects dry
+     * cells and measured buried vertices. GPU carrier mode includes its shared
+     * analytic crest, but not GPU perturbation WPO. Presentation-only: never
+     * use this to change hydraulic wetness or as exact particle collision. */
+    bool SampleVisibleCarrierAtRiverCoordinates(const FVector2D& CoordinatesM,
+        FVector& OutPositionCm) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     int32 GetBreakingLipTriangleCount() const
@@ -395,10 +451,12 @@ public:
             : GetLiveSurfaceRenderLiftCm();
     }
 
-    /** Hydraulic crop large enough to contain the complete put-in rapid. */
+    /** High-resolution hydraulic window around and ahead of the raft. The
+     * full 400 m Troublemaker cook remains available on disk, while runtime
+     * solves only the part capable of affecting the next few seconds. */
     static constexpr float GetSouthForkHydraulicWindowLengthMeters()
     {
-        return 400.0f;
+        return 160.0f;
     }
 
     /** South Fork's live optical carrier extends beyond the hydraulic crop.
@@ -430,6 +488,21 @@ public:
         return Vertices.Num();
     }
 
+    bool GetSurfaceRiverBounds(FVector2D& OutMinimum, FVector2D& OutMaximum) const
+    {
+        if (RiverCoordinatesM.IsEmpty()) return false;
+        OutMinimum=RiverCoordinatesM[0]; OutMaximum=RiverCoordinatesM.Last();
+        return true;
+    }
+
+    // Read-only diagnostics of the last carrier submission, before intentional hull masking.
+    const TArray<FLinearColor>& GetPreHullSurfaceColors() const { return VertexColors; }
+    bool GetSubmittedHullMaskPose(FVector& Center, FVector& Forward) const
+    {
+        Center=SubmittedHullMaskCenter; Forward=SubmittedHullMaskForward;
+        return bSubmittedHullMask;
+    }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     int32 GetSurfaceTriangleCount() const
     {
@@ -442,6 +515,10 @@ public:
     void SetBreakingRollerVolumeRenderingEnabled(bool bEnabled);
 
 protected:
+    FVector SubmittedHullMaskCenter=FVector::ZeroVector;
+    FVector SubmittedHullMaskForward=FVector::ForwardVector;
+    bool bSubmittedHullMask=false;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
     TObjectPtr<UProceduralMeshComponent> SurfaceMesh;
 
@@ -507,6 +584,14 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
     float CurvedGridWidthMeters = 96.0f;
 
+    /** Bounded reconstructed rapids can render their entire solved domain.
+     * Keep long streamed rivers raft-following; this does not resize physics. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
+    bool bFixedCurvedGrid = false;
+
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach", meta = (EditCondition = "bFixedCurvedGrid"))
+    float FixedCurvedGridCenterStationMeters = 0.0f;
+
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
     float CurvedGridRecenterDistanceMeters = 32.0f;
 
@@ -563,6 +648,7 @@ protected:
     float BreakingCrestLiftMeters = 0.22f;
 
 private:
+    friend class FRaftSimVisibleSprayCarrierTest;
     void BuildGrid();
     void RefreshSurface();
     void UpdateLiveVolumeCoreInterpolation(float DeltaSeconds);
@@ -578,6 +664,9 @@ private:
     void RebuildBreakingRollerVolumeMesh();
     void HideBreakingRollerVolumeMesh();
     void UpdateRaftFoamExclusionParameters();
+    void UpdateSurfaceCarrierMesh(bool bCreate,const TArray<FLinearColor>& Colors);
+    void UploadMacroSurface(const TArray<FLinearColor>& Colors,bool bResetHistory);
+    void ReleaseMacroHistory();
 
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
@@ -600,8 +689,28 @@ private:
     TArray<FVector> Vertices;
     TArray<FVector2D> RiverCoordinatesM;
     TArray<int32> Triangles;
+    bool bStatefulDetailGeometryReview=false;
+    bool bStatefulGPUCarrierReview=false;
+    bool bStatefulMotionReview=false;
+    bool bStatefulCrestReview=false;
+    TArray<float> MacroCrestDisplacementCm, MacroCrestShoreWeights;
+    TArray<FVector4f> MacroCrestSites; // Two float4 records per physical site.
+    UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> MacroSurfaceTexture;
+    UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> PreviousMacroSurfaceTexture;
+    TSharedPtr<FRaftSimWaterTextureHistory,ESPMode::ThreadSafe> MacroHistory;
+    FRaftSimSurfaceRefinement DetailRefinement;
+    FVector2D DetailRefinementOrigin=FVector2D::ZeroVector;
+    TArray<FVector> RefinedVertices,RefinedNormals;
+    TArray<FVector2D> RefinedUVs,RefinedFlow,RefinedWake;
+    TArray<FVector2D> RefinedMacroCoordinates;
+    TArray<FLinearColor> RefinedColors;
+    TArray<FProcMeshTangent> RefinedTangents;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
+    // ProceduralMeshComponent uploads half-precision UVs. Keep station values
+    // local; the material reconstructs absolute river UVs after interpolation.
+    FVector2D WaterTextureOriginMeters = FVector2D::ZeroVector;
+    bool bRebaseWaterTextureCoordinates = false;
     /** River-space solver velocity in metres per second. Sent through UV1 so
      * the live material can advect detail in both the downstream and lateral
      * directions without sacrificing foam/depth/speed/coverage vertex data. */
@@ -625,6 +734,8 @@ private:
     TArray<FVector> LiveVolumeCoreInterpolationStartNormals;
     TArray<FLinearColor> LiveVolumeCoreInterpolationStartVertexColors;
     TArray<FVector> RenderedLiveVolumeCoreVertices;
+    // Last refresh's live-and-visible, at-least-10-cm-deep source eligibility.
+    TArray<uint8> SprayWetCarrierMask;
     TArray<FVector> RenderedLiveVolumeCoreNormals;
     TArray<FLinearColor> RenderedLiveVolumeCoreVertexColors;
     /** UV1 flow velocity and UV2 wake data interpolate alongside positions.
@@ -747,6 +858,8 @@ private:
     bool bLoggedRaftInteriorWaterTransmission = false;
     FVector LastLoggedRaftInteriorWaterCenter = FVector::ZeroVector;
     bool bLoggedBreakingSiteDiagnostics = false;
+    bool bLoggedBreakingHeightAudit = false;
+    bool bLoggedCrestSamplingAudit = false;
 
     // Persistent foam state advected between refreshes. The field lives on the
     // presentation grid in its 2D working coordinates (river station/lateral in
@@ -788,12 +901,17 @@ private:
     bool bLiveSurfaceCarrierEnabled = false;
     bool bLiveVolumeCoreEnabled = false;
     bool bSingleLiveWaterSurfaceEnabled = false;
+    // Chilko rollout: use the same persistent crest profile as raft support.
+    bool bSharedBreakingReliefEnabled = false;
     /** True once the loaded South Fork parent exposes the explicit WPO gate.
      * Older saved parents are cancelled analytically by the live mesh. */
     bool bHasTravelingWaveWPOStrengthParameter = false;
     float ResolvedCalmLiveSurfaceCoverage = 0.0f;
     float ResolvedActiveLiveSurfaceCoverage = 0.0f;
     bool bLivePresentationSurfaceSmoothingEnabled = false;
+    bool bSouthForkOpticalSmoothingReview = false;
+    bool bSpatialBreakingReview = false;
+    int32 LastLoggedOpticalSmoothingPassCount = INDEX_NONE;
     float ResolvedPresentationSurfaceSmoothingStrength = 0.0f;
     float ResolvedPresentationStandingWaveScale = 1.0f;
     float ResolvedPresentationHydraulicReliefScale = 1.0f;

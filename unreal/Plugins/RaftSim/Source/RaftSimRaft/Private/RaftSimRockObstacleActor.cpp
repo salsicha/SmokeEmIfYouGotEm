@@ -118,7 +118,10 @@ ARaftSimRockObstacleActor::ARaftSimRockObstacleActor()
 void ARaftSimRockObstacleActor::BeginPlay()
 {
     Super::BeginPlay();
-    ApplyWaterlineToMaterials();
+    if (!bContactProxyOnly)
+    {
+        ApplyWaterlineToMaterials();
+    }
 }
 
 void ARaftSimRockObstacleActor::ApplyWaterlineToMaterials()
@@ -202,6 +205,35 @@ void ARaftSimRockObstacleActor::ConfigureContact(
     RebuildVisualGeometry();
 }
 
+void ARaftSimRockObstacleActor::SetContactProxyOnly(bool bInContactProxyOnly)
+{
+    bContactProxyOnly = bInContactProxyOnly;
+    if (RockMesh)
+    {
+        RockMesh->SetVisibility(!bContactProxyOnly, true);
+        if (bContactProxyOnly)
+        {
+            RockMesh->ClearAllMeshSections();
+        }
+    }
+    if (ProductionRockVisual)
+    {
+        ProductionRockVisual->SetVisibility(!bContactProxyOnly, true);
+        if (bContactProxyOnly)
+        {
+            ProductionRockVisual->SetStaticMesh(nullptr);
+        }
+    }
+    if (ReviewedRockVisual)
+    {
+        ReviewedRockVisual->SetVisibility(!bContactProxyOnly, true);
+        if (bContactProxyOnly)
+        {
+            ReviewedRockVisual->SetStaticMesh(nullptr);
+        }
+    }
+}
+
 void ARaftSimRockObstacleActor::SetPreferReviewedVisual(bool bInPreferReviewedVisual)
 {
     // Evidence/gameplay actors call this after SpawnActor has registered the
@@ -238,7 +270,7 @@ void ARaftSimRockObstacleActor::SetReviewedVisualMeshForDiagnostics(UStaticMesh*
 
 void ARaftSimRockObstacleActor::RebuildVisualGeometry()
 {
-    if (RockMesh == nullptr)
+    if (RockMesh == nullptr || bContactProxyOnly)
     {
         return;
     }

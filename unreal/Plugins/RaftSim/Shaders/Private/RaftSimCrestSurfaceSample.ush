@@ -1,0 +1,89 @@
+#ifndef RAFTSIM_CREST_SURFACE_SAMPLE
+#define RAFTSIM_CREST_SURFACE_SAMPLE
+#include "RaftSimMacroSurfaceSample.ush"
+
+// Height and exact river-coordinate derivatives of the SAME depth-scaled
+// profile as ComputeCoupledBreakingReliefMeters. No new amplitude authority.
+float2 RaftSimCrestSmooth(float lo,float hi,float x)
+{
+    float t=saturate((x-lo)/(hi-lo));
+    return float2(t*t*(3-2*t),6*t*(1-t)/(hi-lo));
+}
+float2 RaftSimCrestGaussian(float x,float width)
+{
+    float g=exp(-(x*x)/(width*width));
+    return float2(g,-2*x*g/(width*width));
+}
+float3 RaftSimCrestHeightGradient(Texture2D<float4> atlas,float2 river,int2 size)
+{
+    float4 meta=atlas.Load(int3(0,size.y*4,0));
+    int count=clamp(int(meta.w),0,size.x-1);
+    float3 total=0,cap=0;
+    [loop] for (int i=1;i<=count;++i)
+    {
+        float4 site=atlas.Load(int3(i,size.y*4,0));
+        float4 properties=atlas.Load(int3(i,size.y*4+1,0));
+        float lift=clamp(site.z,0,1.2),length=clamp(site.w,2,7);
+        bool localCap=properties.z>0.5;
+        if (!localCap && lift>cap.x)cap=float3(lift,0,0);
+        float a=river.y-site.y,d=river.x-site.x;
+        if (lift<=0 || abs(a)>12 || d< -3*length || d>7*length)continue;
+        float u=d-0.035*a*a;
+        float2 face=RaftSimCrestGaussian(u,u<0 ? length : 0.42*length);
+        face-=0.32*RaftSimCrestGaussian(u-0.95*length,0.5*length);
+        face+=0.35*RaftSimCrestGaussian(u-2.8*length,0.75*length);
+        face+=0.16*RaftSimCrestGaussian(u-5.1*length,length);
+        float2 entry=RaftSimCrestSmooth(-3*length,-2*length,d);
+        float2 exitFade=RaftSimCrestSmooth(6*length,7*length,d);
+        float2 edge=float2(entry.x*(1-exitFade.x),entry.y*(1-exitFade.x)-entry.x*exitFade.y);
+        float2 across=RaftSimCrestGaussian(a,clamp(length,3,5));
+        float2 sideFade=RaftSimCrestSmooth(10,12,abs(a));
+        float2 lateral=float2(across.x*(1-sideFade.x),across.y*(1-sideFade.x)-across.x*sideFade.y*sign(a));
+        float3 envelope=lift*float3(edge.x*lateral.x,edge.y*lateral.x,edge.x*lateral.y);
+        if (localCap && envelope.x>cap.x)cap=envelope;
+        total+=float3(face.x*envelope.x,
+            face.y*envelope.x+face.x*envelope.y,
+            -0.07*a*face.y*envelope.x+face.x*envelope.z);
+    }
+    if (total.x>cap.x)return cap;
+    if (total.x< -cap.x)return -cap;
+    return total;
+}
+
+// Returns [height correction cm, dCorrection/dWorldX, dCorrection/dWorldY].
+// Coarse crest is subtracted once. Differentiating both its triangle and the
+// shore weight preserves the original hydraulic/pocket shape and dry boundary.
+float3 RaftSimCrestCorrection(Texture2D<float4> atlas,float2 gridPosition,int2 size,bool subtractCoarseSlope=true)
+{
+    float4 meta=atlas.Load(int3(0,size.y*4,0));
+    if (meta.w<1)return 0;
+    float scale=atlas.Load(int3(0,size.y*4+1,0)).x;
+    float2 p=clamp(gridPosition,0,float2(size-1));
+    int2 cell=clamp(int2(floor(p)),0,size-2);
+    float2 f=p-cell;
+    float4 b=atlas.Load(int3(cell+int2(1,0),0));
+    float4 c=atlas.Load(int3(cell+int2(0,1),0));
+    float4 corner=atlas.Load(int3(cell+(f.x+f.y<=1 ? int2(0,0) : int2(1,1)),0));
+    float4 dx=f.x+f.y<=1 ? b-corner : corner-c;
+    float4 dy=f.x+f.y<=1 ? c-corner : corner-b;
+    int2 row=cell+int2(0,size.y);
+    float sb=atlas.Load(int3(row+int2(1,0),0)).w,sc=atlas.Load(int3(row+int2(0,1),0)).w;
+    float sCorner=atlas.Load(int3(row+(f.x+f.y<=1 ? int2(0,0) : int2(1,1)),0)).w;
+    float2 shoreGradient=f.x+f.y<=1 ? float2(sb-sCorner,sc-sCorner) : float2(sCorner-sc,sCorner-sb);
+    float shore=RaftSimMacroSample(atlas,p,size,1).w;
+    float coarse=RaftSimMacroSample(atlas,p,size,0).w;
+    float3 crest=RaftSimCrestHeightGradient(atlas,meta.xy+p*meta.z,size);
+    float delta=crest.x*shore*scale*100-coarse;
+    float2 g=(crest.yz*meta.z*shore+crest.x*shoreGradient)*scale*100;
+    if (subtractCoarseSlope)g-=float2(dx.w,dy.w);
+    float determinant=dx.x*dy.y-dx.y*dy.x;
+    float2 slope=abs(determinant)>1.e-8 ? float2(dy.y*g.x-dx.y*g.y,-dy.x*g.x+dx.x*g.y)/determinant : 0;
+    return float3(delta,slope);
+}
+float4 RaftSimCrestMacroSample(Texture2D<float4> atlas,float2 p,int2 size)
+{
+    float4 result=RaftSimMacroSample(atlas,p,size,0);
+    result.z+=RaftSimCrestCorrection(atlas,p,size).x;
+    return result;
+}
+#endif

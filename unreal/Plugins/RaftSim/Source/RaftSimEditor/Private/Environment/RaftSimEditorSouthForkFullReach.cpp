@@ -9,6 +9,7 @@
 #include "GameFramework/WorldSettings.h"
 #include "HAL/IConsoleManager.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRockObstacleActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "RenderingThread.h"
@@ -1771,10 +1772,12 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 double LateralM = 0.0;
                 double RadiusM = 1.0;
                 double HeightM = 1.0;
+                FString BoulderId;
                 (*Boulder)->TryGetNumberField(TEXT("station_m"), StationM);
                 (*Boulder)->TryGetNumberField(TEXT("lateral_offset_m"), LateralM);
                 (*Boulder)->TryGetNumberField(TEXT("radius_m"), RadiusM);
                 (*Boulder)->TryGetNumberField(TEXT("height_m"), HeightM);
+                (*Boulder)->TryGetStringField(TEXT("boulder_id"), BoulderId);
                 const int32 CoordinateIndex = ClosestCoordinateIndex(
                     CoordinatePoints, StationM);
                 if (CoordinateIndex < GlobalRowStart ||
@@ -1810,18 +1813,39 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     // Fit source bounds to the catalog and embed the watertight base by 12%.
                     const float ScaleXY = PresentationRadiusM * 0.8481f;
                     const float ScaleZ = static_cast<float>(HeightM) * 0.7045f;
+                    const FVector BoulderWorldLocationCm(
+                        WorldM.X * 100.0f, WorldM.Y * 100.0f,
+                        (BedM - VerticalDatumM +
+                            static_cast<float>(HeightM) * 0.386f) * 100.0f);
                     RockComponents[RockIndex]->AddInstance(
                         FTransform(
                             FRotator(
                                 StableUnitRandom(CoordinateIndex, Column, 31) * 18.0f - 9.0f,
                                 StableUnitRandom(CoordinateIndex, Column, 37) * 360.0f,
                                 StableUnitRandom(CoordinateIndex, Column, 41) * 14.0f - 7.0f),
-                            FVector(
-                                WorldM.X * 100.0f, WorldM.Y * 100.0f,
-                                (BedM - VerticalDatumM +
-                                    static_cast<float>(HeightM) * 0.386f) * 100.0f),
+                            BoulderWorldLocationCm,
                             FVector(ScaleXY, ScaleXY, ScaleZ)),
                         /*bWorldSpace=*/true);
+                    const FString ContactSuffix = BoulderId.IsEmpty()
+                        ? FString::Printf(TEXT("%05d_%03d"), CoordinateIndex, Column)
+                        : BoulderId;
+                    const FString ContactLabel = FString::Printf(
+                        TEXT("RaftSim_SouthFork_D4_Boulder_%s"), *ContactSuffix);
+                    ARaftSimRockObstacleActor* ContactProxy =
+                        SpawnStableSouthForkActor<ARaftSimRockObstacleActor>(
+                            World, FTransform(BoulderWorldLocationCm), ContactLabel);
+                    if (!ContactProxy)
+                    {
+                        OutSummary += FString::Printf(
+                            TEXT("Failed to create D4 contact for South Fork boulder %s.\n"),
+                            *ContactLabel);
+                        return false;
+                    }
+                    ContactProxy->ConfigureContact(PresentationRadiusM, 0.78f);
+                    ContactProxy->SetContactProxyOnly(true);
+                    ContactProxy->Tags.AddUnique(TEXT("RaftSimFullReachBoulderContact"));
+                    ContactProxy->Tags.AddUnique(TEXT("RaftSimContactProxyOnly"));
+                    SetSpatiallyLoadedIfAllowed(ContactProxy, false);
                     AcceptedBoulderPresentationFootprints.Add(
                         FSouthForkBoulderPresentationFootprint{
                             PresentationStationM, PresentationLateralM,
@@ -1913,10 +1937,19 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                         {
                             continue;
                         }
-                        const int32 CandidateColumn = FMath::Clamp(
-                            FMath::RoundToInt(
-                                (Candidate.LateralM + 40.0f) / 4.0f),
-                            LeftWetColumn, RightWetColumn);
+                        const int32 CandidateColumn = FMath::RoundToInt(
+                            (Candidate.LateralM + 40.0f) / 4.0f);
+                        // Do not turn dry bank dressing into hydraulic
+                        // authority by clamping it onto the nearest water
+                        // sample. Require a full wet sample on each side of
+                        // the centre before the rock can own a cutout,
+                        // pressure pillow, or wake.
+                        if (CandidateColumn <= LeftWetColumn ||
+                            CandidateColumn >= RightWetColumn ||
+                            !RowSurfaceElevationsM.IsValidIndex(CandidateColumn))
+                        {
+                            continue;
+                        }
                         const float LocalSurfaceM =
                             RowSurfaceElevationsM[CandidateColumn];
                         if (LocalSurfaceM - Candidate.BaseElevationM <= -0.25f)
@@ -3118,13 +3151,21 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     // The coupled field is phase-warped and packeted rather than an infinite
     // transverse sine train; keep it active so the visible crest geometry and
     // rigid raft support share the same large-scale wave shape.
-    WaterConfig->LivePresentationStandingWaveScale = 0.82f;
-    WaterConfig->bEnableLiveRapidSurfaceRefinement = true;
-    WaterConfig->LiveRapidSurfaceSubdivision = 6;
+    // The full-reach carrier gets crest geometry from the cooked hydraulic
+    // surface, obstacle wakes, and the raft-local GPU field. The generic
+    // station-periodic train produced channel-wide reflection bars, while a
+    // half-metre 600 m mesh cost ~35x the required CPU presentation work.
+    WaterConfig->LivePresentationStandingWaveScale = 0.0f;
+    WaterConfig->bEnableLiveRapidSurfaceRefinement = false;
+    WaterConfig->LiveRapidSurfaceSubdivision = 1;
     WaterConfig->bEnableLiveRaftLocalFluidHeightfield = true;
     WaterConfig->LiveRaftLocalFluidWindowMeters = 100.0f;
-    WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.65f;
-    WaterConfig->Tags.AddUnique(TEXT("RaftSimHalfMeterRapidCarrierV1"));
+    // Keep the 1.5 m / 26k-vertex carrier, but let solver-confirmed rapid
+    // zones reach the half-metre class of relief visible in real whitewater.
+    // The GPU field is zero in calm water, so pools and shoreline remain
+    // stable without returning to the expensive half-metre full-reach mesh.
+    WaterConfig->LiveRaftLocalFluidHeightfieldStrength = 0.95f;
+    WaterConfig->Tags.AddUnique(TEXT("RaftSimThreeMeterFullReachCarrierV2"));
     WaterConfig->Tags.AddUnique(TEXT("RaftSimRaftLocalGpuFluidV2"));
     SetSpatiallyLoadedIfAllowed(WaterConfig, false);
 
