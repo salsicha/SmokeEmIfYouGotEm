@@ -76,11 +76,17 @@ bool FLiquidExitTest::RunTest(const FString&)
         auto NativeWords=Graph.CreateBuffer(WordsDesc,TEXT("ExitTest.FullNativeWords"));
         Graph.QueueBufferUpload(NativeWords,Words.GetData(),Words.Num()*4,ERDGInitialDataFlags::None);
         auto NativeRoutes=CreateStructuredBuffer(Graph,TEXT("ExitTest.NativeRoutes"),TConstArrayView<FUintVector4>(Routes));
+        auto TraceDesc=FRDGBufferDesc::CreateStructuredDesc(4,RaftSimLiquidExitTraceWords);TraceDesc.Usage|=BUF_SourceCopy;
+        auto Trace=Graph.CreateBuffer(TraceDesc,TEXT("ExitTest.FirstRejection"));AddClearUAVPass(Graph,Graph.CreateUAV(Trace),0);
+        Plan.FirstRejectionTrace=Trace;ExactPlan.FirstRejectionTrace=Trace;
+        TRefCountPtr<FRDGPooledBuffer> TraceResult;
+        Graph.QueueBufferExtraction(Trace,&TraceResult);
         TRefCountPtr<FRDGPooledBuffer> Records[4],Counts[4],Original;
         Graph.QueueBufferExtraction(NativeWords,&Original);
         const uint32 Live[4]={15,0,17,15};
         for(uint32 Case=0;Case<4;++Case)
         {
+            Plan.NativeStep=37+Case;ExactPlan.NativeStep=37+Case;
             // Source routing counts are independently checked by assembly. This
             // classifier always preserves the full native live count, including overflow.
             TArray<uint32> SourceCounts;SourceCounts.Init(0,7);SourceCounts[6]=Live[Case];
@@ -134,6 +140,21 @@ bool FLiquidExitTest::RunTest(const FString&)
         Read.EnqueueCopy(Cmd,Original->GetRHI(),Words.Num()*4);Cmd.SubmitAndBlockUntilGPUIdle();
         const auto* Data=Read.Lock(Words.Num()*4);if(!Data) return;
         Passed=FMemory::Memcmp(Data,Words.GetData(),Words.Num()*4)==0;Read.Unlock();
+        FRHIGPUBufferReadback TraceRead(TEXT("ExitTest.FirstRejectionContents"));
+        Cmd.Transition(FRHITransitionInfo(TraceResult->GetRHI(),ERHIAccess::Unknown,ERHIAccess::CopySrc));
+        TraceRead.EnqueueCopy(Cmd,TraceResult->GetRHI(),RaftSimLiquidExitTraceWords*4);Cmd.SubmitAndBlockUntilGPUIdle();
+        const auto* T=static_cast<const uint32*>(TraceRead.Lock(RaftSimLiquidExitTraceWords*4));
+        if(!T) { Passed=false;return; }
+        // The winning rejected index is intentionally unspecified, but must
+        // belong to the FIRST dispatch and preserve its complete raw payload.
+        const uint32 I=T[3];
+        Passed &= T[0]==37 && T[1]==1 && T[2]==0 && I<15 && T[5]==NF && T[6]==NI && T[7]==0 && T[8]==3 && T[13]==15;
+        if(I<15)
+        {
+            Passed &= (Status[I]==4 || Status[I]==8) && T[14]==Status[I] && T[9]==Faces[I] && T[10]==FaceRow[I];
+            for(uint32 K=0;K<NF+NI;++K) Passed &= T[64+K]==Words[K*Capacity+I];
+        }
+        TraceRead.Unlock();
     });
     FlushRenderingCommands();
     TestTrue(TEXT("Rotated physical exits, internal cuts, wet/dry/bed rows, above-stage spray, first floor/roof/corner hit, invalid origins/routes, empty/overflow accounting and unchanged full payload"),Passed);

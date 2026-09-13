@@ -31,8 +31,9 @@ FRaftSimCareerScenarioDefinition MakeScenario(
 
 TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenarioCatalog()
 {
-    // These are real launch contracts, not menu labels. The four South Fork
-    // section bounds share the continuous M4 map and M3 moving-water runtime.
+    // These are launch contracts, not menu labels. South Fork bounds match
+    // reconstruction_2026_09/full_reach/playable_route/session_contracts.json.
+    // Named boundaries are provisional guide mileage, not surveyed landmarks.
     // Completion checkpoints let a new guide resume the next section at the
     // exact transform already reached in the preceding section.
     return {
@@ -45,39 +46,27 @@ TArray<FRaftSimCareerScenarioDefinition> URaftSimProgressionLibrary::GetScenario
             TEXT("south_fork_upper"), TEXT("South Fork I: Chili Bar to Coloma"),
             TEXT("Guide the upper reach, establish crew timing, and finish clean at Coloma."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::Trainee, 1, 120.0f, 5200.0f),
+            ERaftSimLicenseTier::Trainee, 1, 120.0f, 9012.3264f),
         MakeScenario(
             TEXT("south_fork_coloma"), TEXT("South Fork II: Coloma Valley"),
             TEXT("Read the transition water and prepare the crew for the gorge."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::TripLeader, 2, 5200.0f, 18500.0f),
+            ERaftSimLicenseTier::TripLeader, 2, 9012.3264f, 25427.6352f),
         MakeScenario(
             TEXT("south_fork_gorge"), TEXT("South Fork III: Gorge Rapids"),
             TEXT("Run the technical gorge sequence with deliberate lines and rescue readiness."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::SeniorGuide, 3, 18500.0f, 33000.0f),
+            ERaftSimLicenseTier::SeniorGuide, 3, 25427.6352f, 29933.0304f),
         MakeScenario(
             TEXT("south_fork_lower"), TEXT("South Fork IV: Lower Gorge to Salmon Falls"),
             TEXT("Manage fatigue and finish the long lower reach at the take-out."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::SeniorGuide, 4, 33000.0f, 48900.0f),
+            ERaftSimLicenseTier::SeniorGuide, 4, 29933.0304f, 33280.0f),
         MakeScenario(
             TEXT("south_fork_full_descent"), TEXT("South Fork: Full Guided Descent"),
-            TEXT("Guide the complete 48.8 km run in one continuous scored trip."),
+            TEXT("Guide the reconstructed 33.2 km playable reach, including Troublemaker, in one continuous scored trip."),
             TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            ERaftSimLicenseTier::ExpeditionGuide, 5, 120.0f, 48900.0f, false, true),
-        MakeScenario(
-            TEXT("troublemaker_challenge"), TEXT("Troublemaker Rapid Challenge"),
-            TEXT("A short technical challenge at the commercial flow band: the approach, "
-                 "Troublemaker itself and its runout on the production full reach."),
-            // One scene owns South Fork gameplay, including this challenge.
-            // Its geographic reconstruction and visual acceptance remain open.
-            TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"),
-            // Match the user-reviewed run: a short calm setup, the main hole
-            // near 8.36 km, then the hard river-right / river-left S-turn. A
-            // start farther upstream made the named challenge spend minutes
-            // in the broad transit pool and read as an entirely flat river.
-            ERaftSimLicenseTier::Trainee, 10, 8320.0f, 8525.0f),
+            ERaftSimLicenseTier::ExpeditionGuide, 5, 120.0f, 33280.0f, false, true),
         MakeScenario(
             TEXT("hance_challenge"), TEXT("Hance Rapid Free Run"),
             TEXT("Bonus large-volume Colorado rapid slice."),

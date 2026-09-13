@@ -1,6 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "RaftSimDetailWaterGPU.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterFlowFrame.h"
 #include "RHICommandList.h"
 #include "RHIGPUReadback.h"
 #include "RenderingThread.h"
@@ -19,18 +20,21 @@ bool FRaftSimCrestSurfaceGPUTest::RunTest(const FString&)
     // Independent oracle is the existing CPU raft-support function. Include
     // local/global overlap caps, changed site records (previous-frame shape),
     // a zero-site atlas, both triangle halves and an organic shore taper.
-    for (int32 Fixture=0;Fixture<4;++Fixture)
+    for (int32 Fixture=0;Fixture<6;++Fixture)
     {
         const FIntPoint Size(9,7);const int32 Count=Size.X*Size.Y,AtlasHeight=Size.Y*4+2;
         const float Spacing=1.5f,Scale=0.83f;
         const FVector2D Origin(-5.7,-4.4);
         TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite> Sites;
-        if (Fixture<3)
+        if (Fixture!=3)
         {
             auto& A=Sites.AddDefaulted_GetRef();A.RiverCoordinatesMeters=FVector2D(0.17+0.3*Fixture,0.13);
             A.PhysicalCrestHeightMeters=0.75f;A.PhysicalCrestLengthMeters=2;A.bLocalEnvelopeCap=Fixture!=1;
             auto& B=Sites.AddDefaulted_GetRef();B.RiverCoordinatesMeters=FVector2D(1.13,1.9);
             B.PhysicalCrestHeightMeters=0.43f;B.PhysicalCrestLengthMeters=3.2f;B.bLocalEnvelopeCap=Fixture!=1;
+            const float Angle=Fixture==2 ? .713f : (Fixture==4 ? float(PI) : (Fixture==5 ? float(-PI/2) : 0.f));
+            Sites[0].FlowDirection=RaftSimWaterFlowFrame::FromAngle(Angle);
+            Sites[1].FlowDirection=RaftSimWaterFlowFrame::FromAngle(Fixture>=4 ? Angle-.47f : Angle);
         }
         const auto Height=[&](FVector2D P)
         { return double(URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,0.22f,Spacing)); };
@@ -50,7 +54,8 @@ bool FRaftSimCrestSurfaceGPUTest::RunTest(const FString&)
         {
             const auto& S=Sites[I];
             Data[Count*4+I+1]=FVector4f(S.RiverCoordinatesMeters.X,S.RiverCoordinatesMeters.Y,S.PhysicalCrestHeightMeters,S.PhysicalCrestLengthMeters);
-            Data[Count*4+Size.X+I+1]=FVector4f(1,0.5f,S.bLocalEnvelopeCap ? 1 : 0,0);
+            Data[Count*4+Size.X+I+1]=FVector4f(1,0.5f,S.bLocalEnvelopeCap ? 1 : 0,
+                FMath::Atan2(S.FlowDirection.Y,S.FlowDirection.X));
         }
         const auto Sample=[&](FVector2D P,int32 Band)
         {

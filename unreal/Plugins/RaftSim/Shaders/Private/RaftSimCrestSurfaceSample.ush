@@ -26,7 +26,12 @@ float3 RaftSimCrestHeightGradient(Texture2D<float4> atlas,float2 river,int2 size
         float lift=clamp(site.z,0,1.2),length=clamp(site.w,2,7);
         bool localCap=properties.z>0.5;
         if (!localCap && lift>cap.x)cap=float3(lift,0,0);
-        float a=river.y-site.y,d=river.x-site.x;
+        // Atlas property W is the downstream angle in hydraulic XY. Zero
+        // retains legacy station/lateral behavior. Rotate derivatives back too.
+        float sine,cosine; sincos(properties.w,sine,cosine);
+        float2 direction=float2(cosine,sine),acrossDirection=float2(-sine,cosine);
+        float2 relative=river-site.xy;
+        float a=dot(relative,acrossDirection),d=dot(relative,direction);
         if (lift<=0 || abs(a)>12 || d< -3*length || d>7*length)continue;
         float u=d-0.035*a*a;
         float2 face=RaftSimCrestGaussian(u,u<0 ? length : 0.42*length);
@@ -40,10 +45,12 @@ float3 RaftSimCrestHeightGradient(Texture2D<float4> atlas,float2 river,int2 size
         float2 sideFade=RaftSimCrestSmooth(10,12,abs(a));
         float2 lateral=float2(across.x*(1-sideFade.x),across.y*(1-sideFade.x)-across.x*sideFade.y*sign(a));
         float3 envelope=lift*float3(edge.x*lateral.x,edge.y*lateral.x,edge.x*lateral.y);
-        if (localCap && envelope.x>cap.x)cap=envelope;
-        total+=float3(face.x*envelope.x,
+        if (localCap && envelope.x>cap.x)cap=float3(envelope.x,
+            direction*envelope.y+acrossDirection*envelope.z);
+        float3 local=float3(face.x*envelope.x,
             face.y*envelope.x+face.x*envelope.y,
             -0.07*a*face.y*envelope.x+face.x*envelope.z);
+        total+=float3(local.x,direction*local.y+acrossDirection*local.z);
     }
     if (total.x>cap.x)return cap;
     if (total.x< -cap.x)return -cap;

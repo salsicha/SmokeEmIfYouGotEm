@@ -48,6 +48,17 @@ playable scene and consistent geometry/physics must also be validated.
 
 ## Implementation checkpoint — 2026-09-06 (unfinished)
 
+Current playable integration, September12UTC: the normal Troublemaker Rapid
+Challenge now uses L_SouthFork_Troublemaker with the corrected captured terrain,
+shared collision and byte-identical source-matched flow in a packageable data
+location. This is the bounded270m section, NOT the corrected full river. The
+other five South Fork entries retain the old route. Guided traversal/material
+coverage/native progress pass; source geometry and user save are preserved.
+Visible rock/shoreline coarseness, breaking-water realism and performance gates
+remain unresolved. See
+[actual integration and limits](../reconstruction-review-2026-09-07/playable-captured-rapid-integration.md).
+The following September6 checkpoints are historical, not current launch wiring.
+
 The old route starts 15.4 km upstream of the actual Chili Bar bridge. Its old
 Troublemaker marker is about 9.7 km from the published real-rapid hazard location.
 The captured-water-constrained route candidate is 33.334 km; production still

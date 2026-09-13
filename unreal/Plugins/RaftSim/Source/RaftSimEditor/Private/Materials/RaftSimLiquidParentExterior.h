@@ -26,6 +26,9 @@ class FProfile
 public:
     void SetExactBed(FRaftSimLiquidFaceBed Bed) { ExactBed=MoveTemp(Bed); }
     const TArray<FVector3f>& Packed() const { return Values; }
+    // Upload the exact float32 frame also bound to routing/exit shaders. Do not
+    // reconstruct the lower corner from a separately rounded centre on the GPU.
+    TArray<FVector3f> PhysicalFrame() const { return {ExitLower,ExitAxisX,ExitAxisY}; }
     FRaftSimLiquidParticleExitPlan ExitPlan(FRDGBuilder& Graph,const FRaftSimLiquidParticleRoutePlan& Routing,FString& Error) const
     {
         Error=TEXT("Particle exit policy must match the validated physical parent, not a local region");

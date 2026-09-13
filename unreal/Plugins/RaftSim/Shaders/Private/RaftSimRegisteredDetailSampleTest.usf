@@ -1,0 +1,11 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSample.ush"
+Texture2D<float4> DetailTexture;
+StructuredBuffer<float4> Queries;
+RWStructuredBuffer<float4> Results;
+uint QueryCount;
+[numthreads(64,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    if (id.x<QueryCount)Results[id.x]=RaftSimRegisteredDetailSample(DetailTexture,Queries[id.x].xy);
+}

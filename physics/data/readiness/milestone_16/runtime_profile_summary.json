@@ -1,10 +1,3 @@
-{
-  "budget_failed_count": 0,
-  "budget_passed_count": 80,
-  "deterministic_replay_count": 40,
-  "deterministic_replay_passed_count": 40,
-  "passed": true,
-  "run_count": 80,
-  "source_report": "reports/milestone16/runtime_profile.json",
-  "summary_version": "raftsim.milestone16.readiness_summary.v0"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:46f68ca12c5c1392b1aa40375b42eef79ae7e375e2e63cff5125275616b9cb11
+size 312

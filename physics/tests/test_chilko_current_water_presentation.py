@@ -79,10 +79,30 @@ def test_terrain_survey_compares_fixed_coordinate_water_and_terrain():
 
 def test_every_water_data_update_preserves_linear_foam_depth_and_speed():
     import re
+    from collections import Counter
     source = (ROOT / "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp").read_text()
-    calls = re.findall(r"->UpdateMeshSection_LinearColor\((.*?)\);", source, re.S)
-    assert len(calls) == 6
-    assert all("/*bSRGBConversion=*/false" in call for call in calls)
+    calls = re.findall(r"(\w+)->UpdateMeshSection_LinearColor\((.*?)\);", source, re.S)
+    # The refined/macro uploads added two SurfaceMesh paths and replaced the
+    # former single upload. Guard all seven actual sites, not a stale total.
+    assert Counter(owner for owner, _ in calls) == {
+        'SurfaceMesh': 3, 'LiveVolumeCoreMesh': 3, 'RapidFoamMesh': 1}
+    assert all(_has_explicit_linear_upload_argument(call) for _, call in calls)
+
+
+def _has_explicit_linear_upload_argument(arguments):
+    import re
+    # Comments are documentation, not semantics. A trailing explicit false is
+    # required: omitted arguments silently select the engine's default.
+    without_comments = re.sub(r'/\*.*?\*/|//[^\n]*', '', arguments, flags=re.S)
+    return bool(re.search(r',\s*false\s*$', without_comments))
+
+
+def test_linear_upload_guard_rejects_default_and_srgb_conversion():
+    assert _has_explicit_linear_upload_argument('0, Colors, Tangents, false')
+    assert _has_explicit_linear_upload_argument('0, Colors, Tangents, /*bSRGBConversion=*/false')
+    assert not _has_explicit_linear_upload_argument('0, Colors, Tangents')
+    assert not _has_explicit_linear_upload_argument('0, Colors, Tangents, /*bSRGBConversion=*/true')
+    assert not _has_explicit_linear_upload_argument('0, Colors, Tangents /* false */')
 
 
 def test_chilko_spray_requires_a_wet_owned_crest_and_uses_surface_height():

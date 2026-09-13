@@ -225,6 +225,13 @@ public:
         FVector2D WindowCenterM, FVector2D WindowExtentM,
         float RoughnessManning = 0.041f);
 
+    /** Checkpoint preparation is transactional: reject a dry/unavailable
+     * destination before replacing the active window or handoff statistics. */
+    bool ConfigureMovingRiverWindowValidated(
+        const FString& CookedFieldsManifestDir, const FString& BandId,
+        FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning,
+        TOptional<FVector2D> RequiredWetPositionM);
+
     /**
      * Bind a dense station/lateral -> curved-world coordinate map. Once bound,
      * world-space water probes are projected onto the real river axis before
@@ -236,7 +243,17 @@ public:
     bool ConfigureRiverCoordinateMap(const FString& CoordinateMapPath);
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
-    bool HasRiverCoordinateMap() const { return RiverCoordinatePoints.Num() >= 2; }
+    bool HasRiverCoordinateMap() const { return bCartesianWaterCoordinates || RiverCoordinatePoints.Num() >= 2; }
+
+    bool HasCartesianWaterCoordinates() const { return bCartesianWaterCoordinates; }
+    /** Read-only live hydraulic bounds; the shared render baseline does not expand them. */
+    bool GetLiveWaterFieldBoundsM(FBox2D& OutBounds) const;
+    bool GetCartesianWaterBoundsM(FBox2D& OutBounds) const
+    {
+        if (!bCartesianWaterCoordinates) return false;
+        OutBounds = CartesianWaterBoundsM;
+        return true;
+    }
 
     double GetRiverWorldYSign() const { return HasRiverCoordinateMap() ? RiverWorldYSign : 1.0; }
 
@@ -300,6 +317,13 @@ public:
         float StandingWaveScale,
         float HydraulicReliefScale);
 
+    // Game-thread support only: false means unavailable (use the existing
+    // analytic path), true supplies current carrier height or clipped-dry.
+    // Raw solver wetness, depth, velocity and D3/overwash remain independent.
+    using FCarrierSupportSampler = TFunction<bool(const FVector&, float&, bool&)>;
+    void SetRaftSupportCarrierSampler(UObject* Owner, FCarrierSupportSampler Sampler);
+    void ClearRaftSupportCarrierSampler(const UObject* Owner);
+
     /** Mirror the raft-local GPU heightfield into ridden support. The shader
      * still owns sub-grid rendering, but this analytic twin prevents the raft
      * from passing through a visible crest. */
@@ -326,10 +350,13 @@ public:
         /** Spatial evaluation: distant owners must not change this point's
          * overlap cap. False retains the legacy global-owner cap. */
         bool bLocalEnvelopeCap = false;
+        /** Unit downstream vector in hydraulic XY; legacy station grids use +X. */
+        FVector2D FlowDirection = FVector2D(1.,0.);
     };
 
     /** Cooked obstruction footprint shared by the visible solver carrier and
-     * rigid raft support. Coordinates are (station, river-left, radius). */
+     * rigid raft support. Coordinates use the active hydraulic frame:
+     * (station, river-left) or Cartesian (east, north), in metres. */
     struct FSupportBoulderFootprint
     {
         FVector2D RiverCoordinatesMeters = FVector2D::ZeroVector;
@@ -358,11 +385,13 @@ public:
         float BoulderRadiusMeters,
         float WaterSpeedMetersPerSecond);
 
-    /** Strongest configured pillow/Y-wake term at one river coordinate. */
+    /** Strongest configured pillow/Y-wake term at one hydraulic coordinate.
+     * FlowDirection is unit downstream in that frame, not world XY. */
     float ComputeConfiguredBoulderSupportDisplacementMeters(
         const FVector2D& RiverCoordinatesMeters,
         float WaterSpeedMetersPerSecond,
-        float PhaseSeconds) const;
+        float PhaseSeconds,
+        const FVector2D& FlowDirection = FVector2D(1., 0.)) const;
 
     /**
      * Station-indexed mirror of the authored band-water bake: absolute baked
@@ -441,6 +470,11 @@ public:
         TConstArrayView<FSupportBreakingSite> Sites,
         float CrestLiftMeters,
         float StationSpacingMeters);
+
+    // Same dimensionless crest source as the visible macro carrier. This is
+    // an empirical entrainment potential, not measured bubble production.
+    // No wet/depth assumption: the detail owner must apply its wet-cell mask.
+    float SampleAcceptedBreakingSource(const FVector2D& RiverCoordinatesMeters) const;
 
     /** Sample the same live crest/hole surface used by the visible carrier. */
     bool SampleRaftSupportSurfaceAtWorldPosition(
@@ -586,6 +620,8 @@ private:
         FVector& OutWorldLeftNormal) const;
 
     TArray<FRiverCoordinatePoint> RiverCoordinatePoints;
+    bool bCartesianWaterCoordinates = false;
+    FBox2D CartesianWaterBoundsM;
     TMap<FIntPoint, TArray<int32>> RiverSpatialHash;
     /**
      * Consecutive raft probes are only a few metres apart. Preserve the exact
@@ -605,6 +641,8 @@ private:
     FString RiverCoordinateMapPath;
 
     bool bRaftSupportSurfaceEnabled = false;
+    TWeakObjectPtr<UObject> RaftSupportCarrierOwner;
+    FCarrierSupportSampler RaftSupportCarrierSampler;
     float RaftSupportSurfaceSmoothingStrength = 0.0f;
     float RaftSupportStandingWaveScale = 0.0f;
     float RaftSupportHydraulicReliefScale = 0.0f;

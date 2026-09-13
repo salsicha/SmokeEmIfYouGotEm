@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NiagaraDataInterface.h"
+#include "RenderGraphFwd.h"
 #include "RaftSimLiquidStageInterface.generated.h"
 
 // Unsaved editor-review DI. The proxy hook orders reconstruction before the
@@ -15,6 +16,11 @@ struct FRaftSimLiquidCompletedStage
     FName StageName;
     uint32 StageIndex=0,Iteration=0,Iterations=0,Loop=0,Loops=0;
     uint32 RateSpawns=0,EventSpawns=0;
+    // Valid only during the synchronous group callback. This is the immutable
+    // tick upload, not the GT parameter store that may already hold a later tick.
+    const uint8* ExternalParameters=nullptr;
+    uint32 ExternalParameterBytes=0;
+    float EngineDeltaSeconds=-1;
     bool First=false,Last=false,Reset=false;
 };
 // Synchronous render-thread notification after every dispatch/DI post-stage in
@@ -22,6 +28,9 @@ struct FRaftSimLiquidCompletedStage
 // work. Consumers must verify complete participant/stage/tick alignment before
 // coupling. Scheduling after a group alone does not establish conservation.
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FRaftSimLiquidPostGroup,FRDGBuilder&,uint32,TConstArrayView<FRaftSimLiquidCompletedStage>);
+// Read-only binding of the current explicit interface during graph construction.
+// The owning simulation retains and exchanges it; this DI never advances it.
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FRaftSimLiquidSurfaceBinding,FRDGBuilder&,uint64,FRDGTextureRef&);
 
 UCLASS(EditInlineNew)
 class URaftSimLiquidStageInterface : public UNiagaraDataInterface
@@ -42,5 +51,6 @@ public:
     // Bind/unbind and broadcast only on the render thread.
     static FRaftSimLiquidPreStage& PreStageEvent();
     static FRaftSimLiquidPostGroup& PostGroupEvent();
+    static FRaftSimLiquidSurfaceBinding& SurfaceBindingEvent();
     static FNiagaraVariable Variable();
 };

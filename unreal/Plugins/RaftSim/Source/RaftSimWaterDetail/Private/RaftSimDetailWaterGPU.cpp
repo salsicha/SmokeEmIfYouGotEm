@@ -61,6 +61,8 @@ class FRaftSimDetailResolveCS : public FGlobalShader
     BEGIN_SHADER_PARAMETER_STRUCT(FParameters,)
         SHADER_PARAMETER(FIntPoint,GridSize)
         SHADER_PARAMETER(float,CellMeters)
+        SHADER_PARAMETER(FVector2f,GridOriginMeters)
+        SHADER_PARAMETER(uint32,IncludeOriginMetadata)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,MeanFlow)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,DetailState)
         SHADER_PARAMETER_RDG_TEXTURE_UAV(RWTexture2D<float4>,SurfaceOutput)
@@ -69,6 +71,62 @@ class FRaftSimDetailResolveCS : public FGlobalShader
     { return IsFeatureLevelSupported(Parameters.Platform,ERHIFeatureLevel::SM5); }
 };
 IMPLEMENT_GLOBAL_SHADER(FRaftSimDetailResolveCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimDetailResolve.usf","MainCS",SF_Compute);
+
+class FRaftSimDetailRemapCS : public FGlobalShader
+{
+    DECLARE_GLOBAL_SHADER(FRaftSimDetailRemapCS);
+    SHADER_USE_PARAMETER_STRUCT(FRaftSimDetailRemapCS,FGlobalShader);
+    class FActivityMemory : SHADER_PERMUTATION_BOOL("RAFTSIM_ACTIVITY_MEMORY");
+    using FPermutationDomain=TShaderPermutationDomain<FActivityMemory>;
+    BEGIN_SHADER_PARAMETER_STRUCT(FParameters,)
+        SHADER_PARAMETER(FIntPoint,GridSize)
+        SHADER_PARAMETER(FIntPoint,SourceOffsetCells)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,NewMeanFlow)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,PreviousState)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,NextState)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float>,PreviousActivity)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float>,NextActivity)
+    END_SHADER_PARAMETER_STRUCT()
+    static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)
+    { return IsFeatureLevelSupported(Parameters.Platform,ERHIFeatureLevel::SM5); }
+};
+IMPLEMENT_GLOBAL_SHADER(FRaftSimDetailRemapCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimDetailRemap.usf","MainCS",SF_Compute);
+
+class FRaftSimRegisteredDetailSampleCS : public FGlobalShader
+{
+    DECLARE_GLOBAL_SHADER(FRaftSimRegisteredDetailSampleCS);
+    SHADER_USE_PARAMETER_STRUCT(FRaftSimRegisteredDetailSampleCS,FGlobalShader);
+    BEGIN_SHADER_PARAMETER_STRUCT(FParameters,)
+        SHADER_PARAMETER(uint32,QueryCount)
+        SHADER_PARAMETER_RDG_TEXTURE(Texture2D<float4>,DetailTexture)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,Queries)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Results)
+    END_SHADER_PARAMETER_STRUCT()
+    static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& P)
+    { return IsFeatureLevelSupported(P.Platform,ERHIFeatureLevel::SM5); }
+};
+IMPLEMENT_GLOBAL_SHADER(FRaftSimRegisteredDetailSampleCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSampleTest.usf","MainCS",SF_Compute);
+
+bool RaftSimValidateRegisteredDetailSamplingGPU(FRHICommandListImmediate& Cmd,FRHITexture* Texture,
+    const TArray<FVector4f>& Queries,FRHIGPUBufferReadback* Readback,FString& Error)
+{
+    check(IsInRenderingThread());
+    if (!Texture || !Readback || Queries.IsEmpty() || Texture->GetDesc().Extent.X<2 ||
+        Texture->GetDesc().Extent.Y<3 || Texture->GetDesc().Format!=PF_A32B32G32R32F)
+    { Error=TEXT("Registered detail sampling needs a float4 texture with a metadata row");return false; }
+    for (const auto& Q:Queries)if (!FMath::IsFinite(Q.X) || !FMath::IsFinite(Q.Y))
+    { Error=TEXT("Invalid registered detail query");return false; }
+    FRDGBuilder Graph(Cmd);auto* P=Graph.AllocParameters<FRaftSimRegisteredDetailSampleCS::FParameters>();
+    P->QueryCount=Queries.Num();
+    P->DetailTexture=Graph.RegisterExternalTexture(CreateRenderTarget(Texture,TEXT("RaftSim.Detail.RegisteredSample")));
+    P->Queries=Graph.CreateSRV(CreateStructuredBuffer(Graph,TEXT("RaftSim.Detail.WorldQueries"),Queries));
+    const auto Results=Graph.CreateBuffer(FRDGBufferDesc::CreateStructuredDesc(sizeof(FVector4f),Queries.Num()),TEXT("RaftSim.Detail.WorldResults"));
+    P->Results=Graph.CreateUAV(Results);
+    TShaderMapRef<FRaftSimRegisteredDetailSampleCS> Shader(GetGlobalShaderMap(GMaxRHIFeatureLevel));
+    FComputeShaderUtils::AddPass(Graph,RDG_EVENT_NAME("RaftSim Registered Detail Sampling Test"),Shader,P,
+        FIntVector(FMath::DivideAndRoundUp(Queries.Num(),64),1,1));
+    AddEnqueueCopyPass(Graph,Readback,Results,Queries.Num()*sizeof(FVector4f));Graph.Execute();return true;
+}
 
 class FRaftSimMacroSampleTestCS : public FGlobalShader
 {
@@ -227,22 +285,73 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
     return true;
 }
 
+bool FRaftSimDetailWaterGPU::RemapWindow(FRHICommandListImmediate& RHICmdList,
+    const FRaftSimDetailWaterGrid& Grid,const TArray<FVector4f>& Flow,FString& Error,
+    FRHIGPUBufferReadback* Readback,FRHIGPUBufferReadback* ActivityReadback)
+{
+    check(IsInRenderingThread());
+    // Validate every request before constructing a graph or mutating state.
+    if (!Grid.Validate(Flow,Error))return false;
+    if (!State.IsValid() || !MeanFlowState.IsValid() || StateSize!=Grid.Size ||
+        StateCellMeters!=Grid.CellMeters || bStatePeriodic || Grid.bPeriodic ||
+        bStateSecondOrder!=Grid.bSecondOrder || bStateActivityMemory!=Grid.bActivityMemory ||
+        (Grid.bActivityMemory && !ActivityState.IsValid()) || (!Grid.bActivityMemory && ActivityReadback))
+    { Error=TEXT("Detail remap requires initialized nonperiodic state with unchanged grid and modes");return false; }
+    // Compute in double, and require exact lattice correspondence. Snapping
+    // belongs to the owner; tolerating a fractional move would relocate water.
+    const double DX=(double(Grid.OriginMeters.X)-StateOriginMeters.X)/StateCellMeters;
+    const double DY=(double(Grid.OriginMeters.Y)-StateOriginMeters.Y)/StateCellMeters;
+    if (!FMath::IsFinite(DX) || !FMath::IsFinite(DY) || FMath::Abs(DX)>=StateSize.X ||
+        FMath::Abs(DY)>=StateSize.Y || DX!=FMath::FloorToDouble(DX) || DY!=FMath::FloorToDouble(DY))
+    { Error=TEXT("Detail remap needs an exact cell shift with retained overlap; reset explicitly for a teleport");return false; }
+    FRDGBuilder Graph(RHICmdList);
+    const auto FlowBuffer=CreateStructuredBuffer(Graph,TEXT("RaftSim.Detail.RemappedFlow"),Flow);
+    const auto Next=Graph.CreateBuffer(FRDGBufferDesc::CreateStructuredDesc(sizeof(FVector4f),Flow.Num()),TEXT("RaftSim.Detail.RemappedState"));
+    auto* P=Graph.AllocParameters<FRaftSimDetailRemapCS::FParameters>();
+    P->GridSize=Grid.Size;P->SourceOffsetCells=FIntPoint(int32(DX),int32(DY));
+    P->NewMeanFlow=Graph.CreateSRV(FlowBuffer);
+    P->PreviousState=Graph.CreateSRV(Graph.RegisterExternalBuffer(State));P->NextState=Graph.CreateUAV(Next);
+    P->PreviousActivity=nullptr;P->NextActivity=nullptr;
+    FRDGBufferRef NextActivity=nullptr;
+    if (Grid.bActivityMemory)
+    {
+        NextActivity=Graph.CreateBuffer(FRDGBufferDesc::CreateStructuredDesc(sizeof(float),Flow.Num()),TEXT("RaftSim.Detail.RemappedActivity"));
+        P->PreviousActivity=Graph.CreateSRV(Graph.RegisterExternalBuffer(ActivityState));P->NextActivity=Graph.CreateUAV(NextActivity);
+    }
+    FRaftSimDetailRemapCS::FPermutationDomain Permutation;
+    Permutation.Set<FRaftSimDetailRemapCS::FActivityMemory>(Grid.bActivityMemory);
+    TShaderMapRef<FRaftSimDetailRemapCS> Shader(GetGlobalShaderMap(GMaxRHIFeatureLevel),Permutation);
+    FComputeShaderUtils::AddPass(Graph,RDG_EVENT_NAME("RaftSim Detail Exact Window Remap"),Shader,P,
+        FComputeShaderUtils::GetGroupCount(Grid.Size,FIntPoint(8,8)));
+    if (Readback)AddEnqueueCopyPass(Graph,Readback,Next,Flow.Num()*sizeof(FVector4f));
+    if (ActivityReadback)AddEnqueueCopyPass(Graph,ActivityReadback,NextActivity,Flow.Num()*sizeof(float));
+    Graph.QueueBufferExtraction(Next,&State);Graph.QueueBufferExtraction(FlowBuffer,&MeanFlowState);
+    if (NextActivity)Graph.QueueBufferExtraction(NextActivity,&ActivityState);
+    Graph.Execute();
+    StateOriginMeters=Grid.OriginMeters;
+    // Remapping transports storage, not physical time. StepCount and
+    // SimulationSeconds (including pressure-forcing phase) remain unchanged.
+    return true;
+}
+
 bool FRaftSimDetailWaterGPU::Resolve(FRHICommandListImmediate& RHICmdList,FRHITexture* Target,FString& Error)
 {
     check(IsInRenderingThread());
-    if (!State.IsValid() || !MeanFlowState.IsValid() || !Target || Target->GetDesc().Extent!=StateSize ||
+    const bool bOriginMetadata=Target && Target->GetDesc().Extent==FIntPoint(StateSize.X,StateSize.Y+1);
+    if (!State.IsValid() || !MeanFlowState.IsValid() || !Target || (!bOriginMetadata && Target->GetDesc().Extent!=StateSize) ||
         Target->GetDesc().Format!=PF_A32B32G32R32F || !EnumHasAnyFlags(Target->GetDesc().Flags,ETextureCreateFlags::UAV))
     { Error=TEXT("Persistent detail resolve needs a matching float4 UAV target");return false; }
     FRDGBuilder Graph(RHICmdList);
     auto* P=Graph.AllocParameters<FRaftSimDetailResolveCS::FParameters>();
     P->GridSize=StateSize;P->CellMeters=StateCellMeters;
+    P->GridOriginMeters=StateOriginMeters;P->IncludeOriginMetadata=bOriginMetadata ? 1u : 0u;
     P->MeanFlow=Graph.CreateSRV(Graph.RegisterExternalBuffer(MeanFlowState));
     P->DetailState=Graph.CreateSRV(Graph.RegisterExternalBuffer(State));
     auto Output=Graph.RegisterExternalTexture(CreateRenderTarget(Target,TEXT("RaftSim.Detail.Surface")));
     P->SurfaceOutput=Graph.CreateUAV(Output);
     TShaderMapRef<FRaftSimDetailResolveCS> Shader(GetGlobalShaderMap(GMaxRHIFeatureLevel));
     FComputeShaderUtils::AddPass(Graph,RDG_EVENT_NAME("RaftSim Detail Surface Resolve"),Shader,P,
-        FComputeShaderUtils::GetGroupCount(StateSize,FIntPoint(8,8)));
+        FComputeShaderUtils::GetGroupCount(Target->GetDesc().Extent,FIntPoint(8,8)));
     Graph.SetTextureAccessFinal(Output,ERHIAccess::SRVMask);
     Graph.Execute();
     return true;

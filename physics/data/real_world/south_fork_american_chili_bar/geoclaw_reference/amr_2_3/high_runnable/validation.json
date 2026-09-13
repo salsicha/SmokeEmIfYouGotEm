@@ -1,29 +1,3 @@
-{
-  "checks": [
-    {
-      "name": "finite_fields",
-      "passed": true
-    },
-    {
-      "min_depth": 0.0,
-      "name": "nonnegative_depth",
-      "passed": true
-    },
-    {
-      "max_velocity": 5.130283924094261,
-      "name": "bounded_velocity",
-      "passed": true
-    },
-    {
-      "name": "mass_drift_recorded",
-      "passed": true,
-      "relative_drift": 0.03949363699617404
-    }
-  ],
-  "mass_final": 8454.758902280806,
-  "mass_initial": 8802.39759770038,
-  "mass_relative_drift": 0.03949363699617404,
-  "max_velocity": 5.130283924094261,
-  "min_depth": 0.0,
-  "passed": true
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:07b8348d38718af017b22a0539842fa30810f93bc03d0e4430b99a619c7d2e31
+size 623

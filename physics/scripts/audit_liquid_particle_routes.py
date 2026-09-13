@@ -8,6 +8,7 @@ import argparse
 import json
 from pathlib import Path
 import numpy as np
+from liquid_native_ownership import prepared_float_frame_owners
 
 
 def physical_owners(world_positions, regions):
@@ -31,6 +32,23 @@ def physical_owners(world_positions, regions):
             raise ValueError('Overlapping physical owners')
         result[inside] = int(r['id'])
     return result
+
+
+def storage_owners(world_positions,regions,frame_model=None):
+    """Exact declared native storage frame, with survey exterior checks intact.
+
+    Returns both owner arrays so internal-cut precision differences remain
+    visible. Never uses observed GPU destinations or a distance tolerance.
+    """
+    survey=physical_owners(world_positions,regions)
+    if frame_model is None:return survey,survey
+    if frame_model not in ('double-float-demote-v1','double-float-residual-outer-v2'):
+        raise ValueError('Unknown native ownership coordinate contract')
+    uploaded=prepared_float_frame_owners(world_positions,regions,
+        residual_outer=frame_model=='double-float-residual-outer-v2')[0]
+    if np.any((survey<0)&(uploaded>=0)):
+        raise ValueError('Native storage frame cannot expand physical survey exterior')
+    return uploaded,survey
 
 
 def verify_packet(record, words, routes, counts, positions, velocities, identities, expected_owners, owners=12):

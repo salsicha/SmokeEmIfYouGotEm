@@ -1,6 +1,6 @@
 """Independent centered-tent P2G check against an actual native GPU snapshot.
 
-This validates one four-particle transfer, not sustained regional fluid flow,
+This validates a selected-step transfer, not sustained regional fluid flow,
 particle handoff, bathymetry, rendered appearance, or performance.
 """
 import argparse
@@ -137,7 +137,8 @@ def audit(directory, log_path=None):
             handoff = audit_handoff(directory)
     if sorted(r['region_id'] for r in records) != list(range(12)):
         raise ValueError('All twelve owners required')
-    geometry = ROOT/'tmp/south-fork-liquid-regional-geometry-v4-20260910'
+    from liquid_dataset import resolve as resolve_dataset
+    geometry = resolve_dataset(report)['geometry']
     pages = {i: json.loads((geometry/f'region-{i:03d}-boundary.json').read_text()) for i in range(12)}
     columns = []
     for dest, page in pages.items():
@@ -204,6 +205,9 @@ def audit(directory, log_path=None):
     passed = (not any(r['raw_mismatched_components'] for r in summaries) and reduction_mismatch == 0 and
               abs(physical_volume-expected_volume) <= volume_bound and shared_nonzero > 0)
     return dict(native_packet_p2g_verified=passed, native_p2g_step=report.get('native_transfer_packet_step', 1),
+                storage_owner_reference=handoff.get('storage_owner_reference') if handoff else None,
+                survey_internal_storage_owner_disagreements=handoff.get('survey_internal_storage_owner_disagreements') if handoff else None,
+                survey_physical_outer_bounds_preserved=handoff.get('survey_physical_outer_bounds_preserved') if handoff else None,
                 particle_count=len(particles), particles=particles,
                 raw_regions=summaries, reduction_mismatched_components=reduction_mismatch,
                 nonzero_shared_column_cells=shared_nonzero, physical_volume_m3=physical_volume,
@@ -214,10 +218,15 @@ def audit(directory, log_path=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('directory', type=Path); parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--summary-only', action='store_true',
+                        help='Verify every particle but omit redundant per-particle JSON details from the report')
     args = parser.parse_args()
     if args.output.exists():
         raise FileExistsError(args.output)
     result = audit(args.directory)
+    if args.summary_only:
+        result.pop('particles')
+        result['particle_details_omitted_from_report'] = True
     args.output.write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps({k: v for k, v in result.items() if k not in ('raw_regions', 'particles')}, indent=2))
     raise SystemExit(0 if result['native_packet_p2g_verified'] else 1)

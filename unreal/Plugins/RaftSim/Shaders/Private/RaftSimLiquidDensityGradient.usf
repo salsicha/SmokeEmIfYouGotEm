@@ -1,0 +1,41 @@
+#include "/Engine/Public/Platform.ush"
+uint Capacity;
+int3 Cells;
+float3 Spacing;
+StructuredBuffer<float4> Positions;
+StructuredBuffer<uint> LiveCount;
+StructuredBuffer<float2> DensitySolid;
+RWStructuredBuffer<float4> Gradient;
+RWStructuredBuffer<float4> Diagonal;
+RWStructuredBuffer<uint> Diagnostics;
+
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    uint i=Id.x,n=LiveCount[0];
+    if(i==0 && n>Capacity) InterlockedAdd(Diagnostics[0],n-Capacity);
+    if(i>=Capacity) return;
+    Gradient[i]=0;Diagonal[i]=0;
+    if(n>Capacity || i>=n) return; // An overflow is a rejected transaction.
+    float4 particle=Positions[i];
+    if(!all(isfinite(particle)) || particle.w<=0) { InterlockedAdd(Diagnostics[0],1);return; }
+    float3 q=particle.xyz/Spacing-.5;
+    if(!all(isfinite(q)) || any(q<0) || any(q>=float3(Cells-1))) { InterlockedAdd(Diagnostics[1],1);return; }
+    int3 lo=int3(floor(q));float3 t=q-lo;
+    if(any(lo<0) || any(lo+1>=Cells)) { InterlockedAdd(Diagnostics[1],1);return; }
+    float scale=particle.w/(Spacing.x*Spacing.y*Spacing.z);
+    float3 g=0,diagonal=0;bool valid=true;
+    [unroll] for(uint z=0;z<2;++z) [unroll] for(uint y=0;y<2;++y) [unroll] for(uint x=0;x<2;++x)
+    {
+        int3 bit=int3(x,y,z),node=lo+bit;
+        float2 field=DensitySolid[node.x+Cells.x*(node.y+Cells.y*node.z)];
+        if(!all(isfinite(field)) || field.x<0 || field.y<0 || field.y>1) { valid=false;continue; }
+        float3 w=float3(x?t.x:1-t.x,y?t.y:1-t.y,z?t.z:1-t.z);
+        float3 jacobian=scale*(2*float3(bit)-1)/Spacing*float3(w.y*w.z,w.x*w.z,w.x*w.y);
+        float excess=max(field.x+field.y-1,0);
+        g+=excess*jacobian;
+        if(excess>0) diagonal+=jacobian*jacobian;
+    }
+    if(!valid || !all(isfinite(g)) || !all(isfinite(diagonal))) { InterlockedAdd(Diagnostics[2],1);return; }
+    Gradient[i]=float4(g,1);Diagonal[i]=float4(diagonal,1);InterlockedAdd(Diagnostics[3],1);
+}

@@ -38,7 +38,10 @@ def parse_requests(log: str) -> list[dict]:
     return rows
 
 
-def audit(log_path: Path, directory: Path, label: str, roi: list[int]) -> dict:
+def audit(log_path: Path, directory: Path, label: str, roi: list[int],
+          coordinate_frame: str = 'river_station_lateral') -> dict:
+    if coordinate_frame not in ('river_station_lateral', 'cartesian_east_north'):
+        raise ValueError('Explicit supported hydraulic coordinate frame required')
     rows = parse_requests(log_path.read_text())
     files = [directory / f'{label}_{r["index"]:03d}.png' for r in rows]
     actual = set(directory.glob(f'{label}_[0-9][0-9][0-9].png'))
@@ -62,16 +65,26 @@ def audit(log_path: Path, directory: Path, label: str, roi: list[int]) -> dict:
         previous = rgb
     cameras = np.array([r['camera_world_cm'] for r in rows])
     times = np.array([r['world_s'] for r in rows])
-    return dict(scope='Actual sampled game frames; request-time metadata, not exact GPU exposure time',
+    first_range = [min(r['raft_station_m'] for r in rows), max(r['raft_station_m'] for r in rows)]
+    second_range = [min(r['raft_lateral_m'] for r in rows), max(r['raft_lateral_m'] for r in rows)]
+    if coordinate_frame == 'cartesian_east_north':
+        for row in rows:
+            row['raft_east_m'] = row.pop('raft_station_m')
+            row['raft_north_m'] = row.pop('raft_lateral_m')
+    result = dict(scope='Actual sampled game frames; request-time metadata, not exact GPU exposure time',
         log=str(log_path.resolve()), directory=str(directory.resolve()), label=label,
         image_size=list(size), frame_count=len(files), unique_png_hashes=len(set(hashes)),
         elapsed_game_seconds=float(times[-1]-times[0]),
         request_interval_seconds_min_median_max=np.percentile(np.diff(times), [0, 50, 100]).tolist(),
         camera_max_displacement_cm=float(np.linalg.norm(cameras-cameras[0], axis=1).max()),
-        raft_station_range_m=[min(r['raft_station_m'] for r in rows), max(r['raft_station_m'] for r in rows)],
+        hydraulic_coordinate_frame=coordinate_frame,
+        raft_hydraulic_coordinate_ranges_m=[first_range, second_range],
         roi_xyxy=roi, adjacent_frame_roi_differences=differences,
         requests=rows, png_sha256=hashes, photorealism_accepted=False,
         limitations='Image differences establish changed pixels only, not correct flow, splash trajectories, temporal stability, or playable FPS. Screenshot I/O perturbs frame cadence.')
+    if coordinate_frame == 'river_station_lateral':
+        result['raft_station_range_m'] = first_range
+    return result
 
 
 def main():
@@ -81,14 +94,16 @@ def main():
     parser.add_argument('--label', required=True)
     parser.add_argument('--roi', type=int, nargs=4, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--coordinate-frame', choices=('river_station_lateral', 'cartesian_east_north'),
+        default='river_station_lateral', help='Interpret the legacy log labels using the actual map hydraulic coordinates')
     args = parser.parse_args()
-    result = audit(args.log, args.directory, args.label, args.roi)
+    result = audit(args.log, args.directory, args.label, args.roi, args.coordinate_frame)
     with args.output.open('x') as output:
         json.dump(result, output, indent=2)
         output.write('\n')
     print(json.dumps({k: result[k] for k in ['label', 'frame_count', 'unique_png_hashes',
         'elapsed_game_seconds', 'request_interval_seconds_min_median_max',
-        'camera_max_displacement_cm', 'raft_station_range_m', 'photorealism_accepted']}))
+        'camera_max_displacement_cm', 'hydraulic_coordinate_frame', 'raft_hydraulic_coordinate_ranges_m', 'photorealism_accepted']}))
 
 
 if __name__ == '__main__':

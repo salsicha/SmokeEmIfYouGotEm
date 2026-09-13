@@ -12,6 +12,11 @@ RAFTSIMWATERDETAIL_API bool RaftSimValidateMacroSamplingGPU(FRHICommandListImmed
     FRHITexture* Atlas,FIntPoint GridSize,const TArray<FVector4f>& Queries,
     FRHIGPUBufferReadback* Readback,FString& Error,bool bReconstructCrest=false);
 
+// Exercise the same world-registered detail sampler used by material custom
+// nodes. XY queries are in the simulation's fixed metric coordinate frame.
+RAFTSIMWATERDETAIL_API bool RaftSimValidateRegisteredDetailSamplingGPU(FRHICommandListImmediate& Cmd,
+    FRHITexture* Texture,const TArray<FVector4f>& Queries,FRHIGPUBufferReadback* Readback,FString& Error);
+
 // Detail perturbations over the authoritative FV mean flow, not a second
 // water level or a replacement for bathymetry / raft-support physics.
 struct RAFTSIMWATERDETAIL_API FRaftSimDetailWaterGrid
@@ -44,7 +49,20 @@ public:
         int32 Steps, const TArray<FVector4f>* InitialState,
         FRHIGPUBufferReadback* Readback, FString& Error,
         const TArray<float>* InitialActivity=nullptr, FRHIGPUBufferReadback* ActivityReadback=nullptr);
+    // Explicit cell-aligned moving-domain handoff. Overlapping wet state is
+    // copied bit-exactly, newly exposed or now-dry cells start at zero detail.
+    // Mean flow is supplied for the NEW domain; no interpolation/reseeding,
+    // implicit resize, periodic wrap or simulation-clock advance is allowed.
+    // A move without overlap requires an explicit Reset by the owner instead.
+    // Optional readbacks are diagnostics only, never required by runtime.
+    bool RemapWindow(FRHICommandListImmediate& RHICmdList,
+        const FRaftSimDetailWaterGrid& Grid,const TArray<FVector4f>& Flow,
+        FString& Error,FRHIGPUBufferReadback* Readback=nullptr,
+        FRHIGPUBufferReadback* ActivityReadback=nullptr);
     void Reset();
+    // Nx by Ny retains the legacy resolve. Nx by (Ny+1) additionally stores
+    // origin/cell size in a metadata row, copied with rendered-frame history.
+    // This prevents a previous texture being sampled with the current origin.
     bool Resolve(FRHICommandListImmediate& RHICmdList,FRHITexture* Target,FString& Error);
     uint64 GetStepCount() const { return StepCount; }
     double GetSimulationSeconds() const { return SimulationSeconds; }

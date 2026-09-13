@@ -117,6 +117,9 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSouthForkRegisteredRockGuidedTraversalT
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSouthForkGeographicGuidedTraversalTest,
     "RaftSim.Survey.SouthForkGeographicGuidedTraversal",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSouthForkPlayableGuidedTraversalTest,
+    "RaftSim.Survey.SouthForkPlayableGuidedTraversal",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
 class FRaftSimObserveNaturalDrift : public IAutomationLatentCommand
 {
@@ -150,6 +153,8 @@ private:
     double LastGuideStroke = -10.0, MaximumRouteErrorM = 0.0;
     bool bSurveyBreakingReview = false, bOneCarrierThroughout = true;
     bool bFullSurfaceReview = false, bFixedBoundsThroughout = true;
+    bool bCarrierOpticsConfigured = true;
+    bool bPlayableProgressCorrect = true;
     int32 FullSurfaceProbeCount = 0, MissingSurfaceProbes = 0;
     double MinimumSurfaceAlpha = 1.0;
     double MinimumPreHullAlpha = 1.0, MaximumSubmittedAlphaError = 0.0;
@@ -187,8 +192,9 @@ bool FRaftSimObserveNaturalDrift::Update()
     if (Start < 0)
     {
         Start = Now;
-        bSurveyBreakingReview = FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyBreakingReview"));
-        bFullSurfaceReview = FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyFullSurfaceReview"));
+        const bool bPlayable = World->GetMapName().EndsWith(TEXT("L_SouthFork_Troublemaker"));
+        bSurveyBreakingReview = bPlayable || FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyBreakingReview"));
+        bFullSurfaceReview = bPlayable || FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyFullSurfaceReview"));
         if (bFullSurfaceReview && (!bGeographic || !bSurveyBreakingReview))
         { Test->AddError(TEXT("Full surface audit requires geographic breaking review")); return true; }
         bLitFoamReview = bSurveyBreakingReview && FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyLitFoamReview"));
@@ -213,14 +219,17 @@ bool FRaftSimObserveNaturalDrift::Update()
             FString RouteJson;
             TSharedPtr<FJsonObject> RouteData;
             FParse::Value(FCommandLine::Get(),TEXT("RaftSimSurveyGuidedRoute="),RouteSource);
+            if (bPlayable) RouteSource=TEXT("docs/reconstruction-review-2026-09-07/guided-route-playable.json");
             const FString RouteFile=FPaths::ConvertRelativePathToFull(FPaths::ProjectDir()/TEXT("..")/RouteSource);
             if (!FFileHelper::LoadFileToString(RouteJson,*RouteFile) ||
                 !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(RouteJson),RouteData) || !RouteData.IsValid())
             { Test->AddError(TEXT("Missing candidate guided route"));return true; }
             const FString GroundPath=Ground->GetStaticMesh()->GetPathName();
-            const bool bExpectedGround=bRegisteredRock
-                ? GroundPath==TEXT("/Game/RaftSim/Environment/SouthForkRockRegisteredCandidate20260907/SM_TroublemakerSurveyCandidate.SM_TroublemakerSurveyCandidate")
-                : GroundPath.Contains(TEXT("SouthForkSurveyGapCandidate20260907"));
+            const bool bExpectedGround=bPlayable
+                ? GroundPath==TEXT("/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround.SM_TroublemakerCapturedGround")
+                : (bRegisteredRock
+                    ? GroundPath==TEXT("/Game/RaftSim/Environment/SouthForkRockRegisteredCandidate20260907/SM_TroublemakerSurveyCandidate.SM_TroublemakerSurveyCandidate")
+                    : GroundPath.Contains(TEXT("SouthForkSurveyGapCandidate20260907")));
             if (!Config || Config->CookedFieldsDir!=RouteData->GetStringField(TEXT("cooked_fields_dir")) || !bExpectedGround)
             { Test->AddError(TEXT("Guided route does not match the scene's candidate geometry/fields"));return true; }
             BedSampling=TEXT("bilinear");
@@ -277,13 +286,27 @@ bool FRaftSimObserveNaturalDrift::Update()
                 const auto* Property=FindFProperty<FObjectProperty>(It->GetClass(),TEXT("SurfaceMesh"));
                 auto* Mesh=Property ? Cast<UProceduralMeshComponent>(Property->GetObjectPropertyValue_InContainer(*It)) : nullptr;
                 const auto* Section=Mesh ? Mesh->GetProcMeshSection(0) : nullptr;
+                // Submitted alpha alone cannot prove visible water. A renamed
+                // gameplay parent once skipped the runtime optical overrides.
+                UMaterialInterface* Material = Mesh ? Mesh->GetMaterial(0) : nullptr;
+                float CalmCoverage = 0, ActiveCoverage = 0;
+                bCarrierOpticsConfigured &= Material &&
+                    Material->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("CalmLiveSurfaceCoverage")), CalmCoverage) &&
+                    Material->GetScalarParameterValue(FHashedMaterialParameterInfo(TEXT("ActiveLiveSurfaceCoverage")), ActiveCoverage) &&
+                    FMath::IsNearlyEqual(CalmCoverage, 1.0f) && FMath::IsNearlyEqual(ActiveCoverage, 1.0f);
                 // Check actual submitted carrier data, not the volume-only sampling helper.
                 // Four stationary route locations must remain covered as the raft moves.
                 for (const FVector2D Point : {FVector2D(-60,-9),FVector2D(0,3),FVector2D(60,2),FVector2D(100,20)})
                 {
                     ++FullSurfaceProbeCount;
                     const auto& PreHull=It->GetPreHullSurfaceColors();
-                    if (!bBounds || !Section || !Section->bSectionVisible || Section->ProcVertexBuffer.Num()!=181*109 || PreHull.Num()!=181*109)
+                    // Conforming refinement retains every macro vertex at its
+                    // original index, then adds crest-only render vertices.
+                    // Require the normal playable refinement, not just a
+                    // relaxed lower bound that could accept a legacy mesh.
+                    if (!bBounds || !Section || !Section->bSectionVisible ||
+                        Section->ProcVertexBuffer.Num()<=181*109 ||
+                        Section->ProcIndexBuffer.Num()<=180*108*6 || PreHull.Num()!=181*109)
                     { ++MissingSurfaceProbes; continue; }
                     const FVector2D Cell=(Point-Minimum)/1.5;
                     const int32 X=FMath::FloorToInt(Cell.X), Y=FMath::FloorToInt(Cell.Y);
@@ -526,6 +549,20 @@ bool FRaftSimObserveNaturalDrift::Update()
     Sample->SetBoolField(TEXT("wet"), bWater && WaterSample.bWet);
     Samples.Add(MakeShared<FJsonValueObject>(Sample));
     const bool bReachedOutlet = bMapped && River.X >= 110.0;
+    if (World->GetMapName().EndsWith(TEXT("L_SouthFork_Troublemaker")))
+    {
+        bool bFoundProgress = false;
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (It->GetClass()->GetName() != TEXT("RaftSimRunManager")) continue;
+            UFunction* Progress = It->FindFunction(TEXT("GetProgressFraction"));
+            struct { float ReturnValue = -1.0f; } Result;
+            if (Progress) It->ProcessEvent(Progress, &Result);
+            const float Expected = FMath::Clamp(static_cast<float>((River.X + 60.0) / 170.0), 0.0f, 1.0f);
+            bFoundProgress = Progress && FMath::IsNearlyEqual(Result.ReturnValue, Expected, 0.02f);
+        }
+        bPlayableProgressCorrect &= bFoundProgress;
+    }
     const bool bDone = Elapsed >= 120.0 || bReachedOutlet || !bFinite;
     const bool bStationShot = bStationCaptures && bMapped && River.X >= NextCaptureStationM;
     if ((bStationCaptures ? (Shot == 0 || bStationShot) : Elapsed >= Shot * 30.0) || bDone)
@@ -554,6 +591,8 @@ bool FRaftSimObserveNaturalDrift::Update()
     if (bFullSurfaceReview)
     {
         Report->SetBoolField(TEXT("fixed_surface_bounds_throughout"),bFixedBoundsThroughout);
+        Report->SetBoolField(TEXT("carrier_optics_configured_throughout"), bCarrierOpticsConfigured);
+        Report->SetBoolField(TEXT("playable_progress_correct_throughout"), bPlayableProgressCorrect);
         Report->SetNumberField(TEXT("full_surface_probe_count"),FullSurfaceProbeCount);
         Report->SetNumberField(TEXT("missing_surface_probes"),MissingSurfaceProbes);
         Report->SetNumberField(TEXT("minimum_submitted_surface_alpha"),MinimumSurfaceAlpha);
@@ -562,6 +601,8 @@ bool FRaftSimObserveNaturalDrift::Update()
         Report->SetNumberField(TEXT("hull_masked_probe_count"),HullMaskedProbeCount);
         Report->SetArrayField(TEXT("surface_probe_failures"),SurfaceProbeFailures);
         Test->TestTrue(TEXT("whole reconstructed domain remains fixed throughout traversal"),bFixedBoundsThroughout);
+        Test->TestTrue(TEXT("carrier material retains full calm and active coverage"), bCarrierOpticsConfigured);
+        Test->TestTrue(TEXT("playable progress uses the negative-to-positive survey station range"), bPlayableProgressCorrect);
         Test->TestTrue(TEXT("stationary route locations have visible submitted carrier throughout"),
             FullSurfaceProbeCount>0 && MissingSurfaceProbes==0);
     }
@@ -659,6 +700,16 @@ bool FRaftSimSouthForkRegisteredRockGuidedTraversalTest::RunTest(const FString&)
 bool FRaftSimSouthForkGeographicGuidedTraversalTest::RunTest(const FString&)
 {
     if (!AutomationOpenMap(TEXT("/Game/RaftSim/Maps/Review/Geographic/SouthForkRegisteredRockPlayable"),true)) return false;
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.0f));
+    FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FRaftSimObserveNaturalDrift>(this,true,true,true));
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
+    return true;
+}
+bool FRaftSimSouthForkPlayableGuidedTraversalTest::RunTest(const FString&)
+{
+    if (!FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")))
+    { AddError(TEXT("Playable traversal requires an ephemeral profile to protect user saves")); return false; }
+    if (!AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_SouthFork_Troublemaker"),true)) return false;
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.0f));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FRaftSimObserveNaturalDrift>(this,true,true,true));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));

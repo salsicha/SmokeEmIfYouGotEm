@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from liquid_compatible_advection import sample,midpoint
+from liquid_compatible_advection import sample,midpoint,sample_compact
 from liquid_affine_transfer import to_particles
 from liquid_compatible_projection import divergence
 
@@ -41,6 +41,28 @@ class CompatibleAdvectionTest(unittest.TestCase):
 
     def test_incomplete_support_is_not_silently_clamped(self):
         with self.assertRaises(ValueError):sample([[.1,4,4]],np.zeros((8,8,8,3)),[1]*3)
+
+    def test_compact_transport_divergence_commutes_with_tent(self):
+        rng=np.random.default_rng(187);grid=rng.normal(size=(12,12,12,3));h=np.array([.5,.5,1/3])
+        points=rng.uniform(3,9,(180,3))*h
+        div=divergence(grid.transpose(2,1,0,3),h).transpose(2,1,0)
+        expected,_=to_particles(points,np.repeat(div[...,None],3,axis=-1),h)
+        _,j=sample_compact(points,grid,h,True)
+        np.testing.assert_allclose(np.trace(j,axis1=1,axis2=2),expected[:,0],atol=1e-13)
+
+    def test_compact_affine_field_and_checkerboard(self):
+        h=np.array([50,50,100/3]);nodes=(np.indices((12,12,12)).transpose(1,2,3,0)+.5)*h
+        c=np.array([[.2,-.6,.3],[.7,-.1,.2],[-.4,.5,-.1]])
+        grid=nodes@c.T+[100,200,300];points=np.array([[4.2,5.7,6.1],[6.9,7.4,3.3]])*h
+        v,j=sample_compact(points,grid,h,True)
+        np.testing.assert_allclose(v,points@c.T+[100,200,300],atol=1e-12)
+        np.testing.assert_allclose(j,np.broadcast_to(c,j.shape),atol=1e-13)
+        grid=np.zeros_like(grid);grid[...,0]=(-1.)**np.indices((12,12,12))[0]
+        v,j=sample_compact(points,grid,h,True)
+        np.testing.assert_allclose(v,0,atol=1e-14);np.testing.assert_allclose(j,0,atol=1e-14)
+
+    def test_compact_support_is_not_clamped(self):
+        with self.assertRaises(ValueError):sample_compact([[.5,4,4]],np.zeros((8,8,8,3)),[1]*3)
 
 
 if __name__=='__main__':unittest.main()

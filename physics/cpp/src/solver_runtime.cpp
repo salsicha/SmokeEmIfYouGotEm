@@ -1,15 +1,45 @@
 #include "solver_internal.hpp"
 #include "solver_profile.hpp"
+#include "solver_row_executor.hpp"
 
 namespace raftsim {
 
 using namespace solver_detail;
+
+void shutdown_solver_workers() {
+    solver_detail::solver_row_executor().shutdown();
+}
 
 ReducedShallowWaterSolver::ReducedShallowWaterSolver(Scenario scenario, SolverConfig config)
     : scenario_(std::move(scenario)),
       config_(config),
       state_(scenario_.initial),
       initial_mass_(compute_mass(scenario_, scenario_.initial)) {
+    for (const auto& boundary : scenario_.boundaries) {
+        const bool prescribed_profile = boundary.kind == "discharge_profile";
+        if (boundary.kind != "ghost" && !prescribed_profile && boundary.ghost_cells.empty()) continue;
+        const bool x_edge = boundary.edge == "west" || boundary.edge == "east";
+        const bool y_edge = boundary.edge == "south" || boundary.edge == "north";
+        if ((!x_edge && !y_edge) || (boundary.kind != "ghost" && !prescribed_profile) ||
+            config_.solver_mode != "finite_volume" || config_.spatial_order != 2 ||
+            !config_.disable_fixture_calibrations || config_.boundary_mode != "scenario" ||
+            boundary.has_stage || boundary.has_depth || boundary.has_velocity ||
+            boundary.ghost_cells.size() != 2 * (x_edge ? scenario_.grid.ny : scenario_.grid.nx) ||
+            (boundary.edge == "west" && config_.experimental_west_discharge_m3s >= 0.0))
+            throw std::runtime_error("Ghost boundaries require two explicit layers, no scalar override, and uncalibrated MUSCL.");
+        for (const auto& cell : boundary.ghost_cells)
+            if (!std::isfinite(cell.bed) || !std::isfinite(cell.h) || !std::isfinite(cell.u) ||
+                !std::isfinite(cell.v) || cell.h < 0.0)
+                throw std::runtime_error("Boundary ghost cell is nonfinite or has negative depth.");
+        if (prescribed_profile) {
+            const double sign = boundary.edge == "west" || boundary.edge == "south" ? 1. : -1.;
+            for (const auto& cell : boundary.ghost_cells) {
+                const double q = sign * cell.h * (x_edge ? cell.u : cell.v);
+                if (!std::isfinite(q) || q < 0. || !std::isfinite(cell.bed+cell.h))
+                    throw std::runtime_error("Discharge profile requires finite inward face flux and external stage.");
+            }
+        }
+    }
     if (!std::isfinite(config_.experimental_west_discharge_m3s)) {
         throw std::runtime_error("Experimental west discharge must be finite.");
     }
@@ -276,6 +306,25 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
         return primitives[row * nx + col];
     };
     auto ghost_primitive = [&](std::size_t row, std::size_t col, const char* edge) -> solver_detail::MusclFaceState {
+        const auto* boundary = boundary_for_edge(scenario_, edge);
+        if (boundary && boundary->kind == "discharge_profile") {
+            const bool x_edge = boundary->edge == "west" || boundary->edge == "east";
+            const auto& profile = boundary->ghost_cells[x_edge ? row : col];
+            auto ghost = cell_primitive(row,col);
+            // Like the established west-Q closure, do not also pin stage in
+            // a subcritical MUSCL slope. The actual face flux is imposed below.
+            if (profile.h * (x_edge ? profile.u : profile.v) == 0.) {
+                if (x_edge) ghost.u = -ghost.u; else ghost.v = -ghost.v;
+            }
+            return ghost;
+        }
+        if (boundary && boundary->kind == "ghost") {
+            const bool x_edge = std::string(edge) == "west" || std::string(edge) == "east";
+            const auto& cell = boundary->ghost_cells[x_edge ? row : col];
+            return {cell.h, (bed_coupling ? cell.bed : 0.0) + cell.h,
+                cell.h > config_.dry_tolerance ? cell.u : 0.0,
+                cell.h > config_.dry_tolerance ? cell.v : 0.0};
+        }
         // A flow boundary must not also pin stage/velocity during reconstruction.
         if (prescribed_west && std::string(edge) == "west") {
             auto ghost = cell_primitive(row, col);
@@ -291,7 +340,9 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     };
 
     std::vector<solver_detail::MusclHalfSlopes> slopes(ny * nx);
-    for (std::size_t row = 0; row < ny; ++row) {
+    const bool parallel_rows = nx * ny >= 16384 && boundary_fluxes == nullptr && face_fluxes == nullptr;
+    solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
+    for (std::size_t row = first_row; row < end_row; ++row) {
         for (std::size_t col = 0; col < nx; ++col) {
             solver_detail::MusclFaceState center = cell_primitive(row, col);
             if (center.h <= config_.dry_tolerance) {
@@ -326,6 +377,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
         }
     }
 
+    });
     RAFTSIM_PROFILE_FINISH(reconstruction_profile);
     // The bed at each face shared by two wet cells across a smooth bed variation is
     // the arithmetic mean of the adjacent cell-center beds (a continuous piecewise-
@@ -406,20 +458,87 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     const bool east_wall = edge_is_wall("east");
     const bool south_wall = edge_is_wall("south");
     const bool north_wall = edge_is_wall("north");
+    auto ghost_face = [&](std::size_t row, std::size_t col, const char* edge) -> solver_detail::MusclFaceState {
+        auto center = ghost_primitive(row,col,edge);
+        const auto* boundary = boundary_for_edge(scenario_,edge);
+        if (!boundary || boundary->kind != "ghost" || center.h <= config_.dry_tolerance) return center;
+        const std::string name(edge);
+        const bool x_edge = name == "west" || name == "east";
+        const bool low_edge = name == "west" || name == "south";
+        const auto& far = boundary->ghost_cells[(x_edge ? ny : nx) + (x_edge ? row : col)];
+        const auto inside = cell_primitive(row,col);
+        if (far.h <= config_.dry_tolerance || inside.h <= config_.dry_tolerance) return center;
+        const double far_eta = (bed_coupling ? far.bed : 0.0) + far.h;
+        auto half_slope = [&](double inner, double value, double outer) {
+            return low_edge ? 0.5 * mc_limited(value-outer,inner-value)
+                            : 0.5 * mc_limited(value-inner,outer-value);
+        };
+        const double sign = low_edge ? 1.0 : -1.0;
+        const double eta = center.eta + sign * clamp(half_slope(inside.eta,center.eta,far_eta),-center.h,center.h);
+        const double bed = bed_coupling ? boundary->ghost_cells[x_edge ? row : col].bed : 0.0;
+        const double h = std::max(0.0,eta-bed);
+        return {h,h > 0.0 ? bed+h : eta,
+            center.u + sign*half_slope(inside.u,center.u,far.u),
+            center.v + sign*half_slope(inside.v,center.v,far.v)};
+    };
     auto mirror_x = [](const solver_detail::MusclFaceState& state) -> solver_detail::MusclFaceState {
         return solver_detail::MusclFaceState{state.h, state.eta, -state.u, state.v};
     };
     auto mirror_y = [](const solver_detail::MusclFaceState& state) -> solver_detail::MusclFaceState {
         return solver_detail::MusclFaceState{state.h, state.eta, state.u, -state.v};
     };
+    auto impose_profile = [&](InterfaceFluxPair& pair, const solver_detail::MusclFaceState& inside,
+                              std::size_t index, const char* edge) {
+        const auto* boundary = boundary_for_edge(scenario_,edge);
+        if (!boundary || boundary->kind != "discharge_profile") return;
+        const bool x_edge = boundary->edge == "west" || boundary->edge == "east";
+        const double sign = boundary->edge == "west" || boundary->edge == "south" ? 1. : -1.;
+        const auto& external = boundary->ghost_cells[index];
+        const double q = sign * external.h * (x_edge ? external.u : external.v);
+        if (q == 0.) {
+            const double pressure = .5 * config_.gravity * inside.h * inside.h;
+            const FluxState flux = x_edge ? FluxState{0.,pressure,0.} : FluxState{0.,0.,pressure};
+            pair = {flux,flux};
+            return;
+        }
+        const double inward_velocity = sign * (x_edge ? inside.u : inside.v);
+        const double wave_speed = std::sqrt(config_.gravity * inside.h);
+        const double external_depth = external.bed + external.h - (inside.eta-inside.h);
+        double h = external_depth;
+        if (inside.h > config_.dry_tolerance && inward_velocity > -wave_speed && inward_velocity < wave_speed) {
+            const double invariant = inward_velocity - 2.*wave_speed;
+            double low=0., high=std::max(1.,inside.h);
+            auto residual = [&](double depth) { return q/depth - 2.*std::sqrt(config_.gravity*depth) - invariant; };
+            while (residual(high)>0.) high*=2.;
+            for (int iteration=0;iteration<56;++iteration) {
+                const double mid=.5*(low+high);
+                if (residual(mid)>0.) low=mid; else high=mid;
+            }
+            h=.5*(low+high);
+            if (q/h >= std::sqrt(config_.gravity*h)) h=external_depth;
+        } else if (inside.h > config_.dry_tolerance && inward_velocity <= -wave_speed) {
+            throw std::runtime_error("Prescribed inlet encountered supercritical outflow: " + std::string(edge));
+        }
+        if (!std::isfinite(h) || h <= config_.dry_tolerance)
+            throw std::runtime_error("Active discharge face has no valid external depth: " + std::string(edge));
+        const double normal_q=sign*q;
+        const double pressure_flux=q*q/h + .5*config_.gravity*h*h;
+        const double tangent_velocity=x_edge ? external.v : external.u;
+        const FluxState flux=x_edge ? FluxState{normal_q,pressure_flux,normal_q*tangent_velocity}
+                                    : FluxState{normal_q,normal_q*tangent_velocity,pressure_flux};
+        pair={flux,flux};
+    };
 
     // Interior faces are shared by adjacent cells. Retain the complete pair:
     // hydrostatic bed corrections differ on its two sides. A rolling row uses
     // O(nx) storage, and never survives this immutable-from RK stage.
     RAFTSIM_PROFILE_SCOPE(flux_profile, Flux);
+    solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
+    // Each stripe owns its rolling face cache. Its first south face is computed
+    // again from the same immutable state; no value or arithmetic order changes.
     std::vector<InterfaceFluxPair> previous_north(nx);
     std::vector<bool> previous_north_valid(nx, false);
-    for (std::size_t row = 0; row < ny; ++row) {
+    for (std::size_t row = first_row; row < end_row; ++row) {
         InterfaceFluxPair previous_east{};
         bool previous_east_valid = false;
         for (std::size_t col = 0; col < nx; ++col) {
@@ -447,7 +566,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
             InterfaceFluxPair west_pair = previous_east_valid ? previous_east : muscl_hydrostatic_flux_x(
                 col > 0 ? east_face(row, col - 1)
                         : ((west_wall || (prescribed_west && !west_inlet[row]))
-                            ? mirror_x(center_west) : ghost_primitive(row, col, "west")),
+                            ? mirror_x(center_west) : ghost_face(row, col, "west")),
                 center_west,
                 bed_coupling,
                 config_);
@@ -495,21 +614,25 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
             InterfaceFluxPair east_pair = muscl_hydrostatic_flux_x(
                 center_east,
                 col + 1 < nx ? west_face(row, col + 1)
-                             : (east_wall ? mirror_x(center_east) : ghost_primitive(row, col, "east")),
+                             : (east_wall ? mirror_x(center_east) : ghost_face(row, col, "east")),
                 bed_coupling,
                 config_);
             InterfaceFluxPair south_pair = previous_north_valid[col] ? previous_north[col] : muscl_hydrostatic_flux_y(
                 row > 0 ? north_face(row - 1, col)
-                        : (south_wall ? mirror_y(center_south) : ghost_primitive(row, col, "south")),
+                        : (south_wall ? mirror_y(center_south) : ghost_face(row, col, "south")),
                 center_south,
                 bed_coupling,
                 config_);
             InterfaceFluxPair north_pair = muscl_hydrostatic_flux_y(
                 center_north,
                 row + 1 < ny ? south_face(row + 1, col)
-                             : (north_wall ? mirror_y(center_north) : ghost_primitive(row, col, "north")),
+                             : (north_wall ? mirror_y(center_north) : ghost_face(row, col, "north")),
                 bed_coupling,
                 config_);
+            if (col == 0) impose_profile(west_pair,center_west,row,"west");
+            if (col + 1 == nx) impose_profile(east_pair,center_east,row,"east");
+            if (row == 0) impose_profile(south_pair,center_south,col,"south");
+            if (row + 1 == ny) impose_profile(north_pair,center_north,col,"north");
             previous_east = east_pair;
             previous_east_valid = true;
             previous_north[col] = north_pair;
@@ -566,6 +689,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
             to.v(row, col) = hv_next / safe_depth(h_next, config_.dry_tolerance);
         }
     }
+    });
 }
 
 void ReducedShallowWaterSolver::step_finite_volume_once_second_order(double dt) {
@@ -584,7 +708,11 @@ void ReducedShallowWaterSolver::step_finite_volume_once_second_order(double dt) 
     finite_volume_second_order_flux_update(state_, dt, predictor);
     WaterState& corrector = muscl_corrector_;
     finite_volume_second_order_flux_update(predictor, dt, corrector);
+    finish_finite_volume_second_order_step(dt);
+}
 
+void ReducedShallowWaterSolver::finish_finite_volume_second_order_step(double dt) {
+    const WaterState& corrector = muscl_corrector_;
     if (muscl_next_.h.empty()) {
         muscl_next_ = state_;
     }

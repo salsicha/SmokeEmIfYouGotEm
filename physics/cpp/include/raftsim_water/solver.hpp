@@ -7,6 +7,10 @@
 
 namespace raftsim {
 
+// Call during host module shutdown, before DLL unloading/Windows loader lock.
+// Waits for in-flight row work and joins the bounded persistent workers.
+void shutdown_solver_workers();
+
 struct DerivedFields {
     Array2D normal_x;
     Array2D normal_y;
@@ -101,6 +105,7 @@ public:
     void replace_state(WaterState state, double time);
 
 private:
+    friend class CartesianWaterDomain;
     Scenario scenario_;
     SolverConfig config_;
     WaterState state_;
@@ -120,6 +125,7 @@ private:
     void step_finite_volume_once(double dt);
     bool finite_volume_second_order_enabled() const;
     void step_finite_volume_once_second_order(double dt);
+    void finish_finite_volume_second_order_step(double dt);
     void finite_volume_second_order_flux_update(const WaterState& from, double dt, WaterState& to,
         BoundaryMassFluxes* boundary_fluxes = nullptr,
         NumericalMassFluxGrid* face_fluxes = nullptr) const;

@@ -69,7 +69,8 @@ def audit_emission(directory, prepared, report):
         initial[r['region_id']] = words
     before = [native_snapshot(root, h, 'before') for root, h in zip(roots, history)]
     later = {r['region_id']: read(directory, r, 'route_words', (nf+ni, r['particle_capacity']))[:, :r['particle_count']] for r in records}
-    groups = [g for g in report['groups'] if g['entries'][0]['first']][:step]
+    from liquid_stage_journal import stage_groups
+    groups = [g for g in stage_groups(report) if g['entries'][0]['first']][:step]
     if len(groups) != step:
         raise ValueError('Missing native first-stage spawn plan')
     planned = {}

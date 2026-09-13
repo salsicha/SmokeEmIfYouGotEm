@@ -1,6 +1,7 @@
 #include "raftsim_water/chrono_coupling.hpp"
 #include "raftsim_water/solver.hpp"
 #include "../src/solver_internal.hpp"
+#include "../src/solver_row_executor.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -220,6 +221,45 @@ void assert_boundary_flux_diagnostic(const raftsim::Scenario& source) {
     expect(rejected, "unsupported diagnostic mode was silently accepted");
 }
 
+void assert_solver_row_barrier_and_failure_recovery() {
+    using raftsim::solver_detail::solver_row_ranges;
+    for (int repeat = 0; repeat < 12; ++repeat) {
+        std::vector<int> values(163, -1);
+        solver_row_ranges(values.size(), true, [&](std::size_t first, std::size_t end) {
+            for (auto row = first; row < end; ++row) values[row] = static_cast<int>(row) + repeat;
+        });
+        for (std::size_t row = 0; row < values.size(); ++row)
+            expect(values[row] == static_cast<int>(row) + repeat, "row dispatch returned before completion");
+    }
+    bool caught = false;
+    try {
+        solver_row_ranges(163, true, [](std::size_t first, std::size_t) {
+            if (first == 8) throw std::runtime_error("row failure probe");
+        });
+    } catch (const std::runtime_error& error) { caught = std::string(error.what()) == "row failure probe"; }
+    expect(caught, "worker exception was lost");
+    std::atomic<int> count{0};
+    auto dispatch = [&] {
+        solver_row_ranges(163, true, [&](std::size_t first, std::size_t end) {
+            count.fetch_add(static_cast<int>(end-first));
+            // Nested use must not wait on its own worker barrier.
+            solver_row_ranges(20, true, [](std::size_t, std::size_t) {});
+        });
+    };
+    std::thread concurrent(dispatch);
+    dispatch();
+    concurrent.join();
+    expect(count == 326, "concurrent dispatch or post-failure recovery lost work");
+    const int rounding = std::fegetround();
+    std::fesetround(FE_DOWNWARD);
+    std::atomic<int> wrong_rounding{0};
+    solver_row_ranges(163, true, [&](std::size_t, std::size_t) {
+        if (std::fegetround() != FE_DOWNWARD) ++wrong_rounding;
+    });
+    std::fesetround(rounding);
+    expect(wrong_rounding == 0, "worker changed host floating-point rounding mode");
+}
+
 void assert_finite_volume_second_order_is_deterministic(const raftsim::Scenario& scenario) {
     raftsim::SolverConfig config = finite_volume_second_order_config();
     raftsim::ReducedShallowWaterSolver first(scenario, config);
@@ -320,6 +360,57 @@ void assert_muscl_scratch_is_not_state(const raftsim::Scenario& scenario) {
             a.v.values() == b.v.values() && a.eta.values() == b.eta.values() &&
             a.hu.values() == b.hu.values() && a.hv.values() == b.hv.values() &&
             a.wet.values == b.wet.values, "RK scratch leaked across wet/dry state replacement");
+    }
+}
+
+void assert_large_parallel_rows_match_serial(const raftsim::Scenario& original) {
+    auto scenario = original;
+    constexpr std::size_t nx = 131, ny = 129; // Above the real parallel threshold.
+    scenario.grid.nx = nx; scenario.grid.ny = ny;
+    scenario.grid.dx = .7; scenario.grid.dy = 1.1;
+    scenario.bed = raftsim::Array2D(ny,nx);
+    for (auto* field : {&scenario.initial.h,&scenario.initial.u,&scenario.initial.v,
+                       &scenario.initial.eta,&scenario.initial.hu,&scenario.initial.hv})
+        *field = raftsim::Array2D(ny,nx);
+    scenario.initial.wet = raftsim::BoolGrid{ny,nx,std::vector<std::uint8_t>(nx*ny,0)};
+    for (auto& boundary : scenario.boundaries) {
+        boundary.kind = "wall";
+        boundary.has_stage = boundary.has_depth = boundary.has_velocity = false;
+    }
+    for (std::size_t row=0;row<ny;++row) for (std::size_t col=0;col<nx;++col) {
+        const double bed = .8*std::sin(row*.11)+.4*std::cos(col*.17) + ((row/7+col/11)%5==0 ? 1.5 : 0.);
+        scenario.bed(row,col)=bed;
+        scenario.initial.h(row,col)=std::max(0.,1.1-bed);
+        if ((row+col)%13==0) scenario.initial.h(row,col)=.5e-6; // Preserve positive films.
+        scenario.initial.u(row,col)=.4*std::sin(col*.05);
+        scenario.initial.v(row,col)=.3*std::cos(row*.13);
+    }
+    for (const char* scheme : {"hll","roe","rusanov"}) for (double bed_scale : {0.,1.}) {
+        auto config=finite_volume_second_order_config();
+        config.flux_scheme=scheme;
+        config.bed_slope_source_scale=bed_scale;
+        raftsim::ReducedShallowWaterSolver parallel(scenario,config),serial(scenario,config);
+        for (int step=0;step<12;++step) {
+            if (step==4 || step==8) {
+                auto replacement=parallel.state();
+                replacement.h(64,65)=step==4 ? 0. : .3;
+                parallel.replace_state(replacement,parallel.time());
+                serial.replace_state(replacement,serial.time());
+            }
+            const double dt=.003+.0001*step;
+            parallel.step(dt);
+            // A nested dispatch executes serially; the identical numerical
+            // implementation is exercised without adding a public solver knob.
+            raftsim::solver_detail::solver_row_ranges(32,true,[&](std::size_t first,std::size_t) {
+                if (first==0) serial.step(dt);
+            });
+            const auto& a=parallel.state();const auto& b=serial.state();
+            expect(a.h.values()==b.h.values() && a.u.values()==b.u.values() &&
+                a.v.values()==b.v.values() && a.eta.values()==b.eta.values() &&
+                a.hu.values()==b.hu.values() && a.hv.values()==b.hv.values() &&
+                a.wet.values==b.wet.values && parallel.time()==serial.time(),
+                "parallel rows differ from serial across wet/dry/film or replacement state");
+        }
     }
 }
 
@@ -455,6 +546,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
+        assert_solver_row_barrier_and_failure_recovery();
         assert_scenario_loads(scenario);
         assert_boundary_flux_diagnostic(scenario);
         assert_solver_is_deterministic(scenario);
@@ -463,6 +555,7 @@ int main(int argc, char** argv) {
         assert_validation_rejects_clipped_or_nonfinite_flow(scenario);
         assert_live_state_can_be_replaced(scenario);
         assert_muscl_scratch_is_not_state(scenario);
+        assert_large_parallel_rows_match_serial(scenario);
         assert_finite_volume_second_order_is_well_balanced(scenario);
         assert_emergent_step_uses_hydrostatic_flux();
         assert_chrono_coupling_samples_water_and_contact(scenario);
@@ -474,6 +567,11 @@ int main(int argc, char** argv) {
                       << " cascading_drop_transitions=" << scenario.cascading.drop_transitions.size() << "\n";
         }
         std::cout << "raftsim_water_tests passed for " << scenario.scenario_id << "\n";
+        raftsim::shutdown_solver_workers();
+        raftsim::shutdown_solver_workers();
+        raftsim::solver_detail::solver_row_ranges(20, true, [](std::size_t, std::size_t) {
+            raftsim::solver_detail::solver_row_ranges(20, true, [](std::size_t, std::size_t) {});
+        });
         return 0;
     } catch (const std::exception& exc) {
         std::cerr << "raftsim_water_tests: " << exc.what() << "\n";

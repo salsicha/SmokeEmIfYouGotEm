@@ -140,6 +140,13 @@ Scenario load_scenario_package(const std::string& scenario_dir) {
             boundary.velocity_x = velocity->at(0).as_number();
             boundary.velocity_y = velocity->at(1).as_number();
         }
+        if (const JsonValue* ghosts = value.find("ghost_cells")) {
+            for (const JsonValue& cell : ghosts->as_array()) {
+                if (cell.as_array().size() != 4) throw std::runtime_error("Boundary ghost cell must contain bed, h, u, v.");
+                boundary.ghost_cells.push_back({cell.at(0).as_number(),cell.at(1).as_number(),
+                    cell.at(2).as_number(),cell.at(3).as_number()});
+            }
+        }
         scenario.boundaries.push_back(boundary);
     }
 

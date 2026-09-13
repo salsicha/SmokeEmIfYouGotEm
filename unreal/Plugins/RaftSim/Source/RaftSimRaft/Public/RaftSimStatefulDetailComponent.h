@@ -1,14 +1,15 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "RaftSimDetailPresentationFrame.h"
 #include "RaftSimStatefulDetailComponent.generated.h"
 class URaftSimWaterRuntimeAdapter;
 class UMaterialInstanceDynamic;
 class UTextureRenderTarget2D;
 struct FRaftSimDetailRenderState;
 
-// Optional, fixed world-space crux window. Camera/raft motion never changes
-// its origin or reseeds state. A future moving window needs explicit remapping.
+// Persistent detail on the existing carrier. Playable Cartesian rivers remap
+// exact overlapping state; legacy review maps may retain a fixed local basis.
 UCLASS()
 class RAFTSIMRAFT_API URaftSimStatefulDetailComponent : public UActorComponent
 {
@@ -16,19 +17,31 @@ class RAFTSIMRAFT_API URaftSimStatefulDetailComponent : public UActorComponent
 public:
     URaftSimStatefulDetailComponent();
     bool Initialize(URaftSimWaterRuntimeAdapter* Adapter,UMaterialInstanceDynamic* Material,
-        FVector CenterWorldCm,FVector DownstreamWorld,bool bMotionHistory=false);
+        FVector CenterWorldCm,FVector DownstreamWorld,bool bMotionHistory=false,bool bMovingCartesian=false);
+    void SetFocusActor(AActor* Actor);
+    bool IsReady() const { return bReady; }
+    void CommitCompletedFrame();
+    bool AuditPresentedFrame();
+    TSharedPtr<const FRaftSimDetailPresentationFrame,ESPMode::ThreadSafe> GetPresentedFrame() const { return bReady ? PresentedFrame : nullptr; }
     virtual void TickComponent(float DeltaTime,ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 private:
+    bool CacheSampleCoordinates();
     bool UpdateMeanFlow();
     UPROPERTY(Transient) TObjectPtr<URaftSimWaterRuntimeAdapter> Water;
     UPROPERTY(Transient) TObjectPtr<UMaterialInstanceDynamic> SurfaceMaterial;
     UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> SurfaceTexture;
     UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> PreviousSurfaceTexture;
+    UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> ComputeTexture;
+    TSharedPtr<const FRaftSimDetailPresentationFrame,ESPMode::ThreadSafe> PresentedFrame;
+    uint64 LastCommitGameFrame=MAX_uint64,PresentationCommits=0,PresentationHolds=0;
+    double MaximumPresentationAge=0;
+    FString ContactAuditPath;
+    bool bContactAuditRequested=false;
     TSharedPtr<FRaftSimDetailRenderState,ESPMode::ThreadSafe> RenderState;
     TArray<FVector4f> CachedFlow;
-    // Fixed window: invert world coordinates only at initialization. The live
-    // field still updates at 8 Hz; cached geometry never freezes hydraulics.
+    // Recompute coordinates only on initialization/remap. Live fields update
+    // at 8 Hz; cached geometry never freezes hydraulics.
     TArray<FVector2D> SampleCoordinates;
     TArray<FVector4f> SampleBasisToDetail;
     FVector Center=FVector::ZeroVector,Downstream=FVector::ForwardVector,Left=FVector::RightVector;
@@ -37,8 +50,13 @@ private:
     double FlowPreparationTotalMs=0,FlowPreparationMaxMs=0;
     int32 FlowPreparationCount=0;
     bool bReady=false,bReported=false;
+    bool bReportedBreakingSource=false;
     bool bSecondOrder=false;
     bool bActivityMemory=false;
+    bool bMovingWindow=false;
+    FVector FocusWorldCm=FVector::ZeroVector;
+    TWeakObjectPtr<AActor> FocusActor;
+    FVector2f WindowOriginMeters=FVector2f::ZeroVector;
     int32 DetailSize=128;
     float DetailCellMeters=0.5f;
     float DetailOriginMeters=-32.0f;

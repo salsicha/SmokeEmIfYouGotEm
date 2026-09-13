@@ -14,7 +14,7 @@ class RAFTSIMUI_API URaftSimSaveSubsystem : public UGameInstanceSubsystem
 
 public:
     static const TCHAR* SlotName;
-    static constexpr int32 CurrentSaveVersion = 3;
+    static constexpr int32 CurrentSaveVersion = 4;
 
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
@@ -47,7 +47,8 @@ public:
     void RecordTrainingDrillCompleted(FName DrillId);
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Career")
-    void RecordCareerCheckpoint(FName ScenarioId, FName SectionId, float StationM, FTransform Transform);
+    void RecordCareerCheckpoint(FName ScenarioId, FName SectionId, float StationM, FTransform Transform,
+        const FString& CoordinateMapPath = TEXT(""));
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Career")
     bool IsScenarioUnlocked(FName ScenarioId, ERaftSimGameMode GameMode) const;
@@ -61,7 +62,8 @@ public:
     // finish, never from a checkpoint kilometres further down the river.
     bool FindBestCheckpoint(
         float MinimumStationM, FTransform& OutTransform,
-        float MaximumStationM = 1000000000.0f) const;
+        float MaximumStationM = 1000000000.0f, const FString& CoordinateMapPath = TEXT(""),
+        FName LevelName = NAME_None) const;
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Settings")
     void RestoreDefaultSettings();
@@ -77,11 +79,19 @@ public:
     static bool NormalizeSave(URaftSimVerticalSliceSaveGame* Save);
     static ERaftSimMedal ApplyRunResult(
         URaftSimVerticalSliceSaveGame* Save, const FRaftSimRunResult& Result);
+    static bool ApplyCareerCheckpoint(URaftSimVerticalSliceSaveGame* Save,
+        FName ScenarioId, FName SectionId, float StationM, const FTransform& Transform,
+        const FString& CoordinateMapPath);
+    static bool SelectCheckpoint(const URaftSimVerticalSliceSaveGame* Save,
+        float MinimumStationM, float MaximumStationM, const FString& CoordinateMapPath,
+        FName LevelName, FTransform& OutTransform);
 
 private:
     static FRaftSimScenarioProgress& FindOrAddProgress(
         URaftSimVerticalSliceSaveGame* Save, FName ScenarioId);
     static void RecalculateLicenseAndUnlocks(URaftSimVerticalSliceSaveGame* Save);
+    static void EnsureProgressCoordinates(URaftSimVerticalSliceSaveGame* Save,
+        FRaftSimScenarioProgress& Progress, const FString& CoordinateMapPath);
 
     UPROPERTY()
     TObjectPtr<URaftSimVerticalSliceSaveGame> CurrentSave;

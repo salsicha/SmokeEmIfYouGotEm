@@ -22,6 +22,16 @@ def fixture(moved=False):
 
 
 class RegisteredRockMeshTests(unittest.TestCase):
+    def test_exact_upward_triangle_normals(self):
+        for moved in (False,True):
+            data,_=fixture(moved);sampler=RegisteredMeshSampler(data)
+            xyz=sampler.xyz[data['triangles']].mean(axis=1)
+            heights,normals=sampler.sample(xyz[:,0],xyz[:,1],with_normals=True)
+            np.testing.assert_allclose(heights,xyz[:,2],atol=1e-12)
+            np.testing.assert_allclose(normals,np.broadcast_to(np.array([-2,-3,1])/np.sqrt(14),normals.shape),atol=1e-12)
+            _,single=sampler.sample(xyz[0,0],xyz[0,1],with_normals=True)
+            self.assertEqual(single.shape,(3,))
+
     def test_regular_mesh_keeps_existing_diagonal_and_sampling(self):
         data,stats=fixture()
         np.testing.assert_array_equal(data['triangles'],grid_triangles(2,2))

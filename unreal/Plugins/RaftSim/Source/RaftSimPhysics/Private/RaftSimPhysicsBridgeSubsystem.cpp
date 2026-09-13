@@ -1,4 +1,5 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimGroundSourceRegistry.h"
 
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
@@ -14,6 +15,8 @@ void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collec
 
 void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 {
+    // Release the contact registry's world delegates before subsystem teardown.
+    if (RaftRuntime) RaftRuntime->SetGroundSurfaceSampler({});
     WaterRuntime = nullptr;
     RaftRuntime = nullptr;
     Super::Deinitialize();
@@ -79,35 +82,14 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
         // collision cannot resolve Landscape contact. Supply authoritative
         // height-field data to the selected reduced runtime instead. Physical
         // source Landscapes take precedence; maps without one use solver bed.
-        TArray<TWeakObjectPtr<ALandscapeProxy>> TerrainLandscapes;
-        TArray<TWeakObjectPtr<UStaticMeshComponent>> CapturedGroundMeshes;
-        if (UWorld* World = GetWorld())
-        {
-            for (TActorIterator<ALandscapeProxy> It(World); It; ++It)
-            {
-                TerrainLandscapes.Add(*It);
-            }
-            // Opt in only geometry that owns the physical ground. Scenery,
-            // foliage, raft visuals and water must never become contact beds.
-            for (TActorIterator<AActor> It(World); It; ++It)
-            {
-                TInlineComponentArray<UStaticMeshComponent*> Meshes(*It);
-                for (UStaticMeshComponent* Mesh : Meshes)
-                {
-                    if (It->ActorHasTag(TEXT("RaftSimPhysicalGround")) ||
-                        Mesh->ComponentHasTag(TEXT("RaftSimPhysicalGround")))
-                    {
-                        CapturedGroundMeshes.Add(Mesh);
-                    }
-                }
-            }
-        }
+        const auto GroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
         RaftRuntime->SetGroundSurfaceSampler(
-            [WeakWater, TerrainLandscapes, CapturedGroundMeshes](
+            [WeakWater, GroundSources](
                 const FVector& WorldPositionCm,
                 float& OutGroundZCm,
                 FVector& OutGroundNormal) -> bool
             {
+                GroundSources->RefreshIfDirty();
                 // The survey mesh and hydraulic bed share a source, but a
                 // coarser hydraulic raster cannot resolve every exposed rock.
                 // Query the full collision triangles at the requested XY;
@@ -115,7 +97,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                 TOptional<float> CapturedGroundZCm;
                 FVector CapturedNormal = FVector::UpVector;
                 FCollisionQueryParams Params(SCENE_QUERY_STAT(RaftSimCapturedGround), true);
-                for (const TWeakObjectPtr<UStaticMeshComponent>& WeakMesh : CapturedGroundMeshes)
+                for (const TWeakObjectPtr<UStaticMeshComponent>& WeakMesh : GroundSources->Meshes)
                 {
                     UStaticMeshComponent* Mesh = WeakMesh.Get();
                     if (!Mesh || !Mesh->IsQueryCollisionEnabled()) continue;
@@ -144,7 +126,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                 const ALandscapeProxy* HighestLandscape = nullptr;
                 TOptional<float> HighestLandscapeZCm;
                 for (const TWeakObjectPtr<ALandscapeProxy>& WeakLandscape :
-                     TerrainLandscapes)
+                     GroundSources->Landscapes)
                 {
                     const ALandscapeProxy* Landscape = WeakLandscape.Get();
                     if (Landscape == nullptr)

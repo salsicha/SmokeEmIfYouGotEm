@@ -218,6 +218,17 @@ bool FRaftSimHydraulicCrestScaleTest::RunTest(const FString&)
     TestEqual(TEXT("upstream wave face is not painted white"), Foam, 0.0f);
     FAdapter::ComputeCoupledBreakingReliefMeters(FVector2D(303,0), Sites, 0.22f, 1.0f, &Foam);
     TestEqual(TEXT("toe does not create fresh foam"), Foam, 0.0f);
+    const float SavedHeight = Sites[0].PhysicalCrestHeightMeters;
+    Sites[0].PhysicalCrestHeightMeters = 0.0f;
+    const float ResolvedRelief = FAdapter::ComputeCoupledBreakingReliefMeters(
+        FVector2D(300,0), Sites, 0.22f, 1.0f, &Foam);
+    TestEqual(TEXT("resolved jump does not gain duplicate geometry"), ResolvedRelief, 0.0f);
+    TestTrue(TEXT("resolved spilling jump still generates crest foam"), Foam > 0.8f);
+    Sites[0].SpillingFraction = 0.0f;
+    FAdapter::ComputeCoupledBreakingReliefMeters(FVector2D(300,0), Sites, 0.22f, 1.0f, &Foam);
+    TestEqual(TEXT("resolved nonspilling jump does not generate foam"), Foam, 0.0f);
+    Sites[0].PhysicalCrestHeightMeters = SavedHeight;
+    Sites[0].SpillingFraction = 1.0f;
     Sites[0].PhysicalCrestHeightMeters *= 0.5f;
     TestTrue(TEXT("ownership release scales geometry continuously"),
         FMath::IsNearlyEqual(Height(300), FullHeight * 0.5f));

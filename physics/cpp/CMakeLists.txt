@@ -8,9 +8,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
 find_package(Chrono QUIET)
 
 add_library(raftsim_water
+  src/cartesian_domain.cpp
   src/chrono_bridge_fixtures.cpp
   src/chrono_coupling.cpp
   src/json.cpp
@@ -37,7 +39,7 @@ option(RAFTSIM_PROFILE_SOLVER "Emit opt-in native solver stage timings at thread
 if(RAFTSIM_PROFILE_SOLVER)
   target_compile_definitions(raftsim_water PRIVATE RAFTSIM_PROFILE_SOLVER=1)
 endif()
-target_link_libraries(raftsim_water PUBLIC ZLIB::ZLIB)
+target_link_libraries(raftsim_water PUBLIC ZLIB::ZLIB Threads::Threads)
 target_compile_options(raftsim_water PRIVATE
   $<$<CXX_COMPILER_ID:AppleClang,Clang,GNU>:-Wall -Wextra -Wpedantic>
 )
@@ -45,10 +47,18 @@ target_compile_options(raftsim_water PRIVATE
 add_executable(raftsim_water_solver tools/raftsim_water_solver.cpp)
 target_link_libraries(raftsim_water_solver PRIVATE raftsim_water)
 
+add_executable(raftsim_cartesian_cook tools/raftsim_cartesian_cook.cpp)
+target_link_libraries(raftsim_cartesian_cook PRIVATE raftsim_water)
+
 add_executable(raftsim_water_tests tests/raftsim_water_tests.cpp)
 target_link_libraries(raftsim_water_tests PRIVATE raftsim_water)
 
+add_executable(raftsim_cartesian_domain_tests tests/cartesian_domain_tests.cpp)
+target_link_libraries(raftsim_cartesian_domain_tests PRIVATE raftsim_water)
+
 if(BUILD_TESTING)
+  add_test(NAME water_cartesian_domain COMMAND raftsim_cartesian_domain_tests)
+  set_tests_properties(water_cartesian_domain PROPERTIES TIMEOUT 120)
   foreach(fixture wet_dry_shoreline lake_at_rest_balance transcritical_bump)
     add_test(NAME water_${fixture}
       COMMAND raftsim_water_tests

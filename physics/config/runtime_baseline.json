@@ -1,15 +1,3 @@
-{
-  "schema_version": "raftsim.runtime_baseline.v0",
-  "primary_unreal_water_runtime": {
-    "solver_id": "raftsim_water_reduced_cpp_v0",
-    "executable": "raftsim_water_solver",
-    "source": "physics/cpp",
-    "validation_reference": "PyClaw",
-    "runtime_role": "Reduced shallow-water / height-field solver and water query provider"
-  },
-  "chrono_role": {
-    "baseline": "Rigid raft dynamics, collision, and contact response driven by custom water samples",
-    "fsi_policy": "optional_experiment_reference_only"
-  },
-  "replacement_rule": "Changing the primary water runtime requires a later milestone decision with PyClaw agreement, runtime budget, deterministic replay, and frozen schema compatibility evidence."
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:0f0f493133344c91a5100d65ab541c6ad5cffb71599b49ee10c8df93919a556e
+size 740

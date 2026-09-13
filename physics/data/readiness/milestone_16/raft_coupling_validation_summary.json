@@ -1,11 +1,3 @@
-{
-  "comparison_count": 50,
-  "failed_count": 0,
-  "notes": [
-    "Distinct pin/release closure evidence is tracked separately in the Milestone 18 pin_release_fixture report; this report only compares raft coupling over GeoClaw-derived and C++ water fields."
-  ],
-  "passed": true,
-  "passed_count": 50,
-  "source_report": "reports/milestone16/raft_coupling_validation.json",
-  "summary_version": "raftsim.milestone16.readiness_summary.v0"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:dd8edb816a997901b921e3642f1f8eafac8cf89f5ef70af1e5a14bc716985782
+size 451

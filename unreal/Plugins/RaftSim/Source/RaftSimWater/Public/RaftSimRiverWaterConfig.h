@@ -194,6 +194,11 @@ public:
         meta = (ClampMin = "0.0", ClampMax = "1.0"))
     float LivePresentationHydraulicReliefScale = 1.0f;
 
+    /** Current-driven breaking relief shared by the visible carrier and
+     * raft support. Production opt-in, independent of map names/review flags. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    bool bEnableLiveSharedBreakingRelief = false;
+
     /** Use the fine presentation lattice on bounded named-rapid windows. The
      * solver remains authoritative; this only gives coupled crests, boulder
      * wakes, and the raft-local GPU heightfield enough vertices to form a

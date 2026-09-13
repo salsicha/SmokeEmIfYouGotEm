@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RaftSimCartesianWaterRegions.h"
 
 #include "RaftSimRiverWaterStreamingActor.generated.h"
 
@@ -35,6 +36,7 @@ public:
     FString GetActiveFieldsDirectory() const { return ActiveFieldsDirectory; }
 
 private:
+    friend class FRaftSimCartesianStreamingActorTest;
     struct FSourceWindow
     {
         FString FieldsDirectory;
@@ -74,6 +76,9 @@ private:
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
 
     TArray<FSourceWindow> SourceWindows;
+    FRaftSimCartesianWaterRegions CartesianRegions;
+    bool bCartesianStreaming = false;
+    FVector2D LastCartesianCenterM = FVector2D::ZeroVector;
     FString TransitFieldsDirectory;
     FString ActiveFieldsDirectory;
     float LastWindowCenterStationM = -BIG_NUMBER;

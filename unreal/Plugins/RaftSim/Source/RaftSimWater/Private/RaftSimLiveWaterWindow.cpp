@@ -5,6 +5,7 @@
 #include "Dom/JsonObject.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Misc/ScopeLock.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -125,6 +126,7 @@ struct FNpyArray
     // Populated for u1/b1 payloads.
     TArray<uint8> Bytes;
     bool bIsFloat = false;
+    int32 ElementBytes = 0;
 };
 
 bool ParseNpy(const TArray<uint8>& FileBytes, FNpyArray& OutArray, FString& OutError)
@@ -222,6 +224,12 @@ bool ParseNpy(const TArray<uint8>& FileBytes, FNpyArray& OutArray, FString& OutE
         return false;
     }
 
+    if (OutArray.Nx > MAX_int32 || OutArray.Ny > MAX_int32/OutArray.Nx)
+    {
+        OutError = TEXT(".npy shape exceeds supported array size");
+        return false;
+    }
+    OutArray.ElementBytes = ElementSize;
     const int64 Count = OutArray.Ny * OutArray.Nx;
     if (FileBytes.Num() - DataOffset < Count * ElementSize)
     {
@@ -311,6 +319,258 @@ bool LoadCookedArray(
     return true;
 }
 
+struct FSharedCartesianAtlas
+{
+    FNpyArray Bed, H, U, V;
+    TArray<FVector2D> Origins;
+    TArray<FVector2D> PhysicalWetExteriorCells;
+    TMap<FIntPoint, int32> TileLookup;
+    int32 TileNx=0, TileNy=0;
+    double Spacing=0., Datum=0., DryTolerance=0.;
+
+    int32 CellIndex(int64 Column, int64 Row) const
+    {
+        const double KeyX = FMath::FloorToDouble(double(Column) / TileNx);
+        const double KeyY = FMath::FloorToDouble(double(Row) / TileNy);
+        if (FMath::Abs(KeyX) > 1.e8 || FMath::Abs(KeyY) > 1.e8) return INDEX_NONE;
+        const FIntPoint Key{int32(KeyX), int32(KeyY)};
+        const int32* Tile = TileLookup.Find(Key);
+        if (!Tile) return INDEX_NONE;
+        const int32 X = int32(Column - int64(Key.X)*TileNx);
+        const int32 Y = int32(Row - int64(Key.Y)*TileNy);
+        return (*Tile*TileNy + Y)*TileNx + X;
+    }
+
+    FRaftSimLiveWaterSampleResult Sample(const FVector2D& Position) const
+    {
+        FRaftSimLiveWaterSampleResult Result;
+        const FVector2D Grid = (Position - Origins[0]) / Spacing;
+        // The verified atlas permits at most 1e8 tiles of at most 4096 cells
+        // from its origin. Reject nonfinite/overflowing queries before casts.
+        if (Grid.ContainsNaN() || FMath::Abs(Grid.X) > 4.1e11 || FMath::Abs(Grid.Y) > 4.1e11)
+            return Result;
+        const int64 X = int64(FMath::FloorToDouble(Grid.X));
+        const int64 Y = int64(FMath::FloorToDouble(Grid.Y));
+        const double Fx = Grid.X-X, Fy = Grid.Y-Y;
+        double BedValue = 0., Depth = 0., VelX = 0., VelY = 0.;
+        for (int32 DY = 0; DY < 2; ++DY) for (int32 DX = 0; DX < 2; ++DX)
+        {
+            const double Weight = (DX ? Fx : 1.-Fx)*(DY ? Fy : 1.-Fy);
+            if (Weight == 0.) continue;
+            const int32 I = CellIndex(X+DX, Y+DY);
+            // Interpolation may cross a real tile seam, but must never bridge
+            // an unavailable hole or extrapolate past a physical river end.
+            if (I == INDEX_NONE) return Result;
+            BedValue += Weight*Bed.Float64[I]; Depth += Weight*H.Float64[I];
+            VelX += Weight*U.Float64[I]; VelY += Weight*V.Float64[I];
+        }
+        Result.bValid = true;
+        Result.DepthM = float(Depth);
+        Result.BedHeightM = float(BedValue + Datum);
+        Result.SurfaceHeightM = float(BedValue + Depth + Datum);
+        Result.VelocityMps = FVector2D(float(VelX), float(VelY));
+        Result.bWet = Depth > 1.e-4; // Same presentation wet threshold as the live sampler.
+        const int32 Center = CellIndex(X, Y);
+        const auto Surface = [this](int32 I) { return Bed.Float64[I] + H.Float64[I]; };
+        const int32 L = CellIndex(X-1, Y), R = CellIndex(X+1, Y);
+        const int32 D = CellIndex(X, Y-1), Up = CellIndex(X, Y+1);
+        const auto Gradient = [&](int32 Before, int32 After)
+        {
+            if (Before != INDEX_NONE && After != INDEX_NONE)
+                return (Surface(After)-Surface(Before))/(2.*Spacing);
+            if (After != INDEX_NONE) return (Surface(After)-Surface(Center))/Spacing;
+            if (Before != INDEX_NONE) return (Surface(Center)-Surface(Before))/Spacing;
+            return 0.;
+        };
+        Result.SurfaceNormal = FVector(float(-Gradient(L,R)), float(-Gradient(D,Up)), 1.f).GetSafeNormal();
+        return Result;
+    }
+};
+
+FCriticalSection SharedAtlasMutex;
+TSharedPtr<const FSharedCartesianAtlas,ESPMode::ThreadSafe> SharedAtlasCache;
+FString SharedAtlasCacheKey;
+int32 SharedAtlasLoadCount=0;
+
+bool ReadFinitePair(const TSharedPtr<FJsonObject>& Object,const TCHAR* Name,FVector2D& Pair)
+{
+    const TArray<TSharedPtr<FJsonValue>>* Values=nullptr;
+    return Object.IsValid() && Object->TryGetArrayField(Name,Values) && Values->Num()==2 &&
+        (*Values)[0].IsValid() && (*Values)[1].IsValid() &&
+        (*Values)[0]->TryGetNumber(Pair.X) && (*Values)[1]->TryGetNumber(Pair.Y) && !Pair.ContainsNaN();
+}
+
+TSharedPtr<const FSharedCartesianAtlas,ESPMode::ThreadSafe> LoadSharedCartesianAtlas(
+    const FString& Directory,const TSharedPtr<FJsonObject>& Reference,FString& Error)
+{
+    Error=TEXT("invalid shared Cartesian state atlas");
+    FString Relative,ExpectedHash;
+    if (!Reference->TryGetStringField(TEXT("manifest"),Relative) ||
+        !Reference->TryGetStringField(TEXT("sha256"),ExpectedHash) || ExpectedHash.Len()!=64) return nullptr;
+    const FString Path=FPaths::ConvertRelativePathToFull(FPaths::Combine(Directory,Relative));
+    const FString Key=Path+TEXT("|")+ExpectedHash.ToLower();
+    FScopeLock Lock(&SharedAtlasMutex);
+    // Keep one immutable verified atlas, not one copy per source window. A
+    // changed digest/path requires a new load; failed loads never replace it.
+    if (SharedAtlasCache.IsValid() && SharedAtlasCacheKey==Key) return SharedAtlasCache;
+    TArray<uint8> Bytes;
+    if (!FFileHelper::LoadFileToArray(Bytes,*Path) ||
+        !Sha256HexOf(Bytes).Equals(ExpectedHash,ESearchCase::IgnoreCase)) return nullptr;
+    FString Text;
+    FFileHelper::BufferToString(Text,Bytes.GetData(),Bytes.Num());
+    TSharedPtr<FJsonObject> Root;
+    if (!FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text),Root) || !Root.IsValid()) return nullptr;
+    FString Schema;
+    FVector2D Shape;
+    const TArray<TSharedPtr<FJsonValue>>* Tiles=nullptr;
+    const TArray<TSharedPtr<FJsonValue>>* Physical=nullptr;
+    const TSharedPtr<FJsonObject>* Arrays=nullptr;
+    auto Atlas=MakeShared<FSharedCartesianAtlas,ESPMode::ThreadSafe>();
+    if (!Root->TryGetStringField(TEXT("schema"),Schema) || Schema!=TEXT("raftsim.cartesian_state_atlas.v1") ||
+        !ReadFinitePair(Root,TEXT("tile_shape"),Shape) || Shape.X<2 || Shape.Y<2 ||
+        Shape.X>4096 || Shape.Y>4096 || Shape.X!=FMath::FloorToDouble(Shape.X) || Shape.Y!=FMath::FloorToDouble(Shape.Y) ||
+        !Root->TryGetNumberField(TEXT("grid_spacing_m"),Atlas->Spacing) || !FMath::IsFinite(Atlas->Spacing) || Atlas->Spacing<=0. ||
+        !Root->TryGetNumberField(TEXT("source_elevation_datum_m"),Atlas->Datum) || !FMath::IsFinite(Atlas->Datum) ||
+        !Root->TryGetNumberField(TEXT("dry_tolerance"),Atlas->DryTolerance) || !FMath::IsFinite(Atlas->DryTolerance) || Atlas->DryTolerance<=0. ||
+        !Root->TryGetArrayField(TEXT("tiles"),Tiles) || Tiles->IsEmpty() ||
+        !Root->TryGetArrayField(TEXT("physical_exterior_faces"),Physical) ||
+        !Root->TryGetObjectField(TEXT("arrays"),Arrays)) return nullptr;
+    Atlas->TileNy=int32(Shape.X); Atlas->TileNx=int32(Shape.Y);
+    if (Tiles->Num()>MAX_int32/(Atlas->TileNx*Atlas->TileNy)) return nullptr;
+    TMap<FIntPoint,int32> Occupied;
+    TArray<FIntPoint> Keys;
+    for (const auto& Value:*Tiles)
+    {
+        const TSharedPtr<FJsonObject>* Tile=nullptr;
+        FVector2D Origin;
+        if (!Value.IsValid() || !Value->TryGetObject(Tile) || !ReadFinitePair(*Tile,TEXT("origin_m"),Origin)) return nullptr;
+        if (Atlas->Origins.IsEmpty()) Atlas->Origins.Add(Origin);
+        const FVector2D Offset=Origin-Atlas->Origins[0];
+        const FVector2D Index(Offset.X/(Atlas->TileNx*Atlas->Spacing),Offset.Y/(Atlas->TileNy*Atlas->Spacing));
+        if (FMath::Abs(Index.X)>1.e8 || FMath::Abs(Index.Y)>1.e8 ||
+            FMath::Abs(Index.X-FMath::RoundToDouble(Index.X))>1.e-8 ||
+            FMath::Abs(Index.Y-FMath::RoundToDouble(Index.Y))>1.e-8) return nullptr;
+        const FIntPoint TileKey(FMath::RoundToInt(Index.X),FMath::RoundToInt(Index.Y));
+        if (Occupied.Contains(TileKey)) return nullptr;
+        const int32 TileIndex=Keys.Num();
+        Occupied.Add(TileKey,TileIndex); Keys.Add(TileKey);
+        if (TileIndex>0) Atlas->Origins.Add(Origin);
+    }
+    const TPair<const TCHAR*,FNpyArray*> Loads[]={{TEXT("bed"),&Atlas->Bed},{TEXT("h"),&Atlas->H},
+        {TEXT("u"),&Atlas->U},{TEXT("v"),&Atlas->V}};
+    for (const auto& Load:Loads)
+    {
+        const TSharedPtr<FJsonObject>* Meta=nullptr;
+        if (!(*Arrays)->TryGetObjectField(Load.Key,Meta) ||
+            !LoadCookedArray(FPaths::GetPath(Path),*Meta,Load.Key,*Load.Value,Error) ||
+            !Load.Value->bIsFloat || Load.Value->ElementBytes!=8 ||
+            Load.Value->Nx!=Atlas->TileNx || Load.Value->Ny!=int64(Tiles->Num())*Atlas->TileNy) return nullptr;
+    }
+    for (int32 I=0;I<Atlas->H.Float64.Num();++I)
+        if (!FMath::IsFinite(Atlas->Bed.Float64[I]) || !FMath::IsFinite(Atlas->H.Float64[I]) ||
+            !FMath::IsFinite(Atlas->U.Float64[I]) || !FMath::IsFinite(Atlas->V.Float64[I]) ||
+            Atlas->H.Float64[I]<0. || Atlas->H.Float64[I]>10. ||
+            FMath::Square(Atlas->U.Float64[I])+FMath::Square(Atlas->V.Float64[I])>400.) return nullptr;
+    const FIntPoint Deltas[]={{-1,0},{1,0},{0,-1},{0,1}};
+    const FString Edges[]={TEXT("west"),TEXT("east"),TEXT("south"),TEXT("north")};
+    TSet<int64> PhysicalFaces;
+    for (const auto& Value:*Physical)
+    {
+        const TSharedPtr<FJsonObject>* Face=nullptr;
+        double TileNumber=0.; FString Edge;
+        if (!Value.IsValid() || !Value->TryGetObject(Face) ||
+            !(*Face)->TryGetNumberField(TEXT("tile_index"),TileNumber) || !FMath::IsFinite(TileNumber) ||
+            TileNumber<0 || TileNumber>=Tiles->Num() || TileNumber!=FMath::FloorToDouble(TileNumber) ||
+            !(*Face)->TryGetStringField(TEXT("edge"),Edge)) return nullptr;
+        int32 E=0; while (E<4 && Edges[E]!=Edge) ++E;
+        if (E==4 || Occupied.Contains(Keys[int32(TileNumber)]+Deltas[E])) return nullptr;
+        const int64 FaceKey=int64(TileNumber)*4+E;
+        if (PhysicalFaces.Contains(FaceKey)) return nullptr;
+        PhysicalFaces.Add(FaceKey);
+    }
+    // Independently establish the condition that makes outside captured-dry
+    // context valid. Do not trust a manifest's generic "passed" flag.
+    for (int32 Tile=0;Tile<Tiles->Num();++Tile) for (int32 E=0;E<4;++E)
+    {
+        if (Occupied.Contains(Keys[Tile]+Deltas[E])) continue;
+        const bool bPhysical=PhysicalFaces.Contains(int64(Tile)*4+E);
+        const int32 Count=E<2?Atlas->TileNy:Atlas->TileNx;
+        for (int32 Along=0;Along<Count;++Along)
+        {
+            const int32 R=E<2?Along:(E==2?0:Atlas->TileNy-1);
+            const int32 C=E>=2?Along:(E==0?0:Atlas->TileNx-1);
+            if (Atlas->H.Float64[(Tile*Atlas->TileNy+R)*Atlas->TileNx+C]!=0.)
+            {
+                if (!bPhysical)
+                { Error=TEXT("shared atlas has wet artificial exterior bank cells"); return nullptr; }
+                // Internal crop ghosts must not replace a physical discharge
+                // or outflow boundary with invented dry exterior state.
+                Atlas->PhysicalWetExteriorCells.Add(Atlas->Origins[Tile]+
+                    FVector2D(C+Deltas[E].X,R+Deltas[E].Y)*Atlas->Spacing);
+            }
+        }
+    }
+    Atlas->TileLookup = MoveTemp(Occupied);
+    SharedAtlasCache=Atlas; SharedAtlasCacheKey=Key; ++SharedAtlasLoadCount;
+    Error.Reset();
+    return Atlas;
+}
+
+bool GatherSharedCartesianState(const FString& Directory,const TSharedPtr<FJsonObject>& Reference,
+    double OriginX,double OriginY,double Dx,double Dy,double Datum,double DryTolerance,
+    const FNpyArray& Bed,const FNpyArray& CapturedWater,FNpyArray& H,FNpyArray& U,FNpyArray& V,
+    FNpyArray& Wet,TArray<uint8>& Availability,
+    TSharedPtr<const FSharedCartesianAtlas,ESPMode::ThreadSafe>& OutAtlas,FString& Error)
+{
+    const auto Atlas=LoadSharedCartesianAtlas(Directory,Reference,Error);
+    if (!Atlas.IsValid()) return false;
+    Error=TEXT("shared Cartesian atlas/source grid, datum, mask or bed mismatch");
+    if (Atlas->Spacing!=Dx || Dx!=Dy || Atlas->Datum!=Datum || Atlas->DryTolerance!=DryTolerance ||
+        !Bed.bIsFloat || Bed.ElementBytes!=8 || CapturedWater.bIsFloat ||
+        CapturedWater.Nx!=Bed.Nx || CapturedWater.Ny!=Bed.Ny) return false;
+    const int32 Count=Bed.Nx*Bed.Ny;
+    for (FNpyArray* Array:{&H,&U,&V})
+    { Array->Nx=Bed.Nx; Array->Ny=Bed.Ny; Array->bIsFloat=true; Array->ElementBytes=8; Array->Float64.Init(0.,Count); }
+    Wet.Nx=Bed.Nx; Wet.Ny=Bed.Ny; Wet.Bytes.Init(0,Count);
+    Availability.SetNumUninitialized(Count);
+    for (int32 I=0;I<Count;++I)
+    {
+        if (CapturedWater.Bytes[I]>1) return false;
+        Availability[I]=CapturedWater.Bytes[I]?0:1; // 0 unavailable; 1 captured-dry context; 2 solved.
+    }
+    for (int32 Tile=0;Tile<Atlas->Origins.Num();++Tile)
+    {
+        const FVector2D Offset=(Atlas->Origins[Tile]-FVector2D(OriginX,OriginY))/Dx;
+        if (FMath::Abs(Offset.X)>MAX_int32/2. || FMath::Abs(Offset.Y)>MAX_int32/2. ||
+            FMath::Abs(Offset.X-FMath::RoundToDouble(Offset.X))>1.e-7 ||
+            FMath::Abs(Offset.Y-FMath::RoundToDouble(Offset.Y))>1.e-7) return false;
+        const int32 X=FMath::RoundToInt(Offset.X),Y=FMath::RoundToInt(Offset.Y);
+        const int32 X0=FMath::Max(0,X),Y0=FMath::Max(0,Y);
+        const int32 X1=FMath::Min(int32(Bed.Nx),X+Atlas->TileNx),Y1=FMath::Min(int32(Bed.Ny),Y+Atlas->TileNy);
+        for (int32 R=Y0;R<Y1;++R) for (int32 C=X0;C<X1;++C)
+        {
+            const int32 Dest=R*Bed.Nx+C;
+            const int32 Source=(Tile*Atlas->TileNy+R-Y)*Atlas->TileNx+C-X;
+            if (Availability[Dest]==2 || Bed.Float64[Dest]!=Atlas->Bed.Float64[Source]) return false;
+            Availability[Dest]=2;
+            H.Float64[Dest]=Atlas->H.Float64[Source]; U.Float64[Dest]=Atlas->U.Float64[Source]; V.Float64[Dest]=Atlas->V.Float64[Source];
+            Wet.Bytes[Dest]=H.Float64[Dest]>DryTolerance?1:0;
+        }
+    }
+    for (const FVector2D& Point:Atlas->PhysicalWetExteriorCells)
+    {
+        const FVector2D Offset=(Point-FVector2D(OriginX,OriginY))/Dx;
+        const int32 C=FMath::RoundToInt(Offset.X),R=FMath::RoundToInt(Offset.Y);
+        if (C>=0 && C<Bed.Nx && R>=0 && R<Bed.Ny)
+        {
+            if (Availability[R*Bed.Nx+C]==2) return false;
+            Availability[R*Bed.Nx+C]=0;
+        }
+    }
+    OutAtlas = Atlas;
+    Error.Reset(); return true;
+}
+
 bool ComputeCropRange(
     double WindowMin, double WindowMax, double OriginCenter, double CellSize, int64 CellCount,
     int32& OutFirst, int32& OutLast)
@@ -390,6 +650,11 @@ bool TryReadRuntimeBoundary(
 
 } // namespace
 
+struct FRaftSimLiveWaterWindow::FPresentationState
+{
+    TSharedPtr<const FSharedCartesianAtlas, ESPMode::ThreadSafe> Atlas;
+};
+
 FRaftSimLiveWaterWindow::FRaftSimLiveWaterWindow() = default;
 FRaftSimLiveWaterWindow::~FRaftSimLiveWaterWindow() = default;
 
@@ -441,6 +706,14 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFlatTank(
     return Window;
 }
 
+#if WITH_AUTOMATION_TESTS
+int32 FRaftSimLiveWaterWindow::GetSharedAtlasLoadCountForTesting()
+{
+    FScopeLock Lock(&SharedAtlasMutex);
+    return SharedAtlasLoadCount;
+}
+#endif
+
 TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFields(
     const FString& CookedFieldsDir, const FString& BandId,
     const FVector2D& WindowCenterM, const FVector2D& WindowExtentM,
@@ -491,7 +764,9 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     const double Dy = (*Grid)->GetNumberField(TEXT("dy_m"));
     const double OriginX = (*Grid)->GetNumberField(TEXT("origin_x_m"));
     const double OriginY = (*Grid)->GetNumberField(TEXT("origin_y_m"));
-    if (FullNx < kMinWindowCells || FullNy < kMinWindowCells || Dx <= 0.0 || Dy <= 0.0)
+    if (FullNx < kMinWindowCells || FullNy < kMinWindowCells || FullNx>MAX_int32 || FullNy>MAX_int32/FullNx ||
+        !FMath::IsFinite(Dx) || !FMath::IsFinite(Dy) || !FMath::IsFinite(OriginX) || !FMath::IsFinite(OriginY) ||
+        !FMath::IsFinite(SourceElevationDatumM) || Dx <= 0.0 || Dy <= 0.0)
     {
         OutError = TEXT("cooked grid is degenerate");
         return nullptr;
@@ -540,11 +815,25 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
 
     // --- Arrays (hash-verified) -----------------------------------------
     FNpyArray Bed, Depth, VelU, VelV, WetMask;
+    TArray<uint8> SourceAvailability;
+    TSharedPtr<const FSharedCartesianAtlas, ESPMode::ThreadSafe> SharedSource;
+    const bool bSharedAtlas=Band->HasField(TEXT("shared_cartesian_state"));
+    bool bCartesianCoupled=false, bReplayOfflineSolver=false;
+    (*Solver)->TryGetBoolField(TEXT("runtime_cartesian_coupled_config"),bCartesianCoupled);
+    (*Solver)->TryGetBoolField(TEXT("runtime_replay_offline_config"),bReplayOfflineSolver);
+    if (bSharedAtlas && (!bCartesianCoupled || bReplayOfflineSolver || bRecenterHydraulicCrux))
+    { OutError=TEXT("shared state atlas requires explicit Cartesian live crops"); return nullptr; }
     const TPair<const TCHAR*, FNpyArray*> Loads[] = {
         {TEXT("bed"), &Bed}, {TEXT("h"), &Depth}, {TEXT("u"), &VelU},
         {TEXT("v"), &VelV}, {TEXT("wet_mask"), &WetMask}};
     for (const TPair<const TCHAR*, FNpyArray*>& Load : Loads)
     {
+        if (bSharedAtlas && Load.Value!=&Bed)
+        {
+            if ((*Arrays)->HasField(Load.Key))
+            { OutError=TEXT("shared atlas cannot be mixed with dense h/u/v/wet arrays"); return nullptr; }
+            continue;
+        }
         const TSharedPtr<FJsonObject>* ArrayMeta = nullptr;
         if (!(*Arrays)->TryGetObjectField(Load.Key, ArrayMeta))
         {
@@ -560,6 +849,23 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
             OutError = FString::Printf(
                 TEXT("array '%s' shape (%lld, %lld) does not match the cooked grid (%lld, %lld)"),
                 Load.Key, Load.Value->Ny, Load.Value->Nx, FullNy, FullNx);
+            return nullptr;
+        }
+    }
+    if (bSharedAtlas)
+    {
+        const TSharedPtr<FJsonObject>* Reference=nullptr;
+        const TSharedPtr<FJsonObject>* CapturedMeta=nullptr;
+        FNpyArray Captured;
+        double DryTolerance=0.;
+        if (!Band->TryGetObjectField(TEXT("shared_cartesian_state"),Reference) ||
+            !(*Arrays)->TryGetObjectField(TEXT("captured_water_mask"),CapturedMeta) ||
+            !(*Solver)->TryGetNumberField(TEXT("dry_tolerance"),DryTolerance) ||
+            !LoadCookedArray(CookedFieldsDir,*CapturedMeta,TEXT("captured_water_mask"),Captured,OutError) ||
+            !GatherSharedCartesianState(CookedFieldsDir,*Reference,OriginX,OriginY,Dx,Dy,SourceElevationDatumM,DryTolerance,
+                Bed,Captured,Depth,VelU,VelV,WetMask,SourceAvailability,SharedSource,OutError))
+        {
+            if (OutError.IsEmpty()) OutError=TEXT("invalid shared Cartesian source reference");
             return nullptr;
         }
     }
@@ -583,6 +889,43 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     }
     const std::size_t Nx = static_cast<std::size_t>(Col1 - Col0 + 1);
     const std::size_t Ny = static_cast<std::size_t>(Row1 - Row0 + 1);
+
+    if (bCartesianCoupled)
+    {
+        FString Coordinates;
+        // Internal crops are not physical river inlets. They require the two
+        // source-cell layers used by the offline MUSCL reconstruction, including
+        // on north/south edges and where the current points west. Never clamp a
+        // missing halo or reuse a whole-river discharge on a partial section.
+        if (bReplayOfflineSolver || bRecenterHydraulicCrux ||
+            !Root->TryGetStringField(TEXT("coordinate_system"), Coordinates) ||
+            Coordinates != TEXT("cartesian_east_north_m") ||
+            Col0 < 2 || Row0 < 2 || Col1 > FullNx-3 || Row1 > FullNy-3 ||
+            (*Solver)->HasField(TEXT("experimental_west_discharge_m3s")))
+        {
+            OutError = TEXT("Cartesian coupled crop requires east/north coordinates, two complete source ghost layers, no crux recenter and no physical-inlet/survey replay configuration");
+            return nullptr;
+        }
+        if (bSharedAtlas)
+        {
+            for (int32 R=Row0-2;R<=Row1+2;++R) for (int32 C=Col0-2;C<=Col1+2;++C)
+                if (SourceAvailability[R*FullNx+C]==0)
+                { OutError=TEXT("Cartesian crop/ghost reaches unavailable captured-water state"); return nullptr; }
+        }
+        // Validate the entire source, not just today's crop. A later handoff
+        // must not expose invalid values hidden outside the initial window.
+        for (int64 Index = 0; Index < FullNx*FullNy; ++Index)
+        {
+            if (!FMath::IsFinite(Bed.Float64[Index]) || !FMath::IsFinite(Depth.Float64[Index]) ||
+                Depth.Float64[Index] < 0. || !FMath::IsFinite(VelU.Float64[Index]) ||
+                !FMath::IsFinite(VelV.Float64[Index]) ||
+                !FMath::IsFinite(Bed.Float64[Index]+Depth.Float64[Index]))
+            {
+                OutError = TEXT("Cartesian coupled source contains invalid bed/depth/velocity");
+                return nullptr;
+            }
+        }
+    }
 
     // --- Scenario seeded from the cooked steady state --------------------
     raftsim::Scenario Scenario;
@@ -752,8 +1095,6 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     // candidates must retain the offline boundary and roughness for meaningful
     // geometry/raft comparisons. Do not transplant a total-discharge boundary
     // to a crop covering only part of the inlet.
-    bool bReplayOfflineSolver = false;
-    (*Solver)->TryGetBoolField(TEXT("runtime_replay_offline_config"), bReplayOfflineSolver);
     if (bReplayOfflineSolver)
     {
         double PrescribedDischarge = -1.0;
@@ -778,6 +1119,50 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
         Scenario.roughness = Manning;
         UE_LOG(LogTemp, Display, TEXT("RaftSim survey replay: MUSCL full grid, Q=%.6f m3/s, Manning=%.4f"),
             PrescribedDischarge, Manning);
+    }
+
+    if (bCartesianCoupled)
+    {
+        double Manning = 0., SpatialOrder = 0.;
+        if (!(*Solver)->TryGetNumberField(TEXT("roughness_manning"), Manning) ||
+            !FMath::IsFinite(Manning) || Manning <= 0. || Manning > .2 ||
+            !FMath::IsNearlyEqual(Manning, double(RoughnessManning), 1.e-8) ||
+            !(*Solver)->TryGetNumberField(TEXT("spatial_order"), SpatialOrder) || SpatialOrder != 2. ||
+            Config.solver_mode != "finite_volume" || Config.flux_scheme != "hll" ||
+            !FMath::IsFinite(Config.cfl) || Config.cfl <= 0. || Config.cfl > .5 ||
+            !FMath::IsFinite(Config.dry_tolerance) || Config.dry_tolerance <= 0. ||
+            Config.roughness_scale != 1. || Config.bed_slope_source_scale != 1. ||
+            Config.feature_strength_scale != 0. || Config.preserve_initial_mass ||
+            !FMath::IsFinite(SourceElevationDatumM))
+        {
+            OutError = TEXT("Cartesian coupled crop requires explicit unforced MUSCL2/HLL settings and matching Manning roughness");
+            return nullptr;
+        }
+        Config.spatial_order = 2;
+        Config.boundary_mode = "scenario";
+        Scenario.roughness = Manning;
+        Scenario.boundaries.clear();
+        for (const char* Edge : {"west", "east", "south", "north"})
+        {
+            auto Boundary = MakeEdgeBoundary(Edge, "ghost");
+            const bool bWest = Boundary.edge == "west", bEast = Boundary.edge == "east";
+            const bool bXEdge = bWest || bEast;
+            const int32 Count = static_cast<int32>(bXEdge ? Ny : Nx);
+            Boundary.ghost_cells.reserve(2*Count);
+            for (int32 Layer = 0; Layer < 2; ++Layer)
+            {
+                for (int32 Along = 0; Along < Count; ++Along)
+                {
+                    const int64 Col = bXEdge ? (bWest ? Col0-1-Layer : Col1+1+Layer) : Col0+Along;
+                    const int64 Row = bXEdge ? Row0+Along :
+                        (Boundary.edge == "south" ? Row0-1-Layer : Row1+1+Layer);
+                    const int64 Index = Row*FullNx+Col;
+                    Boundary.ghost_cells.push_back({Bed.Float64[Index]-VerticalDatum,
+                        Depth.Float64[Index], VelU.Float64[Index], VelV.Float64[Index]});
+                }
+            }
+            Scenario.boundaries.push_back(MoveTemp(Boundary));
+        }
     }
 
     const FVector2D RuntimeOriginM = bRecenterHydraulicCrux
@@ -810,8 +1195,27 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     // WPO animates the travelling bake wave; tanks stay flat-rendered.
     // A survey replay has no authored travelling-wave material. Adding the
     // legacy wave here would move raft support away from the measured field.
-    Window->bHasTravelingWavePresentation = !bReplayOfflineSolver;
+    Window->bHasTravelingWavePresentation = !bReplayOfflineSolver && !bCartesianCoupled;
+    if (SharedSource.IsValid())
+    {
+        auto Presentation = MakeShared<FPresentationState, ESPMode::ThreadSafe>();
+        Presentation->Atlas = MoveTemp(SharedSource);
+        Window->PresentationState = MoveTemp(Presentation);
+    }
     return Window;
+}
+
+FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::SamplePresentationSource(const FVector2D& PositionM) const
+{
+    return PresentationState.IsValid() ? PresentationState->Atlas->Sample(PositionM) : FRaftSimLiveWaterSampleResult{};
+}
+
+bool FRaftSimLiveWaterWindow::GetFieldBoundsM(FBox2D& OutBounds) const
+{
+    if (!Solver.IsValid()) return false;
+    const auto& Grid = Solver->scenario().grid;
+    OutBounds = FBox2D(OriginM, OriginM + FVector2D((Grid.nx-1)*double(CellXM), (Grid.ny-1)*double(CellYM)));
+    return true;
 }
 
 void FRaftSimLiveWaterWindow::Step(float DtSeconds)
@@ -899,12 +1303,51 @@ int32 FRaftSimLiveWaterWindow::TransferOverlapStateFrom(
         static_cast<double>(PreviousScenario.grid.nx - 1) * PreviousWindow.CellXM;
     const double PreviousMaxY = PreviousWindow.OriginM.Y +
         static_cast<double>(PreviousScenario.grid.ny - 1) * PreviousWindow.CellYM;
+    const raftsim::WaterState& PreviousState = PreviousWindow.Solver->state();
+    // Same Cartesian lattice means the cells are identical control volumes.
+    // Going through Sample() rounded doubles to floats and applied its 1e-4 m
+    // presentation wet threshold, losing shallow-cell momentum on each move.
+    const double ColumnOffset = (OriginM.X - PreviousWindow.OriginM.X) / CellXM;
+    const double RowOffset = (OriginM.Y - PreviousWindow.OriginM.Y) / CellYM;
+    const double RoundedColumnOffset = FMath::RoundToDouble(ColumnOffset);
+    const double RoundedRowOffset = FMath::RoundToDouble(RowOffset);
+    const bool bSameLattice = CellXM == PreviousWindow.CellXM &&
+        CellYM == PreviousWindow.CellYM &&
+        FMath::Abs(ColumnOffset - RoundedColumnOffset) < 1.e-8 &&
+        FMath::Abs(RowOffset - RoundedRowOffset) < 1.e-8 &&
+        FMath::Abs(RoundedColumnOffset) < MAX_int32 &&
+        FMath::Abs(RoundedRowOffset) < MAX_int32;
+    const int64 ColumnShift = bSameLattice ? static_cast<int64>(RoundedColumnOffset) : 0;
+    const int64 RowShift = bSameLattice ? static_cast<int64>(RoundedRowOffset) : 0;
     raftsim::WaterState State = Solver->state();
     int32 TransferredCells = 0;
     for (std::size_t Row = 0; Row < Scenario.grid.ny; ++Row)
     {
         for (std::size_t Col = 0; Col < Scenario.grid.nx; ++Col)
         {
+            if (bSameLattice)
+            {
+                const int64 PreviousRow = static_cast<int64>(Row) + RowShift;
+                const int64 PreviousCol = static_cast<int64>(Col) + ColumnShift;
+                if (PreviousRow < 0 || PreviousCol < 0 ||
+                    PreviousRow >= static_cast<int64>(PreviousScenario.grid.ny) ||
+                    PreviousCol >= static_cast<int64>(PreviousScenario.grid.nx))
+                {
+                    continue;
+                }
+                const double Depth = PreviousState.h(PreviousRow, PreviousCol);
+                State.h(Row, Col) = Depth;
+                State.u(Row, Col) = PreviousState.u(PreviousRow, PreviousCol);
+                State.v(Row, Col) = PreviousState.v(PreviousRow, PreviousCol);
+                State.hu(Row, Col) = PreviousState.hu(PreviousRow, PreviousCol);
+                State.hv(Row, Col) = PreviousState.hv(PreviousRow, PreviousCol);
+                // eta belongs to the receiving solver's elevation datum.
+                State.eta(Row, Col) = Scenario.bed(Row, Col) + Depth;
+                State.wet.values[Row * Scenario.grid.nx + Col] =
+                    PreviousState.wet.values[PreviousRow * PreviousScenario.grid.nx + PreviousCol];
+                ++TransferredCells;
+                continue;
+            }
             const FVector2D WorldPosition(
                 OriginM.X + static_cast<double>(Col) * CellXM,
                 OriginM.Y + static_cast<double>(Row) * CellYM);

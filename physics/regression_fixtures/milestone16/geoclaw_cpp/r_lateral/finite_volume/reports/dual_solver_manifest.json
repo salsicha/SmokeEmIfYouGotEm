@@ -1,30 +1,3 @@
-{
-  "cpp": {
-    "command": [],
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19",
-    "returncode": 0,
-    "runtime_seconds": 0.48100058299678494,
-    "stderr": "",
-    "stdout": "",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_lateral/finite_volume/cpp_solver/lateral_wave_seed_19/validation.json"
-  },
-  "geoclaw": {
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_lateral/normalized/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_lateral/normalized",
-    "runtime_seconds": 1.193660707998788,
-    "seconds_per_simulated_second": 0.1492075884998485,
-    "solver": "geoclaw",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_lateral/normalized/validation.json"
-  },
-  "runtime": {
-    "cpp_runtime_seconds": 0.48100058299678494,
-    "cpp_seconds_per_simulated_second": 0.06012507287459812,
-    "geoclaw_runtime_seconds": 1.193660707998788,
-    "geoclaw_seconds_per_simulated_second": 0.1492075884998485,
-    "simulated_duration_seconds": 8.0
-  },
-  "scenario_id": "lateral_wave_seed_19",
-  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_lateral/shared_scenario/scenario.json",
-  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_lateral/shared_scenario"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:52bb53097f84a8023ae1bda2466fd63c5c02fa9491aa66d60788dd976c7115e1
+size 1658

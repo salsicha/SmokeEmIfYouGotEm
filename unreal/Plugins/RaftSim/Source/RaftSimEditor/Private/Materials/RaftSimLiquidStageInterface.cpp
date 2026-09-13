@@ -4,11 +4,13 @@
 #include "NiagaraGPUSystemTick.h"
 #include "NiagaraSimStageData.h"
 #include "RenderGraphBuilder.h"
+#include "NiagaraGpuComputeDispatchInterface.h"
 
 struct FRaftSimLiquidPendingGroup
 {
     TArray<FRaftSimLiquidCompletedStage> Records;
     uint32 Ordinal=0;
+    TMap<const FNiagaraComputeInstanceData*,float> EngineClocks;
 };
 RDG_REGISTER_BLACKBOARD_STRUCT(FRaftSimLiquidPendingGroup);
 
@@ -16,6 +18,7 @@ namespace
 {
 BEGIN_SHADER_PARAMETER_STRUCT(FLiquidStageParameters,)
     SHADER_PARAMETER(uint32,Ready)
+    SHADER_PARAMETER_RDG_TEXTURE_SRV(Texture3D<float>,Surface)
 END_SHADER_PARAMETER_STRUCT()
 
 struct FLiquidStageProxy final : FNiagaraDataInterfaceProxy
@@ -37,6 +40,10 @@ struct FLiquidStageProxy final : FNiagaraDataInterfaceProxy
         Record.First=Stage.bFirstStage;Record.Last=Stage.bLastStage;Record.Reset=Context.GetComputeInstanceData().bResetData;
         Record.RateSpawns=Context.GetComputeInstanceData().SpawnInfo.SpawnRateInstances;
         Record.EventSpawns=Context.GetComputeInstanceData().SpawnInfo.EventSpawnTotal;
+        const auto& Instance=Context.GetComputeInstanceData();
+        Record.ExternalParameters=Instance.ExternalParamData;Record.ExternalParameterBytes=Instance.ExternalParamDataSize;
+        if(const float* Clock=Context.GetGraphBuilder().Blackboard.GetOrCreate<FRaftSimLiquidPendingGroup>().EngineClocks.Find(&Instance))
+            Record.EngineDeltaSeconds=*Clock;
         Context.GetGraphBuilder().Blackboard.GetOrCreate<FRaftSimLiquidPendingGroup>().Records.Add(Record);
     }
     virtual void FinalizePostStage(FRDGBuilder& Graph,const FNiagaraGpuComputeDispatchInterface&) override
@@ -57,6 +64,8 @@ FRaftSimLiquidPreStage& URaftSimLiquidStageInterface::PreStageEvent()
 
 FRaftSimLiquidPostGroup& URaftSimLiquidStageInterface::PostGroupEvent()
 { static FRaftSimLiquidPostGroup Event;return Event; }
+FRaftSimLiquidSurfaceBinding& URaftSimLiquidStageInterface::SurfaceBindingEvent()
+{ static FRaftSimLiquidSurfaceBinding Event;return Event; }
 
 FNiagaraVariable URaftSimLiquidStageInterface::Variable()
 { return FNiagaraVariable(FNiagaraTypeDefinition(StaticClass()),TEXT("User.RiverCurrentSurfaceStage")); }
@@ -75,7 +84,23 @@ void URaftSimLiquidStageInterface::BuildShaderParameters(FNiagaraShaderParameter
 { Builder.AddNestedStruct<FLiquidStageParameters>(); }
 
 void URaftSimLiquidStageInterface::SetShaderParameters(const FNiagaraDataInterfaceSetShaderParametersContext& Context) const
-{ Context.GetParameterNestedStruct<FLiquidStageParameters>()->Ready=1; }
+{
+    auto* Parameters=Context.GetParameterNestedStruct<FLiquidStageParameters>();
+    Parameters->Ready=1;
+    if(Context.IsResourceBound(&Parameters->Surface))
+    {
+        FRDGTextureRef Surface=nullptr;
+        SurfaceBindingEvent().Broadcast(Context.GetGraphBuilder(),Context.GetSystemInstanceID(),Surface);
+        Parameters->Surface=Surface?Context.GetGraphBuilder().CreateSRV(Surface):
+            Context.GetComputeDispatchInterface().GetBlackTextureSRV(Context.GetGraphBuilder(),ETextureDimension::Texture3D);
+    }
+    // Interpolated systems copy two structures. Never give GetGlobalParameters
+    // a single-structure destination and overrun it when interpolation is on.
+    FNiagaraGlobalParameters Globals[2];
+    Context.GetSystemTick().GetGlobalParameters(Context.GetComputeInstanceData(),Globals);
+    Context.GetGraphBuilder().Blackboard.GetOrCreate<FRaftSimLiquidPendingGroup>().EngineClocks.Add(
+        &Context.GetComputeInstanceData(),Globals[0].EngineDeltaTime);
+}
 
 #if WITH_EDITORONLY_DATA
 void URaftSimLiquidStageInterface::GetFunctionsInternal(TArray<FNiagaraFunctionSignature>& Functions) const
@@ -86,17 +111,29 @@ void URaftSimLiquidStageInterface::GetFunctionsInternal(TArray<FNiagaraFunctionS
     Function.Inputs.Add(FNiagaraVariable(FNiagaraTypeDefinition(GetClass()),TEXT("Stage")));
     Function.Outputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetIntDef(),TEXT("Ready")));
     Functions.Add(Function);
+    Function.Name=TEXT("ReadSurface");
+    Function.Inputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetIntDef(),TEXT("X")));
+    Function.Inputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetIntDef(),TEXT("Y")));
+    Function.Inputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetIntDef(),TEXT("Z")));
+    Function.Outputs={FNiagaraVariable(FNiagaraTypeDefinition::GetFloatDef(),TEXT("Phi"))};
+    Functions.Add(Function);
 }
 bool URaftSimLiquidStageInterface::AppendCompileHash(FNiagaraCompileHashVisitor* Visitor) const
 {
     if (!Super::AppendCompileHash(Visitor)) return false;
     Visitor->UpdateShaderParameters<FLiquidStageParameters>();
-    return Visitor->UpdateString(TEXT("RiverCurrentSurfaceStageVersion"),TEXT("1"));
+    return Visitor->UpdateString(TEXT("RiverCurrentSurfaceStageVersion"),TEXT("2"));
 }
 void URaftSimLiquidStageInterface::GetParameterDefinitionHLSL(const FNiagaraDataInterfaceGPUParamInfo& Info,FString& Code)
-{ Code+=FString::Printf(TEXT("uint %s_Ready;\n"),*Info.DataInterfaceHLSLSymbol); }
+{ Code+=FString::Printf(TEXT("uint %s_Ready;\nTexture3D<float> %s_Surface;\n"),*Info.DataInterfaceHLSLSymbol,*Info.DataInterfaceHLSLSymbol); }
 bool URaftSimLiquidStageInterface::GetFunctionHLSL(const FNiagaraDataInterfaceGPUParamInfo& Info,const FNiagaraDataInterfaceGeneratedFunction& Function,int,FString& Code)
 {
+    if(Function.DefinitionName==TEXT("ReadSurface"))
+    {
+        Code+=FString::Printf(TEXT("void %s(int X,int Y,int Z,out float Phi) { Phi=%s_Surface.Load(int4(X,Y,Z,0)); }\n"),
+            *Function.InstanceName,*Info.DataInterfaceHLSLSymbol);
+        return true;
+    }
     if (Function.DefinitionName!=TEXT("ReadReady")) return false;
     Code+=FString::Printf(TEXT("void %s(out int Ready) { Ready=(int)%s_Ready; }\n"),*Function.InstanceName,*Info.DataInterfaceHLSLSymbol);
     return true;

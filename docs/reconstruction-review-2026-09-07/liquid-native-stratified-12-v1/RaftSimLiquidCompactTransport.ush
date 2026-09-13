@@ -1,0 +1,36 @@
+#pragma once
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPhysicalFrame.ush"
+
+// Shared by native particle motion and explicit interface transport.
+// Averaged quadratic normal / tent transverse basis, centered grid samples.
+float3 RaftSimLiquidCompactWeights(float3 R)
+{
+    float3 W=max(1-abs(R),0),N;
+    [unroll] for(int A=0;A<3;++A)
+    {
+        float L=R[A]-.5,H=R[A]+.5;
+        float B=abs(L)<.5?.75-L*L:.5*pow(max(1.5-abs(L),0),2);
+        float C=abs(H)<.5?.75-H*H:.5*pow(max(1.5-abs(H),0),2);
+        N[A]=.5*(B+C);
+    }
+    return float3(N.x*W.y*W.z,W.x*N.y*W.z,W.x*W.y*N.z);
+}
+
+// The native scaled matrix inverse uses approximate reciprocals. Recover
+// coordinates from the same orthogonal UnitToWorld frame that places cells,
+// rather than using a second, slightly different inverse of that frame.
+float3 RaftSimLiquidOrthogonalUnit(float3 P,float4x4 UnitToWorld)
+{
+    // Preserve rotated subtraction/product/division residuals through one final
+    // demotion, as physical ownership already does. Merely disabling FMA still
+    // leaves approximate float division able to flip half-cell phase selection.
+    FDFVector3 D=DFTwoSum(P,-UnitToWorld[3].xyz);
+    precise float3 Unit;
+    [unroll] for(int A=0;A<3;++A)
+    {
+        FDFScalar Numerator=RaftSimLiquidPhysicalDot(D,UnitToWorld[A].xyz);
+        FDFScalar Denominator=RaftSimLiquidPhysicalDot(DFPromote(UnitToWorld[A].xyz),UnitToWorld[A].xyz);
+        Unit[A]=DFDemote(DFDivide(Numerator,Denominator));
+    }
+    return Unit;
+}

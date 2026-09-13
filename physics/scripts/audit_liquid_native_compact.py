@@ -46,7 +46,8 @@ def audit(directory, log_path=None):
     step = report['native_transfer_packet_step']
     if step != history[-1]['native_step']+1:
         raise ValueError('Native handoff must continue through the retained P2G boundary')
-    groups = [g for g in report['groups'] if g['entries'][0]['first']][:step]
+    from liquid_stage_journal import stage_groups
+    groups = [g for g in stage_groups(report) if g['entries'][0]['first']][:step]
     planned = {s: {e['owner']: e['native_rate_spawns']+e['native_event_spawns'] for e in g['entries']}
                for s, g in enumerate(groups, 1)}
     if len(planned) != step or any(v not in (0, 1) or (v and o != 1) for s,p in planned.items() if s > 1 for o,v in p.items()):

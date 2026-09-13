@@ -1,0 +1,138 @@
+#define RAFTSIM_INTERFACE_HELPERS_ONLY 1
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidInterface.usf"
+uint Stage;
+Texture3D<float> Auxiliary;
+Texture3D<float> Forward;
+// Exact 0/1 floats allow the existing race-free scalar owner-halo exchange.
+Texture3D<float> InputValid;
+Texture3D<float> AuxiliaryValid;
+Texture3D<uint> Solid;
+Texture3D<float4> NativeBoundary;
+RWTexture3D<float> ResultValid;
+
+bool SolidValueValid(int3 P)
+{
+#if RAFTSIM_HIGHORDER_NATIVE_BOUNDARY
+    float T=NativeBoundary.Load(int4(P,0)).w;
+    return isfinite(T) && (T==0 || T==1 || T==2 || T==3);
+#else
+    return Solid.Load(int4(P,0))<=1;
+#endif
+}
+bool SolidAt(int3 P)
+{
+#if RAFTSIM_HIGHORDER_NATIVE_BOUNDARY
+    float T=NativeBoundary.Load(int4(P,0)).w;
+    return T==1 || T==3;
+#else
+    return Solid.Load(int4(P,0))!=0;
+#endif
+}
+
+bool Owned(int3 P) { return all(P>=UpdateMin) && all(P<UpdateMax); }
+
+bool RelativeStencil(int3 P,float3 Offset,out int3 Low,out float3 LowerWeight,out float3 UpperWeight)
+{
+    Low=0;LowerWeight=0;UpperWeight=0;
+    if(!all(isfinite(Offset)) || any(Offset<float3(-P)) || any(Offset>=float3(Size-1-P))) return false;
+    int3 Base=int3(floor(Offset));Low=P+Base;
+    // Keep the small residual even when P+Offset would round to P. Compute
+    // both weights independently: 1-(1+tiny) would lose a negative residual.
+    LowerWeight=float3(Base+1)-Offset;UpperWeight=Offset-float3(Base);
+    return true;
+}
+
+bool RelativeVelocity(int3 P,float3 Offset,out float3 Value)
+{
+    Value=0;
+    if(!all(isfinite(Offset))) return false;
+    if(CompactTransport==0)
+    {
+        int3 Low;float3 A,B;if(!RelativeStencil(P,Offset,Low,A,B)) return false;
+        [unroll] for(int Z=0;Z<2;++Z) [unroll] for(int Y=0;Y<2;++Y) [unroll] for(int X=0;X<2;++X)
+        {
+            float3 W=lerp(A,B,float3(X,Y,Z));Value+=W.x*W.y*W.z*Velocity.Load(int4(Low+int3(X,Y,Z),0)).xyz;
+        }
+        return all(isfinite(Value));
+    }
+    if(any(Offset<float3(1-P)) || any(Offset>=float3(Size-2-P))) return false;
+    int3 Base=int3(floor(Offset))-1;
+    for(int Z=0;Z<4;++Z) for(int Y=0;Y<4;++Y) for(int X=0;X<4;++X)
+    {
+        if(int(X==0 || X==3)+int(Y==0 || Y==3)+int(Z==0 || Z==3)>1) continue;
+        int3 Relative=Base+int3(X,Y,Z);
+        Value+=Velocity.Load(int4(P+Relative,0)).xyz*RaftSimLiquidCompactWeights(float3(Relative)-Offset);
+    }
+    return all(isfinite(Value));
+}
+
+bool Trace(int3 P,float Direction,out int3 Low,out float3 A,out float3 B)
+{
+    Low=0;A=0;B=0;
+    float3 V=Velocity.Load(int4(P,0)).xyz;
+    if(CompactTransport!=0 && !RelativeVelocity(P,0,V)) return false;
+    if(!all(isfinite(V))) return false;
+    float3 Mid=-.5*Direction*Dt*V/CellCm,MidV;
+    if(!RelativeVelocity(P,Mid,MidV)) return false;
+    return RelativeStencil(P,-Direction*Dt*MidV/CellCm,Low,A,B);
+}
+
+[numthreads(4,4,4)]
+void HighOrderCS(uint3 P:SV_DispatchThreadID)
+{
+    if(any(P>=uint3(Size))) return;
+    float Old=Source.Load(int4(P,0));
+    Result[P]=Stage==4?Forward.Load(int4(P,0)):Old;ResultValid[P]=0;
+    if(!isfinite(Old) || !SolidValueValid(int3(P))) { InterlockedAdd(Diagnostics[2],1);return; }
+    if(!Owned(int3(P))) return;
+    int3 Low;float3 A,B;
+    if(Stage==0 || Stage==1 || Stage==3)
+    {
+        if(!Trace(int3(P),Stage==1?-1:1,Low,A,B))
+        { InterlockedAdd(Diagnostics[Stage==0?1:Stage==1?6:7],1);return; }
+        float Value=0;
+        [unroll] for(int Z=0;Z<2;++Z) [unroll] for(int Y=0;Y<2;++Y) [unroll] for(int X=0;X<2;++X)
+        { float3 W=lerp(A,B,float3(X,Y,Z));Value+=W.x*W.y*W.z*Source.Load(int4(Low+int3(X,Y,Z),0)); }
+        if(!isfinite(Value)) { InterlockedAdd(Diagnostics[2],1);return; }
+        Result[P]=Value;ResultValid[P]=1;
+        if(Stage==0) InterlockedAdd(Diagnostics[0],1);
+        return;
+    }
+    bool Ready=InputValid.Load(int4(P,0))!=0 && !SolidAt(int3(P));
+    if(Stage==2) Ready=Ready && AuxiliaryValid.Load(int4(P,0))!=0;
+    if(!Ready)
+    {
+        if(Stage==4 && InputValid.Load(int4(P,0))!=0) InterlockedAdd(Diagnostics[5],1);
+        return;
+    }
+    if(!Trace(int3(P),Stage==2?-1:1,Low,A,B))
+    { if(Stage==4) InterlockedAdd(Diagnostics[5],1);return; }
+    float Minimum=3.402823466e+38,Maximum=-3.402823466e+38;
+    [unroll] for(int Z=0;Z<2;++Z) [unroll] for(int Y=0;Y<2;++Y) [unroll] for(int X=0;X<2;++X)
+    {
+        float3 W=lerp(A,B,float3(X,Y,Z));
+        if(W.x*W.y*W.z<=0) continue;
+        int3 Donor=Low+int3(X,Y,Z);
+        if(Stage==2)
+        {
+            // Outside-owner support is allowed only when the real owner has
+            // produced and exchanged its validity. Physical exteriors stay 0.
+            Ready=Ready && InputValid.Load(int4(Donor,0))!=0 && !SolidAt(Donor);
+        }
+        else
+        {
+            float Value=Source.Load(int4(Donor,0));Minimum=min(Minimum,Value);Maximum=max(Maximum,Value);
+            Ready=Ready && AuxiliaryValid.Load(int4(Donor,0))!=0 && !SolidAt(Donor);
+        }
+    }
+    if(!Ready) { if(Stage==4) InterlockedAdd(Diagnostics[5],1);return; }
+    float Value=Stage==2?Old+.5*(Old-Auxiliary.Load(int4(P,0))):Auxiliary.Load(int4(P,0));
+    if(!isfinite(Value)) { InterlockedAdd(Diagnostics[2],1);return; }
+    if(Stage==4)
+    {
+        InterlockedAdd(Diagnostics[3],1);
+        if(Value<Minimum || Value>Maximum) InterlockedAdd(Diagnostics[4],1);
+        Value=clamp(Value,Minimum,Maximum);
+    }
+    Result[P]=Value;ResultValid[P]=1;
+}

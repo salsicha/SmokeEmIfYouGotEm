@@ -270,7 +270,8 @@ def audit(directory, prepared=None, boundary=None, log_path=None):
     if emission and (not report['native_emission_activated'] or report['native_emission_rate'] != 60 or report['native_emission_start_step'] < 1):
         raise ValueError('Activated bounded source required')
     step = report['native_transfer_packet_step']
-    groups = [g for g in report['groups'] if g['entries'][0]['first']][:step]
+    from liquid_stage_journal import stage_groups
+    groups = [g for g in stage_groups(report) if g['entries'][0]['first']][:step]
     if len(groups) != step:
         raise ValueError('Missing native first-stage spawn plan')
     planned = {}

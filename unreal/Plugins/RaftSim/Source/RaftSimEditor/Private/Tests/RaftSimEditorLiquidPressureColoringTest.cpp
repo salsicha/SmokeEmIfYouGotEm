@@ -1,6 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "../Materials/RaftSimLiquidPressureColoring.h"
 #include "../Materials/RaftSimLiquidRegionalProjection.h"
+#include <cmath>
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FLiquidPressureColoringTest,
     "RaftSim.Editor.LiquidPressureColoring",
@@ -44,6 +45,7 @@ bool FLiquidPressureColoringTest::RunTest(const FString&)
     using namespace RaftSimLiquidRegionalProjection;
     RaftSimLiquidRegionalState::FParent Parent;Parent.Cells=FIntVector(490,162,24);Parent.Spacing=FVector(50,50,800.0/24);
     int32 PhysicalVisits=0,Shifted=0;
+    double SharedOmega=0;
     for (int32 FY:{0,64,128}) for (int32 FX:{0,128,256,384})
     {
         RaftSimLiquidRegionalState::FState R;R.FirstCell=FIntPoint(FX,FY);
@@ -51,6 +53,17 @@ bool FLiquidPressureColoringTest::RunTest(const FString&)
         R.ComputationalCells=R.Cells+FIntVector(4,4,0);R.Extent=FVector(R.ComputationalCells)*Parent.Spacing;
         FLayout L;FString Error;
         if (!TestTrue(TEXT("Actual region pressure layout"),Build(Parent,R,L,Error))) return false;
+        if(SharedOmega==0) SharedOmega=L.PressureOmega();
+        TestEqual(TEXT("All regional cuts use the same parent pressure relaxation"),L.PressureOmega(),SharedOmega);
+        double Rho=0,Weights=0;
+        for(int Axis=0;Axis<3;++Axis)
+        {
+            const double W=1/(Parent.Spacing[Axis]*Parent.Spacing[Axis]);
+            Rho+=W*std::cos(3.14159265358979323846/(std::ceil(Parent.Cells[Axis]/2.0)+1));Weights+=W;
+        }
+        Rho/=Weights;
+        TestTrue(TEXT("SOR estimate follows anisotropic two-cell graph"),FMath::Abs(L.PressureOmega()-2/(1+std::sqrt(1-Rho*Rho)))<1.e-12);
+        TestTrue(TEXT("SOR estimate is strictly within its convergence interval"),L.PressureOmega()>1 && L.PressureOmega()<2);
         Shifted+=L.Phase()!=0;
         for (int32 Y=0;Y<R.ComputationalCells.Y;++Y) for (int32 Z=0;Z<24;++Z)
             for (int32 Phase=0;Phase<2;++Phase) for (int32 T=0;T<R.ComputationalCells.X/2;++T)

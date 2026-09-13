@@ -11,6 +11,23 @@ struct FLayout
     FIntVector Cells=FIntVector::ZeroValue,ParentCells=FIntVector::ZeroValue;
     FIntPoint Offset=FIntPoint::ZeroValue;
     FVector Spacing=FVector::ZeroVector;
+    double PressureOmega() const
+    {
+        // Rectangular-box spectral estimate for the ACTUAL +/-2, anisotropic
+        // pressure graph. Its eight parity subgrids have half the sample count.
+        // Use the parent, never a regional cut, so every owner uses one omega.
+        // Irregular terrain/free surfaces change the spectrum: this is an
+        // estimate, not a residual tolerance or proof of convergence.
+        double WeightedRho=0,Weight=0;
+        for(int32 Axis=0;Axis<3;++Axis)
+        {
+            const double A=1.0/(Spacing[Axis]*Spacing[Axis]);
+            const int32 Nodes=(ParentCells[Axis]+1)/2;
+            WeightedRho+=A*FMath::Cos(UE_DOUBLE_PI/double(Nodes+1));Weight+=A;
+        }
+        const double Rho=WeightedRho/Weight;
+        return 2.0/(1.0+FMath::Sqrt(1.0-Rho*Rho));
+    }
     int32 Phase() const { return (Offset.X/2+Offset.Y/2)%2; }
     FString ParentIndexHlsl(const TCHAR* Index) const
     { return FString::Printf(TEXT("(%s+int3(%d,%d,0))"),Index,Offset.X,Offset.Y); }
@@ -60,4 +77,4 @@ inline bool Build(const RaftSimLiquidRegionalState::FParent& Parent,
 // regions: boundary, momentum and particle exchange are still required.
 bool RaftSimInstallRegionalLiquidProjection(UNiagaraSystem* System,
     const RaftSimLiquidRegionalState::FParent& Parent,
-    const RaftSimLiquidRegionalState::FState& Region,FString& Error);
+    const RaftSimLiquidRegionalState::FState& Region,FString& Error,bool CurrentSurface=false);

@@ -17,7 +17,12 @@ struct FRaftSimLiquidParticleExitPlan
     float HeightCm=0;
     FRDGBufferRef BedKnots=nullptr;
     FIntVector4 BedOffsets=FIntVector4(0,0,0,0),BedCounts=FIntVector4(0,0,0,0);
+    // Optional caller-owned persistent diagnostic latch, cleared once per
+    // simulation generation. No native particle writes or CPU tick readbacks.
+    FRDGBufferRef FirstRejectionTrace=nullptr;
+    uint32 NativeStep=0;
 };
+inline constexpr uint32 RaftSimLiquidExitTraceWords=320; // 64 header + up to 256 payload words
 RAFTSIMWATERDETAIL_API FRaftSimLiquidParticleExitPlan RaftSimBuildLiquidParticleExitPlan(
     FRDGBuilder& Graph,const FRaftSimLiquidParticleRoutePlan& Routing,float HeightCm,
     TConstArrayView<FVector3f> BedStageNormalSpeed,FString& Error,

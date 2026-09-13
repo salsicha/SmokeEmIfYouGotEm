@@ -45,7 +45,8 @@ def audit(directory):
           'regional_compatible_projection_installed','boundary_readback_valid','scheduler_alignment_observed')
     if not capture['complete'] or not all(report.get(k) for k in keys) or report['exchange_error']:
         raise ValueError('Successful native shared-boundary capture required')
-    groups=sum(g['entries'][0]['name']=='Compute Boundary' for g in report['groups'])
+    from liquid_stage_journal import stage_groups
+    groups=sum(g['entries'][0]['name']=='Compute Boundary' for g in stage_groups(report))
     if report['boundary_halo_dispatches']!=groups or groups<=0:
         raise ValueError('Every native boundary stage must exchange before downstream stages')
     files=report['boundary_readbacks']

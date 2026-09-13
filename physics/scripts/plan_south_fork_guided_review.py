@@ -29,7 +29,8 @@ def aligned_raft_clearance(depth,cell,half_length=2.35,half_width=1.2):
     return clearance
 
 
-def plan(depth,start,end_column,cell=1.0,footprint_radius=3.0,minimum_depth=.55,clearance=None,velocity=None):
+def plan(depth,start,end_column,cell=1.0,footprint_radius=3.0,minimum_depth=.55,clearance=None,velocity=None,
+         allowed_steps=None, maximum_cross_current=2.2):
     if depth.ndim!=2 or not np.isfinite(depth).all() or cell<=0:
         raise ValueError('Finite depth grid and positive cell size required')
     radius=int(np.ceil(footprint_radius/cell))
@@ -38,6 +39,13 @@ def plan(depth,start,end_column,cell=1.0,footprint_radius=3.0,minimum_depth=.55,
     if velocity is not None:
         if len(velocity)!=2 or any(a.shape!=depth.shape or not np.isfinite(a).all() for a in velocity):
             raise ValueError('Two finite velocity grids matching depth are required')
+    neighbors=((0,1),(1,1),(-1,1),(1,0),(-1,0),(0,-1),(1,-1),(-1,-1))
+    if allowed_steps is not None:
+        if not allowed_steps or any(step not in neighbors for step in allowed_steps):
+            raise ValueError('Allowed steps must be nonempty eight-neighbor offsets')
+        neighbors=tuple(allowed_steps)
+    if not np.isfinite(maximum_cross_current) or not 0.<maximum_cross_current<=2.2:
+        raise ValueError('Cross-current planning limit must not exceed existing paddle capability')
     safe=clearance>=minimum_depth
     rows,cols=depth.shape
     if not (0<=start[0]<rows and 0<=start[1]<cols and 0<=end_column<cols) or not safe[start]:
@@ -49,7 +57,7 @@ def plan(depth,start,end_column,cell=1.0,footprint_radius=3.0,minimum_depth=.55,
         if distance!=cost[current]:continue
         y,x=current
         if x==end_column:end=current;break
-        for dy,dx in ((0,1),(1,1),(-1,1),(1,0),(-1,0),(0,-1),(1,-1),(-1,-1)):
+        for dy,dx in neighbors:
             yy,xx=y+dy,x+dx
             if not (0<=yy<rows and 0<=xx<cols and safe[yy,xx]):continue
             if dx and dy and not (safe[y,xx] and safe[yy,x]):continue
@@ -61,7 +69,7 @@ def plan(depth,start,end_column,cell=1.0,footprint_radius=3.0,minimum_depth=.55,
                 cross=(v[y,x]*dx-u[y,x]*dy)/length
                 # Ground-track speed attainable with the game's existing
                 # 2.2 m/s over-water paddling governor, not a force override.
-                if abs(cross)>=2.2:continue
+                if abs(cross)>=maximum_cross_current:continue
                 speed=along+np.sqrt(2.2**2-cross**2)
                 if speed<=.1:continue
                 step/=speed

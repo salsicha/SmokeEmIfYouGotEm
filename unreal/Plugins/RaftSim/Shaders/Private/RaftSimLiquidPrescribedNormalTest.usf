@@ -1,0 +1,15 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPrescribedNormal.ush"
+uint Cases;
+StructuredBuffer<float4> Inputs;
+RWStructuredBuffer<float4> Results;
+[numthreads(64,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID)
+{
+    if(Id.x>=Cases) return;
+    float3 start=Inputs[4*Id.x].xyz;
+    float3 candidate=Inputs[4*Id.x+1].xyz;
+    float3 normal=Inputs[4*Id.x+2].xyz;
+    float travel=Inputs[4*Id.x+3].x;
+    Results[Id.x]=float4(RaftSimLiquidPrescribedNormalPosition(start,candidate,normal,travel),0);
+}

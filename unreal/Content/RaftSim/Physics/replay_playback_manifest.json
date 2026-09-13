@@ -1,15 +1,3 @@
-{
-  "schema": "raftsim.unreal.replay_playback.v1",
-  "source_replay": "../../physics/data/readiness/milestone_10/unreal_visualization/replay.json",
-  "source_force_telemetry": "../../physics/data/readiness/milestone_10/unreal_visualization/telemetry_forces.csv",
-  "source_manifest": "../../physics/data/readiness/milestone_10/unreal_visualization/manifest.json",
-  "subsystem": "URaftSimReplaySubsystem",
-  "integration_order": [
-    "load_manifest",
-    "publish_authoritative_raft_frames",
-    "render_interpolated_pose",
-    "draw_force_and_contact_debug",
-    "swap_to_live_physics_after_visualization_is_verified"
-  ],
-  "status": "source_integrated_pending_editor_compile"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d5adcfb8e4dc20bf8c957cbf91a0519013581466fa5da2c907836b2d3483e8aa
+size 697

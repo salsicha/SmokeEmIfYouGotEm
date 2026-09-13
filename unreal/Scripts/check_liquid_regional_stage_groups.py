@@ -4,13 +4,21 @@ Neither mode is sustained-flow, visual, or performance acceptance.
 """
 from pathlib import Path
 import json
+import hashlib
 import os
 import re
 import time
 import traceback
+import sys
 import unreal
 
 ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT/'physics/scripts'))
+from liquid_stage_journal import stage_groups
+from liquid_dataset import resolve as resolve_dataset
+dataset_match=re.search(r'-RaftSimRegionalDataset=([A-Za-z0-9_-]+)',unreal.SystemLibrary.get_command_line())
+dataset_key=dataset_match.group(1) if dataset_match else 'core-v1'
+dataset=resolve_dataset(key=dataset_key)
 match=re.search(r'-RaftSimRegionalStageLabel=([A-Za-z0-9_-]+)',unreal.SystemLibrary.get_command_line())
 assert match, 'Unique scheduler evidence label required'
 output=ROOT/'docs/reconstruction-review-2026-09-07'/match.group(1)
@@ -30,10 +38,72 @@ state=dict(frame=0,complete=False,zero_water=not packet,fluid_or_performance_acc
 started=time.perf_counter()
 all_regions='-RaftSimRegionalStageAll' in unreal.SystemLibrary.get_command_line()
 expected_regions=12 if all_regions else 2
+transport_sources={}
+inlet_sources={}
+boundary_sources={}
+
+
+def retain_transport_sources():
+    if '-RaftSimRegionalResidualBoundary' in unreal.SystemLibrary.get_command_line():
+        plugin=ROOT/'unreal/Plugins/RaftSim'
+        for relative in ('Shaders/Private/RaftSimLiquidPhysicalFrame.ush',
+                         'Shaders/Private/RaftSimLiquidParticleRouting.usf',
+                         'Shaders/Private/RaftSimLiquidParticleExit.usf',
+                         'Source/RaftSimWaterDetail/Public/RaftSimLiquidParticleRoutingGPU.h',
+                         'Source/RaftSimWaterDetail/Private/RaftSimLiquidParticleRoutingGPU.cpp',
+                         'Source/RaftSimWaterDetail/Private/RaftSimLiquidParticleExitGPU.cpp',
+                         *(('Source/RaftSimWaterDetail/Public/RaftSimLiquidHaloGPU.h',
+                         'Source/RaftSimWaterDetail/Private/RaftSimLiquidHaloGPU.cpp',
+                         'Shaders/Private/RaftSimLiquidHalo.usf') if '-RaftSimRegionalUnifiedTransport' in unreal.SystemLibrary.get_command_line() else ()),
+                         'Source/RaftSimEditor/Private/Materials/RaftSimEditorLiquidRegionalStageProbe.cpp'):
+            data=(plugin/relative).read_bytes();boundary_sources[relative]=hashlib.sha256(data).hexdigest()
+            target=output/'boundary-sources'/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes(data)
+        if '-RaftSimRegionalHighOrderInterface' in unreal.SystemLibrary.get_command_line():
+            for relative in ('Shaders/Private/RaftSimLiquidInterfaceHighOrder.usf',
+                             'Source/RaftSimWaterDetail/Public/RaftSimLiquidInterfaceHighOrderGPU.h',
+                             'Source/RaftSimWaterDetail/Private/RaftSimLiquidInterfaceHighOrderGPU.cpp',
+                             'Source/RaftSimEditor/Private/Materials/RaftSimLiquidInterfaceRuntime.h'):
+                data=(plugin/relative).read_bytes();boundary_sources[relative]=hashlib.sha256(data).hexdigest()
+                target=output/'boundary-sources'/relative;target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes(data)
+        (output/'boundary-sources.json').write_text(json.dumps(dict(schema='raftsim.liquid_boundary_sources.v1',
+            files_sha256=boundary_sources),indent=2)+'\n')
+    if '-RaftSimRegionalStratifiedSource' in unreal.SystemLibrary.get_command_line():
+        source_root=ROOT/'unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials'
+        for name in ('RaftSimLiquidStratifiedSource.h','RaftSimLiquidRegionalState.cpp',
+                     'RaftSimLiquidNativeTransferAudit.h','RaftSimEditorLiquidRegionalStageProbe.cpp'):
+            data=(source_root/name).read_bytes();inlet_sources[name]=hashlib.sha256(data).hexdigest()
+            (output/name).write_bytes(data)
+        (output/'inlet-sources.json').write_text(json.dumps(dict(schema='raftsim.liquid_inlet_sources.v1',
+            files_sha256=inlet_sources),indent=2)+'\n')
+    if '-RaftSimRegionalUnifiedTransport' not in unreal.SystemLibrary.get_command_line():return
+    shader_root=ROOT/'unreal/Plugins/RaftSim/Shaders/Private'
+    for name in ('RaftSimLiquidCompactTransport.ush','RaftSimLiquidPhysicalFrame.ush','RaftSimLiquidInterface.usf'):
+        data=(shader_root/name).read_bytes()
+        transport_sources[name]=hashlib.sha256(data).hexdigest()
+        (output/name).write_bytes(data)
+    (output/'transport-sources.json').write_text(json.dumps(dict(
+        schema='raftsim.liquid_transport_sources.v1',files_sha256=transport_sources),indent=2)+'\n')
 
 
 def finish(error=None):
     global output,started,components
+    if boundary_sources:
+        plugin=ROOT/'unreal/Plugins/RaftSim'
+        state['boundary_sources_unchanged']=all(hashlib.sha256((plugin/name).read_bytes()).hexdigest()==digest
+            for name,digest in boundary_sources.items())
+        if not state['boundary_sources_unchanged']:error=error or 'Boundary source changed during capture'
+    if inlet_sources:
+        source_root=ROOT/'unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials'
+        state['inlet_sources_unchanged']=all(hashlib.sha256((source_root/name).read_bytes()).hexdigest()==digest
+            for name,digest in inlet_sources.items())
+        if not state['inlet_sources_unchanged']:error=error or 'Inlet source changed during capture'
+    if transport_sources:
+        shader_root=ROOT/'unreal/Plugins/RaftSim/Shaders/Private'
+        state['transport_sources_unchanged']=all(hashlib.sha256((shader_root/name).read_bytes()).hexdigest()==digest
+            for name,digest in transport_sources.items())
+        if not state['transport_sources_unchanged']:error=error or 'Transport shader source changed during capture'
     if error is not None and not (output/'stages.json').exists():
         # Keep the actual failed schedule and native error, not only a Python
         # traceback. The capture remains failed even if diagnostic saving works.
@@ -66,7 +136,8 @@ def finish(error=None):
 
 def tick(delta):
     try:
-        assert time.perf_counter()-started<240, 'Regional stage probe wall-time bound exceeded'
+        # Bounded longer dense replay; this measures diagnostic wall time, never FPS.
+        assert time.perf_counter()-started<(1800 if dense else 240), 'Regional stage probe wall-time bound exceeded'
         # Every component enqueues its tick before one common render flush.
         # A scheduler proof requires observed groups, not this intended order.
         # A reset batch can otherwise queue several ticks before the first GPU
@@ -95,13 +166,14 @@ def tick(delta):
             state['empty_regional_exchange_dispatched']=report['empty_regional_exchange_dispatched']
             assert report['empty_regional_exchange_dispatched'], report['exchange_error']
             assert report['region_count']==expected_regions
-            solve_groups=sum(g['entries'][0]['name']=='Solve Pressure' for g in report['groups'])
+            observed_dataset=resolve_dataset(report,key=dataset_key)
+            assert report.get('native_dataset'), 'Actual native dataset identity was not captured'
+            solve_groups=sum(g['entries'][0]['name']=='Solve Pressure' for g in stage_groups(report))
             assert report['pressure_halo_dispatches']==solve_groups, 'Missed same-iteration halo exchange'
-            assert report['shared_columns']==(5960 if all_regions else 136), 'Incomplete shared face/corner map'
             # Independent prepared canonical mappings, not the C++ builder's
             # counts. Reflect both Y addresses and compare every source/target.
             ids=set(report['region_ids'])
-            geometry=ROOT/'tmp/south-fork-liquid-regional-geometry-v4-20260910'
+            geometry=observed_dataset['geometry']
             pages={i:json.loads((geometry/f'region-{i:03d}-boundary.json').read_text()) for i in ids}
             expected=[]
             for dest,page in pages.items():
@@ -110,6 +182,7 @@ def tick(delta):
                     if source in ids:
                         expected.append((source,dest,sx,pages[source]['computational_cells'][1]-1-sy,dx,dy_size-1-dy))
             assert sorted(map(tuple,report['halo_columns_niagara']))==sorted(expected), 'Regional GPU addresses disagree with independently audited canonical ownership'
+            assert report['shared_columns']==len(expected), 'Incomplete shared face/corner map'
             state['all_halo_addresses_match_prepared_geometry']=True
             if '-RaftSimRegionalContact' in unreal.SystemLibrary.get_command_line():
                 assert report['canonical_regional_contact_installed'] and report['boundary_readback_valid'], 'Missing actual regional contact/grid evidence'
@@ -118,12 +191,12 @@ def tick(delta):
             if '-RaftSimRegionalPressureMarker' in unreal.SystemLibrary.get_command_line():
                 assert report['nonzero_pressure_marker_seeded'] and report['nonzero_pressure_marker_readback_valid'], 'Nonzero pressure marker readback missing'
             if '-RaftSimRegionalBoundaryExchange' in unreal.SystemLibrary.get_command_line():
-                boundary_groups=sum(g['entries'][0]['name']=='Compute Boundary' for g in report['groups'])
+                boundary_groups=sum(g['entries'][0]['name']=='Compute Boundary' for g in stage_groups(report))
                 assert report['shared_boundary_exchange_enabled'] and report['boundary_halo_dispatches']==boundary_groups>0, 'Missing same-step boundary exchange'
             if '-RaftSimRegionalParentExterior' in unreal.SystemLibrary.get_command_line():
                 assert report['parent_exterior_forcing_installed'] and report['outlet_pressure_readback_valid'], 'Parent-domain forcing/pressure evidence missing'
             if '-RaftSimRegionalTransfer' in unreal.SystemLibrary.get_command_line():
-                raster_groups=sum(g['entries'][0]['name']=='Neighbor Grid Rasterize Particles' for g in report['groups'])
+                raster_groups=sum(g['entries'][0]['name']=='Neighbor Grid Rasterize Particles' for g in stage_groups(report))
                 assert report['conservative_transfer_enabled'] and report['raw_transfer_reductions']==raster_groups>0, 'Missing same-step raw reduction / native resolve'
             if packet:
                 assert not report['zero_water'] and report['native_transfer_packet_saved'], 'Actual native particle/raw/total snapshots missing'
@@ -133,6 +206,7 @@ def tick(delta):
 
 
 def start_regions():
+    retain_transport_sources()
     unreal.SystemLibrary.execute_console_command(world,'RaftSim.LiquidRegionalStageProbe start'+(' all' if all_regions else ''))
     # EditorActorSubsystem deliberately excludes RF_Transient actors. Keep the
     # probe unsavable and enumerate its exact labels in this world instead.

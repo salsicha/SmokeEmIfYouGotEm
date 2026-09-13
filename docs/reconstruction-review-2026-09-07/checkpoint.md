@@ -4,6 +4,1220 @@ The queue is active, not complete: **South Fork → Colorado → Pacuare → Fut
 
 ## Completed in this pass
 
+LATEST 2026-09-12 10:01 UTC heartbeat PROGRESS; previous goal turn PROGRESS.
+See gameplay-export-coverage.md. New audit_south_fork_gameplay_export_coverage.py
+hashchecksALL799source/826cores, exact bed41,594,716 modeledintersectioncells;
+perpacketcore-sliceindexrecorded. SourcebedNPZ dtypeACTUALfloat64,321x321.
+Reports tmp/south-fork-gameplay-export-coverage-20260912.json SHAe05c19f4...
+and...-coverage-v2-20260912.json SHA03e397b7... (with--original-water-domain).
+Auditjobs82180/30793terminal0. NOTfullcoverageacceptance:52,689route/+/-12crop
++2ghost probesPASS usingnativeactivesourcepreference/margin3, BUT21,518unique
+capturedwet cellsoutside826coreunion (58,412packetduplicates). Broadoriginal
+406,823wetprobes:3,822centered224m+ghostfootprintsreachunmodeledcapturedwater.
+Firstexamplesreachphysicaldownstreamwestx669719; doNOTassumeallfailuresendpoints
+fromonlyfirst20records. Nextclassifyallfailures, boundary-aware cropcenter or
+physicaledgehandling/additionalsolvedcontext; preservefullfootprintandgates.
+DoNOTzero-fillunknownwetstate/shrinkdomain/reportonlycenterlineascoverage.
+Naive799bed+hUVf64+maskdup2.717GB +5future127MBframesexceedsfreereserve;
+proposedsharedhashverifiednativehUVtileatlas127MB +exactbed/sliceindex/cached
+loader/unavailablemask. NOTIMPLEMENTEDyet. Avoid127MBread/hashperhandoff and
+stageexactdependenciesonly. Nofiledeletion/precisionreduction tofitspace.
+Onlylivejobcook63136/PID36216 unchanged; step2730/136.5s at10:01UTC,still
+transient,target600s. Previous22CPU/GPU/gamechecksremainterminalPASS; noUE
+build/editor/mapchangeinheartbeat. Nativeexe/inputmustNOTbeoverwritten/restarted.
+Nextadvanceexport+remainingCartboulderheight/baselinepaths/realmapintegration;
+allbroadgoalrequirementsopen. Heartbeatquiet: diagnosticprogress,nodeliveryor
+userdecision. SouthForkscenario,Troublemakerrapid/offmenu unchanged.
+
+LATEST 2026-09-12 09:51 UTC: previous goal turn PROGRESS; current turn PROGRESS.
+See full-river-flow-frames.md. New shared RaftSimWaterFlowFrame.h; siteunitflow
+direction carried through CPU support/coarse/refined crest/spray-anchor/GPU.
+MacroCrestSites propertyW now angle (zero legacy), same2rowatlas; HLSL rotates
+both profile and localcapgradientsbacktoXY. AllCPUatlasdecodersupdated. Temporal
+directions shortestarc (nozero collapse/reversalseam),auditrecords includeXYdir.
+SitebucketXboundsoriented; pocket/tongue/boil/localroller inverseframe, roller
+velocitybacktofield beforefoam. Bouldereddyfoamlocalbulkframe (HEIGHTwakeSTILLX).
+Cartesian detectornear/farupstream andtail now signedflow nearestgridvertices;
+sameFr/wet/clearancegates.2DwetedgeBFSconservativeChebyshevincludesdryholes/all
+gridedges; shoredamping/detectorcoverage useit. Curvaturebilinearalongcurrent;
+adaptermatchingoffsets; noCartlegacyphaseStanding/GradeWave. Fixedsupportgate:
+CartsharedcrestallowedwithlegacybakewaveOFF. Legacydefaultflow+Xunchanged.
+Buildsession3356terminal0,37actions268s;followup58899terminal0,12actions58.34s.
+Logs south-fork-flow-frame-build-20260912.log and ...-support-build-20260912.log.
+TwooldC4305dampingwarningsremainmainbuild. ActualD3D12offscreen session33111
+terminal0at09:48:35;report unreal/Saved/RaftSimValidation/south-fork-flow-frame-v1-20260912/index.json
+20PASS0testerrors/warnings. 51192rotatedprofilesheight/foamERROR0;XY5.066e-13m.
+RealCartloader/worldsupport regression crestcouplingerr3.784895e-6m. GPU2106
+queries height8.696231e-5cm,slope.000233079,vertexchange0; unchangedgatespass.
+Actualgame report south-fork-flow-frame-gameplay-20260912/index.json2cleanPASS,
+session29325terminal0at09:50:43(crew6.516s,scores28.328s). AllUEjobsTERMINAL.
+OnlycookLIVE:session63136/PID36216samev2root; step2220/111s at09:51UTC of600s.
+Completed frame_002000/complete.json at100s. New audit_cartesian_cook_snapshot.py
+independentlyALL5,286,400f64cells/inputhash/packagegrids/dtypes/finite/state/
+volumechecksPASS. frame_002000_audit.json SHAe04059df... undercookroot.100s:
+maxh4.077397654,speed12.168448361,volume3024098.947044366,gain2016.927401107;
+reader-driver volumeerr-3.72529e-9,maxstepmass1.32753e-8m3. Inlet45.3069545472
+vsoutlet24.193707909=>TRANSIENTNOTSETTLED. DoNOTrestart/duplicate/overwriteexe.
+Mape77da92b/usersave181d1e57/installedarchivee69772d2unchanged. Free3557429248B.
+No deletion/commit. NEXT exportgameplay321cellpacketsfromcompletecoupledframe,
+independentsource/state/overlap/fullroute+halo audit (transientfixtureonlyuntil
+acceptedsettling). RemainingCartboulderHEIGHT/supportwake, baseline/liveXY
+authorityfeather/columncoverage, actualdetector/carrier/motion/costverification,
+coherentnormalFullReachterrain/material/route/start/section/finishintegration.
+CookneedssectionQ/settling notonlyoutlet. Ifmorespinupneededaddverifiedexact
+restart; doNOTstopcurrentrunjustfromtimeout. Broadgoalactive;rapidNOTscenario.
+
+LATEST 2026-09-12 09:29 UTC: previous goal turn PROGRESS; current turn PROGRESS.
+See full-river-cartesian-crops.md. LiveWindow explicit manifest flag
+solver.runtime_cartesian_coupled_config=true +rootcoordinate_system
+cartesian_east_north_m retainsMUSCL2/HLL, matchingManning, unforced/no massfix.
+Requires two complete sourceghostlayersall4edges, no crux relocation, no
+physicalwestQ orSurveyReplayconflict. Copies exact signedbed/h/u/v withdatum;
+allsourcefinite/nonnegativechecked. Fixedcookedghoststates, NOTwhole826tile
+dynamicruntimecoupling. Requires eventualacceptedsettledsource. No legacybakewave.
+SurveyReplayfullgridguardandlegacyorder1behavior unchanged. Source selector
+optional source_context_cells=3 (2ghost+rounding), explicit<3/nonintegerrejected;
+legacyomittedmargin1retained. ALL52689sourcecoverageprobespass3cellmargin.
+New prepare_cartesian_runtime_fixture.py stdlibgenerates9analyticvariants
+under tmp/cartesian-runtime-crop-fixture-v1; neverriveracceptance/stageddata.
+Nativecropregression96exactghostcells, ALLinitialfacefluxvsuncroppedERROR0,
+10stepMUSCL2referenceERROR0, config/halo/legacyguardspass. Testreport
+unreal/Saved/RaftSimValidation/south-fork-cartesian-crops-v1-20260912/index.json
+17PASS,0testerrors/warnings, session66261terminal0 at09:27:51. Actualgame
+south-fork-cartesian-crops-gameplay-20260912/index.json2PASS(crew6.518s,
+scores/save28.427s),session80963terminal0at09:29:18,EphemeralProfile.
+Buildfirstrestricted session34134 stalled beforecompile; ownedPID716stopped,
+exit1. Approvedrebuildsession34086terminal0,36actions232.73s;log
+unreal/Saved/Logs/south-fork-cartesian-crop-build-escalated-20260912.log.
+TwoexistingC4305dampingwarnings600/601remain(notcleanrelease). AllUEjobs
+terminal; NOeditoralive. Installedarchivee69772d2...UNCHANGED(plainGhostsupports
+thisruntime; offline88cadefdnotinstalled/newdischargeprofilesnotruntimeenabled).
+NormalFullReachmap e77da92b... andusersave181d1e57...UNCHANGED. Free3,793,698,816B.
+No deletion/commit. LONGCOOKONLYLIVE:session63136/PID36216, samev2input/output,
+step1200/60s at09:29UTC,target600s;maxh4.223701,speed12.167506, maxstepmass
+1.0942824e-8m3,inlet45.3069545472/outlet24.929496=>TRANSIENTnotsettled.
+DoNOTrestart/duplicate/rebuildrunningexe. Firstnewframeat2000steps/100s.
+NEXT audit/convert downstreamX assumptions found atsurface4234(relief),
+5050(breakingdetection),5210(tail),5488(sitebucketing),5524(localenvelopes),
+5842(roller),5871(bouldereddy); adapter1320/1380supportsameXassumption.
+Refinedcrestatlas also lacksorientation: keepCPU/support/shaderconsistent.
+Then sourceexport/baselinecoverage, sectionQ/settling and coherent normal
+FullReachterrain/material/globalroute/starts/sections/finishintegration.
+No visible normal-map reconstruction or breaking/froth/performance acceptance
+claimed. Broadergoalqueueactive;TroublemakeronlyarapidinsideSouthFork/offmenu.
+
+LATEST 2026-09-12 09:10 UTC: previous goal turn PROGRESS; current turn PROGRESS.
+See full-river-coupled-flow-cook.md. Native explicit four-edge discharge profiles
+share ONE river Q across real inlet faces, subcritical characteristic depth,
+mixed supercritical/dry stage closure. Signed ghost behavior/oldwestQ unchanged.
+Domain exact RK2 exterior-volume integration covers BOTH stages/allCFLsubsteps;
+constructor fullfieldshapevalidation added. New native cook driver writes NPY
+snapshots/progress, checks ALL cells eachstep (finite,h<=10,speed<=20), .001m3/s
+conservationgate, retains fullfailurestate. FourCTestsPASS(latest3.34s), including
+16tile/unsplit prescribedQ equality, multi-substep mass, all4supercritical/dry
+inlets. Driver .5slake exactdepth/volume; nativeNPY independentlyloads correctly.
+Candidate tmp/troublemaker-row-solver-discharge-v1-20260912 library88cadefd...;
+RUNNINGcook exe f22ced82... unchanged by later test-only rebuild. NOTinstalled.
+PlayablearchiveSTILLe69772d2...; no UEbuild/editor thispass. Source new behavior
+must not be selected by old runtime before corresponding verified installation.
+Full826packageinputv1metadata inherited analytic labels: retainedv1pilot; v2
+corrects source provenance/generator, numerical seedsunchanged. V2manifest
+tmp/south-fork-coupled-flow-input-v2-20260912/manifest.json SHA13f57b3d...;
+input_audit.json SHA9c258a8e... PASS ALL826/5,286,400cells, hashes,exactbed,
+finiteh/u/v,momentum/eta, boolmask,combinedQ. VelocityisINFERRED10mconveyanceseed,
+notobserved/settled. Submergedbed2.2mpriorstilluncalibrated. Downstreamstage
+131.0414276123NAVD88 is inferredcapturedmedian, not matchedflowmeasurement.
+Fullriverpilotv1:20steps/1s terminal0,15.50swall, maxh2.71215/speed9.87563,
+stepmassresidual5.27143e-9m3. Inlet45.3069545472,outlet82.98=>NOTsettled.
+LONGCOOK LIVE session63136, nativePID36216, started09:05:06UTC. Path
+tmp/south-fork-coupled-flow-600s-v2-20260912; target12000*.05s=600s,
+snapshotinterval2000steps. At09:10:52UTC processconfirmedalive;step290/time14.5s,
+wall338.25s,maxh3.74924/speed12.54218,stepresidual1.03490e-8m3, cumulative
+-1.55421e-9m3. Inletexact(40.919675east+4.387280north),outlet10.69TRANSIENT.
+Poll SAME session/process and progress.jsonl. Do NOT overwrite runningexe,
+launchduplicatecook, or call earlyflow settled. completed.json is solveexit
+only; physics acceptance stillrequiressectionQ/settling andunchangedgates.
+All other ownedbuild/preparation/testjobs terminal0. Free3,811,680,256bytes.
+Map/save hashesunchanged; no deletion/commit. NEXT continuecook + explicit
+runtimeCartesianMUSCLcrop/twosourceghostlayers/contextmargin3cells (loaderstill
+order1/transmissive; preserveSurveyReplayfullgridguard), sourceexport/baseline
+coverage, XYflowawarecrests andnormalmap/material/globalprogress/start/finish.
+Goal broaderqueueactive; rapid staysinsideSouthFork/offmenu.
+
+LATEST 2026-09-12 08:44 UTC: previous goal turn PROGRESS; current turn PROGRESS.
+See full-river-cartesian-surface.md. Previous172actionbuild/session43455 is
+TERMINAL0,1938.63s. Two-axis render-carrier construction/recenter, bounds clamp,
+texture origins, wet/foam/crest/bank state and mid-blend rendered-history carry
+are now implemented in the real WaterSurfaceActor. Legacy station/lateral
+behavior remains. North center is separate from gameplay station. Follow-up
+31actionbuild/session36226 TERMINAL0,161.18s. Two old C4305 damping-literal
+warnings remain in D6ChaosMeasuredRunner; not release-warning acceptance.
+Report south-fork-cartesian-surface-v1-20260912/index.json: SIXTEEN PASS,
+ZERO test errors/warnings; includes641exactcarrier-overlapvertices through
+actual construction/recenter/carry methods, signedXYmoves/largejump/UVbucket
+crossings/incomingstate/clamp. Solver windows, selector, progress, menu/migration,
+spray and water-field regressions pass. Additional -game test-tank report
+south-fork-cartesian-gameplay-20260912/index.json TWO PASS (crew,score/save),
+session61885 TERMINAL0 at08:43:36. All owned jobs terminal; no editor/UBT alive.
+Native solver archive remains e69772d2..., same verified backup retained.
+Disjoint799core audit found36wetexteriorfaces including interior mask-edge gaps.
+Added27source-exact80x80cores from existinghashchecked321x321packets; no terrain
+edit/interpolation/fill. All interior wetexteriorfaces nowclosed byrealcontext.
+coupled_geometry/manifest.json SHAa0ec9475...:826cores/5,286,400cells; four wet
+exteriorfaces only (upstream core0825 east+north, downstream core0000/0001west).
+Independent source_exact_audit.json SHAd00a791c... PASS:all5,113,600original+
+172,800addedcells exact acrossbed/surface/mask/owner.799sourcepackethasheschecked.
+GEOMETRY ONLY, no solvedQ/U/V. Endfaceclassification is nearest-axis geometry,
+not physical boundary acceptance. Do not apply fullQ independently to both
+upstreamfaces. Native whole-riverdriver/physicalboundary/initialflow/cook,
+settling/conservation and runtime320m-source export remain NEXT. Runtime source
+crop must explicitly support MUSCL two-layer BCs; keep SurveyReplay fullgridguard.
+Then coherent normal FullReach map/material/globalprogress/starts/sections/finish
+integration and actual game visuals/cost. Audit crest-generation downstreamX
+assumptions forCartesianvelocity. No rapidmenu. Alllatergoalitems remainOPEN.
+Map/save hashes unchanged08:44UTC. Free4,478,861,312bytes; zero deletions/commits.
+
+LATEST 2026-09-12 08:18 UTC: previous turn PROGRESS; current turn PROGRESS.
+See full-river-coupled-hydraulics.md. Native two-layer spatial ghost profiles
+and synchronized disjoint Cartesian MUSCL/RK2 domain implemented. Four CTests
+PASS. Analytic four/sixteen-tile cases exactly match unsplit states/face fluxes;
+closed volume drift <=3.41061e-13m3. Actual source-exact South Fork 256x256 crop
+split sixteen ways passes: state4.74338e-20,faceflux5.55112e-16,volume difference
+7.27596e-11m3. Only .05s partition diagnostic, NOT full-river settled flow.
+On-disk four-edge profile parser v3 passes three frames exactly; retained v1
+dtype and v2 harness-path failures. No acceptance gates weakened.
+Installed solver archive SHAe69772d2... with old archive SHA385a1622... backed
+up in candidate previous-playable-before-cartesian.lib. NATIVE ABI CHANGED.
+FULL172action Unreal rebuild LIVE, session43455, dotnetPID27180, started08:05UTC.
+At08:18UTC83/172actions complete. Check UBT Log.txt/process/session first.
+DO NOT launch editor/game or duplicate build until whole build terminal0.
+Then rerun seven runtime/catalog/progress regressions with ephemeral profile
+and inspect report JSON, not exit code alone. No post-library native UE tests
+have run yet. Later CMake test-only rebuilds left installed archive unchanged.
+Normal map/save hashes unchanged at08:18UTC; free4,622,315,520bytes; no deletion.
+This coupling handles INTERNAL edges only; actual river exterior inflow/outlet,
+whole-river cook/settling, two-axis render carrier and coherent normal FullReach
+map integration remain NEXT. Rapid remains inside South Fork and off menu.
+Breaking/froth realism and broader queue remain OPEN; no goal completion.
+
+LATEST 2026-09-12 07:45 UTC: previous turn PROGRESS; current turn PROGRESS.
+See full-river-cartesian-runtime.md. Existing normal runtime now directly copies
+aligned shared solver cells; old render-sampler round trips lost precision and
+shallow-water momentum. 936 exact shared cells across signed XY moves and 100
+repeated handoffs pass. Legacy interpolation and moving-window tests retained.
+Added explicit Cartesian water coordinates, complete-footprint source selection,
+and actual streaming-actor both-axis recenter/handoff branch. RunManager rejects
+Cartesian XY as implicit or explicit gameplay progress; separate full axis stays
+authoritative. New coordinate map SHA2b4cb3cb... . No map or cooked flow promoted.
+Full-route native selector: all52,689axis/sideprobes,3,567source selections,
+maxXYroundtrip2.03369197834e-12m. Native progress2,002queries stillpass1cmgate.
+Initial selector test harness crashed on TArray self-element append: fixed by
+copying shared pointer, retained crashlog south-fork-cartesian-regions-20260912.
+Next report south-fork-cartesian-runtime-final-20260912 is SIXpass/ONEfail:
+survey replay correctly rejects partial crop. Safeguard UNCHANGED. Controller
+regression now uses existing crop-compatible procedural flow as a controller
+fixture only; it is NOT geographic reconstruction/physics acceptance evidence.
+Final report south-fork-cartesian-runtime-v2-20260912/index.json: SEVEN PASS,
+ZERO errors/warnings; actual actor crops(120,0)->(120,12)->(108,12), shared state
+and clock preserved. Catalog/migration and globalprogress alsoPASS. All jobs
+terminal0 except retained harness crash1; five builds terminal0, latest14.83s.
+Boundary geometry audit:577/799regions have north/south water,304no west water,
+137multiplewetsegments ononeedge. Scalarwest-inlet/bank-side model not valid.
+Report hydraulic_regions_context/boundary_geometry_audit.json SHA074ada2d... .
+NEXT source-exact geographic flow cook with valid spatial/coupled open-edge
+states and conservation/settling; two-axis RENDER-carrier geometry/temporal-state
+handoff (RecenterCurvedGrid remains X-only/Y=0); then coherent normal FullReach
+map/material/globalprogress/starts/sections/finish and actual game motion/cost.
+The new solver-streaming branch is built but not selected by the normal map.
+Normal map/save hashes unchanged, no menu change, no source terrain deformation.
+Wave/froth realism, performance/robustness and broader goal remain OPEN.
+
+LATEST 2026-09-12 07:17 UTC: previous turn PROGRESS; current turn PROGRESS,
+not normal-map delivery. See full-river-hydraulic-context.md. Menu hierarchy
+rechecked: South Fork is the scenario; no Troublemaker catalog/menu entry.
+Initial Cartesian region build failed after 14 packets because the old terrain
+clip lacks required source context. Keep that failed evidence. Shift-only fit
+cannot cover 7,394 original wet vertices. Recovered context from all 82 retained
+hash-verified DEM tiles: 207,654 added source vertices / 415,380 supplemental
+triangles, original captured surface/bed/topology/rapid/seam unchanged.
+Extension manifest e3341621..., geometry-region manifest b56843c6... .
+799 source-exact geometry regions / 82,329,759 samples cover 459,512 original-wet
+and axis-side probes; minimum full source margin 117.78134464565665 m > 112 m.
+14 tests PASS. Overlap audit terminal 0: all 7,726 pairs / 238,908,286 shared
+cells bit-identical for bed, captured surface, wet mask and terrain owner.
+These are GEOMETRY packets, not solved discharge/velocity states.
+Native import FINISHED: 390 original coarse tiles + 51 additive context tiles.
+All 441 asset hashes independently verified after editor exit at 07:13:38 UTC.
+3,528 collision probes; max coarse error .001627605 cm, context .003255209 cm.
+Driver log south-fork-terrain-and-context-20260912.log; no UnrealEditor alive.
+All owned export/compression/audit jobs terminal. This pass losslessly compressed
+505 old generated diagnostic files, all hashes/lengths/paths unchanged, zero
+deleted. Free space 4,673,716,224 bytes after imports. No C++ edits/build this pass.
+FullReach map and user-save hashes rechecked unchanged. Terrain/material/global
+axis are NOT map-integrated. NEXT actual Cartesian hydraulic cook and both-axis
+runtime source selection/recentering/handoff, then coherent normal-map migration
+with starts/sections/finish and in-game inspection. Current streamer remains
+X-only and Y=0; it cannot safely consume geographic Cartesian fields unchanged.
+Do not re-add rapid menu. Breaking/froth and the broader goal remain OPEN.
+
+LATEST 2026-09-12 06:33 UTC: previous turn PROGRESS; current turn PROGRESS.
+See full-river-runtime-progress.md. Normal runtime held-paddle bug FIXED:
+repeated W/S/A/D calls no longer restart pending crew reaction forever. Initial
+actual-game score diagnostic stalled atzeroX/zeroSpeed and was stopped(PID38768,
+terminal1). Existing test now enforces its documented25sbound instead ofhanging.
+CrewRespondsToCommands+RunScoresAndSaves PASS; isolated fresh-process scoring
+alsoPASS, proving this is not a leftover standing-order effect. Save unchanged.
+RunManager separates global progress from local hydraulics. Initial1cmstation
+testFAIL led to exact nearest-polyline chainage, not a weakened gate. Finalfive
+native testsPASS;2,002progressqueries maxerror0.000000000m, rapidstation
+8343.945510131m vs hydraulic0. Corrected material frame built with bounded aerial
+coverage and unchanged original material/normal/roughness/WPO. Not map-applied.
+Builds terminalexit0; latest46.60screw build and14.33stest build. No map changed.
+Importer pausedat110 forbuild withallhashesverified/nounreportedassets, then
+cleanlypausedat124 via newexplicitpausefile forcrew rebuild. Resume06:31UTC:
+PID17124 LIVE, log south-fork-composite-tiles-held-paddle-resume-20260912.log.
+At06:36UTC155/390tilesverified, pause_reasonnull; PID17124 confirmed live.
+FinalPython syntaxchecks and9geometry/deliverytestsPASS; scopedgitdiffcheckclean.
+Normalmap andusersave hashesrecheckedunchanged. Check live report/process first.
+NEXT finish tiles and fullriver compatible hydraulicregionhandoff, then map+
+material+runmanagerglobalaxis+starts/sections/finish together. A global Cartesian
+hydraulic approach must fix streamingactor'sX-onlyadvance; preserve2Doverlap.
+Held input is delivered to normal runtime; fullriverterrain, wave/froth realism,
+robustness/performance and broadergoalremainOPEN. No new rapidmenu.
+
+LATEST 2026-09-12 06:08 UTC: previous turn PROGRESS; current turn PROGRESS,
+not normal-game delivery. See full-river-composite-terrain.md. Shared Cartesian
+coarse terrain / retained rapid / inferred seam is built and audited. All
+403,200 rapid vertices and original topology retained; dry coarse source exact.
+3,214 seam triangles, 6,428 native collision probes pass (.001546224 cm max).
+390 tile FBXs retain all 7,982,812 coarse triangles without simplification.
+Matched 461x321 join flow completes 600s; all13frames sane, nine sections pass
+settling (max Q error3.1017%), conservative microstep error4.736e-6 m3/s passes.
+New rapid_join_flow has source-exact bed and full-river translated coordinates;
+NOT selected by normal scenario. Nine geometry/delivery tests pass.
+First tile importer9372 stopped after52verifiedassets for lowdisk; no unreported
+assets. Added safe4GiBpause guard. Losslessly compressed two terminal diagnostic
+folders:1,026files, allSHA256/length/path unchanged, zero deleted. Reports in tmp.
+Headroom5.446GB before resumed editor launch06:07UTC. Tile importer23460 is LIVE;
+at06:09UTC64/390assets verified, maxcollisionerror .000996908cm, no pause reason.
+inspect process/report before relaunching, do not build while editor holds DLLs.
+Resume log south-fork-composite-tiles-resume-20260912.log; per-tile report
+Saved/RaftSimValidation/south-fork-composite-tiles-20260912.json. No map modified.
+NEXT finish import and material-world-frame fix, then actual full-river geometry
+placement plus separate progress coordinates and hydraulic-region handoff.
+Migration must change map/start/sections/finish together; do not re-add rapid
+menu. Breaking/froth, guidance robustness/performance and broader goal OPEN.
+
+LATEST 2026-09-12 05:20 UTC: previous turn PROGRESS (menu hierarchy correction);
+current turn PROGRESS, all owned jobs terminal. See full-river-rapid-placement.md.
+New builder build_south_fork_playable_route.py creates full_reach/playable_route:
+33,334.146393644 m geographic axis, 17,563 runtime points and restationed captured
+surface profile, rigid rapid translation and translated local hydraulic map.
+135,163 actual water-mask probes plus diagonal corners pass. All measured source
+terrain unchanged; the profile is water surface, NOT measured bed. Troublemaker
+origin global station 8,343.945510 m; local hydraulic station remains distinct.
+Native embedding initially FAILS (depth .000380814 m / height .000305176 m /
+velocity .000122215 m/s translation differences). Fixed constant-normal inverse
+in RaftSimWaterRuntimeAdapter.cpp with exact linear projection, leaving curved
+inverse, physics and gates intact. Build44256 terminal exit0/15.48s. Final native
+run62360 terminal exit0: corrected full route, translated rapid fields and existing
+M4 full-reach water regression all PASS. Report south-fork-full-route-embedding-fixed-20260912.
+2,002 route queries maxstation .000057994 m.527 rapid queries/152 wet preserve
+depth/velocity at logged precision; maxheightdifference .000015259 m.5 Python
+tests pass. Save and maps unchanged. NOT full-river integration or visual delivery.
+NEXT execute shared Cartesian full-river terrain/rapid seam, inferred bed/flow
+and local hydraulic-region handoff using the new geographic contract; then
+replace normal river map/config/start/finish together. Do not repeat isolated
+rapid menu delivery or use the old mismatched 33.693 km source-profile stations.
+
+LATEST 2026-09-12: explicit user correction supersedes the standalone rapid
+delivery described below. South Fork is the scenario; Troublemaker is a rapid
+within it and must NOT appear separately on any menu. Removed the rapid from
+the scenario catalog and main-menu button specifications; the five South Fork
+contracts retain FullReach and have not been shortened to the 273 m fixture.
+Retained cooked reconstruction assets are classified as a rapid component in
+scene_catalog.json, not an independently selectable river. Existing selections
+of the retired rapid migrate to south_fork_full_descent without transferring
+completion credit. Historical rapid checkpoints are preserved but excluded
+from full-river checkpoint lookup (local 110 m overlaps put-in search bounds).
+The user save remains unchanged. Builds succeeded (26.51 s, final 14.29 s).
+Six rapid hierarchy/authority/profile guards and seven project-layout tests pass.
+Initial native CareerCatalog, ProgressionMigration and MainMenuRender passed
+(one render-test warning); inspected actual menu shows one South Fork river
+button and no Troublemaker button. Final-binary verification is recorded in
+Saved/RaftSimValidation/south-fork-scenario-hierarchy-final-20260912/index.json.
+IMPORTANT NEXT: integrate the captured rapid geometry/flow/water inside the
+normal South Fork river run. This is not already accomplished by the menu fix.
+Do not reintroduce a separate rapid scenario as a delivery shortcut. Previous
+-RaftSimScenario=troublemaker_challenge commands are obsolete. The active broader
+goal, breaking/froth realism, guidance/performance failures and later rivers
+remain incomplete. No terrain, water or captured data were removed this pass.
+
+LATEST 2026-09-12 04:53 UTC: current turn PROGRESS, all owned jobs TERMINAL.
+Normal playable inferred-flank terrain/collision/flow stays installed; visible
+sloping rock sides replace prior columns. All geometry/asset identities below
+remain current; user save unchanged. Seeplayable-inferred-rock-flanks.md.
+First traversal4.98056m NARROWPASS, repeat27760 TERMINAL/FAIL5.001737m at
+approachstation−37.034; zero grounding/missingwater,2208probes,minclearance
+39.191cm. Reporttroublemaker-inferred-flanks-traversal-repeat-20260912;
+samplesSouthForkGuidedTraversal_20260912_044407.json. Failure NOT roundedaway.
+Independent existing flow-aware planner recomputed173points/86changes with
+SAME4.7x2.4m footprint,.55m depth,2.2m/s effort andsameendpoints. Replanned
+run15520 TERMINAL/FAIL6.95817m atstation13.213/lateral−4.955,despite0grounded/
+missing andoutlet110.019,minclearance34.072cm. Reporttroublemaker-inferred-
+flanks-replanned-traversal-20260912; samplesSouthForkGuidedTraversal_20260912_044820.json.
+Failednewroute retained; PREVIOUSLINEPOINTSRESTORED, notterrainrollback.
+Restoredlinefootprintminimumfreshlyrecomputed0.629153m,currentrouteSHA
+57afff4b85a6151f8e90f5cc5f539389630de0258eba0f7dd19c7f81b5cb2e03.
+59focusedPythonchecksPASS, includingindependentcurrentdepth/effortchecks.
+No gate,steeringstrength,gamephysics orsourcecapture modified to forcepass.
+Normalcapture003 inspected; perfTERMINALmean14.184/p9526.427/solver5.022ms
+stillFAILSbudgets. Freshsavedasset/packageaudit14972exit0,24dependencies.
+NEXT finite-turning-response/trackability guidance, actual breaking/froth motion,
+remainingterrainvisualfidelity/runtimecost, fullroute/later-riverwork. Do not
+repeat completedflankcook/import or call staticpathfeasibilitydynamicacceptance.
+No blockers, no finalcommit, fullgoalACTIVE/incomplete.
+
+LATEST 2026-09-12 04:44 UTC: current turn PROGRESS. Explicitly inferred rock
+connecting flanks are now installed in NORMAL Troublemaker with matched
+collision/flow. SourceSHA8bdf1a586e7bd2536eaf25a982763efd9e5a558e7172fd7897b8ae0ecc8fe06b;
+capturedXYZ/topologyfixed,3,896 previouslyinferredverticeschanged within2m
+uncalibratedprior. Seeplayable-inferred-rock-flanks.md. Cook27895,flow/flux/export
+72438 terminalPASS;14,257collisionprobes max.004006cm;integration88202wrote
+successreport/noPythonfatalerrors butwrapperexit1. Independentfresh14972exit0,
+24dependencies.58focusedtestsPASS aftershellquotingfix. Actualnormalcapture003
+shows slopingflanksreplacingcolumns, notfullvisualacceptance. Firstguidedrun
+TERMINAL/PASS:63.119s,outlet110.277,maxroute4.98056m NARROWvs5m unchangedgate,
+2,244waterchecks,zero missing/grounded,minclearance41.121cm. Same-settingsrepeat
+CURRENTLYRUNNING nativeGUI PID27760 (confirmedlive04:44:26); log
+unreal/Saved/Logs/troublemaker_inferred_flanks_traversal_repeat_20260912.log,
+reportdirectorytroublemaker-inferred-flanks-traversal-repeat-20260912. Do not
+launch another engineuntilterminal. Normalcaptureandperf alreadyTERMINAL:
+mean14.184,p9526.427,solver5.022ms;performancegatesSTILLFAIL. RealusersaveSHA
+181d1e570485d1ec3139aec4e1d9b56d0a420fd107ce5a94218368324207f5b1 unchanged.
+NewmapSHAba16f2c92e003b2f72ad1ec6e1d35ff2c0fef69ab6a2e2a9cb74e9d7cc8ed66d,
+meshSHA6aec899c1dad1d26b8410813637f705c4fdd2552d5b4db718bb974eb6fa51a4a.
+Backupallpriorplayablefilesintmp/troublemaker-playable-before-inferred-flanks-20260912.
+Nextfinishrepeat;retainfailureifitfails,notcherrypicknarrowpass. Need further
+breakingmotion,terrainvisualfidelity,performance/fullroute/later-riverwork.
+NoC++changesthisturn,existingrebuiltrowsolverarchive385a162... stillactive.
+
+LATEST 2026-09-12 04:24 UTC: this goal turn is PROGRESS. Row-parallel solver is
+now delivered in rebuilt normal gameplay, not just an offline candidate.
+Full179-actionUEbuild54787 TERMINAL/SUCCEEDED exit0 in1860.25s. Do not resume
+or duplicate it. Actual runtime logs archiveSHA
+385a1622637a573c47f48f38981cb47e33182f0c58cc3ba9e066daf28152b565 and joins
+workers before module unload. Prior settled/cold parity and native lifecycle
+tests allpassed; seeplayable-row-solver.md. Two separate normal Troublemaker
+performance runs TERMINAL: solver4.943/5.020ms vs8.666baseline; meanframe
+14.447/14.458ms vs18.294; p9527.256/26.461ms vs29.798. Same1280x720/87%,
+10swarmup/12ssample,contentunchanged. Frame16.667 andsolver1.6 gates STILLFAIL;
+memorypasses. This is repeatable engineering improvement, not release/60FPS.
+Native guided traversal TERMINAL/PASS:62.879s,outlet110.088m,maxroute3.109m,
+2,224waterprobes,zero missing/grounded,minclearance30.659cm,onecarrier/progress
+correctthroughout. ExistingMotionVectorSimulationwarning retained. Samples
+SouthForkGuidedTraversal_20260912_041845.json; crux004 inspected. Normal-game
+troublemaker_row_solver_playable_20260912_000/003 inspected: flat-sided rocks
+and insufficient breaking motion remain. Four focused UE tests88467 exit0/PASS.
+Baseline engine Python AgentSkill/PythonTestRunner startup errors recur in
+normal-game logs; not new solver errors. Real user save/map/mesh freshly
+rehashunchanged. All owned builds,tests,captures andperformance runs TERMINAL;
+no engineprocessremains04:23:30UTC. No scene/material/gatechange thispass.
+NEXT actual unresolved inferred rock-side/shore shape and breaking motion,
+remaining runtimecost, then full-route/later-river integration. Do not repeat
+the completed row optimization or call it a visual fix. Goalactive/incomplete.
+
+LATEST 2026-09-12 03:32 UTC: source-supported sparse-rock correction is integrated
+in NORMAL Troublemaker with matched recooked flow/collision.420 previously
+discarded captured cells retained; original measurements unchanged; steep
+connecting area reduced8.45%, not eliminated. Every triangle sampling error
+2.05e-12m,2,644 collision traces max.02927cm; 6000step flow/settling/conservation
+checks pass. Build74819 passed;52 Python tests pass. Integration52221 terminal
+success report/no logged error but wrapper exit1; independent fresh38372 now
+TERMINAL/exit0/PASS,24 package dependencies. Traversal TERMINAL/PASS with existing
+warning:62.625s,outlet110.132m,maxroute3.141m,2,248 fixed water checks,zero
+missing/grounded,minclearance30.891cm. Normal-game003 and guidedcrux004 inspected:
+flat-sided rocks stillobvious, frothvisible but breaking realism NOTaccepted.
+Separate performance TERMINAL:661frames,mean18.294ms,p9529.798ms,solver8.666ms;
+frame/solvergatesFAIL,not a demonstratedperf improvement. All ownedprocesses
+absent and realusersaveunchanged. See
+playable-sparse-rock-support.md. Original map/flow/texture/route byte backups
+retained. No prior measured point, guideforce or test gate changed. Full realism,
+breaking motion/performance/full-route and later-river integration not complete.
+NEXT unresolved inferred connecting faces/shore shape and actual breaking motion
+plus runtimecost; do not repeat this recovery or present its8.45% numeric change
+as a large visual transformation. The full goal remains active, no final commit.
+
+LATEST 2026-09-12 03:07 UTC: user's explicit implementation request is active:
+make terrain, rapid shape, breaking waves and froth work in playable scenarios.
+Normal Troublemaker now has shared-profile conforming fine crests, resolved-jump
+foam fix, lit froth normal and registered source-classed bank color. See
+playable-crest-and-ground-surfaces.md for retained failures and exact assets.
+Four native tests/45 Python functions pass after optimization; actual mesh
+centroid crest error .01614431 m with unchanged source vertices,38,488 rendered
+vertices/76,398 triangles. Initial refined
+perf FAILED (p95 34.578ms, solver8.701ms); combined traversal53382 FAILED route
+5.158m at station52.4 despite outlet/no grounding. Runtime is being optimized
+with bounded finest detail and an exact-input crest correction cache, no gate
+relaxation. Build28617 PASSED143.02s; native25056 passes4tests including exact
+cached/uncached parity. Final fresh audit58547 passes/24 game dependencies.
+Final normal-game capture first/last and final guided crux inspected, still
+block-like rocks and insufficient breaking realism. Optimized perf TERMINAL:
+655frames,mean18.468ms,p9529.978ms,GPU7.415ms,solver8.650ms; gatesFAIL and still
+slower than pre-refinement24.018ms p95. Final traversal85025 TERMINAL/PASSED
+existing warning:63.154s,outlet110.146m,maxroute3.624m,2,236 water checks,zero
+missing/grounded,minclearance29.865cm. Retain earlier route failure; one later
+pass is not a timing-robustness fix. Ground revision51646 and all other owned
+jobs TERMINAL. Terrain/flow/map sources and real user save remain unchanged. No
+full realism/route/performance acceptance, final commit or goal completion.
+NEXT actual source-consistent rock-side/shore geometry, rapid breaking motion
+and runtime cost/route robustness, then matched full-route/scenario integration.
+Do not restart unchanged rejected offline volume work or spend another pass
+only adjusting surface color while the obvious geometry remains unresolved.
+
+LATEST 2026-09-12 02:18 UTC: corrected reflected-world lateral foam backtracing,
+surface-normal conversion and tangent-space bitangent in the actual runtime.
+Normal Troublemaker material now has one transported-foam response for color,
+roughness/specular and zero emission; protected opacity/hull/normal/WPO graphs
+unchanged. See playable-foam-frame-and-lighting.md. Builds35022/11098 pass,
+setup54001/fresh20585 pass, two native reflection/adapter tests pass,39 focused
+Python functions pass. Normal-game first/last and guided crux captures inspected:
+more visible froth, still broad smooth water/coarse geometry. Traversal52602
+TERMINAL/passed with existing warning:64.917s,outlet110.069m,maxroute3.744m,
+2,272 fixed water checks,zero missing/grounded,minclearance32.926cm. Short perf
+TERMINAL:732frames,mean16.476ms,p9524.018ms,GPU7.360ms,solver8.681ms; gatesFAIL.
+The initial2cm crest log is startup-envelope affected, not a settled maximum.
+The normal-game ten-second BreakingHeightAudit is terminal:51 candidate
+comparisons,42 accepted before deduplication,max additional .5638m at12,6.
+See the newer crest/ground report; no acceptance/final commit, full goal active.
+
+LATEST 2026-09-12 02:00 UTC: source-constrained bank canopy is now saved in the
+NORMAL Troublemaker Rapid Challenge, not an isolated review.1,268 instances in
+three HISM components, from retained LiDAR/NAIP patches; species, tree count,
+trunks and crown forms explicitly inferred. Terrain/collision/flow unchanged.
+See playable-captured-canopy.md. Build20058 passed; corrected integration24334
+passes1,268 root and254 existing ground checks. Fresh audit2293 verifies all
+saved instances/22 dependencies. Initial failures retained; fixed async collision
+readiness without snapping roots or loosening tolerance.12 normal-game frames
+first/last inspected: visible trees/shadows, still coarse morphology, rock faces
+and insufficient whitewater. Traversal32296 TERMINAL/passed existing warning:
+64.464s,outlet110.062,maxroute4.520m,2,268 fixed water checks, no missing/grounded
+queries,minclearance30.602cm.34 focused Python tests pass. Performance PID26440
+is TERMINAL:702frames,mean17.138ms,p9524.113ms,GPU7.425ms,solver8.770ms;
+frame/solver gates FAIL. Not packaged qualification. Real save unchanged.
+All owned jobs terminal; full objective active. NEXT source-consistent rock-side,
+shoreline and breaking-water refinement, provisional canopy morphology/bank
+surfaces and coordinated full-route migration. No acceptance or final commit.
+
+LATEST 2026-09-12 01:30 UTC: the ordinary Troublemaker Rapid Challenge now opens
+/Game/RaftSim/Maps/L_SouthFork_Troublemaker, carrying the captured geographic
+ground/collision and unchanged matched fields in packageable playable_flow.
+The other five South Fork entries retain legacy FullReach; full-route migration
+is NOT complete. See playable-captured-rapid-integration.md.
+Build12946,97860,77779 pass. Integration32392 passes254 collision-height probes;
+fresh package43610 resolves11 game assets without never-cook review dependencies.
+Initial traversal28454 passed old gates but looked dry: renamed material skipped
+runtime initialization. Fixed explicit playable identity and strengthened tests.
+Rerun76911 passes with existing MotionVectorSimulation warning:64.506s,outlet110.194m,
+maxroute4.043m,2,280 surface checks,material coverage and native progress correct,
+zero missing/grounded queries,min tube clearance32.113cm.13 station screenshots.
+Separate -game12frames first/last inspected, water and captured rock passage
+visible. Still coarse connected faces/angular shoreline/insufficient breaking
+froth; no real-reference visual acceptance.26 focused Python functions pass.
+Perf729frames:mean16.572ms,p9523.838ms,GPU6.822ms;frame and solver gates FAIL.
+New mapSHA27a8d394bbafb18ff2206e1600886c98c23e9677f52bccbfa39bc6d9e6cc1299.
+Original geographic map unchanged36f4bc42...; real save unchanged181d1e57... .
+All runs TERMINAL. Next source-consistent geometry/whitewater refinement through
+this normal playable entry and coordinated full-route migration. Full goal open.
+
+LATEST 2026-09-12 01:06 UTC: transported foam optics now installed in the normal
+FullReach V4 parent. Settled actual-game probe proves source foam exists (peak
+.7412;1032/7245 wet vertices above.2). Replaced repeated optical suppression
+with one transported-field/lace response shared by four optical consumers.
+Build51027 and asset audit42758 pass;684 nodes,idempotent,complete reachable
+normal/WPO/wet-mask graphs unchanged. Twelve normal-game frames captured;
+first/last inspected, white patches now visible. Capture26808 and perf20436
+TERMINAL. Performance467frames:mean25.738ms,p9541.841ms,GPU9.148ms; still FAIL60FPS.
+21 focused functions pass, including repaired stale upload-site regression with
+explicit conversion rejection tests. Saved parent SHA06ed556dbf027e705f0d93f2def1974c2a20092ea36f9932958657bf778b5c57.
+Final authoring/log-description rebuild74960 succeeded in34.62s; all jobs terminal.
+See playable-transported-foam-review.md. This remains optical progress, NOT
+reconstructed terrain/breaking-wave acceptance. Next prioritize coordinated
+normal-playable captured terrain/rock/collision/flow/scenario integration;
+the old route and bounded geographic review cannot simply be overlaid.
+
+LATEST 2026-09-12 00:51 UTC: current-gradient normals are now saved in the
+actual FullReach V4 parent used by normal South Fork/Troublemaker gameplay.
+Actual twelve-frame drifting-raft capture shows smaller moving ripples and
+reflections in place of broad smooth bands; first/last frames inspected.
+This is optical detail, not reconstructed terrain or finished breaking water.
+See playable-current-normal-review.md for the exact paths and limits.
+Build19870 succeeded; asset audit41968 succeeded, preserving80 constants and
+all non-normal material output connections. Refresh is idempotent. All jobs
+are TERMINAL, including updated performance PID35096 and baseline PID38624.
+Matching offscreen12-second samples: mean frame26.463→25.562ms,
+p95 43.758→40.826ms; both still FAIL60FPS and release qualification.
+V4 SHA135ec9cf2c21adc7a25b5121ff1d3eb79f6968dc612c14ca3206166e3d7f8d1c.
+Original backup remains tmp/southfork-water-v4-before-current-normal-20260912.uasset.
+Sixteen existing optical test functions pass; one unrelated stale six-upload
+count assertion fails. Existing engine Python startup errors appear in both
+game runs. No whole-project clean pass, shipping package or final commit.
+Next: normal playable froth/rapid shape and consistent captured geometry
+integration; the rejected offline liquid solve and all later queue work remain
+unfinished. Do not return to unchanged full-volume reruns or isolated-only work.
+
+Previous heartbeat23:10UTC: run66257/PID35912 is TERMINAL exit1 after3437.496s,
+not still live. Full initial integral resolvesall82665;1324contact solve passes,
+but alpha1/.5 each leave1/2 unresolved volume columns, smalleralpha failsnative
+bed/skin. No map accepted; unchangedseed115outside. ReportSHA
+2a25bcfab6180c1bd60f3a6a64740f05e4999ca85e8e09f27e6a2e2c0571e988.
+Do NOT restart unchanged. See liquid-terrain-quadrature-review.md for details.
+PLAYABLE baseline84302 and spatial-flag comparison37669 both terminal0;
+actualFullReach -game at8320m,8frames each in unreal/Saved/Screenshots,
+prefixes southfork_playable_baseline_20260911_2310 and
+southfork_playable_spatial_20260911_2310. Viewedfirst/last: both stillsmoothbands,
+notrealisticwhitewater; existingreviewflagaloneisnotavisiblefix,notpromoted.
+ActualmaterialV4,1.5mgrid,oneinteriorcrest.047m,4edgesitesrejected; solvermean
+~10.27msbaseline/~10.56msspatial, NOTgameFPS. Alljobs nowterminal. Next priority
+is actual FullReach runtime/asset improvement against this normal-launch baseline,
+not repeated isolated CPU diagnostics. No production/build/commit change yet.
+
+USER DIRECTION 2026-09-11: all changes must update the playable game so progress
+is visible by running it. See the playable-first requirement in remaining-work.md.
+Do not keep completed features only in CPU references/editor fixtures/review
+flags, or gate all playable improvements on final physical/visual perfection.
+Deliver incremental tested runtime/asset changes through normal scene selection,
+build and inspect actual motion/performance, and identify what is visible.
+Current volume calculation is still offline; existing water variants have
+review-map/command-line gates. Runtime integration is now the next delivery
+priority. Prior unchanged-map/no-promotion statements are historical evidence,
+not a standing restriction against updating the playable scene.
+
+Heartbeat22:10UTC verified live run66257/PID35912; observed55296/82665columns,
+0unresolved retained sofar, still no full result or accepted correction.
+The existing hourly automation now explicitly preserves playable-first delivery.
+Normal boot is /Game/RaftSim/Maps/L_RaftSimBoot (DefaultEngine.ini); all six
+South Fork frontend entries, including Troublemaker, launch
+/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach, NOT the registered review map.
+See RaftSimVerticalSliceFrontend.cpp. BuildGrid in RaftSimWaterSurfaceActor.cpp
+still gates spatial-breaking/stateful variants by review map/flags; the old
+SecondaryWaterComponent also requires review flags and logs that it lacks solid
+sweeps. Do not blindly enable that known incomplete path. Next playable work
+must inspect/capture the normal FullReach runtime and integrate a verified
+increment there, without silently substituting the short review map or changing
+the full-descent route contract. Current CPU volume/reference code is still not
+runtime-integrated. No native source, cooked asset, map, build or commit changed
+during this heartbeat; no new user action is needed.
+
+CURRENT 2026-09-11 continuation: [terrain-aware volume integration](liquid-terrain-quadrature-review.md).
+Scalar-only split full run62212/PID30628 was deliberately stopped as superseded,
+identity-checked, then observed terminal1. Latest completed order64 left8201
+columns unresolved;128 did not finish. No report/map accepted. Retained sources
+and progress at tmp/south-fork-liquid-shared-volume-split-v1-20260911.
+Implemented exact bed-triangle intervals, quadratic scalar/bed contact roots,
+explicit X-edge contact splits and adaptive X error-budget subdivision. Analytic
+tests caught/fixed a narrow-contact false convergence. Captured64-column first
+run13808 failed1column at128; revised18849 resolvesall64 in9.574s withunchanged
+1e-4 gates, same source data, allsnapshotsunchanged. This is bounded numerical
+evidence, NOT whole-river volume/visual/FPS acceptance. See review for hashes.
+NOW FULL RUN66257/PID35912 at tmp/south-fork-liquid-shared-volume-terrain-v1-20260911,
+729672 particles. Latest observed14336/82665columns processed,0unresolved sofar.
+Full579liquidtestsPASS9.004s,27078terminal0. Scopedwhitespacechecks clean.
+Revalidate handle; do not restart from stale progress or edit its algorithm
+sources while alive. It must finish volume/contact/nonlinear map tests before
+independent acceptance. Savedplayablemap unchanged; noUE/build/commit/push.
+
+CURRENT 2026-09-11: [volume constraint and GPU transpose](liquid-volume-constraint-review.md).
+Progress: actual above-bed trilinear-volume nodal gradient, inverse-map chain
+gradient, shared-field volume/contact equality, nonlinear volume refinement.
+561 Python testsPASS8.766s. New GPU compact transpose bins/gathers32-support
+without gradient atomic quantization. Build65205PASS20.58s; engine82631failed
+root-parameter comma declaration; split fixed it. Engine23762PASS1clean,
+engine-liquid-compact-adjoint-v2, all504 anisotropic nodes/seven cases verified.
+This primitive does not yet move native particles/interface or prove FPS.
+CPU TRIAL NOW TERMINAL: toolsession79716/PID37216 exited1 after1333.15s;
+outputtmp/south-fork-liquid-shared-volume-v1-20260911. Early729672-state target
+15201.500453m3. First gradient left1842/82665 columns unresolved at128th order;
+volume/gradient tolerances1e-4 unchanged, all source snapshots unchanged.
+Surface15266.927402m3 still65.426949m3 over nominal. No correction executed;
+retained state is unchanged seed, not an accepted volume fix. ReportSHA
+01d20dcbe56c041f5e79c0d69105ac59155742438f297db72144508645046342.
+All sessions79716/11809/65205/82631/23762 terminal; no liveUE/build/worker.
+NEXT split/refine derivative integration at changing zero-crossing intervals
+and terrain clipping; preserve per-column diagnostics, no weaker accuracy gate.
+Then full nonlinear shared volume/contact refinement and independent saved-state
+geometry/map/volume audit. Follow with early
+native density/contact/momentum, shared volume/surface, exterior/Z/flow,
+visible whitewater, boat/FPS and complete laterqueue. No promotion/commit/push.
+About2.46GBfreeC:. See linked review for command, source hashes and detailed gates.
+Prior:[shared density/contact and same-map surface correction](liquid-shared-map-review.md).
+Previous user-status turn was no implementation progress; resumed turn implements
+exact compact-adjoint all-node density gradient and shared-field exact contacts,
+inverse scalar transport and a continuous-map global no-fold bound.550 tests pass.
+Late highorder600 has one PRE-EXISTING coincident pair:originalowner7,9203/9204,
+born33.4764cm apart vertically, now identical; first collapse step unknown.
+A shared map cannot separate identical positions. Input gate now rejects this;
+late native/double trials preserved and rejected/stopped, no particle surgery.
+Early highorder12 has729672 distinct particles. Shared native-rounded CPUcandidate
+tmp/south-fork-liquid-shared-density-early-v1-20260911 passes exactbed/survey/IDs,
+E208.614→150.871, peak1.42355→1.30952, no duplicates,749403 inverse samples.
+Authoritative independent audit liquid-shared-density-early-independent-v2.json
+snapshots sources, all unchanged, all float32 endpoints exact, continuous map
+Lipschitz.72955967<1, clearance margin−2.374e−13cm. Surface117→115outside.
+GEOMETRIC volume15245.337→15266.917m3 (+21.5801) vsnominal15201.500m3; estimated
+Gauss2..128 zero unresolved, not certified. No physical/visual/native acceptance.
+NEXT early native density/contact/momentum and shared-map volume consistency;
+do not offsetsurface or jitter/merge late coincident particles. Then exterior/Z,
+sustainedflow, visible froth/crests, boat/FPS and later fullqueue unchanged.
+Allsessions terminal:84130fail1,10307/95383deliberatelyterminated1,
+16230early0,35210supersededaudit0,45823authoritativeaudit0,99328/41948tests0.
+No liveUE/build/worker. SavedmapSHA unchanged36f4bc42...96; about2.3GBfree.
+No deletes/promotion/finalcommit/push. Prior:
+[native wave-preserving surface integration](liquid-native-highorder-review.md).
+Previous goal turn made progress; this pass connected the five-stage high-order
+surface to native pressure/particles behind -RaftSimRegionalHighOrderInterface,
+requiring unified transport. Reads actual native boundary phase (0fluid,1solid,
+2air,3prescribed exterior), blocks correction at1/3; records full8-word counters.
+Four GPU tests clean including phase4/NaN fail-closed and actual12-field/native
+boundary comparison. 539 Python tests pass. New independent staged regional
+CPU reference preserves original exterior values and passes whole-grid corner
+fixtures; actual whole-grid assembly rejected ghost disagreements outside the
+physical XY domain (65velocity samples,max93.25cm/s;2scalar samples,7.63e-6cm).
+No averaging/waiver: these physical boundary extensions remain unresolved.
+Native12 capture complete; scalarerror .000045776cm. Native600 capture
+liquid-native-highorder-600-v1 complete, stagesSHA:
+d9aed7048891f33a239d86c4a4d5445ec655045626f77f892796a8fc4481958a.
+All599transports and601observed velocity exchanges verified, scalar CPU maxerror
+.01354218cm (gate.02), all726920 particle positions replay .004080523cm.
+Dense729724original+22533births-25337exits=726920; all598commits, outer survey
+preserved. Source snapshots exact14-file contract, all unchanged. Tracked actual
+coverage91outside/0unsupported vs128outside in previous shared-velocity replay
+using same coordinate method. Not volume/visual success. Peakdensity12.36109x,
+fixed-density candidate misses6970particles/663columns; storage-59.1875m3,
+lastoutflow37.4138vsinflow47.0474m3/s. Renderer still disconnected, map unchanged.
+All ownedjobs terminal:61078,9590,28652,68402,31831,78704,90407,82523,27756,
+66369,11707,69600,56862,34641. No live worker/UE. About2.2GB freeonC: avoid
+redundant fullcaptures. NEXT coupled whole-support density/contact/interface
+correction, consistent exterior/Z and geometric volume/sustainedflow, then
+single visible frothy water/real references/boat-rock/FPS and the full queue.
+No scene completion, saved-map promotion, final commit or goal closure.
+
+PREVIOUS 2026-09-11: [wave-preserving GPU transport and regional velocity fix](liquid-highorder-regional-review.md).
+Previous goal turn made progress; the intervening status answer verified the
+23-test engine job terminal. This continuation implemented five-stage regional
+high-order exchange, verified four XY owners/corner against an unsplit GPU grid
+after 24 steps (7280 samples, exactly equal), then found actual native velocity
+halo disagreement up to145cm/s. Native unified transport now exchanges current
+velocity before both interface and particles. Actual12 and600-step captures
+complete with zero shared-velocity mismatches; all601 transport stages/exchanges
+accounted in600 capture. It retains726908 particles, all598 compact commits;
+all positions replay within .003011221cm. 534 Python tests pass. GPU tests in
+liquid-highorder-regions-engine-v2 (4clean) and liquid-velocity-halo-engine-v1
+(3clean) pass. Native600 stages SHA:
+667534dcd78fef5ee6e151e1da71aad3b036f63d2696eee84d9148e5ee2eccc1.
+Remaining native density12.35897x, fixed-density candidate misses6759particles/
+666columns; storage-59.4375m3, lastoutflow37.5vsinflow47.0474m3/s. Not physical
+or visual acceptance. Saved map unchanged; no final commit/queue completion.
+NEXT actual12-owner high-order/native solid integration with 8-word diagnostics
+and matching independent reference, coupled density/interface correction,
+sustainedflow/render/raft/FPS, then full remaining original queue.
+All owned jobs terminal. Audit94570 exit0: full P2G verified with0 reduction
+mismatches; standalone600 interface maxCPUerror .0005290635cm across2178720
+samples, all599transports and sharedvelocity verified. No background job pending.
+About2.94GB freeonC: avoid redundant large captures. No deletions thispass.
+
+PREVIOUS 2026-09-11: [tracked surface volume and crest transport](liquid-tracked-surface-review.md).
+Previous goal turn made progress. This pass implemented terrain-clipped geometric
+interface volume and limited BFECC transport CPU reference, rather than treating
+the fixed-density isovalue as the actual tracked surface. Actual native scalar
+has 129 original / 181 corrected outside markers; density candidate has 6583.
+Native above-bed volume estimate15301.800953m3 (+1.043% vs marker volume), resolved
+quadrature; density candidate14573.001842m3 (-3.770%),29 columns still unresolved.
+Detailed reports liquid-particle-surface-v1/v2.json retain cap/extrapolation and
+estimated-not-certified quadrature qualifications. No volume acceptance.
+529 liquid tests pass. Limited BFECC passes unchanged 24-step crest-error target:
+.232293 vs lower-order .503025. Actual twelve-field GPU references prepared at
+tmp/south-fork-liquid-interface-highorder-cases-20260911 (2178720 samples), manifest
+6d892811165d2eaea6c100ce1afc30d97a153bbcbe48e07d93df25ecab4b074c.
+All owned jobs terminal:50801,22734,63700,21977 exit0. No UE/build launched.
+NEXT GPU high-order scalar implementation and actual-field tests, intermediate
+halo/solid handling for live regional steps, coupled density/interface correction,
+sustainedflow and single-surface rendering/raft/FPS. All scenes still incomplete,
+no saved scene change, final commit or queue closure. Full original scope active.
+
+PREVIOUS 2026-09-11: [native-representable contacts and local retries](liquid-represented-contact-review.md).
+The preceding status turn verified build 39317 terminal/succeeded. This goal
+continuation made concrete progress: four clean actual GPU regression successes,
+full-river collision diagnosis, local contact trust retries and independent
+geometry/density checks. Source package:
+tmp/south-fork-liquid-local-contact-retry-v1-20260911, solver84445 exit0/166.94s.
+All 726905 IDs, distinct final positions and 15143.85461798869m3 retained. All
+four saved steps are native-float32-representable. Peak density 12.361 -> 3.130x,
+solid-labelled peak 4.325 -> 2.933x; four accepted full global steps with only
+2/10/24/38 particles requiring local contact retries. No jitter/deletion/pushout.
+Independent report liquid-local-contact-retry-independent-v2.json verifies every
+saved step's distinct positions and full exact bed/skin/survey paths. Raw worst
+path skin margin -8.63552e-7cm is within the unchanged 1e-6cm numerical gate.
+515 Python tests pass. GPU derivative engine37512 exit0, four clean successes.
+Independent audits3596 and18025 exited0; pair diagnostic23538 exited0. All owned
+UE/build/Python jobs are terminal; no background job is pending at this checkpoint.
+NOT complete: density still excessive; fixed isovalue leaves 6583 particles
+outside and 759 occupied columns without candidate water. Full correction remains
+CPU/position-only; GPU derivative is not native solver or renderer integration.
+NEXT convergence/native correction + consistent scalar/interface, sustained flow,
+single visible 3D whitewater, raft/FPS, then the entire remaining queue. Saved map
+unchanged, no production promotion or final commit. All older LIVE labels below
+are historical and must not be treated as process evidence.
+
+PREVIOUS 2026-09-11: [whole-support density correction](liquid-whole-support-density-review.md).
+Previousgoalturn made progress; thispass implemented exactall-node particle
+densitygradient, separable3DcontactQPs, savedtrajectory checks andsurvey-aware
+global line search. No UE/build launched; all ownedjobs terminal.
+AuthoritativeCPUcandidate: tmp/south-fork-liquid-particle-density-descent-v4-20260911.
+Solver21130 exit0/156.91s; independent96535 exit0. All726905 IDs, distinct
+positions and15143.85461798869m3 preserved. Fourfullpaths verified against
+exactbed/skin andoriginalsurvey. Peakdensity12.361→4.857x, solidlabelpeak
+4.325→3.903x, totalexcessenergy3623.276→2571.989. 505Python testsPASS.
+NOT native-ready: float32conversion causes2034skinviolations,worst-.00951688cm.
+Fixedisovalue stillmisses6633particles/700occupiedcolumns; airlabelpeakrises.
+NEXT representation-aware contactconstraintscoupled to density, notpost-solve
+pushout; thennativeimplementation, consistentinterface, sustainedflow/render/
+raft/FPS. No momentum/time/terrain changes,savedmapunchanged,no commit.
+FullColorado→Pacuare→Futaleufu/remaining scenes/crew/cleanup/delivery stillactive.
+
+PREVIOUS 2026-09-11: [native inlet and boundary verification](liquid-native-inlet-boundary-review.md).
+Previous user-status turn was informational/no progress; this continuation
+implemented and verified residual-preserving GPU exterior/exit classification.
+All owned jobs terminal; native600 session17658 exit0, fullengine92062 exit0.
+Latest capture `liquid-native-residual-600-v1`: dense state, strict survey
+exterior, P2G, motion, interface transport and source selections pass. Original
+729724+22533 births-25352 exits=726905; zero coincident groups. 494Python tests
+pass;21engine successes (one unrelated connectivity warning). Savedmapunchanged.
+No scene promotion, final commit, or full physics/visual/FPS acceptance.
+Physical failures: peakdensity12.36117x, storage-59.5m3, finaloutflow37.5215 vs
+inflow47.0474m3/s. Fixedisovalue leaves6760particlesoutside/681occupiedcolumns
+withoutwater; partial-solidkernelweight463.453m3 is not bedpenetration.
+NEXT repair partial-solid density/pressure support and scalar/particle drift;
+do not blindly repeat prior fluid-only CPU corrections or use narrower density
+reports to hide concentration. Then native sustainedflow/render/raft/FPS and
+the full Colorado→Pacuare→Futaleufu/remaining scenes/crew/cleanup/commit queue.
+
+PREVIOUS 2026-09-11: [repeated correction and inlet lineage](liquid-repeated-correction-review.md).
+All owned jobs terminal; no UE/build was launched. Previous status turn was
+no-progress; this continuation implemented/tested whole-domain density reports,
+same-map inverse interface transport, validated repeated-state handoff and a
+second full726900-particle correction. Solver77879 converged3geometryiterations;
+independent40603 and interface52509 exit0. New peakdensity10.0862x, stillFAIL;
+solid-labelled peak increases7.8092x and interface coverage worsens123→144→169.
+Exact bed/path/exterior crossings0, representedvolume15143.75m3 unchanged.
+489liquidtestsPASS. Savedmapunchanged. No native/visual/FPS acceptance or commit.
+89exactpairs are incoming particles born in the same respective native steps,
+not initial seeds;88pairs awayfrombed. Weighted point-source draws can duplicate
+sites. Stratified source CPU candidate verified on actual600-step spawn counts
+(float32 included), not yet native-installed or actual birth-site verified.
+NEXT native source/group capture and stratified selector; fix partial-solid
+pressure/density support and scalar-volume drift, then native flow/render/raft/FPS.
+Details/commands/hashes in latest review. FULL original queue remains active.
+Everything below this paragraph is historical; old LIVE statements are NOT
+current process evidence and must not cause a restart or duplicate job.
+
+Latest: [contact refinement and full correction paths](liquid-density-contact-refinement-review.md).
+FINAL UPDATE for this continuation: all owned jobs terminal. Authoritative
+reference swept-active-v4/session41482 converges4geometryiterations/217.65s;
+independent evaluator88285 passes existing serialized geometry tolerances.
+Path: tmp/south-fork-liquid-geometric-density-swept-active-v4-20260911.
+Report: liquid-geometric-density-swept-evaluation-v4.json. All726900particles,
+zero bed/path/exterior crossings, preserved-skin margin-5.776e-9m within1e-8m
+gate, representedvolume15143.75m3, serializedequationerror2.697e-8. Stilldensity
+12.69585x and89coincidentpairs: NOT fullphysics/native/visual/FPSacceptance.
+Edge-clearance planes fix the slow frozen-contact-time ridge constraint.
+All12algorithm source snapshots verified;468liquidtestsPASS. Savedmapunchanged.
+NEXT repeatedcorrection with evolvingphase/globaldensity andcoincidentmarker
+checks, thennativeimplementation/pressure/interface/render/raft/FPS. Do not
+equate a single frozen-field correction with steadyflow or scene completion.
+No promotion/commit/push. Earlier live-job statements below are historical;
+69272failed,27175interrupted,28698finishednotconverged,41482/88285terminal0.
+
+Previous goal turn made progress; this continuation implemented/tested reusable
+pressure/Schur caching, warm starts, exact-row reduction, PSOR and active-set
+refinement. No gate relaxed. Cached v1/v2 andPSORv1 terminalFAIL at third solve
+KKT:1.64e-5/1.64e-5/6.06e-7cm (required1e-7). Former slowv6/session38714 was
+deliberately stopped, not accepted. All those jobs are now terminal.
+Independent full-particle checks: cachedv1 retains15143.75m3, density14.77→12.70x,
+zero ENDPOINT bed/exterior violations, BUTskin losses and89coincident pairs
+persist. New exact straight-path audit finds ONE actual rock crossing8.345mm
+deep, particle219074,fraction.625584,face248546. Endpoint-only checks insufficient.
+Implemented swept-path contact Jacobians and tests. Swept-activev1/session69272
+terminalFAIL: second active system2212rows/rank2203, residualnotverifiednull.
+Added curvature-aware descent without discarding the unresolved residual.
+Swept-activev2/session27175 deliberately stopped when unit regression was found;
+partial package not usable. Regression fixed; all465tests pass again.
+Now LIVE session28698, PID20204:
+tmp/south-fork-liquid-geometric-density-swept-active-v3-20260911.
+First1521-row coupled solve converges after1024seed sweeps+2active-setpivots;
+fullKKT4.94e-15cm, BUTnewgeometry718sweptpenetrations/86exteriorpoints. Second
+iteration5240rows is running. Re-poll SAME28698, inspect progress.jsonl; do not
+restart for an observation timeout. Source files frozen at start; do not edit
+its recorded algorithm modules while it runs. Constraint/dual snapshots retained.
+NEXT finish this solve, independent serialized+SWEPT evaluation, then repeated
+correction/native feasibility. None is native/visual/FPS/whole-scene acceptance.
+465liquidtests PASS; earlier mesh7/rock5PASS. No UE/build running or mapchange.
+Full original queue active; no promotion/finalcommit/push. Review has paths,
+exact rejected runs, new provenance and all remaining acceptance requirements.
+
+Latest: [position-density and exact-contact reference](liquid-density-contact-review.md).
+Previous user-status turn was informational/no progress; this continuation
+advanced the CPU reference and independent all-particle checks. Adaptive exact
+bed kernel integration reaches successive-order agreement through order128.
+Sparse unilateral contact elimination converges where the earlier joint
+equality solve failed. However serialized v2 still has 61 tiny below-bed points,
+2 exterior crossings and density12.8576x; no physical pass or native integration.
+Strict nominal2cm tests expose fixed constraints and pre-existing captured skin
+discrepancies (minimum1.985756cm). Current policy preserves existing clearance
+when below nominal and reports it; neither bed nor exterior is expanded.
+v7/original mobility terminalFAIL, incompatible row requires.133351cm.
+v6/geometric mobility LIVE session38714, PID32132: second geometry iteration
+has5230contactrows,13below-bed points and4exterior crossings, despite converged
+equations. Re-poll the same live session; do not restart just for a timeout.
+No UE/build running. Prior sessions20550/23532/52271/37301/48240/75482 terminal;
+refinement62740 also terminal0. v3 package incomplete due JSON failure, not usable.
+New memory-local dual loop tested independently, not wired while v6 source is
+in use. NEXT finish v6, inspect serialized full-particle geometry/density and
+cost, then integrate/test the faster loop and repeated correction/native
+feasibility. Do not replace actual physics/geometry gates with equation passes.
+Latest full suite438liquid PASS; mesh7/rock5PASS.
+Savedmaphash unchanged; no scene completion, promotion, final commit or push.
+Full SouthFork→Colorado→Pacuare→Futaleufu and remaining all-scene/crew/cleanup
+queue remains active. See linked review for artifact paths and rejected runs.
+
+Latest: [shared particle/interface transport](liquid-unified-transport-review.md).
+Previous user-status turn was informational/no progress. This continuation
+implemented and verified opt-in UnifiedTransport: same post-extrapolation flow,
+compact basis and clocks for particles/interface. Native scaled inverse replaced
+by residual-preserving UnitToWorld queries; first float/precise attempts failed
+half-cell replay, final DoubleFloat version passes without relaxed gates.
+Authoritative liquid-native-unified-transport-600-v4 (session55491 terminal0):
+726900particles, fullP2GPASS/zero reduction mismatches, all-position replay max
+.002730cm, interface599updates/maxCPUerror.000503793cm. Source includes retained
+at launch and checked unchanged. 598validcommits BUTstorage-59.604m3, finaloutflow
+37.522vs47.047m3/s andworstdensity14.774x: stillNOTphysicalacceptance.
+Exact triangle normals show most bed-near particles flow inward before contact;
+owner4peak261fluid/6solid. NEXT consistent actual-bed pressure/transport boundary
+andparticle/interface volume correction, thenrenderer/raft/visual/FPS integration.
+Builds52635/71672PASS;413liquid+5registeredrock PythonPASS;finalengine1915:
+20cleanpasses. Savedmaphashunchanged. No scenecompletion/promotion/commit/push.
+Earlier unified captures lack final include snapshots: preserve their historical
+reports, do not silently replay them under today's different coordinate contract.
+Full queue remains active; exact evidence and remaining constraints in review.
+
+Latest: [compatible position transport and paired motion](liquid-compatible-transport-review.md).
+Previous user-status turn was no implementation progress; this continuation
+implemented opt-in -RaftSimRegionalCompatibleTransport and actual same-step
+post-extrapolation/post-FLIP particle capture (-RaftSimRegionalAdvectionPacket).
+32-load averaged-quadratic/tent midpoint position transport preserves native
+FLIP/PIC momentum, P2G, exact terrain, sources and strict exit/owner gates.
+Capture uses immutable native matrices/dt; float half-cell rounding is tested.
+First three captures failed RHI counter overlap; added explicit snapshot UAV
+dependency. Clean native77931: liquid-native-compatible-transport-600-v2,
+727332 particles, full P2G audit PASS, zero reduction mismatches. All598compact
+commits valid. Motion replay max .000488543cm; pressure-interior interpolation
+D RMS .000266848/s matches centered grid D. BUT storage-50.604m3, lastoutflow
+34.914 vs47.047m3/s, maxdensity14.87, worse at one bed clump. NOT physical or
+steady-flow/visual/performance acceptance. Surface still uses old trilinear
+post-pressure flow, so particle/interface transport consistency remains open.
+16842particles within2.5cm bed; owner4peak mostlynearestFLUID, not justsolid
+ballistics. NEXT same interface/particle transport, bed support/contact and
+volume consistency. Builds35843/20807/16244/26007/98775 PASS;406PythonPASS;
+engine39174:20CLEANpasses. All owned sessions/processes terminal, maphashsame,
+no promotion/commit/push. Full queue remains active. See review for failures.
+
+Latest: [native evolving-interface pressure](liquid-interface-pressure-review.md).
+Previous goal turn was progress. This turn added opt-in
+-RaftSimRegionalInterfacePressure: active boundary graph classifies from retained
+phi, pressure/gradient share subcell distances, exact solids/exterior retain
+priority, actual pre-transport surface bound through read-only stage DI. Keep
+selected readback immutable while later queued ticks continue live transport.
+Builds67356/17521/28452/85009 PASS. First native96430 crashed (UObject enumeration
+allocation); next8929 rejected old graph version. Fixed active graph selection.
+Native23555 startup-v3,90485 step600,95413 step1800 all complete/terminal0.
+Full P2G audits729654/727585/757610 PASS,zero reduction or owner mismatches.
+Step600 storage-45.333m3 vsuncoupled-590.604m3, BUTstep1800 storage+580.167m3 and
+lastoutflow5.431m3/s vsinflow47.047: NOT steady/physical acceptance. All1798compact
+commits valid; old641 rejection absent in this trajectory.1799interfaceupdates
+valid,maxpairedCPUerror .00058555cm;actualpostD .00044637/s vsinput .162945/s.
+Coverage1120/727585 outside at600;8435/757610 at1800;no invalid stencils or
+below-exact-bed centres. Density max65.264 at1800: clumping/volume and surface
+correction remain. New coverage diagnosis pairs BEFORE scalar with currentP2G.
+399PythonPASS. Engine91184 initiallyfailed compiled identifier assertion;
+verified Out_RetBoundary name, fixedtest. Engine60184 v2:20CLEANpasses.
+All processes/sessions terminal; savedmaphash unchanged. NO renderer coupling,
+scene acceptance, promotion, commit or push. NEXT diagnose/correct declining
+outgoingflux and persistent particle/interface/volume drift before visible water.
+Full queue remains active. Disk C about11.6GB free before final engine run;
+avoid gratuitous large captures. All exact evidence paths in new review.
+
+Latest: [retained native interface transport](liquid-interface-live-review.md).
+Previous user-status turn was informational/no progress; this continuation
+revalidated failed startup-v2 and implemented working retained transport on the
+actual twelve-owner South Fork river. Fixed premature CBuffer-size lookup and
+reset-versus-flow-step sequencing, preserving immutable tick bounds checks.
+Builds23392/20854/45471 PASS. Native21490 v3 failed (terminal0 is NOT pass).
+Native6439 v4 and88635 step600 completed: 11/599 actual surface transports,
+both clocks measured .0166666675359s; full per-step GPU ledger valid. Independent
+paired CPU/halo audit maxerror .000526833/.000621733cm. Full native P2G audits
+729558/701412particles PASS, no reduction mismatches; step600 has2 internal
+survey/native-float cut differences, unchanged physical exterior.598compact
+commits valid but storage-590.604167m3 persists.399PythonPASS; engine54564 terminal0:
+19clean+1success with unrelated Google timeout warning,0failures. All sessions
+terminal. Scalar remains optional/unsaved and NOT pressure/render coupled;
+initial64particle coverage, provisional physical boundaries, native641backflow,
+visual/FPS and full queue remain open. Next current-interface particlecorrection,
+consistent phase/subcellpressure and single visible surface. Map hash unchanged;
+no promotion/commit/push. See new review for exact evidence and temporal pairing.
+
+Latest: [explicit initial interface + GPU transport](liquid-interface-transport-review.md).
+Previous goal turn was progress (actual density-surface rejection). This turn
+prepared tmp/south-fork-liquid-interface-20260911 from original wetstage/exact
+terrain; all729724originalsstencilsvalid,64aboveinterpolatedsurface(max37.07cm)
+vs9025densitycandidate. Coverage NOT accepted or shiftedup. Implemented native
+RaftSimLiquidInterfaceGPU RK2transport + CPUreference; distinctR32field, cm/s
+metric, callerownedhalos, explicitbadtrace/nonfinitecounts. NOTwiredintoflowyet.
+Actual12regionalinitialphi+capturedstep600postpressurevelocity OPERATORcases,
+notcoupledtrajectory:2,181,600samples maxGPU/CPUerror.000350952148cm.
+Build68031PASS;engine64798failedshaderparameterparser;fixeddeclarations.
+Engine36251terminal0 BUTtestfailedmissingBUF_SourceCopy;fixedbufferflag.
+Build72510PASS;engine3614terminal0 v3report20CLEANpasses.395PythontestsPASS.
+Prep71243terminal0. Allprocessesterminal. NEXT retainedalignednativeinterface
+withverifiedactualdt, sharedhalos/exterior/floor/roof, particlecorrection,
+ghostpressure +samevisiblesurface. Longflowfailure641/storage/visual/FPSremain.
+No map/promotion/commit/push. Sourcesandfailedattemptsretainedinreview.
+
+Latest: [actual volume-interface feasibility](liquid-volume-interface-review.md).
+Previous turn was user status (no implementation progress). This continuation
+implemented and ran a fixed-volume tent-surface reference on ALL729724 verified
+original birth positions and ALL701417 current native particles at step600.
+Raw density iso.5 excludes9025 originals/11639 evolved particles;1427 original
+particle-occupied columns have no wet candidate centre.5426 excluded originals
+within25cm of exactbed. Thus DO NOT install rawmass threshold as fixed surface.
+Native paired kernel mass in solid493.3053m³ is interpolation, NOT penetration:
+every particle centre above exactbed.390Python testsPASS. Verified diagnostic
+checks598compactcommits and rejectsfailed30s trajectory at641. NoUE/buildlaunch;
+noownedprocesseslive. NEXT explicitadvected liquidinterface initializedfrom
+actual wetstage/terrain, particlecorrection, sharedpressure/render subcell
+interface; retainbackflow/storage/visual/FPS gates. No map/promotion/commit.
+
+Latest: [metric-aware pressure correction](liquid-metric-pressure-review.md).
+Previous goal turn was progress; this pass corrected native regional SOR's
+isotropic nearest-neighbor estimate to parent anisotropic +/-2 parity grids.
+Same40iterations; commonomega1.70102573. Build89097PASS. Native5522terminal0:
+actualpressure residual RMS.000434666/s vsold.018653564/s (~43x lower), input
+.154568695/s, residual/input.281%. Storage still-590.5m³ in598validcommits.
+Firstfullaudit hit1internalstorage-cut mismatch: surveyframe7 vsnative11 at
+localY6500.000127→6500. Independent prepared-float-frame reference matchesGPU;
+denseaudit nowexplicitlychecksdeclaredframe andretains surveycomparison, NO
+distance tolerance/exterior expansion/payload relaxation. Audit29115PASS701417
+particles, zeroreductionmismatches; native-dense-audit reports1surveycutdifference.
+30s native97040terminal0 FAILS641 (only639validcommits), sameowner4/birth97114/
+westrow71 above-stagebackflow: normal.022797→-.404966cm, hit899.627, stage883.15,
+bed871.526. Storage-618.54167m³ over10.65requestedseconds. Preservefirstfailure;
+postfailure1800packet NOT validflow.383Python testsPASS; engine13580terminal0,
+19cleanpasses. ALLsessions terminal. Keepmetricfix; NEXT actualmovinginterface/
+ghostpressure and signedreservoirbackflow/storage. No scene/map/promotion/commit.
+
+Latest: [pressure interface and paired native fields](liquid-pressure-interface-review.md).
+Previous user-status turn was informational; continuation added real paired
+native pressure captures. CPU ghost-fluid interface correction fixes fractional
+still-water head/current, but is NOT installed in the native river. Actual
+step600 P2G nonzero support occupies 1.35627 times deposited-volume cell space.
+New optional -RaftSimRegionalProjectionPacket copies same-step boundary/velocity/
+divergence/pressure and post-Project-Pressure velocity, with precision metadata.
+Build28828 PASS; native66092 terminal0 (four fields), all598commits valid;
+701269-particle full audit22375 PASS, zero reduction mismatches. Native pressure
+has16944 low-weight fluid cells and predicts12.05% residual divergence.
+Build55930 PASS; repeatnative85515 terminal0, all5fields paired atstep600.
+Actual GPU post-pressure divergence RMS.01865356/s vsbefore.15663394/s (11.91%).
+201509interiorfluidcells,16973 lowweight<=.1. Full701278-particleaudit57077 PASS,
+zero reductionmismatches;598validcommits,storage-593.39583m³.376Python testsPASS;
+engine87665 terminal0,18cleanpasses. ALLprocesses terminal. See review for next
+live-interface/native pressure convergence/backflow work. No native
+surface correction, saved-map change, scene acceptance, commit or push.
+
+Latest: [reservoir runtime and rotated-coordinate precision](liquid-reservoir-runtime-review.md).
+Previous user-status turn was informational; this continuation made progress.
+Runtime dataset allowlist/hash checks and dataset-aware audits are installed.
+Five-step native reservoir startup passes full identities/neighbor/P2G audit:
+729873 particles, zero reduction mismatches. Initial600-step run fails292 at
+east zero-flow row229; actual float-frame double evaluation is inside but GPU
+rounding put endpoint .001953125cm outside. Full preserved evidence is in
+liquid-native-reservoir-flow/first-rejection-precision.json.
+Shared physical-frame helper now retains subtraction/product residuals using
+engine DoubleFloat and rounds once; no gate, clamp, damping or deletion change.
+New actual GPU38-point regression covers captured failure and allfour faces.
+Build50289PASS; engine24177 terminal0,17clean passes;358Python tests pass.
+UE52923 terminal0: liquid-native-reservoir-precise-flow stillfails286 owner3/
+birth54513/east229. GPU nowmatches correctsinglerounding: actual storedfloat
+positiondriftsoutside duringtangentialmotion atzero-normal inletplane.
+Addedprescribednormalresidualsolve/inwardrepresentableworldcomponent rounding
+ONLYtoexistingplaneresponse, no bulkwater/exitgatechange. Build63646PASS36.55s.
+UE22730failedlateGlobalShaderregistration; moveddevelopmenttesttoearlyWaterDetail
+module. Build68744PASS20.70s. Engine62358terminal0:18pass(17clean,1HTTPwarning).
+FULL600step liquid-native-reservoir-inward-flow46988terminal0 has598validcommits,
+noexitfailure. Nativeaudit97132passes701276actualparticles/identities/NQ/P2G,
+zeroreductionmismatches. This isfirstverified10secondnativeflow,NOTsceneacceptance.
+Newdiagnose_liquid_flow_budget.py verifiesexactcompactsource/exit/storage prefix.
+363Python tests pass.10sflow storage-593.4375m³,input47 vsout117..86m³/s.
+Longer1800stepcapture40699terminal0 FAILS635 owner4/birth97114/westrow71:
+genuineabove-stagebackflow,normal.32189→-.07909cm,hit899.909cm vsstage883.15cm,
+bed871.62cm,zero targetinflow,marker0. GPUframe nowmatchescorrectsinglerounding.
+Only633commitsvalid:729724+23812births-53268exits=700268,storage-613.6667m³.
+Evidence:liquid-native-reservoir-inward-flow-30s/first-rejection-diagnosis.json
+andstorage-budget.json. DoNOTauditpostfailure1800snapshotasvalidflow.
+ALLengine/build/audithandlesterminal. Savedreviewmaphashunchanged. Cdrive20GBfree.
+NEXT explicit signedreservoirbackflow andpressure/free-surfacecoupling consistent
+withactualwaterdepth; notmoreplaneclamps/damping orsimplyallowingparticleloss.
+Keep broader physical
+boundary/backflow/storage/realmotion/surface/FPS work open. No map promotion,
+scene completion, commit or push. Review contains previous runtime details.
+
+Latest: [explicit exterior support preparation](liquid-reservoir-preparation-review.md).
+Previous turn was progress but fullflowfailed; this turn prepares actual buffer
+data, not more damping. Newprepare_liquid_reservoir.py exports10389particles
+outsideoriginalcore, IDs719335..729723,216.4375m³nominal, originalsourceprovenance.
+Newmerge_liquid_reservoir_state.py plus optionalexplicit partitionedges preserve
+ALL719335core IDs/positions/velocities/owners and17worldsharedcuts. Total729724,
+12owners,max158248initial/max1800960render voxels (oldcapsunchanged).
+Newouterwindow247×83×8m,494×166×24; same0.5×0.5×1/3mgrid. Newauditedouter
+6144source sites47.02471224393831m³/s, no source atoldcoreinterface.
+Nativeoutermicrostepfluxpasses; newaudit_liquid_reservoir_flux.py sums656native
+ringcells independently, bufferQ=.004563085590524 vs actualdVdt=.004563085085032,
+error5.05e-10m³/s. This is NOT FLIPbackflow acceptance.
+Preparedstate:tmp/south-fork-liquid-exterior-reservoir-20260910.json.
+Parent:tmp/south-fork-liquid-reservoir-window-20260910.
+Regions:tmp/south-fork-liquid-reservoir-regions-20260910 (manifestd59dbdf8152aaf2c82fd846a7c03842e270146b0ecaa24126a865fb2d438d247).
+Geometry:tmp/south-fork-liquid-reservoir-geometry-20260910; independentaudit
+verifies729724seedcontacts bitexact,90780XYcenters,98304supportprobes,365010triangles.
+Exactfacebed:tmp/south-fork-liquid-reservoir-face-bed-20260910/physical_face_bed.json,
+311/310/1284/1285knots,maxerror2.13e-14m. Originalcapturedmesh unchanged.
+352Python tests pass;18newcases. NoC++change orUElaunchthisturn. Sessions84037,
+67384,3200 andallotherpreparers terminal. Docsactualauditsdirectory:
+docs/reconstruction-review-2026-09-07/liquid-reservoir-outer-native-flux.
+NEXT validated runtime dataset selection (probe/auditshardcodeoldpaths), current
+core/buffer pressure/velocity support and explicit signed outer exchange.
+Do NOT simply movefailureplane outward andclaimresolved; outeronewayinletgate
+stillrequiresproper physicalbackflowpolicy/accounting. Realmotion/reflection/Q/
+storage/surface/FPS stillunverified. No savedmap/promotion/commit/push.
+
+Prior: [bounded inlet relaxation candidate](liquid-inlet-relaxation-review.md).
+Previous status-only turn was no implementation progress; this continuation
+implemented four-cell normal-velocity relaxation at physical upstream faces,
+with exact frozen-coefficient exponential endpoint/integrated displacement.
+Vertical/tangential motion, source rates, stage and exit/mass gates unchanged.
+Build90893PASS43.97s. Engine5622terminal0:14clean+1pass with unrelatedGoogle
+HTTP timeout, no failures.334Python regressions pass. Actual zero spatialsource
+scales now retained and validated across12owners; report inlet model versioned.
+Dense600run87787terminal0 still REJECTED501 atowner4/birth89015/westrow69,
+16.47cm above prescribedstage; marker1 proves relaxationexecuted but insufficient.
+499validcommits:719335+18764births-44577exits=693522survivors; storage-537.77m³.
+Input47m³/s vs97–124m³/s initial outflow; no steadyflow acceptance.
+Fullstep500 replay59535terminal0 fails498 (sameidentity/row), so full500 is NOT
+pre-failure evidence. Operation audit53491terminal0 matches7256unobstructed
+responses,362terrainresponsesdeferred,19385candidates inclzero markers.
+Maxpositionerror.00049825cm/maxvelocityerror.00004933cm/s. Initialauditbound
+omitted102.16cm/s targetbeforecancellation; now uses uncancelled operation
+magnitudes with unchangedgamma32,3newtests. No physical tolerance loosened.
+NEXT explicit reservoir/buffer state, free-surface/pressure support and signed
+backflow coupling. Finite sponge alone is NOT a complete open-boundary model;
+do not force green gates with more damping/heightclamps/particle deletion.
+Primaryreference and caveats inreview. All sessions terminal, finalprocesscheck
+none. No production/visual/FPS/sceneacceptance, promotion, commit or push.
+
+Prior: [actual inlet neighborhood](liquid-inlet-neighborhood-review.md).
+Previous turn was implementation/verification progress. Unseeded fullstep306
+capture32962terminal0 didnotreproduce priorfailure; matchingbirthnumber in a new
+generation didnotmean matchingposition. Added OPTIONAL dense source seed option
+(base+7919*owner, componentoffset0), default randommode unchanged. Build82318PASS
+32.86s. Seed173193 run79903terminal0 fails367; repeat full367 run57028terminal0
+fails368, SAME owner8/birth1638/westrow136. Crucially full367 particleposition
+bitmatches same-run firstlatch368 START. Priorcommit [1,0,699152,113] passes.
+324neighbors within2m;25cm graph5above-stage particles,35/50cm graph325connected
+backbelowstage. This is NOT proof of independent spray; do not discard it.
+Newdiagnose_liquid_inlet_neighborhood.py and mixedfull/compactfirstfailurecontrol
+reader.324Python tests pass. Engine18484terminal0:15cleanregressionpasses.
+Allhandles terminal; no UE/python/compiler running at final processcheck.
+NEXT consistent bounded free-surface/open-boundary coupling with incoming/outgoing
+mass/momentum and source/buffer support; verify runtime source scale/births.
+Do not hide failure with allowed-exit relabel, reflection, stage inflation or loss.
+No sustainedflow/visual/FPS/sceneacceptance, promotion, commit or push.
+
+Latest continuation: [longer flow journal and inlet frame](liquid-long-flow-journal-review.md).
+Previous status-only turn was no implementation progress. Added bounded lossless
+observed-stage journal (262144 records/4096 templates/8Mi characters), extended
+dense cap to3600 steps with original compact304byte histories and all old audit
+gates intact. Exact old6424-group roundtrip;15 engine/317Python passes.
+Ten-second600-step run59202terminal0 saved31864 groups/435templates but REJECTED
+firstcommit67: wet east inlet escaped without inlet correction. GPU latch shows
+24500.001953125cm exterior and36.807cm original-bed clearance, inlet marker0.
+Inlet still used centre+half math unlike routing/exit. Now uploads exact shared
+lower/axis frame and calls same precise .ush helper in Niagara. Build20411PASS,
+318PythonPASS. Engine31479terminal0:15cleanpasses, shared compiled Niagara
+helper and bit-exact bound frame validated. Corrected600-step UE88830terminal0
+`liquid-native-inlet-frame-flow-10s` REJECTEDstep306 [0,64,702151,126]. Owner8
+westrow137 firsthit909.66375cm, prescribedstage879.21075cm, actualbed820.20208cm.
+Above-stage inlet motion intentionally unconstrained, but exit forbids any
+reverse inlet crossing. This is a new free-surface policy issue, not rounding.
+304 valid commits through305:719335+11431-28652=702114live. Initial five1s
+bins ~47m³/s births vs112–124m³/s exits; storagedeclining, no stableQ claim.
+NEXT inspect local inlet particle/free-surface history and consistent bounded
+bulk/spray exchange. Above prescribedstage alone is NOT proof of disconnected
+spray. Preserve identity/mass, do not loosen gates or invent reflective walls.
+Allbuild/UE/audits terminal, no liveprocess. No sustained/scene/FPS acceptance.
+No production promotion, commit or push. Full queue remains active.
+
+Latest: [first-rejection recorder and routing precision](liquid-first-rejection-review.md).
+Previous turn was progress (inlet boundary implementation/verification).
+Added1280byte persistent first-rejected-particle GPU latch: complete rawpayload,
+actualstep/owner/index/frame/route/reason. Atomic firstclaim, no perstepCPUreadback,
+no changes togate or native water. Build40528PASS147.08s; UE16700terminal0
+engine-first-rejection14cleanpass;312PythonPASS. First120step replay62191terminal0
+passes dense/P2Gaudit91929:712453particles,0reductionmismatch, originalvolume bound.
+Repeat99304terminal0 REJECTEDstep40. Latch proves owner11 route saysinside while
+exit's same point is8100.00048828125cm>8100. Independentfloat64 approvesnorthoutlet.
+Root cause: router dividedphysicalcoordinates by50cm beforeinside test; float32
+reciprocal rounds to162. Added shared precise physical-frame helper; router now
+compares centimetres directly for parent and regional half-open bounds, preserving
+closedouteredge. Noepsilonexpansion/deletion. GPUtestcovers1ULPoutside/inside8100.
+Build49119PASS22.10s; UE11072terminal0 engine-physical-routing14pass (1HTTPwarning).
+UE37573/55575 and audits37257/47472 ALL terminal0. Both corrected120-step
+replays pass original dense/identity/mass/all12P2G checks, empty rejection latch,
+712455 survivors=719335+4474-11354, zero reduction mismatches. These two-second
+checks are not sustained flow, visuals or FPS. Next continuation replaces
+verbose stage history with bounded lossless template journal for longer flow.
+Fullqueueactive, no map promotion/commit/push.
+
+Latest: [inlet advection review](liquid-inlet-advection-review.md). Previous
+goal turn was progress (exact-bed integration and next failure diagnosis).
+Added native physical inlet-plane normal advection/velocity prescription BEFORE
+existing terrain contact, preserving tangential motion, all mass/IDs and original
+exit gates/source tables. Raw proposed position/velocity and face retained in
+7additional transient diagnostic float components. Build20713PASS191.05s.
+308PythonPASS; new independent float64 response reference and seven tests.
+UE53885terminal0 (`liquid-native-inlet-advection-debug`) fullstep30:
+actualcontrol[1,0,718008,53]; audit54candidates/1inlet response, positionerror
+.0006560203cm, velocityerror2.0277e-7cm/s. Oldstep30 failure fixed without exit
+permission changes. Still NO sustained-flow/scene/FPS acceptance.
+UE5590terminal0 (`liquid-native-inlet-advection-flow`)120step replay now first
+failsstep50[0,64,716865,122]. Dense/P2Gaudit37269terminal1 rejects it.
+UE15552terminal0, `liquid-native-inlet-step50-debug`,52steps/fullstep50,
+first failed EARLIER atstep15[0,64,719136,123]. Step50 contains3632alreadyoutside
+origins/120approvednewcrossings, NOT first-failure evidence. Diagnostic now avoids
+negative-time hypothetical crossings from alreadyinvalidorigins. NEXT add a
+bounded GPU first-rejection trajectory latch (step,owner,positions,route,reason)
+saved afterstop, not perstepCPUreadback, so variable first-failure timing no
+longer requires guessing a full snapshot step. Then resolve actual firstfailure.
+14engine regression rerun still required after integration. All build/UE handles
+are terminal; no process running from this pass.
+No saved scene/NS promotion, commit or push. Full queue remains active.
+
 Latest continuation: prior user-status turn was informational; this pass made
 code changes and gathered live GPU evidence. Build6053 terminalsuccess1104.07s;
 incremental38222PASS11.12s. Newprofile test initially failed800vs799.9999999999999

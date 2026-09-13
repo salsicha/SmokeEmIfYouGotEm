@@ -18,6 +18,13 @@ struct GridSpec {
     double origin_y = 0.0;
 };
 
+struct BoundaryGhostCell {
+    double bed = 0.0;
+    double h = 0.0;
+    double u = 0.0;
+    double v = 0.0;
+};
+
 struct BoundaryCondition {
     std::string edge;
     std::string kind;
@@ -28,6 +35,16 @@ struct BoundaryCondition {
     bool has_stage = false;
     bool has_depth = false;
     bool has_velocity = false;
+    // Explicit neighboring cell averages for uncalibrated MUSCL. Two layers,
+    // layer-major, nearest layer first. Each layer has ny samples on west/east
+    // or nx on south/north, ordered along increasing global y/x respectively.
+    // kind=ghost retains both flow directions at a coupled/open interface.
+    // kind=discharge_profile is an explicitly prescribed physical inlet:
+    // nearest h*normal_velocity is inward face discharge density; bed+h is
+    // external stage used only when both normal characteristics enter. The
+    // tangential component is imposed inflow velocity. Zero-q faces reflect.
+    // Authors must partition a multi-edge river discharge across all faces.
+    std::vector<BoundaryGhostCell> ghost_cells;
 };
 
 struct Feature {

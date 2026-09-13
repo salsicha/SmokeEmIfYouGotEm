@@ -119,6 +119,18 @@ bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
         return false;
     }
     FString Schema;
+    if (Root->TryGetStringField(TEXT("schema"), Schema) &&
+        Schema == TEXT("raftsim.cartesian_water_streaming.v1"))
+    {
+        FString Error;
+        bCartesianStreaming = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates() &&
+            CartesianRegions.Load(Root, Error);
+        if (!bCartesianStreaming)
+        {
+            UE_LOG(LogTemp, Error, TEXT("RaftSim Cartesian streaming requires matching Cartesian water coordinates and valid cooked regions: %s"), *Error);
+        }
+        return bCartesianStreaming;
+    }
     if (!Root->TryGetStringField(TEXT("schema"), Schema) ||
         Schema != TEXT("raftsim.south_fork.moving_water_streaming.v1"))
     {
@@ -234,6 +246,29 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
             Raft->GetActorLocation().Y,
             Raft->GetActorLocation().Z);
         return false;
+    }
+    if (bCartesianStreaming)
+    {
+        FVector2D WindowCenter;
+        const auto* Region = CartesianRegions.Select(RiverPosition, ActiveFieldsDirectory,&WindowCenter);
+        if (!Region)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("RaftSim Cartesian water has no complete source crop at (%.3f, %.3f)"),
+                RiverPosition.X, RiverPosition.Y);
+            return false;
+        }
+        if (!bForce && Region->FieldsDirectory == ActiveFieldsDirectory &&
+            CartesianRegions.CoversRaft(RiverPosition,LastCartesianCenterM) &&
+            !CartesianRegions.NeedsRecentering(WindowCenter, LastCartesianCenterM)) return true;
+        if (!WaterAdapter->ConfigureMovingRiverWindow(Region->FieldsDirectory,
+                CachedFlowBand.ToString(), WindowCenter, CartesianRegions.GetExtentM(),
+                CartesianRegions.GetRoughnessManning())) return false;
+        ActiveFieldsDirectory = Region->FieldsDirectory;
+        LastCartesianCenterM = WindowCenter;
+        ++SuccessfulHandoffCount;
+        UE_LOG(LogTemp, Display, TEXT("RaftSim Cartesian water handoff %d at (%.3f, %.3f), center=(%.3f, %.3f), source=%s"),
+            SuccessfulHandoffCount, RiverPosition.X, RiverPosition.Y,WindowCenter.X,WindowCenter.Y,*Region->Id);
+        return true;
     }
     const FSourceWindow* RapidWindow = SelectSource(RiverPosition.X);
     const FString DesiredDirectory = RapidWindow

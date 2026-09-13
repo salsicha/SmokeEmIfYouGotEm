@@ -59,6 +59,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $zlibInclude "zlib.h"))) {
 New-Item -ItemType Directory -Path $objectRoot -Force | Out-Null
 
 $sources = @(
+    "cartesian_domain.cpp",
     "chrono_bridge_fixtures.cpp",
     "chrono_coupling.cpp",
     "json.cpp",

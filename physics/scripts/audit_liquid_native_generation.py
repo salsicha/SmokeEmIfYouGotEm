@@ -1,5 +1,6 @@
 """Check native generation metadata against the observed full spawn schedule."""
 from uuid import UUID
+from liquid_stage_journal import stage_groups
 
 
 def verify_generation(report):
@@ -9,10 +10,10 @@ def verify_generation(report):
         raise ValueError('Valid active native generation required')
     records = report['native_transfer_packet']
     history = report['native_particle_handoff_history']
-    groups = report['groups']
-    if any(item.get('simulation_generation') != generation for item in records+history+groups):
+    if any(item.get('simulation_generation') != generation for item in records+history) or any(
+            g.get('simulation_generation') != generation for g in stage_groups(report)):
         raise ValueError('Stale generation entered native capture or transfer')
-    first = [g for g in groups if g['entries'][0]['first']]
+    first = [g for g in stage_groups(report) if g['entries'][0]['first']]
     if not first or len(first) != report['native_lifetime_steps']:
         raise ValueError('Lifetime step count differs from actual native groups')
     births = [0]*12

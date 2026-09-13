@@ -1,30 +1,3 @@
-{
-  "cpp": {
-    "command": [],
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20",
-    "returncode": 0,
-    "runtime_seconds": 0.48574825000105193,
-    "stderr": "",
-    "stdout": "",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16cpp/r_eddy/reduced/cpp_solver/eddy_line_shear_seed_20/validation.json"
-  },
-  "geoclaw": {
-    "manifest": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized/manifest.json",
-    "output_dir": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized",
-    "runtime_seconds": 1.182894416999261,
-    "seconds_per_simulated_second": 0.14786180212490763,
-    "solver": "geoclaw",
-    "validation": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/normalized/validation.json"
-  },
-  "runtime": {
-    "cpp_runtime_seconds": 0.48574825000105193,
-    "cpp_seconds_per_simulated_second": 0.06071853125013149,
-    "geoclaw_runtime_seconds": 1.182894416999261,
-    "geoclaw_seconds_per_simulated_second": 0.14786180212490763,
-    "simulated_duration_seconds": 8.0
-  },
-  "scenario_id": "eddy_line_shear_seed_20",
-  "scenario_json": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/shared_scenario/scenario.json",
-  "scenario_package": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/outputs/m16g/r_eddy/shared_scenario"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d6d3e438f628d620126c6cebe20d2ca27ec2c0f7ee01d00a114c0f8da85e4d1e
+size 1630

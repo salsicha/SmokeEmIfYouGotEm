@@ -62,6 +62,10 @@ public:
      * median seed uses 0.041). Cut edges get transmissive (copy-neighbor)
      * boundaries; window edges coinciding with the cooked grid's cross-stream
      * banks keep the bank condition the fields were cooked with.
+     * Explicit Cartesian coupled manifests instead retain MUSCL2 and two
+     * exact source ghost layers on all four crop edges. They require matching
+     * authored Manning roughness and bRecenterHydraulicCrux=false; incomplete
+     * halos fail closed. Their surface has no legacy travelling bake wave.
      *
      * Returns nullptr with a populated OutError on any manifest, hash, or
      * array mismatch. Only available with the solver library linked.
@@ -72,6 +76,10 @@ public:
         float RoughnessManning, FString& OutError,
         bool bRecenterHydraulicCrux = true);
 
+#if WITH_AUTOMATION_TESTS && RAFTSIM_HAS_LIVE_SOLVER
+    static int32 GetSharedAtlasLoadCountForTesting();
+#endif
+
     ~FRaftSimLiveWaterWindow();
 
     /** Advance the genuine FV solver by DtSeconds (internally CFL-substepped). */
@@ -79,6 +87,14 @@ public:
 
     /** Bilinear sample at a world-space position (meters). */
     FRaftSimLiveWaterSampleResult Sample(const FVector2D& WorldPositionM) const;
+
+    /** Immutable shared river source for presentation outside the live crop.
+     * Never a fallback for gameplay sampling. Missing source remains invalid;
+     * valid dry cells retain their source bed/depth. Velocity/normal use field XY. */
+    FRaftSimLiveWaterSampleResult SamplePresentationSource(const FVector2D& PositionM) const;
+    bool HasSharedPresentationSource() const { return PresentationState.IsValid(); }
+    /** Exact inclusive live cell-center bounds, excluding source ghost cells. */
+    bool GetFieldBoundsM(FBox2D& OutBounds) const;
 
     double SimTimeSeconds() const;
     uint64 StepCount() const { return StepCounter; }
@@ -110,12 +126,20 @@ public:
     /**
      * Copy depth and velocity from every world-space cell shared with the
      * previous window, preserve its solver clock, and return the number of
-     * transferred cells.  Zero means the windows do not overlap.
+     * transferred cells. Aligned equal-resolution grids copy solver values
+     * directly, without float sampling or a rendering wet/dry threshold.
+     * Nonaligned legacy grids retain bilinear transfer. Zero means no transfer.
      */
     int32 TransferOverlapStateFrom(const FRaftSimLiveWaterWindow& PreviousWindow);
 
 private:
+    friend class FRaftSimExactWaterOverlapTest;
+    friend class FRaftSimCartesianCropBoundaryTest;
+    friend class FRaftSimSharedCartesianAtlasTest;
     FRaftSimLiveWaterWindow();
+
+    struct FPresentationState;
+    TSharedPtr<const FPresentationState, ESPMode::ThreadSafe> PresentationState;
 
     TPimplPtr<raftsim::ReducedShallowWaterSolver> Solver;
     /** World position (meters) of the center of solver cell (0,0). */

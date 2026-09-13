@@ -29,11 +29,19 @@ def verified_solver_sha(work, run):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--label',default='')
     parser.add_argument('--cell', type=float, choices=(0.5, 1.0), default=1.0)
+    parser.add_argument('--work', type=Path)
+    parser.add_argument('--report', type=Path)
     args=parser.parse_args()
     work=ROOT/f'tmp/south-fork-survey-hydraulics/{args.cell:g}m-mixed-inlet'
     if args.label: work=work.with_name(work.name+'-'+args.label)
     suffix=('' if args.cell == 1.0 else f'-{args.cell:g}m') + ('-'+args.label if args.label else '')
     report_path=ROOT/f'docs/reconstruction-review-2026-09-06/troublemaker_numerical_boundary_flux{suffix}.json'
+    if bool(args.work) != bool(args.report):
+        raise ValueError('Explicit work and report paths must be provided together')
+    if args.work:
+        work, report_path = args.work.resolve(), args.report.resolve()
+        if not work.is_relative_to(ROOT/'tmp') or not report_path.is_relative_to(ROOT):
+            raise ValueError('Explicit audit paths must stay within the project')
     audit=work/'boundary_flux_audit'
     if audit.exists() or report_path.exists():
         raise FileExistsError('Preserve the existing flux audit; do not overwrite its evidence')

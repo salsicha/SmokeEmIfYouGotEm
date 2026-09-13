@@ -6,6 +6,13 @@
 // Compute from the complete immutable depth/velocity input; output only W.
 struct FRaftSimDetailEntrainment
 {
+    // Two estimates of the same source do not create additive production.
+    // Retain flow-driven rock/wake transitions and the accepted crest source.
+    static float MergeBreakingSource(const FVector4f& Flow,float CrestSource)
+    {
+        return Flow.X>0.01f ? FMath::Max(Flow.W,FMath::Clamp(CrestSource,0.f,1.f)) : 0.f;
+    }
+
     static void Build(FIntPoint Size,float CellMeters,TArray<FVector4f>& Flow)
     {
         check(Size.X>=2 && Size.Y>=2 && CellMeters>0 && Flow.Num()==Size.X*Size.Y);

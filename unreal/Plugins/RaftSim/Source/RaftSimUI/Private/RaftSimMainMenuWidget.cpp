@@ -51,8 +51,6 @@ struct FRunButtonSpec
 const FRunButtonSpec RunButtonSpecs[] = {
     {TEXT("south_fork_full_descent"), TEXT("South Fork American: Chili Bar to Salmon Falls"),
         ERaftSimGameMode::FreeRun},
-    {TEXT("troublemaker_challenge"), TEXT("South Fork American: Troublemaker Rapid"),
-        ERaftSimGameMode::FreeRun},
     {TEXT("hance_challenge"), TEXT("Colorado, Grand Canyon: Hance"), ERaftSimGameMode::FreeRun},
     {TEXT("upper_huacas_challenge"), TEXT("Pacuare: Upper Huacas"), ERaftSimGameMode::FreeRun},
     {TEXT("terminator_challenge"), TEXT("Futaleufu: Terminator"), ERaftSimGameMode::FreeRun},

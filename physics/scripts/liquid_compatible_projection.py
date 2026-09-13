@@ -31,6 +31,39 @@ def divergence(v, spacing):
                for c, h in enumerate(spacing))
 
 
+def surface_gradient_weights(boundary, phi):
+    """Ghost-fluid distances for the existing centred +/-h gradient.
+
+    phi is a current signed liquid interface field at pressure locations, in
+    consistent length units, negative in water. At each velocity location the
+    pressure samples are 2h apart. If only one is wet, the gradient reaches the
+    zero-pressure surface after theta*2h, not the far empty-cell centre.
+    The same weights MUST enter D M W G and the final velocity update. This
+    function alone is not a native surface reconstruction or boundary model.
+    """
+    phi=np.asarray(phi,dtype=float);boundary=np.asarray(boundary,dtype=float)
+    if boundary.shape!=(*phi.shape,4) or phi.ndim!=3 or not np.isfinite(phi).all() or not np.isfinite(boundary).all():
+        raise ValueError('Matching finite signed interface and boundary required')
+    types=np.rint(boundary[...,3]).astype(int)
+    if (not np.isin(types,[0,1,2,3]).all() or
+            np.any((types==0)&(phi>=0)) or np.any((types==2)&(phi<0))):
+        raise ValueError('Fluid/air classification must agree with the supplied interface')
+    wet=(types==0)|((types==3)&(phi<0))
+    air=(types==2)|((types==3)&(phi>=0))
+    weights=np.ones((*phi.shape,3))
+    for c in range(3):
+        pm,pp=shift(phi,-1,2-c),shift(phi,1,2-c)
+        left=shift(wet,-1,2-c)&shift(air,1,2-c)
+        right=shift(air,-1,2-c)&shift(wet,1,2-c)
+        for selected,water,empty in ((left,pm,pp),(right,pp,pm)):
+            # No empirical lower theta clamp: near-interface conditioning is
+            # visible to the linear solver and convergence checks.
+            weights[...,c][selected]=(empty[selected]-water[selected])/(-water[selected])
+    if not np.isfinite(weights).all() or (weights<1).any():
+        raise ValueError('Invalid liquid-to-interface pressure distance')
+    return weights
+
+
 def constrain_velocity(velocity, boundary):
     if velocity.shape[-1] != 3 or boundary.shape != (*velocity.shape[:-1], 4):
         raise ValueError('Matching XYZ velocity and XYZ/type boundary arrays required')
@@ -55,11 +88,15 @@ def constrain_velocity(velocity, boundary):
 
 
 def project(velocity, boundary, spacing=(32.8125, 32.8125, 800/24), dt=1/60,
-            max_iterations=600, tolerance=1e-7, boundary_pressure=None):
+            max_iterations=600, tolerance=1e-7, boundary_pressure=None, free_surface_phi=None,
+            target_divergence=None):
     spacing = np.asarray(spacing, dtype=float)
     if spacing.shape != (3,) or not np.isfinite(spacing).all() or (spacing <= 0).any() or not np.isfinite(dt) or dt <= 0:
         raise ValueError('Finite positive cell dimensions and time step required')
     fixed, mobility, fluid = constrain_velocity(velocity, boundary)
+    gradient_weights=(np.ones_like(mobility) if free_surface_phi is None else
+                      surface_gradient_weights(boundary,free_surface_phi))
+    pressure_mobility=mobility*gradient_weights
     stage = np.rint(boundary[..., 3]) == 3
     if boundary_pressure is None:
         if stage.any():
@@ -68,14 +105,19 @@ def project(velocity, boundary, spacing=(32.8125, 32.8125, 800/24), dt=1/60,
     boundary_pressure = np.asarray(boundary_pressure, dtype=float)
     if boundary_pressure.shape != fluid.shape or not np.isfinite(boundary_pressure).all() or np.any(boundary_pressure[~stage] != 0):
         raise ValueError('Finite pressure on external stage cells only required')
+    if free_surface_phi is not None and np.any(stage & (np.asarray(free_surface_phi)>=0) & (boundary_pressure!=0)):
+        raise ValueError('Atmospheric external-stage air must have zero gauge pressure')
     before = divergence(fixed, spacing)
-    rhs = np.where(fluid, -before/dt+divergence(mobility*gradient(boundary_pressure, spacing), spacing), 0.)
+    target=np.zeros_like(before) if target_divergence is None else np.asarray(target_divergence,float)
+    if target.shape!=before.shape or not np.isfinite(target).all() or np.any(target[~fluid]!=0):
+        raise ValueError('Finite target divergence on fluid pressure DOFs only required')
+    rhs = np.where(fluid, (target-before)/dt+divergence(pressure_mobility*gradient(boundary_pressure, spacing), spacing), 0.)
 
     def matrix(p):
         p = np.where(fluid, p, 0.)
-        return np.where(fluid, -divergence(mobility*gradient(p, spacing), spacing), 0.)
+        return np.where(fluid, -divergence(pressure_mobility*gradient(p, spacing), spacing), 0.)
 
-    diagonal = sum((shift(mobility[..., c], 1, 2-c)+shift(mobility[..., c], -1, 2-c))/(4*h*h)
+    diagonal = sum((shift(pressure_mobility[..., c], 1, 2-c)+shift(pressure_mobility[..., c], -1, 2-c))/(4*h*h)
                    for c, h in enumerate(spacing))
     unsupported = fluid & (diagonal == 0) & (abs(rhs) > tolerance)
     if unsupported.any():
@@ -105,7 +147,7 @@ def project(velocity, boundary, spacing=(32.8125, 32.8125, 800/24), dt=1/60,
         next_rz = float(np.sum(residual*z))
         direction = z+(next_rz/rz)*direction
         rz = next_rz
-    updated = fixed-dt*mobility*gradient(pressure+boundary_pressure, spacing)
+    updated = fixed-dt*pressure_mobility*gradient(pressure+boundary_pressure, spacing)
     after = divergence(updated, spacing)
     actual_residual = rhs-matrix(pressure)
     relative = float(np.linalg.norm(actual_residual))/max(initial_norm, 1e-30)
@@ -117,7 +159,12 @@ def project(velocity, boundary, spacing=(32.8125, 32.8125, 800/24), dt=1/60,
                   maximum_fixed_velocity_change_cm_s=float(abs(updated-fixed)[mobility == 0].max(initial=0.)),
                   pressure_min=float(pressure.min()), pressure_max=float(pressure.max()),
                   history=history, converged=relative <= tolerance,
-                  method='collocated matrix-free PCG of -D M G, anisotropic spacing',
+                  method='collocated matrix-free PCG of -D M W G, anisotropic spacing' if free_surface_phi is not None else
+                         'collocated matrix-free PCG of -D M G, anisotropic spacing',
+                  current_interface_supplied=free_surface_phi is not None,
+                  target_divergence_supplied=target_divergence is not None,
+                  target_divergence_rms_error=rms((after-target)[fluid]),
+                  maximum_free_surface_gradient_weight=float(gradient_weights.max()),
                   production_promoted=False, cpu_reference_only=True)
     return updated, pressure+boundary_pressure, report
 

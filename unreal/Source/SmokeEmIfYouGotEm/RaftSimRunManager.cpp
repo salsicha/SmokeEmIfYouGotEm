@@ -5,10 +5,15 @@
 #include "EngineUtils.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Misc/FileHelper.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 #include "RaftSimEncounterVolume.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimCartesianWaterRegions.h"
 #include "RaftSimRouteGhostActor.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimWaterRuntimeAdapter.h"
@@ -21,6 +26,8 @@ ARaftSimRunManager::ARaftSimRunManager()
 void ARaftSimRunManager::BeginPlay()
 {
     Super::BeginPlay();
+
+    ConfigureProgressCoordinateMap(ProgressCoordinateMapPath);
 
     if (TActorIterator<ARaftSimRaftActor> It(GetWorld()); It)
     {
@@ -47,7 +54,8 @@ void ARaftSimRunManager::BeginPlay()
                 ConfigureSession(Scenario, Save->GetSave()->ActiveGameMode);
             }
             FRaftSimScenarioProgress Progress;
-            if (Save->GetScenarioProgress(ScenarioId, Progress))
+            if (Save->GetScenarioProgress(ScenarioId, Progress) &&
+                Progress.CoordinateMapPath == ProgressCoordinateMapPath)
             {
                 BestGhostRoute = Progress.BestGhostRoute;
             }
@@ -69,6 +77,7 @@ void ARaftSimRunManager::BeginPlay()
 void ARaftSimRunManager::ConfigureSession(
     const FRaftSimCareerScenarioDefinition& Scenario, ERaftSimGameMode InGameMode)
 {
+    LastProgressSample.bValid = false;
     ScenarioId = Scenario.ScenarioId;
     GameModeKind = InGameMode;
     StartStationM = Scenario.StartStationM;
@@ -77,21 +86,120 @@ void ARaftSimRunManager::ConfigureSession(
     // GameMode configures this again after BeginPlay, so apply the ephemeral
     // review start here. Never modify the selected scenario or saved checkpoint.
     float ReviewStationM = -1.0f;
+    FRaftSimCareerScenarioDefinition FullRiver;
+    const bool bHasFullRiver = URaftSimProgressionLibrary::FindScenario(TEXT("south_fork_full_descent"),FullRiver);
+    float ReviewMinimumM = 0.f, ReviewMaximumM = bHasFullRiver ? FullRiver.FinishStationM : FinishStationM;
+    if (ProgressCoordinates) ProgressCoordinates->GetRiverStationRangeM(ReviewMinimumM,ReviewMaximumM);
     if (GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
         FParse::Value(FCommandLine::Get(), TEXT("RaftSimWaterReviewStation="), ReviewStationM) &&
-        FMath::IsFinite(ReviewStationM) && ReviewStationM >= 0.0f && ReviewStationM <= 48900.0f)
+        FMath::IsFinite(ReviewStationM) && ReviewStationM >= ReviewMinimumM && ReviewStationM <= ReviewMaximumM)
     {
         ScenarioId = TEXT("south_fork_full_descent");
         GameModeKind = ERaftSimGameMode::FreeRun;
         StartStationM = ReviewStationM;
-        FinishStationM = 48900.0f;
+        FinishStationM = ReviewMaximumM;
         bCheckpointRestorePending = true;
     }
 }
 
+bool ARaftSimRunManager::ConfigureProgressCoordinateMap(const FString& Path)
+{
+    LastProgressSample.bValid = false;
+    ProgressCoordinateMapPath = Path;
+    ProgressCoordinates = nullptr;
+    ProgressAxis.Reset();
+    ProgressAxisIndex.Reset();
+    if (Path.IsEmpty()) return true;
+    auto* Candidate = NewObject<URaftSimWaterRuntimeAdapter>(this);
+    if (!Candidate->ConfigureRiverCoordinateMap(Path) || Candidate->HasCartesianWaterCoordinates()) return false;
+    // Retain the exact polyline corners for geometric descent chainage.
+    // The hydraulic inverse instead solves a ruled lateral ribbon; its
+    // off-axis station is not necessarily the nearest-axis station.
+    FString Text;
+    TSharedPtr<FJsonObject> Root;
+    if (!FFileHelper::LoadFileToString(Text, *URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(Path)) ||
+        !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text), Root) || !Root.IsValid()) return false;
+    const TArray<TSharedPtr<FJsonValue>>* Points = nullptr;
+    if (!Root->TryGetArrayField(TEXT("points"), Points) || !Points) return false;
+    for (const auto& Value : *Points)
+    {
+        const auto& Values = Value->AsArray(); // Already validated by Candidate.
+        FProgressAxisPoint Point;
+        Point.StationM = Values[0]->AsNumber();
+        Point.PositionM = FVector2D(Values[1]->AsNumber(), Values[2]->AsNumber());
+        const int32 Index = ProgressAxis.Add(Point);
+        ProgressAxisIndex.FindOrAdd(FIntPoint(FMath::FloorToInt(Point.PositionM.X / 128.),
+            FMath::FloorToInt(Point.PositionM.Y / 128.))).Add(Index);
+    }
+    ProgressCoordinates = Candidate;
+    return true;
+}
+
+const URaftSimWaterRuntimeAdapter* ARaftSimRunManager::GetProgressCoordinates(
+    const URaftSimWaterRuntimeAdapter* HydraulicCoordinates) const
+{
+    if (!ProgressCoordinateMapPath.IsEmpty()) return ProgressCoordinates.Get();
+    // Cartesian east/north is never a fallback scoring or checkpoint axis.
+    return HydraulicCoordinates && !HydraulicCoordinates->HasCartesianWaterCoordinates()
+        ? HydraulicCoordinates : nullptr;
+}
+
+bool ARaftSimRunManager::WorldToRunCoordinates(const FVector& WorldPositionCm,
+    const URaftSimWaterRuntimeAdapter* HydraulicCoordinates,
+    FVector2D& OutStationLateralM, FVector& OutTangent, FVector& OutLeft) const
+{
+    if (ProgressCoordinateMapPath.IsEmpty())
+        return HydraulicCoordinates && HydraulicCoordinates->HasRiverCoordinateMap() &&
+            !HydraulicCoordinates->HasCartesianWaterCoordinates() &&
+            HydraulicCoordinates->WorldToRiverCoordinates(WorldPositionCm, OutStationLateralM, OutTangent, OutLeft);
+    if (!ProgressCoordinates || ProgressAxis.Num() < 2 || WorldPositionCm.ContainsNaN()) return false;
+    const double Sign = ProgressCoordinates->GetRiverWorldYSign();
+    const FVector2D Position(WorldPositionCm.X / 100., Sign * WorldPositionCm.Y / 100.);
+    const FIntPoint Key(FMath::FloorToInt(Position.X / 128.), FMath::FloorToInt(Position.Y / 128.));
+    double BestDistance = TNumericLimits<double>::Max(), BestAlpha = 0;
+    int32 BestIndex = INDEX_NONE;
+    TSet<int32> Segments;
+    // 256 m accepted corridor plus one cell for the validated <=16 m edges.
+    // Always compare nearby segments; a warm hydraulic-ribbon cache must not
+    // select a different branch of a bend for scoring or checkpoints.
+    for (int32 Y = -3; Y <= 3; ++Y)
+        for (int32 X = -3; X <= 3; ++X)
+            if (const auto* Indices = ProgressAxisIndex.Find(Key + FIntPoint(X, Y)))
+                for (int32 Index : *Indices)
+                {
+                    if (Index > 0) Segments.Add(Index - 1);
+                    if (Index + 1 < ProgressAxis.Num()) Segments.Add(Index);
+                }
+    for (int32 Index : Segments)
+    {
+        const FVector2D Delta = ProgressAxis[Index + 1].PositionM - ProgressAxis[Index].PositionM;
+        const double LengthSquared = Delta.SquaredLength();
+        if (LengthSquared <= UE_DOUBLE_SMALL_NUMBER) continue;
+        const double Alpha = FMath::Clamp(FVector2D::DotProduct(
+            Position - ProgressAxis[Index].PositionM, Delta) / LengthSquared, 0., 1.);
+        const double Distance = (Position - (ProgressAxis[Index].PositionM + Alpha * Delta)).SquaredLength();
+        if (Distance < BestDistance || (Distance == BestDistance && Index < BestIndex))
+        {
+            BestDistance = Distance;
+            BestIndex = Index;
+            BestAlpha = Alpha;
+        }
+    }
+    if (BestIndex == INDEX_NONE || BestDistance > FMath::Square(256.)) return false;
+    const auto& A = ProgressAxis[BestIndex];
+    const auto& B = ProgressAxis[BestIndex + 1];
+    const FVector2D Tangent = (B.PositionM - A.PositionM).GetSafeNormal();
+    const FVector2D Left(-Tangent.Y, Tangent.X);
+    OutStationLateralM = FVector2D(FMath::Lerp(A.StationM, B.StationM, BestAlpha),
+        FVector2D::DotProduct(Position - FMath::Lerp(A.PositionM, B.PositionM, BestAlpha), Left));
+    OutTangent = FVector(Tangent.X, Sign * Tangent.Y, 0);
+    OutLeft = FVector(Left.X, Sign * Left.Y, 0);
+    return true;
+}
+
 float ARaftSimRunManager::GetProgressFraction() const
 {
-    if (StartStationM >= 0.0f && FinishStationM > StartStationM)
+    if (FMath::IsFinite(StartStationM) && FMath::IsFinite(FinishStationM) && FinishStationM > StartStationM)
     {
         return FMath::Clamp(
             (CurrentStationM - StartStationM) / (FinishStationM - StartStationM),
@@ -106,7 +214,8 @@ float ARaftSimRunManager::GetProgressFraction() const
     return 0.0f;
 }
 
-bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTangent) const
+bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTangent,
+    FVector* OutSamplePositionCm) const
 {
     if (Raft == nullptr || GetGameInstance() == nullptr)
     {
@@ -115,14 +224,16 @@ bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTang
     const URaftSimPhysicsBridgeSubsystem* Bridge =
         GetGameInstance()->GetSubsystem<URaftSimPhysicsBridgeSubsystem>();
     const URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
-    if (Water == nullptr || !Water->HasRiverCoordinateMap())
+    const URaftSimWaterRuntimeAdapter* Progress = GetProgressCoordinates(Water);
+    if (Progress == nullptr || !Progress->HasRiverCoordinateMap())
     {
         return false;
     }
     FVector2D StationLateral;
     FVector Tangent;
     FVector Left;
-    if (!Water->WorldToRiverCoordinates(Raft->GetActorLocation(), StationLateral, Tangent, Left))
+    const FVector SamplePositionCm = Raft->GetActorLocation();
+    if (!WorldToRunCoordinates(SamplePositionCm, Water, StationLateral, Tangent, Left))
     {
         return false;
     }
@@ -131,7 +242,9 @@ bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTang
     {
         *OutTangent = Tangent;
     }
-    return FMath::IsFinite(OutStationM);
+    if (!FMath::IsFinite(OutStationM)) return false;
+    if (OutSamplePositionCm) *OutSamplePositionCm = SamplePositionCm;
+    return true;
 }
 
 // A section that starts mid-reach with no saved checkpoint (a Free Run of a
@@ -140,13 +253,14 @@ bool ARaftSimRunManager::SampleRiverStation(float& OutStationM, FVector* OutTang
 // raft move the checkpoint restore does, with a transform built from the
 // corridor (heading downstream, hull just above the local water surface).
 static bool BuildStationStartTransform(
-    URaftSimWaterRuntimeAdapter* Water, float StationM, FTransform& OutTransform)
+    const URaftSimWaterRuntimeAdapter* Progress, URaftSimWaterRuntimeAdapter* Water,
+    float StationM, FTransform& OutTransform)
 {
     FVector PointCm;
     FVector AheadCm;
-    const float DatumM = Water->GetRiverVerticalDatumM();
-    if (!Water->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, PointCm) ||
-        !Water->RiverToWorldPosition(FVector2D(StationM + 1.0f, 0.0f), DatumM, AheadCm))
+    const float DatumM = Progress->GetRiverVerticalDatumM();
+    if (!Progress->RiverToWorldPosition(FVector2D(StationM, 0.0f), DatumM, PointCm) ||
+        !Progress->RiverToWorldPosition(FVector2D(StationM + 1.0f, 0.0f), DatumM, AheadCm))
     {
         return false;
     }
@@ -164,6 +278,20 @@ static bool BuildStationStartTransform(
     return true;
 }
 
+bool ARaftSimRunManager::SeedCartesianCheckpointWater(const ARaftSimRiverWaterConfig* Config,
+    URaftSimWaterRuntimeAdapter* Water, FTransform& Checkpoint)
+{
+    if (!Config || !Water || !Water->HasCartesianWaterCoordinates() || !Checkpoint.IsValid()) return false;
+    if (!FRaftSimCartesianWaterRegions::ConfigureAtWorldPosition(Water, Config->StreamingManifestPath,
+        Config->FlowBand.ToString(), Checkpoint.GetLocation())) return false;
+    FRaftSimWaterSample Sample;
+    if (!Water->SampleWaterAtWorldPosition(Checkpoint.GetLocation(),Sample) || !Sample.bWet) return false;
+    FVector Position = Checkpoint.GetLocation();
+    Position.Z = Sample.SurfaceHeightMeters*100.f+40.f;
+    Checkpoint.SetLocation(Position);
+    return true;
+}
+
 void ARaftSimRunManager::TryRestoreSessionCheckpoint()
 {
     if (!bCheckpointRestorePending || bCheckpointRestoreAttempted || Raft == nullptr)
@@ -174,7 +302,9 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
     URaftSimPhysicsBridgeSubsystem* Bridge =
         GetGameInstance()->GetSubsystem<URaftSimPhysicsBridgeSubsystem>();
     URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
-    if (Save == nullptr || Water == nullptr || !Water->HasRiverCoordinateMap())
+    const URaftSimWaterRuntimeAdapter* Progress = GetProgressCoordinates(Water);
+    if (Save == nullptr || Water == nullptr || !Water->HasRiverCoordinateMap() ||
+        Progress == nullptr || !Progress->HasRiverCoordinateMap())
     {
         return;
     }
@@ -195,7 +325,7 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
         !MapName.IsEmpty() &&
         Definition.LevelName.ToString().EndsWith(TEXT("/") + MapName, ESearchCase::IgnoreCase);
     const bool bInsideCorridor =
-        Water->GetRiverStationRangeM(MinimumStationM, MaximumStationM) &&
+        Progress->GetRiverStationRangeM(MinimumStationM, MaximumStationM) &&
         StartStationM >= MinimumStationM && StartStationM <= MaximumStationM;
     if (!bOwnLevel || !bInsideCorridor)
     {
@@ -212,9 +342,10 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
         && FMath::IsFinite(ReviewStationM)
         && ReviewStationM >= 0.0f && ReviewStationM <= 48900.0f
         && FMath::IsNearlyEqual(ReviewStationM, StartStationM);
-    if (bReviewStart || !Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint, CheckpointCeilingM))
+    if (bReviewStart || !Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint, CheckpointCeilingM,
+            ProgressCoordinateMapPath,Definition.LevelName))
     {
-        if (!BuildStationStartTransform(Water, StartStationM, Checkpoint))
+        if (!BuildStationStartTransform(Progress, Water, StartStationM, Checkpoint))
         {
             bCheckpointRestorePending = false;
             return;
@@ -226,14 +357,61 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
     // A resumed section is an intentional discontinuity. Seed a fresh live
     // window at its saved station before moving the authoritative raft body;
     // normal downstream handoffs remain overlap-preserving after this point.
+    bool bHydraulicRegionVerified = Progress == Water;
     if (TActorIterator<ARaftSimRiverWaterConfig> It(GetWorld()); It)
     {
         ARaftSimRiverWaterConfig* Config = *It;
-        Water->ConfigureRiverWindow(
+        if (Water->HasCartesianWaterCoordinates())
+        {
+            if (!SeedCartesianCheckpointWater(Config,Water,Checkpoint))
+            {
+                UE_LOG(LogTemp,Warning,TEXT("RaftSim Cartesian section start rejected: no verified wet destination; raft not moved"));
+                bCheckpointRestorePending = false;
+                return;
+            }
+            bHydraulicRegionVerified = true;
+        }
+        else
+        {
+        FVector2D HydraulicCenter(StartStationM, 0.0f);
+        if (Progress != Water)
+        {
+            FVector Tangent, Left;
+            // Global descent metres are never solver-local metres. Resolve
+            // through the shared world position, including lateral offset.
+            if (!Water->WorldToRiverCoordinates(Checkpoint.GetLocation(), HydraulicCenter, Tangent, Left) ||
+                !Water->GetRiverStationRangeM(MinimumStationM, MaximumStationM) ||
+                HydraulicCenter.X < MinimumStationM || HydraulicCenter.X > MaximumStationM)
+            {
+                bCheckpointRestorePending = false;
+                return;
+            }
+        }
+        const bool bSeeded = Water->ConfigureRiverWindow(
             Config->CookedFieldsDir, Config->FlowBand.ToString(),
-            FVector2D(StartStationM, 0.0f),
+            HydraulicCenter,
             FVector2D(Config->MovingWindowStationExtentM, Config->MovingWindowLateralExtentM),
             0.041f, Config->bRecenterHydraulicCrux);
+        if (Progress != Water)
+        {
+            FRaftSimWaterSample Sample;
+            if (!bSeeded || !Water->SampleWaterAtWorldPosition(Checkpoint.GetLocation(), Sample) || !Sample.bWet)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("RaftSim global section start has no wet hydraulic region; raft not moved"));
+                bCheckpointRestorePending = false;
+                return;
+            }
+            FVector Position = Checkpoint.GetLocation();
+            Position.Z = Sample.SurfaceHeightMeters * 100.0f + 40.0f;
+            Checkpoint.SetLocation(Position);
+            bHydraulicRegionVerified = true;
+        }
+        }
+    }
+    if (!bHydraulicRegionVerified)
+    {
+        bCheckpointRestorePending = false;
+        return;
     }
     Raft->SetCheckpointTransform(Checkpoint, true);
     CurrentStationM = StartStationM;
@@ -319,6 +497,7 @@ void ARaftSimRunManager::AccumulateSignals(float DeltaSeconds)
 void ARaftSimRunManager::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
+    LastProgressSample.bValid = false;
     if (Raft == nullptr)
     {
         return;
@@ -327,10 +506,15 @@ void ARaftSimRunManager::Tick(float DeltaSeconds)
     TryRestoreSessionCheckpoint();
 
     float SampledStation = CurrentStationM;
-    const bool bHasStation = SampleRiverStation(SampledStation);
+    FVector SamplePositionCm;
+    const bool bHasStation = SampleRiverStation(SampledStation, nullptr, &SamplePositionCm);
+    // An explicitly separate progress contract must not silently become an
+    // X-axis distance trial when loading/projection fails.
+    if (!ProgressCoordinateMapPath.IsEmpty() && !bHasStation) return;
     if (bHasStation)
     {
         CurrentStationM = SampledStation;
+        LastProgressSample = { SamplePositionCm, GetWorld()->GetTimeSeconds(), SampledStation, true };
         FurthestStationM = FMath::Max(FurthestStationM, CurrentStationM);
     }
 
@@ -339,7 +523,7 @@ void ARaftSimRunManager::Tick(float DeltaSeconds)
     if (RunState == ERaftSimRunState::Ready)
     {
         // Start once the raft leaves the scout eddy / passes the start line.
-        const bool bCrossedStart = StartStationM >= 0.0f && bHasStation
+        const bool bCrossedStart = FinishStationM > StartStationM && bHasStation
             ? CurrentStationM >= StartStationM - 10.0f
             : RaftX >= StartLineX;
         if (bCrossedStart)
@@ -356,7 +540,7 @@ void ARaftSimRunManager::Tick(float DeltaSeconds)
         RecordCheckpointIfNeeded();
 
         // Finish at the Finish volume if present, else the fallback line.
-        bool bFinished = FinishStationM >= 0.0f && bHasStation
+        bool bFinished = FinishStationM > StartStationM && bHasStation
             ? CurrentStationM >= FinishStationM
             : RaftX >= FinishLineX;
         for (const TObjectPtr<ARaftSimEncounterVolume>& Volume : Volumes)
@@ -389,12 +573,13 @@ void ARaftSimRunManager::RecordCheckpointIfNeeded()
             ScenarioId,
             FName(*FString::Printf(TEXT("%s_%05d"), *ScenarioId.ToString(),
                 FMath::RoundToInt(CurrentStationM))),
-            CurrentStationM, Raft->GetActorTransform());
+            CurrentStationM, Raft->GetActorTransform(), ProgressCoordinateMapPath);
     }
 }
 
 void ARaftSimRunManager::RestartRun()
 {
+    LastProgressSample.bValid = false;
     if (Raft != nullptr)
     {
         Raft->ResetToCheckpoint();
@@ -426,6 +611,7 @@ void ARaftSimRunManager::FinishRun()
         {
             FRaftSimRunResult Result;
             Result.ScenarioId = ScenarioId;
+            Result.CoordinateMapPath = ProgressCoordinateMapPath;
             Result.GameMode = GameModeKind;
             Result.SafetyScore = FinalScore.SafetyScore;
             Result.OverallScore = FinalScore.TotalScore;

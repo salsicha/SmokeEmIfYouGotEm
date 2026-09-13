@@ -1,6 +1,8 @@
 #include "Misc/AutomationTest.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "Serialization/JsonSerializer.h"
 #include "../Materials/RaftSimLiquidRegionalState.h"
 #include "../Materials/RaftSimLiquidRegionalBoundary.h"
@@ -228,6 +230,7 @@ bool FLiquidRegionalContactTest::RunTest(const FString&)
                     Code.Contains(TEXT("CompatibleMaskedDivergence")) && Code.Contains(TEXT("CompatibleAnisotropicGradient")));
                 TestTrue(TEXT("Shared imported pressures survive local solve"),Code.Contains(TEXT("RegionalPressureOwner")) && Code.Contains(TEXT("if(regionalShared) continue;")));
                 TestTrue(TEXT("Explicit regional XYZ metric reaches GPU"),Code.Contains(TEXT("RegionalProjectionMetricCM")));
+                TestTrue(TEXT("Parent metric/parity SOR estimate reaches GPU"),Code.Contains(TEXT("RegionalMetricParitySOR")));
                 TestFalse(TEXT("No hidden fixed-fixture pressure metric"),Code.Contains(TEXT("float3 h=float3(dx,dx,800.0/24.0)")));
             }
         }
@@ -318,6 +321,12 @@ bool FLiquidRegionalStateTest::RunTest(const FString&)
                     const auto& Hlsl=Script->GetVMExecutableData().LastHlslTranslationGPU;
                     TestTrue(TEXT("Initial positions and velocities reach actual GPU spawn reader"),Hlsl.Contains(TEXT("Get_User_RiverInitialPositions")) && Hlsl.Contains(TEXT("Get_User_RiverInitialVelocities")));
                     TestTrue(TEXT("Subsequent external source branch retained"),Hlsl.Contains(TEXT("Get_User_RiverSourcePositions")) && Hlsl.Contains(TEXT("Get_User_RiverSourceVelocities")));
+                    if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRegionalStratifiedSource")) && !R.SourceWeights.IsEmpty())
+                    {
+                        TestTrue(TEXT("Stratified source CDF reaches compiled GPU spawn"),Hlsl.Contains(TEXT("Get_User_RiverSourceCDF")));
+                        TestTrue(TEXT("Native spawn group count reaches stratification"),Hlsl.Contains(TEXT("Engine_ExecutionCount")));
+                        TestTrue(TEXT("Integer batch hash reaches GPU source selection"),Hlsl.Contains(TEXT("0x7feb352d")));
+                    }
                 }
             }
         TestEqual(TEXT("One primary regional GPU emitter"),Kernels,1);
@@ -326,6 +335,18 @@ bool FLiquidRegionalStateTest::RunTest(const FString&)
         TestFalse(TEXT("Initial burst no longer multiplies grid volume by particles per cell"),UpdateHlsl.Contains(TEXT("* Context.Map.Grid3D_FLIP_Tank_Spawn.ParticlesPerCell")));
         TestTrue(TEXT("Native one-time spawn info and indicator retained"),UpdateHlsl.Contains(TEXT("Grid3D_FLIP_Tank_Spawn.SpawnBurst =")) && UpdateHlsl.Contains(TEXT("Grid3D_FLIP_Tank_Spawn.HasSpawnedThisFrame =")));
         const auto& Store=Candidate->GetExposedParameters();
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimRegionalStratifiedSource")) && !R.SourceWeights.IsEmpty())
+        {
+            const FNiagaraVariable V(FNiagaraTypeDefinition(UNiagaraDataInterfaceArrayFloat::StaticClass()),TEXT("User.River Source CDF"));
+            const auto* Cdf=Cast<UNiagaraDataInterfaceArrayFloat>(Store.GetDataInterface(V));
+            if(!TestNotNull(TEXT("Actual source CDF bound"),Cdf) || !TestEqual(TEXT("Every weighted source site retained"),Cdf->FloatData.Num(),R.SourceWeights.Num())) return false;
+            double Total=0,Sum=0;for(double W:R.SourceWeights) Total+=W;
+            for(int32 I=0;I<R.SourceWeights.Num();++I)
+            {
+                Sum+=R.SourceWeights[I];const float Expected=I+1==R.SourceWeights.Num()?1.f:float(Sum/Total);
+                TestEqual(TEXT("CDF preserves original source weights"),Cdf->FloatData[I],Expected);
+            }
+        }
         for (const auto& Entry:TArray<TPair<FString,const TArray<FVector>*>>{
             {TEXT("User.River Initial Positions"),&R.Positions},{TEXT("User.River Initial Velocities"),&R.Velocities},
             {TEXT("User.River Source Positions"),&R.SourcePositions},{TEXT("User.River Source Velocities"),&R.SourceVelocities}})
@@ -410,8 +431,10 @@ bool FLiquidRegionalExteriorTest::RunTest(const FString&)
             FCanonicalFrame::WorldVector(Parent.Frame.AxisX),FCanonicalFrame::WorldVector(Parent.Frame.AxisY),
             {Parent.Spacing.X,Parent.Spacing.Y},Error);
         const auto Exit=Profile.ExitPlan(Graph,Route,Error);
+        const auto InletFrame=Profile.PhysicalFrame();
         auto Wrong=Route;Wrong.LowerWorldCm.X+=1;
         ExitBound=Exit.FaceRows && Exit.HeightCm==float(Parent.Spacing.Z*Parent.Cells.Z) &&
+            InletFrame.Num()==3 && InletFrame[0]==Route.LowerWorldCm && InletFrame[1]==Route.AxisX && InletFrame[2]==Route.AxisY &&
             Exit.FaceRows->Desc.NumElements==uint32(2*(Parent.Cells.X+Parent.Cells.Y)) &&
             !Profile.ExitPlan(Graph,Wrong,Error).FaceRows && !Invalid.ExitPlan(Graph,Route,Error).FaceRows;
         Graph.Execute();
@@ -430,7 +453,8 @@ bool FLiquidRegionalExteriorTest::RunTest(const FString&)
         if (!RaftSimInstallRegionalLiquidContact(Candidate.Get(),R,Contact,Error,&Profile)) { AddError(Error);return false; }
         auto WrongParent=Parent;WrongParent.Frame.Origin.X+=1;
         TestFalse(TEXT("Outlet pressure must use the installed parent frame"),RaftSimInstallRegionalLiquidProjection(Candidate.Get(),WrongParent,R,Error));
-        if (!RaftSimInstallRegionalLiquidProjection(Candidate.Get(),Parent,R,Error)) { AddError(Error);return false; }
+        const bool CurrentSurface=Id==5;
+        if (!RaftSimInstallRegionalLiquidProjection(Candidate.Get(),Parent,R,Error,CurrentSurface)) { AddError(Error);return false; }
         Candidate->RequestCompile(true);Candidate->WaitForCompilationComplete(false,false);Candidate->WaitForCompilationComplete(true,false);
         TestTrue(TEXT("Parent exterior regional program ready"),Candidate->IsReadyToRun());
         for (const auto& H:Candidate->GetEmitterHandles()) if (H.GetIsEnabled()) if (const auto* E=H.GetInstance().GetEmitterData())
@@ -440,6 +464,34 @@ bool FLiquidRegionalExteriorTest::RunTest(const FString&)
             {
                 TestTrue(TEXT("Actual exterior GPU shader compiled"),S->DidScriptCompilationSucceed(true));
                 const auto& Code=S->GetVMExecutableData().LastHlslTranslationGPU;
+                TestEqual(TEXT("Current interface phase is opt-in"),Code.Contains(TEXT("CurrentInterfacePhase:")),CurrentSurface);
+                const bool CompactTransport=FParse::Param(FCommandLine::Get(),TEXT("RaftSimRegionalCompatibleTransport"));
+                TestEqual(TEXT("Compatible position transport is opt-in"),Code.Contains(TEXT("RiverCompactCompatibleTransport:")),CompactTransport);
+                const bool UnifiedTransport=CompactTransport && FParse::Param(FCommandLine::Get(),TEXT("RaftSimRegionalUnifiedTransport"));
+                TestEqual(TEXT("Shared interface/particle transport is opt-in"),Code.Contains(TEXT("RiverUnifiedTransport:")),UnifiedTransport);
+                if(UnifiedTransport)
+                    TestTrue(TEXT("Shared basis and placement-frame coordinates compiled"),Code.Contains(TEXT("RaftSimLiquidCompactWeights")) && Code.Contains(TEXT("RaftSimLiquidOrthogonalUnit")));
+                if(CompactTransport)
+                {
+                    TestTrue(TEXT("Complete support is checked, not clamped"),Code.Contains(TEXT("any(low<0) || any(low+3>=ts)")));
+                    TestTrue(TEXT("Two-stage position transport uses the native timestep"),Code.Contains(TEXT("stage<2 && tc")) && Code.Contains(TEXT("In_Position=In_PreviousPosition+In_DeltaTime*tv")));
+                    TestTrue(TEXT("Momentum remains the native FLIP/PIC blend"),Code.Contains(TEXT("Grid3D_FLIP_ParticleUpdate.PicOrFlip")));
+                }
+                TestEqual(TEXT("Current interface pressure distance is opt-in"),Code.Contains(TEXT("CurrentInterfacePressure:")),CurrentSurface);
+                TestEqual(TEXT("Pressure and gradient use the same interface mode"),Code.Contains(TEXT("CurrentInterfaceGradient:")),CurrentSurface);
+                if(CurrentSurface)
+                {
+                    TestTrue(TEXT("Pressure scales the actual two-cell stencil distance"),Code.Contains(TEXT("weight*=(outerPhi-centerPhi)/(-centerPhi)")));
+                    TestTrue(TEXT("Final native gradient uses that same distance"),Code.Contains(TEXT("Grad[axis]=surfaceWeight*(plus-minus)/(2*h[axis])")));
+                    // Niagara prefixes custom-HLSL output parameters during
+                    // translation. Assert the compiled predicate, not source names.
+                    TestTrue(TEXT("Phase preserves solid and prescribed boundary priority"),Code.Contains(TEXT("if(round(Out_RetBoundary)==0 || round(Out_RetBoundary)==2) Out_RetBoundary=surfacePhi<0?0:2")));
+                    TestTrue(TEXT("External air has atmospheric pressure"),Code.Contains(TEXT("Pressure=centerPhi<0?externalPressure:0")));
+                }
+                 TestTrue(TEXT("Inlet advection uses shared precise physical predicate and exact frame DI"),
+                    Code.Contains(TEXT("RaftSimLiquidPhysicalPoint(")) && Code.Contains(TEXT("Get_User_RiverParentPhysicalFrame")));
+                TestTrue(TEXT("Native inlet includes bounded timestep-integrated relaxation"),
+                    Code.Contains(TEXT("NativeInletRelaxation:")) && Code.Contains(TEXT("RaftSimLiquidInletRelaxation(")));
                 TestTrue(TEXT("Parent table reaches native inflow and outlet consumers"),Code.Contains(TEXT("Get_User_RiverParentExterior")) &&
                     Code.Contains(TEXT("NativeVectorInflow")) && Code.Contains(TEXT("NativeOutletStageClassification")) && Code.Contains(TEXT("NativeOutletStagePressure")));
                 const int32 RawWrite=Code.Find(TEXT("// RegionalRawP2G:"));
@@ -456,6 +508,9 @@ bool FLiquidRegionalExteriorTest::RunTest(const FString&)
         const FNiagaraVariable V(FNiagaraTypeDefinition(UNiagaraDataInterfaceArrayFloat3::StaticClass()),TEXT("User.River Parent Exterior"));
         const auto* Data=Cast<UNiagaraDataInterfaceArrayFloat3>(Candidate->GetExposedParameters().GetDataInterface(V));
         TestTrue(TEXT("Bound parent rows unchanged"),Data && Data->InternalFloatData==Profile.Packed());
+        const FNiagaraVariable FV(FNiagaraTypeDefinition(UNiagaraDataInterfaceArrayFloat3::StaticClass()),TEXT("User.River Parent Physical Frame"));
+        const auto* FD=Cast<UNiagaraDataInterfaceArrayFloat3>(Candidate->GetExposedParameters().GetDataInterface(FV));
+        TestTrue(TEXT("Inlet lower corner and axes preserve every routing float32 bit"),FD && FD->InternalFloatData==Profile.PhysicalFrame());
         const UNiagaraDataInterfaceGrid3DCollection* Raw=nullptr;int32 RawCount=0;
         for (const auto& Info:Candidate->GetSystemSpawnScript()->GetCachedDefaultDataInterfaces())
             if (Info.Name.ToString().EndsWith(TEXT(".RiverRawTransfer")) || Info.CompileName.ToString().EndsWith(TEXT(".RiverRawTransfer")))

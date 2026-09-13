@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 
 
-def partition(domain, max_xy=(128, 64)):
+def partition(domain, max_xy=(128, 64), *, cell_edges=None):
     counts = np.asarray(domain['physical_cells'])
     maximum = np.asarray(max_xy)
     spacing = np.asarray(domain['cell_size_m'], dtype=float)
@@ -25,12 +25,21 @@ def partition(domain, max_xy=(128, 64)):
             not np.allclose(bounds[1]-bounds[0], spacing[:2]*counts[:2], atol=1e-9, rtol=0)):
         raise ValueError('Parent bounds and cell metrics disagree')
     edges = []
+    if cell_edges is not None and len(cell_edges)!=2:
+        raise ValueError('Explicit partition requires X and Y edge arrays')
     for axis in range(2):
-        edge = list(range(0, int(counts[axis]), int(maximum[axis])))+[int(counts[axis])]
-        # Do not create an unsupported one-cell last row: merge it with its
-        # predecessor. The independent capacity check below still applies.
-        if edge[-1]-edge[-2] == 1 and len(edge) > 2:
-            edge.pop(-2)
+        if cell_edges is None:
+            edge = list(range(0, int(counts[axis]), int(maximum[axis])))+[int(counts[axis])]
+            # Do not create an unsupported one-cell last row: merge it with its
+            # predecessor. The independent capacity check below still applies.
+            if edge[-1]-edge[-2] == 1 and len(edge) > 2:
+                edge.pop(-2)
+        else:
+            edge=np.asarray(cell_edges[axis])
+            if (edge.ndim!=1 or len(edge)<2 or not np.issubdtype(edge.dtype,np.integer) or
+                edge[0]!=0 or edge[-1]!=counts[axis] or np.any(np.diff(edge)<2) or
+                (axis==0 and np.any(edge%2))):
+                raise ValueError('Explicit edges must cover the parent with supported integer spans')
         edges.append(np.asarray(edge, dtype=int))
     regions = []
     for j in range(len(edges[1])-1):
@@ -82,7 +91,7 @@ def owners(positions_sl_m, regions):
     return result
 
 
-def split_state(window, source, initial, axes, max_xy=(128, 64)):
+def split_state(window, source, initial, axes, max_xy=(128, 64), *, cell_edges=None):
     if (source.get('schema') != 'raftsim.native_face_liquid_source.v2' or
             initial.get('schema') != 'raftsim.registered_liquid_initial_state.v2' or
             source['domain'] != initial['domain'] or
@@ -97,7 +106,7 @@ def split_state(window, source, initial, axes, max_xy=(128, 64)):
     volume = float(domain['nominal_particle_volume_m3'])
     if not np.isfinite(volume) or volume <= 0 or source['nominal_particle_volume_m3'] != volume or initial['nominal_particle_volume_m3'] != volume:
         raise ValueError('Inlet and seed particle volume mismatch')
-    regions, interfaces = partition(domain, max_xy)
+    regions, interfaces = partition(domain, max_xy, cell_edges=cell_edges)
     spacing = np.asarray(domain['cell_size_m'], dtype=float)
     if (not np.isclose(volume, np.prod(spacing)/4, atol=1e-12, rtol=0) or
             not np.allclose(domain['physical_extents_m'], np.asarray(domain['physical_cells'])*spacing, atol=1e-9, rtol=0)):

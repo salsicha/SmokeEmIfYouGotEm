@@ -61,8 +61,10 @@ def diagnose(directory, step):
                               unconstrained_velocity_cm_s=w[rv:rv+3,i].copy().view('<f4').astype(float).tolist(),
                               inlet_face_marker=float(w[rf:rf+1,i].copy().view('<f4')[0]))
             hits=[]
+            valid_origin=bool(np.isfinite(la[i]).all() and np.all((la[i]>=0)&(la[i]<=extent)))
+            sample['valid_segment_origin']=valid_origin
             for axis in range(3):
-                if lb[i,axis]<0 or lb[i,axis]>extent[axis]:
+                if valid_origin and (lb[i,axis]<0 or lb[i,axis]>extent[axis]):
                     high=lb[i,axis]>extent[axis]
                     t=((extent[axis] if high else 0)-la[i,axis])/(lb[i,axis]-la[i,axis])
                     hits.append((float(t),2*axis+int(high)))

@@ -40,6 +40,7 @@
 #include "RaftSimLiquidRegionalContact.h"
 #include "RaftSimLiquidParentExterior.h"
 #include "RaftSimLiquidInletAdvection.h"
+#include "RaftSimLiquidCompactTransport.h"
 
 namespace
 {
@@ -649,6 +650,18 @@ bool AddPrivateTerrainProjection(UNiagaraNode* Outer,UEdGraphPin* VelocityRead,b
     {
         if(!ExactTriangles || !CanonicalWorld) return false;
         Project->Signature.Inputs.Add(FNiagaraVariable(Variable.GetType(),TEXT("InletProfile")));
+        Project->Signature.Inputs.Add(FNiagaraVariable(Variable.GetType(),TEXT("InletFrame")));
+        auto* Includes=FindFProperty<FArrayProperty>(Project->GetClass(),TEXT("VirtualIncludeFilePaths"));
+        if(!Includes) return false;
+        FScriptArrayHelper IncludePaths(Includes,Includes->ContainerPtrToValuePtr<void>(Project));
+        for(const TCHAR* Path:{TEXT("/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPhysicalFrame.ush"),
+            TEXT("/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidInletRelaxation.ush"),
+            TEXT("/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidPrescribedNormal.ush"),
+            TEXT("/Plugin/RaftSimWaterDetail/Private/RaftSimLiquidCompactTransport.ush")})
+        {
+            const int32 IncludeIndex=IncludePaths.AddValue();
+            CastFieldChecked<FStrProperty>(Includes->Inner)->SetPropertyValue(IncludePaths.GetRawPtr(IncludeIndex),Path);
+        }
         Project->Signature.Outputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetPositionDef(),TEXT("InletRawPosition")));
         Project->Signature.Outputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetVec3Def(),TEXT("InletRawVelocity")));
         Project->Signature.Outputs.Add(FNiagaraVariable(FNiagaraTypeDefinition::GetFloatDef(),TEXT("InletFace")));
@@ -657,12 +670,37 @@ bool AddPrivateTerrainProjection(UNiagaraNode* Outer,UEdGraphPin* VelocityRead,b
             Code.ReplaceInline(TEXT("float3 travel=Position-PreviousPosition;"),TEXT("float3 travel=inletPosition-PreviousPosition;"),ESearchCase::CaseSensitive)!=1) return false;
         Hlsl->SetPropertyValue_InContainer(Project,RaftSimLiquidInletAdvectionHlsl()+Code);
     }
+    const bool CompactTransport=ParentExterior && FParse::Param(FCommandLine::Get(),TEXT("RaftSimRegionalCompatibleTransport"));
+    const bool UnifiedTransport=CompactTransport && FParse::Param(FCommandLine::Get(),TEXT("RaftSimRegionalUnifiedTransport"));
+    if(CompactTransport)
+    {
+        const auto Grid=FNiagaraTypeDefinition(UNiagaraDataInterfaceGrid3DCollection::StaticClass());
+        const auto Matrix=FNiagaraTypeDefinition::GetMatrix4Def();
+        Project->Signature.Inputs.Append({FNiagaraVariable(Grid,TEXT("TransportFlow")),
+            FNiagaraVariable(Grid,TEXT("TransportBoundary")),FNiagaraVariable(Matrix,TEXT("TransportWorldToUnit")),
+            FNiagaraVariable(Matrix,TEXT("TransportLocalToWorld"))});
+        Hlsl->SetPropertyValue_InContainer(Project,RaftSimLiquidCompactTransportHlsl(UnifiedTransport)+Hlsl->GetPropertyValue_InContainer(Project));
+    }
     Project->AllocateDefaultPins();
+    if(CompactTransport)
+    {
+        const FName Names[]={TEXT("Emitter.SimGrid"),TEXT("Emitter.TransientGrid"),UnifiedTransport?TEXT("Emitter.UnitToWorld"):TEXT("Emitter.WorldToUnit"),TEXT("Emitter.LocalToWorld")};
+        for(int32 I=0;I<4;++I)
+        {
+            const auto& Input=Project->Signature.Inputs[Project->Signature.Inputs.Num()-4+I];
+            auto* Read=DuplicateTypedMapRead(Terrain,FNiagaraVariable(Input.GetType(),Names[I]));
+            if(!Read) return false;
+            Project->FindPin(Input.GetName(),EGPD_Input)->MakeLinkTo(Read);
+        }
+    }
     if(ParentExterior)
     {
         auto* Read=DuplicateTypedMapRead(Terrain,FNiagaraVariable(Variable.GetType(),TEXT("User.River Parent Exterior")));
         if(!Read) return false;
         Project->FindPin(TEXT("InletProfile"),EGPD_Input)->MakeLinkTo(Read);
+        auto* FrameRead=DuplicateTypedMapRead(Terrain,FNiagaraVariable(Variable.GetType(),TEXT("User.River Parent Physical Frame")));
+        if(!FrameRead) return false;
+        Project->FindPin(TEXT("InletFrame"),EGPD_Input)->MakeLinkTo(FrameRead);
     }
     auto* TargetPosition=Position->LinkedTo[0];auto* TargetVelocity=Velocity->LinkedTo[0];
     TargetPosition->BreakAllPinLinks();TargetVelocity->BreakAllPinLinks();
@@ -1040,6 +1078,10 @@ bool RaftSimInstallRegionalLiquidContact(UNiagaraSystem* System,const RaftSimLiq
         for (const auto P:Exterior->Packed()) { Faces->FloatData.Add(FVector(P));Faces->InternalFloatData.Add(P); }
         const FNiagaraVariable FaceVariable(FNiagaraTypeDefinition(Faces->GetClass()),TEXT("User.River Parent Exterior"));
         Store.AddParameter(FaceVariable);Store.SetDataInterface(Faces,FaceVariable);
+        auto* Frame=NewObject<UNiagaraDataInterfaceArrayFloat3>(System);
+        for(const auto P:Exterior->PhysicalFrame()) { Frame->FloatData.Add(FVector(P));Frame->InternalFloatData.Add(P); }
+        const FNiagaraVariable FrameVariable(FNiagaraTypeDefinition(Frame->GetClass()),TEXT("User.River Parent Physical Frame"));
+        Store.AddParameter(FrameVariable);Store.SetDataInterface(Frame,FrameVariable);
         if (!CorrectRiverBoundaryAxes(System)) { Error=TEXT("Regional exterior numerical boundary controls failed");return false; }
     }
     UNiagaraNodeFunctionCall* Update=nullptr;int32 Rewired=0;
@@ -1065,7 +1107,7 @@ bool RaftSimInstallRegionalLiquidContact(UNiagaraSystem* System,const RaftSimLiq
 }
 
 bool RaftSimInstallRegionalLiquidProjection(UNiagaraSystem* System,
-    const RaftSimLiquidRegionalState::FParent& Parent,const RaftSimLiquidRegionalState::FState& Region,FString& Error)
+    const RaftSimLiquidRegionalState::FParent& Parent,const RaftSimLiquidRegionalState::FState& Region,FString& Error,bool CurrentSurface)
 {
     RaftSimLiquidRegionalProjection::FLayout Layout;
     if (!RaftSimLiquidRegionalProjection::Build(Parent,Region,Layout,Error)) return false;
@@ -1103,7 +1145,9 @@ bool RaftSimInstallRegionalLiquidProjection(UNiagaraSystem* System,
             Faces->InternalFloatData[5]!=FVector3f(Parent.Cells))
         { Error=TEXT("Projection parent does not match installed exterior table");return false; }
     }
-    if (!RaftSimCompatibleProjection::Install(System,Graphs,DuplicateTypedMapRead,HasExterior,&Layout))
+    if(CurrentSurface && (!HasExterior || Store.IndexOf(URaftSimLiquidStageInterface::Variable())==INDEX_NONE))
+    { Error=TEXT("Current surface pressure requires the retained interface DI and parent exterior");return false; }
+    if (!RaftSimCompatibleProjection::Install(System,Graphs,DuplicateTypedMapRead,HasExterior,&Layout,CurrentSurface))
     { Error=TEXT("Regional compatible pressure graph installation failed");return false; }
     Error.Reset();return true;
 }

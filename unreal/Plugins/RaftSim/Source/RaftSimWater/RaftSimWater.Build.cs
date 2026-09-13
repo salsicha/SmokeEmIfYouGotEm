@@ -63,7 +63,8 @@ public class RaftSimWater : ModuleRules
             "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics",
             "physics/data/real_world/south_fork_american_chili_bar/cooked_flow_fields",
             "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/cooked_flow_fields",
-            "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields"
+            "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields",
+            "physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/troublemaker/playable_flow"
         };
         foreach (string RelativeRoot in RuntimeRoots)
         {

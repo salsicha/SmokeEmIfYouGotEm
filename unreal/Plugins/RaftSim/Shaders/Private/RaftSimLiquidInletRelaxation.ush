@@ -1,0 +1,16 @@
+#pragma once
+
+// Experimental upstream reservoir coupling, in centimetres/seconds. A compact
+// four-cell band leaves the rapid interior untouched. Strength 4 is a candidate,
+// not a calibrated absorption coefficient. No particle is removed or reflected.
+// Integrate du/dt = sigma*(target-u) with sigma frozen over this substep.
+// Average attenuation integrates displacement; endpoint attenuation updates u.
+void RaftSimLiquidInletRelaxation(float distanceToFace, float width, float depth,
+    float dt, out float averageAttenuation, out float endAttenuation)
+{
+    float q=saturate(1-distanceToFace/width);
+    float sigma=4*sqrt(981*depth)/width*q*q*(3-2*q);
+    float x=sigma*dt;
+    endAttenuation=exp(-x);
+    averageAttenuation=x<0.001 ? 1-x*0.5+x*x/6 : (1-endAttenuation)/x;
+}

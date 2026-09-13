@@ -63,6 +63,19 @@ bool FRaftSimM6ProgressionMigrationTest::RunTest(const FString&)
     Save->Settings.MotionIntensity = -4.0f;
     URaftSimSaveSubsystem::NormalizeSave(Save);
 
+    URaftSimVerticalSliceSaveGame* RapidSave = NewObject<URaftSimVerticalSliceSaveGame>();
+    RapidSave->Selection.ScenarioId = TEXT("troublemaker_challenge");
+    RapidSave->CompletedScenarioIds.Add(TEXT("troublemaker_challenge"));
+    URaftSimSaveSubsystem::NormalizeSave(RapidSave);
+    TestEqual(TEXT("retired rapid selection returns to its parent river"),
+        RapidSave->Selection.ScenarioId, FName(TEXT("south_fork_full_descent")));
+    TestTrue(TEXT("historical rapid completion is preserved"),
+        RapidSave->CompletedScenarioIds.Contains(TEXT("troublemaker_challenge")));
+    TestFalse(TEXT("rapid completion does not complete the river"),
+        RapidSave->CompletedScenarioIds.Contains(TEXT("south_fork_full_descent")));
+    TestFalse(TEXT("retired rapid is no longer selectable"),
+        RapidSave->UnlockedScenarioIds.Contains(TEXT("troublemaker_challenge")));
+
     TestEqual(TEXT("legacy save upgraded to current additive schema"),
         Save->SaveVersion, URaftSimSaveSubsystem::CurrentSaveVersion);
     TestEqual(TEXT("UI scale clamped"), Save->Settings.UiScale, 1.5f);
@@ -138,8 +151,16 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
     const TArray<FRaftSimCareerScenarioDefinition> Catalog =
         URaftSimProgressionLibrary::GetScenarioCatalog();
     TestTrue(
-        TEXT("training, South Fork campaign, five signature challenges, and Zambezi reference run are catalogued"),
-        Catalog.Num() >= 12);
+        TEXT("training, South Fork campaign, four other river slices, and Zambezi are catalogued"),
+        Catalog.Num() >= 11);
+    FRaftSimCareerScenarioDefinition RetiredRapid;
+    TestFalse(TEXT("Troublemaker is not a standalone scenario"),
+        URaftSimProgressionLibrary::FindScenario(TEXT("troublemaker_challenge"), RetiredRapid));
+    for (const FRaftSimCareerScenarioDefinition& Scenario : Catalog)
+    {
+        TestFalse(TEXT("no scenario launches only the bounded South Fork rapid"),
+            Scenario.LevelName == FName(TEXT("/Game/RaftSim/Maps/L_SouthFork_Troublemaker")));
+    }
     TArray<FRaftSimCareerScenarioDefinition> Sections;
     FRaftSimCareerScenarioDefinition FullDescent;
     int32 TrainingCount = 0;
@@ -159,9 +180,11 @@ bool FRaftSimM6CareerCatalogTest::RunTest(const FString&)
         TestEqual(FString::Printf(TEXT("section %d uses continuous full-reach map"), Index + 1),
             Sections[Index].LevelName, FName(TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach")));
     }
-    TestTrue(TEXT("full descent spans authored playable reach"),
-        FullDescent.bFullDescent && FullDescent.StartStationM <= 120.0f &&
-        FullDescent.FinishStationM >= 48900.0f);
+    TestTrue(TEXT("full descent stays inside reconstructed 33334.146m source route"),
+        FullDescent.bFullDescent && FullDescent.StartStationM == 120.0f &&
+        FullDescent.FinishStationM == 33280.0f &&
+        Sections[0].StartStationM == FullDescent.StartStationM &&
+        Sections.Last().FinishStationM == FullDescent.FinishStationM);
     FRaftSimCareerScenarioDefinition Zambezi;
     TestTrue(
         TEXT("Zambezi reference run is catalogued"),

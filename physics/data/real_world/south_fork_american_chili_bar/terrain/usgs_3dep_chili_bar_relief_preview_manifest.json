@@ -1,17 +1,3 @@
-{
-  "schema": "raftsim.dem_relief_preview.v1",
-  "status": "generated_preview_only_not_production_heightfield",
-  "source_id": "usgs_3dep_chili_bar_sample_256",
-  "provider": "USGS 3D Elevation Program ImageServer",
-  "input_dem": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_sample_256.tif",
-  "output_relief": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_relief_preview_512.png",
-  "processing": {
-    "output_size_px": 512,
-    "height_percentiles": "2_to_98",
-    "relief": "slope_aware_normalized_grayscale_preview"
-  },
-  "caveats": [
-    "Preview relief is sampled into procedural geometry only.",
-    "Full terrain import still requires clipping, reprojection, conditioning, and Unreal heightfield or landscape import."
-  ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:401db966a638791d0816885b313883151e15079219182eb57dc708d2427756d9
+size 827

@@ -1,0 +1,21 @@
+// Optical breakup, not bubble production or liquid mass. Mean is the linear
+// red-channel mean of the existing project-owned South Fork lace source:
+// SHA256 5aeea75dc41b0441314064494ba440f85a80f3b5bd4726e77918ca7eab0d9576.
+// This affine remap preserves expected coverage under linear texture filtering;
+// it does not promise per-pixel or correlated spatial-area conservation.
+struct RaftSimFoamCoverageOptics
+{
+    float Sample(float Amount, float Density, float3 Lace)
+    {
+        const float MeanLace = 0.1552058425604128;
+        // GPU coverage was inverted to optical density by the registered
+        // authority node. Do not clamp that density to one and lose dense foam.
+        float coverage = saturate(1.0-exp(-max(Density,0.0)*max(Amount,0.0)));
+        float cells = lerp(saturate(Lace.g),saturate(Lace.r),saturate(Lace.b));
+        // The largest contrast that stays in [0,1] without a clipping bias.
+        // Zero coverage remains zero, full coverage remains full; both phases
+        // and any linear mip average retain the same ensemble mean.
+        float contrast = min(coverage/MeanLace,(1.0-coverage)/(1.0-MeanLace));
+        return saturate(coverage+contrast*(cells-MeanLace));
+    }
+};

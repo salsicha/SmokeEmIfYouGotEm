@@ -66,7 +66,9 @@ bool FRaftSimConfigureRunCommand::Update()
     return true;
 }
 
-// Paddle the raft forward each tick until it finishes (bounded by the wait).
+// One held-input refresh per scheduled step. Returning false here used to
+// trap the queue in its first command forever when propulsion failed, so the
+// advertised 25-second bound and final failure assertion never executed.
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimPaddleUntilFinishCommand, FAutomationTestBase*, Test);
 bool FRaftSimPaddleUntilFinishCommand::Update()
@@ -83,7 +85,7 @@ bool FRaftSimPaddleUntilFinishCommand::Update()
         return true; // done
     }
     Raft->ApplyPaddleStroke(ERaftSimPaddleSide::Both, 1.0f);
-    return false; // keep paddling
+    return true; // the next scheduled step continues held input
 }
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(

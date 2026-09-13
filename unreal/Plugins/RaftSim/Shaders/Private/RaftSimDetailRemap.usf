@@ -1,0 +1,38 @@
+#include "/Engine/Public/Platform.ush"
+
+int2 GridSize;
+int2 SourceOffsetCells;
+StructuredBuffer<float4> NewMeanFlow;
+StructuredBuffer<float4> PreviousState;
+RWStructuredBuffer<float4> NextState;
+#if RAFTSIM_ACTIVITY_MEMORY
+StructuredBuffer<float> PreviousActivity;
+RWStructuredBuffer<float> NextActivity;
+#endif
+
+[numthreads(8,8,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    int2 p=int2(id.xy);
+    if (any(p>=GridSize))return;
+    uint destination=p.y*GridSize.x+p.x;
+    int2 old=p+SourceOffsetCells;
+    // Transported density may exceed one: copy it, do not turn it into
+    // coverage or clamp it during a world-window move. No wrap at domain edges.
+    float4 state=0;
+#if RAFTSIM_ACTIVITY_MEMORY
+    float activity=0;
+#endif
+    if (all(old>=0) && all(old<GridSize) && NewMeanFlow[destination].x>0.01)
+    {
+        uint source=old.y*GridSize.x+old.x;
+        state=PreviousState[source];
+#if RAFTSIM_ACTIVITY_MEMORY
+        activity=PreviousActivity[source];
+#endif
+    }
+    NextState[destination]=state;
+#if RAFTSIM_ACTIVITY_MEMORY
+    NextActivity[destination]=activity;
+#endif
+}

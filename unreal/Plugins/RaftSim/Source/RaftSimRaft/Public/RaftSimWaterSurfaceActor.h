@@ -1,19 +1,24 @@
 #pragma once
 
+class URaftSimShorelineMeshComponent;
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimSurfaceRefinement.h"
+#include "RaftSimShorelineCrests.h"
 
 #include "RaftSimWaterSurfaceActor.generated.h"
 
 class UProceduralMeshComponent;
 class UMaterialInterface;
+class UMaterialInstanceDynamic;
 class UMaterialParameterCollection;
 class UTextureRenderTarget2D;
 class FRaftSimWaterTextureHistory;
 class ARaftSimRaftActor;
 class URaftSimWaterRuntimeAdapter;
+class URaftSimStatefulDetailComponent;
 struct FCollisionQueryParams;
 struct FHitResult;
 
@@ -271,6 +276,7 @@ public:
         /** Detection lifetime fade, independent of the strongest-site geometry
          * budget. Local spray can use this without changing raft-support relief. */
         float PersistenceWeight = 0.0f;
+        FVector2D FlowDirection = FVector2D(1.,0.);
     };
 
     /** Copies the published breaking sites, strongest first, deduplicated to
@@ -286,6 +292,12 @@ public:
      * use this to change hydraulic wetness or as exact particle collision. */
     bool SampleVisibleCarrierAtRiverCoordinates(const FVector2D& CoordinatesM,
         FVector& OutPositionCm) const;
+    // Support-only lookup. true/dry means an in-grid point was clipped out;
+    // false means this actor cannot currently answer. Does not alter solver
+    // wetness. Paired GPU detail is evaluated at the submitted triangle's
+    // vertices, not bilinearly at the probe position.
+    bool SampleCartesianCarrierSupport(const FVector& WorldPositionCm,
+        float& OutHeightM, bool& OutWet) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Presentation")
     int32 GetBreakingLipTriangleCount() const
@@ -528,6 +540,9 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
     TObjectPtr<UProceduralMeshComponent> LiveVolumeCoreMesh;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Presentation")
+    TObjectPtr<URaftSimShorelineMeshComponent> CartesianShorelineMesh;
+
     /** Non-colliding curled sheets generated only at solver-detected hydraulic
      * jumps. Kept separate from SurfaceMesh so they can overhang without ever
      * feeding their multi-valued geometry back into D3, D4 or buoyancy. */
@@ -592,6 +607,10 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach", meta = (EditCondition = "bFixedCurvedGrid"))
     float FixedCurvedGridCenterStationMeters = 0.0f;
 
+    /** Hydraulic north coordinate for fixed Cartesian surfaces; zero for station/lateral rivers. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach", meta = (EditCondition = "bFixedCurvedGrid"))
+    float FixedCartesianGridCenterNorthMeters = 0.0f;
+
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
     float CurvedGridRecenterDistanceMeters = 32.0f;
 
@@ -649,12 +668,27 @@ protected:
 
 private:
     friend class FRaftSimVisibleSprayCarrierTest;
+    friend class FRaftSimCartesianSurfaceGridTest;
+    friend class FRaftSimCartesianBoulderSurfaceTest;
+    friend class FRaftSimCartesianShorelineSurfaceTest;
+    void PublishLiveVolumeCore(const TArray<FVector>& Positions, const TArray<FVector>& VertexNormals,
+        const TArray<FLinearColor>& Colors, const TArray<FVector2D>& Flow,
+        const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha=1.f);
+    FRaftSimShorelineCrestInput CartesianCrestInput;
+    TArray<uint8> CartesianShoreWet;
+    TArray<uint8> CartesianShoreAvailable;
+    TArray<float> CartesianShoreDepthM;
+    TArray<float> CartesianShoreBedM;
+    int32 CartesianShoreSourceVertexCount = 0;
+    bool bRuntimeSurfaceReady = false;
+    bool TryInitializeRuntimeSurface();
     void BuildGrid();
     void RefreshSurface();
     void UpdateLiveVolumeCoreInterpolation(float DeltaSeconds);
     void UpdatePersistentBreakingSites(
         const TArray<FBreakingSite>& AcceptedCandidates);
     void RecenterCurvedGrid();
+    void CarryRenderedGridHistory(int32 ShiftX, int32 ShiftY);
     void ClampCurvedGridCenter();
     float StationEdgeCoverage(int32 StationIndex) const;
     int32 CorridorEndPadState() const;
@@ -679,6 +713,9 @@ private:
 
     UPROPERTY()
     TObjectPtr<ARaftSimRaftActor> FoamOcclusionRaft;
+    UPROPERTY(Transient) TObjectPtr<URaftSimStatefulDetailComponent> MovingDetail;
+    UPROPERTY(Transient) TObjectPtr<UMaterialInstanceDynamic> MovingDetailMaterial;
+    bool bMovingDetailAttempted=false;
 
     int32 GridStationN = 0;
     int32 GridLateralN = 0;
@@ -686,6 +723,7 @@ private:
     float ResolvedVertexSpacingMeters = 3.0f;
     int32 PresentationAnalysisStride = 1;
     float CurvedGridCenterStationM = 0.0f;
+    float CartesianGridCenterNorthM = 0.0f;
     TArray<FVector> Vertices;
     TArray<FVector2D> RiverCoordinatesM;
     TArray<int32> Triangles;
@@ -693,6 +731,13 @@ private:
     bool bStatefulGPUCarrierReview=false;
     bool bStatefulMotionReview=false;
     bool bStatefulCrestReview=false;
+    // Normal captured gameplay: CPU-only conforming crest geometry, no
+    // experimental liquid solver, shader displacement or secondary sheet.
+    bool bPlayableCrestRefinement=false;
+    TArray<FVector2D> RefinedRiverCoordinates;
+    TArray<FVector4f> CachedPlayableCrestSites;
+    TArray<float> CachedPlayableCoarseCrest, CachedPlayableShore, PlayableCrestCorrections;
+    int32 PlayableCrestCacheHits=0;
     TArray<float> MacroCrestDisplacementCm, MacroCrestShoreWeights;
     TArray<FVector4f> MacroCrestSites; // Two float4 records per physical site.
     UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> MacroSurfaceTexture;
@@ -867,6 +912,10 @@ private:
     // origin lets a back-trace land in the previous field even across a grid
     // recenter.
     TArray<float> FoamField;
+    // Exact effective velocity used by the preceding foam backtrace, including
+    // presentation-only roller/eddy return. UV3 on the Cartesian carrier;
+    // UV1 remains solver/bulk current for all existing physical consumers.
+    TArray<FVector2D> FoamTransportVelocityMetersPerSecond;
     FVector2D FoamFieldOriginM = FVector2D::ZeroVector;
     bool bFoamFieldValid = false;
     double LastRefreshRealSeconds = 0.0;

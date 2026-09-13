@@ -1,7 +1,3 @@
-{
-  "available": false,
-  "passed": false,
-  "reason": "--cpp-solver was not provided.",
-  "run_count": 0,
-  "runs": []
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f515ad3a8814b3dd75108514730ce303cb2d42c5aa395df3c43eabf962e6eb4b
+size 127

@@ -19,6 +19,7 @@
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimCartesianWaterRegions.h"
 #include "RaftSimRiverWaterStreamingActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UnrealClient.h"
@@ -236,7 +237,14 @@ void ARaftSimRaftActor::BeginPlay()
         {
             const bool bCoordinateMapReady = RiverConfig->CoordinateMapPath.IsEmpty() ||
                 WaterAdapter->ConfigureRiverCoordinateMap(RiverConfig->CoordinateMapPath);
-            if (bCoordinateMapReady && RiverConfig->bEnableMovingWindowStreaming)
+            if (bCoordinateMapReady && WaterAdapter->HasCartesianWaterCoordinates() &&
+                RiverConfig->bEnableMovingWindowStreaming)
+            {
+                bRiverConfigured = FRaftSimCartesianWaterRegions::ConfigureAtWorldPosition(
+                    WaterAdapter, RiverConfig->StreamingManifestPath,
+                    RiverConfig->FlowBand.ToString(), GetActorLocation());
+            }
+            else if (bCoordinateMapReady && RiverConfig->bEnableMovingWindowStreaming)
             {
                 const bool bSouthForkSingleSurface =
                     RiverConfig->CookedFieldsDir.Contains(
@@ -283,7 +291,17 @@ void ARaftSimRaftActor::BeginPlay()
                     RiverConfig->bRecenterHydraulicCrux);
             }
         }
-        if (!bRiverConfigured)
+        if (!bRiverConfigured && RiverConfig)
+        {
+            // A broken authored river is not a flat tank. Leave the raft
+            // stationary and report the missing data instead of disguising
+            // integration failures with unrelated water or falling physics.
+            UE_LOG(LogTemp, Error, TEXT("RaftSim authored river initialization failed: %s; raft disabled, no tank fallback"),
+                *RiverConfig->StreamingManifestPath);
+            SetActorTickEnabled(false);
+            return;
+        }
+        if (!RiverConfig)
         {
             WaterAdapter->ConfigureDevTankWindow(
                 FVector2D(-80.0, -80.0), 160.0f, 160.0f, 2.0f,
@@ -1092,8 +1110,17 @@ void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
     // that never expires; guide-paddle (W/S/A/D) cadence ownership ends
     // here and is re-marked by the caller when the tap owns the crew.
     bCrewCommandFromGuidePaddle = false;
-    if (Command != ActiveCrewCommand)
+    if (Command == ActiveCrewCommand)
     {
+        // Reaffirming the current order cancels a different pending call.
+        PendingCrewCommand = Command;
+        CrewReactionRemaining = 0.0f;
+    }
+    else if (Command != PendingCrewCommand || CrewReactionRemaining <= 0.0f)
+    {
+        // Held W/S/A/D refreshes the same command every frame. Only a new
+        // pending order starts reaction latency; refreshing it must not
+        // postpone crew response forever.
         PendingCrewCommand = Command;
         CrewReactionRemaining = CrewReactionSeconds;
     }

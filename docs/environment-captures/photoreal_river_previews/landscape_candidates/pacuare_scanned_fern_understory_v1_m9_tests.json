@@ -1,18 +1,3 @@
-{
-  "schema": "raftsim.environment.focused_native_test_evidence.v1",
-  "recorded_on": "2026-08-04",
-  "platform": "MacEditor Metal SM6",
-  "filter": "RaftSim.M9.FPacuare",
-  "succeeded": 5,
-  "succeeded_with_warnings": 0,
-  "failed": 0,
-  "not_run": 0,
-  "tests": [
-    "RaftSim.M9.FPacuareLiveTransmittingWater",
-    "RaftSim.M9.FPacuareOpaqueRainforestVegetation",
-    "RaftSim.M9.FPacuareOrganicRainforestTerrain",
-    "RaftSim.M9.FPacuareRainforestDefaultLitWater",
-    "RaftSim.M9.FPacuareScannedFernUnderstory"
-  ],
-  "source_report": "/private/tmp/raftsim-pacuare-scanned-fern-v1-final-m9/index.json"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:7c8bdc902cb595be7b63bb99229aa2a5daa9a67bfd272b980de5848abeca56d4
+size 628

@@ -1224,7 +1224,11 @@ UMaterial* LoadOrCreateSouthForkRaftTransmissionWaterParent(
             return nullptr;
         }
     }
-    return Material;
+    // The normal playable carrier already consumes this parent. Keep its
+    // optical microstructure moving with the integrated current and filtered
+    // to the pixel footprint, including after a full material regeneration.
+    return LoadOrCreateCurrentGradientWaterParent(Material, PackagePath,
+        TEXT("SouthFork"), 0.28f, 0.18f, OutSummary, true);
 }
 } // namespace
 
@@ -1565,5 +1569,21 @@ static FAutoConsoleCommand GRefreshSolverCurrentFoamMaterialCommand(
          "dependent South Fork water carrier shader."),
     FConsoleCommandWithArgsDelegate::CreateStatic(
         &HandleRefreshSolverCurrentFoamMaterial));
+
+static FAutoConsoleCommand GRefreshSouthForkCurrentNormalsCommand(
+    TEXT("RaftSim.RefreshSouthForkCurrentNormals"),
+    TEXT("Refresh current normals and transported foam optics on the normal South Fork water parent."),
+    FConsoleCommandDelegate::CreateLambda([]()
+    {
+        const FString Path = TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Materials/"
+            "M_RaftSim_SouthForkRaftTransmissionWaterV4");
+        UMaterial* Material = LoadObject<UMaterial>(nullptr,
+            *(Path + TEXT(".M_RaftSim_SouthForkRaftTransmissionWaterV4")));
+        FString Summary;
+        UMaterial* Updated = LoadOrCreateCurrentGradientWaterParent(Material, Path,
+            TEXT("SouthFork"), 0.28f, 0.18f, Summary, true);
+        UE_LOG(LogRaftSimEditorEnvironment, Display,
+            TEXT("South Fork playable water optics saved=%d\n%s"), Updated ? 1 : 0, *Summary);
+    }));
 
 } // namespace RaftSimEditorEnvironment

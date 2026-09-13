@@ -133,9 +133,14 @@ bool FLiquidBoundaryHaloTest::RunTest(const FString&)
         // a stale type or velocity left from the previous boundary stage.
         AddClearUAVPass(Graph,Graph.CreateUAV(Grids[0]),FVector4f(-13,17,-7,3));
         if (!RaftSimExchangeLiquidBoundaryHalo(Graph,Plan,Grids,Error)) { Graph.Execute();return; }
+        // The advection entry point must likewise copy current signed velocity
+        // and its fourth native channel, without changing any physical owner.
+        AddClearUAVPass(Graph,Graph.CreateUAV(Grids[1]),FVector4f(11,-23,5,2));
+        if (!RaftSimExchangeLiquidVelocityHalo(Graph,Plan,Grids,Error)) { Graph.Execute();return; }
         WrongFormatRejected=!RaftSimExchangeLiquidPressureHalo(Graph,Plan,Grids,Error);
         auto Aliased=Grids;Aliased[1]=Grids[0];
-        AliasedRejected=!RaftSimExchangeLiquidBoundaryHalo(Graph,Plan,Aliased,Error);
+        AliasedRejected=!RaftSimExchangeLiquidBoundaryHalo(Graph,Plan,Aliased,Error) &&
+            !RaftSimExchangeLiquidVelocityHalo(Graph,Plan,Aliased,Error);
         Graph.Execute();Cmd.SubmitAndBlockUntilGPUIdle();
         for (int32 I=0;I<Sizes.Num();++I)
         {
@@ -161,6 +166,7 @@ bool FLiquidBoundaryHaloTest::RunTest(const FString&)
         }
     };
     ExchangeCPU();for (auto& V:Expected[0]) V=FFloat16Color(FLinearColor(-13,17,-7,3));ExchangeCPU();
+    for (auto& V:Expected[1]) V=FFloat16Color(FLinearColor(11,-23,5,2));ExchangeCPU();
     for (int32 I=0;I<Sizes.Num();++I)
         if (FMemory::Memcmp(Actual[I].GetData(),Expected[I].GetData(),Expected[I].Num()*sizeof(FFloat16Color))!=0)
         { AddError(TEXT("Boundary type/solid velocity differs or a physical owner was overwritten"));return false; }

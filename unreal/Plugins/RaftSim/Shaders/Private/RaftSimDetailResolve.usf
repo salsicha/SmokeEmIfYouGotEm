@@ -1,6 +1,8 @@
 #include "/Engine/Public/Platform.ush"
 int2 GridSize;
 float CellMeters;
+float2 GridOriginMeters;
+uint IncludeOriginMetadata;
 StructuredBuffer<float4> MeanFlow;
 StructuredBuffer<float4> DetailState;
 RWTexture2D<float4> SurfaceOutput;
@@ -15,6 +17,11 @@ float Height(int2 p) { p=clamp(p,0,GridSize-1);return DetailState[Index(p)].x*We
 void MainCS(uint3 id:SV_DispatchThreadID)
 {
     int2 p=int2(id.xy);
+    if (IncludeOriginMetadata!=0 && p.y==GridSize.y && p.x<GridSize.x)
+    {
+        SurfaceOutput[p]=float4(GridOriginMeters,CellMeters,1);
+        return;
+    }
     if (any(p>=GridSize))return;
     float weight=Weight(p);
     if (weight<=0) { SurfaceOutput[p]=0;return; }

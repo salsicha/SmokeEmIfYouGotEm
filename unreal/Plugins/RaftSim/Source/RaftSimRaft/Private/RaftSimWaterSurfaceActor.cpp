@@ -1,6 +1,16 @@
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimShorelineMeshComponent.h"
+#include "RaftSimWaterShoreline.h"
+#include "RaftSimWaterSourcePacking.h"
+#include "RaftSimWaterSmoothing.h"
+#include "RaftSimWaterFlowFrame.h"
+#include "RaftSimWaterFlowHistory.h"
 #include "RaftSimWaterCarrierMeshComponent.h"
 #include "RaftSimWaterTextureHistory.h"
+#include "RaftSimFoamTransportFrame.h"
+#include "RaftSimPlayableCrestMesh.h"
+#include "Async/ParallelFor.h"
+#include "ProfilingDebugging/CsvProfiler.h"
 
 #include "CollisionQueryParams.h"
 #include "Engine/GameInstance.h"
@@ -29,6 +39,45 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UObject/UObjectGlobals.h"
+
+CSV_DEFINE_CATEGORY(RaftSimSurface,true);
+
+namespace
+{
+// Opt-in actual-game stage timings. No solver/presentation settings change.
+// Buffer timings and emit one line so individual stages exclude log I/O.
+class FWaterSurfacePerf
+{
+public:
+    explicit FWaterSurfacePerf(const TCHAR* InScope) : Scope(InScope)
+    {
+        static const bool Enabled = FParse::Param(FCommandLine::Get(), TEXT("RaftSimWaterStageTimings"));
+        bEnabled = Enabled;
+        if (bEnabled) Start = Last = FPlatformTime::Seconds();
+    }
+    void Mark(const TCHAR* Name)
+    {
+        if (!bEnabled) return;
+        const double Now = FPlatformTime::Seconds();
+        Stages.Emplace(Name, (Now - Last)*1000.);
+        Last = Now;
+    }
+    ~FWaterSurfacePerf()
+    {
+        if (!bEnabled) return;
+        const double Total = (FPlatformTime::Seconds() - Start)*1000.;
+        FString Line = FString::Printf(TEXT("WaterPerf scope=%s frame=%llu total_ms=%.4f"),
+            Scope, static_cast<unsigned long long>(GFrameCounter), Total);
+        for (const auto& Stage : Stages) Line.Appendf(TEXT(" %s_ms=%.4f"), Stage.Key, Stage.Value);
+        UE_LOG(LogTemp, Display, TEXT("%s"), *Line);
+    }
+private:
+    const TCHAR* Scope;
+    bool bEnabled = false;
+    double Start = 0., Last = 0.;
+    TArray<TPair<const TCHAR*, double>, TInlineAllocator<16>> Stages;
+};
+}
 
 static TAutoConsoleVariable<int32> CVarRaftSimForceBoatWakeTest(
     TEXT("raftsim.ForceBoatWakeTest"), 0,
@@ -406,6 +455,9 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     LiveVolumeCoreMesh->ComponentTags.AddUnique(
         TEXT("RaftSimLiveSolverVolumeCore"));
     LiveVolumeCoreMesh->bUseAsyncCooking = true;
+    CartesianShorelineMesh = CreateDefaultSubobject<URaftSimShorelineMeshComponent>(TEXT("CartesianShorelineMesh"));
+    CartesianShorelineMesh->SetupAttachment(SurfaceMesh);
+    CartesianShorelineMesh->SetVisibility(false);
 
     BreakingLipMesh = CreateDefaultSubobject<UProceduralMeshComponent>(
         TEXT("BreakingLipMesh"));
@@ -1013,7 +1065,12 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
 void ARaftSimWaterSurfaceActor::BeginPlay()
 {
     Super::BeginPlay();
+    TryInitializeRuntimeSurface();
+}
 
+bool ARaftSimWaterSurfaceActor::TryInitializeRuntimeSurface()
+{
+    if (bRuntimeSurfaceReady) return true;
     if (const UGameInstance* GameInstance = GetGameInstance())
     {
         if (URaftSimPhysicsBridgeSubsystem* Bridge =
@@ -1023,9 +1080,15 @@ void ARaftSimWaterSurfaceActor::BeginPlay()
         }
     }
 
+    // A placed carrier may BeginPlay before the raft configures the bridge.
+    // Never cache an unconfigured adapter as a flat/straight river. Retry on
+    // the first ready tick; failed authored launches leave no fake surface.
+    FBox2D Bounds;
+    if (!WaterAdapter || !WaterAdapter->GetLiveWaterFieldBoundsM(Bounds)) return false;
     UpdateRaftFoamExclusionParameters();
     BuildGrid();
     RefreshSurface();
+    return true;
 }
 
 void ARaftSimWaterSurfaceActor::UpdateRaftFoamExclusionParameters()
@@ -1135,6 +1198,7 @@ void ARaftSimWaterSurfaceActor::UpdateRaftFoamExclusionParameters()
 
 void ARaftSimWaterSurfaceActor::BuildGrid()
 {
+    bRuntimeSurfaceReady = true;
     const ARaftSimRiverWaterConfig* RiverWaterConfig = nullptr;
     if (TActorIterator<ARaftSimRiverWaterConfig> ConfigIt(GetWorld()); ConfigIt)
     {
@@ -1160,8 +1224,16 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     const bool bRegisteredRockSurveyReview = RiverWaterConfig &&
         GetWorld()->GetMapName().EndsWith(TEXT("SouthForkRegisteredRockPlayable")) &&
         RiverWaterConfig->CookedFieldsDir == TEXT("tmp/south-fork-survey-hydraulics/1m-mixed-inlet-registered-rock-xy-20260907/engine_review");
-    const bool bSurveyBreakingReview = (bOriginalSurveyReview || bRegisteredRockSurveyReview) &&
-        FParse::Param(FCommandLine::Get(), TEXT("RaftSimSurveyBreakingReview"));
+    const bool bPlayableCapturedSouthFork = RiverWaterConfig &&
+        GetWorld()->GetMapName().EndsWith(TEXT("L_SouthFork_Troublemaker")) &&
+        RiverWaterConfig->CookedFieldsDir == TEXT("physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/troublemaker/playable_flow");
+    // Promote the source-matched shared carrier/support relief only. The
+    // separate particle/stateful experiments still require their review map
+    // and explicit flags; they are not part of ordinary reconstructed play.
+    const bool bSurveyBreakingReview = bPlayableCapturedSouthFork ||
+        ((bOriginalSurveyReview || bRegisteredRockSurveyReview) &&
+            FParse::Param(FCommandLine::Get(), TEXT("RaftSimSurveyBreakingReview")));
+    bPlayableCrestRefinement = bPlayableCapturedSouthFork;
     const bool bStatefulDetailReview = bRegisteredRockSurveyReview && bSurveyBreakingReview &&
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimStatefulDetailReview"));
     bStatefulCrestReview=bStatefulDetailReview && FParse::Param(FCommandLine::Get(),TEXT("RaftSimStatefulCrestReview"));
@@ -1172,11 +1244,14 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     bStatefulDetailGeometryReview=bStatefulDetailReview && (bStatefulGPUCarrierReview ||
         FParse::Param(FCommandLine::Get(),TEXT("RaftSimStatefulDetailGeometryReview")));
     DetailRefinement=FRaftSimSurfaceRefinement();
+    PlayableCrestCorrections.Reset();CachedPlayableCrestSites.Reset();
+    CachedPlayableCoarseCrest.Reset();CachedPlayableShore.Reset();PlayableCrestCacheHits=0;
     ReleaseMacroHistory();MacroSurfaceTexture=nullptr;PreviousMacroSurfaceTexture=nullptr;
     MacroCrestSites.Reset();MacroCrestDisplacementCm.Reset();MacroCrestShoreWeights.Reset();
     if (auto* Carrier=Cast<URaftSimWaterCarrierMeshComponent>(SurfaceMesh))
         Carrier->SetHydraulicBounds(FBox(ForceInit));
-    bSpatialBreakingReview |= bSurveyBreakingReview;
+    bSpatialBreakingReview |= bSurveyBreakingReview ||
+        (RiverWaterConfig && RiverWaterConfig->bEnableLiveSharedBreakingRelief);
     bLiveSurfaceCarrierEnabled =
         RiverWaterConfig &&
         (RiverWaterConfig->bLiveSolverOwnsRuntimeRendering ||
@@ -1634,7 +1709,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         // Same bounded helper and accepted site list feed the carrier and
         // rigid support. The raw solver/captured terrain remain unchanged.
         ResolvedPresentationHydraulicReliefScale = 1.0f;
-        UE_LOG(LogTemp, Display, TEXT("SurveyBreakingReview enabled: shared relief, local envelopes, one surface-lit carrier; production unchanged"));
+        UE_LOG(LogTemp, Display, TEXT("Captured South Fork shared relief enabled: playable=%d, local envelopes, one surface-lit carrier"), bPlayableCapturedSouthFork);
         const bool bCurrentNormalV2 = FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyCurrentNormalV2Review"));
         if (bStatefulDetailReview || bCurrentNormalV2 || FParse::Param(FCommandLine::Get(),TEXT("RaftSimSurveyCurrentNormalReview")))
         {
@@ -1727,6 +1802,16 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 ResolvedRaftLocalFluidHeightfieldStrength > 0.0f,
             ResolvedRaftLocalFluidHeightfieldStrength,
             FoamTextureAdvectionMeters);
+        if (bSingleLiveWaterSurfaceEnabled && WaterAdapter->HasCartesianWaterCoordinates())
+        {
+            const TWeakObjectPtr<ARaftSimWaterSurfaceActor> WeakSurface(this);
+            WaterAdapter->SetRaftSupportCarrierSampler(this,
+                [WeakSurface](const FVector& P,float& HeightM,bool& bWet)
+                {
+                    const auto* Surface=WeakSurface.Get();
+                    return Surface && Surface->SampleCartesianCarrierSupport(P,HeightM,bWet);
+                });
+        }
         // Legacy detail-overlay maps render the AUTHORED band water (baked
         // sculpt + band-gated WPO), which the live solver cannot reconstruct.
         // Mirror it into rigid support from the cooked band field the editor
@@ -1745,7 +1830,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                         *RiverWaterConfig->FlowBand.ToString())));
             WaterAdapter->LoadRaftSupportBandFieldFromFile(BandFieldPath);
         }
-        if (bSingleLiveWaterSurfaceEnabled && RiverWaterConfig)
+        if (bSingleLiveWaterSurfaceEnabled && RiverWaterConfig && !WaterAdapter->HasCartesianWaterCoordinates())
         {
             // The named-rapid solver windows are intentionally smaller than
             // the camera's one-piece river carrier. Continue only the visible
@@ -1881,6 +1966,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     Tangents.SetNum(VertCount);
     Triangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
     FoamField.SetNumZeroed(VertCount);
+    FoamTransportVelocityMetersPerSecond.SetNumZeroed(VertCount);
     bFoamFieldValid = false;
     LiveVolumeCoreWetPresence.SetNumZeroed(VertCount);
     SmoothedBreakingLiftCm.SetNumZeroed(VertCount);
@@ -1898,6 +1984,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     if (bUsesCurvedRiverCoordinates)
     {
         if (bFixedCurvedGrid) CurvedGridCenterStationM=FixedCurvedGridCenterStationMeters;
+        CartesianGridCenterNorthM = WaterAdapter->HasCartesianWaterCoordinates()
+            ? FixedCartesianGridCenterNorthMeters : 0.0f;
         TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld());
         if (RaftIt && !bFixedCurvedGrid)
         {
@@ -1908,6 +1996,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     RaftIt->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
             {
                 CurvedGridCenterStationM = RiverPosition.X;
+                if (WaterAdapter->HasCartesianWaterCoordinates()) CartesianGridCenterNorthM = RiverPosition.Y;
             }
         }
         ClampCurvedGridCenter();
@@ -1919,7 +2008,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         LiveVolumeCoreMaterial->GetVectorParameterValue(
             FHashedMaterialParameterInfo(FName(TEXT("RaftSimWaterUVOrigin"))), ExistingWaterUVOrigin);
     WaterTextureOriginMeters = bRebaseWaterTextureCoordinates
-        ? FVector2D(ComputeWaterTextureOriginMeters(CurvedGridCenterStationM), 0.0f)
+        ? FVector2D(ComputeWaterTextureOriginMeters(CurvedGridCenterStationM),
+            ComputeWaterTextureOriginMeters(CartesianGridCenterNorthM))
         : FVector2D::ZeroVector;
 
     for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
@@ -1931,7 +2021,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
             {
                 const float StationM = CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f +
                     StationIndex * ResolvedVertexSpacingMeters;
-                const float LateralM = -CurvedGridWidthMeters * 0.5f +
+                const float LateralM = CartesianGridCenterNorthM - CurvedGridWidthMeters * 0.5f +
                     LateralIndex * ResolvedVertexSpacingMeters;
                 RiverCoordinatesM[Index] = FVector2D(StationM, LateralM);
                 // Populated in one pass below so tangents can be derived from
@@ -2004,6 +2094,7 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     SurfaceMesh->SetMeshSectionVisible(1, false);
     SurfaceMesh->SetMeshSectionVisible(0, !bSingleLiveWaterSurfaceEnabled);
     LiveVolumeCoreMesh->SetVisibility(false, true);
+    CartesianShorelineMesh->SetVisibility(false);
     if (LiveVolumeCoreMaterial != nullptr)
     {
         LiveVolumeCoreMesh->SetMaterial(0, LiveVolumeCoreMaterial);
@@ -2040,11 +2131,11 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     ResolvedLiveFoamIntensity);
                 if (bSingleLiveWaterSurfaceEnabled)
                 {
-                    // South Fork presents foam directly from the persistent
-                    // solver field. Its lace samples use the same accumulated
-                    // RaftSimFoamAdvectionMeters as the CPU foam transport, so
-                    // they can break up the white body without a panner,
-                    // refresh-phase reset, or texture that outruns the raft.
+                    // South Fork presents the persistent transported foam
+                    // field. Its current parent samples effective surface
+                    // transport through UV3; older parents retain the shared
+                    // advection collection. These legacy parameter overrides
+                    // do not replace the new parent's optical coverage node.
                     // Keep a small floor for connected froth, but never force
                     // the breakup response solid again.
                     VolumeMaterial->SetScalarParameterValue(
@@ -2291,7 +2382,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         // maps deliberately hide their capture ribbon during play; their
         // saved water config therefore promotes this same solver mesh to the
         // river-wide visible carrier with a bounded river-specific profile.
-        if (WaterMaterial->GetPathName().Contains(TEXT("M_RaftSim_LiveRiverSurface")))
+        if (bPlayableCapturedSouthFork ||
+            WaterMaterial->GetPathName().Contains(TEXT("M_RaftSim_LiveRiverSurface")))
         {
             if (UMaterialInstanceDynamic* LiveWaterMaterial =
                     SurfaceMesh->CreateDynamicMaterialInstance(0, WaterMaterial))
@@ -3042,7 +3134,9 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         return;
     }
     const float PreviousCenterStationM = CurvedGridCenterStationM;
+    const float PreviousCenterNorthM = CartesianGridCenterNorthM;
     float DesiredCenterStationM = CurvedGridCenterStationM;
+    float DesiredCenterNorthM = CartesianGridCenterNorthM;
     TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld());
     if (RaftIt)
     {
@@ -3053,10 +3147,12 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
                 RaftIt->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
         {
             DesiredCenterStationM = RiverPosition.X;
+            if (WaterAdapter->HasCartesianWaterCoordinates()) DesiredCenterNorthM = RiverPosition.Y;
         }
     }
     if (FMath::Abs(DesiredCenterStationM - CurvedGridCenterStationM) <
-        CurvedGridRecenterDistanceMeters)
+        CurvedGridRecenterDistanceMeters &&
+        FMath::Abs(DesiredCenterNorthM - CartesianGridCenterNorthM) < CurvedGridRecenterDistanceMeters)
     {
         return;
     }
@@ -3080,16 +3176,19 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
                 SafeSpacingMeters;
     }
     CurvedGridCenterStationM = DesiredCenterStationM;
+    CartesianGridCenterNorthM = DesiredCenterNorthM;
     ClampCurvedGridCenter();
     if (bRebaseWaterTextureCoordinates)
     {
         WaterTextureOriginMeters.X =
             ComputeWaterTextureOriginMeters(CurvedGridCenterStationM);
+        WaterTextureOriginMeters.Y = ComputeWaterTextureOriginMeters(CartesianGridCenterNorthM);
         if (UMaterialInstanceDynamic* Material =
             Cast<UMaterialInstanceDynamic>(LiveVolumeCoreMesh->GetMaterial(0)))
         {
             Material->SetVectorParameterValue(TEXT("RaftSimWaterUVOrigin"),
-                FLinearColor(WaterTextureOriginMeters.X / kWaterTextureRepeatMeters, 0, 0, 0));
+                FLinearColor(WaterTextureOriginMeters.X / kWaterTextureRepeatMeters,
+                    WaterTextureOriginMeters.Y / kWaterTextureRepeatMeters, 0, 0));
         }
     }
     for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
@@ -3100,7 +3199,7 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
             RiverCoordinatesM[Index] = FVector2D(
                 CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f +
                     StationIndex * ResolvedVertexSpacingMeters,
-                -CurvedGridWidthMeters * 0.5f +
+                CartesianGridCenterNorthM - CurvedGridWidthMeters * 0.5f +
                     LateralIndex * ResolvedVertexSpacingMeters);
             UVs[Index] = (RiverCoordinatesM[Index] - WaterTextureOriginMeters) / kWaterTextureRepeatMeters;
         }
@@ -3117,11 +3216,13 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
     const float ShiftCellsExact =
         (CurvedGridCenterStationM - PreviousCenterStationM) / SafeSpacingMeters;
     const int32 ShiftCells = FMath::RoundToInt(ShiftCellsExact);
-    if (ShiftCells != 0 &&
-        FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f)
+    const float ShiftNorthExact = (CartesianGridCenterNorthM - PreviousCenterNorthM) / SafeSpacingMeters;
+    const int32 ShiftNorth = FMath::RoundToInt(ShiftNorthExact);
+    if ((ShiftCells != 0 || ShiftNorth != 0) &&
+        FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f && FMath::Abs(ShiftNorthExact - ShiftNorth) < 0.01f)
     {
         const auto ShiftStationIndexedFloats =
-            [this, ShiftCells](TArray<float>& Values, float FillValue)
+            [this, ShiftCells, ShiftNorth](TArray<float>& Values, float FillValue)
         {
             if (Values.Num() != GridStationN * GridLateralN)
             {
@@ -3133,9 +3234,10 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
                 for (int32 X = 0; X < GridStationN; ++X)
                 {
                     const int32 SourceX = X + ShiftCells;
+                    const int32 SourceY = Y + ShiftNorth;
                     Values[Y * GridStationN + X] =
-                        SourceX >= 0 && SourceX < GridStationN
-                        ? Previous[Y * GridStationN + SourceX]
+                        SourceX >= 0 && SourceX < GridStationN && SourceY >= 0 && SourceY < GridLateralN
+                        ? Previous[SourceY * GridStationN + SourceX]
                         : FillValue;
                 }
             }
@@ -3146,7 +3248,7 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         ShiftStationIndexedFloats(ShoreSmoothedSurfaceZCm, MAX_flt);
         ShiftStationIndexedFloats(VisualBankTerrainZCm, 0.0f);
         const auto ShiftStationIndexedBytes =
-            [this, ShiftCells](TArray<uint8>& Values, uint8 FillValue)
+            [this, ShiftCells, ShiftNorth](TArray<uint8>& Values, uint8 FillValue)
         {
             if (Values.Num() != GridStationN * GridLateralN)
             {
@@ -3158,9 +3260,10 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
                 for (int32 X = 0; X < GridStationN; ++X)
                 {
                     const int32 SourceX = X + ShiftCells;
+                    const int32 SourceY = Y + ShiftNorth;
                     Values[Y * GridStationN + X] =
-                        SourceX >= 0 && SourceX < GridStationN
-                        ? Previous[Y * GridStationN + SourceX]
+                        SourceX >= 0 && SourceX < GridStationN && SourceY >= 0 && SourceY < GridLateralN
+                        ? Previous[SourceY * GridStationN + SourceX]
                         : FillValue;
                 }
             }
@@ -3170,7 +3273,7 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         ShiftStationIndexedBytes(VisualBankProbeState, 0);
         ShiftStationIndexedBytes(VisualFilmCullState, 0);
         const auto ShiftStationIndexedVectors =
-            [this, ShiftCells](
+            [this, ShiftCells, ShiftNorth](
                 TArray<FVector2D>& Values, const FVector2D& FillValue)
         {
             if (Values.Num() != GridStationN * GridLateralN)
@@ -3183,9 +3286,10 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
                 for (int32 X = 0; X < GridStationN; ++X)
                 {
                     const int32 SourceX = X + ShiftCells;
+                    const int32 SourceY = Y + ShiftNorth;
                     Values[Y * GridStationN + X] =
-                        SourceX >= 0 && SourceX < GridStationN
-                        ? Previous[Y * GridStationN + SourceX]
+                        SourceX >= 0 && SourceX < GridStationN && SourceY >= 0 && SourceY < GridLateralN
+                        ? Previous[SourceY * GridStationN + SourceX]
                         : FillValue;
                 }
             }
@@ -3195,6 +3299,31 @@ void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
         ShiftStationIndexedVectors(
             FlowVelocityMetersPerSecond, FVector2D::ZeroVector);
     }
+}
+
+void ARaftSimWaterSurfaceActor::CarryRenderedGridHistory(int32 ShiftX, int32 ShiftY)
+{
+    const auto Carry = [this, ShiftX, ShiftY](auto& History, const auto& Targets)
+    {
+        check(History.Num() == GridStationN * GridLateralN && Targets.Num() == History.Num());
+        const auto Previous = History;
+        for (int32 Y = 0; Y < GridLateralN; ++Y)
+        {
+            for (int32 X = 0; X < GridStationN; ++X)
+            {
+                const int32 Index = Y * GridStationN + X;
+                const int32 SourceX = X + ShiftX;
+                const int32 SourceY = Y + ShiftY;
+                History[Index] = SourceX >= 0 && SourceX < GridStationN && SourceY >= 0 && SourceY < GridLateralN
+                    ? Previous[SourceY * GridStationN + SourceX] : Targets[Index];
+            }
+        }
+    };
+    Carry(RenderedLiveVolumeCoreVertices, LiveVolumeCoreVertices);
+    Carry(RenderedLiveVolumeCoreNormals, LiveVolumeCoreNormals);
+    Carry(RenderedLiveVolumeCoreVertexColors, LiveVolumeCoreVertexColors);
+    Carry(RenderedLiveVolumeCoreFlowVelocity, FlowVelocityMetersPerSecond);
+    Carry(RenderedLiveVolumeCoreWakeData, BoatWakePresentationData);
 }
 
 int32 ARaftSimWaterSurfaceActor::CorridorEndPadState() const
@@ -3247,6 +3376,26 @@ float ARaftSimWaterSurfaceActor::StationEdgeCoverage(int32 StationIndex) const
 
 void ARaftSimWaterSurfaceActor::ClampCurvedGridCenter()
 {
+    FBox2D Bounds;
+    if (WaterAdapter && WaterAdapter->GetCartesianWaterBoundsM(Bounds))
+    {
+        // Use an inward-rounded global presentation lattice on BOTH axes.
+        // Bounds are hydraulic coordinates, never global gameplay chainage.
+        const float Spacing = FMath::Max(ResolvedVertexSpacingMeters, KINDA_SMALL_NUMBER);
+        const auto ClampAxis = [Spacing](float Desired, double Minimum, double Maximum, float Extent, int32 Samples)
+        {
+            const double Low = FMath::CeilToDouble((Minimum + Extent * .5) / Spacing) * Spacing;
+            // BuildGrid rounds the vertex count: use its actual last vertex,
+            // not the nominal extent, when the extent is not spacing-divisible.
+            const double ActualSpan = FMath::Max(Samples-1, 1) * static_cast<double>(Spacing);
+            const double High = FMath::FloorToDouble((Maximum + Extent * .5 - ActualSpan) / Spacing) * Spacing;
+            checkf(Low <= High, TEXT("Cartesian water carrier is larger than its coordinate domain"));
+            return static_cast<float>(FMath::Clamp(FMath::RoundToDouble(Desired / Spacing) * Spacing, Low, High));
+        };
+        CurvedGridCenterStationM = ClampAxis(CurvedGridCenterStationM, Bounds.Min.X, Bounds.Max.X, CurvedGridLengthMeters, GridStationN);
+        CartesianGridCenterNorthM = ClampAxis(CartesianGridCenterNorthM, Bounds.Min.Y, Bounds.Max.Y, CurvedGridWidthMeters, GridLateralN);
+        return;
+    }
     float MinimumStationM = 0.0f;
     float MaximumStationM = 0.0f;
     if (!WaterAdapter ||
@@ -3298,7 +3447,7 @@ void ARaftSimWaterSurfaceActor::UpdateCurvedGridPlanarGeometry()
             const FVector FlowTangent = FVector(
                 Next.X - Previous.X, Next.Y - Previous.Y, 0.0f).GetSafeNormal();
             Tangents[LateralIndex * GridStationN + StationIndex] =
-                FProcMeshTangent(FlowTangent, false);
+                FProcMeshTangent(FlowTangent, WaterAdapter && WaterAdapter->GetRiverWorldYSign() < 0);
         }
     }
 }
@@ -3386,6 +3535,8 @@ void ARaftSimWaterSurfaceActor::UpdatePersistentBreakingSites(
                 Smoothed.PresentationCoverage,
                 Candidate.PresentationCoverage,
                 PositionBlend);
+            Smoothed.FlowDirection = RaftSimWaterFlowFrame::BlendDirections(
+                Smoothed.FlowDirection,Candidate.FlowDirection,PositionBlend);
             Smoothed.HydraulicCrestDimensionsMeters = FMath::Lerp(
                 Smoothed.HydraulicCrestDimensionsMeters,
                 Candidate.HydraulicCrestDimensionsMeters, PositionBlend);
@@ -3500,6 +3651,7 @@ void ARaftSimWaterSurfaceActor::ReleaseMacroHistory()
 
 void ARaftSimWaterSurfaceActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    if (WaterAdapter) WaterAdapter->ClearRaftSupportCarrierSampler(this);
     ReleaseMacroHistory();
     Super::EndPlay(EndPlayReason);
 }
@@ -3589,7 +3741,7 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
         for (int32 I=0;I+2<ReflectedTriangles.Num();I+=3) Swap(ReflectedTriangles[I+1],ReflectedTriangles[I+2]);
         return ReflectedTriangles;
     };
-    if (!bStatefulDetailGeometryReview)
+    if (!bStatefulDetailGeometryReview && !bPlayableCrestRefinement)
     {
         if (bCreate)SurfaceMesh->CreateMeshSection_LinearColor(0,Vertices,WorldWinding(Triangles),Normals,UVs,
             FlowVelocityMetersPerSecond,BoatWakePresentationData,EmptyUVs,Colors,Tangents,false);
@@ -3605,12 +3757,22 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
     }
     if (bRebuild)
     {
-        const int32 Levels=bStatefulCrestReview && FParse::Param(FCommandLine::Get(),TEXT("RaftSimFineDetailReview")) ? 3 : 2;
-        if (!DetailRefinement.Build(RiverCoordinatesM,Triangles,FBox2D(FVector2D(-32,-32),FVector2D(32,32)),Levels))
+        const int32 Levels=bPlayableCrestRefinement ||
+            (bStatefulCrestReview && FParse::Param(FCommandLine::Get(),TEXT("RaftSimFineDetailReview"))) ? 3 : 2;
+        const FBox2D RefinementWindow = bPlayableCrestRefinement
+            ? FBox2D(FVector2D(-18,-18),FVector2D(30,18))
+            : FBox2D(FVector2D(-32,-32),FVector2D(32,32));
+        // Third-level detail covers the steep settled crests, not the full
+        // bounding bank rectangle. Red/green stitching remains conforming.
+        const FBox2D FinestWindow(FVector2D(4,-8),FVector2D(17,12));
+        if (!DetailRefinement.Build(RiverCoordinatesM,Triangles,RefinementWindow,Levels,
+            bPlayableCrestRefinement ? &FinestWindow : nullptr))
         {
             UE_LOG(LogTemp,Error,TEXT("Stateful detail geometry rejected invalid source mesh"));return;
         }
         DetailRefinementOrigin=RiverCoordinatesM[0];
+        PlayableCrestCorrections.Reset();
+        DetailRefinement.Expand(RiverCoordinatesM,RefinedRiverCoordinates);
         if (bStatefulGPUCarrierReview)
         {
             TArray<FVector2D> GridCoordinates;GridCoordinates.SetNumUninitialized(Vertices.Num());
@@ -3633,6 +3795,81 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
             (RefinedTangents[P.X].TangentX+RefinedTangents[P.Y].TangentX).GetSafeNormal(),RefinedTangents[P.X].bFlipTangentY);
     }
     for (FVector& N:RefinedNormals)N=N.GetSafeNormal();
+    if (bPlayableCrestRefinement && MacroCrestDisplacementCm.Num()==Vertices.Num())
+    {
+        TArray<URaftSimWaterRuntimeAdapter::FSupportBreakingSite> Sites;
+        for (int32 I=0; I+1<MacroCrestSites.Num(); I+=2)
+        {
+            const auto& G=MacroCrestSites[I]; const auto& P=MacroCrestSites[I+1];
+            auto& S=Sites.AddDefaulted_GetRef();
+            S.RiverCoordinatesMeters=FVector2D(G.X,G.Y);
+            S.PhysicalCrestHeightMeters=G.Z; S.PhysicalCrestLengthMeters=G.W;
+            S.Intensity=P.X; S.SpillingFraction=P.Y; S.bLocalEnvelopeCap=P.Z!=0;
+            S.FlowDirection=RaftSimWaterFlowFrame::FromAngle(P.W);
+        }
+        // Exact input comparisons, not a quantized hash or a tolerance. A
+        // changed physical profile/shore immediately invalidates the cache.
+        const bool bRecomputeCrest=PlayableCrestCorrections.Num()!=RefinedVertices.Num() ||
+            CachedPlayableCrestSites!=MacroCrestSites || CachedPlayableCoarseCrest!=MacroCrestDisplacementCm ||
+            CachedPlayableShore!=MacroCrestShoreWeights;
+        RaftSimPlayableCrestMesh::Reconstruct(DetailRefinement,RefinedRiverCoordinates,
+            MacroCrestDisplacementCm,MacroCrestShoreWeights,Sites,BreakingCrestLiftMeters,
+            ResolvedVertexSpacingMeters,ResolvedPresentationHydraulicReliefScale,
+            WaterAdapter ? WaterAdapter->GetRiverWorldYSign() : 1.0f,RefinedVertices,RefinedNormals,
+            &PlayableCrestCorrections,bRecomputeCrest);
+        if(bRecomputeCrest)
+        {
+            CachedPlayableCrestSites=MacroCrestSites;CachedPlayableCoarseCrest=MacroCrestDisplacementCm;
+            CachedPlayableShore=MacroCrestShoreWeights;
+        }
+        else if(++PlayableCrestCacheHits==60)
+            UE_LOG(LogTemp,Display,TEXT("Playable crest cache: 60 exact-input reuses; no height approximation"));
+        for(int32 I=0;I<RefinedTangents.Num();++I)
+        {
+            const FVector N=RefinedNormals[I];
+            auto& T=RefinedTangents[I].TangentX;
+            T=(T-N*FVector::DotProduct(T,N)).GetSafeNormal();
+        }
+        FString AuditPath;
+        if (GetWorld()->GetTimeSeconds()>=10 &&
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestSamplingAudit="),AuditPath) &&
+            !FPaths::FileExists(AuditPath+TEXT(".mesh.json")))
+        {
+            TArray<float> BaseZ,ExpandedBaseZ,Shore;
+            for(int32 I=0;I<Vertices.Num();++I) BaseZ.Add(Vertices[I].Z-MacroCrestDisplacementCm[I]);
+            DetailRefinement.Expand(BaseZ,ExpandedBaseZ);
+            DetailRefinement.Expand(MacroCrestShoreWeights,Shore);
+            double MaxError=0,MaxSourceChange=0;
+            int32 Samples=0;
+            for(int32 I=0;I<Vertices.Num();++I)
+                MaxSourceChange=FMath::Max(MaxSourceChange,FVector::Distance(Vertices[I],RefinedVertices[I]));
+            for(int32 T=0;T<DetailRefinement.Triangles.Num();T+=3)
+            {
+                const int32 A=DetailRefinement.Triangles[T],B=DetailRefinement.Triangles[T+1],C=DetailRefinement.Triangles[T+2];
+                const FVector2D P=(RefinedRiverCoordinates[A]+RefinedRiverCoordinates[B]+RefinedRiverCoordinates[C])/3;
+                const double Weight=(Shore[A]+Shore[B]+Shore[C])/3;
+                if(Weight<=0)continue;
+                const double Expected=URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
+                    P,Sites,BreakingCrestLiftMeters,ResolvedVertexSpacingMeters)*ResolvedPresentationHydraulicReliefScale*Weight;
+                const double Submitted=(RefinedVertices[A].Z+RefinedVertices[B].Z+RefinedVertices[C].Z-
+                    ExpandedBaseZ[A]-ExpandedBaseZ[B]-ExpandedBaseZ[C])/300;
+                MaxError=FMath::Max(MaxError,FMath::Abs(Expected-Submitted));++Samples;
+            }
+            auto Report=MakeShared<FJsonObject>();
+            Report->SetStringField(TEXT("map"),GetWorld()->GetMapName());
+            Report->SetStringField(TEXT("scope"),TEXT("Actual CPU carrier crest component at triangle centroids; other base relief excluded; unchanged hydraulic samples."));
+            Report->SetNumberField(TEXT("source_vertices"),Vertices.Num());
+            Report->SetNumberField(TEXT("submitted_vertices"),RefinedVertices.Num());
+            Report->SetNumberField(TEXT("submitted_triangles"),DetailRefinement.Triangles.Num()/3);
+            Report->SetNumberField(TEXT("maximum_source_vertex_change_cm"),MaxSourceChange);
+            Report->SetNumberField(TEXT("maximum_centroid_crest_error_m"),MaxError);
+            Report->SetNumberField(TEXT("sample_count"),Samples);
+            FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+            FFileHelper::SaveStringToFile(Json,*(AuditPath+TEXT(".mesh.json")));
+            UE_LOG(LogTemp,Display,TEXT("Playable crest mesh: vertices=%d triangles=%d centroid_error_m=%.7f source_change_cm=%.7f"),
+                RefinedVertices.Num(),DetailRefinement.Triangles.Num()/3,MaxError,MaxSourceChange);
+        }
+    }
     if (bCreate || bRebuild)SurfaceMesh->CreateMeshSection_LinearColor(0,RefinedVertices,WorldWinding(DetailRefinement.Triangles),
         RefinedNormals,RefinedUVs,RefinedFlow,RefinedWake,bStatefulGPUCarrierReview ? RefinedMacroCoordinates : EmptyUVs,RefinedColors,RefinedTangents,false);
     else SurfaceMesh->UpdateMeshSection_LinearColor(0,RefinedVertices,RefinedNormals,
@@ -3641,19 +3878,40 @@ void ARaftSimWaterSurfaceActor::UpdateSurfaceCarrierMesh(bool bCreate,const TArr
 
 void ARaftSimWaterSurfaceActor::RefreshSurface()
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimSurface,Refresh);
+    FWaterSurfacePerf Perf(TEXT("refresh"));
+    const bool bCartesianFlow = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates();
+    const auto FlowDirectionFor = [bCartesianFlow](const FRaftSimWaterSample& Sample)
+    {
+        // Refresh samples the field API, whose velocity is already hydraulic
+        // XY. Applying the world north reflection here would reverse it twice.
+        return bCartesianFlow ? RaftSimWaterFlowFrame::Direction(FVector2D(
+            Sample.VelocityMetersPerSecond.X,Sample.VelocityMetersPerSecond.Y))
+            : FVector2D(1.,0.);
+    };
     const double RefreshStartSeconds = FPlatformTime::Seconds();
     const bool bCrestLocalizedFoam = bSharedBreakingReliefEnabled &&
         CVarRaftSimChilkoCrestFoam.GetValueOnGameThread() != 0;
     const float PreviousGridCenterStationM = CurvedGridCenterStationM;
+    const float PreviousGridCenterNorthM = CartesianGridCenterNorthM;
     RecenterCurvedGrid();
     const bool bGridRecentredThisRefresh = !FMath::IsNearlyEqual(
         PreviousGridCenterStationM,
         CurvedGridCenterStationM,
-        KINDA_SMALL_NUMBER);
+        KINDA_SMALL_NUMBER) || !FMath::IsNearlyEqual(PreviousGridCenterNorthM, CartesianGridCenterNorthM, KINDA_SMALL_NUMBER);
     if (bGridRecentredThisRefresh)
     {
         LogWaterRenderStateEvent(GetWorld(), TEXT("grid_recentre"));
     }
+    FBox2D LiveCropBounds(ForceInit);
+    const bool bHasLiveCropBounds = bCartesianFlow && WaterAdapter->GetLiveWaterFieldBoundsM(LiveCropBounds);
+    const auto CropAuthorityFor = [this, bCartesianFlow, bHasLiveCropBounds, LiveCropBounds](int32 Index)
+    {
+        if (bCartesianFlow)
+            return bHasLiveCropBounds ? RaftSimWaterFlowFrame::CropAuthority(RiverCoordinatesM[Index], LiveCropBounds, 30.f) : 0.f;
+        const int32 X = Index % GridStationN;
+        return StationSolverCropAuthority.IsValidIndex(X) ? StationSolverCropAuthority[X] : 1.f;
+    };
     TArray<uint8> WetVertexMask;
     WetVertexMask.Init(0, Vertices.Num());
     TArray<uint8> LiveSolverWetVertexMask;
@@ -3667,6 +3925,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     FeatheredBaselineWet.SetNumZeroed(Vertices.Num());
     TArray<FRaftSimWaterSample> WaterSamples;
     WaterSamples.SetNum(Vertices.Num());
+    if (bCartesianFlow) CartesianShoreAvailable.Init(0, Vertices.Num());
     TArray<float> PresentationSurfaceHeightMeters;
     PresentationSurfaceHeightMeters.Init(0.0f, Vertices.Num());
     TArray<float> HydraulicReliefMeters;
@@ -3694,16 +3953,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // the outer bank rings.
     TArray<uint8> BaselineKeepProbeWanted;
     BaselineKeepProbeWanted.Init(0, Vertices.Num());
-    if (WaterAdapter != nullptr)
-    {
-        const FTransform BaselineKeepTransform =
+    const FTransform BaselineKeepTransform =
             SurfaceMesh ? SurfaceMesh->GetComponentTransform()
                         : GetActorTransform();
-        for (int32 Y = 0; Y < GridLateralN; ++Y)
-        {
-            for (int32 X = 0; X < GridStationN; ++X)
-            {
-                const int32 Index = Y * GridStationN + X;
+    const auto SampleVertex = [&](int32 Index)
+    {
                 const FVector& V = Vertices[Index];
                 FRaftSimWaterSample& Sample = WaterSamples[Index];
                 const bool bSampled = bUsesCurvedRiverCoordinates
@@ -3722,6 +3976,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         SamplePresentationBaselineFieldAtRiverCoordinates(
                             RiverCoordinatesM[Index], Sample);
                 SolverSampledVertexMask[Index] = bSampled ? 1 : 0;
+                if (bCartesianFlow) CartesianShoreAvailable[Index] = bSampled || bBaselineSampled;
                 LiveSolverWetVertexMask[Index] =
                     bSampled && Sample.bWet ? 1 : 0;
                 if (bBaselineSampled && Sample.bWet)
@@ -3735,11 +3990,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // refresh's authority is still fading in, a solver-dry /
                 // baseline-wet cell adopts the baseline sample as ordinary
                 // water and fades by presence instead.
-                const int32 StationIndex = Index % GridStationN;
-                const float CropAuthority =
-                    StationSolverCropAuthority.IsValidIndex(StationIndex)
-                    ? StationSolverCropAuthority[StationIndex]
-                    : 1.0f;
+                const float CropAuthority = CropAuthorityFor(Index);
                 // Visual-submersion keep: the live solver's wetting is
                 // coarser than the visible margin, so as the crop's
                 // authority sweeps in with the raft its dry verdicts drained
@@ -3862,14 +4113,28 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     PresentationSurfaceHeightMeters[Index] =
                         Sample.SurfaceHeightMeters;
                 }
-            }
-        }
-    }
+    };
+    const auto SampleLiveVertices = [&](bool bConcurrent)
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,SourceSamples);
+        if (!WaterAdapter) return;
+        // Cartesian samplers read a stable live solver and immutable atlas.
+        // Each task writes only its own element; join before any solver step,
+        // probe, field resize, or following presentation pass. Legacy world /
+        // route queries retain their original serial execution and ordering.
+        if (bConcurrent) ParallelFor(TEXT("RaftSimCartesianSourceSamples"),Vertices.Num(),256,
+            SampleVertex,EParallelForFlags::Unbalanced);
+        else for (int32 I=0; I<Vertices.Num(); ++I) SampleVertex(I);
+    };
+    const bool bConcurrentSource=bCartesianFlow && bUsesCurvedRiverCoordinates;
+    SampleLiveVertices(bConcurrentSource);
 
     // Recompute the crop's per-station wet/dry authority for the next
     // refresh: full solver ownership deep inside the covered stations,
     // feathering to baseline ownership over ~30 m at the crop's travelling
-    // ends. Two sweeps give distance-to-uncovered in station steps.
+    // ends. Two sweeps give distance-to-uncovered in station steps. Cartesian
+    // fields instead use exact current live bounds on all four sides above.
+    if (!bCartesianFlow)
     {
         if (StationSolverCropAuthority.Num() != GridStationN)
         {
@@ -3922,30 +4187,24 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // bar moving with the raft. This modifies the local render samples only;
     // the adapter's solver field, force sampling and wet/dry authority remain
     // untouched.
-    if (bSingleLiveWaterSurfaceEnabled && bUsesCurvedRiverCoordinates &&
-        WaterAdapter != nullptr)
+    const auto BlendSourceVertex = [&](int32 Index)
     {
-        for (int32 Index = 0; Index < WaterSamples.Num(); ++Index)
-        {
             if (SolverSampledVertexMask[Index] == 0 ||
                 WetVertexMask[Index] == 0)
             {
-                continue;
+                return;
             }
-            const int32 X = Index % GridStationN;
-            const float Authority = StationSolverCropAuthority.IsValidIndex(X)
-                ? StationSolverCropAuthority[X]
-                : 1.0f;
+            const float Authority = CropAuthorityFor(Index);
             if (Authority >= 0.999f)
             {
-                continue;
+                return;
             }
             FRaftSimWaterSample BaselineSample;
             if (!WaterAdapter->SamplePresentationBaselineFieldAtRiverCoordinates(
                     RiverCoordinatesM[Index], BaselineSample) ||
                 !BaselineSample.bWet)
             {
-                continue;
+                return;
             }
             const float Blend = Authority * Authority *
                 (3.0f - 2.0f * Authority);
@@ -3965,9 +4224,67 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 Blend);
             PresentationSurfaceHeightMeters[Index] =
                 Sample.SurfaceHeightMeters;
+    };
+    const auto BlendSourceVertices = [&](bool bConcurrent)
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,SourceHandover);
+        if (!bSingleLiveWaterSurfaceEnabled || !bUsesCurvedRiverCoordinates || !WaterAdapter) return;
+        if (bConcurrent) ParallelFor(TEXT("RaftSimCartesianSourceHandover"),WaterSamples.Num(),256,
+            BlendSourceVertex,EParallelForFlags::Unbalanced);
+        else for (int32 I=0; I<WaterSamples.Num(); ++I) BlendSourceVertex(I);
+    };
+    BlendSourceVertices(bConcurrentSource);
+
+    // Opt-in actual-state equivalence audit, excluded from ordinary/timing runs.
+    // Restore the parallel outputs after rerunning both passes from clean arrays.
+    static const FString SourceAuditPath=[]()
+    { FString P; FParse::Value(FCommandLine::Get(),TEXT("RaftSimWaterSourceAudit="),P); return P; }();
+    static bool bSourceAuditWritten=false;
+    if (!SourceAuditPath.IsEmpty() && !bSourceAuditWritten && bConcurrentSource &&
+        GetWorld() && GetWorld()->GetTimeSeconds()>=10.)
+    {
+        bSourceAuditWritten=true;
+        auto SavedSamples=WaterSamples;
+        auto SavedWet=WetVertexMask, SavedLiveWet=LiveSolverWetVertexMask;
+        auto SavedSampled=SolverSampledVertexMask, SavedAvailable=CartesianShoreAvailable;
+        auto SavedProbeWanted=BaselineKeepProbeWanted;
+        auto SavedFeather=FeatheredBaselineWet, SavedHeights=PresentationSurfaceHeightMeters;
+        const int32 Count=Vertices.Num();
+        WaterSamples.Init(FRaftSimWaterSample{},Count);
+        WetVertexMask.Init(0,Count); LiveSolverWetVertexMask.Init(0,Count);
+        SolverSampledVertexMask.Init(0,Count); CartesianShoreAvailable.Init(0,Count);
+        BaselineKeepProbeWanted.Init(0,Count); FeatheredBaselineWet.Init(0.f,Count);
+        PresentationSurfaceHeightMeters.Init(0.f,Count);
+        SampleLiveVertices(false); BlendSourceVertices(false);
+        int32 DifferentSamples=0;
+        for (int32 I=0; I<Count; ++I)
+        {
+            const auto& A=SavedSamples[I]; const auto& B=WaterSamples[I];
+            DifferentSamples += !(A.WorldPosition==B.WorldPosition && A.SurfaceHeightMeters==B.SurfaceHeightMeters &&
+                A.BedHeightMeters==B.BedHeightMeters && A.DepthMeters==B.DepthMeters &&
+                A.VelocityMetersPerSecond==B.VelocityMetersPerSecond && A.SurfaceNormal==B.SurfaceNormal && A.bWet==B.bWet);
         }
+        const bool SameFields=SavedWet==WetVertexMask && SavedLiveWet==LiveSolverWetVertexMask &&
+            SavedSampled==SolverSampledVertexMask && SavedAvailable==CartesianShoreAvailable &&
+            SavedProbeWanted==BaselineKeepProbeWanted && SavedFeather==FeatheredBaselineWet &&
+            SavedHeights==PresentationSurfaceHeightMeters;
+        WaterSamples=MoveTemp(SavedSamples); WetVertexMask=MoveTemp(SavedWet);
+        LiveSolverWetVertexMask=MoveTemp(SavedLiveWet); SolverSampledVertexMask=MoveTemp(SavedSampled);
+        CartesianShoreAvailable=MoveTemp(SavedAvailable); BaselineKeepProbeWanted=MoveTemp(SavedProbeWanted);
+        FeatheredBaselineWet=MoveTemp(SavedFeather); PresentationSurfaceHeightMeters=MoveTemp(SavedHeights);
+        TSharedRef<FJsonObject> Audit=MakeShared<FJsonObject>();
+        Audit->SetStringField(TEXT("scope"),TEXT("Exact serial/parallel live-source sampling, bank decisions and crop handover on the same actual runtime state; excludes later relief/foam/mesh stages and full visual acceptance."));
+        Audit->SetStringField(TEXT("map"),GetWorld()->GetMapName());
+        Audit->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
+        Audit->SetNumberField(TEXT("samples"),Count);
+        Audit->SetNumberField(TEXT("different_samples"),DifferentSamples);
+        Audit->SetBoolField(TEXT("identical_masks_probe_requests_feather_and_heights"),SameFields);
+        Audit->SetBoolField(TEXT("passed"),DifferentSamples==0 && SameFields);
+        FString Json; auto Writer=TJsonWriterFactory<>::Create(&Json); FJsonSerializer::Serialize(Audit,Writer);
+        if (!IFileManager::Get().FileExists(*SourceAuditPath)) FFileHelper::SaveStringToFile(Json,*SourceAuditPath);
     }
 
+    Perf.Mark(TEXT("source_samples"));
     // Cooked visualization cells can otherwise read as broad transverse
     // steps. The optional cardinal filter retains the original three-metre
     // physical neighbourhood after render subdivision. It is Jacobi-style
@@ -3981,6 +4298,21 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     // retaining feature-scale curvature.
     TArray<float> HydraulicSourceSurfaceHeightMeters =
         PresentationSurfaceHeightMeters;
+    const bool bNativeMean=bCartesianFlow && bSingleLiveWaterSurfaceEnabled;
+    bool bNeedsOptical=false;
+    FString SmoothingAuditPath;
+    bool bAuditSmoothing=false;
+#if !UE_BUILD_SHIPPING
+    FString RequestedDecomposition;
+    bNeedsOptical=bNativeMean && GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimSurfaceDecompositionAudit="),RequestedDecomposition) &&
+        !FPaths::FileExists(RequestedDecomposition);
+    // Same-binary timing control; no stage/geometry settings are changed.
+    bNeedsOptical |= FParse::Param(FCommandLine::Get(),TEXT("RaftSimRetainDiscardedOpticalPasses"));
+    bAuditSmoothing=bNativeMean && GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimSmoothingElisionAudit="),SmoothingAuditPath) &&
+        !FPaths::FileExists(SmoothingAuditPath);
+#endif
     if (bLivePresentationSurfaceSmoothingEnabled &&
         ResolvedPresentationSurfaceSmoothingStrength > 0.0f)
     {
@@ -3988,15 +4320,16 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // Sixteen optical passes predate the UV precision repair. Keep the
         // baseline until visual review, but allow a South Fork-only ablation
         // without simultaneously changing the four-pass hydraulic sources.
-        const int32 OpticalPassCount = bSouthForkOpticalSmoothingReview
+        const int32 ConfiguredOpticalPassCount = bSouthForkOpticalSmoothingReview
             ? FMath::Clamp(
                   CVarRaftSimSouthForkOpticalSmoothingPasses.GetValueOnGameThread(),
                   1, 16)
             : bSingleLiveWaterSurfaceEnabled ? 16 : 1;
         const int32 HydraulicPassCount = bSingleLiveWaterSurfaceEnabled ? 4 : 1;
-        const int32 SmoothingPassCount =
-            FMath::Max(OpticalPassCount, HydraulicPassCount);
-        TArray<float> OpticalSurfaceHeightMeters;
+        const int32 OpticalPassCount=RaftSimWaterSmoothing::OpticalPassCount(
+            bNativeMean,bNeedsOptical,ConfiguredOpticalPassCount);
+        TArray<float> AuditSource;
+        if (bAuditSmoothing) AuditSource=PresentationSurfaceHeightMeters;
         if (LastLoggedOpticalSmoothingPassCount != OpticalPassCount)
         {
             UE_LOG(LogTemp, Display,
@@ -4005,65 +4338,83 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 bSouthForkOpticalSmoothingReview ? 1 : 0);
             LastLoggedOpticalSmoothingPassCount = OpticalPassCount;
         }
-        for (int32 PassIndex = 0;
-             PassIndex < SmoothingPassCount;
-             ++PassIndex)
         {
-            const TArray<float> PreviousPassSurfaceHeightMeters =
-                PresentationSurfaceHeightMeters;
-            for (int32 Y = Stride; Y < GridLateralN - Stride; ++Y)
-            {
-                for (int32 X = Stride; X < GridStationN - Stride; ++X)
-                {
-                    const int32 Index = Y * GridStationN + X;
-                    const int32 UpstreamIndex = Index - Stride;
-                    const int32 DownstreamIndex = Index + Stride;
-                    const int32 RiverRightIndex =
-                        Index - Stride * GridStationN;
-                    const int32 RiverLeftIndex =
-                        Index + Stride * GridStationN;
-                    if (WetVertexMask[Index] == 0 ||
-                        WetVertexMask[UpstreamIndex] == 0 ||
-                        WetVertexMask[DownstreamIndex] == 0 ||
-                        WetVertexMask[RiverRightIndex] == 0 ||
-                        WetVertexMask[RiverLeftIndex] == 0)
-                    {
-                        continue;
-                    }
-                    PresentationSurfaceHeightMeters[Index] =
-                        ComputePresentationSmoothedSurfaceHeightMeters(
-                            PreviousPassSurfaceHeightMeters[Index],
-                            PreviousPassSurfaceHeightMeters[UpstreamIndex],
-                            PreviousPassSurfaceHeightMeters[DownstreamIndex],
-                            PreviousPassSurfaceHeightMeters[RiverRightIndex],
-                            PreviousPassSurfaceHeightMeters[RiverLeftIndex],
-                            ResolvedPresentationSurfaceSmoothingStrength);
-                }
-            }
-            if (PassIndex + 1 == HydraulicPassCount)
-            {
-                HydraulicSourceSurfaceHeightMeters =
-                    PresentationSurfaceHeightMeters;
-            }
-            if (PassIndex + 1 == OpticalPassCount &&
-                OpticalPassCount < SmoothingPassCount)
-            {
-                OpticalSurfaceHeightMeters = PresentationSurfaceHeightMeters;
-            }
+            CSV_SCOPED_TIMING_STAT(RaftSimSurface,OpticalFilter);
+            RaftSimWaterSmoothing::Apply(PresentationSurfaceHeightMeters,WetVertexMask,
+                GridStationN,GridLateralN,Stride,ResolvedPresentationSurfaceSmoothingStrength,
+                OpticalPassCount,HydraulicPassCount,HydraulicSourceSurfaceHeightMeters);
         }
-        if (!OpticalSurfaceHeightMeters.IsEmpty())
+#if !UE_BUILD_SHIPPING
+        if (bAuditSmoothing)
         {
-            PresentationSurfaceHeightMeters = MoveTemp(OpticalSurfaceHeightMeters);
+            TArray<float> LegacyHydraulic;
+            RaftSimWaterSmoothing::Apply(AuditSource,WetVertexMask,GridStationN,GridLateralN,
+                Stride,ResolvedPresentationSurfaceSmoothingStrength,ConfiguredOpticalPassCount,
+                HydraulicPassCount,LegacyHydraulic);
+            int32 DifferentBase=0,DifferentHydraulic=0;
+            for (int32 I=0;I<AuditSource.Num();++I)
+            {
+                const float Legacy=WetVertexMask[I] ? WaterSamples[I].SurfaceHeightMeters : AuditSource[I];
+                const float Fast=WetVertexMask[I] ? WaterSamples[I].SurfaceHeightMeters : PresentationSurfaceHeightMeters[I];
+                DifferentBase+=Legacy!=Fast;
+                DifferentHydraulic+=LegacyHydraulic[I]!=HydraulicSourceSurfaceHeightMeters[I];
+            }
+            auto Report=MakeShared<FJsonObject>();
+            Report->SetStringField(TEXT("scope"),TEXT("Same actual source state and wet mask: native base and hydraulic stage arrays with/without discarded optical passes. Excludes subsequent frame scheduling, GPU state and visual/performance acceptance."));
+            Report->SetNumberField(TEXT("source_vertices"),AuditSource.Num());
+            Report->SetNumberField(TEXT("executed_passes"),FMath::Max(OpticalPassCount,HydraulicPassCount));
+            Report->SetNumberField(TEXT("legacy_passes"),FMath::Max(ConfiguredOpticalPassCount,HydraulicPassCount));
+            Report->SetNumberField(TEXT("different_base_values"),DifferentBase);
+            Report->SetNumberField(TEXT("different_hydraulic_values"),DifferentHydraulic);
+            Report->SetBoolField(TEXT("passed"),DifferentBase==0 && DifferentHydraulic==0);
+            FString Json; auto Writer=TJsonWriterFactory<>::Create(&Json); FJsonSerializer::Serialize(Report,Writer);
+            FFileHelper::SaveStringToFile(Json,*SmoothingAuditPath);
         }
+#endif
     }
 
+    TArray<float> FilteredBaseForAudit;
+    if (bNativeMean)
+    {
+#if !UE_BUILD_SHIPPING
+        if (GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimSurfaceDecompositionAudit="),RequestedDecomposition) &&
+            !FPaths::FileExists(RequestedDecomposition))
+            FilteredBaseForAudit=PresentationSurfaceHeightMeters;
+#endif
+        // Filtering is useful for feature detection, not for replacing the
+        // authoritative mean stage. At the actual crux the optical filter
+        // filled a solver-resolved trough by >1m. Retain HydraulicSource...
+        // above for existing detection/relief, but render the native mean.
+        for (int32 I=0;I<WaterSamples.Num();++I)
+            if (WetVertexMask[I])PresentationSurfaceHeightMeters[I]=WaterSamples[I].SurfaceHeightMeters;
+    }
+    Perf.Mark(TEXT("optical_filter"));
     // Amplify only solver-resolved station curvature. The five analysis
     // samples retain their original 12 m span on the subdivided render grid,
     // large enough to describe a readable rapid crest/hole pair without
     // misclassifying the new short presentation bands as solver relief.
     const int32 AnalysisNearStride = PresentationAnalysisStride;
     const int32 AnalysisFarStride = 2 * PresentationAnalysisStride;
-    for (int32 Y = 0; Y < GridLateralN; ++Y)
+    if (bCartesianFlow)
+    {
+        for (int32 Index=0;Index<WaterSamples.Num();++Index)
+        {
+            if (!WetVertexMask[Index]) continue;
+            const auto& Sample=WaterSamples[Index];
+            const FVector2D Direction=FlowDirectionFor(Sample);
+            const FVector2D Position(Index%GridStationN,Index/GridStationN);
+            float Heights[4]; bool Valid=true; int32 I=0;
+            for (const int32 Offset : {-AnalysisFarStride,-AnalysisNearStride,AnalysisNearStride,AnalysisFarStride})
+                Valid &= RaftSimWaterFlowFrame::SampleWetScalar(HydraulicSourceSurfaceHeightMeters,WetVertexMask,
+                    GridStationN,GridLateralN,Position+Direction*Offset,Heights[I++]);
+            if (!Valid) continue;
+            HydraulicReliefMeters[Index]=URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
+                HydraulicSourceSurfaceHeightMeters[Index],Heights[0],Heights[1],Heights[2],Heights[3],
+                Sample.VelocityMetersPerSecond.Size2D(),Sample.DepthMeters)*ResolvedPresentationHydraulicReliefScale;
+        }
+    }
+    else for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = AnalysisFarStride;
              X < GridStationN - AnalysisFarStride;
@@ -4100,6 +4451,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 ResolvedPresentationHydraulicReliefScale;
         }
     }
+    Perf.Mark(TEXT("hydraulic_relief"));
     TArray<float> StationWetSurfaceZSum;
     StationWetSurfaceZSum.Init(0.0f, GridStationN);
     TArray<int32> StationWetSurfaceCount;
@@ -4125,6 +4477,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
     TArray<float> ShoreDisplacementWeight;
     ShoreDisplacementWeight.SetNumZeroed(Vertices.Num());
+    const TArray<int32> CartesianWetEdgeSteps = bCartesianFlow
+        ? RaftSimWaterFlowFrame::WetEdgeSteps(GridStationN,GridLateralN,WetVertexMask) : TArray<int32>();
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 0; X < GridStationN; ++X)
@@ -4132,7 +4486,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             const int32 Index = Y * GridStationN + X;
             if (WetVertexMask[Index] != 0)
             {
-                ShoreDisplacementWeight[Index] =
+                ShoreDisplacementWeight[Index] = bCartesianFlow
+                    ? ComputePresentationShoreDisplacementWeight(CartesianWetEdgeSteps[Index],0,
+                        2*CartesianWetEdgeSteps[Index],ResolvedVertexSpacingMeters)
+                    :
                     ComputePresentationShoreDisplacementWeight(
                         Y,
                         MinimumWetLateralIndex[X],
@@ -4317,12 +4674,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         const FVector2D& Coordinate = RiverCoordinatesM[WakeIndex];
         const float WaterSpeedMps =
             WaterSamples[WakeIndex].VelocityMetersPerSecond.Size2D();
+        const FVector2D BoulderFlowDirection = FlowDirectionFor(WaterSamples[WakeIndex]);
         for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
         {
-            const float DownstreamM =
-                static_cast<float>(Coordinate.X) - Footprint.X;
-            const float AcrossM =
-                static_cast<float>(Coordinate.Y) - Footprint.Y;
+            // Match rigid support and the foam return path: geographic X
+            // is east, not downstream. Keep +X for station/lateral fields.
+            const FVector2D Relative = RaftSimWaterFlowFrame::ToLocal(
+                Coordinate - FVector2D(Footprint.X, Footprint.Y), BoulderFlowDirection);
+            const float DownstreamM = Relative.X;
+            const float AcrossM = Relative.Y;
             const FVector2D Wake = ComputeBoulderWakePresentation(
                 DownstreamM,
                 AcrossM,
@@ -4400,6 +4760,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             LiveVsBaselineLevelDeltaM);
     }
 
+    Perf.Mark(TEXT("shore_wake_fields"));
     // Continuous current detail belongs in the single carrier's WPO. It is
     // evaluated every rendered frame from the same integrated solver-current
     // displacement as the foam. Sampling that phase here made the whole mesh
@@ -4429,6 +4790,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
 
             float DepthNorm = 0.0f;
             float SpeedNorm = 0.0f;
+            const FVector2D PreviousFlowVelocityMps = FlowVelocityMetersPerSecond[Index];
             FlowVelocityMetersPerSecond[Index] = FVector2D::ZeroVector;
             if (WetVertexMask[Index] != 0)
             {
@@ -4446,18 +4808,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 const FVector2D SampledFlowVelocityMps(
                     Sample.VelocityMetersPerSecond.X,
                     Sample.VelocityMetersPerSecond.Y);
-                const float FlowVelocityBlend = 1.0f - FMath::Exp(
-                    -4.0f * FMath::Max(RefreshIntervalSeconds, 0.0f));
-                FlowVelocityMetersPerSecond[Index] =
-                    (SampledFlowVelocityMps -
-                     FlowVelocityMetersPerSecond[Index]).SizeSquared() > 25.0f
-                    ? SampledFlowVelocityMps
-                    : FMath::Lerp(
-                          FlowVelocityMetersPerSecond[Index],
-                          SampledFlowVelocityMps,
-                          FlowVelocityBlend);
+                FlowVelocityMetersPerSecond[Index] = RaftSimWaterFlowHistory::Advance(
+                    PreviousFlowVelocityMps, SampledFlowVelocityMps, RefreshIntervalSeconds);
                 const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
-                const FRaftSimWaterStandingWave StandingWave =
+                const FRaftSimWaterStandingWave StandingWave = bCartesianFlow ? FRaftSimWaterStandingWave{} :
                     URaftSimWaterRuntimeAdapter::ComputeCoupledStandingWave(
                         RiverCoordinatesM[Index], Speed, Depth);
                 const float HydraulicRelief = HydraulicReliefMeters[Index];
@@ -4532,20 +4886,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // without the sink the translucent carrier shrouds every
                 // exposed rock to its tip; pillow/arm amplitudes mirror the
                 // baked band-mesh terms so the two surfaces agree.
-                const float VertexStationM =
-                    static_cast<float>(RiverCoordinatesM[Index].X);
-                const float VertexLateralM =
-                    static_cast<float>(RiverCoordinatesM[Index].Y);
+                const FVector2D BoulderFlowDirection = FlowDirectionFor(Sample);
                 for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
                 {
                     const float RadiusM = FMath::Max(Footprint.Z, 0.75f);
-                    const float DeltaStationM = VertexStationM - Footprint.X;
+                    const FVector2D Relative = RaftSimWaterFlowFrame::ToLocal(
+                        RiverCoordinatesM[Index] - FVector2D(Footprint.X, Footprint.Y),
+                        BoulderFlowDirection);
+                    const float DeltaStationM = Relative.X;
                     if (DeltaStationM < -RadiusM * 3.0f ||
                         DeltaStationM > RadiusM * 10.5f)
                     {
                         continue;
                     }
-                    const float DeltaLateralM = VertexLateralM - Footprint.Y;
+                    const float DeltaLateralM = Relative.Y;
                     if (FMath::Abs(DeltaLateralM) > RadiusM * 7.5f)
                     {
                         continue;
@@ -4754,12 +5108,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 if (bUsesCurvedRiverCoordinates)
                 {
                     const FVector FlowTangent = Tangents[Index].TangentX;
-                    const FVector LeftNormal(
-                        -FlowTangent.Y, FlowTangent.X, 0.0f);
-                    NormalOut = (
-                        FlowTangent * PresentationLocalNormal.X +
-                        LeftNormal * PresentationLocalNormal.Y +
-                        FVector::UpVector * PresentationLocalNormal.Z).GetSafeNormal();
+                    NormalOut = RaftSimFoamTransport::TransformSurfaceNormal(
+                        PresentationLocalNormal, FlowTangent,
+                        WaterAdapter ? WaterAdapter->GetRiverWorldYSign() : 1.0f);
                 }
                 else
                 {
@@ -4870,6 +5221,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
     LastBoulderWakeFoamVertexCount = WakeFoamVertexCount;
 
+    Perf.Mark(TEXT("base_vertices"));
     // --- Breaking water at hydraulic jumps -------------------------------
     // A supercritical station running into a subcritical neighbour is the
     // solver's own hydraulic jump. Presentation: lift the breaking crest so it
@@ -4892,15 +5244,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimBreakingHeightAudit"));
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
-        for (int32 X = PresentationAnalysisStride; X < GridStationN; ++X)
+        for (int32 X = bCartesianFlow ? 0 : PresentationAnalysisStride; X < GridStationN; ++X)
         {
             const int32 Index = Y * GridStationN + X;
-            const int32 ImmediateUpstreamIndex =
-                Index - PresentationAnalysisStride;
+            const FVector2D DownstreamDirection = FlowDirectionFor(WaterSamples[Index]);
+            const int32 ImmediateUpstreamIndex = bCartesianFlow
+                ? RaftSimWaterFlowFrame::OffsetIndex(Index,GridStationN,GridLateralN,
+                    DownstreamDirection,-PresentationAnalysisStride) : Index-PresentationAnalysisStride;
             // The full-reach baseline is a visual continuity fallback only.
             // Hydraulic breaking sites alter rigid raft support, so both
             // sides of a detected transition must belong to the live solver.
-            if (LiveSolverWetVertexMask[Index] == 0 ||
+            if (ImmediateUpstreamIndex == INDEX_NONE || LiveSolverWetVertexMask[Index] == 0 ||
                 LiveSolverWetVertexMask[ImmediateUpstreamIndex] == 0)
             {
                 continue;
@@ -4919,11 +5273,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // This remains a strict local Froude transition; no marker, tag,
             // or art cue can create a breaking site by itself.
             if (UpstreamFroude < 1.12f &&
-                X >= 2 * PresentationAnalysisStride)
+                (bCartesianFlow || X >= 2 * PresentationAnalysisStride))
             {
-                const int32 FarUpstreamIndex =
-                    Index - 2 * PresentationAnalysisStride;
-                if (LiveSolverWetVertexMask[FarUpstreamIndex] != 0 &&
+                const int32 FarUpstreamIndex = bCartesianFlow
+                    ? RaftSimWaterFlowFrame::OffsetIndex(Index,GridStationN,GridLateralN,
+                        DownstreamDirection,-2*PresentationAnalysisStride) : Index-2*PresentationAnalysisStride;
+                if (FarUpstreamIndex != INDEX_NONE && LiveSolverWetVertexMask[FarUpstreamIndex] != 0 &&
                     FroudeField[FarUpstreamIndex] > UpstreamFroude)
                 {
                     UpstreamIndex = FarUpstreamIndex;
@@ -4943,12 +5298,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 continue;
             }
 
-            const int32 UpstreamStationIndex =
-                X - (Index - UpstreamIndex);
+            const int32 UpstreamStationIndex = UpstreamIndex%GridStationN;
+            const int32 UpstreamLateralIndex = UpstreamIndex/GridStationN;
             const float UpstreamStationCoverage = StationEdgeCoverage(UpstreamStationIndex);
             const float LocalStationCoverage = StationEdgeCoverage(X);
             const float UpstreamLateralCoverage = ComputeLateralWetCoverage(
-                Y,
+                UpstreamLateralIndex,
                 MinimumWetLateralIndex[UpstreamStationIndex],
                 MaximumWetLateralIndex[UpstreamStationIndex],
                 ResolvedVertexSpacingMeters,
@@ -4959,14 +5314,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 MaximumWetLateralIndex[X],
                 ResolvedVertexSpacingMeters,
                 CurvedGridLateralEdgeBlendMeters);
-            const float PresentationCoverage = FMath::Min(
+            float PresentationCoverage = FMath::Min(
                 UpstreamStationCoverage * UpstreamLateralCoverage,
                 LocalStationCoverage * LocalLateralCoverage);
-            const float PresentationEdgeClearanceMeters = FMath::Min(
+            float PresentationEdgeClearanceMeters = FMath::Min(
                 ComputePresentationSurfaceEdgeClearanceMeters(
                     UpstreamStationIndex,
                     GridStationN,
-                    Y,
+                    UpstreamLateralIndex,
                     MinimumWetLateralIndex[UpstreamStationIndex],
                     MaximumWetLateralIndex[UpstreamStationIndex],
                     ResolvedVertexSpacingMeters),
@@ -4977,6 +5332,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     MinimumWetLateralIndex[X],
                     MaximumWetLateralIndex[X],
                     ResolvedVertexSpacingMeters));
+            if (bCartesianFlow)
+            {
+                PresentationEdgeClearanceMeters=FMath::Min(CartesianWetEdgeSteps[Index],
+                    CartesianWetEdgeSteps[UpstreamIndex])*ResolvedVertexSpacingMeters;
+                const float T=FMath::Clamp(PresentationEdgeClearanceMeters/
+                    FMath::Max(CurvedGridLateralEdgeBlendMeters,KINDA_SMALL_NUMBER),0.f,1.f);
+                PresentationCoverage=T*T*(3.f-2.f*T);
+            }
             // Legacy overlay maps need a large fully opaque margin because a
             // separate crest/roller sheet can expose their rectangular edge.
             // South Fork has one continuous carrier: rejecting its physical
@@ -5057,14 +5420,19 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             const int32 TailStepCount = FMath::Max(
                 1,
                 FMath::RoundToInt(18.0f / ResolvedVertexSpacingMeters));
+            int32 PreviousTailIndex = Index;
             for (int32 TailStep = 1; TailStep <= TailStepCount; ++TailStep)
             {
-                const int32 TailIndex = Index + TailStep;
-                if (X + TailStep >= GridStationN ||
+                const int32 TailIndex = bCartesianFlow
+                    ? RaftSimWaterFlowFrame::OffsetIndex(Index,GridStationN,GridLateralN,DownstreamDirection,TailStep)
+                    : Index+TailStep;
+                if (TailIndex == INDEX_NONE || (!bCartesianFlow && X + TailStep >= GridStationN) ||
                     WetVertexMask[TailIndex] == 0)
                 {
                     break;
                 }
+                if (TailIndex==PreviousTailIndex) continue;
+                PreviousTailIndex=TailIndex;
                 const float TailDistanceMeters =
                     TailStep * ResolvedVertexSpacingMeters;
                 const float Decay = FMath::Exp(-0.14f * TailDistanceMeters);
@@ -5083,6 +5451,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             FBreakingSite Site;
             Site.WorldPositionCm = Vertices[UpstreamIndex];
             Site.WorldVelocityMps = WaterSamples[UpstreamIndex].VelocityMetersPerSecond;
+            Site.FlowDirection = FlowDirectionFor(WaterSamples[UpstreamIndex]);
+            if (bUsesCurvedRiverCoordinates)
+            {
+                // Spray/lip placement consumes world velocity. Convert only
+                // at this boundary; crest/support/foam coordinates stay local.
+                const FVector Tangent = Tangents[UpstreamIndex].TangentX;
+                const FVector2D WorldVelocity = RaftSimFoamTransport::TransformFieldVelocity(
+                    FVector2D(Site.WorldVelocityMps.X, Site.WorldVelocityMps.Y),
+                    FVector2D(Tangent.X, Tangent.Y), WaterAdapter->GetRiverWorldYSign());
+                Site.WorldVelocityMps = FVector(WorldVelocity.X, WorldVelocity.Y, 0.);
+            }
             Site.RiverCoordinatesMeters = RiverCoordinatesM[UpstreamIndex];
             Site.Intensity = Intensity;
             Site.HydraulicCrestDimensionsMeters =
@@ -5173,6 +5552,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         URaftSimWaterRuntimeAdapter::FSupportBreakingSite& SupportSite =
             SupportSites.AddDefaulted_GetRef();
         SupportSite.RiverCoordinatesMeters = Site.RiverCoordinatesMeters;
+        SupportSite.FlowDirection = Site.FlowDirection;
         SupportSite.bLocalEnvelopeCap = bSpatialBreakingReview;
         SupportSite.Intensity = Site.Intensity *
             (bSharedBreakingReliefEnabled ? Site.PresentationWeight : 1.0f);
@@ -5183,7 +5563,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SupportSite.SpillingFraction = Site.HydraulicSpillingFraction * Site.PresentationWeight;
         }
     }
-    if (bStatefulCrestReview)
+    if (bStatefulCrestReview || bPlayableCrestRefinement)
     {
         MacroCrestSites.Reset();
         bool bPhysical=SupportSites.Num()<GridStationN;
@@ -5201,9 +5581,48 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             {
                 MacroCrestSites.Add(FVector4f(Site.RiverCoordinatesMeters.X,Site.RiverCoordinatesMeters.Y,
                     Site.PhysicalCrestHeightMeters,Site.PhysicalCrestLengthMeters));
-                MacroCrestSites.Add(FVector4f(Site.Intensity,Site.SpillingFraction,Site.bLocalEnvelopeCap ? 1 : 0,0));
+                MacroCrestSites.Add(FVector4f(Site.Intensity,Site.SpillingFraction,Site.bLocalEnvelopeCap ? 1 : 0,
+                    FMath::Atan2(Site.FlowDirection.Y,Site.FlowDirection.X)));
             }
         }
+    }
+    if (bCartesianFlow && bSingleLiveWaterSurfaceEnabled && bSharedBreakingReliefEnabled)
+    {
+        MacroCrestDisplacementCm.Init(0.f,Vertices.Num());
+        MacroCrestShoreWeights=ShoreDisplacementWeight;
+        const float Lift=BreakingCrestLiftMeters, Spacing=ResolvedVertexSpacingMeters;
+        const float Scale=ResolvedPresentationHydraulicReliefScale;
+        const float Sign=WaterAdapter->GetRiverWorldYSign();
+        CartesianCrestInput.ProfileKey={Lift,Spacing,Scale,Sign};
+        CartesianCrestInput.NonzeroRegionsCm.Reset();
+        for (const auto& Site:SupportSites)
+        {
+            CartesianCrestInput.ProfileKey.Append({Site.RiverCoordinatesMeters.X,Site.RiverCoordinatesMeters.Y,
+                Site.PhysicalCrestHeightMeters,Site.PhysicalCrestLengthMeters,Site.Intensity,
+                Site.SpillingFraction,Site.FlowDirection.X,Site.FlowDirection.Y,Site.bLocalEnvelopeCap ? 1. : 0.});
+            const bool Physical=Site.PhysicalCrestHeightMeters>=0.f;
+            const float Length=FMath::Clamp(Site.PhysicalCrestLengthMeters,2.f,7.f);
+            const float SafeSpacing=FMath::Max(Spacing,.05f);
+            const double Low=Physical ? -3.*Length : -SafeSpacing;
+            const double High=Physical ? 7.*Length : (2+FMath::Max(1,FMath::RoundToInt(18.f/SafeSpacing)))*SafeSpacing;
+            const double Across=Physical ? 12. : 3.*FMath::Sqrt(-FMath::Loge(.02));
+            FBox2D Bounds(ForceInit);
+            for (double D:{Low,High}) for (double A:{-Across,Across})
+            {
+                const FVector2D P=Site.RiverCoordinatesMeters+RaftSimWaterFlowFrame::ToField(FVector2D(D,A),Site.FlowDirection);
+                Bounds+=FVector2D(P.X*100.,P.Y*100.*Sign);
+            }
+            // Conservative roundoff padding only. The underlying profile's
+            // exact compact support, not visual importance, controls culling.
+            CartesianCrestInput.NonzeroRegionsCm.Add(Bounds.ExpandBy(.01));
+        }
+        // Capture the actual support records, not float-packed shader records
+        // or reconstructed angles. The same profile survives between refreshes.
+        CartesianCrestInput.HeightAtWorldXYCm=[Sites=SupportSites,Lift,Spacing,Scale,Sign](const FVector2D& P)
+        {
+            return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
+                FVector2D(P.X*.01,P.Y*.01*Sign),Sites,Lift,Spacing)*Scale*100.f;
+        };
     }
     if (WaterAdapter)
     {
@@ -5289,6 +5708,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             Record->SetNumberField(TEXT("lateral_m"), Site.RiverCoordinatesMeters.Y);
             Record->SetNumberField(TEXT("height_m"), Site.PhysicalCrestHeightMeters);
             Record->SetNumberField(TEXT("length_m"), Site.PhysicalCrestLengthMeters);
+            Record->SetNumberField(TEXT("flow_direction_x"), Site.FlowDirection.X);
+            Record->SetNumberField(TEXT("flow_direction_y"), Site.FlowDirection.Y);
             Record->SetNumberField(TEXT("spilling_fraction"), Site.SpillingFraction);
             Record->SetNumberField(TEXT("intensity"), Site.Intensity);
             Record->SetBoolField(TEXT("local_envelope_cap"), Site.bLocalEnvelopeCap);
@@ -5302,6 +5723,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             SampleCount, MaxError, MaxContinuous, bSaved, *CrestAuditPath);
     }
 
+    Perf.Mark(TEXT("breaking_detection"));
     // Give the strongest accepted interior jumps a coherent plan-view
     // plunge pocket beneath the connected crest-to-plunge membrane. The
     // solver selects every site; this pass only changes presentation vertices
@@ -5352,15 +5774,18 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             const float MinRelative = Site.PhysicalCrestHeightMeters >= 0.0f ? -3.0f * Length : -Spacing;
             const float MaxRelative = Site.PhysicalCrestHeightMeters >= 0.0f ? 7.0f * Length
                 : (2 + FMath::Max(1, FMath::RoundToInt(18.0f / Spacing))) * Spacing;
-            const FIntPoint Range = RowRange(Site.RiverCoordinatesMeters.X + MinRelative,
-                Site.RiverCoordinatesMeters.X + MaxRelative);
+            const FVector2D Bounds = RaftSimWaterFlowFrame::XBounds(Site.FlowDirection,MinRelative,MaxRelative,
+                Site.PhysicalCrestHeightMeters >= 0.f ? 12. : 3.*FMath::Sqrt(-FMath::Loge(.02)));
+            const FIntPoint Range = RowRange(Site.RiverCoordinatesMeters.X + Bounds.X,
+                Site.RiverCoordinatesMeters.X + Bounds.Y);
             for (int32 Row = Range.X; Row <= Range.Y; ++Row)
                 StationBreakingSites[Row].Support.Add(Site);
         }
         for (const FBreakingSite& Site : WeightedPresentationSites)
         {
-            const FIntPoint Range = RowRange(Site.RiverCoordinatesMeters.X - 32.0f,
-                Site.RiverCoordinatesMeters.X + 23.0f);
+            const FVector2D Bounds = RaftSimWaterFlowFrame::XBounds(Site.FlowDirection,-32.,23.,12.);
+            const FIntPoint Range = RowRange(Site.RiverCoordinatesMeters.X + Bounds.X,
+                Site.RiverCoordinatesMeters.X + Bounds.Y);
             for (int32 Row = Range.X; Row <= Range.Y; ++Row)
                 StationBreakingSites[Row].Presentation.Add(Site);
         }
@@ -5384,6 +5809,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     ActiveDownstreamBoilSiteCount = bDownstreamBoilMicroreliefEnabled
         ? BreakingPresentationSiteCount
         : 0;
+    const bool bUseHydraulicFoamBudget = bCartesianFlow && bCrestLocalizedFoam &&
+        CVarRaftSimChilkoHydraulicCrestScale.GetValueOnGameThread()!=0;
     MaximumAbsoluteDownstreamBoilDisplacementMeters = 0.0f;
     for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
     {
@@ -5391,7 +5818,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             continue;
         }
-        float CombinedPocketDisplacementMeters = 0.0f;
+    float CombinedPocketDisplacementMeters = 0.0f;
         float CombinedBoilDisplacementMeters = 0.0f;
         float PocketFoam = 0.0f;
         float BoilFoam = 0.0f;
@@ -5399,10 +5826,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             ? StationBreakingSites[VertexIndex % GridStationN].Presentation : WeightedPresentationSites;
         for (const FBreakingSite& Site : LocalPresentationSites)
         {
-            const FVector2D RelativeRiverPosition =
-                RiverCoordinatesM[VertexIndex] - Site.RiverCoordinatesMeters;
+            const FVector2D RelativeRiverPosition = RaftSimWaterFlowFrame::ToLocal(
+                RiverCoordinatesM[VertexIndex] - Site.RiverCoordinatesMeters,Site.FlowDirection);
             const float LocalWeight = Site.PresentationWeight * LocalPresentationWeight(RelativeRiverPosition);
             if (LocalWeight <= 0.0f) continue;
+            // The shared physical crest already budgets new foam by spilling.
+            // Apply the same budget to pocket/boil generation; the legacy
+            // minimum-white remap must not bypass a nonspilling wave. Do not
+            // change geometry, return velocity or already-advected foam.
+            const float FoamSourceWeight = RaftSimFoamTransport::BreakingSourceWeight(
+                LocalWeight,Site.HydraulicSpillingFraction,
+                bUseHydraulicFoamBudget);
             const FVector2D Pocket =
                 ComputeBreakingPlungePocketPresentation(
                     RelativeRiverPosition.X,
@@ -5411,7 +5845,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             CombinedPocketDisplacementMeters +=
                 Pocket.X * LocalWeight;
             PocketFoam = FMath::Max(
-                PocketFoam, Pocket.Y * LocalWeight);
+                PocketFoam, Pocket.Y * FoamSourceWeight);
 
             // Entry tongue: the smooth accelerating V upstream of the jump,
             // narrowest at the crest and widening upstream. Its centreline
@@ -5461,7 +5895,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             CombinedBoilDisplacementMeters +=
                 Boil.X * LocalWeight;
             BoilFoam = FMath::Max(
-                BoilFoam, Boil.Y * LocalWeight);
+                BoilFoam, Boil.Y * FoamSourceWeight);
         }
         CombinedPocketDisplacementMeters = FMath::Clamp(
             CombinedPocketDisplacementMeters, -0.30f, 0.18f);
@@ -5490,7 +5924,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 ShoreDisplacementWeight[VertexIndex]
             : 0.0f;
         PocketFoam *= ShoreDisplacementWeight[VertexIndex];
-        if (bStatefulCrestReview && MacroCrestDisplacementCm.IsValidIndex(VertexIndex))
+        if ((bStatefulCrestReview || bPlayableCrestRefinement ||
+            (bCartesianFlow && bSingleLiveWaterSurfaceEnabled && bSharedBreakingReliefEnabled)) &&
+            MacroCrestDisplacementCm.IsValidIndex(VertexIndex))
             MacroCrestDisplacementCm[VertexIndex]=SharedBreakingReliefMeters*kSurfCmPerM;
         BoilFoam *= ShoreDisplacementWeight[VertexIndex];
         if (bCrestLocalizedFoam)
@@ -5514,6 +5950,40 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             BreakingPresentationVertexMask[VertexIndex] = 1;
         }
     }
+
+#if !UE_BUILD_SHIPPING
+    FString DecompositionPath;
+    if (bCartesianFlow && GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimSurfaceDecompositionAudit="),DecompositionPath) &&
+        !FPaths::FileExists(DecompositionPath))
+    {
+        // Diagnostic source targets BEFORE temporal rendering, clipping and
+        // GPU perturbation. Nothing here changes the geometry or support.
+        FString Csv=TEXT("field_x_m,field_y_m,raw_eta_m,raw_depth_m,filtered_eta_m,presented_base_eta_m,hydraulic_relief_m,shared_crest_m,other_relief_m,target_z_m,flow_x_mps,flow_y_mps\n");
+        int32 Count=0;
+        const double RenderLiftM=GetResolvedLiveSurfaceRenderLiftCm()*.01;
+        for (int32 I=0;I<Vertices.Num();++I)
+        {
+            if (!WetVertexMask[I])continue;
+            const auto& S=WaterSamples[I];
+            const double Z=Vertices[I].Z*.01;
+            const double Crest=MacroCrestDisplacementCm.IsValidIndex(I) ? MacroCrestDisplacementCm[I]*.01 : 0.;
+            const double Other=Z-PresentationSurfaceHeightMeters[I]-HydraulicReliefMeters[I]-Crest-RenderLiftM;
+            Csv+=FString::Printf(TEXT("%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g,%.9g\n"),
+                RiverCoordinatesM[I].X,RiverCoordinatesM[I].Y,double(S.SurfaceHeightMeters),double(S.DepthMeters),
+                double(FilteredBaseForAudit.IsValidIndex(I) ? FilteredBaseForAudit[I] : PresentationSurfaceHeightMeters[I]),
+                double(PresentationSurfaceHeightMeters[I]),double(HydraulicReliefMeters[I]),Crest,Other,Z,
+                double(S.VelocityMetersPerSecond.X),double(S.VelocityMetersPerSecond.Y));
+            ++Count;
+        }
+        if (FFileHelper::SaveStringToFile(Csv,*DecompositionPath))
+        {
+            UE_LOG(LogTemp,Display,TEXT("Surface decomposition saved: %s wet_targets=%d render_lift_m=%.9g world_s=%.9g; excludes temporal/clipping/GPU"),
+                *DecompositionPath,Count,RenderLiftM,GetWorld()->GetTimeSeconds());
+        }
+        else { UE_LOG(LogTemp,Error,TEXT("Cannot save requested surface decomposition: %s"),*DecompositionPath); }
+    }
+#endif
 
     // Recompute normals only in and immediately around the modified pocket.
     // This makes the depression and return respond to light while leaving the
@@ -5629,6 +6099,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             MaximumAbsoluteDownstreamBoilDisplacementMeters);
     }
 
+    Perf.Mark(TEXT("breaking_carve"));
     // --- Persistent advected foam ----------------------------------------
     // Semi-Lagrangian: each wet vertex looks upstream along the sampled flow
     // into the previous foam field, decays what it finds through the half-life,
@@ -5638,13 +6109,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const FVector2D CurrentFieldOriginM = bUsesCurvedRiverCoordinates
         ? FVector2D(
               CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f,
-              -CurvedGridWidthMeters * 0.5f)
+              CartesianGridCenterNorthM - CurvedGridWidthMeters * 0.5f)
         : FVector2D(GridOriginCm.X / kSurfCmPerM, GridOriginCm.Y / kSurfCmPerM);
     const float DecayFactor = FoamDeltaSeconds > 0.0f
         ? FMath::Pow(0.5f, FoamDeltaSeconds / FMath::Max(FoamHalfLifeSeconds, 0.5f))
         : 0.0f;
     TArray<float> NewFoamField;
     NewFoamField.SetNumZeroed(Vertices.Num());
+    FoamTransportVelocityMetersPerSecond.Init(FVector2D::ZeroVector,Vertices.Num());
     float FoamAdvectionSum = 0.0f;
     float FoamAdvectionMax = 0.0f;
     for (int32 Y = 0; Y < GridLateralN; ++Y)
@@ -5657,24 +6129,19 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 continue;
             }
             float Advected = 0.0f;
+            const FVector SampledVelocity = WaterSamples[Index].VelocityMetersPerSecond;
+            FoamTransportVelocityMetersPerSecond[Index] = FVector2D(SampledVelocity.X,SampledVelocity.Y);
             if (bFoamFieldValid && DecayFactor > 0.0f &&
                 FoamField.Num() == NewFoamField.Num())
             {
-                const FVector WorldVelocity =
-                    WaterSamples[Index].VelocityMetersPerSecond;
-                FVector2D FieldVelocity(WorldVelocity.X, WorldVelocity.Y);
+                FVector2D FieldVelocity(SampledVelocity.X, SampledVelocity.Y);
                 FVector2D FieldPosition(
                     Vertices[Index].X / kSurfCmPerM, Vertices[Index].Y / kSurfCmPerM);
                 if (bUsesCurvedRiverCoordinates)
                 {
-                    const FVector FlowTangent = Tangents[Index].TangentX;
-                    const FVector2D Tangent2D(FlowTangent.X, FlowTangent.Y);
-                    const FVector2D Left2D(-FlowTangent.Y, FlowTangent.X);
-                    FieldVelocity = FVector2D(
-                        FVector2D::DotProduct(
-                            FVector2D(WorldVelocity.X, WorldVelocity.Y), Tangent2D),
-                        FVector2D::DotProduct(
-                            FVector2D(WorldVelocity.X, WorldVelocity.Y), Left2D));
+                    // SampleWaterFieldAtRiverCoordinates already returns
+                    // field velocity, both for station and Cartesian grids.
+                    // A second world projection rotates/reflects the backtrace.
                     FieldPosition = RiverCoordinatesM[Index];
                 }
                 // Foam inside an accepted hydraulic jump must visibly turn
@@ -5684,21 +6151,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // or create a second surface.
                 const float BulkWaterSpeedMetersPerSecond =
                     FieldVelocity.Size();
+                const FVector2D BulkFlowDirection = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates()
+                    ? RaftSimWaterFlowFrame::Direction(FieldVelocity) : FVector2D(1.,0.);
                 FVector2D RollerVelocity = FVector2D::ZeroVector;
                 const auto& LocalRollerSites = bSpatialBreakingReview
                     ? StationBreakingSites[Index % GridStationN].Presentation : WeightedPresentationSites;
                 for (const FBreakingSite& Site : LocalRollerSites)
                 {
-                    const FVector2D RelativePosition =
-                        FieldPosition - Site.RiverCoordinatesMeters;
+                    const FVector2D RelativePosition = RaftSimWaterFlowFrame::ToLocal(
+                        FieldPosition - Site.RiverCoordinatesMeters,Site.FlowDirection);
                     const float LocalWeight = Site.PresentationWeight * LocalPresentationWeight(RelativePosition);
                     if (LocalWeight <= 0.0f) continue;
-                    RollerVelocity +=
+                    RollerVelocity += RaftSimWaterFlowFrame::ToField(
                         ComputeBreakingRollerSurfaceVelocityMetersPerSecond(
                             RelativePosition.X,
                             RelativePosition.Y,
                             Site.Intensity,
-                            BulkWaterSpeedMetersPerSecond) *
+                            BulkWaterSpeedMetersPerSecond),Site.FlowDirection) *
                         LocalWeight;
                 }
                 FieldVelocity += RollerVelocity.GetClampedToMaxSize(
@@ -5715,13 +6184,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 for (const FVector3f& Footprint : WindowBoulderFootprintsSLR)
                 {
                     const float RadiusM = FMath::Max(Footprint.Z, 0.75f);
-                    const float DownstreamM = FieldPosition.X - Footprint.X;
+                    const FVector2D BoulderRelative = RaftSimWaterFlowFrame::ToLocal(
+                        FieldPosition-FVector2D(Footprint.X,Footprint.Y),BulkFlowDirection);
+                    const float DownstreamM = BoulderRelative.X;
                     if (DownstreamM < RadiusM * 0.5f ||
                         DownstreamM > RadiusM * 6.0f)
                     {
                         continue;
                     }
-                    const float AcrossM = FieldPosition.Y - Footprint.Y;
+                    const float AcrossM = BoulderRelative.Y;
                     const float AcrossT = AcrossM / (RadiusM * 1.6f);
                     if (FMath::Abs(AcrossT) > 1.0f)
                     {
@@ -5745,8 +6216,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         -AcrossT * 0.30f * BulkWaterSpeedMetersPerSecond *
                             AlongT);
                     FieldVelocity = FMath::Lerp(
-                        FieldVelocity, EddyVelocity, PocketEnvelope);
+                        FieldVelocity, RaftSimWaterFlowFrame::ToField(EddyVelocity,BulkFlowDirection), PocketEnvelope);
                 }
+                // Export the exact velocity that moves the foam field, after
+                // every local return contribution, without changing transport.
+                FoamTransportVelocityMetersPerSecond[Index] = FieldVelocity;
                 const FVector2D BackPosition =
                     FieldPosition - FieldVelocity * FoamDeltaSeconds;
                 const float FractionalX =
@@ -6113,6 +6587,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // disconnected islands from presentation.
         TArray<uint8> ConnectedWetMask;
         ConnectedWetMask.Init(0, Vertices.Num());
+        if (bCartesianFlow) ConnectedWetMask = VolumeCoreWetMask;
+        else
         {
             TArray<int32> FloodQueue;
             FloodQueue.Reserve(Vertices.Num() / 4);
@@ -6271,7 +6747,15 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     VisualFilmCullMask[Index] = VisualFilmCullState[Index];
                 }
             };
-            for (int32 X = 0; X < GridStationN; ++X)
+            if (bCartesianFlow)
+            {
+                const auto EdgeSteps = RaftSimWaterFlowFrame::WetEdgeSteps(
+                    GridStationN, GridLateralN, VolumeCoreWetMask);
+                for (int32 I=0; I<Vertices.Num(); ++I)
+                    if (VolumeCoreWetMask[I] && EdgeSteps[I]<kVisualBankBandRings)
+                        EvaluateBandCell(I%GridStationN, I/GridStationN);
+            }
+            else for (int32 X = 0; X < GridStationN; ++X)
             {
                 const int32 MinimumY = VolumeCoreMinimumWetLateralIndex[X];
                 const int32 MaximumY = VolumeCoreMaximumWetLateralIndex[X];
@@ -6367,6 +6851,21 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             LiveVolumeCoreWetPresence[Index] = Presence;
         }
 
+        if (bCartesianFlow)
+        {
+            CartesianShoreWet.SetNumUninitialized(Vertices.Num());
+            CartesianShoreDepthM.SetNumUninitialized(Vertices.Num());
+            CartesianShoreBedM.SetNumUninitialized(Vertices.Num());
+            for (int32 I=0; I<Vertices.Num(); ++I)
+            {
+                CartesianShoreDepthM[I] = WaterSamples[I].DepthMeters;
+                CartesianShoreBedM[I] = WaterSamples[I].BedHeightMeters;
+                CartesianShoreWet[I] = CartesianShoreAvailable[I] && ConnectedWetMask[I] &&
+                    !VisualFilmCullMask[I] && VolumeCoreWetMask[I] && WaterSamples[I].DepthMeters>1.e-4f &&
+                    StationEdgeCoverage(I%GridStationN)>=kLiveVolumeCoreMinimumStationCoverage;
+            }
+        }
+
         // One immutable index list, the terminal form of a long render
         // lesson: a recreated mesh section is a new render proxy, and its
         // first frame renders with no temporal history and cold shading
@@ -6450,7 +6949,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // (The diagonal stitch triangles the one-row bank steps used to need
         // are gone: every dry cell is emitted and collapses onto the
         // waterline, so the edge fill is real geometry.)
-        if (bLivePresentationBankNaturalismEnabled)
+        if (!bCartesianFlow && bLivePresentationBankNaturalismEnabled)
         {
             // The Single Layer Water volume still shades at nearly zero
             // surface opacity, so alpha alone cannot break up its hard bank
@@ -6622,6 +7121,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     OutwardCm * OutReach[X];
             }
         };
+        if (!bCartesianFlow)
+        {
         TArray<float> BankReachScratch;
         ComputeBankReach(MinPresentY, +1, BankReachScratch);
         ComputeBankReach(MaxPresentY, -1, BankReachScratch);
@@ -6888,6 +7389,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 }
             }
         }
+        } // Legacy column reach/collapse. Cartesian dry regions are clipped in 2D.
 #if !UE_BUILD_SHIPPING
         const float ShoreProbeStation = CVarRaftSimShorelineProbeStation.GetValueOnGameThread();
         if (ShoreProbeStation >= 0.0f && GetWorld() && GetWorld()->GetTimeSeconds() >= 8.0f &&
@@ -6939,7 +7441,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // A rebuilt topology (corridor-end rows gained or lost) must also
             // recreate the section: an in-place update keeps the old index
             // buffer.
-            const bool bSectionMissing = CoreSectionState == nullptr ||
+            const bool bSectionMissing = bCartesianFlow
+                ? CartesianShoreSourceVertexCount != LiveVolumeCoreVertices.Num()
+                : CoreSectionState == nullptr ||
                 CoreSectionState->ProcVertexBuffer.Num() !=
                     LiveVolumeCoreVertices.Num() ||
                 CoreSectionState->ProcIndexBuffer.Num() !=
@@ -6973,60 +7477,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     (CurvedGridCenterStationM - PreviousGridCenterStationM) /
                     SafeSpacingMeters;
                 const int32 ShiftCells = FMath::RoundToInt(ShiftCellsExact);
+                const float ShiftNorthExact = (CartesianGridCenterNorthM - PreviousGridCenterNorthM) / SafeSpacingMeters;
+                const int32 ShiftNorth = FMath::RoundToInt(ShiftNorthExact);
                 // The river-end clamp can land the centre off the shared
                 // lattice. Only an exact integer shift keeps every overlap
                 // vertex at its previous river coordinates; otherwise fall
                 // through to the hard swap below.
-                if (FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f)
+                if (FMath::Abs(ShiftCellsExact - ShiftCells) < 0.01f && FMath::Abs(ShiftNorthExact - ShiftNorth) < 0.01f)
                 {
-                    if (ShiftCells != 0)
+                    if (ShiftCells != 0 || ShiftNorth != 0)
                     {
-                        const TArray<FVector> PreviousRenderedVertices =
-                            RenderedLiveVolumeCoreVertices;
-                        const TArray<FVector> PreviousRenderedNormals =
-                            RenderedLiveVolumeCoreNormals;
-                        const TArray<FLinearColor> PreviousRenderedColors =
-                            RenderedLiveVolumeCoreVertexColors;
-                        const TArray<FVector2D> PreviousRenderedFlow =
-                            RenderedLiveVolumeCoreFlowVelocity;
-                        const TArray<FVector2D> PreviousRenderedWake =
-                            RenderedLiveVolumeCoreWakeData;
-                        for (int32 Y = 0; Y < GridLateralN; ++Y)
-                        {
-                            for (int32 X = 0; X < GridStationN; ++X)
-                            {
-                                const int32 Index = Y * GridStationN + X;
-                                const int32 SourceX = X + ShiftCells;
-                                if (SourceX >= 0 && SourceX < GridStationN)
-                                {
-                                    const int32 SourceIndex =
-                                        Y * GridStationN + SourceX;
-                                    RenderedLiveVolumeCoreVertices[Index] =
-                                        PreviousRenderedVertices[SourceIndex];
-                                    RenderedLiveVolumeCoreNormals[Index] =
-                                        PreviousRenderedNormals[SourceIndex];
-                                    RenderedLiveVolumeCoreVertexColors[Index] =
-                                        PreviousRenderedColors[SourceIndex];
-                                    RenderedLiveVolumeCoreFlowVelocity[Index] =
-                                        PreviousRenderedFlow[SourceIndex];
-                                    RenderedLiveVolumeCoreWakeData[Index] =
-                                        PreviousRenderedWake[SourceIndex];
-                                }
-                                else
-                                {
-                                    RenderedLiveVolumeCoreVertices[Index] =
-                                        LiveVolumeCoreVertices[Index];
-                                    RenderedLiveVolumeCoreNormals[Index] =
-                                        LiveVolumeCoreNormals[Index];
-                                    RenderedLiveVolumeCoreVertexColors[Index] =
-                                        LiveVolumeCoreVertexColors[Index];
-                                    RenderedLiveVolumeCoreFlowVelocity[Index] =
-                                        FlowVelocityMetersPerSecond[Index];
-                                    RenderedLiveVolumeCoreWakeData[Index] =
-                                        BoatWakePresentationData[Index];
-                                }
-                            }
-                        }
+                        CarryRenderedGridHistory(ShiftCells, ShiftNorth);
                     }
                     bRecentreCarryApplied = true;
                 }
@@ -7064,17 +7525,9 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     // their coordinates for the frame this refresh renders.
                     // With the immutable topology this is a plain in-place
                     // update — a recentre no longer touches the index list.
-                    LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
-                        0,
-                        RenderedLiveVolumeCoreVertices,
-                        RenderedLiveVolumeCoreNormals,
-                        UVs,
-                        RenderedLiveVolumeCoreFlowVelocity,
-                        RenderedLiveVolumeCoreWakeData,
-                        VolumeCoreEmptyUVs,
-                        RenderedLiveVolumeCoreVertexColors,
-                        Tangents,
-                        /*bSRGBConversion=*/false);
+                    PublishLiveVolumeCore(RenderedLiveVolumeCoreVertices, RenderedLiveVolumeCoreNormals,
+                        RenderedLiveVolumeCoreVertexColors, RenderedLiveVolumeCoreFlowVelocity,
+                        RenderedLiveVolumeCoreWakeData, false,0.f);
                 }
             }
             else if (bSectionMissing)
@@ -7085,18 +7538,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // re-wet — is vertex motion on this one immortal section.
                 LogWaterRenderStateEvent(
                     GetWorld(), TEXT("core_create_hard_section_missing"));
-                LiveVolumeCoreMesh->CreateMeshSection_LinearColor(
-                    0,
-                    LiveVolumeCoreVertices,
-                    LiveVolumeCoreTriangles,
-                    LiveVolumeCoreNormals,
-                    UVs,
-                    FlowVelocityMetersPerSecond,
-                    BoatWakePresentationData,
-                    VolumeCoreEmptyUVs,
-                    LiveVolumeCoreVertexColors,
-                    Tangents,
-                    /*bCreateCollision=*/false);
+                PublishLiveVolumeCore(LiveVolumeCoreVertices, LiveVolumeCoreNormals,
+                    LiveVolumeCoreVertexColors, FlowVelocityMetersPerSecond, BoatWakePresentationData, true);
                 RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
                 RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
                 RenderedLiveVolumeCoreVertexColors =
@@ -7108,17 +7551,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
             else
             {
-                LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
-                    0,
-                    LiveVolumeCoreVertices,
-                    LiveVolumeCoreNormals,
-                    UVs,
-                    FlowVelocityMetersPerSecond,
-                    BoatWakePresentationData,
-                    VolumeCoreEmptyUVs,
-                    LiveVolumeCoreVertexColors,
-                    Tangents,
-                    /*bSRGBConversion=*/false);
+                PublishLiveVolumeCore(LiveVolumeCoreVertices, LiveVolumeCoreNormals,
+                    LiveVolumeCoreVertexColors, FlowVelocityMetersPerSecond, BoatWakePresentationData, false);
                 RenderedLiveVolumeCoreVertices = LiveVolumeCoreVertices;
                 RenderedLiveVolumeCoreNormals = LiveVolumeCoreNormals;
                 RenderedLiveVolumeCoreVertexColors =
@@ -7132,7 +7566,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // all-dry window is already invisible geometrically (every
             // vertex collapsed or sunk), and a visibility flip is itself a
             // render-state invalidation.
-            if (!LiveVolumeCoreMesh->IsVisible())
+            if (bCartesianFlow)
+            {
+                if (LiveVolumeCoreMesh->IsVisible()) LiveVolumeCoreMesh->SetVisibility(false);
+                if (!CartesianShorelineMesh->IsVisible()) CartesianShorelineMesh->SetVisibility(true);
+                LiveVolumeCoreTriangleCount = CartesianShorelineMesh->GetWaterIndices().Num()/3;
+            }
+            else if (!LiveVolumeCoreMesh->IsVisible())
             {
                 LiveVolumeCoreMesh->SetVisibility(true, true);
             }
@@ -7145,8 +7585,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         LiveVolumeCoreStaticTopologyVertexCount = 0;
         bLiveVolumeCoreInterpolationActive = false;
         LiveVolumeCoreMesh->SetVisibility(false, true);
+        CartesianShorelineMesh->SetVisibility(false);
     }
 
+    Perf.Mark(TEXT("foam_core_publish"));
     // Present solver-owned foam on a separate masked lace sheet. Vertex alpha
     // combines advected foam with the verified station/bank feather; the
     // material's runtime raft ellipse removes foam over the boat and crew at
@@ -7154,12 +7596,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     VisibleRapidFoamVertexCount = 0;
     const bool bSharedSurfaceLitCarrierOwnsFoam =
         bSharedBreakingReliefEnabled && !bLiveVolumeCoreEnabled;
-    if (bSharedSurfaceLitCarrierOwnsFoam)
+    const bool bCartesianSingleCarrier = bCartesianFlow && bSingleLiveWaterSurfaceEnabled;
+    if (bSharedSurfaceLitCarrierOwnsFoam || bCartesianSingleCarrier)
     {
-        // The opt-in captured survey carrier already shades its advected
-        // foam. Do not draw (or upload) the legacy masked sheet above it.
-        // Keeping this ownership rule tied only to volume-core mode left
-        // the review rendering two independent foam responses.
+        // The visible carrier already shades its advected foam. The Cartesian
+        // single-surface path also kept calculating/uploading this entire
+        // raised sheet even though it was unconditionally hidden below.
+        // Keep foam transport and core channels above; omit only dead uploads.
         RapidFoamMesh->SetVisibility(false, true);
     }
     else if (RapidFoamVertices.Num() == Vertices.Num() &&
@@ -7231,7 +7674,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         RapidFoamMesh->SetVisibility(bRapidFoamVisible, true);
     }
 
-    TArray<FLinearColor> SurfacePresentationColors = VertexColors;
+    const bool bBuildPaddleRipple = MaximumAbsoluteBoatWakeM > 0.001f &&
+        CVarRaftSimPaddleWakeRippleOverlay.GetValueOnGameThread() != 0 &&
+        CVarRaftSimFreezeCoreTopology.GetValueOnGameThread() < 2;
+    TArray<FLinearColor> SurfacePresentationColors;
+    if (!bCartesianSingleCarrier || bBuildPaddleRipple)
+        SurfacePresentationColors = VertexColors;
     bSubmittedHullMask=IsValid(FoamOcclusionRaft);
     if (IsValid(FoamOcclusionRaft))
     {
@@ -7252,9 +7700,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
     }
 
-    PaddleWakeVertexColors = VertexColors;
     int32 VisiblePaddleWakeVertexCount = 0;
-    for (int32 Index = 0; Index < PaddleWakeVertexColors.Num(); ++Index)
+    if (!bCartesianSingleCarrier || bBuildPaddleRipple)
+        PaddleWakeVertexColors = VertexColors;
+    for (int32 Index = 0; Index < SurfacePresentationColors.Num(); ++Index)
     {
         PaddleWakeVertexColors[Index].R = 0.0f;
         PaddleWakeVertexColors[Index].A =
@@ -7267,15 +7716,17 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     }
 
     const TArray<FVector2D> EmptyUVs;
-    UpdateSurfaceCarrierMesh(false,SurfacePresentationColors);
+    // Section zero is hidden for the lifetime of the Cartesian single core.
+    // Its source arrays still drive crests, foam, wakes and support; copying
+    // them to a second unused procedural render buffer serves no consumer.
+    if (!bCartesianSingleCarrier)
+        UpdateSurfaceCarrierMesh(false,SurfacePresentationColors);
 
     // Rebuild section 1 from only the triangles touched by the wake. Its
     // topology is the bilateral ripple, while vertex alpha softly feathers
     // the signed displaced crest/trough bands without sampling a texture.
     int32 PaddleWakeRenderTriangleCount = 0;
-    if (MaximumAbsoluteBoatWakeM > 0.001f &&
-        CVarRaftSimPaddleWakeRippleOverlay.GetValueOnGameThread() != 0 &&
-        CVarRaftSimFreezeCoreTopology.GetValueOnGameThread() < 2)
+    if (bBuildPaddleRipple)
     {
         TArray<FVector> RippleVertices;
         TArray<int32> RippleTriangles;
@@ -7423,6 +7874,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             FMath::IsFinite(WaterSamples[Index].DepthMeters) &&
             WaterSamples[Index].DepthMeters >= 0.10f ? 1 : 0;
     }
+    Perf.Mark(TEXT("foam_overlay_finish"));
     const double RefreshCpuMilliseconds =
         (FPlatformTime::Seconds() - RefreshStartSeconds) * 1000.0;
     if (!bLoggedPresentationDiagnostics && WetVertexCount > 0)
@@ -7512,6 +7964,9 @@ bool ARaftSimWaterSurfaceActor::IsRapidFoamMeshVisible() const
 
 bool ARaftSimWaterSurfaceActor::IsLiveVolumeCoreVisible() const
 {
+    if (WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates())
+        return CartesianShorelineMesh && CartesianShorelineMesh->IsVisible() &&
+            !CartesianShorelineMesh->GetWaterIndices().IsEmpty();
     return LiveVolumeCoreMesh &&
         LiveVolumeCoreMesh->IsVisible() &&
         LiveVolumeCoreTriangleCount > 0;
@@ -7520,6 +7975,42 @@ bool ARaftSimWaterSurfaceActor::IsLiveVolumeCoreVisible() const
 void ARaftSimWaterSurfaceActor::GetBreakingSites(TArray<FBreakingSite>& OutSites) const
 {
     OutSites = BreakingSites;
+}
+
+bool ARaftSimWaterSurfaceActor::SampleCartesianCarrierSupport(
+    const FVector& WorldPositionCm,float& OutHeightM,bool& OutWet) const
+{
+    OutHeightM=0.f; OutWet=false;
+    if (!WaterAdapter || !WaterAdapter->HasCartesianWaterCoordinates() ||
+        !bSingleLiveWaterSurfaceEnabled || !IsLiveVolumeCoreVisible() ||
+        GridStationN<2 || GridLateralN<2 || RiverCoordinatesM.IsEmpty() ||
+        ResolvedVertexSpacingMeters<=0.f || WorldPositionCm.ContainsNaN()) return false;
+    FVector2D Coordinates; FVector Tangent,Left;
+    if (!WaterAdapter->WorldToRiverCoordinates(WorldPositionCm,Coordinates,Tangent,Left)) return false;
+    const FVector2D Grid=(Coordinates-RiverCoordinatesM[0])/ResolvedVertexSpacingMeters;
+    if (Grid.X<0. || Grid.Y<0. || Grid.X>GridStationN-1 || Grid.Y>GridLateralN-1) return false;
+    if (MovingDetail) MovingDetail->CommitCompletedFrame();
+    const int32 X=FMath::Min(FMath::FloorToInt(Grid.X),GridStationN-2);
+    const int32 Y=FMath::Min(FMath::FloorToInt(Grid.Y),GridLateralN-2);
+    const int32 Cell=Y*(GridStationN-1)+X;
+    const auto& Offsets=CartesianShorelineMesh->GetCellOffsets();
+    if (!Offsets.IsValidIndex(Cell+1)) return false;
+    FVector Position,Weights;FIntVector Corners;
+    const auto& Drawn=CartesianShorelineMesh->GetWaterVertices();
+    OutWet=RaftSimWaterShoreline::Sample(FVector2D(WorldPositionCm.X,WorldPositionCm.Y),
+        Offsets[Cell],Offsets[Cell+1],Drawn,CartesianShorelineMesh->GetWaterIndices(),Position,&Corners,&Weights);
+    const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
+    if (OutWet && Detail)
+    {
+        // WPO is applied at rendered vertices, then rasterized linearly. A
+        // bilinear detail query at the hull point is NOT that same triangle.
+        const float Sign=WaterAdapter->GetRiverWorldYSign();
+        Position.Z+=Weights.X*Detail->DisplacementCm(Drawn[Corners.X].Position,Sign)+
+            Weights.Y*Detail->DisplacementCm(Drawn[Corners.Y].Position,Sign)+
+            Weights.Z*Detail->DisplacementCm(Drawn[Corners.Z].Position,Sign);
+    }
+    if (OutWet) OutHeightM=float((Position.Z-GetResolvedLiveSurfaceRenderLiftCm())*.01);
+    return true;
 }
 
 bool ARaftSimWaterSurfaceActor::SampleVisibleCarrierAtRiverCoordinates(
@@ -7548,6 +8039,17 @@ bool ARaftSimWaterSurfaceActor::SampleVisibleCarrierAtRiverCoordinates(
     const float U = Grid.X - X;
     const float V = Grid.Y - Y;
     const int32 I0 = Y * GridStationN + X;
+    if (!bGpuCarrier && WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates())
+    {
+        const int32 Cell=Y*(GridStationN-1)+X;
+        const auto& CartesianShoreCellOffsets=CartesianShorelineMesh->GetCellOffsets();
+        if (!CartesianShoreCellOffsets.IsValidIndex(Cell+1)) return false;
+        FVector QueryWorld;
+        if (!WaterAdapter->RiverToWorldPosition(CoordinatesM,0.f,QueryWorld)) return false;
+        return RaftSimWaterShoreline::Sample(FVector2D(QueryWorld.X,QueryWorld.Y), CartesianShoreCellOffsets[Cell],
+            CartesianShoreCellOffsets[Cell+1], CartesianShorelineMesh->GetWaterVertices(),
+            CartesianShorelineMesh->GetWaterIndices(), OutPositionCm);
+    }
     // Match the actual I0/I2/I1, I1/I2/I3 carrier diagonal, not a bilinear
     // height patch that can float above or under a non-planar triangle.
     const bool bFirstTriangle = U + V <= 1.0f;
@@ -7606,6 +8108,7 @@ bool ARaftSimWaterSurfaceActor::SampleVisibleCarrierAtRiverCoordinates(
             Site.Intensity = Properties.X;
             Site.SpillingFraction = Properties.Y;
             Site.bLocalEnvelopeCap = Properties.Z != 0;
+            Site.FlowDirection = RaftSimWaterFlowFrame::FromAngle(Properties.W);
         }
         Position.Z += 100.0f * ResolvedPresentationHydraulicReliefScale * ShoreWeight *
             URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
@@ -7740,6 +8243,211 @@ void ARaftSimWaterSurfaceActor::SampleBoatWakeState()
     bBoatWakeValid = true;
 }
 
+void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Positions,
+    const TArray<FVector>& VertexNormals, const TArray<FLinearColor>& Colors,
+    const TArray<FVector2D>& Flow, const TArray<FVector2D>& Wake, bool bCreate,float CrestBlendAlpha)
+{
+    if (WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates())
+    {
+        FWaterSurfacePerf Perf(TEXT("cartesian_publish"));
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,CartesianPublish);
+        const int32 N=Positions.Num();
+        if (N!=GridStationN*GridLateralN || VertexNormals.Num()!=N || Colors.Num()!=N ||
+            Flow.Num()!=N || Wake.Num()!=N || UVs.Num()!=N || Tangents.Num()!=N) return;
+        TArray<FProcMeshVertex> Source;
+        {
+            CSV_SCOPED_TIMING_STAT(RaftSimSurface,PackSource);
+            // Exact packing is not necessarily faster in parallel. Keep it
+            // opt-in for same-binary timing comparisons until measured better.
+            static const bool bParallelSourcePacking = FParse::Param(
+                FCommandLine::Get(), TEXT("RaftSimParallelSourcePacking"));
+            if (!RaftSimWaterSourcePacking::Pack(Positions,VertexNormals,Colors,UVs,
+                Flow,Wake,Tangents,Source,bParallelSourcePacking,
+                FoamTransportVelocityMetersPerSecond.Num()==N
+                    ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>(Flow))) return;
+        }
+        Perf.Mark(TEXT("pack_source"));
+        if (CartesianShorelineMesh->GetMaterial(0)!=LiveVolumeCoreMesh->GetMaterial(0))
+            CartesianShorelineMesh->SetMaterial(0, LiveVolumeCoreMesh->GetMaterial(0));
+        const bool bFineCrests=bSharedBreakingReliefEnabled && bSingleLiveWaterSurfaceEnabled &&
+            MacroCrestDisplacementCm.Num()==N && MacroCrestShoreWeights.Num()==N && CartesianCrestInput.HeightAtWorldXYCm;
+        CartesianCrestInput.SourceCrestCm=MacroCrestDisplacementCm;
+        CartesianCrestInput.SourceShoreWeight=MacroCrestShoreWeights;
+        CartesianCrestInput.BlendAlpha=bCreate ? 1.f : CrestBlendAlpha;
+        CartesianCrestInput.DetailSpanCm=0;
+        if (MovingDetail && MovingDetail->IsReady() && FoamOcclusionRaft)
+        {
+            // Quantized 16m coverage with 16m padding encloses every possible
+            // 8m-hysteresis detail window until the next geometry submission.
+            const FVector P=FoamOcclusionRaft->GetActorLocation();
+            const FVector2D C(FMath::RoundToDouble(P.X/1600.)*1600.,FMath::RoundToDouble(P.Y/1600.)*1600.);
+            CartesianCrestInput.DetailWindowCm=FBox2D(C-FVector2D(4800,4800),C+FVector2D(4800,4800));
+            CartesianCrestInput.DetailSpanCm=50.f;
+        }
+        if (CartesianShorelineMesh->SetClippedWaterMesh(GridStationN,GridLateralN,MoveTemp(Source),
+            CartesianShoreWet,CartesianShoreAvailable,CartesianShoreDepthM,CartesianShoreBedM,
+            bFineCrests ? &CartesianCrestInput : nullptr))
+        {
+            CartesianShoreSourceVertexCount=N;
+            LiveVolumeCoreTriangleCount=CartesianShorelineMesh->GetWaterIndices().Num()/3;
+        }
+        Perf.Mark(TEXT("clip_bounds_enqueue"));
+#if !UE_BUILD_SHIPPING
+        FString ContactAuditPath;
+        if (GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimCarrierContactAudit="),ContactAuditPath) &&
+            !FPaths::FileExists(ContactAuditPath))
+        {
+            // Independent barycentric points on ACTUAL submitted triangles,
+            // including shore clipping and temporal/fine-crest corrections.
+            // Includes the paired detail payload; GPU upload/sampler parity is
+            // audited separately. This does not measure render latency.
+            const auto& Drawn=CartesianShorelineMesh->GetWaterVertices();
+            const auto& Indices=CartesianShorelineMesh->GetWaterIndices();
+            if (MovingDetail) MovingDetail->CommitCompletedFrame();
+            const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
+            double MaxError=0.,SumSquared=0.; int32 Count=0,Dry=0,Unavailable=0;
+            int32 DetailAffectedPoints=0; double MaxContactDetailCm=0.;
+            const int32 TriangleStride=FMath::Max(1,Indices.Num()/3/2000);
+            for (int32 T=0;T<Indices.Num()/3;T+=TriangleStride)
+            {
+                const FVector P=Drawn[Indices[3*T]].Position*.2+
+                    Drawn[Indices[3*T+1]].Position*.3+Drawn[Indices[3*T+2]].Position*.5;
+                FRaftSimWaterSample Support;
+                if (!WaterAdapter->SampleRaftSupportSurfaceAtWorldPosition(P,Support)) { ++Unavailable; continue; }
+                if (!Support.bWet) { ++Dry; continue; }
+                double DetailCm=0.;
+                if (Detail)
+                {
+                    const float Sign=WaterAdapter->GetRiverWorldYSign();
+                    DetailCm=.2*Detail->DisplacementCm(Drawn[Indices[3*T]].Position,Sign)+
+                        .3*Detail->DisplacementCm(Drawn[Indices[3*T+1]].Position,Sign)+
+                        .5*Detail->DisplacementCm(Drawn[Indices[3*T+2]].Position,Sign);
+                }
+                if (FMath::Abs(DetailCm)>1.e-6) ++DetailAffectedPoints;
+                MaxContactDetailCm=FMath::Max(MaxContactDetailCm,FMath::Abs(DetailCm));
+                const double Error=Support.SurfaceHeightMeters*100.-
+                    (P.Z+DetailCm-GetResolvedLiveSurfaceRenderLiftCm());
+                MaxError=FMath::Max(MaxError,FMath::Abs(Error)); SumSquared+=Error*Error; ++Count;
+            }
+            auto Report=MakeShared<FJsonObject>();
+            Report->SetStringField(TEXT("scope"),TEXT("Actual world-space raft support versus independent barycentric submitted wet triangles, including the paired resolved-detail payload when present. GPU payload/upload parity is audited separately. Excludes render latency, full traversal and visual acceptance."));
+            Report->SetBoolField(TEXT("includes_paired_detail"),Detail.IsValid());
+            Report->SetNumberField(TEXT("detail_affected_contact_points"),DetailAffectedPoints);
+            Report->SetNumberField(TEXT("maximum_contact_detail_height_cm"),MaxContactDetailCm);
+            Report->SetNumberField(TEXT("detail_frame_sequence"),Detail ? Detail->Sequence : 0);
+            Report->SetBoolField(TEXT("detail_gpu_audit_requested"),MovingDetail && MovingDetail->AuditPresentedFrame());
+            Report->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
+            Report->SetNumberField(TEXT("tested_wet_points"),Count);
+            Report->SetNumberField(TEXT("raw_dry_points"),Dry);
+            Report->SetNumberField(TEXT("unavailable_points"),Unavailable);
+            Report->SetNumberField(TEXT("maximum_support_carrier_error_cm"),MaxError);
+            Report->SetNumberField(TEXT("rms_support_carrier_error_cm"),Count ? FMath::Sqrt(SumSquared/Count) : 0.);
+            Report->SetNumberField(TEXT("render_lift_cm"),GetResolvedLiveSurfaceRenderLiftCm());
+            FString Json; auto Writer=TJsonWriterFactory<>::Create(&Json); FJsonSerializer::Serialize(Report,Writer);
+            FFileHelper::SaveStringToFile(Json,*ContactAuditPath);
+        }
+#endif
+        FString TransportAuditPath;
+        if (GetWorld() && GetWorld()->GetTimeSeconds()>=10.f && FoamTransportVelocityMetersPerSecond.Num()==N &&
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamTransportAudit="),TransportAuditPath) &&
+            !FPaths::FileExists(TransportAuditPath))
+        {
+            const auto& Drawn=CartesianShorelineMesh->GetWaterVertices();
+            double MaxTransportError=0.,MaxBulkError=0.,MaxReturn=0.;
+            int32 WetCount=0,ReturnCount=0;
+            if (Drawn.Num()>=N) for (int32 I=0;I<N;++I)
+            {
+                MaxTransportError=FMath::Max(MaxTransportError,(Drawn[I].UV3-FoamTransportVelocityMetersPerSecond[I]).Size());
+                MaxBulkError=FMath::Max(MaxBulkError,(Drawn[I].UV1-Flow[I]).Size());
+                if (CartesianShoreWet[I])
+                {
+                    ++WetCount;
+                    // Compare against the published (smoothed) bulk channel.
+                    // This difference includes smoothing as well as return
+                    // flow; it is not a measurement of roller velocity alone.
+                    const double Return=(FoamTransportVelocityMetersPerSecond[I]-Flow[I]).Size();
+                    ReturnCount+=Return>1.e-6; MaxReturn=FMath::Max(MaxReturn,Return);
+                }
+            }
+            auto Report=MakeShared<FJsonObject>();
+            Report->SetStringField(TEXT("scope"),TEXT("Actual submitted Cartesian source UV3 versus exact CPU foam backtrace velocity; UV1 bulk flow unchanged. Roller/eddy contributions are presentation-only, not measured fluid momentum or visual acceptance."));
+            Report->SetNumberField(TEXT("source_vertices"),N);
+            Report->SetBoolField(TEXT("complete_source_prefix"),Drawn.Num()>=N);
+            Report->SetNumberField(TEXT("wet_vertices"),WetCount);
+            Report->SetNumberField(TEXT("transport_differs_from_published_bulk_vertices"),ReturnCount);
+            Report->SetNumberField(TEXT("maximum_difference_from_published_bulk_mps"),MaxReturn);
+            Report->SetNumberField(TEXT("maximum_source_transport_error_mps"),MaxTransportError);
+            Report->SetNumberField(TEXT("maximum_bulk_channel_error_mps"),MaxBulkError);
+            FString Json; FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+            FFileHelper::SaveStringToFile(Json,*TransportAuditPath);
+        }
+        FString CrestAuditPath;
+        if (bFineCrests && GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestSamplingAudit="),CrestAuditPath) &&
+            !FPaths::FileExists(CrestAuditPath+TEXT(".cartesian-mesh.json")))
+        {
+            const auto& MeshVertices=CartesianShorelineMesh->GetWaterVertices();
+            const auto& MeshIndices=CartesianShorelineMesh->GetWaterIndices();
+            const auto& Offsets=CartesianShorelineMesh->GetCellOffsets();
+            const auto& Fine=CartesianShorelineMesh->GetCrestRefinement();
+            const auto& Coarse=Fine.GetExpandedCoarseCrestCm();
+            const auto& Shore=Fine.GetExpandedShore();
+            const auto& Target=Fine.GetTargetCorrectionsCm();
+            const auto& Rendered=Fine.GetRenderedCorrectionsCm();
+            double MaxTargetErrorCm=0.,MaxCorrectionTrackingCm=0.,MaxSourceChangeCm=0.;
+            int32 SampleCount=0;
+            for (int32 I=0; I<N; ++I)
+                MaxSourceChangeCm=FMath::Max(MaxSourceChangeCm,FVector::Distance(Positions[I],MeshVertices[I].Position));
+            for (int32 Y=0; Y<GridLateralN-1; ++Y) for (int32 X=0; X<GridStationN-1; ++X)
+            {
+                const int32 A=Y*GridStationN+X,Cell=Y*(GridStationN-1)+X;
+                if (!CartesianShoreWet[A] || !CartesianShoreWet[A+1] ||
+                    !CartesianShoreWet[A+GridStationN] || !CartesianShoreWet[A+GridStationN+1]) continue;
+                for (int32 T=Offsets[Cell]; T<Offsets[Cell+1]; T+=3)
+                {
+                    const int32 IA=MeshIndices[T],IB=MeshIndices[T+1],IC=MeshIndices[T+2];
+                    for (int32 U=0; U<=7; ++U) for (int32 V=0; V<=7-U; ++V)
+                    {
+                        const double WB=U/7.,WC=V/7.,WA=1.-WB-WC;
+                        const FVector P=MeshVertices[IA].Position*WA+MeshVertices[IB].Position*WB+MeshVertices[IC].Position*WC;
+                        const double Weight=Shore[IA]*WA+Shore[IB]*WB+Shore[IC]*WC;
+                        const double Expected=CartesianCrestInput.HeightAtWorldXYCm(FVector2D(P.X,P.Y))*Weight;
+                        const double Actual=(Coarse[IA]+Target[IA])*WA+(Coarse[IB]+Target[IB])*WB+(Coarse[IC]+Target[IC])*WC;
+                        const double Tracking=(Rendered[IA]-Target[IA])*WA+(Rendered[IB]-Target[IB])*WB+(Rendered[IC]-Target[IC])*WC;
+                        MaxTargetErrorCm=FMath::Max(MaxTargetErrorCm,FMath::Abs(Expected-Actual));
+                        MaxCorrectionTrackingCm=FMath::Max(MaxCorrectionTrackingCm,FMath::Abs(Tracking));
+                        ++SampleCount;
+                    }
+                }
+            }
+            auto Report=MakeShared<FJsonObject>();
+            Report->SetStringField(TEXT("map"),GetWorld()->GetMapName());
+            Report->SetStringField(TEXT("scope"),TEXT("Current shared crest target on actual submitted Cartesian topology; sevenths sampled in fully wet source cells. Excludes macro temporal lag, other base relief and GPU perturbations. Fine correction temporal tracking reported separately; not full shaded motion acceptance."));
+            Report->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
+            Report->SetNumberField(TEXT("source_vertices"),N);
+            Report->SetNumberField(TEXT("active_vertices_including_shore_reserve"),CartesianShorelineMesh->GetActiveVertexCount());
+            Report->SetNumberField(TEXT("render_buffer_vertices"),MeshVertices.Num());
+            Report->SetNumberField(TEXT("submitted_triangles"),MeshIndices.Num()/3);
+            Report->SetNumberField(TEXT("samples"),SampleCount);
+            Report->SetNumberField(TEXT("maximum_target_crest_error_cm"),MaxTargetErrorCm);
+            Report->SetNumberField(TEXT("maximum_fine_correction_tracking_cm"),MaxCorrectionTrackingCm);
+            Report->SetNumberField(TEXT("maximum_source_vertex_change_cm"),MaxSourceChangeCm);
+            Report->SetNumberField(TEXT("refinement_build_count"),Fine.GetBuildCount());
+            FString Json; FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+            const bool Saved=FFileHelper::SaveStringToFile(Json,*(CrestAuditPath+TEXT(".cartesian-mesh.json")));
+            UE_LOG(LogTemp,Display,TEXT("Cartesian fine crest audit: samples=%d target_error_cm=%.9g tracking_cm=%.9g source_change_cm=%.9g saved=%d"),
+                SampleCount,MaxTargetErrorCm,MaxCorrectionTrackingCm,MaxSourceChangeCm,Saved);
+        }
+        return;
+    }
+    const TArray<FVector2D> Empty;
+    if (bCreate) LiveVolumeCoreMesh->CreateMeshSection_LinearColor(0, Positions,
+        LiveVolumeCoreTriangles, VertexNormals, UVs, Flow, Wake, Empty, Colors, Tangents, false, false);
+    else LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(0, Positions, VertexNormals,
+        UVs, Flow, Wake, Empty, Colors, Tangents, false);
+}
+
 void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
     float DeltaSeconds)
 {
@@ -7749,10 +8457,12 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
     const FProcMeshSection* CoreSection = LiveVolumeCoreMesh
         ? LiveVolumeCoreMesh->GetProcMeshSection(0)
         : nullptr;
+    const bool bCartesianFlow = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates();
+    const bool bMeshShapeValid = bCartesianFlow ? CartesianShoreSourceVertexCount == LiveVolumeCoreVertices.Num()
+        : CoreSection && CoreSection->ProcVertexBuffer.Num() == LiveVolumeCoreVertices.Num();
     if (!bLiveVolumeCoreInterpolationActive ||
         !LiveVolumeCoreMesh ||
-        CoreSection == nullptr ||
-        CoreSection->ProcVertexBuffer.Num() != LiveVolumeCoreVertices.Num() ||
+        !bMeshShapeValid ||
         LiveVolumeCoreVertices.Num() == 0 ||
         LiveVolumeCoreInterpolationStartVertices.Num() !=
             LiveVolumeCoreVertices.Num() ||
@@ -7823,17 +8533,9 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
     // Preserve the numeric channels on every refresh/recentre/interpolation:
     // otherwise e.g. 0.05 foam becomes ~0.25 after the first update, driving
     // both exaggerated whitening and different local-fluid displacement.
-    LiveVolumeCoreMesh->UpdateMeshSection_LinearColor(
-        0,
-        RenderedLiveVolumeCoreVertices,
-        RenderedLiveVolumeCoreNormals,
-        UVs,
-        RenderedLiveVolumeCoreFlowVelocity,
-        RenderedLiveVolumeCoreWakeData,
-        EmptyUVs,
-        RenderedLiveVolumeCoreVertexColors,
-        Tangents,
-        /*bSRGBConversion=*/false);
+    PublishLiveVolumeCore(RenderedLiveVolumeCoreVertices, RenderedLiveVolumeCoreNormals,
+        RenderedLiveVolumeCoreVertexColors, RenderedLiveVolumeCoreFlowVelocity,
+        RenderedLiveVolumeCoreWakeData, false,Alpha);
     // The chase never "completes": it keeps easing toward the latest
     // refresh targets every frame until a hard swap or grid teardown
     // deactivates it.
@@ -7841,7 +8543,11 @@ void ARaftSimWaterSurfaceActor::UpdateLiveVolumeCoreInterpolation(
 
 void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimSurface,Tick);
     Super::Tick(DeltaSeconds);
+    if (!TryInitializeRuntimeSurface()) return;
+    if (MovingDetail) MovingDetail->CommitCompletedFrame();
+    FWaterSurfacePerf Perf(TEXT("tick"));
     PresentationPhaseSeconds = FMath::Fmod(
         PresentationPhaseSeconds + FMath::Max(DeltaSeconds, 0.0f),
         4096.0f);
@@ -7869,6 +8575,35 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
     }
     if (FoamOcclusionRaft && WaterAdapter)
     {
+        if (bSingleLiveWaterSurfaceEnabled &&
+            WaterAdapter->HasCartesianWaterCoordinates())
+        {
+            auto* Material=Cast<UMaterialInstanceDynamic>(LiveVolumeCoreMesh->GetMaterial(0));
+            if (MovingDetailMaterial && MovingDetailMaterial!=Material)
+            {
+                if (MovingDetail)MovingDetail->DestroyComponent();
+                MovingDetail=nullptr;MovingDetailMaterial=nullptr;bMovingDetailAttempted=false;
+            }
+            float IntegratedMarker=0;
+            if (!bMovingDetailAttempted && Material && Material->GetScalarParameterValue(
+                FHashedMaterialParameterInfo(TEXT("StatefulDetailWorldYSign")),IntegratedMarker))
+            {
+                bMovingDetailAttempted=true;MovingDetailMaterial=Material;
+                MovingDetail=NewObject<URaftSimStatefulDetailComponent>(this);
+                MovingDetail->RegisterComponent();
+                if (MovingDetail->Initialize(WaterAdapter,Material,FoamOcclusionRaft->GetActorLocation(),
+                    FVector::ForwardVector,true,true))
+                {
+                    // Retire both sides of the old procedural local-fluid
+                    // coupling. Macro height/shared crest support remains.
+                    // GPU perturbation support/contact still needs validation.
+                    ResolvedRaftLocalFluidHeightfieldStrength=0;
+                    Material->SetScalarParameterValue(TEXT("RaftSimLocalFluidWPOStrength"),0);
+                }
+                else UE_LOG(LogTemp,Error,TEXT("Playable South Fork moving detail initialization failed; not accepted as integrated water"));
+            }
+            if (MovingDetail)MovingDetail->SetFocusActor(FoamOcclusionRaft);
+        }
         FRaftSimWaterSample ClockSample;
         if (WaterAdapter->SampleWaterAtWorldPosition(
                 FoamOcclusionRaft->GetActorLocation(), ClockSample) &&
@@ -8049,7 +8784,9 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
     // Solver sampling and topology stay at the bounded hydraulic cadence, but
     // the one visible carrier must not expose that cadence through its normal
     // field. Reflections are especially sensitive to even small normal steps.
+    Perf.Mark(TEXT("clock_masks"));
     UpdateLiveVolumeCoreInterpolation(DeltaSeconds);
+    Perf.Mark(TEXT("interpolation"));
 
     TimeSinceRefresh += DeltaSeconds;
     if (TimeSinceRefresh >= RefreshIntervalSeconds)
@@ -8057,4 +8794,5 @@ void ARaftSimWaterSurfaceActor::Tick(float DeltaSeconds)
         TimeSinceRefresh = 0.0f;
         RefreshSurface();
     }
+    Perf.Mark(TEXT("refresh"));
 }

@@ -20,7 +20,12 @@ class ProjectLayoutTests(unittest.TestCase):
         self.assertEqual(set(cooked),shipping)
         frontend=(PLUGIN/'RaftSimUI/Private/RaftSimVerticalSliceFrontend.cpp').read_text()
         launches=set(re.findall(r'TEXT\("(/Game/RaftSim/Maps/[^"\n]+)"\)',frontend))
-        self.assertEqual(launches,shipping-{'/Game/RaftSim/Maps/L_RaftSimBoot'})
+        components={item['map'] for item in CATALOG['shipping'] if item['role']=='rapid_component'}
+        self.assertEqual(launches,shipping-{'/Game/RaftSim/Maps/L_RaftSimBoot'}-components)
+        self.assertTrue(components.isdisjoint(launches))
+        for item in CATALOG['shipping']:
+            if item['role']=='rapid_component':
+                self.assertIn(item['parent_map'],launches)
 
     def test_current_maps_exist(self):
         for item in CATALOG['shipping']:

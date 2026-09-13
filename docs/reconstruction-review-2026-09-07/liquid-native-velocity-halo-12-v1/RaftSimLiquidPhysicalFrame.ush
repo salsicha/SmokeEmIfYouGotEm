@@ -1,0 +1,27 @@
+#ifndef RAFTSIM_LIQUID_PHYSICAL_FRAME
+#define RAFTSIM_LIQUID_PHYSICAL_FRAME
+#include "/Engine/Private/DoubleFloat.ush"
+
+FDFScalar RaftSimLiquidPhysicalDot(FDFVector3 displacement,float3 axis)
+{
+    FDFVector3 product=DFMultiply(displacement,axis);
+    return DFAdd(DFAdd(DFGetComponent(product,0),DFGetComponent(product,1)),DFGetComponent(product,2));
+}
+// Routing and exit classification must make the same physical-box decision.
+// Do not normalize to cells before testing the boundary: reciprocal rounding
+// can map 8100.00048828125 cm / 50 cm back onto cell coordinate 162 exactly.
+FDFVector3 RaftSimLiquidPhysicalPointDF(float3 world,float3 lower,float3 axisX,float3 axisY)
+{
+    // Keep the subtraction AND rotated dot-product residuals until the final
+    // float result. At the actual reservoir east face, separate float rounding
+    // turned 24699.99992154778 cm into 24700.001953125 cm: a false exit.
+    // No boundary epsilon, position clamp, or change to the represented box.
+    FDFVector3 displacement=DFTwoSum(world,-lower);
+    return MakeDFVector(RaftSimLiquidPhysicalDot(displacement,axisX),
+        RaftSimLiquidPhysicalDot(displacement,axisY),DFGetComponent(displacement,2));
+}
+float3 RaftSimLiquidPhysicalPoint(float3 world,float3 lower,float3 axisX,float3 axisY)
+{
+    return DFDemote(RaftSimLiquidPhysicalPointDF(world,lower,axisX,axisY));
+}
+#endif

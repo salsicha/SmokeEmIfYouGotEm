@@ -1,19 +1,3 @@
-{
-  "features": [
-    {
-      "angle": 0.0,
-      "center": {
-        "x": 31.5,
-        "y": 0.0
-      },
-      "kind": "ledge",
-      "length": 23.0,
-      "metadata": {
-        "analytic_fixture_role": "riemann_depth_discontinuity"
-      },
-      "radius": 0.0,
-      "strength": 1.0,
-      "width": 0.0
-    }
-  ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:af405740e2ab1df94beb49f70ab85e75870df5ae4a6ac7807db454e7047c4cb6
+size 336

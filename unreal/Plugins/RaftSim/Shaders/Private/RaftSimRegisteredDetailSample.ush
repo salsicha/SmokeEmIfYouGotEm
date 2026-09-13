@@ -1,0 +1,30 @@
+#ifndef RAFTSIM_REGISTERED_DETAIL_SAMPLE
+#define RAFTSIM_REGISTERED_DETAIL_SAMPLE
+float RaftSimRegisteredDetailWindowWeight(Texture2D<float4> detail,float2 fieldPositionM)
+{
+    uint width,height;detail.GetDimensions(width,height);
+    if (width<2 || height<3)return 0;
+    float4 metadata=detail.Load(int3(0,height-1,0));
+    if (metadata.w!=1 || metadata.z<=0)return 0;
+    float2 p=fieldPositionM-metadata.xy;
+    float2 farEdge=float2(width-1,height-2)*metadata.z-p;
+    return smoothstep(0,4,min(min(p.x,p.y),min(farEdge.x,farEdge.y)));
+}
+// The last row belongs to this texture's own rendered state. Never combine
+// previous-frame pixels with a new window origin supplied by a current uniform.
+float4 RaftSimRegisteredDetailSample(Texture2D<float4> detail,float2 fieldPositionM)
+{
+    uint width,height;detail.GetDimensions(width,height);
+    if (width<2 || height<3)return 0;
+    float4 metadata=detail.Load(int3(0,height-1,0));
+    if (metadata.w!=1 || metadata.z<=0)return 0;
+    int2 size=int2(width,height-1);
+    float2 p=(fieldPositionM-metadata.xy)/metadata.z;
+    if (any(p<0) || any(p>float2(size-1)))return 0;
+    int2 cell=clamp(int2(floor(p)),0,size-2);float2 f=p-cell;
+    // Clamp to DATA centres. Hardware filtering against the metadata row
+    // would inject kilometre-scale values along the far edge of the water.
+    return lerp(lerp(detail.Load(int3(cell,0)),detail.Load(int3(cell+int2(1,0),0)),f.x),
+                lerp(detail.Load(int3(cell+int2(0,1),0)),detail.Load(int3(cell+1,0)),f.x),f.y);
+}
+#endif

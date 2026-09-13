@@ -44,7 +44,8 @@ def audit(directory):
     if (not capture['complete'] or report['zero_water'] or report['exchange_error'] or
             not report['native_transfer_packet_saved'] or report['native_transfer_packet_step'] <= 1):
         raise ValueError('Successful later-step snapshot with actual first-step birth records required')
-    rasters = [g for g in report['groups'] if g['entries'][0]['name'] == 'Neighbor Grid Rasterize Particles']
+    from liquid_stage_journal import stage_groups
+    rasters = [g for g in stage_groups(report) if g['entries'][0]['name'] == 'Neighbor Grid Rasterize Particles']
     step = report['native_transfer_packet_step']
     if (len(rasters) < step or any(not g['complete'] or not g['aligned'] or len(g['entries']) != 12
                                   for g in rasters[:step]) or
