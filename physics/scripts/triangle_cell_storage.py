@@ -16,7 +16,12 @@ def clip_polygon(polygon, axis, bound, keep_greater):
         if inside_a:
             output.append(a)
         if inside_a != inside_b:
-            output.append(a+(b-a)*(da/(da-db)))
+            intersection = a+(b-a)*(da/(da-db))
+            # The computed intersection lies on this mathematical plane.
+            # Assign it exactly so neighboring cells share the same face;
+            # the original vertices and interpolated other coordinates stay.
+            intersection[axis] = bound
+            output.append(intersection)
     return np.asarray(output, float).reshape(-1, 3)
 
 
@@ -71,6 +76,10 @@ class TriangleCellStorage:
             raise ValueError('Degenerate projected triangle')
         self.levels = np.sort(triangles[:, :, 2], axis=1)
         self.area = float(self.areas.sum())
+        a, b = triangles[:, 1]-triangles[:, 0], triangles[:, 2]-triangles[:, 0]
+        determinant = a[:, 0]*b[:, 1]-a[:, 1]*b[:, 0]
+        self.bed_gradients = np.stack(((a[:, 2]*b[:, 1]-b[:, 2]*a[:, 1])/determinant,
+                                      (a[:, 0]*b[:, 2]-b[:, 0]*a[:, 2])/determinant), axis=1)
 
     def volume_and_wet_area(self, stage):
         """Integral of max(stage-bed,0) and strictly positive-depth wet area.
@@ -82,6 +91,21 @@ class TriangleCellStorage:
         fractions. Above it subtract the complementary dry triangle. Repeated
         vertex heights use only branches with nonzero denominators.
         """
+        volume, wet = self._triangle_volume_and_wet_area(stage)
+        return float(volume.sum()), float(wet.sum())
+
+    def hydrostatic_bed_force(self, stage, gravity=9.81):
+        """Exact -g integral(depth * grad(bed)) over the original triangles.
+
+        Units are m^4/s^2, consistent with integrated cell momentum V*u.
+        No face-pressure residual is used to manufacture a rest balance.
+        """
+        if not np.isfinite(gravity) or gravity <= 0:
+            raise ValueError('Positive finite gravity required')
+        volume, _ = self._triangle_volume_and_wet_area(stage)
+        return -gravity*np.sum(volume[:, None]*self.bed_gradients, axis=0)
+
+    def _triangle_volume_and_wet_area(self, stage):
         if not np.isfinite(stage):
             raise ValueError('Finite stage required')
         a, b, c = self.levels.T
@@ -104,7 +128,7 @@ class TriangleCellStorage:
         lower_span = b[upper]-a[upper]
         volume[upper] = (lower_span**2/3+t*lower_span+t*t*(1-t/(3*remaining)))/span
         wet[upper] = (lower_span+t*(2-t/remaining))/span
-        return float(self.areas@volume), float(self.areas@wet)
+        return self.areas*volume, self.areas*wet
 
     def stage_for_volume(self, volume):
         """Invert the monotone local storage relation; zero volume stays dry."""
