@@ -1,10 +1,17 @@
 # Troublemaker: reference sequence and liquid-test coverage
 
-Latest retry September14,09:08UTC: both browser runtimes fail initialization with
+Latest retry September14,approximately18:16UTC: BOTH supplied YouTube players
+now open in the in-app browser. New sampled frames from the on-board and
+bank-side videos were inspected and compared with the latest ordinary-game
+capture; geometry/breaking/froth remain visually unaccepted. This is sampled
+reference access, not calibrated motion, measured bathymetry or new shipping
+rights. See [fresh viewing and limitations](reference-review.md).
+
+Historical retry September14,09:08UTC: both browser runtimes fail initialization with
 missing kernel-assets path (os error3), including one reset/retry; direct web
 opens of both supplied videos return cache misses. No new footage inspected.
 See [retry details](reference-review.md). Historical observations below are not
-superseded by a newly successful viewing or continuous-motion measurement.
+replaced by a continuous-motion measurement; the access failure is superseded above.
 
 September 9 continuation. The preceding user-facing status turn was **no
 implementation progress**. This pass adds inspected reference evidence and a

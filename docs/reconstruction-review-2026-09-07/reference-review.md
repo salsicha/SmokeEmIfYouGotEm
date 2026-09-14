@@ -1,5 +1,42 @@
 # Troublemaker reference cross-check
 
+## September 14, approximately 18:16 UTC: both supplied videos accessible
+
+The in-app browser now opens BOTH public YouTube players. This supersedes the
+access failures below, not the outstanding geographic/visual acceptance gates.
+No login, remote-video download, asset import or security-setting change was used.
+The computer-use skill and required guidance were read before browser inspection.
+
+- [John Elkins: Troublemaker Rapid on the South Fork American River](https://www.youtube.com/watch?v=ZEG1kvjNI30):
+  player duration 1:08. Inspected the title card at 0:03 (June 24, 2016), then
+  paused footage at 0:18, 0:28 and 0:33. Dark approach water contains narrow,
+  intermittent white streaks; exposed rock constrains the passage; the view
+  ahead at 0:33 contains separated white crests and dark troughs. Playback was
+  started, and a later screenshot showed the end card. That does NOT mean every
+  intervening frame was visually inspected or that motion was quantitatively measured.
+- [Qweniden: Trouble Maker South Fork American River 7/15/2022 - Raft California](https://www.youtube.com/watch?v=2XTbOCNDcZQ):
+  player duration 3:24. Inspected paused footage at 0:06, 0:11 and 0:16. The
+  bank-side view shows staggered, locally breaking crests, dark faces and gaps,
+  irregular aerated tongues around exposed rock, and a raft descending through
+  the constriction. The camera changes its framing by 0:16: this is not a
+  calibrated fixed-camera temporal comparison.
+
+Compared these new browser observations with the unmodified ordinary-game frame
+`detail-motion/south-fork-upload-cache-motion-v1-20260914_01s.png`, inspected again
+in this turn. The game still has broad smooth steep faces, smeared white patches,
+and a row of bulky gray rocks. The references show a more broken, spatially varied
+rock/water arrangement. Different camera, flow, exposure and unknown calibration
+prevent pixel matching or extracting physical dimensions from this comparison.
+No metric rock relocation, wave height, submerged bed, bubble-size measurement,
+flow rate or scene acceptance follows from these images.
+
+Next visual work must address crest/rapid geometry and local breaking as well as
+foam appearance; another foam-only mask cannot establish the required rapid
+shape. Register fixed exposed landmarks against the captured geographic sources
+before changing terrain or hydraulic controls. Troublemaker stays a rapid within
+the South Fork scenario, never an extra menu entry. The supplied videos remain
+reference-only, with no shipping rights inferred.
+
 ## September 14, local auxiliary-work turn: fresh retry still fails
 
 Read the computer-use skill and required guidance/confirmation documents, then

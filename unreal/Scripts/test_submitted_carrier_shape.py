@@ -34,6 +34,57 @@ class SubmittedCarrierShapeTest(unittest.TestCase):
         np.testing.assert_array_equal(gradients(xy, values), [[1., -2.]])
         np.testing.assert_array_equal(gradients(xy[:, ::-1], values[:, ::-1]), [[1., -2.]])
 
+    def test_target_split_retains_opposite_signed_contributions(self):
+        meta, vertices, triangles, source = self.fixture()
+        meta['schema'] = 'raftsim.submitted_carrier_shape.v2'
+        # Raw=x, target base=3x, submitted base=x. Presentation differences
+        # cancel; neither absolute magnitudes nor a changed denominator may hide it.
+        source = np.column_stack((source, 3*source[:, 1], 3*source[:, 1]+2*source[:, 2]))
+        result = summarize(meta, vertices, triangles, source, 30)
+        group = result['slope_groups'][3]
+        parts = group['source_comparison_signed_gradient_along_displayed_slope']
+        along_x = .5/np.sqrt(.5**2+2**2)
+        self.assertAlmostEqual(parts['cached_source'], along_x)
+        self.assertAlmostEqual(parts['target_minus_source'], 2*along_x)
+        self.assertAlmostEqual(parts['submitted_base_minus_target'], -2*along_x)
+        self.assertEqual(group['source_comparison_area_m2'], 1.)
+        self.assertEqual(result['maximum_source_component_sum_error'], 0.)
+        reverse = summarize(meta, vertices, triangles[:, ::-1], source, 30)
+        self.assertEqual(reverse['slope_groups'], result['slope_groups'])
+
+    def test_target_split_reflects_world_coordinates(self):
+        meta, vertices, triangles, source = self.fixture()
+        meta.update(schema='raftsim.submitted_carrier_shape.v2', world_y_sign=-1, focus_y_cm=-50)
+        vertices[:, 2] *= -1
+        source = np.column_stack((source, 2*source[:, 2], source[:, 1]+2*source[:, 2]))
+        report = summarize(meta, vertices, triangles, source, 30)
+        parts = report['slope_groups'][3]['source_comparison_signed_gradient_along_displayed_slope']
+        # World target gradient=(0,-2), source=(1,0), base=(1,0).
+        direction = np.array([.5, -2])/np.sqrt(4.25)
+        self.assertAlmostEqual(parts['target_minus_source'], np.dot([-1, -2], direction))
+        self.assertAlmostEqual(parts['submitted_base_minus_target'], np.dot([1, 2], direction))
+
+    def test_unavailable_target_or_dry_comparison_is_not_zero_evidence(self):
+        meta, vertices, triangles, source = self.fixture()
+        historical = summarize(meta, vertices, triangles, source, 30)
+        parts = historical['slope_groups'][3]['source_comparison_signed_gradient_along_displayed_slope']
+        self.assertNotIn('target_minus_source', parts)
+        source[0, 3] = 0
+        empty = summarize(meta, vertices, triangles, source, 30)
+        self.assertIsNone(empty['maximum_source_component_sum_error'])
+        self.assertEqual(empty['slope_groups'][3]['source_comparison_signed_gradient_along_displayed_slope'], {})
+        self.assertEqual(empty['slope_groups'][3]['source_comparison_area_m2'], 0.)
+
+    def test_target_schema_and_finiteness_are_required(self):
+        meta, vertices, triangles, source = self.fixture()
+        meta['schema'] = 'raftsim.submitted_carrier_shape.v2'
+        with self.assertRaises(ValueError):
+            summarize(meta, vertices, triangles, source, 30)
+        source = np.column_stack((source, np.zeros((4, 2))))
+        source[0, 6] = np.inf
+        with self.assertRaises(ValueError):
+            summarize(meta, vertices, triangles, source, 30)
+
     def test_world_sign_and_no_dry_or_outside_extrapolation(self):
         meta, vertices, triangles, source = self.fixture()
         points = np.array([[.3, -.4], [2., 2.]])

@@ -1,5 +1,40 @@
 # Source-exact expanded-domain continuation — September 12, 10:38 UTC
 
+## September14,18:23UTC: interrupted cook recovered exactly from9400
+
+Old handle83142 is missing; a fresh privileged Win32_Process inventory found no
+native cook or Python research process running. Do not continue labeling the old
+five jobs LIVE. Their cause/exit status is unknown, and their incomplete targets
+are not passes. Old output remains untouched, with latest COMPLETE9400/local28000.
+
+Preparation2274 completed exit0. New immutable input
+`tmp/south-fork-expanded-checkpoint-9400s-v1-20260914/manifest.json`, SHA256
+`5685c531ca81c4a22ea3a06a7696107e84eefeb9936b88217d7d25f64338b0e6`,
+contains all original5,382,400 cells/841 grids. Zero added context or water.
+Grid, bed, roughness, physical boundaries and native time9400.000000003458 remain
+unchanged. Executable SHA256 remains
+`7d7c3be00a4eaefaba7fca67626ab4b6415f6d173ee9933459b06862734b135f`.
+
+Pilot38136 completed20steps exit0,19.092256s wall, ending9401.000000003443s.
+Independent `tmp/south-fork-expanded-9400s-pilot-{restart,state,banks}-v1-20260914.json`
+audits pass. All86,720 artificial-bank cells exactly dry, maximum step conservation
+residual8.410903e-9m3. Pilot frame-zero complete h/u/v file hashes match the
+old9400 checkpoint, including signed-zero bytes, not merely array equality.
+
+New continuation84168/PID4848 launched2026-09-14T18:23:24Z; system process
+inventory verifies the executable and command line. Output
+`tmp/south-fork-expanded-flow-9400-to10000s-v1-20260914`,12000steps at.05s,
+snapshot interval2000steps/100s. Actual long-run restart audit
+`tmp/south-fork-expanded-9400s-long-restart-v1-20260914.json` passes. Independent
+full h/u/v SHA256 values match the original9400 state listed below. The pilot's
+extra second is not spliced into this run; both begin at the same original9400.
+
+NEXT COMPLETE9500 is local2000 in the NEW output and needs BOTH state/bank audits.
+Do not wait for old local30000 or reuse the old handle/PID. A recovered checkpoint
+does not prove settling: source outflow102.118174 versus inflow45.306955m3/s is
+still imbalanced. No source promotion into gameplay, terrain substitution,
+physics-budget change or full-river acceptance follows from restart fidelity.
+
 ## Latest: 9400 s complete, both audits pass; still unsettled
 
 September14,2026. COMPLETE local28000/native9400.000000003458s passes BOTH

@@ -8468,7 +8468,8 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
                 [&](const FVector& P)->double { return Detail ? Detail->DisplacementCm(P,Sign) : 0.; },
                 GetWorld()->GetTimeSeconds(),Detail ? Detail->Sequence : 0,GetResolvedLiveSurfaceRenderLiftCm(),
                 Focus,GridStationN,GridLateralN,RiverCoordinatesM,CartesianShoreWet,
-                CartesianShoreDepthM,CartesianShoreBedM,Sign);
+                CartesianShoreDepthM,CartesianShoreBedM,Sign,
+                LiveVolumeCoreVertices,MacroCrestDisplacementCm);
             if (Saved) { UE_LOG(LogTemp,Display,TEXT("Submitted carrier shape saved: %s"),*ShapeAuditPath); }
             else { UE_LOG(LogTemp,Error,TEXT("Submitted carrier shape capture refused: %s"),*ShapeAuditPath); }
         }

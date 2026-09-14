@@ -8,6 +8,7 @@ import numpy as np
 
 VERTEX_FIELDS = ['id', 'x_cm', 'y_cm', 'carrier_z_cm', 'coarse_crest_cm', 'fine_correction_cm', 'detail_cm']
 SOURCE_FIELDS = ['id', 'field_x_m', 'field_y_m', 'clipping_wet', 'source_bed_plus_depth_m', 'source_depth_m']
+SOURCE_FIELDS_V2 = SOURCE_FIELDS + ['target_base_m', 'target_full_m']
 
 
 def read_table(path, fields):
@@ -37,9 +38,9 @@ def gradients(xy, values):
                      (a[:, 0]*db-b[:, 0]*da)/determinant), axis=1)
 
 
-def raw_stage(points, source, nx, ny, sign):
+def raw_stage(points, source, nx, ny, sign, value_column=4):
     """Original source-lattice triangle interpolation, only inside fully wet cells."""
-    grid = source.reshape(ny, nx, 6)
+    grid = source.reshape(ny, nx, source.shape[1])
     xs, ys = grid[0, :, 1], grid[:, 0, 2]
     dx, dy = xs[1]-xs[0], ys[1]-ys[0]
     if dx <= 0 or dy <= 0 or not np.allclose(np.diff(xs), dx, rtol=0, atol=1e-7) or not np.allclose(np.diff(ys), dy, rtol=0, atol=1e-7):
@@ -54,7 +55,7 @@ def raw_stage(points, source, nx, ny, sign):
     a = cell[:, 1]*nx+cell[:, 0]
     corners = np.stack((a, a+1, a+nx, a+nx+1), axis=1)
     valid &= (source[corners, 3] == 1).all(axis=1)
-    z = source[corners, 4]
+    z = source[corners, value_column]
     height = np.where(u+v <= 1, z[:, 0]*(1-u-v)+z[:, 2]*v+z[:, 1]*u,
                       z[:, 1]*(1-v)+z[:, 2]*(1-u)+z[:, 3]*(u+v-1))
     height[~valid] = np.nan
@@ -62,11 +63,13 @@ def raw_stage(points, source, nx, ny, sign):
 
 
 def summarize(meta, vertices, triangles, source, radius):
-    for table, width in [(vertices, 7), (triangles, 3), (source, 6)]:
+    version = meta.get('schema')
+    if version not in ('raftsim.submitted_carrier_shape.v1', 'raftsim.submitted_carrier_shape.v2'):
+        raise ValueError('Wrong schema')
+    source_width = 8 if version.endswith('.v2') else 6
+    for table, width in [(vertices, 7), (triangles, 3), (source, source_width)]:
         if table.ndim != 2 or table.shape[1] != width or not np.isfinite(table).all():
             raise ValueError('Invalid/nonfinite table')
-    if meta.get('schema') != 'raftsim.submitted_carrier_shape.v1':
-        raise ValueError('Wrong schema')
     n, nx, ny = meta['active_vertices'], meta['source_nx'], meta['source_ny']
     for key in ['world_seconds', 'detail_sequence', 'render_lift_cm', 'focus_x_cm', 'focus_y_cm']:
         if not np.isfinite(meta[key]):
@@ -102,6 +105,18 @@ def summarize(meta, vertices, triangles, source, radius):
     raw, valid = raw_stage(vertices[:, 1:3]*.01, source, nx, ny, meta['world_y_sign'])
     raw_valid = valid[t].all(axis=1)
     raw_g = gradients(xy[raw_valid], raw[t[raw_valid]])
+    source_parts = {'cached_source': raw_g}
+    if source_width == 8:
+        target, target_valid = raw_stage(vertices[:, 1:3]*.01, source, nx, ny, meta['world_y_sign'], 6)
+        if not np.array_equal(valid, target_valid):
+            raise ValueError('Different source/target comparison domains')
+        target_g = gradients(xy[raw_valid], target[t[raw_valid]])
+        source_parts['target_minus_source'] = target_g-raw_g
+        source_parts['submitted_base_minus_target'] = g['base_residual'][raw_valid]-target_g
+    else:
+        source_parts['submitted_base_minus_source'] = g['base_residual'][raw_valid]-raw_g
+    source_closure = (float(np.max(np.abs(sum(source_parts.values())-g['base_residual'][raw_valid])))
+                      if raw_valid.any() else None)
     slope = np.linalg.norm(g['displayed'], axis=1)
     degrees = np.degrees(np.arctan(slope))
     residual = np.max(np.abs(g['displayed']-g['base_residual']-g['crest']-g['detail']))
@@ -114,8 +129,17 @@ def summarize(meta, vertices, triangles, source, radius):
             direction = g['displayed'][mask]/np.maximum(slope[mask, None], 1e-30)
             for key in ['base_residual', 'crest', 'detail']:
                 component_projection[key] = float(np.sum(areas[mask]*np.sum(g[key][mask]*direction, axis=1))/area)
+        compared = mask[raw_valid]
+        compared_area = float(areas[raw_valid][compared].sum())
+        source_projection = {}
+        if compared_area:
+            direction = g['displayed'][raw_valid][compared]/np.maximum(slope[raw_valid][compared, None], 1e-30)
+            for key, values in source_parts.items():
+                source_projection[key] = float(np.sum(areas[raw_valid][compared]*np.sum(values[compared]*direction, axis=1))/compared_area)
         groups.append(dict(slope_degrees=[low, high], triangles=int(mask.sum()), projected_area_m2=area,
-                           area_weighted_signed_gradient_along_displayed_slope=component_projection))
+                           area_weighted_signed_gradient_along_displayed_slope=component_projection,
+                           source_comparison_triangles=int(compared.sum()), source_comparison_area_m2=compared_area,
+                           source_comparison_signed_gradient_along_displayed_slope=source_projection))
     top = np.flatnonzero(areas >= 1e-4)
     top = top[np.argsort(-slope[top])[:12]]
     raw_lookup = {int(i): gradient.tolist() for i, gradient in zip(np.flatnonzero(raw_valid), raw_g)}
@@ -123,6 +147,8 @@ def summarize(meta, vertices, triangles, source, radius):
         world_seconds=meta['world_seconds'], detail_sequence=meta['detail_sequence'],
         selected_triangles=len(t), zero_projected_area_nearby=int((nearby & ~keep).sum()),
         projected_area_m2=float(areas.sum()), maximum_gradient_component_sum_error=float(residual),
+        maximum_source_component_sum_error=source_closure,
+        target_scope=meta.get('target_scope', 'Pre-temporal targets unavailable in historical v1 capture.'),
         component_max_absolute_height_m={k: float(np.max(np.abs(v[np.unique(t)]))) for k, v in height.items()},
         raw_comparison_triangles=int(raw_valid.sum()), raw_comparison_projected_area_m2=float(areas[raw_valid].sum()),
         maximum_raw_triangle_slope=float(np.max(np.linalg.norm(raw_g, axis=1))) if len(raw_g) else None,
@@ -145,7 +171,7 @@ def main():
     paths = [args.capture]+[Path(str(args.capture)+suffix) for suffix in ('.vertices.csv', '.triangles.csv', '.source.csv')]
     meta = json.loads(paths[0].read_text(encoding='utf-8-sig'))
     result = summarize(meta, read_table(paths[1], VERTEX_FIELDS), read_table(paths[2], ['a', 'b', 'c']),
-                       read_table(paths[3], SOURCE_FIELDS), args.radius_m)
+                       read_table(paths[3], SOURCE_FIELDS_V2 if meta.get('schema') == 'raftsim.submitted_carrier_shape.v2' else SOURCE_FIELDS), args.radius_m)
     result['input_sha256'] = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
     with args.report.open('x', encoding='utf-8') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)

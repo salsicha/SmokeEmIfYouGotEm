@@ -3,6 +3,36 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September14: [same-publication source/target/mesh decomposition](../reconstruction-review-2026-09-07/normal-river-target-shape.md).
+Read-only audit now records pre-temporal targets on the exact source lattice;
+v1 historical captures remain supported. BuildPASS,12 Python and10 native tests
+PASS. Actual ordinary capture29746 TERMINAL exit0, detail125/world13.08036s:
+on935 fully wet30–60degree triangles/69.875m2, signed slopes are source0.620884,
+target-minus-source0.087440, submitted-base-minus-target0.124832. The latter is
+NOT a pure temporal-error measurement. Source remains dominant; removing crest
+detail or changing foam alone cannot address it. No runtime behavior/appearance
+or acceptance improvement claimed. NEXT qualify source geometry/evolution and
+joint mass/pressure replacement; inspect remaining target/history shaping.
+Cook84168 LIVE beyond9441.5; next COMPLETE9500/local2000 BOTH audits. All full
+reconstruction/30FPS/later-river/crew/release requirements remain OPEN.
+
+Latest September14,18:23UTC: [post-interruption validation](../reconstruction-review-2026-09-07/normal-river-post-interruption-profile.md).
+BOTH supplied reference videos now open in the browser; new sampled frames
+confirm the ordinary-game geometry/breaking/froth remain visually unaccepted.
+Fresh ordinary profile59736 TERMINAL exit0, strict300-row CSV PASS but11.4394FPS/
+p95114.9399ms FAIL30FPS. Not a controlled isolated or causal comparison.
+The old five processes are no longer running; their missing handles and a fresh
+system process inventory supersede prior LIVE notes, not their unfinished gates.
+Research states remain unqualified;417/422 guarded sources still unchanged.
+Recovered the expanded cook from COMPLETE9400/local28000 with no added geometry,
+water or clock reset. Pilot20steps PASS restart/state/banks; actual long frame0
+restart audit and full h/u/v file hashes PASS. NEW LIVE84168/PID4848 uses immutable
+checkpoint9400 input toward10000,12000steps at.05s. NEXT COMPLETE9500/local2000
+in the NEW output requires BOTH state and bank audits; do not poll old83142 or
+reuse its local30000 target. No new runtime solver/material/terrain promotion.
+All reconstruction, physical/visual, later-river, crew,30FPS and release gates
+remain OPEN. Reference access is restored, not calibrated motion acceptance.
+
 Latest September14 heartbeat: [normal playable upload-cache delivery](../reconstruction-review-2026-09-07/normal-river-upload-cache.md).
 Rebuilt normal renderer now reuses exact dense source membership only when actual
 triangle indices stay unchanged; all vertex attributes still update every frame.
