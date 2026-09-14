@@ -3,6 +3,16 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [base pairing inside the same two-pole operator](../reconstruction-review-2026-09-07/normal-river-two-pole-base-pairing.md).
+Explicit paired-base mass/canonical-advection path removes the constant-velocity
+energy obstruction while retaining local physical momentum and original linear
+mass/pressure response. ALL8 original nonlinear profiles stillFAIL1e-10 energy;
+smaller residuals are not acceptance. Final required suite25PASS/12FAIL preserves
+8 new nonlinear and4 legacy failures, no waivers. Original default retained.
+NEXT discrete auxiliary-pressure work compatible with joint mass/advection;
+then full2D/exact-terrain/wet-front/time/open/refinement/native/shared-surface
+qualification. No runtime visual/FPS change; full later-river/crew/releaseOPEN.
+
 Latest September 14: [joint exact-terrain mass/pressure flux](../reconstruction-review-2026-09-07/normal-river-subcell-energy-flux.md).
 New pressure-secant mass and paired momentum flux conserve instantaneous base
 energy over exact source triangles without global correction. Actual256-cell/
