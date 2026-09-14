@@ -3,6 +3,17 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [coupled two-pole metric transport](../reconstruction-review-2026-09-07/normal-river-coupled-metric-transport.md).
+Independent-mode candidate conserved totals but FAILED nonlinear model refinement.
+Derived missing skew cross-coupling, retaining original poles/40-CG/geometry.
+All12 original-profile grid cases now conserve energy/mass/local momentum and
+approach an independent continuum-potential rate at second order;14 new component
+tests PASS. Old required suite remains25PASS/12FAIL, untouched and not waived.
+Research-only positive flat1D, no gameplay default change;464 protected hashes
+unchanged. NEXT full2D and exact-terrain coupling, finite-time/wet-front/open/
+refinement/native/shared-surface qualification. Actual visual and30FPS gates
+stillFAIL; full SouthFork/later-river/crew/normalization/regression/releaseOPEN.
+
 Latest September 14: [base pairing inside the same two-pole operator](../reconstruction-review-2026-09-07/normal-river-two-pole-base-pairing.md).
 Explicit paired-base mass/canonical-advection path removes the constant-velocity
 energy obstruction while retaining local physical momentum and original linear
