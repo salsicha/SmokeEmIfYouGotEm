@@ -35,6 +35,7 @@ void FRaftSimShorelineCrests::Reset()
     CachedCoarse.Reset(); CachedShore.Reset(); CorrectionHistory.Reset();
     CandidateCorrectionHistory.Reset();
     MidpointExpansion.Reset();
+    ParallelNormals.Reset();
     TargetCorrectionsCm.Reset(); RenderedCorrectionsCm.Reset();
     FineProfileCm.Reset();
 }
@@ -239,21 +240,29 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         CellOffsets[Cell]=Triangle*3;
     }
     const double TopologyDone=bTiming ? FPlatformTime::Seconds() : 0.;
-    TArray<FVector> Sums; Sums.Init(FVector::ZeroVector,Count);
-    TArray<uint8> Touched; Touched.Init(0,Count);
-    for (int32 T=0; T<Indices.Num(); T+=3)
     {
-        const int32 A=Indices[T],B=Indices[T+1],C=Indices[T+2];
-        const FVector N=FVector::CrossProduct(Vertices[C].Position-Vertices[A].Position,
-            Vertices[B].Position-Vertices[A].Position);
-        Sums[A]+=N; Sums[B]+=N; Sums[C]+=N;
-        if (A>=Source.Num() || B>=Source.Num() || C>=Source.Num()) Touched[A]=Touched[B]=Touched[C]=1;
+    CSV_SCOPED_TIMING_STAT(RaftSimCrests,Normals);
+    // Same-input playable audit preserves every attribute and improves both
+    // call orders including rebuild costs. Retain the original control path.
+    static const bool bParallelNormals=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialCrestNormals"));
+    static const bool bNormalsAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestNormalsAudit"));
+    if(bNormalsAudit && GFrameCounter>=100 && GFrameCounter<=250)
+    {
+        TArray<FProcMeshVertex> Candidate=Vertices;
+        double SerialMs=0.,ParallelMs=0.;bool Valid=true;
+        const uint64 Builds=ParallelNormals.Builds;
+        const auto Serial=[&](){const double Start=FPlatformTime::Seconds();FRaftSimCrestNormals::Reference(Vertices,Indices,Source.Num());SerialMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Parallel=[&](){const double Start=FPlatformTime::Seconds();Valid=ParallelNormals.Apply(Candidate,Indices,Source.Num());ParallelMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        if(GFrameCounter%2){Parallel();Serial();}else{Serial();Parallel();}
+        for(int32 I=0;Valid && I<Vertices.Num();++I)Valid=FRaftSimCrestMidpointExpansion::EqualAttributes(Vertices[I],Candidate[I]);
+        if(!Valid){UE_LOG(LogTemp,Error,TEXT("CrestNormalsAudit mismatch frame=%llu"),GFrameCounter);return false;}
+        UE_LOG(LogTemp,Display,TEXT("CrestNormalsAudit exact frame=%llu vertices=%d triangles=%d rebuilt=%d serial_ms=%.6f parallel_ms=%.6f parallel_first=%d"),
+            GFrameCounter,Vertices.Num(),Indices.Num()/3,int32(ParallelNormals.Builds!=Builds),SerialMs,ParallelMs,int32(GFrameCounter%2));
+        if(bParallelNormals)Vertices=MoveTemp(Candidate);
     }
-    for (int32 I=0; I<Count; ++I) if (Touched[I] && !Sums[I].IsNearlyZero())
-    {
-        auto& V=Vertices[I]; V.Normal=Sums[I].GetSafeNormal();
-        auto& T=V.Tangent.TangentX;
-        T=(T-V.Normal*FVector::DotProduct(T,V.Normal)).GetSafeNormal();
+    else if(bParallelNormals)
+    {if(!ParallelNormals.Apply(Vertices,Indices,Source.Num()))return false;}
+    else FRaftSimCrestNormals::Reference(Vertices,Indices,Source.Num());
     }
     if (bTiming)
     {

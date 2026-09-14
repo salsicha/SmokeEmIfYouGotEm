@@ -13,7 +13,8 @@ WATER_SCOPES = ("RaftSimSurface/GameThread/Tick", "RaftSimSurface/GameThread/Ref
                 "RaftSimSurface/GameThread/CartesianPublish", "RaftSimCrests/GameThread/Update",
                 "RaftSimCrests/GameThread/Selection", "RaftSimSolver/GameThread/StepWater")
 PUBLISH_SCOPES = ("RaftSimSurface/GameThread/PackSource", "RaftSimShoreline/GameThread/SetMesh",
-                  "RaftSimShoreline/GameThread/Topology", "RaftSimShoreline/GameThread/CrestInput")
+                  "RaftSimShoreline/GameThread/Topology", "RaftSimShoreline/GameThread/CrestInput",
+                  "RaftSimCrests/GameThread/Normals")
 SMOOTHING_SCOPES = ("RaftSimSurface/GameThread/OpticalFilter",)
 # Optional in historical captures; absence must not be reported as zero cost.
 BREAKING_SCOPES = ("RaftSimSurface/GameThread/BreakingVertices",)
@@ -124,7 +125,7 @@ def main():
               "Sample indices are zero-based CSV rows, not engine frame IDs. Threads overlap; "
               "water scopes are inclusive and nested (Tick contains Refresh/CartesianPublish; "
               "Refresh contains source samples/handover/optical filter/breaking vertices/foam transport; CartesianPublish contains packing/SetMesh; "
-              "SetMesh contains topology/crest input/crest update, which contains selection). "
+              "SetMesh contains topology/crest input/crest update, which contains selection and normals). "
               "Do not sum nested or thread times. Present zero scope "
               "rows record zero time (not proof of no call); absent columns are unavailable. "
               "Append-only timing columns require a matching final header and "

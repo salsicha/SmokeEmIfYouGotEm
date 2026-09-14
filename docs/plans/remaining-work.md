@@ -3,6 +3,19 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [exact parallel normals in ordinary water](../reconstruction-review-2026-09-07/normal-river-crest-normals.md).
+Default-enabled exact triangle/vertex normal calculation preserves original sum
+order and all attributes. Actual paired132 calls/8.87million vertex comparisons
+PASS; mean1.048ms vs1.676ms original, both call orders improve including rebuilds.
+Final buildPASS,11 native testsPASS,12 audit testsPASS. Ordinary300-row game run
+11.520818FPS/p95103.8838ms stillFAIL30FPS. Fresh contact/GPU sequence106 agrees;
+new inspected actual recording STILL FAILS rapid shape/breaking/froth realism.
+No terrain, material, water state, quality or gate changes. NEXT prioritize
+compatible exact-geometry mass/pressure and shared contact/render coupling, plus
+larger crest/solver costs; full SouthFork/later-river/crew/release scope OPEN.
+Cook84168 directly LIVE beyond9704; COMPLETE9700/local6000 BOTH auditsPASS, still
+unsettled; next COMPLETE9800/local8000 BOTH audits. Not full-scene acceptance.
+
 Latest September 14: [fine geometry and conservative source-cell storage](../reconstruction-review-2026-09-07/normal-river-subcell-geometry.md).
 Exact registered source matches actual ground collision at all11,056 submitted
 water points to0.000182cm; coarse bilinear bed differs by up to58.95cm, and coarse
