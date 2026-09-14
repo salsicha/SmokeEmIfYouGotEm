@@ -3,6 +3,20 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [fine geometry and conservative source-cell storage](../reconstruction-review-2026-09-07/normal-river-subcell-geometry.md).
+Exact registered source matches actual ground collision at all11,056 submitted
+water points to0.000182cm; coarse bilinear bed differs by up to58.95cm, and coarse
+triangle interpolation worsens that to77.77cm. 600-to9500 source evolution lowers
+median stage0.739m but steep source area only34.5->32m2. Implemented exact original
+triangle/Cartesian-cell storage and volume inversion;15 tests PASS, all2,827 real
+cell inversions recover volume to2.67e-15m3. NOT coupled hydrodynamics or gameplay:
+bed-only constant-stage reinterpretation changes local storage up to0.342m3/cell.
+NEXT compatible exact-geometry mass/pressure coupling, shared contact/render
+clipping and actual30FPS optimization; no runtime/visual improvement claimed.
+Cook84168 directly LIVE beyond9641; COMPLETE9600/local4000 BOTH auditsPASS, still
+unsettled; next COMPLETE9700/local6000 BOTH audits. All later rivers/crew/release
+and full SouthFork visual/physical/performance acceptance remain OPEN.
+
 Latest September 14: [dry-rock point sampling correction](../reconstruction-review-2026-09-07/normal-river-dry-rock-sampling.md).
 Actual native flat-pool test exposed a phantom 0.5 m water sheet at the dry-rock
 intersection. Shared correction now runs in both live and atlas samplers;
