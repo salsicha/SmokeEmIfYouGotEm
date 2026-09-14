@@ -3,6 +3,17 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [joint exact-terrain mass/pressure flux](../reconstruction-review-2026-09-07/normal-river-subcell-energy-flux.md).
+New pressure-secant mass and paired momentum flux conserve instantaneous base
+energy over exact source triangles without global correction. Actual256-cell/
+544-face600s-state identity residual1.14e-13; dissipative mode matches predicted
+loss to2.28e-12. All8 real lake controls and55 component/source testsPASS.
+Still nondispersive/offline; central flux explicitly fails dry-front positivity.
+Original two-pole controls rerun14PASS/4FAIL, no replaced/waived energy gates.
+NEXT compatible auxiliary/two-pole work with the new joint mass choice, finite
+time/wet-front/open-boundary/refinement qualification, then native/shared surface
+and budget. No new visual orFPS improvement; full later-river/crew/releaseOPEN.
+
 Latest September 14: [exact coordinate memo layout](../reconstruction-review-2026-09-07/normal-river-flat-memo.md).
 Two actual paired runs reject a flat lookup as a reliable latency improvement;
 ordinary gameplay remains unchanged. Final9 native and40 Python checks PASS;
