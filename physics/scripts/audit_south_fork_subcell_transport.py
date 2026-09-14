@@ -27,7 +27,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--atlas', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--steps', type=int, default=10)
     args = parser.parse_args()
+    if args.steps < 1:
+        parser.error('--steps must be positive')
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -94,7 +97,7 @@ def main():
     initial_volume = float(volume.sum())
     steps, elapsed = [], 0.
     started = time.perf_counter()
-    for index in range(10):
+    for index in range(args.steps):
         dv, dp, limit, bound = patch.rates(volume, momentum, diagnostics=True)
         eta = np.array([cell.stage_for_volume(v) for cell, v in zip(patch.cells, volume.ravel())]).reshape(shape)
         velocity = np.divide(momentum, volume[:, :, None], out=np.zeros_like(momentum), where=volume[:, :, None] > 0)
@@ -113,7 +116,8 @@ def main():
             local_dt_limit_seconds=float(limit), minimum_volume_m3=float(volume.min()),
             maximum_volume_m3=float(volume.max()), total_volume_error_m3=error,
             nondispersive_mechanical_energy_rate=rate, before_step_bounds=bound,
-            maximum_cell_speed_mps=float(np.max(np.linalg.norm(momentum, axis=2)/volume))))
+            maximum_cell_speed_mps=float(np.max(np.divide(np.linalg.norm(momentum, axis=2), volume,
+                out=np.zeros_like(volume), where=volume > 0)))))
     for path in paths:
         if sha(path) != initial_hashes[str(path)]:
             raise ValueError('Protected input changed during audit')
@@ -124,7 +128,7 @@ def main():
         stationary_controls=controls, source_initialized_closed_patch_steps=steps,
         initial_volume_m3=initial_volume, evolving_loop_wall_seconds=time.perf_counter()-started,
         input_sha256={str(path.resolve()): initial_hashes[str(path)] for path in paths},
-        scope='Original registered terrain and exact shared face geometry. Synthetic lakes and ten explicit nondispersive base steps initialized from the real atlas, with reflecting walls on this small test patch, NOT actual river boundaries or continued river history. No artificial depth, global rescale or source/cook/map mutation. Rusanov base transport is dissipative and first order; mechanical entropy production does not qualify the full two-pole energy, dispersion, refinement, internal basin connectivity, breaking waves, open boundaries, native budget, rendered contact, 30 FPS, or scene acceptance.')
+        scope='Original registered terrain and exact shared face geometry. Synthetic lakes and explicit nondispersive base steps initialized from the real atlas, with reflecting walls on this small test patch, NOT actual river boundaries or continued river history. No artificial depth, global rescale or source/cook/map mutation. Rusanov base transport is dissipative and first order; mechanical entropy production does not qualify the full two-pole energy, dispersion, refinement, internal basin connectivity, breaking waves, open boundaries, native budget, rendered contact, 30 FPS, or scene acceptance.')
     with args.report.open('x', encoding='utf-8') as stream:
         json.dump(report, stream, indent=2, allow_nan=False)
     print(json.dumps({key: value for key, value in report.items() if key != 'input_sha256'}, indent=2))

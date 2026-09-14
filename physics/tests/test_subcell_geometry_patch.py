@@ -56,6 +56,36 @@ class SubcellGeometryPatchTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'geometry differs'):
             SubcellGeometryPatch(sampler(lambda x, y: x+2), [-1.5, -1.5], (4, 4), periodic=(True, False))
 
+    def test_shallow_counterflow_requires_gross_donor_bound(self):
+        # Two wet slivers meet at the bottom of z=abs(normal). Equal stages
+        # imply zero net mass flux, but tangential Rusanov momentum exchange
+        # remains. Each cell has V=eta^2/2; the shared face has area eta.
+        # Independent analytic rate: du_t/dt = -2*sqrt(g*eta)/eta * u_t.
+        for axis in (0, 1):
+            shape = (1, 2) if axis == 0 else (2, 1)
+            origin = [-.5, 0.] if axis == 0 else [0., -.5]
+            terrain = sampler(lambda x, y: abs(x if axis == 0 else y))
+            patch = SubcellGeometryPatch(terrain, origin, shape, periodic=(axis == 1, axis == 0))
+            for eta in (1e-2, 1e-4, 1e-6):
+                velocity = np.zeros((*shape, 2))
+                velocity.reshape(2, 2)[:, 1-axis] = [1., -1.]
+                volume, momentum = patch.state_from_stages(eta, velocity)
+                dv, dp, limit, bounds = patch.rates(volume, momentum, diagnostics=True)
+                np.testing.assert_allclose(volume, eta*eta/2, atol=0, rtol=1e-14)
+                np.testing.assert_allclose(dv, 0, atol=0)
+                expected_rate = -2*np.sqrt(9.81*eta)/eta*velocity[..., 1-axis]
+                np.testing.assert_allclose(dp[..., 1-axis]/volume, expected_rate, atol=0, rtol=1e-13)
+                old_dt = .45*min(bounds['net_drain_limit_seconds'], bounds['wave_limit_seconds'])
+                old_velocity = (momentum+old_dt*dp)/volume[..., None]
+                self.assertGreater(np.max(abs(old_velocity)), 2.)
+                self.assertLess(limit, old_dt)
+                with self.assertRaisesRegex(ValueError, 'donor'):
+                    patch.advance(volume, momentum, old_dt)
+                fixed_v, fixed_p = patch.advance(volume, momentum, .45*limit)
+                np.testing.assert_array_equal(fixed_v, volume)
+                self.assertLessEqual(np.max(abs(fixed_p/fixed_v[..., None])), 1.)
+                np.testing.assert_allclose(fixed_p.sum(axis=(0, 1)), 0, atol=1e-18)
+
 
 if __name__ == '__main__':
     unittest.main()

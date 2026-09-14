@@ -3,6 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [exact shared-face coupling and donor timestep correction](../reconstruction-review-2026-09-07/normal-river-subcell-donor-bound.md).
+Offline exact source-face geometry and independently integrated bed force retain
+lake-at-rest balance; 29 component/source tests PASS. Analytic shallow counterflow
+exposes old net-only timestep: unchanged positive volumes but 1 m/s becomes
+135.66 m/s. Gross donor coefficient now bounds the update, without clipping.
+Real 256-cell/100-step run conserves mass and bounds current, BUT advances only
+0.0674112s as drying-cell dt falls to17 microseconds: NOT production acceptance.
+NEXT compatible wet-front/cut-cell mass/pressure and full two-pole energy work;
+do not blindly extend this tiny-dt run or promote the first-order reference.
+All464 protected map/capture/mesh/profile/actor files unchanged. No new runtime
+visual/FPS improvement; full SouthFork/30FPS/later-river/crew/release scope OPEN.
+Cook84168 directly LIVE beyond9800; COMPLETE9800/local8000 BOTH audits PASS,
+still unsettled104.772869out vs45.306955in. Next COMPLETE9900/local10000 BOTH
+audits; no restart/suspension and no experimental-subcell solver promotion.
+
 Latest September 14: [exact parallel normals in ordinary water](../reconstruction-review-2026-09-07/normal-river-crest-normals.md).
 Default-enabled exact triangle/vertex normal calculation preserves original sum
 order and all attributes. Actual paired132 calls/8.87million vertex comparisons

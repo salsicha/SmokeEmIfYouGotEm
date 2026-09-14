@@ -90,7 +90,14 @@ class SubcellGeometryPatch:
         wave_limit = .5*float(self.spacing.min())/max_speed if max_speed > 0 else np.inf
         active = donor_outgoing > 0
         donor_limit = float(np.min(volume[active]/donor_outgoing[active])) if active.any() else np.inf
-        result = (mass_rate.reshape(self.shape), momentum_rate.reshape((*self.shape, 2)), min(drain_limit, wave_limit))
+        # Net discharge can vanish while counter-propagating Rusanov donors
+        # exchange momentum. Bound their gross coefficient, not only net mass
+        # loss: V_new*u_new is then a nonnegative combination of transported
+        # momenta before pressure/bed work. A grid-width wave CFL alone misses
+        # the arbitrarily small V/face-area ratio of partially wet cells.
+        # This does not prove stability of pressure or dispersive coupling.
+        result = (mass_rate.reshape(self.shape), momentum_rate.reshape((*self.shape, 2)),
+                  min(drain_limit, donor_limit, wave_limit))
         if diagnostics:
             return (*result, dict(net_drain_limit_seconds=drain_limit, donor_limit_seconds=donor_limit,
                 wave_limit_seconds=wave_limit, maximum_face_signal_speed_mps=max_speed,
@@ -103,7 +110,7 @@ class SubcellGeometryPatch:
             raise ValueError('Positive finite timestep required')
         dv, dp, limit = self.rates(volumes, momenta, gravity)
         if dt > limit:
-            raise ValueError('Timestep exceeds local draining/wave bound')
+            raise ValueError('Timestep exceeds local donor/draining/wave bound')
         new_v, new_p = np.asarray(volumes)+dt*dv, np.asarray(momenta)+dt*dp
         if (new_v < 0).any() or not np.isfinite(new_v).all() or not np.isfinite(new_p).all():
             raise ValueError('Update rejected; no negative-depth repair')
