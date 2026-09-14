@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "Async/ParallelFor.h"
 #include "RaftSimCoordinateMap.h"
+#include "RaftSimFlatCoordinateMap.h"
 #include "RaftSimCrestCornerSamples.h"
 #include "RaftSimCrestRegionIndex.h"
 
@@ -27,6 +28,7 @@ struct FRaftSimSurfaceRefinement
     // profile epoch even when the grouping changes. Selection remains exact.
     int32 ParallelBatchSize=128;
     bool bIndexedRegions=false; // Candidate until actual paired timing qualifies it.
+    bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
     double InputSeconds=0,SelectionSeconds=0,AssemblySeconds=0;
     uint64 ParallelContextsCreated=0,ParallelContextsDestroyed=0;
     uint64 SharedCornerSamples=0,SharedCornerReads=0;
@@ -35,6 +37,8 @@ struct FRaftSimSurfaceRefinement
         uint64 Bytes=RetainedParallelValues.GetAllocatedSize()+RetainedFastParallelValues.GetAllocatedSize();
         for(const auto& Context:RetainedParallelValues)Bytes+=Context.GetAllocatedSize();
         for(const auto& Context:RetainedFastParallelValues)Bytes+=Context.GetAllocatedSize();
+        Bytes+=RetainedFlatParallelValues.GetAllocatedSize();
+        for(const auto& Context:RetainedFlatParallelValues)Bytes+=Context.GetAllocatedSize();
         // Diagnostic numeric value for CSV/JSON. Exact for any feasible
         // process allocation (<2^53 bytes); never controls cache ownership.
         return double(Bytes);
@@ -81,10 +85,12 @@ struct FRaftSimSurfaceRefinement
         auto& ParallelValues=bRetainParallelMemo ? RetainedParallelValues : LocalParallelValues;
         TArray<TRaftSimCoordinateMap<FProfileMemoSample>> LocalFastParallelValues;
         auto& FastParallelValues=bRetainParallelMemo ? RetainedFastParallelValues : LocalFastParallelValues;
+        TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> LocalFlatParallelValues;
+        auto& FlatParallelValues=bRetainParallelMemo ? RetainedFlatParallelValues : LocalFlatParallelValues;
         // Retain lookup slots, NEVER profile values across calls. XY can move,
         // profiles can change without a key, and callers can replace HeightCm.
         // Each batch owns its map; levels join before resizing or reusing it.
-        if (++ProfileMemoEpoch==0) { RetainedParallelValues.Reset(); RetainedFastParallelValues.Reset(); ++ProfileMemoEpoch; }
+        if (++ProfileMemoEpoch==0) { RetainedParallelValues.Reset(); RetainedFastParallelValues.Reset(); RetainedFlatParallelValues.Reset(); ++ProfileMemoEpoch; }
         TMap<FVector2D,float>& Values=ProfileValues ? *ProfileValues : LocalValues;
         const auto MemoValue=[&](auto& Memo,const FVector2D& P)
         {
@@ -104,6 +110,13 @@ struct FRaftSimSurfaceRefinement
             if (bParallel && !bMemoizeParallel) return HeightCm(P);
             if (bParallel)
             {
+                if(bFlatCoordinateMemo)
+                {
+                    auto& Sample=FlatParallelValues[Context].FindOrAdd(P,4096);
+                    if(Sample.Epoch!=ProfileMemoEpoch)
+                    {Sample.Value=HeightCm(P);Sample.Epoch=ProfileMemoEpoch;}
+                    return Sample.Value;
+                }
                 return bFastCoordinateHash ? MemoValue(FastParallelValues[Context],P) : MemoValue(ParallelValues[Context],P);
             }
             if (const float* Found=Values.Find(P)) return *Found;
@@ -157,7 +170,8 @@ struct FRaftSimSurfaceRefinement
                         ParallelContextsCreated+=FMath::Max(Count-Before,0);
                         ParallelContextsDestroyed+=FMath::Max(Before-Count,0);
                     };
-                    if (bFastCoordinateHash) Prepare(FastParallelValues);
+                    if (bFlatCoordinateMemo) Prepare(FlatParallelValues);
+                    else if (bFastCoordinateHash) Prepare(FastParallelValues);
                     else Prepare(ParallelValues);
                 }
             },[&](const TArray<FVector2D>& Points,const TArray<int32>& CurrentTriangles)
@@ -171,6 +185,7 @@ struct FRaftSimSurfaceRefinement
 private:
     TArray<TMap<FVector2D,FProfileMemoSample>> RetainedParallelValues;
     TArray<TRaftSimCoordinateMap<FProfileMemoSample>> RetainedFastParallelValues;
+    TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> RetainedFlatParallelValues;
     uint64 ProfileMemoEpoch=0;
     struct FTopologyLevel
     {

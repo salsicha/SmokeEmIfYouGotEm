@@ -8,6 +8,7 @@
 #include "RaftSimCrestCornerAudit.h"
 #include "RaftSimCrestBatchAudit.h"
 #include "RaftSimCrestRegionAudit.h"
+#include "RaftSimFlatMemoAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -71,6 +72,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     const bool SameTargets=SameGeometry && SameCoarse && SameShore;
     if(SameGeometry)RaftSimCrestBatchAudit::Unchanged();
     if(SameGeometry)RaftSimCrestRegionAudit::Unchanged();
+    if(SameGeometry)RaftSimFlatMemoAudit::Unchanged();
     CSV_CUSTOM_STAT(RaftSimCrests,UpdateCalls,1,ECsvCustomStatOp::Accumulate);
     CSV_CUSTOM_STAT(RaftSimCrests,XYChanged,int32(!SameXY),ECsvCustomStatOp::Accumulate);
     CSV_CUSTOM_STAT(RaftSimCrests,IndicesChanged,int32(!SameIndices),ECsvCustomStatOp::Accumulate);
@@ -94,6 +96,8 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             Refinement.bMeasureStages=bTiming;
             static const bool bIndexedRegions=FParse::Param(FCommandLine::Get(),TEXT("RaftSimIndexedCrestRegions"));
             Refinement.bIndexedRegions=bIndexedRegions;
+            static const bool bFlatMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlatCrestMemo"));
+            Refinement.bFlatCoordinateMemo=bFlatMemo;
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;
             if (!Refinement.BuildAdaptive(XY,Triangles,Input.HeightAtWorldXYCm,3,.5f,Input.NonzeroRegionsCm,nullptr,true,true,
                 Input.DetailSpanCm>0 ? &Input.DetailWindowCm : nullptr,Input.DetailSpanCm,!bFreshMemos,!bLegacyCoordinateHash,!bResizeContexts,bSharedCorners)) return false;
@@ -143,6 +147,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestCornerAudit::Run(CachedXY,Triangles,Input);
         RaftSimCrestBatchAudit::Run(CachedXY,Triangles,Input);
         RaftSimCrestRegionAudit::Run(CachedXY,Triangles,Input);
+        RaftSimFlatMemoAudit::Run(CachedXY,Triangles,Input);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }

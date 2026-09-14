@@ -3,6 +3,17 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [exact coordinate memo layout](../reconstruction-review-2026-09-07/normal-river-flat-memo.md).
+Two actual paired runs reject a flat lookup as a reliable latency improvement;
+ordinary gameplay remains unchanged. Final9 native and40 Python checks PASS;
+all8,597,657 compared vertices/6,230,065 triangles exact. Mean10.856902ms original
+vs10.747665ms candidate, but benefit reverses by call order; do not promote or
+call this an FPS gain. About4MB less memo storage is not scene acceptance.
+All464 protected sources unchanged. NEXT dominant source-stage/fine-terrain
+hydraulic coupling and actual breaking/froth, larger solver/render costs—not
+more weak batch/hash variants. Latest ordinary30FPS and visual gates stillFAIL;
+all later rivers, crew, normalization/regressions and release scope remainOPEN.
+
 Latest September 14: [physical ground and ordinary water contact](../reconstruction-review-2026-09-07/normal-river-ground-contact.md).
 Playable Cartesian water support and spray anchors now use the same captured
 ground query as solid raft contact, with paired detail and no clearance floor.
