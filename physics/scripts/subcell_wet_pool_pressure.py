@@ -77,6 +77,45 @@ def shared_subsegments(left, right):
             yield li, ri, np.column_stack((t, za))
 
 
+def piecewise_column_integral(partition, first, second=None):
+    """Independent knot sweep for differing stages of same-cell pool traces.
+
+    Unlike a scalar parent stage, this remains meaningful when distinct pools
+    are independently perturbed. Multiple owners of one interval are rejected.
+    """
+    pieces = first+(second if second is not None else [])
+    if not pieces:
+        return 0.
+    knots = sorted(set(float(x) for _, segment in pieces for x in segment[:, 0]))
+    total = 0.
+    for low, high in zip(knots, knots[1:]):
+        middle = .5*(low+high)
+        def owner(segments):
+            candidates = [(index, segment) for index, segment in segments if segment[0, 0] < middle < segment[1, 0]]
+            if len(candidates) > 1:
+                raise ValueError('Multiple pool owners on the same source face interval')
+            return candidates[0] if candidates else None
+        left = owner(first)
+        right = owner(second) if second is not None else left
+        if left is None or right is None:
+            continue
+        index, segment = left
+        t = np.array([low, high])
+        z = segment[0, 1]+(segment[1, 1]-segment[0, 1])*(t-segment[0, 0])/(segment[1, 0]-segment[0, 0])
+        clipped = np.column_stack((t, z))
+        lp, rp = partition.pools[index]['form'], partition.pools[right[0]]['form']
+        if second is None:
+            total += TriangleFaceSection([clipped], [low, high]).moments(lp['stage_offset'], lp['datum'])[0]
+        else:
+            total += harmonic_area(clipped, lp['stage_offset'], rp['stage_offset'], lp['datum'], rp['datum'])
+    return total
+
+
+def uniform_parent_stage(partition, parent):
+    pools = [partition.pools[i] for i in partition.parent_pools[parent]]
+    return pools and all(p['parent_stage_offset'] == pools[0]['parent_stage_offset'] for p in pools)
+
+
 class WetPoolPressureSystem:
     def __init__(self, partition, length):
         if not np.isfinite(length) or length <= 0 or not partition.pools:
@@ -108,8 +147,10 @@ class WetPoolPressureSystem:
                         weight = area/(2*self.h[owner, 0])
                         add(owner, 2*ri+axis, weight)
                         add(owner, 2*li+axis, -weight)
-                expected = 0.
-                if partition.parent_pools[left] and partition.parent_pools[right]:
+                expected = piecewise_column_integral(partition, first, second)
+                self.maximum_shared_column_partition_error = max(self.maximum_shared_column_partition_error,
+                    abs(total_area-expected)/max(1., expected))
+                if uniform_parent_stage(partition, left) and uniform_parent_stage(partition, right):
                     lp = partition.pools[partition.parent_pools[left][0]]
                     rp = partition.pools[partition.parent_pools[right][0]]
                     expected = sum(harmonic_area(segment, lp['parent_stage_offset'], rp['parent_stage_offset'],
@@ -128,8 +169,10 @@ class WetPoolPressureSystem:
                     total_area += area
                     add(owner, 2*owner+axis, -sign*area/self.h[owner, 0])
                     self.walls.append(dict(owner=owner, axis=axis, sign=sign, area=area))
-                expected = 0.
-                if partition.parent_pools[parent]:
+                expected = piecewise_column_integral(partition, partition.boundary_segments(parent, axis, sign))
+                self.maximum_wall_column_partition_error = max(self.maximum_wall_column_partition_error,
+                    abs(total_area-expected)/max(1., expected))
+                if uniform_parent_stage(partition, parent):
                     pool = partition.pools[partition.parent_pools[parent][0]]
                     expected = section.moments(pool['parent_stage_offset'], pool['parent_datum'])[0]
                 self.maximum_wall_column_partition_error = max(self.maximum_wall_column_partition_error,

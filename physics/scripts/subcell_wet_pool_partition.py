@@ -4,6 +4,7 @@ No volume correction or point/edge welding is used. This retains initial volume
 and momentum to their measured storage-inversion error, not bit-exact remapping.
 Changing pool stages/topology requires a new explicit transition mechanism.
 """
+import math
 import numpy as np
 
 from triangle_cell_storage import TriangleCellStorage
@@ -70,6 +71,39 @@ class WetPoolPartition:
         self.reassembled_momenta = self.reassembled_momenta.reshape(p.shape)
         self.maximum_volume_error = float(np.max(abs(self.reassembled_volumes-v)))
         self.maximum_momentum_error = float(np.max(abs(self.reassembled_momenta-p)))
+
+    def volume_probe(self, volumes):
+        """Independent-stage geometry probe within the original topology interval.
+
+        This is not an integrator or a merge/wetting transition. Original pool
+        velocities are merely retained as metadata; no dynamics are inferred.
+        """
+        volumes = np.asarray(volumes, float)
+        if volumes.shape != (len(self.pools),) or not np.isfinite(volumes).all() or (volumes <= 0).any():
+            raise ValueError('One positive finite volume per existing wet pool required')
+        result = object.__new__(type(self))
+        result.__dict__ = self.__dict__.copy()
+        result.pools = []
+        result.is_volume_probe = True
+        result.reassembled_volumes = np.zeros(self.patch.shape)
+        result.reassembled_momenta = np.zeros((*self.patch.shape, 2))
+        # Original-source partition error metrics are not measurements of this
+        # deliberately perturbed state.
+        for key in ('maximum_volume_error', 'maximum_momentum_error',
+                    'maximum_gram_partition_error', 'maximum_volume_tangent_partition_error'):
+            setattr(result, key, None)
+        for old, volume in zip(self.pools, volumes):
+            form = local_form(old['storage'], volume)
+            parent_height = math.fsum((form['stage_offset'], form['datum'], -old['parent_datum']))
+            low, high = old['parent_topology_stage_interval']
+            if not low < parent_height < high:
+                raise ValueError('Volume probe crosses a source topology event; transition not implemented')
+            pool = dict(old, volume=float(volume), form=form, parent_stage_offset=parent_height,
+                        momentum=old['momentum']*(volume/old['volume']))
+            result.pools.append(pool)
+            result.reassembled_volumes.flat[pool['parent']] += volume
+            result.reassembled_momenta.reshape(-1, 2)[pool['parent']] += pool['momentum']
+        return result
 
     def boundary_segments(self, parent, axis, sign):
         """Original clipped face segments tagged by their wet pool owner.
