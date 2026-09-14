@@ -1,0 +1,37 @@
+#include "/Engine/Public/Platform.ush"
+float2 FirstTime;
+float Duration;
+uint BoundaryMode;
+StructuredBuffer<float4> PreviousProgress;
+StructuredBuffer<uint> PreviousSummary,PreviousDiagnostics;
+RWStructuredBuffer<float4> NextProgress;
+RWStructuredBuffer<uint> NextSummary,NextDiagnostics;
+[numthreads(1,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    float4 p=PreviousProgress[0];
+    // Error-free normalization accepts equivalent high/low encodings without
+    // accepting a different instant, resetting the clock, or adding a tolerance.
+    precise float hi=p.x+p.y;
+    precise float v=hi-p.x;
+    precise float lo=(p.x-(hi-v))+(p.y-v);
+    bool valid=all(isfinite(p)) && hi==FirstTime.x && lo==FirstTime.y && p.z==0 && p.w>=0 && p.w<=1./120. &&
+        PreviousSummary[2]==1 && PreviousSummary[3]==BoundaryMode &&
+        PreviousSummary[0]<=4096 && PreviousSummary[1]<=PreviousSummary[0] &&
+        (PreviousSummary[0]==0 || PreviousSummary[1]>0) &&
+        (PreviousDiagnostics[0]|PreviousDiagnostics[1]|PreviousDiagnostics[2])==0 &&
+        PreviousDiagnostics[3]==(PreviousSummary[1]>0?1u:0u);
+    NextProgress[0]=valid?float4(p.xy,Duration,min(Duration,1./120.)):p;
+    for(uint k=0;k<4;++k)
+    {
+        NextSummary[k]=valid?0:PreviousSummary[k];
+        NextDiagnostics[k]=valid?0:PreviousDiagnostics[k];
+    }
+    if(valid)NextSummary[3]=BoundaryMode;
+    else
+    {
+        NextSummary[2]=2;
+        NextDiagnostics[2]|=64u;
+        NextDiagnostics[3]=0;
+    }
+}

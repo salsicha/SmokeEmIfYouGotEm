@@ -1,0 +1,455 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimPortableFloat.ush"
+#include "RaftSimExactHydrostatic.ush"
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+#include "RaftSimScaledHydrostatic.ush"
+RWStructuredBuffer<float2> ShorelineFactors;
+#endif
+int2 GridSize;
+float CellMeters;
+uint Periodic;
+uint SecondOrder;
+uint PartialCount;
+StructuredBuffer<float4> State;
+StructuredBuffer<float> Bed;
+#if RAFTSIM_TRANSPORT_EXTERIOR
+StructuredBuffer<float4> ExteriorState;
+StructuredBuffer<float> ExteriorBed;
+RWStructuredBuffer<float4> BoundaryFlux;
+uint BoundaryIndex(uint i,uint a,bool high)
+{
+    return a==0?(high?GridSize.y:0)+i/GridSize.x:
+        2*GridSize.y+(high?GridSize.x:0)+i%GridSize.x;
+}
+#endif
+RWStructuredBuffer<float2> Velocity;
+RWStructuredBuffer<float2> Geometry;
+RWStructuredBuffer<float2> PhysicalBedSlope;
+RWStructuredBuffer<float4> RawX;
+RWStructuredBuffer<float4> RawY;
+RWStructuredBuffer<float4> SlopeX;
+RWStructuredBuffer<float4> SlopeY;
+RWStructuredBuffer<float4> FluxX;
+RWStructuredBuffer<float4> FluxY;
+RWStructuredBuffer<float2> FoamFlux;
+RWStructuredBuffer<float2> CorrectionX;
+RWStructuredBuffer<float2> CorrectionY;
+RWStructuredBuffer<float2> Partial;
+RWStructuredBuffer<uint> Pairs;
+RWStructuredBuffer<uint> Flattened;
+RWStructuredBuffer<uint> Diagnostics;
+RWStructuredBuffer<float4> HydroRate;
+RWStructuredBuffer<float4> CFL;
+static const float Gravity=9.81;
+uint Coord(uint i,uint a){return a==0?i%GridSize.x:i/GridSize.x;}
+uint Neighbor(uint i,uint a,int d)
+{
+    int2 p=int2(i%GridSize.x,i/GridSize.x);p[a]=(p[a]+d+GridSize[a])%GridSize[a];return p.y*GridSize.x+p.x;
+}
+float4 MC(float4 back,float4 front)
+{ return .5*(sign(back)+sign(front))*min(.5*abs(back+front),2*min(abs(back),abs(front))); }
+float2 DepthSum(float a,float b)
+{
+    precise float hi=a+b;
+    precise float v=hi-a;
+    precise float lo=(a-(hi-v))+(b-v);
+    return float2(hi,lo);
+}
+float2 DepthAdd(float2 a,float2 b)
+{
+    precise float2 s=DepthSum(a.x,b.x);
+    precise float e=(s.y+a.y)+b.y;
+    return DepthSum(s.x,e);
+}
+bool SmallerDepthSlope(float2 a,float2 b)
+{
+    if(a.x<0)a=-a;if(b.x<0)b=-b;
+    return a.x<b.x || (a.x==b.x && a.y<b.y);
+}
+float2 LimitedSlope(float2 back,float2 front)
+{
+    if(sign(back.x)!=sign(front.x) || back.x==0 || front.x==0)return 0;
+    precise float2 slope=.5*DepthAdd(back,front);
+    precise float2 low=2*back,high=2*front;
+    if(SmallerDepthSlope(low,slope))slope=low;
+    if(SmallerDepthSlope(high,slope))slope=high;
+    return slope;
+}
+float2 DepthSlope(uint i,uint a)
+{
+    float h=State[i].x,hl=State[Neighbor(i,a,-1)].x,hr=State[Neighbor(i,a,1)].x;
+    precise float2 back=DepthSum(h,-hl),front=DepthSum(hr,-h);
+    return LimitedSlope(back,front);
+}
+float2 SurfaceSlope(uint i,uint a)
+{
+    uint l=Neighbor(i,a,-1),r=Neighbor(i,a,1);
+    precise float2 back=DepthAdd(DepthSum(State[i].x,-State[l].x),DepthSum(Bed[i],-Bed[l]));
+    precise float2 front=DepthAdd(DepthSum(State[r].x,-State[i].x),DepthSum(Bed[r],-Bed[i]));
+    return LimitedSlope(back,front);
+}
+float ReconstructionFactor(uint i,uint a,bool raw);
+float2 ApplySlopeFactor(float2 slope,float factor)
+{return DepthSum(RaftSimPortableMul(slope.x,factor),RaftSimPortableMul(slope.y,factor));}
+float2 PolynomialDepthWords(uint i,uint a,float direction,float storedSlope,bool raw)
+{
+    float h=State[i].x;
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+    float factor=ReconstructionFactor(i,a,raw);
+    if(asuint(factor)==0)return float2(h,0);
+    precise float2 offset=(.5*direction)*ApplySlopeFactor(DepthSlope(i,a),factor);
+#else
+    if(storedSlope==0)return float2(h,0); // zero-order or deliberately flattened polynomial
+    precise float2 offset=(.5*direction)*DepthSlope(i,a);
+#endif
+    precise float2 face=DepthAdd(float2(h,0),offset);
+    return face;
+}
+float PolynomialDepth(uint i,uint a,float direction,float storedSlope)
+{
+    precise float2 face=PolynomialDepthWords(i,a,direction,storedSlope,false);
+    // Retain the low word through cancellation. In a one-sided MC branch this
+    // recovers the actual tiny neighbor depth, not a zero face or a depth floor.
+    return face.x+face.y;
+}
+float4 Slopes(uint i,uint a,bool raw)
+{ return raw?(a==0?RawX[i]:RawY[i]):(a==0?SlopeX[i]:SlopeY[i]); }
+bool ActivePolynomial(uint i,uint a,bool raw)
+{
+    uint c=Coord(i,a);
+    return SecondOrder!=0 && (Periodic!=0 || (c>0 && c+1<GridSize[a])) && (raw || (Flattened[i]&(1u<<a))==0);
+}
+float ReconstructionFactor(uint i,uint a,bool raw)
+{
+    if(!ActivePolynomial(i,a,raw))return 0;
+    if(!RaftSimPositiveDepth(State[i].x) || !RaftSimPositiveDepth(State[Neighbor(i,a,-1)].x) ||
+       !RaftSimPositiveDepth(State[Neighbor(i,a,1)].x))return 0;
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+    return raw?1:ShorelineFactors[i][a];
+#else
+    return 1;
+#endif
+}
+void ExactPolynomialInputs(uint i,uint a,bool raw,float direction,out float4 depth,out float4 bed)
+{
+    uint l=Neighbor(i,a,-1),r=Neighbor(i,a,1);
+    depth=float4(State[l].x,State[i].x,State[r].x,ActivePolynomial(i,a,raw)?1:0);
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+    depth.w=ReconstructionFactor(i,a,raw);
+#endif
+    bed=float4(Bed[l],Bed[i],Bed[r],direction);
+}
+void FaceDepths(uint l,uint r,uint a,float dl,float dr,float4 sl,float4 sr,bool raw,out float2 h,out float2 hs,out bool2 positive)
+{
+    precise float2 left=PolynomialDepthWords(l,a,dl,sl.x,raw),right=PolynomialDepthWords(r,a,dr,sr.x,raw);
+    h=float2(left.x+left.y,right.x+right.y);
+    // Difference the bed and polynomial offsets separately; never store eta
+    // in place of positive h, even for a film below the bed datum's FP32 ULP.
+    // Use the SAME compensated h/eta polynomials for the bed offsets and
+    // hydrostatic reduction. Mixing a recovered depth with rounded offsets
+    // can turn an exactly blocked face into a small positive face, selecting
+    // a completely different reconstruction on the next pass.
+    precise float2 ldh=sl.x!=0?DepthSlope(l,a):0,rdh=sr.x!=0?DepthSlope(r,a):0;
+    precise float2 lde=sl.y!=0?SurfaceSlope(l,a):0,rde=sr.y!=0?SurfaceSlope(r,a):0;
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+    float lf=ReconstructionFactor(l,a,raw),rf=ReconstructionFactor(r,a,raw);
+    ldh=ApplySlopeFactor(DepthSlope(l,a),lf);rdh=ApplySlopeFactor(DepthSlope(r,a),rf);
+    lde=ApplySlopeFactor(SurfaceSlope(l,a),lf);rde=ApplySlopeFactor(SurfaceSlope(r,a),rf);
+#endif
+    precise float2 lo=(.5*dl)*DepthAdd(lde,-ldh),ro=(.5*dr)*DepthAdd(rde,-rdh);
+    precise float2 jump=DepthAdd(DepthSum(Bed[r],-Bed[l]),DepthAdd(ro,-lo));
+    if(jump.x>0 || (jump.x==0 && jump.y>0))left=DepthAdd(left,-jump);
+    if(jump.x<0 || (jump.x==0 && jump.y<0))right=DepthAdd(right,jump);
+    float2 before=float2(left.x+left.y,right.x+right.y);
+    hs=max(0,before);positive=bool2(RaftSimPositiveDepth(hs.x),RaftSimPositiveDepth(hs.y));
+    // Only select arithmetic precision here. No wet/dry or physical threshold
+    // changes: cancellation-prone faces use the same exact MC polynomials.
+    float scale=abs(State[l].x)+abs(State[r].x)+abs(Bed[r]-Bed[l]);
+    [unroll]for(int d=-1;d<=1;d+=2)
+    {uint li=Neighbor(l,a,d),ri=Neighbor(r,a,d);scale+=abs(State[li].x)+abs(State[ri].x)+abs(Bed[li]-Bed[l])+abs(Bed[ri]-Bed[r]);}
+    float bound=64*1.1920928955078125e-7*scale;
+    bool risk=(RaftSimPositiveDepth(State[l].x) && (abs(before.x)<=bound || abs(h.x)<=bound)) ||
+        (RaftSimPositiveDepth(State[r].x) && (abs(before.y)<=bound || abs(h.y)<=bound));
+    if(risk && Diagnostics[0]==0)
+    {
+        float4 lh,lb,rh,rb;ExactPolynomialInputs(l,a,raw,dl,lh,lb);ExactPolynomialInputs(r,a,raw,dr,rh,rb);
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+        float4 exact=RaftSimScaledHydrostatic(lh,lb,rh,rb,positive);
+#else
+        float4 exact=RaftSimExactHydrostatic(lh,lb,rh,rb,positive);
+#endif
+        h=exact.xy;hs=exact.zw;
+    }
+}
+float StablePolynomialDepth(uint i,uint a,float direction,float slope)
+{
+    float value=PolynomialDepth(i,a,direction,slope);uint l=Neighbor(i,a,-1),r=Neighbor(i,a,1);
+    float scale=abs(State[i].x)+abs(State[l].x)+abs(State[r].x)+abs(Bed[l]-Bed[i])+abs(Bed[r]-Bed[i]);
+    if(RaftSimPositiveDepth(State[i].x) && abs(value)<=64*1.1920928955078125e-7*scale && Diagnostics[0]==0)
+    {
+        float4 h,b;ExactPolynomialInputs(i,a,false,direction,h,b);
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+        RaftSimWidePolynomial p=RaftSimScaledPolynomialAt(h.xyz,b.xyz,h.w,direction);value=RaftSimRoundAccumulator(p.h,false,0);
+#else
+        RaftSimExactPolynomial p=RaftSimExactPolynomialAt(h.xyz,b.xyz,h.w!=0,direction);value=RaftSimDyadicRound(p.h);
+#endif
+    }
+    return value;
+}
+float2 FaceVelocity(uint i,uint a,float direction,float4 s)
+{
+    float h=State[i].x;float2 u=Velocity[i];
+    float hm=StablePolynomialDepth(i,a,-1,s.x),hp=StablePolynomialDepth(i,a,1,s.x);
+    float rm=RaftSimPositiveDepth(h)?RaftSimPortableMul(-.5,RaftSimPortableDivide(hp,h)):0;
+    float rp=RaftSimPositiveDepth(h)?RaftSimPortableMul(.5,RaftSimPortableDivide(hm,h)):0;
+    float2 dm=float2(RaftSimPortableMul(rm,s.z),RaftSimPortableMul(rm,s.w));
+    float2 dp=float2(RaftSimPortableMul(rp,s.z),RaftSimPortableMul(rp,s.w));
+    float2 l=Velocity[Neighbor(i,a,-1)],r=Velocity[Neighbor(i,a,1)];
+    float2 low=min(u,min(l,r)),high=max(u,max(l,r)),factor=1;
+    [unroll]for(uint k=0;k<2;++k)
+    {
+        if(dm[k]!=0)factor[k]=min(factor[k],max(0,((dm[k]>=0?high[k]:low[k])-u[k])/dm[k]));
+        if(dp[k]!=0)factor[k]=min(factor[k],max(0,((dp[k]>=0?high[k]:low[k])-u[k])/dp[k]));
+    }
+    float faceH=direction>0?hp:hm;
+    // Match conservative momentum reconstruction, including roundoff from
+    // forming the face momentum before hydrostatic depth reduction.
+    float2 v=u+factor*(direction>0?dp:dm);
+    float2 q=float2(RaftSimPortableMul(faceH,v.x),RaftSimPortableMul(faceH,v.y));
+    return RaftSimPositiveDepth(faceH)?float2(RaftSimPortableDivide(q.x,faceH),RaftSimPortableDivide(q.y,faceH)):0;
+}
+float3 TransportValue(float2 hs,float2 ul,float2 ur,uint a,out float signal)
+{
+    float vl=ul[a],vr=ur[a];
+    float cl=RaftSimPortableSqrt(RaftSimPortableMul(Gravity,hs.x)),cr=RaftSimPortableSqrt(RaftSimPortableMul(Gravity,hs.y));
+    signal=max(abs(vl)+cl,abs(vr)+cr);
+    float wl=.5*max((abs(vl)+vl)+cl,(abs(vr)+vl)+cr);
+    float wr=.5*max((abs(vl)-vr)+cl,(abs(vr)-vr)+cr);
+    float3 l=float3(hs.x,RaftSimPortableMul(hs.x,ul.x),RaftSimPortableMul(hs.x,ul.y));
+    float3 r=float3(hs.y,RaftSimPortableMul(hs.y,ur.x),RaftSimPortableMul(hs.y,ur.y)),value;
+    // Round the opposing products symmetrically, then subtract. A one-sided
+    // fused operation would inject residual transport into an exact rest state.
+    [unroll]for(uint k=0;k<3;++k)value[k]=RaftSimPortableSub(RaftSimPortableMul(wl,l[k]),RaftSimPortableMul(wr,r[k]));
+    return value;
+}
+float FaceFoam(float water,float4 donor)
+{
+    if((asuint(water)&0x7fffffffu)==0)return 0;
+    return RaftSimPositiveDepth(donor.x)?RaftSimPortableMul(RaftSimPortableDivide(water,donor.x),donor.w):asfloat(0x7fc00000u);
+}
+float FacePressureJump(float2 hs)
+{return RaftSimPortableMul(RaftSimPortableMul(.25*Gravity,RaftSimPortableSub(hs.y,hs.x)),RaftSimPortableAdd(hs.y,hs.x));}
+void Face(uint l,uint r,uint a,float dl,float dr,bool reflectL,bool reflectR,
+    out float4 flux,out float2 correction,out bool wet,out float foam)
+{
+    float4 sl=Slopes(l,a,false),sr=Slopes(r,a,false);float2 h,hs;
+    bool2 positive;FaceDepths(l,r,a,dl,dr,sl,sr,false,h,hs,positive);
+    float2 ul=FaceVelocity(l,a,dl,sl),ur=FaceVelocity(r,a,dr,sr);
+    if(reflectL)ul[a]=-ul[a];if(reflectR)ur[a]=-ur[a];
+    float signal;float3 value=TransportValue(hs,ul,ur,a,signal);
+    uint donor=(asuint(value.x)>>31)==0?l:r;
+    // Shared water flux with first-order upwind foam concentration. Ratio
+    // order avoids overflow from foam/h in a representable thin wet film.
+    foam=FaceFoam(value.x,State[donor]);
+    // Cancel owning-cell hydrostatic pressure with the polynomial bed source
+    // analytically, before rounding. The remaining face deviation is opposite
+    // on its two owners. An exactly resting reconstructed lake stays at rest.
+    float jump=FacePressureJump(hs);
+    flux=float4(value,signal);correction=float2(jump,-jump);wet=all(positive);
+}
+#if RAFTSIM_TRANSPORT_EXTERIOR
+// Endpoint normal slopes are zero. The exterior is an explicit constant ghost
+// polynomial, not a reflecting wall or a reset of any conserved interior cell.
+void ExteriorFace(uint i,uint a,bool high,out float4 flux,out float2 correction,
+    out float foam,out float4 ledger)
+{
+    uint j=BoundaryIndex(i,a,high);float4 ghost=ExteriorState[j],inside=State[i];
+    float2 gu=RaftSimPositiveDepth(ghost.x)?float2(RaftSimPortableDivide(ghost.y,ghost.x),RaftSimPortableDivide(ghost.z,ghost.x)):0;
+    float2 gq=float2(RaftSimPortableMul(ghost.x,gu.x),RaftSimPortableMul(ghost.x,gu.y));
+    gu=RaftSimPositiveDepth(ghost.x)?float2(RaftSimPortableDivide(gq.x,ghost.x),RaftSimPortableDivide(gq.y,ghost.x)):0;
+    float2 iu=FaceVelocity(i,a,high?1:-1,Slopes(i,a,false));
+    float4 sl=high?inside:ghost,sr=high?ghost:inside;
+    float2 ul=high?iu:gu,ur=high?gu:iu;
+    float zl=high?Bed[i]:ExteriorBed[j],zr=high?ExteriorBed[j]:Bed[i];bool2 positive;
+    float2 hs=RaftSimExactHydrostatic(float4(sl.xxx,0),float4(zl,zl,zl,1),float4(sr.xxx,0),float4(zr,zr,zr,-1),positive).zw;
+    float signal;float3 value=TransportValue(hs,ul,ur,a,signal);
+    float4 donor=(asuint(value.x)>>31)==0?sl:sr;
+    foam=FaceFoam(value.x,donor);float jump=FacePressureJump(hs);
+    correction=float2(jump,-jump);flux=float4(value,signal);
+    ledger=float4(value,foam);
+    float pressure=RaftSimPortableMul(.25*Gravity,RaftSimPortableAdd(RaftSimPortableMul(hs.x,hs.x),RaftSimPortableMul(hs.y,hs.y)));
+    ledger[a+1]=RaftSimPortableAdd(ledger[a+1],pressure);
+}
+#endif
+groupshared float2 Shared[256];
+float2 ReduceMax(float2 value,uint lane)
+{
+    Shared[lane]=value;GroupMemoryBarrierWithGroupSync();
+    [unroll]for(uint stride=128;stride>0;stride>>=1)
+    { if(lane<stride)Shared[lane]=max(Shared[lane],Shared[lane+stride]);GroupMemoryBarrierWithGroupSync(); }
+    return Shared[0];
+}
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_GroupIndex)
+{
+    uint i=id.x,count=GridSize.x*GridSize.y;
+#if RAFTSIM_TRANSPORT_PHASE < 4
+    if(i>=count)return;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 0
+    float4 s=State[i];float bed=Bed[i];
+    bool bad=!RaftSimPortableValidState(s) || !isfinite(bed);
+    bool wet=(asuint(s.x)&0x7fffffffu)!=0;
+    float2 u=wet?float2(RaftSimPortableDivide(s.y,s.x),RaftSimPortableDivide(s.z,s.x)):0;
+    if(bad)InterlockedAdd(Diagnostics[0],1);
+#if RAFTSIM_TRANSPORT_EXTERIOR
+    for(uint j=i;j<2*(GridSize.x+GridSize.y);j+=count)
+    {
+        float4 e=ExteriorState[j];
+        if(!RaftSimPortableValidState(e) || !isfinite(ExteriorBed[j]))InterlockedAdd(Diagnostics[0],1);
+    }
+#endif
+    Velocity[i]=bad?0:u;Geometry[i]=float2(s.x,bed);
+    float2 slope=0;
+    [unroll]for(uint a=0;a<2;++a)if(GridSize[a]>1)
+    {
+        uint c=Coord(i,a),l=Neighbor(i,a,-1),r=Neighbor(i,a,1);
+        bool boundary=Periodic==0 && (c==0 || c+1==GridSize[a]);
+        if(Periodic==0 && c==0)l=i;if(Periodic==0 && c+1==GridSize[a])r=i;
+        slope[a]=(Bed[r]-Bed[l])/(CellMeters*(boundary?1:2));
+    }
+    PhysicalBedSlope[i]=slope;
+#if RAFTSIM_TRANSPORT_EXTERIOR
+    [unroll]for(uint a=0;a<2;++a)
+    {
+        uint c=Coord(i,a);
+        float lb=c==0?ExteriorBed[BoundaryIndex(i,a,false)]:Bed[Neighbor(i,a,-1)];
+        float rb=c+1==GridSize[a]?ExteriorBed[BoundaryIndex(i,a,true)]:Bed[Neighbor(i,a,1)];
+        slope[a]=(rb-lb)/(2*CellMeters);
+    }
+    PhysicalBedSlope[i]=slope;
+#endif
+    if(any(!isfinite(slope)))InterlockedAdd(Diagnostics[0],1);
+#elif RAFTSIM_TRANSPORT_PHASE == 1
+    [unroll]for(uint a=0;a<2;++a)
+    {
+        uint l=Neighbor(i,a,-1),r=Neighbor(i,a,1),c=Coord(i,a);float4 s=0;
+        bool wet=RaftSimPositiveDepth(State[i].x) && RaftSimPositiveDepth(State[l].x) && RaftSimPositiveDepth(State[r].x);
+        if(SecondOrder!=0 && wet && (Periodic!=0 || (c>0 && c+1<GridSize[a])) && Diagnostics[0]==0)
+        {
+            float back=State[i].x-State[l].x,front=State[r].x-State[i].x;
+            s=MC(float4(back,back+(Bed[i]-Bed[l]),Velocity[i]-Velocity[l]),
+                 float4(front,front+(Bed[r]-Bed[i]),Velocity[r]-Velocity[i]));
+            s.x=DepthSlope(i,a).x;
+            s.y=SurfaceSlope(i,a).x;
+        }
+        if(a==0)RawX[i]=s;else RawY[i]=s;
+        if(any(!isfinite(s)))InterlockedAdd(Diagnostics[1],1);
+    }
+#elif RAFTSIM_TRANSPORT_PHASE == 2
+#if RAFTSIM_TRANSPORT_UNSCALED
+    // Preserve the original positive MC h/eta/u polynomials. No hydrostatic
+    // survival ratios, extra face classifications or slope arithmetic here.
+    SlopeX[i]=RawX[i];SlopeY[i]=RawY[i];Flattened[i]=0;
+#else
+    uint flattened=0;
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+    float2 factors=0;
+#endif
+    [unroll]for(uint a=0;a<2;++a)
+    {
+        uint c=Coord(i,a),l=Neighbor(i,a,-1),r=Neighbor(i,a,1);
+        bool low=Periodic==0 && c==0,high=Periodic==0 && c+1==GridSize[a];
+        if(low)l=i;if(high)r=i;
+        float4 s=Slopes(i,a,true);float2 h,positive,negative;bool2 posWet,negWet;
+        FaceDepths(i,r,a,1,high?1:-1,s,Slopes(r,a,true),true,h,positive,posWet);
+        float positiveOwn=h.x;
+        FaceDepths(l,i,a,low?-1:1,-1,Slopes(l,a,true),s,true,h,negative,negWet);
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+        float f=min(1,min(RaftSimPositiveDepth(positiveOwn)?RaftSimPortableDivide(positive.x,positiveOwn):0,
+                         RaftSimPositiveDepth(h.y)?RaftSimPortableDivide(negative.y,h.y):0));
+        factors[a]=f;
+        [unroll]for(uint k=0;k<4;++k)s[k]=RaftSimPortableMul(s[k],f);
+        if(asuint(f)==0)flattened|=1u<<a;
+#else
+        if(RaftSimPositiveDepth(State[i].x) && (!posWet.x || !negWet.y)){s=0;flattened|=1u<<a;}
+#endif
+        if(a==0)SlopeX[i]=s;else SlopeY[i]=s;
+    }
+    Flattened[i]=flattened;
+#if RAFTSIM_TRANSPORT_CONTINUOUS
+    ShorelineFactors[i]=factors;
+#endif
+#endif
+#elif RAFTSIM_TRANSPORT_PHASE == 3
+    uint mask=0;float2 foam=0;
+    [unroll]for(uint a=0;a<2;++a)
+    {
+        bool high=Periodic==0 && Coord(i,a)+1==GridSize[a];uint r=high?i:Neighbor(i,a,1);
+        float4 f;float2 correction;bool wet=false;
+#if RAFTSIM_TRANSPORT_EXTERIOR
+        if(high)
+        {
+            float4 ledger;ExteriorFace(i,a,true,f,correction,foam[a],ledger);
+            BoundaryFlux[BoundaryIndex(i,a,true)]=ledger;
+            if(any(!isfinite(ledger)))InterlockedAdd(Diagnostics[1],1);
+        }
+        else
+#endif
+        Face(i,r,a,1,high?1:-1,false,high,f,correction,wet,foam[a]);
+#if RAFTSIM_TRANSPORT_EXTERIOR
+        if(Coord(i,a)==0)
+        {
+            float4 lf,ledger;float2 lc;float foamLow;
+            ExteriorFace(i,a,false,lf,lc,foamLow,ledger);
+            BoundaryFlux[BoundaryIndex(i,a,false)]=ledger;
+            if(any(!isfinite(lf)) || any(!isfinite(lc)) || any(!isfinite(ledger)))InterlockedAdd(Diagnostics[1],1);
+        }
+#endif
+        if(wet && !high && GridSize[a]>1)mask|=1u<<a;
+        if(a==0){FluxX[i]=f;CorrectionX[i]=correction;}else{FluxY[i]=f;CorrectionY[i]=correction;}
+        if(any(!isfinite(f)) || any(!isfinite(correction)) || !isfinite(foam[a]))InterlockedAdd(Diagnostics[1],1);
+    }
+    Pairs[i]=mask;FoamFlux[i]=foam;
+#elif RAFTSIM_TRANSPORT_PHASE == 4
+    float2 peak=0;
+    if(i<count)
+    {
+        float3 result=0;float foamRate=0;
+        [unroll]for(uint a=0;a<2;++a)
+        {
+            uint l=Neighbor(i,a,-1);float4 pos=a==0?FluxX[i]:FluxY[i],neg=a==0?FluxX[l]:FluxY[l];
+            float2 pc=a==0?CorrectionX[i]:CorrectionY[i],nc=a==0?CorrectionX[l]:CorrectionY[l];
+            float fp=FoamFlux[i][a],fn=FoamFlux[l][a];
+            if(Periodic==0 && Coord(i,a)==0)
+            {
+#if RAFTSIM_TRANSPORT_EXTERIOR
+                float4 ledger;ExteriorFace(i,a,false,neg,nc,fn,ledger);
+#else
+                bool wet;Face(i,i,a,-1,-1,true,false,neg,nc,wet,fn);
+#endif
+            }
+            foamRate=RaftSimPortableSub(foamRate,RaftSimPortableDivide(RaftSimPortableSub(fp,fn),CellMeters));
+            float3 plus=pos.xyz,minus=neg.xyz;
+            plus[a+1]=RaftSimPortableAdd(plus[a+1],pc.x);minus[a+1]=RaftSimPortableAdd(minus[a+1],nc.y);
+            [unroll]for(uint k=0;k<3;++k)result[k]=RaftSimPortableSub(result[k],RaftSimPortableDivide(RaftSimPortableSub(plus[k],minus[k]),CellMeters));
+            float4 s=Slopes(i,a,false);
+            float source=RaftSimPortableDivide(RaftSimPortableMul(RaftSimPortableMul(Gravity,State[i].x),s.y),CellMeters);
+            result[a+1]=RaftSimPortableSub(result[a+1],source);
+            peak[a]=max(pos.w,neg.w);
+        }
+        if(any(!isfinite(result)) || any(!isfinite(peak)) || !isfinite(foamRate))InterlockedAdd(Diagnostics[1],1);
+        HydroRate[i]=float4(result,foamRate);
+    }
+    peak=ReduceMax(peak,lane);if(lane==0)Partial[group.x]=peak;
+#elif RAFTSIM_TRANSPORT_PHASE == 5
+    float2 peak=0;for(uint j=lane;j<PartialCount;j+=256)peak=max(peak,Partial[j]);
+    peak=ReduceMax(peak,lane);
+    if(lane==0)
+    {
+        float bound=peak.x+peak.y>0?.4*CellMeters/(peak.x+peak.y):asfloat(0x7f800000u);
+        if(Diagnostics[0]!=0 || Diagnostics[1]!=0)bound=0;
+        CFL[0]=float4(peak,bound,0);
+    }
+#endif
+}

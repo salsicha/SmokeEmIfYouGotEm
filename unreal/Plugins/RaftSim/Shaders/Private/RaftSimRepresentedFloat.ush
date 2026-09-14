@@ -1,0 +1,69 @@
+#ifndef RAFTSIM_REPRESENTED_FLOAT
+#define RAFTSIM_REPRESENTED_FLOAT
+// Preserve represented FP32 subnormals without relying on the shader's FP32
+// denorm mode. FP64 evaluation is local arithmetic, not a depth floor or repair.
+// Full solver use additionally requires every consumer to retain these values.
+double RaftSimDecodeFloat(float value)
+{
+    uint b=asuint(value),m=b&0x7fffffffu;
+    if((m>>23)!=0)return double(value);
+    double scale=asdouble(0u,uint(1023-149)<<20);
+    double result=double(m)*scale;
+    return (b>>31)!=0?-result:result;
+}
+uint RaftSimRoundSignificand(uint low,uint high,uint shift,int residualSign)
+{
+    // high:low contains an unsigned 53-bit significand. Ties round to even.
+    if(shift>53)return 0;
+    uint value,tail,midpoint;bool sticky=false;
+    if(shift<32)
+    {
+        value=(high<<(32-shift))|(low>>shift);
+        tail=low&((1u<<shift)-1u);midpoint=1u<<(shift-1);
+    }
+    else if(shift==32)
+    {value=high;tail=low;midpoint=0x80000000u;}
+    else
+    {
+        uint s=shift-32;value=high>>s;
+        tail=high&((1u<<s)-1u);midpoint=1u<<(s-1);sticky=low!=0;
+    }
+    if(tail==midpoint && !sticky)
+        return value+uint(residualSign>0 || (residualSign==0 && (value&1u)!=0));
+    return value+uint(tail>midpoint || (tail==midpoint && sticky));
+}
+float RaftSimEncodeFloatWithResidual(double value,double residual)
+{
+    uint low,high;asuint(value,low,high);
+    uint sign=high&0x80000000u,exponent=(high>>20)&0x7ffu;
+    uint significand=(high&0xfffffu)|0x100000u;
+    int residualSign=residual>0?1:residual<0?-1:0;
+    if(sign!=0)residualSign=-residualSign;
+    if(exponent==0x7ffu)return asfloat(sign|0x7f800000u|uint((high&0xfffffu)!=0 || low!=0)*0x400000u);
+    if(exponent==0)return asfloat(sign); // FP64 subnormals are below FP32 range.
+    int target=int(exponent)-1023+127;
+    if(target>=255)return asfloat(sign|0x7f800000u);
+    if(target<=0)
+    {
+        uint mantissa=RaftSimRoundSignificand(low,significand,uint(30-target),residualSign);
+        // Rounding can carry directly into the smallest normal FP32 value.
+        return asfloat(sign|mantissa);
+    }
+    uint mantissa=RaftSimRoundSignificand(low,significand,29,residualSign);
+    if(mantissa==0x1000000u){mantissa>>=1;++target;}
+    return asfloat(sign|(uint(target)<<23)|(mantissa&0x7fffffu));
+}
+float RaftSimEncodeFloat(double value){return RaftSimEncodeFloatWithResidual(value,0.0L);}
+float RaftSimRepresentedEuler(float state,float dt,float rate)
+{
+    // The product of two FP32 significands is exact in FP64. TwoSum keeps
+    // the addition tail so a second rounding cannot choose the wrong FP32
+    // tie (including subnormal ties). No state or rate magnitude cutoff.
+    precise double initial=RaftSimDecodeFloat(state);
+    precise double product=RaftSimDecodeFloat(dt)*RaftSimDecodeFloat(rate);
+    precise double result=initial+product;
+    precise double v=result-initial;
+    precise double residual=(initial-(result-v))+(product-v);
+    return RaftSimEncodeFloatWithResidual(result,residual);
+}
+#endif

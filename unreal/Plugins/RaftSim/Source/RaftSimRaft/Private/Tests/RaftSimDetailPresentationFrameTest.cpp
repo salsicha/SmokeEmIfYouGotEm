@@ -49,6 +49,8 @@ bool FRaftSimDetailPresentationFrameTest::RunTest(const FString&)
         if (!Frame) FPlatformProcess::Sleep(.001f); // Diagnostic fixture only, never runtime.
     }
     if (!TestTrue(TEXT("production nonblocking slot returns completed registered data"),PollOK && Frame.IsValid()))return false;
+    TestEqual(TEXT("readback inserts captured host clock marker, not wall time"),Frame->Pixels[Nx*Ny+1].W,3.f);
+    TestTrue(TEXT("expected payload gains only captured clock metadata"),Expected->WriteHostClockMetadata());
     TestTrue(TEXT("padded texture rows, metadata, clock and pixels survive candidate overwrite exactly"),
         Frame->Pixels==Expected->Pixels && Frame->Sequence==2 && Frame->ElapsedSeconds==2 && Frame->SimulationSeconds==1.99);
     auto Old=MakeShared<FRaftSimDetailPresentationFrame,ESPMode::ThreadSafe>(*Expected);Old->Sequence=1;

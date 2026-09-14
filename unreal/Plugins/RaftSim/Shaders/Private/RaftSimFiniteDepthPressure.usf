@@ -1,0 +1,52 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimFiniteDepthPressure.ush"
+int2 GridSize;
+float CellMeters;
+uint Periodic;
+float2 Relaxation;
+float2 Momentum;
+StructuredBuffer<float4> MeanFlow;
+StructuredBuffer<float4> WaveState;
+#if !RAFTSIM_PRESSURE_INITIALIZE
+StructuredBuffer<float2> PreviousPotential;
+StructuredBuffer<float2> OlderPotential;
+#endif
+RWStructuredBuffer<float2> NextPotential;
+
+uint PressureIndex(int2 p) { return p.y*GridSize.x+p.x; }
+bool PressureOutside(int2 p) { return any(p<0) || any(p>=GridSize); }
+
+[numthreads(8,8,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    int2 p=int2(id.xy);
+    if (PressureOutside(p))return;
+    uint i=PressureIndex(p);
+    float depth=MeanFlow[i].x;
+    if (depth<=0.01) { NextPotential[i]=0;return; }
+    float eta=WaveState[i].x;
+#if RAFTSIM_PRESSURE_INITIALIZE
+    NextPotential[i]=eta.xx;
+#else
+    float2 sum=0;
+    uint count=0;
+    const int2 offsets[4]={int2(-1,0),int2(1,0),int2(0,-1),int2(0,1)};
+    [unroll]for(uint n=0;n<4;++n)
+    {
+        int2 q=p+offsets[n];
+        if (Periodic!=0)q=(q+GridSize)%GridSize;
+        else if (PressureOutside(q))continue;
+        uint j=PressureIndex(q);
+        // No coupling across dry land or outside the moving domain. This is
+        // a reflecting pressure boundary, not zero pressure at a dry cell.
+        if (MeanFlow[j].x<=0.01)continue;
+        sum+=PreviousPotential[j];++count;
+    }
+    float2 alpha=RaftSimPressureLengths*(depth*depth/(CellMeters*CellMeters));
+    float2 previous=PreviousPotential[i];
+    float2 jacobi=(eta+alpha*sum)/(1+alpha*count);
+    // Chebyshev acceleration uses a proven spectral interval of the
+    // row-normalized wet-neighbour Helmholtz matrix; no empirical overrelaxation.
+    NextPotential[i]=previous+Relaxation*(jacobi-previous)+Momentum*(previous-OlderPotential[i]);
+#endif
+}

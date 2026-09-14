@@ -1,0 +1,391 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimPressureMath.ush"
+int2 GridSize;
+float CellMeters;
+float2 Lengths;
+uint Periodic;
+uint UsePhysicalBedSlope;
+uint UseDispersionFraction;
+uint PartialCount;
+uint Iteration;
+StructuredBuffer<float2> Geometry;
+StructuredBuffer<float2> PhysicalBedSlope;
+StructuredBuffer<float> NonbreakingFraction;
+StructuredBuffer<uint> Pairs;
+StructuredBuffer<float4> RightHandSide;
+StructuredBuffer<float4> Center;
+StructuredBuffer<float4> Edges;
+StructuredBuffer<float4> Diagonal;
+RWStructuredBuffer<float4> PreparedCenter;
+RWStructuredBuffer<float4> PreparedEdges;
+RWStructuredBuffer<float4> PreparedDiagonal;
+RWStructuredBuffer<float4> Solution;
+RWStructuredBuffer<float4> Residual;
+RWStructuredBuffer<float4> Direction;
+RWStructuredBuffer<float4> Scratch;
+RWStructuredBuffer<float2> WValue;
+RWStructuredBuffer<float4> TrueResidual;
+RWStructuredBuffer<uint> Diagnostics;
+RWStructuredBuffer<float4> Partial;
+// integer scale exponents.xy; rz.xy/norm.zw; alpha.xy/beta.zw; active.xy;
+// last normalization exponents.xy. Solution remains in physical RHS units.
+RWStructuredBuffer<float4> Control;
+// Fused global reductions must never overwrite partials/control that other
+// workgroups are still reading. These are distinct RDG buffers, not aliases.
+RWStructuredBuffer<float4> NextPartial;
+RWStructuredBuffer<float4> NextControl;
+RWStructuredBuffer<float2> PartialExponents;
+uint Index(int2 p) { return p.y*GridSize.x+p.x; }
+int2 Point(uint i) { return int2(i%GridSize.x,i/GridSize.x); }
+int2 Neighbor(int2 p,int2 d)
+{
+    // Array indexing wraps, connectivity does not: nonperiodic exterior graph
+    // bits are required to be zero. Clamping would alias a boundary row into
+    // its missing neighbor and break the transpose/positive-definite operator.
+    return (p+d+GridSize)%GridSize;
+}
+float2 Fractions(float h,float other)
+{ return RaftSimPressureWeights(h,other); }
+float Fraction(uint i) { return UseDispersionFraction!=0?NonbreakingFraction[i]:1; }
+
+#if RAFTSIM_ACCELERATION_PREPARE
+void Coefficients(int2 p,out float4 c,out float4 e)
+{
+    uint i=Index(p);float h=Geometry[i].x,bed=Geometry[i].y;
+    float2 central=0,b=0;e=0;
+    [unroll]for(uint axis=0;axis<2;++axis)
+    {
+        int2 delta=axis==0?int2(1,0):int2(0,1);
+        uint r=Index(Neighbor(p,delta)),l=Index(Neighbor(p,-delta));
+        bool right=(Pairs[i]&(1u<<axis))!=0,left=(Pairs[l]&(1u<<axis))!=0;
+        float2 wr=Fractions(h,Geometry[r].x),wl=Fractions(h,Geometry[l].x);
+        b[axis]=UsePhysicalBedSlope!=0 ? (RaftSimPressureWet(h)?PhysicalBedSlope[i][axis]:0) :
+            ((right?wr.x*(Geometry[r].y-bed):0)+(left?wl.x*(bed-Geometry[l].y):0))/CellMeters;
+        // Algebraic W coefficients avoid sqrt(h)^3 / sqrt(neighbor h) and
+        // reciprocal-depth intermediates; no small-depth cutoff is used.
+        float3 values=RaftSimPressureCoefficients(h,Geometry[r].x,Geometry[l].x,b[axis],wr,wl,right,left,CellMeters);
+        central[axis]=values.x;e[axis]=values.y;e[axis+2]=values.z;
+    }
+    c=float4(central,b);
+}
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    uint i=id.x;if(i>=GridSize.x*GridSize.y)return;
+    int2 p=Point(i);float2 g=Geometry[i];uint mask=Pairs[i];
+    bool invalid=any(!isfinite(g)) || RaftSimPressureNegative(g.x) || (mask&~3u)!=0 || any(!isfinite(RightHandSide[i]));
+    if(UsePhysicalBedSlope!=0)invalid=invalid || any(!isfinite(PhysicalBedSlope[i]));
+    float fraction=Fraction(i);
+    invalid=invalid || !isfinite(fraction) || fraction<0 || fraction>1;
+    [unroll]for(uint axis=0;axis<2;++axis)
+    {
+        int2 delta=axis==0?int2(1,0):int2(0,1);
+        if((mask&(1u<<axis))!=0)
+            invalid=invalid || GridSize[axis]==1 || (Periodic==0 && p[axis]+1==GridSize[axis]) ||
+                !RaftSimPressureWet(g.x) || !RaftSimPressureWet(Geometry[Index(Neighbor(p,delta))].x);
+    }
+    if(invalid)
+    { InterlockedAdd(Diagnostics[0],1);PreparedCenter[i]=0;PreparedEdges[i]=0;PreparedDiagonal[i]=1;return; }
+    float4 c,e;Coefficients(p,c,e);float2 d=fraction*(c.xy*c.xy+.75*c.zw*c.zw);
+    [unroll]for(uint axis=0;axis<2;++axis)
+    {
+        int2 delta=axis==0?int2(1,0):int2(0,1);float4 nc,ne;
+        Coefficients(Neighbor(p,delta),nc,ne);d[axis]+=Fraction(Index(Neighbor(p,delta)))*ne[axis+2]*ne[axis+2];
+        Coefficients(Neighbor(p,-delta),nc,ne);d[axis]+=Fraction(Index(Neighbor(p,-delta)))*ne[axis]*ne[axis];
+    }
+    float4 diag=1+float4(Lengths.x*d,Lengths.y*d);
+    if(any(!isfinite(c)) || any(!isfinite(e)) || any(!isfinite(diag)))InterlockedAdd(Diagnostics[0],1);
+    PreparedCenter[i]=c;PreparedEdges[i]=e;PreparedDiagonal[i]=diag;
+}
+#else
+groupshared float4 Shared[256];
+groupshared float2 Scale,Rz,Norm,Alpha,Beta;
+groupshared int2 ScaleExponent,RatioExponent;
+groupshared uint2 Active;
+float4 Reduce(float4 v,uint lane,bool maximum)
+{
+    Shared[lane]=v;GroupMemoryBarrierWithGroupSync();
+    [unroll]for(uint stride=128;stride>0;stride>>=1)
+    {
+        if(lane<stride)Shared[lane]=maximum?max(Shared[lane],Shared[lane+stride]):Shared[lane]+Shared[lane+stride];
+        GroupMemoryBarrierWithGroupSync();
+    }
+    return Shared[0];
+}
+float2 PairDot(float4 a,float4 b) { return float2(dot(a.xy,b.xy),dot(a.zw,b.zw)); }
+float4 PairScale(float2 v) { return float4(v.x,v.x,v.y,v.y); }
+float4 ScalePower(float4 v,int2 e)
+{return float4(RaftSimPortableScale(v.x,e.x),RaftSimPortableScale(v.y,e.x),RaftSimPortableScale(v.z,e.y),RaftSimPortableScale(v.w,e.y));}
+int2 PeakExponent(float4 peak)
+{return int2(RaftSimPortableExponent(max(peak.x,peak.y)),RaftSimPortableExponent(max(peak.z,peak.w)));}
+float4 AddScaled(float4 value,float4 direction,float2 alpha,int2 exponent)
+{
+    float4 physical=ScalePower(direction,exponent),result;
+    [unroll]for(uint k=0;k<4;++k)result[k]=RaftSimPortableAdd(value[k],RaftSimPortableMul(physical[k],alpha[k/2]));
+    return result;
+}
+float2 ApplyW(uint i)
+{
+    int2 p=Point(i);float4 c=Center[i],e=Edges[i],v=Direction[i];
+    float2 result=float2(dot(c.xy,v.xy),dot(c.xy,v.zw));
+    [unroll]for(uint axis=0;axis<2;++axis)
+    {
+        int2 delta=axis==0?int2(1,0):int2(0,1);
+        float4 r=Direction[Index(Neighbor(p,delta))],l=Direction[Index(Neighbor(p,-delta))];
+        result+=e[axis]*float2(r[axis],r[axis+2])+e[axis+2]*float2(l[axis],l[axis+2]);
+    }
+    return result;
+}
+float4 ApplyA(uint i)
+{
+    int2 p=Point(i);float4 c=Center[i],v=Direction[i];float2 w=WValue[i];
+    precise float4 transpose=float4(c.xy*w.x,c.xy*w.y);
+    [unroll]for(uint axis=0;axis<2;++axis)
+    {
+        int2 delta=axis==0?int2(1,0):int2(0,1);
+        uint r=Index(Neighbor(p,delta)),l=Index(Neighbor(p,-delta));
+        precise float2 addition=Edges[r][axis+2]*WValue[r]+Edges[l][axis]*WValue[l];
+        transpose[axis]+=addition.x;transpose[axis+2]+=addition.y;
+    }
+    transpose+=.75*Fraction(i)*float4(c.zw*dot(c.zw,v.xy),c.zw*dot(c.zw,v.zw));
+    return v+PairScale(Lengths)*transpose;
+}
+#if RAFTSIM_ACCELERATION_PHASE == 0
+[numthreads(256,1,1)]
+void MainCS(uint lane:SV_GroupIndex)
+{
+    uint count=GridSize.x*GridSize.y;
+    // Every lane executes every barrier, including lanes with no owned cells.
+    // The entire grid belongs to this one group; never dispatch extra groups.
+    if(Diagnostics[0]!=0)
+    { for(uint i=lane;i<count;i+=256){Solution[i]=0;TrueResidual[i]=-RightHandSide[i];}return; }
+    float4 peak=0;
+    for(uint i=lane;i<count;i+=256)peak=max(peak,abs(RightHandSide[i]));
+    peak=Reduce(peak,lane,true);
+    if(lane==0)ScaleExponent=PeakExponent(peak);
+    GroupMemoryBarrierWithGroupSync();
+    float4 sums=0;
+    for(uint i=lane;i<count;i+=256)
+    {
+        float4 r=ScalePower(RightHandSide[i],-ScaleExponent);
+        float4 z=r/Diagonal[i];Solution[i]=0;Residual[i]=r;Direction[i]=z;
+        sums+=float4(PairDot(r,z),PairDot(r,r));
+    }
+    sums=Reduce(sums,lane,false);
+    if(lane==0){Rz=sums.xy;Norm=sums.zw;Active=uint2(Rz.x>0,Rz.y>0);}
+    AllMemoryBarrierWithGroupSync();
+    [loop]for(uint iteration=0;iteration<40;++iteration)
+    {
+        if(all(Active==0))break;
+        for(uint i=lane;i<count;i+=256)WValue[i]=Fraction(i)*ApplyW(i);
+        AllMemoryBarrierWithGroupSync();
+        float2 denominator=0;
+        for(uint i=lane;i<count;i+=256){float4 a=ApplyA(i);Scratch[i]=a;denominator+=PairDot(Direction[i],a);}
+        denominator=Reduce(float4(denominator,0,0),lane,false).xy;
+        if(lane==0)
+        {
+            Alpha=0;
+            [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
+            {
+                if(!isfinite(denominator[k]) || denominator[k]<=0){Diagnostics[1]|=1u<<k;Active[k]=0;}
+                else {Alpha[k]=Rz[k]/denominator[k];Diagnostics[k+2]=iteration+1;}
+            }
+        }
+        GroupMemoryBarrierWithGroupSync();peak=0;
+        for(uint i=lane;i<count;i+=256)
+        {
+            float4 r=Residual[i]-PairScale(Alpha)*Scratch[i];
+            Solution[i]=AddScaled(Solution[i],Direction[i],Alpha,ScaleExponent);Residual[i]=r;
+            peak=max(peak,abs(r));
+        }
+        peak=Reduce(peak,lane,true);
+        if(lane==0)RatioExponent=PeakExponent(peak);
+        GroupMemoryBarrierWithGroupSync();sums=0;
+        for(uint i=lane;i<count;i+=256)
+        {
+            float4 r=ScalePower(Residual[i],-RatioExponent),z=r/Diagonal[i];Residual[i]=r;Scratch[i]=z;
+            sums+=float4(PairDot(r,z),PairDot(r,r));
+        }
+        sums=Reduce(sums,lane,false);
+        if(lane==0)
+        {
+            Beta=0;
+            [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
+            {
+                if(!isfinite(sums[k]) || !isfinite(sums[k+2])){Diagnostics[1]|=1u<<k;Active[k]=0;}
+                else if(sums[k]==0)Active[k]=0;
+                else Beta[k]=RaftSimPortableScale(sums[k]/Rz[k],RatioExponent[k]);
+            }
+            Rz=sums.xy;ScaleExponent+=RatioExponent;
+        }
+        AllMemoryBarrierWithGroupSync();
+        for(uint i=lane;i<count;i+=256)Direction[i]=Scratch[i]+PairScale(Beta)*Direction[i];
+        AllMemoryBarrierWithGroupSync();
+    }
+    for(uint i=lane;i<count;i+=256)Direction[i]=Solution[i];
+    AllMemoryBarrierWithGroupSync();
+    for(uint i=lane;i<count;i+=256)WValue[i]=Fraction(i)*ApplyW(i);
+    AllMemoryBarrierWithGroupSync();
+    for(uint i=lane;i<count;i+=256)TrueResidual[i]=ApplyA(i)-RightHandSide[i];
+}
+#else
+// Each vector phase spans the entire domain. Separate RDG dispatches provide
+// device-wide ordering; the only one-group passes reduce global partial sums.
+// No subdomain is solved independently and no cross-group spinlock is used.
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_GroupIndex)
+{
+    uint i=id.x,count=GridSize.x*GridSize.y;
+    if(Diagnostics[0]!=0)
+    {
+#if RAFTSIM_ACCELERATION_PHASE == 11
+        if(i<count){Solution[i]=0;Direction[i]=0;}
+#elif RAFTSIM_ACCELERATION_PHASE == 12
+        if(i<count)TrueResidual[i]=-RightHandSide[i];
+#endif
+        return;
+    }
+#if RAFTSIM_ACCELERATION_PHASE == 1
+    float4 peak=Reduce(i<count?abs(RightHandSide[i]):0,lane,true);
+    if(lane==0)Partial[group.x]=peak;
+#elif RAFTSIM_ACCELERATION_PHASE == 2
+    float4 peak=0;
+    for(uint j=lane;j<PartialCount;j+=256)peak=max(peak,Partial[j]);
+    peak=Reduce(peak,lane,true);
+    if(lane==0)Control[0]=float4(PeakExponent(peak),0,0);
+#elif RAFTSIM_ACCELERATION_PHASE == 3
+    float4 sums=0;
+    if(i<count)
+    {
+        float4 r=ScalePower(RightHandSide[i],-int2(Control[0].xy));
+        float4 z=r/Diagonal[i];Solution[i]=0;Residual[i]=r;Direction[i]=z;
+        sums=float4(PairDot(r,z),PairDot(r,r));
+    }
+    sums=Reduce(sums,lane,false);
+    if(lane==0)Partial[group.x]=sums;
+#elif RAFTSIM_ACCELERATION_PHASE == 4
+    float4 sums=0;for(uint j=lane;j<PartialCount;j+=256)sums+=Partial[j];
+    sums=Reduce(sums,lane,false);
+    if(lane==0){Control[1]=sums;Control[2]=0;Control[3]=float4(sums.x>0?1:0,sums.y>0?1:0,0,0);}
+#elif RAFTSIM_ACCELERATION_PHASE == 5
+    // Also used for the final true residual, even when both poles converged.
+    if(i<count)WValue[i]=Fraction(i)*ApplyW(i);
+#elif RAFTSIM_ACCELERATION_PHASE == 6
+    if(all(Control[3].xy==0))return;
+    float2 sums=0;
+    if(i<count){float4 a=ApplyA(i);Scratch[i]=a;sums=PairDot(Direction[i],a);}
+    float4 reduced=Reduce(float4(sums,0,0),lane,false);
+    if(lane==0)Partial[group.x]=reduced;
+#elif RAFTSIM_ACCELERATION_PHASE == 7
+    if(all(Control[3].xy==0))return;
+    float4 sums=0;for(uint j=lane;j<PartialCount;j+=256)sums+=Partial[j];
+    sums=Reduce(sums,lane,false);
+    if(lane==0)
+    {
+        float2 active=Control[3].xy,alpha=0,rz=Control[1].xy;
+        [unroll]for(uint k=0;k<2;++k)if(active[k]!=0)
+        {
+            if(!isfinite(sums[k]) || sums[k]<=0){Diagnostics[1]|=1u<<k;active[k]=0;}
+            else {alpha[k]=rz[k]/sums[k];Diagnostics[k+2]=Iteration+1;}
+        }
+        Control[2]=float4(alpha,0,0);Control[3]=float4(active,0,0);
+    }
+#elif RAFTSIM_ACCELERATION_PHASE == 8
+    if(all(Control[3].xy==0))return;
+    float4 sums=0,r=0;
+    if(i<count)
+    {
+        float4 alpha=PairScale(Control[2].xy);
+        r=Residual[i]-alpha*Scratch[i];
+        Solution[i]=AddScaled(Solution[i],Direction[i],Control[2].xy,int2(Control[0].xy));Residual[i]=r;
+    }
+    float4 peak=Reduce(abs(r),lane,true);int2 exponent=PeakExponent(peak);
+    GroupMemoryBarrierWithGroupSync();
+    if(i<count){r=ScalePower(r,-exponent);float4 z=r/Diagonal[i];sums=float4(PairDot(r,z),PairDot(r,r));}
+    sums=Reduce(sums,lane,false);
+    if(lane==0){Partial[group.x]=sums;PartialExponents[group.x]=float2(exponent);}
+#elif RAFTSIM_ACCELERATION_PHASE == 9
+    if(all(Control[3].xy==0))return;
+    float2 exponent=-512;for(uint j=lane;j<PartialCount;j+=256)exponent=max(exponent,PartialExponents[j]);
+    float4 peaks=Reduce(float4(exponent,exponent),lane,true);int2 ratio=int2(peaks.xy);
+    GroupMemoryBarrierWithGroupSync();
+    float4 sums=0;for(uint j=lane;j<PartialCount;j+=256)
+        sums+=Partial[j]*float4(exp2(2*(PartialExponents[j]-ratio)),exp2(2*(PartialExponents[j]-ratio)));
+    sums=Reduce(sums,lane,false);
+    if(lane==0)
+    {
+        float2 active=Control[3].xy,beta=0;float4 old=Control[1];
+        [unroll]for(uint k=0;k<2;++k)if(active[k]!=0)
+        {
+            if(!isfinite(sums[k]) || !isfinite(sums[k+2])){Diagnostics[1]|=1u<<k;active[k]=0;}
+            else if(sums[k]==0)active[k]=0;
+            else beta[k]=RaftSimPortableScale(sums[k]/old[k],ratio[k]);
+        }
+        Control[1]=float4(sums.xy,old.zw);Control[2]=float4(Control[2].xy,beta);Control[3]=float4(active,0,0);
+        Control[0]=float4(Control[0].xy+ratio,0,0);Control[4]=float4(ratio,0,0);
+    }
+#elif RAFTSIM_ACCELERATION_PHASE == 10
+    if(all(Control[3].xy==0))return;
+    if(i<count)
+    {float4 r=ScalePower(Residual[i],-int2(Control[4].xy));Residual[i]=r;
+        Direction[i]=r/Diagonal[i]+PairScale(Control[2].zw)*Direction[i];}
+#elif RAFTSIM_ACCELERATION_PHASE == 11
+    if(i<count)Direction[i]=Solution[i];
+#elif RAFTSIM_ACCELERATION_PHASE == 12
+    if(i<count)TrueResidual[i]=ApplyA(i)-RightHandSide[i];
+#elif RAFTSIM_ACCELERATION_PHASE == 13
+    // Every workgroup repeats the small global denominator reduction, then
+    // updates its own vector segment. No grid-wide barrier or spinlock.
+    float4 sums=0;for(uint j=lane;j<PartialCount;j+=256)sums+=Partial[j];
+    sums=Reduce(sums,lane,false);
+    if(lane==0)
+    {
+        Active=uint2(Control[3].xy);Alpha=0;float4 old=Control[1];
+        [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
+        {
+            if(!isfinite(sums[k]) || sums[k]<=0)
+            { if(group.x==0)Diagnostics[1]|=1u<<k;Active[k]=0; }
+            else
+            { Alpha[k]=old[k]/sums[k];if(group.x==0)Diagnostics[k+2]=Iteration+1; }
+        }
+        if(group.x==0){NextControl[0]=old;NextControl[1]=float4(Active,0,0);NextControl[2]=Control[0];}
+    }
+    GroupMemoryBarrierWithGroupSync();
+    sums=0;float4 r=0;
+    if(i<count && any(Active!=0))
+    {
+        float4 alpha=PairScale(Alpha);r=Residual[i]-alpha*Scratch[i];
+        Solution[i]=AddScaled(Solution[i],Direction[i],Alpha,int2(Control[0].xy));Residual[i]=r;
+    }
+    float4 peak=Reduce(abs(r),lane,true);int2 exponent=PeakExponent(peak);
+    GroupMemoryBarrierWithGroupSync();
+    if(i<count && any(Active!=0)){r=ScalePower(r,-exponent);float4 z=r/Diagonal[i];sums=float4(PairDot(r,z),PairDot(r,r));}
+    sums=Reduce(sums,lane,false);
+    if(lane==0){NextPartial[group.x]=sums;PartialExponents[group.x]=float2(exponent);}
+#elif RAFTSIM_ACCELERATION_PHASE == 14
+    float2 exponent=-512;for(uint j=lane;j<PartialCount;j+=256)exponent=max(exponent,PartialExponents[j]);
+    float4 peaks=Reduce(float4(exponent,exponent),lane,true);int2 ratio=int2(peaks.xy);
+    GroupMemoryBarrierWithGroupSync();
+    float4 sums=0;for(uint j=lane;j<PartialCount;j+=256)
+        sums+=NextPartial[j]*float4(exp2(2*(PartialExponents[j]-ratio)),exp2(2*(PartialExponents[j]-ratio)));
+    sums=Reduce(sums,lane,false);
+    if(lane==0)
+    {
+        Active=uint2(NextControl[1].xy);Beta=0;float4 old=NextControl[0];
+        [unroll]for(uint k=0;k<2;++k)if(Active[k]!=0)
+        {
+            if(!isfinite(sums[k]) || !isfinite(sums[k+2]))
+            { if(group.x==0)Diagnostics[1]|=1u<<k;Active[k]=0; }
+            else if(sums[k]==0)Active[k]=0;
+            else Beta[k]=RaftSimPortableScale(sums[k]/old[k],ratio[k]);
+        }
+        if(group.x==0)
+        { Control[1]=float4(sums.xy,old.zw);Control[3]=float4(Active,0,0);Control[0]=float4(NextControl[2].xy+ratio,0,0); }
+    }
+    GroupMemoryBarrierWithGroupSync();
+    if(i<count && any(Active!=0))
+    {float4 r=ScalePower(Residual[i],-ratio);Residual[i]=r;Direction[i]=r/Diagonal[i]+PairScale(Beta)*Direction[i];}
+#endif
+}
+#endif
+#endif

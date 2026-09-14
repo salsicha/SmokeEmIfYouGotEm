@@ -25,7 +25,9 @@ class FRaftSimDetailWaterCS : public FGlobalShader
     DECLARE_GLOBAL_SHADER(FRaftSimDetailWaterCS);
     SHADER_USE_PARAMETER_STRUCT(FRaftSimDetailWaterCS,FGlobalShader);
     class FActivityMemory : SHADER_PERMUTATION_BOOL("RAFTSIM_ACTIVITY_MEMORY");
-    using FPermutationDomain = TShaderPermutationDomain<FActivityMemory>;
+    class FFiniteDepth : SHADER_PERMUTATION_BOOL("RAFTSIM_FINITE_DEPTH");
+    class FMeanStrain : SHADER_PERMUTATION_BOOL("RAFTSIM_MEAN_STRAIN");
+    using FPermutationDomain = TShaderPermutationDomain<FActivityMemory,FFiniteDepth,FMeanStrain>;
     BEGIN_SHADER_PARAMETER_STRUCT(FParameters,)
         SHADER_PARAMETER(FIntPoint,GridSize)
         SHADER_PARAMETER(float,CellMeters)
@@ -47,12 +49,82 @@ class FRaftSimDetailWaterCS : public FGlobalShader
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,MeanFlow)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,PreviousState)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,StepInitialState)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,PressurePotential)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,NextState)
+    END_SHADER_PARAMETER_STRUCT()
+    static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)
+    {
+        const FPermutationDomain P(Parameters.PermutationId);
+        return IsFeatureLevelSupported(Parameters.Platform,ERHIFeatureLevel::SM5) &&
+            (!P.Get<FMeanStrain>() || P.Get<FFiniteDepth>());
+    }
+};
+IMPLEMENT_GLOBAL_SHADER(FRaftSimDetailWaterCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimDetailWater.usf","MainCS",SF_Compute);
+
+class FRaftSimFiniteDepthPressureCS : public FGlobalShader
+{
+    DECLARE_GLOBAL_SHADER(FRaftSimFiniteDepthPressureCS);
+    SHADER_USE_PARAMETER_STRUCT(FRaftSimFiniteDepthPressureCS,FGlobalShader);
+    class FInitialize : SHADER_PERMUTATION_BOOL("RAFTSIM_PRESSURE_INITIALIZE");
+    using FPermutationDomain = TShaderPermutationDomain<FInitialize>;
+    BEGIN_SHADER_PARAMETER_STRUCT(FParameters,)
+        SHADER_PARAMETER(FIntPoint,GridSize)
+        SHADER_PARAMETER(float,CellMeters)
+        SHADER_PARAMETER(uint32,Periodic)
+        SHADER_PARAMETER(FVector2f,Relaxation)
+        SHADER_PARAMETER(FVector2f,Momentum)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,MeanFlow)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,WaveState)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,PreviousPotential)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,OlderPotential)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,NextPotential)
     END_SHADER_PARAMETER_STRUCT()
     static bool ShouldCompilePermutation(const FGlobalShaderPermutationParameters& Parameters)
     { return IsFeatureLevelSupported(Parameters.Platform,ERHIFeatureLevel::SM5); }
 };
-IMPLEMENT_GLOBAL_SHADER(FRaftSimDetailWaterCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimDetailWater.usf","MainCS",SF_Compute);
+IMPLEMENT_GLOBAL_SHADER(FRaftSimFiniteDepthPressureCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimFiniteDepthPressure.usf","MainCS",SF_Compute);
+
+namespace
+{
+FRDGBufferRef BuildFiniteDepthPressure(FRDGBuilder& Graph,const FRaftSimDetailWaterGrid& Grid,
+    FRDGBufferRef Flow,FRDGBufferRef WaveState,float MaximumDepth)
+{
+    FRDGBufferRef Potential=nullptr,Older=nullptr;
+    const double Lengths[2]={0.4052787713439809,0.03916567310046354};
+    double C[2],Rho[2];
+    for (int32 J=0;J<2;++J)
+    {
+        // Gershgorin bounds [1/(1+4a),2-1/(1+4a)]. The wet graph is
+        // diagonally symmetrizable even with varying positive local depths.
+        const double A=Lengths[J]*FMath::Square(double(MaximumDepth)/Grid.CellMeters);
+        C[J]=1-1/(1+4*A);Rho[J]=C[J];
+    }
+    for (int32 Iteration=0;Iteration<=Grid.PressureIterations;++Iteration)
+    {
+        const auto Next=Graph.CreateBuffer(FRDGBufferDesc::CreateStructuredDesc(sizeof(FVector2f),
+            Grid.Size.X*Grid.Size.Y),TEXT("RaftSim.Detail.FiniteDepthPressure"));
+        auto* P=Graph.AllocParameters<FRaftSimFiniteDepthPressureCS::FParameters>();
+        P->GridSize=Grid.Size;P->CellMeters=Grid.CellMeters;P->Periodic=Grid.bPeriodic ? 1u : 0u;
+        P->Relaxation=FVector2f(1,1);P->Momentum=FVector2f::ZeroVector;
+        if (Iteration>1)for (int32 J=0;J<2;++J)if (C[J]>0)
+        {
+            const double NextRho=1/(2/C[J]-Rho[J]);
+            P->Relaxation[J]=float(2*NextRho/C[J]);P->Momentum[J]=float(NextRho*Rho[J]);Rho[J]=NextRho;
+        }
+        P->MeanFlow=Graph.CreateSRV(Flow);P->WaveState=Graph.CreateSRV(WaveState);
+        P->PreviousPotential=Potential ? Graph.CreateSRV(Potential) : nullptr;
+        P->OlderPotential=Potential ? Graph.CreateSRV(Older ? Older : Potential) : nullptr;
+        P->NextPotential=Graph.CreateUAV(Next);
+        FRaftSimFiniteDepthPressureCS::FPermutationDomain Permutation;
+        Permutation.Set<FRaftSimFiniteDepthPressureCS::FInitialize>(Iteration==0);
+        TShaderMapRef<FRaftSimFiniteDepthPressureCS> Shader(GetGlobalShaderMap(GMaxRHIFeatureLevel),Permutation);
+        FComputeShaderUtils::AddPass(Graph,RDG_EVENT_NAME("RaftSim Finite Depth Pressure"),Shader,P,
+            FComputeShaderUtils::GetGroupCount(Grid.Size,FIntPoint(8,8)));
+        Older=Potential;Potential=Next;
+    }
+    return Potential;
+}
+}
 
 class FRaftSimDetailResolveCS : public FGlobalShader
 {
@@ -98,6 +170,7 @@ class FRaftSimRegisteredDetailSampleCS : public FGlobalShader
     SHADER_USE_PARAMETER_STRUCT(FRaftSimRegisteredDetailSampleCS,FGlobalShader);
     BEGIN_SHADER_PARAMETER_STRUCT(FParameters,)
         SHADER_PARAMETER(uint32,QueryCount)
+        SHADER_PARAMETER(uint32,ClockMode)
         SHADER_PARAMETER_RDG_TEXTURE(Texture2D<float4>,DetailTexture)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,Queries)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Results)
@@ -108,7 +181,7 @@ class FRaftSimRegisteredDetailSampleCS : public FGlobalShader
 IMPLEMENT_GLOBAL_SHADER(FRaftSimRegisteredDetailSampleCS,"/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSampleTest.usf","MainCS",SF_Compute);
 
 bool RaftSimValidateRegisteredDetailSamplingGPU(FRHICommandListImmediate& Cmd,FRHITexture* Texture,
-    const TArray<FVector4f>& Queries,FRHIGPUBufferReadback* Readback,FString& Error)
+    const TArray<FVector4f>& Queries,FRHIGPUBufferReadback* Readback,FString& Error,uint32 ClockMode)
 {
     check(IsInRenderingThread());
     if (!Texture || !Readback || Queries.IsEmpty() || Texture->GetDesc().Extent.X<2 ||
@@ -117,6 +190,7 @@ bool RaftSimValidateRegisteredDetailSamplingGPU(FRHICommandListImmediate& Cmd,FR
     for (const auto& Q:Queries)if (!FMath::IsFinite(Q.X) || !FMath::IsFinite(Q.Y))
     { Error=TEXT("Invalid registered detail query");return false; }
     FRDGBuilder Graph(Cmd);auto* P=Graph.AllocParameters<FRaftSimRegisteredDetailSampleCS::FParameters>();
+    P->ClockMode=ClockMode;
     P->QueryCount=Queries.Num();
     P->DetailTexture=Graph.RegisterExternalTexture(CreateRenderTarget(Texture,TEXT("RaftSim.Detail.RegisteredSample")));
     P->Queries=Graph.CreateSRV(CreateStructuredBuffer(Graph,TEXT("RaftSim.Detail.WorldQueries"),Queries));
@@ -177,7 +251,9 @@ bool FRaftSimDetailWaterGrid::Validate(TConstArrayView<FVector4f> Flow,FString& 
         !FMath::IsFinite(ActivitySourcePerSecond) || ActivitySourcePerSecond<0 ||
         !FMath::IsFinite(ActivityDecayPerSecond) || ActivityDecayPerSecond<0 ||
         !FMath::IsFinite(TurbulentHeadMeters) || TurbulentHeadMeters<0 || TurbulentHeadMeters>0.1f ||
-        !FMath::IsFinite(OriginMeters.X) || !FMath::IsFinite(OriginMeters.Y))
+        !FMath::IsFinite(OriginMeters.X) || !FMath::IsFinite(OriginMeters.Y) ||
+        (bFiniteDepthDispersion && (PressureIterations<1 || PressureIterations>128 || !bSecondOrder)) ||
+        (bExperimentalMeanStrain && !bFiniteDepthDispersion))
     { Error=TEXT("Invalid detail grid, timestep, rates or input size");return false; }
     float MaxSignal=0;
     for (const FVector4f& F:Flow)
@@ -197,6 +273,8 @@ void FRaftSimDetailWaterGPU::Reset()
     check(IsInRenderingThread());
     State.SafeRelease();MeanFlowState.SafeRelease();ActivityState.SafeRelease();StateSize=FIntPoint::ZeroValue;StateCellMeters=0;
     bStatePeriodic=false;bStateSecondOrder=false;bStateActivityMemory=false;StateOriginMeters=FVector2f::ZeroVector;SimulationSeconds=0;StepCount=0;
+    bStateFiniteDepthDispersion=false;StatePressureIterations=0;
+    bStateExperimentalMeanStrain=false;
 }
 
 bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
@@ -209,7 +287,9 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
     if (Steps<1 || Steps>512 || (State.IsValid() &&
         (StateSize!=Grid.Size || StateCellMeters!=Grid.CellMeters || bStatePeriodic!=Grid.bPeriodic ||
         StateOriginMeters!=Grid.OriginMeters || bStateSecondOrder!=Grid.bSecondOrder ||
-        bStateActivityMemory!=Grid.bActivityMemory || InitialState || InitialActivity)))
+        bStateActivityMemory!=Grid.bActivityMemory || bStateFiniteDepthDispersion!=Grid.bFiniteDepthDispersion ||
+        bStateExperimentalMeanStrain!=Grid.bExperimentalMeanStrain ||
+        (Grid.bFiniteDepthDispersion && StatePressureIterations!=Grid.PressureIterations) || InitialState || InitialActivity)))
     { Error=TEXT("Invalid batch size or implicit reset of persistent detail state");return false; }
     if (InitialState)
     {
@@ -227,6 +307,8 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
         { Error=TEXT("Initial activity must be finite and in [0,1]");return false; }
     }
     FRDGBuilder Graph(RHICmdList);
+    float PressureMaximumDepth=0;
+    if (Grid.bFiniteDepthDispersion)for (const FVector4f& F:Flow)PressureMaximumDepth=FMath::Max(PressureMaximumDepth,F.X);
     FRDGBufferRef FlowBuffer=CreateStructuredBuffer(Graph,TEXT("RaftSim.Detail.MeanFlow"),Flow);
     TArray<FVector4f> Zero;
     if (!State.IsValid() && !InitialState)Zero.Init(FVector4f(0,0,0,0),Flow.Num());
@@ -242,6 +324,8 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
     }
     FRaftSimDetailWaterCS::FPermutationDomain Permutation;
     Permutation.Set<FRaftSimDetailWaterCS::FActivityMemory>(Grid.bActivityMemory);
+    Permutation.Set<FRaftSimDetailWaterCS::FFiniteDepth>(Grid.bFiniteDepthDispersion);
+    Permutation.Set<FRaftSimDetailWaterCS::FMeanStrain>(Grid.bExperimentalMeanStrain);
     TShaderMapRef<FRaftSimDetailWaterCS> Shader(GetGlobalShaderMap(GMaxRHIFeatureLevel),Permutation);
     for (int32 Step=0;Step<Steps;++Step)
     {
@@ -267,6 +351,8 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
                 P->NextActivity=Graph.CreateUAV(NextActivity);CurrentActivity=NextActivity;
             }
             P->StepInitialState=Graph.CreateSRV(StepInitial);
+            P->PressurePotential=Grid.bFiniteDepthDispersion ?
+                Graph.CreateSRV(BuildFiniteDepthPressure(Graph,Grid,FlowBuffer,Current,PressureMaximumDepth)) : nullptr;
             P->MeanFlow=Graph.CreateSRV(FlowBuffer);P->PreviousState=Graph.CreateSRV(Current);P->NextState=Graph.CreateUAV(Next);
             FComputeShaderUtils::AddPass(Graph,RDG_EVENT_NAME("RaftSim Stateful Detail Water"),Shader,P,
                 FComputeShaderUtils::GetGroupCount(Grid.Size,FIntPoint(8,8)));
@@ -281,6 +367,8 @@ bool FRaftSimDetailWaterGPU::Advance(FRHICommandListImmediate& RHICmdList,
     Graph.Execute();
     StateSize=Grid.Size;StateCellMeters=Grid.CellMeters;bStatePeriodic=Grid.bPeriodic;bStateSecondOrder=Grid.bSecondOrder;
     bStateActivityMemory=Grid.bActivityMemory;
+    bStateFiniteDepthDispersion=Grid.bFiniteDepthDispersion;StatePressureIterations=Grid.PressureIterations;
+    bStateExperimentalMeanStrain=Grid.bExperimentalMeanStrain;
     StateOriginMeters=Grid.OriginMeters;SimulationSeconds+=Steps*double(Grid.StepSeconds);StepCount+=Steps;
     return true;
 }
@@ -295,6 +383,9 @@ bool FRaftSimDetailWaterGPU::RemapWindow(FRHICommandListImmediate& RHICmdList,
     if (!State.IsValid() || !MeanFlowState.IsValid() || StateSize!=Grid.Size ||
         StateCellMeters!=Grid.CellMeters || bStatePeriodic || Grid.bPeriodic ||
         bStateSecondOrder!=Grid.bSecondOrder || bStateActivityMemory!=Grid.bActivityMemory ||
+        bStateFiniteDepthDispersion!=Grid.bFiniteDepthDispersion ||
+        bStateExperimentalMeanStrain!=Grid.bExperimentalMeanStrain ||
+        (Grid.bFiniteDepthDispersion && StatePressureIterations!=Grid.PressureIterations) ||
         (Grid.bActivityMemory && !ActivityState.IsValid()) || (!Grid.bActivityMemory && ActivityReadback))
     { Error=TEXT("Detail remap requires initialized nonperiodic state with unchanged grid and modes");return false; }
     // Compute in double, and require exact lattice correspondence. Snapping

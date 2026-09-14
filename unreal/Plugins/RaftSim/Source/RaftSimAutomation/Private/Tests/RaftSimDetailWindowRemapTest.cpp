@@ -36,11 +36,13 @@ bool FRaftSimDetailWindowRemapTest::RunTest(const FString&)
     { AddError(TEXT("A real SM5+ GPU is required for window transfer evidence"));return false; }
     constexpr int32 Nx=17,Ny=13,Count=Nx*Ny; // Non-square, partial dispatch groups.
     int32 CheckedCells=0,RetainedNonzero=0,Exposed=0,Dried=0;
-    for (bool Activity:{false,true})for (bool SecondOrder:{false,true})
+    for (bool Activity:{false,true})for (bool SecondOrder:{false,true})for (bool FiniteDepth:{false,true})
     {
+        if (FiniteDepth && !SecondOrder)continue;
         FRaftSimDetailWaterGrid Grid;Grid.Size=FIntPoint(Nx,Ny);Grid.CellMeters=.5f;
         Grid.OriginMeters=FVector2f(-5439.f,3606.f);
         Grid.bActivityMemory=Activity;Grid.bSecondOrder=SecondOrder;
+        Grid.bFiniteDepthDispersion=FiniteDepth;
         Grid.FoamDecayPerSecond=0;Grid.FoamSourcePerSecond=0;
         Grid.ActivityDecayPerSecond=0;Grid.ActivitySourcePerSecond=0;
         TArray<FVector4f> Flow,Initial,Before;TArray<float> InitialActivity,BeforeActivity;
@@ -127,11 +129,21 @@ bool FRaftSimDetailWindowRemapTest::RunTest(const FString&)
             InvalidRejected &= !Simulation->RemapWindow(Cmd,Bad,Flow,Error);
             Bad=Grid;Bad.bActivityMemory=!Activity;
             InvalidRejected &= !Simulation->RemapWindow(Cmd,Bad,Flow,Error);
+            Bad=Grid;Bad.bFiniteDepthDispersion=!FiniteDepth;
+            InvalidRejected &= !Simulation->RemapWindow(Cmd,Bad,Flow,Error);
+            if (FiniteDepth)
+            {
+                Bad=Grid;Bad.bExperimentalMeanStrain=true;
+                InvalidRejected &= !Simulation->RemapWindow(Cmd,Bad,Flow,Error);
+                InvalidRejected &= !Simulation->Advance(Cmd,Bad,Flow,1,nullptr,nullptr,Error);
+                Bad=Grid;++Bad.PressureIterations;
+                InvalidRejected &= !Simulation->RemapWindow(Cmd,Bad,Flow,Error);
+            }
             Bad=Grid;Bad.StepSeconds=1;
             InvalidRejected &= !Simulation->RemapWindow(Cmd,Bad,Flow,Error);
             auto BadFlow=Flow;BadFlow[0].W=2;
             InvalidRejected &= !Simulation->RemapWindow(Cmd,Grid,BadFlow,Error);
-            // Failed requests must leave the previous origin/state usable.
+            // Failed requests leave the previous origin/state usable.
             InvalidRejected &= Simulation->RemapWindow(Cmd,Grid,Flow,Error,&FinalRead.Get());
             Continued=Simulation->Advance(Cmd,Grid,Flow,1,nullptr,nullptr,Error);
             ClockAdvanced=Simulation->GetStepCount()==2 && Simulation->GetSimulationSeconds()==2*InitialClock;
@@ -145,7 +157,7 @@ bool FRaftSimDetailWindowRemapTest::RunTest(const FString&)
         TestTrue(TEXT("normal evolution resumes at moved origin without reseed or lost clock"),Continued && ClockAdvanced);
     }
     TestTrue(TEXT("fixture exercises compressed foam, exposed cells and drying"),RetainedNonzero>0 && Exposed>0 && Dried>0);
-    AddInfo(FString::Printf(TEXT("GPU remap checked %d cells; %d retained density>1, %d newly exposed, %d drying; four transport/activity mode combinations"),
+    AddInfo(FString::Printf(TEXT("GPU remap checked %d cells; %d retained density>1, %d newly exposed, %d drying; six transport/activity/pressure mode combinations"),
         CheckedCells,RetainedNonzero,Exposed,Dried));
     return !HasAnyErrors();
 }

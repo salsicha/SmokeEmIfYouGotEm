@@ -1,0 +1,24 @@
+#ifndef RAFTSIM_REGISTERED_FOAM_TIME
+#define RAFTSIM_REGISTERED_FOAM_TIME
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSample.ush"
+// One-second optical backtrace. Subtract split full clocks BEFORE wrapping;
+// blending wrapped phases would reverse motion at each integer second.
+float RaftSimRegisteredFoamPhase(Texture2D<float4> detail,float2 fieldPositionM,float2 cpuClock,float enable)
+{
+    precise float cpuFraction=frac(cpuClock.x);
+    precise float cpuPhase=frac(cpuFraction+cpuClock.y);
+    uint width,height;detail.GetDimensions(width,height);
+    if(width<2 || height<3)return cpuPhase;
+    float4 clock=detail.Load(int3(1,height-1,0));
+    if((clock.w!=2 && clock.w!=3) || clock.z!=0 || !all(isfinite(clock)))return cpuPhase;
+    float weight=RaftSimRegisteredDetailWindowWeight(detail,fieldPositionM)*saturate(enable);
+    precise float gpuFraction=frac(clock.x);
+    precise float gpuPhase=frac(gpuFraction+clock.y);
+    if(weight>=1)return gpuPhase;
+    if(weight<=0)return cpuPhase;
+    precise float highDifference=clock.x-cpuClock.x;
+    precise float lowDifference=clock.y-cpuClock.y;
+    precise float difference=highDifference+lowDifference;
+    return frac(cpuPhase+weight*difference);
+}
+#endif

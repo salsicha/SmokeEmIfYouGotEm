@@ -1,0 +1,15 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimFoamCoverage.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimFilteredFrothCells.ush"
+StructuredBuffer<float4> Queries;
+RWStructuredBuffer<float4> Results;
+uint QueryCount;
+[numthreads(64,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    if (id.x>=QueryCount)return;
+    float4 q=Queries[id.x];RaftSimFoamCoverageOptics optics;RaftSimFrothCells cells;
+    Results[id.x]=float4(optics.Sample(q.x,q.y,float3(q.zw,0)),
+        optics.Sample(q.x,q.y,float3(q.zw,0.5)),
+        optics.Sample(q.x,q.y,float3(q.zw,1)),cells.Sample(q.x,q.y,q.zw,float2(1.2,0.4),0.73,(id.x%5)*0.03));
+}

@@ -1,6 +1,981 @@
 # Source-exact expanded-domain continuation — September 12, 10:38 UTC
 
-## Latest: 2300 s state and artificial-bank checks pass
+## Latest: 9400 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local28000/native9400.000000003458s passes BOTH
+`tmp/south-fork-expanded-9400s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.7845152720229236m,
+speed6.2337673491423065m/s, volume2544585.847951414m3; snapshot/driver volume
+discrepancy1.862645149230957e-9m3, maximum step residual1.4535885384248104e-8m3.
+Outflow102.11817406576894 versus inflow45.30695454719997m3/s remains UNSETTLED.
+Depth SHA256 `4a1424ddc870483d30c9862555a462d09d983cc2010d1eac77881fd9429dd732`.
+Original83142 continues unchanged toward10000. Next COMPLETE9500/local30000
+requires BOTH audits. No hydraulic-source or runtime promotion follows.
+
+## Latest: 9300 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local26000/native9300.000000004913s passes BOTH
+`tmp/south-fork-expanded-9300s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.7807176436051275m,
+speed6.233777917517893m/s, volume2550319.1771818926m3; snapshot/driver volume
+discrepancy0, maximum step residual1.4535885384248104e-8m3. Outflow102.608747399
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`4ae9dfaeb4e088beabae07045ce5bbe54abb52e03a18a76ea2867c441db87246`.
+Original83142 continues unchanged past9301.5 toward10000. Next COMPLETE9400/
+local28000 requires BOTH audits. No runtime promotion or performance acceptance.
+
+## Latest: 9200 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local24000/native9200.000000006368s passes BOTH
+`tmp/south-fork-expanded-9200s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.778196305000428m,
+speed6.233357582673407m/s, volume2556020.3968504495m3; snapshot/driver discrepancy
+9.313225746154785e-10m3, maximum step residual1.4535885384248104e-8m3.
+Outflow101.67752720652828 versus inflow45.30695454719997m3/s remains UNSETTLED.
+Depth SHA256 `cf8c0825ab480beb39adce82bda3972afe6143e79b8be7bff8674f99765fe7aa`.
+Original83142 continues unchanged toward10000. Next COMPLETE9300/local26000
+requires BOTH audits. No runtime promotion, changed boundary/source, or
+performance acceptance. The9100 dual-audit result is also retained in
+`tmp/south-fork-expanded-9100s-{state,banks}-v1-20260914.json`.
+
+## Latest: 8900 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local18000/native8900.000000010734s passes BOTH
+`tmp/south-fork-expanded-8900s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.77731463069403m,
+speed6.220746796777652m/s, volume2572974.1440217616m3; snapshot/driver discrepancy
+-9.313226e-10m3, maximum step residual1.441914e-8m3. Outflow102.204022764
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`1c1235b22a4a3f944e4af17663c8742383f93d803d9c394ac231b778f40f2437`.
+Original83142 continues unchanged. Next COMPLETE9000/local20000 requires BOTH
+audits. No runtime promotion, changed boundary/source, or performance acceptance.
+
+## Latest: 8800 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local16000/native8800.000000012189s passes BOTH
+`tmp/south-fork-expanded-8800s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.778867484m,
+speed6.217922599m/s, volume2578584.4473744854m3; snapshot/driver discrepancy
+4.656612873e-10m3, maximum step residual1.441913611e-8m3. Outflow100.728364197
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`be51a6ecc568cd8c8a07af9ae23e410cfd549318519bf93e01e5d7e2b3047d64`.
+Original83142 continues unchanged. Next COMPLETE8900/local18000 requires BOTH
+audits. No runtime promotion, changed boundary/source, or performance acceptance.
+
+## Latest: 8700 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local14000/native8700.000000013644s passes BOTH
+`tmp/south-fork-expanded-8700s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.781222516m,
+speed6.217596960m/s, volume2584185.6328006517m3; snapshot/driver discrepancy
+1.396983862e-9m3, maximum step residual1.441913611e-8m3. Outflow102.744042356
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`6c7d26dc80d9e4912aa540843b7c76b3f4871c8f985016db07776e25bbd2a39e`.
+Original83142 continues unchanged. Next COMPLETE8800/local16000 requires BOTH
+audits. No runtime promotion, changed boundary/source, or performance acceptance.
+
+## Latest: 8600 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local12000/native8600.0000000151s passes BOTH
+`tmp/south-fork-expanded-8600s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.784169160m,
+speed6.217498044m/s, volume2589780.9134141m3; snapshot/driver discrepancy
+9.313225746e-10m3, maximum step residual1.441913611e-8m3. Outflow100.143015461
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`6ebade15f7c456d1033704f3d9599b1f2a5a69e82e98abf8a6727754099fdcca`.
+Original83142 continues unchanged. Next COMPLETE8700/local14000 requires BOTH
+audits. No runtime promotion, changed boundary/source, or performance acceptance.
+
+## Latest: 8500 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local10000/native8500.000000016555s passes BOTH
+`tmp/south-fork-expanded-8500s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.787599786m,
+speed6.217527267m/s, volume2595380.838419362m3; snapshot/driver discrepancy
+2.793967724e-9m3, maximum step residual1.266686445e-8m3. Outflow102.452874602
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`2373b7cd8f3a78b4783b00aa5180192e2cd3a2b2f7fc650ddf54127792e1b0ed`.
+Original83142 continues unchanged. Next COMPLETE8600/local12000 requires BOTH
+audits. No runtime promotion, changed boundary/source, or performance acceptance.
+
+## Latest: 8400 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local8000/native8400.00000001801s passes BOTH
+`tmp/south-fork-expanded-8400s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.791326166m,
+speed6.217522426m/s, volume2600992.1137484685m3; snapshot/driver discrepancy
+exactly0m3, maximum step residual1.266686445e-8m3. Outflow100.895687973
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`7e790e2f74e4a646e1aa57b4c797598beec570e6e11d29ba11f6a3f9e0e0efda`.
+Original83142 continues unchanged. Next COMPLETE8500/local10000 requires BOTH
+audits. No runtime promotion, changed boundary/source, or performance acceptance.
+
+## Latest: 8300 s complete, both audits pass; still unsettled
+
+September14,2026. COMPLETE local6000/native8300.000000019465s passes BOTH
+`tmp/south-fork-expanded-8300s-{state,banks}-v1-20260914.json` audits.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry,1084 bank
+faces and2276 directed shared faces. Maximum depth3.795200608m,
+speed6.217491623m/s, volume2606625.7482991233m3; snapshot/driver difference
+9.313225746e-10m3, maximum step residual1.261999572e-8m3. Outflow102.960523094
+versus inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`c8f8db0ba1ae14e7221f5605a39abe5ca1ab46f0fcb1279e976ee15aabcd5642`.
+Original83142 continues unchanged; latest directly observed8316s.
+Next COMPLETE8400/local8000 requires BOTH audits. No runtime promotion.
+
+## Latest: 8200 s complete, both audits pass; still unsettled
+
+September14,2026,10:22UTC. COMPLETE local4000/native8200.00000002092s passes
+both state and bank audits, `tmp/south-fork-expanded-8200s-{state,banks}-v1-20260914.json`.
+All5,382,400 cells finite;86,720 artificial-bank cells exactly dry. Maximum
+depth3.799076990m, speed6.215393530m/s, volume2612291.1336005144m3,
+snapshot/driver difference6.9849193e-9m3, maxstep residual1.2619996e-8m3.
+Outflow101.151589004 vs inflow45.306954547m3/s remains UNSETTLED. Depth SHA256
+`68485db8db91bd35ea331b51c3e9d9b4ef477eb6bc1486aefc32c00c1d7b21cf`.
+Original83142 continues unchanged; next COMPLETE8300/local6000 needs BOTH audits.
+No runtime promotion or performance acceptance.
+
+## Latest: 8100 s complete, both audits pass; still unsettled
+
+September14,2026,09:48UTC. Continuation83142/PID39184 remains live. Complete
+local2000/native8100.000000020702s passes BOTH state and artificial-bank audits:
+`tmp/south-fork-expanded-8100s-{state,banks}-v1-20260914.json`.
+All5,382,400 cells finite and all86,720 artificial-bank cells exactly dry;
+1084 bank faces and2276 directed shared faces. Depth3.802812165m,
+speed6.215370336m/s, volume2617996.856658636m3, snapshot/driver difference
+-4.656612873e-10m3, maxstep conservation residual1.245863368e-8m3.
+Outflow103.364601400 vs inflow45.306954547m3/s: NOT settled, no runtime promotion.
+hSHA `bee46862fba600f2cb3c64ac453f3a83b97a338c628ce5094cc667aaea0f3fd2`.
+Original8000s restart input/executable unchanged. Next COMPLETE8200/local4000
+requires BOTH audits. No pause/restart or source replacement.
+
+## Latest: exact8000 s continuation toward10000 s is live
+
+September14,2026,09:14UTC. Prepared immutable input
+`tmp/south-fork-expanded-checkpoint-8000s-v1-20260914`, manifest SHA256
+`fde85ce401c8bc2ffd557ed2510a5a0aef788026b92b3bec2209bda87abe57bc`.
+Preparation55753 TERMINAL exit0. No added terrain/context/water; all5,382,400
+original cells,841 grids, bed, roughness and physical boundaries are retained.
+
+20-step pilot13223 TERMINAL exit0, ending8001.000000020342s in19.931s. Independent
+restart/state/artificial-bank audits all pass:
+`tmp/south-fork-expanded-8000s-pilot-{restart,state,banks}-v1-20260914.json`.
+The pilot frame-zero h/u/v COMPLETE FILE hashes also equal the source checkpoint
+hashes below, proving identical bytes including signed zeros, not only numerical
+equality. Pilot maxstep residual5.830279814e-9m3, all86,720 artificial-bank cells
+remain exactly dry. This is checkpoint fidelity, NOT settling acceptance.
+
+Continuation83142/PID39184 started2026-09-14T09:14:00.0585288Z. Actual process
+path verified as `tmp/south-fork-checkpoint-solver-v1-20260912/raftsim_cartesian_cook.exe`;
+unchanged executable SHA256
+`7d7c3be00a4eaefaba7fca67626ab4b6415f6d173ee9933459b06862734b135f`.
+Output `tmp/south-fork-expanded-flow-8000-to10000s-v1-20260914`,40000 additional
+steps at.05s, snapshot interval2000steps/100s. Actual long-run frame-zero
+restart audit also passes:
+`tmp/south-fork-expanded-8000s-long-restart-v1-20260914.json`. Its h/u/v file
+hashes independently match the source EXACTLY. No clock reset, inferred new
+water, topology change, solver change or state substitution. The restart
+auditor's summed-volume error9.313225746e-10m3 is reduction roundoff; field bytes
+are identical.
+
+Observed live at local40/native8002s. Next COMPLETE local2000/native8100s needs
+BOTH state and artificial-bank audits. Keep this new input/executable immutable;
+do not reuse old terminal74818/PID41820 for live observation. The prior pilot
+is a verification run, not an extra second claimed as transferred to the long
+run. Runtime600s remains unchanged; this source is still unsettled.
+
+## Previous: 8000 s complete, state and artificial-bank checks pass
+
+Continuation74818 TERMINAL exit0, local40000/native8000.000000020338s,
+wall39011.346087s. BOTH
+`tmp/south-fork-expanded-8000s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-8000s-banks-v1-20260914.json` pass.5,382,400 finite cells,
+86,720 exactly dry artificial-bank cells,1084 bank faces,2276 directed shared
+faces. Maxdepth3.806272854m, speed6.215366085m/s, volume2623755.418289252m3,
+snapshot/driver volume difference0, maxstep conservation residual1.573537967e-8m3.
+Outflow102.560804137 versus inflow45.306954547m3/s: STILL SETTLING.
+No normal-map/runtime source promotion.
+
+Completed checkpoint
+`tmp/south-fork-expanded-flow-6000-to8000s-v1-20260913/frame_040000`:
+
+- h SHA `ad59e15c628cd54ce1f089a527d691adcc2f4892ec34463f830609e34ea3bbda`.
+- u SHA `4ccf59b46dbbc6a4badc2f0354605635aae118f56068edee5f2477810fc104c1`.
+- v SHA `660363a7230a1253fb5d88543496de85b5422cd39b9b2aa034832073e03bc78c`.
+
+## Previous: 7900 s state and artificial-bank checks pass
+
+BOTH `tmp/south-fork-expanded-7900s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7900s-banks-v1-20260914.json` pass atlocal38000. Same
+5,382,400 finite cells and86,720 exactly dry artificial-bank cells. Depth
+3.809306536m, speed6.214802425m/s, volume2629573.173237153m3, maxstep residual
+1.573537967e-8m3. Outflow104.453759914 versus inflow45.306954547m3/s: unsettled.
+hSHA `40b80568b6d5ffc37783a0b671cf747c13e42a700e43d1ea4d11e74b5852347a`.
+These audits were completed before8000s; no skipped intermediate checkpoint.
+
+## Previous: 7800 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local36000/native7800.000000019611s.
+BOTH `tmp/south-fork-expanded-7800s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7800s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.811767582m, speed6.215088685m/s, volume2,635,463.953519446m3;
+driver error2.793968e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet104.002367127 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`c56eb25352dbff5cebb593486bfd6cf1e7fef63777b21866060a2362429e9645`.
+Next COMPLETE local38000/native7900s requires BOTH audits. No pause/restart here.
+
+## Previous: 7700 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local34000/native7700.000000019247s.
+BOTH `tmp/south-fork-expanded-7700s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7700s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.813541006m, speed6.215391373m/s, volume2,641,431.751372933m3;
+driver error5.122274e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet104.855538796 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`4ddfb70c9b9b59318e72cc432011dac67e5d7581f2fe84e5cf38dea69766fb7c`.
+Next COMPLETE local36000/native7800s requires BOTH audits. No pause/restart here.
+
+## Previous: 7600 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local32000/native7600.000000018883s.
+BOTH `tmp/south-fork-expanded-7600s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7600s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.814530638m, speed6.215729594m/s, volume2,647,491.881766402m3;
+driver error3.259629e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet105.691269963 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`9a5d0a09010f810072cd3b649df200604979e4b6da9de8ce8c129e70890b7804`.
+Next COMPLETE local34000/native7700s requires BOTH audits. No pause/restart here.
+
+## Previous: 7500 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local30000/native7500.000000018519s.
+BOTH `tmp/south-fork-expanded-7500s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7500s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.814642941m, speed6.215935579m/s, volume2,653,645.895207782m3;
+driver error1.396984e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet109.116515721 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`2fd0d1588fe00075c1c200420c3ea751261a60d060e69721d6344d6be02805f1`.
+Next COMPLETE local32000/native7600s requires BOTH audits. No pause/restart here.
+
+## Previous: 7400 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local28000/native7400.000000018155s.
+BOTH `tmp/south-fork-expanded-7400s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7400s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.813781763m, speed6.216222167m/s, volume2,659,904.039944065m3;
+driver error4.656613e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet108.821858155 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`f89b642374ddafb8717b928c8bae204779adf3d22f5b7cf0f11134f5022f8337`.
+Next COMPLETE local30000/native7500s requires BOTH audits. No pause/restart here.
+
+## Previous: 7300 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local26000/native7300.0000000177915s.
+BOTH `tmp/south-fork-expanded-7300s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7300s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.811920947m, speed6.216627760m/s, volume2,666,273.5178706655m3;
+driver error1.862645e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet108.849672429 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`273d89824796faf2130e76e23827e92b388ba7b4ef1d04c88e123873b8282389`.
+Next COMPLETE local28000/native7400s requires BOTH audits. No pause/restart here.
+
+## Previous: 7200 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local24000/native7200.000000017428s.
+BOTH `tmp/south-fork-expanded-7200s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7200s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.808975954m, speed6.216878015m/s, volume2,672,755.975801505m3;
+driver error1.396984e-9m3, maximum step conservation residual1.573538e-8m3.
+Outlet111.205419127 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`c8236b774734f0af34326d16914b0819d36a44b920fb664fd38c68542d39e99c`.
+Next COMPLETE local26000/native7300s requires BOTH audits. No pause/restart here.
+
+## Previous: 7100 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local22000/native7100.000000017064s.
+BOTH `tmp/south-fork-expanded-7100s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7100s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.805054838m, speed6.218014487m/s, volume2,679,358.6687050955m3;
+driver error-9.313226e-10m3, maximum step conservation residual1.573538e-8m3.
+Outlet111.411573419 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`14b83d248bae6422258b43429002e7dd52ba205e09b1950c5de5c30fefb47c77`.
+Next COMPLETE local24000/native7200s requires BOTH audits. No pause/restart here.
+
+## Previous: 7000 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local20000/native7000.0000000167s.
+BOTH `tmp/south-fork-expanded-7000s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-7000s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.799718723m, speed6.218901589m/s, volume2,686,081.4906430393m3;
+driver error1.396984e-9m3, maximum step conservation residual1.364739e-8m3.
+Outlet113.129839410 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`f3539d7aac74ba12ea0ede6fb1e02bcbc7091f6bca26be070249c63f3811ff6a`.
+Next COMPLETE local22000/native7100s requires BOTH audits. No pause/restart here.
+
+## Previous: 6900 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local18000/native6900.000000016336s.
+BOTH `tmp/south-fork-expanded-6900s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-6900s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.793536437m, speed6.220045783m/s, volume2,692,927.826213111m3;
+driver error-9.313226e-10m3, maximum step conservation residual1.364739e-8m3.
+Outlet112.824760954 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`6da123d0a3ba7101eb4abf6703bc0430614748121133efc5f48085a473092c50`.
+Fresh process check confirms PID41820 live past6904s. Next COMPLETE
+local20000/native7000s requires BOTH audits. No pause/restart this continuation.
+
+## Previous: 6800 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local16000/native6800.000000015973s.
+BOTH `tmp/south-fork-expanded-6800s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-6800s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.786272326m, speed6.220839020m/s, volume2,699,899.3093225523m3;
+driver error0m3, maximum step conservation residual1.303227e-8m3.
+Outlet115.700403096 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`559d6b587e34a5a6dab9e7d65a99dfe3c79ab0050de93e43afd013770f28b9fe`.
+Fresh process check confirms PID41820 live past6840.5s. Next COMPLETE
+local18000/native6900s requires BOTH audits. No pause/restart this continuation.
+
+## Previous: 6700 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local14000/native6700.000000015609s.
+BOTH `tmp/south-fork-expanded-6700s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-6700s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.778158851m, speed6.222520279m/s, volume2,706,992.9426817102m3;
+driver error4.656613e-9m3, maximum step conservation residual1.281433e-8m3.
+Outlet118.635379278 versus inlet45.306954547m3/s: STILL SETTLING, no runtime
+source promotion. hSHA256
+`7b164b1b38f91482fc0df29916e2aa37b44cce1bd9bd503902418e4eed98293f`.
+Next COMPLETE local16000/native6800s requires BOTH audits. No restart.
+
+## Previous: 6600 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local12000/native6600.000000015245s.
+BOTH `tmp/south-fork-expanded-6600s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-6600s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.769322036m, speed6.222278764m/s, volume2,714,206.8000253253m3;
+driver error4.656613e-10m3, maximum step conservation residual1.281433e-8m3.
+Outlet115.252900746 versus inlet45.306954547m3/s: STILL SETTLING, not steady
+or promoted to runtime. hSHA256
+`e934269896e96789e5a3c156cded3d7add8b329d58a712ccfd0f4104bb4b5434`.
+Next COMPLETE local14000/native6700s requires BOTH audits. No restart.
+
+## Previous: 6500 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local10000/native6500.000000014881s.
+BOTH `tmp/south-fork-expanded-6500s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-6500s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry,2276 shared directed faces.
+Depth3.759931396m, speed6.226469718m/s, volume2,721,536.101278791m3;
+driver error-4.656613e-10m3, maximum step conservation residual1.281433e-8m3.
+Outlet121.706097871 versus inlet45.306954547m3/s: STILL SETTLING, not a
+steady solution or runtime600s source promotion. hSHA256
+`30a8987e0159a6f68457aa2343d8a0f6f686b206ac3045162a68ed5f5e4b36c2`.
+Next COMPLETE local12000/native6600s requires BOTH audits. No restart.
+
+## Previous: 6400 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local8000/native6400.000000014517s.
+BOTH `tmp/south-fork-expanded-6400s-state-v1-20260914.json` and
+`tmp/south-fork-expanded-6400s-banks-v1-20260914.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry. Depth3.750105520m,
+speed6.229504307m/s, volume2,728,976.311413965m3; driver error3.259629e-9m3,
+maximum step conservation residual1.281433e-8m3. Outlet117.129729436 versus
+inlet45.306954547m3/s: STILL SETTLING. No runtime600s source promotion.
+hSHA256 `6304566dae2822d9228d3039a1e48978535f38eb0a1dea940e50a14b3c970613`.
+The cook was temporarily paused for live/GPU timing diagnostics and resumed
+successfully each time; no restart or altered state. Next complete local10000/
+6500s requires BOTH audits.
+
+## Previous: 6300 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local6000/native6300.000000014154s.
+BOTH `tmp/south-fork-expanded-6300s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-6300s-banks-v1-20260913.json` pass. All5,382,400 cells
+finite; all86,720 artificial-bank cells exactly dry. Depth3.740284210m,
+speed6.233901559m/s, volume2,736,517.621478812m3; driver error5.122274e-9m3,
+maximum step conservation residual1.281433e-8m3. Outlet124.209143304 versus
+inlet45.306954547m3/s: STILL SETTLING. No runtime600s source promotion.
+hSHA256 `9f3613e3054e00fa0b041de833d1cb6e493fd7258566089f723d50651be94db6`.
+Observed live local6590/native6329.500000014261s. Next complete local8000/6400s
+requires BOTH audits. No restart.
+
+## Previous: 6200 s state and artificial-bank checks pass
+
+Same live continuation74818/PID41820, complete local4000/native6200.00000001379s.
+BOTH `tmp/south-fork-expanded-6200s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-6200s-banks-v1-20260913.json` pass. All5,382,400 cells
+finite; all86,720 artificial-face cells exactly dry. Depth3.730791171m,
+speed6.238590574m/s, volume2,744,149.785993439m3; driver error8.381903e-9m3,
+maximum step conservation residual1.281433e-8m3. Outlet119.675930788 versus
+inlet45.306954547m3/s: STILL SETTLING. No runtime600s source promotion.
+hSHA256 `3613d3645efb1d9136621405fa704caf87955ae9206ff2ef2d33886cc33ba260`.
+Next complete local6000/6300s requires BOTH audits. No restart.
+
+## Previous: 6100 s state and artificial-bank checks pass
+
+Same continuation74818/PID41820, complete local2000/native6100.000000013426s.
+BOTH `tmp/south-fork-expanded-6100s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-6100s-banks-v1-20260913.json` pass.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.721853394m, speed6.244805503m/s, volume2,751,864.786502137m3;
+driver error4.656613e-10m3, maximum step residual1.281433e-8m3.
+Outlet124.058516538 versus inlet45.306954547m3/s: STILL SETTLING.
+hSHA256 `072589eedc77c3c82375f67df6ffc4b575f3db291629ab2c6d6d86442ce1bba0`.
+Runtime600s unchanged. Next complete local4000/6200s requires BOTH audits.
+No restart or promotion.
+
+## Previous: exact6000 s continuation toward8000 s is live
+
+Prepared immutable input `tmp/south-fork-expanded-checkpoint-6000s-v1-20260913`,
+manifest SHA256 `cede644a12a5cb956b4ccdf44ad84dac3f0807cef93ad828fb257a4acb1a7431`.
+Preparation2397 and20-step pilot12018 both exit0. Independent restart, final
+state and artificial-bank audits all pass (`tmp/south-fork-expanded-6000s-pilot-
+{restart,state,banks}-v1-20260913.json`). All5,382,400 original cells are bit-exact
+at restart; no added terrain or water; grid/bed/roughness/boundaries unchanged.
+Pilot ends6001.000000013066s; all86,720 artificial-face cells remain exactly dry.
+Maximum step residual5.956527271e-9m3; this is not settling acceptance.
+
+Continuation session74818/PID41820 started2026-09-13T22:19:30.4224204Z.
+Actual process path verified as the unchanged checkpoint executable below;
+executable SHA256 remains7d7c3be00a4eaefaba7fca67626ab4b6415f6d173ee9933459b06862734b135f.
+Output `tmp/south-fork-expanded-flow-6000-to8000s-v1-20260913`,40000 steps at.05s,
+snapshot interval2000steps/100s. Actual frame-zero restart audit also passes:
+`tmp/south-fork-expanded-6000s-long-restart-v1-20260913.json`.
+Observed live at local20/native6001s. Next COMPLETE local2000/6100s requires
+BOTH state and artificial-bank audits. Verify the session/process before acting;
+never restart solely on an observation timeout. Runtime600s remains unchanged.
+
+## Previous: 6000 s complete, state and artificial-bank checks pass
+
+Continuation84534 is TERMINAL exit0, local40000/native6000.000000013062s,
+wall39678.4313844s. PID32144 is no longer live; do not use it for profiling
+suspend/resume. BOTH `tmp/south-fork-expanded-6000s-state-v1-20260913.json`
+and `tmp/south-fork-expanded-6000s-banks-v1-20260913.json` pass.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.713839700m, speed6.248634134m/s, volume2,759,643.344970264m3;
+driver error-2.793968e-9m3, maximum step residual1.435381e-8m3.
+Outlet123.742090564 versus inlet45.306954547m3/s: STILL SETTLING.
+The completed checkpoint is
+`tmp/south-fork-expanded-flow-4000-to6000s-v1-20260913/frame_040000`.
+Its h/u/v hashes are recorded in the state audit; immutable input manifest
+SHA256 is `d0db6ed8b522aabda91fdf20880c74b6003abb9f19b2b0dc8a4fe157f0c4711a`.
+Runtime600s remains unchanged; no promotion. Further evolution must use the
+verified exact checkpoint protocol below, not restart the inferred warm start.
+No continuation beyond6000s has been launched.
+
+## Previous: 5900 s state and artificial-bank checks pass
+
+Continuation84534/PID32144 produced complete local38000; BOTH
+`tmp/south-fork-expanded-5900s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5900s-banks-v1-20260913.json` pass.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.706960883m, speed6.254426806m/s, volume2,767,470.539277367m3;
+driver error-4.656613e-10m3, maximum step residual1.435381e-8m3.
+Outlet123.553698568 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next6000/local40000 needs BOTH audits and the process's
+terminal result. No restart or promotion.
+
+## Previous: 5800 s state and artificial-bank checks pass
+
+Continuation84534/PID32144 produced a complete local36000 snapshot; BOTH
+`tmp/south-fork-expanded-5800s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5800s-banks-v1-20260913.json` pass.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.701500344m, speed6.261293496m/s, volume2,775,330.616331320m3;
+driver error-9.313226e-10m3, maximum step residual1.435381e-8m3.
+Outlet126.196005615 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5900/local38000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5700 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local34000 passes BOTH
+`tmp/south-fork-expanded-5700s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5700s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.697737259m, speed6.269775655m/s, volume2,783,199.370632222m3;
+driver error1.396984e-9m3, maximum step residual1.435381e-8m3.
+Outlet122.139447589 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5800/local36000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5600 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local32000 passes BOTH
+`tmp/south-fork-expanded-5600s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5600s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.696140087m, speed6.278242646m/s, volume2,791,053.477784216m3;
+driver error1.396984e-9m3, maximum step residual1.435381e-8m3.
+Outlet125.430049401 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5700/local34000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5500 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local30000 passes BOTH
+`tmp/south-fork-expanded-5500s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5500s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.696871555m, speed6.290535938m/s, volume2,798,870.019992471m3;
+driver error1.396984e-9m3, maximum step residual1.435381e-8m3.
+Outlet122.409787734 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5600/local32000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5400 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local28000 passes BOTH
+`tmp/south-fork-expanded-5400s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5400s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.699729907m, speed6.309647578m/s, volume2,806,620.921452779m3;
+driver error-1.396984e-9m3, maximum step residual1.435381e-8m3.
+Outlet123.410437732 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5500/local30000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5300 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local26000 passes BOTH
+`tmp/south-fork-expanded-5300s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5300s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.704788286m, speed6.326251050m/s, volume2,814,280.575049586m3;
+driver error1.396984e-9m3, maximum step residual1.435381e-8m3.
+Outlet123.127112415 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5400/local28000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5200 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local24000 passes BOTH
+`tmp/south-fork-expanded-5200s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5200s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.712484231m, speed6.344035770m/s, volume2,821,814.473806265m3;
+driver error6.053596735e-9m3, maximum step residual1.413489015e-8m3.
+Outlet117.824758481 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5300/local26000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5100 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local22000 passes BOTH
+`tmp/south-fork-expanded-5100s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5100s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.722584468m, speed6.505003175m/s, volume2,829,202.473339705m3;
+driver error1.396983862e-9m3, maximum step residual1.413489015e-8m3.
+Outlet120.361428258 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next5200/local24000 BOTH audits after complete marker.
+No restart or promotion.
+
+## Previous: 5000 s state and artificial-bank checks pass
+
+Same continuation84534/PID32144; local20000 passes BOTH
+`tmp/south-fork-expanded-5000s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-5000s-banks-v1-20260913.json`.
+All5,382,400 cells finite;86,720 artificial-face cells exactly dry.
+Depth3.735055004m, speed6.504989644m/s, volume2,836,410.815623484m3;
+driver error-4.656612873e-10m3, maximum step residual1.413489015e-8m3.
+Outlet114.226363348 versus inlet45.306954547m3/s: STILL SETTLING. Runtime600s
+unchanged. Next5100/local22000 BOTH audits after complete marker. No restart.
+
+## Previous: 4800 and 4900 s state and artificial-bank checks pass
+
+Same live continuation84534/PID32144; no restart. Both state and bank audits
+pass for local16000/4800s and local18000/4900s. Reports are
+`tmp/south-fork-expanded-{4800,4900}s-{state,banks}-v1-20260913.json`.
+All5,382,400 cells finite and86,720 artificial-face cells exactly dry in both.
+At4900s: depth3.750274537m, speed6.504964495m/s, volume2,843,415.841175036m3;
+driver error4.190951586e-9m3, maximum step residual1.413489015e-8m3.
+Outlet114.934461835 versus inlet45.306954547m3/s: STILL SETTLING, no promotion.
+Runtime600s unchanged. Next5000/local20000 requires BOTH audits after complete
+marker. Target6000s remains active.
+
+## Previous: 4700 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local14000 passes BOTH
+`tmp/south-fork-expanded-4700s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4700s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.786394777m, speed6.504746033m/s, volume2,856,725.473618488m3;
+snapshot/driver error4.656612873e-9m3, maximum step residual1.413489015e-8m3.
+hSHA256 `231fc1a38f1cc8f1fd8b90acd32e15024ce33b63fe4d12aac5606b8f24e10e46`.
+uSHA256 `b7d780e14330a850d144ee5461789d5762a0d936f4470ed116a25048f12a3974`.
+vSHA256 `f6983d4de5131fb4e966d01a4c0c098b906eb455ba817fbb554259d9d813892e`.
+Outlet108.949582316 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+Runtime600s unchanged. Next4800/local16000 requires BOTH audits after its
+complete marker; the same continuation target remains6000s.
+
+## Previous: 4600 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local12000 passes BOTH
+`tmp/south-fork-expanded-4600s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4600s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.807763793m, speed6.503993432m/s, volume2,862,997.195002834m3;
+snapshot/driver error1.862645149e-9m3, maximum step residual1.413489015e-8m3.
+hSHA256 `2df436dec5d2c44f857b7791f4212177bc5d41c8e4b49a217962e52aeaaa8846`.
+uSHA256 `8ed06c08ac2b0edf154c74b42f1ecce349af7dd6930cfa7eb44ab55d012565b0`.
+vSHA256 `630556e84822305c4e851cf7bcfb50d3dc8277ae6a688d8484efa3eec4cfe05d`.
+Outlet108.331975333 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+Runtime600s unchanged. Next4700/local14000 requires BOTH audits after its
+complete marker; the same continuation target remains6000s. The running cook
+keeps its original executable; the separate runtime optimization does not alter it.
+
+## Previous: 4500 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local10000 passes BOTH
+`tmp/south-fork-expanded-4500s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4500s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.831070364m, speed6.520488057m/s, volume2,868,997.087442960m3;
+snapshot/driver error6.053596735e-9m3, maximum step residual1.413489015e-8m3.
+hSHA256 `6348de7629f22b016176211f2861d13acba40d460ace64c94fe6baacaaa8d33a`.
+uSHA256 `fe966f1d37a005bc933562c39b653ad4b1221b62d05c84a285ddf83c5749842d`.
+vSHA256 `9faedf9e74e63dd0e61c6cec2194cc7a0fd6f032c64a651175287f0648a087e1`.
+Outlet102.641989394 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+Runtime600s unchanged. Next4600/local12000 requires BOTH audits after its
+complete marker; the same continuation target remains6000s.
+
+## Previous: 4400 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local8000 passes BOTH
+`tmp/south-fork-expanded-4400s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4400s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.855998403m, speed6.551798249m/s, volume2,874,725.943162262m3;
+snapshot/driver error2.793967724e-9m3, maximum step residual1.413489015e-8m3.
+hSHA256 `790e085c5de4854e0090a30001ccf847bb466bf60c087c7acea91001a0babd6f`.
+uSHA256 `3647c265902a3336302bc11a5e7dac2fe8c94919d13a4f615dcad0a7ec0a4367`.
+vSHA256 `9608c2202c25d3651b2bfebaf0731a2e0d8a7e1f20dac9936abe3aec181ab1ad`.
+Outlet102.245200001 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+Clock, coordinate-lookup and all four foam-clock profiling wrappers returned
+successful cook resumes. Last observed4475.5s/local9510, same process and epoch.
+Runtime600s unchanged. Next4500/local10000 requires BOTH audits after its
+complete marker; the same continuation target remains6000s.
+
+## Previous: 4300 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local6000 passes BOTH
+`tmp/south-fork-expanded-4300s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4300s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.882450793m, speed6.581974891m/s, volume2,880,186.57657297m3;
+snapshot/driver error4.190951586e-9m3, maximum step residual1.397480309e-8m3.
+hSHA256 `79d673725c72536b16ed28c91d793cf85cc6e6a3f3a5c7ad05706c20fc0726c5`.
+Outlet97.216719762 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+All three inactive-iteration profiling wrappers51988/35395/73222 returned
+successful suspend/resume status0. Runtime600s unchanged. Next4400/local8000
+requires BOTH audits after its complete marker. The continuation target remains6000s.
+
+## Previous: 4200 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local4000 passes BOTH
+`tmp/south-fork-expanded-4200s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4200s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.910051154m, speed6.615818261m/s, volume2,885,394.984745592m3;
+snapshot/driver error3.725290298e-9m3, maximum step residual1.397480309e-8m3.
+hSHA256 `033bcb15067e81c038f8062057133fceef9ef0dc6cc5a099bab6bff651663028`.
+Outlet97.379378196 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+Both temporal-source profile wrappers58839/6560 returned successful suspend/resume
+status0; same handle subsequently verified live4202s/local4040. Runtime600s
+unchanged. Next4300/local6000 requires BOTH audits after its complete marker.
+
+## Previous: 4100 s state and artificial-bank checks pass; continuation live
+
+Same continuation84534/PID32144, no restart. Complete local2000 passes BOTH
+`tmp/south-fork-expanded-4100s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4100s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.938513199m, speed6.650998951m/s, volume2,890,369.8559359093m3;
+snapshot/driver error-2.328306437e-9m3, maximum step residual1.397480309e-8m3.
+hSHA256 `d3c799c4c8da555f4095c3887f8e900fa45d2c340d83a0687d53db164ac2e6ef`.
+Outlet93.265958595 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+Runtime600s unchanged. Next4200/local4000 requires BOTH audits after complete
+marker. Observed live4104s/local2080 while GPU boundary transactions were tested.
+
+## Previous: 4000 s complete; exact continuation toward6000 s live
+
+Session96057/PID29104 completed normally, exit0, final local40000. Both independent
+`tmp/south-fork-expanded-4000s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-4000s-banks-v1-20260913.json` pass.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.967027746m, speed6.687496729m/s, volume2,895,138.1071723765m3;
+snapshot/driver error0, maximum step residual1.649971937e-8m3.
+hSHA256 `eacabae58d73de7f5519463917ed357e188164fb800fb5787fd74497cd85453b`.
+Outlet92.309768866 versus inlet45.306954547m3/s: STILL SETTLING. No promotion.
+
+Prepared fresh exact-state restart, no added terrain or water:
+`tmp/south-fork-expanded-checkpoint-4000s-v1-20260913/manifest.json`, SHA256
+`d0db6ed8b522aabda91fdf20880c74b6003abb9f19b2b0dc8a4fe157f0c4711a`.
+Preparation52720 and20-step pilot66127 exited0. Independent pilot restart and
+bank audits pass (`tmp/south-fork-expanded-4000s-pilot-{restart,banks}-v1-20260913.json`).
+All5,382,400 prior cells bit-exact; grid/bed/roughness/boundaries unchanged.
+
+NEW continuation session84534/PID32144, start `2026-09-13T10:55:07.5804942Z`,
+same executable `tmp/south-fork-checkpoint-solver-v1-20260912/raftsim_cartesian_cook.exe`.
+Output `tmp/south-fork-expanded-flow-4000-to6000s-v1-20260913`.
+40,000steps at.05s; complete snapshots every2000steps/100s. Frame-zero independent
+restart audit passes (`tmp/south-fork-expanded-4000s-long-restart-v1-20260913.json`).
+Observed local50/4002.5s live. Next4100s/local2000 requires BOTH state and bank
+audits after complete marker; never restart on observation timeout.
+Runtime600s remains unchanged. This is continued settling work, not acceptance.
+
+## Previous: 3900 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104, no restart. Complete local38000 passes BOTH
+`tmp/south-fork-expanded-3900s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-3900s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth3.996082233m, speed6.724040732m/s, volume2,899,730.600805466m3,
+snapshot/driver volume error-1.396983862e-9m3, max step residual1.649971937e-8m3.
+hSHA2333483e12244f64e38887666d7eba46409c45ff3d3fb5d45cd3417197e6c9e3.
+Outlet89.607173945 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Observed live3940s/local38800 during exterior transport
+work. Final4000/local40000 needs BOTH audits after complete marker and terminal
+process confirmation; an observation timeout is not permission to restart.
+
+## Previous: 3800 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104, no restart. Complete local36000 passes BOTH
+`tmp/south-fork-expanded-3800s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-3800s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth4.025009769m, speed6.758695222m/s, volume2,904,181.190120580m3,
+snapshot/driver volume error1.862645149e-9m3, max step residual1.649971937e-8m3.
+hSHA066f4190409caef7d979de0a2cf36b6fee93a6b7dec9d88382c2ec2e7968d26b.
+Outlet89.839640591 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3900/local38000 needs BOTH audits after complete marker.
+
+## Previous: 3700 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104, no restart. Complete local34000 passes BOTH
+`tmp/south-fork-expanded-3700s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-3700s-banks-v1-20260913.json`.
+All5,382,400 cells finite; all86,720 artificial-face cells exactly dry.
+Depth4.053567124m, speed6.795293903m/s, volume2,908,523.140634853m3,
+snapshot/driver volume error1.862645149e-9m3, max step residual1.649971937e-8m3.
+hSHA66dc75f61e44287f4b5d584918c38883f17a884886ad9fac3776983ef37d741a.
+Outlet88.161592137 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3800/local36000 needs BOTH audits after complete marker.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 3500 s and 3600 s state and artificial-bank checks pass
+
+Continuation96057/PID29104 remains live without restart, observed3633s/local32660.
+Complete local30000 and32000 each pass BOTH independent audits:
+`tmp/south-fork-expanded-3500s-state-v1-20260913.json`,
+`tmp/south-fork-expanded-3500s-banks-v1-20260913.json`,
+`tmp/south-fork-expanded-3600s-state-v1-20260913.json`, and
+`tmp/south-fork-expanded-3600s-banks-v1-20260913.json`.
+All5,382,400 cells finite and all86,720 artificial-face cells exactly dry at
+both checkpoints. Maximum step residual remains1.649971937e-8m3.
+
+At3500s: depth4.107196107m, speed6.969103525m/s, volume2,917,015.668071452m3,
+snapshot/driver error2.793967724e-9m3,
+hSHA38bbca0b6665815bf42179c95b3c8b9e2ea96cc364505bb0035110b013963d04.
+At3600s: depth4.081067537m, speed6.842874394m/s, volume2,912,791.540487270m3,
+snapshot/driver error2.328306437e-9m3,
+hSHA29aba93987864321f40838207403564b3516329c5eb1b1f7116229d4ce1a7566.
+3600s outlet88.396459214 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3700/local34000 needs BOTH audits after complete marker.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 3400 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local28000 passes BOTH
+`tmp/south-fork-expanded-3400s-state-v1-20260913.json` and
+`tmp/south-fork-expanded-3400s-banks-v1-20260913.json`.
+All5,382,400 cells finite; maximum depth4.131587260m, speed7.097425567m/s,
+volume2,921,225.907451295m3, driver volume error4.656612873e-10m3,
+maximum step residual1.649971937e-8m3. All86,720 artificial-face cells dry.
+hSHA31b1fac55156b4f8f15d0e8117dec5b436361c1355976a092a77b7a4fc545214.
+Outlet87.173481898 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3500/local30000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 3300 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local26000 passes BOTH
+`tmp/south-fork-expanded-3300s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-3300s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.153545221m, speed7.150990469m/s,
+volume2,925,445.544416327m3, driver volume error1.396983862e-9m3,
+maximum step residual1.500216973e-8m3. All86,720 artificial-face cells dry.
+hSHA6fb61de934a260752fb5be91edfd84d4899d2321d8455a2657d8370a02ed8905.
+Outlet87.606693735 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3400/local28000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 3200 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local24000 passes BOTH
+`tmp/south-fork-expanded-3200s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-3200s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.172419951m, speed7.153497328m/s,
+volume2,929,700.619486186m3, driver volume error1.396983862e-9m3,
+maximum step residual1.500216973e-8m3. All86,720 artificial-face cells dry.
+hSHAf06380301c3d83973625e29e3cbdb5f7afaa2712b2212a76d9a176b9d2e45122.
+Outlet88.681916440 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3300/local26000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 3100 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local22000 passes BOTH
+`tmp/south-fork-expanded-3100s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-3100s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.187604153m, speed7.145899740m/s,
+volume2,934,008.701801248m3, driver volume error0m3,
+maximum step residual1.500216973e-8m3. All86,720 artificial-face cells dry.
+hSHA2e8160c2ae8a7e18d81e9dfa12652ba7fd530ad88c9e0e3195ed93bbf8c07607.
+Outlet89.343868381 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3200/local24000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 3000 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local20000 passes BOTH
+`tmp/south-fork-expanded-3000s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-3000s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.198490394m, speed7.135705088m/s,
+volume2,938,391.655052163m3, driver volume error3.725290298e-9m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHAaedfb9ad797cd18c0288b0bd4779a8d7d59548202e24e8b3e041d90d45a973d6.
+Outlet89.397159194 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3100/local22000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2900 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local18000 passes BOTH
+`tmp/south-fork-expanded-2900s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-2900s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.204411145m, speed7.129313465m/s,
+volume2,942,863.450235154m3, driver volume error9.313225746e-10m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHA1ac8390154f3df242846248d26b5d3a2b6146e04fcc8f738bdd9a24ad9337cde.
+Outlet90.587866890 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next3000/local20000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2800 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local16000 passes BOTH
+`tmp/south-fork-expanded-2800s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-2800s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.204689902m, speed7.161252625m/s,
+volume2,947,440.615585675m3, driver volume error-1.862645149e-9m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHAa9f77e9fcf35619dea77a9d3bee3b1f628e52487ff7db23f23cdd3aea7e6fddf.
+Outlet90.809059285 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next2900/local18000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2700 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local14000 passes BOTH
+`tmp/south-fork-expanded-2700s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-2700s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.198682302m, speed7.191810225m/s,
+volume2,952,130.423408859m3, driver volume error2.793967724e-9m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHA0a405bbff6d2eb2e682a964dbc0d1d3c39832f010768d3625d02c9ee005ebed1.
+Outlet93.857325467 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next2800/local16000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2600 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104 remains live, no restart. Local12000 passes BOTH
+`tmp/south-fork-expanded-2600s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-2600s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.185818888m, speed7.200518528m/s,
+volume2,956,936.02334337m3, driver volume error9.313225746e-10m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHA731d92c6fead8396889119798f23a86560512930d80811f67b380ba22c17ea2d.
+Outlet93.380261028 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next2700/local14000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2500 s state and artificial-bank checks pass
+
+Same continuation96057/PID29104, no restart. Local10000 passes BOTH
+`tmp/south-fork-expanded-2500s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-2500s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.165784649m, speed7.191115731m/s,
+volume2,961,849.884211907m3, driver volume error-1.862645149e-9m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHA d4e02ba09f0bcab6b1d27485acb08e8f2fcb5c48f2d713403f02347f0306369b.
+Outlet95.898609679 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next2600/local12000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2400 s state and artificial-bank checks pass
+
+Continuation96057/PID29104 is live, without restart. Local8000 passes BOTH
+`tmp/south-fork-expanded-2400s-state-v1-20260912.json` and
+`tmp/south-fork-expanded-2400s-banks-v1-20260912.json`.
+All5,382,400 cells finite; maximum depth4.137919638m, speed7.171133110m/s,
+volume2,966,857.208824068m3, driver volume error1.862645149e-9m3,
+maximum step residual1.425201424e-8m3. All86,720 artificial-face cells dry.
+hSHA600a9d31d8768b59744485a5f8cca4ebe2972cc0ef7b7a443b3887ab71ab8f86.
+Outlet95.574313300 versus inlet45.306954547m3/s: STILL SETTLING.
+Runtime600s unchanged. Next2500/local10000 requires BOTH independent audits.
+
+The following entries are retained process history, not current-state overrides.
+
+## Previous: 2300 s state and artificial-bank checks pass
 
 Continuation96057/PID29104 remains live; no restart. Local6000 passes BOTH
 independent audits `tmp/south-fork-expanded-2300s-state-v1-20260912.json`

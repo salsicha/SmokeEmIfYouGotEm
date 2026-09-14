@@ -5,6 +5,9 @@
 #include "LandscapeProxy.h"
 #include "Components/StaticMeshComponent.h"
 #include "CollisionQueryParams.h"
+#include "ProfilingDebugging/CsvProfiler.h"
+
+CSV_DEFINE_CATEGORY(RaftSimClock,true);
 
 void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -37,7 +40,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     AuthorityIntegrationPolicy.WaterAuthority = TEXT("custom_cxx_shallow_water_solver");
     AuthorityIntegrationPolicy.bChaosMayDriveScoringCriticalPhysics = false;
     AuthorityIntegrationPolicy.bRenderTickMayAdvanceAuthority = false;
-    AccumulatedSeconds = 0.0f;
+    FixedClock.Reset();
     PhysicsFrame = 0;
     LastOutput = FRaftSimPhysicsTickOutput();
 
@@ -218,33 +221,26 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
 
 FRaftSimPhysicsTickOutput URaftSimPhysicsBridgeSubsystem::TickBridge(const FRaftSimPhysicsTickInput& Input)
 {
-    AccumulatedSeconds += FMath::Max(Input.FrameDeltaSeconds, 0.0f);
-
-    // A 0.5 m rapid window is intentionally much more expensive than the
-    // earlier 2 m field. Never solve it repeatedly inside one rendered frame:
-    // a single hitch otherwise requested as many as 15 second-order solves,
-    // each made the next frame later, and the game locked into a ~1 FPS
-    // catch-up spiral. Raft/Chrono ticks may catch up against the latest
-    // authoritative water state; the live fluid itself advances at most once
-    // per render frame. Four raft ticks cover a stable 15 FPS floor, and any
-    // still-older wall-clock debt is discarded so recovery is immediate.
-    constexpr int32 kMaximumRaftCatchUpTicksPerFrame = 4;
-    int32 CatchUpTickCount = 0;
-    while (AccumulatedSeconds + KINDA_SMALL_NUMBER >= WaterStepSeconds &&
-           CatchUpTickCount < kMaximumRaftCatchUpTicksPerFrame)
+    // Bound work per rendered frame, not physical elapsed time. Every accepted
+    // tick advances water AND raft; a slow frame retains its unprocessed debt.
+    // Capacity/lag are measured, never hidden by dropping ticks or enlarging dt.
+    int32 Completed=0;
+    LastOutput.bFixedTickFailed=!FixedClock.Advance(double(Input.FrameDeltaSeconds),double(WaterStepSeconds),4,
+        [this]{return RunOneFixedWaterTick();},Completed);
+    LastOutput.FixedTicksThisFrame=Completed;
+    LastOutput.SimulationBacklogSeconds=FixedClock.BacklogSeconds;
+    CSV_CUSTOM_STAT(RaftSimClock,RequestedSeconds,FixedClock.RequestedSeconds,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,CommittedSeconds,FixedClock.CommittedSeconds,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,BacklogSeconds,FixedClock.BacklogSeconds,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,FixedTicks,Completed,ECsvCustomStatOp::Set);
+    CSV_CUSTOM_STAT(RaftSimClock,Failed,int32(LastOutput.bFixedTickFailed),ECsvCustomStatOp::Set);
+    if(WaterRuntime)
     {
-        if (!RunOneFixedWaterTick(/*bAdvanceWaterSolver=*/CatchUpTickCount == 0))
-        {
-            break;
-        }
-        AccumulatedSeconds -= WaterStepSeconds;
-        ++CatchUpTickCount;
+        double NativeSeconds=0;
+        if(WaterRuntime->GetLiveFieldTimeSeconds(NativeSeconds))
+            CSV_CUSTOM_STAT(RaftSimClock,NativeFieldSeconds,NativeSeconds,ECsvCustomStatOp::Set);
+        CSV_CUSTOM_STAT(RaftSimClock,WaterCommittedSeconds,WaterRuntime->GetCommittedStepSeconds(),ECsvCustomStatOp::Set);
     }
-    if (AccumulatedSeconds >= WaterStepSeconds)
-    {
-        AccumulatedSeconds = FMath::Fmod(AccumulatedSeconds, WaterStepSeconds);
-    }
-
     return LastOutput;
 }
 
@@ -256,14 +252,14 @@ void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent(
     RefreshContactRuntimeSummary();
 }
 
-bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick(bool bAdvanceWaterSolver)
+bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
 {
     if (!WaterRuntime || !RaftRuntime)
     {
         return false;
     }
 
-    if (bAdvanceWaterSolver && !WaterRuntime->StepWater(WaterStepSeconds))
+    if (!WaterRuntime->StepWater(WaterStepSeconds))
     {
         return false;
     }

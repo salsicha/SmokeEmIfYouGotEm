@@ -1,0 +1,113 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimPortableFloat.ush"
+uint Count;
+uint PartialCount;
+StructuredBuffer<float4> RHS;
+StructuredBuffer<float4> Residual;
+StructuredBuffer<float2> Geometry;
+RWStructuredBuffer<float4> Partial;
+RWStructuredBuffer<float2> Scale;
+RWStructuredBuffer<float4> Norms;
+RWStructuredBuffer<uint> Diagnostics;
+groupshared float4 Shared[256];
+float4 Reduce(float4 value,uint lane,bool maximum)
+{
+    Shared[lane]=value;GroupMemoryBarrierWithGroupSync();
+    [unroll]for(uint s=128;s>0;s>>=1)
+    {if(lane<s)
+        {
+#if RAFTSIM_RESIDUAL_PHYSICAL
+            Shared[lane]=maximum?max(Shared[lane],Shared[lane+s]):Shared[lane]+Shared[lane+s];
+#else
+            Shared[lane]=maximum?asfloat(max(asuint(Shared[lane]),asuint(Shared[lane+s]))):Shared[lane]+Shared[lane+s];
+#endif
+        }
+        GroupMemoryBarrierWithGroupSync();}
+    return Shared[0];
+}
+float WeightedExponent(float v,float root)
+{
+    if((asuint(v)&0x7fffffffu)==0 || (asuint(root)&0x7fffffffu)==0)return -1024;
+    return float(RaftSimPortableExponent(v)+RaftSimPortableExponent(root));
+}
+float NormalizeWeighted(float v,float root,int exponent)
+{
+    if((asuint(v)&0x7fffffffu)==0 || (asuint(root)&0x7fffffffu)==0)return 0;
+    int ev=RaftSimPortableExponent(v),er=RaftSimPortableExponent(root);
+    float product=RaftSimPortableScale(v,-ev)*RaftSimPortableScale(root,-er);
+    return RaftSimPortableScale(product,ev+er-exponent);
+}
+float Normalize(float v,float scale)
+{
+    // Inspect exponent/mantissa bits so a subnormal SRV value is not flushed
+    // to zero before normalization. Integer ordering gives positive maxabs.
+    uint bits=asuint(v),m=bits&0x7fffffffu,s=asuint(scale);
+    if(m==0 || s==0)return 0;
+    uint e=m>>23,se=s>>23;
+    float mant=(e!=0?1.:0.)+float(m&0x7fffffu)/8388608.;
+    float smant=(se!=0?1.:0.)+float(s&0x7fffffu)/8388608.;
+    int exponent=e!=0?int(e)-127:-126,sexponent=se!=0?int(se)-127:-126;
+    return (bits>>31!=0?-1.:1.)*(mant/smant)*exp2(float(exponent-sexponent));
+}
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID,uint3 group:SV_GroupID,uint lane:SV_GroupIndex)
+{
+#if RAFTSIM_RESIDUAL_PHASE == 0
+#if RAFTSIM_RESIDUAL_PHYSICAL
+    float4 value=-1024;
+#else
+    float4 value=0;
+#endif
+    if(id.x<Count)
+    {
+        float4 b=RHS[id.x],r=Residual[id.x];
+        bool invalid=any(!isfinite(b)) || any(!isfinite(r));
+#if RAFTSIM_RESIDUAL_PHYSICAL
+        float h=Geometry[id.x].x;uint hb=asuint(h);
+        invalid=invalid || !isfinite(h) || ((hb>>31)!=0 && (hb&0x7fffffffu)!=0);
+        if(invalid)InterlockedAdd(Diagnostics[0],1);
+        else
+        {
+            float root=RaftSimPortableSqrt(h);
+            [unroll]for(uint k=0;k<4;++k)value[k]=max(WeightedExponent(b[k],root),WeightedExponent(r[k],root));
+        }
+#else
+        if(invalid)InterlockedAdd(Diagnostics[0],1);
+        else value=asfloat(max(asuint(b)&0x7fffffffu,asuint(r)&0x7fffffffu));
+#endif
+    }
+    value=Reduce(value,lane,true);if(lane==0)Partial[group.x]=value;
+#elif RAFTSIM_RESIDUAL_PHASE == 1
+#if RAFTSIM_RESIDUAL_PHYSICAL
+    float4 value=-1024;for(uint i=lane;i<PartialCount;i+=256)value=max(value,Partial[i]);
+    value=Reduce(value,lane,true);if(lane==0)Scale[0]=float2(max(value.x,value.y),max(value.z,value.w));
+#else
+    float4 value=0;for(uint i=lane;i<PartialCount;i+=256)value=asfloat(max(asuint(value),asuint(Partial[i])));
+    value=Reduce(value,lane,true);if(lane==0)Scale[0]=asfloat(uint2(max(asuint(value.x),asuint(value.y)),max(asuint(value.z),asuint(value.w))));
+#endif
+#elif RAFTSIM_RESIDUAL_PHASE == 2
+    float4 value=0;
+    if(id.x<Count && Diagnostics[0]==0)
+    {
+        float2 s=Scale[0];float4 r,b,rv=Residual[id.x],bv=RHS[id.x];
+#if RAFTSIM_RESIDUAL_PHYSICAL
+        float root=RaftSimPortableSqrt(Geometry[id.x].x);
+        [unroll]for(uint k=0;k<4;++k){r[k]=NormalizeWeighted(rv[k],root,int(s[k/2]));b[k]=NormalizeWeighted(bv[k],root,int(s[k/2]));}
+#else
+        [unroll]for(uint k=0;k<4;++k){r[k]=Normalize(rv[k],s[k/2]);b[k]=Normalize(bv[k],s[k/2]);}
+#endif
+        value=float4(dot(r.xy,r.xy),dot(b.xy,b.xy),dot(r.zw,r.zw),dot(b.zw,b.zw));
+    }
+    value=Reduce(value,lane,false);if(lane==0)Partial[group.x]=value;
+#elif RAFTSIM_RESIDUAL_PHASE == 3
+    float4 value=0;for(uint i=lane;i<PartialCount;i+=256)value+=Partial[i];
+    value=Reduce(value,lane,false);
+    if(lane==0)
+    {
+        Norms[RAFTSIM_RESIDUAL_PHYSICAL]=value;uint bits=0;
+        [unroll]for(uint k=0;k<2;++k)
+        {float r=value[2*k],b=value[2*k+1];if(!isfinite(r) || !isfinite(b) || (b==0?r!=0:r>4e-10*b))bits|=1u<<k;}
+        Diagnostics[1]|=bits<<(2*RAFTSIM_RESIDUAL_PHYSICAL);
+    }
+#endif
+}

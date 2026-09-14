@@ -11,13 +11,45 @@ struct FRaftSimDetailPresentationFrame
     TArray<FVector4f> Pixels;
     uint64 Sequence=0;
     double ElapsedSeconds=0,SimulationSeconds=0;
+    bool bGPUClockMetadata=false;
+    // Attach the host timestamp captured WITH this legacy GPU readback.
+    bool WriteHostClockMetadata()
+    {
+        if(bGPUClockMetadata || !Validate())return false;
+        const float High=float(SimulationSeconds),Low=float(SimulationSeconds-double(High));
+        if(!FMath::IsFinite(High) || !FMath::IsFinite(Low))return false;
+        Pixels[Size.X*Size.Y+1]=FVector4f(High,Low,0,3);
+        return true;
+    }
+    // Adopt only the clock carried by this completed GPU texture. The older
+    // detail solver uses repeated registration metadata and keeps its existing
+    // host clock path; it must not silently interpret that row as a GPU time.
+    bool AdoptGPUClock()
+    {
+        if(Size.X<2 || Size.Y<2 || Pixels.Num()!=int64(Size.X)*(Size.Y+1))return false;
+        const auto Clock=Pixels[Size.X*Size.Y+1];
+        if(Clock.ContainsNaN() || Clock.W!=2.f || Clock.Z!=0.f)return false;
+        SimulationSeconds=double(Clock.X)+double(Clock.Y);bGPUClockMetadata=true;
+        return FMath::IsFinite(SimulationSeconds);
+    }
     bool Validate() const
     {
         if (Size.X<2 || Size.Y<2 || Pixels.Num()!=int64(Size.X)*(Size.Y+1) || !Sequence ||
             !FMath::IsFinite(ElapsedSeconds) || !FMath::IsFinite(SimulationSeconds)) return false;
         const FVector4f M=Pixels[Size.X*Size.Y];
         if (M.W!=1.f || M.Z<=0.f) return false;
+        if(bGPUClockMetadata)
+        {
+            const auto Clock=Pixels[Size.X*Size.Y+1];
+            if(Clock.W!=2.f || Clock.Z!=0.f || SimulationSeconds!=double(Clock.X)+double(Clock.Y))return false;
+        }
         for (const auto& P:Pixels) if (P.ContainsNaN()) return false;
+        if(!bGPUClockMetadata && Pixels[Size.X*Size.Y+1].W==3.f)
+        {
+            const auto Clock=Pixels[Size.X*Size.Y+1];
+            const float High=float(SimulationSeconds),Low=float(SimulationSeconds-double(High));
+            if(Clock.Z!=0.f || Clock.X!=High || Clock.Y!=Low)return false;
+        }
         return true;
     }
     FVector4f SampleField(FVector2f FieldM) const

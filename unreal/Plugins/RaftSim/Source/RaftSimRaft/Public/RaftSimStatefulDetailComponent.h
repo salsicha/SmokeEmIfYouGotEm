@@ -2,11 +2,14 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "RaftSimDetailPresentationFrame.h"
+#include "RaftSimDetailSampleGrid.h"
+#include "RaftSimCommittedWaterClock.h"
 #include "RaftSimStatefulDetailComponent.generated.h"
 class URaftSimWaterRuntimeAdapter;
 class UMaterialInstanceDynamic;
 class UTextureRenderTarget2D;
 struct FRaftSimDetailRenderState;
+struct FRaftSimTotalDepthSource;
 
 // Persistent detail on the existing carrier. Playable Cartesian rivers remap
 // exact overlapping state; legacy review maps may retain a fixed local basis.
@@ -28,6 +31,7 @@ public:
 private:
     bool CacheSampleCoordinates();
     bool UpdateMeanFlow();
+    TSharedPtr<const FRaftSimTotalDepthSource,ESPMode::ThreadSafe> SampleClosingWindow(FString& Error);
     UPROPERTY(Transient) TObjectPtr<URaftSimWaterRuntimeAdapter> Water;
     UPROPERTY(Transient) TObjectPtr<UMaterialInstanceDynamic> SurfaceMaterial;
     UPROPERTY(Transient) TObjectPtr<UTextureRenderTarget2D> SurfaceTexture;
@@ -37,15 +41,28 @@ private:
     uint64 LastCommitGameFrame=MAX_uint64,PresentationCommits=0,PresentationHolds=0;
     double MaximumPresentationAge=0;
     FString ContactAuditPath;
+    FString TemporalBoundaryAuditPath;
     bool bContactAuditRequested=false;
     TSharedPtr<FRaftSimDetailRenderState,ESPMode::ThreadSafe> RenderState;
     TArray<FVector4f> CachedFlow;
+    // Paired source geometry: live Cartesian total-state inputs and captures.
+    // Bed, sampled mean surface, unmasked depth, interpolated wet indicator.
+    TArray<FVector4f> CachedMeanGeometry;
+    TSharedPtr<const FRaftSimTotalDepthSource,ESPMode::ThreadSafe> CachedTotalDepthSource;
+    TSharedPtr<const FRaftSimTotalDepthSource,ESPMode::ThreadSafe> PendingClosingWindowSource;
+    uint64 TotalDepthSourceRevision=0;
+    double MeanSampleElapsed=0;
     // Recompute coordinates only on initialization/remap. Live fields update
-    // at 8 Hz; cached geometry never freezes hydraulics.
+    // at 8 Hz; cached geometry never freezes hydraulics. Moving windows sample
+    // 67x67 fixed-world nodes (65x65 interior plus one coarse exterior ring).
     TArray<FVector2D> SampleCoordinates;
     TArray<FVector4f> SampleBasisToDetail;
+    TArray<FVector2D> FaceSampleCoordinates;
+    TArray<FVector4f> FaceSampleBasisToDetail;
+    FRaftSimDetailSampleGrid SampleGrid; // Fixed world lattice for moving Cartesian windows.
     FVector Center=FVector::ZeroVector,Downstream=FVector::ForwardVector,Left=FVector::RightVector;
     double Accumulator=0,FlowAge=1,Elapsed=0;
+    FRaftSimCommittedWaterClock WaterClock;
     float StepSeconds=1.0f/120.0f;
     double FlowPreparationTotalMs=0,FlowPreparationMaxMs=0;
     int32 FlowPreparationCount=0;
@@ -53,6 +70,7 @@ private:
     bool bReportedBreakingSource=false;
     bool bSecondOrder=false;
     bool bActivityMemory=false;
+    bool bFiniteDepthDispersion=false;
     bool bMovingWindow=false;
     FVector FocusWorldCm=FVector::ZeroVector;
     TWeakObjectPtr<AActor> FocusActor;

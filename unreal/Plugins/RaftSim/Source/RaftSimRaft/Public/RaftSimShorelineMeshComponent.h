@@ -46,4 +46,6 @@ private:
     int32 ActiveVertexCount=0;
     RaftSimWaterShoreline::FTopologyCache TopologyCache;
     bool bPendingIndexUpdate = true;
+    TArray<uint32> RenderVertexSources;
+    bool bHasRenderVertexSources = false;
 };

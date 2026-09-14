@@ -364,7 +364,7 @@ def load_qa_report(path: Path) -> dict[str, Any]:
     schema = payload.get("schema", "unknown")
     passed = payload.get("passed") is True
     release_performance_qualified: bool | None = None
-    if schema == "raftsim.m8.full_reach_performance_soak.v3":
+    if schema in ("raftsim.m8.full_reach_performance_soak.v3", "raftsim.m8.full_reach_performance_soak.v4"):
         release_performance_qualified = (
             payload.get("release_performance_qualified") is True
         )

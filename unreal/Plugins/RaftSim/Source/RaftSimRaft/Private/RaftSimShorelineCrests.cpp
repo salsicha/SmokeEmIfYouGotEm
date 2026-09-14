@@ -3,6 +3,11 @@
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
 #include "ProfilingDebugging/CsvProfiler.h"
+#include "RaftSimCrestLookupAudit.h"
+#include "RaftSimCrestContextAudit.h"
+#include "RaftSimCrestCornerAudit.h"
+#include "RaftSimCrestBatchAudit.h"
+#include "RaftSimCrestRegionAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -28,6 +33,8 @@ void FRaftSimShorelineCrests::Reset()
 {
     CachedXY.Reset(); CachedIndices.Reset(); CachedProfile.Reset();
     CachedCoarse.Reset(); CachedShore.Reset(); CorrectionHistory.Reset();
+    CandidateCorrectionHistory.Reset();
+    MidpointExpansion.Reset();
     TargetCorrectionsCm.Reset(); RenderedCorrectionsCm.Reset();
     FineProfileCm.Reset();
 }
@@ -42,6 +49,13 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     if (Source.Num()!=CoarseCrestCm.Num() || Source.Num()!=Shore.Num() ||
         !Input.HeightAtWorldXYCm || SourceCellOffsets.IsEmpty()) return false;
     static const bool bTiming=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWaterStageTimings"));
+    static const bool bFreshMemos=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFreshCrestMemos"));
+    static const bool bMappedHistory=FParse::Param(FCommandLine::Get(),TEXT("RaftSimMappedCrestHistory"));
+    static const bool bLegacyCoordinateHash=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLegacyCrestCoordinateHash"));
+    static const bool bResizeContexts=FParse::Param(FCommandLine::Get(),TEXT("RaftSimResizeCrestContexts"));
+    // Actual-input paired measurements rejected this candidate as slower.
+    static const bool bSharedCorners=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSharedCrestCorners")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimRepeatedCrestCorners"));
     const double Started=bTiming ? FPlatformTime::Seconds() : 0.;
     double SelectionMs=0., TargetsMs=0.;
     const bool SameIndices=CachedIndices==SourceIndices,SameProfile=CachedProfile==Input.ProfileKey;
@@ -54,6 +68,8 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         SameXY=CachedXY[I]==FVector2D(Source[I].Position.X,Source[I].Position.Y);
     const bool SameGeometry=SameXY && SameIndices && SameProfile && SameDetail;
     const bool SameTargets=SameGeometry && SameCoarse && SameShore;
+    if(SameGeometry)RaftSimCrestBatchAudit::Unchanged();
+    if(SameGeometry)RaftSimCrestRegionAudit::Unchanged();
     CSV_CUSTOM_STAT(RaftSimCrests,UpdateCalls,1,ECsvCustomStatOp::Accumulate);
     CSV_CUSTOM_STAT(RaftSimCrests,XYChanged,int32(!SameXY),ECsvCustomStatOp::Accumulate);
     CSV_CUSTOM_STAT(RaftSimCrests,IndicesChanged,int32(!SameIndices),ECsvCustomStatOp::Accumulate);
@@ -74,11 +90,17 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         const uint64 PreviousTopologyBuilds=Refinement.TopologyBuildCount;
         {
             CSV_SCOPED_TIMING_STAT(RaftSimCrests,Selection);
+            Refinement.bMeasureStages=bTiming;
+            static const bool bIndexedRegions=FParse::Param(FCommandLine::Get(),TEXT("RaftSimIndexedCrestRegions"));
+            Refinement.bIndexedRegions=bIndexedRegions;
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;
             if (!Refinement.BuildAdaptive(XY,Triangles,Input.HeightAtWorldXYCm,3,.5f,Input.NonzeroRegionsCm,nullptr,true,true,
-                Input.DetailSpanCm>0 ? &Input.DetailWindowCm : nullptr,Input.DetailSpanCm)) return false;
+                Input.DetailSpanCm>0 ? &Input.DetailWindowCm : nullptr,Input.DetailSpanCm,!bFreshMemos,!bLegacyCoordinateHash,!bResizeContexts,bSharedCorners)) return false;
             CSV_CUSTOM_STAT(RaftSimCrests,TopologyLevelsBuilt,int32(Refinement.TopologyBuildCount-OldBuilds),ECsvCustomStatOp::Accumulate);
             CSV_CUSTOM_STAT(RaftSimCrests,TopologyLevelsReused,int32(Refinement.TopologyReuseCount-OldReuses),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimCrests,MemoContextsCreated,int32(Refinement.ParallelContextsCreated),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimCrests,MemoContextsDestroyed,int32(Refinement.ParallelContextsDestroyed),ECsvCustomStatOp::Accumulate);
+            CSV_CUSTOM_STAT(RaftSimCrests,MemoAllocatedBytes,Refinement.GetRetainedMemoAllocatedBytes(),ECsvCustomStatOp::Set);
         }
         const double Selected=bTiming ? FPlatformTime::Seconds() : 0.;
         SelectionMs=(Selected-Started)*1000.;
@@ -115,6 +137,11 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         });
         CachedXY=MoveTemp(XY); CachedIndices=SourceIndices; CachedProfile=Input.ProfileKey;
         CachedDetailWindowCm=Input.DetailWindowCm;CachedDetailSpanCm=Input.DetailSpanCm;
+        RaftSimCrestLookupAudit::Run(CachedXY,Triangles,Input);
+        RaftSimCrestContextAudit::Run(CachedXY,Triangles,Input);
+        RaftSimCrestCornerAudit::Run(CachedXY,Triangles,Input);
+        RaftSimCrestBatchAudit::Run(CachedXY,Triangles,Input);
+        RaftSimCrestRegionAudit::Run(CachedXY,Triangles,Input);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }
@@ -142,25 +169,64 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     RaftSimWaterVertexCopy::Prefix(Source,Vertices);
     // Build the uncorrected parent interpolation first. Adding a correction
     // while constructing descendants would double-count parent crest relief.
-    for (int32 I=0; I<Refinement.MidpointParents.Num(); ++I)
+    // Paired playable runs preserve exact attributes and improve both call orders.
+    // Retain the original serial path for controlled regression comparisons.
+    static const bool bParallelMidpoints=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialCrestMidpoints"));
+    static const bool bMidpointAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestMidpointAudit"));
+    const auto SerialMidpoints=[&](TArray<FProcMeshVertex>& Output)
     {
-        const auto P=Refinement.MidpointParents[I];
-        Vertices[Source.Num()+I]=Midpoint(Vertices[P.X],Vertices[P.Y]);
+        for(int32 I=0;I<Refinement.MidpointParents.Num();++I)
+        {const auto P=Refinement.MidpointParents[I];Output[Source.Num()+I]=Midpoint(Output[P.X],Output[P.Y]);}
+    };
+    if(bMidpointAudit && GFrameCounter>=100 && GFrameCounter<=250)
+    {
+        TArray<FProcMeshVertex> Candidate;Candidate.SetNumUninitialized(Count);
+        RaftSimWaterVertexCopy::Prefix(Source,Candidate);
+        double SerialMs=0,ParallelMs=0;bool Valid=true;
+        const auto Serial=[&](){const double Start=FPlatformTime::Seconds();SerialMidpoints(Vertices);SerialMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        const auto Parallel=[&](){const double Start=FPlatformTime::Seconds();Valid=MidpointExpansion.Expand(Candidate,Source.Num(),Refinement.MidpointParents);ParallelMs=(FPlatformTime::Seconds()-Start)*1000.;};
+        if(GFrameCounter%2){Parallel();Serial();}else{Serial();Parallel();}
+        for(int32 I=0;Valid && I<Vertices.Num();++I)Valid=FRaftSimCrestMidpointExpansion::EqualAttributes(Vertices[I],Candidate[I]);
+        if(!Valid){UE_LOG(LogTemp,Error,TEXT("CrestMidpointAudit mismatch frame=%llu"),GFrameCounter);return false;}
+        UE_LOG(LogTemp,Display,TEXT("CrestMidpointAudit exact frame=%llu vertices=%d midpoints=%d bands=%d serial_ms=%.6f parallel_ms=%.6f parallel_first=%d"),
+            GFrameCounter,Vertices.Num(),Refinement.MidpointParents.Num(),MidpointExpansion.BandCount(),SerialMs,ParallelMs,int32(GFrameCounter%2));
+        if(bParallelMidpoints)Vertices=MoveTemp(Candidate);
     }
+    else if(bParallelMidpoints)
+    {if(!MidpointExpansion.Expand(Vertices,Source.Num(),Refinement.MidpointParents))return false;}
+    else SerialMidpoints(Vertices);
     const float Alpha=FMath::Clamp(Input.BlendAlpha,0.f,1.f);
-    TMap<FVector2D,float> NextHistory;
-    RenderedCorrectionsCm.Init(0,Count);
-    for (int32 I=0; I<Refinement.MidpointParents.Num(); ++I)
+    static const bool bHistoryHashAudit=FParse::Param(FCommandLine::Get(),TEXT("RaftSimCrestHistoryHashAudit"));
+    bool bDenseHistory=false;
+    if(bHistoryHashAudit)
     {
-        const int32 Node=Source.Num()+I;
-        auto& V=Vertices[Node]; const FVector2D XY(V.Position.X,V.Position.Y);
-        const float* Previous=CorrectionHistory.Find(XY);
-        const float Correction=BoundaryMidpoints[I] ? 0.f : FMath::Lerp(
-            Previous ? *Previous : 0.f,TargetCorrectionsCm[Node],Alpha);
-        V.Position.Z+=Correction; RenderedCorrectionsCm[Node]=Correction;
-        NextHistory.Add(XY,Correction);
+        auto ReferenceVertices=Vertices;
+        TArray<float> ReferenceRendered;
+        double FastMs=0,LegacyMs=0;bool ReferenceDense=false;
+        const auto Fast=[&]()
+        {
+            const double Begin=FPlatformTime::Seconds();
+            ReferenceDense=CandidateCorrectionHistory.Apply(ReferenceVertices,Source.Num(),BoundaryMidpoints,
+                TargetCorrectionsCm,Alpha,ReferenceRendered,!bMappedHistory);
+            FastMs=(FPlatformTime::Seconds()-Begin)*1000.;
+        };
+        const auto Legacy=[&]()
+        {
+            const double Begin=FPlatformTime::Seconds();
+            bDenseHistory=CorrectionHistory.Apply(Vertices,Source.Num(),BoundaryMidpoints,
+                TargetCorrectionsCm,Alpha,RenderedCorrectionsCm,!bMappedHistory);
+            LegacyMs=(FPlatformTime::Seconds()-Begin)*1000.;
+        };
+        if(GFrameCounter%2){Fast();Legacy();}else{Legacy();Fast();}
+        const bool Exact=bDenseHistory==ReferenceDense && RenderedCorrectionsCm==ReferenceRendered &&
+            FMemory::Memcmp(Vertices.GetData(),ReferenceVertices.GetData(),SIZE_T(Vertices.Num())*sizeof(FProcMeshVertex))==0;
+        if(!Exact){UE_LOG(LogTemp,Error,TEXT("CrestHistoryHashAudit mismatch frame=%llu"),GFrameCounter);return false;}
+        UE_LOG(LogTemp,Display,TEXT("CrestHistoryHashAudit exact frame=%llu vertices=%d dense=%d fast_ms=%.6f legacy_ms=%.6f fast_first=%d"),
+            GFrameCounter,Vertices.Num(),bDenseHistory,FastMs,LegacyMs,int32(GFrameCounter%2));
     }
-    CorrectionHistory=MoveTemp(NextHistory); // Bounded to this current window.
+    else bDenseHistory=CorrectionHistory.Apply(Vertices,Source.Num(),BoundaryMidpoints,
+        TargetCorrectionsCm,Alpha,RenderedCorrectionsCm,!bMappedHistory);
+    CSV_CUSTOM_STAT(RaftSimCrests,DenseHistoryUpdates,int32(bDenseHistory),ECsvCustomStatOp::Accumulate);
     const double VerticesDone=bTiming ? FPlatformTime::Seconds() : 0.;
     Indices.Reset(Refinement.Triangles.Num());
     for (int32 I:Refinement.Triangles) Indices.Add(uint32(I));
@@ -192,10 +258,12 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
     if (bTiming)
     {
         const double End=FPlatformTime::Seconds();
-        UE_LOG(LogTemp,Display,TEXT("WaterCrestPerf frame=%llu rebuild=%d total_ms=%.4f selection_ms=%.4f targets_ms=%.4f vertices_ms=%.4f topology_ms=%.4f normals_ms=%.4f fine_vertices=%d xy_changed=%d indices_changed=%d profile_changed=%d coarse_changed=%d shore_changed=%d detail_changed=%d"),
+        UE_LOG(LogTemp,Display,TEXT("WaterCrestPerf frame=%llu rebuild=%d total_ms=%.4f selection_ms=%.4f targets_ms=%.4f vertices_ms=%.4f topology_ms=%.4f normals_ms=%.4f fine_vertices=%d xy_changed=%d indices_changed=%d profile_changed=%d coarse_changed=%d shore_changed=%d detail_changed=%d sample_ms=%.4f assembly_ms=%.4f refine_input_ms=%.4f"),
             GFrameCounter,SameGeometry ? 0 : 1,(End-Started)*1000.,SelectionMs,TargetsMs,
             (VerticesDone-Started)*1000.-SelectionMs-TargetsMs,(TopologyDone-VerticesDone)*1000.,
-            (End-TopologyDone)*1000.,Refinement.MidpointParents.Num(),!SameXY,!SameIndices,!SameProfile,!SameCoarse,!SameShore,!SameDetail);
+            (End-TopologyDone)*1000.,Refinement.MidpointParents.Num(),!SameXY,!SameIndices,!SameProfile,!SameCoarse,!SameShore,!SameDetail,
+            SameGeometry ? 0 : Refinement.SelectionSeconds*1000.,SameGeometry ? 0 : Refinement.AssemblySeconds*1000.,
+            SameGeometry ? 0 : Refinement.InputSeconds*1000.);
     }
     return true;
 }

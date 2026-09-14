@@ -1,7 +1,1209 @@
 # Remaining requested work
 
-Last reviewed 2026-09-12. This index does not convert diagnostic passes into
+Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
+
+Latest September14 heartbeat: [normal playable upload-cache delivery](../reconstruction-review-2026-09-07/normal-river-upload-cache.md).
+Rebuilt normal renderer now reuses exact dense source membership only when actual
+triangle indices stay unchanged; all vertex attributes still update every frame.
+BuildPASS,10 native testsPASS, ordinary motion/contact/GPU checksPASS within their
+scope. Actual RenderPacket means1.365ms cached/2.464ms original in separate shared
+runs, NOT a paired causal timing claim. Default9.77FPS/p95122.82ms stillFAIL30FPS;
+new inspected motion still has smooth faces/blurred froth, VISUALFAIL. No broken
+solver enabled or quality reduction. All5 original jobsLIVE; COMPLETE9400 BOTH
+state/bank auditsPASS, still unsettled; next COMPLETE9500/local30000 BOTH audits.
+Joint mass/pressure replacement and full terrain/water/later-river/crew/release
+scope remainOPEN. This is a performance-only normal-scene update, not new waves.
+
+Latest September14: [local reconstruction work and mass-transport obstruction](../reconstruction-review-2026-09-07/normal-river-geometry-work-mass-obstruction.md).
+Complete cellwise geometry+auxiliary energy identity now verified on all8
+original physical profiles (worst2.14e-14), with local <=9-depth-cell support;
+all8 actual energy gates STILL FAIL. New8 geometry tests PASS; prior full set
+85PASS/25FAIL. Exact constant-physical-velocity oracle proves a momentum-only
+repair CANNOT conserve energy atop current donor mass: rates -13.48875 and
+-15.328125, both axes, independent of conservative momentum flux. Four new
+oracle checks PASS and four required energy gates FAIL, retained. Final complete
+control set89PASS/29FAIL, no waived/skipped gates. NEXT joint
+mass/pressure work pairing replacement; no centered-mass-only or global fix.
+No native/gameplay promotion. All5 original jobs LIVE,417/422 guards unchanged;
+cook beyond9372.5, latest BOTH-audited9300, next COMPLETE9400/local28000 BOTH
+audits. Full terrain/water/later-river/crew/release scope and desktop30FPS OPEN.
+
+Latest September14: [local auxiliary energy-work identity](../reconstruction-review-2026-09-07/normal-river-local-auxiliary-work.md).
+Same two-pole physical energy now has cellwise time derivative and actual-stencil
+auxiliary exchange, with finite-solve residual work retained. New10 tests PASS;
+all8 original local balances/finite differences PASS. All8 actual stress energy
+gates STILL FAIL. Auxiliary exchange integrates to <=2.61e-17; residual work
+<=4.90e-15 cannot explain >=1.32e-4 net defects. Final complete prior control set
+plus new tests77PASS/25FAIL retains all known failures. NEXT compatible hydrodynamic flux/reconstruction
+work pairing, then bed/dry/open/full-history qualification; no gameplay promotion.
+Both video URLs retried: browser initialization fails even after reset, direct
+web retrieval cache misses; no new footage inspected. All5 original jobs LIVE,
+417/422 guarded sources unchanged. Cook beyond9344.5; latest BOTH-audited9300,
+next COMPLETE9400/local28000 BOTH audits. Full scope and desktop30FPS remain OPEN.
+
+Latest September14: [equivalent positive physical-energy realization](../reconstruction-review-2026-09-07/normal-river-positive-primal-energy.md).
+Derived K=S^-1 as two positive inverse-metric factors of the SAME original Q/
+two-pole response, no refit/model substitution. Matrix-free physical energy and
+fixed-p gradient replace the dense preparation inverse; all16 original physical
+states pass derivative gates, velocity agrees with denseK<=4.96e-14, gradient
+<=1.87e-13. Shared reference timings are NOT native/FPS evidence. Connected
+physical-state entry to the same stress component with unchanged inputs and
+round-trip guard. All8 flat momentum controls pass; ALL8 energy failures remain.
+Combined67PASS/25FAIL retains every original failure. Positive local energy is
+not conserved flux/convexity/entropy/wetting proof. NEXT auxiliary-energy local
+stress/positive-transport work balance, then bed/dry/full-history qualification.
+No native/source/history promotion. COMPLETE9300/local26000 cook BOTH audits
+PASS; still unsettled102.6087out versus45.3070in, artificial banks exactly dry.
+Next complete9400/local28000 BOTH audits. Full SouthFork/later-river/crew/release/
+30FPS scopeOPEN. Original5 handles LIVE;417/422 guarded sources unchanged.
+
+Latest September14: [local physical conservative stress; retained energy failure](../reconstruction-review-2026-09-07/normal-river-conservative-stress.md).
+Same-operator improved primal solves remove128 derivative noise: worst finest
+probe6.15e-7→3.00e-10,16/16 energy-coordinate gates pass, original40CG/poles.
+New positive-flat-periodic stress component retains donor MASS and both poles;
+derives physical face flux via full auxiliary momentum correction, not a global
+projection. All8 original flat physical-momentum gates nowPASS (worst2.64e-15),
+local flux error<=1.46e-13; rest/reversal/reflection and finite-kh two-pole
+controlsPASS. BUT all8 energy gatesFAIL, both positive and negative energy rates.
+Work decomposition proves both stress and donor mass need a compatible local
+discrete split; a centered-mass-only swap does not fix it. Full combined58PASS/
+25FAIL retains new and original failures. Variable-bed/dry/history/entropy/
+native/gameplay remain unqualified; this flat component does not replace full
+river scope. NEXT compatible stress/mass energy work, then bed/dry/full-history
+qualification. Cook latest dual-audited9200; next9300/local26000 BOTH audits.
+All5 original jobs LIVE,417/422 guards unchanged. Fullscope and30FPS remainOPEN.
+
+Latest September14: [physical momentum/energy bridge and derivative accuracy](../reconstruction-review-2026-09-07/normal-river-physical-momentum-bridge.md).
+Implemented full two-pole analytic physical p_t and fixed-p energy gradients;
+local canonical/physical momentum rates differ by up to2.3839183, so they cannot
+be interchanged in a conservative flux. Original16-state audit exposes4/16
+energy-coordinate accuracy failures. Exact local-principal-block preconditioning
+fixes all4 without changing full operators or40CG:16/16 pass, worst4.30e-14.
+Final patch audit records identical after linear-cost row traversal change.
+Combined38PASS/17FAIL retains all4 old accuracy and13 physical failures. Eight
+flat-bed momentum failures and reversal defect remain UNFIXED; no gameplay
+promotion. Some128 primal finite-difference probes remain noisy (6.15e-7);
+need same-operator improved primal reference, then local conservative pressure/
+momentum stress with compatible positive mass/energy and both poles. Bridge is
+not a finished replacement solver. COMPLETE9200/local24000 cook BOTH audits
+PASS, still unsettled101.6775out vs45.3070in. Next9300/local26000 BOTH audits.
+All5 original jobs directly LIVE,417/422 guards unchanged; fullscope/30FPS OPEN.
+
+Latest September14: [smooth pressure and momentum/reversal failure](../reconstruction-review-2026-09-07/normal-river-smooth-pressure-momentum.md).
+C1 positive pressure component resolves all16 original energy probes and all8
+short temporal controls (ratios approximately4); all29 old branch segments now
+have shrinking force gaps, original8 endpoints preserved. These limited passes
+DO NOT qualify coupled physics: all8 flat-bed momentum profiles fail. Independent
+exact three-cell oracle proves net rest force26.9775 and a43.491m/s² jump across
+zero flow, unchanged under65536x perturbation reduction; reflection fails both
+axes. Current combined25PASS/13FAIL retained. NEXT local conservative momentum/
+pressure stress with compatible positive mass/energy transport and both poles;
+no tie-only patch, global projection, weaker gates or gameplay promotion.
+All5 original jobs directly LIVE;417/422 guards unchanged. Earlier difference
+history now1405m/s in2.17mm water, physically unacceptable. Cook9174/local23480;
+next COMPLETE9200/local24000 requires BOTH audits. Storage-guard timing/provenance
+documented separately from earlier main audits. Full scope/30FPS remains OPEN.
+
+Latest September14: [temporal branch jumps and continuous mass candidate](../reconstruction-review-2026-09-07/normal-river-temporal-branch-jumps.md).
+Same eight finest trajectories reproduced exactly.29 pressure MC branch records;
+independent directional evaluator confirms gradient jumps to7.11e-15. Variable-bed
+force-rate jumps persist up to0.0143074 despite vanishing state gaps. EP mass
+transport ALSO discontinuous: exact five-cell slope jump1/64, face flux1/128.
+Retained continuity failures; do not swap EP into pressure as an assumed fix.
+New C0 MC/EP-envelope MASS candidate11PASS; all29 same-crossing mass gaps now
+shrink100x with100x input reduction. Original8 endpoints unchanged; no new
+coupled trajectory or gameplay promotion. Combined58PASS/3FAIL plus later passing
+envelope identity retains old MC/EP failures. NEXT C1 pressure-energy reconstruction
+and matched derivatives on original variable-bed states, then unchanged temporal/
+dry/boundary/native/visual gates. Complete9100 cook BOTH audits PASS, still
+unsettled102.8957out vs45.3070in; next9200/local24000 requires BOTH audits.
+Original five handles LIVE,417/422 guards unchanged. Full scope and30FPS OPEN.
+
+Latest September14: [extrema-preserving positive stage and evolution defects](../reconstruction-review-2026-09-07/normal-river-extrema-positive-stage.md).
+Implemented published EP slope with positive donor reconstruction and same-face
+energy transpose; original pressure poles/40CG and independent derivative gate
+unchanged. Original mass-refinement ratios now4.35790/4.19743; extra phases,
+directions, dry/rough-bed and thin-depth controls pass. Fixed an additional
+near-bank flattening defect by retaining connected three-cell MC support.
+Final combined45PASS/1FAIL retains the old MC transport's original failure.
+All16 original64/128 instantaneous energy gates PASS, but all-eight-state
+short RK2 evolution exposes incomplete temporal convergence: four velocity
+ratios2.21-2.82, one depth ratio2.083; seed2203 finer energy drift worsens.
+Final24 trajectories positive/mass-conservative and endpoint-identical after
+bank correction; NOT full moving-source, wetting, physical or gameplay acceptance.
+NEXT temporal regularity/branch diagnosis on original profiles, exact dry-pressure
+and boundary qualification. Still far outside1.6ms/native30FPS goals. Original
+five jobs LIVE,417/422 guards unchanged; cook9055.5, next9100/local22000 BOTH audits.
+Terrain/visual/later-river/crew/release/full goal remains OPEN.
+
+Latest September14: [positive donor-face transport, retained accuracy failure](../reconstruction-review-2026-09-07/normal-river-positive-face-transport.md).
+Research mass-only transport and its exact frozen-face transpose implemented;
+dry velocity independence, positive donor steps, conservation and bed barriers
+pass. Combined25PASS/1FAIL: original smooth32-to64 refinement ratio2.597618
+fails unchanged >3.2 gate. Additional controls isolate extrema reconstruction;
+uncut alone also fails, unlimited diagnostic expressions are NOT replacements.
+No coupled-stage/native/gameplay promotion. NEXT resolve reconstruction while
+retaining positive transport and physical barriers, then coupled wetting/evolution.
+Original five jobs LIVE,417/422 guards unchanged. Complete9000 cook BOTH audits
+PASS, still unsettled101.3847out versus45.3070in. Next9100/local22000 needs BOTH
+audits. Reference-video retries still fail: web cache misses and browser/skill
+runtime missing-path error. Desktop30FPS, visual/later-river/full goal OPEN.
+
+Latest September14: [local reverse depth gradient](../reconstruction-review-2026-09-07/normal-river-reverse-depth-gradient.md).
+Research stage now avoids per-cell basis solves. Exact represented branch
+selection, floating reverse adjoints; original poles/40CG and independent
+actual-direction chain-rule check retained. Combined31PASS. All eight64-cell
+paired states agree within1.78e-14 gradient/4.98e-14 rate; flux/depth rate exact.
+Mean stage6.2658s becomes0.2207s (28.4x shared-load research speedup, NOT FPS).
+All sixteen64/128 energy-direction gates pass; worst128 error6.8923e-8 retained.
+Still FAR outside native1.6ms gate; no dry/positive/breaking/open/time acceptance.
+NEXT positive second-order face transport and matching energy adjoint, then
+exact dry/boundary qualification. Earlier40PASS/8FAIL not superseded. All five
+original jobs LIVE;417/422 guards unchanged. Cook8969s; next complete9000/local
+20000 needs BOTH audits. Terrain/visual/30FPS/later-river/full goal OPEN.
+
+Latest September14: [derived variational two-pole stage, research only](../reconstruction-review-2026-09-07/normal-river-variational-two-pole-stage.md).
+Derived and tested dual-energy depth variation using original pole constants
+and40CG. Seven primitive/five nonlinear-stage tests pass; combined23PASS.
+All eight original64-cell smooth states retain their source/layer velocities
+through explicit canonical conversion; independent energy-direction error
+<=3.553e-10, instantaneous energy rate<=1.333e-15. No projection/damping.
+This NEW rotational closed stage changes transport (mass-rate delta<=0.050474),
+costs4.35-6.63SECONDS, and lacks dry/positive/breaking/open/time integration.
+NOT native/gameplay or original-history acceptance; prior40PASS/8FAIL retained.
+NEXT exact local reverse gradient and consistent positive wet-bank/boundary
+transport before evolving qualification. Both poles/rotational flow retained.
+All five original jobs LIVE;417/422 guards unchanged. Complete8900 cook BOTH
+audits PASS but unsettled; next9000/local20000 needs BOTH. Full goal OPEN.
+
+Latest September14: [exact dry kinematics and connected energy qualification](../reconstruction-review-2026-09-07/normal-river-exact-dry-kinematics.md).
+Independent rational face oracle reproduces dry D1.25(limit) versus3.75 at
+original probes, D-squared error12.5; original agrees within1.78e-15. This is
+joint cut/depth behavior, not an arithmetic-only defect. Connected scalar
+retains rational-metric positive rates4/8 at64 and5/8 at128; all64 pressure
+evaluations pass. Original state-space checks independently confirm two
+positive rates to3.17e-11/1.27e-11. Five new controls PASS; prior40PASS/8FAIL
+unchanged. No promotion or extra history launched. NEXT jointly consistent
+cut kinematics and nonlinear two-pole energy/flux closure, not precision-only
+tuning or smaller-probe substitution. Complete8900 cook BOTH audits PASS,
+still unsettled102.2040out vs45.3070in. Next9000/local20000 requires BOTH.
+417/422 guards unchanged; all five original jobs directly LIVE. Full goal OPEN.
+
+Latest September 14: [connected scalar support and retained forcing failures](../reconstruction-review-2026-09-07/normal-river-connected-scalar-support.md).
+Research-only connected depth weighting removes 28 directed dry-gap links at
+each actual South Fork endpoint, retaining quadratic rank for all13,141 wet
+core cells. Actual source registration is128x128 interior/134x134 full,0.5m,
+not the earlier summary's69x69/1m. Six focused tests PASS. Unchanged physical
+variable-bed force ray error0.669219854 becomes3.925956e-7 (gate1e-6), but
+combined original/candidate controls remain40PASS/8FAIL. Raw dry-cell forcing
+error14.091705, flat raw1.055569e-6, and coarse refinement3.463260 remain FAIL.
+No native/gameplay promotion, energy qualification or new history claimed.
+NEXT underlying dry-front kinematics/forcing and nonlinear energy, not test
+waivers. All five original jobs directly LIVE;417/422 guards unchanged.
+Next8900 cook checkpoint not yet complete at check. Visual/FPS/full goal OPEN.
+
+Latest September 14: [submitted shape and integrated shoreline fan correction](../reconstruction-review-2026-09-07/normal-river-submitted-shape.md).
+Actual submitted-triangle decomposition identifies base shape, not added crest,
+as dominant on steep faces. It also isolates a small clipped-bank fan artifact:
+same captured cell slope3.321318 becomes1.278880 without moving any vertex or
+wet boundary. Opposite-dry-corner fan now ordinary in South Fork only; original
+layout retained via regression flag. Builds PASS; final native9PASS and analyzer
+8PASS. Default actual shape has no >60degree triangles within30m; CPU contact
+max4.76801e-5cm across2,020 points, paired GPU sequence72 max2.98023e-8 PASS.
+Fresh default capture fully decodes196frames/42sourceframes, still visually
+FAILS broad sheetlike faces and blurred froth. No full shape/physics acceptance.
+Ordinary300-frame benchmark valid:8.921945FPS/p95129.5326ms under shared load,
+FAIL30FPS; last isolated18.899245FPS result not replaced. Source/material/terrain
+unchanged; physics120Hz retained. NEXT physical breaking/froth and broad base
+shape/performance work, not another occupancy-only tuning. Full goal OPEN.
+All417/422 guards unchanged; complete8800 cook passes BOTH audits but unsettled.
+Next complete8900/local18000 requires BOTH. No final commit or goal completion.
+
+Latest September 14: [irregular froth candidate rejected and restored](../reconstruction-review-2026-09-07/normal-river-irregular-froth.md).
+Desktop target is 30 FPS / p95 33.333 ms; physics stays 120 Hz. Eight CSV/budget
+tests pass. The optical candidate passes four native tests (83,377 GPU queries)
+and fresh material readback, with source/clock/geometry and 459 files protected.
+Actual playable capture fully decodes 194 frames from 44 source frames, but
+inspected froth looks like flat angular chips; visual FAIL, candidate REJECTED.
+Guarded restoration and independent fresh readback both PASS: all six original
+graphs exact. Restored material SHA is44c07f419a3a0a9f27f420871e4f1594184e57476de0960e560337ce6a93b31d.
+Builder retains the original helper. The accepted midpoint scheduling remains.
+Baseline ordinary 300-frame CSV is valid:9.038802496 FPS/p95133.1675ms under
+shared load, not a replacement for isolated18.899245FPS/p9570.33ms. Candidate
+CSV rejected for unexpected repeated header; no performance comparison claimed.
+NEXT address froth structure/physical wave/contact, not further acceptance based
+on sharper optical occupancy alone. Terrain, native physics, all rivers, crew,
+visual and 30FPS acceptance remain OPEN. All five long jobs directly LIVE,
+417/422 guards unchanged; complete8700 cook passes BOTH audits but is unsettled.
+Next complete8800/local16000 needs BOTH audits. No final commit or goal completion.
+
+Latest September14: [exact crest-region index and fresh visual check](../reconstruction-review-2026-09-07/normal-river-crest-region-index.md).
+Build30598 PASS; native87164 all6PASS (40,000boxqueries/12changingreconstructions);
+Python45PASS. Actual6875 complete131frames/131builds+1unchanged call retains
+8,803,559 exact vertices, but only9regions and0.034968ms mean saving with
+opposite-sign call-order results: candidate REJECTED, original scan retained.
+Previous parallel midpoint improvement stays integrated. Fresh ordinary
+capture36318 fully decoded194frames/44sourceframes; inspected image still
+shows broad smeared froth and sheetlike water: visual FAIL. Video retries
+still fail (webcachemiss, browserkernelassetsoserror3); no new footage claimed.
+Active material SHA matches saved graph: original whole-cell cubic coverage,
+density3, registered transported source/clock; historical driftfoam is runtime
+zeroed, not evidence of an active second source. NEXT qualify resolved irregular
+clumps without changing quantity/clock and continue physical wave/contact;
+do not repeat rejected rectangular sharpening or
+promote unqualified physics. Desktop30FPS/full-project acceptance remain OPEN.
+
+Latest September14: [playable midpoint scheduling](../reconstruction-review-2026-09-07/normal-river-crest-midpoint-scheduling.md).
+Two complete paired South Fork runs preserve all attributes over17,741,826
+vertex comparisons. Mean expansion saving0.724739/0.709419ms per call;
+both timing orders and p95 improve. Native5PASS; parser/budget19PASS.
+Parallel dependency-band scheduling is integrated as ordinary default, retaining
+the serial regression flag. Default build25566 PASS; final native67503 all7PASS
+including no-Troublemaker catalog/migration; final Python36PASS. Ordinary
+process58264 TERMINAL exit0,300completeCSVframes:9.345596FPS/p95128.5814ms
+under shared load,30FPS FAIL. Does not replace isolated18.899245FPS result.
+This changes scheduling only, not crest shape/foam/physics. NEXT larger crest
+selection/water refresh-publish performance and remaining physics/visual work.
+All5longjobs directly LIVE;417/422 guards exact; COMPLETE8600/local12000 passes
+BOTH audits but still UNSETTLED. Next COMPLETE8700/local14000 needs BOTH audits.
+No new visual or isolated-FPS acceptance. Full goal stays OPEN.
+
+Latest September14: [energy and physical wetting-force controls](../reconstruction-review-2026-09-07/normal-river-energy-and-wetting-force.md).
+Source-supported forcing now couples to BOTH original pressure poles in an
+isolated CPU reference; no native/history changes. Variable-bed failure reaches
+physical momentum forcing:0.669219854m2/s2 error at2^-24 on an originally1m-deep
+cell, despite both CG residuals below7.1e-16. At2^-64 it reaches1.51e-14, but
+the nonuniform cut limit is NOT qualified. Original failed test is unchanged.
+Independent full energy derivative:6reference tests PASS; pressure coupling
+2tests PASS.256 closed full-rate controls all pass pressure gates. SGN sampled
+energy rates negative; nonlinear extension of rational frozen-linear metric has
+positive rates in4/8smooth profiles at64cells and5/8 at128cells. Independent
+actual-state finite differences confirm two positive cases to2.54e-10.
+This candidate metric is NOT a proven nonlinear energy; do not call this proof
+that no energy exists or use linear SPD as a nonlinear stability guarantee.
+NEXT derive/qualify actual two-pole nonlinear energy/flux and joint near-dry
+cut behavior before boundary evolution/native promotion. No easier SGN swap,
+depth floor, source edit, relaxed gate, appearance/FPS claim or final commit.
+Final combined suite34PASS/1FAIL9.38s; original failure unchanged. All5original
+long jobs directly LIVE: cook8549.5s, main0.757298817s, observer0.525206602s,
+earlier scalar candidate0.891666712s;417/422 guards exact. COMPLETE8500 audited,
+next COMPLETE8600/local12000 needs BOTH audits. Full objective remains OPEN.
+
+Latest September14: [source-supported scalar boundary action](../reconstruction-review-2026-09-07/normal-river-source-supported-scalar-boundary.md).
+Actual three-ring source now supports a research scalar derivative: flat affine
+edge/corner consistency and second-order smooth refinement pass. Original
+pressure D/E, affine face traces and current evolving interior remain intact.
+Both actual source endpoints evaluate with8 entering dry cells each via exact
+conserved-ray limits; force-related changes remain within the composed boundary
+stencil. Process35768 TERMINAL exit0, retained source provenance, no old history
+spliced. Combined controls26PASS/1FAIL: variable-bed finite-depth ray test fails
+with Q error11.405668861 at2^-24. Independent exact represented bed-gap analysis
+explains why these probes are pre-asymptotic; additional2^-64 probe matches the
+analytic limit to1.11e-16. Original failed probes/tolerance remain unchanged.
+NEXT qualify finite-depth cut transitions and mechanical-energy/boundary closure
+before evolution or native promotion. This is NOT playable waves/froth/30FPS
+acceptance. All5original long jobs directly LIVE;417/422 guards unchanged.
+Last main0.733333372s, observer0.511859913s, earlier scalar candidate0.750000038s;
+cook COMPLETE8500/local10000 passes BOTH audits:5,382,400finitecells,
+86,720bankcells exactlydry, snapshot/driver difference2.79397e-9m3.
+Outflow102.452874602 vs45.306954547 UNSETTLED; next COMPLETE8600/local12000
+needs BOTH audits. Full objective OPEN.
+
+Latest September14: [actual wider boundary-source capture](../reconstruction-review-2026-09-07/normal-river-pressure-stencil-source.md).
+Desktop acceptance confirmed at30FPS/p9533.333ms; physics120Hz unchanged.
+Build21221 and corrected native96665 PASS(all3tests). Actual capture26326
+TERMINAL exit0: revisions2/3 retain1572 genuine outer samples each, all512
+original exterior entries exact, full bed unchanged. Independent source audit
+and actual GPU temporal interpolation PASS; final source/budget suite15PASS1.09s.
+This opt-in acquisition adds no ordinary-play samples and fixes no pressure
+boundary operator. Existing histories are not extended or replaced.
+Recording fully decoded(193 encoded frames,45 source frames/6.436s); inspected
+image still shows smeared foam and sheetlike crests: visual FAIL. No new FPS
+claim. Next derive and qualify source-consistent scalar boundary closure before
+any playable solver promotion. Full-project acceptance and final commit OPEN.
+
+Latest September14: [independent scalar/boundary identities](../reconstruction-review-2026-09-07/normal-river-scalar-boundary-identities.md).
+Explicit face matrices explain the candidate's changed scalar work identity:
+A(f)=G(f)-f*G(1), not G=-D.T. Physical pressure work remains paired. Independent
+finite-time differences reproduce candidate material identities to8.15e-12,
+including prescribed affine traces. Directional dry-support work defect is
+independently reproduced. Ten identity/scalar checks PASS1.54s, but original
+94-control comparison still has3candidate FAILURES; no assertions were rewritten.
+NEW physical consistency FAIL: affine f(x)=x gets endpoint derivative0.5 rather
+than1 at8/16/32/64cells; error does NOT refine. Constant-null alone is insufficient.
+NEXT derive a source-consistent finite-window scalar boundary action, retaining
+pressure work, original exterior traces, actual geometry rates and wet/dry
+validity. Do not promote the candidate on slower-growing partial history.
+All5longjobs directly checked LIVE; current complete8400/local8000 cook passes
+BOTH state/artificial-bank audits:5,382,400finitecells,86,720exactlydry bankcells,
+zero snapshot/driver inventory discrepancy. Outflow100.895688 vs45.306955 still
+UNSETTLED. Next COMPLETE8500/local10000 needs BOTH audits. Full moving history,
+native/playable waves/froth/contact/30FPS, terrain/crew/later rivers/release and
+finalcommit remain OPEN. No new screenshot/appearance or FPS improvement claim.
+Final long-run observations: main0.663617900s/speed33.063211m/s, observer saved
+0.466666691s/speed30.279665m/s, candidate saved0.491666691s/speed7.263400m/s.
+All417/422 frozen dependency hashes unchanged; full9.066667s and BOTHmoves open.
+
+Latest September14: [crest batch scheduling](../reconstruction-review-2026-09-07/normal-river-crest-batch-scheduling.md)
+and [scalar derivative control failures](../reconstruction-review-2026-09-07/normal-river-difference-scalar-controls.md).
+Scheduling builds78752/39484 PASS; native48264 all13tests PASS, including85,110
+exact regrouped expanded vertices. First full audit correctly rejected unlogged
+unchanged frame248; explicit no-op records added,8parser tests PASS. Repeat31155
+TERMINAL exit0, complete131frames/131build groups plus1unchanged call; all5batch
+variants exact over8,803,547 XY positions each. No reliable timing winner:
+keep128 default, no frame-rate or appearance improvement claimed.300frame CSV
+complete; FIVE extra reconstructions make it diagnostic, not an ordinary FPS run.
+Broader physical controls: original94PASS6.59s; candidate91PASS/3FAIL6.51s.
+Failures expose existing material/affine/dry-adjoint assumptions equating scalar
+advection with pressure G=-D.T. Preserve failures; candidate remains unqualified.
+NEXT independently derive the scalar-vs-pressure material/boundary work identities
+and physical consistency; do not merely rewrite assertions to follow new code.
+Second observer speed-doubling snapshot audited: all4fastest cells still have
+negative local kinetic rate; NOT proof of total-energy balance or stability.
+All5long runs directly polled LIVE;417/422 guarded hashes unchanged. Main59896
+0.652288684s/speed29.974111m/s; candidate41566 0.408333351s/speed7.048642m/s.
+Final parser/budget suite22PASS0.66s. Latestcook8377s;
+BOTH complete8300 audits PASS butUNSETTLED. Next COMPLETE8400/local8000
+requires BOTH audits. Full9.066667s/two-move histories, native/playable waves,
+froth/contact/30FPS, terrain, crew, later rivers/release/finalcommit remain OPEN.
+
+Latest September14: [complete frame profiling and history comparison](../reconstruction-review-2026-09-07/normal-river-frame-profile-history-hash.md).
+Desktop target remains30FPS / p9533.333ms, physics120Hz unchanged. Profiler now
+owns shutdown after all300 frames and file flush; normal shared-load44495 has
+complete CSV,8.985494FPS/p95137.2469ms FAIL. This does not replace the earlier
+isolated18.899245FPS/p9570.33ms FAIL. Crest selection remains a major hotspot.
+History hash candidate preserves exact outputs but offers no reliable speed
+gain across BOTH paired runs (about0.102ms then0.045ms mean, order-sensitive,
+worse p95). Original TMap default restored and build66527 PASS265.11s.
+Native64548 all5tests PASS, including both hashes/dense/mapped paths;
+final-game paired99144 PASS10,233,501 exact vertex visits/152calls/151frames.
+Budget/CSV/crest-parser14tests PASS0.91s. Ordinary experimental capture94733
+fully decoded/inspected, still broad smeared foam and sheetlike crests: visual
+FAIL, not a delivered water-realism milestone. Final original-default capture
+30178 TERMINAL exit0;001 and decoded1s viewed, all194encoded frames decoded
+(46source frames/6.482s, NOT game FPS). Same visual failures, no new appearance
+or performance success. No diagnostic comparison enabled in this capture.
+All5longjobs directly polled LIVE,417/422 script hashes unchanged. Main59896
+last0.610619973s/speed36.624925m/s, originalobserver97152 saved0.407489756s,
+separatecandidate41566 saved0.258333344s; full9.066667s/BOTHmoves unproved.
+Cook83142 past8316s; BOTH complete8300/local6000 audits PASS butUNSETTLED.
+Next COMPLETE8400/local8000 requires BOTH audits. No solver promotion, new
+reference-video access,30FPS acceptance, full-scene acceptance or final commit.
+Next pursue measured crest-selection cost and evidence-based wave/froth shape,
+continue full-history diagnosis and preserve the original long runs. Full
+playable terrain/contact/crew/all-river/release scope remains OPEN.
+
+Latest September14: [scalar-advection full-history candidate](../reconstruction-review-2026-09-07/normal-river-difference-scalar-history.md).
+Isolated difference-form ordinary scalar gradient exactly annihilates constants;
+pressure G=-D.T and D/E unchanged.6tests PASS0.520s, including second-order
+manufactured refinement and directional dry support. Full-rate27164 TERMINALexit0:
+original matches retained complete rate byte-for-byte; candidate mass/CFL unchanged,
+both40CG residuals pass, momentum forcing changes (not equivalent optimization).
+Separate41566 LIVE runs fulloriginalstart9.066667s endpoint/BOTHmoves, original
+FV/RK/CFL/residual gates; latest third accepted0.09166667s, no rejections; all422
+candidate script hashes unchanged. No native/gameplay promotion.
+All417 original observer scripts unchanged; original59896/95666/97152/83142
+directly polled LIVE. Next compare candidate fullhistory, preserve originals.
+Cook8258s/BOTH8200 PASS butunsettled; COMPLETE8300/local6000 needsBOTHaudits.
+Video browser/desktop retry stillkernelassetsos3, bothwebfetchescachemiss; no new
+footage. LastcaptureCSV is ZERO BYTES (151frameexit before300finalization), not
+timing evidence. Lastvalid18.899245FPS/p9570.33ms stillFAIL30FPS. Broadfoam and
+sheetlikecrest stillunaccepted; no reshuffling/reinstating rejected grid sharpening.
+Full terrain/hydraulic/rapid/wave/froth/contact/performance/crew/allrivers/release/
+finalcommit scope OPEN. Research prerequisites do not count as playable delivery.
+
+Latest September14: [playable normal clock integration](../reconstruction-review-2026-09-07/normal-river-committed-normals.md).
+Normal current highlights now use the SAME displayed-frame clock as foam lace
+and coverage in the existing normal South Fork parent. One existing input only;
+no new expressions, changed gains, geometry or solver. Preserve registered-detail
+normal wrapper. First installer67237 failed root guard BEFORE writes; corrected
+reachability/root guard, retry26849 TERMINAL exit0. Fresh read-only17553 exit0:
+all6graphs exact,459protected files unchanged. New materialSHAadb56123...c0c3.
+Editor build59707 pass; actualGPU48115 pass56clockqueries/maxerror2.74554e-6.
+Shore-camera gameplay12489 TERMINAL exit0, actual001/002/decoded1s frames viewed:
+normal scene integration visible, but broad blurred foam and sheet-like crest
+still FAIL visual acceptance. Full191encodedframes decoded/46sourceframes6.372s;
+shared load and encoder repeats NOT30FPS. Earlier baseline obstructed and fixed
+focus retry dry/refused, not a matched visual pair. Desktop target30FPS unchanged;
+last valid benchmark18.899245FPS/p9570.33ms FAIL, no isolated new performance claim.
+Observer first doubling trial58 retained: all4fastest cells have NEGATIVE local
+kinetic rate despite rising speed/positive pressure work;3independent bookkeeping
+tests pass. NOT total-energy/stability proof. All417frozen scripts unchanged.
+Original59896/95666/97152/83142 directly polled LIVE, no resets/substitutions.
+Main0.548778026s/speed103.524m/s still unqualified/full9.066667s+2moves open.
+Cook BOTH complete8200/local4000 audits PASS butUNSETTLED; next COMPLETE8300/local6000
+needs BOTH audits. Full playable terrain/waves/froth/contact/30FPS/crew/rivers/
+release/final commit OPEN. Next continue evidence-based playable wave/froth shape
+and full-history stability diagnosis; do not promote diagnostic passes as finished.
+
+Latest September14: [observed original-history growth](../reconstruction-review-2026-09-07/normal-river-observed-history-growth.md).
+Original59896/95666/83142 directly polled LIVE. Main0.534898806672s/speed123.95m/s
+remains unqualified. Added separate observation-only full replay97152, original
+source/9.066667s/two moves/solver/gates unchanged, exact endpoint/shared construction
+and matching-original-step diagnostics checked. First7steps exact through0.125000s;
+initial COMPLETE rate hash equals audited original. Capture speed-doubling trial
+state/rate/pressure and0.1s-bin accepted states WITHOUT shortening steps.3tests pass.
+Original boundary bracket has~5.4m/s speeds, no matching120m/s input spike. Separate
+scalar-derivative audit70931 exit0 exposes refining constant-field defect over
+variable bed;2tests pass. Neither this nor huge initial force/depth proves growth
+cause. NEXT inspect97152 first doubling/accepted-cell pressure vs transport; do
+not invent a floor or promote a different operator on diagnostic checks alone.
+Observer hashes ALL pre-existing scripts; preserve its dependency record too.
+Cook live8146.5s, BOTH8100 pass/unsettled; next COMPLETE8200/local4000 BOTH audits.
+Full native/playable30FPS/terrain/waves/froth/crew/all-river/release scope OPEN.
+
+Latest September14: [native CG fusion/range controls](../reconstruction-review-2026-09-07/normal-river-native-cg-fusion-controls.md).
+Direction286dispatch and reduction205dispatch+120copy experiments each preserve
+all960 actual-source solution/diagnostic bits, independently match audited
+original6GPU/CPU outputs, but BOTH SLOWER. Leave opt-in, no production promotion.
+Baseline captured medians3.8-3.9ms/pole vs fused4.0-4.2ms; still over component
+budget. Builds43760/69934/83463/82829 pass; wrappers71788/64076/39911/26571
+TERMINAL exit0. Explicit zero/identity-range controls also pass60 paired solves
+each and independent expected-bit audits through smallest binary64 subnormal;
+synthetic magic/labels prevent false original-source acceptance.6audit tests pass.
+MAIN59896 and diagnostic95666 LIVE, dependencies preserved. MAIN last accepted
+0.531213540253s/speed109.68494m/s: concerning growth, NOT stability acceptance. Full
+9.066667s/two moves unproved. NEXT diagnose growth from retained original-history
+evidence and pursue native construction/evolution, not more claimed fusion wins.
+Cook83142/PID39184 LIVE past8100; BOTH complete8100/local2000 audits PASS but
+unsettled. Next COMPLETE8200/local4000 BOTH audits. Desktop30FPS/playable visual,
+terrain/contact/outer wave-foam/crew/all-river/release/final-commit scope OPEN.
+
+Latest September14: [shared exact pressure construction](../reconstruction-review-2026-09-07/normal-river-shared-pressure-construction.md).
+Same-geometry W/V reuse keeps original coefficient/preconditioner order and all
+full-rate/source bits. Captured reference~36s→24-26s;234 tests pass5.34s.
+Audits30565/26770/99219 TERMINAL exit0, including7 interleaved full-rate checks.
+Partial-cut cache has no clear extra cost benefit; keep opt-in. No live original
+module/history or native/gameplay promotion. NEXT exact-operation-preserving
+native GPU phase fusion, original40CG/true-residual checks and sustained timing.
+MAIN59896 live,last accepted0.5132596902s/maxspeed53.35m/s; full9.066667s/two
+moves unproved, NOT stability acceptance. Diagnostic95666 separately live.
+Cook74818 TERMINAL exit0 at8000s; BOTH8000 audits PASS but still unsettled.
+Preparation55753/pilot13223 terminal; pilot3audits and raw restart byte hashes
+pass. Exact continuation83142/PID39184 LIVE toward10000s, inputSHAfde85ce4...,
+actual restart audit+all3 raw field hashes pass. Latest observed8002s. Next
+COMPLETE8100/local2000 BOTH audits. See full-river-expanded-checkpoint.md.
+Video retry09:08UTC: runtime kernel-assets os error3 in both browser paths;
+both YouTube fetches cache-miss, no new footage. Desktop30FPS/scene goal OPEN.
+
+Latest September14: [exact pressure-cut endpoints](../reconstruction-review-2026-09-07/normal-river-exact-cut-endpoints.md).
+Separate candidate changes ONLY exactR=0/R=H algebra, preserves one-sided rates.
+Full original/candidate FV rate,CFL,operator/RHS fixture,solutions and all array
+diagnostics BIT-EXACT. Audit41754 reporting comparison failed; repaired harness
+and fresh2877 TERMINAL exit0. Sample35.265→31.281s (~11.3%), NOT native cost.
+164 isolated-context tests pass5.01s. No original module/history modified.
+NEXT isolate same-geometry W/V construction reuse across two poles, preserving
+original length-dependent accumulation order and full-rate/source parity.
+MAIN59896 live,last accepted0.4890696637s; full9.066667s/two moves unproved.
+Diagnostic95666 separately live. Cook41820 live7946s; latest BOTH7900 PASS but
+unsettled; next COMPLETE8000/local40000 BOTH. No scene/30FPS/goal acceptance.
+
+Latest September14: [native CG resident telemetry/CPU profile](../reconstruction-review-2026-09-07/normal-river-native-cg-resident-telemetry.md).
+Build27904/engine1724/wrapper45218 TERMINAL exit0; bothGPU regressions pass.
+All960 resident full solves BIT-EXACT; captured slot-major median3.57ms PER
+POLE vs CSR7.5-7.6ms under sustained high-clock load. Ordinary sparse submissions
+coincide with low clocks. Two poles alone~7.1ms STILL FAIL1.6ms component gate;
+no30FPS/gameplay claim. CPU cProfile84378 terminal: exact geometry/cut/tangent
+construction dominates, notCG. NEXT isolated exact endpoint rational-cut
+optimization/full-rate parity; preserve both live original dependency sets.
+MAIN59896 live,last accepted0.4803328143s/full9.066667s+two moves unproved;
+diagnostic95666 separately live. Cook41820 live7927s; BOTH7900 audits PASS,
+still unsettled. Next COMPLETE8000/local40000 BOTH audits. No promotion.
+
+Latest September14: [native CG repeated timing](../reconstruction-review-2026-09-07/normal-river-native-cg-repeated-timing.md).
+Batched loads preserve all bits but show NO benefit; disabled. Added10-run
+interleaved CSR/slot test: all60 original full solves pass, solution/diagnostic
+bits exact. Four post-warmup captured samples range CSR7.6-55.3ms vs slot3.8-
+21.8ms PER POLE; late slowdown affects both layouts. Do NOT cherry-pick fast
+samples or call production cost/30FPS passed. Builds91287/62730 and engines
+11289/89222 TERMINAL exit0; both native regressions pass. Post-run GPU snapshot
+cannot explain during-run timing. NEXT correlate per-solve GPU clock/power/
+utilization and host submission timing; no model/precision/gate changes.
+MAIN59896 live,last accepted0.4415827887s/full9.066667s+two moves unproved;
+diagnostic95666 separately live. Cook41820 live7846.5s; latest BOTH7800, next
+COMPLETE7900/local38000 BOTH audits. Preserve original dependencies; no promotion.
+
+Latest September14: [native CG profile/exact memory layout](../reconstruction-review-2026-09-07/normal-river-native-cg-memory-layout.md).
+Per-phase GPU timing identifies sparse action/preconditioning as~90% of sampled
+CSR cost. Slot-major storage preserves ALL original coefficient/column bits,
+row order, FP64,40CG and gates; all6 GPU/CPU solutions/diagnostics BIT-EXACT to
+the independently audited CSR run. Sampled captured per-pole time128.062/123.915
+→52.501/52.495ms: meaningful diagnostic improvement, STILL FAR OVER budget.
+Builds17451/41789 and engines66984/37633 all TERMINAL exit0; bothGPU regressions
+pass and bitwise comparisons exit0. NEXT repeated/interleaved cost verification
+and exact-input-preserving sparse-action/dispatch optimization; no promotion.
+BOTH7800/local36000 cook audits pass, still unsettled; cook41820 live7807.5s,
+next COMPLETE7900/local38000 BOTH. MAIN59896 live,last accepted0.4236290969s;
+full9.066667s/two moves unproved; diagnostic95666 separately live. Preserve
+both dependency sets. No native geometry/history/scene or30FPS acceptance.
+
+Latest September14: [complete native reconstructed40-CG](../reconstruction-review-2026-09-07/normal-river-native-reconstructed-cg.md).
+Native CPU/GPU solves on all6 original actual-RHS cases pass40-iteration and
+independent original factored/depth-weighted residual checks. Serial and parallel
+final-reduction variants both pass; captured larger residual6.053e-10. BUT naive
+sparse FP64 native timings~125-133ms PER POLE are far over budget; no promotion.
+Builds19155/98440, engine31362/22864, independent audits55841/11087 all TERMINAL
+exit0.139 combined tests pass8.10s. RHI selects RTX3060 Laptop GPU; automation
+AMD metadata is misleading, previous arithmetic document corrected. NEXT
+per-phase cost diagnosis/exact-input-preserving optimization, not weaker gates.
+MAIN59896 live,last accepted0.3947436975s; full9.066667s/two moves unproved.
+Diagnostic95666 live separately; preserve both dependency sets. Cook41820 live
+7772s, latest BOTH7700 audits; next COMPLETE7800/local36000 BOTH. Production
+geometry/history/wetting/scene integration and full30FPS scope remain open.
+
+Latest September14: [native reconstructed polynomial arithmetic](../reconstruction-review-2026-09-07/normal-river-native-reconstructed-polynomial.md).
+Original actual-RHS fixtures for both poles of fine wave,2D-bed and captured
+South Fork pass independent native CPU and actual D3D12 SM6 GPU action/degree1
+preconditioner checks. Maximum component-scaled action error6.60e-16; polynomial
+differences0. UE build43004 exit0; initial missing-include launch77178 failed,
+fixed retry53934 terminal exit0.131 combined tests pass8.49s. This is NOT a full
+native solve/cost/assembly/history or scene pass; production remains untouched.
+MAIN59896 live,last accepted0.3491247184s,maxspeed23.61m/s,retries retained;
+full9.066667s/two moves unproved. Diagnostic95666 also live. Cook41820 live7714s;
+BOTH7700/local34000 audits pass, still unsettled. Next COMPLETE7800/local36000
+BOTH audits. NEXT full40CG native parity/true residual/cost, isolated pending
+physical/history/wetting qualification. Desktop30FPS and all other work remain.
+
+Latest September14: [parallel pressure-polynomial reference](../reconstruction-review-2026-09-07/normal-river-parallel-pressure-polynomial.md).
+Short triangular approximation passes1D but FAILS2D and is retained/rejected.
+Matrix-bounded SPD damped polynomial keeps original A/RHS/40CG/gates; degrees
+1/2/4/8 pass wave,2D-bed and full captured RHS tests. Captured degree1 solves
+74.77/89.41ms still FAIL native cost; no adapter/native/history promotion.
+129 combined tests pass8.05s. Solitary39791 now TERMINAL exit0, all4 case-state
+hashes verified. SGN error refines~4x; rational discrepancy persists/peak grows,
+so comparison completion is not nonlinear physical acceptance. Captured static
+52119 terminal exit0. MAIN59896 last accepted0.3163384986s/6 rejections, full
+9.066667s/two moves unproved; diagnostic95666 also live. Cook41820 live7666s;
+latest BOTH7600 audits, next COMPLETE7700/local34000 BOTH. NEXT isolated native
+fixed-degree preconditioner/operator/RHS/cost checks without weakening gates.
+
+Latest September14: [symmetric pressure sweep diagnosis](../reconstruction-review-2026-09-07/normal-river-symmetric-pressure-sweep.md).
+Independent40-step CG reproduces the fine-rational failure: convergence, not
+range-normalization bug. New isolated SPD symmetric-sweep preconditioner retains
+original A/RHS/40steps/gates; fine-source residual5.45e-5→9.53e-13. Variable-bed
+2D and ORIGINAL32768-unknown South Fork RHS comparisons also pass. CPU captured
+solves737/743ms FAIL production cost; no adapter/native/history promotion.
+109 combined tests pass7.86s. Current-wave17326 now terminal exit0, all3 full
+periods/four checkpoints pass, hashes unchanged. STANDARD SGN both4s resolutions
+complete, surface discrepancy0.03710→0.009545; rational suite39791 still live.
+MAIN59896 last accepted0.2958333472s,1 rejection then1/240 step; full9.066667s/
+two moves still unproved. Captured A/B54268 terminal exit0. Cook41820 live7633.5s,
+latest BOTH7600 audits; next COMPLETE7700/local34000 BOTH audits. Full scope open.
+
+Latest September14: [nonlinear/current-wave qualification](../reconstruction-review-2026-09-07/normal-river-reconstructed-nonlinear-validation.md).
+Corrected zero-current wave motion27013 TERMINAL exit0; all3 wavelengths/4
+checkpoints pass unchanged phase/amplitude limits, hashes unchanged. This does
+not close current/nonlinear/wetting/native/scene acceptance. Added original
+four-wavelength0.4m/s benchmark17326 and original96m/4s SGN+rational solitary
+0.5/0.25m histories39791, BOTH LIVE; preserve all hashed dependencies.
+Instantaneous SGN profile rates refine~second order; fine0.125m RATIONAL solve
+FAILS original2e-5 gate at5.44643e-5 after40iterations. Explicit failure report
+solitary-residual-v2 exits1; no tolerance/state/model repair.99 combined tests
+pass6.34s, including failure retention. SGN0.5m completed4s, surface discrepancy
+0.0371/peak0.9911, negligible net momentum change;0.25m still live. Current2m
+full-period checks pass;4m live. Neither suite complete. MAIN59896 last accepted
+0.2416666771s, target9.0666671395s/two moves remains. BOTH7600/local32000 cook
+audits pass; outlet105.69127 vs inlet45.30695m3/s remains unsettled. Same cook
+41820 live; next COMPLETE7700/local34000 BOTH audits. No promotion/final commit.
+
+Latest independent check: [reconstructed physical wave validation](../reconstruction-review-2026-09-07/normal-river-reconstructed-wave-validation.md).
+Actual unscaled FV plus research pressure shows spatial refinement toward its
+continuum closure; finest2/4/12m restoring-response errors against linear theory
+0.620%/0.0644%/0.0328%. This is not evolved-wave or wetting acceptance.
+87 combined checks pass3.15s. One-period motion audit81108 completed2/4/12m
+checkpoints within phase/amplitude limits, but its final report FAILED NumPy
+boolean serialization. Partial report and progress retained. Wrapper-only fix
+and serialization regression added; corrected fresh v2 audit27013 is LIVE.
+Zero-mean-current waves do not close the earlier0.4m/s benchmark or wetting.
+Do not edit audit/dependencies during validation. MAIN59896 and diagnostic95666
+both revalidated live; MAIN last observed accepted0.1416666736s, full requested
+9.0666671395s/two moves still outstanding. Cook41820 live7557.5s; latest BOTH
+audited7500s, next COMPLETE7600/local32000 needs BOTH audits. No native promotion.
+
+September14 follow-up: desktop30FPS/physics120Hz confirmed in configuration;
+27 runtime-budget, frame-CSV and release-candidate tests pass in0.95s. Latest
+measured18.899245FPS/p9570.33ms is still a failure. Reference-video retry failed
+in web retrieval (Cache miss) and browser/Node startup (kernel assets path error3,
+also after resets); no new footage viewed. Earlier frame reviews remain valid.
+MAIN59896 reached an accepted0.1250000034769376s at7 steps/0 rejects,
+mass balance3.13527e-13m3, not the requested9.0666671395s endpoint. Diagnostic
+95666 separately reports retained endpoint0.20000001043081284s and remains only
+an old-failure-time prefix. Cook latest observed7538s/local30760; latest BOTH
+audited7500s. All runs retain their original dependencies; no native promotion.
+
+Latest September14 UTC: [analytic conserved-direction wetting force](../reconstruction-review-2026-09-07/normal-river-analytic-wetting.md).
+Implemented explicit research directional_limit force on ORIGINAL zero depths:
+right MC/cut/weight derivatives, finite entering m_t/h_t trace and exact leading
+conservative cancellation, without epsilon initialization or dropped rates.
+Tests distinguish positive-mass block convergence from non-identity massless
+auxiliary block. Original-source force matches smallest probe to1.86517e-14;
+dry pressure force exactly0, larger-pole residual6.1051e-8 at40. Not history proof.
+285 tests pass6.71s;78 existing nonlinear tests23.29s. Scope audit found first
+replay95666 targets ONLY old failure2.3257857778s; retained as diagnostic prefix,
+NOT full requested-history proof. Correct MAIN replay59896 targets original
+9.0666671395s and BOTH moves with unchanged FV/RK/CFL/residual gates; no resets.
+`tmp/south-fork-requested-reconstructed-history-v1-20260914`: first ACCEPTED step
+0.07500000347693761s, dt1/120,0 rejects, mass residual2.007e-13. Full target not
+reached. DO NOT edit hashed implementation dependencies while either runs.
+NEXT poll MAIN59896 and diagnostic95666; inspect retained failure/completed
+history before independent physical/native/cost/playable qualification.
+Cook74818/PID41820 also live7516s; BOTH7500s/local30000 audits pass, still
+unsettled. COMPLETE7600/local32000 needs BOTH audits. Full project scope and
+30FPS requirement remain; no promotion or final commit.
+
+Previous September14 UTC: [pressure boundaries and wetting direction](../reconstruction-review-2026-09-07/normal-river-pressure-boundary-wetting.md).
+Integrated original prescribed velocity/time-rate lift into research nonlinear
+pressure; actual-source affine work error0, through-flow/derivative tests pass.
+New FULL conserved-direction pressure probes retain mass AND momentum: domain
+force changes3.20370e-7 then1.33227e-14. Larger-pole residual6.1051e-8 at40.
+NOT a uniform dry-limit pass: tiny-cell forces are non-monotone and final
+123/94 pressure acceleration[-293.944654,-27.333725]m/s2. Exact audit separates
+stored-state/velocity-rounding errors: y u_t~765758/~1157468 although the exact
+linear dry ray has u_t=0. No residual/state repair; base dry closure still rejects.
+NEXT analytic one-sided original-MC/conserved-direction limit with entering
+m_t/h_t and exact leading cancellations, then original-history validation.
+Final270 combined checks pass6.14s. BOTH7400s/local28000
+cook audits pass; outlet108.821858155 vs inlet45.306954547m3/s still unsettled.
+Same cook74818/PID41820 live7418.5s; next COMPLETE7500/local30000 BOTH audits.
+No native/playable/30FPS acceptance or commit. Full project goal remains open.
+
+Previous September14 UTC: [reconstructed acceleration and dry-row support](../reconstruction-review-2026-09-07/normal-river-reconstructed-acceleration.md).
+Located persistent raw D*u jump ONLY at activating cell123/94 in this source
+direction; wet rows tend to zero change, as does h*D*u. Original CPU mass rates
+remain intact and unsupported dry tangent still exits1. Added range-factored
+W/V acceleration operator, actual diagonal/block preconditioning and nonlinear
+pressure correction for STATIONARY exact-dry sets. Fully wet flat-bed and new
+variable-bed identities pass; no actual wetting-front forcing/boundary lifts yet.
+Full128-square captured matrix manufactured-RHS solves retain larger-pole
+residual~5.55e-7 at40 iterations; smaller pole~3.9e-16. NOT physical RHS/history.
+244 combined tests pass5.28s;78 existing nonlinear checks pass22.30s.
+Reference CPU build~5s/pole, solves49–109ms are
+NOT native cost acceptance. NEXT weighted wet/dry forcing + prescribed lifts,
+then original-start accuracy/stability/cost/native/playable gates. No source,
+hydro, native, timestep, menu or acceptance changes;30FPS still fails. Cook74818/
+PID41820 live at7367.5s; latest BOTH audited7300s. Complete7400/local28000 next.
+All full-project requests remain open; no playable promotion or final commit.
+
+Previous September14 UTC: [geometry-rate and exact-dry diagnostic](../reconstruction-review-2026-09-07/normal-river-shared-bottom-pressure.md#geometry-rates-and-exact-dry-source-probe).
+Desktop target confirmed at30FPS /33.333ms, physics120Hz unchanged; latest
+measured gameplay18.899245FPS /p9570.33ms remains a failure, not a new pass.
+Research A/C/weight/shared-k derivatives and matching D_t/E_t nonlinear forcing
+are implemented for a stationary exact-dry set;238 regression tests passed.
+Actual CPU source mass rates activate TWO dry cells below FP32 storage range;
+native captured rates are zero there. Tangent audit explicitly exits1 and saves
+unsupported_dry_transition, without dropping these rates. Positive-mass limit
+probes retain a0.0846985581 jump in frozen-velocity D, while frozen-pressure
+action tends to zero. No valid dry-transition tangent or evolved candidate yet.
+NEXT resolve the wet/dry kinematic extension and reconstruction switch before
+the range-factored solve, prescribed lifts and original-history qualification.
+Fresh focused rate/30FPS checks pass28 tests in1.06s. BOTH7300s/local26000 cook
+audits pass; outlet108.849672429 vs inlet45.306954547m3/s remains unsettled.
+Same cook remains live; next COMPLETE7400s/local28000 needs BOTH audits.
+No playable promotion, native changes, source repair, FPS acceptance or commit.
+
+Previous September14 UTC: [integrated/shared-bottom pressure geometry](../reconstruction-review-2026-09-07/normal-river-shared-bottom-pressure.md).
+Explicit research integrated-pressure trace fixes constant-P flat-water error;
+shared bottom trace and physical constant-moment quadrature preserve BOTH E(1)
+and E^T(1), net bed force and adjoint/SPD identities. Manufactured maximum force
+error now converges second order,3.81973e-5 at1024 cells versus3.81537e-5 original.
+Captured original wetting bracket retains a roundoff-scale STATIC response:
+frozen pressure action changes[0,0] at owner,1.77636e-15 maximum over domain.
+No candidate pressure solve, trajectory or boundary/playable qualification.
+Closing-cut and bounded-cell-mean shared-flux limits tested through2^-1070;
+one-sided profile boundedness at raw-face pinches is explicitly NOT established.
+220 tests pass in14.33s. NEXT derive actual-FV-rate A/C/weight/shared-k time
+derivatives, matching D_t/E_t forcing, range-factored solve and prescribed lifts;
+diagnose exact-dry MC stencil switch. Full original-start physical/history/cost/
+native/contact/playable gates remain. Only research pressure discretization
+changed; original hydro transport, source terrain/state, timestep and native
+defaults unchanged. Cook74818/PID41820 live past7238.5s; next COMPLETE7300s/
+local26000 requires BOTH audits. Full project scope remains open; no commit.
+
+Previous September14 UTC: [reconstructed pressure geometry](../reconstruction-review-2026-09-07/normal-river-reconstructed-pressure-geometry.md).
+Implemented STATIC original-MC face pressure + blocked/within-cell bed traction,
+with matching signed-adjoint D/E operators. No graph threshold or source change.
+Flat periodic momentum, explicit face/source assembly and small-matrix SPD
+checks pass. On the original wetting bracket, frozen-pressure action changes
+only4.66294e-15 over the domain (owner[1.73472e-18,0]); no candidate pressure
+solve/evolution or boundary qualification. Refinement exposes a pressure-transfer
+defect: constant integrated P on a variable-depth flat bed has first-order
+maximum error at limiter extrema,0.000575222 at1024 cells instead of exact zero.
+Do NOT promote or weaken pointwise gates. NEXT resolve that pressure transfer
+while retaining moment/closing-face/conservation identities, then derive D_t/E_t,
+compatible nonlinear forcing, boundary lifts and range-factored solve.210 tests
+pass in18.44s, including tests that RECORD this known limitation. Full original-
+start history/physical/cost/playable and complete project scope remain open.
+No shipping physics/geometry/menu/timestep changes or new gameplay/FPS acceptance.
+BOTH7200s/local24000 full-river audits pass:5,382,400 finite cells and86,720
+exactly dry bank cells. Outlet111.205419127 vs inlet45.306954547m3/s is still
+unsettled. Same cook74818/PID41820 remains live; next COMPLETE7300s/local26000
+needs BOTH audits. No restart, source promotion or final commit.
+
+Previous September14 UTC: [exact pressure cut columns](../reconstruction-review-2026-09-07/normal-river-pressure-cut-columns.md).
+The preceding30FPS confirmation did not advance water integration. A proposed
+harmonic-cubic edge weighting is now REJECTED: it creates net flat-periodic
+pressure gradient[-2.051003,-0.826602] instead of zero. Its unused implementation
+was removed; reproducible counterexample retained. New exact scalar column
+integration preserves both top and blocked pressure and their analytic rates,
+without floors, pressure clipping, intermediate range loss or source changes.
+The source-hash-checked captured-edge audit finds top integral1.14065e-35 but
+blocked integral jump0.01769915; smoothing/clipping only the final transmitted
+force does not repair the underlying pressure solve. This is a one-sided
+profile diagnostic, NOT a shared flux, new trajectory or playable solver.
+192 pressure/provenance/boundary/30FPS tests pass in16.91s. NEXT derive original
+second-order pressure-profile transfer and oriented face/blocked-traction
+operators, consistent adjoint kinematics and geometry time derivatives; retain
+flat momentum and full original-start accuracy/stability gates. No shipping
+physics, geometry, scenario menu or timestep changed. Cook74818/PID41820 directly
+verified live at7161s/local23220;7200s/local24000 not complete, BOTH audits pending.
+Full project scope remains open; no new playable/FPS/footage acceptance or commit.
+
+Previous September14 UTC: [pressure wetting-face limit](../reconstruction-review-2026-09-07/normal-river-pressure-wetting-limit.md).
+Same-input single-edge counterfactuals establish that the positive-y pressure
+connection at y22/x102 causes the jump. The actual first-stage acceleration
+[-0.21626,-0.69698] becomes[3.85548,12.65575]m/s2 with only that diagnostic edge
+opened; no evolved graph/state changes. Coherent independently recomputed CPU
+probes across the actual transition differ by1.77636e-15 in state and9.94760e-14
+in hydro rate, but retain pressure-force jump[0.14248036,0.46709793]. Exactly one
+graph cell changes while the owning hydrostatic face opens0→7.80541e-19m.
+This proves a finite pressure-connection discontinuity on actual geometry,
+not GPU rounding or a timestep-only issue. Pressure-matrix quadratic forms also
+jump; these are NOT a full rational-model energy audit. Final145-test pressure/
+provenance/30FPS suite passes in12.67s, including source-read-only and diagnostic
+exception-cleanup tests. No shipping physics changes.
+NEXT derive a conservative geometry-based pressure coupling with consistent
+adjoint operators and its kinematic time derivative; no ad-hoc smoothing,
+threshold, pressure deactivation or physics/source reduction is qualified.
+Full original-start physical/accuracy/cost/playable gates and complete project
+scope remain. All local probes/tests terminal. Cook74818/PID41820 remains live;
+BOTH7100s/local22000 audits passed:5,382,400 finite cells,86,720 exactly dry bank
+cells, still settling. Next COMPLETE7200s/local24000 needs BOTH audits.
+No new gameplay/FPS/footage acceptance or commit.
+
+Previous September14 UTC: [unscaled persistent ownership](../reconstruction-review-2026-09-07/normal-river-unscaled-owner.md).
+Immutable unscaled mode now reaches BOTH RK2 stages, bounded advance, consecutive
+intervals, window moves and source-exact recorded replay. Invalid combined model
+flags are rejected. Native82495 passes38 clean tests including all six ordered
+switches among three models and all three move-before-first-step controls.
+Python2237 passes95 physical/provenance/budget checks. Native original-history
+replay11493 FAILS at2.3257857778s after19 completed intervals: repeated second-stage
+CFL rejection reaches the unchanged minimum retry gate. Retained finite-depth
+cell y22/x102 has runaway momentum/speed80.3million m/s. No candidate promotion.
+Explicit retained-failure diagnostic preserves original interval timing and must
+match state/clock/counters/flags exactly. First capture73689 hits unchanged memory
+limit; narrower readback-only capture4495 completes with22 records, all2438 original
+trials and exact failure. At interval19/start, pressure accelerates y22/x102 by
+[262.3,889.6]m/s2 while transport decelerates it. Independent same-input CPU80153
+checks all44 stages with max force discrepancy2.0343e-5 and matching graphs;
+not independent full-history accuracy. Endpoint capture72561 completes20 original
+interval starts/all2438 trials/exact failure; pressure growth is bracketed by
+1.8–1.9333s alongside graph bits1→3 at y22/x102. Successful original binary trace
+35922 completes1080 steps/two moves/final-byte-exact; earlier-transition stage
+capture29229 completes16 retained trials/all2438 original trials/exact failure.
+Interval15/trial8 at1.866666764s opens the positive-y pressure edge between stages;
+y acceleration changes-0.696983→12.780603m/s2. Neighbor mean depth is positive,
+6.44474e-7m. NEXT isolate this pressure/kinematic wetting-face response; do not
+disable the edge or add a depth threshold. Default regression48416
+passes126 clean plus one warning and retains byte-exact original history/capture;
+70 broader history/provenance/30FPS Python checks pass (overlapping earlier33).
+Then qualify a physically stable original-source full history before
+physical/cost/capacity and frame/contact/playable integration.
+Default remains binary; full scope, source fidelity,30FPS and all accuracy gates
+unchanged. BOTH7000s/local20000 cook audits pass; still settling. Next COMPLETE
+7100s/local22000 requires BOTH audits. Video retry again fails web/browser/runtime
+access; no newly viewed footage. All local diagnostics terminal; only the unchanged
+cook remains live, freshly checked past7027s. Full goal remains open; no commit.
+
+Previous September14 UTC: [unscaled original-MC reconstruction](../reconstruction-review-2026-09-07/normal-river-unscaled-reconstruction.md).
+Explicit CPU/native transport candidate removes the extra shoreline slope pass,
+not MC reconstruction, pressure or physics fidelity. On actual first-failure
+inputs the stiff negative mode changes-1283.71→-22.33/s. Independent paired
+interval98791 completes with4.4433e-6 difference,17 default steps/no rejects;
+not full-history accuracy. Native23903 passes18 transport/pressure cases cleanly,
+including eight EXACT rough lakes and both stage crops.43 physical/probe tests
+and58 baseline/provenance/budget tests pass (overlapping suites). Default remains
+binary; step/owner/playable integration not yet changed. Full default native76759
+completes126 clean plus one descriptor-warning pass, zero failures; original
+binary history and retained capture remain byte-exact. All local diagnostics
+terminal. NEXT carry immutable
+unscaled model identity through both RK2 stages and persistent ownership, qualify
+independent full original history/physical behavior/cost, then playable integration.
+No promotion, FPS acceptance, source changes or final commit. Cook74818/PID41820
+verified live past6904s; BOTH6900s/local18000 audits pass, still settling.
+Next complete7000s/local20000 needs both audits. Full scope remains.
+
+Previous September14 UTC: [continuous history failure and startup fix](../reconstruction-review-2026-09-07/normal-river-continuous-history-failure.md).
+Independent CPU25447 is COMPLETE and accuracy FAILS: max0.020847492663,
+132 cells over1e-4, relative momentum errors7.6160e-5/1.1301e-4. Preserve the
+failure; the local shoreline improvement did not qualify full history. Native
+endpoint capture66776 completes all72 starts/1080 trials/two moves with exact
+final replay and one descriptor warning. Independent checkpoint job54556 is
+COMPLETE without resets; first new endpoint failure is interval13 at1.6667s,
+max0.00050908/two cells. Both-stage polynomial capture94954 completes with exact
+final replay/one descriptor warning. Retained independent control reproduces
+the burst; same-input trials stay within8.01e-7. New single-depth probes prove
+non-self-monotonicity at y100/x19: scaled owning-plus derivative-135.02275,
+limiter derivative2880.90871/m. Local hydro matrices at radius1/2 agree on
+a stiff negative mode near-1283.72/s; frozen RK2 gain47.52 at recorded dt.
+These are diagnostic local results, not global stability/full-history acceptance.
+NEXT derive bounded/self-monotone reconstruction preserving fixed geometry,
+exact rough/dry lakes, thin-film gravity and second-order wave accuracy; do not
+add arbitrary epsilon or silently shrink timesteps.14 new probe tests pass;
+combined reconstruction/provenance/lake/30FPS suite1180 passes61 in27.02s.
+All local diagnostics are terminal; only the cook remains live.
+The old1.2667s
+burst is eliminated in the continuous history (max4.56e-6 there). Separately reproduced
+and fixed initial-window-move admission: a zero-trial initializer incorrectly
+set accepted-step1. Both models now pass initial move plus first interval.
+Eight additional rough-bed/island/datum lakes have exactly zero GPU rates/forces.
+Full native74994:126 clean plus one descriptor-warning pass, no failures;
+binary original history and retained capture remain exact.82 focused Python
+tests pass. No playable promotion/30FPS acceptance. Cook74818/PID41820 freshly
+verified live past6840.5s. BOTH6800s audits pass, still unsettled; next COMPLETE6900s/local18000 needs
+both audits. Full scope open.
+
+Previous September14 UTC: [continuous shoreline persistent ownership](../reconstruction-review-2026-09-07/normal-river-continuous-owner.md).
+The fixed model choice now reaches bounded advance and the persistent owner;
+GPU transaction metadata rejects changing models within/between intervals.
+36 native ownership tests pass cleanly, including moving-window ownership and
+both model-switch rejection directions. New original-source replay exposed and
+corrected a harness error submitting the closing move packet twice; the failed
+v1 artifacts and strict owner validation remain. Corrected full-history native
+replay71187 completes72 intervals/two moves/1080 accepted trials at the exact
+original endpoint, all80 source observations unchanged; one descriptor warning.
+Independent same-model CPU25447 remains running. Binary-control/native26684
+completes125 clean plus one descriptor-warning pass, no failures; the full
+binary history is final-state-byte-exact to the original.89 focused Python
+tests pass. Independent continuous accuracy is not accepted yet. Candidate defaults
+remain off; no normal-water or30FPS acceptance. BOTH6600s/local12000 expanded
+cook audits pass, still unsettled; next COMPLETE6700s/local14000 needs both.
+Full original scope and final commit remain open.
+
+Previous September14 UTC: [opt-in continuous shoreline GPU components](../reconstruction-review-2026-09-07/normal-river-shoreline-continuity.md).
+Exact scaled hydrostatic arithmetic passes4317 rational GPU cases. Continuous
+transport passes ten cases including both actual first-failure stage crops;
+both RK2 stages pass foam/state/clock/rejection checks. The initial transport
+test exposed a tiny CPU resting-lake reference residual; rational near-equal
+face refinement fixes the reference without changing gates, and the failed
+artifacts remain. Combined candidate native tests pass3 clean; unchanged-default
+suite passes123 clean and one WITH WARNING (engine connectivity-probe timeout),
+zero failures. Retained default capture is byte-identical to the original.
+Candidate remains opt-in false by default and is NOT integrated with bounded
+advance/persistent ownership or normal playable water. NEXT carry a fixed model
+choice through those owners, qualify the full independent original history,
+physical behavior and warm cost, then playable visuals/contact and30FPS.
+No new gameplay FPS result: last valid18.899245FPS/p9570.33ms still fails.
+Cook74818/PID41820 remains LIVE; BOTH6500s/local10000 audits pass, still
+unsettled. Next COMPLETE6600s/local12000 requires both audits. Full scope open.
+
+Previous September14 UTC: [first divergence and continuous shoreline candidate](../reconstruction-review-2026-09-07/normal-river-shoreline-continuity.md).
+Independent endpoint audit18242 is COMPLETE:72 checkpoints, same FAILED final
+error0.004130154591/1306 cells. The first burst is interval10/trial15/second
+stage: binary shoreline flattening changes on two genuinely different nearby
+states at y90/x42, amplifying a3.329e-7m depth difference into2.2317356 transport
+rate difference. Exact arithmetic confirms this is a discontinuous rule, not
+GPU same-input arithmetic or breaking classification. Candidate continuous
+polynomial limiting reduces the actual nearby-state transport difference to
+9.1059e-5; complete independently evolving paired interval with pressure and
+breaking reduces final difference0.00931967 to7.18223e-6, no state resets within
+the interval,17 default CPU steps each/no rejects. This is sensitivity evidence,
+NOT independent full-history accuracy or gameplay acceptance.105 focused Python
+checks pass, including thin-film gravity, conservation, wet/dry lakes, analytic
+wave accuracy and variable-bed second-order consistency. CPU default remains
+binary; GPU/runtime are unchanged. NEXT qualify/port the continuous polynomial
+with exact factor arithmetic, then actual native/full-history/cost tests before
+normal integration. Cook74818/PID41820 verified LIVE past6469s; next COMPLETE
+6500s/local10000 still needs BOTH audits. Full original scope remains open.
+
+Previous September14 UTC: [moving history and exact-product cost](../reconstruction-review-2026-09-07/normal-river-moving-history-performance.md).
+Fresh actual owner completes72 intervals/two moves with no queue failure, but
+independent full-history accuracy STILL FAILS: max0.004130154591,1306 cells
+over1e-4, relative momentum errors3.2963e-5/4.5878e-5. Preserve the failure.
+Two-limb exact multiplication passes34,875 rational GPU cases and all124 native
+checks; the retained capture is byte-identical. Controlled warmed GPU timing
+for two active steps improves27.485625→18.005750ms (34.49%), still not fast enough
+for the intended120Hz physics/30FPS rendering. No normal playable promotion.
+Fresh screenshot still shows merged foam/rounded crests/basic crew; its CSV is
+truncated and correctly rejected, not a new FPS result. Endpoint capture61113
+finishes with72 starts/two moves and byte-exact final state, but one descriptor
+warning (not clean). Independent CPU checkpoint audit18242 is now running to
+locate error growth;74 focused Python checks pass. Cook74818/PID41820 resumed,
+live past6401.5s; BOTH6400s/local8000 audits pass, still unsettled. Next complete
+6500s/local10000 requires both audits. Full remaining scope intact.
+
+Previous September13: [runtime physical residual and retained interval](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+now pass. The additional sqrt(depth)-weighted true-residual gate is enforced
+at BOTH RK2 stages, alongside the unchanged original2e-5 gate. Native98695
+passes124 checks cleanly, including17 residual cases and the ten-case pressure
+fixture. The actual stalled interval completes in five additional accepted
+trials, retaining432/37 original counters and all state/clock/ledger records;
+final437/42, status1, exact original end7.600000396370888s. Independent CPU
+continuation passes: maxerror1.486208486e-6, component-relative<4.93e-8.
+This qualifies only the retained remainder, NOT the earlier full history,
+capacity, warm cost or normal playable/visual integration.56 focused Python
+checks pass. Desktop target remains30FPS; ordinary18.899245FPS/p9570.33ms
+still fails. Live cook74818/PID41820 is past6329.5s; BOTH6300s/local6000
+audits pass, still unsettled. Next complete6400s/local8000 needs both audits.
+
+Previous September13: [dynamically normalized pressure solve](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+now passes124 native checks cleanly (86921), including all three previously
+failing extreme-depth pressure cases. The same40-iteration CG uses a moving
+power-of-two arithmetic scale; shared edge coefficients preserve information
+before square-rooting depth ratios.16,672 exact scale cases pass. The corrected
+CPU reference is independently checked against dense matrices, not accepted
+merely because it agrees with the GPU. The actual retained step still accepts;
+both pressure/force and added physical-residual audits pass. Unchanged original
+source pressure fixtures also pass separately (92880);125 focused Python checks
+pass in15.24s. Full interval/history,
+capacity, runtime physical-residual enforcement and warm cost remain open;
+no normal-water/visual promotion or30FPS acceptance. Live cook74818/PID41820
+is past6261.5s; next complete6300s/local6000 requires both snapshot audits.
+
+Previous September13: [represented-range pressure correction](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+now accepts the actual retained stalled step, diagnostics[0,0,0,1]. Both actual
+pressure stages pass independent RHS/correction/pressure/force comparisons;
+maximum force error1.7692824e-5, residual below2.158e-7. Native57320 finishes
+123 passes/one FAIL: the new extreme-depth pressure fixtures expose large force
+errors despite small global residuals. Unchanged original pressure fixtures
+pass separately (34877);101 focused Python checks pass. Dense independent
+solves also disprove the extreme fixtures' underconverged iterative CPU oracle:
+force discrepancy up to4.1466. Keep failures; strengthen solver/reference
+conditioning and meaningful error qualification, not tolerances. Full-history,
+capacity, warm cost and normal visual/gameplay integration remain unqualified.
+Cook74818/PID41820 remains live; BOTH6200s/local4000 audits pass, still unsettled.
+All5,382,400 cells finite and86,720 artificial-bank cells exactly dry. No
+runtime600s source promotion; next complete6300s/local6000 needs both audits.
+
+Previous September13: [represented-range breaking classifier](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+now passes both actual retained-state stages against independent classification
+of the captured wet graph: 79 fronts, 1514 truncated runs and maximum fraction
+error3.69548798e-6. Neither stage has invalid fractions. Native20037 exits0 with
+124 clean tests, including37 synthetic classifier cases and six invalid-input
+cases;24 focused Python checks pass. The actual transaction STILL rejects in
+pressure; output/committed time remain unchanged. Pressure/acceleration range
+handling, full-history accuracy/capacity, warm cost and playable integration
+remain open. Desktop target remains30FPS, not a claimed measured pass.
+Cook74818/PID41820 is live, observed6156.5s; next complete6200s/local4000 needs
+both audits. No new source snapshot or scene is promoted.
+
+Previous September13: [represented-range face transport](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+now preserves the actual subnormal mass/momentum flow through both stages;
+same-input hydro error is5.6215792e-5. Native84310 passes124 checks cleanly;
+16,672 exact square-root cases and68 focused Python checks also pass.
+The actual transaction still rejects: breaking classification produces16384
+invalid second-stage fractions after float wetness checks misread the thin
+cell. Breaking/pressure range handling, full-history/capacity, warm cost and
+normal gameplay/visual integration remain open. The cold test/compilation cost
+increased substantially and is not a measured warm frame time or an FPS pass.
+Both6100s full-river audits pass, unsettled; continuation74818/PID41820 remains
+live. Next complete6200s/local4000 requires both audits.
+
+Previous September13: [exact hydrostatic cancellation](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+passes4301 independent rational GPU face cases including both actual stages.
+Integrated native23103 passes123 regressions plus actual capture cleanly;
+67 focused Python checks pass. The captured false positive inflow is removed,
+and the doubled thin-cell outflow is corrected. However, later arithmetic
+still flushes subnormal face transport to zero; pressure rejects the step.
+No gameplay promotion or full-history/performance/visual acceptance.
+Cook74818/PID41820 remains live, observed6052s;6100s needs both audits.
+
+Previous September13: [transport velocity correction](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+passes17,159 exact division cases. Native74585 passes123 regressions plus one
+actual capture cleanly;64 focused Python checks pass. Actual transport now
+recognizes the retained subnormal and reconstructs its velocity correctly,
+but hydrostatic cancellation still produces wrong thin-face inflow and the
+pressure path rejects the transaction. No gameplay promotion or accuracy claim.
+The latest video retry still fails before footage is accessible.
+The full-river6000s exact restart passes independent pilot state/bank/fidelity
+checks. Continuation74818/PID41820 is now live toward8000s; actual frame-zero
+fidelity also passes. Next complete6100s snapshot needs both audits. No settling
+or normal-map acceptance; runtime600s is unchanged. See
+[checkpoint details](../reconstruction-review-2026-09-07/full-river-expanded-checkpoint.md).
+
+Previous September13: [portable thin-state step](../reconstruction-review-2026-09-07/normal-river-thin-state.md)
+preserves the actual Euler subnormal depth and clears the false step validity
+flag. Integer-only Euler/RK2/validity pass4133/8229/8250 exact-reference cases;
+fresh native60293 passes123 tests cleanly;54 focused Python checks pass.
+Actual replay74008 still REJECTS in downstream transport, preserving state and
+committed time. The new solver remains diagnostic-only; normal visuals,
+full-history accuracy, real-time capacity and30FPS acceptance remain open.
+Full-river cook84534 is terminal exit0 at6000s: both state/artificial-bank
+audits pass, settling false. No cook is running; do not reuse old PID32144.
+Earlier entries below preserve the sequence of evidence, not current status.
+
+## Current performance target — user revision, September 12
+
+The user explicitly changed the desktop target from 60 to **30 FPS**.
+Use a 33.333 ms p95 frame budget; the two-frame hitch threshold is 66.667 ms.
+This supersedes 60 FPS requirements in earlier entries and referenced plans.
+Preserve old measurements and reports as history, not current target authority.
+Keep resolution/quality, physics timestep, contact/geometry tolerances, source
+provenance, solver/memory budgets and visual requirements unchanged. Do not cap
+frame rate or reduce simulation frequency just to meet the target. The separate
+future VR comfort profile remains90FPS and is not this desktop target.
+
+CSV audit v2 defaults to30FPS, records the target and budget, and accepts an
+explicit `--target-fps` for historical comparisons. Eight parser/budget tests pass
+(reconfirmed September13 in0.15s); native desktop target is also30FPS.
+The legacy `physics/config/runtime_budgets.json` desktop render target and its
+documentation now also say30Hz; ten focused runtime/CSV budget tests pass.
+
+September13 consistent hydrostatic polynomial correction:
+[actual GPU rounding defect and regression](../reconstruction-review-2026-09-07/normal-river-hydrostatic-polynomials.md).
+Bounded traces reproduce all224 steps of the1.933s live failure bit-exactly.
+Actual GPU slopes expose a spuriously positive blocked bank face caused by
+mixing compensated depth with rounded bed offsets. Consistent compensated
+h/eta/bed reduction lowers the exact failing-stage transport error2.23173945
+to0.0000523329. All102 native tests pass cleanly, including both actual recorded
+stages;60 Python checks pass. Fresh first-move comparison at3.933333538s now
+PASSES: max5.241438e-5, component-relative norms all below8.316190e-7. No
+normal promotion: post-handoff evolution, repeated moves, outer-domain wave/foam
+persistence and real-time capacity remain open. Backlog0.9333s; diagnostic
+capture10.58439FPS/p9588.0686ms still fails30. Normal visuals and full project
+scope remain open; fresh screenshot confirms broad merged froth and rough crew/trees.
+Both direct video fetch and supported computer/browser initialization retries fail.
+Extended two-move attempt84558 exits0/resumes cook, but actual owner queue fills
+at16 observations before second move:48 completed intervals, one move, retained
+state6.333333664s versus latest source8.200000428s. No time discarded. Independent
+post-handoff CPU comparison79125 is now complete and FAILS the local gate:
+max0.002101234931,94 cells over1e-4; relative norms still pass. This is a separate
+accuracy issue from queue capacity, not normal-water qualification.
+
+September13 [post-handoff batching and accuracy](../reconstruction-review-2026-09-07/normal-river-postmove-throughput.md):
+bounded16-slot option preserves exact state/clock/rejection results;122 native
+tests now pass cleanly after separating descriptor-heavy stress cases into
+automation frames. Default/physics step/queue size/accuracy gates unchanged.
+Actual16-slot capture21693 still fills the queue before second move:58 intervals,
+one move, retained state7.581101276s. Diagnostic10.130425FPS/p9581.5572ms still
+fails30. Three post-move exact-stage replays now follow actual transfers and
+reproduce the failing eight-slot state bit-exactly. Same-input operators show
+no large defect in3.9–5.9s and6.0–6.34s. The passing first-handoff run has a
+different observation history, so it cannot establish this run's error onset.
+Independent endpoint-history job97458 completes from the original state.
+All42 focused Python/30FPS budget checks pass. No normal promotion.
+Full-river5600s state and artificial-bank audits both pass; still settling.
+
+September13 [exact-flat front correction](../reconstruction-review-2026-09-07/normal-river-flat-fronts.md):
+history localizes the main error to6.067–6.2s. Isolated interval control reproduces
+it; retained individual steps identify an exactly flat face spuriously splitting
+a monotone front and flipping three cells' breaking classification. CPU/GPU
+now join exact-flat internal faces only between matching connected slope signs;
+no epsilon or physical threshold change.51 Python tests pass; preserved-input
+fraction difference falls1.0 to3.380646e-6. Native41724 passes122 original tests
+cleanly; extra native69889 passes plateau and actual-stage cases cleanly.
+Fresh actual-owner capture25924 exits0/resumes cook but AGAIN fails queue
+capacity before its second move.57 intervals/one move, retained state7.581101280s;
+diagnostic8.733420FPS fails30. Independent CPU20724 completed and FAILS:
+maximum state error0.007430692, relative momentum errors3.460175e-5/8.402016e-5.
+The inspected
+normal screenshot remains visually unaccepted; the solver is diagnostic-only.
+5900s full-river state/artificial-bank audits pass, still settling.
+Normal integration,30FPS and scene quality remain open.
+
+September13 [captured thin-state failure](../reconstruction-review-2026-09-07/normal-river-thin-state.md):
+actual retained-state replay isolates an invalid Euler stage at y79/x88:
+minimum-normal depth becomes zero while momentum remains nonzero. Rejection
+preserves input and unconsumed time. This is a numerical stall, not merely
+queue throughput. Exact rational face checks also identify cancellation in the
+double-precision comparison operator. An adaptive exact-arithmetic correction
+now removes the CPU's spurious inflow while preserving the same reconstruction,
+one-pass flattening and state.181 focused Python tests pass. Additional native
+17673 captures the actual GPU polynomials cleanly; GPU transaction still fails.
+Full corrected independent history replay70729 completes exit0 but still FAILS:
+maximum state error0.007430692651, relative momentum errors3.460175e-5/8.402016e-5.
+No production GPU arithmetic change, depth floor, state repair, or normal promotion. Desktop30FPS remains
+the target; quality, capacity and full scene acceptance remain open.
+
+September13 represented-float foundation: an in-project GPU arithmetic helper
+preserves the actual Euler depth0x007fffff that ordinary arithmetic flushes to
+zero. Native98817 passes4133 exact-rational cases and bit-exact roundtrips with
+zero errors/warnings.44 focused Python/provenance/30FPS checks pass. This helper
+is tested in isolation ONLY; transport/pressure consumers, full RK2, hardware
+capability handling and runtime cost still need qualification before use.
+No production solver/display promotion; full-history accuracy remains failed.
+
+Latest ordinary FullReach capture with committed froth-phase material:
+18.899245FPS/p9570.33ms, still FAIL30. All87 native tests pass cleanly; saved
+normal material now follows its displayed GPU frame's clock, CPU foam clock
+outside the window. Actual paired contact/GPU errors4.765454e-5cm/5.960464e-8
+pass unchanged gates. Refresh/selection99/181 frames versus prior181/181;
+different cadence/trajectory means no isolated whole-frame gain is established.
+Broad white foam, rounded crests, terrain and crew remain visually unaccepted.
+See the committed-froth record. Previous ordinary FullReach capture after rejecting shared-corner sampling and
+restoring the original default:12.965487FPS/p9590.3953ms, still FAIL30.
+All86 tests pass cleanly. Surface52.407546ms, crest20.895641ms (nested); all181
+selected frames refresh, unlike the preceding17.724105FPS capture. Different
+actual cadence/trajectory prevents attribution of that FPS difference to this
+candidate. Backlog grows1.6068 to3.4789s despite724 successful ticks/no failures.
+Foam/terrain/crew remain unaccepted; see the shared-corners rejection record.
+Previous ordinary FullReach capture after the native combination optimization:
+17.724105FPS/p9573.6027ms, still FAIL30. Native gate p9553.357399ms and average
+water step3.487379ms also fail; memory3949.367MB passes8192MB. All85 engine tests
+pass cleanly. Selected-frame simulation backlog decreases1.0956 to0.01623s,
+with677 successful ticks and no failures. Actual refresh/selection cadence differs
+from the previous capture, so the whole FPS difference is not an isolated causal
+gain. Foam/terrain/crew visuals remain unaccepted; see the native-combine record.
+Previous ordinary FullReach capture with retained crest worker storage measures
+12.611023FPS/p9587.8737ms; original shrinking control13.265546/p9581.0985. Both
+fail30FPS; no whole-frame gain established. Identical-input crest selection is
+about20.1%cheaper with exact geometry. Native memory3976.246MB passes8192MB,
+but native frame and4.314730ms water-step measurements fail their budgets.
+See the crest-context record. Previous ordinary FullReach capture after the committed CPU foam-clock fix and
+restoring serial transport is12.764093FPS/p9586.5670ms: still fails30FPS.
+Foam transport1.014924ms; surface52.079404ms and crest22.029361ms remain large
+inclusive costs. No whole-frame gain is established. See the foam-clock record.
+Previous ordinary FullReach capture with direct full-precision crest lookup is
+12.674492FPS/p9586.7254ms: still fails30FPS with growing fixed-step backlog.
+Same-build original-lookup control13.140796FPS/p9584.5586ms does not establish
+a whole-frame gain. Identical actual-input comparison shows~6.94%lower crest
+selection time with exact topology; sampling remains the main cost. See the
+coordinate-hash record. Previous ordinary FullReach capture with retained fixed-step debt and common
+committed water/detail duration is12.496034FPS/p9590.7015ms: fails30FPS and has
+growing simulation backlog. Four fixed water/raft ticks run per render frame;
+native, bridge and adapter clocks agree, but CPU capacity is insufficient.
+See the committed-clock record. The prior20.877573FPS capture dropped water time
+and is preserved, not a same-work benchmark. Previous ordinary FullReach capture
+with independent face observations/native source
+clock is20.877573FPS/p9556.8497ms: still fails30FPS. Actual512face temporal GPU
+sampling and paired surface checks pass, not PDE/visual acceptance. Native river
+time11.383334s versus detail34.050002s exposes the deliberate one-fluid-step-per-
+render-frame bridge policy, which must be resolved before common-clock promotion.
+See the latest temporal-source record. Previous ordinary FullReach capture with
+actual exterior source sampling is
+21.496540FPS/p9554.5967ms: still fails30FPS. Five/six actual overlapping moves
+retain exterior-to-prior-interior bed exactly; no visual acceptance or causal
+performance-change claim. See the latest live-exterior-source record.
+Previous ordinary FullReach capture with world-aligned mean/source sampling is
+22.252858FPS/p9551.2054ms: still fails30FPS. Live overlapping moves retain the
+bed exactly; registration correction is not a causal FPS-gain claim.
+Previous ordinary FullReach capture with the parallel breaking vertex pass is
+21.509721FPS/p9553.5233ms; same-binary serial control20.176301/p9556.6490.
+The active pass measures1.852976ms versus2.852847ms, with all50,625same-input
+vertex outputs bit-exact. Both fail30FPS; trajectory/timing differences prevent
+attributing the full FPS difference to this pass. See the latest parallel-pass record.
+Previous ordinary FullReach capture with unmasked source uploads is23.365478FPS,
+p9547.2488ms (CSV rows60–240,1280x720): still below30FPS. First source-upload
+capture20.661446FPS/p9566.1661ms is retained; differing trajectories/refreshes
+do not establish a causal optimization gain. See the latest live-source record.
+Previous measured CSV capture:21.571211FPS average,
+p9552.6052ms with the exact indexed crest calculation in ordinary play. Same-
+binary full scan measures21.016691FPS/p9556.9051ms; small trajectory/refresh
+differences do not prove sustained improvement. Previous21.348655FPS/p9554.2771ms
+after isolating the strain experiment is preserved. Finite-depth pressure stays
+enabled, experimental strain OFF, actual CSV target metadata30.
+Prior capture19.625346FPS/p9574.679ms is preserved; trajectory/timing differences
+do not prove a causal optimization gain. An earlier capture measured20.043179FPS/
+p9558.8251ms; the history optimization does not establish overall FPS improvement.
+The prior wave-regime capture measured
+19.492874FPS/p9570.4635ms. The older retained-memo capture was20.569411FPS/p9555.4904ms;
+re-scoring that old capture at30 did not establish a pass or a new engine run.
+Native content-lock budget/default environment metadata was rebuilt successfully
+in build96580. The 61-test regression run passed. A fresh short development
+native gate now emits30 FPS budgets and fails (workload p9553.226101ms,
+453 frames; reporting-only v4 rebuild/run:50.014801ms,460 frames,1 hitch over
+66.667ms). It is not packaged release qualification. All remaining scene,
+release and final-commit work stays active.
 
 The user explicitly activated an app goal on September 7 to complete this entire
 queue and keep working until genuinely finished. The goal includes final
@@ -12,6 +1214,887 @@ verified. Resume from the latest checkpoint after interruptions, checking for
 owned running processes before launching work.
 
 ## Active reconstruction sequence
+
+September13 explicit moving control-volume transactions:
+[same-time source pairs, exact transfer and bounded GPU continuation](../reconstruction-review-2026-09-07/normal-river-window-transactions.md).
+Normal overlapping moves now capture the old boundary at the entering source's
+exact native instant. The queued owner finishes that old interval, preserves
+overlap state exactly and records entered/departed inventory separately. Startup
+teleports remain a separate lifecycle; unavailable candidate closing data does
+not disable the existing playable solver. Four- and eight-trial captures first
+hit queue capacity. Bounded same-bracket GPU continuation while status returns
+fixes the first-move stall: actual97329 completes31 intervals/472 trials and one
+move at4.0000002086s, with15 run-ahead graphs. Still1.066667s behind latest source.
+Longer-time parity FAILS before the move: at1.9333334342s,26 cells exceed1e-4,
+max0.004802509481, two relative norms exceed2e-5. Through-move CPU replay23901
+also FAILS: max0.008853043960,140 cells over1e-4, all relative norms over2e-5.
+The actual(-16,+2) source move and14,112-cell overlap validate independently;
+GPU float inventory residual3.746917e-4m3 is recorded without repair.
+Do not promote this candidate or call capacity/physics/visual gates
+passed. Next isolate the longer shoreline divergence and qualify coupled
+outer-domain wave/foam exchange, sustained capacity, then shared surface.
+Native9957 had89 clean plus1 descriptor-cache warning; preserving all stress
+cases in separate automation frames resolves it. Final54830 passes102 clean
+tests, zero warnings/failures. Focused Python ownership/budget tests pass41.
+Both5400/local28000 cook audits pass, still settling; next5500/local30000 BOTH.
+All verification jobs from this turn are terminal; only cook84534 remains live.
+Computer/browser reference access still fails at runtime initialization.
+
+September13 shoreline polynomial correction:
+[actual recorded-stage isolation and live parity](../reconstruction-review-2026-09-07/normal-river-shoreline-polynomial.md).
+Exact baseline replay reproduces all40 GPU trials. Same-input analysis isolates
+FP32 cancellation of a positive1.112e-12m bank face, which incorrectly flattens
+its reconstruction. Compensated MC face arithmetic preserves it without a floor.
+Native25737 passes90 tests including the appended actual bank crop;38 Python
+tests pass. New live capture92434 completes four intervals at the exact endpoint;
+independent CPU max error3.635572e-6 now passes1e-4, relative max2.031874e-7
+passes2e-5. Final-build diagnostic99739 reproduces the corrected live state
+bit-exactly. Same-input transport max error falls0.033111467 to9.914187e-5;
+some stages still differ by one wet-graph cell. No normal solver promotion or
+FPS/visual acceptance follows. Next: longer-time shoreline and moving-window
+qualification, then foam/shared rendered-contact integration. Both video retries fail.
+
+September13 actual-source queued nonlinear owner:
+[retained observation FIFO and live diagnostic](../reconstruction-review-2026-09-07/normal-river-nonlinear-owner.md).
+Own immutable pending brackets and GPU transactions instead of replacing them
+with the latest mean upload. Initial90 native tests pass. Actual normal-map
+diagnostic catches5.588ns remaining-time subtraction drift and refuses endpoint
+completion; independent CPU state agreement does not override that failure.
+Explicit immutable endpoint accounting fixes the clock without snaps/dropped
+time. Native67747 passes90 clean tests;21 Python tests pass. Fresh normal-map
+diagnostic31114 completes four actual intervals/40 accepted trials at exact
+.40000002086162567s. Independent CPU replay completes, but seven shallow-bank
+cells fail the unchanged local1e-4 state gate (max8.712637e-4 at y77,x72).
+Relative norms pass; that does not override the local failure. Trace per-stage
+transport/pressure/classification divergence on identical inputs next. Four
+observations remain queued, so sustained capacity is also unqualified.
+Moving-window exchange, physical/foam qualification and normal shared-surface
+promotion remain unfinished. Latest ordinary18.899245FPS still fails30.
+Same cook84534 passes BOTH5200s/local24000 audits; still settling. Next
+5300s/local26000 BOTH after complete marker, no restart or runtime promotion.
+
+September13 retained consecutive GPU intervals:
+[exact-time handoff](../reconstruction-review-2026-09-07/normal-river-persistent-interval.md).
+Preserve evolved state and cumulative accepted boundary ledger; admit the next
+interval only after exact-time successful completion, without clock snaps,
+readback or resets. Initial89 native tests pass, including two halves of the
+actual observed hybrid interval with five-record exact graph partition and
+unchanged CPU state gates. Final native74276 passes89 clean tests, including
+all20 admission cases; eight30FPS budget tests also pass. Original nonbreaking
+fixture compatibility also passes (93576,one clean test). This remains
+a fixed-grid primitive, not the complete observation/window owner or playable
+PDE promotion. Current30FPS/visual/terrain/crew requirements remain unmet.
+
+September13 same-stage GPU physical breaking and observed-interval coupling:
+[GPU front classifier and nonlinear RK2 coupling](../reconstruction-review-2026-09-07/normal-river-gpu-breaking-front.md).
+Implement existing cardinal-front CPU model on GPU with wet connectivity,
+subcell bands and error rejection; recompute independently for both nonlinear
+RK stages. No normal solver promotion before physical/window qualification.
+Actual legacy snapshot has one negative reconstructed depth(-5.519mm), refused
+without repair; reference initialization uses the intended native total-depth
+source instead. New RK2 test exposed1.979e-9s loss for noncanonical clock words;
+normalize the compensated pair before addition, without changing dt/tolerance.
+Native17596 passes88 clean tests. Complete observed interval now uses both-stage
+GPU classification and its actual time-varying exterior/face observations;
+native78112 passes88 clean tests,2 accepted GPU trials, exact end time, max state
+error9.536743e-7 and exact five-record graph partition. CPU control3steps/0retries,
+balance-5.268e-14m3; GPU float balance-1.342e-6m3 reported without repair.
+30 Python tests pass; final harness build46761 succeeds14.41s. New seventh
+BreakingFrontFixture flag required; version2 temporal fixture explicitly selects
+hybrid mode. Persistent interval/window ownership, long-time physical and foam
+qualification still block normal PDE promotion. Normal material, map/save and
+latest18.899245FPS measurement unchanged.
+Final version1 nonbreaking compatibility test29687 also passes. Same expanded
+cook84534 passes BOTH5100s/local22000 audits; still settling, runtime600s
+unchanged. Next5200/local24000 requires both audits after complete marker.
+
+September13 displayed-frame froth phase integrated in normal play:
+[committed optical clock](../reconstruction-review-2026-09-07/normal-river-committed-froth.md).
+Replace wall-time phase with the displayed GPU frame's captured timestamp;
+outside the moving window use committed CPU foam duration. Preserve data,
+contact, geometry, density and existing4m blend. Build45290 succeeds after a
+pointer-type correction. New long-duration GPU test initially fails; precise
+split-clock intermediates fix it without tolerance change. Build72713 succeeds;
+native91439 passes87 clean tests. Guarded install26489 and fresh read-only1969
+verify saved normal material and459 unchanged protected files. Paired playable
+72471 contact/GPU checks pass; ordinary34532 measures18.899245FPS/p9570.33ms,
+still FAIL30. Both captures resume cook0, map/material/save unchanged. No visual
+acceptance. Cook4800/4900/5000 state and bank audits BOTH pass, still settling;
+verified live5026.5/local20530, next5100/local22000 BOTH after complete marker.
+
+September13 normal-play foam optical isolation:
+[actual source/state snapshots and optical knockouts](../reconstruction-review-2026-09-07/normal-river-foam-optical-isolation.md).
+Three actual GPU snapshots are finite; only515/667/682 of9483/9979/9968 wet
+interior cells exceed50% coverage. CPU source edits would not directly alter
+GPU-owned interior foam. Corrected FullReach optical-off capture88433 confirms
+a broad reflective layer remains without foam optics. Dielectric comparison
+20625 retains foam, but does not establish visual improvement; not promoted.
+Both diagnostic switches are opt-in, production defaults/assets unchanged.
+Builds succeed; native86-test rerun53639 passes cleanly. Continue physical surface/
+foam evolution and shared clocks, not repeated optical threshold/color tuning.
+
+September13 shared current-profile corner candidate REJECTED for normal play:
+[exact geometry but slower measured sampling](../reconstruction-review-2026-09-07/normal-river-shared-corners.md).
+Normal stage capture78478 CLOSED0; adaptive sampling9.476741ms is the largest
+measured crest substage. Share required indexed corner values within one build,
+never across frames; keep every intermediate sample and refinement decision.
+Unreal92790 succeeded;86 native tests passed cleanly. Eight actual-input pairs
+preserve exact geometry, but shared11.968000ms versus original11.018362ms is
+slower. Restore original sampling as default, retain candidate only by explicit
+opt-in and keep regression tests. Rebuild72064 succeeded and restored-default
+suite43554 again passes86 tests cleanly. Ordinary20633 measures12.965487FPS/
+p9590.3953ms with every-frame refresh, fails30. No FPS or visual gain claimed;
+blanket foam/terrain/crew remain unaccepted. Latest expanded cook4700s
+passes BOTH state/bank audits but is still settling; next4800/local16000.
+
+September13 native RK combination/friction optimization:
+[exact-state regressions and measured playable results](../reconstruction-review-2026-09-07/normal-river-native-combine.md).
+Independent cells use the existing bounded row executor with identical arithmetic
+and floating-point environment. Four native suites pass; registered600-step
+replay exports are byte-identical. Four alternating pairs: combination59.66%cheaper,
+total native time2.19%lower on average, one total-step candidate slower. The first
+pair's8.74%total gain is not sustained; no whole-frame claim. Production archive
+rebuilt; Unreal62522 CLOSED0 in1637.33s, all177 actions. Engine/playable verification
+completed:85 clean engine tests; normal capture17.724105FPS/p9573.6027ms still
+FAIL30. Native p9553.357399ms and water3.487379ms fail unchanged budgets; memory
+3949.367MB passes. No full-frame causal speedup claim or visual acceptance.
+Thirty FPS, native1.6ms step budget, visual review and final acceptance remain open.
+
+September13 crest worker-storage lifetime and measured allocation cost:
+[exact current-height epochs, paired timings and memory gate](../reconstruction-review-2026-09-07/normal-river-crest-contexts.md).
+Keep inactive worker tables across coarse/fine levels instead of destroying and
+recreating them every frame. Every build STILL evaluates current heights; no
+profile value reuse, geometry/timestep/quality reduction or changed tolerances.
+Build49769 failed a CSV numeric overload; corrected diagnostic accessor,
+build86220 CLOSED0/156.67s. Native64724 CLOSED0,85clean in21.318068s;28 changing
+profiles/crops retain exact37,187 expanded vertices against independent controls.
+Actual eight alternating same-input pairs all exact and faster:10.042213ms vs
+12.564313ms;243 create/destroy operations per old-path call become zero. Actual
+1,550,232 crest samples max0.594095cm; paired contact/GPU frame117 passes.
+Ordinary12.611023FPS/p9587.8737ms, old control13.265546/p9581.0985: both fail,
+no whole-frame gain. Default181frames create/destroy zero contexts versus old
+42,755/42,771; retained-table peak64.15MB vs37.66MB. Native gate10245 correctly
+CLOSED1 (game0/resume0): process memory3976.246MB passes8192MB, frame83.102898ms
+and solver4.314730ms fail33.333/1.6ms budgets. Not packaged acceptance.
+All4gameplay processes closed and cook resumed. Screenshot remains unaccepted;
+assets/save unchanged. Cook84534/PID32144 live4530.5/local10610;4500/local10000
+BOTH audits pass, still settling. Next4600/local12000 BOTH after complete marker.
+Next focus remaining crest/sample work and native water-step capacity, without
+discarding queued physical time; all realism/scene/release/final-commit work remains.
+
+September13 committed CPU foam clock and measured transport experiment:
+[held-field integration and actual transport cost](../reconstruction-review-2026-09-07/normal-river-foam-clock.md).
+Normal Cartesian foam now follows accepted water duration, with no wall-time
+fallback or half-second clipping. Zero-time refresh holds existing foam exactly;
+spatial remap uses known prior nodes only. Initial native63954 CLOSED1 exposed
+an old wall-time-driven test; fixture now advances12 actual native steps and
+also verifies exact whole-field hold. Native31318 CLOSED0,85clean in20.499918s.
+Actual parallel/serial50,625vertex comparison and transport UV3/UV1 checks pass;
+paired carrier/GPU frame114 passes. Three gameplay wrappers CLOSED0/resume0.
+Parallel foam costs1.549904ms versus0.995331ms serial: NOT promoted; final normal
+path is serial, parallel remains opt-in. Initial13.413732FPS/p9580.7017ms and
+serial control12.902243/p9584.6519 both fail30FPS; differing trajectories do not
+prove a whole-frame gain. Final build12327 CLOSED0/43.40s; native61605 CLOSED0,
+85clean in19.286444s. Final ordinary48738 CLOSED0/resume0:12.764093FPS/p9586.567ms,
+foam1.014924ms,724 successful fixed ticks, debt grows1.2550 to3.3622s. No30FPS pass.
+Foam still precedes end-of-frame detail by one water interval; not synchronous
+frame ownership. Other presentation clocks, crest sampling, real-time capacity,
+convincing froth/terrain/crew and all later scene/release/final-commit work remain.
+The screenshot was viewed and remains unaccepted; protected assets unchanged.
+Cook84534/PID32144 remains live; latest4400/local8000 BOTH audits pass, still
+settling. Last4475.5/local9510; next4500/local10000 BOTH after complete marker.
+
+September13 exact-coordinate crest lookup and actual-input cost split:
+[full-precision keys, eight exact paired comparisons and playable checks](../reconstruction-review-2026-09-07/normal-river-coordinate-hash.md).
+Direct hash default in normal South Fork, original CRC retained as same-build
+control. No coordinate quantization, stale profile values, timestep or geometry
+changes. Native30622/56267 CLOSED0,84clean each; final20.592167s. Build48170
+succeeds151.98s; diagnostic macro error59425 fixed, final36854 succeeds17.47s.
+Five gameplay wrappers all CLOSED0/resume0. Eight same-input pairs all exact and
+faster:12.013162ms direct versus12.908713ms CRC; not whole-frame qualification.
+Ordinary12.674492FPS/p9586.7254ms; original control13.140796/p9584.5586. Both fail.
+Sampling10.771742ms versus assembly1.524397ms in diagnostic changing frames:
+target sampling next, not merely triangle assembly. Actual1,550,592crest samples
+max0.593485cm below unchanged2cm; paired contact/GPU frame125 passes. Screenshot
+viewed: broad glossy folds/blanket foam still unaccepted, protected assets unchanged.
+At that checkpoint CPU foam still used clipped wall time and a zero-delta attack
+fallback; this was subsequently addressed by the committed-foam entry above.
+Cook84534/PID32144 remains same continuation;4400/local8000 BOTH audits pass,
+still settling, runtime600unchanged. Next4500/local10000 BOTH after marker.
+All remaining scene, realism, release and final-commit requirements remain active.
+
+September13 fixed water/raft clock and normal detail duration:
+[retained debt, native clock guards and actual playable capacity failure](../reconstruction-review-2026-09-07/normal-river-committed-clock.md).
+Caller delta clipping and bridge debt discard removed; existing1/60water,
+1/120raft and four-tick frame work limit unchanged. Every accepted tick advances
+water and raft. Normal detail follows committed water duration, not independent
+frame time. Build21090 CLOSED0/157.36s; two existing damping conversion warnings.
+Native24013 CLOSED0,83clean passes21.109785s, including three new clock tests.
+Audit13236/default46208 CLOSED0, both verified cook resumes0. Paired frame110
+contact/GPU and512face temporal interpolation pass, not new PDE evolution.
+Ordinary12.496034FPS/p9590.7015ms, water/bridge/native CSV clocks agree but debt
+grows1.5122to3.9120s over selected181frames. End water/detail29.000001512s versus
+frame elapsed34.094403613s. This is NOT a30FPS or real-time pass. Surface CPU
+53.513756ms, crest update23.345163ms and four native water calls16.837475ms are
+inclusive/nested scopes; do not sum. Optimize capacity without discarding time.
+Screenshot viewed: broad glossy folds/blanket foam still unaccepted. Protected
+map/material/save unchanged; no Troublemaker menu entry added. Cook84534 remains
+live4356.5/local7130; latest4300BOTH passes, next4400/local8000BOTH after marker.
+Persistent source/PDE ownership, breaking/froth, all scenes and final commit remain.
+
+September13 inactive GPU pressure recurrence optimization:
+[status-driven indirect iterations, exact controls and paired timing](../reconstruction-review-2026-09-07/normal-river-inactive-iterations.md).
+Only inactive recurrence dispatches use zero groups; active40iterations, final
+residual, rollback and corrupt-ledger gates remain intact. Actual128x128 interval,
+21transaction cases and32fused/unfused pressure comparisons remain bit-exact.
+Paired timing73222 CLOSED0: terminal mean6.9775ms direct versus2.069875ms culled,
+all8pairs lower; comparable active work unchanged, not30FPS qualification.
+All3profiling wrappers resumed the identity-verified cook with status0.
+Monolithic test descriptor warning retained; same13cases now span normalframes
+754–766 with no lost assertions. Final build63106 succeeds14.33s; native23918
+CLOSED0,80clean passes19.494408s. Normalplay still20.877573FPS; common-clock
+ownership, continued evolution, breaking/froth and scene acceptance remain open.
+Fresh YouTube/browser retries still fail; no footage viewed. Direct clips
+requested asynchronously, without stopping remaining code work. Cook84534/PID32144
+4300/local6000 BOTH audits pass, all5,382,400cells finite and86,720artificial
+facecells dry. Still settling; runtime600s unchanged. Next4400/local8000 BOTH
+audits after complete marker; same continuation toward6000s remains live.
+
+September13 actual captured interval CPU/GPU evolution:
+[complete observed interval, partition-exact evolution and isolated GPU timing](../reconstruction-review-2026-09-07/normal-river-temporal-evolution.md).
+Actual128x128 paired source advances the full16.6666675ms bracket: CPUdouble
+three steps/no rejects, GPUtwo steps/no rejects, maxstate difference9.536743e-7.
+Split/batched state, clock, summary, diagnostics and accepted boundary inventory
+are bit-exact. CPU261tests pass39.08s; final native92246 CLOSED0/80pass18.763475s. Final optional
+timing build23201 succeeds14.44s; isolated timing99688 CLOSED0 with cook resume0.
+All eight two-step GPU samples retained: early32.876/32.867/17.686ms, later~5ms;
+terminal-slot overhead~3ms later. No sustained capacity or30FPS claim. Six native
+fixtures now required, including actual temporal evolution. Normalplay, clock
+throttling, breaking/froth, protected assets and latest20.877573FPS remain unchanged.
+Reduce inactive GPU work/qualify capacity, then persistent common-clock ownership,
+outgoing-wave/long-time stability and actual evolved render/contact realism.
+Cook84534/PID32144 resumed and verified4241/local4820;4300/local6000 BOTH audits
+next after complete marker. Goal and remaining scene/crew/release/commit scope active.
+
+September13 actual face observations/native source clock and temporal GPU sampler:
+[real source bracket, stage-time interpolation, runtime parity and clock policy](../reconstruction-review-2026-09-07/normal-river-temporal-source.md).
+Final build79114 succeeds14.99s; native23859 CLOSED0 with79clean passes18.182985s.
+Fourteen interpolation cases, rejected-stage retry and actual source-uploader
+composition pass. Normal512face audit error5.90097e-8 normalized, exact bed;
+actual endpoint data saved for CPU/GPU evolution replay. Paired frame179 passes
+2021contact/4226GPU queries. Profiles58839/6560 CLOSED0, both cook resumes0.
+Current20.877573FPS/p9556.8497ms fails30; screenshot still has smooth crests and
+blanket-like foam. No new solver/visual/cost promotion. Replay actual temporal
+inputs and resolve native/detail clock throttling with capacity and persistent
+ownership, then outgoing-wave/stability and evolved wet/breaking/froth gates.
+Cook84534/PID32144 verified live4202/local4040;4200BOTH audited and still settling,
+4300/local6000 next after complete marker. Protected map/material/save and full goal unchanged.
+
+September13 bounded GPU boundary transactions and completed-frame ownership:
+[shared commit decision, cumulative water/foam inventory, exact rollback](../reconstruction-review-2026-09-07/normal-river-boundary-advance.md).
+Final build19865 succeeds20.70s; native87706 CLOSED0 with78clean passes18.90897s.
+Thirteen split/batched continuation cases include nonuniform foam movement and
+corrupt/overflowed ledger rollback. Initial accepted-count/unchanged-state failure
+was reproduced and fixed with an explicit shared GPU commit record; precise
+compiler/driver/graph mechanism remains unproven. No diagnostic shader output remains.
+Actual temporal sources, outgoing-wave policy, nonlinear stability and normal-play
+total-state ownership are next, not yet accepted. Latest gameplay21.496540FPS/
+p9554.5967ms still fails30;8desktop-budget tests pass. Same cook84534/PID32144:
+4100/local2000 state AND banks pass, still settling;4200/local4000 is next.
+Runtime600s, protected map/material/save and full scene/crew/release/commit goal unchanged.
+
+September13 boundary-aware CPU evolution and GPU single-trial integration:
+[actual stage data, accepted flux accounting, outgoing-wave experiment](../reconstruction-review-2026-09-07/normal-river-boundary-stages.md).
+248 CPU tests/77 native tests pass. Both GPU stages consume explicit exterior
+state/bed/face traces; rejected trials retain state/time and contribute zero flux.
+Corrected16s pulse comparisons with80m/120m padded controls detect a remaining
+boundary effect, NOT a nonreflecting pass. Next bounded-advance ledger/provider
+propagation, actual GPU temporal sources, outgoing-wave policy and nonlinear
+stability before normal-play total-state promotion. Actual FPS remains21.496540,
+not30; no new visual/reference acceptance. Same cook84534/PID32144 live4048.5s,
+next4100/local2000 needs both audits. Full scene/crew/release/commit goal unchanged.
+
+September13 prescribed face-velocity pressure boundary implemented and GPU-verified:
+[explicit trace, unchanged adjoint, direct exterior-FV composition](../reconstruction-review-2026-09-07/normal-river-prescribed-pressure-boundary.md).
+210 CPU tests and76 native tests pass;34 actual GPU exterior-FV/pressure uniform
+compositions have zero transport rate/pressure force. This is not nonreflecting
+qualification or normal-play promotion. Next explicit CPU rate/temporal boundary
+plumbing, RK source stages, long-run stability, normal total-state owner and motion.
+4000s state/banks both pass but flow remains unsettled. Exact4000-to6000 continuation
+is live (84534/PID32144); no added water and all5,382,400 starting cells bit-exact.
+Runtime stays600s and latest actual gameplay still fails30FPS. Full goal unchanged.
+
+September13 actual exterior source sampling integrated into normal play:
+[fixed-world halo, paired GPU buffers and actual contact/performance](../reconstruction-review-2026-09-07/normal-river-live-exterior-source.md).
+67x67 world-aligned samples supply512 exterior h/M/bed values without clamping
+or overwriting evolving interior state. Native40776 CLOSED76passes15.706357s,
+build58789 succeeds70.48s.11,688manufactured ghost/interior exchanges and65,536
+old/new interior interpolation comparisons exact. Actual audit54470/default52402
+both CLOSED0 with successful cook resume; five/six overlap moves have zero bed
+difference, paired frame184 passes2,021contact/4,226GPU queries. Fresh21.496540FPS/
+p9554.5967ms still fails30; crests/froth not accepted. New evolution owner,
+pressure/temporal boundary closure and evolved wet eligibility still required.
+Both videos remain unviewed after web/browser/native retry failures. Cook96057
+live3974s,3900BOTH audited and stillsettling,4000/local40000 next. Full goal active.
+
+September13 explicit exterior transport implemented and GPU-verified:
+[boundary water/foam flux and current integration limits](../reconstruction-review-2026-09-07/normal-river-exterior-transport.md).
+CPU/GPU total-depth transport now accepts explicit exterior ghost states without
+resetting interior h/M/foam. Four-direction steady flow and stepped resting lake
+are exact on GPU; boundary mass/foam ledgers and22fixtures pass. Build62661
+succeeds28.65s; native22236 CLOSED76passes16.821411s, no automation failures,
+warnings or unrun. Final broadCPU5791 CLOSED184passes33.00s, including flat-bed
+momentum ledger. No normal evolution promotion: open nonhydrostatic pressure,
+actual ghost sources, persistent time/window ownership and evolved wet eligibility
+still required. Latest actual22.252858FPS/p9551.2054ms remains historical and fails
+30FPS; no new scene acceptance. Cook96057 live3940s,3900BOTH audited and still
+settling,4000/local40000 next. Map/material/save preserved; full goal active.
+
+September13 normal mean/source sampling now uses a fixed world lattice:
+[half-cell phase correction, exact overlap and paired actual contact](../reconstruction-review-2026-09-07/normal-river-world-sample-grid.md).
+Build64924 succeeds82.80s; native77931 CLOSED75passes17.603611s, zero automation
+warnings/failures/unrun.485,464manufactured overlap cells bit-exact; historical
+0.5m phase error is a fixture result, not measured South Fork error. Normal
+audit88219 and default85277 both close0; six/five overlapping live moves show
+zero bed change. Paired frame182 has2,021contact/4,226GPU queries with errors
+0.000047678516cm/5.960464478e-8 respectively. No tolerance change or state reset.
+Latest22.252858FPS/p9551.2054ms still fails30; smooth crests/soft froth remain
+unaccepted. New total-depth evolution owner and physical boundaries still open.
+Mistyped editor launch and SDK descendants cleaned up by verified identity;
+no orphan process or evidence deletion. Cook96057 live3881s,3800BOTH audited,
+3900/local38000 next. Map/material/save unchanged; full goal active.
+
+September13 normal Cartesian breaking-vertex CPU pass parallelized:
+[same-input exact live comparison and isolated same-binary performance](../reconstruction-review-2026-09-07/normal-river-parallel-breaking-vertices.md).
+Build30263 succeeds43.03s after fixing a diagnostic log conditional;8CSV tests
+pass. Native66811 CLOSED74clean passes18.327023s. Actual50,625vertex audit matches all output bits; profile's indexed flag
+is false, so no indexed-route execution is inferred. Normal run98331 closes0,
+21.509721FPS/p9553.5233ms still fails30. Smooth crests/soft foam still unaccepted.
+Reference-video retry again fails browser initialization and both web fetches;
+neither clip viewed. New total-depth solver still lacks live state ownership
+and physical boundaries; no water-shape or scene completion claimed.
+Cook96057 live3836.5s after four verified profile suspend/resume pairs;3800BOTH
+audited,3900/local38000 next. Map/material/save unchanged; full goal active.
+
+September13 total-depth foam transport implemented and verified:
+[same water-mass flux, coupled RK stages and exact zero-foam coverage](../reconstruction-review-2026-09-07/normal-river-total-foam-transport.md).
+Final build18100 succeeds13.54s; native82952 CLOSED74clean passes16.422503s;
+CPU53822 CLOSED148passes31.24s. Ten GPU step fixtures compare all four state
+components; repeated interval tests retain rejected foam and conserve accepted
+transport. No clipping, source/decay, CFL change or tolerance relaxation.
+This supersedes earlier held-foam limitations, not normal-play acceptance.
+New total-depth evolution still needs persistent ownership, physical open
+boundaries, conservative mean/window exchange and breaking/foam production.
+No new visual/FPS/reference-video run; latest23.365478FPS/p9547.2488ms fails30.
+Map/material/save unchanged. Cook96057 complete3800/local36000 passes BOTH
+audits, banks dry but still settling;3900/local38000 next. Full goal remains active.
+
+September13 unmasked total-depth source now uploaded in normal South Fork:
+[live sampled h/momentum and paired bed/carrier, actual launch and measured cost](../reconstruction-review-2026-09-07/normal-river-live-total-source.md).
+Uses the same live query/basis, independent of wet flags/1cm cutoff or capture
+options. Immutable source revisions upload once; h/hu/hv interpolation avoids
+the product-of-interpolated-depth/velocity error. This is sampled mean/entering
+data, not a conservative FV remap or permission to overwrite evolving state.
+Build12869 succeeds69.54s; native20205 CLOSED74clean passes15.731615s. Removed
+redundant diagnostic geometry copy in final build52058(success14.86s).
+Final native26647 CLOSED74clean passes16.011993s on that rebuilt code.
+Normal runs39084/73179 CLOSED0; exact cook29104 suspended/resumed(status0 each).
+Final run240uploads and1082positive sub1cm cells, no research/capture opt-in.
+Actual23.365478FPS/p9547.2488ms still fails30; prior20.661446/p9566.1661 retained.
+Both captures inspected: smooth crests/soft broad foam remain visually unaccepted.
+No new solver-owner/physical-boundary/window/breaking/froth evolution yet.
+Map/material/save unchanged. Cook96057 live3757.5s;3700BOTH audited, stillsettling,
+3800/local36000 next after marker. Entire scene/river/crew/release/commit goal active.
+
+September13 accepted GPU surface/clock bridge to shared material/contact frames:
+[completed GPU interval through production mailbox, reupload and material sampler](../reconstruction-review-2026-09-07/normal-river-gpu-frame.md).
+One texture carries same-state displacement/slopes/foam and accepted hi/lo GPU
+clock. Existing readback/mailbox explicitly adopts and validates that clock;
+incomplete/failed/invalid candidates cannot publish. Legacy normal fixed-step
+callers retain their existing behavior.11actualGPU cases cover validity gates;
+each valid frame has286 material/contact queries with exactly zero difference.
+Initial37342 failed on premature RDG final access; owner extraction fixes it.
+Build53347 succeeds14.78s, single30330 clean, full66112 CLOSED73clean passes
+15.883719s. No tolerance relaxed. Map/material/save hashes unchanged.
+New solver is still NOT normal game's state owner: live interval scheduling,
+physical open boundaries, actual bed/mean/window exchange and breaking/froth
+integration remain; no new visual, FPS, cost or long-replay acceptance.
+Cook96057 live3723s/local34460;3700/local34000 BOTH audits pass, banks dry but
+still settling. Next3800/local36000 after complete marker. All scene/terrain/
+river/crew/30FPS/release/final-commit requirements remain active.
+
+September13 bounded GPU interval continuation implemented and verified:
+[cross-graph retry budgets, preserved accepted state and terminal latching](../reconstruction-review-2026-09-07/normal-river-gpu-advance.md).
+1–8 scheduled trial slots per graph; explicit cumulative interval budget survives
+pooled-buffer extraction. Complete/fatal/exhausted intervals retain their last
+effective diagnostics and cannot silently resume. Batched versus split graphs
+produce bit-exact state/progress/summary/diagnostics for8actualGPU cases.
+Initial test-initializer build40913 failed; corrected16419 succeeds13.74s.
+Single81789 CLOSED1clean pass; full48199 CLOSED72clean passes16.850071s.
+Inactive slots still schedule underlying kernels: NOT a cost optimization.
+No game-thread/frame-owner/open-boundary/mean/window/foam/breaking integration
+or normal-game enablement yet; actual motion/30FPS and full reconstruction remain
+unaccepted. CPU unchanged; prior137CPU result not rerun. Map/material/save hashes
+unchanged. Stale rapid-challenge launch note in South Fork plan now historical;
+Troublemaker remains off-menu. Cook96057 live3667.5s/local33350,3500and3600 BOTH
+audited, artificial banks dry but flow still settling.3700/local34000 next.
+Full scene/terrain/river/crew/30FPS/release/final-commit scope remains active.
+
+September13 transactional GPU water trial and true-residual gates verified:
+[same-stage RK, rejection/clock behavior and exact transverse symmetry](../reconstruction-review-2026-09-07/normal-river-gpu-step.md).
+Both native FV/pressure stages recompute; invalid trials preserve input state
+and clock exactly, with compensated accepted time advance. Per-pole residual
+qualification handles subnormal input residuals without a false zero pass.
+Pressure equal-weight identity/precise cancellation fixes false sideways dam
+momentum, now explicitly required to be exactly zero. No tolerance relaxed.
+Build32793 succeeds13.95s; actualD3D12 suite89225 CLOSED71clean passes17.858295s;
+137 selected Python tests pass29.72s. All three explicit fixture flags required.
+This is ONE trial, not the bounded retry/frame owner. Foam remains unchanged;
+physical boundaries, mean/window/bed ownership, GPU breaking/froth and completed
+render/contact publication remain unfinished. No new playable promotion/FPS or
+reference playback. Map/material/save hashes unchanged. Prior trajectory/cost
+reports predate the pressure arithmetic fix. Cook96057 live3434.5s;3400/local28000
+BOTH audited, still settling,3500/local30000 next after complete marker.
+All scene/terrain/river/crew/30FPS/release/final-commit work remains active.
+
+September13 conservative GPU transport connected to pressure and verified:
+[same-stage native FV/pressure evidence and exact resting-water balance](../reconstruction-review-2026-09-07/normal-river-gpu-transport.md).
+MC/hydrostatic Rusanov rates, final wet graph, fixed slope and global CFL are
+now GPU-produced and feed the pressure helper directly in native verification.
+No playable RK/physical-boundary/mean/window/froth/frame-owner integration yet.
+Algebraically factored hydrostatic source preserves the equation while avoiding
+lake cancellation; precise opposing flux products prevent spurious mass flux.
+136 selected Python tests pass; build3920 succeeds13.90s; actualGPU77940 passes
+all9fixtures including exact resting lake and captured128x128 South Fork.
+Full native61640 CLOSED69clean passes15.702791s. New suite requires both explicit
+transport and pressure fixtures. Initial build/parser/lake-test failures retained.
+Captured rate error6.00815e-5, coupled-force error0.000110626, graph/slope exact,
+true residual2.13777e-7; no gates relaxed. This is not physical evolution or FPS.
+CPU driver hash changed only for the algebraic pressure balance; prior20s
+hybrid replay remains historical evidence for its recorded earlier hash.
+Cook96057/PID29104 live3368.5s;3300/local26000 BOTH audited,3400/local28000 next.
+All playable water/terrain/river/crew/30FPS/release/final-commit work remains open.
+
+September13 full-pressure solver optimized and verified:
+[fused global reductions, actual-RHS timing and full replay evidence](../reconstruction-review-2026-09-07/normal-river-fused-pressure.md).
+Whole-grid PCG keeps the same equations/40 iterations/accuracy gates but uses
+four instead of six dispatches per iteration; fused is the helper default.
+Final build65932 succeeds15.59s; native11863 CLOSED68clean passes15.690984s,
+including both independent single-active-pole cases and legacy/fused controls.
+Isolated26042 CLOSED1clean pass; exact cook29104 resumed(status0).
+Later hybrid captured full-pressure block1.333375ms legacy vs1.155500ms fused
+mean,13.34% lower; ALL128 samples retained, including slow initial7–8ms regime.
+Not a whole-water-step budget or gameplay30FPS pass. New GPU transport/RK,
+true-residual stage acceptance, physical mean/window/boundaries, froth and
+single completed render/contact owner are still needed; no playable promotion.
+Hybrid replay23543 CLOSED20s/2903steps/957retries, volume error0, peak17.017388m/s
+still physically unqualified. Cook96057/PID29104 LIVE3330s;3300/local26000
+passed BOTH audits, still settling,3400/local28000 next after marker.
+No new reference playback or ordinary-play FPS; map/material/save unchanged.
+All scene/river/crew/release/final-commit requirements remain active.
+
+September12 full GPU nonlinear pressure forcing/reconstruction implemented:
+[represented-input CPU comparison and actual-device evidence](../reconstruction-review-2026-09-07/normal-river-gpu-pressure-forcing.md).
+Consumes actual same-stage FV rates, total state, geometry, wet graph, slope and
+hybrid fraction. New actualGPU56193 passes7fixtures including captured128x128
+South Fork with/without fronts. Max force error0.000153423, true residual<2.3e-7;
+no tolerance relaxed. Full native32415 CLOSED68clean passes,156 Python tests
+pass. New native pressure filter requires explicit generated fixture argument;
+see linked command. Timing-only build2556 succeeds; isolated26860 CLOSED1pass,
+both exact owned cook/replay resumed(status0). Full pressure8.267–8.389ms per
+captured128x128 evaluation: NOT qualified for the complete solver budget.
+Next isolate actual-RHS operator versus forcing/reconstruction/scheduling cost;
+the earlier1.2ms synthetic operator number is not a like-for-like baseline.
+Hybrid20s replay23543/PID40864 last14.50396s/1946steps/404retries,
+peak15.63780m/s; full physical acceptance remains open. No playable transport,
+RK/mean/window/foam/frame-owner integration or fresh FPS/reference playback yet.
+Entire scene/river/crew/release/final-commit goal remains active.
+
+September12 hybrid breaking candidate implemented in CPU evolution and matching
+GPU operator, opt-in and NOT promoted:
+[pressure-column diagnosis, source basis, coupling and verification](../reconstruction-review-2026-09-07/normal-river-hybrid-breaking.md).
+Pressure at the fast cell remains positive; standard SGN has the same type of
+surge, so neither local suction nor the two rational poles alone explains it.
+New fraction-weighted SPD operator preserves40iterations and conservative
+pressure reconstruction. Front detector uses explicit published criteria with
+documented cardinal-grid adaptation; no depth/velocity caps.154 Python tests
+pass, build50889 succeeds, native85728 CLOSED67clean passes. Full hybrid20s
+replay23543/PID40864(UTC06:36:15.2874881) is live, last4.5s/540steps,
+0retries/peak7.97545m/s. Shortv1 finishes0.51s at peak15.87852m/s but precedes
+connectivity hardening; current v2 session48914 CLOSED confirms15.87852m/s,
+107steps/83retries/volume error0. Preserve both outcomes; no full acceptance.
+Reference videos freshly retried: both UI runtimes still fail kernel startup
+(OSerror3), web both cache miss; NOT viewed. No playable map/material/save/FPS
+change. All physical/visual integration and whole-project acceptance remain open.
+
+September12 distributed GPU pressure operator implemented with unchanged
+whole-grid coupling, 40-iteration maximum and accuracy limits:
+[actual-device comparison and timing](../reconstruction-review-2026-09-07/normal-river-distributed-acceleration.md).
+Build14797 succeeded; isolated96198 passed both solver paths, plus distributed
+512x512 and1x257. All eight new128x128 component intervals1.156–1.197ms;
+original4.239–31.388ms retained, order/warmup effects not discarded. This is
+not gameplay FPS or full solver-budget acceptance. Cook29104 resumed successfully.
+Native regression68419 CLOSED67clean passes17.706604s; peak probe44374 CLOSED,
+first20m/s crossing at depth0.10246m, not negligible thin film. Still unresolved.
+Cook3200/local24000 BOTH audits passed;3300/local26000 next, still settling.
+Fixed-bed replay
+8377 CLOSED completed20s,2888steps/874retries, volume error4.55e-13m3,
+final speed9.14657m/s, peak20.75619m/s still requires physical review.
+No full nonlinear forcing/evolution, physical breaking/foam or playable owner
+integration yet. Entire remaining scene/river/crew/release/commit goal stays open.
+
+September12 exact transient spike traced to a fictitious moving-bed term;
+fixed physical bed slopes implemented in CPU and GPU components:
+[same-step reproduction, correction, GPU evidence and cost](../reconstruction-review-2026-09-07/normal-river-fixed-bed-pressure.md).
+Kinematic v2 session28187 is CLOSED FAILED at4.18997s; state preserved.
+Diagnostic reproduces505.375m/s in one SSP-RK2 step exactly. Depth-weighted bed
+slope time derivative generates7.781e6m/s2 false bottom acceleration; fixed
+geometry reduces its curvature term to0.005636m/s2 and same-step maximum speed
+to7.236m/s without clipping.132 Python tests pass. New fixed-slope20s replay
+8377/PID40392(start23:02:49;UTC06:02:49.9073529) is live, last17.00101s,
+2475steps/781stage-CFL retries, peak20.75619m/s requiring physical review.
+Current wave comparison93691 completed and retains all three Airy checks.
+Build23771 succeeds and native91652 records67 clean passes; GPU fixed-slope
+operator errors below2e-7. Timing-only build12520 and actual GPU tests pass,
+but performance is NOT qualified: isolated intervals4.071–31.431ms for the
+128x128 two-pole solve. All samples retained, no frame-FPS inference. Isolation
+81718 temporarily paused/resumed both exact owned jobs successfully. Next
+distribute the coupled PCG across GPU groups with global reductions, preserving
+40iterations, whole-grid coupling and accuracy; do not independently solve tiles.
+Cook96057/PID29104 remains live,3100 last BOTH audited,3200/local24000 next.
+No gameplay mode/map/material/save change or fresh reference playback/FPS.
+All scene/terrain/rapid/breaking/froth/sharedsurface/30FPS/other-river/crew/release/
+final-commit acceptance remains active.
+
+September12 discrete pressure/transport mismatch identified and corrected in
+the CPU candidate, NOT promoted:
+[kinematic identities, shallow arithmetic and preserved failed replay](../reconstruction-review-2026-09-07/normal-river-discrete-kinematics.md).
+Initial captured-state standard-SGN acceleration mismatch95.8178m/s2 falls to
+1.05065e-6 using actual FV rates, depth-weight time derivatives and discrete
+material identities.127 focused Python tests pass; current-arithmetic Airy
+checks pass and retain finite-depth response. This is not an energy-stability
+or playable-water acceptance claim. Kinematic20s v1 session41231 TERMINATED
+FAILED at4.19241s, extreme velocity at3.545e-19m boundary depth; report/state
+and2s/4s checkpoints preserved. New algebraically equivalent correction solve,
+RHS normalization and factored pressure avoid a reproduced subnormal-inflow
+overflow without clipping or raising40iterations. Corrected v2 live28187/
+PID36084(start22:52:43), latest4.00664s/533steps/82retries/peak505.375m/s;
+current7.279m/s does not erase that transient failure. Saves every0.5s;
+preserve handle and diagnose. Comparisons
+54842 and SGN57534 completed. No new Unreal/FPS/reference access.
+Cook29104:3100/local22000 passes BOTH audits, still settling; runtime600
+unchanged,3200/local24000 next. All terrain/rapid/breaking/froth/sharedsurface,
+30FPS, other-river/crew/release/final-commit work remains active.
+
+September12 GPU nonlinear acceleration solve implemented and actual-device
+verified, NOT integrated into playable evolution:
+[GPU operator evidence and retained longer-bank spike](../reconstruction-review-2026-09-07/normal-river-gpu-acceleration.md).
+Build76621 succeeds; actual D3D12 test70398 matches independent manufactured
+solutions on17x13/128x128 grids, maximum accelerationerror1.25836e-7 and true
+relative residual1.87885e-7 within the unchanged40-iteration budget. Full native
+10924 records67 clean passes, including no standalone Troublemaker. No new FPS,
+reference playback or gameplay mode change. Prior116 Python tests not rerun.
+Corrected weighted20s20297 TERMINATED FAILED at11.48746s: minimum-step
+exhaustion,2471steps/342retries, speed75,001,601m/s at0.28928m depth,
+maxdepth16.92955m. This is not merely a vanishing-depth velocity artifact.
+Report and terminal state preserved; GPU component passes do not fix it.
+Original centered5s2816 also TERMINATED FAILED at2.19023s:10000trial budget,
+speed10,384.1m/s at1.29478e-19m bank depth. Both handles closed, no restarts.
+Cook29104 observed3063s,
+3000/local20000 last BOTH audited,3100/local22000 next; runtime600 unchanged.
+Full nonlinear forcing/transport/boundary/mean exchange, physical breaking/froth,
+shared render/contact integration and all scene/terrain/other-river/crew/release/
+final-commit work remain open.30FPS target unchanged and not yet met.
+
+September12 conserved total-state GPU storage/projection implemented and tested:
+[actual-device storage, failed long replay and corrected arithmetic](../reconstruction-review-2026-09-07/normal-river-total-state-storage.md).
+Build58956 succeeds; native9239 records66 clean passes, including no standalone
+Troublemaker. New GPU stage verifies1326 bit-exact h/hu/hv/foam cells and225
+tiny wet cells across window shifts; derived surface maxerror8.94e-8. It is NOT
+connected to gameplay evolution and does not replace nonlinear pressure or
+breaking. Map/material/save unchanged; no new FPS or reference playback.
+Weighted20s v1 terminates on reciprocal overflow for subnormal positive depth;
+failed report retained. Direct force/depth division avoids that overflow without
+a film floor.116 Python tests pass. Corrected20s v2 live20297/PID30532; original
+centered5s2816/PID14124 still live. Preserve handles, not restarts on timeout.
+Cook29104:3000/local20000 passes BOTH audits, still settling; runtime600s
+unchanged,3100/local22000 next.30FPS and all scene/terrain/breaking/froth,
+other-river/crew/release/final-commit acceptance remain open.
+
+September12 vanishing-depth pressure failure identified and a conservative
+depth-weighted interpolation candidate tested:
+[failure, unchanged-budget correction and live longer checks](../reconstruction-review-2026-09-07/normal-river-depth-weighted-pressure.md).
+Centered nonlinear continuation reaches40.846m/s at a7.05e-13m bank cell near2s.
+Block preconditioning does not fix it and remains OFF. Depth-weighted face
+velocity plus its adjoint pressure gradient removes the captured extreme
+acceleration without clipping depth/momentum/velocity. Fresh2s replay:
+241steps/0retries/volumeerror0, maxspeed7.06312m/s, maxdepth4.66621m. Full5s
+completes600steps/0retries/volumeerror0, finalmaxdepth4.09822m/finalspeed6.87218m/s,
+peak13.29469m/s retained for physical review.114 unique focused tests pass;
+finite-depth small-wave response retained. NOT promoted.
+Weighted SGN L1 convergence0.0396703/0.0100194/0.00245653; finest1285steps/
+1008stage-CFL retries retained, no claim of fully converged pressure solve.
+Live weighted20s session4864/PID25112; weighted5s15029 and SGN7638 completed;
+original centered5s session2816/PID14124 also still live, preserve all handles.
+Cook29104 observed19820/time2991;2900 last BOTH audited,3000/local20000 next.
+No Unreal/build/FPS/reference playback this turn.30FPS still fails; all full
+scene, breaking/froth, terrain, other-river, crew, release and commit work active.
+
+September12 nonlinear pressure reference is implemented and analytically
+checked, NOT promoted to normal play:
+[nonlinear acceleration, bottom reaction and actual-bank status](../reconstruction-review-2026-09-07/normal-river-nonlinear-pressure.md).
+100 focused tests pass. Standard SGN solitary-wave surface L1 error converges
+0.0391772 -> 0.00987178 -> 0.00241946 at 0.5/0.25/0.125m; flat-periodic
+momentum is conserved to roundoff. The rational extension retains finite-depth
+linear response and improves nonlinear shape, but is NOT exact Whitham-GN.
+Same maximum40 PCG iterations; GPU cost/memory equivalence to Chebyshev is
+UNVERIFIED. Difficult actual-bank1s replay takes121steps/0retries/volumeerror0,
+maxdepth4.70529m; pressure residual reaches1.6344e-5. Full5s replay remains live
+session2816/PID14124, started21:38:58; preserve its handle and do not restart.
+No Unreal changes/build/new FPS; current30FPS still fails. Fresh video retry
+fails browser initialization (OS error3) and web fetch; neither video viewed.
+Cook29104 live at least18600/time2930;2900 last BOTH audited,3000/local20000
+next after completion marker. Runtime600s unchanged. All integration, breaking,
+froth, scene/reference, other-river, crew, release and commit work remains active.
+
+September12 total-depth finite-depth coupling is implemented in the research
+solver, but NOT accepted for normal play:
+[linear successes, nonlinear discrepancies and next formulation](../reconstruction-review-2026-09-07/normal-river-total-depth-dispersion.md).
+Same40 pressure iterations, dynamic reconstructed wet graph, no film/height/
+momentum repair or speed cap.87 focused tests pass. The SAME difficult15s bank
+input completes5s/600steps/0retries/volumeerror0, but develops maxdepth7.69462m
+versus3.667m in the nondispersive control. Correcting pressure/transport graph
+agreement does not remove it.2/4/12m small waves retain finite-depth phase and
+98.16–99.18% amplitude. A/H=.3 SGN solitary-wave comparison still has9.6–10.4%
+shape discrepancy and flat-periodic momentum drift0.0103–0.0134m3/s. NEXT is
+consistent nonlinear nonhydrostatic pressure/acceleration and bathymetry, not
+GPU promotion of this approximation. Source/mean/window/foam integration still
+required. No Unreal changes/build/new FPS/reference playback this turn;30FPS
+still fails. Cook29104 live17340/time2867,2800 last both audited,2900/local18000
+next; runtime600s unchanged. Full remaining goal remains active.
+
+September12 higher-order total-depth bank control:
+[rejected trials, exact roundoff failure and corrected control](../reconstruction-review-2026-09-07/normal-river-high-order-bank.md).
+On the SAME paired difficult15s input, high-order MC trials initially develop
+34.9–61.8m/s shore velocities. A superficially stable variant suppresses thin-film
+gravity and is rejected. Datum-independent reconstruction and local partially
+dry treatment expose exact dry-cell momentum with canceled incoming mass at
+2.441667s; the last admissible state is preserved. Algebraically factored Rusanov
+transport fixes that cancellation without water/momentum repair or a speed cap.
+Corrected v9 completes5s/600steps/0retries, nonnegative depth, peak speed8.01637m/s,
+volumeerror0. Analytic200/400-cell wave error ratio0.245782;18 targeted and71
+focused tests pass. Same implementation also completes20s/2401steps/0retries,
+peak speed9.17282m/s and volumeerror9.094947e-13m3. This is NOT gameplay:
+finite-depth/source/mean/window/foam
+coupling still missing. No Unreal changes/build/gameplay/performance/reference
+claims in this turn. Latest measured21.571211FPS/p9552.6052ms still FAIL30.
+2800/local16000 passes BOTH hydraulic audits, outlet90.8091/inlet45.3070m3/s
+still settling; runtime600s unchanged,2900/local18000 next. Full goal active.
+
+September12 paired bed/mean capture and real difficult-bank control:
+[implementation, reproduced failure and model limits](../reconstruction-review-2026-09-07/normal-river-paired-mean.md).
+Snapshotv2 retains actual bed/mean-surface/unmasked-depth/wet-fraction from the
+same sampled upload as flow, with sample time, channel/datum/size checks/hashes.
+No extra geometry readback/allocation in ordinary play. Build35887 succeeds;
+56 focused Python tests and65 native tests pass. Ordinary capture81587 paired
+contact108/GPU passes; both models pass its easier state, NOT used as fix proof.
+Explicit strain trial30277 reproduces4 nonpositive cells by20s (maxeta2.491167m).
+From its SAME valid15s state, frozen hybrid FAILS at1.197983s at the original
+geographic bank(-5441.5,3618.5)m; bed-aware total-depth control completes5s/
+600steps/0retries with nonnegative depth, maxspeed5.99049m/s and measured volume
+error0. Already-invalid20s input is rejected without repair. The control lacks
+dispersion/forcing/foam/moving coupling and is first-order spatially: DO NOT
+substitute it for the requested production model or call the scene complete.
+NEXT high-order total-depth/bed pressure and finite-depth/source/mean/window
+coupling, using these same paired failure states. Strain remains OFF normally;
+Raft ebd29363..., other current binaries unchanged. No fresh FPS or reference
+playback;30FPS and visual acceptance still fail. Cook29104 live15060/time2753,
+2700 last both audited,2800/local16000 next; full remaining scope stays active.
+
+September12 exact crest spatial index integrated into ordinary Cartesian play:
+[implementation, native comparison and actual-game measurements](../reconstruction-review-2026-09-07/normal-river-indexed-crests.md).
+Build77497 succeeds140.27s; native45173 passes65/65 with no warnings/failures/
+unrun.149,679 query points match full-scan height AND foam EXACTLY, including
+global/local caps, seams, reordered sites and fallbacks. Current profile48041
+is21.571211FPS/p9552.6052ms, still FAIL30; no sustained speedup established.
+47 focused Python tests pass, including strict append-only engine CSV support
+verified against the installed writer (no gate relaxation). Actual-game2992
+paired contact114 maxerror4.764629216e-5cm/GPU5.960464478e-8 passes; macro
+1,549,872samples max0.600509882cm<2cm/sourcechange0, transport/bulk errors0.
+All3 raw snapshots have positive total depth.8PNG produced,007 inspected:
+rounded crests/merged froth remain UNACCEPTED. Map/material/save unchanged.
+Raft54517b00..., Water48f9caf9..., mainbdf4bcba..., Detail615b55aa... unchanged.
+2700/local14000 passes BOTH hydraulic audits; all5.3824M cells finite/86,720
+artificial bank cells dry, out93.85733/in45.30695m3/s still settling. Cook29104
+live14370/time2718.5,2800/local16000 next; runtime600s unchanged.
+NEXT physical total-depth/bed/mean and wet-domain coupling before nonlinear
+macro crest/foam integration. The index does not resolve that failure. No new
+reference playback; full remaining rivers/terrain/crew/release scope active.
+
+September12 actual-bank 2-D replay rejects the proposed nonlinear hybrid before
+GPU integration. See the replay section in
+[mean-strain analysis](../reconstruction-review-2026-09-07/normal-river-mean-strain.md).
+Both nonlinear and linear-with-strain controls collapse their admissible step
+below1e-9s at1.196927/1.406881s of a requested5s, at the same shallow-bank cell.
+Last-valid states and failure diagnostics are preserved;45 focused Python tests
+pass, including explicit rejection tests, NOT physical acceptance. A two-cell
+counterexample isolates eta-flux drainage across unequal bed levels even without
+mean strain/dispersion. NEXT is total-depth face/bed balance and consistent
+mean/wet-domain coupling, not a smaller timestep or amplitude cap. No production
+changes or fresh gameplay/performance claims in this replay work. Current normal
+play remains restored with strain OFF;30FPS still fails. Cook29104 local13660/
+time2683s live;2700/local14000 next, runtime600s unchanged.
+
+September12 nonlinear formulation and actual-bank failure narrowed the next step:
+[physical derivation, rejected strain trial and restoration](../reconstruction-review-2026-09-07/normal-river-mean-strain.md).
+The large Gaussian crest/toe/tails are still not time-evolved breaking. A new
+full-hydrostatic relative-momentum reference verifies exact conserved fluxes,
+characteristics and pre-breaking analytic steepening;37 Python tests pass.
+An isolated GPU mean-strain addition passed64 native tests but FAILED actual
+South Fork at20s: maximum raw detail5.591992m,10 nonpositive total-depth cells,
+and visible bank spikes. DO NOT enable it from the affine fixture alone.
+It is now opt-in `bExperimentalMeanStrain=false` / `RaftSimMeanStrainReview`,
+separate shader permutation, implicit Advance/Remap changes rejected. Default
+finite-depth pressure remains enabled. Builds24372/79296 succeed; restored-mode
+native55126 passes64/64 with0warnings/failures/unrun. Ordinary restoration62514
+has0 nonpositive total-depth cells in all3 snapshots and max|eta|<=0.163286m.
+EightPNG produced,007 inspected: bank spike absent, macro/froth still unfinished.
+Contactsequence115 maxerror4.767604378e-5cm;GPU maxRGBA5.960464478e-8 passes;
+macro1,549,944samples max0.600502968cm<=2cm/sourcechange0. Raft8a648037…,
+Detail615b55aa…, shader952243ae….
+Fresh isolated default profile6390:21.348655FPS/p9554.2771ms still FAIL30;
+metadata30, backlog4.390ms,680commits/1hold. Not packaged/visual/traversal acceptance.
+NEXT coupled nonlinear height/momentum/pressure, state-aware CFL/admissibility,
+wet-boundary/mean consistency and actual source-driven macro crest motion/froth;
+replay the preserved failed bank states. No amplitude cap or gate relaxation.
+2600/local12000 passes BOTH hydraulic audits, all5.3824M cells finite and86,720
+artificial banks dry; outlet93.38026/in45.30695 still settling. Cook29104 live,
+next2700/local14000; runtime600s unchanged. Full other rivers/terrain/collision/
+crew/normalization/release/finalcommit remain active; no reference playback.
+
+September12 exact-coordinate crest history integrated:
+[implementation, exact comparison and current gameplay evidence](../reconstruction-review-2026-09-07/normal-river-crest-history.md).
+Build48405 succeeds157.98s. Native4167 passes63/63 with0warnings/failures/unrun;
+new serial comparison covers694,534 vertices/36 frames including duplicate
+last-writer ownership, moving windows and reset, with EXACT corrections/positions.
+Stable-coordinate vertex/history timing falls6.4154 to3.2817ms, but instrumented
+overall FPS worsens and ordinary current run20171 is19.625346FPS/p9574.679ms:
+NO overall performance improvement established, still FAIL30. Density/quality/
+physics/tolerances unchanged. Raft3aad3636…, main4b9065ec…, Detail ef1d7f74….
+Actual-game45220 produces8PNG,000/007 inspected. Pairedsequence100 contact2,021
+points maxerror4.756047474e-5cm; GPU4,226queries maxRGBA5.960464478e-8 passes;
+crest1,550,016samples max0.600685767cm<=2cm, sourcechange0, UV3/UV1errors0.
+Actual profile PNGs inspected; broad smooth crests/soft merged whitewater remain
+UNACCEPTED. Browser reference retry fails kernel-assets os error3; both direct
+video retrievals return cache misses, no reference playback claimed. NEXT is
+actual finite-amplitude/source-coupled crest motion and froth, alongside the
+remaining dominant CPU refresh/selection work and the full terrain/rivers/crew/
+normalization/release/finalcommit scope. Cook29104 live; runtime600s unchanged.
+
+September12 finite-depth wave dynamics now integrated into ordinary South Fork:
+[implementation and actual GPU/gameplay evidence](../reconstruction-review-2026-09-07/normal-river-finite-depth-pressure.md).
+Forty Chebyshev pressure iterations approximate finite-depth dispersion while
+retaining the same conservative height/foam transport, paired contact surface,
+wet boundaries and moving-window registration. Initial32-iteration native run
+failed convergence; tolerance unchanged,40-iteration run62success/0warnings/
+failures/unrun. Actual phase error<1.8% for tested1.5/3m depths and4/8/16m waves.
+31 Python checks pass. Default is scoped to FullReach, other rivers unchanged.
+Build29042 succeeds14.15s; Raft0d0622c6…, Detail ef1d7f74…, main934a8714….
+Final exact-default-build native run65533 passes62/62, with0warnings/failures/
+unrun; report `south-fork-finite-depth-default-regressions-v1-20260912/index.json`.
+Actual capture40PNG,000/039 inspected: macrocrests STILL TOO SMOOTH and froth
+TOO SOFT; no continuous reference playback. Pairedsequence101 contact2,021
+points maxerror4.76785e-5cm; GPU4,226queries maxRGBA2.98023e-8; sharedcrest
+1,550,016samples max0.600681cm<=2cm, sourcechange0, UV3/UV1errors0.
+Ordinary run50264 confirms finite_depth=1 with NO reviewflag and metadata30.
+20.043179FPS/p9558.8251ms STILL FAIL30; backlog1.427ms,644commits/1hold,
+maxqueueage0.4s NOT warmedrenderlatencyacceptance. Map/material/save unchanged.
+NEXT finite-amplitude/source-coupled crest breakup and actual motion, remaining
+CPU costs/30FPS, terrain/collision/fullriver hydraulics, all later rivers/crew/
+normalization/release/finalcommit. Cook29104 live;2500last bothaudited,
+next2600/local12000;runtime600s unchanged. Goal stays active.
+
+September12 fresh current-build measurement and physical wave-model diagnosis:
+[actual GPU state and native30 FPS gate](../reconstruction-review-2026-09-07/normal-river-wave-regime.md).
+Isolated CSV19.492874 FPS, p9570.4635 ms still fails30. Actual screenshot remains
+too smooth/merged whitewater. Native gate now verified to emit30 FPS budgets;
+v1 report fails despite host exit0, so the launcher now requires the report's
+Boolean result. Three current GPU snapshots show median depth1.41–1.49 m and
+detail RMS5.32–6.10 mm. At those depths the current continuum wave model is
+51–55% faster than finite-depth Airy theory for a4 m probe, NOT a measured
+runtime phase speed. Four new diagnostic tests pass; no dispersive correction
+or new physical breaking behavior has yet been implemented. Next is GPU
+phase validation and finite-depth wave dynamics on the shared contact surface,
+then physical crest breakup, while retaining all broader goal requirements.
+The rejected filtered-froth material remains restored; no visual acceptance.
+Native report v4 replaces the stale33ms hitch key with `hitches_over_budget`;
+the release reader covers v3/v4 without accepting diagnostic passes. All17
+release-report tests pass, build71801 succeeds15.21s, nativev4 fails correctly.
+Main DLL934a8714…; map/material/save unchanged. CSV target metadata override
+is now30 without a frame cap; a subsequent CSV still needs to verify the label.
+CookPID29104 remains live,2500/local10000 passes BOTH state/bank audits;
+STILL SETTLING, runtime600s unchanged. Next2600/local12000 needsboth.
+
+September12 current-profile crest selection lookup reuse integrated:
+[implementation, comparisons and actual-game evidence](../reconstruction-review-2026-09-07/normal-river-crest-memo-epochs.md).
+Parallel coordinate slots persist, but each call advances an epoch and MUST
+evaluate current profile heights. Bounded4096 entries per batch; no stale
+heights, tolerance/density/cadence changes or approximate coordinate welding.
+Build25823 succeeds228.09s; native10515 has61 successes and no warnings/failures/
+unrun. New fixture37,187 vertices/28 changing profiles and crops exactly match
+fresh serial selection. Same-binary isolated fresh/retained runs both exit0:
+17.732330 versus20.569411FPS, retained p9555.4904ms STILL FAILS60. Different
+trajectory, refresh counts and GPU times prevent sole-cause attribution.
+Actualgame38330 exits0:8uniquePNG,000/007 inspected, centralwaveTOOSMOOTH and
+frothTOOSOFT remain UNACCEPTED. No continuous recording/reference playback.
+PairedGPU/contactsequence104:956/2,021points nonzero detail; maximum support
+error.000047675115cm. GPU4,226queries RGBAerror5.960464478e-8. Sharedcrest
+1,550,016samples max.600654193cm<=2cm, sourcechange0, UV3/UV1errors0.
+Raft042a5dcd…, Waterf992dec3…, Detailbf51784a…, main37fc63e3…; map/material/save
+unchanged. Ordinary detail PDElag1.336ms; maxqueueage.4s is NOT warmedlatency
+acceptance. Cook96057/PID29104 confirmedlive2421/local8420;2400passes BOTH
+independent state/bank checks, STILL SETTLING; next2500/local10000 needsboth.
+Runtime600s unchanged. NEXT physical/source-driven crest/entrainment and froth
+structure, larger remaining selection/vertex/publish/GPU costs and latency,
+guided terrain/collision, fullriver hydraulics, all later-rivers/crew/normalization/
+release/finalcommit. SouthFork is the scenario; Troublemaker ONLY a rapid.
+Goal active; this is not full scene completion.
+
+The entries below are retained chronological evidence, not current-state overrides.
+
+September12 visible froth optical loss corrected, appearance still intermediate:
+[retained rejected blanket and advected-clump results](../reconstruction-review-2026-09-07/normal-river-coverage-froth.md).
+Old secondarylace gate suppressed12% simulatedcoverage to1.458% in source-
+texture calculation. First affine correction preservedmean but actualcapture
+became a WHITE BLANKET: explicitly rejected, preserved inbackup/reports.
+Replacement thresholds smooth random corner occupancies BEFORE convex
+interpolation, then uses two scales and existing UV3phasebacktrace; subpixel
+clumps resolve to expectedcoverage. No source density/height/terrain edits.
+Finalbuild22.37s;60native/GPU tests pass,16,576GPUqueries and16,384pointclump
+samplemean.119268729 for.12target, CPU/GPUerror.000102475. These are optical
+checks, not fluidmass or visualacceptance. Guardedinstall80488/fresh93349
+exit0; fourconsumers/othernodes/459protectedfiles retained. Currentmaterial
+26aa5029…, WaterDetailf9ac11cd…; Raftc8a9d9b3…,Water73b9b542…,mainb2b68080…
+unchanged. Sourceimage unchanged; backups preserve both previousmaterials.
+Actualgame63663 exits0,40uniquePNG/12.303s.000/039inspected: separatedfoam
+patches/darkgaps nowvisible, but clumpsTOOSOFT and underlyingwaveTOOSMOOTH.
+STILL NOT convincing-froth/breaking acceptance. SameGPU/supportsequence101,
+956of2,021points nonzerodetail,maxsupporterror.000047591cm; GPU4226queries
+RGBAerror5.960464478e-8. Crest1,550,016samples max.600680cm<=2cm,sourcechange0,
+UV3/UV1errors0. Movie182859 not continuouslyviewed. Isolated17.078327FPS,
+p9584.6274ms REGRESSES from20.206351FPS and FAILS60; GPUandcrestCPUcostboth
+rise, so no solecauseattribution. OrdinaryPDElag4.988ms; maxqueueage.4s still
+not warmedlatencyacceptance. Computer-use skill/browser both failinitialization
+oserror3 before referencevideoopens; no newrealreferenceviewingclaimed.
+Cook96057/PID29104 resumed/live2375.5/local7510;2300passesBOTHstate/banks,
+stillsettling/runtime600sunchanged; next2400/local8000needsbothaudits.
+NEXT physical/source-driven crest and entrainment dynamics (currentmacrostatic
+Gaussianenvelopes/detailhead.06m are not measuredwaveforms), softclumpstructure,
+largercrest/publish/GPUcost and presentationlatency, guidedterrain/collision,
+fullriverhydraulics,alllater-river/crew/normalization/release/finalcommit.
+SouthFork remains the scenario; Troublemaker onlya rapid. Goalactive.
+
+The entries below are retained chronological evidence, not current-state overrides.
 
 September12 paired GPU detail and raft contact integrated:
 [completed-frame ownership and actual GPU/support parity](../reconstruction-review-2026-09-07/normal-river-paired-detail.md).

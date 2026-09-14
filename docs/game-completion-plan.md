@@ -6,6 +6,11 @@ platform, solver-honesty, and scope decisions.
 
 ## Completion goal
 
+Desktop performance target revised by the user on September12,2026 to30FPS
+(33.333ms p95; two-frame hitch limit66.667ms). Historical60FPS measurements
+below remain unchanged. Quality, physics and geographic acceptance are not
+relaxed; see[remaining work](plans/remaining-work.md) for current execution scope.
+
 Ship RaftSim as a complete, free, open-source whitewater guide game: one continuous,
 deep South Fork American campaign from Chili Bar to Salmon Falls, all 20 named rapids
 at three flow bands, first-person guiding and AI crew commands, rescue and progression,

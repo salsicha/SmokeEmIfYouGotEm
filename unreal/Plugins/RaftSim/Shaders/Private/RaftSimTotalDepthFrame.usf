@@ -1,0 +1,47 @@
+#include "/Engine/Public/Platform.ush"
+int2 GridSize;
+float2 OriginMeters;
+float CellMeters;
+StructuredBuffer<float4> State;
+StructuredBuffer<float4> Surface;
+StructuredBuffer<float4> Progress;
+#if RAFTSIM_FRAME_BOUNDARY
+StructuredBuffer<float4> BoundaryVolume;
+#endif
+StructuredBuffer<uint> Summary;
+StructuredBuffer<uint> TrialDiagnostics;
+StructuredBuffer<uint> ProjectionDiagnostics;
+RWStructuredBuffer<uint> Diagnostics;
+RWTexture2D<float4> Output;
+[numthreads(8,8,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    int2 p=int2(id.xy);uint i=p.y*GridSize.x+p.x;
+#if RAFTSIM_FRAME_PHASE == 0
+    if(any(p>=GridSize))return;
+    float4 s=State[i];
+    if(any(!isfinite(s)) || s.x<0 || s.w<0 || (s.x==0 && any(s.yz!=0)) ||
+        (s.x>0 && any(!isfinite(s.yz/s.x))))InterlockedAdd(Diagnostics[0],1);
+    if(any(!isfinite(Surface[i])))InterlockedAdd(Diagnostics[2],1);
+#if RAFTSIM_FRAME_BOUNDARY
+    for(uint j=i;j<2*(GridSize.x+GridSize.y);j+=GridSize.x*GridSize.y)
+        if(any(!isfinite(BoundaryVolume[j])))InterlockedAdd(Diagnostics[0],1);
+#endif
+#elif RAFTSIM_FRAME_PHASE == 1
+    if(any(p!=0))return;
+    Diagnostics[1]=ProjectionDiagnostics[1];
+    // No progress from a rejected/pending interval can become a completed frame.
+    float4 clock=Progress[0];uint bits=0;
+    if(Summary[2]!=1 || Summary[1]>Summary[0] || clock.z!=0)bits|=1u;
+    if(any(!isfinite(clock)))bits|=2u;
+    if((TrialDiagnostics[0]|TrialDiagnostics[1]|TrialDiagnostics[2])!=0)bits|=4u;
+    if(Summary[3]!=RAFTSIM_FRAME_BOUNDARY)bits|=8u;
+    Diagnostics[3]=bits;
+#else
+    if(p.x>=GridSize.x || p.y>GridSize.y)return;
+    bool valid=(Diagnostics[0]|Diagnostics[1]|Diagnostics[2]|Diagnostics[3])==0;
+    if(p.y==GridSize.y)
+        Output[p]=!valid?float4(0,0,0,0):p.x==1?float4(Progress[0].xyz,2):float4(OriginMeters,CellMeters,1);
+    else Output[p]=valid?Surface[i]:float4(0,0,0,0);
+#endif
+}

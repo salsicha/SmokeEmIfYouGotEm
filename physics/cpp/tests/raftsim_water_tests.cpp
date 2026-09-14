@@ -385,7 +385,9 @@ void assert_large_parallel_rows_match_serial(const raftsim::Scenario& original) 
         scenario.initial.u(row,col)=.4*std::sin(col*.05);
         scenario.initial.v(row,col)=.3*std::cos(row*.13);
     }
-    for (const char* scheme : {"hll","roe","rusanov"}) for (double bed_scale : {0.,1.}) {
+    for (const char* scheme : {"hll","roe","rusanov"}) for (double bed_scale : {0.,1.})
+    for (double roughness : {0., .035, .6}) {
+        scenario.roughness = roughness;
         auto config=finite_volume_second_order_config();
         config.flux_scheme=scheme;
         config.bed_slope_source_scale=bed_scale;
@@ -397,7 +399,9 @@ void assert_large_parallel_rows_match_serial(const raftsim::Scenario& original) 
                 parallel.replace_state(replacement,parallel.time());
                 serial.replace_state(replacement,serial.time());
             }
-            const double dt=.003+.0001*step;
+            // Exercise both single-stage and CFL-subdivided calls, including
+            // undamped and strongly damped water, without changing the scheme.
+            const double dt=step==11 ? .081 : .003+.0001*step;
             parallel.step(dt);
             // A nested dispatch executes serially; the identical numerical
             // implementation is exercised without adding a public solver knob.

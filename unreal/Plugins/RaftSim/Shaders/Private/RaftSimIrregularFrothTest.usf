@@ -1,0 +1,19 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimIrregularFrothCells.ush"
+StructuredBuffer<float4> Queries;
+StructuredBuffer<float4> Contexts;
+RWStructuredBuffer<float4> Results;
+uint QueryCount;
+[numthreads(64,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    if(id.x>=QueryCount)return;
+    float4 q=Queries[id.x],c=Contexts[id.x];RaftSimFrothCells cells;
+    float p=saturate(1-exp(-max(q.x,0)*max(q.y,0)));
+    Results[id.x*2]=float4(cells.Sample(q.x,q.y,q.zw,c.xy,c.z,c.w),
+        p<=0 ? 0 : p>=1 ? 1 : cells.Grid(q.zw,p,c.w),
+        cells.Sample(q.x,q.y,q.zw,c.xy,c.z+0.00001,c.w),
+        cells.Sample(q.x+0.1,q.y,q.zw,c.xy,c.z,c.w));
+    precise float2 phaseA=q.zw-c.xy*frac(c.z);
+    Results[id.x*2+1]=cells.Coordinates(phaseA);
+}

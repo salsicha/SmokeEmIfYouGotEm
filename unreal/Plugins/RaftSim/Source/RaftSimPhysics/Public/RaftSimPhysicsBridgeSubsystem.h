@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimContactMaterials.h"
+#include "RaftSimFixedStepClock.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 
@@ -58,6 +59,15 @@ struct FRaftSimPhysicsTickOutput
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
     float SimTimeSeconds = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    double SimulationBacklogSeconds = 0.0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    int32 FixedTicksThisFrame = 0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
+    bool bFixedTickFailed = false;
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Physics")
     FRaftSimRaftKinematicState RaftState;
@@ -132,9 +142,9 @@ private:
     float ChronoSubstepSeconds = 1.0f / 120.0f;
     FRaftSimWaterRaftCouplingPolicy CouplingPolicy;
     FRaftSimRaftAuthorityIntegrationPolicy AuthorityIntegrationPolicy;
-    float AccumulatedSeconds = 0.0f;
+    FRaftSimFixedStepClock FixedClock;
     int32 PhysicsFrame = 0;
 
-    bool RunOneFixedWaterTick(bool bAdvanceWaterSolver);
+    bool RunOneFixedWaterTick();
     void RefreshContactRuntimeSummary();
 };

@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimSurfaceRefinement.h"
+#include "RaftSimCrestHistory.h"
+#include "RaftSimCrestMidpointExpansion.h"
 
 struct FRaftSimShorelineCrestInput
 {
@@ -42,6 +44,10 @@ private:
     float CachedDetailSpanCm=0;
     TArray<uint8> BoundaryMidpoints;
     TArray<float> TargetCorrectionsCm,RenderedCorrectionsCm,ExpandedCoarseCrestCm,ExpandedShore;
-    TMap<FVector2D,float> CorrectionHistory;
+    FRaftSimCrestHistory CorrectionHistory;
+    // Allocated only by the explicit actual-input hash comparison audit.
+    FRaftSimFastCrestHistory CandidateCorrectionHistory;
+    // Exact topology-only dependency schedule; no cached evolving attributes.
+    FRaftSimCrestMidpointExpansion MidpointExpansion;
     uint64 BuildCount=0;
 };

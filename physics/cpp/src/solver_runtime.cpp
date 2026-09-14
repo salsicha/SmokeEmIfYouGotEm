@@ -718,7 +718,12 @@ void ReducedShallowWaterSolver::finish_finite_volume_second_order_step(double dt
     }
     WaterState& next = muscl_next_;
     RAFTSIM_PROFILE_SCOPE(combine_profile, CombineFriction);
-    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
+    // The RK combination and Manning damping have no neighbour reads or
+    // reductions. Use the existing bounded executor (including its caller FP
+    // environment) while preserving every cell's arithmetic and dry-film path.
+    solver_row_ranges(scenario_.grid.ny, scenario_.grid.nx * scenario_.grid.ny >= 16384,
+        [&](std::size_t first_row, std::size_t end_row) {
+    for (std::size_t row = first_row; row < end_row; ++row) {
         for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
             double h_start = std::max(0.0, state_.h(row, col));
             double h_end = std::max(0.0, corrector.h(row, col));
@@ -742,6 +747,7 @@ void ReducedShallowWaterSolver::finish_finite_volume_second_order_step(double dt
             next.v(row, col) = clamp(v_next * damping, -config_.max_velocity, config_.max_velocity);
         }
     }
+    });
     RAFTSIM_PROFILE_FINISH(combine_profile);
     if (config_.feature_strength_scale > 0.0) {
         apply_feature_forcing(dt, next);

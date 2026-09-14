@@ -1,0 +1,62 @@
+// Presentation-only clumps driven by transported coverage. Threshold random
+// corner occupancies BEFORE interpolation: every convex blend has expected
+// coverage p. Thresholding an interpolated noise field does not have that property.
+// No density source, geometry displacement or independent animation clock.
+struct RaftSimFrothCells
+{
+    float Random(int2 cell)
+    {
+        uint h=uint(cell.x)*1597334677u^uint(cell.y)*3812015801u;
+        h^=h>>16;h*=2246822519u;h^=h>>13;
+        return (float(h&65535u)+0.5)/65536.0;
+    }
+    float Occupancy(int2 cell,float p)
+    {
+        float band=min(0.025,min(p,1-p));
+        return 1-smoothstep(p-band,p+band,Random(cell));
+    }
+    float TransitionIntegral(float t)
+    {
+        if (t<=0)return 0;
+        if (t>=1)return t-0.5;
+        return t*t*t*(1-0.5*t);
+    }
+    float Transition(float f,float footprint)
+    {
+        // A 20%-cell transition replaces a whole-cell grey ramp. Filter its
+        // cubic analytically across a conservative pixel footprint, rather
+        // than sharpening the final coverage (which would change its mean).
+        const float width=0.2;
+        if (footprint<=0.0001)return smoothstep(0.4,0.6,f);
+        float lo=(f-0.5*footprint-0.4)/width;
+        float hi=(f+0.5*footprint-0.4)/width;
+        return saturate(width*(TransitionIntegral(hi)-TransitionIntegral(lo))/footprint);
+    }
+    float Grid(float2 position,float p,float footprint)
+    {
+        int2 cell=int2(floor(position));float2 f=frac(position);
+        f=float2(Transition(f.x,footprint),Transition(f.y,footprint));
+        float value=lerp(lerp(Occupancy(cell,p),Occupancy(cell+int2(1,0),p),f.x),
+            lerp(Occupancy(cell+int2(0,1),p),Occupancy(cell+int2(1,1),p),f.x),f.y);
+        // Resolve subpixel clumps to their expected coverage, not aliased dots.
+        return lerp(value,p,smoothstep(0.5,1.25,footprint));
+    }
+    float Phase(float2 worldM,float p,float footprintM)
+    {
+        precise float2 fine=float2(dot(worldM,float2(0.7986355,0.601815)),
+            dot(worldM,float2(-0.601815,0.7986355)));
+        precise float2 coarsePosition=worldM*1.7;
+        precise float2 finePosition=fine*6.5+float2(17.13,9.37);
+        return 0.7*Grid(coarsePosition,p,footprintM*1.7)+
+            0.3*Grid(finePosition,p,footprintM*6.5);
+    }
+    float Sample(float amount,float density,float2 worldM,float2 velocityMps,float time,float footprintM)
+    {
+        float p=saturate(1-exp(-max(amount,0)*max(density,0)));
+        if (p<=0)return 0;if (p>=1)return 1;
+        float a=frac(time),b=frac(a+0.5),weight=1-abs(2*a-1);
+        precise float2 phaseA=worldM-velocityMps*a;
+        precise float2 phaseB=worldM-velocityMps*b;
+        return lerp(Phase(phaseB,p,footprintM),Phase(phaseA,p,footprintM),weight);
+    }
+};

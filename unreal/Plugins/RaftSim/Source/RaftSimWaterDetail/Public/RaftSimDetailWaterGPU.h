@@ -15,7 +15,7 @@ RAFTSIMWATERDETAIL_API bool RaftSimValidateMacroSamplingGPU(FRHICommandListImmed
 // Exercise the same world-registered detail sampler used by material custom
 // nodes. XY queries are in the simulation's fixed metric coordinate frame.
 RAFTSIMWATERDETAIL_API bool RaftSimValidateRegisteredDetailSamplingGPU(FRHICommandListImmediate& Cmd,
-    FRHITexture* Texture,const TArray<FVector4f>& Queries,FRHIGPUBufferReadback* Readback,FString& Error);
+    FRHITexture* Texture,const TArray<FVector4f>& Queries,FRHIGPUBufferReadback* Readback,FString& Error,uint32 ClockMode=0);
 
 // Detail perturbations over the authoritative FV mean flow, not a second
 // water level or a replacement for bathymetry / raft-support physics.
@@ -30,6 +30,9 @@ struct RAFTSIMWATERDETAIL_API FRaftSimDetailWaterGrid
     bool bPeriodic = false; // Regression fixtures only; runtime uses walls.
     bool bSecondOrder = false; // MC wave reconstruction + SSP-RK2; foam spatial flux stays upwind.
     bool bActivityMemory = false; // Authored entrainment persistence, not measured turbulent kinetic energy.
+    bool bFiniteDepthDispersion = false; // Explicit candidate; same height/momentum/foam carrier.
+    bool bExperimentalMeanStrain = false; // Rejected alone in real shallow banks; opt-in research only.
+    int32 PressureIterations = 40; // Both positive Helmholtz terms, per RK stage.
     float ActivitySourcePerSecond = 1.0f;
     float ActivityDecayPerSecond = 0.5f;
     FVector2f OriginMeters = FVector2f::ZeroVector;
@@ -78,6 +81,9 @@ private:
     bool bStatePeriodic = false;
     bool bStateSecondOrder = false;
     bool bStateActivityMemory = false;
+    bool bStateFiniteDepthDispersion = false;
+    bool bStateExperimentalMeanStrain = false;
+    int32 StatePressureIterations = 0;
     FVector2f StateOriginMeters = FVector2f::ZeroVector;
     double SimulationSeconds = 0;
     uint64 StepCount = 0;

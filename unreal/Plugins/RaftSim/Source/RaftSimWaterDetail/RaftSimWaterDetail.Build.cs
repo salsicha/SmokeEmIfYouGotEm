@@ -7,5 +7,7 @@ public class RaftSimWaterDetail : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "Core", "RHI", "RenderCore" });
         PrivateDependencyModuleNames.AddRange(new[] { "Projects" });
+        if (Target.bBuildDeveloperTools)
+            PrivateDependencyModuleNames.Add("Json");
     }
 }

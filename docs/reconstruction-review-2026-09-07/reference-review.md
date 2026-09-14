@@ -1,5 +1,39 @@
 # Troublemaker reference cross-check
 
+## September 14, local auxiliary-work turn: fresh retry still fails
+
+Read the computer-use skill and required guidance/confirmation documents, then
+tried the bank-side YouTube URL through the browser route. Initialization failed
+with `failed to write kernel assets: The system cannot find the path specified.
+(os error 3)`. Reset the browser session and retried the raft-view URL: same
+error. Direct web opens of BOTH supplied links also returned cache misses.
+No new frame or continuous motion was inspected; no download workaround or
+runtime/security modification was attempted. Historical observations below
+remain historical, not new reference acceptance.
+
+## September 14, crest-region optimization turn: retry still fails
+
+Fresh direct web opens of both supplied URLs returned cache misses. A fresh
+browser-route call for `ZEG1kvjNI30` failed before navigation with `failed to
+write kernel assets: The system cannot find the path specified. (os error 3)`.
+The computer-use skill and required guidance were read before this attempt.
+No new frame or motion was inspected, and no remote-media download or runtime
+security modification was attempted. This is an access failure, not evidence
+about either video's contents or a new visual qualification.
+
+## September 14, 09:08 UTC retry: no new footage inspected
+
+Retried both supplied videos, `ZEG1kvjNI30` and `2XTbOCNDcZQ`. After reading the
+computer-use skill and its required runtime/confirmation guidance, the Windows
+JavaScript runtime failed initialization with `failed to write kernel assets:
+The system cannot find the path specified. (os error 3)`. Resetting and retrying
+once returned the same error. The separate browser connector failed with the
+same initialization error. Direct web opens of BOTH YouTube URLs returned cache
+misses. No browser player, frame or new motion was inspected; no media download
+workaround or local/security setting change was attempted. The historical
+September7/9 frame observations below remain historical evidence, not a new
+continuous-motion review or calibrated geometric measurement.
+
 Reviewed 2026-09-06 local time (2026-09-07 UTC). Reference interpretation only; no new surveyed boulder coordinates or rapid-identity acceptance is implied.
 
 The [county river-map overview](https://www.eldoradocounty.ca.gov/Land-Use/Parks-Trails/Rivers/River-Maps) describes roughly 20 miles from Chili Bar to Salmon Falls. This supports continuing the captured-data route audit instead of keeping the old roughly 49 km scene merely because it renders.

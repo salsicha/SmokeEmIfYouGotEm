@@ -1,0 +1,46 @@
+#ifndef RAFTSIM_PRESSURE_MATH
+#define RAFTSIM_PRESSURE_MATH
+#include "RaftSimPortableFloat.ush"
+
+bool RaftSimPressureWet(float h)
+{uint bits=asuint(h);return bits!=0 && bits<0x7f800000u;}
+bool RaftSimPressureNegative(float h)
+{uint bits=asuint(h);return (bits>>31)!=0 && (bits&0x7fffffffu)!=0;}
+float2 RaftSimPressureWeights(float h,float other)
+{
+    float total=RaftSimPortableAdd(h,other);
+    return RaftSimPressureWet(total)?float2(RaftSimPortableDivide(h,total),RaftSimPortableDivide(other,total)):0;
+}
+float2 RaftSimPressureMul(float2 a,float b)
+{return float2(RaftSimPortableMul(a.x,b),RaftSimPortableMul(a.y,b));}
+float2 RaftSimPressureDivide(float2 a,float b)
+{return float2(RaftSimPortableDivide(a.x,b),RaftSimPortableDivide(a.y,b));}
+float2 RaftSimPressureAdd(float2 a,float2 b)
+{return float2(RaftSimPortableAdd(a.x,b.x),RaftSimPortableAdd(a.y,b.y));}
+float2 RaftSimPressureSub(float2 a,float2 b)
+{return float2(RaftSimPortableSub(a.x,b.x),RaftSimPortableSub(a.y,b.y));}
+// Shared by the pressure lift and acceleration matrix. Keeping identical
+// coefficients preserves the W / transpose-W pairing on represented wet cells.
+float RaftSimPressureEdge(float h,float other,float dx)
+{
+    if(!RaftSimPressureWet(h) || !RaftSimPressureWet(other))return 0;
+    if(asuint(h)==asuint(other))return RaftSimPortableDivide(RaftSimPortableMul(h,.5),dx);
+    // h*sqrt(h*other)/(h+other)/dx, evaluated in normalized mantissas.
+    // Taking sqrt of already-rounded fractions loses a minimum-subnormal
+    // neighbor even when the FINAL edge coefficient is a normal float.
+    int eh=RaftSimPortableExponent(h),eo=RaftSimPortableExponent(other),common=max(eh,eo),sum=eh+eo;
+    int rootExponent=sum>=0?sum/2:-((-sum+1)/2);
+    float mh=RaftSimPortableScale(h,-eh),mo=RaftSimPortableScale(other,-eo);
+    float total=RaftSimPortableAdd(RaftSimPortableScale(mh,eh-common),RaftSimPortableScale(mo,eo-common));
+    float product=RaftSimPortableMul(mh,mo);
+    float root=RaftSimPortableSqrt(RaftSimPortableScale(product,sum-2*rootExponent));
+    float coefficient=RaftSimPortableDivide(RaftSimPortableDivide(RaftSimPortableMul(mh,root),total),dx);
+    return RaftSimPortableScale(coefficient,eh+rootExponent-common);
+}
+float3 RaftSimPressureCoefficients(float h,float hr,float hl,float b,float2 wr,float2 wl,bool right,bool left,float dx)
+{
+    float center=RaftSimPortableSub(RaftSimPortableDivide(RaftSimPortableMul(h,
+        RaftSimPortableSub(right?wr.x:0,left?wl.x:0)),dx),RaftSimPortableMul(1.5,b));
+    return float3(center,right?RaftSimPressureEdge(h,hr,dx):0,left?-RaftSimPressureEdge(h,hl,dx):0);
+}
+#endif

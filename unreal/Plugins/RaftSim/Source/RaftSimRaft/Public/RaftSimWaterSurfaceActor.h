@@ -7,6 +7,7 @@ class URaftSimShorelineMeshComponent;
 #include "ProceduralMeshComponent.h"
 #include "RaftSimSurfaceRefinement.h"
 #include "RaftSimShorelineCrests.h"
+#include "RaftSimCommittedWaterClock.h"
 
 #include "RaftSimWaterSurfaceActor.generated.h"
 
@@ -919,6 +920,9 @@ private:
     FVector2D FoamFieldOriginM = FVector2D::ZeroVector;
     bool bFoamFieldValid = false;
     double LastRefreshRealSeconds = 0.0;
+    FRaftSimCommittedWaterClock FoamWaterClock;
+    bool bFoamUsesCommittedClock=false;
+    uint64 FoamClockRefreshes=0,FoamClockHolds=0,FoamClockInitializations=0;
     TArray<FBreakingSite> BreakingSites;
     /** One hydraulic jump tracked across refreshes. Detection re-finds and
      * re-ranks candidates from the raw Froude field every refresh, so rank,

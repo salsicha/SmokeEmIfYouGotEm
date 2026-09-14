@@ -1,0 +1,161 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimPortableFloat.ush"
+#include "RaftSimExactHydrostatic.ush"
+int2 GridSize;
+float CellMeters;
+uint Periodic;
+StructuredBuffer<float2> Geometry;
+StructuredBuffer<float4> HydroRate;
+StructuredBuffer<uint> Pairs;
+RWStructuredBuffer<uint> Coverage;
+RWStructuredBuffer<uint> Diagnostics;
+RWStructuredBuffer<float> Fraction;
+RWStructuredBuffer<float2> SurfaceJumps;
+
+uint Neighbor(uint i,int axis,int direction)
+{
+    int2 p=int2(i%GridSize.x,i/GridSize.x);
+    p[axis]=(p[axis]+direction+GridSize[axis])%GridSize[axis];
+    return p.y*GridSize.x+p.x;
+}
+bool Linked(uint i,int axis){return (Pairs[i]&(1u<<axis))!=0;}
+float RepresentedSign(float value)
+{uint bits=asuint(value);return (bits&0x7fffffffu)==0?0:(bits>>31)!=0?-1:1;}
+float DepthLog2(float h)
+{
+    uint bits=asuint(h),m=bits&0x7fffffu;
+    if((bits&0x7f800000u)==0 && m!=0)
+    {int shift=23-firstbithigh(m);return log2(asfloat(0x3f800000u|((m<<shift)&0x7fffffu)))+float(-126-shift);}
+    return log2(h);
+}
+float ComputeJump(uint i,int axis)
+{
+    uint j=Neighbor(i,axis,1);
+    precise float dh=Geometry[j].x-Geometry[i].x;
+    precise float db=Geometry[j].y-Geometry[i].y;
+    precise float result=dh+db;
+    if(all(asuint(Geometry[i])==asuint(Geometry[j])))return 0;
+    float scale=abs(Geometry[i].x)+abs(Geometry[j].x)+abs(db);
+    if(abs(result)<=64*1.1920928955078125e-7*scale)
+    {
+        RaftSimDyadic exact=RaftSimDyadicSub(RaftSimDyadicFloat(Geometry[j].x),RaftSimDyadicFloat(Geometry[i].x));
+        exact=RaftSimDyadicAdd(exact,RaftSimDyadicSub(RaftSimDyadicFloat(Geometry[j].y),RaftSimDyadicFloat(Geometry[i].y)));
+        result=RaftSimDyadicRound(exact);
+    }
+    return result;
+}
+float Jump(uint i,int axis){return SurfaceJumps[i][axis];}
+void Cover(uint i,int axis,float center,float radius,bool seam)
+{
+    float left=axis==0 ? i%GridSize.x:i/GridSize.x;
+    float overlap=0;
+    for(int offset=seam?-1:0;offset<=(seam?1:0);++offset)
+    {
+        float c=center+offset*GridSize[axis];
+        overlap=max(overlap,max(0,min(left+1,c+radius)-max(left,c-radius)));
+    }
+    // Only a geometric interval fraction is bounded, never water/foam state.
+    if(RaftSimPositiveDepth(Geometry[i].x))InterlockedMax(Coverage[i],asuint(min(overlap,1)));
+}
+void Front(uint first,int axis)
+{
+    int n=GridSize[axis];
+    if(n==1 || !Linked(first,axis))return;
+    float initialJump=Jump(first,axis),direction=RepresentedSign(initialJump);
+    if(direction==0)return;
+    uint before=Neighbor(first,axis,-1);
+    // Exactly flat internal faces do not create a second crest/trough.
+    // Look through only connected zero slopes; never round a small slope or
+    // bridge a reversal, dry gap or physical boundary.
+    uint previous=before;
+    for(int count=0;count<n;++count)
+    {
+        if(!Linked(previous,axis) || RepresentedSign(Jump(previous,axis))!=0)break;
+        previous=Neighbor(previous,axis,-1);
+    }
+    if(Linked(previous,axis) && RepresentedSign(Jump(previous,axis))==direction)return;
+    uint last=first,steepest=first,after=Neighbor(first,axis,1);
+    float maximum=abs(initialJump);
+    bool rateTrigger=HydroRate[first].x>=.6*RaftSimPortableSqrt(RaftSimPortableMul(9.81,Geometry[first].x));
+    for(int count=0;count<n;++count)
+    {
+        after=Neighbor(last,axis,1);
+        rateTrigger=rateTrigger || HydroRate[after].x>=.6*RaftSimPortableSqrt(RaftSimPortableMul(9.81,Geometry[after].x));
+        if(!Linked(after,axis))break;
+        float nextDirection=RepresentedSign(Jump(after,axis));
+        if(nextDirection==0)
+        {
+            uint following=after;
+            for(int look=0;look<n;++look)
+            {
+                if(!Linked(following,axis) || RepresentedSign(Jump(following,axis))!=0)break;
+                following=Neighbor(following,axis,1);
+            }
+            if(Linked(following,axis))nextDirection=RepresentedSign(Jump(following,axis));
+        }
+        if(nextDirection!=direction)break;
+        last=after;
+        float magnitude=abs(Jump(last,axis));
+        if(asuint(magnitude)>asuint(maximum)){maximum=magnitude;steepest=last;}
+    }
+    if(!Linked(before,axis) || !Linked(after,axis))
+    {InterlockedAdd(Diagnostics[2],1);return;}
+    float hp=Geometry[direction>0?after:first].x,ht=Geometry[direction>0?first:after].x;
+    if(asuint(hp)<=asuint(ht))return;
+    // Log form avoids squared ratios overflowing at genuine tiny wet depths.
+    float logFroude=DepthLog2(hp)-DepthLog2(ht)+.5*log2(1+RaftSimPortableDivide(ht,hp))-.5;
+    if(!(rateTrigger || maximum/CellMeters>=.5773502691896258) || logFroude<=.3785116232537298)return;
+    float radius=RaftSimPortableDivide(RaftSimPortableMul(3.75,RaftSimPortableSub(hp,ht)),CellMeters);
+    if(!isfinite(radius)){InterlockedOr(Diagnostics[0],4u);return;}
+    float center=(axis==0 ? steepest%GridSize.x:steepest/GridSize.x)+1;
+    uint edge=axis==0 ? (first/GridSize.x)*GridSize.x+GridSize.x-1:
+        (GridSize.y-1)*GridSize.x+first%GridSize.x;
+    bool seam=Linked(edge,axis);
+    InterlockedAdd(Diagnostics[1],1);
+    if(2*radius<1)InterlockedAdd(Diagnostics[3],1);
+    Cover(first,axis,center,radius,seam);
+    // Walk only this wet component. A full periodic circuit owns every cell;
+    // otherwise walk backwards as well to include its other half.
+    uint current=first;
+    bool circuit=false;
+    for(int count=0;count<n;++count)
+    {
+        if(!Linked(current,axis))break;
+        current=Neighbor(current,axis,1);
+        if(current==first){circuit=true;break;}
+        Cover(current,axis,center,radius,seam);
+    }
+    if(!circuit)
+    {
+        current=first;
+        for(int count=0;count<n;++count)
+        {
+            uint previous=Neighbor(current,axis,-1);
+            if(!Linked(previous,axis) || previous==first)break;
+            current=previous;Cover(current,axis,center,radius,seam);
+        }
+    }
+}
+[numthreads(64,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    uint i=id.x;
+    if(i>=uint(GridSize.x*GridSize.y))return;
+#if RAFTSIM_BREAKING_PHASE==0
+    Coverage[i]=0;
+    float2 jumps=float2(ComputeJump(i,0),ComputeJump(i,1));SurfaceJumps[i]=jumps;
+    bool bad=!all(isfinite(Geometry[i])) || RepresentedSign(Geometry[i].x)<0 || !all(isfinite(HydroRate[i])) || (Pairs[i]&~3u)!=0;
+    for(int axis=0;axis<2;++axis)if(Linked(i,axis))
+    {
+        uint j=Neighbor(i,axis,1);
+        int position=axis==0?i%GridSize.x:i/GridSize.x;
+        bad=bad || GridSize[axis]==1 || (!Periodic && position==GridSize[axis]-1) ||
+            !RaftSimPositiveDepth(Geometry[i].x) || !RaftSimPositiveDepth(Geometry[j].x) || !isfinite(jumps[axis]);
+    }
+    if(bad)InterlockedOr(Diagnostics[0],1u);
+#elif RAFTSIM_BREAKING_PHASE==1
+    if(Diagnostics[0]==0){Front(i,0);Front(i,1);}
+#else
+    Fraction[i]=Diagnostics[0]!=0?asfloat(0x7fc00000u):1-asfloat(Coverage[i]);
+#endif
+}

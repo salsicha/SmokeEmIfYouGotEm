@@ -1,0 +1,9 @@
+// Four-level continued fraction (DLMF 4.39.1), reduced to two positive
+// Helmholtz resolvents plus a local residual:
+// tanh(x)/x ~= (1+x^2/9+x^4/945)/(1+4*x^2/9+x^4/63).
+// This is a finite-depth approximation, not a nonlinear breaking model.
+static const float2 RaftSimPressureLengths = float2(0.4052787713439809,0.03916567310046354);
+float RaftSimPressureCombine(float eta,float2 potentials)
+{
+    return eta/15.0+dot(float2(0.8106202879112342,0.12271304542209915),potentials);
+}

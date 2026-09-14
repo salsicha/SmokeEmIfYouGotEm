@@ -2,6 +2,10 @@
 
 Requested 2026-09-06. Work in progress; no geographic or hydraulic acceptance yet.
 
+Performance target revised by the user on2026-09-12: desktop30FPS,33.333ms
+p95 frame budget. Earlier60FPS assessments below are historical. See the
+current target and unchanged quality/physics requirements in[remaining work](remaining-work.md).
+
 Reconstruct Chili Bar to Salmon Falls as accurately as available captured data
 permits, then make the rendered terrain, boulders, collisions, bathymetry, water
 geometry and hydraulics mutually consistent. Keep source evidence, inferred
@@ -46,9 +50,25 @@ is completed and validated. See `colorado-evidence-reconstruction.md`.
 Source acquisition alone does not satisfy the South Fork prerequisite: the
 playable scene and consistent geometry/physics must also be validated.
 
-## Implementation checkpoint — 2026-09-06 (unfinished)
+## Current launch hierarchy — September 13 (unfinished)
 
-Current playable integration, September12UTC: the normal Troublemaker Rapid
+South Fork is the scenario. Troublemaker is a rapid inside it and is NOT a
+separate menu entry; the five South Fork launch contracts retain the full river
+map. The bounded captured-rapid assets remain available for reconstruction,
+but do not replace the river. Native career/catalog and migration regressions
+cover this correction. The rapid-challenge launch note below is superseded.
+
+The normal FullReach water material has received current-carried ripple and
+transported-foam updates. It is not yet accepted for convincing breaking waves,
+froth, reconstructed terrain/river alignment or performance. Latest measured
+ordinary play is23.365478FPS/p9547.2488ms with live unmasked source uploads,
+still below30FPS/33.333ms; prior21.571211FPS/p9552.6052ms is retained. Current supporting
+GPU trial work and remaining integration are recorded in
+[remaining work](remaining-work.md); passing solver fixtures is not scene delivery.
+
+## Historical implementation checkpoint — 2026-09-06 (unfinished)
+
+Superseded playable integration, September12UTC: the normal Troublemaker Rapid
 Challenge now uses L_SouthFork_Troublemaker with the corrected captured terrain,
 shared collision and byte-identical source-matched flow in a packageable data
 location. This is the bounded270m section, NOT the corrected full river. The

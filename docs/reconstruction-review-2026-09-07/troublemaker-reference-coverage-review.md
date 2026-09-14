@@ -1,5 +1,11 @@
 # Troublemaker: reference sequence and liquid-test coverage
 
+Latest retry September14,09:08UTC: both browser runtimes fail initialization with
+missing kernel-assets path (os error3), including one reset/retry; direct web
+opens of both supplied videos return cache misses. No new footage inspected.
+See [retry details](reference-review.md). Historical observations below are not
+superseded by a newly successful viewing or continuous-motion measurement.
+
 September 9 continuation. The preceding user-facing status turn was **no
 implementation progress**. This pass adds inspected reference evidence and a
 reproducible geographic coverage check; it does not accept or promote a scene.
@@ -83,3 +89,15 @@ Three tests pass for metric rotation, coordinate-rebase invariance and rejection
 of non-rigid/reflected frames. The plot was rendered and visually inspected.
 No Unreal build or scene mutation occurred in this pass. The production route,
 saved water assets and full completion queue remain unchanged and incomplete.
+
+## September 14 access retry
+
+Retried both exact YouTube references (`ZEG1kvjNI30` and `2XTbOCNDcZQ`).
+Web retrieval returned `Cache miss`. Browser control failed before opening a
+page with `failed to write kernel assets: The system cannot find the path
+specified. (os error 3)`; resetting its session and retrying returned the same
+error. The computer-use skill's Node/sky initialization also failed with that
+error, including after one session reset. No new video frames or continuous
+motion were viewed, and no remote video was downloaded. This access failure
+does not invalidate or supersede the documented September 7/9 frame reviews.
+It supplies no new geometry, water-motion or playable acceptance evidence.

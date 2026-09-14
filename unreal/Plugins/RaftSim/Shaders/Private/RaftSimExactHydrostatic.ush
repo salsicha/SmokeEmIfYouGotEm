@@ -1,0 +1,98 @@
+#ifndef RAFTSIM_EXACT_HYDROSTATIC
+#define RAFTSIM_EXACT_HYDROSTATIC
+// Finite FP32 h/bed values and their MC affine polynomials are dyadic.
+// Ten32-bit two's-complement limbs at quantum2^-160 preserve every term,
+// including the two successive halves, without an h/bed cancellation floor.
+// The highest supported bit is2^158; these short polynomials stay below2^132.
+struct RaftSimDyadic { uint w[10]; };
+RaftSimDyadic RaftSimDyadicZero()
+{RaftSimDyadic a;[unroll]for(uint i=0;i<10;++i)a.w[i]=0;return a;}
+RaftSimDyadic RaftSimDyadicNegate(RaftSimDyadic a)
+{
+    uint carry=1;
+    [unroll]for(uint i=0;i<10;++i){uint v=~a.w[i];a.w[i]=v+carry;carry=uint(carry!=0 && a.w[i]==0);}
+    return a;
+}
+RaftSimDyadic RaftSimDyadicFloat(float value)
+{
+    uint b=asuint(value),e=(b>>23)&255u,m=(b&0x7fffffu)|(e!=0?0x800000u:0);
+    uint shift=max(e,1u)+10u,index=shift>>5,offset=shift&31u;
+    RaftSimDyadic a=RaftSimDyadicZero();
+    [unroll]for(uint i=0;i<10;++i)
+    {if(i==index)a.w[i]=m<<offset;if(offset!=0 && i==index+1)a.w[i]=m>>(32-offset);}
+    if((b>>31)!=0)a=RaftSimDyadicNegate(a);return a;
+}
+RaftSimDyadic RaftSimDyadicAdd(RaftSimDyadic a,RaftSimDyadic b)
+{
+    uint carry=0;
+    [unroll]for(uint i=0;i<10;++i)
+    {uint t=a.w[i]+b.w[i],v=t+carry;carry=uint(t<a.w[i] || v<t);a.w[i]=v;}
+    return a;
+}
+RaftSimDyadic RaftSimDyadicSub(RaftSimDyadic a,RaftSimDyadic b)
+{return RaftSimDyadicAdd(a,RaftSimDyadicNegate(b));}
+RaftSimDyadic RaftSimDyadicHalf(RaftSimDyadic a)
+{
+    [unroll]for(uint i=0;i<9;++i)a.w[i]=(a.w[i]>>1)|(a.w[i+1]<<31);
+    a.w[9]=uint(int(a.w[9])>>1);return a;
+}
+int RaftSimDyadicSign(RaftSimDyadic a)
+{
+    if((a.w[9]>>31)!=0)return -1;
+    uint bits=0;[unroll]for(uint i=0;i<10;++i)bits|=a.w[i];return bits!=0?1:0;
+}
+RaftSimDyadic RaftSimDyadicMC(RaftSimDyadic back,RaftSimDyadic front)
+{
+    int sign=RaftSimDyadicSign(back);
+    if(sign==0 || sign!=RaftSimDyadicSign(front))return RaftSimDyadicZero();
+    RaftSimDyadic result=RaftSimDyadicHalf(RaftSimDyadicAdd(back,front));
+    RaftSimDyadic lo=RaftSimDyadicAdd(back,back),hi=RaftSimDyadicAdd(front,front);
+    if(RaftSimDyadicSign(RaftSimDyadicSub(result,lo))==sign)result=lo;
+    if(RaftSimDyadicSign(RaftSimDyadicSub(result,hi))==sign)result=hi;
+    return result;
+}
+float RaftSimDyadicRound(RaftSimDyadic a)
+{
+    uint sign=a.w[9]&0x80000000u;if(sign!=0)a=RaftSimDyadicNegate(a);
+    int highest=-1;[unroll]for(uint i=0;i<10;++i)if(a.w[i]!=0)highest=int(32*i)+firstbithigh(a.w[i]);
+    if(highest<0)return 0;
+    int exponent=highest-160;uint cut=uint(max(highest-23,11)),index=cut>>5,offset=cut&31u;
+    uint q=a.w[index]>>offset;
+    if(offset!=0 && index+1<10)q|=a.w[index+1]<<(32-offset);
+    uint ri=(cut-1)>>5,ro=(cut-1)&31u;bool rb=((a.w[ri]>>ro)&1u)!=0,sticky=false;
+    [unroll]for(uint i=0;i<10;++i)
+    {if(i<ri)sticky=sticky || a.w[i]!=0;if(i==ri && ro!=0)sticky=sticky || (a.w[i]&((1u<<ro)-1u))!=0;}
+    if(rb && (sticky || (q&1u)!=0))++q;
+    if(q==0)return asfloat(sign);
+    if(q>=0x1000000u){q>>=1;++exponent;}
+    if(exponent>127)return asfloat(sign|0x7f800000u);
+    if(exponent< -126 && q<0x800000u)return asfloat(sign|q);
+    return asfloat(sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu));
+}
+bool RaftSimPositiveDepth(float h){uint b=asuint(h);return b>0 && b<0x7f800000u;}
+struct RaftSimExactPolynomial { RaftSimDyadic h; RaftSimDyadic z; };
+RaftSimExactPolynomial RaftSimExactPolynomialAt(float3 depth,float3 bed,bool active,float direction)
+{
+    RaftSimExactPolynomial p;p.h=RaftSimDyadicFloat(depth.y);p.z=RaftSimDyadicFloat(bed.y);
+    if(!active || !RaftSimPositiveDepth(depth.x) || !RaftSimPositiveDepth(depth.y) || !RaftSimPositiveDepth(depth.z))return p;
+    RaftSimDyadic back=RaftSimDyadicSub(p.h,RaftSimDyadicFloat(depth.x));
+    RaftSimDyadic front=RaftSimDyadicSub(RaftSimDyadicFloat(depth.z),p.h);
+    RaftSimDyadic dh=RaftSimDyadicMC(back,front);
+    RaftSimDyadic de=RaftSimDyadicMC(
+        RaftSimDyadicAdd(back,RaftSimDyadicSub(p.z,RaftSimDyadicFloat(bed.x))),
+        RaftSimDyadicAdd(front,RaftSimDyadicSub(RaftSimDyadicFloat(bed.z),p.z)));
+    RaftSimDyadic oh=RaftSimDyadicHalf(dh),oz=RaftSimDyadicHalf(RaftSimDyadicSub(de,dh));
+    if(direction<0){oh=RaftSimDyadicNegate(oh);oz=RaftSimDyadicNegate(oz);}
+    p.h=RaftSimDyadicAdd(p.h,oh);p.z=RaftSimDyadicAdd(p.z,oz);return p;
+}
+float4 RaftSimExactHydrostatic(float4 depthL,float4 bedL,float4 depthR,float4 bedR,out bool2 positive)
+{
+    RaftSimExactPolynomial l=RaftSimExactPolynomialAt(depthL.xyz,bedL.xyz,depthL.w!=0,bedL.w);
+    RaftSimExactPolynomial r=RaftSimExactPolynomialAt(depthR.xyz,bedR.xyz,depthR.w!=0,bedR.w);
+    float2 h=float2(RaftSimDyadicRound(l.h),RaftSimDyadicRound(r.h));
+    RaftSimDyadic jump=RaftSimDyadicSub(r.z,l.z);int sign=RaftSimDyadicSign(jump);
+    if(sign>0)l.h=RaftSimDyadicSub(l.h,jump);if(sign<0)r.h=RaftSimDyadicAdd(r.h,jump);
+    positive=bool2(RaftSimDyadicSign(l.h)>0,RaftSimDyadicSign(r.h)>0);
+    return float4(h,positive.x?RaftSimDyadicRound(l.h):0,positive.y?RaftSimDyadicRound(r.h):0);
+}
+#endif

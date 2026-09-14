@@ -194,14 +194,15 @@ def test_qa_report_requires_explicit_pass(tmp_path: Path) -> None:
     assert release.load_qa_report(path)["passed"] is False
 
 
+@pytest.mark.parametrize("schema_version", [3, 4])
 def test_performance_report_requires_player_representative_qualification(
-    tmp_path: Path,
+    tmp_path: Path, schema_version: int,
 ) -> None:
     path = tmp_path / "performance.json"
     path.write_text(
         json.dumps(
             {
-                "schema": "raftsim.m8.full_reach_performance_soak.v3",
+                "schema": f"raftsim.m8.full_reach_performance_soak.v{schema_version}",
                 "passed": True,
                 "performance_protocol": "offscreen_engineering_diagnostic",
                 "release_performance_qualified": False,
@@ -218,7 +219,7 @@ def test_performance_report_requires_player_representative_qualification(
     path.write_text(
         json.dumps(
             {
-                "schema": "raftsim.m8.full_reach_performance_soak.v3",
+                "schema": f"raftsim.m8.full_reach_performance_soak.v{schema_version}",
                 "passed": True,
                 "performance_protocol": "normal_windowed_player_presentation",
                 "release_performance_qualified": True,

@@ -1,12 +1,16 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Async/ParallelFor.h"
+#include "RaftSimCoordinateMap.h"
+#include "RaftSimCrestCornerSamples.h"
+#include "RaftSimCrestRegionIndex.h"
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
 // every render attribute uses the same piecewise-linear hydraulic authority;
 // no new solver query, second surface or independent stage is introduced.
 struct FRaftSimSurfaceRefinement
 {
+    struct FProfileMemoSample { float Value=0; uint64 Epoch=0; };
     TArray<FIntPoint> MidpointParents;
     TArray<int32> Triangles;
     // Final triangles retain their original cell owner, including green
@@ -17,13 +21,31 @@ struct FRaftSimSurfaceRefinement
     // Only combinatorial assembly is cached. Every build still evaluates its
     // current coordinates/profile and makes every selection decision anew.
     uint64 TopologyBuildCount=0,TopologyReuseCount=0;
+    // Opt-in diagnostic only; these do not control selection or topology.
+    bool bMeasureStages=false;
+    // Scheduling only. Each batch owns its memo, and every build advances the
+    // profile epoch even when the grouping changes. Selection remains exact.
+    int32 ParallelBatchSize=128;
+    bool bIndexedRegions=false; // Candidate until actual paired timing qualifies it.
+    double InputSeconds=0,SelectionSeconds=0,AssemblySeconds=0;
+    uint64 ParallelContextsCreated=0,ParallelContextsDestroyed=0;
+    uint64 SharedCornerSamples=0,SharedCornerReads=0;
+    double GetRetainedMemoAllocatedBytes() const
+    {
+        uint64 Bytes=RetainedParallelValues.GetAllocatedSize()+RetainedFastParallelValues.GetAllocatedSize();
+        for(const auto& Context:RetainedParallelValues)Bytes+=Context.GetAllocatedSize();
+        for(const auto& Context:RetainedFastParallelValues)Bytes+=Context.GetAllocatedSize();
+        // Diagnostic numeric value for CSV/JSON. Exact for any feasible
+        // process allocation (<2^53 bytes); never controls cache ownership.
+        return double(Bytes);
+    }
     void InvalidateTopologyCache() { CachedRootTriangles.Reset(); CachedLevels.Reset(); CachedRootPointCount=0; }
 
     bool Build(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
         const FBox2D& Window,int32 Levels,const FBox2D* FinalLevelWindow=nullptr)
     {
         return BuildSelected(Coordinates,SourceTriangles,Levels,
-            [&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32 Level,int32)
+            [&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32 Level,int32,int32)
             {
                 FBox2D Bounds(ForceInit); Bounds+=A; Bounds+=B; Bounds+=C;
                 return Bounds.Intersect(FinalLevelWindow && Level==Levels-1 ? *FinalLevelWindow : Window);
@@ -37,26 +59,58 @@ struct FRaftSimSurfaceRefinement
     // exact world-coordinate values; interpolation/selection is always rerun.
     // Parallel evaluation requires a pure, thread-safe HeightCm. It deliberately
     // bypasses the caller's mutable memo table; optional batch-local tables
-    // have one owner per parallel batch. Final topology order stays serial/exact.
+    // have one owner per parallel batch. Retained tables keep coordinate slots
+    // only: a new epoch forces current HeightCm evaluation on every build.
+    // Final topology order stays serial/exact.
     bool BuildAdaptive(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
         TFunctionRef<float(const FVector2D&)> HeightCm,int32 Levels,float ToleranceCm,
         TConstArrayView<FBox2D> NonzeroRegions={},TMap<FVector2D,float>* ProfileValues=nullptr,
         bool bParallel=false,bool bMemoizeParallel=false,
-        const FBox2D* DetailWindow=nullptr,float DetailSpanCm=0)
+        const FBox2D* DetailWindow=nullptr,float DetailSpanCm=0,bool bRetainParallelMemo=false,
+        bool bFastCoordinateHash=true,bool bKeepParallelContexts=true,bool bShareCornerSamples=false)
     {
         if (!FMath::IsFinite(ToleranceCm) || ToleranceCm<=0) return false;
+        TUniquePtr<FRaftSimCrestRegionIndex> RegionIndex;
+        if(bIndexedRegions)RegionIndex=MakeUnique<FRaftSimCrestRegionIndex>(NonzeroRegions);
+        ParallelContextsCreated=ParallelContextsDestroyed=0;
+        SharedCornerSamples=SharedCornerReads=0;
+        FRaftSimCrestCornerSamples Corners; // Never survives this profile build.
+        const bool ShareCorners=bParallel && bShareCornerSamples;
         TMap<FVector2D,float> LocalValues;
-        TArray<TMap<FVector2D,float>> ParallelValues;
+        TArray<TMap<FVector2D,FProfileMemoSample>> LocalParallelValues;
+        auto& ParallelValues=bRetainParallelMemo ? RetainedParallelValues : LocalParallelValues;
+        TArray<TRaftSimCoordinateMap<FProfileMemoSample>> LocalFastParallelValues;
+        auto& FastParallelValues=bRetainParallelMemo ? RetainedFastParallelValues : LocalFastParallelValues;
+        // Retain lookup slots, NEVER profile values across calls. XY can move,
+        // profiles can change without a key, and callers can replace HeightCm.
+        // Each batch owns its map; levels join before resizing or reusing it.
+        if (++ProfileMemoEpoch==0) { RetainedParallelValues.Reset(); RetainedFastParallelValues.Reset(); ++ProfileMemoEpoch; }
         TMap<FVector2D,float>& Values=ProfileValues ? *ProfileValues : LocalValues;
+        const auto MemoValue=[&](auto& Memo,const FVector2D& P)
+        {
+            if (auto* Found=Memo.Find(P))
+            {
+                if (Found->Epoch!=ProfileMemoEpoch)
+                { Found->Value=HeightCm(P); Found->Epoch=ProfileMemoEpoch; }
+                return Found->Value;
+            }
+            // Bound moving-window coordinate history. Clearing only repeats
+            // exact evaluations; it cannot change selection or profile age.
+            if (Memo.Num()>=4096) Memo.Reset();
+            const float V=HeightCm(P); Memo.Add(P,{V,ProfileMemoEpoch}); return V;
+        };
         const auto Value=[&](const FVector2D& P,int32 Context)
         {
             if (bParallel && !bMemoizeParallel) return HeightCm(P);
-            auto& Memo=bParallel ? ParallelValues[Context] : Values;
-            if (const float* Found=Memo.Find(P)) return *Found;
-            const float V=HeightCm(P); Memo.Add(P,V); return V;
+            if (bParallel)
+            {
+                return bFastCoordinateHash ? MemoValue(FastParallelValues[Context],P) : MemoValue(ParallelValues[Context],P);
+            }
+            if (const float* Found=Values.Find(P)) return *Found;
+            const float V=HeightCm(P); Values.Add(P,V); return V;
         };
         return BuildSelected(Coordinates,SourceTriangles,Levels,
-            [&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32,int32 Context)
+            [&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32,int32 Context,int32 Triangle)
             {
                 // A dynamic displacement field needs geometric samples even
                 // where the immutable macro crest is flat. This selection
@@ -67,10 +121,13 @@ struct FRaftSimSurfaceRefinement
                 if (!NonzeroRegions.IsEmpty())
                 {
                     bool Intersects=false;
-                    for (const auto& Region:NonzeroRegions) if (Bounds.Intersect(Region)) { Intersects=true; break; }
+                    if(RegionIndex)Intersects=RegionIndex->Intersects(Bounds);
+                    else for (const auto& Region:NonzeroRegions) if (Bounds.Intersect(Region)) { Intersects=true; break; }
                     if (!Intersects) return false; // The supplied profile is exactly zero here.
                 }
-                const float VA=Value(A,Context), VB=Value(B,Context), VC=Value(C,Context);
+                const float VA=ShareCorners ? Corners.Get(Triangle,0) : Value(A,Context);
+                const float VB=ShareCorners ? Corners.Get(Triangle,1) : Value(B,Context);
+                const float VC=ShareCorners ? Corners.Get(Triangle,2) : Value(C,Context);
                 for (int32 U=0; U<=4; ++U) for (int32 V=0; V<=4-U; ++V)
                 {
                     if ((U==0 && V==0) || U==4 || V==4) continue;
@@ -83,12 +140,38 @@ struct FRaftSimSurfaceRefinement
             {
                 // Resize only after the previous level has joined. Values
                 // remain valid across levels within this exact profile build.
-                // No table or coordinate survives into a changed profile.
-                if (bMemoizeParallel) ParallelValues.SetNum(Contexts);
+                // No sampled height survives into another build's epoch.
+                if (bMemoizeParallel)
+                {
+                    const auto Prepare=[&](auto& Tables)
+                    {
+                        const int32 Before=Tables.Num();
+                        // A coarse level needs fewer workers than the previous
+                        // frame's fine level. Preserve those inactive maps for
+                        // later levels instead of destroying and recreating
+                        // them every frame. Heights STILL use this build's epoch.
+                        // Storage is bounded by peak context count and the
+                        // existing4096-entry cap per map; no shared worker map.
+                        const int32 Count=bRetainParallelMemo && bKeepParallelContexts ? FMath::Max(Before,Contexts) : Contexts;
+                        Tables.SetNum(Count);
+                        ParallelContextsCreated+=FMath::Max(Count-Before,0);
+                        ParallelContextsDestroyed+=FMath::Max(Before-Count,0);
+                    };
+                    if (bFastCoordinateHash) Prepare(FastParallelValues);
+                    else Prepare(ParallelValues);
+                }
+            },[&](const TArray<FVector2D>& Points,const TArray<int32>& CurrentTriangles)
+            {
+                if(!ShareCorners)return;
+                Corners.Prepare(Points,CurrentTriangles,HeightCm,NonzeroRegions,DetailWindow,DetailSpanCm);
+                SharedCornerSamples=Corners.SampleCount;SharedCornerReads=Corners.ReadCount;
             });
     }
 
 private:
+    TArray<TMap<FVector2D,FProfileMemoSample>> RetainedParallelValues;
+    TArray<TRaftSimCoordinateMap<FProfileMemoSample>> RetainedFastParallelValues;
+    uint64 ProfileMemoEpoch=0;
     struct FTopologyLevel
     {
         TArray<uint8> Selection;
@@ -100,11 +183,15 @@ private:
     int32 CachedRootPointCount=0;
 
     bool BuildSelected(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
-        int32 Levels,TFunctionRef<bool(const FVector2D&,const FVector2D&,const FVector2D&,int32,int32)> Select,
-        bool bParallel=false,TFunction<void(int32)> PrepareParallel={})
+        int32 Levels,TFunctionRef<bool(const FVector2D&,const FVector2D&,const FVector2D&,int32,int32,int32)> Select,
+        bool bParallel=false,TFunction<void(int32)> PrepareParallel={},
+        TFunction<void(const TArray<FVector2D>&,const TArray<int32>&)> PrepareLevel={})
     {
+        InputSeconds=SelectionSeconds=AssemblySeconds=0;
+        const double InputStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
         MidpointParents.Reset();Triangles.Reset();TriangleOrigins.Reset();SourceVertexCount=Coordinates.Num();
-        if (Coordinates.IsEmpty() || SourceTriangles.Num()%3 || Levels<0 || Levels>3)return false;
+        if (Coordinates.IsEmpty() || SourceTriangles.Num()%3 || Levels<0 || Levels>3 ||
+            ParallelBatchSize<1 || ParallelBatchSize>4096)return false;
         for (int32 I:SourceTriangles)if (!Coordinates.IsValidIndex(I))return false;
         bool SamePrefix=CachedRootPointCount==Coordinates.Num() && CachedRootTriangles==SourceTriangles;
         if (!SamePrefix) CachedLevels.Reset();
@@ -113,13 +200,16 @@ private:
         TArray<FVector2D> Points=Coordinates;Triangles=SourceTriangles;
         for (int32 I=0; I<SourceTriangles.Num()/3; ++I) TriangleOrigins.Add(I);
         const auto Key=[](int32 A,int32 B) { return (uint64(FMath::Min(A,B))<<32)|uint32(FMath::Max(A,B)); };
+        if(bMeasureStages)InputSeconds=FPlatformTime::Seconds()-InputStarted;
         for (int32 Level=0;Level<Levels;++Level)
         {
+            const double SelectionStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
+            if(PrepareLevel)PrepareLevel(Points,Triangles);
             TArray<uint8> Selection;
             Selection.SetNumUninitialized(Triangles.Num()/3);
             if (bParallel)
             {
-                constexpr int32 BatchSize=128;
+                const int32 BatchSize=ParallelBatchSize;
                 const int32 Batches=FMath::DivideAndRoundUp(Selection.Num(),BatchSize);
                 if (PrepareParallel) PrepareParallel(Batches);
                 // Selection only reads this level's immutable points/indices.
@@ -130,12 +220,14 @@ private:
                     const int32 End=FMath::Min((Batch+1)*BatchSize,Selection.Num());
                     for (int32 T=Batch*BatchSize; T<End; ++T)
                         Selection[T]=Select(Points[Triangles[T*3]],Points[Triangles[T*3+1]],
-                            Points[Triangles[T*3+2]],Level,Batch) ? 1 : 0;
+                            Points[Triangles[T*3+2]],Level,Batch,T) ? 1 : 0;
                 },EParallelForFlags::Unbalanced);
             }
             else for (int32 T=0;T<Selection.Num();++T)
                 Selection[T]=Select(Points[Triangles[T*3]],Points[Triangles[T*3+1]],
-                    Points[Triangles[T*3+2]],Level,0) ? 1 : 0;
+                    Points[Triangles[T*3+2]],Level,0,T) ? 1 : 0;
+            const double AssemblyStarted=bMeasureStages ? FPlatformTime::Seconds() : 0.;
+            if(bMeasureStages)SelectionSeconds+=AssemblyStarted-SelectionStarted;
             auto& Cached=CachedLevels[Level];
             SamePrefix=SamePrefix && Cached.Selection==Selection;
             if (SamePrefix)
@@ -147,6 +239,7 @@ private:
                 MidpointParents.Append(Cached.Parents);
                 Triangles=Cached.Triangles; TriangleOrigins=Cached.Origins;
                 ++TopologyReuseCount;
+                if(bMeasureStages)AssemblySeconds+=FPlatformTime::Seconds()-AssemblyStarted;
                 if (Cached.Parents.IsEmpty()) break;
                 continue;
             }
@@ -175,6 +268,7 @@ private:
             if (Midpoints.IsEmpty())
             {
                 Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
+                if(bMeasureStages)AssemblySeconds+=FPlatformTime::Seconds()-AssemblyStarted;
                 break;
             }
             TArray<int32> Next;Next.Reserve(Triangles.Num()*4);
@@ -207,6 +301,7 @@ private:
             Triangles=MoveTemp(Next);
             TriangleOrigins=MoveTemp(NextOrigins);
             Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
+            if(bMeasureStages)AssemblySeconds+=FPlatformTime::Seconds()-AssemblyStarted;
         }
         return true;
     }

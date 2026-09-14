@@ -38,7 +38,6 @@ bool FRaftSimCartesianBoulderSurfaceTest::RunTest(const FString&)
     Surface->ResolvedPresentationHydraulicReliefScale = 0.f;
     Surface->ResolvedPresentationStandingWaveScale = 0.f;
     Surface->RefreshSurface();
-    const auto WithoutRocks = Surface->Vertices;
     // Seed a directional dye-like foam ramp, then exercise the actual
     // semi-Lagrangian refresh. A field/world double reflection samples the
     // opposite north neighbor and must fail this independent expectation.
@@ -48,10 +47,19 @@ bool FRaftSimCartesianBoulderSurfaceTest::RunTest(const FString&)
         const FVector2D R = Surface->RiverCoordinatesM[I] - FoamOrigin;
         Surface->FoamField[I] = .2 + .003*R.X + .012*R.Y;
     }
-    Surface->LastRefreshRealSeconds = FPlatformTime::Seconds() - .2;
-    const double PreviousRefresh = Surface->LastRefreshRealSeconds;
+    const auto HeldFoam=Surface->FoamField;
+    Surface->LastRefreshRealSeconds=FPlatformTime::Seconds()-1234.;
     Surface->RefreshSurface();
-    const float Dt = FMath::Clamp(float(Surface->LastRefreshRealSeconds - PreviousRefresh), 0.f, .5f);
+    TestTrue(TEXT("actual Cartesian refresh holds all foam bits despite elapsed wall time"),
+        HeldFoam.Num()==Surface->FoamField.Num() && FMemory::Memcmp(HeldFoam.GetData(),
+            Surface->FoamField.GetData(),HeldFoam.Num()*sizeof(float))==0);
+    const double BeforeWater=Water->GetCommittedStepSeconds();
+    for(int32 Step=0;Step<12;++Step)
+        if(!TestTrue(TEXT("actual native water advances foam interval"),Water->StepWater(1.f/60.f)))return false;
+    Surface->RefreshSurface();
+    const float Dt=float(Water->GetCommittedStepSeconds()-BeforeWater);
+    TestEqual(TEXT("actual foam clock publishes current committed water time"),Surface->FoamWaterClock.Last,Water->GetCommittedStepSeconds());
+    TestTrue(TEXT("foam interval comes from accepted native steps"),Dt>.19f && Dt<.21f);
     const float Decay = FMath::Pow(.5f, Dt / FMath::Max(Surface->FoamHalfLifeSeconds, .5f));
     double MaxFoamError = 0., WrongNorthDifference = 0.;
     const int32 FoamNx = Surface->GridStationN, FoamNy = Surface->GridLateralN;
@@ -69,6 +77,8 @@ bool FRaftSimCartesianBoulderSurfaceTest::RunTest(const FString&)
     }
     TestTrue(TEXT("actual foam backtrace uses field north without a second reflection"), MaxFoamError < 1.e-6);
     TestTrue(TEXT("foam fixture distinguishes reflected from actual north transport"), WrongNorthDifference > .001);
+    // Isolate rock relief at the SAME advanced water state, not a pre-step mean.
+    const auto WithoutRocks=Surface->Vertices;
     Surface->BoulderFootprintsSLR = {FVector3f(Center.X, Center.Y, 1.5f)};
     Surface->RefreshSurface();
     TestEqual(TEXT("actual render window retains exposed test rock"), Surface->WindowBoulderFootprintsSLR.Num(), 1);

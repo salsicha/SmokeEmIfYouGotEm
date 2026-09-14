@@ -1790,7 +1790,8 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     }
 
     FRaftSimPhysicsTickInput Input;
-    Input.FrameDeltaSeconds = FMath::Min(DeltaSeconds, 0.25f);
+    // The bridge bounds work and retains debt; do not discard hitch time here.
+    Input.FrameDeltaSeconds = DeltaSeconds;
     FRaftSimPhysicsTickOutput Output;
     {
         TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_PhysicsBridgeTick);

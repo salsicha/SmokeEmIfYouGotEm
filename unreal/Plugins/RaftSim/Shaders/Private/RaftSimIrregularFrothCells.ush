@@ -1,0 +1,75 @@
+// Optical occupancy only. The transported amount, density mapping and committed
+// two-phase advection clock remain unchanged. No geometry or foam source here.
+struct RaftSimFrothCells
+{
+    uint Hash(int2 cell,uint salt)
+    {
+        uint h=uint(cell.x)*1597334677u^uint(cell.y)*3812015801u^salt;
+        h^=h>>16;h*=2246822519u;h^=h>>13;return h;
+    }
+    float Occupancy(int2 cell,float p)
+    {
+        float r=(float(Hash(cell,0u)&65535u)+0.5)/65536.0;
+        float band=min(0.025,min(p,1-p));
+        return 1-smoothstep(p-band,p+band,r);
+    }
+    float Grid(float2 position,float p,float footprint)
+    {
+        if(footprint>=0.75)return p;
+        int2 cell=int2(floor(position));
+        precise float2 local=frac(position);
+        float distances[9];float nearest=100;
+        [unroll] for(int y=-1;y<=1;++y) [unroll] for(int x=-1;x<=1;++x)
+        {
+            uint h=Hash(cell+int2(x,y),0x6a09e667u);
+            precise float2 jitter=(float2(h&65535u,h>>16)+0.5)/65536.0;
+            precise float2 delta=float2(x,y)+0.3+0.4*jitter-local;
+            precise float d=delta.x*delta.x+delta.y*delta.y;
+            distances[(y+1)*3+x+1]=d;nearest=min(nearest,d);
+        }
+        // Smooth partition of unity around irregular Voronoi cells. Include
+        // every nearby cell, not only two: triple junctions remain continuous.
+        // The bounded .2-cell jitter and <=.25 border make 3x3 support sufficient.
+        float border=min(0.25,max(0.025,0.5*max(footprint,0)));
+        float span=2*sqrt(nearest)*border+border*border;
+        float total=0,weight=0;
+        [unroll] for(int y=-1;y<=1;++y) [unroll] for(int x=-1;x<=1;++x)
+        {
+            float w=1-smoothstep(0,span,distances[(y+1)*3+x+1]-nearest);
+            total+=w*Occupancy(cell+int2(x,y),p);weight+=w;
+        }
+        // Geometry weights do not depend on occupancy. Their normalized blend
+        // retains expected coverage p; subpixel cells resolve to that same p.
+        // Reciprocal/convex-blend rounding can overshoot one by a single ULP.
+        // Enforce the optical range, not a clamp on transported foam density.
+        return saturate(lerp(total/weight,p,smoothstep(0.35,0.75,footprint)));
+    }
+    float4 Coordinates(float2 worldM)
+    {
+        // A dot intrinsic may choose its own internal contraction even when
+        // its result is precise. Spell out the represented coordinate stages.
+        precise float xx=worldM.x*0.7986355;
+        precise float xy=worldM.y*0.601815;
+        precise float yx=worldM.x*(-0.601815);
+        precise float yy=worldM.y*0.7986355;
+        precise float2 fine=float2(xx+xy,yx+yy);
+        precise float2 coarsePosition=worldM*4.5;
+        precise float2 finePosition=fine*17.0+float2(17.13,9.37);
+        return float4(coarsePosition,finePosition);
+    }
+    float Phase(float2 worldM,float p,float footprintM)
+    {
+        float4 positions=Coordinates(worldM);
+        return 0.7*Grid(positions.xy,p,footprintM*4.5)+
+            0.3*Grid(positions.zw,p,footprintM*17.0);
+    }
+    float Sample(float amount,float density,float2 worldM,float2 velocityMps,float time,float footprintM)
+    {
+        float p=saturate(1-exp(-max(amount,0)*max(density,0)));
+        if(p<=0)return 0;if(p>=1)return 1;
+        float a=frac(time),b=frac(a+0.5),weight=1-abs(2*a-1);
+        precise float2 phaseA=worldM-velocityMps*a;
+        precise float2 phaseB=worldM-velocityMps*b;
+        return saturate(lerp(Phase(phaseB,p,footprintM),Phase(phaseA,p,footprintM),weight));
+    }
+};

@@ -1,0 +1,138 @@
+#include "/Engine/Public/Platform.ush"
+#include "RaftSimPortableFloat.ush"
+uint Count;
+uint BoundaryCount;
+uint UseIntervalEnd;
+float2 IntervalEnd;
+StructuredBuffer<float4> FirstBoundaryFlux;
+StructuredBuffer<float4> SecondBoundaryFlux;
+RWStructuredBuffer<float4> BoundaryVolume;
+StructuredBuffer<float4> InputState;
+StructuredBuffer<float4> StageState;
+StructuredBuffer<float4> InputProgress;
+StructuredBuffer<float4> HydroRate;
+StructuredBuffer<float2> PressureForce;
+StructuredBuffer<float4> StageCFL;
+StructuredBuffer<uint> TransportErrors;
+StructuredBuffer<uint> PressureErrors;
+StructuredBuffer<uint> SolverErrors;
+StructuredBuffer<uint> ResidualErrors;
+RWStructuredBuffer<float4> OutputState;
+RWStructuredBuffer<float4> OutputProgress;
+RWStructuredBuffer<float4> Info;
+RWStructuredBuffer<uint> Diagnostics;
+uint StageErrors()
+{
+    uint bits=(TransportErrors[0]!=0 || TransportErrors[1]!=0 || PressureErrors[0]!=0 || PressureErrors[1]!=0 ||
+        SolverErrors[0]!=0 || SolverErrors[1]!=0 || ResidualErrors[0]!=0)?1u:0u;
+    if(ResidualErrors[1]!=0)bits|=2u;return bits;
+}
+bool ValidState(float4 s)
+{
+    return RaftSimPortableValidState(s);
+}
+float2 TwoSum(float a,float b)
+{
+    precise float hi=a+b;
+    precise float v=hi-a;
+    precise float lo=(a-(hi-v))+(b-v);
+    return float2(hi,lo);
+}
+float RemainingToEnd(float2 time)
+{
+    precise float2 a=TwoSum(IntervalEnd.x,-time.x);
+    precise float2 b=TwoSum(IntervalEnd.y,-time.y);
+    precise float2 c=TwoSum(a.x,b.x);
+    precise float tail=(a.y+b.y)+c.y;
+    precise float2 r=TwoSum(c.x,tail);
+    // Round DOWN only the proposed duration, never the conserved state or clock.
+    // Any residual remains real unconsumed time for a subsequent accepted step.
+    // This avoids a final dt overshooting the immutable observation endpoint.
+    if(r.x>0 && r.y<0)return asfloat(asuint(r.x)-1u);
+    return r.x;
+}
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    uint i=id.x;
+#if RAFTSIM_STEP_PHASE == 0
+    if(i!=0)return;
+    float4 progress=InputProgress[0];float bound=StageCFL[0].z;
+    uint bits=StageErrors();float dt=0;
+    if(any(!isfinite(progress)) || progress.z<0 || (progress.z>0 && progress.w<=0))bits|=16u;
+    else if(progress.z==0)bits=0;
+    else
+    {
+        if(UseIntervalEnd!=0 && progress.z!=RemainingToEnd(progress.xy))bits|=16u;
+        dt=min(1./120.,min(progress.z,min(progress.w,bound)));
+        if(!isfinite(dt) || dt<=0 || (dt<1e-9 && dt!=progress.z))bits|=16u;
+    }
+    Diagnostics[0]=bits;Info[0]=float4(0,dt,bound,0);
+#elif RAFTSIM_STEP_PHASE == 1
+    if(i>=Count)return;
+    float4 s=InputState[i];float dt=Info[0].y;
+    if(Diagnostics[0]==0 && dt>0)
+    {
+        float4 rate=HydroRate[i];float2 pressure=PressureForce[i];
+        rate.y=RaftSimPortableEuler(rate.y,1,pressure.x);
+        rate.z=RaftSimPortableEuler(rate.z,1,pressure.y);
+        [unroll]for(uint k=0;k<4;++k)s[k]=RaftSimPortableEuler(s[k],dt,rate[k]);
+        if(!ValidState(s))InterlockedOr(Diagnostics[2],8u);
+    }
+    OutputState[i]=s;
+#elif RAFTSIM_STEP_PHASE == 2
+    if(i!=0)return;
+    uint bits=StageErrors();float bound=StageCFL[0].z;float4 info=Info[0];info.w=bound;
+    if(info.y>bound)bits|=4u;
+    if(InputProgress[0].z==0)bits=0;
+    Diagnostics[1]=bits;Info[0]=info;
+#elif RAFTSIM_STEP_PHASE == 3
+    if(i>=Count)return;
+    float4 s=InputState[i];float dt=Info[0].y;
+    if(Diagnostics[0]==0 && Diagnostics[1]==0 && dt>0)
+    {
+        float4 rate=HydroRate[i];float2 pressure=PressureForce[i];
+        rate.y=RaftSimPortableEuler(rate.y,1,pressure.x);
+        rate.z=RaftSimPortableEuler(rate.z,1,pressure.y);
+        float4 stage=StageState[i];
+        [unroll]for(uint k=0;k<4;++k)s[k]=RaftSimPortableRK2(s[k],stage[k],dt,rate[k]);
+        if(!ValidState(s))InterlockedOr(Diagnostics[2],8u);
+    }
+    OutputState[i]=s;
+#elif RAFTSIM_STEP_PHASE == 4
+    if(i!=0)return;
+    float4 previous=InputProgress[0],next=previous,info=Info[0];float dt=info.y;
+    bool accept=dt>0 && (Diagnostics[0]|Diagnostics[1]|Diagnostics[2])==0;
+    if(accept)
+    {
+        // Normalize an equivalent hi/lo encoding before adding dt. Otherwise
+        // adding the new rounding residual to a large low word loses it.
+        // Canonical inputs retain exactly their original two words.
+        precise float baseHi=previous.x+previous.y;
+        precise float baseV=baseHi-previous.x;
+        precise float baseLo=(previous.x-(baseHi-baseV))+(previous.y-baseV);
+        precise float sum=baseHi+dt;
+        precise float v=sum-baseHi;
+        precise float error=(baseHi-(sum-v))+(dt-v)+baseLo;
+        precise float hi=sum+error;
+        precise float lo=error-(hi-sum);
+        float remaining=UseIntervalEnd!=0?RemainingToEnd(float2(hi,lo)):(dt==previous.z?0:previous.z-dt);
+        if(!isfinite(hi) || !isfinite(lo) || !isfinite(remaining) || remaining<0 || remaining==previous.z || (hi==previous.x && lo==previous.y))
+        {Diagnostics[2]|=16u;accept=false;}
+        else next=float4(hi,lo,remaining,min(1./120.,remaining));
+    }
+    if(!accept)
+    {
+        next=previous;next.w=Diagnostics[0]!=0 || (Diagnostics[2]&16u)!=0 || previous.z==0?0:.5*dt;
+        if(next.w>0 && next.w<1e-9 && next.w!=previous.z){next.w=0;Diagnostics[2]|=16u;}
+    }
+    info.x=accept?dt:0;Info[0]=info;OutputProgress[0]=next;Diagnostics[3]=accept?1u:0u;
+#elif RAFTSIM_STEP_PHASE == 5
+    if(i<Count)OutputState[i]=Diagnostics[3]!=0?StageState[i]:InputState[i];
+#elif RAFTSIM_STEP_PHASE == 6
+    if(i<BoundaryCount)
+        // Apply the bounded dt BEFORE adding: two finite face fluxes can
+        // otherwise overflow even when their integrated inventory is finite.
+        BoundaryVolume[i]=Diagnostics[3]!=0?(.5*Info[0].x)*FirstBoundaryFlux[i]+(.5*Info[0].x)*SecondBoundaryFlux[i]:0;
+#endif
+}

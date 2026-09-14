@@ -6,11 +6,17 @@ These budgets gate the Python/C++ modeling phase before Unreal production begins
 
 | Profile | Render Target | Physics Tick | Total Physics Budget | Water Solver | Raft Coupling | Probe/Telemetry |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Desktop | 60 Hz | 120 Hz | 4.00 ms/tick | 2.40 ms | 0.80 ms | 0.40 ms |
+| Desktop | 30 Hz | 120 Hz | 4.00 ms/tick | 2.40 ms | 0.80 ms | 0.40 ms |
 | VR | 90 Hz | 120 Hz | 3.00 ms/tick | 1.60 ms | 0.60 ms | 0.25 ms |
 | Handheld | 60 Hz | 60 Hz | 5.00 ms/tick | 2.80 ms | 0.90 ms | 0.40 ms |
 
 ## Acceptance Gates
+
+The desktop render target is 30 FPS per the user's revision. Playable-scene
+acceptance uses a 33.333 ms p95 frame budget and a 66.667 ms two-frame hitch
+threshold. This changes neither the physics tick rate nor the per-tick modeling
+budgets above; the separate production solver gate remains 1.60 ms/tick. VR and
+handheld profiles are unchanged. A target is not evidence of measured performance.
 
 - Baseline reports must include the canonical fixtures plus one generated procedural rapid.
 - C++ solver mean runtime should stay within the per-profile water-solver budget for the target platform.

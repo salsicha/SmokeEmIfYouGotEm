@@ -24,7 +24,7 @@ RAFTSIMRAFT_API bool Build(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
     TArray<FProcMeshVertex>& OutVertices, TArray<uint32>& OutIndices,
     TArray<int32>* OutCellOffsets = nullptr, TArray<FEdge>* OutEdges = nullptr,
-    bool bCompactEdges = false);
+    bool bCompactEdges = false, bool bOppositeDryFan = false);
 RAFTSIMRAFT_API bool Sample(const FVector2D& PositionXY, int32 Begin, int32 End,
     TConstArrayView<FProcMeshVertex> Vertices, TConstArrayView<uint32> Indices, FVector& Position,
     FIntVector* Corners=nullptr,FVector* Weights=nullptr);
@@ -40,7 +40,8 @@ public:
         TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
         TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
         TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices,
-        TArray<int32>& CellOffsets, bool& bTopologyRebuilt, bool bCompactEdges = false);
+        TArray<int32>& CellOffsets, bool& bTopologyRebuilt, bool bCompactEdges = false,
+        bool bOppositeDryFan = false);
     void Reset();
     uint64 GetRebuildCount() const { return RebuildCount; }
     uint64 GetReuseCount() const { return ReuseCount; }
@@ -48,6 +49,7 @@ public:
 private:
     int32 CachedNx=0, CachedNy=0, CachedIndexCount=0;
     bool bCachedCompactEdges=false;
+    bool bCachedOppositeDryFan=false;
     TArray<FVector2D> XY;
     TArray<uint8> WetMask, AvailableMask;
     TArray<FEdge> Edges;

@@ -485,4 +485,164 @@ bool FRaftSimDetailSecondOrderTest::RunTest(const FString&)
     AddInfo(FString::Printf(TEXT("Forced RK2: batch error %.9g, maximum height response %.9g m"),ForcedBatchError,ForcedHeight));
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimFiniteDepthDetailTest,
+    "RaftSim.WaterDetail.FiniteDepthDispersionGPU",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FRaftSimFiniteDepthDetailTest::RunTest(const FString&)
+{
+    if (GUsingNullRHI || GMaxRHIFeatureLevel<ERHIFeatureLevel::SM5)
+    { AddError(TEXT("Actual SM5+ GPU required"));return false; }
+    constexpr int32 N=32,Steps=64;
+    constexpr double Amplitude=.01,Current=.4;
+    double MaximumPhaseError=0,MaximumConvergenceError=0;
+    for (float Depth:{1.5f,3.f})for (float Wavelength:{4.f,8.f,16.f})for (int32 Axis:{0,1})
+    {
+        FRaftSimDetailWaterGrid Grid;Grid.Size=FIntPoint(N,N);Grid.bPeriodic=true;Grid.bSecondOrder=true;
+        Grid.MomentumDampingPerSecond=0;Grid.FoamDecayPerSecond=0;Grid.FoamSourcePerSecond=0;
+        const double K=2*PI/Wavelength;
+        const double Speed=FMath::Sqrt(9.81/K*FMath::Tanh(K*Depth));
+        const double Time=Steps*double(Grid.StepSeconds),ExpectedPhase=(Speed+Current)*K*Time;
+        TArray<FVector4f> Flow,Initial,Result,Legacy,Converged;
+        Flow.Init(FVector4f(Depth,Axis==0 ? Current : 0,Axis==1 ? Current : 0,0),N*N);
+        for (int32 Y=0;Y<N;++Y)for (int32 X=0;X<N;++X)
+        {
+            const double Eta=Amplitude*FMath::Sin(K*(Axis==0 ? X : Y)*Grid.CellMeters);
+            Initial.Add(FVector4f(Eta,Axis==0 ? Speed*Eta : 0,Axis==1 ? Speed*Eta : 0,
+                .2f+.1f*FMath::Cos(K*X*Grid.CellMeters)));
+        }
+        FString Error;
+        if (!ReadDetailFixture(Grid,Flow,Initial,Steps,Legacy,Error)) { AddError(Error);return false; }
+        Grid.bFiniteDepthDispersion=true;
+        if (!ReadDetailFixture(Grid,Flow,Initial,Steps,Result,Error)) { AddError(Error);return false; }
+        Grid.PressureIterations*=2;
+        if (!ReadDetailFixture(Grid,Flow,Initial,Steps,Converged,Error)) { AddError(Error);return false; }
+        double Sine=0,Cosine=0,Mass=0,MaxDifference=0;
+        for (int32 I=0;I<N*N;++I)
+        {
+            const double Coordinate=(Axis==0 ? I%N : I/N)*Grid.CellMeters;
+            Sine+=Result[I].X*FMath::Sin(K*Coordinate);Cosine+=Result[I].X*FMath::Cos(K*Coordinate);
+            Mass+=Result[I].X;
+            TestEqual(TEXT("dispersion never changes the independent foam transport"),Result[I].W,Legacy[I].W);
+            for (int32 C=0;C<4;++C)
+            {
+                if (!FMath::IsFinite(Result[I][C])) { AddError(TEXT("Nonfinite dispersive state"));return false; }
+                MaxDifference=FMath::Max(MaxDifference,double(FMath::Abs(Result[I][C]-Converged[I][C])));
+            }
+        }
+        const double Phase=FMath::Atan2(-Cosine,Sine);
+        const double PhaseError=FMath::Abs(Phase-ExpectedPhase)/(Speed*K*Time);
+        const double Retention=2*FMath::Sqrt(Sine*Sine+Cosine*Cosine)/(N*N*Amplitude);
+        MaximumPhaseError=FMath::Max(MaximumPhaseError,PhaseError);
+        MaximumConvergenceError=FMath::Max(MaximumConvergenceError,MaxDifference);
+        TestTrue(TEXT("actual intrinsic phase within eight percent of finite-depth Airy theory"),PhaseError<.08);
+        TestTrue(TEXT("travelling wave survives without artificial amplitude growth"),Retention>.5 && Retention<1.02);
+        TestTrue(TEXT("signed perturbation volume conserved"),FMath::Abs(Mass)<1.e-4);
+        TestTrue(TEXT("doubling pressure iterations changes every state component by less than 1e-4"),MaxDifference<1.e-4);
+        AddInfo(FString::Printf(TEXT("Finite depth: h=%.2f lambda=%.1f axis=%d phase=%.9g expected=%.9g relative_intrinsic_error=%.9g retention=%.9g solve_difference=%.9g"),
+            Depth,Wavelength,Axis,Phase,ExpectedPhase,PhaseError,Retention,MaxDifference));
+    }
+    // Variable depth, disconnected dry banks, and constant pressure at rest.
+    FRaftSimDetailWaterGrid Grid;Grid.Size=FIntPoint(19,17);Grid.bSecondOrder=true;Grid.bFiniteDepthDispersion=true;
+    Grid.FoamDecayPerSecond=0;Grid.FoamSourcePerSecond=0;
+    TArray<FVector4f> Flow,Initial,Result,Split;
+    for (int32 Y=0;Y<17;++Y)for (int32 X=0;X<19;++X)
+    {
+        const bool Wet=X!=9 && Y>1 && Y<15;
+        Flow.Add(Wet ? FVector4f(.4f+.1f*X,0,0,0) : FVector4f(0,0,0,0));
+        Initial.Add(Wet ? FVector4f(.02f,0,0,.2f) : FVector4f(0,0,0,0));
+    }
+    FString Error;
+    if (!ReadDetailFixture(Grid,Flow,Initial,64,Result,Error) ||
+        !ReadDetailFixture(Grid,Flow,Initial,64,Split,Error,true)) { AddError(Error);return false; }
+    double RestError=0,DryError=0,BatchError=0;
+    for (int32 I=0;I<Flow.Num();++I)for (int32 C=0;C<4;++C)
+    {
+        RestError=FMath::Max(RestError,double(FMath::Abs(Result[I][C]-Initial[I][C])));
+        BatchError=FMath::Max(BatchError,double(FMath::Abs(Result[I][C]-Split[I][C])));
+        if (Flow[I].X==0)DryError=FMath::Max(DryError,double(FMath::Abs(Result[I][C])));
+    }
+    TestTrue(TEXT("constant perturbation at rest over variable bed"),RestError<1.e-6);
+    TestEqual(TEXT("no pressure or wave state across dry boundaries"),DryError,0.0);
+    TestEqual(TEXT("batch boundaries do not affect the pressure solve"),BatchError,0.0);
+    Grid.TurbulentHeadMeters=.06f;
+    for (int32 I=0;I<Flow.Num();++I)
+    {
+        if (Flow[I].X>0.01f)Flow[I].W=.6f;
+        Initial[I]=FVector4f(0,0,0,0);
+    }
+    if (!ReadDetailFixture(Grid,Flow,Initial,120,Result,Error) ||
+        !ReadDetailFixture(Grid,Flow,Initial,120,Split,Error,true)) { AddError(Error);return false; }
+    double ForcedHeight=0,ForcedBatch=0,ForcedDry=0;
+    for (int32 I=0;I<Flow.Num();++I)for (int32 C=0;C<4;++C)
+    {
+        if (!FMath::IsFinite(Result[I][C])) { AddError(TEXT("Nonfinite forced finite-depth state"));return false; }
+        ForcedBatch=FMath::Max(ForcedBatch,double(FMath::Abs(Result[I][C]-Split[I][C])));
+        if (Flow[I].X<=0.01f)ForcedDry=FMath::Max(ForcedDry,double(FMath::Abs(Result[I][C])));
+        if (C==0)ForcedHeight=FMath::Max(ForcedHeight,double(FMath::Abs(Result[I][C])));
+    }
+    TestTrue(TEXT("finite-depth source excites bounded nonzero waves without a height clamp"),ForcedHeight>.001 && ForcedHeight<.1);
+    TestEqual(TEXT("forced finite-depth state respects dry boundaries"),ForcedDry,0.0);
+    TestEqual(TEXT("forced finite-depth state preserves batch clock"),ForcedBatch,0.0);
+    AddInfo(FString::Printf(TEXT("Finite depth forcing: max height %.9g m, dry %.9g, batch %.9g"),ForcedHeight,ForcedDry,ForcedBatch));
+    Grid.PressureIterations=0;TestFalse(TEXT("zero pressure work rejected"),Grid.Validate(Flow,Error));
+    Grid.PressureIterations=129;TestFalse(TEXT("unbounded pressure work rejected"),Grid.Validate(Flow,Error));
+    Grid.PressureIterations=32;Grid.bSecondOrder=false;
+    TestFalse(TEXT("dispersive candidate requires RK2"),Grid.Validate(Flow,Error));
+    AddInfo(FString::Printf(TEXT("Finite depth summary: max phase error %.9g, pressure convergence %.9g, rest %.9g, dry %.9g, batch %.9g"),
+        MaximumPhaseError,MaximumConvergenceError,RestError,DryError,BatchError));
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimDetailMeanStrainTest,
+    "RaftSim.WaterDetail.MeanStrainGPU",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FRaftSimDetailMeanStrainTest::RunTest(const FString&)
+{
+    if (GUsingNullRHI || GMaxRHIFeatureLevel<ERHIFeatureLevel::SM5)
+    { AddError(TEXT("Actual SM5+ GPU required"));return false; }
+    constexpr int32 N=64;
+    double MaxMomentumError=0,MaxHeightError=0;
+    // Affine divergence-free rotation and extension. Uniform perturbation q
+    // obeys dq/dt=-J*q in the interior: exact RK2 is (I-dt*J+dt^2*J^2/2)q.
+    // Prescribed mean acceleration/bed balance belongs to the mean authority.
+    for(int32 Kind=0;Kind<2;++Kind)
+    {
+        FRaftSimDetailWaterGrid Grid;Grid.Size=FIntPoint(N,N);
+        Grid.bSecondOrder=true;Grid.bFiniteDepthDispersion=true;
+        Grid.bExperimentalMeanStrain=true;
+        Grid.MomentumDampingPerSecond=0;Grid.FoamSourcePerSecond=0;Grid.FoamDecayPerSecond=0;
+        TArray<FVector4f> Flow,Initial,Result,Legacy;
+        for(int32 Y=0;Y<N;++Y)for(int32 X=0;X<N;++X)
+        {
+            const float PX=(X-31.5f)*Grid.CellMeters,PY=(Y-31.5f)*Grid.CellMeters;
+            Flow.Add(Kind==0 ? FVector4f(1.5f,-.3f*PY,.3f*PX,0) : FVector4f(1.5f,.3f*PX,-.3f*PY,0));
+            Initial.Add(FVector4f(0,.1f,.2f,.3f));
+        }
+        FString Error;
+        if(!ReadDetailFixture(Grid,Flow,Initial,1,Result,Error)) { AddError(Error);return false; }
+        Grid.bFiniteDepthDispersion=false;Grid.bExperimentalMeanStrain=false;
+        if(!ReadDetailFixture(Grid,Flow,Initial,1,Legacy,Error)) { AddError(Error);return false; }
+        const FVector2D Q(.1,.2);
+        const auto J=[&](FVector2D V) { return Kind==0 ? FVector2D(-.3*V.Y,.3*V.X) : FVector2D(.3*V.X,-.3*V.Y); };
+        const double Dt=Grid.StepSeconds;
+        const FVector2D Expected=Q-Dt*J(Q)+.5*Dt*Dt*J(J(Q));
+        for(int32 Y=28;Y<36;++Y)for(int32 X=28;X<36;++X)
+        {
+            const auto& V=Result[Y*N+X];
+            MaxMomentumError=FMath::Max(MaxMomentumError,FVector2D(V.Y-Expected.X,V.Z-Expected.Y).Size());
+            MaxHeightError=FMath::Max(MaxHeightError,double(FMath::Abs(V.X)));
+        }
+        for(int32 I=0;I<N*N;++I)
+        {
+            TestEqual(TEXT("mean strain does not alter foam flux"),Result[I].W,Legacy[I].W);
+            for(int32 C=0;C<4;++C)if(!FMath::IsFinite(Result[I][C]))
+            { AddError(TEXT("Nonfinite affine strain fixture"));return false; }
+        }
+    }
+    TestTrue(TEXT("GPU relative momentum matches analytic RK2 rotation/extension"),MaxMomentumError<1.e-6);
+    FRaftSimDetailWaterGrid Default;
+    TestFalse(TEXT("known shallow-bank failure is never enabled by default"),Default.bExperimentalMeanStrain);
+    TestTrue(TEXT("divergence-free interior keeps its water height"),MaxHeightError<1.e-6);
+    AddInfo(FString::Printf(TEXT("Mean strain: affine rotation/extension core128 points, max momentum error %.9g m2/s, height %.9g m; foam bit-exact"),MaxMomentumError,MaxHeightError));
+    return !HasAnyErrors();
+}
 #endif

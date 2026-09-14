@@ -223,6 +223,48 @@ bool ConfigureSouthForkTransportedFoam(UMaterial* Material)
         Input(TEXT("TimeSeconds"), Time);
         Input(TEXT("LaceTexture"), Texture);
     }
+    // Froth phase follows the displayed density, never MaterialExpressionTime.
+    UMaterialExpressionCustom* FoamClock=nullptr;
+    UMaterialExpressionCustom* Authority=nullptr;
+    UMaterialExpressionVectorParameter* CPUClock=nullptr;
+    for(UMaterialExpression* Expression:Material->GetExpressions())
+    {
+        if(auto* Custom=Cast<UMaterialExpressionCustom>(Expression))
+        {
+            if(Custom->Desc==TEXT("SouthForkCommittedFrothTimeV1"))FoamClock=Custom;
+            if(Custom->Desc==TEXT("SouthForkMovingFoamAuthorityV1"))Authority=Custom;
+        }
+        if(auto* Parameter=Cast<UMaterialExpressionVectorParameter>(Expression))
+            if(Parameter->ParameterName==TEXT("RaftSimCPUFoamClock"))CPUClock=Parameter;
+    }
+    // Only the registered Cartesian parent has the matching runtime clock.
+    if(Authority)
+    {
+    if(!CPUClock)
+    {
+        CPUClock=AddCurrentWaterExpression<UMaterialExpressionVectorParameter>(Material);
+        CPUClock->ParameterName=TEXT("RaftSimCPUFoamClock");CPUClock->DefaultValue=FLinearColor(0,0,0,0);
+    }
+    if(!FoamClock)FoamClock=AddCurrentWaterExpression<UMaterialExpressionCustom>(Material);
+    FoamClock->Desc=TEXT("SouthForkCommittedFrothTimeV1");FoamClock->OutputType=CMOT_Float1;
+    FoamClock->Inputs.Reset();FoamClock->IncludeFilePaths.Reset();
+    FCustomInput ClockInput;ClockInput.InputName=TEXT("CPUClock");ClockInput.Input.Connect(0,CPUClock);
+    FoamClock->Inputs.Add(ClockInput);
+    FoamClock->Code=TEXT("return frac(frac(CPUClock.x)+CPUClock.y);");
+    if(Authority)
+    {
+        for(const TCHAR* Name:{TEXT("Texture"),TEXT("World"),TEXT("Sign"),TEXT("Enable")})
+        {
+            const auto* Source=Authority->Inputs.FindByPredicate([Name](const FCustomInput& I){return I.InputName==Name;});
+            if(!Source || !Source->Input.Expression)return false;
+            FoamClock->Inputs.Add(*Source);
+        }
+        FoamClock->IncludeFilePaths.Add(TEXT("/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredFoamTime.ush"));
+        FoamClock->Code=TEXT("return RaftSimRegisteredFoamPhase(Texture,World.xy*float2(.01,.01*Sign),CPUClock.xy,Enable);");
+    }
+    for(auto& Input:LocalLace->Inputs)
+        if(Input.InputName==TEXT("TimeSeconds"))Input.Input.Connect(0,FoamClock);
+    }
     LocalLace->OutputType = CMOT_Float3;
     for (FCustomInput& Input : LocalLace->Inputs)
         if (Input.InputName == TEXT("Flow"))
@@ -486,6 +528,18 @@ return normalize(float3(-slope, 1.0));
     }
     if (RiverLabel == TEXT("SouthFork"))
         Summary += TEXT("Transported foam drives colour, roughness, opacity and scattering; geometry is unchanged.\n");
+    if (RiverLabel == TEXT("SouthFork"))
+    {
+        // Share the displayed-frame clock with foam in the registered parent.
+        // Nonregistered legacy parents keep their existing time source.
+        UMaterialExpressionCustom* DisplayedClock = nullptr;
+        for (UMaterialExpression* Expression : Material->GetExpressions())
+            if (auto* Custom = Cast<UMaterialExpressionCustom>(Expression))
+                if (Custom->Desc == TEXT("SouthForkCommittedFrothTimeV1")) DisplayedClock = Custom;
+        if (DisplayedClock)
+            for (FCustomInput& Input : Detail->Inputs)
+                if (Input.InputName == TEXT("TimeSeconds")) Input.Input.Connect(0, DisplayedClock);
+    }
     Material->StateId = FGuid::NewGuid();
     Material->UpdateCachedExpressionData();
     Package->MarkPackageDirty();

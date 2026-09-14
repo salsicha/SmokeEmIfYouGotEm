@@ -19,6 +19,7 @@ URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include <exception>
+#include <limits>
 
 CSV_DEFINE_CATEGORY(RaftSimSolver,true);
 
@@ -144,7 +145,18 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
         const double StartSeconds = FPlatformTime::Seconds();
         try
         {
+            const double Before=LiveWindow->SimTimeSeconds();
             LiveWindow->Step(DeltaSeconds);
+            const double After=LiveWindow->SimTimeSeconds(),Advanced=After-Before;
+            // Never publish a requested duration which the native field did
+            // not actually integrate (including its legacy large-dt clamp).
+            const double ClockRoundoff=FMath::Max(1e-12,8.*std::numeric_limits<double>::epsilon()*FMath::Abs(Before));
+            if(!FMath::IsFinite(After) || Advanced<=0 || FMath::Abs(Advanced-double(DeltaSeconds))>ClockRoundoff)
+            {
+                Status=ERaftSimWaterRuntimeStatus::Faulted;
+                UE_LOG(LogTemp,Error,TEXT("RaftSim native water clock mismatch: requested=%.17g advanced=%.17g; refusing committed duration"),double(DeltaSeconds),Advanced);
+                return false;
+            }
         }
         catch (const std::exception& Exception)
         {
@@ -1217,7 +1229,8 @@ float URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
     TConstArrayView<FSupportBreakingSite> Sites,
     float CrestLiftMeters,
     float StationSpacingMeters,
-    float* OutCrestFoam)
+    float* OutCrestFoam,
+    float GlobalOwnerCapMeters)
 {
     if (OutCrestFoam) *OutCrestFoam = 0.0f;
     // The depth-scaled branch below reconstructs a continuous subgrid profile;
@@ -1231,7 +1244,9 @@ float URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
     const float SpacingM = FMath::Max(StationSpacingMeters, 0.05f);
     const int32 TailStepCount = FMath::Max(1, FMath::RoundToInt(18.0f / SpacingM));
     float TotalM = 0.0f;
-    float MaximumLiftM = 0.0f;
+    // A prepared spatial subset retains the full set's nonlocal owner cap.
+    // Ordinary callers use zero; local envelope caps are still evaluated here.
+    float MaximumLiftM = GlobalOwnerCapMeters;
     for (const FSupportBreakingSite& Site : Sites)
     {
         const FVector2D Relative = RaftSimWaterFlowFrame::ToLocal(
@@ -1625,6 +1640,17 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtRiverCoordinates(
         WorldLeftNormal * RiverSample.SurfaceNormal.Y +
         FVector::UpVector * RiverSample.SurfaceNormal.Z).GetSafeNormal();
     return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::GetLiveFieldTimeSeconds(double& OutSeconds) const
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if(LiveWindow.IsValid() && Status!=ERaftSimWaterRuntimeStatus::Faulted)
+    {
+        OutSeconds=LiveWindow->SimTimeSeconds();return FMath::IsFinite(OutSeconds);
+    }
+#endif
+    return false;
 }
 
 bool URaftSimWaterRuntimeAdapter::SampleWaterFieldAtRiverCoordinates(

@@ -1,0 +1,44 @@
+#include "/Engine/Public/Platform.ush"
+uint Count;
+float2 FirstTime;
+float Duration;
+StructuredBuffer<float4> FirstState,SecondState,Progress,TrialInfo;
+StructuredBuffer<float> FirstBed,SecondBed,FirstVelocity,SecondVelocity;
+RWStructuredBuffer<float4> State;
+RWStructuredBuffer<float> Bed;
+RWStructuredBuffer<float2> FaceTrace;
+RWStructuredBuffer<uint> Diagnostics;
+bool ValidState(float4 s)
+{
+    return all(isfinite(s)) && s.x>=0 && s.w>=0 && (s.x!=0 || all(s.yz==0)) &&
+        (s.x<=0 || all(isfinite(s.yz/s.x)));
+}
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    uint i=id.x;if(i>=Count)return;
+    precise float offset=(Progress[0].x-FirstTime.x)+(Progress[0].y-FirstTime.y);
+    float dt=0;
+#if RAFTSIM_BOUNDARY_SECOND_STAGE
+    dt=TrialInfo[0].y;
+#endif
+    precise float elapsed=offset+dt;
+    bool timeValid=all(isfinite(Progress[0].xy)) && isfinite(dt) && dt>=0 && isfinite(elapsed) && elapsed>=0 && elapsed<=Duration;
+    float alpha=elapsed/Duration;
+    float4 a=FirstState[i],b=SecondState[i];float za=FirstBed[i],zb=SecondBed[i],ua=FirstVelocity[i],ub=SecondVelocity[i];
+    // Copy endpoints exactly. Convex interpolation preserves nonnegative h/foam.
+    float4 s=elapsed==0?a:elapsed==Duration?b:(1-alpha)*a+alpha*b;
+    float u=elapsed==0?ua:elapsed==Duration?ub:(1-alpha)*ua+alpha*ub;
+    float acceleration=(ub-ua)/Duration;
+    bool stateValid=ValidState(a) && ValidState(b) && ValidState(s);
+    bool bedValid=isfinite(za) && isfinite(zb) && za==zb;
+    bool velocityValid=isfinite(ua) && isfinite(ub) && isfinite(u) && isfinite(acceleration);
+    if(i==0 && !timeValid)InterlockedAdd(Diagnostics[0],1u);
+    if(!stateValid)InterlockedAdd(Diagnostics[1],1u);
+    if(!bedValid)InterlockedAdd(Diagnostics[2],1u);
+    if(!velocityValid)InterlockedAdd(Diagnostics[3],1u);
+    float invalid=asfloat(0x7fc00000u);
+    State[i]=timeValid && stateValid?s:float4(invalid,invalid,invalid,invalid);
+    Bed[i]=timeValid && bedValid?za:invalid;
+    FaceTrace[i]=timeValid && velocityValid?float2(u,acceleration):float2(invalid,invalid);
+}

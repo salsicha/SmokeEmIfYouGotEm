@@ -46,8 +46,11 @@ constexpr const TCHAR* FullReachTransitFields = TEXT(
     "full_hydraulics/full_reach_transit_seed");
 constexpr const TCHAR* ReleaseVersion = TEXT("1.0.0-rc1");
 constexpr float SolverBudgetMilliseconds = 1.6f;
-constexpr float FrameBudgetMilliseconds = 1000.0f / 60.0f;
-constexpr float HitchBudgetMilliseconds = 33.0f;
+// User revised the desktop target to 30 FPS on September 12, 2026.
+// Keep the hitch criterion at two target frames; physics step rates are separate.
+constexpr float TargetFrameRate = 30.0f;
+constexpr float FrameBudgetMilliseconds = 1000.0f / TargetFrameRate;
+constexpr float HitchBudgetMilliseconds = 2.0f * FrameBudgetMilliseconds;
 constexpr float MemoryBudgetMegabytes = 8192.0f;
 constexpr float MinimumGpuTimingCeilingMilliseconds = 1000.0f;
 constexpr float GpuToWallClockPlausibilityRatio = 16.0f;
@@ -1079,7 +1082,7 @@ void ARaftSimContentLockDirector::FinishPerformanceCapture()
         bPerformanceCapturePassed && bReleasePerformanceQualificationEligible;
 
     TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
-    Report->SetStringField(TEXT("schema"), TEXT("raftsim.m8.full_reach_performance_soak.v3"));
+    Report->SetStringField(TEXT("schema"), TEXT("raftsim.m8.full_reach_performance_soak.v4"));
     Report->SetStringField(
         TEXT("platform"), ANSI_TO_TCHAR(FPlatformProperties::IniPlatformName()));
     Report->SetStringField(TEXT("build_configuration"), LexToString(FApp::GetBuildConfiguration()));
@@ -1159,7 +1162,7 @@ void ARaftSimContentLockDirector::FinishPerformanceCapture()
     Report->SetNumberField(TEXT("mean_game_thread_ms"), GameThread.Mean);
     Report->SetNumberField(TEXT("mean_render_thread_ms"), RenderThread.Mean);
     Report->SetNumberField(TEXT("mean_gpu_ms"), Gpu.Mean);
-    Report->SetNumberField(TEXT("hitches_over_33ms"), PerformanceHitchCount);
+    Report->SetNumberField(TEXT("hitches_over_budget"), PerformanceHitchCount);
     auto RecordConsoleVariable = [&Report](
         const TCHAR* FieldName, const TCHAR* ConsoleVariableName)
     {
@@ -1252,6 +1255,8 @@ void ARaftSimContentLockDirector::FinishPerformanceCapture()
         TEXT("active_rapid_roller_niagara_count"),
         ActiveRapidRollerCount);
     Report->SetNumberField(TEXT("frame_budget_ms"), FrameBudgetMilliseconds);
+    Report->SetNumberField(TEXT("target_fps"), TargetFrameRate);
+    Report->SetNumberField(TEXT("hitch_budget_ms"), HitchBudgetMilliseconds);
     Report->SetNumberField(
         TEXT("average_solver_step_ms"), WaterStats.AverageSolverStepMilliseconds);
     Report->SetNumberField(TEXT("max_solver_step_ms"), WaterStats.MaxSolverStepMilliseconds);

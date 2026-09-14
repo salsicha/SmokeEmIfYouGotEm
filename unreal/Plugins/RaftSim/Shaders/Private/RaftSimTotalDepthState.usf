@@ -1,0 +1,60 @@
+#include "/Engine/Public/Platform.ush"
+int2 GridSize;
+int2 SourceOffset;
+float CellMeters;
+StructuredBuffer<float4> PreviousState;
+StructuredBuffer<float4> NewDomainState;
+StructuredBuffer<float2> Reference;
+#if RAFTSIM_WINDOW_EXCHANGE
+StructuredBuffer<float4> PreviousWindowExchange;
+#endif
+RWStructuredBuffer<float4> NextState;
+RWStructuredBuffer<float4> Surface;
+RWStructuredBuffer<uint> Diagnostics;
+#if RAFTSIM_WINDOW_EXCHANGE
+RWStructuredBuffer<float4> WindowExchange;
+#endif
+
+uint Index(int2 p) { return p.y*GridSize.x+p.x; }
+bool Retained(int2 p) { int2 old=p+SourceOffset;return all(old>=0) && all(old<GridSize); }
+float4 Total(int2 p)
+{ return Retained(p) ? PreviousState[Index(p+SourceOffset)] : NewDomainState[Index(p)]; }
+float OffsetAt(int2 p)
+{
+    float2 reference=Reference[Index(p)];
+    return (reference.x-reference.y)+Total(p).x;
+}
+
+[numthreads(8,8,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    int2 p=int2(id.xy);if(any(p>=GridSize))return;
+    uint i=Index(p);float4 state=Total(p);float2 reference=Reference[i];
+    NextState[i]=state; // No wet mask, subtraction, clipping or representation round-trip.
+    // Slots are accounting bins, not persistent world positions. Summing all
+    // bins times cell area gives explicit cumulative entering minus departing
+    // inventory. Keep this separate from physical boundary flux and the state.
+    bool invalidExchange=false;
+#if RAFTSIM_WINDOW_EXCHANGE
+    int2 next=p-SourceOffset;
+    float4 entered=Retained(p)?0:NewDomainState[i];
+    float4 departed=(any(next<0)||any(next>=GridSize))?PreviousState[i]:0;
+    precise float4 exchange=(PreviousWindowExchange[i]+entered)-departed;
+    WindowExchange[i]=exchange;
+    invalidExchange=any(!isfinite(exchange)) || any(!isfinite(departed)) || departed.x<0 || departed.w<0 ||
+        (departed.x==0 && any(departed.yz!=0));
+#endif
+    bool invalidState=any(!isfinite(state)) || state.x<0 || state.w<0 ||
+        (state.x==0 && any(state.yz!=0)) || invalidExchange;
+    bool invalidReference=any(!isfinite(reference));
+    if(invalidState)InterlockedAdd(Diagnostics[0],1);
+    if(invalidReference)InterlockedAdd(Diagnostics[1],1);
+    InterlockedAdd(Diagnostics[Retained(p) ? 2 : 3],1);
+    int2 l=int2(max(p.x-1,0),p.y),r=int2(min(p.x+1,GridSize.x-1),p.y);
+    int2 b=int2(p.x,max(p.y-1,0)),t=int2(p.x,min(p.y+1,GridSize.y-1));
+    float dx=(OffsetAt(r)-OffsetAt(l))/((r.x-l.x)*CellMeters);
+    float dy=(OffsetAt(t)-OffsetAt(b))/((t.y-b.y)*CellMeters);
+    // Projection is derived output only. A nonzero diagnostic rejects the
+    // whole candidate frame; do not promote zero/NaN pixels as fallback water.
+    Surface[i]=float4(OffsetAt(p),dx,dy,1-exp(-state.w));
+}

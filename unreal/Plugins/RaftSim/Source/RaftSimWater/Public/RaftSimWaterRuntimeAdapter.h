@@ -300,6 +300,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
     float GetSimTimeSeconds() const { return static_cast<float>(SimTimeSeconds); }
 
+    /** Unrounded sum of successfully committed water requests, continuous across spatial handoffs.
+     *  Distinct from the native field's local clock, which restarts on a cold spatial boot. */
+    double GetCommittedStepSeconds() const { return SimTimeSeconds; }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool StepWater(float DeltaSeconds);
 
@@ -555,7 +559,8 @@ public:
         TConstArrayView<FSupportBreakingSite> Sites,
         float CrestLiftMeters,
         float StationSpacingMeters,
-        float* OutCrestFoam = nullptr);
+        float* OutCrestFoam = nullptr,
+        float GlobalOwnerCapMeters = 0.0f);
 
     /**
      * Sample the live solver directly in station/lateral coordinates. This is
@@ -575,6 +580,9 @@ public:
      */
     bool SampleWaterFieldAtRiverCoordinates(
         FVector2D StationLateralM, FRaftSimWaterSample& OutSample) const;
+
+    /** Actual native field clock, not elapsed presentation time or requested step sum. */
+    bool GetLiveFieldTimeSeconds(double& OutSeconds) const;
 
     /** Resolve repository-relative source data in editor and staged NonUFS data in builds. */
     static FString ResolveRuntimeDataPath(const FString& Path);

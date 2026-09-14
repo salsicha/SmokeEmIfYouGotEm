@@ -44,7 +44,8 @@ static bool BuildClipped(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
     TArray<FProcMeshVertex>& OutVertices, TArray<uint32>& OutIndices, TArray<int32>* OutCellOffsets,
     TArray<RaftSimWaterShoreline::FEdge>* OutEdges, bool bPreserveUnusedNodes, bool bCompactEdges,
-    TArray<RaftSimWaterShoreline::FBankTriangle>* OutBankTriangles = nullptr)
+    TArray<RaftSimWaterShoreline::FBankTriangle>* OutBankTriangles = nullptr,
+    bool bOppositeDryFan = false)
 {
     // Both public entry points validate before any output/cache mutation.
     // Do not scan the entire source grid again on a cache miss.
@@ -144,6 +145,20 @@ static bool BuildClipped(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& Source,
                 if (Wet[P]) Polygon[N++]=P;
                 if (bool(Wet[P])!=bool(Wet[Q])) Polygon[N++]=Edge(P,Q);
             }
+            if (bOppositeDryFan && N==5)
+            {
+                // Three wet corners form a pentagon. Fan from the wet corner
+                // opposite the sole dry corner, not an arbitrary grid origin.
+                // Retain every vertex and boundary segment. The changed
+                // interior surface is sampled by the same raft support path;
+                // no dry source elevation or additional water is introduced.
+                uint32 Anchor=0;
+                for(int32 I=0;I<4;++I)if(!Wet[V[I]])Anchor=V[(I+2)%4];
+                int32 Start=0;while(Start<N && Polygon[Start]!=Anchor)++Start;
+                check(Start<N);
+                uint32 Rotated[5];for(int32 I=0;I<5;++I)Rotated[I]=Polygon[(Start+I)%5];
+                for(int32 I=0;I<5;++I)Polygon[I]=Rotated[I];
+            }
             Emit(Polygon,N);
         }
     }
@@ -155,17 +170,19 @@ bool RaftSimWaterShoreline::Build(int32 Nx, int32 Ny, TArray<FProcMeshVertex>&& 
     TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
     TArray<FProcMeshVertex>& OutVertices, TArray<uint32>& OutIndices,
-    TArray<int32>* OutCellOffsets, TArray<FEdge>* OutEdges, bool bCompactEdges)
+    TArray<int32>* OutCellOffsets, TArray<FEdge>* OutEdges, bool bCompactEdges,
+    bool bOppositeDryFan)
 {
     if (!ValidInput(Nx,Ny,Source,Wet,Available,DepthM,BedM)) return false;
     return BuildClipped(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
-        OutVertices,OutIndices,OutCellOffsets,OutEdges,false,bCompactEdges);
+        OutVertices,OutIndices,OutCellOffsets,OutEdges,false,bCompactEdges,nullptr,bOppositeDryFan);
 }
 
 void RaftSimWaterShoreline::FTopologyCache::Reset()
 {
     CachedNx=CachedNy=CachedIndexCount=0;
     bCachedCompactEdges=false;
+    bCachedOppositeDryFan=false;
     XY.Reset(); WetMask.Reset(); AvailableMask.Reset(); Edges.Reset(); BankTriangles.Reset();
 }
 
@@ -173,12 +190,12 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     TArray<FProcMeshVertex>&& Source, TConstArrayView<uint8> Wet, TConstArrayView<uint8> Available,
     TConstArrayView<float> DepthM, TConstArrayView<float> BedM,
     TArray<FProcMeshVertex>& Vertices, TArray<uint32>& Indices, TArray<int32>& CellOffsets,
-    bool& bTopologyRebuilt, bool bCompactEdges)
+    bool& bTopologyRebuilt, bool bCompactEdges, bool bOppositeDryFan)
 {
     bTopologyRebuilt=false;
     if (!ValidInput(Nx,Ny,Source,Wet,Available,DepthM,BedM)) return false;
     const int32 Count=Nx*Ny;
-    bool bReuse=CachedNx==Nx && CachedNy==Ny && XY.Num()==Count && bCachedCompactEdges==bCompactEdges &&
+    bool bReuse=CachedNx==Nx && CachedNy==Ny && XY.Num()==Count && bCachedCompactEdges==bCompactEdges && bCachedOppositeDryFan==bOppositeDryFan &&
         Vertices.Num()==Count+(bCompactEdges ? Edges.Num() : (Nx-1)*Ny+Nx*(Ny-1)) && Indices.Num()==CachedIndexCount &&
         CellOffsets.Num()==(Nx-1)*(Ny-1)+1;
     for (int32 I=0; bReuse && I<Count; ++I)
@@ -209,9 +226,10 @@ bool RaftSimWaterShoreline::FTopologyCache::Update(int32 Nx, int32 Ny,
     const bool bInitializedReserve=CachedNx==Nx && CachedNy==Ny &&
         Vertices.Num()==Count+(Nx-1)*Ny+Nx*(Ny-1);
     if (!BuildClipped(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
-        Vertices,Indices,&CellOffsets,&Edges,bInitializedReserve,bCompactEdges,&BankTriangles)) return false;
+        Vertices,Indices,&CellOffsets,&Edges,bInitializedReserve,bCompactEdges,&BankTriangles,bOppositeDryFan)) return false;
     CachedNx=Nx; CachedNy=Ny; CachedIndexCount=Indices.Num();
     bCachedCompactEdges=bCompactEdges;
+    bCachedOppositeDryFan=bOppositeDryFan;
     XY.SetNumUninitialized(Count); WetMask.SetNumUninitialized(Count); AvailableMask.SetNumUninitialized(Count);
     for (int32 I=0; I<Count; ++I)
     {

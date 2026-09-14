@@ -12,6 +12,7 @@
 #include "Misc/AutomationTest.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
+#include "Engine/World.h"
 #include "ProfilingDebugging/CsvProfiler.h"
 
 CSV_DEFINE_CATEGORY(RaftSimShoreline,true);
@@ -40,16 +41,30 @@ struct FShorelineRenderPacket
 };
 
 FShorelineRenderPacket MakeRenderPacket(const TArray<FProcMeshVertex>& Source,
-    const TArray<uint32>& SourceIndices,bool bIncludeIndices)
+    const TArray<uint32>& SourceIndices,bool bIncludeIndices,
+    TArray<uint32>* DenseSources=nullptr,bool bReuseMapping=false)
 {
+    CSV_SCOPED_TIMING_STAT(RaftSimShoreline,RenderPacket);
     FShorelineRenderPacket Packet;
+    if (bReuseMapping)
+    {
+        check(DenseSources && !bIncludeIndices);
+        Packet.Vertices.Reserve(DenseSources->Num());
+        for (uint32 I:*DenseSources) Packet.Vertices.Add(RenderVertex(Source[I]));
+        return Packet;
+    }
+    if (DenseSources) DenseSources->Reset();
     TArray<int32> Remap; Remap.Init(INDEX_NONE,Source.Num());
     Packet.Vertices.Reserve(FMath::Min(Source.Num(),SourceIndices.Num()));
     if (bIncludeIndices) Packet.Indices.Reserve(SourceIndices.Num());
     for (uint32 I:SourceIndices)
     {
         int32& Dense=Remap[I];
-        if (Dense==INDEX_NONE) Dense=Packet.Vertices.Add(RenderVertex(Source[I]));
+        if (Dense==INDEX_NONE)
+        {
+            Dense=Packet.Vertices.Add(RenderVertex(Source[I]));
+            if (DenseSources) DenseSources->Add(I);
+        }
         if (bIncludeIndices) Packet.Indices.Add(uint32(Dense));
     }
     // No coordinate welding, triangle removal or attribute interpolation.
@@ -300,8 +315,14 @@ bool URaftSimShorelineMeshComponent::SetClippedWaterMesh(int32 Nx, int32 Ny,
     auto& BaseOffsets=Crests ? ClippedCellOffsets : CellOffsets;
     {
         CSV_SCOPED_TIMING_STAT(RaftSimShoreline,Topology);
+        static const bool bForceOppositeDryFan=FParse::Param(FCommandLine::Get(),TEXT("RaftSimOppositeDryBankFan"));
+        static const bool bOriginalBankFan=FParse::Param(FCommandLine::Get(),TEXT("RaftSimOriginalBankFan"));
+        // Qualified captured-cell and actual-contact correction for South Fork.
+        // Other scenarios remain explicit until their own scene verification.
+        const bool bReviewedSouthFork=GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
+        const bool bOppositeDryFan=!bOriginalBankFan && (bReviewedSouthFork || bForceOppositeDryFan);
         if (!TopologyCache.Update(Nx,Ny,MoveTemp(Source),Wet,Available,DepthM,BedM,
-            BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr)) return false;
+            BaseVertices,BaseIndices,BaseOffsets,bTopologyRebuilt,Crests!=nullptr,bOppositeDryFan)) return false;
     }
     if (Crests)
     {
@@ -359,7 +380,12 @@ void URaftSimShorelineMeshComponent::SendRenderDynamicData_Concurrent()
     if (auto* Proxy = static_cast<FShorelineSceneProxy*>(SceneProxy))
     {
         const bool bIndicesChanged=bPendingIndexUpdate;
-        auto Packet=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged);
+        static const bool bOriginalRemap=FParse::Param(FCommandLine::Get(),TEXT("RaftSimOriginalUploadRemap"));
+        // Exact index-order equality is already checked by the topology owner.
+        // Cache membership only; every active vertex attribute is rebuilt now.
+        auto Packet=MakeRenderPacket(WaterVertices,WaterIndices,bIndicesChanged,
+            &RenderVertexSources,!bOriginalRemap && bHasRenderVertexSources && !bIndicesChanged);
+        bHasRenderVertexSources=true;
         static const bool bTiming=FParse::Param(FCommandLine::Get(),TEXT("RaftSimWaterStageTimings"));
         if (bTiming) UE_LOG(LogTemp,Display,TEXT("WaterUpload frame=%llu source_vertices=%d upload_vertices=%d indices=%d index_update=%d"),
             GFrameCounter,WaterVertices.Num(),Packet.Vertices.Num(),WaterIndices.Num(),bIndicesChanged ? 1 : 0);
@@ -413,6 +439,27 @@ bool FRaftSimShorelineCompactUploadTest::RunTest(const FString&)
     for (int32 I=0; I<Rewet.Num(); ++I)
         TestTrue(TEXT("rewet/reordered topology remaps each current corner exactly"),
             Equal(WetAgain.Vertices[WetAgain.Indices[I]],RenderVertex(Source[Rewet[I]])));
+    TArray<uint32> DenseSources;
+    const auto CachedInitial=MakeRenderPacket(Source,Original,true,&DenseSources);
+    TestTrue(TEXT("cache retains exact first-occurrence source order"),
+        DenseSources==TArray<uint32>({65535,17,901,49000}));
+    Source[17].Color=FColor(17,49,71,103); Source[65535].UV3.Y+=.125;
+    Source[49000].Position.Z+=.875;
+    const auto CachedValues=MakeRenderPacket(Source,Original,false,&DenseSources,true);
+    TestTrue(TEXT("cached membership does not upload unchanged indices"),CachedValues.Indices.IsEmpty());
+    for (int32 I=0; I<Original.Num(); ++I)
+        TestTrue(TEXT("cached value update refreshes every current attribute exactly"),
+            Equal(CachedValues.Vertices[CachedInitial.Indices[I]],RenderVertex(Source[Original[I]])));
+    const auto CachedDry=MakeRenderPacket(Source,{},true,&DenseSources);
+    const auto StillDry=MakeRenderPacket(Source,{},false,&DenseSources,true);
+    TestTrue(TEXT("dry topology clears cached membership and stays empty"),
+        DenseSources.IsEmpty() && CachedDry.Vertices.IsEmpty() && StillDry.Vertices.IsEmpty());
+    const auto CachedRewet=MakeRenderPacket(Source,Rewet,true,&DenseSources);
+    const auto RewetValues=MakeRenderPacket(Source,Rewet,false,&DenseSources,true);
+    TestTrue(TEXT("rewet cache rebuild preserves exact current indices"),CachedRewet.Indices==WetAgain.Indices);
+    for (int32 I=0; I<Rewet.Num(); ++I)
+        TestTrue(TEXT("rewet cached source ordering matches the rebuilt index buffer"),
+            Equal(RewetValues.Vertices[CachedRewet.Indices[I]],RenderVertex(Source[Rewet[I]])));
     return !HasAnyErrors();
 }
 #endif

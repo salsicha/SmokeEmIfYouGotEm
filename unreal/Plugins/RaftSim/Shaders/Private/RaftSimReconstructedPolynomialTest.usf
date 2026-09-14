@@ -1,0 +1,42 @@
+#include "/Engine/Public/Platform.ush"
+
+// Isolated arithmetic qualification only. The existing production water
+// operator, state, solver and shader paths do not call this kernel.
+uint Count;
+uint4 OmegaBits;
+StructuredBuffer<uint> RowOffsets;
+StructuredBuffer<uint> Columns;
+StructuredBuffer<uint2> Matrix;
+StructuredBuffer<uint2> Scaled;
+StructuredBuffer<uint2> InverseRoot;
+StructuredBuffer<uint2> RHS;
+RWStructuredBuffer<uint4> Output;
+
+double Decode(uint2 bits) { return asdouble(bits.x,bits.y); }
+
+[numthreads(256,1,1)]
+void MainCS(uint3 Id : SV_DispatchThreadID)
+{
+    uint row=Id.x;
+    if(row>=Count)return;
+    precise double fine=0.0L;
+    precise double scaledAction=0.0L;
+    for(uint j=RowOffsets[row];j<RowOffsets[row+1];++j)
+    {
+        uint col=Columns[j];
+        precise double rhs=Decode(RHS[col]);
+        precise double normalized=rhs*Decode(InverseRoot[col]);
+        fine+=Decode(Matrix[j])*rhs;
+        scaledAction+=Decode(Scaled[j])*normalized;
+    }
+    precise double omega=Decode(OmegaBits.xy);
+    precise double inv=Decode(InverseRoot[row]);
+    precise double value=Decode(RHS[row])*inv;
+    // Exactly the degree-one reference ordering, with no threshold or repair.
+    precise double polynomial=value+value-omega*scaledAction;
+    precise double result=omega*inv*polynomial;
+    uint4 bits;
+    asuint(fine,bits.x,bits.y);
+    asuint(result,bits.z,bits.w);
+    Output[row]=bits;
+}

@@ -1,11 +1,18 @@
 #include "/Engine/Public/Platform.ush"
 #include "/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredDetailSample.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimRegisteredFoamTime.ush"
 Texture2D<float4> DetailTexture;
 StructuredBuffer<float4> Queries;
 RWStructuredBuffer<float4> Results;
 uint QueryCount;
+uint ClockMode;
 [numthreads(64,1,1)]
 void MainCS(uint3 id:SV_DispatchThreadID)
 {
-    if (id.x<QueryCount)Results[id.x]=RaftSimRegisteredDetailSample(DetailTexture,Queries[id.x].xy);
+    if (id.x<QueryCount)
+    {
+        float4 query=Queries[id.x];
+        Results[id.x]=ClockMode ? float4(RaftSimRegisteredFoamPhase(DetailTexture,query.xy,query.zw,ClockMode==1),0,0,0)
+            : RaftSimRegisteredDetailSample(DetailTexture,query.xy);
+    }
 }

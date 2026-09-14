@@ -1,0 +1,110 @@
+#include "/Engine/Public/Platform.ush"
+uint TotalTrialLimit;
+uint BoundaryMode;
+uint Count;
+uint BoundaryCount;
+RWBuffer<uint> IterationDispatchArgs;
+StructuredBuffer<float4> PreviousState;
+StructuredBuffer<float4> TrialState;
+StructuredBuffer<float4> PreviousBoundaryVolume;
+StructuredBuffer<float4> TrialBoundaryVolume;
+StructuredBuffer<float4> CandidateBoundaryRead;
+RWStructuredBuffer<float4> CandidateBoundaryWrite;
+RWStructuredBuffer<float4> NextState;
+RWStructuredBuffer<float4> NextBoundaryVolume;
+RWStructuredBuffer<uint> LedgerErrors;
+StructuredBuffer<uint> LedgerErrorsRead;
+RWStructuredBuffer<uint> CommitWrite;
+StructuredBuffer<uint> CommitRead;
+StructuredBuffer<float4> PreviousProgress;
+StructuredBuffer<uint> PreviousSummary;
+StructuredBuffer<uint> PreviousDiagnostics;
+StructuredBuffer<float4> TrialProgress;
+StructuredBuffer<uint> TrialDiagnostics;
+RWStructuredBuffer<float4> NextProgress;
+RWStructuredBuffer<uint> NextSummary;
+RWStructuredBuffer<uint> NextDiagnostics;
+uint Status()
+{
+    if(PreviousSummary[3]!=BoundaryMode)return 2u;
+    uint status=PreviousSummary[2];
+    if(status==0)
+    {
+        float4 p=PreviousProgress[0];
+        if(all(isfinite(p)) && p.z==0)status=1u;
+        else if(PreviousSummary[0]>=TotalTrialLimit)status=4u;
+    }
+    return status;
+}
+[numthreads(256,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    uint status=Status();
+#if RAFTSIM_ADVANCE_PHASE == 0
+    if(id.x!=0)return;
+    float4 p=PreviousProgress[0];
+    // Scratch only: preserve the actual progress record on inactive slots.
+    if(status!=0)p=float4(0,0,0,0);
+    NextProgress[0]=p;
+    IterationDispatchArgs[0]=status==0?(Count+255u)/256u:0u;
+    IterationDispatchArgs[1]=1u;IterationDispatchArgs[2]=1u;
+    IterationDispatchArgs[3]=status==0?1u:0u;
+    IterationDispatchArgs[4]=1u;IterationDispatchArgs[5]=1u;
+#elif RAFTSIM_ADVANCE_PHASE == 1
+    if(id.x!=0)return;
+    uint trials=PreviousSummary[0],accepted=PreviousSummary[1];
+    float4 p=PreviousProgress[0];
+#if RAFTSIM_ADVANCE_BOUNDARY
+    bool ledgerBad=LedgerErrorsRead[0]!=0;
+#else
+    bool ledgerBad=false;
+#endif
+#if RAFTSIM_ADVANCE_BOUNDARY
+    // Publish one authoritative decision from the same pass as the counters
+    // and clock. State/inventory selection explicitly depends on this record.
+    CommitWrite[0]=status==0 && !ledgerBad && TrialDiagnostics[3]!=0?1u:0u;
+#endif
+    if(status==0)
+    {
+        ++trials;
+        for(uint k=0;k<4;++k)NextDiagnostics[k]=TrialDiagnostics[k];
+        if(ledgerBad)
+        {
+            p.w=0;status=2u;NextDiagnostics[2]|=32u;NextDiagnostics[3]=0;
+        }
+        else
+        {
+            p=TrialProgress[0];accepted+=TrialDiagnostics[3]!=0?1u:0u;
+            if(TrialDiagnostics[3]!=0 && p.z==0)status=1u;
+            else if(p.w==0)status=2u;
+            else if(trials>=TotalTrialLimit)status=4u;
+        }
+    }
+    else for(uint k=0;k<4;++k)NextDiagnostics[k]=PreviousDiagnostics[k];
+    if(ledgerBad){p.w=0;status=2u;NextDiagnostics[2]|=32u;NextDiagnostics[3]=0;}
+    if(PreviousSummary[3]!=BoundaryMode){p.w=0;NextDiagnostics[2]|=32u;NextDiagnostics[3]=0;}
+    NextProgress[0]=p;NextSummary[0]=trials;NextSummary[1]=accepted;
+    NextSummary[2]=status;NextSummary[3]=PreviousSummary[3];
+#elif RAFTSIM_ADVANCE_PHASE == 2
+    if(id.x>=BoundaryCount)return;
+    float4 previous=PreviousBoundaryVolume[id.x],candidate=previous;
+    if(status==0)
+    {
+        if(TrialDiagnostics[3]!=0)candidate+=TrialBoundaryVolume[id.x];
+    }
+    if(any(!isfinite(previous)) || any(!isfinite(candidate)))InterlockedOr(LedgerErrors[0],1u);
+    CandidateBoundaryWrite[id.x]=candidate;
+#elif RAFTSIM_ADVANCE_PHASE == 3
+    bool accept=CommitRead[0]!=0;
+    if(accept)
+    {
+        if(id.x<Count)NextState[id.x]=TrialState[id.x];
+        if(id.x<BoundaryCount)NextBoundaryVolume[id.x]=CandidateBoundaryRead[id.x];
+    }
+    else
+    {
+        if(id.x<Count)NextState[id.x]=PreviousState[id.x];
+        if(id.x<BoundaryCount)NextBoundaryVolume[id.x]=PreviousBoundaryVolume[id.x];
+    }
+#endif
+}

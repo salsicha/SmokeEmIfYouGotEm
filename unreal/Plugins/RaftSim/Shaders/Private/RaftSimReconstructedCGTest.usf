@@ -1,0 +1,380 @@
+#include "/Engine/Public/Platform.ush"
+// Isolated sparse FP64 range-PCG qualification, not production geometry/forcing.
+uint Count;
+uint PartialCount;
+uint InitializeDirection;
+uint4 OmegaBits;
+StructuredBuffer<uint> RowOffsets;
+StructuredBuffer<uint> Columns;
+StructuredBuffer<uint2> Matrix;
+StructuredBuffer<uint2> Scaled;
+StructuredBuffer<uint2> InverseRoot;
+StructuredBuffer<uint2> RHS;
+StructuredBuffer<uint2> DirectionInput;
+StructuredBuffer<uint2> PartialInput;
+StructuredBuffer<uint2> ControlInput;
+StructuredBuffer<uint> DiagnosticInput;
+RWStructuredBuffer<uint2> X;
+RWStructuredBuffer<uint2> Residual;
+RWStructuredBuffer<uint2> Z;
+RWStructuredBuffer<uint2> Direction;
+RWStructuredBuffer<uint2> Applied;
+RWStructuredBuffer<uint2> Partials;
+// Scale, rz, ratio, alpha, beta. All are double, including reductions.
+RWStructuredBuffer<uint2> Control;
+// Failure bits, completed iterations, active, initially zero RHS.
+RWStructuredBuffer<uint> Diagnostics;
+groupshared uint2 Scratch[256];
+
+double Decode(uint2 b){return asdouble(b.x,b.y);}
+uint2 Encode(double v){uint2 b;asuint(v,b.x,b.y);return b;}
+bool Finite(double v){uint2 b=Encode(v);return (b.y&0x7ff00000u)!=0x7ff00000u;}
+double AbsD(double v){return v<0.0L?-v:v;}
+double MaxD(double a,double b){return a>b?a:b;}
+double DirectionAt(uint row)
+{
+#if RAFTSIM_RECONSTRUCTED_CG_FUSED_DIRECTION
+    // Separate immutable input/output buffers: no cross-thread read of a
+    // partially updated direction. Same multiply then add as original phase5.
+    precise double value=Decode(Z[row])+Decode(Control[4])*Decode(DirectionInput[row]);
+    return value;
+#else
+    return Decode(Direction[row]);
+#endif
+}
+double PowerFloor(double v)
+{
+    uint2 b=Encode(v);uint exponent=b.y&0x7ff00000u;
+    if(exponent!=0)return asdouble(0u,exponent);
+    // Handle positive binary64 subnormals by their leading significand bit.
+    uint high=b.y&0xfffffu;
+    return high!=0?asdouble(0u,1u<<firstbithigh(high)):asdouble(1u<<firstbithigh(b.x),0u);
+}
+void Reduce(double v,uint lane,uint group,bool peak)
+{
+    Scratch[lane]=Encode(v);GroupMemoryBarrierWithGroupSync();
+    for(uint stride=128;stride>0;stride>>=1)
+    {
+        if(lane<stride)
+        {
+            precise double a=Decode(Scratch[lane]),b=Decode(Scratch[lane+stride]);
+            Scratch[lane]=Encode(peak?MaxD(a,b):a+b);
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+    if(lane==0)Partials[group]=Scratch[0];
+}
+double FinishReduction(bool peak,uint lane)
+{
+    precise double value=0.0L;
+#if RAFTSIM_RECONSTRUCTED_CG_PARALLEL_REDUCTION
+    for(uint i=lane;i<PartialCount;i+=256)
+    {
+        precise double part=Decode(Partials[i]);
+        value=peak?MaxD(value,part):value+part;
+    }
+    Scratch[lane]=Encode(value);GroupMemoryBarrierWithGroupSync();
+    for(uint stride=128;stride>0;stride>>=1)
+    {
+        if(lane<stride)
+        {
+            precise double a=Decode(Scratch[lane]),b=Decode(Scratch[lane+stride]);
+            Scratch[lane]=Encode(peak?MaxD(a,b):a+b);
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+    return Decode(Scratch[0]);
+#else
+    if(lane!=0)return value;
+    for(uint i=0;i<PartialCount;++i)
+    {
+        precise double part=Decode(Partials[i]);
+        value=peak?MaxD(value,part):value+part;
+    }
+    return value;
+#endif
+}
+
+double FinishSourceSum(uint lane)
+{
+    // Same parallel reduction tree as FinishReduction. The source is separate
+    // from this dispatch's output partials; workgroups need no global barrier.
+    precise double value=0.0L;
+    for(uint i=lane;i<PartialCount;i+=256)value+=Decode(PartialInput[i]);
+    Scratch[lane]=Encode(value);GroupMemoryBarrierWithGroupSync();
+    for(uint stride=128;stride>0;stride>>=1)
+    {
+        if(lane<stride)
+        {
+            precise double a=Decode(Scratch[lane]),b=Decode(Scratch[lane+stride]);
+            Scratch[lane]=Encode(a+b);
+        }
+        GroupMemoryBarrierWithGroupSync();
+    }
+    precise double result=Decode(Scratch[0]);
+    // Every lane must consume the result before Reduce reuses Scratch.
+    GroupMemoryBarrierWithGroupSync();
+    return result;
+}
+
+void CopyControl(uint row)
+{
+    if(row==0)for(uint i=0;i<5;++i)Control[i]=ControlInput[i];
+}
+
+[numthreads(256,1,1)]
+void MainCS(uint3 Id:SV_DispatchThreadID,uint3 Local:SV_GroupThreadID,uint3 Group:SV_GroupID)
+{
+    uint row=Id.x;
+#if RAFTSIM_RECONSTRUCTED_CG_PHASE == 0
+    precise double value=row<Count?Decode(RHS[row]):0.0L;
+    if(!Finite(value))InterlockedOr(Diagnostics[0],1u);
+    Reduce(AbsD(value),Local.x,Group.x,true);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 1
+    precise double peak=FinishReduction(true,Local.x);
+    if(row!=0)return;
+    Diagnostics[1]=0;Diagnostics[3]=uint(peak==0.0L);
+    Diagnostics[2]=uint(peak>0.0L && Finite(peak) && Diagnostics[0]==0);
+    Control[0]=Encode(peak>0.0L?PowerFloor(peak):1.0L);
+    Control[1]=Encode(0.0L);Control[2]=Encode(1.0L);Control[3]=Encode(0.0L);Control[4]=Encode(0.0L);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 2
+    if(row>=Count)return;
+    X[row]=Encode(0.0L);Direction[row]=Encode(0.0L);
+    precise double value=Diagnostics[2]!=0?Decode(RHS[row])/Decode(Control[0]):0.0L;
+    Residual[row]=Encode(value);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 3
+    precise double product=0.0L;
+    if(row<Count)
+    {
+        precise double result=0.0L;
+        if(Diagnostics[2]!=0)
+        {
+            precise double sum=0.0L;
+#if RAFTSIM_RECONSTRUCTED_CG_BATCHED_LOADS
+            uint start=RowOffsets[row],end=RowOffsets[row+1];
+            for(uint base=start;base<end;base+=4)
+            {
+                precise double contribution[4];
+                [unroll]for(uint lane=0;lane<4;++lane)
+                {
+                    contribution[lane]=0.0L;
+                    if(base+lane<end)
+                    {
+                        uint entry=base+lane;
+#if RAFTSIM_RECONSTRUCTED_CG_SLOT_MAJOR
+                        entry=(entry-start)*Count+row;
+#endif
+                        uint col=Columns[entry];
+                        precise double normalized=Decode(Residual[col])*Decode(InverseRoot[col]);
+                        contribution[lane]=Decode(Scaled[entry])*normalized;
+                    }
+                }
+                // Fetch products ahead, but accumulate in ORIGINAL row order.
+                [unroll]for(uint lane=0;lane<4;++lane)if(base+lane<end)sum+=contribution[lane];
+            }
+#else
+            for(uint j=RowOffsets[row];j<RowOffsets[row+1];++j)
+            {
+                uint entry=j;
+#if RAFTSIM_RECONSTRUCTED_CG_SLOT_MAJOR
+                entry=(j-RowOffsets[row])*Count+row;
+#endif
+                uint col=Columns[entry];
+                precise double normalized=Decode(Residual[col])*Decode(InverseRoot[col]);
+                sum+=Decode(Scaled[entry])*normalized;
+            }
+#endif
+            precise double inv=Decode(InverseRoot[row]),omega=Decode(OmegaBits.xy);
+            precise double normalized=Decode(Residual[row])*inv;
+            precise double polynomial=normalized+normalized-omega*sum;
+            result=omega*inv*polynomial;
+            product=Decode(Residual[row])*result;
+            if(!Finite(result) || !Finite(product))InterlockedOr(Diagnostics[0],2u);
+        }
+        Z[row]=Encode(result);
+        if(InitializeDirection!=0)Direction[row]=Encode(result);
+    }
+    Reduce(product,Local.x,Group.x,false);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 4
+    if(Diagnostics[2]==0)return;
+    precise double next=FinishReduction(false,Local.x);
+    if(row!=0)return;
+    if(!Finite(next) || next<0.0L || Diagnostics[0]!=0){Diagnostics[0]|=4u;Diagnostics[2]=0;return;}
+    if(next==0.0L){Diagnostics[2]=0;return;}
+    if(InitializeDirection==0)
+    {
+        precise double beta=Decode(Control[2])*next/Decode(Control[1]);
+        if(!Finite(beta)){Diagnostics[0]|=8u;Diagnostics[2]=0;return;}
+        Control[4]=Encode(beta);
+    }
+    Control[1]=Encode(next);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 5
+    if(row>=Count || Diagnostics[2]==0)return;
+    precise double value=Decode(Z[row])+Decode(Control[4])*Decode(Direction[row]);
+    if(!Finite(value))InterlockedOr(Diagnostics[0],16u);
+    Direction[row]=Encode(value);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 6
+    precise double product=0.0L;
+    if(row<Count)
+    {
+        precise double sum=0.0L;
+        if(Diagnostics[2]!=0)
+        {
+            precise double direction=DirectionAt(row);
+#if RAFTSIM_RECONSTRUCTED_CG_FUSED_DIRECTION
+            if(!Finite(direction))InterlockedOr(Diagnostics[0],16u);
+            Direction[row]=Encode(direction);
+#endif
+#if RAFTSIM_RECONSTRUCTED_CG_BATCHED_LOADS
+            uint start=RowOffsets[row],end=RowOffsets[row+1];
+            for(uint base=start;base<end;base+=4)
+            {
+                precise double contribution[4];
+                [unroll]for(uint lane=0;lane<4;++lane)
+                {
+                    contribution[lane]=0.0L;
+                    if(base+lane<end)
+                    {
+                        uint entry=base+lane;
+#if RAFTSIM_RECONSTRUCTED_CG_SLOT_MAJOR
+                        entry=(entry-start)*Count+row;
+#endif
+                        contribution[lane]=Decode(Matrix[entry])*DirectionAt(Columns[entry]);
+                    }
+                }
+                [unroll]for(uint lane=0;lane<4;++lane)if(base+lane<end)sum+=contribution[lane];
+            }
+#else
+            for(uint j=RowOffsets[row];j<RowOffsets[row+1];++j)
+            {
+                uint entry=j;
+#if RAFTSIM_RECONSTRUCTED_CG_SLOT_MAJOR
+                entry=(j-RowOffsets[row])*Count+row;
+#endif
+                sum+=Decode(Matrix[entry])*DirectionAt(Columns[entry]);
+            }
+#endif
+            product=direction*sum;
+            if(!Finite(sum) || !Finite(product))InterlockedOr(Diagnostics[0],32u);
+        }
+        Applied[row]=Encode(sum);
+    }
+    Reduce(product,Local.x,Group.x,false);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 7
+    if(Diagnostics[2]==0)return;
+    precise double denominator=FinishReduction(false,Local.x);
+    if(row!=0)return;
+    if(!Finite(denominator) || denominator<=0.0L || Diagnostics[0]!=0){Diagnostics[0]|=64u;Diagnostics[2]=0;return;}
+    precise double alpha=Decode(Control[1])/denominator;
+    if(!Finite(alpha)){Diagnostics[0]|=128u;Diagnostics[2]=0;return;}
+    Control[3]=Encode(alpha);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 8
+    precise double peak=0.0L;
+    if(row<Count && Diagnostics[2]!=0)
+    {
+        precise double alpha=Decode(Control[3]);
+        precise double step=alpha*Decode(Direction[row]);
+        precise double value=Decode(X[row])+step*Decode(Control[0]);
+        precise double residual=Decode(Residual[row])-alpha*Decode(Applied[row]);
+        if(!Finite(value) || !Finite(residual))InterlockedOr(Diagnostics[0],256u);
+        X[row]=Encode(value);Residual[row]=Encode(residual);peak=AbsD(residual);
+    }
+    Reduce(peak,Local.x,Group.x,true);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 9
+    if(Diagnostics[2]==0)return;
+    precise double peak=FinishReduction(true,Local.x);
+    if(row!=0)return;
+    ++Diagnostics[1];
+    if(!Finite(peak) || Diagnostics[0]!=0){Diagnostics[0]|=512u;Diagnostics[2]=0;return;}
+    if(peak==0.0L){Diagnostics[2]=0;return;}
+    precise double ratio=PowerFloor(peak),scale=Decode(Control[0])*ratio;
+    if(!Finite(scale) || scale==0.0L){Diagnostics[0]|=1024u;Diagnostics[2]=0;return;}
+    Control[2]=Encode(ratio);Control[0]=Encode(scale);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 10
+    if(row>=Count || Diagnostics[2]==0)return;
+    precise double value=Decode(Residual[row])/Decode(Control[2]);
+    if(!Finite(value))InterlockedOr(Diagnostics[0],2048u);
+    Residual[row]=Encode(value);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 11
+    // Original phases4+5. All groups independently repeat the SAME small
+    // final reduction. Read old control/diagnostics from immutable snapshots;
+    // a newly detected direction overflow must not change another group's
+    // earlier phase4 decision. Only row0 owns scalar-state transitions.
+    CopyControl(row);
+    if(DiagnosticInput[2]==0)return;
+    precise double next=FinishReduction(false,Local.x);
+    if(!Finite(next) || next<0.0L || DiagnosticInput[0]!=0)
+    {
+        if(row==0){InterlockedOr(Diagnostics[0],4u);Diagnostics[2]=0;}
+        return;
+    }
+    if(next==0.0L){if(row==0)Diagnostics[2]=0;return;}
+    precise double beta=Decode(ControlInput[2])*next/Decode(ControlInput[1]);
+    if(!Finite(beta))
+    {
+        if(row==0){InterlockedOr(Diagnostics[0],8u);Diagnostics[2]=0;}
+        return;
+    }
+    if(row==0){Control[4]=Encode(beta);Control[1]=Encode(next);}
+    if(row>=Count)return;
+    precise double value=Decode(Z[row])+beta*Decode(Direction[row]);
+    if(!Finite(value))InterlockedOr(Diagnostics[0],16u);
+    Direction[row]=Encode(value);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 12
+    // Original phases7+8, with separate p*Ap input and residual-peak output.
+    precise double peak=0.0L;
+    if(DiagnosticInput[2]!=0)
+    {
+        precise double denominator=FinishSourceSum(Local.x);
+        bool valid=Finite(denominator) && denominator>0.0L && DiagnosticInput[0]==0;
+        precise double alpha=0.0L;
+        if(!valid)
+        {
+            if(row==0){InterlockedOr(Diagnostics[0],64u);Diagnostics[2]=0;}
+        }
+        else
+        {
+            alpha=Decode(Control[1])/denominator;
+            if(!Finite(alpha))
+            {
+                valid=false;
+                if(row==0){InterlockedOr(Diagnostics[0],128u);Diagnostics[2]=0;}
+            }
+            else if(row==0)Control[3]=Encode(alpha);
+        }
+        if(valid && row<Count)
+        {
+            precise double step=alpha*Decode(Direction[row]);
+            precise double value=Decode(X[row])+step*Decode(Control[0]);
+            precise double residual=Decode(Residual[row])-alpha*Decode(Applied[row]);
+            if(!Finite(value) || !Finite(residual))InterlockedOr(Diagnostics[0],256u);
+            X[row]=Encode(value);Residual[row]=Encode(residual);peak=AbsD(residual);
+        }
+    }
+    Reduce(peak,Local.x,Group.x,true);
+#elif RAFTSIM_RECONSTRUCTED_CG_PHASE == 13
+    // Original phases9+10. One immutable peak/control/diagnostic generation
+    // supplies every workgroup; output scale and normalized rows are separate.
+    CopyControl(row);
+    if(DiagnosticInput[2]==0)return;
+    precise double peak=FinishReduction(true,Local.x);
+    if(row==0)Diagnostics[1]=DiagnosticInput[1]+1;
+    if(!Finite(peak) || DiagnosticInput[0]!=0)
+    {
+        if(row==0){InterlockedOr(Diagnostics[0],512u);Diagnostics[2]=0;}
+        return;
+    }
+    if(peak==0.0L){if(row==0)Diagnostics[2]=0;return;}
+    precise double ratio=PowerFloor(peak),scale=Decode(ControlInput[0])*ratio;
+    if(!Finite(scale) || scale==0.0L)
+    {
+        if(row==0){InterlockedOr(Diagnostics[0],1024u);Diagnostics[2]=0;}
+        return;
+    }
+    if(row==0){Control[2]=Encode(ratio);Control[0]=Encode(scale);}
+    if(row>=Count)return;
+    precise double value=Decode(Residual[row])/ratio;
+    if(!Finite(value))InterlockedOr(Diagnostics[0],2048u);
+    Residual[row]=Encode(value);
+#endif
+}

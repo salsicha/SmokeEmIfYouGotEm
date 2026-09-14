@@ -1,0 +1,70 @@
+#ifndef RAFTSIM_SCALED_HYDROSTATIC
+#define RAFTSIM_SCALED_HYDROSTATIC
+#include "RaftSimPortableFloat.ush"
+#include "RaftSimExactHydrostatic.ush"
+// Optional continuous shoreline reconstruction. MC slopes have quantum2^-150;
+// multiplying by any finite FP32 factor in[0,1] and halving needs quantum2^-300.
+// Keep those products exact until face rounding, using the existing18-limb
+// accumulator. The ordinary unscaled10-limb path is unchanged.
+struct RaftSimWidePolynomial { uint h[RAFTSIM_FLOAT_LIMBS];uint z[RAFTSIM_FLOAT_LIMBS]; };
+void RaftSimWideSubtract(inout uint a[RAFTSIM_FLOAT_LIMBS],uint b[RAFTSIM_FLOAT_LIMBS])
+{
+    uint borrow=0;
+    [unroll]for(uint i=0;i<RAFTSIM_FLOAT_LIMBS;++i)
+    {uint t=a[i]-b[i],v=t-borrow;borrow=uint(a[i]<b[i] || t<borrow);a[i]=v;}
+}
+int RaftSimWideSign(uint a[RAFTSIM_FLOAT_LIMBS])
+{
+    if((a[RAFTSIM_FLOAT_LIMBS-1]>>31)!=0)return -1;
+    uint bits=0;[unroll]for(uint i=0;i<RAFTSIM_FLOAT_LIMBS;++i)bits|=a[i];return bits!=0?1:0;
+}
+void RaftSimScaledOffset(inout uint target[RAFTSIM_FLOAT_LIMBS],RaftSimDyadic slope,float factor,float direction)
+{
+    int sign=RaftSimDyadicSign(slope);uint bits=asuint(factor);
+    if(sign==0 || (bits&0x7fffffffu)==0)return;
+    if(sign<0)slope=RaftSimDyadicNegate(slope);
+    uint e=(bits>>23)&255u,m=(bits&0x7fffffu)|(e!=0?0x800000u:0);
+    // The low10 bits of an exact MC slope are zero. Strip them without
+    // rounding, then multiply each16-bit digit by the FP32 significand.
+    // The extra half is in the shift, including minimum-subnormal factors.
+    bool negative=(sign<0)!=(direction<0);
+    [loop]for(uint digit=0;digit<20;++digit)
+    {
+        uint at=16*digit+10,index=at>>5,offset=at&31u;
+        uint part=index<10?slope.w[index]>>offset:0;
+        if(offset>16 && index+1<10)part|=slope.w[index+1]<<(32-offset);
+        part&=0xffffu;if(part==0)continue;
+        uint shift=16*digit+max(e,1u)-1u;
+        RaftSimAccumulate(target,part*(m&0xffffu),0,shift,negative);
+        RaftSimAccumulate(target,part*(m>>16),0,shift+16,negative);
+    }
+}
+RaftSimWidePolynomial RaftSimScaledPolynomialAt(float3 depth,float3 bed,float factor,float direction)
+{
+    RaftSimWidePolynomial p;
+    [unroll]for(uint i=0;i<RAFTSIM_FLOAT_LIMBS;++i){p.h[i]=0;p.z[i]=0;}
+    RaftSimAccumulateFloat(p.h,asuint(depth.y));RaftSimAccumulateFloat(p.z,asuint(bed.y));
+    if(asuint(factor)==0 || !RaftSimPositiveDepth(depth.x) || !RaftSimPositiveDepth(depth.y) || !RaftSimPositiveDepth(depth.z))return p;
+    RaftSimDyadic h=RaftSimDyadicFloat(depth.y),z=RaftSimDyadicFloat(bed.y);
+    RaftSimDyadic back=RaftSimDyadicSub(h,RaftSimDyadicFloat(depth.x)),front=RaftSimDyadicSub(RaftSimDyadicFloat(depth.z),h);
+    RaftSimDyadic dh=RaftSimDyadicMC(back,front);
+    RaftSimDyadic de=RaftSimDyadicMC(
+        RaftSimDyadicAdd(back,RaftSimDyadicSub(z,RaftSimDyadicFloat(bed.x))),
+        RaftSimDyadicAdd(front,RaftSimDyadicSub(RaftSimDyadicFloat(bed.z),z)));
+    RaftSimScaledOffset(p.h,dh,factor,direction);
+    RaftSimScaledOffset(p.z,RaftSimDyadicSub(de,dh),factor,direction);return p;
+}
+float4 RaftSimScaledHydrostatic(float4 depthL,float4 bedL,float4 depthR,float4 bedR,out bool2 positive)
+{
+    RaftSimWidePolynomial l=RaftSimScaledPolynomialAt(depthL.xyz,bedL.xyz,depthL.w,bedL.w);
+    RaftSimWidePolynomial r=RaftSimScaledPolynomialAt(depthR.xyz,bedR.xyz,depthR.w,bedR.w);
+    // Round copies: rounding normalizes the accumulator sign in place.
+    RaftSimWidePolynomial lc=l,rc=r;
+    float2 h=float2(RaftSimRoundAccumulator(lc.h,false,0),RaftSimRoundAccumulator(rc.h,false,0));
+    RaftSimWideSubtract(rc.z,l.z);int sign=RaftSimWideSign(rc.z);
+    if(sign>0)RaftSimWideSubtract(l.h,rc.z);
+    if(sign<0){RaftSimWideSubtract(l.z,r.z);RaftSimWideSubtract(r.h,l.z);}
+    positive=bool2(RaftSimWideSign(l.h)>0,RaftSimWideSign(r.h)>0);
+    return float4(h,positive.x?RaftSimRoundAccumulator(l.h,false,0):0,positive.y?RaftSimRoundAccumulator(r.h,false,0):0);
+}
+#endif

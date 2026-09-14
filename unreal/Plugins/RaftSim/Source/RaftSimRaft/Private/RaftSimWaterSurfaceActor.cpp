@@ -4,11 +4,14 @@
 #include "RaftSimWaterSourcePacking.h"
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
+#include "RaftSimIndexedBreakingProfile.h"
 #include "RaftSimWaterFlowHistory.h"
 #include "RaftSimWaterCarrierMeshComponent.h"
 #include "RaftSimWaterTextureHistory.h"
 #include "RaftSimFoamTransportFrame.h"
+#include "RaftSimFoamEvolution.h"
 #include "RaftSimPlayableCrestMesh.h"
+#include "RaftSimCarrierShapeAudit.h"
 #include "Async/ParallelFor.h"
 #include "ProfilingDebugging/CsvProfiler.h"
 
@@ -2129,6 +2132,18 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("HydraulicFoamIntensity"),
                     ResolvedLiveFoamIntensity);
+#if !UE_BUILD_SHIPPING
+                // Diagnostic knockout of the final optical consumer only.
+                // Density/source/advection, WPO, normals and contact are not
+                // edited. Zero optical density makes both GPU-authority and
+                // CPU-edge coverage resolve to zero in the same material.
+                if (GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) && FParse::Param(
+                    FCommandLine::Get(),TEXT("RaftSimFoamOpticsOff")))
+                {
+                    VolumeMaterial->SetScalarParameterValue(TEXT("SouthForkFoamOpticalDensity"),0.f);
+                    UE_LOG(LogTemp,Display,TEXT("FoamOpticsOff: diagnostic optical coverage disabled; foam state and carrier unchanged"));
+                }
+#endif
                 if (bSingleLiveWaterSurfaceEnabled)
                 {
                     // South Fork presents the persistent transported foam
@@ -2249,6 +2264,21 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                     VolumeMaterial->SetScalarParameterValue(
                         TEXT("SpeedAerationFraction"), 0.0f);
                 }
+#if !UE_BUILD_SHIPPING
+                if (GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) && FParse::Param(
+                    FCommandLine::Get(),TEXT("RaftSimDielectricWaterReview")))
+                {
+                    // Single Layer Water already evaluates view-dependent
+                    // Fresnel reflection. Use water's dielectric F0 input,
+                    // without another angle-dependent IOR or painted sky
+                    // contribution in the base-color graph. No lighting,
+                    // roughness, foam density, normal or geometry changes.
+                    VolumeMaterial->SetScalarParameterValue(TEXT("Specular"),0.255f);
+                    VolumeMaterial->SetScalarParameterValue(TEXT("FresnelSpecular"),0.f);
+                    VolumeMaterial->SetScalarParameterValue(TEXT("FallbackSkyReflectionStrength"),0.f);
+                    UE_LOG(LogTemp,Display,TEXT("DielectricWaterReview: specular=0.255, additional Fresnel/painted-sky=0; foam and physical carrier retained"));
+                }
+#endif
                 VolumeMaterial->SetScalarParameterValue(
                     TEXT("CalmRippleStrength"),
                     0.025f + ResolvedLiveRippleStrength * 0.08f);
@@ -3651,6 +3681,8 @@ void ARaftSimWaterSurfaceActor::ReleaseMacroHistory()
 
 void ARaftSimWaterSurfaceActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+    if(FoamClockRefreshes){UE_LOG(LogTemp,Display,TEXT("Foam committed-water clock: origin=%.9f water=%.9f target=%.9f refreshes=%llu holds=%llu initializations=%llu; no wall-time fallback"),
+        FoamWaterClock.Origin,FoamWaterClock.Last,FoamWaterClock.TargetSeconds(),FoamClockRefreshes,FoamClockHolds,FoamClockInitializations);}
     if (WaterAdapter) WaterAdapter->ClearRaftSupportCarrierSampler(this);
     ReleaseMacroHistory();
     Super::EndPlay(EndPlayReason);
@@ -3881,6 +3913,21 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     CSV_SCOPED_TIMING_STAT(RaftSimSurface,Refresh);
     FWaterSurfacePerf Perf(TEXT("refresh"));
     const bool bCartesianFlow = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates();
+    FRaftSimCommittedWaterClock NextFoamClock=FoamWaterClock;
+    const bool bPreviousFoamUsable=bFoamFieldValid && bCartesianFlow==bFoamUsesCommittedClock;
+    double FoamCommittedDelta=0;
+    float FoamDeltaSeconds=0;
+    if(bCartesianFlow)
+    {
+        const double WaterSeconds=WaterAdapter->GetCommittedStepSeconds();
+        const bool Valid=WaterAdapter->GetStatus()!=ERaftSimWaterRuntimeStatus::Faulted &&
+            (bPreviousFoamUsable ? NextFoamClock.Observe(WaterSeconds,FoamCommittedDelta) : NextFoamClock.Initialize(WaterSeconds));
+        FoamDeltaSeconds=float(FoamCommittedDelta);
+        if(!Valid || !FMath::IsFinite(FoamDeltaSeconds) || (FoamCommittedDelta>0 && FoamDeltaSeconds==0))
+        {UE_LOG(LogTemp,Error,TEXT("Foam committed-water clock invalid/regressed; refusing unpaired evolution"));return;}
+        // Commit this candidate only when the new foam field is published.
+        // A newly initialized field has no historical foam duration to replay.
+    }
     const auto FlowDirectionFor = [bCartesianFlow](const FRaftSimWaterSample& Sample)
     {
         // Refresh samples the field API, whose velocity is already hydraulic
@@ -3935,14 +3982,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     TArray<float> SourceFoam;
     SourceFoam.Init(0.0f, Vertices.Num());
 
-    // Real elapsed time since the previous refresh drives foam advection and
-    // decay; clamped so a hitch or the first refresh cannot teleport foam.
-    const double NowRealSeconds = FPlatformTime::Seconds();
-    const float FoamDeltaSeconds = bFoamFieldValid
-        ? FMath::Clamp(
-              static_cast<float>(NowRealSeconds - LastRefreshRealSeconds), 0.0f, 0.5f)
-        : 0.0f;
-    LastRefreshRealSeconds = NowRealSeconds;
+    // Legacy non-Cartesian reviews retain their separate clock. The normal
+    // Cartesian field uses only the committed-water duration prepared above.
+    if(!bCartesianFlow)
+    {
+        const double NowRealSeconds=FPlatformTime::Seconds();
+        FoamDeltaSeconds=bPreviousFoamUsable ? FMath::Clamp(float(NowRealSeconds-LastRefreshRealSeconds),0.f,.5f) : 0.f;
+        LastRefreshRealSeconds=NowRealSeconds;
+    }
 
     // Sample the live field once per vertex. A separate presentation pass can
     // then compare same-lateral station neighbours without multiplying runtime
@@ -5586,6 +5633,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             }
         }
     }
+    static const bool bFullCrestScan=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFullCrestScan"));
+    TSharedPtr<FRaftSimIndexedBreakingProfile,ESPMode::ThreadSafe> SharedCrestProfile;
     if (bCartesianFlow && bSingleLiveWaterSurfaceEnabled && bSharedBreakingReliefEnabled)
     {
         MacroCrestDisplacementCm.Init(0.f,Vertices.Num());
@@ -5618,10 +5667,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }
         // Capture the actual support records, not float-packed shader records
         // or reconstructed angles. The same profile survives between refreshes.
-        CartesianCrestInput.HeightAtWorldXYCm=[Sites=SupportSites,Lift,Spacing,Scale,Sign](const FVector2D& P)
+        const auto IndexedProfile=MakeShared<FRaftSimIndexedBreakingProfile,ESPMode::ThreadSafe>(SupportSites,Lift,Spacing);
+        SharedCrestProfile=IndexedProfile;
+        CartesianCrestInput.HeightAtWorldXYCm=[Sites=SupportSites,IndexedProfile,Lift,Spacing,Scale,Sign](const FVector2D& P)
         {
-            return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
-                FVector2D(P.X*.01,P.Y*.01*Sign),Sites,Lift,Spacing)*Scale*100.f;
+            const FVector2D Field(P.X*.01,P.Y*.01*Sign);
+            return (bFullCrestScan ? URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
+                Field,Sites,Lift,Spacing) : IndexedProfile->Sample(Field))*Scale*100.f;
         };
     }
     if (WaterAdapter)
@@ -5811,14 +5863,35 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         : 0;
     const bool bUseHydraulicFoamBudget = bCartesianFlow && bCrestLocalizedFoam &&
         CVarRaftSimChilkoHydraulicCrestScale.GetValueOnGameThread()!=0;
-    MaximumAbsoluteDownstreamBoilDisplacementMeters = 0.0f;
-    for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
+    const bool bPhysicalCrestFoam=CVarRaftSimChilkoHydraulicCrestScale.GetValueOnGameThread()!=0;
+    static const bool bSerialBreakingVertices=FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialBreakingVertices"));
+    FString BreakingVertexAuditPath;
+#if !UE_BUILD_SHIPPING
+    if (GetWorld() && GetWorld()->GetTimeSeconds()>=10.f)
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimBreakingVertexAudit="),BreakingVertexAuditPath);
+    if (!BreakingVertexAuditPath.IsEmpty() && FPaths::FileExists(BreakingVertexAuditPath))BreakingVertexAuditPath.Reset();
+#endif
+    // The comparison owns the SAME pre-pass input, not a different trajectory.
+    TArray<FVector> SerialVertices;
+    TArray<float> SerialFoam,SerialCrest,SerialTongue;
+    TArray<uint8> SerialMask;
+    if (!BreakingVertexAuditPath.IsEmpty())
+    {
+        SerialVertices=Vertices;SerialFoam=SourceFoam;SerialCrest=MacroCrestDisplacementCm;
+        SerialTongue=TongueFoamSuppression;SerialMask=BreakingPresentationVertexMask;
+    }
+    const auto ApplyBreakingVertices=[&](TArray<FVector>& Vertices,TArray<float>& SourceFoam,
+        TArray<float>& MacroCrestDisplacementCm,TArray<float>& TongueFoamSuppression,
+        TArray<uint8>& BreakingPresentationVertexMask,bool bConcurrent,bool bOriginalScan)
+    {
+    TArray<float> AbsoluteBoil;AbsoluteBoil.Init(0.f,Vertices.Num());
+    const auto ApplyVertex=[&](int32 VertexIndex)
     {
         if (WetVertexMask[VertexIndex] == 0)
         {
-            continue;
+            return;
         }
-    float CombinedPocketDisplacementMeters = 0.0f;
+        float CombinedPocketDisplacementMeters = 0.0f;
         float CombinedBoilDisplacementMeters = 0.0f;
         float PocketFoam = 0.0f;
         float BoilFoam = 0.0f;
@@ -5901,9 +5974,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             CombinedPocketDisplacementMeters, -0.30f, 0.18f);
         CombinedBoilDisplacementMeters = FMath::Clamp(
             CombinedBoilDisplacementMeters, -0.045f, 0.070f);
-        MaximumAbsoluteDownstreamBoilDisplacementMeters = FMath::Max(
-            MaximumAbsoluteDownstreamBoilDisplacementMeters,
-            FMath::Abs(CombinedBoilDisplacementMeters));
+        AbsoluteBoil[VertexIndex]=FMath::Abs(CombinedBoilDisplacementMeters);
         const float CombinedDisplacementMeters = FMath::Clamp(
             CombinedPocketDisplacementMeters + CombinedBoilDisplacementMeters,
             -0.31f,
@@ -5917,9 +5988,11 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         const auto& LocalSupportSites = bSpatialBreakingReview
             ? StationBreakingSites[VertexIndex % GridStationN].Support : SupportSites;
         const float SharedBreakingReliefMeters = bSharedBreakingReliefEnabled
-            ? URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
+            ? ((!bOriginalScan && !bFullCrestScan && !bSpatialBreakingReview && SharedCrestProfile)
+                ? SharedCrestProfile->Sample(RiverCoordinatesM[VertexIndex],&PhysicalCrestFoam)
+                : URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
                   RiverCoordinatesM[VertexIndex], LocalSupportSites,
-                  BreakingCrestLiftMeters, ResolvedVertexSpacingMeters, &PhysicalCrestFoam) *
+                  BreakingCrestLiftMeters, ResolvedVertexSpacingMeters, &PhysicalCrestFoam)) *
                 ResolvedPresentationHydraulicReliefScale *
                 ShoreDisplacementWeight[VertexIndex]
             : 0.0f;
@@ -5934,7 +6007,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // Fresh crest foam follows the same accepted/eased geometry as
             // raft support. Troughs may carry old foam but do not continually
             // create it; the persistent advection below supplies the trail.
-            const float CrestFoam = CVarRaftSimChilkoHydraulicCrestScale.GetValueOnGameThread() != 0
+            const float CrestFoam = bPhysicalCrestFoam
                 ? PhysicalCrestFoam * ShoreDisplacementWeight[VertexIndex]
                 : 0.85f * FMath::SmoothStep(0.015f, 0.09f, SharedBreakingReliefMeters);
             SourceFoam[VertexIndex] = FMath::Max(SourceFoam[VertexIndex], CrestFoam);
@@ -5949,7 +6022,52 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             BreakingPresentationVertexMask[VertexIndex] = 1;
         }
+    };
+    // Stable source/site arrays; one writer per destination. Join before foam
+    // advection, source resizing, or any UObject/solver mutation. Site sum order
+    // inside a vertex remains serial and identical to the reference evaluator.
+    if (bConcurrent)ParallelFor(TEXT("RaftSimBreakingVertices"),Vertices.Num(),256,
+        ApplyVertex,EParallelForFlags::Unbalanced);
+    else for (int32 I=0;I<Vertices.Num();++I)ApplyVertex(I);
+    float Maximum=0.f;
+    for (float Value:AbsoluteBoil)Maximum=FMath::Max(Maximum,Value);
+    return Maximum;
+    };
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,BreakingVertices);
+        MaximumAbsoluteDownstreamBoilDisplacementMeters=ApplyBreakingVertices(Vertices,SourceFoam,
+            MacroCrestDisplacementCm,TongueFoamSuppression,BreakingPresentationVertexMask,
+            bCartesianFlow && !bSerialBreakingVertices,bSerialBreakingVertices);
     }
+#if !UE_BUILD_SHIPPING
+    if (!BreakingVertexAuditPath.IsEmpty())
+    {
+        const float SerialMaximum=ApplyBreakingVertices(SerialVertices,SerialFoam,SerialCrest,
+            SerialTongue,SerialMask,false,true);
+        const auto Exact=[](const auto& A,const auto& B)
+        {return A.Num()==B.Num() && (A.IsEmpty() || FMemory::Memcmp(A.GetData(),B.GetData(),A.Num()*sizeof(A[0]))==0);};
+        const bool Positions=Exact(Vertices,SerialVertices),Foam=Exact(SourceFoam,SerialFoam),
+            Crest=Exact(MacroCrestDisplacementCm,SerialCrest),Tongue=Exact(TongueFoamSuppression,SerialTongue),
+            Mask=Exact(BreakingPresentationVertexMask,SerialMask),Maximum=MaximumAbsoluteDownstreamBoilDisplacementMeters==SerialMaximum;
+        const bool Passed=Positions && Foam && Crest && Tongue && Mask && Maximum;
+        const TSharedRef<FJsonObject> Report=MakeShared<FJsonObject>();
+        Report->SetStringField(TEXT("scope"),TEXT("Same live pre-pass input; parallel/indexed versus serial/full scan, exact output bits; not visual or performance acceptance"));
+        Report->SetBoolField(TEXT("passed"),Passed);Report->SetNumberField(TEXT("vertices"),Vertices.Num());
+        Report->SetNumberField(TEXT("support_sites"),SupportSites.Num());
+        Report->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
+        Report->SetBoolField(TEXT("parallel"),bCartesianFlow && !bSerialBreakingVertices);
+        Report->SetBoolField(TEXT("indexed"),!bSerialBreakingVertices && !bFullCrestScan && !bSpatialBreakingReview && SharedCrestProfile && SharedCrestProfile->IsIndexed());
+        Report->SetBoolField(TEXT("positions_exact"),Positions);Report->SetBoolField(TEXT("foam_exact"),Foam);
+        Report->SetBoolField(TEXT("crest_exact"),Crest);Report->SetBoolField(TEXT("tongue_exact"),Tongue);
+        Report->SetBoolField(TEXT("mask_exact"),Mask);Report->SetBoolField(TEXT("maximum_exact"),Maximum);
+        FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+        const bool Saved=FFileHelper::SaveStringToFile(Json,*BreakingVertexAuditPath);
+        if (Passed && Saved)
+        {UE_LOG(LogTemp,Display,TEXT("BreakingVertexAudit exact vertices=%d sites=%d path=%s"),Vertices.Num(),SupportSites.Num(),*BreakingVertexAuditPath);}
+        else
+        {UE_LOG(LogTemp,Error,TEXT("BreakingVertexAudit failed passed=%d saved=%d path=%s"),Passed,Saved,*BreakingVertexAuditPath);}
+    }
+#endif
 
 #if !UE_BUILD_SHIPPING
     FString DecompositionPath;
@@ -6111,28 +6229,32 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
               CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f,
               CartesianGridCenterNorthM - CurvedGridWidthMeters * 0.5f)
         : FVector2D(GridOriginCm.X / kSurfCmPerM, GridOriginCm.Y / kSurfCmPerM);
-    const float DecayFactor = FoamDeltaSeconds > 0.0f
+    const bool bHoldFoam=bCartesianFlow && FoamDeltaSeconds==0.f;
+    const float DecayFactor = FoamDeltaSeconds > 0.0f || bCartesianFlow
         ? FMath::Pow(0.5f, FoamDeltaSeconds / FMath::Max(FoamHalfLifeSeconds, 0.5f))
         : 0.0f;
+    const float FoamAttackDeltaSeconds=bCartesianFlow ? FoamDeltaSeconds :
+        (FoamDeltaSeconds>0.f ? FoamDeltaSeconds : FMath::Max(RefreshIntervalSeconds,1.f/60.f));
+    const float FoamAttackBlend=1.f-FMath::Exp(-FoamAttackDeltaSeconds/.22f);
     TArray<float> NewFoamField;
     NewFoamField.SetNumZeroed(Vertices.Num());
     FoamTransportVelocityMetersPerSecond.Init(FVector2D::ZeroVector,Vertices.Num());
     float FoamAdvectionSum = 0.0f;
     float FoamAdvectionMax = 0.0f;
-    for (int32 Y = 0; Y < GridLateralN; ++Y)
+    const auto AdvectFoam=[&](TArray<float>& OutputFoam,TArray<FVector2D>& OutputVelocity,
+        TArray<FLinearColor>& OutputColors,bool Concurrent)
     {
-        for (int32 X = 0; X < GridStationN; ++X)
+        const auto Vertex=[&](int32 Index)
         {
-            const int32 Index = Y * GridStationN + X;
             if (WetVertexMask[Index] == 0)
             {
-                continue;
+                return;
             }
             float Advected = 0.0f;
             const FVector SampledVelocity = WaterSamples[Index].VelocityMetersPerSecond;
-            FoamTransportVelocityMetersPerSecond[Index] = FVector2D(SampledVelocity.X,SampledVelocity.Y);
-            if (bFoamFieldValid && DecayFactor > 0.0f &&
-                FoamField.Num() == NewFoamField.Num())
+            OutputVelocity[Index] = FVector2D(SampledVelocity.X,SampledVelocity.Y);
+            if (bPreviousFoamUsable && DecayFactor > 0.0f &&
+                FoamField.Num() == OutputFoam.Num())
             {
                 FVector2D FieldVelocity(SampledVelocity.X, SampledVelocity.Y);
                 FVector2D FieldPosition(
@@ -6151,7 +6273,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 // or create a second surface.
                 const float BulkWaterSpeedMetersPerSecond =
                     FieldVelocity.Size();
-                const FVector2D BulkFlowDirection = WaterAdapter && WaterAdapter->HasCartesianWaterCoordinates()
+                const FVector2D BulkFlowDirection = bCartesianFlow
                     ? RaftSimWaterFlowFrame::Direction(FieldVelocity) : FVector2D(1.,0.);
                 FVector2D RollerVelocity = FVector2D::ZeroVector;
                 const auto& LocalRollerSites = bSpatialBreakingReview
@@ -6220,7 +6342,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 }
                 // Export the exact velocity that moves the foam field, after
                 // every local return contribution, without changing transport.
-                FoamTransportVelocityMetersPerSecond[Index] = FieldVelocity;
+                OutputVelocity[Index] = FieldVelocity;
                 const FVector2D BackPosition =
                     FieldPosition - FieldVelocity * FoamDeltaSeconds;
                 const float FractionalX =
@@ -6231,7 +6353,13 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     ResolvedVertexSpacingMeters;
                 const int32 CellX = FMath::FloorToInt(FractionalX);
                 const int32 CellY = FMath::FloorToInt(FractionalY);
-                if (CellX >= 0 && CellX < GridStationN - 1 &&
+                if(bHoldFoam)
+                {
+                    // Exact same-grid hold also preserves border-node values.
+                    Advected=CurrentFieldOriginM==FoamFieldOriginM ? FoamField[Index] :
+                        RaftSimFoamEvolution::RemapHeld(FoamField,GridStationN,GridLateralN,FractionalX,FractionalY);
+                }
+                else if (CellX >= 0 && CellX < GridStationN - 1 &&
                     CellY >= 0 && CellY < GridLateralN - 1)
                 {
                     const float Fx = FractionalX - CellX;
@@ -6253,40 +6381,72 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             // transported release. This is state smoothing only: the solver
             // still decides where foam is born and the sampled current still
             // decides where it travels.
-            const float FoamAttackDeltaSeconds = FoamDeltaSeconds > 0.0f
-                ? FoamDeltaSeconds
-                : FMath::Max(RefreshIntervalSeconds, 1.0f / 60.0f);
-            const float FoamAttackBlend = 1.0f - FMath::Exp(
-                -FoamAttackDeltaSeconds / 0.22f);
-            float FinalFoam = FMath::Clamp(
-                SourceFoam[Index] > Advected
-                    ? FMath::Lerp(
-                          Advected,
-                          SourceFoam[Index],
-                          FMath::Clamp(FoamAttackBlend, 0.0f, 1.0f))
-                    : Advected,
-                0.0f,
-                1.0f);
-            // Entry tongues stay glassy: damp both generated and advected
-            // foam in the tongue core so the V reads as clean fast water.
-            if (TongueFoamSuppression[Index] > 0.0f)
-            {
-                FinalFoam *= 1.0f - 0.9f * FMath::Min(
-                    TongueFoamSuppression[Index], 1.0f);
-            }
-            // Foam drives the same carrier's local-fluid WPO. Fade it with
-            // the geometric shoreline weight so an energetic cell beside a
-            // dry bank cannot raise a detached green water mound there.
-            FinalFoam *= ShoreDisplacementWeight[Index];
-            NewFoamField[Index] = FinalFoam;
-            VertexColors[Index].R = FinalFoam;
-            FoamAdvectionSum += FinalFoam;
-            FoamAdvectionMax = FMath::Max(FoamAdvectionMax, FinalFoam);
-        }
+            const float FinalFoam=RaftSimFoamEvolution::Resolve(Advected,SourceFoam[Index],FoamAttackBlend,
+                TongueFoamSuppression[Index],ShoreDisplacementWeight[Index],bHoldFoam);
+            OutputFoam[Index]=FinalFoam;
+            OutputColors[Index].R=FinalFoam;
+        };
+        if(Concurrent)ParallelFor(TEXT("RaftSimFoamTransport"),Vertices.Num(),256,Vertex,EParallelForFlags::Unbalanced);
+        else for(int32 I=0;I<Vertices.Num();++I)Vertex(I);
+    };
+    // Actual warmed captures measured dispatch overhead above this sparse
+    // loop's serial cost. Keep parallel transport opt-in, not the normal path.
+    static const bool bParallelFoamTransport=FParse::Param(FCommandLine::Get(),TEXT("RaftSimParallelFoamTransport")) &&
+        !FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialFoamTransport"));
+    FString FoamAuditPath;
+#if !UE_BUILD_SHIPPING
+    if(GetWorld() && GetWorld()->GetTimeSeconds()>=10.f)
+    {
+        FParse::Value(FCommandLine::Get(),TEXT("RaftSimFoamEvolutionAudit="),FoamAuditPath);
+        if(FPaths::FileExists(FoamAuditPath))FoamAuditPath.Reset();
+    }
+#endif
+    TArray<float> SerialTransportFoam;TArray<FVector2D> SerialVelocity;TArray<FLinearColor> SerialColors;
+    if(!FoamAuditPath.IsEmpty())
+    {SerialTransportFoam.Init(0.f,Vertices.Num());SerialVelocity.Init(FVector2D::ZeroVector,Vertices.Num());SerialColors=VertexColors;}
+    {
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,FoamTransport);
+        AdvectFoam(NewFoamField,FoamTransportVelocityMetersPerSecond,VertexColors,bCartesianFlow && bParallelFoamTransport);
+        // Preserve the original Y-major reduction order; no parallel sum drift.
+        for(int32 I=0;I<Vertices.Num();++I)if(WetVertexMask[I])
+        {FoamAdvectionSum+=NewFoamField[I];FoamAdvectionMax=FMath::Max(FoamAdvectionMax,NewFoamField[I]);}
+    }
+    if(!FoamAuditPath.IsEmpty())
+    {
+        AdvectFoam(SerialTransportFoam,SerialVelocity,SerialColors,false);
+        const auto Exact=[](const auto& A,const auto& B)
+        {return A.Num()==B.Num() && (A.IsEmpty() || FMemory::Memcmp(A.GetData(),B.GetData(),A.Num()*sizeof(A[0]))==0);};
+        float SerialSum=0,SerialMax=0;
+        for(int32 I=0;I<Vertices.Num();++I)if(WetVertexMask[I]){SerialSum+=SerialTransportFoam[I];SerialMax=FMath::Max(SerialMax,SerialTransportFoam[I]);}
+        const bool Passed=Exact(NewFoamField,SerialTransportFoam) && Exact(FoamTransportVelocityMetersPerSecond,SerialVelocity) &&
+            Exact(VertexColors,SerialColors) && SerialSum==FoamAdvectionSum && SerialMax==FoamAdvectionMax;
+        auto Report=MakeShared<FJsonObject>();Report->SetBoolField(TEXT("passed"),Passed);
+        Report->SetStringField(TEXT("scope"),TEXT("Same actual previous foam and current water/sites/coordinates; selected path versus serial density, effective velocity, RGBA and ordered reductions. The parallel field identifies selection; serial/default is a self-check, not parallel validation. Not visual or performance acceptance."));
+        Report->SetNumberField(TEXT("vertices"),Vertices.Num());Report->SetNumberField(TEXT("committed_water_seconds"),NextFoamClock.Last);
+        Report->SetNumberField(TEXT("committed_delta_seconds"),FoamCommittedDelta);Report->SetNumberField(TEXT("kernel_delta_seconds"),FoamDeltaSeconds);
+        Report->SetBoolField(TEXT("held"),bHoldFoam);Report->SetBoolField(TEXT("parallel"),bCartesianFlow && bParallelFoamTransport);
+        FString Json;FJsonSerializer::Serialize(Report,TJsonWriterFactory<>::Create(&Json));
+        const bool Saved=FFileHelper::SaveStringToFile(Json,*FoamAuditPath);
+        if(Passed && Saved){UE_LOG(LogTemp,Display,TEXT("FoamEvolutionAudit exact vertices=%d path=%s"),Vertices.Num(),*FoamAuditPath);}
+        else {UE_LOG(LogTemp,Error,TEXT("FoamEvolutionAudit failed passed=%d saved=%d"),Passed,Saved);}
     }
     FoamField = MoveTemp(NewFoamField);
     FoamFieldOriginM = CurrentFieldOriginM;
+    if(bCartesianFlow)
+    {
+        FoamWaterClock=NextFoamClock;++FoamClockRefreshes;FoamClockHolds+=bHoldFoam;FoamClockInitializations+=!bPreviousFoamUsable;
+        if(LiveVolumeCoreMesh)
+            if(auto* Material=Cast<UMaterialInstanceDynamic>(LiveVolumeCoreMesh->GetMaterial(0)))
+            {
+                const double Seconds=FoamWaterClock.TargetSeconds();
+                const float High=float(Seconds),Low=float(Seconds-double(High));
+                Material->SetVectorParameterValue(TEXT("RaftSimCPUFoamClock"),FLinearColor(High,Low,0,0));
+            }
+        CSV_CUSTOM_STAT(RaftSimSurface,FoamWaterSeconds,FoamWaterClock.Last,ECsvCustomStatOp::Set);
+        CSV_CUSTOM_STAT(RaftSimSurface,FoamDeltaSeconds,FoamCommittedDelta,ECsvCustomStatOp::Set);
+    }
     bFoamFieldValid = true;
+    bFoamUsesCommittedClock=bCartesianFlow;
     FoamSum = FoamAdvectionSum;
     MaximumFoam = FoamAdvectionMax;
 
@@ -8293,6 +8453,25 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
         }
         Perf.Mark(TEXT("clip_bounds_enqueue"));
 #if !UE_BUILD_SHIPPING
+        FString ShapeAuditPath;
+        if (bFineCrests && GetWorld() && GetWorld()->GetTimeSeconds()>=13.f &&
+            FParse::Value(FCommandLine::Get(),TEXT("RaftSimCarrierShapeAudit="),ShapeAuditPath) &&
+            !FPaths::FileExists(ShapeAuditPath))
+        {
+            // Inspect the already presented payload; do not force a new commit.
+            const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
+            const float Sign=WaterAdapter->GetRiverWorldYSign();
+            const FVector Focus=FoamOcclusionRaft ? FoamOcclusionRaft->GetActorLocation() : GetActorLocation();
+            const bool Saved=RaftSimCarrierShapeAudit::Save(ShapeAuditPath,
+                CartesianShorelineMesh->GetWaterVertices(),CartesianShorelineMesh->GetWaterIndices(),
+                CartesianShorelineMesh->GetActiveVertexCount(),CartesianShorelineMesh->GetCrestRefinement(),
+                [&](const FVector& P)->double { return Detail ? Detail->DisplacementCm(P,Sign) : 0.; },
+                GetWorld()->GetTimeSeconds(),Detail ? Detail->Sequence : 0,GetResolvedLiveSurfaceRenderLiftCm(),
+                Focus,GridStationN,GridLateralN,RiverCoordinatesM,CartesianShoreWet,
+                CartesianShoreDepthM,CartesianShoreBedM,Sign);
+            if (Saved) { UE_LOG(LogTemp,Display,TEXT("Submitted carrier shape saved: %s"),*ShapeAuditPath); }
+            else { UE_LOG(LogTemp,Error,TEXT("Submitted carrier shape capture refused: %s"),*ShapeAuditPath); }
+        }
         FString ContactAuditPath;
         if (GetWorld() && GetWorld()->GetTimeSeconds()>=10.f &&
             FParse::Value(FCommandLine::Get(),TEXT("RaftSimCarrierContactAudit="),ContactAuditPath) &&
