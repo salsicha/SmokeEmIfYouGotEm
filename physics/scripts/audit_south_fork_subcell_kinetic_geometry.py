@@ -9,12 +9,17 @@ from audit_south_fork_subcell_energy_flux import ROOT, read, sha, exact_cells
 from south_fork_registered_mesh import RegisteredMeshSampler
 from subcell_geometry_patch import SubcellGeometryPatch
 from subcell_pressure_kinetic_geometry import local_form, quadrature
+from subcell_wet_connectivity import components
+from subcell_wet_pool_partition import WetPoolPartition
+from subcell_wet_pool_pressure import WetPoolPressureSystem
+from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--atlas', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--pool-pressure', action='store_true', help='Also audit both original poles on separated fixed wet pools')
     args = parser.parse_args()
     if args.report.exists():
         raise FileExistsError(args.report)
@@ -39,10 +44,12 @@ def main():
     paths = [args.atlas, geometry_path, coordinate_path, mesh_path, Path(__file__)]
     paths += [ROOT/'physics/scripts'/name for name in (
         'subcell_pressure_kinetic_geometry.py', 'triangle_cell_storage.py', 'subcell_geometry_patch.py',
-        'triangle_face_section.py', 'south_fork_registered_mesh.py', 'audit_south_fork_subcell_energy_flux.py')]
+        'triangle_face_section.py', 'south_fork_registered_mesh.py', 'audit_south_fork_subcell_energy_flux.py',
+        'subcell_wet_connectivity.py', 'subcell_wet_pool_partition.py', 'subcell_wet_pool_pressure.py',
+        'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
-    for key in ('h', 'bed'):
+    for key in (('h', 'bed', 'u', 'v') if args.pool_pressure else ('h', 'bed')):
         record = atlas['arrays'][key]
         path = (args.atlas.parent/record['file']).resolve()
         if sha(path) != record['sha256']:
@@ -72,6 +79,7 @@ def main():
             unsupported.append(dict(index=index, reason='dry; no inverse-mass or wet-front closure'))
             continue
         form = local_form(cell, volume)
+        connectivity = components(terrain, cell, origins[index]+shift, [1., 1.], form['stage_offset'])
         triangle_volume, triangle_wet_area = cell._triangle_volume_and_wet_area(form['stage_offset'], cell.relative_levels)
         cell_codes = set()
         for source_id, tv, tw in zip(cell.source_triangle_indices, triangle_volume, triangle_wet_area):
@@ -102,6 +110,7 @@ def main():
             raise ValueError('Actual exact-volume/kinetic-tangent geometry control failed')
         mean_wet_depth_cubic = volume*(volume/form['wet_area'])**2
         records.append(dict(index=index, volume_m3=float(volume), wet_area_m2=form['wet_area'],
+            wet_connectivity=connectivity,
             wet_source_vertex_authority_codes=sorted(cell_codes),
             original_triangle_count=len(cell.areas), factor_row_count=len(form['factor']),
             relative_volume_error=relative_volume_error, relative_kinetic_tangent_error=derivative_error,
@@ -113,13 +122,69 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
+    pressure = None
+    if args.pool_pressure:
+        volume = fields['h'].reshape(patch.shape)
+        momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
+        pools = WetPoolPartition(patch, terrain, origins[0]+shift, volume, momentum)
+        rhs = np.array([pool['momentum']/np.sqrt(pool['volume']) for pool in pools.pools])[:, None, :]
+        pole_records = []
+        for length, weight in zip(LENGTHS, WEIGHTS):
+            system = WetPoolPressureSystem(pools, float(length))
+            value, stats = system.solve(rhs)
+            # Independent bounded dense assembly from the local Gram tensors,
+            # not the factor-action routine used by CG. This is an audit oracle
+            # only and never replaces the 40-iteration result.
+            if len(pools.pools) > 1024:
+                raise ValueError('Dense pressure oracle exceeds its bounded audit scope')
+            dense = np.eye(2*len(pools.pools))
+            for index, pool in enumerate(pools.pools):
+                mapping = system.row_maps[index]
+                cols = sorted(set(mapping) | {2*index, 2*index+1})
+                jet = np.zeros((3, len(cols)))
+                for j, col in enumerate(cols):
+                    jet[0, j] = mapping.get(col, 0.)/system.root[col//2]
+                    if col//2 == index:
+                        jet[1+col%2, j] = 1/system.root[index]
+                dense[np.ix_(cols, cols)] += length*(jet.T@pool['form']['gram']@jet)
+            expected = np.linalg.solve(dense, rhs.ravel()).reshape(rhs.shape)
+            error = float(np.max(abs(expected-value))/max(1., np.max(abs(expected))))
+            action_error = float(np.max(abs(dense@rhs.ravel()-system.apply(rhs).ravel()))
+                                 /max(1., np.max(abs(dense@rhs.ravel()))))
+            pole_records.append(dict(length=float(length), weight=float(weight), **stats,
+                scaled_dense_solution_error=error, scaled_dense_action_error=action_error,
+                solve_gate_passed=stats['relative_residual'] < 2e-5,
+                independent_solution_gate_passed=error < 1e-10,
+                shared_column_partition_error=system.maximum_shared_column_partition_error,
+                wall_column_partition_error=system.maximum_wall_column_partition_error,
+                shared_wet_subsegments=len(system.connections), reflecting_wall_subsegments=len(system.walls),
+                direct_same_cell_pool_connections=sum(pools.pools[f['left']]['parent'] == pools.pools[f['right']]['parent']
+                                                     for f in system.connections)))
+        pressure = dict(pool_count=len(pools.pools), original_wet_cells=int(np.sum(volume > 0)),
+            maximum_partition_volume_error=pools.maximum_volume_error,
+            maximum_partition_momentum_error=pools.maximum_momentum_error,
+            maximum_gram_partition_error=pools.maximum_gram_partition_error,
+            maximum_volume_tangent_partition_error=pools.maximum_volume_tangent_partition_error,
+            probe='Source-velocity-shaped normalized RHS, NOT an acceleration or evolved state',
+            poles=pole_records,
+            fixed_pressure_controls_passed=(max(pools.maximum_volume_error, pools.maximum_momentum_error,
+                pools.maximum_gram_partition_error, pools.maximum_volume_tangent_partition_error) < 1e-10
+                and all(p['solve_gate_passed'] and p['independent_solution_gate_passed']
+                    and max(p['scaled_dense_action_error'], p['shared_column_partition_error'],
+                            p['wall_column_partition_error']) < 1e-10
+                    and p['direct_same_cell_pool_connections'] == 0 for p in pole_records)),
+            nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
     quantiles = lambda key: np.quantile([r[key] for r in records], [0, .5, .95, 1]).tolist()
     result = dict(schema='raftsim.south_fork.subcell_pressure_kinetic_geometry.v1',
         accepted=False, positive_cell_geometry_controls_passed=True, total_cells=256,
+        fixed_pool_pressure=pressure,
         positive_cells=len(records), unsupported_cells=unsupported,
+        multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
+        total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
+        one_pressure_unknown_per_cell_supported=all(r['wet_connectivity']['one_pressure_unknown_per_cell_supported'] for r in records),
         wet_geometry_by_source_vertex_authority_codes=provenance,
         provenance_note='Codes are preserved per original triangle vertex, not averaged or promoted. '
             '1=captured DEM ground; 3=original exposed-rock return support. Other codes are inference/'
@@ -133,12 +198,14 @@ def main():
         mean_depth_cubic_loss_fraction_min_median_p95_max=quantiles('mean_depth_cubic_loss_fraction'),
         records=records, source_sha256=hashes,
         scope='Original wet source-triangle geometry and original cell volumes. Positive local kinetic '
-              'factor and fixed-terrain volume derivative only; no selected intercell derivative, '
-              'two-pole solve, nonlinear bed-force work, dry/open/time, native or gameplay qualification.')
+              'factor and fixed-terrain volume derivative, plus optional separated-pool static two-pole '
+              'pressure on shared wet faces and reflecting walls. No nonlinear bed-force work, topology '
+              'evolution, wetting/open/time, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
     print(json.dumps({k: v for k, v in result.items() if k not in ('records', 'source_sha256')}, indent=2))
+    return 1 if pressure is not None and not pressure['fixed_pressure_controls_passed'] else 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

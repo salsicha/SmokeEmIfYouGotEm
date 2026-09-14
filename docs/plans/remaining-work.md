@@ -3,6 +3,17 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [separated wet-pool pressure on exact terrain](../reconstruction-review-2026-09-07/normal-river-separated-wet-pool-pressure.md).
+Actual3 cells contain disconnected pools:255 wet cells require258 wet regions.
+Original-source topology now prevents one-cell pressure bridges, preserves small
+pools and mixed provenance, and couples exact kinetic factors through shared
+harmonic wet faces plus physical reflecting walls. Both original poles pass on
+the actual graph in40CG; independent dense solution error<=6.74e-13.72 testsPASS.
+Fixed snapshot ONLY: no full nonlinear bed-force work, topology transitions or
+wetting/time evolution yet. NEXT complete metric/advection/bed-force and pool
+storage/flux coupling, events/open/refinement/native/shared-surface qualification.
+464 protected hashes unchanged; no gameplay orFPS gain; full scene scope OPEN.
+
 Latest September 14: [exact-terrain pressure kinetic geometry](../reconstruction-review-2026-09-07/normal-river-exact-terrain-kinetic-geometry.md).
 Original wet triangles now supply positive completed-square kinetic factors and
 analytic local volume derivatives; source-face IDs preserve mixed measured/

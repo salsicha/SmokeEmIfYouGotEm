@@ -75,6 +75,8 @@ class TriangleCellStorage:
         triangles = np.asarray(triangles, float)
         if triangles.ndim != 3 or triangles.shape[1:] != (3, 3) or not len(triangles) or not np.isfinite(triangles).all():
             raise ValueError('Finite nonempty XYZ triangles required')
+        self.triangles = triangles.copy()
+        self.triangles.flags.writeable = False
         self.areas = projected_areas(triangles)
         if (self.areas <= 0).any():
             raise ValueError('Degenerate projected triangle')
