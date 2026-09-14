@@ -17,7 +17,7 @@ from continuous_extremum_transport import ContinuousExtremumTransport
 from rational_velocity_bracket_reference import gradient
 
 
-def stress_stage_physical(g,physical_momentum,*,flux_scheme='donor-stress'):
+def stress_stage_physical(g,physical_momentum,*,flux_scheme='donor-stress',preconditioner='patch'):
     """Physical-state entry using the equivalent matrix-free inverse metric.
 
     Inputs stay untouched. The solve's momentum round-trip is checked, never
@@ -26,8 +26,8 @@ def stress_stage_physical(g,physical_momentum,*,flux_scheme='donor-stress'):
     """
     from rational_primal_energy import evaluate as primal_energy
     p=np.asarray(physical_momentum,dtype=float)
-    prepared=primal_energy(g,p)
-    result=stress_stage(g,prepared['canonical_velocity'],flux_scheme=flux_scheme)
+    prepared=primal_energy(g,p,preconditioner=preconditioner)
+    result=stress_stage(g,prepared['canonical_velocity'],flux_scheme=flux_scheme,preconditioner=preconditioner)
     error=float(abs(result['momentum']-p).max())
     if error>1e-10*max(1.,float(abs(p).max())):
         raise ValueError('Physical momentum preparation round-trip is unqualified')
@@ -41,13 +41,13 @@ def negative_divergence(faces,dx):
     return -sum((face-np.roll(face,1,axis))/dx for face,axis in zip(faces,(1,0)))
 
 
-def stress_stage(g,canonical_velocity,*,flux_scheme='donor-stress'):
+def stress_stage(g,canonical_velocity,*,flux_scheme='donor-stress',preconditioner='patch'):
     if (not isinstance(g,SmoothPressureGeometry) or not np.all(g.bed==g.bed.flat[0])):
         raise ValueError('Flat positive periodic stress component only; bed force is not derived')
     if flux_scheme not in ('donor-stress','paired-base'):
         raise ValueError('Unknown conservative stress flux scheme')
     h=g.h;v=np.asarray(canonical_velocity,dtype=float);root=np.sqrt(h)
-    response=evaluate(g,v,preconditioner='patch');p=response['canonical_gradient_flux'];u=response['layer_velocity']
+    response=evaluate(g,v,preconditioner=preconditioner);p=response['canonical_gradient_flux'];u=response['layer_velocity']
     if flux_scheme=='donor-stress':
         transport=ContinuousExtremumTransport(h,g.bed,u,g.dx,periodic=True)
         ht=transport.mass_rate;mass_bound=transport.draining_bound
@@ -84,8 +84,8 @@ def stress_stage(g,canonical_velocity,*,flux_scheme='donor-stress'):
                 canonical_faces[j]+=mass_faces[j][...,None]*.5*(v+np.roll(v,-1,axis))
         mt=negative_divergence(canonical_faces,g.dx)
         vt=(mt-ht[...,None]*v)/h[...,None]
-    transformed=physical_rate(g,v,ht,vt,derivative_preconditioner='patch',
-                              primal_preconditioner='patch',include_auxiliary_rates=True)
+    transformed=physical_rate(g,v,ht,vt,derivative_preconditioner=preconditioner,
+                              primal_preconditioner=preconditioner,include_auxiliary_rates=True)
     tangent=SmoothPressureGeometryRate(g,g.bed,ht);ell=ht/(2*h)
     bfaces=[np.zeros_like(h),np.zeros_like(h)];btfaces=[np.zeros_like(h),np.zeros_like(h)]
     with np.errstate(over='raise',under='raise',invalid='raise'):

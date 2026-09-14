@@ -3,6 +3,18 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [full-velocity two-dimensional metric transport](../reconstruction-review-2026-09-07/normal-river-two-dimensional-metric-transport.md).
+Derived tensor cross-coupling with off-diagonal physical momentum faces; retains
+both velocity components and canonical vorticity. Both16/32/64-grid profiles
+conserve energy/local momentum and approach the independent full continuum
+bracket at second order. Initial64-grid patch solve failed its strict round-trip
+gate; opt-in flat spectral preconditioning resolves it with SAME operator,
+40CG and tolerances.32 targeted testsPASS; retained suite41PASS/12FAIL, no waivers.
+Incomplete-tensor comparison is NOT rejected by these coarse trend tests alone.
+All464 protected hashes unchanged. NEXT exact-terrain/bed-force coupling and
+finite-time/wet-front/open/refinement/native/shared-surface qualification. No
+gameplay change; visual/30FPS and full later-river/crew/release scope remainOPEN.
+
 Latest September 14: [coupled two-pole metric transport](../reconstruction-review-2026-09-07/normal-river-coupled-metric-transport.md).
 Independent-mode candidate conserved totals but FAILED nonlinear model refinement.
 Derived missing skew cross-coupling, retaining original poles/40-CG/geometry.

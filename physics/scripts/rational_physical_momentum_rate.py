@@ -47,7 +47,7 @@ def physical_rate(geometry,canonical_velocity,mass_rate,canonical_velocity_rate,
             or not all(np.isfinite(x).all() for x in (v,vt,ht))):
         raise ValueError('Registered finite state and direction required')
     response=evaluate(g,v,preconditioner=primal_preconditioner); tangent=SmoothPressureGeometryRate(g,g.bed,ht)
-    if derivative_preconditioner not in ('block','patch'):
+    if derivative_preconditioner not in ('block','patch','spectral-flat'):
         raise ValueError('Unknown derivative preconditioner')
     system_type=ReconstructedAccelerationSystem
     if derivative_preconditioner=='patch':

@@ -34,7 +34,7 @@ def evaluate(geometry, canonical_velocity, *, tangent=None, preconditioner='bloc
         raise ValueError('Dual primitive requires an explicitly closed, positive, finite domain')
     if tangent is not None and (tangent.geometry is not g or tangent.one_sided):
         raise ValueError('Original registered stationary-positive tangent required')
-    if preconditioner not in ('block','patch'):
+    if preconditioner not in ('block','patch','spectral-flat'):
         raise ValueError('Unknown dual pressure preconditioner')
     system_type=ReconstructedAccelerationSystem
     if preconditioner=='patch':

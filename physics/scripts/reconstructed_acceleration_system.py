@@ -139,6 +139,9 @@ class ReconstructedAccelerationSystem:
 
     def precondition(self, residual, scheme='diagonal'):
         residual = self._vector(residual)
+        if scheme == 'spectral-flat':
+            from flat_spectral_pressure_preconditioner import precondition
+            return precondition(self, residual)
         if scheme == 'diagonal': return residual/self.diagonal
         if scheme != 'block': raise ValueError('Unknown pressure preconditioner')
         a, b = self.diagonal[..., 0], self.diagonal[..., 1]
