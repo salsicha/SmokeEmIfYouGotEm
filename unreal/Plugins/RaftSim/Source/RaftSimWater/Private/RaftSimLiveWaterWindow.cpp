@@ -1,4 +1,5 @@
 #include "RaftSimLiveWaterWindow.h"
+#include "RaftSimWetSurfaceInterpolation.h"
 
 #if RAFTSIM_HAS_LIVE_SOLVER
 
@@ -353,14 +354,19 @@ struct FSharedCartesianAtlas
         const int64 Y = int64(FMath::FloorToDouble(Grid.Y));
         const double Fx = Grid.X-X, Fy = Grid.Y-Y;
         double BedValue = 0., Depth = 0., VelX = 0., VelY = 0.;
+        double CornerBed[4]={},CornerDepth[4]={};
+        bool Available[4]={};
         for (int32 DY = 0; DY < 2; ++DY) for (int32 DX = 0; DX < 2; ++DX)
         {
             const double Weight = (DX ? Fx : 1.-Fx)*(DY ? Fy : 1.-Fy);
-            if (Weight == 0.) continue;
             const int32 I = CellIndex(X+DX, Y+DY);
             // Interpolation may cross a real tile seam, but must never bridge
             // an unavailable hole or extrapolate past a physical river end.
-            if (I == INDEX_NONE) return Result;
+            if (I == INDEX_NONE) { if (Weight!=0.) return Result; else continue; }
+            const int32 Corner=DY*2+DX;
+            CornerBed[Corner]=Bed.Float64[I]; CornerDepth[Corner]=H.Float64[I];
+            Available[Corner]=true;
+            if (Weight==0.) continue;
             BedValue += Weight*Bed.Float64[I]; Depth += Weight*H.Float64[I];
             VelX += Weight*U.Float64[I]; VelY += Weight*V.Float64[I];
         }
@@ -383,6 +389,13 @@ struct FSharedCartesianAtlas
             return 0.;
         };
         Result.SurfaceNormal = FVector(float(-Gradient(L,R)), float(-Gradient(D,Up)), 1.f).GetSafeNormal();
+        double ReconstructedSurface=BedValue+Depth;
+        if (RaftSimWetSurfaceInterpolation::ResolveMixed(CornerBed,CornerDepth,Available,
+            Fx,Fy,BedValue,Spacing,Spacing,Depth,ReconstructedSurface,Result.SurfaceNormal))
+        {
+            Result.DepthM=float(Depth); Result.SurfaceHeightM=float(ReconstructedSurface+Datum);
+            Result.bWet=Depth>1.e-4;
+        }
         return Result;
     }
 };
@@ -1356,19 +1369,28 @@ int32 FRaftSimLiveWaterWindow::TransferOverlapStateFrom(
             {
                 continue;
             }
-            const FRaftSimLiveWaterSampleResult Sampled = PreviousWindow.Sample(WorldPosition);
-            if (!Sampled.bValid)
-            {
-                continue;
-            }
-            const double Depth = FMath::Max(static_cast<double>(Sampled.DepthM), 0.0);
+            // Legacy nonaligned transfer interpolates conserved depth/current,
+            // NOT the shoreline point reconstruction used for render/support.
+            // Retain the historical float conversion and wet threshold here;
+            // exact aligned Cartesian transfer above remains double/bit exact.
+            const double GX=(WorldPosition.X-PreviousWindow.OriginM.X)/PreviousWindow.CellXM;
+            const double GY=(WorldPosition.Y-PreviousWindow.OriginM.Y)/PreviousWindow.CellYM;
+            const std::size_t C=FMath::Min(std::size_t(FMath::FloorToDouble(GX)),PreviousScenario.grid.nx-2);
+            const std::size_t R=FMath::Min(std::size_t(FMath::FloorToDouble(GY)),PreviousScenario.grid.ny-2);
+            const double FX=GX-double(C),FY=GY-double(R);
+            const auto Raw=[&](const raftsim::Array2D& Field)
+            { return FMath::Lerp(FMath::Lerp(Field(R,C),Field(R,C+1),FX),
+                FMath::Lerp(Field(R+1,C),Field(R+1,C+1),FX),FY); };
+            const double RawDepth=Raw(PreviousState.h);
+            const double Depth=double(float(FMath::Max(RawDepth,0.)));
+            const bool Wet=RawDepth>1.e-4;
             State.h(Row, Col) = Depth;
-            State.u(Row, Col) = Sampled.bWet ? static_cast<double>(Sampled.VelocityMps.X) : 0.0;
-            State.v(Row, Col) = Sampled.bWet ? static_cast<double>(Sampled.VelocityMps.Y) : 0.0;
+            State.u(Row, Col) = Wet ? double(float(Raw(PreviousState.u))) : 0.;
+            State.v(Row, Col) = Wet ? double(float(Raw(PreviousState.v))) : 0.;
             State.eta(Row, Col) = Scenario.bed(Row, Col) + Depth;
             State.hu(Row, Col) = Depth * State.u(Row, Col);
             State.hv(Row, Col) = Depth * State.v(Row, Col);
-            State.wet.values[Row * Scenario.grid.nx + Col] = Sampled.bWet ? 1 : 0;
+            State.wet.values[Row * Scenario.grid.nx + Col] = Wet ? 1 : 0;
             ++TransferredCells;
         }
     }
@@ -1457,6 +1479,18 @@ FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
                         (CellYM * static_cast<double>(RU - RD == 0 ? 1 : RU - RD));
     Result.SurfaceNormal =
         FVector(static_cast<float>(-DzDx), static_cast<float>(-DzDy), 1.0f).GetSafeNormal();
+    const double CornerBed[4]={Scenario.bed(Row,Col),Scenario.bed(Row,Col+1),
+        Scenario.bed(Row+1,Col),Scenario.bed(Row+1,Col+1)};
+    const double CornerDepth[4]={State.h(Row,Col),State.h(Row,Col+1),
+        State.h(Row+1,Col),State.h(Row+1,Col+1)};
+    const bool Available[4]={true,true,true,true};
+    double SampleDepth=FMath::Max(Depth,0.),Surface=Bed+SampleDepth;
+    if (RaftSimWetSurfaceInterpolation::ResolveMixed(CornerBed,CornerDepth,Available,
+        Fx,Fy,Bed,CellXM,CellYM,SampleDepth,Surface,Result.SurfaceNormal))
+    {
+        Result.DepthM=float(SampleDepth); Result.SurfaceHeightM=float(Surface+ElevationDatumM);
+        Result.bWet=SampleDepth>1.e-4;
+    }
     return Result;
 }
 

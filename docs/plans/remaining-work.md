@@ -3,6 +3,20 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [dry-rock point sampling correction](../reconstruction-review-2026-09-07/normal-river-dry-rock-sampling.md).
+Actual native flat-pool test exposed a phantom 0.5 m water sheet at the dry-rock
+intersection. Shared correction now runs in both live and atlas samplers;
+lower dry wetting fronts, thin films, source currents and solver state transfers
+remain intact. Final build PASS; 15 native tests PASS with original failures
+preserved. Ordinary game/contact/GPU checks pass within their scope, but the new
+inspected game frame STILL FAILS rapid shape/breaking/froth realism. Separate
+ordinary 300-row profile: 11.43567 FPS / p95 104.3914 ms FAILS 30 FPS. No quality,
+physics-rate or acceptance-gate reductions. NEXT main source geometry/evolved
+stage and compatible joint mass/pressure correction, then all later river/crew/
+release scope. Cook 84168 confirmed LIVE beyond 9511; COMPLETE 9500/local2000
+BOTH audits PASS, still unsettled. Next COMPLETE 9600/local4000 needs BOTH audits.
+All full-goal completion gates remain open; this is a specific runtime fix.
+
 Latest September14: [same-publication source/target/mesh decomposition](../reconstruction-review-2026-09-07/normal-river-target-shape.md).
 Read-only audit now records pre-temporal targets on the exact source lattice;
 v1 historical captures remain supported. BuildPASS,12 Python and10 native tests

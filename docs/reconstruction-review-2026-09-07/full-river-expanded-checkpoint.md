@@ -1,5 +1,22 @@
 # Source-exact expanded-domain continuation — September 12, 10:38 UTC
 
+## September 14: recovered continuation reaches COMPLETE 9500, both audits pass
+
+Handle 84168 remains live beyond native 9511. COMPLETE local2000 is native
+9500.000000002003 seconds. Independent state and bank reports:
+`tmp/south-fork-expanded-9500s-{state,banks}-v1-20260914.json`.
+All 5,382,400 cells remain finite, maximum depth 3.789571810 m, maximum speed
+6.234818373 m/s, volume 2,538,824.879381 m3. Maximum step conservation residual
+1.222034873e-8 m3. All 86,720 artificial-bank cells are exactly dry.
+Outflow 103.708333926 m3/s remains greater than inflow 45.306954547 m3/s:
+NOT settled or promoted. Next COMPLETE 9600 is local4000 in the recovered output.
+
+Complete-state SHA256:
+
+- h: `da696855119ae52632e637b192ee76c0b88232f4b5e17c80279d4c4bdf45d3cc`.
+- u: `2a046d9a5e1e5bf8dcad0ce4f666320e839c19863d31afa12ee870b12ada3866`.
+- v: `992197c6b23c1024cc72cd9aaa0696279f77f7bd31202b224c50eeb034bae818`.
+
 ## September14,18:23UTC: interrupted cook recovered exactly from9400
 
 Old handle83142 is missing; a fresh privileged Win32_Process inventory found no

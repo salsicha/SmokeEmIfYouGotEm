@@ -85,7 +85,9 @@ public:
     /** Advance the genuine FV solver by DtSeconds (internally CFL-substepped). */
     void Step(float DtSeconds);
 
-    /** Bilinear sample at a world-space position (meters). */
+    /** World-space point sample (meters). Bilinear bed/current; mixed wet/dry
+     * surface reconstruction excludes high dry terrain from water elevation.
+     * Does not alter the finite-volume state or its transfer representation. */
     FRaftSimLiveWaterSampleResult Sample(const FVector2D& WorldPositionM) const;
 
     /** Immutable shared river source for presentation outside the live crop.
@@ -136,6 +138,7 @@ private:
     friend class FRaftSimExactWaterOverlapTest;
     friend class FRaftSimCartesianCropBoundaryTest;
     friend class FRaftSimSharedCartesianAtlasTest;
+    friend class FRaftSimWaterDryRockSamplingTest;
     FRaftSimLiveWaterWindow();
 
     struct FPresentationState;
