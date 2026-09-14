@@ -37,11 +37,11 @@ class TriangleFaceSection:
                     segments.append([[a[1-axis], a[2]], [b[1-axis], b[2]]])
         return cls(segments, bounds)
 
-    def moments(self, stage):
+    def moments(self, stage, datum=0.):
         """Return integral(h ds), integral(h^2 ds), and wet width; exact for each segment."""
-        if not np.isfinite(stage):
+        if not np.isfinite(stage) or not np.isfinite(datum):
             raise ValueError('Finite stage required')
-        low, high = self.levels.T
+        low, high = (self.levels-datum).T
         first, second, wet = (np.zeros(len(low)) for _ in range(3))
         full = (stage >= high) & (stage > low)
         a, b = stage-low[full], stage-high[full]
@@ -73,7 +73,8 @@ class TriangleFaceSection:
         if not np.allclose(self.bed_at(points), other.bed_at(points), atol=1e-9, rtol=0):
             raise ValueError('Neighboring source face geometry differs')
 
-    def flux(self, left_stage, left_velocity, right_stage, right_velocity, axis, gravity=9.81):
+    def flux(self, left_stage, left_velocity, right_stage, right_velocity, axis, gravity=9.81,
+             left_datum=0., right_datum=0.):
         """Integrated nondispersive Rusanov base flux on one shared geometric face.
 
         The bound is constant on this face, so integrals of h and h^2 are exact.
@@ -84,11 +85,11 @@ class TriangleFaceSection:
         if (axis not in (0, 1) or left.shape != (2,) or right.shape != (2,)
                 or not np.isfinite([left, right]).all() or not np.isfinite(gravity) or gravity <= 0):
             raise ValueError('Finite velocities, positive gravity and XY normal required')
-        hl, hhl, _ = self.moments(left_stage)
-        hr, hhr, _ = self.moments(right_stage)
+        hl, hhl, _ = self.moments(left_stage, left_datum)
+        hr, hhr, _ = self.moments(right_stage, right_datum)
         minimum = float(self.levels.min())
-        speed = max(abs(left[axis])+np.sqrt(gravity*max(left_stage-minimum, 0)),
-                    abs(right[axis])+np.sqrt(gravity*max(right_stage-minimum, 0)))
+        speed = max(abs(left[axis])+np.sqrt(gravity*max(left_stage-(minimum-left_datum), 0)),
+                    abs(right[axis])+np.sqrt(gravity*max(right_stage-(minimum-right_datum), 0)))
         mass = .5*(left[axis]*hl+right[axis]*hr)-.5*speed*(hr-hl)
         momentum = .5*(left[axis]*hl*left+right[axis]*hr*right)-.5*speed*(hr*right-hl*left)
         momentum[axis] += .25*gravity*(hhl+hhr)

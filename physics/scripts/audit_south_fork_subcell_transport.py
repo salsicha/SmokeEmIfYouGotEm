@@ -28,6 +28,9 @@ def main():
     parser.add_argument('--atlas', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--steps', type=int, default=10)
+    parser.add_argument('--stepper', choices=('explicit', 'implicit-frozen'), default='explicit')
+    parser.add_argument('--relative-stages', action='store_true')
+    parser.add_argument('--energy-audit', action='store_true')
     args = parser.parse_args()
     if args.steps < 1:
         parser.error('--steps must be positive')
@@ -58,10 +61,14 @@ def main():
     origin = source_points[0].copy()
     if not np.array_equal(source_points, origin+np.stack((xx.ravel(), yy.ravel()), 1)):
         raise ValueError('Selected source cells do not form one exact regular patch')
-    patch = SubcellGeometryPatch(terrain, origin+offset, shape)
+    patch = SubcellGeometryPatch(terrain, origin+offset, shape, relative_stages=args.relative_stages)
     paths = [args.atlas, geometry_path, coordinate_path, mesh_path, Path(__file__),
              ROOT/'physics/scripts/triangle_cell_storage.py', ROOT/'physics/scripts/triangle_face_section.py',
              ROOT/'physics/scripts/subcell_geometry_patch.py', ROOT/'physics/scripts/south_fork_registered_mesh.py']
+    if args.stepper == 'implicit-frozen':
+        paths.append(ROOT/'physics/scripts/subcell_implicit_transport.py')
+    if args.energy_audit:
+        paths.append(ROOT/'physics/scripts/subcell_mechanical_energy.py')
     initial_hashes = {str(path): sha(path) for path in paths}
     fields = {}
     for key in ('bed', 'h', 'u', 'v'):
@@ -95,7 +102,7 @@ def main():
     volume = fields['h'].copy()
     momentum = volume[:, :, None]*np.stack((fields['u'], fields['v']), axis=2)
     initial_volume = float(volume.sum())
-    steps, elapsed = [], 0.
+    steps, elapsed, failure = [], 0., None
     started = time.perf_counter()
     for index in range(args.steps):
         dv, dp, limit, bound = patch.rates(volume, momentum, diagnostics=True)
@@ -105,9 +112,34 @@ def main():
         # cell storage. This is not the required two-pole physical energy.
         rate = float(np.sum((9.81*eta-.5*np.sum(velocity*velocity, axis=2))*dv)+np.sum(velocity*dp))
         if rate > 1e-9:
-            raise ValueError('Base mechanical energy production became positive')
-        dt = min(.02, .45*limit)
-        volume, momentum = patch.advance(volume, momentum, dt)
+            failure = dict(step=index+1, elapsed_seconds=elapsed,
+                error='Base mechanical energy production became positive', energy_rate=rate)
+            break
+        old_volume = volume
+        energy_check = None
+        if args.energy_audit:
+            from subcell_mechanical_energy import energy
+            before_energy = energy(patch, volume, momentum)
+        if args.stepper == 'implicit-frozen':
+            from subcell_implicit_transport import advance
+            dt = min(.02, .45*bound['wave_limit_seconds'])
+            try:
+                volume, momentum = advance(patch, volume, momentum, dt)
+            except (ValueError, np.linalg.LinAlgError, FloatingPointError) as error:
+                failure = dict(step=index+1, elapsed_seconds=elapsed, attempted_dt_seconds=dt,
+                    error=str(error), before_step_bounds=bound)
+                break
+        else:
+            dt = min(.02, .45*limit)
+            volume, momentum = patch.advance(volume, momentum, dt)
+        if args.energy_audit:
+            after_energy = energy(patch, volume, momentum)
+            energy_change = after_energy['total']-before_energy['total']
+            energy_check = dict(before=before_energy, after=after_energy, change=energy_change)
+            if energy_change > 1e-9:
+                failure = dict(step=index+1, elapsed_seconds=elapsed, attempted_dt_seconds=dt,
+                    error='Finite-step nondispersive mechanical energy increased', energy_check=energy_check)
+                break
         elapsed += dt
         error = float(volume.sum()-initial_volume)
         if abs(error) > 1e-10:
@@ -116,22 +148,32 @@ def main():
             local_dt_limit_seconds=float(limit), minimum_volume_m3=float(volume.min()),
             maximum_volume_m3=float(volume.max()), total_volume_error_m3=error,
             nondispersive_mechanical_energy_rate=rate, before_step_bounds=bound,
+            finite_step_energy=energy_check,
+            dry_cells=int((volume == 0).sum()),
+            floating_to_zero_cells=int(((old_volume > 0) & (volume == 0)).sum()),
             maximum_cell_speed_mps=float(np.max(np.divide(np.linalg.norm(momentum, axis=2), volume,
                 out=np.zeros_like(volume), where=volume > 0)))))
     for path in paths:
         if sha(path) != initial_hashes[str(path)]:
             raise ValueError('Protected input changed during audit')
     report = dict(schema='raftsim.south_fork.subcell_base_transport.v1', accepted=False,
+        stepper=args.stepper,
+        relative_stages=args.relative_stages,
+        finite_step_energy_audited=args.energy_audit,
+        completed_requested_steps=failure is None, rejected_update=failure,
         cells=shape[0]*shape[1], shared_and_wall_faces=len(patch.faces), source_field_origin_m=origin.tolist(),
         source_shape=list(shape), original_atlas_time_seconds=atlas['source_time_seconds'],
         maximum_source_center_bed_error_m=float(abs(source_bed-exact_bed).max()),
         stationary_controls=controls, source_initialized_closed_patch_steps=steps,
         initial_volume_m3=initial_volume, evolving_loop_wall_seconds=time.perf_counter()-started,
         input_sha256={str(path.resolve()): initial_hashes[str(path)] for path in paths},
-        scope='Original registered terrain and exact shared face geometry. Synthetic lakes and explicit nondispersive base steps initialized from the real atlas, with reflecting walls on this small test patch, NOT actual river boundaries or continued river history. No artificial depth, global rescale or source/cook/map mutation. Rusanov base transport is dissipative and first order; mechanical entropy production does not qualify the full two-pole energy, dispersion, refinement, internal basin connectivity, breaking waves, open boundaries, native budget, rendered contact, 30 FPS, or scene acceptance.')
+        scope='Original registered terrain and exact shared face geometry. Synthetic lakes and nondispersive base steps using the recorded stepper, initialized from the real atlas with reflecting walls on this small test patch, NOT actual river boundaries or continued river history. No artificial depth, global rescale or source/cook/map mutation. Rusanov base transport is dissipative and first order; mechanical energy checks do not qualify the full two-pole energy, dispersion, refinement, internal basin connectivity, breaking waves, open boundaries, native budget, rendered contact, 30 FPS, or scene acceptance.')
     with args.report.open('x', encoding='utf-8') as stream:
         json.dump(report, stream, indent=2, allow_nan=False)
-    print(json.dumps({key: value for key, value in report.items() if key != 'input_sha256'}, indent=2))
+    print(json.dumps({key: value for key, value in report.items()
+        if key not in ('input_sha256', 'source_initialized_closed_patch_steps')}, indent=2))
+    if failure is not None:
+        raise RuntimeError('Rejected coupled update; failure retained in '+str(args.report))
 
 
 if __name__ == '__main__':

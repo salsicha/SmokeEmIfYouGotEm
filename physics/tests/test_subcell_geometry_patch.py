@@ -79,12 +79,29 @@ class SubcellGeometryPatchTest(unittest.TestCase):
                 old_velocity = (momentum+old_dt*dp)/volume[..., None]
                 self.assertGreater(np.max(abs(old_velocity)), 2.)
                 self.assertLess(limit, old_dt)
+                limiting = bounds['limiting_donor_cell']
+                self.assertEqual(limiting['row'], 0)
+                self.assertEqual(limiting['col'], 0)
+                self.assertAlmostEqual(limiting['volume_m3'], eta*eta/2)
+                self.assertAlmostEqual(limiting['wet_area_m2'], eta)
+                self.assertAlmostEqual(limiting['stage_m']-limiting['minimum_bed_m'], eta)
+                self.assertAlmostEqual(limiting['incoming_discharge_m3s'], limiting['outgoing_discharge_m3s'])
+                self.assertAlmostEqual(limiting['volume_m3']/limiting['gross_donor_coefficient_m3s'], limit)
                 with self.assertRaisesRegex(ValueError, 'donor'):
                     patch.advance(volume, momentum, old_dt)
                 fixed_v, fixed_p = patch.advance(volume, momentum, .45*limit)
                 np.testing.assert_array_equal(fixed_v, volume)
                 self.assertLessEqual(np.max(abs(fixed_p/fixed_v[..., None])), 1.)
                 np.testing.assert_allclose(fixed_p.sum(axis=(0, 1)), 0, atol=1e-18)
+
+    def test_dry_diagnostics_have_no_invented_limiting_cell(self):
+        patch = SubcellGeometryPatch(sampler(lambda x, y: x*0), [-.5, -.5], (2, 2))
+        volume, momentum = patch.state_from_stages(0.)
+        dv, dp, limit, bounds = patch.rates(volume, momentum, diagnostics=True)
+        self.assertIsNone(bounds['limiting_donor_cell'])
+        self.assertTrue(np.isinf(limit))
+        np.testing.assert_array_equal(dv, 0)
+        np.testing.assert_array_equal(dp, 0)
 
 
 if __name__ == '__main__':

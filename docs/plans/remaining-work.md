@@ -3,6 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [coupled thin-cell transport and datum-relative state](../reconstruction-review-2026-09-07/normal-river-subcell-relative-state.md).
+Actual stalled cell has incoming AND outgoing water, so an isolated drain event
+is not a valid shortcut. Coupled frozen-donor transport exposed an absolute-stage
+roundoff floor: pressure represented more water than stored, causing a rejected
+velocity explosion. Datum-relative volume/face/pressure state fixes that mismatch.
+Same real256-cell/100-step control now advances2s at .02s per step, bounded speeds
+and <=1.251e-12m3 mass error;45 component/source tests PASS. Still first-order,
+dissipative, reflecting-wall research, NOT full two-pole physics or gameplay.
+Separate40-step/0.8s finite-energy audit passes nonincrease across first dry
+transitions; not a full two-pole energy or wet-front/refinement acceptance.
+NEXT compatible full pressure/energy and wet-front/refinement/open/native/shared
+contact-render qualification; no new visual or30FPS improvement claimed.
+Cook84168 LIVE beyond9900; COMPLETE9900/local10000 BOTH audits PASS, unsettled.
+Next COMPLETE10000/local12000 BOTH audits. Full later-river/crew/release scope OPEN.
+
 Latest September 14: [exact shared-face coupling and donor timestep correction](../reconstruction-review-2026-09-07/normal-river-subcell-donor-bound.md).
 Offline exact source-face geometry and independently integrated bed force retain
 lake-at-rest balance; 29 component/source tests PASS. Analytic shallow counterflow

@@ -9,13 +9,14 @@ from triangle_face_section import TriangleFaceSection
 
 
 class SubcellGeometryPatch:
-    def __init__(self, sampler, origin, shape, spacing=(1., 1.), periodic=(False, False)):
+    def __init__(self, sampler, origin, shape, spacing=(1., 1.), periodic=(False, False), relative_stages=False):
         origin, spacing = np.asarray(origin, float), np.asarray(spacing, float)
         if (origin.shape != (2,) or spacing.shape != (2,) or not np.isfinite([origin, spacing]).all()
                 or (spacing <= 0).any() or len(shape) != 2 or any(int(n) != n or n < 1 for n in shape)
                 or len(periodic) != 2):
             raise ValueError('Finite origin, positive spacing and integer (ny,nx) shape required')
         self.shape, self.spacing = tuple(map(int, shape)), spacing
+        self.relative_stages = bool(relative_stages)
         ny, nx = self.shape
         self.cells, boundaries = [], []
         for row in range(ny):
@@ -59,10 +60,13 @@ class SubcellGeometryPatch:
                 or np.any(momenta[volumes == 0] != 0)):
             raise ValueError('Finite physical cell state required; dry momentum must be exactly zero')
         volume, momentum = volumes.ravel(), momenta.reshape(-1, 2)
-        eta = np.array([cell.stage_for_volume(v) for cell, v in zip(self.cells, volume)])
+        eta = np.array([cell.relative_stage_for_volume(v) if self.relative_stages else cell.stage_for_volume(v)
+                        for cell, v in zip(self.cells, volume)])
+        datums = np.array([cell.datum if self.relative_stages else 0. for cell in self.cells])
         velocity = np.divide(momentum, volume[:, None], out=np.zeros_like(momentum), where=volume[:, None] > 0)
         mass_rate = np.zeros(len(volume))
-        momentum_rate = np.array([cell.hydrostatic_bed_force(e, gravity) for cell, e in zip(self.cells, eta)])
+        momentum_rate = np.array([cell.hydrostatic_bed_force(e, gravity, self.relative_stages)
+                                  for cell, e in zip(self.cells, eta)])
         outgoing = np.zeros(len(volume))
         donor_outgoing = np.zeros(len(volume))
         max_speed = 0.
@@ -73,18 +77,18 @@ class SubcellGeometryPatch:
                 ul[axis] *= -1
             if right == -1:
                 ur[axis] *= -1
-            flux, speed = section.flux(eta[li], ul, eta[ri], ur, axis, gravity)
+            flux, speed = section.flux(eta[li], ul, eta[ri], ur, axis, gravity, datums[li], datums[ri])
             max_speed = max(max_speed, speed)
             if left != -1:
                 mass_rate[left] -= flux[0]
                 momentum_rate[left] -= flux[1:]
                 outgoing[left] += max(flux[0], 0)
-                donor_outgoing[left] += .5*(ul[axis]+speed)*section.moments(eta[li])[0]
+                donor_outgoing[left] += .5*(ul[axis]+speed)*section.moments(eta[li], datums[li])[0]
             if right != -1:
                 mass_rate[right] += flux[0]
                 momentum_rate[right] += flux[1:]
                 outgoing[right] += max(-flux[0], 0)
-                donor_outgoing[right] += .5*(speed-ur[axis])*section.moments(eta[ri])[0]
+                donor_outgoing[right] += .5*(speed-ur[axis])*section.moments(eta[ri], datums[ri])[0]
         donating = outgoing > 0
         drain_limit = float(np.min(volume[donating]/outgoing[donating])) if donating.any() else np.inf
         wave_limit = .5*float(self.spacing.min())/max_speed if max_speed > 0 else np.inf
@@ -99,9 +103,28 @@ class SubcellGeometryPatch:
         result = (mass_rate.reshape(self.shape), momentum_rate.reshape((*self.shape, 2)),
                   min(drain_limit, donor_limit, wave_limit))
         if diagnostics:
+            limiting_cell = None
+            if active.any():
+                candidates = np.flatnonzero(active)
+                index = int(candidates[np.argmin(volume[active]/donor_outgoing[active])])
+                cell = self.cells[index]
+                limiting_cell = dict(row=index//self.shape[1], col=index%self.shape[1],
+                    volume_m3=float(volume[index]), stage_m=float(eta[index]+datums[index]),
+                    stage_offset_m=float(eta[index]) if self.relative_stages else float(eta[index]-cell.datum),
+                    minimum_bed_m=float(cell.levels.min()), maximum_bed_m=float(cell.levels.max()),
+                    wet_area_m2=(cell.relative_volume_and_wet_area(eta[index]) if self.relative_stages
+                                 else cell.volume_and_wet_area(eta[index]))[1],
+                    velocity_mps=velocity[index].tolist(),
+                    net_volume_rate_m3s=float(mass_rate[index]),
+                    incoming_discharge_m3s=float(outgoing[index]+mass_rate[index]),
+                    outgoing_discharge_m3s=float(outgoing[index]),
+                    gross_donor_coefficient_m3s=float(donor_outgoing[index]),
+                    momentum_rate_m4s2=momentum_rate[index].tolist(),
+                    hydrostatic_bed_force_m4s2=cell.hydrostatic_bed_force(eta[index], gravity, self.relative_stages).tolist())
             return (*result, dict(net_drain_limit_seconds=drain_limit, donor_limit_seconds=donor_limit,
                 wave_limit_seconds=wave_limit, maximum_face_signal_speed_mps=max_speed,
-                maximum_cell_speed_mps=float(np.linalg.norm(velocity, axis=1).max())))
+                maximum_cell_speed_mps=float(np.linalg.norm(velocity, axis=1).max()),
+                limiting_donor_cell=limiting_cell))
         return result
 
     def advance(self, volumes, momenta, dt, gravity=9.81):

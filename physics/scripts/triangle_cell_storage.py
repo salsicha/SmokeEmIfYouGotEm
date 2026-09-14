@@ -75,6 +75,8 @@ class TriangleCellStorage:
         if (self.areas <= 0).any():
             raise ValueError('Degenerate projected triangle')
         self.levels = np.sort(triangles[:, :, 2], axis=1)
+        self.datum = float(self.levels.min())
+        self.relative_levels = self.levels-self.datum
         self.area = float(self.areas.sum())
         a, b = triangles[:, 1]-triangles[:, 0], triangles[:, 2]-triangles[:, 0]
         determinant = a[:, 0]*b[:, 1]-a[:, 1]*b[:, 0]
@@ -94,7 +96,7 @@ class TriangleCellStorage:
         volume, wet = self._triangle_volume_and_wet_area(stage)
         return float(volume.sum()), float(wet.sum())
 
-    def hydrostatic_bed_force(self, stage, gravity=9.81):
+    def hydrostatic_bed_force(self, stage, gravity=9.81, relative=False):
         """Exact -g integral(depth * grad(bed)) over the original triangles.
 
         Units are m^4/s^2, consistent with integrated cell momentum V*u.
@@ -102,17 +104,18 @@ class TriangleCellStorage:
         """
         if not np.isfinite(gravity) or gravity <= 0:
             raise ValueError('Positive finite gravity required')
-        volume, _ = self._triangle_volume_and_wet_area(stage)
+        volume, _ = self._triangle_volume_and_wet_area(stage, self.relative_levels if relative else self.levels)
         return -gravity*np.sum(volume[:, None]*self.bed_gradients, axis=0)
 
-    def _triangle_volume_and_wet_area(self, stage):
+    def _triangle_volume_and_wet_area(self, stage, levels=None):
         if not np.isfinite(stage):
             raise ValueError('Finite stage required')
-        a, b, c = self.levels.T
+        levels = self.levels if levels is None else levels
+        a, b, c = levels.T
         volume, wet = np.zeros(len(a)), np.zeros(len(a))
         full = stage > a
         full &= stage >= c
-        volume[full] = (stage-self.levels[full]).mean(axis=1)
+        volume[full] = (stage-levels[full]).mean(axis=1)
         wet[full] = 1
         lower = (stage > a) & (stage <= b) & (stage < c)
         t = stage-a[lower]
@@ -129,6 +132,59 @@ class TriangleCellStorage:
         volume[upper] = (lower_span**2/3+t*lower_span+t*t*(1-t/(3*remaining)))/span
         wet[upper] = (lower_span+t*(2-t/remaining))/span
         return self.areas*volume, self.areas*wet
+
+    def relative_volume_and_wet_area(self, height):
+        volume, wet = self._triangle_volume_and_wet_area(height, self.relative_levels)
+        return float(volume.sum()), float(wet.sum())
+
+    def relative_stage_for_volume(self, volume):
+        """Return height ABOVE the cell minimum, never add its datum to physics.
+
+        Scale the lower-interval bracket using its exact leading power. A
+        fixed 128 halvings of a metre-sized interval cannot resolve 1e-100 m.
+        No positive volume is replaced by zero or a minimum represented stage.
+        """
+        if not np.isfinite(volume) or volume < 0:
+            raise ValueError('Finite nonnegative volume required')
+        if volume == 0:
+            return 0.
+        levels = self.relative_levels
+        positive = levels[levels > 0]
+        ceiling = float(positive.min()) if positive.size else np.inf
+        high = float(levels.max())+volume/self.area
+        if not positive.size:
+            height = volume/self.area
+            if height == 0 or not np.isfinite(height):
+                raise ValueError('Positive volume has no representable local stage')
+            return height
+        if volume <= self.relative_volume_and_wet_area(ceiling)[0]:
+            a, b, c = levels.T
+            at_minimum = a == 0
+            flat = at_minimum & (c == 0)
+            edge = at_minimum & (b == 0) & (c > 0)
+            corner = at_minimum & (b > 0)
+            leading = (float(self.areas[flat].sum()),
+                       float(np.sum(self.areas[edge]/c[edge])),
+                       float(np.sum(self.areas[corner]/(3*b[corner]*c[corner]))))
+            power, coefficient = next((i+1, x) for i, x in enumerate(leading) if x > 0)
+            # Logarithms avoid underflow before taking the root.
+            high = min(ceiling, float(np.exp((np.log(volume)-np.log(coefficient))/power))*2)
+            if high == 0:
+                raise ValueError('Positive volume has no representable local stage')
+            while self.relative_volume_and_wet_area(high)[0] < volume:
+                if high == ceiling:
+                    raise ValueError('Cannot bracket represented positive volume')
+                high = min(ceiling, 2*high)
+        low = 0.
+        for _ in range(128):
+            middle = (low+high)/2
+            if middle == low or middle == high:
+                break
+            if self.relative_volume_and_wet_area(middle)[0] < volume:
+                low = middle
+            else:
+                high = middle
+        return (low+high)/2
 
     def stage_for_volume(self, volume):
         """Invert the monotone local storage relation; zero volume stays dry."""
