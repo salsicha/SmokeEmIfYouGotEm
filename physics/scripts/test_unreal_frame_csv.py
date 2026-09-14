@@ -1,6 +1,6 @@
 import io
 import unittest
-from audit_unreal_frame_csv import parse_capture, summarize, WATER_SCOPES, PUBLISH_SCOPES, SMOOTHING_SCOPES, BREAKING_SCOPES, FOAM_SCOPES
+from audit_unreal_frame_csv import parse_capture, summarize, WATER_SCOPES, PUBLISH_SCOPES, SMOOTHING_SCOPES, BREAKING_SCOPES, FOAM_SCOPES, GROUND_SCOPES
 
 HEADER = "FrameTime,GameThreadTime,RenderThreadTime,RHIThreadTime,GPUTime\n"
 FOOTER = HEADER + "[HasHeaderRowAtEnd],1\n"
@@ -31,7 +31,7 @@ class UnrealFrameCsvTest(unittest.TestCase):
                 parse_capture(io.StringIO(capture + '[HasHeaderRowAtEnd],1\n'))
 
     def test_same_frame_scopes_and_inactive_rows(self):
-        scopes = WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES
+        scopes = WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES
         header = HEADER.rstrip() + "," + ",".join(scopes) + "\n"
         rows = "20,18,4,2,5," + ",".join(["8"] * len(scopes)) + "\n"
         rows += "10,8,3,1,4," + ",".join(["0"] * len(scopes)) + "\n"
@@ -53,6 +53,7 @@ class UnrealFrameCsvTest(unittest.TestCase):
         self.assertNotIn(SMOOTHING_SCOPES[0], summarize(legacy, 0, 0))
         self.assertNotIn(BREAKING_SCOPES[0], summarize(legacy, 0, 0))  # Historical capture lacks the new scope.
         self.assertNotIn(FOAM_SCOPES[0], summarize(legacy, 0, 0))
+        self.assertNotIn(GROUND_SCOPES[0], summarize(legacy, 0, 0))
         self.assertNotIn("RaftSimCrests/GameThread/Normals", summarize(legacy, 0, 0))
 
     def test_duplicate_unrelated_columns_are_rejected(self):

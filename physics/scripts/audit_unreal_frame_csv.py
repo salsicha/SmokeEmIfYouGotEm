@@ -19,6 +19,7 @@ SMOOTHING_SCOPES = ("RaftSimSurface/GameThread/OpticalFilter",)
 # Optional in historical captures; absence must not be reported as zero cost.
 BREAKING_SCOPES = ("RaftSimSurface/GameThread/BreakingVertices",)
 FOAM_SCOPES = ("RaftSimSurface/GameThread/FoamTransport",)
+GROUND_SCOPES = ("RaftSimGround/GameThread/Sample",)
 METADATA = {"config", "engineversion", "deviceprofile", "rhiname", "raytracing",
             "systemresolution.resx", "systemresolution.resy", "targetframerate"}
 
@@ -33,7 +34,7 @@ def parse_capture(stream, require_water_scopes=False):
         raise ValueError(f"missing actual frame metrics: {sorted(missing)}")
     if require_water_scopes and set(WATER_SCOPES) - set(header):
         raise ValueError("capture is missing required same-frame water scopes")
-    columns = {name: header.index(name) for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES if name in header}
+    columns = {name: header.index(name) for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES if name in header}
     samples, metadata = [], {}
     footer = False
     completed_metadata = False
@@ -80,7 +81,7 @@ def summarize(samples, first, last, target_fps=30.0):
     if any(s["FrameTime"] <= 0 for s in selected):
         raise ValueError("selected frames have no measured elapsed time")
     result = {}
-    for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES:
+    for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES:
         if name not in selected[0]:
             continue  # Absent scope is unavailable, never inferred to be zero.
         values = [s[name] for s in selected]

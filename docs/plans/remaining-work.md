@@ -3,6 +3,20 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [physical ground and ordinary water contact](../reconstruction-review-2026-09-07/normal-river-ground-contact.md).
+Playable Cartesian water support and spray anchors now use the same captured
+ground query as solid raft contact, with paired detail and no clearance floor.
+Native regression first reproduced buried-water buoyancy; final12 native and22
+Python checks PASS. Actual2020-point source-triangle audit includes84 buried
+points, all correctly dry; no false-dry clear water or missing ground. Inspected
+ordinary recording STILL visually fails rapid shape/breaking/froth. Final300-row
+game profile20.803377FPS/p9564.9716ms FAIL30FPS; shared ground queries0.159887ms
+mean. Cook84168 is now TERMINAL exit0 at10000/local12000; BOTH final state/bank
+audits PASS, but out105.525238 vsin45.306955 remains unsettled. Do not poll asLIVE,
+automatically restart, or promote it. All464 protected hashes unchanged.
+NEXT dominant source-stage/terrain and compatible mass/pressure coupling, actual
+breaking/froth, larger crest/solver costs; then full later-river/crew/release scope.
+
 Latest September 14: [coupled thin-cell transport and datum-relative state](../reconstruction-review-2026-09-07/normal-river-subcell-relative-state.md).
 Actual stalled cell has incoming AND outgoing water, so an isolated drain event
 is not a valid shortcut. Coupled frozen-donor transport exposed an absolute-stage

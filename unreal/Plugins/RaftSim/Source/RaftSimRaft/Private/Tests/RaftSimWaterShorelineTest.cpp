@@ -12,6 +12,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/StaticMeshActor.h"
 
 #if WITH_AUTOMATION_TESTS
 namespace
@@ -588,6 +589,8 @@ bool FRaftSimCartesianShorelineSurfaceTest::RunTest(const FString&)
     TestFalse(TEXT("spray carrier cannot anchor inside dry island"),Surface->SampleVisibleCarrierAtRiverCoordinates(
         FVector2D(-5432.,3600.)+FVector2D(9.,9.),Point));
     int32 CheckedTriangles=0;
+    FVector GroundProbe=FVector::ZeroVector;
+    bool bHaveGroundProbe=false;
     double MaximumAnchorErrorCm=0.;
     const auto& CV=Mesh->GetWaterVertices(); const auto& CT=Mesh->GetWaterIndices();
     for (int32 I=0; I<CT.Num(); I+=3)
@@ -606,6 +609,7 @@ bool FRaftSimCartesianShorelineSurfaceTest::RunTest(const FString&)
         FRaftSimWaterSample Raw,Support;
         if (Water->SampleWaterAtWorldPosition(Expected,Raw) && Raw.bWet)
         {
+            if (!bHaveGroundProbe) { GroundProbe=Expected; bHaveGroundProbe=true; }
             TestTrue(TEXT("production registration routes live wet raft probes to this carrier"),
                 Water->SampleRaftSupportSurfaceAtWorldPosition(Expected,Support));
             TestEqual(TEXT("registered provider is the actual actor query"),Support.SurfaceHeightMeters,SupportHeight);
@@ -633,6 +637,42 @@ bool FRaftSimCartesianShorelineSurfaceTest::RunTest(const FString&)
         Surface->SampleCartesianCarrierSupport(DryWorld,Height,bWet) && !bWet);
     TestFalse(TEXT("off-grid provider is unavailable"),
         Surface->SampleCartesianCarrierSupport(DryWorld+FVector(100000.,0.,0.),Height,bWet));
+    // Physical collision can resolve rock finer than the hydraulic lattice.
+    // Exercise the actual carrier/provider, not just a height comparison helper.
+    if (!TestTrue(TEXT("fixture has a wet ground-contact probe"),bHaveGroundProbe)) return false;
+    Surface->SampleCartesianCarrierSupport(GroundProbe,Height,bWet);
+    const double WaterZ=Height*100.;
+    auto* Ground=World->SpawnActor<AStaticMeshActor>();
+    if (!TestNotNull(TEXT("physical ground fixture"),Ground)) return false;
+    Ground->Tags.Add(TEXT("RaftSimPhysicalGround"));
+    auto* GroundMesh=Ground->GetStaticMeshComponent();
+    GroundMesh->SetMobility(EComponentMobility::Movable);
+    GroundMesh->SetStaticMesh(LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube")));
+    GroundMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    GroundMesh->SetCollisionResponseToAllChannels(ECR_Block);
+    Ground->SetActorLocation(FVector(GroundProbe.X,GroundProbe.Y,WaterZ));
+    FHitResult GroundHit;
+    FCollisionQueryParams GroundParams(SCENE_QUERY_STAT(RaftSimGroundWaterTest),true);
+    if (!TestTrue(TEXT("independent complex trace verifies rock above the carrier"),
+        GroundMesh->LineTraceComponent(GroundHit,GroundProbe+FVector(0,0,1000),
+            GroundProbe-FVector(0,0,1000),GroundParams) && GroundHit.ImpactPoint.Z>WaterZ)) return false;
+    TestTrue(TEXT("rock-occluded water is dry, not unavailable or fallback"),
+        Surface->SampleCartesianCarrierSupport(GroundProbe,Height,bWet) && !bWet);
+    FRaftSimWaterSample RockSupport;
+    TestTrue(TEXT("registered raft provider also rejects buried water"),
+        Water->SampleRaftSupportSurfaceAtWorldPosition(GroundProbe,RockSupport) && !RockSupport.bWet);
+    const FVector2D GroundField(GroundProbe.X*.01,-GroundProbe.Y*.01);
+    TestFalse(TEXT("spray cannot anchor to water hidden inside physical rock"),
+        Surface->SampleVisibleCarrierAtRiverCoordinates(GroundField,Point));
+    Ground->SetActorLocation(FVector(GroundProbe.X,GroundProbe.Y,WaterZ-50.-.01));
+    TestTrue(TEXT("positive 0.01 cm film is not culled by a ground clearance threshold"),
+        Surface->SampleCartesianCarrierSupport(GroundProbe,Height,bWet) && bWet);
+    TestTrue(TEXT("positive film keeps the shared spray anchor"),
+        Surface->SampleVisibleCarrierAtRiverCoordinates(GroundField,Point));
+    Ground->SetActorLocation(FVector(GroundProbe.X,GroundProbe.Y,WaterZ));
+    GroundMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    TestTrue(TEXT("disabled ground collision cannot occlude contact"),
+        Surface->SampleCartesianCarrierSupport(GroundProbe,Height,bWet) && bWet);
     Mesh->SetVisibility(false);
     TestFalse(TEXT("hidden carrier does not supply stale support"),Surface->SampleCartesianCarrierSupport(DryWorld,Height,bWet));
     return true;

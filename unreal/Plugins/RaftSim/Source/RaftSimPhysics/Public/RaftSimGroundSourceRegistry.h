@@ -7,7 +7,7 @@
 // Game-thread contact sources. Keep weak references, but invalidate membership
 // when world partition adds/removes levels or gameplay spawns an actor. A
 // startup-only list silently misses the actual terrain later in a river run.
-class FRaftSimGroundSourceRegistry
+class RAFTSIMPHYSICS_API FRaftSimGroundSourceRegistry
 {
 public:
     explicit FRaftSimGroundSourceRegistry(UWorld* InWorld) : World(InWorld)
@@ -46,6 +46,9 @@ public:
         }
     }
     uint32 GetRefreshCount() const { return RefreshCount; }
+    // The same captured triangles/landscape used for solid raft contact.
+    // No solver-bed fallback: missing physical geometry remains unknown.
+    bool SampleGround(const FVector& WorldPositionCm, double& OutGroundZCm, FVector& OutGroundNormal);
     TArray<TWeakObjectPtr<ALandscapeProxy>> Landscapes;
     TArray<TWeakObjectPtr<UStaticMeshComponent>> Meshes;
 private:

@@ -17,6 +17,7 @@ class UMaterialInstanceDynamic;
 class UMaterialParameterCollection;
 class UTextureRenderTarget2D;
 class FRaftSimWaterTextureHistory;
+class FRaftSimGroundSourceRegistry;
 class ARaftSimRaftActor;
 class URaftSimWaterRuntimeAdapter;
 class URaftSimStatefulDetailComponent;
@@ -288,12 +289,13 @@ public:
     void GetBreakingSites(TArray<FBreakingSite>& OutSites) const;
     /** Bounded lookup on the currently presented single carrier.
      * Uses known river coordinates, not nearest-bend projection. Rejects dry
-     * cells and measured buried vertices. GPU carrier mode includes its shared
-     * analytic crest, but not GPU perturbation WPO. Presentation-only: never
+     * cells and measured buried vertices. Cartesian mode shares the contact
+     * triangle, completed detail WPO and physical-ground rejection. Legacy GPU
+     * carrier mode includes its analytic crest, not perturbation WPO. Never
      * use this to change hydraulic wetness or as exact particle collision. */
     bool SampleVisibleCarrierAtRiverCoordinates(const FVector2D& CoordinatesM,
         FVector& OutPositionCm) const;
-    // Support-only lookup. true/dry means an in-grid point was clipped out;
+    // Support-only lookup. true/dry means clipped or physically ground-occluded;
     // false means this actor cannot currently answer. Does not alter solver
     // wetness. Paired GPU detail is evaluated at the submitted triangle's
     // vertices, not bilinearly at the probe position.
@@ -669,6 +671,8 @@ protected:
 
 private:
     friend class FRaftSimVisibleSprayCarrierTest;
+    mutable TSharedPtr<FRaftSimGroundSourceRegistry> CarrierGroundSources;
+    bool SampleCartesianCarrierPosition(const FVector& WorldPositionCm,FVector& OutPositionCm,bool& OutWet) const;
     friend class FRaftSimCartesianSurfaceGridTest;
     friend class FRaftSimCartesianBoulderSurfaceTest;
     friend class FRaftSimCartesianShorelineSurfaceTest;

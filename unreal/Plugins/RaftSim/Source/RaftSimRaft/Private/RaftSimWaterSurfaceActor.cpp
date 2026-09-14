@@ -1,4 +1,5 @@
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterSourcePacking.h"
@@ -3684,6 +3685,7 @@ void ARaftSimWaterSurfaceActor::EndPlay(const EEndPlayReason::Type EndPlayReason
     if(FoamClockRefreshes){UE_LOG(LogTemp,Display,TEXT("Foam committed-water clock: origin=%.9f water=%.9f target=%.9f refreshes=%llu holds=%llu initializations=%llu; no wall-time fallback"),
         FoamWaterClock.Origin,FoamWaterClock.Last,FoamWaterClock.TargetSeconds(),FoamClockRefreshes,FoamClockHolds,FoamClockInitializations);}
     if (WaterAdapter) WaterAdapter->ClearRaftSupportCarrierSampler(this);
+    CarrierGroundSources.Reset();
     ReleaseMacroHistory();
     Super::EndPlay(EndPlayReason);
 }
@@ -8140,7 +8142,16 @@ void ARaftSimWaterSurfaceActor::GetBreakingSites(TArray<FBreakingSite>& OutSites
 bool ARaftSimWaterSurfaceActor::SampleCartesianCarrierSupport(
     const FVector& WorldPositionCm,float& OutHeightM,bool& OutWet) const
 {
-    OutHeightM=0.f; OutWet=false;
+    FVector Position;
+    const bool Available=SampleCartesianCarrierPosition(WorldPositionCm,Position,OutWet);
+    OutHeightM=OutWet ? float(Position.Z*.01) : 0.f;
+    return Available;
+}
+
+bool ARaftSimWaterSurfaceActor::SampleCartesianCarrierPosition(
+    const FVector& WorldPositionCm,FVector& OutPositionCm,bool& OutWet) const
+{
+    OutPositionCm=FVector::ZeroVector; OutWet=false;
     if (!WaterAdapter || !WaterAdapter->HasCartesianWaterCoordinates() ||
         !bSingleLiveWaterSurfaceEnabled || !IsLiveVolumeCoreVisible() ||
         GridStationN<2 || GridLateralN<2 || RiverCoordinatesM.IsEmpty() ||
@@ -8169,7 +8180,18 @@ bool ARaftSimWaterSurfaceActor::SampleCartesianCarrierSupport(
             Weights.Y*Detail->DisplacementCm(Drawn[Corners.Y].Position,Sign)+
             Weights.Z*Detail->DisplacementCm(Drawn[Corners.Z].Position,Sign);
     }
-    if (OutWet) OutHeightM=float((Position.Z-GetResolvedLiveSurfaceRenderLiftCm())*.01);
+    if (OutWet)
+    {
+        const double PhysicalWaterZCm=Position.Z-GetResolvedLiveSurfaceRenderLiftCm();
+        if (!CarrierGroundSources) CarrierGroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
+        double GroundZCm=0.; FVector GroundNormal;
+        // A submitted water triangle can be hidden by finer captured rock.
+        // Match solid contact geometry, including WPO above, without lifting
+        // the water, changing conserved state, or suppressing positive films.
+        if (CarrierGroundSources->SampleGround(WorldPositionCm,GroundZCm,GroundNormal) &&
+            PhysicalWaterZCm<=GroundZCm) OutWet=false;
+        else { OutPositionCm=Position; OutPositionCm.Z=PhysicalWaterZCm; }
+    }
     return true;
 }
 
@@ -8206,9 +8228,10 @@ bool ARaftSimWaterSurfaceActor::SampleVisibleCarrierAtRiverCoordinates(
         if (!CartesianShoreCellOffsets.IsValidIndex(Cell+1)) return false;
         FVector QueryWorld;
         if (!WaterAdapter->RiverToWorldPosition(CoordinatesM,0.f,QueryWorld)) return false;
-        return RaftSimWaterShoreline::Sample(FVector2D(QueryWorld.X,QueryWorld.Y), CartesianShoreCellOffsets[Cell],
-            CartesianShoreCellOffsets[Cell+1], CartesianShorelineMesh->GetWaterVertices(),
-            CartesianShorelineMesh->GetWaterIndices(), OutPositionCm);
+        bool bWet=false;
+        if (!SampleCartesianCarrierPosition(QueryWorld,OutPositionCm,bWet) || !bWet) return false;
+        OutPositionCm.Z+=GetResolvedLiveSurfaceRenderLiftCm();
+        return true;
     }
     // Match the actual I0/I2/I1, I1/I2/I3 carrier diagonal, not a bilinear
     // height patch that can float above or under a non-planar triangle.
@@ -8488,14 +8511,14 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             const auto Detail=MovingDetail ? MovingDetail->GetPresentedFrame() : nullptr;
             double MaxError=0.,SumSquared=0.; int32 Count=0,Dry=0,Unavailable=0;
             int32 DetailAffectedPoints=0; double MaxContactDetailCm=0.;
+            FRaftSimGroundSourceRegistry AuditGround(GetWorld());
+            TArray<TSharedPtr<FJsonValue>> GroundProbes;
+            int32 GroundOccluded=0,GroundOccludedWet=0;
             const int32 TriangleStride=FMath::Max(1,Indices.Num()/3/2000);
             for (int32 T=0;T<Indices.Num()/3;T+=TriangleStride)
             {
                 const FVector P=Drawn[Indices[3*T]].Position*.2+
                     Drawn[Indices[3*T+1]].Position*.3+Drawn[Indices[3*T+2]].Position*.5;
-                FRaftSimWaterSample Support;
-                if (!WaterAdapter->SampleRaftSupportSurfaceAtWorldPosition(P,Support)) { ++Unavailable; continue; }
-                if (!Support.bWet) { ++Dry; continue; }
                 double DetailCm=0.;
                 if (Detail)
                 {
@@ -8504,6 +8527,29 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
                         .3*Detail->DisplacementCm(Drawn[Indices[3*T+1]].Position,Sign)+
                         .5*Detail->DisplacementCm(Drawn[Indices[3*T+2]].Position,Sign);
                 }
+                const double WaterZCm=P.Z+DetailCm-GetResolvedLiveSurfaceRenderLiftCm();
+                double GroundZCm=0.; FVector GroundNormal;
+                const bool GroundHit=AuditGround.SampleGround(P,GroundZCm,GroundNormal);
+                FRaftSimWaterSample Support,Raw;
+                const bool Available=WaterAdapter->SampleRaftSupportSurfaceAtWorldPosition(P,Support);
+                const bool RawAvailable=WaterAdapter->SampleWaterAtWorldPosition(P,Raw);
+                auto Probe=MakeShared<FJsonObject>();
+                Probe->SetNumberField(TEXT("x_cm"),P.X); Probe->SetNumberField(TEXT("y_cm"),P.Y);
+                Probe->SetNumberField(TEXT("water_z_cm"),WaterZCm);
+                Probe->SetBoolField(TEXT("ground_hit"),GroundHit);
+                if (GroundHit) Probe->SetNumberField(TEXT("ground_z_cm"),GroundZCm);
+                Probe->SetBoolField(TEXT("support_available"),Available);
+                Probe->SetBoolField(TEXT("support_wet"),Available && Support.bWet);
+                Probe->SetBoolField(TEXT("raw_available"),RawAvailable);
+                Probe->SetBoolField(TEXT("raw_wet"),RawAvailable && Raw.bWet);
+                GroundProbes.Add(MakeShared<FJsonValueObject>(Probe));
+                if (GroundHit && WaterZCm<=GroundZCm)
+                {
+                    ++GroundOccluded;
+                    if (Available && Support.bWet) ++GroundOccludedWet;
+                }
+                if (!Available) { ++Unavailable; continue; }
+                if (!Support.bWet) { ++Dry; continue; }
                 if (FMath::Abs(DetailCm)>1.e-6) ++DetailAffectedPoints;
                 MaxContactDetailCm=FMath::Max(MaxContactDetailCm,FMath::Abs(DetailCm));
                 const double Error=Support.SurfaceHeightMeters*100.-
@@ -8519,6 +8565,10 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
             Report->SetBoolField(TEXT("detail_gpu_audit_requested"),MovingDetail && MovingDetail->AuditPresentedFrame());
             Report->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
             Report->SetNumberField(TEXT("tested_wet_points"),Count);
+            Report->SetNumberField(TEXT("ground_occluded_points"),GroundOccluded);
+            Report->SetNumberField(TEXT("ground_occluded_wet_points"),GroundOccludedWet);
+            Report->SetArrayField(TEXT("ground_contact_probes"),GroundProbes);
+            Report->SetStringField(TEXT("dry_point_scope"),TEXT("raw_dry_points includes ground-occluded support; inspect per-probe raw_wet separately. Independent registered-source triangle verification is required for ground classification."));
             Report->SetNumberField(TEXT("raw_dry_points"),Dry);
             Report->SetNumberField(TEXT("unavailable_points"),Unavailable);
             Report->SetNumberField(TEXT("maximum_support_carrier_error_cm"),MaxError);
