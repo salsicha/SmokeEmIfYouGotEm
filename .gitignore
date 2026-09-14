@@ -5,7 +5,17 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.nox/
+
+# Local environment values may contain credentials; keep shareable templates.
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
 
 # Virtual environments
 .venv/
@@ -42,6 +52,20 @@ unreal/.vsconfig
 unreal/*.sln
 unreal/*.slnx
 
+# Per-machine Unreal editor/agent connections (keep local copies, not in Git).
+/unreal/.mcp.json
+/unreal/.codex/config.toml
+/unreal/.cursor/mcp.json
+/unreal/.gemini/settings.json
+/unreal/.vscode/mcp.json
+
+# Editor workspace state and recovery files, not source or art assets.
+*.suo
+*.vcxproj.user
+*.code-workspace
+*.swp
+*.swo
+
 # Locally regenerated from installed UE sample content; never open-source redistributed.
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypress*/
@@ -54,6 +78,8 @@ unreal/Content/RaftSim/Characters/Production/MetaHumans/
 graphify-out/
 
 .DS_Store
+Thumbs.db
+Desktop.ini
 
 # Generated diagnostic maps are regenerable and never versioned (release-1.0-plan.md P0.6)
 unreal/Content/RaftSim/Maps/EnvironmentPreviews/
