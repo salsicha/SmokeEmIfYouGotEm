@@ -25,7 +25,7 @@ def clip_polygon(polygon, axis, bound, keep_greater):
     return np.asarray(output, float).reshape(-1, 3)
 
 
-def cell_triangles(sampler, center, size):
+def cell_triangles(sampler, center, size, *, with_source_ids=False):
     """Intersect the original registered mesh with a rectangular FV footprint.
 
     The bounded candidate search uses the same half-nominal-cell displacement
@@ -40,7 +40,7 @@ def cell_triangles(sampler, center, size):
     c1 = int(np.floor((high[0]-sampler.east[0])/sampler.dx))+1
     r0 = int(np.floor((sampler.north[0]-high[1])/sampler.dy))-1
     r1 = int(np.floor((sampler.north[0]-low[1])/sampler.dy))+1
-    output = []
+    output, source_ids = [], []
     for row in range(max(0, r0), min(sampler.rows-2, r1)+1):
         for col in range(max(0, c0), min(sampler.cols-2, c1)+1):
             quad = row*(sampler.cols-1)+col
@@ -53,11 +53,15 @@ def cell_triangles(sampler, center, size):
                     polygon = clip_polygon(polygon, axis, size[axis]/2, False)
                 for index in range(1, len(polygon)-1):
                     output.append(polygon[[0, index, index+1]])
+                    source_ids.append(face)
     triangles = np.asarray(output, float).reshape(-1, 3, 3)
     areas = projected_areas(triangles)
-    triangles, areas = triangles[areas > 0], areas[areas > 0]
+    retained = areas > 0
+    triangles, areas = triangles[retained], areas[retained]
     if abs(areas.sum()-size.prod()) > 1e-9*size.prod():
         raise ValueError('Cell footprint not fully covered by original mesh')
+    if with_source_ids:
+        return triangles, np.asarray(source_ids, dtype=np.int64)[retained]
     return triangles
 
 
@@ -67,13 +71,20 @@ def projected_areas(triangles):
 
 
 class TriangleCellStorage:
-    def __init__(self, triangles):
+    def __init__(self, triangles, source_triangle_indices=None):
         triangles = np.asarray(triangles, float)
         if triangles.ndim != 3 or triangles.shape[1:] != (3, 3) or not len(triangles) or not np.isfinite(triangles).all():
             raise ValueError('Finite nonempty XYZ triangles required')
         self.areas = projected_areas(triangles)
         if (self.areas <= 0).any():
             raise ValueError('Degenerate projected triangle')
+        self.source_triangle_indices = None
+        if source_triangle_indices is not None:
+            ids = np.asarray(source_triangle_indices)
+            if ids.shape != self.areas.shape or not np.issubdtype(ids.dtype, np.integer) or (ids < 0).any():
+                raise ValueError('One nonnegative original source triangle index per clipped triangle required')
+            self.source_triangle_indices = ids.copy()
+            self.source_triangle_indices.flags.writeable = False
         self.levels = np.sort(triangles[:, :, 2], axis=1)
         self.datum = float(self.levels.min())
         self.relative_levels = self.levels-self.datum

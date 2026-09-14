@@ -3,6 +3,17 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [exact-terrain pressure kinetic geometry](../reconstruction-review-2026-09-07/normal-river-exact-terrain-kinetic-geometry.md).
+Original wet triangles now supply positive completed-square kinetic factors and
+analytic local volume derivatives; source-face IDs preserve mixed measured/
+inferred vertex authority through clipping. Actual255 wet cells PASS geometry
+checks; cell158 is dry and explicitly unsupported.62 targeted testsPASS.
+Mean-slope aggregation loses p9572.43% of the slope kinetic coefficient—not a
+measured flow-energy or visual change. Most patch volume is over inferred bed.
+NEXT shared wet-face derivative/adjoint, both poles and full metric/bed-force
+coupling, actual dry cell/boundaries and finite-time/open/native qualification.
+464 protected hashes unchanged; no gameplay/FPS change. Full scene scope OPEN.
+
 Latest September 14: [full-velocity two-dimensional metric transport](../reconstruction-review-2026-09-07/normal-river-two-dimensional-metric-transport.md).
 Derived tensor cross-coupling with off-diagonal physical momentum faces; retains
 both velocity components and canonical vorticity. Both16/32/64-grid profiles

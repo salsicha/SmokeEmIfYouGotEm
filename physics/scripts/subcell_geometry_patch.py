@@ -21,8 +21,8 @@ class SubcellGeometryPatch:
         self.cells, boundaries = [], []
         for row in range(ny):
             for col in range(nx):
-                triangles = cell_triangles(sampler, origin+spacing*[col, row], spacing)
-                self.cells.append(TriangleCellStorage(triangles))
+                triangles, source_ids = cell_triangles(sampler, origin+spacing*[col, row], spacing, with_source_ids=True)
+                self.cells.append(TriangleCellStorage(triangles, source_ids))
                 boundaries.append([TriangleFaceSection.from_cell(triangles, axis, sign*spacing[axis]/2,
                     [-spacing[1-axis]/2, spacing[1-axis]/2]) for axis in (0, 1) for sign in (-1, 1)])
         self.faces = []
