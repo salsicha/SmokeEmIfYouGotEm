@@ -20,6 +20,7 @@ SMOOTHING_SCOPES = ("RaftSimSurface/GameThread/OpticalFilter",)
 BREAKING_SCOPES = ("RaftSimSurface/GameThread/BreakingVertices",)
 FOAM_SCOPES = ("RaftSimSurface/GameThread/FoamTransport",)
 GROUND_SCOPES = ("RaftSimGround/GameThread/Sample",)
+RELIEF_SCOPES = ("RaftSimSurface/GameThread/HydraulicRelief",)
 METADATA = {"config", "engineversion", "deviceprofile", "rhiname", "raytracing",
             "systemresolution.resx", "systemresolution.resy", "targetframerate"}
 
@@ -34,7 +35,7 @@ def parse_capture(stream, require_water_scopes=False):
         raise ValueError(f"missing actual frame metrics: {sorted(missing)}")
     if require_water_scopes and set(WATER_SCOPES) - set(header):
         raise ValueError("capture is missing required same-frame water scopes")
-    columns = {name: header.index(name) for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES if name in header}
+    columns = {name: header.index(name) for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES if name in header}
     samples, metadata = [], {}
     footer = False
     completed_metadata = False
@@ -81,7 +82,7 @@ def summarize(samples, first, last, target_fps=30.0):
     if any(s["FrameTime"] <= 0 for s in selected):
         raise ValueError("selected frames have no measured elapsed time")
     result = {}
-    for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES:
+    for name in METRICS + WATER_SCOPES + PUBLISH_SCOPES + SMOOTHING_SCOPES + BREAKING_SCOPES + FOAM_SCOPES + GROUND_SCOPES + RELIEF_SCOPES:
         if name not in selected[0]:
             continue  # Absent scope is unavailable, never inferred to be zero.
         values = [s[name] for s in selected]
@@ -125,7 +126,7 @@ def main():
               "scope": "Actual Unreal frame/CPU-thread/GPU CSV metrics, not water-actor time. "
               "Sample indices are zero-based CSV rows, not engine frame IDs. Threads overlap; "
               "water scopes are inclusive and nested (Tick contains Refresh/CartesianPublish; "
-              "Refresh contains source samples/handover/optical filter/breaking vertices/foam transport; CartesianPublish contains packing/SetMesh; "
+              "Refresh contains source samples/handover/optical filter/hydraulic relief/breaking vertices/foam transport; CartesianPublish contains packing/SetMesh; "
               "SetMesh contains topology/crest input/crest update, which contains selection and normals). "
               "Do not sum nested or thread times. Present zero scope "
               "rows record zero time (not proof of no call); absent columns are unavailable. "

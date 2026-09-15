@@ -1,4 +1,5 @@
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
@@ -4447,21 +4448,60 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     const int32 AnalysisFarStride = 2 * PresentationAnalysisStride;
     if (bCartesianFlow)
     {
-        for (int32 Index=0;Index<WaterSamples.Num();++Index)
+        CSV_SCOPED_TIMING_STAT(RaftSimSurface,HydraulicRelief);
+        // Qualified on identical actual South Fork fields in both call orders.
+        // Diagnostic serial switch changes scheduling only, not sample quality.
+        static const bool bParallelRelief=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSerialHydraulicRelief"));
+        if(!RaftSimCartesianHydraulicRelief::Apply(WaterSamples,HydraulicSourceSurfaceHeightMeters,
+            WetVertexMask,GridStationN,GridLateralN,AnalysisNearStride,AnalysisFarStride,
+            ResolvedPresentationHydraulicReliefScale,HydraulicReliefMeters,bParallelRelief))
+        {UE_LOG(LogTemp,Error,TEXT("Invalid Cartesian hydraulic relief input; refusing surface refresh"));return;}
+#if !UE_BUILD_SHIPPING
+        static const FString ReliefAuditPath=[]()
+        {FString P;FParse::Value(FCommandLine::Get(),TEXT("RaftSimHydraulicReliefAudit="),P);return P;}();
+        static TArray<TSharedPtr<FJsonValue>> ReliefRows;
+        if(!ReliefAuditPath.IsEmpty() && ReliefRows.Num()<64 && GetWorld() &&
+            GetWorld()->GetTimeSeconds()>=10. && !FPaths::FileExists(ReliefAuditPath))
         {
-            if (!WetVertexMask[Index]) continue;
-            const auto& Sample=WaterSamples[Index];
-            const FVector2D Direction=FlowDirectionFor(Sample);
-            const FVector2D Position(Index%GridStationN,Index/GridStationN);
-            float Heights[4]; bool Valid=true; int32 I=0;
-            for (const int32 Offset : {-AnalysisFarStride,-AnalysisNearStride,AnalysisNearStride,AnalysisFarStride})
-                Valid &= RaftSimWaterFlowFrame::SampleWetScalar(HydraulicSourceSurfaceHeightMeters,WetVertexMask,
-                    GridStationN,GridLateralN,Position+Direction*Offset,Heights[I++]);
-            if (!Valid) continue;
-            HydraulicReliefMeters[Index]=URaftSimWaterRuntimeAdapter::ComputeCoupledHydraulicReliefMeters(
-                HydraulicSourceSurfaceHeightMeters[Index],Heights[0],Heights[1],Heights[2],Heights[3],
-                Sample.VelocityMetersPerSecond.Size2D(),Sample.DepthMeters)*ResolvedPresentationHydraulicReliefScale;
+            TArray<float> Outputs[2];double Milliseconds[2];
+            const bool ParallelFirst=ReliefRows.Num()%2!=0;
+            for(int32 Pass=0;Pass<2;++Pass)
+            {
+                const int32 Kind=ParallelFirst ? 1-Pass : Pass;
+                const double Start=FPlatformTime::Seconds();
+                RaftSimCartesianHydraulicRelief::Apply(WaterSamples,HydraulicSourceSurfaceHeightMeters,
+                    WetVertexMask,GridStationN,GridLateralN,AnalysisNearStride,AnalysisFarStride,
+                    ResolvedPresentationHydraulicReliefScale,Outputs[Kind],Kind==1);
+                Milliseconds[Kind]=(FPlatformTime::Seconds()-Start)*1000.;
+            }
+            int32 Different=0,Nonzero=0;
+            for(int32 I=0;I<WaterSamples.Num();++I)
+            {
+                Different+=FMemory::Memcmp(&Outputs[0][I],&Outputs[1][I],sizeof(float))!=0 ||
+                    FMemory::Memcmp(&Outputs[0][I],&HydraulicReliefMeters[I],sizeof(float))!=0;
+                Nonzero+=Outputs[0][I]!=0.f;
+            }
+            auto Row=MakeShared<FJsonObject>();
+            Row->SetNumberField(TEXT("world_seconds"),GetWorld()->GetTimeSeconds());
+            Row->SetBoolField(TEXT("parallel_first"),ParallelFirst);
+            Row->SetNumberField(TEXT("vertices"),WaterSamples.Num());
+            Row->SetNumberField(TEXT("nonzero_relief_vertices"),Nonzero);
+            Row->SetNumberField(TEXT("different_float_bits"),Different);
+            Row->SetNumberField(TEXT("serial_ms"),Milliseconds[0]);
+            Row->SetNumberField(TEXT("parallel_ms"),Milliseconds[1]);
+            ReliefRows.Add(MakeShared<FJsonValueObject>(Row));
+            if(ReliefRows.Num()==64)
+            {
+                auto Report=MakeShared<FJsonObject>();
+                Report->SetStringField(TEXT("schema"),TEXT("raftsim.cartesian_hydraulic_relief_pair.v1"));
+                Report->SetStringField(TEXT("scope"),TEXT("Same actual frozen source inputs, alternating call order, exact per-vertex relief. Not total FPS, geometry/water realism or release acceptance."));
+                Report->SetArrayField(TEXT("rows"),ReliefRows);
+                Report->SetBoolField(TEXT("release_accepted"),false);
+                FString Json;auto Writer=TJsonWriterFactory<>::Create(&Json);FJsonSerializer::Serialize(Report,Writer);
+                FFileHelper::SaveStringToFile(Json,*ReliefAuditPath);
+            }
         }
+#endif
     }
     else for (int32 Y = 0; Y < GridLateralN; ++Y)
     {

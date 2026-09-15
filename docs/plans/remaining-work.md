@@ -3,7 +3,22 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [full nonlinear source time candidate](../reconstruction-review-2026-09-07/normal-river-source-nonlinear-time.md).
+Latest September 15: [normal playable hydraulic-relief scheduling](../reconstruction-review-2026-09-07/normal-river-hydraulic-relief-scheduling.md).
+The existing four-sample relief pass is now parallel in normal play, with exact
+original arithmetic and unchanged fields/geometry/quality. Actual 64 alternating
+pairs / 3.24 million vertex comparisons are bit-identical: 2.004799 ms serial vs
+1.501256 ms parallel, faster in both call-order means. Final build PASS; rendered
+Cartesian group 5 PASS; Python audit tests 11 PASS. Earlier NullRHI proxy failure
+is retained (wrong invocation, not waived). All 464 protected hashes unchanged.
+Ordinary 300-frame run: 12.257837 FPS / p95 98.2909 ms FAILS 30 FPS. Same-build
+serial-control CSV rejected for duplicate engine-stat headers; no overall FPS
+improvement claimed. No wave/foam visual or full source-physics acceptance.
+All owned jobs terminal. NEXT full-metric wet/front/open/native coupling (actual
+bank still rejects activation), larger crest/solver costs and motion/reference
+qualification. South Fork, later rivers in requested order, all-scene water,
+crew, normalization, remaining regressions and release remain OPEN.
+
+Earlier September 15: [full nonlinear source time candidate](../reconstruction-review-2026-09-07/normal-river-source-nonlinear-time.md).
 Full original-source rates now advance with bounded Gauss collocation and
 independent finite face/bed/wall impulses; no projection or timestep repair.
 Original 16-pool channel state completes 12 fixed 120 Hz steps / 0.1 s with
