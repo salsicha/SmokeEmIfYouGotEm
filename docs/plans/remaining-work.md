@@ -3,7 +3,25 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [original source birth geometry and pressure limit](../reconstruction-review-2026-09-07/normal-river-source-birth-pressure.md).
+Latest September 15: [simultaneous original-source pressure births](../reconstruction-review-2026-09-07/normal-river-simultaneous-source-birth.md).
+Geometry-only labels now expose original dry/dry internal edges without adding
+water or changing the physical partition. Coupled point-birth pressure retains
+original positive factors, exact source minima/face support and original 40 CG.
+Actual bank: 24 births, four new/new edges; both seven-height paths pass original
+energy refinement plus all 48 original newborn operator columns (672 checks).
+Final slope errors 0.0225% / 0.0600%; 547 matching source hashes; 464 protected
+hashes unchanged. Here connected groups have negligible leading old stress, so
+energy alone is nondiscriminating; full-column evidence and unequal-stage unit
+controls are retained. 18 focused tests PASS. Final combined suite: 421 PASS /
+13 retained FAIL (one legacy geometry, eight paired-stress energy, four constant-
+velocity energy); no waivers. Actual audit and test jobs terminal.
+This is NOT conservative front force/time or native/playable acceptance. NEXT
+full-metric front work/forces and edge/flat limits, then time/open/native/surface
+and motion/reference qualification. Last ordinary 12.257837 FPS / p95 98.2909 ms
+still FAILS 30 FPS. All later-river, crew, normalization, regression and release
+requirements remain OPEN; no existing guard or quality gate is removed.
+
+Earlier September 15: [original source birth geometry and pressure limit](../reconstruction-review-2026-09-07/normal-river-source-birth-pressure.md).
 Exact one-sided storage, kinetic Gram and face-contact polynomials now retain
 flat/edge/point births without epsilon water. A derived original-two-pole POINT
 pressure limit matches independent finite positive-water energies. Actual bank:

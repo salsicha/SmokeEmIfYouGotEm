@@ -38,7 +38,19 @@ def clipped_edge(sampler, edge, center, spacing, with_exact=False):
     return (xyz, length, exact) if with_exact else (xyz, length)
 
 
-def internal_faces(partition):
+def internal_faces(partition, additional_owners=None):
+    """Enumerate original edges, optionally with geometry-only birth labels.
+
+    Additional labels do not create water or alter the partition. They expose
+    dry/dry edges needed by one-sided simultaneous-birth analysis.
+    """
+    additional_owners = {} if additional_owners is None else dict(additional_owners)
+    for (parent, face), index in additional_owners.items():
+        if (not isinstance(parent, (int, np.integer)) or not 0 <= parent < len(partition.patch.cells)
+                or not isinstance(face, (int, np.integer))
+                or face not in partition.patch.cells[parent].source_triangle_indices
+                or not isinstance(index, (int, np.integer)) or index < len(partition.pools)):
+            raise ValueError('Explicit unowned original source and new geometry label required')
     source = partition.sampler
     result = []
     for parent, cell in enumerate(partition.patch.cells):
@@ -47,6 +59,11 @@ def internal_faces(partition):
             for face in partition.pools[index]['source_triangle_indices']:
                 if face in owner:
                     raise ValueError('Original source face has multiple region owners')
+                owner[face] = index
+        for (p, face), index in additional_owners.items():
+            if p == parent:
+                if face in owner:
+                    raise ValueError('Birth geometry label cannot replace an existing owner')
                 owner[face] = index
         if not owner:
             continue
