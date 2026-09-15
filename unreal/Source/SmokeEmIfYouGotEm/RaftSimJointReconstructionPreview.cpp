@@ -93,7 +93,7 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     }
     TMap<FString,FString> Files;
     for (const TCHAR* Key:{TEXT("streaming_manifest"),TEXT("initial_fields_manifest"),TEXT("coordinate_map"),
-        TEXT("mesh_file"),TEXT("material_file"),TEXT("geometry_manifest"),TEXT("atlas_manifest"),
+        TEXT("mesh_file"),TEXT("material_file"),TEXT("geometry_manifest"),TEXT("flow_input_manifest"),TEXT("atlas_manifest"),
         TEXT("snapshot_audit"),TEXT("bank_audit"),TEXT("coverage_audit"),TEXT("render_stage"),TEXT("collision_audit")})
     {
         FString File;
@@ -110,6 +110,7 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
         !Vector(Root,TEXT("translation_cm"),Translation,3) || !Vector(Root,TEXT("scale"),Scale,3) ||
         Scale[0]!=1. || Scale[1]!=-1. || Scale[2]!=1. || !Vector(Root,TEXT("window_center_m"),Center,2)) return false;
     const auto Geometry=Read(Resolve(Files[TEXT("geometry_manifest")]));
+    const auto Input=Read(Resolve(Files[TEXT("flow_input_manifest")]));
     const auto Atlas=Read(Resolve(Files[TEXT("atlas_manifest")]));
     const auto Render=Read(Resolve(Files[TEXT("render_stage")]));
     const auto Collision=Read(Resolve(Files[TEXT("collision_audit")]));
@@ -133,13 +134,36 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
         !String(Coverage,TEXT("repaired_streaming_manifest_sha256"),Hashes[Files[TEXT("streaming_manifest")]])) return false;
     FString InputHash;double SnapshotTime=0.,AtlasTime=0.;
     if (!Atlas->TryGetStringField(TEXT("input_manifest_sha256"),InputHash) ||
+        InputHash!=Hashes[Files[TEXT("flow_input_manifest")]] ||
+        !String(Input,TEXT("geometry_manifest_sha256"),Hashes[Files[TEXT("geometry_manifest")]]) ||
         !String(Snapshot,TEXT("input_manifest_sha256"),InputHash) || !String(Banks,TEXT("input_manifest_sha256"),InputHash) ||
         !Atlas->TryGetNumberField(TEXT("source_time_seconds"),AtlasTime) ||
         !Snapshot->TryGetNumberField(TEXT("time_seconds"),SnapshotTime) || FMath::Abs(AtlasTime-SnapshotTime)>1.e-9) return false;
-    const TSharedPtr<FJsonObject>* Arrays=nullptr;const TSharedPtr<FJsonObject>* H=nullptr;
-    FString DepthHash;
-    if (!Atlas->TryGetObjectField(TEXT("arrays"),Arrays) || !(*Arrays)->TryGetObjectField(TEXT("h"),H) ||
-        !(*H)->TryGetStringField(TEXT("sha256"),DepthHash) || !String(Banks,TEXT("h_sha256"),DepthHash)) return false;
+    const TSharedPtr<FJsonObject>* Arrays=nullptr;const TSharedPtr<FJsonObject>* SnapshotArrays=nullptr;
+    if (!Atlas->TryGetObjectField(TEXT("arrays"),Arrays) || !Arrays->IsValid() ||
+        !Snapshot->TryGetObjectField(TEXT("arrays"),SnapshotArrays) || !SnapshotArrays->IsValid()) return false;
+    for (const TCHAR* Name:{TEXT("h"),TEXT("u"),TEXT("v")})
+    {
+        const TSharedPtr<FJsonObject>* Actual=nullptr;const TSharedPtr<FJsonObject>* Audited=nullptr;
+        FString Digest;
+        if (!(*Arrays)->TryGetObjectField(Name,Actual) || !Actual->IsValid() ||
+            !(*SnapshotArrays)->TryGetObjectField(Name,Audited) ||
+            !(*Actual)->TryGetStringField(TEXT("sha256"),Digest) || !String(*Audited,TEXT("sha256"),Digest)) return false;
+        if (FString(Name)==TEXT("h") && !String(Banks,TEXT("h_sha256"),Digest)) return false;
+    }
+    // A valid but unrelated packet must not satisfy preflight by loading a
+    // different atlas successfully. Bind the actual initial loader reference.
+    const FString InitialPath=Resolve(Files[TEXT("initial_fields_manifest")]);
+    const auto Initial=Read(InitialPath);
+    const TArray<TSharedPtr<FJsonValue>>* Bands=nullptr;
+    if (!Initial.IsValid() || !Initial->TryGetArrayField(TEXT("bands"),Bands) || Bands->Num()!=1) return false;
+    const TSharedPtr<FJsonObject>* Band=nullptr;const TSharedPtr<FJsonObject>* Shared=nullptr;
+    FString SharedFile;
+    if (!(*Bands)[0]->TryGetObject(Band) || !String(*Band,TEXT("band_id"),TEXT("median_runnable")) ||
+        !(*Band)->TryGetObjectField(TEXT("shared_cartesian_state"),Shared) || !Shared->IsValid() ||
+        !String(*Shared,TEXT("sha256"),Hashes[Files[TEXT("atlas_manifest")]]) ||
+        !(*Shared)->TryGetStringField(TEXT("manifest"),SharedFile) ||
+        FPaths::ConvertRelativePathToFull(FPaths::GetPath(InitialPath)/SharedFile)!=Resolve(Files[TEXT("atlas_manifest")])) return false;
     ARaftSimRiverWaterConfig* Config=nullptr;int32 Count=0;
     for (TActorIterator<ARaftSimRiverWaterConfig> It(World);It;++It) { Config=*It;++Count; }
     if (Count!=1 || !Config->bMapProvidesTerrain || !Config->bEnableMovingWindowStreaming) return false;

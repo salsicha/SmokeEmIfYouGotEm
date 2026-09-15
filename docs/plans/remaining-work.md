@@ -3,7 +3,25 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [actual-map collision and compound runtime packets](../reconstruction-review-2026-09-07/normal-river-rock-union-runtime.md).
+Latest September 15: [source-matched playable preview](../reconstruction-review-2026-09-07/normal-river-joint-playable-preview.md).
+The original-return rock and audited 50 s water now run together in the EXISTING
+South Fork game via an opt-in ephemeral preview. 3,255 dependency hashes bind
+geometry, all 799 packets, actual h/u/v, material and prior collision/coverage
+proof. Actual source-centered captures show the rock and moving raft/water;
+single-surface startup verified. Reference video accessible again. Visuals are
+NOT accepted: abrupt inferred flanks, broad smooth faces/blanket froth and
+unfinished terrain persist. Native wrong-state packet refusal verified before
+BeginPlay; new launcher rejects misleading engine exit-0 failures. Final editor
+build PASS; 54 focused Python + four native PASS; successful launcher capture
+verified and all 464 protected hashes unchanged. No default level/material/profile promotion.
+SAME cook LIVE session45187/PID32276; independently audited 100/150 s states
+and all 86,720 dry bank-face cells PASS, discharge still NOT settled. Next 200 s
+checkpoint, source boundary support, crest/froth and real raft-contact work.
+30 FPS still FAILS (last ordinary 24.225877 / p95 47.78 ms); other scenes, crew,
+normalization, 13 physical + four presentation regressions and release OPEN.
+Troublemaker remains a rapid within South Fork and is NOT a menu scenario.
+
+Earlier September 15: [actual-map collision and compound runtime packets](../reconstruction-review-2026-09-07/normal-river-rock-union-runtime.md).
 Combined saved South Fork terrain plus transient source rock: all 27,245 probes
 PASS at unchanged 1 mm gate. Exactly 118 hydraulic cells switch to the candidate.
 Eight explicit compound source packets / 791 strictly verified reused packets;
