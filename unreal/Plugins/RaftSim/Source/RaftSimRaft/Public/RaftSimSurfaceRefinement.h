@@ -5,6 +5,7 @@
 #include "RaftSimFlatCoordinateMap.h"
 #include "RaftSimCrestCornerSamples.h"
 #include "RaftSimCrestRegionIndex.h"
+#include "RaftSimEdgeMap.h"
 
 // Conforming red/green triangle refinement. Midpoints retain parent indices so
 // every render attribute uses the same piecewise-linear hydraulic authority;
@@ -29,6 +30,8 @@ struct FRaftSimSurfaceRefinement
     int32 ParallelBatchSize=128;
     bool bIndexedRegions=false; // Candidate until actual paired timing qualifies it.
     bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
+    bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
+    bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     double InputSeconds=0,SelectionSeconds=0,AssemblySeconds=0;
     uint64 ParallelContextsCreated=0,ParallelContextsDestroyed=0;
@@ -38,6 +41,11 @@ struct FRaftSimSurfaceRefinement
         uint64 Bytes=RetainedParallelValues.GetAllocatedSize()+RetainedFastParallelValues.GetAllocatedSize();
         for(const auto& Context:RetainedParallelValues)Bytes+=Context.GetAllocatedSize();
         for(const auto& Context:RetainedFastParallelValues)Bytes+=Context.GetAllocatedSize();
+        for(const auto& Level:RetainedLevelFastValues)
+        {
+            Bytes+=Level.GetAllocatedSize();
+            for(const auto& Context:Level)Bytes+=Context.GetAllocatedSize();
+        }
         Bytes+=RetainedFlatParallelValues.GetAllocatedSize();
         for(const auto& Context:RetainedFlatParallelValues)Bytes+=Context.GetAllocatedSize();
         // Diagnostic numeric value for CSV/JSON. Exact for any feasible
@@ -86,12 +94,20 @@ struct FRaftSimSurfaceRefinement
         auto& ParallelValues=bRetainParallelMemo ? RetainedParallelValues : LocalParallelValues;
         TArray<TRaftSimCoordinateMap<FProfileMemoSample>> LocalFastParallelValues;
         auto& FastParallelValues=bRetainParallelMemo ? RetainedFastParallelValues : LocalFastParallelValues;
+        TArray<TRaftSimCoordinateMap<FProfileMemoSample>> LocalLevelFastValues[3];
+        auto* ActiveFastParallelValues=&FastParallelValues;
+        int32 MemoLevel=-1;
         TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> LocalFlatParallelValues;
         auto& FlatParallelValues=bRetainParallelMemo ? RetainedFlatParallelValues : LocalFlatParallelValues;
         // Retain lookup slots, NEVER profile values across calls. XY can move,
         // profiles can change without a key, and callers can replace HeightCm.
         // Each batch owns its map; levels join before resizing or reusing it.
-        if (++ProfileMemoEpoch==0) { RetainedParallelValues.Reset(); RetainedFastParallelValues.Reset(); RetainedFlatParallelValues.Reset(); ++ProfileMemoEpoch; }
+        if (++ProfileMemoEpoch==0)
+        {
+            RetainedParallelValues.Reset(); RetainedFastParallelValues.Reset(); RetainedFlatParallelValues.Reset();
+            for(auto& Level:RetainedLevelFastValues)Level.Reset();
+            ++ProfileMemoEpoch;
+        }
         TMap<FVector2D,float>& Values=ProfileValues ? *ProfileValues : LocalValues;
         const auto MemoValue=[&](auto& Memo,const FVector2D& P)
         {
@@ -118,7 +134,7 @@ struct FRaftSimSurfaceRefinement
                     {Sample.Value=HeightCm(P);Sample.Epoch=ProfileMemoEpoch;}
                     return Sample.Value;
                 }
-                return bFastCoordinateHash ? MemoValue(FastParallelValues[Context],P) : MemoValue(ParallelValues[Context],P);
+                return bFastCoordinateHash ? MemoValue((*ActiveFastParallelValues)[Context],P) : MemoValue(ParallelValues[Context],P);
             }
             if (const float* Found=Values.Find(P)) return *Found;
             const float V=HeightCm(P); Values.Add(P,V); return V;
@@ -172,13 +188,19 @@ struct FRaftSimSurfaceRefinement
                         ParallelContextsDestroyed+=FMath::Max(Before-Count,0);
                     };
                     if (bFlatCoordinateMemo) Prepare(FlatParallelValues);
-                    else if (bFastCoordinateHash) Prepare(FastParallelValues);
+                    else if (bFastCoordinateHash) Prepare(*ActiveFastParallelValues);
                     else Prepare(ParallelValues);
                 }
             };
         const TFunction<void(const TArray<FVector2D>&,const TArray<int32>&)> PrepareLevel=
             [&](const TArray<FVector2D>& Points,const TArray<int32>& CurrentTriangles)
             {
+                ++MemoLevel;
+                // A batch number refers to a different spatial strip at each
+                // refinement level. Keep its coordinate slots level-local;
+                // all sampled values still expire at this build's new epoch.
+                if(bLevelLocalMemos)
+                    ActiveFastParallelValues=bRetainParallelMemo ? &RetainedLevelFastValues[MemoLevel] : &LocalLevelFastValues[MemoLevel];
                 if(!ShareCorners)return;
                 Corners.Prepare(Points,CurrentTriangles,HeightCm,NonzeroRegions,DetailWindow,DetailSpanCm);
                 SharedCornerSamples=Corners.SampleCount;SharedCornerReads=Corners.ReadCount;
@@ -193,6 +215,7 @@ struct FRaftSimSurfaceRefinement
 private:
     TArray<TMap<FVector2D,FProfileMemoSample>> RetainedParallelValues;
     TArray<TRaftSimCoordinateMap<FProfileMemoSample>> RetainedFastParallelValues;
+    TArray<TRaftSimCoordinateMap<FProfileMemoSample>> RetainedLevelFastValues[3];
     TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> RetainedFlatParallelValues;
     uint64 ProfileMemoEpoch=0;
     struct FTopologyLevel
@@ -270,62 +293,70 @@ private:
             const int32 FirstParent=MidpointParents.Num();
             ++TopologyBuildCount;
             Cached.Selection=MoveTemp(Selection);
-            TMap<uint64,int32> Midpoints;
-            for (int32 I=0;I<Triangles.Num();I+=3)
+            const auto Assemble=[&](auto& Midpoints)
             {
-                const int32 A=Triangles[I],B=Triangles[I+1],C=Triangles[I+2];
-                if (!Cached.Selection[I/3])continue;
-                const int32 Corners[]={A,B,C};
-                for (int32 E=0;E<3;++E)
+                for (int32 I=0;I<Triangles.Num();I+=3)
                 {
-                    const int32 L=Corners[E],R=Corners[(E+1)%3];const uint64 K=Key(L,R);
-                    if (!Midpoints.Contains(K))
+                    const int32 A=Triangles[I],B=Triangles[I+1],C=Triangles[I+2];
+                    if (!Cached.Selection[I/3])continue;
+                    const int32 Corners[]={A,B,C};
+                    for (int32 E=0;E<3;++E)
                     {
-                        const int32 NewIndex=Points.Num();
-                        Points.Add((Points[L]+Points[R])*0.5);
-                        MidpointParents.Add(FIntPoint(L,R));Midpoints.Add(K,NewIndex);
+                        const int32 L=Corners[E],R=Corners[(E+1)%3];const uint64 K=Key(L,R);
+                        if (!Midpoints.Contains(K))
+                        {
+                            const int32 NewIndex=Points.Num();
+                            Points.Add((Points[L]+Points[R])*0.5);
+                            MidpointParents.Add(FIntPoint(L,R));Midpoints.Add(K,NewIndex);
+                        }
                     }
                 }
-            }
-            Cached.Parents.Reset();
-            for (int32 I=FirstParent;I<MidpointParents.Num();++I) Cached.Parents.Add(MidpointParents[I]);
-            if (Midpoints.IsEmpty())
-            {
+                Cached.Parents.Reset();
+                for (int32 I=FirstParent;I<MidpointParents.Num();++I) Cached.Parents.Add(MidpointParents[I]);
+                if (Midpoints.IsEmpty())
+                {
+                    Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
+                    return false;
+                }
+                TArray<int32> Next;Next.Reserve(Triangles.Num()*4);
+                TArray<int32> NextOrigins; NextOrigins.Reserve(Triangles.Num()*4/3);
+                int32 Origin=0;
+                const auto Add=[&](int32 A,int32 B,int32 C)
+                { Next.Add(A);Next.Add(B);Next.Add(C);NextOrigins.Add(Origin); };
+                for (int32 I=0;I<Triangles.Num();I+=3)
+                {
+                    Origin=TriangleOrigins[I/3];
+                    int32 V[]={Triangles[I],Triangles[I+1],Triangles[I+2]};int32 M[3],Count=0;
+                    for (int32 E=0;E<3;++E)
+                    {
+                        const int32* Found=Midpoints.Find(Key(V[E],V[(E+1)%3]));M[E]=Found ? *Found : INDEX_NONE;
+                        Count+=Found ? 1 : 0;
+                    }
+                    if (Count==0) { Add(V[0],V[1],V[2]);continue; }
+                    if (Count==3)
+                    {
+                        Add(V[0],M[0],M[2]);Add(M[0],V[1],M[1]);Add(M[2],M[1],V[2]);Add(M[0],M[1],M[2]);continue;
+                    }
+                    // Rotate indices cyclically; preserve the parent's winding.
+                    int32 Start=0;
+                    if (Count==1)while (M[Start]==INDEX_NONE)++Start;
+                    else while (M[Start]==INDEX_NONE || M[(Start+1)%3]==INDEX_NONE)++Start;
+                    const int32 A=V[Start],B=V[(Start+1)%3],C=V[(Start+2)%3],AB=M[Start];
+                    if (Count==1) { Add(A,AB,C);Add(AB,B,C); }
+                    else { const int32 BC=M[(Start+1)%3];Add(B,BC,AB);Add(A,AB,C);Add(AB,BC,C); }
+                }
+                Triangles=MoveTemp(Next);
+                TriangleOrigins=MoveTemp(NextOrigins);
                 Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
-                if(bMeasureStages)AssemblySeconds+=FPlatformTime::Seconds()-AssemblyStarted;
-                break;
-            }
-            TArray<int32> Next;Next.Reserve(Triangles.Num()*4);
-            TArray<int32> NextOrigins; NextOrigins.Reserve(Triangles.Num()*4/3);
-            int32 Origin=0;
-            const auto Add=[&](int32 A,int32 B,int32 C)
-            { Next.Add(A);Next.Add(B);Next.Add(C);NextOrigins.Add(Origin); };
-            for (int32 I=0;I<Triangles.Num();I+=3)
-            {
-                Origin=TriangleOrigins[I/3];
-                int32 V[]={Triangles[I],Triangles[I+1],Triangles[I+2]};int32 M[3],Count=0;
-                for (int32 E=0;E<3;++E)
-                {
-                    const int32* Found=Midpoints.Find(Key(V[E],V[(E+1)%3]));M[E]=Found ? *Found : INDEX_NONE;
-                    Count+=Found ? 1 : 0;
-                }
-                if (Count==0) { Add(V[0],V[1],V[2]);continue; }
-                if (Count==3)
-                {
-                    Add(V[0],M[0],M[2]);Add(M[0],V[1],M[1]);Add(M[2],M[1],V[2]);Add(M[0],M[1],M[2]);continue;
-                }
-                // Rotate indices cyclically; preserve the parent's winding.
-                int32 Start=0;
-                if (Count==1)while (M[Start]==INDEX_NONE)++Start;
-                else while (M[Start]==INDEX_NONE || M[(Start+1)%3]==INDEX_NONE)++Start;
-                const int32 A=V[Start],B=V[(Start+1)%3],C=V[(Start+2)%3],AB=M[Start];
-                if (Count==1) { Add(A,AB,C);Add(AB,B,C); }
-                else { const int32 BC=M[(Start+1)%3];Add(B,BC,AB);Add(A,AB,C);Add(AB,BC,C); }
-            }
-            Triangles=MoveTemp(Next);
-            TriangleOrigins=MoveTemp(NextOrigins);
-            Cached.Triangles=Triangles; Cached.Origins=TriangleOrigins;
+                return true;
+            };
+            bool HasMidpoints=false;
+            if(bStrongEdgeHash)
+            { TRaftSimEdgeMap<int32> Midpoints; HasMidpoints=Assemble(Midpoints); }
+            else
+            { TMap<uint64,int32> Midpoints; HasMidpoints=Assemble(Midpoints); }
             if(bMeasureStages)AssemblySeconds+=FPlatformTime::Seconds()-AssemblyStarted;
+            if(!HasMidpoints)break;
         }
         return true;
     }
