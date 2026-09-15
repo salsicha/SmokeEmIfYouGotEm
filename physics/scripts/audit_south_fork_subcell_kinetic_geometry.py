@@ -14,7 +14,7 @@ from subcell_wet_pool_partition import WetPoolPartition
 from subcell_wet_pool_pressure import WetPoolPressureSystem
 from audit_wet_pool_pressure_rate import audit_direction
 from audit_wet_pool_transport import audit_transport, audit_internal_regions
-from audit_source_activation import audit_activation
+from audit_source_activation import audit_activation, audit_history
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
@@ -27,9 +27,13 @@ def main():
     parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
     parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
     parser.add_argument('--pool-activation', action='store_true', help='Attempt finite source-front activation with strict state/energy rejection; implies --pool-pressure')
+    parser.add_argument('--pool-history-steps', type=int, default=0, help='Successive 20ms source-front attempts, stopping on rejection; implies --pool-pressure')
+    parser.add_argument('--pool-history-scheme', choices=('explicit', 'coupled-frozen'), default='explicit')
     args = parser.parse_args()
+    if args.pool_history_steps < 0:
+        parser.error('--pool-history-steps must be nonnegative')
     args.pool_transport = args.pool_transport or args.pool_internal
-    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation
+    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation or args.pool_history_steps > 0
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -61,6 +65,7 @@ def main():
         'subcell_source_region_faces.py',
         'subcell_dry_front_flux.py', 'subcell_source_activation.py', 'audit_source_activation.py',
         'subcell_exact_source_faces.py',
+        'subcell_coupled_front_update.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -137,7 +142,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure, direction, transport, internal, activation = None, None, None, None, None
+    pressure, direction, transport, internal, activation, history = None, None, None, None, None, None
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -197,6 +202,8 @@ def main():
             internal = audit_internal_regions(pools)
         if args.pool_activation:
             activation = audit_activation(pools)
+        if args.pool_history_steps:
+            history = audit_history(pools, args.pool_history_steps, scheme=args.pool_history_scheme)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
@@ -208,6 +215,7 @@ def main():
         fixed_pool_transport=transport,
         fixed_internal_source_regions=internal,
         source_activation_candidates=activation,
+        source_activation_history=history,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -228,8 +236,9 @@ def main():
               'factor and fixed-terrain volume derivative, plus optional separated-pool static two-pole '
               'pressure on shared wet faces and reflecting walls, and optional analytic controlled '
               'volume/velocity directions checked against independent perturbed states; optional physical-momentum '
-              'energy/reverse volume gradient and nondispersive pool flux support. No full nonlinear bed-force work, topology '
-              'evolution, wetting/open/time, native or gameplay qualification.')
+              'energy/reverse volume gradient and nondispersive pool flux support. Optional finite source-front '
+              'activation and successive candidate controls include support transitions and finite energy rejection. '
+              'No full rational nonlinear transport/bed-force, wet-front/open/time-refinement, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
     console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions', 'source_activation_candidates')}
@@ -247,6 +256,7 @@ def main():
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
     print(json.dumps(console, indent=2))
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
+               or (history is not None and not history['all_requested_steps_passed'])
                or (activation is not None and not activation['twenty_ms_candidate_passed'])
                or (internal is not None and not internal['internal_region_controls_passed'])
                or (direction is not None and not direction['fixed_topology_direction_controls_passed'])

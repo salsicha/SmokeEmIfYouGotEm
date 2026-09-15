@@ -3,6 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [source activation and successive-state failures](../reconstruction-review-2026-09-07/normal-river-source-front-history.md).
+Actual one-sided source activation now passes independent finite budgets at
+20 ms: 258->313 regions, 54 new source regions across 18 cells. Exact original
+face cuts remove rounded trace overlaps; wet-support release/splits conserve
+represented state. Successive explicit step 2 FAILS with 11 draining regions.
+Coupled mass transfer exposed stiff momentum exchange left explicit; an
+independent failing energy test drove a conservative implicit velocity-graph
+correction, preserving original rates and constant velocity under changing V.
+Actual first 10 steps have bounded speeds, BUT step 11 reaches157.7 m/s in a
+tiny region and step12 FAILS true residual. NOT accepted finite-time physics.
+NEXT local tiny-region force/conditioning and coupled pressure/momentum, full
+rational transport/bed-force, topology/time/open/refinement/native qualification.
+162 focused testsPASS; retained three-file selection25PASS/12FAIL, no waivers.
+464 protected hashes unchanged; no gameplay/visual/FPS gain. Full scene scopeOPEN.
+
 Latest September 14: [internal source-region faces and conditioning](../reconstruction-review-2026-09-07/normal-river-internal-source-regions.md).
 Independent regions now communicate on exact original internal source edges,
 including oblique mass/pressure, analytic direction and reverse-energy work.

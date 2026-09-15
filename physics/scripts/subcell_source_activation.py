@@ -17,6 +17,7 @@ from subcell_pressure_kinetic_geometry import local_form
 from subcell_wet_connectivity import components
 from triangle_cell_storage import TriangleCellStorage
 from triangle_face_section import TriangleFaceSection
+from subcell_coupled_front_update import coupled_update
 
 
 def faces(partition):
@@ -43,9 +44,10 @@ def assembly(partition, gravity=9.81):
     velocity = momentum/volume[:, None]
     datum = min(float(c.datum) for c in partition.patch.cells)
     dv = np.zeros_like(volume)
+    incoming, outgoing = np.zeros_like(volume), np.zeros_like(volume)
     bed = np.array([p['storage'].hydrostatic_bed_force(p['form']['stage_offset'], gravity, True) for p in pools])
     dp, wall = bed.copy(), np.zeros(2)
-    receipts, front_records = {}, []
+    receipts, front_records, transfers, exchanges = {}, [], [], []
     for face in faces(partition):
         li, ri = face['left'], face['right']
         if li is None and ri is None:
@@ -69,6 +71,8 @@ def assembly(partition, gravity=9.81):
             receipt['momentum_rate'] += flux[1:]
             receipt['incoming_energy_flux'] += info['energy_flux']
             dv[owner] -= flux[0]; dp[owner] -= flux[1:]
+            outgoing[owner] += flux[0]
+            transfers.append((owner, key, float(flux[0])))
             front_records.append(dict(wet_pool=owner, dry_parent=parent, dry_source_face=source,
                 internal=face['internal'], normal=outward.tolist(), segment=face['segment'].tolist(),
                 volume_flux=float(flux[0]), momentum_flux=flux[1:].tolist(), **info))
@@ -79,20 +83,42 @@ def assembly(partition, gravity=9.81):
             ul -= 2*float(ul@n)*n
         if face['right_parent'] < 0:
             ur -= 2*float(ur@n)*n
-        flux, _ = face_flux_normal(section, lf['stage_offset'], ul, rf['stage_offset'], ur, n,
+        flux, info = face_flux_normal(section, lf['stage_offset'], ul, rf['stage_offset'], ur, n,
                                    gravity, lf['datum'], rf['datum'], dissipative=True)
+        if not wall_face and li != ri:
+            # Fp = Fmass*u_upwind + D*(ul-ur) + pressure*n. Only the
+            # nonnegative exchange D is implicit; any negative remainder is
+            # still present in the exact assembled rate, never discarded.
+            al = section.moments(lf['stage_offset'], lf['datum'])[0]
+            ar = section.moments(rf['stage_offset'], rf['datum'])[0]
+            central = float(.5*(ul+ur)@n)*info['pressure_secant_area']
+            d = .5*(info['dissipation_speed']*ar-central) if flux[0] >= 0 else .5*(info['dissipation_speed']*al+central)
+            if d > 0:
+                exchanges.append((li, ri, float(d)))
         if face['left_parent'] >= 0:
             dv[li] -= flux[0]; dp[li] -= flux[1:]
+            outgoing[li] += max(0., flux[0]); incoming[li] += max(0., -flux[0])
         if face['right_parent'] >= 0:
             dv[ri] += flux[0]; dp[ri] += flux[1:]
+            outgoing[ri] += max(0., -flux[0]); incoming[ri] += max(0., flux[0])
         if wall_face:
             wall += flux[1:]*(1 if face['left_parent'] < 0 else -1)
+        elif flux[0] > 0 and li != ri:
+            transfers.append((li, ri, float(flux[0])))
+        elif flux[0] < 0 and li != ri:
+            transfers.append((ri, li, float(-flux[0])))
     new = list(receipts.values())
+    receiving_indices = {key: len(pools)+i for i, key in enumerate(receipts)}
+    transfers = [(owner, receiving_indices[other] if isinstance(other, tuple) else other, rate)
+                 for owner, other, rate in transfers]
     total_mass = float(dv.sum()+sum(r['volume_rate'] for r in new))
     total_momentum = dp.sum(axis=0)+sum((r['momentum_rate'] for r in new), np.zeros(2))
-    outgoing = dv < 0
-    net_volume_limit = float(np.min(volume[outgoing]/-dv[outgoing])) if outgoing.any() else None
+    draining = dv < 0
+    net_volume_limit = float(np.min(volume[draining]/-dv[draining])) if draining.any() else None
     return dict(partition=partition, gravity=gravity, volume_rate=dv, momentum_rate=dp, new_region_rates=new, fronts=front_records,
+        incoming_volume_rate=incoming, outgoing_volume_rate=outgoing,
+        transfers=transfers,
+        velocity_exchanges=exchanges,
         net_mass_rate=total_mass, momentum_boundary_bed_error=float(np.max(abs(total_momentum-bed.sum(axis=0)-wall))),
         bed_force=bed, wall_force=wall, net_volume_limit=net_volume_limit, reference_datum_m=datum)
 
@@ -153,7 +179,7 @@ def wet_support_transition(partition, states):
     return output, records
 
 
-def attempt(partition, duration, gravity=9.81, assembled=None):
+def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'):
     """Return a state ONLY if this candidate's mass/momentum/energy gates pass.
 
     A passing candidate remains a nondispersive activation control, not proof
@@ -161,6 +187,8 @@ def attempt(partition, duration, gravity=9.81, assembled=None):
     """
     if not np.isfinite([duration, gravity]).all() or duration <= 0 or gravity <= 0:
         raise ValueError('Positive finite duration and gravity required')
+    if scheme not in ('explicit', 'coupled-frozen'):
+        raise ValueError('Unknown source-front update scheme')
     a = assembly(partition, gravity) if assembled is None else assembled
     if a['partition'] is not partition or a['gravity'] != gravity:
         raise ValueError('Matching source state and gravity required for cached assembly')
@@ -168,17 +196,36 @@ def attempt(partition, duration, gravity=9.81, assembled=None):
     momentum = np.array([p['momentum'] for p in partition.pools])
     new_volume = volume+duration*a['volume_rate']
     new_momentum = momentum+duration*a['momentum_rate']
-    audit = dict(duration=duration, original_region_count=len(volume),
+    audit = dict(duration=duration, scheme=scheme, original_region_count=len(volume),
         requested_new_regions=len(a['new_region_rates']), net_volume_limit=a['net_volume_limit'],
         assembly_net_mass_rate=a['net_mass_rate'], assembly_momentum_balance_error=a['momentum_boundary_bed_error'],
         candidate_accepted=False, full_rational_model_or_time_history_or_gameplay_accepted=False)
     audit['maximum_original_speed_mps'] = float(np.max(np.linalg.norm(momentum/volume[:, None], axis=1)))
+    coupled = None
+    if scheme == 'coupled-frozen':
+        try:
+            coupled = coupled_update(a, duration)
+        except ValueError as exc:
+            return dict(state=None, audit=dict(audit, rejection=str(exc)))
+        new_volume, new_momentum = coupled['volume'][:len(volume)], coupled['momentum'][:len(volume)]
+        audit['coupled_update'] = coupled['audit']
     if (new_volume <= 0).any() or not np.isfinite(new_momentum).all() or not np.isfinite(new_volume).all():
+        rejected = np.flatnonzero((new_volume <= 0) | ~np.isfinite(new_volume) | ~np.isfinite(new_momentum).all(axis=1))
+        failures = [dict(index=int(i), parent=partition.pools[i]['parent'],
+            source_triangle_indices=partition.pools[i]['source_triangle_indices'],
+            volume=float(volume[i]), candidate_volume=float(new_volume[i]),
+            incoming_volume_rate=float(a['incoming_volume_rate'][i]),
+            outgoing_volume_rate=float(a['outgoing_volume_rate'][i]),
+            stage_offset=partition.pools[i]['form']['stage_offset'], datum=partition.pools[i]['form']['datum'],
+            velocity=(momentum[i]/volume[i]).tolist(), momentum_rate=a['momentum_rate'][i].tolist()) for i in rejected]
         return dict(state=None, audit=dict(audit, rejection='Existing region drains or becomes unrepresentable; no clipping/deletion',
+                                         rejected_regions=failures,
                                          minimum_candidate_volume=float(new_volume.min())))
     states = [dict(old, volume=float(v), momentum=p) for old, v, p in zip(partition.pools, new_volume, new_momentum)]
-    for receipt in a['new_region_rates']:
+    for index, receipt in enumerate(a['new_region_rates'], len(volume)):
         v, p = duration*receipt['volume_rate'], duration*receipt['momentum_rate']
+        if coupled is not None:
+            v, p = coupled['volume'][index], coupled['momentum'][index]
         if v <= 0 or not np.isfinite(v) or not np.isfinite(p).all():
             return dict(state=None, audit=dict(audit, rejection='Positive receiving flux has unrepresentable stored state'))
         states.append(dict(parent=receipt['parent'], source_triangle_indices=receipt['source_triangle_indices'], volume=v, momentum=p))

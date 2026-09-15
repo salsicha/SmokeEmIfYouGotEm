@@ -6,6 +6,7 @@ from triangle_face_section import TriangleFaceSection
 from subcell_dry_front_flux import flux
 from subcell_source_activation import assembly, attempt, wet_support_transition
 from subcell_exact_source_faces import triangle_cut
+import audit_source_activation
 
 
 @pytest.mark.parametrize('height', [1., .13, 1e-50, 1e-150])
@@ -171,3 +172,38 @@ def test_original_triangle_face_cuts_share_exactly_the_same_nonbinary_endpoint()
     assert len(shared) == 1
     assert one[1, 0] == two[0, 0]
     np.testing.assert_array_equal(one, triangle_cut(left, [.4, 0.], [.4, 2.], 0, -1))
+
+
+def test_history_uses_accepted_state_and_stops_without_retry(monkeypatch):
+    from types import SimpleNamespace
+    initial, next_state = SimpleNamespace(pools=[0]), SimpleNamespace(pools=[0, 1])
+    calls = []
+    def fake_attempt(state, duration, scheme):
+        assert scheme == 'explicit'
+        calls.append((state, duration))
+        accepted = state is initial
+        return dict(state=next_state if accepted else None,
+                    audit=dict(candidate_accepted=accepted, rejection=None if accepted else 'energy'))
+    monkeypatch.setattr(audit_source_activation, 'attempt', fake_attempt)
+    result = audit_source_activation.audit_history(initial, 5)
+    assert calls == [(initial, .02), (next_state, .02)]
+    assert result['accepted_steps'] == 1 and result['advanced_seconds'] == .02
+    assert result['final_region_count'] == 2
+    assert not result['all_requested_steps_passed']
+    assert result['attempts'][-1]['start_time'] == .02
+    assert not result['nonlinear_model_or_native_or_gameplay_accepted']
+
+
+def test_history_records_assembly_failure_and_rejects_invalid_requests(monkeypatch):
+    pools = dam()
+    def failed_attempt(state, duration, scheme):
+        raise ValueError('incompatible source face')
+    monkeypatch.setattr(audit_source_activation, 'attempt', failed_attempt)
+    result = audit_source_activation.audit_history(pools, 2)
+    assert result['accepted_steps'] == 0 and result['advanced_seconds'] == 0
+    assert result['attempts'][0]['failure_phase'] == 'assembly'
+    for steps in (0, -1, True, 1.5):
+        with pytest.raises(ValueError, match='step count'):
+            audit_source_activation.audit_history(pools, steps)
+    with pytest.raises(ValueError, match='duration'):
+        audit_source_activation.audit_history(pools, 1, float('nan'))
