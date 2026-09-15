@@ -3,7 +3,28 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [actual lit-froth rejection and recovery](../reconstruction-review-2026-09-07/normal-river-lit-froth-rejection.md).
+Latest September 15: [normal-play wet-edge distance sweep](../reconstruction-review-2026-09-07/normal-river-wet-edge-sweep.md).
+Normal South Fork uses the exact two-pass wet-edge distance transform in both
+shore damping and terrain-probe band selection. Actual 64 comparisons span
+19 masks / 3,240,000 exact integer distances: queue 2.030311 ms versus sweep
+0.747100 ms, faster in every pair, both orders and both production uses.
+The first short capture was rejected for one unchanged mask; a longer actual
+720-frame descent supplies changing-mask evidence without relaxing validation.
+Final build PASS; 24 native tests PASS; 44 Python report tests PASS. Protected
+464 source/actor hashes unchanged. No geometry, contact, probe, timestep or
+visual gate changed. Strong edge hashing and level-local crest memo storage
+were slower in actual comparisons and remain disabled by default.
+Fresh ordinary 300-frame default run: 13.420531 FPS / p95 89.9936 ms still
+FAILS 30 FPS. No controlled whole-frame gain or visual acceptance claimed.
+Fresh default recording finalized (64 source frames / 6.150 s, 184 decoded
+frames). Inspected original and decoded frames still show broad white froth
+bands and smooth green faces; the CPU change adds no visual detail. All owned
+jobs terminal, and final post-capture protected hashes remain unchanged.
+NEXT major crest/surface/solver cost reduction, breaking-surface/froth
+deformation and source-front coupling; Colorado → Pacuare → Futaleufu,
+all-scene water, crew, normalization, retained regressions and release stay OPEN.
+
+Earlier September 15: [actual lit-froth rejection and recovery](../reconstruction-review-2026-09-07/normal-river-lit-froth-rejection.md).
 Normal-only and combined finer-coverage/lit-normal candidates were installed,
 fresh-audited and captured in normal South Fork play; BOTH visually REJECTED.
 Actual reference video access works. Broad white patches / angular white chips

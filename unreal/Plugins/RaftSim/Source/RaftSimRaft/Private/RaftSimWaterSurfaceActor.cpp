@@ -1,6 +1,7 @@
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimBreakingTileAudit.h"
+#include "RaftSimWetEdgeAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
@@ -4568,7 +4569,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
     TArray<float> ShoreDisplacementWeight;
     ShoreDisplacementWeight.SetNumZeroed(Vertices.Num());
     const TArray<int32> CartesianWetEdgeSteps = bCartesianFlow
-        ? RaftSimWaterFlowFrame::WetEdgeSteps(GridStationN,GridLateralN,WetVertexMask) : TArray<int32>();
+        ? RaftSimWetEdgeAudit::Evaluate(GridStationN,GridLateralN,WetVertexMask,1) : TArray<int32>();
     for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
         for (int32 X = 0; X < GridStationN; ++X)
@@ -6954,8 +6955,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             };
             if (bCartesianFlow)
             {
-                const auto EdgeSteps = RaftSimWaterFlowFrame::WetEdgeSteps(
-                    GridStationN, GridLateralN, VolumeCoreWetMask);
+                const auto EdgeSteps = RaftSimWetEdgeAudit::Evaluate(
+                    GridStationN, GridLateralN, VolumeCoreWetMask,2);
                 for (int32 I=0; I<Vertices.Num(); ++I)
                     if (VolumeCoreWetMask[I] && EdgeSteps[I]<kVisualBankBandRings)
                         EvaluateBandCell(I%GridStationN, I/GridStationN);
