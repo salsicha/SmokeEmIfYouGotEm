@@ -3,7 +3,28 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [secondary front receipts and inlet placement](../reconstruction-review-2026-09-07/normal-river-secondary-front-receipts.md).
+Latest September 15: [original-source inlet-connected geometry](../reconstruction-review-2026-09-07/normal-river-inlet-sweep-geometry.md).
+Conditional outward inlet sweeps now retain original entry location and
+source-clipped depth moments rather than filling a receiver minimum away from
+the inlet. Exact polynomial integration carries certified switch bounds;
+crossed-source and out-of-block amounts are never normalized or discarded.
+Actual bank: 10 represented outward sweeps (eight above receiving minima),
+one tiny-speed case below float time/volume range, two receding cases outside
+this construction. SEVEN streams have positive pieces in additional sources;
+THREE reach already-wet regions. NEXT resolve stream crossings/overlap and
+existing water, non-horizontal support/one-sided forces, fan/receding/full
+rational time evolution, edge/flat/mixed transitions and native integration.
+Maximum combined moment uncertainty 4.974e-14 of incoming; original-normal
+flux discrepancy 1.797e-16. 62 focused PASS; full 548 PASS / 13 identical
+retained FAIL, zero errors/skips. All 563 audit-source and 464 protected
+source/actor hashes unchanged; owned jobs terminal. This is NOT a physical
+water update or playable acceptance. Last ordinary 22.429181 FPS / p95
+54.7266 ms still FAILS 30 FPS; broad froth and smooth faces remain unaccepted.
+Colorado → Pacuare → Futaleufu, Chilko/Zambezi/all-scene water, crew,
+normalization, regressions and release remain OPEN. Troublemaker remains
+a rapid within South Fork, not a separate menu scenario.
+
+Earlier September 15: [secondary front receipts and inlet placement](../reconstruction-review-2026-09-07/normal-river-secondary-front-receipts.md).
 Closed integration of the ORIGINAL dry-Riemann wet/fan/dry branches now
 supplies conditional secondary-source mass coefficients with matching donor
 losses. No tiny-speed cutoff: actual 1.916e-126 positive normal speed retains
