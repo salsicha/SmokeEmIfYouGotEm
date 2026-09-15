@@ -139,3 +139,19 @@ def test_unrepresentable_positive_donor_volume_is_rejected_without_deletion():
     with pytest.raises(ValueError, match='volume is not positive/finite'):
         coupled_update(source, .02)
     assert source['partition'].pools[0]['volume'] == 1e-250
+
+
+def test_front_pressure_uses_same_integrated_transfer_as_front_mass():
+    volume, rate, dt = 1e-6, 1e-3, .02
+    velocity, force = np.array([2., 0.]), np.array([2e-4, 0.])
+    source = dict(partition=SimpleNamespace(pools=[dict(volume=volume, momentum=volume*velocity)]),
+        new_region_rates=[dict(volume_rate=rate, momentum_rate=rate*velocity+force, explicit_force_rate=force)],
+        transfers=[(0, 1, rate)], front_forces=[(0, 1, force)],
+        volume_rate=np.array([-rate]), momentum_rate=np.array([-rate*velocity-force]),
+        explicit_force_parts=dict(bed=np.zeros((1, 2)), dry_front=np.array([-force])))
+    result = coupled_update(source, dt)
+    ratio = 1/(1+dt*rate/volume)
+    donor_velocity = velocity-dt*ratio*force/volume
+    expected = np.array([donor_velocity, donor_velocity+force/rate])
+    np.testing.assert_allclose(result['momentum']/result['volume'][:, None], expected, atol=1e-13)
+    np.testing.assert_allclose(result['momentum'].sum(axis=0), volume*velocity, atol=1e-20)

@@ -135,6 +135,8 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     receiving_indices = {key: len(pools)+i for i, key in enumerate(receipts)}
     transfers = [(owner, receiving_indices[other] if isinstance(other, tuple) else other, rate)
                  for owner, other, rate in transfers]
+    front_forces = [(f['wet_pool'], receiving_indices[(f['dry_parent'], f['dry_source_face'])],
+                     np.asarray(f['nonadvective_momentum_flux'])) for f in front_records]
     total_mass = float(dv.sum()+sum(r['volume_rate'] for r in new))
     total_momentum = dp.sum(axis=0)+sum((r['momentum_rate'] for r in new), np.zeros(2))
     draining = dv < 0
@@ -148,6 +150,7 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     return dict(partition=partition, gravity=gravity, face_scheme=face_scheme, volume_rate=dv, momentum_rate=dp, new_region_rates=new, fronts=front_records,
         incoming_volume_rate=incoming, outgoing_volume_rate=outgoing,
         transfers=transfers,
+        front_forces=front_forces,
         velocity_exchanges=exchanges,
         source_face_below_storage_minimum=dict(count=len(below), largest_relative_discrepancies=below[:8]),
         explicit_force_parts=dict(bed=bed, **force_parts),
@@ -240,7 +243,8 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
         try:
             coupled = coupled_update(a, duration)
         except ValueError as exc:
-            return dict(state=None, audit=dict(audit, rejection=str(exc)))
+            return dict(state=None, audit=dict(audit, rejection=str(exc),
+                failure_details=getattr(exc, 'details', None)))
         new_volume, new_momentum = coupled['volume'][:len(volume)], coupled['momentum'][:len(volume)]
         audit['coupled_update'] = coupled['audit']
     if (new_volume <= 0).any() or not np.isfinite(new_momentum).all() or not np.isfinite(new_volume).all():
