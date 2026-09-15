@@ -3,7 +3,30 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [guarded point-birth curvature and unresolved edges](../reconstruction-review-2026-09-07/normal-river-point-birth-curvature.md).
+Latest September 15: [secondary front receipts and inlet placement](../reconstruction-review-2026-09-07/normal-river-secondary-front-receipts.md).
+Closed integration of the ORIGINAL dry-Riemann wet/fan/dry branches now
+supplies conditional secondary-source mass coefficients with matching donor
+losses. No tiny-speed cutoff: actual 1.916e-126 positive normal speed retains
+its nonzero threshold and finite fan flux. Bank: 13 immediate and 10 delayed
+newborn/unowned faces; the eight curvature interfaces split seven outward /
+one receding. Eleven outward transfers target ten regions; TWO enter at the
+receiver minimum, NINE above it. Above-minimum receipts are NOT assigned a
+connected pool update: placing their water at the minimum would miss the inlet.
+NEXT inlet-connected wet-region geometry plus one-sided forces/transport,
+complete rational front/time coupling, edge/flat/mixed transitions and native
+single-surface integration. This does not enable a physical water update.
+91 actual original-quadrature comparisons: max relative error 1.259e-15;
+paired mass coefficient error zero. 48 focused tests PASS; full suite
+534 PASS / 13 identical retained FAIL, zero errors/skips. Earlier command
+with nonexistent test path ran zero tests and is retained, not counted.
+All 561 audit-source and 464 protected source/actor hashes unchanged; jobs
+terminal. No playable visual/FPS change: last ordinary 22.429181 FPS / p95
+54.7266 ms FAILS 30 FPS; broad froth and smooth faces remain unaccepted.
+Colorado → Pacuare → Futaleufu, Chilko/Zambezi/all-scene water, crew,
+normalization, regressions and release remain OPEN. Troublemaker remains a
+rapid within South Fork, not its own menu scenario.
+
+Earlier September 15: [guarded point-birth curvature and unresolved edges](../reconstruction-review-2026-09-07/normal-river-point-birth-curvature.md).
 Analytic e^-2 RHS coefficients of the existing common-trace curvature are
 verified against original finite-water expressions, including both axes and
 oblique original edges. This diagnoses a guarded expression, not an accepted
