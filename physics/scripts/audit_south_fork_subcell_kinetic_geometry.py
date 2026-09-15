@@ -18,6 +18,7 @@ from audit_wet_pool_transport import audit_transport, audit_internal_regions
 from audit_source_activation import audit_activation, audit_history
 from audit_source_time_refinement import audit_refinement
 from audit_primal_metric_direction import audit_direction as audit_primal_direction
+from audit_source_auxiliary_transport import audit_components as audit_auxiliary_components
 from audit_source_representation import audit_representation
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
@@ -31,6 +32,7 @@ def main():
     parser.add_argument('--exact-pool-geometry', action='store_true', help='Use exact source storage, datums, traces and internal edges throughout the pool path; implies --pool-pressure')
     parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
     parser.add_argument('--pool-primal-direction', action='store_true', help='Verify changing-volume physical/canonical inverse metric on the original moving state; implies --pool-pressure')
+    parser.add_argument('--pool-auxiliary-components', action='store_true', help='Verify original-source auxiliary face transport and geometric commutator; NOT a full force; implies --pool-pressure')
     parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
     parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
     parser.add_argument('--pool-activation', action='store_true', help='Attempt finite source-front activation with strict state/energy rejection; implies --pool-pressure')
@@ -46,7 +48,7 @@ def main():
     if args.pool_refinement_levels < 3:
         parser.error('--pool-refinement-levels must be at least three')
     args.pool_transport = args.pool_transport or args.pool_internal
-    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_primal_direction or args.pool_transport or args.pool_activation or args.pool_history_steps > 0 or args.pool_refinement_steps > 0 or args.exact_pool_geometry
+    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_primal_direction or args.pool_auxiliary_components or args.pool_transport or args.pool_activation or args.pool_history_steps > 0 or args.pool_refinement_steps > 0 or args.exact_pool_geometry
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -79,6 +81,7 @@ def main():
         'subcell_dry_front_flux.py', 'subcell_source_activation.py', 'audit_source_activation.py',
         'audit_source_time_refinement.py',
         'subcell_primal_metric_rate.py', 'audit_primal_metric_direction.py',
+        'subcell_auxiliary_transport.py', 'audit_source_auxiliary_transport.py',
         'subcell_exact_source_faces.py',
         'subcell_coupled_front_update.py',
         'subcell_transfer_events.py', 'subcell_event_front_update.py',
@@ -166,7 +169,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure, direction, transport, internal, activation, history, refinement, primal_direction = (None,)*8
+    pressure, direction, transport, internal, activation, history, refinement, primal_direction, auxiliary_components = (None,)*9
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -230,6 +233,8 @@ def main():
             history = audit_history(pools, args.pool_history_steps, scheme=args.pool_history_scheme)
         if args.pool_primal_direction:
             primal_direction = audit_primal_direction(pools)
+        if args.pool_auxiliary_components:
+            auxiliary_components = audit_auxiliary_components(pools)
         if args.pool_refinement_steps:
             refinement = audit_refinement(pools, .02*args.pool_refinement_steps,
                 args.pool_refinement_steps, args.pool_refinement_levels, scheme=args.pool_history_scheme)
@@ -250,6 +255,7 @@ def main():
         source_activation_history=history,
         source_time_refinement=refinement,
         fixed_pool_primal_direction=primal_direction,
+        fixed_pool_auxiliary_components=auxiliary_components,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -303,6 +309,7 @@ def main():
                or (history is not None and not history['all_requested_steps_passed'])
                or (refinement is not None and not refinement['all_runs_completed'])
                or (primal_direction is not None and not primal_direction['fixed_topology_metric_direction_controls_passed'])
+               or (auxiliary_components is not None and not auxiliary_components['source_auxiliary_component_controls_passed'])
                or (activation is not None and not activation['twenty_ms_candidate_passed'])
                or (internal is not None and not internal['internal_region_controls_passed'])
                or (direction is not None and not direction['fixed_topology_direction_controls_passed'])

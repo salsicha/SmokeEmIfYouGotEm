@@ -3,6 +3,20 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [source auxiliary transport components](../reconstruction-review-2026-09-07/normal-river-source-auxiliary-transport.md).
+Original source-face factor transport, integrated geometric commutator and
+symmetric tensor DERIVATIVE part now retain source slopes/depth moments and
+oblique graph adjoints. Exact quadrature and flat-model limits pass; inconsistent
+legacy clipped slopes explicitly reject, not average. Actual258-region47-hash
+snapshot passes component controls with original40CG, but reports57unowned wet
+traces/21one-sided owned faces/55differing wet extents. No mass evolution or full
+force: original-source terrain-curvature tensor and front work still missing.
+320focusedPASS/1retained geometryFAIL;25PASS/12retained energyFAIL, no waivers.
+464protected hashes unchanged; all numerical jobs completed. NEXT source slope-jump curvature (including
+same-region internal source edges), full physical face/bed budget and coupling
+to changing inertia/mass/pressure, then wet/open/time/native/shared-surface.
+No visual/FPS gain; full later-river/crew/normalization/release scope remainsOPEN.
+
 Latest September 14: [nonlinear terrain metric and local forces](../reconstruction-review-2026-09-07/normal-river-nonlinear-terrain-metric.md).
 New positive-periodic full two-pole terrain stage includes the symmetric bed
 Hessian tensor, geometric factor-time commutator and complete changing inertia.
