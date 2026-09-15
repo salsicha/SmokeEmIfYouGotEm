@@ -3,7 +3,28 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [original point-birth metric-time force](../reconstruction-review-2026-09-07/normal-river-point-metric-force.md).
+Latest September 15: [original point-birth geometry-time connection](../reconstruction-review-2026-09-07/normal-river-point-birth-connection.md).
+Original commutator and pressure pullback now couple to the half-metric birth
+force. Independent positive-water vectors verify partial cancellation and a
+nonzero coupled newborn remainder; zero skew work does not mean zero force.
+Actual 24-source bank, two seven-height paths: final maximum term-scaled errors
+0.011606% / 0.042485%, all prior operator/work/source gates retained. Scales use
+uncancelled terms, not relative error against a cancelled zero coefficient.
+84 focused tests PASS; final new module 11 PASS; full suite 497 PASS / 13
+identical retained FAIL, zero errors/skips. Earlier incorrect test expectations
+of nonzero old correction and complete newborn cancellation are retained;
+implementation and independent vector checks were not changed to fit them.
+All 558 audit-source and 464 protected source/actor hashes unchanged. All jobs
+terminal. This remains an offline component, NOT complete front dynamics or
+native/playable acceptance. Source activation and unequal wet-support guards
+remain. NEXT one-sided transport/curvature, joint force/impulse/time coupling,
+edge/flat/mixed transitions and native shared-surface integration. No fresh
+visual/FPS claim: last ordinary 22.429181 FPS / p95 54.7266 ms FAILS 30 FPS;
+smooth wave faces and broad froth remain open. Colorado → Pacuare → Futaleufu,
+Chilko/Zambezi/all-scene water, crew, normalization, regressions and release
+remain OPEN. Troublemaker remains a rapid within South Fork, not a menu scenario.
+
+Earlier September 15: [original point-birth metric-time force](../reconstruction-review-2026-09-07/normal-river-point-metric-force.md).
 Matrix-free old/new vector coefficients now derive from the original coupled
 pressure Schur response, not an energy remainder. Independent positive-water
 metric derivatives and canonical-momentum differences verify the old nonlocal

@@ -13,6 +13,9 @@ from subcell_source_birth_pressure import SourceBirthPressure
 from subcell_source_birth_work import point_work
 from subcell_point_birth_metric_force import point_metric_force
 from subcell_primal_metric_rate import metric_time_force
+from subcell_point_birth_connection import point_connection
+from subcell_auxiliary_transport import geometric_commutator
+from subcell_wet_pool_pressure_rate import WetPoolPressureRate
 from subcell_simultaneous_birth_pressure import birth_faces, BirthLimitSystem
 from subcell_source_frames import face_section
 from subcell_wet_pool_primal_energy import evaluate
@@ -67,6 +70,59 @@ def metric_force_probe(partition, candidate, parameter, expected):
                                                for p in rate['direction']['poles']))
 
 
+def connection_probe(partition, candidate, parameter, expected):
+    """Independent finite original J and T.T*J, retaining cancellation scales."""
+    old = len(partition.pools)
+    volume = np.array([p['volume'] for p in candidate.pools])
+    momentum = np.array([p['momentum'] for p in candidate.pools])[:, None]
+    root = np.sqrt(volume)[:, None, None]
+    vd = np.zeros((len(volume), 1))
+    vd[old:, 0] = 3*volume[old:]/float(parameter)
+    primal = evaluate(candidate, momentum)
+    metric = metric_time_force(candidate, momentum/volume[:, None, None], vd)
+    total = .5*metric['auxiliary_force'][:, 0]
+    records, errors = [], []
+    scale_old = .5*float(np.max(abs(expected['metric']['old_force_limit'])))
+    scale_new = .5*float(np.max(abs(expected['metric']['newborn_force_over_path_limit'])))
+    for pole, target in zip(primal['poles'], expected['poles']):
+        system = WetPoolPressureSystem(candidate, pole['beta'])
+        w = pole['normalized_auxiliary_velocity']/root
+        j = geometric_commutator(WetPoolPressureRate(system, vd), w)
+        solution, stats = system.solve(j/root)
+        if stats['relative_residual'] > 2e-5:
+            raise ValueError('Original connection probe pullback residual gate failed')
+        pulled = root*solution
+        total += pole['alpha']*pulled[:, 0]
+        scales = []
+        record = dict(old_commutator=j[:old, 0], newborn_commutator_over_path=j[old:, 0]/float(parameter),
+                      old_pulled_commutator=pulled[:old, 0],
+                      newborn_pulled_commutator_over_path=pulled[old:, 0]/float(parameter),
+                      pullback_residual=stats['relative_residual'], skew_work=float(np.sum(w*j)))
+        if abs(record['skew_work']) > 1e-10:
+            raise ValueError('Original connection probe skew-work gate failed')
+        for block, suffix in [('old', ''), ('newborn', '_over_path')]:
+            # A pulled or summed vector can have a zero leading coefficient.
+            # Normalize by its uncancelled original terms, never by roundoff
+            # in that zero and never claim componentwise relative accuracy.
+            keys = [block+'_'+name+suffix for name in ('commutator', 'pulled_commutator')]
+            scale = max(float(np.max(abs(target[key+'_limit']))) for key in keys)
+            if scale == 0:
+                raise ValueError('Original bank connection probe needs nonzero uncancelled terms')
+            scales.append(scale)
+            for key in keys:
+                errors.append(float(np.max(abs(record[key]-target[key+'_limit'])))/scale)
+        scale_old += pole['alpha']*scales[0]
+        scale_new += pole['alpha']*scales[1]
+        records.append(record)
+    old_error = float(np.max(abs(total[:old]-expected['old_connection_limit'])))/scale_old
+    new_error = float(np.max(abs(total[old:]/float(parameter)-expected['newborn_connection_over_path_limit'])))/scale_new
+    errors.extend((old_error, new_error))
+    return dict(poles=records, old_connection=total[:old], newborn_connection_over_path=total[old:]/float(parameter),
+                old_uncancelled_scale=scale_old, newborn_uncancelled_scale=scale_new,
+                old_connection_scaled_error=old_error, newborn_connection_scaled_error=new_error,
+                maximum_term_scaled_error=max(errors))
+
+
 def analyze(partition, receipts, assembled=None):
     before = [(p['volume'], p['momentum'].copy()) for p in partition.pools]
     keys, rates = [], []
@@ -99,6 +155,7 @@ def analyze(partition, receipts, assembled=None):
         requests = [(p, s, k) for (p, s), k in zip(keys, scales)]
         work = point_work(context, requests)
         metric_force = point_metric_force(context, requests)
+        connection = point_connection(context, requests)
         limit = work['limit']
         bounds = [b.next_height/F(float(k)) for b, k in zip(births, scales) if b.next_height is not None]
         lookup = {key: i for i, key in enumerate(keys)}
@@ -140,6 +197,7 @@ def analyze(partition, receipts, assembled=None):
                 positive_energy_contraction_error=metric['positive_energy_contraction_error'],
                 original_newborn_operator=operator_probe(partition, candidate, limit),
                 original_metric_force=metric_force_probe(partition, candidate, parameter, metric_force),
+                original_connection=connection_probe(partition, candidate, parameter, connection),
                 volume_gradient_path_squared=scaled_gradient, canonical_velocity_path=scaled_canonical,
                 volume_gradient_max_norm_relative_error=work_errors[0],
                 canonical_velocity_max_norm_relative_error=work_errors[1],
@@ -169,13 +227,18 @@ def analyze(partition, receipts, assembled=None):
         force_passed &= all(r['original_metric_force']['maximum_pressure_residual'] <= 2e-5
             and r['original_metric_force']['energy_coordinate_error'] <= 1e-10
             and r['original_metric_force']['canonical_metric_local_error'] <= 1e-10 for r in rows)
+        connection_passed = (rows[-1]['original_connection']['maximum_term_scaled_error'] < .01
+            and rows[-1]['original_connection']['maximum_term_scaled_error']
+            < rows[0]['original_connection']['maximum_term_scaled_error']/3)
         passed = bool(expected < 0 and rows[-1]['error'] < rows[0]['error']/3 and rows[-1]['error'] < .01*abs(expected)
             and all(r['maximum_pressure_residual'] <= 2e-5 and r['positive_energy_contraction_error'] <= 1e-10 for r in rows)
-            and operator_passed and work_passed and force_passed)
+            and operator_passed and work_passed and force_passed and connection_passed)
         paths.append(dict(name=name, limit=limit, rows=rows, original_newborn_operator_controls_passed=operator_passed,
                           analytic_pressure_work={k: v for k, v in work.items() if k != 'limit'},
                           analytic_metric_force={k: v for k, v in metric_force.items() if k != 'limit'},
                           metric_force_probe_controls_passed=bool(force_passed),
+                          analytic_connection={k: v for k, v in connection.items() if k != 'metric'},
+                          connection_probe_controls_passed=bool(connection_passed),
                           pressure_work_probe_controls_passed=bool(work_passed),
                           pressure_limit_probe_controls_passed=passed))
     if any(p['volume'] != v or not np.array_equal(p['momentum'], m) for p, (v, m) in zip(partition.pools, before)):
@@ -204,7 +267,7 @@ def main():
         vertex_authority_codes=sorted(set(map(int, authority[sampler.faces[r['source_triangle_indices']]].ravel())))) for r in receipts]
     if any(sha(Path(path)) != digest for path, digest in hashes.items()):
         raise ValueError('Original source or implementation changed during simultaneous-birth audit')
-    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v3', accepted=False,
+    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v4', accepted=False,
         original_block_col_row=[args.block_col, args.block_row], original_snapshot_time_seconds=source['source_time_seconds'],
         original_pool_count=len(partition.pools), origin_registered_m=origin, provenance=provenance,
         source_sha256=hashes, result=result,
@@ -230,6 +293,7 @@ def main():
         final_canonical_relative_error=p['rows'][-1]['canonical_velocity_max_norm_relative_error'],
         final_old_metric_force_error=p['rows'][-1]['original_metric_force']['old_force_max_norm_relative_error'],
         final_new_metric_force_error=p['rows'][-1]['original_metric_force']['newborn_force_max_norm_relative_error'],
+        final_connection_error=p['rows'][-1]['original_connection']['maximum_term_scaled_error'],
         mass_direction_scaled_work=p['rows'][-1]['fixed_old_mass_direction_scaled_work'],
         controls_passed=p['pressure_limit_probe_controls_passed']) for p in result['paths']])), flush=True)
     return 0 if result['pressure_limit_probe_controls_passed'] else 1
