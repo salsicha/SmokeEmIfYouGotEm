@@ -1,0 +1,15 @@
+#include "/Engine/Public/Platform.ush"
+#include "/Plugin/RaftSimWaterDetail/Private/RaftSimFrothMicroNormal.ush"
+uint QueryCount;
+StructuredBuffer<float4> Queries;
+StructuredBuffer<float4> Contexts;
+RWStructuredBuffer<float4> Results;
+[numthreads(64,1,1)]
+void MainCS(uint3 id:SV_DispatchThreadID)
+{
+    if(id.x>=QueryCount)return;
+    float4 q=Queries[id.x],c=Contexts[id.x];RaftSimFrothMicroNormal detail;
+    float3 base=normalize(float3(0.12,-0.09,1));
+    Results[2*id.x]=float4(detail.Sample(base,c.z,q.xy,c.xy,q.z,q.w),0);
+    Results[2*id.x+1]=float4(detail.GridSlope(q.xy),detail.Phase(q.xy,q.w));
+}

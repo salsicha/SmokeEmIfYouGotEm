@@ -1,0 +1,44 @@
+// Lit optical microrelief only: no foam source, coverage change or displacement.
+// Rounded compact domes avoid turning denser foam into a flat white surface.
+// Dimensions below are presentation choices, NOT measured bubble dimensions.
+struct RaftSimFrothMicroNormal
+{
+    uint Hash(int2 cell,uint salt)
+    {
+        uint h=uint(cell.x)*1597334677u^uint(cell.y)*3812015801u^salt;
+        h^=h>>16;h*=2246822519u;h^=h>>13;return h;
+    }
+    float2 GridSlope(float2 position)
+    {
+        int2 cell=int2(floor(position));float2 local=frac(position),result=0;
+        [unroll] for(int y=-1;y<=1;++y) [unroll] for(int x=-1;x<=1;++x)
+        {
+            uint h=Hash(cell+int2(x,y),0x6a09e667u);
+            float2 jitter=(float2(h&65535u,h>>16)+0.5)/65536.0;
+            float radius=0.38+0.22*((Hash(cell+int2(x,y),0xbb67ae85u)&65535u)+0.5)/65536.0;
+            precise float2 d=local-(float2(x,y)+0.28+0.44*jitter);
+            precise float r2=d.x*d.x+d.y*d.y;
+            float t=max(1-r2/(radius*radius),0);
+            // Gradient of (1-r^2/R^2)^3; both height and slope vanish at R.
+            result+=(-6*t*t/(radius*radius))*d;
+        }
+        return result;
+    }
+    float2 Phase(float2 position,float footprintM)
+    {
+        precise float2 coarse=position*8.0;
+        precise float2 fine=position*22.0+float2(17.13,9.37);
+        // Height in metres times cells/metre gives dimensionless slope.
+        return GridSlope(coarse)*0.008*8.0*(1-smoothstep(0.35,0.85,footprintM*8.0))+
+               GridSlope(fine)*0.002*22.0*(1-smoothstep(0.35,0.85,footprintM*22.0));
+    }
+    float3 Sample(float3 base,float coverage,float2 position,float2 velocity,float time,float footprintM)
+    {
+        if(coverage<=0)return base;
+        float a=frac(time),b=frac(a+0.5),weight=1-abs(2*a-1);
+        precise float2 pa=position-velocity*a;
+        precise float2 pb=position-velocity*b;
+        float2 slope=lerp(Phase(pb,footprintM),Phase(pa,footprintM),weight)*saturate(coverage);
+        return normalize(float3(base.xy/max(base.z,0.1)-slope,1));
+    }
+};
