@@ -80,6 +80,25 @@ def verify_audits(atlas, snapshot, banks, coverage, atlas_hash, stream_hash):
     require(atlas['arrays']['h']['sha256'] == banks['h_sha256'], 'Bank audit has different water')
 
 
+def verify_native_state(collision, atlas_hash, source_time, fields_manifest, fields_hash, center, geometry_hash):
+    """A successful old loader run is not proof of this preview's initial state."""
+    runtime = collision.get('native_runtime') or {}
+    require(collision.get('failures') == [] and
+            collision.get('sampled_full_map_union_verified') is True and
+            runtime.get('field_queries_verified') is True, 'Native evidence failed')
+    require(collision.get('geometry_manifest_sha256') == geometry_hash, 'Native geometry mismatch')
+    require(runtime.get('atlas_sha256') == atlas_hash, 'Native atlas mismatch')
+    require(runtime.get('fields_manifest') == fields_manifest and
+            runtime.get('fields_manifest_sha256') == fields_hash, 'Native initial packet mismatch')
+    time = runtime.get('source_time_seconds')
+    require(isinstance(time, (int, float)) and not isinstance(time, bool) and math.isfinite(time) and
+            abs(time - source_time) <= 1e-9, 'Native source time mismatch')
+    require(runtime.get('window_center_m') == list(center), 'Native window center mismatch')
+    require(type(runtime.get('query_count')) is int and runtime['query_count'] == 12800 and
+            runtime.get('wet_mismatches') == 0 and type(runtime.get('solver_steps_run')) is int and
+            runtime['solver_steps_run'] == 0, 'Native initial query coverage mismatch')
+
+
 def prepare(args):
     output = args.output.resolve()
     require(not output.exists() and output.is_relative_to(ROOT / 'tmp'), 'Fresh project tmp output required')
@@ -130,6 +149,8 @@ def prepare(args):
     require(chosen is not None and len(stream['windows']) == 799, 'Incomplete source-window collection')
     render = deps.read(args.render_stage)
     collision = deps.read(args.collision_audit, render['collision_report_sha256'])
+    verify_native_state(collision, atlas_hash, atlas['source_time_seconds'],
+                        chosen.relative_to(ROOT).as_posix(), sha(chosen), args.center, sha(args.geometry_manifest))
     require(render['source_cap_sha256'] == collision['source_cap_sha256'] == union.identity['cap_sha256'],
             'Different source rock in render or collision')
     require(render['fbx_sha256'] == collision['fbx_sha256'] and

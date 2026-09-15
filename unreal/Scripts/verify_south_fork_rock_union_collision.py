@@ -129,6 +129,8 @@ def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_direct
             native_sample_wet_query_count=sum(r['expected_runtime']['native_sample_wet'] for r in expected['queries']),
             solver_dry_threshold_m=1.e-6,native_sample_wet_threshold_m=1.e-4,
             field_queries_verified=not runtime_failures,source_time_seconds=expected['source_time_seconds'],
+            atlas_manifest=expected['atlas_manifest'],atlas_sha256=expected['atlas_sha256'],
+            fields_manifest_sha256=expected['fields_manifest_sha256'],
             fields_manifest=expected['fields_manifest'],window_center_m=expected['window_center_m'],
             expectation_sha256=sha(runtime_expectations),solver_steps_run=0)
     for path,digest in before.items():assert sha(Path(path))==digest,('Protected file changed',path)

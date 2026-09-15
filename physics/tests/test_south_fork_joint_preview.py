@@ -1,7 +1,7 @@
 """Preview evidence must refer to the same source and actual hydraulic state."""
 import pytest
 
-from prepare_south_fork_joint_preview import Dependencies, asset_file, verify_audits, add_cap_dependencies
+from prepare_south_fork_joint_preview import Dependencies, asset_file, verify_audits, add_cap_dependencies, verify_native_state
 from south_fork_rock_union import sha
 
 
@@ -98,3 +98,51 @@ def test_preview_hashes_interpreted_selection_alongside_original_cap_sources(tmp
 def test_asset_escape_and_ambiguous_paths_rejected(tmp_path, asset):
     with pytest.raises(ValueError):
         asset_file(asset, tmp_path)
+
+
+@pytest.fixture
+def native_state():
+    runtime = dict(field_queries_verified=True, atlas_sha256='atlas', fields_manifest='tmp/current/packet.json',
+                   fields_manifest_sha256='packet', source_time_seconds=50., window_center_m=[1., 2.],
+                   query_count=12800, wet_mismatches=0, solver_steps_run=0)
+    collision = dict(failures=[], sampled_full_map_union_verified=True,
+                     geometry_manifest_sha256='geometry', native_runtime=runtime)
+    def check():
+        verify_native_state(collision, 'atlas', 50., 'tmp/current/packet.json', 'packet', [1., 2.], 'geometry')
+    return collision, runtime, check
+
+
+def test_native_initial_state_matches_actual_preview(native_state):
+    native_state[2]()
+
+
+@pytest.mark.parametrize('key,value', [
+    ('atlas_sha256', 'previous-atlas'), ('fields_manifest', 'tmp/old/packet.json'),
+    ('fields_manifest_sha256', 'old-packet'), ('source_time_seconds', 1.),
+    ('source_time_seconds', float('nan')), ('source_time_seconds', float('inf')),
+    ('source_time_seconds', None), ('source_time_seconds', True),
+    ('window_center_m', [1., 3.]), ('query_count', 12799), ('query_count', True),
+    ('wet_mismatches', 1), ('solver_steps_run', 1), ('solver_steps_run', False),
+    ('field_queries_verified', False), ('field_queries_verified', 'true'),
+])
+def test_native_old_or_incomplete_state_is_not_preview_evidence(native_state, key, value):
+    native_state[1][key] = value
+    with pytest.raises(ValueError):
+        native_state[2]()
+
+
+@pytest.mark.parametrize('key,value', [
+    ('geometry_manifest_sha256', 'old-geometry'), ('failures', ['retained failure']),
+    ('failures', None), ('sampled_full_map_union_verified', False), ('native_runtime', None),
+])
+def test_native_failed_or_different_geometry_is_rejected(native_state, key, value):
+    native_state[0][key] = value
+    with pytest.raises(ValueError):
+        native_state[2]()
+
+
+def test_legacy_native_report_without_state_hashes_is_not_silently_upgraded(native_state):
+    for key in ('atlas_sha256', 'fields_manifest_sha256'):
+        native_state[1].pop(key)
+    with pytest.raises(ValueError, match='atlas mismatch'):
+        native_state[2]()

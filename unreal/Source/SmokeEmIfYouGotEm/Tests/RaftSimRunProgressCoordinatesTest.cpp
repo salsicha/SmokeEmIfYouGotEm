@@ -1,7 +1,9 @@
 #include "Misc/AutomationTest.h"
 #include "Misc/ScopeExit.h"
+#include "Misc/CommandLine.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
+#include "UObject/Package.h"
 #include "../RaftSimRunManager.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 
@@ -189,6 +191,51 @@ bool FRaftSimReviewDownstreamCoordinatesTest::RunTest(const FString&)
     TestNull(TEXT("broken explicit path never falls back even to a legacy ribbon"), RaftSimReviewCoordinates::GetMap(World, Legacy));
     Run->Destroy();
     TestTrue(TEXT("no-provider legacy worlds retain their original map"), RaftSimReviewCoordinates::GetMap(World, Legacy) == Legacy);
+    return true;
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimReviewStartRangeTest,
+    "RaftSim.Survey.ReviewStartUsesScenarioRange",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimReviewStartRangeTest::RunTest(const FString&)
+{
+    const FString PreviousCommandLine = FCommandLine::Get();
+    ON_SCOPE_EXIT { FCommandLine::Set(*PreviousCommandLine); };
+    // GetMapName uses the outer package, not the UWorld object's name.
+    // A unique transient package models the scope without loading/saving a map.
+    const FString PackageName = TEXT("/Temp/RaftSimReviewRange_") + FGuid::NewGuid().ToString() +
+        TEXT("/L_SouthForkAmerican_FullReach");
+    UPackage* Package = CreatePackage(*PackageName);
+    Package->SetFlags(RF_Transient);
+    UWorld* World = UWorld::CreateWorld(EWorldType::Editor, false, TEXT("L_SouthForkAmerican_FullReach"), Package);
+    if (!TestNotNull(TEXT("review range fixture world"), World)) return false;
+    ON_SCOPE_EXIT { World->DestroyWorld(false); World->RemoveFromRoot(); };
+    if (!TestEqual(TEXT("fixture has the real map-scoped name"),
+        World->GetMapName(), FString(TEXT("L_SouthForkAmerican_FullReach")))) return false;
+    auto* Run = World->SpawnActor<ARaftSimRunManager>();
+    if (!TestNotNull(TEXT("actual run manager"), Run)) return false;
+    const FString Path = TEXT("physics/data/real_world/south_fork_american_chili_bar/"
+        "reconstruction_2026_09/full_reach/playable_route/coordinate_map.json");
+    if (!TestTrue(TEXT("captured full-route range loads"), Run->ConfigureProgressCoordinateMap(Path))) return false;
+    float Minimum = 0, Maximum = 0;
+    if (!TestTrue(TEXT("actual route bounds available"),
+        Run->GetProgressCoordinates(nullptr)->GetRiverStationRangeM(Minimum, Maximum))) return false;
+    FRaftSimCareerScenarioDefinition Scenario;
+    Scenario.ScenarioId = TEXT("range_test_original");
+    Scenario.StartStationM = 10.f;
+    Scenario.FinishStationM = 20.f;
+    for (float Station : {Minimum, 8330.f, Maximum, Minimum - 1.f, Maximum + 1.f, 48000.f})
+    {
+        FCommandLine::Set(*FString::Printf(TEXT("-RaftSimWaterReviewStation=%.9f"), Station));
+        Run->ConfigureSession(Scenario, ERaftSimGameMode::FreeRun);
+        const bool bInside = Station >= Minimum && Station <= Maximum;
+        TestEqual(TEXT("review start is accepted only inside the real route"),
+            Run->StartStationM, bInside ? Station : Scenario.StartStationM);
+        TestEqual(TEXT("review finish comes from the real route, not the old 48.9 km constant"),
+            Run->FinishStationM, bInside ? Maximum : Scenario.FinishStationM);
+        TestEqual(TEXT("rejected review leaves the selected scenario intact"),
+            Run->ScenarioId, bInside ? FName(TEXT("south_fork_full_descent")) : Scenario.ScenarioId);
+    }
     return true;
 }
 #endif

@@ -3,7 +3,28 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [landward source extension and actual-map union](../reconstruction-review-2026-09-07/normal-river-landward-source-extension.md).
+Latest September 15: [source-matched landward 50-second playable comparison](../reconstruction-review-2026-09-07/normal-river-landward-playable-50s.md).
+Landward cook session59493/PID24324 FINISHED; all 5,350,400 cells, dry banks,
+799 runtime packets, 406,823 original-water coverage probes and 12,800 native
+field queries PASS. Actual-map union again passes all 30,403 probes. Fresh
+source-exact mesh/50-second water run in the EXISTING South Fork game, one
+surface, three stills and finalized recording. Source-state binding now rejects
+old pilot/native evidence: exact atlas, initial packet, time, center and geometry
+required. The actual comparison STILL FAILS visual acceptance: jagged inferred
+flanks, broad froth/smooth wave faces and distant terrain remain unfinished.
+Reference video accessible and inspected; no guessed measurements. Four stale
+presentation regressions resolved against current native contracts; checkpoint
+review uses actual route bounds. Final build PASS, 90 Python/eight native PASS,
+464 protected hashes unchanged. SAME original-geometry cook session45187/PID32276
+LIVE; independent 400/450-second snapshot/bank audits PASS, NOT settled. NEXT
+actual carrier foam-production/optical diagnosis, source-supported flanks,
+crest/froth motion, raft contact/traversal and remaining publication costs;
+continue the existing cook, no old-state transfer or default promotion.
+30 FPS still FAILS (24.225877 / p95 47.78 ms); 13 physical regressions,
+Colorado -> Pacuare -> Futaleufu, other-scene water, crew, normalization and
+release remain OPEN. Troublemaker is a rapid, never a menu scenario.
+
+Earlier September 15: [landward source extension and actual-map union](../reconstruction-review-2026-09-07/normal-river-landward-source-extension.md).
 Unrestricted expansion rejected after registered aerial review: it reaches
 apparent whitewater and increases inferred boundary exposure. New explicitly
 interpreted, source-hashed landward selection retains ALL original roof faces;

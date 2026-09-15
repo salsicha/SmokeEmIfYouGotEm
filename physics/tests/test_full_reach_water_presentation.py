@@ -39,7 +39,13 @@ def test_south_fork_crest_spray_experiment_is_opt_in_and_map_scoped():
     cvar = source.split('CVarSouthForkCrestSpray(', 1)[1].split(';', 1)[0]
     assert 'TEXT("raftsim.SouthForkCrestSpray"), 0,' in cvar
     gating = source.split('const bool bSouthForkCrestOwnedSpray =', 1)[1].split('TArray<int32> RankedSiteIndices', 1)[0]
-    assert 'EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&' in gating
+    assert 'IsSouthForkSprayReviewMap(GetWorld()->GetMapName()) &&' in gating
+    scope = source.split('bool ARaftSimWaterVfxActor::IsSouthForkSprayReviewMap(', 1)[1].split(
+        'FQuat ARaftSimWaterVfxActor::ComputeRapidSourcePlaneRotation(', 1)[0]
+    assert 'Name == TEXT("L_SouthForkAmerican_FullReach")' in scope
+    assert 'Name == TEXT("SouthForkRegisteredRockPlayable")' in scope
+    assert 'Name.Mid(7, Separator - 7).IsNumeric()' in scope
+    assert 'EndsWith' not in scope  # no unrelated suffix-lookalike maps
     assert 'CVarSouthForkCrestSpray.GetValueOnGameThread() != 0' in gating
     assert 'EndsWith(TEXT("L_LavaCanyon")) &&' in gating
     assert 'CVarChilkoCrestSpray.GetValueOnGameThread() != 0' in gating
@@ -57,7 +63,7 @@ def test_local_fluid_clock_phase_matches_render_and_raft_support():
 def test_south_fork_falling_spray_review_reuses_assets_without_promoting_defaults():
     source = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp').read_text()
     selection = source.split('if (PhotographicReviewVersion == 0 && GetWorld() &&', 2)[2].split('// The retained V4/V5', 1)[0]
-    assert 'EndsWith(TEXT("L_SouthForkAmerican_FullReach"))' in selection
+    assert 'IsSouthForkSprayReviewMap(GetWorld()->GetMapName())' in selection
     assert 'FParse::Param(FCommandLine::Get(), TEXT("RaftSimSouthForkBallisticSpray"))' in selection
     assert 'if (BallisticRoller && BallisticSpray)' in selection
     assert 'RapidRollerSystem = BallisticRoller;' in selection
@@ -85,7 +91,11 @@ def test_visible_carrier_spray_lookup_uses_rendered_triangles_without_physics_qu
     surface = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp').read_text()
     lookup = surface.split('bool ARaftSimWaterSurfaceActor::SampleVisibleCarrierAtRiverCoordinates(', 1)[1].split('bool ARaftSimWaterSurfaceActor::IsBreakingLipVisible()', 1)[0]
     assert 'CoordinatesM - RiverCoordinatesM[0]' in lookup
-    assert 'RenderedLiveVolumeCoreVertices[Index]' in lookup
+    assert 'SourceVertices = bGpuCarrier ? Vertices : RenderedLiveVolumeCoreVertices' in lookup
+    assert 'GetActorTransform().TransformPosition(SourceVertices[Index]) : SourceVertices[Index]' in lookup
+    assert 'WaterAdapter->HasCartesianWaterCoordinates()' in lookup
+    assert 'CartesianShorelineMesh->GetCellOffsets()' in lookup
+    assert '!SampleCartesianCarrierPosition(QueryWorld,OutPositionCm,bWet) || !bWet' in lookup
     assert 'U + V <= 1.0f' in lookup
     assert 'SprayWetCarrierMask[Index] == 0' in lookup
     mask = surface.split('SprayWetCarrierMask.SetNumUninitialized', 1)[1].split('if (!bLoggedHydraulicReliefDiagnostics', 1)[0]
@@ -290,12 +300,19 @@ def test_boils_require_water_depth_and_migration_supplies_it():
 
 def test_review_start_is_map_scoped_and_does_not_write_selection():
     source = (ROOT / "unreal/Source/SmokeEmIfYouGotEm/RaftSimRunManager.cpp").read_text()
-    block = source.split("void ARaftSimRunManager::ConfigureSession(", 1)[1].split("float ARaftSimRunManager::GetProgressFraction", 1)[0]
+    block = source.split("void ARaftSimRunManager::ConfigureSession(", 1)[1].split("bool ARaftSimRunManager::ConfigureProgressCoordinateMap", 1)[0]
     assert "RaftSimWaterReviewStation=" in block
     assert 'EndsWith(TEXT("L_SouthForkAmerican_FullReach"))' in block
     assert "FMath::IsFinite(ReviewStationM)" in block
-    assert "ReviewStationM >= 0.0f && ReviewStationM <= 48900.0f" in block
+    assert 'ProgressCoordinates->GetRiverStationRangeM(ReviewMinimumM,ReviewMaximumM)' in block
+    assert 'ReviewStationM >= ReviewMinimumM && ReviewStationM <= ReviewMaximumM' in block
+    assert 'FinishStationM = ReviewMaximumM' in block
     assert "Save->" not in block
+    restore = source.split('void ARaftSimRunManager::TryRestoreSessionCheckpoint()', 1)[1].split(
+        'void ARaftSimRunManager::StartRun()', 1)[0]
+    assert 'Progress->GetRiverStationRangeM(MinimumStationM, MaximumStationM)' in restore
+    assert 'ReviewStationM >= MinimumStationM && ReviewStationM <= MaximumStationM' in restore
+    assert 'ReviewStationM <= 48900' not in source
 
 
 def test_legacy_normal_migration_invalidates_saved_shader_identity():

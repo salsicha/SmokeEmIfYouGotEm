@@ -340,7 +340,7 @@ void ARaftSimRunManager::TryRestoreSessionCheckpoint()
         FCommandLine::Get(), TEXT("RaftSimWaterReviewStation="), ReviewStationM)
         && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach"))
         && FMath::IsFinite(ReviewStationM)
-        && ReviewStationM >= 0.0f && ReviewStationM <= 48900.0f
+        && ReviewStationM >= MinimumStationM && ReviewStationM <= MaximumStationM
         && FMath::IsNearlyEqual(ReviewStationM, StartStationM);
     if (bReviewStart || !Save->FindBestCheckpoint(StartStationM - 25.0f, Checkpoint, CheckpointCeilingM,
             ProgressCoordinateMapPath,Definition.LevelName))
