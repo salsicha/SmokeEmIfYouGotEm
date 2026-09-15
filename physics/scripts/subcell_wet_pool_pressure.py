@@ -377,6 +377,11 @@ class WetPoolPressureSystem:
         return q+self.length*self.factor_transpose(self.factor_action(q))
 
     def precondition(self, residual, scheme='block'):
+        if scheme == 'spectral-frozen-depth':
+            from subcell_spectral_preconditioner import SourceSpectralReference
+            if not hasattr(self, '_spectral_reference'):
+                self._spectral_reference = SourceSpectralReference(self)
+            return self._spectral_reference.apply(self._vector(residual))
         r = self._vector(residual)[:, 0]
         if scheme not in ('block', 'source-block'):
             raise ValueError('Only local 2x2 or connected source-region block preconditioning is implemented')
@@ -396,6 +401,11 @@ class WetPoolPressureSystem:
 
     def solve(self, rhs):
         scheme = 'source-block' if self.source_blocks else 'block'
+        requested = getattr(self.partition, 'pressure_preconditioner', 'auto')
+        if requested != 'auto':
+            if requested != 'spectral-frozen-depth':
+                raise ValueError('Unknown original-source pressure preconditioner')
+            scheme = requested
         value, stats = range_cg(self, self._vector(rhs), 40, preconditioner=scheme)
         return value, dict(stats, preconditioner=scheme)
 

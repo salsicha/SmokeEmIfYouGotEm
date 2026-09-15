@@ -63,3 +63,51 @@ def test_reflecting_domain_does_not_invent_an_exterior_bed_extension():
 def test_legacy_geometry_is_not_promoted_to_original_source_curvature():
     with pytest.raises(ValueError, match='exact-source'):
         SourceCurvatureTensor(WetPoolPressureSystem(lake(exact=False), .1))
+
+
+def test_source_curvature_refines_to_independent_analytic_smooth_bed_force(record_property):
+    from audit_subcell_nonlinear_metric_stage import fixture
+    # Constant vectors make div(w)=0, isolating 3 h (grad(b).w) Hess(b) z.
+    # Analytic derivatives of the original prescribed smooth bed, not a
+    # numerical derivative or reuse of source curvature/Gram coefficients.
+    seed = 2843
+    phase = np.random.default_rng(seed).uniform(0, 2*np.pi, 6)
+    w, z = np.array([.4, -.2]), np.array([.7, .3])
+    errors = {'constant': [], 'variable': []}
+    omitted = {'constant': [], 'variable': []}
+    for n in (8, 16, 32):
+        part, _ = fixture(seed, n)
+        s = WetPoolPressureSystem(part, .1)
+        curvature = SourceCurvatureTensor(s)
+        y, x = np.meshgrid(2*np.pi*(np.arange(n)+.5)/n,
+                          2*np.pi*(np.arange(n)+.5)/n, indexing='ij')
+        a, b, c = x+phase[0], y+phase[1], 2*x-y+phase[2]
+        bed = .35*np.sin(a)*np.cos(b)+.2*np.cos(c)
+        h = 1.5-.6*bed+.12*np.sin(x-y+phase[3])
+        k = 2*np.pi/16
+        bx = k*(.35*np.cos(a)*np.cos(b)-.4*np.sin(c))
+        by = k*(-.35*np.sin(a)*np.sin(b)+.2*np.sin(c))
+        bxx = k*k*(-.35*np.sin(a)*np.cos(b)-.8*np.cos(c))
+        bxy = k*k*(-.35*np.cos(a)*np.sin(b)+.4*np.cos(c))
+        byy = k*k*(-.35*np.sin(a)*np.cos(b)-.2*np.cos(c))
+        for mode in errors:
+            field = np.broadcast_to(w, (n, n, 2)).copy()
+            divergence = np.zeros((n, n))
+            if mode == 'variable':
+                field[..., 0] += .1*np.sin(x+y)
+                field[..., 1] += .1*np.cos(x-y)
+                divergence = .1*k*(np.cos(x+y)+np.sin(x-y))
+            actual = curvature.action(field.reshape(n*n, 1, 2),
+                                      np.broadcast_to(z, (n*n, 1, 2))).reshape(n, n, 2)/(16/n)**2
+            coefficient = -1.5*h*h*divergence+3*h*(bx*field[..., 0]+by*field[..., 1])
+            expected = coefficient[..., None]*np.stack(
+                (bxx*z[0]+bxy*z[1], bxy*z[0]+byy*z[1]), axis=-1)
+            errors[mode].append(float(np.sqrt(np.mean((actual-expected)**2))))
+            omitted[mode].append(float(np.sqrt(np.mean(expected**2))))
+    record_property('analytic_curvature_rms_8_16_32', str(errors))
+    record_property('omitted_curvature_rms_8_16_32', str(omitted))
+    for mode in errors:
+        measured, control = errors[mode], omitted[mode]
+        assert measured[0]/measured[1] > 3, (mode, errors, omitted)
+        assert measured[1]/measured[2] > 3, (mode, errors, omitted)
+        assert measured[2] < .1*control[2], (mode, errors, omitted)

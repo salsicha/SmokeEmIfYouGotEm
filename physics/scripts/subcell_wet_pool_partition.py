@@ -17,7 +17,10 @@ from subcell_source_face_section import stage_difference
 
 
 class WetPoolPartition:
-    def __init__(self, patch, sampler, origin, volumes, momenta):
+    def __init__(self, patch, sampler, origin, volumes, momenta, *, pressure_preconditioner='auto'):
+        if pressure_preconditioner not in ('auto', 'spectral-frozen-depth'):
+            raise ValueError('Unknown original-source pressure preconditioner')
+        self.pressure_preconditioner = pressure_preconditioner
         origin = np.asarray(origin, float)
         v, p = np.asarray(volumes, float), np.asarray(momenta, float)
         if (origin.shape != (2,) or not np.isfinite(origin).all()
