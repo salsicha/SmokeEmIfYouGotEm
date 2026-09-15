@@ -103,3 +103,39 @@ def test_one_cell_periodic_flux_does_not_create_self_donor_transfers():
     result = coupled_update(source, .02)
     np.testing.assert_allclose(result['volume'], [p['volume'] for p in pools.pools], atol=1e-14)
     np.testing.assert_allclose(result['momentum'], [p['momentum'] for p in pools.pools], atol=1e-14)
+
+
+def test_direct_face_force_survives_cancellation_of_large_transport_rates():
+    volume = np.array([1., 1e-60])
+    velocity = np.array([[.7, -.2], [.3, .1]])
+    momentum = volume[:, None]*velocity
+    generator = np.array([[-1e-20, 0.], [1e-20, 0.]])
+    exchange = 2e-6*np.array([[-1., 1.], [1., -1.]])
+    force = np.tile([1e-90, -2e-90], (2, 1))
+    source = dict(partition=SimpleNamespace(pools=[dict(volume=v, momentum=p) for v, p in zip(volume, momentum)]),
+        new_region_rates=[], transfers=[(0, 1, 1e-20)], velocity_exchanges=[(0, 1, 2e-6)],
+        volume_rate=generator@volume, momentum_rate=generator@momentum+exchange@velocity+force,
+        explicit_force_parts=dict(bed=force))
+    result = coupled_update(source, .02)
+    assert result['audit']['residual_assembly'] == 'direct-face-and-bed'
+    np.testing.assert_array_equal(result['audit']['fastest_region_budget']['explicit_remainder'], force[0])
+    assert np.max(np.linalg.norm(result['momentum']/result['volume'][:, None], axis=1)) < 1.
+
+
+def test_direct_force_ledger_must_still_reproduce_original_rates():
+    source = assembly(moving_pools())
+    source['explicit_force_parts']['bed'] = source['explicit_force_parts']['bed']+1.
+    with pytest.raises(ValueError, match='force ledger'):
+        coupled_update(source, .02)
+
+
+def test_unrepresentable_positive_donor_volume_is_rejected_without_deletion():
+    volume = np.array([1e-250, 1.])
+    source = dict(partition=SimpleNamespace(pools=[dict(volume=v, momentum=np.zeros(2)) for v in volume]),
+        new_region_rates=[], transfers=[(0, 1, 1e-160)], volume_rate=np.array([-1e-160, 1e-160]),
+        momentum_rate=np.zeros((2, 2)))
+    # The exact backward-Euler donor is about 5e-339, below float64's range.
+    # A global mass tolerance would miss its deletion; positivity must not.
+    with pytest.raises(ValueError, match='volume is not positive/finite'):
+        coupled_update(source, .02)
+    assert source['partition'].pools[0]['volume'] == 1e-250

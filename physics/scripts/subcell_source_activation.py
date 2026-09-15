@@ -18,6 +18,7 @@ from subcell_wet_connectivity import components
 from triangle_cell_storage import TriangleCellStorage
 from triangle_face_section import TriangleFaceSection
 from subcell_coupled_front_update import coupled_update
+from subcell_donor_face_flux import flux as donor_flux
 
 
 def faces(partition):
@@ -35,9 +36,11 @@ def faces(partition):
         yield dict(face, left_parent=face['parent'], right_parent=face['parent'], internal=True)
 
 
-def assembly(partition, gravity=9.81):
+def assembly(partition, gravity=9.81, face_scheme='paired'):
     if not np.isfinite(gravity) or gravity <= 0:
         raise ValueError('Positive finite gravity required')
+    if face_scheme not in ('paired', 'donor'):
+        raise ValueError('Unknown source face flux')
     pools = partition.pools
     volume = np.array([p['volume'] for p in pools])
     momentum = np.array([p['momentum'] for p in pools])
@@ -45,11 +48,16 @@ def assembly(partition, gravity=9.81):
     datum = min(float(c.datum) for c in partition.patch.cells)
     dv = np.zeros_like(volume)
     incoming, outgoing = np.zeros_like(volume), np.zeros_like(volume)
+    face_minima = np.full_like(volume, np.inf)
     bed = np.array([p['storage'].hydrostatic_bed_force(p['form']['stage_offset'], gravity, True) for p in pools])
     dp, wall = bed.copy(), np.zeros(2)
+    force_parts = {key: np.zeros_like(momentum) for key in ('wall', 'pressure', 'negative_exchange', 'dry_front')}
     receipts, front_records, transfers, exchanges = {}, [], [], []
     for face in faces(partition):
         li, ri = face['left'], face['right']
+        for owner in (li, ri):
+            if owner is not None:
+                face_minima[owner] = min(face_minima[owner], float(face['segment'][:, 1].min()))
         if li is None and ri is None:
             continue
         section = TriangleFaceSection([face['segment']], face['segment'][:, 0])
@@ -66,12 +74,14 @@ def assembly(partition, gravity=9.81):
             source = face['left_source'] if li is None else face['right_source']
             key = (parent, source)
             receipt = receipts.setdefault(key, dict(parent=parent, source_triangle_indices=[source],
-                volume_rate=0., momentum_rate=np.zeros(2), incoming_energy_flux=0.))
+                volume_rate=0., momentum_rate=np.zeros(2), explicit_force_rate=np.zeros(2), incoming_energy_flux=0.))
             receipt['volume_rate'] += float(flux[0])
             receipt['momentum_rate'] += flux[1:]
+            receipt['explicit_force_rate'] += np.asarray(info['nonadvective_momentum_flux'])
             receipt['incoming_energy_flux'] += info['energy_flux']
             dv[owner] -= flux[0]; dp[owner] -= flux[1:]
             outgoing[owner] += flux[0]
+            force_parts['dry_front'][owner] -= np.asarray(info['nonadvective_momentum_flux'])
             transfers.append((owner, key, float(flux[0])))
             front_records.append(dict(wet_pool=owner, dry_parent=parent, dry_source_face=source,
                 internal=face['internal'], normal=outward.tolist(), segment=face['segment'].tolist(),
@@ -83,18 +93,31 @@ def assembly(partition, gravity=9.81):
             ul -= 2*float(ul@n)*n
         if face['right_parent'] < 0:
             ur -= 2*float(ur@n)*n
-        flux, info = face_flux_normal(section, lf['stage_offset'], ul, rf['stage_offset'], ur, n,
-                                   gravity, lf['datum'], rf['datum'], dissipative=True)
+        if face_scheme == 'donor':
+            flux, info = donor_flux(section, lf['stage_offset'], ul, rf['stage_offset'], ur, n,
+                                   gravity, lf['datum'], rf['datum'])
+        else:
+            flux, info = face_flux_normal(section, lf['stage_offset'], ul, rf['stage_offset'], ur, n,
+                                       gravity, lf['datum'], rf['datum'], dissipative=True)
         if not wall_face and li != ri:
             # Fp = Fmass*u_upwind + D*(ul-ur) + pressure*n. Only the
             # nonnegative exchange D is implicit; any negative remainder is
             # still present in the exact assembled rate, never discarded.
             al = section.moments(lf['stage_offset'], lf['datum'])[0]
             ar = section.moments(rf['stage_offset'], rf['datum'])[0]
-            central = float(.5*(ul+ur)@n)*info['pressure_secant_area']
-            d = .5*(info['dissipation_speed']*ar-central) if flux[0] >= 0 else .5*(info['dissipation_speed']*al+central)
+            if face_scheme == 'donor':
+                d = info['velocity_exchange']
+            else:
+                central = float(.5*(ul+ur)@n)*info['pressure_secant_area']
+                d = .5*(info['dissipation_speed']*ar-central) if flux[0] >= 0 else .5*(info['dissipation_speed']*al+central)
             if d > 0:
                 exchanges.append((li, ri, float(d)))
+            else:
+                force_parts['negative_exchange'][li] -= d*(ul-ur)
+                force_parts['negative_exchange'][ri] += d*(ul-ur)
+            pressure = .5*(info['left_pressure']+info['right_pressure'])*n
+            force_parts['pressure'][li] -= pressure
+            force_parts['pressure'][ri] += pressure
         if face['left_parent'] >= 0:
             dv[li] -= flux[0]; dp[li] -= flux[1:]
             outgoing[li] += max(0., flux[0]); incoming[li] += max(0., -flux[0])
@@ -103,6 +126,7 @@ def assembly(partition, gravity=9.81):
             outgoing[ri] += max(0., -flux[0]); incoming[ri] += max(0., flux[0])
         if wall_face:
             wall += flux[1:]*(1 if face['left_parent'] < 0 else -1)
+            force_parts['wall'][li] += flux[1:]*(1 if face['left_parent'] < 0 else -1)
         elif flux[0] > 0 and li != ri:
             transfers.append((li, ri, float(flux[0])))
         elif flux[0] < 0 and li != ri:
@@ -115,10 +139,18 @@ def assembly(partition, gravity=9.81):
     total_momentum = dp.sum(axis=0)+sum((r['momentum_rate'] for r in new), np.zeros(2))
     draining = dv < 0
     net_volume_limit = float(np.min(volume[draining]/-dv[draining])) if draining.any() else None
-    return dict(partition=partition, gravity=gravity, volume_rate=dv, momentum_rate=dp, new_region_rates=new, fronts=front_records,
+    below = [dict(index=i, parent=p['parent'], source_triangle_indices=p['source_triangle_indices'],
+        volume=p['volume'], stage_offset=p['form']['stage_offset'], datum=p['form']['datum'],
+        face_minimum=float(face_minima[i]), gap=float(face_minima[i]-p['form']['datum']),
+        gap_to_stage_ratio=float((p['form']['datum']-face_minima[i])/p['form']['stage_offset']))
+        for i, p in enumerate(pools) if face_minima[i] < p['form']['datum']]
+    below.sort(key=lambda r: r['gap_to_stage_ratio'], reverse=True)
+    return dict(partition=partition, gravity=gravity, face_scheme=face_scheme, volume_rate=dv, momentum_rate=dp, new_region_rates=new, fronts=front_records,
         incoming_volume_rate=incoming, outgoing_volume_rate=outgoing,
         transfers=transfers,
         velocity_exchanges=exchanges,
+        source_face_below_storage_minimum=dict(count=len(below), largest_relative_discrepancies=below[:8]),
+        explicit_force_parts=dict(bed=bed, **force_parts),
         net_mass_rate=total_mass, momentum_boundary_bed_error=float(np.max(abs(total_momentum-bed.sum(axis=0)-wall))),
         bed_force=bed, wall_force=wall, net_volume_limit=net_volume_limit, reference_datum_m=datum)
 
@@ -187,10 +219,11 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
     """
     if not np.isfinite([duration, gravity]).all() or duration <= 0 or gravity <= 0:
         raise ValueError('Positive finite duration and gravity required')
-    if scheme not in ('explicit', 'coupled-frozen'):
+    if scheme not in ('explicit', 'coupled-frozen', 'coupled-donor'):
         raise ValueError('Unknown source-front update scheme')
-    a = assembly(partition, gravity) if assembled is None else assembled
-    if a['partition'] is not partition or a['gravity'] != gravity:
+    face_scheme = 'donor' if scheme == 'coupled-donor' else 'paired'
+    a = assembly(partition, gravity, face_scheme) if assembled is None else assembled
+    if a['partition'] is not partition or a['gravity'] != gravity or a['face_scheme'] != face_scheme:
         raise ValueError('Matching source state and gravity required for cached assembly')
     volume = np.array([p['volume'] for p in partition.pools])
     momentum = np.array([p['momentum'] for p in partition.pools])
@@ -200,9 +233,10 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
         requested_new_regions=len(a['new_region_rates']), net_volume_limit=a['net_volume_limit'],
         assembly_net_mass_rate=a['net_mass_rate'], assembly_momentum_balance_error=a['momentum_boundary_bed_error'],
         candidate_accepted=False, full_rational_model_or_time_history_or_gameplay_accepted=False)
+    audit['source_face_below_storage_minimum'] = a['source_face_below_storage_minimum']
     audit['maximum_original_speed_mps'] = float(np.max(np.linalg.norm(momentum/volume[:, None], axis=1)))
     coupled = None
-    if scheme == 'coupled-frozen':
+    if scheme in ('coupled-frozen', 'coupled-donor'):
         try:
             coupled = coupled_update(a, duration)
         except ValueError as exc:

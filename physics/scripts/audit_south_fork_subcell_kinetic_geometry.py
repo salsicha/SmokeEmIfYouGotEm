@@ -28,7 +28,7 @@ def main():
     parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
     parser.add_argument('--pool-activation', action='store_true', help='Attempt finite source-front activation with strict state/energy rejection; implies --pool-pressure')
     parser.add_argument('--pool-history-steps', type=int, default=0, help='Successive 20ms source-front attempts, stopping on rejection; implies --pool-pressure')
-    parser.add_argument('--pool-history-scheme', choices=('explicit', 'coupled-frozen'), default='explicit')
+    parser.add_argument('--pool-history-scheme', choices=('explicit', 'coupled-frozen', 'coupled-donor'), default='explicit')
     args = parser.parse_args()
     if args.pool_history_steps < 0:
         parser.error('--pool-history-steps must be nonnegative')
@@ -66,6 +66,7 @@ def main():
         'subcell_dry_front_flux.py', 'subcell_source_activation.py', 'audit_source_activation.py',
         'subcell_exact_source_faces.py',
         'subcell_coupled_front_update.py',
+        'subcell_donor_face_flux.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}

@@ -20,15 +20,17 @@ def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.)
     eta = math.fsum((stage, datum, -energy_datum))
     nodes, weights = np.polynomial.legendre.leggauss(4)
     result = np.zeros(4)  # volume, XY momentum, energy relative to fixed datum
+    direct_force = np.zeros(2)
     branch_widths = dict(dry=0., wet=0., fan=0.)
     def at(c):
         front = un+2*c
         if front <= 0:
-            return np.zeros(4), 'dry'
+            return np.zeros(4), 'dry', np.zeros(2)
         h = c*(c/gravity)
         if un >= c:
             mass = h*un
             pn = mass*un+.5*gravity*h*h
+            force = .5*gravity*h*h
             energy = mass*(.5*(un*un+ut*ut)+gravity*eta)
             branch = 'wet'
         else:
@@ -36,10 +38,11 @@ def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.)
             hs = star*(star/gravity)
             mass = hs*star
             pn = 1.5*mass*star
+            force = mass*(c-.5*un)
             # h+b=eta on the original wet side; b need not be flattened.
             energy = mass*(1.5*star*star+.5*ut*ut+gravity*eta-c*c)
             branch = 'fan'
-        return np.r_[mass, pn*n+mass*ut*tangent, energy], branch
+        return np.r_[mass, pn*n+mass*ut*tangent, energy], branch, force*n
     for (low, high), width in zip(section.levels, section.lengths):
         a = math.fsum((stage, datum, -float(high)))
         b = math.fsum((stage, datum, -float(low)))
@@ -50,8 +53,9 @@ def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.)
             a = 0.
         ca, cb = math.sqrt(gravity*a), math.sqrt(gravity*b)
         if ca == cb:
-            value, branch = at(ca)
+            value, branch, force = at(ca)
             result += width*value
+            direct_force += width*force
             branch_widths[branch] += float(width)
             continue
         knots = [ca, cb]
@@ -63,15 +67,17 @@ def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.)
             part = width*((last-first)/(cb-ca))*((last+first)/(cb+ca))
             cs = .5*(first+last)+.5*(last-first)*nodes
             for c, weight in zip(cs, weights):
-                value, branch = at(float(c))
+                value, branch, force = at(float(c))
                 ds = part*weight*c/(first+last)
                 result += ds*value
+                direct_force += ds*force
                 branch_widths[branch] += float(ds)
-    if not np.isfinite(result).all() or result[0] < 0:
+    if not np.isfinite(result).all() or not np.isfinite(direct_force).all() or result[0] < 0:
         raise ValueError('Dry-front flux exceeds represented range')
     if result[0] == 0 and branch_widths['wet']+branch_widths['fan'] > 0:
         raise ValueError('Positive dry-front flux underflows represented range')
     if result[0] == 0 and np.any(result[1:] != 0):
         raise ValueError('Unrepresentable zero-mass dry-front momentum/energy')
     return result[:3], dict(energy_flux=float(result[3]), branch_projected_widths=branch_widths,
+                            nonadvective_momentum_flux=direct_force.tolist(),
                             dispersive_front_or_time_or_gameplay_accepted=False)

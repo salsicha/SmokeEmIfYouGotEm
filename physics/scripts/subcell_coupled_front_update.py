@@ -13,6 +13,7 @@ constant velocity when volumes change. It removes the frozen net-mass-only
 scheme's explicitly stiff diffusion. Pressure and negative exchange remainders
 still need qualification; positive volume is not local velocity stability.
 """
+import math
 import numpy as np
 
 
@@ -45,7 +46,22 @@ def coupled_update(assembled, duration):
         exchange[left, right] += conductance
         exchange[right, left] += conductance
     velocity = np.divide(momentum, volume[:, None], out=np.zeros_like(momentum), where=volume[:, None] > 0)
-    residual = momentum_rate-generator@momentum-exchange@velocity
+    subtracted_residual = momentum_rate-generator@momentum-exchange@velocity
+    if 'explicit_force_parts' in assembled:
+        # Subtracting large advective/exchange rates to recover an extremely
+        # small physical force leaves an ulp-sized ghost force. Assemble it
+        # directly from the same face/bed terms instead, without a state fix.
+        parts = list(assembled['explicit_force_parts'].values())
+        old_force = np.array([[math.fsum(float(part[i, axis]) for part in parts)
+                              for axis in range(2)] for i in range(len(pools))])
+        new_force = np.array([r['explicit_force_rate'] for r in new]).reshape(-1, 2)
+        residual = np.concatenate((old_force, new_force))
+        residual_assembly = 'direct-face-and-bed'
+    else:
+        residual, residual_assembly = subtracted_residual, 'supplied-rate-difference'
+    momentum_rate_error = float(np.max(abs(generator@momentum+exchange@velocity+residual-momentum_rate)))
+    if momentum_rate_error >= 1e-10:
+        raise ValueError('Direct force ledger does not reproduce original momentum rates')
     matrix = np.eye(count)-duration*generator
     if not np.isfinite(matrix).all() or not np.isfinite(residual).all():
         raise ValueError('Coupled source transfer exceeds represented range')
@@ -73,11 +89,21 @@ def coupled_update(assembled, duration):
     solve_error = max(float(np.max(abs(matrix@new_volume-volume))),
                       float(np.max(abs(velocity_matrix@new_velocity-rhs))))
     if solve_error >= 1e-10:
-        raise ValueError('Coupled source true residual failed')
+        raise ValueError(f'Coupled source true residual failed: {solve_error:.17g}')
+    fastest = int(np.argmax(np.linalg.norm(new_velocity, axis=1)))
+    local = dict(index=fastest, old_volume=float(volume[fastest]), new_volume=float(new_volume[fastest]),
+        old_velocity=velocity[fastest].tolist(), new_velocity=new_velocity[fastest].tolist(),
+        explicit_remainder=residual[fastest].tolist(), momentum_rhs=rhs[fastest].tolist(),
+        normalized_diagonal=float(normalized[fastest, fastest]),
+        normalized_row_sum=float(normalized[fastest].sum()))
+    if fastest < len(pools) and 'explicit_force_parts' in assembled:
+        local['explicit_force_parts'] = {k: v[fastest].tolist() for k, v in assembled['explicit_force_parts'].items()}
     return dict(volume=value[:, 0], momentum=value[:, 1:],
         audit=dict(original_mass_rate_error=rate_error, solve_residual=solve_error,
+            original_momentum_rate_error=momentum_rate_error, residual_assembly=residual_assembly,
             matrix_size=count, transfer_count=len(assembled['transfers']),
             implicit_velocity_exchanges=len(assembled.get('velocity_exchanges', [])),
+            fastest_region_budget=local,
             minimum_volume=float(value[:, 0].min()),
             pressure_and_bed_work_remain_explicit=True,
             full_rational_or_energy_or_gameplay_accepted=False))

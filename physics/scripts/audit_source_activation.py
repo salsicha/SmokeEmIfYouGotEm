@@ -34,7 +34,7 @@ def audit_history(partition, steps, duration=.02, scheme='explicit'):
         raise ValueError('Positive integer step count required')
     if not math.isfinite(duration) or duration <= 0:
         raise ValueError('Positive finite duration required')
-    if scheme not in ('explicit', 'coupled-frozen'):
+    if scheme not in ('explicit', 'coupled-frozen', 'coupled-donor'):
         raise ValueError('Unknown source-front update scheme')
     current, records = partition, []
     accepted = 0

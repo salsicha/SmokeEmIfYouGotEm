@@ -3,6 +3,20 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [donor exchange and direct source forces](../reconstruction-review-2026-09-07/normal-river-donor-force-ledger.md).
+Local evidence identifies negative paired-flux velocity exchange as the first
+tiny-region force explosion. Opt-in donor base removes it; direct face/bed
+force assembly removes a second catastrophic subtraction residue. Original
+rates and finite energy/conservation gates retained; no native/default change.
+Actual fixed20ms candidate reaches17 steps/0.34s, then FAILS positive finite
+volume. Prior minimum4.05e-254; drying/extinction and force timing still needed.
+Endpoint interpolation fixed; exact storage/face representation remains an
+explicit failing gate (full-cell exact clipping cannot silently drop fragments).
+173 focusedPASS/1FAIL; original energy selection25PASS/12FAIL, no waivers.
+NEXT conservative drying/topology, consistent source representation, full
+rational transport/bed/pressure, time/open/refinement/native/shared surface.
+464 protected hashes unchanged; full visual/30FPS/later-river/crew/releaseOPEN.
+
 Latest September 14: [source activation and successive-state failures](../reconstruction-review-2026-09-07/normal-river-source-front-history.md).
 Actual one-sided source activation now passes independent finite budgets at
 20 ms: 258->313 regions, 54 new source regions across 18 cells. Exact original

@@ -68,8 +68,11 @@ def shared_subsegments(left, right):
             if high <= low:
                 continue
             t = np.array([low, high])
-            za = a[0, 1]+(a[1, 1]-a[0, 1])*(t-a[0, 0])/(a[1, 0]-a[0, 0])
-            zb = b[0, 1]+(b[1, 1]-b[0, 1])*(t-b[0, 0])/(b[1, 0]-b[0, 0])
+            # Preserve represented source endpoint heights exactly. Rebuilding
+            # an endpoint as z0+(z1-z0) can move it by an ulp and create false
+            # wet pressure support relative to the original storage minimum.
+            za = np.interp(t, a[:, 0], a[:, 1])
+            zb = np.interp(t, b[:, 0], b[:, 1])
             # Same coverage tolerance as the existing source-face verifier;
             # coordinates are not welded or displaced to satisfy this check.
             if not np.allclose(za, zb, atol=1e-9, rtol=0):

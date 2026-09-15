@@ -41,12 +41,20 @@ def test_dry_front_rotation_receding_and_upstream_branches():
     b, bi = flux(section, 1., 0., rot@u, rot@np.array([1., 0.]))
     np.testing.assert_allclose(b, np.r_[a[0], rot@a[1:]], atol=1e-14)
     np.testing.assert_allclose(ai['energy_flux'], bi['energy_flux'], atol=1e-14)
+    np.testing.assert_allclose(bi['nonadvective_momentum_flux'], rot@ai['nonadvective_momentum_flux'], atol=1e-14)
 
 
 def test_front_flux_rejects_unrepresentable_positive_transfer():
     section = TriangleFaceSection([[[0., 0.], [1., 1.]]], [0., 1.])
     with pytest.raises(ValueError, match='underflows'):
         flux(section, 1e-150, 0., [0., 0.], [1., 0.])
+
+
+def test_upstream_dry_front_keeps_tiny_pressure_separate_from_large_advection():
+    section = TriangleFaceSection([[[0., 0.], [1., 0.]]], [0., 1.])
+    result, info = flux(section, 1e-100, 0., [1., 0.], [1., 0.])
+    assert result[1]-result[0] == 0.  # Subtraction has lost the actual pressure.
+    np.testing.assert_allclose(info['nonadvective_momentum_flux'], [4.905e-200, 0.], rtol=1e-14, atol=0.)
 
 
 @pytest.mark.parametrize('normal_speed', [-1., 1., 2.])
@@ -70,6 +78,8 @@ def test_mixed_riemann_branches_match_independent_depth_quadrature(normal_speed)
                      m*(.5*(us*us+.3**2)+9.81*(hs+1.3-depth))]
             expected += .5*(high-low)*weight*np.array(value)
     np.testing.assert_allclose(np.r_[actual, info['energy_flux']], expected, atol=2e-10, rtol=2e-10)
+    np.testing.assert_allclose(info['nonadvective_momentum_flux'],
+        expected[1:3]-expected[0]*np.array([normal_speed, .3]), atol=2e-10, rtol=2e-10)
 
 
 def dam():
