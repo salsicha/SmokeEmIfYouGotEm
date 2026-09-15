@@ -1,7 +1,7 @@
 """Preview evidence must refer to the same source and actual hydraulic state."""
 import pytest
 
-from prepare_south_fork_joint_preview import Dependencies, asset_file, verify_audits
+from prepare_south_fork_joint_preview import Dependencies, asset_file, verify_audits, add_cap_dependencies
 from south_fork_rock_union import sha
 
 
@@ -78,6 +78,20 @@ def test_dependencies_are_normalized_hashed_and_bounded(tmp_path):
 
 def test_asset_path_matches_its_package(tmp_path):
     assert asset_file('/Game/Review/Rock.Rock', tmp_path) == tmp_path / 'unreal/Content/Review/Rock.uasset'
+
+
+def test_preview_hashes_interpreted_selection_alongside_original_cap_sources(tmp_path):
+    cap={}
+    for name in ('source_mesh','original_returns','cap'):
+        path=tmp_path/(name+'.bin');path.write_bytes(name.encode())
+        cap[name+'_path']=path.name;cap[name+'_sha256']=sha(path)
+    selection=tmp_path/'selection.json';selection.write_text('interpreted, not measured')
+    cap['reviewed_extension_selection']=dict(path=selection.name,sha256=sha(selection))
+    deps=Dependencies(tmp_path);add_cap_dependencies(deps,cap)
+    assert len(deps.hashes)==4 and deps.hashes[selection.name]==sha(selection)
+    selection.write_text('changed selection')
+    with pytest.raises(ValueError,match='Changed dependency'):
+        add_cap_dependencies(Dependencies(tmp_path),cap)
 
 
 @pytest.mark.parametrize('asset', ['/Engine/Rock', '/Game/../../escape', '/Game/', '/Game//Rock', '/Game/A\\B'])

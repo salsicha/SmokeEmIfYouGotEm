@@ -5,13 +5,14 @@ No PIE, water-state changes, saved asset, saved level or playable promotion.
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import sys
 import unreal
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'unreal/Scripts'))
-from verify_troublemaker_dem_rock_cap_collision import import_candidate_solid
+from verify_troublemaker_dem_rock_cap_collision import import_candidate_solid,candidate_configuration
 
 LEVEL='/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach'
 PROBES=ROOT/'tmp/south-fork-rock-union-full-map-probes-v1-20260915.json'
@@ -27,9 +28,9 @@ def package_file(package):
     return ROOT/'unreal/Content'/(package.removeprefix('/Game/')+'.uasset')
 
 
-def main(runtime_expectations=None,output=REPORT):
+def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_directory=None,asset_path=None):
     assert not output.exists()
-    probes=json.loads(PROBES.read_text())
+    probes=json.loads(probe_path.read_text())
     assert sha(ROOT/probes['geometry_manifest'])==probes['geometry_manifest_sha256']
     before={str(ROOT/'unreal/Content/RaftSim/Maps/L_SouthForkAmerican_FullReach.umap'):
         sha(ROOT/'unreal/Content/RaftSim/Maps/L_SouthForkAmerican_FullReach.umap')}
@@ -85,7 +86,7 @@ def main(runtime_expectations=None,output=REPORT):
                     error_cm=error,actor=owner.get_name() if owner else None))
 
     check(probes['baseline'],'retained')
-    mesh,export=import_candidate_solid();assert export['source_cap_sha256']==probes['source_cap_sha256']
+    mesh,export=import_candidate_solid(export_directory,asset_path);assert export['source_cap_sha256']==probes['source_cap_sha256']
     candidate=subsystem.spawn_actor_from_class(unreal.StaticMeshActor,unreal.Vector(*probes['translation_cm']))
     candidate.set_actor_location(unreal.Vector(*probes['translation_cm']),False,True)
     candidate.set_actor_rotation(unreal.Rotator(0,0,0),True);candidate.set_actor_scale3d(unreal.Vector(1,-1,1))
@@ -95,7 +96,7 @@ def main(runtime_expectations=None,output=REPORT):
     runtime_result=None
     if runtime_expectations is not None:
         expected=json.loads(runtime_expectations.read_text())
-        assert expected['source_probe_sha256']==sha(PROBES)
+        assert expected['source_probe_sha256']==sha(probe_path)
         assert expected['solver_dry_threshold_m']==1.e-6 and expected['native_sample_wet_threshold_m']==1.e-4
         for key,digest in [('atlas_manifest','atlas_sha256'),('fields_manifest','fields_manifest_sha256'),
                            ('coordinate_map','coordinate_map_sha256')]:
@@ -132,7 +133,7 @@ def main(runtime_expectations=None,output=REPORT):
             expectation_sha256=sha(runtime_expectations),solver_steps_run=0)
     for path,digest in before.items():assert sha(Path(path))==digest,('Protected file changed',path)
     for package,digest in packages.items():assert sha(package_file(package))==digest,('Saved actor changed',package)
-    result=dict(level=LEVEL,source_probe_sha256=sha(PROBES),source_cap_sha256=export['source_cap_sha256'],
+    result=dict(level=LEVEL,source_probe_sha256=sha(probe_path),source_cap_sha256=export['source_cap_sha256'],
         fbx_sha256=export['fbx_sha256'],geometry_manifest_sha256=probes['geometry_manifest_sha256'],
         original_rapid_actor=rapid[0].get_name(),candidate_translation_cm=probes['translation_cm'],
         ground_actors=ground_rows,groups=groups,failures=failures,
@@ -148,5 +149,10 @@ def main(runtime_expectations=None,output=REPORT):
 
 
 if __name__=='__main__':
-    try:main()
+    try:
+        config_path=os.environ.get('RAFTSIM_ROCK_COLLISION_CONFIG')
+        if config_path:
+            config=candidate_configuration(config_path)
+            main(output=config['report'],probe_path=config['probes'],export_directory=config['export_directory'],asset_path=config['asset'])
+        else:main()
     finally:unreal.SystemLibrary.quit_editor()

@@ -50,6 +50,14 @@ class Dependencies:
         return json.loads(Path(path).read_text())
 
 
+def add_cap_dependencies(deps, cap):
+    for name in ('source_mesh', 'original_returns', 'cap'):
+        deps.add(deps.root / cap[name + '_path'], cap[name + '_sha256'])
+    selection = cap.get('reviewed_extension_selection')
+    if selection is not None:
+        deps.add(deps.root / selection['path'], selection['sha256'])
+
+
 def verify_audits(atlas, snapshot, banks, coverage, atlas_hash, stream_hash):
     require(snapshot['passed'] is True, 'Snapshot failed')
     require(banks['all_artificial_banks_exactly_dry'] is True and
@@ -94,8 +102,7 @@ def prepare(args):
     require(flow['geometry_manifest_sha256'] == sha(args.geometry_manifest), 'Different hydraulic geometry')
     cap_path = ROOT / geometry['rock_cap_manifest']
     cap = deps.read(cap_path, union.identity['cap_manifest_sha256'])
-    for name in ('source_mesh', 'original_returns', 'cap'):
-        deps.add(ROOT / cap[name + '_path'], cap[name + '_sha256'])
+    add_cap_dependencies(deps, cap)
     deps.add(source_path, geometry['source_manifest_sha256'])
     for row in geometry['regions']:
         deps.add(ROOT / row['geometry_file'], row['geometry_sha256'])

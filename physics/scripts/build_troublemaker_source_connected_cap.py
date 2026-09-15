@@ -24,6 +24,27 @@ from south_fork_rock_union import sha
 NEIGHBORS = ((-1, 0), (1, 0), (0, -1), (0, 1))
 
 
+def reviewed_region(path, previous):
+    """Read an explicitly interpreted selection; never relabel it measured."""
+    path = Path(path).resolve()
+    record = json.loads(path.read_text())
+    if record.get('schema') != 'raftsim.interpreted_source_selection.v1':
+        raise ValueError('Explicit interpreted source selection required')
+    for key in ('source_mesh_sha256', 'original_returns_sha256', 'source_naip_sha256',
+                'source_naip_export_sha256', 'origin_utm_and_vertical_datum_m'):
+        if record.get(key) != previous[key]:
+            raise ValueError('Selection belongs to different sources/frame: ' + key)
+    if record.get('measured_outline') is not False or record.get('measured_flanks') is not False:
+        raise ValueError('Image selection cannot claim measured outlines or flanks')
+    region = Polygon(record['interpreted_selection_polygon_m'])
+    if not region.is_valid or region.area <= 0:
+        raise ValueError('Valid positive-area reviewed selection required')
+    return region, dict(path=path.relative_to(ROOT).as_posix(), sha256=sha(path),
+        measured_outline=False, measured_flanks=False,
+        interpretation=record['interpretation'],
+        registration_uncertainty_m=record['registration_uncertainty_m'])
+
+
 def lower_bins(xyz, ids, cell_m=.5, minimum_count=2):
     xyz, ids = np.asarray(xyz, float), np.asarray(ids)
     if xyz.ndim != 2 or xyz.shape[1] != 3 or not np.issubdtype(ids.dtype, np.integer):
@@ -168,7 +189,7 @@ def recover_segment(vertices, faces, a, b):
     return np.concatenate([faces[~crossed],recovered])
 
 
-def constrained_extension(vertices, preserved_faces, maximum_edge_m=1.):
+def constrained_extension(vertices, preserved_faces, maximum_edge_m=1., allowed_region=None):
     """Keep every old roof triangle verbatim; constrain its outside connection."""
     vertices,preserved_faces=np.asarray(vertices,float),np.asarray(preserved_faces)
     if len(np.unique(vertices[:,:2],axis=0))!=len(vertices):
@@ -179,6 +200,11 @@ def constrained_extension(vertices, preserved_faces, maximum_edge_m=1.):
     faces[cross<0]=faces[cross<0][:,[0,2,1]]
     old_polygons=[Polygon(p) for p in vertices[preserved_faces,:2]]
     old_footprint=union_all(old_polygons)
+    if allowed_region is not None:
+        if not allowed_region.is_valid or allowed_region.area <= 0:
+            raise ValueError('Valid reviewed extension region required')
+        # The older cap is retained, not reinterpreted by an extension review.
+        allowed_region = union_all([allowed_region, old_footprint])
     old_edges=np.sort(np.concatenate([preserved_faces[:,[0,1]],preserved_faces[:,[1,2]],preserved_faces[:,[2,0]]]),axis=1)
     edges,count=np.unique(old_edges,axis=0,return_counts=True)
     constraints=edges[count==1]
@@ -195,19 +221,22 @@ def constrained_extension(vertices, preserved_faces, maximum_edge_m=1.):
             if abs(overlap-polygon.area)>1e-10:
                 raise ValueError('New face crosses the preserved roof')
             continue
+        if allowed_region is not None and not allowed_region.covers(polygon):
+            continue
         xy=vertices[face,:2]
         if np.linalg.norm(xy-np.roll(xy,1,axis=0),axis=1).max()<=maximum_edge_m:
             outside.append(face)
     return np.concatenate([preserved_faces,np.asarray(outside,dtype=np.int64).reshape(-1,3)])
 
 
-def run(previous_path, output):
+def run(previous_path, output, support_region=None):
     previous_path, output = Path(previous_path).resolve(), Path(output).resolve()
     if output.exists() or not output.is_relative_to(ROOT / 'tmp'):
         raise ValueError('Fresh project tmp candidate required')
     if sha(PARENT) != PARENT_SHA or sha(RETURNS) != RETURNS_SHA:
         raise ValueError('Original source changed')
     previous = json.loads(previous_path.read_text())
+    selection_region, selection_identity = (None, None) if support_region is None else reviewed_region(support_region, previous)
     old_path = ROOT / previous['cap_path']
     if sha(old_path) != previous['cap_sha256']:
         raise ValueError('Previous cap changed')
@@ -227,14 +256,17 @@ def run(previous_path, output):
         valid &= (xyz[:, 1] >= sampler.north[-1] + sampler.dy / 2) & (xyz[:, 1] <= sampler.north[0] - sampler.dy / 2)
         ids, keys, counts = lower_bins(xyz, np.flatnonzero(valid))
         clearance = xyz[ids, 2] - sampler.sample(xyz[ids, 0], xyz[ids, 1])
-        gaps = {tuple(k): float(h) for k, h in zip(keys, clearance)}
+        reviewed = np.ones(len(ids), dtype=bool) if selection_region is None else intersects_xy(selection_region, xyz[ids,0], xyz[ids,1])
+        gaps = {tuple(k): float(h) for k, h, keep in zip(keys, clearance, reviewed) if keep}
         active, collar, unsupported = connected_support(gaps, np.floor(old_xyz[:, :2] / .5).astype(int))
         wanted = active | collar
         take = np.array([tuple(k) in wanted for k in keys])
         outside_old = ~intersects_xy(old_footprint,xyz[ids,0],xyz[ids,1])
-        seeds = np.union1d(old_ids, ids[take & outside_old])
+        seeds = np.union1d(old_ids, ids[take & outside_old & reviewed])
         all_ids = np.flatnonzero(valid)
         all_ids = all_ids[~intersects_xy(old_footprint,xyz[all_ids,0],xyz[all_ids,1])]
+        if selection_region is not None:
+            all_ids = all_ids[intersects_xy(selection_region,xyz[all_ids,0],xyz[all_ids,1])]
         bins = np.floor(xyz[all_ids, :2] / .5).astype(int)
         pool = np.union1d(old_ids, all_ids[[tuple(k) in wanted for k in bins]])
         # Keep original duplicate observations in the archive, but choose the
@@ -252,7 +284,7 @@ def run(previous_path, output):
         if not np.array_equal(selected[old_to_selected],old_ids):
             raise ValueError('Original cap IDs missing before constraint recovery')
         preserved_faces = old_to_selected[old_faces]
-        faces = constrained_extension(xyz[selected],preserved_faces)
+        faces = constrained_extension(xyz[selected],preserved_faces,allowed_region=selection_region)
         if not np.array_equal(xyz[selected[faces[:len(old_faces)]]],old_xyz[old_faces]):
             raise ValueError('Original roof triangles changed')
         used = np.unique(faces)
@@ -297,7 +329,11 @@ def run(previous_path, output):
             source_connected_selection=dict(bin_m=.5,minimum_count=2,clearance_prior_m=.3,connectivity='four face neighbors',
                 active_bins=len(active),ground_collar_bins=len(collar),unsupported_directed_edges=unsupported,
                 capture_interior_eligible_bins=len(ids),raw_pool_count=len(pool),selected_seed_count=len(seeds),
+                reviewed_selection_eligible_bins=int(reviewed.sum()),
+                excluded_by_reviewed_selection_bins=int((~reviewed).sum()),
+                unsupported_edges_include_selection_exclusions=selection_region is not None,
                 unsupported_edges_are_not_ground=True,original_region_is_seed_not_outline=True),
+            reviewed_extension_selection=selection_identity,
             selection=dict(bin_size_prior_m=.5,minimum_original_returns_per_bin=2,
                 clearance_connectivity_prior_m=.3,maximum_triangle_edge_prior_m=1.,water_mask_required=False,
                 previous_seed_vertices_forced=True,near_ground_collar_uses_original_points=True),
@@ -326,5 +362,7 @@ if __name__ == '__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--previous',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--support-region',type=Path,
+        help='Source-bound interpreted extension selection; never a measured outline')
     args=parser.parse_args()
-    print(json.dumps(run(args.previous,args.output),indent=2),flush=True)
+    print(json.dumps(run(args.previous,args.output,args.support_region),indent=2),flush=True)

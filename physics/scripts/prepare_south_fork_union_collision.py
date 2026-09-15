@@ -15,7 +15,23 @@ def engine_position(utm_xy,height_navd88,world_origin,datum):
             float(-(utm_xy[1]-world_origin[1])*100),float((height_navd88-datum)*100)]
 
 
-def prepare(geometry_path,output):
+def visible_union_roof_probe(probe,parent_z,translation):
+    """Trace the actual union, retaining the buried source target as evidence."""
+    result=dict(probe)
+    point=np.asarray(probe['world_position_cm'],float)
+    parent_cm=float(parent_z)*100
+    if parent_cm>=point[2]:
+        result.update(kind='parent_covering_'+probe['kind'],
+            retained_original_source_position_cm=point.tolist(),outward_normal=[0.,0.,1.],
+            ray_half_length_cm=100.,expected_candidate=False)
+        point=point.copy();point[2]=parent_cm
+    else:
+        result['expected_candidate']=True
+    result['world_position_cm']=(point+translation).tolist()
+    return result
+
+
+def prepare(geometry_path,output,source_visible_probes=None):
     geometry_path=Path(geometry_path).resolve();output=Path(output).resolve()
     if output.exists() or not output.is_relative_to(ROOT/'tmp'):
         raise ValueError('Fresh project tmp probe file required')
@@ -45,16 +61,33 @@ def prepare(geometry_path,output):
         native=native_collision_probes(data['vertices_m'],data['triangles'],data['solid_vertices_m'],
             data['solid_triangles'],data['solid_face_kind'],cap['cap_sha256'])
         translation=np.array(engine_position(origin[:2],origin[2],world_origin,datum))
-        for probe in native['probes']:
-            if probe['kind'] not in ('original_vertex_interior_cone','roof_triangle_centroid'):continue
-            combined.append(dict(probe,world_position_cm=(np.asarray(probe['world_position_cm'])+translation).tolist(),
-                expected_candidate=True))
         with np.load(ROOT/cap['source_mesh_path'],allow_pickle=False) as parent:
             sampler=RegisteredMeshSampler({key:parent[key] for key in parent.files})
+        if source_visible_probes is None:
+            roof_probes=[p for p in native['probes'] if p['kind'] in ('original_vertex_interior_cone','roof_triangle_centroid')]
+        else:
+            source_visible_probes=Path(source_visible_probes).resolve()
+            extra=json.loads(source_visible_probes.read_text())
+            if extra['source_cap_sha256']!=cap['cap_sha256'] or extra['source_cap_manifest_sha256']!=sha(cap_path):
+                raise ValueError('Source-visible probes belong to different geometry')
+            vertices=[p for p in extra['probes'] if p['kind']=='original_vertex_source_visible_cone']
+            if [p['source_vertex_index'] for p in vertices]!=list(range(len(data['vertices_m']))) or not np.array_equal(
+                    [p['world_position_cm'] for p in vertices],data['vertices_m']*[100,-100,100]):
+                raise ValueError('Every exact original vertex must have a source-visible probe')
+            roof_probes=vertices+[p for p in native['probes'] if p['kind']=='roof_triangle_centroid']
+        for probe in roof_probes:
+            point=np.asarray(probe['world_position_cm'])/[100,-100,100]
+            parent_z=float(sampler.sample(point[0],point[1]))
+            combined.append(visible_union_roof_probe(probe,parent_z,translation))
         for ia,ib in data['boundary_edges']:
             a,b=data['vertices_m'][[ia,ib]];mid=(a+b)*.5
             parent_z=float(sampler.sample(mid[0],mid[1]))
-            if parent_z>=mid[2]:raise ValueError('No exposed candidate flank at source edge')
+            if parent_z>=mid[2]:
+                combined.append(dict(kind='parent_covering_union_boundary_midpoint',
+                    retained_original_source_position_cm=(mid*[100,-100,100]).tolist(),
+                    world_position_cm=(np.r_[mid[:2],parent_z]*[100,-100,100]+translation).tolist(),
+                    outward_normal=[0.,0.,1.],ray_half_length_cm=100.,expected_candidate=False))
+                continue
             # Orient away from the incident roof triangle, independent of
             # the boundary-edge array's undirected index ordering.
             faces=data['triangles'];incident=faces[np.any(faces==ia,axis=1)&np.any(faces==ib,axis=1)]
@@ -71,11 +104,18 @@ def prepare(geometry_path,output):
         source_cap_sha256=cap['cap_sha256'],parent_mesh_sha256=cap['source_mesh_sha256'],
         translation_cm=translation.tolist(),world_origin_utm_m=world_origin.tolist(),datum_m=datum,
         baseline=baseline,combined=combined,prior_vertical_tangent_gate_closed=False)
+    if source_visible_probes is not None:
+        result.update(source_visible_probe_file=source_visible_probes.relative_to(ROOT).as_posix(),
+            source_visible_probe_sha256=sha(source_visible_probes),
+            every_roof_vertex_and_centroid_represents_physical_union=True,
+            covered_roof_targets_preserved_in_probe_metadata=True,
+            legacy_isolated_probe_failures_waived=False)
     output.write_text(json.dumps(result,indent=2)+'\n')
     return {k:v for k,v in result.items() if k not in ('baseline','combined')}|dict(baseline_count=len(baseline),combined_count=len(combined))
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('geometry',type=Path)
-    parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
-    print(json.dumps(prepare(args.geometry,args.output),indent=2),flush=True)
+    parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--source-visible-probes',type=Path);args=parser.parse_args()
+    print(json.dumps(prepare(args.geometry,args.output,args.source_visible_probes),indent=2),flush=True)

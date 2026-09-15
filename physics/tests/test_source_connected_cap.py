@@ -4,6 +4,7 @@ import json
 
 from build_troublemaker_source_connected_cap import lower_bins, connected_support, separate_vertex_fans, recover_segment, constrained_extension
 from build_troublemaker_dem_rock_cap import close_cap_below_retained_terrain
+from shapely.geometry import Polygon
 
 
 def test_lower_bins_keep_actual_lowest_xyz_with_original_id_tie():
@@ -94,3 +95,31 @@ def test_recover_existing_segment_is_bit_exact_noop():
     xyz=np.array([[0,0,1],[1,0,1],[0,1,2.]])
     faces=np.array([[0,1,2]])
     assert np.array_equal(recover_segment(xyz,faces,0,1),faces)
+
+
+def test_extension_never_bridges_review_exclusion_and_keeps_original_roof():
+    xyz=np.array([[0,0,3],[1,0,1],[1,1,3],[0,1,1],[-1,-1,0],[2,-1,0],[2,2,0],[-1,2,0.]])
+    old=np.array([[0,1,2],[0,2,3]])
+    allowed=Polygon([[-1,0],[0,0],[0,1],[2,1],[2,2],[-1,2]])
+    result=constrained_extension(xyz,old,maximum_edge_m=5.,allowed_region=allowed)
+    assert np.array_equal(result[:2],old)
+    assert len(result)>2
+    region=allowed.union(Polygon(xyz[old[0],:2])).union(Polygon(xyz[old[1],:2]))
+    assert all(region.covers(Polygon(xyz[f,:2])) for f in result[2:])
+    assert not any(4 in f or 5 in f for f in result)
+
+
+def test_reviewed_region_is_bound_to_sources_and_cannot_claim_measurement(tmp_path,monkeypatch):
+    import build_troublemaker_source_connected_cap as module
+    monkeypatch.setattr(module,'ROOT',tmp_path)
+    source={k:'original' for k in ('source_mesh_sha256','original_returns_sha256','source_naip_sha256','source_naip_export_sha256')}
+    source['origin_utm_and_vertical_datum_m']=[1,2,3]
+    record=dict(source,schema='raftsim.interpreted_source_selection.v1',measured_outline=False,measured_flanks=False,
+        interpreted_selection_polygon_m=[[0,0],[1,0],[0,1]],interpretation='Explicit prior',registration_uncertainty_m=3.)
+    path=tmp_path/'selection.json';path.write_text(json.dumps(record))
+    region,identity=module.reviewed_region(path,source)
+    assert region.area==.5 and not identity['measured_outline']
+    path.write_text(json.dumps(dict(record,measured_outline=True)))
+    with pytest.raises(ValueError,match='cannot claim measured'):module.reviewed_region(path,source)
+    path.write_text(json.dumps(dict(record,source_naip_sha256='changed')))
+    with pytest.raises(ValueError,match='different sources'):module.reviewed_region(path,source)

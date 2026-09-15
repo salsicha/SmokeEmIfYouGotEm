@@ -47,6 +47,25 @@ def test_union_never_fills_outside_triangle_inside_bounding_box(source):
     assert out==22 and not changed
 
 
+def test_interpreted_selection_hash_and_sources_are_part_of_union(source):
+    root,path,_,manifest=source
+    manifest.update(source_naip_sha256='image',source_naip_export_sha256='registration')
+    record={key:manifest[key] for key in ('source_mesh_sha256','original_returns_sha256','source_naip_sha256',
+        'source_naip_export_sha256','origin_utm_and_vertical_datum_m')}
+    record.update(schema='raftsim.interpreted_source_selection.v1',measured_outline=False,measured_flanks=False)
+    selection=root/'selection.json';selection.write_text(json.dumps(record))
+    manifest['reviewed_extension_selection']=dict(path=selection.name,sha256=sha(selection))
+    path.write_text(json.dumps(manifest))
+    assert load(source).identity['interpreted_selection_sha256']==sha(selection)
+    selection.write_text(json.dumps(dict(record,source_naip_sha256='other-image')))
+    with pytest.raises(ValueError,match='interpreted selection'):load(source)
+    manifest['reviewed_extension_selection']['sha256']=sha(selection);path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError,match='source/frame mismatch'):load(source)
+    selection.write_text(json.dumps(dict(record,measured_outline=True)))
+    manifest['reviewed_extension_selection']['sha256']=sha(selection);path.write_text(json.dumps(manifest))
+    with pytest.raises(ValueError,match='cannot claim measured'):load(source)
+
+
 @pytest.mark.parametrize('field',['source_mesh','original_returns','cap'])
 def test_modified_dependency_is_rejected(source,field):
     root,_,_,manifest=source
@@ -131,6 +150,18 @@ def test_runtime_packet_union_preserves_observations_and_outside_samples(source)
 def test_full_map_probe_frame_applies_origin_datum_and_y_reflection_once():
     from prepare_south_fork_union_collision import engine_position
     assert engine_position([101,198],23,[100,200],20)==[100,200,300]
+
+
+def test_full_map_probe_samples_actual_union_without_discarding_buried_source():
+    from prepare_south_fork_union_collision import visible_union_roof_probe
+    original=dict(kind='source_vertex',world_position_cm=[10,-20,300],outward_normal=[.1,.2,.9],ray_half_length_cm=100.)
+    shift=np.array([1000,2000,0])
+    exposed=visible_union_roof_probe(original,2.,shift)
+    assert exposed['expected_candidate'] and exposed['world_position_cm']==[1010,1980,300]
+    covered=visible_union_roof_probe(original,3.2,shift)
+    assert not covered['expected_candidate'] and covered['world_position_cm']==[1010,1980,320]
+    assert covered['retained_original_source_position_cm']==[10,-20,300]
+    assert covered['outward_normal']==[0,0,1] and original['world_position_cm']==[10,-20,300]
 
 
 @pytest.fixture

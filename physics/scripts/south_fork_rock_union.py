@@ -34,6 +34,20 @@ class SourceRockUnion:
             paths[name]=path
         if paths['source_mesh']!=Path(parent_path).resolve():
             raise ValueError('Cap belongs to a different retained terrain')
+        selection=m.get('reviewed_extension_selection')
+        if selection is not None:
+            selection_path=(root/selection['path']).resolve()
+            if not selection_path.is_relative_to(root) or sha(selection_path)!=selection['sha256']:
+                raise ValueError('Changed or out-of-repository interpreted selection')
+            review=json.loads(selection_path.read_text())
+            if review.get('schema')!='raftsim.interpreted_source_selection.v1':
+                raise ValueError('Explicit interpreted source selection required')
+            if review.get('measured_outline') is not False or review.get('measured_flanks') is not False:
+                raise ValueError('Interpreted selection cannot claim measured geometry')
+            for key in ('source_mesh_sha256','original_returns_sha256','source_naip_sha256',
+                        'source_naip_export_sha256','origin_utm_and_vertical_datum_m'):
+                if review.get(key)!=m.get(key):
+                    raise ValueError('Interpreted selection source/frame mismatch: '+key)
         with np.load(paths['cap'],allow_pickle=False) as data:
             self.xyz=data['vertices_m'].copy();self.faces=data['triangles'].copy()
             ids=data['original_return_index']
@@ -64,6 +78,8 @@ class SourceRockUnion:
             operation='vertical solid union: maximum retained terrain and source roof',
             original_terrain_modified=False,flanks_measured=False,
             hydraulics_recooked=False,playable_integrated=False)
+        if selection is not None:
+            self.identity['interpreted_selection_sha256']=selection['sha256']
 
     def apply(self,east,north,parent):
         east,north,parent=np.broadcast_arrays(np.asarray(east,float),np.asarray(north,float),np.asarray(parent,float))

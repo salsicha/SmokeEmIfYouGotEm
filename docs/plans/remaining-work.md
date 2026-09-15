@@ -3,7 +3,27 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [source-matched playable preview](../reconstruction-review-2026-09-07/normal-river-joint-playable-preview.md).
+Latest September 15: [landward source extension and actual-map union](../reconstruction-review-2026-09-07/normal-river-landward-source-extension.md).
+Unrestricted expansion rejected after registered aerial review: it reaches
+apparent whitewater and increases inferred boundary exposure. New explicitly
+interpreted, source-hashed landward selection retains ALL original roof faces;
+1,601 original vertices / 2,954 roof triangles. Steep unmeasured flanks remain.
+Actual saved South Fork plus transient candidate: all 30,403 union probes PASS
+at unchanged 1 mm gate; exactly 319 hydraulic cells change. All 1,601 additional
+source-visible vertex rays PASS; all 6,652 legacy rays retained, 11 old failures
+still OPEN (nine independently reproduced source self-occlusions, two misses).
+All original 5,350,400 cells audited, fresh one-second hydraulic pilot/banks
+PASS, eight changed / 791 verified retained runtime packets prepared.
+Landward 50 s cook LIVE session59493/PID24324; prior-geometry 600 s cook remains
+LIVE session45187/PID32276 with 250/300/350 s snapshot/bank audits PASS, NOT settled.
+NEXT fresh 50 s audit, source-matched atlas/coverage/native fields, parameterized
+mesh staging, joint playable motion/reference review. No old-state transfer,
+saved map/material or default promotion; 105 focused tests PASS, 464 protected hashes unchanged.
+30 FPS still FAILS; crest/froth, traversal, remaining scenes/crew/normalization,
+13 physical + four presentation regressions and release remain OPEN.
+Troublemaker remains a rapid within South Fork, NOT a menu scenario.
+
+Earlier September 15: [source-matched playable preview](../reconstruction-review-2026-09-07/normal-river-joint-playable-preview.md).
 The original-return rock and audited 50 s water now run together in the EXISTING
 South Fork game via an opt-in ephemeral preview. 3,255 dependency hashes bind
 geometry, all 799 packets, actual h/u/v, material and prior collision/coverage
