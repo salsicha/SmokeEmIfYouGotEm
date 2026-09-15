@@ -1,5 +1,6 @@
 #include "RaftSimWaterSurfaceActor.h"
 #include "RaftSimCartesianHydraulicRelief.h"
+#include "RaftSimBreakingTileAudit.h"
 #include "RaftSimGroundSourceRegistry.h"
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
@@ -5710,12 +5711,14 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         // Capture the actual support records, not float-packed shader records
         // or reconstructed angles. The same profile survives between refreshes.
         const auto IndexedProfile=MakeShared<FRaftSimIndexedBreakingProfile,ESPMode::ThreadSafe>(SupportSites,Lift,Spacing);
+        RaftSimBreakingTileAudit::Run(*IndexedProfile,RiverCoordinatesM);
         SharedCrestProfile=IndexedProfile;
         CartesianCrestInput.HeightAtWorldXYCm=[Sites=SupportSites,IndexedProfile,Lift,Spacing,Scale,Sign](const FVector2D& P)
         {
+            static const bool bHashed=FParse::Param(FCommandLine::Get(),TEXT("RaftSimHashedBreakingTiles"));
             const FVector2D Field(P.X*.01,P.Y*.01*Sign);
             return (bFullCrestScan ? URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(
-                Field,Sites,Lift,Spacing) : IndexedProfile->Sample(Field))*Scale*100.f;
+                Field,Sites,Lift,Spacing) : IndexedProfile->Sample(Field,nullptr,!bHashed))*Scale*100.f;
         };
     }
     if (WaterAdapter)

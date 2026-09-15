@@ -3,7 +3,28 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [original wet-front pressure work](../reconstruction-review-2026-09-07/normal-river-source-birth-work.md).
+Latest September 15: [edge wetting and playable crest lookup](../reconstruction-review-2026-09-07/normal-river-edge-birth-and-tile-lookup.md).
+Normal South Fork now uses a bounded direct tile lookup for the unchanged crest
+function. Actual 64-pair comparison: 3.24 million identical height/foam samples,
+2.067817 ms hash versus 1.535808 ms direct, faster in every pair and both orders.
+Build PASS; 18 native tests PASS, including 166,388 full-scan reference points;
+nine strict report-parser tests PASS. 464 protected asset/source hashes unchanged.
+Fresh ordinary capture still FAILS: 11.447123 FPS / p95 98.7482 ms; no overall FPS
+gain claimed. Fresh recording and three inspected frames still show smooth green
+faces, merged broad froth and blocky rock flanks; full motion/reference acceptance
+is open. No quality, geometry, contact or solver gate was weakened.
+Separately, the original single EDGE-birth pressure limit now retains the order-
+one old/new coupling and all old pressure response. Manufactured positive-water
+checks expose a finite energy jump, not the point-birth height slope. 12 new
+tests PASS; full source/legacy-energy suite 451 PASS / 13 retained FAIL. This is
+NOT a front force, justified dissipation or time update; actual bank activation
+still rejects. All owned jobs terminal. NEXT compatible point/edge/flat/mixed
+front forces/impulses and transport, native single-surface integration, major
+solver/surface cost reduction and actual breaking/froth/reference qualification.
+Colorado → Pacuare → Futaleufu, all-scene water, crew, normalization, regressions
+and release remain OPEN.
+
+Earlier September 15: [original wet-front pressure work](../reconstruction-review-2026-09-07/normal-river-source-birth-work.md).
 Analytic coupled point-birth derivatives retain original positive factors and
 harmonic-face stage partials: volume-gradient leading height^-2 and canonical
 velocity height^-1 coefficients verified against original positive-water states.

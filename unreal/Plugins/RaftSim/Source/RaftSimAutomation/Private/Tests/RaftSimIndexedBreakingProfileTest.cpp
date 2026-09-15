@@ -9,7 +9,7 @@ bool FRaftSimIndexedBreakingProfileTest::RunTest(const FString&)
     using FSite=URaftSimWaterRuntimeAdapter::FSupportBreakingSite;
     FRandomStream Random(842619);
     int64 Compared=0;
-    for (int32 Case=0;Case<9;++Case)
+    for (int32 Case=0;Case<10;++Case)
     {
         TArray<FSite> Sites;
         for (int32 I=0;I<24 && Case!=8;++I)
@@ -27,13 +27,20 @@ bool FRaftSimIndexedBreakingProfileTest::RunTest(const FString&)
         if(Case==5)Sites[8].FlowDirection=FVector2D::ZeroVector;
         if(Case==6)Sites[7].RiverCoordinatesMeters.X=1.e9; // Bounded-index fallback.
         if(Case==7)Algo::Reverse(Sites);
+        if(Case==9)Sites[7].RiverCoordinatesMeters=FVector2D(20000.,20000.); // Sparse rectangle fallback.
         FRaftSimIndexedBreakingProfile Index(Sites,.35f,.7f);
+        const FRaftSimIndexedBreakingProfile Copy=Index; // No pointer lifetime dependency.
         TestEqual(TEXT("unsupported profiles use original full scan"),Index.IsIndexed(),Case!=4 && Case!=5 && Case!=6);
+        TestEqual(TEXT("bounded dense coverage"),Index.DenseTileCount()>0,Case!=4 && Case!=5 && Case!=6 && Case!=8 && Case!=9);
         const auto Compare=[&](const FVector2D& P)
         {
             float FullFoam=-1.f,IndexedFoam=-1.f;
             const float Full=URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,.35f,.7f,&FullFoam);
             const float Fast=Index.Sample(P,&IndexedFoam);
+            float HashedFoam=-1.f;
+            const float Hashed=Index.Sample(P,&HashedFoam,false);
+            if (Fast!=Hashed || IndexedFoam!=HashedFoam || Copy.Sample(P)!=Index.Sample(P))
+            {AddError(TEXT("Dense/hash/copied profile differs"));return false;}
             if(Full!=Fast || FullFoam!=IndexedFoam)
             {
                 AddError(FString::Printf(TEXT("Case%d at(%.17g,%.17g): full %.9g/%.9g indexed %.9g/%.9g"),

@@ -12,6 +12,11 @@ class FRaftSimIndexedBreakingProfile
     static constexpr double TileMeters=8.;
     TArray<FSite> Sites;
     TMap<FIntPoint,TArray<FSite>> Tiles;
+    // Immutable direct lookup of exactly the same ordered site subsets.
+    // A bounded rectangular table avoids hashing every refinement sample.
+    // Own the copied subsets: normal copy/move cannot leave dangling pointers.
+    TArray<TArray<FSite>> DenseTiles;
+    FIntPoint DenseOrigin=FIntPoint::ZeroValue,DenseSize=FIntPoint::ZeroValue;
     float Lift,Spacing,GlobalCap=0;
     bool bIndexed=false;
     static bool Tile(const FVector2D& P,FIntPoint& Out)
@@ -49,15 +54,41 @@ public:
                 Tiles.FindOrAdd(FIntPoint(X,Y)).Add(Site); // Original sum order.
         }
         bIndexed=true;
+        if (!Tiles.IsEmpty())
+        {
+            FIntPoint Low(MAX_int32,MAX_int32),High(MIN_int32,MIN_int32);
+            for (const auto& Entry:Tiles)
+            {
+                Low.X=FMath::Min(Low.X,Entry.Key.X);Low.Y=FMath::Min(Low.Y,Entry.Key.Y);
+                High.X=FMath::Max(High.X,Entry.Key.X);High.Y=FMath::Max(High.Y,Entry.Key.Y);
+            }
+            const int64 Width=int64(High.X)-Low.X+1,Height=int64(High.Y)-Low.Y+1;
+            // Widely separated sites keep the existing sparse hash path.
+            if (Width*Height<=65536)
+            {
+                DenseOrigin=Low;DenseSize=FIntPoint(int32(Width),int32(Height));
+                DenseTiles.SetNum(int32(Width*Height));
+                for (const auto& Entry:Tiles)
+                    DenseTiles[(Entry.Key.Y-Low.Y)*DenseSize.X+Entry.Key.X-Low.X]=Entry.Value;
+            }
+        }
     }
     bool IsIndexed() const { return bIndexed; }
     int32 TileCount() const { return Tiles.Num(); }
-    float Sample(const FVector2D& P,float* Foam=nullptr) const
+    int32 DenseTileCount() const { return DenseTiles.Num(); }
+    float Sample(const FVector2D& P,float* Foam=nullptr,bool bDense=true) const
     {
         FIntPoint Key;
         if (!bIndexed || !Tile(P,Key))
             return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,Lift,Spacing,Foam);
-        const auto* Found=Tiles.Find(Key);
+        const TArray<FSite>* Found=nullptr;
+        if (bDense && !DenseTiles.IsEmpty())
+        {
+            const int32 X=Key.X-DenseOrigin.X,Y=Key.Y-DenseOrigin.Y;
+            if (X>=0 && Y>=0 && X<DenseSize.X && Y<DenseSize.Y)
+                Found=&DenseTiles[Y*DenseSize.X+X];
+        }
+        else Found=Tiles.Find(Key);
         const TConstArrayView<FSite> Local=Found ? TConstArrayView<FSite>(*Found) : TConstArrayView<FSite>();
         return URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Local,Lift,Spacing,Foam,GlobalCap);
     }
