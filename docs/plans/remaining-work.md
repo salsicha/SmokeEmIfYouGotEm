@@ -3,6 +3,19 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [exact source fragment representation](../reconstruction-review-2026-09-07/normal-river-exact-source-representation.md).
+Original rational polygons retain positive fragments lost by float vertex
+projection, plus exact areas, original slopes and source IDs. Explicit local
+storage adapter feeds existing kinetic forms; evolving pools NOT switched.
+Actual256-cell audit:4216 original face segments exact; rational volume/kinetic
+controls within1.14e-15. Synthetic tests cover collapsed positive fragments.
+195 focusedPASS/1 original geometryFAIL; retained25PASS/12 energyFAIL, no waivers.
+Prior committed front-force timing removes receiver spike, but fixed20ms history
+stillFAILS step18 after0.34s. Conservative drying/coupled inflow remains open.
+NEXT consistent exact-datum faces/storage/topology integration, full rational
+transport/pressure/bed-force and finite-time/open/refinement/native qualification.
+464 protected hashes unchanged; no visual/FPS gain. Full scene/crew/releaseOPEN.
+
 Latest September 14: [donor exchange and direct source forces](../reconstruction-review-2026-09-07/normal-river-donor-force-ledger.md).
 Local evidence identifies negative paired-flux velocity exchange as the first
 tiny-region force explosion. Opt-in donor base removes it; direct face/bed

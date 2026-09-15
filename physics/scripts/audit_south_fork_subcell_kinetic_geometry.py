@@ -15,6 +15,7 @@ from subcell_wet_pool_pressure import WetPoolPressureSystem
 from audit_wet_pool_pressure_rate import audit_direction
 from audit_wet_pool_transport import audit_transport, audit_internal_regions
 from audit_source_activation import audit_activation, audit_history
+from audit_source_representation import audit_representation
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
@@ -23,6 +24,7 @@ def main():
     parser.add_argument('--atlas', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--pool-pressure', action='store_true', help='Also audit both original poles on separated fixed wet pools')
+    parser.add_argument('--source-representation', action='store_true', help='Audit exact source polygons and relative metrics against rational integrals')
     parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
     parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
     parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
@@ -67,6 +69,7 @@ def main():
         'subcell_exact_source_faces.py',
         'subcell_coupled_front_update.py',
         'subcell_donor_face_flux.py',
+        'subcell_exact_geometry.py', 'audit_source_representation.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -88,6 +91,8 @@ def main():
         authority = np.asarray(mesh['authority']).ravel().copy()
     shift = np.array(coordinates['world_origin_utm_m'])-geometry['rapid_origin_utm_m']
     patch = SubcellGeometryPatch(terrain, origins[0]+shift, (16, 16), relative_stages=True)
+    representation = (audit_representation(terrain, origins[0]+shift, (16, 16), [1., 1.], fields['h'])
+                      if args.source_representation else None)
     source_bed = fields['bed']+atlas['source_elevation_datum_m']-geometry['rapid_datum_navd88_m']
     exact_bed = terrain.sample(*(origins+shift).T)
     if not np.allclose(source_bed, exact_bed, atol=1e-9, rtol=0):
@@ -212,6 +217,7 @@ def main():
     result = dict(schema='raftsim.south_fork.subcell_pressure_kinetic_geometry.v1',
         accepted=False, positive_cell_geometry_controls_passed=True, total_cells=256,
         fixed_pool_pressure=pressure,
+        exact_source_representation=representation,
         fixed_pool_direction=direction,
         fixed_pool_transport=transport,
         fixed_internal_source_regions=internal,
@@ -243,6 +249,8 @@ def main():
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
     console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions', 'source_activation_candidates')}
+    if representation is not None:
+        console['exact_source_representation'] = {k: v for k, v in representation.items() if k != 'records'}
     if activation is not None:
         console['source_activation_candidates'] = {k: v for k, v in activation.items() if k not in ('front_records', 'receiving_rate_records')}
     if internal is not None:
@@ -257,6 +265,7 @@ def main():
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
     print(json.dumps(console, indent=2))
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
+               or (representation is not None and not representation['exact_representation_controls_passed'])
                or (history is not None and not history['all_requested_steps_passed'])
                or (activation is not None and not activation['twenty_ms_candidate_passed'])
                or (internal is not None and not internal['internal_region_controls_passed'])
