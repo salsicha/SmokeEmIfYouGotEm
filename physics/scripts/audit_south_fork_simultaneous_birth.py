@@ -16,6 +16,8 @@ from subcell_primal_metric_rate import metric_time_force
 from subcell_point_birth_connection import point_connection
 from subcell_auxiliary_transport import geometric_commutator
 from subcell_wet_pool_pressure_rate import WetPoolPressureRate
+from subcell_point_birth_curvature import point_curvature_limit
+from subcell_source_curvature import SourceCurvatureTensor
 from subcell_simultaneous_birth_pressure import birth_faces, BirthLimitSystem
 from subcell_source_frames import face_section
 from subcell_wet_pool_primal_energy import evaluate
@@ -123,6 +125,35 @@ def connection_probe(partition, candidate, parameter, expected):
                 maximum_term_scaled_error=max(errors))
 
 
+def curvature_probe(partition, candidate, parameter, expected):
+    """Guarded common-trace expression, not a qualified front equation."""
+    momentum = np.array([p['momentum'] for p in candidate.pools])[:, None]
+    volume = np.array([p['volume'] for p in candidate.pools])[:, None, None]
+    root = np.sqrt(volume)
+    u = momentum/volume
+    primal = evaluate(candidate, momentum)
+    force, residuals = np.zeros_like(momentum), []
+    for pole in primal['poles']:
+        system = WetPoolPressureSystem(candidate, pole['beta'])
+        curvature = SourceCurvatureTensor(system)
+        w = pole['normalized_auxiliary_velocity']/root
+        solution, stats = system.solve(curvature.action(w, u)/root)
+        residuals.extend((pole['relative_residual'], stats['relative_residual']))
+        force += pole['alpha']*(root*solution-curvature.action(w, w))
+    if max(residuals) > 2e-5 or not np.isfinite(force).all():
+        raise ValueError('Original finite common-trace curvature solve/range gate failed')
+    target = np.vstack((expected['old_force_path_squared_limit'], expected['newborn_force_path_squared_limit']))
+    actual = float(parameter)**2*force[:, 0]
+    scale = float(np.max(abs(target)))
+    error = float(np.max(abs(actual-target)))
+    return dict(force_path_squared=actual, maximum_absolute_coefficient_error=error,
+                analytic_coefficient_scale=scale,
+                maximum_relative_coefficient_error=error/scale if scale else None,
+                maximum_solve_residual=max(residuals), unscaled_skew_work=float(np.sum(u*force)),
+                unresolved_curvature_fronts=curvature.unresolved,
+                common_trace_front_or_full_model_accepted=False)
+
+
 def analyze(partition, receipts, assembled=None):
     before = [(p['volume'], p['momentum'].copy()) for p in partition.pools]
     keys, rates = [], []
@@ -156,6 +187,7 @@ def analyze(partition, receipts, assembled=None):
         work = point_work(context, requests)
         metric_force = point_metric_force(context, requests)
         connection = point_connection(context, requests)
+        curvature = point_curvature_limit(context, requests)
         limit = work['limit']
         bounds = [b.next_height/F(float(k)) for b, k in zip(births, scales) if b.next_height is not None]
         lookup = {key: i for i, key in enumerate(keys)}
@@ -198,6 +230,7 @@ def analyze(partition, receipts, assembled=None):
                 original_newborn_operator=operator_probe(partition, candidate, limit),
                 original_metric_force=metric_force_probe(partition, candidate, parameter, metric_force),
                 original_connection=connection_probe(partition, candidate, parameter, connection),
+                original_curvature=curvature_probe(partition, candidate, parameter, curvature),
                 volume_gradient_path_squared=scaled_gradient, canonical_velocity_path=scaled_canonical,
                 volume_gradient_max_norm_relative_error=work_errors[0],
                 canonical_velocity_max_norm_relative_error=work_errors[1],
@@ -230,15 +263,22 @@ def analyze(partition, receipts, assembled=None):
         connection_passed = (rows[-1]['original_connection']['maximum_term_scaled_error'] < .01
             and rows[-1]['original_connection']['maximum_term_scaled_error']
             < rows[0]['original_connection']['maximum_term_scaled_error']/3)
+        cf, cl = rows[0]['original_curvature'], rows[-1]['original_curvature']
+        curvature_passed = (cl['maximum_relative_coefficient_error'] < .01
+            if cl['analytic_coefficient_scale'] else cl['maximum_absolute_coefficient_error'] < 1e-10)
+        curvature_passed &= (cl['maximum_absolute_coefficient_error'] < cf['maximum_absolute_coefficient_error']/3
+            or cl['maximum_absolute_coefficient_error'] == cf['maximum_absolute_coefficient_error'] == 0.)
         passed = bool(expected < 0 and rows[-1]['error'] < rows[0]['error']/3 and rows[-1]['error'] < .01*abs(expected)
             and all(r['maximum_pressure_residual'] <= 2e-5 and r['positive_energy_contraction_error'] <= 1e-10 for r in rows)
-            and operator_passed and work_passed and force_passed and connection_passed)
+            and operator_passed and work_passed and force_passed and connection_passed and curvature_passed)
         paths.append(dict(name=name, limit=limit, rows=rows, original_newborn_operator_controls_passed=operator_passed,
                           analytic_pressure_work={k: v for k, v in work.items() if k != 'limit'},
                           analytic_metric_force={k: v for k, v in metric_force.items() if k != 'limit'},
                           metric_force_probe_controls_passed=bool(force_passed),
                           analytic_connection={k: v for k, v in connection.items() if k != 'metric'},
                           connection_probe_controls_passed=bool(connection_passed),
+                          analytic_guarded_curvature={k: v for k, v in curvature.items() if k != 'limit'},
+                          guarded_curvature_probe_controls_passed=bool(curvature_passed),
                           pressure_work_probe_controls_passed=bool(work_passed),
                           pressure_limit_probe_controls_passed=passed))
     if any(p['volume'] != v or not np.array_equal(p['momentum'], m) for p, (v, m) in zip(partition.pools, before)):
@@ -267,7 +307,7 @@ def main():
         vertex_authority_codes=sorted(set(map(int, authority[sampler.faces[r['source_triangle_indices']]].ravel())))) for r in receipts]
     if any(sha(Path(path)) != digest for path, digest in hashes.items()):
         raise ValueError('Original source or implementation changed during simultaneous-birth audit')
-    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v4', accepted=False,
+    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v5', accepted=False,
         original_block_col_row=[args.block_col, args.block_row], original_snapshot_time_seconds=source['source_time_seconds'],
         original_pool_count=len(partition.pools), origin_registered_m=origin, provenance=provenance,
         source_sha256=hashes, result=result,
@@ -294,6 +334,8 @@ def main():
         final_old_metric_force_error=p['rows'][-1]['original_metric_force']['old_force_max_norm_relative_error'],
         final_new_metric_force_error=p['rows'][-1]['original_metric_force']['newborn_force_max_norm_relative_error'],
         final_connection_error=p['rows'][-1]['original_connection']['maximum_term_scaled_error'],
+        curvature_front_edge_scope=p['analytic_guarded_curvature']['front_edge_scope'],
+        final_curvature_absolute_coefficient_error=p['rows'][-1]['original_curvature']['maximum_absolute_coefficient_error'],
         mass_direction_scaled_work=p['rows'][-1]['fixed_old_mass_direction_scaled_work'],
         controls_passed=p['pressure_limit_probe_controls_passed']) for p in result['paths']])), flush=True)
     return 0 if result['pressure_limit_probe_controls_passed'] else 1

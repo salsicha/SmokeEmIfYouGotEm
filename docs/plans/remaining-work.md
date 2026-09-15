@@ -3,7 +3,29 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [original point-birth geometry-time connection](../reconstruction-review-2026-09-07/normal-river-point-birth-connection.md).
+Latest September 15: [guarded point-birth curvature and unresolved edges](../reconstruction-review-2026-09-07/normal-river-point-birth-curvature.md).
+Analytic e^-2 RHS coefficients of the existing common-trace curvature are
+verified against original finite-water expressions, including both axes and
+oblique original edges. This diagnoses a guarded expression, not an accepted
+wet-front curvature law. Actual bank: 33 old/new faces = 24 matching slopes
+plus nine old stages at/below the source minimum, so that leading coefficient
+is zero. Both seven-height paths refine to it (final absolute errors
+2.065e-17 / 7.643e-15). EIGHT newborn/still-unowned internal curvature edges
+remain explicitly unresolved at every probe; zero leading old/new curvature
+does not qualify those interfaces or the full force. NEXT couple one-sided
+transport/curvature at these edges, joint forces/impulses/time and edge/flat/
+mixed transitions, then native single-surface integration and actual motion.
+63 focused tests PASS; final new module 11 PASS; broader suite 508 PASS / 13
+identical retained FAIL, zero errors/skips. Initial insufficient refinement
+and incorrect nonzero oblique expectation retained; no tolerance relaxed.
+All 559 audit-source and 464 protected source/actor hashes unchanged; jobs
+terminal. No native/visual/FPS change: last ordinary 22.429181 FPS / p95
+54.7266 ms FAILS 30 FPS; broad froth and smooth faces remain unaccepted.
+Colorado → Pacuare → Futaleufu, Chilko/Zambezi/all-scene water, crew,
+normalization, regressions and release remain OPEN. Troublemaker remains a
+rapid within South Fork, not its own menu scenario.
+
+Earlier September 15: [original point-birth geometry-time connection](../reconstruction-review-2026-09-07/normal-river-point-birth-connection.md).
 Original commutator and pressure pullback now couple to the half-metric birth
 force. Independent positive-water vectors verify partial cancellation and a
 nonzero coupled newborn remainder; zero skew work does not mean zero force.
