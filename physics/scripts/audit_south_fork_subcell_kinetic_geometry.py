@@ -13,7 +13,7 @@ from subcell_wet_connectivity import components
 from subcell_wet_pool_partition import WetPoolPartition
 from subcell_wet_pool_pressure import WetPoolPressureSystem
 from audit_wet_pool_pressure_rate import audit_direction
-from audit_wet_pool_transport import audit_transport
+from audit_wet_pool_transport import audit_transport, audit_internal_regions
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
@@ -24,7 +24,9 @@ def main():
     parser.add_argument('--pool-pressure', action='store_true', help='Also audit both original poles on separated fixed wet pools')
     parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
     parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
+    parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
     args = parser.parse_args()
+    args.pool_transport = args.pool_transport or args.pool_internal
     args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport
     if args.report.exists():
         raise FileExistsError(args.report)
@@ -54,6 +56,7 @@ def main():
         'subcell_wet_pool_pressure_rate.py', 'audit_wet_pool_pressure_rate.py', 'subcell_mechanical_energy.py',
         'subcell_wet_pool_primal_energy.py', 'subcell_wet_pool_transport.py', 'audit_wet_pool_transport.py',
         'rational_primal_energy.py', 'subcell_energy_flux.py',
+        'subcell_source_region_faces.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -130,7 +133,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure, direction, transport = None, None, None
+    pressure, direction, transport, internal = None, None, None, None
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -186,6 +189,8 @@ def main():
             direction = audit_direction(pools)
         if args.pool_transport:
             transport = audit_transport(pools)
+        if args.pool_internal:
+            internal = audit_internal_regions(pools)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
@@ -195,6 +200,7 @@ def main():
         fixed_pool_pressure=pressure,
         fixed_pool_direction=direction,
         fixed_pool_transport=transport,
+        fixed_internal_source_regions=internal,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -219,7 +225,9 @@ def main():
               'evolution, wetting/open/time, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
-    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport')}
+    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions')}
+    if internal is not None:
+        console['fixed_internal_source_regions'] = {k: v for k, v in internal.items() if k != 'physical_energy_and_transport'}
     if transport is not None:
         pending = transport['central_base']['unresolved_activation_faces']
         console['fixed_pool_transport'] = dict(
@@ -230,6 +238,7 @@ def main():
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
     print(json.dumps(console, indent=2))
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
+               or (internal is not None and not internal['internal_region_controls_passed'])
                or (direction is not None and not direction['fixed_topology_direction_controls_passed'])
                or (transport is not None and (not transport['physical_energy_controls_passed']
                    or not transport['central_base']['complete_fixed_topology_base_rates']

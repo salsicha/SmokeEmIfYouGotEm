@@ -106,6 +106,19 @@ class WetPoolPressureRate:
                     area, _, wet_width = face.moments(form['stage_offset'], form['datum'])
                     rate = wet_width*stage_rate[owner]
                     add(owner, 2*owner+axis, -sign*(rate-2*self.ell[owner]*area)/system.h[owner, 0])
+        for face in system.partition.internal_faces:
+            li, ri = face['left'], face['right']
+            if li is None or ri is None:
+                continue
+            lf, rf = pools[li]['form'], pools[ri]['form']
+            args = (face['segment'], lf['stage_offset'], rf['stage_offset'], lf['datum'], rf['datum'])
+            area = harmonic_area(*args)
+            rate = harmonic_area_rate(*args, stage_rate[li], stage_rate[ri])
+            for owner in (li, ri):
+                for axis, normal in enumerate(face['normal']):
+                    weight = normal*(rate-2*self.ell[owner]*area)/(2*system.h[owner, 0])
+                    add(owner, 2*ri+axis, weight)
+                    add(owner, 2*li+axis, -weight)
         entries = [(r, c, v) for r, row in enumerate(maps) for c, v in row.items() if v != 0]
         self.rows = np.array([r for r, _, _ in entries], int)
         self.columns = np.array([c for _, c, _ in entries], int)

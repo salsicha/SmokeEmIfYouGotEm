@@ -3,6 +3,19 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [internal source-region faces and conditioning](../reconstruction-review-2026-09-07/normal-river-internal-source-regions.md).
+Independent regions now communicate on exact original internal source edges,
+including oblique mass/pressure, analytic direction and reverse-energy work.
+Controlled cell112 subdivision preserves representedV/P;258->273 regions with
+19 internal wet edges. Initial physical round-tripFAIL5.05e-5 corrected to1.66e-10
+by exact source-group principal-block preconditioning; SAME operator/40CG/gates.
+133 subcell/triangle testsPASS; retained34PASS/12FAIL. Actual activation still
+missing on66 trace entries across18 cells; overall source audit correctlyFAILS.
+Subdivision raises discrete kinetic energy6.45944: not a conservative transition.
+NEXT one-sided source activation and topology/remapping energy budgets, full
+rational advection/bed-force, wet-front/time/open/refinement/native qualification.
+464 protected hashes unchanged; no gameplay/FPS gain; full scene/releaseOPEN.
+
 Latest September 14: [physical energy and wet-pool transport support](../reconstruction-review-2026-09-07/normal-river-wet-pool-transport-support.md).
 Original-pole inverse energy and all-pool reverse volume work now use exact
 source geometry; actual258-pool energy controlsPASS. Pool-aware base mass/

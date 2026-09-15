@@ -55,6 +55,19 @@ def kinetic_volume_gradient(system, q):
                 face = TriangleFaceSection([segment], segment[:, 0])
                 area, _, width = face.moments(form['stage_offset'], form['datum'])
                 wall[owner] -= sign*f[owner, 0]*u[owner, axis]*(width/form['wet_area']-area/volume[owner])/volume[owner]
+    for face in system.partition.internal_faces:
+        li, ri = face['left'], face['right']
+        if li is None or ri is None:
+            continue
+        lf, rf = pools[li]['form'], pools[ri]['form']
+        args = (face['segment'], lf['stage_offset'], rf['stage_offset'], lf['datum'], rf['datum'])
+        area = harmonic_area(*args)
+        jump = float((u[ri]-u[li])@face['normal'])
+        adjoint = jump*(f[li, 0]/(2*volume[li])+f[ri, 0]/(2*volume[ri]))
+        shared[li] += adjoint*harmonic_area_rate(*args, 1., 0.)/lf['wet_area']
+        shared[ri] += adjoint*harmonic_area_rate(*args, 0., 1.)/rf['wet_area']
+        for owner in (li, ri):
+            shared[owner] -= (f[owner, 0]/volume[owner])*(area/(2*volume[owner]))*jump
     result = local+normalization+shared+wall
     if not np.isfinite(result).all():
         raise ValueError('Exact wet-pool reverse volume gradient exceeds represented range')

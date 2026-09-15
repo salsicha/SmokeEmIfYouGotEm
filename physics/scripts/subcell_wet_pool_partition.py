@@ -10,6 +10,7 @@ import numpy as np
 from triangle_cell_storage import TriangleCellStorage
 from subcell_pressure_kinetic_geometry import local_form
 from subcell_wet_connectivity import components
+from subcell_source_region_faces import internal_faces
 
 
 class WetPoolPartition:
@@ -22,6 +23,8 @@ class WetPoolPartition:
                 or np.any(p[v == 0] != 0)):
             raise ValueError('Original finite volume/momentum state and source origin required')
         self.patch, self.pools = patch, []
+        self.sampler, self.origin = sampler, origin.copy()
+        self.origin.setflags(write=False)
         self.parent_pools = [[] for _ in patch.cells]
         self.reassembled_volumes = np.zeros_like(v).ravel()
         self.reassembled_momenta = np.zeros_like(p).reshape(-1, 2)
@@ -71,6 +74,68 @@ class WetPoolPartition:
         self.reassembled_momenta = self.reassembled_momenta.reshape(p.shape)
         self.maximum_volume_error = float(np.max(abs(self.reassembled_volumes-v)))
         self.maximum_momentum_error = float(np.max(abs(self.reassembled_momenta-p)))
+        self.internal_faces = internal_faces(self)
+
+    def with_regions(self, states):
+        """Explicit candidate region state; NOT a conservative transition.
+
+        Each record specifies parent, original source_triangle_indices, volume,
+        momentum. Regions may touch but remain independent unknowns with real
+        internal faces. No volume/momentum budget is invented for the caller.
+        """
+        result = object.__new__(type(self))
+        result.__dict__ = self.__dict__.copy()
+        result.pools = []
+        result.parent_pools = [[] for _ in self.patch.cells]
+        result.reassembled_volumes = np.zeros(self.patch.shape)
+        result.reassembled_momenta = np.zeros((*self.patch.shape, 2))
+        seen = set()
+        for state in states:
+            parent = state['parent']
+            if not isinstance(parent, (int, np.integer)) or not 0 <= parent < len(self.patch.cells):
+                raise ValueError('Original parent cell required')
+            cell = self.patch.cells[parent]
+            ids = list(state['source_triangle_indices'])
+            volume, momentum = float(state['volume']), np.asarray(state['momentum'], float)
+            if (not ids or any(not isinstance(i, (int, np.integer)) for i in ids)
+                    or len(ids) != len(set(ids)) or not set(ids).issubset(set(cell.source_triangle_indices))
+                    or any((parent, i) in seen for i in ids) or not np.isfinite(volume) or volume <= 0
+                    or momentum.shape != (2,) or not np.isfinite(momentum).all()):
+                raise ValueError('Disjoint original source regions with positive finite state required')
+            seen.update((parent, i) for i in ids)
+            mask = np.isin(cell.source_triangle_indices, ids)
+            storage = TriangleCellStorage(cell.triangles[mask], cell.source_triangle_indices[mask])
+            form = local_form(storage, volume)
+            row, col = divmod(parent, self.patch.shape[1])
+            center = self.origin+self.patch.spacing*[col, row]
+            connected = components(self.sampler, storage, center, self.patch.spacing, form['stage_offset'])
+            if connected['component_count'] != 1 or set(connected['components'][0]['source_triangle_indices']) != set(ids):
+                raise ValueError('Each region must be one wet connected source set; dry support needs activation')
+            height = math.fsum((form['stage_offset'], form['datum'], -cell.datum))
+            absolute_levels = np.unique(cell.levels)
+            distances = np.array([math.fsum((form['stage_offset'], form['datum'], -float(z))) for z in absolute_levels])
+            if np.any(distances == 0):
+                raise ValueError('Topology event requires explicit one-sided transition')
+            lower, upper = absolute_levels[distances > 0], absolute_levels[distances < 0]
+            absolute_interval = [float(lower.max()) if lower.size else -np.inf,
+                                 float(upper.min()) if upper.size else np.inf]
+            interval = [level-cell.datum for level in absolute_interval]
+            index = len(result.pools)
+            result.parent_pools[parent].append(index)
+            result.pools.append(dict(parent=parent, source_triangle_indices=sorted(ids), storage=storage,
+                volume=volume, momentum=momentum.copy(), form=form, parent_stage_offset=height,
+                parent_datum=cell.datum, parent_topology_stage_interval=interval,
+                topology_absolute_stage_interval=absolute_interval))
+            result.reassembled_volumes.flat[parent] += volume
+            result.reassembled_momenta.reshape(-1, 2)[parent] += momentum
+        if not result.pools:
+            raise ValueError('At least one positive source region required')
+        for key in ('maximum_volume_error', 'maximum_momentum_error', 'maximum_gram_partition_error',
+                    'maximum_volume_tangent_partition_error'):
+            setattr(result, key, None)
+        result.is_region_state = True
+        result.internal_faces = internal_faces(result)
+        return result
 
     def volume_probe(self, volumes):
         """Independent-stage geometry probe within the original topology interval.
@@ -96,7 +161,13 @@ class WetPoolPartition:
             form = local_form(old['storage'], volume)
             parent_height = math.fsum((form['stage_offset'], form['datum'], -old['parent_datum']))
             low, high = old['parent_topology_stage_interval']
-            if not low < parent_height < high:
+            if 'topology_absolute_stage_interval' in old:
+                low, high = old['topology_absolute_stage_interval']
+                inside = (math.fsum((form['stage_offset'], form['datum'], -low)) > 0
+                          and math.fsum((form['stage_offset'], form['datum'], -high)) < 0)
+            else:
+                inside = low < parent_height < high
+            if not inside:
                 raise ValueError('Volume probe crosses a source topology event; transition not implemented')
             pool = dict(old, volume=float(volume), form=form, parent_stage_offset=parent_height,
                         momentum=old['momentum']*(volume/old['volume']))

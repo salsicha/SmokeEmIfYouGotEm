@@ -6,6 +6,7 @@ from subcell_wet_pool_pressure import WetPoolPressureSystem, response
 from subcell_wet_pool_pressure_rate import WetPoolPressureRate
 from subcell_wet_pool_primal_energy import evaluate
 from subcell_wet_pool_transport import rates
+from triangle_cell_storage import TriangleCellStorage
 
 
 def audit_transport(pools):
@@ -32,6 +33,7 @@ def audit_transport(pools):
         reverse = pole['alpha']*float(pole['reverse_terms']['value']@vd)
         forward += work
         pole_directions.append(dict(beta=pole['beta'], alpha=pole['alpha'],
+            preconditioner=pole['preconditioner'],
             iterations=pole['iterations'], relative_residual=pole['relative_residual'],
             forward_volume_work=work, reverse_volume_work=reverse,
             scaled_forward_reverse_error=abs(work-reverse)/max(1., abs(work))))
@@ -93,4 +95,40 @@ def audit_transport(pools):
         inverse_factors=pole_directions, independent_energy_probes=probes,
         central_base=report_flux(central), dissipative_base=report_flux(dissipative),
         original_pole_roundtrip_solves=dual['poles'],
+        nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
+
+
+def audit_internal_regions(pools, parent=112):
+    """Controlled source subdivision, NOT activation or a hydraulic time step."""
+    indices = pools.parent_pools[parent]
+    if len(indices) != 1:
+        raise ValueError('Selected actual parent must have one original wet pool')
+    old = pools.pools[indices[0]]
+    cell = pools.patch.cells[parent]
+    if old['parent_stage_offset'] <= float(cell.relative_levels.max()):
+        raise ValueError('Selected source subdivision requires a fully wet parent')
+    states = [dict(pool) for i, pool in enumerate(pools.pools) if i != indices[0]]
+    velocity = old['momentum']/old['volume']
+    for source in sorted(set(cell.source_triangle_indices)):
+        mask = cell.source_triangle_indices == source
+        storage = TriangleCellStorage(cell.triangles[mask], cell.source_triangle_indices[mask])
+        # Same source water level and velocity; no added volume or terrain edit.
+        volume = storage.relative_volume_and_wet_area(
+            old['form']['stage_offset']+(old['form']['datum']-storage.datum))[0]
+        states.append(dict(parent=parent, source_triangle_indices=[int(source)],
+                           volume=volume, momentum=volume*velocity))
+    refined = pools.with_regions(states)
+    v_error = float(np.max(abs(refined.reassembled_volumes-pools.reassembled_volumes)))
+    p_error = float(np.max(abs(refined.reassembled_momenta-pools.reassembled_momenta)))
+    s = WetPoolPressureSystem(refined, float(LENGTHS[0]))
+    internal = [face for face in s.connections if face.get('internal_source_edge')]
+    control = audit_transport(refined)
+    return dict(probe='Original source-face subdivision at unchanged water level/velocity; NOT wetting activation',
+        parent=parent, original_pool_count=len(pools.pools), refined_pool_count=len(refined.pools),
+        maximum_parent_volume_error=v_error, maximum_parent_momentum_error=p_error,
+        internal_wet_pressure_edges=len(internal),
+        oblique_internal_wet_pressure_edges=sum(bool(np.all(abs(face['normal']) > 0)) for face in internal),
+        internal_region_controls_passed=(v_error < 1e-10 and p_error < 1e-10 and bool(internal)
+                                        and control['physical_energy_controls_passed']),
+        physical_energy_and_transport=control,
         nonlinear_or_wetting_or_time_or_gameplay_accepted=False)

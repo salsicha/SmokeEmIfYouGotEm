@@ -199,6 +199,23 @@ class WetPoolPressureSystem:
                     expected = section.moments(pool['parent_stage_offset'], pool['parent_datum'])[0]
                 self.maximum_wall_column_partition_error = max(self.maximum_wall_column_partition_error,
                     abs(total_area-expected)/max(1., expected))
+        # Newly activated source regions can meet inside a Cartesian cell.
+        # Retain their actual oblique normal; no forced common pool level.
+        for face in partition.internal_faces:
+            li, ri = face['left'], face['right']
+            if li is None or ri is None:
+                continue
+            lf, rf = partition.pools[li]['form'], partition.pools[ri]['form']
+            area = harmonic_area(face['segment'], lf['stage_offset'], rf['stage_offset'], lf['datum'], rf['datum'])
+            if area == 0:
+                continue
+            self.connections.append(dict(left=li, right=ri, axis=None, normal=face['normal'], area=area,
+                                         internal_source_edge=face['edge_vertex_ids']))
+            for owner in (li, ri):
+                for axis, normal in enumerate(face['normal']):
+                    weight = area*normal/(2*self.h[owner, 0])
+                    add(owner, 2*ri+axis, weight)
+                    add(owner, 2*li+axis, -weight)
         rows, columns, coefficients = [], [], []
         for row, mapping in enumerate(self.row_maps):
             for column, coefficient in mapping.items():
@@ -206,6 +223,29 @@ class WetPoolPressureSystem:
                     rows.append(row); columns.append(column); coefficients.append(coefficient)
         self.rows, self.columns = np.asarray(rows, int), np.asarray(columns, int)
         self.coefficients = np.asarray(coefficients)
+        # Source subdivision introduces tightly coupled same-parent unknowns.
+        # Precondition their exact principal blocks, without coalescing states
+        # or changing A. Ordinary disconnected-pool graphs retain the old 2x2
+        # path exactly. Only actual common-wet internal edges form a group.
+        adjacency = {}
+        for face in self.connections:
+            if face.get('internal_source_edge'):
+                li, ri = face['left'], face['right']
+                adjacency.setdefault(li, set()).add(ri)
+                adjacency.setdefault(ri, set()).add(li)
+        groups, remaining = [], set(adjacency)
+        while remaining:
+            pending, found = [min(remaining)], set()
+            while pending:
+                index = pending.pop()
+                if index in found:
+                    continue
+                found.add(index)
+                pending.extend(adjacency[index]-found)
+            remaining -= found
+            groups.append(sorted(found))
+        group_for = {pool: (g, i) for g, group in enumerate(groups) for i, pool in enumerate(group)}
+        group_matrices = [np.eye(2*len(group)) for group in groups]
         self.diagonal = np.ones((len(self.h), 2))
         self.off_diagonal = np.zeros(len(self.h))
         for index, pool in enumerate(partition.pools):
@@ -217,6 +257,12 @@ class WetPoolPressureSystem:
                 if column//2 == index:
                     jet_map[1+column%2, j] = 1/self.root[index]
             matrix = pool['form']['factor']@jet_map
+            for group in set(group_for[c//2][0] for c in columns if c//2 in group_for):
+                selected = [(j, 2*group_for[c//2][1]+c%2) for j, c in enumerate(columns)
+                            if c//2 in group_for and group_for[c//2][0] == group]
+                j, k = zip(*selected)
+                local = matrix[:, j]
+                group_matrices[group][np.ix_(k, k)] += self.length*(local.T@local)
             for j, column in enumerate(columns):
                 self.diagonal[column//2, column%2] += self.length*float(matrix[:, j]@matrix[:, j])
                 if column%2 == 0 and column+1 in columns:
@@ -224,6 +270,8 @@ class WetPoolPressureSystem:
                     self.off_diagonal[column//2] += self.length*float(matrix[:, j]@matrix[:, k])
         if not np.isfinite(self.coefficients).all() or not np.isfinite(self.diagonal).all():
             raise ValueError('Wet-pool operator exceeds represented range')
+        self.source_blocks = [(np.array(group, int), np.linalg.cholesky(matrix))
+                              for group, matrix in zip(groups, group_matrices)]
 
     def _vector(self, value):
         value = np.asarray(value, float)
@@ -256,8 +304,8 @@ class WetPoolPressureSystem:
 
     def precondition(self, residual, scheme='block'):
         r = self._vector(residual)[:, 0]
-        if scheme != 'block':
-            raise ValueError('Only exact local 2x2 block preconditioning is implemented')
+        if scheme not in ('block', 'source-block'):
+            raise ValueError('Only local 2x2 or connected source-region block preconditioning is implemented')
         a, b = self.diagonal.T
         ratio = self.off_diagonal/a
         schur = b-self.off_diagonal*ratio
@@ -265,10 +313,17 @@ class WetPoolPressureSystem:
             raise ValueError('Invalid wet-pool pressure block')
         second = (r[:, 1]-ratio*r[:, 0])/schur
         first = r[:, 0]/a-ratio*second
-        return np.stack((first, second), axis=-1)[:, None, :]
+        result = np.stack((first, second), axis=-1)
+        if scheme == 'source-block':
+            for indices, cholesky in self.source_blocks:
+                result[indices] = np.linalg.solve(cholesky.T,
+                    np.linalg.solve(cholesky, r[indices].ravel())).reshape(-1, 2)
+        return result[:, None, :]
 
     def solve(self, rhs):
-        return range_cg(self, self._vector(rhs), 40, preconditioner='block')
+        scheme = 'source-block' if self.source_blocks else 'block'
+        value, stats = range_cg(self, self._vector(rhs), 40, preconditioner=scheme)
+        return value, dict(stats, preconditioner=scheme)
 
 
 def response(partition, rhs):

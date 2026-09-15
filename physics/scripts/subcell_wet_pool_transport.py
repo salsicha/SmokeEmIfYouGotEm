@@ -9,7 +9,7 @@ wetting events and a time integrator. No gameplay acceptance is implied.
 import math
 import numpy as np
 
-from subcell_energy_flux import face_flux
+from subcell_energy_flux import face_flux, face_flux_normal
 from subcell_wet_pool_pressure import shared_subsegments
 from subcell_wet_pool_primal_energy import evaluate
 from triangle_face_section import TriangleFaceSection
@@ -102,7 +102,42 @@ def rates(partition, physical_momentum=None, gravity=9.81, dissipative=False, fu
             expected_work += info['expected_energy_work']*(.5 if exterior else 1.)
             fluxes.append(dict(left=None if parent_l < 0 else li, right=None if parent_r < 0 else ri,
                                axis=axis, mass_flux=float(flux[0]), momentum_flux=flux[1:].tolist()))
+    internal_active = 0
+    for face in partition.internal_faces:
+        li, ri = face['left'], face['right']
+        section = TriangleFaceSection([face['segment']], face['segment'][:, 0])
+        if li is None or ri is None:
+            owner = ri if li is None else li
+            form = pools[owner]['form']
+            area = section.moments(form['stage_offset'], form['datum'])[0]
+            if area > 0:
+                unresolved.append(dict(left_parent=face['parent'], right_parent=face['parent'], axis=None,
+                    normal=face['normal'].tolist(), edge_vertex_ids=face['edge_vertex_ids'],
+                    wet_pool=owner, dry_parent=face['parent'],
+                    wet_source_face=face['right_source'] if li is None else face['left_source'],
+                    dry_source_face=face['left_source'] if li is None else face['right_source'],
+                    segment=face['segment'].tolist(), wet_column_area=float(area),
+                    reason='Internal wet source edge faces unowned support; one-sided activation needed'))
+            continue
+        lf, rf = pools[li]['form'], pools[ri]['form']
+        al, i2l, _ = section.moments(lf['stage_offset'], lf['datum'])
+        ar, i2r, _ = section.moments(rf['stage_offset'], rf['datum'])
+        if al == 0 and ar == 0:
+            continue
+        internal_active += 1
+        wet_dry_owned_segments += int((al == 0) != (ar == 0))
+        flux, info = face_flux_normal(section, lf['stage_offset'], velocity[li], rf['stage_offset'], velocity[ri],
+                                      face['normal'], gravity, lf['datum'], rf['datum'], dissipative)
+        dv[li] -= flux[0]; dv[ri] += flux[0]
+        dp[li] -= flux[1:]; dp[ri] += flux[1:]
+        hydrostatic_closure[li] -= .5*gravity*i2l*face['normal']
+        hydrostatic_closure[ri] += .5*gravity*i2r*face['normal']
+        expected_work += info['expected_energy_work']
+        fluxes.append(dict(left=li, right=ri, axis=None, normal=face['normal'].tolist(),
+                           internal_source_edge=face['edge_vertex_ids'], mass_flux=float(flux[0]),
+                           momentum_flux=flux[1:].tolist()))
     common = dict(unresolved_activation_faces=unresolved,
+        internal_source_edges=len(partition.internal_faces), internal_active_source_edges=internal_active,
         owned_wet_dry_face_segments=wet_dry_owned_segments,
         complete_fixed_topology_base_rates=not unresolved,
         nonlinear_two_pole_or_wetting_or_time_or_gameplay_accepted=False)

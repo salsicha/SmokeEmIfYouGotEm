@@ -84,6 +84,22 @@ def face_flux(section, left_stage, left_velocity, right_stage, right_velocity, a
                         left_pressure=.5*gravity*i2l, right_pressure=.5*gravity*i2r)
 
 
+def face_flux_normal(section, left_stage, left_velocity, right_stage, right_velocity, normal,
+                     gravity=9.81, left_datum=0., right_datum=0., dissipative=False):
+    """Same flux on an oriented source edge, with BOTH momentum components."""
+    normal = np.asarray(normal, float)
+    if (normal.shape != (2,) or not np.isfinite(normal).all()
+            or abs(float(normal@normal)-1.) > 1e-12):
+        raise ValueError('Finite unit horizontal face normal required')
+    basis = np.array([normal, [-normal[1], normal[0]]])
+    left, right = np.asarray(left_velocity, float), np.asarray(right_velocity, float)
+    if left.shape != (2,) or right.shape != (2,):
+        raise ValueError('Two-component face velocities required')
+    flux, info = face_flux(section, left_stage, basis@left, right_stage, basis@right, 0,
+                           gravity, left_datum, right_datum, dissipative)
+    return np.r_[flux[0], basis.T@flux[1:]], info
+
+
 def rates(patch, volumes, momenta, gravity=9.81, dissipative=False):
     """Closed/periodic exact-geometry patch; no clipping, repair or time update."""
     v, p = np.asarray(volumes, float), np.asarray(momenta, float)
