@@ -209,3 +209,20 @@ def test_gross_donor_candidate_keeps_all_finite_state_and_energy_gates():
     assert result['audit']['momentum_error'] < 1e-10
     assert result['audit']['coupled_update']['momentum_uses_mass_matrix']
     assert not result['audit']['full_rational_model_or_time_history_or_gameplay_accepted']
+
+
+def test_failed_transfer_neighborhood_retains_incoming_and_outside_connections():
+    from subcell_coupled_front_update import transfer_neighborhood
+    v = np.array([1., 2., 3., 4., 5.])
+    p = np.column_stack((v, -v))
+    source = dict(partition=SimpleNamespace(pools=[dict(parent=i, source_triangle_indices=[10+i]) for i in range(5)]),
+                  new_region_rates=[])
+    edges = [(0, 1, .2), (0, 1, .3), (1, 2, .7), (3, 0, .8), (2, 4, .9)]
+    graph = transfer_neighborhood(source, [1], v, p, edges)
+    assert [r['index'] for r in graph['regions']] == [0, 1, 2]
+    assert graph['regions'][0]['outside_incoming_rate'] == .8
+    assert graph['regions'][2]['outside_outgoing_rate'] == .9
+    assert graph['transfers'] == [dict(owner=0, receiver=1, rate=.5), dict(owner=1, receiver=2, rate=.7)]
+    np.testing.assert_array_equal(graph['regions'][1]['velocity'], [1., -1.])
+    assert graph['regions'][1]['failed']
+    assert not graph['regions'][0]['failed']

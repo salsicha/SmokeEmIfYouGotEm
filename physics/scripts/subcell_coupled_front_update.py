@@ -27,6 +27,47 @@ class SourceUpdateFailure(ValueError):
         self.details = details
 
 
+def transfer_neighborhood(assembled, indices, volume, momentum, transfers):
+    """Original incident exchanges, never a declaration that a region is dry.
+
+    Include both ends of every transfer incident to a failed region, plus all
+    exchanges among those neighbors. Boundary totals expose omitted outside
+    connections, so a local drain cannot be mistaken for an isolated system.
+    """
+    failed = set(map(int, indices))
+    neighbors = set(failed)
+    for owner, other, _ in transfers:
+        if owner in failed or other in failed:
+            neighbors.update((owner, other))
+    pairs = {}
+    boundary_in, boundary_out = {}, {}
+    for owner, other, rate in transfers:
+        if owner in neighbors and other in neighbors:
+            pairs.setdefault((owner, other), []).append(float(rate))
+        elif other in neighbors:
+            boundary_in.setdefault(other, []).append(float(rate))
+        elif owner in neighbors:
+            boundary_out.setdefault(owner, []).append(float(rate))
+    old = assembled['partition'].pools
+    regions = []
+    for i in sorted(neighbors):
+        state = old[i] if i < len(old) else assembled['new_region_rates'][i-len(old)]
+        form = state.get('form', {})
+        region = dict(index=i, failed=i in failed, parent=state.get('parent'),
+            source_triangle_indices=state.get('source_triangle_indices'),
+            volume=float(volume[i]), momentum=momentum[i].tolist(),
+            velocity=(momentum[i]/volume[i]).tolist() if volume[i] > 0 else None,
+            stage_offset=form.get('stage_offset'), datum=form.get('datum'),
+            outside_incoming_rate=math.fsum(boundary_in.get(i, [])),
+            outside_outgoing_rate=math.fsum(boundary_out.get(i, [])))
+        if i < len(old) and 'explicit_force_parts' in assembled:
+            region['explicit_force_parts'] = {k: v[i].tolist() for k, v in assembled['explicit_force_parts'].items()}
+        regions.append(region)
+    return dict(regions=regions,
+        transfers=[dict(owner=a, receiver=b, rate=math.fsum(values)) for (a, b), values in sorted(pairs.items())],
+        scope='Original one-hop incident graph, not an isolated system or a drying model')
+
+
 def front_timed_remainder(assembled, old_volume, new_volume):
     """Average each dry-front force with its donor's integrated mass weight.
 
@@ -126,7 +167,8 @@ def coupled_update(assembled, duration, gross_donors=False):
                     outgoing_volume_rate=float(assembled['outgoing_volume_rate'][i]) if i < len(pools) and 'outgoing_volume_rate' in assembled else None,
                     gross_incoming_volume_rate=float(assembled['gross_incoming_volume_rate'][i]) if 'gross_incoming_volume_rate' in assembled else None,
                     gross_outgoing_volume_rate=float(assembled['gross_outgoing_volume_rate'][i]) if 'gross_outgoing_volume_rate' in assembled else None))
-            raise SourceUpdateFailure('Coupled source volume is not positive/finite; no repair', dict(regions=records))
+            raise SourceUpdateFailure('Coupled source volume is not positive/finite; no repair', dict(regions=records,
+                transfer_neighborhood=transfer_neighborhood(assembled, indices, volume, momentum, transfers)))
         # Column j contains new_volume[j] times the donor operator. Dividing
         # rows by new_volume is a solve normalization, not a depth floor.
         timed_residual = front_timed_remainder(assembled, volume, new_volume) if 'front_forces' in assembled else residual

@@ -18,6 +18,7 @@ from subcell_wet_connectivity import components
 from triangle_cell_storage import TriangleCellStorage
 from triangle_face_section import TriangleFaceSection
 from subcell_coupled_front_update import coupled_update
+from subcell_event_front_update import event_update
 from subcell_donor_face_flux import flux as donor_flux
 from subcell_source_frames import physical_datum, pool_form, face_section
 from subcell_source_face_section import SourceFaceSection, stage_difference
@@ -55,6 +56,7 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     dp, wall = bed.copy(), np.zeros(2)
     force_parts = {key: np.zeros_like(momentum) for key in ('wall', 'pressure', 'negative_exchange', 'dry_front')}
     receipts, front_records, transfers, exchanges, gross = {}, [], [], [], []
+    pressure_forces = []
     for face in faces(partition):
         li, ri = face['left'], face['right']
         for owner in (li, ri):
@@ -128,6 +130,8 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
             pressure = .5*(info['left_pressure']+info['right_pressure'])*n
             force_parts['pressure'][li] -= pressure
             force_parts['pressure'][ri] += pressure
+            pressure_forces.append((li, li, ri, .5*info['left_pressure']*n))
+            pressure_forces.append((ri, li, ri, .5*info['right_pressure']*n))
         if face['left_parent'] >= 0:
             dv[li] -= flux[0]; dp[li] -= flux[1:]
             outgoing[li] += max(0., flux[0]); incoming[li] += max(0., -flux[0])
@@ -169,6 +173,7 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
         gross_donor_transfers=gross,
         gross_incoming_volume_rate=gross_incoming, gross_outgoing_volume_rate=gross_outgoing,
         front_forces=front_forces,
+        pressure_forces=pressure_forces,
         velocity_exchanges=exchanges,
         source_face_below_storage_minimum=dict(count=len(below), largest_relative_discrepancies=below[:8]),
         explicit_force_parts=dict(bed=bed, **force_parts),
@@ -239,9 +244,9 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
     """
     if not np.isfinite([duration, gravity]).all() or duration <= 0 or gravity <= 0:
         raise ValueError('Positive finite duration and gravity required')
-    if scheme not in ('explicit', 'coupled-frozen', 'coupled-donor', 'coupled-gross-donor'):
+    if scheme not in ('explicit', 'coupled-frozen', 'coupled-donor', 'coupled-gross-donor', 'coupled-events'):
         raise ValueError('Unknown source-front update scheme')
-    face_scheme = 'donor' if scheme in ('coupled-donor', 'coupled-gross-donor') else 'paired'
+    face_scheme = 'donor' if scheme in ('coupled-donor', 'coupled-gross-donor', 'coupled-events') else 'paired'
     a = assembly(partition, gravity, face_scheme) if assembled is None else assembled
     if a['partition'] is not partition or a['gravity'] != gravity or a['face_scheme'] != face_scheme:
         raise ValueError('Matching source state and gravity required for cached assembly')
@@ -256,15 +261,18 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
     audit['source_face_below_storage_minimum'] = a['source_face_below_storage_minimum']
     audit['maximum_original_speed_mps'] = float(np.max(np.linalg.norm(momentum/volume[:, None], axis=1)))
     coupled = None
-    if scheme in ('coupled-frozen', 'coupled-donor', 'coupled-gross-donor'):
+    if scheme in ('coupled-frozen', 'coupled-donor', 'coupled-gross-donor', 'coupled-events'):
         try:
-            coupled = coupled_update(a, duration, gross_donors=scheme == 'coupled-gross-donor')
+            coupled = (event_update(a, duration) if scheme == 'coupled-events'
+                       else coupled_update(a, duration, gross_donors=scheme == 'coupled-gross-donor'))
         except ValueError as exc:
             return dict(state=None, audit=dict(audit, rejection=str(exc),
                 failure_details=getattr(exc, 'details', None)))
         new_volume, new_momentum = coupled['volume'][:len(volume)], coupled['momentum'][:len(volume)]
         audit['coupled_update'] = coupled['audit']
-    if (new_volume <= 0).any() or not np.isfinite(new_momentum).all() or not np.isfinite(new_volume).all():
+    zero_allowed = scheme == 'coupled-events'
+    invalid_v = new_volume < 0 if zero_allowed else new_volume <= 0
+    if invalid_v.any() or not np.isfinite(new_momentum).all() or not np.isfinite(new_volume).all():
         rejected = np.flatnonzero((new_volume <= 0) | ~np.isfinite(new_volume) | ~np.isfinite(new_momentum).all(axis=1))
         failures = [dict(index=int(i), parent=partition.pools[i]['parent'],
             source_triangle_indices=partition.pools[i]['source_triangle_indices'],
@@ -276,11 +284,22 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
         return dict(state=None, audit=dict(audit, rejection='Existing region drains or becomes unrepresentable; no clipping/deletion',
                                          rejected_regions=failures,
                                          minimum_candidate_volume=float(new_volume.min())))
-    states = [dict(old, volume=float(v), momentum=p) for old, v, p in zip(partition.pools, new_volume, new_momentum)]
+    states, dry_events = [], []
+    for index, (old, v, p) in enumerate(zip(partition.pools, new_volume, new_momentum)):
+        if v == 0:
+            if not zero_allowed or index not in coupled['audit']['zero_regions'] or np.any(p != 0):
+                raise ValueError('Only exact zero-volume, zero-momentum events release a region')
+            dry_events.append(dict(input_region=index, parent=old['parent'], output_regions=0,
+                released_zero_water_source_ids=old['source_triangle_indices'], exact_drain_event=True,
+                volume_error=0., momentum_error=[0., 0.]))
+        else:
+            states.append(dict(old, volume=float(v), momentum=p))
     for index, receipt in enumerate(a['new_region_rates'], len(volume)):
         v, p = duration*receipt['volume_rate'], duration*receipt['momentum_rate']
         if coupled is not None:
             v, p = coupled['volume'][index], coupled['momentum'][index]
+        if v == 0 and zero_allowed and index in coupled['audit']['zero_regions'] and np.all(p == 0):
+            continue
         if v <= 0 or not np.isfinite(v) or not np.isfinite(p).all():
             return dict(state=None, audit=dict(audit, rejection='Positive receiving flux has unrepresentable stored state'))
         states.append(dict(parent=receipt['parent'], source_triangle_indices=receipt['source_triangle_indices'], volume=v, momentum=p))
@@ -289,7 +308,7 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
         candidate = partition.with_regions(states)
     except ValueError as exc:
         return dict(state=None, audit=dict(audit, rejection=str(exc)))
-    audit['wet_support_transitions'] = transitions
+    audit['wet_support_transitions'] = dry_events+transitions
     mass_error = abs(float(candidate.reassembled_volumes.sum()-partition.reassembled_volumes.sum()))
     speeds = np.array([np.linalg.norm(p['momentum']/p['volume']) for p in candidate.pools])
     fastest = int(np.argmax(speeds))
@@ -297,7 +316,8 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
         fastest_region=dict(index=fastest, parent=candidate.pools[fastest]['parent'],
             source_triangle_indices=candidate.pools[fastest]['source_triangle_indices'],
             volume=candidate.pools[fastest]['volume']))
-    expected_momentum = duration*(a['bed_force'].sum(axis=0)+a['wall_force'])
+    expected_momentum = (coupled['boundary_impulse'] if scheme == 'coupled-events'
+                         else duration*(a['bed_force'].sum(axis=0)+a['wall_force']))
     actual_momentum = candidate.reassembled_momenta.sum(axis=(0, 1))-partition.reassembled_momenta.sum(axis=(0, 1))
     momentum_error = float(np.max(abs(actual_momentum-expected_momentum)))
     before_base, after_base = base_energy(partition, gravity), base_energy(candidate, gravity)

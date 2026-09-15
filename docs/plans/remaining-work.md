@@ -3,6 +3,22 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [coupled draining events and force timing](../reconstruction-review-2026-09-07/normal-river-coupled-drain-events.md).
+Actual incident ledger identifies a four-region inflowing cascade. New opt-in
+constant-capacity event transport preserves exact per-node water ledgers through
+exhaustion; implicit parcel mixing avoids division by zero. This changes the
+finite-step approximation, not a repair of the old proportional-drain solve.
+Independent controls exposed growing-owner force amplification; front and
+wet-side pressure now use the same integrated donor activity as transferred mass.
+First actual candidates had826/160m/s spikes despite global budgets; rejected.
+Final42-hash actual run completes20 steps/0.4s,387 exhaustion events,381 regions;
+maximum stored-state speed declines5.30->3.83m/s, mass/momentum errors <=1.48e-12,
+both finite energies decrease. No positive-volume deletion or velocity cap.
+260 focusedPASS/1 retained geometryFAIL; retained25PASS/12 energyFAIL;464 protected
+hashes unchanged. NEXT longer history, depth-dependent/full rational evolution,
+time/refinement/open-boundary and native/shared-surface integration. Not gameplay,
+visual or30FPS acceptance. Full later-river/crew/normalization/release scopeOPEN.
+
 Latest September 14: [return-flow cancellation correction](../reconstruction-review-2026-09-07/normal-river-return-donor-precision.md).
 Compensated Rusanov donor evaluation retains representable sub-ulp gravity-wave
 return flow; genuinely underflowing positive donors explicitly reject. Ten new
