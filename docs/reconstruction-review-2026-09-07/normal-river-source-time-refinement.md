@@ -49,7 +49,7 @@ selection is **25 PASS / 12 FAIL**, recorded in
 `tmp/subcell-time-refinement-retained-v1-20260914.xml`. No existing test
 or gate was relaxed. All 464 protected source, map, actor and prior runtime
 evidence hashes were checked unchanged. Actual-source equal-horizon refinement
-is required next; synthetic results cannot qualify the South Fork state.
+is reported below; synthetic results alone cannot qualify the South Fork state.
 
 ## Completed two-second actual-source history
 
@@ -79,10 +79,35 @@ The dispatched comparison uses the original state, not the two-second endpoint:
 python -B physics/scripts/audit_south_fork_subcell_kinetic_geometry.py --atlas tmp/south-fork-runtime-atlas-600s-v1-20260912/atlas/manifest.json --report tmp/south-fork-source-time-refinement-v1-20260914.json --exact-pool-geometry --pool-refinement-steps 20 --pool-refinement-levels 3 --pool-history-scheme coupled-events
 ```
 
-It requests 20/40/80 steps of 20/10/5ms over the same 0.4 seconds. Its result
-is pending, not accepted or inferred from the completed two-second run. Even
-successful completion does not set the time-accuracy or full-model flag: source
-differences and every intermediate velocity still require inspection.
+It requests 20/40/80 steps of 20/10/5ms over the same 0.4 seconds. The run has
+now completed with exit 0, all 43 hashes verified before the driver was extended
+for the later inverse-metric direction audit. Every intermediate state was
+inspected; no earlier extreme velocity spike recurred.
+
+| Steps | Peak stored-state speed (m/s) | Final speed (m/s) | Final regions | Regional exhaustion events |
+| --- | ---: | ---: | ---: | ---: |
+| 20 | 5.300636 | 3.830346 | 381 | 387 |
+| 40 | 5.466477 | 3.815358 | 384 | 485 |
+| 80 | 5.763380 | 3.807931 | 391 | 343 |
+
+All speed maxima occur at step 1. Every step passes its original mass, physical
+momentum/external impulse and both finite-energy checks. Maximum mass error is
+2.28e-13 and momentum error 2.73e-12; all base/full energy changes are negative.
+
+The source-water L1 difference decreases from 0.6814607797 to 0.3288034004 m3,
+a ratio of 2.07255. Source physical-momentum L1 difference ratios are 2.03179
+and 2.03594 for the two components. Parent-cell ratios are 2.04430 for water
+and 2.01934/2.03353 for momentum; source differences are not hidden by aggregation.
+Maximum source-storage inversion discrepancy is 1.78e-15 m3.
+
+This supports first-order temporal **self-consistency** over this fixed 0.4s
+interval, not an exact-error bound, full nonlinear rational-model convergence,
+open-boundary validity, breaking or gameplay. The timestep was not changed in
+any production solver. The report's time-accuracy/full-model flag remains false.
+
+Completed report SHA256:
+`2c262c7d829808c39ab26f7c0d68a81bacbe02c5e6ca2c22760cdf8fdc3c7459`.
+The owned process/session is terminal; it must not be restarted as a pending job.
 
 ## Delivery limitations
 

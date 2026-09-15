@@ -3,7 +3,8 @@
 September 14, 2026. This adds a pressure-wave component on the original
 source-supported pool geometry. It does **not** implement full nonlinear
 advection, moving wet support, breaking, a native solver or playable water.
-The separate actual moving-water timestep comparison remains required.
+The separate actual moving-water timestep comparison has since completed;
+see the [source-time refinement record](normal-river-source-time-refinement.md).
 
 ## Compatible transport and pressure force
 

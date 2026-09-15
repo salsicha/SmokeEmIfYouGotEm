@@ -3,6 +3,19 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [changing-volume physical/canonical metric](../reconstruction-review-2026-09-07/normal-river-changing-volume-primal-metric.md).
+Actual43-hash source-time comparison COMPLETED20/40/80 steps at equal0.4s:
+source-water difference ratio2.07255, momentum2.03179/2.03594; all140 budget checks
+pass and no extreme velocity spike. Temporal self-consistency only, NOT full model.
+New original-two-pole inverse-metric direction includes both volume factors and
+local stress/changing-divergence/terrain terms. Actual258-pool moving-state controls
+pass with45 matching hashes; prescribed directions are NOT evolved river forces.
+301 focused PASS/1 retained geometry FAIL;25 PASS/12 retained energy FAIL, no waivers.
+464 protected hashes unchanged. No owned numerical jobs remain running. NEXT full
+nonlinear auxiliary advection and terrain work coupled to changing wet support,
+then open/native/shared-surface integration. No visual/FPS gain; SouthFork/later
+rivers/crew/normalization/release scope remains OPEN.
+
 Latest September 14: [terrain-coupled linear gravity waves](../reconstruction-review-2026-09-07/normal-river-terrain-gravity-waves.md).
 Same wet-face mass/adjoint pressure pairing and original two poles now advance
 fixed-reference linear waves. Independently assembled face, exact-bed and wall
