@@ -3,7 +3,27 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [normal playable hydraulic-relief scheduling](../reconstruction-review-2026-09-07/normal-river-hydraulic-relief-scheduling.md).
+Latest September 15: [original source birth geometry and pressure limit](../reconstruction-review-2026-09-07/normal-river-source-birth-pressure.md).
+Exact one-sided storage, kinetic Gram and face-contact polynomials now retain
+flat/edge/point births without epsilon water. A derived original-two-pole POINT
+pressure limit matches independent finite positive-water energies. Actual bank:
+24 cubic-volume receiving regions, 14 delayed incoming contacts, 10 nonzero
+pressure height slopes; 360 exact integral checks and 545 matching source hashes.
+Strongest-source seven-height refinement reaches 0.478% slope error; earlier
+coarse 7.65% result FAILED the unchanged 1% gate and is retained. Tiny added
+volumes are geometry probes, NOT time steps or minimum depths. Provenance remains
+explicit: 16 exposed-rock, 4 mixed exposed/inferred, 4 inferred receiving regions.
+25 new tests PASS; full source suite 393 PASS / 1 retained geometry FAIL; fresh
+legacy energy regressions 15 PASS / 12 retained FAIL, no waivers. All owned jobs
+terminal. Both old channel/bank reports match after loader
+extraction; 464 protected hashes unchanged. Actual nonlinear bank time still
+rejects activation. NEXT conservative full-metric front work/forces, simultaneous
+births and edge/flat pressure cases, then time/open/native/shared-surface and
+motion/reference qualification. No new engine/FPS/visual gain; last ordinary
+12.257837 FPS / p95 98.2909 ms FAILS 30 FPS. Full later-river/crew/normalization/
+regression/release scope remains OPEN.
+
+Earlier September 15: [normal playable hydraulic-relief scheduling](../reconstruction-review-2026-09-07/normal-river-hydraulic-relief-scheduling.md).
 The existing four-sample relief pass is now parallel in normal play, with exact
 original arithmetic and unchanged fields/geometry/quality. Actual 64 alternating
 pairs / 3.24 million vertex comparisons are bit-identical: 2.004799 ms serial vs

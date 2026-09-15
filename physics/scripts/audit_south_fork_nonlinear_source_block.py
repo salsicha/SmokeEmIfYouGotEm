@@ -17,20 +17,14 @@ from subcell_nonlinear_metric_stage import stage
 from subcell_nonlinear_time_stage import history
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--source-report', required=True, type=Path)
-    parser.add_argument('--atlas', required=True, type=Path)
-    parser.add_argument('--report', required=True, type=Path)
-    parser.add_argument('--block-col', type=int, choices=range(13), default=6)
-    parser.add_argument('--block-row', type=int, choices=range(13), default=6)
-    parser.add_argument('--steps', type=int, default=0, help='Optional fixed-support nonlinear time steps')
-    parser.add_argument('--dt', type=float, default=1/120)
-    args = parser.parse_args()
-    if args.steps < 0 or not np.isfinite(args.dt) or args.dt <= 0:
-        raise ValueError('Nonnegative step count and positive finite duration required')
-    if args.report.exists():
-        raise FileExistsError(args.report)
+def load_original_block(args):
+    """Shared unchanged-source loader for block rate and birth-geometry audits.
+
+    args supplies source_report, atlas, block_col and block_row. Preserve the
+    original registration arithmetic and field/source hash checks verbatim.
+    """
+    if args.block_col not in range(13) or args.block_row not in range(13):
+        raise ValueError('Original 4x4 block must lie inside the 16x16 source patch')
     source, atlas = read(args.source_report), read(args.atlas)
     if (source['schema'] != 'raftsim.south_fork.subcell_pressure_kinetic_geometry.v1'
             or source['pool_geometry'] != 'exact-source-relative' or source['total_cells'] != 256
@@ -81,6 +75,24 @@ def main():
     patch = SubcellGeometryPatch(sampler, origin, (4, 4), relative_stages=True, exact_sources=True)
     momentum = fields['h'][..., None]*np.stack((fields['u'], fields['v']), axis=-1)
     pools = WetPoolPartition(patch, sampler, origin, fields['h'], momentum)
+    return pools, source, indices, origin, authority, sampler, hashes
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--source-report', required=True, type=Path)
+    parser.add_argument('--atlas', required=True, type=Path)
+    parser.add_argument('--report', required=True, type=Path)
+    parser.add_argument('--block-col', type=int, choices=range(13), default=6)
+    parser.add_argument('--block-row', type=int, choices=range(13), default=6)
+    parser.add_argument('--steps', type=int, default=0, help='Optional fixed-support nonlinear time steps')
+    parser.add_argument('--dt', type=float, default=1/120)
+    args = parser.parse_args()
+    if args.steps < 0 or not np.isfinite(args.dt) or args.dt <= 0:
+        raise ValueError('Nonnegative step count and positive finite duration required')
+    if args.report.exists():
+        raise FileExistsError(args.report)
+    pools, source, indices, origin, authority, sampler, hashes = load_original_block(args)
     result, failure = None, None
     try:
         value = stage(pools)
