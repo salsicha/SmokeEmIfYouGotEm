@@ -3,6 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [source-resolved timestep refinement](../reconstruction-review-2026-09-07/normal-river-source-time-refinement.md).
+New equal-horizon comparison reassembles changing regions on original source
+triangles, retaining both physical momentum components and separate parent-cell
+errors. No retry, source reassignment or normalization. Moving-water 4/8/16-step
+controls show first-order differences; successive partial-lake equilibrium passes
+for both geometry representations. These are not actual-river or full-model passes.
+Completed actual42-hash history passes100 fixed20ms candidates/2s, with2,173 regional
+exhaustions and425 final regions; all-state peak5.30m/s, final1.76m/s. Both energies
+decrease; mass/momentum errors <=1.48e-12. Closed nondispersive control, NOT gameplay.
+275 focused PASS/1 retained geometry FAIL; retained energy25 PASS/12 FAIL, unchanged.
+464 protected hashes unchanged. Actual43-hash20/40/80-step equal-horizon0.4s
+refinement is running, not accepted; followed by full rational/terrain-force, wet/open/native
+and playable/shared-surface qualification. No visual or30FPS gain. All later-river,
+crew, normalization and release work remains OPEN.
+
 Latest September 14: [coupled draining events and force timing](../reconstruction-review-2026-09-07/normal-river-coupled-drain-events.md).
 Actual incident ledger identifies a four-region inflowing cascade. New opt-in
 constant-capacity event transport preserves exact per-node water ledgers through

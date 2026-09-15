@@ -16,6 +16,7 @@ from subcell_wet_pool_pressure import WetPoolPressureSystem
 from audit_wet_pool_pressure_rate import audit_direction
 from audit_wet_pool_transport import audit_transport, audit_internal_regions
 from audit_source_activation import audit_activation, audit_history
+from audit_source_time_refinement import audit_refinement
 from audit_source_representation import audit_representation
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
@@ -33,11 +34,17 @@ def main():
     parser.add_argument('--pool-activation', action='store_true', help='Attempt finite source-front activation with strict state/energy rejection; implies --pool-pressure')
     parser.add_argument('--pool-history-steps', type=int, default=0, help='Successive 20ms source-front attempts, stopping on rejection; implies --pool-pressure')
     parser.add_argument('--pool-history-scheme', choices=('explicit', 'coupled-frozen', 'coupled-donor', 'coupled-gross-donor', 'coupled-events'), default='explicit')
+    parser.add_argument('--pool-refinement-steps', type=int, default=0, help='Compare this many 20ms steps with twice/four times as many steps over the SAME horizon; implies --pool-pressure')
+    parser.add_argument('--pool-refinement-levels', type=int, default=3, help='Number of successive timestep halvings including the original level (at least three)')
     args = parser.parse_args()
     if args.pool_history_steps < 0:
         parser.error('--pool-history-steps must be nonnegative')
+    if args.pool_refinement_steps < 0:
+        parser.error('--pool-refinement-steps must be nonnegative')
+    if args.pool_refinement_levels < 3:
+        parser.error('--pool-refinement-levels must be at least three')
     args.pool_transport = args.pool_transport or args.pool_internal
-    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation or args.pool_history_steps > 0 or args.exact_pool_geometry
+    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation or args.pool_history_steps > 0 or args.pool_refinement_steps > 0 or args.exact_pool_geometry
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -68,6 +75,7 @@ def main():
         'rational_primal_energy.py', 'subcell_energy_flux.py',
         'subcell_source_region_faces.py',
         'subcell_dry_front_flux.py', 'subcell_source_activation.py', 'audit_source_activation.py',
+        'audit_source_time_refinement.py',
         'subcell_exact_source_faces.py',
         'subcell_coupled_front_update.py',
         'subcell_transfer_events.py', 'subcell_event_front_update.py',
@@ -155,7 +163,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure, direction, transport, internal, activation, history = None, None, None, None, None, None
+    pressure, direction, transport, internal, activation, history, refinement = (None,)*7
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -217,6 +225,9 @@ def main():
             activation = audit_activation(pools)
         if args.pool_history_steps:
             history = audit_history(pools, args.pool_history_steps, scheme=args.pool_history_scheme)
+        if args.pool_refinement_steps:
+            refinement = audit_refinement(pools, .02*args.pool_refinement_steps,
+                args.pool_refinement_steps, args.pool_refinement_levels, scheme=args.pool_history_scheme)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
@@ -232,6 +243,7 @@ def main():
         fixed_internal_source_regions=internal,
         source_activation_candidates=activation,
         source_activation_history=history,
+        source_time_refinement=refinement,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -254,11 +266,17 @@ def main():
               'volume/velocity directions checked against independent perturbed states; optional physical-momentum '
               'energy/reverse volume gradient and nondispersive pool flux support. Optional finite source-front '
               'activation and successive candidate controls include support transitions and finite energy rejection. '
+              'Optional equal-horizon timestep comparisons retain original source-triangle water and physical momentum. '
               'The selected pool_geometry reports whether exact source storage/datums/traces/internal edges are used throughout. '
               'No full rational nonlinear transport/bed-force, wet-front/open/time-refinement, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False, default=report_scalar)
-    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions', 'source_activation_candidates')}
+    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions', 'source_activation_candidates', 'source_activation_history', 'source_time_refinement')}
+    if history is not None:
+        console['source_activation_history'] = {k: v for k, v in history.items() if k != 'attempts'}
+    if refinement is not None:
+        console['source_time_refinement'] = dict(refinement,
+            runs=[{k: v for k, v in run.items() if k != 'attempts'} for run in refinement['runs']])
     if representation is not None:
         console['exact_source_representation'] = {k: v for k, v in representation.items() if k != 'records'}
     if activation is not None:
@@ -277,6 +295,7 @@ def main():
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
                or (representation is not None and not representation['exact_representation_controls_passed'])
                or (history is not None and not history['all_requested_steps_passed'])
+               or (refinement is not None and not refinement['all_runs_completed'])
                or (activation is not None and not activation['twenty_ms_candidate_passed'])
                or (internal is not None and not internal['internal_region_controls_passed'])
                or (direction is not None and not direction['fixed_topology_direction_controls_passed'])
