@@ -1,0 +1,81 @@
+"""Exact source-space probes for a transient full-map rock/terrain union."""
+import argparse
+import json
+from pathlib import Path
+import numpy as np
+from south_fork_rock_union import SourceRockUnion,sha
+from south_fork_registered_mesh import RegisteredMeshSampler
+from build_troublemaker_dem_rock_cap import native_collision_probes
+
+ROOT=Path(__file__).resolve().parents[2]
+
+
+def engine_position(utm_xy,height_navd88,world_origin,datum):
+    return [float((utm_xy[0]-world_origin[0])*100),
+            float(-(utm_xy[1]-world_origin[1])*100),float((height_navd88-datum)*100)]
+
+
+def prepare(geometry_path,output):
+    geometry_path=Path(geometry_path).resolve();output=Path(output).resolve()
+    if output.exists() or not output.is_relative_to(ROOT/'tmp'):
+        raise ValueError('Fresh project tmp probe file required')
+    geometry=json.loads(geometry_path.read_text());cap_path=ROOT/geometry['rock_cap_manifest']
+    cap=json.loads(cap_path.read_text());origin=np.asarray(cap['origin_utm_and_vertical_datum_m'])
+    union=SourceRockUnion(cap_path,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2])
+    if union.identity!=geometry['terrain_union']:raise ValueError('Changed compound source identity')
+    world_origin=np.asarray(geometry['world_origin_utm_m']);datum=geometry['vertical_datum_navd88_m']
+    if datum!=origin[2]:raise ValueError('Geometry/engine datum mismatch')
+    baseline=[];combined=[]
+    for record in geometry['regions']:
+        if not record.get('terrain_union'):continue
+        paths=[ROOT/record['geometry_file'],ROOT/record['original_core_geometry_file']]
+        if [sha(p) for p in paths]!=[record['geometry_sha256'],record['original_core_geometry_sha256']]:
+            raise ValueError('Changed hydraulic reference core')
+        with np.load(paths[0],allow_pickle=False) as a,np.load(paths[1],allow_pickle=False) as b:
+            x0,y0=np.asarray(record['center_utm_m'])-40
+            for row in range(80):
+                for col in range(80):
+                    xy=[x0+col,y0+row]
+                    before=engine_position(xy,b['bed_navd88_m'][row,col],world_origin,datum)
+                    after=engine_position(xy,a['bed_navd88_m'][row,col],world_origin,datum)
+                    baseline.append(dict(kind='retained_hydraulic_cell',world_position_cm=before))
+                    combined.append(dict(kind='union_hydraulic_cell',world_position_cm=after,
+                        expected_candidate=after[2]>before[2]))
+    with np.load(ROOT/cap['cap_path'],allow_pickle=False) as data:
+        native=native_collision_probes(data['vertices_m'],data['triangles'],data['solid_vertices_m'],
+            data['solid_triangles'],data['solid_face_kind'],cap['cap_sha256'])
+        translation=np.array(engine_position(origin[:2],origin[2],world_origin,datum))
+        for probe in native['probes']:
+            if probe['kind'] not in ('original_vertex_interior_cone','roof_triangle_centroid'):continue
+            combined.append(dict(probe,world_position_cm=(np.asarray(probe['world_position_cm'])+translation).tolist(),
+                expected_candidate=True))
+        with np.load(ROOT/cap['source_mesh_path'],allow_pickle=False) as parent:
+            sampler=RegisteredMeshSampler({key:parent[key] for key in parent.files})
+        for ia,ib in data['boundary_edges']:
+            a,b=data['vertices_m'][[ia,ib]];mid=(a+b)*.5
+            parent_z=float(sampler.sample(mid[0],mid[1]))
+            if parent_z>=mid[2]:raise ValueError('No exposed candidate flank at source edge')
+            # Orient away from the incident roof triangle, independent of
+            # the boundary-edge array's undirected index ordering.
+            faces=data['triangles'];incident=faces[np.any(faces==ia,axis=1)&np.any(faces==ib,axis=1)]
+            if len(incident)!=1:raise ValueError('Ambiguous source perimeter')
+            interior=data['vertices_m'][incident[0]].mean(axis=0)
+            delta=b-a;n=np.array([delta[1],-delta[0],0.]);n/=np.linalg.norm(n)
+            if np.dot(n[:2],interior[:2]-mid[:2])>0:n=-n
+            mid[2]=(mid[2]+parent_z)*.5
+            combined.append(dict(kind='exposed_union_flank_midpoint',
+                world_position_cm=(mid*[100,-100,100]+translation).tolist(),
+                outward_normal=(n*[1,-1,1]).tolist(),ray_half_length_cm=1.,expected_candidate=True))
+    result=dict(schema='raftsim.full_map_rock_union_probes.v1',geometry_manifest=geometry_path.relative_to(ROOT).as_posix(),
+        geometry_manifest_sha256=sha(geometry_path),cap_manifest_sha256=sha(cap_path),
+        source_cap_sha256=cap['cap_sha256'],parent_mesh_sha256=cap['source_mesh_sha256'],
+        translation_cm=translation.tolist(),world_origin_utm_m=world_origin.tolist(),datum_m=datum,
+        baseline=baseline,combined=combined,prior_vertical_tangent_gate_closed=False)
+    output.write_text(json.dumps(result,indent=2)+'\n')
+    return {k:v for k,v in result.items() if k not in ('baseline','combined')}|dict(baseline_count=len(baseline),combined_count=len(combined))
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('geometry',type=Path)
+    parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
+    print(json.dumps(prepare(args.geometry,args.output),indent=2),flush=True)

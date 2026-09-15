@@ -3,7 +3,26 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [source-backed DEM rock and shared hydraulic union](../reconstruction-review-2026-09-07/normal-river-dem-rock-union.md).
+Latest September 15: [actual-map collision and compound runtime packets](../reconstruction-review-2026-09-07/normal-river-rock-union-runtime.md).
+Combined saved South Fork terrain plus transient source rock: all 27,245 probes
+PASS at unchanged 1 mm gate. Exactly 118 hydraulic cells switch to the candidate.
+Eight explicit compound source packets / 791 strictly verified reused packets;
+41,987,038 packet/atlas bed comparisons exact. Diagnostic one-second native
+loader: all 12,800 field samples match, with original solver/presentation wet
+thresholds distinguished rather than changed. All 406,823 captured-water probes
+retain runtime coverage with >=10 m raft margin. 97 focused tests PASS; all 464
+protected hashes match, no asset/map/water-state save. Prior two vertical tangent
+rays remain separately unresolved; no dynamic/visual/playable acceptance.
+SAME 600 s cook LIVE session45187/PID32276. Step1000 / 50 s state and bank audits
+PASS; all 86,720 artificial bank-face cells dry, but discharge is NOT settled.
+Next full checkpoint step2000 / 100 s; re-poll actual handle/process, no restart
+on timeout. NEXT settling, visible source mapping/materials, real motion and
+joint mesh/state/coverage staging, raft contact/traversal and crest/froth work.
+No FPS change: last 24.225877 / p95 47.78 ms FAILS 30 FPS. Other scenes, crew,
+normalization, 13 physical + four presentation regressions and release OPEN.
+Troublemaker stays a rapid within South Fork, NOT its own scenario/menu entry.
+
+Earlier September 15: [source-backed DEM rock and shared hydraulic union](../reconstruction-review-2026-09-07/normal-river-dem-rock-union.md).
 549 original-return roof vertices and explicit inferred sides now have one
 source-verified terrain/hydraulic union, without altering the captured DEM.
 All 5,350,400 original cells checked; 118 samples change in two cores. Actual

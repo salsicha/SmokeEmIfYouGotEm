@@ -112,3 +112,81 @@ def test_fresh_input_gate_rejects_old_depth_and_changed_boundary():
         validate_fresh_package(scenario,scenario,bed,dict(state,depth=h*.8),geometry,20)
     with pytest.raises(ValueError,match='physical setup'):
         validate_fresh_package(dict(scenario,boundaries=[]),scenario,bed,state,geometry,20)
+
+
+def test_runtime_packet_union_preserves_observations_and_outside_samples(source):
+    from south_fork_rock_union_packets import packet_fields
+    fields=dict(bed_navd88_m=np.full((321,321),22.),captured_surface_navd88_m=np.full((321,321),23.),
+        captured_water_mask=np.ones((321,321),np.uint8),terrain_owner=np.full((321,321),2,np.uint8))
+    values,changed=packet_fields(fields,[100,200],load(source))
+    assert changed.sum()==3
+    for key in ('captured_surface_navd88_m','captured_water_mask'):
+        assert np.array_equal(values[key],fields[key])
+    assert np.array_equal(values['bed_navd88_m'][~changed],fields['bed_navd88_m'][~changed])
+    assert np.all(values['terrain_owner'][changed]==5)
+    with pytest.raises(ValueError,match='321'):
+        packet_fields({k:v[:80,:80] for k,v in fields.items()},[100,200],load(source))
+
+
+def test_full_map_probe_frame_applies_origin_datum_and_y_reflection_once():
+    from prepare_south_fork_union_collision import engine_position
+    assert engine_position([101,198],23,[100,200],20)==[100,200,300]
+
+
+@pytest.fixture
+def packet_export(source):
+    from south_fork_rock_union_packets import packet_fields,changed_record
+    root,cap_path,_,_=source;union=load(source)
+    directory=root/'original';directory.mkdir();derived=root/'derived';derived.mkdir()
+    fields=dict(bed_navd88_m=np.full((321,321),22.),captured_surface_navd88_m=np.full((321,321),23.),
+        captured_water_mask=np.ones((321,321),np.uint8),terrain_owner=np.full((321,321),2,np.uint8))
+    original_path=directory/'region_0000.npz';np.savez_compressed(original_path,**fields)
+    record=dict(name='region_0000',geometry_file='original/region_0000.npz',geometry_sha256=sha(original_path),
+        center_utm_m=[100,200],grid_origin_local_m=[-160,-160],shape=[321,321],owner_cell_counts={'2':321*321})
+    original=dict(regions=[record],world_origin_utm_m=[100,200],vertical_datum_navd88_m=20,grid_spacing_m=1.)
+    original_manifest=directory/'manifest.json';original_manifest.write_text(json.dumps(original))
+    geometry=dict(regions=[dict(source_geometry_file=record['geometry_file'])],source_manifest_sha256=sha(original_manifest),
+        rock_cap_manifest=cap_path.name,terrain_union=union.identity)
+    geometry_path=root/'geometry.json';geometry_path.write_text(json.dumps(geometry))
+    values,changed=packet_fields(fields,[100,200],union);path=derived/'region_0000.npz'
+    np.savez_compressed(path,**values)
+    result=dict(original,schema='raftsim.cartesian_source_packet_union.v1',
+        regions=[changed_record(record,path,values,changed,union,root)],terrain_union=union.identity,
+        hydraulic_geometry_manifest_sha256=sha(geometry_path),retained_source_manifest_sha256=sha(original_manifest))
+    manifest=derived/'manifest.json';manifest.write_text(json.dumps(result))
+    return root,geometry_path,manifest,path,result
+
+
+def test_compound_packet_verification_reconstructs_all_changed_fields(packet_export):
+    from south_fork_rock_union_packets import verify
+    root,geometry,manifest,_,expected=packet_export
+    assert verify(manifest,geometry,root)==expected
+
+
+@pytest.mark.parametrize('field',['bed_navd88_m','captured_surface_navd88_m','captured_water_mask'])
+def test_rehashed_compound_packet_cannot_change_source_or_roof(packet_export,field):
+    from south_fork_rock_union_packets import verify
+    root,geometry,manifest,path,result=packet_export
+    with np.load(path) as data:values={k:data[k] for k in data.files}
+    values[field]=values[field].copy();values[field][10,10]=0
+    np.savez_compressed(path,**values);result['regions'][0]['geometry_sha256']=sha(path)
+    manifest.write_text(json.dumps(result))
+    with pytest.raises(ValueError,match='differs from source-exact'):verify(manifest,geometry,root)
+
+
+@pytest.mark.parametrize('kind',['frame','cook','coverage'])
+def test_compound_packets_reject_relabelled_frame_cook_or_coverage(packet_export,kind):
+    from south_fork_rock_union_packets import verify
+    root,geometry,manifest,_,result=packet_export
+    if kind=='frame':result['world_origin_utm_m'][0]+=1
+    elif kind=='cook':result['hydraulic_geometry_manifest_sha256']='different'
+    else:result['regions']=[]
+    manifest.write_text(json.dumps(result))
+    with pytest.raises(ValueError):verify(manifest,geometry,root)
+
+
+@pytest.mark.parametrize('depth,solver,presentation',[(0,False,False),(1.e-6,False,False),
+    (2.e-6,True,False),(1.e-4,True,False),(np.nextafter(1.e-4,np.inf),True,True)])
+def test_native_sample_visibility_and_solver_wetness_are_distinct_contracts(depth,solver,presentation):
+    from prepare_south_fork_union_runtime import wet_flags
+    assert wet_flags(depth)==dict(solver_wet=solver,native_sample_wet=presentation)

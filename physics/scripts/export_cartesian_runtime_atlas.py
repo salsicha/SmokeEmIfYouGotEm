@@ -66,6 +66,8 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--bank-audit", type=Path, required=True)
     parser.add_argument("--centers", type=Path, required=True)
+    parser.add_argument("--source-union-manifest",type=Path,
+                        help="Explicit source-verified compound packets matching this cook's terrain union")
     parser.add_argument("--reuse-source-packets", type=Path,
                         help="Reference verified unchanged bed/mask arrays from a prior export; do not copy them")
     args = parser.parse_args()
@@ -85,6 +87,15 @@ def main():
     centers = json.loads(args.centers.read_text())
     assert centers["source_manifest_sha256"] == sha(source_path)
     assert [r["window_id"] for r in centers["windows"]] == [r["name"] for r in source["regions"]]
+    if geometry.get('terrain_union'):
+        if not args.source_union_manifest:raise ValueError('Compound terrain requires explicit matching source packets')
+        from south_fork_rock_union_packets import verify
+        source=verify(args.source_union_manifest,geometry_path)
+        # The old center evidence is retained, not relabelled. The verifier
+        # proves identical packet grids, captured masks and declared coverage.
+        assert source['retained_source_manifest_sha256']==centers['source_manifest_sha256']
+    elif args.source_union_manifest:
+        raise ValueError('A retained-terrain cook cannot use different union packets')
     frame = cook/f"frame_{args.step:06d}"
     complete = json.loads((frame/"complete.json").read_text())
     audit = json.loads(args.bank_audit.read_text())
@@ -97,7 +108,8 @@ def main():
     assert state["h"].min() >= 0 and state["h"].max() <= 10 and np.hypot(state["u"], state["v"]).max() <= 20
     # Preserve >=1GiB after output, in addition to the remaining native frames.
     reuse_root = args.reuse_source_packets.resolve() if args.reuse_source_packets else None
-    expected_bytes = (0 if reuse_root else len(source["regions"])*321*321*9) + count*80*80*8 + 12*1024**2
+    new_packets=sum(not reuse_root or 'terrain_union' in r for r in source['regions'])
+    expected_bytes = new_packets*321*321*9 + count*80*80*8 + 12*1024**2
     assert shutil.disk_usage(output.parent).free > expected_bytes + 1024**3
     output.mkdir()
     atlas_dir = output/"atlas"
@@ -125,6 +137,9 @@ def main():
                  source_frame=str(frame), source_time_seconds=complete["time_seconds"],
                  input_manifest_sha256=sha(flow_path), bank_audit_sha256=sha(args.bank_audit),
                  settled_hydraulics=False, normal_map_integrated=False)
+    if geometry.get('terrain_union'):
+        atlas['terrain_union']=geometry['terrain_union']
+        atlas['source_union_manifest_sha256']=sha(args.source_union_manifest)
     write_json(atlas_dir/"manifest.json", atlas)
     atlas_hash = sha(atlas_dir/"manifest.json")
     origins = np.asarray([t["origin_m"] for t in tiles])
@@ -164,7 +179,7 @@ def main():
         directory = output/record["name"]
         directory.mkdir()
         source_arrays = dict(bed=packet_bed, captured_water_mask=captured)
-        if reuse_root:
+        if reuse_root and 'terrain_union' not in record:
             dependencies = verified_packet_dependencies(reuse_root, record, origin,
                 flow["vertical_datum_navd88_m"], source_arrays)
             reused_packet_bytes += sum(path.stat().st_size for path in dependencies.values())
@@ -184,6 +199,10 @@ def main():
                         bands=[dict(band_id="median_runnable", arrays=arrays,
                                     shared_cartesian_state=dict(manifest="../atlas/manifest.json", sha256=atlas_hash))],
                         source_geometry_sha256=record["geometry_sha256"], settled_hydraulics=False, normal_map_integrated=False)
+        if 'terrain_union' in record:
+            manifest['terrain_union']=record['terrain_union']
+            manifest['retained_source_geometry_sha256']=record['retained_geometry_sha256']
+            manifest['source_union_manifest_sha256']=sha(args.source_union_manifest)
         write_json(directory/"manifest.json", manifest)
         streaming["windows"].append(dict(window_id=record["name"],
             cooked_fields_manifest=(directory/"manifest.json").relative_to(ROOT).as_posix(),
@@ -217,6 +236,9 @@ def main():
                   reused_packet_count=len(reused_dependencies), reused_packet_bytes=reused_packet_bytes,
                   external_source_packet_dependencies=reused_dependencies,
                   settled_hydraulics=False, normal_map_integrated=False)
+    if args.source_union_manifest:
+        report['source_union_manifest_sha256']=sha(args.source_union_manifest)
+        report['new_union_packet_count']=sum('terrain_union' in r for r in source['regions'])
     write_json(output/"export_audit.json", report)
     print(json.dumps({k: v for k, v in report.items() if k != "external_source_packet_dependencies"}, indent=2))
 

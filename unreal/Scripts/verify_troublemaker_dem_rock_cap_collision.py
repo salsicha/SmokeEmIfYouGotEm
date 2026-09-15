@@ -12,10 +12,9 @@ REPORT=ROOT/'unreal/Saved/RaftSimValidation/dem-rock-cap-collision-v3-20260915.j
 ASSET='/Game/RaftSim/Environment/GeneratedLocalReview/DemRockCap20260915/SM_OriginalReturnRockSolid'
 
 
-def main():
-    assert not REPORT.exists()
-    export=json.loads((EXPORT/'manifest.json').read_text());probes=json.loads(PROBES.read_text())
-    assert export['source_cap_sha256']==probes['source_cap_sha256']
+def import_candidate_solid():
+    """Import the source-exact candidate without saving or replacing assets."""
+    export=json.loads((EXPORT/'manifest.json').read_text())
     assert hashlib.sha256((ROOT/export['fbx']).read_bytes()).hexdigest()==export['fbx_sha256']
     assert not unreal.EditorAssetLibrary.does_asset_exist(ASSET)
     options=unreal.FbxImportUI()
@@ -45,6 +44,14 @@ def main():
     editor.set_nanite_settings(mesh,settings)
     unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
     assert mesh.get_num_triangles(0)==export['triangle_count']
+    return mesh,export
+
+
+def main():
+    assert not REPORT.exists()
+    probes=json.loads(PROBES.read_text())
+    mesh,export=import_candidate_solid()
+    assert export['source_cap_sha256']==probes['source_cap_sha256']
     actors=unreal.get_editor_subsystem(unreal.EditorActorSubsystem)
     ignore=actors.get_all_level_actors()
     ground=actors.spawn_actor_from_class(unreal.StaticMeshActor,unreal.Vector(0,0,0))
