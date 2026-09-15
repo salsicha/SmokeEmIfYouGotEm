@@ -13,6 +13,7 @@ from subcell_wet_connectivity import components
 from subcell_wet_pool_partition import WetPoolPartition
 from subcell_wet_pool_pressure import WetPoolPressureSystem
 from audit_wet_pool_pressure_rate import audit_direction
+from audit_wet_pool_transport import audit_transport
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
@@ -22,8 +23,9 @@ def main():
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--pool-pressure', action='store_true', help='Also audit both original poles on separated fixed wet pools')
     parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
+    parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
     args = parser.parse_args()
-    args.pool_pressure = args.pool_pressure or args.pool_direction
+    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -50,6 +52,8 @@ def main():
         'triangle_face_section.py', 'south_fork_registered_mesh.py', 'audit_south_fork_subcell_energy_flux.py',
         'subcell_wet_connectivity.py', 'subcell_wet_pool_partition.py', 'subcell_wet_pool_pressure.py',
         'subcell_wet_pool_pressure_rate.py', 'audit_wet_pool_pressure_rate.py', 'subcell_mechanical_energy.py',
+        'subcell_wet_pool_primal_energy.py', 'subcell_wet_pool_transport.py', 'audit_wet_pool_transport.py',
+        'rational_primal_energy.py', 'subcell_energy_flux.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -126,7 +130,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure, direction = None, None
+    pressure, direction, transport = None, None, None
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -180,6 +184,8 @@ def main():
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
         if args.pool_direction:
             direction = audit_direction(pools)
+        if args.pool_transport:
+            transport = audit_transport(pools)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
@@ -188,6 +194,7 @@ def main():
         accepted=False, positive_cell_geometry_controls_passed=True, total_cells=256,
         fixed_pool_pressure=pressure,
         fixed_pool_direction=direction,
+        fixed_pool_transport=transport,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -207,13 +214,28 @@ def main():
         scope='Original wet source-triangle geometry and original cell volumes. Positive local kinetic '
               'factor and fixed-terrain volume derivative, plus optional separated-pool static two-pole '
               'pressure on shared wet faces and reflecting walls, and optional analytic controlled '
-              'volume/velocity directions checked against independent perturbed states. No nonlinear bed-force work, topology '
+              'volume/velocity directions checked against independent perturbed states; optional physical-momentum '
+              'energy/reverse volume gradient and nondispersive pool flux support. No full nonlinear bed-force work, topology '
               'evolution, wetting/open/time, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
-    print(json.dumps({k: v for k, v in result.items() if k not in ('records', 'source_sha256')}, indent=2))
+    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport')}
+    if transport is not None:
+        pending = transport['central_base']['unresolved_activation_faces']
+        console['fixed_pool_transport'] = dict(
+            physical_energy_controls_passed=transport['physical_energy_controls_passed'],
+            complete_fixed_topology_base_rates=transport['central_base']['complete_fixed_topology_base_rates'],
+            unresolved_face_entries=len(pending),
+            unresolved_parent_cells=sorted(set(face['dry_parent'] for face in pending)),
+            nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
+    print(json.dumps(console, indent=2))
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
-               or (direction is not None and not direction['fixed_topology_direction_controls_passed']))
+               or (direction is not None and not direction['fixed_topology_direction_controls_passed'])
+               or (transport is not None and (not transport['physical_energy_controls_passed']
+                   or not transport['central_base']['complete_fixed_topology_base_rates']
+                   or not transport['dissipative_base']['complete_fixed_topology_base_rates']
+                   or not transport['central_base']['base_balance_controls_passed']
+                   or not transport['dissipative_base']['base_balance_controls_passed'])))
 
 
 if __name__ == '__main__':

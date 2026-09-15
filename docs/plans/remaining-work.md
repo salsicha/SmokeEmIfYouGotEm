@@ -3,6 +3,19 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [physical energy and wet-pool transport support](../reconstruction-review-2026-09-07/normal-river-wet-pool-transport-support.md).
+Original-pole inverse energy and all-pool reverse volume work now use exact
+source geometry; actual258-pool energy controlsPASS. Pool-aware base mass/
+momentum/exact bed-force closes on supported fixtures and includes singly wet
+owned faces. Actual transport audit FAILS explicitly:66 raw unowned wet trace
+entries across18 cells,17 already wet elsewhere; not only dry cell158. Partial
+rates remain unavailable, never reflected/dropped/reassigned to another pool.
+122 subcell/triangle testsPASS; retained34PASS/12FAIL, no waivers.
+NEXT conservative source-supported activation with explicit one-sided topology/
+energy accounting, full rational auxiliary advection/bed-force, then finite-time/
+open/refinement/native/shared-surface qualification.464 protected hashes unchanged.
+No native/state/visual/FPS gain; full SouthFork/later-river/crew/releaseOPEN.
+
 Latest September 14: [changing-volume pressure on exact wet pools](../reconstruction-review-2026-09-07/normal-river-wet-pool-pressure-direction.md).
 Analytic shared-face, exact local geometry, divergence/transpose and both mass
 normalization derivatives now feed the original two-pole dual energy/momentum
