@@ -12,6 +12,10 @@ The velocity graph acts on NEW momentum divided by NEW volume, preserving
 constant velocity when volumes change. It removes the frozen net-mass-only
 scheme's explicitly stiff diffusion. Pressure and negative exchange remainders
 still need qualification; positive volume is not local velocity stability.
+
+The optional gross-donor form instead freezes both original Rusanov donors and
+uses the SAME matrix on conserved mass and momentum. Their counterflow is
+already present in that matrix; it must not be added as a second velocity graph.
 """
 import math
 import numpy as np
@@ -50,7 +54,7 @@ def front_timed_remainder(assembled, old_volume, new_volume):
     return result
 
 
-def coupled_update(assembled, duration):
+def coupled_update(assembled, duration, gross_donors=False):
     if not np.isfinite(duration) or duration <= 0:
         raise ValueError('Positive finite duration required')
     pools, new = assembled['partition'].pools, assembled['new_region_rates']
@@ -59,7 +63,10 @@ def coupled_update(assembled, duration):
     volume[:len(pools)] = [p['volume'] for p in pools]
     momentum[:len(pools)] = [p['momentum'] for p in pools]
     generator = np.zeros((count, count))
-    for owner, other, flux in assembled['transfers']:
+    transfers = assembled.get('gross_donor_transfers') if gross_donors else assembled['transfers']
+    if transfers is None:
+        raise ValueError('Explicit original gross donor records required')
+    for owner, other, flux in transfers:
         if (owner == other or not 0 <= owner < len(pools) or not 0 <= other < count
                 or not np.isfinite(flux) or flux <= 0 or volume[owner] <= 0):
             raise ValueError('Positive original donor and conservative source transfer required')
@@ -70,7 +77,7 @@ def coupled_update(assembled, duration):
     momentum_rate = np.concatenate((assembled['momentum_rate'],
         np.array([r['momentum_rate'] for r in new]).reshape(-1, 2)))
     exchange = np.zeros((count, count))
-    for left, right, conductance in assembled.get('velocity_exchanges', []):
+    for left, right, conductance in ([] if gross_donors else assembled.get('velocity_exchanges', [])):
         if (left == right or not 0 <= left < len(pools) or not 0 <= right < len(pools)
                 or not np.isfinite(conductance) or conductance <= 0):
             raise ValueError('Positive conservative velocity exchange required')
@@ -116,25 +123,35 @@ def coupled_update(assembled, duration):
                     source_triangle_indices=state.get('source_triangle_indices'),
                     old_volume=float(volume[i]), new_volume=float(new_volume[i]) if np.isfinite(new_volume[i]) else None,
                     incoming_volume_rate=float(assembled['incoming_volume_rate'][i]) if i < len(pools) and 'incoming_volume_rate' in assembled else None,
-                    outgoing_volume_rate=float(assembled['outgoing_volume_rate'][i]) if i < len(pools) and 'outgoing_volume_rate' in assembled else None))
+                    outgoing_volume_rate=float(assembled['outgoing_volume_rate'][i]) if i < len(pools) and 'outgoing_volume_rate' in assembled else None,
+                    gross_incoming_volume_rate=float(assembled['gross_incoming_volume_rate'][i]) if 'gross_incoming_volume_rate' in assembled else None,
+                    gross_outgoing_volume_rate=float(assembled['gross_outgoing_volume_rate'][i]) if 'gross_outgoing_volume_rate' in assembled else None))
             raise SourceUpdateFailure('Coupled source volume is not positive/finite; no repair', dict(regions=records))
         # Column j contains new_volume[j] times the donor operator. Dividing
         # rows by new_volume is a solve normalization, not a depth floor.
-        velocity_matrix = matrix*new_volume[None, :]-duration*exchange
         timed_residual = front_timed_remainder(assembled, volume, new_volume) if 'front_forces' in assembled else residual
         rhs = momentum+duration*timed_residual
-        normalized = velocity_matrix/new_volume[:, None]
-        normalized_rhs = rhs/new_volume[:, None]
-        if not np.isfinite(normalized).all() or not np.isfinite(normalized_rhs).all():
-            raise ValueError('Coupled momentum normalization exceeds represented range')
-        new_velocity = np.linalg.solve(normalized, normalized_rhs)
-        value = np.column_stack((new_volume, new_volume[:, None]*new_velocity))
+        if gross_donors:
+            new_momentum = np.linalg.solve(matrix, rhs)
+            new_velocity = new_momentum/new_volume[:, None]
+            momentum_residual = matrix@new_momentum-rhs
+            normalized = None
+        else:
+            velocity_matrix = matrix*new_volume[None, :]-duration*exchange
+            normalized = velocity_matrix/new_volume[:, None]
+            normalized_rhs = rhs/new_volume[:, None]
+            if not np.isfinite(normalized).all() or not np.isfinite(normalized_rhs).all():
+                raise ValueError('Coupled momentum normalization exceeds represented range')
+            new_velocity = np.linalg.solve(normalized, normalized_rhs)
+            new_momentum = new_volume[:, None]*new_velocity
+            momentum_residual = velocity_matrix@new_velocity-rhs
+        value = np.column_stack((new_volume, new_momentum))
     except np.linalg.LinAlgError as exc:
         raise ValueError('Coupled source transfer solve failed') from exc
-    if not np.isfinite(value).all() or np.any(value[:, 0] <= 0):
+    if not np.isfinite(value).all() or not np.isfinite(new_velocity).all() or np.any(value[:, 0] <= 0):
         raise ValueError('Coupled source state is not positive/finite; no repair')
     solve_error = max(float(np.max(abs(matrix@new_volume-volume))),
-                      float(np.max(abs(velocity_matrix@new_velocity-rhs))))
+                      float(np.max(abs(momentum_residual))))
     if solve_error >= 1e-10:
         raise ValueError(f'Coupled source true residual failed: {solve_error:.17g}')
     fastest = int(np.argmax(np.linalg.norm(new_velocity, axis=1)))
@@ -142,16 +159,19 @@ def coupled_update(assembled, duration):
         old_velocity=velocity[fastest].tolist(), new_velocity=new_velocity[fastest].tolist(),
         explicit_remainder=residual[fastest].tolist(), momentum_rhs=rhs[fastest].tolist(),
         time_averaged_remainder=timed_residual[fastest].tolist(),
-        normalized_diagonal=float(normalized[fastest, fastest]),
-        normalized_row_sum=float(normalized[fastest].sum()))
+        normalized_diagonal=float(normalized[fastest, fastest]) if normalized is not None else None,
+        normalized_row_sum=float(normalized[fastest].sum()) if normalized is not None else None,
+        mass_matrix_diagonal=float(matrix[fastest, fastest]))
     if fastest < len(pools) and 'explicit_force_parts' in assembled:
         local['explicit_force_parts'] = {k: v[fastest].tolist() for k, v in assembled['explicit_force_parts'].items()}
     return dict(volume=value[:, 0], momentum=value[:, 1:],
         audit=dict(original_mass_rate_error=rate_error, solve_residual=solve_error,
             original_momentum_rate_error=momentum_rate_error, residual_assembly=residual_assembly,
             front_force_timing='matched-to-donor-mass' if 'front_forces' in assembled else 'supplied-explicit',
-            matrix_size=count, transfer_count=len(assembled['transfers']),
-            implicit_velocity_exchanges=len(assembled.get('velocity_exchanges', [])),
+            matrix_size=count, transfer_count=len(transfers),
+            momentum_uses_mass_matrix=gross_donors,
+            mass_transport='gross-donor' if gross_donors else 'net-transfer',
+            implicit_velocity_exchanges=0 if gross_donors else len(assembled.get('velocity_exchanges', [])),
             fastest_region_budget=local,
             minimum_volume=float(value[:, 0].min()),
             pressure_and_bed_work_remain_explicit=True,

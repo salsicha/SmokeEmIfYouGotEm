@@ -3,6 +3,14 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [frozen gross-donor comparison](../reconstruction-review-2026-09-07/normal-river-gross-donor-comparison.md).
+Opt-in bidirectional donor transport uses one matrix for volume and momentum;
+independent frozen-ODE control passes, but actual history still rejects step18
+after17 candidates/0.34s. Four zero volumes, three with inflow; no state repair.
+225 focusedPASS/1 retained geometryFAIL; retained25PASS/12 energyFAIL, no waivers.
+All40 report source hashes match and464 protected hashes remain unchanged.
+Native/gameplay integration, convincing water and30FPS remain incomplete.
+
 Latest September 14: [exact geometry through wet-pool state](../reconstruction-review-2026-09-07/normal-river-exact-pool-integration.md).
 Opt-in exact source geometry now persists through separated pools, source subsets,
 datums/traces/internal edges, both pressure poles, probes and activation states.

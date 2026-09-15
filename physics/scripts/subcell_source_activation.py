@@ -54,7 +54,7 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     bed = np.array([p['storage'].hydrostatic_bed_force(p['form']['stage_offset'], gravity, True) for p in pools])
     dp, wall = bed.copy(), np.zeros(2)
     force_parts = {key: np.zeros_like(momentum) for key in ('wall', 'pressure', 'negative_exchange', 'dry_front')}
-    receipts, front_records, transfers, exchanges = {}, [], [], []
+    receipts, front_records, transfers, exchanges, gross = {}, [], [], [], []
     for face in faces(partition):
         li, ri = face['left'], face['right']
         for owner in (li, ri):
@@ -88,6 +88,7 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
             outgoing[owner] += flux[0]
             force_parts['dry_front'][owner] -= np.asarray(info['nonadvective_momentum_flux'])
             transfers.append((owner, key, float(flux[0])))
+            gross.append((owner, key, float(flux[0])))
             front_records.append(dict(wet_pool=owner, dry_parent=parent, dry_source_face=source,
                 internal=face['internal'], normal=outward.tolist(), segment=face['segment'].tolist(),
                 volume_flux=float(flux[0]), momentum_flux=flux[1:].tolist(), **info))
@@ -112,6 +113,10 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
             ar = section.moments(rf['stage_offset'], rf['datum'])[0]
             if face_scheme == 'donor':
                 d = info['velocity_exchange']
+                if info['left_donor'] > 0:
+                    gross.append((li, ri, info['left_donor']))
+                if info['right_donor'] > 0:
+                    gross.append((ri, li, info['right_donor']))
             else:
                 central = float(.5*(ul+ur)@n)*info['pressure_secant_area']
                 d = .5*(info['dissipation_speed']*ar-central) if flux[0] >= 0 else .5*(info['dissipation_speed']*al+central)
@@ -140,6 +145,12 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     receiving_indices = {key: len(pools)+i for i, key in enumerate(receipts)}
     transfers = [(owner, receiving_indices[other] if isinstance(other, tuple) else other, rate)
                  for owner, other, rate in transfers]
+    gross = [(owner, receiving_indices[other] if isinstance(other, tuple) else other, rate)
+             for owner, other, rate in gross] if face_scheme == 'donor' else None
+    gross_incoming, gross_outgoing = np.zeros(len(pools)+len(new)), np.zeros(len(pools)+len(new))
+    for owner, other, rate in gross or []:
+        gross_outgoing[owner] += rate
+        gross_incoming[other] += rate
     front_forces = [(f['wet_pool'], receiving_indices[(f['dry_parent'], f['dry_source_face'])],
                      np.asarray(f['nonadvective_momentum_flux'])) for f in front_records]
     total_mass = float(dv.sum()+sum(r['volume_rate'] for r in new))
@@ -155,6 +166,8 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     return dict(partition=partition, gravity=gravity, face_scheme=face_scheme, volume_rate=dv, momentum_rate=dp, new_region_rates=new, fronts=front_records,
         incoming_volume_rate=incoming, outgoing_volume_rate=outgoing,
         transfers=transfers,
+        gross_donor_transfers=gross,
+        gross_incoming_volume_rate=gross_incoming, gross_outgoing_volume_rate=gross_outgoing,
         front_forces=front_forces,
         velocity_exchanges=exchanges,
         source_face_below_storage_minimum=dict(count=len(below), largest_relative_discrepancies=below[:8]),
@@ -226,9 +239,9 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
     """
     if not np.isfinite([duration, gravity]).all() or duration <= 0 or gravity <= 0:
         raise ValueError('Positive finite duration and gravity required')
-    if scheme not in ('explicit', 'coupled-frozen', 'coupled-donor'):
+    if scheme not in ('explicit', 'coupled-frozen', 'coupled-donor', 'coupled-gross-donor'):
         raise ValueError('Unknown source-front update scheme')
-    face_scheme = 'donor' if scheme == 'coupled-donor' else 'paired'
+    face_scheme = 'donor' if scheme in ('coupled-donor', 'coupled-gross-donor') else 'paired'
     a = assembly(partition, gravity, face_scheme) if assembled is None else assembled
     if a['partition'] is not partition or a['gravity'] != gravity or a['face_scheme'] != face_scheme:
         raise ValueError('Matching source state and gravity required for cached assembly')
@@ -243,9 +256,9 @@ def attempt(partition, duration, gravity=9.81, assembled=None, scheme='explicit'
     audit['source_face_below_storage_minimum'] = a['source_face_below_storage_minimum']
     audit['maximum_original_speed_mps'] = float(np.max(np.linalg.norm(momentum/volume[:, None], axis=1)))
     coupled = None
-    if scheme in ('coupled-frozen', 'coupled-donor'):
+    if scheme in ('coupled-frozen', 'coupled-donor', 'coupled-gross-donor'):
         try:
-            coupled = coupled_update(a, duration)
+            coupled = coupled_update(a, duration, gross_donors=scheme == 'coupled-gross-donor')
         except ValueError as exc:
             return dict(state=None, audit=dict(audit, rejection=str(exc),
                 failure_details=getattr(exc, 'details', None)))
