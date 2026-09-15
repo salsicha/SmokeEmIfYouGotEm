@@ -18,6 +18,11 @@
 
 #include <memory>
 
+#if RAFTSIM_HAS_LIVE_SOLVER
+/** Same portable SHA-256 implementation used for cooked field dependencies. */
+RAFTSIMWATER_API FString RaftSimCookedArtifactSha256(const TArray<uint8>& Data);
+#endif
+
 namespace raftsim
 {
 class ReducedShallowWaterSolver;

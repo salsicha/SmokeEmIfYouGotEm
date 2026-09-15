@@ -10,12 +10,32 @@
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimTrainingDirector.h"
 #include "RaftSimVerticalSliceFrontend.h"
+#include "RaftSimJointReconstructionPreview.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "HAL/PlatformMisc.h"
 
 ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
 {
     DefaultPawnClass = ARaftSimGuidePawn::StaticClass();
     PlayerControllerClass = ARaftSimGuidePlayerController::StaticClass();
     InitializeScenarioDefinitions();
+}
+
+void ARaftSimVerticalSliceGameMode::StartPlay()
+{
+    FString Manifest;
+    if (FParse::Value(FCommandLine::Get(),TEXT("RaftSimJointReconstructionPreview="),Manifest))
+    {
+        FString Error;
+        if (!RaftSimJointReconstructionPreview::Apply(GetWorld(),Manifest,
+            FParse::Param(FCommandLine::Get(),TEXT("RaftSimEphemeralProfile")),Error))
+        {
+            UE_LOG(LogTemp,Error,TEXT("Joint reconstruction preview refused before BeginPlay: %s"),*Error);
+            FPlatformMisc::RequestExitWithStatus(false,1);return;
+        }
+    }
+    Super::StartPlay();
 }
 
 void ARaftSimVerticalSliceGameMode::BeginPlay()

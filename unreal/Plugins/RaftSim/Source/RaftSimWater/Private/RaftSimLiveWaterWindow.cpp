@@ -663,6 +663,11 @@ bool TryReadRuntimeBoundary(
 
 } // namespace
 
+FString RaftSimCookedArtifactSha256(const TArray<uint8>& Data)
+{
+    return Sha256HexOf(Data);
+}
+
 struct FRaftSimLiveWaterWindow::FPresentationState
 {
     TSharedPtr<const FSharedCartesianAtlas, ESPMode::ThreadSafe> Atlas;
