@@ -3,20 +3,36 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 14 local: [source pressure conditioning and analytic curvature](../reconstruction-review-2026-09-07/normal-river-source-pressure-conditioning.md).
+Latest September 15: [full nonlinear source time candidate](../reconstruction-review-2026-09-07/normal-river-source-nonlinear-time.md).
+Full original-source rates now advance with bounded Gauss collocation and
+independent finite face/bed/wall impulses; no projection or timestep repair.
+Original 16-pool channel state completes 12 fixed 120 Hz steps / 0.1 s with
+maximum cumulative full-energy error 4.786e-11 and local momentum error 3.262e-15.
+Reflecting test boundaries and inferred authority 2/5 remain explicit. The old
+nondispersive both-energy control is FALSE (+11.012 energy); not broad acceptance.
+Actual mixed-source rock bank still rejects unresolved wet-front activation.
+Exact geometry identity avoids 13,568 redundant face constructions; original
+force/provenance and a full one-step state are unchanged (binary64 field A/B).
+This is Python reference work, NOT engine/FPS improvement. Final focused suite:
+368 PASS/1 retained geometry FAIL; legacy energy failures remain unwaived.
+464 protected hashes unchanged; all numerical jobs completed. NEXT temporal
+convergence/longer histories and wet/front/open/native/shared-surface coupling.
+South Fork visual/30 FPS, later rivers, crew, normalization and release remain OPEN.
+
+Earlier September 14 local: [source pressure conditioning and analytic curvature](../reconstruction-review-2026-09-07/normal-river-source-pressure-conditioning.md).
 The default 64-grid full rate FAILED original local momentum/energy gates.
 An explicit fully-wet periodic SPD reference preconditioner retains the original
 source matrix, 40 CG and all gates; default river solves are unchanged. The first
 64-grid profile now passes and separates full curvature from the omitted control
 (32-to-64 refinement 3.951 versus 2.092). Independent analytic curvature controls
-also discriminate the force. The SECOND profile is still running: session 98022,
-PID 31956, report tmp/source-nonlinear-model-fine-spectral-v1-20260914.json.
-Keep hashed implementation sources frozen and read that same terminal result.
+also discriminate the force. The second profile is now COMPLETED: full/omitted
+refinement 3.943/1.873, original budgets pass. The complete report has 531 hashes
+matched at completion; session 98022/PID 31956 is terminal, exit 0.
 351 focused PASS/1 retained geometry FAIL plus an additional audit-regression
 pass; paired stress/constant velocity 15 PASS/12 retained energy FAIL, no waivers.
 464 protected hashes unchanged. Fresh engine CareerCatalog and ProgressionMigration
 PASS confirm no standalone Troublemaker scenario and correct old-save migration.
-NEXT finish this audit, then nonlinear
+NEXT nonlinear
 finite-time wet/front/open/native coupling. No visual/FPS or full scene acceptance;
 later rivers, crew, normalization and release remain OPEN.
 

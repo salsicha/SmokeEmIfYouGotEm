@@ -1,8 +1,8 @@
 """Unchanged South Fork block state with explicit reflecting test boundaries.
 
 Unlike the earlier artificial-lake experiment, original volumes and physical
-velocities are retained. This is still a closed instantaneous rate control,
-not the natural open river, an evolved trajectory or gameplay acceptance.
+velocities are retained as the initial state. Optional fixed-support time steps
+are closed controls, not the natural open river or gameplay acceptance.
 """
 import argparse
 import json
@@ -14,6 +14,7 @@ from south_fork_registered_mesh import RegisteredMeshSampler
 from subcell_geometry_patch import SubcellGeometryPatch
 from subcell_wet_pool_partition import WetPoolPartition
 from subcell_nonlinear_metric_stage import stage
+from subcell_nonlinear_time_stage import history
 
 
 def main():
@@ -23,7 +24,11 @@ def main():
     parser.add_argument('--report', required=True, type=Path)
     parser.add_argument('--block-col', type=int, choices=range(13), default=6)
     parser.add_argument('--block-row', type=int, choices=range(13), default=6)
+    parser.add_argument('--steps', type=int, default=0, help='Optional fixed-support nonlinear time steps')
+    parser.add_argument('--dt', type=float, default=1/120)
     args = parser.parse_args()
+    if args.steps < 0 or not np.isfinite(args.dt) or args.dt <= 0:
+        raise ValueError('Nonnegative step count and positive finite duration required')
     if args.report.exists():
         raise FileExistsError(args.report)
     source, atlas = read(args.source_report), read(args.atlas)
@@ -86,6 +91,9 @@ def main():
                       total_bed_force=value['bed_force'].sum(axis=0), total_wall_force=value['wall_force'].sum(axis=0))
     except ValueError as exc:
         failure = str(exc)
+    time_control = history(pools, args.steps, args.dt,
+        on_step=lambda row: print(json.dumps(dict(time_step=row), allow_nan=False), flush=True)
+        ) if args.steps and result is not None else None
     provenance = [dict(original_cell=indices[p['parent']], source_triangle_indices=p['source_triangle_indices'],
                        volume_m3=p['volume'], physical_momentum=p['momentum'],
                        vertex_authority_codes=sorted(set(map(int, authority[sampler.faces[p['source_triangle_indices']]].ravel()))))
@@ -97,7 +105,8 @@ def main():
         original_snapshot_time_seconds=source['source_time_seconds'], pools=len(pools.pools),
         volume_partition_error=pools.maximum_volume_error, momentum_partition_error=pools.maximum_momentum_error,
         closed_snapshot_rate_controls_passed=result is not None, result=result, failure=failure,
-        boundary_note='Original volumes and velocities, but reflecting test-block boundaries; NOT the natural open river or an evolved state.',
+        time_control=time_control,
+        boundary_note='Original initial volumes and velocities, but reflecting test-block boundaries. Optional time steps are closed candidates, NOT the natural open river.',
         authority_note='1 captured DEM; 3 exposed-rock returns; 2 submerged prior, 4 interpolation, 5 inferred flank. Mixed triangles are not wholly measured.',
         source_provenance=provenance, source_sha256=hashes,
         actual_open_flow_or_finite_time_or_native_or_gameplay_accepted=False)
@@ -105,7 +114,8 @@ def main():
     with args.report.open('x') as stream:
         json.dump(report, stream, indent=2, allow_nan=False, default=converter)
     print(json.dumps({k: v for k, v in report.items() if k not in ('source_provenance', 'source_sha256')}, default=converter), flush=True)
-    return 0 if report['closed_snapshot_rate_controls_passed'] else 1
+    return 0 if (report['closed_snapshot_rate_controls_passed']
+                 and (not args.steps or time_control['closed_fixed_support_time_controls_passed'])) else 1
 
 
 if __name__ == '__main__':

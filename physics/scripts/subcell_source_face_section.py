@@ -79,6 +79,10 @@ class SourceFaceSection(TriangleFaceSection):
         low, high = F(low), F(high)
         if low >= high or low < self.source_segments[0][0][0] or high > self.source_segments[-1][1][0]:
             raise ValueError('Positive represented source subinterval required')
+        if (low, high) == (self.source_segments[0][0][0], self.source_segments[-1][1][0]):
+            # Geometry is already canonical and its arrays are read-only.
+            # No water/depth result is retained or reused here.
+            return self
         pieces = []
         for a, b in self.source_segments:
             first, last = max(low, a[0]), min(high, b[0])
@@ -99,6 +103,8 @@ class SourceFaceSection(TriangleFaceSection):
         first, last = self.source_segments[0][0][0], self.source_segments[-1][1][0]
         if (first, last) != (other.source_segments[0][0][0], other.source_segments[-1][1][0]):
             raise ValueError('Original shared face bounds differ')
+        if self.source_segments == other.source_segments:
+            return  # Exact represented geometry equality, not float tolerance.
         knots = sorted(set(v[0] for s in self.source_segments+other.source_segments for v in s))
         def height(section, t):
             a, b = next(s for s in section.source_segments if s[0][0] <= t <= s[1][0])

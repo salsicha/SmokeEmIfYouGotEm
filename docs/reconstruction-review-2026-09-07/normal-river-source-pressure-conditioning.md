@@ -65,7 +65,7 @@ The seven focused tests then passed in
 verifies that the first rejected stage is recorded, stops the audit and returns
 exit 1; all eight focused tests pass in `tmp/source-spectral-unit-v3-20260914.xml`.
 
-## Finer comparison: first profile completed, second still running
+## Completed finer comparison
 
 The first 64x64 profile, seed 2843, completed with the selected reference
 preconditioner and unchanged physical equations and gates:
@@ -80,11 +80,19 @@ preconditioner and unchanged physical equations and gates:
 - 12,288 curvature edges, including 4,096 same-region edges; no unresolved
   fronts in this fully wet periodic control.
 
-This is a completed individual measurement, **not a completed audit**. Seed
-2845 is still running in the same process, session 98022 / Python PID 31956.
-Its output is `tmp/source-nonlinear-model-fine-spectral-v1-20260914.json`, written
-only when the audit terminates and verifies its frozen implementation hashes.
-Do not restart it or edit those sources before reading its terminal result.
+Seed 2845 also completed: full-model RMS 0.0003322252736, omitted-curvature RMS
+0.0005955715967. Its 32-to-64 refinement ratios are respectively 3.94258 and
+1.87306. Energy rate is -1.5987211554602254e-14, local momentum-ledger error
+1.0755285551056204e-15, maximum solve residual 2.096051511576476e-15, and physical
+round-trip error 1.1102230246251565e-16. Both profiles therefore discriminate the
+omitted-curvature control at this resolution. This is not a general proof for
+arbitrary terrain, topology changes or finite trajectories.
+
+The same audit terminated with exit 0; session 98022 / PID 31956 is finished.
+Report: `tmp/source-nonlinear-model-fine-spectral-v1-20260914.json`, SHA256
+`cc9f9988c6a3e5405c0361e4bab358a343e7562bd51fa9a22e69eeb3dd009520`.
+All 531 recorded implementation hashes matched at completion, before subsequent
+time-audit additions. The new time-integration file was not part of this audit.
 
 The focused source/triangle regression suite completed with 351 passes and the
 one retained geometry failure in `tmp/source-spectral-suite-v1-20260914.xml`.
@@ -93,8 +101,8 @@ stress/constant-velocity suite retains 15 passes and 12 energy failures in
 `tmp/source-spectral-retained-v1-20260914.xml`. No gate is waived.
 
 All 464 protected scene/source/capture/actor hashes were checked and remain
-unchanged. No engine capture or FPS improvement is claimed. Next are completion
-of this same audit, nonlinear finite-time wet/front coupling and actual open-flow
+unchanged. No engine capture or FPS improvement is claimed. Next are
+nonlinear finite-time wet/front coupling and actual open-flow
 integration. Native/shared-surface, convincing water, 30 FPS, and the ordered
 later-river/crew/normalization/release scope remain open.
 

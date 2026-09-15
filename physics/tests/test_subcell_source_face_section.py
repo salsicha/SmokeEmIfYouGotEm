@@ -73,6 +73,32 @@ def test_shared_source_face_verifier_uses_exact_heights_not_float_tolerance():
         section.verify_shared(wrong)
 
 
+def test_full_extent_restriction_reuses_read_only_geometry_not_water_values():
+    datum, width = F(220)+F(1, 3), F(1, 10**40)
+    section = SourceFaceSection([[(F(1), datum), (F(1)+width, datum+F(1, 10**30))]])
+    restricted = section.restricted(F(1), F(1)+width)
+    assert restricted is section
+    assert not any(value.flags.writeable for value in (restricted.lengths, restricted.segments, restricted.levels))
+    fresh = SourceFaceSection(section.source_segments)
+    for stage in (0., 1e-40, 1e-31, 1e-25, .3):
+        np.testing.assert_array_equal(restricted.depth_intervals(stage, datum), fresh.depth_intervals(stage, datum))
+        np.testing.assert_array_equal(restricted.moments(stage, datum), fresh.moments(stage, datum))
+    assert restricted.moments(1e-25, datum)[0] > 0
+
+
+def test_proper_subinterval_is_still_cut_exactly_and_invalid_extents_reject():
+    datum = F(220)+F(1, 3)
+    section = SourceFaceSection([[(F(0), datum), (F(1), datum+1)]])
+    low, high = F(1, 3), F(2, 3)
+    restricted = section.restricted(low, high)
+    assert restricted is not section
+    assert restricted.source_segments == (((low, datum+low), (high, datum+high)),)
+    restricted.verify_shared(SourceFaceSection(restricted.source_segments))
+    for a, b in ((0, 0), (-1, 1), (0, 2)):
+        with pytest.raises(ValueError, match='Positive represented source subinterval'):
+            section.restricted(a, b)
+
+
 def test_exact_relative_storage_connectivity_uses_the_actual_source_datum():
     source = sampler(lambda x, y: 220.+x+2*y)
     center, spacing = [.1, -.1], [1.2, .8]
