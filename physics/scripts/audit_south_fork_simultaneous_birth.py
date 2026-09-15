@@ -11,6 +11,8 @@ from subcell_source_activation import assembly
 from subcell_source_birth_geometry import SourceBirthGeometry
 from subcell_source_birth_pressure import SourceBirthPressure
 from subcell_source_birth_work import point_work
+from subcell_point_birth_metric_force import point_metric_force
+from subcell_primal_metric_rate import metric_time_force
 from subcell_simultaneous_birth_pressure import birth_faces, BirthLimitSystem
 from subcell_source_frames import face_section
 from subcell_wet_pool_primal_energy import evaluate
@@ -37,6 +39,32 @@ def operator_probe(partition, candidate, limit):
         expected = predicted.q_action(basis[old:])
         errors.append(float(np.max(abs(actual-expected)))/max(1., float(np.max(abs(expected)))))
     return dict(columns_checked=2*count, column_scaled_errors=errors, maximum_column_scaled_error=max(errors))
+
+
+def metric_force_probe(partition, candidate, parameter, expected):
+    """Independent original positive-water derivative, not a force update."""
+    old = len(partition.pools)
+    volume = np.array([p['volume'] for p in candidate.pools])
+    velocity = np.array([p['momentum'] for p in candidate.pools])[:, None]/volume[:, None, None]
+    vd = np.zeros((len(volume), 1))
+    vd[old:, 0] = 3*volume[old:]/float(parameter)
+    rate = metric_time_force(candidate, velocity, vd)
+    actual = (rate['force'][:old, 0], rate['force'][old:, 0]/float(parameter))
+    targets = (expected['old_force_limit'], expected['newborn_force_over_path_limit'])
+    errors = []
+    for value, target in zip(actual, targets):
+        scale = float(np.max(abs(target)))
+        if scale == 0:
+            raise ValueError('Actual bank metric force probe requires nonzero vector coefficients')
+        errors.append(float(np.max(abs(value-target)))/scale)
+    return dict(old_force=actual[0], newborn_force_over_path=actual[1],
+                old_force_max_norm_relative_error=errors[0],
+                newborn_force_max_norm_relative_error=errors[1],
+                metric_work=rate['metric_energy_work'],
+                energy_coordinate_error=rate['direction']['energy_coordinate_error'],
+                canonical_metric_local_error=rate['direction']['canonical_metric_local_error'],
+                maximum_pressure_residual=max(max(p['solve_residual'], p['direction_solve']['relative_residual'])
+                                               for p in rate['direction']['poles']))
 
 
 def analyze(partition, receipts, assembled=None):
@@ -70,6 +98,7 @@ def analyze(partition, receipts, assembled=None):
                          ('nondispersive_receipt_direction', np.cbrt(np.asarray(rates)/np.array([float(b.volume_coefficient) for b in births])))]:
         requests = [(p, s, k) for (p, s), k in zip(keys, scales)]
         work = point_work(context, requests)
+        metric_force = point_metric_force(context, requests)
         limit = work['limit']
         bounds = [b.next_height/F(float(k)) for b, k in zip(births, scales) if b.next_height is not None]
         lookup = {key: i for i, key in enumerate(keys)}
@@ -110,6 +139,7 @@ def analyze(partition, receipts, assembled=None):
                 error=abs(observed-expected), maximum_pressure_residual=max(p['relative_residual'] for p in metric['poles']),
                 positive_energy_contraction_error=metric['positive_energy_contraction_error'],
                 original_newborn_operator=operator_probe(partition, candidate, limit),
+                original_metric_force=metric_force_probe(partition, candidate, parameter, metric_force),
                 volume_gradient_path_squared=scaled_gradient, canonical_velocity_path=scaled_canonical,
                 volume_gradient_max_norm_relative_error=work_errors[0],
                 canonical_velocity_max_norm_relative_error=work_errors[1],
@@ -133,11 +163,19 @@ def analyze(partition, receipts, assembled=None):
         if bounded_direction is not None and name == 'nondispersive_receipt_direction':
             work_passed &= (rows[-1]['bounded_original_direction_work_error'] < .01*abs(expected/3)
                 and rows[-1]['bounded_original_direction_work_error'] < rows[0]['bounded_original_direction_work_error']/3)
+        force_passed = all(rows[-1]['original_metric_force'][key] < .01
+            and rows[-1]['original_metric_force'][key] < rows[0]['original_metric_force'][key]/3
+            for key in ('old_force_max_norm_relative_error', 'newborn_force_max_norm_relative_error'))
+        force_passed &= all(r['original_metric_force']['maximum_pressure_residual'] <= 2e-5
+            and r['original_metric_force']['energy_coordinate_error'] <= 1e-10
+            and r['original_metric_force']['canonical_metric_local_error'] <= 1e-10 for r in rows)
         passed = bool(expected < 0 and rows[-1]['error'] < rows[0]['error']/3 and rows[-1]['error'] < .01*abs(expected)
             and all(r['maximum_pressure_residual'] <= 2e-5 and r['positive_energy_contraction_error'] <= 1e-10 for r in rows)
-            and operator_passed and work_passed)
+            and operator_passed and work_passed and force_passed)
         paths.append(dict(name=name, limit=limit, rows=rows, original_newborn_operator_controls_passed=operator_passed,
                           analytic_pressure_work={k: v for k, v in work.items() if k != 'limit'},
+                          analytic_metric_force={k: v for k, v in metric_force.items() if k != 'limit'},
+                          metric_force_probe_controls_passed=bool(force_passed),
                           pressure_work_probe_controls_passed=bool(work_passed),
                           pressure_limit_probe_controls_passed=passed))
     if any(p['volume'] != v or not np.array_equal(p['momentum'], m) for p, (v, m) in zip(partition.pools, before)):
@@ -166,7 +204,7 @@ def main():
         vertex_authority_codes=sorted(set(map(int, authority[sampler.faces[r['source_triangle_indices']]].ravel())))) for r in receipts]
     if any(sha(Path(path)) != digest for path, digest in hashes.items()):
         raise ValueError('Original source or implementation changed during simultaneous-birth audit')
-    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v2', accepted=False,
+    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v3', accepted=False,
         original_block_col_row=[args.block_col, args.block_row], original_snapshot_time_seconds=source['source_time_seconds'],
         original_pool_count=len(partition.pools), origin_registered_m=origin, provenance=provenance,
         source_sha256=hashes, result=result,
@@ -190,6 +228,8 @@ def main():
         first_error=p['rows'][0]['error'], last_error=p['rows'][-1]['error'],
         final_gradient_relative_error=p['rows'][-1]['volume_gradient_max_norm_relative_error'],
         final_canonical_relative_error=p['rows'][-1]['canonical_velocity_max_norm_relative_error'],
+        final_old_metric_force_error=p['rows'][-1]['original_metric_force']['old_force_max_norm_relative_error'],
+        final_new_metric_force_error=p['rows'][-1]['original_metric_force']['newborn_force_max_norm_relative_error'],
         mass_direction_scaled_work=p['rows'][-1]['fixed_old_mass_direction_scaled_work'],
         controls_passed=p['pressure_limit_probe_controls_passed']) for p in result['paths']])), flush=True)
     return 0 if result['pressure_limit_probe_controls_passed'] else 1

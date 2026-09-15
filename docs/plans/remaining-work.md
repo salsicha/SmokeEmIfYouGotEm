@@ -3,7 +3,28 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [normal-play conservative crest range](../reconstruction-review-2026-09-07/normal-river-crest-range-bound.md).
+Latest September 15: [original point-birth metric-time force](../reconstruction-review-2026-09-07/normal-river-point-metric-force.md).
+Matrix-free old/new vector coefficients now derive from the original coupled
+pressure Schur response, not an energy remainder. Independent positive-water
+metric derivatives and canonical-momentum differences verify the old nonlocal
+force and newborn coefficient. Actual 24-source bank, two seven-height paths:
+final old-vector errors 0.040601% / 0.116796%, newborn 0.000127% / 0.000566%;
+all original operator/work/residual gates retained. 56 focused tests PASS;
+broader suite 486 PASS / 13 identical retained FAIL, zero errors/skips.
+Earlier broad manufactured-test expectation corrected to retain its separate
+failed operator gate, not relax it. All 557 audit hashes and 464 protected
+source/actor hashes unchanged; all owned jobs terminal.
+This is ONE required metric-force component, NOT complete front dynamics,
+an impulse/time law, native integration or playable acceptance. Bank activation
+still rejects; no new visual/FPS evidence. Last ordinary 22.429181 FPS / p95
+54.7266 ms still FAILS 30 FPS; broad froth and smooth water faces remain open.
+NEXT joint front transport/curvature/forces, edge/flat/mixed transitions and
+finite-time/native single-surface integration; major runtime costs and actual
+breaking/froth/reference qualification. Colorado → Pacuare → Futaleufu,
+Chilko/Zambezi/all-scene water, crew, normalization, regressions and release
+remain OPEN. Troublemaker stays a rapid within South Fork, not a menu scenario.
+
+Earlier September 15: [normal-play conservative crest range](../reconstruction-review-2026-09-07/normal-river-crest-range-bound.md).
 Normal play now skips adaptive profile sampling only where a conservative
 height-range bound proves the unchanged 0.5 cm selection test cannot trigger.
 It does not substitute heights or change geometry/detail/quality/contact gates.
