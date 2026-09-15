@@ -9,6 +9,7 @@
 #include "RaftSimCrestBatchAudit.h"
 #include "RaftSimCrestRegionAudit.h"
 #include "RaftSimFlatMemoAudit.h"
+#include "RaftSimCrestInlineAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -98,6 +99,8 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             Refinement.bIndexedRegions=bIndexedRegions;
             static const bool bFlatMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimFlatCrestMemo"));
             Refinement.bFlatCoordinateMemo=bFlatMemo;
+            static const bool bInlineSelection=FParse::Param(FCommandLine::Get(),TEXT("RaftSimInlineCrestSelection"));
+            Refinement.bInlineSelection=bInlineSelection;
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;
             if (!Refinement.BuildAdaptive(XY,Triangles,Input.HeightAtWorldXYCm,3,.5f,Input.NonzeroRegionsCm,nullptr,true,true,
                 Input.DetailSpanCm>0 ? &Input.DetailWindowCm : nullptr,Input.DetailSpanCm,!bFreshMemos,!bLegacyCoordinateHash,!bResizeContexts,bSharedCorners)) return false;
@@ -148,6 +151,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestBatchAudit::Run(CachedXY,Triangles,Input);
         RaftSimCrestRegionAudit::Run(CachedXY,Triangles,Input);
         RaftSimFlatMemoAudit::Run(CachedXY,Triangles,Input);
+        RaftSimCrestInlineAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }

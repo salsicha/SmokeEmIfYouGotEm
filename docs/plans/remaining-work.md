@@ -3,7 +3,24 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [simultaneous original-source pressure births](../reconstruction-review-2026-09-07/normal-river-simultaneous-source-birth.md).
+Latest September 15: [typed crest-selection experiment](../reconstruction-review-2026-09-07/normal-river-inline-crest-selection.md).
+Candidate REJECTED for promotion: 64 changing-input pairs compare 4,299,524
+vertices / 3,116,342 triangles exactly, but its 0.068124 ms mean advantage is
+order-sensitive (0.463356 ms slower when first). Ordinary erased selection
+remains default; samples, tolerance, levels, cadence, geometry and physics are
+unchanged. Native fixture-complete run 91 PASS; earlier 75 PASS / nine missing-
+fixture FAIL retained, then rerun with original inputs. Python evidence suite
+23 PASS. 464 protected hashes unchanged; all owned jobs terminal. Fresh ordinary
+300-frame run: 12.361760 FPS / p95 93.2314 ms FAILS 30 FPS; crest selection still
+10.995881 ms/frame, water step 16.721307 ms/frame (nested scopes, do not sum).
+No visual, physical or FPS gain claimed. NEXT conservative full-metric front
+work/forces, edge/flat birth limits, time/open/native/shared-surface integration,
+actual wave/froth/reference qualification and larger solver/surface costs.
+Colorado → Pacuare → Futaleufu, all-scene water, crew, normalization, retained
+regressions and release remain OPEN. Do not repeat rejected predicate/memo/
+region/scheduling candidates as presumed improvements.
+
+Earlier September 15: [simultaneous original-source pressure births](../reconstruction-review-2026-09-07/normal-river-simultaneous-source-birth.md).
 Geometry-only labels now expose original dry/dry internal edges without adding
 water or changing the physical partition. Coupled point-birth pressure retains
 original positive factors, exact source minima/face support and original 40 CG.

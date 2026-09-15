@@ -29,6 +29,7 @@ struct FRaftSimSurfaceRefinement
     int32 ParallelBatchSize=128;
     bool bIndexedRegions=false; // Candidate until actual paired timing qualifies it.
     bool bFlatCoordinateMemo=false; // Candidate: exact keys, unchanged profile epochs.
+    bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
     double InputSeconds=0,SelectionSeconds=0,AssemblySeconds=0;
     uint64 ParallelContextsCreated=0,ParallelContextsDestroyed=0;
     uint64 SharedCornerSamples=0,SharedCornerReads=0;
@@ -122,8 +123,7 @@ struct FRaftSimSurfaceRefinement
             if (const float* Found=Values.Find(P)) return *Found;
             const float V=HeightCm(P); Values.Add(P,V); return V;
         };
-        return BuildSelected(Coordinates,SourceTriangles,Levels,
-            [&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32,int32 Context,int32 Triangle)
+        const auto Select=[&](const FVector2D& A,const FVector2D& B,const FVector2D& C,int32,int32 Context,int32 Triangle)
             {
                 // A dynamic displacement field needs geometric samples even
                 // where the immutable macro crest is flat. This selection
@@ -149,7 +149,8 @@ struct FRaftSimSurfaceRefinement
                         (VA*AWeight+VB*BWeight+VC*CWeight))>ToleranceCm) return true;
                 }
                 return false;
-            },bParallel,[&](int32 Contexts)
+            };
+        const TFunction<void(int32)> PrepareParallel=[&](int32 Contexts)
             {
                 // Resize only after the previous level has joined. Values
                 // remain valid across levels within this exact profile build.
@@ -174,12 +175,19 @@ struct FRaftSimSurfaceRefinement
                     else if (bFastCoordinateHash) Prepare(FastParallelValues);
                     else Prepare(ParallelValues);
                 }
-            },[&](const TArray<FVector2D>& Points,const TArray<int32>& CurrentTriangles)
+            };
+        const TFunction<void(const TArray<FVector2D>&,const TArray<int32>&)> PrepareLevel=
+            [&](const TArray<FVector2D>& Points,const TArray<int32>& CurrentTriangles)
             {
                 if(!ShareCorners)return;
                 Corners.Prepare(Points,CurrentTriangles,HeightCm,NonzeroRegions,DetailWindow,DetailSpanCm);
                 SharedCornerSamples=Corners.SampleCount;SharedCornerReads=Corners.ReadCount;
-            });
+            };
+        if(bInlineSelection)
+            return BuildSelected(Coordinates,SourceTriangles,Levels,Select,bParallel,PrepareParallel,PrepareLevel);
+        // Retain the original erased-call path for independent same-build A/B.
+        using FPredicate=TFunctionRef<bool(const FVector2D&,const FVector2D&,const FVector2D&,int32,int32,int32)>;
+        return BuildSelected<FPredicate>(Coordinates,SourceTriangles,Levels,Select,bParallel,PrepareParallel,PrepareLevel);
     }
 
 private:
@@ -197,8 +205,9 @@ private:
     TArray<FTopologyLevel> CachedLevels;
     int32 CachedRootPointCount=0;
 
+    template<typename TSelect>
     bool BuildSelected(const TArray<FVector2D>& Coordinates,const TArray<int32>& SourceTriangles,
-        int32 Levels,TFunctionRef<bool(const FVector2D&,const FVector2D&,const FVector2D&,int32,int32,int32)> Select,
+        int32 Levels,TSelect Select,
         bool bParallel=false,TFunction<void(int32)> PrepareParallel={},
         TFunction<void(const TArray<FVector2D>&,const TArray<int32>&)> PrepareLevel={})
     {
