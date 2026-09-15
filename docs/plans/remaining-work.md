@@ -3,6 +3,20 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [terrain-coupled linear gravity waves](../reconstruction-review-2026-09-07/normal-river-terrain-gravity-waves.md).
+Same wet-face mass/adjoint pressure pairing and original two poles now advance
+fixed-reference linear waves. Independently assembled face, exact-bed and wall
+forces reproduce physical momentum; midpoint preserves quadratic energy without
+projection. Thirteen new tests cover phase/frequency, full flat-model linear limit,
+oblique internal faces, dry separation and finite physical force budgets.
+Controlled registered channel/rock-bank lakes pass6x20ms:522 source hashes each,
+mixed captured/inferred provenance explicit. NOT original river flow or nonlinear
+advection/topology.288 focused PASS/1 retained geometry FAIL;25 PASS/12 retained
+energy FAIL;464 protected scene/source hashes unchanged. Actual source-time refinement is still running on its original43
+hashes. NEXT inspect that same result, then full nonlinear metric/advection/terrain
+work, wet/open/native/shared-surface integration. No visual or30FPS improvement;
+full later-river/crew/normalization/release scope remains OPEN.
+
 Latest September 14: [source-resolved timestep refinement](../reconstruction-review-2026-09-07/normal-river-source-time-refinement.md).
 New equal-horizon comparison reassembles changing regions on original source
 triangles, retaining both physical momentum components and separate parent-cell
