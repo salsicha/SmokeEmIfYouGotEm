@@ -3,6 +3,18 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [changing-volume pressure on exact wet pools](../reconstruction-review-2026-09-07/normal-river-wet-pool-pressure-direction.md).
+Analytic shared-face, exact local geometry, divergence/transpose and both mass
+normalization derivatives now feed the original two-pole dual energy/momentum
+map. Actual258-pool independent perturbation audit PASS; both poles and direction
+solves retain40CG and original gates. Coverage oracle corrected for source-clip
+float overlaps and dry traces WITHOUT changing terrain or pressure assembly.
+98 subcell/triangle testsPASS; retained suite34PASS/12FAIL, no waivers.
+Controlled directions ONLY, not conserved evolution, breaking or gameplay.
+NEXT compatible pool mass/advection/exact bed-force, explicit wetting/topology
+events, finite-time/open/refinement/native/shared-surface qualification.
+464 protected hashes unchanged; visual/30FPS and full later-river/crew/releaseOPEN.
+
 Latest September 14: [separated wet-pool pressure on exact terrain](../reconstruction-review-2026-09-07/normal-river-separated-wet-pool-pressure.md).
 Actual3 cells contain disconnected pools:255 wet cells require258 wet regions.
 Original-source topology now prevents one-cell pressure bridges, preserves small

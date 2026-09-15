@@ -12,6 +12,7 @@ from subcell_pressure_kinetic_geometry import local_form, quadrature
 from subcell_wet_connectivity import components
 from subcell_wet_pool_partition import WetPoolPartition
 from subcell_wet_pool_pressure import WetPoolPressureSystem
+from audit_wet_pool_pressure_rate import audit_direction
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
@@ -20,7 +21,9 @@ def main():
     parser.add_argument('--atlas', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--pool-pressure', action='store_true', help='Also audit both original poles on separated fixed wet pools')
+    parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
     args = parser.parse_args()
+    args.pool_pressure = args.pool_pressure or args.pool_direction
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -46,6 +49,7 @@ def main():
         'subcell_pressure_kinetic_geometry.py', 'triangle_cell_storage.py', 'subcell_geometry_patch.py',
         'triangle_face_section.py', 'south_fork_registered_mesh.py', 'audit_south_fork_subcell_energy_flux.py',
         'subcell_wet_connectivity.py', 'subcell_wet_pool_partition.py', 'subcell_wet_pool_pressure.py',
+        'subcell_wet_pool_pressure_rate.py', 'audit_wet_pool_pressure_rate.py', 'subcell_mechanical_energy.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -122,7 +126,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure = None
+    pressure, direction = None, None
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -174,6 +178,8 @@ def main():
                             p['wall_column_partition_error']) < 1e-10
                     and p['direct_same_cell_pool_connections'] == 0 for p in pole_records)),
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
+        if args.pool_direction:
+            direction = audit_direction(pools)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
@@ -181,6 +187,7 @@ def main():
     result = dict(schema='raftsim.south_fork.subcell_pressure_kinetic_geometry.v1',
         accepted=False, positive_cell_geometry_controls_passed=True, total_cells=256,
         fixed_pool_pressure=pressure,
+        fixed_pool_direction=direction,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -199,12 +206,14 @@ def main():
         records=records, source_sha256=hashes,
         scope='Original wet source-triangle geometry and original cell volumes. Positive local kinetic '
               'factor and fixed-terrain volume derivative, plus optional separated-pool static two-pole '
-              'pressure on shared wet faces and reflecting walls. No nonlinear bed-force work, topology '
+              'pressure on shared wet faces and reflecting walls, and optional analytic controlled '
+              'volume/velocity directions checked against independent perturbed states. No nonlinear bed-force work, topology '
               'evolution, wetting/open/time, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
     print(json.dumps({k: v for k, v in result.items() if k not in ('records', 'source_sha256')}, indent=2))
-    return 1 if pressure is not None and not pressure['fixed_pressure_controls_passed'] else 0
+    return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
+               or (direction is not None and not direction['fixed_topology_direction_controls_passed']))
 
 
 if __name__ == '__main__':

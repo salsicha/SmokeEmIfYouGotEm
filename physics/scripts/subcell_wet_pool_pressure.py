@@ -81,19 +81,41 @@ def piecewise_column_integral(partition, first, second=None):
     """Independent knot sweep for differing stages of same-cell pool traces.
 
     Unlike a scalar parent stage, this remains meaningful when distinct pools
-    are independently perturbed. Multiple owners of one interval are rejected.
+    are independently perturbed. Multiple pool owners of one interval are
+    rejected. Same-pool trace overlaps are unioned ONLY in this coverage oracle;
+    the original geometry/operator remains unchanged and its overlap error is
+    measured against this integral.
     """
     pieces = first+(second if second is not None else [])
     if not pieces:
         return 0.
-    knots = sorted(set(float(x) for _, segment in pieces for x in segment[:, 0]))
+    knots = set(float(x) for _, segment in pieces for x in segment[:, 0])
+    for index, segment in pieces:
+        form = partition.pools[index]['form']
+        depths = [math.fsum((form['stage_offset'], form['datum'], -float(z))) for z in segment[:, 1]]
+        if (depths[0] < 0 < depths[1]) or (depths[1] < 0 < depths[0]):
+            knots.add(float(segment[0, 0]+(segment[1, 0]-segment[0, 0])*depths[0]/(depths[0]-depths[1])))
+    knots = sorted(knots)
     total = 0.
     for low, high in zip(knots, knots[1:]):
-        middle = .5*(low+high)
         def owner(segments):
-            candidates = [(index, segment) for index, segment in segments if segment[0, 0] < middle < segment[1, 0]]
+            # No representable midpoint need exist between adjacent float knots.
+            candidates = [(index, segment) for index, segment in segments
+                          if segment[0, 0] <= low and high <= segment[1, 0]]
+            # A component's source triangle can have dry face portions. Those
+            # portions do not own pressure, including at a dry rock ridge where
+            # separately clipped traces overlap by one representable interval.
+            candidates = [(i, s) for i, s in candidates
+                          if any(math.fsum((partition.pools[i]['form']['stage_offset'],
+                                            partition.pools[i]['form']['datum'], -float(z))) > 0
+                                 for z in np.interp([low, high], s[:, 0], s[:, 1]))]
             if len(candidates) > 1:
-                raise ValueError('Multiple pool owners on the same source face interval')
+                heights = [np.interp([low, high], s[:, 0], s[:, 1]) for _, s in candidates]
+                # Existing source-face agreement tolerance; no geometry welding.
+                if (len(set(i for i, _ in candidates)) != 1
+                        or any(not np.allclose(z, heights[0], atol=1e-9, rtol=0) for z in heights[1:])):
+                    raise ValueError(f'Multiple incompatible pool traces on interval {low!r}, {high!r}: '
+                                     f'{[(i, s.tolist()) for i, s in candidates]}')
             return candidates[0] if candidates else None
         left = owner(first)
         right = owner(second) if second is not None else left
