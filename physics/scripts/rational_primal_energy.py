@@ -49,7 +49,7 @@ def evaluate(geometry,physical_momentum,*,tangent=None,preconditioner='patch'):
         raise ValueError('Positive finite periodic primal energy required')
     if tangent is not None and (tangent.geometry is not g or tangent.one_sided):
         raise ValueError('Matching stationary positive energy tangent required')
-    if preconditioner not in ('block','patch','spectral-flat'):raise ValueError('Unknown primal energy preconditioner')
+    if preconditioner not in ('block','patch','spectral-flat','spectral-frozen-depth'):raise ValueError('Unknown primal energy preconditioner')
     system_type=PatchPressureSystem if preconditioner=='patch' else ReconstructedAccelerationSystem
     root=np.sqrt(h);q=p/root[...,None];mapped=K0*q;density=.5*K0*np.sum(q*q,axis=-1)
     poles=[];operator_direction=0.

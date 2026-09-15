@@ -3,6 +3,23 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [nonlinear terrain metric and local forces](../reconstruction-review-2026-09-07/normal-river-nonlinear-terrain-metric.md).
+New positive-periodic full two-pole terrain stage includes the symmetric bed
+Hessian tensor, geometric factor-time commutator and complete changing inertia.
+Independent face/bed-force assembly matches local physical momentum; no residual
+is relabeled as a source. Two turning-flow profiles on16/32/64 grids converge
+to the original canonical bracket at ratios4.01-4.08; omitted-term controls
+conserve energy but fail this trend. Initial64-grid patch round-trip FAILED;
+opt-in SPD frozen-depth preconditioning fixes it without changing the actual
+terrain matrix,40CG or tolerances. Completed523-hash audit matches sources.
+23new/55prior testsPASS;301sourcePASS/1retained geometryFAIL;25PASS/12retained
+energyFAIL. Total404PASS/13FAIL, no waivers;464protected hashes unchanged.
+All numerical jobs completed. NEXT derive this full nonlinear coupling on the
+actual integrated source moments/oblique wet-pool faces, then wet/dry finite-time,
+open/native/shared-surface integration. Do not replace source moments with mean
+depth/slope. This is NOT gameplay, visual or30FPS acceptance; all later rivers,
+crew, normalization, release and remaining SouthFork requirements remainOPEN.
+
 Latest September 14: [changing-volume physical/canonical metric](../reconstruction-review-2026-09-07/normal-river-changing-volume-primal-metric.md).
 Actual43-hash source-time comparison COMPLETED20/40/80 steps at equal0.4s:
 source-water difference ratio2.07255, momentum2.03179/2.03594; all140 budget checks

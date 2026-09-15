@@ -12,6 +12,21 @@ def precondition(system, residual):
     if (not g.periodic or np.any(g.h <= 0) or not np.all(g.bed == g.bed.flat[0])
             or not np.all(system.fraction == 1)):
         raise ValueError('Spectral preconditioner requires positive periodic flat full dispersion')
+    return frozen_depth_precondition(system, residual)
+
+
+def frozen_depth_precondition(system, residual):
+    """SPD constant-depth, zero-slope REFERENCE inverse for a terrain matrix.
+
+    Its Fourier eigenvalues are 1 (transverse) and 1/(1+lambda*h0^2*|k|^2)
+    (longitudinal), hence strictly positive irrespective of the actual bed.
+    This is preconditioning only: every CG action/residual retains the actual
+    variable-depth, variable-bed reconstructed matrix, including both factors.
+    No equivalence of that matrix with the reference inverse is asserted.
+    """
+    g = system.geometry
+    if not g.periodic or np.any(g.h <= 0) or not np.all(system.fraction == 1):
+        raise ValueError('Frozen-depth preconditioner requires positive periodic full dispersion')
     r = system._vector(residual)
     if not hasattr(system, '_flat_spectral_symbol'):
         frequencies = []
