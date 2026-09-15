@@ -128,9 +128,11 @@ class SourceAuxiliaryTransport:
         self.system = system
         part = system.partition
         velocity = system._vector(transport_velocity)[:, 0]
+        self.transport_velocity = velocity.copy()
         self.faces, self.unresolved = [], []
         self.one_sided_owned_faces = 0
         self.partially_shared_owned_faces = 0
+        self.same_region_geometry_faces = 0
 
         def append(li, ri, ls, rs, pl, pr, segment, normal, source_edge=None):
             if li is None and ri is None:
@@ -168,6 +170,30 @@ class SourceAuxiliaryTransport:
         for face in part.internal_faces:
             append(face['left'], face['right'], face['left_source'], face['right_source'],
                    face['parent'], face['parent'], face['segment'], face['normal'], face['edge_vertex_ids'])
+        if all(hasattr(cell, 'fragments') for cell in part.patch.cells):
+            from subcell_source_curvature import SourceCurvatureTensor
+            geometry = SourceCurvatureTensor(system)
+            for face in geometry.edges:
+                if face['left'] == face['right'] and face['kind'] == 'internal-source-jump':
+                    append(face['left'], face['right'], face['left_source'], face['right_source'],
+                           face['parent_left'], face['parent_right'], face['section'],
+                           face['normal'], face['source_edge'])
+                    self.same_region_geometry_faces += 1
+
+    def volume_factor_force(self, velocity):
+        """Within-triangle skew work where adv(h)=-grad(b).u at fixed eta.
+
+        k=.75 integral h grad(b)(grad(b).u)=Gamma_vv u/4, preserving
+        the original slope covariance. This is not a mean-slope correction.
+        """
+        s = self.system
+        w = s._vector(velocity)[:, 0]
+        gram = np.array([pool['form']['gram'] for pool in s.partition.pools])
+        k = .25*np.einsum('nij,nj->ni', gram[:, 1:, 1:], self.transport_velocity)
+        result = k*s.divergence(w)[:, None]-s.divergence_transpose(np.sum(k*w, axis=1))
+        if not np.isfinite(result).all():
+            raise ValueError('Within-source factor transport exceeds represented range')
+        return result[:, None, :]
 
     def factor_force(self, velocity):
         s = self.system
@@ -181,7 +207,7 @@ class SourceAuxiliaryTransport:
         result = s.divergence_transpose(force[:, 0])+force[:, 1:]
         if not np.isfinite(result).all():
             raise ValueError('Source auxiliary factor transport exceeds represented range')
-        return result[:, None, :]
+        return result[:, None, :]+self.volume_factor_force(velocity)
 
     def difference_force(self, velocity):
         u = self.system._vector(velocity)[:, 0]
@@ -196,6 +222,7 @@ class SourceAuxiliaryTransport:
 
     def scope(self):
         return dict(shared_source_faces=len(self.faces), unresolved_activation_faces=self.unresolved,
+                    same_region_geometry_faces=self.same_region_geometry_faces,
                     one_sided_owned_faces=self.one_sided_owned_faces,
                     partially_shared_owned_faces=self.partially_shared_owned_faces,
                     full_tensor_or_front_or_nonlinear_or_time_or_gameplay_accepted=False)

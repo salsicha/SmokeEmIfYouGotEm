@@ -3,7 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 14: [source auxiliary transport components](../reconstruction-review-2026-09-07/normal-river-source-auxiliary-transport.md).
+Latest September 14: [combined source-metric rate and terrain curvature](../reconstruction-review-2026-09-07/normal-river-source-nonlinear-curvature.md).
+Original slope-jump curvature, including same-region source edges, is coupled
+to changing inertia, mass/pressure and auxiliary transport with an independent
+local physical force ledger. Two missing spatial geometry transport terms were
+corrected. Original channel-state closed-boundary rate passes; the mixed-source
+rock-bank block rejects unresolved wet-front activation without changing water.
+Two 8/16/32 nonlinear source-grid profiles refine, but the omitted-curvature
+control also refines and is closer: full continuum consistency remains OPEN.
+343 focused PASS/1 retained geometry FAIL; 25 PASS/12 retained energy FAIL,
+no waivers. All numerical jobs completed; 464 protected hashes unchanged.
+NEXT discriminating continuum validation and finite-time wet/front coupling,
+then actual open/native/shared-surface integration. No visual or FPS gain;
+30 FPS, playable water, later rivers, crew, normalization and release remain OPEN.
+
+Earlier September 14: [source auxiliary transport components](../reconstruction-review-2026-09-07/normal-river-source-auxiliary-transport.md).
 Original source-face factor transport, integrated geometric commutator and
 symmetric tensor DERIVATIVE part now retain source slopes/depth moments and
 oblique graph adjoints. Exact quadrature and flat-model limits pass; inconsistent

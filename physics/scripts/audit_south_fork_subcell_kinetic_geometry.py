@@ -82,6 +82,7 @@ def main():
         'audit_source_time_refinement.py',
         'subcell_primal_metric_rate.py', 'audit_primal_metric_direction.py',
         'subcell_auxiliary_transport.py', 'audit_source_auxiliary_transport.py',
+        'subcell_source_curvature.py',
         'subcell_exact_source_faces.py',
         'subcell_coupled_front_update.py',
         'subcell_transfer_events.py', 'subcell_event_front_update.py',
