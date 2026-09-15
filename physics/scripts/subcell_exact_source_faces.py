@@ -6,6 +6,7 @@ intersection; no independently rounded polygon endpoints are welded or dropped.
 """
 from fractions import Fraction as F
 import numpy as np
+from subcell_source_face_section import SourceFaceSection
 
 
 def triangle_cut(triangle, center, spacing, axis, sign):
@@ -44,6 +45,14 @@ def source_faces(partition, parent, axis, sign):
         row, col = divmod(parent, partition.patch.shape[1])
         center = partition.origin+partition.patch.spacing*[col, row]
         result = []
+        cell = partition.patch.cells[parent]
+        if hasattr(cell, 'fragments'):
+            for fragment in cell.fragments:
+                segment = fragment.face(axis, sign*F(float(partition.patch.spacing[axis]))/2)
+                if segment is not None:
+                    result.append((fragment.source_id, SourceFaceSection([segment])))
+            partition.source_face_cache[key] = result
+            return result
         for source in sorted(set(map(int, partition.patch.cells[parent].source_triangle_indices))):
             triangle = partition.sampler.xyz[partition.sampler.faces[source]]
             segment = triangle_cut(triangle, center, partition.patch.spacing, axis, sign)

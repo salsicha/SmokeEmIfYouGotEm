@@ -7,6 +7,8 @@ from subcell_wet_pool_pressure_rate import WetPoolPressureRate
 from subcell_wet_pool_primal_energy import evaluate
 from subcell_wet_pool_transport import rates
 from triangle_cell_storage import TriangleCellStorage
+from subcell_source_frames import physical_datum
+from subcell_source_face_section import stage_difference
 
 
 def audit_transport(pools):
@@ -110,11 +112,10 @@ def audit_internal_regions(pools, parent=112):
     states = [dict(pool) for i, pool in enumerate(pools.pools) if i != indices[0]]
     velocity = old['momentum']/old['volume']
     for source in sorted(set(cell.source_triangle_indices)):
-        mask = cell.source_triangle_indices == source
-        storage = TriangleCellStorage(cell.triangles[mask], cell.source_triangle_indices[mask])
+        storage = cell.subset_sources([source])
         # Same source water level and velocity; no added volume or terrain edit.
         volume = storage.relative_volume_and_wet_area(
-            old['form']['stage_offset']+(old['form']['datum']-storage.datum))[0]
+            stage_difference(0., physical_datum(storage), old['form']['stage_offset'], old['form']['datum']))[0]
         states.append(dict(parent=parent, source_triangle_indices=[int(source)],
                            volume=volume, momentum=volume*velocity))
     refined = pools.with_regions(states)

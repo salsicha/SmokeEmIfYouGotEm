@@ -1,5 +1,7 @@
 """Exact nondispersive hydrostatic energy; NOT the full two-pole energy gate."""
 import numpy as np
+from subcell_source_frames import physical_datum
+from subcell_source_face_section import stage_difference
 
 
 def squared_depth_integral(storage, stage, relative=False):
@@ -30,12 +32,12 @@ def energy(patch, volumes, momenta, gravity=9.81):
         raise ValueError('Finite physical energy state required')
     normalized = np.divide(p, np.sqrt(v)[..., None], out=np.zeros_like(p), where=v[..., None] > 0)
     kinetic = .5*np.sum(normalized*normalized)
-    datum = min(float(cell.levels.min()) for cell in patch.cells)
+    datum = min(physical_datum(cell) for cell in patch.cells)
     potential = 0.
     for cell, volume in zip(patch.cells, v.ravel()):
         relative = patch.relative_stages
         stage = cell.relative_stage_for_volume(volume) if relative else cell.stage_for_volume(volume)
-        relative_to_datum = (cell.datum-datum)+stage if relative else stage-datum
+        relative_to_datum = stage_difference(0., datum, stage, physical_datum(cell)) if relative else stage-datum
         potential += gravity*(relative_to_datum*volume-.5*squared_depth_integral(cell, stage, relative))
     if not np.isfinite([kinetic, potential]).all():
         raise ValueError('Mechanical energy exceeds storage range')

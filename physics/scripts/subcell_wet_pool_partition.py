@@ -12,6 +12,8 @@ from subcell_pressure_kinetic_geometry import local_form
 from subcell_wet_connectivity import components
 from subcell_source_region_faces import internal_faces
 from subcell_exact_source_faces import source_faces
+from subcell_source_frames import physical_datum, pool_form, absolute_interval, inside_interval, trace_start
+from subcell_source_face_section import stage_difference
 
 
 class WetPoolPartition:
@@ -43,27 +45,32 @@ class WetPoolPartition:
             velocity = momentum/volume
             combined_gram = np.zeros((3, 3))
             combined_tangent = np.zeros((3, 3))
-            levels = np.unique(cell.relative_levels)
-            if np.any(levels == height):
-                raise ValueError('Topology event requires explicit one-sided transition')
-            lower = levels[levels < height]
-            upper = levels[levels > height]
-            interval = [float(lower.max()) if lower.size else -np.inf,
-                        float(upper.min()) if upper.size else np.inf]
+            if hasattr(cell, 'source_datum'):
+                bounds = absolute_interval(cell, height, physical_datum(cell))
+                interval = [level-physical_datum(cell) for level in bounds]
+            else:
+                levels = np.unique(cell.relative_levels)
+                if np.any(levels == height):
+                    raise ValueError('Topology event requires explicit one-sided transition')
+                lower = levels[levels < height]
+                upper = levels[levels > height]
+                interval = [float(lower.max()) if lower.size else -np.inf,
+                            float(upper.min()) if upper.size else np.inf]
             for component in graph['components']:
                 ids = component['source_triangle_indices']
-                mask = np.isin(cell.source_triangle_indices, ids)
-                storage = TriangleCellStorage(cell.triangles[mask], cell.source_triangle_indices[mask])
+                storage = cell.subset_sources(ids)
                 pool_volume = component['volume_m3']
                 if pool_volume <= 0:
                     raise ValueError('Wet source component has no represented positive volume')
-                form = local_form(storage, pool_volume)
+                form = pool_form(storage, pool_volume)
                 pool_index = len(self.pools)
                 self.parent_pools[index].append(pool_index)
                 self.pools.append(dict(parent=index, source_triangle_indices=ids, storage=storage,
                     volume=pool_volume, momentum=pool_volume*velocity, form=form,
-                    parent_stage_offset=height, parent_datum=cell.datum,
+                    parent_stage_offset=height, parent_datum=physical_datum(cell),
                     parent_topology_stage_interval=interval))
+                if hasattr(cell, 'source_datum'):
+                    self.pools[-1]['topology_absolute_stage_interval'] = absolute_interval(cell, height, physical_datum(cell))
                 self.reassembled_volumes[index] += pool_volume
                 self.reassembled_momenta[index] += pool_volume*velocity
                 combined_gram += form['gram']
@@ -105,29 +112,22 @@ class WetPoolPartition:
                     or momentum.shape != (2,) or not np.isfinite(momentum).all()):
                 raise ValueError('Disjoint original source regions with positive finite state required')
             seen.update((parent, i) for i in ids)
-            mask = np.isin(cell.source_triangle_indices, ids)
-            storage = TriangleCellStorage(cell.triangles[mask], cell.source_triangle_indices[mask])
-            form = local_form(storage, volume)
+            storage = cell.subset_sources(ids)
+            form = pool_form(storage, volume)
             row, col = divmod(parent, self.patch.shape[1])
             center = self.origin+self.patch.spacing*[col, row]
             connected = components(self.sampler, storage, center, self.patch.spacing, form['stage_offset'])
             if connected['component_count'] != 1 or set(connected['components'][0]['source_triangle_indices']) != set(ids):
                 raise ValueError('Each region must be one wet connected source set; dry support needs activation')
-            height = math.fsum((form['stage_offset'], form['datum'], -cell.datum))
-            absolute_levels = np.unique(cell.levels)
-            distances = np.array([math.fsum((form['stage_offset'], form['datum'], -float(z))) for z in absolute_levels])
-            if np.any(distances == 0):
-                raise ValueError('Topology event requires explicit one-sided transition')
-            lower, upper = absolute_levels[distances > 0], absolute_levels[distances < 0]
-            absolute_interval = [float(lower.max()) if lower.size else -np.inf,
-                                 float(upper.min()) if upper.size else np.inf]
-            interval = [level-cell.datum for level in absolute_interval]
+            height = stage_difference(0., physical_datum(cell), form['stage_offset'], form['datum'])
+            bounds = absolute_interval(cell, form['stage_offset'], form['datum'])
+            interval = [level-physical_datum(cell) for level in bounds]
             index = len(result.pools)
             result.parent_pools[parent].append(index)
             result.pools.append(dict(parent=parent, source_triangle_indices=sorted(ids), storage=storage,
                 volume=volume, momentum=momentum.copy(), form=form, parent_stage_offset=height,
-                parent_datum=cell.datum, parent_topology_stage_interval=interval,
-                topology_absolute_stage_interval=absolute_interval))
+                parent_datum=physical_datum(cell), parent_topology_stage_interval=interval,
+                topology_absolute_stage_interval=bounds))
             result.reassembled_volumes.flat[parent] += volume
             result.reassembled_momenta.reshape(-1, 2)[parent] += momentum
         if not result.pools:
@@ -160,13 +160,12 @@ class WetPoolPartition:
                     'maximum_gram_partition_error', 'maximum_volume_tangent_partition_error'):
             setattr(result, key, None)
         for old, volume in zip(self.pools, volumes):
-            form = local_form(old['storage'], volume)
-            parent_height = math.fsum((form['stage_offset'], form['datum'], -old['parent_datum']))
+            form = pool_form(old['storage'], volume)
+            parent_height = stage_difference(0., old['parent_datum'], form['stage_offset'], form['datum'])
             low, high = old['parent_topology_stage_interval']
             if 'topology_absolute_stage_interval' in old:
                 low, high = old['topology_absolute_stage_interval']
-                inside = (math.fsum((form['stage_offset'], form['datum'], -low)) > 0
-                          and math.fsum((form['stage_offset'], form['datum'], -high)) < 0)
+                inside = inside_interval(form['stage_offset'], form['datum'], low, high)
             else:
                 inside = low < parent_height < high
             if not inside:
@@ -192,4 +191,4 @@ class WetPoolPartition:
             for source in self.pools[pool_index]['source_triangle_indices']:
                 owners[source] = pool_index
         result = [(owners[source], segment) for source, segment in source_faces(self, parent, axis, sign) if source in owners]
-        return sorted(result, key=lambda item: item[1][0, 0])
+        return sorted(result, key=lambda item: trace_start(item[1]))

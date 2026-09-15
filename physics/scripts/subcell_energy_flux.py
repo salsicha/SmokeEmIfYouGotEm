@@ -101,6 +101,8 @@ def face_flux_normal(section, left_stage, left_velocity, right_stage, right_velo
 
 def rates(patch, volumes, momenta, gravity=9.81, dissipative=False):
     """Closed/periodic exact-geometry patch; no clipping, repair or time update."""
+    if getattr(patch, 'exact_sources', False):
+        raise ValueError('Exact source evolution requires the pool-aware rate API')
     v, p = np.asarray(volumes, float), np.asarray(momenta, float)
     if (v.shape != patch.shape or p.shape != (*patch.shape, 2) or (v < 0).any()
             or not np.isfinite(v).all() or not np.isfinite(p).all() or np.any(p[v == 0] != 0)):

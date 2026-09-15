@@ -10,6 +10,8 @@ import numpy as np
 
 
 def frozen_system(patch, volumes, momenta, gravity=9.81):
+    if getattr(patch, 'exact_sources', False):
+        raise ValueError('Exact source evolution requires the pool-aware rate API')
     volume, momentum = np.asarray(volumes, float), np.asarray(momenta, float)
     if (volume.shape != patch.shape or momentum.shape != (*patch.shape, 2)
             or not np.isfinite(volume).all() or not np.isfinite(momentum).all()

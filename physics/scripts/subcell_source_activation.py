@@ -19,6 +19,8 @@ from triangle_cell_storage import TriangleCellStorage
 from triangle_face_section import TriangleFaceSection
 from subcell_coupled_front_update import coupled_update
 from subcell_donor_face_flux import flux as donor_flux
+from subcell_source_frames import physical_datum, pool_form, face_section
+from subcell_source_face_section import SourceFaceSection, stage_difference
 
 
 def faces(partition):
@@ -45,10 +47,10 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
     volume = np.array([p['volume'] for p in pools])
     momentum = np.array([p['momentum'] for p in pools])
     velocity = momentum/volume[:, None]
-    datum = min(float(c.datum) for c in partition.patch.cells)
+    datum = min(physical_datum(c) for c in partition.patch.cells)
     dv = np.zeros_like(volume)
     incoming, outgoing = np.zeros_like(volume), np.zeros_like(volume)
-    face_minima = np.full_like(volume, np.inf)
+    face_minima = [np.inf]*len(volume)
     bed = np.array([p['storage'].hydrostatic_bed_force(p['form']['stage_offset'], gravity, True) for p in pools])
     dp, wall = bed.copy(), np.zeros(2)
     force_parts = {key: np.zeros_like(momentum) for key in ('wall', 'pressure', 'negative_exchange', 'dry_front')}
@@ -57,10 +59,13 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
         li, ri = face['left'], face['right']
         for owner in (li, ri):
             if owner is not None:
-                face_minima[owner] = min(face_minima[owner], float(face['segment'][:, 1].min()))
+                trace = face['segment']
+                minimum = (min(z for levels in trace.source_levels for z in levels)
+                           if isinstance(trace, SourceFaceSection) else float(trace[:, 1].min()))
+                face_minima[owner] = min(face_minima[owner], minimum)
         if li is None and ri is None:
             continue
-        section = TriangleFaceSection([face['segment']], face['segment'][:, 0])
+        section = face_section(face['segment'])
         n = face['normal']
         wall_face = min(face['left_parent'], face['right_parent']) < 0
         if not wall_face and (li is None or ri is None):
@@ -159,13 +164,13 @@ def assembly(partition, gravity=9.81, face_scheme='paired'):
 
 
 def base_energy(partition, gravity=9.81):
-    datum = min(float(c.datum) for c in partition.patch.cells)
+    datum = min(physical_datum(c) for c in partition.patch.cells)
     kinetic, potential = 0., 0.
     for p in partition.pools:
         f = p['form']
         q = p['momentum']/math.sqrt(p['volume'])
         kinetic += .5*float(q@q)
-        height = math.fsum((f['stage_offset'], f['datum'], -datum))
+        height = stage_difference(0., datum, f['stage_offset'], f['datum'])
         potential += gravity*(height*p['volume']-.5*squared_depth_integral(p['storage'], f['stage_offset'], True))
     return dict(kinetic=kinetic, potential=potential, total=kinetic+potential)
 
@@ -184,9 +189,8 @@ def wet_support_transition(partition, states):
         cell = partition.patch.cells[parent]
         if not set(ids).issubset(set(cell.source_triangle_indices)):
             raise ValueError('Transition support must use original parent source IDs')
-        mask = np.isin(cell.source_triangle_indices, ids)
-        storage = TriangleCellStorage(cell.triangles[mask], cell.source_triangle_indices[mask])
-        form = local_form(storage, state['volume'])
+        storage = cell.subset_sources(ids)
+        form = pool_form(storage, state['volume'])
         row, col = divmod(parent, partition.patch.shape[1])
         center = partition.origin+partition.patch.spacing*[col, row]
         graph = components(partition.sampler, storage, center, partition.patch.spacing, form['stage_offset'])

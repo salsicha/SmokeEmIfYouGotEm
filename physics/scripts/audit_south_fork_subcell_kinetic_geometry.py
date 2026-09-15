@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+from fractions import Fraction
 
 import numpy as np
 
@@ -25,6 +26,7 @@ def main():
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--pool-pressure', action='store_true', help='Also audit both original poles on separated fixed wet pools')
     parser.add_argument('--source-representation', action='store_true', help='Audit exact source polygons and relative metrics against rational integrals')
+    parser.add_argument('--exact-pool-geometry', action='store_true', help='Use exact source storage, datums, traces and internal edges throughout the pool path; implies --pool-pressure')
     parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
     parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
     parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
@@ -35,7 +37,7 @@ def main():
     if args.pool_history_steps < 0:
         parser.error('--pool-history-steps must be nonnegative')
     args.pool_transport = args.pool_transport or args.pool_internal
-    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation or args.pool_history_steps > 0
+    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation or args.pool_history_steps > 0 or args.exact_pool_geometry
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -71,6 +73,8 @@ def main():
         'subcell_donor_face_flux.py',
         'subcell_exact_geometry.py', 'audit_source_representation.py',
         'subcell_source_face_section.py',
+        'subcell_source_frames.py',
+        'subcell_implicit_transport.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -91,7 +95,8 @@ def main():
         terrain = RegisteredMeshSampler(mesh)
         authority = np.asarray(mesh['authority']).ravel().copy()
     shift = np.array(coordinates['world_origin_utm_m'])-geometry['rapid_origin_utm_m']
-    patch = SubcellGeometryPatch(terrain, origins[0]+shift, (16, 16), relative_stages=True)
+    patch = SubcellGeometryPatch(terrain, origins[0]+shift, (16, 16), relative_stages=True,
+                                 exact_sources=args.exact_pool_geometry)
     representation = (audit_representation(terrain, origins[0]+shift, (16, 16), [1., 1.], fields['h'])
                       if args.source_representation else None)
     source_bed = fields['bed']+atlas['source_elevation_datum_m']-geometry['rapid_datum_navd88_m']
@@ -217,6 +222,8 @@ def main():
     quantiles = lambda key: np.quantile([r[key] for r in records], [0, .5, .95, 1]).tolist()
     result = dict(schema='raftsim.south_fork.subcell_pressure_kinetic_geometry.v1',
         accepted=False, positive_cell_geometry_controls_passed=True, total_cells=256,
+        pool_geometry='exact-source-relative' if args.exact_pool_geometry else 'legacy-float-vertices',
+        geometry_reporting_note='Exact datums and source segments are retained in memory; JSON elevations/traces are float projections. Source hashes preserve the original geometry, not additional measurement precision.',
         fixed_pool_pressure=pressure,
         exact_source_representation=representation,
         fixed_pool_direction=direction,
@@ -246,9 +253,10 @@ def main():
               'volume/velocity directions checked against independent perturbed states; optional physical-momentum '
               'energy/reverse volume gradient and nondispersive pool flux support. Optional finite source-front '
               'activation and successive candidate controls include support transitions and finite energy rejection. '
+              'The selected pool_geometry reports whether exact source storage/datums/traces/internal edges are used throughout. '
               'No full rational nonlinear transport/bed-force, wet-front/open/time-refinement, native or gameplay qualification.')
     with args.report.open('x') as stream:
-        json.dump(result, stream, indent=2, allow_nan=False)
+        json.dump(result, stream, indent=2, allow_nan=False, default=report_scalar)
     console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions', 'source_activation_candidates')}
     if representation is not None:
         console['exact_source_representation'] = {k: v for k, v in representation.items() if k != 'records'}
@@ -264,7 +272,7 @@ def main():
             unresolved_face_entries=len(pending),
             unresolved_parent_cells=sorted(set(face['dry_parent'] for face in pending)),
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
-    print(json.dumps(console, indent=2))
+    print(json.dumps(console, indent=2, default=report_scalar))
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
                or (representation is not None and not representation['exact_representation_controls_passed'])
                or (history is not None and not history['all_requested_steps_passed'])
@@ -276,6 +284,12 @@ def main():
                    or not transport['dissipative_base']['complete_fixed_topology_base_rates']
                    or not transport['central_base']['base_balance_controls_passed']
                    or not transport['dissipative_base']['base_balance_controls_passed'])))
+
+
+def report_scalar(value):
+    if isinstance(value, Fraction):
+        return float(value)
+    raise TypeError(f'Unsupported audit value: {type(value).__name__}')
 
 
 if __name__ == '__main__':

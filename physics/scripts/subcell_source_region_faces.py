@@ -7,9 +7,10 @@ horizontal projection, not the sloping three-dimensional edge length.
 from fractions import Fraction as F
 import math
 import numpy as np
+from subcell_source_face_section import SourceFaceSection
 
 
-def clipped_edge(sampler, edge, center, spacing):
+def clipped_edge(sampler, edge, center, spacing, with_exact=False):
     a, b = sampler.xyz[list(edge)]
     start = [F(float(a[j])) for j in range(3)]
     delta = [F(float(b[j]))-start[j] for j in range(3)]
@@ -31,9 +32,10 @@ def clipped_edge(sampler, edge, center, spacing):
     length = math.hypot(float((high-low)*delta[0]), float((high-low)*delta[1]))
     if not math.isfinite(length) or length <= 0:
         raise ValueError('Positive internal source edge exceeds represented range')
-    xyz = np.array([[float(start[j]+t*delta[j]-(F(float(center[j])) if j < 2 else 0))
-                     for j in range(3)] for t in (low, high)])
-    return xyz, length
+    exact = tuple(tuple(start[j]+t*delta[j]-(F(float(center[j])) if j < 2 else 0)
+                        for j in range(3)) for t in (low, high))
+    xyz = np.asarray(exact, float)
+    return (xyz, length, exact) if with_exact else (xyz, length)
 
 
 def internal_faces(partition):
@@ -65,10 +67,13 @@ def internal_faces(partition):
             li, ri = owner.get(left), owner.get(right)
             if li == ri:
                 continue
-            clipped = clipped_edge(source, edge, center, partition.patch.spacing)
+            exact_sources = hasattr(cell, 'fragments')
+            clipped = clipped_edge(source, edge, center, partition.patch.spacing, with_exact=exact_sources)
             if clipped is None:
                 continue
-            xyz, length = clipped
+            xyz, length = clipped[:2]
+            segment = (SourceFaceSection([[(F(0), clipped[2][0][2]), (F(length), clipped[2][1][2])]])
+                       if exact_sources else np.column_stack(([0., length], xyz[:, 2])))
             a, b = source.xyz[list(edge)]
             third = source.xyz[next(int(v) for v in source.faces[left] if int(v) not in edge)]
             dx, dy = F(float(b[0]))-F(float(a[0])), F(float(b[1]))-F(float(a[1]))
@@ -81,5 +86,5 @@ def internal_faces(partition):
                 normal *= -1
             result.append(dict(parent=parent, left=li, right=ri, left_source=left, right_source=right,
                 edge_vertex_ids=list(edge), normal=normal,
-                xyz=xyz, segment=np.column_stack(([0., length], xyz[:, 2]))))
+                xyz=xyz, segment=segment))
     return result

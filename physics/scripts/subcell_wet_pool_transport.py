@@ -11,6 +11,8 @@ import numpy as np
 
 from subcell_energy_flux import face_flux, face_flux_normal
 from subcell_wet_pool_pressure import shared_subsegments
+from subcell_source_frames import face_section, physical_datum
+from subcell_source_face_section import stage_difference
 from subcell_wet_pool_primal_energy import evaluate
 from triangle_face_section import TriangleFaceSection
 from subcell_exact_source_faces import source_faces
@@ -53,7 +55,7 @@ def rates(partition, physical_momentum=None, gravity=9.81, dissipative=False, fu
             li, ri = tag_l[0], tag_r[0]
             if li is None and ri is None:
                 continue
-            section = TriangleFaceSection([segment], segment[:, 0])
+            section = face_section(segment)
             if li is None or ri is None:
                 owner = ri if li is None else li
                 form = pools[owner]['form']
@@ -96,7 +98,7 @@ def rates(partition, physical_momentum=None, gravity=9.81, dissipative=False, fu
     internal_active = 0
     for face in partition.internal_faces:
         li, ri = face['left'], face['right']
-        section = TriangleFaceSection([face['segment']], face['segment'][:, 0])
+        section = face_section(face['segment'])
         if li is None or ri is None:
             owner = ri if li is None else li
             form = pools[owner]['form']
@@ -135,8 +137,8 @@ def rates(partition, physical_momentum=None, gravity=9.81, dissipative=False, fu
     if unresolved:
         # Do not expose accumulated partial dv/dp as a plausible evolution.
         return dict(**common, volume_rate=None, momentum_rate=None, full_metric_energy_rate=None)
-    datum = min(float(c.datum) for c in partition.patch.cells)
-    heights = np.array([math.fsum((p['form']['stage_offset'], p['form']['datum'], -datum)) for p in pools])
+    datum = min(physical_datum(c) for c in partition.patch.cells)
+    heights = np.array([stage_difference(0., datum, p['form']['stage_offset'], p['form']['datum']) for p in pools])
     base_work = float((gravity*heights-.5*np.sum(velocity*velocity, axis=1))@dv+np.sum(velocity*dp))
     metric = evaluate(partition, momentum[:, None, :], gravity) if full_metric else None
     full_work = None if metric is None else float(metric['volume_gradient']@dv+np.sum(metric['canonical_velocity'][:, 0]*dp))

@@ -75,6 +75,24 @@ class SourceFaceSection(TriangleFaceSection):
             result.append(float(a[1]+(b[1]-a[1])*(t-a[0])/(b[0]-a[0])))
         return np.asarray(result).reshape(values.shape)
 
+    def restricted(self, low, high):
+        low, high = F(low), F(high)
+        if low >= high or low < self.source_segments[0][0][0] or high > self.source_segments[-1][1][0]:
+            raise ValueError('Positive represented source subinterval required')
+        pieces = []
+        for a, b in self.source_segments:
+            first, last = max(low, a[0]), min(high, b[0])
+            if first < last:
+                z = lambda t: a[1]+(b[1]-a[1])*(t-a[0])/(b[0]-a[0])
+                pieces.append(((first, z(first)), (last, z(last))))
+        return type(self)(pieces)
+
+    def tolist(self):
+        """Single-trace FLOAT PROJECTION for reports, never geometry recovery."""
+        if len(self.source_segments) != 1:
+            raise ValueError('Single original trace required for report projection')
+        return self.segments[0].tolist()
+
     def verify_shared(self, other):
         if not isinstance(other, SourceFaceSection):
             raise ValueError('Exact source neighbor required; float projection is not authoritative')

@@ -10,6 +10,7 @@ from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 from subcell_mechanical_energy import squared_depth_integral
 from subcell_wet_pool_pressure import WetPoolPressureSystem, harmonic_area, shared_subsegments, column_intervals
 from subcell_source_face_section import stage_difference
+from subcell_source_frames import face_section, physical_datum
 from triangle_face_section import TriangleFaceSection
 
 
@@ -103,7 +104,7 @@ class WetPoolPressureRate:
                 parent, sign = (right, -1) if left < 0 else (left, 1)
                 for owner, segment in system.partition.boundary_segments(parent, axis, sign):
                     form = pools[owner]['form']
-                    face = TriangleFaceSection([segment], segment[:, 0])
+                    face = face_section(segment)
                     area, _, wet_width = face.moments(form['stage_offset'], form['datum'])
                     rate = wet_width*stage_rate[owner]
                     add(owner, 2*owner+axis, -sign*(rate-2*self.ell[owner]*area)/system.h[owner, 0])
@@ -181,11 +182,11 @@ def dual_direction(partition, canonical_velocity, volume_rate, canonical_velocit
         records.append(dict(length=float(length), weight=float(weight), solve=stats, direction_solve=rate_stats))
     kinetic = float(.5*np.sum(q*sq))
     kinetic_rate = float(np.sum(qt*sq)-.5*metric_work)
-    datum = min(float(cell.datum) for cell in partition.patch.cells)
+    datum = min(physical_datum(cell) for cell in partition.patch.cells)
     potential, potential_rate = 0., 0.
     for pool, vd in zip(partition.pools, tangent.volume_rate[:, 0]):
         form = pool['form']
-        height = math.fsum((form['stage_offset'], form['datum'], -datum))
+        height = stage_difference(0., datum, form['stage_offset'], form['datum'])
         potential += gravity*(height*pool['volume']-.5*squared_depth_integral(pool['storage'], form['stage_offset'], True))
         potential_rate += gravity*height*vd
     return dict(physical_momentum=root*sq, physical_momentum_rate=ell*root*sq+root*sqt,

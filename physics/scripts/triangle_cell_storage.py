@@ -71,6 +71,15 @@ def projected_areas(triangles):
 
 
 class TriangleCellStorage:
+    def subset_sources(self, source_ids):
+        if self.source_triangle_indices is None:
+            raise ValueError('Original source indices required for a storage subset')
+        requested = set(source_ids)
+        if not requested or not requested.issubset(set(self.source_triangle_indices)):
+            raise ValueError('Nonempty represented original source subset required')
+        mask = np.isin(self.source_triangle_indices, list(requested))
+        return type(self)(self.triangles[mask], self.source_triangle_indices[mask])
+
     def __init__(self, triangles, source_triangle_indices=None):
         triangles = np.asarray(triangles, float)
         if triangles.ndim != 3 or triangles.shape[1:] != (3, 3) or not len(triangles) or not np.isfinite(triangles).all():

@@ -3,6 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [exact geometry through wet-pool state](../reconstruction-review-2026-09-07/normal-river-exact-pool-integration.md).
+Opt-in exact source geometry now persists through separated pools, source subsets,
+datums/traces/internal edges, both pressure poles, probes and activation states.
+Actual258-pool pressure controlsPASS; every history attempt has zero source faces
+below storage minimum. Still17 candidate steps/0.34s, then step18 rejects FOUR zero
+volumes, three with inflow; step17 tiny-region speed8.68m/s is not qualified.
+Aggregate energy datum bug corrected; legacy aggregate bypass APIs reject exact
+patches. Default/native water remains unchanged. NEXT conservative coupled drying
+and pressure/force timing, full rational dynamics, time/open/refinement/native work.
+Final40-hash actual audit: both original40CG poles, analytic directions and physical
+energy controlsPASS, but fixed-topology flux still has57 unowned-source entries.
+218 focusedPASS/1 original geometryFAIL; retained25PASS/12 energyFAIL, no waivers.
+464 protected source/capture/map/profile/actor hashes unchanged.
+Full visual/30FPS/later-river/crew/normalization/regression/release scope remainsOPEN.
+
 Latest September 14: [source-relative faces and pressure columns](../reconstruction-review-2026-09-07/normal-river-source-relative-faces.md).
 Exact source widths/heights now feed existing hydrostatic, paired/donor/front
 flux and harmonic pressure/direction kernels without absolute-float projection.

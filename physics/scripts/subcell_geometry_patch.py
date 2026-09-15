@@ -6,10 +6,14 @@ no native budget, energy, open-boundary, breaking or gameplay qualification.
 import numpy as np
 from triangle_cell_storage import cell_triangles, TriangleCellStorage
 from triangle_face_section import TriangleFaceSection
+from fractions import Fraction as F
+from subcell_exact_geometry import cell_fragments, SourceRelativeStorage
+from subcell_source_face_section import fragment_section, stage_difference
 
 
 class SubcellGeometryPatch:
-    def __init__(self, sampler, origin, shape, spacing=(1., 1.), periodic=(False, False), relative_stages=False):
+    def __init__(self, sampler, origin, shape, spacing=(1., 1.), periodic=(False, False), relative_stages=False,
+                 exact_sources=False):
         origin, spacing = np.asarray(origin, float), np.asarray(spacing, float)
         if (origin.shape != (2,) or spacing.shape != (2,) or not np.isfinite([origin, spacing]).all()
                 or (spacing <= 0).any() or len(shape) != 2 or any(int(n) != n or n < 1 for n in shape)
@@ -17,10 +21,19 @@ class SubcellGeometryPatch:
             raise ValueError('Finite origin, positive spacing and integer (ny,nx) shape required')
         self.shape, self.spacing = tuple(map(int, shape)), spacing
         self.relative_stages = bool(relative_stages)
+        self.exact_sources = bool(exact_sources)
+        if self.exact_sources and not self.relative_stages:
+            raise ValueError('Exact source geometry requires datum-relative storage')
         ny, nx = self.shape
         self.cells, boundaries = [], []
         for row in range(ny):
             for col in range(nx):
+                if self.exact_sources:
+                    fragments = cell_fragments(sampler, origin+spacing*[col, row], spacing)
+                    self.cells.append(SourceRelativeStorage(fragments))
+                    boundaries.append([fragment_section(fragments, axis, sign*F(float(spacing[axis]))/2)
+                                       for axis in (0, 1) for sign in (-1, 1)])
+                    continue
                 triangles, source_ids = cell_triangles(sampler, origin+spacing*[col, row], spacing, with_source_ids=True)
                 self.cells.append(TriangleCellStorage(triangles, source_ids))
                 boundaries.append([TriangleFaceSection.from_cell(triangles, axis, sign*spacing[axis]/2,
@@ -47,13 +60,17 @@ class SubcellGeometryPatch:
 
     def state_from_stages(self, stages, velocities=None):
         stages = np.broadcast_to(np.asarray(stages, float), self.shape).ravel()
-        volumes = np.array([cell.volume_and_wet_area(eta)[0] for cell, eta in zip(self.cells, stages)])
+        volumes = np.array([cell.relative_volume_and_wet_area(stage_difference(0., cell.source_datum, eta, 0.))[0]
+                            if hasattr(cell, 'source_datum') else cell.volume_and_wet_area(eta)[0]
+                            for cell, eta in zip(self.cells, stages)])
         velocities = np.zeros((*self.shape, 2)) if velocities is None else np.broadcast_to(velocities, (*self.shape, 2))
         if not np.isfinite(velocities).all():
             raise ValueError('Finite velocity required')
         return volumes.reshape(self.shape), volumes.reshape((*self.shape, 1))*velocities
 
     def rates(self, volumes, momenta, gravity=9.81, diagnostics=False):
+        if self.exact_sources:
+            raise ValueError('Exact source evolution requires pool-aware state, not the legacy aggregate-cell rate API')
         volumes, momenta = np.asarray(volumes, float), np.asarray(momenta, float)
         if (volumes.shape != self.shape or momenta.shape != (*self.shape, 2)
                 or not np.isfinite(volumes).all() or not np.isfinite(momenta).all() or (volumes < 0).any()

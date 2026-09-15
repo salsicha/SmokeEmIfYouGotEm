@@ -11,6 +11,8 @@ import numpy as np
 from rational_primal_energy import K0, BETAS, ALPHAS
 from subcell_mechanical_energy import squared_depth_integral
 from subcell_wet_pool_pressure import WetPoolPressureSystem, shared_subsegments, harmonic_area
+from subcell_source_frames import face_section, physical_datum
+from subcell_source_face_section import stage_difference
 from subcell_wet_pool_pressure_rate import harmonic_area_rate
 from triangle_face_section import TriangleFaceSection
 
@@ -52,7 +54,7 @@ def kinetic_volume_gradient(system, q):
             parent, sign = (right, -1) if left < 0 else (left, 1)
             for owner, segment in system.partition.boundary_segments(parent, axis, sign):
                 form = pools[owner]['form']
-                face = TriangleFaceSection([segment], segment[:, 0])
+                face = face_section(segment)
                 area, _, width = face.moments(form['stage_offset'], form['datum'])
                 wall[owner] -= sign*f[owner, 0]*u[owner, axis]*(width/form['wet_area']-area/volume[owner])/volume[owner]
     for face in system.partition.internal_faces:
@@ -106,8 +108,8 @@ def evaluate(partition, physical_momentum, gravity=9.81):
     canonical = mapped/root
     velocity = p/volume[:, None, None]
     normalization = -.5*np.sum(canonical[:, 0]*velocity[:, 0], axis=1)
-    datum = min(float(cell.datum) for cell in partition.patch.cells)
-    heights = np.array([math.fsum((pool['form']['stage_offset'], pool['form']['datum'], -datum))
+    datum = min(physical_datum(cell) for cell in partition.patch.cells)
+    heights = np.array([stage_difference(0., datum, pool['form']['stage_offset'], pool['form']['datum'])
                         for pool in partition.pools])
     potential = gravity*sum(height*pool['volume']-.5*squared_depth_integral(
         pool['storage'], pool['form']['stage_offset'], True) for pool, height in zip(partition.pools, heights))

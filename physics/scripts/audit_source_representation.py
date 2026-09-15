@@ -115,5 +115,5 @@ def audit_representation(sampler, origin, shape, spacing, volumes):
         maximum_errors=errors, records=records,
         evolving_storage_or_topology_or_full_physics_or_gameplay_accepted=False,
         scope='Exact original-source polygons, area, slopes, relative storage/face moments, partial-lake '
-              'balance, source connectivity and shared column controls. Current evolving pools still '
-              'use the old float-vertex storage and float datum/face API; no exact-frame pressure graph evolution.')
+              'balance, source connectivity and shared column controls. This standalone audit does not '
+              'certify pool evolution; the opt-in exact-source pool path is reported separately.')

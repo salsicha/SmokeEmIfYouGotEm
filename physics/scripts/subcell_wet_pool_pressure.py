@@ -11,7 +11,9 @@ import numpy as np
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 from pressure_cg_range_reference import solve as range_cg
 from triangle_face_section import TriangleFaceSection
-from subcell_source_face_section import stage_difference
+from subcell_source_face_section import stage_difference, SourceFaceSection
+from subcell_source_frames import face_section
+from fractions import Fraction as F
 
 
 def column_intervals(segment, height, datum):
@@ -79,6 +81,16 @@ def shared_subsegments(left, right):
     """Intersect labelled source face pieces without joining point contacts."""
     for li, a in left:
         for ri, b in right:
+            if isinstance(a, SourceFaceSection) or isinstance(b, SourceFaceSection):
+                if not isinstance(a, SourceFaceSection) or not isinstance(b, SourceFaceSection):
+                    raise ValueError('Exact and projected source traces cannot be mixed')
+                low = max(a.source_segments[0][0][0], b.source_segments[0][0][0])
+                high = min(a.source_segments[-1][1][0], b.source_segments[-1][1][0])
+                if low < high:
+                    first, second = a.restricted(low, high), b.restricted(low, high)
+                    first.verify_shared(second)
+                    yield li, ri, first
+                continue
             low, high = max(a[0, 0], b[0, 0]), min(a[1, 0], b[1, 0])
             if high <= low:
                 continue
@@ -107,6 +119,8 @@ def piecewise_column_integral(partition, first, second=None):
     pieces = first+(second if second is not None else [])
     if not pieces:
         return 0.
+    if isinstance(pieces[0][1], SourceFaceSection):
+        return exact_column_integral(partition, first, second)
     knots = set(float(x) for _, segment in pieces for x in segment[:, 0])
     for index, segment in pieces:
         form = partition.pools[index]['form']
@@ -151,6 +165,48 @@ def piecewise_column_integral(partition, first, second=None):
     return total
 
 
+def exact_column_integral(partition, first, second=None):
+    """Independent rational knot sweep; do not infer ownership from projections."""
+    pieces = first+(second if second is not None else [])
+    knots = set()
+    for owner, trace in pieces:
+        if not isinstance(trace, SourceFaceSection):
+            raise ValueError('Exact source traces required throughout the column oracle')
+        form = partition.pools[owner]['form']
+        surface = F(form['datum'])+F(float(form['stage_offset']))
+        for a, b in trace.source_segments:
+            knots.update((a[0], b[0]))
+            da, db = surface-a[1], surface-b[1]
+            if da*db < 0:
+                knots.add(a[0]+(b[0]-a[0])*da/(da-db))
+    knots = sorted(knots)
+    values = []
+    for low, high in zip(knots, knots[1:]):
+        def owner_on(traces):
+            found = []
+            for owner, trace in traces:
+                if trace.source_segments[0][0][0] <= low and high <= trace.source_segments[-1][1][0]:
+                    part = trace.restricted(low, high)
+                    form = partition.pools[owner]['form']
+                    surface = F(form['datum'])+F(float(form['stage_offset']))
+                    if any(surface > v[1] for s in part.source_segments for v in s):
+                        found.append((owner, part))
+            if len(found) > 1:
+                raise ValueError('Multiple exact source owners on one positive interval')
+            return found[0] if found else None
+        left = owner_on(first)
+        right = owner_on(second) if second is not None else left
+        if left is None or right is None:
+            continue
+        lf, rf = partition.pools[left[0]]['form'], partition.pools[right[0]]['form']
+        if second is None:
+            values.append(left[1].moments(lf['stage_offset'], lf['datum'])[0])
+        else:
+            left[1].verify_shared(right[1])
+            values.append(harmonic_area(left[1], lf['stage_offset'], rf['stage_offset'], lf['datum'], rf['datum']))
+    return math.fsum(values)
+
+
 def uniform_parent_stage(partition, parent):
     pools = [partition.pools[i] for i in partition.parent_pools[parent]]
     return pools and all(p['parent_stage_offset'] == pools[0]['parent_stage_offset'] for p in pools)
@@ -193,8 +249,8 @@ class WetPoolPressureSystem:
                 if uniform_parent_stage(partition, left) and uniform_parent_stage(partition, right):
                     lp = partition.pools[partition.parent_pools[left][0]]
                     rp = partition.pools[partition.parent_pools[right][0]]
-                    expected = sum(harmonic_area(segment, lp['parent_stage_offset'], rp['parent_stage_offset'],
-                                                lp['parent_datum'], rp['parent_datum']) for segment in section.segments)
+                    expected = harmonic_area(section, lp['parent_stage_offset'], rp['parent_stage_offset'],
+                                             lp['parent_datum'], rp['parent_datum'])
                 self.maximum_shared_column_partition_error = max(self.maximum_shared_column_partition_error,
                     abs(total_area-expected)/max(1., expected))
             else:
@@ -202,7 +258,7 @@ class WetPoolPressureSystem:
                 total_area = 0.
                 for owner, segment in partition.boundary_segments(parent, axis, sign):
                     pool = partition.pools[owner]
-                    part = TriangleFaceSection([segment], segment[:, 0])
+                    part = face_section(segment)
                     area = part.moments(pool['form']['stage_offset'], pool['form']['datum'])[0]
                     if area == 0:
                         continue
