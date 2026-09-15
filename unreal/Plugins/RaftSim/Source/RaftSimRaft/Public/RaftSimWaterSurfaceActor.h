@@ -685,6 +685,9 @@ private:
     TArray<float> CartesianShoreDepthM;
     TArray<float> CartesianShoreBedM;
     int32 CartesianShoreSourceVertexCount = 0;
+    // Scratch capacity only; Pack rewrites every field before submission.
+    // Downstream may consume the rvalue; a moved-from buffer simply regrows.
+    TArray<FProcMeshVertex> CartesianSourcePackingScratch;
     bool bRuntimeSurfaceReady = false;
     bool TryInitializeRuntimeSurface();
     void BuildGrid();

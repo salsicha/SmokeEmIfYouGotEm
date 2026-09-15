@@ -575,6 +575,9 @@ bool FRaftSimCartesianShorelineSurfaceTest::RunTest(const FString&)
     auto* Mesh=Surface->CartesianShorelineMesh.Get();
     Water->ConfigureRaftSupportSurface(true,1.f,0.f,1.f);
     TestTrue(TEXT("actual refresh publishes Cartesian clipped carrier"),Surface->IsLiveVolumeCoreVisible());
+    const auto* PackingStorage=Surface->CartesianSourcePackingScratch.GetData();
+    TestEqual(TEXT("normal publication retains the complete current source prefix"),
+        Surface->CartesianSourcePackingScratch.Num(),Surface->GridStationN*Surface->GridLateralN);
     TestFalse(TEXT("old uncut procedural carrier is hidden"),Surface->LiveVolumeCoreMesh->IsVisible());
     TestTrue(TEXT("actual clipped mesh has water triangles"),Mesh && Mesh->GetWaterIndices().Num()>0);
     int32 Dry=0;
@@ -622,6 +625,8 @@ bool FRaftSimCartesianShorelineSurfaceTest::RunTest(const FString&)
     auto* Proxy=Mesh->GetSceneProxy();
     if (!TestNotNull(TEXT("actual carrier has a rendering proxy"),Proxy)) return false;
     Surface->RefreshSurface(); Surface->UpdateLiveVolumeCoreInterpolation(.016f);
+    TestTrue(TEXT("refresh/interpolation reuse packing allocation while rewriting current attributes"),
+        PackingStorage && Surface->CartesianSourcePackingScratch.GetData()==PackingStorage);
     TestEqual(TEXT("single core never refreshes hidden base render buffer"),
         HiddenBase->ProcVertexBuffer[0].Position.Z,-12345.);
     TestEqual(TEXT("single core never refreshes hidden raised foam render buffer"),

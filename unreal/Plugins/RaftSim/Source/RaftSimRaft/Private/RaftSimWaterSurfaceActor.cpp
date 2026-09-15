@@ -6,6 +6,7 @@
 #include "RaftSimShorelineMeshComponent.h"
 #include "RaftSimWaterShoreline.h"
 #include "RaftSimWaterSourcePacking.h"
+#include "RaftSimSourcePackingAudit.h"
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimIndexedBreakingProfile.h"
@@ -8500,18 +8501,25 @@ void ARaftSimWaterSurfaceActor::PublishLiveVolumeCore(const TArray<FVector>& Pos
         const int32 N=Positions.Num();
         if (N!=GridStationN*GridLateralN || VertexNormals.Num()!=N || Colors.Num()!=N ||
             Flow.Num()!=N || Wake.Num()!=N || UVs.Num()!=N || Tangents.Num()!=N) return;
-        TArray<FProcMeshVertex> Source;
+        TArray<FProcMeshVertex> FreshSource;
+        // Same-input live pairs preserve every attribute and improve both
+        // orders. Retain capacity only; Pack still writes every current field.
+        static const bool bReuseSource=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimFreshSourcePacking"));
+        auto& Source=bReuseSource ? CartesianSourcePackingScratch : FreshSource;
         {
             CSV_SCOPED_TIMING_STAT(RaftSimSurface,PackSource);
             // Exact packing is not necessarily faster in parallel. Keep it
             // opt-in for same-binary timing comparisons until measured better.
             static const bool bParallelSourcePacking = FParse::Param(
                 FCommandLine::Get(), TEXT("RaftSimParallelSourcePacking"));
+            static const bool bVectorColors=FParse::Param(FCommandLine::Get(),TEXT("RaftSimVectorSourceColors"));
             if (!RaftSimWaterSourcePacking::Pack(Positions,VertexNormals,Colors,UVs,
                 Flow,Wake,Tangents,Source,bParallelSourcePacking,
                 FoamTransportVelocityMetersPerSecond.Num()==N
-                    ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>(Flow))) return;
+                    ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>(Flow),bVectorColors)) return;
         }
+        RaftSimSourcePackingAudit::Run(Positions,VertexNormals,Colors,UVs,Flow,Wake,Tangents,
+            FoamTransportVelocityMetersPerSecond.Num()==N ? TConstArrayView<FVector2D>(FoamTransportVelocityMetersPerSecond) : TConstArrayView<FVector2D>(Flow),Source);
         Perf.Mark(TEXT("pack_source"));
         if (CartesianShorelineMesh->GetMaterial(0)!=LiveVolumeCoreMesh->GetMaterial(0))
             CartesianShorelineMesh->SetMaterial(0, LiveVolumeCoreMesh->GetMaterial(0));

@@ -3,7 +3,27 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [original-source inlet-connected geometry](../reconstruction-review-2026-09-07/normal-river-inlet-sweep-geometry.md).
+Latest September 15: [normal-play source packing capacity reuse](../reconstruction-review-2026-09-07/normal-river-source-packing-reuse.md).
+Normal play now reuses source packing allocation while rewriting EVERY current
+vertex field. Two 64-pair live comparisons: all 128 exact and faster in both
+orders, 6.48 million complete vertices compared. Packing drops about 1.1 ms
+per call (rebuilt default 2.311875→1.217355 ms); no geometry/cadence/quality/
+physics/contact changes. Vector-color candidate is exact but slower in one
+order and remains DISABLED. Final native build PASS; 28 native tests and 26
+evidence-parser tests PASS. Actual actor reuse and ground/contact checks pass.
+Clean ordinary 300-frame run: 24.225877 FPS, mean 41.278176 ms, p95 47.78 ms:
+STILL FAILS 30 FPS / 33.333333 ms. Do not attribute the whole-frame difference
+to packing; trajectories/refresh counts differ. Fresh original still and later
+decoded frame inspected: broad froth, smooth wave faces and broad rock flanks
+remain unaccepted. All 464 protected hashes match; owned jobs terminal.
+NEXT remaining publication/refresh costs and actual crest/froth/reference work,
+source-crossing/overlapping inlets, non-horizontal support/one-sided forces,
+complete rational fronts/time and native single-surface integration. Prior
+13 physics regressions remain unresolved. Colorado → Pacuare → Futaleufu,
+Chilko/Zambezi/all-scene water, crew, normalization and release remain OPEN.
+Troublemaker stays a rapid within South Fork, never its own menu scenario.
+
+Earlier September 15: [original-source inlet-connected geometry](../reconstruction-review-2026-09-07/normal-river-inlet-sweep-geometry.md).
 Conditional outward inlet sweeps now retain original entry location and
 source-clipped depth moments rather than filling a receiver minimum away from
 the inlet. Exact polynomial integration carries certified switch bounds;
