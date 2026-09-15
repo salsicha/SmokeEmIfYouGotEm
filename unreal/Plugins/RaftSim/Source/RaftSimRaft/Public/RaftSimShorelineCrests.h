@@ -14,6 +14,7 @@ struct FRaftSimShorelineCrestInput
     TArray<double> ProfileKey;
     TArray<FBox2D> NonzeroRegionsCm;
     TFunction<float(const FVector2D&)> HeightAtWorldXYCm;
+    TFunction<float(const FBox2D&)> HeightRangeWidthAtWorldXYCm;
     float BlendAlpha=1.f;
     FBox2D DetailWindowCm=FBox2D(ForceInit);
     float DetailSpanCm=0;

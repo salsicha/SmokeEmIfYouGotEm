@@ -9,6 +9,7 @@
 #include "RaftSimWaterSmoothing.h"
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimIndexedBreakingProfile.h"
+#include "RaftSimBreakingHeightRange.h"
 #include "RaftSimWaterFlowHistory.h"
 #include "RaftSimWaterCarrierMeshComponent.h"
 #include "RaftSimWaterTextureHistory.h"
@@ -5714,6 +5715,24 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         const auto IndexedProfile=MakeShared<FRaftSimIndexedBreakingProfile,ESPMode::ThreadSafe>(SupportSites,Lift,Spacing);
         RaftSimBreakingTileAudit::Run(*IndexedProfile,RiverCoordinatesM);
         SharedCrestProfile=IndexedProfile;
+        // Actual 64-pair changing-input audit: exact topology, faster in
+        // every pair and both orders. Retain an independent reference switch.
+        static const bool bRangeEnabled=[]
+        {
+            FString Path;
+            return !FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestRange")) ||
+                FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestRangeAudit="),Path);
+        }();
+        if(bRangeEnabled)
+        {
+            CartesianCrestInput.HeightRangeWidthAtWorldXYCm=[Sites=SupportSites,Scale,Sign](const FBox2D& Box)
+            {
+                FBox2D Field(ForceInit);
+                Field+=FVector2D(Box.Min.X*.01,Box.Min.Y*.01*Sign);
+                Field+=FVector2D(Box.Max.X*.01,Box.Max.Y*.01*Sign);
+                return RaftSimBreakingHeightRange::WidthMeters(Sites,Field)*FMath::Abs(Scale)*100.f;
+            };
+        }
         CartesianCrestInput.HeightAtWorldXYCm=[Sites=SupportSites,IndexedProfile,Lift,Spacing,Scale,Sign](const FVector2D& P)
         {
             static const bool bHashed=FParse::Param(FCommandLine::Get(),TEXT("RaftSimHashedBreakingTiles"));

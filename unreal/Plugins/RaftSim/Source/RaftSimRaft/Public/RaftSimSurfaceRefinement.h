@@ -33,6 +33,10 @@ struct FRaftSimSurfaceRefinement
     bool bStrongEdgeHash=false; // Candidate until exact actual-input timing qualifies it.
     bool bLevelLocalMemos=false; // Candidate: retain coordinate slots separately per level.
     bool bInlineSelection=false; // Candidate: typed predicate, identical evaluations.
+    // Optional conservative width of a range containing the current profile
+    // on a box. Only skips selection when every error test is provably below
+    // the SAME tolerance. It never changes a sampled or published height.
+    TFunction<float(const FBox2D&)> HeightRangeWidthCm;
     double InputSeconds=0,SelectionSeconds=0,AssemblySeconds=0;
     uint64 ParallelContextsCreated=0,ParallelContextsDestroyed=0;
     uint64 SharedCornerSamples=0,SharedCornerReads=0;
@@ -153,6 +157,14 @@ struct FRaftSimSurfaceRefinement
                     if(RegionIndex)Intersects=RegionIndex->Intersects(Bounds);
                     else for (const auto& Region:NonzeroRegions) if (Bounds.Intersect(Region)) { Intersects=true; break; }
                     if (!Intersects) return false; // The supplied profile is exactly zero here.
+                }
+                if(HeightRangeWidthCm)
+                {
+                    const float Width=HeightRangeWidthCm(Bounds);
+                    // All quarter-triangle weights are nonnegative and sum
+                    // to one. Profile values and their interpolation stay in
+                    // the same range, hence their difference is <= its width.
+                    if(FMath::IsFinite(Width) && Width>=0.f && Width<=ToleranceCm)return false;
                 }
                 const float VA=ShareCorners ? Corners.Get(Triangle,0) : Value(A,Context);
                 const float VB=ShareCorners ? Corners.Get(Triangle,1) : Value(B,Context);

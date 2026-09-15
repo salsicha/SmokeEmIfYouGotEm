@@ -3,7 +3,25 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [flat-source pressure work](../reconstruction-review-2026-09-07/normal-river-flat-birth-work.md).
+Latest September 15: [normal-play conservative crest range](../reconstruction-review-2026-09-07/normal-river-crest-range-bound.md).
+Normal play now skips adaptive profile sampling only where a conservative
+height-range bound proves the unchanged 0.5 cm selection test cannot trigger.
+It does not substitute heights or change geometry/detail/quality/contact gates.
+Two actual 64-pair changing-input audits: every pair exact and faster in both
+orders (10.867741→8.228150 ms; rebuilt default 10.712986→8.252667 ms).
+More than 8.6 million vertices compared across the two runs. Final build PASS;
+21 native and 27 Python evidence tests PASS. All 464 protected hashes unchanged.
+Fresh ordinary default: 22.429181 FPS / p95 54.7266 ms still FAILS 30 FPS.
+Different refresh counts/trajectories prevent attributing the whole-game FPS
+difference to this change. Recording finalized (93 source frames / 6.049 s,
+181 decoded); original and 3/5-second frames still show broad merged froth and
+smooth water faces. No visual acceptance or new breaking geometry claimed.
+All owned jobs terminal. NEXT breaking/froth deformation, compatible original
+front forces/transport and native single-surface integration, remaining major
+solver/surface costs; Colorado → Pacuare → Futaleufu, all-scene water, crew,
+normalization, retained regressions and release stay OPEN.
+
+Earlier September 15: [flat-source pressure work](../reconstruction-review-2026-09-07/normal-river-flat-birth-work.md).
 The original single flat-birth energy/work limit now retains both order-height
 old self-divergence and order-sqrt-height old/new pressure coupling, plus
 bounded newborn momentum. Energy slope, canonical velocity, fixed-momentum
