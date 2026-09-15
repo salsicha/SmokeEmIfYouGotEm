@@ -8,7 +8,8 @@ import numpy as np
 
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 from subcell_mechanical_energy import squared_depth_integral
-from subcell_wet_pool_pressure import WetPoolPressureSystem, harmonic_area, shared_subsegments
+from subcell_wet_pool_pressure import WetPoolPressureSystem, harmonic_area, shared_subsegments, column_intervals
+from subcell_source_face_section import stage_difference
 from triangle_face_section import TriangleFaceSection
 
 
@@ -23,22 +24,22 @@ def harmonic_area_rate(segment, lh, rh, ld, rd, left_rate, right_rate):
     harmonic_area(segment, lh, rh, ld, rd)  # Validate the same represented inputs.
     if not np.isfinite([left_rate, right_rate]).all():
         raise ValueError('Finite stage directions required')
-    segment = np.asarray(segment, float)
-    width = segment[1, 0]-segment[0, 0]
-    delta = math.fsum((rd, -ld, rh, -lh))
+    delta = stage_difference(lh, ld, rh, rd)
     if delta < 0:
         lh, rh, ld, rd = rh, lh, rd, ld
         left_rate, right_rate = right_rate, left_rate
         delta = -delta
-    low, high = np.sort(segment[:, 1])
-    a = math.fsum((lh, ld, -float(high)))
-    b = math.fsum((lh, ld, -float(low)))
-    if b == 0 and high == low:
+    return math.fsum(_harmonic_interval_rate(a, b, span, width, delta, left_rate, right_rate)
+                     for a, b, span, width in column_intervals(segment, lh, ld))
+
+
+def _harmonic_interval_rate(a, b, bed_span, width, delta, left_rate, right_rate):
+    if b == 0 and bed_span == 0:
         raise ValueError('Level-dry face requires a one-sided topology transition')
     if b <= 0:
         return 0.
     if a < 0:
-        width *= b/(high-low)
+        width *= b/bed_span
         a = 0.
     if delta == 0:
         return .5*width*(left_rate+right_rate)

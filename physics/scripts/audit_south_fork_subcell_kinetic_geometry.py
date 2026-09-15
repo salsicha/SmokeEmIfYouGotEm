@@ -70,6 +70,7 @@ def main():
         'subcell_coupled_front_update.py',
         'subcell_donor_face_flux.py',
         'subcell_exact_geometry.py', 'audit_source_representation.py',
+        'subcell_source_face_section.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}

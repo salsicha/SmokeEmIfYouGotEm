@@ -7,17 +7,18 @@ speed integrates the branch polynomials exactly up to floating-point error.
 """
 import math
 import numpy as np
+from subcell_source_face_section import stage_difference
 
 
 def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.):
     u, n = np.asarray(velocity, float), np.asarray(normal, float)
     if (u.shape != (2,) or n.shape != (2,) or not np.isfinite([u, n]).all()
-            or abs(float(n@n)-1.) > 1e-12 or not np.isfinite([stage, datum, gravity, energy_datum]).all()
+            or abs(float(n@n)-1.) > 1e-12 or not all(math.isfinite(v) for v in (stage, datum, gravity, energy_datum))
             or gravity <= 0):
         raise ValueError('Finite wet state, unit outward normal and positive gravity required')
     tangent = np.array([-n[1], n[0]])
     un, ut = float(u@n), float(u@tangent)
-    eta = math.fsum((stage, datum, -energy_datum))
+    eta = stage_difference(0., energy_datum, stage, datum)
     nodes, weights = np.polynomial.legendre.leggauss(4)
     result = np.zeros(4)  # volume, XY momentum, energy relative to fixed datum
     direct_force = np.zeros(2)
@@ -43,13 +44,11 @@ def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.)
             energy = mass*(1.5*star*star+.5*ut*ut+gravity*eta-c*c)
             branch = 'fan'
         return np.r_[mass, pn*n+mass*ut*tangent, energy], branch, force*n
-    for (low, high), width in zip(section.levels, section.lengths):
-        a = math.fsum((stage, datum, -float(high)))
-        b = math.fsum((stage, datum, -float(low)))
+    for (b, a), span, width in zip(section.depth_intervals(stage, datum), section.bed_spans, section.lengths):
         if b <= 0:
             continue
         if a < 0:
-            width *= b/(high-low)
+            width *= b/span
             a = 0.
         ca, cb = math.sqrt(gravity*a), math.sqrt(gravity*b)
         if ca == cb:

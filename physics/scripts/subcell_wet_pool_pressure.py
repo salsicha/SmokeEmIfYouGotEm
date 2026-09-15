@@ -11,6 +11,23 @@ import numpy as np
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 from pressure_cg_range_reference import solve as range_cg
 from triangle_face_section import TriangleFaceSection
+from subcell_source_face_section import stage_difference
+
+
+def column_intervals(segment, height, datum):
+    """High/low depths, bed span and width without exporting exact faces."""
+    if isinstance(segment, TriangleFaceSection):
+        return [(float(a), float(b), float(span), float(width)) for (b, a), span, width
+                in zip(segment.depth_intervals(height, datum), segment.bed_spans, segment.lengths)]
+    segment = np.asarray(segment, float)
+    if segment.shape != (2, 2) or not np.isfinite(segment).all():
+        raise ValueError('Finite shared face segment required')
+    width = segment[1, 0]-segment[0, 0]
+    if width <= 0:
+        raise ValueError('Positive face length required')
+    low, high = np.sort(segment[:, 1])
+    return [(math.fsum((height, datum, -float(high))), math.fsum((height, datum, -float(low))),
+             float(high-low), float(width))]
 
 
 def harmonic_area(segment, left_height, right_height, left_datum, right_datum):
@@ -19,23 +36,21 @@ def harmonic_area(segment, left_height, right_height, left_datum, right_datum):
     Exact logarithmic antiderivative, with a convergent numerical series only
     to avoid log1p subtraction cancellation. No dry-depth threshold is used.
     """
-    segment = np.asarray(segment, float)
-    if segment.shape != (2, 2) or not np.isfinite(segment).all():
-        raise ValueError('Finite shared face segment required')
-    width = segment[1, 0]-segment[0, 0]
-    if width <= 0 or not np.isfinite([left_height, right_height, left_datum, right_datum]).all():
+    if not all(math.isfinite(v) for v in (left_height, right_height, left_datum, right_datum)):
         raise ValueError('Positive face length and finite relative stages required')
-    delta = math.fsum((right_datum, -left_datum, right_height, -left_height))
+    delta = stage_difference(left_height, left_datum, right_height, right_datum)
     if delta < 0:
         left_height, right_height, left_datum, right_datum = right_height, left_height, right_datum, left_datum
         delta = -delta
-    low, high = np.sort(segment[:, 1])
-    b = math.fsum((left_height, left_datum, -float(low)))
+    return math.fsum(_harmonic_interval(a, b, span, width, delta)
+                     for a, b, span, width in column_intervals(segment, left_height, left_datum))
+
+
+def _harmonic_interval(a, b, bed_span, width, delta):
     if b <= 0:
         return 0.
-    a = math.fsum((left_height, left_datum, -float(high)))
     if a < 0:
-        width *= b/(high-low)
+        width *= b/bed_span
         a = 0.
     if delta == 0:
         return width*.5*(a+b)

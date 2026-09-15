@@ -8,6 +8,7 @@ Optional conservative dissipation has an explicit nonpositive energy rate.
 """
 import math
 import numpy as np
+from subcell_source_face_section import stage_difference
 
 
 def pressure_secant_area(section, left_stage, right_stage, left_datum=0., right_datum=0.):
@@ -17,9 +18,9 @@ def pressure_secant_area(section, left_stage, right_stage, left_datum=0., right_
     integrate mean depth; singly-wet pieces integrate h^2/(2*[eta]). Equal
     stages take the derivative (wet face area), not a small-difference cutoff.
     """
-    if not np.isfinite([left_stage, right_stage, left_datum, right_datum]).all():
+    if not all(math.isfinite(v) for v in (left_stage, right_stage, left_datum, right_datum)):
         raise ValueError('Finite datum-relative stages required')
-    delta = math.fsum((right_datum, -left_datum, right_stage, -left_stage))
+    delta = stage_difference(left_stage, left_datum, right_stage, right_datum)
     if delta == 0:
         return section.moments(left_stage, left_datum)[0]
     if delta < 0:
@@ -27,10 +28,9 @@ def pressure_secant_area(section, left_stage, right_stage, left_datum=0., right_
         left_datum, right_datum = right_datum, left_datum
         delta = -delta
     total = 0.
-    for (low, high), width in zip(section.levels, section.lengths):
-        a = math.fsum((left_stage, left_datum, -float(low)))
-        b = math.fsum((right_stage, right_datum, -float(low)))
-        span = high-low
+    left_depth = section.depth_intervals(left_stage, left_datum)[:, 0]
+    right_depth = section.depth_intervals(right_stage, right_datum)[:, 0]
+    for a, b, span, width in zip(left_depth, right_depth, section.bed_spans, section.lengths):
         if b <= 0:
             continue
         if span == 0:
@@ -63,9 +63,8 @@ def face_flux(section, left_stage, left_velocity, right_stage, right_velocity, a
     ar, i2r, _ = section.moments(right_stage, right_datum)
     area = pressure_secant_area(section, left_stage, right_stage, left_datum, right_datum)
     average = .5*(left+right)
-    minimum = float(section.levels.min())
-    signal = max(abs(left[axis])+math.sqrt(gravity*max(left_stage-(minimum-left_datum), 0)),
-                 abs(right[axis])+math.sqrt(gravity*max(right_stage-(minimum-right_datum), 0)))
+    signal = max(abs(left[axis])+math.sqrt(gravity*section.maximum_depth(left_stage, left_datum)),
+                 abs(right[axis])+math.sqrt(gravity*section.maximum_depth(right_stage, right_datum)))
     # The extra advective bound prevents an exactly dry face from donating
     # volume for the secant-based flux. It is not a pressure/time-step proof.
     speed = max(signal, 2*abs(average[axis])) if dissipative else 0.
@@ -74,7 +73,7 @@ def face_flux(section, left_stage, left_velocity, right_stage, right_velocity, a
     momentum[axis] += .25*gravity*(i2l+i2r)
     mass -= .5*speed*(ar-al)
     momentum -= .5*speed*(ar*right-al*left)
-    delta = math.fsum((right_datum, -left_datum, right_stage, -left_stage))
+    delta = stage_difference(left_stage, left_datum, right_stage, right_datum)
     work = -.5*speed*(gravity*delta*(ar-al)+.5*(al+ar)*float(np.sum((right-left)**2)))
     result = np.r_[mass, momentum]
     if not np.isfinite(result).all() or not math.isfinite(work):

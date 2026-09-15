@@ -1,5 +1,6 @@
 """Shared exact wet face area and pressure from the original terrain triangles."""
 import numpy as np
+import math
 
 
 class TriangleFaceSection:
@@ -39,22 +40,33 @@ class TriangleFaceSection:
 
     def moments(self, stage, datum=0.):
         """Return integral(h ds), integral(h^2 ds), and wet width; exact for each segment."""
-        if not np.isfinite(stage) or not np.isfinite(datum):
+        if not all(math.isfinite(v) for v in (stage, datum)):
             raise ValueError('Finite stage required')
-        low, high = (self.levels-datum).T
-        first, second, wet = (np.zeros(len(low)) for _ in range(3))
-        full = (stage >= high) & (stage > low)
-        a, b = stage-low[full], stage-high[full]
+        lower_depth, upper_depth = self.depth_intervals(stage, datum).T
+        first, second, wet = (np.zeros(len(lower_depth)) for _ in range(3))
+        full = (upper_depth >= 0) & (lower_depth > 0)
+        a, b = lower_depth[full], upper_depth[full]
         first[full] = (a+b)/2
         second[full] = (a*a+a*b+b*b)/3
         wet[full] = 1
-        partial = (stage > low) & (stage < high)
-        depth = stage-low[partial]
-        fraction = depth/(high[partial]-low[partial])
+        partial = (lower_depth > 0) & (upper_depth < 0)
+        depth = lower_depth[partial]
+        fraction = depth/self.bed_spans[partial]
         first[partial] = fraction*depth/2
         second[partial] = fraction*depth*depth/3
         wet[partial] = fraction
         return float(self.lengths@first), float(self.lengths@second), float(self.lengths@wet)
+
+    def depth_intervals(self, stage, datum=0.):
+        """Depth at each sorted low/high bed endpoint in the supplied frame."""
+        return stage-(self.levels-datum)
+
+    @property
+    def bed_spans(self):
+        return self.levels[:, 1]-self.levels[:, 0]
+
+    def maximum_depth(self, stage, datum=0.):
+        return max(float(self.depth_intervals(stage, datum)[:, 0].max()), 0.)
 
     def bed_at(self, tangent):
         tangent = np.asarray(tangent, float)
@@ -87,9 +99,8 @@ class TriangleFaceSection:
             raise ValueError('Finite velocities, positive gravity and XY normal required')
         hl, hhl, _ = self.moments(left_stage, left_datum)
         hr, hhr, _ = self.moments(right_stage, right_datum)
-        minimum = float(self.levels.min())
-        speed = max(abs(left[axis])+np.sqrt(gravity*max(left_stage-(minimum-left_datum), 0)),
-                    abs(right[axis])+np.sqrt(gravity*max(right_stage-(minimum-right_datum), 0)))
+        speed = max(abs(left[axis])+np.sqrt(gravity*self.maximum_depth(left_stage, left_datum)),
+                    abs(right[axis])+np.sqrt(gravity*self.maximum_depth(right_stage, right_datum)))
         mass = .5*(left[axis]*hl+right[axis]*hr)-.5*speed*(hr-hl)
         momentum = .5*(left[axis]*hl*left+right[axis]*hr*right)-.5*speed*(hr*right-hl*left)
         momentum[axis] += .25*gravity*(hhl+hhr)

@@ -32,7 +32,7 @@ def shared_wet_edge(sampler, edge, center, size, cell_datum, relative_stage):
             return False
     if lower >= upper:
         return False
-    z = F(float(a[2]))-F(float(cell_datum))
+    z = F(float(a[2]))-F(cell_datum)
     dz = F(float(b[2]))-F(float(a[2]))
     eta = F(float(relative_stage))
     # An affine depth is positive on a positive-length interval iff at least
@@ -60,7 +60,8 @@ def components(sampler, cell, center, size, relative_stage):
     for edge, faces in owners.items():
         if len(faces) > 2:
             raise ValueError('Nonmanifold original source edge')
-        if len(faces) == 2 and shared_wet_edge(sampler, edge, center, size, cell.datum, relative_stage):
+        if len(faces) == 2 and shared_wet_edge(sampler, edge, center, size,
+                getattr(cell, 'source_datum', cell.datum), relative_stage):
             a, b = faces
             adjacency[a].add(b); adjacency[b].add(a)
             connected_edges += 1

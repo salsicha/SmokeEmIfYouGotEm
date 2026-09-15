@@ -3,6 +3,21 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [source-relative faces and pressure columns](../reconstruction-review-2026-09-07/normal-river-source-relative-faces.md).
+Exact source widths/heights now feed existing hydrostatic, paired/donor/front
+flux and harmonic pressure/direction kernels without absolute-float projection.
+Source connectivity uses the retained datum; explicit range failures prevent
+nonzero depths from silently becoming dry. Original-state SouthFork controls:
+258 wet components,480 exact neighbor faces,458 positive shared columns;
+partial-lake bed/pressure residual2.14e-14. Evolving pool API still NOT switched.
+211 focusedPASS/1 original geometryFAIL; retained25PASS/12 energyFAIL, no waivers.
+464 protected source/capture/map/profile/actor hashes rechecked unchanged.
+Final38-hash actual audit retains original40CG pressure controls; entire old
+history unchanged and stillFAILS step18 after17 candidates/0.34s, not acceptance.
+NEXT exact-datum pool subsets/traces/internal edges/topology and pressure graph,
+conservative drying/full rational dynamics, time/open/refinement/native integration.
+No gameplay orFPS acceptance; full SouthFork/later-river/crew/release scopeOPEN.
+
 Latest September 14: [exact source fragment representation](../reconstruction-review-2026-09-07/normal-river-exact-source-representation.md).
 Original rational polygons retain positive fragments lost by float vertex
 projection, plus exact areas, original slopes and source IDs. Explicit local
