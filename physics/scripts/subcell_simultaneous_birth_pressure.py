@@ -174,6 +174,7 @@ def point_limits(context, requests):
             raise ValueError('Original positive birth pressure contraction failed')
         poles.append(dict(alpha=pole['alpha'], beta=pole['beta'], **stats,
             energy_path_slope=-.5*pole['alpha']*pole['beta']*work,
+            coupled_response=solution[:, 0],
             auxiliary_velocity_path_product_limit=-pole['beta']*solution[:, 0]/roots[:, None]))
     return dict(source_keys=keys, stage_scales=scales, volume_path_coefficients=coefficients,
         newborn_jet_maps=mappings, newborn_scaled_grams=grams, newborn_scaled_factors=factors,

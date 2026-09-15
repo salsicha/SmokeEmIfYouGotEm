@@ -10,7 +10,8 @@ from audit_south_fork_subcell_energy_flux import sha
 from subcell_source_activation import assembly
 from subcell_source_birth_geometry import SourceBirthGeometry
 from subcell_source_birth_pressure import SourceBirthPressure
-from subcell_simultaneous_birth_pressure import point_limits, birth_faces, BirthLimitSystem
+from subcell_source_birth_work import point_work
+from subcell_simultaneous_birth_pressure import birth_faces, BirthLimitSystem
 from subcell_source_frames import face_section
 from subcell_wet_pool_primal_energy import evaluate
 from subcell_wet_pool_pressure import WetPoolPressureSystem
@@ -38,7 +39,7 @@ def operator_probe(partition, candidate, limit):
     return dict(columns_checked=2*count, column_scaled_errors=errors, maximum_column_scaled_error=max(errors))
 
 
-def analyze(partition, receipts):
+def analyze(partition, receipts, assembled=None):
     before = [(p['volume'], p['momentum'].copy()) for p in partition.pools]
     keys, rates = [], []
     for receipt in receipts:
@@ -48,13 +49,28 @@ def analyze(partition, receipts):
         rates.append(receipt['volume_rate'])
     if not rates or not np.isfinite(rates).all() or min(rates) <= 0:
         raise ValueError('Positive original receipt rates required')
+    bounded_direction = None
+    if assembled is not None:
+        if assembled['partition'] is not partition or assembled['new_region_rates'] is not receipts:
+            raise ValueError('Matching original assembled receipt direction required')
+        vd = np.r_[assembled['volume_rate'], rates]
+        pd = np.vstack((assembled['momentum_rate'], [r['momentum_rate'] for r in receipts]))
+        if not np.isfinite(vd).all() or not np.isfinite(pd).all():
+            raise ValueError('Finite original bounded physical rates required')
+        mass_error = abs(float(vd.sum()))
+        momentum_error = float(np.max(abs(pd.sum(axis=0)-assembled['bed_force'].sum(axis=0)-assembled['wall_force'])))
+        if max(mass_error, momentum_error) > 1e-10:
+            raise ValueError('Original base mass/boundary-momentum ledger failed')
+        bounded_direction = dict(volume_rate=vd, physical_momentum_rate=pd, mass_rate_error=mass_error,
+                                 boundary_bed_momentum_rate_error=momentum_error)
     births = [SourceBirthGeometry(partition.patch.cells[p].subset_sources([s])) for p, s in keys]
     context = SourceBirthPressure(partition)
     paths = []
     for name, scales in [('uniform_stage', np.ones(len(keys))),
                          ('nondispersive_receipt_direction', np.cbrt(np.asarray(rates)/np.array([float(b.volume_coefficient) for b in births])))]:
         requests = [(p, s, k) for (p, s), k in zip(keys, scales)]
-        limit = point_limits(context, requests)
+        work = point_work(context, requests)
+        limit = work['limit']
         bounds = [b.next_height/F(float(k)) for b, k in zip(births, scales) if b.next_height is not None]
         lookup = {key: i for i, key in enumerate(keys)}
         for face in birth_faces(partition, keys):
@@ -79,21 +95,55 @@ def analyze(partition, receipts):
             candidate = partition.with_regions(regions)
             metric = evaluate(candidate, np.array([p['momentum'] for p in candidate.pools])[:, None, :])
             observed = (metric['kinetic']-context.primal['kinetic'])/float(parameter)
+            old = len(partition.pools)
+            scaled_gradient = float(parameter)**2*metric['volume_gradient'][old:]
+            scaled_canonical = float(parameter)*metric['canonical_velocity'][old:, 0]
+            targets = (work['volume_gradient_path_squared_limit'], work['canonical_velocity_path_limit'])
+            work_errors = []
+            for actual, target in zip((scaled_gradient, scaled_canonical), targets):
+                scale = float(np.max(abs(target)))
+                if scale == 0:
+                    raise ValueError('Actual bank work probe requires nonzero analytic coefficients')
+                work_errors.append(float(np.max(abs(actual-target)))/scale)
+            mass_direction_work = float(scaled_gradient@limit['volume_path_coefficients'])
             rows.append(dict(path_parameter=parameter, added_volumes=added, observed_energy_path_slope=observed,
                 error=abs(observed-expected), maximum_pressure_residual=max(p['relative_residual'] for p in metric['poles']),
                 positive_energy_contraction_error=metric['positive_energy_contraction_error'],
-                original_newborn_operator=operator_probe(partition, candidate, limit)))
+                original_newborn_operator=operator_probe(partition, candidate, limit),
+                volume_gradient_path_squared=scaled_gradient, canonical_velocity_path=scaled_canonical,
+                volume_gradient_max_norm_relative_error=work_errors[0],
+                canonical_velocity_max_norm_relative_error=work_errors[1],
+                fixed_old_mass_direction_scaled_work=mass_direction_work,
+                mass_direction_scaled_work_error=abs(mass_direction_work-expected/3)))
+            if bounded_direction is not None and name == 'nondispersive_receipt_direction':
+                # The complete original base direction includes donor losses,
+                # receiving momentum, and bed/wall forces. Its independent
+                # mass/momentum balance does not remove the singular full work.
+                scaled_work = float(parameter)**2*float(metric['volume_gradient']@vd
+                    +np.sum(metric['canonical_velocity'][:, 0]*pd))
+                rows[-1]['bounded_original_direction_scaled_work'] = scaled_work
+                rows[-1]['bounded_original_direction_work_error'] = abs(scaled_work-expected/3)
         operator_passed = (rows[-1]['original_newborn_operator']['maximum_column_scaled_error'] < 1e-4
             and rows[-1]['original_newborn_operator']['maximum_column_scaled_error']
             < rows[0]['original_newborn_operator']['maximum_column_scaled_error']/3)
+        work_passed = all(rows[-1][key] < .01 and rows[-1][key] < rows[0][key]/3 for key in (
+            'volume_gradient_max_norm_relative_error', 'canonical_velocity_max_norm_relative_error'))
+        work_passed &= (rows[-1]['mass_direction_scaled_work_error'] < .01*abs(expected/3)
+            and rows[-1]['mass_direction_scaled_work_error'] < rows[0]['mass_direction_scaled_work_error']/3)
+        if bounded_direction is not None and name == 'nondispersive_receipt_direction':
+            work_passed &= (rows[-1]['bounded_original_direction_work_error'] < .01*abs(expected/3)
+                and rows[-1]['bounded_original_direction_work_error'] < rows[0]['bounded_original_direction_work_error']/3)
         passed = bool(expected < 0 and rows[-1]['error'] < rows[0]['error']/3 and rows[-1]['error'] < .01*abs(expected)
             and all(r['maximum_pressure_residual'] <= 2e-5 and r['positive_energy_contraction_error'] <= 1e-10 for r in rows)
-            and operator_passed)
+            and operator_passed and work_passed)
         paths.append(dict(name=name, limit=limit, rows=rows, original_newborn_operator_controls_passed=operator_passed,
+                          analytic_pressure_work={k: v for k, v in work.items() if k != 'limit'},
+                          pressure_work_probe_controls_passed=bool(work_passed),
                           pressure_limit_probe_controls_passed=passed))
     if any(p['volume'] != v or not np.array_equal(p['momentum'], m) for p, (v, m) in zip(partition.pools, before)):
         raise ValueError('Birth analysis altered original physical water')
     return dict(receiving_region_count=len(keys), paths=paths, original_water_unchanged=True,
+                bounded_original_base_direction=bounded_direction,
                 pressure_limit_probe_controls_passed=all(p['pressure_limit_probe_controls_passed'] for p in paths),
                 full_metric_front_force_or_time_or_gameplay_accepted=False)
 
@@ -109,13 +159,14 @@ def main():
     if args.report.exists():
         raise FileExistsError(args.report)
     partition, source, indices, origin, authority, sampler, hashes = load_original_block(args)
-    receipts = assembly(partition, face_scheme='donor')['new_region_rates']
-    result = analyze(partition, receipts)
+    assembled = assembly(partition, face_scheme='donor')
+    receipts = assembled['new_region_rates']
+    result = analyze(partition, receipts, assembled)
     provenance = [dict(parent=r['parent'], original_cell=indices[r['parent']], source_ids=r['source_triangle_indices'],
         vertex_authority_codes=sorted(set(map(int, authority[sampler.faces[r['source_triangle_indices']]].ravel())))) for r in receipts]
     if any(sha(Path(path)) != digest for path, digest in hashes.items()):
         raise ValueError('Original source or implementation changed during simultaneous-birth audit')
-    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v1', accepted=False,
+    report = dict(schema='raftsim.south_fork.simultaneous_source_birth.v2', accepted=False,
         original_block_col_row=[args.block_col, args.block_row], original_snapshot_time_seconds=source['source_time_seconds'],
         original_pool_count=len(partition.pools), origin_registered_m=origin, provenance=provenance,
         source_sha256=hashes, result=result,
@@ -137,6 +188,9 @@ def main():
         name=p['name'], new_connections=len(p['limit']['immediate_newborn_connections']),
         slope=p['limit']['fixed_old_state_energy_path_slope'], independent_sum=p['limit']['independent_single_source_sum'],
         first_error=p['rows'][0]['error'], last_error=p['rows'][-1]['error'],
+        final_gradient_relative_error=p['rows'][-1]['volume_gradient_max_norm_relative_error'],
+        final_canonical_relative_error=p['rows'][-1]['canonical_velocity_max_norm_relative_error'],
+        mass_direction_scaled_work=p['rows'][-1]['fixed_old_mass_direction_scaled_work'],
         controls_passed=p['pressure_limit_probe_controls_passed']) for p in result['paths']])), flush=True)
     return 0 if result['pressure_limit_probe_controls_passed'] else 1
 

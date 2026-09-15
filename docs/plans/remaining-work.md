@@ -3,7 +3,25 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [typed crest-selection experiment](../reconstruction-review-2026-09-07/normal-river-inline-crest-selection.md).
+Latest September 15: [original wet-front pressure work](../reconstruction-review-2026-09-07/normal-river-source-birth-work.md).
+Analytic coupled point-birth derivatives retain original positive factors and
+harmonic-face stage partials: volume-gradient leading height^-2 and canonical
+velocity height^-1 coefficients verified against original positive-water states.
+Actual 24-source bank: two seven-height paths, final max-norm errors below
+0.005% / 0.0003%; 549 matching source hashes and 464 protected hashes unchanged.
+The complete original base direction balances mass and bed/wall momentum to
+1.388e-16 / 8.882e-16 yet retains the predicted nonzero singular full-energy work
+(0.2028% final coefficient error). This does NOT derive a force, dissipative
+closure or time update. 36 focused tests PASS; final broader run: 439 PASS / 13
+retained FAIL (153.12 seconds, exit 1). All owned jobs are terminal.
+NEXT compatible full-metric front forces/impulses, edge/flat births and complete
+front transport, then time/open/native single-surface and motion/reference
+qualification. No epsilon water, energy projection, force remainder, guard
+removal or physics promotion. No visual/FPS gain; last 12.361760 FPS / p95
+93.2314 ms FAILS 30 FPS. Full later-river/crew/normalization/regression/release
+scope remains OPEN.
+
+Earlier September 15: [typed crest-selection experiment](../reconstruction-review-2026-09-07/normal-river-inline-crest-selection.md).
 Candidate REJECTED for promotion: 64 changing-input pairs compare 4,299,524
 vertices / 3,116,342 triangles exactly, but its 0.068124 ms mean advantage is
 order-sensitive (0.463356 ms slower when first). Ordinary erased selection
