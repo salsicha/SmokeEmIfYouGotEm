@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 from build_troublemaker_dem_rock_cap import (select_lower_returns, cap_triangles, sample_cap,
-    refine_source_coverage,close_cap_below_retained_terrain,sample_terrain_union)
+    refine_source_coverage,close_cap_below_retained_terrain,sample_terrain_union,native_collision_probes)
 
 REGION = [[-1,-1],[3,-1],[3,3],[-1,3]]
 
@@ -113,3 +113,31 @@ def test_physical_union_keeps_parent_outside_cap_and_where_parent_is_higher():
     points=np.array([[.1,.1],[.8,.1],[2,2]])
     result=sample_terrain_union(Parent(),xyz,np.array([[0,1,2]]),points)
     assert result.tolist()==pytest.approx([3,3.6,3])
+
+
+def test_native_cone_rays_keep_every_original_point_and_enter_the_solid():
+    xyz=np.array([[0,0,3],[1,0,4],[0,1,3.]])
+    faces=np.array([[0,1,2]])
+    v,t,k,_=close_cap_below_retained_terrain(xyz,faces,0.)
+    report=native_collision_probes(xyz,faces,v,t,k,'source')
+    assert report['source_cap_sha256']=='source'
+    vertical=[p for p in report['probes'] if p['kind']=='original_roof_vertex']
+    cone=[p for p in report['probes'] if p['kind']=='original_vertex_interior_cone']
+    assert len(vertical)==len(cone)==len(xyz)
+    for original,p in zip(xyz,cone):
+        assert np.array_equal(p['world_position_cm'],original*[100,-100,100])
+        n=np.array(p['outward_normal'])*[1,-1,1]
+        assert np.linalg.norm(n)==pytest.approx(1)
+        interior=original-n*.01
+        roof=sample_cap(xyz,faces,interior[None,:2])[0]
+        assert np.isfinite(roof) and 0<interior[2]<roof
+
+
+def test_vertical_extremal_rays_can_miss_quantized_footprint_without_large_xyz_error():
+    xyz=np.array([[-6.967397715430707,17.61073176469654,9.100939801879605],
+                  [-6,17,10],[-6,18,10.]])
+    faces=cap_triangles(xyz,[[-8,16],[-5,16],[-5,19],[-8,19]],maximum_edge_m=2.)
+    quantized=(xyz*100).astype(np.float32).astype(float)/100
+    assert np.isfinite(sample_cap(xyz,faces,xyz[:1,:2])[0])
+    assert np.isnan(sample_cap(quantized,faces,xyz[:1,:2])[0])
+    assert np.linalg.norm((quantized-xyz)*100,axis=1).max()<.1

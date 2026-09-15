@@ -114,10 +114,11 @@ class CompositeTerrainSampler:
     """One surface for future render/collision exports and hydraulic cooking.
 
     Owner codes: 1 original coarse triangles, 2 original rapid triangles,
-    3 inferred join triangles, 4 additive source-context coarse triangles.
+    3 inferred join triangles, 4 additive source-context coarse triangles,
+    5 optional original-return rock solid with explicitly inferred flanks.
     These codes identify meshes, NOT measurement authority.
     """
-    def __init__(self, directory, extension_directory=None):
+    def __init__(self, directory, extension_directory=None, rock_cap_manifest=None):
         import hashlib
         import json
         from pathlib import Path
@@ -138,6 +139,15 @@ class CompositeTerrainSampler:
             self.seam_xyz, self.seam_faces = data['xyz_navd88_utm_m'], data['triangles']
         self.x0, self.y0 = self.manifest['grid']['first_vertex_utm_m']
         self.cell = self.manifest['grid']['cell_m']
+        self.rock_union=None
+        if rock_cap_manifest is not None:
+            from south_fork_rock_union import SourceRockUnion
+            self.rock_union=SourceRockUnion(rock_cap_manifest,Path(__file__).resolve().parents[2],
+                directory/'troublemaker_registered_source.npz',self.manifest['rapid_origin_utm_m'],
+                self.manifest['rapid_datum_navd88_m'])
+            a,b,c,d=self.manifest['inner_boundary_utm_m']
+            if (np.any(self.rock_union.lower<[a,b]) or np.any(self.rock_union.upper>[c,d])):
+                raise ValueError('Rock candidate extends beyond its retained rapid terrain')
         self.supplemental_quads = None
         if extension_directory is not None:
             extension_directory = Path(extension_directory)
@@ -190,6 +200,10 @@ class CompositeTerrainSampler:
             owner[coarse] = 1
             if self.supplemental_quads is not None:
                 owner[coarse] += 3*self.supplemental_quads[r, c].astype(np.uint8)
+        if self.rock_union is not None:
+            out,changed=self.rock_union.apply(x,y,out)
+            if np.any(changed&~rapid):raise ValueError('Rock union changed another terrain owner')
+            owner[changed]=5
         return (out.reshape(shape), owner.reshape(shape)) if with_owner else out.reshape(shape)
 
 

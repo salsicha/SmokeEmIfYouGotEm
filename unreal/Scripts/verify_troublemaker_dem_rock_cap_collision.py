@@ -7,8 +7,8 @@ import unreal
 
 ROOT=Path(__file__).resolve().parents[2]
 EXPORT=ROOT/'tmp/troublemaker-dem-rock-cap-v4-20260915/fbx'
-PROBES=ROOT/'tmp/troublemaker-dem-rock-cap-v4-20260915/native-probes.json'
-REPORT=ROOT/'unreal/Saved/RaftSimValidation/dem-rock-cap-collision-v1-20260915.json'
+PROBES=ROOT/'tmp/troublemaker-dem-rock-cap-v4-20260915/native-probes-v3.json'
+REPORT=ROOT/'unreal/Saved/RaftSimValidation/dem-rock-cap-collision-v3-20260915.json'
 ASSET='/Game/RaftSim/Environment/GeneratedLocalReview/DemRockCap20260915/SM_OriginalReturnRockSolid'
 
 
@@ -47,29 +47,40 @@ def main():
     assert mesh.get_num_triangles(0)==export['triangle_count']
     actors=unreal.get_editor_subsystem(unreal.EditorActorSubsystem)
     ignore=actors.get_all_level_actors()
-    ground=actors.spawn_actor_from_class(unreal.StaticMeshActor,unreal.Vector())
+    ground=actors.spawn_actor_from_class(unreal.StaticMeshActor,unreal.Vector(0,0,0))
+    # Editor spawning may choose a viewport placement. Traces require the
+    # declared source frame, not the editor's last placement or rotation.
+    ground.set_actor_location(unreal.Vector(0,0,0),False,True)
+    ground.set_actor_rotation(unreal.Rotator(0,0,0),True)
     ground.set_actor_scale3d(unreal.Vector(1,-1,1))
     ground.static_mesh_component.set_static_mesh(mesh)
     ground.static_mesh_component.set_collision_profile_name('BlockAll')
     world=unreal.get_editor_subsystem(unreal.UnrealEditorSubsystem).get_editor_world()
-    errors=[];kinds={}
+    location=ground.get_actor_location();rotation=ground.get_actor_rotation()
+    assert location==unreal.Vector(0,0,0) and rotation==unreal.Rotator(0,0,0)
+    errors=[];kinds={};failures=[]
     for probe in probes['probes']:
         p=unreal.Vector(*probe['world_position_cm']);n=unreal.Vector(*probe['outward_normal'])
         distance=probe['ray_half_length_cm']
         hit=unreal.SystemLibrary.line_trace_single(world,p+n*distance,p-n*distance,
             unreal.TraceTypeQuery.TRACE_TYPE_QUERY1,False,ignore,unreal.DrawDebugTrace.NONE,False)
         values=hit.to_tuple() if hit else None
-        assert values and values[0],probe
+        if not values or not values[0]:
+            failures.append(dict(probe=probe,reason='no_blocking_hit'))
+            continue
         error=math.sqrt((values[5].x-p.x)**2+(values[5].y-p.y)**2+(values[5].z-p.z)**2)
-        assert error<=.1,(probe,error)
+        if error>.1:failures.append(dict(probe=probe,reason='source_position_error',error_cm=error))
         errors.append(error);kinds[probe['kind']]=kinds.get(probe['kind'],0)+1
     REPORT.parent.mkdir(parents=True,exist_ok=True)
     REPORT.write_text(json.dumps(dict(source_cap_sha256=export['source_cap_sha256'],fbx_sha256=export['fbx_sha256'],
         source_probe_sha256=hashlib.sha256(PROBES.read_bytes()).hexdigest(),triangle_count=mesh.get_num_triangles(0),
-        probe_count=len(errors),probe_kind_counts=kinds,maximum_collision_error_cm=max(errors),
+        requested_probe_count=len(probes['probes']),probe_count=len(errors),probe_kind_counts=kinds,
+        maximum_collision_error_cm=max(errors) if errors else None,failures=failures,
+        collision_verified=not failures,actor_location_cm=[location.x,location.y,location.z],
         complex_collision_same_triangles=True,full_nanite_fallback=True,saved_assets=False,saved_levels=False,
         parent_terrain_modified=False,actual_full_river_union_verified=False,
         hydraulic_recooked=False,playable_integrated=False,visual_acceptance=False),indent=2)+'\n')
+    assert not failures, str(len(failures))+' collision probes failed; see '+str(REPORT)
     unreal.log('Transient source-rock collision verified: '+str(REPORT))
 
 

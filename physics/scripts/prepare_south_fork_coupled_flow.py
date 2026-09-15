@@ -5,6 +5,7 @@ an explicitly inferred station-binned conveyance seed, not settled/observed
 flow. One upstream Q is partitioned over both actual exterior inlet edges.
 """
 import copy
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -25,8 +26,14 @@ def sha(path):
 def main():
     from scipy.spatial import cKDTree
     from scipy.ndimage import gaussian_filter1d
-    assert not OUT.exists(), 'Preserve prior flow preparations'
-    geometry_path=BASE/'coupled_geometry/manifest.json'
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--geometry-manifest',type=Path,default=BASE/'coupled_geometry/manifest.json')
+    parser.add_argument('--output',type=Path,default=OUT)
+    args=parser.parse_args()
+    output=args.output.resolve()
+    if not output.is_relative_to(ROOT/'tmp') or output.exists():
+        raise ValueError('Fresh project tmp flow preparation required')
+    geometry_path=args.geometry_manifest.resolve()
     geometry=json.loads(geometry_path.read_text())
     audit=json.loads((geometry_path.parent/'source_exact_audit.json').read_text())
     assert audit['passed'] and audit['manifest_sha256']==sha(geometry_path)
@@ -109,7 +116,7 @@ def main():
         profiles[item['i'],item['edge']]=np.tile(profile,(2,1)).tolist()
         imposed_total+=float(Q*item['weight'].sum()/weight)
     assert abs(imposed_total-Q)<1.e-12
-    OUT.mkdir()
+    output.mkdir()
     template=json.loads((ROOT/'physics/data/validation/milestone17/analytic_fixtures/fixtures/lake_at_rest_balance/scenario/scenario.json').read_text())
     manifest=dict(schema='raftsim.cartesian_flow_cook.v1',dt_seconds=.05,packages=[],boundary_probes=[],
         geometry_manifest=geometry_path.relative_to(ROOT).as_posix(),geometry_manifest_sha256=sha(geometry_path),
@@ -121,7 +128,7 @@ def main():
         maximum_initial_speed_mps=max(float(np.hypot(c['u'],c['v']).max()) for c in cells))
     physical={(index_by_name[e['region']],e['edge']):e['endpoint'] for e in geometry['open_geometry_edges']}
     for i,(record,cell) in enumerate(zip(geometry['regions'],cells)):
-        package=OUT/record['name']; package.mkdir()
+        package=output/record['name']; package.mkdir()
         np.save(package/'bed.npy',cell['bed'])
         h,u,v=cell['depth'],cell['u'],cell['v']
         np.savez_compressed(package/'initial_state.npz',depth=h,eta=cell['bed']+h,u=u,v=v,hu=h*u,hv=h*v,wet=h>1.e-6)
@@ -136,7 +143,9 @@ def main():
             provenance=dict(source_geometry_file=record['geometry_file'],source_geometry_sha256=record['geometry_sha256'],
                 original_source_geometry_file=record['source_geometry_file'],
                 original_source_geometry_sha256=record['source_geometry_sha256'],
-                terrain_geometry_modified=False,submerged_bed_is_uncalibrated_inference=True,
+                terrain_geometry_modified=bool(record.get('terrain_union')),
+                retained_source_terrain_modified=False,terrain_union=record.get('terrain_union'),
+                submerged_bed_is_uncalibrated_inference=True,
                 initial_velocity_is_inferred=True,target_discharge_m3s=Q,normal_map_integrated=False))
         scenario['grid']=dict(nx=80,ny=80,dx=1.,dy=1.,origin_x=record['grid_origin_local_m'][0],origin_y=record['grid_origin_local_m'][1])
         scenario.update(fixed_dt=.05,duration=600.,roughness=.035,feature_count=0,probe_count=0)
@@ -157,7 +166,10 @@ def main():
             files={name:sha(package/name) for name in ('scenario.json','bed.npy','initial_state.npz','features.json','probes.json')}))
         if (i+1)%100==0:
             print(f'Prepared {i+1}/{len(cells)} coupled flow packages',flush=True)
-    (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    if geometry.get('terrain_union'):
+        manifest['terrain_union']=geometry['terrain_union']
+        manifest['initialization_is_fresh_not_restart']=True
+    (output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps({k:v for k,v in manifest.items() if k not in ('inputs','packages')},indent=2),flush=True)
 
 

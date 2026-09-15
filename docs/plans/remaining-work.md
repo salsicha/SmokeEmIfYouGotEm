@@ -3,7 +3,25 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [correct downstream cameras and source-face evidence](../reconstruction-review-2026-09-07/normal-river-downstream-camera.md).
+Latest September 15: [source-backed DEM rock and shared hydraulic union](../reconstruction-review-2026-09-07/normal-river-dem-rock-union.md).
+549 original-return roof vertices and explicit inferred sides now have one
+source-verified terrain/hydraulic union, without altering the captured DEM.
+All 5,350,400 original cells checked; 118 samples change in two cores. Actual
+composite sampler and both complete changed cores match exactly. Native v3:
+2,267/2,269 hits; ALL 549 added exact-point interior-cone probes pass, but two
+retained vertical boundary rays miss from float32 footprint rounding. The
+0.1 cm gate is unchanged; collision_verified remains FALSE, not full acceptance.
+Fresh full-domain input audit and 1 s native pilot PASS; artificial banks dry.
+77 focused tests PASS, all 464 protected hashes match. Candidate 600 s cook
+LIVE session45187/PID32276, output tmp/south-fork-rock-union-cook600s-v1-20260915;
+check actual process/handle and completed checkpoints, never restart on timeout.
+NEXT full-river union/contact verification, explicit compound-source runtime
+packets, source-matched hydraulic settling, actual crest/froth/reference review.
+No playable or FPS change; prior 13 physical + four presentation failures open.
+Last 24.225877 FPS / p95 47.78 ms FAILS 30 FPS. All remaining scenes, crew,
+normalization and release remain OPEN. Troublemaker is NOT a menu scenario.
+
+Earlier September 15: [correct downstream cameras and source-face evidence](../reconstruction-review-2026-09-07/normal-river-downstream-camera.md).
 Shoreline review cameras had interpreted Cartesian east/north as downstream/
 river-left. They now use the existing scenario progress axis; explicit old-view
 control retained. Fixed-station focus and evidence labels also use true chainage.

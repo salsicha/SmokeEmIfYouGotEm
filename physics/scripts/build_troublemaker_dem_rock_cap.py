@@ -232,6 +232,21 @@ def native_collision_probes(vertices,faces,solid_vertices,solid_faces,face_kind,
         for point in points:
             probes.append(dict(kind=kind,world_position_cm=(point*[100,-100,100]).tolist(),
                 outward_normal=[0.,0.,1.],ray_half_length_cm=100.))
+    # Keep the original vertical probes, including tangent boundary rays.
+    # Also approach EVERY original vertex through its solid's interior cone:
+    # float32 rounding can put an extremal source XY just outside the imported
+    # footprint, making a vertical edge ray miss despite sub-millimetre XYZ.
+    # No point is shifted, no vertex omitted and no hit tolerance enlarged.
+    for index,point in enumerate(vertices):
+        incident=faces[np.any(faces==index,axis=1)]
+        if not len(incident):raise ValueError('Unsupported original roof vertex')
+        triangle=vertices[incident[0]]
+        interior=triangle.mean(axis=0)
+        interior[2]=min(interior[2],point[2])-1.
+        normal=point-interior;normal/=np.linalg.norm(normal)
+        probes.append(dict(kind='original_vertex_interior_cone',
+            world_position_cm=(point*[100,-100,100]).tolist(),
+            outward_normal=(normal*[1,-1,1]).tolist(),ray_half_length_cm=100.))
     walls=solid_faces[np.asarray(face_kind)==2]
     for triangle in solid_vertices[walls]:
         normal=np.cross(triangle[1]-triangle[0],triangle[2]-triangle[0]);normal/=np.linalg.norm(normal)
