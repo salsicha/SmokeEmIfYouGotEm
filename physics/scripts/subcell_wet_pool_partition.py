@@ -11,6 +11,7 @@ from triangle_cell_storage import TriangleCellStorage
 from subcell_pressure_kinetic_geometry import local_form
 from subcell_wet_connectivity import components
 from subcell_source_region_faces import internal_faces
+from subcell_exact_source_faces import source_faces
 
 
 class WetPoolPartition:
@@ -25,6 +26,7 @@ class WetPoolPartition:
         self.patch, self.pools = patch, []
         self.sampler, self.origin = sampler, origin.copy()
         self.origin.setflags(write=False)
+        self.source_face_cache = {}
         self.parent_pools = [[] for _ in patch.cells]
         self.reassembled_volumes = np.zeros_like(v).ravel()
         self.reassembled_momenta = np.zeros_like(p).reshape(-1, 2)
@@ -185,15 +187,9 @@ class WetPoolPartition:
         """
         if axis not in (0, 1) or sign not in (-1, 1):
             raise ValueError('Cartesian face direction required')
-        coordinate = sign*self.patch.spacing[axis]/2
-        result = []
+        owners = {}
         for pool_index in self.parent_pools[parent]:
-            storage = self.pools[pool_index]['storage']
-            for triangle in storage.triangles:
-                for a, b in zip(triangle, np.roll(triangle, -1, axis=0)):
-                    if a[axis] == coordinate and b[axis] == coordinate and a[1-axis] != b[1-axis]:
-                        segment = np.array([[a[1-axis], a[2]], [b[1-axis], b[2]]])
-                        if segment[0, 0] > segment[1, 0]:
-                            segment = segment[::-1]
-                        result.append((pool_index, segment))
+            for source in self.pools[pool_index]['source_triangle_indices']:
+                owners[source] = pool_index
+        result = [(owners[source], segment) for source, segment in source_faces(self, parent, axis, sign) if source in owners]
         return sorted(result, key=lambda item: item[1][0, 0])

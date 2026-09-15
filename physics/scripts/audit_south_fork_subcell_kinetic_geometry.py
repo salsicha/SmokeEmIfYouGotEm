@@ -14,6 +14,7 @@ from subcell_wet_pool_partition import WetPoolPartition
 from subcell_wet_pool_pressure import WetPoolPressureSystem
 from audit_wet_pool_pressure_rate import audit_direction
 from audit_wet_pool_transport import audit_transport, audit_internal_regions
+from audit_source_activation import audit_activation
 from finite_depth_pressure_reference import LENGTHS, WEIGHTS
 
 
@@ -25,9 +26,10 @@ def main():
     parser.add_argument('--pool-direction', action='store_true', help='Also verify analytic volume/velocity directions; implies --pool-pressure')
     parser.add_argument('--pool-transport', action='store_true', help='Audit physical energy and pool-aware base flux support; implies --pool-pressure')
     parser.add_argument('--pool-internal', action='store_true', help='Also audit controlled internal source-region subdivision; implies --pool-transport')
+    parser.add_argument('--pool-activation', action='store_true', help='Attempt finite source-front activation with strict state/energy rejection; implies --pool-pressure')
     args = parser.parse_args()
     args.pool_transport = args.pool_transport or args.pool_internal
-    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport
+    args.pool_pressure = args.pool_pressure or args.pool_direction or args.pool_transport or args.pool_activation
     if args.report.exists():
         raise FileExistsError(args.report)
     base = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -57,6 +59,8 @@ def main():
         'subcell_wet_pool_primal_energy.py', 'subcell_wet_pool_transport.py', 'audit_wet_pool_transport.py',
         'rational_primal_energy.py', 'subcell_energy_flux.py',
         'subcell_source_region_faces.py',
+        'subcell_dry_front_flux.py', 'subcell_source_activation.py', 'audit_source_activation.py',
+        'subcell_exact_source_faces.py',
         'finite_depth_pressure_reference.py', 'pressure_cg_range_reference.py')]
     hashes = {str(path.resolve()): sha(path) for path in paths}
     fields = {}
@@ -133,7 +137,7 @@ def main():
             gram=form['gram'].tolist(), volume_derivative=form['volume_derivative'].tolist()))
     if not records:
         raise ValueError('No positive actual cells evaluated')
-    pressure, direction, transport, internal = None, None, None, None
+    pressure, direction, transport, internal, activation = None, None, None, None, None
     if args.pool_pressure:
         volume = fields['h'].reshape(patch.shape)
         momentum = volume[..., None]*np.stack((fields['u'], fields['v']), axis=-1).reshape(*patch.shape, 2)
@@ -191,6 +195,8 @@ def main():
             transport = audit_transport(pools)
         if args.pool_internal:
             internal = audit_internal_regions(pools)
+        if args.pool_activation:
+            activation = audit_activation(pools)
     for path, expected in hashes.items():
         if sha(Path(path)) != expected:
             raise ValueError('Source changed during geometry audit')
@@ -201,6 +207,7 @@ def main():
         fixed_pool_direction=direction,
         fixed_pool_transport=transport,
         fixed_internal_source_regions=internal,
+        source_activation_candidates=activation,
         positive_cells=len(records), unsupported_cells=unsupported,
         multi_pool_cell_count=sum(r['wet_connectivity']['component_count'] > 1 for r in records),
         total_wet_component_count=sum(r['wet_connectivity']['component_count'] for r in records),
@@ -225,7 +232,9 @@ def main():
               'evolution, wetting/open/time, native or gameplay qualification.')
     with args.report.open('x') as stream:
         json.dump(result, stream, indent=2, allow_nan=False)
-    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions')}
+    console = {k: v for k, v in result.items() if k not in ('records', 'source_sha256', 'fixed_pool_transport', 'fixed_internal_source_regions', 'source_activation_candidates')}
+    if activation is not None:
+        console['source_activation_candidates'] = {k: v for k, v in activation.items() if k not in ('front_records', 'receiving_rate_records')}
     if internal is not None:
         console['fixed_internal_source_regions'] = {k: v for k, v in internal.items() if k != 'physical_energy_and_transport'}
     if transport is not None:
@@ -238,6 +247,7 @@ def main():
             nonlinear_or_wetting_or_time_or_gameplay_accepted=False)
     print(json.dumps(console, indent=2))
     return int((pressure is not None and not pressure['fixed_pressure_controls_passed'])
+               or (activation is not None and not activation['twenty_ms_candidate_passed'])
                or (internal is not None and not internal['internal_region_controls_passed'])
                or (direction is not None and not direction['fixed_topology_direction_controls_passed'])
                or (transport is not None and (not transport['physical_energy_controls_passed']

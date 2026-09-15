@@ -1,0 +1,77 @@
+"""One-sided nondispersive dry-bed Riemann flux on a source terrain edge.
+
+This is not the rational dispersive front model. The dry side has zero water,
+not a chosen artificial water level. Wet-side velocity is constant on the face;
+depth follows its original linear terrain segments. Four-point Gauss in wave
+speed integrates the branch polynomials exactly up to floating-point error.
+"""
+import math
+import numpy as np
+
+
+def flux(section, stage, datum, velocity, normal, gravity=9.81, energy_datum=0.):
+    u, n = np.asarray(velocity, float), np.asarray(normal, float)
+    if (u.shape != (2,) or n.shape != (2,) or not np.isfinite([u, n]).all()
+            or abs(float(n@n)-1.) > 1e-12 or not np.isfinite([stage, datum, gravity, energy_datum]).all()
+            or gravity <= 0):
+        raise ValueError('Finite wet state, unit outward normal and positive gravity required')
+    tangent = np.array([-n[1], n[0]])
+    un, ut = float(u@n), float(u@tangent)
+    eta = math.fsum((stage, datum, -energy_datum))
+    nodes, weights = np.polynomial.legendre.leggauss(4)
+    result = np.zeros(4)  # volume, XY momentum, energy relative to fixed datum
+    branch_widths = dict(dry=0., wet=0., fan=0.)
+    def at(c):
+        front = un+2*c
+        if front <= 0:
+            return np.zeros(4), 'dry'
+        h = c*(c/gravity)
+        if un >= c:
+            mass = h*un
+            pn = mass*un+.5*gravity*h*h
+            energy = mass*(.5*(un*un+ut*ut)+gravity*eta)
+            branch = 'wet'
+        else:
+            star = front/3
+            hs = star*(star/gravity)
+            mass = hs*star
+            pn = 1.5*mass*star
+            # h+b=eta on the original wet side; b need not be flattened.
+            energy = mass*(1.5*star*star+.5*ut*ut+gravity*eta-c*c)
+            branch = 'fan'
+        return np.r_[mass, pn*n+mass*ut*tangent, energy], branch
+    for (low, high), width in zip(section.levels, section.lengths):
+        a = math.fsum((stage, datum, -float(high)))
+        b = math.fsum((stage, datum, -float(low)))
+        if b <= 0:
+            continue
+        if a < 0:
+            width *= b/(high-low)
+            a = 0.
+        ca, cb = math.sqrt(gravity*a), math.sqrt(gravity*b)
+        if ca == cb:
+            value, branch = at(ca)
+            result += width*value
+            branch_widths[branch] += float(width)
+            continue
+        knots = [ca, cb]
+        switch = un if un > 0 else -un/2
+        if ca < switch < cb:
+            knots.append(switch)
+        knots.sort()
+        for first, last in zip(knots, knots[1:]):
+            part = width*((last-first)/(cb-ca))*((last+first)/(cb+ca))
+            cs = .5*(first+last)+.5*(last-first)*nodes
+            for c, weight in zip(cs, weights):
+                value, branch = at(float(c))
+                ds = part*weight*c/(first+last)
+                result += ds*value
+                branch_widths[branch] += float(ds)
+    if not np.isfinite(result).all() or result[0] < 0:
+        raise ValueError('Dry-front flux exceeds represented range')
+    if result[0] == 0 and branch_widths['wet']+branch_widths['fan'] > 0:
+        raise ValueError('Positive dry-front flux underflows represented range')
+    if result[0] == 0 and np.any(result[1:] != 0):
+        raise ValueError('Unrepresentable zero-mass dry-front momentum/energy')
+    return result[:3], dict(energy_flux=float(result[3]), branch_projected_widths=branch_widths,
+                            dispersive_front_or_time_or_gameplay_accepted=False)

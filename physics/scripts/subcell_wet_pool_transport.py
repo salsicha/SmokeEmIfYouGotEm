@@ -13,6 +13,7 @@ from subcell_energy_flux import face_flux, face_flux_normal
 from subcell_wet_pool_pressure import shared_subsegments
 from subcell_wet_pool_primal_energy import evaluate
 from triangle_face_section import TriangleFaceSection
+from subcell_exact_source_faces import source_faces
 
 
 def source_traces(partition, parent, axis, sign):
@@ -23,17 +24,7 @@ def source_traces(partition, parent, axis, sign):
             if source in owners:
                 raise ValueError('Original source face belongs to multiple wet pools')
             owners[source] = index
-    cell = partition.patch.cells[parent]
-    coordinate = sign*partition.patch.spacing[axis]/2
-    traces = []
-    for source, triangle in zip(cell.source_triangle_indices, cell.triangles):
-        for a, b in zip(triangle, np.roll(triangle, -1, axis=0)):
-            if a[axis] == coordinate and b[axis] == coordinate and a[1-axis] != b[1-axis]:
-                segment = np.array([[a[1-axis], a[2]], [b[1-axis], b[2]]])
-                if segment[0, 0] > segment[1, 0]:
-                    segment = segment[::-1]
-                traces.append(((owners.get(int(source)), int(source)), segment))
-    return traces
+    return [((owners.get(source), source), segment) for source, segment in source_faces(partition, parent, axis, sign)]
 
 
 def rates(partition, physical_momentum=None, gravity=9.81, dissipative=False, full_metric=True):
