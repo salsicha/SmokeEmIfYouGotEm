@@ -1,5 +1,16 @@
 # Troublemaker reference cross-check
 
+## September 15: access reconfirmed alongside corrected engine cameras
+
+Both players are accessible again. Inspected Qweniden bank-side 0:08/0:13
+(after the ordinary Skip-ad control), and John Elkins raft-level 0:05/0:20/0:30.
+No login, video download or upload. See [downstream camera/source-face review](normal-river-downstream-camera.md)
+for the actual engine comparisons and limitations. The corrected camera is
+not a terrain/water fix: separated local crests, dark gaps, angular exposed
+boundaries and irregular aeration remain visibly more convincing in the
+references. These paused frames are not calibrated geometry/discharge or
+continuous-motion acceptance.
+
 ## September 14, approximately 18:16 UTC: both supplied videos accessible
 
 The in-app browser now opens BOTH public YouTube players. This supersedes the

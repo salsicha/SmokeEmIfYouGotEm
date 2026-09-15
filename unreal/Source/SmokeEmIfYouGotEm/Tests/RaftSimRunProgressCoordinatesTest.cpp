@@ -1,6 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "Misc/ScopeExit.h"
 #include "Engine/World.h"
+#include "Engine/Engine.h"
 #include "../RaftSimRunManager.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 
@@ -98,6 +99,96 @@ bool FRaftSimRunProgressCoordinatesTest::RunTest(const FString&)
         Run->GetProgressCoordinates(CartesianWater) == nullptr);
     Run->RestartRun();
     TestFalse(TEXT("restart never exposes an old progress observation"), Run->GetLastProgressSample().bValid);
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimReviewDownstreamCoordinatesTest,
+    "RaftSim.Survey.ReviewCameraUsesScenarioDownstream",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FRaftSimReviewDownstreamCoordinatesTest::RunTest(const FString&)
+{
+    UWorld* World = UWorld::CreateWorld(EWorldType::Editor, false);
+    if (!TestNotNull(TEXT("review fixture world"), World)) return false;
+    GEngine->CreateNewWorldContext(EWorldType::Editor).SetCurrentWorld(World);
+    ON_SCOPE_EXIT { World->DestroyWorld(false); GEngine->DestroyWorldContext(World); World->RemoveFromRoot(); };
+    auto* Water = NewObject<URaftSimWaterRuntimeAdapter>();
+    const FString Base = TEXT("physics/data/real_world/south_fork_american_chili_bar/"
+        "reconstruction_2026_09/full_reach/");
+    if (!TestTrue(TEXT("original Cartesian map loads"), Water->ConfigureRiverCoordinateMap(
+        Base + TEXT("hydraulic_regions_context/coordinate_map.json")))) return false;
+    FVector Position(-543792.4, -360843.6, 736.8);
+    FVector Location, Tangent, Left;
+    FRotator Rotation;
+    FVector2D Coordinates;
+    TestNull(TEXT("no provider never converts Cartesian axes into a river"),
+        RaftSimReviewCoordinates::GetMap(World, Water));
+    TestFalse(TEXT("shore camera without downstream evidence fails"),
+        RaftSimReviewCoordinates::ShorePose(World, Water, Position, true, false, false, Location, Rotation));
+    auto* Run = World->SpawnActor<ARaftSimRunManager>();
+    if (!TestNotNull(TEXT("real scenario provider"), Run)) return false;
+    TestNotNull(TEXT("run exposes the plugin interface without a game-module dependency"),
+        Cast<IRaftSimRunCoordinateProvider>(Run));
+    if (!TestTrue(TEXT("authored downstream axis loads"), Run->ConfigureProgressCoordinateMap(
+        Base + TEXT("playable_route/coordinate_map.json")))) return false;
+    TestTrue(TEXT("review uses exactly the scenario's retained map"),
+        RaftSimReviewCoordinates::GetMap(World, Water) == Run->GetProgressCoordinates(Water));
+    if (!TestTrue(TEXT("original capture position projects onto the scenario"),
+        Run->WorldToRunCoordinates(Position, Water, Coordinates, Tangent, Left))) return false;
+    FVector2D ReviewCoordinates;
+    FVector ReviewTangent, ReviewLeft;
+    TestTrue(TEXT("review query succeeds"), RaftSimReviewCoordinates::WorldToCoordinates(
+        World, Water, Position, ReviewCoordinates, ReviewTangent, ReviewLeft));
+    TestTrue(TEXT("review preserves exact authoritative nearest-polyline results"),
+        ReviewCoordinates == Coordinates && ReviewTangent == Tangent && ReviewLeft == Left);
+    TestTrue(TEXT("Troublemaker downstream is west, not the east hydraulic axis"), Tangent.X < -.5);
+    TestTrue(TEXT("river-left preserves the map's Y reflection"),
+        Left.Equals(FVector(Tangent.Y, -Tangent.X, 0), 1e-10));
+    for (bool bLow : {false, true})
+        for (bool bLeft : {false, true})
+        {
+            TestTrue(TEXT("both banks and camera heights resolve"),
+                RaftSimReviewCoordinates::ShorePose(World, Water, Position, bLeft, bLow, false, Location, Rotation));
+            const FVector ExpectedLocation = Position - Tangent * 300. + FVector::UpVector * (bLow ? 70. : 320.);
+            const FVector Target = Position + (bLeft ? Left : -Left) * (bLow ? 2200. : 1500.) +
+                Tangent * (bLow ? 600. : 1400.) + FVector::UpVector * (bLow ? 40. : 0.);
+            TestTrue(TEXT("camera uses unchanged offsets in the downstream frame"), Location.Equals(ExpectedLocation, 1e-7));
+            TestTrue(TEXT("camera points at the requested downstream bank"),
+                Rotation.Vector().Equals((Target - Location).GetSafeNormal(), 1e-10));
+            TestTrue(TEXT("explicit old-frame control resolves"),
+                RaftSimReviewCoordinates::ShorePose(World, Water, Position, bLeft, bLow, true, Location, Rotation));
+            const FVector OldLocation = Position - FVector::ForwardVector * 300. + FVector::UpVector * (bLow ? 70. : 320.);
+            const FVector OldTarget = Position + FVector(0, bLeft ? -1. : 1., 0) * (bLow ? 2200. : 1500.) +
+                FVector::ForwardVector * (bLow ? 600. : 1400.) + FVector::UpVector * (bLow ? 40. : 0.);
+            TestTrue(TEXT("comparison preserves original camera location"), Location.Equals(OldLocation, 1e-7));
+            TestTrue(TEXT("comparison preserves original camera orientation"),
+                Rotation.Vector().Equals((OldTarget - OldLocation).GetSafeNormal(), 1e-10));
+        }
+    TestTrue(TEXT("camera queries did not modify hydraulic coordinates"),
+        Water->WorldToRiverCoordinates(Position, ReviewCoordinates, ReviewTangent, ReviewLeft) &&
+        ReviewCoordinates.Equals(FVector2D(Position.X / 100., -Position.Y / 100.), 1e-10) &&
+        ReviewTangent == FVector::ForwardVector && ReviewLeft == FVector(0, -1, 0));
+    TestFalse(TEXT("outside the supported corridor never falls back east"),
+        RaftSimReviewCoordinates::WorldToCoordinates(World, Water, FVector(1e9), ReviewCoordinates, ReviewTangent, ReviewLeft));
+    auto* OtherRun = World->SpawnActor<ARaftSimRunManager>();
+    if (!TestNotNull(TEXT("ambiguous provider fixture"), OtherRun)) return false;
+    TestNull(TEXT("two scenario providers fail closed independent of actor order"),
+        RaftSimReviewCoordinates::GetMap(World, Water));
+    TestFalse(TEXT("ambiguous world never chooses an arbitrary bank"),
+        RaftSimReviewCoordinates::ShorePose(World, Water, Position, true, false, false, Location, Rotation));
+    OtherRun->Destroy();
+    TestTrue(TEXT("clearing override succeeds"), Run->ConfigureProgressCoordinateMap(TEXT("")));
+    TestNull(TEXT("invalid provider cannot fall back to Cartesian water"), RaftSimReviewCoordinates::GetMap(World, Water));
+    auto* Legacy = NewObject<URaftSimWaterRuntimeAdapter>();
+    if (!TestTrue(TEXT("legacy non-Cartesian map loads"), Legacy->ConfigureRiverCoordinateMap(
+        Base + TEXT("rapid_join_flow/coordinate_map.json")))) return false;
+    TestTrue(TEXT("legacy scenario still uses its hydraulic ribbon"),
+        RaftSimReviewCoordinates::GetMap(World, Legacy) == Legacy);
+    AddExpectedError(TEXT("RaftSim coordinate map not found"), EAutomationExpectedErrorFlags::Contains, 1);
+    TestFalse(TEXT("broken explicit scenario path rejected"), Run->ConfigureProgressCoordinateMap(Base + TEXT("missing-review-axis.json")));
+    TestNull(TEXT("broken explicit path never falls back even to a legacy ribbon"), RaftSimReviewCoordinates::GetMap(World, Legacy));
+    Run->Destroy();
+    TestTrue(TEXT("no-provider legacy worlds retain their original map"), RaftSimReviewCoordinates::GetMap(World, Legacy) == Legacy);
     return true;
 }
 #endif

@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimVerticalSliceFrontend.h"
+#include "RaftSimRunCoordinateProvider.h"
 
 #include "RaftSimRunManager.generated.h"
 
@@ -40,7 +41,7 @@ enum class ERaftSimRunState : uint8
  * is exercisable in the test tank.
  */
 UCLASS()
-class SMOKEEMIFYOUGOTEM_API ARaftSimRunManager : public AActor
+class SMOKEEMIFYOUGOTEM_API ARaftSimRunManager : public AActor, public IRaftSimRunCoordinateProvider
 {
     GENERATED_BODY()
 
@@ -102,10 +103,10 @@ public:
     static bool SeedCartesianCheckpointWater(const ARaftSimRiverWaterConfig* Config,
         URaftSimWaterRuntimeAdapter* Water, FTransform& Checkpoint);
     const URaftSimWaterRuntimeAdapter* GetProgressCoordinates(
-        const URaftSimWaterRuntimeAdapter* HydraulicCoordinates) const;
+        const URaftSimWaterRuntimeAdapter* HydraulicCoordinates) const override;
     bool WorldToRunCoordinates(const FVector& WorldPositionCm,
         const URaftSimWaterRuntimeAdapter* HydraulicCoordinates,
-        FVector2D& OutStationLateralM, FVector& OutTangent, FVector& OutLeft) const;
+        FVector2D& OutStationLateralM, FVector& OutTangent, FVector& OutLeft) const override;
 
     /** Scenario id used as the save key (e.g. "south_fork_full_descent"). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")

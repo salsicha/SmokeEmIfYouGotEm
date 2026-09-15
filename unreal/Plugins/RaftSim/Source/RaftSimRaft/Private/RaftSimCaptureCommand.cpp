@@ -31,6 +31,7 @@
 #include "RaftSimRaftActor.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimCameraPresentation.h"
+#include "RaftSimRunCoordinateProvider.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
@@ -565,6 +566,8 @@ static bool ResolveShorelineCameraPose(
     UWorld* World,
     const ARaftSimRaftActor& Raft,
     bool bRiverLeft,
+    bool bLow,
+    bool bLegacyHydraulicFrame,
     FVector& OutLocation,
     FRotator& OutRotation)
 {
@@ -578,66 +581,8 @@ static bool ResolveShorelineCameraPose(
             Adapter = Bridge->GetWaterRuntime();
         }
     }
-    FVector2D RiverPosition;
-    FVector Tangent;
-    FVector LeftNormal;
-    const FVector RaftLocation = Raft.GetActorLocation();
-    if (Adapter == nullptr ||
-        !Adapter->WorldToRiverCoordinates(
-            RaftLocation, RiverPosition, Tangent, LeftNormal))
-    {
-        return false;
-    }
-    const FVector Toward =
-        (bRiverLeft ? LeftNormal : -LeftNormal).GetSafeNormal2D();
-    const FVector Along = Tangent.GetSafeNormal2D();
-    OutLocation = RaftLocation - Along * 300.0f + FVector::UpVector * 320.0f;
-    const FVector LookAt =
-        RaftLocation + Toward * 1500.0f + Along * 1400.0f;
-    OutRotation = (LookAt - OutLocation).Rotation();
-    return true;
-}
-
-// Guide-eye variant: ~0.7 m above the water looking across at the bank,
-// reproducing the grazing incidence the seated player actually sees (bank
-// sheen and reflection artifacts are invisible from the elevated preset).
-static bool ResolveShorelineLowCameraPose(
-    UWorld* World,
-    const ARaftSimRaftActor& Raft,
-    bool bRiverLeft,
-    FVector& OutLocation,
-    FRotator& OutRotation)
-{
-    if (!ResolveShorelineCameraPose(
-            World, Raft, bRiverLeft, OutLocation, OutRotation))
-    {
-        return false;
-    }
-    OutLocation.Z = Raft.GetActorLocation().Z + 70.0f;
-    URaftSimWaterRuntimeAdapter* Adapter = nullptr;
-    if (const UGameInstance* GameInstance = World->GetGameInstance())
-    {
-        if (URaftSimPhysicsBridgeSubsystem* Bridge =
-                GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
-        {
-            Adapter = Bridge->GetWaterRuntime();
-        }
-    }
-    FVector2D RiverPosition;
-    FVector Tangent;
-    FVector LeftNormal;
-    if (Adapter != nullptr &&
-        Adapter->WorldToRiverCoordinates(
-            Raft.GetActorLocation(), RiverPosition, Tangent, LeftNormal))
-    {
-        const FVector Toward =
-            (bRiverLeft ? LeftNormal : -LeftNormal).GetSafeNormal2D();
-        const FVector LookAt = Raft.GetActorLocation() +
-            Toward * 2200.0f + Tangent.GetSafeNormal2D() * 600.0f +
-            FVector::UpVector * 40.0f;
-        OutRotation = (LookAt - OutLocation).Rotation();
-    }
-    return true;
+    return RaftSimReviewCoordinates::ShorePose(World, Adapter, Raft.GetActorLocation(),
+        bRiverLeft, bLow, bLegacyHydraulicFrame, OutLocation, OutRotation);
 }
 
 // Burst variant of CaptureAfter for temporal artifacts: after the start
@@ -656,7 +601,12 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     const float Interval =
         Args.Num() > 2 ? FMath::Max(FCString::Atof(*Args[2]), 0.05f) : 0.2f;
     const FString Label = Args.Num() > 3 ? Args[3] : TEXT("RaftSimSeries");
-    const FString CameraPreset = Args.Num() > 4 ? Args[4] : FString();
+    // Named options also work with the ordinary gameplay camera (no preset).
+    const FString FirstOption = Args.Num() > 4 ? Args[4] : FString();
+    const bool bFirstIsOption = FirstOption.Contains(TEXT("=")) ||
+        FirstOption.Equals(TEXT("record"), ESearchCase::IgnoreCase) ||
+        FirstOption.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
+    const FString CameraPreset = bFirstIsOption ? FString() : FirstOption;
     bool bHasPose = false;
     FVector CamLoc = FVector::ZeroVector;
     FRotator CamRot = FRotator::ZeroRotator;
@@ -679,10 +629,12 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
     float FocusStationM = -1.0f;
     float FocusLateralM = 0.0f;
     bool bRecord=false;
+    bool bLegacyHydraulicFrame = false;
     for (const FString& Arg : Args)
     {
         bPaddle |= Arg.Equals(TEXT("paddle"), ESearchCase::IgnoreCase);
         bRecord |= Arg.Equals(TEXT("record"), ESearchCase::IgnoreCase);
+        bLegacyHydraulicFrame |= Arg.Equals(TEXT("legacy_hydraulic_frame"), ESearchCase::IgnoreCase);
         if (Arg.StartsWith(TEXT("station="), ESearchCase::IgnoreCase))
         {
             TargetStationM = FCString::Atof(*Arg.RightChop(8));
@@ -751,7 +703,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                 FVector Tangent;
                 FVector LeftNormal;
                 if (Water == nullptr || Raft == nullptr ||
-                    !Water->WorldToRiverCoordinates(
+                    !RaftSimReviewCoordinates::WorldToCoordinates(W, Water,
                         Raft->GetActorLocation(),
                         RiverPosition,
                         Tangent,
@@ -776,11 +728,12 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                 const float StepLateralM = bFinalStep ? TargetLateralM : 0.0f;
                 FVector StepWorldCm = FVector::ZeroVector;
                 FVector AheadWorldCm = FVector::ZeroVector;
-                if (!Water->RiverToWorldPosition(
+                const auto* Progress = RaftSimReviewCoordinates::GetMap(W, Water);
+                if (!Progress || !Progress->RiverToWorldPosition(
                         FVector2D(StepStationM, StepLateralM),
                         Water->GetRiverVerticalDatumM(),
                         StepWorldCm) ||
-                    !Water->RiverToWorldPosition(
+                    !Progress->RiverToWorldPosition(
                         FVector2D(StepStationM + 1.0f, StepLateralM),
                         Water->GetRiverVerticalDatumM(),
                         AheadWorldCm))
@@ -802,7 +755,7 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
         StartHandle,
         FTimerDelegate::CreateLambda(
             [WeakWorld, Count, Interval, Label, CameraPreset, bHasPose,
-             CamLoc, CamRot, FocusStationM, FocusLateralM, bRecord]()
+             CamLoc, CamRot, FocusStationM, FocusLateralM, bRecord, bLegacyHydraulicFrame]()
         {
             UWorld* W = WeakWorld.Get();
             if (W == nullptr)
@@ -823,12 +776,13 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                 URaftSimWaterRuntimeAdapter* Water = Bridge ? Bridge->GetWaterRuntime() : nullptr;
                 FRaftSimWaterSample Sample;
                 FVector Focus, Ahead;
+                const auto* Progress = RaftSimReviewCoordinates::GetMap(W, Water);
                 if (!Water || !FMath::IsFinite(FocusStationM) || FocusStationM < 0.0f ||
                     !FMath::IsFinite(FocusLateralM) ||
-                    !Water->SampleWaterAtRiverCoordinates(FVector2D(FocusStationM, FocusLateralM), Sample) ||
-                    !Sample.bWet ||
-                    !Water->RiverToWorldPosition(FVector2D(FocusStationM, FocusLateralM), Water->GetRiverVerticalDatumM(), Focus) ||
-                    !Water->RiverToWorldPosition(FVector2D(FocusStationM + 1.0f, FocusLateralM), Water->GetRiverVerticalDatumM(), Ahead))
+                    !Progress ||
+                    !Progress->RiverToWorldPosition(FVector2D(FocusStationM, FocusLateralM), Water->GetRiverVerticalDatumM(), Focus) ||
+                    !Progress->RiverToWorldPosition(FVector2D(FocusStationM + 1.0f, FocusLateralM), Water->GetRiverVerticalDatumM(), Ahead) ||
+                    !Water->SampleWaterAtWorldPosition(Focus, Sample) || !Sample.bWet)
                 {
                     UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: invalid or dry fixed river focus %.3f,%.3f; refusing misleading fallback capture"), FocusStationM, FocusLateralM);
                     FPlatformMisc::RequestExit(false);
@@ -860,41 +814,49 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                             W, *Raft, CameraPreset, ResolvedLoc, ResolvedRot);
                     }
                     else if (CameraPreset == TEXT("shore_left") ||
-                             CameraPreset == TEXT("shore_right"))
+                             CameraPreset == TEXT("shore_right") ||
+                             CameraPreset == TEXT("shore_left_low") ||
+                             CameraPreset == TEXT("shore_right_low"))
                     {
                         bCamera = ResolveShorelineCameraPose(
                             W,
                             *Raft,
-                            CameraPreset == TEXT("shore_left"),
-                            ResolvedLoc,
-                            ResolvedRot);
-                    }
-                    else if (CameraPreset == TEXT("shore_left_low") ||
-                             CameraPreset == TEXT("shore_right_low"))
-                    {
-                        bCamera = ResolveShorelineLowCameraPose(
-                            W,
-                            *Raft,
-                            CameraPreset == TEXT("shore_left_low"),
+                            CameraPreset.StartsWith(TEXT("shore_left")),
+                            CameraPreset.EndsWith(TEXT("_low")),
+                            bLegacyHydraulicFrame,
                             ResolvedLoc,
                             ResolvedRot);
                     }
                 }
             }
+            if (!bCamera && !CameraPreset.IsEmpty())
+            {
+                UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: could not resolve requested camera %s; refusing fallback capture"), *CameraPreset);
+                FPlatformMisc::RequestExit(false);
+                return;
+            }
+            UE_LOG(LogTemp, Display, TEXT("RaftSim.CaptureSeries: camera preset=%s shore_frame=%s location=%s rotation=%s"),
+                *CameraPreset, !CameraPreset.StartsWith(TEXT("shore_")) ? TEXT("not_applicable") :
+                bLegacyHydraulicFrame ? TEXT("legacy_hydraulic_axes_NOT_downstream") : TEXT("scenario_downstream"),
+                *ResolvedLoc.ToCompactString(), *ResolvedRot.ToCompactString());
             if (bCamera)
             {
                 ACameraActor* Cam = W->SpawnActor<ACameraActor>(
                     ACameraActor::StaticClass(), ResolvedLoc, ResolvedRot);
-                if (Cam != nullptr)
+                APlayerController* PC = W->GetFirstPlayerController();
+                if (!Cam || !PC)
+                {
+                    UE_LOG(LogTemp, Error, TEXT("RaftSim.CaptureSeries: requested camera could not be installed; refusing fallback capture"));
+                    FPlatformMisc::RequestExit(false);
+                    return;
+                }
+                else
                 {
                     // Same fixed photographic exposure as gameplay cameras;
                     // an auto-exposure review camera pumps frame to frame.
                     RaftSimCameraPresentation::Configure(
                         Cam->GetCameraComponent());
-                    if (APlayerController* PC = W->GetFirstPlayerController())
-                    {
-                        PC->SetViewTarget(Cam);
-                    }
+                    PC->SetViewTarget(Cam);
                 }
             }
             TSharedRef<int32> Taken = MakeShared<int32>(0);
@@ -939,14 +901,18 @@ static void HandleCaptureSeries(const TArray<FString>& Args, UWorld* World)
                     ARaftSimRaftActor* Raft = FindRaft(W2);
                     FVector2D RaftRiver = FVector2D::ZeroVector;
                     FVector Tangent, LeftNormal;
-                    const bool bRiver = Water && Raft && Water->WorldToRiverCoordinates(
+                    const bool bRiver = Water && Raft && RaftSimReviewCoordinates::WorldToCoordinates(W2, Water,
                         Raft->GetActorLocation(), RaftRiver, Tangent, LeftNormal);
                     APlayerController* PC = W2->GetFirstPlayerController();
                     const APlayerCameraManager* Camera = PC ? PC->PlayerCameraManager : nullptr;
-                    UE_LOG(LogTemp, Display, TEXT("RaftSim capture-series request: index=%d world_s=%.3f frame=%llu raft_river_valid=%d raft_station_m=%.3f raft_lateral_m=%.3f camera_valid=%d camera_world_cm=%s"),
+                    UE_LOG(LogTemp, Display, TEXT("RaftSim capture-series request: index=%d world_s=%.3f frame=%llu raft_river_valid=%d raft_station_m=%.3f raft_lateral_m=%.3f camera_valid=%d camera_world_cm=%s camera_pitch_deg=%.6f camera_yaw_deg=%.6f camera_roll_deg=%.6f camera_fov_deg=%.3f raft_coordinates=scenario_downstream"),
                         *Taken, W2->GetTimeSeconds(), static_cast<unsigned long long>(GFrameCounter),
                         bRiver, RaftRiver.X, RaftRiver.Y, Camera != nullptr,
-                        Camera ? *Camera->GetCameraLocation().ToCompactString() : TEXT("unavailable"));
+                        Camera ? *Camera->GetCameraLocation().ToCompactString() : TEXT("unavailable"),
+                        Camera ? Camera->GetCameraRotation().Pitch : 0.,
+                        Camera ? Camera->GetCameraRotation().Yaw : 0.,
+                        Camera ? Camera->GetCameraRotation().Roll : 0.,
+                        Camera ? Camera->GetFOVAngle() : 0.f);
                     ++(*Taken);
                     if (*Taken >= Count)
                     {
@@ -982,6 +948,7 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureSeriesCommand(
          "breaking_water_side|breaking_water_opposite|river_station|"
          "river_station_side|river_station_downstream] [paddle] "
          "[focusstation=<m>] [focuslateral=<m>] [record] "
+         "[legacy_hydraulic_frame (shore comparison only, NOT downstream)] "
          "[station=<m>] [lateral=<m>] (station walks the raft there in "
          "sub-80 m handoff-sized hops before the capture starts)"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureSeries));

@@ -241,7 +241,9 @@ def test_water_capture_series_records_actual_raft_and_camera_positions():
 def test_fixed_water_review_camera_converts_surface_elevation_only_once():
     source = (ROOT / 'unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp').read_text()
     fixed = source.split('if (CameraPreset.StartsWith(TEXT("river_station")))', 1)[1].split('if (!bCamera && !CameraPreset.IsEmpty())', 1)[0]
-    assert 'SampleWaterAtRiverCoordinates(FVector2D(FocusStationM, FocusLateralM), Sample)' in fixed
+    assert 'RaftSimReviewCoordinates::GetMap(W, Water)' in fixed
+    assert 'Progress->RiverToWorldPosition(FVector2D(FocusStationM, FocusLateralM)' in fixed
+    assert 'Water->SampleWaterAtWorldPosition(Focus, Sample)' in fixed
     assert 'Water->GetRiverVerticalDatumM(), Focus)' in fixed
     assert 'Water->GetRiverVerticalDatumM(), Ahead)' in fixed
     assert 'Focus.Z = Ahead.Z = Sample.SurfaceHeightMeters * 100.0f' in fixed

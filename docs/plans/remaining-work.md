@@ -3,7 +3,24 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [normal-play source packing capacity reuse](../reconstruction-review-2026-09-07/normal-river-source-packing-reuse.md).
+Latest September 15: [correct downstream cameras and source-face evidence](../reconstruction-review-2026-09-07/normal-river-downstream-camera.md).
+Shoreline review cameras had interpreted Cartesian east/north as downstream/
+river-left. They now use the existing scenario progress axis; explicit old-view
+control retained. Fixed-station focus and evidence labels also use true chainage.
+30 native PASS without warnings; 14 focused Python PASS. Broader 29 PASS/four
+pre-existing source-text FAIL, verified against HEAD, remain OPEN alongside the
+prior 13 physics regressions. Both reference videos accessible and selected
+frames inspected. Three actual recordings remain visually UNACCEPTED: broad
+smooth water faces/froth and incomplete distant terrain persist. Preliminary
+source rays through the old broad face hit DEM-ground authority 1, NOT inferred
+flanks; nearby raw ground support is sparse. NEXT register that patch against
+original returns/NAIP/exposed landmarks, not tune the unrelated flank prior;
+then justified shared-geometry/hydraulic changes and real crest/froth work.
+All 464 protected hashes match. Last ordinary 24.225877 FPS / p95 47.78 ms still
+FAILS 30 FPS. Full reconstruction, physical integration, Colorado → Pacuare →
+Futaleufu, other scenes, crew, normalization and release remain OPEN.
+
+Earlier September 15: [normal-play source packing capacity reuse](../reconstruction-review-2026-09-07/normal-river-source-packing-reuse.md).
 Normal play now reuses source packing allocation while rewriting EVERY current
 vertex field. Two 64-pair live comparisons: all 128 exact and faster in both
 orders, 6.48 million complete vertices compared. Packing drops about 1.1 ms

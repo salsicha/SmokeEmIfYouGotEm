@@ -17,6 +17,11 @@ REQUEST = re.compile(
     r'camera_valid=(\d) camera_world_cm=V\(X=([-\d.]+), Y=([-\d.]+), Z=([-\d.]+)\)'
 )
 
+CAMERA = re.compile(
+    r' camera_pitch_deg=([-\d.]+) camera_yaw_deg=([-\d.]+) '
+    r'camera_roll_deg=([-\d.]+) camera_fov_deg=([\d.]+) '
+    r'raft_coordinates=(\w+)')
+
 
 def parse_requests(log: str) -> list[dict]:
     rows = []
@@ -26,12 +31,26 @@ def parse_requests(log: str) -> list[dict]:
             raft_river_valid=bool(int(p[3])), raft_station_m=float(p[4]),
             raft_lateral_m=float(p[5]), camera_valid=bool(int(p[6])),
             camera_world_cm=list(map(float, p[7:10]))))
+        tail = log[match.end():].split('\n', 1)[0].rstrip('\r')
+        metadata = CAMERA.fullmatch(tail)
+        if tail and not metadata:
+            raise ValueError('Malformed camera or coordinate-frame metadata')
+        if metadata:
+            pitch, yaw, roll, fov = map(float, metadata.groups()[:4])
+            if not np.isfinite([pitch, yaw, roll, fov]).all() or not 0 < fov < 180:
+                raise ValueError('Invalid camera orientation or field of view')
+            if metadata[5] != 'scenario_downstream':
+                raise ValueError('Unknown declared raft coordinate frame')
+            rows[-1].update(camera_rotation_pitch_yaw_roll_deg=[pitch, yaw, roll],
+                camera_fov_deg=fov, raft_coordinate_frame=metadata[5])
     if len(rows) < 2:
         raise ValueError('Need at least two fully instrumented screenshot requests')
     if [r['index'] for r in rows] != list(range(len(rows))):
         raise ValueError('Duplicate, missing, or unordered request index')
     if not all(r['raft_river_valid'] and r['camera_valid'] for r in rows):
         raise ValueError('Invalid raft or camera coordinates')
+    if len({r.get('raft_coordinate_frame') for r in rows}) != 1:
+        raise ValueError('Mixed declared and legacy coordinate frames')
     for a, b in zip(rows, rows[1:]):
         if b['world_s'] <= a['world_s'] or b['frame'] <= a['frame']:
             raise ValueError('Requests must advance game time and render frame')
@@ -39,10 +58,16 @@ def parse_requests(log: str) -> list[dict]:
 
 
 def audit(log_path: Path, directory: Path, label: str, roi: list[int],
-          coordinate_frame: str = 'river_station_lateral') -> dict:
-    if coordinate_frame not in ('river_station_lateral', 'cartesian_east_north'):
-        raise ValueError('Explicit supported hydraulic coordinate frame required')
+          coordinate_frame: str | None = None) -> dict:
+    if coordinate_frame not in (None, 'river_station_lateral', 'cartesian_east_north', 'scenario_downstream'):
+        raise ValueError('Supported coordinate frame required')
     rows = parse_requests(log_path.read_text())
+    declared_frame = rows[0].get('raft_coordinate_frame')
+    if declared_frame and coordinate_frame not in (None, declared_frame):
+        raise ValueError('Requested interpretation contradicts the recorded coordinate frame')
+    if coordinate_frame == 'scenario_downstream' and not declared_frame:
+        raise ValueError('Legacy log does not prove scenario-downstream coordinates')
+    coordinate_frame = declared_frame or coordinate_frame or 'river_station_lateral'
     files = [directory / f'{label}_{r["index"]:03d}.png' for r in rows]
     actual = set(directory.glob(f'{label}_[0-9][0-9][0-9].png'))
     if actual != set(files):
@@ -77,12 +102,19 @@ def audit(log_path: Path, directory: Path, label: str, roi: list[int],
         elapsed_game_seconds=float(times[-1]-times[0]),
         request_interval_seconds_min_median_max=np.percentile(np.diff(times), [0, 50, 100]).tolist(),
         camera_max_displacement_cm=float(np.linalg.norm(cameras-cameras[0], axis=1).max()),
-        hydraulic_coordinate_frame=coordinate_frame,
-        raft_hydraulic_coordinate_ranges_m=[first_range, second_range],
+        raft_coordinate_frame=coordinate_frame,
+        raft_coordinate_ranges_m=[first_range, second_range],
         roi_xyxy=roi, adjacent_frame_roi_differences=differences,
         requests=rows, png_sha256=hashes, photorealism_accepted=False,
         limitations='Image differences establish changed pixels only, not correct flow, splash trajectories, temporal stability, or playable FPS. Screenshot I/O perturbs frame cadence.')
-    if coordinate_frame == 'river_station_lateral':
+    if coordinate_frame != 'scenario_downstream':
+        result['hydraulic_coordinate_frame'] = coordinate_frame
+        result['raft_hydraulic_coordinate_ranges_m'] = [first_range, second_range]
+    else:
+        rotations = np.array([r['camera_rotation_pitch_yaw_roll_deg'] for r in rows])
+        result['camera_max_angle_change_deg'] = float(np.max(np.abs((rotations-rotations[0]+180) % 360-180)))
+        result['camera_fov_range_deg'] = [min(r['camera_fov_deg'] for r in rows), max(r['camera_fov_deg'] for r in rows)]
+    if coordinate_frame in ('river_station_lateral', 'scenario_downstream'):
         result['raft_station_range_m'] = first_range
     return result
 
@@ -94,8 +126,8 @@ def main():
     parser.add_argument('--label', required=True)
     parser.add_argument('--roi', type=int, nargs=4, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--coordinate-frame', choices=('river_station_lateral', 'cartesian_east_north'),
-        default='river_station_lateral', help='Interpret the legacy log labels using the actual map hydraulic coordinates')
+    parser.add_argument('--coordinate-frame', choices=('river_station_lateral', 'cartesian_east_north', 'scenario_downstream'),
+        help='New logs declare their frame. For legacy logs only, specify actual hydraulic coordinates (default river station/lateral).')
     args = parser.parse_args()
     result = audit(args.log, args.directory, args.label, args.roi, args.coordinate_frame)
     with args.output.open('x') as output:
@@ -103,7 +135,7 @@ def main():
         output.write('\n')
     print(json.dumps({k: result[k] for k in ['label', 'frame_count', 'unique_png_hashes',
         'elapsed_game_seconds', 'request_interval_seconds_min_median_max',
-        'camera_max_displacement_cm', 'hydraulic_coordinate_frame', 'raft_hydraulic_coordinate_ranges_m', 'photorealism_accepted']}))
+        'camera_max_displacement_cm', 'raft_coordinate_frame', 'raft_coordinate_ranges_m', 'photorealism_accepted']}))
 
 
 if __name__ == '__main__':
