@@ -3,6 +3,18 @@
 Last reviewed 2026-09-14 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest September 14: [return-flow cancellation correction](../reconstruction-review-2026-09-07/normal-river-return-donor-precision.md).
+Compensated Rusanov donor evaluation retains representable sub-ulp gravity-wave
+return flow; genuinely underflowing positive donors explicitly reject. Ten new
+controls cover independent flux formulas, exact-datum translation and range.
+Final40-hash actual run still17 candidates/0.34s then step18 rejects four zero
+volumes, three with inflow; the new range guard does not trigger. This rules out
+lost return flow as the cause, not acceptance of drying or local force timing.
+235 focusedPASS/1 retained geometryFAIL; retained25PASS/12 energyFAIL;464 protected
+hashes unchanged. NEXT conservative coupled wet/dry/force evolution, full rational
+dynamics and actual native/shared-surface delivery. No new gameplay orFPS gain;
+full SouthFork/later-river/crew/normalization/release objective remainsOPEN.
+
 Latest September 14: [frozen gross-donor comparison](../reconstruction-review-2026-09-07/normal-river-gross-donor-comparison.md).
 Opt-in bidirectional donor transport uses one matrix for volume and momentum;
 independent frozen-ODE control passes, but actual history still rejects step18
