@@ -1,5 +1,6 @@
-"""Guarded normal-only candidate install, fresh audit and semantic restoration."""
+"""Guarded normal-only candidate installation and fresh restoration audits."""
 import json
+import hashlib
 from pathlib import Path
 import sys
 import zipfile
@@ -35,6 +36,9 @@ def graphs(material):
 def main():
     lib = unreal.MaterialEditingLibrary
     command = unreal.SystemLibrary.get_command_line()
+    if 'RaftSimRestoreFrothMicroNormal' in command:
+        raise RuntimeError('Close Unreal and use raftsim_restore_material_backup.py; '
+                           'then run -RaftSimAuditRestoredFrothMicroNormal in a fresh process.')
     material = unreal.load_asset(old.PATH)
     assert material and material.get_editor_property('tangent_space_normal')
     nodes = list(lib.get_material_expressions(material))
@@ -61,48 +65,43 @@ def main():
         output.write_text(json.dumps(dict(read_only=True, restored=restored, eight_graphs_exact=True,
             material_sha256=old.sha(old.FILE), visual_or_physical_accepted=False), indent=2)+'\n')
         return
-    restore = 'RaftSimRestoreFrothMicroNormal' in command
     old_nodes = {n.get_name(): old.graph(material,n)[n.get_name()] for n in nodes}
-    if restore:
-        expected = json.loads(REPORT.read_text())
-        assert old.sha(old.FILE) == expected['material_sha256']
-        assert canonical_graph(before) == canonical_graph(expected['saved_graphs'])
-        detail, = [n for n in nodes if n.get_editor_property('desc') == MARKER]
-        base = old.links(material, detail)['BaseNormalTS']
-        assert lib.connect_material_property(base,'',unreal.MaterialProperty.MP_NORMAL)
-        lib.delete_material_expression(material,detail)
-        output = REPORT.with_name('south-fork-froth-micro-normal-restored-v1-20260915.json')
-        assert not output.exists()
-        assert canonical_graph(graphs(material)) == canonical_graph(expected['original_graphs'])
-    else:
-        assert 'RaftSimInstallFrothMicroNormal' in command
-        native = json.loads((ROOT/'tmp/froth-micro-normal-native-v1-20260915/index.json').read_text(encoding='utf-8-sig'))
-        assert native['failed'] == 0 and native['succeeded'] == 5 and native['notRun'] == 0
-        assert {t['fullTestPath'] for t in native['tests'] if t['state'] == 'Success'} == {
-            'RaftSim.WaterDetail.FrothMicroNormalGPU','RaftSim.WaterDetail.FoamCoverageOpticsGPU',
-            'RaftSim.WaterDetail.RegisteredFoamClockGPU','RaftSim.Water.FoamCommittedEvolution','RaftSim.M4.ShorelineFineCrest'}
-        assert old.sha(HELPER) == QUALIFIED_HELPER
-        assert old.sha(old.FILE) == BASELINE and not REPORT.exists() and not BACKUP.exists()
-        assert not any(n.get_editor_property('desc') == MARKER for n in nodes)
-        base = lib.get_material_property_input_node(material,unreal.MaterialProperty.MP_NORMAL)
-        assert base.get_editor_property('desc') == 'SouthForkCurrentGradientNormalV1'
-        with zipfile.ZipFile(BACKUP,'x',zipfile.ZIP_DEFLATED) as archive:
-            archive.write(old.FILE,old.FILE.relative_to(ROOT).as_posix())
-        detail = lib.create_material_expression(material,unreal.MaterialExpressionCustom)
-        detail.set_editor_property('desc',MARKER)
-        detail.set_editor_property('code',CODE)
-        detail.set_editor_property('output_type',unreal.CustomMaterialOutputType.CMOT_FLOAT3)
-        sources = dict(BaseNormalTS=base,Coverage=coverage,**{key: inputs[key] for key in ('FrothUV','FrothOrigin','FrothFlow','FrothTime')})
-        pins = []
-        for name in sources:
-            pin=unreal.CustomInput();pin.set_editor_property('input_name',name);pins.append(pin)
-        detail.set_editor_property('inputs',pins)
-        for name, node in sources.items():
-            assert lib.connect_material_expressions(node,'',detail,name)
-        assert lib.connect_material_property(detail,'',unreal.MaterialProperty.MP_NORMAL)
-        for node in nodes:
-            assert old.graph(material,node)[node.get_name()] == old_nodes[node.get_name()], node.get_name()
-        output = REPORT
+    assert 'RaftSimInstallFrothMicroNormal' in command
+    native = json.loads((ROOT/'tmp/froth-micro-normal-native-v1-20260915/index.json').read_text(encoding='utf-8-sig'))
+    assert native['failed'] == 0 and native['succeeded'] == 5 and native['notRun'] == 0
+    assert {t['fullTestPath'] for t in native['tests'] if t['state'] == 'Success'} == {
+        'RaftSim.WaterDetail.FrothMicroNormalGPU','RaftSim.WaterDetail.FoamCoverageOpticsGPU',
+        'RaftSim.WaterDetail.RegisteredFoamClockGPU','RaftSim.Water.FoamCommittedEvolution','RaftSim.M4.ShorelineFineCrest'}
+    assert old.sha(HELPER) == QUALIFIED_HELPER
+    assert old.sha(old.FILE) == BASELINE and not REPORT.exists() and not BACKUP.exists()
+    assert not any(n.get_editor_property('desc') == MARKER for n in nodes)
+    base = lib.get_material_property_input_node(material,unreal.MaterialProperty.MP_NORMAL)
+    # Preserve the complete current-plus-registered hydraulic detail normal.
+    baseline_report = json.loads((ROOT/'unreal/Saved/RaftSimValidation/south-fork-irregular-froth-restored-v1-20260914.json').read_text())
+    assert canonical_graph(before['MP_NORMAL']) == canonical_graph(baseline_report['saved_graphs']['MP_NORMAL'])
+    assert base.get_editor_property('code') == 'return normalize(float3(Base.xy-Detail.yz*Base.z,Base.z));'
+    base_inputs = old.links(material, base)
+    assert base_inputs['Base'].get_editor_property('desc') == 'SouthForkCurrentGradientNormalV1'
+    assert base_inputs['Detail'].get_editor_property('code') == 'return RaftSimRegisteredDetailSample(Detail,World.xy*float2(0.01,0.01*Sign))*Enable;'
+    with zipfile.ZipFile(BACKUP,'x',zipfile.ZIP_DEFLATED) as archive:
+        archive.write(old.FILE,old.FILE.relative_to(ROOT).as_posix())
+    with zipfile.ZipFile(BACKUP) as archive:
+        assert hashlib.sha256(archive.read(old.FILE.relative_to(ROOT).as_posix())).hexdigest() == BASELINE
+    detail = lib.create_material_expression(material,unreal.MaterialExpressionCustom)
+    detail.set_editor_property('desc',MARKER)
+    detail.set_editor_property('code',CODE)
+    detail.set_editor_property('output_type',unreal.CustomMaterialOutputType.CMOT_FLOAT3)
+    sources = dict(BaseNormalTS=base,Coverage=coverage,**{key: inputs[key] for key in ('FrothUV','FrothOrigin','FrothFlow','FrothTime')})
+    pins = []
+    for name in sources:
+        pin=unreal.CustomInput();pin.set_editor_property('input_name',name);pins.append(pin)
+    detail.set_editor_property('inputs',pins)
+    for name, node in sources.items():
+        assert lib.connect_material_expressions(node,'',detail,name)
+    assert lib.connect_material_property(detail,'',unreal.MaterialProperty.MP_NORMAL)
+    for node in nodes:
+        assert old.graph(material,node)[node.get_name()] == old_nodes[node.get_name()], node.get_name()
+    output = REPORT
     after = graphs(material)
     for name in PROPERTIES:
         assert canonical_graph(before[name]) == canonical_graph(after[name]), name
@@ -111,9 +110,9 @@ def main():
     assert unreal.EditorAssetLibrary.save_loaded_asset(material,only_if_is_dirty=False)
     for path, digest in protected.items():
         assert old.sha(Path(path)) == digest, path
-    output.write_text(json.dumps(dict(material=old.PATH, restored=restore, material_sha256=old.sha(old.FILE),
+    output.write_text(json.dumps(dict(material=old.PATH, restored=False, material_sha256=old.sha(old.FILE),
         helper_sha256=old.sha(HELPER),original_graphs=before,saved_graphs=after,protected_files=len(protected),
-        only_normal_output_changed=True, existing_nodes_unchanged=not restore, visual_or_physical_accepted=False),indent=2)+'\n')
+        only_normal_output_changed=True, existing_nodes_unchanged=True, visual_or_physical_accepted=False),indent=2)+'\n')
 
 
 if __name__ == '__main__':

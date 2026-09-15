@@ -3,7 +3,23 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [edge wetting and playable crest lookup](../reconstruction-review-2026-09-07/normal-river-edge-birth-and-tile-lookup.md).
+Latest September 15: [actual lit-froth rejection and recovery](../reconstruction-review-2026-09-07/normal-river-lit-froth-rejection.md).
+Normal-only and combined finer-coverage/lit-normal candidates were installed,
+fresh-audited and captured in normal South Fork play; BOTH visually REJECTED.
+Actual reference video access works. Broad white patches / angular white chips
+and smooth wave faces persist in inspected engine and decoded sequence frames.
+Six native tests PASS, seven exact-backup recovery tests PASS; neither proves
+visual acceptance. Both complete local recordings decode187 frames, but30Hz
+encoding is NOT game FPS. Original material restored byte-for-byte; fresh audit
+verifies all eight graphs and464 protected hashes. In-editor restore crash and
+failed recovery attempts are retained; successful recovery runs outside Unreal.
+No candidate is enabled by ordinary material regeneration. All owned jobs are
+terminal. NEXT breaking-surface/foam deformation and source-front coupling,
+major solver/surface cost reduction; not another presumed normal-only fix.
+Last11.447123FPS/p9598.7482ms still FAILS30FPS. Full later-river, all-scene,
+crew, normalization, regression and release work remains OPEN.
+
+Earlier September 15: [edge wetting and playable crest lookup](../reconstruction-review-2026-09-07/normal-river-edge-birth-and-tile-lookup.md).
 Normal South Fork now uses a bounded direct tile lookup for the unchanged crest
 function. Actual 64-pair comparison: 3.24 million identical height/foam samples,
 2.067817 ms hash versus 1.535808 ms direct, faster in every pair and both orders.

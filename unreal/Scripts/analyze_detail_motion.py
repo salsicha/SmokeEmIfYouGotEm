@@ -1,6 +1,7 @@
 """Decode complete local engine clips; measure image changes, not physical FPS."""
 from pathlib import Path
 import json
+import argparse
 import re
 import sys
 
@@ -14,8 +15,8 @@ ROIS = dict(terrain=(850,110,1150,170), foam_face=(60,380,480,650),
             dark_water=(950,430,1220,680), crest=(500,280,770,420))
 
 
-def analyze(label):
-    log_path = ROOT / 'unreal/Saved/Logs' / (label + '.log')
+def analyze(label, log_dir=None, save_times=(1,8,16,23)):
+    log_path = (Path(log_dir) if log_dir is not None else ROOT / 'unreal/Saved/Logs') / (label + '.log')
     log = log_path.read_text(encoding='utf-8', errors='replace')
     match = re.search(r'recording saved: (.+?\.mp4) \((\d+) source_frames, ([\d.]+) s;', log)
     if not match:
@@ -23,7 +24,7 @@ def analyze(label):
     path = Path(match[1]); source_count = int(match[2]); source_duration = float(match[3])
     stats = {name:dict(changes=[], gradients=[]) for name in ROIS}
     frames=[]; previous=None; times=[]; duplicate_count=0; saved=[]
-    save_at=iter([1,8,16,23]); next_save=next(save_at, None)
+    save_at=iter(save_times); next_save=next(save_at, None)
     with av.open(str(path)) as container:
         for frame in container.decode(video=0):
             t=float(frame.pts*frame.time_base)
@@ -66,6 +67,18 @@ def analyze(label):
 
 
 if __name__ == '__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('labels', nargs='*', default=['DetailMotionBaseline','DetailMotionSecondOrder'])
+    parser.add_argument('--log-dir', type=Path, default=ROOT/'unreal/Saved/Logs')
+    parser.add_argument('--output', type=Path, default=OUT)
+    parser.add_argument('--save-times', type=int, nargs='+', default=[1,8,16,23])
+    args=parser.parse_args()
+    if args.save_times != sorted(set(args.save_times)) or min(args.save_times)<0:
+        parser.error('save times must be distinct, increasing, nonnegative seconds')
+    OUT=args.output
     OUT.mkdir(parents=True,exist_ok=True)
-    reports=[analyze(label) for label in ('DetailMotionBaseline','DetailMotionSecondOrder')]
+    for label in args.labels:
+        if Path(label).name != label or (OUT/(label+'.json')).exists():
+            parser.error('use a simple label and a fresh output path')
+    reports=[analyze(label,args.log_dir,args.save_times) for label in args.labels]
     print(json.dumps(reports,indent=2))
