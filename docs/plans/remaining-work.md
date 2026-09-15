@@ -3,7 +3,27 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest September 15: [normal-play wet-edge distance sweep](../reconstruction-review-2026-09-07/normal-river-wet-edge-sweep.md).
+Latest September 15: [flat-source pressure work](../reconstruction-review-2026-09-07/normal-river-flat-birth-work.md).
+The original single flat-birth energy/work limit now retains both order-height
+old self-divergence and order-sqrt-height old/new pressure coupling, plus
+bounded newborn momentum. Energy slope, canonical velocity, fixed-momentum
+volume derivative and all operator columns converge against independent
+positive-water states. 23 focused tests PASS, including nonzero pressure work,
+both axes/orientations, oblique internal sources, sloped old terrain and a
+large source datum. Final broader suite: 474 PASS / 13 retained FAIL, zero
+errors/skips; failure identities exactly match the preceding suite. All owned
+jobs terminal; all 464 protected source/actor hashes remain unchanged.
+This is an offline prerequisite, NOT a front force, time update, native
+integration or playable acceptance. Actual bank point-birth activation remains
+unresolved; no nonlinear candidate or changed optics is enabled in play.
+Last ordinary 13.420531 FPS / p95 89.9936 ms still FAILS 30 FPS; smooth breaking
+faces and broad froth remain unaccepted. NEXT compatible point/edge/flat/mixed
+front forces/impulses and complete-front transport, native shared-surface
+integration, major solver/surface cost reduction and actual motion/reference
+qualification. Colorado → Pacuare → Futaleufu, all-scene water, crew,
+normalization, retained regressions and release remain OPEN.
+
+Earlier September 15: [normal-play wet-edge distance sweep](../reconstruction-review-2026-09-07/normal-river-wet-edge-sweep.md).
 Normal South Fork uses the exact two-pass wet-edge distance transform in both
 shore damping and terrain-probe band selection. Actual 64 comparisons span
 19 masks / 3,240,000 exact integer distances: queue 2.030311 ms versus sweep
