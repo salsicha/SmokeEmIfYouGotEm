@@ -3,21 +3,27 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [normal installed-module rapid review](../reconstruction-review-2026-09-07/normal-installed-rapid-review.md).
-Actual normal Raft/WaterDetail/project DLL paths and hashes verified; no temporary
-module override. Rapid recording56238 TERMINAL0, three1280x720 stills and complete
-25.221s clip, sampled contact agreement. Broad froth/bank-side shape still FAIL
-visual acceptance; paired350s preview is NOT a saved/default promotion. Long
-normal replay78384 TERMINAL: result FALSE,900s timeout after7 required8 handoffs,
-4962 fresh frames; detail remains active but full regression is NOT passed.
-Reference video playback works. SAME SM5 suite47178/PID35584 LIVE with active
-workers; preserve inputs, no duplicate cook. SAME hydraulic40601/PID11316 LIVE;
-800/850s BOTH state/dry-bank audits PASS, NOT settled; next900/local6000 BOTH.
-600-800s zero-step rapid flux/storage analysis confirms continuing drainage.
-All464 protected identities retained. Current generated inventory corrected:
-26 focused PASS; wider set63 PASS/12 FAIL, historical evidence/gates unchanged.
-Full coupled nonlinear-water gameplay, full replay, package/source closure,
-normal-menu delivery, physical/visual/30FPS and later-river/crew/release OPEN.
+Latest: [isolated normal performance and full replay](../reconstruction-review-2026-09-07/isolated-normal-performance.md).
+Normal installed-module replay59643 TERMINAL0: original full streaming gate PASS,
+eight post-ready handoffs,5,593 fresh frames and372.800019 detail seconds. Actual
+module paths/hashes verified; paired350s preview remains opt-in, not default
+promotion. Prior seven-handoff timeout remains recorded in the
+[rapid review](../reconstruction-review-2026-09-07/normal-installed-rapid-review.md).
+Fresh ordinary300-frame1280x720 profile61858:22.560934FPS/p9553.9323ms FAIL30FPS.
+Competing owned jobs were safely suspended/resumed; no resolution/quality/physics
+or acceptance reduction. Main cost is game-thread water publication/crest work,
+not GPU rendering. Fixed exact-timestamp JSON type validation; PowerShell checks
+and25 related parser tests PASS. Detailed capture72082 is diagnostic, not FPS.
+Later replay screenshots show water but unfinished context terrain/crew; initial
+readiness screenshot does not yet show water. Visual and initial-render gates
+remain open. SAME SM5 suite47178/PID35584 and hydraulic40601/PID11316 confirmed
+LIVE after all five owned processes resumed with status0 and advancing CPU.
+900/local6000 BOTH state/dry-bank audits PASS, NOT settled; next950/local7000 BOTH.
+Prior wider regressions remain63 PASS/12 FAIL; no historical hashes/gates changed.
+NEXT fidelity-preserving water-update optimization and coupled nonlinear-water
+integration; settled source-consistent terrain/rapid/wave/froth review, source
+closure/default-menu delivery, sustained30FPS and all later-river/crew/release
+requirements remain OPEN. Reference video playback previously verified working.
 Troublemaker remains a rapid within South Fork, never a menu scenario.
 
 Previous: [actual detail gameplay and exact continuation](../reconstruction-review-2026-09-07/detail-gameplay-handoff.md).

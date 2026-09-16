@@ -6,16 +6,20 @@ param(
     [string]$ShaderWorkloadManifest = '',
     [string]$ExtraGameArgument = '',
     [string[]]$ExtraGameArguments = @(),
-    [switch]$NativePerformanceGate
+    [switch]$NativePerformanceGate,
+    [switch]$DetailStreamingReplay
 )
 $ErrorActionPreference = 'Stop'
 if ($Label -notmatch '^south-fork-[a-z0-9-]+$') { throw 'Use a fresh scoped capture label' }
+if ($NativePerformanceGate -and $DetailStreamingReplay) { throw 'Choose one native validation mode' }
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $logFile = Join-Path $projectRoot "unreal/Saved/Logs/$Label.log"
 $reportFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-process.json"
 $gateFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-gate.json"
+$detailReplayFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-detail.json"
 if ((Test-Path -LiteralPath $logFile) -or (Test-Path -LiteralPath $reportFile)) { throw 'Preserve previous capture evidence' }
 if ($NativePerformanceGate -and (Test-Path -LiteralPath $gateFile)) { throw 'Preserve previous native gate evidence' }
+if ($DetailStreamingReplay -and (Test-Path -LiteralPath $detailReplayFile)) { throw 'Preserve previous detail replay evidence' }
 $cookExe = [IO.Path]::GetFullPath((Join-Path $projectRoot $CookExecutable))
 $localCookRoot = [IO.Path]::GetFullPath((Join-Path $projectRoot 'tmp')) + [IO.Path]::DirectorySeparatorChar
 if (-not $cookExe.StartsWith($localCookRoot, [StringComparison]::OrdinalIgnoreCase) -or
@@ -48,7 +52,12 @@ if ($ShaderWorkloadManifest) {
         $process = [Diagnostics.Process]::GetProcessById($identity.pid)
         $actual = Get-CimInstance Win32_Process -Filter ('ProcessId=' + $identity.pid)
         $expectedExe = if ($identity.role -eq 'shader_editor') { $editorExe } elseif ($identity.role -eq 'shader_worker') { $workerExe } else { throw 'Unexpected owned process role' }
-        if ($process.StartTime.ToUniversalTime().ToString('o') -cne $identity.start_utc -or
+        # PowerShell 7.5+ decodes JSON ISO timestamps as DateTime by default.
+        # Normalize that representation without losing any identity precision.
+        $expectedStartUtc = if ($identity.start_utc -is [datetime]) {
+            $identity.start_utc.ToUniversalTime().ToString('o')
+        } else { $identity.start_utc }
+        if ($process.StartTime.ToUniversalTime().ToString('o') -cne $expectedStartUtc -or
             $process.MainModule.FileName -ine $expectedExe -or $identity.executable -ine $expectedExe -or
             [string]::IsNullOrEmpty($identity.command_line) -or $actual.CommandLine -cne $identity.command_line -or
             $actual.ParentProcessId -ne $identity.parent_id) { throw 'Owned shader process identity changed' }
@@ -73,6 +82,8 @@ public static class RaftSimProfileProcessControl {
 $paused = @()
 $game = $null
 $report = [ordered]@{ cook_pid=$CookProcessId; cook_start_utc=$CookStartUtc; cook_executable=$cookExe; cook_sha256=(Get-FileHash -LiteralPath $cookExe).Hash.ToLowerInvariant(); shader_manifest=$ShaderWorkloadManifest; label=$Label; native_gate=[bool]$NativePerformanceGate; gate_passed=$null; suspend_status=$null; resume_status=$null; processes=@(); game_exit_code=$null; game_timeout=$false }
+$report.detail_replay = [bool]$DetailStreamingReplay
+$report.detail_replay_passed = $null
 try {
     foreach ($item in $owned) {
         $entry = [ordered]@{ pid=$item.process.Id; role=$item.role; start_utc=$item.process.StartTime.ToUniversalTime().ToString('o'); executable=$item.process.MainModule.FileName; cpu_seconds_before=$item.process.TotalProcessorTime.TotalSeconds; cpu_seconds_before_resume=$null; suspend=$null; resume=$null }
@@ -105,6 +116,11 @@ try {
             '-RaftSimPerformanceRequiredMap=L_SouthForkAmerican_FullReach', "-RaftSimValidationOutput=$gateFile")) {
             $start.ArgumentList.Add($argument)
         }
+    } elseif ($DetailStreamingReplay) {
+        # The existing read-only native probe owns all coverage gates and its
+        # unchanged 900-second observation timeout. Never truncate it with CSV.
+        $start.ArgumentList.Add('-ForceRes')
+        $start.ArgumentList.Add("-RaftSimDetailStreamingReport=$detailReplayFile")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -114,7 +130,9 @@ try {
     if ($ExtraGameArgument) { $start.ArgumentList.Add($ExtraGameArgument) }
     foreach ($argument in $ExtraGameArguments) { $start.ArgumentList.Add($argument) }
     $game = [Diagnostics.Process]::Start($start)
-    $deadline = [DateTime]::UtcNow.AddSeconds(240)
+    # Native replay still fails itself at 900 seconds. The outer watchdog only
+    # allows startup/report flushing; it does not alter a native acceptance gate.
+    $deadline = [DateTime]::UtcNow.AddSeconds($(if ($DetailStreamingReplay) { 960 } else { 240 }))
     while (-not $game.WaitForExit(1000)) {
         if ([DateTime]::UtcNow -ge $deadline) {
             $report.game_timeout = $true
@@ -124,7 +142,7 @@ try {
         }
     }
     $report.game_exit_code = $game.ExitCode
-    if (-not $NativePerformanceGate -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
+    if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$Label.csv"
         if (-not (Test-Path -LiteralPath $csvFile) -or (Get-Item -LiteralPath $csvFile).Length -eq 0) {
             throw 'Profiler exited without a nonempty CSV; no timing evidence'
@@ -139,6 +157,16 @@ try {
         $gate = Get-Content -LiteralPath $gateFile -Raw | ConvertFrom-Json
         if ($gate.passed -isnot [bool]) { throw 'Native performance report lacks a Boolean result' }
         $report.gate_passed = $gate.passed
+    }
+    if ($DetailStreamingReplay) {
+        if (-not (Test-Path -LiteralPath $detailReplayFile)) { throw 'Native detail replay report was not produced' }
+        $detailReplay = Get-Content -LiteralPath $detailReplayFile -Raw | ConvertFrom-Json
+        if ($detailReplay.schema -ne 'raftsim.detail_streaming_actual_play.v1' -or $detailReplay.passed -isnot [bool]) {
+            throw 'Invalid native detail replay report'
+        }
+        $report.detail_replay_passed = $detailReplay.passed
+        $report.detail_replay_file = $detailReplayFile
+        $report.detail_replay_sha256 = (Get-FileHash -LiteralPath $detailReplayFile).Hash.ToLowerInvariant()
     }
 } finally {
     # Resume workers before their editor, then the cook, even after a failed
@@ -159,3 +187,4 @@ try {
 if (@($report.processes | Where-Object { $_.suspend -eq 0 -and $_.resume -ne 0 }).Count) { throw 'Owned process resume failed: immediate same-process recovery required' }
 if ($report.game_timeout -or $report.game_exit_code -ne 0) { throw 'Capture did not finish successfully' }
 if ($NativePerformanceGate -and -not $report.gate_passed) { throw 'Native performance gate failed; see preserved gate report' }
+if ($DetailStreamingReplay -and -not $report.detail_replay_passed) { throw 'Native detail replay failed; see preserved replay report' }
