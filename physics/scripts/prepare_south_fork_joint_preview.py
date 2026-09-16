@@ -148,6 +148,12 @@ def prepare(args):
                 for r in window['valid_live_center_bounds_m']), 'Initial center outside verified coverage')
     require(chosen is not None and len(stream['windows']) == 799, 'Incomplete source-window collection')
     render = deps.read(args.render_stage)
+    rebind = render.get('cpu_retention_rebind')
+    if rebind is not None:
+        deps.add(ROOT / rebind['original_stage'], rebind['original_stage_sha256'])
+        deps.add(ROOT / rebind['retention_receipt'], rebind['retention_receipt_sha256'])
+        require((ROOT / rebind['native_collision_report']).resolve() == args.collision_audit.resolve(),
+                'Rebind points to a different native audit')
     collision = deps.read(args.collision_audit, render['collision_report_sha256'])
     verify_native_state(collision, atlas_hash, atlas['source_time_seconds'],
                         chosen.relative_to(ROOT).as_posix(), sha(chosen), args.center, sha(args.geometry_manifest))

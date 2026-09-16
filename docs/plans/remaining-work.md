@@ -3,7 +3,25 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [portable saved-scene runtime bundle](../reconstruction-review-2026-09-07/portable-runtime-bundle.md).
+Latest: [retained preview, exact solver rows and corrected hydraulic continuation](../reconstruction-review-2026-09-07/retained-preview-and-solver-rows.md).
+Fresh provenance-bound actual South Fork preview completed with one water
+surface and zero logged hull/render mismatch; 77 focused Python tests PASS.
+Broad froth and inferred sidewalls remain visually unaccepted; no normal-menu
+promotion. All 464 protected files match unchanged or proven CPU-only revisions.
+Committed solver optimization passes all four native tests and two bit-exact
+replay comparisons. UE static library rebuilt; editor/game relink and actual
+30 FPS qualification remain NEXT, not delivered by the static library alone.
+The former session86918 failed its1250s east artificial bank and was replaced
+only after a source-exact restart from its last clean1200s state. CURRENT LIVE
+session69416 / PID18716, output `tmp/south-fork-landward-context1200to1800s-v1-20260916`.
+New1250/1300s cell AND all86,720 exact-dry bank-face checks PASS, NOT settled.
+NEXT completed local3000 / absolute1350s audits. Package session80881 / PID16144
+still live with active shader worker31852; verify same-job completion and444
+non-editor source identities plus2,405 runtime payloads before packaged play.
+No restart on observation timeout. Last ordinary17.819710FPS / p9581.6343ms
+still FAILS30FPS. All later rivers, crew and release requirements remain OPEN.
+
+Previous: [portable saved-scene runtime bundle](../reconstruction-review-2026-09-07/portable-runtime-bundle.md).
 The unchanged saved South Fork scene now has a versioned, hash-checked runtime
 dependency closure: 2,405 payloads / 916,906,778 bytes, staged by the game build.
 113 focused Python tests PASS. Native staged-vs-source comparison: 2,001 route
