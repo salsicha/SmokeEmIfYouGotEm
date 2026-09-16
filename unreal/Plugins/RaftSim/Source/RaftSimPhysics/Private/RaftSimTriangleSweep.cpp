@@ -113,6 +113,7 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
     if(!bValid || StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
         !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8 || !FMath::IsFinite(ProvenClearanceCm) || ProvenClearanceCm>=SkinCm)return Best;
     TArray<FVector> LocalStart,LocalEnd;
+    FBox InitialBounds(ForceInit);
     if(bGroupedBroadPhase){LocalStart.SetNumUninitialized(StartCm.Num());LocalEnd.SetNumUninitialized(EndCm.Num());}
     for(int32 I=0;I<StartCm.Num();++I)
     {
@@ -120,9 +121,61 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
         // Exactly the reference arithmetic, once per original vertex rather
         // than repeated for each indexed face and its enclosing group.
         if(bGroupedBroadPhase){LocalStart[I]=(StartCm[I]-OriginCm)*.01;LocalEnd[I]=(EndCm[I]-OriginCm)*.01;}
+        InitialBounds+=bGroupedBroadPhase?LocalStart[I]:(StartCm[I]-OriginCm)*.01;
     }
     for(const auto& F:Faces)
         if(!StartCm.IsValidIndex(F.X) || !StartCm.IsValidIndex(F.Y) || !StartCm.IsValidIndex(F.Z))return Best;
+    if(ClosedGround.ComponentCount()>0)
+    {
+        if(MovingTopology.Num()!=Faces.Num() ||
+            FMemory::Memcmp(MovingTopology.GetData(),Faces.GetData(),Faces.Num()*sizeof(FIntVector))!=0)
+        {
+            MovingTopology.Reset(Faces.Num());MovingTopology.Append(Faces.GetData(),Faces.Num());MovingRepresentatives.Reset();
+            TArray<int32> Parents;Parents.SetNumUninitialized(StartCm.Num());
+            for(int32 I=0;I<Parents.Num();++I)Parents[I]=I;
+            const auto Root=[&](int32 I){while(Parents[I]!=I){Parents[I]=Parents[Parents[I]];I=Parents[I];}return I;};
+            for(const auto& F:Faces){Parents[Root(F.Y)]=Root(F.X);Parents[Root(F.Z)]=Root(F.X);}
+            TSet<int32> Seen;
+            for(int32 I=0;I<Faces.Num();++I)
+            {const int32 R=Root(Faces[I].X);if(!Seen.Contains(R)){Seen.Add(R);MovingRepresentatives.Add(FIntPoint(Faces[I].X,I));}}
+        }
+        // Every connected moving sheet is checked, not just the raft centre or
+        // selected supports. If a sheet is not wholly on the representative's
+        // side, its initial surface crossing is detected by the triangle sweep.
+        for(const auto& Representative:MovingRepresentatives)
+        {
+            const auto Location=ClosedGround.Classify((StartCm[Representative.X]-OriginCm)*.01,Vertices,Triangles);
+            if(Location!=FRaftSimClosedGround::ELocation::Outside)
+            {
+                Best.Status=Location==FRaftSimClosedGround::ELocation::Inside?EStatus::InitialIntersection:EStatus::Unresolved;
+                Best.MovingFace=Representative.Y;return Best;
+            }
+        }
+    }
+    {
+        // Reverse containment is possible only when the complete source
+        // component bounds fit inside the initial hull bounds. Actual crossing
+        // surfaces still use the full original-triangle narrow phase below.
+        TArray<FVector> EnclosedGroundPoints;
+        ClosedGround.AddEnclosedRepresentatives(InitialBounds,Vertices,EnclosedGroundPoints);
+        if(!EnclosedGroundPoints.IsEmpty())
+        {
+            if(!bGroupedBroadPhase)
+            {LocalStart.SetNumUninitialized(StartCm.Num());for(int32 I=0;I<StartCm.Num();++I)LocalStart[I]=(StartCm[I]-OriginCm)*.01;}
+            // Rebuild from this exact deformed pose: separated seams must not
+            // inherit closure from a rest mesh or a previous deformation.
+            FRaftSimClosedGround ClosedHull;ClosedHull.Build(LocalStart,Faces);
+            for(const auto& Point:EnclosedGroundPoints)
+            {
+                const auto Location=ClosedHull.Classify(Point,LocalStart,Faces);
+                if(Location!=FRaftSimClosedGround::ELocation::Outside)
+                {
+                    Best.Status=Location==FRaftSimClosedGround::ELocation::Inside?EStatus::InitialIntersection:EStatus::Unresolved;
+                    return Best;
+                }
+            }
+        }
+    }
     Best.Status=EStatus::Clear;Best.Time=1.;uint64 Pairs=0;
     TArray<int32,TInlineAllocator<64>> GroupLeaves;
     for(int32 Face=0;Face<Faces.Num();++Face)
@@ -240,6 +293,7 @@ bool FRaftSimTriangleSweepMesh::Build(UStaticMeshComponent* Component)
         Order.Add(Triangles.Add(FIntVector(T.v0,T.v1,T.v2)));
     }
     if(Triangles.IsEmpty())return false;
+    ClosedGround.Build(Vertices,Triangles);MovingTopology.Reset();MovingRepresentatives.Reset();
     Nodes.Reserve(Triangles.Num()/4+1);BuildNode(0,Order.Num());
     bValid=true;return true;
 }

@@ -179,4 +179,113 @@ bool FRaftSimSourceSurfaceBVHTest::RunTest(const FString&)
     }
     return true;
 }
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimClosedGroundTopologyTest,"RaftSim.Physics.ClosedGroundTopology",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimClosedGroundTopologyTest::RunTest(const FString&)
+{
+    using ELocation=FRaftSimClosedGround::ELocation;
+    auto* Asset=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube"));
+    FTriMeshCollisionData Data;if(!Asset || !Asset->GetPhysicsTriMeshData(&Data,false))return false;
+    TArray<FVector> Vertices;TArray<FIntVector> Faces;
+    // Deliberately split EVERY original triangle corner: exact seam topology
+    // must work without rewriting any collision vertex or triangle.
+    for(const auto& F:Data.Indices)
+    {
+        const int32 Base=Vertices.Num();
+        for(const int32 I:{F.v0,F.v1,F.v2})Vertices.Add(FVector(Data.Vertices[I])*.01);
+        Faces.Add(FIntVector(Base,Base+1,Base+2));
+    }
+    const auto OriginalVertices=Vertices;const auto OriginalFaces=Faces;
+    FRaftSimClosedGround Closed;Closed.Build(Vertices,Faces);
+    TestEqual(TEXT("split source corners reconstruct one closed component"),Closed.ComponentCount(),1);
+    TestTrue(TEXT("centre is inside original triangles"),Closed.Classify(FVector::ZeroVector,Vertices,Faces)==ELocation::Inside);
+    TestTrue(TEXT("outside is not a solid"),Closed.Classify(FVector(2,0,0),Vertices,Faces)==ELocation::Outside);
+    TestTrue(TEXT("singular source vertex cannot be declared clear"),Closed.Classify(Vertices[0],Vertices,Faces)==ELocation::Unresolved);
+    TestTrue(TEXT("classification never changes geometry"),Vertices==OriginalVertices && Faces==OriginalFaces);
+    for(auto& F:Faces)Swap(F.Y,F.Z);
+    Closed.Build(Vertices,Faces);
+    TestTrue(TEXT("global reversed winding retains the solid"),Closed.Classify(FVector::ZeroVector,Vertices,Faces)==ELocation::Inside);
+    Swap(Faces[0].Y,Faces[0].Z);Closed.Build(Vertices,Faces);
+    TestTrue(TEXT("inconsistent closed winding refuses rather than inventing inside/outside"),Closed.Classify(FVector::ZeroVector,Vertices,Faces)==ELocation::Unresolved);
+    Faces=OriginalFaces;Faces.RemoveAt(Faces.Num()-1);Closed.Build(Vertices,Faces);
+    TestEqual(TEXT("open terrain sheet is not declared a closed volume"),Closed.ComponentCount(),0);
+    TArray<FVector> OpenPoints;Closed.AddEnclosedRepresentatives(FBox(FVector(-2),FVector(2)),Vertices,OpenPoints);
+    TestEqual(TEXT("open source sheet is retained for reverse containment"),OpenPoints.Num(),1);
+    Faces=OriginalFaces;
+    // Nested separately indexed solids with opposite orientation must not
+    // cancel one another into a false zero winding number.
+    const int32 Offset=Vertices.Num();for(const auto& V:OriginalVertices)Vertices.Add(V*.5);
+    for(const auto& F:OriginalFaces)Faces.Add(FIntVector(F.X+Offset,F.Z+Offset,F.Y+Offset));
+    Closed.Build(Vertices,Faces);
+    TestEqual(TEXT("independent source solids stay separate"),Closed.ComponentCount(),2);
+    TestTrue(TEXT("nested opposite winding cannot cancel containment"),Closed.Classify(FVector::ZeroVector,Vertices,Faces)==ELocation::Inside);
+    // Concave closed source: an L-shaped prism. Its missing upper-right square
+    // is inside the AABB but outside the solid, independently of triangle tests.
+    Vertices={FVector(0,0,-1),FVector(2,0,-1),FVector(2,1,-1),FVector(1,1,-1),FVector(1,2,-1),FVector(0,2,-1)};
+    for(int32 I=0;I<6;++I)Vertices.Add(Vertices[I]+FVector(0,0,2));
+    Faces.Reset();
+    const TArray<FIntVector> Cap{FIntVector(0,1,3),FIntVector(1,2,3),FIntVector(0,3,5),FIntVector(3,4,5)};
+    for(const auto& F:Cap){Faces.Add(FIntVector(F.X,F.Z,F.Y));Faces.Add(FIntVector(F.X+6,F.Y+6,F.Z+6));}
+    for(int32 I=0;I<6;++I){const int32 J=(I+1)%6;Faces.Add(FIntVector(I,J,J+6));Faces.Add(FIntVector(I,J+6,I+6));}
+    Closed.Build(Vertices,Faces);
+    TestTrue(TEXT("concave arm is inside"),Closed.Classify(FVector(.5,1.5,0),Vertices,Faces)==ELocation::Inside);
+    TestTrue(TEXT("concavity is not filled by component bounds"),Closed.Classify(FVector(1.5,1.5,0),Vertices,Faces)==ELocation::Outside);
+    FRandomStream Random(481027);
+    for(int32 I=0;I<2048;++I)
+    {
+        const FVector P(Random.FRandRange(-.5f,2.5f),Random.FRandRange(-.5f,2.5f),Random.FRandRange(-1.5f,1.5f));
+        const bool Inside=P.X>0. && P.X<2. && P.Y>0. && P.Y<2. && (P.X<1. || P.Y<1.) && FMath::Abs(P.Z)<1.;
+        const auto Fast=Closed.Classify(P,Vertices,Faces),Reference=Closed.Classify(P,Vertices,Faces,false);
+        TestTrue(TEXT("accelerated winding agrees with full solid angle"),Fast==Reference);
+        TestTrue(TEXT("both classifiers agree with independent concave-prism volume"),Fast==(Inside?ELocation::Inside:ELocation::Outside));
+    }
+    return !HasAnyErrors();
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSourceContainmentTest,"RaftSim.Physics.SourceClosedContainment",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimSourceContainmentTest::RunTest(const FString&)
+{
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);if(!World)return false;
+    ON_SCOPE_EXIT{World->DestroyWorld(false);World->RemoveFromRoot();};
+    auto* Asset=LoadObject<UStaticMesh>(nullptr,TEXT("/Engine/BasicShapes/Cube.Cube"));
+    auto* Actor=World->SpawnActor<AStaticMeshActor>();if(!Asset || !Actor)return false;
+    Actor->Tags.Add(TEXT("RaftSimPhysicalGround"));auto* Component=Actor->GetStaticMeshComponent();
+    Component->SetStaticMesh(Asset);Component->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    FRaftSimGroundSourceRegistry Registry(World);
+    for(const FTransform Transform:{FTransform::Identity,
+        FTransform(FRotator(17,33,-11),FVector(-543186,-360044,235),FVector(1.2,-.8,1.1))})
+    {
+        Actor->SetActorTransform(Transform);
+        TArray<FVector> Start,End;
+        for(const FVector V:{FVector(100,0,0),FVector(110,0,0),FVector(100,10,0),
+            FVector(-10,-10,0),FVector(10,-10,0),FVector(0,10,0)})
+        {Start.Add(Transform.TransformPosition(V));End.Add(Transform.TransformPosition(V+FVector(0,0,200)));}
+        TArray<FIntVector> Faces{FIntVector(0,1,2),FIntVector(0,1,2)};
+        TestTrue(TEXT("unreferenced inside vertices are not physical hull faces"),Registry.SweepCapturedSurface(Start,Start,Faces,.001).Status==EStatus::Clear);
+        Faces[1]=FIntVector(3,4,5); // same count and allocation, different topology
+        for(const bool Grouped:{false,true})
+        {
+            const auto Stationary=Registry.SweepCapturedSurface(Start,Start,Faces,.001,-1.,Grouped);
+            TestTrue(TEXT("disconnected contained sheet is initial overlap"),Stationary.Status==EStatus::InitialIntersection && Stationary.Time==0. && Stationary.MovingFace==1);
+            TestTrue(TEXT("source component retained without fabricating a contact normal"),Stationary.GroundComponent.Get()==Component && Stationary.Normal.IsZero());
+            const auto Exiting=Registry.SweepCapturedSurface(Start,End,Faces,.001,-1.,Grouped);
+            TestTrue(TEXT("an exit from a closed source is not a valid entering contact"),Exiting.Status==EStatus::InitialIntersection && Exiting.Time==0.);
+        }
+        Faces[1]=FIntVector(0,1,2);
+        TestTrue(TEXT("topology replacement invalidates inside representative cache"),Registry.SweepCapturedSurface(Start,Start,Faces,.001).Status==EStatus::Clear);
+        FTriMeshCollisionData Data;if(!Asset->GetPhysicsTriMeshData(&Data,false))return false;
+        TArray<FVector> Enclosing;TArray<FIntVector> EnclosingFaces;
+        for(const auto& V:Data.Vertices)Enclosing.Add(Transform.TransformPosition(FVector(V)*3.));
+        for(const auto& F:Data.Indices)EnclosingFaces.Add(FIntVector(F.v0,F.v1,F.v2));
+        for(const bool Grouped:{false,true})
+            TestTrue(TEXT("closed source entirely inside a closed moving hull refuses"),
+                Registry.SweepCapturedSurface(Enclosing,Enclosing,EnclosingFaces,.001,-1.,Grouped).Status==EStatus::InitialIntersection);
+        // Opening the current pose cannot inherit the previous closed topology.
+        EnclosingFaces.RemoveAt(EnclosingFaces.Num()-1);
+        TestTrue(TEXT("an open surrounding sheet does not invent an interior"),
+            Registry.SweepCapturedSurface(Enclosing,Enclosing,EnclosingFaces,.001).Status==EStatus::Clear);
+    }
+    return !HasAnyErrors();
+}
 #endif

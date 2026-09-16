@@ -73,8 +73,8 @@ RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
         {
             Cache=MakeShared<FRaftSimTriangleSweepMesh>();
             const double Started=FPlatformTime::Seconds();const bool Built=Cache->Build(Mesh);
-            UE_LOG(LogTemp,Display,TEXT("Captured surface sweep source: component=%s triangles=%d ready=%d build_ms=%.3f"),
-                *Mesh->GetPathName(),Cache->TriangleCount(),int32(Built),(FPlatformTime::Seconds()-Started)*1000.);
+            UE_LOG(LogTemp,Display,TEXT("Captured surface sweep source: component=%s triangles=%d closed_components=%d ready=%d build_ms=%.3f"),
+                *Mesh->GetPathName(),Cache->TriangleCount(),Cache->ClosedSourceCount(),int32(Built),(FPlatformTime::Seconds()-Started)*1000.);
         }
         auto Hit=Cache->SweepSurface(StartCm,EndCm,Faces,SkinCm,ProvenClearanceCm,bGroupedBroadPhase);Hit.GroundComponent=Mesh;
         Pairs+=Hit.TrianglePairs;

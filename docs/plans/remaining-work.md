@@ -3,7 +3,27 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [source-preserving rock shading and corrected hydraulic context](../reconstruction-review-2026-09-07/landward-rock-shading.md).
+Latest: [closed-source containment and actual playable verification](../reconstruction-review-2026-09-07/closed-source-containment.md).
+Initial containment now refuses in both directions using original triangles;
+open terrain is not invented into a solid volume. Final build and 48 native
+tests PASS, including 2,048 analytic/reference containment comparisons. Initial
+actual-play performance regression retained and corrected with a source BVH;
+final replay reaches world72.218s / station8388.416m, 149 contact response entries,
+zero refused hull substeps/latches or source/render mismatches. All 464 protected
+hashes unchanged. Still opt-in: NOT default, visual, whole-river or 30 FPS acceptance.
+IMPORTANT next integration prerequisite: native audit proves CPU triangle access
+DISABLED on all three actual ground assets. Retain exact CPU source geometry
+through generation/cooking and verify packaged readback/play, not simple fallback.
+Visible breaking/froth, source-supported flanks and normal-play delivery remain
+required; do not replace them with endless isolated diagnostics.
+Corrected-domain 1000/1050s cell AND all 86,720 exact-dry bank-face audits PASS,
+NOT settled. SAME LIVE session69275 / PID27776; output
+`tmp/south-fork-landward-context950to1200s-v1-20260916`, next completed local3000
+/ absolute1100s audit. Never restart on observation timeout. Colorado -> Pacuare
+-> Futaleufu, other-scene water, crew, normalization, regressions and release OPEN.
+Troublemaker remains a rapid inside South Fork, never a menu scenario.
+
+Previous: [source-preserving rock shading and corrected hydraulic context](../reconstruction-review-2026-09-07/landward-rock-shading.md).
 Actual playable comparison reduces triangle-by-triangle rock lighting; source
 geometry/flanks and whitewater remain unaccepted. Independent native readback
 proves all 6,404 directed triangles identical, 9,308 corner normals changed.

@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "Engine/HitResult.h"
 #include "RaftSimSurfaceSweep.h"
+#include "RaftSimClosedGround.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
@@ -27,6 +28,7 @@ public:
         TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm=-1.,bool bGroupedBroadPhase=true) const;
     bool IsValid() const { return bValid; }
     int32 TriangleCount() const { return Triangles.Num(); }
+    int32 ClosedSourceCount() const { return ClosedGround.ComponentCount(); }
 private:
     struct FNode { FBox Bounds=FBox(ForceInit);int32 Left=INDEX_NONE,Right=INDEX_NONE,Begin=0,Count=0; };
     int32 BuildNode(int32 Begin,int32 Count);
@@ -41,5 +43,10 @@ private:
     TArray<FIntVector> Triangles;
     TArray<int32> Order;
     TArray<FNode> Nodes;
+    FRaftSimClosedGround ClosedGround;
+    // Connectivity is unchanged by deformation. Exact face comparison prevents
+    // stale representatives when an allocation is reused for different topology.
+    mutable TArray<FIntVector> MovingTopology;
+    mutable TArray<FIntPoint> MovingRepresentatives; // original vertex, original face
     bool bValid=false;
 };
