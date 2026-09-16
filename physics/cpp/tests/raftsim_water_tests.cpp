@@ -3,6 +3,7 @@
 #include "../src/solver_internal.hpp"
 #include "../src/solver_row_executor.hpp"
 #include "../src/solver_grid_view.hpp"
+#include "../src/solver_wave_speed.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -409,6 +410,67 @@ void assert_muscl_scratch_is_not_state(const raftsim::Scenario& scenario) {
     }
 }
 
+void assert_cfl_scan_matches_original() {
+    using namespace raftsim;
+    using namespace raftsim::solver_detail;
+    const int previous_rounding=std::fegetround();
+    struct RestoreRounding {
+        int value;
+        ~RestoreRounding() { std::fesetround(value); }
+    } restore{previous_rounding};
+    for (auto dimensions:{std::pair<std::size_t,std::size_t>{1,1},{7,19},{131,129}}) {
+        Scenario scenario;
+        const auto nx=dimensions.first,ny=dimensions.second;
+        WaterState state;
+        state.h=Array2D(ny,nx);state.u=Array2D(ny,nx);state.v=Array2D(ny,nx);
+        SolverConfig config;
+        for (std::size_t row=0;row<ny;++row) for (std::size_t col=0;col<nx;++col) {
+            const auto i=row*nx+col;
+            state.h(row,col)=i%9==0 ? -1. : (i%7==0 ? .5e-6 : .003+(i%113)*.017);
+            state.u(row,col)=.13*double(int(i%139)-69);
+            state.v(row,col)=-.19*double(int(i%107)-53);
+        }
+        const auto reference=[&]() {
+            double maximum=0.0;
+            for (std::size_t row=0;row<ny;++row) for (std::size_t col=0;col<nx;++col) {
+                const auto q=conserved_from_cell(scenario,state,config,row,col);
+                maximum=std::max(maximum,wave_speed_x(q,config));
+                maximum=std::max(maximum,wave_speed_y(q,config));
+            }
+            return maximum;
+        };
+        for (int rounding:{FE_TONEAREST,FE_DOWNWARD,FE_UPWARD,FE_TOWARDZERO}) {
+            expect(std::fesetround(rounding)==0,"CFL test could not set rounding mode");
+            for (double dry:{1.e-6,.01,3.}) {
+                config.dry_tolerance=dry;
+                const double expected=reference(),actual=maximum_wave_speed(state,config,ny,nx);
+                expect(actual==expected && std::signbit(actual)==std::signbit(expected),
+                    "row CFL maximum differs from original scan or signed zero");
+                expect(std::fegetround()==rounding,"CFL scan changed caller rounding mode");
+            }
+        }
+        std::fesetround(previous_rounding);
+        config.dry_tolerance=1.e-6;
+        // Exercise the original unordered comparison behavior without claiming
+        // these malformed physical inputs constitute a valid solver state.
+        state.h.values()[0]=1.;state.u.values()[0]=std::numeric_limits<double>::quiet_NaN();
+        state.v.values()[0]=.3;
+        expect(maximum_wave_speed(state,config,ny,nx)==reference(),"CFL NaN comparison changed");
+        state.v.values().back()=std::numeric_limits<double>::infinity();
+        state.h.values().back()=1.;
+        expect(maximum_wave_speed(state,config,ny,nx)==reference(),"CFL infinity handling changed");
+        for (int field=0;field<3;++field) {
+            auto malformed=state;
+            Array2D* arrays[]={&malformed.h,&malformed.u,&malformed.v};
+            arrays[field]->values().pop_back();
+            bool rejected=false;
+            try { maximum_wave_speed(malformed,config,ny,nx); }
+            catch (const std::runtime_error&) { rejected=true; }
+            expect(rejected,"CFL scan accepted malformed storage");
+        }
+    }
+}
+
 void assert_large_parallel_rows_match_serial(const raftsim::Scenario& original) {
     auto scenario = original;
     constexpr std::size_t nx = 131, ny = 129; // Above the real parallel threshold.
@@ -607,6 +669,7 @@ int main(int argc, char** argv) {
         assert_validation_rejects_clipped_or_nonfinite_flow(scenario);
         assert_live_state_can_be_replaced(scenario);
         assert_muscl_scratch_is_not_state(scenario);
+        assert_cfl_scan_matches_original();
         assert_large_parallel_rows_match_serial(scenario);
         assert_finite_volume_second_order_is_well_balanced(scenario);
         assert_emergent_step_uses_hydrostatic_flux();

@@ -3,19 +3,22 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [solver Game integration and 1350-second hydraulic checkpoint](../reconstruction-review-2026-09-07/solver-game-link-and-1350s.md).
-Win64 Development Game build PASS; new solver identity independently found in
-the executable, all17 editor DLL hashes unchanged. All2,405 staged runtime
-payloads PASS, no external fallback. Editor relink and packaged execution
-remain pending; archive must use new Game hash23733e94... rather than an old
-executable with the same target-receipt hash. SAME cook16144/session80881 live;
-long SM5 batch completed and later shader compilation advances. Do not restart
-on timeout. SAME hydraulic18716/session69416 live; absolute1350s cell AND all
-86,720 exact-dry bank checks PASS, NOT settled (80.573710out vs45.306955in).
-NEXT completed local4000 / absolute1400s audits, then package444 non-editor
-sources and runtime bundle before packaged play/contact/performance. No visual
-or default full-hull promotion. Last ordinary17.819710FPS / p9581.6343ms still
-FAILS30FPS. All later rivers, crew, regressions and release remain OPEN.
+Latest: [exact parallel CFL scan and engine integration](../reconstruction-review-2026-09-07/solver-cfl-rows.md).
+All4 native tests PASS; independent original-scan/rounding/storage controls PASS.
+Two fixed four-pair source replays preserve all44 paired frames each exactly;
+all8 candidates faster, median solve/capture reductions8.08% and13.20%. These
+are component timings, NOT FPS. Unhelpful combination-view experiment removed.
+UE solver archive rebuilt (2ce80e6f...); Game-only build session14368 PASS,
+new Game18d9e4b2... embeds that archive, all17 editor DLL hashes unchanged.
+Fresh2,405 staged-file audit PASS, no external fallback;7 layout tests PASS.
+NEXT actual package444 non-editor sources and play/contact/performance; ensure
+the archive contains the new executable, restaging without recook if needed.
+SAME package16144/session80881 live; never restart on timeout. SAME hydraulic
+18716/session69416 live; absolute1400/1450s cell AND all86,720 exact-dry bank
+checks PASS, NOT settled (latest83.804253out vs45.306955in). NEXT local6000 /
+absolute1500s audits. No visual or default full-hull promotion. Last ordinary
+17.819710FPS / p9581.6343ms still FAILS30FPS. All later rivers, crew, regressions
+and release remain OPEN. Troublemaker is a rapid within South Fork only.
 
 Previous: [retained preview, exact solver rows and corrected hydraulic continuation](../reconstruction-review-2026-09-07/retained-preview-and-solver-rows.md).
 Fresh provenance-bound actual South Fork preview completed with one water

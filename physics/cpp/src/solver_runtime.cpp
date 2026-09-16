@@ -2,6 +2,7 @@
 #include "solver_profile.hpp"
 #include "solver_row_executor.hpp"
 #include "solver_grid_view.hpp"
+#include "solver_wave_speed.hpp"
 
 namespace raftsim {
 
@@ -1400,14 +1401,7 @@ void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
 
 double ReducedShallowWaterSolver::finite_volume_stable_dt() const {
     RAFTSIM_PROFILE_SCOPE(cfl_profile, CFL);
-    double max_speed = 0.0;
-    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
-        for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
-            ConservedState q = conserved_from_cell(scenario_, state_, config_, row, col);
-            max_speed = std::max(max_speed, wave_speed_x(q, config_));
-            max_speed = std::max(max_speed, wave_speed_y(q, config_));
-        }
-    }
+    const double max_speed = maximum_wave_speed(state_,config_,scenario_.grid.ny,scenario_.grid.nx);
     if (max_speed <= 1.0e-9) {
         return scenario_.fixed_dt;
     }
