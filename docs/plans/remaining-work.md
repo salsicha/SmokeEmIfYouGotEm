@@ -3,7 +3,27 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [closed-source containment and actual playable verification](../reconstruction-review-2026-09-07/closed-source-containment.md).
+Latest: [exact saved ground retention and packaged qualification](../reconstruction-review-2026-09-07/ground-source-retention.md).
+All 443 actual-map ground meshes plus the current local rock candidate retain
+CPU sources: 444 packages / 9,211,652 original directed triangles unchanged.
+Fresh engine reload and actual saved-asset 30,403 collision / 12,800 water-field
+queries PASS; 66 focused Python tests PASS. Of 464 prior protected files, 462
+unchanged and two explicitly proven source-mesh metadata revisions; no map,
+actor package or profile save. Historical evidence is not rewritten.
+PACKAGING LIVE session80881 / cook PID16144, not yet packaged acceptance.
+NEXT same-job completion, non-editor 444-source audit, self-contained route/
+atlas staging, actual play/contact/performance and normal-play delivery.
+Old hydraulic session69275 FINISHED at1200s, cell audit PASS but exact-dry
+boundary FAIL (core0229 west, one cell at0.007962992m). Corrected restart from
+last clean1150s adds one source-exact dry context tile, zero added water; pilot
+and actual native restart PASS. CURRENT LIVE session86918 / PID18000, output
+`tmp/south-fork-landward-context1150to1800s-v1-20260916`; next completed local1000
+/ absolute1200s state AND bank audits. Never restart on observation timeout.
+No settled-water, visible breaking/froth, whole-river, default full-hull or 30 FPS
+acceptance. Source-supported flanks and all later rivers/crew/release remain OPEN.
+Troublemaker remains a rapid inside South Fork, never a menu scenario.
+
+Previous: [closed-source containment and actual playable verification](../reconstruction-review-2026-09-07/closed-source-containment.md).
 Initial containment now refuses in both directions using original triangles;
 open terrain is not invented into a solid volume. Final build and 48 native
 tests PASS, including 2,048 analytic/reference containment comparisons. Initial

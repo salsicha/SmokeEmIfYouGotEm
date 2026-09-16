@@ -1,5 +1,6 @@
 """Pure configuration tests; these do not emulate or certify Unreal collision."""
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -45,3 +46,31 @@ def test_configuration_cannot_overwrite_previous_report(configuration):
     report=load()['report'];report.parent.mkdir(parents=True);report.write_text('retained')
     with pytest.raises(ValueError,match='Fresh'):load()
     assert report.read_text()=='retained'
+
+
+def test_saved_candidate_requires_exact_current_package(configuration):
+    load, root = configuration
+    asset = load()['asset']
+    path = root/'unreal/Content'/(asset[6:]+'.uasset')
+    path.parent.mkdir(parents=True)
+    path.write_bytes(b'actual saved candidate')
+    package_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+    config = load(saved_mesh_sha256=package_hash, saved_source_sha256='a'*64)
+    assert config['saved_mesh_sha256'] == package_hash
+    assert config['saved_source_sha256'] == 'a'*64
+    path.write_bytes(b'changed saved candidate')
+    with pytest.raises(ValueError, match='package changed'):
+        load(saved_mesh_sha256=package_hash, saved_source_sha256='a'*64)
+
+
+@pytest.mark.parametrize('values', [dict(saved_mesh_sha256='a'*64), dict(saved_source_sha256='a'*64),
+    dict(saved_mesh_sha256='g'*64,saved_source_sha256='a'*64),
+    dict(saved_mesh_sha256='a'*64,saved_source_sha256='short')])
+def test_saved_candidate_rejects_incomplete_identity(configuration, values):
+    with pytest.raises(ValueError, match='Both exact'):
+        configuration[0](**values)
+
+
+def test_saved_candidate_rejects_missing_package(configuration):
+    with pytest.raises(ValueError, match='missing'):
+        configuration[0](saved_mesh_sha256='a'*64, saved_source_sha256='b'*64)

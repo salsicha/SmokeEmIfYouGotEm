@@ -70,7 +70,36 @@ def candidate_configuration(path,root=ROOT):
     if not asset.startswith('/Game/RaftSim/Environment/GeneratedLocalReview/') or any(
             not part or not part.replace('_','').isalnum() for part in asset[1:].split('/')):
         raise ValueError('Only a regenerable local-review asset path is allowed')
-    return resolved|dict(asset=asset)
+    saved = {}
+    keys = ('saved_mesh_sha256', 'saved_source_sha256')
+    if any(key in config for key in keys):
+        for key in keys:
+            value = config.get(key)
+            if not isinstance(value, str) or len(value) != 64 or any(c not in '0123456789abcdef' for c in value):
+                raise ValueError('Both exact saved-package and native-source SHA256 identities required')
+            saved[key] = value
+        path = root/'unreal/Content'/(asset[6:]+'.uasset')
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != saved['saved_mesh_sha256']:
+            raise ValueError('Saved candidate package changed or is missing')
+    return resolved|dict(asset=asset)|saved
+
+
+def load_saved_candidate(export_directory, asset, package_sha256, source_sha256):
+    """Check the actual retained package, without import, rebuild or save."""
+    path = ROOT/'unreal/Content'/(asset[6:]+'.uasset')
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == package_sha256
+    export = json.loads((Path(export_directory)/'manifest.json').read_text())
+    assert hashlib.sha256((ROOT/export['fbx']).read_bytes()).hexdigest() == export['fbx_sha256']
+    mesh = unreal.load_asset(asset)
+    assert isinstance(mesh, unreal.StaticMesh)
+    unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+    native = json.loads(unreal.RaftSimGroundSourceLibrary.audit_collision_source(mesh))
+    assert native['available'] and native['allow_cpu_access']
+    assert native['collision_source_sha256'] == source_sha256
+    assert native['triangle_count'] == export['triangle_count']
+    assert mesh.get_editor_property('body_setup').get_editor_property('collision_trace_flag') == unreal.CollisionTraceFlag.CTF_USE_COMPLEX_AS_SIMPLE
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == package_sha256
+    return mesh, export
 
 
 def main():

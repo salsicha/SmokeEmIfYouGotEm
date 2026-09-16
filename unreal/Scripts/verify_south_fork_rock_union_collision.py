@@ -12,7 +12,7 @@ import unreal
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'unreal/Scripts'))
-from verify_troublemaker_dem_rock_cap_collision import import_candidate_solid,candidate_configuration
+from verify_troublemaker_dem_rock_cap_collision import import_candidate_solid,candidate_configuration,load_saved_candidate
 
 LEVEL='/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach'
 PROBES=ROOT/'tmp/south-fork-rock-union-full-map-probes-v1-20260915.json'
@@ -28,7 +28,8 @@ def package_file(package):
     return ROOT/'unreal/Content'/(package.removeprefix('/Game/')+'.uasset')
 
 
-def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_directory=None,asset_path=None):
+def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_directory=None,asset_path=None,
+         saved_mesh_sha256=None,saved_source_sha256=None):
     assert not output.exists()
     probes=json.loads(probe_path.read_text())
     assert sha(ROOT/probes['geometry_manifest'])==probes['geometry_manifest_sha256']
@@ -86,7 +87,13 @@ def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_direct
                     error_cm=error,actor=owner.get_name() if owner else None))
 
     check(probes['baseline'],'retained')
-    mesh,export=import_candidate_solid(export_directory,asset_path);assert export['source_cap_sha256']==probes['source_cap_sha256']
+    if saved_mesh_sha256 is not None or saved_source_sha256 is not None:
+        assert saved_mesh_sha256 and saved_source_sha256
+        mesh,export=load_saved_candidate(export_directory,asset_path,saved_mesh_sha256,saved_source_sha256)
+        before[str(package_file(asset_path))]=saved_mesh_sha256
+    else:
+        mesh,export=import_candidate_solid(export_directory,asset_path)
+    assert export['source_cap_sha256']==probes['source_cap_sha256']
     candidate=subsystem.spawn_actor_from_class(unreal.StaticMeshActor,unreal.Vector(*probes['translation_cm']))
     candidate.set_actor_location(unreal.Vector(*probes['translation_cm']),False,True)
     candidate.set_actor_rotation(unreal.Rotator(0,0,0),True);candidate.set_actor_scale3d(unreal.Vector(1,-1,1))
@@ -143,7 +150,9 @@ def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_direct
         prior_vertical_tangent_gate_closed=False,actual_raft_contact_traversal_verified=False,
         saved_assets=False,saved_levels=False,water_state_modified=False,
         hydraulic_settling_accepted=False,playable_integrated=False,visual_acceptance=False,
-        native_runtime=runtime_result,
+        native_runtime=runtime_result,saved_candidate_verified=saved_mesh_sha256 is not None,
+        saved_candidate_asset=asset_path if saved_mesh_sha256 else None,
+        saved_candidate_sha256=saved_mesh_sha256,saved_candidate_source_sha256=saved_source_sha256,
         protected_file_count=len(before),protected_actor_package_count=len(packages))
     output.write_text(json.dumps(result,indent=2)+'\n')
     assert not failures,str(len(failures))+' union probes failed; '+str(output)
@@ -155,6 +164,7 @@ if __name__=='__main__':
         config_path=os.environ.get('RAFTSIM_ROCK_COLLISION_CONFIG')
         if config_path:
             config=candidate_configuration(config_path)
-            main(output=config['report'],probe_path=config['probes'],export_directory=config['export_directory'],asset_path=config['asset'])
+            main(output=config['report'],probe_path=config['probes'],export_directory=config['export_directory'],asset_path=config['asset'],
+                 saved_mesh_sha256=config.get('saved_mesh_sha256'),saved_source_sha256=config.get('saved_source_sha256'))
         else:main()
     finally:unreal.SystemLibrary.quit_editor()
