@@ -3,28 +3,29 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [isolated normal performance and full replay](../reconstruction-review-2026-09-07/isolated-normal-performance.md).
-Normal installed-module replay59643 TERMINAL0: original full streaming gate PASS,
-eight post-ready handoffs,5,593 fresh frames and372.800019 detail seconds. Actual
-module paths/hashes verified; paired350s preview remains opt-in, not default
-promotion. Prior seven-handoff timeout remains recorded in the
-[rapid review](../reconstruction-review-2026-09-07/normal-installed-rapid-review.md).
-Fresh ordinary300-frame1280x720 profile61858:22.560934FPS/p9553.9323ms FAIL30FPS.
-Competing owned jobs were safely suspended/resumed; no resolution/quality/physics
-or acceptance reduction. Main cost is game-thread water publication/crest work,
-not GPU rendering. Fixed exact-timestamp JSON type validation; PowerShell checks
-and25 related parser tests PASS. Detailed capture72082 is diagnostic, not FPS.
-Later replay screenshots show water but unfinished context terrain/crew; initial
-readiness screenshot does not yet show water. Visual and initial-render gates
-remain open. SAME SM5 suite47178/PID35584 and hydraulic40601/PID11316 confirmed
-LIVE after all five owned processes resumed with status0 and advancing CPU.
-900/local6000 BOTH state/dry-bank audits PASS, NOT settled; next950/local7000 BOTH.
-Prior wider regressions remain63 PASS/12 FAIL; no historical hashes/gates changed.
-NEXT fidelity-preserving water-update optimization and coupled nonlinear-water
-integration; settled source-consistent terrain/rapid/wave/froth review, source
-closure/default-menu delivery, sustained30FPS and all later-river/crew/release
-requirements remain OPEN. Reference video playback previously verified working.
-Troublemaker remains a rapid within South Fork, never a menu scenario.
+Latest: [editor split, rejected optimization and hydraulic continuation](../reconstruction-review-2026-09-07/editor-split-and-range-rejection.md).
+FullReach editor source split below the unchanged3,000-line gate; all moved
+implementation blocks preserved, three independent compiles and isolated full
+editor DLL link93500 TERMINAL0. Installed modules/assets unchanged. All1,133
+existing test assertion ASTs retained; regenerated source inventory. Focused38
+PASS; original75-test selection plus six new checks69 PASS/12 FAIL. Oversized
+source failure now names only8,897-line LandscapeFoliage; other failures remain.
+Two exact actual-input crest range early-out candidates FAIL both-order speed
+gate; removed from production and archived locally, no optimization promotion.
+Same hydraulic40601/PID11316 LIVE;1050/1100 state AND dry-bank audits PASS,
+NOT settled (1100s outflow70.028100 vs inflow45.306955m3/s). Next1150/local11000
+needs BOTH audits. Same SM5 session47178/PID35584 and workers31820/34968 LIVE;
+22:41:40 UTC hung-shadermap ERROR after7200s/15 pending jobs is not a terminal
+report. Preserve this job and its inputs; no restart or success claim.
+[Normal installed-module replay59643](../reconstruction-review-2026-09-07/isolated-normal-performance.md)
+still passes full eight-handoff/5,593-frame/372.800019s technical gate, not default
+promotion. First-ready image visibly lacks water; later terrain/crew/froth remain
+unaccepted. Ordinary1280x720 profile61858 remains22.560934FPS/p9553.9323ms FAIL30.
+NEXT coupled nonlinear-water and initial-render integration, source-consistent
+terrain/rapid/wave/froth review, source closure/default-menu delivery, sustained
+30FPS, remaining normalization, Colorado -> Pacuare -> Futaleufu, all-scene water,
+crew and release gates. Reference playback previously verified working.
+Troublemaker remains only a rapid within South Fork, never a menu scenario.
 
 Previous: [actual detail gameplay and exact continuation](../reconstruction-review-2026-09-07/detail-gameplay-handoff.md).
 Committed coverage fix48c161868 passes four native tests and52,689 route footprints.

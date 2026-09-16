@@ -1,7 +1,7 @@
 # RaftSim Editor Source Inventory
 
-Implementation files: **168**.
-Implementation lines: **109235**.
+Implementation files: **171**.
+Implementation lines: **109311**.
 Registered console commands: **37**.
 
 ## Source Files
@@ -27,12 +27,15 @@ Registered console commands: **37**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkDerivedBankReview.cpp` | 737 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkDisplacedGravelReview.cpp` | 512 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFoliageSelection.cpp` | 83 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReach.cpp` | 4077 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReach.cpp` | 2865 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReachHelpers.cpp` | 910 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReachInternal.h` | 130 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkGroundCover.cpp` | 724 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkMeatGrinderHeroReview.cpp` | 656 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkMeshAuthoring.cpp` | 318 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkScannedBankKitReview.cpp` | 513 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkShoreCobbleDressing.cpp` | 375 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkSupportExport.cpp` | 248 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkTerrainCoverage.cpp` | 1063 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkTerrainRelief.cpp` | 147 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp` | 1589 |

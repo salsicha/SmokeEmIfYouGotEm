@@ -5,6 +5,7 @@ from pathlib import Path
 from raftsim.editor_source_layout import (
     build_editor_source_inventory,
     read_raftsim_editor_source,
+    read_south_fork_full_reach_source,
     render_editor_source_inventory_markdown,
 )
 
@@ -104,11 +105,7 @@ def test_editor_source_inventory_matches_generator():
 
 
 def test_full_reach_generator_stabilizes_external_actor_identity_and_minimap():
-    source_path = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    )
-    source = source_path.read_text(encoding="utf-8")
+    source = read_south_fork_full_reach_source(REPO_ROOT)
     manifest_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkBuildManifest.cpp"
@@ -121,10 +118,7 @@ def test_full_reach_generator_stabilizes_external_actor_identity_and_minimap():
 
 
 def test_full_reach_mesh_reuse_preserves_persisted_macro_texture_mips():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     coverage_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkTerrainCoverage.cpp"
@@ -138,10 +132,7 @@ def test_full_reach_mesh_reuse_preserves_persisted_macro_texture_mips():
 
 
 def test_full_reach_single_layer_water_does_not_shadow_transmitted_riverbed():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     mesh_authoring_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkMeshAuthoring.cpp"
@@ -1108,10 +1099,7 @@ def test_live_oak_cc0_island_tree_material_v1_review_is_isolated_and_fail_closed
 
 
 def test_full_reach_boulder_dressing_uses_bounded_project_owned_presentation():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     editor_source = read_raftsim_editor_source(REPO_ROOT)
     manifest_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
@@ -1143,10 +1131,7 @@ def test_full_reach_boulder_dressing_uses_bounded_project_owned_presentation():
 
 
 def test_full_reach_shore_cobbles_are_bounded_visual_only_procedural_infill():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     cobble_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkShoreCobbleDressing.cpp"
@@ -1183,10 +1168,7 @@ def test_full_reach_shore_cobbles_are_bounded_visual_only_procedural_infill():
 
 
 def test_full_reach_ground_cover_breaks_up_repeated_terrain_without_gameplay_collision():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     ground_cover_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkGroundCover.cpp"
@@ -1283,10 +1265,7 @@ def test_live_breaking_water_uses_sparse_foam_and_feathered_moderate_arches():
 
 
 def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_holes():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     coverage_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkTerrainCoverage.cpp"
@@ -1500,10 +1479,7 @@ def test_full_reach_procedurally_completes_only_bounded_submerged_shoreline_hole
 
 
 def test_full_reach_fixed_captures_lock_time_and_temporal_history():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     capture_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkCapture.cpp"
@@ -2024,11 +2000,7 @@ def test_rigged_mannequin_fallback_preserves_project_owned_rafting_gear():
 
 
 def test_full_reach_far_field_breaks_up_grid_and_repeated_tree_silhouettes():
-    source_path = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    )
-    source = source_path.read_text(encoding="utf-8")
+    source = read_south_fork_full_reach_source(REPO_ROOT)
     terrain_coverage_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkTerrainCoverage.cpp"
@@ -2290,10 +2262,7 @@ def test_project_owned_equipment_textiles_are_imported_and_material_bound():
 
 
 def test_full_reach_far_field_adds_bounded_inferred_geomorphology():
-    full_reach_source = (
-        REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
-        "RaftSimEditorSouthForkFullReach.cpp"
-    ).read_text(encoding="utf-8")
+    full_reach_source = read_south_fork_full_reach_source(REPO_ROOT)
     relief_source = (
         REPO_ROOT / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
         "RaftSimEditorSouthForkTerrainRelief.cpp"

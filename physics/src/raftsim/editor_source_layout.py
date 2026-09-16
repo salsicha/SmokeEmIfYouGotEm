@@ -45,6 +45,25 @@ def read_raftsim_editor_source(repo_root: Path) -> str:
     return "".join(chunks)
 
 
+def read_south_fork_full_reach_source(repo_root: Path) -> str:
+    """Read the explicit FullReach builder source set, not unrelated editors.
+
+    Keep static contract checks spanning moved helpers/export code without
+    accepting a matching token from a different river's implementation.
+    Missing members fail normally; this is not a best-effort glob.
+    """
+    environment = repo_root / EDITOR_PRIVATE_RELATIVE_PATH / "Environment"
+    return "\n".join(
+        (environment / name).read_text(encoding="utf-8")
+        for name in (
+            "RaftSimEditorSouthForkFullReach.cpp",
+            "RaftSimEditorSouthForkFullReachInternal.h",
+            "RaftSimEditorSouthForkFullReachHelpers.cpp",
+            "RaftSimEditorSouthForkSupportExport.cpp",
+        )
+    )
+
+
 def _registered_console_commands(source: str) -> list[dict[str, str | None]]:
     assignment_pattern = re.compile(
         r"(?P<member>[A-Za-z0-9_]+)\s*=\s*MakeUnique<FAutoConsoleCommand>\s*\(\s*"
