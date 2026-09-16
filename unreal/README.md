@@ -31,11 +31,20 @@ The [scene catalog](Config/scene_catalog.json) records startup, training,
 six playable rivers, development reviews and retired content. Shipping scenes
 must match `Config/DefaultGame.ini` and the frontend launch catalog.
 
-South Fork and its Troublemaker challenge share `L_SouthForkAmerican_FullReach`.
-The obsolete separate straight-channel Troublemaker prototype is retired.
+South Fork launches `L_SouthForkAmerican_FullReach`. Troublemaker is a rapid
+within that scenario and must not appear as its own menu entry. The retained
+`L_SouthFork_Troublemaker` cooked reconstruction component is not a selectable
+scenario; the obsolete straight-channel `L_Troublemaker` prototype is retired.
 The two `Maps/Review/SouthForkSurvey*` scenes are active reconstruction work,
 explicitly excluded from shipping; they depend on locally generated survey
 fields and are not replacement gameplay scenes.
+
+The saved FullReach scene's exact route and hydraulic dependency closure is
+versioned under `physics/data/runtime_bundles/south_fork_saved_scene_v1` and
+staged beside the game executable. Fetch its LFS payloads before building.
+Experimental local previews still depend on ignored local inputs and are not
+release delivery. See the [remaining-work index](../docs/plans/remaining-work.md)
+for current integration, visual, physical and 30 FPS acceptance status.
 
 `bootstrap_river_maps.py` and `bootstrap_one_river_map.py` create compact
 prototype maps and can overwrite their targets. Do not use them to refresh

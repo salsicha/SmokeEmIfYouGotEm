@@ -4,7 +4,7 @@ Whitewater rafting simulator built with Unreal Engine 5.8 and a C++/Python shall
 
 ## Current state
 
-In development. Six rivers are selectable; photorealism and geographic accuracy are not yet accepted. South Fork reconstruction is unfinished: the playable full-reach map still uses the old roughly 49 km route, while captured-data reconstruction work is isolated in development review maps. See the [South Fork work plan](docs/plans/south-fork-evidence-reconstruction.md).
+In development. Six rivers are selectable; photorealism and geographic accuracy are not yet accepted. The saved South Fork full-reach scene now uses the survey-water-constrained route, reconstructed terrain and versioned hydraulic data. The newer landward rock/water candidate and full-hull contact remain under review rather than normal-menu defaults. Convincing breaking/froth and the 30 FPS target are still unfinished. See the [current remaining-work index](docs/plans/remaining-work.md) and [South Fork work plan](docs/plans/south-fork-evidence-reconstruction.md).
 
 ## Project layout
 
@@ -19,7 +19,7 @@ In development. Six rivers are selectable; photorealism and geographic accuracy 
 | `docs` | Plans, rights records and historical evidence |
 | `tmp`, `unreal/Saved`, build directories | Local generated work; not source-controlled |
 
-The [scene inventory](unreal/Config/scene_catalog.json) is checked against the frontend and packaging configuration. It distinguishes eight shipping maps (startup, training, six rivers), two active development review maps, and retired content. The Troublemaker challenge uses the full South Fork scene, not a separate prototype.
+The [scene inventory](unreal/Config/scene_catalog.json) is checked against the frontend and packaging configuration. It distinguishes startup, training, six playable rivers, a retained cooked rapid-component map, development review maps, and retired content. Troublemaker is a rapid within South Fork, not a separate scenario or menu entry. A cooked rapid-component map is not an independently selectable river or proof that every reconstruction candidate is integrated.
 
 Selectable rivers: South Fork American, Colorado, Pacuare, Futaleufú, Chilko, and Zambezi (Batoka Gorge).
 
