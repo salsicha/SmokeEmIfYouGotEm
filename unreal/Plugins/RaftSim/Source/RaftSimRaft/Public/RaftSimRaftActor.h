@@ -452,6 +452,10 @@ private:
     void SpawnCrewVisuals();
     void BuildRaftVisual();
     void UpdateFlexibleRaftVisual();
+    void ConfigureSharedHullGeometryReview();
+    bool PrepareSharedHullGeometry(const TArray<FRaftSimFlexVisualSegmentState>& Segments,FRaftSimHullGeometry& Out);
+    void CommitSharedHullGeometry();
+    void UpdateSharedHullVisual();
     void UpdateRaftWetness(float DeltaSeconds);
     void UpdateRockObstacles();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
@@ -530,8 +534,18 @@ private:
     RaftSimRaftMesh::FRaftSimRaftVisualCondition LastRenderedRaftVisualCondition;
     bool bHasRenderedFlexibleRaftState = false;
 
-    /** Production topology is visual-only; the hidden hull and D3/D4 stay authoritative. */
+    /** Authored CPU source is present; shared snapshots alone do not enable full-hull contact. */
     bool bUsingProductionRaftRestMesh = false;
+
+    // One fixed-step geometry producer, transactional publication to physics
+    // and render. Opt-in until full-surface CCD and cost are qualified.
+    bool bSharedHullGeometryReview=false;
+    TArray<RaftSimRaftMesh::FMeshData> SharedHullPreparedSections;
+    TArray<FRaftSimFlexVisualSegmentState> SharedHullPreparedSegments,SharedHullPublishedSegments;
+    RaftSimRaftMesh::FRaftSimRaftVisualCondition SharedHullPreparedCondition,SharedHullPublishedCondition;
+    uint64 LastRenderedHullRevision=0,LastLoggedHullRevision=0;
+    double SharedHullPrepareTotalMs=0,SharedHullPrepareMaximumMs=0;
+    uint64 SharedHullPrepareCount=0;
 
     /** Persistent surface saturation; contact wets quickly and dries slowly. */
     float SurfaceWetness = 0.0f;

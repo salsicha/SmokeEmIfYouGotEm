@@ -8,6 +8,7 @@ constexpr double kSupportGravityMps2 = 9.80665;
 
 void URaftSimChronoRuntimeAdapter::ConfigureRaftBody(const FRaftSimRaftBodyConfig& InConfig)
 {
+    SetHullGeometryProvider({},{});
     RaftConfig = InConfig;
     AuthorityIntegrationPolicy.SelectedRuntime = InConfig.Runtime;
 
@@ -168,6 +169,20 @@ bool URaftSimChronoRuntimeAdapter::StepRaftDynamics(float SubstepSeconds)
 
     const FVector TranslationDelta = KinematicState.LinearVelocityMetersPerSecond * SubstepSeconds * 100.0f;
     KinematicState.WorldTransform.AddToTranslation(TranslationDelta);
+    return true;
+}
+
+bool URaftSimChronoRuntimeAdapter::SetHullGeometryProvider(
+    TFunction<bool(const TArray<FRaftSimFlexVisualSegmentState>&,FRaftSimHullGeometry&)> Prepare,
+    TFunction<void()> Commit)
+{
+    HullGeometryProvider=MoveTemp(Prepare);HullGeometryCommit=MoveTemp(Commit);
+    PublishedHullGeometry={};PendingHullGeometry={};HullGeometryRevision=0;
+    if(!HullGeometryProvider)return true;
+    if(!HullGeometryCommit || !HullGeometryProvider(LastFlexVisualSegments,PendingHullGeometry) || !PendingHullGeometry.IsValid())
+        return false;
+    Swap(PublishedHullGeometry,PendingHullGeometry);++HullGeometryRevision;
+    HullGeometryCommit();
     return true;
 }
 
@@ -334,6 +349,16 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         Visual.bWrapping |= Contact.bWrapping;
         Visual.bPinned |= Contact.bPinned;
         Visual.bRecovering |= Contact.bRecovering;
+    }
+
+    // Prepare the exact visible hull from the same fixed-step deformation,
+    // before contact integration. Keep the previous published shape available
+    // for future deforming-surface CCD; a rejected step must not publish this one.
+    if(HullGeometryProvider &&
+        (!HullGeometryCommit || !HullGeometryProvider(LastFlexVisualSegments,PendingHullGeometry) || !PendingHullGeometry.IsValid()))
+    {
+        UE_LOG(LogTemp,Error,TEXT("Shared hull geometry rejected: missing or invalid source snapshot"));
+        return false;
     }
 
     // Quasi-static force/moment modifiers on the kinematic state.
@@ -819,10 +844,15 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         }
     }
 
+    if(HullGeometryProvider && !bInvalidState)
+    {
+        Swap(PublishedHullGeometry,PendingHullGeometry);++HullGeometryRevision;
+    }
     KinematicState.WorldTransform.SetTranslation(State.Position * 100.0);
     KinematicState.WorldTransform.SetRotation(State.Orientation);
     KinematicState.LinearVelocityMetersPerSecond = State.LinearVelocity;
     KinematicState.AngularVelocityRadiansPerSecond = State.AngularVelocity;
+    if(HullGeometryProvider && !bInvalidState)HullGeometryCommit();
 
     LastFlexStepTelemetry.bEvaluated = true;
     LastFlexStepTelemetry.MaxFreeboardLossM = SeatSolve.TubeSolve.MaxFreeboardLossM;

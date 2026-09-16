@@ -580,6 +580,46 @@ bool ExtractProductionRaftRestMesh(
     return true;
 }
 
+bool ExportHullGeometry(const TArray<FMeshData>& Sections,
+    const FTransform& LocalToBodyCm,FRaftSimHullGeometry& Out)
+{
+    const auto Fail=[&](){Out={};return false;};
+    if(Sections.IsEmpty() || LocalToBodyCm.ContainsNaN())return Fail();
+    int64 VertexCount=0,FaceCount=0;
+    for(const auto& S:Sections)
+    {
+        if(S.Vertices.IsEmpty() || S.Triangles.IsEmpty() || S.Triangles.Num()%3!=0)return Fail();
+        VertexCount+=S.Vertices.Num();FaceCount+=S.Triangles.Num()/3;
+    }
+    if(VertexCount>MAX_int32 || FaceCount>MAX_int32)return Fail();
+    Out.VerticesM.SetNum(int32(VertexCount),EAllowShrinking::No);
+    Out.Faces.SetNum(int32(FaceCount),EAllowShrinking::No);
+    Out.Sections.SetNum(Sections.Num(),EAllowShrinking::No);
+    int32 VertexBase=0,FaceBase=0;
+    for(int32 Section=0;Section<Sections.Num();++Section)
+    {
+        const auto& S=Sections[Section];
+        Out.Sections[Section]={VertexBase,S.Vertices.Num(),FaceBase,S.Triangles.Num()/3};
+        for(int32 I=0;I<S.Vertices.Num();++I)
+        {
+            const FVector P=LocalToBodyCm.TransformPosition(S.Vertices[I])*.01;
+            if(P.ContainsNaN())return Fail();
+            Out.VerticesM[VertexBase+I]=P;
+        }
+        // Retain exact source indexing (including UV seam duplicates and thin
+        // rigging). Revalidate every face, so same-count source edits cannot
+        // silently inherit stale topology from a previous snapshot.
+        for(int32 I=0;I<S.Triangles.Num();I+=3)
+        {
+            const int32 A=S.Triangles[I],B=S.Triangles[I+1],C=S.Triangles[I+2];
+            if(!S.Vertices.IsValidIndex(A) || !S.Vertices.IsValidIndex(B) || !S.Vertices.IsValidIndex(C))return Fail();
+            Out.Faces[FaceBase+I/3]=FIntVector(VertexBase+A,VertexBase+B,VertexBase+C);
+        }
+        VertexBase+=S.Vertices.Num();FaceBase+=S.Triangles.Num()/3;
+    }
+    return Out.IsValid();
+}
+
 bool ProductionDeformationCacheMatches(
     const FProductionRaftDeformationCache& Cache,
     const TArray<FMeshData>& RestSections,
@@ -666,7 +706,9 @@ FPointDeformation EvaluateCachedPointDeformation(
     const FProductionRaftDeformationSectionCache& Section,
     int32 VertexIndex,
     float TubeCm,
-    const TArray<FRaftSimFlexVisualSegmentState>& Deformation)
+    const TArray<FRaftSimFlexVisualSegmentState>& Deformation,
+    TConstArrayView<FPointDeformation> PreparedSegments,
+    bool bUpdateGradients)
 {
     FPointDeformation Result;
     if (!Section.Starts.IsValidIndex(VertexIndex + 1))
@@ -685,28 +727,35 @@ FPointDeformation EvaluateCachedPointDeformation(
         }
         const FRaftSimFlexVisualSegmentState& Segment =
             Deformation[Influence.SegmentIndex];
-        const FVector ContactNormal = Segment.ContactNormalLocal.GetSafeNormal();
-        FVector SegmentOffsetCm = ContactNormal *
-            static_cast<float>(Segment.IndentationM * kCmPerM);
-        SegmentOffsetCm.Z -= static_cast<float>(Segment.FreeboardLossM * kCmPerM);
-        if (Segment.bWrapping || Segment.bPinned)
+        FVector ContactNormal,SegmentOffsetCm;float SegmentCompression;
+        if(PreparedSegments.IsValidIndex(Influence.SegmentIndex))
         {
-            SegmentOffsetCm.Z += static_cast<float>(
-                Segment.IndentationM * kCmPerM * (Segment.bPinned ? 0.52 : 0.34));
+            const auto& Values=PreparedSegments[Influence.SegmentIndex];
+            ContactNormal=Values.ContactNormal;SegmentOffsetCm=Values.OffsetCm;SegmentCompression=Values.CompressionRatio;
+        }
+        else
+        {
+            // Retained repeated-evaluation reference for exact A/B tests.
+            ContactNormal=Segment.ContactNormalLocal.GetSafeNormal();
+            SegmentOffsetCm=ContactNormal*static_cast<float>(Segment.IndentationM*kCmPerM);
+            SegmentOffsetCm.Z-=static_cast<float>(Segment.FreeboardLossM*kCmPerM);
+            if(Segment.bWrapping || Segment.bPinned)
+                SegmentOffsetCm.Z+=static_cast<float>(Segment.IndentationM*kCmPerM*(Segment.bPinned?.52:.34));
+            const double RadialLossM=Segment.CompressionM+.35*Segment.IndentationM;
+            SegmentCompression=static_cast<float>(RadialLossM*kCmPerM/FMath::Max(TubeCm,1.0f));
         }
         Result.OffsetCm += SegmentOffsetCm * Influence.Weight;
-        Result.OffsetGradientX += SegmentOffsetCm * Influence.GradientXFactor;
-        Result.OffsetGradientY += SegmentOffsetCm * Influence.GradientYFactor;
+        if(bUpdateGradients)
+        {
+            Result.OffsetGradientX += SegmentOffsetCm * Influence.GradientXFactor;
+            Result.OffsetGradientY += SegmentOffsetCm * Influence.GradientYFactor;
+        }
         Result.ContactNormal += ContactNormal * Influence.Weight;
         Result.ContactCenterCm +=
             Cache.SegmentPositionsCm[Influence.SegmentIndex] * Influence.Weight;
         Result.ContactWeight += Influence.Weight;
 
-        const double RadialLossM = Segment.CompressionM + 0.35 * Segment.IndentationM;
-        CompressionRatio = FMath::Max(
-            CompressionRatio,
-            static_cast<float>(RadialLossM * kCmPerM / FMath::Max(TubeCm, 1.0f)) *
-                Influence.Weight);
+        CompressionRatio=FMath::Max(CompressionRatio,SegmentCompression*Influence.Weight);
     }
     Result.CompressionRatio = FMath::Clamp(CompressionRatio, 0.0f, 0.30f);
     Result.ContactNormal = Result.ContactNormal.GetSafeNormal();
@@ -723,7 +772,9 @@ void DeformProductionRaftRestMesh(
     const TArray<FRaftSimFlexVisualSegmentState>& Deformation,
     const FRaftSimRaftVisualCondition& Condition,
     TArray<FMeshData>& OutSections,
-    FProductionRaftDeformationCache* ReusableCache)
+    FProductionRaftDeformationCache* ReusableCache,
+    bool bUpdateShadingFrame,
+    bool bPrecomputeSegmentValues)
 {
     bool bOutputBuffersMatch = OutSections.Num() == RestSections.Num();
     for (int32 SectionIndex = 0;
@@ -754,6 +805,23 @@ void DeformProductionRaftRestMesh(
     const float TubeCm = FMath::Max(TubeRadiusM * kCmPerM, 1.0f);
     const float ProductionFloorLiftCm =
         TubeCm - kProductionAuthoredFloorPlaneZCm;
+    // Current-call scratch, rebuilt from EVERY current input. Not temporal
+    // memoization: only avoid normalizing the same segment for every vertex.
+    TArray<FPointDeformation,TInlineAllocator<16>> PreparedSegments;
+    if(ReusableCache && bPrecomputeSegmentValues)
+    {
+        for(const auto& Segment:Deformation)
+        {
+            auto& Values=PreparedSegments.AddDefaulted_GetRef();
+            Values.ContactNormal=Segment.ContactNormalLocal.GetSafeNormal();
+            Values.OffsetCm=Values.ContactNormal*static_cast<float>(Segment.IndentationM*kCmPerM);
+            Values.OffsetCm.Z-=static_cast<float>(Segment.FreeboardLossM*kCmPerM);
+            if(Segment.bWrapping || Segment.bPinned)
+                Values.OffsetCm.Z+=static_cast<float>(Segment.IndentationM*kCmPerM*(Segment.bPinned?.52:.34));
+            const double RadialLossM=Segment.CompressionM+.35*Segment.IndentationM;
+            Values.CompressionRatio=static_cast<float>(RadialLossM*kCmPerM/FMath::Max(TubeCm,1.0f));
+        }
+    }
     const float PressureScale = FMath::Lerp(
         0.82f,
         1.0f,
@@ -766,7 +834,7 @@ void DeformProductionRaftRestMesh(
         for (int32 VertexIndex = 0; VertexIndex < Deformed.Vertices.Num(); ++VertexIndex)
         {
             const FVector& RestVertex = Rest.Vertices[VertexIndex];
-            const FVector RestNormal = Rest.Normals.IsValidIndex(VertexIndex)
+            const FVector RestNormal = (bUpdateShadingFrame || SectionIndex<2 || Condition.CreaseAmplitudeM>0.f) && Rest.Normals.IsValidIndex(VertexIndex)
                 ? Rest.Normals[VertexIndex].GetSafeNormal()
                 : FVector::UpVector;
             const FPointDeformation Shape = ReusableCache != nullptr
@@ -775,7 +843,7 @@ void DeformProductionRaftRestMesh(
                       ReusableCache->Sections[SectionIndex],
                       VertexIndex,
                       TubeCm,
-                      Deformation)
+                      Deformation,PreparedSegments,bUpdateShadingFrame)
                 : EvaluatePointDeformation(RestVertex, TubeCm, &Deformation);
             // Match the procedural fallback: the laced floor follows 55% of
             // tube displacement instead of inheriting the full accumulated
@@ -851,6 +919,7 @@ void DeformProductionRaftRestMesh(
                     FMath::Sin(Phase) * (1.0f - Condition.Integrity);
             }
             Deformed.Vertices[VertexIndex] = Vertex;
+            if(!bUpdateShadingFrame)continue;
 
             // Preserve the imported smooth tangent frame through both the
             // chamber squash and the spatial gradient of the D4 offset. Leaving

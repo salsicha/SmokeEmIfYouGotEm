@@ -4,6 +4,7 @@
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimGroundContactObservation.h"
 #include "RaftSimSweptGroundContact.h"
+#include "RaftSimHullGeometry.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -352,6 +353,15 @@ public:
         return LastFlexVisualSegments;
     }
 
+    // A caller-owned source avoids a Physics -> Raft/render module cycle.
+    // Prepare is evaluated from THIS fixed substep's D1-D4 state. Commit is
+    // called only when that same body step is published successfully.
+    bool SetHullGeometryProvider(
+        TFunction<bool(const TArray<FRaftSimFlexVisualSegmentState>&,FRaftSimHullGeometry&)> Prepare,
+        TFunction<void()> Commit);
+    const FRaftSimHullGeometry& GetHullGeometry() const { return PublishedHullGeometry; }
+    uint64 GetHullGeometryRevision() const { return HullGeometryRevision; }
+
 private:
     UPROPERTY()
     FRaftSimRaftBodyConfig RaftConfig;
@@ -402,6 +412,11 @@ private:
     TMap<FString, double> IndentationBySegment;
     FRaftSimFlexStepTelemetry LastFlexStepTelemetry;
     TArray<FRaftSimFlexVisualSegmentState> LastFlexVisualSegments;
+
+    TFunction<bool(const TArray<FRaftSimFlexVisualSegmentState>&,FRaftSimHullGeometry&)> HullGeometryProvider;
+    TFunction<void()> HullGeometryCommit;
+    FRaftSimHullGeometry PublishedHullGeometry,PendingHullGeometry;
+    uint64 HullGeometryRevision=0;
 
     bool StepFlexibleRaftDynamics(double SubstepSeconds);
 };

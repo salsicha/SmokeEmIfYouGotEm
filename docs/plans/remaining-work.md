@@ -3,7 +3,15 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [actual terrain contact-normal refresh](../reconstruction-review-2026-09-07/normal-river-contact-normal-refresh.md).
+Latest: [shared authored hull snapshot checkpoint](../reconstruction-review-2026-09-07/normal-river-shared-hull-snapshot.md).
+Complete indexed authored hull geometry now has fixed-step prepare/commit and
+renderer agreement checks behind an opt-in review flag. Final editor build and
+16 targeted native tests PASS, including exact optimized deformation/shading
+comparisons. All 464 protected hashes remain unchanged. Full-surface contact is
+NOT implemented; fresh optimized gameplay/performance qualification remains.
+No visual, default integration or 30 FPS acceptance is claimed.
+
+Previous: [actual terrain contact-normal refresh](../reconstruction-review-2026-09-07/normal-river-contact-normal-refresh.md).
 Captured source state proves near-normal deduplication discarded a newly closing
 constraint. Exact unchanged-terrain regression FAILS before / PASSES after its
 normal refresh; all 13 native tests PASS. Actual existing South Fork game runs

@@ -647,6 +647,7 @@ void ARaftSimRaftActor::BuildRaftVisual()
     {
         RaftVisual->SetMaterial(4, RubberMat);
     }
+    ConfigureSharedHullGeometryReview();
 }
 
 bool ARaftSimRaftActor::GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const
@@ -688,6 +689,11 @@ bool ARaftSimRaftActor::GetRenderedFloorCenterWorldZCm(float& OutWorldZCm) const
 
 void ARaftSimRaftActor::UpdateFlexibleRaftVisual()
 {
+    if(bSharedHullGeometryReview && RaftVisual && RaftAdapter)
+    {
+        UpdateSharedHullVisual();
+        return;
+    }
     TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_UpdateFlexibleRaftVisual);
     if (RaftVisual == nullptr || RaftAdapter == nullptr)
     {

@@ -99,10 +99,19 @@ RAFTSIMRAFT_API bool ExtractProductionRaftRestMesh(
     const UStaticMesh* StaticMesh,
     TArray<FMeshData>& OutSections);
 
+// Preserve every source vertex and indexed face, with section/local identity
+// recoverable from the contiguous section ranges. LocalToBodyCm is the visual
+// component transform relative to the rigid body, including its scale/origin.
+RAFTSIMRAFT_API bool ExportHullGeometry(const TArray<FMeshData>& Sections,
+    const FTransform& LocalToBodyCm,FRaftSimHullGeometry& Out);
+
 /**
  * Apply the existing D4-derived continuous deformation field to an authored
  * production rest mesh. Topology and UVs remain fixed so the procedural mesh
  * component can update vertices without replacing physics authority.
+ * A positions-only fixed step may defer shading, but rendering must rebuild
+ * the shading frame from those same committed inputs. The final option keeps
+ * the repeated per-influence evaluation available as an exact test reference.
  */
 RAFTSIMRAFT_API void DeformProductionRaftRestMesh(
     const TArray<FMeshData>& RestSections,
@@ -110,6 +119,8 @@ RAFTSIMRAFT_API void DeformProductionRaftRestMesh(
     const TArray<FRaftSimFlexVisualSegmentState>& Deformation,
     const FRaftSimRaftVisualCondition& Condition,
     TArray<FMeshData>& OutSections,
-    FProductionRaftDeformationCache* ReusableCache = nullptr);
+    FProductionRaftDeformationCache* ReusableCache = nullptr,
+    bool bUpdateShadingFrame = true,
+    bool bPrecomputeSegmentValues = true);
 
 } // namespace RaftSimRaftMesh
