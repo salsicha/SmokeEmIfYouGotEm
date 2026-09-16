@@ -1,6 +1,9 @@
 using UnrealBuildTool;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using EpicGames.Core;
 
 public class RaftSimWater : ModuleRules
 {
@@ -58,6 +61,7 @@ public class RaftSimWater : ModuleRules
         // acquisitions. ResolveRuntimeDataPath maps the preserved repo-relative
         // path under RaftSimRuntimeData beside the packaged executable.
         string RepoRoot = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../../.."));
+        var RuntimeDestinations = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         string[] RuntimeRoots =
         {
             "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics",
@@ -81,6 +85,7 @@ public class RaftSimWater : ModuleRules
                     continue;
                 }
                 string RepoRelative = Path.GetRelativePath(RepoRoot, SourceFile).Replace('\\', '/');
+                RuntimeDestinations.Add(RepoRelative);
                 RuntimeDependencies.Add(
                     "$(TargetOutputDir)/RaftSimRuntimeData/" + RepoRelative,
                     SourceFile,
@@ -92,10 +97,96 @@ public class RaftSimWater : ModuleRules
         string CoordinateMapSource = Path.Combine(RepoRoot, CoordinateMapRelative);
         if (File.Exists(CoordinateMapSource))
         {
+            RuntimeDestinations.Add(CoordinateMapRelative);
             RuntimeDependencies.Add(
                 "$(TargetOutputDir)/RaftSimRuntimeData/" + CoordinateMapRelative,
                 CoordinateMapSource,
                 StagedFileType.NonUFS);
+        }
+        StageVerifiedRuntimeBundle(RepoRoot,
+            "physics/data/runtime_bundles/south_fork_saved_scene_v1", RuntimeDestinations);
+    }
+
+    private static string CheckedRelativePath(string Value)
+    {
+        if (String.IsNullOrEmpty(Value) || Path.IsPathRooted(Value) || Value.Contains('\\') || Value.Contains(':'))
+        {
+            throw new BuildException("Runtime bundle requires portable relative paths: " + Value);
+        }
+        foreach (string Part in Value.Split('/'))
+        {
+            if (Part.Length == 0 || Part == "." || Part == "..")
+            {
+                throw new BuildException("Runtime bundle path is not canonical: " + Value);
+            }
+        }
+        return Value;
+    }
+
+    private void VerifyRuntimeFile(string FileName, string ExpectedHash)
+    {
+        // Include every source in makefile invalidation: cached rules must not
+        // let later source changes bypass the hash check on the next build.
+        ExternalDependencies.Add(FileName);
+        if (!File.Exists(FileName))
+        {
+            throw new BuildException("Missing required runtime bundle input: " + FileName);
+        }
+        using var Stream = File.OpenRead(FileName);
+        using var Hasher = SHA256.Create();
+        string ActualHash = BitConverter.ToString(Hasher.ComputeHash(Stream)).Replace("-", "").ToLowerInvariant();
+        if (!String.Equals(ActualHash, ExpectedHash, StringComparison.Ordinal))
+        {
+            throw new BuildException("Changed runtime bundle input (fetch LFS data or regenerate the verified bundle): " + FileName);
+        }
+    }
+
+    private void StageVerifiedRuntimeBundle(string RepoRoot, string RelativeBundle,
+        HashSet<string> Destinations)
+    {
+        string BundleRoot = Path.Combine(RepoRoot, CheckedRelativePath(RelativeBundle));
+        string ManifestFile = Path.Combine(BundleRoot, "manifest.json");
+        ExternalDependencies.Add(ManifestFile);
+        if (!File.Exists(ManifestFile))
+        {
+            throw new BuildException("Required saved-scene runtime bundle is missing: " + ManifestFile);
+        }
+        JsonObject Manifest = JsonObject.Read(new FileReference(ManifestFile));
+        if (Manifest.GetStringField("schema") != "raftsim.runtime_data_bundle.v1")
+        {
+            throw new BuildException("Unsupported runtime bundle schema: " + ManifestFile);
+        }
+        foreach (JsonObject Binding in Manifest.GetObjectArrayField("saved_scene_assets"))
+        {
+            string RelativeFile = CheckedRelativePath(Binding.GetStringField("path"));
+            VerifyRuntimeFile(Path.Combine(RepoRoot, RelativeFile), Binding.GetStringField("sha256"));
+        }
+        JsonObject[] Files = Manifest.GetObjectArrayField("files");
+        if (Files.Length == 0)
+        {
+            throw new BuildException("Empty saved-scene runtime bundle: " + ManifestFile);
+        }
+        foreach (JsonObject File in Files)
+        {
+            string Destination = CheckedRelativePath(File.GetStringField("destination"));
+            string Source = CheckedRelativePath(File.GetStringField("source"));
+            string Hash = File.GetStringField("sha256");
+            string Extension = Path.GetExtension(Destination);
+            if ((Extension != ".json" && Extension != ".npy") ||
+                Source != "files/" + Hash + Extension || !Destinations.Add(Destination))
+            {
+                throw new BuildException("Invalid or duplicate runtime bundle destination: " + Destination);
+            }
+            string SourceFile = Path.Combine(BundleRoot, Source);
+            VerifyRuntimeFile(SourceFile, Hash);
+            if (new FileInfo(SourceFile).Length != File.GetDoubleField("size_bytes"))
+            {
+                throw new BuildException("Runtime bundle size mismatch: " + SourceFile);
+            }
+            // Logical legacy paths are preserved inside the standalone package;
+            // all source bytes come from the versioned bundle, never repo tmp.
+            RuntimeDependencies.Add("$(TargetOutputDir)/RaftSimRuntimeData/" + Destination,
+                SourceFile, StagedFileType.NonUFS);
         }
     }
 }

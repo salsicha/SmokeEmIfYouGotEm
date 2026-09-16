@@ -3,7 +3,16 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact saved ground retention and packaged qualification](../reconstruction-review-2026-09-07/ground-source-retention.md).
+Latest: [portable saved-scene runtime bundle](../reconstruction-review-2026-09-07/portable-runtime-bundle.md).
+The unchanged saved South Fork scene now has a versioned, hash-checked runtime
+dependency closure: 2,405 payloads / 916,906,778 bytes, staged by the game build.
+113 focused Python tests PASS. Native staged-vs-source comparison: 2,001 route
+and 2,601 initial-water queries match exactly. No solver steps or asset saves;
+this is not packaged gameplay, visual, settled-water, or 30 FPS acceptance.
+Full package cook remains pending; verify archive coherence and non-editor
+ground sources before playable motion/contact/performance qualification.
+
+Previous: [exact saved ground retention and packaged qualification](../reconstruction-review-2026-09-07/ground-source-retention.md).
 All 443 actual-map ground meshes plus the current local rock candidate retain
 CPU sources: 444 packages / 9,211,652 original directed triangles unchanged.
 Fresh engine reload and actual saved-asset 30,403 collision / 12,800 water-field
