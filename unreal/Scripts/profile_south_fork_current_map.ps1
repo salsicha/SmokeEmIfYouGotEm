@@ -7,11 +7,14 @@ param(
     [string]$ExtraGameArgument = '',
     [string[]]$ExtraGameArguments = @(),
     [switch]$NativePerformanceGate,
-    [switch]$DetailStreamingReplay
+    [switch]$DetailStreamingReplay,
+    [switch]$StartupRenderReplay
 )
 $ErrorActionPreference = 'Stop'
 if ($Label -notmatch '^south-fork-[a-z0-9-]+$') { throw 'Use a fresh scoped capture label' }
-if ($NativePerformanceGate -and $DetailStreamingReplay) { throw 'Choose one native validation mode' }
+if (([int][bool]$NativePerformanceGate + [int][bool]$DetailStreamingReplay + [int][bool]$StartupRenderReplay) -gt 1) {
+    throw 'Choose one capture or validation mode'
+}
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $logFile = Join-Path $projectRoot "unreal/Saved/Logs/$Label.log"
 $reportFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Label-process.json"
@@ -20,6 +23,10 @@ $detailReplayFile = Join-Path $projectRoot "unreal/Saved/RaftSimValidation/$Labe
 if ((Test-Path -LiteralPath $logFile) -or (Test-Path -LiteralPath $reportFile)) { throw 'Preserve previous capture evidence' }
 if ($NativePerformanceGate -and (Test-Path -LiteralPath $gateFile)) { throw 'Preserve previous native gate evidence' }
 if ($DetailStreamingReplay -and (Test-Path -LiteralPath $detailReplayFile)) { throw 'Preserve previous detail replay evidence' }
+$startupFrames = @(0..23 | ForEach-Object { Join-Path $projectRoot ('unreal/Saved/Screenshots/{0}_{1:000}.png' -f $Label, $_) })
+if ($StartupRenderReplay -and @($startupFrames | Where-Object { Test-Path -LiteralPath $_ }).Count) {
+    throw 'Preserve previous startup replay evidence'
+}
 $cookExe = [IO.Path]::GetFullPath((Join-Path $projectRoot $CookExecutable))
 $localCookRoot = [IO.Path]::GetFullPath((Join-Path $projectRoot 'tmp')) + [IO.Path]::DirectorySeparatorChar
 if (-not $cookExe.StartsWith($localCookRoot, [StringComparison]::OrdinalIgnoreCase) -or
@@ -84,6 +91,8 @@ $game = $null
 $report = [ordered]@{ cook_pid=$CookProcessId; cook_start_utc=$CookStartUtc; cook_executable=$cookExe; cook_sha256=(Get-FileHash -LiteralPath $cookExe).Hash.ToLowerInvariant(); shader_manifest=$ShaderWorkloadManifest; label=$Label; native_gate=[bool]$NativePerformanceGate; gate_passed=$null; suspend_status=$null; resume_status=$null; processes=@(); game_exit_code=$null; game_timeout=$false }
 $report.detail_replay = [bool]$DetailStreamingReplay
 $report.detail_replay_passed = $null
+$report.startup_render_replay = [bool]$StartupRenderReplay
+if ($StartupRenderReplay) { $report.visual_accepted = $false }
 try {
     foreach ($item in $owned) {
         $entry = [ordered]@{ pid=$item.process.Id; role=$item.role; start_utc=$item.process.StartTime.ToUniversalTime().ToString('o'); executable=$item.process.MainModule.FileName; cpu_seconds_before=$item.process.TotalProcessorTime.TotalSeconds; cpu_seconds_before_resume=$null; suspend=$null; resume=$null }
@@ -121,6 +130,11 @@ try {
         # unchanged 900-second observation timeout. Never truncate it with CSV.
         $start.ArgumentList.Add('-ForceRes')
         $start.ArgumentList.Add("-RaftSimDetailStreamingReport=$detailReplayFile")
+    } elseif ($StartupRenderReplay) {
+        # Observe the ordinary gameplay camera from startup. No warm-up skip,
+        # teleport, solver/time override, CSV shutdown or FPS acceptance.
+        $start.ArgumentList.Add('-ForceRes')
+        $start.ArgumentList.Add("-ExecCmds=RaftSim.CaptureSeries 0.1 24 0.5 $Label")
     } else {
         # Let the profiler own shutdown after its frame count and file flush.
         # A wall/game-time screenshot exit can truncate slow runs to zero bytes.
@@ -142,13 +156,29 @@ try {
         }
     }
     $report.game_exit_code = $game.ExitCode
-    if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
+    if (-not $NativePerformanceGate -and -not $DetailStreamingReplay -and -not $StartupRenderReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
         $csvFile = Join-Path $projectRoot "unreal/Saved/Profiling/CSV/$Label.csv"
         if (-not (Test-Path -LiteralPath $csvFile) -or (Get-Item -LiteralPath $csvFile).Length -eq 0) {
             throw 'Profiler exited without a nonempty CSV; no timing evidence'
         }
         $report.csv_file = $csvFile
         $report.csv_sha256 = (Get-FileHash -LiteralPath $csvFile -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+    if ($StartupRenderReplay -and -not $report.game_timeout -and $game.ExitCode -eq 0) {
+        $report.startup_frames = @()
+        foreach ($frame in $startupFrames) {
+            if (-not (Test-Path -LiteralPath $frame)) { throw 'Startup replay did not capture all 24 frames' }
+            $header = [byte[]]::new(24)
+            $stream = [IO.File]::OpenRead($frame)
+            try { $read = $stream.Read($header, 0, $header.Length) } finally { $stream.Dispose() }
+            if ($read -ne 24 -or [BitConverter]::ToString($header, 0, 16) -ne '89-50-4E-47-0D-0A-1A-0A-00-00-00-0D-49-48-44-52') {
+                throw 'Startup replay frame lacks a PNG IHDR'
+            }
+            $width = ([int]$header[16] -shl 24) -bor ([int]$header[17] -shl 16) -bor ([int]$header[18] -shl 8) -bor $header[19]
+            $height = ([int]$header[20] -shl 24) -bor ([int]$header[21] -shl 16) -bor ([int]$header[22] -shl 8) -bor $header[23]
+            if ($width -ne 1280 -or $height -ne 720) { throw 'Startup replay is not actual 1280x720' }
+            $report.startup_frames += [ordered]@{ path=$frame; width=$width; height=$height; sha256=(Get-FileHash -LiteralPath $frame).Hash.ToLowerInvariant() }
+        }
     }
     if ($NativePerformanceGate) {
         # Unreal's requested status can differ from the host process status.

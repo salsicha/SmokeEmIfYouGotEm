@@ -30,12 +30,19 @@ foreach ($badStamp in @('2026-09-16T20:41:40.8546391Z', '2026-09-16T20:41:41.854
 $identity = [pscustomobject]@{ start_utc=$cases[1].start_utc.AddTicks(1) }
 if ((& $normalize) -ceq $stamp) { throw 'DateTime normalization lost 100 ns identity precision' }
 'PASS: exact process identity timestamps (string, DateTime, JSON, and rejection cases)'
-$rejected = $false
-try {
-    & $source -Label 'south-fork-test-invalid-modes' -CookProcessId 0 -CookStartUtc 'invalid' -NativePerformanceGate -DetailStreamingReplay
-} catch {
-    if ($_.Exception.Message -ne 'Choose one native validation mode') { throw }
-    $rejected = $true
+foreach ($modes in @(
+    @{ NativePerformanceGate=$true; DetailStreamingReplay=$true },
+    @{ NativePerformanceGate=$true; StartupRenderReplay=$true },
+    @{ DetailStreamingReplay=$true; StartupRenderReplay=$true },
+    @{ NativePerformanceGate=$true; DetailStreamingReplay=$true; StartupRenderReplay=$true }
+)) {
+    $rejected = $false
+    try {
+        & $source -Label 'south-fork-test-invalid-modes' -CookProcessId 0 -CookStartUtc 'invalid' @modes
+    } catch {
+        if ($_.Exception.Message -ne 'Choose one capture or validation mode') { throw }
+        $rejected = $true
+    }
+    if (-not $rejected) { throw 'Conflicting validation modes were accepted' }
 }
-if (-not $rejected) { throw 'Conflicting validation modes were accepted' }
 'PASS: conflicting validation modes rejected before process access'
