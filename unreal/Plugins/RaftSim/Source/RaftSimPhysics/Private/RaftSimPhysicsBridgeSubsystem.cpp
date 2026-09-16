@@ -23,7 +23,7 @@ void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collec
 void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 {
     // Release the contact registry's world delegates before subsystem teardown.
-    if (RaftRuntime) { RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
+    if (RaftRuntime) { RaftRuntime->SetGroundSphereSweep({}); RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
     WaterRuntime = nullptr;
     RaftRuntime = nullptr;
     Super::Deinitialize();
@@ -91,7 +91,14 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
         // source Landscapes take precedence; maps without one use solver bed.
         const auto GroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
         RaftRuntime->SetGroundContactObserver({});
+        RaftRuntime->SetGroundSphereSweep({});
 #if !UE_BUILD_SHIPPING
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimContinuousGroundReview")))
+        {
+            RaftRuntime->SetGroundSphereSweep([GroundSources](const FVector& A,const FVector& B,double Radius,FHitResult& Hit)
+            { return GroundSources->SweepCapturedSphere(A,B,Radius,Hit); });
+            UE_LOG(LogTemp,Display,TEXT("Continuous ground review enabled: six swept tube supports; source mesh unchanged; rotation chord limit 0.005 rad"));
+        }
         FString ContactAuditPath;
         if(FParse::Value(FCommandLine::Get(),TEXT("RaftSimGroundContactAudit="),ContactAuditPath))
         {

@@ -50,6 +50,7 @@ public:
     // No solver-bed fallback: missing physical geometry remains unknown.
     bool SampleGround(const FVector& WorldPositionCm, double& OutGroundZCm, FVector& OutGroundNormal,
         FHitResult* OutCapturedHit=nullptr);
+    bool SweepCapturedSphere(const FVector& StartCm,const FVector& EndCm,double RadiusCm,FHitResult& OutHit);
     TArray<TWeakObjectPtr<ALandscapeProxy>> Landscapes;
     TArray<TWeakObjectPtr<UStaticMeshComponent>> Meshes;
 private:

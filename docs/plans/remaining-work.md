@@ -3,7 +3,18 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [cache memory, completed control cook, and actual stranding](../reconstruction-review-2026-09-07/normal-river-cache-and-contact-review.md).
+Latest: [exact roof jump and swept-contact candidate](../reconstruction-review-2026-09-07/normal-river-swept-contact.md).
+Read-only contact evidence identifies roof face 1090 lifting the entire 605 kg
+raft by 1.841773266 m in one substep. New opt-in six-sphere source-mesh contact
+couples impulses and consumes remaining time. Ten native tests PASS; two actual
+replays pass the old sticking point, reaching station 8440.910 at 72.080 seconds
+with no rejected steps. Local improvement, NOT full hull/default acceptance;
+NEXT sustained/multiple-support, rotation/full-hull clearance and contact cost.
+All 464 protected hashes unchanged. Same landward cook remains LIVE PID2344; its completed
+100/150-second cell/bank audits PASS, NOT settled. NEXT completed local step 3000 /
+absolute 200 seconds. Default contact and all remaining acceptance gates OPEN.
+
+Previous: [cache memory, completed control cook, and actual stranding](../reconstruction-review-2026-09-07/normal-river-cache-and-contact-review.md).
 The final lower-memory cache is exact but loses one timing order; it remains
 OFF by default. Nine native / 47 focused Python tests PASS. The longer actual
 landward preview strands the raft near station 8364 m with one grounded point

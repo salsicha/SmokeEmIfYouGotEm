@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimGroundContactObservation.h"
+#include "RaftSimSweptGroundContact.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -277,6 +278,7 @@ public:
     // Optional observer, never a force/pose callback. Empty in ordinary play.
     void SetGroundContactObserver(TFunction<void(const FRaftSimGroundContactObservation&)> Observer)
     { GroundContactObserver=MoveTemp(Observer); }
+    void SetGroundSphereSweep(FRaftSimGroundSweep Sweep) { GroundSphereSweep=MoveTemp(Sweep); }
 
     float GetLastMaximumGroundPenetrationMeters() const
     {
@@ -371,6 +373,7 @@ private:
         float& OutGroundZCm,
         FVector& OutGroundNormal)> GroundSurfaceSampler;
     TFunction<void(const FRaftSimGroundContactObservation&)> GroundContactObserver;
+    FRaftSimGroundSweep GroundSphereSweep;
     int32 LastGroundedSupportPointCount = 0;
     float LastMaximumGroundPenetrationM = 0.0f;
     TFunction<bool(

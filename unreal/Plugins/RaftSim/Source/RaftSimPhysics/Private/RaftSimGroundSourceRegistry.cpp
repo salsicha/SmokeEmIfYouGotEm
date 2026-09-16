@@ -4,6 +4,27 @@
 
 CSV_DEFINE_CATEGORY(RaftSimGround,true);
 
+bool FRaftSimGroundSourceRegistry::SweepCapturedSphere(const FVector& StartCm,
+    const FVector& EndCm,double RadiusCm,FHitResult& OutHit)
+{
+    CSV_SCOPED_TIMING_STAT(RaftSimGround,Sweep);
+    RefreshIfDirty();
+    FBox SweptBounds(ForceInit);SweptBounds+=StartCm;SweptBounds+=EndCm;
+    SweptBounds=SweptBounds.ExpandBy(RadiusCm);
+    bool Found=false;
+    for(const auto& WeakMesh:Meshes)
+    {
+        auto* Mesh=WeakMesh.Get();
+        if(!Mesh || !Mesh->IsQueryCollisionEnabled() || !SweptBounds.Intersect(Mesh->Bounds.GetBox()))continue;
+        FHitResult Hit;
+        if(!Mesh->SweepComponent(Hit,StartCm,EndCm,FQuat::Identity,FCollisionShape::MakeSphere(RadiusCm),true))continue;
+        if(!Hit.bStartPenetrating && Hit.Time<=1.e-7 && FVector::DotProduct(EndCm-StartCm,Hit.Normal)>=-1.e-9)continue;
+        if(!Found || Hit.Time<OutHit.Time || (Hit.bStartPenetrating && !OutHit.bStartPenetrating))
+        {OutHit=Hit;Found=true;}
+    }
+    return Found;
+}
+
 bool FRaftSimGroundSourceRegistry::SampleGround(const FVector& WorldPositionCm,
     double& OutGroundZCm, FVector& OutGroundNormal,FHitResult* OutCapturedHit)
 {

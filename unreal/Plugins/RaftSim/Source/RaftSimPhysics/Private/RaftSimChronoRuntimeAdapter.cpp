@@ -685,6 +685,22 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         State.Orientation = (Delta * State.Orientation).GetNormalized();
     }
 
+    if(GroundSphereSweep)
+    {
+        const double Radius=FMath::Max(double(RaftConfig.TubeRadiusMeters)*
+            FMath::Lerp(.82,1.,double(FlexPressureFraction)),1.e-3);
+        const auto Contact=RaftSimSweptGround::Integrate(State,PreviousFiniteState,
+            TubeSamplePointsM,Radius,MassKg,Inertia,Dt,GroundSphereSweep);
+        if(!Contact.bCompleted)
+        {
+            UE_LOG(LogTemp,Error,TEXT("Continuous ground review rejected: %s; consumed_s=%.9g dt=%.9g"),
+                *Contact.Failure,Contact.ConsumedSeconds,Dt);
+            return false;
+        }
+        if(Contact.Impulses>0)
+            UE_LOG(LogTemp,Verbose,TEXT("Continuous ground review impulses=%d consumed_s=%.9g"),Contact.Impulses,Contact.ConsumedSeconds);
+    }
+
     // Height-field contact constraint. ARaftSimRaftActor is advanced by this
     // custom kinematic state, so child QueryOnly collision and an unswept
     // SetActorLocationAndRotation cannot make Landscape or riverbed geometry
