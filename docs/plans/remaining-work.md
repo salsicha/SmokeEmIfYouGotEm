@@ -3,7 +3,21 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [retained preview, exact solver rows and corrected hydraulic continuation](../reconstruction-review-2026-09-07/retained-preview-and-solver-rows.md).
+Latest: [solver Game integration and 1350-second hydraulic checkpoint](../reconstruction-review-2026-09-07/solver-game-link-and-1350s.md).
+Win64 Development Game build PASS; new solver identity independently found in
+the executable, all17 editor DLL hashes unchanged. All2,405 staged runtime
+payloads PASS, no external fallback. Editor relink and packaged execution
+remain pending; archive must use new Game hash23733e94... rather than an old
+executable with the same target-receipt hash. SAME cook16144/session80881 live;
+long SM5 batch completed and later shader compilation advances. Do not restart
+on timeout. SAME hydraulic18716/session69416 live; absolute1350s cell AND all
+86,720 exact-dry bank checks PASS, NOT settled (80.573710out vs45.306955in).
+NEXT completed local4000 / absolute1400s audits, then package444 non-editor
+sources and runtime bundle before packaged play/contact/performance. No visual
+or default full-hull promotion. Last ordinary17.819710FPS / p9581.6343ms still
+FAILS30FPS. All later rivers, crew, regressions and release remain OPEN.
+
+Previous: [retained preview, exact solver rows and corrected hydraulic continuation](../reconstruction-review-2026-09-07/retained-preview-and-solver-rows.md).
 Fresh provenance-bound actual South Fork preview completed with one water
 surface and zero logged hull/render mismatch; 77 focused Python tests PASS.
 Broad froth and inferred sidewalls remain visually unaccepted; no normal-menu
