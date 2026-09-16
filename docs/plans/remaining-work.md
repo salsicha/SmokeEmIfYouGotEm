@@ -3,7 +3,20 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest diagnostic: [current South Fork foam provenance](../reconstruction-review-2026-09-07/current-foam-provenance.md).
+Latest: [exact prepared crest-range spatial index](../reconstruction-review-2026-09-07/prepared-crest-range.md).
+Corrected spatial membership preserves all 128 actual-input geometry pairs and
+has a small repeated component gain (0.04–0.10 ms), including preparation.
+It is now the default with an independent complete-scan control. Final build
+and 51 native tests PASS; 53 targeted Python tests PASS. No visual or 30 FPS
+acceptance: the last uncontended 17.819710 FPS / p95 81.6343 ms still FAILS.
+All 464 protected hashes unchanged. Hydraulic audits through 950 s PASS, NOT
+settled; SAME cook session84989 / PID32068 remains live, next completed local
+8000 / absolute 1000 s. Next priorities are visible rock surfaces, breaking-wave
+deformation and froth motion, remaining runtime cost and physical/contact gates;
+not further tuning of this small range-cache gain. All later rivers, other-scene
+water, crew, normalization and release remain OPEN.
+
+Previous diagnostic: [current South Fork foam provenance](../reconstruction-review-2026-09-07/current-foam-provenance.md).
 46 native and 17 Python tests PASS; all 464 protected hashes unchanged.
 This adds paired coverage checks and an opt-in provenance view, not a visual or
 30 FPS acceptance. Deformation, breaking and foam motion remain unfinished.

@@ -11,6 +11,7 @@
 #include "RaftSimWaterFlowFrame.h"
 #include "RaftSimIndexedBreakingProfile.h"
 #include "RaftSimBreakingHeightRange.h"
+#include "RaftSimPreparedBreakingHeightRange.h"
 #include "RaftSimWaterFlowHistory.h"
 #include "RaftSimWaterCarrierMeshComponent.h"
 #include "RaftSimWaterTextureHistory.h"
@@ -5739,6 +5740,31 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         }();
         if(bRangeEnabled)
         {
+            static const bool bPrepareRange=[]
+            {
+                FString Path;
+                return !FParse::Param(FCommandLine::Get(),TEXT("RaftSimUnpreparedCrestRange")) ||
+                    FParse::Value(FCommandLine::Get(),TEXT("RaftSimCrestPreparedRangeAudit="),Path);
+            }();
+            if(bPrepareRange)
+            {
+                const double PrepareStart=FPlatformTime::Seconds();
+                const auto Prepared=MakeShared<FRaftSimPreparedBreakingHeightRange,ESPMode::ThreadSafe>(SupportSites);
+                CartesianCrestInput.PreparedHeightRangeWidthAtWorldXYCm=[Prepared,Scale,Sign](const FBox2D& Box)
+                {
+                    FBox2D Field(ForceInit);
+                    Field+=FVector2D(Box.Min.X*.01,Box.Min.Y*.01*Sign);
+                    Field+=FVector2D(Box.Max.X*.01,Box.Max.Y*.01*Sign);
+                    return Prepared->WidthMeters(Field)*FMath::Abs(Scale)*100.f;
+                };
+                CartesianCrestInput.PreparedRangeConstructionMs=(FPlatformTime::Seconds()-PrepareStart)*1000.;
+                static bool bLoggedPreparedRange=false;
+                if(!bLoggedPreparedRange)
+                {
+                    UE_LOG(LogTemp,Display,TEXT("Prepared crest range active: immutable spatial index with complete-scan fallback; reference arithmetic and tolerances unchanged"));
+                    bLoggedPreparedRange=true;
+                }
+            }
             CartesianCrestInput.HeightRangeWidthAtWorldXYCm=[Sites=SupportSites,Scale,Sign](const FBox2D& Box)
             {
                 FBox2D Field(ForceInit);

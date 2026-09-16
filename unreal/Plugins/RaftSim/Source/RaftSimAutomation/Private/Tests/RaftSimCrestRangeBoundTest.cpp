@@ -1,5 +1,6 @@
 #include "Misc/AutomationTest.h"
 #include "RaftSimBreakingHeightRange.h"
+#include "RaftSimPreparedBreakingHeightRange.h"
 #include "RaftSimSurfaceRefinement.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -23,12 +24,15 @@ bool FRaftSimCrestRangeBoundTest::RunTest(const FString&)
             S.PhysicalCrestLengthMeters=1.f+I;
             S.bLocalEnvelopeCap=Case%2==0 || I%2==0;
         }
+        const FRaftSimPreparedBreakingHeightRange Prepared(Sites);
+        TestTrue(TEXT("ordinary profiles use conservative spatial membership"),Case==7 || Prepared.IsIndexed());
         for(int32 Box=0;Box<80;++Box)
         {
             const FVector2D C=Origin+FVector2D(Random.FRandRange(-35.f,60.f),Random.FRandRange(-35.f,45.f));
             const double Radius=Box%5 ? .125 : 4.;
             const FBox2D Bounds(C-FVector2D(Radius),C+FVector2D(Radius));
             const float Width=RaftSimBreakingHeightRange::WidthMeters(Sites,Bounds);
+            TestTrue(TEXT("prepared constants preserve exact range"),Prepared.WidthMeters(Bounds)==Width);
             float Low=0.f,High=0.f;
             for(int32 Y=0;Y<=10;++Y)for(int32 X=0;X<=10;++X)
             {
@@ -50,11 +54,13 @@ bool FRaftSimCrestRangeBoundTest::RunTest(const FString&)
                 const FVector2D P=S.RiverCoordinatesMeters+RaftSimWaterFlowFrame::ToField(FVector2D(D,A),S.FlowDirection)/S.FlowDirection.SizeSquared();
                 const FBox2D B(P-FVector2D(.00001),P+FVector2D(.00001));
                 const float W=RaftSimBreakingHeightRange::WidthMeters(Sites,B);
+                TestTrue(TEXT("prepared support boundary range is exact"),Prepared.WidthMeters(B)==W);
                 const float H=URaftSimWaterRuntimeAdapter::ComputeCoupledBreakingReliefMeters(P,Sites,.35f,.7f);
                 TestTrue(TEXT("boundary range includes zero and actual profile"),FMath::Abs(H)<=W);++Compared;
             }
         }
         Sites[0].PhysicalCrestHeightMeters=-1.f;
+        TestEqual(TEXT("prepared legacy profile also disables bound"),FRaftSimPreparedBreakingHeightRange(Sites).WidthMeters(FBox2D(Origin,Origin+FVector2D(1.))),MAX_flt);
         TestEqual(TEXT("legacy profile disables bound"),RaftSimBreakingHeightRange::WidthMeters(Sites,FBox2D(Origin,Origin+FVector2D(1.))),MAX_flt);
     }
     AddInfo(FString::Printf(TEXT("Conservative physical crest range contains %lld actual samples across rotating/mixed-cap/large-coordinate profiles and support boundaries"),Compared));
@@ -113,6 +119,67 @@ bool FRaftSimCrestRangeSelectionTest::RunTest(const FString&)
     Candidate.HeightRangeWidthCm=[](const FBox2D&){return 0.f;};
     TestTrue(TEXT("zero-range profile builds"),Candidate.BuildAdaptive(XY,Triangles,[&](const FVector2D&){++Calls;return 0.f;},3,.5f));
     TestEqual(TEXT("certified zero range needs no profile samples"),Calls,0);
+    return !HasAnyErrors();
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimPreparedRangeOwnershipTest,
+    "RaftSim.P2.PreparedCrestRangeOwnership",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimPreparedRangeOwnershipTest::RunTest(const FString&)
+{
+    using FSite=URaftSimWaterRuntimeAdapter::FSupportBreakingSite;
+    TArray<FSite> Sites;Sites.AddDefaulted();
+    Sites[0].RiverCoordinatesMeters=FVector2D::ZeroVector;
+    Sites[0].FlowDirection=FVector2D(1.,0.);
+    Sites[0].PhysicalCrestHeightMeters=.8f;Sites[0].PhysicalCrestLengthMeters=3.f;
+    const FBox2D Box(FVector2D(-1.),FVector2D(1.));
+    const float Original=RaftSimBreakingHeightRange::WidthMeters(Sites,Box);
+    FRaftSimPreparedBreakingHeightRange Prepared(Sites);
+    Sites[0].PhysicalCrestHeightMeters=0.f;
+    TestTrue(TEXT("immutable preparation owns the original profile"),Prepared.WidthMeters(Box)==Original);
+    TestTrue(TEXT("fresh preparation sees the changed profile"),FRaftSimPreparedBreakingHeightRange(Sites).WidthMeters(Box)==RaftSimBreakingHeightRange::WidthMeters(Sites,Box));
+    Sites[0].FlowDirection=FVector2D::ZeroVector;
+    TestTrue(TEXT("zero-lift unsupported direction still disables shortcut"),FRaftSimPreparedBreakingHeightRange(Sites).WidthMeters(Box)==MAX_flt);
+    const auto Copy=Prepared;
+    TestTrue(TEXT("copy owns its complete prepared state"),Copy.WidthMeters(Box)==Original);
+    TestTrue(TEXT("invalid query bounds disable shortcut"),Prepared.WidthMeters(FBox2D(ForceInit))==MAX_flt);
+    Sites.Reset();
+    TestTrue(TEXT("empty profiles preserve reference roundoff cushion"),FRaftSimPreparedBreakingHeightRange(Sites).WidthMeters(Box)==RaftSimBreakingHeightRange::WidthMeters(Sites,Box));
+    return !HasAnyErrors();
+}
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimPreparedRangeSpatialTest,
+    "RaftSim.P2.PreparedCrestRangeSpatial",EAutomationTestFlags::EditorContext|EAutomationTestFlags::EngineFilter)
+bool FRaftSimPreparedRangeSpatialTest::RunTest(const FString&)
+{
+    using FSite=URaftSimWaterRuntimeAdapter::FSupportBreakingSite;
+    FRandomStream Random(960916);
+    TArray<FSite> Sites;
+    for(int32 I=0;I<17;++I)
+    {
+        auto& S=Sites.AddDefaulted_GetRef();
+        S.RiverCoordinatesMeters=FVector2D(-5500.+I*2.13,3600.+(I%5)*3.17);
+        S.FlowDirection=RaftSimWaterFlowFrame::FromAngle(I*.381f)*(I%2 ? .51 : 1.99);
+        S.PhysicalCrestHeightMeters=I%4 ? .02f+I*.13f : 0.f;
+        S.PhysicalCrestLengthMeters=1.f+I*.7f;
+    }
+    const FRaftSimPreparedBreakingHeightRange Prepared(Sites);
+    TestTrue(TEXT("rotated non-unit sites build the spatial index"),Prepared.IsIndexed());
+    for(int32 I=0;I<24000;++I)
+    {
+        // Include exact tile edges, negative coordinates, the maximal indexed
+        // half extent, and query-domain/size fallbacks. No tolerance here.
+        FVector2D Center(-5500.+Random.FRandRange(-330.f,330.f),3600.+Random.FRandRange(-330.f,330.f));
+        if(I%3==0)Center=FVector2D(FMath::RoundToDouble(Center.X/8.)*8.,FMath::RoundToDouble(Center.Y/8.)*8.);
+        const double R=I%5==0 ? 8. : (I%7==0 ? 8.000001 : Random.FRandRange(0.f,30.f));
+        const FVector2D Half(R,I%2 ? R : R*.013);
+        const FBox2D Bounds(Center-Half,Center+Half);
+        const float Reference=RaftSimBreakingHeightRange::WidthMeters(Sites,Bounds);
+        if(Prepared.WidthMeters(Bounds)!=Reference)
+        {AddError(FString::Printf(TEXT("Exact spatial range mismatch query=%d center=(%.17g,%.17g) half=(%.17g,%.17g) reference=%.9g candidate=%.9g"),I,Center.X,Center.Y,Half.X,Half.Y,Reference,Prepared.WidthMeters(Bounds)));return false;}
+    }
+    Sites[0].RiverCoordinatesMeters=FVector2D(1.e8,1.e8);
+    const FRaftSimPreparedBreakingHeightRange Wide(Sites);
+    TestFalse(TEXT("oversized index falls back to complete preparation"),Wide.IsIndexed());
+    const FBox2D Bounds(FVector2D(-5501.,3599.),FVector2D(-5499.,3601.));
+    TestTrue(TEXT("index fallback preserves all sites and original order"),Wide.WidthMeters(Bounds)==RaftSimBreakingHeightRange::WidthMeters(Sites,Bounds));
     return !HasAnyErrors();
 }
 #endif

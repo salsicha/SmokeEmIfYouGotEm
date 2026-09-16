@@ -13,6 +13,7 @@
 #include "RaftSimCrestEdgeHashAudit.h"
 #include "RaftSimCrestLevelMemoAudit.h"
 #include "RaftSimCrestRangeAudit.h"
+#include "RaftSimCrestPreparedRangeAudit.h"
 #include "RaftSimCrestBoundMemoAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
@@ -112,7 +113,14 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             static const bool bBoundMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBoundCrestMemo"));
             Refinement.bBoundCoordinateMemo=bBoundMemo;
             static const bool bRangeBound=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestRange"));
-            Refinement.HeightRangeWidthCm=bRangeBound ? Input.HeightRangeWidthAtWorldXYCm : TFunction<float(const FBox2D&)>();
+            // The corrected spatial index is exact and slightly faster in
+            // both orders of two actual-input captures, including preparation.
+            // Preserve the full reference scan as an independent control.
+            static const bool bPreparedRange=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimUnpreparedCrestRange"));
+            Refinement.HeightRangeWidthCm=bRangeBound
+                ? (bPreparedRange && Input.PreparedHeightRangeWidthAtWorldXYCm
+                    ? Input.PreparedHeightRangeWidthAtWorldXYCm : Input.HeightRangeWidthAtWorldXYCm)
+                : TFunction<float(const FBox2D&)>();
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;
             if (!Refinement.BuildAdaptive(XY,Triangles,Input.HeightAtWorldXYCm,3,.5f,Input.NonzeroRegionsCm,nullptr,true,true,
                 Input.DetailSpanCm>0 ? &Input.DetailWindowCm : nullptr,Input.DetailSpanCm,!bFreshMemos,!bLegacyCoordinateHash,!bResizeContexts,bSharedCorners)) return false;
@@ -167,6 +175,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestEdgeHashAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestLevelMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestPreparedRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestBoundMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
