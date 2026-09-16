@@ -77,7 +77,24 @@ artificial-bank face cells remain exactly dry. Max depth4.505365274m, max speed
 - Bank report `tmp/south-fork-context3-1600-banks-v1-20260916.json`, SHA256
   `4d5ab046fb6d1ea0743d50c94e2ab72a1ddf720e72c815820417e250c4d3c6de`.
 
-Next completed local9000 / absolute1650s needs both audits. No runtime-field,
+Continuation: completed local9000 / absolute1650s also passes all5,369,600
+cell checks and all86,720 exact-dry artificial-bank face checks. Max depth
+4.490972506m, max speed7.236992171m/s, volume3,003,663.384020110m3. Maximum
+per-step conservation residual remains1.378528425e-8m3. Outflow89.099834811
+versus inflow45.306954547m3/s still rejects settling.
+
+- State report `tmp/south-fork-context3-1650-snapshot-v1-20260916.json`, SHA256
+  `a3cc5ae6ca684a8ea808b692ee499de737989e29f9e673efbf1a80bfa6e8411a`.
+- Bank report `tmp/south-fork-context3-1650-banks-v1-20260916.json`, SHA256
+  `2c54b3c698e7d765e79d0107c10fb007b56ba4b97f201f1936381e05b92ddb15`.
+
+Same editor build87748/PID12368 reached128/160 actions; queued GPU95612 has
+not launched yet. Both transport compiler probes remain live with increasing
+CPU time:21 session1965/PID19472 and3 session27413/PID24980. No restart or
+production shader changes. Read-only inspection of the measured mesh-cost path
+confirms persistent RHI allocation is already used; no new performance claim.
+
+Next completed local10000 / absolute1700s needs both audits. No runtime-field,
 geometry or normal-map promotion follows from the checkpoint. Ordinary play
 still fails 30 FPS: last17.819710FPS / p9581.6343ms. Visible breaking and froth,
 source-supported rock flanks, playable integration, all later rivers, crew,

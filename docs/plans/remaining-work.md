@@ -14,8 +14,10 @@ pressure96639 is TERMINAL0. Transport21 session1965 and other distinct transport
 inputs session27413 need same-job completion, not restarts. No production
 shader edits before queued candidate GPU comparison. Full cook and packaged
 444-source checks still OPEN.
-SAME hydraulic18716/session69416:1600s state and all86,720 dry bank-face checks
-PASS, NOT settled (87.916530out vs45.306955in). NEXT local9000/absolute1650s.
+SAME hydraulic18716/session69416:1600/1650s state and all86,720 dry bank-face
+checks PASS, NOT settled (latest89.099835out vs45.306955in). NEXT local10000 /
+absolute1700s. Editor build87748 reached128/160; GPU95612 still queued.
+Transport21/PID19472 and3/PID24980 remain live; preserve the same jobs.
 Last ordinary17.819710FPS/p9581.6343ms still FAILS30FPS. Visual, physical,
 normal-play integration, later rivers, crew, regressions and release remain OPEN.
 
