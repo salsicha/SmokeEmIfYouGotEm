@@ -26,6 +26,20 @@ def write_json(path, value):
     path.write_text(json.dumps(value, indent=2)+"\n", encoding="utf-8")
 
 
+def make_restart_manifest(manifest, source_time):
+    """Preserve physical inputs, never inherit a cold-start or old-state claim."""
+    if type(source_time) not in (int, float) or not np.isfinite(source_time) or source_time < 0:
+        raise ValueError('Finite nonnegative checkpoint time required')
+    result = copy.deepcopy(manifest)
+    result.update(initial_time_seconds=source_time, inputs=[], packages=[],
+                  initialization_is_fresh_not_restart=False,
+                  initial_velocity_method="Bit-exact native checkpoint on retained cells; inferred zero velocity on added context only",
+                  settled_hydraulics=False, normal_map_integrated=False)
+    for key in ('maximum_initial_depth_m', 'maximum_initial_speed_mps', 'restart'):
+        result.pop(key, None)
+    return result
+
+
 def validate_bank_observation(audit, manifest_sha, source_step, observed_h_sha, allow_later=False):
     """Later edge wetting may select context for an earlier clean checkpoint.
 
@@ -124,10 +138,7 @@ def main():
     # Reserve space for input arrays, diagnostic snapshots and the ongoing cook.
     assert shutil.disk_usage(output.parent).free > arrays["h"].nbytes*8 + 1024**3
     output.mkdir()
-    result = copy.deepcopy(manifest)
-    result.update(initial_time_seconds=complete["time_seconds"], inputs=[], packages=[],
-                  initial_velocity_method="Bit-exact native checkpoint on retained cells; inferred zero velocity on added context only",
-                  settled_hydraulics=False, normal_map_integrated=False)
+    result = make_restart_manifest(manifest, complete["time_seconds"])
     restart = dict(source_manifest=str(original), source_manifest_sha256=sha(original),
                    source_frame=str(frame), source_step=args.step, source_time_seconds=complete["time_seconds"],
                    arrays={n: sha(frame/f"{n}.npy") for n in arrays},
@@ -204,9 +215,6 @@ def main():
         write_json(output/"geometry_manifest.json", geometry)
         result.update(geometry_manifest=(output/"geometry_manifest.json").relative_to(ROOT).as_posix(),
                       geometry_manifest_sha256=sha(output/"geometry_manifest.json"))
-    # Old warm-start extrema are no longer valid for a checkpoint.
-    result.pop("maximum_initial_depth_m", None)
-    result.pop("maximum_initial_speed_mps", None)
     write_json(output/"manifest.json", result)
     print(json.dumps(restart, indent=2))
 

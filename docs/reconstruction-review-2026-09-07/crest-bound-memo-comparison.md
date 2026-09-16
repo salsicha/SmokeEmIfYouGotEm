@@ -3,6 +3,11 @@
 September 15, 2026. This is an opt-in diagnostic candidate, not a gameplay
 performance or visual acceptance result. Default gameplay is unchanged.
 
+Subsequent storage changes and measurements are recorded in
+[the cache/contact continuation](normal-river-cache-and-contact-review.md).
+The final lower-memory variant also remains disabled after losing one timing
+order; the results below describe the original three-table implementation.
+
 `-RaftSimBoundCrestMemo` enables per-triangle exact-coordinate lookup bindings.
 Every reused binding checks the full coordinate; sampled heights expire every
 profile epoch. The existing 4096-coordinate cap invalidates all bindings before

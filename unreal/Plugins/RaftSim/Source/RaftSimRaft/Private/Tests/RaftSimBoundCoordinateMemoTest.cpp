@@ -29,6 +29,9 @@ bool FRaftSimBoundMemoTest::RunTest(const FString&)
     Memo.Value(FVector2D(0,0),1,3,Height);
     for(int32 I=1;I<4096;++I)Memo.Value(FVector2D(I,0),0,3,Height);
     TestEqual(TEXT("existing bounded history capacity"),Memo.Num(),4096);
+    const int32 BeforeGrowthRead=Calls;
+    TestEqual(TEXT("original binding survives all intermediate growth and rehashes"),Memo.Value(FVector2D(0,0),1,3,Height),0.f);
+    TestEqual(TEXT("growth retains the already evaluated sample"),Calls,BeforeGrowthRead);
     Memo.Value(FVector2D(4096,0),0,3,Height);
     TestEqual(TEXT("new coordinate at capacity clears old history"),Memo.Num(),1);
     TestEqual(TEXT("old handle cannot alias a new point after reset"),Memo.Value(FVector2D(0,0),1,3,Height),0.f);
@@ -36,6 +39,15 @@ bool FRaftSimBoundMemoTest::RunTest(const FString&)
     Offset=5;
     TestEqual(TEXT("batch resize keeps coordinates but reevaluates current epoch"),
         Memo.Value(FVector2D(0,0),29,4,Height),5.f);
+    Memo.Reset();Memo.Prepare(45);Calls=0;
+    for(int32 Level=0;Level<3;++Level)Memo.Value(P,Level*15,5,Height);
+    TestEqual(TEXT("different level bindings share one current coordinate sample"),Calls,1);
+    for(int32 Level=0;Level<3;++Level)Memo.Value(P,Level*15,6,Height);
+    TestEqual(TEXT("shared levels never reuse a previous profile epoch"),Calls,2);
+    for(int32 I=0;I<4096;++I)Memo.Value(FVector2D(I,0),44,6,Height);
+    const int32 BeforeOldBindings=Calls;
+    for(int32 Level=0;Level<3;++Level)Memo.Value(P,Level*15,6,Height);
+    TestEqual(TEXT("capacity reset invalidates every level but still deduplicates"),Calls,BeforeOldBindings+1);
     return !HasAnyErrors();
 }
 
@@ -62,7 +74,8 @@ bool FRaftSimBoundMemoRefinementTest::RunTest(const FString&)
         const auto Height=[&](const FVector2D& P)
         {const auto D=(P-XY[12*N+12])*.01;return float((Frame%3 ? 20.+Frame : 0.)*FMath::Exp(-D.SizeSquared()*.3));};
         const FBox2D Detail(XY[10*N+10],XY[14*N+14]);
-        for(auto* W:{&Candidate,&Control})if(!W->BuildAdaptive(XY,Triangles,Height,3,.5f,{},nullptr,
+        const int32 Levels=Frame<24 ? 1+Frame%3 : 3;
+        for(auto* W:{&Candidate,&Control})if(!W->BuildAdaptive(XY,Triangles,Height,Levels,.5f,{},nullptr,
             true,true,Frame>=24 ? &Detail : nullptr,Frame>=24 ? 25.f : 0.f,Frame!=18))return false;
         TestTrue(TEXT("moving/profile/reordered/hole/detail/batch changes preserve all ordered topology"),
             Candidate.MidpointParents==Control.MidpointParents && Candidate.Triangles==Control.Triangles &&

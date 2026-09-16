@@ -1,7 +1,22 @@
 # Remaining requested work
 
-Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
+Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
+
+Latest: [cache memory, completed control cook, and actual stranding](../reconstruction-review-2026-09-07/normal-river-cache-and-contact-review.md).
+The final lower-memory cache is exact but loses one timing order; it remains
+OFF by default. Nine native / 47 focused Python tests PASS. The longer actual
+landward preview strands the raft near station 8364 m with one grounded point
+and about 2.2 m floor freeboard. NEXT identify its exact entering ground contact
+and implement/verify continuous side contact against the SAME source geometry;
+do not hide the failure by moving rocks or reducing collision. The original-
+geometry 600 s cook FINISHED; 550/600 s cell/bank audits PASS, NOT settled.
+Current landward water must continue only from its own state, never this older
+bed. Landward continuation is now LIVE session75302/PID2344 from its own 50 s
+checkpoint toward 600 s; native restart proves all 5,350,400 cells and clock
+exact, with no added context. NEXT completed local step 1000 / absolute 100 s
+audit. All 464 protected hashes unchanged. Visuals, 30 FPS, remaining physics/
+scenes/crew/normalization/release OPEN.
 
 Latest performance experiment: [exact-coordinate binding cache](../reconstruction-review-2026-09-07/crest-bound-memo-comparison.md).
 All 64 actual-input pairs are geometrically exact, but the candidate is slower

@@ -54,11 +54,8 @@ struct FRaftSimSurfaceRefinement
         }
         Bytes+=RetainedFlatParallelValues.GetAllocatedSize();
         for(const auto& Context:RetainedFlatParallelValues)Bytes+=Context.GetAllocatedSize();
-        for(const auto& Level:RetainedBoundValues)
-        {
-            Bytes+=Level.GetAllocatedSize();
-            for(const auto& Context:Level)Bytes+=Context.GetAllocatedSize();
-        }
+        Bytes+=RetainedBoundValues.GetAllocatedSize();
+        for(const auto& Context:RetainedBoundValues)Bytes+=Context.GetAllocatedSize();
         // Diagnostic numeric value for CSV/JSON. Exact for any feasible
         // process allocation (<2^53 bytes); never controls cache ownership.
         return double(Bytes);
@@ -106,8 +103,8 @@ struct FRaftSimSurfaceRefinement
         TArray<TRaftSimCoordinateMap<FProfileMemoSample>> LocalFastParallelValues;
         auto& FastParallelValues=bRetainParallelMemo ? RetainedFastParallelValues : LocalFastParallelValues;
         TArray<TRaftSimCoordinateMap<FProfileMemoSample>> LocalLevelFastValues[3];
-        TArray<FRaftSimBoundCoordinateMemo> LocalBoundValues[3];
-        TArray<FRaftSimBoundCoordinateMemo>* ActiveBoundValues=nullptr;
+        TArray<FRaftSimBoundCoordinateMemo> LocalBoundValues;
+        auto& BoundValues=bRetainParallelMemo ? RetainedBoundValues : LocalBoundValues;
         auto* ActiveFastParallelValues=&FastParallelValues;
         int32 MemoLevel=-1;
         TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> LocalFlatParallelValues;
@@ -119,7 +116,7 @@ struct FRaftSimSurfaceRefinement
         {
             RetainedParallelValues.Reset(); RetainedFastParallelValues.Reset(); RetainedFlatParallelValues.Reset();
             for(auto& Level:RetainedLevelFastValues)Level.Reset();
-            for(auto& Level:RetainedBoundValues)Level.Reset();
+            RetainedBoundValues.Reset();
             ++ProfileMemoEpoch;
         }
         TMap<FVector2D,float>& Values=ProfileValues ? *ProfileValues : LocalValues;
@@ -142,7 +139,7 @@ struct FRaftSimSurfaceRefinement
             if (bParallel)
             {
                 if(bBoundCoordinateMemo)
-                    return (*ActiveBoundValues)[Context].Value(P,Binding,ProfileMemoEpoch,HeightCm);
+                    return BoundValues[Context].Value(P,Binding,ProfileMemoEpoch,HeightCm);
                 if(bFlatCoordinateMemo)
                 {
                     auto& Sample=FlatParallelValues[Context].FindOrAdd(P,4096);
@@ -178,7 +175,10 @@ struct FRaftSimSurfaceRefinement
                     // the same range, hence their difference is <= its width.
                     if(FMath::IsFinite(Width) && Width>=0.f && Width<=ToleranceCm)return false;
                 }
-                const int32 BindingBase=bBoundCoordinateMemo ? (Triangle%ParallelBatchSize)*15 : 0;
+                // Each level keeps distinct triangle bindings, but exact
+                // coordinate samples share ONE bounded table per worker.
+                // Levels join before reuse, and all heights expire together.
+                const int32 BindingBase=bBoundCoordinateMemo ? (MemoLevel*ParallelBatchSize+Triangle%ParallelBatchSize)*15 : 0;
                 const float VA=ShareCorners ? Corners.Get(Triangle,0) : Value(A,Context,BindingBase);
                 const float VB=ShareCorners ? Corners.Get(Triangle,1) : Value(B,Context,BindingBase+1);
                 const float VC=ShareCorners ? Corners.Get(Triangle,2) : Value(C,Context,BindingBase+2);
@@ -215,8 +215,8 @@ struct FRaftSimSurfaceRefinement
                     };
                     if (bBoundCoordinateMemo)
                     {
-                        Prepare(*ActiveBoundValues);
-                        for(int32 I=0;I<Contexts;++I)(*ActiveBoundValues)[I].Prepare(ParallelBatchSize*15);
+                        Prepare(BoundValues);
+                        for(int32 I=0;I<Contexts;++I)BoundValues[I].Prepare(Levels*ParallelBatchSize*15);
                     }
                     else if (bFlatCoordinateMemo) Prepare(FlatParallelValues);
                     else if (bFastCoordinateHash) Prepare(*ActiveFastParallelValues);
@@ -227,8 +227,6 @@ struct FRaftSimSurfaceRefinement
             [&](const TArray<FVector2D>& Points,const TArray<int32>& CurrentTriangles)
             {
                 ++MemoLevel;
-                if(bBoundCoordinateMemo)
-                    ActiveBoundValues=bRetainParallelMemo ? &RetainedBoundValues[MemoLevel] : &LocalBoundValues[MemoLevel];
                 // A batch number refers to a different spatial strip at each
                 // refinement level. Keep its coordinate slots level-local;
                 // all sampled values still expire at this build's new epoch.
@@ -250,7 +248,7 @@ private:
     TArray<TRaftSimCoordinateMap<FProfileMemoSample>> RetainedFastParallelValues;
     TArray<TRaftSimCoordinateMap<FProfileMemoSample>> RetainedLevelFastValues[3];
     TArray<TRaftSimFlatCoordinateMap<FProfileMemoSample>> RetainedFlatParallelValues;
-    TArray<FRaftSimBoundCoordinateMemo> RetainedBoundValues[3];
+    TArray<FRaftSimBoundCoordinateMemo> RetainedBoundValues;
     uint64 ProfileMemoEpoch=0;
     struct FTopologyLevel
     {
