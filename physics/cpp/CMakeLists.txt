@@ -50,6 +50,9 @@ target_link_libraries(raftsim_water_solver PRIVATE raftsim_water)
 add_executable(raftsim_cartesian_cook tools/raftsim_cartesian_cook.cpp)
 target_link_libraries(raftsim_cartesian_cook PRIVATE raftsim_water)
 
+add_executable(raftsim_cartesian_inspect tools/raftsim_cartesian_inspect.cpp)
+target_link_libraries(raftsim_cartesian_inspect PRIVATE raftsim_water)
+
 add_executable(raftsim_water_tests tests/raftsim_water_tests.cpp)
 target_link_libraries(raftsim_water_tests PRIVATE raftsim_water)
 

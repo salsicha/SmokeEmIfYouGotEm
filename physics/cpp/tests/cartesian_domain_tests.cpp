@@ -87,8 +87,10 @@ void compare(const raftsim::Scenario& source, std::size_t across, bool reverse,
     raftsim::CartesianWaterDomain domain(std::move(parts),config());
     const double initial_volume=raftsim::compute_mass(whole.scenario(),whole.state());
     double error=0., flux_error=0.;
-    for (int step=0;step<steps;++step) {
-        whole.step(.005); domain.step(.005);
+    // Also compare the untouched initial state: checkpoint inspection must use
+    // the actual neighbouring ghost layers before ANY advance, not bank walls.
+    for (int step=0;step<=steps;++step) {
+        if(step>0) { whole.step(.005); domain.step(.005); }
         expect(domain.time()==whole.time(),"tile clock differs from whole domain");
         const auto whole_faces=whole.inspect_numerical_mass_flux_grid();
         for (std::size_t tile=0;tile<domain.size();++tile) {
