@@ -29,6 +29,8 @@ def import_candidate_solid(export_directory=None,asset_path=None):
     options.static_mesh_import_data.convert_scene_unit=True
     options.static_mesh_import_data.generate_lightmap_u_vs=False
     options.static_mesh_import_data.auto_generate_collision=False
+    if export.get('shading',{}).get('import_normals_required'):
+        options.static_mesh_import_data.normal_import_method=unreal.FBXNormalImportMethod.FBXNIM_IMPORT_NORMALS
     task=unreal.AssetImportTask();task.filename=str(ROOT/export['fbx'])
     task.destination_path=asset_path.rsplit('/',1)[0];task.destination_name=asset_path.rsplit('/',1)[1]
     task.automated=True;task.replace_existing=False;task.save=False
@@ -47,6 +49,8 @@ def import_candidate_solid(export_directory=None,asset_path=None):
     editor.set_nanite_settings(mesh,settings)
     unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
     assert mesh.get_num_triangles(0)==export['triangle_count']
+    if export.get('shading',{}).get('import_normals_required'):
+        assert not editor.get_lod_build_settings(mesh,0).recompute_normals
     return mesh,export
 
 

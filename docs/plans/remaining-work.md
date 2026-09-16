@@ -3,7 +3,28 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact prepared crest-range spatial index](../reconstruction-review-2026-09-07/prepared-crest-range.md).
+Latest: [source-preserving rock shading and corrected hydraulic context](../reconstruction-review-2026-09-07/landward-rock-shading.md).
+Actual playable comparison reduces triangle-by-triangle rock lighting; source
+geometry/flanks and whitewater remain unaccepted. Independent native readback
+proves all 6,404 directed triangles identical, 9,308 corner normals changed.
+All 30,403 union probes / 12,800 native fields PASS; 114 related Python and six
+restart tests PASS; 464 protected hashes unchanged. Shading remains an opt-in
+local candidate, not a saved-map/default promotion. No new FPS pass.
+IMPORTANT: original landward 1000/1050 s states FAIL exact-dry artificial-bank
+gate at core_0201 south (up to 0.114372 m). Added one existing source-exact dry
+context tile, restarted from its own last clean 950 s state, zero added water.
+Pilot and actual native restart prove all 5,350,400 retained h/u/v cells exact;
+pilot 951 s passes finite/state AND all 86,720 dry bank-face checks, NOT settled.
+CURRENT LIVE session69275 / PID27776, output
+`tmp/south-fork-landward-context950to1200s-v1-20260916`; next completed local1000
+/ absolute1000 s audit. Superseded session84989/PID32068 stopped only after
+verified replacement; all old files retained. Never restart on timeout.
+NEXT source-supported geometry, convincing breaking/froth motion and runtime
+cost/contact gates; inspect later completed corrected-domain states. Colorado
+-> Pacuare -> Futaleufu, other-scene water, crew, normalization, regressions and
+release remain OPEN. Troublemaker remains a rapid, not a scenario.
+
+Previous: [exact prepared crest-range spatial index](../reconstruction-review-2026-09-07/prepared-crest-range.md).
 Corrected spatial membership preserves all 128 actual-input geometry pairs and
 has a small repeated component gain (0.04–0.10 ms), including preparation.
 It is now the default with an independent complete-scan control. Final build
