@@ -1473,6 +1473,19 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
                 *ReviewMaterial->GetPathName());
         }
     }
+#if !UE_BUILD_SHIPPING
+    if(GetWorld() && GetWorld()->GetMapName().EndsWith(TEXT("L_SouthForkAmerican_FullReach")) &&
+        FParse::Param(FCommandLine::Get(),TEXT("RaftSimCurrentFoamCoverageAudit")))
+    {
+        auto* Audit=LoadObject<UMaterialInterface>(nullptr,TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/CurrentFoamAudit/M_CurrentSouthForkFoamAudit"));
+        if(Audit)
+        {
+            LiveVolumeCoreMaterial=Audit;
+            UE_LOG(LogTemp,Display,TEXT("Current foam coverage audit enabled: same carrier; R=final coverage G=GPU ownership B=GPU coverage; diagnostic only"));
+        }
+        else UE_LOG(LogTemp,Error,TEXT("Current foam coverage audit unavailable; no diagnostic acceptance"));
+    }
+#endif
     bLiveVolumeCoreEnabled =
         bLiveSurfaceCarrierEnabled &&
         (RiverWaterConfig->bEnableLiveSolverVolumeCore ||

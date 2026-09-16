@@ -3,7 +3,12 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [integrated full-hull response and exact-source query optimization](../reconstruction-review-2026-09-07/normal-river-full-hull-response.md).
+Latest diagnostic: [current South Fork foam provenance](../reconstruction-review-2026-09-07/current-foam-provenance.md).
+46 native and 17 Python tests PASS; all 464 protected hashes unchanged.
+This adds paired coverage checks and an opt-in provenance view, not a visual or
+30 FPS acceptance. Deformation, breaking and foam motion remain unfinished.
+
+Latest integration: [integrated full-hull response and exact-source query optimization](../reconstruction-review-2026-09-07/normal-river-full-hull-response.md).
 Opt-in full authored/deforming hull contact is now integrated; final build and
 28 native tests PASS. Grouped source-BVH traversal and once-per-vertex coordinate
 conversion preserve exact reference results and reduce same-input query cost.
@@ -13,7 +18,7 @@ NOT whole-river, initial-containment, packaged or default-promotion acceptance.
 All 464 protected asset hashes unchanged. Broad froth/inferred flanks remain
 visually unaccepted; ordinary 30 FPS gate still FAILS (last 17.819710 FPS /
 p95 81.6343 ms). Current-scene paired foam source/density/coverage evidence is
-next, alongside remaining runtime cost and contact qualification. Completed
+now recorded above; runtime cost and contact qualification remain open. Completed
 650/700/750 s hydraulic cell/bank audits PASS, NOT settled. SAME continuation
 session84989 / PID32068 verified live; next completed local 4000 / absolute
 800 s audit. Never restart on observation timeout. Colorado -> Pacuare ->
