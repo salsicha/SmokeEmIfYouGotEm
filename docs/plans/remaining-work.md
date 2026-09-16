@@ -3,7 +3,25 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [matched 50s actual-game comparison](../reconstruction-review-2026-09-07/equal-age-bed-playback.md).
+Latest: [transient inundation and native residency](../reconstruction-review-2026-09-07/inundation-and-residency.md).
+Zero-step native flux/history checks identify initialized upstream storage release:
+203 eastern tiles lose40,519.56m3 by450s; cut discharge121.42 versus inlet45.31m3/s.
+Local flooding peaks150–200s then drains; do not calibrate banks against this
+transient state.400/450/500s state AND86,720 exact-dry bank-face audits PASS,
+NOT settled. SAME solve46094/PID22940 LIVE; next11000/550s both audits.
+54 focused/native-CLI Python tests PASS. Actual streaming-view round trip29669
+exits0: same revised original terrain actor retained through10km-away/return.
+NOT raft traversal, normal project DLL, visual or FPS acceptance. Crucially the
+long run exposes a detailed-water domain failure one frame before handoff5;
+detail is disabled afterward. NEXT reproduce native footprint and fix crop
+coverage/tick ordering for the full detail/closing-window requests, then longer
+actual play with detail remaining active. No clamped samples or fallback water.
+SAME package83678/cook5852/shader5104 LIVE; old35032 finished, preserve inputs.
+Normal relink after terminal cook, settled physical/visual comparison, breaking/
+froth and30FPS remain OPEN, as do all later-river/crew/regression/release tasks.
+Troublemaker remains only a rapid inside the South Fork scenario.
+
+Previous: [matched 50s actual-game comparison](../reconstruction-review-2026-09-07/equal-age-bed-playback.md).
 Original and revised1280x720 captures use the same50s source age, crop and camera;
 full input controls PASS. Original central bowl persists; revised central bowl
 is absent in matched view, but broad froth/bank streaks remain visually unaccepted.

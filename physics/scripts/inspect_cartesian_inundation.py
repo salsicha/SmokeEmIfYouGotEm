@@ -71,28 +71,38 @@ def inspect(cook,steps,packages,solver,center,radius):
     if not manifest_path.is_absolute():manifest_path=ROOT/manifest_path
     checked(manifest_path);checked(cook/'input_manifest.json',sha(manifest_path))
     manifest=json.loads(manifest_path.read_text())
-    require(len(steps)==len(set(steps)) and steps==sorted(steps) and min(steps)>=0,'Distinct increasing nonnegative steps required')
+    require(bool(steps) and all(type(s) is int and s>=0 for s in steps) and len(steps)==len(set(steps)) and steps==sorted(steps),'Distinct increasing nonnegative steps required')
     require(len(packages)==len(set(packages)) and bool(packages),'Distinct nonempty packages required')
     require(np.asarray(center).shape==(2,) and np.isfinite(center).all() and np.isfinite(radius) and radius>0,'Finite center and positive radius required')
     indices=[manifest['packages'].index(name) for name in packages]
+    require(len(manifest['packages'])==len(set(manifest['packages'])),'Repeated manifest package')
+    require([row['name'] for row in manifest['inputs']]==manifest['packages'],'Incomplete or reordered input identities')
     for row in manifest['inputs']:
+        require(set(row['files'])=={'scenario.json','bed.npy','initial_state.npz','features.json','probes.json'},'Incomplete package identities')
         for name,digest in row['files'].items():checked(manifest_path.parent/row['name']/name,digest)
     geometry_path=checked(ROOT/manifest['geometry_manifest'],manifest['geometry_manifest_sha256'])
     geometry=json.loads(geometry_path.read_text());geometry_rows={r['name']:r for r in geometry['regions']}
+    require(geometry['vertical_datum_navd88_m']==manifest['vertical_datum_navd88_m'],'Input/source vertical datum mismatch')
     grids={};beds=[];surfaces=[];water=[];initial=[];local=[];area=None;ny=None;nx=None
     h0=np.load(checked(cook/'frame_000000/h.npy'),mmap_mode='r',allow_pickle=False)
     for index,name in zip(indices,packages):
-        base=manifest_path.parent/name;g=json.loads((base/'scenario.json').read_text())['grid'];grids[index]=g
+        base=manifest_path.parent/name;scenario=json.loads((base/'scenario.json').read_text());g=scenario['grid'];grids[index]=g
+        require(scenario['array_files']==dict(bed='bed.npy',initial_state='initial_state.npz',features='features.json',probes='probes.json'),'Scenario array identities differ from checked inputs')
+        require((g['ny'],g['nx'])==tuple(geometry['core_shape']) and g['dx']==g['dy']==geometry['grid_spacing_m'],'Input/source grid dimensions or spacing mismatch')
         if area is None:ny,nx=g['ny'],g['nx'];area=g['dx']*g['dy']
         require((ny,nx,area)==(g['ny'],g['nx'],g['dx']*g['dy']), 'Different selected grids')
         require(h0.shape==(len(manifest['packages'])*ny,nx),'Invalid initial stacked dimensions')
         r=geometry_rows[name]
+        require([g['origin_x'],g['origin_y']]==r['grid_origin_local_m'],'Input/source grid origin mismatch')
         with np.load(checked(ROOT/r['geometry_file'],r['geometry_sha256']),allow_pickle=False) as a:
             bed=np.load(base/'bed.npy',allow_pickle=False)
             require(np.array_equal(bed,a['bed_navd88_m']-manifest['vertical_datum_navd88_m']),'Input/source bed mismatch')
             beds.append(bed);surfaces.append(a['captured_surface_navd88_m'].astype(float)-manifest['vertical_datum_navd88_m'])
             water.append(a['captured_water_mask'].copy())
-        initial.append(h0[index*ny:(index+1)*ny].copy())
+        initial_depth=h0[index*ny:(index+1)*ny].copy()
+        with np.load(base/'initial_state.npz',allow_pickle=False) as state:
+            require(np.array_equal(initial_depth,state['depth']),'Frame-zero/input depth mismatch')
+        initial.append(initial_depth)
         xx,yy=np.meshgrid(g['origin_x']+np.arange(nx)*g['dx'],g['origin_y']+np.arange(ny)*g['dy'])
         local.append((xx-center[0])**2+(yy-center[1])**2<=radius**2)
     beds,surfaces,water,initial,local=map(np.asarray,(beds,surfaces,water,initial,local))
@@ -121,7 +131,7 @@ def inspect(cook,steps,packages,solver,center,radius):
         current['interval_selected_volume_rate_m3s']=(current['native']['selected_volume_m3']-previous['native']['selected_volume_m3'])/dt
     return dict(schema='raftsim.cartesian_inundation_inspection.v1',packages=packages,
         local_center_field_m=center,local_radius_m=radius,history=history,dependencies=dependencies,
-        scope='Native fluxes enclose all selected tiles; local-circle metrics have NO corresponding flux measurement. Source water mask and captured stage are historical source observations, not a current-flow shoreline calibration. Instantaneous net inflow is not a time-integrated budget or a cause identified by itself.',
+        scope='Native fluxes enclose all selected tiles; local-circle metrics cover selected cells inside the circle and have NO corresponding flux measurement. Source water mask and captured stage are historical source observations, not a current-flow shoreline calibration. Instantaneous net inflow is not a time-integrated budget or a cause identified by itself.',
         settling_accepted=False,visual_accepted=False,normal_map_integrated=False)
 
 
