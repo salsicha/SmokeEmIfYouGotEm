@@ -1,5 +1,9 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimGroundSourceRegistry.h"
+#include "RaftSimGroundContactAudit.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "Misc/Paths.h"
 
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
@@ -19,7 +23,7 @@ void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collec
 void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 {
     // Release the contact registry's world delegates before subsystem teardown.
-    if (RaftRuntime) RaftRuntime->SetGroundSurfaceSampler({});
+    if (RaftRuntime) { RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
     WaterRuntime = nullptr;
     RaftRuntime = nullptr;
     Super::Deinitialize();
@@ -86,6 +90,20 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
         // height-field data to the selected reduced runtime instead. Physical
         // source Landscapes take precedence; maps without one use solver bed.
         const auto GroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
+        RaftRuntime->SetGroundContactObserver({});
+#if !UE_BUILD_SHIPPING
+        FString ContactAuditPath;
+        if(FParse::Value(FCommandLine::Get(),TEXT("RaftSimGroundContactAudit="),ContactAuditPath))
+        {
+            if(FPaths::FileExists(ContactAuditPath))
+            { UE_LOG(LogTemp,Error,TEXT("Refusing to overwrite existing ground contact evidence: %s"),*ContactAuditPath); }
+            else
+            {
+                const auto Audit=MakeShared<FRaftSimGroundContactAudit>(GetWorld(),GroundSources,ContactAuditPath);
+                RaftRuntime->SetGroundContactObserver([Audit](const FRaftSimGroundContactObservation& O){Audit->Record(O);});
+            }
+        }
+#endif
         RaftRuntime->SetGroundSurfaceSampler(
             [WeakWater, GroundSources](
                 const FVector& WorldPositionCm,

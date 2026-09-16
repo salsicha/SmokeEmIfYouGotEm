@@ -48,7 +48,8 @@ public:
     uint32 GetRefreshCount() const { return RefreshCount; }
     // The same captured triangles/landscape used for solid raft contact.
     // No solver-bed fallback: missing physical geometry remains unknown.
-    bool SampleGround(const FVector& WorldPositionCm, double& OutGroundZCm, FVector& OutGroundNormal);
+    bool SampleGround(const FVector& WorldPositionCm, double& OutGroundZCm, FVector& OutGroundNormal,
+        FHitResult* OutCapturedHit=nullptr);
     TArray<TWeakObjectPtr<ALandscapeProxy>> Landscapes;
     TArray<TWeakObjectPtr<UStaticMeshComponent>> Meshes;
 private:

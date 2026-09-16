@@ -701,6 +701,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
                 1.0e-3);
         double VerticalCorrectionM = 0.0;
         FVector DeepestContactNormal = FVector::UpVector;
+        FVector DeepestLocalSupport=FVector::ZeroVector;
+        double DeepestGroundZCm=0;
         for (const FVector& LocalM : TubeSamplePointsM)
         {
             const FVector WorldOffset = State.Orientation.RotateVector(LocalM);
@@ -728,6 +730,8 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
             if (PenetrationM > VerticalCorrectionM)
             {
                 VerticalCorrectionM = PenetrationM;
+                DeepestLocalSupport=LocalM;
+                DeepestGroundZCm=GroundZCm;
                 DeepestContactNormal = GroundNormal.GetSafeNormal();
                 if (DeepestContactNormal.IsNearlyZero() ||
                     DeepestContactNormal.Z < 0.05)
@@ -739,6 +743,19 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
 
         if (VerticalCorrectionM > 0.0)
         {
+            if(GroundContactObserver)
+            {
+                FRaftSimGroundContactObservation Observation;
+                Observation.PreviousPoseCm=FTransform(PreviousFiniteState.Orientation,PreviousFiniteState.Position*100.);
+                Observation.PredictedPoseCm=FTransform(State.Orientation,State.Position*100.);
+                Observation.LocalSupportMeters=DeepestLocalSupport;
+                Observation.VelocityBeforeProjectionMps=State.LinearVelocity;
+                Observation.ContactNormal=DeepestContactNormal;
+                Observation.RadiusMeters=ContactRadiusM;Observation.GroundZCm=DeepestGroundZCm;
+                Observation.VerticalCorrectionMeters=VerticalCorrectionM;
+                Observation.SubstepSeconds=Dt;Observation.MassKg=MassKg;
+                GroundContactObserver(Observation);
+            }
             // Terrain is a height field, so vertical projection is the exact
             // minimum translation that clears the deepest sampled tube. Clip
             // inward velocity along its normal and damp contact motion; this

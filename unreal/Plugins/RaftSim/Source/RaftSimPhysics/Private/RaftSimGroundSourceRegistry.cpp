@@ -5,10 +5,11 @@
 CSV_DEFINE_CATEGORY(RaftSimGround,true);
 
 bool FRaftSimGroundSourceRegistry::SampleGround(const FVector& WorldPositionCm,
-    double& OutGroundZCm, FVector& OutGroundNormal)
+    double& OutGroundZCm, FVector& OutGroundNormal,FHitResult* OutCapturedHit)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimGround,Sample);
     OutGroundZCm=0.; OutGroundNormal=FVector::UpVector;
+    if(OutCapturedHit)*OutCapturedHit=FHitResult();
     if (WorldPositionCm.ContainsNaN()) return false;
     RefreshIfDirty();
     // The survey mesh and hydraulic bed share a source, but a
@@ -18,6 +19,7 @@ bool FRaftSimGroundSourceRegistry::SampleGround(const FVector& WorldPositionCm,
     TOptional<double> CapturedGroundZCm;
     FVector CapturedNormal = FVector::UpVector;
     FCollisionQueryParams Params(SCENE_QUERY_STAT(RaftSimCapturedGround), true);
+    Params.bReturnFaceIndex=OutCapturedHit!=nullptr;
     for (const TWeakObjectPtr<UStaticMeshComponent>& WeakMesh : Meshes)
     {
         UStaticMeshComponent* Mesh = WeakMesh.Get();
@@ -36,6 +38,7 @@ bool FRaftSimGroundSourceRegistry::SampleGround(const FVector& WorldPositionCm,
             // bBlockingHit as a world-channel trace would.
             CapturedGroundZCm = Hit.ImpactPoint.Z;
             CapturedNormal = Hit.ImpactNormal.GetSafeNormal();
+            if(OutCapturedHit)*OutCapturedHit=Hit;
         }
     }
     if (CapturedGroundZCm.IsSet())
