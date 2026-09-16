@@ -3,7 +3,23 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [SM5 cook failure and verified shader corrections](../reconstruction-review-2026-09-07/sm5-cook-recovery.md).
+Latest: [compact exact addition and SM5 recovery](../reconstruction-review-2026-09-07/compact-portable-add.md).
+Candidate committed d9aee8cac, NOT wired into production.36 Python tests and
+64,078 compiled shader-source CPU cases PASS. Actual candidate/original GPU
+comparison queued95612 after SAME editor build87748/PID12368 succeeds.
+Preparation explicit-unroll probe
+13666 FINISHED successfully; compact-add-only preparation FAILED; combined
+compact-add/explicit-bounds preparation PASS. All pressure2/4/9/11 probes PASS;
+pressure96639 is TERMINAL0. Transport21 session1965 and other distinct transport
+inputs session27413 need same-job completion, not restarts. No production
+shader edits before queued candidate GPU comparison. Full cook and packaged
+444-source checks still OPEN.
+SAME hydraulic18716/session69416:1600s state and all86,720 dry bank-face checks
+PASS, NOT settled (87.916530out vs45.306955in). NEXT local9000/absolute1650s.
+Last ordinary17.819710FPS/p9581.6343ms still FAILS30FPS. Visual, physical,
+normal-play integration, later rivers, crew, regressions and release remain OPEN.
+
+Previous: [SM5 cook failure and verified shader corrections](../reconstruction-review-2026-09-07/sm5-cook-recovery.md).
 Package session80881 is TERMINAL FAILED (UAT25, cook3):36 SM5 shader errors;
 no archive exists. Do not keep polling old cook16144 or restart unchanged.
 Fixed prescribed-normal variable-index stores and group-uniform acceleration
