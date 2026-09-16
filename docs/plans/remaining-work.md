@@ -3,7 +3,24 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [editor split, rejected optimization and hydraulic continuation](../reconstruction-review-2026-09-07/editor-split-and-range-rejection.md).
+Latest: [startup water ordering and hydraulic continuation](../reconstruction-review-2026-09-07/startup-water-ordering.md).
+Water now initializes after checkpoint restoration at the actual rapid, not the
+authored launch. Consumer-side tick dependency handles late-streamed carriers;
+native four-test replay PASS and targeted Python80 PASS. Isolated compiled/linked
+candidate only; installed modules/assets unchanged. First startup image STILL
+dry, even with separate PSO-delay/render-lag diagnostic overrides; visual issue
+remains OPEN. All24 frames retained per replay; no capture warmup skip or FPS claim.
+Full candidate eight-handoff detail replay29793/PID25548 LIVE, unchanged gates;
+runner temporarily owns pause/resume of cook11316 and SM5 editor35584/worker34968.
+1150/1200 hydraulic state AND all86,720 exact-dry bank checks PASS, NOT settled;
+1200 outflow74.629022 versus inflow45.306955m3/s. Next1250/local13000 both audits.
+Last ordinary22.560934FPS/p9553.9323ms still FAIL30. NEXT initial render submission,
+full detail replay result, coupled nonlinear-water integration, source-consistent
+terrain/rapid/wave/froth review, source closure/default-menu delivery, sustained
+30FPS, normalization, Colorado -> Pacuare -> Futaleufu, all-scene water, crew and
+release gates. Troublemaker is a rapid inside South Fork, never a menu scenario.
+
+Previous: [editor split, rejected optimization and hydraulic continuation](../reconstruction-review-2026-09-07/editor-split-and-range-rejection.md).
 FullReach editor source split below the unchanged3,000-line gate; all moved
 implementation blocks preserved, three independent compiles and isolated full
 editor DLL link93500 TERMINAL0. Installed modules/assets unchanged. All1,133

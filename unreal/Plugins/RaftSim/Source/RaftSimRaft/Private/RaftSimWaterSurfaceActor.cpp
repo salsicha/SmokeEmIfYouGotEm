@@ -1,4 +1,5 @@
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimRunCoordinateProvider.h"
 #include "RaftSimCartesianHydraulicRelief.h"
 #include "RaftSimBreakingTileAudit.h"
 #include "RaftSimWetEdgeAudit.h"
@@ -1075,7 +1076,17 @@ FVector2D ARaftSimWaterSurfaceActor::ComputeBreakingDownstreamBoilPresentation(
 void ARaftSimWaterSurfaceActor::BeginPlay()
 {
     Super::BeginPlay();
-    TryInitializeRuntimeSurface();
+    // The carrier can arrive through World Partition after the run manager's
+    // BeginPlay. Bind here, on the consumer, and let the first ordered tick
+    // build the surface after any checkpoint/section-start water transaction.
+    // BeginPlay itself is not tick-ordered and must not publish the old launch.
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        if (Cast<IRaftSimRunCoordinateProvider>(*It))
+        {
+            AddTickPrerequisiteActor(*It);
+        }
+    }
 }
 
 bool ARaftSimWaterSurfaceActor::TryInitializeRuntimeSurface()

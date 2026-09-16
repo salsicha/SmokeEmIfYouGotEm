@@ -6,12 +6,35 @@
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
 #include "Misc/FileHelper.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimStartupWaterOrderingTest,"RaftSim.Survey.StartupWaterAfterSessionRestore",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimStartupWaterOrderingTest::RunTest(const FString&)
+{
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);
+    if (!World) return false;
+    ON_SCOPE_EXIT { World->DestroyWorld(false); World->RemoveFromRoot(); };
+    auto* Run=World->SpawnActor<ARaftSimRunManager>();
+    // No water carrier exists when the run starts: exercise consumer-side
+    // registration independently of the producer's BeginPlay iteration.
+    Run->DispatchBeginPlay();
+    auto* Surface=World->SpawnActor<ARaftSimWaterSurfaceActor>();
+    Surface->DispatchBeginPlay();
+    bool bFound=false;
+    for (const FTickPrerequisite& Prerequisite : Surface->PrimaryActorTick.GetPrerequisites())
+        bFound |= Prerequisite.Get()==&Run->PrimaryActorTick;
+    TestTrue(TEXT("late-streamed water tick waits for session restore"),bFound);
+    TestEqual(TEXT("no reverse tick dependency/cycle"),Run->PrimaryActorTick.GetPrerequisites().Num(),0);
+    TestEqual(TEXT("water retains ordinary prephysics tick group"),Surface->PrimaryActorTick.TickGroup.GetValue(),TG_PrePhysics);
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimReconstructedSessionContractsTest,"RaftSim.Survey.ReconstructedSessionContracts",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 bool FRaftSimReconstructedSessionContractsTest::RunTest(const FString&)
