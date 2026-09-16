@@ -6,9 +6,12 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import sys
 import unreal
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT/'physics/scripts'))
+from source_asset_retention import retained_asset_digest
 SOURCE = ROOT/'unreal/SourceArt/RaftSim/SouthForkCompositeTerrain20260912/Tiles/manifest.json'
 ASSETS = '/Game/RaftSim/Environment/SouthForkReconstruction/FullReach/Tiles'
 REPORT = ROOT/'unreal/Saved/RaftSimValidation/south-fork-composite-tiles-20260912.json'
@@ -61,7 +64,7 @@ def main(source_path=SOURCE, asset_directory=ASSETS, report_path=REPORT,
         asset = ASSETS+'/'+tile['asset_name']
         asset_file = ROOT/'unreal/Content'/(asset.removeprefix('/Game/')+'.uasset')
         if asset in previous:
-            assert sha(asset_file) == previous[asset]['asset_sha256']
+            retained_asset_digest(asset_file, previous[asset]['asset_sha256'])
             assert previous[asset]['fbx_sha256'] == tile['fbx_sha256']
             continue
         if PAUSE_REQUEST.exists() or shutil.disk_usage(ROOT).free < 4*1024**3:
@@ -81,6 +84,7 @@ def main(source_path=SOURCE, asset_directory=ASSETS, report_path=REPORT,
         unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
         mesh = unreal.load_asset(asset)
         assert isinstance(mesh, unreal.StaticMesh)
+        mesh.set_editor_property('allow_cpu_access', True)
         bounds = mesh.get_bounding_box()
         actual = [[bounds.min.x, bounds.min.y, bounds.min.z], [bounds.max.x, bounds.max.y, bounds.max.z]]
         assert max(abs(actual[i][j]-tile['expected_unreal_bounds_cm'][i][j]) for i in range(2) for j in range(3)) < .1

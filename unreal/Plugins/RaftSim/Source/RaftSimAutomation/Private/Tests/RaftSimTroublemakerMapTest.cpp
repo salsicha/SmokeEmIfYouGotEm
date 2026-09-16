@@ -2453,13 +2453,24 @@ bool FRaftSimAssertSouthForkSupportParityCommand::Update()
     Test->TestNotNull(TEXT("South Fork full reach has a water runtime"), Water);
     int32 FullReachBoulderContactCount = 0;
     int32 TroublemakerBoulderContactCount = 0;
+    // The generator persists deterministic object names; editor labels are
+    // stripped by cooking. Keep the same twelve catalog identities in clients.
+    TSet<FName> TroublemakerContactNames;
+    for(int32 Index=0;Index<12;++Index)
+    {
+        const FString Label=FString::Printf(TEXT("RaftSim_SouthFork_D4_Boulder_08_%02d"),Index);
+        const FString Key=FString::Printf(TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach|%s|%s"),
+            *ARaftSimRockObstacleActor::StaticClass()->GetPathName(),*Label);
+        TroublemakerContactNames.Add(FName(*FString::Printf(TEXT("RaftSim_%s"),
+            *FGuid::NewDeterministicGuid(Key).ToString(EGuidFormats::Digits))));
+    }
     bool bAllBoulderContactsAreProxyOnly = true;
     for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
     {
         if (It->ActorHasTag(TEXT("RaftSimFullReachBoulderContact")))
         {
             ++FullReachBoulderContactCount;
-            if (It->GetActorLabel().Contains(TEXT("D4_Boulder_08_")))
+            if (TroublemakerContactNames.Contains(It->GetFName()))
             {
                 ++TroublemakerBoulderContactCount;
             }

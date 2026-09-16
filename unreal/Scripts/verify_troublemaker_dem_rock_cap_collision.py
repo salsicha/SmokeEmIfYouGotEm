@@ -37,6 +37,7 @@ def import_candidate_solid(export_directory=None,asset_path=None):
     task.factory=unreal.FbxFactory();task.options=options
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
     mesh=unreal.load_asset(asset_path);assert isinstance(mesh,unreal.StaticMesh)
+    mesh.set_editor_property('allow_cpu_access',True)
     bounds=mesh.get_bounding_box()
     actual=[[bounds.min.x,bounds.min.y,bounds.min.z],[bounds.max.x,bounds.max.y,bounds.max.z]]
     assert max(abs(actual[i][j]-export['expected_unreal_bounds_cm'][i][j]) for i in range(2) for j in range(3))<.1

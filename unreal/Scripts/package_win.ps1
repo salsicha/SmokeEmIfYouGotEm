@@ -37,4 +37,5 @@ if (-not (Test-Path $ZambeziMap)) {
     -archive -archivedirectory="$OutputDir" `
     -nop4 -utf8output -unattended
 
+if ($LASTEXITCODE -ne 0) { throw "Windows packaging failed with exit code $LASTEXITCODE" }
 Write-Host "Packaged: $OutputDir"

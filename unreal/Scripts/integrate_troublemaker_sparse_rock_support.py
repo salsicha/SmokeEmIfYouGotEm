@@ -70,6 +70,7 @@ def main():
     unreal.AssetToolsHelpers.get_asset_tools().import_asset_tasks([task])
     mesh = unreal.load_asset(ASSETS+'/'+NAME)
     assert isinstance(mesh, unreal.StaticMesh)
+    mesh.set_editor_property('allow_cpu_access', True)
     bounds = mesh.get_bounding_box()
     actual = [[bounds.min.x,bounds.min.y,bounds.min.z],[bounds.max.x,bounds.max.y,bounds.max.z]]
     assert max(abs(actual[i][j]-export['expected_unreal_bounds_cm'][i][j]) for i in range(2) for j in range(3)) < 2

@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from source_asset_retention import retained_asset_digest
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = ROOT/'physics/data/real_world/south_fork_american_chili_bar/reconstruction_2026_09/full_reach'
@@ -96,13 +97,13 @@ def prepare(runtime_export, inventory_path):
         imported = {row['asset'].rsplit('/', 1)[1]: row for row in report['tiles']}
         for tile in source['tiles']:
             record = imported[tile['asset_name']]
-            assert sha(asset_file(record['asset'])) == record['asset_sha256'], record['asset']
+            current_asset_sha256 = retained_asset_digest(asset_file(record['asset']), record['asset_sha256'])
             assert tile['fbx_sha256'] == record['fbx_sha256']
             assert tile['triangle_count'] == record['triangle_count']
             assert tile['actor_translation_cm'] == record['actor_translation_cm']
             assert tile['actor_scale'] == [1., -1., 1.]
             assert record['collision_probe_count'] > 0 and record['maximum_collision_error_cm'] < .1
-            actors.append(dict(asset=record['asset'], asset_sha256=record['asset_sha256'],
+            actors.append(dict(asset=record['asset'], asset_sha256=current_asset_sha256,
                 role='coarse_terrain' if directory == 'Tiles' else 'captured_context',
                 translation_cm=tile['actor_translation_cm'], scale=tile['actor_scale'],
                 rotation_degrees=[0., 0., 0.], material_override=material,
@@ -124,7 +125,7 @@ def prepare(runtime_export, inventory_path):
         if role == 'retained_rapid':
             validate_rapid_geometry_binding(composite, export, evidence)
             assert evidence['mesh'] == package
-            assert sha(asset_file(package)) == evidence['mesh_sha256'], 'Rapid collision proof is stale for the imported asset'
+            retained_asset_digest(asset_file(package), evidence['mesh_sha256'])
         assert sha(ROOT/export['fbx']) == export['fbx_sha256']
         assert export['source_geometry_sha256'] == evidence['source_geometry_sha256']
         assert evidence['collision_probe_count'] > 0 and evidence['maximum_collision_error_cm'] < .1
