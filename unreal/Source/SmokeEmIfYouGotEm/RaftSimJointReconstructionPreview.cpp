@@ -2,6 +2,7 @@
 #include "RaftSimLiveWaterWindow.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimGroundSourceLibrary.h"
 #include "Components/StaticMeshComponent.h"
 #include "Dom/JsonObject.h"
 #include "Engine/StaticMesh.h"
@@ -65,6 +66,18 @@ bool Vector(const TSharedPtr<FJsonObject>& Object,const TCHAR* Key,TArray<double
     }
     return true;
 }
+
+bool NativeSourceMatches(UStaticMesh* Mesh,const TSharedPtr<FJsonObject>& Expected,double TriangleCount)
+{
+    if (!Mesh || !Expected.IsValid()) return false;
+    const FString Text=URaftSimGroundSourceLibrary::AuditCollisionSource(Mesh);
+    TSharedPtr<FJsonObject> Actual;FString Digest;double ActualCount=0.;
+    return FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text),Actual) &&
+        Flag(Actual,TEXT("available"),true) && Flag(Actual,TEXT("allow_cpu_access"),true) &&
+        Expected->TryGetStringField(TEXT("collision_source_sha256"),Digest) && Digest.Len()==64 &&
+        String(Actual,TEXT("collision_source_sha256"),Digest) &&
+        Actual->TryGetNumberField(TEXT("triangle_count"),ActualCount) && ActualCount==TriangleCount;
+}
 }
 #endif
 
@@ -76,7 +89,8 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     Error=TEXT("Invalid joint-preview manifest; nothing installed");
     const FString Resolved=Resolve(ManifestPath);
     const auto Root=Read(Resolved);
-    if (!String(Root,TEXT("schema"),TEXT("raftsim.south_fork_joint_preview.v1")) ||
+    const bool bTerrainRevision=String(Root,TEXT("schema"),TEXT("raftsim.south_fork_joint_preview.v2"));
+    if ((!bTerrainRevision && !String(Root,TEXT("schema"),TEXT("raftsim.south_fork_joint_preview.v1"))) ||
         !Flag(Root,TEXT("candidate"),true) || !Flag(Root,TEXT("production_promoted"),false) ||
         !String(Root,TEXT("target_level"),TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"))) return false;
     const TSharedPtr<FJsonObject>* Dependencies=nullptr;
@@ -117,6 +131,7 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     const auto Snapshot=Read(Resolve(Files[TEXT("snapshot_audit")]));
     const auto Banks=Read(Resolve(Files[TEXT("bank_audit")]));
     const auto Coverage=Read(Resolve(Files[TEXT("coverage_audit")]));
+    if (!Geometry.IsValid() || Geometry->HasField(TEXT("terrain_revision"))!=bTerrainRevision) return false;
     const TSharedPtr<FJsonObject>* Union=nullptr;const TSharedPtr<FJsonObject>* AtlasUnion=nullptr;
     TArray<double> VerifiedTranslation;
     if (!Geometry.IsValid() || !Atlas.IsValid() || !Geometry->TryGetObjectField(TEXT("terrain_union"),Union) ||
@@ -172,6 +187,67 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     UStaticMesh* Mesh=LoadObject<UStaticMesh>(nullptr,*MeshPath);
     UMaterialInterface* Material=LoadObject<UMaterialInterface>(nullptr,*MaterialPath);
     if (!Mesh || !Material) { Error=TEXT("Missing verified preview mesh/material");return false; }
+    AStaticMeshActor* TerrainActor=nullptr;UStaticMesh* RevisedTerrain=nullptr;
+    if (bTerrainRevision)
+    {
+        const TSharedPtr<FJsonObject>* Terrain=nullptr;
+        const TSharedPtr<FJsonObject>* Revision=nullptr;const TSharedPtr<FJsonObject>* SourceRevision=nullptr;
+        const TSharedPtr<FJsonObject>* AtlasRevision=nullptr;const TSharedPtr<FJsonObject>* OriginalSource=nullptr;
+        const TSharedPtr<FJsonObject>* RevisedSource=nullptr;const TSharedPtr<FJsonObject>* Proof=nullptr;
+        FString RevisedPath,RevisedFile,RevisedHash,OriginalHash,SourceHash,OriginalSourceHash;
+        double Triangles=0.,Compared=0.;TArray<double> TerrainTranslation,TerrainScale;
+        const FString OriginalPath=TEXT("/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround");
+        const FString OriginalFile=TEXT("unreal/Content/")+OriginalPath.RightChop(6)+TEXT(".uasset");
+        if (!Collision->TryGetObjectField(TEXT("terrain_replacement"),Terrain) || !Terrain->IsValid() ||
+            !Flag(*Terrain,TEXT("saved_mesh_verified"),true) ||
+            !Flag(*Terrain,TEXT("original_actor_reused"),true) ||
+            !Flag(*Terrain,TEXT("second_ground_actor_added"),false) ||
+            !Flag(*Terrain,TEXT("original_material_preserved"),true) ||
+            !String(*Terrain,TEXT("original_mesh_asset"),OriginalPath) ||
+            !String(*Terrain,TEXT("material_asset"),MaterialPath) ||
+            !(*Terrain)->TryGetStringField(TEXT("mesh_asset"),RevisedPath) ||
+            !RevisedPath.StartsWith(TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/")) ||
+            !(*Terrain)->TryGetStringField(TEXT("mesh_file"),RevisedFile) ||
+            RevisedFile!=TEXT("unreal/Content/")+RevisedPath.RightChop(6)+TEXT(".uasset") ||
+            !(*Terrain)->TryGetStringField(TEXT("mesh_sha256"),RevisedHash) ||
+            !(*Terrain)->TryGetStringField(TEXT("original_mesh_sha256"),OriginalHash) ||
+            !Hashes.Contains(RevisedFile) || Hashes[RevisedFile]!=RevisedHash ||
+            !Hashes.Contains(OriginalFile) || Hashes[OriginalFile]!=OriginalHash ||
+            !Vector(*Terrain,TEXT("translation_cm"),TerrainTranslation,3) || TerrainTranslation!=Translation ||
+            !Vector(*Terrain,TEXT("scale"),TerrainScale,3) || TerrainScale!=Scale ||
+            !Geometry->TryGetObjectField(TEXT("terrain_revision"),Revision) || !Revision->IsValid() ||
+            !(*Terrain)->TryGetObjectField(TEXT("source_revision"),SourceRevision) ||
+            !(*AtlasUnion)->TryGetObjectField(TEXT("terrain_revision"),AtlasRevision) ||
+            !(*Revision)->TryGetStringField(TEXT("revised_geometry_sha256"),SourceHash) ||
+            !(*Revision)->TryGetStringField(TEXT("original_geometry_sha256"),OriginalSourceHash) ||
+            !String(*SourceRevision,TEXT("revised_geometry_sha256"),SourceHash) ||
+            !String(*SourceRevision,TEXT("original_geometry_sha256"),OriginalSourceHash) ||
+            !String(*AtlasRevision,TEXT("revised_geometry_sha256"),SourceHash) ||
+            !String(*AtlasRevision,TEXT("original_geometry_sha256"),OriginalSourceHash) ||
+            !(*Terrain)->TryGetObjectField(TEXT("original_native_source"),OriginalSource) ||
+            !(*Terrain)->TryGetObjectField(TEXT("revised_native_source"),RevisedSource) ||
+            !(*Terrain)->TryGetNumberField(TEXT("triangle_count"),Triangles) || Triangles<=0. ||
+            !(*Terrain)->TryGetObjectField(TEXT("exact_native_replacement"),Proof) || !Proof->IsValid() ||
+            !Flag(*Proof,TEXT("unmodified_native_corners_bit_exact"),true) ||
+            !Flag(*Proof,TEXT("registered_xy_and_winding_bit_exact"),true) ||
+            !(*Proof)->TryGetNumberField(TEXT("all_directed_triangles_compared"),Compared) || Compared!=Triangles)
+        { Error=TEXT("Missing or inconsistent source-matched terrain replacement");return false; }
+        UStaticMesh* OriginalTerrain=LoadObject<UStaticMesh>(nullptr,*OriginalPath);
+        RevisedTerrain=LoadObject<UStaticMesh>(nullptr,*RevisedPath);
+        if (!NativeSourceMatches(OriginalTerrain,*OriginalSource,Triangles) ||
+            !NativeSourceMatches(RevisedTerrain,*RevisedSource,Triangles))
+        { Error=TEXT("Native terrain source differs from verified collision geometry");return false; }
+        int32 TerrainCount=0;
+        for (TActorIterator<AStaticMeshActor> It(World);It;++It)
+        {
+            if (It->Tags.Contains(TEXT("RaftSimPhysicalGround")) && It->GetStaticMeshComponent()->GetStaticMesh()==OriginalTerrain)
+            { TerrainActor=*It;++TerrainCount; }
+        }
+        const FTransform Expected(FQuat::Identity,FVector(Translation[0],Translation[1],Translation[2]),FVector(1.,-1.,1.));
+        if (TerrainCount!=1 || !TerrainActor->GetActorTransform().Equals(Expected,.001) ||
+            TerrainActor->GetStaticMeshComponent()->GetMaterial(0)!=Material)
+        { Error=TEXT("Verified original rapid actor must be loaded before paired terrain/water activation");return false; }
+    }
     // Exercise the real loader before touching the saved-map configuration.
     TStrongObjectPtr<URaftSimWaterRuntimeAdapter> Trial(NewObject<URaftSimWaterRuntimeAdapter>());
     FRaftSimWaterRuntimeConfig Runtime;Runtime.bRequireAcceptedReportManifest=false;
@@ -188,12 +264,17 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     auto* Component=Actor->GetStaticMeshComponent();
     if (!Component->SetStaticMesh(Mesh)) { Actor->Destroy();return false; }
     Component->SetMaterial(0,Material);Component->SetCollisionProfileName(TEXT("BlockAll"));
+    if (TerrainActor && !TerrainActor->GetStaticMeshComponent()->SetStaticMesh(RevisedTerrain))
+    { Actor->Destroy();Error=TEXT("Could not replace original terrain; paired water not installed");return false; }
     Actor->Tags.Add(TEXT("RaftSimPhysicalGround"));Actor->Tags.Add(TEXT("RaftSimJointReconstructionPreview"));
     Actor->SetActorLabel(TEXT("UNACCEPTED joint source-rock / water preview"));
     Config->CookedFieldsDir=FieldsDir;Config->StreamingManifestPath=Files[TEXT("streaming_manifest")];
     Config->CoordinateMapPath=Files[TEXT("coordinate_map")];Config->WindowCenterM=FVector2D(Center[0],Center[1]);
     Config->WindowExtentM=224.f;Config->MovingWindowStationExtentM=224.f;Config->MovingWindowLateralExtentM=224.f;
     Config->FlowBand=TEXT("median_runnable");Config->bRecenterHydraulicCrux=false;
+    if (TerrainActor)
+        UE_LOG(LogTemp,Display,TEXT("RaftSim verified terrain replacement installed on original actor=%s mesh=%s before paired water BeginPlay"),
+            *TerrainActor->GetName(),*RevisedTerrain->GetPathName());
     UE_LOG(LogTemp,Display,TEXT("RaftSim joint reconstruction preview installed before BeginPlay: cap=%s source_time=%.9f actor=%s streaming=%s candidate_only=true"),
         *CapHash,AtlasTime,*Actor->GetName(),*Config->StreamingManifestPath);
     Error.Reset();return true;

@@ -28,6 +28,8 @@ def prepare(export,probes_path,output):
     atlas=json.loads(atlas_path.read_text());stream_path=export/'streaming_manifest.json';stream=json.loads(stream_path.read_text())
     if atlas['dry_tolerance']!=1.e-6:raise ValueError('Changed solver dry threshold')
     if atlas['terrain_union']['cap_sha256']!=probes['source_cap_sha256']:raise ValueError('Different source solid in atlas')
+    if atlas['terrain_union'].get('terrain_revision')!=probes.get('terrain_revision'):
+        raise ValueError('Different registered bed revision in atlas and collision probes')
     rows=[p for p in probes['combined'] if p['kind']=='union_hydraulic_cell']
     points=np.array([p['world_position_cm'][:2] for p in rows])*[.01,-.01]
     cells=exact_cells(points,[t['origin_m'] for t in atlas['tiles']],atlas['tile_shape'],atlas['grid_spacing_m'])

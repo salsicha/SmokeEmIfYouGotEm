@@ -80,7 +80,8 @@ def verify_audits(atlas, snapshot, banks, coverage, atlas_hash, stream_hash):
     require(atlas['arrays']['h']['sha256'] == banks['h_sha256'], 'Bank audit has different water')
 
 
-def verify_native_state(collision, atlas_hash, source_time, fields_manifest, fields_hash, center, geometry_hash):
+def verify_native_state(collision, atlas_hash, source_time, fields_manifest, fields_hash, center, geometry_hash,
+                        expected_queries=12800):
     """A successful old loader run is not proof of this preview's initial state."""
     runtime = collision.get('native_runtime') or {}
     require(collision.get('failures') == [] and
@@ -94,9 +95,47 @@ def verify_native_state(collision, atlas_hash, source_time, fields_manifest, fie
     require(isinstance(time, (int, float)) and not isinstance(time, bool) and math.isfinite(time) and
             abs(time - source_time) <= 1e-9, 'Native source time mismatch')
     require(runtime.get('window_center_m') == list(center), 'Native window center mismatch')
-    require(type(runtime.get('query_count')) is int and runtime['query_count'] == 12800 and
+    require(type(expected_queries) is int and expected_queries >= 12800 and expected_queries % 6400 == 0,
+            'Complete changed-core query coverage required')
+    require(type(runtime.get('query_count')) is int and runtime['query_count'] == expected_queries and
             runtime.get('wet_mismatches') == 0 and type(runtime.get('solver_steps_run')) is int and
             runtime['solver_steps_run'] == 0, 'Native initial query coverage mismatch')
+
+
+def bind_terrain_replacement(deps,geometry,collision,material,translation):
+    revision=geometry.get('terrain_revision')
+    terrain=collision.get('terrain_replacement')
+    if revision is None:
+        require(terrain is None,'Unrequested native terrain replacement')
+        return
+    require(isinstance(terrain,dict) and terrain.get('saved_mesh_verified') is True,
+            'Revised-bed play requires a fresh saved-mesh native verification')
+    require(terrain.get('source_revision')==revision and
+            geometry['terrain_union'].get('terrain_revision')==revision,'Different revised terrain')
+    require(terrain.get('original_actor_reused') is True and terrain.get('second_ground_actor_added') is False and
+            terrain.get('original_material_preserved') is True,'Terrain was overlaid or rematerialed')
+    require(terrain.get('translation_cm')==translation and terrain.get('scale')==[1,-1,1] and
+            terrain.get('material_asset')==material,'Terrain transform/material mismatch')
+    count=terrain.get('triangle_count');proof=terrain.get('exact_native_replacement',{})
+    require(type(count) is int and count>0 and proof.get('all_directed_triangles_compared')==count and
+            proof.get('changed_source_vertices')==revision['changed_vertices'] and
+            proof.get('unmodified_native_corners_bit_exact') is True and
+            proof.get('registered_xy_and_winding_bit_exact') is True,'Incomplete native terrain comparison')
+    for key in ('original_native_source','revised_native_source'):
+        source=terrain.get(key,{})
+        require(source.get('available') is True and source.get('allow_cpu_access') is True and
+                source.get('triangle_count')==count and len(source.get('collision_source_sha256',''))==64,
+                'Native terrain collision source unavailable')
+    require(terrain['original_mesh_asset']=='/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround',
+            'Wrong original terrain asset')
+    require(terrain['mesh_asset'].startswith('/Game/RaftSim/Environment/GeneratedLocalReview/'),
+            'Only an explicit local terrain candidate is allowed')
+    path=asset_file(terrain['mesh_asset'],deps.root)
+    require(path==(deps.root/terrain['mesh_file']).resolve(),'Terrain asset/file mismatch')
+    deps.add(path,terrain['mesh_sha256'])
+    deps.add(asset_file(terrain['original_mesh_asset'],deps.root),terrain['original_mesh_sha256'])
+    deps.add(deps.root/revision['manifest'],revision['manifest_sha256'])
+    deps.add(deps.root/revision['mesh_path'],revision['revised_geometry_sha256'])
 
 
 def prepare(args):
@@ -156,7 +195,9 @@ def prepare(args):
                 'Rebind points to a different native audit')
     collision = deps.read(args.collision_audit, render['collision_report_sha256'])
     verify_native_state(collision, atlas_hash, atlas['source_time_seconds'],
-                        chosen.relative_to(ROOT).as_posix(), sha(chosen), args.center, sha(args.geometry_manifest))
+                        chosen.relative_to(ROOT).as_posix(), sha(chosen), args.center, sha(args.geometry_manifest),
+                        sum(bool(r.get('terrain_union')) for r in geometry['regions'])*6400 if union.terrain_revision else 12800)
+    bind_terrain_replacement(deps,geometry,collision,render['material_asset'],render['translation_cm'])
     require(render['source_cap_sha256'] == collision['source_cap_sha256'] == union.identity['cap_sha256'],
             'Different source rock in render or collision')
     require(render['fbx_sha256'] == collision['fbx_sha256'] and
@@ -178,7 +219,8 @@ def prepare(args):
                  snapshot_audit=args.snapshot_audit, bank_audit=args.bank_audit,
                  coverage_audit=args.coverage_audit, render_stage=args.render_stage,
                  collision_audit=args.collision_audit)
-    result = dict(schema='raftsim.south_fork_joint_preview.v1', candidate=True, production_promoted=False,
+    result = dict(schema='raftsim.south_fork_joint_preview.v2' if union.terrain_revision else 'raftsim.south_fork_joint_preview.v1',
+                  candidate=True, production_promoted=False,
                   target_level='/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach',
                   **{key: deps.add(path) for key, path in files.items()},
                   mesh_asset=render['mesh_asset'], material_asset=render['material_asset'],

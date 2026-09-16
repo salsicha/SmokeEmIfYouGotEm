@@ -29,10 +29,15 @@ def package_file(package):
 
 
 def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_directory=None,asset_path=None,
-         saved_mesh_sha256=None,saved_source_sha256=None):
+         saved_mesh_sha256=None,saved_source_sha256=None,terrain_config=None):
     assert not output.exists()
     probes=json.loads(probe_path.read_text())
     assert sha(ROOT/probes['geometry_manifest'])==probes['geometry_manifest_sha256']
+    terrain=None;terrain_result=None
+    assert bool(terrain_config)==bool(probes.get('terrain_replacement_required')),'Source-matched terrain replacement required'
+    if terrain_config:
+        from south_fork_terrain_replacement import configuration,native_source,compare_native_meshes
+        terrain=configuration(terrain_config,probes,ROOT)
     before={str(ROOT/'unreal/Content/RaftSim/Maps/L_SouthForkAmerican_FullReach.umap'):
         sha(ROOT/'unreal/Content/RaftSim/Maps/L_SouthForkAmerican_FullReach.umap')}
     levels=unreal.get_editor_subsystem(unreal.LevelEditorSubsystem);assert levels.load_level(LEVEL)
@@ -87,6 +92,40 @@ def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_direct
                     error_cm=error,actor=owner.get_name() if owner else None))
 
     check(probes['baseline'],'retained')
+    if terrain is not None:
+        original_mesh=rapid[0].static_mesh_component.static_mesh
+        original_native=native_source(original_mesh,terrain['export']['triangle_count'])
+        material=rapid[0].static_mesh_component.get_material(0)
+        material_path=package_file(material.get_path_name().split('.')[0]);before[str(material_path)]=sha(material_path)
+        if terrain.get('saved_mesh_sha256'):
+            revised_mesh,revised_export=load_saved_candidate(terrain['export_directory'],terrain['asset'],
+                terrain['saved_mesh_sha256'],terrain['saved_source_sha256'])
+            before[str(terrain['package'])]=terrain['saved_mesh_sha256']
+            assert revised_mesh.get_material(0)==material
+        else:
+            revised_mesh,revised_export=import_candidate_solid(terrain['export_directory'],terrain['asset'])
+            revised_mesh.set_material(0,material)
+        unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+        revised_native=native_source(revised_mesh,terrain['export']['triangle_count'])
+        assert revised_native['collision_source_sha256']!=original_native['collision_source_sha256']
+        exact_native=compare_native_meshes(original_mesh,revised_mesh,probes)
+        assert rapid[0].static_mesh_component.set_static_mesh(revised_mesh)
+        assert rapid[0].static_mesh_component.static_mesh==revised_mesh
+        assert rapid[0].get_actor_location()==pos and rapid[0].get_actor_scale3d()==scale
+        terrain_result=dict(source_revision=terrain['revision'],config_sha256=terrain['config_sha256'],
+            export_manifest_sha256=terrain['export_manifest_sha256'],fbx_sha256=revised_export['fbx_sha256'],
+            mesh_asset=terrain['asset'],original_mesh_asset=GROUND,
+            original_mesh_sha256=before[str(package_file(GROUND))],
+            original_native_source=original_native,revised_native_source=revised_native,
+            exact_native_replacement=exact_native,
+            triangle_count=revised_export['triangle_count'],replacement_actor=rapid[0].get_name(),
+            translation_cm=probes['translation_cm'],scale=[1,-1,1],
+            original_actor_reused=True,second_ground_actor_added=False,
+            original_material_preserved=True,material_asset=material.get_path_name(),material_sha256=sha(material_path),
+            saved_local_mesh=False)
+        if terrain.get('saved_mesh_sha256'):
+            terrain_result.update(saved_mesh_verified=True,mesh_file=terrain['package'].relative_to(ROOT).as_posix(),
+                mesh_sha256=terrain['saved_mesh_sha256'])
     if saved_mesh_sha256 is not None or saved_source_sha256 is not None:
         assert saved_mesh_sha256 and saved_source_sha256
         mesh,export=load_saved_candidate(export_directory,asset_path,saved_mesh_sha256,saved_source_sha256)
@@ -142,6 +181,13 @@ def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_direct
             expectation_sha256=sha(runtime_expectations),solver_steps_run=0)
     for path,digest in before.items():assert sha(Path(path))==digest,('Protected file changed',path)
     for package,digest in packages.items():assert sha(package_file(package))==digest,('Saved actor changed',package)
+    if terrain is not None and not failures and terrain['save_verified_mesh']:
+        assert not terrain['package'].exists()
+        assert unreal.EditorAssetLibrary.save_loaded_asset(revised_mesh,only_if_is_dirty=False)
+        after_native=native_source(revised_mesh,terrain['export']['triangle_count'])
+        assert after_native['collision_source_sha256']==revised_native['collision_source_sha256']
+        terrain_result.update(saved_local_mesh=True,mesh_file=terrain['package'].relative_to(ROOT).as_posix(),
+            mesh_sha256=sha(terrain['package']))
     result=dict(level=LEVEL,source_probe_sha256=sha(probe_path),source_cap_sha256=export['source_cap_sha256'],
         fbx_sha256=export['fbx_sha256'],geometry_manifest_sha256=probes['geometry_manifest_sha256'],
         original_rapid_actor=rapid[0].get_name(),candidate_translation_cm=probes['translation_cm'],
@@ -154,6 +200,9 @@ def main(runtime_expectations=None,output=REPORT,probe_path=PROBES,export_direct
         saved_candidate_asset=asset_path if saved_mesh_sha256 else None,
         saved_candidate_sha256=saved_mesh_sha256,saved_candidate_source_sha256=saved_source_sha256,
         protected_file_count=len(before),protected_actor_package_count=len(packages))
+    if terrain_result is not None:
+        result.update(terrain_replacement=terrain_result,saved_assets=terrain_result['saved_local_mesh'],
+            only_regenerable_replacement_mesh_saved=terrain_result['saved_local_mesh'])
     output.write_text(json.dumps(result,indent=2)+'\n')
     assert not failures,str(len(failures))+' union probes failed; '+str(output)
     unreal.log('Actual full-map sampled terrain/rock union verified: '+str(output))
@@ -165,6 +214,7 @@ if __name__=='__main__':
         if config_path:
             config=candidate_configuration(config_path)
             main(output=config['report'],probe_path=config['probes'],export_directory=config['export_directory'],asset_path=config['asset'],
-                 saved_mesh_sha256=config.get('saved_mesh_sha256'),saved_source_sha256=config.get('saved_source_sha256'))
+                 saved_mesh_sha256=config.get('saved_mesh_sha256'),saved_source_sha256=config.get('saved_source_sha256'),
+                 terrain_config=os.environ.get('RAFTSIM_TERRAIN_REPLACEMENT_CONFIG'))
         else:main()
     finally:unreal.SystemLibrary.quit_editor()

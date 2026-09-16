@@ -146,3 +146,63 @@ def test_legacy_native_report_without_state_hashes_is_not_silently_upgraded(nati
         native_state[1].pop(key)
     with pytest.raises(ValueError, match='atlas mismatch'):
         native_state[2]()
+
+
+def test_revised_four_core_native_coverage_cannot_reuse_two_core_report(native_state):
+    collision,runtime,_=native_state
+    def check(count):
+        verify_native_state(collision,'atlas',50.,'tmp/current/packet.json','packet',[1.,2.],'geometry',count)
+    with pytest.raises(ValueError,match='coverage'):check(25600)
+    runtime['query_count']=25600;check(25600)
+    for count in (6400,True,25601,25600.):
+        with pytest.raises(ValueError):check(count)
+
+
+@pytest.fixture
+def terrain_binding(tmp_path):
+    from prepare_south_fork_joint_preview import bind_terrain_replacement
+    def file(name):
+        path=tmp_path/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(name.encode())
+        return sha(path)
+    original='/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround'
+    candidate='/Game/RaftSim/Environment/GeneratedLocalReview/Fixture/SM_Ground'
+    mesh_file='unreal/Content/'+candidate[6:]+'.uasset'
+    revision=dict(manifest='tmp/geometry.json',manifest_sha256=file('tmp/geometry.json'),mesh_path='tmp/mesh.npz',
+        revised_geometry_sha256=file('tmp/mesh.npz'),changed_vertices=2)
+    native=dict(available=True,allow_cpu_access=True,triangle_count=8,collision_source_sha256='a'*64)
+    proof=dict(all_directed_triangles_compared=8,changed_source_vertices=2,
+        unmodified_native_corners_bit_exact=True,registered_xy_and_winding_bit_exact=True)
+    terrain=dict(saved_mesh_verified=True,source_revision=revision,original_actor_reused=True,
+        second_ground_actor_added=False,original_material_preserved=True,translation_cm=[1,2,0],scale=[1,-1,1],
+        material_asset='material',triangle_count=8,exact_native_replacement=proof,
+        original_native_source=dict(native),revised_native_source=dict(native),original_mesh_asset=original,
+        original_mesh_sha256=file('unreal/Content/'+original[6:]+'.uasset'),
+        mesh_asset=candidate,mesh_file=mesh_file,mesh_sha256=file(mesh_file))
+    geometry=dict(terrain_revision=revision,terrain_union=dict(terrain_revision=revision))
+    collision=dict(terrain_replacement=terrain)
+    def check():
+        deps=Dependencies(tmp_path);bind_terrain_replacement(deps,geometry,collision,'material',[1,2,0]);return deps
+    return geometry,collision,terrain,check
+
+
+def test_terrain_binding_retains_original_and_revised_source_dependencies(terrain_binding):
+    assert len(terrain_binding[3]().hashes)==4
+
+
+@pytest.mark.parametrize('key,value',[
+    ('saved_mesh_verified',False),('original_actor_reused',False),('second_ground_actor_added',True),
+    ('original_material_preserved',False),('translation_cm',[1,3,0]),('scale',[1,1,1]),
+    ('material_asset','other'),('triangle_count',True),('source_revision',{}),('mesh_sha256','changed'),
+    ('original_mesh_asset','/Game/Other'),('mesh_asset','/Game/Production'),
+    ('exact_native_replacement',{}),('revised_native_source',{}),
+])
+def test_terrain_binding_refuses_incomplete_or_different_geometry(terrain_binding,key,value):
+    terrain_binding[2][key]=value
+    with pytest.raises(ValueError):terrain_binding[3]()
+
+
+def test_cap_only_and_revised_geometry_cannot_be_mixed(terrain_binding):
+    geometry,collision,_,check=terrain_binding
+    collision.clear()
+    with pytest.raises(ValueError,match='Revised-bed'):check()
+    geometry.clear();check()

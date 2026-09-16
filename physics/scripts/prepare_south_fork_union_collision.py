@@ -6,6 +6,7 @@ import numpy as np
 from south_fork_rock_union import SourceRockUnion,sha
 from south_fork_registered_mesh import RegisteredMeshSampler
 from build_troublemaker_dem_rock_cap import native_collision_probes
+from build_troublemaker_dem_rock_cap import sample_cap
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -13,6 +14,42 @@ ROOT=Path(__file__).resolve().parents[2]
 def engine_position(utm_xy,height_navd88,world_origin,datum):
     return [float((utm_xy[0]-world_origin[0])*100),
             float(-(utm_xy[1]-world_origin[1])*100),float((height_navd88-datum)*100)]
+
+
+def physical_union_samples(union,xy,parent):
+    """Rock ownership is relative to the revised bed, not the old height."""
+    xy=np.asarray(xy,float);parent=np.asarray(parent,float)
+    after,_=union.apply(xy[:,0],xy[:,1],parent)
+    bed=parent
+    if union.terrain_revision is not None:
+        bed,_=union.terrain_revision.apply(xy[:,0],xy[:,1],parent)
+    rock=np.zeros(len(xy),bool)
+    low=union.xyz[:,:2].min(axis=0)+union.origin[:2]
+    high=union.xyz[:,:2].max(axis=0)+union.origin[:2]
+    ids=np.flatnonzero(np.all(xy>=low,axis=1)&np.all(xy<=high,axis=1))
+    if len(ids):
+        roof=sample_cap(union.xyz,union.faces,xy[ids]-union.origin[:2])+union.origin[2]
+        rock[ids]=np.isfinite(roof)&(roof>bed[ids])
+    return after,rock
+
+
+def revision_triangle_probes(union,world_origin,datum):
+    revision=union.terrain_revision
+    if revision is None:return [],[]
+    old,new=revision.original,revision.revised
+    changed=old.xyz[:,2]!=new.xyz[:,2]
+    ids=np.flatnonzero(np.any(changed[old.faces],axis=1))
+    xy=old.xyz[old.faces[ids],:2].mean(axis=1)+revision.origin
+    # Round-trip the absolute frame exactly as the shared union does.
+    before=old.sample(*(xy-revision.origin).T)+revision.datum
+    after,rock=physical_union_samples(union,xy,before)
+    baseline=[];combined=[]
+    for i,face in enumerate(ids):
+        baseline.append(dict(kind='original_changed_triangle_centroid',source_triangle_index=int(face),
+            world_position_cm=engine_position(xy[i],before[i],world_origin,datum)))
+        combined.append(dict(kind='revised_triangle_union_centroid',source_triangle_index=int(face),
+            world_position_cm=engine_position(xy[i],after[i],world_origin,datum),expected_candidate=bool(rock[i])))
+    return baseline,combined
 
 
 def visible_union_roof_probe(probe,parent_z,translation):
@@ -37,7 +74,9 @@ def prepare(geometry_path,output,source_visible_probes=None):
         raise ValueError('Fresh project tmp probe file required')
     geometry=json.loads(geometry_path.read_text());cap_path=ROOT/geometry['rock_cap_manifest']
     cap=json.loads(cap_path.read_text());origin=np.asarray(cap['origin_utm_and_vertical_datum_m'])
-    union=SourceRockUnion(cap_path,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2])
+    revision=geometry.get('terrain_revision_manifest')
+    union=SourceRockUnion(cap_path,ROOT,ROOT/cap['source_mesh_path'],origin[:2],origin[2],
+                          ROOT/revision if revision else None)
     if union.identity!=geometry['terrain_union']:raise ValueError('Changed compound source identity')
     world_origin=np.asarray(geometry['world_origin_utm_m']);datum=geometry['vertical_datum_navd88_m']
     if datum!=origin[2]:raise ValueError('Geometry/engine datum mismatch')
@@ -49,6 +88,10 @@ def prepare(geometry_path,output,source_visible_probes=None):
             raise ValueError('Changed hydraulic reference core')
         with np.load(paths[0],allow_pickle=False) as a,np.load(paths[1],allow_pickle=False) as b:
             x0,y0=np.asarray(record['center_utm_m'])-40
+            x,y=np.meshgrid(x0+np.arange(80),y0+np.arange(80))
+            expected,rock=physical_union_samples(union,np.column_stack((x.ravel(),y.ravel())),b['bed_navd88_m'].ravel())
+            if not np.array_equal(expected.reshape(80,80),a['bed_navd88_m']):
+                raise ValueError('Collision probes differ from exact hydraulic union')
             for row in range(80):
                 for col in range(80):
                     xy=[x0+col,y0+row]
@@ -56,13 +99,16 @@ def prepare(geometry_path,output,source_visible_probes=None):
                     after=engine_position(xy,a['bed_navd88_m'][row,col],world_origin,datum)
                     baseline.append(dict(kind='retained_hydraulic_cell',world_position_cm=before))
                     combined.append(dict(kind='union_hydraulic_cell',world_position_cm=after,
-                        expected_candidate=after[2]>before[2]))
+                        expected_candidate=bool(rock[row*80+col])))
+    original_faces,revised_faces=revision_triangle_probes(union,world_origin,datum)
+    baseline.extend(original_faces);combined.extend(revised_faces)
     with np.load(ROOT/cap['cap_path'],allow_pickle=False) as data:
         native=native_collision_probes(data['vertices_m'],data['triangles'],data['solid_vertices_m'],
             data['solid_triangles'],data['solid_face_kind'],cap['cap_sha256'])
         translation=np.array(engine_position(origin[:2],origin[2],world_origin,datum))
         with np.load(ROOT/cap['source_mesh_path'],allow_pickle=False) as parent:
             sampler=RegisteredMeshSampler({key:parent[key] for key in parent.files})
+        if union.terrain_revision is not None:sampler=union.terrain_revision.revised
         if source_visible_probes is None:
             roof_probes=[p for p in native['probes'] if p['kind'] in ('original_vertex_interior_cone','roof_triangle_centroid')]
         else:
@@ -104,6 +150,13 @@ def prepare(geometry_path,output,source_visible_probes=None):
         source_cap_sha256=cap['cap_sha256'],parent_mesh_sha256=cap['source_mesh_sha256'],
         translation_cm=translation.tolist(),world_origin_utm_m=world_origin.tolist(),datum_m=datum,
         baseline=baseline,combined=combined,prior_vertical_tangent_gate_closed=False)
+    if union.terrain_revision is not None:
+        old=union.terrain_revision.original.xyz;new=union.terrain_revision.revised.xyz
+        changed=np.flatnonzero(old[:,2]!=new[:,2])
+        result.update(terrain_revision=union.terrain_revision.identity,
+            terrain_replacement_required=True,changed_triangle_probe_count=len(revised_faces),
+            terrain_vertex_changes_cm=[dict(source_vertex_index=int(i),before=(old[i]*100).tolist(),
+                after=(new[i]*100).tolist()) for i in changed])
     if source_visible_probes is not None:
         result.update(source_visible_probe_file=source_visible_probes.relative_to(ROOT).as_posix(),
             source_visible_probe_sha256=sha(source_visible_probes),
@@ -111,7 +164,7 @@ def prepare(geometry_path,output,source_visible_probes=None):
             covered_roof_targets_preserved_in_probe_metadata=True,
             legacy_isolated_probe_failures_waived=False)
     output.write_text(json.dumps(result,indent=2)+'\n')
-    return {k:v for k,v in result.items() if k not in ('baseline','combined')}|dict(baseline_count=len(baseline),combined_count=len(combined))
+    return {k:v for k,v in result.items() if k not in ('baseline','combined','terrain_vertex_changes_cm')}|dict(baseline_count=len(baseline),combined_count=len(combined))
 
 
 if __name__=='__main__':

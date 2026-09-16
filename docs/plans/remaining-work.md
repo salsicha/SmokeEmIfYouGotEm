@@ -3,7 +3,21 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [source-control comparison and clean1800s checkpoint](../reconstruction-review-2026-09-07/control-prior-comparison.md).
+Latest: [source-matched full-map terrain replacement](../reconstruction-review-2026-09-07/shared-terrain-revision.md).
+All803,842 actual native terrain triangles compared; only2,132 declared inferred
+heights/4,466 triangles change.64,935 full-map collision probes PASS, repeated on
+fresh saved-mesh reload; all464 protected identities retained. No map/actor save.
+Fresh full841-core flow reaches50s: cell/conservation and86,720 exact-dry bank
+checks PASS, NOT settled.799-packet export and406,823 original-water coverage PASS.
+Version2 paired terrain/water loader implemented;138 Python tests and isolated
+native compile PASS. Fresh native25,600 field checks PASS, zero wet mismatches;
+3,267-dependency v2 descriptor READY. Linked playback/default delivery NEXT.
+SAME full solve46094/PID22940 LIVE; next step2000/100s state AND bank audits.
+SAME package83678/cook5852/shader35032 LIVE; preserve DLLs/shaders until terminal.
+No visual, contact, settled-water or30FPS acceptance. Later rivers, all-scene
+water, crew, normalization/regressions/release OPEN. Troublemaker is not a scenario.
+
+Previous: [source-control comparison and clean1800s checkpoint](../reconstruction-review-2026-09-07/control-prior-comparison.md).
 Corrected shoreline A-D interpolation disproves the apparent temporal/base
 interpolation error; do not tune blending from the archived B-C analysis.
 Isolated removal of the explicitly uncalibrated shelf/plunge preserves ALL

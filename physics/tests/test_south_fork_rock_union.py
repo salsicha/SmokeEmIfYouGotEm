@@ -152,6 +152,18 @@ def test_full_map_probe_frame_applies_origin_datum_and_y_reflection_once():
     assert engine_position([101,198],23,[100,200],20)==[100,200,300]
 
 
+def test_revised_bed_ownership_is_not_inferred_from_height_increase(source):
+    from types import SimpleNamespace
+    from prepare_south_fork_union_collision import physical_union_samples
+    union=load(source)
+    union.terrain_revision=SimpleNamespace(apply=lambda x,y,parent:(np.asarray(parent)+2,np.ones_like(parent,dtype=bool)))
+    after,rock=physical_union_samples(union,[[100.1,200.1],[102,202]],[22.,22.])
+    assert after.tolist()==[24.,24.] and rock.tolist()==[False,False]
+    union.terrain_revision=SimpleNamespace(apply=lambda x,y,parent:(np.asarray(parent)-.5,np.ones_like(parent,dtype=bool)))
+    after,rock=physical_union_samples(union,[[100.1,200.1]],[23.5])
+    assert after[0]==pytest.approx(23.1) and rock[0]
+
+
 def test_full_map_probe_samples_actual_union_without_discarding_buried_source():
     from prepare_south_fork_union_collision import visible_union_roof_probe
     original=dict(kind='source_vertex',world_position_cm=[10,-20,300],outward_normal=[.1,.2,.9],ray_half_length_cm=100.)

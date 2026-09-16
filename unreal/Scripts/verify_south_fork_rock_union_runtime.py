@@ -26,7 +26,8 @@ if __name__=='__main__':
             config=runtime_configuration(config_path)
             main(config['runtime_expectations'],output=config['report'],probe_path=config['probes'],
                 export_directory=config['export_directory'],asset_path=config['asset'],
-                saved_mesh_sha256=config.get('saved_mesh_sha256'),saved_source_sha256=config.get('saved_source_sha256'))
+                saved_mesh_sha256=config.get('saved_mesh_sha256'),saved_source_sha256=config.get('saved_source_sha256'),
+                terrain_config=os.environ.get('RAFTSIM_TERRAIN_REPLACEMENT_CONFIG'))
         else:
             main(ROOT/'tmp/south-fork-rock-union-runtime-expectations-v2-20260915.json',
                 ROOT/'unreal/Saved/RaftSimValidation/south-fork-rock-union-runtime-v2-20260915.json')
