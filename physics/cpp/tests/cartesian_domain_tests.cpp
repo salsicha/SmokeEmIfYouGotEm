@@ -1,6 +1,7 @@
 #include "raftsim_water/cartesian_domain.hpp"
 #include <algorithm>
 #include <cmath>
+#include <cfenv>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -80,7 +81,7 @@ raftsim::SolverConfig config() {
 }
 
 void compare(const raftsim::Scenario& source, std::size_t across, bool reverse,
-             int steps, bool closed) {
+             int steps, bool closed, double dt=.005) {
     raftsim::ReducedShallowWaterSolver whole(source,config());
     auto parts=split(source,across);
     if (reverse) std::reverse(parts.begin(),parts.end());
@@ -90,7 +91,7 @@ void compare(const raftsim::Scenario& source, std::size_t across, bool reverse,
     // Also compare the untouched initial state: checkpoint inspection must use
     // the actual neighbouring ghost layers before ANY advance, not bank walls.
     for (int step=0;step<=steps;++step) {
-        if(step>0) { whole.step(.005); domain.step(.005); }
+        if(step>0) { whole.step(dt); domain.step(dt); }
         expect(domain.time()==whole.time(),"tile clock differs from whole domain");
         const auto whole_faces=whole.inspect_numerical_mass_flux_grid();
         for (std::size_t tile=0;tile<domain.size();++tile) {
@@ -136,6 +137,24 @@ void equivalence(bool lake, std::size_t across=2, bool reverse=false) {
     source.scenario_id+=lake ? "_lake" : "_moving";
     source.grid.dy=.75; // Non-square metric cells must preserve both flux axes.
     compare(source,across,reverse,50,true);
+}
+
+void parallel_tile_cfl_rounding() {
+    struct RestoreEnvironment {
+        std::fenv_t previous;
+        RestoreEnvironment() { std::fegetenv(&previous); }
+        ~RestoreEnvironment() { std::fesetenv(&previous); }
+    } restore;
+    for (int rounding : {FE_TONEAREST,FE_DOWNWARD,FE_UPWARD,FE_TOWARDZERO}) {
+        expect(std::fesetround(rounding)==0,"could not set CFL rounding control");
+        auto source=fixture(false);
+        source.grid.dy=.75;
+        // Each call requires CFL subdivision and scans16 independent tiles.
+        // The unsplit solver retains its independent original global scan.
+        for (bool reverse : {false,true}) compare(source,4,reverse,3,true,.125);
+        expect(std::fegetround()==rounding,"parallel tile scan changed caller rounding mode");
+    }
+    std::cout << "16-tile subdivided CFL matches unsplit state/fluxes in four rounding modes and both tile orders\n";
 }
 
 // This exercises the numerical partition on actual source geometry. Fixed
@@ -331,6 +350,7 @@ int main(int argc, char** argv) {
         profiles_and_rejections();
         discharge_profiles();
         mixed_regime_discharge_profiles();
+        parallel_tile_cfl_rounding();
         checkpoint_continuation();
         if (argc>1) source_package_equivalence(argv[1]);
         raftsim::shutdown_solver_workers();
