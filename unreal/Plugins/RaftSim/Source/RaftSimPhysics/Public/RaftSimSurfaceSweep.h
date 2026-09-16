@@ -28,5 +28,5 @@ struct FResult
 // Degenerate source faces retain their segment/point geometry rather than vanish.
 RAFTSIMPHYSICS_API FDistance Distance(const FTriangle& Moving,const FTriangle& Ground);
 RAFTSIMPHYSICS_API FResult Sweep(const FTriangle& Start,const FTriangle& End,const FTriangle& Ground,
-    double SkinM=1.e-5,int32 MaximumIterations=128);
+    double SkinM=1.e-5,int32 MaximumIterations=128,double ProvenClearanceM=-1.,bool bPreflightSeparation=true);
 }

@@ -86,12 +86,37 @@ FDistance Distance(const FTriangle& A,const FTriangle& B)
 }
 
 FResult Sweep(const FTriangle& Start,const FTriangle& End,const FTriangle& Ground,
-    double SkinM,int32 MaximumIterations)
+    double SkinM,int32 MaximumIterations,double ProvenClearanceM,bool bPreflightSeparation)
 {
     FResult R;
     constexpr double DistanceRoundoffM=1.e-10;
     if(!Finite(Start) || !Finite(End) || !Finite(Ground) ||
-        !FMath::IsFinite(SkinM) || SkinM<=DistanceRoundoffM || MaximumIterations<=0)return R;
+        !FMath::IsFinite(SkinM) || SkinM<=DistanceRoundoffM || MaximumIterations<=0 ||
+        !FMath::IsFinite(ProvenClearanceM) || ProvenClearanceM>=SkinM)return R;
+    if(bPreflightSeparation && ProvenClearanceM>=0.)
+    {
+        const FVector Origin=Ground.V[0];
+        const FVector Axes[]={FVector::CrossProduct(Ground.V[1]-Ground.V[0],Ground.V[2]-Ground.V[0]),
+            FVector::CrossProduct(Start.V[1]-Start.V[0],Start.V[2]-Start.V[0])};
+        for(const auto& Axis:Axes)
+        {
+            const double Length=Axis.Length();if(Length==0.)continue;
+            double AMin=DBL_MAX,AMax=-DBL_MAX,BMin=DBL_MAX,BMax=-DBL_MAX;
+            for(int32 I=0;I<3;++I)
+            {
+                const double A=FVector::DotProduct(Start.V[I]-Origin,Axis),E=FVector::DotProduct(End.V[I]-Origin,Axis);
+                const double B=FVector::DotProduct(Ground.V[I]-Origin,Axis);
+                AMin=FMath::Min(AMin,FMath::Min(A,E));AMax=FMath::Max(AMax,FMath::Max(A,E));
+                BMin=FMath::Min(BMin,B);BMax=FMath::Max(BMax,B);
+            }
+            // A plane that separates all SIX endpoint vertices separates their
+            // convex hull, hence every linear triangle in the interval. The
+            // caller's curved-path bound is already part of ProvenClearanceM.
+            // Avoid feature-distance construction only with this actual proof.
+            if(AMin-BMax>ProvenClearanceM*Length || BMin-AMax>ProvenClearanceM*Length)
+            {R.Status=EStatus::Clear;R.Time=1.;return R;}
+        }
+    }
     FVector Motion[3];for(int32 I=0;I<3;++I)Motion[I]=End.V[I]-Start.V[I];
     for(int32 Iteration=0;Iteration<MaximumIterations;++Iteration)
     {
@@ -141,7 +166,42 @@ FResult Sweep(const FTriangle& Start,const FTriangle& End,const FTriangle& Groun
         // face/edge axes provide independently evaluated separating planes;
         // never turn a cancellation-damaged witness plane into a clear result.
         R.Normal=Axis;
-        if(D<=SkinM+DistanceRoundoffM){R.Status=EStatus::Contact;return R;}
+        if(ProvenClearanceM>=0. && Gap>ProvenClearanceM)
+        {
+            double EndGap=DBL_MAX,GroundMax=-DBL_MAX;
+            for(int32 I=0;I<3;++I)
+            {
+                EndGap=FMath::Min(EndGap,FVector::DotProduct(End.V[I]-Origin,Axis));
+                GroundMax=FMath::Max(GroundMax,FVector::DotProduct(Ground.V[I]-Origin,Axis));
+            }
+            // The same fixed separating plane clears EVERY vertex at both
+            // endpoints, hence the complete linear triangle at EVERY time.
+            // A rigid caller includes its proven arc-error bound in clearance.
+            // This permits resting/separating skin contacts without skipping a
+            // later entering feature or requiring zero-time repeat impulses.
+            if(EndGap-GroundMax>ProvenClearanceM){R.Status=EStatus::Clear;return R;}
+        }
+        if(D<=SkinM+DistanceRoundoffM)
+        {
+            if(ProvenClearanceM>=0.)
+            {
+                double Closing=FVector::DotProduct(Motion[0]*R.Witness.MovingBary.X+
+                    Motion[1]*R.Witness.MovingBary.Y+Motion[2]*R.Witness.MovingBary.Z,Axis);
+                for(int32 I=0;I<3;++I)
+                {
+                    const double CandidateClosing=FVector::DotProduct(Motion[I],Axis);
+                    if(CandidateClosing>=Closing)continue;
+                    const FTriangle Vertex{{Current.V[I],Current.V[I],Current.V[I]}};
+                    auto Candidate=Distance(Vertex,Ground);
+                    if(Candidate.Squared>FMath::Square(SkinM+DistanceRoundoffM))continue;
+                    // Several vertices can be in the SAME numerical contact
+                    // band. Do not keep reporting an already solved witness
+                    // while a different source vertex is still entering.
+                    Candidate.MovingBary=UnitBary(I);R.Witness=Candidate;Closing=CandidateClosing;
+                }
+            }
+            R.Status=EStatus::Contact;return R;
+        }
         double Closing=0.;
         for(int32 I=0;I<3;++I)Closing=FMath::Max(Closing,-FVector::DotProduct(Motion[I],Axis));
         if(Gap<=SkinM){R.Status=EStatus::Unresolved;return R;}

@@ -5,6 +5,7 @@
 #include "RaftSimGroundContactObservation.h"
 #include "RaftSimSweptGroundContact.h"
 #include "RaftSimHullGeometry.h"
+#include "RaftSimHullContact.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -280,6 +281,8 @@ public:
     void SetGroundContactObserver(TFunction<void(const FRaftSimGroundContactObservation&)> Observer)
     { GroundContactObserver=MoveTemp(Observer); }
     void SetGroundSphereSweep(FRaftSimGroundSweep Sweep) { GroundSphereSweep=MoveTemp(Sweep); }
+    void SetHullGroundQuery(FRaftSimHullGroundQuery Query) { HullGroundQuery=MoveTemp(Query);LastHullContact={}; }
+    const FRaftSimHullContactResult& GetLastHullContact() const { return LastHullContact; }
 
     float GetLastMaximumGroundPenetrationMeters() const
     {
@@ -384,6 +387,8 @@ private:
         FVector& OutGroundNormal)> GroundSurfaceSampler;
     TFunction<void(const FRaftSimGroundContactObservation&)> GroundContactObserver;
     FRaftSimGroundSweep GroundSphereSweep;
+    FRaftSimHullGroundQuery HullGroundQuery;
+    FRaftSimHullContactResult LastHullContact;
     int32 LastGroundedSupportPointCount = 0;
     float LastMaximumGroundPenetrationM = 0.0f;
     TFunction<bool(

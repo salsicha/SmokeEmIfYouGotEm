@@ -9,7 +9,8 @@ CSV_DEFINE_CATEGORY(RaftSimHull,true);
 void ARaftSimRaftActor::ConfigureSharedHullGeometryReview()
 {
 #if !UE_BUILD_SHIPPING
-    if(!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSharedHullReview")))return;
+    if(!FParse::Param(FCommandLine::Get(),TEXT("RaftSimSharedHullReview")) &&
+       !FParse::Param(FCommandLine::Get(),TEXT("RaftSimFullHullGroundReview")))return;
     bSharedHullGeometryReview=true;
     LastRenderedHullRevision=0;LastLoggedHullRevision=0;
     SharedHullPrepareCount=0;SharedHullPrepareTotalMs=0;SharedHullPrepareMaximumMs=0;

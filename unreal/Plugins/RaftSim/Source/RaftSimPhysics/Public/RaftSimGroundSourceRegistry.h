@@ -56,7 +56,7 @@ public:
         FHitResult* OutCapturedHit=nullptr);
     bool SweepCapturedSphere(const FVector& StartCm,const FVector& EndCm,double RadiusCm,FHitResult& OutHit);
     RaftSimSurfaceSweep::FResult SweepCapturedSurface(TConstArrayView<FVector> StartCm,
-        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm);
+        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm=-1.);
     TArray<TWeakObjectPtr<ALandscapeProxy>> Landscapes;
     TArray<TWeakObjectPtr<UStaticMeshComponent>> Meshes;
 private:

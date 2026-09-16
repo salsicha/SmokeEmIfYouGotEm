@@ -61,6 +61,13 @@ bool FRaftSimSurfaceFeaturesTest::RunTest(const FString&)
     TestTrue(TEXT("iteration exhaustion cannot become clear"),Sweep(Wide,Shift(Wide,FVector(0,0,-2)),Floor,1.e-5,1).Status==EStatus::Unresolved);
     auto Invalid=Wide;Invalid.V[0].X=std::numeric_limits<double>::quiet_NaN();
     TestTrue(TEXT("nonfinite input rejected"),Sweep(Invalid,End,Floor).Status==EStatus::Invalid);
+    auto Resting=Wide;for(auto& V:Resting.V)V.Z=1.e-5;
+    auto Entering=Resting;Entering.V[0].Z+=.001;Entering.V[1].Z-=.001;
+    const auto Simultaneous=Sweep(Resting,Entering,Floor,1.e-5,128,1.e-9);
+    TestTrue(TEXT("simultaneous contact chooses still-entering source vertex"),Simultaneous.Status==EStatus::Contact &&
+        Simultaneous.Time==0. && Simultaneous.Witness.MovingBary==FVector(0,1,0));
+    TestTrue(TEXT("stationary skin contact clears only with a proven separating plane"),
+        Sweep(Resting,Resting,Floor,1.e-5,128,1.e-9).Status==EStatus::Clear);
     FRandomStream Random(984123);
     for(int32 Trial=0;Trial<128;++Trial)
     {
@@ -74,6 +81,46 @@ bool FRaftSimSurfaceFeaturesTest::RunTest(const FString&)
         const auto Swapped=Distance(Floor,Start),Forward=Distance(Start,Floor);
         TestTrue(TEXT("distance symmetric"),FMath::Abs(Swapped.Squared-Forward.Squared)<1.e-10);
         CheckWitness(Start,Floor,Forward);
+    }
+    return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimSurfaceSeparationProofTest,"RaftSim.Physics.SurfaceSeparationProof",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimSurfaceSeparationProofTest::RunTest(const FString&)
+{
+    const FTriangle Ground{{FVector(-100,-100,0),FVector(100,-100,0),FVector(0,100,0)}};
+    FRandomStream Random(140729);TArray<FTriangle> Starts,Ends;
+    for(int32 I=0;I<128;++I)
+    {
+        FTriangle A{{FVector(-1,-1,.2),FVector(1,-1,.5),FVector(0,1,.3)}},B=A;
+        for(int32 J=0;J<3;++J)
+        {A.V[J].Z=Random.FRandRange(.01f,2.f);B.V[J]=A.V[J]+FVector(.03,.05,I%2?-.005:-3.);}
+        Starts.Add(A);Ends.Add(B);
+        const auto Fast=Sweep(A,B,Ground,1.e-5,128,1.e-9,true),Reference=Sweep(A,B,Ground,1.e-5,128,1.e-9,false);
+        TestTrue(TEXT("proof preserves actual crossing/clear classification"),Fast.Status==Reference.Status);
+        if(Fast.Status==EStatus::Contact)
+            TestTrue(TEXT("entering contact unchanged"),Fast.Time==Reference.Time && Fast.Witness.MovingBary==Reference.Witness.MovingBary && Fast.Normal==Reference.Normal);
+        else
+            for(int32 S=0;S<=32;++S)
+            {
+                FTriangle T;for(int32 J=0;J<3;++J)T.V[J]=FMath::Lerp(A.V[J],B.V[J],S/32.);
+                TestTrue(TEXT("independent feature distance stays outside proof clearance"),Distance(T,Ground).Squared>1.e-18);
+            }
+    }
+    for(int32 Order=0;Order<2;++Order)
+    {
+        double SlowMs=0.,FastMs=0.;int32 Count=0;
+        for(int32 Repeat=0;Repeat<8;++Repeat)
+        {
+            const auto Run=[&](bool Fast)
+            {const double T=FPlatformTime::Seconds();for(int32 I=1;I<Starts.Num();I+=2)
+                {const auto R=Sweep(Starts[I],Ends[I],Ground,1.e-5,128,1.e-9,Fast);if(R.Status!=EStatus::Clear)AddError(TEXT("timed proof query changed result"));}
+                return (FPlatformTime::Seconds()-T)*1000.;};
+            if(Order==0){SlowMs+=Run(false);FastMs+=Run(true);}else{FastMs+=Run(true);SlowMs+=Run(false);}
+            Count+=Starts.Num()/2;
+        }
+        AddInfo(FString::Printf(TEXT("same-input source-plane proof order=%d queries=%d reference_ms=%.6f proof_ms=%.6f; not gameplay FPS"),Order,Count,SlowMs,FastMs));
     }
     return true;
 }

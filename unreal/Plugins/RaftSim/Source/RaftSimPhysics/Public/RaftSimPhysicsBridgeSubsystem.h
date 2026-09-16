@@ -144,6 +144,9 @@ private:
     FRaftSimRaftAuthorityIntegrationPolicy AuthorityIntegrationPolicy;
     FRaftSimFixedStepClock FixedClock;
     int32 PhysicsFrame = 0;
+    // Water/earlier raft substeps may already have advanced at refusal. Never
+    // replay that partially advanced tick or claim rollback; require reconfigure.
+    bool bRaftStepFailureLatched = false;
 
     bool RunOneFixedWaterTick();
     void RefreshContactRuntimeSummary();

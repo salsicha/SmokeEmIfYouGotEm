@@ -23,7 +23,7 @@ void URaftSimPhysicsBridgeSubsystem::Initialize(FSubsystemCollectionBase& Collec
 void URaftSimPhysicsBridgeSubsystem::Deinitialize()
 {
     // Release the contact registry's world delegates before subsystem teardown.
-    if (RaftRuntime) { RaftRuntime->SetGroundSphereSweep({}); RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
+    if (RaftRuntime) { RaftRuntime->SetHullGroundQuery({}); RaftRuntime->SetGroundSphereSweep({}); RaftRuntime->SetGroundContactObserver({}); RaftRuntime->SetGroundSurfaceSampler({}); }
     WaterRuntime = nullptr;
     RaftRuntime = nullptr;
     Super::Deinitialize();
@@ -45,6 +45,7 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     AuthorityIntegrationPolicy.bChaosMayDriveScoringCriticalPhysics = false;
     AuthorityIntegrationPolicy.bRenderTickMayAdvanceAuthority = false;
     FixedClock.Reset();
+    bRaftStepFailureLatched=false;
     PhysicsFrame = 0;
     LastOutput = FRaftSimPhysicsTickOutput();
 
@@ -92,7 +93,15 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
         const auto GroundSources=MakeShared<FRaftSimGroundSourceRegistry>(GetWorld());
         RaftRuntime->SetGroundContactObserver({});
         RaftRuntime->SetGroundSphereSweep({});
+        RaftRuntime->SetHullGroundQuery({});
 #if !UE_BUILD_SHIPPING
+        if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimFullHullGroundReview")))
+        {
+            RaftRuntime->SetHullGroundQuery([GroundSources](TConstArrayView<FVector> A,TConstArrayView<FVector> B,
+                TConstArrayView<FIntVector> Faces,double Skin,double Clearance)
+            {return GroundSources->SweepCapturedSurface(A,B,Faces,Skin,Clearance);});
+            UE_LOG(LogTemp,Display,TEXT("Full-hull ground review enabled: every authored face, bounded rotating/deforming sweeps; no six-sphere or height-projection fallback"));
+        }
         if(FParse::Param(FCommandLine::Get(),TEXT("RaftSimContinuousGroundReview")))
         {
             RaftRuntime->SetGroundSphereSweep([GroundSources](const FVector& A,const FVector& B,double Radius,FHitResult& Hit)
@@ -203,6 +212,7 @@ void URaftSimPhysicsBridgeSubsystem::RecordContactTelemetryEvent(
 
 bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
 {
+    if(bRaftStepFailureLatched)return false;
     if (!WaterRuntime || !RaftRuntime)
     {
         return false;
@@ -217,7 +227,13 @@ bool URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick()
     const float ActualSubstep = WaterStepSeconds / static_cast<float>(Substeps);
     for (int32 SubstepIndex = 0; SubstepIndex < Substeps; ++SubstepIndex)
     {
-        RaftRuntime->StepRaftDynamics(ActualSubstep);
+        if(!RaftRuntime->StepRaftDynamics(ActualSubstep))
+        {
+            bRaftStepFailureLatched=true;
+            LastOutput.RaftState=RaftRuntime->GetKinematicState();
+            UE_LOG(LogTemp,Error,TEXT("Raft fixed substep refused: substep=%d/%d; partial water tick latched, no clock commit or retry until reconfigure"),SubstepIndex+1,Substeps);
+            return false;
+        }
     }
 
     ++PhysicsFrame;

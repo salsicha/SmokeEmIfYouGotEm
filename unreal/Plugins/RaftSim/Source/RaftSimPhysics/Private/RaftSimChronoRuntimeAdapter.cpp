@@ -710,7 +710,22 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         State.Orientation = (Delta * State.Orientation).GetNormalized();
     }
 
-    if(GroundSphereSweep)
+    if(HullGroundQuery)
+    {
+        LastHullContact=RaftSimHullContact::Integrate(State,PreviousFiniteState,PublishedHullGeometry,
+            PendingHullGeometry,MassKg,Inertia,Dt,HullGroundQuery);
+        if(!LastHullContact.bCompleted)
+        {
+            UE_LOG(LogTemp,Error,TEXT("Full-hull ground review rejected: %s; consumed_s=%.17g dt=%.17g queries=%d faces=%d/%d"),
+                *LastHullContact.Failure,LastHullContact.ConsumedSeconds,Dt,LastHullContact.Queries,LastHullContact.MovingFace,LastHullContact.GroundFace);
+            return false;
+        }
+        if(LastHullContact.Impulses)
+            UE_LOG(LogTemp,Verbose,TEXT("Full-hull ground response: impulses=%d queries=%d pairs=%llu consumed_s=%.17g curve_bound_m=%.17g shape_work_j=%.17g dissipated_j=%.17g kinetic_change_j=%.17g"),
+                LastHullContact.Impulses,LastHullContact.Queries,LastHullContact.TrianglePairs,LastHullContact.ConsumedSeconds,
+                LastHullContact.MaximumCurveBoundM,LastHullContact.PrescribedShapeWorkJ,LastHullContact.DissipatedJ,LastHullContact.KineticChangeJ);
+    }
+    else if(GroundSphereSweep)
     {
         const double Radius=FMath::Max(double(RaftConfig.TubeRadiusMeters)*
             FMath::Lerp(.82,1.,double(FlexPressureFraction)),1.e-3);
@@ -733,7 +748,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     // using the same six tube footprint points as buoyancy.
     LastGroundedSupportPointCount = 0;
     LastMaximumGroundPenetrationM = 0.0f;
-    if (GroundSurfaceSampler && TubeSamplePointsM.Num() > 0)
+    if (!HullGroundQuery && GroundSurfaceSampler && TubeSamplePointsM.Num() > 0)
     {
         const double ContactRadiusM =
             FMath::Max(

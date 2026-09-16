@@ -106,12 +106,12 @@ bool RaftSimTriangleSweep::Triangle(const FVector& Start,const FVector& End,doub
 
 RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
     TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
-    TConstArrayView<FIntVector> Faces,double SkinCm) const
+    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm) const
 {
     using namespace RaftSimSurfaceSweep;
     FResult Best;
     if(!bValid || StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
-        !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8)return Best;
+        !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8 || !FMath::IsFinite(ProvenClearanceCm) || ProvenClearanceCm>=SkinCm)return Best;
     for(int32 I=0;I<StartCm.Num();++I)
         if(StartCm[I].ContainsNaN() || EndCm[I].ContainsNaN())return Best;
     for(const auto& F:Faces)
@@ -147,7 +147,7 @@ RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
                 const double Limit=Best.Status==EStatus::Contact?Best.Time:1.;
                 FTriangle ClippedEnd;
                 for(int32 V=0;V<3;++V)ClippedEnd.V[V]=Start.V[V]+(End.V[V]-Start.V[V])*Limit;
-                ++Pairs;auto Hit=RaftSimSurfaceSweep::Sweep(Start,ClippedEnd,Ground,SkinCm*.01);
+                ++Pairs;auto Hit=RaftSimSurfaceSweep::Sweep(Start,ClippedEnd,Ground,SkinCm*.01,128,ProvenClearanceCm*.01);
                 Hit.Time*=Limit;
                 Hit.MovingFace=Face;Hit.GroundFace=GroundFace;
                 // Witness positions returned in world metres; normals already
