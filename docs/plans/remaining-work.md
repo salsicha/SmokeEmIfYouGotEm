@@ -3,7 +3,21 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [source-matched full-map terrain replacement](../reconstruction-review-2026-09-07/shared-terrain-revision.md).
+Latest: [actual paired-terrain playback](../reconstruction-review-2026-09-07/paired-terrain-playback.md).
+World Partition unsaved-actor duplication corrected; actual PIE independently
+verifies revised ground/rock and exact paired water. V9 exits0 with three captures
+and20.871s recording; v6 mismatch/v7 logging/v8 shutdown failures retained.
+Actual viewport1014x550 despite1280x720 request: NOT resolution/FPS acceptance.
+Central bowl absent in this early-state image, but broad smooth froth persists;
+different flow ages prevent causal visual acceptance. No normal-map promotion.
+100/150s full-domain state AND86,720 exact-dry bank checks PASS, NOT settled.
+SAME solve46094/PID22940 LIVE; next4000/200s both audits. SAME package83678 /
+cook5852/shader35032 LIVE; preserve inputs. NEXT linked v2 startup/streaming
+verification and1280x720 actual-game delivery, then physical/visual/30FPS gates.
+Later rivers, all-scene water, crew, normalization/regressions/release OPEN.
+Troublemaker remains a rapid within South Fork, never a separate scenario.
+
+Previous: [source-matched full-map terrain replacement](../reconstruction-review-2026-09-07/shared-terrain-revision.md).
 All803,842 actual native terrain triangles compared; only2,132 declared inferred
 heights/4,466 triangles change.64,935 full-map collision probes PASS, repeated on
 fresh saved-mesh reload; all464 protected identities retained. No map/actor save.
