@@ -2,6 +2,7 @@
 #include "raftsim_water/solver.hpp"
 #include "../src/solver_internal.hpp"
 #include "../src/solver_row_executor.hpp"
+#include "../src/solver_grid_view.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -30,6 +31,26 @@ double max_abs_diff(const raftsim::Array2D& left, const raftsim::Array2D& right)
         }
     }
     return diff;
+}
+
+void assert_validated_grid_views() {
+    using namespace raftsim::solver_detail;
+    raftsim::Array2D field(7,11);
+    WriteGridView write(field,7,11);
+    for (std::size_t r=0;r<7;++r) for (std::size_t c=0;c<11;++c)
+        write(r,c)=double(r*11+c)*.03125;
+    const ReadGridView read(field,7,11);
+    for (std::size_t r=0;r<7;++r) for (std::size_t c=0;c<11;++c)
+        expect(read(r,c)==field(r,c),"validated view changed a value or coordinate");
+    auto rejected=[&](std::size_t ny,std::size_t nx) {
+        bool failed=false;
+        try { ReadGridView bad(field,ny,nx); } catch (const std::runtime_error&) { failed=true; }
+        expect(failed,"invalid view must fail before unchecked access");
+    };
+    rejected(11,7); rejected(0,11); rejected(7,0);
+    rejected(std::numeric_limits<std::size_t>::max(),2);
+    field.values().pop_back(); rejected(7,11);
+    field.values().resize(78); rejected(7,11);
 }
 
 void assert_scenario_loads(const raftsim::Scenario& scenario) {
@@ -219,6 +240,31 @@ void assert_boundary_flux_diagnostic(const raftsim::Scenario& source) {
     try { raftsim::ReducedShallowWaterSolver(scenario, config).inspect_boundary_mass_fluxes(); }
     catch (const std::runtime_error&) { rejected = true; }
     expect(rejected, "unsupported diagnostic mode was silently accepted");
+}
+
+void assert_malformed_state_storage_is_rejected(const raftsim::Scenario& scenario) {
+    for (int field=0;field<8;++field) {
+        auto malformed=scenario;
+        if(field==7) malformed.initial.wet.values.pop_back();
+        else {
+            raftsim::Array2D* arrays[]={&malformed.bed,&malformed.initial.h,&malformed.initial.u,
+                &malformed.initial.v,&malformed.initial.eta,&malformed.initial.hu,&malformed.initial.hv};
+            arrays[field]->values().pop_back();
+        }
+        bool rejected=false;
+        try { raftsim::ReducedShallowWaterSolver bad(malformed); }
+        catch(const std::runtime_error&) { rejected=true; }
+        expect(rejected,"constructor accepted inconsistent numerical backing storage");
+    }
+    raftsim::ReducedShallowWaterSolver solver(scenario);
+    const auto before=solver.state();
+    auto malformed=before;
+    malformed.h.values().pop_back();
+    bool rejected=false;
+    try { solver.replace_state(malformed,3.); } catch(const std::runtime_error&) { rejected=true; }
+    expect(rejected && solver.time()==0. && solver.state().h.values()==before.h.values() &&
+        solver.state().u.values()==before.u.values() && solver.state().v.values()==before.v.values(),
+        "rejected malformed replacement mutated the committed state");
 }
 
 void assert_solver_row_barrier_and_failure_recovery() {
@@ -550,10 +596,12 @@ int main(int argc, char** argv) {
             return 1;
         }
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
+        assert_validated_grid_views();
         assert_solver_row_barrier_and_failure_recovery();
         assert_scenario_loads(scenario);
         assert_boundary_flux_diagnostic(scenario);
         assert_solver_is_deterministic(scenario);
+        assert_malformed_state_storage_is_rejected(scenario);
         assert_finite_volume_second_order_is_deterministic(scenario);
         assert_finite_volume_cfl_failure_is_bounded(scenario);
         assert_validation_rejects_clipped_or_nonfinite_flow(scenario);

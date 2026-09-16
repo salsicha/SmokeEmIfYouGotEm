@@ -1,6 +1,7 @@
 #include "solver_internal.hpp"
 #include "solver_profile.hpp"
 #include "solver_row_executor.hpp"
+#include "solver_grid_view.hpp"
 
 namespace raftsim {
 
@@ -250,6 +251,11 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     RAFTSIM_PROFILE_SCOPE(reconstruction_profile, Reconstruction);
     const std::size_t ny = scenario_.grid.ny;
     const std::size_t nx = scenario_.grid.nx;
+    // Every read/write below is bounded by this immutable stage's grid; worker
+    // stripes join before these views expire. No state or numerical value is cached.
+    const ReadGridView from_h(from.h,ny,nx), from_u(from.u,ny,nx), from_v(from.v,ny,nx);
+    const ReadGridView bed(scenario_.bed,ny,nx);
+    const WriteGridView to_h(to.h,ny,nx), to_u(to.u,ny,nx), to_v(to.v,ny,nx);
     const bool bed_coupling = config_.bed_slope_source_scale != 0.0;
     const bool prescribed_west = config_.experimental_west_discharge_m3s >= 0.0;
     double west_conveyance = 0.0;
@@ -262,16 +268,16 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
             // Keep the external inflow segment inside its authored wetted
             // cross-section. Stage defines this fixed footprint only; it does
             // not constrain the evolving free surface in the inlet segment.
-            west_inlet[row] = boundary->stage - scenario_.bed(row, 0) > config_.dry_tolerance;
+            west_inlet[row] = boundary->stage - bed(row, 0) > config_.dry_tolerance;
             if (!west_inlet[row]) continue;
-            const double h = from.h(row, 0);
+            const double h = from_h(row, 0);
             if (h > config_.dry_tolerance) {
                 const double c = std::sqrt(config_.gravity * h);
-                if (from.u(row, 0) <= -c) {
+                if (from_u(row, 0) <= -c) {
                     // Both characteristics leave through this face (typically a
                     // draining wet/dry fringe). Extrapolate its outgoing flux;
                     // compensate in the subcritical inflow so net Q stays exact.
-                    west_outward_discharge += h * from.u(row, 0) * scenario_.grid.dy;
+                    west_outward_discharge += h * from_u(row, 0) * scenario_.grid.dy;
                 } else {
                     west_conveyance += std::pow(h, 5.0 / 3.0) * scenario_.grid.dy;
                 }
@@ -286,22 +292,25 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     // that topography does not influence the finite-volume dynamics, so the bed is
     // treated as flat throughout the reconstruction.
     auto cell_bed = [&](std::size_t row, std::size_t col) -> double {
-        return bed_coupling ? scenario_.bed(row, col) : 0.0;
+        return bed_coupling ? bed(row, col) : 0.0;
     };
     // Each immutable RK stage revisits the same primitives for slopes and
     // opposite faces. Materialize them once; do not cache across stages or
     // replace_state(), where depths and wet/dry transitions may have changed.
     std::vector<solver_detail::MusclFaceState> primitives(ny * nx);
-    for (std::size_t row = 0; row < ny; ++row) {
+    const bool parallel_rows = nx * ny >= 16384 && boundary_fluxes == nullptr && face_fluxes == nullptr;
+    solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
+    for (std::size_t row = first_row; row < end_row; ++row) {
         for (std::size_t col = 0; col < nx; ++col) {
-            const double h = std::max(0.0, from.h(row, col));
+            const double h = std::max(0.0, from_h(row, col));
             // Dry tolerance suppresses velocity, never positive film volume.
             primitives[row * nx + col] = solver_detail::MusclFaceState{
                 h, cell_bed(row, col) + h,
-                h <= config_.dry_tolerance ? 0.0 : from.u(row, col),
-                h <= config_.dry_tolerance ? 0.0 : from.v(row, col)};
+                h <= config_.dry_tolerance ? 0.0 : from_u(row, col),
+                h <= config_.dry_tolerance ? 0.0 : from_v(row, col)};
         }
     }
+    });
     auto cell_primitive = [&](std::size_t row, std::size_t col) -> const solver_detail::MusclFaceState& {
         return primitives[row * nx + col];
     };
@@ -340,7 +349,6 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     };
 
     std::vector<solver_detail::MusclHalfSlopes> slopes(ny * nx);
-    const bool parallel_rows = nx * ny >= 16384 && boundary_fluxes == nullptr && face_fluxes == nullptr;
     solver_row_ranges(ny, parallel_rows, [&](std::size_t first_row, std::size_t end_row) {
     for (std::size_t row = first_row; row < end_row; ++row) {
         for (std::size_t col = 0; col < nx; ++col) {
@@ -387,7 +395,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
     // behavior), and abrupt bed jumps also keep the cell-center bed so the full jump
     // is handled by the interface f-wave flux instead.
     auto neighbor_wet = [&](std::size_t row, std::size_t col) -> bool {
-        return from.h(row, col) > config_.dry_tolerance;
+        return from_h(row, col) > config_.dry_tolerance;
     };
     auto build_face = [&](std::size_t row, std::size_t col, bool has_wet_neighbor, double neighbor_bed,
                           double eta_face, double u_face, double v_face) -> solver_detail::MusclFaceState {
@@ -549,11 +557,11 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
             // not shoreline cells, positive films, or external boundary faces.
             // Re-evaluate each RK stage so advancing wet fronts remain active.
             if (center.h == 0.0 && row > 0 && row + 1 < ny && col > 0 && col + 1 < nx &&
-                from.h(row, col - 1) == 0.0 && from.h(row, col + 1) == 0.0 &&
-                from.h(row - 1, col) == 0.0 && from.h(row + 1, col) == 0.0) {
-                to.h(row, col) = 0.0;
-                to.u(row, col) = 0.0;
-                to.v(row, col) = 0.0;
+                from_h(row, col - 1) == 0.0 && from_h(row, col + 1) == 0.0 &&
+                from_h(row - 1, col) == 0.0 && from_h(row + 1, col) == 0.0) {
+                to_h(row, col) = 0.0;
+                to_u(row, col) = 0.0;
+                to_v(row, col) = 0.0;
                 previous_east_valid = false;
                 previous_north_valid[col] = false;
                 continue;
@@ -578,7 +586,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
                 // physical face flux directly so the integrated mass flux is Q,
                 // not the flux of another imposed-stage ghost Riemann problem.
                 const double q = (config_.experimental_west_discharge_m3s - west_outward_discharge) *
-                    std::pow(from.h(row, 0), 5.0 / 3.0) / west_conveyance;
+                    std::pow(from_h(row, 0), 5.0 / 3.0) / west_conveyance;
                 const double invariant = center_west.u - 2.0 * std::sqrt(config_.gravity * center_west.h);
                 const bool incoming_supercritical = center_west.u >= std::sqrt(config_.gravity * center_west.h);
                 if (incoming_supercritical && !config_.experimental_west_supercritical_stage)
@@ -601,7 +609,7 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
                     // rather than extrapolating an interior invariant or
                     // silently deleting the shallow bank's discharge.
                     const auto* boundary = boundary_for_edge(scenario_, "west");
-                    h = boundary->stage - scenario_.bed(row, 0);
+                    h = boundary->stage - bed(row, 0);
                     if (h <= config_.dry_tolerance) {
                         throw std::runtime_error("Mixed-regime inlet stage is dry at an active inflow face.");
                     }
@@ -679,14 +687,14 @@ void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
 
             h_next = std::max(0.0, h_next);
             if (h_next <= config_.dry_tolerance) {
-                to.h(row, col) = h_next;
-                to.u(row, col) = 0.0;
-                to.v(row, col) = 0.0;
+                to_h(row, col) = h_next;
+                to_u(row, col) = 0.0;
+                to_v(row, col) = 0.0;
                 continue;
             }
-            to.h(row, col) = h_next;
-            to.u(row, col) = hu_next / safe_depth(h_next, config_.dry_tolerance);
-            to.v(row, col) = hv_next / safe_depth(h_next, config_.dry_tolerance);
+            to_h(row, col) = h_next;
+            to_u(row, col) = hu_next / safe_depth(h_next, config_.dry_tolerance);
+            to_v(row, col) = hv_next / safe_depth(h_next, config_.dry_tolerance);
         }
     }
     });
@@ -1553,21 +1561,31 @@ void ReducedShallowWaterSolver::apply_feature_forcing(double dt, WaterState& nex
 
 void ReducedShallowWaterSolver::recompute_state(WaterState& next) const {
     RAFTSIM_PROFILE_SCOPE(recompute_profile, Recompute);
-    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
-        for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
-            double h = std::max(0.0, next.h(row, col));
-            next.h(row, col) = h;
+    const std::size_t nx=scenario_.grid.nx, ny=scenario_.grid.ny;
+    const ReadGridView bed(scenario_.bed,ny,nx);
+    const WriteGridView depth(next.h,ny,nx), u(next.u,ny,nx), v(next.v,ny,nx),
+        eta(next.eta,ny,nx), hu(next.hu,ny,nx), hv(next.hv,ny,nx);
+    if(next.wet.nx!=nx || next.wet.ny!=ny || next.wet.values.size()!=nx*ny)
+        throw std::runtime_error("Numerical kernel wet-mask shape/storage mismatch");
+    // Independent cells only: no reduction, neighbor reads or persistent values.
+    // The bounded executor preserves the caller's floating-point environment.
+    solver_row_ranges(ny, nx*ny>=16384, [&](std::size_t first_row,std::size_t end_row) {
+    for (std::size_t row = first_row; row < end_row; ++row) {
+        for (std::size_t col = 0; col < nx; ++col) {
+            double h = std::max(0.0, depth(row, col));
+            depth(row, col) = h;
             bool wet = h > config_.dry_tolerance;
-            next.wet.values[idx(scenario_, row, col)] = wet ? 1 : 0;
+            next.wet.values[row*nx+col] = wet ? 1 : 0;
             if (!wet) {
-                next.u(row, col) = 0.0;
-                next.v(row, col) = 0.0;
+                u(row, col) = 0.0;
+                v(row, col) = 0.0;
             }
-            next.eta(row, col) = scenario_.bed(row, col) + h;
-            next.hu(row, col) = h * next.u(row, col);
-            next.hv(row, col) = h * next.v(row, col);
+            eta(row, col) = bed(row, col) + h;
+            hu(row, col) = h * u(row, col);
+            hv(row, col) = h * v(row, col);
         }
     }
+    });
 }
 
 DerivedFields compute_derived_fields(const Scenario& scenario, const WaterState& state, const SolverConfig& config) {
