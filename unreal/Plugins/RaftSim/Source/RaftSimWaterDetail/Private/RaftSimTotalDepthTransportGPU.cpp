@@ -23,23 +23,36 @@ class FRaftSimTotalDepthTransportCS : public FGlobalShader
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,ExteriorState)
         SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float>,ExteriorBed)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,BoundaryFlux)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,Velocity)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,Velocity)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,VelocityOutput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,Geometry)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,PhysicalBedSlope)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,RawX)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,RawY)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,SlopeX)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,SlopeY)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,FluxX)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,FluxY)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,FoamFlux)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,CorrectionX)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,CorrectionY)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,RawX)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,RawXOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,RawY)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,RawYOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,SlopeX)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,SlopeXOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,SlopeY)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,SlopeYOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,FluxX)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,FluxXOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,FluxY)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,FluxYOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,FoamFlux)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,FoamFluxOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,CorrectionX)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,CorrectionXOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,CorrectionY)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,CorrectionYOutput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<uint>,Pairs)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<uint>,Flattened)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,ShorelineFactors)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<uint>,Flattened)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<uint>,FlattenedOutput)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,ShorelineFactors)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,ShorelineFactorsOutput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,HydroRate)
-        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,Partial)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float2>,Partial)
+        SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,PartialOutput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,CFL)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<uint>,Diagnostics)
     END_SHADER_PARAMETER_STRUCT()
@@ -97,13 +110,36 @@ FRaftSimTotalDepthTransportResult RaftSimTotalDepthTransportGPU(FRDGBuilder& Gra
         P->ExteriorState=bExterior?Graph.CreateSRV(ExteriorState):nullptr;
         P->ExteriorBed=bExterior?Graph.CreateSRV(ExteriorBed):nullptr;
         P->BoundaryFlux=bExterior?Graph.CreateUAV(R.BoundaryFlux):nullptr;
-        P->Velocity=Graph.CreateUAV(Velocity);P->Geometry=Graph.CreateUAV(R.Geometry);P->PhysicalBedSlope=Graph.CreateUAV(R.PhysicalBedSlope);
-        P->RawX=Graph.CreateUAV(RawX);P->RawY=Graph.CreateUAV(RawY);P->SlopeX=Graph.CreateUAV(SlopeX);P->SlopeY=Graph.CreateUAV(SlopeY);
-        P->FluxX=Graph.CreateUAV(FluxX);P->FluxY=Graph.CreateUAV(FluxY);P->CorrectionX=Graph.CreateUAV(CorrectionX);P->CorrectionY=Graph.CreateUAV(CorrectionY);
-        P->FoamFlux=Graph.CreateUAV(FoamFlux);
-        P->Flattened=Graph.CreateUAV(Flattened);
-        P->ShorelineFactors=bContinuousShoreline?Graph.CreateUAV(ShorelineFactors):nullptr;
-        P->Pairs=Graph.CreateUAV(R.Pairs);P->HydroRate=Graph.CreateUAV(R.HydroRate);P->Partial=Graph.CreateUAV(Partial);
+        P->Velocity=Phase!=0 ? Graph.CreateSRV(Velocity):nullptr;
+        P->VelocityOutput=Phase==0 ? Graph.CreateUAV(Velocity):nullptr;
+        P->Geometry=Graph.CreateUAV(R.Geometry);
+        P->PhysicalBedSlope=Graph.CreateUAV(R.PhysicalBedSlope);
+        P->RawX=Phase!=1 ? Graph.CreateSRV(RawX):nullptr;
+        P->RawXOutput=Phase==1 ? Graph.CreateUAV(RawX):nullptr;
+        P->RawY=Phase!=1 ? Graph.CreateSRV(RawY):nullptr;
+        P->RawYOutput=Phase==1 ? Graph.CreateUAV(RawY):nullptr;
+        P->SlopeX=Phase!=2 ? Graph.CreateSRV(SlopeX):nullptr;
+        P->SlopeXOutput=Phase==2 ? Graph.CreateUAV(SlopeX):nullptr;
+        P->SlopeY=Phase!=2 ? Graph.CreateSRV(SlopeY):nullptr;
+        P->SlopeYOutput=Phase==2 ? Graph.CreateUAV(SlopeY):nullptr;
+        P->FluxX=Phase!=3 ? Graph.CreateSRV(FluxX):nullptr;
+        P->FluxXOutput=Phase==3 ? Graph.CreateUAV(FluxX):nullptr;
+        P->FluxY=Phase!=3 ? Graph.CreateSRV(FluxY):nullptr;
+        P->FluxYOutput=Phase==3 ? Graph.CreateUAV(FluxY):nullptr;
+        P->CorrectionX=Phase!=3 ? Graph.CreateSRV(CorrectionX):nullptr;
+        P->CorrectionXOutput=Phase==3 ? Graph.CreateUAV(CorrectionX):nullptr;
+        P->CorrectionY=Phase!=3 ? Graph.CreateSRV(CorrectionY):nullptr;
+        P->CorrectionYOutput=Phase==3 ? Graph.CreateUAV(CorrectionY):nullptr;
+        P->FoamFlux=Phase!=3 ? Graph.CreateSRV(FoamFlux):nullptr;
+        P->FoamFluxOutput=Phase==3 ? Graph.CreateUAV(FoamFlux):nullptr;
+        P->Flattened=Phase!=2 ? Graph.CreateSRV(Flattened):nullptr;
+        P->FlattenedOutput=Phase==2 ? Graph.CreateUAV(Flattened):nullptr;
+        P->ShorelineFactors=bContinuousShoreline && Phase!=2 ? Graph.CreateSRV(ShorelineFactors):nullptr;
+        P->ShorelineFactorsOutput=bContinuousShoreline && Phase==2 ? Graph.CreateUAV(ShorelineFactors):nullptr;
+        P->Pairs=Graph.CreateUAV(R.Pairs);
+        P->HydroRate=Graph.CreateUAV(R.HydroRate);
+        P->Partial=Phase!=4 ? Graph.CreateSRV(Partial):nullptr;
+        P->PartialOutput=Phase==4 ? Graph.CreateUAV(Partial):nullptr;
         P->CFL=Graph.CreateUAV(R.CFL);P->Diagnostics=Graph.CreateUAV(R.Diagnostics);
         FRaftSimTotalDepthTransportCS::FPermutationDomain Permutation;Permutation.Set<FRaftSimTotalDepthTransportCS::FPhase>(Phase);
         Permutation.Set<FRaftSimTotalDepthTransportCS::FExterior>(bExterior);

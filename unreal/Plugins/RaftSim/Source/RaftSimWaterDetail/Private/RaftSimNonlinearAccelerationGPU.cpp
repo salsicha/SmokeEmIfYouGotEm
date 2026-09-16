@@ -35,12 +35,16 @@ class FRaftSimNonlinearAccelerationCS : public FGlobalShader
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Solution)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Residual)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Direction)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,DirectionInput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Scratch)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,ScratchInput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,WValue)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,TrueResidual)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<uint>,Diagnostics)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Partial)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,PartialInput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,Control)
+        SHADER_PARAMETER_RDG_BUFFER_SRV(StructuredBuffer<float4>,ControlInput)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,NextPartial)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float4>,NextControl)
         SHADER_PARAMETER_RDG_BUFFER_UAV(RWStructuredBuffer<float2>,PartialExponents)
@@ -105,10 +109,19 @@ FRaftSimNonlinearAccelerationResult RaftSimSolveNonlinearAccelerationGPU(FRDGBui
         Params->Geometry=Graph.CreateSRV(Geometry);Params->Pairs=Graph.CreateSRV(Pairs);Params->RightHandSide=Graph.CreateSRV(RHS);
         Params->Center=Graph.CreateSRV(Center);Params->Edges=Graph.CreateSRV(Edges);Params->Diagonal=Graph.CreateSRV(Diagonal);
         Params->PreparedCenter=Graph.CreateUAV(Center);Params->PreparedEdges=Graph.CreateUAV(Edges);Params->PreparedDiagonal=Graph.CreateUAV(Diagonal);
-        Params->Solution=Graph.CreateUAV(Result.Solution);Params->Residual=Graph.CreateUAV(R);Params->Direction=Graph.CreateUAV(P);
-        Params->Scratch=Graph.CreateUAV(AP);Params->WValue=Graph.CreateUAV(W);Params->TrueResidual=Graph.CreateUAV(Result.Residual);
+        Params->Solution=Graph.CreateUAV(Result.Solution);
+        Params->Residual=Graph.CreateUAV(R);
+        Params->Direction=!Prepare && Phase==13 ? nullptr:Graph.CreateUAV(P);
+        Params->DirectionInput=!Prepare && Phase==13 ? Graph.CreateSRV(P):nullptr;
+        Params->Scratch=!Prepare && Phase==13 ? nullptr:Graph.CreateUAV(AP);
+        Params->ScratchInput=!Prepare && Phase==13 ? Graph.CreateSRV(AP):nullptr;
+        Params->WValue=Graph.CreateUAV(W);
+        Params->TrueResidual=Graph.CreateUAV(Result.Residual);
         Params->Diagnostics=Graph.CreateUAV(Result.Diagnostics);
-        Params->Partial=Graph.CreateUAV(Partial);Params->Control=Graph.CreateUAV(Control);
+        Params->Partial=!Prepare && Phase==13 ? nullptr:Graph.CreateUAV(Partial);
+        Params->PartialInput=!Prepare && Phase==13 ? Graph.CreateSRV(Partial):nullptr;
+        Params->Control=!Prepare && Phase==13 ? nullptr:Graph.CreateUAV(Control);
+        Params->ControlInput=!Prepare && Phase==13 ? Graph.CreateSRV(Control):nullptr;
         Params->NextPartial=Graph.CreateUAV(NextPartial);Params->NextControl=Graph.CreateUAV(NextControl);
         Params->PartialExponents=Graph.CreateUAV(PartialExponents);
         FRaftSimNonlinearAccelerationCS::FPermutationDomain Permutation;Permutation.Set<FRaftSimNonlinearAccelerationCS::FPrepare>(Prepare);

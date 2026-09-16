@@ -111,17 +111,7 @@ void CartesianWaterDomain::step_with_flux_audit(double dt) { advance(dt,true); }
 void CartesianWaterDomain::advance(double dt, bool audit_fluxes) {
     if (!std::isfinite(dt) || dt <= 0.) throw std::runtime_error("Cartesian step must be finite and positive.");
     double stable_dt = std::numeric_limits<double>::max();
-    // Every tile reads only its current immutable state. Reuse the existing
-    // bounded executor/environment propagation, then retain the ORIGINAL
-    // tile-order reduction (including std::min's unordered-value behavior).
-    // The executor suppresses nested row dispatches on larger tile grids.
-    std::vector<double> tile_stable_dt(tiles_.size());
-    solver_detail::solver_row_ranges(tiles_.size(),tiles_.size() >= 16,
-        [&](std::size_t first,std::size_t end) {
-            for (std::size_t i=first;i<end;++i)
-                tile_stable_dt[i]=tiles_[i]->finite_volume_stable_dt();
-        });
-    for (double value : tile_stable_dt) stable_dt=std::min(stable_dt,value);
+    for (const auto& tile : tiles_) stable_dt = std::min(stable_dt,tile->finite_volume_stable_dt());
     const double count = std::ceil(dt/stable_dt);
     if (!std::isfinite(stable_dt) || stable_dt <= 0. || !std::isfinite(count) || count > 4096.)
         throw std::runtime_error("Cartesian finite-volume CFL work limit exceeded.");

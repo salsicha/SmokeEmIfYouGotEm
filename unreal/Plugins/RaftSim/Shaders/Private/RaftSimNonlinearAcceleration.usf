@@ -21,15 +21,37 @@ RWStructuredBuffer<float4> PreparedEdges;
 RWStructuredBuffer<float4> PreparedDiagonal;
 RWStructuredBuffer<float4> Solution;
 RWStructuredBuffer<float4> Residual;
+// Fused alpha/update reads these prior-stage buffers; only the six outputs
+// need UAV slots. Other phases retain their original read/write recurrence.
+#if !RAFTSIM_ACCELERATION_PREPARE && RAFTSIM_ACCELERATION_PHASE == 13
+StructuredBuffer<float4> DirectionInput;
+#define Direction DirectionInput
+#else
 RWStructuredBuffer<float4> Direction;
+#endif
+#if !RAFTSIM_ACCELERATION_PREPARE && RAFTSIM_ACCELERATION_PHASE == 13
+StructuredBuffer<float4> ScratchInput;
+#define Scratch ScratchInput
+#else
 RWStructuredBuffer<float4> Scratch;
+#endif
 RWStructuredBuffer<float2> WValue;
 RWStructuredBuffer<float4> TrueResidual;
 RWStructuredBuffer<uint> Diagnostics;
+#if !RAFTSIM_ACCELERATION_PREPARE && RAFTSIM_ACCELERATION_PHASE == 13
+StructuredBuffer<float4> PartialInput;
+#define Partial PartialInput
+#else
 RWStructuredBuffer<float4> Partial;
+#endif
 // integer scale exponents.xy; rz.xy/norm.zw; alpha.xy/beta.zw; active.xy;
 // last normalization exponents.xy. Solution remains in physical RHS units.
+#if !RAFTSIM_ACCELERATION_PREPARE && RAFTSIM_ACCELERATION_PHASE == 13
+StructuredBuffer<float4> ControlInput;
+#define Control ControlInput
+#else
 RWStructuredBuffer<float4> Control;
+#endif
 // Fused global reductions must never overwrite partials/control that other
 // workgroups are still reading. These are distinct RDG buffers, not aliases.
 RWStructuredBuffer<float4> NextPartial;

@@ -1,9 +1,16 @@
 #include "/Engine/Public/Platform.ush"
 #include "RaftSimPortableFloat.ush"
 #include "RaftSimExactHydrostatic.ush"
+// Intermediate buffers are UAVs only in their producer dispatch. Subsequent
+// dispatches use SRVs: SM5 supports eight UAVs, not eight total buffers.
 #if RAFTSIM_TRANSPORT_CONTINUOUS
 #include "RaftSimScaledHydrostatic.ush"
-RWStructuredBuffer<float2> ShorelineFactors;
+#if RAFTSIM_TRANSPORT_PHASE == 2
+RWStructuredBuffer<float2> ShorelineFactorsOutput;
+#define ShorelineFactors ShorelineFactorsOutput
+#else
+StructuredBuffer<float2> ShorelineFactors;
+#endif
 #endif
 int2 GridSize;
 float CellMeters;
@@ -22,21 +29,81 @@ uint BoundaryIndex(uint i,uint a,bool high)
         2*GridSize.y+(high?GridSize.x:0)+i%GridSize.x;
 }
 #endif
-RWStructuredBuffer<float2> Velocity;
+#if RAFTSIM_TRANSPORT_PHASE == 0
+RWStructuredBuffer<float2> VelocityOutput;
+#define Velocity VelocityOutput
+#else
+StructuredBuffer<float2> Velocity;
+#endif
 RWStructuredBuffer<float2> Geometry;
 RWStructuredBuffer<float2> PhysicalBedSlope;
-RWStructuredBuffer<float4> RawX;
-RWStructuredBuffer<float4> RawY;
-RWStructuredBuffer<float4> SlopeX;
-RWStructuredBuffer<float4> SlopeY;
-RWStructuredBuffer<float4> FluxX;
-RWStructuredBuffer<float4> FluxY;
-RWStructuredBuffer<float2> FoamFlux;
-RWStructuredBuffer<float2> CorrectionX;
-RWStructuredBuffer<float2> CorrectionY;
-RWStructuredBuffer<float2> Partial;
+#if RAFTSIM_TRANSPORT_PHASE == 1
+RWStructuredBuffer<float4> RawXOutput;
+#define RawX RawXOutput
+#else
+StructuredBuffer<float4> RawX;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 1
+RWStructuredBuffer<float4> RawYOutput;
+#define RawY RawYOutput
+#else
+StructuredBuffer<float4> RawY;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 2
+RWStructuredBuffer<float4> SlopeXOutput;
+#define SlopeX SlopeXOutput
+#else
+StructuredBuffer<float4> SlopeX;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 2
+RWStructuredBuffer<float4> SlopeYOutput;
+#define SlopeY SlopeYOutput
+#else
+StructuredBuffer<float4> SlopeY;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 3
+RWStructuredBuffer<float4> FluxXOutput;
+#define FluxX FluxXOutput
+#else
+StructuredBuffer<float4> FluxX;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 3
+RWStructuredBuffer<float4> FluxYOutput;
+#define FluxY FluxYOutput
+#else
+StructuredBuffer<float4> FluxY;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 3
+RWStructuredBuffer<float2> FoamFluxOutput;
+#define FoamFlux FoamFluxOutput
+#else
+StructuredBuffer<float2> FoamFlux;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 3
+RWStructuredBuffer<float2> CorrectionXOutput;
+#define CorrectionX CorrectionXOutput
+#else
+StructuredBuffer<float2> CorrectionX;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 3
+RWStructuredBuffer<float2> CorrectionYOutput;
+#define CorrectionY CorrectionYOutput
+#else
+StructuredBuffer<float2> CorrectionY;
+#endif
+#if RAFTSIM_TRANSPORT_PHASE == 4
+RWStructuredBuffer<float2> PartialOutput;
+#define Partial PartialOutput
+#else
+StructuredBuffer<float2> Partial;
+#endif
 RWStructuredBuffer<uint> Pairs;
-RWStructuredBuffer<uint> Flattened;
+#if RAFTSIM_TRANSPORT_PHASE == 2
+RWStructuredBuffer<uint> FlattenedOutput;
+#define Flattened FlattenedOutput
+#else
+StructuredBuffer<uint> Flattened;
+#endif
 RWStructuredBuffer<uint> Diagnostics;
 RWStructuredBuffer<float4> HydroRate;
 RWStructuredBuffer<float4> CFL;
