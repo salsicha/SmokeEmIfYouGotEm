@@ -115,9 +115,19 @@ bool FRaftSimCartesianWaterRegions::Load(const TSharedPtr<FJsonObject>& Root, FS
 }
 
 const FRaftSimCartesianWaterRegions::FRegion* FRaftSimCartesianWaterRegions::Select(
-    FVector2D PositionM, const FString& ActiveDirectory, FVector2D* OutWindowCenterM) const
+    FVector2D PositionM, const FString& ActiveDirectory, FVector2D* OutWindowCenterM,
+    const FBox2D* RequiredSourceBoundsM) const
 {
     if (PositionM.ContainsNaN()) return nullptr;
+    const FVector2D FieldHalf=ExtentM*.5;
+    FBox2D RequiredCenters(ForceInit);
+    if(RequiredSourceBoundsM)
+    {
+        if(!RequiredSourceBoundsM->bIsValid || RequiredSourceBoundsM->Min.ContainsNaN() ||
+            RequiredSourceBoundsM->Max.ContainsNaN())return nullptr;
+        RequiredCenters=FBox2D(RequiredSourceBoundsM->Max-FieldHalf,RequiredSourceBoundsM->Min+FieldHalf);
+        if(RequiredCenters.Min.X>RequiredCenters.Max.X || RequiredCenters.Min.Y>RequiredCenters.Max.Y)return nullptr;
+    }
     const double ContextM = SourceContextCells*GridSpacingM;
     const FVector2D Half = ExtentM*.5 + FVector2D(ContextM,ContextM);
     const FRegion* Best = nullptr;
@@ -128,6 +138,7 @@ const FRaftSimCartesianWaterRegions::FRegion* FRaftSimCartesianWaterRegions::Sel
     {
         if (!CoversRaft(PositionM,Center) || !Region.BoundsM.IsInsideOrOn(Center-Half) ||
             !Region.BoundsM.IsInsideOrOn(Center+Half)) return;
+        if(RequiredSourceBoundsM && !RequiredCenters.IsInsideOrOn(Center))return;
         const double Shift = FVector2D::DistSquared(PositionM,Center);
         const bool bActive = Region.FieldsDirectory==ActiveDirectory;
         const double Margin = FMath::Min((Center-Region.BoundsM.Min).GetMin(),
@@ -142,6 +153,20 @@ const FRaftSimCartesianWaterRegions::FRegion* FRaftSimCartesianWaterRegions::Sel
     };
     for (const FRegion& Region : Regions)
     {
+        if(RequiredSourceBoundsM)
+        {
+            const auto Cover=[&](const FBox2D& Rectangle)
+            {
+                const FVector2D Low=FVector2D::Max(Rectangle.Min,RequiredCenters.Min);
+                const FVector2D High=FVector2D::Min(Rectangle.Max,RequiredCenters.Max);
+                if(Low.X<=High.X && Low.Y<=High.Y)
+                    Consider(Region,FVector2D(FMath::Clamp(PositionM.X,Low.X,High.X),FMath::Clamp(PositionM.Y,Low.Y,High.Y)));
+            };
+            if(Region.bHasExplicitLiveCenters)
+                for(const FBox2D& Rectangle:Region.LiveCenterBoundsM)Cover(Rectangle);
+            else Cover(FBox2D(Region.BoundsM.Min+Half,Region.BoundsM.Max-Half));
+            continue;
+        }
         if (Region.bHasExplicitLiveCenters)
         {
             for (const FBox2D& Rectangle : Region.LiveCenterBoundsM)

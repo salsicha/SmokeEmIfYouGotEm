@@ -29,6 +29,8 @@ public:
     virtual void TickComponent(float DeltaTime,ELevelTick TickType,FActorComponentTickFunction* ThisTickFunction) override;
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 private:
+    friend class FRaftSimDetailNativeHandoffTest;
+    bool EnsureSourceCoverage(FVector2f NextOrigin);
     bool CacheSampleCoordinates();
     bool UpdateMeanFlow();
     TSharedPtr<const FRaftSimTotalDepthSource,ESPMode::ThreadSafe> SampleClosingWindow(FString& Error);

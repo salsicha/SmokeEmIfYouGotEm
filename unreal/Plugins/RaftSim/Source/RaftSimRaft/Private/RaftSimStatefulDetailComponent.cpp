@@ -9,6 +9,9 @@
 #include "RaftSimWaterTextureHistory.h"
 #include "RaftSimDetailEntrainment.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimRiverWaterStreamingActor.h"
+#include "RaftSimDetailSourceFootprint.h"
+#include "EngineUtils.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
@@ -107,7 +110,7 @@ bool URaftSimStatefulDetailComponent::Initialize(URaftSimWaterRuntimeAdapter* Ad
     WindowOriginMeters=bMovingWindow
         ? FVector2f(Center.X/100.0-32.0,Center.Y*Left.Y/100.0-32.0)
         : FVector2f(DetailOriginMeters,DetailOriginMeters);
-    if (!CacheSampleCoordinates() || !UpdateMeanFlow())return false;
+    if (!EnsureSourceCoverage(WindowOriginMeters) || !CacheSampleCoordinates() || !UpdateMeanFlow())return false;
     const int32 TextureHeight=DetailSize+(bMovingWindow ? 1 : 0);
     SurfaceTexture=NewObject<UTextureRenderTarget2D>(this);
     SurfaceTexture->ClearColor=FLinearColor::Transparent;
@@ -196,6 +199,21 @@ bool URaftSimStatefulDetailComponent::AuditPresentedFrame()
 #else
     return false;
 #endif
+}
+
+bool URaftSimStatefulDetailComponent::EnsureSourceCoverage(FVector2f NextOrigin)
+{
+    if(!bMovingWindow)return true;
+    FBox2D Required,Current;
+    if(!Water || !FRaftSimDetailSourceFootprint::Required(WindowOriginMeters,NextOrigin,LiveSourceSampleSide(),Required))return false;
+    if(Water->GetLiveWaterFieldBoundsM(Current) && FRaftSimDetailSourceFootprint::Covered(Current,Required))return true;
+    // Called after observing the current raft transform, immediately before
+    // closing/current source sampling. No dependency on the periodic actor tick.
+    for(TActorIterator<ARaftSimRiverWaterStreamingActor> It(GetWorld());It;++It)
+        if(It->EnsureDetailSourceCoverage(Water,Required))return true;
+    UE_LOG(LogTemp,Error,TEXT("No complete native crop for detail source footprint min=(%.9f,%.9f) max=(%.9f,%.9f); refusing fallback water"),
+        Required.Min.X,Required.Min.Y,Required.Max.X,Required.Max.Y);
+    return false;
 }
 
 bool URaftSimStatefulDetailComponent::CacheSampleCoordinates()
@@ -452,10 +470,14 @@ void URaftSimStatefulDetailComponent::TickComponent(float DeltaTime,ELevelTick T
     // AFTER the surface actor's tick. Read its current transform here, not a
     // stale early-frame position copied by that actor.
     if (bMovingWindow && FocusActor.IsValid())FocusWorldCm=FocusActor->GetActorLocation();
-    if (bMovingWindow && FMath::Max(FMath::Abs(FocusWorldCm.X-Center.X),FMath::Abs(FocusWorldCm.Y-Center.Y))>=800.0)
+    const bool bMove=bMovingWindow && FMath::Max(FMath::Abs(FocusWorldCm.X-Center.X),FMath::Abs(FocusWorldCm.Y-Center.Y))>=800.0;
+    const double NextX=bMove ? FMath::RoundToDouble(FocusWorldCm.X/50.0)*50.0 : Center.X;
+    const double NextY=bMove ? FMath::RoundToDouble(FocusWorldCm.Y/50.0)*50.0 : Center.Y;
+    const FVector2f NextOrigin=bMove ? FVector2f(NextX/100.0-32.0,NextY*Left.Y/100.0-32.0) : WindowOriginMeters;
+    if(!EnsureSourceCoverage(NextOrigin))
+    { SurfaceMaterial->SetScalarParameterValue(TEXT("StatefulDetailEnable"),0);bReady=false;return; }
+    if (bMove)
     {
-        const double NextX=FMath::RoundToDouble(FocusWorldCm.X/50.0)*50.0,NextY=FMath::RoundToDouble(FocusWorldCm.Y/50.0)*50.0;
-        const FVector2f NextOrigin(NextX/100.0-32.0,NextY*Left.Y/100.0-32.0);
         const auto Shift=(NextOrigin-WindowOriginMeters)/.5f;
         PendingClosingWindowSource.Reset();
         if(FMath::Abs(Shift.X)<128 && FMath::Abs(Shift.Y)<128)

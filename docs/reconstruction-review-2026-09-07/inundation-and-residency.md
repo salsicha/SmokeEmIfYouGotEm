@@ -156,3 +156,26 @@ Broad froth/bank streaks, settled hydraulics, normal-play delivery and the uncha
 still fails. Colorado then Pacuare then Futaleufu, other-scene water, crew,
 normalization/regressions and release remain open. Troublemaker remains only a
 rapid in the South Fork scenario, never a separate menu entry.
+
+## Detail source-coverage fix: native regression verified
+
+The detail consumer now requests a complete native crop synchronously before
+initialization and each source update. Selection includes the exact current/next
+67-node source footprints (69 for pressure diagnostics), including overlapping
+closing observations. Existing crop dimensions, resolution, raft margin, sampling
+strictness and physics are unchanged; unavailable coverage still fails closed.
+
+On 2026-09-16, the isolated native module compiled and all four
+`RaftSim.M3.Detail` tests passed (process exit 0). The real pre-failure crop
+reproduced 67 missing samples among 8,978 queries. The production detail/controller
+coverage call restored all queries in one native handoff, preserved all 8,911
+previously valid samples exactly, and preserved simulation and committed clocks.
+Repeated coverage requests did not reload the crop. Full-route selection checked
+52,689 detail/closing footprints at center and +/-12m offsets, with zero missing.
+
+Local report: `tmp/detail-footprint-v1-20260916/native-tests-v3/index.json`, SHA256
+`7eb0e17816088074467b2ab928566eac10096077d5db0ff654811672869f2d5d`.
+Temporary harnesses, reports and binaries remain ignored, not release content.
+This is isolated native regression evidence, not a normal project relink,
+extended gameplay replay, visual acceptance or a 30FPS qualification. Those
+checks remain required; existing project DLLs and shaders were not replaced.

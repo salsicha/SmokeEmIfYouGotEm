@@ -24,7 +24,7 @@ public:
 
     bool Load(const TSharedPtr<FJsonObject>& Root, FString& OutError);
     const FRegion* Select(FVector2D PositionM, const FString& ActiveDirectory,
-        FVector2D* OutWindowCenterM = nullptr) const;
+        FVector2D* OutWindowCenterM = nullptr,const FBox2D* RequiredSourceBoundsM = nullptr) const;
     bool CoversRaft(FVector2D PositionM, FVector2D WindowCenterM) const;
     bool NeedsRecentering(FVector2D PositionM, FVector2D PreviousCenterM) const;
     FVector2D GetExtentM() const { return ExtentM; }

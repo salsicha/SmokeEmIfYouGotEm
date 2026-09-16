@@ -35,8 +35,13 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water|Streaming")
     FString GetActiveFieldsDirectory() const { return ActiveFieldsDirectory; }
 
+    // Synchronous game-thread coverage request from the actual detail consumer.
+    // The ordinary periodic raft controller cannot guarantee its full halo.
+    bool EnsureDetailSourceCoverage(URaftSimWaterRuntimeAdapter* ConsumerWater,const FBox2D& RequiredBoundsM);
+
 private:
     friend class FRaftSimCartesianStreamingActorTest;
+    friend class FRaftSimDetailNativeHandoffTest;
     struct FSourceWindow
     {
         FString FieldsDirectory;
@@ -49,7 +54,7 @@ private:
 
     bool LoadStreamingManifest();
     const FSourceWindow* SelectSource(float StationM) const;
-    bool UpdateWaterWindow(bool bForce);
+    bool UpdateWaterWindow(bool bForce,const FBox2D* RequiredSourceBoundsM=nullptr);
     void ApplyStaticFlowBandVisibility() const;
     void ApplyStaticFlowBandVisibilityToActor(AActor* Actor) const;
     void HandleLevelAddedToWorld(ULevel* Level, UWorld* World);

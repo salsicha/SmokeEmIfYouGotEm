@@ -16,6 +16,7 @@
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
+#include "RaftSimDetailSourceFootprint.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -227,7 +228,18 @@ ARaftSimRiverWaterStreamingActor::SelectSource(float StationM) const
     return Best;
 }
 
-bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
+bool ARaftSimRiverWaterStreamingActor::EnsureDetailSourceCoverage(
+    URaftSimWaterRuntimeAdapter* ConsumerWater,const FBox2D& RequiredBoundsM)
+{
+    check(IsInGameThread());
+    if(!bCartesianStreaming || !ConsumerWater || ConsumerWater!=WaterAdapter || !RequiredBoundsM.bIsValid)return false;
+    FBox2D Bounds;
+    if(WaterAdapter->GetLiveWaterFieldBoundsM(Bounds) && FRaftSimDetailSourceFootprint::Covered(Bounds,RequiredBoundsM))return true;
+    if(!UpdateWaterWindow(true,&RequiredBoundsM))return false;
+    return WaterAdapter->GetLiveWaterFieldBoundsM(Bounds) && FRaftSimDetailSourceFootprint::Covered(Bounds,RequiredBoundsM);
+}
+
+bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce,const FBox2D* RequiredSourceBoundsM)
 {
     if (!Raft || !WaterAdapter)
     {
@@ -250,7 +262,7 @@ bool ARaftSimRiverWaterStreamingActor::UpdateWaterWindow(bool bForce)
     if (bCartesianStreaming)
     {
         FVector2D WindowCenter;
-        const auto* Region = CartesianRegions.Select(RiverPosition, ActiveFieldsDirectory,&WindowCenter);
+        const auto* Region = CartesianRegions.Select(RiverPosition, ActiveFieldsDirectory,&WindowCenter,RequiredSourceBoundsM);
         if (!Region)
         {
             UE_LOG(LogTemp, Warning, TEXT("RaftSim Cartesian water has no complete source crop at (%.3f, %.3f)"),
