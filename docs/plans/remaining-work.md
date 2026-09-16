@@ -3,6 +3,11 @@
 Last reviewed 2026-09-15 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
+Latest performance experiment: [exact-coordinate binding cache](../reconstruction-review-2026-09-07/crest-bound-memo-comparison.md).
+All 64 actual-input pairs are geometrically exact, but the candidate is slower
+in both execution orders and uses more memory. It remains opt-in, OFF by default;
+nine native and 39 targeted Python tests pass. The 30 FPS gate remains OPEN.
+
 Latest September 15: [source-matched landward 50-second playable comparison](../reconstruction-review-2026-09-07/normal-river-landward-playable-50s.md).
 Landward cook session59493/PID24324 FINISHED; all 5,350,400 cells, dry banks,
 799 runtime packets, 406,823 original-water coverage probes and 12,800 native

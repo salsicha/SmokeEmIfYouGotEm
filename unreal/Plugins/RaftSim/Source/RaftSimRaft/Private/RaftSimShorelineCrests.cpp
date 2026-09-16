@@ -13,6 +13,7 @@
 #include "RaftSimCrestEdgeHashAudit.h"
 #include "RaftSimCrestLevelMemoAudit.h"
 #include "RaftSimCrestRangeAudit.h"
+#include "RaftSimCrestBoundMemoAudit.h"
 
 CSV_DEFINE_CATEGORY(RaftSimCrests,true);
 
@@ -108,6 +109,8 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
             Refinement.bStrongEdgeHash=bStrongEdgeHash;
             static const bool bLevelLocalMemos=FParse::Param(FCommandLine::Get(),TEXT("RaftSimLevelLocalCrestMemos"));
             Refinement.bLevelLocalMemos=bLevelLocalMemos;
+            static const bool bBoundMemo=FParse::Param(FCommandLine::Get(),TEXT("RaftSimBoundCrestMemo"));
+            Refinement.bBoundCoordinateMemo=bBoundMemo;
             static const bool bRangeBound=!FParse::Param(FCommandLine::Get(),TEXT("RaftSimReferenceCrestRange"));
             Refinement.HeightRangeWidthCm=bRangeBound ? Input.HeightRangeWidthAtWorldXYCm : TFunction<float(const FBox2D&)>();
             const uint64 OldBuilds=Refinement.TopologyBuildCount,OldReuses=Refinement.TopologyReuseCount;
@@ -164,6 +167,7 @@ bool FRaftSimShorelineCrests::Update(const TArray<FProcMeshVertex>& Source,
         RaftSimCrestEdgeHashAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestLevelMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         RaftSimCrestRangeAudit::Run(CachedXY,Triangles,Input,Refinement);
+        RaftSimCrestBoundMemoAudit::Run(CachedXY,Triangles,Input,Refinement);
         ++BuildCount;
         TargetsMs=bTiming ? (FPlatformTime::Seconds()-Selected)*1000. : 0.;
     }
