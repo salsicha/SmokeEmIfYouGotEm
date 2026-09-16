@@ -1,0 +1,41 @@
+#ifndef RAFTSIM_PORTABLE_ADD
+#define RAFTSIM_PORTABLE_ADD
+// Two binary32 operands need a 24-bit significand plus guard/round/sticky,
+// unlike the wide exact product-and-add accumulator. Integer-only alignment
+// retains denormals independently of the GPU's floating-point flush mode.
+uint RaftSimAddShiftRightJam(uint value,uint shift)
+{
+    if(shift==0)return value;
+    if(shift>=32)return uint(value!=0);
+    return (value>>shift)|uint((value&((1u<<shift)-1u))!=0);
+}
+float RaftSimPortableAdd(float a,float b)
+{
+    uint ba=asuint(a),bb=asuint(b),aa=ba&0x7fffffffu,ab=bb&0x7fffffffu;
+    // Preserve the existing finite-physical-helper contract, not a new NaN
+    // payload or infinity arithmetic policy.
+    if(aa>=0x7f800000u || ab>=0x7f800000u)return asfloat(0x7fc00000u);
+    if(aa==0 && ab==0)return asfloat(ba&bb&0x80000000u);
+    if(aa==0)return b;
+    if(ab==0)return a;
+    if(aa<ab){uint swap=ba;ba=bb;bb=swap;}
+    uint sign=ba&0x80000000u,ma=ba&0x7fffffu,mb=bb&0x7fffffu;
+    int ea=int((ba>>23)&255u),eb=int((bb>>23)&255u);
+    if(ea==0){int shift=23-firstbithigh(ma);ma<<=shift;ea=1-shift;}else ma|=0x800000u;
+    if(eb==0){int shift=23-firstbithigh(mb);mb<<=shift;eb=1-shift;}else mb|=0x800000u;
+    uint left=ma<<3,right=RaftSimAddShiftRightJam(mb<<3,uint(ea-eb));
+    uint magnitude=((ba^bb)&0x80000000u)==0?left+right:left-right;
+    if(magnitude==0)return 0; // Exact nonzero cancellation is positive zero.
+    int adjust=firstbithigh(magnitude)-26;
+    if(adjust>0)magnitude=RaftSimAddShiftRightJam(magnitude,uint(adjust));
+    else magnitude<<=uint(-adjust);
+    int exponent=ea+adjust;
+    if(exponent<=0){magnitude=RaftSimAddShiftRightJam(magnitude,uint(1-exponent));exponent=1;}
+    uint rounded=magnitude>>3,remainder=magnitude&7u;
+    if(remainder>4u || (remainder==4u && (rounded&1u)!=0))++rounded;
+    if(rounded>=0x1000000u){rounded>>=1;++exponent;}
+    if(exponent>=255)return asfloat(sign|0x7f800000u);
+    if(rounded<0x800000u)return asfloat(sign|rounded);
+    return asfloat(sign|(uint(exponent)<<23)|(rounded&0x7fffffu));
+}
+#endif

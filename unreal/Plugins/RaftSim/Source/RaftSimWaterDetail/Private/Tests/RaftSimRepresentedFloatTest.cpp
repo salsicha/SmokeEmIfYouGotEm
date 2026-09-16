@@ -41,7 +41,7 @@ bool FRepresentedFloatTest::RunTest(const FString&)
     const uint32 Operation=Header[1]-1;const bool bFace=Operation==4 || Operation==8;
     const uint32 Stride=bFace?96:Operation==0?16:20;
     const uint32 InputVectors=bFace?4:1,ExpectedComponents=bFace?8:1,OutputComponents=bFace?8:4;
-    if(Header[0]!=0x52534650 || Header[1]<1 || Header[1]>9 || Header[2]<32 || Header[2]>65536 || Bytes.Num()!=12+Stride*Header[2])
+    if(Header[0]!=0x52534650 || Header[1]<1 || Header[1]>10 || Header[2]<32 || Header[2]>65536 || Bytes.Num()!=12+Stride*Header[2])
     {AddError(TEXT("Invalid bounded arithmetic fixture"));return false;}
     TArray<FVector4f> Input;Input.SetNumUninitialized(Header[2]*InputVectors);TArray<uint32> ExpectedBits;ExpectedBits.SetNumUninitialized(Header[2]*ExpectedComponents);
     for(uint32 I=0;I<Header[2];++I)
@@ -49,7 +49,7 @@ bool FRepresentedFloatTest::RunTest(const FString&)
     const bool bDoubleRequested=FParse::Param(FCommandLine::Get(),TEXT("RaftSimDoubleArithmeticControl"));
     if(bDoubleRequested && (Operation!=0 || !IsD3DPlatform(GMaxRHIShaderPlatform) || GMaxRHIFeatureLevel<ERHIFeatureLevel::SM6))
     {AddError(TEXT("FP64 control requires Euler fixtures and a capable D3D SM6 device; portable arithmetic does not"));return false;}
-    uint32 WrongEuler=0,WrongRoundtrip=0,OrdinaryDifferences=0,CompletedBackends=0;TArray<FString> Details;
+    uint32 WrongEuler=0,WrongRoundtrip=0,WrongLegacyAdd=0,OrdinaryDifferences=0,CompletedBackends=0;TArray<FString> Details;
     ENQUEUE_RENDER_COMMAND(RepresentedFloatArithmetic)([&](FRHICommandListImmediate& Cmd)
     {
         const bool bDoubleControl=bDoubleRequested;
@@ -81,6 +81,7 @@ bool FRepresentedFloatTest::RunTest(const FString&)
             uint32 Expected=ExpectedBits[I],Initial;FMemory::Memcpy(&Initial,&Input[I].X,4);
             bool Wrong=Values[4*I]!=Expected;
             WrongEuler+=Wrong;WrongRoundtrip+=Values[4*I+1]!=Initial;if(Operation==0)OrdinaryDifferences+=Values[4*I+2]!=Expected;
+            if(Operation==9)WrongLegacyAdd+=Values[4*I+2]!=Expected;
             if((Wrong || I<2) && Details.Num()<16)
                 Details.Add(FString::Printf(TEXT("%s case%d expected%08x represented%08x"),bPortable?TEXT("integer"):TEXT("double"),I,Expected,Values[4*I]));
         }
@@ -90,6 +91,7 @@ bool FRepresentedFloatTest::RunTest(const FString&)
     FlushRenderingCommands();TestEqual(TEXT("Read every requested arithmetic backend"),CompletedBackends,bDoubleRequested?2u:1u);
     TestEqual(TEXT("Exact rational arithmetic / admissibility reference"),WrongEuler,0u);
     TestEqual(TEXT("Transported input / double roundtrip bits exact"),WrongRoundtrip,0u);
+    TestEqual(TEXT("Original wide-accumulator addition also matches the rational oracle"),WrongLegacyAdd,0u);
     AddInfo(FString::Printf(TEXT("%u cases operation%u; combined errors%u, input/roundtrip errors%u, ordinary differences%u; portable backend always tested; not full solver qualification"),Header[2],Operation,WrongEuler,WrongRoundtrip,OrdinaryDifferences));
     for(const auto& Detail:Details)AddInfo(Detail);
     return !HasAnyErrors();

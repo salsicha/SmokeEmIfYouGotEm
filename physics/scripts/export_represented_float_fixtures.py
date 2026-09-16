@@ -163,6 +163,43 @@ def product_cases():
     for row in raw.view(np.float32):yield 'finite_random',(*map(float,row),0.,0.)
 
 
+def sum_bits(a,b):
+    ba,bb=(struct.unpack('<I',struct.pack('<f',v))[0] for v in (a,b))
+    if (ba&0x7f800000)==0x7f800000 or (bb&0x7f800000)==0x7f800000:return 0x7fc00000
+    if (ba&0x7fffffff)==0 and (bb&0x7fffffff)==0:return ba&bb&0x80000000
+    return rounded_bits(Fraction(float(a))+Fraction(float(b)))
+
+
+def addition_cases():
+    def value(bits):return struct.unpack('<f',struct.pack('<I',bits))[0]
+    raw_values=(0,1,2,3,0x3fffff,0x7ffffe,0x7fffff,0x800000,0x800001,
+                0x1000000,0x3f000000,0x3f800000,0x3f800001,0x7f7fffff,
+                0x7f800000,0x7fc00000)
+    for a in raw_values:
+        for b in raw_values:
+            for signs in range(4):
+                yield 'signed_range_and_special',(value(a|((signs&1)<<31)),value(b|((signs>>1)<<31)),0.,0.)
+    for exponent in range(1,255):
+        for mantissa in (0,1,2,0x3fffff,0x7ffffe,0x7fffff):
+            a=(exponent<<23)|mantissa
+            for delta in (-1,0,1):
+                b=a+delta
+                if b>=0x7f800000:continue
+                for sign in (0,0x80000000):
+                    yield 'cancellation',(value(a|sign),value(b|(sign^0x80000000)),0.,0.)
+        # Both tie parities, each side of a halfway value, carry/borrow at
+        # exponent boundaries, and exponent gaps beyond the machine word.
+        for a in ((exponent<<23),(exponent<<23)|1,(exponent<<23)|0x7fffff):
+            for gap in (1,3,4,23,24,25,31,32,100,254):
+                small=max(1,exponent-gap)<<23 if exponent>gap else 1
+                for delta in (-1,0,1):
+                    for sign in (0,0x80000000):
+                        yield 'alignment_rounding',(value(a),value((small+delta)|sign),0.,0.)
+    rng=np.random.default_rng(20260916)
+    raw=rng.integers(0,0xffffffff,(8192,2),dtype=np.uint32)
+    for row in raw.view(np.float32):yield 'finite_random',(*map(float,row),0.,0.)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('--output', type=Path, required=True)
     mode = parser.add_mutually_exclusive_group()
@@ -171,13 +208,15 @@ def main():
     mode.add_argument('--divide', action='store_true', help='Correctly rounded represented FP32 division')
     mode.add_argument('--sqrt', action='store_true', help='Correctly rounded represented FP32 square root')
     mode.add_argument('--multiply', action='store_true', help='Exact finite represented FP32 product; nonfinite inputs invalid')
+    mode.add_argument('--add', action='store_true', help='Exact finite represented FP32 sum; nonfinite inputs invalid')
     args = parser.parse_args(); manifest = args.output.with_suffix('.json')
     if args.output.exists() or manifest.exists(): raise FileExistsError(args.output)
     records = []; payload = bytearray()
-    wide = args.rk2 or args.validity or args.divide or args.sqrt or args.multiply; stride = 20 if wide else 16
-    for name, triple in (product_cases() if args.multiply else sqrt_cases() if args.sqrt else division_cases() if args.divide else validity_cases() if args.validity else rk2_cases() if args.rk2 else cases()):
+    wide = args.rk2 or args.validity or args.divide or args.sqrt or args.multiply or args.add; stride = 20 if wide else 16
+    for name, triple in (addition_cases() if args.add else product_cases() if args.multiply else sqrt_cases() if args.sqrt else division_cases() if args.divide else validity_cases() if args.validity else rk2_cases() if args.rk2 else cases()):
         represented = np.asarray(triple, dtype=np.float32)
-        if args.multiply: expected=product_bits(*represented[:2])
+        if args.add: expected=sum_bits(*represented[:2])
+        elif args.multiply: expected=product_bits(*represented[:2])
         elif args.sqrt: expected=sqrt_bits(represented[0])
         elif args.divide: expected = divided_bits(*represented[:2])
         elif args.validity: expected = int(valid_state(represented))
@@ -186,9 +225,9 @@ def main():
             expected = rounded_bits((values[0]+values[1]+values[2]*values[3])/2 if args.rk2 else values[0]+values[1]*values[2])
         payload.extend(struct.pack('<ffffI' if wide else '<fffI', *represented, expected))
         if name != 'finite_random': records.append(dict(index=len(payload)//stride-1, name=name, expected_bits=expected))
-    data = struct.pack('<III', 0x52534650, 8 if args.multiply else 6 if args.sqrt else 4 if args.divide else 3 if args.validity else 2 if args.rk2 else 1, len(payload)//stride)+payload
+    data = struct.pack('<III', 0x52534650, 10 if args.add else 8 if args.multiply else 6 if args.sqrt else 4 if args.divide else 3 if args.validity else 2 if args.rk2 else 1, len(payload)//stride)+payload
     with args.output.open('xb') as stream: stream.write(data)
-    report = dict(scope=__doc__,count=len(payload)//stride,rk2=args.rk2,validity=args.validity,divide=args.divide,sqrt=args.sqrt,multiply=args.multiply,selected=records,
+    report = dict(scope=__doc__,count=len(payload)//stride,rk2=args.rk2,validity=args.validity,divide=args.divide,sqrt=args.sqrt,multiply=args.multiply,add=args.add,selected=records,
         fixture_sha256=hashlib.sha256(data).hexdigest(),implementation_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     with manifest.open('x') as stream: json.dump(report, stream, indent=2)
     print(json.dumps(report, indent=2))

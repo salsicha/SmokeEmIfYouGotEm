@@ -3,6 +3,11 @@
 #include "RaftSimPortableFloat.ush"
 #include "RaftSimExactHydrostatic.ush"
 #include "RaftSimScaledHydrostatic.ush"
+// Compare the unwired candidate and the existing wide-accumulator helper on
+// the same GPU inputs before changing any physical shader consumer.
+#define RaftSimPortableAdd RaftSimPortableAddCandidate
+#include "RaftSimPortableAdd.ush"
+#undef RaftSimPortableAdd
 #else
 #include "RaftSimRepresentedFloat.ush"
 #endif
@@ -16,6 +21,11 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     if(id.x>=Count)return;
     float4 v=Input[id.x];
 #if RAFTSIM_ARITHMETIC_PORTABLE
+    if(RK2==9)
+    {
+        Output[id.x]=uint4(asuint(RaftSimPortableAddCandidate(v.x,v.y)),
+            asuint(v.x),asuint(RaftSimPortableAdd(v.x,v.y)),0);return;
+    }
     if(RK2==4 || RK2==8)
     {
         bool2 positive;float4 result;

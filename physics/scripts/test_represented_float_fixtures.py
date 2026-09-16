@@ -109,3 +109,25 @@ def test_product_rational_oracle_agrees_with_exact_double_product_then_single_ro
                 assert product_bits(a,b)==bits(np.float32(np.float64(a)*np.float64(b)))
             count+=1
     assert count==34875
+
+
+def test_addition_reference_special_values_and_cancellation():
+    from export_represented_float_fixtures import sum_bits
+    assert sum_bits(-0.,-0.)==0x80000000
+    assert sum_bits(-0.,0.)==sum_bits(1.,-1.)==0
+    assert sum_bits(np.inf,0.)==sum_bits(np.nan,1.)==0x7fc00000
+    assert sum_bits(2.**-126,-(2.**-126-2.**-149))==1
+    assert sum_bits(1.,2.**-24)==bits(1.)
+    assert sum_bits(1.+2.**-23,2.**-24)==bits(1.+2.**-22)
+    assert sum_bits(float(np.finfo(np.float32).max),2.**104)==0x7f800000
+
+
+def test_addition_fixture_oracle_agrees_with_independent_numpy_single_addition():
+    from export_represented_float_fixtures import addition_cases,sum_bits
+    count=0
+    with np.errstate(over='ignore',under='ignore',invalid='ignore'):
+        for _,(a,b,_,_) in addition_cases():
+            if np.isfinite(a) and np.isfinite(b):
+                assert sum_bits(a,b)==bits(np.float32(a)+np.float32(b))
+            count+=1
+    assert count==64078
