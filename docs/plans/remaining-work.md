@@ -3,7 +3,20 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [sustained contact and original-triangle sweeps](../reconstruction-review-2026-09-07/normal-river-sustained-contact.md).
+Latest: [actual terrain contact-normal refresh](../reconstruction-review-2026-09-07/normal-river-contact-normal-refresh.md).
+Captured source state proves near-normal deduplication discarded a newly closing
+constraint. Exact unchanged-terrain regression FAILS before / PASSES after its
+normal refresh; all 13 native tests PASS. Actual existing South Fork game runs
+through 72.149 s with zero rejected contact steps; sampled decoded frames pass
+the earlier roof-jump location. This remains opt-in, not full-hull/default,
+visual or 30 FPS acceptance. Large terrain cache startup is still 3.638 s.
+NEXT full authored/deformed hull coverage, initial-overlap and packaged source
+qualification, startup/runtime cost, then safe normal-play promotion alongside
+the source-matched reconstruction. Existing cook's 300/350 s cell/bank audits
+PASS, NOT settled; next local 7000 / absolute 400 s audit, no restart on timeout.
+All later rivers, all-scene water, crew, normalization and release remain open.
+
+Previous: [sustained contact and original-triangle sweeps](../reconstruction-review-2026-09-07/normal-river-sustained-contact.md).
 Final editor build and 12 native tests PASS, including sustained multi-support
 rotation, actual-mesh clearance and transformed BVH/source-triangle agreement.
 Actual South Fork replay still FAILS contact acceptance: 81 zero-time separating

@@ -8,6 +8,69 @@
 #include "Misc/ScopeExit.h"
 
 #if WITH_AUTOMATION_TESTS
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimCapturedManifoldRegressionTest,
+    "RaftSim.Physics.CapturedTerrainManifoldNormal",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FRaftSimCapturedManifoldRegressionTest::RunTest(const FString&)
+{
+    // Original force-updated input from South Fork's rejected substep, not a
+    // moved rock or invented plane. See normal-river-contact-normal-refresh.md.
+    UWorld* World=UWorld::CreateWorld(EWorldType::Editor,false);
+    if(!World)return false;
+    ON_SCOPE_EXIT {World->DestroyWorld(false);World->RemoveFromRoot();};
+    auto* Asset=LoadObject<UStaticMesh>(nullptr,TEXT("/Game/RaftSim/Environment/SouthForkReconstruction/Troublemaker/SM_TroublemakerCapturedGround.SM_TroublemakerCapturedGround"));
+    auto* Ground=World->SpawnActor<AStaticMeshActor>();
+    if(!Asset || !Ground){AddError(TEXT("actual captured terrain unavailable"));return false;}
+    Ground->Tags.Add(TEXT("RaftSimPhysicalGround"));
+    auto* Component=Ground->GetStaticMeshComponent();Component->SetStaticMesh(Asset);
+    Component->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    const FTransform Transform(FQuat::Identity,FVector(-543186.63697775919,-360044.75875617936,0),FVector(1,-1,1));
+    Ground->SetActorTransform(Transform);
+    FRaftSimGroundSourceRegistry Sources(World);
+    const FRaftSimGroundSweep Sweep=[&](const FVector& A,const FVector& B,double R,FHitResult& H)
+    {return Sources.SweepCapturedSphere(A,B,R,H);};
+    const TArray<FVector> Supports{FVector(1.8500000953674316,-.85,0),FVector(1.8500000953674316,.85,0),
+        FVector(0,-1,0),FVector(0,1,0),FVector(-1.8500000953674316,-.85,0),FVector(-1.8500000953674316,.85,0)};
+    FRaftSimFlexRigidState Start;
+    Start.Position=FVector(-5424.7174506758874,-3598.7643103566443,8.361084349034396);
+    Start.Orientation=FQuat(.021392189267036451,-.015856605861191558,-.94161085906592412,.33564852506462606);
+    Start.LinearVelocity=FVector(-1.1076687237533553,.87921918031475277,-.38718523429993262);
+    Start.AngularVelocity=FVector(.32498939504031243,-.048382579305241646,.39650499166802355);
+    constexpr double Dt=.0083333337679505348,Radius=.2800000011920929,Mass=605.;
+    const FVector Inertia(510.24191284179688,510.24191284179688,1133.8709716796875);
+    auto State=Start;RaftSimSweptGround::Advance(State,Dt);
+    const auto Result=RaftSimSweptGround::Integrate(State,Start,Supports,Radius,Mass,Inertia,Dt,Sweep);
+    TestTrue(FString::Printf(TEXT("actual rejected substep completes: %s"),*Result.Failure),Result.bCompleted);
+    TestTrue(TEXT("actual substep consumes all time"),FMath::Abs(Result.ConsumedSeconds-Dt)<1.e-12);
+    TestTrue(TEXT("actual source contact applies impulses"),Result.Impulses>0);
+    const auto Energy=[&](const FRaftSimFlexRigidState& S)
+    {const auto& W=S.AngularVelocity;return .5*(Mass*S.LinearVelocity.SizeSquared()+Inertia.X*W.X*W.X+Inertia.Y*W.Y*W.Y+Inertia.Z*W.Z*W.Z);};
+    TestTrue(TEXT("actual contact does not add kinetic energy"),Energy(State)<=Energy(Start)+1.e-8);
+    if(!Result.bCompleted)return false;
+    // Independent closest-point distance against every original triangle,
+    // not the BVH sweep result or vertical ground-height approximation.
+    FTriMeshCollisionData Data;
+    if(!Asset->GetPhysicsTriMeshData(&Data,false)){AddError(TEXT("original source unavailable"));return false;}
+    TestEqual(TEXT("original source triangle count unchanged"),Data.Indices.Num(),803842);
+    const FVector Origin=Transform.GetTranslation()*.01;
+    TArray<FVector> Vertices;Vertices.Reserve(Data.Vertices.Num());
+    for(const auto& V:Data.Vertices)Vertices.Add(Transform.TransformVector(FVector(V))*.01);
+    double MinimumGap=DBL_MAX;
+    for(const auto& Local:Supports)
+    {
+        const FVector Centre=State.WorldPoint(Local)-Origin;
+        for(const auto& T:Data.Indices)
+        {
+            const FVector Closest=FMath::ClosestPointOnTriangleToPoint(Centre,Vertices[T.v0],Vertices[T.v1],Vertices[T.v2]);
+            MinimumGap=FMath::Min(MinimumGap,(Centre-Closest).Length()-Radius);
+        }
+    }
+    TestTrue(TEXT("actual source clearance remains within ten micrometres"),MinimumGap>=-1.e-5);
+    AddInfo(FString::Printf(TEXT("original-map regression impulses=%d minimum_gap_m=%.17g energy_change_j=%.17g time_error_s=%.17g"),
+        Result.Impulses,MinimumGap,Energy(State)-Energy(Start),Result.ConsumedSeconds-Dt));
+    return !HasAnyErrors();
+}
+
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimTriangleFeaturesTest,
     "RaftSim.Physics.SourceTriangleSweepFeatures",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

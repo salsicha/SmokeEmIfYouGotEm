@@ -77,9 +77,14 @@ FRaftSimSweptContactResult Integrate(FRaftSimFlexRigidState& State,
         Contacts.RemoveAll([&](const FContact& C)
         { return FVector::DotProduct(Current.WorldPoint(Supports[C.Support])-C.BoundaryPoint,C.Normal)>2.*ContactSkinM; });
         const FVector Normal=EarliestHit.Normal.GetSafeNormal();
-        if(!Contacts.ContainsByPredicate([&](const FContact& C)
+        const FContact Fresh{SupportIndex,Normal,Boundary.WorldPoint(Supports[SupportIndex])};
+        if(auto* Existing=Contacts.FindByPredicate([&](const FContact& C)
             {return C.Support==SupportIndex && FVector::DotProduct(C.Normal,Normal)>1.-1.e-10;}))
-            Contacts.Add({SupportIndex,Normal,Boundary.WorldPoint(Supports[SupportIndex])});
+            // A sphere rolling around a triangle edge changes its normal.
+            // Deduplication must refresh that constraint, not discard the
+            // newly closing normal because an older tangent is already solved.
+            *Existing=Fresh;
+        else Contacts.Add(Fresh);
         if(Contacts.Num()>24){Result.Failure=TEXT("contact manifold capacity exceeded");return Result;}
         int32 Applied=0;bool Resolved=false;
         const auto FutureConstraint=[&](const FContact& C,FVector& FutureLocal)
