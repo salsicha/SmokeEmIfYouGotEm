@@ -82,6 +82,14 @@ camera; do not interpret their named statistics as foam/terrain measurements.
 
 ## Submitted geometry, not an optical guess
 
+**September 16 correction:** the v1 source interpolation below used the old
+B-C quad diagonal, not the native shoreline fan A-C-D / A-D-B. Its source/base
+split is superseded by the corrected analysis in
+[control-prior comparison](control-prior-comparison.md). The original report
+and numbers are retained as historical evidence, not valid interpolation-error
+measurements. Actual submitted geometry and its total component split are
+unchanged. Do not change temporal blending to fix this diagnostic error.
+
 Second actual game run with `-RaftSimCarrierShapeAudit` exits0 and captures at
 world13.022695s, presented detail sequence66. It contains69,340 active vertices
 and53,702 triangles. The existing independent analyzer examines22,869 triangles

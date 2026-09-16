@@ -3,7 +3,24 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [later-state actual playable comparison](../reconstruction-review-2026-09-07/later-state-playable-comparison.md).
+Latest: [source-control comparison and clean1800s checkpoint](../reconstruction-review-2026-09-07/control-prior-comparison.md).
+Corrected shoreline A-D interpolation disproves the apparent temporal/base
+interpolation error; do not tune blending from the archived B-C analysis.
+Isolated removal of the explicitly uncalibrated shelf/plunge preserves ALL
+captured vertices/XY/topology/flanks. Paired open-boundary180s solves finish;
+644 common crux stencils show max centered slope43.4 ->23.1 degrees, NOT
+calibrated geometry, settled hydraulics or game acceptance.24 focused tests PASS.
+NEXT shared full-map terrain/collision/hydraulic candidate including the actual
+landward rock union, fresh flow and actual playable motion; no direct transplant
+of bounded diagnostic fields. Prioritize normal South Fork delivery.
+Full-river72710/PID4608 is now TERMINAL0 at1800s: all5,382,400 cells AND all
+86,720 artificial-bank faces PASS, still NOT settled. Do not poll/restart it.
+SAME package83678/cook5852 remains LIVE; preserve shaders/DLLs until terminal.
+Visual/physical/default delivery and30FPS gate remain OPEN, as do later rivers,
+all-scene water, crew, normalization/regressions/release. Troublemaker is only
+a rapid within South Fork, not a scenario or menu entry.
+
+Previous: [later-state actual playable comparison](../reconstruction-review-2026-09-07/later-state-playable-comparison.md).
 Corrected1700s state AND all86,720 artificial-bank faces PASS, still NOT settled.
 Source-matched841-tile/799-packet export,406,823 original-water coverage,
 30,403 native collision and12,800 native field checks PASS;98 focused tests PASS.
