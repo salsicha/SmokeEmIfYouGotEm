@@ -84,6 +84,8 @@ Desktop.ini
 # Generated diagnostic maps are regenerable and never versioned (release-1.0-plan.md P0.6)
 unreal/Content/RaftSim/Maps/EnvironmentPreviews/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/
+# Unaccepted, reproducible bed-comparison FBX export; not a shipping source asset.
+/unreal/SourceArt/RaftSim/TroublemakerControlAblation20260916/
 
 # Packaged builds are release artifacts, never repo content (GitHub Releases instead)
 unreal/Packaged/

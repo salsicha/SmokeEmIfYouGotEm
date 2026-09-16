@@ -14,10 +14,11 @@ class SourceRockUnion:
     """Maximum of retained terrain and a source-exact roof with inferred sides.
 
     Inputs/outputs use absolute UTM / NAVD88 metres. Owner 5 means candidate
-    solid, NOT measured rock classification. Unsupported cap XY retains the
+    solid, NOT measured rock classification; owner 6 is an explicit registered
+    submerged-bed revision. Without a revision, unsupported cap XY retains the
     original bed. Source water masks/stages are never changed here.
     """
-    def __init__(self, manifest_path, root, parent_path, origin_utm_m, datum_m):
+    def __init__(self, manifest_path, root, parent_path, origin_utm_m, datum_m, terrain_revision=None):
         root=Path(root).resolve();manifest_path=Path(manifest_path).resolve()
         self.manifest=json.loads(manifest_path.read_text())
         m=self.manifest
@@ -80,12 +81,24 @@ class SourceRockUnion:
             hydraulics_recooked=False,playable_integrated=False)
         if selection is not None:
             self.identity['interpreted_selection_sha256']=selection['sha256']
+        self.terrain_revision = None
+        if terrain_revision is not None:
+            from south_fork_terrain_revision import load_revision
+            self.terrain_revision = load_revision(terrain_revision,root,parent_path,origin_utm_m,datum_m)
+            self.lower=np.minimum(self.lower,self.terrain_revision.lower)
+            self.upper=np.maximum(self.upper,self.terrain_revision.upper)
+            self.identity.update(terrain_revision=self.terrain_revision.identity,
+                original_terrain_modified=True,
+                operation='explicit registered submerged-bed revision, then maximum with retained source roof')
 
-    def apply(self,east,north,parent):
+    def apply(self,east,north,parent,with_owner=False):
         east,north,parent=np.broadcast_arrays(np.asarray(east,float),np.asarray(north,float),np.asarray(parent,float))
         if not np.isfinite([east,north,parent]).all():
             raise ValueError('Finite coordinates and retained terrain required')
-        shape=parent.shape;out=parent.ravel().copy();changed=np.zeros(out.shape,bool)
+        shape=parent.shape;out=parent.ravel().copy();owner=np.zeros(out.shape,np.uint8)
+        if self.terrain_revision is not None:
+            revised,replaced=self.terrain_revision.apply(east,north,parent)
+            out=revised.ravel().copy();owner[replaced.ravel()]=6
         xy=np.column_stack((east.ravel(),north.ravel()))
         candidates=np.flatnonzero(np.all(xy>=self.lower,axis=1)&np.all(xy<=self.upper,axis=1))
         if len(candidates):
@@ -94,5 +107,8 @@ class SourceRockUnion:
             if np.any(out[candidates[supported]]<=self.floor+self.origin[2]):
                 raise ValueError('Candidate bottom exposed outside retained solid')
             take=supported&(roof>out[candidates])
-            out[candidates[take]]=roof[take];changed[candidates[take]]=True
-        return out.reshape(shape),changed.reshape(shape)
+            out[candidates[take]]=roof[take];owner[candidates[take]]=5
+        changed=out!=parent.ravel()
+        owner[~changed]=0
+        result=(out.reshape(shape),changed.reshape(shape))
+        return (*result,owner.reshape(shape)) if with_owner else result

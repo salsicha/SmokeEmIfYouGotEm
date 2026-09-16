@@ -14,9 +14,9 @@ def packet_fields(fields,center,union):
     if any(np.shape(fields[k])!=(321,321) for k in FIELDS):
         raise ValueError('Complete original 321 by 321 packet required')
     x,y=np.meshgrid(center[0]+np.arange(321)-160,center[1]+np.arange(321)-160)
-    bed,changed=union.apply(x,y,fields['bed_navd88_m'])
+    bed,changed,owners=union.apply(x,y,fields['bed_navd88_m'],with_owner=True)
     result={k:fields[k].copy() for k in FIELDS};result['bed_navd88_m']=bed
-    result['terrain_owner'][changed]=5
+    result['terrain_owner'][changed]=owners[changed]
     return result,changed
 
 
@@ -27,7 +27,9 @@ def dependencies(geometry_path,root=ROOT):
     source=json.loads(source_path.read_text())
     cap_path=root/geometry['rock_cap_manifest'];cap=json.loads(cap_path.read_text())
     origin=cap['origin_utm_and_vertical_datum_m']
-    union=SourceRockUnion(cap_path,root,root/cap['source_mesh_path'],origin[:2],origin[2])
+    revision=geometry.get('terrain_revision_manifest')
+    union=SourceRockUnion(cap_path,root,root/cap['source_mesh_path'],origin[:2],origin[2],
+                          terrain_revision=root/revision if revision else None)
     if geometry['terrain_union']!=union.identity:raise ValueError('Different source union in hydraulic geometry')
     return geometry,source_path,source,union
 
@@ -37,7 +39,8 @@ def changed_record(original,path,values,changed,union,root):
     row.update(geometry_file=path.relative_to(root).as_posix(),geometry_sha256=sha(path),
         retained_geometry_file=original['geometry_file'],retained_geometry_sha256=original['geometry_sha256'],
         terrain_union=union.identity,changed_union_samples=int(changed.sum()),
-        owner_cell_counts={str(k):int(np.sum(values['terrain_owner']==k)) for k in (1,2,3,4,5)})
+        owner_cell_counts={str(k):int(np.sum(values['terrain_owner']==k))
+                           for k in ((1,2,3,4,5,6) if union.terrain_revision else (1,2,3,4,5))})
     return row
 
 
