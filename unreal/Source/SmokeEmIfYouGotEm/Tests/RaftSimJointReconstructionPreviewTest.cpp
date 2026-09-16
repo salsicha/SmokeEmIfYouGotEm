@@ -1,6 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "../RaftSimJointReconstructionPreview.h"
 #include "RaftSimLiveWaterWindow.h"
+#include "WorldPartition/WorldPartitionStreamingSource.h"
 
 #if WITH_AUTOMATION_TESTS
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRaftSimJointPreviewContract,
@@ -19,6 +20,17 @@ bool FRaftSimJointPreviewContract::RunTest(const FString&)
     FString Error;
     TestFalse(TEXT("Missing world is side-effect-free failure"),Apply(nullptr,TEXT("tmp/missing.json"),true,Error));
     TestFalse(TEXT("Failure provides evidence"),Error.IsEmpty());
+    FWorldPartitionStreamingSource Source;
+    const FBox Bounds(FVector(-200.,-400.,10.),FVector(400.,400.,90.));
+    TestTrue(TEXT("Verified bounds define residency"),MakeTerrainResidencySource(Bounds,Source));
+    TestEqual(TEXT("World-space center retains coordinate signs"),Source.Location,FVector(100.,0.,50.));
+    TestTrue(TEXT("Source activates collision before play"),Source.TargetState==EStreamingSourceTargetState::Activated);
+    TestTrue(TEXT("Residency independent of terrain height"),Source.bForce2D);
+    TestTrue(TEXT("No global grid-range change"),Source.Shapes.Num()==1 && !Source.Shapes[0].bUseGridLoadingRange);
+    TestTrue(TEXT("All footprint corners covered"),Source.Shapes.Num()==1 && Source.Shapes[0].Radius>=500.);
+    TestTrue(TEXT("Block on incomplete source loading"),Source.bBlockOnSlowLoading);
+    TestFalse(TEXT("Invalid bounds rejected"),MakeTerrainResidencySource(FBox(ForceInit),Source));
+    TestFalse(TEXT("Degenerate footprint rejected"),MakeTerrainResidencySource(FBox(FVector::ZeroVector,FVector::ZeroVector),Source));
 #if RAFTSIM_HAS_LIVE_SOLVER
     TestEqual(TEXT("Portable empty SHA256"),RaftSimCookedArtifactSha256({}),
         FString(TEXT("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")));

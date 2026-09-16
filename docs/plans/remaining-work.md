@@ -3,7 +3,22 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [actual paired-terrain playback](../reconstruction-review-2026-09-07/paired-terrain-playback.md).
+Latest: [native paired-terrain residency](../reconstruction-review-2026-09-07/native-terrain-residency.md).
+Native loader now activates/retains verified terrain before paired water;
+original identity/transform/material and native source gates remain unchanged.
+Isolated native test PASS; actual1280x720 game activation before BeginPlay and
+24.816s recording complete, session62052 exit0. All22 existing binary/manifest
+hashes and464 protected identities retained;149 Python tests PASS.
+This uses an explicit temporary module, NOT the normal relinked project DLL.
+Broad smooth froth/bank-side streaks persist; no normal-menu or30FPS acceptance.
+200s full-domain state AND all86,720 artificial-bank faces PASS, NOT settled.
+SAME solve46094/PID22940 LIVE; next5000/250s both audits. SAME package83678 /
+cook5852/shader35032 LIVE; preserve inputs. NEXT normal native call-site and
+leave/return checks, source-consistent later-state/reference comparison, then
+normal-play physical/visual/performance delivery. All later-river/crew/release
+requirements remain OPEN. Troublemaker is only a rapid inside South Fork.
+
+Previous: [actual paired-terrain playback](../reconstruction-review-2026-09-07/paired-terrain-playback.md).
 World Partition unsaved-actor duplication corrected; actual PIE independently
 verifies revised ground/rock and exact paired water. V9 exits0 with three captures
 and20.871s recording; v6 mismatch/v7 logging/v8 shutdown failures retained.

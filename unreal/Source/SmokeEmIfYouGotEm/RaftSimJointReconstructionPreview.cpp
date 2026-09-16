@@ -15,6 +15,8 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "UObject/StrongObjectPtr.h"
+#include "WorldPartition/WorldPartitionStreamingSource.h"
+#include "WorldPartition/WorldPartitionSubsystem.h"
 
 namespace RaftSimJointReconstructionPreview
 {
@@ -24,9 +26,64 @@ bool IsAllowed(const FString& MapName, bool bEphemeralProfile, bool bEditorBuild
         MapName.EndsWith(TEXT("L_SouthForkAmerican_FullReach"));
 }
 
+bool MakeTerrainResidencySource(const FBox& WorldBounds,FWorldPartitionStreamingSource& Source)
+{
+    if (!WorldBounds.IsValid || WorldBounds.Min.ContainsNaN() || WorldBounds.Max.ContainsNaN()) return false;
+    const FVector Extent=WorldBounds.GetExtent();
+    const double Radius=Extent.Size2D()+1.;
+    if (Extent.X<=0. || Extent.Y<=0. || !FMath::IsFinite(Radius) || Radius>MAX_flt) return false;
+    Source=FWorldPartitionStreamingSource();
+    Source.Name=TEXT("RaftSimVerifiedTerrainResidency");
+    Source.Location=WorldBounds.GetCenter();
+    Source.TargetState=EStreamingSourceTargetState::Activated;
+    Source.bBlockOnSlowLoading=true;
+    Source.bForce2D=true;
+    FStreamingSourceShape Shape;
+    Shape.bUseGridLoadingRange=false;
+    Shape.Radius=static_cast<float>(Radius);
+    Source.Shapes.Add(Shape);
+    return true;
+}
+
 #if WITH_EDITOR && RAFTSIM_HAS_LIVE_SOLVER
 namespace
 {
+// Runtime cell reloads would otherwise restore the saved old mesh. Retain the
+// verified terrain footprint for this ephemeral world's entire lifetime; no
+// saved actor, normal player streaming source, or global loading range changes.
+class FTerrainResidency final : public IWorldPartitionStreamingSourceProvider
+{
+public:
+    FTerrainResidency(UWorldPartitionSubsystem* InSubsystem,const FWorldPartitionStreamingSource& InSource)
+        : Subsystem(InSubsystem),Source(InSource)
+    { InSubsystem->RegisterStreamingSourceProvider(this); }
+    ~FTerrainResidency()
+    { if (auto* Value=Subsystem.Get()) Value->UnregisterStreamingSourceProvider(this); }
+    bool GetStreamingSource(FWorldPartitionStreamingSource& OutSource) const override
+    { OutSource=Source;return Subsystem.IsValid(); }
+    const UObject* GetStreamingSourceOwner() const override { return Subsystem.Get(); }
+private:
+    TWeakObjectPtr<UWorldPartitionSubsystem> Subsystem;
+    FWorldPartitionStreamingSource Source;
+};
+
+struct FTerrainResidencyRegistry
+{
+    TMap<TWeakObjectPtr<UWorld>,TUniquePtr<FTerrainResidency>> Sources;
+    FDelegateHandle CleanupHandle;
+    FTerrainResidencyRegistry()
+    { CleanupHandle=FWorldDelegates::OnWorldCleanup.AddRaw(this,&FTerrainResidencyRegistry::Cleanup); }
+    ~FTerrainResidencyRegistry()
+    { FWorldDelegates::OnWorldCleanup.Remove(CleanupHandle);Sources.Empty(); }
+    void Cleanup(UWorld* World,bool,bool) { Sources.Remove(World); }
+};
+
+FTerrainResidencyRegistry& TerrainResidencies()
+{
+    static FTerrainResidencyRegistry Registry;
+    return Registry;
+}
+
 FString Resolve(const FString& Relative)
 {
     if (Relative.IsEmpty() || !FPaths::IsRelative(Relative) || Relative.Contains(TEXT(".."))) return {};
@@ -188,6 +245,7 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     UMaterialInterface* Material=LoadObject<UMaterialInterface>(nullptr,*MaterialPath);
     if (!Mesh || !Material) { Error=TEXT("Missing verified preview mesh/material");return false; }
     AStaticMeshActor* TerrainActor=nullptr;UStaticMesh* RevisedTerrain=nullptr;
+    TUniquePtr<FTerrainResidency> TerrainResidency;
     if (bTerrainRevision)
     {
         const TSharedPtr<FJsonObject>* Terrain=nullptr;
@@ -237,16 +295,29 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
         if (!NativeSourceMatches(OriginalTerrain,*OriginalSource,Triangles) ||
             !NativeSourceMatches(RevisedTerrain,*RevisedSource,Triangles))
         { Error=TEXT("Native terrain source differs from verified collision geometry");return false; }
+        if (World->HasBegunPlay() || !World->IsGameWorld() || !World->GetWorldPartition() ||
+            TerrainResidencies().Sources.Contains(World))
+        { Error=TEXT("Paired terrain residency must be established once before game BeginPlay");return false; }
+        const FTransform Expected(FQuat::Identity,FVector(Translation[0],Translation[1],Translation[2]),FVector(1.,-1.,1.));
+        FWorldPartitionStreamingSource ResidencySource;
+        auto* Partition=World->GetSubsystem<UWorldPartitionSubsystem>();
+        if (!Partition || !MakeTerrainResidencySource(OriginalTerrain->GetBoundingBox().TransformBy(Expected),ResidencySource))
+        { Error=TEXT("Verified terrain has no valid streaming footprint");return false; }
+        TerrainResidency=MakeUnique<FTerrainResidency>(Partition,ResidencySource);
+        World->BlockTillLevelStreamingCompleted();
+        if (World->HasBegunPlay() || !Partition->IsStreamingCompleted(TerrainResidency.Get()))
+        { Error=TEXT("Verified terrain streaming did not complete before paired activation");return false; }
         int32 TerrainCount=0;
         for (TActorIterator<AStaticMeshActor> It(World);It;++It)
         {
             if (It->Tags.Contains(TEXT("RaftSimPhysicalGround")) && It->GetStaticMeshComponent()->GetStaticMesh()==OriginalTerrain)
             { TerrainActor=*It;++TerrainCount; }
         }
-        const FTransform Expected(FQuat::Identity,FVector(Translation[0],Translation[1],Translation[2]),FVector(1.,-1.,1.));
         if (TerrainCount!=1 || !TerrainActor->GetActorTransform().Equals(Expected,.001) ||
             TerrainActor->GetStaticMeshComponent()->GetMaterial(0)!=Material)
         { Error=TEXT("Verified original rapid actor must be loaded before paired terrain/water activation");return false; }
+        UE_LOG(LogTemp,Display,TEXT("RaftSim verified terrain resident before BeginPlay: actor=%s source_center_cm=%s radius_cm=%.3f; normal player streaming unchanged"),
+            *TerrainActor->GetName(),*ResidencySource.Location.ToCompactString(),ResidencySource.Shapes[0].Radius);
     }
     // Exercise the real loader before touching the saved-map configuration.
     TStrongObjectPtr<URaftSimWaterRuntimeAdapter> Trial(NewObject<URaftSimWaterRuntimeAdapter>());
@@ -272,6 +343,7 @@ bool Apply(UWorld* World,const FString& ManifestPath,bool bEphemeralProfile,FStr
     Config->CoordinateMapPath=Files[TEXT("coordinate_map")];Config->WindowCenterM=FVector2D(Center[0],Center[1]);
     Config->WindowExtentM=224.f;Config->MovingWindowStationExtentM=224.f;Config->MovingWindowLateralExtentM=224.f;
     Config->FlowBand=TEXT("median_runnable");Config->bRecenterHydraulicCrux=false;
+    if (TerrainResidency) TerrainResidencies().Sources.Add(World,MoveTemp(TerrainResidency));
     if (TerrainActor)
         UE_LOG(LogTemp,Display,TEXT("RaftSim verified terrain replacement installed on original actor=%s mesh=%s before paired water BeginPlay"),
             *TerrainActor->GetName(),*RevisedTerrain->GetPathName());
