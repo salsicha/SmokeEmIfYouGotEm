@@ -3,19 +3,21 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [SM5 bindings and normal editor integration](../reconstruction-review-2026-09-07/sm5-resource-bindings.md).
-Normal-entry replay8661 TERMINAL0 passes eight handoffs/5593 frames; normal editor
-modules now rebuilt after package83678 TERMINAL FAILED (UAT25/cook3). Actual SM5
-failure includes excessive UAVs and compiler internal errors. Stage-correct
-SRV/UAV bindings implemented; acceleration26 focused FXC/reflection PASS with six
-UAVs. Normal-module SM6 suite completes83 tests:82 clean,1 HTTP-timeout warning,
-zero errors; strict wrapper exits1, NOT clean release acceptance. SM5 suite47178/
-PID35584 LIVE; preserve inputs and poll same job.125 old compiler files preserved.
-40 Python and4 native tests PASS. CFL tile optimization removed after fixed four
-pairs show exact states but no consistent speedup. SAME hydraulic40601/PID11316
-LIVE;700/750s BOTH state/dry-bank audits PASS, NOT settled; next800/local4000.
-All464 protected identities retained. Full package/source closure, normal installed
-playback, visual/physical/30FPS and all later-river/crew/release work remain OPEN.
+Latest: [normal installed-module rapid review](../reconstruction-review-2026-09-07/normal-installed-rapid-review.md).
+Actual normal Raft/WaterDetail/project DLL paths and hashes verified; no temporary
+module override. Rapid recording56238 TERMINAL0, three1280x720 stills and complete
+25.221s clip, sampled contact agreement. Broad froth/bank-side shape still FAIL
+visual acceptance; paired350s preview is NOT a saved/default promotion. Long
+normal replay78384 TERMINAL: result FALSE,900s timeout after7 required8 handoffs,
+4962 fresh frames; detail remains active but full regression is NOT passed.
+Reference video playback works. SAME SM5 suite47178/PID35584 LIVE with active
+workers; preserve inputs, no duplicate cook. SAME hydraulic40601/PID11316 LIVE;
+800/850s BOTH state/dry-bank audits PASS, NOT settled; next900/local6000 BOTH.
+600-800s zero-step rapid flux/storage analysis confirms continuing drainage.
+All464 protected identities retained. Current generated inventory corrected:
+26 focused PASS; wider set63 PASS/12 FAIL, historical evidence/gates unchanged.
+Full coupled nonlinear-water gameplay, full replay, package/source closure,
+normal-menu delivery, physical/visual/30FPS and later-river/crew/release OPEN.
 Troublemaker remains a rapid within South Fork, never a menu scenario.
 
 Previous: [actual detail gameplay and exact continuation](../reconstruction-review-2026-09-07/detail-gameplay-handoff.md).

@@ -60,3 +60,19 @@ A new negative test verifies rejection when that bit is absent. The release,
 project-layout and survey-sanity suites now pass **28/28**. This is not a real
 macOS package qualification, and the other historical/source-layout failures
 remain separate. Evidence: `../reconstruction-review-2026-09-07/release-fixture-regressions.xml`.
+
+## September 16 follow-up: current inventory and remaining regressions
+
+The existing generator refreshes the current source inventory from90 to168
+implementation files,109,235 lines and37 registered commands. This is a current
+index, not revised historical provenance. No test assertions or review hashes
+were changed. The inventory/catalog/layout/release subset passes26 checks.
+
+The same four-suite source-layout/Zambezi-reference/layout/release run improves
+from62 passed/13 failed to63 passed/12 failed. Remaining failures cover oversized
+editor implementations, foliage provenance, water-source/material expectations
+and historical Zambezi source/data identities. They are not waived or counted
+as completed normalization. Evidence:
+`tmp/normal-installed-review-regressions-final-v1-20260916.xml`.
+See [normal installed rapid review](../reconstruction-review-2026-09-07/normal-installed-rapid-review.md)
+for separate gameplay and hydraulic findings; those are not release acceptance.
