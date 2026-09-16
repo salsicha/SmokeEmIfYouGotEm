@@ -53,7 +53,7 @@ void Coefficients(int2 p,out float4 c,out float4 e)
 {
     uint i=Index(p);float h=Geometry[i].x,bed=Geometry[i].y;
     float2 central=0,b=0;e=0;
-    [unroll]for(uint axis=0;axis<2;++axis)
+    [unroll(2)]for(uint axis=0;axis<2;++axis)
     {
         int2 delta=axis==0?int2(1,0):int2(0,1);
         uint r=Index(Neighbor(p,delta)),l=Index(Neighbor(p,-delta));
@@ -77,7 +77,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     if(UsePhysicalBedSlope!=0)invalid=invalid || any(!isfinite(PhysicalBedSlope[i]));
     float fraction=Fraction(i);
     invalid=invalid || !isfinite(fraction) || fraction<0 || fraction>1;
-    [unroll]for(uint axis=0;axis<2;++axis)
+    [unroll(2)]for(uint axis=0;axis<2;++axis)
     {
         int2 delta=axis==0?int2(1,0):int2(0,1);
         if((mask&(1u<<axis))!=0)
@@ -87,7 +87,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     if(invalid)
     { InterlockedAdd(Diagnostics[0],1);PreparedCenter[i]=0;PreparedEdges[i]=0;PreparedDiagonal[i]=1;return; }
     float4 c,e;Coefficients(p,c,e);float2 d=fraction*(c.xy*c.xy+.75*c.zw*c.zw);
-    [unroll]for(uint axis=0;axis<2;++axis)
+    [unroll(2)]for(uint axis=0;axis<2;++axis)
     {
         int2 delta=axis==0?int2(1,0):int2(0,1);float4 nc,ne;
         Coefficients(Neighbor(p,delta),nc,ne);d[axis]+=Fraction(Index(Neighbor(p,delta)))*ne[axis+2]*ne[axis+2];

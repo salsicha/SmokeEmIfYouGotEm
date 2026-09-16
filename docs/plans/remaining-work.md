@@ -3,7 +3,25 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [compact exact addition and SM5 recovery](../reconstruction-review-2026-09-07/compact-portable-add.md).
+Latest: [integrated exact arithmetic and corrected hydraulic continuation](../reconstruction-review-2026-09-07/sm5-integrated-arithmetic.md).
+Compact addition and explicit fixed loop bounds are now in production shaders.
+64,078 actual GPU candidate/original comparisons PASS; corrected complete
+WaterDetail/prescribed-normal suite83 PASS;44 Python tests PASS. First suite
+82 PASS/1 missing-output-argument setup FAIL is preserved, not hidden.
+All prior failed distinct SM5 preparation/pressure/transport probes now compile;
+warnings retained, no SM5 runtime/full-cook acceptance. All old probes TERMINAL.
+Fresh package83678/cook5852 LIVE, target GroundCPU-Development-v2-20260916;
+do not modify shaders or DLLs mid-cook. NEXT archive identity,444 non-editor
+ground-source and2,405 staged-runtime checks, then packaged play/contact/FPS.
+Old hydraulic69416/PID18716 FINISHED1800s but1700–1800 artificial banks FAIL.
+Corrected restart from last clean1650s adds TWO source-exact dry context tiles,
+zero water; pilot and actual restart bit-exact, full pilot state/banks PASS.
+LIVE72710/PID4608, output south-fork-landward-context1650to1800s-v2-20260916;
+NEXT local1000/absolute1700s BOTH audits. NOT settled or runtime-integrated.
+Last ordinary17.819710FPS/p9581.6343ms still FAILS30FPS. Visual/physical/default
+integration, later rivers, all-scene water, crew, normalization/release OPEN.
+
+Previous: [compact exact addition and SM5 recovery](../reconstruction-review-2026-09-07/compact-portable-add.md).
 Candidate committed d9aee8cac, NOT wired into production.36 Python tests and
 64,078 compiled shader-source CPU cases PASS. Actual candidate/original GPU
 comparison queued95612 after SAME editor build87748/PID12368 succeeds.

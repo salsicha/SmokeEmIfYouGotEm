@@ -132,7 +132,9 @@ float RaftSimPortableMul(float a,float b)
     if(exponent< -126 && q<0x800000u)return asfloat(sign|q);
     return asfloat(sign|(uint(max(exponent,-126)+127)<<23)|(q&0x7fffffu));
 }
-float RaftSimPortableAdd(float a,float b){return RaftSimPortableEuler(a,1,b);}
+// Two-operand addition preserves the wide accumulator's exact rounded result
+// without expanding an eighteen-limb product-and-add at every call site.
+#include "RaftSimPortableAdd.ush"
 float RaftSimPortableSub(float a,float b){return RaftSimPortableAdd(a,asfloat(asuint(b)^0x80000000u));}
 float RaftSimPortableSqrt(float value)
 {

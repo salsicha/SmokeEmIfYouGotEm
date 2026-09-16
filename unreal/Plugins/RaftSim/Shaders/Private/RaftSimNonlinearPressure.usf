@@ -50,7 +50,7 @@ float2 Slope(uint i) { return RaftSimPressureWet(Geometry[i].x)?PhysicalBedSlope
 void Coefficients(uint i,out float2 center,out float4 edge)
 {
     float h=Geometry[i].x;float2 b=Slope(i);center=0;edge=0;
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         uint r=Neighbor(i,a,1),l=Neighbor(i,a,-1);
         bool pr=(Pairs[i]&(1u<<a))!=0,pl=(Pairs[l]&(1u<<a))!=0;
@@ -62,7 +62,7 @@ void Coefficients(uint i,out float2 center,out float4 edge)
 float2 GradTerms(uint i,int component)
 {
     float2 g=0;float v=Terms[i][component];
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         uint r=Neighbor(i,a,1),l=Neighbor(i,a,-1);
         if((Pairs[i]&(1u<<a))!=0)g[a]+=Weights(i,r).x*(Terms[r][component]-v)/CellMeters;
@@ -73,7 +73,7 @@ float2 GradTerms(uint i,int component)
 float2 GradPressure(uint i,int component,bool forcing)
 {
     float2 g=0;float v=forcing?Forcing[i][component]:Pressure[i][component];
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         uint r=Neighbor(i,a,1),l=Neighbor(i,a,-1);
         float vr=forcing?Forcing[r][component]:Pressure[r][component];
@@ -95,7 +95,7 @@ float2 WCorrection(uint i)
 {
     float2 c;float4 e;Coefficients(i,c,e);float4 v=Correction[i];
     float2 w=float2(dot(c,v.xy),dot(c,v.zw));
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         float4 r=Correction[Neighbor(i,a,1)],l=Correction[Neighbor(i,a,-1)];
         w+=e[a]*float2(r[a],r[a+2])+e[a+2]*float2(l[a],l[a+2]);
@@ -112,7 +112,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
         any(!isfinite(PhysicalBedSlope[i])) || !isfinite(f) || f<0 || f>1 ||
         !RaftSimPortableValidState(state) || RaftSimPressureNegative(g.x) ||
         (asuint(state.x)!=asuint(g.x) && ((asuint(state.x)|asuint(g.x))&0x7fffffffu)!=0) || (Pairs[i]&~3u)!=0;
-    [unroll]for(int a=0;a<2;++a)if((Pairs[i]&(1u<<a))!=0)
+    [unroll(2)]for(int a=0;a<2;++a)if((Pairs[i]&(1u<<a))!=0)
     {
         uint coord=a==0?i%GridSize.x:i/GridSize.x;
         invalid=invalid || GridSize[a]==1 || (Periodic==0 && coord+1==GridSize[a]) ||
@@ -140,7 +140,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     }
 #if RAFTSIM_PRESSURE_PHASE == 1
     float2 u=Velocity[i],advective=0;float div=0;
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         uint r=Neighbor(i,a,1),l=Neighbor(i,a,-1);float2 grad=0;
         if((Pairs[i]&(1u<<a))!=0)
@@ -162,7 +162,7 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     if(any(!isfinite(result)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 2
     float4 t=Terms[i];float2 u=Velocity[i];float divAdv=0,divRate=0;
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         uint r=Neighbor(i,a,1),l=Neighbor(i,a,-1);
         if((Pairs[i]&(1u<<a))!=0)
@@ -196,14 +196,14 @@ void MainCS(uint3 id:SV_DispatchThreadID)
     if(any(!isfinite(base)) || any(!isfinite(forcing)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 3
     float2 c;float4 e;Coefficients(i,c,e);float w=dot(c,Base[i]);
-    [unroll]for(int a=0;a<2;++a)w+=e[a]*Base[Neighbor(i,a,1)][a]+e[a+2]*Base[Neighbor(i,a,-1)][a];
+    [unroll(2)]for(int a=0;a<2;++a)w+=e[a]*Base[Neighbor(i,a,1)][a]+e[a+2]*Base[Neighbor(i,a,-1)][a];
     float2 result=float2(w,dot(Slope(i),Base[i]));BaseW[i]=result;
     if(any(!isfinite(result)))InterlockedAdd(Diagnostics[1],1);
 #elif RAFTSIM_PRESSURE_PHASE == 4
     float2 c;float4 e;Coefficients(i,c,e);
     float f=NonbreakingFraction[i],h=Geometry[i].x;float2 b=Slope(i);
     precise float2 k=c*f*BaseW[i].x+.75*f*b*BaseW[i].y;
-    [unroll]for(int a=0;a<2;++a)
+    [unroll(2)]for(int a=0;a<2;++a)
     {
         uint r=Neighbor(i,a,1),l=Neighbor(i,a,-1);float2 nc;float4 ne;
         Coefficients(r,nc,ne);k[a]+=ne[a+2]*NonbreakingFraction[r]*BaseW[r].x;
