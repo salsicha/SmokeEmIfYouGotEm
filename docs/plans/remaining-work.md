@@ -3,7 +3,18 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [exact roof jump and swept-contact candidate](../reconstruction-review-2026-09-07/normal-river-swept-contact.md).
+Latest: [sustained contact and original-triangle sweeps](../reconstruction-review-2026-09-07/normal-river-sustained-contact.md).
+Final editor build and 12 native tests PASS, including sustained multi-support
+rotation, actual-mesh clearance and transformed BVH/source-triangle agreement.
+Actual South Fork replay still FAILS contact acceptance: 81 zero-time separating
+contact rejection log entries, despite reaching station 8433.688 at 72.070 s.
+Large terrain cache construction also takes 3.542 seconds. Candidate remains
+opt-in; NEXT reproduce/resolve the actual-map refusal, then full hull, packaged
+source availability, memory and performance qualification. No 30 FPS or visual
+acceptance. All 464 protected hashes unchanged. Landward 200/250 s cell/bank
+audits PASS, NOT settled; later checkpoints need their own audits.
+
+Previous: [exact roof jump and swept-contact candidate](../reconstruction-review-2026-09-07/normal-river-swept-contact.md).
 Read-only contact evidence identifies roof face 1090 lifting the entire 605 kg
 raft by 1.841773266 m in one substep. New opt-in six-sphere source-mesh contact
 couples impulses and consumes remaining time. Ten native tests PASS; two actual

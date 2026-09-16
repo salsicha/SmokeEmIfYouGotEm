@@ -1,4 +1,6 @@
 #include "RaftSimGroundSourceRegistry.h"
+#include "RaftSimTriangleSweep.h"
+#include <limits>
 #include "CollisionQueryParams.h"
 #include "ProfilingDebugging/CsvProfiler.h"
 
@@ -16,10 +18,28 @@ bool FRaftSimGroundSourceRegistry::SweepCapturedSphere(const FVector& StartCm,
     {
         auto* Mesh=WeakMesh.Get();
         if(!Mesh || !Mesh->IsQueryCollisionEnabled() || !SweptBounds.Intersect(Mesh->Bounds.GetBox()))continue;
+        auto& Cache=TriangleCaches.FindOrAdd(WeakMesh);
+        if(!Cache || !Cache->Matches(Mesh))
+        {
+            Cache=MakeShared<FRaftSimTriangleSweepMesh>();
+            const double Started=FPlatformTime::Seconds();
+            const bool Built=Cache->Build(Mesh);
+            UE_LOG(LogTemp,Display,TEXT("Captured triangle sweep source: component=%s triangles=%d ready=%d build_ms=%.3f"),
+                *Mesh->GetPathName(),Cache->TriangleCount(),int32(Built),(FPlatformTime::Seconds()-Started)*1000.);
+        }
+        if(!Cache->IsValid())
+        {
+            // Missing collision-source data is not permission to pass through
+            // terrain or silently fall back to the unreliable sweep.
+            OutHit=FHitResult();OutHit.Time=std::numeric_limits<float>::quiet_NaN();
+            OutHit.Normal=FVector::UpVector;return true;
+        }
         FHitResult Hit;
-        if(!Mesh->SweepComponent(Hit,StartCm,EndCm,FQuat::Identity,FCollisionShape::MakeSphere(RadiusCm),true))continue;
-        if(!Hit.bStartPenetrating && Hit.Time<=1.e-7 && FVector::DotProduct(EndCm-StartCm,Hit.Normal)>=-1.e-9)continue;
-        if(!Found || Hit.Time<OutHit.Time || (Hit.bStartPenetrating && !OutHit.bStartPenetrating))
+        if(!Cache->Sweep(StartCm,EndCm,RadiusCm,Hit))continue;
+        Hit.Component=Mesh;
+        if(!Found || (Hit.bStartPenetrating && !OutHit.bStartPenetrating) ||
+            (Hit.bStartPenetrating==OutHit.bStartPenetrating &&
+             (Hit.bStartPenetrating?Hit.PenetrationDepth>OutHit.PenetrationDepth:Hit.Time<OutHit.Time)))
         {OutHit=Hit;Found=true;}
     }
     return Found;

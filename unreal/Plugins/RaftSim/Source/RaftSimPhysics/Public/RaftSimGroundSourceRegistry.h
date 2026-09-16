@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
 #include "Components/StaticMeshComponent.h"
+class FRaftSimTriangleSweepMesh;
 
 // Game-thread contact sources. Keep weak references, but invalidate membership
 // when world partition adds/removes levels or gameplay spawns an actor. A
@@ -44,6 +45,8 @@ public:
                         Meshes.Add(Mesh);
             }
         }
+        for(auto It=TriangleCaches.CreateIterator();It;++It)
+            if(!Meshes.Contains(It.Key()))It.RemoveCurrent();
     }
     uint32 GetRefreshCount() const { return RefreshCount; }
     // The same captured triangles/landscape used for solid raft contact.
@@ -60,4 +63,5 @@ private:
     FDelegateHandle LevelAdded,LevelRemoved,ActorSpawned;
     bool bDirty=true;
     uint32 RefreshCount=0;
+    TMap<TWeakObjectPtr<UStaticMeshComponent>,TSharedPtr<FRaftSimTriangleSweepMesh>> TriangleCaches;
 };
