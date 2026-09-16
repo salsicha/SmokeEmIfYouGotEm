@@ -3,7 +3,20 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [integrated exact arithmetic and corrected hydraulic continuation](../reconstruction-review-2026-09-07/sm5-integrated-arithmetic.md).
+Latest: [later-state actual playable comparison](../reconstruction-review-2026-09-07/later-state-playable-comparison.md).
+Corrected1700s state AND all86,720 artificial-bank faces PASS, still NOT settled.
+Source-matched841-tile/799-packet export,406,823 original-water coverage,
+30,403 native collision and12,800 native field checks PASS;98 focused tests PASS.
+Fresh actual1700s FullReach preview reaches station8354.029 with zero logged
+hull/render error. Bowl/streaks/broad froth persist: visual/default promotion FAIL.
+Actual submitted-shape audit points toward source/base contribution, not solely
+crest/detail deformation; NEXT isolate visible defect on those triangles and fix.
+All464 protected identities verified. No fresh FPS pass; last17.819710/p9581.6343ms.
+SAME package83678/cook5852 LIVE; preserve shaders/DLLs until terminal result.
+SAME hydraulic72710/PID4608 LIVE; NEXT local2000/absolute1750s BOTH audits.
+Later rivers, other-scene water, crew, normalization/regressions/release OPEN.
+
+Previous: [integrated exact arithmetic and corrected hydraulic continuation](../reconstruction-review-2026-09-07/sm5-integrated-arithmetic.md).
 Compact addition and explicit fixed loop bounds are now in production shaders.
 64,078 actual GPU candidate/original comparisons PASS; corrected complete
 WaterDetail/prescribed-normal suite83 PASS;44 Python tests PASS. First suite
