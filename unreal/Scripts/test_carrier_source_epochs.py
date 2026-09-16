@@ -23,10 +23,13 @@ class CarrierSourceEpochTest(unittest.TestCase):
         wet = np.ones(4)
         self.assertEqual(len(common_triangles(source, 2, 2, wet, wet, [.5, .5], 2)), 2)
         for depth in (0., np.nan, 1e-5):
-            changed = wet.copy(); changed[0] = depth
-            np.testing.assert_array_equal(common_triangles(source, 2, 2, wet, changed, [.5, .5], 2), [[1, 3, 2]])
+            changed = wet.copy(); changed[2] = depth
+            np.testing.assert_array_equal(common_triangles(source, 2, 2, wet, changed, [.5, .5], 2), [[0, 3, 1]])
+        source[2, 3] = 0
+        np.testing.assert_array_equal(common_triangles(source, 2, 2, wet, wet, [.5, .5], 2), [[0, 3, 1]])
+        # The A-D diagonal is shared by BOTH native full-wet triangles.
         source[0, 3] = 0
-        np.testing.assert_array_equal(common_triangles(source, 2, 2, wet, wet, [.5, .5], 2), [[1, 3, 2]])
+        self.assertEqual(len(common_triangles(source,2,2,wet,wet,[.5,.5],2)),0)
 
 
 if __name__ == '__main__':

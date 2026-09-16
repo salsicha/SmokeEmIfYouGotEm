@@ -38,8 +38,19 @@ def gradients(xy, values):
                      (a[:, 0]*db-b[:, 0]*da)/determinant), axis=1)
 
 
+def source_grid_triangles(nx, ny):
+    """Fully wet shoreline fan A,C,D / A,D,B, independent of world-Y winding.
+
+    BuildClipped emits the perimeter A,C,D,B from A. The older procedural
+    carrier's B-C diagonal is a different surface on a nonplanar quad.
+    """
+    root = np.arange(nx*ny).reshape(ny, nx)[:-1, :-1].ravel()
+    return np.concatenate((np.stack((root, root+nx, root+nx+1), 1),
+                           np.stack((root, root+nx+1, root+1), 1)))
+
+
 def raw_stage(points, source, nx, ny, sign, value_column=4):
-    """Original source-lattice triangle interpolation, only inside fully wet cells."""
+    """Actual shoreline A-D interpolation, only inside fully wet source cells."""
     grid = source.reshape(ny, nx, source.shape[1])
     xs, ys = grid[0, :, 1], grid[:, 0, 2]
     dx, dy = xs[1]-xs[0], ys[1]-ys[0]
@@ -56,8 +67,8 @@ def raw_stage(points, source, nx, ny, sign, value_column=4):
     corners = np.stack((a, a+1, a+nx, a+nx+1), axis=1)
     valid &= (source[corners, 3] == 1).all(axis=1)
     z = source[corners, value_column]
-    height = np.where(u+v <= 1, z[:, 0]*(1-u-v)+z[:, 2]*v+z[:, 1]*u,
-                      z[:, 1]*(1-v)+z[:, 2]*(1-u)+z[:, 3]*(u+v-1))
+    height = np.where(v >= u, z[:, 0]*(1-v)+z[:, 2]*(v-u)+z[:, 3]*u,
+                      z[:, 0]*(1-u)+z[:, 3]*v+z[:, 1]*(u-v))
     height[~valid] = np.nan
     return height, valid
 
@@ -143,7 +154,8 @@ def summarize(meta, vertices, triangles, source, radius):
     top = np.flatnonzero(areas >= 1e-4)
     top = top[np.argsort(-slope[top])[:12]]
     raw_lookup = {int(i): gradient.tolist() for i, gradient in zip(np.flatnonzero(raw_valid), raw_g)}
-    return dict(accepted=False, scope=meta['scope'], radius_m=radius, focus_world_m=focus.tolist(),
+    return dict(accepted=False, source_interpolation='shoreline_fan_A_C_D__A_D_B',
+        scope=meta['scope'], radius_m=radius, focus_world_m=focus.tolist(),
         world_seconds=meta['world_seconds'], detail_sequence=meta['detail_sequence'],
         selected_triangles=len(t), zero_projected_area_nearby=int((nearby & ~keep).sum()),
         projected_area_m2=float(areas.sum()), maximum_gradient_component_sum_error=float(residual),

@@ -2,7 +2,7 @@ import unittest
 import tempfile
 from pathlib import Path
 import numpy as np
-from audit_submitted_carrier_shape import gradients, raw_stage, summarize, read_table
+from audit_submitted_carrier_shape import gradients, raw_stage, summarize, read_table, source_grid_triangles
 
 
 class SubmittedCarrierShapeTest(unittest.TestCase):
@@ -33,6 +33,40 @@ class SubmittedCarrierShapeTest(unittest.TestCase):
         values = np.array([[4., 6., -2.]])
         np.testing.assert_array_equal(gradients(xy, values), [[1., -2.]])
         np.testing.assert_array_equal(gradients(xy[:, ::-1], values[:, ::-1]), [[1., -2.]])
+
+    def test_nonplanar_quad_uses_actual_shoreline_fan_not_legacy_diagonal(self):
+        # Native BuildClipped's fully wet perimeter is A,C,D,B. Only D is high:
+        # ACD is z=x, ADB is z=y. B-C interpolation would give zero at the
+        # first two probes and manufacture a source/presentation discrepancy.
+        _, _, _, source = self.fixture()
+        source[:, 4] = [0., 0., 0., 1.]
+        field_points = np.array([[.75,.25],[.25,.75],[.5,.5],[0.,0.],[1.,1.]])
+        for sign in (-1, 1):
+            heights, valid = raw_stage(field_points*[1,sign], source, 2, 2, sign)
+            np.testing.assert_array_equal(valid, np.ones(5, dtype=bool))
+            np.testing.assert_array_equal(heights, [.25,.25,.5,0.,1.])
+        np.testing.assert_array_equal(source_grid_triangles(2,2), [[0,2,3],[0,3,1]])
+
+    def test_refined_nonplanar_native_fan_has_no_invented_base_error(self):
+        meta, _, _, source = self.fixture()
+        meta.update(schema='raftsim.submitted_carrier_shape.v2',active_vertices=6,
+                    buffer_vertices=6,triangles=4)
+        source[:,4] = [0.,0.,0.,1.]
+        source = np.column_stack((source,source[:,4],source[:,4]))
+        xy = np.array([[0.,0.],[1.,0.],[0.,1.],[1.,1.],[.5,.5],[.25,.25]])
+        z = np.array([0.,0.,0.,1.,.5,.25])
+        vertices = np.column_stack((np.arange(6),xy*100,z*100,np.zeros((6,3))))
+        triangles = np.array([[0,2,4],[2,3,4],[0,4,1],[4,3,1]],dtype=float)
+        for sign in (-1,1):
+            meta['world_y_sign'] = sign
+            meta['focus_y_cm'] = sign*50
+            vertices[:,2] = xy[:,1]*100*sign
+            result = summarize(meta,vertices,triangles,source,30)
+            for group in result['slope_groups']:
+                parts = group['source_comparison_signed_gradient_along_displayed_slope']
+                if parts:
+                    self.assertAlmostEqual(parts['target_minus_source'],0.)
+                    self.assertAlmostEqual(parts['submitted_base_minus_target'],0.)
 
     def test_target_split_retains_opposite_signed_contributions(self):
         meta, vertices, triangles, source = self.fixture()

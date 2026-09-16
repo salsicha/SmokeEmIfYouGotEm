@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import numpy as np
-from audit_submitted_carrier_shape import read_table, SOURCE_FIELDS_V2, gradients, raw_stage
+from audit_submitted_carrier_shape import read_table, SOURCE_FIELDS_V2, gradients, raw_stage, source_grid_triangles
 
 
 def sha(path):
@@ -39,9 +39,7 @@ def exact_cells(points, origins, shape, spacing):
 def common_triangles(source, nx, ny, early, late, focus, radius):
     if len(source) != nx*ny or not np.isfinite(radius) or radius <= 0:
         raise ValueError('Invalid source size/radius')
-    root = np.arange(nx*ny).reshape(ny, nx)[:-1, :-1].ravel()
-    triangles = np.concatenate((np.stack((root, root+1, root+nx), 1),
-                                np.stack((root+1, root+nx+1, root+nx), 1)))
+    triangles = source_grid_triangles(nx, ny)
     xy = source[triangles, 1:3]
     keep = ((np.linalg.norm(xy.mean(1)-focus, axis=1) <= radius)
             & np.isfinite(early[triangles]).all(1) & np.isfinite(late[triangles]).all(1)
@@ -153,7 +151,8 @@ def main():
         statistics[label] = dict(area_at_least_30_degrees_m2=float(areas[slopes >= 30].sum()),
                                  maximum_degrees=float(slopes.max()))
     used = np.unique(triangles)
-    report = dict(schema='raftsim.carrier_source_epoch_comparison.v1', accepted=False, early_time_seconds=atlas['source_time_seconds'],
+    report = dict(schema='raftsim.carrier_source_epoch_comparison.v1', accepted=False,
+        source_interpolation='shoreline_fan_A_C_D__A_D_B', early_time_seconds=atlas['source_time_seconds'],
         late_time_seconds=complete['time_seconds'], captured_world_seconds=meta['world_seconds'],
         radius_m=args.radius_m, common_wet_triangles=len(triangles), common_wet_area_m2=float(areas.sum()),
         common_used_vertices=len(used), unavailable_or_off_lattice_vertices=int((~available).sum()),
