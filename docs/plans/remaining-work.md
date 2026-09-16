@@ -3,7 +3,28 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [native paired-terrain residency](../reconstruction-review-2026-09-07/native-terrain-residency.md).
+Latest: [matched 50s actual-game comparison](../reconstruction-review-2026-09-07/equal-age-bed-playback.md).
+Original and revised1280x720 captures use the same50s source age, crop and camera;
+full input controls PASS. Original central bowl persists; revised central bowl
+is absent in matched view, but broad froth/bank streaks remain visually unaccepted.
+250/300/350s state AND all86,720 exact-dry bank-face audits PASS, NOT settled.
+SAME solve46094/PID22940 LIVE; next8000/400s both audits. Runtime350s export /
+coverage / expectations PASS (19540 exit0), native64,935 collision/25,600 field
+queries and descriptor PASS (92376 exit0). Actual1280x720350s play25668 exit0:
+central bowl still absent, but more low-bank inundation and broad froth remain.
+1,930 sampled support points consistent (max4.77e-5cm); NOT full traversal or
+GPU parity. Steep subset remains source/base dominated. No visual promotion.
+SAME package83678/cook5852/shader35032 LIVE; preserve shader and DLL inputs.
+[Two exact normal candidates](../reconstruction-review-2026-09-07/active-normal-comparison.md)
+passed native/actual mesh comparisons but did not prove faster in both orders;
+removed from production source, recoverable locally. All22 binary identities
+and464 protected identities retained. Last ordinary17.819710FPS/p9581.6343ms
+still FAILS30FPS. NEXT normal native integration when cook is terminal, later
+source-consistent physical/visual comparison, breaking/froth and normal-play
+delivery. Later rivers, other-scene water, crew, normalization/regressions/release
+remain OPEN. Troublemaker remains only a rapid inside the South Fork scenario.
+
+Previous: [native paired-terrain residency](../reconstruction-review-2026-09-07/native-terrain-residency.md).
 Native loader now activates/retains verified terrain before paired water;
 original identity/transform/material and native source gates remain unchanged.
 Isolated native test PASS; actual1280x720 game activation before BeginPlay and
