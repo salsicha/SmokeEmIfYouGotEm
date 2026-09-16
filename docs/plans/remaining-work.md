@@ -3,7 +3,23 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [transient inundation and native residency](../reconstruction-review-2026-09-07/inundation-and-residency.md).
+Latest: [actual detail gameplay and exact continuation](../reconstruction-review-2026-09-07/detail-gameplay-handoff.md).
+Committed coverage fix48c161868 passes four native tests and52,689 route footprints.
+Separately linked actual gameplay DLL is verified loaded; replay70833 TERMINAL0
+passes eight post-ready handoffs,5593 fresh frames and372.800019 detail seconds,
+including the formerly failing handoff5.120s short replay remains incomplete,
+NOT a pass. Three adjacent native compatibility regressions PASS. Normal project
+module with paired-terrain GameMode and opt-in read-only probe compiles/links;
+distinct normal-entry replay8661/PID32124 now LIVE: original terrain replaced
+before BeginPlay, detail frames advancing; full replay pending. No live
+cook binaries replaced. Reference video playback works.600s solve46094 TERMINAL0;
+state AND dry-bank audits PASS, NOT settled. Exact5,382,400-cell restart PASS,
+new continuation40601/PID11316 LIVE to1800s;650s BOTH audits PASS, next700s.
+All464 protected identities and22 binaries retained. SAME package83678/cook5852/
+shader5104 LIVE. Normal-menu/visual/physical/30FPS acceptance and all later work
+remain OPEN. Troublemaker is only a rapid within the South Fork scenario.
+
+Previous: [transient inundation and native residency](../reconstruction-review-2026-09-07/inundation-and-residency.md).
 Zero-step native flux/history checks identify initialized upstream storage release:
 203 eastern tiles lose40,519.56m3 by450s; cut discharge121.42 versus inlet45.31m3/s.
 Local flooding peaks150–200s then drains; do not calibrate banks against this
