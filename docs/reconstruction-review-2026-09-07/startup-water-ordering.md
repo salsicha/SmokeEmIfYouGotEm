@@ -58,12 +58,33 @@ Report `tmp/startup-water-consumer-native-v2-20260916/index.json`, SHA256
 Targeted Python preview/retention/session checks: **80 PASS**. No older failing
 assertion or acceptance threshold was changed.
 
-Full candidate detail replay is now session **29793 / PID25548**, label
-`south-fork-consumer-order-detail-replay-v1-20260916`. It retains the original
-eight post-ready handoffs, 100 fresh frames, 60 detail seconds, 120 world seconds,
-and 900-second native observation timeout. Result pending, not accepted.
-The scoped runner owns temporary suspension/resumption of cook11316 and
-SM5 editor35584/worker34968; preserve its process handles and live inputs.
+Full candidate detail replay **29793 / PID25548** is terminal PASS, label
+`south-fork-consumer-order-detail-replay-v1-20260916`: eight post-ready handoffs,
+5,599 fresh frames and 373.200019 detail seconds. The original 100-frame,
+60-detail-second, 120-world-second and 900-second timeout gates are unchanged.
+Visual/performance acceptance and normal project deployment remain false.
+The scoped runner resumed all three temporarily suspended processes.
+Detail report SHA256:
+`d60df5185476b5bfc837d5926ba17f397b6f50be5c13dba4c09373412c399062`.
+
+## Opt-in startup render audit
+
+`-RaftSimStartupRenderAudit` records proxy creation, view relevance, mesh/buffer
+readiness and actual material shader availability during the first eight frame
+numbers. It uses read-only `GetMaterialNoFallback`; it does not request fallback
+compilation, change rendering settings, or delay screenshot capture.
+
+The v5 isolated gameplay module compiled and linked successfully, SHA256
+`91c9d862791615055ca3013b814feeb397110f5361e0fb50a3dbfc1e56945b2c`.
+Replay `south-fork-startup-render-submission-v5-20260916` exits 0, retains all
+24 actual 1280x720 frames, and resumes the hydraulic cook successfully.
+Render frames 4 and 5 submit initialized buffers with 57,690 and 147,651 indices,
+but their material shader maps contain no LocalVertexFactory BasePass shaders.
+Frame 6 first reports both NoLightMapPolicy BasePass vertex and pixel shaders.
+This narrows the missing initial water to shader readiness; the opt-in audit
+does not fix it. Whole-map completeness remains false even after those shaders
+appear, so it is not a substitute for checking the required pass permutations.
+No installed module, map asset, normal-menu delivery or FPS acceptance changes.
 
 ## Hydraulic continuation
 
@@ -90,8 +111,13 @@ Reports under `tmp/`, with SHA256:
   `cece2c936f565b3d244ae557ef0fd3129bc75ef2ea3055b8d0d94b52467b2912`
 
 Next hydraulic checkpoint: local13000 / absolute1250 seconds, both audits.
-The existing SM5 job is still live with worker34968; its prior hung-shadermap
-warning is not a terminal report. No restart or success claim.
+The SM5 suite is now terminal FAIL: 51 clean passes, one warned pass, 31 failures,
+zero not-run. The strict outer validator exits 1 despite the editor exiting 0.
+Failures include exact represented-float/subnormal arithmetic, nonlinear owner
+time stepping and total-depth integration. Two reconstructed fixtures explicitly
+require SM6/FP64 and are incompatible with this SM5 run; they are not waived or
+counted as passes. Report `tmp/sm5-resource-bindings-native-sm5-v1-20260916/index.json`,
+SHA256 `f7e87aa1b7ca3c9ca4d2e1f05bd861825e1d9dbfd22f16a7d759968ad2601d87`.
 
 Normal 30 FPS, coupled nonlinear water, terrain/rapid/foam/crew realism,
 source closure/default delivery, Colorado -> Pacuare -> Futaleufu, other-scene

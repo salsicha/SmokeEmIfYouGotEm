@@ -10,12 +10,18 @@ native four-test replay PASS and targeted Python80 PASS. Isolated compiled/linke
 candidate only; installed modules/assets unchanged. First startup image STILL
 dry, even with separate PSO-delay/render-lag diagnostic overrides; visual issue
 remains OPEN. All24 frames retained per replay; no capture warmup skip or FPS claim.
-Full candidate eight-handoff detail replay29793/PID25548 LIVE, unchanged gates;
-runner temporarily owns pause/resume of cook11316 and SM5 editor35584/worker34968.
+Full candidate detail replay29793 is terminal PASS: eight handoffs,5,599 fresh
+frames,373.200019 detail seconds; unchanged gates, no visual/FPS acceptance.
+Opt-in read-only startup render audit compiles/links and retains24 frames: mesh
+buffers are ready before required LocalVF BasePass shaders appear at render
+frame6. Initial water rendering remains unfixed; installed binaries unchanged.
+SM5 suite47178 terminal FAIL:51 clean passes,1 warned pass,31 failures,0 not-run.
+Arithmetic, nonlinear time-stepping and incompatible SM6-only fixtures remain
+documented failures, not waived. Scoped replay runners resumed their owned jobs.
 1150/1200 hydraulic state AND all86,720 exact-dry bank checks PASS, NOT settled;
 1200 outflow74.629022 versus inflow45.306955m3/s. Next1250/local13000 both audits.
-Last ordinary22.560934FPS/p9553.9323ms still FAIL30. NEXT initial render submission,
-full detail replay result, coupled nonlinear-water integration, source-consistent
+Last ordinary22.560934FPS/p9553.9323ms still FAIL30. NEXT initial water shader
+readiness, coupled nonlinear-water integration, source-consistent
 terrain/rapid/wave/froth review, source closure/default-menu delivery, sustained
 30FPS, normalization, Colorado -> Pacuare -> Futaleufu, all-scene water, crew and
 release gates. Troublemaker is a rapid inside South Fork, never a menu scenario.

@@ -1,6 +1,8 @@
 #include "RaftSimShorelineMeshComponent.h"
 #include "DynamicMeshBuilder.h"
 #include "Materials/Material.h"
+#include "Materials/MaterialRenderProxy.h"
+#include "MaterialShared.h"
 #include "MaterialDomain.h"
 #include "PrimitiveSceneProxy.h"
 #include "PrimitiveViewRelevance.h"
@@ -81,8 +83,12 @@ public:
         , Material(Component->GetMaterial(0))
         , MaterialRelevance(Component->GetMaterialRelevance(GetScene().GetShaderPlatform()))
         , ActiveIndices(Component->GetWaterIndices().Num())
+        , bStartupRenderAudit(FParse::Param(FCommandLine::Get(),TEXT("RaftSimStartupRenderAudit")))
     {
         if (!Material) Material = UMaterial::GetDefaultMaterial(MD_Surface);
+        if (bStartupRenderAudit && GFrameCounter<8)
+            UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_PROXY game_frame=%llu indices=%d visible=%d material=%s bounds=%s"),
+                GFrameCounter,ActiveIndices,Component->IsVisible(),*Material->GetPathName(),*Component->Bounds.ToString());
         const auto Packet=MakeRenderPacket(Component->GetWaterVertices(),Component->GetWaterIndices(),true);
         TArray<FDynamicMeshVertex> Vertices;
         // Retain worst-case allocation and dry/rewet proxy stability, but draw
@@ -177,6 +183,9 @@ public:
         Result.bRenderCustomDepth = ShouldRenderCustomDepth();
         MaterialRelevance.SetPrimitiveViewRelevance(Result);
         Result.bVelocityRelevance = DrawsVelocity() && Result.bOpaque && Result.bRenderInMainPass;
+        if (bStartupRenderAudit && View->Family->FrameNumber<8)
+            UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_RELEVANCE render_frame=%u draw=%d main=%d opaque=%d indices=%d"),
+                View->Family->FrameNumber,Result.bDrawRelevance,Result.bRenderInMainPass,Result.bOpaque,ActiveIndices);
         return Result;
     }
 
@@ -205,6 +214,25 @@ public:
     void GetDynamicMeshElements(const TArray<const FSceneView*>& Views,
         const FSceneViewFamily& Family, uint32 VisibilityMap, FMeshElementCollector& Collector) const override
     {
+        if (bStartupRenderAudit && Family.FrameNumber<8)
+        {
+            const FMaterial* DrawMaterial=Material->GetRenderProxy()->GetMaterialNoFallback(GetScene().GetFeatureLevel());
+            const FMaterialShaderMap* ShaderMap=DrawMaterial ? DrawMaterial->GetRenderingThreadShaderMap() : nullptr;
+            UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_DRAW render_frame=%u mask=%u indices=%d buffers_ready=%d"),
+                Family.FrameNumber,VisibilityMap,ActiveIndices,IndexBuffer.IsInitialized() && VertexFactory.IsInitialized());
+            UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_MATERIAL render_frame=%u material_present=%d shader_map=%d complete=%d single_layer_water=%d material=%s"),
+                Family.FrameNumber,DrawMaterial!=nullptr,ShaderMap!=nullptr,DrawMaterial && DrawMaterial->IsRenderingThreadShaderMapComplete(),
+                DrawMaterial && DrawMaterial->GetShadingModels().HasShadingModel(MSM_SingleLayerWater),DrawMaterial ? *DrawMaterial->GetFriendlyName() : TEXT("none"));
+            if (ShaderMap)
+            {
+                TMap<FShaderId,TShaderRef<FShader>> Shaders;
+                ShaderMap->GetShaderList(Shaders);
+                for (const auto& Pair:Shaders)
+                    if (Pair.Key.VFType==VertexFactory.GetType() && FString(Pair.Key.Type->GetName()).Contains(TEXT("BasePass")))
+                        UE_LOG(LogTemp,Display,TEXT("STARTUP_WATER_SHADER render_frame=%u type=%s permutation=%d"),
+                            Family.FrameNumber,Pair.Key.Type->GetName(),Pair.Key.PermutationId);
+            }
+        }
         if (!ActiveIndices) return;
         for (int32 View=0; View<Views.Num(); ++View) if (VisibilityMap & (1<<View))
         {
@@ -263,6 +291,7 @@ private:
     UMaterialInterface* Material;
     FMaterialRelevance MaterialRelevance;
     int32 ActiveIndices;
+    bool bStartupRenderAudit;
 };
 }
 
