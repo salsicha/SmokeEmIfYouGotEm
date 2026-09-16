@@ -24,7 +24,7 @@ public:
     // Indexed full surface, world centimetres. Linear motion of every vertex;
     // no convex hull, support-point subset or fitted capsule replacement.
     RaftSimSurfaceSweep::FResult SweepSurface(TConstArrayView<FVector> StartCm,
-        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm=-1.) const;
+        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm=-1.,bool bGroupedBroadPhase=true) const;
     bool IsValid() const { return bValid; }
     int32 TriangleCount() const { return Triangles.Num(); }
 private:

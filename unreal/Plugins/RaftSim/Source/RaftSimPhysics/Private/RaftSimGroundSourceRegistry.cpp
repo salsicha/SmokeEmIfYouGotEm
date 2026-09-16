@@ -47,7 +47,7 @@ bool FRaftSimGroundSourceRegistry::SweepCapturedSphere(const FVector& StartCm,
 
 RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
     TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
-    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm)
+    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase)
 {
     CSV_SCOPED_TIMING_STAT(RaftSimGround,SurfaceSweep);
     using namespace RaftSimSurfaceSweep;
@@ -76,7 +76,7 @@ RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
             UE_LOG(LogTemp,Display,TEXT("Captured surface sweep source: component=%s triangles=%d ready=%d build_ms=%.3f"),
                 *Mesh->GetPathName(),Cache->TriangleCount(),int32(Built),(FPlatformTime::Seconds()-Started)*1000.);
         }
-        auto Hit=Cache->SweepSurface(StartCm,EndCm,Faces,SkinCm,ProvenClearanceCm);Hit.GroundComponent=Mesh;
+        auto Hit=Cache->SweepSurface(StartCm,EndCm,Faces,SkinCm,ProvenClearanceCm,bGroupedBroadPhase);Hit.GroundComponent=Mesh;
         Pairs+=Hit.TrianglePairs;
         if(Hit.Status==EStatus::Invalid || Hit.Status==EStatus::Unresolved || Hit.Status==EStatus::InitialIntersection)
         {Hit.TrianglePairs=Pairs;return Hit;}

@@ -3,7 +3,24 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [full indexed-surface queries and actual-play verification](../reconstruction-review-2026-09-07/normal-river-full-surface-queries.md).
+Latest: [integrated full-hull response and exact-source query optimization](../reconstruction-review-2026-09-07/normal-river-full-hull-response.md).
+Opt-in full authored/deforming hull contact is now integrated; final build and
+28 native tests PASS. Grouped source-BVH traversal and once-per-vertex coordinate
+conversion preserve exact reference results and reduce same-input query cost.
+Final actual South Fork replay reaches station 8430.210 m at world time 132.191 s:
+213 response entries, zero rejected hull steps, latched failures or mesh mismatches.
+NOT whole-river, initial-containment, packaged or default-promotion acceptance.
+All 464 protected asset hashes unchanged. Broad froth/inferred flanks remain
+visually unaccepted; ordinary 30 FPS gate still FAILS (last 17.819710 FPS /
+p95 81.6343 ms). Current-scene paired foam source/density/coverage evidence is
+next, alongside remaining runtime cost and contact qualification. Completed
+650/700/750 s hydraulic cell/bank audits PASS, NOT settled. SAME continuation
+session84989 / PID32068 verified live; next completed local 4000 / absolute
+800 s audit. Never restart on observation timeout. Colorado -> Pacuare ->
+Futaleufu, other-scene water, crew, normalization, physical regressions and
+release remain OPEN. Troublemaker remains a rapid within South Fork only.
+
+Previous: [full indexed-surface queries and actual-play verification](../reconstruction-review-2026-09-07/normal-river-full-surface-queries.md).
 Final build and 19 native tests PASS, including every authored hull face and a
 fully deforming linear sweep; full-hull impulse/rotation/overlap integration is
 STILL NEXT. Optimized shared-source actual South Fork replay has zero rejected

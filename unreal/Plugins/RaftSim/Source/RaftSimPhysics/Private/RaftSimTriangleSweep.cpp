@@ -106,29 +106,67 @@ bool RaftSimTriangleSweep::Triangle(const FVector& Start,const FVector& End,doub
 
 RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
     TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
-    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm) const
+    TConstArrayView<FIntVector> Faces,double SkinCm,double ProvenClearanceCm,bool bGroupedBroadPhase) const
 {
     using namespace RaftSimSurfaceSweep;
     FResult Best;
     if(!bValid || StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
         !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8 || !FMath::IsFinite(ProvenClearanceCm) || ProvenClearanceCm>=SkinCm)return Best;
+    TArray<FVector> LocalStart,LocalEnd;
+    if(bGroupedBroadPhase){LocalStart.SetNumUninitialized(StartCm.Num());LocalEnd.SetNumUninitialized(EndCm.Num());}
     for(int32 I=0;I<StartCm.Num();++I)
+    {
         if(StartCm[I].ContainsNaN() || EndCm[I].ContainsNaN())return Best;
+        // Exactly the reference arithmetic, once per original vertex rather
+        // than repeated for each indexed face and its enclosing group.
+        if(bGroupedBroadPhase){LocalStart[I]=(StartCm[I]-OriginCm)*.01;LocalEnd[I]=(EndCm[I]-OriginCm)*.01;}
+    }
     for(const auto& F:Faces)
         if(!StartCm.IsValidIndex(F.X) || !StartCm.IsValidIndex(F.Y) || !StartCm.IsValidIndex(F.Z))return Best;
     Best.Status=EStatus::Clear;Best.Time=1.;uint64 Pairs=0;
+    TArray<int32,TInlineAllocator<64>> GroupLeaves;
     for(int32 Face=0;Face<Faces.Num();++Face)
     {
+        if(bGroupedBroadPhase && Face%64==0)
+        {
+            // Amortize the upper tree walk across consecutive source faces.
+            // This box contains EVERY endpoint in the group; no face, time,
+            // deformation or source triangle is approximated or omitted.
+            FBox GroupBounds(ForceInit);
+            const double Limit=Best.Status==EStatus::Contact?Best.Time:1.;
+            for(int32 F=Face;F<FMath::Min(Face+64,Faces.Num());++F)
+                for(int32 V=0;V<3;++V)
+                {
+                    const int32 Index=Faces[F][V];
+                    const FVector A=LocalStart[Index],B=LocalEnd[Index];
+                    GroupBounds+=A;GroupBounds+=A+(B-A)*Limit;
+                }
+            GroupBounds=GroupBounds.ExpandBy(SkinCm*.01+1.e-10);
+            GroupLeaves.Reset();TArray<int32,TInlineAllocator<64>> Pending;Pending.Add(0);
+            while(!Pending.IsEmpty())
+            {
+                const int32 Index=Pending.Pop(EAllowShrinking::No);const auto& Node=Nodes[Index];
+                if(!GroupBounds.Intersect(Node.Bounds))continue;
+                if(Node.Count==0){Pending.Add(Node.Left);Pending.Add(Node.Right);}
+                else GroupLeaves.Add(Index);
+            }
+        }
+        if(bGroupedBroadPhase && GroupLeaves.IsEmpty())continue;
         const auto& Indices=Faces[Face];FTriangle Start,End;FBox Bounds(ForceInit);
         const double BoundLimit=Best.Status==EStatus::Contact?Best.Time:1.;
         for(int32 I=0;I<3;++I)
         {
-            Start.V[I]=(StartCm[Indices[I]]-OriginCm)*.01;
-            End.V[I]=(EndCm[Indices[I]]-OriginCm)*.01;
+            Start.V[I]=bGroupedBroadPhase?LocalStart[Indices[I]]:(StartCm[Indices[I]]-OriginCm)*.01;
+            End.V[I]=bGroupedBroadPhase?LocalEnd[Indices[I]]:(EndCm[Indices[I]]-OriginCm)*.01;
             Bounds+=Start.V[I];Bounds+=Start.V[I]+(End.V[I]-Start.V[I])*BoundLimit;
         }
         Bounds=Bounds.ExpandBy(SkinCm*.01+1.e-10);
-        TArray<int32,TInlineAllocator<64>> Stack;Stack.Add(0);
+        TArray<int32,TInlineAllocator<64>> Stack;
+        // Reverse insertion preserves the exact reference DFS leaf/pair order,
+        // including first-hit ties. Per-face bounds still filter every leaf.
+        if(bGroupedBroadPhase)
+            for(int32 I=GroupLeaves.Num()-1;I>=0;--I)Stack.Add(GroupLeaves[I]);
+        else Stack.Add(0);
         while(!Stack.IsEmpty())
         {
             const auto& Node=Nodes[Stack.Pop(EAllowShrinking::No)];
