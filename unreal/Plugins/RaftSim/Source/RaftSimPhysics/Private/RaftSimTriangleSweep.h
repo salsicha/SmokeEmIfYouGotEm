@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Engine/HitResult.h"
+#include "RaftSimSurfaceSweep.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
@@ -20,6 +21,10 @@ public:
     bool Build(UStaticMeshComponent* Component);
     bool Matches(UStaticMeshComponent* Component) const;
     bool Sweep(const FVector& StartCm,const FVector& EndCm,double RadiusCm,FHitResult& Hit) const;
+    // Indexed full surface, world centimetres. Linear motion of every vertex;
+    // no convex hull, support-point subset or fitted capsule replacement.
+    RaftSimSurfaceSweep::FResult SweepSurface(TConstArrayView<FVector> StartCm,
+        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm) const;
     bool IsValid() const { return bValid; }
     int32 TriangleCount() const { return Triangles.Num(); }
 private:

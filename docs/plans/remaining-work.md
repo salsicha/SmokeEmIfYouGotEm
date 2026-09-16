@@ -3,7 +3,20 @@
 Last reviewed 2026-09-16 UTC. This index does not convert diagnostic passes into
 completed scenes. The request is to finish the work, not merely close its records.
 
-Latest: [shared authored hull snapshot checkpoint](../reconstruction-review-2026-09-07/normal-river-shared-hull-snapshot.md).
+Latest: [full indexed-surface queries and actual-play verification](../reconstruction-review-2026-09-07/normal-river-full-surface-queries.md).
+Final build and 19 native tests PASS, including every authored hull face and a
+fully deforming linear sweep; full-hull impulse/rotation/overlap integration is
+STILL NEXT. Optimized shared-source actual South Fork replay has zero rejected
+contact steps or mesh mismatches through 72.159 s. All 464 protected hashes are
+unchanged. Ordinary performance STILL FAILS: 17.819710 FPS / p95 81.6343 ms versus
+the unchanged 30 FPS target. Broad froth and inferred rock flanks remain visually
+unaccepted. Original landward cook completed 600 s, final cell/bank audits PASS
+but NOT settled. Exact-state 600-to-1200 s continuation retains geometry and
+boundaries; native restart audit PASS for all 5,350,400 cells. LIVE session84989 /
+PID32068; next completed local 1000 / absolute 650 s audit. Never restart a live
+process on timeout. All later rivers and remaining acceptance work OPEN.
+
+Previous: [shared authored hull snapshot checkpoint](../reconstruction-review-2026-09-07/normal-river-shared-hull-snapshot.md).
 Complete indexed authored hull geometry now has fixed-step prepare/commit and
 renderer agreement checks behind an opt-in review flag. Final editor build and
 16 targeted native tests PASS, including exact optimized deformation/shading

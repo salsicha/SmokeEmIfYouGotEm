@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "LandscapeProxy.h"
 #include "Components/StaticMeshComponent.h"
+#include "RaftSimSurfaceSweep.h"
 class FRaftSimTriangleSweepMesh;
 
 // Game-thread contact sources. Keep weak references, but invalidate membership
@@ -54,6 +55,8 @@ public:
     bool SampleGround(const FVector& WorldPositionCm, double& OutGroundZCm, FVector& OutGroundNormal,
         FHitResult* OutCapturedHit=nullptr);
     bool SweepCapturedSphere(const FVector& StartCm,const FVector& EndCm,double RadiusCm,FHitResult& OutHit);
+    RaftSimSurfaceSweep::FResult SweepCapturedSurface(TConstArrayView<FVector> StartCm,
+        TConstArrayView<FVector> EndCm,TConstArrayView<FIntVector> Faces,double SkinCm);
     TArray<TWeakObjectPtr<ALandscapeProxy>> Landscapes;
     TArray<TWeakObjectPtr<UStaticMeshComponent>> Meshes;
 private:

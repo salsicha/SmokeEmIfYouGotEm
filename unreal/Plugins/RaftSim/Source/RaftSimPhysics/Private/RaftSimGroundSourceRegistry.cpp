@@ -45,6 +45,46 @@ bool FRaftSimGroundSourceRegistry::SweepCapturedSphere(const FVector& StartCm,
     return Found;
 }
 
+RaftSimSurfaceSweep::FResult FRaftSimGroundSourceRegistry::SweepCapturedSurface(
+    TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
+    TConstArrayView<FIntVector> Faces,double SkinCm)
+{
+    CSV_SCOPED_TIMING_STAT(RaftSimGround,SurfaceSweep);
+    using namespace RaftSimSurfaceSweep;
+    FResult Best;
+    if(StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
+        !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8)return Best;
+    FBox Bounds(ForceInit);
+    for(int32 I=0;I<StartCm.Num();++I)
+    {
+        if(StartCm[I].ContainsNaN() || EndCm[I].ContainsNaN())return Best;
+        Bounds+=StartCm[I];Bounds+=EndCm[I];
+    }
+    for(const auto& F:Faces)
+        if(!StartCm.IsValidIndex(F.X) || !StartCm.IsValidIndex(F.Y) || !StartCm.IsValidIndex(F.Z))return Best;
+    Bounds=Bounds.ExpandBy(SkinCm+1.e-8);
+    RefreshIfDirty();Best.Status=EStatus::Clear;Best.Time=1.;uint64 Pairs=0;
+    for(const auto& WeakMesh:Meshes)
+    {
+        auto* Mesh=WeakMesh.Get();
+        if(!Mesh || !Mesh->IsQueryCollisionEnabled() || !Bounds.Intersect(Mesh->Bounds.GetBox()))continue;
+        auto& Cache=TriangleCaches.FindOrAdd(WeakMesh);
+        if(!Cache || !Cache->Matches(Mesh))
+        {
+            Cache=MakeShared<FRaftSimTriangleSweepMesh>();
+            const double Started=FPlatformTime::Seconds();const bool Built=Cache->Build(Mesh);
+            UE_LOG(LogTemp,Display,TEXT("Captured surface sweep source: component=%s triangles=%d ready=%d build_ms=%.3f"),
+                *Mesh->GetPathName(),Cache->TriangleCount(),int32(Built),(FPlatformTime::Seconds()-Started)*1000.);
+        }
+        auto Hit=Cache->SweepSurface(StartCm,EndCm,Faces,SkinCm);Hit.GroundComponent=Mesh;
+        Pairs+=Hit.TrianglePairs;
+        if(Hit.Status==EStatus::Invalid || Hit.Status==EStatus::Unresolved || Hit.Status==EStatus::InitialIntersection)
+        {Hit.TrianglePairs=Pairs;return Hit;}
+        if(Hit.Status==EStatus::Contact && (Best.Status==EStatus::Clear || Hit.Time<Best.Time))Best=Hit;
+    }
+    Best.TrianglePairs=Pairs;return Best;
+}
+
 bool FRaftSimGroundSourceRegistry::SampleGround(const FVector& WorldPositionCm,
     double& OutGroundZCm, FVector& OutGroundNormal,FHitResult* OutCapturedHit)
 {

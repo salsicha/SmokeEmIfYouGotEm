@@ -104,6 +104,64 @@ bool RaftSimTriangleSweep::Triangle(const FVector& Start,const FVector& End,doub
     return Found;
 }
 
+RaftSimSurfaceSweep::FResult FRaftSimTriangleSweepMesh::SweepSurface(
+    TConstArrayView<FVector> StartCm,TConstArrayView<FVector> EndCm,
+    TConstArrayView<FIntVector> Faces,double SkinCm) const
+{
+    using namespace RaftSimSurfaceSweep;
+    FResult Best;
+    if(!bValid || StartCm.IsEmpty() || StartCm.Num()!=EndCm.Num() || Faces.IsEmpty() ||
+        !FMath::IsFinite(SkinCm) || SkinCm<=1.e-8)return Best;
+    for(int32 I=0;I<StartCm.Num();++I)
+        if(StartCm[I].ContainsNaN() || EndCm[I].ContainsNaN())return Best;
+    for(const auto& F:Faces)
+        if(!StartCm.IsValidIndex(F.X) || !StartCm.IsValidIndex(F.Y) || !StartCm.IsValidIndex(F.Z))return Best;
+    Best.Status=EStatus::Clear;Best.Time=1.;uint64 Pairs=0;
+    for(int32 Face=0;Face<Faces.Num();++Face)
+    {
+        const auto& Indices=Faces[Face];FTriangle Start,End;FBox Bounds(ForceInit);
+        const double BoundLimit=Best.Status==EStatus::Contact?Best.Time:1.;
+        for(int32 I=0;I<3;++I)
+        {
+            Start.V[I]=(StartCm[Indices[I]]-OriginCm)*.01;
+            End.V[I]=(EndCm[Indices[I]]-OriginCm)*.01;
+            Bounds+=Start.V[I];Bounds+=Start.V[I]+(End.V[I]-Start.V[I])*BoundLimit;
+        }
+        Bounds=Bounds.ExpandBy(SkinCm*.01+1.e-10);
+        TArray<int32,TInlineAllocator<64>> Stack;Stack.Add(0);
+        while(!Stack.IsEmpty())
+        {
+            const auto& Node=Nodes[Stack.Pop(EAllowShrinking::No)];
+            if(!Bounds.Intersect(Node.Bounds))continue;
+            if(Node.Count==0){Stack.Add(Node.Left);Stack.Add(Node.Right);continue;}
+            for(int32 I=Node.Begin;I<Node.Begin+Node.Count;++I)
+            {
+                const int32 GroundFace=Order[I];const auto& T=Triangles[GroundFace];
+                const FTriangle Ground{{Vertices[T.X],Vertices[T.Y],Vertices[T.Z]}};
+                FBox FaceBounds(ForceInit);for(const auto& V:Ground.V)FaceBounds+=V;
+                if(!Bounds.Intersect(FaceBounds))continue;
+                // Once an impact is known, later events cannot change the
+                // earliest result. Prove every other source pair only up to
+                // that time, rather than entering already-forbidden geometry
+                // and rejecting an irrelevant later near-tangent event.
+                const double Limit=Best.Status==EStatus::Contact?Best.Time:1.;
+                FTriangle ClippedEnd;
+                for(int32 V=0;V<3;++V)ClippedEnd.V[V]=Start.V[V]+(End.V[V]-Start.V[V])*Limit;
+                ++Pairs;auto Hit=RaftSimSurfaceSweep::Sweep(Start,ClippedEnd,Ground,SkinCm*.01);
+                Hit.Time*=Limit;
+                Hit.MovingFace=Face;Hit.GroundFace=GroundFace;
+                // Witness positions returned in world metres; normals already
+                // include the exact source component scale/reflection/rotation.
+                Hit.Witness.MovingPoint+=OriginCm*.01;Hit.Witness.GroundPoint+=OriginCm*.01;
+                if(Hit.Status==EStatus::Invalid || Hit.Status==EStatus::Unresolved || Hit.Status==EStatus::InitialIntersection)
+                {Hit.TrianglePairs=Pairs;return Hit;}
+                if(Hit.Status==EStatus::Contact && (Best.Status==EStatus::Clear || Hit.Time<Best.Time))Best=Hit;
+            }
+        }
+    }
+    Best.TrianglePairs=Pairs;return Best;
+}
+
 bool FRaftSimTriangleSweepMesh::Matches(UStaticMeshComponent* Component) const
 {
     UStaticMesh* Mesh=Component?Component->GetStaticMesh():nullptr;
